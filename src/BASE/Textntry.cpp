@@ -52,7 +52,7 @@ VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
     m_icon = NULL;
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
     m_maxLength = 0;
     m_iconFrame = 0;
     m_displayOffset = 0;
@@ -71,7 +71,7 @@ textEntryWidget::textEntryWidget(
     char* iconName,
     i16 iconFrame,
     i16 id,
-    i16 kind,
+    H2_ENUM_PARAM(WidgetKind, i16) kind,
     i16 layout,
     i32 horizontalInset,
     i32 verticalInset
@@ -85,7 +85,7 @@ textEntryWidget::textEntryWidget(
     m_icon = loadedIcon;
     m_iconFrame = iconFrame;
     m_rectX = rectX;
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
     m_rectY = m_y;
     m_rectW = m_width;
     m_maxLength = maxLength;
@@ -177,7 +177,7 @@ void textEntryWidget::Read(i32 type) {
     m_iconFrame = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
     gpResourceManager->ReadWord();
-    m_kind = EncodeWidgetKind(WIDGET_KIND_TEXT_ENTRY);
+    m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
 VA(0x004d8b90, 0x874)

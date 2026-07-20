@@ -15,7 +15,16 @@ public:
     icon* m_backgroundIcon;
     i16 m_fillColor;
     border(void);
-    border(i16, i16, i16, i16, i16, i16, i16, char*);
+    border(
+        i16,
+        i16,
+        i16,
+        i16,
+        i16,
+        H2_ENUM_PARAM(WidgetKind, i16),
+        i16,
+        char*
+    );
     virtual ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual i32 Main(struct tag_message&) OVERRIDE;

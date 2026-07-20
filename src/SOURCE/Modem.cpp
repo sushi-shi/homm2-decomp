@@ -39,7 +39,7 @@ void ModemSetup(i32 mode) {
     iBaudBits = MODEM_BAUD_CLOCK / IDX(gConfig.baudRate[gbDirectConnect]);
     com_init(
         static_cast<u8>(gConfig.comPort[gbDirectConnect]),
-        IDX(COM_BAUD_19200),
+        COM_BAUD_19200,
         0
     );
     LogStr("MS2");

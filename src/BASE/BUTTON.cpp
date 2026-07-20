@@ -20,7 +20,7 @@ H2_ENUM_BEGIN(ButtonConstant)
 H2_ENUM_END(ButtonConstant)
 
 VA(0x004dd440, 0x34)
-button::button(void) : widget(0, 0, 0, 0, 0, 0) {
+button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
     m_iconId = 0;
@@ -41,7 +41,7 @@ button::button(
     H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
     i16 hotkey,
     i16 id,
-    i16 kind
+    H2_ENUM_PARAM(WidgetKind, i16) kind
 )
     : widget(x, y, width, height, id, kind) {
     m_iconId = iconId;
@@ -64,7 +64,7 @@ button::button(
     H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
     i16 hotkey,
     i16 id,
-    i16 kind
+    H2_ENUM_PARAM(WidgetKind, i16) kind
 )
     : widget(x, y, width, height, id, kind) {
     u32l iconId = gpResourceManager->MakeId(iconName, 1);
@@ -109,7 +109,7 @@ inline button::~button() {
 
 VA(0x004dd6d0, 0x595)
 i32 button::Main(tag_message& msg) {
-    if (DecodeWidgetKind(m_kind) == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
+    if (m_kind == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
         if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
             return WIDGET_DISPATCH_CONTINUE;

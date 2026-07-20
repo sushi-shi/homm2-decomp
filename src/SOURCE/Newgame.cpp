@@ -222,7 +222,6 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
     PLAYER_RACE_CYCLE_WIDTH           = 62,
     PLAYER_RACE_CYCLE_HEIGHT          = 45,
     PLAYER_RACE_CYCLE_FRAME           = 51,
-    PLAYER_WIDGET_KIND                = WIDGET_KIND_ICON_DIRECT,
     PLAYER_WIDGET_FILL_COLOR          = 1,
     SCENARIO_PLAYER_Y_OFFSET          = 34,
     SCENARIO_PLAYER_HUMAN_Y           = PLAYER_HUMAN_Y - SCENARIO_PLAYER_Y_OFFSET,
@@ -684,7 +683,7 @@ void game::InitNewGameWindow(void) {
                 PLAYER_HUMAN_FRAME,
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
-                PLAYER_WIDGET_KIND,
+                WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
             if (iconControlLocal == NULL)
@@ -701,7 +700,7 @@ void game::InitNewGameWindow(void) {
                 0,
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
-                PLAYER_WIDGET_KIND,
+                WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
             if (iconControlLocal == NULL)
@@ -727,7 +726,7 @@ void game::InitNewGameWindow(void) {
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -753,7 +752,7 @@ void game::InitNewGameWindow(void) {
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -774,7 +773,7 @@ void game::InitNewGameWindow(void) {
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -796,7 +795,7 @@ void game::InitNewGameWindow(void) {
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
-                MESSAGE_WIDGET,
+                WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (textControlLocal == NULL)
@@ -818,7 +817,7 @@ void game::InitNewGameWindow(void) {
             PLAYER_RACE_ICON_FRAME,
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -850,7 +849,7 @@ void game::InitNewGameWindow(void) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
-            MESSAGE_WIDGET,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (textControlLocal == NULL)
@@ -868,7 +867,7 @@ void game::InitNewGameWindow(void) {
             PLAYER_RACE_CYCLE_FRAME,
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -887,7 +886,7 @@ void game::UpdateNewGameWindow(void) {
     strcpy(gText, m_mapHeader.name);
     messageTemp.type = MESSAGE_WIDGET;
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    messageTemp.payload.widget.id = EncodeNewGameControl(NEW_GAME_SCENARIO_NAME);
+    messageTemp.payload.widget.id = NEW_GAME_SCENARIO_NAME;
     messageTemp.payload.widget.data.text = gText;
     m_newGameWindow->BroadcastMessage(messageTemp);
 
@@ -895,12 +894,12 @@ void game::UpdateNewGameWindow(void) {
     messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
     for (playerIndex3 = 0; playerIndex3 < IDX(DIFFICULTY_COUNT); ++playerIndex3) {
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, playerIndex3);
+            NEW_GAME_DIFFICULTY_FIRST + playerIndex3;
         m_newGameWindow->BroadcastMessage(messageTemp);
     }
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
     messageTemp.payload.widget.id =
-        EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, IDX(m_difficulty));
+        NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
     m_newGameWindow->BroadcastMessage(messageTemp);
 
     if (giNumHumanPlayers > 1) {
@@ -908,7 +907,7 @@ void game::UpdateNewGameWindow(void) {
             sprintf(gText, cTextReceivedBuffer[playerIndex3]);
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
             messageTemp.payload.widget.id =
-                EncodeNewGameControlIndex(NEW_GAME_CHAT_FIRST, playerIndex3);
+                NEW_GAME_CHAT_FIRST + playerIndex3;
             messageTemp.payload.widget.data.text = gText;
             m_newGameWindow->BroadcastMessage(messageTemp);
         }
@@ -924,7 +923,7 @@ void game::UpdateNewGameWindow(void) {
         }
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_NAME_FIRST, playerIndex3);
+            NEW_GAME_PLAYER_NAME_FIRST + playerIndex3;
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
@@ -933,7 +932,7 @@ void game::UpdateNewGameWindow(void) {
         else
             messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_SELECT_FIRST, playerIndex3);
+            NEW_GAME_PLAYER_SELECT_FIRST + playerIndex3;
         messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
@@ -945,7 +944,7 @@ void game::UpdateNewGameWindow(void) {
             playerLockedValue = 1;
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_COLOR_FIRST, playerIndex3);
+            NEW_GAME_COLOR_FIRST + playerIndex3;
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.data.value =
                 m_setupPlayerColor[playerIndex3]
@@ -969,7 +968,7 @@ void game::UpdateNewGameWindow(void) {
 
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_HANDICAP_FIRST, playerIndex3);
+            NEW_GAME_HANDICAP_FIRST + playerIndex3;
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
@@ -991,7 +990,7 @@ void game::UpdateNewGameWindow(void) {
         m_newGameWindow->BroadcastMessage(messageTemp);
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, playerIndex3);
+            NEW_GAME_RACE_CYCLE_FIRST + playerIndex3;
         messageTemp.payload.widget.data.value =
             IDX(m_setupPlayerRace[playerIndex3])
             + (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE
@@ -1001,7 +1000,7 @@ void game::UpdateNewGameWindow(void) {
         sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex3])]);
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, playerIndex3);
+            NEW_GAME_RACE_NAME_FIRST + playerIndex3;
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
         if (playerLockedValue)
@@ -1014,7 +1013,7 @@ void game::UpdateNewGameWindow(void) {
 
     gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    messageTemp.payload.widget.id = EncodeNewGameControl(NEW_GAME_RATING);
+    messageTemp.payload.widget.id = NEW_GAME_RATING;
     sprintf(gText, "%s %d%%", "Rating", gpGame->m_difficultyRating);
     messageTemp.payload.widget.data.text = gText;
     m_newGameWindow->BroadcastMessage(messageTemp);
@@ -1044,7 +1043,7 @@ i32 NewGameHandler(struct tag_message& message) {
         gbNewGameShadowHidden = true;
         windowMessage.type = MESSAGE_WIDGET;
         windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        windowMessage.payload.widget.id = EncodeNewGameControl(NEW_GAME_SHADOW);
+        windowMessage.payload.widget.id = NEW_GAME_SHADOW;
         windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
         gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
     }
@@ -1166,56 +1165,35 @@ i32 NewGameHandler(struct tag_message& message) {
             || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
             helpDialogIndexLocal = -1;
             if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
-                 && message.payload.widget.id <= LastNewGameControl(
-                        NEW_GAME_DIFFICULTY_HELP_FIRST,
-                        IDX(DIFFICULTY_COUNT)
-                    ))
+                 && message.payload.widget.id <= NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_COUNT) - 1)
                 || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
-                    && message.payload.widget.id <= LastNewGameControl(
-                           NEW_GAME_DIFFICULTY_FIRST,
-                           IDX(DIFFICULTY_COUNT)
-                       )))
+                    && message.payload.widget.id <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
                 helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
             if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
-                 && message.payload.widget.id <= LastNewGameControl(
-                        NEW_GAME_HANDICAP_FIRST,
-                        GAME_PLAYER_CONTROL_COUNT
-                    ))
+                 && message.payload.widget.id <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
                 || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
-                    && message.payload.widget.id <= LastNewGameControl(
-                           NEW_GAME_PLAYER_HUMAN_FIRST,
-                           GAME_PLAYER_CONTROL_COUNT
-                       )))
+                    && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1))
                 helpDialogIndexLocal = GAME_HELP_HANDICAP;
             if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
                  && message.payload.widget.id
-                        <= LastNewGameControl(NEW_GAME_COLOR_FIRST, GAME_PLAYER_CONTROL_COUNT))
+                        <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
                 || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
-                    && message.payload.widget.id <= LastNewGameControl(
-                           NEW_GAME_RACE_FIRST,
-                           GAME_PLAYER_CONTROL_COUNT
-                       ))
+                    && message.payload.widget.id <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
                 || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
                     && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
                 || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
                     && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST))
                 helpDialogIndexLocal = GAME_HELP_PLAYER;
             if ((message.payload.widget.id >= NEW_GAME_RACE_CYCLE_FIRST
-                 && message.payload.widget.id <= LastNewGameControl(
-                        NEW_GAME_RACE_CYCLE_FIRST,
-                        GAME_PLAYER_CONTROL_COUNT
-                    ))
+                 && message.payload.widget.id <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
                 || (message.payload.widget.id >= NEW_GAME_RACE_ICON_FIRST
-                    && message.payload.widget.id <= LastNewGameControl(
-                           NEW_GAME_RACE_ICON_FIRST,
-                           GAME_PLAYER_CONTROL_COUNT
-                       )))
+                    && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1))
                 helpDialogIndexLocal = GAME_HELP_RACE;
             if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
-                || DecodeNewGameControl(message.payload.widget.id) == NEW_GAME_MAP_SELECT
-                || DecodeNewGameControl(message.payload.widget.id) == NEW_GAME_SCENARIO_NAME)
+                || message.payload.widget.id == NEW_GAME_MAP_SELECT
+                || message.payload.widget.id == NEW_GAME_SCENARIO_NAME)
                 helpDialogIndexLocal = GAME_HELP_MAP;
-            if (DecodeNewGameControl(message.payload.widget.id) == NEW_GAME_RATING)
+            if (message.payload.widget.id == NEW_GAME_RATING)
                 helpDialogIndexLocal = GAME_HELP_RATING;
             if (message.payload.widget.id == GAME_DIALOG_OK)
                 helpDialogIndexLocal = GAME_HELP_OK;
@@ -1736,7 +1714,7 @@ void game::ShowScenInfo(void) {
 
     scenarioMessageTemp.type = MESSAGE_WIDGET;
     scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    scenarioMessageTemp.payload.widget.id = EncodeNewGameControl(NEW_GAME_SCENARIO_NAME);
+    scenarioMessageTemp.payload.widget.id = NEW_GAME_SCENARIO_NAME;
     scenarioMessageTemp.payload.widget.data.text = m_mapHeader.name;
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
@@ -1798,7 +1776,7 @@ void game::ShowScenInfo(void) {
                 PLAYER_HUMAN_FRAME,
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
-                PLAYER_WIDGET_KIND,
+                WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
             if (iconControlLocal == NULL)
@@ -1817,7 +1795,7 @@ void game::ShowScenInfo(void) {
                 0,
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
-                PLAYER_WIDGET_KIND,
+                WIDGET_KIND_ICON_DIRECT,
                 PLAYER_WIDGET_FILL_COLOR
             );
             if (iconControlLocal == NULL)
@@ -1843,7 +1821,7 @@ void game::ShowScenInfo(void) {
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -1864,7 +1842,7 @@ void game::ShowScenInfo(void) {
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -1888,7 +1866,7 @@ void game::ShowScenInfo(void) {
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
-                MESSAGE_WIDGET,
+                WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (textControlLocal == NULL)
@@ -1908,7 +1886,7 @@ void game::ShowScenInfo(void) {
             PLAYER_RACE_ICON_FRAME,
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -1940,7 +1918,7 @@ void game::ShowScenInfo(void) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
-            MESSAGE_WIDGET,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (textControlLocal == NULL)
@@ -1958,7 +1936,7 @@ void game::ShowScenInfo(void) {
             PLAYER_RACE_CYCLE_FRAME,
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
-            PLAYER_WIDGET_KIND,
+            WIDGET_KIND_ICON_DIRECT,
             PLAYER_WIDGET_FILL_COLOR
         );
         if (iconControlLocal == NULL)
@@ -1976,7 +1954,7 @@ void game::ShowScenInfo(void) {
         }
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_NAME_FIRST, playerCounter);
+            NEW_GAME_PLAYER_NAME_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.text = gText;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
@@ -1985,7 +1963,7 @@ void game::ShowScenInfo(void) {
         else
             scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_PLAYER_SELECT_FIRST, playerCounter);
+            NEW_GAME_PLAYER_SELECT_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
@@ -1997,7 +1975,7 @@ void game::ShowScenInfo(void) {
             playerLockedLocal = 1;
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_COLOR_FIRST, playerCounter);
+            NEW_GAME_COLOR_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             scenarioMessageTemp.payload.widget.data.value =
                 m_setupPlayerColor[playerCounter]
@@ -2022,7 +2000,7 @@ void game::ShowScenInfo(void) {
 
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_HANDICAP_FIRST, playerCounter);
+            NEW_GAME_HANDICAP_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             scenarioMessageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
         else
@@ -2037,7 +2015,7 @@ void game::ShowScenInfo(void) {
 
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, playerCounter);
+            NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.value =
             IDX(m_setupPlayerRace[playerCounter])
             + (playerLockedLocal ? GAME_FIXED_RACE_FRAME_BASE
@@ -2047,7 +2025,7 @@ void game::ShowScenInfo(void) {
         sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerCounter])]);
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         scenarioMessageTemp.payload.widget.id =
-            EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, playerCounter);
+            NEW_GAME_RACE_NAME_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.text = gText;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
     }

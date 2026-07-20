@@ -2,6 +2,7 @@
 #define HOMM2_BASE_WIDGET_H
 
 #include <va.h>
+#include <BASE/widgetKind.h>
 
 class heroWindow;
 struct tag_message;
@@ -33,13 +34,20 @@ public:
     widget* m_prev;
     i16 m_id;
     i16 m_zOrder;
-    i16 m_kind;
+    H2_ENUM_STORAGE(WidgetKind, i16) m_kind;
     i16 m_flags;
     i16 m_x;
     i16 m_y;
     i16 m_width;
     i16 m_height;
-    widget(i16 x, i16 y, i16 width, i16 height, i16 id, i16 kind);
+    widget(
+        i16 x,
+        i16 y,
+        i16 width,
+        i16 height,
+        i16 id,
+        H2_ENUM_PARAM(WidgetKind, i16) kind
+    );
     widget(void);
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;

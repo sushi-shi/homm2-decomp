@@ -15,7 +15,7 @@ H2_ENUM_BEGIN(BorderConstant)
 H2_ENUM_END(BorderConstant)
 
 VA(0x004d20a0, 0x32)
-border::border(void) : widget(0, 0, 0, 0, 0, 0) {
+border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
     m_fillColor = 0;
@@ -23,8 +23,17 @@ border::border(void) : widget(0, 0, 0, 0, 0, 0) {
 
 
 VA(0x004d2130, 0x64)
-border::border(i16 x, i16 y, i16 w, i16 h, i16 e, i16 f, i16 fillColor, char* name)
-    : widget(x, y, w, h, e, f) {
+border::border(
+    i16 x,
+    i16 y,
+    i16 w,
+    i16 h,
+    i16 e,
+    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    i16 fillColor,
+    char* name
+)
+    : widget(x, y, w, h, e, kind) {
     if (name != NULL)
         m_backgroundBitmap = gpResourceManager->GetBitmap(name);
     else
@@ -48,19 +57,19 @@ void border::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_id = gpResourceManager->ReadWord();
-    i16 kind = gpResourceManager->ReadWord();
+    H2_ENUM_STORAGE(WidgetKind, i16) kind = gpResourceManager->ReadWord();
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
     m_kind = kind;
     char resourceName[RESOURCE_NAME_CAPACITY];
-    if (DecodeWidgetKind(kind) == WIDGET_KIND_BITMAP) {
+    if (kind == WIDGET_KIND_BITMAP) {
         gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
         gpResourceManager->SavePosition();
         m_backgroundBitmap = gpResourceManager->GetBitmap(resourceName);
         gpResourceManager->RestorePosition();
         return;
     }
-    if (DecodeWidgetKind(kind) == WIDGET_KIND_ICON) {
+    if (kind == WIDGET_KIND_ICON) {
         gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
         gpResourceManager->SavePosition();
         m_backgroundIcon = gpResourceManager->GetIcon(resourceName);
@@ -128,7 +137,7 @@ VA(0x004d2480, 0xab)
 void border::Draw(void) {
     i16 y = m_y + static_cast<i16>(m_owner->m_posY);
     i16 x = m_x + static_cast<i16>(m_owner->m_posX);
-    i32 kind = m_kind;
+    WidgetKind kind = m_kind;
     switch (kind) {
         case WIDGET_KIND_SOLID:
             FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, m_fillColor);

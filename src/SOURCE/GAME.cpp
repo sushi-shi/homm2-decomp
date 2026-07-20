@@ -617,7 +617,6 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_MONSTER_WIDGET_WIDTH    = 86,
     VIEW_ARMY_MONSTER_WIDGET_HEIGHT   = 149,
     VIEW_ARMY_MONSTER_WIDGET_Z_ORDER  = 5,
-    VIEW_ARMY_MONSTER_WIDGET_COLOR    = 16,
     VIEW_ARMY_ICON_CENTER_DIVISOR     = 2,
     VIEW_ARMY_FILENAME_SIZE           = 16,
     VIEW_ARMY_NAME_SIZE               = 32,
@@ -634,7 +633,6 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_SPELL_VISIBLE_LIMIT     = 6,
     VIEW_ARMY_SPELL_WIDGET_Y_OFFSET   = 14,
     VIEW_ARMY_SPELL_WIDGET_ID_BASE    = 200,
-    VIEW_ARMY_SPELL_WIDGET_COLOR      = 16,
     VIEW_ARMY_ANIMATION_INITIAL_DELAY = 90,
     VIEW_ARMY_HANDLER_FRAME_DELAY     = 5,
     VIEW_ARMY_UPGRADE_COST_MULTIPLIER = 2,
@@ -1381,29 +1379,29 @@ void game::SetupOrigData(void) {
             m_heroRecs[i].m_secondarySkillOrder[j] = 0;
         }
         if (m_heroRecs[i].m_cursorType == FACTION_KNIGHT) {
-            m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, IDX(HERO_SKILL_LEVEL_BASIC));
-            m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_LEADERSHIP, HERO_SKILL_LEVEL_BASIC);
+            m_heroRecs[i].GiveSS(HERO_SKILL_BALLISTICS, HERO_SKILL_LEVEL_BASIC);
         }
         if (m_heroRecs[i].m_cursorType == FACTION_SORCERESS) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
-            m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, IDX(HERO_SKILL_LEVEL_ADVANCED));
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_NAVIGATION, HERO_SKILL_LEVEL_ADVANCED);
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
         if (m_heroRecs[i].m_cursorType == FACTION_BARBARIAN)
-            m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_PATHFINDING, HERO_SKILL_LEVEL_ADVANCED);
         if (m_heroRecs[i].m_cursorType == FACTION_WARLOCK) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
-            m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, IDX(HERO_SKILL_LEVEL_ADVANCED));
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_SCOUTING, HERO_SKILL_LEVEL_ADVANCED);
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
         }
         if (m_heroRecs[i].m_cursorType == FACTION_WIZARD) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_ADVANCED));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_ADVANCED);
         }
         if (m_heroRecs[i].m_cursorType == FACTION_NECROMANCER) {
             m_heroRecs[i].m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
-            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, IDX(HERO_SKILL_LEVEL_BASIC));
-            m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, IDX(HERO_SKILL_LEVEL_BASIC));
+            m_heroRecs[i].GiveSS(HERO_SKILL_WISDOM, HERO_SKILL_LEVEL_BASIC);
+            m_heroRecs[i].GiveSS(HERO_SKILL_NECROMANCY, HERO_SKILL_LEVEL_BASIC);
         }
     }
 
@@ -3620,7 +3618,7 @@ void game::ViewArmy(
         gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
         facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
         VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
-        VIEW_ARMY_MONSTER_WIDGET_COLOR,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (!monsterWidget7)
@@ -3799,7 +3797,7 @@ void game::ViewArmy(
                 static_cast<i16>(IDX(spellIndex9)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
-                VIEW_ARMY_SPELL_WIDGET_COLOR,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (!spellWidget)
@@ -6317,7 +6315,7 @@ void game::ProcessOnMapHeroes(void) {
                                         static_cast<HeroSecondarySkill>(
                                             extra0->skillTypes[recordSlot10]
                                         ),
-                                        extra0->skillLevels[recordSlot10]
+                                        static_cast<HeroSkillLevel>(extra0->skillLevels[recordSlot10])
                                     );
                                 }
                             }

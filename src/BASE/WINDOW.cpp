@@ -58,7 +58,9 @@ heroWindow::heroWindow(void) {
 }
 
 VA(0x004cec20, 0xa5)
-heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
+heroWindow::heroWindow(
+    i32 x, i32 y, i32 w, i32 h, H2_ENUM_PARAM(WindowFlag, i32) flags
+) {
     strcpy(name, "Dynamic Construct");
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
@@ -67,7 +69,7 @@ heroWindow::heroWindow(i32 x, i32 y, i32 w, i32 h, i32 flags) {
     m_posY = y;
     m_winWidth = w;
     m_winHeight = h;
-    m_winFlags = static_cast<WindowFlag>(flags);
+    m_winFlags = flags;
     m_winState = WINDOW_STATE_CLOSED;
     m_widgetListHead = NULL;
     m_widgetListTail = m_widgetListHead;

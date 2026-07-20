@@ -3453,9 +3453,9 @@ void combatManager::Resurrect(
                 0
             );
             UpdateCombatArea();
-            target_i->m_facing = static_cast<ArmyFacing>(
-                static_cast<i32>(ARMY_FACING_RIGHT) - target_i->m_side
-            );
+            target_i->m_facing = target_i->m_side == COMBAT_ATTACKER_SIDE
+                ? ARMY_FACING_RIGHT
+                : ARMY_FACING_LEFT;
             if (target_i->m_animationSequence == ARMY_ANIMATION_DEATH) {
                 if (index_o >= RESURRECT_DEATH_REVERSE_FRAME) {
                     target_i->m_animationSequence = ARMY_ANIMATION_STAND;

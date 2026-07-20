@@ -238,7 +238,6 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_SCREEN_BOTTOM            = 479,
     NORMAL_DIALOG_SCREEN_HEIGHT            = 480,
     NORMAL_DIALOG_MAX_TOP                  = 28,
-    NORMAL_DIALOG_WIDGET_COLOR             = 0x10,
     NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID     = 100,
     NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID = 0x1e14,
     NORMAL_DIALOG_TIMEOUT_MIN              = 1,
@@ -250,7 +249,6 @@ H2_ENUM_BEGIN(NormalDialogConstant)
     NORMAL_DIALOG_BUTTON_SIX               = 0x7806,
     NORMAL_DIALOG_BUTTON_SEVEN             = 0x7807,
     NORMAL_DIALOG_BUTTON_EIGHT             = 0x7808,
-    NORMAL_DIALOG_WIDGET_FLAGS             = 0x200
 H2_ENUM_END(NormalDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)

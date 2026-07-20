@@ -335,7 +335,6 @@ H2_ENUM_BEGIN(AdventureOpenConstant)
     SCROLL_HEIGHT      = 17,
     SCROLL_LEFT_FRAME  = 26,
     SCROLL_RIGHT_FRAME = 27,
-    SCROLL_HOTKEY      = 16,
     TIMER_DELAY        = 120,
     MANAGER_MESSAGE    = 0x400
 H2_ENUM_END(AdventureOpenConstant)
@@ -488,7 +487,6 @@ H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
     ARMY_QUICK_ICON_BASELINE         = 30,
     ARMY_QUICK_AREA_LEFT             = 22,
     ARMY_QUICK_CENTER_DIVISOR        = 2,
-    ARMY_QUICK_WIDGET_FLAGS          = 16,
     ARMY_QUICK_LABEL_HEIGHT          = 12,
     ARMY_QUICK_FIRST_ROW_SHIFT       = 22,
     ARMY_QUICK_SECOND_ROW_SHIFT      = 44,
@@ -574,8 +572,6 @@ H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_CREATURE_BOUND_COUNT      = 2,
     BOTTOM_HERO_FIRST_ICON_ID             = 2002,
     BOTTOM_HERO_FIRST_TEXT_ID             = 2101,
-    BOTTOM_HERO_WIDGET_FLAGS              = 16,
-    BOTTOM_HERO_TEXT_ALIGNMENT            = 0x200
 H2_ENUM_END(AdventureBottomHeroViewConstant)
 
 H2_ENUM_BEGIN(AdventureLocatorConstant)
@@ -675,8 +671,6 @@ H2_ENUM_BEGIN(AdventureBottomViewConstant)
     BOTTOM_VIEW_FOREGROUND_ID     = 2001,
     BOTTOM_VIEW_TEXT_ID           = 2100,
     BOTTOM_VIEW_TEXT_ID_2         = 2101,
-    BOTTOM_VIEW_WIDGET_FLAGS      = 16,
-    BOTTOM_VIEW_TEXT_FLAGS        = 0x200,
     BOTTOM_VIEW_DRAW_LEFT         = 0,
     BOTTOM_VIEW_DRAW_TOP          = 2000,
     BOTTOM_VIEW_DRAW_BOTTOM       = 2200,
@@ -780,7 +774,6 @@ H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
     ENEMY_TURN_SAND_Z             = 1020,
     ENEMY_TURN_CREST_Z            = 1030,
     ENEMY_TURN_PHASE_Z            = 1040,
-    ENEMY_TURN_WIDGET_FLAGS       = 16,
     ENEMY_TURN_SAND_FRAME_OFFSET  = 11,
     ENEMY_TURN_SAND_FRAME_LIMIT   = 20,
     ENEMY_TURN_SAND_RESTART_FRAME = 16,
@@ -1070,7 +1063,7 @@ i32 advManager::Open(i32 id) {
             WIDGET_FLAG_DRAW,
             ICON_DRAW_NORMAL,
             SCROLL_LEFT_FRAME,
-            SCROLL_HOTKEY,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (m_scrollLeftButton == NULL) {
@@ -1086,7 +1079,7 @@ i32 advManager::Open(i32 id) {
             WIDGET_FLAG_DRAW,
             ICON_DRAW_NORMAL,
             SCROLL_RIGHT_FRAME,
-            SCROLL_HOTKEY,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (m_scrollRightButton == NULL) {
@@ -5532,7 +5525,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_BACKGROUND_ID,
-            ENEMY_TURN_WIDGET_FLAGS,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (m_bottomViewBackground == NULL) {
@@ -5549,7 +5542,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_HOURGLASS_ID,
-            ENEMY_TURN_WIDGET_FLAGS,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (m_bottomViewHourglassBackground == NULL) {
@@ -5587,7 +5580,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET,
                     ICON_DRAW_NORMAL,
                     ENEMY_TURN_SAND_ID,
-                    ENEMY_TURN_WIDGET_FLAGS,
+                    WIDGET_KIND_ICON_DIRECT,
                     1
                 );
                 if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] == NULL) {
@@ -5623,7 +5616,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_CREST_ID,
-                ENEMY_TURN_WIDGET_FLAGS,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] == NULL) {
@@ -5658,7 +5651,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_PHASE_ID,
-                ENEMY_TURN_WIDGET_FLAGS,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] == NULL) {
@@ -5704,7 +5697,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
-        BOTTOM_VIEW_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewBackground == NULL) {
@@ -5721,7 +5714,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         dateIconFrame,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
-        BOTTOM_VIEW_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewHourglassBackground == NULL) {
@@ -5745,7 +5738,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
-        BOTTOM_VIEW_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
@@ -5769,7 +5762,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         "bigfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
-        BOTTOM_VIEW_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
@@ -5805,7 +5798,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
-        BOTTOM_VIEW_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewBackground == NULL) {
@@ -5833,7 +5826,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
-        BOTTOM_VIEW_TEXT_FLAGS,
+        WIDGET_KIND_TEXT,
         FONT_ALIGN_CENTER
     );
     if (m_bottomViewAllTexts[0] == NULL) {
@@ -5860,7 +5853,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
-            BOTTOM_VIEW_WIDGET_FLAGS,
+            WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (m_bottomViewHourglassBackground == NULL) {
@@ -5882,7 +5875,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
-            BOTTOM_VIEW_TEXT_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (m_bottomViewAllTexts[1] == NULL) {
@@ -5940,7 +5933,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
-        BOTTOM_VIEW_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewBackground == NULL) {
@@ -5957,7 +5950,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
-        BOTTOM_VIEW_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewHourglassBackground == NULL) {
@@ -5996,7 +5989,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             index11 + BOTTOM_VIEW_TEXT_ID,
-            BOTTOM_VIEW_TEXT_FLAGS,
+            WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
         if (m_bottomViewAllTexts[index11] == NULL) {
@@ -6046,7 +6039,7 @@ i32 advManager::UpdBottomViewHero(void) {
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FIRST_MESSAGE,
-        BOTTOM_HERO_WIDGET_FLAGS,
+        WIDGET_KIND_ICON_DIRECT,
         1
     );
     if (m_bottomViewBackground == NULL) {
@@ -6133,7 +6126,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     creature,
                     ICON_DRAW_NORMAL,
                     displayIndexData + BOTTOM_HERO_FIRST_ICON_ID,
-                    BOTTOM_HERO_WIDGET_FLAGS,
+                    WIDGET_KIND_ICON_DIRECT,
                     1
                 );
                 if (m_bottomViewIcons[displayIndexData] == NULL) {
@@ -6154,7 +6147,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     displayIndexData + BOTTOM_HERO_FIRST_TEXT_ID,
-                    BOTTOM_HERO_TEXT_ALIGNMENT,
+                    WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
                 if (m_bottomViewTexts[displayIndexData] == NULL) {
@@ -6298,7 +6291,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         static_cast<i16>(creature),
                         ICON_DRAW_NORMAL,
                         -1,
-                        ARMY_QUICK_WIDGET_FLAGS,
+                        WIDGET_KIND_ICON_DIRECT,
                         1
                     );
                     if (stackIconsWidgets[armyIndex] == NULL) {
@@ -6390,7 +6383,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 static_cast<i16>(creatureTypeId),
                 ICON_DRAW_NORMAL,
                 -1,
-                ARMY_QUICK_WIDGET_FLAGS,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (stackIconsWidgets[armyIndex] == NULL) {
@@ -6457,7 +6450,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     static_cast<i16>(creatureTypeId),
                     ICON_DRAW_NORMAL,
                     -1,
-                    ARMY_QUICK_WIDGET_FLAGS,
+                    WIDGET_KIND_ICON_DIRECT,
                     1
                 );
                 if (stackIconsWidgets[armyIndex] == NULL) {
@@ -6765,7 +6758,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 static_cast<i16>(creatureLocal),
                 ICON_DRAW_NORMAL,
                 -1,
-                ARMY_QUICK_WIDGET_FLAGS,
+                WIDGET_KIND_ICON_DIRECT,
                 1
             );
             if (armyIcons[widgetIndexWidget] == NULL) {
@@ -6849,7 +6842,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     static_cast<i16>(creatureLocal),
                     ICON_DRAW_NORMAL,
                     -1,
-                    ARMY_QUICK_WIDGET_FLAGS,
+                    WIDGET_KIND_ICON_DIRECT,
                     1
                 );
                 if (armyIcons[widgetIndexWidget] == NULL) {

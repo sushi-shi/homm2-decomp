@@ -26,7 +26,7 @@ public:
         i16 frame,
         H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
         i16 id,
-        i16 kind,
+        H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 fillColor
     );
     iconWidget(
@@ -38,7 +38,7 @@ public:
         i16 frame,
         H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
         i16 id,
-        i16 kind,
+        H2_ENUM_PARAM(WidgetKind, i16) kind,
         i16 fillColor
     );
     virtual ~iconWidget() OVERRIDE;
