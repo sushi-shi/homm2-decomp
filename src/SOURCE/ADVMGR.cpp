@@ -2683,7 +2683,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     UpdateScreen(0, 0);
 
     if (gpGame->m_ultimateArtifactX == x && gpGame->m_ultimateArtifactY == IDX(y)
-        && gpGame->m_ultimateArtifactId != IDX(ARTIFACT_NONE)) {
+        && gpGame->m_ultimateArtifactId != ARTIFACT_NONE) {
         if (searchingHeroState->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
@@ -2720,15 +2720,14 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                         "%s%s",
                         "Congratulations! After spending many hours digging here, you have "
                         "uncovered the ",
-                        gArtifactNames[gpGame->m_ultimateArtifactId]
+                        gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (specialArtifactValue) {
                     searchingHeroState->ViewArtifact(ARTIFACT_SPHERE_NEGATION, 0, -1);
                 } else {
-                    searchingHeroState
-                        ->ViewArtifact(ArtifactType(gpGame->m_ultimateArtifactId), 0, -1);
+                    searchingHeroState->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
                 }
                 gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
             }
@@ -2737,12 +2736,12 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             } else {
                 artifactResultLocal = GiveArtifact(
                     searchingHeroState,
-                    ArtifactType(gpGame->m_ultimateArtifactId),
+                    gpGame->m_ultimateArtifactId,
                     1,
                     -1
                 );
             }
-            gpGame->m_ultimateArtifactId = IDX(ARTIFACT_NONE);
+            gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
         NormalDialog("Nothing here.\nWhere could it be?", 1, -1, -1, -1, 0, -1, 0, -1, 0);

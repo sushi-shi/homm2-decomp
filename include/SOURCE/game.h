@@ -133,7 +133,7 @@ public:
     char m_defaultPlayerNames[GAME_DEFAULT_PLAYER_NAMES_SIZE];
     i8 m_ultimateArtifactX;
     i8 m_ultimateArtifactY;
-    i8 m_ultimateArtifactId;
+    H2_ENUM_STORAGE(ArtifactType, i8) m_ultimateArtifactId;
     class heroWindow* m_newGameWindow;
     char m_pad_0x639c;
     u8 m_cheated;
