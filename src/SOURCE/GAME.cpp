@@ -141,31 +141,6 @@ H2_ENUM_BEGIN(NewMapConstant)
     ULTIMATE_SEARCH_REGION_RETRY_LIMIT         = 400
 H2_ENUM_END(NewMapConstant)
 
-H2_ENUM_CLASS_BEGIN(GameMapTrigger)
-    TRIGGER_TOWN_BASE                = 0x23,
-    TRIGGER_MONSTER                  = 0x98,
-    TRIGGER_RESOURCE                 = 0x9b,
-    TRIGGER_SEA_CHEST                = 0xa1,
-    TRIGGER_TOWN                     = 0xa3,
-    TRIGGER_ARTIFACT                 = 0xa9,
-    TRIGGER_HERO                     = 0xaa,
-    TRIGGER_BOAT                     = 0xab,
-    TRIGGER_RANDOM_ULTIMATE_ARTIFACT = 0xac,
-    TRIGGER_RANDOM_ARTIFACT          = 0xad,
-    TRIGGER_RANDOM_RESOURCE          = 0xae,
-    TRIGGER_RANDOM_MONSTER           = 0xaf,
-    TRIGGER_RANDOM_TOWN              = 0xb0,
-    TRIGGER_RANDOM_CASTLE            = 0xb1,
-    TRIGGER_RANDOM_MINE              = 0xb2,
-    TRIGGER_RANDOM_MONSTER_LEVEL_1   = 0xb3,
-    TRIGGER_RANDOM_MONSTER_LEVEL_2   = 0xb4,
-    TRIGGER_RANDOM_MONSTER_LEVEL_3   = 0xb5,
-    TRIGGER_RANDOM_MONSTER_LEVEL_4   = 0xb6,
-    TRIGGER_RANDOM_ARTIFACT_LEVEL_1  = 0xf4,
-    TRIGGER_RANDOM_ARTIFACT_LEVEL_2  = 0xf5,
-    TRIGGER_RANDOM_ARTIFACT_LEVEL_3  = 0xf6
-H2_ENUM_CLASS_END(GameMapTrigger)
-
 H2_ENUM_BEGIN(GameDifficultyConstant)
     DIFFICULTY_EASY       = 0,
     DIFFICULTY_NORMAL     = 1,
@@ -1066,7 +1041,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         mapCell* cell = WORLDMAP->Row(y) + x;
         boat->savedTriggerType = cell->m_triggerType;
         boat->savedEventData = static_cast<u8>(cell->m_objectMetadata);
-        cell->m_triggerType = IDX(TRIGGER_BOAT);
+        cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
         cell->m_objectMetadata = boatIdx;
     }
     return boatIdx;
@@ -2040,7 +2015,8 @@ void game::NewMap(char* filename) {
                 m_worldMap.GetCell(heroX6, heroY16)->m_triggerType;
             m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_occupiedTown =
                 m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata;
-            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType = IDX(TRIGGER_HERO);
+            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType =
+                MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
             m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata =
                 m_players[player2].m_heroIds[campaignHero15];
         }
@@ -2381,7 +2357,7 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == IDX(TERRAIN_WATER)) {
-                        cell2->m_triggerType = IDX(TRIGGER_SEA_CHEST);
+                        cell2->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SEA_CHEST;
                         randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
                         if (randomValue7 < SEA_CHEST_EMPTY_CUTOFF)
                             cell2->m_objectMetadata = SEA_CHEST_OUTCOME_EMPTY;
@@ -5168,7 +5144,7 @@ void game::InitRandomArtifacts(void) {
     for (x = 0; x < MAP_WIDTH; x++) {
         for (i32 y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->Row(y) + x;
-            if (cell->m_triggerType == IDX(TRIGGER_ARTIFACT))
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT))
                 m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
         }
     }
@@ -5332,41 +5308,41 @@ void game::ProcessRandomObjects(void) {
     for (y8 = 0; MAP_HEIGHT > y8; y8++) {
         for (x10 = 0; x10 < MAP_WIDTH; x10++) {
             cell6 = WORLDMAP->GetCell(x10, y8);
-            switch (static_cast<GameMapTrigger>(IDX(cell6->m_triggerType))) {
-                case TRIGGER_RANDOM_ULTIMATE_ARTIFACT:
+            switch (cell6->m_triggerType) {
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT:
                     giUABaseX = static_cast<i16>(x10);
                     giUABaseY = static_cast<i16>(y8);
                     giUARadius = static_cast<i16>(cell6->m_objectMetadata);
-                    cell6->m_triggerType = 0;
+                    cell6->m_triggerType = MAP_OBJECT_NONE;
                     cell6->m_objectTileset = TILESET_NONE;
                     cell6->m_objectIndex = -1;
                     break;
-                case TRIGGER_RANDOM_TOWN:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
                     RandomizeTown(x10, y8, 0);
                     break;
-                case TRIGGER_RANDOM_CASTLE:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
                     RandomizeTown(x10, y8, 1);
                     break;
                 // Random-object value bands, quantity ranges, and paired source
                 // frames are serialized map-editor balance and tileset payload.
                 // NOLINTBEGIN(readability-magic-numbers)
-                case TRIGGER_RANDOM_MONSTER:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER:
                     minValue7 = 80;
                     maxValue17 = 2000;
                     goto randomMonster;
-                case TRIGGER_RANDOM_MONSTER_LEVEL_1:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
                     minValue7 = 0;
                     maxValue17 = 400;
                     goto randomMonster;
-                case TRIGGER_RANDOM_MONSTER_LEVEL_2:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
                     minValue7 = 400;
                     maxValue17 = 1000;
                     goto randomMonster;
-                case TRIGGER_RANDOM_MONSTER_LEVEL_3:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
                     minValue7 = 1000;
                     maxValue17 = 2500;
                     goto randomMonster;
-                case TRIGGER_RANDOM_MONSTER_LEVEL_4:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
                     minValue7 = 2500;
                     maxValue17 = 100000;
                     goto randomMonster;
@@ -5375,34 +5351,34 @@ void game::ProcessRandomObjects(void) {
                         && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
                         randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
-                        switch (static_cast<GameMapTrigger>(randomObjectType3)) {
-                            case TRIGGER_RANDOM_MONSTER_LEVEL_1:
+                        switch (static_cast<MapObjectType>(randomObjectType3)) {
+                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
                                 minValue7 = 0;
                                 maxValue17 = 400;
                                 goto monsterBoundsReady;
-                            case TRIGGER_RANDOM_MONSTER_LEVEL_2:
+                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
                                 minValue7 = 400;
                                 maxValue17 = 1000;
                                 goto monsterBoundsReady;
-                            case TRIGGER_RANDOM_MONSTER_LEVEL_3:
+                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
                                 minValue7 = 1000;
                                 maxValue17 = 2500;
                                 goto monsterBoundsReady;
-                            case TRIGGER_RANDOM_MONSTER_LEVEL_4:
+                            case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
                                 minValue7 = 2500;
                                 maxValue17 = 100000;
                                 goto monsterBoundsReady;
                         }
                     }
                 monsterBoundsReady:
-                    cell6->m_triggerType = IDX(TRIGGER_MONSTER);
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
                     cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     while (gMonsterDatabase[cell6->m_objectIndex].randomValue <= minValue7
                            || gMonsterDatabase[cell6->m_objectIndex].randomValue >= maxValue17)
                         cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
-                case TRIGGER_RANDOM_RESOURCE:
-                    cell6->m_triggerType = IDX(TRIGGER_RESOURCE);
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_RESOURCE:
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE;
                     randomType0 = Random(0, 6);
                     ConvertObject(
                         x10 - 1,
@@ -5443,9 +5419,9 @@ void game::ProcessRandomObjects(void) {
                             break;
                     }
                     break;
-                case TRIGGER_RANDOM_ARTIFACT:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
-                    cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -5473,9 +5449,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case TRIGGER_RANDOM_ARTIFACT_LEVEL_1:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TREASURE_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
-                    cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -5503,9 +5479,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case TRIGGER_RANDOM_ARTIFACT_LEVEL_2:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MINOR_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
-                    cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -5533,9 +5509,9 @@ void game::ProcessRandomObjects(void) {
                         -1
                     );
                     break;
-                case TRIGGER_RANDOM_ARTIFACT_LEVEL_3:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MAJOR_ARTIFACT:
                     artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
-                    cell6->m_triggerType = IDX(TRIGGER_ARTIFACT);
+                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
                         x10 - 1,
                         y8,
@@ -5564,7 +5540,9 @@ void game::ProcessRandomObjects(void) {
                     );
                     break;
                 // NOLINTEND(readability-magic-numbers)
-                case TRIGGER_RANDOM_MINE:
+                // The legacy random-mine trigger reuses the flagged value whose low
+                // seven bits later identify an Eye of the Magi map object.
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EYE_OF_MAGI:
                     RandomizeMine(x10, y8);
                     break;
             }
@@ -7190,8 +7168,8 @@ void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, 
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && obj == IDX(TRIGGER_TOWN)
-        && gpAdvManager->GetCell(x, y - 1)->m_triggerType != IDX(TRIGGER_TOWN_BASE)) {
+    if (y > 0 && obj == IDX(MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+        && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
     } else {
@@ -7872,7 +7850,7 @@ i32 game::CountShrines(i32 player) {
         for (row = 0; row < MAP_HEIGHT; row++) {
             for (col = 0; col < MAP_WIDTH; col++) {
                 cell = WORLDMAP->Row(row) + col;
-                if (cell->m_triggerType == IDX(TRIGGER_TOWN)) {
+                if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     castle = GetCastle(cell->m_objectMetadata);
                     if (castle->m_owner == player
                         && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
