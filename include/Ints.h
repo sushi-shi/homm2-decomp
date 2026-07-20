@@ -54,6 +54,7 @@ class H2EnumStorage {
 public:
     H2EnumStorage() = default;
     constexpr H2EnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
+    constexpr H2EnumStorage(Storage value) : m_value(value) {}
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
 
@@ -64,6 +65,21 @@ public:
 
     H2EnumStorage& operator=(Storage value) {
         m_value = value;
+        return *this;
+    }
+
+    H2EnumStorage& operator|=(Enum value) {
+        m_value = static_cast<Storage>(m_value | static_cast<Storage>(value));
+        return *this;
+    }
+
+    H2EnumStorage& operator&=(Enum value) {
+        m_value = static_cast<Storage>(m_value & static_cast<Storage>(value));
+        return *this;
+    }
+
+    H2EnumStorage& operator^=(Enum value) {
+        m_value = static_cast<Storage>(m_value ^ static_cast<Storage>(value));
         return *this;
     }
 
