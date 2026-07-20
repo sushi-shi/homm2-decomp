@@ -43,6 +43,20 @@ H2_ENUM_BEGIN(ExpansionCampaignMap)
     MAP_VOY_BLOOD_IS_THICKER  = 3
 H2_ENUM_END(ExpansionCampaignMap)
 
+H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
+    AWARD_ELVEN_ALLIANCE      = 0,
+    AWARD_BREASTPLATE_ANDURAN = 1,
+    AWARD_WOOD_BONUS          = 2,
+    AWARD_HELMET_ANDURAN      = 3,
+    AWARD_DEFEAT_KRAEGER      = 4,
+    AWARD_BATTLE_GARB         = 5,
+    AWARD_WAYWARD_SON         = 6,
+    AWARD_UNCLE_IVAN          = 7,
+    AWARD_LEGENDARY_SCEPTER   = 8,
+    AWARD_SET_GUARDIAN        = 9,
+    AWARD_SPHERE_NEGATION     = 10
+H2_ENUM_CLASS_END(ExpansionCampaignAward)
+
 H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT            = 8,
     EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT       = 3,
@@ -91,9 +105,9 @@ public:
     void ResetMapsPlayed(void);
     void ResetAwards(void);
     void ResetBonusChoices(void);
-    void GrantAward(i32);
-    void RemoveAward(i32);
-    i8 HasAward(i32);
+    void GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
+    void RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
+    i8 HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32));
     void SetMapWasPlayed(void);
     void InitNewCampaign(ExpansionCampaignId);
     void InitMap(void);
