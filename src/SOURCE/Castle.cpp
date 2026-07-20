@@ -476,7 +476,7 @@ i32 CastleHandler(tag_message& message) {
                 sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
                 break;
 
-            case IDX(CASTLE_MAGE_GUILD):
+            case TOWN_OBJECT_MAGE_GUILD:
                 if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex))) {
                     sprintf(
                         gText,
@@ -683,7 +683,7 @@ i32 CastleHandler(tag_message& message) {
                         }
                         break;
 
-                    case IDX(CASTLE_MAGE_GUILD):
+                    case TOWN_OBJECT_MAGE_GUILD:
                         if (quickFlag
                             || gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
                             || (gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
