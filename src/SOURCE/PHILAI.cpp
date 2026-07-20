@@ -145,14 +145,21 @@ H2_ENUM_BEGIN(AIRuntimeConstant)
 H2_ENUM_END(AIRuntimeConstant)
 
 H2_ENUM_BEGIN(AIPositionValueConstant)
-    POSITION_FULL_CHANCE         = 100,
-    POSITION_MINIMUM_LIVE_CHANCE = 30,
-    POSITION_FAILED_VALUE        = -100,
-    POSITION_EMBARKED_BOAT_BONUS = 40,
-    POSITION_DEBUG_LEVEL         = 5,
-    POSITION_DEBUG_UNUSED        = -999,
-    POSITION_OBJECT_NAME_COUNT   = 119
+    POSITION_FULL_CHANCE          = 100,
+    POSITION_MINIMUM_LIVE_CHANCE  = 30,
+    POSITION_FAILED_VALUE         = -100,
+    POSITION_EMBARKED_BOAT_BONUS  = 40,
+    POSITION_DEBUG_LEVEL          = 5,
+    POSITION_DEBUG_UNUSED         = -999,
+    POSITION_OBJECT_NAME_COUNT    = 119,
+    POSITION_DEBUG_TEXT_CAPACITY  = 104,
+    POSITION_STRATEGIC_MULTIPLIER = 2
 H2_ENUM_END(AIPositionValueConstant)
+
+H2_ENUM_BEGIN(AIFightValueConstant)
+    FIGHT_VALUE_SPELL_COUNT      = IDX(SPELL_SUMMON_FIRE_ELEMENTAL) + 1,
+    FIGHT_VALUE_SPELL_STAT_LIMIT = 10
+H2_ENUM_END(AIFightValueConstant)
 
 H2_ENUM_BEGIN(AIQuickCombatConstant)
     QUICK_COMBAT_TOWN_EXPERIENCE = 500,
@@ -2922,7 +2929,7 @@ i32 philAI::RVOfPosition(
     i32 eventValue;
     i32 adjacentEventValue;
     float distanceFactor;
-    char debugText[104];
+    char debugText[POSITION_DEBUG_TEXT_CAPACITY];
     char* objectName;
 
     strategicEventValue = 0;
@@ -3034,7 +3041,8 @@ i32 philAI::RVOfPosition(
 
     totalValue = static_cast<i32>(totalValue / (distanceFactor + AI_POSITION_DISTANCE_BASE));
     strategicDelta = static_cast<i32>(
-        strategicDelta * 2 / (distanceFactor + AI_POSITION_STRATEGIC_DISTANCE_BASE)
+        strategicDelta * POSITION_STRATEGIC_MULTIPLIER
+        / (distanceFactor + AI_POSITION_STRATEGIC_DISTANCE_BASE)
     );
     if (strategicLiveChance == POSITION_FULL_CHANCE)
         totalValue += strategicDelta;
@@ -3063,6 +3071,8 @@ i32 philAI::RVOfPosition(
     return totalValue;
 }
 
+// Search horizons, danger decay, crowding penalties, and score clamps are retail AI strategy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043ef45, 0xaf9)
 i32 philAI::StrategicValueOfPosition(
     i32 targetX,
@@ -3109,7 +3119,7 @@ i32 philAI::StrategicValueOfPosition(
             & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
         friendlyTown1 = 1;
     }
-    *liveChance = 100;
+    *liveChance = POSITION_FULL_CHANCE;
     if (checkEnemies && !gaiEnemyHeroReachable[targetY * MAP_WIDTH + targetX]) {
         if (immediate)
             return 0;
@@ -3269,12 +3279,15 @@ i32 philAI::StrategicValueOfPosition(
     }
     return score4;
 }
+// NOLINTEND(readability-magic-numbers)
 
+// Town base value and scenario-objective bonuses are retail AI strategy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043fa3e, 0x14e)
 i32 philAI::ValueOfTown(town* t) {
     i32 sum = 0;
     i32 idx;
-    for (idx = 0; idx <= 24; idx++) {
+    for (idx = 0; idx <= IDX(BUILDING_SLOT_DWELLING_SIXTH); idx++) {
         if (t->m_buildings & (1 << idx))
             sum += GetBuildingBaseResourceValue(
                 t->m_type,
@@ -3294,29 +3307,35 @@ i32 philAI::ValueOfTown(town* t) {
         sum += 50000;
     return sum;
 }
+// NOLINTEND(readability-magic-numbers)
 
+// Income horizon and normalization weights are retail AI resource-policy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043fb8c, 0x180)
 void philAI::TurnCostResource(i32 player) {
     i32 nb;
     playerData* kn;
-    float jb[7];    // per-resource ratio
+    float jb[AI_PURCHASE_RESOURCE_COUNT]; // per-resource ratio
     float idx;      // average turn cost
     i32 total;
-    i32 cost[7];
+    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     kn = &gpGame->m_players[player];
     total = 0;
-    for (nb = 0; nb < 7; nb++) {
+    for (nb = 0; nb < AI_PURCHASE_RESOURCE_COUNT; nb++) {
         cost[nb] = (i32)(((double)(kn->m_income[nb] * 5) * 0.7 + (double)kn->m_resources[nb])
                          * (double)gResourceBaseValue[nb]);
         total += cost[nb];
     }
-    idx = (float)(total / 7);
-    for (nb = 0; nb < 7; nb++) {
+    idx = (float)(total / AI_PURCHASE_RESOURCE_COUNT);
+    for (nb = 0; nb < AI_PURCHASE_RESOURCE_COUNT; nb++) {
         jb[nb] = (float)cost[nb] / idx;
         gafAITurnCostResource[nb] = (float)((jb[nb] / 2.0f + 0.5) / gResourceBaseValue[nb]);
     }
 }
+// NOLINTEND(readability-magic-numbers)
 
+// Obelisk turn value and exploration weighting are retail AI strategy payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043fd0c, 0x175)
 float philAI::TurnValueOfObelisk(i32 player) {
     i32 jb;         // artifact RV
@@ -3329,15 +3348,20 @@ float philAI::TurnValueOfObelisk(i32 player) {
     idx = jb / 110;
     if (gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE))
         return 0.0f;
-    ta->m_obeliskValue = idx * 48 / gpGame->m_obeliskCount;
+    ta->m_obeliskValue = idx * GAME_OBELISK_VISITOR_COUNT / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
         ta->m_obeliskValue = (i32)(ta->m_obeliskValue * 1.4);
-    ta->m_obeliskValue = (i32)((1.5 - abs(48 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f)
-                               * ta->m_obeliskValue);
+    ta->m_obeliskValue = (i32)(
+        (1.5
+         - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, 1))
+               / static_cast<float>(GAME_OBELISK_VISITOR_COUNT))
+        * ta->m_obeliskValue
+    );
     ta->m_obeliskValue =
         static_cast<i32>((ta->m_attentionWeights.heroValue + 0.66) * ta->m_obeliskValue);
     return (float)ta->m_obeliskValue;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x0043fe81, 0x51)
 float philAI::FutureDeflator(i32* const p) {
@@ -3348,6 +3372,8 @@ float philAI::FutureDeflator(i32* const p) {
     return v;
 }
 
+// Stack-size curves, combat modifiers, and spell/tower caps are retail AI battle-value payload.
+// NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043fed2, 0xbf8)
 i32 philAI::FightValueOfStack(
     armyGroup* group,
@@ -3378,7 +3404,7 @@ i32 philAI::FightValueOfStack(
     float durationModifier7;
     i32 spellScoreTotal;
     i32 spellCount;
-    i32 spellScores[46];
+    i32 spellScores[FIGHT_VALUE_SPELL_COUNT];
     float spellPowerModifier;
     i32 numSpellCastsValue;
     i32 bestSpellScore8;
@@ -3395,11 +3421,12 @@ i32 philAI::FightValueOfStack(
 
     if (useEnemyMods) {
         if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(SPELL_EARTHQUAKE)
-            || heroPtr->m_secondarySkills[10]) {
+            || heroPtr->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]) {
             enemyMeleeModifierIndex = 1.05f;
             enemyFlyingModifier36 = 0.95f;
         }
-        if (heroPtr->m_secondarySkills[1] || heroPtr->HasArtifact(ARTIFACT_GOLDEN_BOW))
+        if (heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+            || heroPtr->HasArtifact(ARTIFACT_GOLDEN_BOW))
             enemyRangedModifier27 = 1.05f;
     }
     if (useTown) {
@@ -3409,7 +3436,7 @@ i32 philAI::FightValueOfStack(
     }
 
     for (armySlotRecord = 0; armySlotRecord < AI_TOWN_ARMY_SLOTS; armySlotRecord++) {
-        if (group->m_creatureTypes[armySlotRecord] != -1) {
+        if (group->m_creatureTypes[armySlotRecord] != ARMY_GROUP_EMPTY_SLOT) {
             stackValueMap = gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].fightValue
                             * group->m_quantities[armySlotRecord];
             if (useHero) {
@@ -3475,9 +3502,10 @@ i32 philAI::FightValueOfStack(
                 }
                 if (HAS(gMonsterDatabase[group->m_creatureTypes[armySlotRecord]].attributes,
                         MONSTER_ATTRIBUTE_RANGED)
-                    && heroPtr && heroPtr->m_secondarySkills[1]) {
+                    && heroPtr && heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]) {
                     stackValueMap = static_cast<i32>(
-                        stackValueMap * gfSSAIArcheryMod[heroPtr->m_secondarySkills[1]]
+                        stackValueMap
+                        * gfSSAIArcheryMod[heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]]
                     );
                 }
                 if (useEnemyMods) {
@@ -3508,7 +3536,7 @@ i32 philAI::FightValueOfStack(
 
     if (useHero && heroPtr) {
         statPowerTarget =
-            heroPtr->Stats(HeroPrimaryStat(0)) + heroPtr->Stats(HeroPrimaryStat(1)) + 20;
+            heroPtr->Stats(HERO_PRIMARY_ATTACK) + heroPtr->Stats(HERO_PRIMARY_DEFENSE) + 20;
         if (statPowerTarget < 0)
             statPowerTarget = 0;
         if (statPowerTarget > 40)
@@ -3529,14 +3557,16 @@ i32 philAI::FightValueOfStack(
 
         if (heroPtr->m_spellPoints >= 3) {
             spellCount = 0;
-            if (heroPtr->Stats(HeroPrimaryStat(2)) <= 10) {
-                durationModifier7 = gfPhilAIDurationMod[heroPtr->Stats(HeroPrimaryStat(2))];
-                spellPowerModifier = gfPhilAISpellPowerMod[heroPtr->Stats(HeroPrimaryStat(2))];
+            if (heroPtr->Stats(HERO_PRIMARY_SPELL_POWER) <= FIGHT_VALUE_SPELL_STAT_LIMIT) {
+                durationModifier7 =
+                    gfPhilAIDurationMod[heroPtr->Stats(HERO_PRIMARY_SPELL_POWER)];
+                spellPowerModifier =
+                    gfPhilAISpellPowerMod[heroPtr->Stats(HERO_PRIMARY_SPELL_POWER)];
             } else {
-                durationModifier7 = gfPhilAIDurationMod[10];
-                spellPowerModifier = gfPhilAISpellPowerMod[10];
+                durationModifier7 = gfPhilAIDurationMod[FIGHT_VALUE_SPELL_STAT_LIMIT];
+                spellPowerModifier = gfPhilAISpellPowerMod[FIGHT_VALUE_SPELL_STAT_LIMIT];
             }
-            for (armySlotRecord = 0; armySlotRecord < 46; armySlotRecord++) {
+            for (armySlotRecord = 0; armySlotRecord < FIGHT_VALUE_SPELL_COUNT; armySlotRecord++) {
                 if (heroPtr->HasSpell(SpellType(armySlotRecord))) {
                     spellScoreTotal = gsSpellInfo[armySlotRecord].aiValue;
                     if (HAS(gsSpellInfo[armySlotRecord].attributes, SPELL_INFO_ATTRIBUTE_DURATION))
@@ -3546,8 +3576,8 @@ i32 philAI::FightValueOfStack(
                         spellScoreTotal = static_cast<i32>(spellScoreTotal * spellPowerModifier);
                     numSpellCastsValue =
                         heroPtr->m_spellPoints / GetManaCost(SpellType(armySlotRecord), heroPtr);
-                    if (numSpellCastsValue > 10)
-                        numSpellCastsValue = 10;
+                    if (numSpellCastsValue > FIGHT_VALUE_SPELL_STAT_LIMIT)
+                        numSpellCastsValue = FIGHT_VALUE_SPELL_STAT_LIMIT;
                     spellScoreTotal =
                         static_cast<i32>(spellScoreTotal * gfSpellCastNumMod[numSpellCastsValue]);
                     if (spellScoreTotal <= 0)
@@ -3556,7 +3586,8 @@ i32 philAI::FightValueOfStack(
                     spellCount++;
                 }
             }
-            for (armySlotRecord = 0; armySlotRecord < 7; armySlotRecord++) {
+            for (armySlotRecord = 0; armySlotRecord < KB_QUICK_COMBAT_SPELL_TYPE_COUNT;
+                 armySlotRecord++) {
                 if ((armySlotRecord | 0) >= spellCount) {
                     break;
                 }
@@ -3589,12 +3620,22 @@ i32 philAI::FightValueOfStack(
     } else if ((armyValue | 0) < townArcherValueValue)
         townArcherValueValue =
             static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
-    if (giDebugLevel == 9)
-        LogInt("FV3", armyValue, spellValueMap, townArcherValueValue, 0, 0, -999, -999);
+    if (giDebugLevel == AI_BATTLE_DEBUG_LEVEL)
+        LogInt(
+            "FV3",
+            armyValue,
+            spellValueMap,
+            townArcherValueValue,
+            0,
+            0,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE
+        );
     armyValue += spellValueMap;
     armyValue += townArcherValueValue;
     return armyValue;
 }
+// NOLINTEND(readability-magic-numbers)
 
 VA(0x00440aca, 0x1e7)
 void philAI::EvaluateOneTimeCreaturePurchase(
