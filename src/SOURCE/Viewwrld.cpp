@@ -727,22 +727,22 @@ i32 ViewWorldDialogHandler(struct tag_message& message) {
             case VIEW_WORLD_SELECT:
                 if (message.payload.widget.id == WORLD_RADAR_WIDGET
                     && (giViewWorldScale != VIEW_WORLD_SCALE_NEAR
-                        || MAP_WIDTH > IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE))
+                        || MAP_WIDTH > MAP_DIMENSION_SMALL)
                     && (giViewWorldScale != VIEW_WORLD_SCALE_MIDDLE
-                        || MAP_WIDTH > IDX(VIEW_WORLD_MIDDLE_MAX_MAP_SIZE))) {
+                        || MAP_WIDTH > MAP_DIMENSION_MEDIUM)) {
                     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR
-                        && MAP_WIDTH <= IDX(VIEW_WORLD_FAR_MAX_MAP_SIZE))
+                        && MAP_WIDTH <= MAP_DIMENSION_LARGE)
                         break;
                     // Retail radar scale ratios for the three supported map sizes.
                     // NOLINTBEGIN(readability-magic-numbers)
                     switch (MAP_HEIGHT) {
-                        case IDX(VIEW_WORLD_NEAR_MAX_MAP_SIZE):
+                        case MAP_DIMENSION_SMALL:
                             radarScale6 = 4.0f;
                             break;
-                        case IDX(VIEW_WORLD_MIDDLE_MAX_MAP_SIZE):
+                        case MAP_DIMENSION_MEDIUM:
                             radarScale6 = 2.0f;
                             break;
-                        case IDX(VIEW_WORLD_FAR_MAX_MAP_SIZE):
+                        case MAP_DIMENSION_LARGE:
                             radarScale6 = 1.3333f;
                             break;
                         default:

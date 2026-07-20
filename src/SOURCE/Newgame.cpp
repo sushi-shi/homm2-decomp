@@ -1767,11 +1767,11 @@ void game::ShowScenInfo(void) {
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
     mapSizeIndex = MAP_SIZE_SMALL_INDEX;
-    if (m_mapHeader.width == IDX(MAP_DIMENSION_MEDIUM))
+    if (m_mapHeader.width == MAP_DIMENSION_MEDIUM)
         mapSizeIndex = MAP_SIZE_MEDIUM_INDEX;
-    else if (m_mapHeader.width == IDX(MAP_DIMENSION_LARGE))
+    else if (m_mapHeader.width == MAP_DIMENSION_LARGE)
         mapSizeIndex = MAP_SIZE_LARGE_INDEX;
-    else if (m_mapHeader.width == IDX(MAP_DIMENSION_XLARGE))
+    else if (m_mapHeader.width == MAP_DIMENSION_XLARGE)
         mapSizeIndex = MAP_SIZE_XLARGE_INDEX;
     scenarioMessageTemp.payload.widget.id = GAME_SCENARIO_MAP_SIZE;
     scenarioMessageTemp.payload.widget.data.text = cMapSize[mapSizeIndex];
