@@ -254,22 +254,88 @@ H2_ENUM_BEGIN(GamePlayerTurnConstant)
 H2_ENUM_END(GamePlayerTurnConstant)
 
 H2_ENUM_BEGIN(GameScoreConstant)
-    SCORE_MAP_SMALL       = 36,
-    SCORE_MAP_MEDIUM      = 72,
-    SCORE_MAP_LARGE       = 108,
-    SCORE_MAP_EXTRA_LARGE = 144,
-    SCORE_BASE            = 200,
-    SCORE_FIRST_TIER      = 60,
-    SCORE_SECOND_TIER     = 120,
-    SCORE_THIRD_TIER      = 360,
-    SCORE_MINIMUM         = 20
+    SCORE_MAP_SMALL         = 36,
+    SCORE_MAP_MEDIUM        = 72,
+    SCORE_MAP_LARGE         = 108,
+    SCORE_MAP_EXTRA_LARGE   = 144,
+    SCORE_BASE              = 200,
+    SCORE_FIRST_TIER        = 60,
+    SCORE_SECOND_TIER       = 120,
+    SCORE_THIRD_TIER        = 360,
+    SCORE_MINIMUM           = 20,
+    RATING_EASY_BONUS       = 50,
+    RATING_NORMAL_BONUS     = 80,
+    RATING_HARD_BONUS       = 100,
+    RATING_EXPERT_BONUS     = 120,
+    RATING_IMPOSSIBLE_BONUS = 140,
+    MAP_RATING_NORMAL_BONUS = 20,
+    MAP_RATING_HARD_BONUS   = 40,
+    MAP_RATING_EXPERT_BONUS = 80
 H2_ENUM_END(GameScoreConstant)
 
 H2_ENUM_BEGIN(GameJoinConstant)
     JOIN_HEADER_SIZE = 2,
-    JOIN_BUFFER_SIZE = 700000,
-    JOIN_LOG_UNUSED  = -999
+    JOIN_BUFFER_SIZE = 700000
 H2_ENUM_END(GameJoinConstant)
+
+H2_ENUM_BEGIN(RemoteSaveConstant)
+    TRANSMIT_FILENAME_CAPACITY       = 456,
+    RECEIVE_FILENAME_CAPACITY        = SAVE_PATH_CAPACITY,
+    REMOTE_LOOPING_SOUND_COUNT       = 4,
+    REMOTE_PACKET_TRACKING_CAPACITY  = 5000,
+    REMOTE_HEADER_CAPACITY           = 256,
+    REMOTE_BUFFER_EXTRA              = 2000,
+    REMOTE_PACKET_PAYLOAD_SIZE       = 200,
+    REMOTE_PACKET_BATCH_SIZE         = 100,
+    REMOTE_PACKET_INDEX_SIZE         = sizeof(i16),
+    REMOTE_SAVE_HEADER_SIZE          = sizeof(i32) * 4,
+    REMOTE_DECODE_BUFFER_SIZE        = JOIN_BUFFER_SIZE,
+    REMOTE_RECEIVE_TIMEOUT           = 90000,
+    REMOTE_RECEIVE_DIALOG_BUTTONS    = 2,
+    REMOTE_MAP_CHANGE_UNWIND_LIMIT   = 999,
+    REMOTE_SAVE_HEADER_FILE_SIZE     = 0,
+    REMOTE_SAVE_HEADER_FILE_CRC      = 1,
+    REMOTE_SAVE_HEADER_TRANSMIT_CRC  = 2,
+    REMOTE_SAVE_HEADER_PLAYER        = 3,
+    REMOTE_SAVE_INIT_COMMAND         = 1,
+    REMOTE_SAVE_INIT_RESPONSE        = 2,
+    REMOTE_SAVE_DATA_COMMAND         = 3,
+    REMOTE_SAVE_ACK_REQUEST_COMMAND  = 4,
+    REMOTE_SAVE_ACK_RESPONSE_COMMAND = 5,
+    REMOTE_SAVE_FINISH_COMMAND       = 6,
+    REMOTE_SAVE_PACKET_TYPE_FIRST    = 2,
+    REMOTE_SAVE_PACKET_TYPE_SECOND   = 3
+H2_ENUM_END(RemoteSaveConstant)
+
+H2_ENUM_BEGIN(NewTurnConstant)
+    NEW_TURN_MUSIC_FILENAME_CAPACITY = 16,
+    NEW_TURN_LOWER_NAME_CAPACITY     = 52,
+    NEW_TURN_BOTTOM_VIEW_DURATION    = 3000,
+    NEW_TURN_DIALOG_TYPE             = 9,
+    NEW_MONTH_MUSIC_TRACK            = 21,
+    NEW_WEEK_MUSIC_TRACK             = 20,
+    NEW_MONTH_NORMAL_TEXT            = 2,
+    NEW_MONTH_CREATURE_TEXT          = 3,
+    NEW_MONTH_PLAGUE_TEXT            = 4,
+    NEW_WEEK_NORMAL_TEXT             = 5,
+    NEW_WEEK_CREATURE_TEXT           = 6
+H2_ENUM_END(NewTurnConstant)
+
+H2_ENUM_BEGIN(DiffRuntimeConstant)
+    DIFF_WORD_SHIFT       = 16,
+    DIFF_WORD_HEADER_SIZE = 3,
+    DIFF_BYTE_SHIFT       = 8,
+    DIFF_BYTE_HEADER_SIZE = 2,
+    DIFF_BUFFER_EXTRA     = 5000,
+    DIFF_MAX_SHORT_MATCH  = 3,
+    DIFF_COPY_FLAG_SHIFT  = 7
+H2_ENUM_END(DiffRuntimeConstant)
+
+#define SCORE_SECOND_TIER_FACTOR 0.5
+#define SCORE_SECOND_TIER_BASE_DEDUCTION 30.0
+#define SCORE_THIRD_TIER_FACTOR 0.25
+#define SCORE_THIRD_TIER_BASE_DEDUCTION 60.0
+#define SCORE_FINAL_TIER_FACTOR 0.125
 
 H2_ENUM_CLASS_BEGIN(GameDiffEncoding)
     COMMAND_SHIFT      = 7,
@@ -6406,7 +6472,7 @@ VA(0x00483219, 0x71e)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 success;
     i32 samplesReady;
-    char filename[456];
+    char filename[TRANSMIT_FILENAME_CAPACITY];
     u8* transmitData;
     i32 batchCount;
     i32 packet;
@@ -6430,7 +6496,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     u8* fileData;
     i32 done;
 
-    gpAdvManager->TrimLoopingSounds(4);
+    gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
     header = NULL;
     reply = NULL;
     transmitData = NULL;
@@ -6451,8 +6517,8 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         BVResMsg(const_cast<char*>("Sending Data"), -1, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
-    acknowledged = static_cast<char*>(H2_ALLOC(5000, 6777));
-    memset(acknowledged, 0, 5000);
+    acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY, 6777));
+    memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
         useCurrentSave = 1;
@@ -6465,12 +6531,21 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     );
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
     fileSize = FileSize(filename);
-    LogInt(const_cast<char*>("PostDiffFileSize"), fileSize, -999, -999, -999, -999, -999, -999);
+    LogInt(
+        const_cast<char*>("PostDiffFileSize"),
+        fileSize,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
 
-    header = static_cast<i32*>(H2_ALLOC(256, 6797));
+    header = static_cast<i32*>(H2_ALLOC(REMOTE_HEADER_CAPACITY, 6797));
     if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6799));
-    fileData = static_cast<u8*>(H2_ALLOC(fileSize + 2000, 6800));
+        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA, 6799));
+    fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA, 6800));
 
     file = open(filename, _O_BINARY);
     if (file == -1)
@@ -6496,45 +6571,63 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
-        LogInt(const_cast<char*>("Send"), fileSize, transmitCrc, -999, -999, -999, -999, -999);
+        LogInt(
+            const_cast<char*>("Send"),
+            fileSize,
+            transmitCrc,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE,
+            LOG_UNUSED_VALUE
+        );
 
-        header[0] = fileSize;
-        header[1] = fileCrc;
-        header[2] = transmitCrc;
-        header[3] = player;
-        result = TransmitAndWait(reinterpret_cast<char*>(header), remotePlayer, 16, 1, 2, &reply);
+        header[REMOTE_SAVE_HEADER_FILE_SIZE] = fileSize;
+        header[REMOTE_SAVE_HEADER_FILE_CRC] = fileCrc;
+        header[REMOTE_SAVE_HEADER_TRANSMIT_CRC] = transmitCrc;
+        header[REMOTE_SAVE_HEADER_PLAYER] = player;
+        result = TransmitAndWait(
+            reinterpret_cast<char*>(header),
+            remotePlayer,
+            REMOTE_SAVE_HEADER_SIZE,
+            REMOTE_SAVE_INIT_COMMAND,
+            REMOTE_SAVE_INIT_RESPONSE,
+            &reply
+        );
         if (!result)
             ShutDown(NULL);
 
-        packetCount = (fileSize - 1) / 200 + 1;
-        batchCount = (packetCount - 1) / 100 + 1;
+        packetCount = (fileSize - 1) / REMOTE_PACKET_PAYLOAD_SIZE + 1;
+        batchCount = (packetCount - 1) / REMOTE_PACKET_BATCH_SIZE + 1;
         for (batch = 0; batch < batchCount; batch++) {
             if (batch + 1 == batchCount)
-                packetsInBatch = packetCount - batch * 100;
+                packetsInBatch = packetCount - batch * REMOTE_PACKET_BATCH_SIZE;
             else
-                packetsInBatch = 100;
+                packetsInBatch = REMOTE_PACKET_BATCH_SIZE;
 
             done = 0;
             while (!done) {
-                for (packet = batch * 100; packet < batch * 100 + packetsInBatch; packet++) {
+                for (packet = batch * REMOTE_PACKET_BATCH_SIZE;
+                     packet < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
+                     packet++) {
                     PollSound();
                     CheckDoMain(0, 1);
                     if (!acknowledged[packet]) {
                         if (packet + 1 == packetCount)
-                            chunkSize = fileSize - packet * 200;
+                            chunkSize = fileSize - packet * REMOTE_PACKET_PAYLOAD_SIZE;
                         else
-                            chunkSize = 200;
+                            chunkSize = REMOTE_PACKET_PAYLOAD_SIZE;
                         *reinterpret_cast<i16*>(header) = static_cast<i16>(packet);
                         memcpy(
-                            reinterpret_cast<char*>(header) + 2,
-                            transmitData + packet * 200,
+                            reinterpret_cast<char*>(header) + REMOTE_PACKET_INDEX_SIZE,
+                            transmitData + packet * REMOTE_PACKET_PAYLOAD_SIZE,
                             chunkSize
                         );
                         result = TransmitRemoteData(
                             reinterpret_cast<char*>(header),
                             remotePlayer,
-                            chunkSize + 2,
-                            3,
+                            chunkSize + REMOTE_PACKET_INDEX_SIZE,
+                            REMOTE_SAVE_DATA_COMMAND,
                             0,
                             1,
                             -1
@@ -6544,24 +6637,41 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     }
                 }
                 LogStr(const_cast<char*>("PreWait"));
-                *reinterpret_cast<i16*>(header) = static_cast<i16>(batch * 100);
-                result =
-                    TransmitAndWait(reinterpret_cast<char*>(header), remotePlayer, 2, 4, 5, &reply);
+                *reinterpret_cast<i16*>(header) =
+                    static_cast<i16>(batch * REMOTE_PACKET_BATCH_SIZE);
+                result = TransmitAndWait(
+                    reinterpret_cast<char*>(header),
+                    remotePlayer,
+                    REMOTE_PACKET_INDEX_SIZE,
+                    REMOTE_SAVE_ACK_REQUEST_COMMAND,
+                    REMOTE_SAVE_ACK_RESPONSE_COMMAND,
+                    &reply
+                );
                 LogStr(const_cast<char*>("PostWait"));
                 if (!result)
                     ShutDown(NULL);
                 for (packet = 0; packetsInBatch > packet; packet++) {
                     if (reinterpret_cast<RemoteMessage*>(reply)->payload[packet] > 0)
-                        acknowledged[batch * 100 + packet] = 1;
+                        acknowledged[batch * REMOTE_PACKET_BATCH_SIZE + packet] = 1;
                 }
                 done = 1;
-                for (packet = batch * 100; packet < batch * 100 + packetsInBatch; packet++) {
+                for (packet = batch * REMOTE_PACKET_BATCH_SIZE;
+                     packet < batch * REMOTE_PACKET_BATCH_SIZE + packetsInBatch;
+                     packet++) {
                     if (!acknowledged[packet])
                         done = 0;
                 }
             }
         }
-        result = TransmitRemoteData(NULL, remotePlayer, 0, 6, 1, 1, -1);
+        result = TransmitRemoteData(
+            NULL,
+            remotePlayer,
+            0,
+            REMOTE_SAVE_FINISH_COMMAND,
+            1,
+            1,
+            -1
+        );
         if (!result)
             ShutDown(NULL);
         success = 1;
@@ -6641,7 +6751,7 @@ i32 game::ReceiveSaveGame(
     i32 unused20819;
     i32 success;
     i32 samplesReady;
-    char filename[452];
+    char filename[RECEIVE_FILENAME_CAPACITY];
     u8* incomingData;
     i32 index;
     i32 oldTrack;
@@ -6657,10 +6767,19 @@ i32 game::ReceiveSaveGame(
     i32 packetStart;
     u8* decodedData;
 
-    LogInt(const_cast<char*>("FW1"), remotePlayer, -999, -999, -999, -999, -999, -999);
+    LogInt(
+        const_cast<char*>("FW1"),
+        remotePlayer,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
     LogStr(const_cast<char*>("RSG1"));
     AiPrint(const_cast<char*>("Receive Start - Getting Data"));
-    gpAdvManager->TrimLoopingSounds(4);
+    gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
 
     ackBuffer = NULL;
     incomingData = NULL;
@@ -6673,7 +6792,7 @@ i32 game::ReceiveSaveGame(
     success = 0;
     oldTrack = -1;
 
-    gpAdvManager->UnwindMapChangeQueue(999, 0);
+    gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active)
         BVResMsg(const_cast<char*>("Receiving Data"), -1, 0);
 
@@ -6684,27 +6803,36 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->m_samplesReady = samplesReady;
 
     LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
-    result = TransmitRemoteData(NULL, remotePlayer, 0, 2, 1, 1, -1);
+    result = TransmitRemoteData(NULL, remotePlayer, 0, REMOTE_SAVE_INIT_RESPONSE, 1, 1, -1);
     LogStr(const_cast<char*>("End Transmit Init Confirm"));
     if (!result)
         ShutDown(NULL);
 
-    received = static_cast<char*>(H2_ALLOC(5000, 7008));
-    memset(received, 0, 5000);
+    received = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY, 7008));
+    memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(700000, 7012));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(256, 7014));
-    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + 2000, 7015));
+        decodedData = static_cast<u8*>(H2_ALLOC(REMOTE_DECODE_BUFFER_SIZE, 7012));
+    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY, 7014));
+    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA, 7015));
 
     lastPacketTime = KBTickCount();
-    LogInt(const_cast<char*>("FW2"), remotePlayer, -999, -999, -999, -999, -999, -999);
+    LogInt(
+        const_cast<char*>("FW2"),
+        remotePlayer,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
-        if (KBTickCount() > lastPacketTime + 90000) {
+        if (KBTickCount() > lastPacketTime + REMOTE_RECEIVE_TIMEOUT) {
             NormalDialog(
                 const_cast<char*>("Error receiving data.  Keep trying?"),
-                2,
+                REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
                 -1,
@@ -6721,37 +6849,40 @@ i32 game::ReceiveSaveGame(
         }
 
         packet = reinterpret_cast<RemoteMessage*>(GetRemoteData(1));
-        if (packet && (packet->type == 2 || packet->type == 3)) {
+        if (packet
+            && (packet->type == REMOTE_SAVE_PACKET_TYPE_FIRST
+                || packet->type == REMOTE_SAVE_PACKET_TYPE_SECOND)) {
             lastPacketTime = KBTickCount();
             switch (packet->command) {
-                case 3:
+                case REMOTE_SAVE_DATA_COMMAND:
                     packetStart = *reinterpret_cast<i16*>(packet->payload);
                     received[packetStart] = 1;
                     memcpy(
-                        incomingData + packetStart * 200,
-                        packet->payload + 2,
-                        packet->payloadSize - 2
+                        incomingData + packetStart * REMOTE_PACKET_PAYLOAD_SIZE,
+                        packet->payload + REMOTE_PACKET_INDEX_SIZE,
+                        packet->payloadSize - REMOTE_PACKET_INDEX_SIZE
                     );
                     break;
-                case 4:
+                case REMOTE_SAVE_ACK_REQUEST_COMMAND:
                     packetStart = *reinterpret_cast<i16*>(packet->payload);
-                    for (index = packetStart; index < packetStart + 100; index++)
+                    for (index = packetStart; index < packetStart + REMOTE_PACKET_BATCH_SIZE;
+                         index++)
                         *(ackBuffer + index - packetStart) = received[index];
                     LogInt(
                         const_cast<char*>("FW3"),
                         remotePlayer,
-                        -999,
-                        -999,
-                        -999,
-                        -999,
-                        -999,
-                        -999
+                        LOG_UNUSED_VALUE,
+                        LOG_UNUSED_VALUE,
+                        LOG_UNUSED_VALUE,
+                        LOG_UNUSED_VALUE,
+                        LOG_UNUSED_VALUE,
+                        LOG_UNUSED_VALUE
                     );
                     result = TransmitRemoteData(
                         reinterpret_cast<char*>(ackBuffer),
                         remotePlayer,
-                        200,
-                        5,
+                        REMOTE_PACKET_PAYLOAD_SIZE,
+                        REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                         1,
                         1,
                         -1
@@ -6759,7 +6890,7 @@ i32 game::ReceiveSaveGame(
                     if (!result)
                         ShutDown(NULL);
                     break;
-                case 6:
+                case REMOTE_SAVE_FINISH_COMMAND:
                     finished = 1;
                     break;
             }
@@ -6773,10 +6904,10 @@ i32 game::ReceiveSaveGame(
         dataSize,
         receivedCrc,
         expectedTransmitCrc,
-        -999,
-        -999,
-        -999,
-        -999
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
     if (gbUseRegularCompression) {
         dataSize = DecodeData(
@@ -6794,10 +6925,10 @@ i32 game::ReceiveSaveGame(
         dataSize,
         computedCrc,
         expectedCrc,
-        -999,
-        -999,
-        -999,
-        -999
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
 
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
@@ -6852,8 +6983,8 @@ i32 game::ReceiveSaveGame(
 
 VA(0x00483fc4, 0x455)
 void game::DoNewTurn(void) {
-    char musicFile18[16];
-    char lowerName19[52];
+    char musicFile18[NEW_TURN_MUSIC_FILENAME_CAPACITY];
+    char lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
     i32 musicTrack2;
 
     CheckForTimeEvent();
@@ -6861,7 +6992,7 @@ void game::DoNewTurn(void) {
         CheckEndGame(0, 0);
         return;
     }
-    giBottomViewOverrideEndTime = KBTickCount() + 3000;
+    giBottomViewOverrideEndTime = KBTickCount() + NEW_TURN_BOTTOM_VIEW_DURATION;
     giBottomViewOverride = 1;
     gpAdvManager->UpdBottomView(1, 1, 1);
     gpAdvManager->SetInitialMapOrigin();
@@ -6880,7 +7011,7 @@ void game::DoNewTurn(void) {
             1,
             -1,
             -1,
-            9,
+            NEW_TURN_DIALOG_TYPE,
             gpGame->GetPlayerColor(static_cast<i8>(giCurPlayer)),
             -1,
             0,
@@ -6902,26 +7033,40 @@ void game::DoNewTurn(void) {
         if (giWeekType != -1) {
             musicTrack2 = -1;
             if (m_week == 1) {
-                musicTrack2 = 21;
+                musicTrack2 = NEW_MONTH_MUSIC_TRACK;
                 strcpy(musicFile18, "newmonth.82m");
-                if (giMonthType == 0) {
-                    sprintf(gText, cNewTurn[2], gMonthNames[giMonthTypeExtra]);
-                } else if (giMonthType == 1) {
+                if (giMonthType == TYPE_NORMAL) {
+                    sprintf(
+                        gText,
+                        cNewTurn[NEW_MONTH_NORMAL_TEXT],
+                        gMonthNames[giMonthTypeExtra]
+                    );
+                } else if (giMonthType == TYPE_CREATURE) {
                     strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
                     lowerName19[0] -= 'a' - 'A';
-                    sprintf(gText, cNewTurn[3], gArmyNames[giMonthTypeExtra], lowerName19);
+                    sprintf(
+                        gText,
+                        cNewTurn[NEW_MONTH_CREATURE_TEXT],
+                        gArmyNames[giMonthTypeExtra],
+                        lowerName19
+                    );
                 } else {
-                    sprintf(gText, cNewTurn[4]);
+                    sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
                 }
             } else {
-                musicTrack2 = 20;
+                musicTrack2 = NEW_WEEK_MUSIC_TRACK;
                 strcpy(musicFile18, "newweek.82m");
-                if (giWeekType == 0) {
-                    sprintf(gText, cNewTurn[5], gWeekNames[giWeekTypeExtra]);
+                if (giWeekType == WEEK_NORMAL) {
+                    sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
                     strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
                     lowerName19[0] -= 'a' - 'A';
-                    sprintf(gText, cNewTurn[6], gArmyNames[giWeekTypeExtra], lowerName19);
+                    sprintf(
+                        gText,
+                        cNewTurn[NEW_WEEK_CREATURE_TEXT],
+                        gArmyNames[giWeekTypeExtra],
+                        lowerName19
+                    );
                 }
             }
             gpSoundManager->PlayAmbientMusic(musicTrack2, 0, -1);
@@ -6933,8 +7078,11 @@ void game::DoNewTurn(void) {
         }
     }
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[gpAdvManager->m_currentTerrain]);
-    gpAdvManager
-        ->SetEnvironmentOrigin(gpAdvManager->m_mapOriginX + 7, gpAdvManager->m_mapOriginY + 7, 1);
+    gpAdvManager->SetEnvironmentOrigin(
+        gpAdvManager->m_mapOriginX + ENVIRONMENT_ORIGIN_TILE_OFFSET,
+        gpAdvManager->m_mapOriginY + ENVIRONMENT_ORIGIN_TILE_OFFSET,
+        1
+    );
 }
 
 VA(0x00484419, 0x58)
@@ -6964,24 +7112,24 @@ VA(0x0048450d, 0x113)
 i32 game::CalcDifficultyRating(void) {
     i32 notused;
     i32 rating = 0;
-    if (m_difficulty == 0)
-        rating += 50;
-    else if (m_difficulty == 1)
-        rating += 80;
-    else if (m_difficulty == 2)
-        rating += 100;
-    else if (m_difficulty == 3)
-        rating += 120;
-    else if (m_difficulty == 4)
-        rating += 140;
-    if (m_mapHeader.difficulty == 0)
+    if (m_difficulty == DIFFICULTY_EASY)
+        rating += RATING_EASY_BONUS;
+    else if (m_difficulty == DIFFICULTY_NORMAL)
+        rating += RATING_NORMAL_BONUS;
+    else if (m_difficulty == DIFFICULTY_HARD)
+        rating += RATING_HARD_BONUS;
+    else if (m_difficulty == DIFFICULTY_EXPERT)
+        rating += RATING_EXPERT_BONUS;
+    else if (m_difficulty == DIFFICULTY_IMPOSSIBLE)
+        rating += RATING_IMPOSSIBLE_BONUS;
+    if (m_mapHeader.difficulty == DIFFICULTY_EASY)
         ;
-    else if (m_mapHeader.difficulty == 1)
-        rating += 20;
-    else if (m_mapHeader.difficulty == 2)
-        rating += 40;
-    else if (m_mapHeader.difficulty == 3)
-        rating += 80;
+    else if (m_mapHeader.difficulty == DIFFICULTY_NORMAL)
+        rating += MAP_RATING_NORMAL_BONUS;
+    else if (m_mapHeader.difficulty == DIFFICULTY_HARD)
+        rating += MAP_RATING_HARD_BONUS;
+    else if (m_mapHeader.difficulty == DIFFICULTY_EXPERT)
+        rating += MAP_RATING_EXPERT_BONUS;
     return rating;
 }
 
@@ -7002,14 +7150,20 @@ i32 CalcBaseScore(i32 days) {
     } else {
         score -= SCORE_FIRST_TIER;
         if (days <= SCORE_SECOND_TIER) {
-            score = static_cast<i32>(score - (days - SCORE_FIRST_TIER) * 0.5);
+            score = static_cast<i32>(
+                score - (days - SCORE_FIRST_TIER) * SCORE_SECOND_TIER_FACTOR
+            );
         } else {
-            score = static_cast<i32>(score - 30.0);
+            score = static_cast<i32>(score - SCORE_SECOND_TIER_BASE_DEDUCTION);
             if (days <= SCORE_THIRD_TIER) {
-                score = static_cast<i32>(score - (days - SCORE_SECOND_TIER) * 0.25);
+                score = static_cast<i32>(
+                    score - (days - SCORE_SECOND_TIER) * SCORE_THIRD_TIER_FACTOR
+                );
             } else {
-                score = static_cast<i32>(score - 60.0);
-                score = static_cast<i32>(score - (days - SCORE_THIRD_TIER) * 0.125);
+                score = static_cast<i32>(score - SCORE_THIRD_TIER_BASE_DEDUCTION);
+                score = static_cast<i32>(
+                    score - (days - SCORE_THIRD_TIER) * SCORE_FINAL_TIER_FACTOR
+                );
             }
         }
     }
@@ -7058,18 +7212,18 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     flags = (cmd << IDX(COMMAND_SHIFT)) | flags;
     if (len > IDX(LEN_WORD_MAX)) {
         flags |= IDX(LEN_WORD_FLAG);
-        flags |= (len & IDX(LEN_HIGH_MASK)) >> 16;
+        flags |= (len & IDX(LEN_HIGH_MASK)) >> DIFF_WORD_SHIFT;
         u16 word = static_cast<u16>(len & IDX(LEN_LOW_MASK));
         buf[*pos] = flags;
         *reinterpret_cast<u16*>(buf + *pos + 1) = word;
-        *pos += 3;
+        *pos += DIFF_WORD_HEADER_SIZE;
     } else if (len > IDX(LEN_BYTE_MAX)) {
         flags |= IDX(LEN_BYTE_FLAG);
-        flags |= (len >> 8) & IDX(LEN_SHORT_MASK);
+        flags |= (len >> DIFF_BYTE_SHIFT) & IDX(LEN_SHORT_MASK);
         u8 lo = static_cast<u8>(len);
         buf[*pos] = flags;
         buf[*pos + 1] = lo;
-        *pos += 2;
+        *pos += DIFF_BYTE_HEADER_SIZE;
     } else {
         flags |= static_cast<u8>(len);
         buf[*pos] = flags;
@@ -7083,14 +7237,14 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
     i32 len;
     if (b & IDX(LEN_WORD_FLAG)) {
         len = b & IDX(LEN_WORD_HIGH_MASK);
-        len <<= 16;
+        len <<= DIFF_WORD_SHIFT;
         len |= *reinterpret_cast<u16*>(buf + *pos + 1);
-        *pos += 3;
+        *pos += DIFF_WORD_HEADER_SIZE;
     } else if (b & IDX(LEN_BYTE_FLAG)) {
         len = b & IDX(LEN_SHORT_MASK);
-        len <<= 8;
+        len <<= DIFF_BYTE_SHIFT;
         len |= buf[*pos + 1];
-        *pos += 2;
+        *pos += DIFF_BYTE_HEADER_SIZE;
     } else {
         len = b & IDX(LEN_SHORT_MASK);
         (*pos)++;
@@ -7148,11 +7302,11 @@ void CreateDiffFile(
         const_cast<char*>("Orig Join CRC"),
         calc_crc_long(joinData29, joinSize36),
         joinSize36,
-        -999,
-        -999,
-        -999,
-        -999,
-        -999
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
 
     if (!forceWhole) {
@@ -7167,17 +7321,19 @@ void CreateDiffFile(
         close(oldFile17);
     }
 
-    diffData6 =
-        static_cast<u8*>(H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + 5000, 7581));
+    diffData6 = static_cast<u8*>(H2_ALLOC(
+        (oldSize37 > joinSize36 ? oldSize37 : joinSize36) + DIFF_BUFFER_EXTRA,
+        7581
+    ));
     if (sendWhole4) {
         diffData6[0] = 0;
         diffData6[1] = 0;
-        memcpy(diffData6 + 2, joinData29, joinSize36);
-        diffSize29 = joinSize36 + 2;
+        memcpy(diffData6 + JOIN_HEADER_SIZE, joinData29, joinSize36);
+        diffSize29 = joinSize36 + JOIN_HEADER_SIZE;
     } else {
         diffData6[0] = 1;
         diffData6[1] = 0;
-        diffSize29 = 2;
+        diffSize29 = JOIN_HEADER_SIZE;
         position1 = 0;
         copyLength28 = 0;
         compareOffset4 = copyLength28;
@@ -7198,7 +7354,7 @@ void CreateDiffFile(
                        && oldData13[position1 + compareOffset4 + copyLength28]
                               == joinData29[position1 + compareOffset4 + copyLength28])
                     compareOffset4++;
-                if (compareOffset4 <= 3) {
+                if (compareOffset4 <= DIFF_MAX_SHORT_MATCH) {
                     copyLength28 += compareOffset4;
                     compareOffset4 = 0;
                     continue;
@@ -7289,7 +7445,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
         position1 = JOIN_HEADER_SIZE;
         while (diffSize1 > position1) {
-            copyFlag16 = diffData5[position1] >> 7;
+            copyFlag16 = diffData5[position1] >> DIFF_COPY_FLAG_SHIFT;
             copyLength9 = GetSkipCopyLen(diffData5, &position1);
             if (copyFlag16) {
                 memcpy(joinData9 + joinSize37, diffData5 + position1, copyLength9);
@@ -7311,11 +7467,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         const_cast<char*>("New Join CRC"),
         calc_crc_long(joinData9, joinSize37),
         joinSize37,
-        JOIN_LOG_UNUSED,
-        JOIN_LOG_UNUSED,
-        JOIN_LOG_UNUSED,
-        JOIN_LOG_UNUSED,
-        JOIN_LOG_UNUSED
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
     );
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
