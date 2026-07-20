@@ -6,13 +6,23 @@
 
 struct tag_message;
 
+H2_ENUM_BEGIN(PlayerColor)
+    PLAYER_COLOR_BLUE   = 0,
+    PLAYER_COLOR_GREEN  = 1,
+    PLAYER_COLOR_RED    = 2,
+    PLAYER_COLOR_YELLOW = 3,
+    PLAYER_COLOR_ORANGE = 4,
+    PLAYER_COLOR_PURPLE = 5,
+    PLAYER_COLOR_COUNT  = 6
+H2_ENUM_END(PlayerColor)
+
 H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_SOURCE_LINE             = 660,
     GAME_LOAD_SOURCE_LINE        = 1103,
     GAME_SAVE_BUFFER_SIZE        = 50000,
     GAME_FILE_MARKER             = 1234,
     GAME_UNUSED_FILE_MARKER      = 9999,
-    GAME_PLAYER_COUNT            = 6,
+    GAME_PLAYER_COUNT            = PLAYER_COLOR_COUNT,
     GAME_HERO_COUNT              = 54,
     GAME_TOWN_COUNT              = 72,
     GAME_MINE_COUNT              = 144,

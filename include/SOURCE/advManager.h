@@ -34,9 +34,9 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_BOTTOM_VIEW_TEXT_PADDING_SIZE = 0x18,
     ADVMGR_RUNTIME_ALIGNMENT_SIZE        = 4,
     ADVMGR_OBJECT_ICON_COUNT             = 64,
-    ADVMGR_VIEW_BOUND_COUNT              = 4,
-    ADVMGR_HERO_ICON_COUNT               = 8,
-    ADVMGR_PLAYER_FLAG_ICON_COUNT        = 6,
+    ADVMGR_ANIMATION_PHASE_COUNT         = 4,
+    ADVMGR_HERO_ICON_COUNT               = IDX(FACTION_COUNT) + 2,
+    ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
     ADVMGR_STEP_PIXEL_COUNT              = 6,
@@ -101,7 +101,7 @@ public:
     i32 m_updateMaxX;
     i32 m_updateMaxY;
     i32 m_updatePending;
-    i32 m_viewBounds[ADVMGR_VIEW_BOUND_COUNT];
+    i32 m_animationPhases[ADVMGR_ANIMATION_PHASE_COUNT];
     class icon* m_heroIcons[ADVMGR_HERO_ICON_COUNT];
     class icon* m_shadowIcon;
     class icon* m_boatShadowIcon;
