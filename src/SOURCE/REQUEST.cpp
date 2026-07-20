@@ -1123,7 +1123,9 @@ void fileRequester::Update(i32 drawWindow) {
 
     if (m_fileCount <= iMaxListSize) {
         m_scrollKnob->m_y =
-            static_cast<i16>(fGutterTravelLength / SCROLL_CENTER_DIVISOR + fGutterMinY);
+            static_cast<i16>(
+                fGutterTravelLength / IDX(SCROLL_CENTER_DIVISOR) + fGutterMinY
+            );
     } else {
         gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
         m_scrollKnob->m_y = static_cast<i16>(m_topIndex * gutterStepCount + fGutterMinY);

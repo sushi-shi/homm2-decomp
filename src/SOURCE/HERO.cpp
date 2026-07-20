@@ -667,7 +667,7 @@ i32 hero::GetExperience(i32 level) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - EXPERIENCE_PREVIOUS_ENTRY_OFFSET])
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -693,7 +693,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - EXPERIENCE_PREVIOUS_ENTRY_OFFSET])
+               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;

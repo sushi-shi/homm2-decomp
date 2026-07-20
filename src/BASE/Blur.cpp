@@ -165,10 +165,10 @@ void DoBlur(
                     static_cast<u32>(input[-SCREEN_WIDTH * BORDER_RADIUS])
                     << COMPONENT_INDEX_SHIFT;
                 samples[IDX(SOUTH_TWO_SAMPLE)] =
-                    static_cast<u32>(input[SCREEN_WIDTH * SECOND_NEIGHBOR_DISTANCE])
+                    static_cast<u32>(input[SCREEN_WIDTH * IDX(SECOND_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
                 samples[IDX(NORTH_TWO_SAMPLE)] =
-                    static_cast<u32>(input[-SCREEN_WIDTH * SECOND_NEIGHBOR_DISTANCE])
+                    static_cast<u32>(input[-SCREEN_WIDTH * IDX(SECOND_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
                 samples[IDX(EAST_ONE_SAMPLE)] =
                     static_cast<u32>(input[1]) << COMPONENT_INDEX_SHIFT;
@@ -177,12 +177,12 @@ void DoBlur(
                 samples[IDX(EAST_TWO_SAMPLE)] =
                     static_cast<u32>(input[SECOND_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
                 samples[IDX(SOUTH_THREE_SAMPLE)] =
-                    static_cast<u32>(input[SCREEN_WIDTH * THIRD_NEIGHBOR_DISTANCE])
+                    static_cast<u32>(input[SCREEN_WIDTH * IDX(THIRD_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
                 samples[IDX(WEST_TWO_SAMPLE)] =
                     static_cast<u32>(input[-SECOND_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
                 samples[IDX(NORTH_THREE_SAMPLE)] =
-                    static_cast<u32>(input[-SCREEN_WIDTH * THIRD_NEIGHBOR_DISTANCE])
+                    static_cast<u32>(input[-SCREEN_WIDTH * IDX(THIRD_NEIGHBOR_DISTANCE)])
                     << COMPONENT_INDEX_SHIFT;
                 samples[IDX(EAST_THREE_SAMPLE)] =
                     static_cast<u32>(input[THIRD_NEIGHBOR_DISTANCE]) << COMPONENT_INDEX_SHIFT;
@@ -377,7 +377,9 @@ void DoBlur(
     gpWindowManager
         ->FizzleForward(0, 0, SCREEN_WIDTH, height, FIZZLE_DELAY, oldPalette, newPalette);
     DelayMilli(
-        static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SPEED_DELAY_MILLISECONDS)
+        static_cast<i32l>(
+            gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
+        )
     );
     gpWindowManager->SaveFizzleSource(0, 0, SCREEN_WIDTH, height);
     memcpy(source->m_pixels, saved->m_pixels, imageSize);

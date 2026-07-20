@@ -319,7 +319,7 @@ i32 WaitForDirectConnect(void) {
 VA(0x0040d3b8, 0x127)
 char ReadPacket(void) {
     i32 input;
-    if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - INPUT_QUEUE_GUARD) {
+    if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - IDX(INPUT_QUEUE_GUARD)) {
         LogStr("OverFlow1");
         inque.writePosition = 0;
         newpacket = 1;
