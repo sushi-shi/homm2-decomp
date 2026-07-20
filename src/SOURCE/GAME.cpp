@@ -2192,7 +2192,7 @@ void game::RandomizeEvents(void) {
     i32 yPos19;
     i32 xPos2;
     i32 j9;
-    i32 value26;
+    ArtifactType value26;
     i32 randomValue7;
     i32 mineId2;
     i32 column1;
@@ -2562,8 +2562,8 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
                     randomValue7 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value26 = cell2->m_objectIndex >> 1;
-                    if (value26 != IDX(ARTIFACT_SPELL_SCROLL)) {
+                    value26 = static_cast<ArtifactType>(cell2->m_objectIndex >> 1);
+                    if (value26 != ARTIFACT_SPELL_SCROLL) {
                         if (randomValue7 < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
                             if (randomValue7 % EVENT_BUCKET_COUNT
                                 == ARTIFACT_EVENT_WISDOM_BUCKET)
@@ -2574,14 +2574,14 @@ void game::RandomizeEvents(void) {
                             else
                                 cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_PICKUP;
                         } else if (randomValue7 < ARTIFACT_EVENT_GUARD_CUTOFF) {
-                            if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
+                            if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_TREASURE)
                                 cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_GOLD;
-                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
+                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MINOR)
                                 cell2->m_objectMetadata =
                                     (Random(IDX(RES_WOOD), IDX(RES_GEMS))
                                      << ARTIFACT_EVENT_RESOURCE_SHIFT)
                                     | ARTIFACT_EVENT_MODE_RESOURCE_3;
-                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MAJOR))
+                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MAJOR)
                                 cell2->m_objectMetadata =
                                     (Random(IDX(RES_WOOD), IDX(RES_GEMS))
                                      << ARTIFACT_EVENT_RESOURCE_SHIFT)
@@ -2601,9 +2601,9 @@ void game::RandomizeEvents(void) {
                             artifactGuardianChoices[5] = CREATURE_TITAN;
                             // NOLINTEND(readability-magic-numbers)
                             cell2->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
-                            if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_TREASURE))
+                            if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_TREASURE)
                                 cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
-                            else if (gArtifactLevel[value26] == IDX(ARTIFACT_LEVEL_MINOR))
+                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MINOR)
                                 cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
                                     EVENT_ROLL_MIN,
                                     MINOR_GUARDIAN_CHOICE_COUNT - 1
@@ -5159,27 +5159,25 @@ i32 game::GetRandomArtifactId(
     b32 allowCursed
 ) {
     i32 attempts = 0;
-    i32 artifact;
+    ArtifactType artifact;
 
     while (1) {
         if (xIsExpansionMap)
-            artifact = Random(ARTIFACT_FIRST, ARTIFACT_EXPANSION_LAST);
+            artifact = static_cast<ArtifactType>(Random(ARTIFACT_FIRST, ARTIFACT_EXPANSION_LAST));
         else
-            artifact = Random(ARTIFACT_FIRST, ARTIFACT_BASE_LAST);
+            artifact = static_cast<ArtifactType>(Random(ARTIFACT_FIRST, ARTIFACT_BASE_LAST));
 
-        if (!(IDX(levelMask) & gArtifactLevel[artifact]))
+        if (!HAS(levelMask, gArtifactLevel[IDX(artifact)]))
             continue;
-        if (artifact == IDX(ARTIFACT_EDITOR_ANY_ULTIMATE)
-            || artifact == IDX(ARTIFACT_EDITOR_UNUSED_84)
-            || artifact == IDX(ARTIFACT_EDITOR_UNUSED_85)
-            || artifact == IDX(ARTIFACT_EDITOR_UNUSED_86) || artifact == IDX(ARTIFACT_SPELL_SCROLL)
-            || artifact == IDX(ARTIFACT_BREASTPLATE_ANDURAN)
-            || artifact == IDX(ARTIFACT_BATTLE_GARB) || artifact == IDX(ARTIFACT_HELMET_ANDURAN)
-            || artifact == IDX(ARTIFACT_SWORD_ANDURAN) || artifact == IDX(ARTIFACT_SPHERE_NEGATION))
+        if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
+            || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
+            || artifact == ARTIFACT_SPELL_SCROLL || artifact == ARTIFACT_BREASTPLATE_ANDURAN
+            || artifact == ARTIFACT_BATTLE_GARB || artifact == ARTIFACT_HELMET_ANDURAN
+            || artifact == ARTIFACT_SWORD_ANDURAN || artifact == ARTIFACT_SPHERE_NEGATION)
             continue;
-        if (attempts++ < ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[artifact])
+        if (attempts++ < ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[IDX(artifact)])
             continue;
-        if (IsCursedItem(ArtifactType(artifact))) {
+        if (IsCursedItem(artifact)) {
             if (!allowCursed)
                 continue;
             if (Random(ARTIFACT_FIRST, ARTIFACT_CURSED_ROLL_MAX)
@@ -5187,12 +5185,12 @@ i32 game::GetRandomArtifactId(
                 continue;
         }
         if (m_mapHeader.victoryCondition != MAP_VICTORY_FIND_ARTIFACT
-            || m_mapHeader.victoryConditionValue - ARTIFACT_ID_OFFSET != artifact)
+            || m_mapHeader.victoryConditionValue - ARTIFACT_ID_OFFSET != IDX(artifact))
             break;
     }
 
-    m_randomArtifacts[artifact] = 1;
-    return artifact;
+    m_randomArtifacts[IDX(artifact)] = 1;
+    return IDX(artifact);
 }
 
 VA(0x0047fe4f, 0x68)

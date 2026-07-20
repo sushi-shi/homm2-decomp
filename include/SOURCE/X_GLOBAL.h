@@ -346,7 +346,7 @@ extern i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESO
 extern i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT];
 extern i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT];
 extern i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT];
-extern u8 gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
+extern H2_ENUM_STORAGE(ArtifactLevelMask, u8) gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT];
 extern i32 gUltArtifactAvgValue;
 extern i8 giVisRangeTown;
 extern float gfStatPower[KB_STAT_POWER_COUNT];
