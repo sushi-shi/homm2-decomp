@@ -1636,8 +1636,8 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
 
             value26 =
                 gMonsterDatabase[IDX(target0->m_monsterType)].fightValue * target0->m_quantity;
-            if ((IDX(bestPriority0) | 0) < IDX(priority)
-                || ((IDX(bestPriority0) | 0) == IDX(priority) && bestValue10 < value26)) {
+            if (bestPriority0 < priority
+                || (bestPriority0 == priority && bestValue10 < value26)) {
                 bestValue10 = value26;
                 bestPriority0 = priority;
                 bestArmyIndex5 = armyIndex3;
@@ -1665,8 +1665,8 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     };
     // NOLINTEND(readability-magic-numbers)
     i32 unknownTowerData6[KEEP_TOWER_SCRATCH_COUNT];
-    i32 sourceX9 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][tower].x;
-    i32 sourceY6 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][tower].y;
+    i32 sourceX9 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][IDX(tower)].x;
+    i32 sourceY6 = towerOrigins4[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)][IDX(tower)].y;
     i32 targetX9 = target0->MidX();
     i32 targetY8 = target0->MidY();
     // Retail keep-missile direction payload.
@@ -1958,11 +1958,11 @@ void combatManager::LowerDoor(void) {
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_DOOR_EXTENT_MAX_Y;
-    i32 bridgeFrame;
-    for (bridgeFrame = IDX(COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND);
-         bridgeFrame >= IDX(COMBAT_DRAWBRIDGE_LOWERED);
+    CombatDrawbridgeState bridgeFrame;
+    for (bridgeFrame = COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND;
+         bridgeFrame >= COMBAT_DRAWBRIDGE_LOWERED;
          bridgeFrame--) {
-        m_drawbridgeState = CombatDrawbridgeState(bridgeFrame);
+        m_drawbridgeState = bridgeFrame;
         DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     }
     WaitEndSample(drawbridgeSample, -1);
