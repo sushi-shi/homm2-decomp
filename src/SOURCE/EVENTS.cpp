@@ -1030,7 +1030,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero2->m_remainingMobility = 0;
                 eventHero2->m_direction = static_cast<u8>(m_cursorDirection);
-                m_cursorType = eventHero2->m_cursorType;
+                m_cursorType = IDX(eventHero2->m_cursorType);
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
                 playedSample3 = LoadPlaySample("killfade.82m");
@@ -5610,7 +5610,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = static_cast<u8>(m_cursorDirection);
-                m_cursorType = eventHero->m_cursorType;
+                m_cursorType = IDX(eventHero->m_cursorType);
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
                 CheckAdjacentMon(&adjacentMonster_j);
@@ -6679,16 +6679,16 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             if (!(eventHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags | AI_GENERIC_SITE_SHIPWRECK_FLAG;
                 switch (eventHero->m_cursorType) {
-                    case IDX(FACTION_SORCERESS):
-                    case IDX(FACTION_WARLOCK):
-                    case IDX(FACTION_WIZARD):
-                    case IDX(FACTION_NECROMANCER):
+                    case FACTION_SORCERESS:
+                    case FACTION_WARLOCK:
+                    case FACTION_WIZARD:
+                    case FACTION_NECROMANCER:
                         primaryStat16 = HERO_PRIMARY_SPELL_POWER;
                         break;
-                    case IDX(FACTION_BARBARIAN):
+                    case FACTION_BARBARIAN:
                         primaryStat16 = HERO_PRIMARY_ATTACK;
                         break;
-                    case IDX(FACTION_KNIGHT):
+                    case FACTION_KNIGHT:
                         primaryStat16 = HERO_PRIMARY_DEFENSE;
                         break;
                     default:

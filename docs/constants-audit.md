@@ -39,3 +39,16 @@ Do not replace serialized payloads, retail annotations, source-line steering val
 operands merely to silence the audit. Preserve meaningful evidence and record any necessary retained
 literal in the manifest notes. Each source batch is verified with MSVC, raw bytes, and ordered
 relocations; a fuzzy score is navigation only and never an acceptance ratchet.
+
+## Storage-split enum domains
+
+Use `H2_ENUM_CLASS_BEGIN_SPLIT(name, storage)` when one semantic domain has an `i32` CodeView/API
+type but is also stored in narrower fields. Strict Clang builds see a scoped enum with the declared
+underlying type; retail MSVC builds keep the domain typedef as `i32`. Declare each stored field as
+`H2_ENUM_STORAGE(name, proven_storage)`, which exposes the enum to strict checking while preserving
+that field's proven retail type (`u8`, `i8`, plain `char`, or `i32`) in production.
+
+Function parameters and semantic locals use the domain type directly. Raw file/network values are
+converted where they enter the domain, and `IDX` remains limited to real indexing or arithmetic.
+Generic integer sinks should provide a strict-only enum overload when every enum is a legitimate
+input, instead of making ordinary callers encode and decode the domain manually.

@@ -178,7 +178,7 @@ public:
     i32 CreateBoat(i32, i32, i32);
     i32 Scan(i8*, i32, i32);
     i32 RandomScan(i8*, i32, i32, i32, i8);
-    i32 GetNewHeroId(i32, i32, i32);
+    i32 GetNewHeroId(i32, FactionType, i32);
     i32 GetTownId(i32, i32);
     hero* GetHero(i32 id) {
         return &m_heroRecs[id];

@@ -187,7 +187,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             }
 
             {
-                i32 townFrame = record->m_type;
+                i32 townFrame = IDX(record->m_type);
                 if ((record->m_buildings & IDX(TOWN_BUILDING_CASTLE)) == 0) {
                     townFrame += 6;
                 }
@@ -297,8 +297,8 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                 iconCount++;
 
-                i32 captainMana = record->m_type == IDX(FACTION_BARBARIAN)
-                                          || record->m_type == IDX(FACTION_KNIGHT)
+                i32 captainMana = record->m_type == FACTION_BARBARIAN
+                                          || record->m_type == FACTION_KNIGHT
                                       ? 10
                                       : 20;
                 OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
@@ -421,7 +421,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             40,
                             const_cast<char*>("mons32.icn"),
                             static_cast<i16>(
-                                gDwellingType[static_cast<i8>(record->m_type)][detailIndex]
+                                gDwellingType[IDX(record->m_type)][detailIndex]
                             ),
                             0,
                             static_cast<i16>(rowWidgetId6 + detailIndex + 15),

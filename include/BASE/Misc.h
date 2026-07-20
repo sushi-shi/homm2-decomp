@@ -103,6 +103,13 @@ void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(char*);
 void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
+#ifdef HOMM2_STRICT_ENUM_TYPES
+template <typename Enum>
+    requires __is_enum(Enum)
+inline void LogInt(char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
+    LogInt(text, static_cast<i32>(value), b, c, d, e, f, g);
+}
+#endif
 void AiPrint(char*);
 void AbsAiPrint(char*);
 void FadeTo(u8*, u8*, i32);

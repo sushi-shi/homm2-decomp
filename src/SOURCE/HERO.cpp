@@ -198,7 +198,7 @@ hero::hero(void) {
     m_owner = 0;
     m_x = 0;
     m_y = 0;
-    m_cursorType = 0;
+    m_cursorType = FACTION_KNIGHT;
     m_portrait = 0;
     m_name[0] = 0;
     heroWin = NULL;
@@ -439,7 +439,7 @@ void hero::UpdateArmies(void) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
             message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value =
-                gMonsterDatabase[m_army.m_creatureTypes[index]].race
+                IDX(gMonsterDatabase[m_army.m_creatureTypes[index]].race)
                 + UI_ARMY_RACE_FRAME_OFFSET;
             heroWin->BroadcastMessage(message);
 
@@ -802,18 +802,18 @@ void hero::CheckLevel(void) {
             SRand(m_randomSeed + currentLevelIndex * HERO_LEVEL_RANDOM_SEED_FACTOR);
             randomValue = SRandom(1, HERO_LEVEL_RANDOM_MAX);
             if (randomValue
-                < gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)]) {
+                < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)]) {
                 statBonuses[IDX(HERO_PRIMARY_ATTACK)]++;
             } else {
                 randomValue -=
-                    gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)];
+                    gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)];
                 if (randomValue
-                    < gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)]) {
+                    < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)]) {
                     statBonuses[IDX(HERO_PRIMARY_DEFENSE)]++;
                 } else {
                     randomValue -=
-                        gHeroSkillBonus[m_cursorType][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)];
-                    if (randomValue < gHeroSkillBonus[m_cursorType][highLevelIndex]
+                        gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)];
+                    if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex]
                                                      [IDX(HERO_PRIMARY_SPELL_POWER)]) {
                         statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)]++;
                     } else {
@@ -833,8 +833,8 @@ void hero::CheckLevel(void) {
 
             for (indexValue = 0; indexValue < HERO_SECONDARY_SKILL_CHOICE_COUNT; indexValue++) {
                 skillChoicesResult[indexValue] = HERO_SECONDARY_SKILL_NONE;
-                if (indexValue == 0 && m_cursorType != IDX(FACTION_BARBARIAN)
-                    && m_cursorType != IDX(FACTION_KNIGHT)
+                if (indexValue == 0 && m_cursorType != FACTION_BARBARIAN
+                    && m_cursorType != FACTION_KNIGHT
                     && m_secondarySkills[IDX(HERO_SKILL_WISDOM)] < IDX(HERO_SKILL_LEVEL_EXPERT)
                     && currentLevelIndex - m_enabled >= HERO_SECONDARY_SKILL_OFFER_GAP) {
                     skillChoicesResult[indexValue] = IDX(HERO_SKILL_WISDOM);
@@ -850,7 +850,7 @@ void hero::CheckLevel(void) {
                                         < IDX(HERO_SKILL_LEVEL_EXPERT))
                                 || (m_secondarySkills[skillIndexValue] == IDX(HERO_SKILL_LEVEL_NONE)
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
-                            skillWeightIndex -= iGetSSByAlignment[skillIndexValue][m_cursorType];
+                            skillWeightIndex -= iGetSSByAlignment[skillIndexValue][IDX(m_cursorType)];
                             if (skillWeightIndex <= 0) {
                                 skillChoicesResult[indexValue] = skillIndexValue;
                                 break;
@@ -1109,7 +1109,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 gText,
                 cHeroScreen[IDX(TEXT_DISMISS)],
                 gpHVHero->m_name,
-                gAlignmentNames[gpHVHero->m_cursorType]
+                gAlignmentNames[IDX(gpHVHero->m_cursorType)]
             );
             break;
 
@@ -1608,7 +1608,7 @@ void SetupHeroView(void) {
         cannotDismiss = 1;
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "%s the %s", gpHVHero->m_name, gAlignmentNames[gpHVHero->m_cursorType]);
+    sprintf(gText, "%s the %s", gpHVHero->m_name, gAlignmentNames[IDX(gpHVHero->m_cursorType)]);
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_HERO_TITLE;
     message.payload.widget.data.text = gText;
@@ -2006,7 +2006,7 @@ i8 hero::GetSSLevel(i32 skill) {
         return level;
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;
-    if (m_cursorType == IDX(FACTION_NECROMANCER))
+    if (m_cursorType == FACTION_NECROMANCER)
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;

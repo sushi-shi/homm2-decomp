@@ -15,7 +15,7 @@ public:
     i32 m_buildingId;
     icon* m_icon;
     border* m_border;
-    townObject(i32, i32, char*);
+    townObject(FactionType, i32, char*);
     ~townObject();
     void Draw(i32);
 };

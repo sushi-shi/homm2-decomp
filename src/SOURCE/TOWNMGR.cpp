@@ -385,7 +385,7 @@ H2_ENUM_CLASS_BEGIN(TownPortraitIcon)
 H2_ENUM_CLASS_END(TownPortraitIcon)
 
 VA(0x00413900, 0x16a)
-townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
+townObject::townObject(FactionType townType, i32 buildingId, char* iconBaseName) {
     char fileName[TOWN_OBJECT_FILENAME_SIZE];
     i32 x;
     i32 y;
@@ -398,11 +398,11 @@ townObject::townObject(i32 townType, i32 buildingId, char* iconBaseName) {
     m_icon = NULL;
     m_border = NULL;
     m_visible = 1;
-    m_animationFrameCount = sBuildingInfo[townType][buildingId].animationFrameCount;
-    x = sBuildingInfo[townType][buildingId].x;
-    y = sBuildingInfo[townType][buildingId].y;
-    w = sBuildingInfo[townType][buildingId].width;
-    h = sBuildingInfo[townType][buildingId].height;
+    m_animationFrameCount = sBuildingInfo[IDX(townType)][buildingId].animationFrameCount;
+    x = sBuildingInfo[IDX(townType)][buildingId].x;
+    y = sBuildingInfo[IDX(townType)][buildingId].y;
+    w = sBuildingInfo[IDX(townType)][buildingId].width;
+    h = sBuildingInfo[IDX(townType)][buildingId].height;
     buildingId_h = buildingId;
     m_buildingId = buildingId_h;
     sprintf(fileName, "%s.icn", iconBaseName);
@@ -439,7 +439,7 @@ void townObject::Draw(i32 advanceAnimation) {
     if (m_buildingId == TOWN_OBJECT_CASTLE_UPGRADE)
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
-        && gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT)
+        && gpTownManager->m_town->m_type == FACTION_KNIGHT
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_GATE))
             || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_FIRST_OPTION))
                 && !(
@@ -450,7 +450,7 @@ void townObject::Draw(i32 advanceAnimation) {
                 ))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
-        && gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT)
+        && gpTownManager->m_town->m_type == FACTION_KNIGHT
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_GATE))
             || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_FIRST_OPTION))
                 && !(
@@ -458,31 +458,31 @@ void townObject::Draw(i32 advanceAnimation) {
                 ))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
-        && gpTownManager->m_town->m_type == IDX(FACTION_BARBARIAN)
+        && gpTownManager->m_town->m_type == FACTION_BARBARIAN
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_RIGHT_GATE))
             || !(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_RIGHT_OPTION))))
         return;
     if (m_buildingId == TOWN_OBJECT_BARBARIAN_OVERLAY
-        && gpTownManager->m_town->m_type == IDX(FACTION_BARBARIAN)
+        && gpTownManager->m_town->m_type == FACTION_BARBARIAN
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_OVERLAY_GATE))
             || !(gpTownManager->m_town->m_buildings & IDX(RENDER_BARBARIAN_OVERLAY_OPTION))))
         return;
-    if (gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
+    if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && m_buildingId == TOWN_OBJECT_KNIGHT_LEFT_OVERLAY
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_GATE))
             || !(gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_OPTION))))
         return;
-    if (gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
+    if (gpTownManager->m_town->m_type == FACTION_SORCERESS
         && (m_buildingId == TOWN_OBJECT_SORCERESS_LEFT_OVERLAY
             || m_buildingId == TOWN_OBJECT_SORCERESS_RIGHT_OVERLAY)
         && (gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_GATE))
         && (gpTownManager->m_town->m_buildings & IDX(RENDER_SORCERESS_LEFT_OPTION)))
         return;
     if (m_buildingId == TOWN_OBJECT_RACE_OVERLAY
-        && (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER)
-            || gpTownManager->m_town->m_type == IDX(FACTION_WARLOCK)
-            || gpTownManager->m_town->m_type == IDX(FACTION_SORCERESS)
-            || gpTownManager->m_town->m_type == IDX(FACTION_KNIGHT))
+        && (gpTownManager->m_town->m_type == FACTION_NECROMANCER
+            || gpTownManager->m_town->m_type == FACTION_WARLOCK
+            || gpTownManager->m_town->m_type == FACTION_SORCERESS
+            || gpTownManager->m_town->m_type == FACTION_KNIGHT)
         && ((gpTownManager->m_town->m_buildings & IDX(RENDER_RACE_OVERLAY_FIRST_OPTION))
             || (gpTownManager->m_town->m_buildings & IDX(RENDER_RACE_OVERLAY_SECOND_OPTION))))
         return;
@@ -491,14 +491,14 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
-        if (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER)) {
+        if (gpTownManager->m_town->m_type == FACTION_NECROMANCER) {
             baseFrame = 2 * (3 * (gpTownManager->m_town->m_buildState - 1));
         } else {
             baseFrame = gpTownManager->m_town->m_buildState - 1;
         }
         m_icon->DrawToBuffer(0, 0, baseFrame, 0);
         if (m_animationFrameCount != 0) {
-            if (gpTownManager->m_town->m_type == IDX(FACTION_BARBARIAN)
+            if (gpTownManager->m_town->m_type == FACTION_BARBARIAN
                 && gpTownManager->m_town->m_buildState < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
                 return;
             m_icon->DrawToBuffer(0, 0, m_animationFrame + baseFrame + 1, 0);
@@ -534,23 +534,23 @@ townManager::townManager(void) {
 VA(0x00413f69, 0x1a0)
 void townManager::SetupExtraStuff(void) {
     m_town->m_buildings &= IDX(TOWN_EXTRA_DYNAMIC_CLEAR_MASK);
-    if (m_town->m_type == IDX(FACTION_WIZARD))
+    if (m_town->m_type == FACTION_WIZARD)
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_FIRST_MASK);
-    if (m_town->m_type == IDX(FACTION_SORCERESS)) {
+    if (m_town->m_type == FACTION_SORCERESS) {
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_FIRST_MASK);
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_SECOND_MASK);
     }
-    if (m_town->m_type == IDX(FACTION_KNIGHT)) {
+    if (m_town->m_type == FACTION_KNIGHT) {
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_SECOND_MASK);
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_THIRD_MASK);
     }
-    if (m_town->m_type == IDX(FACTION_BARBARIAN)) {
+    if (m_town->m_type == FACTION_BARBARIAN) {
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_SECOND_MASK);
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_THIRD_MASK);
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_LAST_MASK);
     }
-    if ((m_town->m_type == IDX(FACTION_WARLOCK) || m_town->m_type == IDX(FACTION_KNIGHT)
-         || m_town->m_type == IDX(FACTION_BARBARIAN) || m_town->m_type == IDX(FACTION_NECROMANCER))
+    if ((m_town->m_type == FACTION_WARLOCK || m_town->m_type == FACTION_KNIGHT
+         || m_town->m_type == FACTION_BARBARIAN || m_town->m_type == FACTION_NECROMANCER)
         && m_town->CanBuildDock())
         m_town->m_buildings |= IDX(TOWN_EXTRA_RACE_FIRST_MASK);
     if ((m_town->m_buildings & IDX(TOWN_BUILDING_DOCK))
@@ -565,13 +565,13 @@ i32 townManager::Open(i32 id) {
     gpGame->CheckHeroConsistency();
     if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
+        gpSoundManager->SwitchAmbientMusic(townTheme[IDX(m_town->m_type)]);
     PollSound();
     m_townWindow = new heroWindow(0, 0, "townwind.bin");
     if (m_townWindow == NULL)
         MemError();
     glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
-    m_lastTownType = TOWN_LAST_TYPE_UNINITIALIZED;
+    m_lastTownType = FACTION_UNINITIALIZED;
     m_castleDialogActive = 0;
     m_recruitResult = 0;
     m_lastHoverId = TOWN_HOVER_NONE;
@@ -603,7 +603,7 @@ void townManager::ChangeTown(void) {
 
     if (gConfig.useOpera != IDX(CONFIG_OPERA_DISABLED)
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(townTheme[m_town->m_type]);
+        gpSoundManager->SwitchAmbientMusic(townTheme[IDX(m_town->m_type)]);
     SetupExtraStuff();
     SetupTown();
     message.type = MESSAGE_WIDGET;
@@ -647,18 +647,18 @@ void townManager::SetupTown(void) {
     }
 
     if (m_town->m_type != m_lastTownType) {
-        if (m_lastTownType != TOWN_LAST_TYPE_NONE)
+        if (m_lastTownType != FACTION_NONE)
             UnloadTown();
         m_bankBox = new bankBox(TOWN_BANK_BOX_X, TOWN_GARRISON_STRIP_Y, gpCurPlayer);
         if (m_bankBox == NULL)
             MemError();
-        sprintf(gText, "townbkg%d.icn", m_town->m_type);
+        sprintf(gText, "townbkg%d.icn", IDX(m_town->m_type));
         m_backgroundIcon = gpResourceManager->GetIcon(gText);
         m_townObjectCount = 0;
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
-            objectId = gTownObjectOrder[m_town->m_type][objectOrder];
+            objectId = gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
             if (objectId != TOWN_OBJECT_NONE) {
-                sprintf(gText, "%s%s", gTownPrefixNames[m_town->m_type], gTownObjNames[objectId]);
+                sprintf(gText, "%s%s", gTownPrefixNames[IDX(m_town->m_type)], gTownObjNames[objectId]);
                 m_townObjects[m_townObjectCount] = new townObject(m_town->m_type, objectId, gText);
                 if (m_townObjects[m_townObjectCount] == NULL)
                     MemError();
@@ -680,7 +680,7 @@ void townManager::SetupTown(void) {
     } else {
         m_townObjectCount = 0;
         for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
-            i32 existingObjectId = gTownObjectOrder[m_town->m_type][objectOrder];
+            i32 existingObjectId = gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
             if (existingObjectId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & (1L << existingObjectId))) {
@@ -746,7 +746,7 @@ void townManager::SetupTown(void) {
         if (m_town->m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD))
             m_town->GiveSpells(NULL);
     } else if (m_town->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS)) {
-        sprintf(gText, "port%04d.icn", m_town->m_type + TOWN_PORTRAIT_FRAME_BASE);
+        sprintf(gText, "port%04d.icn", IDX(m_town->m_type) + TOWN_PORTRAIT_FRAME_BASE);
         m_heroStrip = new strip(
             0,
             TOWN_HERO_STRIP_Y,
@@ -984,7 +984,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
             break;
         case TOWN_OBJECT_TAVERN:
-            if (m_town->m_type == IDX(FACTION_NECROMANCER))
+            if (m_town->m_type == FACTION_NECROMANCER)
                 strcpy(m_statusText, xNecromancerShrine);
             else
                 strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
@@ -1021,10 +1021,10 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
             break;
         case TOWN_OBJECT_SPECIAL_BUILDING:
-            strcpy(m_statusText, gSpecialBuildingNames[m_town->m_type]);
+            strcpy(m_statusText, gSpecialBuildingNames[IDX(m_town->m_type)]);
             break;
         case TOWN_OBJECT_SECOND_WELL:
-            strcpy(m_statusText, gWellExtraNames[m_town->m_type]);
+            strcpy(m_statusText, gWellExtraNames[IDX(m_town->m_type)]);
             break;
         case TOWN_OBJECT_DWELLING_1:
         case TOWN_OBJECT_DWELLING_2:
@@ -1041,7 +1041,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_RECRUIT)],
-                gArmyNames[gDwellingType[m_town->m_type][objectId - TOWN_OBJECT_DWELLING_1]]
+                gArmyNames[gDwellingType[IDX(m_town->m_type)][objectId - TOWN_OBJECT_DWELLING_1]]
             );
             break;
     }
@@ -1084,11 +1084,11 @@ i32 townManager::Main(tag_message& message) {
         giDebugBuildingToBuild = -1;
         if (debugBuilding_e == TOWN_DEBUG_BUILD_ALL) {
             for (index_i = 0; index_i < TOWN_BUILDING_COUNT; ++index_i) {
-                if ((gTownEligibleBuildMask[m_town->m_type] & (1L << index_i))
+                if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & (1L << index_i))
                     || index_i == IDX(TOWN_COMMAND_CASTLE))
                     BuildObj(index_i);
             }
-        } else if ((gTownEligibleBuildMask[m_town->m_type]
+        } else if ((gTownEligibleBuildMask[IDX(m_town->m_type)]
                     & (1L << static_cast<u8>(debugBuilding_e)))
                    || debugBuilding_e == IDX(TOWN_COMMAND_CASTLE)) {
             BuildObj(debugBuilding_e);
@@ -1191,7 +1191,7 @@ i32 townManager::Main(tag_message& message) {
                                         sprintf(
                                             gText,
                                             "port%04d.icn",
-                                            m_town->m_type + IDX(TOWN_PORTRAIT_ICON_BASE)
+                                            IDX(m_town->m_type) + IDX(TOWN_PORTRAIT_ICON_BASE)
                                         );
                                         m_heroStrip = new strip(
                                             0,
@@ -1333,12 +1333,12 @@ i32 townManager::Main(tag_message& message) {
                                 goto showBuildingInformation;
                             }
                             {
-                                if (m_town->m_type == IDX(FACTION_NECROMANCER)) {
+                                if (m_town->m_type == FACTION_NECROMANCER) {
                                     sprintf(
                                         description_b,
                                         GetBuildingInfo(
                                             m_town->m_type,
-                                            message.payload.widget.id,
+                                            static_cast<BuildingSlotType>(message.payload.widget.id),
                                             1
                                         )
                                     );
@@ -1347,7 +1347,7 @@ i32 townManager::Main(tag_message& message) {
                                         1,
                                         -1,
                                         -1,
-                                        m_town->m_type + 19,
+                                        IDX(m_town->m_type) + 19,
                                         message.payload.widget.id,
                                         -1,
                                         0,
@@ -1494,14 +1494,18 @@ i32 townManager::Main(tag_message& message) {
                             if (quickView_k) {
                                 sprintf(
                                     description_b,
-                                    GetBuildingInfo(m_town->m_type, message.payload.widget.id, 1)
+                                    GetBuildingInfo(
+                                        m_town->m_type,
+                                        static_cast<BuildingSlotType>(message.payload.widget.id),
+                                        1
+                                    )
                                 );
                                 NormalDialog(
                                     description_b,
                                     4,
                                     -1,
                                     -1,
-                                    m_town->m_type + 19,
+                                    IDX(m_town->m_type) + 19,
                                     message.payload.widget.id,
                                     -1,
                                     0,
@@ -1511,14 +1515,18 @@ i32 townManager::Main(tag_message& message) {
                             } else {
                                 sprintf(
                                     description_b,
-                                    GetBuildingInfo(m_town->m_type, message.payload.widget.id, 1)
+                                    GetBuildingInfo(
+                                        m_town->m_type,
+                                        static_cast<BuildingSlotType>(message.payload.widget.id),
+                                        1
+                                    )
                                 );
                                 NormalDialog(
                                     description_b,
                                     1,
                                     -1,
                                     -1,
-                                    m_town->m_type + 19,
+                                    IDX(m_town->m_type) + 19,
                                     message.payload.widget.id,
                                     -1,
                                     0,
@@ -1924,7 +1932,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     if (building >= 19 && building <= 30)
         dwelling_k = building - 19;
 
-    if (building == IDX(TOWN_COMMAND_TAVERN) && m_town->m_type == IDX(FACTION_NECROMANCER)) {
+    if (building == IDX(TOWN_COMMAND_TAVERN) && m_town->m_type == FACTION_NECROMANCER) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (xShrineBuildingCost[index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
@@ -1951,10 +1959,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         }
     } else if (building == IDX(TOWN_COMMAND_SPECIAL_BUILDING)) {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
-            if (gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h] > 0) {
+            if (gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
                 costs_e[costCount_o] =
-                    static_cast<i16>(gSpecialBuildingCosts[gpTownManager->m_town->m_type][index_h]);
+                    static_cast<i16>(gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h]);
                 ++costCount_o;
             }
         }
@@ -1968,10 +1976,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         }
     } else {
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
-            if (gDwellingCosts[gpTownManager->m_town->m_type][dwelling_k][index_h] > 0) {
+            if (gDwellingCosts[IDX(gpTownManager->m_town->m_type)][dwelling_k][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
                 costs_e[costCount_o] = static_cast<i16>(
-                    gDwellingCosts[gpTownManager->m_town->m_type][dwelling_k][index_h]
+                    gDwellingCosts[IDX(gpTownManager->m_town->m_type)][dwelling_k][index_h]
                 );
                 ++costCount_o;
             }
@@ -2007,10 +2015,13 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         bottomRowCount_o = 4;
     }
 
-    sprintf(description_b, GetBuildingInfo(m_town->m_type, building, 0));
+    sprintf(
+        description_b,
+        GetBuildingInfo(m_town->m_type, static_cast<BuildingSlotType>(building), 0)
+    );
     if (dwelling_k >= 0) {
         prerequisiteCount_p = 0;
-        prerequisiteMask_c = gHierarchyMask[m_town->m_type][dwelling_k];
+        prerequisiteMask_c = gHierarchyMask[IDX(m_town->m_type)][dwelling_k];
         for (index_h = 0; index_h < 32; ++index_h) {
             if (prerequisiteMask_c & (1L << index_h)) {
                 if (prerequisiteCount_p == 0)
@@ -2019,11 +2030,11 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                 strcat(description_b, "\n");
                 strcat(
                     description_b,
-                    GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(index_h))
+                    GetBuildingName(m_town->m_type, BuildingSlotType(index_h))
                 );
             }
         }
-        if (m_town->m_type == IDX(FACTION_NECROMANCER)
+        if (m_town->m_type == FACTION_NECROMANCER
             && building == IDX(TOWN_COMMAND_NECROMANCER_MAGE_GUILD_PREREQUISITE)
             && m_town->m_buildState <= 2)
             strcat(description_b, "\nLevel 2 Mage Guild");
@@ -2054,7 +2065,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
     message_m.type = MESSAGE_WIDGET;
     message_m.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_m.payload.widget.id = 2;
-    sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    sprintf(iconName_o, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
     message_m.payload.widget.data.text = iconName_o;
     window_a->BroadcastMessage(message_m);
     message_m.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -2070,7 +2081,7 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                                                         : TOWN_MAGE_GUILD_MAX_LEVEL
         );
     } else {
-        strcpy(gText, GetBuildingName(FactionType(m_town->m_type), BuildingSlotType(building)));
+        strcpy(gText, GetBuildingName(m_town->m_type, BuildingSlotType(building)));
     }
     message_m.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message_m.payload.widget.id = 3;
@@ -2265,7 +2276,7 @@ void townManager::BuildObj(i32 building) {
         gbSaveBiggestExtent = true;
         gbReturnAfterComputeExtent = true;
         if (building == IDX(TOWN_COMMAND_MAGE_GUILD)) {
-            if (gpTownManager->m_town->m_type == IDX(FACTION_NECROMANCER))
+            if (gpTownManager->m_town->m_type == FACTION_NECROMANCER)
                 frame_g = (gpTownManager->m_town->m_buildState - 1) * 3 * 2;
             else
                 frame_g = gpTownManager->m_town->m_buildState - 1;
@@ -2346,7 +2357,7 @@ void townManager::SetupMage(heroWindow* window) {
 
     for (level = 0; level < TOWN_MAGE_GUILD_MAX_LEVEL; ++level) {
         for (slot_m = 0; slot_m < TOWN_MAGE_SPELLS_PER_LEVEL; ++slot_m) {
-            if (m_town->m_type == IDX(FACTION_WIZARD)
+            if (m_town->m_type == FACTION_WIZARD
                 && (m_town->m_buildings & TOWN_WIZARD_LIBRARY_BUILDING_FLAG))
                 hasLibrary_k = 1;
             else
@@ -2423,7 +2434,7 @@ void townManager::SetupMage(heroWindow* window) {
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     unusedGuildFrame_n = message_b.payload.widget.data.value;
     window->BroadcastMessage(message_b);
-    sprintf(gText, "magegld%c.icn", cHeroTypeInitial[m_town->m_type]);
+    sprintf(gText, "magegld%c.icn", cHeroTypeInitial[IDX(m_town->m_type)]);
     message_b.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
     message_b.payload.widget.data.text = gText;
@@ -2542,7 +2553,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         "%s is a level %d %s with %d artifacts.",
         m_recruitHero->m_name,
         m_recruitHero->m_level,
-        gAlignmentNames[m_recruitHero->m_cursorType],
+        gAlignmentNames[IDX(m_recruitHero->m_cursorType)],
         artifactCountb
     );
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -2601,7 +2612,11 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         newHeroClassCount = gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / 9;
         newHeroClassCount = (Random(1, 5) + newHeroClassCount) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClassCount, 0));
+            static_cast<i8>(gpGame->GetNewHeroId(
+                giCurPlayer,
+                static_cast<FactionType>(newHeroClassCount),
+                0
+            ));
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
     } else {
@@ -2795,7 +2810,7 @@ void townManager::SetupWell(heroWindow* window) {
 
     messaged.type = MESSAGE_WIDGET;
     messaged.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(iconNameCount, "cstl%s.icn", cHeroTypeShortName[m_town->m_type]);
+    sprintf(iconNameCount, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
     messaged.payload.widget.data.text = iconNameCount;
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         messaged.payload.widget.id = dwellingResult + 1;
@@ -2811,7 +2826,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(
             gText,
             "monh%04d.icn",
-            gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]
+            gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
         );
         messaged.payload.widget.command = WIDGET_COMMAND_SET_ICON;
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_MONSTER_ICON_CONTROL;
@@ -2825,7 +2840,7 @@ void townManager::SetupWell(heroWindow* window) {
         sprintf(
             gText,
             GetBuildingName(
-                FactionType(m_town->m_type),
+                m_town->m_type,
                 BuildingSlotType(
                     dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)
                 )
@@ -2851,7 +2866,7 @@ void townManager::SetupWell(heroWindow* window) {
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_CREATURE_CONTROL;
         strcpy(
             gText,
-            gArmyNamesPlural[gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]]
+            gArmyNamesPlural[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]]
         );
         gText[0] -= ' ';
         messaged.payload.widget.data.text = gText;
@@ -2860,7 +2875,7 @@ void townManager::SetupWell(heroWindow* window) {
 
     for (dwellingResult = 0; dwellingResult < TOWN_WELL_DWELLING_COUNT; ++dwellingResult) {
         monsterInfoi =
-            gMonsterDatabase[gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]];
+            gMonsterDatabase[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]];
         strcpy(gText, "");
         sprintf(detailTextf, "%s%d", cWellDetail[0], monsterInfoi.attack);
         strcat(gText, detailTextf);
@@ -2879,7 +2894,7 @@ void townManager::SetupWell(heroWindow* window) {
         if (m_town->m_buildings
             & (1L << (dwellingTypesValue[dwellingResult] + IDX(TOWN_COMMAND_FIRST_DWELLING)))) {
             growthd =
-                gMonsterDatabase[gDwellingType[m_town->m_type][dwellingTypesValue[dwellingResult]]]
+                gMonsterDatabase[gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]]
                     .growth;
             growthd += TOWN_WELL_BASE_GROWTH_BONUS;
             if (dwellingResult == 0
