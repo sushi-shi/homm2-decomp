@@ -5392,7 +5392,7 @@ void UpdateNormalDialog(char* text) {
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
     pNormalDialogWindow->DrawWindow(
         1,
-        IDX(WINDOW_ALL_WIDGETS_LOW),
+        WINDOW_ALL_WIDGETS_LOW,
         NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
     );
 }
