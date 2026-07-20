@@ -39,12 +39,6 @@ H2_ENUM_BEGIN(DataEntryLayout)
     WIDGET_Z_ORDER              = -1
 H2_ENUM_END(DataEntryLayout)
 
-H2_ENUM_CLASS_BEGIN(DataEntryPhase)
-    ENTRY_PHASE_IMMEDIATE    = 0,
-    ENTRY_PHASE_POINTER_SENT = 1,
-    ENTRY_PHASE_READY        = 2
-H2_ENUM_CLASS_END(DataEntryPhase)
-
 H2_ENUM_BEGIN(DataEntryWidgetId)
     ENTRY_PROMPT_WIDGET = 1,
     ENTRY_TEXT_WIDGET   = 10,
@@ -2422,10 +2416,10 @@ void GetDataEntry(
     DataEntryWin->AddWidget(entry, WIDGET_Z_ORDER);
 
     if (useImmediateHandler != 0) {
-        bDataEntryTime = IDX(ENTRY_PHASE_IMMEDIATE);
+        bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
         gbAllowTextEntryEscape = false;
     } else
-        bDataEntryTime = IDX(ENTRY_PHASE_READY);
+        bDataEntryTime = ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
     gpMouseManager->SetPointer(
@@ -2438,7 +2432,7 @@ void GetDataEntry(
 
 VA(0x004c6e50, 0x173)
 i32 DataEntryWindowHandler(struct tag_message& message) {
-    if (bDataEntryTime == IDX(ENTRY_PHASE_IMMEDIATE)) {
+    if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
@@ -2447,7 +2441,7 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
         return EVENT_WINDOW_CONTINUE;
     }
 
-    if (bDataEntryTime == IDX(ENTRY_PHASE_POINTER_SENT))
+    if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT)
         ++bDataEntryTime;
     else {
         if (message.type != MESSAGE_WIDGET)
@@ -2499,6 +2493,6 @@ normalEvent:
 DATA(0x005331c4) class heroWindow* DataEntryWin;
 DATA(0x005331c8) char* cDEDest;
 DATA(0x005331d4) i32 iDEMaxLen;
-DATA(0x005331d8) i32 bDataEntryTime;
+DATA(0x005331d8) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
 DATA(0x005331dc) i32 inBoxX;
 DATA(0x005331e0) i32 inBoxY;
