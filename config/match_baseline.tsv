@@ -1219,7 +1219,7 @@ SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5822	86ddd856b03c
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	ac9fba24c780
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	92.2032	760da81a49d0
-SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.2457	b3966f6f3e90
+SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.2457	e12966a5d419
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	e4bf51350c9d
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	90.4262	988c80fc3a85
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	99.9306	ae1846e6aebf
@@ -1246,11 +1246,11 @@ SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	99.8939	dcd3
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	e4348e7cf836
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	e1d04e3cdf3c
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	09bb746c40f7
-SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	ed745d3de730
+SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	147cae8ccf6c
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	b3763dc72b1f
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	93.5000	256eaa9baf26
 SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	97.2291	cc97f9854655
-SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	99.9840	c98582061a1e
+SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	99.9840	740e79f337e7
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	01c1809db709
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	daabb39d0eff
 SOURCE/STRIP	??1bankBox@@QAE@XZ	100.0000	055c0f1b7c09

@@ -617,7 +617,7 @@ public:
     i32l m_combatMessageExpiration;
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
-    u8 m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
+    H2_ENUM_STORAGE(CreatureType, u8) m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_sideDefeated[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_networkArmyPresent[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_playerId[COMBAT_MANAGER_SIDE_COUNT];
@@ -763,7 +763,7 @@ public:
     void ShowMassSpell(i8 (*const)[COMBAT_ARMY_SLOT_COUNT], i32, i32);
     void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
-    void SummonElemental(i32, i32);
+    void SummonElemental(H2_ENUM_PARAM(CreatureType, i32), i32);
     void DoLuck(i32, i32);
     void DoBlast(i32, H2_ENUM_PARAM(SpellType, i32));
     void Resurrect(H2_ENUM_PARAM(SpellType, i32), i32, i32);
