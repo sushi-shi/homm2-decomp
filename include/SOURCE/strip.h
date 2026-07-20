@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_STRIP_H
 
 #include <va.h>
+#include <SOURCE/KB_TYPES.h>
 
 class armyGroup;
 class border;
@@ -44,7 +45,7 @@ public:
     border* m_borders[STRIP_BORDER_COUNT];
     icon* m_stripIcon;
     icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];
-    i32 m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i32) m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
     icon* m_portraitIcon;
     icon* m_flagIcon;
     i32 m_portraitFrame;

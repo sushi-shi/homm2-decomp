@@ -217,8 +217,10 @@ public:
     void SetSS(i32, i32);
     i32 TakeSS(i32, i32);
     i32 GiveSS(i32, i32);
-    i32 CreatureTypeCount(i32);
-    void UpgradeCreatures(i32, i32);
+    i32 CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32));
+    void UpgradeCreatures(
+        H2_ENUM_PARAM(CreatureType, i32), H2_ENUM_PARAM(CreatureType, i32)
+    );
     i32 GetNthSS(i32);
     class town* GetOccupiedTown(void);
     i8 Stats(HeroPrimaryStat);

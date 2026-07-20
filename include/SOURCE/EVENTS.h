@@ -85,7 +85,7 @@ struct timeEventExtra {
 struct mapHeroExtra {
     i8 owner;
     u8 hasCustomArmy;
-    i8 troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
     u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasCustomHero;
     i8 heroId;
@@ -111,7 +111,7 @@ struct mapTownExtra {
     u32 buildings;
     i8 mageGuildLevel;
     i8 hasCustomArmy;
-    i8 troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
+    H2_ENUM_STORAGE(CreatureType, i8) troopTypes[EVENT_RECORD_ARMY_SLOT_COUNT];
     u16 troopCounts[EVENT_RECORD_ARMY_SLOT_COUNT];
     u8 hasShrine;
     char unused18;

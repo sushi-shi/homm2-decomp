@@ -964,7 +964,9 @@ void game::InitCampaignMap(void) {
         case CAMPAIGN_CHOICE_CREATURES:
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
-                    ->m_army.Add(choiceBest->value, choiceBest->amount, -1);
+                    ->m_army.Add(
+                        static_cast<CreatureType>(choiceBest->value), choiceBest->amount, -1
+                    );
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
             m_players[0].m_cheatValue = static_cast<i8>(choiceBest->value);
@@ -1016,28 +1018,28 @@ void game::InitCampaignMap(void) {
         armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
-            armyHero->m_army.m_creatureTypes[heroPositionValue] = ARMY_GROUP_EMPTY_SLOT;
+            armyHero->m_army.m_creatureTypes[heroPositionValue] = CREATURE_NONE;
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
         switch (static_cast<FactionType>(armyHero->m_cursorType)) {
             case FACTION_BARBARIAN:
                 armyHero->m_army
-                    .Add(IDX(CREATURE_ORC_CHIEF), BARBARIAN_ORC_CHIEF_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_OGRE), BARBARIAN_OGRE_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GOBLIN), BARBARIAN_GOBLIN_COUNT, -1);
+                    .Add(CREATURE_ORC_CHIEF, BARBARIAN_ORC_CHIEF_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_OGRE, BARBARIAN_OGRE_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GOBLIN, BARBARIAN_GOBLIN_COUNT, -1);
                 break;
             case FACTION_WARLOCK:
-                armyHero->m_army.Add(IDX(CREATURE_CENTAUR), WARLOCK_CENTAUR_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GARGOYLE), WARLOCK_GARGOYLE_COUNT, -1);
-                armyHero->m_army.Add(IDX(CREATURE_GRIFFIN), WARLOCK_GRIFFIN_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_CENTAUR, WARLOCK_CENTAUR_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GARGOYLE, WARLOCK_GARGOYLE_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GRIFFIN, WARLOCK_GRIFFIN_COUNT, -1);
                 break;
             case FACTION_NECROMANCER:
                 armyHero->m_army
-                    .Add(IDX(CREATURE_SKELETON), NECROMANCER_SKELETON_COUNT, -1);
+                    .Add(CREATURE_SKELETON, NECROMANCER_SKELETON_COUNT, -1);
                 armyHero->m_army
-                    .Add(IDX(CREATURE_ROYAL_MUMMY), NECROMANCER_MUMMY_COUNT, -1);
+                    .Add(CREATURE_ROYAL_MUMMY, NECROMANCER_MUMMY_COUNT, -1);
                 armyHero->m_army
-                    .Add(IDX(CREATURE_VAMPIRE_LORD), NECROMANCER_VAMPIRE_COUNT, -1);
+                    .Add(CREATURE_VAMPIRE_LORD, NECROMANCER_VAMPIRE_COUNT, -1);
                 break;
         }
         gpGame->GetHero(m_players[0].m_heroIds[0])->m_experience += CAMPAIGN_EXPERIENCE_BONUS;
@@ -1052,7 +1054,7 @@ void game::InitCampaignMap(void) {
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] =
-                static_cast<i8>(m_campaignCarryoverCreatureTypes[heroPositionValue]);
+                m_campaignCarryoverCreatureTypes[heroPositionValue];
             armyHero->m_army.m_creatureCounts[heroPositionValue] =
                 (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
                      ? CAMPAIGN_TRIPLE_ARMY_MULTIPLIER

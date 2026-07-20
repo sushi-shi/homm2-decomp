@@ -6068,7 +6068,7 @@ i32 advManager::UpdBottomViewHero(void) {
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
     for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
-        if (targetHero->m_army.m_creatureTypes[armySlot] != BOTTOM_HERO_EMPTY_SLOT) {
+        if (targetHero->m_army.m_creatureTypes[armySlot] != CREATURE_NONE) {
             ++occupiedSlotsLocal;
         }
     }
@@ -6077,7 +6077,7 @@ i32 advManager::UpdBottomViewHero(void) {
         displayIndexData = 0;
         monsterIconsLocal = gpResourceManager->GetIcon("mons32.icn");
         for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
-            creature = targetHero->m_army.m_creatureTypes[armySlot];
+            creature = IDX(targetHero->m_army.m_creatureTypes[armySlot]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
                 // Retail stores eight compact (x, y) layout anchors and indexes them through
                 // the occupied-slot table below; the coordinate payload has no separate domain.
@@ -6254,7 +6254,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
     visibleArmyCountState = 0;
     for (armyIndex = 0; armyIndex < ARMY_QUICK_SLOT_COUNT; ++armyIndex) {
-        if (targetHero->m_army.m_creatureTypes[armyIndex] != ARMY_QUICK_EMPTY_SLOT) {
+        if (targetHero->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE) {
             ++visibleArmyCountState;
         }
     }
@@ -6286,10 +6286,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             i32 creature;
             for (armyIndex = 0; armyIndex < visibleArmyCountState; ++armyIndex) {
                 while (targetHero->m_army.m_creatureTypes[displayIndexStateOffset]
-                       == ARMY_QUICK_EMPTY_SLOT) {
+                       == CREATURE_NONE) {
                     ++displayIndexStateOffset;
                 }
-                creature = targetHero->m_army.m_creatureTypes[displayIndexStateOffset];
+                creature = IDX(targetHero->m_army.m_creatureTypes[displayIndexStateOffset]);
                 if (creature != ARMY_QUICK_EMPTY_SLOT) {
                     stackIconsWidgets[armyIndex] = new iconWidget(
                         static_cast<i16>(
@@ -6381,10 +6381,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             + ARMY_QUICK_AREA_LEFT;
         for (armyIndex = 0; armyIndex < topRowCount; ++armyIndex) {
             while (targetHero->m_army.m_creatureTypes[displayIndexValue]
-                   == ARMY_QUICK_EMPTY_SLOT) {
+                   == CREATURE_NONE) {
                 ++displayIndexValue;
             }
-            creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
+            creatureTypeId = IDX(targetHero->m_army.m_creatureTypes[displayIndexValue]);
             stackIconsWidgets[armyIndex] = new iconWidget(
                 static_cast<i16>(
                     armyIndex * armySpacing + slotStartPosition
@@ -6446,10 +6446,10 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             rowYCurrent += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = topRowCount; armyIndex < topRowCount + secondRowCountTotal;
                  ++armyIndex) {
-                while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1) {
+                while (targetHero->m_army.m_creatureTypes[displayIndexValue] == CREATURE_NONE) {
                     ++displayIndexValue;
                 }
-                creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
+                creatureTypeId = IDX(targetHero->m_army.m_creatureTypes[displayIndexValue]);
                 stackIconsWidgets[armyIndex] = new iconWidget(
                     static_cast<i16>(
                         (armyIndex - HERO_QUICK_SECOND_ROW_FIRST_SLOT) * armySpacing
@@ -6677,7 +6677,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
     armyCountLocal = 0;
     for (armyIndex = 0; armyIndex < ARMY_QUICK_SLOT_COUNT; ++armyIndex) {
-        if (quickTownLocal->m_army.m_creatureTypes[armyIndex] != ARMY_QUICK_EMPTY_SLOT) {
+        if (quickTownLocal->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE) {
             ++armyCountLocal;
         }
     }
@@ -6756,10 +6756,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                                                     : -ARMY_QUICK_FIVE_STACK_X_SHIFT;
             }
             while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]
-                   == ARMY_QUICK_EMPTY_SLOT) {
+                   == CREATURE_NONE) {
                 ++creatureSlotLocal;
             }
-            creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
+            creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
             armyIcons[widgetIndexWidget] = new iconWidget(
                 static_cast<i16>(
                     slotWidthSlot * (widgetIndexWidget | 0) + slotStartState + fiveArmyShiftValue
@@ -6839,10 +6839,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                  armyIndex < secondRowCountState + firstRowCountState;
                  ++armyIndex) {
                 while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]
-                       == ARMY_QUICK_EMPTY_SLOT) {
+                       == CREATURE_NONE) {
                     ++creatureSlotLocal;
                 }
-                creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
+                creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
                 armyIcons[widgetIndexWidget] = new iconWidget(
                     static_cast<i16>(
                         (widgetIndexWidget - firstRowCountState) * slotWidthSlot + slotStartState
@@ -10518,7 +10518,7 @@ i32 advManager::DoVisions(hero* visionHero) {
         static_cast<float>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[IDX(creatureData)].fightValue * monsterCountIndex);
 
-    if (visionHero->m_army.CanJoin(IDX(creatureData))
+    if (visionHero->m_army.CanJoin(creatureData)
         && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && creatureData != CREATURE_GHOST
         && creatureData != CREATURE_EARTH_ELEMENTAL && creatureData != CREATURE_AIR_ELEMENTAL

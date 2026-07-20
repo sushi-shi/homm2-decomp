@@ -1570,8 +1570,8 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
 }
 
 VA(0x0049990c, 0x20)
-char* GetMonsterName(i32 m) {
-    return gArmyNames[m];
+char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster) {
+    return gArmyNames[IDX(monster)];
 }
 
 VA(0x0049992c, 0x140)
@@ -2601,7 +2601,7 @@ void CheckEndGame(
 
         if (carryoverHeroId != IDX(END_GAME_NO_PLAYER)) {
             for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
-                gpGame->m_campaignCarryoverCreatureTypes[player] = IDX(END_GAME_EMPTY_ARMY);
+                gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
@@ -2614,7 +2614,7 @@ void CheckEndGame(
                 }
             }
             if (gpGame->m_players[0].m_heroCount == campaignHeroIndex) {
-                gpGame->m_campaignCarryoverCreatureTypes[0] = 0;
+                gpGame->m_campaignCarryoverCreatureTypes[0] = CREATURE_PEASANT;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
                 for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
@@ -2739,8 +2739,9 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         if (homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
             alignment_e = 0;
             for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
-                if (h->m_army.m_creatureTypes[slot8] != ARMY_GROUP_EMPTY_SLOT) {
-                    alignment_e = IDX(gMonsterDatabase[h->m_army.m_creatureTypes[slot8]].race);
+                if (h->m_army.m_creatureTypes[slot8] != CREATURE_NONE) {
+                    alignment_e =
+                        IDX(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[slot8])].race);
                 }
             }
             sprintf(
@@ -3833,7 +3834,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                 if (gpCurPlayer->CurrentHero() != -1) {
                     gpGame->GiveArmy(
                         &gpGame->m_heroRecs[gpCurPlayer->CurrentHero()].m_army,
-                        command - APP_MENU_ARMY_FIRST,
+                        static_cast<CreatureType>(command - APP_MENU_ARMY_FIRST),
                         APP_MENU_CHEAT_ARMY_QUANTITY,
                         -1
                     );
@@ -7052,7 +7053,9 @@ DATA(0x004fc9c8) char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "wel2", "moat", "spec", "boat", "capt", "ext0", "ext1", "ext2", "dw_0", "dw_1", "dw_2",
     "dw_3", "dw_4", "dw_5", "up_1", "up_2", "up_3", "up_4", "up_5", "up5b", "ext3"
 };
-DATA(0x004fca48) i8 gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
+DATA(0x004fca48)
+H2_ENUM_STORAGE(CreatureType, i8)
+gDwellingType[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {IDX(CREATURE_PEASANT),
      IDX(CREATURE_ARCHER),
      IDX(CREATURE_PIKEMAN),

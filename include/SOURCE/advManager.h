@@ -261,7 +261,7 @@ public:
     void PasswordEvent(class mapCell*, class hero*);
     void GenericSiteEvent(class mapCell*, class hero*);
     void RecruitSiteEvent(class mapCell*, class hero*);
-    void ExpansionRecruitEvent(class hero*, i32, i16*);
+    void ExpansionRecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), i16*);
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
     void EventSound(i32, i32, struct SAMPLE2*);
@@ -269,7 +269,7 @@ public:
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);
     void GiveResource(class hero*, ResourceType, i32);
-    void RecruitEvent(class hero*, i32, class mapCell*);
+    void RecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), class mapCell*);
     i32 SkeletonEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 GhostEvent(class hero*, class mapCell*, char*, i32, i32);
@@ -284,10 +284,10 @@ public:
         i32,
         i32,
         i32,
+        H2_ENUM_PARAM(CreatureType, i32),
         i32,
         i32,
-        i32,
-        i32,
+        H2_ENUM_PARAM(CreatureType, i32),
         i32,
         i32
     );

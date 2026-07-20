@@ -520,7 +520,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 i32 displayedTroops = 0;
                 for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
-                    if (record->m_army.m_creatureTypes[item] != IDX(CREATURE_NONE)
+                    if (record->m_army.m_creatureTypes[item] != CREATURE_NONE
                         && record->m_army.m_creatureCounts[item] > 0) {
                         OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                             static_cast<i16>(
@@ -532,7 +532,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
                             const_cast<char*>("mons32.icn"),
-                            static_cast<i16>(record->m_army.m_creatureTypes[item]),
+                            static_cast<i16>(IDX(record->m_army.m_creatureTypes[item])),
                             0,
                             static_cast<i16>(rowWidgetId6 + item + TOWN_ARMY_FIRST),
                             WIDGET_KIND_ICON_CENTERED,
@@ -634,7 +634,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_ICON_HEIGHT,
                             const_cast<char*>("mons32.icn"),
                             static_cast<i16>(
-                                gDwellingType[IDX(record->m_type)][detailIndex]
+                                IDX(gDwellingType[IDX(record->m_type)][detailIndex])
                             ),
                             0,
                             static_cast<i16>(rowWidgetId6 + detailIndex + TOWN_RECRUIT_FIRST),
@@ -816,7 +816,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             {
                 i32 displayedTroops = 0;
                 for (item = 0; item < OVERVIEW_TROOP_SLOTS; item++) {
-                    if (heroData0->m_army.m_creatureTypes[item] != IDX(CREATURE_NONE)
+                    if (heroData0->m_army.m_creatureTypes[item] != CREATURE_NONE
                         && heroData0->m_army.m_creatureCounts[item] > 0) {
                         OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                             static_cast<i16>(
@@ -828,7 +828,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_ICON_WIDTH,
                             TROOP_ICON_HEIGHT,
                             const_cast<char*>("mons32.icn"),
-                            static_cast<i16>(heroData0->m_army.m_creatureTypes[item]),
+                            static_cast<i16>(IDX(heroData0->m_army.m_creatureTypes[item])),
                             0,
                             static_cast<i16>(rowWidgetId6 + item + HERO_ARMY_FIRST),
                             WIDGET_KIND_ICON_CENTERED,
