@@ -22,6 +22,8 @@ REVIEW_MANIFEST = REPO / "config" / "constants_review.tsv"
 SOURCE_PATTERN = r"src/(BASE|SOURCE|EDITOR)/.*\.cpp"
 ANNOTATION_MACROS = {"DATA", "SIZE", "SYMBOL", "VA", "VAU", "VTBL"}
 SOURCE_LINE_ARGUMENTS = {
+    "DDSD": 2,
+    "DPSD": 2,
     "H2_ALLOC": 1,
     "H2_FREE": 1,
     "H2_ALLOC_AT": 2,

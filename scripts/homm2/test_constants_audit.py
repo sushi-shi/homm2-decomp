@@ -55,6 +55,8 @@ void Function(i32 condition) {
     H2_ASSERT(condition == 12, RETAIL_FILE, 42);
     H2_ALLOC_AT(80, "source.cpp", 99);
     ProcessAssert(condition == 13, RETAIL_FILE, 100);
+    DDSD(14, RETAIL_FILE, 101);
+    DPSD(15, RETAIL_FILE, 102);
 }
 """
         with tempfile.TemporaryDirectory(dir=constants_audit.REPO) as directory:
@@ -76,6 +78,10 @@ void Function(i32 condition) {
         self.assertEqual(categories[("99", 7)], "source-line")
         self.assertEqual(categories[("13", 8)], "code")
         self.assertEqual(categories[("100", 8)], "source-line")
+        self.assertEqual(categories[("14", 9)], "code")
+        self.assertEqual(categories[("101", 9)], "source-line")
+        self.assertEqual(categories[("15", 10)], "code")
+        self.assertEqual(categories[("102", 10)], "source-line")
 
     def test_diagnostics_use_source_literal_and_deduplicate(self):
         source = "void Test() {\n    return 12;\n}\n"
