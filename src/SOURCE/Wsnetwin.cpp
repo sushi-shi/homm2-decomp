@@ -44,7 +44,7 @@ i16 wsnet_init(void) {
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 player;
 
-    if (gConfig.gfx[giCurExe].fullScreen != 0) {
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         sprintf(
             gText,
             "About to initiate TCP/IP connection.  Heroes II will now drop from full screen mode "

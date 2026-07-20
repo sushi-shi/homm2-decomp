@@ -109,15 +109,15 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
             return 0;
     }
 
-    if (gConfig.gfx[giCurExe].showMenu != 0)
+    if (gConfig.gfx[IDX(giCurExe)].showMenu != 0)
         giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
     else
         giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
     windowRect.left = windowRect.top = 0;
-    windowRect.right = gConfig.gfx[giCurExe].width - 1;
-    windowRect.bottom = gConfig.gfx[giCurExe].height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[giCurExe].showMenu);
-    if (gConfig.gfx[giCurExe].showMenu != 0)
+    windowRect.right = gConfig.gfx[IDX(giCurExe)].width - 1;
+    windowRect.bottom = gConfig.gfx[IDX(giCurExe)].height - 1;
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[IDX(giCurExe)].showMenu);
+    if (gConfig.gfx[IDX(giCurExe)].showMenu != 0)
         windowMenu = reinterpret_cast<HMENU>(hmnuDflt);
     else
         windowMenu = NULL;
@@ -126,8 +126,8 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         szAppName,
         szTitle,
         giCurWindowsStyleFlags,
-        gConfig.gfx[giCurExe].x,
-        gConfig.gfx[giCurExe].y,
+        gConfig.gfx[IDX(giCurExe)].x,
+        gConfig.gfx[IDX(giCurExe)].y,
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
         NULL,
@@ -144,7 +144,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
-        if (gConfig.gfx[giCurExe].showMenu == 0)
+        if (gConfig.gfx[IDX(giCurExe)].showMenu == 0)
             SetMenuStatus(0);
         InitGraphics();
         SetCursor(LoadCursorA(NULL, IDC_ARROW));
@@ -213,10 +213,10 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 return 0;
             lTemp = GetWindowLongA(hwndApp, GWL_STYLE);
             if ((lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
-                && gConfig.gfx[giCurExe].fullScreen == 0) {
+                && gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
                 GetWindowRect(window, &rcTemp);
-                gConfig.gfx[giCurExe].x = rcTemp.left;
-                gConfig.gfx[giCurExe].y = rcTemp.top;
+                gConfig.gfx[IDX(giCurExe)].x = rcTemp.left;
+                gConfig.gfx[IDX(giCurExe)].y = rcTemp.top;
                 WritePrefs();
             }
             return 0;
@@ -244,9 +244,9 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (iMainWinScreenHeight < 1)
                 iMainWinScreenHeight = 1;
             if (hwndApp != NULL && (lTemp & (WS_MINIMIZE | WS_MAXIMIZE)) == 0 && gbClosingApp == 0
-                && gConfig.gfx[giCurExe].fullScreen == 0) {
-                gConfig.gfx[giCurExe].width = iMainWinScreenWidth;
-                gConfig.gfx[giCurExe].height = iMainWinScreenHeight;
+                && gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
+                gConfig.gfx[IDX(giCurExe)].width = iMainWinScreenWidth;
+                gConfig.gfx[IDX(giCurExe)].height = iMainWinScreenHeight;
                 WritePrefs();
             }
             return 0;
@@ -347,7 +347,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     RECT windowRect;
     i32 targetY;
 
-    if (gConfig.gfx[giCurExe].fullScreen != 0)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
         return;
     GetWindowRect(hwndApp, &windowRect);
     if (x == -1)
@@ -362,7 +362,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     windowRect.top = 0;
     windowRect.right = width - 1;
     windowRect.bottom = height - 1;
-    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[giCurExe].showMenu);
+    AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[IDX(giCurExe)].showMenu);
     MoveWindow(
         hwndApp,
         windowX,
@@ -371,10 +371,10 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
         windowRect.bottom - windowRect.top + 1,
         1
     );
-    gConfig.gfx[giCurExe].x = windowX;
-    gConfig.gfx[giCurExe].y = targetY;
-    gConfig.gfx[giCurExe].width = width;
-    gConfig.gfx[giCurExe].height = height;
+    gConfig.gfx[IDX(giCurExe)].x = windowX;
+    gConfig.gfx[IDX(giCurExe)].y = targetY;
+    gConfig.gfx[IDX(giCurExe)].width = width;
+    gConfig.gfx[IDX(giCurExe)].height = height;
     WritePrefs();
 }
 
@@ -405,7 +405,7 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
             ResizeWindow(-1, -1, KBWIN_WIDTH_1280, KBWIN_HEIGHT_1024);
             break;
         case KBWIN_MENU_FULLSCREEN:
-            SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
+            SetFullScreenStatus(1 - gConfig.gfx[IDX(giCurExe)].fullScreen);
             break;
         default:
             return HandleAppSpecificMenuCommands(command);
@@ -418,7 +418,7 @@ void UpdateDfltMenu(HMENU menu) {
     i32 result;
     i32 value;
 
-    if (gConfig.gfx[giCurExe].showMenu == 0)
+    if (gConfig.gfx[IDX(giCurExe)].showMenu == 0)
         return;
     if (giMainVideoModeWidth <= KBWIN_WIDTH_640)
         EnableMenuItem(menu, IDX(KBWIN_MENU_SIZE_640_480), MF_GRAYED);
@@ -438,7 +438,7 @@ void KBChangeMenu(HMENU menu) {
         menu = hmnuCurrent;
     hmnuCurrent = menu;
     hmnuApp = menu;
-    if (gConfig.gfx[giCurExe].showMenu && menu != NULL) {
+    if (gConfig.gfx[IDX(giCurExe)].showMenu && menu != NULL) {
         SetMenu(hwndApp, menu);
         UpdateDfltMenu(menu);
         UpdateAppSpecificMenus(menu);
@@ -456,24 +456,24 @@ void SetMenuStatus(i32 showMenu) {
     i32l windowStyle;
     i32l replacedStyle;
 
-    if (gConfig.gfx[giCurExe].fullScreen && showMenu)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen && showMenu)
         return;
     {
-        width = gConfig.gfx[giCurExe].width;
-        height = gConfig.gfx[giCurExe].height;
-        gConfig.gfx[giCurExe].showMenu = showMenu;
+        width = gConfig.gfx[IDX(giCurExe)].width;
+        height = gConfig.gfx[IDX(giCurExe)].height;
+        gConfig.gfx[IDX(giCurExe)].showMenu = showMenu;
         KBChangeMenu(NULL);
-        gConfig.gfx[giCurExe].width = width;
-        gConfig.gfx[giCurExe].height = height;
+        gConfig.gfx[IDX(giCurExe)].width = width;
+        gConfig.gfx[IDX(giCurExe)].height = height;
         WritePrefs();
         windowStyle = GetWindowLongA(hwndApp, GWL_STYLE);
-        if (gConfig.gfx[giCurExe].showMenu)
+        if (gConfig.gfx[IDX(giCurExe)].showMenu)
             giCurWindowsStyleFlags = KBWIN_WINDOWED_STYLE;
         else
             giCurWindowsStyleFlags = KBWIN_FULLSCREEN_STYLE;
         replacedStyle = SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
         ShowWindow(hwndApp, SW_SHOWNA);
-        ResizeWindow(-1, -1, gConfig.gfx[giCurExe].width, gConfig.gfx[giCurExe].height);
+        ResizeWindow(-1, -1, gConfig.gfx[IDX(giCurExe)].width, gConfig.gfx[IDX(giCurExe)].height);
     }
 }
 

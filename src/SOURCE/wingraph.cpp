@@ -80,7 +80,7 @@ VA(0x004353bf, 0xe3)
 void SetupClipper(void) {
     HRESULT result;
 
-    if (gConfig.gfx[giCurExe].fullScreen == 0) {
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
         result = lpDD->CreateClipper(0, &lpClipper, NULL);
         if (result != DD_OK)
             DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 8);
@@ -102,7 +102,7 @@ void DDInitGraphics(void) {
     result = lpDirectDrawCreate(NULL, &lpDD, NULL);
     if (result != DD_OK)
         DDSD(result, RETAIL_FILE, gDDInitLineBase + 8);
-    if (gConfig.gfx[giCurExe].fullScreen != 0) {
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         SetMenuStatus(0);
         result = lpDD->SetCooperativeLevel(
             hwndApp,
@@ -535,16 +535,16 @@ void DDSetFullScreenStatus(i32 fullScreen) {
 
     if (gbWinGraphBusy != 0)
         return;
-    if (gConfig.gfx[giCurExe].fullScreen == fullScreen)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == fullScreen)
         return;
     {
-        x = gConfig.gfx[giCurExe].x;
-        y = gConfig.gfx[giCurExe].y;
-        width = gConfig.gfx[giCurExe].width;
-        windowHeight0 = gConfig.gfx[giCurExe].height;
+        x = gConfig.gfx[IDX(giCurExe)].x;
+        y = gConfig.gfx[IDX(giCurExe)].y;
+        width = gConfig.gfx[IDX(giCurExe)].width;
+        windowHeight0 = gConfig.gfx[IDX(giCurExe)].height;
         gbWinGraphBusy = true;
-        gConfig.gfx[giCurExe].fullScreen = fullScreen;
-        if (gConfig.gfx[giCurExe].fullScreen != 0)
+        gConfig.gfx[IDX(giCurExe)].fullScreen = fullScreen;
+        if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
             SetMenuStatus(0);
 
         result0 = lpDD->SetCooperativeLevel(
@@ -557,7 +557,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
                 RETAIL_FILE,
                 gDDSetFullScreenLineBase + 21
             );
-        if (gConfig.gfx[giCurExe].fullScreen != 0) {
+        if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
             result0 = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
             if (result0 != DD_OK)
                 DDSD(
@@ -595,14 +595,14 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             );
         WritePrefs();
         gbWinGraphBusy = false;
-        if (gConfig.gfx[giCurExe].fullScreen == 0) {
+        if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
             SetMenuStatus(1);
             ResizeWindow(x, y, width, windowHeight0);
         } else {
-            gConfig.gfx[giCurExe].x = x;
-            gConfig.gfx[giCurExe].y = y;
-            gConfig.gfx[giCurExe].width = width;
-            gConfig.gfx[giCurExe].height = windowHeight0;
+            gConfig.gfx[IDX(giCurExe)].x = x;
+            gConfig.gfx[IDX(giCurExe)].y = y;
+            gConfig.gfx[IDX(giCurExe)].width = width;
+            gConfig.gfx[IDX(giCurExe)].height = windowHeight0;
         }
         SetupClipper();
     }
@@ -874,7 +874,7 @@ void ConnectToDLLs(void) {
     if (lpDirectDrawCreate != NULL) {
         gbDDrawAttached = true;
     } else {
-        gConfig.gfx[giCurExe].fullScreen = 0;
+        gConfig.gfx[IDX(giCurExe)].fullScreen = 0;
         SetMenuStatus(1);
     }
 }
@@ -928,7 +928,7 @@ void InitGraphics(void) {
     LogStr("IG1");
     ConnectToDLLs();
     LogStr("IG2");
-    if (gConfig.gfx[giCurExe].fullScreen != 0)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
         giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
     else
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
@@ -980,12 +980,12 @@ VA(0x00437483, 0xe1)
 void SetFullScreenStatus(i32 fullScreen) {
     if (gbInSmackMgr != 0)
         return;
-    if (gConfig.gfx[giCurExe].fullScreen == fullScreen)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == fullScreen)
         return;
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
         if (gbDDrawAttached == 0)
             return;
-        gConfig.gfx[giCurExe].fullScreen = 1;
+        gConfig.gfx[IDX(giCurExe)].fullScreen = 1;
         if (SetGraphicsType(WINGRAPH_GRAPHICS_DIRECT_DRAW) != 0)
             DDSetFullScreenStatus(fullScreen);
     } else if (fullScreen == 0) {
@@ -1022,18 +1022,18 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     if (graphicsType == WINGRAPH_GRAPHICS_DIRECT_DRAW && gbDDrawAttached == 0)
         return 0;
 
-    fullScreen = gConfig.gfx[giCurExe].fullScreen;
-    x = gConfig.gfx[giCurExe].x;
-    y = gConfig.gfx[giCurExe].y;
-    width = gConfig.gfx[giCurExe].width;
-    height7 = gConfig.gfx[giCurExe].height;
+    fullScreen = gConfig.gfx[IDX(giCurExe)].fullScreen;
+    x = gConfig.gfx[IDX(giCurExe)].x;
+    y = gConfig.gfx[IDX(giCurExe)].y;
+    width = gConfig.gfx[IDX(giCurExe)].width;
+    height7 = gConfig.gfx[IDX(giCurExe)].height;
     screenBuffer = H2_ALLOC(
         WINGRAPH_WIDTH * WINGRAPH_HEIGHT,
         gSetGraphicsTypeLineBase + 18
     );
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
-        gConfig.gfx[giCurExe].fullScreen = 0;
+        gConfig.gfx[IDX(giCurExe)].fullScreen = 0;
         DDCleanUpWinGraphics();
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
         WGInitGraphics();

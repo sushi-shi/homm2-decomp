@@ -189,7 +189,7 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
         if (cursorType == MOUSE_AUTO_CURSOR_TYPE) {
-            if (giCurExe == IDX(CONFIG_EXECUTABLE_EDITOR) || *name == 'a' || *name == 'A')
+            if (giCurExe == CONFIG_EXECUTABLE_EDITOR || *name == 'a' || *name == 'A')
                 cursorType = MOUSE_CURSOR_ADVENTURE;
             else if (*name == 's' || *name == 'S')
                 cursorType = MOUSE_CURSOR_SPELL;
@@ -232,7 +232,7 @@ void mouseManager::SetPointer(i32 frame) {
     gbInSetPointer = true;
     gbPutzingWithMouseCtr++;
     gpResourceManager->SavePosition();
-    if (giCurExe == IDX(CONFIG_EXECUTABLE_EDITOR))
+    if (giCurExe == CONFIG_EXECUTABLE_EDITOR)
         m_cursorType = MOUSE_CURSOR_ADVENTURE;
     if (frame == MOUSE_KEEP_CURRENT_FRAME)
         frame = m_cursorFrame;

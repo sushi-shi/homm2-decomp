@@ -57,7 +57,7 @@ i32 executive::InitSystem(void) {
         ShutDown(gExecutiveText.resourceInitError);
     if (gpInputManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.inputInitError);
-    if (giCurExe == IDX(CONFIG_EXECUTABLE_EDITOR)) {
+    if (giCurExe == CONFIG_EXECUTABLE_EDITOR) {
         if (gpSoundManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
             ShutDown(gExecutiveText.soundInitError);
     }

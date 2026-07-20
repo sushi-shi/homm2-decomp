@@ -136,7 +136,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
                 AppCommand(hwndApp, 0, IDX(KBWIN_MENU_HELP), 0);
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
-                SetFullScreenStatus(1 - gConfig.gfx[giCurExe].fullScreen);
+                SetFullScreenStatus(1 - gConfig.gfx[IDX(giCurExe)].fullScreen);
         }
     }
     return event->type == MESSAGE_NONE;
@@ -201,7 +201,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     event->payload.mouse.screenX = event->payload.mouse.x;
     event->payload.mouse.screenY = event->payload.mouse.y;
 
-    if (gConfig.gfx[giCurExe].fullScreen == 0 && gConfig.gfx[giCurExe].colorMouseCursor == 0
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0 && gConfig.gfx[IDX(giCurExe)].colorMouseCursor == 0
         && KBTickCount() > iLastBWOnScreenCheck
         && event->payload.mouse.x > IDX(CURSOR_INTERIOR_MIN_EXCLUSIVE)
         && event->payload.mouse.x < IDX(CURSOR_INTERIOR_MAX_X_EXCLUSIVE)
@@ -215,8 +215,8 @@ afterMouseCoordinates:
     if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
         i32 y = event->payload.mouse.y;
         i32 x = event->payload.mouse.x;
-        if (bInCheckChangeCursor == 0 && gConfig.gfx[giCurExe].fullScreen == 0
-            && gConfig.gfx[giCurExe].colorMouseCursor != 0) {
+        if (bInCheckChangeCursor == 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0
+            && gConfig.gfx[IDX(giCurExe)].colorMouseCursor != 0) {
             bInCheckChangeCursor = 1;
             if (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT) {
                 if (bLastMouseOffscreen != 0) {
@@ -532,9 +532,9 @@ VA(0x004ce990, 0xe4)
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
-    if (gConfig.gfx[giCurExe].fullScreen != 0 && force == 0)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0 && force == 0)
         return;
-    if (gConfig.gfx[giCurExe].colorMouseCursor == 0)
+    if (gConfig.gfx[IDX(giCurExe)].colorMouseCursor == 0)
         return;
 
     bInCheckChangeCursor = 1;
