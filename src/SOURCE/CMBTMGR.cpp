@@ -174,12 +174,6 @@ H2_ENUM_BEGIN(CombatMoraleConstant)
     MORALE_EFFECT_DURATION       = 180
 H2_ENUM_END(CombatMoraleConstant)
 
-H2_ENUM_CLASS_BEGIN(CombatMapTrigger)
-    TRIGGER_MINE    = 0x97,
-    TRIGGER_MONSTER = 0x98,
-    TRIGGER_HERO    = 0xaa
-H2_ENUM_CLASS_END(CombatMapTrigger)
-
 }
 
 VA(0x0048fd50, 0x1ba)
@@ -578,19 +572,20 @@ void combatManager::Close(void) {
             total += m_armyGroups[groupSide]->m_creatureCounts[index];
     }
 
-    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MONSTER)) {
+    if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
         if (total > MONSTER_COUNT_SAVE_LIMIT)
             total = MONSTER_COUNT_SAVE_LIMIT;
         m_battlefieldCell->m_objectMetadata = total & IDX(MAP_MONSTER_COUNT_MASK);
     }
 
-    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_MINE)
+    if (m_battlefieldCell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
         && gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianType != CREATURE_NONE)
         gpGame->m_mines[m_battlefieldCell->m_objectMetadata].guardianCount = static_cast<u8>(total);
 
-    if (m_battlefieldCell->m_triggerType == IDX(TRIGGER_HERO)) {
+    if (m_battlefieldCell->m_triggerType
+        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
         hero* combatHero = gpGame->GetHero(m_battlefieldCell->m_objectMetadata);
-        if (combatHero->m_locationType == IDX(TRIGGER_MINE)
+        if (combatHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
             && gpGame->m_mines[combatHero->m_occupiedTown].guardianType != CREATURE_NONE)
             gpGame->m_mines[combatHero->m_occupiedTown].guardianCount = static_cast<u8>(total);
     }

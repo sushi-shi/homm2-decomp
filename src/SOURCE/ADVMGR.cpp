@@ -203,16 +203,6 @@ H2_ENUM_BEGIN(AdventureTriggerConstant)
     TRIGGER_EVENT_6      = 6
 H2_ENUM_END(AdventureTriggerConstant)
 
-H2_ENUM_BEGIN(AdventureHoverObject)
-    HOVER_MONSTER           = 0x18,
-    HOVER_COAST             = 0x1c,
-    HOVER_SHIPWRECK         = 0x20,
-    HOVER_TOWN              = 0x23,
-    HOVER_HERO              = 0x2a,
-    HOVER_BOAT              = 0x2b,
-    HOVER_SHIPWRECK_TRIGGER = IDX(HOVER_SHIPWRECK) | MAP_TRIGGER_ACTION_FLAG
-H2_ENUM_END(AdventureHoverObject)
-
 H2_ENUM_BEGIN(AdventureHoverConstant)
     HOVER_VIEW_CELLS           = VIEW_CELL_COUNT,
     HOVER_MAX_CELL             = VIEW_LAST_CELL,
@@ -466,9 +456,6 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_FRAME_VIEW_FAR_XLARGE   = 7,
     RADAR_FRAME_VIEW_NEAR_LARGE   = 8,
     RADAR_FRAME_VIEW_MIDDLE_LARGE = 9,
-    RADAR_TOWN_TRIGGER            = 0x2a,
-    RADAR_REEFS_TRIGGER           = 0x67,
-    RADAR_NEIGHBOR_TRIGGER        = 0xa3
 H2_ENUM_END(AdventureRadarConstant)
 
 H2_ENUM_BEGIN(AdventureArmySizeThreshold)
@@ -763,7 +750,6 @@ H2_ENUM_END(AdventureKingdomViewConstant)
 
 H2_ENUM_BEGIN(AdventureVisionsConstant)
     VISIONS_RADIUS               = 3,
-    VISIONS_MONSTER_TRIGGER      = 0x98,
     VISIONS_NO_MONSTER_DISTANCE  = 100,
     VISIONS_MESSAGE_BUFFER_SIZE  = 200,
     VISIONS_JOIN_COST_MULTIPLIER = 2
@@ -830,7 +816,6 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     ROUTE_BEYOND_MOBILITY_FLAG  = 0x100,
     HERO_FRAME_MIRROR_FLAG      = 0x80,
     HERO_FRAME_INDEX_MASK       = 0x7f,
-    OBJECT_GENERIC_SITE         = 0x7a,
     QUICK_INFO_TEXT_CAPACITY    = 200,
     QUICK_INFO_SITE_FRAME_COUNT = 2,
     QUICK_INFO_X_OFFSET         = 57,
@@ -927,7 +912,6 @@ H2_ENUM_END(AdventurePanelCommand)
 H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
     ADJACENT_MONSTER_RADIUS     = 1,
     ADJACENT_MONSTER_END_OFFSET = 2,
-    ADJACENT_MONSTER_TRIGGER    = 0x98,
     ADJACENT_OBJECT_INDEX_NONE  = 0xFF
 H2_ENUM_END(AdventureAdjacentMonsterConstant)
 
@@ -2813,13 +2797,14 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
             hoverCellLocal = GetCell(m_commandTargetX, m_commandTargetY);
             if (gpCurPlayer->m_currentHero == INVALID_HERO) {
-                if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) == HOVER_TOWN
+                if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE
                     && gpGame->GetTown(hoverCellLocal->m_objectMetadata)->m_owner == giCurPlayer) {
                     gpMouseManager->SetPointer(POINTER_TOWN);
                     m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                     return 1;
                 } else {
-                    if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) == HOVER_HERO
+                    if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)
+                            == MAP_OBJECT_HERO_INTERACTION
                         && gpGame->GetHero(hoverCellLocal->m_objectMetadata)->m_owner
                                == giCurPlayer) {
                         gpMouseManager->SetPointer(POINTER_HERO);
@@ -2842,7 +2827,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
                 if (hoverCellLocal->m_flags & HOVER_OBJECT_BLOCKED) {
                     if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)
-                        == HOVER_TOWN) {
+                        == MAP_OBJECT_CASTLE) {
                         hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
                         if (hoverTownCell->m_owner == giCurPlayer) {
                             gpMouseManager->SetPointer(POINTER_TOWN);
@@ -2861,10 +2846,11 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                        || hoverCellLocal->m_triggerType
                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
-                       || hoverCellLocal->m_triggerType == HOVER_SHIPWRECK_TRIGGER)
+                       || hoverCellLocal->m_triggerType
+                              == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK))
                       && (m_cursorType != HERO_TYPE_BOAT
                           || !giGroundToTerrain[hoverCellLocal->m_terrainImageIndex]
-                          || hoverCellLocal->m_triggerType == HOVER_COAST))) {
+                          || hoverCellLocal->m_triggerType == MAP_OBJECT_COAST))) {
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
                     return 1;
@@ -2886,8 +2872,8 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     }
                     pointerBaseCursor = routeDaysCount * HOVER_ROUTE_FRAMES_PER_DAY;
 
-                    switch (hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
-                        case HOVER_BOAT:
+                    switch (IDX(hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
+                        case MAP_OBJECT_BOAT:
                             if (m_cursorType != HERO_TYPE_BOAT) {
                                 gpMouseManager->SetPointer(pointerBaseCursor + POINTER_SAIL);
                                 m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
@@ -2895,7 +2881,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                 gpMouseManager->SetPointer(pointerBaseCursor);
                             }
                             break;
-                        case HOVER_COAST:
+                        case MAP_OBJECT_COAST:
                             if (m_cursorType == HERO_TYPE_BOAT) {
                                 gpMouseManager->SetPointer(
                                     pointerBaseCursor + POINTER_DISEMBARK
@@ -2910,11 +2896,11 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             }
                             m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             break;
-                        case HOVER_MONSTER:
+                        case MAP_OBJECT_MONSTER:
                             gpMouseManager->SetPointer(pointerBaseCursor + POINTER_ATTACK);
                             m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             break;
-                        case HOVER_HERO:
+                        case MAP_OBJECT_HERO_INTERACTION:
                             if (gpGame->GetHero(hoverCellLocal->m_objectMetadata)->m_owner
                                 != giCurPlayer) {
                                 gpMouseManager->SetPointer(
@@ -2928,7 +2914,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                 m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             }
                             break;
-                        case HOVER_TOWN:
+                        case MAP_OBJECT_CASTLE:
                             hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
                             if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                                 && hoverTownCell->m_owner != giCurPlayer
@@ -2959,7 +2945,8 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                                 pointerBaseCursor + POINTER_ACTION
                                             );
                                         } else if (hoverCellLocal->m_triggerType
-                                                   == HOVER_SHIPWRECK_TRIGGER) {
+                                                   == (MAP_TRIGGER_ACTION_FLAG
+                                                       | MAP_OBJECT_SHIPWRECK)) {
                                             gpMouseManager->SetPointer(
                                                 pointerBaseCursor + POINTER_ACTION
                                             );
@@ -4477,7 +4464,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     radarColorValue = gOwnerColors[gpGame->m_players[giCurPlayer].m_color];
                 } else {
                     if ((cellValue->m_triggerType & MAP_TRIGGER_TYPE_MASK)
-                        == RADAR_TOWN_TRIGGER) {
+                        == MAP_OBJECT_HERO_INTERACTION) {
                         ownerIndexValue = gpGame->m_availableHeroes[cellValue->m_objectMetadata];
                         if (!(giCurPlayer != ownerIndexValue)) {
                             i32 ownerColorIndex;
@@ -4500,14 +4487,14 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                             || (objectTilesetLocal == TILESET_FLAG32 && mapColumnLimit > 0
                                 && mapColumnLimit < MAP_WIDTH - 1
                                 && m_mapData->Row(mapRow)[mapColumnLimit - 1].m_triggerType
-                                       == RADAR_NEIGHBOR_TRIGGER)
+                                       == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
                             || m_mapData->Row(mapRow)[mapColumnLimit + 1].m_triggerType
-                                   == RADAR_NEIGHBOR_TRIGGER) {
+                                   == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                             objectTilesetLocal = TILESET_OBJNTOWN;
                         }
 
                         if (objectTilesetLocal == TILESET_X_LOC2
-                            && cellValue->m_triggerType == RADAR_REEFS_TRIGGER) {
+                            && cellValue->m_triggerType == MAP_OBJECT_ROCK) {
                             radarColorValue =
                                 gMapColors[giGroundToTerrain[cellValue->m_terrainImageIndex]]
                                 + RADAR_TERRAIN_SHADE;
@@ -4549,7 +4536,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                 case TILESET_TREFIR:
                                 case TILESET_TREFALL:
                                 case TILESET_TREDECI:
-                                    switch (cellValue->m_triggerType) {
+                                    switch (IDX(cellValue->m_triggerType)) {
                                         case MAP_OBJECT_ALCHEMIST_LAB:
                                         case MAP_OBJECT_MINE:
                                         case MAP_OBJECT_SAWMILL:
@@ -4578,7 +4565,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                     break;
                                 default:
                                 radar_default_object:
-                                    switch (cellValue->m_triggerType) {
+                                    switch (IDX(cellValue->m_triggerType)) {
                                         case MAP_OBJECT_ALCHEMIST_LAB:
                                         case MAP_OBJECT_MINE:
                                         case MAP_OBJECT_SAWMILL:
@@ -4837,7 +4824,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
             sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
-            switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+            switch (IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
                 case MAP_OBJECT_ARTIFACT:
                     sprintf(gText, "%s", "Artifact");
                     break;
@@ -5081,7 +5068,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         static_cast<char>(toupper(static_cast<i32>(static_cast<i8>(gText[0]))));
                     gText[0] = uppercaseResult;
                     break;
-                case OBJECT_GENERIC_SITE: {
+                case MAP_OBJECT_EXPANSION_OBJECT: {
                     mapObjectKindValue = -1;
                     if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
@@ -5222,7 +5209,7 @@ quick_info_ready:
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
-            currentCell->m_triggerType,
+            IDX(currentCell->m_triggerType),
             currentCell->m_objectMetadata,
             currentCell->HasFlag(MAP_CELL_OCCUPIED),
             savedTextLocal,
@@ -8051,7 +8038,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     }
 
     if (currentCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) {
-        switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+        switch (IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)) {
             case MAP_OBJECT_ARCHER_HOUSE:
                 return ADVMGR_SOUND_DWELLING;
             case MAP_OBJECT_DWARF_COTTAGE:
@@ -8123,7 +8110,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
                 break;
         }
     } else {
-        switch (currentCell->m_triggerType) {
+        switch (IDX(currentCell->m_triggerType)) {
             case MAP_OBJECT_TAR_PIT:
                 return ADVMGR_SOUND_TAR_PIT;
             case MAP_OBJECT_LAVA_POOL:
@@ -8252,7 +8239,7 @@ void advManager::TeleportTo(
 
     destinationCell29 = GetCell(destinationX, destinationY);
     oldCell2 = GetCell(mapHero->m_x, mapHero->m_y);
-    if (mapHero->m_locationType == HERO_TOWN_LOCATION) {
+    if (mapHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
         occupiedTown47 = gpGame->GetTown(mapHero->m_occupiedTown);
         occupiedTown47->m_occupyingHeroId = INVALID_HERO;
     }
@@ -8560,7 +8547,7 @@ void advManager::TownGate(SpellType spellId) {
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId =
         targetHero->m_id;
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(NULL);
-    targetHero->m_locationType = HERO_TOWN_LOCATION;
+    targetHero->m_locationType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE;
     targetHero->m_occupiedTown = gpCurPlayer->m_townIds[selectedTownIndex];
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[m_currentTerrain]);
 }
@@ -8606,7 +8593,7 @@ void advManager::SummonBoat(void) {
 
             destinationCell = GetCell(destinationX10, destinationY15);
             if (destinationCell->m_objectIndex == MAPCELL_SPRITE_NONE
-                && destinationCell->m_triggerType == 0
+                && destinationCell->m_triggerType == MAP_OBJECT_NONE
                 && !giGroundToTerrain[destinationCell->m_terrainImageIndex]) {
                 foundDestination9 = 1;
                 break;
@@ -9503,7 +9490,7 @@ i32 advManager::FindAdjacentMonster(
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
                 if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX].m_triggerType
-                    == ADJACENT_MONSTER_TRIGGER) {
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                     if (originY > s_adjacentMonsterY) {
                         if ((GetCell(originX, originY)->m_objectIndex
                                  == ADJACENT_OBJECT_INDEX_NONE
@@ -9544,7 +9531,7 @@ i32 advManager::FindAdjacentMonster(
                  s_adjacentMonsterY < s_adjacentMonsterEndY;
                  ++s_adjacentMonsterY) {
                 if (m_mapData->Row(s_adjacentMonsterY)[s_adjacentMonsterX].m_triggerType
-                    == ADJACENT_MONSTER_TRIGGER) {
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                     if (originY > s_adjacentMonsterY) {
                         if ((GetCell(originX, originY)->m_objectIndex
                                  == ADJACENT_OBJECT_INDEX_NONE
@@ -10482,7 +10469,7 @@ i32 advManager::DoVisions(hero* visionHero) {
              scanYLocal <= visionHero->m_y + VISIONS_RADIUS;
              ++scanYLocal) {
             cellData = GetCell(scanXType, scanYLocal);
-            if (cellData->m_triggerType == VISIONS_MONSTER_TRIGGER) {
+            if (cellData->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER)) {
                 if (nearestDistanceState
                     > (currentDistanceId =
                            abs(visionHero->m_x - scanXType) + abs(visionHero->m_y - scanYLocal))) {
