@@ -21,6 +21,11 @@ H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_EVENT_MESSAGE_HEAD_SIZE = 1
 H2_ENUM_END(GameSerializationConstant)
 
+H2_ENUM_BEGIN(GameCalendarConstant)
+    CALENDAR_DAYS_PER_WEEK  = 7,
+    CALENDAR_DAYS_PER_MONTH = 28
+H2_ENUM_END(GameCalendarConstant)
+
 H2_ENUM_BEGIN(GameSetupSharedConstant)
     GAME_COMPUTER_PLAYER = 10,
     GAME_RANDOM_RACE     = 7
