@@ -4292,7 +4292,7 @@ VA(0x0047c761, 0x9aa)
 void game::PerDay(void) {
     i32 maxSpellPoints9;
     i32 player;
-    i32 resource8;
+    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource8;
     i32 income13;
     i32 dailyIncome0;
     MineType resourceType1;
@@ -4303,9 +4303,9 @@ void game::PerDay(void) {
     double penaltyRate9;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < IDX(RES_COUNT); resource8++) {
-            gpGame->m_players[player].m_income[resource8] =
-                -m_players[player].m_resources[resource8];
+        for (resource8 = RES_WOOD; resource8 < RES_COUNT; resource8++) {
+            gpGame->m_players[player].m_income[IDX(resource8)] =
+                -m_players[player].m_resources[IDX(resource8)];
         }
     }
 
@@ -4389,15 +4389,15 @@ void game::PerDay(void) {
             m_heroRecs[player].m_eventFlags & ~WEEKLY_HERO_RESERVED_FLAG;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < IDX(RES_GOLD); resource8++) {
+        for (resource8 = RES_WOOD; resource8 < RES_GOLD; resource8++) {
             if (m_playerHandicap[player] != PLAYER_HANDICAP_NONE) {
                 if (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE)
                     penaltyRate9 = GAME_HANDICAP_MODERATE_DAILY_PENALTY;
                 else
                     penaltyRate9 = GAME_HANDICAP_SEVERE_DAILY_PENALTY;
-                m_players[player].m_resources[resource8] -= static_cast<i32>(
-                    (gpGame->m_players[player].m_income[resource8]
-                     + m_players[player].m_resources[resource8])
+                m_players[player].m_resources[IDX(resource8)] -= static_cast<i32>(
+                    (gpGame->m_players[player].m_income[IDX(resource8)]
+                     + m_players[player].m_resources[IDX(resource8)])
                     * penaltyRate9
                 );
             }
@@ -4405,9 +4405,9 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
-        for (resource8 = 0; resource8 < IDX(RES_COUNT); resource8++) {
-            gpGame->m_players[player].m_income[resource8] +=
-                m_players[player].m_resources[resource8];
+        for (resource8 = RES_WOOD; resource8 < RES_COUNT; resource8++) {
+            gpGame->m_players[player].m_income[IDX(resource8)] +=
+                m_players[player].m_resources[IDX(resource8)];
         }
     }
 
