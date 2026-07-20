@@ -26,7 +26,7 @@ H2_ENUM_BEGIN(ArmyFacing)
 H2_ENUM_END(ArmyFacing)
 
 inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
-    return static_cast<ArmyFacing>(IDX(ARMY_FACING_RIGHT) - IDX(facing));
+    return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
 }
 
 inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {

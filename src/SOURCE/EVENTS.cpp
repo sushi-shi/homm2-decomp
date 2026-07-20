@@ -5399,7 +5399,7 @@ i32 advManager::CombatMonsterEvent(
             && SRandom(0, MONSTER_RANDOM_MAX) < MONSTER_UPGRADE_CHANCE && secondaryCount == 0
             && tertiaryCount == 0)
             gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
-                static_cast<CreatureType>(IDX(monsterType) + 1);
+                NextCreatureType(monsterType);
         else
             gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
                 monsterType;

@@ -117,6 +117,12 @@ H2_ENUM_CLASS_BEGIN(CreatureType)
     CREATURE_WATER_ELEMENTAL     = 65,
     CREATURE_COUNT               = 66
 H2_ENUM_CLASS_END(CreatureType)
+H2_ENUM_STEPPED(CreatureType)
+
+inline CreatureType NextCreatureType(CreatureType creatureType) {
+    ++creatureType;
+    return creatureType;
+}
 
 H2_ENUM_CLASS_BEGIN(ArtifactLevelMask)
     ARTIFACT_LEVEL_ULTIMATE = 0x01,
