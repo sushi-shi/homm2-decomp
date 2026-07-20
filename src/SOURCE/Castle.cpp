@@ -428,14 +428,16 @@ i32 CastleHandler(tag_message& message) {
     i32 result;
     i16 textControl;
     i32 quickFlag;
-    i32 buildingIndex;
+    BuildingSlotType selectedBuilding;
+    i32 formationControl;
     i32 loopIndex;
     i32 cannotRecruitHero;
     i32 hoverMessage;
     i32 heroChoiceIndex;
 
     textControl = IDX(CONTROL_STATUS_TEXT);
-    buildingIndex = TOWN_SELECTED_BUILDING_NONE;
+    selectedBuilding = BUILDING_SLOT_NONE;
+    formationControl = 0;
     result = 0;
     hoverMessage = 0;
 
@@ -445,26 +447,27 @@ i32 CastleHandler(tag_message& message) {
             hoverMessage = 1;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
-            buildingIndex = IDX(CASTLE_CAPTAIN);
+            selectedBuilding = CASTLE_CAPTAIN;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
-            buildingIndex = CONTROL_CAPTAIN_FORMATION_GROUPED;
+            formationControl = CONTROL_CAPTAIN_FORMATION_GROUPED;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
-            buildingIndex = CONTROL_CAPTAIN_FORMATION_SPREAD;
+            formationControl = CONTROL_CAPTAIN_FORMATION_SPREAD;
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
                        < CONTROL_BUILDING_NAME_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildingIndex = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
+                selectedBuilding = castleSlotsUse
+                    [message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST];
             else if (message.payload.widget.id >= CONTROL_BUILDING_ICON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_ICON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildingIndex = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
+                selectedBuilding = castleSlotsUse
+                    [message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST];
             else if (message.payload.widget.id >= CONTROL_BUILDING_BUTTON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildingIndex = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
-            if (buildingIndex != TOWN_SELECTED_BUILDING_NONE)
-                buildingIndex = IDX(castleSlotsUse[buildingIndex]);
+                selectedBuilding = castleSlotsUse
+                    [message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST];
         }
     }
 
@@ -472,31 +475,33 @@ i32 CastleHandler(tag_message& message) {
         if (message.payload.widget.id == gpTownManager->m_lastHoverId)
             return EVENT_WINDOW_CONTINUE;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
-        switch (buildingIndex) {
-            case CONTROL_CAPTAIN_FORMATION_GROUPED:
-                sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
-                break;
-            case CONTROL_CAPTAIN_FORMATION_SPREAD:
-                sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
-                break;
+        if (formationControl == CONTROL_CAPTAIN_FORMATION_GROUPED) {
+            sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
+            goto hover_text_ready;
+        }
+        if (formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD) {
+            sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
+            goto hover_text_ready;
+        }
+        switch (selectedBuilding) {
 
             case TOWN_OBJECT_MAGE_GUILD:
-                if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex))) {
+                if (!(gpTownManager->m_buildableBuildings & BIT(selectedBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            BuildingSlotType(buildingIndex)
+                            selectedBuilding
                         )
                     );
-                } else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex))) {
+                } else if (!(gpTownManager->m_affordableBuildings & BIT(selectedBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            BuildingSlotType(buildingIndex)
+                            selectedBuilding
                         )
                     );
                 } else {
@@ -538,32 +543,32 @@ i32 CastleHandler(tag_message& message) {
             case BUILDING_SLOT_SPECIAL_THIRTY:
                 if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(gText, "Cannot build.  Already built here this turn.");
-                } else if (gpTownManager->m_town->m_buildings & (1L << buildingIndex)) {
+                } else if (gpTownManager->m_town->m_buildings & BIT(selectedBuilding)) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            BuildingSlotType(buildingIndex)
+                            selectedBuilding
                         )
                     );
                 } else {
-                    if (!(gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
+                    if (!(gpTownManager->m_buildableBuildings & BIT(selectedBuilding)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                BuildingSlotType(buildingIndex)
+                                selectedBuilding
                             )
                         );
-                    else if (!(gpTownManager->m_affordableBuildings & (1L << buildingIndex)))
+                    else if (!(gpTownManager->m_affordableBuildings & BIT(selectedBuilding)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                BuildingSlotType(buildingIndex)
+                                selectedBuilding
                             )
                         );
                     else
@@ -572,13 +577,13 @@ i32 CastleHandler(tag_message& message) {
                             cCastleInfo[IDX(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                BuildingSlotType(buildingIndex)
+                                selectedBuilding
                             )
                         );
                 }
                 break;
 
-            case TOWN_SELECTED_BUILDING_NONE:
+            case BUILDING_SLOT_NONE:
                 switch (message.payload.widget.id) {
                     case CONTROL_HERO_FIRST:
                     case CONTROL_HERO_FIRST + 1:
@@ -605,9 +610,10 @@ i32 CastleHandler(tag_message& message) {
                                 gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(heroChoiceIndex)]
                                     .m_name,
                                 gAlignmentNames
-                                    [gpGame
-                                         ->m_heroRecs[gpCurPlayer->AvailableHeroId(heroChoiceIndex)]
-                                         .m_cursorType]
+                                    [IDX(gpGame
+                                             ->m_heroRecs[gpCurPlayer
+                                                              ->AvailableHeroId(heroChoiceIndex)]
+                                             .m_cursorType)]
                             );
                         }
                         break;
@@ -641,9 +647,9 @@ i32 CastleHandler(tag_message& message) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 quickFlag = (message.payload.widget.parameter & MESSAGE_MODIFIER_LEFT_SHIFT) != 0;
-                switch (buildingIndex) {
-                    case CONTROL_CAPTAIN_FORMATION_SPREAD:
-                        if (quickFlag) {
+                if (formationControl != 0) {
+                    if (quickFlag) {
+                        if (formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD)
                             NormalDialog(
                                 "{Spread Formation}\n\n'Spread' combat formation spreads your "
                                 "armies from the top to the bottom of the battlefield, with at "
@@ -658,15 +664,7 @@ i32 CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                        } else {
-                            gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
-                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                            gpTownManager->m_heroWindow0->DrawWindow();
-                        }
-                        break;
-
-                    case CONTROL_CAPTAIN_FORMATION_GROUPED:
-                        if (quickFlag) {
+                        else
                             NormalDialog(
                                 "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
                                 "army together in the center of your side of the battlefield.",
@@ -680,17 +678,22 @@ i32 CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                        } else {
-                            gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
-                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                            gpTownManager->m_heroWindow0->DrawWindow();
-                        }
-                        break;
+                    } else {
+                        gpTownManager->m_town->m_formation =
+                            formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD
+                                ? TOWN_FORMATION_SPREAD
+                                : TOWN_FORMATION_GROUPED;
+                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
+                        gpTownManager->m_heroWindow0->DrawWindow();
+                    }
+                    goto selection_done;
+                }
+                switch (selectedBuilding) {
 
                     case TOWN_OBJECT_MAGE_GUILD:
                         if (quickFlag
                             || gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
-                            || (gpTownManager->m_buildableBuildings & (1L << buildingIndex)))
+                            || (gpTownManager->m_buildableBuildings & BIT(selectedBuilding)))
                             goto buy_building;
                         break;
 
@@ -719,24 +722,24 @@ i32 CastleHandler(tag_message& message) {
                     case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
                     case BUILDING_SLOT_SPECIAL_THIRTY:
                         if (quickFlag
-                            || (!(gpTownManager->m_town->m_buildings & (1L << buildingIndex))
-                                && (gpTownManager->m_buildableBuildings & (1L << buildingIndex)))) {
+                            || (!(gpTownManager->m_town->m_buildings & BIT(selectedBuilding))
+                                && (gpTownManager->m_buildableBuildings & BIT(selectedBuilding)))) {
                         buy_building:
                             for (loopIndex = 0;
                                  loopIndex < gpTownManager->m_townObjectCount
                                  && gpTownManager->m_townObjects[loopIndex]->m_buildingId
-                                        != buildingIndex;
+                                        != selectedBuilding;
                                  ++loopIndex) {
                             }
                             result = gpTownManager->BuyBuild(
-                                static_cast<BuildingSlotType>(buildingIndex),
-                                (gpTownManager->m_affordableBuildings & (1L << buildingIndex)) == 0,
+                                selectedBuilding,
+                                (gpTownManager->m_affordableBuildings & BIT(selectedBuilding)) == 0,
                                 quickFlag
                             );
                         }
                         break;
 
-                    case TOWN_SELECTED_BUILDING_NONE:
+                    case BUILDING_SLOT_NONE:
                         switch (message.payload.widget.id) {
                             case CONTROL_HERO_FIRST:
                             case CONTROL_HERO_FIRST + 1:
