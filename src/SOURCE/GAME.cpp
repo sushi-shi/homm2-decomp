@@ -1424,11 +1424,11 @@ void game::NewMap(char* filename) {
         {
             if (xIsPlayingExpansionCampaign && player2 == 0) {
                 specialClass6 = FACTION_ANY;
-                if (xCampaign.HasAward(6)) {
+                if (xCampaign.HasAward(AWARD_WAYWARD_SON)) {
                     specialClass6 = FACTION_WIZARD;
                     specialName3 = xCampaign.JosephName();
                     specialPortrait6 = 64;
-                } else if (xCampaign.HasAward(7)) {
+                } else if (xCampaign.HasAward(AWARD_UNCLE_IVAN)) {
                     specialClass6 = FACTION_BARBARIAN;
                     specialName3 = xCampaign.IvanName();
                     specialPortrait6 = 63;
@@ -3542,7 +3542,7 @@ void game::PerDay(void) {
         m_players[player].m_resources[IDX(RES_GOLD)] += ComputeDailyGold(player);
     }
 
-    if (xIsPlayingExpansionCampaign && xCampaign.HasAward(2))
+    if (xIsPlayingExpansionCampaign && xCampaign.HasAward(AWARD_WOOD_BONUS))
         m_players[0].m_resources[IDX(RES_WOOD)] += 2;
 
     for (player = 0; player < m_playerCount; player++) {
