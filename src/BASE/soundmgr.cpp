@@ -502,7 +502,7 @@ i32 soundManager::Open(i32) {
                 gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
                 WritePrefs();
             } else {
-                gConfig.musicVolume = 0;
+                gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
             }
         }
@@ -514,7 +514,7 @@ i32 soundManager::Open(i32) {
                 gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
                 WritePrefs();
             } else {
-                gConfig.musicVolume = 0;
+                gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
             }
         }
@@ -530,7 +530,7 @@ i32 soundManager::Open(i32) {
             0
         );
     if (m_digitalDriver == NULL) {
-        gConfig.soundVolume = 0;
+        gConfig.soundVolume = CONFIG_VOLUME_MUTED;
         WritePrefs();
     }
     AllocateSampleHandles();

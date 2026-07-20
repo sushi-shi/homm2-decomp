@@ -306,7 +306,6 @@ H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
 H2_ENUM_END(AdventureSystemOptionsMessage)
 
 H2_ENUM_BEGIN(AdventureSystemOptionConstant)
-    OPTION_VOLUME_LEVELS   = 11,
     OPTION_INTERFACE_COUNT = 3,
     OPTION_DIALOG_MESSAGE  = 1,
     OPTION_DIALOG_HELP     = 4,
@@ -491,11 +490,6 @@ H2_ENUM_BEGIN(AdventureSaveConstant)
 H2_ENUM_END(AdventureSaveConstant)
 
 H2_ENUM_BEGIN(AdventureBottomViewConstant)
-    BOTTOM_VIEW_NONE              = 0,
-    BOTTOM_VIEW_NEW_TURN          = 1,
-    BOTTOM_VIEW_KINGDOM           = 2,
-    BOTTOM_VIEW_RESOURCE          = 5,
-    BOTTOM_VIEW_OVERRIDE_DISABLED = 6,
     BOTTOM_VIEW_PANEL_X           = 480,
     BOTTOM_VIEW_PANEL_Y           = 392,
     BOTTOM_VIEW_PANEL_WIDTH       = 143,
@@ -697,7 +691,6 @@ H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
 H2_ENUM_END(AdventureAdjacentMonsterConstant)
 
 H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
-    PUZZLE_PIECE_COUNT       = 48,
     PUZZLE_MUSIC             = 23,
     PUZZLE_WINDOW_X          = DRAW_CLIP_WIDTH,
     PUZZLE_WINDOW_Y          = SCROLL_BORDER,
@@ -1013,9 +1006,9 @@ i32 advManager::Open(i32 id) {
     }
 
     glTimers[0] = KBTickCount() + TIMER_DELAY;
-    i32 oldSampleVolumeState = gConfig.soundVolume;
-    if (gConfig.soundVolume != 0) {
-        gConfig.soundVolume = 10;
+    ConfigVolumeLevel oldSampleVolumeState = gConfig.soundVolume;
+    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
+        gConfig.soundVolume = CONFIG_VOLUME_MAX;
     }
     SetInitialMapOrigin();
 
@@ -9800,8 +9793,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            gConfig.musicVolume =
-                                (gConfig.musicVolume + 1) % OPTION_VOLUME_LEVELS;
+                            gConfig.musicVolume = static_cast<ConfigVolumeLevel>(
+                                (gConfig.musicVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT
+                            );
                             gpSoundManager->AdjustMusicVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
@@ -9823,8 +9817,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            gConfig.soundVolume =
-                                (gConfig.soundVolume + 1) % OPTION_VOLUME_LEVELS;
+                            gConfig.soundVolume = static_cast<ConfigVolumeLevel>(
+                                (gConfig.soundVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT
+                            );
                             gpSoundManager->AdjustSoundVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;

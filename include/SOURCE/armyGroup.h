@@ -15,6 +15,14 @@ H2_ENUM_BEGIN(ArmyGroupConstant)
     ARMY_GROUP_MORALE_MAX         = 3
 H2_ENUM_END(ArmyGroupConstant)
 
+H2_ENUM_BEGIN(ArmyGroupAlignmentResult)
+    ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE = -3,
+    ARMY_GROUP_ALIGNMENT_FOUR         = -2,
+    ARMY_GROUP_ALIGNMENT_THREE        = -1,
+    ARMY_GROUP_ALIGNMENT_NO_MODIFIER  = 0,
+    ARMY_GROUP_ALIGNMENT_SAME         = 1
+H2_ENUM_END(ArmyGroupAlignmentResult)
+
 #pragma pack(push, 1)
 class armyGroup {
 public:
@@ -34,7 +42,7 @@ public:
     i32 GetMorale(class hero*, class town*, class armyGroup*);
     void Dismiss(i32);
     i32 IsMember(i32);
-    i32 IsHomogeneous(i32);
+    ArmyGroupAlignmentResult IsHomogeneous(i32);
     i32 CanJoin(i32);
     i32 GetNumArmies(void);
     i32 Add(i32, i32, i32);

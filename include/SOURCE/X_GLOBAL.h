@@ -87,10 +87,31 @@ H2_ENUM_BEGIN(GlobalConstant)
     GLOBAL_MAP_PATH_SIZE                    = 0x14,
     GLOBAL_DRIVER_NAME_SIZE                 = 0x10,
     GLOBAL_BOTTOM_VIEW_TEXT_SIZE            = 0x98,
+    GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE         = 92,
     GLOBAL_SHORT_MAP_NAME_SIZE              = 16,
     GLOBAL_PLAYER_NAME_SIZE                 = 21,
-    GLOBAL_WINDOW_TEXT_SIZE                 = 0x12c
+    GLOBAL_WINDOW_TEXT_SIZE                 = 0x12c,
+    GLOBAL_TEXT_BUFFER_SIZE                 = 768
 H2_ENUM_END(GlobalConstant)
+
+H2_ENUM_BEGIN(GameBalanceConstant)
+    HERO_RECRUITMENT_GOLD_COST      = 2500,
+    ULTIMATE_ARTIFACT_AVERAGE_VALUE = 16500,
+    TOWN_VISIBILITY_RADIUS          = 5
+H2_ENUM_END(GameBalanceConstant)
+
+H2_ENUM_BEGIN(SpellEffectDisplayType)
+    SPELL_EFFECT_DISPLAY_HIGHLIGHT     = 0,
+    SPELL_EFFECT_DISPLAY_SPELL_ICON    = 1,
+    SPELL_EFFECT_DISPLAY_EFFECT_STATUS = 2,
+    SPELL_EFFECT_DISPLAY_COUNT         = 3
+H2_ENUM_END(SpellEffectDisplayType)
+
+inline SpellEffectDisplayType NextSpellEffectDisplayType(SpellEffectDisplayType type) {
+    return static_cast<SpellEffectDisplayType>(
+        (IDX(type) + 1) % SPELL_EFFECT_DISPLAY_COUNT
+    );
+}
 
 extern i8 xIsExpansionMap;
 extern i32 xLastChoice;
@@ -143,7 +164,9 @@ H2_ENUM_BEGIN(KbControlTableConstant)
 H2_ENUM_END(KbControlTableConstant)
 
 H2_ENUM_BEGIN(KbPaletteTableConstant)
-    PUZZLE_DRAW_TABLE_COUNT = 64
+    PUZZLE_DRAW_TABLE_COUNT   = 64,
+    PUZZLE_PIECE_COUNT        = 48,
+    PUZZLE_PIECE_STORAGE_SIZE = (PUZZLE_PIECE_COUNT + 7) / 8
 H2_ENUM_END(KbPaletteTableConstant)
 
 H2_ENUM_BEGIN(KbGameTableConstant)
@@ -430,7 +453,7 @@ extern i32 iLastDiffSendTo;
 extern u8 gcSpellInfluenceIcons[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT];
 extern u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT];
-extern i32 giSpellEffectShowType;
+extern H2_ENUM_STORAGE(SpellEffectDisplayType, i32) giSpellEffectShowType;
 extern i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT];
 extern char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT];
 extern struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT];
@@ -594,7 +617,7 @@ extern i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 extern b32 gbInCampaign;
 extern i32 giResExtra1;
 extern i32 giResExtra2;
-extern i8 puzzlePiecesRemoved[IDX(FACTION_COUNT)];
+extern i8 puzzlePiecesRemoved[PUZZLE_PIECE_STORAGE_SIZE];
 extern i32 giSeedingValid;
 extern i32 giLimitPlayer;
 extern i32 giShowClouds;

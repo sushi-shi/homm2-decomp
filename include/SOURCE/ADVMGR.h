@@ -32,6 +32,18 @@ H2_ENUM_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = 16
 H2_ENUM_END(AdventureRemoteConstant)
 
+H2_ENUM_BEGIN(BottomViewMode)
+    BOTTOM_VIEW_NONE              = 0,
+    BOTTOM_VIEW_NEW_TURN          = 1,
+    BOTTOM_VIEW_KINGDOM           = 2,
+    BOTTOM_VIEW_RESOURCE          = 5,
+    BOTTOM_VIEW_OVERRIDE_DISABLED = 6
+H2_ENUM_END(BottomViewMode)
+
+H2_ENUM_BEGIN(AdventureBottomViewSharedConstant)
+    BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION = 5000
+H2_ENUM_END(AdventureBottomViewSharedConstant)
+
 H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
     ADVMGR_ENVIRONMENT_SOUND_NONE     = -1,
     ADVMGR_SOUND_BUOY                 = 0,
