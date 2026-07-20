@@ -88,6 +88,22 @@ class ReportCacheTest(unittest.TestCase):
 
 
 class LiveStatusTest(unittest.TestCase):
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.maxima = Path(self.temporary.name) / "match_baseline.tsv"
+        self.maxima_patch = mock.patch.object(status, "MAXIMA", self.maxima)
+        self.maxima_patch.start()
+        self.hashes_patch = mock.patch.object(status, "source_hashes", return_value={
+            ("SOURCE/UNIT", "exact"): "hash-exact",
+            ("SOURCE/UNIT", "partial"): "hash-partial",
+        })
+        self.hashes_patch.start()
+
+    def tearDown(self):
+        self.hashes_patch.stop()
+        self.maxima_patch.stop()
+        self.temporary.cleanup()
+
     @staticmethod
     def report():
         return {
@@ -118,26 +134,77 @@ class LiveStatusTest(unittest.TestCase):
             },
         }
 
-    def test_readme_contains_only_live_metrics(self):
-        block = status.readme_block(self.report())
+    def test_readme_contains_live_and_retained_maxima(self):
+        maxima = {
+            ("SOURCE/UNIT", "exact"): (100.0, "hash-exact"),
+            ("SOURCE/UNIT", "partial"): (100.0, "hash-partial"),
+        }
+        block = status.readme_block(self.report(), maxima)
         self.assertIn("1 / 2 functions exact", block)
+        self.assertIn("2 / 2 functions exact-max", block)
         self.assertIn("98.20% fuzzy", block)
-        self.assertNotIn("exact-max", block)
-        self.assertNotIn("fuzzy-max", block)
+        self.assertIn("100.00% fuzzy-max", block)
 
-    def test_status_prints_live_exact_count(self):
+    def test_status_prints_live_and_max_exact_counts(self):
+        self.maxima.write_text(
+            "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
+            "SOURCE/UNIT\tpartial\t100.0000\thash-partial\n")
         with mock.patch("builtins.print") as output:
             self.assertEqual(status.main([], data=self.report()), 0)
         rendered = "\n".join(" ".join(str(arg) for arg in call.args)
                              for call in output.call_args_list)
         self.assertIn("matched-code-bytes: 40.00%", rendered)
         self.assertIn("functions-exact: 1/2", rendered)
-        self.assertNotIn("max", rendered)
+        self.assertIn("functions-exact-max: 2/2", rendered)
+        self.assertIn("fuzzy-max: 100.00%", rendered)
 
-    def test_removed_ratchet_commands_are_rejected(self):
-        for command in ("update", "check"):
-            with self.subTest(command=command):
-                self.assertEqual(status.main([command], data=self.report()), 1)
+    def test_status_does_not_collapse_duplicate_source_less_names(self):
+        report = self.report()
+        report["units"][0]["functions"].append(
+            {"name": "exact", "size": "10", "fuzzy_match_percent": 100.0})
+        report["units"][0]["measures"].update({
+            "total_functions": 3,
+            "matched_functions": 2,
+        })
+        report["measures"].update({"total_functions": 3, "matched_functions": 2})
+        with mock.patch("builtins.print") as output:
+            self.assertEqual(status.main([], data=report), 0)
+        rendered = "\n".join(" ".join(str(arg) for arg in call.args)
+                             for call in output.call_args_list)
+        self.assertIn("functions-exact-max: 2/3", rendered)
+
+    def test_recording_never_lowers_maximum_for_same_hash(self):
+        self.maxima.write_text(
+            "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
+            "SOURCE/UNIT\tpartial\t99.0000\thash-partial\n")
+        maxima = status.record_maxima(self.report())
+        self.assertEqual(maxima[("SOURCE/UNIT", "exact")], (100.0, "hash-exact"))
+        self.assertEqual(maxima[("SOURCE/UNIT", "partial")], (99.0, "hash-partial"))
+        rendered = self.maxima.read_text()
+        self.assertIn("never an enforcement baseline", rendered)
+        self.assertIn("99.0000\thash-partial", rendered)
+
+    def test_changed_hash_resets_maximum_without_rejecting_regression(self):
+        self.maxima.write_text(
+            "SOURCE/UNIT\texact\t100.0000\thash-exact\n"
+            "SOURCE/UNIT\tpartial\t99.0000\told-hash\n")
+        maxima = status.record_maxima(self.report())
+        self.assertEqual(maxima[("SOURCE/UNIT", "partial")],
+                         (97.0, "hash-partial"))
+
+    def test_recording_adds_new_observations(self):
+        maxima = status.record_maxima(self.report())
+        self.assertEqual(maxima[("SOURCE/UNIT", "partial")], (97.0, "hash-partial"))
+        self.assertEqual(status.load_maxima(), maxima)
+
+    def test_removed_ratchet_check_is_rejected(self):
+        self.assertEqual(status.main(["check"], data=self.report()), 1)
+        self.assertFalse(self.maxima.exists())
+
+    def test_update_command_records_without_enforcement(self):
+        self.assertEqual(status.main(["update"], data=self.report()), 0)
+        self.assertEqual(status.load_maxima()[("SOURCE/UNIT", "partial")],
+                         (97.0, "hash-partial"))
 
     def test_force_option_reaches_report_loader(self):
         with mock.patch.object(status, "load_report", return_value=self.report()) as loader:

@@ -1,15 +1,22 @@
-"""Run objdiff and report the live base-to-target comparison.
+"""Run objdiff and report the live and best-observed base-to-target comparison.
 
   homm2 status                 print per-unit and overall live metrics
+  homm2 status update          record maxima for the current normalized source hashes
   homm2 status --force-refresh regenerate report.json even when its inputs are unchanged
   homm2 status --write-readme  refresh the generated match block in README.md
+
+Builds and explicit updates record the current source-hash epoch and raise its
+per-function maximum when appropriate. The maxima are never gates.
 """
 import hashlib, json, os, shutil, struct, subprocess, sys, tempfile
 from pathlib import Path
+from homm2.match.source_hashes import source_hashes
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
 REPORT_CACHE_SCHEMA = 1
 REPORT_STAMP = "report.stamp.json"
+MAXIMA = REPO / "config/match_baseline.tsv"
+EXACT_MATCH_PERCENT = 100.0
 
 
 def _i(v): return int(v) if v not in (None, "") else 0
@@ -297,6 +304,70 @@ def unit_pct(u):
     return float((u.get("measures", {}) or {}).get("matched_code_percent", 0) or 0)
 
 
+def _fn_fuzzy(data):
+    return {
+        (unit.get("name", "?"), function.get("name", "?")):
+            float(function.get("fuzzy_match_percent") or 0.0)
+        for unit in data.get("units", [])
+        for function in (unit.get("functions", []) or [])
+    }
+
+
+def load_maxima():
+    """Load ``(maximum, source hash)`` for source-backed functions."""
+    maxima = {}
+    if not MAXIMA.exists():
+        return maxima
+    for line in MAXIMA.read_text().splitlines():
+        if not line or line.startswith("#"):
+            continue
+        fields = line.split("\t")
+        if len(fields) >= 4 and fields[3]:
+            key = (fields[0], fields[1])
+            maximum = float(fields[2])
+            if key not in maxima or maximum > maxima[key][0]:
+                maxima[key] = (maximum, fields[3])
+    return maxima
+
+
+def _updated_maxima(data, maxima, hashes):
+    out = {}
+    for key, current in _fn_fuzzy(data).items():
+        source_hash = hashes.get(key)
+        if not source_hash:
+            continue
+        old_maximum, old_hash = maxima.get(key, (0.0, None))
+        maximum = max(old_maximum, current) if old_hash == source_hash else current
+        out[key] = (maximum, source_hash)
+    return out
+
+
+def write_maxima(maxima):
+    lines = [
+        "# homm2 retained match maxima by normalized function source hash.",
+        "# Observational only; never an enforcement baseline.",
+        "# Updated by `homm2 status update` and `homm2 build`; do not hand-edit.",
+        "# unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash",
+    ]
+    lines.extend("%s\t%s\t%.4f\t%s" % (unit, function, maximum, source_hash)
+                 for (unit, function), (maximum, source_hash) in sorted(maxima.items()))
+    _atomic_write(MAXIMA, ("\n".join(lines) + "\n").encode("utf-8"))
+
+
+def record_maxima(data):
+    previous = load_maxima()
+    maxima = _updated_maxima(data, previous, source_hashes())
+    write_maxima(maxima)
+    return maxima
+
+
+def current_maxima():
+    """Return only stored maxima whose hashes describe the current source."""
+    hashes = source_hashes()
+    return {key: value for key, value in load_maxima().items()
+            if hashes.get(key) == value[1]}
+
+
 def _md_table(headers, aligns, rows):
     widths = [len(h) for h in headers]
     for r in rows:
@@ -314,14 +385,15 @@ def _md_table(headers, aligns, rows):
     return [row(headers), "| " + " | ".join(sep) + " |", *(row(r) for r in rows)]
 
 
-def readme_block(data):
-    """Render the live per-tier comparison table."""
+def readme_block(data, maxima):
+    """Render live and current-source-hash-best per-tier comparison metrics."""
     tiers = {}
     for u in data.get("units", []):
         tier = u.get("name", "?").split("/")[0]
         m = u.get("measures", {}) or {}
-        t = tiers.setdefault(tier, {"units": 0, "fe": 0, "ft": 0,
-                                    "fz": 0.0, "fzt": 0,
+        unit_name = u.get("name", "?")
+        t = tiers.setdefault(tier, {"units": 0, "fe": 0, "fem": 0, "ft": 0,
+                                    "fz": 0.0, "fzt": 0, "mx": 0.0,
                                     "dm": 0, "dt": 0, "de": 0, "du": 0})
         t["units"] += 1
         t["fe"] += _i(m.get("matched_functions")); t["ft"] += _i(m.get("total_functions"))
@@ -332,37 +404,49 @@ def readme_block(data):
             t["de"] += matched_data == total_data
         for f in u.get("functions", []) or []:
             sz = _i(f.get("size")); cur = f.get("fuzzy_match_percent") or 0.0
+            maximum = max(cur, maxima.get((unit_name, f.get("name", "?")), (cur, None))[0])
+            t["fem"] += maximum >= EXACT_MATCH_PERCENT
             t["fz"] += sz * cur / 100.0; t["fzt"] += sz
+            t["mx"] += sz * maximum / 100.0
     rows = []
-    TE = TT = DM = DT = DE = DU = 0; FZ = 0.0; FZT = 0
+    TE = TEM = TT = DM = DT = DE = DU = 0; FZ = MX = 0.0; FZT = 0
     for tier in sorted(tiers, key=lambda k: -tiers[k]["ft"]):
         d = tiers[tier]
         if d["ft"] == 0:
             continue
-        TE += d["fe"]; TT += d["ft"]
+        TE += d["fe"]; TEM += d["fem"]; TT += d["ft"]
         DM += d["dm"]; DT += d["dt"]; DE += d["de"]; DU += d["du"]
-        FZ += d["fz"]; FZT += d["fzt"]
+        FZ += d["fz"]; FZT += d["fzt"]; MX += d["mx"]
         fp = 100 * d["fe"] / d["ft"]
+        fmp = 100 * d["fem"] / d["ft"]
         zp = 100 * d["fz"] / d["fzt"] if d["fzt"] else 0
+        mp = 100 * d["mx"] / d["fzt"] if d["fzt"] else 0
         dp = 100 * d["dm"] / d["dt"] if d["dt"] else 0
         rows.append([f"`{tier}`", str(d["units"]),
                      f"{d['fe']} / {d['ft']} ({fp:.1f}%)",
-                     f"{zp:.1f}%",
+                     f"{d['fem']} / {d['ft']} ({fmp:.1f}%)",
+                     f"{zp:.1f}%", f"{mp:.1f}%",
                      f"{d['de']} / {d['du']}",
                      f"{d['dm']:,} / {d['dt']:,} ({dp:.2f}%)"])
     overall_f = 100 * TE / TT if TT else 0
+    overall_fm = 100 * TEM / TT if TT else 0
     overall_z = 100 * FZ / FZT if FZT else 0
+    overall_m = 100 * MX / FZT if FZT else 0
     overall_d = 100 * DM / DT if DT else 0
     out = [RM_START, "## Match status", "",
            "_Auto-generated by `homm2 status --write-readme` (refreshed by `homm2 build`); do not hand-edit._", "",
            f"**Overall: {TE} / {TT} functions exact ({overall_f:.2f}%) &middot; "
-           f"{overall_z:.2f}% fuzzy &middot; "
+           f"{TEM} / {TT} functions exact-max ({overall_fm:.2f}%) &middot; "
+           f"{overall_z:.2f}% fuzzy &middot; {overall_m:.2f}% fuzzy-max &middot; "
            f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
            f"{DE} / {DU} data-bearing units exact.**", "",
-           "_**Functions exact** = byte-identical now. **Fuzzy** = the live size-weighted "
-           "instruction match; neither metric replaces raw-byte and relocation review._", "",
-           *_md_table(["Module", "Units", "Functions exact", "Fuzzy", "Data exact", "Data bytes"],
-                      "lrrrrr", rows),
+           "_**Functions exact** = byte-identical now. **Functions exact-max** = observed at "
+           "100% at least once for the current source hash. **Fuzzy** is the live size-weighted "
+           "instruction match; **fuzzy-max** retains each function's best observed score for its "
+           "current source hash. "
+           "Maxima are historical navigation data, not correctness proof or enforcement._", "",
+           *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
+                       "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows),
            "", RM_END]
     return "\n".join(out)
 
@@ -371,12 +455,21 @@ def main(argv=None, data=None):
     argv = list(argv or [])
     force_refresh = "--force-refresh" in argv
     argv = [arg for arg in argv if arg != "--force-refresh"]
+    if argv not in ([], ["update"], ["--write-readme"]):
+        print("usage: homm2 status [update] [--force-refresh] [--write-readme]",
+              file=sys.stderr)
+        return 1
     if data is None:
         data = load_report(force_refresh=force_refresh)
     if data is None:
         print("[status] no report (run 'homm2 build' first)"); return 1
+    if argv == ["update"]:
+        maxima = record_maxima(data)
+        print("[status] retained maxima updated: %d source-backed functions" % len(maxima))
+        return 0
     if "--write-readme" in argv:
-        block = readme_block(data); rm = REPO / "README.md"
+        maxima = record_maxima(data)
+        block = readme_block(data, maxima); rm = REPO / "README.md"
         text = rm.read_text() if rm.exists() else "# homm2-decomp\n\n" + RM_START + "\n" + RM_END + "\n"
         if RM_START in text and RM_END in text:
             pre = text[:text.index(RM_START)]; post = text[text.index(RM_END) + len(RM_END):]
@@ -385,9 +478,7 @@ def main(argv=None, data=None):
             rm.write_text(text.rstrip() + "\n\n" + block + "\n")
         print("[status] refreshed README.md match block")
         return 0
-    if argv:
-        print("usage: homm2 status [--force-refresh] [--write-readme]", file=sys.stderr)
-        return 1
+    maxima = current_maxima()
     started = sorted((u for u in data["units"] if unit_pct(u) > 0 and
                       _i((u.get("measures", {}) or {}).get("total_functions"))), key=unit_pct, reverse=True)
     if started:
@@ -402,9 +493,29 @@ def main(argv=None, data=None):
     data_percent = float(measures.get("matched_data_percent", 0) or 0)
     matched_functions = _i(measures.get("matched_functions"))
     total_functions = _i(measures.get("total_functions"))
+    exact_max = sum(
+        maxima.get((unit.get("name", "?"), function.get("name", "?")),
+                   (float(function.get("fuzzy_match_percent") or 0.0), None))[0]
+        >= EXACT_MATCH_PERCENT
+        for unit in data.get("units", [])
+        for function in (unit.get("functions", []) or []))
+    fuzzy_max_numerator = sum(
+        _i(function.get("size")) * maxima.get(
+            (unit.get("name", "?"), function.get("name", "?")),
+            (float(function.get("fuzzy_match_percent") or 0.0), None))[0]
+        for unit in data.get("units", [])
+        for function in (unit.get("functions", []) or []))
+    fuzzy_max_denominator = sum(
+        _i(function.get("size"))
+        for unit in data.get("units", [])
+        for function in (unit.get("functions", []) or []))
+    fuzzy_max = (fuzzy_max_numerator / fuzzy_max_denominator
+                 if fuzzy_max_denominator else 0.0)
     print(f"[status] units: {len(data['units'])}  with-progress: {len(started)}  "
           f"matched-code-bytes: {matched_code_percent:.2f}%  "
           f"fuzzy: {fuzzy_match_percent:.2f}%  "
           f"functions-exact: {matched_functions}/{total_functions}  "
+          f"functions-exact-max: {exact_max}/{total_functions}  "
+          f"fuzzy-max: {fuzzy_max:.2f}%  "
           f"data: {matched_data}/{total_data} ({data_percent:.3f}%)")
     return 0

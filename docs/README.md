@@ -27,6 +27,9 @@ one-run progress summaries belong under `build/`, not here.
 
 - `build-asserts.md`, `od-stack-layout.md`, `jump-tables.md`, and `patterns/` are reusable
   matching references.
+- `config/match_baseline.tsv` is the observation-only score ledger. It preserves a
+  per-function maximum for the current normalized source hash, but has no ratchet or
+  acceptance role.
 - `constants-audit.md` defines the whole-tree numeric-literal inventory and per-file review
   contract.
 - `iconf2bc-experiment-matrix.md` and `matching-matrices/` retain negative experiment evidence.
