@@ -1647,7 +1647,7 @@ void game::NewMap(char* filename) {
         m_ultimateArtifactId = IDX(ARTIFACT_ULTIMATE_CROWN);
     for (player2 = 0; player2 < m_playerCount; player2++) {
         if (gbHumanPlayer[player2]) {
-            m_players[player2].m_aiDifficulty = 3;
+            m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
             memcpy(m_players[player2].m_resources, gInitResourcesHuman[m_difficulty], 28);
             if (m_playerHandicap[player2] != 0) {
                 for (townIndex9 = 0; townIndex9 < 7; townIndex9++) {
@@ -1662,7 +1662,10 @@ void game::NewMap(char* filename) {
                 }
             }
         } else {
-            m_players[player2].m_aiDifficulty = Random(0, 2);
+            m_players[player2].m_aiDifficulty = static_cast<PlayerPersonality>(Random(
+                IDX(PLAYER_PERSONALITY_COMPUTER_FIRST),
+                IDX(PLAYER_PERSONALITY_COMPUTER_LAST)
+            ));
             memcpy(m_players[player2].m_resources, gInitResourcesComputer[m_difficulty], 28);
         }
     }
@@ -3681,7 +3684,8 @@ void game::PerDay(void) {
                 m_players[player].m_resources[m_day - 1]++;
             if (gpGame->m_difficulty >= DIFFICULTY_IMPOSSIBLE && m_day >= 1 && m_day <= 6)
                 m_players[player].m_resources[m_day - 1]++;
-            if (gpGame->m_players[player].m_aiDifficulty == 1 && m_day >= 1 && m_day <= 6)
+            if (gpGame->m_players[player].m_aiDifficulty == PLAYER_PERSONALITY_BUILDER
+                && m_day >= 1 && m_day <= 6)
                 m_players[player].m_resources[m_day - 1]++;
         }
     }

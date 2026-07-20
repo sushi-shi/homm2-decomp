@@ -622,7 +622,7 @@ void philAI::CheckBerserk(void) {
     gbBerserk = false;
     fBerserkFactor = 1.0f;
     jb = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 1, 0, 0, 0);
-    if (gpCurPlayer->m_aiDifficulty == 0)
+    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
         jb = static_cast<i32>(jb * AI_EASY_STRENGTH_FACTOR);
     if (jb < AI_MINIMUM_FIGHT_VALUE)
         jb = AI_MINIMUM_FIGHT_VALUE;
@@ -1415,7 +1415,7 @@ firstWeekDone:
 
     earlyTurn21 = 16;
     lateTurn40 = 22;
-    if (gpCurPlayer->m_aiDifficulty == 2) {
+    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER) {
         earlyTurn21 = 8;
         lateTurn40 = 15;
     }
@@ -1432,7 +1432,7 @@ firstWeekDone:
     if (lateTurn40 > giCurTurn && giMaxHeroesForThisPlayer > 2) {
         giMaxHeroesForThisPlayer = 2;
     }
-    if (gpCurPlayer->m_aiDifficulty == 2)
+    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
         ownedTownCount19++;
     if (ownedTownCount19 + 1 < giMaxHeroesForThisPlayer)
         giMaxHeroesForThisPlayer = ownedTownCount19 + 1;
@@ -1620,7 +1620,7 @@ i32 philAI::DetermineTargetPosition(i32& targetX, i32& targetY, i32 mobility, i3
     } else if (gpGame->m_mapHeader.width == MAP_SIZE_XLARGE) {
         mobility = static_cast<i32>(mobility * 1.1);
     }
-    if (gpCurPlayer->m_aiDifficulty == 2)
+    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
         mobility = static_cast<i32>(mobility * 1.15);
 
     scanSpacingStep = mobility / 100 / 4;
@@ -1911,7 +1911,7 @@ void philAI::ProbableOutcomeOfBattle(
             (gpGame->m_difficulty * AI_BATTLE_DIFFICULTY_STEP + AI_BATTLE_BASE_STRENGTH_FACTOR)
             * attackerFightValue26
         );
-        if (gpCurPlayer->m_aiDifficulty == AI_BATTLE_EASY_DIFFICULTY)
+        if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
             attackerStrength0 =
                 static_cast<float>(attackerStrength0 * AI_BATTLE_EASY_STRENGTH_FACTOR);
     } else {
@@ -1919,7 +1919,7 @@ void philAI::ProbableOutcomeOfBattle(
         if (gbHumanPlayer[enemyPlayer] != 0) {
             defenderStrength4 =
                 static_cast<float>(defenderStrength4 * AI_BATTLE_HUMAN_DEFENDER_FACTOR);
-        } else if (gpCurPlayer->m_aiDifficulty == AI_BATTLE_EASY_DIFFICULTY) {
+        } else if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR) {
             attackerStrength0 =
                 static_cast<float>(attackerStrength0 * AI_BATTLE_EASY_STRENGTH_FACTOR);
         }
@@ -2305,7 +2305,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
         if (!(t->m_buildings & (1 << node)) || (node == 0 && t->m_buildState < 5)) {
             if (CanBuild(t, BuildingSlotType(node))) {
                 ValueOfBuyingBuilding(t, BuildingSlotType(node), cost, idx);
-                if (gpCurPlayer->m_aiDifficulty == 1)
+                if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_BUILDER)
                     cost = static_cast<i32>(cost * 1.3);
                 score = (Random(1, 5) + 95) * idx / 100.0f;
                 if (score > OD_STEER(kn)) {
@@ -2492,7 +2492,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                         currentPurchaseCount,
                         rawValue
                     );
-                    if (gpCurPlayer->m_aiDifficulty == 0)
+                    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
                         resourceValue =
                             static_cast<i32>(resourceValue * AI_CREATURE_EASY_COST_FACTOR);
                     if (townPtr->m_threat != 0)
@@ -3211,7 +3211,7 @@ float philAI::TurnValueOfObelisk(i32 player) {
     if (gpGame->m_ultimateArtifactId == IDX(ARTIFACT_NONE))
         return 0.0f;
     ta->m_obeliskValue = idx * 48 / gpGame->m_obeliskCount;
-    if (gpCurPlayer->m_aiDifficulty == 2)
+    if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
         ta->m_obeliskValue = (i32)(ta->m_obeliskValue * 1.4);
     ta->m_obeliskValue = (i32)((1.5 - abs(48 - gpGame->SetupPuzzlePieces(giCurPlayer, 1)) / 48.0f)
                                * ta->m_obeliskValue);
@@ -6212,7 +6212,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
         result5 = static_cast<i32>(townValue8 * winChance9 + result5);
 
     if (gbHumanPlayer[enemyHero6->m_owner] && result5 > EVENT_HUMAN_VALUE_THRESHOLD) {
-        if (gpCurPlayer->m_aiDifficulty == 0)
+        if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
             result5 *= 2;
         else
             result5 = static_cast<i32>(result5 * AI_EVENT_HUMAN_VALUE_FACTOR);
@@ -6357,7 +6357,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
 
     if (p->m_owner != TOWN_OWNER_NONE && gbHumanPlayer[p->m_owner]
         && node > EVENT_HUMAN_VALUE_THRESHOLD) {
-        if (gpCurPlayer->m_aiDifficulty == 0)
+        if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
             node = static_cast<i32>(node * AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR);
         else
             node = static_cast<i32>(node * AI_TOWN_OTHER_HUMAN_VALUE_FACTOR);

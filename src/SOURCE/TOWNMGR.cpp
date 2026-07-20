@@ -3369,7 +3369,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
 
                 if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
                 } else {
-                    strcpy(gText, cPersonality[gpGame->m_players[rank].m_aiDifficulty]);
+                    strcpy(gText, cPersonality[IDX(gpGame->m_players[rank].m_aiDifficulty)]);
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC(
                             strlen(gText) + 1,

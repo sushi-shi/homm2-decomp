@@ -181,8 +181,7 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     STABLES_MOBILITY_BONUS        = 400,
     AI_DIFFICULTY_MOBILITY_BONUS  = 75,
     AI_STATE_MOBILITY_BONUS       = 50,
-    HARD_GAME_DIFFICULTY          = 2,
-    HIGH_AI_DIFFICULTY            = 2
+    HARD_GAME_DIFFICULTY          = 2
 H2_ENUM_END(HeroMobilityConstant)
 
 H2_ENUM_BEGIN(HeroImplementationConstant)
@@ -284,7 +283,7 @@ i32 hero::CalcMobility(void) {
     if (m_owner >= 0 && m_owner < IDX(GAME_PLAYER_COUNT) && !gbHumanPlayer[m_owner]
         && gpGame->m_difficulty >= HARD_GAME_DIFFICULTY) {
         mobilityResult += AI_DIFFICULTY_MOBILITY_BONUS;
-        if (gpGame->m_players[m_owner].m_aiDifficulty == HIGH_AI_DIFFICULTY)
+        if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             mobilityResult += AI_STATE_MOBILITY_BONUS;
     }
     return mobilityResult;
