@@ -56,7 +56,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_WIDGET_REFRESH_FRAME             = 4,
     GAME_SHADOW_FRAME                     = 6,
     GAME_MOUSE_RIGHT_FLAG                 = 0x200,
-    GAME_LAST_STANDARD_RACE               = IDX(FACTION_NECROMANCER),
     GAME_PLAYER_CONTROL_COUNT             = 6,
     GAME_DIFFICULTY_COUNT                 = 5,
     GAME_CHAT_LINE_COUNT                  = 3,
@@ -359,8 +358,8 @@ void game::InitNewGame(struct SMapHeader* header) {
             if (player >= m_mapHeader.playerCount) {
                 m_setupPlayerType[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerNetworkId[player] = m_setupPlayerType[player];
-                m_setupPlayerRace[player] = m_setupPlayerNetworkId[player];
-                m_playerHandicap[player] = m_setupPlayerRace[player];
+                m_setupPlayerRace[player] = FACTION_ANY;
+                m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
             } else {
                 m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
@@ -993,7 +992,7 @@ void game::UpdateNewGameWindow(void) {
         messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex3]] == GAME_RANDOM_RACE)
+        if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex3]] == FACTION_RANDOM)
             playerLockedValue = 0;
         else
             playerLockedValue = 1;
@@ -1004,12 +1003,12 @@ void game::UpdateNewGameWindow(void) {
         messageTemp.payload.widget.id =
             EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, playerIndex3);
         messageTemp.payload.widget.data.value =
-            m_setupPlayerRace[playerIndex3]
+            IDX(m_setupPlayerRace[playerIndex3])
             + (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE
                                  : GAME_RANDOM_RACE_FRAME_BASE);
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        sprintf(gText, gAlignmentNames[m_setupPlayerRace[playerIndex3]]);
+        sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex3])]);
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
             EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, playerIndex3);
@@ -1468,12 +1467,12 @@ i32 NewGameHandler(struct tag_message& message) {
                 cycleRace:
                     if (gpGame->m_mapHeader
                             .playerRace[gpGame->m_setupPlayerColor[currentPlayerLocal]]
-                        == GAME_RANDOM_RACE) {
-                        if (gpGame->m_setupPlayerRace[currentPlayerLocal] == GAME_RANDOM_RACE)
-                            gpGame->m_setupPlayerRace[currentPlayerLocal] = 0;
+                        == FACTION_RANDOM) {
+                        if (gpGame->m_setupPlayerRace[currentPlayerLocal] == FACTION_RANDOM)
+                            gpGame->m_setupPlayerRace[currentPlayerLocal] = FACTION_KNIGHT;
                         else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
-                                 == GAME_LAST_STANDARD_RACE)
-                            gpGame->m_setupPlayerRace[currentPlayerLocal] = GAME_RANDOM_RACE;
+                                 == FACTION_NECROMANCER)
+                            gpGame->m_setupPlayerRace[currentPlayerLocal] = FACTION_RANDOM;
                         else
                             ++gpGame->m_setupPlayerRace[currentPlayerLocal];
                         synchronizeSetupResult = 1;
@@ -2050,12 +2049,12 @@ void game::ShowScenInfo(void) {
         scenarioMessageTemp.payload.widget.id =
             EncodeNewGameControlIndex(NEW_GAME_RACE_CYCLE_FIRST, playerCounter);
         scenarioMessageTemp.payload.widget.data.value =
-            m_setupPlayerRace[playerCounter]
+            IDX(m_setupPlayerRace[playerCounter])
             + (playerLockedLocal ? GAME_FIXED_RACE_FRAME_BASE
                                  : GAME_RANDOM_RACE_FRAME_BASE);
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
-        sprintf(gText, gAlignmentNames[m_setupPlayerRace[playerCounter]]);
+        sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerCounter])]);
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         scenarioMessageTemp.payload.widget.id =
             EncodeNewGameControlIndex(NEW_GAME_RACE_NAME_FIRST, playerCounter);
