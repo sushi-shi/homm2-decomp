@@ -43,7 +43,6 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_STEP_DELAY_COUNT              = 5,
     ADVMGR_VIEW_WORLD_SCALE_COUNT        = 3,
     ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT  = 6,
-    ADVMGR_VIEW_WORLD_AXIS_COUNT         = 2,
     ADVMGR_ARMY_SIZE_NAME_SIZE           = 12,
     ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
 H2_ENUM_END(AdventureManagerStorageConstant)
@@ -168,7 +167,7 @@ public:
     void ProcessIncomingGroupMapChange(char*);
     void PurgeMapChangeQueue(void);
     void UnwindMapChangeQueue(i32, i32);
-    void ViewWorld(ViewWorldMode, b32, b32);
+    void ViewWorld(SpellType, b32, b32);
     void VWCleanup(void);
     void VWInit(i32, i32);
     void VWCompleteDraw(void);
@@ -385,7 +384,7 @@ extern struct _SAMPLE* hNewWalkSample;
 extern i32 EveryOther;
 extern i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT];
 extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
-                     [ADVMGR_VIEW_WORLD_AXIS_COUNT];
+                     [IDX(COORDINATE_AXIS_COUNT)];
 extern ViewWorldScale giViewWorldScale;
 extern i32 giViewWorldScaleLookup;
 extern b32 gbInViewWorld;
@@ -419,7 +418,7 @@ extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
 extern i32 iVWDrawAllTerrains;
-extern ViewWorldMode iVWWhatToDraw;
+extern SpellType iVWWhatToDraw;
 extern i32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;

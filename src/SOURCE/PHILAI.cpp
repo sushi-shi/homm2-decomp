@@ -30,8 +30,8 @@
 #define AI_SECONDARY_SKILL_NAVIGATION_FACTOR 1.3
 #define AI_SECONDARY_SKILL_ARCHERY_SHARE 0.2
 #define AI_SECONDARY_SKILL_ARCHERY_BASE 0.25
-#define AI_GENERIC_SITE_SHIPWRECK_VALUE 1000.0f
-#define AI_GENERIC_SITE_FAERIE_RING_VALUE 200.0f
+#define AI_GENERIC_SITE_ARENA_VALUE 1000.0f
+#define AI_GENERIC_SITE_MERMAID_VALUE 200.0f
 #define AI_GENERIC_SITE_DAY_VALUE 200
 #define AI_MINIMUM_FIGHT_VALUE 100
 #define AI_FRAME_THROTTLE_TICKS 15
@@ -328,8 +328,6 @@ H2_ENUM_END(AISecondarySkillConstant)
 H2_ENUM_BEGIN(AISideConstant)
     SIDE_NO_PLAYER                = -1,
     SIDE_PRIMARY_PLAYER           = 0,
-    SIDE_CAMPAIGN_TYPE_ZERO       = 0,
-    SIDE_CAMPAIGN_TYPE_ONE        = 1,
     SIDE_CAMPAIGN_SCENARIO_OFFSET = 1,
     SIDE_CAMPAIGN_SCENARIO_NINE   = 9,
     SIDE_CAMPAIGN_SCENARIO_TEN    = 10,
@@ -399,7 +397,6 @@ H2_ENUM_BEGIN(AIEventEvaluationConstant)
 H2_ENUM_END(AIEventEvaluationConstant)
 
 H2_ENUM_BEGIN(AITownEvaluationConstant)
-    TOWN_EARLY_DIFFICULTY_LIMIT     = 3,
     TOWN_EARLY_TURN_BASE            = 40,
     TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
 H2_ENUM_END(AITownEvaluationConstant)
@@ -1265,8 +1262,11 @@ void philAI::DoAI(i32 player) {
         ResetHeroRVs(0, 0, 0);
         stepLimit36 = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) ? 15 : 5;
         minimumValue9 = gpCurAIHero->m_mobility + 800;
-        stepLimit36 = static_cast<i32>(stepLimit36 * (1.7 - gpGame->m_difficulty * 0.1));
-        minimumValue9 = static_cast<i32>(minimumValue9 * ((gpGame->m_difficulty - 1) * 0.06 + 0.8));
+        stepLimit36 =
+            static_cast<i32>(stepLimit36 * (1.7 - IDX(gpGame->m_difficulty) * 0.1));
+        minimumValue9 = static_cast<i32>(
+            minimumValue9 * ((IDX(gpGame->m_difficulty) - 1) * 0.06 + 0.8)
+        );
 
         while (!heroDone5 && gpCurAIHero->m_remainingMobility >= AI_MINIMUM_SITE_MOBILITY) {
             if (!(gbGameOver == 0)) {
@@ -1685,15 +1685,15 @@ firstWeekDone:
 
     for (generalIndex4 = 0; generalIndex4 < GAME_HERO_COUNT; generalIndex4++)
         gfHeroInteractionBonus[generalIndex4] = 1.0f;
-    if (gpGame->m_difficulty == 0) {
+    if (gpGame->m_difficulty == DIFFICULTY_EASY) {
         gfAttackHumanBonus = 0.6f;
         gfAttackComputerBonus = 1.3f;
-    } else if (gpGame->m_difficulty == 1) {
+    } else if (gpGame->m_difficulty == DIFFICULTY_NORMAL) {
         gfAttackHumanBonus = 1.0f;
         gfAttackComputerBonus = 1.0f;
     } else {
-        gfAttackHumanBonus = static_cast<float>(gpGame->m_difficulty * 0.07 + 1.0);
-        gfAttackComputerBonus = static_cast<float>(1.1 - gpGame->m_difficulty * 0.12);
+        gfAttackHumanBonus = static_cast<float>(IDX(gpGame->m_difficulty) * 0.07 + 1.0);
+        gfAttackComputerBonus = static_cast<float>(1.1 - IDX(gpGame->m_difficulty) * 0.12);
     }
     if (gbIAmGreatest)
         gfAttackComputerBonus = 0.1f;
@@ -2238,7 +2238,8 @@ void philAI::ProbableOutcomeOfBattle(
     defenderStrength4 = defenderFightValue5;
     if (enemyPlayer == AI_BATTLE_NO_PLAYER) {
         attackerStrength0 = static_cast<float>(
-            (gpGame->m_difficulty * AI_BATTLE_DIFFICULTY_STEP + AI_BATTLE_BASE_STRENGTH_FACTOR)
+            (IDX(gpGame->m_difficulty) * AI_BATTLE_DIFFICULTY_STEP
+             + AI_BATTLE_BASE_STRENGTH_FACTOR)
             * attackerFightValue26
         );
         if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
@@ -3981,11 +3982,11 @@ i32 philAI::QuickCombat(
         attackerExperience37 += QUICK_COMBAT_TOWN_EXPERIENCE;
     defenderExperience4 = gpGame->ExperienceValueOfStack(defender, defenderHero);
     attackerExperience37 = static_cast<i32>(
-        (gpGame->m_difficulty * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP + 1.0)
+        (IDX(gpGame->m_difficulty) * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP + 1.0)
         * attackerExperience37
     );
     defenderExperience4 = static_cast<i32>(
-        (gpGame->m_difficulty * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP + 1.0)
+        (IDX(gpGame->m_difficulty) * AI_QUICK_COMBAT_EXPERIENCE_DIFFICULTY_STEP + 1.0)
         * defenderExperience4
     );
 
@@ -6071,7 +6072,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 unusedValue29;
     i32 artifactIndex1;
     i32 siteLevel5;
-    i32 siteType0;
+    H2_ENUM_STORAGE(GenericSiteType, i32) siteType0;
     i32 value1;
     i32 cursedArtifactCount2;
     CreatureType creatureType2;
@@ -6080,14 +6081,13 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 armyValue7;
 
     cursedArtifactCount2 = 0;
-    siteType0 = cell->m_tentColor;
-    siteType0 &= AI_GENERIC_SITE_TYPE_MASK;
+    siteType0 = cell->m_tentColor & GENERIC_SITE_TYPE_MASK;
     siteLevel5 = cell->m_tentColor;
-    siteLevel5 >>= AI_GENERIC_SITE_LEVEL_SHIFT;
+    siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
     value1 = 0;
 
     switch (siteType0) {
-        case AI_GENERIC_SITE_CURSED_ARTIFACTS:
+        case GENERIC_SITE_ALCHEMIST_TOWER:
             for (artifactIndex1 = 0; artifactIndex1 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
                  artifactIndex1++) {
                 if (IsCursedItem(gpCurAIHero->m_artifacts[artifactIndex1]))
@@ -6097,25 +6097,25 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
                 value1 = cursedArtifactCount2 * AI_GENERIC_SITE_CURSED_ARTIFACT_VALUE;
             }
             break;
-        case AI_GENERIC_SITE_SHIPWRECK:
-            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_SHIPWRECK_FLAG)) {
+        case GENERIC_SITE_ARENA:
+            if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_ARENA)) {
                 value1 =
-                    static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_SHIPWRECK_VALUE);
+                    static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_ARENA_VALUE);
             }
             break;
-        case AI_GENERIC_SITE_FAERIE_RING:
-            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_FAERIE_RING_FLAG)
+        case GENERIC_SITE_MERMAID:
+            if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_MERMAID)
                 && giCurAIHeroLuck < AI_GENERIC_SITE_MAX_LUCK) {
                 value1 = static_cast<i32>(
-                    gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_FAERIE_RING_VALUE
+                    gpCurAIHero->m_aiFightValue * AI_GENERIC_SITE_MERMAID_VALUE
                 );
             }
             break;
-        case AI_GENERIC_SITE_UNUSED_2:
-        case AI_GENERIC_SITE_UNUSED_3:
+        case GENERIC_SITE_HUT_OF_MAGI:
+        case GENERIC_SITE_EYE_OF_MAGI:
             break;
-        case AI_GENERIC_SITE_GRAVEYARD:
-            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_GRAVEYARD_FLAG)) {
+        case GENERIC_SITE_SIRENS:
+            if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_SIRENS)) {
                 armyValue7 = 0;
                 for (artifactIndex1 = 0; artifactIndex1 < AI_GENERIC_SITE_ARMY_SLOTS;
                      artifactIndex1++) {
@@ -6123,7 +6123,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
                     if (creatureType2 != CREATURE_NONE) {
                         quantity6 = gpCurAIHero->m_army.m_quantities[artifactIndex1];
                         removedQuantity3 =
-                            static_cast<i32>(quantity6 * AI_GENERIC_SITE_GRAVEYARD_REMAINING);
+                            static_cast<i32>(quantity6 * AI_GENERIC_SITE_SIRENS_ARMY_REMAINDER);
                         armyValue7 += gMonsterDatabase[IDX(creatureType2)].hitPoints
                                       * (quantity6 - removedQuantity3);
                     }
@@ -6131,9 +6131,9 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
                 value1 = static_cast<i32>(armyValue7 * gpCurAIHero->m_aiFightValue);
             }
             break;
-        case AI_GENERIC_SITE_CREATURE_UPGRADE:
+        case GENERIC_SITE_STABLES:
             value1 = ComputeUpgradeValue(AI_GENERIC_SITE_UPGRADE_FROM, AI_GENERIC_SITE_UPGRADE_TO);
-            if (!(gpCurAIHero->m_eventFlags & AI_GENERIC_SITE_CREATURE_UPGRADE_FLAG)) {
+            if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_STABLES)) {
                 value1 = static_cast<i32>(
                     value1
                     + (AI_GENERIC_SITE_WEEK_END - gpGame->m_day) * AI_GENERIC_SITE_DAY_VALUE
@@ -6170,32 +6170,32 @@ i32 philAI::EvaluatePassword(mapCell* cell) {
 VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // result
-    i32 node; // color
+    H2_ENUM_STORAGE(RecruitSiteType, i32) siteType;
     i32 nb;   // monster type
     i32 kn;
     i32 jb;
     i32 idx;
     i16 lvl;  // monster level
-    node = cell->m_tentColor;
-    node &= EVENT_RECRUIT_TYPE_MASK;
+    siteType = cell->m_tentColor;
+    siteType = IDX(siteType) & EVENT_RECRUIT_TYPE_MASK;
     lvl = cell->m_tentColor;
     lvl >>= EVENT_RECRUIT_COUNT_SHIFT;
     nb = 0;
     val = 0;
-    switch (node) {
-        case SITE_GHOST:
+    switch (siteType) {
+        case RECRUITMENT_SITE_BARROW_MOUNDS:
             nb = IDX(CREATURE_GHOST);
             break;
-        case SITE_EARTH_ELEMENTAL:
+        case RECRUITMENT_SITE_EARTH_ALTAR:
             nb = IDX(CREATURE_EARTH_ELEMENTAL);
             break;
-        case SITE_AIR_ELEMENTAL:
+        case RECRUITMENT_SITE_AIR_ALTAR:
             nb = IDX(CREATURE_AIR_ELEMENTAL);
             break;
-        case SITE_FIRE_ELEMENTAL:
+        case RECRUITMENT_SITE_FIRE_ALTAR:
             nb = IDX(CREATURE_FIRE_ELEMENTAL);
             break;
-        case SITE_WATER_ELEMENTAL:
+        case RECRUITMENT_SITE_WATER_ALTAR:
             nb = IDX(CREATURE_WATER_ELEMENTAL);
             break;
     }
@@ -6247,11 +6247,11 @@ VA(0x004460f8, 0x26a)
 i32 OnMySide(i32 player) {
     if (player != SIDE_NO_PLAYER
         && (player == giCurPlayer
-            || (gbInCampaign && gpGame->m_campaignType == SIDE_CAMPAIGN_TYPE_ZERO
+            || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
                 && gpGame->m_campaignScenario + SIDE_CAMPAIGN_SCENARIO_OFFSET
                        == SIDE_CAMPAIGN_SCENARIO_TEN
                 && player != SIDE_PRIMARY_PLAYER)
-            || (gbInCampaign && gpGame->m_campaignType == SIDE_CAMPAIGN_TYPE_ONE
+            || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
                 && gpGame->m_campaignScenario + SIDE_CAMPAIGN_SCENARIO_OFFSET
                        == SIDE_CAMPAIGN_SCENARIO_ELEVEN
                 && player != SIDE_PRIMARY_PLAYER)
@@ -6267,7 +6267,7 @@ i32 OnMySide(i32 player) {
                                     >= gpGame->m_mapHeader.victorySideThreshold
                                 && gpGame->m_players[player].m_color
                                        >= gpGame->m_mapHeader.victorySideThreshold)))))
-            || (gbInCampaign && gpGame->m_campaignType == SIDE_CAMPAIGN_TYPE_ZERO
+            || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
                 && gpGame->m_campaignScenario + SIDE_CAMPAIGN_SCENARIO_OFFSET
                        == SIDE_CAMPAIGN_SCENARIO_NINE
                 && gpGame->m_players[player].m_color != SIDE_FIRST_COLOR
@@ -6697,7 +6697,8 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
         gbReduceByReload = false;
     gbReduceByBerserk = false;
     if (result5 > 0
-        && EVENT_EARLY_TURN_BASE - gpGame->m_difficulty * EVENT_EARLY_TURN_DIFFICULTY_STEP
+        && EVENT_EARLY_TURN_BASE
+                   - IDX(gpGame->m_difficulty) * EVENT_EARLY_TURN_DIFFICULTY_STEP
                > giCurTurn
         && !(mapExtra[x + MAP_WIDTH * y] & giCurPlayerBit)) {
         result5 = 0;
@@ -6745,9 +6746,9 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
     } else if (gbIAmGreatest && gpGame->m_townOwners[townId] >= 0
                && !gbHumanPlayer[gpGame->m_townOwners[townId]]) {
         node = 0;
-    } else if (gpGame->m_difficulty < TOWN_EARLY_DIFFICULTY_LIMIT
+    } else if (gpGame->m_difficulty < DIFFICULTY_EXPERT
                && TOWN_EARLY_TURN_BASE
-                          - gpGame->m_difficulty * TOWN_EARLY_TURN_DIFFICULTY_STEP
+                          - IDX(gpGame->m_difficulty) * TOWN_EARLY_TURN_DIFFICULTY_STEP
                       > giCurTurn
                && !(mapExtra[x + MAP_WIDTH * y] & giCurPlayerBit)) {
         node = 0;

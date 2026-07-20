@@ -4,6 +4,7 @@
 #include <va.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/combatTypes.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/playerData.h>
@@ -97,7 +98,7 @@ public:
     H2_ENUM_STORAGE(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
     H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
-    i8 m_difficulty;
+    H2_ENUM_STORAGE(GameDifficulty, i8) m_difficulty;
     char m_mapFilename[GAME_MAP_FILENAME_SIZE];
     i8 m_setupPlayerType[MAP_HEADER_PLAYER_COUNT];
     i8 m_selectedSetupPlayer;
@@ -149,7 +150,7 @@ public:
     i32 m_viewArmyResult;
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
-    i32 m_viewSpellsType;
+    HeroSpellType m_viewSpellsType;
     i32 m_viewSpellsTop[GAME_VIEW_SPELLS_SIDE_COUNT];
     i32 m_viewSpellsCount[GAME_VIEW_SPELLS_SIDE_COUNT];
     SpellType m_viewSpell;
@@ -225,7 +226,7 @@ public:
         i32,
         class town*,
         i32,
-        i32,
+        H2_ENUM_PARAM(ArmyFacing, i32),
         i32,
         class hero*,
         class army*,

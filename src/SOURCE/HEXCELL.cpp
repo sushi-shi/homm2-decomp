@@ -18,7 +18,7 @@ hexcell::hexcell(void) {
     m_blocked = 0;
     m_occupantSide = -1;
     m_occupantIndex = 0;
-    m_occupantFrame = -1;
+    m_occupantFrame = ARMY_FACING_NONE;
     m_deadOccupantCount = 0;
 }
 
@@ -29,7 +29,7 @@ void hexcell::DrawGround(void) {
 
 VA(0x0044a41c, 0xc6)
 void hexcell::DrawLowerDeadOccupants(void) {
-    i32 currentFrame;
+    ArmyFacing currentFrame;
     i32 i;
     army* occupant;
 
@@ -45,7 +45,7 @@ void hexcell::DrawLowerDeadOccupants(void) {
 
 VA(0x0044a4e2, 0xc8)
 void hexcell::DrawUpperDeadOccupant(void) {
-    i32 currentFrame;
+    ArmyFacing currentFrame;
     i32 i;
     army* occupant;
 

@@ -1009,7 +1009,7 @@ void fileRequester::Update(i32 drawWindow) {
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(broadcastMessage);
 
-        sprintf(gText, "%s", cDifficulty[m_mapHeaders[m_selectedIndex].difficulty]);
+        sprintf(gText, "%s", cDifficulty[IDX(m_mapHeaders[m_selectedIndex].difficulty)]);
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(broadcastMessage);
 

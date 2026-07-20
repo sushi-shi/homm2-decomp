@@ -459,7 +459,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     TOWN_HERO_PORTRAIT_WIDTH,
                     TOWN_HERO_PORTRAIT_HEIGHT,
                     const_cast<char*>(hasCaptain ? "minicapt.icn" : "miniport.icn"),
-                    hasCaptain ? static_cast<u8>(static_cast<FactionType>(record->m_type))
+                    hasCaptain ? static_cast<u8>(IDX(record->m_type))
                                : static_cast<u8>(heroData0->m_id),
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_PORTRAIT_CONTROL),

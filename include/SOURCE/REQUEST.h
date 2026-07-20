@@ -45,7 +45,7 @@ H2_ENUM_CLASS_END_T(MapLossCondition, u8)
 #pragma pack(push, 1)
 struct SMapHeader {
     u32 magic;
-    u8 difficulty;
+    H2_ENUM_STORAGE(GameDifficulty, u8) difficulty;
     u8 unknown5;
     H2_ENUM_STORAGE(MapDimension, u8) width;
     H2_ENUM_STORAGE(MapDimension, u8) height;

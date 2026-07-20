@@ -28,11 +28,11 @@ public:
     i8 m_obstacleIndex;
     i8 m_occupantSide;
     i8 m_occupantIndex;
-    i8 m_occupantFrame;
+    H2_ENUM_STORAGE(ArmyFacing, i8) m_occupantFrame;
     i32 m_deadOccupantCount;
     i8 m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
     i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
-    i8 m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
     u8 m_pathReachable;
     struct SLimitData m_limits[HEXCELL_LIMIT_COUNT];
     hexcell(void);

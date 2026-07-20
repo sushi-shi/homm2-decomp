@@ -182,8 +182,7 @@ H2_ENUM_BEGIN(HeroMobilityConstant)
     TRAVELER_BOOTS_MOBILITY_BONUS = 300,
     STABLES_MOBILITY_BONUS        = 400,
     AI_DIFFICULTY_MOBILITY_BONUS  = 75,
-    AI_STATE_MOBILITY_BONUS       = 50,
-    HARD_GAME_DIFFICULTY          = 2
+    AI_STATE_MOBILITY_BONUS       = 50
 H2_ENUM_END(HeroMobilityConstant)
 
 H2_ENUM_BEGIN(HeroImplementationConstant)
@@ -286,7 +285,7 @@ i32 hero::CalcMobility(void) {
         mobilityResult += compassMobility;
 
     if (m_owner >= 0 && m_owner < GAME_PLAYER_COUNT && !gbHumanPlayer[m_owner]
-        && gpGame->m_difficulty >= HARD_GAME_DIFFICULTY) {
+        && gpGame->m_difficulty >= DIFFICULTY_HARD) {
         mobilityResult += AI_DIFFICULTY_MOBILITY_BONUS;
         if (gpGame->m_players[m_owner].m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
             mobilityResult += AI_STATE_MOBILITY_BONUS;
@@ -1419,7 +1418,7 @@ i32 HeroHandler(struct tag_message& message) {
                                 gpHVHero->m_army.m_creatureCounts[armySlot7],
                                 NULL,
                                 canDismiss,
-                                1,
+                                ARMY_FACING_RIGHT,
                                 quickView0,
                                 gpHVHero,
                                 NULL,

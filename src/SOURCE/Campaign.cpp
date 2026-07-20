@@ -62,12 +62,6 @@ H2_ENUM_BEGIN(CampaignSmacker)
     SMACKER_ARCHIBALD_END   = 34
 H2_ENUM_END(CampaignSmacker)
 
-H2_ENUM_CLASS_BEGIN(CampaignMapDifficulty)
-    DIFFICULTY_EASY   = 0,
-    DIFFICULTY_NORMAL = 1,
-    DIFFICULTY_HARD   = 2
-H2_ENUM_CLASS_END(CampaignMapDifficulty)
-
 H2_ENUM_BEGIN(CampaignMapIndex)
     MAP_ONE      = 0,
     MAP_TWO      = 1,
@@ -896,11 +890,11 @@ void game::InitCampaignMap(void) {
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
-        gpGame->m_difficulty = IDX(DIFFICULTY_EASY);
+        gpGame->m_difficulty = DIFFICULTY_EASY;
     else if (m_campaignScenario + 1 <= CAMPAIGN_NORMAL_SCENARIO_LIMIT)
-        gpGame->m_difficulty = IDX(DIFFICULTY_NORMAL);
+        gpGame->m_difficulty = DIFFICULTY_NORMAL;
     else
-        gpGame->m_difficulty = IDX(DIFFICULTY_HARD);
+        gpGame->m_difficulty = DIFFICULTY_HARD;
     m_playerCount = m_mapHeader.playerCount;
     NewMap(gMapName);
 
@@ -1033,7 +1027,7 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] = CREATURE_NONE;
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
-        switch (static_cast<FactionType>(armyHero->m_cursorType)) {
+        switch (armyHero->m_cursorType) {
             case FACTION_BARBARIAN:
                 armyHero->m_army
                     .Add(CREATURE_ORC_CHIEF, BARBARIAN_ORC_CHIEF_COUNT, -1);

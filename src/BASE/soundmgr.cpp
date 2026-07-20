@@ -14,14 +14,13 @@
 #include <BASE/Misc.h>
 
 H2_ENUM_BEGIN(SoundConstant)
-    VOLUME_STEPS                 = 10,
     SAMPLE_VOLUME_MAX            = 0x40,
     MIDI_VOLUME_MAX              = 0x7f,
     CD_VOLUME_SCALE_DIVISOR      = 0x280,
     CD_MUSIC_TRACK_FIRST         = 8,
     CD_MUSIC_TRACK_LAST          = 15,
     FADE_HOLD_STEPS              = 10,
-    FADE_TOTAL_STEPS             = VOLUME_STEPS + 1,
+    FADE_TOTAL_STEPS             = IDX(CONFIG_VOLUME_MAX) + 1,
     FADE_SAMPLE_RISE_STEPS       = 6,
     AUX_VOLUME_LEVEL_COUNT       = 12,
     AUX_VOLUME_LEVEL_SHIFT       = 12,
@@ -183,7 +182,7 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     if (m_auxDevice == -1)
         return;
     if (volume == -1)
-        local_c = gConfig.musicVolume;
+        local_c = IDX(gConfig.musicVolume);
     else
         local_c = volume;
     if (local_c != 0) {
@@ -214,7 +213,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         return;
     if (m_cdReady == 0)
         return;
-    if (gConfig.musicVolume == 0)
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     if (track == -1) {
         CDStop();
@@ -300,7 +299,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     if (m_fadeSteps > 0) {
         m_fadeSteps = FADE_TOTAL_STEPS;
         glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + CD_FADE_DELAY_TICKS;
-        CDSetVolume(VOLUME_STEPS, 0);
+        CDSetVolume(IDX(CONFIG_VOLUME_MAX), 0);
     } else {
         CDSetVolume(volume, 0);
     }
@@ -311,7 +310,7 @@ VA(0x004cc0c0, 0xf1)
 void soundManager::CDPoll(void) {
     if (gbNoSound != 0)
         return;
-    if (gConfig.musicVolume == 0)
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     if (m_cdReady == 0)
         return;
@@ -332,13 +331,18 @@ VA(0x004cc1c0, 0xdd)
 i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
     i32 local_8 = 0;
     if (soundType == SOUND_VOLUME_MUSIC) {
-        if (gConfig.musicVolume >= 1 && gConfig.musicVolume <= VOLUME_STEPS) {
-            local_8 = ((FADE_TOTAL_STEPS - gConfig.musicVolume) * volume) / VOLUME_STEPS;
+        if (gConfig.musicVolume >= CONFIG_VOLUME_MIN
+            && gConfig.musicVolume <= CONFIG_VOLUME_MAX) {
+            local_8 =
+                ((FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume)
+                / IDX(CONFIG_VOLUME_MAX);
             if (local_8 < 1)
                 local_8 = 1;
         }
-    } else if (gConfig.soundVolume >= 1 && gConfig.soundVolume <= VOLUME_STEPS) {
-        local_8 = ((FADE_TOTAL_STEPS - gConfig.soundVolume) * volume) / VOLUME_STEPS;
+    } else if (gConfig.soundVolume >= CONFIG_VOLUME_MIN
+               && gConfig.soundVolume <= CONFIG_VOLUME_MAX) {
+        local_8 =
+            ((FADE_TOTAL_STEPS - IDX(gConfig.soundVolume)) * volume) / IDX(CONFIG_VOLUME_MAX);
         if (local_8 < 1)
             local_8 = 1;
     }
@@ -724,7 +728,7 @@ void soundManager::AdjustSoundVolumes(void) {
     LogStr("Adjust Sound Volumes 1");
     for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
         sampleHandle = m_sampleHandles[sampleIndex];
-        if (gConfig.soundVolume != 0) {
+        if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
             if (DigitalReport(sampleHandle, SOUND_DIGITAL_REPORT_PLAYING) != 0)
                 ModifySample(
                     sampleHandle,
@@ -750,7 +754,7 @@ void soundManager::AdjustMusicVolumes(void) {
     i32 local_4 = 0;
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
-    if (gConfig.musicVolume != 0) {
+    if (gConfig.musicVolume != CONFIG_VOLUME_MUTED) {
         if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
             CDSetVolume(-1, 0);
         else
@@ -779,7 +783,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
         return;
     if (m_ready == 0)
         return;
-    if (gConfig.musicVolume == 0)
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     if (m_cdReady == 0)
         return;
@@ -807,7 +811,7 @@ void soundManager::PlayAmbientMusic(i32 track, i32l resume, i32 unused) {
         return;
     if (m_currentTrack == track)
         return;
-    if (gConfig.musicVolume == 0) {
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_currentTrack = static_cast<char>(track);
         return;
     }
@@ -831,7 +835,7 @@ void soundManager::PollSound(void) {
         CDPoll();
     if (m_pollRequested == 0 && m_fadeSteps == 0)
         return;
-    if (gConfig.musicVolume == 0)
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     LogStr("Poll Sound 1");
     if (m_fadeSteps > 0) {
@@ -878,8 +882,8 @@ void soundManager::PollSound(void) {
         LogStr("Poll Sound 1c");
         smp = m_sampleHandles[0];
         if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-            volume = (VOLUME_STEPS + 1 - gConfig.musicVolume) * volume * MIDI_VOLUME_MAX
-                     / CD_VOLUME_SCALE_DIVISOR;
+            volume = (IDX(CONFIG_VOLUME_MAX) + 1 - IDX(gConfig.musicVolume)) * volume
+                * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
             if (volume > MIDI_VOLUME_MAX)
                 volume = MIDI_VOLUME_MAX;
             if (volume < 0)
@@ -900,7 +904,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
         return;
     if (m_samplesReady == 0)
         return;
-    if (gConfig.musicVolume == 0) {
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
         m_currentTrack = static_cast<char>(track);
         return;
     }
@@ -937,7 +941,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
         return NULL;
     if (m_samplesReady == 0)
         return NULL;
-    if (gConfig.soundVolume == 0)
+    if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
         return NULL;
     playbackData = &sampleResource->m_playbackData;
     if (m_ready == 0 || playbackData->volume == 0)
@@ -970,7 +974,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     AIL_set_sample_playback_rate(smp, playbackData->sampleRate);
     AIL_set_sample_loop_count(smp, playbackData->loopCount);
     AIL_set_sample_address(smp, playbackData->data, playbackData->size);
-    if (gConfig.soundVolume != 0)
+    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
         AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
     else
         AIL_set_sample_volume(smp, 0);

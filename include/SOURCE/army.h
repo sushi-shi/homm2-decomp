@@ -20,19 +20,6 @@ H2_ENUM_BEGIN(ArmyPathTarget)
     ARMY_PATH_EXACT_TARGET_HEX = 1
 H2_ENUM_END(ArmyPathTarget)
 
-H2_ENUM_BEGIN(ArmyFacing)
-    ARMY_FACING_LEFT  = 0,
-    ARMY_FACING_RIGHT = 1
-H2_ENUM_END(ArmyFacing)
-
-inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
-    return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
-}
-
-inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
-    return facing == ARMY_FACING_RIGHT ? 1 : -1;
-}
-
 H2_ENUM_BEGIN(ArmyDamagePenalty)
     ARMY_DAMAGE_PENALTY_NONE = 0,
     ARMY_DAMAGE_PENALTY_HALF = 2

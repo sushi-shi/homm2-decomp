@@ -1053,7 +1053,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
     i32 negativeEffectResult;
     *effect = 0;
     i32 done = 0;
-    i32 influence;
+    H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) influence;
     army* combatTarget;
     i32 curePointsTotal;
     i32 positiveEffectResult;
@@ -1096,10 +1096,12 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                     continue;
                 }
 
-                for (influence = 0; influence < ARMY_SPELL_INFLUENCE_COUNT; influence++) {
-                    if (!combatTarget->m_spellInfluence[influence])
+                for (influence = ARMY_SPELL_INFLUENCE_HASTE;
+                     influence < ARMY_SPELL_INFLUENCE_COUNT;
+                     influence++) {
+                    if (!combatTarget->m_spellInfluence[IDX(influence)])
                         continue;
-                    switch (static_cast<ArmySpellInfluence>(influence)) {
+                    switch (influence) {
                         case ARMY_SPELL_INFLUENCE_HASTE:
                         case ARMY_SPELL_INFLUENCE_BLESS:
                         case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
@@ -1111,14 +1113,14 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                 positiveEffectResult
                                 + RawEffectSpellInfluence(
                                       combatTarget,
-                                      static_cast<ArmySpellInfluence>(influence)
+                                      influence
                                   )
                                       * gfCancelDurationMods
-                                          [combatTarget->m_spellInfluence[influence]
+                                          [combatTarget->m_spellInfluence[IDX(influence)]
                                                        + fullQuantityWork
                                                    >= SPELL_AI_MAX_DURATION
                                                ? SPELL_AI_MAX_DURATION
-                                               : combatTarget->m_spellInfluence[influence]
+                                               : combatTarget->m_spellInfluence[IDX(influence)]
                                                      + fullQuantityWork]
                             );
                             break;
@@ -1133,14 +1135,14 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                 negativeEffectResult
                                 + RawEffectSpellInfluence(
                                       combatTarget,
-                                      static_cast<ArmySpellInfluence>(influence)
+                                      influence
                                   )
                                       * gfCancelDurationMods
-                                          [combatTarget->m_spellInfluence[influence]
+                                          [combatTarget->m_spellInfluence[IDX(influence)]
                                                        + fullQuantityWork
                                                    >= SPELL_AI_MAX_DURATION
                                                ? SPELL_AI_MAX_DURATION
-                                               : combatTarget->m_spellInfluence[influence]
+                                               : combatTarget->m_spellInfluence[IDX(influence)]
                                                      + fullQuantityWork]
                             );
                             break;

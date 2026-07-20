@@ -16,6 +16,15 @@ H2_ENUM_BEGIN(PlayerColor)
     PLAYER_COLOR_COUNT  = 6
 H2_ENUM_END(PlayerColor)
 
+H2_ENUM_CLASS_BEGIN_SPLIT(GameDifficulty, i8)
+    DIFFICULTY_EASY       = 0,
+    DIFFICULTY_NORMAL     = 1,
+    DIFFICULTY_HARD       = 2,
+    DIFFICULTY_EXPERT     = 3,
+    DIFFICULTY_IMPOSSIBLE = 4,
+    DIFFICULTY_COUNT      = 5
+H2_ENUM_CLASS_END_SPLIT(GameDifficulty, i8)
+
 H2_ENUM_BEGIN(GameSerializationConstant)
     GAME_SOURCE_LINE             = 660,
     GAME_LOAD_SOURCE_LINE        = 1103,

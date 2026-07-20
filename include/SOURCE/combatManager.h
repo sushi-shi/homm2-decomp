@@ -53,14 +53,6 @@ struct SBolt {
 SIZE(SBolt, 0x78);
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN_T(SummonedElementalType, u8)
-    SUMMONED_ELEMENTAL_NONE  = 0,
-    SUMMONED_ELEMENTAL_EARTH = IDX(CREATURE_EARTH_ELEMENTAL),
-    SUMMONED_ELEMENTAL_AIR   = IDX(CREATURE_AIR_ELEMENTAL),
-    SUMMONED_ELEMENTAL_FIRE  = IDX(CREATURE_FIRE_ELEMENTAL),
-    SUMMONED_ELEMENTAL_WATER = IDX(CREATURE_WATER_ELEMENTAL)
-H2_ENUM_CLASS_END_T(SummonedElementalType, u8)
-
 H2_ENUM_CLASS_BEGIN(CombatCastleHex)
     COMBAT_CASTLE_HEX_NONE           = -1,
     COMBAT_CASTLE_HEX_TOP_TOWER      = 9,
@@ -114,12 +106,6 @@ H2_ENUM_CLASS_BEGIN(CombatCastleWallState)
     COMBAT_WALL_STATE_SECTION_DESTROYED    = 6
 H2_ENUM_CLASS_END(CombatCastleWallState)
 H2_ENUM_STEPPED(CombatCastleWallState)
-
-H2_ENUM_CLASS_BEGIN(CombatCoordinateAxis)
-    COMBAT_COORDINATE_X     = 0,
-    COMBAT_COORDINATE_Y     = 1,
-    COMBAT_COORDINATE_COUNT = 2
-H2_ENUM_CLASS_END(CombatCoordinateAxis)
 
 H2_ENUM_BEGIN(CombatCatapultConstant)
     COMBAT_CATAPULT_TARGET_ROLL_MIN           = 0,
@@ -565,7 +551,7 @@ public:
     i32l m_combatMessageExpiration;
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
-    SummonedElementalType m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
+    H2_ENUM_STORAGE(CreatureType, u8) m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_sideDefeated[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_networkArmyPresent[COMBAT_MANAGER_SIDE_COUNT];
     i32 m_playerId[COMBAT_MANAGER_SIDE_COUNT];
@@ -665,7 +651,7 @@ public:
     void ElementalStorm(void);
     void Armageddon(void);
     void TurnToStone(class army*);
-    void BloodLustEffect(class army*, H2_ENUM_PARAM(MonsterAbilityFlags, i32));
+    void BloodLustEffect(class army*, H2_ENUM_PARAM(MonsterFlags, i32));
     void Ripple(i32);
     void Blur(i32, i32, i32);
     void ResetBoltAngle(struct SBolt*);
@@ -759,7 +745,14 @@ public:
     void CycleCombatScreen(void);
     void SetCombatViewArmySmallLevel(i32);
     void SetCombatGrid(i32, i32, i32);
-    void AddArmy(i32, H2_ENUM_PARAM(CreatureType, i32), i32, i32, i32, i32);
+    void AddArmy(
+        i32,
+        H2_ENUM_PARAM(CreatureType, i32),
+        i32,
+        i32,
+        H2_ENUM_PARAM(MonsterFlags, i32),
+        i32
+    );
     void SetupSmallView(void);
     void ViewBallista(i32);
     i32 DoSpellAI(i32, i32);

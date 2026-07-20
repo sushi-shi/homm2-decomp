@@ -142,14 +142,6 @@ H2_ENUM_BEGIN(NewMapConstant)
     ULTIMATE_SEARCH_REGION_RETRY_LIMIT         = 400
 H2_ENUM_END(NewMapConstant)
 
-H2_ENUM_BEGIN(GameDifficultyConstant)
-    DIFFICULTY_EASY       = 0,
-    DIFFICULTY_NORMAL     = 1,
-    DIFFICULTY_HARD       = 2,
-    DIFFICULTY_EXPERT     = 3,
-    DIFFICULTY_IMPOSSIBLE = 4
-H2_ENUM_END(GameDifficultyConstant)
-
 H2_ENUM_BEGIN(GameDailyEconomyConstant)
     DAILY_GOLD_MINE_INCOME          = 1000,
     DAILY_GOLD_TOWN_INCOME          = 1000,
@@ -2079,7 +2071,7 @@ void game::NewMap(char* filename) {
             m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
             memcpy(
                 m_players[player2].m_resources,
-                gInitResourcesHuman[m_difficulty],
+                gInitResourcesHuman[IDX(m_difficulty)],
                 sizeof(m_players[player2].m_resources)
             );
             if (m_playerHandicap[player2] != PLAYER_HANDICAP_NONE) {
@@ -2101,7 +2093,7 @@ void game::NewMap(char* filename) {
             ));
             memcpy(
                 m_players[player2].m_resources,
-                gInitResourcesComputer[m_difficulty],
+                gInitResourcesComputer[IDX(m_difficulty)],
                 sizeof(m_players[player2].m_resources)
             );
         }
@@ -3103,9 +3095,9 @@ game::ViewSpells(
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
         m_viewSpellsHero = spellHero;
         if (spellType == SPELL_TYPE_ALL)
-            m_viewSpellsType = IDX(SPELL_TYPE_ADVENTURE);
+            m_viewSpellsType = SPELL_TYPE_ADVENTURE;
         else
-            m_viewSpellsType = IDX(spellType);
+            m_viewSpellsType = spellType;
         m_viewSpellsTop[0] = 0;
         m_viewSpellsCount[0] = spellHero->GetNumSpells(SPELL_TYPE_COMBAT);
         m_viewSpellsTop[1] = 0;
@@ -3183,7 +3175,8 @@ void game::UpdateSpellWidgets(void) {
     m_viewSpellsWindow->BroadcastMessage(message9);
 
     for (spellSlot6 = 0; spellSlot6 < VIEW_SPELL_PAGE_SIZE; spellSlot6++) {
-        if (m_viewSpellsTop[m_viewSpellsType] + spellSlot6 >= m_viewSpellsCount[m_viewSpellsType]) {
+        if (m_viewSpellsTop[IDX(m_viewSpellsType)] + spellSlot6
+            >= m_viewSpellsCount[IDX(m_viewSpellsType)]) {
             message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
             message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
@@ -3192,8 +3185,8 @@ void game::UpdateSpellWidgets(void) {
             m_viewSpellsWindow->BroadcastMessage(message9);
         } else {
             spell2 = m_viewSpellsHero->GetNthSpell(
-                static_cast<HeroSpellType>(m_viewSpellsType),
-                m_viewSpellsTop[m_viewSpellsType] + spellSlot6 + 1
+                m_viewSpellsType,
+                m_viewSpellsTop[IDX(m_viewSpellsType)] + spellSlot6 + 1
             );
             message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
@@ -3273,31 +3266,31 @@ i32 ViewSpellsHandler(tag_message& msg) {
                             );
                             break;
                         case VIEW_SPELL_PREVIOUS_ID:
-                            if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] == 0)
+                            if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] == 0)
                                 break;
-                            gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] -=
+                            gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] -=
                                 VIEW_SPELL_PAGE_SIZE;
-                            if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] < 0)
-                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] = 0;
+                            if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] < 0)
+                                gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] = 0;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case VIEW_SPELL_NEXT_ID:
-                            if (gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
+                            if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)]
                                     + VIEW_SPELL_PAGE_SIZE
-                                < gpGame->m_viewSpellsCount[gpGame->m_viewSpellsType])
-                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType] +=
+                                < gpGame->m_viewSpellsCount[IDX(gpGame->m_viewSpellsType)])
+                                gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] +=
                                     VIEW_SPELL_PAGE_SIZE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case VIEW_SPELL_COMBAT_TAB_ID:
-                            gpGame->m_viewSpellsType = IDX(SPELL_TYPE_ADVENTURE);
+                            gpGame->m_viewSpellsType = SPELL_TYPE_ADVENTURE;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
                         case VIEW_SPELL_ADVENTURE_TAB_ID:
-                            gpGame->m_viewSpellsType = IDX(SPELL_TYPE_COMBAT);
+                            gpGame->m_viewSpellsType = SPELL_TYPE_COMBAT;
                             gpGame->UpdateSpellWidgets();
                             gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                             break;
@@ -3325,8 +3318,8 @@ i32 ViewSpellsHandler(tag_message& msg) {
                         case VIEW_SPELL_ICON_ID_10:
                         case VIEW_SPELL_ICON_ID_11:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
-                                static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
-                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
+                                gpGame->m_viewSpellsType,
+                                gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)]
                                     + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             NormalDialog(
@@ -3427,8 +3420,8 @@ i32 ViewSpellsHandler(tag_message& msg) {
                         case VIEW_SPELL_ICON_ID_10:
                         case VIEW_SPELL_ICON_ID_11:
                             spell = gpGame->m_viewSpellsHero->GetNthSpell(
-                                static_cast<HeroSpellType>(gpGame->m_viewSpellsType),
-                                gpGame->m_viewSpellsTop[gpGame->m_viewSpellsType]
+                                gpGame->m_viewSpellsType,
+                                gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)]
                                     + (msg.payload.widget.id - VIEW_SPELL_ICON_ID_BASE) + 1
                             );
                             if (gpGame->m_viewSpellsReadOnly) {
@@ -3528,7 +3521,7 @@ void game::ViewArmy(
     i32 numTroops,
     town* castle,
     i32 disableUpgrade,
-    i32 facing,
+    H2_ENUM_PARAM(ArmyFacing, i32) facing,
     i32 quickView,
     hero* theHero,
     class army* theArmy,
@@ -3586,7 +3579,7 @@ void game::ViewArmy(
     if (!m_viewArmyWindow)
         MemError();
 
-    viewArmyFacingWIPXMod = facing == 1 ? -1 : 1;
+    viewArmyFacingWIPXMod = facing == ARMY_FACING_RIGHT ? -1 : 1;
     gpResourceManager->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[monsterType], 1));
     gpResourceManager->ReadBlock(
         reinterpret_cast<i8*>(&sViewArmyMonFrameInfo),
@@ -3624,7 +3617,7 @@ void game::ViewArmy(
         VIEW_ARMY_MONSTER_WIDGET_HEIGHT,
         filename4,
         gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
-        facing == 0,
+        facing == ARMY_FACING_LEFT,
         VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
         VIEW_ARMY_MONSTER_WIDGET_COLOR,
         1
@@ -3784,7 +3777,8 @@ void game::ViewArmy(
         i32 spellX3 =
             VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount + spellCenterX8
             - (theArmy->m_spellCount * spacing0) / VIEW_ARMY_ICON_CENTER_DIVISOR;
-        i32 spellIndex9 = -1;
+        H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) spellIndex9 =
+            ARMY_SPELL_INFLUENCE_NONE;
         for (loopIndex0 = 0;
              loopIndex0 < (theArmy->m_spellCount < VIEW_ARMY_SPELL_VISIBLE_LIMIT
                                ? theArmy->m_spellCount
@@ -3792,7 +3786,7 @@ void game::ViewArmy(
              loopIndex0++) {
             spellIndex9++;
             for (; spellIndex9 < ARMY_SPELL_INFLUENCE_COUNT; spellIndex9++) {
-                if (theArmy->m_spellInfluence[spellIndex9])
+                if (theArmy->m_spellInfluence[IDX(spellIndex9)])
                     break;
             }
             iconWidget* spellWidget = new iconWidget(
@@ -3801,7 +3795,7 @@ void game::ViewArmy(
                 0,
                 0,
                 const_cast<char*>("spellinl.icn"),
-                static_cast<i16>(spellIndex9),
+                static_cast<i16>(IDX(spellIndex9)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
                 VIEW_ARMY_SPELL_WIDGET_COLOR,
@@ -4541,7 +4535,8 @@ void game::PerWeek(void) {
                     )[gpGame->m_players[0].m_availableHeroIds]] = -1;
                 if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
                     desiredClass1 = FACTION_ANY;
-                i32 useDifficultyBonus3 = !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > 0;
+                i32 useDifficultyBonus3 =
+                    !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > DIFFICULTY_EASY;
                 (
                     innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
                 )[gpGame->m_players[0].m_availableHeroIds] =

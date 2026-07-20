@@ -212,13 +212,13 @@ i32 army::ValidAttack(
         if (direction == COMBAT_DIRECTION_WIDE_WEST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_NORTHWEST
+                m_facing < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_NORTHWEST
                                                                : COMBAT_DIRECTION_NORTHEAST
             );
         } else if (direction == COMBAT_DIRECTION_WIDE_EAST) {
             *attackHex = GetAdjacentCellIndex(
                 sourceHex,
-                static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_SOUTHWEST
+                m_facing < ARMY_FACING_RIGHT ? COMBAT_DIRECTION_SOUTHWEST
                                                                : COMBAT_DIRECTION_SOUTHEAST
             );
         } else {

@@ -258,7 +258,7 @@ i32 recruitUnit::Main(struct tag_message& message) {
                             0,
                             NULL,
                             1,
-                            1,
+                            ARMY_FACING_RIGHT,
                             quickView,
                             NULL,
                             NULL,

@@ -254,8 +254,10 @@ DATA(0x0051d560) SCampaignChoice xCampaignChoices[IDX(
       {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}}
 };
 
-DATA(0x0051d740) static i8 expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_COUNT)]
-                                                      [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
+DATA(0x0051d740)
+static H2_ENUM_STORAGE(GameDifficulty, i8)
+    expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_COUNT)]
+                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
                                                           {0, 1, 1, 1, 1, 2, 2, 3},
                                                           {0, 1, 1, 1, 2, 2, 2, 3},
                                                           {1, 1, 1, 2, -1, -1, -1, -1},

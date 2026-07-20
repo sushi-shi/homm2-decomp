@@ -47,7 +47,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_DIALOG_CLOSE_MESSAGE             = 10,
     GAME_PLAYER_DEFAULT                   = 0,
     GAME_PLAYER_FLEXIBLE                  = 1,
-    GAME_DEFAULT_DIFFICULTY               = 1,
     GAME_DIALOG_CANCEL                    = 0x7801,
     GAME_DIALOG_OK                        = 0x7802,
     GAME_MAP_OPTIONS_CONTROL              = 0x36,
@@ -57,7 +56,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SHADOW_FRAME                     = 6,
     GAME_MOUSE_RIGHT_FLAG                 = 0x200,
     GAME_PLAYER_CONTROL_COUNT             = 6,
-    GAME_DIFFICULTY_COUNT                 = 5,
     GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
     GAME_COMPUTER_COLOR_LOCKED_FRAME      = 15,
@@ -150,14 +148,6 @@ H2_ENUM_BEGIN(NewGameMapChoice)
     MAP_CHOICE_EXPANSION = 2
 H2_ENUM_END(NewGameMapChoice)
 
-H2_ENUM_CLASS_BEGIN(NewGameDifficultySlot)
-    DIFFICULTY_SLOT_EASY       = 0,
-    DIFFICULTY_SLOT_NORMAL     = 1,
-    DIFFICULTY_SLOT_HARD       = 2,
-    DIFFICULTY_SLOT_EXPERT     = 3,
-    DIFFICULTY_SLOT_IMPOSSIBLE = 4
-H2_ENUM_CLASS_END(NewGameDifficultySlot)
-
 H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
     PLAYER_SLOT_FIRST  = 0,
     PLAYER_SLOT_SECOND = 1,
@@ -168,7 +158,7 @@ H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
 H2_ENUM_CLASS_END(NewGamePlayerSlot)
 
 #ifdef HOMM2_STRICT_ENUM_TYPES
-constexpr i32 operator+(NewGameControl first, NewGameDifficultySlot slot) {
+constexpr i32 operator+(NewGameControl first, GameDifficulty slot) {
     return static_cast<i32>(first) + static_cast<i32>(slot);
 }
 
@@ -404,7 +394,7 @@ void game::InitNewGame(struct SMapHeader* header) {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
             }
         }
-        m_difficulty = GAME_DEFAULT_DIFFICULTY;
+        m_difficulty = DIFFICULTY_NORMAL;
         m_newGameInitialized = 1;
     }
     m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
@@ -903,14 +893,14 @@ void game::UpdateNewGameWindow(void) {
 
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
     messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
-    for (playerIndex3 = 0; playerIndex3 < GAME_DIFFICULTY_COUNT; ++playerIndex3) {
+    for (playerIndex3 = 0; playerIndex3 < IDX(DIFFICULTY_COUNT); ++playerIndex3) {
         messageTemp.payload.widget.id =
             EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, playerIndex3);
         m_newGameWindow->BroadcastMessage(messageTemp);
     }
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
     messageTemp.payload.widget.id =
-        EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, m_difficulty);
+        EncodeNewGameControlIndex(NEW_GAME_DIFFICULTY_FIRST, IDX(m_difficulty));
     m_newGameWindow->BroadcastMessage(messageTemp);
 
     if (giNumHumanPlayers > 1) {
@@ -1178,12 +1168,12 @@ i32 NewGameHandler(struct tag_message& message) {
             if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
                  && message.payload.widget.id <= LastNewGameControl(
                         NEW_GAME_DIFFICULTY_HELP_FIRST,
-                        GAME_DIFFICULTY_COUNT
+                        IDX(DIFFICULTY_COUNT)
                     ))
                 || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
                     && message.payload.widget.id <= LastNewGameControl(
                            NEW_GAME_DIFFICULTY_FIRST,
-                           GAME_DIFFICULTY_COUNT
+                           IDX(DIFFICULTY_COUNT)
                        )))
                 helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
             if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
@@ -1298,22 +1288,22 @@ i32 NewGameHandler(struct tag_message& message) {
 
         case NEW_GAME_EVENT_PRESS:
             switch (message.payload.widget.id) {
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_SLOT_EASY:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_SLOT_NORMAL:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_SLOT_HARD:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_SLOT_EXPERT:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_SLOT_IMPOSSIBLE:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_EASY:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_NORMAL:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_HARD:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_EXPERT:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_IMPOSSIBLE:
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
                     goto setDifficulty;
 
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_SLOT_EASY:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_SLOT_NORMAL:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_SLOT_HARD:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_SLOT_EXPERT:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_SLOT_IMPOSSIBLE:
+                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_EASY:
+                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_NORMAL:
+                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_HARD:
+                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_EXPERT:
+                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_IMPOSSIBLE:
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
                 setDifficulty:
-                    gpGame->m_difficulty = static_cast<i8>(currentPlayerLocal);
+                    gpGame->m_difficulty = static_cast<GameDifficulty>(currentPlayerLocal);
                     synchronizeSetupResult = 1;
                     redrawWindow = 1;
                     break;
@@ -1751,10 +1741,10 @@ void game::ShowScenInfo(void) {
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
     scenarioMessageTemp.payload.widget.id = GAME_SCENARIO_DIFFICULTY;
-    scenarioMessageTemp.payload.widget.data.text = cDifficulty[m_mapHeader.difficulty];
+    scenarioMessageTemp.payload.widget.data.text = cDifficulty[IDX(m_mapHeader.difficulty)];
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
     scenarioMessageTemp.payload.widget.id = GAME_SCENARIO_SELECTED_DIFFICULTY;
-    scenarioMessageTemp.payload.widget.data.text = cDifficulty[m_difficulty];
+    scenarioMessageTemp.payload.widget.data.text = cDifficulty[IDX(m_difficulty)];
     scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
     sprintf(gText, "%d", CalcDifficultyRating());

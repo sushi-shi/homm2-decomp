@@ -179,8 +179,7 @@ H2_ENUM_BEGIN(CombatCommandConstant)
 H2_ENUM_END(CombatCommandConstant)
 
 H2_ENUM_BEGIN(CombatRoundConstant)
-    ROUND_INITIAL_SPEED = 15,
-    ROUND_ABILITY_FLAGS = 0xff1f
+    ROUND_INITIAL_SPEED = 15
 H2_ENUM_END(CombatRoundConstant)
 
 H2_ENUM_BEGIN(CombatCommandGeometry)
@@ -1114,7 +1113,7 @@ void combatManager::ResetRound(void) {
             army* currentArmy = m_armies[side] + armyIndex;
             if (currentArmy->m_quantity > 0) {
                 currentArmy->m_monster.flags.abilityFlags &=
-                    static_cast<MonsterAbilityFlags>(ROUND_ABILITY_FLAGS);
+                    MONSTER_FLAGS_ROUND_PERSISTENT_MASK;
                 if (currentArmy->m_monsterType == CREATURE_TROLL
                     || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
@@ -3015,7 +3014,7 @@ void combatManager::AddArmy(
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 quantity,
     i32 hex,
-    i32 flags,
+    H2_ENUM_PARAM(MonsterFlags, i32) flags,
     i32 animate
 ) {
     i32 armyIndex_r = INVALID_ARMY_INDEX;
@@ -3047,7 +3046,7 @@ void combatManager::AddArmy(
         newArmy = &m_armies[side][armyIndex_r];
         newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
         newArmy->LoadResources();
-        newArmy->m_monster.flags.all |= MonsterFlags(flags);
+        newArmy->m_monster.flags.all |= flags;
         if (reusedArmy_m == 0)
             ++m_armyCount[side];
 
