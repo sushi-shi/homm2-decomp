@@ -1547,7 +1547,7 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     } else if (building == BUILDING_SLOT_SPECIAL) {
         memcpy(dest, gSpecialBuildingCosts[IDX(race)], KB_BUILDING_RESOURCE_COUNT * sizeof(i32));
     } else {
-        if (IDX(building) >= KB_BUILDING_NEUTRAL_LIMIT)
+        if (building >= BUILDING_SLOT_DISABLED_SECOND)
             return;
         memcpy(
             dest,
