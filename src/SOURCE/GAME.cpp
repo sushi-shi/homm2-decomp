@@ -6505,7 +6505,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     LogStr(const_cast<char*>("Transmit Game Start"));
     if (gpAdvManager->m_active)
-        BVResMsg(const_cast<char*>("Sending Data"), -1, 0);
+        BVResMsg(const_cast<char*>("Sending Data"), RES_NONE, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY, 6777));
@@ -6785,7 +6785,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active)
-        BVResMsg(const_cast<char*>("Receiving Data"), -1, 0);
+        BVResMsg(const_cast<char*>("Receiving Data"), RES_NONE, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
     oldTrack = static_cast<i8>(gpSoundManager->m_currentTrack);

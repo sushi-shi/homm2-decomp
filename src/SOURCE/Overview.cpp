@@ -1185,8 +1185,8 @@ void game::Overview(void) {
     lighthouseCount4 = 0;
     for (mine4 = 0; mine4 < IDX(GAME_MINE_COUNT); mine4++) {
         if (m_mineOwners[mine4] == giCurPlayer) {
-            if (m_mines[mine4].resourceType <= IDX(RES_GOLD)) {
-                mineCounts4[m_mines[mine4].resourceType]++;
+            if (m_mines[mine4].resourceType <= MINE_TYPE_GOLD) {
+                mineCounts4[IDX(m_mines[mine4].resourceType)]++;
             } else if (m_mines[mine4].resourceType == MINE_TYPE_LIGHTHOUSE) {
                 lighthouseCount4++;
             }

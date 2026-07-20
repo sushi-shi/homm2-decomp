@@ -359,7 +359,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 teleportY;
     ArtifactType artifact8;
     mapEventExtra* eventExtra1;
-    i32 resourceType;
+    ResourceType resourceType;
     i32 teleportX3;
     i32 teleportCount;
     CreatureType guardedMonster5;
@@ -1181,18 +1181,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->CheckLevel();
                 }
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                if (gpGame->m_mines[cell->m_objectMetadata].resourceType == IDX(RES_GOLD))
+                if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_GOLD)
                     resourceAmount6 = MINE_GOLD_INCOME;
-                else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == IDX(RES_ORE))
+                else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_ORE)
                     resourceAmount6 = MINE_ORE_INCOME;
                 else
                     resourceAmount6 = 1;
                 EventWindow(
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType
+                    IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
                         + MINE_RESOURCE_ICON_OFFSET,
                     NORMAL_DIALOG_INFO,
                     "",
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType,
+                    IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
                     -resourceAmount6,
                     -1,
                     0,
@@ -1535,7 +1535,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                resourceType = (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1;
+                resourceType = static_cast<ResourceType>(
+                    (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
+                );
                 resourceAmount6 =
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT;
                 NormalDialog(
@@ -1544,14 +1546,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
-                    resourceType,
+                    IDX(resourceType),
                     resourceAmount6,
                     -1,
                     0,
                     -1,
                     0
                 );
-                GiveResource(eventHero2, ResourceType(resourceType), resourceAmount6);
+                GiveResource(eventHero2, resourceType, resourceAmount6);
                 cell->m_objectMetadata = 0;
             }
             break;
@@ -1559,7 +1561,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WAGON:
             if (cell->m_objectMetadata) {
                 if (!(cell->m_objectMetadata & WAGON_ARTIFACT_FLAG)) {
-                    resourceType = (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1;
+                    resourceType = static_cast<ResourceType>(
+                        (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
+                    );
                     resourceAmount6 =
                         (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT;
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
@@ -1569,13 +1573,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
                         "make it to safe terrain.  Inside, you find some of the wagon's cargo "
                         "still intact.",
-                        resourceType,
+                        IDX(resourceType),
                         resourceAmount6,
                         -1,
                         0,
                         -1
                     );
-                    GiveResource(eventHero2, ResourceType(resourceType), resourceAmount6);
+                    GiveResource(eventHero2, resourceType, resourceAmount6);
                     cell->m_objectMetadata = 0;
                     break;
                 }
@@ -1948,21 +1952,21 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            resourceType = cell->m_objectIndex >> 1;
+            resourceType = static_cast<ResourceType>(cell->m_objectIndex >> 1);
             GiveResource(
                 eventHero2,
-                ResourceType(resourceType),
-                resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
-                                              : cell->m_objectMetadata
+                resourceType,
+                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                                         : cell->m_objectMetadata
             );
-            strcpy(sphinxAnswer_a, gResourceNames[resourceType]);
+            strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType)]);
             sphinxAnswer_a[0] += ' ';
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
                 resourceType,
-                resourceType == IDX(RES_GOLD) ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
-                                              : cell->m_objectMetadata
+                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                                         : cell->m_objectMetadata
             );
             eraseObject = 1;
             fizzleType3 = 1;
@@ -3636,7 +3640,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         ABANDONED_MINE_OBJECT,
                         ABANDONED_MINE_EVENT
                     );
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType = IDX(RES_GOLD);
+                    gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
                     gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
@@ -5988,7 +5992,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 exitY_d;
     ArtifactType artifact_g;
     i32 heroInteractionResult;
-    i32 resourceType_a;
+    ResourceType resourceType_a;
     i32 exitX;
     i32 exitCount;
     mapEventExtra* eventExtra_o;
@@ -6373,11 +6377,11 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            resourceType_a = cell->m_objectIndex >> 1;
-            resourceAmount_o = resourceType_a == IDX(RES_GOLD)
+            resourceType_a = static_cast<ResourceType>(cell->m_objectIndex >> 1);
+            resourceAmount_o = resourceType_a == RES_GOLD
                                    ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                    : cell->m_objectMetadata;
-            GiveResource(eventHero, ResourceType(resourceType_a), resourceAmount_o);
+            GiveResource(eventHero, resourceType_a, resourceAmount_o);
             eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
             break;
 
