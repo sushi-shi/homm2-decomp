@@ -291,13 +291,6 @@ namespace {
         ARTIFACT_PICKUP_SOUND_LAST = 7
     H2_ENUM_END(FizzleCenterConstant)
 
-    H2_ENUM_BEGIN(FlotsamReward)
-        FLOTSAM_EMPTY = 0,
-        FLOTSAM_WOOD = 1,
-        FLOTSAM_WOOD_AND_GOLD = 2,
-        FLOTSAM_LARGE_TREASURE = 3
-    H2_ENUM_END(FlotsamReward)
-
     H2_ENUM_BEGIN(FlotsamConstant)
         FLOTSAM_WOOD_AMOUNT = 5,
         FLOTSAM_GOLD_AMOUNT = 200,
@@ -3224,7 +3217,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                 case DAEMON_REWARD_ARTIFACT:
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY
-                        || gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1) == -1)
+                        || gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true) == -1)
                         goto daemonExperienceGold;
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
                     eventValue1 = IDX(GiveRandomArtifact(eventHero2));
@@ -4739,7 +4732,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
 VA(0x004b00e9, 0x5e)
 ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     ArtifactType artifactId =
-        ArtifactType(gpGame->GetRandomArtifactId(EVENT_RANDOM_ARTIFACT_ANY, 1));
+        ArtifactType(gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true));
 
     if (artifactId == ARTIFACT_NONE)
         GiveResource(eventHero, RES_GOLD, EVENT_RANDOM_ARTIFACT_GOLD);
