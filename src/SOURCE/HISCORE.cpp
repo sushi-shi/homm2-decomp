@@ -90,7 +90,7 @@ i32 highScoreManager::Main(struct tag_message& message) {
         );
     }
 
-    if (message.payload.keyboard.modifiers & HIGH_SCORE_INPUT_BLOCK_FLAG)
+    if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
         return HIGH_SCORE_MANAGER_CONTINUE;
 
     switch (message.type) {

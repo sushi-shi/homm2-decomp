@@ -105,7 +105,7 @@ i32 textWidget::Main(tag_message& msg) {
                 return WIDGET_DISPATCH_CONTINUE;
             m_flags = flags | WIDGET_FLAG_SELECTED;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
             SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
             return WIDGET_DISPATCH_FORWARD;
         }
@@ -115,7 +115,7 @@ i32 textWidget::Main(tag_message& msg) {
             if ((flags & WIDGET_FLAG_SELECTED) != 0) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return WIDGET_DISPATCH_FORWARD;
             }

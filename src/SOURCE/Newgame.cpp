@@ -54,7 +54,6 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_WIDGET_INACTIVE_FRAME            = 2,
     GAME_WIDGET_REFRESH_FRAME             = 4,
     GAME_SHADOW_FRAME                     = 6,
-    GAME_MOUSE_RIGHT_FLAG                 = 0x200,
     GAME_PLAYER_CONTROL_COUNT             = 6,
     GAME_CHAT_LINE_COUNT                  = 3,
     GAME_SWAP_SEARCH_DONE                 = 999,
@@ -1160,7 +1159,10 @@ i32 NewGameHandler(struct tag_message& message) {
     if (message.type != MESSAGE_WIDGET)
         goto finish;
 
-    if (message.payload.widget.parameter & GAME_MOUSE_RIGHT_FLAG) {
+    if (HAS(
+            static_cast<MessageModifier>(message.payload.widget.parameter),
+            MESSAGE_MODIFIER_RIGHT_BUTTON
+        )) {
         if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
             || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
             helpDialogIndexLocal = -1;

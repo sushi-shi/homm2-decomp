@@ -696,7 +696,7 @@ VA(0x00412694, 0x13e)
 i32 SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -736,7 +736,7 @@ VA(0x004127d2, 0x13e)
 i32 SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -776,7 +776,7 @@ VA(0x00412910, 0x118)
 i32 SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FIVE);
@@ -801,7 +801,7 @@ VA(0x00412a28, 0x12e)
 i32 SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -841,7 +841,7 @@ VA(0x00412b56, 0x108)
 i32 SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -866,7 +866,7 @@ VA(0x00412c5e, 0xd7)
 i32 SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -891,7 +891,7 @@ VA(0x00412d35, 0xf8)
 i32 SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -916,7 +916,7 @@ VA(0x00412e2d, 0x14b)
 i32 SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0) {
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
         if (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
             helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -952,7 +952,7 @@ VA(0x00412f78, 0xd7)
 i32 ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -977,7 +977,7 @@ VA(0x0041304f, 0xd7)
 i32 ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -1002,7 +1002,7 @@ VA(0x00413126, 0xd7)
 i32 ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((message.payload.widget.parameter & MESSAGE_MODIFIER_RIGHT_BUTTON) != 0
+    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -1040,8 +1040,8 @@ i32 BaseSetupHandler(struct tag_message& message) {
 
     if (handled || giMenuCommand != -1) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         if (giMenuCommand != -1)
             gpWindowManager->m_dialogResult = DIALOG_CANCEL;
         return HANDLER_CLOSE;

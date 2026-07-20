@@ -563,7 +563,10 @@ i32 fileRequester::Main(struct tag_message& message) {
                     break;
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT:
-                    if ((message.payload.widget.parameter & FILE_REQUESTER_HELP_MODIFIER) != 0) {
+                    if (HAS(
+                            static_cast<MessageModifier>(message.payload.widget.parameter),
+                            MESSAGE_MODIFIER_LEFT_SHIFT
+                        )) {
                         helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {
                             case FILE_REQUESTER_FILENAME_ENTRY:

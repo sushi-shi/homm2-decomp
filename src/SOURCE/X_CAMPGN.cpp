@@ -565,13 +565,13 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (viewOnly == 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
         m_window->BroadcastMessage(message);
     }
     if (gbLowMemory != 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
-        message.payload.widget.data.value = CAMPAIGN_MESSAGE_DESELECT;
+        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
         m_window->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(EXPANSION_CAMPAIGN_MUSIC);

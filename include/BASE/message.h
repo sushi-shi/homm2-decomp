@@ -7,7 +7,7 @@
 // The complete definition is required anywhere a message is passed or returned by value.
 
 // Values emitted by INPUTMGR and consumed by manager/widget Main loops.
-H2_ENUM_BEGIN(MessageType)
+H2_ENUM_CLASS_BEGIN(MessageType)
     MESSAGE_NONE                       = 0,
     MESSAGE_KEY_DOWN                   = 1,
     SPELL_MESSAGE_MOUSE_DOWN           = MESSAGE_KEY_DOWN,
@@ -45,10 +45,11 @@ H2_ENUM_BEGIN(MessageType)
     MESSAGE_EXECUTIVE                  = 0x4000,
     COMBAT_WIN_MESSAGE                 = MESSAGE_EXECUTIVE,
     ADVMGR_REMOTE_WAIT_EXIT_MESSAGE    = MESSAGE_EXECUTIVE
-H2_ENUM_END(MessageType)
+H2_ENUM_CLASS_END(MessageType)
+H2_ENUM_FLAGS(MessageType)
 
 // One widget-dispatch command space; per-window names are value-verified aliases.
-H2_ENUM_BEGIN(BaseWidgetCommand)
+H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_DRAW                       = 2,
     WIDGET_COMMAND_SET_TEXT                   = 3,
     HERO_UI_WIDGET_TEXT                       = WIDGET_COMMAND_SET_TEXT,
@@ -161,12 +162,13 @@ H2_ENUM_BEGIN(BaseWidgetCommand)
     ADVMGR_REMOTE_WAIT_POP_NET_BOX_COMMAND    = WIDGET_COMMAND_REPLACE_ICON,
     ADVMGR_INTERFACE_REPLACE_RESOURCE         = WIDGET_COMMAND_REPLACE_ICON,
     WIDGET_COMMAND_SET_WIDTH                  = 0x3d
-H2_ENUM_END(BaseWidgetCommand)
+H2_ENUM_CLASS_END(BaseWidgetCommand)
 
-H2_ENUM_BEGIN(MessageModifier)
+H2_ENUM_CLASS_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_NONE                   = 0,
     MESSAGE_MODIFIER_RIGHT_SHIFT            = 1,
     MESSAGE_MODIFIER_LEFT_SHIFT             = 2,
+    MESSAGE_MODIFIER_SHIFT_KEYS             = 0x3,
     MESSAGE_MODIFIER_CONTROL                = 4,
     MESSAGE_MODIFIER_ALT                    = 0x20,
     MESSAGE_MODIFIER_CONTROL_KEYS           = 0xc, // either control-key modifier bit
@@ -177,7 +179,7 @@ H2_ENUM_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_LEFT_BUTTON            = 0x100,
     MESSAGE_MODIFIER_RIGHT_BUTTON           = 0x200,
     MESSAGE_MODIFIER_BUTTON_MASK            = 0x300
-H2_ENUM_END(MessageModifier)
+H2_ENUM_CLASS_END(MessageModifier)
 H2_ENUM_FLAGS(MessageModifier)
 
 struct tag_messageKeyboardPayload {
@@ -186,7 +188,7 @@ struct tag_messageKeyboardPayload {
         u8 keyByte;
     };
     i32 unknown0x08;
-    i32 modifiers;
+    MessageModifier modifiers;
     i32 unknown0x10;
     i32 unknown0x14;
     i32 unknown0x18;
@@ -196,7 +198,7 @@ SIZE(tag_messageKeyboardPayload, 0x18);
 struct tag_messageMousePayload {
     i32 x;
     i32 y;
-    i32 modifiers;
+    MessageModifier modifiers;
     i32 screenX;
     i32 screenY;
     i32 unknown0x18;
@@ -206,7 +208,7 @@ SIZE(tag_messageMousePayload, 0x18);
 struct tag_messageHoverPayload {
     i32 x;
     i32 id;
-    i32 modifiers;
+    i32 subId;
     i32 screenX;
     i32 screenY;
     i32 unknown0x18;
@@ -230,13 +232,13 @@ struct tag_messageWidgetPayload {
 SIZE(tag_messageWidgetPayload, 0x18);
 
 // Executive-arm commands consumed by the manager loop (EXEC), not by widgets.
-H2_ENUM_BEGIN(ExecutiveCommand)
+H2_ENUM_CLASS_BEGIN(ExecutiveCommand)
     EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
     EXECUTIVE_COMMAND_REMOVE_MANAGER = 2,
     EXECUTIVE_COMMAND_RETURN_RESULT  = 4,
     FILE_REQUESTER_EXECUTIVE_CLOSE   = EXECUTIVE_COMMAND_RETURN_RESULT,
     SWAP_COMMAND_EXIT                = EXECUTIVE_COMMAND_RETURN_RESULT
-H2_ENUM_END(ExecutiveCommand)
+H2_ENUM_CLASS_END(ExecutiveCommand)
 
 struct tag_messageExecutivePayload {
     ExecutiveCommand command;

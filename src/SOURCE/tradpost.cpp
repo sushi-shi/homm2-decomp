@@ -391,8 +391,8 @@ i32 TradingPostHandler(struct tag_message& message) {
     if (updateDisplay)
         UpdateTradingPost(1);
     if (exitFlag) {
-        message.payload.widget.id = WIDGET_COMMAND_DIALOG_SELECT;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return IDX(POST_HANDLER_EXIT);
     }
     return IDX(POST_HANDLER_CONTINUE);

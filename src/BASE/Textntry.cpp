@@ -204,7 +204,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                message.payload.widget.parameter = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 return WIDGET_DISPATCH_FORWARD;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width
