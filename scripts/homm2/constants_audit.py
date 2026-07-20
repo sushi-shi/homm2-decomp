@@ -27,6 +27,7 @@ SOURCE_LINE_ARGUMENTS = {
     "H2_ALLOC_AT": 2,
     "H2_FREE_AT": 2,
     "H2_ASSERT": 2,
+    "ProcessAssert": 2,
 }
 SOURCE_LINE_DECLARATION_RE = re.compile(r"\b\w*source_?line\w*\s*=", re.IGNORECASE)
 MAGIC_RE = re.compile(
