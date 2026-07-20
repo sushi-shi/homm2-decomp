@@ -361,8 +361,8 @@ void combatManager::SetupCombat(
             for (side = 0; side < ARMY_GROUP_SLOT_COUNT; side++)
                 m_captain.m_army.m_creatureTypes[side] = CREATURE_NONE;
             for (side = 0; side < HERO_ARTIFACT_SLOT_COUNT; side++)
-                m_captain.m_artifacts[side] = ARMY_GROUP_EMPTY_SLOT;
-            m_captain.m_artifacts[0] = IDX(ARTIFACT_MAGIC_BOOK);
+                m_captain.m_artifacts[side] = ARTIFACT_NONE;
+            m_captain.m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_combatTowns[COMBAT_DEFENDER_SIDE]->GiveSpells(&m_captain);
             m_captain.m_isCaptain = 1;
         }

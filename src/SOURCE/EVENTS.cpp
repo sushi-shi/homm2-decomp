@@ -4021,7 +4021,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     switch (siteType2) {
         case SITE_ALCHEMIST_TOWER:
             for (index3 = 0; index3 < HERO_ARTIFACT_SLOT_COUNT; index3++) {
-                if (IsCursedItem(ArtifactType(eventHero->m_artifacts[index3])))
+                if (IsCursedItem(eventHero->m_artifacts[index3]))
                     cursedArtifactCount9++;
             }
             if (cursedArtifactCount9 != 0) {
@@ -4048,8 +4048,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= SITE_ALCHEMIST_COST) {
                         for (index3 = 0; index3 < HERO_ARTIFACT_SLOT_COUNT; index3++) {
-                            if (IsCursedItem(ArtifactType(eventHero->m_artifacts[index3])))
-                                eventHero->m_artifacts[index3] = IDX(ARTIFACT_NONE);
+                            if (IsCursedItem(eventHero->m_artifacts[index3]))
+                                eventHero->m_artifacts[index3] = ARTIFACT_NONE;
                         }
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
@@ -4696,7 +4696,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     i32 artifactSlot;
 
     for (artifactSlot = 0; artifactSlot < EVENT_ARTIFACT_SLOT_COUNT; artifactSlot++) {
-        if (eventHero->m_artifacts[artifactSlot] == IDX(ARTIFACT_NONE)) {
+        if (eventHero->m_artifacts[artifactSlot] == ARTIFACT_NONE) {
             break;
         }
     }
@@ -4705,7 +4705,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
         return IDX(ARTIFACT_NONE);
     }
 
-    eventHero->m_artifacts[artifactSlot] = IDX(artifact);
+    eventHero->m_artifacts[artifactSlot] = artifact;
     eventHero->m_artifactExtra[artifactSlot] = artifactExtra;
     GiveTakeArtifactStat(eventHero, artifact, 0);
     eventHero->CheckAnduranPieces(0);
@@ -5808,20 +5808,21 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
         if (destinationHero == NULL) {
         } else {
             for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
-                if (destinationHero->m_artifacts[targetSlot] == IDX(ARTIFACT_NONE)) {
+                if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
                     for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
                          sourceArtifactSlot++) {
-                        if (sourceHero->m_artifacts[sourceArtifactSlot] != IDX(ARTIFACT_NONE)
+                        if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
                             && sourceHero->m_artifacts[sourceArtifactSlot]
-                                   != IDX(ARTIFACT_MAGIC_BOOK)) {
+                                   != ARTIFACT_MAGIC_BOOK) {
                             if (sourceHero->m_artifacts[sourceArtifactSlot]
-                                <= EVENT_ARTIFACT_NON_TRANSFERABLE_LAST) {
+                                <= ARTIFACT_ULTIMATE_WAND) {
                                 if (gbThisNetHumanPlayer[sourceHero->m_owner]
                                     || gbThisNetHumanPlayer[destinationHero->m_owner]) {
                                     sprintf(
                                         gText,
                                         "As you reach for the %s, it mysteriously disappears.",
-                                        gArtifactNames[sourceHero->m_artifacts[sourceArtifactSlot]]
+                                        gArtifactNames
+                                            [IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
                                     );
                                     NormalDialog(
                                         gText,
@@ -5829,7 +5830,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                                         -1,
                                         -1,
                                         NORMAL_DIALOG_ARTIFACT,
-                                        sourceHero->m_artifacts[sourceArtifactSlot],
+                                        IDX(sourceHero->m_artifacts[sourceArtifactSlot]),
                                         -1,
                                         0,
                                         -1,
@@ -5839,7 +5840,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             } else {
                                 GiveTakeArtifactStat(
                                     destinationHero,
-                                    ArtifactType(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                    sourceHero->m_artifacts[sourceArtifactSlot],
                                     false
                                 );
                                 destinationHero->m_artifacts[targetSlot] =
@@ -5849,10 +5850,10 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             }
                             GiveTakeArtifactStat(
                                 sourceHero,
-                                ArtifactType(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                sourceHero->m_artifacts[sourceArtifactSlot],
                                 true
                             );
-                            sourceHero->m_artifacts[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
+                            sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
                             sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
                             break;
                         }
@@ -7124,7 +7125,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     switch (siteType3) {
         case AI_GENERIC_SITE_CURSED_ARTIFACTS:
             for (artifactIndex1 = 0; artifactIndex1 < HERO_ARTIFACT_SLOT_COUNT; artifactIndex1++) {
-                if (IsCursedItem(ArtifactType(eventHero->m_artifacts[artifactIndex1])))
+                if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
                     cursedArtifactCount5++;
             }
             if (cursedArtifactCount5 != 0
@@ -7132,8 +7133,8 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                        >= EVENT_CURSED_ARTIFACT_GOLD_THRESHOLD) {
                 for (artifactIndex1 = 0; artifactIndex1 < HERO_ARTIFACT_SLOT_COUNT;
                      artifactIndex1++) {
-                    if (IsCursedItem(ArtifactType(eventHero->m_artifacts[artifactIndex1])))
-                        eventHero->m_artifacts[artifactIndex1] = IDX(ARTIFACT_NONE);
+                    if (IsCursedItem(eventHero->m_artifacts[artifactIndex1]))
+                        eventHero->m_artifacts[artifactIndex1] = ARTIFACT_NONE;
                 }
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= EVENT_CURSED_ARTIFACT_COST;
             }

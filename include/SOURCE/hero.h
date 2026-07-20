@@ -184,7 +184,7 @@ public:
     u8 m_secondarySkillOrder[IDX(HERO_SKILL_COUNT)];
     i32 m_secondarySkillCount;
     i8 m_spells[IDX(SPELL_COUNT)];
-    i8 m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
+    H2_ENUM_STORAGE(ArtifactType, i8) m_artifacts[HERO_ARTIFACT_SLOT_COUNT];
     HeroEventFlag m_eventFlags;
     u8 m_isCaptain;
     float m_aiFightValue;

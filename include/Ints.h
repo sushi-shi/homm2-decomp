@@ -56,6 +56,10 @@ public:
     constexpr H2EnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
     constexpr H2EnumStorage(Storage value) : m_value(value) {}
 
+    template <typename OtherStorage>
+    constexpr H2EnumStorage(H2EnumStorage<Enum, OtherStorage> value)
+        : m_value(static_cast<Storage>(static_cast<Enum>(value))) {}
+
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
 
     H2EnumStorage& operator=(Enum value) {
@@ -65,6 +69,12 @@ public:
 
     H2EnumStorage& operator=(Storage value) {
         m_value = value;
+        return *this;
+    }
+
+    template <typename OtherStorage>
+    H2EnumStorage& operator=(H2EnumStorage<Enum, OtherStorage> value) {
+        m_value = static_cast<Storage>(static_cast<Enum>(value));
         return *this;
     }
 

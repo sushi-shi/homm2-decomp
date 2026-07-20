@@ -2103,9 +2103,11 @@ void philAI::ProbableOutcomeOfBattle(
     if (attackerHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (attackerHero->m_artifacts[artifactIndex15] >= 0
-                && attackerHero->m_artifacts[artifactIndex15] < AI_BATTLE_BASE_ARTIFACT_LIMIT)
-                attackerArtifacts7 += gArtifactBaseRV[attackerHero->m_artifacts[artifactIndex15]];
+            if (attackerHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+                && IDX(attackerHero->m_artifacts[artifactIndex15])
+                       < AI_BATTLE_BASE_ARTIFACT_LIMIT)
+                attackerArtifacts7 +=
+                    gArtifactBaseRV[IDX(attackerHero->m_artifacts[artifactIndex15])];
         }
         if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
             && static_cast<u8>(attackerHero->m_id) == gpGame->m_mapHeader.victoryConditionValue)
@@ -2127,9 +2129,11 @@ void philAI::ProbableOutcomeOfBattle(
     if (defenderHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (defenderHero->m_artifacts[artifactIndex15] >= 0
-                && defenderHero->m_artifacts[artifactIndex15] < AI_BATTLE_BASE_ARTIFACT_LIMIT)
-                defenderArtifacts18 += gArtifactBaseRV[defenderHero->m_artifacts[artifactIndex15]];
+            if (defenderHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+                && IDX(defenderHero->m_artifacts[artifactIndex15])
+                       < AI_BATTLE_BASE_ARTIFACT_LIMIT)
+                defenderArtifacts18 +=
+                    gArtifactBaseRV[IDX(defenderHero->m_artifacts[artifactIndex15])];
         }
         if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO
             && static_cast<u8>(defenderHero->m_id) == gpGame->m_mapHeader.lossConditionValue)
@@ -2721,10 +2725,10 @@ void philAI::ValueOfBuyingHero(
     costValue6 = RVConversion(costs2);
     value27 = heroPtr->m_experience + AI_HERO_PURCHASE_EXPERIENCE_BASE;
     for (artifactIndex10 = 0; artifactIndex10 < AI_BATTLE_ARTIFACT_SLOT_COUNT; artifactIndex10++) {
-        if (heroPtr->m_artifacts[artifactIndex10] >= 0
-            && heroPtr->m_artifacts[artifactIndex10] < IDX(ARTIFACT_EDITOR_ANY_ULTIMATE)
-            && heroPtr->m_artifacts[artifactIndex10] != IDX(ARTIFACT_MAGIC_BOOK)) {
-            value27 += gArtifactBaseRV[heroPtr->m_artifacts[artifactIndex10]];
+        if (heroPtr->m_artifacts[artifactIndex10] != ARTIFACT_NONE
+            && heroPtr->m_artifacts[artifactIndex10] < ARTIFACT_EDITOR_ANY_ULTIMATE
+            && heroPtr->m_artifacts[artifactIndex10] != ARTIFACT_MAGIC_BOOK) {
+            value27 += gArtifactBaseRV[IDX(heroPtr->m_artifacts[artifactIndex10])];
         }
     }
     value27 += heroPtr->m_experience / 2;
@@ -4030,8 +4034,7 @@ void philAI::HeroInteractionAtHero(
             );
             if (evaluateOnly != 0) {
                 for (statIndex8 = 0; statIndex8 < AI_BATTLE_ARTIFACT_SLOT_COUNT; statIndex8++) {
-                    artifactType15 =
-                        static_cast<ArtifactType>(recipientHero36->m_artifacts[statIndex8]);
+                    artifactType15 = recipientHero36->m_artifacts[statIndex8];
                     if (artifactType15 != ARTIFACT_NONE && artifactType15 != ARTIFACT_MAGIC_BOOK)
                         interactionValue8 += gArtifactBaseRV[IDX(artifactType15)];
                 }
@@ -5871,7 +5874,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
         case AI_GENERIC_SITE_CURSED_ARTIFACTS:
             for (artifactIndex1 = 0; artifactIndex1 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
                  artifactIndex1++) {
-                if (IsCursedItem(ArtifactType(gpCurAIHero->m_artifacts[artifactIndex1])))
+                if (IsCursedItem(gpCurAIHero->m_artifacts[artifactIndex1]))
                     cursedArtifactCount2++;
             }
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] > AI_GENERIC_SITE_GOLD_THRESHOLD) {
