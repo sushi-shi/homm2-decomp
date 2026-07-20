@@ -105,8 +105,9 @@ H2_ENUM_CLASS_BEGIN(CombatCastleWallState)
 H2_ENUM_CLASS_END(CombatCastleWallState)
 
 H2_ENUM_CLASS_BEGIN(CombatCoordinateAxis)
-    COMBAT_COORDINATE_X = 0,
-    COMBAT_COORDINATE_Y = 1
+    COMBAT_COORDINATE_X     = 0,
+    COMBAT_COORDINATE_Y     = 1,
+    COMBAT_COORDINATE_COUNT = 2
 H2_ENUM_CLASS_END(CombatCoordinateAxis)
 
 H2_ENUM_BEGIN(CombatCatapultConstant)
