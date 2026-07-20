@@ -300,7 +300,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 actingMonsterType =
                     m_armies[m_currentArmySide][m_hexCells[m_selectedHex].m_occupantIndex]
                         .m_monsterType;
-                if (IDX(actingMonsterType) >= 0)
+                if (actingMonsterType >= CREATURE_PEASANT)
                     sprintf(
                         gText,
                         cCombatMessage[IDX(MESSAGE_TEXT_VIEW_INFO)],
@@ -1158,14 +1158,16 @@ void combatManager::DrawFrame(
                 i32 wallX7;
                 i32 wallFrame1;
                 i32 wallY;
-                i32 hexIndex6;
+                CombatCastleHex hexIndex6;
 
                 if (m_inCastleCombat != 0 && side5 == 0) {
-                    hexIndex6 = IDX(row) * COMBAT_GRID_ROW_LENGTH + column1;
+                    hexIndex6 = static_cast<CombatCastleHex>(
+                        IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                    );
                     wallFrame1 = 0;
                     wallX7 = 0;
                     wallY = 0;
-                    switch (static_cast<CombatCastleHex>(hexIndex6)) {
+                    switch (hexIndex6) {
                         case COMBAT_CASTLE_HEX_TOP_TOWER:
                             wallFrame1 =
                                 wallFrameOffsets1[IDX(
@@ -1244,7 +1246,7 @@ void combatManager::DrawFrame(
                             wallX7,
                             wallY,
                             wallFrame1,
-                            &m_hexCells[hexIndex6].m_limits[0],
+                            &m_hexCells[IDX(hexIndex6)].m_limits[0],
                             ICON_DRAW_NORMAL,
                             0,
                             NULL,
@@ -1254,10 +1256,14 @@ void combatManager::DrawFrame(
                 }
 
                 if (skipSpecialOccupants6 == 0
-                    || (IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
-                            != IDX(COMBAT_CASTLE_SPECIAL_HEX_FIRST)
-                        && IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
-                               != IDX(COMBAT_CASTLE_SPECIAL_HEX_SECOND))) {
+                    || (static_cast<CombatCastleHex>(
+                            IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                        )
+                            != COMBAT_CASTLE_SPECIAL_HEX_FIRST
+                        && static_cast<CombatCastleHex>(
+                               IDX(row) * COMBAT_GRID_ROW_LENGTH + column1
+                           )
+                               != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
                     m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(
                         static_cast<ArmyDrawState>(side5),
                         0
