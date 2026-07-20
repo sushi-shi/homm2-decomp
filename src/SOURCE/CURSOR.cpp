@@ -64,7 +64,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_cursorDirection = direction;
     m_cursorFrame = GetCursorBaseFrame(direction) + 1;
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-        > IDX(CONFIG_WALK_SPEED_SLOWEST))
+        > CONFIG_WALK_SPEED_SLOWEST)
         m_cursorCycle = 1;
     else
         m_cursorCycle = SLOW_CURSOR_CYCLE_START;
@@ -277,14 +277,14 @@ void advManager::DrawCursor(void) {
 
     if (m_cursorCycle
         && (&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-               != IDX(CONFIG_WALK_SPEED_INSTANT)) {
+               != CONFIG_WALK_SPEED_INSTANT) {
         ++m_cursorFrameCount;
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-                == IDX(CONFIG_WALK_SPEED_FAST)
+                == CONFIG_WALK_SPEED_FAST
             && (m_cursorFrameCount == SKIPPED_ANIMATION_FRAME || m_cursorFrameCount == 1))
             ++m_cursorFrameCount;
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-                == IDX(CONFIG_WALK_SPEED_SLOWEST)
+                == CONFIG_WALK_SPEED_SLOWEST
             && (EveryOther = 1 - EveryOther) != 0)
             --m_cursorFrameCount;
     }
@@ -296,7 +296,7 @@ void advManager::DrawCursor(void) {
             hOldWalkSample = hNewWalkSample;
         if (m_cursorFrameCount == FOOTSTEP_ANIMATION_FRAME
             || ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-                    == IDX(CONFIG_WALK_SPEED_INSTANT)
+                    == CONFIG_WALK_SPEED_INSTANT
                 && !bMoveSoundMade)) {
             bMoveSoundMade = 1;
             if (EveryOther == 0) {
@@ -469,12 +469,13 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         turnStep_c = -1;
     m_cursorTurning = 1;
     i32 frameIndex_i = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
-    i32 delay_f = giStepDelay[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
+    i32 delay_f =
+        giStepDelay[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-        == IDX(CONFIG_WALK_SPEED_SLOWEST))
+        == CONFIG_WALK_SPEED_SLOWEST)
         delay_f *= CURSOR_SLOW_TURN_MULTIPLIER;
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-        == IDX(CONFIG_WALK_SPEED_SLOW))
+        == CONFIG_WALK_SPEED_SLOW)
         delay_f = static_cast<i32>(delay_f * SLOW_TURN_DELAY_SCALE);
 
     do {
@@ -486,7 +487,7 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         m_cursorFrameCount = 0;
         glTimers[1] = delay_f + KBTickCount();
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-            != IDX(CONFIG_WALK_SPEED_INSTANT)) {
+            != CONFIG_WALK_SPEED_INSTANT) {
             if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
                 UpdateScreen(0, 0);
             if (bShowIt)
@@ -735,11 +736,12 @@ mapCell* advManager::MoveHero(
     m_forceCompleteDraw = 1;
 
     pixelsPerStep_o =
-        giPixelsPerStep[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
-    stepDelay_d = giStepDelay[(&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]];
+        giPixelsPerStep[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
+    stepDelay_d =
+        giStepDelay[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     StartCursor(direction);
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
-        == IDX(CONFIG_WALK_SPEED_INSTANT)) {
+        == CONFIG_WALK_SPEED_INSTANT) {
         if (EveryOther)
             --m_cursorFrame;
         bMoveSoundMade = 0;

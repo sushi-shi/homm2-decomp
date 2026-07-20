@@ -1284,7 +1284,8 @@ void advManager::Close(void) {
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gConfig.useOpera || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
+    if (!bEnteringTown || gConfig.useOpera != CONFIG_OPERA_DISABLED
+        || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         gpSoundManager->SwitchAmbientMusic(-1);
         gpSoundManager->StopAllSamples(1);
     } else {
@@ -1352,10 +1353,8 @@ void advManager::Close(void) {
 }
 
 VA(0x00457432, 0xe9)
-void advManager::GetCursorSampleSet(i32 sampleSet) {
-    if (sampleSet >= 1) {
-        sampleSet = CURSOR_SAMPLE_FAST_SET;
-    }
+void advManager::GetCursorSampleSet(H2_ENUM_PARAM(ConfigWalkSpeed, i32) walkSpeed) {
+    i32 sampleSet = walkSpeed > CONFIG_WALK_SPEED_SLOWEST ? CURSOR_SAMPLE_FAST_SET : 0;
     // Ordered filename suffixes select the retail walking-sound variants.
     // NOLINTBEGIN(readability-magic-numbers)
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
@@ -10058,7 +10057,7 @@ void advManager::SystemOptions(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 oldInterfaceMode = gConfig.evilInterfaceUsage;
-    i32 oldWalkSpeed = gConfig.walkSpeed;
+    ConfigWalkSpeed oldWalkSpeed = gConfig.walkSpeed;
     i32 heroWasMobilized = m_heroContextLocked;
     bPrefsChanged = 0;
     DemobilizeCurrHero();
@@ -10112,12 +10111,13 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED;
-    message.payload.widget.data.value = gConfig.walkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+    message.payload.widget.data.value =
+        IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
-    } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
+    } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
         musicQuality = MUSIC_QUALITY_CD_STEREO;
     } else {
         musicQuality = MUSIC_QUALITY_CD_OPERA;
@@ -10132,7 +10132,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED;
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.value =
-            gConfig.computerWalkSpeed + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+            IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     } else {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     }
@@ -10162,7 +10162,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_HERO_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = walkSpeedText[gConfig.walkSpeed];
+    message.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -10175,7 +10175,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer == 0) {
-        message.payload.widget.data.text = walkSpeedText[gConfig.computerWalkSpeed];
+        message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     } else {
         message.payload.widget.data.text = "Don't Show";
     }
@@ -10298,7 +10298,7 @@ i32 SystemOptionsHandler(struct tag_message& message) {
 
                         case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
                             ++gConfig.walkSpeed;
-                            gConfig.walkSpeed %= IDX(CONFIG_WALK_SPEED_COUNT);
+                            gConfig.walkSpeed %= CONFIG_WALK_SPEED_COUNT;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
@@ -10306,9 +10306,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                         case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
                             if (gConfig.blackoutComputer) {
                                 gConfig.blackoutComputer = 0;
-                                gConfig.computerWalkSpeed = IDX(CONFIG_WALK_SPEED_NORMAL);
+                                gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_NORMAL;
                             } else if (gConfig.computerWalkSpeed
-                                       < IDX(CONFIG_WALK_SPEED_INSTANT)) {
+                                       < CONFIG_WALK_SPEED_INSTANT) {
                                 ++gConfig.computerWalkSpeed;
                             } else {
                                 gConfig.blackoutComputer = 1;
@@ -10340,15 +10340,17 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                                     break;
                                 }
                                 gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_CD));
-                                gConfig.useOpera = IDX(CONFIG_OPERA_DISABLED);
-                            } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
-                                gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED);
+                                gConfig.useOpera = CONFIG_OPERA_DISABLED;
+                            } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
+                                gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
                                 if (gpSoundManager->m_midiStarted == 0) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED) - gConfig.useOpera;
+                                    gConfig.useOpera = gConfig.useOpera == CONFIG_OPERA_DISABLED
+                                                          ? CONFIG_OPERA_ENABLED
+                                                          : CONFIG_OPERA_DISABLED;
                                 } else {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }

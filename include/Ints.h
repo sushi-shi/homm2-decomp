@@ -266,6 +266,9 @@ constexpr i32 H2EnumIndex(Value value) {
         name old = a;                                                                              \
         ++a;                                                                                       \
         return old;                                                                                \
+    }                                                                                              \
+    inline name& operator%=(name& a, name modulus) {                                               \
+        return a = static_cast<name>(static_cast<i64>(a) % static_cast<i64>(modulus));             \
     }
 #else
 #define H2_ENUM_STEPPED(name)
