@@ -1039,8 +1039,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
         for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++) {
             if (targetIndex != -1 && index != targetIndex)
                 continue;
-            if (IDX(m_armies[sideWork][index].m_monsterType) >= 0
-                && m_armies[sideWork][index].m_quantity > 0) {
+            if (m_armies[sideWork][index].IsAlive()) {
                 combatTarget = &m_armies[sideWork][index];
                 if (cure == 1) {
                     curePointsTotal =
