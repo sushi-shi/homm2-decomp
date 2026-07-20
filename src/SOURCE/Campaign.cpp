@@ -607,10 +607,10 @@ void game::CampaignInfoUpdate(i32 redraw) {
 
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(gText, "%d %s", choice->amount, gResourceNames[choice->value]);
+                sprintf(gText, "%d %s", choice->amount, gResourceNames[IDX(choice->resource)]);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
-                switch (static_cast<ArtifactType>(choice->value)) {
+                switch (choice->artifact) {
                     case ARTIFACT_MAGE_RING:
                         strcpy(gText, "Mage's Ring");
                         break;
@@ -641,15 +641,15 @@ void game::CampaignInfoUpdate(i32 redraw) {
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
                     default:
-                        sprintf(gText, "%s", gArtifactNames[choice->value]);
+                        sprintf(gText, "%s", gArtifactNames[IDX(choice->artifact)]);
                         break;
                 }
                 break;
             case CAMPAIGN_CHOICE_SPELL:
-                if (choice->value == IDX(SPELL_SUMMON_EARTH_ELEMENTAL))
+                if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(gText, "Summon Earth");
                 else
-                    sprintf(gText, "%s", gSpellNames[choice->value]);
+                    sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
                 sprintf(
@@ -660,7 +660,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 );
                 break;
             case CAMPAIGN_CHOICE_CREATURES:
-                strcpy(armyName, gArmyNamesPlural[choice->value]);
+                strcpy(armyName, gArmyNamesPlural[IDX(choice->creature)]);
                 armyName[0] -= 'a' - 'A';
                 sprintf(gText, "%d %s", choice->amount, armyName);
                 break;
@@ -674,7 +674,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
                 sprintf(gText, "n/a");
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[choice->value]);
+                sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
                 break;
         }
         message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
@@ -892,7 +892,7 @@ void game::InitCampaignMap(void) {
             if (m_mapHeader.playerEnabled[1])
                 ++playerSlotSlot;
         }
-        m_setupPlayerRace[playerSlotSlot] = static_cast<i8>(choiceBest->value);
+        m_setupPlayerRace[playerSlotSlot] = static_cast<i8>(IDX(choiceBest->faction));
     }
 
     if (m_campaignScenario + 1 <= CAMPAIGN_EASY_SCENARIO_LIMIT)
@@ -945,13 +945,13 @@ void game::InitCampaignMap(void) {
 
     switch (choiceBest->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            m_players[0].m_resources[choiceBest->value] += choiceBest->amount;
+            m_players[0].m_resources[IDX(choiceBest->resource)] += choiceBest->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (m_players[0].m_heroCount > 0)
                 GiveArtifact(
                     gpGame->GetHero(m_players[0].m_heroIds[0]),
-                    ArtifactType(choiceBest->value),
+                    choiceBest->artifact,
                     0,
                     -1
                 );
@@ -964,7 +964,7 @@ void game::InitCampaignMap(void) {
                     && m_players[0].m_heroCount > 1)
                     bonusHeroIndexPosition = 1;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
-                    ->m_spells[choiceBest->value] = 1;
+                    ->m_spells[IDX(choiceBest->spell)] = 1;
             }
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
@@ -978,9 +978,7 @@ void game::InitCampaignMap(void) {
         case CAMPAIGN_CHOICE_CREATURES:
             if (m_players[0].m_heroCount > 0)
                 gpGame->GetHero(m_players[0].m_heroIds[0])
-                    ->m_army.Add(
-                        static_cast<CreatureType>(choiceBest->value), choiceBest->amount, -1
-                    );
+                    ->m_army.Add(choiceBest->creature, choiceBest->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
             m_players[0].m_cheatValue = static_cast<i8>(choiceBest->value);

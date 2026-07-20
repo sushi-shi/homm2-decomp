@@ -344,20 +344,21 @@ void ExpCampaign::InitMap(void) {
     hero* choiceHero;
     switch (campaignChoice->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            player->m_resources[campaignChoice->value] += campaignChoice->amount;
+            player->m_resources[IDX(campaignChoice->resource)] += campaignChoice->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (player->m_heroCount > 0)
                 GiveArtifact(
                     gpGame->GetHero(player->m_heroIds[0]),
-                    ArtifactType(campaignChoice->value),
+                    campaignChoice->artifact,
                     0,
                     -1
                 );
             break;
         case CAMPAIGN_CHOICE_SPELL:
             if (player->m_heroCount > 0)
-                gpGame->GetHero(player->m_heroIds[0])->m_spells[campaignChoice->value] = 1;
+                gpGame->GetHero(player->m_heroIds[0])
+                    ->m_spells[IDX(campaignChoice->spell)] = 1;
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
             if (player->m_heroCount > 0) {
@@ -386,7 +387,7 @@ void ExpCampaign::InitMap(void) {
         case CAMPAIGN_CHOICE_CREATURES:
             if (player->m_heroCount > 0)
                 gpGame->GetHero(player->m_heroIds[0])
-                    ->m_army.Add(campaignChoice->value, campaignChoice->amount, -1);
+                    ->m_army.Add(campaignChoice->creature, campaignChoice->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
             player->m_cheatValue = static_cast<i8>(campaignChoice->value);
@@ -424,7 +425,7 @@ void ExpCampaign::InitMap(void) {
                     gpGame->GetHero(player->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
                     0,
-                    static_cast<i8>(campaignChoice->value)
+                    static_cast<i8>(IDX(campaignChoice->spell))
                 );
             break;
     }
@@ -669,10 +670,10 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                  + map;
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(gText, "%d %s", choice->amount, gResourceNames[choice->value]);
+                sprintf(gText, "%d %s", choice->amount, gResourceNames[IDX(choice->resource)]);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
-                switch (static_cast<ArtifactType>(choice->value)) {
+                switch (choice->artifact) {
                     case ARTIFACT_MINOR_SCROLL:
                         strcpy(gText, "Minor Scroll");
                         break;
@@ -721,15 +722,15 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
                     default:
-                        sprintf(gText, "%s", gArtifactNames[choice->value]);
+                        sprintf(gText, "%s", gArtifactNames[IDX(choice->artifact)]);
                         break;
                 }
                 break;
             case CAMPAIGN_CHOICE_SPELL:
-                if (choice->value == IDX(SPELL_SUMMON_EARTH_ELEMENTAL))
+                if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
                     sprintf(gText, "Summon Earth");
                 else
-                    sprintf(gText, "%s", gSpellNames[choice->value]);
+                    sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
                 if ((choice->amount == EXPANSION_CAMPAIGN_SPECIAL_SKILL_LEVEL
@@ -752,7 +753,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 }
                 break;
             case CAMPAIGN_CHOICE_CREATURES:
-                strcpy(armyName8, gArmyNamesPlural[choice->value]);
+                strcpy(armyName8, gArmyNamesPlural[IDX(choice->creature)]);
                 armyName8[0] -= 'a' - 'A';
                 sprintf(gText, "%d %s", choice->amount, armyName8);
                 break;
@@ -766,23 +767,23 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 sprintf(gText, "n/a");
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[choice->value]);
+                sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
                 break;
             case CAMPAIGN_CHOICE_PRIMARY_SKILL:
                 sprintf(gText, "%s +%d", gStatNames[choice->value], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_SPELL_SCROLL: {
                 showScroll = 1;
-                switch (static_cast<SpellType>(choice->value)) {
+                switch (choice->spell) {
                     case SPELL_DISRUPTING_RAY:
                     case SPELL_ANIMATE_DEAD:
                         showScroll = 0;
                         break;
                 }
                 if (showScroll != 0) {
-                    sprintf(gText, "%s %s", gSpellNames[choice->value], "Scroll");
+                    sprintf(gText, "%s %s", gSpellNames[IDX(choice->spell)], "Scroll");
                 } else {
-                    sprintf(gText, "%s", gSpellNames[choice->value]);
+                    sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 }
                 break;
             }
