@@ -268,6 +268,8 @@ def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
     by_file = Counter(item["path"] for item in magic
                       if item["path"] in pending
                       and item["category"] in ("code", "local-table", "declaration"))
+    actionable = sum(by_file.values())
+    retained_evidence = magic_categories["data-payload"] + magic_categories["source-line"]
     reviewed = sum(row["status"] == "reviewed" for row in review)
     third_party = sum(row["status"] == "third-party" for row in review)
     lines = [
@@ -278,7 +280,9 @@ def _summary(lexical: list[Literal], magic: list[dict], null_zero: list[dict],
         "cannot parse its MSVC 4.2 naked inline assembly.",
         "",
         f"- Numeric tokens: {len(lexical)}",
-        f"- Semantic magic-number findings: {len(magic)}",
+        f"- Clang magic-number diagnostics: {len(magic)}",
+        f"- Pending actionable findings: {actionable}",
+        f"- Retained payload/source evidence findings: {retained_evidence}",
         f"- Remaining numeric null-pointer spellings: {len(null_zero)}",
         f"- Files resolved: {reviewed + third_party}/{len(review)}",
         f"- Reconstructed files reviewed: {reviewed}",
@@ -334,7 +338,12 @@ def run(*, jobs: int = 8, magic_log: Path | None = None,
     _write_tsv(OUTPUT / "null-zero.tsv",
                ["path", "line", "column", "literal", "category", "context"], null_zero)
     (OUTPUT / "README.md").write_text(_summary(lexical, magic, null_zero, review))
-    print(f"[constants] numeric={len(lexical)} magic={len(magic)} null-zero={len(null_zero)}")
+    pending = {row["path"] for row in review if row["status"] == "pending"}
+    actionable = sum(item["path"] in pending
+                     and item["category"] in ("code", "local-table", "declaration")
+                     for item in magic)
+    print(f"[constants] numeric={len(lexical)} magic={len(magic)} "
+          f"actionable={actionable} null-zero={len(null_zero)}")
     print("[constants] wrote build/constants/{README.md,literals.tsv,magic-numbers.tsv,null-zero.tsv}")
     return 1 if null_zero else 0
 
