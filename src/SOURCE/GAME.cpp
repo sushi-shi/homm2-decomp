@@ -54,6 +54,23 @@ H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f // persisted prefix, up to m_pad_0x4f
 H2_ENUM_END(ExpansionCampaignSaveConstant)
 
+H2_ENUM_BEGIN(GameSaveFormatConstant)
+    SAVE_PATH_CAPACITY                 = 452,
+    SAVE_LEGACY_SCRATCH_SIZE           = 100,
+    SAVE_LEGACY_CLEAR_SIZE             = 40,
+    SAVE_LEGACY_SERIALIZED_SIZE        = 36,
+    SAVE_STANDARD_FILENAME_SIZE        = 14,
+    SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
+    SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
+    SAVE_MARKER_SCRATCH_COUNT          = 3,
+    LOAD_DIMENSION_SCRATCH_COUNT       = 11,
+    LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 8,
+    LOAD_MARKER_SCRATCH_SIZE           = 8,
+    SAVE_TRUNCATED_SCALAR_SIZE         = sizeof(i8),
+    SAVE_EVENT_HEADER_SIZE             = sizeof(u16) * 2,
+    SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
+H2_ENUM_END(GameSaveFormatConstant)
+
 H2_ENUM_CLASS_BEGIN(GameMapTrigger)
     TRIGGER_TOWN_BASE                = 0x23,
     TRIGGER_MONSTER                  = 0x98,
@@ -191,14 +208,14 @@ H2_ENUM_END(GameCompressionTestConstant)
 
 DATA(0x004f70e0) b32 gbGameOver = false;
 // Fixed source-file and line anchors preserve allocation diagnostics.
-DATA(0x004f70e4) static i16 gSaveSourceLine = 0x294;
-DATA(0x004f71a8) static i16 gLoadSourceLine = 0x44f;
-DATA(0x004f7274) static i16 gMapSourceLine = 0xaf4;
-DATA(0x004f75c4) static i16 gTransmitSourceLine = 0x1a4e;
-DATA(0x004f77b8) static i16 gReceiveSourceLine = 0x1b2d;
-DATA(0x004f7a60) static i16 gDiffSourceLine = 0x1d66;
-DATA(0x004f7e90) static i16 gCompressTest2SourceLine = 0x1f72;
-DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95;
+DATA(0x004f70e4) static i16 gSaveSourceLine = 0x294; // NOLINT(readability-magic-numbers)
+DATA(0x004f71a8) static i16 gLoadSourceLine = 0x44f; // NOLINT(readability-magic-numbers)
+DATA(0x004f7274) static i16 gMapSourceLine = 0xaf4; // NOLINT(readability-magic-numbers)
+DATA(0x004f75c4) static i16 gTransmitSourceLine = 0x1a4e; // NOLINT(readability-magic-numbers)
+DATA(0x004f77b8) static i16 gReceiveSourceLine = 0x1b2d; // NOLINT(readability-magic-numbers)
+DATA(0x004f7a60) static i16 gDiffSourceLine = 0x1d66; // NOLINT(readability-magic-numbers)
+DATA(0x004f7e90) static i16 gCompressTest2SourceLine = 0x1f72; // NOLINT(readability-magic-numbers)
+DATA(0x004f7f84) static i16 gCompressTestSourceLine = 0x1f95; // NOLINT(readability-magic-numbers)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
 
@@ -677,14 +694,14 @@ void GenerateStandardFileName(char* source, char* destination) {
 
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
-    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, 670);
+    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, gSaveSourceLine + 10);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
         expansionFormat = 1;
     gpAdvManager->DemobilizeCurrHero();
 
-    char savePathValue[452];
-    char generatedNameStorage[452];
+    char savePathValue[SAVE_PATH_CAPACITY];
+    char generatedNameStorage[SAVE_PATH_CAPACITY];
     i32 humanPlayersVar;
     i32 indexFile;
     i32 unusedTemp;
@@ -712,12 +729,12 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(generatedNameStorage, filename);
     }
 
-    if (strnicmp(generatedNameStorage, "RMT", 3) == 0) {
+    if (strnicmp(generatedNameStorage, "RMT", sizeof("RMT") - 1) == 0) {
         sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
     } else {
         sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
-        if (strnicmp(generatedNameStorage, "AUTOSAVE", 8) != 0
-            && strnicmp(generatedNameStorage, "PLYREXIT", 8) != 0)
+        if (strnicmp(generatedNameStorage, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
+            && strnicmp(generatedNameStorage, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
@@ -727,62 +744,62 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
 
     i32 legacyMarkerTemp = -1;
     if (!expansionFormat)
-        write(fileInfo, &legacyMarkerTemp, 4);
-    write(fileInfo, &m_worldMap.width, 4);
-    write(fileInfo, &m_worldMap.height, 4);
+        write(fileInfo, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
+    write(fileInfo, &m_worldMap.width, sizeof(m_worldMap.width));
+    write(fileInfo, &m_worldMap.height, sizeof(m_worldMap.height));
     write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
     write(fileInfo, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    write(fileInfo, &gbIAmGreatest, 1);
-    write(fileInfo, this, 2);
-    write(fileInfo, &giMonthType, 1);
-    write(fileInfo, &giMonthTypeExtra, 1);
-    write(fileInfo, &giWeekType, 1);
-    write(fileInfo, &giWeekTypeExtra, 1);
-    write(fileInfo, cPlayerNames, 126);
+    write(fileInfo, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(fileInfo, this, sizeof(m_difficultyRating));
+    write(fileInfo, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(fileInfo, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(fileInfo, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(fileInfo, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(fileInfo, cPlayerNames, sizeof(cPlayerNames));
 
-    char legacyData[100];
-    memset(legacyData, 0, 40);
-    write(fileInfo, legacyData, 36);
+    char legacyData[SAVE_LEGACY_SCRATCH_SIZE];
+    memset(legacyData, 0, SAVE_LEGACY_CLEAR_SIZE);
+    write(fileInfo, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
     if (xIsPlayingExpansionCampaign) {
-        i32 campaignTypeInfo = 2;
-        write(fileInfo, &campaignTypeInfo, 4);
+        i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
+        write(fileInfo, &campaignTypeInfo, sizeof(campaignTypeInfo));
         write(fileInfo, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
-        write(fileInfo, &gbInCampaign, 4);
+        write(fileInfo, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
             write(fileInfo, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
-        write(fileInfo, &xIsExpansionMap, 1);
+        write(fileInfo, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    write(fileInfo, &giMapChangeCtr, 4);
+    write(fileInfo, &giMapChangeCtr, sizeof(giMapChangeCtr));
     GenerateStandardFileName(m_saveName, legacyData);
-    write(fileInfo, legacyData, 14);
-    write(fileInfo, &m_playerCount, 1);
-    char currentPlayerInfo[4];
+    write(fileInfo, legacyData, SAVE_STANDARD_FILENAME_SIZE);
+    write(fileInfo, &m_playerCount, sizeof(m_playerCount));
+    char currentPlayerInfo[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
     currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
-    write(fileInfo, currentPlayerInfo, 1);
-    write(fileInfo, &m_deadPlayerCount, 1);
-    write(fileInfo, m_playerDead, 6);
+    write(fileInfo, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
+    write(fileInfo, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    write(fileInfo, m_playerDead, sizeof(m_playerDead));
 
-    char humanFlagsLocal[8];
+    char humanFlagsLocal[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
         humanFlagsLocal[indexFile] = static_cast<char>(gbHumanPlayer[indexFile]);
         if (m_playerDead[indexFile] != 0)
             humanFlagsLocal[indexFile] = 0;
     }
-    write(fileInfo, humanFlagsLocal, 6);
-    write(fileInfo, &m_day, 2);
-    write(fileInfo, &m_week, 2);
-    write(fileInfo, &m_month, 2);
+    write(fileInfo, humanFlagsLocal, GAME_PLAYER_COUNT);
+    write(fileInfo, &m_day, sizeof(m_day));
+    write(fileInfo, &m_week, sizeof(m_week));
+    write(fileInfo, &m_month, sizeof(m_month));
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
         m_players[indexFile].Write(fileInfo);
 
-    write(fileInfo, &m_obeliskCount, 1);
+    write(fileInfo, &m_obeliskCount, sizeof(m_obeliskCount));
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
         m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
-    write(fileInfo, m_availableHeroes, GAME_HERO_COUNT);
+    write(fileInfo, m_availableHeroes, sizeof(m_availableHeroes));
     write(fileInfo, m_castleRecs, sizeof(m_castleRecs));
     write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
     write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
@@ -795,39 +812,44 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     write(fileInfo, m_boats, sizeof(m_boats));
     write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
     write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    write(fileInfo, &m_ultimateArtifactX, 1);
-    write(fileInfo, &m_ultimateArtifactY, 1);
-    write(fileInfo, &m_ultimateArtifactId, 1);
+    write(fileInfo, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    write(fileInfo, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    write(fileInfo, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
     write(fileInfo, m_rumour, sizeof(m_rumour));
     write(fileInfo, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    write(fileInfo, &m_rumourEventCount, 4);
-    write(fileInfo, m_rumourEventIndices, m_rumourEventCount * 2);
-    write(fileInfo, &m_timeEventCount, 4);
-    write(fileInfo, m_timeEventIndices, m_timeEventCount * 2);
-    write(fileInfo, &m_mapEventCount, 4);
-    write(fileInfo, m_mapEventIndices, m_mapEventCount * 2);
+    // Each legacy event header persists the count and the first index word.
+    write(fileInfo, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(
+        fileInfo,
+        m_rumourEventIndices,
+        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+    );
+    write(fileInfo, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(fileInfo, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    write(fileInfo, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(fileInfo, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
-    i32 markerBuffer[3];
+    i32 markerBuffer[SAVE_MARKER_SCRATCH_COUNT];
     markerBuffer[0] = GAME_FILE_MARKER;
     i32 unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
-    write(fileInfo, markerBuffer, 4);
-    write(fileInfo, &iMaxMapExtra, 4);
-    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
+    write(fileInfo, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
     for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
-        write(fileInfo, markerBuffer, 4);
-        write(fileInfo, pwSizeOfMapExtra + indexFile, 2);
+        write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
+        write(fileInfo, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
         if (ppMapExtra[indexFile] != NULL)
             write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
         else
             write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
     }
-    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
     write(fileInfo, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
     m_worldMap.Write(fileInfo);
-    write(fileInfo, markerBuffer, 4);
+    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
     close(fileInfo);
-    H2_FREE(emptyPayload, 897);
+    H2_FREE(emptyPayload, gSaveSourceLine + 0xed);
     return 1;
 }
 
@@ -981,8 +1003,8 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    char path28[452];
-    if (loadFromFile || strnicmp(filename, "RMT", 3) == 0)
+    char path28[SAVE_PATH_CAPACITY];
+    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(path28, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(path28, "%s%s", gcGamePath, filename);
@@ -994,52 +1016,52 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
 
     i8 expansionMarker0 = 0;
     i32 width8;
-    i32 height9[11];
-    read(file0, &width8, 4);
+    i32 height9[LOAD_DIMENSION_SCRATCH_COUNT];
+    read(file0, &width8, sizeof(width8));
     if (width8 == -1) {
         expansionMarker0 = 1;
-        read(file0, &width8, 4);
+        read(file0, &width8, sizeof(width8));
     }
-    read(file0, height9, 4);
+    read(file0, height9, sizeof(height9[0]));
     SetMapSize(width8, height9[0]);
     read(file0, &m_mapHeader, sizeof(m_mapHeader));
     read(file0, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    read(file0, &gbIAmGreatest, 1);
-    read(file0, this, 2);
-    read(file0, &giMonthType, 1);
-    read(file0, &giMonthTypeExtra, 1);
-    read(file0, &giWeekType, 1);
-    read(file0, &giWeekTypeExtra, 1);
-    read(file0, cPlayerNames, 126);
+    read(file0, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(file0, this, sizeof(m_difficultyRating));
+    read(file0, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(file0, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(file0, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(file0, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(file0, cPlayerNames, sizeof(cPlayerNames));
 
-    char oldData3[40];
-    read(file0, oldData3, 36);
-    read(file0, &gbInCampaign, 4);
+    char oldData3[SAVE_LEGACY_CLEAR_SIZE];
+    read(file0, oldData3, SAVE_LEGACY_SERIALIZED_SIZE);
+    read(file0, &gbInCampaign, sizeof(gbInCampaign));
     if (gbInCampaign == 1) {
         read(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
-    } else if (gbInCampaign == 2) {
+    } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
         read(file0, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expansionMarker0)
-        read(file0, &xIsExpansionMap, 1);
+        read(file0, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    read(file0, &giMapChangeCtr, 4);
-    read(file0, oldData3, 14);
-    if (strnicmp(filename, "RMT", 3) != 0)
+    read(file0, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    read(file0, oldData3, SAVE_STANDARD_FILENAME_SIZE);
+    if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
-    read(file0, &m_playerCount, 1);
+    read(file0, &m_playerCount, sizeof(m_playerCount));
 
-    char currentPlayer6[8];
-    read(file0, currentPlayer6, 1);
+    char currentPlayer6[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
+    read(file0, currentPlayer6, sizeof(currentPlayer6[0]));
     giCurPlayer = currentPlayer6[0];
-    read(file0, &m_deadPlayerCount, 1);
-    read(file0, m_playerDead, 6);
+    read(file0, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    read(file0, m_playerDead, sizeof(m_playerDead));
 
-    char humanFlags1[8];
-    read(file0, humanFlags1, 6);
+    char humanFlags1[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
+    read(file0, humanFlags1, GAME_PLAYER_COUNT);
     i32 i29;
     for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
         if (humanFlags1[i29] && humansLoaded3 < (&giNumHumanPlayers)[0]) {
@@ -1060,17 +1082,18 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
         }
     }
 
-    read(file0, &m_day, 2);
-    read(file0, &m_week, 2);
-    read(file0, &m_month, 2);
-    giCurTurn = (m_week - 1) * 7 + (m_month - 1) * 28 + m_day;
+    read(file0, &m_day, sizeof(m_day));
+    read(file0, &m_week, sizeof(m_week));
+    read(file0, &m_month, sizeof(m_month));
+    giCurTurn = (m_week - 1) * EVENT_DAYS_PER_WEEK
+                + (m_month - 1) * EVENT_DAYS_PER_MONTH + m_day;
     for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++)
         m_players[i29].Read(file0);
 
-    read(file0, &m_obeliskCount, 1);
+    read(file0, &m_obeliskCount, sizeof(m_obeliskCount));
     for (i29 = 0; i29 < GAME_HERO_COUNT; i29++)
         m_heroRecs[i29].Read(file0, expansionMarker0);
-    read(file0, m_availableHeroes, GAME_HERO_COUNT);
+    read(file0, m_availableHeroes, sizeof(m_availableHeroes));
     read(file0, m_castleRecs, sizeof(m_castleRecs));
     read(file0, m_castleOwners, sizeof(m_castleOwners));
     read(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
@@ -1083,37 +1106,45 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, m_boats, sizeof(m_boats));
     read(file0, m_boatSlots, sizeof(m_boatSlots));
     read(file0, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    read(file0, &m_ultimateArtifactX, 1);
-    read(file0, &m_ultimateArtifactY, 1);
-    read(file0, &m_ultimateArtifactId, 1);
+    read(file0, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    read(file0, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    read(file0, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
     read(file0, m_rumour, sizeof(m_rumour));
     read(file0, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    read(file0, &m_rumourEventCount, 4);
-    read(file0, m_rumourEventIndices, m_rumourEventCount * 2);
-    read(file0, &m_timeEventCount, 4);
-    read(file0, m_timeEventIndices, m_timeEventCount * 2);
-    read(file0, &m_mapEventCount, 4);
-    read(file0, m_mapEventIndices, m_mapEventCount * 2);
+    read(file0, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(
+        file0,
+        m_rumourEventIndices,
+        m_rumourEventCount * sizeof(m_rumourEventIndices[0])
+    );
+    read(file0, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(file0, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    read(file0, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(file0, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
-    char marker0[8];
-    read(file0, marker0, 4);
-    read(file0, &iMaxMapExtra, 4);
-    read(file0, marker0, 4);
-    ppMapExtra = reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * 4, 1306));
-    pwSizeOfMapExtra = reinterpret_cast<i16*>(H2_ALLOC(iMaxMapExtra * 2, 1307));
-    memset(ppMapExtra, 0, iMaxMapExtra * 4);
-    memset(pwSizeOfMapExtra, 0, iMaxMapExtra * 2);
+    char marker0[LOAD_MARKER_SCRATCH_SIZE];
+    read(file0, marker0, sizeof(i32));
+    read(file0, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    read(file0, marker0, sizeof(i32));
+    ppMapExtra = reinterpret_cast<void**>(
+        H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra), gLoadSourceLine + 0xcb)
+    );
+    pwSizeOfMapExtra = reinterpret_cast<i16*>(
+        H2_ALLOC(iMaxMapExtra * sizeof(*pwSizeOfMapExtra), gLoadSourceLine + 0xcc)
+    );
+    memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
+    memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
-        read(file0, marker0, 4);
-        read(file0, pwSizeOfMapExtra + i29, 2);
-        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], 1316);
+        read(file0, marker0, sizeof(i32));
+        read(file0, pwSizeOfMapExtra + i29, sizeof(pwSizeOfMapExtra[i29]));
+        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], gLoadSourceLine + 0xd5);
         read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
     }
-    read(file0, marker0, 4);
+    read(file0, marker0, sizeof(i32));
     read(file0, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    read(file0, marker0, 4);
+    read(file0, marker0, sizeof(i32));
     m_worldMap.Read(file0, 0);
-    read(file0, marker0, 4);
+    read(file0, marker0, sizeof(i32));
     close(file0);
 
     gpAdvManager->m_heroContextLocked = 0;
