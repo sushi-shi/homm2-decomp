@@ -44,10 +44,10 @@ H2_ENUM_BEGIN(SoundConstant)
     NO_SAMPLE_CHANNEL_TYPE       = SOUND_CHANNEL_TYPE_COUNT
 H2_ENUM_END(SoundConstant)
 
-H2_ENUM_CLASS_BEGIN(SoundSampleStatus)
+H2_ENUM_BEGIN(SoundSampleStatus)
     SAMPLE_STATUS_DONE    = 2,
     SAMPLE_STATUS_PLAYING = 4
-H2_ENUM_CLASS_END(SoundSampleStatus)
+H2_ENUM_END(SoundSampleStatus)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp"
 
@@ -604,7 +604,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     LogStr("SAS 1");
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
         sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
-        if (sampleStatus == IDX(SAMPLE_STATUS_PLAYING))
+        if (sampleStatus == SAMPLE_STATUS_PLAYING)
             AIL_end_sample(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
@@ -704,7 +704,7 @@ i32l soundManager::DigitalReport(struct _SAMPLE* sample, SoundDigitalReportQuery
             return AIL_sample_volume(sample);
         case SOUND_DIGITAL_REPORT_PLAYING:
             sampleStatus = AIL_sample_status(sample);
-            return sampleStatus == IDX(SAMPLE_STATUS_PLAYING);
+            return sampleStatus == SAMPLE_STATUS_PLAYING;
     }
     return 0;
 }
@@ -946,7 +946,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     // The one-past channel type reads the zeroed record-shaped prefix of adjacent storage.
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (AIL_sample_status(m_sampleHandles[ch]) == IDX(SAMPLE_STATUS_DONE))
+        if (AIL_sample_status(m_sampleHandles[ch]) == SAMPLE_STATUS_DONE)
             break;
     }
     if (scs->endChannel == ch) {
