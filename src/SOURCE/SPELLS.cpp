@@ -920,7 +920,7 @@ void combatManager::CastSpell(
                 DoBlast(targetHex, spell);
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_COLD_RAY)].combatEffect, 0, 0);
                 target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(-1, 1, -1, -1);
+                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
                 break;
             case SPELL_CHAIN_LIGHTNING:
                 ChainLightning(targetHex, spellPower_i);
@@ -971,7 +971,7 @@ void combatManager::CastSpell(
                 );
                 gpResourceManager->Dispose(missileIcon_p);
                 target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(-1, 1, -1, -1);
+                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
                 break;
             case SPELL_LIGHTNING_BOLT:
                 damage_m = spellPower_i * SPELL_LIGHTNING_DAMAGE_PER_POWER;
@@ -1017,7 +1017,7 @@ void combatManager::CastSpell(
                 );
                 target_i->SpellEffect(gsSpellInfo[IDX(SPELL_LIGHTNING_BOLT)].combatEffect, 0, 0);
                 target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(-1, 1, -1, -1);
+                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
                 break;
             case SPELL_MASS_CURE:
             case SPELL_MASS_HASTE:
@@ -1419,7 +1419,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
         else
             sprintf(gText, "The fireball does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target_n->PowEffect(-1, 1, -1, -1);
+        target_n->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
 }
 
@@ -1496,7 +1496,7 @@ void combatManager::MeteorShower(i32 targetHex) {
     if (anyAffected_h) {
         sprintf(gText, "The meteor shower does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target_k->PowEffect(-1, 1, -1, -1);
+        target_k->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
 }
 
@@ -1571,7 +1571,7 @@ void combatManager::ElementalStorm(void) {
     if (anyAffected_f) {
         sprintf(gText, "The elemental storm does %d damage.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
-        target_m->PowEffect(-1, 1, -1, -1);
+        target_m->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
 }
 
@@ -1746,7 +1746,7 @@ void combatManager::Armageddon(void) {
 
     m_backgroundDrawn = 0;
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-    target18->PowEffect(-1, 1, -1, -1);
+    target18->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
 
     i8* effectDataRestore7 = effectPalette4->Data();
     i8* originalData18 = originalPalette5->Data();
@@ -2697,16 +2697,16 @@ void combatManager::RippleCreature(i32 side, i32 armyIndex, CombatRippleMode mod
 VA(0x004273df, 0x6b2)
 void combatManager::ShowMassSpell(
     i8 (*const affected)[COMBAT_ARMY_SLOT_COUNT],
-    i32 effect,
+    H2_ENUM_PARAM(CombatEffectType, i32) effect,
     i32 animateCreatures
 ) {
-    u32l effectFile = MAKEFILEID(gCombatFxNames[effect]);
-    i32 effectFrames = giNumPowFrames[effect] - 1;
+    u32l effectFile = MAKEFILEID(gCombatFxNames[IDX(effect)]);
+    i32 effectFrames = giNumPowFrames[IDX(effect)] - 1;
     i32 returnFrames = 0;
-    if (gCurLoadedSpellEffect != SpellType(effect)) {
+    if (gCurLoadedSpellEffect != effect) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
         gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFile);
-        gCurLoadedSpellEffect = SpellType(effect);
+        gCurLoadedSpellEffect = effect;
     }
 
     i32 side;
@@ -2768,7 +2768,7 @@ void combatManager::ShowMassSpell(
                         target->m_animationFrame = 0;
                     }
                 }
-                if (frame + 1 < giNumPowFrames[effect])
+                if (frame + 1 < giNumPowFrames[IDX(effect)])
                     gCurSpellEffectFrame = frame;
             }
         }
@@ -2826,7 +2826,7 @@ void combatManager::ShowMassSpell(
 VA(0x00427a91, 0x8f8)
 void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = NULL;
-    u32 effect = gsSpellInfo[IDX(spell)].combatEffect;
+    CombatEffectType effect = gsSpellInfo[IDX(spell)].combatEffect;
     i32 animateCreatures_k = 0;
     gpWindowManager->m_updateFlags = 0;
     ShowSpellMessage(0, spell, NULL);
@@ -3066,7 +3066,7 @@ void combatManager::MirrorImage(i32 targetHex) {
 mirror_found:
     AddArmy(
         m_currentSide,
-        IDX(source->m_monsterType),
+        source->m_monsterType,
         source->m_quantity,
         mirrorHex,
         MIRROR_ARMY_FLAG,

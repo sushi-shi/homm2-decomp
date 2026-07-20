@@ -9956,7 +9956,7 @@ DATA(0x00528928) i32 gIndex;
 DATA(0x0052892c) i32 giWeekTypeExtra;
 DATA(0x00528930) philAI* gpPhilAI;
 DATA(0x00528934) i32 giTCPType;
-DATA(0x00528938) SpellType gCurLoadedSpellEffect;
+DATA(0x00528938) CombatEffectType gCurLoadedSpellEffect;
 DATA(0x0052893c) class mouseManager* gpMouseManager;
 DATA(0x00528940) i32 giCurTempMobility;
 DATA(0x00528944) OverviewReturnAction giOverviewReturnAction;

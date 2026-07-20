@@ -2997,7 +2997,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
 VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(
     i32 side,
-    i32 monsterType,
+    H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 quantity,
     i32 hex,
     i32 flags,
@@ -3030,8 +3030,7 @@ void combatManager::AddArmy(
             return;
 
         newArmy = &m_armies[side][armyIndex_r];
-        newArmy
-            ->Init(CreatureType(monsterType), quantity, side, armyIndex_r, hex, INVALID_HEX);
+        newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
         newArmy->LoadResources();
         newArmy->m_monster.flags.all |= MonsterFlags(flags);
         if (reusedArmy_m == 0)

@@ -760,7 +760,11 @@ public:
     void ChainLightning(i32, i32);
     void VaporizeCreature(i32, i32);
     void RippleCreature(i32, i32, CombatRippleMode);
-    void ShowMassSpell(i8 (*const)[COMBAT_ARMY_SLOT_COUNT], i32, i32);
+    void ShowMassSpell(
+        i8 (*const)[COMBAT_ARMY_SLOT_COUNT],
+        H2_ENUM_PARAM(CombatEffectType, i32),
+        i32
+    );
     void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
     void SummonElemental(H2_ENUM_PARAM(CreatureType, i32), i32);
@@ -807,7 +811,7 @@ public:
     void CycleCombatScreen(void);
     void SetCombatViewArmySmallLevel(i32);
     void SetCombatGrid(i32, i32, i32);
-    void AddArmy(i32, i32, i32, i32, i32, i32);
+    void AddArmy(i32, H2_ENUM_PARAM(CreatureType, i32), i32, i32, i32, i32);
     void SetupSmallView(void);
     void ViewBallista(i32);
     i32 DoSpellAI(i32, i32);

@@ -169,8 +169,6 @@ H2_ENUM_BEGIN(CombatMoraleConstant)
     BAD_MORALE_ROLL_MAX          = 12,
     BAD_MORALE_NETWORK_ROLL_MAX  = 4,
     BAD_MORALE_NETWORK_SKIP_ROLL = 1,
-    GOOD_MORALE_EFFECT           = 11,
-    BAD_MORALE_EFFECT            = 12,
     MORALE_EFFECT_DURATION       = 180
 H2_ENUM_END(CombatMoraleConstant)
 
@@ -504,7 +502,7 @@ i32 combatManager::Open(i32 openFlags) {
     CycleColors(1);
     CycleColors(1);
     gCurLoadedSpellIcon = NULL;
-    gCurLoadedSpellEffect = SPELL_NONE;
+    gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
     gpMouseManager->m_forcePointerUpdate = 0;
     gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
@@ -970,7 +968,7 @@ void combatManager::FreeArmies(void) {
     if (gCurLoadedSpellIcon)
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
     gCurLoadedSpellIcon = NULL;
-    gCurLoadedSpellEffect = SPELL_NONE;
+    gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
 }
 
 VA(0x0049272d, 0x1e2)
@@ -1068,7 +1066,7 @@ void combatManager::CheckApplyGoodMorale(i32 side, i32 index) {
         CombatMessage(gText, 1, 1, 0);
     }
 
-    activeArmy->SpellEffect(GOOD_MORALE_EFFECT, MORALE_EFFECT_DURATION, 0);
+    activeArmy->SpellEffect(COMBAT_EFFECT_GOOD_MORALE, MORALE_EFFECT_DURATION, 0);
     if HAS (activeArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_BAD_MORALE)
         activeArmy->m_monster.flags.abilityFlags -= MONSTER_ABILITY_FLAG_BAD_MORALE;
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
@@ -1112,7 +1110,7 @@ i32 combatManager::CheckApplyBadMorale(i32 side, i32 index) {
         CombatMessage(gText, 1, 1, 0);
     }
 
-    activeArmy->SpellEffect(BAD_MORALE_EFFECT, MORALE_EFFECT_DURATION, 1);
+    activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
         WaitEndSample(moraleSample, -1);
@@ -1736,7 +1734,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target0->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
-    target0->PowEffect(-1, 1, -1, -1);
+    target0->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     WaitEndSample(keepSample19, -1);
     LogStr("KA2");
 }

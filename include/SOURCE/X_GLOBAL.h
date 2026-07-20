@@ -176,7 +176,7 @@ H2_ENUM_BEGIN(KbGameTableConstant)
     KB_INTERFACE_TYPE_COUNT             = 37,
     KB_INTERFACE_VARIANT_COUNT          = 2,
     KB_COMBAT_SPEED_COUNT               = 3,
-    KB_COMBAT_FX_COUNT                  = 32,
+    KB_COMBAT_FX_COUNT                  = IDX(COMBAT_EFFECT_COUNT),
     KB_TOWN_COMMAND_COUNT               = 28,
     KB_HERO_DEFAULT_NAME_COUNT          = 54,
     KB_ARMY_EFFECT_COUNT                = 20,
@@ -566,7 +566,8 @@ extern i32 giResType2;
 extern i32 gIndex;
 extern i32 giWeekTypeExtra;
 extern i32 giTCPType;
-extern SpellType gCurLoadedSpellEffect;
+// Retail name retained; the payload indexes gCombatFxNames, not the spell table.
+extern CombatEffectType gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
 extern OverviewReturnAction giOverviewReturnAction;
 extern char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];

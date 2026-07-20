@@ -130,11 +130,11 @@ public:
     void CheckLuck(void);
     void DamageEnemy(class army*, i32*, i32*, i32, i32);
     i32 Damage(i32l, SpellType);
-    void PowEffect(i32, i32, i32, i32);
+    void PowEffect(H2_ENUM_PARAM(CombatEffectType, i32), i32, i32, i32);
     u32l Strength(void);
     i32 LeaveNoBody(void);
     void ProcessDeath(i32);
-    void SpellEffect(i32, i32, i32);
+    void SpellEffect(H2_ENUM_PARAM(CombatEffectType, i32), i32, i32);
     void CancelSpellType(ArmySpellCancelType);
     void CancelIndividualSpell(ArmySpellInfluence);
     i32 SetSpellInfluence(ArmySpellInfluence, i32);
