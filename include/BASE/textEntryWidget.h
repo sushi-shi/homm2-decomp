@@ -51,7 +51,7 @@ public:
         i16 maxLength,
         char* text,
         char* fontName,
-        i16 color,
+        H2_ENUM_PARAM(FontDrawMode, i16) color,
         char* iconName,
         i16 iconFrame,
         i16 id,

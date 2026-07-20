@@ -67,7 +67,7 @@ textEntryWidget::textEntryWidget(
     i16 maxLength,
     char* text,
     char* fontName,
-    i16 color,
+    H2_ENUM_PARAM(FontDrawMode, i16) color,
     char* iconName,
     i16 iconFrame,
     i16 id,
@@ -76,7 +76,7 @@ textEntryWidget::textEntryWidget(
     i32 horizontalInset,
     i32 verticalInset
 )
-    : textWidget(x, y, width, height, text, fontName, color, id, kind, 1) {
+    : textWidget(x, y, width, height, text, fontName, color, id, kind, FONT_ALIGN_CENTER) {
     m_cursorPosition = 0;
     m_maxLength = maxLength;
     icon* loadedIcon = gpResourceManager->GetIcon(iconName);
@@ -91,7 +91,7 @@ textEntryWidget::textEntryWidget(
     m_maxLength = maxLength;
     m_maxLines = 1;
     m_preserveTextOnFocus = 0;
-    m_color = static_cast<i16>(FONT_DRAW_DEFAULT);
+    m_color = FONT_DRAW_DEFAULT;
     m_rectH = m_height;
 #line 61 RETAIL_FILE
     m_text = static_cast<char*>(
@@ -129,8 +129,8 @@ void textEntryWidget::Read(i32 type) {
     gpResourceManager->SavePosition();
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
-    m_color = gpResourceManager->ReadWord() & COLOR_MASK;
-    m_alignment = static_cast<char>(gpResourceManager->ReadWord());
+    m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & COLOR_MASK);
+    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
@@ -414,14 +414,14 @@ void textEntryWidget::Draw(void) {
             m_innerY + m_owner->m_posY,
             m_innerW,
             m_innerH,
-            FontDrawModeFromStorage(m_color),
-            FontAlignmentFromStorage(m_alignment)
+            m_color,
+            m_alignment
         );
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, 0);
-        FontDrawMode color = FONT_DRAW_DARK_GRAY;
+        FontDrawMode color = FONT_DRAW_DIMMED;
         if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
-            color = FontDrawModeFromStorage(m_color);
+            color = m_color;
         m_font->DrawBoundedString(
             m_text,
             m_innerX + m_owner->m_posX,
@@ -429,7 +429,7 @@ void textEntryWidget::Draw(void) {
             m_innerW,
             m_innerH,
             color,
-            FontAlignmentFromStorage(m_alignment)
+            m_alignment
         );
     }
 }

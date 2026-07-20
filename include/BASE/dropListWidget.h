@@ -2,6 +2,7 @@
 #define HOMM2_BASE_DROPLISTWIDGET_H
 
 #include <va.h>
+#include <BASE/font.h>
 #include "widget.h"
 
 struct tag_message;
@@ -22,10 +23,10 @@ public:
     i16 m_contentHeight;
     i16 m_maxVisibleItems;
     i16 m_visibleItemCount;
-    i16 m_normalColor;
-    i16 m_selColor;
-    i16 m_unusedColor;
-    i16 m_alignment;
+    H2_ENUM_STORAGE(FontDrawMode, i16) m_normalColor;
+    H2_ENUM_STORAGE(FontDrawMode, i16) m_selColor;
+    H2_ENUM_STORAGE(FontDrawMode, i16) m_unusedColor;
+    H2_ENUM_STORAGE(FontAlignment, i16) m_alignment;
     i16 m_itemCount;
     i16 m_selectedIndex;
     char** m_items;

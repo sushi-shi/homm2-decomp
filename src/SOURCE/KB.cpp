@@ -5109,10 +5109,10 @@ void NormalDialog(
                 (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
                 resourceText_e[resourceSlot_n],
                 "smalfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 textWidgetId_h++,
                 NORMAL_DIALOG_WIDGET_FLAGS,
-                1
+                FONT_ALIGN_CENTER
             );
             if (!textPanel_h)
                 MemError();
@@ -5140,10 +5140,10 @@ void NormalDialog(
             (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) * 12 + 12,
             resourceText_e[resourceSlot_n],
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             textWidgetId_h++,
             NORMAL_DIALOG_WIDGET_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (!textPanel_h)
             MemError();
@@ -5159,10 +5159,10 @@ void NormalDialog(
                 16,
                 bonusText,
                 "bigfont.fnt",
-                1,
+                FONT_DRAW_DEFAULT,
                 textWidgetId_h++,
                 NORMAL_DIALOG_WIDGET_FLAGS,
-                1
+                FONT_ALIGN_CENTER
             );
             if (!textPanel_h)
                 MemError();
@@ -5198,10 +5198,10 @@ void NormalDialog(
             12,
             orText_f,
             "smalfont.fnt",
-            1,
+            FONT_DRAW_DEFAULT,
             textWidgetId_h++,
             NORMAL_DIALOG_WIDGET_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (!textPanel_h)
             MemError();

@@ -40,7 +40,6 @@ H2_ENUM_BEGIN(ArenaConstant)
     WIDGET_LAST_ID          = 102,
     SELECTED_FRAME_OFFSET   = 4,
     ICON_FILL_COLOR         = 0x10,
-    TEXT_COLOR              = 1,
     TEXT_BACKGROUND         = -1,
     TEXT_FLAGS              = 0x200,
     CYCLE_KEY               = 15,
@@ -113,10 +112,10 @@ i32 DoArenaDialog(void) {
             TEXT_HEIGHT,
             gStatNames[widgetIndex_12],
             "smalfont.fnt",
-            TEXT_COLOR,
+            FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
             TEXT_FLAGS,
-            1
+            FONT_ALIGN_CENTER
         );
         if (statWidgets[widgetIndex_12] == NULL)
             MemError();

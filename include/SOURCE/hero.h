@@ -140,7 +140,7 @@ public:
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
     char m_name[HERO_NAME_SIZE];
-    H2_ENUM_STORAGE(FactionType, u8) m_cursorType;
+    H2_ENUM_STORAGE(HeroCursorType, u8) m_cursorType;
     u8 m_portrait;
     i32 m_x;
     i32 m_y;

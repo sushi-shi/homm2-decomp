@@ -117,7 +117,6 @@ H2_ENUM_BEGIN(AIEventConstant)
     EVENT_RANDOM_EVENT_SUCCESS           = 40,
     EVENT_RANDOM_PERCENT_MAX             = 100,
     EVENT_HERO_TOWN_LOCATION             = 0xa3,
-    EVENT_BOAT_CURSOR                    = 6,
     EVENT_BOAT_RESTORE_MODE              = 3,
     EVENT_SITE_TYPE_MASK                 = 0x3f,
     EVENT_SITE_LEVEL_SHIFT               = 6,
@@ -1030,7 +1029,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero2->m_remainingMobility = 0;
                 eventHero2->m_direction = static_cast<u8>(m_cursorDirection);
-                m_cursorType = IDX(eventHero2->m_cursorType);
+                m_cursorType = eventHero2->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
                 playedSample3 = LoadPlaySample("killfade.82m");
@@ -1062,7 +1061,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventHero2->m_remainingMobility = 0;
             boat_j->heroId = eventHero2->m_id;
             boat_j->owner = eventHero2->m_owner;
-            m_cursorType = BOAT_CURSOR_TYPE;
+            m_cursorType = HERO_TYPE_BOAT;
             m_cursorDirection = boat_j->direction;
             m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
             m_cursorActive = 1;
@@ -5610,7 +5609,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = static_cast<u8>(m_cursorDirection);
-                m_cursorType = IDX(eventHero->m_cursorType);
+                m_cursorType = eventHero->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
                 CheckAdjacentMon(&adjacentMonster_j);
@@ -5631,7 +5630,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             eventHero->m_remainingMobility = 0;
             boat_k->heroId = eventHero->m_id;
             boat_k->owner = eventHero->m_owner;
-            m_cursorType = EVENT_BOAT_CURSOR;
+            m_cursorType = HERO_TYPE_BOAT;
             m_cursorDirection = boat_k->direction;
             m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
             m_cursorActive = 1;

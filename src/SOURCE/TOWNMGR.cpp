@@ -2095,10 +2095,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
         static_cast<i16>(lineCount_j << 4),
         description_b,
         "bigfont.fnt",
-        1,
+        FONT_DRAW_DEFAULT,
         -1,
         8,
-        1
+        FONT_ALIGN_CENTER
     );
     if (descriptionWidget_g == NULL)
         MemError();
@@ -2143,10 +2143,10 @@ i32 townManager::BuyBuild(i32 building, i32 cannotBuy, i32 quickView) {
                     12,
                     amountText_n[widgetIndex_f],
                     "smalfont.fnt",
-                    1,
+                    FONT_DRAW_DEFAULT,
                     -1,
                     8,
-                    1
+                    FONT_ALIGN_CENTER
                 );
                 if (amountWidgets_b[widgetIndex_f] == NULL)
                     MemError();
@@ -3109,10 +3109,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         48,
                         widgetText_control,
                         "smalfont.fnt",
-                        1,
+                        FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
-                        0
+                        FONT_ALIGN_LEFT
                     );
                     window->AddWidget(textControl_icon, -1);
 
@@ -3138,10 +3138,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         48,
                         widgetText_control,
                         "smalfont.fnt",
-                        1,
+                        FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
-                        0
+                        FONT_ALIGN_LEFT
                     );
                     window->AddWidget(textControl_icon, -1);
                 }
@@ -3160,10 +3160,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         16,
                         widgetText_control,
                         "smalfont.fnt",
-                        1,
+                        FONT_DRAW_DEFAULT,
                         -1,
                         8,
-                        1
+                        FONT_ALIGN_CENTER
                     );
                     window->AddWidget(textControl_icon, -1);
 

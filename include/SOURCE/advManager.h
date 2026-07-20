@@ -109,7 +109,7 @@ public:
     class icon* m_boatFlagIcons[ADVMGR_PLAYER_FLAG_ICON_COUNT];
     i32 m_cursorActive;
     i32 m_drawHeroShadows;
-    i32 m_cursorType;
+    H2_ENUM_STORAGE(HeroCursorType, i32) m_cursorType;
     i32 m_cursorDirection;
     i32 m_cursorFrame;
     i32 m_cursorFrameCount;
