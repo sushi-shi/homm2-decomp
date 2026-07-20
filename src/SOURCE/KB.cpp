@@ -70,22 +70,12 @@ H2_ENUM_END(CampaignChoiceAmount)
 
 H2_ENUM_BEGIN(CheckEndGameConstants)
     END_GAME_NO_PLAYER               = -1,
-    END_GAME_EMPTY_ARMY              = -1,
-    END_GAME_PLAYER_COUNT            = 6,
-    END_GAME_HERO_COUNT              = 54,
-    END_GAME_ARMY_SLOTS              = 5,
-    END_GAME_GOLD_RESOURCE           = 6,
     END_GAME_GRACE_DAYS              = 7,
-    END_GAME_DAYS_PER_WEEK           = 7,
-    END_GAME_DAYS_PER_MONTH          = 28,
     END_GAME_TEXT_BUFFER_SIZE        = 100,
     END_GAME_GOLD_SCALE              = 1000,
     END_GAME_ULTIMATE_ARTIFACT       = 0,
-    END_GAME_LAST_ULTIMATE_PART      = 7,
-    END_GAME_SIDE_SPECIAL_VALUE      = 99,
     END_GAME_PLAYER_DIALOG_ICON      = 9,
     END_GAME_REMOTE_DIALOG_TIME      = 5000,
-    END_GAME_ROLAND_HERO             = 54,
     END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20
 H2_ENUM_END(CheckEndGameConstants)
 
@@ -95,9 +85,7 @@ H2_ENUM_CLASS_BEGIN(CheckEndGameCampaignConstants)
     END_GAME_SIDE_SCENARIO           = 7,
     END_GAME_ROLAND_CAPTURE_SCENARIO = 9,
     END_GAME_FIRST_NO_SAVE_SCENARIO  = 10,
-    END_GAME_LAST_SCENARIO           = 11,
-    END_GAME_ROLAND_COLOR            = 0,
-    END_GAME_ALLY_COLOR              = 3
+    END_GAME_LAST_SCENARIO           = 11
 H2_ENUM_CLASS_END(CheckEndGameCampaignConstants)
 
 H2_ENUM_CLASS_BEGIN(MoraleInfoTextIndex)
@@ -2067,8 +2055,8 @@ void CheckEndGame(
     playerData* rec;
     i32 savedRemoteOn;
     i32 numAlive;
-    char unusedTextA_c[IDX(END_GAME_TEXT_BUFFER_SIZE)];
-    char unusedTextB_c[IDX(END_GAME_TEXT_BUFFER_SIZE)];
+    char unusedTextA_c[END_GAME_TEXT_BUFFER_SIZE];
+    char unusedTextB_c[END_GAME_TEXT_BUFFER_SIZE];
     i32 sideBelow_i;
     i32 sideAbove;
     i32 bestGold;
@@ -2078,7 +2066,7 @@ void CheckEndGame(
     i32 enemyRemaining;
     i32 hasRoland_j;
     i32 hasDwarfTown;
-    char artifactName[IDX(END_GAME_TEXT_BUFFER_SIZE)];
+    char artifactName[END_GAME_TEXT_BUFFER_SIZE];
     hero* artifactHeroPtr;
     i32 artifactWinnerPerson;
     hero* lossHero;
@@ -2118,12 +2106,12 @@ void CheckEndGame(
                         1,
                         -1,
                         -1,
-                        IDX(END_GAME_PLAYER_DIALOG_ICON),
+                        END_GAME_PLAYER_DIALOG_ICON,
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         -1,
                         -1,
-                        IDX(END_GAME_REMOTE_DIALOG_TIME)
+                        END_GAME_REMOTE_DIALOG_TIME
                     );
                 }
             } else if (rec->m_townCount == 0) {
@@ -2140,7 +2128,7 @@ void CheckEndGame(
                             1,
                             -1,
                             -1,
-                            IDX(END_GAME_PLAYER_DIALOG_ICON),
+                            END_GAME_PLAYER_DIALOG_ICON,
                             gpGame->GetPlayerColor(static_cast<i8>(player)),
                             -1,
                             0,
@@ -2148,7 +2136,7 @@ void CheckEndGame(
                             0
                         );
                     }
-                    rec->m_daysLeft = IDX(END_GAME_GRACE_DAYS);
+                    rec->m_daysLeft = END_GAME_GRACE_DAYS;
                 } else if (rec->m_daysLeft == 0) {
                     PlayerDead(player);
                     if (gbThisNetHumanPlayer[player] && giCurPlayer == player) {
@@ -2174,7 +2162,7 @@ void CheckEndGame(
                         1,
                         -1,
                         -1,
-                        IDX(END_GAME_PLAYER_DIALOG_ICON),
+                        END_GAME_PLAYER_DIALOG_ICON,
                         gpGame->GetPlayerColor(static_cast<i8>(player)),
                         -1,
                         0,
@@ -2219,7 +2207,7 @@ void CheckEndGame(
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
-        && gpGame->m_mapHeader.victoryConditionValue != IDX(END_GAME_SIDE_SPECIAL_VALUE)
+        && gpGame->m_mapHeader.victoryConditionValue != CAMPAIGN_SWITCH_VICTORY_VALUE
         && (!gbInCampaign || gpGame->m_campaignType != CAMPAIGN_ARCHIBALD
             || gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    != IDX(END_GAME_SIDE_SCENARIO))) {
@@ -2268,7 +2256,7 @@ void CheckEndGame(
             gpGame->m_mapHeader.victoryConditionValue,
             gpGame->m_mapHeader.victoryTownY
         ));
-        if (victoryTownData->m_owner != IDX(END_GAME_NO_PLAYER)
+        if (victoryTownData->m_owner != TOWN_OWNER_NONE
             && (gbHumanPlayer[victoryTownData->m_owner] || gpGame->m_mapHeader.computerAlsoWins)) {
             if (gbThisNetHumanPlayer[victoryTownData->m_owner]) {
                 winFlag = 1;
@@ -2299,7 +2287,7 @@ void CheckEndGame(
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == IDX(END_GAME_NO_PLAYER)
+        if (lossTown->m_owner == TOWN_OWNER_NONE
             || !gbHumanPlayer[lossTown->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
@@ -2315,11 +2303,11 @@ void CheckEndGame(
         winnerPlayer = END_GAME_NO_PLAYER;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
-                && gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)]
-                       >= gpGame->m_mapHeader.victoryConditionValue * IDX(END_GAME_GOLD_SCALE)
-                && gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)]
+                && gpGame->m_players[player].m_resources[IDX(RES_GOLD)]
+                       >= gpGame->m_mapHeader.victoryConditionValue * END_GAME_GOLD_SCALE
+                && gpGame->m_players[player].m_resources[IDX(RES_GOLD)]
                        >= bestGold) {
-                bestGold = gpGame->m_players[player].m_resources[IDX(END_GAME_GOLD_RESOURCE)];
+                bestGold = gpGame->m_players[player].m_resources[IDX(RES_GOLD)];
                 winnerPlayer = player;
             }
             if (winnerPlayer != END_GAME_NO_PLAYER) {
@@ -2354,7 +2342,7 @@ void CheckEndGame(
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
         if (winningHeroEntry->m_owner < 0
-            || winningHeroEntry->m_owner >= IDX(END_GAME_PLAYER_COUNT)
+            || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
             || gbHumanPlayer[winningHeroEntry->m_owner]) {
             winFlag = 1;
             if (!showedDialog) {
@@ -2371,7 +2359,7 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO) {
         lossHero = GetHeroSlot(gpGame->m_mapHeader.lossConditionValue);
-        if (lossHero->m_owner < 0 || lossHero->m_owner >= IDX(END_GAME_PLAYER_COUNT)
+        if (lossHero->m_owner < 0 || lossHero->m_owner >= GAME_PLAYER_COUNT
             || !gbHumanPlayer[lossHero->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
@@ -2384,8 +2372,8 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TIME) {
         if (gpGame->m_mapHeader.lossConditionValue
-            < (gpGame->m_week - 1) * IDX(END_GAME_DAYS_PER_WEEK)
-                  + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH) + gpGame->m_day) {
+            < (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
+                  + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH + gpGame->m_day) {
             defeated = 1;
             if (!showedDialog) {
                 showedDialog = 1;
@@ -2403,7 +2391,7 @@ void CheckEndGame(
                      heroIndex++) {
                     artifactHeroPtr = gpGame->GetPlayerHero(player, heroIndex);
                     if (gpGame->m_mapHeader.victoryConditionValue
-                        > IDX(END_GAME_ULTIMATE_ARTIFACT)) {
+                        > END_GAME_ULTIMATE_ARTIFACT) {
                         if (artifactHeroPtr->HasArtifact(
                                 ArtifactType(gpGame->m_mapHeader.victoryConditionValue - 1)
                             )) {
@@ -2433,7 +2421,7 @@ void CheckEndGame(
             if (!showedDialog) {
                 showedDialog = 1;
                 if (gpGame->m_mapHeader.victoryConditionValue
-                    == IDX(END_GAME_ULTIMATE_ARTIFACT)) {
+                    == END_GAME_ULTIMATE_ARTIFACT) {
                     sprintf(artifactName, "Ultimate Artifact");
                 } else {
                     sprintf(
@@ -2495,10 +2483,10 @@ void CheckEndGame(
         && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                == IDX(END_GAME_ROLAND_CAPTURE_SCENARIO)) {
         hasRoland_j = 0;
-        for (player = 0; player < IDX(END_GAME_HERO_COUNT); player++) {
-            if (gpGame->m_heroRecs[player].m_portrait == IDX(END_GAME_ROLAND_HERO)
+        for (player = 0; player < GAME_HERO_COUNT; player++) {
+            if (gpGame->m_heroRecs[player].m_portrait == IDX(CAMPAIGN_HERO_ROLAND)
                 && gpGame->m_heroRecs[player].m_owner >= 0
-                && gpGame->m_heroRecs[player].m_owner <= END_GAME_PLAYER_COUNT - 1) {
+                && gpGame->m_heroRecs[player].m_owner <= GAME_PLAYER_COUNT - 1) {
                 hasRoland_j = 1;
             }
         }
@@ -2518,8 +2506,8 @@ void CheckEndGame(
         enemyRemaining = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
             if (!gpGame->m_playerDead[player]
-                && gpGame->m_players[player].m_color != IDX(END_GAME_ROLAND_COLOR)
-                && gpGame->m_players[player].m_color != IDX(END_GAME_ALLY_COLOR)) {
+                && gpGame->m_players[player].m_color != PLAYER_COLOR_BLUE
+                && gpGame->m_players[player].m_color != PLAYER_COLOR_YELLOW) {
                 enemyRemaining = 1;
             }
         }
@@ -2559,12 +2547,12 @@ void CheckEndGame(
         gbGameOver = true;
         giEndSequence = 0;
     }
-    if (forcedResult == IDX(END_GAME_FORCE_VICTORY)) {
+    if (forcedResult == END_GAME_FORCE_VICTORY) {
         winFlag = 1;
         gbGameOver = true;
         giEndSequence = 1;
     }
-    if (forcedResult == IDX(END_GAME_FORCE_DEFEAT)) {
+    if (forcedResult == END_GAME_FORCE_DEFEAT) {
         defeated = 1;
         gbGameOver = true;
         giEndSequence = 0;
@@ -2578,8 +2566,8 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && winFlag) {
-        currentDayIndex = (gpGame->m_week - 1) * IDX(END_GAME_DAYS_PER_WEEK)
-                          + (gpGame->m_month - 1) * IDX(END_GAME_DAYS_PER_MONTH)
+        currentDayIndex = (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
+                          + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
                           + gpGame->m_day;
         gpGame->m_campaignScenarioWon = 1;
         gpGame->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
@@ -2593,26 +2581,26 @@ void CheckEndGame(
             + gpGame->m_campaignScenarioBonus[IDX(gpGame->m_campaignType)]
                                              [gpGame->m_campaignScenario];
 
-        carryoverHeroId = IDX(END_GAME_NO_PLAYER);
+        carryoverHeroId = END_GAME_NO_PLAYER;
         if (gpGame->m_campaignType == CAMPAIGN_ROLAND
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    == IDX(END_GAME_SIDE_SCENARIO)) {
-            carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
+            carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
         if (gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
             && gpGame->m_campaignScenario + IDX(END_GAME_SCENARIO_OFFSET)
                    == IDX(END_GAME_FIRST_NO_SAVE_SCENARIO)) {
-            carryoverHeroId = IDX(END_GAME_SIDE_SPECIAL_VALUE);
+            carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
 
-        if (carryoverHeroId != IDX(END_GAME_NO_PLAYER)) {
-            for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
+        if (carryoverHeroId != END_GAME_NO_PLAYER) {
+            for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
                 gpGame->m_campaignCarryoverCreatureTypes[player] = CREATURE_NONE;
                 gpGame->m_campaignCarryoverCreatureCounts[player] = 0;
             }
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
-                if (carryoverHeroId == IDX(END_GAME_SIDE_SPECIAL_VALUE)
+                if (carryoverHeroId == CAMPAIGN_SWITCH_VICTORY_VALUE
                     || gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                                .m_portrait
                            == carryoverHeroId) {
@@ -2623,7 +2611,7 @@ void CheckEndGame(
                 gpGame->m_campaignCarryoverCreatureTypes[0] = CREATURE_PEASANT;
                 gpGame->m_campaignCarryoverCreatureCounts[0] = 1;
             } else {
-                for (player = 0; player < IDX(END_GAME_ARMY_SLOTS); player++) {
+                for (player = 0; player < CAMPAIGN_ARMY_SLOT_COUNT; player++) {
                     gpGame->m_campaignCarryoverCreatureTypes[player] =
                         gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
                             .m_army.m_creatureTypes[player];
