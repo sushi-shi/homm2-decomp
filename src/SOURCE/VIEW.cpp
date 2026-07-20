@@ -117,7 +117,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
         generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
         if (generalWindow == NULL)
             MemError();
-        sprintf(gText, "port%04d.icn", m_heroes[side]->m_portrait);
+        sprintf(gText, "port%04d.icn", IDX(m_heroes[side]->m_portrait));
         message.payload.widget.command = VIEW_GENERAL_SET_ICON;
         message.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
         message.payload.widget.data.text = gText;

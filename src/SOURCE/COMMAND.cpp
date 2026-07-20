@@ -2409,7 +2409,7 @@ i32 combatManager::DoSurrender(void) {
     sprintf(
         gText,
         "port%04d.icn",
-        static_cast<u32>(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait)
+        static_cast<u32>(IDX(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait))
     );
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);

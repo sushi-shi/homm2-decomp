@@ -5,6 +5,21 @@
 
 class sample;
 
+H2_ENUM_CLASS_BEGIN(HeroPortrait)
+    CAMPAIGN_HERO_ROLAND           = 54,
+    CAMPAIGN_HERO_CORLAGON         = 55,
+    CAMPAIGN_HERO_ELIZA            = 56,
+    CAMPAIGN_HERO_ARCHIBALD        = 57,
+    CAMPAIGN_HERO_HALTON           = 58,
+    CAMPAIGN_HERO_BRAX             = 59,
+    HERO_DAINWIN                   = 61,
+    EXPANSION_HERO_IVAN_PORTRAIT   = 63,
+    EXPANSION_HERO_JOSEPH_PORTRAIT = 64,
+    HERO_GALLAVANT                 = 65,
+    HERO_CEALLACH                  = 67,
+    HERO_CAPTAIN_PORTRAIT_FIRST    = 90
+H2_ENUM_CLASS_END(HeroPortrait)
+
 H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_NONE            = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,

@@ -822,7 +822,7 @@ void townManager::SetupTown(void) {
     crestFrame = gpCurPlayer->m_color;
     if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
         crestFrame *= CREST_PORTRAITS_PER_COLOR;
-        crestFrame += gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait;
+        crestFrame += IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait);
     } else {
         crestFrame += TOWN_EMPTY_HERO_PORTRAIT_OFFSET;
     }
@@ -844,7 +844,11 @@ void townManager::SetupTown(void) {
         MemError();
 
     if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
-        sprintf(gText, "port%04d.icn", gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait);
+        sprintf(
+            gText,
+            "port%04d.icn",
+            IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait)
+        );
         m_heroStrip = new strip(
             0,
             TOWN_HERO_STRIP_Y,
@@ -1287,7 +1291,7 @@ i32 townManager::Main(tag_message& message) {
                                         TOWN_VIEW_FIZZLE_HEIGHT
                                     );
                                     delete m_heroStrip;
-                                    sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
+                                    sprintf(gText, "port%04d.icn", IDX(m_recruitHero->m_portrait));
                                     m_heroStrip = new strip(
                                         0,
                                         TOWN_HERO_STRIP_Y,
@@ -2744,7 +2748,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     messageLocal.payload.widget.id = RECRUIT_DESCRIPTION_CONTROL;
     messageLocal.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(messageLocal);
-    sprintf(gText, "port%04d.icn", m_recruitHero->m_portrait);
+    sprintf(gText, "port%04d.icn", IDX(m_recruitHero->m_portrait));
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     messageLocal.payload.widget.id = RECRUIT_PORTRAIT_CONTROL;
     messageLocal.payload.widget.data.text = gText;
@@ -3287,7 +3291,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     0,
                     0,
                     "miniport.icn",
-                    gpGame->GetPlayerHero(rank, strongestHeroPosition_first)->m_portrait,
+                    static_cast<i16>(IDX(
+                        gpGame->GetPlayerHero(rank, strongestHeroPosition_first)->m_portrait
+                    )),
                     ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
