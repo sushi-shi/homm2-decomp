@@ -158,7 +158,7 @@ i16 wsnet_init(void) {
             startup.netPosition = static_cast<u8>(player);
             wsSendMessage(
                 giNetPosToDCOPos[player],
-                IDX(NETWORK_PACKET_STARTUP),
+                NETWORK_PACKET_STARTUP,
                 sizeof(startup),
                 &startup
             );
@@ -213,14 +213,19 @@ void wsnet_term(void) {
 }
 
 VA(0x00406f37, 0x1f5)
-void wsSendMessage(i32 destination, u8 type, u16 size, void* data) {
+void wsSendMessage(
+    i32 destination,
+    H2_ENUM_PARAM(NetworkPacketType, u8) type,
+    u16 size,
+    void* data
+) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1, s_wsSendSourceLineBase + 2));
     struct sockaddr_in peerAddress;
     i32 attemptCount;
     i32 error;
     i32 netPlayer;
 
-    packetBuffer[0] = type;
+    packetBuffer[0] = static_cast<u8>(type);
     if (size != 0)
         memcpy(packetBuffer + 1, data, size);
     peerAddress.sin_family = AF_INET;
@@ -277,12 +282,12 @@ i32 wsnet_snd(i32 destination, i32 size, void* data) {
     if (destination != WS_TRANSPORT_BROADCAST_POSITION)
         wsSendMessage(
             giNetPosToDCOPos[destination],
-            IDX(NETWORK_PACKET_DATA),
+            NETWORK_PACKET_DATA,
             static_cast<u16>(size),
             data
         );
     else
-        wsSendMessage(0, IDX(NETWORK_PACKET_DATA), static_cast<u16>(size), data);
+        wsSendMessage(0, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 
@@ -339,8 +344,8 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     tag_message windowMessage;
     i32 player;
 
-    switch (rcvBufIn[0]) {
-        case IDX(NETWORK_PACKET_DATA):
+    switch (static_cast<NetworkPacketType>(static_cast<u8>(rcvBufIn[0]))) {
+        case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(
                 size - 1,
                 s_wsEvaluateSourceLineBase + 10
@@ -349,7 +354,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
             break;
-        case IDX(NETWORK_PACKET_GUEST_ARRIVED):
+        case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
                 if (gbRemoteGameOpen != 0) {
                     for (player = 1; player < giNumHumanPlayers; player++) {
@@ -358,7 +363,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                                    == reinterpret_cast<SNetPlayerInfo*>(message)) {
                             wsSendMessage(
                                 giNetPosToDCOPos[player],
-                                IDX(NETWORK_PACKET_GUEST_ACCEPTED),
+                                NETWORK_PACKET_GUEST_ACCEPTED,
                                 0,
                                 NULL
                             );
@@ -382,17 +387,17 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                         xNetHasOldPlayers = 1;
                     wsSendMessage(
                         giNetPosToDCOPos[giNumHumanPlayers],
-                        IDX(NETWORK_PACKET_GUEST_ACCEPTED),
+                        NETWORK_PACKET_GUEST_ACCEPTED,
                         0,
                         NULL
                     );
                     giNumHumanPlayers++;
                 } else {
-                    wsSendMessage(sender, IDX(NETWORK_PACKET_GUEST_REJECTED), 0, NULL);
+                    wsSendMessage(sender, NETWORK_PACKET_GUEST_REJECTED, 0, NULL);
                 }
             }
             break;
-        case IDX(NETWORK_PACKET_STARTUP):
+        case NETWORK_PACKET_STARTUP:
             giNumHumanPlayers = message[0];
             giThisNetPos = message[1];
             LogInt(
@@ -412,7 +417,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             );
             bStartUpInfoReceived = 1;
             break;
-        case IDX(NETWORK_PACKET_GUEST_REJECTED):
+        case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
                 cWSTextBuffer,
                 "The Host already has a game in progress and is not accepting new players."
@@ -420,7 +425,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
             ShutDown(NULL);
             break;
-        case IDX(NETWORK_PACKET_GUEST_ACCEPTED):
+        case NETWORK_PACKET_GUEST_ACCEPTED:
             sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -486,7 +491,7 @@ i32 wsWaitForHost(void) {
             }
             wsSendMessage(
                 0,
-                IDX(NETWORK_PACKET_GUEST_ARRIVED),
+                NETWORK_PACKET_GUEST_ARRIVED,
                 sizeof(SNetPlayerInfo),
                 &gsThisNetPlayerInfo
             );

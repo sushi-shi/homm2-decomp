@@ -2922,7 +2922,7 @@ void army::GoBerserk(void) {
                 goto walkToward;
             }
         } while (masks_28[IDX(BERSERK_MASK_ATTACK)] & (1 << direction_4));
-        giNextAction = COMBAT_AI_ACTION_MOVE;
+        giNextAction = ACTION_MOVE;
         ValidAttack(
             m_hex,
             static_cast<CombatHexDirection>(direction_4),
@@ -2963,7 +2963,7 @@ void army::GoBerserk(void) {
         }
         if (nearestIndex_19 != -1 && HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER)
             && m_monster.shots > 0) {
-            giNextAction = COMBAT_AI_ACTION_MOVE;
+            giNextAction = ACTION_MOVE;
             giNextActionGridIndex = gpCombatManager->m_armies[nearestSide_8][nearestIndex_19].m_hex;
         } else {
             i32 sideZeroTarget_12 = -1;
@@ -2973,7 +2973,7 @@ void army::GoBerserk(void) {
                     COMBAT_ATTACKER_SIDE,
                     masks_28[IDX(BERSERK_MASK_SIDE_ZERO)]
                 )) {
-                giNextAction = COMBAT_AI_ACTION_MOVE;
+                giNextAction = ACTION_MOVE;
                 sideZeroTarget_12 = giNextActionGridIndex;
             }
             if (gpCombatManager->AttemptAttack(
@@ -2981,7 +2981,7 @@ void army::GoBerserk(void) {
                     COMBAT_DEFENDER_SIDE,
                     masks_28[IDX(BERSERK_MASK_SIDE_ONE)]
                 )) {
-                giNextAction = COMBAT_AI_ACTION_MOVE;
+                giNextAction = ACTION_MOVE;
                 sideOneTarget_18 = giNextActionGridIndex;
             }
             giNextActionGridIndex = -1;
@@ -3024,10 +3024,10 @@ walkToward:
                 COMBAT_DEFENDER_SIDE - m_side,
                 masks_28[COMBAT_DEFENDER_SIDE - m_side]
             ))) {
-        giNextAction = COMBAT_AI_ACTION_WAIT;
+        giNextAction = ACTION_WAIT;
     }
 berserkFinish:
-    if (giNextAction == COMBAT_AI_ACTION_MOVE
+    if (giNextAction == ACTION_MOVE
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == m_side) {
         gpCombatManager->m_heroDeathPending[m_side] = 1;
     }

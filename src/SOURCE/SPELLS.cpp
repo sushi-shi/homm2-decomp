@@ -43,7 +43,6 @@ H2_ENUM_BEGIN(CombatSpellUiConstant)
     HELP_DEFAULT          = 7,
     HANDLER_CONTINUE      = 1,
     HANDLER_CLOSE         = 2,
-    ACTION_CAST           = 1,
     NO_SELECTION          = -1,
     HEX_COLUMN_COUNT      = 13,
     HEX_RIGHT_BORDER      = 12,
@@ -283,7 +282,7 @@ i32 combatManager::ViewSpells(i32) {
                     return 0;
                 }
             set_action:
-                giNextAction = ACTION_CAST;
+                giNextAction = ACTION_CAST_SPELL;
                 giNextActionExtra = IDX(m_selectedSpell);
                 break;
 
@@ -325,7 +324,7 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
-                giNextAction = ACTION_CAST;
+                giNextAction = ACTION_CAST_SPELL;
                 giNextActionExtra = IDX(m_selectedSpell);
                 gpMouseManager->SetPointer(
                     "spelmous.mse",
@@ -431,7 +430,7 @@ i32 HandleCastSpell(tag_message& message) {
 
         case SPELL_MESSAGE_CANCEL:
             gpCombatManager->m_selectedSpell = SPELL_NONE;
-            giNextAction = 0;
+            giNextAction = ACTION_NONE;
             message.type = SPELL_MESSAGE_DIALOG;
             message.payload.widget.command = SPELL_COMMAND_CLOSE;
             bInTeleportGetDest = 0;

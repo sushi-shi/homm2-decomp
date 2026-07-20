@@ -5,6 +5,7 @@
 #include <BASE/baseManager.h>
 #include <BASE/WINMGR.h>
 #include <BASE/icon.h>
+#include <SOURCE/COMMAND.h>
 #include "army.h"
 #include "hero.h"
 #include "hexcell.h"
@@ -430,11 +431,6 @@ H2_ENUM_BEGIN(CombatAIConstant)
     COMBAT_AI_ATTACK_SHOOT             = 1,
     COMBAT_AI_ATTACK_FLY               = 2,
     COMBAT_AI_ATTACK_WALK              = 3,
-    COMBAT_AI_ACTION_MOVE              = 2,
-    COMBAT_AI_ACTION_WAIT              = 3,
-    COMBAT_AI_ACTION_RETREAT           = 4,
-    COMBAT_AI_ACTION_SURRENDER         = 5,
-    COMBAT_AI_ACTION_ATTACK            = 6,
     COMBAT_AI_MASK_FIRST_BIT           = 1,
     COMBAT_AI_NO_ARMY                  = -1,
     COMBAT_AI_LICH_DAMAGE_PER_CREATURE = 9,
@@ -914,7 +910,7 @@ extern i32 giNextActionGridIndex;
 extern i32 giSurrenderCost;
 extern i32 giSkeletonsCreated;
 extern i8 iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
-extern i32 giNextAction;
+extern H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
 extern i32 giNextActionGridIndex2;
 extern i32 giCurrSpellGroup;
 extern i32 bMouseWasVis;
