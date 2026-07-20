@@ -76,8 +76,6 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_WIDTH         = 0x280,
     DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
-    DEFAULT_COMPUTER_WALK_SPEED  = 3,
-    DEFAULT_WALK_SPEED           = 2,
     DEFAULT_MAP_OFFSET_COUNT     = 32001,
     UNIQUE_ID_RANDOM_MODULUS     = 999999,
     UNIQUE_ID_ALPHANUMERIC_COUNT = 36,
@@ -841,7 +839,7 @@ void SetGameDefaults(void) {
     gConfig.combatShadeLevel = 0;
     gConfig.combatArmyInfoLevel = 0;
     gConfig.evilInterfaceUsage = 0;
-    gConfig.useOpera = IDX(CONFIG_OPERA_ENABLED);
+    gConfig.useOpera = CONFIG_OPERA_ENABLED;
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
     gConfig.autoCombatUseSpells = 0;
@@ -853,8 +851,8 @@ void SetGameDefaults(void) {
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
-    gConfig.computerWalkSpeed = DEFAULT_COMPUTER_WALK_SPEED;
-    gConfig.walkSpeed = DEFAULT_WALK_SPEED;
+    gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
+    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
     strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
     *reinterpret_cast<i32*>(gConfig.uniqueSystemID) = 0;
     i32 idSeed = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
