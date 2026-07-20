@@ -95,6 +95,31 @@ H2_ENUM_BEGIN(GameInitialStateConstant)
     BOAT_SLOT_EMPTY             = -1
 H2_ENUM_END(GameInitialStateConstant)
 
+H2_ENUM_BEGIN(NeutralTownReinforcementConstant)
+    REINFORCEMENT_ROLL_MIN             = 1,
+    REINFORCEMENT_ROLL_MAX             = 15,
+    REINFORCEMENT_TIER_ONE_THRESHOLD   = 5,
+    REINFORCEMENT_TIER_TWO_THRESHOLD   = 10,
+    REINFORCEMENT_TIER_THREE_THRESHOLD = 13,
+    REINFORCEMENT_TIER_FOUR_THRESHOLD  = 15,
+    REINFORCEMENT_TIER_ONE_KEY         = 10,
+    REINFORCEMENT_TIER_TWO_KEY         = 20,
+    REINFORCEMENT_TIER_THREE_KEY       = 30,
+    REINFORCEMENT_TIER_FOUR_KEY        = 40,
+    REINFORCEMENT_TIER_FIVE_KEY        = 50,
+    REINFORCEMENT_TIER_ONE_COUNT_MIN   = 8,
+    REINFORCEMENT_TIER_ONE_COUNT_MAX   = 15,
+    REINFORCEMENT_TIER_TWO_COUNT_MIN   = 5,
+    REINFORCEMENT_TIER_TWO_COUNT_MAX   = 7,
+    REINFORCEMENT_TIER_THREE_COUNT_MIN = 3,
+    REINFORCEMENT_TIER_THREE_COUNT_MAX = 5,
+    REINFORCEMENT_TIER_FOUR_COUNT_MIN  = 1,
+    REINFORCEMENT_TIER_FOUR_COUNT_MAX  = 3,
+    REINFORCEMENT_TIER_FIVE_COUNT      = 1,
+    REINFORCEMENT_TURN_ROLL_DIVISOR    = 10,
+    REINFORCEMENT_TURN_COUNT_DIVISOR   = 20
+H2_ENUM_END(NeutralTownReinforcementConstant)
+
 H2_ENUM_CLASS_BEGIN(GameMapTrigger)
     TRIGGER_TOWN_BASE                = 0x23,
     TRIGGER_MONSTER                  = 0x98,
@@ -1192,131 +1217,131 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(i32 townId) {
     i32 kn;
-    i32 jb;
-    i32 idx;
-    i32 random;
-    i32 cnt;
-    i32 divisor;
+    i32 tierKey;
+    CreatureType creature;
+    i32 roll;
+    i32 count;
+    i32 turnRollRange;
 
     if ((m_castleRecs[townId].m_x > 0 || m_castleRecs[townId].m_y > 0)
         && m_castleRecs[townId].m_owner < 0) {
-        random = Random(1, 15);
-        divisor = giCurTurn / 10;
-        if (divisor != 0)
-            random += Random(0, divisor);
+        roll = Random(REINFORCEMENT_ROLL_MIN, REINFORCEMENT_ROLL_MAX);
+        turnRollRange = giCurTurn / REINFORCEMENT_TURN_ROLL_DIVISOR;
+        if (turnRollRange != 0)
+            roll += Random(0, turnRollRange);
 
-        if (random <= 5) {
-            jb = 10;
-            cnt = Random(8, 15);
-        } else if (random <= 10) {
-            jb = 20;
-            cnt = Random(5, 7);
-        } else if (random <= 13) {
-            jb = 30;
-            cnt = Random(3, 5);
-        } else if (random <= 15) {
-            jb = 40;
-            cnt = Random(1, 3);
+        if (roll <= REINFORCEMENT_TIER_ONE_THRESHOLD) {
+            tierKey = REINFORCEMENT_TIER_ONE_KEY;
+            count = Random(REINFORCEMENT_TIER_ONE_COUNT_MIN, REINFORCEMENT_TIER_ONE_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_TWO_THRESHOLD) {
+            tierKey = REINFORCEMENT_TIER_TWO_KEY;
+            count = Random(REINFORCEMENT_TIER_TWO_COUNT_MIN, REINFORCEMENT_TIER_TWO_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_THREE_THRESHOLD) {
+            tierKey = REINFORCEMENT_TIER_THREE_KEY;
+            count = Random(REINFORCEMENT_TIER_THREE_COUNT_MIN, REINFORCEMENT_TIER_THREE_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_FOUR_THRESHOLD) {
+            tierKey = REINFORCEMENT_TIER_FOUR_KEY;
+            count = Random(REINFORCEMENT_TIER_FOUR_COUNT_MIN, REINFORCEMENT_TIER_FOUR_COUNT_MAX);
         } else {
-            jb = 50;
-            cnt = 1;
+            tierKey = REINFORCEMENT_TIER_FIVE_KEY;
+            count = REINFORCEMENT_TIER_FIVE_COUNT;
         }
 
-        cnt += giCurTurn / 20;
-        switch (IDX(m_castleRecs[townId].m_type) + jb) {
-            case 10:
-                idx = 0;
+        count += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
+        switch (IDX(m_castleRecs[townId].m_type) + tierKey) {
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_KNIGHT):
+                creature = CREATURE_PEASANT;
                 break;
-            case 20:
-                idx = 1;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_KNIGHT):
+                creature = CREATURE_ARCHER;
                 break;
-            case 30:
-                idx = 3;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_KNIGHT):
+                creature = CREATURE_PIKEMAN;
                 break;
-            case 40:
-                idx = 5;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_KNIGHT):
+                creature = CREATURE_SWORDSMAN;
                 break;
-            case 50:
-                idx = 7;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_KNIGHT):
+                creature = CREATURE_CAVALRY;
                 break;
-            case 11:
-                idx = 11;
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_BARBARIAN):
+                creature = CREATURE_GOBLIN;
                 break;
-            case 21:
-                idx = 12;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_BARBARIAN):
+                creature = CREATURE_ORC;
                 break;
-            case 31:
-                idx = 14;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_BARBARIAN):
+                creature = CREATURE_WOLF;
                 break;
-            case 41:
-                idx = 15;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_BARBARIAN):
+                creature = CREATURE_OGRE;
                 break;
-            case 51:
-                idx = 17;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_BARBARIAN):
+                creature = CREATURE_TROLL;
                 break;
-            case 12:
-                idx = 20;
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_SORCERESS):
+                creature = CREATURE_SPRITE;
                 break;
-            case 22:
-                idx = 21;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_SORCERESS):
+                creature = CREATURE_DWARF;
                 break;
-            case 32:
-                idx = 23;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_SORCERESS):
+                creature = CREATURE_ELF;
                 break;
-            case 42:
-                idx = 25;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_SORCERESS):
+                creature = CREATURE_DRUID;
                 break;
-            case 52:
-                idx = 27;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_SORCERESS):
+                creature = CREATURE_UNICORN;
                 break;
-            case 13:
-                idx = 29;
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WARLOCK):
+                creature = CREATURE_CENTAUR;
                 break;
-            case 23:
-                idx = 30;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WARLOCK):
+                creature = CREATURE_GARGOYLE;
                 break;
-            case 33:
-                idx = 31;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WARLOCK):
+                creature = CREATURE_GRIFFIN;
                 break;
-            case 43:
-                idx = 32;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WARLOCK):
+                creature = CREATURE_MINOTAUR;
                 break;
-            case 53:
-                idx = 34;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WARLOCK):
+                creature = CREATURE_HYDRA;
                 break;
-            case 14:
-                idx = 38;
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WIZARD):
+                creature = CREATURE_HALFLING;
                 break;
-            case 24:
-                idx = 39;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WIZARD):
+                creature = CREATURE_BOAR;
                 break;
-            case 34:
-                idx = 40;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WIZARD):
+                creature = CREATURE_IRON_GOLEM;
                 break;
-            case 44:
-                idx = 42;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WIZARD):
+                creature = CREATURE_ROC;
                 break;
-            case 54:
-                idx = 43;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WIZARD):
+                creature = CREATURE_MAGE;
                 break;
-            case 15:
-                idx = 47;
+            case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_NECROMANCER):
+                creature = CREATURE_SKELETON;
                 break;
-            case 25:
-                idx = 48;
+            case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_NECROMANCER):
+                creature = CREATURE_ZOMBIE;
                 break;
-            case 35:
-                idx = 50;
+            case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_NECROMANCER):
+                creature = CREATURE_MUMMY;
                 break;
-            case 45:
-                idx = 52;
+            case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_NECROMANCER):
+                creature = CREATURE_VAMPIRE;
                 break;
-            case 55:
-                idx = 54;
+            case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_NECROMANCER):
+                creature = CREATURE_LICH;
                 break;
             default:;
         }
-        GiveArmy(&m_castleRecs[townId].m_army, idx, cnt, -1);
+        GiveArmy(&m_castleRecs[townId].m_army, creature, count, ARMY_GROUP_EMPTY_SLOT);
     }
 }
 
@@ -4853,16 +4878,21 @@ void game::MakeAllWaterVisible(i32 player) {
 }
 
 VA(0x00480e6c, 0xfc)
-void game::GiveArmy(armyGroup* group, i32 type, i32 count, i32 slot) {
+void game::GiveArmy(
+    armyGroup* group,
+    H2_ENUM_PARAM(CreatureType, i32) type,
+    i32 count,
+    i32 slot
+) {
     i32 tmp;
     i32 i;
     if (slot >= 0) {
         i = slot;
-        group->m_creatureTypes[i] = static_cast<i8>(type);
+        group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
         group->m_creatureCounts[i] = 0;
     } else {
         for (i = 0; i < 5; i++) {
-            if (group->m_creatureTypes[i] == type)
+            if (group->m_creatureTypes[i] == IDX(type))
                 break;
         }
         if (i >= 5) {
@@ -4876,7 +4906,7 @@ void game::GiveArmy(armyGroup* group, i32 type, i32 count, i32 slot) {
         if (i >= 5)
             return;
     }
-    group->m_creatureTypes[i] = static_cast<i8>(type);
+    group->m_creatureTypes[i] = static_cast<i8>(IDX(type));
     group->m_creatureCounts[i] += count;
 }
 
