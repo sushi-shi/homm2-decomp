@@ -5493,6 +5493,10 @@ DATA(0x004f8e08) u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_8
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
+
+// These retail palette and lookup tables are byte-exact data payloads; their entries
+// are values rather than individually named constants.
+// NOLINTBEGIN(readability-magic-numbers)
 DATA(0x004f8fb8) u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
@@ -9914,6 +9918,8 @@ DATA(0x00515ca0) u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPO
     {303, 137, 75, 44},
     {0, 389, 86, 90}
 };
+// NOLINTEND(readability-magic-numbers)
+
 DATA(0x00515cc8) i32 lastIMHoverID = -1;
 DATA(0x00515f78) i32 bInCheckEndGame = 0;
 DATA(0x005165dc) i32 bInShutDown = 0;

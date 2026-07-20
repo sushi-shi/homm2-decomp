@@ -106,6 +106,8 @@ void Function(i32 condition) {
     def test_summary_resolves_third_party_without_queuing_its_literals(self):
         magic = [
             {"path": "src/pending.cpp", "category": "code"},
+            {"path": "src/pending.cpp", "category": "data-payload"},
+            {"path": "src/reviewed.cpp", "category": "source-line"},
             {"path": "src/imported.cpp", "category": "code"},
         ]
         review = [
@@ -119,6 +121,9 @@ void Function(i32 condition) {
         self.assertIn("Files resolved: 2/3", summary)
         self.assertIn("Reconstructed files reviewed: 1", summary)
         self.assertIn("Third-party files retained: 1", summary)
+        self.assertIn("Clang magic-number diagnostics: 4", summary)
+        self.assertIn("Pending actionable findings: 1", summary)
+        self.assertIn("Retained payload/source evidence findings: 2", summary)
         self.assertIn("`src/pending.cpp`", summary)
         self.assertNotIn("`src/imported.cpp`", summary)
 
