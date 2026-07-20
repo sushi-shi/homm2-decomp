@@ -9,9 +9,9 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-H2_ENUM_CLASS_BEGIN(MidiSequenceStatus)
+H2_ENUM_BEGIN(MidiSequenceStatus)
     SEQUENCE_PLAYING = 4
-H2_ENUM_CLASS_END(MidiSequenceStatus)
+H2_ENUM_END(MidiSequenceStatus)
 
 H2_ENUM_BEGIN(MidiVolumeConstant)
     VOLUME_HIGH_RANGE = 6,
@@ -137,7 +137,7 @@ VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != 0 && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
-        return AIL_sequence_status(hSequence[CurrentMidiFile]) == IDX(SEQUENCE_PLAYING);
+        return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
     }
     return 0;
 }
