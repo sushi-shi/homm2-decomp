@@ -69,16 +69,58 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
 H2_ENUM_END(AdventureScreenConstant)
 
 H2_ENUM_BEGIN(AdventureDrawConstant)
-    CELL_PIXELS             = 32,
-    DRAW_VIEW_CELLS         = VIEW_CELL_COUNT,
-    DRAW_LAST_CELL          = VIEW_LAST_CELL,
-    DRAW_CLIP_WIDTH         = VIEWPORT_SIZE,
-    DRAW_CLIP_HEIGHT        = VIEWPORT_SIZE,
-    CLOUD_VARIANTS          = 4,
-    HERO_SHADOW_FRAME_END   = 36,
-    MINE_GUARDIAN_ICON_SLOT = 10,
-    TILESET_MONSTER         = 20,
-    TILESET_BOAT            = 39
+    CELL_PIXELS                    = 32,
+    CELL_CENTER_PIXEL              = CELL_PIXELS / 2,
+    CELL_LAST_PIXEL                = CELL_PIXELS - 1,
+    OBJECT_BASELINE_Y              = CELL_PIXELS - 2,
+    DRAW_VIEW_CELLS                = VIEW_CELL_COUNT,
+    DRAW_LAST_CELL                 = VIEW_LAST_CELL,
+    DRAW_CLIP_WIDTH                = VIEWPORT_SIZE,
+    DRAW_CLIP_HEIGHT               = VIEWPORT_SIZE,
+    STONE_TILE_NONE                = -1,
+    STONE_TILE_TOP_LEFT            = 16,
+    STONE_TILE_TOP_RIGHT           = 17,
+    STONE_TILE_BOTTOM_RIGHT        = 18,
+    STONE_TILE_BOTTOM_LEFT         = 19,
+    STONE_TILE_TOP_BASE            = 20,
+    STONE_TILE_RIGHT_BASE          = 24,
+    STONE_TILE_BOTTOM_BASE         = 28,
+    STONE_TILE_LEFT_BASE           = 32,
+    STONE_PATTERN_COORDINATE_SHIFT = 16,
+    CLOUD_VARIANTS                 = 4,
+    CLOUD_VARIANT_MASK             = CLOUD_VARIANTS - 1,
+    CLOUD_FLIPPED_FRAME_BASE       = 100,
+    CLOUD_X_ALTERNATE_FRAME_1      = 1,
+    CLOUD_Y_ALTERNATE_FRAME        = 3,
+    CLOUD_X_ALTERNATE_FRAME_2      = 5,
+    ROUTE_DRAW_X_OFFSET            = 12,
+    ROUTE_DRAW_Y_OFFSET            = 2,
+    ROUTE_FRAME_MASK               = 0xff,
+    TERRAIN_FLAGS_SHIFT            = 14,
+    MINE_GUARDIAN_ICON_SLOT        = 10,
+    MINE_GHOST_FRAME_COUNT         = 15,
+    MONSTER_FRAME_STRIDE           = 9,
+    MONSTER_REVERSED_FRAME         = MONSTER_FRAME_STRIDE - 1,
+    MONSTER_ANIMATION_FRAME_OFFSET = 1,
+    MONSTER_SPECIAL_FRAME_FIRST    = 59,
+    MONSTER_SPECIAL_FRAME_LAST     = 60,
+    HERO_BOAT_Y_OFFSET             = -10,
+    HERO_SHADOW_FRAME_FIRST        = 9,
+    HERO_SHADOW_FRAME_END          = 36,
+    HERO_SHADOW_FRAME_OFFSET       = 50,
+    HERO_SHADOW_SOURCE_FRAME_46    = 46,
+    HERO_SHADOW_SOURCE_FRAME_47    = 47,
+    HERO_SHADOW_SOURCE_FRAME_49    = 49,
+    HERO_SHADOW_SOURCE_FRAME_50    = 50,
+    HERO_SHADOW_SOURCE_FRAME_51    = 51,
+    HERO_SHADOW_TARGET_FRAME_55    = 55,
+    HERO_SHADOW_TARGET_FRAME_56    = 56,
+    HERO_SHADOW_TARGET_FRAME_57    = 57,
+    HERO_SHADOW_TARGET_FRAME_58    = 58,
+    PLAYER_FLAG_FRAME_COUNT        = 8,
+    PLAYER_FLAG_FRAME_BASE         = 56,
+    TILESET_MONSTER                = 20,
+    TILESET_BOAT                   = 39
 H2_ENUM_END(AdventureDrawConstant)
 
 H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
@@ -249,7 +291,8 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_VOLUME_COUNT         = 8,
     ENVIRONMENT_SOUND_FIRST_LAYER    = 1,
     ENVIRONMENT_SOUND_LAYER_COUNT    = 2,
-    ENVIRONMENT_SOUND_CHANNEL_TYPE   = 3
+    ENVIRONMENT_SOUND_CHANNEL_TYPE   = 3,
+    ENVIRONMENT_SOUND_EDGE_SPAN      = 2
 H2_ENUM_END(AdventureEnvironmentSoundConstant)
 
 H2_ENUM_BEGIN(AdventureTeleportConstant)
@@ -366,6 +409,15 @@ H2_ENUM_BEGIN(AdventureRouteConstant)
     ROUTE_DIAGONAL_COST_5       = 300
 H2_ENUM_END(AdventureRouteConstant)
 
+H2_ENUM_BEGIN(AdventureRouteFrame)
+    ROUTE_FRAME_COST_0 = 0,
+    ROUTE_FRAME_COST_1 = 1,
+    ROUTE_FRAME_COST_2 = 2,
+    ROUTE_FRAME_COST_3 = 3,
+    ROUTE_FRAME_COST_4 = 4,
+    ROUTE_FRAME_COST_5 = 5
+H2_ENUM_END(AdventureRouteFrame)
+
 H2_ENUM_BEGIN(AdventureSearchConstant)
     ARTIFACT_CAPACITY       = HERO_ARTIFACT_SLOT_COUNT,
     DIG_HOLE_FRAME          = 140,
@@ -384,23 +436,39 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
     COMBO_HERO_PANEL_BOTTOM = 9,
     COMBO_UPDATE_MIN        = 16,
     COMBO_UPDATE_MAX        = 463,
+    COMBO_FAR_NEIGHBOR_OFFSET = 2,
 H2_ENUM_END(AdventureComboDrawConstant)
 
 H2_ENUM_BEGIN(AdventureRadarConstant)
-    RADAR_SIZE             = MAP_DIMENSION_XLARGE,
-    RADAR_SCREEN_PITCH     = SCREEN_WIDTH,
-    RADAR_ROW_GROUPS       = 5,
-    RADAR_GROUP_BYTES      = 128,
-    RADAR_UNSEEN_COLOR     = 0x24,
-    RADAR_NEUTRAL_OWNER    = GAME_PLAYER_COUNT,
-    RADAR_TERRAIN_SHADE    = 3,
-    RADAR_PARTIAL_MARGIN   = 2,
-    RADAR_PARTIAL_SPAN     = 16,
-    RADAR_CURRENT_CELL     = VIEW_CENTER_CELL,
-    RADAR_TOWN_RADIUS      = 2,
-    RADAR_TOWN_TRIGGER     = 0x2a,
-    RADAR_REEFS_TRIGGER    = 0x67,
-    RADAR_NEIGHBOR_TRIGGER = 0xa3
+    RADAR_SIZE                    = MAP_DIMENSION_XLARGE,
+    RADAR_SCREEN_PITCH            = SCREEN_WIDTH,
+    RADAR_ROW_GROUPS              = 5,
+    RADAR_GROUP_BYTES             = 128,
+    RADAR_UNSEEN_COLOR            = 0x24,
+    RADAR_VIEWPORT_COLOR          = 181,
+    RADAR_NEUTRAL_OWNER           = GAME_PLAYER_COUNT,
+    RADAR_TERRAIN_SHADE           = 3,
+    RADAR_PARTIAL_MARGIN          = 2,
+    RADAR_PARTIAL_SPAN            = 16,
+    RADAR_CURRENT_CELL            = VIEW_CENTER_CELL,
+    RADAR_TOWN_RADIUS             = 2,
+    RADAR_SMALL_CELL_PIXELS       = 4,
+    RADAR_MEDIUM_CELL_PIXELS      = 2,
+    RADAR_LARGE_SCALE_DIVISOR     = 3,
+    RADAR_LARGE_SCALE_ROUNDING    = RADAR_LARGE_SCALE_DIVISOR - 1,
+    RADAR_FRAME_NONE              = -1,
+    RADAR_FRAME_NORMAL_XLARGE     = 1,
+    RADAR_FRAME_NORMAL_LARGE      = 2,
+    RADAR_FRAME_NORMAL_MEDIUM     = 3,
+    RADAR_FRAME_VIEW_NEAR_XLARGE  = 4,
+    RADAR_FRAME_NORMAL_SMALL      = 5,
+    RADAR_FRAME_VIEW_MIDDLE       = 6,
+    RADAR_FRAME_VIEW_FAR_XLARGE   = 7,
+    RADAR_FRAME_VIEW_NEAR_LARGE   = 8,
+    RADAR_FRAME_VIEW_MIDDLE_LARGE = 9,
+    RADAR_TOWN_TRIGGER            = 0x2a,
+    RADAR_REEFS_TRIGGER           = 0x67,
+    RADAR_NEIGHBOR_TRIGGER        = 0xa3
 H2_ENUM_END(AdventureRadarConstant)
 
 H2_ENUM_BEGIN(AdventureArmySizeThreshold)
@@ -413,6 +481,82 @@ H2_ENUM_BEGIN(AdventureArmySizeThreshold)
     ARMY_SWARM_LIMIT   = 500,
     ARMY_ZOUNDS_LIMIT  = 1000
 H2_ENUM_END(AdventureArmySizeThreshold)
+
+H2_ENUM_BEGIN(AdventureArmySizeBand)
+    ARMY_SIZE_FEW     = 0,
+    ARMY_SIZE_SEVERAL = 1,
+    ARMY_SIZE_PACK    = 2,
+    ARMY_SIZE_LOTS    = 3,
+    ARMY_SIZE_HORDE   = 4,
+    ARMY_SIZE_THRONG  = 5,
+    ARMY_SIZE_SWARM   = 6,
+    ARMY_SIZE_ZOUNDS  = 7,
+    ARMY_SIZE_LEGION  = 8
+H2_ENUM_END(AdventureArmySizeBand)
+
+H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
+    ARMY_QUICK_SLOT_COUNT              = ARMY_GROUP_SLOT_COUNT,
+    ARMY_QUICK_ICON_SIZE               = 32,
+    ARMY_QUICK_ICON_BASELINE           = 30,
+    ARMY_QUICK_AREA_LEFT               = 22,
+    ARMY_QUICK_CENTER_DIVISOR          = 2,
+    ARMY_QUICK_WIDGET_FLAGS            = 16,
+    ARMY_QUICK_LABEL_HEIGHT            = 12,
+    ARMY_QUICK_FIRST_ROW_SHIFT         = 22,
+    ARMY_QUICK_SECOND_ROW_SHIFT        = 44,
+    ARMY_QUICK_SECOND_ROW_ICON_SHIFT   = 6,
+    ARMY_QUICK_FIRST_ROW_COUNT         = 2,
+    ARMY_QUICK_TOP_ROW_MAX             = 3,
+    ARMY_QUICK_FOUR_STACK_COUNT        = 4,
+    ARMY_QUICK_FIVE_STACK_COUNT        = ARMY_GROUP_SLOT_COUNT,
+    ARMY_QUICK_FIVE_STACK_X_SHIFT      = 12,
+    ARMY_QUICK_EMPTY_SLOT              = -1,
+    ARMY_QUICK_TEXT_WIDTH              = 60,
+    ARMY_QUICK_TEXT_X_ADJUSTMENT       = 14
+H2_ENUM_END(AdventureArmyQuickViewConstant)
+
+H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
+    HERO_QUICK_ARMY_AREA_WIDTH       = 160,
+    HERO_QUICK_DETAILED_CREATURE_Y   = 124,
+    HERO_QUICK_VAGUE_FIRST_ROW_Y     = 73,
+    HERO_QUICK_DEFAULT_WINDOW_X      = 288,
+    HERO_QUICK_LOCATOR_ROW_HEIGHT    = 30,
+    HERO_QUICK_LOCATOR_BASE_Y        = 97,
+    HERO_QUICK_WINDOW_TEXT           = 18,
+    HERO_QUICK_NAME_WIDGET           = 1,
+    HERO_QUICK_PORTRAIT_WIDGET       = 2,
+    HERO_QUICK_PRIMARY_STAT_WIDGET   = 3,
+    HERO_QUICK_MANA_WIDGET           = 7,
+    HERO_QUICK_PLAYER_COLOR_WIDGET   = 8,
+    HERO_QUICK_PLAYER_COLOR_STRIDE   = 2,
+    HERO_QUICK_ARMY_LABEL_CAPACITY   = 5,
+    HERO_QUICK_SECOND_ROW_FIRST_SLOT = 2,
+    HERO_QUICK_SECOND_ROW_TEXT_SHIFT = 38
+H2_ENUM_END(AdventureHeroQuickViewConstant)
+
+H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
+    TOWN_QUICK_ARMY_AREA_WIDTH        = 192,
+    TOWN_QUICK_FIRST_ROW_Y            = 76,
+    TOWN_QUICK_DEFAULT_WINDOW_X       = 328,
+    TOWN_QUICK_DEFAULT_WINDOW_Y       = 176,
+    TOWN_QUICK_WINDOW_TEXT            = 19,
+    TOWN_QUICK_NAME_WIDGET            = 1,
+    TOWN_QUICK_PORTRAIT_WIDGET        = 2,
+    TOWN_QUICK_PLAYER_COLOR_WIDGET    = 8,
+    TOWN_QUICK_TYPE_FRAME_BASE        = 9,
+    TOWN_QUICK_VILLAGE_FRAME_OFFSET   = 6,
+    TOWN_QUICK_KNOWN_MARKER_WIDGET    = 300,
+    TOWN_QUICK_EMPTY_LABEL_CAPACITY   = 20,
+    TOWN_QUICK_EMPTY_LABEL_X          = 13,
+    TOWN_QUICK_EMPTY_LABEL_Y          = 117,
+    TOWN_QUICK_EMPTY_LABEL_WIDTH      = 211,
+    TOWN_QUICK_ARMY_LABEL_CAPACITY    = 15,
+    TOWN_QUICK_INFORMATION_UNKNOWN    = 0,
+    TOWN_QUICK_INFORMATION_NAMES      = 1,
+    TOWN_QUICK_INFORMATION_ESTIMATES  = 2,
+    TOWN_QUICK_INFORMATION_EXACT      = 3,
+    TOWN_QUICK_DEBUG_INFORMATION      = 2
+H2_ENUM_END(AdventureTownQuickViewConstant)
 
 H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_VIEW_ID          = 3,
@@ -434,6 +578,12 @@ H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_LOWER_MIN_HEIGHT = 37,
     BOTTOM_HERO_GROUP_WIDTH      = 45,
     BOTTOM_HERO_CHARACTER_WIDTH  = 5,
+    BOTTOM_HERO_ABBREVIATED_LABEL_PADDING = 4,
+    BOTTOM_HERO_POSITION_COMPONENT_COUNT = 2,
+    BOTTOM_HERO_LAYOUT_SLOT_COUNT       = 8,
+    BOTTOM_HERO_ICON_POSITION_BYTES     = BOTTOM_HERO_LAYOUT_SLOT_COUNT
+        * BOTTOM_HERO_POSITION_COMPONENT_COUNT,
+    BOTTOM_HERO_CREATURE_BOUND_COUNT    = 2,
     BOTTOM_HERO_FIRST_ICON_ID    = 2002,
     BOTTOM_HERO_FIRST_TEXT_ID    = 2101,
     BOTTOM_HERO_WIDGET_FLAGS     = 16,
@@ -545,6 +695,7 @@ H2_ENUM_BEGIN(AdventureBottomViewConstant)
     BOTTOM_VIEW_TEXT_BUFFER_SIZE  = 30,
     BOTTOM_VIEW_COUNT_BUFFER_SIZE = 8,
     BOTTOM_VIEW_WIDGET_CAPACITY   = 12,
+    BOTTOM_VIEW_CENTER_DIVISOR     = 2,
     BOTTOM_VIEW_NO_ENEMY          = -1,
     BOTTOM_VIEW_NO_ANIMATION      = -1
 H2_ENUM_END(AdventureBottomViewConstant)
@@ -614,7 +765,8 @@ H2_ENUM_BEGIN(AdventureVisionsConstant)
     VISIONS_RADIUS              = 3,
     VISIONS_MONSTER_TRIGGER     = 0x98,
     VISIONS_NO_MONSTER_DISTANCE = 100,
-    VISIONS_MESSAGE_BUFFER_SIZE = 200
+    VISIONS_MESSAGE_BUFFER_SIZE = 200,
+    VISIONS_JOIN_COST_MULTIPLIER = 2
 H2_ENUM_END(AdventureVisionsConstant)
 
 H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
@@ -647,6 +799,9 @@ H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
     ENEMY_TURN_SAND_FRAME_LIMIT   = 20,
     ENEMY_TURN_SAND_RESTART_FRAME = 16,
     ENEMY_TURN_PHASE_FRAME_OFFSET = 1,
+    ENEMY_TURN_CREST_SLOT         = 0,
+    ENEMY_TURN_SAND_SLOT          = 1,
+    ENEMY_TURN_PHASE_SLOT         = 2,
     ENEMY_TURN_ANIMATION_DELAY    = 300,
     ENEMY_TURN_PHASE_DELAY        = 700
 H2_ENUM_END(AdventureEnemyTurnViewConstant)
@@ -667,13 +822,48 @@ H2_ENUM_CLASS_BEGIN(AdventureCloudNeighbor)
 H2_ENUM_CLASS_END(AdventureCloudNeighbor)
 
 H2_ENUM_BEGIN(AdventureQuickInfoObject)
-    OBELISK_INDEX_BASE         = 1,
-    RESOURCE_FRAME_PAIR_MASK   = ~1,
-    ROUTE_BEYOND_MOBILITY_FLAG = 0x100,
-    HERO_FRAME_MIRROR_FLAG     = 0x80,
-    HERO_FRAME_INDEX_MASK      = 0x7f,
-    OBJECT_GENERIC_SITE        = 0x7a
+    OBELISK_INDEX_BASE          = 1,
+    RESOURCE_FRAME_PAIR_MASK    = ~1,
+    RESOURCE_FRAME_PAIR_STRIDE  = 2,
+    CRYSTAL_BALL_RADIUS         = 8,
+    BARRIER_COLOR_MASK          = KB_BARRIER_COLOR_NAME_COUNT - 1,
+    ROUTE_BEYOND_MOBILITY_FLAG  = 0x100,
+    HERO_FRAME_MIRROR_FLAG      = 0x80,
+    HERO_FRAME_INDEX_MASK       = 0x7f,
+    OBJECT_GENERIC_SITE         = 0x7a,
+    QUICK_INFO_TEXT_CAPACITY    = 200,
+    QUICK_INFO_SITE_FRAME_COUNT = 2,
+    QUICK_INFO_X_OFFSET         = 57,
+    QUICK_INFO_MIN_X            = QUICK_VIEW_MIN_X,
+    QUICK_INFO_WIDTH            = 160,
+    QUICK_INFO_RIGHT            = QUICK_VIEW_BOTTOM,
+    QUICK_INFO_RIGHT_X          = QUICK_INFO_RIGHT - QUICK_INFO_WIDTH,
+    QUICK_INFO_Y_OFFSET         = 25,
+    QUICK_INFO_MIN_Y            = QUICK_VIEW_MIN_Y,
+    QUICK_INFO_HEIGHT           = 96,
+    QUICK_INFO_BOTTOM           = QUICK_VIEW_RIGHT,
+    QUICK_INFO_BOTTOM_Y         = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
 H2_ENUM_END(AdventureQuickInfoObject)
+
+H2_ENUM_BEGIN(AdventureGenericSiteName)
+    GENERIC_SITE_ALCHEMIST_TOWER = 0,
+    GENERIC_SITE_ARENA           = 1,
+    GENERIC_SITE_HUT_OF_MAGI     = 2,
+    GENERIC_SITE_EYE_OF_MAGI     = 3,
+    GENERIC_SITE_STABLES         = 4,
+    GENERIC_SITE_MERMAID         = 5,
+    GENERIC_SITE_SIRENS          = 6,
+    GENERIC_SITE_UNKNOWN         = -1
+H2_ENUM_END(AdventureGenericSiteName)
+
+H2_ENUM_BEGIN(AdventureRecruitmentSiteName)
+    RECRUITMENT_SITE_BARROW_MOUNDS = 0,
+    RECRUITMENT_SITE_EARTH_ALTAR   = 1,
+    RECRUITMENT_SITE_AIR_ALTAR     = 2,
+    RECRUITMENT_SITE_FIRE_ALTAR    = 3,
+    RECRUITMENT_SITE_WATER_ALTAR   = 4,
+    RECRUITMENT_SITE_UNKNOWN       = -1
+H2_ENUM_END(AdventureRecruitmentSiteName)
 
 H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_SEQUENCE_RADIX     = 10,
@@ -750,6 +940,9 @@ H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_VIEW_END          = PUZZLE_VIEW_ORIGIN + PUZZLE_VIEW_SIZE,
     PUZZLE_COORDINATE_OFFSET = 7,
     PUZZLE_ALIGNMENT_DIVISOR = 3,
+    PUZZLE_Y_ADJUST_X_FACTOR = 2,
+    PUZZLE_Y_ADJUST_Y_FACTOR = 5,
+    PUZZLE_PARITY_DIVISOR    = 2,
     PUZZLE_FIZZLE_TIME       = 220
 H2_ENUM_END(AdventurePuzzleViewConstant)
 
@@ -777,6 +970,18 @@ H2_ENUM_BEGIN(AdventurePanelDialogConstant)
     CONTROL_CLOSE_HELP        = 4,
     CONTROL_CONFIRMATION_SIZE = 200
 H2_ENUM_END(AdventurePanelDialogConstant)
+
+H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
+    SYSTEM_OPTIONS_HELP_ACCEPT       = 0,
+    SYSTEM_OPTIONS_HELP_FIRST_OPTION = 1,
+    SYSTEM_OPTIONS_TEXT_CAPACITY     = 120
+H2_ENUM_END(AdventureSystemOptionsPrivateConstant)
+
+H2_ENUM_BEGIN(AdventureMusicQuality)
+    MUSIC_QUALITY_MIDI      = 0,
+    MUSIC_QUALITY_CD_STEREO = 1,
+    MUSIC_QUALITY_CD_OPERA  = 2
+H2_ENUM_END(AdventureMusicQuality)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
@@ -3125,33 +3330,34 @@ void advManager::DrawCell(
     s_drawCell = GetCell(mapX, mapY);
 
     if (gbAllBlack == 0 && (mapX < 0 || mapY < 0 || mapX >= MAP_WIDTH || mapY >= MAP_HEIGHT)) {
-        s_drawStoneTile = -1;
+        s_drawStoneTile = STONE_TILE_NONE;
         if (mapX == -1) {
             if (mapY == -1) {
-                s_drawStoneTile = 16;
+                s_drawStoneTile = STONE_TILE_TOP_LEFT;
             } else if (mapY == MAP_HEIGHT) {
-                s_drawStoneTile = 19;
+                s_drawStoneTile = STONE_TILE_BOTTOM_LEFT;
             } else if (mapY >= 0 && mapY < MAP_HEIGHT) {
-                s_drawStoneTile = (mapY & 3) + 32;
+                s_drawStoneTile = (mapY & CLOUD_VARIANT_MASK) + STONE_TILE_LEFT_BASE;
             }
         } else if (mapX == MAP_WIDTH) {
             if (mapY == -1) {
-                s_drawStoneTile = 17;
+                s_drawStoneTile = STONE_TILE_TOP_RIGHT;
             } else if (mapY == MAP_HEIGHT) {
-                s_drawStoneTile = 18;
+                s_drawStoneTile = STONE_TILE_BOTTOM_RIGHT;
             } else if (mapY >= 0 && mapY < MAP_HEIGHT) {
-                s_drawStoneTile = (mapY & 3) + 24;
+                s_drawStoneTile = (mapY & CLOUD_VARIANT_MASK) + STONE_TILE_RIGHT_BASE;
             }
         } else if (mapY == -1) {
             if (mapX >= 0 && mapX < MAP_WIDTH) {
-                s_drawStoneTile = (mapX & 3) + 20;
+                s_drawStoneTile = (mapX & CLOUD_VARIANT_MASK) + STONE_TILE_TOP_BASE;
             }
         } else if (mapY == MAP_HEIGHT && mapX >= 0 && mapX < MAP_WIDTH) {
-            s_drawStoneTile = (mapX & 3) + 28;
+            s_drawStoneTile = (mapX & CLOUD_VARIANT_MASK) + STONE_TILE_BOTTOM_BASE;
         }
-        if (s_drawStoneTile == -1) {
+        if (s_drawStoneTile == STONE_TILE_NONE) {
             s_drawStoneTile =
-                ((mapY + 16) % CLOUD_VARIANTS) * 4 + (mapX + 16) % CLOUD_VARIANTS;
+                ((mapY + STONE_PATTERN_COORDINATE_SHIFT) % CLOUD_VARIANTS) * CLOUD_VARIANTS
+                + (mapX + STONE_PATTERN_COORDINATE_SHIFT) % CLOUD_VARIANTS;
         }
         TileToBitmap(
             m_stoneTiles,
@@ -3174,7 +3380,7 @@ void advManager::DrawCell(
                 if (HAS(drawMask, ADVMGR_DRAW_CLOUD)) {
                     TileToBitmap(
                         m_cloudTiles,
-                        (mapY + mapX) & 3,
+                        (mapY + mapX) & CLOUD_VARIANT_MASK,
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY
@@ -3182,16 +3388,18 @@ void advManager::DrawCell(
                 }
                 return;
             }
-            if (s_drawCloudFrame >= 100) {
+            if (s_drawCloudFrame >= CLOUD_FLIPPED_FRAME_BASE) {
                 s_drawFlipCloud = 1;
-                s_drawCloudFrame -= 100;
+                s_drawCloudFrame -= CLOUD_FLIPPED_FRAME_BASE;
             } else {
                 s_drawFlipCloud = 0;
             }
-            if ((s_drawCloudFrame == 1 || s_drawCloudFrame == 5) && (mapX & 1)) {
+            if ((s_drawCloudFrame == CLOUD_X_ALTERNATE_FRAME_1
+                 || s_drawCloudFrame == CLOUD_X_ALTERNATE_FRAME_2)
+                && (mapX & 1)) {
                 ++s_drawCloudFrame;
             }
-            if (s_drawCloudFrame == 3 && (mapY & 1)) {
+            if (s_drawCloudFrame == CLOUD_Y_ALTERNATE_FRAME && (mapY & 1)) {
                 ++s_drawCloudFrame;
             }
         } else {
@@ -3204,7 +3412,7 @@ void advManager::DrawCell(
                     FlipIconToBitmap(
                         m_cloudOverlayIcon,
                         gpWindowManager->m_screen,
-                        s_drawPixelX + 31,
+                        s_drawPixelX + CELL_LAST_PIXEL,
                         s_drawPixelY,
                         s_drawCloudFrame - 1,
                         0,
@@ -3235,9 +3443,9 @@ void advManager::DrawCell(
                     IconToBitmapColorTable(
                         m_objectIcons[IDX(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
-                        s_drawPixelX - 12,
-                        s_drawPixelY + 2,
-                        (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xFF,
+                        s_drawPixelX - ROUTE_DRAW_X_OFFSET,
+                        s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
+                        (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & ROUTE_FRAME_MASK,
                         1,
                         0,
                         0,
@@ -3251,9 +3459,9 @@ void advManager::DrawCell(
                     IconToBitmap(
                         m_objectIcons[IDX(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
-                        s_drawPixelX - 12,
-                        s_drawPixelY + 2,
-                        (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & 0xFF,
+                        s_drawPixelX - ROUTE_DRAW_X_OFFSET,
+                        s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
+                        (m_visibilityMap[mapY * MAP_WIDTH + mapX] - 1) & ROUTE_FRAME_MASK,
                         1,
                         0,
                         0,
@@ -3266,7 +3474,7 @@ void advManager::DrawCell(
         } else {
             if (HAS(drawMask, ADVMGR_DRAW_GROUND)) {
                 s_drawGroundTile = s_drawCell->m_flags;
-                s_drawGroundTile <<= 14;
+                s_drawGroundTile <<= TERRAIN_FLAGS_SHIFT;
                 s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
                 TileToBitmap(
                     m_groundTiles,
@@ -3278,7 +3486,7 @@ void advManager::DrawCell(
 
                 if (s_drawCell->m_objectLayerBit0
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
-                        || s_drawCell->m_objectIndex != 140)
+                        || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
                     && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
                         m_objectIcons[IDX(s_drawCell->m_objectTileset)],
@@ -3579,9 +3787,9 @@ void advManager::DrawCell(
                                 IconToBitmap(
                                     m_objectIcons[MINE_GUARDIAN_ICON_SLOT],
                                     gpWindowManager->m_screen,
-                                    s_drawPixelX - 16,
+                                    s_drawPixelX - CELL_CENTER_PIXEL,
                                     s_drawPixelY,
-                                    (m_updateMaxY + mapY + mapX) % 15,
+                                    (m_updateMaxY + mapY + mapX) % MINE_GHOST_FRAME_COUNT,
                                     1,
                                     0,
                                     0,
@@ -3593,7 +3801,7 @@ void advManager::DrawCell(
                                 IconToBitmap(
                                     m_objectIcons[TILESET_BOAT],
                                     gpWindowManager->m_screen,
-                                    s_drawPixelX - 32,
+                                    s_drawPixelX - CELL_PIXELS,
                                     s_drawPixelY,
                                     IDX(s_drawMine->guardianType) - IDX(CREATURE_EARTH_ELEMENTAL),
                                     1,
@@ -3612,10 +3820,10 @@ void advManager::DrawCell(
                             IconToBitmap(
                                 m_objectIcons[TILESET_MONSTER],
                                 gpWindowManager->m_screen,
-                                s_drawPixelX + 16,
-                                s_drawPixelY + 30,
-                                (8 - (m_mineGuardianFacingLeft == 0))
-                                    + s_drawCell->m_objectIndex * 9,
+                                s_drawPixelX + CELL_CENTER_PIXEL,
+                                s_drawPixelY + OBJECT_BASELINE_Y,
+                                (MONSTER_REVERSED_FRAME - (m_mineGuardianFacingLeft == 0))
+                                    + s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE,
                                 1,
                                 0,
                                 0,
@@ -3627,9 +3835,9 @@ void advManager::DrawCell(
                             IconToBitmap(
                                 m_objectIcons[TILESET_MONSTER],
                                 gpWindowManager->m_screen,
-                                s_drawPixelX + 16,
-                                s_drawPixelY + 30,
-                                s_drawCell->m_objectIndex * 9,
+                                s_drawPixelX + CELL_CENTER_PIXEL,
+                                s_drawPixelY + OBJECT_BASELINE_Y,
+                                s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE,
                                 1,
                                 0,
                                 0,
@@ -3637,8 +3845,8 @@ void advManager::DrawCell(
                                 DRAW_CLIP_HEIGHT,
                                 0
                             );
-                            if (s_drawCell->m_objectIndex == 59
-                                || s_drawCell->m_objectIndex == 60) {
+                            if (s_drawCell->m_objectIndex == MONSTER_SPECIAL_FRAME_FIRST
+                                || s_drawCell->m_objectIndex == MONSTER_SPECIAL_FRAME_LAST) {
                                 s_drawMonsterFrame =
                                     m_animationPhases[mapX & ANIMATION_PHASE_COLUMN_MASK]
                                     % UPDATE_ANIMATION_PHASES;
@@ -3649,9 +3857,10 @@ void advManager::DrawCell(
                             IconToBitmap(
                                 m_objectIcons[TILESET_MONSTER],
                                 gpWindowManager->m_screen,
-                                s_drawPixelX + 16,
-                                s_drawPixelY + 30,
-                                s_drawCell->m_objectIndex * 9 + s_drawMonsterFrame + 1,
+                                s_drawPixelX + CELL_CENTER_PIXEL,
+                                s_drawPixelY + OBJECT_BASELINE_Y,
+                                s_drawCell->m_objectIndex * MONSTER_FRAME_STRIDE + s_drawMonsterFrame
+                                    + MONSTER_ANIMATION_FRAME_OFFSET,
                                 1,
                                 0,
                                 0,
@@ -3669,7 +3878,7 @@ void advManager::DrawCell(
                     s_drawHeroFrame =
                         GetCursorBaseFrame(gpGame->m_boats[s_drawCell->m_objectMetadata].direction);
                     s_drawHasHero = 1;
-                    s_drawHeroYOffset = -10;
+                    s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                 } else {
                     s_drawHeroYOffset = 0;
                     if (s_drawCell->m_triggerType
@@ -3684,7 +3893,7 @@ void advManager::DrawCell(
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = 1;
                         if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                            s_drawHeroYOffset = -10;
+                            s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                         }
                     }
                 }
@@ -3694,24 +3903,24 @@ void advManager::DrawCell(
                         if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
-                                if (cursorFrame == 51) {
-                                    cursorFrame = 56;
+                                if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_51) {
+                                    cursorFrame = HERO_SHADOW_TARGET_FRAME_56;
                                 }
-                                if (cursorFrame == 50) {
-                                    cursorFrame = 57;
+                                if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_50) {
+                                    cursorFrame = HERO_SHADOW_TARGET_FRAME_57;
                                 }
-                                if (cursorFrame == 49) {
-                                    cursorFrame = 58;
+                                if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_49) {
+                                    cursorFrame = HERO_SHADOW_TARGET_FRAME_58;
                                 }
-                                if (cursorFrame == 47) {
-                                    cursorFrame = 55;
+                                if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_47) {
+                                    cursorFrame = HERO_SHADOW_TARGET_FRAME_55;
                                 }
-                                if (cursorFrame == 46) {
-                                    cursorFrame = 55;
+                                if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_46) {
+                                    cursorFrame = HERO_SHADOW_TARGET_FRAME_55;
                                 }
-                                if (cursorFrame >= 9
+                                if (cursorFrame >= HERO_SHADOW_FRAME_FIRST
                                     && cursorFrame < HERO_SHADOW_FRAME_END) {
-                                    heroShadowOffset = 50;
+                                    heroShadowOffset = HERO_SHADOW_FRAME_OFFSET;
                                 } else {
                                     heroShadowOffset = 0;
                                 }
@@ -3719,7 +3928,7 @@ void advManager::DrawCell(
                                     m_shadowIcon,
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
-                                    s_drawPixelY + 31,
+                                    s_drawPixelY + CELL_LAST_PIXEL,
                                     cursorFrame + heroShadowOffset,
                                     1,
                                     0,
@@ -3731,9 +3940,9 @@ void advManager::DrawCell(
                             }
                             if (m_drawHeroShadows != 0 && s_drawHeroType == HERO_TYPE_BOAT) {
                                 boatFrameIndex = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
-                                if (boatFrameIndex >= 9
+                                if (boatFrameIndex >= HERO_SHADOW_FRAME_FIRST
                                     && boatFrameIndex < HERO_SHADOW_FRAME_END) {
-                                    boatShadowFrameOffset = 36;
+                                    boatShadowFrameOffset = HERO_SHADOW_FRAME_END;
                                 } else {
                                     boatShadowFrameOffset = 0;
                                 }
@@ -3741,7 +3950,7 @@ void advManager::DrawCell(
                                     m_boatShadowIcon,
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
-                                    s_drawPixelY + 31 + s_drawHeroYOffset,
+                                    s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                     boatFrameIndex + boatShadowFrameOffset,
                                     1,
                                     0,
@@ -3753,12 +3962,12 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & 4) == 0) {
+                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
                                 FlipIconToBitmap(
-                                    m_heroIcons[7],
+                                    m_heroIcons[HERO_ICON_FROTH],
                                     gpWindowManager->m_screen,
-                                    s_drawPixelX + 32,
-                                    s_drawPixelY + 31 + s_drawHeroYOffset,
+                                    s_drawPixelX + CELL_PIXELS,
+                                    s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                     s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
                                     1,
                                     0,
@@ -3771,8 +3980,8 @@ void advManager::DrawCell(
                             FlipIconToBitmap(
                                 m_heroIcons[IDX(s_drawHeroType)],
                                 gpWindowManager->m_screen,
-                                s_drawPixelX + 32,
-                                s_drawPixelY + 31 + s_drawHeroYOffset,
+                                s_drawPixelX + CELL_PIXELS,
+                                s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                 s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
                                 1,
                                 0,
@@ -3786,8 +3995,8 @@ void advManager::DrawCell(
                                     FlipIconToBitmap(
                                         m_boatFlagIcons[s_drawPlayerColor],
                                         gpWindowManager->m_screen,
-                                        s_drawPixelX + 32,
-                                        s_drawPixelY + 31 + s_drawHeroYOffset,
+                                        s_drawPixelX + CELL_PIXELS,
+                                        s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                         s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
                                         1,
                                         0,
@@ -3800,10 +4009,11 @@ void advManager::DrawCell(
                                     FlipIconToBitmap(
                                         m_flagIcons[s_drawPlayerColor],
                                         gpWindowManager->m_screen,
-                                        s_drawPixelX + 32,
-                                        s_drawPixelY + 31,
-                                        m_updateMaxY % 8
-                                            + (s_drawHeroFrame & HERO_FRAME_INDEX_MASK) + 56,
+                                        s_drawPixelX + CELL_PIXELS,
+                                        s_drawPixelY + CELL_LAST_PIXEL,
+                                        m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
+                                            + (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
+                                            + PLAYER_FLAG_FRAME_BASE,
                                         1,
                                         0,
                                         0,
@@ -3822,7 +4032,7 @@ void advManager::DrawCell(
                                     m_shadowIcon,
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
-                                    s_drawPixelY + 31,
+                                    s_drawPixelY + CELL_LAST_PIXEL,
                                     s_drawHeroFrame,
                                     1,
                                     0,
@@ -3837,7 +4047,7 @@ void advManager::DrawCell(
                                     m_boatShadowIcon,
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
-                                    s_drawPixelY + 31 + s_drawHeroYOffset,
+                                    s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                     s_drawHeroFrame,
                                     1,
                                     0,
@@ -3849,12 +4059,12 @@ void advManager::DrawCell(
                             }
                         } else {
                             if (s_drawHeroType == HERO_TYPE_BOAT
-                                && (s_drawCell->m_flags & 4) == 0) {
+                                && (s_drawCell->m_flags & CURSOR_CELL_UNCOVERED_FLAG) == 0) {
                                 IconToBitmap(
-                                    m_heroIcons[7],
+                                    m_heroIcons[HERO_ICON_FROTH],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
-                                    s_drawPixelY + 31 + s_drawHeroYOffset,
+                                    s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                     s_drawHeroFrame,
                                     1,
                                     0,
@@ -3868,7 +4078,7 @@ void advManager::DrawCell(
                                 m_heroIcons[IDX(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
-                                s_drawPixelY + 31 + s_drawHeroYOffset,
+                                s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                 s_drawHeroFrame,
                                 1,
                                 0,
@@ -3883,7 +4093,7 @@ void advManager::DrawCell(
                                         m_boatFlagIcons[s_drawPlayerColor],
                                         gpWindowManager->m_screen,
                                         s_drawPixelX,
-                                        s_drawPixelY + 31 + s_drawHeroYOffset,
+                                        s_drawPixelY + CELL_LAST_PIXEL + s_drawHeroYOffset,
                                         s_drawHeroFrame & HERO_FRAME_INDEX_MASK,
                                         1,
                                         0,
@@ -3897,9 +4107,10 @@ void advManager::DrawCell(
                                         m_flagIcons[s_drawPlayerColor],
                                         gpWindowManager->m_screen,
                                         s_drawPixelX,
-                                        s_drawPixelY + 31,
-                                        m_updateMaxY % 8
-                                            + (s_drawHeroFrame & HERO_FRAME_INDEX_MASK) + 56,
+                                        s_drawPixelY + CELL_LAST_PIXEL,
+                                        m_updateMaxY % PLAYER_FLAG_FRAME_COUNT
+                                            + (s_drawHeroFrame & HERO_FRAME_INDEX_MASK)
+                                            + PLAYER_FLAG_FRAME_BASE,
                                         1,
                                         0,
                                         0,
@@ -3915,7 +4126,8 @@ void advManager::DrawCell(
 
                 if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
                     && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
-                    && m_mapOriginX + 7 == mapX && m_mapOriginY + 7 == mapY) {
+                    && m_mapOriginX + VIEW_CENTER_CELL == mapX
+                    && m_mapOriginY + VIEW_CENTER_CELL == mapY) {
                     if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
                         cursorSuppressed = 1;
                     } else {
@@ -4191,26 +4403,32 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     switch (MAP_HEIGHT) {
         case MAP_DIMENSION_SMALL:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
-                              + (minYOffset * 4 + RADAR_TOP) * RADAR_ROW_GROUPS
+                              + (minYOffset * RADAR_SMALL_CELL_PIXELS + RADAR_TOP)
+                                    * RADAR_ROW_GROUPS
                                     * RADAR_GROUP_BYTES
                               + RADAR_LEFT;
-            screenColumnIndex = minXSlot * 4;
+            screenColumnIndex = minXSlot * RADAR_SMALL_CELL_PIXELS;
             break;
         case MAP_DIMENSION_MEDIUM:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
-                              + (minYOffset * 2 + RADAR_TOP) * RADAR_ROW_GROUPS
+                              + (minYOffset * RADAR_MEDIUM_CELL_PIXELS + RADAR_TOP)
+                                    * RADAR_ROW_GROUPS
                                     * RADAR_GROUP_BYTES
                               + RADAR_LEFT;
-            screenColumnIndex = minXSlot * 2;
+            screenColumnIndex = minXSlot * RADAR_MEDIUM_CELL_PIXELS;
             break;
         case MAP_DIMENSION_LARGE:
             screenRowOffset = gpWindowManager->m_screen->m_pixels
-                              + (minYOffset + (minYOffset + 2) / 3 + RADAR_TOP)
+                              + (minYOffset
+                                 + (minYOffset + RADAR_LARGE_SCALE_ROUNDING)
+                                       / RADAR_LARGE_SCALE_DIVISOR
+                                 + RADAR_TOP)
                                     * RADAR_ROW_GROUPS * RADAR_GROUP_BYTES
                               + RADAR_LEFT;
-            screenColumnIndex = minXSlot + (minXSlot + 2) / 3;
-            columnRemainderValue = minXSlot % 3;
-            rowRemainderState = minYOffset % 3;
+            screenColumnIndex = minXSlot
+                + (minXSlot + RADAR_LARGE_SCALE_ROUNDING) / RADAR_LARGE_SCALE_DIVISOR;
+            columnRemainderValue = minXSlot % RADAR_LARGE_SCALE_DIVISOR;
+            rowRemainderState = minYOffset % RADAR_LARGE_SCALE_DIVISOR;
             break;
         default:
             screenRowOffset = &gpWindowManager->m_screen->m_pixels
@@ -4225,20 +4443,20 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         radarPixel = screenRowOffset + screenColumnIndex;
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                screenRowOffset += RADAR_SCREEN_PITCH * 4;
+                screenRowOffset += RADAR_SCREEN_PITCH * RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                screenRowOffset += RADAR_SCREEN_PITCH * 2;
+                screenRowOffset += RADAR_SCREEN_PITCH * RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
                 ++rowRemainderState;
-                if (rowRemainderState > 2) {
+                if (rowRemainderState >= RADAR_LARGE_SCALE_DIVISOR) {
                     rowRemainderState = 0;
                 }
                 if (rowRemainderState != 0) {
                     screenRowOffset += RADAR_SCREEN_PITCH;
                 } else {
-                    screenRowOffset += RADAR_SCREEN_PITCH * 2;
+                    screenRowOffset += RADAR_SCREEN_PITCH * RADAR_MEDIUM_CELL_PIXELS;
                 }
                 break;
             case MAP_DIMENSION_XLARGE:
@@ -4392,16 +4610,33 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
 
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    memset(radarPixel, radarColorValue, 4);
-                    memset(radarPixel + RADAR_SCREEN_PITCH, radarColorValue, 4);
-                    memset(radarPixel + RADAR_SCREEN_PITCH * 2, radarColorValue, 4);
-                    memset(radarPixel + RADAR_SCREEN_PITCH * 3, radarColorValue, 4);
-                    radarPixel += 4;
+                    memset(radarPixel, radarColorValue, RADAR_SMALL_CELL_PIXELS);
+                    memset(
+                        radarPixel + RADAR_SCREEN_PITCH,
+                        radarColorValue,
+                        RADAR_SMALL_CELL_PIXELS
+                    );
+                    memset(
+                        radarPixel + RADAR_SCREEN_PITCH * RADAR_MEDIUM_CELL_PIXELS,
+                        radarColorValue,
+                        RADAR_SMALL_CELL_PIXELS
+                    );
+                    memset(
+                        radarPixel
+                            + RADAR_SCREEN_PITCH * (RADAR_SMALL_CELL_PIXELS - 1),
+                        radarColorValue,
+                        RADAR_SMALL_CELL_PIXELS
+                    );
+                    radarPixel += RADAR_SMALL_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    memset(radarPixel, radarColorValue, 2);
-                    memset(radarPixel + RADAR_SCREEN_PITCH, radarColorValue, 2);
-                    radarPixel += 2;
+                    memset(radarPixel, radarColorValue, RADAR_MEDIUM_CELL_PIXELS);
+                    memset(
+                        radarPixel + RADAR_SCREEN_PITCH,
+                        radarColorValue,
+                        RADAR_MEDIUM_CELL_PIXELS
+                    );
+                    radarPixel += RADAR_MEDIUM_CELL_PIXELS;
                     break;
                 case MAP_DIMENSION_LARGE:
                     if (columnRemainderValue != 0) {
@@ -4416,16 +4651,16 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                     } else if (rowRemainderState != 0) {
                         radarPixel[0] = radarColorValue;
                         radarPixel[1] = radarColorValue;
-                        radarPixel += 2;
+                        radarPixel += RADAR_MEDIUM_CELL_PIXELS;
                     } else {
                         radarPixel[0] = radarColorValue;
                         radarPixel[1] = radarColorValue;
                         radarPixel[RADAR_SCREEN_PITCH] = radarColorValue;
                         radarPixel[RADAR_SCREEN_PITCH + 1] = radarColorValue;
-                        radarPixel += 2;
+                        radarPixel += RADAR_MEDIUM_CELL_PIXELS;
                     }
                     ++columnRemainderValue;
-                    if (columnRemainderValue > 2) {
+                    if (columnRemainderValue >= RADAR_LARGE_SCALE_DIVISOR) {
                         columnRemainderValue = 0;
                     }
                     break;
@@ -4436,59 +4671,63 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
         }
     }
 
-    radarFrameLocal = -1;
+    radarFrameLocal = RADAR_FRAME_NONE;
     skipFrameIndex = 0;
     if (gbInViewWorld != 0) {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                radarScaleState = 4.0f;
+                radarScaleState = RADAR_SMALL_CELL_PIXELS;
                 skipFrameIndex = 1;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                radarScaleState = 2.0f;
+                radarScaleState = RADAR_MEDIUM_CELL_PIXELS;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_MIDDLE) {
                     skipFrameIndex = 1;
                 } else {
-                    radarFrameLocal = 6;
+                    radarFrameLocal = RADAR_FRAME_VIEW_MIDDLE;
                 }
                 break;
             case MAP_DIMENSION_LARGE:
+                // Retail approximates the large-map radar ratio rather than using 4/3.
+                // NOLINTNEXTLINE(readability-magic-numbers)
                 radarScaleState = 1.33f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
                 } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
-                    radarFrameLocal = 9;
+                    radarFrameLocal = RADAR_FRAME_VIEW_MIDDLE_LARGE;
                 } else {
-                    radarFrameLocal = 8;
+                    radarFrameLocal = RADAR_FRAME_VIEW_NEAR_LARGE;
                 }
                 break;
             default:
                 radarScaleState = 1.0f;
                 if (giViewWorldScale == VIEW_WORLD_SCALE_FAR) {
-                    radarFrameLocal = 7;
+                    radarFrameLocal = RADAR_FRAME_VIEW_FAR_XLARGE;
                 } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
-                    radarFrameLocal = 6;
+                    radarFrameLocal = RADAR_FRAME_VIEW_MIDDLE;
                 } else {
-                    radarFrameLocal = 4;
+                    radarFrameLocal = RADAR_FRAME_VIEW_NEAR_XLARGE;
                 }
                 break;
         }
     } else {
         switch (MAP_HEIGHT) {
             case MAP_DIMENSION_SMALL:
-                radarFrameLocal = 5;
-                radarScaleState = 4.0f;
+                radarFrameLocal = RADAR_FRAME_NORMAL_SMALL;
+                radarScaleState = RADAR_SMALL_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_MEDIUM:
-                radarFrameLocal = 3;
-                radarScaleState = 2.0f;
+                radarFrameLocal = RADAR_FRAME_NORMAL_MEDIUM;
+                radarScaleState = RADAR_MEDIUM_CELL_PIXELS;
                 break;
             case MAP_DIMENSION_LARGE:
-                radarFrameLocal = 2;
+                radarFrameLocal = RADAR_FRAME_NORMAL_LARGE;
+                // Retail approximates the large-map radar ratio rather than using 4/3.
+                // NOLINTNEXTLINE(readability-magic-numbers)
                 radarScaleState = 1.33f;
                 break;
             default:
-                radarFrameLocal = 1;
+                radarFrameLocal = RADAR_FRAME_NORMAL_XLARGE;
                 radarScaleState = 1.0f;
                 break;
         }
@@ -4497,10 +4736,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (skipFrameIndex == 0) {
         if (gbInViewWorld != 0) {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(iVWMapOriginX * radarScaleState + 480.0f),
-                static_cast<i32>(iVWMapOriginY * radarScaleState + 16.0f),
+                static_cast<i32>(iVWMapOriginX * radarScaleState + RADAR_LEFT),
+                static_cast<i32>(iVWMapOriginY * radarScaleState + RADAR_TOP),
                 radarFrameLocal,
-                181,
+                RADAR_VIEWPORT_COLOR,
                 0,
                 RADAR_LEFT,
                 RADAR_TOP,
@@ -4509,10 +4748,10 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(m_mapOriginX * radarScaleState + 480.0f),
-                static_cast<i32>(m_mapOriginY * radarScaleState + 16.0f),
+                static_cast<i32>(m_mapOriginX * radarScaleState + RADAR_LEFT),
+                static_cast<i32>(m_mapOriginY * radarScaleState + RADAR_TOP),
                 radarFrameLocal,
-                181,
+                RADAR_VIEWPORT_COLOR,
                 0,
                 RADAR_LEFT,
                 RADAR_TOP,
@@ -4525,8 +4764,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<i32>(minXSlot * radarScaleState + 480.0f),
-                static_cast<i32>(minYOffset * radarScaleState + 16.0f),
+                static_cast<i32>(minXSlot * radarScaleState + RADAR_LEFT),
+                static_cast<i32>(minYOffset * radarScaleState + RADAR_TOP),
                 static_cast<i32>((maxXLocal - minXSlot + 1) * radarScaleState),
                 static_cast<i32>((maxYLocal - minYOffset + 1) * radarScaleState)
             );
@@ -4550,10 +4789,10 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 dialogTopPosition;
     heroWindow* windowLocal;
     HeroEventFlag visitedMaskValue;
-    char savedTextLocal[200];
-    char guardCaption[200];
+    char savedTextLocal[QUICK_INFO_TEXT_CAPACITY];
+    char guardCaption[QUICK_INFO_TEXT_CAPACITY];
     i32 siteIndexName;
-    i32 siteFrameLocal[2];
+    i32 siteFrameLocal[QUICK_INFO_SITE_FRAME_COUNT];
     TilesetId objectTilesetLocal;
     char uppercaseResult;
     char mapObjectKindValue;
@@ -4565,20 +4804,20 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         heroLocal = NULL;
     }
 
-    quickInfoScreenX = cellX * CELL_PIXELS - 57;
-    if (quickInfoScreenX < 30) {
-        quickInfoScreenX = 30;
+    quickInfoScreenX = cellX * CELL_PIXELS - QUICK_INFO_X_OFFSET;
+    if (quickInfoScreenX < QUICK_INFO_MIN_X) {
+        quickInfoScreenX = QUICK_INFO_MIN_X;
     }
-    if (quickInfoScreenX + 160 > 464) {
-        quickInfoScreenX = 304;
+    if (quickInfoScreenX + QUICK_INFO_WIDTH > QUICK_INFO_RIGHT) {
+        quickInfoScreenX = QUICK_INFO_RIGHT_X;
     }
 
-    dialogTopPosition = cellY * CELL_PIXELS - 25;
-    if (dialogTopPosition < 16) {
-        dialogTopPosition = 16;
+    dialogTopPosition = cellY * CELL_PIXELS - QUICK_INFO_Y_OFFSET;
+    if (dialogTopPosition < QUICK_INFO_MIN_Y) {
+        dialogTopPosition = QUICK_INFO_MIN_Y;
     }
-    if (dialogTopPosition + 96 > 448) {
-        dialogTopPosition = 352;
+    if (dialogTopPosition + QUICK_INFO_HEIGHT > QUICK_INFO_BOTTOM) {
+        dialogTopPosition = QUICK_INFO_BOTTOM_Y;
     }
 
     windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, "qwikinfo.bin");
@@ -4780,7 +5019,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "\n\nguarded by %s %s",
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
-                                2
+                                ARMY_SIZE_NAME_INLINE
                             ),
                             gArmyNamesPlural[IDX(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianType
@@ -4802,11 +5041,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         gText,
                         "%s",
                         gResourceNames
-                            [(currentCell->m_objectIndex & RESOURCE_FRAME_PAIR_MASK) / 2]
+                            [(currentCell->m_objectIndex & RESOURCE_FRAME_PAIR_MASK)
+                             / RESOURCE_FRAME_PAIR_STRIDE]
                     );
                     break;
                 case MAP_OBJECT_MONSTER:
-                    if (IsCrystalBallInEffect(m_mapOriginX + cellX, m_mapOriginY + cellY, 8)) {
+                    if (IsCrystalBallInEffect(
+                            m_mapOriginX + cellX,
+                            m_mapOriginY + cellY,
+                            CRYSTAL_BALL_RADIUS
+                        )) {
                         sprintf(
                             gText,
                             "%d %s",
@@ -4819,7 +5063,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             "%s %s",
                             GetArmySizeName(
                                 currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
-                                1
+                                ARMY_SIZE_NAME_SENTENCE
                             ),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
@@ -4830,7 +5074,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     sprintf(
                         gText,
                         gQuickViewText[currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK],
-                        xBarrierColor[currentCell->m_objectMetadata & 7]
+                        xBarrierColor[currentCell->m_objectMetadata & BARRIER_COLOR_MASK]
                     );
                     uppercaseResult =
                         static_cast<char>(toupper(static_cast<i32>(static_cast<i8>(gText[0]))));
@@ -4845,16 +5089,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    siteIndexName = -1;
+                    siteIndexName = GENERIC_SITE_UNKNOWN;
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_1_END) {
-                                    siteIndexName = 0;
+                                    siteIndexName = GENERIC_SITE_ALCHEMIST_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_2_END) {
-                                    siteIndexName = 1;
+                                    siteIndexName = GENERIC_SITE_ARENA;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
@@ -4864,15 +5108,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_ALTAR_END) {
-                                    siteIndexName = 4;
+                                    siteIndexName = GENERIC_SITE_STABLES;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (siteFrameLocal[0] < GENERIC_UNUSED_END) {
-                                    siteIndexName = -1;
+                                    siteIndexName = GENERIC_SITE_UNKNOWN;
                                 } else if (siteFrameLocal[0] < GENERIC_TOWER_END) {
-                                    siteIndexName = 5;
+                                    siteIndexName = GENERIC_SITE_MERMAID;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SPRING_END) {
-                                    siteIndexName = 6;
+                                    siteIndexName = GENERIC_SITE_SIRENS;
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
@@ -4882,14 +5126,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_3_SPLIT) {
-                                    siteIndexName = 2;
+                                    siteIndexName = GENERIC_SITE_HUT_OF_MAGI;
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_3_END) {
-                                    siteIndexName = 3;
+                                    siteIndexName = GENERIC_SITE_EYE_OF_MAGI;
                                 }
                             }
                             break;
                     }
-                    if (siteIndexName == -1) {
+                    if (siteIndexName == GENERIC_SITE_UNKNOWN) {
                         sprintf(gText, "Unknown");
                     } else {
                         sprintf(gText, xGenericSiteNames[siteIndexName]);
@@ -4912,27 +5156,27 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    siteIndexName = -1;
+                    siteIndexName = RECRUITMENT_SITE_UNKNOWN;
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < RECRUITMENT_START) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < RECRUITMENT_1_END) {
-                                    siteIndexName = 0;
+                                    siteIndexName = RECRUITMENT_SITE_BARROW_MOUNDS;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_2_END) {
-                                    siteIndexName = 1;
+                                    siteIndexName = RECRUITMENT_SITE_EARTH_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_3_END) {
-                                    siteIndexName = 2;
+                                    siteIndexName = RECRUITMENT_SITE_AIR_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_4_END) {
-                                    siteIndexName = 3;
+                                    siteIndexName = RECRUITMENT_SITE_FIRE_ALTAR;
                                 } else if (siteFrameLocal[0] < RECRUITMENT_5_END) {
-                                    siteIndexName = 4;
+                                    siteIndexName = RECRUITMENT_SITE_WATER_ALTAR;
                                 }
                             }
                             break;
                     }
-                    if (siteIndexName == -1) {
+                    if (siteIndexName == RECRUITMENT_SITE_UNKNOWN) {
                         sprintf(gText, "Unknown");
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[siteIndexName]);
@@ -4979,7 +5223,7 @@ quick_info_ready:
             currentCell->m_objectIndex,
             currentCell->m_triggerType,
             currentCell->m_objectMetadata,
-            currentCell->m_flags & 8,
+            currentCell->HasFlag(MAP_CELL_OCCUPIED),
             savedTextLocal,
             m_mapOriginX + cellX,
             m_mapOriginY + cellY
@@ -5347,13 +5591,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             }
             updated = 1;
 
-            if (m_bottomViewIcons[1] != NULL) {
+            if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] != NULL) {
                 message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
                 message.payload.widget.id = ENEMY_TURN_SAND_ID;
                 message.payload.widget.data.value = iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET;
                 m_adventureWindow->BroadcastMessage(message);
             } else {
-                m_bottomViewIcons[1] = new iconWidget(
+                m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] = new iconWidget(
                     ENEMY_TURN_ANIMATION_X,
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
@@ -5365,10 +5609,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     ENEMY_TURN_WIDGET_FLAGS,
                     1
                 );
-                if (m_bottomViewIcons[1] == NULL) {
+                if (m_bottomViewIcons[ENEMY_TURN_SAND_SLOT] == NULL) {
                     MemError();
                 }
-                m_adventureWindow->AddWidget(m_bottomViewIcons[1], ENEMY_TURN_SAND_Z);
+                m_adventureWindow->AddWidget(
+                    m_bottomViewIcons[ENEMY_TURN_SAND_SLOT],
+                    ENEMY_TURN_SAND_Z
+                );
             }
         }
     }
@@ -5379,14 +5626,14 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         if (iCurBottomViewEnemy != giCurPlayer) {
             iCurHourGlassPhase = 0;
         }
-        if (m_bottomViewIcons[0] != NULL) {
+        if (m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] != NULL) {
             message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
             message.payload.widget.id = ENEMY_TURN_CREST_ID;
             message.payload.widget.data.value =
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer));
             m_adventureWindow->BroadcastMessage(message);
         } else {
-            m_bottomViewIcons[0] = new iconWidget(
+            m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] = new iconWidget(
                 ENEMY_TURN_CREST_X,
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
@@ -5398,10 +5645,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_WIDGET_FLAGS,
                 1
             );
-            if (m_bottomViewIcons[0] == NULL) {
+            if (m_bottomViewIcons[ENEMY_TURN_CREST_SLOT] == NULL) {
                 MemError();
             }
-            m_adventureWindow->AddWidget(m_bottomViewIcons[0], ENEMY_TURN_CREST_Z);
+            m_adventureWindow->AddWidget(
+                m_bottomViewIcons[ENEMY_TURN_CREST_SLOT],
+                ENEMY_TURN_CREST_Z
+            );
         }
     }
 
@@ -5411,14 +5661,14 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         updated = 1;
         iLastHourGlassPhase = iCurHourGlassPhase;
         giLastHourGlassUpdateTime = KBTickCount();
-        if (m_bottomViewIcons[2] != NULL) {
+        if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] != NULL) {
             message.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
             message.payload.widget.id = ENEMY_TURN_PHASE_ID;
             message.payload.widget.data.value =
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET;
             m_adventureWindow->BroadcastMessage(message);
         } else {
-            m_bottomViewIcons[2] = new iconWidget(
+            m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] = new iconWidget(
                 ENEMY_TURN_ANIMATION_X,
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
@@ -5430,10 +5680,13 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_WIDGET_FLAGS,
                 1
             );
-            if (m_bottomViewIcons[2] == NULL) {
+            if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] == NULL) {
                 MemError();
             }
-            m_adventureWindow->AddWidget(m_bottomViewIcons[2], ENEMY_TURN_PHASE_Z);
+            m_adventureWindow->AddWidget(
+                m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT],
+                ENEMY_TURN_PHASE_Z
+            );
         }
     }
     return updated;
@@ -5441,7 +5694,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 
 VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
-    DATA(0x004f6134) static i16 s_newTurnLineBase = 4560;
+    DATA(0x004f6134) static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
 
     i32 dateIconFrame;
     char* weekText;
@@ -5496,7 +5749,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     weekText = static_cast<char*>(
-        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, 4560 + NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, NEW_TURN_LINE_BASE + NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
     );
     sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5517,7 +5770,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     dayText = static_cast<char*>(
-        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, 4560 + NEW_TURN_DAY_ALLOC_LINE_OFFSET)
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE, NEW_TURN_LINE_BASE + NEW_TURN_DAY_ALLOC_LINE_OFFSET)
     );
     sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5541,7 +5794,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
 VA(0x00461716, 0x35f)
 i32 advManager::UpdBottomViewResMsg(void) {
-    DATA(0x004f61f4) static i16 s_resourceViewLineBase = 4655;
+    DATA(0x004f61f4) static i16 s_resourceViewLineBase = RESOURCE_VIEW_LINE_BASE;
 
     i32 iconWidth6;
     i32 iconHeight11;
@@ -5581,7 +5834,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     messageText2 = static_cast<char*>(H2_ALLOC(
         strlen(gcBottomViewText) + 1,
-        4655 + RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
+        RESOURCE_VIEW_LINE_BASE + RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET
     ));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5610,7 +5863,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
             iconHeight11 = RESOURCE_VIEW_ICON_HEIGHT;
         }
         m_bottomViewHourglassBackground = new iconWidget(
-            (BOTTOM_VIEW_PANEL_WIDTH - iconWidth6) / 2 + BOTTOM_VIEW_PANEL_X,
+            (BOTTOM_VIEW_PANEL_WIDTH - iconWidth6) / BOTTOM_VIEW_CENTER_DIVISOR
+                + BOTTOM_VIEW_PANEL_X,
             RESOURCE_VIEW_ICON_BOTTOM - iconHeight11
                 - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
             iconWidth6,
@@ -5629,7 +5883,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
         resourceCountText6 = static_cast<char*>(H2_ALLOC(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            4655 + RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
+            RESOURCE_VIEW_LINE_BASE + RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET
         ));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
@@ -5654,7 +5908,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
 VA(0x00461a75, 0x363)
 i32 advManager::UpdBottomViewKingdom(void) {
-    DATA(0x004f6294) static i16 s_kingdomViewLineBase = 4758;
+    DATA(0x004f6294) static i16 s_kingdomViewLineBase = KINGDOM_VIEW_LINE_BASE;
 
     i32 villageCount37;
     i32 index11;
@@ -5669,24 +5923,24 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
     ClearBottomView();
     iCurBottomView = BOTTOM_VIEW_KINGDOM;
-    textY5[0] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[1] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[2] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[3] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[4] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[5] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[6] = KINGDOM_VIEW_TOWN_TEXT_Y;
-    textY5[7] = KINGDOM_VIEW_TOWN_TEXT_Y;
-    textY5[8] = KINGDOM_VIEW_TOWN_TEXT_Y;
-    textX[0] = KINGDOM_VIEW_WOOD_TEXT_X;
-    textX[1] = KINGDOM_VIEW_MERCURY_TEXT_X;
-    textX[2] = KINGDOM_VIEW_ORE_TEXT_X;
-    textX[3] = KINGDOM_VIEW_SULFUR_TEXT_X;
-    textX[4] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
-    textX[5] = KINGDOM_VIEW_GEMS_TEXT_X;
-    textX[6] = KINGDOM_VIEW_GOLD_TEXT_X;
-    textX[7] = KINGDOM_VIEW_CASTLE_TEXT_X;
-    textX[8] = KINGDOM_VIEW_VILLAGE_TEXT_X;
+    textY5[IDX(RES_WOOD)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_MERCURY)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_ORE)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_SULFUR)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_GEMS)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[IDX(RES_GOLD)] = KINGDOM_VIEW_TOWN_TEXT_Y;
+    textY5[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
+    textY5[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
+    textX[IDX(RES_WOOD)] = KINGDOM_VIEW_WOOD_TEXT_X;
+    textX[IDX(RES_MERCURY)] = KINGDOM_VIEW_MERCURY_TEXT_X;
+    textX[IDX(RES_ORE)] = KINGDOM_VIEW_ORE_TEXT_X;
+    textX[IDX(RES_SULFUR)] = KINGDOM_VIEW_SULFUR_TEXT_X;
+    textX[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
+    textX[IDX(RES_GEMS)] = KINGDOM_VIEW_GEMS_TEXT_X;
+    textX[IDX(RES_GOLD)] = KINGDOM_VIEW_GOLD_TEXT_X;
+    textX[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_CASTLE_TEXT_X;
+    textX[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_VILLAGE_TEXT_X;
     villageCount37 = 0;
     castleCount12 = 0;
 
@@ -5736,7 +5990,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
         countText14[index11] = static_cast<char*>(H2_ALLOC(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE,
-            4758 + KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
+            KINGDOM_VIEW_LINE_BASE + KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET
         ));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
@@ -5768,7 +6022,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
 VA(0x00461dd8, 0x583)
 i32 advManager::UpdBottomViewHero(void) {
-    DATA(0x004f6300) static i16 s_bottomHeroLineBase = 4835;
+    DATA(0x004f6300) static i16 s_bottomHeroLineBase = BOTTOM_HERO_LINE_BASE;
 
     char* armyCountLabelsResult[BOTTOM_HERO_ARMY_SLOTS];
     icon* monsterIconsLocal;
@@ -5785,7 +6039,7 @@ i32 advManager::UpdBottomViewHero(void) {
     i32 labelY;
     i32 labelWidthCount;
     i32 labelX;
-    i32 creatureBoundsLocal[2];
+    i32 creatureBoundsLocal[BOTTOM_HERO_CREATURE_BOUND_COUNT];
 
     if (!gbForceUpdate && iCurBottomView == BOTTOM_HERO_VIEW_ID) {
         return 0;
@@ -5825,7 +6079,10 @@ i32 advManager::UpdBottomViewHero(void) {
         for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
             creature = targetHero->m_army.m_creatureTypes[armySlot];
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
-                u8 iconPositions[16] =
+                // Retail stores eight compact (x, y) layout anchors and indexes them through
+                // the occupied-slot table below; the coordinate payload has no separate domain.
+                // NOLINTBEGIN(readability-magic-numbers)
+                u8 iconPositions[BOTTOM_HERO_ICON_POSITION_BYTES] =
                     {50, 3, 96, 3, 50, 17, 73, 17, 96, 17, 27, 32, 73, 32, 119, 32};
                 i8 armyLayouts[BOTTOM_HERO_ARMY_SLOTS][BOTTOM_HERO_ARMY_SLOTS] = {
                     {3, -1, -1, -1, -1},
@@ -5834,10 +6091,11 @@ i32 advManager::UpdBottomViewHero(void) {
                     {0, 1, 5, 6, -1},
                     {0, 1, 5, 6, 7}
                 };
+                // NOLINTEND(readability-magic-numbers)
 
                 armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(
                     BOTTOM_HERO_LABEL_BYTES,
-                    4835 + BOTTOM_HERO_ALLOC_LINE_OFFSET
+                    BOTTOM_HERO_LINE_BASE + BOTTOM_HERO_ALLOC_LINE_OFFSET
                 ));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > BOTTOM_HERO_MAX_FULL_COUNT) {
@@ -5856,8 +6114,10 @@ i32 advManager::UpdBottomViewHero(void) {
                 }
 
                 layoutIndexIndex = armyLayouts[occupiedSlotsLocal - 1][displayIndexData];
-                iconX = iconPositions[layoutIndexIndex * 2];
-                iconY = iconPositions[layoutIndexIndex * 2 + 1];
+                iconX = iconPositions[layoutIndexIndex * BOTTOM_HERO_POSITION_COMPONENT_COUNT];
+                iconY = iconPositions[
+                    layoutIndexIndex * BOTTOM_HERO_POSITION_COMPONENT_COUNT + 1
+                ];
                 labelY = iconY + BOTTOM_HERO_LABEL_Y_OFFSET;
                 iconEntryValue = &monsterIconsLocal->Entries()[creature];
                 if (layoutIndexIndex == 0 || layoutIndexIndex == 1) {
@@ -5874,7 +6134,7 @@ i32 advManager::UpdBottomViewHero(void) {
                 if (groupWidthRef > BOTTOM_HERO_GROUP_WIDTH) {
                     groupWidthRef = BOTTOM_HERO_GROUP_WIDTH;
                 }
-                iconX -= (groupWidthRef + 1) / 2;
+                iconX -= (groupWidthRef + 1) / BOTTOM_VIEW_CENTER_DIVISOR;
                 labelX = groupWidthRef - 1 + iconX - (labelWidthCount - 1);
 
                 m_bottomViewIcons[displayIndexData] = new iconWidget(
@@ -5899,7 +6159,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     ((targetHero->m_army.m_creatureCounts[armySlot]
                       <= BOTTOM_HERO_MAX_FULL_COUNT)
                          - 1
-                     & 4)
+                     & BOTTOM_HERO_ABBREVIATED_LABEL_PADDING)
                         + strlen(armyCountLabelsResult[displayIndexData])
                               * BOTTOM_HERO_CHARACTER_WIDTH,
                     BOTTOM_HERO_LABEL_HEIGHT,
@@ -5926,20 +6186,20 @@ i32 advManager::UpdBottomViewHero(void) {
 
 VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6370) static i16 s_quickViewLineBase = 4982;
+    DATA(0x004f6370) static i16 s_quickViewLineBase = QUICK_VIEW_LINE_BASE;
 
-    i16 armyAreaWidthLocal = 160;
-    i16 armyAreaLeftLocal = 22;
-    i16 detailedCreatureY = 124;
-    i16 stackIconWidthData = 32;
-    i16 creatureIconHeight = 32;
+    i16 armyAreaWidthLocal = HERO_QUICK_ARMY_AREA_WIDTH;
+    i16 armyAreaLeftLocal = ARMY_QUICK_AREA_LEFT;
+    i16 detailedCreatureY = HERO_QUICK_DETAILED_CREATURE_Y;
+    i16 stackIconWidthData = ARMY_QUICK_ICON_SIZE;
+    i16 creatureIconHeight = ARMY_QUICK_ICON_SIZE;
     i16 widgetEnableFlagLocal = 1;
-    i16 portraitWidgetLocal = 2;
-    i16 primaryStatsWidgetValue = 3;
-    i16 playerColorWidgetId = 8;
-    iconWidget* stackIconsWidgets[5];
-    textWidget* creatureTextWidgetsLocal[5];
-    char* armyLabelsStrings[5];
+    i16 portraitWidgetLocal = HERO_QUICK_PORTRAIT_WIDGET;
+    i16 primaryStatsWidgetValue = HERO_QUICK_PRIMARY_STAT_WIDGET;
+    i16 playerColorWidgetId = HERO_QUICK_PLAYER_COLOR_WIDGET;
+    iconWidget* stackIconsWidgets[ARMY_QUICK_SLOT_COUNT];
+    textWidget* creatureTextWidgetsLocal[ARMY_QUICK_SLOT_COUNT];
+    char* armyLabelsStrings[ARMY_QUICK_SLOT_COUNT];
     tag_message quickViewMessageState;
     icon* monsterIconRef;
     hero* targetHero;
@@ -5957,16 +6217,16 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     monsterIconRef = gpResourceManager->GetIcon("mons32.icn");
     targetHero = gpGame->GetHero(heroId);
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
-        || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
+        || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
         if (windowX == -1) {
-            windowX = 288;
-            windowY = locatorSlot * 30 + 97;
+            windowX = HERO_QUICK_DEFAULT_WINDOW_X;
+            windowY = locatorSlot * HERO_QUICK_LOCATOR_ROW_HEIGHT + HERO_QUICK_LOCATOR_BASE_Y;
         }
         quickWindowSlot = new heroWindow(windowX, windowY, "qhero0.bin");
         if (quickWindowSlot == NULL) {
             MemError();
         }
-        SetWinText(quickWindowSlot, 18);
+        SetWinText(quickWindowSlot, HERO_QUICK_WINDOW_TEXT);
     } else {
         quickWindowSlot = new heroWindow(windowX, windowY, "qhero1.bin");
         if (quickWindowSlot == NULL) {
@@ -5975,35 +6235,35 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    quickViewMessageState.payload.widget.id = 2;
+    quickViewMessageState.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
     quickViewMessageState.payload.widget.data.value = targetHero->m_portrait;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    quickViewMessageState.payload.widget.id = 8;
+    quickViewMessageState.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
     quickViewMessageState.payload.widget.data.value =
-        gpGame->GetPlayerColor(targetHero->m_owner) * 2;
+        gpGame->GetPlayerColor(targetHero->m_owner) * HERO_QUICK_PLAYER_COLOR_STRIDE;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     ++quickViewMessageState.payload.widget.id;
     ++quickViewMessageState.payload.widget.data.value;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     sprintf(gText, "%s", targetHero->m_name);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    quickViewMessageState.payload.widget.id = 1;
+    quickViewMessageState.payload.widget.id = HERO_QUICK_NAME_WIDGET;
     quickViewMessageState.payload.widget.data.text = gText;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
 
     visibleArmyCountState = 0;
-    for (armyIndex = 0; armyIndex < 5; ++armyIndex) {
-        if (targetHero->m_army.m_creatureTypes[armyIndex] != -1) {
+    for (armyIndex = 0; armyIndex < ARMY_QUICK_SLOT_COUNT; ++armyIndex) {
+        if (targetHero->m_army.m_creatureTypes[armyIndex] != ARMY_QUICK_EMPTY_SLOT) {
             ++visibleArmyCountState;
         }
     }
 
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
-        || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, 8)) {
-        for (armyIndex = 0; armyIndex < 4; ++armyIndex) {
+        || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
+        for (armyIndex = 0; armyIndex < HERO_PRIMARY_STAT_COUNT; ++armyIndex) {
             sprintf(gText, "%d", targetHero->Stats(HeroPrimaryStat(armyIndex)));
-            quickViewMessageState.payload.widget.id = armyIndex + 3;
+            quickViewMessageState.payload.widget.id = armyIndex + HERO_QUICK_PRIMARY_STAT_WIDGET;
             quickViewMessageState.payload.widget.data.text = gText;
             quickWindowSlot->BroadcastMessage(quickViewMessageState);
         }
@@ -6011,46 +6271,57 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             gText,
             "%d/%d",
             targetHero->m_spellPoints,
-            targetHero->Stats(HeroPrimaryStat(3)) * 10
+            targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
         );
-        quickViewMessageState.payload.widget.id = 7;
+        quickViewMessageState.payload.widget.id = HERO_QUICK_MANA_WIDGET;
         quickViewMessageState.payload.widget.data.text = gText;
         quickWindowSlot->BroadcastMessage(quickViewMessageState);
 
         if (visibleArmyCountState != 0) {
-            i32 armyStartPosition = (160 - visibleArmyCountState * 32) / 2 + 22;
+            i32 armyStartPosition =
+                (HERO_QUICK_ARMY_AREA_WIDTH - visibleArmyCountState * ARMY_QUICK_ICON_SIZE)
+                    / ARMY_QUICK_CENTER_DIVISOR
+                + ARMY_QUICK_AREA_LEFT;
             i32 displayIndexStateOffset = 0;
             i32 creature;
             for (armyIndex = 0; armyIndex < visibleArmyCountState; ++armyIndex) {
-                while (targetHero->m_army.m_creatureTypes[displayIndexStateOffset] == -1) {
+                while (targetHero->m_army.m_creatureTypes[displayIndexStateOffset]
+                       == ARMY_QUICK_EMPTY_SLOT) {
                     ++displayIndexStateOffset;
                 }
                 creature = targetHero->m_army.m_creatureTypes[displayIndexStateOffset];
-                if (creature != -1) {
+                if (creature != ARMY_QUICK_EMPTY_SLOT) {
                     stackIconsWidgets[armyIndex] = new iconWidget(
                         static_cast<i16>(
-                            armyIndex * 32 + armyStartPosition
+                            armyIndex * ARMY_QUICK_ICON_SIZE + armyStartPosition
                             - GetIconEntry(monsterIconRef, creature)->x
-                            + (32 - GetIconEntry(monsterIconRef, creature)->w) / 2 + 1
+                            + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconRef, creature)->w)
+                                  / ARMY_QUICK_CENTER_DIVISOR
+                            + 1
                         ),
                         static_cast<i16>(
-                            124 - GetIconEntry(monsterIconRef, creature)->y
-                            - GetIconEntry(monsterIconRef, creature)->h + 30
+                            HERO_QUICK_DETAILED_CREATURE_Y
+                            - GetIconEntry(monsterIconRef, creature)->y
+                            - GetIconEntry(monsterIconRef, creature)->h
+                            + ARMY_QUICK_ICON_BASELINE
                         ),
-                        32,
-                        32,
+                        ARMY_QUICK_ICON_SIZE,
+                        ARMY_QUICK_ICON_SIZE,
                         "mons32.icn",
                         static_cast<i16>(creature),
                         0,
                         -1,
-                        16,
+                        ARMY_QUICK_WIDGET_FLAGS,
                         1
                     );
                     if (stackIconsWidgets[armyIndex] == NULL) {
                         MemError();
                     }
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
-                        H2_ALLOC(5, 4982 + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET)
+                        H2_ALLOC(
+                            HERO_QUICK_ARMY_LABEL_CAPACITY,
+                            QUICK_VIEW_LINE_BASE + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
+                        )
                     );
                     sprintf(
                         armyLabelsStrings[armyIndex],
@@ -6058,10 +6329,12 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         targetHero->m_army.m_creatureCounts[displayIndexStateOffset]
                     );
                     creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                        static_cast<i16>(armyIndex * 32 + armyStartPosition),
-                        static_cast<i16>(124 + 32),
-                        32,
-                        12,
+                        static_cast<i16>(armyIndex * ARMY_QUICK_ICON_SIZE + armyStartPosition),
+                        static_cast<i16>(
+                            HERO_QUICK_DETAILED_CREATURE_Y + ARMY_QUICK_ICON_SIZE
+                        ),
+                        ARMY_QUICK_ICON_SIZE,
+                        ARMY_QUICK_LABEL_HEIGHT,
                         armyLabelsStrings[armyIndex],
                         "smalfont.fnt",
                         FONT_DRAW_DEFAULT,
@@ -6079,33 +6352,36 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             }
         }
     } else if (visibleArmyCountState != 0) {
-        i32 rowYCurrent = 73;
+        i32 rowYCurrent = HERO_QUICK_VAGUE_FIRST_ROW_Y;
         i32 topRowCount;
         i32 secondRowCountTotal;
         i32 creatureTypeId;
         switch (visibleArmyCountState) {
             case 1:
-            case 2:
-            case 3:
-                rowYCurrent += 22;
+            case ARMY_QUICK_FIRST_ROW_COUNT:
+            case ARMY_QUICK_TOP_ROW_MAX:
+                rowYCurrent += ARMY_QUICK_FIRST_ROW_SHIFT;
                 topRowCount = visibleArmyCountState;
                 secondRowCountTotal = 0;
                 break;
-            case 4:
-                topRowCount = 2;
-                secondRowCountTotal = 2;
+            case ARMY_QUICK_FOUR_STACK_COUNT:
+                topRowCount = ARMY_QUICK_FIRST_ROW_COUNT;
+                secondRowCountTotal = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
-                topRowCount = 2;
-                secondRowCountTotal = 3;
+                topRowCount = ARMY_QUICK_FIRST_ROW_COUNT;
+                secondRowCountTotal = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
         i32 displayIndexValue = 0;
-        i32 armySpacing = 160 / topRowCount;
-        i32 slotStartPosition = (armySpacing - 32) / 2 + 22;
+        i32 armySpacing = HERO_QUICK_ARMY_AREA_WIDTH / topRowCount;
+        i32 slotStartPosition = (armySpacing - ARMY_QUICK_ICON_SIZE)
+                / ARMY_QUICK_CENTER_DIVISOR
+            + ARMY_QUICK_AREA_LEFT;
         for (armyIndex = 0; armyIndex < topRowCount; ++armyIndex) {
-            while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1) {
+            while (targetHero->m_army.m_creatureTypes[displayIndexValue]
+                   == ARMY_QUICK_EMPTY_SLOT) {
                 ++displayIndexValue;
             }
             creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
@@ -6113,19 +6389,21 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 static_cast<i16>(
                     armyIndex * armySpacing + slotStartPosition
                     - GetIconEntry(monsterIconRef, creatureTypeId)->x
-                    + (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1
+                    + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconRef, creatureTypeId)->w)
+                          / ARMY_QUICK_CENTER_DIVISOR
+                    + 1
                 ),
                 static_cast<i16>(
                     rowYCurrent - GetIconEntry(monsterIconRef, creatureTypeId)->y
-                    - GetIconEntry(monsterIconRef, creatureTypeId)->h + 30
+                    - GetIconEntry(monsterIconRef, creatureTypeId)->h + ARMY_QUICK_ICON_BASELINE
                 ),
-                32,
-                32,
+                ARMY_QUICK_ICON_SIZE,
+                ARMY_QUICK_ICON_SIZE,
                 "mons32.icn",
                 static_cast<i16>(creatureTypeId),
                 0,
                 -1,
-                16,
+                ARMY_QUICK_WIDGET_FLAGS,
                 1
             );
             if (stackIconsWidgets[armyIndex] == NULL) {
@@ -6135,13 +6413,16 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 static_cast<char*>(H2_ALLOC(15, 4982 + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(
                 armyLabelsStrings[armyIndex],
-                GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0)
+                GetArmySizeName(
+                    targetHero->m_army.m_creatureCounts[displayIndexValue],
+                    ARMY_SIZE_NAME_TITLE
+                )
             );
             creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                static_cast<i16>(armyIndex * armySpacing + 22),
-                static_cast<i16>(rowYCurrent + 32),
+                static_cast<i16>(armyIndex * armySpacing + ARMY_QUICK_AREA_LEFT),
+                static_cast<i16>(rowYCurrent + ARMY_QUICK_ICON_SIZE),
                 armySpacing,
-                12,
+                ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsStrings[armyIndex],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
@@ -6158,9 +6439,11 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         }
 
         if (secondRowCountTotal != 0) {
-            armySpacing = 160 / secondRowCountTotal;
-            slotStartPosition = (armySpacing - 32) / 2 + 22;
-            rowYCurrent += 44;
+            armySpacing = HERO_QUICK_ARMY_AREA_WIDTH / secondRowCountTotal;
+            slotStartPosition = (armySpacing - ARMY_QUICK_ICON_SIZE)
+                    / ARMY_QUICK_CENTER_DIVISOR
+                + ARMY_QUICK_AREA_LEFT;
+            rowYCurrent += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = topRowCount; armyIndex < topRowCount + secondRowCountTotal;
                  ++armyIndex) {
                 while (targetHero->m_army.m_creatureTypes[displayIndexValue] == -1) {
@@ -6169,21 +6452,25 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 creatureTypeId = targetHero->m_army.m_creatureTypes[displayIndexValue];
                 stackIconsWidgets[armyIndex] = new iconWidget(
                     static_cast<i16>(
-                        (armyIndex - 2) * armySpacing + slotStartPosition
+                        (armyIndex - HERO_QUICK_SECOND_ROW_FIRST_SLOT) * armySpacing
+                        + slotStartPosition
                         - GetIconEntry(monsterIconRef, creatureTypeId)->x
-                        + (32 - GetIconEntry(monsterIconRef, creatureTypeId)->w) / 2 + 1
+                        + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconRef, creatureTypeId)->w)
+                              / ARMY_QUICK_CENTER_DIVISOR
+                        + 1
                     ),
                     static_cast<i16>(
                         rowYCurrent - GetIconEntry(monsterIconRef, creatureTypeId)->y
-                        - GetIconEntry(monsterIconRef, creatureTypeId)->h + 30 + 6
+                        - GetIconEntry(monsterIconRef, creatureTypeId)->h
+                        + ARMY_QUICK_ICON_BASELINE + ARMY_QUICK_SECOND_ROW_ICON_SHIFT
                     ),
-                    32,
-                    32,
+                    ARMY_QUICK_ICON_SIZE,
+                    ARMY_QUICK_ICON_SIZE,
                     "mons32.icn",
                     static_cast<i16>(creatureTypeId),
                     0,
                     -1,
-                    16,
+                    ARMY_QUICK_WIDGET_FLAGS,
                     1
                 );
                 if (stackIconsWidgets[armyIndex] == NULL) {
@@ -6194,13 +6481,19 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
-                    GetArmySizeName(targetHero->m_army.m_creatureCounts[displayIndexValue], 0)
+                    GetArmySizeName(
+                        targetHero->m_army.m_creatureCounts[displayIndexValue],
+                        ARMY_SIZE_NAME_TITLE
+                    )
                 );
                 creatureTextWidgetsLocal[armyIndex] = new textWidget(
-                    static_cast<i16>((armyIndex - 2) * armySpacing + 22),
-                    static_cast<i16>(rowYCurrent + 38),
+                    static_cast<i16>(
+                        (armyIndex - HERO_QUICK_SECOND_ROW_FIRST_SLOT) * armySpacing
+                        + ARMY_QUICK_AREA_LEFT
+                    ),
+                    static_cast<i16>(rowYCurrent + HERO_QUICK_SECOND_ROW_TEXT_SHIFT),
                     armySpacing,
-                    12,
+                    ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsStrings[armyIndex],
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
@@ -6220,8 +6513,8 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
     previousOriginXState = m_mapOriginX;
     savedOriginY = m_mapOriginY;
-    m_mapOriginX = targetHero->m_x - 7;
-    m_mapOriginY = targetHero->m_y - 7;
+    m_mapOriginX = targetHero->m_x - VIEW_CENTER_CELL;
+    m_mapOriginY = targetHero->m_y - VIEW_CENTER_CELL;
     UpdateRadar(1, 0);
     gpWindowManager->AddWindow(quickWindowSlot, -1, 1);
     QuickViewWait();
@@ -6240,41 +6533,44 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 }
 
 VA(0x0046308d, 0x120)
-char* advManager::GetArmySizeName(i32 armySize, i32 grammar) {
+char* advManager::GetArmySizeName(
+    i32 armySize,
+    H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar
+) {
     if (giDebugLevel > 0) {
         sprintf(cArmySizeName, "%d", armySize);
         return cArmySizeName;
     }
     if (armySize < ARMY_FEW_LIMIT) {
-        return gArmySizeNames[0][grammar];
+        return gArmySizeNames[ARMY_SIZE_FEW][IDX(grammar)];
     }
     if (armySize < ARMY_SEVERAL_LIMIT) {
-        return gArmySizeNames[1][grammar];
+        return gArmySizeNames[ARMY_SIZE_SEVERAL][IDX(grammar)];
     }
     if (armySize < ARMY_PACK_LIMIT) {
-        return gArmySizeNames[2][grammar];
+        return gArmySizeNames[ARMY_SIZE_PACK][IDX(grammar)];
     }
     if (armySize < ARMY_LOTS_LIMIT) {
-        return gArmySizeNames[3][grammar];
+        return gArmySizeNames[ARMY_SIZE_LOTS][IDX(grammar)];
     }
     if (armySize < ARMY_HORDE_LIMIT) {
-        return gArmySizeNames[4][grammar];
+        return gArmySizeNames[ARMY_SIZE_HORDE][IDX(grammar)];
     }
     if (armySize < ARMY_THRONG_LIMIT) {
-        return gArmySizeNames[5][grammar];
+        return gArmySizeNames[ARMY_SIZE_THRONG][IDX(grammar)];
     }
     if (armySize < ARMY_SWARM_LIMIT) {
-        return gArmySizeNames[6][grammar];
+        return gArmySizeNames[ARMY_SIZE_SWARM][IDX(grammar)];
     }
     if (armySize < ARMY_ZOUNDS_LIMIT) {
-        return gArmySizeNames[7][grammar];
+        return gArmySizeNames[ARMY_SIZE_ZOUNDS][IDX(grammar)];
     }
-    return gArmySizeNames[8][grammar];
+    return gArmySizeNames[ARMY_SIZE_LEGION][IDX(grammar)];
 }
 
 VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6488) static i16 s_townViewLineBase = 5346;
+    DATA(0x004f6488) static i16 s_townViewLineBase = TOWN_VIEW_LINE_BASE;
 
     icon* monsterIconLocal;
     i16 portraitWidgetLocal;
@@ -6295,13 +6591,13 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     i16 armyAreaLeftValue;
     widget* emptyArmyTextState;
 
-    armyAreaWidth = 192;
-    armyAreaLeftValue = 22;
-    armyIconWidthState = 32;
-    armyIconHeightState = 32;
+    armyAreaWidth = TOWN_QUICK_ARMY_AREA_WIDTH;
+    armyAreaLeftValue = ARMY_QUICK_AREA_LEFT;
+    armyIconWidthState = ARMY_QUICK_ICON_SIZE;
+    armyIconHeightState = ARMY_QUICK_ICON_SIZE;
     widgetEnabledData = 1;
-    portraitWidgetLocal = 2;
-    colorWidgetValue = 8;
+    portraitWidgetLocal = TOWN_QUICK_PORTRAIT_WIDGET;
+    colorWidgetValue = TOWN_QUICK_PLAYER_COLOR_WIDGET;
 
     if (townId == INVALID_HERO) {
         return;
@@ -6310,57 +6606,63 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     monsterIconLocal = gpResourceManager->GetIcon("mons32.icn");
     quickTownLocal = gpGame->GetTown(townId);
     if (windowX == -1) {
-        windowX = 328;
-        windowY = 176;
+        windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
+        windowY = TOWN_QUICK_DEFAULT_WINDOW_Y;
     }
     townQuickWindow = new heroWindow(windowX, windowY, "qtown1.bin");
     if (townQuickWindow == NULL) {
         MemError();
     }
 
-    if (quickTownLocal->m_owner == giCurPlayer || giDebugLevel >= 2) {
-        informationLevel = 3;
+    if (quickTownLocal->m_owner == giCurPlayer
+        || giDebugLevel >= TOWN_QUICK_DEBUG_INFORMATION) {
+        informationLevel = TOWN_QUICK_INFORMATION_EXACT;
     } else {
         informationLevel = gpGame->GetNumThievesGuilds(giCurPlayer);
-        if (informationLevel > 2) {
-            informationLevel = 2;
+        if (informationLevel > TOWN_QUICK_INFORMATION_ESTIMATES) {
+            informationLevel = TOWN_QUICK_INFORMATION_ESTIMATES;
         }
     }
-    if (IsCrystalBallInEffect(quickTownLocal->m_x, quickTownLocal->m_y, 8)) {
-        informationLevel = 3;
+    if (IsCrystalBallInEffect(
+            quickTownLocal->m_x,
+            quickTownLocal->m_y,
+            CRYSTAL_BALL_RADIUS
+        )) {
+        informationLevel = TOWN_QUICK_INFORMATION_EXACT;
     }
 
-    SetWinText(townQuickWindow, 19);
+    SetWinText(townQuickWindow, TOWN_QUICK_WINDOW_TEXT);
     armyCountLocal = 0;
     messageLocal.type = MESSAGE_WIDGET;
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-    messageLocal.payload.widget.id = 2;
-    messageLocal.payload.widget.data.value = IDX(quickTownLocal->m_type) + 9;
+    messageLocal.payload.widget.id = TOWN_QUICK_PORTRAIT_WIDGET;
+    messageLocal.payload.widget.data.value =
+        IDX(quickTownLocal->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
     if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
-        messageLocal.payload.widget.data.value += 6;
+        messageLocal.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
     }
     townQuickWindow->BroadcastMessage(messageLocal);
 
-    if (informationLevel != 3
+    if (informationLevel != TOWN_QUICK_INFORMATION_EXACT
         || BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        messageLocal.payload.widget.id = 300;
-        messageLocal.payload.widget.data.value = 4;
+        messageLocal.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
+        messageLocal.payload.widget.data.value = WIDGET_FLAG_DRAW;
         townQuickWindow->BroadcastMessage(messageLocal);
     }
 
     if (quickTownLocal->m_owner == -1) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        messageLocal.payload.widget.id = 8;
-        messageLocal.payload.widget.data.value = 4;
+        messageLocal.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
+        messageLocal.payload.widget.data.value = WIDGET_FLAG_DRAW;
         townQuickWindow->BroadcastMessage(messageLocal);
         ++messageLocal.payload.widget.id;
         townQuickWindow->BroadcastMessage(messageLocal);
     } else {
         messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        messageLocal.payload.widget.id = 8;
+        messageLocal.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
         messageLocal.payload.widget.data.value =
-            gpGame->GetPlayerColor(quickTownLocal->m_owner) * 2;
+            gpGame->GetPlayerColor(quickTownLocal->m_owner) * HERO_QUICK_PLAYER_COLOR_STRIDE;
         townQuickWindow->BroadcastMessage(messageLocal);
         ++messageLocal.payload.widget.id;
         ++messageLocal.payload.widget.data.value;
@@ -6369,30 +6671,32 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
     sprintf(gText, GetTownName(static_cast<i8>(quickTownLocal->m_id)));
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    messageLocal.payload.widget.id = 1;
+    messageLocal.payload.widget.id = TOWN_QUICK_NAME_WIDGET;
     messageLocal.payload.widget.data.text = gText;
     townQuickWindow->BroadcastMessage(messageLocal);
 
     armyCountLocal = 0;
-    for (armyIndex = 0; armyIndex < 5; ++armyIndex) {
-        if (quickTownLocal->m_army.m_creatureTypes[armyIndex] != -1) {
+    for (armyIndex = 0; armyIndex < ARMY_QUICK_SLOT_COUNT; ++armyIndex) {
+        if (quickTownLocal->m_army.m_creatureTypes[armyIndex] != ARMY_QUICK_EMPTY_SLOT) {
             ++armyCountLocal;
         }
     }
 
-    if (informationLevel == 0 || armyCountLocal == 0) {
-        emptyArmyLabel =
-            static_cast<char*>(H2_ALLOC(20, 5346 + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET));
-        if (informationLevel == 0) {
+    if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN || armyCountLocal == 0) {
+        emptyArmyLabel = static_cast<char*>(H2_ALLOC(
+            TOWN_QUICK_EMPTY_LABEL_CAPACITY,
+            TOWN_VIEW_LINE_BASE + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
+        ));
+        if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(emptyArmyLabel, "Unknown");
         } else {
             sprintf(emptyArmyLabel, "None");
         }
         emptyArmyTextState = new textWidget(
-            13,
-            117,
-            211,
-            12,
+            TOWN_QUICK_EMPTY_LABEL_X,
+            TOWN_QUICK_EMPTY_LABEL_Y,
+            TOWN_QUICK_EMPTY_LABEL_WIDTH,
+            ARMY_QUICK_LABEL_HEIGHT,
             emptyArmyLabel,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
@@ -6407,10 +6711,10 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     } else {
         i32 secondRowCountState;
         i32 creatureSlotLocal;
-        char* armyLabelsResult[5];
+        char* armyLabelsResult[ARMY_QUICK_SLOT_COUNT];
         i32 creatureLocal;
-        iconWidget* armyIcons[5];
-        textWidget* armyTexts[5];
+        iconWidget* armyIcons[ARMY_QUICK_SLOT_COUNT];
+        textWidget* armyTexts[ARMY_QUICK_SLOT_COUNT];
         i32 displayIndexLocal;
         i32 widgetIndexWidget;
         i32 slotWidthSlot;
@@ -6419,36 +6723,40 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         i32 rowY;
         i32 firstRowCountState;
 
-        rowY = 76;
+        rowY = TOWN_QUICK_FIRST_ROW_Y;
         switch (armyCountLocal) {
             case 1:
-            case 2:
-            case 3:
-                rowY += 22;
+            case ARMY_QUICK_FIRST_ROW_COUNT:
+            case ARMY_QUICK_TOP_ROW_MAX:
+                rowY += ARMY_QUICK_FIRST_ROW_SHIFT;
                 firstRowCountState = armyCountLocal;
                 secondRowCountState = 0;
                 break;
-            case 4:
-                firstRowCountState = 2;
-                secondRowCountState = 2;
+            case ARMY_QUICK_FOUR_STACK_COUNT:
+                firstRowCountState = ARMY_QUICK_FIRST_ROW_COUNT;
+                secondRowCountState = ARMY_QUICK_FIRST_ROW_COUNT;
                 break;
             default:
-                firstRowCountState = 2;
-                secondRowCountState = 3;
+                firstRowCountState = ARMY_QUICK_FIRST_ROW_COUNT;
+                secondRowCountState = ARMY_QUICK_TOP_ROW_MAX;
                 break;
         }
 
         displayIndexLocal = 0;
         widgetIndexWidget = 0;
         creatureSlotLocal = 0;
-        slotWidthSlot = 192 / firstRowCountState;
-        slotStartState = (slotWidthSlot - 32) / 2 + 22;
+        slotWidthSlot = TOWN_QUICK_ARMY_AREA_WIDTH / firstRowCountState;
+        slotStartState = (slotWidthSlot - ARMY_QUICK_ICON_SIZE)
+                / ARMY_QUICK_CENTER_DIVISOR
+            + ARMY_QUICK_AREA_LEFT;
         fiveArmyShiftValue = 0;
         for (armyIndex = 0; armyIndex < firstRowCountState; ++armyIndex) {
-            if (armyCountLocal == 5) {
-                fiveArmyShiftValue = armyIndex == 0 ? 12 : -12;
+            if (armyCountLocal == ARMY_QUICK_FIVE_STACK_COUNT) {
+                fiveArmyShiftValue = armyIndex == 0 ? ARMY_QUICK_FIVE_STACK_X_SHIFT
+                                                    : -ARMY_QUICK_FIVE_STACK_X_SHIFT;
             }
-            while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal] == -1) {
+            while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]
+                   == ARMY_QUICK_EMPTY_SLOT) {
                 ++creatureSlotLocal;
             }
             creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
@@ -6456,36 +6764,43 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 static_cast<i16>(
                     slotWidthSlot * (widgetIndexWidget | 0) + slotStartState + fiveArmyShiftValue
                     - GetIconEntry(monsterIconLocal, creatureLocal)->x
-                    + (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1
+                    + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconLocal, creatureLocal)->w)
+                          / ARMY_QUICK_CENTER_DIVISOR
+                    + 1
                 ),
                 static_cast<i16>(
                     rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y
-                    - GetIconEntry(monsterIconLocal, creatureLocal)->h + 30
+                    - GetIconEntry(monsterIconLocal, creatureLocal)->h + ARMY_QUICK_ICON_BASELINE
                 ),
-                32,
-                32,
+                ARMY_QUICK_ICON_SIZE,
+                ARMY_QUICK_ICON_SIZE,
                 "mons32.icn",
                 static_cast<i16>(creatureLocal),
                 0,
                 -1,
-                16,
+                ARMY_QUICK_WIDGET_FLAGS,
                 1
             );
             if (armyIcons[widgetIndexWidget] == NULL) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] =
-                static_cast<char*>(H2_ALLOC(15, 5346 + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET));
-            if (informationLevel == 3) {
+            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(
+                TOWN_QUICK_ARMY_LABEL_CAPACITY,
+                TOWN_VIEW_LINE_BASE + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
+            ));
+            if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
                     "%d",
                     quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                 );
-            } else if (informationLevel == 2) {
+            } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
                 strcpy(
                     armyLabelsResult[widgetIndexWidget],
-                    GetArmySizeName(quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal], 0)
+                    GetArmySizeName(
+                        quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal],
+                        ARMY_SIZE_NAME_TITLE
+                    )
                 );
             } else {
                 strcpy(armyLabelsResult[widgetIndexWidget], "???");
@@ -6493,11 +6808,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             armyTexts[widgetIndexWidget] = new textWidget(
                 static_cast<i16>(
                     slotWidthSlot * (widgetIndexWidget | 0) + slotStartState + fiveArmyShiftValue
-                    - 14
+                    - ARMY_QUICK_TEXT_X_ADJUSTMENT
                 ),
-                static_cast<i16>(rowY + 32),
-                60,
-                12,
+                static_cast<i16>(rowY + ARMY_QUICK_ICON_SIZE),
+                ARMY_QUICK_TEXT_WIDTH,
+                ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsResult[widgetIndexWidget],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
@@ -6515,13 +6830,16 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         }
 
         if (secondRowCountState != 0) {
-            slotWidthSlot = 192 / secondRowCountState;
-            slotStartState = (slotWidthSlot - 32) / 2 + 22;
-            rowY += 44;
+            slotWidthSlot = TOWN_QUICK_ARMY_AREA_WIDTH / secondRowCountState;
+            slotStartState = (slotWidthSlot - ARMY_QUICK_ICON_SIZE)
+                    / ARMY_QUICK_CENTER_DIVISOR
+                + ARMY_QUICK_AREA_LEFT;
+            rowY += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = firstRowCountState;
                  armyIndex < secondRowCountState + firstRowCountState;
                  ++armyIndex) {
-                while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal] == -1) {
+                while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]
+                       == ARMY_QUICK_EMPTY_SLOT) {
                     ++creatureSlotLocal;
                 }
                 creatureLocal = quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal];
@@ -6529,39 +6847,43 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     static_cast<i16>(
                         (widgetIndexWidget - firstRowCountState) * slotWidthSlot + slotStartState
                         - GetIconEntry(monsterIconLocal, creatureLocal)->x
-                        + (32 - GetIconEntry(monsterIconLocal, creatureLocal)->w) / 2 + 1
+                        + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconLocal, creatureLocal)->w)
+                              / ARMY_QUICK_CENTER_DIVISOR
+                        + 1
                     ),
                     static_cast<i16>(
                         rowY - GetIconEntry(monsterIconLocal, creatureLocal)->y
-                        - GetIconEntry(monsterIconLocal, creatureLocal)->h + 30
+                        - GetIconEntry(monsterIconLocal, creatureLocal)->h
+                        + ARMY_QUICK_ICON_BASELINE
                     ),
-                    32,
-                    32,
+                    ARMY_QUICK_ICON_SIZE,
+                    ARMY_QUICK_ICON_SIZE,
                     "mons32.icn",
                     static_cast<i16>(creatureLocal),
                     0,
                     -1,
-                    16,
+                    ARMY_QUICK_WIDGET_FLAGS,
                     1
                 );
                 if (armyIcons[widgetIndexWidget] == NULL) {
                     MemError();
                 }
-                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(
-                    H2_ALLOC(15, 5346 + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET)
-                );
-                if (informationLevel == 3) {
+                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(
+                    TOWN_QUICK_ARMY_LABEL_CAPACITY,
+                    TOWN_VIEW_LINE_BASE + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
+                ));
+                if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         armyLabelsResult[widgetIndexWidget],
                         "%d",
                         quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                     );
-                } else if (informationLevel == 2) {
+                } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
                     strcpy(
                         armyLabelsResult[widgetIndexWidget],
                         GetArmySizeName(
                             quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal],
-                            0
+                            ARMY_SIZE_NAME_TITLE
                         )
                     );
                 } else {
@@ -6570,11 +6892,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 armyTexts[widgetIndexWidget] = new textWidget(
                     static_cast<i16>(
                         (widgetIndexWidget - firstRowCountState) * slotWidthSlot + slotStartState
-                        - 14
+                        - ARMY_QUICK_TEXT_X_ADJUSTMENT
                     ),
-                    static_cast<i16>(rowY + 32),
-                    60,
-                    12,
+                    static_cast<i16>(rowY + ARMY_QUICK_ICON_SIZE),
+                    ARMY_QUICK_TEXT_WIDTH,
+                    ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsResult[widgetIndexWidget],
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
@@ -6596,8 +6918,8 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     gpWindowManager->AddWindow(townQuickWindow, -1, 1);
     previousOriginXValue = m_mapOriginX;
     previousOriginYSlot = m_mapOriginY;
-    m_mapOriginX = quickTownLocal->m_x - 7;
-    m_mapOriginY = quickTownLocal->m_y - 7;
+    m_mapOriginX = quickTownLocal->m_x - VIEW_CENTER_CELL;
+    m_mapOriginY = quickTownLocal->m_y - VIEW_CENTER_CELL;
     UpdateRadar(1, 0);
     QuickViewWait();
     gpWindowManager->RemoveWindow(townQuickWindow);
@@ -6615,14 +6937,17 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
 VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
-    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase = 5672;
+    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase = REDRAW_BORDER_FREE_LINE_BASE;
 
     if (!bShowIt) {
         return;
     }
     gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        H2_FREE(m_adventureBorder, 5672 + BORDER_SECONDARY_FREE_LINE_OFFSET);
+        H2_FREE(
+            m_adventureBorder,
+            REDRAW_BORDER_FREE_LINE_BASE + BORDER_SECONDARY_FREE_LINE_OFFSET
+        );
         m_adventureBorder = NULL;
     }
     SaveAdventureBorder();
@@ -6748,7 +7073,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     hero* currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
     m_mapOriginX = currentHero->m_x - VIEW_CENTER_OFFSET;
     m_mapOriginY = currentHero->m_y - VIEW_CENTER_OFFSET;
-    m_cursorMapY = 7;
+    m_cursorMapY = VIEW_CENTER_CELL;
     m_cursorMapX = m_cursorMapY;
     m_previousCursorMapY = IDX(ADVMGR_INVALID_CELL);
     m_previousCursorMapX = m_previousCursorMapY;
@@ -6768,6 +7093,8 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         currentHero->m_locationType,
         currentHero->m_occupiedTown,
         NULL,
+        // Retail's final RestoreCell argument is unused.
+        // NOLINTNEXTLINE(readability-magic-numbers)
         4
     );
 
@@ -7278,36 +7605,37 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                         bComboDraw[column + 1][mapRow] += COMBO_CLOUD_MARK;
                         bComboDraw[column][mapRow + 1] += COMBO_CLOUD_MARK;
                         bComboDraw[column + 1][mapRow + 1] += COMBO_CLOUD_MARK;
-                        bComboDraw[column + 2][mapRow] += COMBO_CLOUD_MARK;
+                        bComboDraw[column + COMBO_FAR_NEIGHBOR_OFFSET][mapRow] += COMBO_CLOUD_MARK;
                         if (mapRow >= 1) {
                             bComboDraw[column][mapRow - 1] += COMBO_CLOUD_MARK;
                         }
                         if (column >= 1) {
                             bComboDraw[column - 1][mapRow] += COMBO_CLOUD_MARK;
                             *(bComboDraw[column - 1] + mapRow + 1) += COMBO_CLOUD_MARK;
-                            if (column >= 2) {
-                                bComboDraw[column - 2][mapRow] += COMBO_CLOUD_MARK;
+                            if (column >= COMBO_FAR_NEIGHBOR_OFFSET) {
+                                bComboDraw[column - COMBO_FAR_NEIGHBOR_OFFSET][mapRow] +=
+                                    COMBO_CLOUD_MARK;
                             }
                             if (mapRow >= 1) {
-                                ++bComboDraw[column - 2][mapRow - 1];
+                                ++bComboDraw[column - COMBO_FAR_NEIGHBOR_OFFSET][mapRow - 1];
                             }
                         }
                     } else {
                         ++bComboDraw[column + 1][mapRow];
                         ++bComboDraw[column][mapRow + 1];
                         ++bComboDraw[column + 1][mapRow + 1];
-                        ++bComboDraw[column + 2][mapRow];
+                        ++bComboDraw[column + COMBO_FAR_NEIGHBOR_OFFSET][mapRow];
                         if (mapRow >= 1) {
                             ++bComboDraw[column][mapRow - 1];
                         }
                         if (column >= 1) {
                             ++bComboDraw[column - 1][mapRow];
                             ++bComboDraw[column - 1][mapRow + 1];
-                            if (column >= 2) {
-                                ++bComboDraw[column - 2][mapRow];
+                            if (column >= COMBO_FAR_NEIGHBOR_OFFSET) {
+                                ++bComboDraw[column - COMBO_FAR_NEIGHBOR_OFFSET][mapRow];
                             }
                             if (mapRow >= 1) {
-                                ++bComboDraw[column - 2][mapRow - 1];
+                                ++bComboDraw[column - COMBO_FAR_NEIGHBOR_OFFSET][mapRow - 1];
                             }
                         }
                     }
@@ -7341,9 +7669,9 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     }
 
     if (m_cursorType == HERO_TYPE_BOAT) {
-        ++bComboDraw[6][5];
-        ++bComboDraw[7][5];
-        ++bComboDraw[8][5];
+        ++bComboDraw[VIEW_CENTER_CELL - 1][COMBO_HERO_PANEL_LEFT];
+        ++bComboDraw[VIEW_CENTER_CELL][COMBO_HERO_PANEL_LEFT];
+        ++bComboDraw[VIEW_CENTER_CELL + 1][COMBO_HERO_PANEL_LEFT];
     }
 
     for (column = 0; column < COMBO_VIEW_CELLS; ++column) {
@@ -7354,7 +7682,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                     ++bComboDraw[column][mapRow];
                     ++bComboDraw[column + 1][mapRow];
                     if (column < COMBO_VIEW_CELLS) {
-                        ++bComboDraw[column + 2][mapRow];
+                        ++bComboDraw[column + COMBO_FAR_NEIGHBOR_OFFSET][mapRow];
                     }
                     if (column > 0) {
                         ++bComboDraw[column - 1][mapRow];
@@ -7363,20 +7691,21 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                         ++bComboDraw[column][mapRow - 1];
                         ++bComboDraw[column + 1][mapRow - 1];
                         if (column < COMBO_VIEW_CELLS) {
-                            ++bComboDraw[column + 2][mapRow - 1];
+                            ++bComboDraw[column + COMBO_FAR_NEIGHBOR_OFFSET][mapRow - 1];
                         }
                         if (column > 0) {
                             ++bComboDraw[column - 1][mapRow - 1];
                         }
                     }
                     if (mapRow > 1) {
-                        ++bComboDraw[column][mapRow - 2];
-                        ++bComboDraw[column + 1][mapRow - 2];
+                        ++bComboDraw[column][mapRow - COMBO_FAR_NEIGHBOR_OFFSET];
+                        ++bComboDraw[column + 1][mapRow - COMBO_FAR_NEIGHBOR_OFFSET];
                         if (column < COMBO_VIEW_CELLS) {
-                            ++bComboDraw[column + 2][mapRow - 2];
+                            ++bComboDraw[column + COMBO_FAR_NEIGHBOR_OFFSET]
+                                        [mapRow - COMBO_FAR_NEIGHBOR_OFFSET];
                         }
                         if (column > 0) {
-                            ++bComboDraw[column - 1][mapRow - 2];
+                            ++bComboDraw[column - 1][mapRow - COMBO_FAR_NEIGHBOR_OFFSET];
                         }
                     }
                 } else if (mapRow > 0 && bComboDraw[column][mapRow - 1] != 0) {
@@ -7395,7 +7724,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 mapCellX = column + originX;
                 mapYValue = mapRow + originY;
                 if (mapCellX < 0 || mapCellX > MAP_WIDTH - 1 || mapYValue < 1
-                    || mapYValue > MAP_HEIGHT - 2) {
+                    || mapYValue > MAP_HEIGHT - COMBO_FAR_NEIGHBOR_OFFSET) {
                     continue;
                 }
                 if (m_visibilityMap[mapYValue * MAP_WIDTH + mapCellX] != 0) {
@@ -7648,7 +7977,9 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
              ++soundLayer) {
             InsertSound(originX, originY, 0, soundLayer);
             for (soundRadius = 0; soundRadius < SOUND_CELL_COUNT; ++soundRadius) {
-                for (edgeOffset = 0; edgeOffset < soundRadius * 2; ++edgeOffset) {
+                for (edgeOffset = 0;
+                     edgeOffset < soundRadius * ENVIRONMENT_SOUND_EDGE_SPAN;
+                     ++edgeOffset) {
                     InsertSound(
                         originX - soundRadius + edgeOffset,
                         originY - soundRadius,
@@ -8439,7 +8770,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         ROUTE_PATH_COST_LIMIT
     );
     if (gpSearchArray->m_pathLength > 0 && pathFound5 > 0) {
-        memset(m_visibilityMap, 0, MAP_WIDTH * MAP_HEIGHT * 2);
+        memset(m_visibilityMap, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(*m_visibilityMap));
         m_visibilityMapValid = 1;
         remainingMobility2 = currentHero0->m_remainingMobility;
         routeX1 = currentHero0->m_x;
@@ -8471,35 +8802,35 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
 
             if (direction & 1) {
                 if (terrainCost == ROUTE_DIAGONAL_COST_0) {
-                    routeFrame = 0;
+                    routeFrame = ROUTE_FRAME_COST_0;
                 } else if (terrainCost == ROUTE_DIAGONAL_COST_1) {
-                    routeFrame = 1;
+                    routeFrame = ROUTE_FRAME_COST_1;
                 } else if (terrainCost == ROUTE_DIAGONAL_COST_2) {
-                    routeFrame = 2;
+                    routeFrame = ROUTE_FRAME_COST_2;
                 } else if (terrainCost == ROUTE_DIAGONAL_COST_3) {
-                    routeFrame = 3;
+                    routeFrame = ROUTE_FRAME_COST_3;
                 } else if (terrainCost == ROUTE_DIAGONAL_COST_4) {
-                    routeFrame = 4;
+                    routeFrame = ROUTE_FRAME_COST_4;
                 } else if (terrainCost == ROUTE_DIAGONAL_COST_5) {
-                    routeFrame = 5;
+                    routeFrame = ROUTE_FRAME_COST_5;
                 } else {
-                    routeFrame = 1;
+                    routeFrame = ROUTE_FRAME_COST_1;
                 }
             } else {
                 if (terrainCost == ROUTE_STRAIGHT_COST_0) {
-                    routeFrame = 0;
+                    routeFrame = ROUTE_FRAME_COST_0;
                 } else if (terrainCost == ROUTE_STRAIGHT_COST_1) {
-                    routeFrame = 1;
+                    routeFrame = ROUTE_FRAME_COST_1;
                 } else if (terrainCost == ROUTE_STRAIGHT_COST_2) {
-                    routeFrame = 2;
+                    routeFrame = ROUTE_FRAME_COST_2;
                 } else if (terrainCost == ROUTE_STRAIGHT_COST_3) {
-                    routeFrame = 3;
+                    routeFrame = ROUTE_FRAME_COST_3;
                 } else if (terrainCost == ROUTE_STRAIGHT_COST_4) {
-                    routeFrame = 4;
+                    routeFrame = ROUTE_FRAME_COST_4;
                 } else if (terrainCost == ROUTE_STRAIGHT_COST_5) {
-                    routeFrame = 5;
+                    routeFrame = ROUTE_FRAME_COST_5;
                 } else {
-                    routeFrame = 1;
+                    routeFrame = ROUTE_FRAME_COST_1;
                 }
             }
 
@@ -9083,14 +9414,14 @@ void advManager::EnableButtons(void) {
 
 VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void) {
-    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase = 8229;
+    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase = SAVE_BORDER_ALLOC_LINE_BASE;
 
     if (m_adventureBorder != NULL) {
         return;
     }
 
     m_adventureBorder = static_cast<u8*>(
-        H2_ALLOC(BORDER_BUFFER_SIZE, 8229 + BORDER_ALLOC_LINE_OFFSET)
+        H2_ALLOC(BORDER_BUFFER_SIZE, SAVE_BORDER_ALLOC_LINE_BASE + BORDER_ALLOC_LINE_OFFSET)
     );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
@@ -9293,11 +9624,14 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
 VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
+    // Retail's fixed reveal permutation is payload, not a numeric domain.
+    // NOLINTBEGIN(readability-magic-numbers)
     u8 puzzleOrderLocal[PUZZLE_PIECE_COUNT] = {23, 7,  44, 5,  24, 47, 1,  39, 16, 36,
                                                       11, 45, 31, 2,  30, 38, 43, 4,  3,  14,
                                                       40, 37, 34, 0,  12, 17, 35, 42, 15, 8,
                                                       26, 41, 28, 46, 10, 22, 21, 6,  32, 18,
                                                       19, 29, 13, 27, 9,  20, 33, 25};
+    // NOLINTEND(readability-magic-numbers)
     i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
@@ -9335,9 +9669,11 @@ void advManager::ViewPuzzle(void) {
     xAdjustmentOffset = (gpGame->m_ultimateArtifactX + gpGame->m_ultimateArtifactY)
                             % PUZZLE_ALIGNMENT_DIVISOR
                         - 1;
-    yAdjustmentOffsetLocal = (gpGame->m_ultimateArtifactX * 2 + gpGame->m_ultimateArtifactY * 5)
-                                 % PUZZLE_ALIGNMENT_DIVISOR
-                             - 1;
+    yAdjustmentOffsetLocal =
+        (gpGame->m_ultimateArtifactX * PUZZLE_Y_ADJUST_X_FACTOR
+         + gpGame->m_ultimateArtifactY * PUZZLE_Y_ADJUST_Y_FACTOR)
+            % PUZZLE_ALIGNMENT_DIVISOR
+        - 1;
     if ((gpGame->m_ultimateArtifactX + gpGame->m_ultimateArtifactY)
             % PUZZLE_ALIGNMENT_DIVISOR
         == 1) {
@@ -9346,7 +9682,9 @@ void advManager::ViewPuzzle(void) {
         } else if (xAdjustmentOffset < 0) {
             --xAdjustmentOffset;
         }
-    } else if ((gpGame->m_ultimateArtifactX + gpGame->m_ultimateArtifactY) % 2 == 1) {
+    } else if ((gpGame->m_ultimateArtifactX + gpGame->m_ultimateArtifactY)
+                   % PUZZLE_PARITY_DIVISOR
+               == 1) {
         if (yAdjustmentOffsetLocal > 0) {
             ++yAdjustmentOffsetLocal;
         } else if (yAdjustmentOffsetLocal < 0) {
@@ -9504,25 +9842,25 @@ i32 APanelHandler(tag_message& message) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
-                switch (message.payload.widget.id) {
-                    case PANEL_VIEW_WORLD:
-                        helpIndex = 0;
-                        break;
-                    case PANEL_VIEW_PUZZLE:
-                        helpIndex = 1;
-                        break;
-                    case PANEL_SCENARIO_INFO:
-                        helpIndex = 2;
-                        break;
-                    case PANEL_SEARCH:
-                        helpIndex = 3;
-                        break;
-                    case PANEL_CLOSE_WIDGET:
-                        helpIndex = PANEL_CLOSE_HELP;
-                        break;
+                if (message.payload.widget.id >= PANEL_VIEW_WORLD
+                    && message.payload.widget.id <= PANEL_SEARCH) {
+                    helpIndex = message.payload.widget.id - PANEL_VIEW_WORLD;
+                } else if (message.payload.widget.id == PANEL_CLOSE_WIDGET) {
+                    helpIndex = PANEL_CLOSE_HELP;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(gAPanelHelp[helpIndex], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(
+                        gAPanelHelp[helpIndex],
+                        NORMAL_DIALOG_QUICK_VIEW,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0
+                    );
                 }
             }
         } else {
@@ -9630,7 +9968,18 @@ i32 CPanelHandler(tag_message& message) {
                         break;
                 }
                 if (helpIndex >= 0) {
-                    NormalDialog(gCPanelHelp[helpIndex], 4, -1, -1, -1, 0, -1, 0, -1, 0);
+                    NormalDialog(
+                        gCPanelHelp[helpIndex],
+                        NORMAL_DIALOG_QUICK_VIEW,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0,
+                        NORMAL_DIALOG_NO_RESOURCE,
+                        0
+                    );
                 }
             }
         } else {
@@ -9667,7 +10016,18 @@ i32 CPanelHandler(tag_message& message) {
                         || message.payload.widget.id == CONTROL_MAIN_MENU) {
                         handled = 1;
                         if (!bFreshSave) {
-                            NormalDialog(confirmation, 2, -1, -1, -1, 0, -1, 0, -1, 0);
+                            NormalDialog(
+                                confirmation,
+                                NORMAL_DIALOG_CONFIRM,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                0,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                0,
+                                NORMAL_DIALOG_NO_RESOURCE,
+                                0
+                            );
                             if (gpWindowManager->m_dialogResult == DIALOG_OK) {
                                 handled = 0;
                             }
@@ -9732,7 +10092,7 @@ void advManager::SystemOptions(void) {
 VA(0x0046b219, 0x35f)
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
-    i32 musicQuality;
+    AdventureMusicQuality musicQuality;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
@@ -9751,14 +10111,14 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-        musicQuality = 0;
+        musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == IDX(CONFIG_OPERA_DISABLED)) {
-        musicQuality = 1;
+        musicQuality = MUSIC_QUALITY_CD_STEREO;
     } else {
-        musicQuality = 2;
+        musicQuality = MUSIC_QUALITY_CD_OPERA;
     }
     message.payload.widget.data.value =
-        musicQuality + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
+        IDX(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE;
     message.payload.widget.data.value =
@@ -9801,7 +10161,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = musicQualityText[musicQuality];
+    message.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         ADVMGR_SYSTEM_OPTION_SHOW_ROUTE + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -9837,7 +10197,7 @@ void UpdateSystemOptions(i32 initialDraw) {
 VA(0x0046b578, 0x672)
 i32 SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
-    char textData[120];
+    char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];
     i32 accepted = 0;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
@@ -9846,37 +10206,12 @@ i32 SystemOptionsHandler(struct tag_message& message) {
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
 
-                switch (message.payload.widget.id) {
-                    case SYSTEM_OPTIONS_DIALOG_ACCEPT:
-                        helpIndex = 0;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
-                        helpIndex = 1;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
-                        helpIndex = 2;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
-                        helpIndex = 3;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
-                        helpIndex = 4;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_SHOW_ROUTE:
-                        helpIndex = 5;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
-                        helpIndex = 6;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_INTERFACE:
-                        helpIndex = 7;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_VIDEO:
-                        helpIndex = 8;
-                        break;
-                    case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
-                        helpIndex = 9;
-                        break;
+                if (message.payload.widget.id == SYSTEM_OPTIONS_DIALOG_ACCEPT) {
+                    helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
+                } else if (message.payload.widget.id >= ADVMGR_SYSTEM_OPTION_FIRST
+                           && message.payload.widget.id <= ADVMGR_SYSTEM_OPTION_LAST) {
+                    helpIndex = message.payload.widget.id - ADVMGR_SYSTEM_OPTION_FIRST
+                        + SYSTEM_OPTIONS_HELP_FIRST_OPTION;
                 }
 
                 if (helpIndex >= 0) {
@@ -10199,15 +10534,16 @@ i32 advManager::DoVisions(hero* visionHero) {
                 joiningCount = monsterCountIndex;
             } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                        == MONSTER_DIPLOMACY_ADVANCED) {
-                joiningCount = monsterCountIndex / 2;
+                joiningCount = monsterCountIndex / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             } else {
-                joiningCount = monsterCountIndex / 4;
+                joiningCount = monsterCountIndex / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;
             }
             if (joiningCount == 0) {
                 joiningCount = 1;
             }
 
-            joiningCostIndex = gMonsterDatabase[IDX(creatureData)].cost * monsterCountIndex * 2;
+            joiningCostIndex = gMonsterDatabase[IDX(creatureData)].cost * monsterCountIndex
+                * VISIONS_JOIN_COST_MULTIPLIER;
             if (joiningCostIndex
                 > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
                 if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
@@ -10307,6 +10643,8 @@ DATA(0x004f57d4) i32 iLastHourGlassPhase = 1;
 DATA(0x004f57d8) b32 gbForceUpdate = false;
 DATA(0x004f59e8) i32 giCheatSeq = 0;
 DATA(0x004f59ec) i32 iQWE = 0;
+// Retail animation-phase payload for the adventure monster overlay.
+// NOLINTNEXTLINE(readability-magic-numbers)
 DATA(0x004f5e38) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
 DATA(0x004f60e0) i32 iLastSandAnimTime = 0;
@@ -10319,12 +10657,12 @@ DATA(0x00527ee0) i32 iThisMinY;
 DATA(0x00527ee8) class heroWindow* townPortalWin;
 DATA(0x00527ef0) struct tag_message USMsg;
 DATA(0x00527f14) i32 giFrameStep;
-DATA(0x00527f28) char cArmySizeName[12];
+DATA(0x00527f28) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
 DATA(0x00527f34) i32 giLimitUpdMaxX;
 DATA(0x00527f38) i32 giLimitUpdMaxY;
 DATA(0x00527f40) i32 bPrefsChanged;
 DATA(0x00527f4c) i32 giLimitUpdMinY;
-DATA(0x00527f50) i8 bComboDraw[18][18];
+DATA(0x00527f50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
 DATA(0x005280b0) struct tag_message CDMsg;
 DATA(0x005280d4) i32 iLastAnimFrame;
 

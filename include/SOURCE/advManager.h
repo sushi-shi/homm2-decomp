@@ -48,6 +48,12 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_MONSTER_ANIMATION_TABLE_SIZE  = 18
 H2_ENUM_END(AdventureManagerStorageConstant)
 
+H2_ENUM_BEGIN(ArmySizeNameVariant)
+    ARMY_SIZE_NAME_TITLE    = 0,
+    ARMY_SIZE_NAME_SENTENCE = 1,
+    ARMY_SIZE_NAME_INLINE   = 2
+H2_ENUM_END(ArmySizeNameVariant)
+
 #pragma pack(push, 1)
 class advManager : public baseManager {
 public:
@@ -199,7 +205,7 @@ public:
     i32 UpdBottomViewKingdom(void);
     i32 UpdBottomViewHero(void);
     void HeroQuickView(i32, i32, i32, i32);
-    char* GetArmySizeName(i32, i32);
+    char* GetArmySizeName(i32, H2_ENUM_PARAM(ArmySizeNameVariant, i32));
     void TownQuickView(i32, i32, i32, i32);
     void RedrawAdvScreen(i32, i32);
     void DeactivateCurrTown(void);

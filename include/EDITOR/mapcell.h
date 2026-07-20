@@ -133,6 +133,10 @@ public:
     u8 m_flags;
     u8 m_triggerType;
     u16 m_extraIndex;
+
+    inline b32 HasFlag(H2_ENUM_PARAM(MapCellFlag, i32) flag) const {
+        return (m_flags & IDX(flag)) != 0;
+    }
 };
 SIZE(mapCell, 12);
 
