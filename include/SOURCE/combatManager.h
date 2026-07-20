@@ -583,7 +583,7 @@ public:
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];
     class icon* m_obstacleIcons[COMBAT_OBSTACLE_ICON_LOAD_COUNT];
     i32 m_obstacleCount;
-    i16 m_eagleEyeSpell[COMBAT_MANAGER_SIDE_COUNT];
+    H2_ENUM_STORAGE(SpellType, i16) m_eagleEyeSpell[COMBAT_MANAGER_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
     i32 m_drawbridgeBackgroundVisible;
     H2_ENUM_STORAGE_STEPPED(CombatCastleWallState, u8)

@@ -614,7 +614,7 @@ SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	100.0000	630d96d071b0
 SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	b0b0fe92a7d7
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	8112e109eeba
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	9958022caed6
-SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	1bfef1999ada
+SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	633b7900c6be
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	1e6a6005c6de
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.9827	5f665b1a6637
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	ea28e1efa5c8
@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	c3085d647e6b
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9808	ae28fc6bd165
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	4b0422331d15
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	abc1f938c310
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.6347	c8eb1f563410
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3263	b34915807b37
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.1031	13e8ba6cb193
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	73ab80bd89bb
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	c0dc28a1c42b
@@ -665,12 +665,12 @@ SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	eac88d6cdc01
 SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	ff78d34345c0
 SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	18fed353ea49
 SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	97.5897	6943ab3ed737
-SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	98.9901	baae87464fd4
+SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	98.9901	44642880cc9c
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	98.5862	444b69209f6d
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	98.8150	d8cd4d84e6fc
 SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	100.0000	f00c88a48ad9
 SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	100.0000	6f94c1ea2535
-SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	405fced3f2d8
+SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	100.0000	60b6cc19c733
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	30a6f118b1fe
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	64c027777abe
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	06f065b2aab8
@@ -1219,7 +1219,7 @@ SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5822	86ddd856b03c
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	ac9fba24c780
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	97.4529	905a118343d8
-SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.4106	295037fc98bd
+SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.4106	f68d83fa11f2
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	e4bf51350c9d
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	90.4262	988c80fc3a85
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	99.9306	ae1846e6aebf

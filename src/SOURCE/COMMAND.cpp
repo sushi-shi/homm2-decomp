@@ -1499,7 +1499,7 @@ i32 WinCombatHandler(struct tag_message& message) {
                             gpCombatManager->ShowSkeletons(gpCombatManager->m_winLoseWindow);
                         } else {
                             if (gpCombatManager->m_eagleEyeSpell[gpCombatManager->m_combatResult]
-                                != -1) {
+                                != SPELL_NONE) {
                                 gpCombatManager->ClearWinLoseBottom(
                                     gpCombatManager->m_winLoseWindow
                                 );
@@ -1507,7 +1507,7 @@ i32 WinCombatHandler(struct tag_message& message) {
                                     gpCombatManager->m_winLoseWindow
                                 );
                                 gpCombatManager->m_eagleEyeSpell[gpCombatManager->m_combatResult] =
-                                    -1;
+                                    SPELL_NONE;
                             } else {
                             ExitDialog:
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
@@ -1774,7 +1774,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
 VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     DATA(0x004f0be4) static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
-    i32 displayedSpell = m_eagleEyeSpell[m_combatResult];
+    SpellType displayedSpell = m_eagleEyeSpell[m_combatResult];
     i32 x = EAGLE_PANEL_X;
     i32 y = EAGLE_PANEL_Y;
     tag_message spellMessage;
@@ -1801,7 +1801,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         EAGLE_ICON_WIDTH,
         EAGLE_ICON_HEIGHT,
         "spells.icn",
-        static_cast<i16>(gsSpellInfo[displayedSpell].iconIndex),
+        static_cast<i16>(gsSpellInfo[IDX(displayedSpell)].iconIndex),
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
         WIN_LOSE_SPELL_ICON_FLAGS,
@@ -1811,7 +1811,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         MemError();
 
     spellName = static_cast<char*>(H2_ALLOC(EAGLE_SPELL_NAME_CAPACITY, 1828));
-    sprintf(spellName, "%s", gSpellNames[displayedSpell]);
+    sprintf(spellName, "%s", gSpellNames[IDX(displayedSpell)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + EAGLE_TEXT_X_OFFSET,
         y + EAGLE_TEXT_Y_OFFSET,
@@ -1835,7 +1835,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         "Through eagle-eyed observation, %s is able to learn the magic "
         "spell '%s'.",
         m_heroes[m_combatResult]->m_name,
-        gSpellNames[displayedSpell]
+        gSpellNames[IDX(displayedSpell)]
     );
     spellMessage.type = MESSAGE_WIDGET;
     spellMessage.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
@@ -2153,8 +2153,8 @@ void combatManager::DoVictory(i32 winningSide) {
         case COMBAT_ATTACKER_SIDE:
         case COMBAT_DEFENDER_SIDE:
             if (m_heroes[winningSide] != NULL) {
-                if (m_eagleEyeSpell[winningSide] != IDX(SPELL_NONE)) {
-                    m_heroes[winningSide]->m_spells[m_eagleEyeSpell[winningSide]] = 1;
+                if (m_eagleEyeSpell[winningSide] != SPELL_NONE) {
+                    m_heroes[winningSide]->m_spells[IDX(m_eagleEyeSpell[winningSide])] = 1;
                 }
                 m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] =
                     ExperienceValueOfStack(COMBAT_DEFENDER_SIDE - winningSide);
