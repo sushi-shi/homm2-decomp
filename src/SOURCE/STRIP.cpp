@@ -124,13 +124,13 @@ void strip::DrawIcons(i32 drawWindow) {
     i32 slot;
     CreatureType creatureType;
 
-    m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_portraitFrame, 0);
+    m_portraitIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_portraitFrame, ICON_DRAW_NORMAL);
     if (m_flagFrame != ARMY_GROUP_EMPTY_SLOT)
-        m_flagIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_flagFrame, 0);
+        m_flagIcon->DrawToBuffer(m_x + STRIP_PORTRAIT_X, m_y + STRIP_CONTENT_Y, m_flagFrame, ICON_DRAW_NORMAL);
 
     if (m_army == NULL) {
         m_stripIcon
-            ->DrawToBuffer(m_x + STRIP_ARMY_FIRST_X, m_y + STRIP_CONTENT_Y, STRIP_NO_ARMY_FRAME, 0);
+            ->DrawToBuffer(m_x + STRIP_ARMY_FIRST_X, m_y + STRIP_CONTENT_Y, STRIP_NO_ARMY_FRAME, ICON_DRAW_NORMAL);
         m_window->DrawWindow(drawWindow);
         return;
     }
@@ -167,13 +167,13 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 m_y + STRIP_CONTENT_Y,
                 IDX(gMonsterDatabase[IDX(creatureType)].race) + STRIP_RACE_FRAME_OFFSET,
-                0
+                ICON_DRAW_NORMAL
             );
             m_creatureIcons[slot]->DrawToBuffer(
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 m_y + STRIP_CONTENT_Y,
                 0,
-                0
+                ICON_DRAW_NORMAL
             );
             sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
             smallFont->DrawBoundedString(
@@ -190,7 +190,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
                 m_y + STRIP_CONTENT_Y,
                 STRIP_EMPTY_FRAME,
-                0
+                ICON_DRAW_NORMAL
             );
         }
     }
@@ -200,14 +200,14 @@ void strip::DrawIcons(i32 drawWindow) {
             m_x + m_selectedSlot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
             m_y + STRIP_CONTENT_Y,
             STRIP_SELECTED_FRAME,
-            0
+            ICON_DRAW_NORMAL
         );
     }
 }
 
 VA(0x00432a05, 0x33)
 void strip::DrawFrame(void) {
-    m_stripIcon->DrawToBuffer(m_x, m_y, 0, 0);
+    m_stripIcon->DrawToBuffer(m_x, m_y, 0, ICON_DRAW_NORMAL);
 }
 
 VA(0x00432a38, 0xb2)

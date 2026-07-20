@@ -148,7 +148,7 @@ void border::Draw(void) {
             PollSound();
             return;
         case WIDGET_KIND_ICON:
-            m_backgroundIcon->DrawToBuffer(x, y, 0, 0);
+            m_backgroundIcon->DrawToBuffer(x, y, 0, ICON_DRAW_NORMAL);
             return;
         default:
             return;

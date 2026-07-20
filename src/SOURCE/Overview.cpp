@@ -342,7 +342,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             ROW_BACKGROUND_HEIGHT,
             const_cast<char*>("overview.icn"),
             static_cast<i16>(IDX(giOverviewType) + ROW_BACKGROUND_FRAME_BASE),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(rowWidgetId6 + ROW_BACKGROUND_CONTROL),
             WIDGET_KIND_ICON_DIRECT,
             OVERVIEW_ICON_FILL_COLOR
@@ -392,7 +392,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     TOWN_ICON_HEIGHT,
                     const_cast<char*>("minitown.icn"),
                     townFrame,
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_SELECT_WIDGET),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -412,7 +412,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     0,
                     const_cast<char*>("locators.icn"),
                     TOWN_LOCATOR_FRAME,
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_LOCATOR_CONTROL),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -442,7 +442,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     TOWN_HERO_FRAME_HEIGHT,
                     const_cast<char*>("portxtra.icn"),
                     0,
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_FIRST),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -461,7 +461,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     const_cast<char*>(hasCaptain ? "minicapt.icn" : "miniport.icn"),
                     hasCaptain ? static_cast<u8>(static_cast<FactionType>(record->m_type))
                                : static_cast<u8>(heroData0->m_id),
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_PORTRAIT_CONTROL),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -481,7 +481,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(
                         GetMobilityFrame(hasCaptain ? 0 : heroData0->m_remainingMobility)
                     ),
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_MOBILITY_CONTROL),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -505,7 +505,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     static_cast<i16>(
                         GetManaFrame(hasCaptain ? captainMana : heroData0->m_spellPoints)
                     ),
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_MANA_CONTROL),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -533,7 +533,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_ICON_HEIGHT,
                             const_cast<char*>("mons32.icn"),
                             static_cast<i16>(IDX(record->m_army.m_creatureTypes[item])),
-                            0,
+                            ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId6 + item + TOWN_ARMY_FIRST),
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
@@ -636,7 +636,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             static_cast<i16>(
                                 IDX(gDwellingType[IDX(record->m_type)][detailIndex])
                             ),
-                            0,
+                            ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId6 + detailIndex + TOWN_RECRUIT_FIRST),
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
@@ -694,7 +694,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 HERO_FRAME_HEIGHT,
                 const_cast<char*>("portxtra.icn"),
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId6 + HERO_SELECT_FIRST),
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
@@ -712,7 +712,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 HERO_PORTRAIT_HEIGHT,
                 const_cast<char*>("miniport.icn"),
                 static_cast<i16>(heroData0->m_id),
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId6 + HERO_PORTRAIT_CONTROL),
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
@@ -730,7 +730,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 0,
                 const_cast<char*>("mobility.icn"),
                 static_cast<i16>(GetMobilityFrame(heroData0->m_remainingMobility)),
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId6 + HERO_MOBILITY_CONTROL),
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
@@ -748,7 +748,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                 0,
                 const_cast<char*>("mana.icn"),
                 static_cast<i16>(GetManaFrame(heroData0->m_spellPoints)),
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(rowWidgetId6 + TOWN_HERO_MANA_CONTROL),
                 WIDGET_KIND_ICON_DIRECT,
                 OVERVIEW_ICON_FILL_COLOR
@@ -801,7 +801,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     HERO_PRIMARY_ICON_HEIGHT,
                     const_cast<char*>("overview.icn"),
                     HERO_PRIMARY_ICON_FRAME,
-                    0,
+                    ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + item + HERO_STAT_FIRST),
                     WIDGET_KIND_ICON_DIRECT,
                     OVERVIEW_ICON_FILL_COLOR
@@ -829,7 +829,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                             TROOP_ICON_HEIGHT,
                             const_cast<char*>("mons32.icn"),
                             static_cast<i16>(IDX(heroData0->m_army.m_creatureTypes[item])),
-                            0,
+                            ICON_DRAW_NORMAL,
                             static_cast<i16>(rowWidgetId6 + item + HERO_ARMY_FIRST),
                             WIDGET_KIND_ICON_CENTERED,
                             OVERVIEW_ICON_FILL_COLOR
@@ -889,7 +889,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_FRAME_HEIGHT,
                         const_cast<char*>("overview.icn"),
                         DETAIL_FRAME_ICON,
-                        0,
+                        ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId6 + item + HERO_SKILL_FRAME_FIRST),
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
@@ -911,7 +911,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_ICON_HEIGHT,
                         const_cast<char*>("miniss.icn"),
                         static_cast<i16>(detailIndex),
-                        0,
+                        ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId6 + item + HERO_SKILL_FIRST),
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
@@ -966,7 +966,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_FRAME_HEIGHT,
                         const_cast<char*>("overview.icn"),
                         DETAIL_FRAME_ICON,
-                        0,
+                        ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId6 + item + HERO_ARTIFACT_FRAME_FIRST),
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
@@ -988,7 +988,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         DETAIL_ICON_HEIGHT,
                         const_cast<char*>("artfx.icn"),
                         static_cast<i16>(heroData0->m_artifacts[item]),
-                        0,
+                        ICON_DRAW_NORMAL,
                         static_cast<i16>(rowWidgetId6 + item + HERO_ARTIFACT_FIRST),
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
@@ -1170,7 +1170,7 @@ void game::Overview(void) {
         SCROLL_KNOB_HEIGHT,
         const_cast<char*>("scrollcn.icn"),
         SCROLL_KNOB_FRAME,
-        0,
+        ICON_DRAW_NORMAL,
         SCROLL_KNOB_WIDGET,
         WIDGET_KIND_ICON_DIRECT,
         OVERVIEW_ICON_FILL_COLOR

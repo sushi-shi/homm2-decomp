@@ -495,7 +495,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 m_hexCells[cellIndex].m_gridTop,
                 1,
                 m_gridState[cellIndex] - 1,
-                1,
+                ICON_DRAW_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -519,7 +519,7 @@ DrawCombatGrid:
                     m_hexCells[cellIndex].m_gridTop,
                     COMBAT_GRID_LINE_FRAME,
                     COMBAT_GRID_LINE_COLOR,
-                    1,
+                    ICON_DRAW_CLIP,
                     0,
                     0,
                     COMBAT_SCREEN_WIDTH,
@@ -554,7 +554,7 @@ void combatManager::DrawBackground(void) {
         0,
         0,
         0,
-        1,
+        ICON_DRAW_CLIP,
         0,
         0,
         COMBAT_SCREEN_WIDTH,
@@ -572,7 +572,7 @@ void combatManager::DrawBackground(void) {
             0,
             0,
             0,
-            0,
+            ICON_DRAW_NO_CLIP,
             0,
             0,
             COMBAT_SCREEN_WIDTH,
@@ -591,7 +591,7 @@ void combatManager::DrawBackground(void) {
                 0,
                 0,
                 0,
-                1,
+                ICON_DRAW_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH / COMBAT_MANAGER_SIDE_COUNT,
@@ -605,7 +605,7 @@ void combatManager::DrawBackground(void) {
                 0,
                 0,
                 0,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -627,7 +627,7 @@ void combatManager::DrawBackground(void) {
             0,
             0,
             COMBAT_CASTLE_BACKGROUND_BASE_FRAME,
-            0,
+            ICON_DRAW_NO_CLIP,
             0,
             0,
             COMBAT_SCREEN_WIDTH,
@@ -641,7 +641,7 @@ void combatManager::DrawBackground(void) {
                 0,
                 0,
                 0,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -656,7 +656,7 @@ void combatManager::DrawBackground(void) {
                 0,
                 0,
                 COMBAT_CASTLE_BACKGROUND_BUILDING_FRAME,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -670,7 +670,7 @@ void combatManager::DrawBackground(void) {
                 0,
                 0,
                 COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME,
-                0,
+                ICON_DRAW_NO_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -768,7 +768,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
             m_hexCells[hexIndex].m_gridTop,
             1,
             COMBAT_GRID_MOUSE_FRAME,
-            1,
+            ICON_DRAW_CLIP,
             0,
             0,
             COMBAT_SCREEN_WIDTH,
@@ -902,7 +902,7 @@ void combatManager::DrawFrame(
                     sCmbtHero[m_heroSpriteIndex[side5]]
                         .animationFrames[m_heroAnimationState[side5]][m_heroAnimationFrame[side5]],
                     &m_heroLimits[side5],
-                    1,
+                    ICON_DRAW_FLIPPED,
                     0,
                     NULL,
                     NULL
@@ -928,7 +928,7 @@ void combatManager::DrawFrame(
                                      + COMBAT_HERO_RIGHT_Y,
                     m_heroOverlayFrame[side5],
                     &m_heroOverlayLimits[side5],
-                    1,
+                    ICON_DRAW_FLIPPED,
                     0,
                     NULL,
                     NULL
@@ -1004,7 +1004,7 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[COMBAT_DEFENDER_SIDE]]
                                     [m_heroAnimationFrame[COMBAT_DEFENDER_SIDE]],
                 &m_heroLimits[1],
-                1,
+                ICON_DRAW_FLIPPED,
                 0,
                 NULL,
                 NULL
@@ -1014,7 +1014,7 @@ void combatManager::DrawFrame(
                 COMBAT_HERO_RIGHT_Y,
                 m_heroOverlayFrame[1],
                 &m_heroOverlayLimits[1],
-                1,
+                ICON_DRAW_FLIPPED,
                 0,
                 NULL,
                 NULL
@@ -1029,7 +1029,7 @@ void combatManager::DrawFrame(
                     .animationFrames[m_heroAnimationState[COMBAT_ATTACKER_SIDE]]
                                     [m_heroAnimationFrame[COMBAT_ATTACKER_SIDE]],
                 &m_heroLimits[0],
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1039,7 +1039,7 @@ void combatManager::DrawFrame(
                 COMBAT_HERO_LEFT_Y,
                 m_heroOverlayFrame[0],
                 &m_heroOverlayLimits[0],
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1061,7 +1061,7 @@ void combatManager::DrawFrame(
                 COMBAT_CATAPULT_Y,
                 m_catapultFrame[COMBAT_ATTACKER_SIDE],
                 &m_catapultLimits,
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1074,7 +1074,7 @@ void combatManager::DrawFrame(
                 0,
                 IDX(m_drawbridgeState) + DRAWBRIDGE_TOWER_FRAME_BASE,
                 &m_upperWallLimits,
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1087,7 +1087,7 @@ void combatManager::DrawFrame(
                 0,
                 COMBAT_CASTLE_TOP_LAYER_FRAME,
                 &m_middleWallLimits,
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1102,7 +1102,7 @@ void combatManager::DrawFrame(
                     ? COMBAT_CASTLE_GATE_CLOSED_FRAME
                     : COMBAT_CASTLE_GATE_FRAME,
                 &m_gateLimits,
-                0,
+                ICON_DRAW_NORMAL,
                 0,
                 NULL,
                 NULL
@@ -1246,7 +1246,7 @@ void combatManager::DrawFrame(
                             wallY,
                             wallFrame1,
                             &m_hexCells[hexIndex6].m_limits[0],
-                            0,
+                            ICON_DRAW_NORMAL,
                             0,
                             NULL,
                             NULL
@@ -1317,7 +1317,7 @@ void combatManager::DrawFrame(
                     0,
                     0,
                     0,
-                    1,
+                    ICON_DRAW_CLIP,
                     0,
                     drawbridgeY,
                     COMBAT_SCREEN_WIDTH,
@@ -1331,7 +1331,7 @@ void combatManager::DrawFrame(
                 goto endRow;
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
-                ->CombatClipDrawToBuffer(0, 0, row, &m_moatLimits[row], 0, 0, NULL, NULL);
+                ->CombatClipDrawToBuffer(0, 0, row, &m_moatLimits[row], ICON_DRAW_NORMAL, 0, NULL, NULL);
             m_hexCells[moatCell[row] - 1].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[row]].DrawOccupant(ARMY_DRAW_ALL, 1);
             m_hexCells[moatCell[row] + 1].DrawOccupant(ARMY_DRAW_ALL, 1);
@@ -1390,7 +1390,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     army* viewArmy1;
     i32 viewX;
     i32 spellSlot;
-    i32 drawn6;
+    IconDrawResult drawn6;
     u8 spellPositions[COMBAT_SMALL_VIEW_MAX_SPELLS][COMBAT_SMALL_VIEW_MAX_SPELLS]
                      [SPELL_POSITION_AXIS_COUNT] = {
         {{COMBAT_SMALL_VIEW_SPELL_X_THIRD, COMBAT_SMALL_VIEW_SPELL_Y_SECOND},
@@ -1513,13 +1513,13 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         viewY2,
         gConfig.combatArmyInfoLevel != COMBAT_SMALL_VIEW_FULL_INFO,
         &m_smallViewLimits,
-        0,
+        ICON_DRAW_NORMAL,
         0,
         NULL,
         NULL
     );
     viewX += COMBAT_SMALL_VIEW_INSET_X;
-    if (drawn6 != 0) {
+    if (drawn6 == ICON_DRAW_COMPLETED) {
         if (viewArmy1->m_quantity > 1)
             sprintf(
                 gText,
@@ -1673,7 +1673,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                             + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
                         IDX(SMALL_VIEW_GOOD_MORALE_FRAME),
-                        0
+                        ICON_DRAW_NORMAL
                     );
             } else if (viewArmy1->m_morale < 0) {
                 for (spellSlot = 0; spellSlot < -viewArmy1->m_morale; spellSlot++)
@@ -1683,7 +1683,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                             + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
                         IDX(SMALL_VIEW_BAD_MORALE_FRAME),
-                        0
+                        ICON_DRAW_NORMAL
                     );
             } else {
                 m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)]->DrawToBuffer(
@@ -1691,7 +1691,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                         + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_MORALE,
                     IDX(SMALL_VIEW_NEUTRAL_MORALE_FRAME),
-                    0
+                    ICON_DRAW_NORMAL
                 );
             }
 
@@ -1704,7 +1704,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                             + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
                         IDX(SMALL_VIEW_GOOD_LUCK_FRAME),
-                        0
+                        ICON_DRAW_NORMAL
                     );
             } else if (viewArmy1->m_luck < 0) {
                 for (spellSlot = 0; spellSlot < -viewArmy1->m_luck; spellSlot++)
@@ -1714,7 +1714,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                         viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                             + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
                         IDX(SMALL_VIEW_BAD_LUCK_FRAME),
-                        0
+                        ICON_DRAW_NORMAL
                     );
             } else {
                 m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)]->DrawToBuffer(
@@ -1722,7 +1722,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     viewY2 + COMBAT_SMALL_VIEW_FIRST_STAT_Y
                         + COMBAT_SMALL_VIEW_STAT_ROW_HEIGHT * STAT_ROW_LUCK,
                     IDX(SMALL_VIEW_NEUTRAL_LUCK_FRAME),
-                    0
+                    ICON_DRAW_NORMAL
                 );
             }
 
@@ -1765,7 +1765,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                  - GetIconEntry(m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)], spellFrame1)->h)
                 >> 1;
             m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)]
-                ->DrawToBuffer(iconX, iconY2, spellFrame1, 0);
+                ->DrawToBuffer(iconX, iconY2, spellFrame1, ICON_DRAW_NORMAL);
         }
     }
 

@@ -1462,7 +1462,7 @@ void combatManager::CatAttack(i32 side) {
             static_cast<i32l>(projectileY4),
             spriteFrame27,
             &limits1,
-            0,
+            ICON_DRAW_NORMAL,
             0,
             NULL,
             NULL
@@ -1521,7 +1521,7 @@ void combatManager::CatAttack(i32 side) {
                 impactX5 - COMBAT_CATAPULT_GATE_CLOUD_X_OFFSET,
                 impactY0 + COMBAT_CATAPULT_GATE_CLOUD_Y_OFFSET,
                 frame18 - COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME,
-                1,
+                ICON_DRAW_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -1536,7 +1536,7 @@ void combatManager::CatAttack(i32 side) {
                 impactX5,
                 impactY0 + (!missShot19 ? COMBAT_CATAPULT_CLOUD_Y_OFFSET : 0),
                 frame18,
-                1,
+                ICON_DRAW_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
@@ -2094,9 +2094,9 @@ void combatManager::ShootMissile(
     i32 xDistance1 = targetX - sourceX;
     i32 yDistance19 = targetY - sourceY;
     i32 absoluteXDistance15 = targetX - sourceX;
-    i8 reverseMissile7 = 0;
+    H2_ENUM_STORAGE(IconDrawOrientation, i8) reverseMissile7 = ICON_DRAW_NORMAL;
     if (absoluteXDistance15 < 0) {
-        reverseMissile7 = 1;
+        reverseMissile7 = ICON_DRAW_FLIPPED;
         absoluteXDistance15 = -absoluteXDistance15;
     }
     i32 directionYDistance1 = targetY - sourceY;

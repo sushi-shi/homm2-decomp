@@ -4073,7 +4073,7 @@ void SetupDynamicWindow(
                 TILE_SIZE,
                 "stonebk2.icn",
                 BACKGROUND_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_COLOR,
                 1
@@ -4091,7 +4091,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         "stonebk2.icn",
         CORNER_FRAME_TOP_LEFT,
-        0,
+        ICON_DRAW_NORMAL,
         -1,
         WIDGET_COLOR,
         1
@@ -4107,7 +4107,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         "stonebk2.icn",
         CORNER_FRAME_TOP_RIGHT,
-        0,
+        ICON_DRAW_NORMAL,
         -1,
         WIDGET_COLOR,
         1
@@ -4123,7 +4123,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         "stonebk2.icn",
         CORNER_FRAME_BOTTOM_RIGHT,
-        0,
+        ICON_DRAW_NORMAL,
         -1,
         WIDGET_COLOR,
         1
@@ -4139,7 +4139,7 @@ void SetupDynamicWindow(
         CORNER_SIZE,
         "stonebk2.icn",
         CORNER_FRAME_BOTTOM_LEFT,
-        0,
+        ICON_DRAW_NORMAL,
         -1,
         WIDGET_COLOR,
         1
@@ -4156,7 +4156,7 @@ void SetupDynamicWindow(
             CORNER_SIZE,
             "stonebk2.icn",
             Random(TOP_FRAME_FIRST, TOP_FRAME_LAST),
-            0,
+            ICON_DRAW_NORMAL,
             -1,
             WIDGET_COLOR,
             1
@@ -4172,7 +4172,7 @@ void SetupDynamicWindow(
             CORNER_SIZE,
             "stonebk2.icn",
             Random(BOTTOM_FRAME_FIRST, BOTTOM_FRAME_LAST),
-            0,
+            ICON_DRAW_NORMAL,
             -1,
             WIDGET_COLOR,
             1
@@ -4190,7 +4190,7 @@ void SetupDynamicWindow(
             CORNER_SIZE,
             "stonebk2.icn",
             Random(LEFT_FRAME_FIRST, LEFT_FRAME_LAST),
-            0,
+            ICON_DRAW_NORMAL,
             -1,
             WIDGET_COLOR,
             1
@@ -4206,7 +4206,7 @@ void SetupDynamicWindow(
             CORNER_SIZE,
             "stonebk2.icn",
             Random(RIGHT_FRAME_FIRST, RIGHT_FRAME_LAST),
-            0,
+            ICON_DRAW_NORMAL,
             -1,
             WIDGET_COLOR,
             1
@@ -4618,7 +4618,7 @@ void CheckShingleUpdate(void) {
             (iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET)
             % SHINGLE_ANIMATION_FRAME_COUNT;
         gShingleAnim->DrawToBuffer(
-            0, 0, iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET, 0
+            0, 0, iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET, ICON_DRAW_NORMAL
         );
         gpWindowManager->UpdateScreenRegion(
             SHINGLE_UPDATE_X,
@@ -5097,7 +5097,7 @@ void NormalDialog(
             imageHeight_b,
             iconFile_h,
             resourceFrame_g,
-            0,
+            ICON_DRAW_NORMAL,
             -1,
             NORMAL_DIALOG_WIDGET_COLOR + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL),
             1
@@ -5115,7 +5115,7 @@ void NormalDialog(
                 NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT,
                 "artifact.icn",
                 resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5133,7 +5133,7 @@ void NormalDialog(
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "primskil.icn",
                 resourceValue_l[resourceSlot_n],
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5153,7 +5153,7 @@ void NormalDialog(
                 "strip.icn",
                 IDX(gMonsterDatabase[resourceValue_l[resourceSlot_n]].race)
                     + NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5171,7 +5171,7 @@ void NormalDialog(
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 gText,
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5189,7 +5189,7 @@ void NormalDialog(
                 NORMAL_DIALOG_CREST_OVERLAY_HEIGHT,
                 "brcrest.icn",
                 NORMAL_DIALOG_CREST_OVERLAY_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5207,7 +5207,7 @@ void NormalDialog(
                 NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT,
                 "secskill.icn",
                 NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1
@@ -5226,7 +5226,7 @@ void NormalDialog(
                 NORMAL_DIALOG_HERO_OVERLAY_HEIGHT,
                 iconFile_h,
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 -1,
                 NORMAL_DIALOG_WIDGET_COLOR,
                 1

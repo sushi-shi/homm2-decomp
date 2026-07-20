@@ -32,7 +32,7 @@ void FlipIconToBitmap(
     i32 x,
     i32 y,
     i32 frame,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -55,15 +55,15 @@ void FlipIconToBitmap(
     i32 X = w + x0 - 1;
     gFlipXEnd = X;
     gFlipY = y;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
+        i32 currentY;
         if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w
-            || (memcpy(&clip, &gFlipY, sizeof(clip)), clip < clipY)
-            || clipY + clipH < entry->h + clip) {
-            clip = 1;
+            || (currentY = gFlipY) < clipY || clipY + clipH < entry->h + currentY) {
+            clip = ICON_DRAW_CLIP;
             gFlipClipR = clipX + clipW - 1;
             gFlipClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     i16 pitch = dest->m_width;
@@ -108,7 +108,7 @@ void FlipIconToBitmap(
             }
             goto do_dim;
         do_fill:
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 memset(reinterpret_cast<u8*>((gFlipRow - count) + 1 + X), gFlipColor, count);
             } else {
                 i32 currentY = gFlipY;
@@ -141,7 +141,7 @@ void FlipIconToBitmap(
                     reinterpret_cast<u8*>(uDimPal)
                     + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFlipDimPal = palette;
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     u8* dp = reinterpret_cast<u8*>((gFlipRow - count) + 1 + X);
                     gFlipCnt = 0;
                     i32 dimCount = count;
@@ -192,7 +192,7 @@ void FlipIconToBitmap(
         gFlipRun = cmd;
         gFlipX = X;
         if (cmd != 0) {
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 gFlipCnt = 0;
                 u8* dst = reinterpret_cast<u8*>(gFlipRow + X);
                 gFlipDst = dst;

@@ -353,7 +353,7 @@ i32 fileRequester::Open(i32 id) {
         SCROLL_KNOB_HEIGHT,
         "scrollcn.icn",
         SCROLL_KNOB_FRAME,
-        0,
+        ICON_DRAW_NORMAL,
         FILE_REQUESTER_SCROLL_KNOB,
         WIDGET_KIND_ICON_DIRECT,
         1

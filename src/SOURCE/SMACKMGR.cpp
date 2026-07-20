@@ -91,15 +91,15 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         while (SmackToBufferRect(smack, SMACKSURFACESLOW)) {
             if (bSmackNum == CHOOSE_CAMPAIGN) {
                 if (gbCampaignSideChoice == 1) {
-                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, 0);
-                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, 0);
+                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
+                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                 } else {
-                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_FRAME, 0);
-                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_SELECTED_FRAME, 0);
+                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_FRAME, ICON_DRAW_NORMAL);
+                    brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                 }
             }
             if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice != -1)
-                backImage->DrawToBuffer(0, 0, 1, 0);
+                backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
             if (bSmackNum == CONGRATS && smack->FrameNum >= CONGRATS_FIRST_FRAME) {
                 smallFont->DrawBoundedString(
                     congratsText,
@@ -291,8 +291,8 @@ void SmackManagerMain(void) {
                 backImage = gpResourceManager->GetIcon("x_ivy.icn");
                 if (!backImage)
                     MemError();
-                backImage->DrawToBuffer(0, 0, 0, 0);
-                backImage->DrawToBuffer(0, 0, 1, 0);
+                backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
+                backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
                 sprintf(gText, "%s%s.SMK", path7, "IVYPOL");
                 smk2 = SmackOpen(gText, 0, SMACKAUTOEXTRA);
                 memcpy(gPalette->m_data, smk2->Palette, PALETTE_DATA_SIZE);
@@ -377,11 +377,11 @@ void SmackManagerMain(void) {
                         break;
                     gbCampaignSideChoice = campaignChoice4;
                     if (gbCampaignSideChoice == 1) {
-                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, 0);
-                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, 0);
+                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
+                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                     } else {
-                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_FRAME, 0);
-                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_SELECTED_FRAME, 0);
+                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_FRAME, ICON_DRAW_NORMAL);
+                        brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                     }
                     BlitBitmapToScreen(
                         gpWindowManager->m_screen,
@@ -400,7 +400,7 @@ void SmackManagerMain(void) {
                     gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
                     expansionChoice1 = ExpansionCampaignRect(expansionMouseX6, expansionMouseY4);
                     if (expansionChoice1 != xLastChoice) {
-                        backImage->DrawToBuffer(0, 0, 0, 0);
+                        backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
                         BlitBitmapToScreen(
                             gpWindowManager->m_screen,
                             0,
@@ -438,7 +438,7 @@ void SmackManagerMain(void) {
                                 gpWindowManager->m_screen->m_pixels,
                                 0
                             );
-                            backImage->DrawToBuffer(0, 0, 1, 0);
+                            backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
                         }
                     }
                 }

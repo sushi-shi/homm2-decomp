@@ -695,7 +695,7 @@ void game::InitNewGameWindow(void) {
                 PLAYER_HUMAN_HEIGHT,
                 "ngextra.icn",
                 PLAYER_HUMAN_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
                 PLAYER_WIDGET_KIND,
                 PLAYER_WIDGET_FILL_COLOR
@@ -712,7 +712,7 @@ void game::InitNewGameWindow(void) {
                 PLAYER_HANDICAP_HEIGHT,
                 "ngextra.icn",
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
                 PLAYER_WIDGET_KIND,
                 PLAYER_WIDGET_FILL_COLOR
@@ -738,7 +738,7 @@ void game::InitNewGameWindow(void) {
                  & (GAME_RACE_WIDGET_MULTIPLAYER_FRAME - GAME_RACE_WIDGET_SINGLE_FRAME))
                 + GAME_RACE_WIDGET_SINGLE_FRAME
             ),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -764,7 +764,7 @@ void game::InitNewGameWindow(void) {
                  & (GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME - GAME_PLAYER_WIDGET_SINGLE_FRAME))
                 + GAME_PLAYER_WIDGET_SINGLE_FRAME
             ),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -785,7 +785,7 @@ void game::InitNewGameWindow(void) {
                  & (GAME_COLOR_WIDGET_MULTIPLAYER_FRAME - GAME_COLOR_WIDGET_SINGLE_FRAME))
                 + GAME_COLOR_WIDGET_SINGLE_FRAME
             ),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -829,7 +829,7 @@ void game::InitNewGameWindow(void) {
             PLAYER_RACE_ICON_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_ICON_FRAME,
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -879,7 +879,7 @@ void game::InitNewGameWindow(void) {
             PLAYER_RACE_CYCLE_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_CYCLE_FRAME,
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -1702,7 +1702,7 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
         GAME_CHAT_DRAW_X,
         GAME_CHAT_DRAW_Y,
         GAME_CHAT_BACKGROUND_WIDTH,
-        0
+        ICON_DRAW_NORMAL
     );
     smallFont->DrawBoundedString(
         cNGKPDisplay,
@@ -1809,7 +1809,7 @@ void game::ShowScenInfo(void) {
                 PLAYER_HUMAN_HEIGHT,
                 "ngextra.icn",
                 PLAYER_HUMAN_FRAME,
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
                 PLAYER_WIDGET_KIND,
                 PLAYER_WIDGET_FILL_COLOR
@@ -1828,7 +1828,7 @@ void game::ShowScenInfo(void) {
                 PLAYER_HANDICAP_HEIGHT,
                 "ngextra.icn",
                 0,
-                0,
+                ICON_DRAW_NORMAL,
                 static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
                 PLAYER_WIDGET_KIND,
                 PLAYER_WIDGET_FILL_COLOR
@@ -1854,7 +1854,7 @@ void game::ShowScenInfo(void) {
                  & (GAME_RACE_WIDGET_MULTIPLAYER_FRAME - GAME_RACE_WIDGET_SINGLE_FRAME))
                 + GAME_RACE_WIDGET_SINGLE_FRAME
             ),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -1875,7 +1875,7 @@ void game::ShowScenInfo(void) {
                  & (GAME_COLOR_WIDGET_MULTIPLAYER_FRAME - GAME_COLOR_WIDGET_SINGLE_FRAME))
                 + GAME_COLOR_WIDGET_SINGLE_FRAME
             ),
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -1919,7 +1919,7 @@ void game::ShowScenInfo(void) {
             PLAYER_RACE_ICON_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_ICON_FRAME,
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR
@@ -1969,7 +1969,7 @@ void game::ShowScenInfo(void) {
             PLAYER_RACE_CYCLE_HEIGHT,
             "ngextra.icn",
             PLAYER_RACE_CYCLE_FRAME,
-            0,
+            ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
             PLAYER_WIDGET_KIND,
             PLAYER_WIDGET_FILL_COLOR

@@ -31,7 +31,7 @@ void IconToBitmapColorTable(
     i32 x,
     i32 y,
     i32 frame,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
@@ -51,15 +51,15 @@ void IconToBitmapColorTable(
     gCTX0 = X;
     gCTPitch = dest->m_width;
     gCTY = entry->y + y;
-    if (clip != 0) {
+    if (clip != ICON_DRAW_NO_CLIP) {
         i32 currentY = gCTY;
         if (X < clipX || clipW + clipX < entry->w + gCTX0 || currentY < clipY
             || clipY + clipH < entry->h + currentY) {
-            clip = 1;
+            clip = ICON_DRAW_CLIP;
             gCTClipR = clipX + clipW - 1;
             gCTClipB = clipY + clipH - 1;
         } else {
-            clip = 0;
+            clip = ICON_DRAW_NO_CLIP;
         }
     }
     u8* row = dest->m_pixels + gCTPitch * gCTY;
@@ -107,7 +107,7 @@ void IconToBitmapColorTable(
             }
             goto do_dim;
         do_fill:
-            if (clip == 0) {
+            if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gCTColor, count);
             } else {
                 i32 right;
@@ -145,7 +145,7 @@ void IconToBitmapColorTable(
                     + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gCTDst = savedDst;
                 gCTDimPal = palette;
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
                     gCTDimLen = 0;
                     i32 dimCount = count;
@@ -208,7 +208,7 @@ void IconToBitmapColorTable(
             do {
                 gCTDst = savedDst;
                 gCTSrcCopy = gCTSrc;
-                if (clip == 0) {
+                if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
                     cnt = cmd;
                 } else {

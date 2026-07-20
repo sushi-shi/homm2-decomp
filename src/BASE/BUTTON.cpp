@@ -288,7 +288,7 @@ i16 button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = static_cast<i16>(window->m_posX + m_x);
     i16 y = static_cast<i16>(window->m_posY + m_y);
-    m_icon->DrawToBuffer(x, y, m_pressedFrame, 0);
+    m_icon->DrawToBuffer(x, y, m_pressedFrame, ICON_DRAW_NORMAL);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= WIDGET_FLAG_SELECTED;
     msg.type = MESSAGE_WIDGET;
@@ -325,10 +325,10 @@ VA(0x004ddda0, 0x55)
 void button::Draw(void) {
     heroWindow* win = m_owner;
     if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
-        m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_pressedFrame, 0);
+        m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_pressedFrame, ICON_DRAW_NORMAL);
         return;
     }
-    m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_normalFrame, 0);
+    m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_normalFrame, ICON_DRAW_NORMAL);
 }
 
 

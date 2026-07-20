@@ -242,7 +242,7 @@ void advManager::VWCompleteDraw(void) {
     u32 groundShape1;
     u32 groundFrame29;
     i32 resourceType9;
-    u32 flipped5;
+    H2_ENUM_STORAGE(IconDrawOrientation, u32) flipped5;
     i32 unusedExtraState29;
     mapCellExtra* extra15;
 
@@ -270,7 +270,7 @@ void advManager::VWCompleteDraw(void) {
                                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                             && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
                                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))))) {
-                flipped5 = 0;
+                flipped5 = ICON_DRAW_NORMAL;
                 pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + iVWXPixelOffset;
                 pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + iVWYPixelOffset;
                 groundShape1 =
@@ -323,7 +323,7 @@ void advManager::VWCompleteDraw(void) {
                 }
                 // NOLINTEND(readability-magic-numbers)
                 if (cell0->m_flags & GROUND_HORIZONTAL_FLIP)
-                    flipped5 = 1;
+                    flipped5 = ICON_DRAW_FLIPPED;
                 if (cell0->m_flags & GROUND_ALTERNATE_SET)
                     groundFrame29 += GROUND_ALTERNATE_OFFSET;
                 if (groundFrame29 == 0)
@@ -334,7 +334,7 @@ void advManager::VWCompleteDraw(void) {
                 groundFrame29 +=
                     giGroundToTerrain[cell0->m_terrainImageIndex] * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
-                    if (flipped5 == 1)
+                    if (flipped5 == ICON_DRAW_FLIPPED)
                         townIconHighlight1 = IDX(giViewWorldScale) - 1;
                     else
                         townIconHighlight1 = 0;
@@ -354,7 +354,7 @@ void advManager::VWCompleteDraw(void) {
                         pixelX6,
                         pixelY2,
                         cell0->m_objectIndex,
-                        0,
+                        ICON_DRAW_NO_CLIP,
                         0,
                         0,
                         WORLD_SCREEN_WIDTH,
@@ -376,7 +376,7 @@ void advManager::VWCompleteDraw(void) {
                             pixelX6,
                             pixelY2,
                             extra15->objectIndex,
-                            0,
+                            ICON_DRAW_NO_CLIP,
                             0,
                             0,
                             WORLD_SCREEN_WIDTH,
@@ -400,7 +400,7 @@ void advManager::VWCompleteDraw(void) {
                         pixelX6,
                         pixelY2,
                         cell0->m_objectIndex,
-                        0,
+                        ICON_DRAW_NO_CLIP,
                         0,
                         0,
                         WORLD_SCREEN_WIDTH,
@@ -422,7 +422,7 @@ void advManager::VWCompleteDraw(void) {
                             pixelX6,
                             pixelY2,
                             extra15->objectIndex,
-                            0,
+                            ICON_DRAW_NO_CLIP,
                             0,
                             0,
                             WORLD_SCREEN_WIDTH,
@@ -446,7 +446,7 @@ void advManager::VWCompleteDraw(void) {
                         pixelX6,
                         pixelY2,
                         cell0->m_overlayIndex,
-                        0,
+                        ICON_DRAW_NO_CLIP,
                         0,
                         0,
                         WORLD_SCREEN_WIDTH,
@@ -467,7 +467,7 @@ void advManager::VWCompleteDraw(void) {
                             pixelX6,
                             pixelY2,
                             extra15->overlayIndex,
-                            0,
+                            ICON_DRAW_NO_CLIP,
                             0,
                             0,
                             WORLD_SCREEN_WIDTH,
@@ -512,7 +512,7 @@ void advManager::VWCompleteDraw(void) {
                     pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][AXIS_Y],
                     ARTIFACT_ICON_FRAME,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -557,7 +557,7 @@ void advManager::VWCompleteDraw(void) {
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
                     playerColor26,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -575,7 +575,7 @@ void advManager::VWCompleteDraw(void) {
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][AXIS_Y],
                     playerColor26,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -610,7 +610,7 @@ void advManager::VWCompleteDraw(void) {
                         pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_X],
                         pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][AXIS_Y],
                         groundFrame29 + HERO_ICON_FRAME_BASE,
-                        1,
+                        ICON_DRAW_CLIP,
                         WORLD_LEFT,
                         WORLD_TOP,
                         WORLD_DRAW_SIZE,
@@ -630,7 +630,7 @@ void advManager::VWCompleteDraw(void) {
                     pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][AXIS_Y],
                     RESOURCE_ICON_FRAME,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -643,7 +643,7 @@ void advManager::VWCompleteDraw(void) {
                     pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
                     groundFrame29,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -672,7 +672,7 @@ void advManager::VWCompleteDraw(void) {
                     pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_X],
                     pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][AXIS_Y],
                     groundFrame29,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
@@ -693,7 +693,7 @@ void advManager::VWCompleteDraw(void) {
                     mineLetterY0[giViewWorldScaleLookup] + pixelY2
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][AXIS_Y],
                     resourceType9,
-                    1,
+                    ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,

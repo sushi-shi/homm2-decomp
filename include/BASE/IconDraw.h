@@ -1,9 +1,21 @@
 #ifndef HOMM2_BASE_ICONDRAW_H
 #define HOMM2_BASE_ICONDRAW_H
 
+#include <Ints.h>
+
 H2_ENUM_CLASS_BEGIN(IconDrawClipMode)
     ICON_DRAW_NO_CLIP = 0,
     ICON_DRAW_CLIP    = 1
 H2_ENUM_CLASS_END(IconDrawClipMode)
+
+H2_ENUM_CLASS_BEGIN(IconDrawOrientation)
+    ICON_DRAW_NORMAL  = 0,
+    ICON_DRAW_FLIPPED = 1
+H2_ENUM_CLASS_END(IconDrawOrientation)
+
+H2_ENUM_CLASS_BEGIN(IconDrawResult)
+    ICON_DRAW_SKIPPED   = 0,
+    ICON_DRAW_COMPLETED = 1
+H2_ENUM_CLASS_END(IconDrawResult)
 
 #endif

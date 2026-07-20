@@ -2,6 +2,7 @@
 #define HOMM2_BASE_ICONWIDGET_H
 
 #include <va.h>
+#include "IconDraw.h"
 #include "widget.h"
 
 struct tag_message;
@@ -12,7 +13,7 @@ class iconWidget : public widget {
 public:
     icon* m_icon;
     i16 m_frame;
-    i8 m_flip;
+    H2_ENUM_STORAGE(IconDrawOrientation, i8) m_orientation;
     i16 m_fillColor;
     u32l m_iconId;
     iconWidget(void);
@@ -23,7 +24,7 @@ public:
         i16 height,
         u32l iconId,
         i16 frame,
-        i8 flip,
+        H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
         i16 id,
         i16 kind,
         i16 fillColor
@@ -35,7 +36,7 @@ public:
         i16 height,
         char* iconName,
         i16 frame,
-        i8 flip,
+        H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
         i16 id,
         i16 kind,
         i16 fillColor

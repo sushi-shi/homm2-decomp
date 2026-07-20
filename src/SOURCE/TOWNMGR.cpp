@@ -610,12 +610,12 @@ void townObject::Draw(i32 advanceAnimation) {
         } else {
             baseFrame = gpTownManager->m_town->m_buildState - 1;
         }
-        m_icon->DrawToBuffer(0, 0, baseFrame, 0);
+        m_icon->DrawToBuffer(0, 0, baseFrame, ICON_DRAW_NORMAL);
         if (m_animationFrameCount != 0) {
             if (gpTownManager->m_town->m_type == FACTION_BARBARIAN
                 && gpTownManager->m_town->m_buildState < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
                 return;
-            m_icon->DrawToBuffer(0, 0, m_animationFrame + baseFrame + 1, 0);
+            m_icon->DrawToBuffer(0, 0, m_animationFrame + baseFrame + 1, ICON_DRAW_NORMAL);
             if (advanceAnimation == 1) {
                 ++m_animationFrame;
                 if (m_animationFrame == m_animationFrameCount)
@@ -625,9 +625,9 @@ void townObject::Draw(i32 advanceAnimation) {
         return;
     }
 
-    m_icon->DrawToBuffer(0, 0, 0, 0);
+    m_icon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
     if (m_animationFrameCount != 0) {
-        m_icon->DrawToBuffer(0, 0, m_animationFrame + 1, 0);
+        m_icon->DrawToBuffer(0, 0, m_animationFrame + 1, ICON_DRAW_NORMAL);
         if (advanceAnimation == 1) {
             ++m_animationFrame;
             if (m_animationFrame == m_animationFrameCount)
@@ -2006,7 +2006,7 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
     i32 index;
 
     PollSound();
-    m_backgroundIcon->DrawToBuffer(0, 0, 0, 0);
+    m_backgroundIcon->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
     PollSound();
     for (index = 0; index < m_townObjectCount; ++index) {
         m_townObjects[index]->Draw(drawFlags);
@@ -2335,7 +2335,7 @@ i32 townManager::BuyBuild(
                     BUILD_RESOURCE_WIDGET_HEIGHT,
                     "resource.icn",
                     resourceTypes_o[widgetIndex_f],
-                    0,
+                    ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
                     1
@@ -2457,16 +2457,16 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             else
                 frame_g = gpTownManager->m_town->m_buildState - 1;
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, 0, 0, NULL, NULL);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g + 1, &limits_h, 0, 0, NULL, NULL);
+                    ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g + 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
         } else {
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, 0, 0, NULL, NULL);
+                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, 0, 0, NULL, NULL);
+                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
         }
         gbComputeExtent = false;
         gbSaveBiggestExtent = false;
@@ -3215,7 +3215,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         gpGame->m_players[categoryOrder_x[position_current]].m_color
                         + TOWN_THIEVES_RANK_ICON_FRAME_BASE
                     ),
-                    0,
+                    ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
                     1
@@ -3269,7 +3269,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     0,
                     "locators.icn",
                     THIEVES_HERO_LOCATOR_FRAME,
-                    0,
+                    ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
                     1
@@ -3287,7 +3287,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     0,
                     "miniport.icn",
                     gpGame->GetPlayerHero(rank, strongestHeroPosition_first)->m_portrait,
-                    0,
+                    ICON_DRAW_NORMAL,
                     -1,
                     WIDGET_KIND_ICON_DIRECT,
                     1
@@ -3448,7 +3448,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                                 THIEVES_CREATURE_HEIGHT,
                                 "mons32.icn",
                                 static_cast<i16>(strongestCreature_m),
-                                0,
+                                ICON_DRAW_NORMAL,
                                 -1,
                                 WIDGET_KIND_ICON_CENTERED,
                                 1

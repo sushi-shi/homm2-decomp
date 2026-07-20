@@ -1,7 +1,7 @@
 #ifndef HOMM2_ICONM2B_H
 #define HOMM2_ICONM2B_H
 
-#include <Ints.h>
+#include <BASE/IconDraw.h>
 
 class bitmap;
 class icon;
@@ -13,7 +13,7 @@ void MonoIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    i32 clip,
+    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,
