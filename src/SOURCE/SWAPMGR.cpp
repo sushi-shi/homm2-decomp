@@ -180,17 +180,17 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.id = TITLE_WIDGET;
     m_window->BroadcastMessage(message);
 
-    for (i32 side_6 = IDX(SWAP_SIDE_LEFT); side_6 < IDX(SWAP_SIDE_COUNT); ++side_6) {
+    for (SwapManagerSide side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
         for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
             if (skillSlot < m_heroes[side_6]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-                message.payload.widget.id = side_6 * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = IDX(m_heroes[side_6]->GetNthSS(skillSlot));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                message.payload.widget.id = side_6 * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
                                             + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 message.payload.widget.data.text = gText;
                 sprintf(
@@ -201,7 +201,7 @@ i32 swapManager::Open(i32 id) {
                 m_window->BroadcastMessage(message);
             } else {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                message.payload.widget.id = side_6 * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = EMPTY_SKILL_VALUE;
                 m_window->BroadcastMessage(message);
@@ -723,11 +723,11 @@ void swapManager::SwapArtifacts(void) {
         || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
         tag_message message_1;
         message_1.type = MESSAGE_WIDGET;
-        for (i32 side = IDX(SWAP_SIDE_LEFT); side < IDX(SWAP_SIDE_COUNT); ++side) {
+        for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
             for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
                 if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
                     message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                    message_1.payload.widget.id = side * SECONDARY_SKILL_WIDGET_COUNT
+                    message_1.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
                                                   + skillSlot + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                     message_1.payload.widget.data.text = gText;
                     sprintf(
@@ -903,7 +903,7 @@ void swapManager::SplitMons(void) {
 
     tag_message message;
     message.type = MESSAGE_WIDGET;
-    if (m_selectedSide == IDX(m_targetSide)) {
+    if (m_selectedSide == m_targetSide) {
         sprintf(gText, "Move how many troops?");
     } else {
         sprintf(
