@@ -12,12 +12,15 @@ H2_ENUM_CLASS_BEGIN(WindowFlag)
     WINDOW_FLAG_FIXED_LAYER     = 1,
     WINDOW_FLAG_SAVE_BACKGROUND = 2,
     WINDOW_FLAG_OWNS_WIDGETS    = 0x4000, // Close/RemoveWidgetById delete the widgets
-    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff, // DrawWindow skips the screen update when only fixed-layer is set
-    WINDOW_ALL_WIDGETS_LOW      = -0xffff, // DrawWindow id-range sentinel: no filter
-    WINDOW_ALL_WIDGETS_HIGH     = 0xffff,
-    WINDOW_DRAW_ID_LIMIT        = 0x7fff
+    WINDOW_UPDATE_SUPPRESS_MASK = 0x7fff // DrawWindow skips the screen update when only fixed-layer is set
 H2_ENUM_CLASS_END(WindowFlag)
 H2_ENUM_FLAGS(WindowFlag)
+
+H2_ENUM_BEGIN(WindowDrawId)
+    WINDOW_ALL_WIDGETS_LOW  = -0xffff, // DrawWindow id-range sentinel: no filter
+    WINDOW_ALL_WIDGETS_HIGH = 0xffff,
+    WINDOW_DRAW_ID_LIMIT    = 0x7fff
+H2_ENUM_END(WindowDrawId)
 
 H2_ENUM_CLASS_BEGIN(WindowState)
     WINDOW_STATE_CLOSED = 0,
