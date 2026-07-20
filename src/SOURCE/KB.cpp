@@ -619,11 +619,11 @@ i32 oldmain(void) {
             giNumHumanPlayers = 1;
             iMPBaseType = MULTIPLAYER_BASE_NETWORK;
             iMPNetProtocol = OLD_MAIN_NETWORK_PROTOCOL;
-            iMPExtendedType = giTCPHostStatus ? IDX(REMOTE_GAME_NETWORK_HOST)
-                                              : IDX(REMOTE_GAME_NETWORK_GUEST);
+            iMPExtendedType =
+                giTCPHostStatus ? REMOTE_GAME_NETWORK_HOST : REMOTE_GAME_NETWORK_GUEST;
             giSetupGameType = static_cast<u8>(giTCPType);
-            RemoteMain(static_cast<RemoteGameMode>(iMPExtendedType));
-            gbWaitForRemoteReceive = iMPExtendedType == IDX(REMOTE_GAME_NETWORK_GUEST);
+            RemoteMain(iMPExtendedType);
+            gbWaitForRemoteReceive = iMPExtendedType == REMOTE_GAME_NETWORK_GUEST;
             giTCPHostStatus = -1;
             switch (giSetupGameType) {
                 case OLD_MAIN_SETUP_NEW:
@@ -9984,7 +9984,7 @@ DATA(0x00528c9c) class palette* gpBufferPalette;
 DATA(0x00528ca0) b32 gbCampaignSideChoice;
 DATA(0x00528ca4) char cNetBoxColor[BOX_LINE_COUNT];
 DATA(0x00528ca8) i32 giMonthTypeExtra;
-DATA(0x00528cac) i32 iMPExtendedType;
+DATA(0x00528cac) H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;
 DATA(0x00528cb0) i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
 DATA(0x00528cb8) char gFullMapName[GLOBAL_MAP_NAME_SIZE];
 DATA(0x00528cd0) char gcTCPName[GLOBAL_TCP_TEXT_SIZE];
