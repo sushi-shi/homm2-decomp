@@ -62,7 +62,6 @@ H2_ENUM_BEGIN(ArmyCombatConstant)
     ARMY_COMBAT_FRAME_DELAY              = 75,
     ARMY_MAGE_BOLT_DELAY                 = 115,
     ARMY_POW_EFFECT_DELAY                = 120,
-    ARMY_LICH_EXPLOSION_EFFECT           = 20,
     ARMY_ARCHMAGE_DISPEL_CHANCE          = 20,
     ARMY_PERCENT_MAX                     = 100
 H2_ENUM_END(ArmyCombatConstant)
@@ -108,7 +107,6 @@ H2_ENUM_BEGIN(ArmyAttackConstant)
     ARMY_NEAREST_DISTANCE_LIMIT        = 999999,
     ARMY_RETALIATION_DELAY             = 150,
     ARMY_SECOND_ATTACK_DELAY           = 100,
-    ARMY_BAD_LUCK_EFFECT               = 10,
     ARMY_BAD_LUCK_EFFECT_DELAY         = 180,
     ARMY_ASCII_CASE_OFFSET             = 32,
     ARMY_DAMAGE_STAT_LIMIT             = 20,

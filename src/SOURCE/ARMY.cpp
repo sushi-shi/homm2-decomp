@@ -43,8 +43,8 @@ H2_ENUM_BEGIN(ArmyDeathConstant)
 H2_ENUM_END(ArmyDeathConstant)
 
 H2_ENUM_BEGIN(SpellEffectConstant)
-    NO_POW_EFFECT    = -1,
-    EFFECT_MINIMUM_Y = 999
+    NO_POW_EFFECT_COORDINATE = -1,
+    EFFECT_MINIMUM_Y         = 999
 H2_ENUM_END(SpellEffectConstant)
 
 H2_ENUM_BEGIN(ArmySpellChanceConstant)
@@ -577,14 +577,14 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 spellX2 -= COMBAT_HEX_ROW_STAGGER;
             }
         }
-        if (gCurLoadedSpellEffect == SPELL_DISPEL) {
+        if (gCurLoadedSpellEffect == COMBAT_EFFECT_SHIELD) {
             if (m_facing == ARMY_FACING_RIGHT) {
                 spellX2 = RightX();
             } else {
                 spellX2 = LeftX();
             }
         }
-        if (gCurLoadedSpellEffect == SPELL_ELEMENTAL_STORM) {
+        if (gCurLoadedSpellEffect == COMBAT_EFFECT_BLIND) {
             spellX2 =
                 ((-(m_facing == ARMY_FACING_RIGHT) & ELEMENTAL_STORM_FACING_SCALE) - 1)
                     * m_frameInfo.spellEffectX
@@ -881,7 +881,7 @@ void army::SpecialAttack(void) {
     i32 missileHalfHeight_1;
     char sourceColumn_8;
     i32 attackDirection_3;
-    i32 effectType_1;
+    CombatEffectType effectType_1;
     i32 initialXDistance_6;
     i32 yStep_6;
     i32 currentMissileY_7;
@@ -1217,7 +1217,7 @@ void army::SpecialAttack(void) {
     }
 
     originalAttack = m_monster.attack;
-    effectType_1 = -1;
+    effectType_1 = COMBAT_EFFECT_INVALID;
     effectX_2 = -1;
     effectY_28 = -1;
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
@@ -1250,7 +1250,7 @@ void army::SpecialAttack(void) {
             }
         }
         m_spellEffectYOffset = 0;
-        effectType_1 = ARMY_LICH_EXPLOSION_EFFECT;
+        effectType_1 = COMBAT_EFFECT_LICH_CLOUD;
         effectX_2 = gpCombatManager->m_hexCells[adjacentHex].m_x;
         effectY_28 = gpCombatManager->m_hexCells[adjacentHex].m_y - PROJECTILE_TARGET_Y_OFFSET;
         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
@@ -1426,7 +1426,7 @@ void army::DoHydraAttack(i32) {
     }
     gText[0] -= ARMY_ASCII_CASE_OFFSET;
     strcpy(combatText_8, gText);
-    PowEffect(-1, 0, -1, -1);
+    PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
     gpCombatManager->CombatMessage(combatText_8, 1, 1, 0);
     gpCombatManager->m_limitCreatureCount[m_side][m_index] = 1;
 }
@@ -1655,7 +1655,7 @@ void army::DoAttack(i32 retaliation) {
                     target_1->m_monster.hitPoints * killed_13;
                 break;
         }
-        PowEffect(-1, 0, -1, -1);
+        PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
         gpCombatManager->CombatMessage(combatText, 1, 1, 0);
         m_index[gpCombatManager->m_limitCreatureCount[m_side]] = 1;
 
@@ -1967,7 +1967,7 @@ void army::CheckLuck(void) {
             }
             sprintf(gText, "Bad luck descends on the %s", badLuckArmyName);
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
-            SpellEffect(ARMY_BAD_LUCK_EFFECT, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
+            SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
             if (m_quantity > 1) {
                 goodLuckArmyName = gArmyNamesPlural[IDX(m_monsterType)];
@@ -2167,7 +2167,12 @@ i32 army::Damage(i32l damage, SpellType spell) {
 }
 
 VA(0x0045036a, 0x1361)
-void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
+void army::PowEffect(
+    H2_ENUM_PARAM(CombatEffectType, i32) effect,
+    i32 resetLimits,
+    i32 effectX,
+    i32 effectY
+) {
     i32 damageFrames;
     i32 side_4;
     i32 maximumDamageFrames_3;
@@ -2202,9 +2207,9 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
     if (m_monsterType == CREATURE_DWARF || m_monsterType == CREATURE_BATTLE_DWARF) {
         overlapAdjustment_7 = POW_EFFECT_DWARF_OVERLAP_ADJUSTMENT;
     }
-    if (effectX != NO_POW_EFFECT) {
+    if (effectX != NO_POW_EFFECT_COORDINATE) {
         drawEffect_1 = 1;
-    } else if (effect != NO_POW_EFFECT) {
+    } else if (effect != COMBAT_EFFECT_INVALID) {
         for (side_4 = 0; side_4 < ARMY_COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[side_4]; index_10++) {
                 if (gpCombatManager->m_armies[side_4][index_10].m_drawSpellEffect) {
@@ -2213,11 +2218,11 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             }
         }
     }
-    if (!gbNoShowCombat && effect != NO_POW_EFFECT && drawEffect_1
-        && IDX(gCurLoadedSpellEffect) != OD_STEER(effect)) {
+    if (!gbNoShowCombat && effect != COMBAT_EFFECT_INVALID && drawEffect_1
+        && gCurLoadedSpellEffect != effect) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
-        gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[effect]);
-        gCurLoadedSpellEffect = SpellType(effect);
+        gCurLoadedSpellIcon = gpResourceManager->GetIcon(gCombatFxNames[IDX(effect)]);
+        gCurLoadedSpellEffect = effect;
     }
     if (drawEffect_1) {
         effectFrames_1 = giNumPowFrames[IDX(gCurLoadedSpellEffect)];
@@ -2282,7 +2287,7 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
         }
     }
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    if (effectX != NO_POW_EFFECT) {
+    if (effectX != NO_POW_EFFECT_COORDINATE) {
         for (index_10 = 0; index_10 < gCurLoadedSpellIcon->m_frameCount; index_10++) {
             entry_1 = &gCurLoadedSpellIcon->Entries()[index_10];
             giMinExtentX =
@@ -2411,7 +2416,8 @@ void army::PowEffect(i32 effect, i32 resetLimits, i32 effectX, i32 effectY) {
             gCurSpellEffectFrame = frame;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-        if (effectX != NO_POW_EFFECT && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
+        if (effectX != NO_POW_EFFECT_COORDINATE
+            && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
             gCurLoadedSpellIcon->CombatClipDrawToBuffer(
                 effectX,
                 m_spellEffectYOffset + effectY,
@@ -2631,7 +2637,11 @@ void army::ProcessDeath(i32 immediate) {
 }
 
 VA(0x00451b5b, 0x39d)
-void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
+void army::SpellEffect(
+    H2_ENUM_PARAM(CombatEffectType, i32) effect,
+    i32 effectFrameDelay,
+    i32 animateCreature
+) {
     u32l effectFileId_3;
     IconEntry* entry_8;
     i32 frame_4;
@@ -2641,16 +2651,16 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
     i32 i_16;
     i32 unusedSpellEffectWord_12;
 
-    effectFileId_3 = MAKEFILEID(gCombatFxNames[effect]);
+    effectFileId_3 = MAKEFILEID(gCombatFxNames[IDX(effect)]);
     if (m_animationSequence == ARMY_ANIMATION_WINCE
         || m_animationSequence == ARMY_ANIMATION_WINCE_RETURN) {
         animateCreature = 0;
     }
     if (!gbNoShowCombat) {
-        if (gCurLoadedSpellEffect != SpellType(effect)) {
+        if (gCurLoadedSpellEffect != effect) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
             gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
-            gCurLoadedSpellEffect = SpellType(effect);
+            gCurLoadedSpellEffect = effect;
         }
     }
     frame_4 = 0;
@@ -2678,10 +2688,10 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
                    < static_cast<i8>(m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)]);
                  frame_4++) {
                 m_animationFrame = frame_4;
-                if (frame_4 < giNumPowFrames[effect]) {
+                if (frame_4 < giNumPowFrames[IDX(effect)]) {
                     gCurSpellEffectFrame = frame_4;
                 } else {
-                    gCurSpellEffectFrame = giNumPowFrames[effect];
+                    gCurSpellEffectFrame = giNumPowFrames[IDX(effect)];
                 }
                 glTimers[1] = static_cast<i32>(
                     KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
@@ -2690,7 +2700,7 @@ void army::SpellEffect(i32 effect, i32 effectFrameDelay, i32 animateCreature) {
                 DelayTil(&glTimers[1]);
             }
         }
-        for (; frame_4 < giNumPowFrames[effect]; frame_4++) {
+        for (; frame_4 < giNumPowFrames[IDX(effect)]; frame_4++) {
             glTimers[1] = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay
             );
@@ -3621,12 +3631,16 @@ i32 army::GetPowBaseY(void) {
     i32 y;
 
     y = MidY();
-    if (gCurLoadedSpellEffect == SPELL_BERSERKER || gCurLoadedSpellEffect == SPELL_MAGIC_ARROW
-        || gCurLoadedSpellEffect == SPELL_HOLY_SHOUT || gCurLoadedSpellEffect == SPELL_METEOR_SHOWER
-        || gCurLoadedSpellEffect == SPELL_ARMAGEDDON || gCurLoadedSpellEffect == SPELL_ANTI_MAGIC) {
+    if (gCurLoadedSpellEffect == COMBAT_EFFECT_HYPNOTIZE
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_PARALYZE
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_BLESS
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_CURSE
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_DRAGON_SLAYER
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_BERSERK) {
         y = TopY();
     }
-    if (gCurLoadedSpellEffect == SPELL_PARALYZE || gCurLoadedSpellEffect == SPELL_HYPNOTIZE) {
+    if (gCurLoadedSpellEffect == COMBAT_EFFECT_STONE_SKIN
+        || gCurLoadedSpellEffect == COMBAT_EFFECT_STEEL_SKIN) {
         y = gpCombatManager->m_hexCells[m_hex].m_y + CONTROL_EFFECT_Y_OFFSET;
     }
     return y;
