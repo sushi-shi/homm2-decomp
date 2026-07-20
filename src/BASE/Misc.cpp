@@ -672,7 +672,7 @@ void FadeIn(i32 increment) {
     if (fadePalette == NULL)
         MemError();
     i32 done = 0;
-    if (gConfig.gfx[giCurExe].fullScreen == 0)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
@@ -711,7 +711,7 @@ void FadeOut(i32 increment) {
     if (fadePalette == NULL)
         MemError();
     i32 done = 0;
-    if (gConfig.gfx[giCurExe].fullScreen == 0)
+    if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
     memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     i32 level = 0;
@@ -1322,18 +1322,18 @@ void ReadPrefsFromRegistry(void) {
         strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
     // Clamp the saved window geometry to sane defaults / on-screen bounds.
-    if (gConfig.gfx[giCurExe].width <= 0)
-        gConfig.gfx[giCurExe].width = MINIMUM_WINDOW_WIDTH;
-    if (gConfig.gfx[giCurExe].height <= 0)
-        gConfig.gfx[giCurExe].height = MINIMUM_WINDOW_HEIGHT;
-    if (gConfig.gfx[giCurExe].x < 0)
-        gConfig.gfx[giCurExe].x = 0;
-    if (gConfig.gfx[giCurExe].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[giCurExe].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-    if (gConfig.gfx[giCurExe].y < 0)
-        gConfig.gfx[giCurExe].y = 0;
-    if (gConfig.gfx[giCurExe].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[giCurExe].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
+    if (gConfig.gfx[IDX(giCurExe)].width <= 0)
+        gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
+    if (gConfig.gfx[IDX(giCurExe)].height <= 0)
+        gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
+    if (gConfig.gfx[IDX(giCurExe)].x < 0)
+        gConfig.gfx[IDX(giCurExe)].x = 0;
+    if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
+    if (gConfig.gfx[IDX(giCurExe)].y < 0)
+        gConfig.gfx[IDX(giCurExe)].y = 0;
+    if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+        gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
 }
 
 VA(0x004c5450, 0xa1)

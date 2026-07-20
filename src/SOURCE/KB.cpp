@@ -545,7 +545,7 @@ i32 oldmain(void) {
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
     bigFont = gpResourceManager->GetFont("bigfont.fnt");
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
-    gpMouseManager->SetColorMice(gConfig.gfx[giCurExe].colorMouseCursor);
+    gpMouseManager->SetColorMice(gConfig.gfx[IDX(giCurExe)].colorMouseCursor);
     LogStr("OM4");
     SetupCDRom();
     LogStr("OM5");
@@ -3887,7 +3887,7 @@ void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
 
-    if (gConfig.gfx[giCurExe].showMenu == 0)
+    if (gConfig.gfx[IDX(giCurExe)].showMenu == 0)
         return;
     if (hmnuApp == NULL)
         return;
@@ -6461,7 +6461,7 @@ DATA(0x004fbb30) i32 giScrollX = 0;
 DATA(0x004fbb34) i32 giScrollY = 0;
 DATA(0x004fbb38) b32 gbNoBorder = false;
 DATA(0x004fbb3c) b32 gbEnlargeScreenBlit = true;
-DATA(0x004fbb40) i32 giCurExe = 0;
+DATA(0x004fbb40) H2_ENUM_STORAGE(ConfigExecutable, i32) giCurExe = CONFIG_EXECUTABLE_GAME;
 DATA(0x004fbb44) b32 gbInDialog = false;
 DATA(0x004fbb48) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
