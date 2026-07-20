@@ -39,13 +39,6 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_ORDER_SENTINEL                = 999999999
 H2_ENUM_END(RemoteConstant)
 
-H2_ENUM_CLASS_BEGIN(RemoteMessageType)
-    REMOTE_MESSAGE_CONFIRM    = 1,
-    REMOTE_MESSAGE_RELIABLE   = 2,
-    REMOTE_MESSAGE_UNRELIABLE = 3,
-    REMOTE_MESSAGE_HEARTBEAT  = 4
-H2_ENUM_CLASS_END(RemoteMessageType)
-
 #pragma pack(push, 1)
 struct RemotePacketHeader {
     char source;
@@ -58,7 +51,7 @@ struct RemotePacketHeader {
 struct RemoteMessage {
     i8 sender;
     i32 id;
-    i8 type;
+    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     u16 payloadSize;
     u8 payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
@@ -76,7 +69,15 @@ i32 EncodePacket(u8*, char, char, i32);
 i32 DecodePacket(u8*, i32);
 i32 SendRemoteData(u8*, u8*, i32, i32);
 i32 ReceiveRemoteData(u8*, u8*, i32);
-i32 TransmitRemoteData(char*, i32, i32, i8, i8, i8, i8);
+i32 TransmitRemoteData(
+    char*,
+    i32,
+    i32,
+    i8,
+    i8,
+    i8,
+    H2_ENUM_PARAM(RemoteMessageType, i8)
+);
 char* GetRemoteData(i8);
 void PollRemote(void);
 i32 TransmitAndWait(char*, i32, i32, i8, i8, char**);

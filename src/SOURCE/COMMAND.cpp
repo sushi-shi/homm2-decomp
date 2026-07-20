@@ -118,7 +118,6 @@ H2_ENUM_CLASS_END(CombatControlId)
 
 H2_ENUM_BEGIN(CombatRemoteConstant)
     REMOTE_PACKET_TYPE     = 1,
-    REMOTE_CATEGORY_ACTION = 2,
     REMOTE_COMMAND_MESSAGE = 11,
     REMOTE_COMMAND_ACTION  = 23
 H2_ENUM_END(CombatRemoteConstant)
@@ -352,7 +351,7 @@ i32 combatManager::Main(tag_message& message) {
     if (gbNoShowCombat == 0) {
         CombatRemotePacket* packet =
             reinterpret_cast<CombatRemotePacket*>(GetRemoteData(REMOTE_PACKET_TYPE));
-        if (packet != NULL && packet->category == REMOTE_CATEGORY_ACTION) {
+        if (packet != NULL && packet->type == REMOTE_MESSAGE_RELIABLE) {
             switch (packet->command) {
                 case REMOTE_COMMAND_ACTION:
                     giNextAction = packet->nextAction;
@@ -2608,7 +2607,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
             REMOTE_COMMAND_ACTION,
             1,
             1,
-            -1
+            REMOTE_MESSAGE_DEFAULT
         );
         LogStr("Post T");
         if (transmitResult == 0)

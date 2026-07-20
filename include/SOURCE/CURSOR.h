@@ -56,8 +56,7 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_DEAD_PLAYER_DIALOG_TIME      = 5000,
     CURSOR_REMOTE_PLAYER_ALL            = 0x7f,
     CURSOR_REMOTE_PACKET_TYPE           = 0x29,
-    CURSOR_REMOTE_RELIABLE              = 1,
-    CURSOR_REMOTE_NO_TIMEOUT            = -1
+    CURSOR_REMOTE_RELIABLE              = 1
 H2_ENUM_END(CursorConstant)
 
 H2_ENUM_BEGIN(MapChangeConstant)
