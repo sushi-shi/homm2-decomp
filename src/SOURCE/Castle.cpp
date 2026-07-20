@@ -120,22 +120,25 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     i16 cannotAffordFrame6 = IDX(FRAME_CANNOT_AFFORD);
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         castleSlotsUse[slot7] = castleSlotsBase[slot7];
-        if (castleSlotsBase[slot7] >= IDX(BUILDING_SLOT_DWELLING_FIRST) + 1
-            && castleSlotsBase[slot7] <= IDX(BUILDING_SLOT_DWELLING_SIXTH)
-            && ((m_town->m_buildings & (1L << castleSlotsBase[slot7]))
-                || (m_town->m_buildings & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))
-                || (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
+        if (castleSlotsBase[slot7] >= BUILDING_SLOT_DWELLING_SECOND
+            && castleSlotsBase[slot7] <= BUILDING_SLOT_DWELLING_SIXTH
+            && ((m_town->m_buildings & (1L << IDX(castleSlotsBase[slot7])))
+                || (m_town->m_buildings
+                    & (1L << (IDX(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET)))
+                || (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
                     && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
             && (gTownEligibleBuildMask[IDX(m_town->m_type)]
-                & (1L << (castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET)))) {
-            if (castleSlotsBase[slot7] == IDX(BUILDING_SLOT_DWELLING_SIXTH)
+                & (1L << (IDX(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET)))) {
+            if (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
                 && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
                     || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
-                castleSlotsUse[slot7] = IDX(BUILDING_SLOT_DWELLING_LAST);
+                castleSlotsUse[slot7] = BUILDING_SLOT_DWELLING_LAST;
             } else {
-                castleSlotsUse[slot7] = castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;
+                castleSlotsUse[slot7] = static_cast<BuildingSlotType>(
+                    IDX(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET
+                );
             }
         }
     }
@@ -143,17 +146,17 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     m_buildableBuildings = 0;
     m_affordableBuildings = m_buildableBuildings;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        if (CanBuy(m_town, BuildingSlotType(castleSlotsUse[slot7])))
-            m_affordableBuildings |= 1L << castleSlotsUse[slot7];
-        if (CanBuild(m_town, BuildingSlotType(castleSlotsUse[slot7])))
-            m_buildableBuildings |= 1L << castleSlotsUse[slot7];
+        if (CanBuy(m_town, castleSlotsUse[slot7]))
+            m_affordableBuildings |= 1L << IDX(castleSlotsUse[slot7]);
+        if (CanBuild(m_town, castleSlotsUse[slot7]))
+            m_buildableBuildings |= 1L << IDX(castleSlotsUse[slot7]);
     }
 
     message3.type = MESSAGE_WIDGET;
     message3.payload.widget.command = CASTLE_WIDGET_FRAME;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slot7;
-        message3.payload.widget.data.value = castleSlotsUse[slot7];
+        message3.payload.widget.data.value = IDX(castleSlotsUse[slot7]);
         casWin->BroadcastMessage(message3);
     }
 
@@ -168,7 +171,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     message3.payload.widget.command = CASTLE_WIDGET_TEXT;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CONTROL_BUILDING_NAME_FIRST + slot7;
-        if (castleSlotsUse[slot7] == IDX(CASTLE_MAGE_GUILD)) {
+        if (castleSlotsUse[slot7] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
                 "Mage Guild, Level %d",
@@ -179,7 +182,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         } else {
             message3.payload.widget.data.text = GetBuildingName(
                 m_town->m_type,
-                BuildingSlotType(castleSlotsUse[slot7])
+                castleSlotsUse[slot7]
             );
         }
         casWin->BroadcastMessage(message3);
@@ -187,14 +190,14 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         widgetFrame12 = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << castleSlotsUse[slot7]))
-            && (castleSlotsUse[slot7] != IDX(CASTLE_MAGE_GUILD)
+        if ((m_town->m_buildings & (1L << IDX(castleSlotsUse[slot7])))
+            && (castleSlotsUse[slot7] != CASTLE_MAGE_GUILD
                 || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
             widgetFrame12 = FRAME_BUILT;
         } else {
-            if (!(m_buildableBuildings & (1L << castleSlotsUse[slot7])))
+            if (!(m_buildableBuildings & (1L << IDX(castleSlotsUse[slot7]))))
                 widgetFrame12 = FRAME_CANNOT_BUILD;
-            else if (!(m_affordableBuildings & (1L << castleSlotsUse[slot7])))
+            else if (!(m_affordableBuildings & (1L << IDX(castleSlotsUse[slot7]))))
                 widgetFrame12 = FRAME_CANNOT_AFFORD;
         }
 
@@ -461,7 +464,7 @@ i32 CastleHandler(tag_message& message) {
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
                 buildingIndex = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
             if (buildingIndex != TOWN_SELECTED_BUILDING_NONE)
-                buildingIndex = castleSlotsUse[buildingIndex];
+                buildingIndex = IDX(castleSlotsUse[buildingIndex]);
         }
     }
 
@@ -780,8 +783,8 @@ selection_done:
 
 // Retail castle building-slot order payload.
 // NOLINTBEGIN(readability-magic-numbers)
-DATA(0x004ef5e0) u8 castleSlotsBase[CASTLE_SLOT_COUNT] =
+DATA(0x004ef5e0) H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT] =
     {19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12};
 // NOLINTEND(readability-magic-numbers)
 DATA(0x00525040) heroWindow* casWin;
-DATA(0x00525048) u8 castleSlotsUse[CASTLE_SLOT_COUNT];
+DATA(0x00525048) H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];
