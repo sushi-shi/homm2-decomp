@@ -126,7 +126,14 @@ public:
     void Clear(void);
     i32 QuickDistance(i32, i32, i32, i32);
     void PushPoint(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
-    void TestPossibleDirections(i32, i32, i8* const, i8* const, i32, i32);
+    void TestPossibleDirections(
+        i32,
+        i32,
+        H2_ENUM_STORAGE(TerrainType, i8) * const,
+        i8* const,
+        i32,
+        i32
+    );
     void SeedCombatPosition(class army*);
     i32 FindCombatPath(i32, i32, class army*, i32, i32);
     void PushCombatPoint(i32, i32, i32, i32);
