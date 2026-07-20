@@ -125,7 +125,7 @@ i32 widget::Main(tag_message& message) {
                 case WIDGET_COMMAND_CLEAR_FLAGS:
                     if (m_id == message.payload.widget.id) {
                         u32 flags = message.payload.widget.data.value;
-                        if (flags == IDX(WIDGET_COMMAND_DIMMED)) {
+                        if (flags == WIDGET_COMMAND_DIMMED) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
                             return WIDGET_DISPATCH_CONSUME;
                         }
