@@ -434,7 +434,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         goto DrawCombatGrid;
 
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-        if (m_previousGridState[cellIndex] != m_gridState[cellIndex])
+        if (OD_STEER(m_previousGridState[cellIndex]) != m_gridState[cellIndex])
             gridChanged = 1;
         if (m_gridState[cellIndex] != GRID_SHADE_NONE)
             drawShading = 1;
@@ -450,7 +450,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
             return 0;
         if (hadOldShade != 0) {
             for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-                if (m_previousGridState[cellIndex] != m_gridState[cellIndex]
+                if (OD_STEER(m_previousGridState[cellIndex]) != m_gridState[cellIndex]
                     || m_gridState[cellIndex] != GRID_SHADE_NONE) {
                     if (m_hexCells[cellIndex].m_gridLeft < minX)
                         minX = m_hexCells[cellIndex].m_gridLeft;
