@@ -244,7 +244,19 @@ public:
     void WeeklyRecruitSite(class mapCell*);
     void WeeklyGenericSite(class mapCell*);
     void PerMonth(void);
-    void ConvertObject(i32, i32, i32, i32, TilesetId, i32, i32, TilesetId, i32, i32, i32);
+    void ConvertObject(
+        i32,
+        i32,
+        i32,
+        i32,
+        TilesetId,
+        i32,
+        i32,
+        TilesetId,
+        i32,
+        H2_ENUM_PARAM(MapObjectType, i32),
+        H2_ENUM_PARAM(MapObjectType, i32)
+    );
     void RandomizeTown(i32, i32, i32);
     void RandomizeMine(i32, i32);
     void InitRandomArtifacts(void);
@@ -276,7 +288,14 @@ public:
     i32 GetBoatsBuilt(void);
     i32 GetNumThievesGuilds(i32);
     i32 CalcDifficultyRating(void);
-    void RestoreCell(i32, i32, i32, i32, class mapCell*, i32);
+    void RestoreCell(
+        i32,
+        i32,
+        H2_ENUM_PARAM(MapObjectType, i32),
+        i32,
+        class mapCell*,
+        i32
+    );
     void SetMapSize(i32, i32);
     i32 HeroIDToHeroPos(class playerData*, i32);
     i32 TownIDToTownPos(class playerData*, i32);

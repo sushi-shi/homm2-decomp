@@ -627,7 +627,7 @@ mapCell* advManager::MoveHero(
         boat->savedTriggerType = boatCell_a->m_triggerType;
         boat->savedEventData = static_cast<u8>(boatCell_a->m_objectMetadata);
         boat->direction = m_cursorDirection;
-        boat->heroId = static_cast<i8>(boat->heroId | MAP_TRIGGER_ACTION_FLAG);
+        boat->heroId = static_cast<i8>(boat->heroId | BOAT_OCCUPIED_FLAG);
         boatCell_a->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
         boatCell_a->m_objectMetadata = static_cast<u16>(OD_STEER(step_a));
         boat->x = static_cast<i8>(movingHero_f->m_x);
@@ -638,7 +638,7 @@ mapCell* advManager::MoveHero(
         m_cursorActive = 0;
     }
 
-    if ((destinationCell_j->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+    if (HAS(destinationCell_j->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
         && gpAdvManager->ValidMoveWithEvent(movingHero_f, direction)) {
         switch (destinationCell_j->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_BOAT:
@@ -828,7 +828,7 @@ mapCell* advManager::MoveHero(
     cursorCell_m = GetCell(m_cursorMapX + m_mapOriginX, m_cursorMapY + m_mapOriginY);
     *eventX = m_cursorMapX + m_mapOriginX;
     *eventY = m_cursorMapY + m_mapOriginY;
-    if ((cursorCell_m->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
+    if (HAS(cursorCell_m->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
         || (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
             && cursorCell_m->m_triggerType == MAP_OBJECT_COAST)) {
         eventCell_g = cursorCell_m;
@@ -861,7 +861,7 @@ movementDone:
     if (!forceMove) {
         if (movingHero_f->m_x != oldHeroX_b || movingHero_f->m_y != oldHeroY_b) {
             if (mapExtra[movingHero_f->m_y * MAP_WIDTH + movingHero_f->m_x]
-                & MAP_TRIGGER_ACTION_FLAG) {
+                & IDX(MAP_EXTRA_ADJACENT_MONSTER)) {
                 if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)) {
                 } else {
                     if (!eventCell_g)
