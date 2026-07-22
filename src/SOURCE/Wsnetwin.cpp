@@ -449,7 +449,9 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 VA(0x00407660, 0x2e)
 i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
-    return giNumHumanPlayers > 1;
+    if (giNumHumanPlayers > 1)
+        return 1;
+    return 0;
 }
 
 VA(0x0040768e, 0xb8)
