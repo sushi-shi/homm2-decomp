@@ -683,9 +683,7 @@ i32 oldmain(void) {
                 switch (giSetupGameType) {
                     case OLD_MAIN_SETUP_NEW:
                         if (gbInCampaign) {
-                            gpGame->InitEntireCampaign(
-                                static_cast<CampaignSide>(gbCampaignSideChoice)
-                            );
+                            gpGame->InitEntireCampaign(gbCampaignSideChoice);
                             result_i = gpGame->HandleCampaignWin();
                             if (result_i) {
                                 gpGame->InitCampaignMap();
@@ -1652,7 +1650,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
     i32 idx;
-    GetBuildingCost(t->m_type, BuildingSlotType(type), buf, t->m_buildState);
+    GetBuildingCost(t->m_type, type, buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
         if (ptr->m_resources[idx] < buf[idx])
@@ -9977,7 +9975,7 @@ DATA(0x00528990) H2_ENUM_STORAGE(CalendarPeriodType, i32) giWeekType;
 DATA(0x00528998) char gText[GLOBAL_TEXT_BUFFER_SIZE];
 DATA(0x00528c98) b32 gbInNewGameSetup;
 DATA(0x00528c9c) class palette* gpBufferPalette;
-DATA(0x00528ca0) b32 gbCampaignSideChoice;
+DATA(0x00528ca0) H2_ENUM_STORAGE(CampaignSide, i32) gbCampaignSideChoice;
 DATA(0x00528ca4) char cNetBoxColor[BOX_LINE_COUNT];
 DATA(0x00528ca8) i32 giMonthTypeExtra;
 DATA(0x00528cac) H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;

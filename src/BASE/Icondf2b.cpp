@@ -81,7 +81,7 @@ void FlipDimIconToBitmap(
                 gFDCnt = 0;
                 u8* dst = (gFDRow - cmd) + X + 1;
                 gFDDst = dst;
-                if (static_cast<i32>(cmd) > 0) {
+                if (cmd > 0) {
                     cnt = cmd;
                     gFDCnt = cmd;
                     do {
@@ -108,7 +108,7 @@ void FlipDimIconToBitmap(
                     gFDCnt2 = cn;
                     gFDDst = dst;
                     gFDCnt = 0;
-                    if (static_cast<i32>(cn) > 0) {
+                    if (cn > 0) {
                         gFDCnt = cn;
                         u32 cnt = cn;
                         do {

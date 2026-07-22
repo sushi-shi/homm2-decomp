@@ -1053,7 +1053,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
                 if (HAS(
-                        static_cast<MessageModifier>(message.payload.widget.parameter),
+                        message.payload.widget.modifiers,
                         MESSAGE_MODIFIER_SHIFT_KEYS
                     ))
                     sprintf(
@@ -1178,7 +1178,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 level14;
 
     if (HAS(
-            static_cast<MessageModifier>(message.payload.widget.parameter),
+            message.payload.widget.modifiers,
             MESSAGE_MODIFIER_RIGHT_BUTTON
         ))
         quickView0 = 1;
@@ -1442,9 +1442,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 temporaryCreature =
                                     gpHVHero->m_army.m_creatureTypes[armySlot7];
                                 if (!HAS(
-                                        static_cast<MessageModifier>(
-                                            message.payload.widget.parameter
-                                        ),
+                                        message.payload.widget.modifiers,
                                         MESSAGE_MODIFIER_SHIFT_KEYS
                                     )
                                     || (gpHVHero->m_army.m_creatureTypes[armySlot7]

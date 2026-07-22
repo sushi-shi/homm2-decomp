@@ -99,12 +99,12 @@ void FlipIconToBitmapYModify(
                                 }
                                 gFYDimIdx = 0;
                                 gFYDimDst = dimDst;
-                                if (0 < static_cast<i32>(gFYDimLen)) {
+                                if (0 < gFYDimLen) {
                                     do {
                                         *gFYDimDst = gFYDimPal[*gFYDimDst];
                                         gFYDimDst = gFYDimDst + 1;
                                         gFYDimIdx = gFYDimIdx + 1;
-                                    } while (gFYDimIdx < static_cast<i32>(gFYDimLen));
+                                    } while (gFYDimIdx < gFYDimLen);
                                 }
                             }
                         }

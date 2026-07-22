@@ -1149,7 +1149,7 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
         goto finish;
 
     if (HAS(
-            static_cast<MessageModifier>(message.payload.widget.parameter),
+            message.payload.widget.modifiers,
             MESSAGE_MODIFIER_RIGHT_BUTTON
         )) {
         if (message.payload.widget.command == NEW_GAME_EVENT_PRESS

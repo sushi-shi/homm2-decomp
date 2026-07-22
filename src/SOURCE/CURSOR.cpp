@@ -619,7 +619,7 @@ mapCell* advManager::MoveHero(
     if (HAS(movingHero_f->m_eventFlags, HERO_EVENT_EMBARKED)
         && destinationCell_j->m_triggerType == MAP_OBJECT_COAST) {
         for (step_a = 0; step_a < CURSOR_BOAT_COUNT; ++step_a) {
-            if (gpGame->m_boats[step_a].heroId == static_cast<u8>(movingHero_f->m_id))
+            if (gpGame->m_boats[step_a].heroId == movingHero_f->m_id)
                 break;
         }
         boatRecord* boat = &gpGame->m_boats[step_a];

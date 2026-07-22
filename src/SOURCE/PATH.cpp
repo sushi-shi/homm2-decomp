@@ -412,10 +412,8 @@ i32 army::ValidRange(i32 targetHex) {
 VA(0x004be9e7, 0x58)
 CombatHexDirection OppositeDirection(CombatHexDirection direction) {
     if (IDX(direction) < COMBAT_DIRECTION_ADJACENT_COUNT) {
-        return static_cast<CombatHexDirection>(
-            (IDX(direction) + COMBAT_DIRECTION_OPPOSITE_OFFSET)
-            % COMBAT_DIRECTION_ADJACENT_COUNT
-        );
+        return (direction + COMBAT_DIRECTION_OPPOSITE_OFFSET)
+               % COMBAT_DIRECTION_ADJACENT_COUNT;
     } else {
         if (direction == COMBAT_DIRECTION_WIDE_WEST)
             return COMBAT_DIRECTION_WIDE_EAST;

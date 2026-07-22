@@ -1614,7 +1614,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
             case MESSAGE_WIDGET:
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
-                        if (!(HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON))) {
+                        if (!(HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))) {
                             processResult =
                                 ProcessDeSelect(&message, &exitRequestedFlag, eventCellsResult);
                         }
@@ -1622,7 +1622,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_SELECT:
                     case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
-                        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             helpIndexState = message.payload.widget.id - PANEL_NEXT_HERO;
                             if (message.payload.widget.id < PANEL_NEXT_HERO
                                 || message.payload.widget.id > PANEL_CAST_SPELL) {
@@ -2091,7 +2091,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 break;
             }
             objectTypeState = gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + pageState];
-            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 HeroQuickView(objectTypeState, pageState, -1, -1);
             } else {
                 if (gpCurPlayer->CurrentHero() == objectTypeState) {
@@ -2112,7 +2112,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 gpCurPlayer
                     ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id
                                - LOCATOR_TOWN_IMAGE_BASE];
-            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 TownQuickView(
                     objectTypeState,
                     message->payload.widget.id - LOCATOR_TOWN_IMAGE_BASE,
@@ -2178,7 +2178,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 visible = 0;
             }
             currentCell = GetCell(m_lastHoverCell + m_mapOriginX, m_hoverCellY + m_mapOriginY);
-            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
@@ -2241,7 +2241,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 mobileResult = 0;
                 if (gpCurPlayer->m_currentHero != INVALID_HERO) {
                     currentHero = gpGame->GetHero(gpCurPlayer->m_currentHero);
-                    mobileResult = gpGame->IsMobile(static_cast<u8>(currentHero->m_id));
+                    mobileResult = gpGame->IsMobile(currentHero->m_id);
                 }
                 if (currentHero != NULL) {
                     if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
@@ -2251,9 +2251,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         DoAdvCommand();
                     } else if ((!mobileResult
                                 || HAS(
-                                    static_cast<MessageModifier>(
-                                        message->payload.widget.parameter
-                                    ),
+                                    message->payload.widget.modifiers,
                                     MESSAGE_MODIFIER_CONTROL_KEYS
                                 )
                                 || (gConfig.showRoute
@@ -2291,7 +2289,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
         }
         case PANEL_RADAR:
-            if (HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
                     "{World Map}\n\nA miniature view of the known world.  "
                     "Left click to move viewing area.",
@@ -2401,7 +2399,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
     }
 
-    if ((HAS(static_cast<MessageModifier>(message->payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON))
+    if ((HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
@@ -6514,7 +6512,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     UpdateScreen(0, 0);
     if (quickViewMessageState.type == MESSAGE_LEFT_BUTTON_DOWN
         && targetHero->m_owner == giCurPlayer) {
-        SetHeroContext(static_cast<u8>(targetHero->m_id), 0);
+        SetHeroContext(targetHero->m_id, 0);
     }
     gpResourceManager->Dispose(monsterIconRef);
 }
@@ -7415,13 +7413,8 @@ void advManager::CheckCastSpell(void) {
         CompleteDraw(0);
         UpdateScreen(0, 0);
         gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
-        CastSpell(SpellType(
-            gpGame->ViewSpells(
-                gpGame->GetHero(gpCurPlayer->m_currentHero),
-                SPELL_TYPE_ADVENTURE,
-                NullHandler,
-                0
-            )
+        CastSpell(gpGame->ViewSpells(
+            gpGame->GetHero(gpCurPlayer->m_currentHero), SPELL_TYPE_ADVENTURE, NullHandler, 0
         ));
     }
 }
@@ -7444,7 +7437,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
-                            if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
+                            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
                             } else {
                                 if (gpWindowManager->m_dialogResult
                                     == TRAVEL_DIALOG_ACCEPT) {
@@ -8323,7 +8316,7 @@ void advManager::TeleportTo(
         } else {
             destinationCell29->m_triggerType =
                 (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
-            destinationCell29->m_objectMetadata = static_cast<u8>(mapHero->m_id);
+            destinationCell29->m_objectMetadata = mapHero->m_id;
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags = HERO_EVENT_EMBARKED | mapHero->m_eventFlags;
@@ -9292,7 +9285,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
 
             case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
                 if (HAS(
-                        static_cast<MessageModifier>(message.payload.widget.parameter),
+                        message.payload.widget.modifiers,
                         MESSAGE_MODIFIER_CONTROL_KEYS
                     )) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
@@ -9837,7 +9830,7 @@ VA(0x0046a9d0, 0x1ca)
 MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -9945,7 +9938,7 @@ VA(0x0046ad7e, 0x304)
 MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -10202,7 +10195,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
         if (HAS(
-                static_cast<MessageModifier>(message.payload.widget.parameter),
+                message.payload.widget.modifiers,
                 MESSAGE_MODIFIER_RIGHT_BUTTON
             )) {
             if (message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_ACTIVATE

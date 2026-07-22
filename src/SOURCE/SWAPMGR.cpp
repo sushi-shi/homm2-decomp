@@ -317,7 +317,7 @@ void swapManager::DrawSelector(void) {
 VA(0x00454be3, 0xaf0)
 MessageDispatchResult swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
-    i32 quickView = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
+    i32 quickView = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     SwapManagerSide side;
     i32 slotIndex_8;
     i32 artifactSlot_2;

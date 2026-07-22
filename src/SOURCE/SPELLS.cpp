@@ -1399,7 +1399,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             && m_hexCells[affectedHexes_e[frame_i]].m_occupantSide != COMBAT_SIDE_NONE) {
             target_n = &m_armies[IDX(m_hexCells[affectedHexes_e[frame_i]].m_occupantSide)]
                                 [m_hexCells[affectedHexes_e[frame_i]].m_occupantIndex];
-            if (target_n->SpellCastWorks(SpellType(spell))
+            if (target_n->SpellCastWorks(spell)
                 && !*(
                     gArmyEffected[0]
                     + IDX(m_hexCells[affectedHexes_e[frame_i]].m_occupantSide)
@@ -1422,7 +1422,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
                         || target_n->m_monsterType == CREATURE_STEEL_GOLEM) {
                         damage_f = static_cast<i32l>(damage_f * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                     }
-                    target_n->Damage(damage_f, SpellType(spell));
+                    target_n->Damage(damage_f, spell);
                     anyAffected_g = 1;
                 }
             }
@@ -1984,8 +1984,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     i32 unusedRandom = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
     i32 step;
     for (step = 0; stepCount > step; ++step) {
-        bolt->currentX = static_cast<float>(sin(bolt->baseAngle)) + bolt->currentX;
-        bolt->currentY = static_cast<float>(cos(bolt->baseAngle)) + bolt->currentY;
+        bolt->currentX = sin(bolt->baseAngle) + bolt->currentX;
+        bolt->currentY = cos(bolt->baseAngle) + bolt->currentY;
         bolt->pixelX = static_cast<i32>(bolt->currentX);
         bolt->pixelY = static_cast<i32>(bolt->currentY);
         if (bolt->pixelX < 0) {
@@ -3364,7 +3364,7 @@ void combatManager::Resurrect(
     processedOtherHex_p = 0;
     oldQuantity_b = target_i->m_quantity;
     target_i->m_quantity += spellPower * RESURRECT_HIT_POINTS_PER_POWER
-                            / static_cast<u16>(target_i->m_monster.hitPoints);
+                            / target_i->m_monster.hitPoints;
     if (target_i->m_initialQuantity < target_i->m_quantity)
         target_i->m_quantity = target_i->m_initialQuantity;
     if (spell == SPELL_RESURRECT)

@@ -1779,7 +1779,7 @@ void game::NewMap(char* filename) {
     nextHuman6 = giNumHumanPlayers;
 
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-        if (player2 >= static_cast<u8>(gpGame->m_mapHeader.playerCount)) {
+        if (player2 >= gpGame->m_mapHeader.playerCount) {
             gbSetupGamePosToRealGamePos[player2] = -1;
         } else {
             if (m_setupPlayerNetworkId[player2] == GAME_COMPUTER_PLAYER)
@@ -2040,10 +2040,10 @@ void game::NewMap(char* filename) {
         static_cast<ArtifactType>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
         && ((m_campaignType == CAMPAIGN_ROLAND
-             && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
+             && m_campaignScenario + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                     == CAMPAIGN_ROLAND_ULTIMATE_CROWN_SCENARIO)
             || (m_campaignType == CAMPAIGN_ARCHIBALD
-                && static_cast<i8>(m_campaignScenario) + CAMPAIGN_SCENARIO_NUMBER_OFFSET
+                && m_campaignScenario + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                        == CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO)))
         m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
     for (player2 = 0; player2 < m_playerCount; player2++) {
@@ -3173,7 +3173,7 @@ void game::UpdateSpellWidgets(void) {
             );
             message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
-            if (GetManaCost(SpellType(spell2), m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
+            if (GetManaCost(spell2, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
                 message9.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
             else
                 message9.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
@@ -3197,14 +3197,14 @@ void game::UpdateSpellWidgets(void) {
                     gText,
                     "%s\n[%d]",
                     gSpellNames[IDX(spell2)],
-                    GetManaCost(SpellType(spell2), m_viewSpellsHero)
+                    GetManaCost(spell2, m_viewSpellsHero)
                 );
             } else {
                 sprintf(
                     gText,
                     "%s [%d]",
                     gSpellNames[IDX(spell2)],
-                    GetManaCost(SpellType(spell2), m_viewSpellsHero)
+                    GetManaCost(spell2, m_viewSpellsHero)
                 );
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -3231,7 +3231,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
         switch (msg.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (HAS(static_cast<MessageModifier>(msg.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
+                    || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0)
                     break;
                 {
                     switch (msg.payload.widget.id) {
@@ -3286,7 +3286,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 if (msg.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT
-                    || (HAS(static_cast<MessageModifier>(msg.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
+                    || (HAS(msg.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
                     switch (msg.payload.widget.id) {
                         case VIEW_SPELL_ICON_ID_0:
                         case VIEW_SPELL_ICON_ID_1:
@@ -5777,7 +5777,7 @@ void game::WaitForPlayer(char* text, i32 player) {
             -1,
             -1,
             WAIT_DIALOG_TYPE,
-            static_cast<i8>(gpGame->m_players[player].m_color),
+            gpGame->m_players[player].m_color,
             -1,
             0,
             -1,

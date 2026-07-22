@@ -233,7 +233,7 @@ void recruitUnit::Update(void) {
 VA(0x0048b8f0, 0x41b)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     i32 close = 0;
-    i32 quickView = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
+    i32 quickView = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:

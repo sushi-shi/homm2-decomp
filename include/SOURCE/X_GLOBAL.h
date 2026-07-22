@@ -13,6 +13,8 @@
 #include <EDITOR/mapcell.h>
 
 class ExpCampaign;
+H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
+H2_ENUM_CLASS_FORWARD_SPLIT(CampaignSide, u8);
 
 H2_ENUM_BEGIN(SecondarySkillValueTableConstant)
     SECONDARY_SKILL_VALUE_LEVEL_COUNT = IDX(HERO_SKILL_LEVEL_COUNT) - 1
@@ -112,15 +114,14 @@ H2_ENUM_CLASS_BEGIN(SpellEffectDisplayType)
     SPELL_EFFECT_DISPLAY_EFFECT_STATUS = 2,
     SPELL_EFFECT_DISPLAY_COUNT         = 3
 H2_ENUM_CLASS_END(SpellEffectDisplayType)
+H2_ENUM_STEPPED(SpellEffectDisplayType)
 
 inline SpellEffectDisplayType NextSpellEffectDisplayType(SpellEffectDisplayType type) {
-    return static_cast<SpellEffectDisplayType>(
-        (IDX(type) + 1) % IDX(SPELL_EFFECT_DISPLAY_COUNT)
-    );
+    return (type + 1) % IDX(SPELL_EFFECT_DISPLAY_COUNT);
 }
 
 extern i8 xIsExpansionMap;
-extern i32 xLastChoice;
+extern ExpansionCampaignId xLastChoice;
 extern u8 xIsPlayingExpansionCampaign;
 extern class ExpCampaign xCampaign;
 extern char* xSetupCampaignGameHelp[X_GLOBAL_SETUP_HELP_COUNT];
@@ -582,7 +583,7 @@ extern b32 gbTCPFirstTime;
 extern i32 giHeroScreenSrcIndex;
 extern H2_ENUM_STORAGE(CalendarPeriodType, i32) giWeekType;
 extern class palette* gpBufferPalette;
-extern b32 gbCampaignSideChoice;
+extern H2_ENUM_STORAGE(CampaignSide, i32) gbCampaignSideChoice;
 extern i32 giMonthTypeExtra;
 extern H2_ENUM_STORAGE(RemoteGameMode, i32) iMPExtendedType;
 extern i8 gcColorToSetupPos[RADAR_OWNER_COLOR_COUNT];
