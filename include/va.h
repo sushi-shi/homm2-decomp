@@ -7,6 +7,7 @@
 
 #define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
 #define VAU(addr) __attribute__((annotate("va:" #addr)))
+#define VA_COMPGEN(addr, size, kind, owner)
 #define SYMBOL(mangled) __attribute__((annotate("symbol:" #mangled)))
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
 #define VTBL(cls, va)
@@ -17,6 +18,7 @@
 
 #define VA(addr, size)
 #define VAU(addr)
+#define VA_COMPGEN(addr, size, kind, owner)
 #define SYMBOL(mangled)
 #define DATA(addr)
 #define VTBL(cls, va)

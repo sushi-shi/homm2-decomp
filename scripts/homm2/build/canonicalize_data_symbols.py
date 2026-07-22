@@ -1,12 +1,13 @@
-"""Canonicalize MSVC compiler-private data names in a disposable COFF copy.
+"""Canonicalize MSVC compiler-private names in a disposable COFF copy.
 
-The transform is deliberately local to one object.  It does not consult a
-manifest, a paired object, source text, or retail addresses.  Symbol indices do
-not change. Compiler-private data receives stable, content-derived names. In
-embedded .text jump tables, same-function DIR32 references through volatile
-local labels or another external function owner are rewritten to the containing
-external function plus an equivalent owner-relative addend; all resolved section
-offsets are proved unchanged.
+The data transform is deliberately local to one object and content-derived.
+Compiler-generated functions may additionally consume source ``VA_COMPGEN``
+claims, then prove their semantic role from the object's relocation graph before
+renaming volatile ``$E`` symbols. Symbol indices do not change. In embedded
+.text jump tables, same-function DIR32 references through volatile local labels
+or another external function owner are rewritten to the containing external
+function plus an equivalent owner-relative addend; all resolved section offsets
+are proved unchanged.
 """
 
 from __future__ import annotations
@@ -29,6 +30,8 @@ SYMBOL_SIZE = 18
 VOLATILE_SG = re.compile(r"^\$SG[0-9]+$")
 VOLATILE_T = re.compile(r"^\$T[0-9]+$")
 NAMED_STATIC = re.compile(r"^(?P<prefix>.+\$S)[0-9]+$")
+VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
+COMPGEN_PREFIX = "__h2cg$"
 
 INITIALIZED_DATA = 0x00000040
 UNINITIALIZED_DATA = 0x00000080
@@ -119,6 +122,14 @@ class CanonicalRow:
     digest: str
     proof: str
     preview: str
+
+
+@dataclass(frozen=True)
+class CompgenClaim:
+    name: str
+    kind: str
+    owner: str
+    size: int
 
 
 @dataclass(frozen=True)
@@ -388,6 +399,131 @@ def _function_owner(ranges, section: int, offset: int) -> Symbol | None:
     return None
 
 
+def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
+    if not claims:
+        return {}, ()
+    claim_names = [claim.name for claim in claims]
+    claim_name_set = set(claim_names)
+    if len(claim_name_set) != len(claim_names):
+        raise ValueError("duplicate semantic compiler-function claim")
+    defined_functions = {
+        symbol.index: symbol for symbol in coff.symbols.values()
+        if (symbol.section > 0 and symbol.typ == FUNCTION_TYPE and
+            coff.sections[symbol.section - 1].characteristics & MEM_EXECUTE)
+    }
+    by_name = defaultdict(list)
+    for symbol in defined_functions.values():
+        by_name[symbol.name].append(symbol)
+    unexpected = sorted(
+        name for name in by_name
+        if name.startswith(COMPGEN_PREFIX) and name not in claim_name_set)
+    if unexpected:
+        raise ValueError("unclaimed semantic compiler functions: %s" %
+                         ", ".join(unexpected))
+    by_section = defaultdict(list)
+    for symbol in defined_functions.values():
+        by_section[symbol.section].append(symbol)
+
+    def extent(symbol):
+        later = sorted(other.value for other in by_section[symbol.section]
+                       if other.value > symbol.value)
+        end = later[0] if later else coff.sections[symbol.section - 1].raw_size
+        return symbol.value, end
+
+    def validate_extent(symbol, claim):
+        start, end = extent(symbol)
+        section = coff.sections[symbol.section - 1]
+        body = coff.section_bytes(section)
+        padding = body[start + claim.size:end]
+        if end - start < claim.size or any(byte not in (0x90, 0xCC)
+                                           for byte in padding):
+            raise ValueError("%s physical span 0x%x does not contain the "
+                             "expected 0x%x-byte body plus code padding" %
+                             (symbol.name, end - start, claim.size))
+        return start, start + claim.size
+
+    satisfied = set()
+    for claim in claims:
+        semantic = by_name.get(claim.name, ())
+        if semantic:
+            if len(semantic) != 1:
+                raise ValueError("duplicate semantic compiler function: %s" % claim.name)
+            validate_extent(semantic[0], claim)
+            satisfied.add(claim.name)
+    pending = [claim for claim in claims if claim.name not in satisfied]
+    if not pending:
+        return {}, ()
+
+    volatile = {index: symbol for index, symbol in defined_functions.items()
+                if VOLATILE_E_FUNCTION.fullmatch(symbol.name)}
+    extents = {}
+    for index, symbol in volatile.items():
+        extents[index] = extent(symbol)
+    outgoing = defaultdict(set)
+    for relocation in coff.relocations:
+        for index, symbol in volatile.items():
+            start, end = extents[index]
+            if relocation.section == symbol.section and start <= relocation.site < end:
+                outgoing[index].add(relocation.symbol_index)
+
+    def target_names(index):
+        return {coff.symbols[target].name for target in outgoing[index]}
+
+    def owner_present(names, owner):
+        return any(name == "_" + owner or name.startswith("?" + owner + "@@")
+                   for name in names)
+
+    assigned = {}
+    claimed_index = {}
+
+    def bind(claim, candidates):
+        candidates = [index for index in candidates if index not in assigned]
+        if len(candidates) != 1:
+            raise ValueError("%s has %d volatile compiler-function candidates" %
+                             (claim.name, len(candidates)))
+        index = candidates[0]
+        assigned[index] = claim
+        claimed_index[(claim.kind, claim.owner)] = index
+
+    for kind, callee_prefix in (("STATIC_CTOR", "??0"), ("STATIC_DTOR", "??1")):
+        for claim in (row for row in pending if row.kind == kind):
+            bind(claim, [
+                index for index in volatile
+                if owner_present(target_names(index), claim.owner) and
+                any(name.startswith(callee_prefix) for name in target_names(index))
+            ])
+    for claim in (row for row in pending if row.kind == "STATIC_ATEXIT"):
+        dtor = claimed_index.get(("STATIC_DTOR", claim.owner))
+        bind(claim, [
+            index for index in volatile
+            if dtor in outgoing[index] and "_atexit" in target_names(index)
+        ])
+    for claim in (row for row in pending if row.kind == "STATIC_INIT_DISPATCH"):
+        ctor = claimed_index.get(("STATIC_CTOR", claim.owner))
+        atexit = claimed_index.get(("STATIC_ATEXIT", claim.owner))
+        bind(claim, [
+            index for index in volatile
+            if ctor in outgoing[index] and atexit in outgoing[index]
+        ])
+    if len(assigned) != len(pending):
+        missing = sorted(claim.name for claim in pending
+                         if claim not in assigned.values())
+        raise ValueError("unclassified VA_COMPGEN claims: %s" % ", ".join(missing))
+
+    rows = []
+    renames = {}
+    for index, claim in assigned.items():
+        symbol = volatile[index]
+        start, end = validate_extent(symbol, claim)
+        renames[index] = claim.name
+        rows.append(CanonicalRow(
+            symbol.name, claim.name, "compgen", "text", symbol.section,
+            start, end - start, end - start, 0, "-",
+            "semantic-relocation-role", "%s:%s" % (claim.kind, claim.owner),
+        ))
+    return renames, tuple(rows)
+
+
 def _rewrite_jump_table_relocations(
         original: CoffObject, payload: bytes) -> tuple[bytes, tuple[JumpTableRewrite, ...]]:
     """Rewrite same-function .text DIR32 sites to owner+relative addend."""
@@ -583,7 +719,8 @@ def _assert_only_canonical_changes(
                 "jump-table relocation resolved-target postcondition failed")
 
 
-def canonicalize_coff(payload: bytes) -> CanonicalizedObject:
+def canonicalize_coff(payload: bytes,
+                      compgen: tuple[CompgenClaim, ...] = ()) -> CanonicalizedObject:
     """Return a normalized comparison copy and its readable rename records."""
     coff = CoffObject(payload)
     definitions = _definitions(coff)
@@ -772,6 +909,12 @@ def canonicalize_coff(payload: bytes) -> CanonicalizedObject:
             section_offset, physical_size, 0, 0, "-", f"skipped-{status}", "",
         ))
 
+    compgen_rename, compgen_rows = _compgen_renames(coff, compgen)
+    overlap = set(renames) & set(compgen_rename)
+    if overlap:
+        raise RuntimeError("data and compiler-function canonicalization overlap")
+    renames.update(compgen_rename)
+    rows.extend(compgen_rows)
     normalized = _rewrite_names(coff, renames)
     normalized, jump_table_rewrites = _rewrite_jump_table_relocations(
         coff, normalized)
@@ -836,11 +979,25 @@ def corpus_summary(roots: list[Path]) -> dict:
     return summary
 
 
+def load_compgen_claims(path: Path | None, unit: str | None):
+    if path is None or unit is None:
+        return ()
+    if not path.exists():
+        raise FileNotFoundError("compiler-function manifest does not exist: %s" % path)
+    with path.open(newline="") as stream:
+        rows = csv.DictReader(stream)
+        return tuple(CompgenClaim(
+            row["name"], row["kind"], row["owner"], int(row["size"], 0))
+            for row in rows if row["unit"] == unit)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--sidecar", type=Path)
+    parser.add_argument("--unit")
+    parser.add_argument("--compgen-manifest", type=Path)
     parser.add_argument("--summary-root", type=Path, action="append")
     parser.add_argument("--summary-output", type=Path)
     args = parser.parse_args(argv)
@@ -861,7 +1018,8 @@ def main(argv=None):
     )]
     if len(set(resolved_paths)) != len(resolved_paths):
         parser.error("input, output, and sidecar paths must be distinct")
-    result = canonicalize_coff(args.input.read_bytes())
+    claims = load_compgen_claims(args.compgen_manifest, args.unit)
+    result = canonicalize_coff(args.input.read_bytes(), claims)
     _atomic_write(args.output, result.data)
     _atomic_write(args.sidecar, sidecar_bytes(result.rows))
     return 0

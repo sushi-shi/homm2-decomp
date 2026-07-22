@@ -240,4 +240,9 @@ DATA(0x00527e98) i8 xIsExpansionMap;
 DATA(0x00527e9c) ExpansionCampaignId xLastChoice;
 DATA(0x00527e20) u8 xIsPlayingExpansionCampaign;
 DATA(0x00527e28) ExpCampaign xCampaign;
+
+VA_COMPGEN(0x004476a0, 0x1a, STATIC_INIT_DISPATCH, xCampaign)
+VA_COMPGEN(0x004476ba, 0x1d, STATIC_ATEXIT, xCampaign)
+VA_COMPGEN(0x004476d7, 0x1a, STATIC_DTOR, xCampaign)
+VA_COMPGEN(0x004476f1, 0x1a, STATIC_CTOR, xCampaign)
 DATA(0x00527ea0) i32 xTheSpell;
