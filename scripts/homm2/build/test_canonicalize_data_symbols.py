@@ -158,7 +158,38 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
         self.assertEqual(
             parsed.symbols[parsed.relocations[4].symbol_index].name, "$L100")
 
-    def test_local_text_dir32_without_external_owner_is_untouched(self):
+    def test_previous_external_owner_addend_is_rewritten_to_site_owner(self):
+        candidate_text = bytearray(0x40)
+        struct.pack_into("<I", candidate_text, 0x30, 0x24)
+        candidate = make_coff([SectionSpec(
+            ".text", bytes(candidate_text), TEXT, ((0x30, 0, DIR32),),
+        )], [
+            ("predecessor", 0x00, 1, 0x20, 2),
+            ("handler", 0x20, 1, 0x20, 2),
+        ])
+
+        canonical_text = bytearray(0x40)
+        struct.pack_into("<I", canonical_text, 0x30, 0x04)
+        canonical = make_coff([SectionSpec(
+            ".text", bytes(canonical_text), TEXT, ((0x30, 1, DIR32),),
+        )], [
+            ("predecessor", 0x00, 1, 0x20, 2),
+            ("handler", 0x20, 1, 0x20, 2),
+        ])
+
+        normalized_candidate = canonicalize_coff(candidate).data
+        normalized_canonical = canonicalize_coff(canonical).data
+
+        self.assertEqual(normalized_candidate, normalized_canonical)
+        parsed = CoffObject(normalized_candidate)
+        relocation = parsed.relocations[0]
+        self.assertEqual(parsed.symbols[relocation.symbol_index].name, "handler")
+        self.assertEqual(
+            struct.unpack_from("<I", parsed.section_bytes(parsed.sections[0]), 0x30)[0],
+            0x04,
+        )
+
+    def test_local_text_dir32_with_static_owner_is_canonicalized(self):
         obj = make_coff([SectionSpec(
             ".text", bytes(0x20), TEXT, ((0x08, 1, DIR32),),
         )], [
@@ -170,8 +201,11 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
 
         parsed = CoffObject(result)
         self.assertEqual(
-            parsed.symbols[parsed.relocations[0].symbol_index].name, "$L1")
-        self.assertEqual(parsed.section_bytes(parsed.sections[0]), bytes(0x20))
+            parsed.symbols[parsed.relocations[0].symbol_index].name, "static_fn")
+        self.assertEqual(
+            struct.unpack_from("<I", parsed.section_bytes(parsed.sections[0]), 0x08)[0],
+            0x10,
+        )
 
     def test_named_dispatch_label_uses_semantic_local_label_class(self):
         obj = make_coff([SectionSpec(

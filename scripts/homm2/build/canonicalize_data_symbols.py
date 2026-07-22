@@ -3,9 +3,10 @@
 The transform is deliberately local to one object.  It does not consult a
 manifest, a paired object, source text, or retail addresses.  Symbol indices do
 not change. Compiler-private data receives stable, content-derived names. In
-embedded .text jump tables, same-function DIR32 references to volatile local
-labels are rewritten to the containing external function plus an equivalent
-owner-relative addend; all resolved section offsets are proved unchanged.
+embedded .text jump tables, same-function DIR32 references through volatile
+local labels or another external function owner are rewritten to the containing
+external function plus an equivalent owner-relative addend; all resolved section
+offsets are proved unchanged.
 """
 
 from __future__ import annotations
@@ -47,6 +48,7 @@ RELOCATION_WIDTHS = {
 DIR32 = 0x0006
 FUNCTION_TYPE = 0x0020
 EXTERNAL_STORAGE = 2
+STATIC_STORAGE = 3
 
 
 @dataclass(frozen=True)
@@ -357,12 +359,12 @@ def _digest(record: bytes, seen: dict[str, bytes]) -> str:
 
 
 def _function_ranges(coff: CoffObject) -> dict[int, tuple[tuple[int, int, Symbol], ...]]:
-    """Return unambiguous external-function ownership ranges per text section."""
+    """Return unambiguous function ownership ranges per text section."""
     by_section: dict[int, dict[int, list[Symbol]]] = defaultdict(
         lambda: defaultdict(list))
     for symbol in coff.symbols.values():
         if (symbol.section > 0 and symbol.typ == FUNCTION_TYPE and
-                symbol.storage_class == EXTERNAL_STORAGE and
+                symbol.storage_class in (EXTERNAL_STORAGE, STATIC_STORAGE) and
                 coff.sections[symbol.section - 1].characteristics & MEM_EXECUTE):
             by_section[symbol.section][symbol.value].append(symbol)
     result = {}
@@ -388,7 +390,7 @@ def _function_owner(ranges, section: int, offset: int) -> Symbol | None:
 
 def _rewrite_jump_table_relocations(
         original: CoffObject, payload: bytes) -> tuple[bytes, tuple[JumpTableRewrite, ...]]:
-    """Rewrite same-function local-label DIR32 sites to owner+relative addend."""
+    """Rewrite same-function .text DIR32 sites to owner+relative addend."""
     data = bytearray(payload)
     ranges = _function_ranges(original)
     rewrites = []
@@ -399,20 +401,23 @@ def _rewrite_jump_table_relocations(
         if not section.characteristics & MEM_EXECUTE:
             continue
         target = original.symbols[relocation.symbol_index]
-        if (target.section != relocation.section or target.typ != 0 or
-                target.storage_class != 6):
+        if target.section != relocation.section:
             continue
-        site_owner = _function_owner(ranges, relocation.section, relocation.site)
-        target_owner = _function_owner(ranges, target.section, target.value)
-        if site_owner is None or target_owner is None or site_owner != target_owner:
+        is_local_label = target.typ == 0 and target.storage_class == 6
+        is_external_function = (
+            target.typ == FUNCTION_TYPE and target.storage_class == EXTERNAL_STORAGE)
+        if not is_local_label and not is_external_function:
             continue
         if relocation.site + 4 > section.raw_size:
             raise ValueError("DIR32 jump-table relocation crosses .text payload")
         operand_offset = section.raw_offset + relocation.site
         original_addend = struct.unpack_from("<I", original.data, operand_offset)[0]
-        owner_addend = (
-            original_addend + target.value - target_owner.value) & 0xFFFFFFFF
         resolved_offset = (target.value + original_addend) & 0xFFFFFFFF
+        site_owner = _function_owner(ranges, relocation.section, relocation.site)
+        target_owner = _function_owner(ranges, target.section, resolved_offset)
+        if site_owner is None or target_owner is None or site_owner != target_owner:
+            continue
+        owner_addend = (resolved_offset - target_owner.value) & 0xFFFFFFFF
         if ((target_owner.value + owner_addend) & 0xFFFFFFFF != resolved_offset):
             raise RuntimeError("jump-table owner/addend resolution changed")
         struct.pack_into("<I", data, operand_offset, owner_addend)
