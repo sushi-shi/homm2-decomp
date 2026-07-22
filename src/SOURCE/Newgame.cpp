@@ -1550,8 +1550,11 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
                     --NGKPcursorIndex;
                 }
-            } else if (strlen(cNGKPCore) + 1 < GAME_CHAT_TEXT_LIMIT
-                       && message.payload.keyboard.keyCode != 0) {
+                break;
+            }
+
+            if (strlen(cNGKPCore) + 1 < GAME_CHAT_TEXT_LIMIT
+                && message.payload.keyboard.keyCode != 0) {
                 strcpy(workText, cNGKPCore);
                 keyChar = 0;
                 if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
