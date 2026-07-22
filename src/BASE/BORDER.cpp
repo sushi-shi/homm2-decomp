@@ -43,7 +43,7 @@ border::border(
 }
 
 VA(0x004d21a0, 0x38)
-border::~border() {
+inline border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
     if (m_backgroundIcon != NULL)
