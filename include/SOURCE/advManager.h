@@ -140,7 +140,7 @@ public:
     advManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void StartCursor(H2_ENUM_PARAM(MapDirection, i32));
     void StopCursor(i32);
     void DrawCursor(void);
@@ -181,10 +181,10 @@ public:
     }
     void CheckSetEvilInterface(i32, i32);
     void Reseed(i32, i32);
-    i32 ProcessSelect(struct tag_message*, class mapCell**);
-    i32 ProcessDeSelect(struct tag_message*, i32*, class mapCell**);
+    MessageDispatchResult ProcessSelect(struct tag_message*, class mapCell**);
+    MessageDispatchResult ProcessDeSelect(struct tag_message*, i32*, class mapCell**);
     i32 ProcessSearch(i32, i32);
-    i32 ProcessHover(i32, i32);
+    MessageDispatchResult ProcessHover(i32, i32);
     void UpdateScreen(i32, i32);
     void CompleteDraw(i32, i32, i32, i32);
     void CompleteDraw(i32);
@@ -239,7 +239,7 @@ public:
     void SetInitialMapOrigin(void);
     void LoadRemote(void);
     char* CheckHandleNet(void);
-    i32 CheckHandleNetPlayerWait(struct tag_message&, i32);
+    MessageDispatchResult CheckHandleNetPlayerWait(struct tag_message&, i32);
     void TrimLoopingSounds(i32);
     void DisableButtons(void);
     void EnableButtons(void);

@@ -7,19 +7,19 @@
 
 struct tag_message;
 
-WidgetDispatchResult SetupCampaignGameHandler(struct tag_message&);
-WidgetDispatchResult SetupComPortHandler(struct tag_message&);
-WidgetDispatchResult SetupBaudHandler(struct tag_message&);
-WidgetDispatchResult SetupHotSeatGameHandler(struct tag_message&);
-WidgetDispatchResult SetupModemGameHandler(struct tag_message&);
-WidgetDispatchResult SetupMultiPlayerGameHandler(struct tag_message&);
-WidgetDispatchResult SetupNetworkGameHandler(struct tag_message&);
-WidgetDispatchResult SetupNetworkGame2Handler(struct tag_message&);
-WidgetDispatchResult SetupGameHandler(struct tag_message&);
-WidgetDispatchResult ExpNewCampaignHandler(struct tag_message&);
-WidgetDispatchResult ExpLoadCampaignHandler(struct tag_message&);
-WidgetDispatchResult ExpStdGameHandler(struct tag_message&);
-WidgetDispatchResult BaseSetupHandler(struct tag_message&);
+MessageDispatchResult SetupCampaignGameHandler(struct tag_message&);
+MessageDispatchResult SetupComPortHandler(struct tag_message&);
+MessageDispatchResult SetupBaudHandler(struct tag_message&);
+MessageDispatchResult SetupHotSeatGameHandler(struct tag_message&);
+MessageDispatchResult SetupModemGameHandler(struct tag_message&);
+MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message&);
+MessageDispatchResult SetupNetworkGameHandler(struct tag_message&);
+MessageDispatchResult SetupNetworkGame2Handler(struct tag_message&);
+MessageDispatchResult SetupGameHandler(struct tag_message&);
+MessageDispatchResult ExpNewCampaignHandler(struct tag_message&);
+MessageDispatchResult ExpLoadCampaignHandler(struct tag_message&);
+MessageDispatchResult ExpStdGameHandler(struct tag_message&);
+MessageDispatchResult BaseSetupHandler(struct tag_message&);
 
 extern b32 gbDoModemConfig;
 

@@ -58,7 +58,7 @@ void highScoreManager::Close(void) {
 }
 
 VA(0x00489c40, 0x22a)
-i32 highScoreManager::Main(struct tag_message& message) {
+MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     i32 result;
     i32 entry;
     tag_message windowMessage;
@@ -91,7 +91,7 @@ i32 highScoreManager::Main(struct tag_message& message) {
     }
 
     if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
-        return HIGH_SCORE_MANAGER_CONTINUE;
+        return MESSAGE_DISPATCH_CONSUME;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -119,9 +119,9 @@ i32 highScoreManager::Main(struct tag_message& message) {
     if (result == 1) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
-        return HIGH_SCORE_MANAGER_CLOSE;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return HIGH_SCORE_MANAGER_CONTINUE;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00489e6a, 0x7d3)

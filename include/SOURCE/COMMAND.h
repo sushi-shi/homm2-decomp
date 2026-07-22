@@ -38,7 +38,7 @@ struct CombatRemotePacket {
 #pragma pack(pop)
 SIZE(CombatRemotePacket, 0x19);
 
-WidgetDispatchResult WinCombatHandler(struct tag_message&);
+MessageDispatchResult WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);
 
 #endif

@@ -155,7 +155,7 @@ public:
     i32 m_viewSpellsTop[GAME_VIEW_SPELLS_SIDE_COUNT];
     i32 m_viewSpellsCount[GAME_VIEW_SPELLS_SIDE_COUNT];
     SpellType m_viewSpell;
-    WidgetMessageHandler m_viewSpellsCallback;
+    MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
     void SetupDynamicStuff(i32, i32, i32);
@@ -218,7 +218,7 @@ public:
     i32 LoadMap(char*);
     void ClaimTown(i32, i32, i32);
     void ClaimMine(i32, i32);
-    SpellType ViewSpells(class hero*, HeroSpellType, WidgetMessageHandler, i32);
+    SpellType ViewSpells(class hero*, HeroSpellType, MessageDispatchHandler, i32);
     void UpdateSpellWidgets(void);
     void ViewArmy(
         i32,

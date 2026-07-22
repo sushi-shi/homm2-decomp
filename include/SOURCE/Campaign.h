@@ -73,6 +73,6 @@ H2_ENUM_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_EVIL_MUSIC            = 22
 H2_ENUM_END(CampaignDisplayConstant)
 
-WidgetDispatchResult CampaignHandler(struct tag_message&);
+MessageDispatchResult CampaignHandler(struct tag_message&);
 
 #endif

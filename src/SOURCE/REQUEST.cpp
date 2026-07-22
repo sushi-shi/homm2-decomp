@@ -462,7 +462,7 @@ void fileRequester::SetOK(i32 enabled) {
 }
 
 VA(0x0048daec, 0x11ae)
-i32 fileRequester::Main(struct tag_message& message) {
+MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     i32 acceptStep = 0;
     i32 iResult;
     FileRequesterHelpIndex helpIndexMouse;
@@ -895,10 +895,10 @@ i32 fileRequester::Main(struct tag_message& message) {
         if (acceptStep != 0) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = FILE_REQUESTER_EXECUTIVE_CLOSE;
-            return FILE_REQUESTER_MAIN_CLOSE;
+            return MESSAGE_DISPATCH_FORWARD;
         }
     }
-    return FILE_REQUESTER_MAIN_CONTINUE;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0048ec9a, 0x2e8)

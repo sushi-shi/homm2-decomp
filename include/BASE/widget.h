@@ -48,7 +48,7 @@ public:
     widget(void);
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
-    virtual WidgetDispatchResult Main(struct tag_message& message) = 0;
+    virtual MessageDispatchResult Main(struct tag_message& message) = 0;
     i32 Open(i32 zOrder, class heroWindow* owner);
     void Close(void);
     void Dim(void);

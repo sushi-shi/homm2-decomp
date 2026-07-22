@@ -63,8 +63,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     VIEW_FULL                    = 0,
     VIEW_QUICK                   = 1,
     CLOSE_REQUESTED              = 1,
-    RESULT_CONTINUE              = 1,
-    RESULT_CLOSE                 = 2,
     SELECTOR_WIDTH               = 0x2e,
     SELECTOR_HEIGHT              = 0x2e,
     ARMY_SELECTOR_FRAME          = 3,
@@ -317,7 +315,7 @@ void swapManager::DrawSelector(void) {
 }
 
 VA(0x00454be3, 0xaf0)
-i32 swapManager::Main(tag_message& message) {
+MessageDispatchResult swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
     i32 quickView = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     SwapManagerSide side;
@@ -676,9 +674,9 @@ i32 swapManager::Main(tag_message& message) {
     if (closeRequested_5 == CLOSE_REQUESTED) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = SWAP_COMMAND_EXIT;
-        return RESULT_CLOSE;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return RESULT_CONTINUE;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004556d3, 0xa3)

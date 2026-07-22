@@ -361,11 +361,11 @@ i32 combatManager::ViewSpells(i32) {
 }
 
 VA(0x00420990, 0x15c)
-WidgetDispatchResult CombatSpecialHandler(tag_message& message) {
+MessageDispatchResult CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
         if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-            return WIDGET_DISPATCH_CONSUME;
+            return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
 
         switch (message.payload.hover.id) {
@@ -389,11 +389,11 @@ WidgetDispatchResult CombatSpecialHandler(tag_message& message) {
                 break;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00420aec, 0x2aa)
-WidgetDispatchResult HandleCastSpell(tag_message& message) {
+MessageDispatchResult HandleCastSpell(tag_message& message) {
     i32 hex;
 
     switch (message.type) {
@@ -432,13 +432,13 @@ WidgetDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage("Select teleport destination.", 1, 0, 0);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
                 bInTeleportGetDest = 0;
                 message.type = SPELL_MESSAGE_DIALOG;
                 message.payload.widget.command = SPELL_COMMAND_CLOSE;
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
             break;
 
@@ -453,9 +453,9 @@ WidgetDispatchResult HandleCastSpell(tag_message& message) {
             message.type = SPELL_MESSAGE_DIALOG;
             message.payload.widget.command = SPELL_COMMAND_CLOSE;
             bInTeleportGetDest = 0;
-            return WIDGET_DISPATCH_FORWARD;
+            return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00420d96, 0x2e5)

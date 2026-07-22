@@ -686,12 +686,12 @@ i32 game::PickLoadGame(void) {
 }
 
 VA(0x00412676, 0x1e)
-WidgetDispatchResult SetupCampaignGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupCampaignGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
 VA(0x00412694, 0x13e)
-WidgetDispatchResult SetupComPortHandler(struct tag_message& message) {
+MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -731,7 +731,7 @@ WidgetDispatchResult SetupComPortHandler(struct tag_message& message) {
 }
 
 VA(0x004127d2, 0x13e)
-WidgetDispatchResult SetupBaudHandler(struct tag_message& message) {
+MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -771,7 +771,7 @@ WidgetDispatchResult SetupBaudHandler(struct tag_message& message) {
 }
 
 VA(0x00412910, 0x118)
-WidgetDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -796,7 +796,7 @@ WidgetDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
 }
 
 VA(0x00412a28, 0x12e)
-WidgetDispatchResult SetupModemGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -836,7 +836,7 @@ WidgetDispatchResult SetupModemGameHandler(struct tag_message& message) {
 }
 
 VA(0x00412b56, 0x108)
-WidgetDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -861,7 +861,7 @@ WidgetDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
 }
 
 VA(0x00412c5e, 0xd7)
-WidgetDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -886,7 +886,7 @@ WidgetDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
 }
 
 VA(0x00412d35, 0xf8)
-WidgetDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
+MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -911,7 +911,7 @@ WidgetDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
 }
 
 VA(0x00412e2d, 0x14b)
-WidgetDispatchResult SetupGameHandler(struct tag_message& message) {
+MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
@@ -947,7 +947,7 @@ WidgetDispatchResult SetupGameHandler(struct tag_message& message) {
 }
 
 VA(0x00412f78, 0xd7)
-WidgetDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
+MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -972,7 +972,7 @@ WidgetDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
 }
 
 VA(0x0041304f, 0xd7)
-WidgetDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
+MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -997,7 +997,7 @@ WidgetDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
 }
 
 VA(0x00413126, 0xd7)
-WidgetDispatchResult ExpStdGameHandler(struct tag_message& message) {
+MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
     if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
@@ -1022,7 +1022,7 @@ WidgetDispatchResult ExpStdGameHandler(struct tag_message& message) {
 }
 
 VA(0x004131fd, 0xf0)
-WidgetDispatchResult BaseSetupHandler(struct tag_message& message) {
+MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     i32 handled = 0;
 
     PollSound();
@@ -1042,11 +1042,11 @@ WidgetDispatchResult BaseSetupHandler(struct tag_message& message) {
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         if (giMenuCommand != -1)
             gpWindowManager->m_dialogResult = DIALOG_CANCEL;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
 
     CheckShingleUpdate();
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 DATA(0x004ee248) b32 gbDoModemConfig = false;

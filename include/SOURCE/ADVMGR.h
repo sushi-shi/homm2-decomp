@@ -125,14 +125,14 @@ H2_ENUM_BEGIN(AdventureAIStorageConstant)
 H2_ENUM_END(AdventureAIStorageConstant)
 
 i32 SaveGame(void);
-WidgetDispatchResult DimensionDoorHandler(struct tag_message&);
-WidgetDispatchResult TownPortalHandler(struct tag_message&);
+MessageDispatchResult DimensionDoorHandler(struct tag_message&);
+MessageDispatchResult TownPortalHandler(struct tag_message&);
 void ComputeAdvNetControl(void);
 i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
-WidgetDispatchResult APanelHandler(struct tag_message&);
-WidgetDispatchResult CPanelHandler(struct tag_message&);
+MessageDispatchResult APanelHandler(struct tag_message&);
+MessageDispatchResult CPanelHandler(struct tag_message&);
 void UpdateSystemOptions(i32);
-WidgetDispatchResult SystemOptionsHandler(struct tag_message&);
+MessageDispatchResult SystemOptionsHandler(struct tag_message&);
 i32 GetMobilityFrame(i32);
 i32 GetManaFrame(i32);
 u8 StopOnTrigger(class mapCell*);

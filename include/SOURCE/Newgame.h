@@ -45,6 +45,6 @@ struct NewGameRemotePacket {
 
 #pragma pack(pop)
 
-WidgetDispatchResult NewGameHandler(struct tag_message&);
+MessageDispatchResult NewGameHandler(struct tag_message&);
 
 #endif

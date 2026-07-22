@@ -98,14 +98,14 @@ iconWidget::~iconWidget() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004d0cd0, 0x291)
-WidgetDispatchResult iconWidget::Main(tag_message& msg) {
+MessageDispatchResult iconWidget::Main(tag_message& msg) {
     WidgetFlag flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)
         && (msg.type != MESSAGE_WIDGET
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
 
     MessageType eventType = msg.type;
@@ -127,9 +127,9 @@ WidgetDispatchResult iconWidget::Main(tag_message& msg) {
                     msg.payload.widget.command = WIDGET_COMMAND_SELECT;
                 }
                 SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
         }
 
         case MESSAGE_LEFT_BUTTON_UP:
@@ -138,9 +138,9 @@ WidgetDispatchResult iconWidget::Main(tag_message& msg) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
                 SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
 
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
@@ -148,13 +148,13 @@ WidgetDispatchResult iconWidget::Main(tag_message& msg) {
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
                     m_frame = msg.payload.widget.data.value;
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
                     m_fillColor = msg.payload.widget.data.value & COLOR_INDEX_MASK;
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_SET_ICON:
                     if (m_id != msg.payload.widget.id)
@@ -163,7 +163,7 @@ WidgetDispatchResult iconWidget::Main(tag_message& msg) {
                         gpResourceManager->Dispose(m_icon);
                         m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.text);
                     }
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
 
                 case WIDGET_COMMAND_REPLACE_ICON:
                     if (m_iconId == msg.payload.widget.id) {
@@ -173,7 +173,7 @@ WidgetDispatchResult iconWidget::Main(tag_message& msg) {
                             static_cast<u32l>(msg.payload.widget.data.value)
                         );
                     }
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
 
                 default:
                     goto normalEvent;

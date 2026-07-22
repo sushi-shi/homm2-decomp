@@ -43,9 +43,7 @@ H2_ENUM_BEGIN(HighScoreManagerConstant)
     HIGH_SCORE_UPDATE_Y                    = 51,
     HIGH_SCORE_UPDATE_WIDTH                = 76,
     HIGH_SCORE_UPDATE_HEIGHT               = 406,
-    HIGH_SCORE_MANAGER_OPEN_OK             = 0,
-    HIGH_SCORE_MANAGER_CONTINUE            = 1,
-    HIGH_SCORE_MANAGER_CLOSE               = 2
+    HIGH_SCORE_MANAGER_OPEN_OK             = 0
 H2_ENUM_END(HighScoreManagerConstant)
 
 #pragma pack(push, 1)
@@ -58,7 +56,7 @@ public:
     highScoreManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Update(void);
 };
 #pragma pack(pop)

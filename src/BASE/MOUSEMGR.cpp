@@ -184,8 +184,8 @@ void mouseManager::Close(void) {
 }
 
 VA(0x004c94e0, 0x5)
-i32 mouseManager::Main(struct tag_message&) {
-    return 0;
+MessageDispatchResult mouseManager::Main(struct tag_message&) {
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004c94f0, 0x135)

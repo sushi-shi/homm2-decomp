@@ -31,8 +31,6 @@ H2_ENUM_BEGIN(RecruitConstant)
     DRAW_DEPTH       = 0x7fff,
     VIEW_ARMY_X      = 0x77,
     VIEW_ARMY_Y      = 0x20,
-    MAIN_CONTINUE    = 1,
-    MAIN_FINISHED    = 2,
     NO_ROOM_DIALOG_X = 177,
     NO_ROOM_DIALOG_Y = 100
 H2_ENUM_END(RecruitConstant)
@@ -233,7 +231,7 @@ void recruitUnit::Update(void) {
 }
 
 VA(0x0048b8f0, 0x41b)
-i32 recruitUnit::Main(struct tag_message& message) {
+MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     i32 close = 0;
     i32 quickView = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     if (message.type == MESSAGE_WIDGET) {
@@ -335,10 +333,10 @@ i32 recruitUnit::Main(struct tag_message& message) {
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
-            return MAIN_FINISHED;
+            return MESSAGE_DISPATCH_FORWARD;
         }
     }
-    return MAIN_CONTINUE;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0048bd0b, 0xdf)
