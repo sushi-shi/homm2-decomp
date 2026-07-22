@@ -2029,7 +2029,6 @@ VA(0x004705c2, 0xc3)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
     H2_ENUM_STORAGE(HeroSkillLevel, i8) baseLevel;
-    i8 effectiveLevel;
 
     baseLevel = m_secondarySkills[IDX(skill)];
     if (skill != HERO_SKILL_NECROMANCY)
@@ -2042,10 +2041,10 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
         shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
     if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
         shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    effectiveLevel = OD_STEER(shrineAndArtifactBonus) + IDX(baseLevel);
-    if (effectiveLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
-        effectiveLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
-    return effectiveLevel;
+    baseLevel += shrineAndArtifactBonus;
+    if (baseLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
+        baseLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
+    return IDX(baseLevel);
 }
 
 VA(0x00470685, 0xf4)
