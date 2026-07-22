@@ -273,7 +273,7 @@ public:
     i32 ZombieEvent(class hero*, class mapCell*, char*, i32, i32);
     i32 GhostEvent(class hero*, class mapCell*, char*, i32, i32);
     void HouseEvent(class hero*, class mapCell*);
-    i32 CombatMonsterEvent(
+    CombatResult CombatMonsterEvent(
         class hero*,
         CreatureType,
         i32,
@@ -313,7 +313,7 @@ public:
     );
     void ComputerMonsterInteract(class mapCell*, class hero*, i32*);
     i32 DoNetCombat(char*);
-    i32 DoCombat(
+    CombatResult DoCombat(
         i32,
         i32,
         class hero*,
@@ -359,7 +359,7 @@ public:
         i8*,
         i8*
     );
-    i32 AutoResolveCombat(
+    CombatResult AutoResolveCombat(
         i32,
         i32,
         class hero*,

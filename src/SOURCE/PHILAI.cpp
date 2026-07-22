@@ -314,7 +314,6 @@ H2_ENUM_END(AIHourglassConstant)
 
 H2_ENUM_BEGIN(AITownEventConstant)
     TOWN_EVENT_NO_HERO      = -1,
-    TOWN_EVENT_ATTACKER_WON = 0,
     TOWN_EVENT_USE_GARRISON = 1
 H2_ENUM_END(AITownEventConstant)
 
@@ -5226,7 +5225,7 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
     i32 currentPlayer26;
     i32 quickCombatResult9;
     town* townPtr2;
-    i32 combatResult7;
+    CombatResult combatResult7;
     hero* defendingHero0;
 
     townPtr2 = GetCastleSlot(cell->m_objectMetadata);
@@ -5264,7 +5263,7 @@ void philAI::TownEvent(mapCell* cell, hero* h, i32 x, i32 y) {
                     AI_BATTLE_NO_PLAYER,
                     TOWN_EVENT_USE_GARRISON
                 );
-                if (combatResult7 == TOWN_EVENT_ATTACKER_WON) {
+                if (combatResult7 == COMBAT_RESULT_ATTACKER) {
                     gpGame->ClaimTown(townPtr2->m_id, giCurPlayer, 0);
                     giHumanTownConquered = townPtr2->m_id;
                 }

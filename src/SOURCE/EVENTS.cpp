@@ -346,7 +346,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType thirdUpgrade;
     CreatureType monsterType6;
     i32 guardedCount;
-    i32 heroCombatResult3;
+    CombatResult heroCombatResult3;
     i32 teleportY;
     ArtifactType artifact8;
     mapEventExtra* eventExtra1;
@@ -372,7 +372,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     i32 levelExperience1;
     i32 heroLevel2;
     i32 dragonFactor_d;
-    i32 mineCombatResult7;
+    CombatResult mineCombatResult7;
     i32 adjacentMonster8;
     i32 wellSpellPoints5;
     i32 springSpellPoints;
@@ -1173,7 +1173,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         0
                     );
-                    if (mineCombatResult7 != 0)
+                    if (mineCombatResult7 != COMBAT_RESULT_ATTACKER)
                         break;
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     eventHero2->CheckLevel();
@@ -2113,7 +2113,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         0
                     )
-                    != 0)
+                    != COMBAT_RESULT_ATTACKER)
                     break;
                 eventHero2->CheckLevel();
                 cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
@@ -2196,7 +2196,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         CITY_DEAD_POWER_LICH_COUNT,
                         CITY_DEAD_POWER_LICH_STACKS
                     )
-                    != 0)
+                    != COMBAT_RESULT_ATTACKER)
                     break;
                 eventHero2->CheckLevel();
                 cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
@@ -2284,7 +2284,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         dragonFactor_d,
                         DRAGON_CITY_DRAGON_STACKS
                     )
-                    != 0)
+                    != COMBAT_RESULT_ATTACKER)
                     break;
                 CheckEndGame(END_GAME_FORCE_NONE, true);
                 if (gbGameOver)
@@ -3010,7 +3010,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         0
                     )
-                    != 0)
+                    != COMBAT_RESULT_ATTACKER)
                     break;
                 eventHero2->CheckLevel();
                 sprintf(
@@ -3063,7 +3063,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     1
                 );
-                if (heroCombatResult3 == 0 && occupiedTown4 != NULL)
+                if (heroCombatResult3 == COMBAT_RESULT_ATTACKER && occupiedTown4 != NULL)
                     gpGame->ClaimTown(occupiedTown4->m_id, giCurPlayer, 0);
             }
             break;
@@ -3166,7 +3166,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         0
                     )
-                    == 0) {
+                    == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
                         "Upon defeating the daemon's servants, you find a hidden cache with 2500 "
@@ -3488,7 +3488,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             0,
                             0
                         )
-                        == 0) {
+                        == COMBAT_RESULT_ATTACKER) {
                         eventHero2->CheckLevel();
                         eventValue1 = cell->m_objectMetadata - 1;
                         sprintf(
@@ -3565,7 +3565,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         0
                     )
-                    == 0) {
+                    == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     EventWindow(
                         -1,
@@ -4445,7 +4445,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 VA(0x004af87c, 0x1da)
 void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     hero* eventHero1;
-    i32 combatResult1;
+    CombatResult combatResult1;
     hero* defendingHero;
     town* eventTown1;
 
@@ -4472,7 +4472,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
             -1,
             1
         );
-        if (combatResult1 == 0)
+        if (combatResult1 == COMBAT_RESULT_ATTACKER)
             gpGame->ClaimTown(eventTown1->m_id, giCurPlayer, 0);
     } else {
         gpGame->ClaimTown(eventTown1->m_id, giCurPlayer, 0);
@@ -4808,7 +4808,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4842,7 +4842,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4876,7 +4876,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4910,7 +4910,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4952,7 +4952,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -4986,7 +4986,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5020,7 +5020,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5054,7 +5054,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 artifactId = GiveRandomArtifact(eventHero);
                 if (artifactId != ARTIFACT_NONE)
                     EventWindow(
@@ -5109,7 +5109,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 sprintf(gText, "%s", text);
                 EventWindow(
                     -1,
@@ -5144,7 +5144,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 sprintf(gText, "%s", text);
                 EventWindow(
                     -1,
@@ -5179,7 +5179,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 sprintf(gText, "%s", text);
                 EventWindow(
                     -1,
@@ -5214,7 +5214,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0,
                     0
                 )
-                == 0) {
+                == COMBAT_RESULT_ATTACKER) {
                 artifactId = GiveRandomArtifact(eventHero);
                 sprintf(gText, "%s", text);
                 if (artifactId != ARTIFACT_NONE)
@@ -5343,7 +5343,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 }
 
 VA(0x004b0d51, 0x62f)
-i32 advManager::CombatMonsterEvent(
+CombatResult advManager::CombatMonsterEvent(
     hero* eventHero,
     CreatureType monsterType,
     i32 monsterCount,
@@ -5362,7 +5362,7 @@ i32 advManager::CombatMonsterEvent(
 ) {
     i32 stackCount;
     i32 stackIndex9;
-    i32 combatResult7;
+    CombatResult combatResult7;
     i32 lastStackCount;
     CreatureType temporaryTypes7[MONSTER_ARMY_SLOTS];
     i32 temporaryCounts[MONSTER_ARMY_SLOTS];
@@ -6003,7 +6003,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 artifactResource_p;
     hero* otherHero_e;
     i32 artifactGuardResult_e;
-    i32 heroCombatResult_h;
+    CombatResult heroCombatResult_h;
     i32 exitY_d;
     ArtifactType artifact_g;
     i32 heroInteractionResult;
@@ -6787,7 +6787,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     -1,
                     1
                 );
-                if (heroCombatResult_h == 0 && occupiedTown_b != NULL)
+                if (heroCombatResult_h == COMBAT_RESULT_ATTACKER && occupiedTown_b != NULL)
                     gpGame->ClaimTown(occupiedTown_b->m_id, giCurPlayer, 0);
             }
             CompleteDraw(0);
@@ -7342,7 +7342,7 @@ void advManager::PlayerMonsterInteract(
 ) {
     CreatureType monster_n;
     float strengthRatio_p;
-    i32 combatResult_f;
+    CombatResult combatResult_f;
     i32 forcedJoin_f;
     i32 joining;
     i32 monsterCount_n;
@@ -7641,7 +7641,7 @@ fightMonsters:
         0,
         0
     );
-    if (combatResult_f == 0 || combatResult_f == -1)
+    if (combatResult_f == COMBAT_RESULT_ATTACKER || combatResult_f == COMBAT_RESULT_DRAW)
         *handled = 1;
 }
 
@@ -7818,7 +7818,7 @@ i32 advManager::DoNetCombat(char* packet) {
         &gbCombatSurrender
     );
     firstPlayer3 = firstHero29->m_owner;
-    combatResult16 = static_cast<CombatResult>(DoCombat(
+    combatResult16 = DoCombat(
         combatX1,
         combatY8,
         firstHero29,
@@ -7830,7 +7830,7 @@ i32 advManager::DoNetCombat(char* packet) {
         setupCombatY15,
         randomSeed1,
         0
-    ));
+    );
     if (!gbHumanPlayer[firstPlayer3]) {
         SendHeroTownData(
             combatX1,
@@ -7864,7 +7864,7 @@ i32 advManager::DoNetCombat(char* packet) {
 }
 
 VA(0x004b5e10, 0x64e)
-i32 advManager::DoCombat(
+CombatResult advManager::DoCombat(
     i32 x,
     i32 y,
     hero* firstHero,
@@ -8072,7 +8072,7 @@ combatFinished:
     gbInCombat = false;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
-    return IDX(gpCombatManager->m_combatResult);
+    return gpCombatManager->m_combatResult;
 }
 
 VA(0x004b645e, 0x36f)
@@ -8371,7 +8371,7 @@ void advManager::ReceiveHeroTownData(
 }
 
 VA(0x004b6c2f, 0x254)
-i32 advManager::AutoResolveCombat(
+CombatResult advManager::AutoResolveCombat(
     i32 x,
     i32 y,
     hero* firstHero,
@@ -8447,7 +8447,7 @@ i32 advManager::AutoResolveCombat(
         gbRetreatWin = false;
     gbInCombat = false;
     gpMouseManager->m_forcePointerUpdate = 0;
-    return IDX(gpCombatManager->m_combatResult);
+    return gpCombatManager->m_combatResult;
 }
 
 VA(0x004b6e83, 0xb8)
