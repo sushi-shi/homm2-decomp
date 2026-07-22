@@ -543,7 +543,7 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_listen(i32 session, void*
     return Netbios(&gNbSessNcb[session]);
 }
 
-VA(0x004a7fe9, 0x126)
+VA(0x004a7fe9, 0x130)
 static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
@@ -572,7 +572,7 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     }
 }
 
-VA(0x004a8119, 0x13b)
+VA(0x004a8119, 0x14f)
 static void __fastcall nb_arm_recv(i32 session) {
     DATA(0x005175c0) static i16 gNbArmReceiveSourceLineBase = 710;
     H2_ENUM_STORAGE(NetbiosResult, u8) result;

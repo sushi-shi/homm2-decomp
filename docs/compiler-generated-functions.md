@@ -1,7 +1,7 @@
-# Compiler-generated and runtime-library functions
+# Compiler-generated, runtime-library, and source-private functions
 
-These functions have executable retail spans but do not have ordinary source
-definitions. Their identities come from different evidence and are kept separate.
+These functions need synthetic PDB procedure records beyond the shipping linker-public
+inventory. Their identities come from different evidence and are kept separate.
 
 ## Runtime-library functions
 
@@ -15,6 +15,19 @@ modeled alternate entry. An assembly entry without a standalone COFF symbol is n
 
 Run `python3 -m homm2.build.runtime_fid --check` to verify the tracked database. A normal
 `homm2 build` runs the same check as a hard gate.
+
+## Source-private functions
+
+A file-local function is ordinary reconstructed source, not compiler-generated code. When
+its definition is `static` and carries `VA(address, size)`, `annotated_functions.py` reads
+the Clang AST, derives its Microsoft-decorated identity from the semantic signature, and
+writes `build/gen/source_private_functions.csv`. `gen_manifest.py` merges those rows into
+`symbol_names.csv`, so `synth_pdb.py` gives Vostok a procedure record even though the
+linker-public retail NB09 stream necessarily omits it.
+
+`homm2 build` checks this generated private-function inventory for freshness. Such functions
+must not be duplicated in `config/delink_procedures.csv`; that manifest is reserved for
+reviewed spans that cannot be generated from source annotations or runtime FID.
 
 ## Source compiler-generated functions
 

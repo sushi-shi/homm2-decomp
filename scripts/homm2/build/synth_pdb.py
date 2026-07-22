@@ -2,11 +2,11 @@
 """synth_pdb.py - synthesize a PDB for vostok-delinker from build/gen/symbol_names.csv.
 
 vostok-delinker consumes a PDB (not CodeView) to slice HEROES2W.EXE into per-symbol
-COFF .obj files. HEROES2W ships a CodeView NB09 stream, but the delinker wants a PDB -
-so we build one. Unlike gruntz (which re-synths as Ghidra discovers names), our symbol
-set is COMPLETE and authoritative from CodeView, so this is a ONE-TIME step run by
-`homm2 init`: every function is already named + unit-attributed, so we always emit
-per-unit line info (no Ghidra functions.csv, no address-bucketed remainder).
+COFF .obj files. HEROES2W ships a publics-only CodeView NB09 stream, but the delinker
+wants a PDB, so we build one from retail publics plus reviewed runtime/compiler and
+source-annotated private identities. This is a deterministic `homm2 init` input: every
+function is named and unit-attributed before delinking, so we always emit per-unit line
+info (no Ghidra functions.csv or address-bucketed remainder).
 
 Pipeline:
   build/gen/symbol_names.csv (rva,name,unit,size,kind,provenance)

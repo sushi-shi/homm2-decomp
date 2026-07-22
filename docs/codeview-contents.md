@@ -62,6 +62,9 @@ Two details worth remembering:
   next-public span is therefore a delinker heuristic, not a CodeView `pLen`. The procedure
   records in the reconstruction's generated PDB are synthetic and must not be cited as retail
   boundary evidence.
+- File-local reconstructed functions carrying `VA(address, size)` are added to that synthetic
+  PDB from their source definitions. Their decorated names and spans are source/reconstruction
+  evidence, not shipping `S_PUB32` records.
 - **`S_COMPILE` is tool/module provenance, not a final-linker banner.** There are 176
   *"Microsoft LINK 2.60.5112 (NT)"* records, and every owning module also contains an
   `S_THUNK32` import thunk. The only non-thunk record is *"Microsoft CVTRES 4.00"* on
