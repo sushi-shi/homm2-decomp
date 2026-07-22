@@ -23,14 +23,6 @@ H2_ENUM_BEGIN(ArmyFlightConstant)
     VAMPIRE_FLIGHT_SOUND_DELAY = 100
 H2_ENUM_END(ArmyFlightConstant)
 
-inline CombatHexDirection FacingRearDirection(ArmyFacing facing) {
-    return facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST;
-}
-
-inline CombatHexDirection FacingFrontDirection(ArmyFacing facing) {
-    return facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST;
-}
-
 }
 
 VA(0x004a5900, 0x295)
@@ -52,7 +44,10 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         return 0;
     }
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        candidateHex = GetAdjacentCellIndex(hex, FacingRearDirection(m_facing));
+        candidateHex = GetAdjacentCellIndex(
+            hex,
+            m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_EAST : COMBAT_DIRECTION_WEST
+        );
         if (ValidHex(candidateHex)) {
             cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
@@ -65,28 +60,32 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         } else {
             if (!tryOtherSide) {
                 return 0;
-            }
-
-            candidateHex = GetAdjacentCellIndex(hex, FacingFrontDirection(m_facing));
-            if (ValidHex(candidateHex)) {
-                cell_9 = &gpCombatManager->m_hexCells[candidateHex];
             } else {
-                return 0;
-            }
-            if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
-                 || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
-                     && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
-                && !cell_9->m_blocked) {
-                if (fittingHex) {
-                    *fittingHex = candidateHex;
+                candidateHex = GetAdjacentCellIndex(
+                    hex,
+                    m_facing == ARMY_FACING_RIGHT ? COMBAT_DIRECTION_WEST : COMBAT_DIRECTION_EAST
+                );
+                if (ValidHex(candidateHex)) {
+                    cell_9 = &gpCombatManager->m_hexCells[candidateHex];
+                } else {
+                    return 0;
                 }
-                return 1;
-            } else {
-                return 0;
+                if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
+                     || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
+                         && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
+                    && !cell_9->m_blocked) {
+                    if (fittingHex) {
+                        *fittingHex = candidateHex;
+                    }
+                    return 1;
+                } else {
+                    return 0;
+                }
             }
         }
+    } else {
+        return 1;
     }
-    return 1;
 }
 
 VA(0x004a5b95, 0x405)
