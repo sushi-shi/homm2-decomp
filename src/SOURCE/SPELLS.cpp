@@ -1984,15 +1984,29 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
 
 VA(0x004254ed, 0x4f0)
 void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
-    i32 oldX = static_cast<i32>(bolt->currentX);
-    i32 oldY = static_cast<i32>(bolt->currentY);
-    i32 widthFirst = bolt->widthFirst;
-    i32 widthLast = bolt->widthLast;
-    i32 unusedRandom = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
-    i32 step;
-    for (step = 0; stepCount > step; ++step) {
-        bolt->currentX = sin(bolt->baseAngle) + bolt->currentX;
-        bolt->currentY = cos(bolt->baseAngle) + bolt->currentY;
+    i32 widthRollResult;
+    i32 distance;
+    i32 unusedBoltWord6;
+    i32 unusedDrawWord1;
+    i32 beamOffset;
+    i32 drawX;
+    i32 drawStep;
+    i32 drawY;
+    u8 color;
+    i32 widthFirst;
+    i32 previousX;
+    i32 previousY;
+    i32 widthLast;
+    i32 edgeShade;
+
+    previousX = static_cast<i32>(bolt->currentX);
+    previousY = static_cast<i32>(bolt->currentY);
+    widthFirst = bolt->widthFirst;
+    widthLast = bolt->widthLast;
+    widthRollResult = Random(BOLT_RANDOM_WIDTH_LOW, BOLT_RANDOM_WIDTH_HIGH);
+    for (drawStep = 0; drawStep < stepCount; ++drawStep) {
+        bolt->currentX = sin(static_cast<double>(bolt->baseAngle)) + bolt->currentX;
+        bolt->currentY = cos(static_cast<double>(bolt->baseAngle)) + bolt->currentY;
         bolt->pixelX = static_cast<i32>(bolt->currentX);
         bolt->pixelY = static_cast<i32>(bolt->currentY);
         if (bolt->pixelX < 0) {
@@ -2012,95 +2026,93 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
             bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
         }
 
-        i32 drawX = bolt->pixelX;
-        i32 drawY = bolt->pixelY;
-        if (bolt->pixelX == oldX) {
-            if (bolt->pixelY == oldY)
+        drawX = bolt->pixelX;
+        drawY = bolt->pixelY;
+        if (bolt->pixelX == previousX) {
+            if (bolt->pixelY == previousY)
                 continue;
         }
         {
-            oldX = bolt->pixelX;
-            oldY = bolt->pixelY;
-            i32 widthIndex;
-            for (widthIndex = widthFirst;; ++widthIndex) {
-                if (widthLast < widthIndex)
-                    break;
+            previousX = bolt->pixelX;
+            previousY = bolt->pixelY;
+            for (beamOffset = widthFirst; beamOffset <= widthLast; ++beamOffset) {
                 if (bolt->drawVertically != 0)
-                    drawY = bolt->pixelY + widthIndex;
+                    drawY = bolt->pixelY + beamOffset;
                 else
-                    drawX = bolt->pixelX + widthIndex;
+                    drawX = bolt->pixelX + beamOffset;
                 if (drawX >= 0 && drawX < COMBAT_SCREEN_WIDTH && drawY >= 0
                     && drawY < COMBAT_AREA_HEIGHT) {
-                    i32 edgeDistance;
-                    if (widthIndex < 0)
-                        edgeDistance = -(widthFirst - widthIndex);
+                    if (beamOffset < 0)
+                        edgeShade = -(widthFirst - beamOffset);
                     else
-                        edgeDistance = widthLast - widthIndex;
+                        edgeShade = widthLast - beamOffset;
                     switch (bolt->colorMode) {
                         case BOLT_COLOR_RED_TABLE:
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] =
                                 gColorTableRed[static_cast<i8>(
-                                    gpWindowManager->m_screen
-                                        ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX]
+                                    (gpWindowManager->m_screen->m_pixels
+                                     + drawY * COMBAT_SCREEN_WIDTH)[drawX]
                                 )];
                             break;
                         case BOLT_COLOR_RED_BEAM:
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
-                                uRedBeam[edgeDistance];
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] =
+                                uRedBeam[edgeShade];
                             break;
                         case BOLT_COLOR_RAINBOW_FORWARD:
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
-                                uRainbow[widthIndex - widthFirst];
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] =
+                                uRainbow[beamOffset - widthFirst];
                             break;
                         case BOLT_COLOR_RAINBOW_REVERSE:
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
-                                uRainbow[BOLT_RAINBOW_LAST_INDEX - (widthIndex - widthFirst)];
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] =
+                                uRainbow[BOLT_RAINBOW_LAST_INDEX - (beamOffset - widthFirst)];
                             break;
                         case BOLT_COLOR_LIGHTNING: {
-                            u8 color;
                             // Retail distance-to-edge lookup for the lightning palette ramp.
                             // NOLINTBEGIN(readability-magic-numbers)
-                            if (edgeDistance == 0)
+                            if (edgeShade == 0)
                                 color = BOLT_LIGHTNING_SHADE_0;
-                            else if (edgeDistance == 1)
+                            else if (edgeShade == 1)
                                 color = BOLT_LIGHTNING_SHADE_1;
-                            else if (edgeDistance == 2)
+                            else if (edgeShade == 2)
                                 color = BOLT_LIGHTNING_SHADE_2;
-                            else if (edgeDistance == 3)
+                            else if (edgeShade == 3)
                                 color = BOLT_LIGHTNING_SHADE_3;
-                            else if (edgeDistance == 4)
+                            else if (edgeShade == 4)
                                 color = BOLT_LIGHTNING_SHADE_4;
                             else
                                 color = BOLT_LIGHTNING_SHADE_5;
                             // NOLINTEND(readability-magic-numbers)
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] = color;
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] = color;
                             break;
                         }
                         default:
-                            gpWindowManager->m_screen
-                                ->m_pixels[drawY * COMBAT_SCREEN_WIDTH + drawX] =
+                            (gpWindowManager->m_screen->m_pixels
+                             + drawY * COMBAT_SCREEN_WIDTH)[drawX] =
                                 static_cast<u8>(bolt->colorMode);
                             break;
                     }
                 }
             }
 
-            i32 distance = abs(bolt->endX - bolt->pixelX) + abs(bolt->endY - bolt->pixelY);
-            if (bolt->nearTarget == 0) {
+            distance = abs(bolt->endX - bolt->pixelX) + abs(bolt->endY - bolt->pixelY);
+            if (bolt->nearTarget != 0) {
+                if (bolt->nearestDistance + 1 < distance
+                    || distance <= BOLT_FINISHED_DISTANCE_MAX) {
+                    bolt->finished = 1;
+                    return;
+                } else if (distance < bolt->nearestDistance) {
+                    bolt->nearestDistance = distance;
+                }
+            } else {
                 if (distance < BOLT_NEAR_TARGET_DISTANCE) {
                     bolt->nearTarget = 1;
                     bolt->nearestDistance = distance;
                 }
-            } else if (bolt->nearestDistance + 1 < distance || distance < BOLT_FINISHED_DISTANCE) {
-                bolt->finished = 1;
-                return;
-            } else if (distance < bolt->nearestDistance) {
-                bolt->nearestDistance = distance;
             }
         }
     }
