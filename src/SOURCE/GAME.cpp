@@ -161,11 +161,6 @@ H2_ENUM_BEGIN(GameDailyEconomyConstant)
     POWER_RING_DAILY_MANA_BONUS     = 2
 H2_ENUM_END(GameDailyEconomyConstant)
 
-H2_ENUM_BEGIN(WeekType)
-    WEEK_NORMAL   = 0,
-    WEEK_CREATURE = 1
-H2_ENUM_END(WeekType)
-
 H2_ENUM_BEGIN(WeeklyRuntimeConstant)
     WEEK_NAME_LAST                = KB_WEEK_NAME_COUNT - 2,
     CREATURE_WEEK_LAST            = IDX(CREATURE_BONE_DRAGON),
@@ -316,9 +311,6 @@ H2_ENUM_BEGIN(GameSaveSentinel)
 H2_ENUM_END(GameSaveSentinel)
 
 H2_ENUM_BEGIN(GameMonthlyConstant)
-    TYPE_NORMAL                   = 0,
-    TYPE_CREATURE                 = 1,
-    TYPE_PLAGUE                   = 2,
     ROLL_MIN                      = 1,
     ROLL_MAX                      = 10,
     NORMAL_ROLL_MAX               = 5,
@@ -1304,9 +1296,9 @@ void game::SetupOrigData(void) {
     ClearMapExtra();
     gbIAmGreatest = false;
     m_difficultyRating = INITIAL_DIFFICULTY_RATING;
-    giMonthType = 0;
+    giMonthType = CALENDAR_PERIOD_NORMAL;
     giMonthTypeExtra = 0;
-    giWeekType = 0;
+    giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = 0;
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
@@ -4447,12 +4439,12 @@ void game::PerWeek(void) {
     i32 monsterCount36;
     hero* weeklyHero4;
 
-    giWeekType = WEEK_NORMAL;
+    giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = Random(0, WEEK_NAME_LAST);
     if (m_week != GAME_WEEKS_PER_MONTH) {
         outerIndex5 = Random(1, SPECIAL_WEEK_ROLL_MAX);
         if (outerIndex5 == 1) {
-            giWeekType = WEEK_CREATURE;
+            giWeekType = CALENDAR_PERIOD_CREATURE;
             giWeekTypeExtra = Random(0, CREATURE_WEEK_LAST);
         }
     }
@@ -4482,7 +4474,7 @@ void game::PerWeek(void) {
                     if (gpGame->m_difficulty == DIFFICULTY_IMPOSSIBLE)
                         growth13 = static_cast<i32>(growth13 * WEEKLY_IMPOSSIBLE_GROWTH_FACTOR);
                 }
-                if (giWeekType == WEEK_CREATURE
+                if (giWeekType == CALENDAR_PERIOD_CREATURE
                     && IDX(gDwellingType[IDX(castle37->m_type)]
                                         [innerIndex3 - WEEKLY_FIRST_DWELLING])
                            == giWeekTypeExtra)
@@ -4753,13 +4745,13 @@ void game::PerMonth(void) {
     m_month++;
     townIndex0 = Random(ROLL_MIN, ROLL_MAX);
     if (townIndex0 <= NORMAL_ROLL_MAX) {
-        giMonthType = TYPE_NORMAL;
+        giMonthType = CALENDAR_PERIOD_NORMAL;
         giMonthTypeExtra = Random(NORMAL_NAME_MIN, NORMAL_NAME_MAX);
     } else if (townIndex0 <= CREATURE_ROLL_MAX) {
-        giMonthType = TYPE_CREATURE;
+        giMonthType = CALENDAR_PERIOD_CREATURE;
         giMonthTypeExtra = giMonType[Random(CREATURE_LIST_MIN, CREATURE_LIST_MAX)];
     } else {
-        giMonthType = TYPE_PLAGUE;
+        giMonthType = CALENDAR_PERIOD_PLAGUE;
     }
 
     for (townIndex0 = 0; townIndex0 < GAME_TOWN_COUNT; townIndex0++) {
@@ -4775,14 +4767,14 @@ void game::PerMonth(void) {
                     && (castle10->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
                     growth9 += FIRST_DWELLING_GROWTH;
 
-                if (giMonthType == TYPE_CREATURE
+                if (giMonthType == CALENDAR_PERIOD_CREATURE
                     && IDX(gDwellingType[IDX(castle10->m_type)]
                                         [building4 - WEEKLY_FIRST_DWELLING])
                            == giMonthTypeExtra)
                     castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *=
                         CREATURE_MONTH_MULTIPLIER;
 
-                if (giMonthType == TYPE_PLAGUE) {
+                if (giMonthType == CALENDAR_PERIOD_PLAGUE) {
                     castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
                     if (castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] < 0)
                         castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] = 0;
@@ -4793,7 +4785,7 @@ void game::PerMonth(void) {
         }
     }
 
-    if (giMonthType == TYPE_CREATURE) {
+    if (giMonthType == CALENDAR_PERIOD_CREATURE) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
             for (mapY5 = 0; mapY5 < MAP_HEIGHT; mapY5++) {
                 cell0 = gpAdvManager->GetCell(mapX8, mapY5);
@@ -7018,18 +7010,18 @@ void game::DoNewTurn(void) {
     if (m_day == 1 && (m_month != 1 || m_week != 1 || m_day != 1)) {
         if (gbThisNetHumanPlayer[giCurPlayer])
             gpSoundManager->m_samplesReady = 1;
-        if (giWeekType != -1) {
+        if (giWeekType != CALENDAR_PERIOD_NONE) {
             musicTrack2 = -1;
             if (m_week == 1) {
                 musicTrack2 = NEW_MONTH_MUSIC_TRACK;
                 strcpy(musicFile18, "newmonth.82m");
-                if (giMonthType == TYPE_NORMAL) {
+                if (giMonthType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(
                         gText,
                         cNewTurn[NEW_MONTH_NORMAL_TEXT],
                         gMonthNames[giMonthTypeExtra]
                     );
-                } else if (giMonthType == TYPE_CREATURE) {
+                } else if (giMonthType == CALENDAR_PERIOD_CREATURE) {
                     strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
                     lowerName19[0] -= 'a' - 'A';
                     sprintf(
@@ -7044,7 +7036,7 @@ void game::DoNewTurn(void) {
             } else {
                 musicTrack2 = NEW_WEEK_MUSIC_TRACK;
                 strcpy(musicFile18, "newweek.82m");
-                if (giWeekType == WEEK_NORMAL) {
+                if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
                     strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
