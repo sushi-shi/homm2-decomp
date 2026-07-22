@@ -108,7 +108,7 @@ textEntryWidget::textEntryWidget(
 }
 
 VA(0x004d88f0, 0x21)
-textEntryWidget::~textEntryWidget() {
+inline textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
