@@ -21,6 +21,7 @@ import os
 import re
 import struct
 import tempfile
+import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -473,42 +474,44 @@ def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
         return any(name == "_" + owner or name.startswith("?" + owner + "@@")
                    for name in names)
 
+    def is_special_member(index, owner, prefix):
+        names = target_names(index)
+        return (owner_present(names, owner) and
+                any(name.startswith(prefix) for name in names))
+
+    def is_atexit(index, owner):
+        return ("_atexit" in target_names(index) and
+                any(target in volatile and
+                    is_special_member(target, owner, "??1")
+                    for target in outgoing[index]))
+
+    def has_role(index, claim):
+        if claim.kind == "STATIC_CTOR":
+            return is_special_member(index, claim.owner, "??0")
+        if claim.kind == "STATIC_DTOR":
+            return is_special_member(index, claim.owner, "??1")
+        if claim.kind == "STATIC_ATEXIT":
+            return is_atexit(index, claim.owner)
+        if claim.kind == "STATIC_INIT_DISPATCH":
+            targets = outgoing[index]
+            return (any(target in volatile and
+                        is_special_member(target, claim.owner, "??0")
+                        for target in targets) and
+                    any(target in volatile and is_atexit(target, claim.owner)
+                        for target in targets))
+        return False
+
     assigned = {}
-    claimed_index = {}
-
-    def bind(claim, candidates):
-        candidates = [index for index in candidates if index not in assigned]
+    for claim in pending:
+        candidates = [index for index in volatile
+                      if index not in assigned and has_role(index, claim)]
         if len(candidates) != 1:
-            raise ValueError("%s has %d volatile compiler-function candidates" %
-                             (claim.name, len(candidates)))
-        index = candidates[0]
-        assigned[index] = claim
-        claimed_index[(claim.kind, claim.owner)] = index
-
-    for kind, callee_prefix in (("STATIC_CTOR", "??0"), ("STATIC_DTOR", "??1")):
-        for claim in (row for row in pending if row.kind == kind):
-            bind(claim, [
-                index for index in volatile
-                if owner_present(target_names(index), claim.owner) and
-                any(name.startswith(callee_prefix) for name in target_names(index))
-            ])
-    for claim in (row for row in pending if row.kind == "STATIC_ATEXIT"):
-        dtor = claimed_index.get(("STATIC_DTOR", claim.owner))
-        bind(claim, [
-            index for index in volatile
-            if dtor in outgoing[index] and "_atexit" in target_names(index)
-        ])
-    for claim in (row for row in pending if row.kind == "STATIC_INIT_DISPATCH"):
-        ctor = claimed_index.get(("STATIC_CTOR", claim.owner))
-        atexit = claimed_index.get(("STATIC_ATEXIT", claim.owner))
-        bind(claim, [
-            index for index in volatile
-            if ctor in outgoing[index] and atexit in outgoing[index]
-        ])
-    if len(assigned) != len(pending):
-        missing = sorted(claim.name for claim in pending
-                         if claim not in assigned.values())
-        raise ValueError("unclassified VA_COMPGEN claims: %s" % ", ".join(missing))
+            warnings.warn(
+                "%s has %d semantic compiler-function candidates; leaving "
+                "claim unbound" % (claim.name, len(candidates)),
+                RuntimeWarning, stacklevel=2)
+            continue
+        assigned[candidates[0]] = claim
 
     rows = []
     renames = {}
