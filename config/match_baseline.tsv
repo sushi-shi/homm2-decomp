@@ -690,12 +690,12 @@ SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	99.9180	02f456500b54
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.9942	ffa791e5b029
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	9ca9e9ded8fc
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	97.5420	dac031dcac48
-SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	b45567fd0cc7
+SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	e9802dee2d65
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	664d40e31f0b
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	99.1117	27ade0ca7d5c
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	823d533fd3be
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	a482cc551de8
-SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	97ea92cbe715
+SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	100.0000	17fdf0919e6b
 SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	78.3492	fd1f3a79d69a
 SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	100.0000	518ee5809504
 SOURCE/DRAWING	?CheckUpdateCombatMessages@combatManager@@QAEXXZ	100.0000	b943cc367cc5
@@ -718,7 +718,7 @@ SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHH
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1456	9afdaff41bdd
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.0089	6963340cd26b
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	97.9523	96fd9411a588
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	95.9555	23f52ff57304
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	95.9902	23f52ff57304
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	92.7800	b6cf6f8bb437
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	4ad2728af490
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	c535299c2379
@@ -1219,7 +1219,7 @@ SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.5822	82e83a6183a7
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	95.6462	80f176f59fa8
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	97.4529	287b669859ea
-SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	96.9856	0484aed1cb0a
+SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.2361	0484aed1cb0a
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	e4bf51350c9d
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	90.4262	52a95844e94a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	99.9306	ae1846e6aebf
@@ -1292,7 +1292,7 @@ SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	99.0521	8d954e23611e
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	815fc3df80f1
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	100.0000	6e8c01f080f3
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	62dbd322bc57
-SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	99.0400	34f07f43945e
+SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	99.0507	34f07f43945e
 SOURCE/TOWNMGR	?MageGuildHandler@@YIHAAUtag_message@@@Z	100.0000	a1dcef5b6d63
 SOURCE/TOWNMGR	?Main@townManager@@UAEHAAUtag_message@@@Z	96.6702	76d5e68fc688
 SOURCE/TOWNMGR	?Open@townManager@@UAEHH@Z	100.0000	c3d702f62c45
