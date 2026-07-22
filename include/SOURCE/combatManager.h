@@ -495,7 +495,7 @@ public:
     H2_ENUM_STORAGE(CombatGridShade, u8) m_previousGridState[COMBAT_HEX_COUNT];
     H2_ENUM_STORAGE(CombatGridShade, u8) m_gridState[COMBAT_HEX_COUNT];
     hexcell m_hexCells[COMBAT_HEX_COUNT];
-    TerrainType m_terrainType;
+    H2_ENUM_STORAGE(TerrainType, i32) m_terrainType;
     BattlefieldFringeFrame m_battlefieldFringe;
     class town* m_originalCombatTown;
     WindowColorCycleMode m_colorCycleType;
@@ -605,7 +605,7 @@ public:
     char m_battlefieldBackgroundName[COMBAT_BACKGROUND_NAME_SIZE];
     i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
     class heroWindow* m_winLoseWindow;
-    SpellType m_selectedSpell;
+    H2_ENUM_STORAGE(SpellType, i32) m_selectedSpell;
     H2_ENUM_STORAGE(CombatResult, i32) m_combatResult;
     combatManager(void);
     virtual i32 Open(i32) OVERRIDE;
