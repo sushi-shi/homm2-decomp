@@ -41,7 +41,12 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Compare raw `llvm-objdump -r` ranges when a provisional boundary confuses the helper.
 6. Use relocation-masked bytes only to isolate code-shape differences. They do not prove
    correctness; ordered relocation identity/addend/destination checks still apply.
-7. Before committing, run `homm2 build`, the focused relocation review, and
+7. On a structurally aligned compiler-state residual, run the bounded disposable predecessor
+   search in `scripts/tu_state_noise.py` before adding persistent compiler steering. With
+   `--record-max`, only a retail-sized exact-100 result with complete ordered-relocation
+   identity may update the hash-scoped retained maximum. Never retain generated probe source
+   or record a sub-100 probe.
+8. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
 
@@ -57,8 +62,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   relocations decide correctness.
 - Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
-- Never invent source objects, labels, globals, aliases, padding, or fake code solely to
-  improve a metric.
+- Never retain source objects, labels, globals, aliases, padding, or fake code solely to
+  improve a metric. The controlled TU-state probe is disposable compiler input, not
+  reconstructed source; its exact-only retained-maximum contract is documented in
+  `docs/msvc42-tu-state-noise-search.md`.
 
 ## Source Conventions
 

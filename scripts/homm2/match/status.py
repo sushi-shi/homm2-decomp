@@ -441,9 +441,9 @@ def readme_block(data, maxima):
            f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
            f"{DE} / {DU} data-bearing units exact.**", "",
            "_**Functions exact** = byte-identical now. **Functions exact-max** = observed at "
-           "100% at least once for the current source hash. **Fuzzy** is the live size-weighted "
-           "instruction match; **fuzzy-max** retains each function's best observed score for its "
-           "current source hash. "
+           "100% at least once for the current source hash, including audited exact disposable "
+           "TU-state probes. **Fuzzy** is the live size-weighted instruction match; "
+           "**fuzzy-max** retains each function's best observed score for its current source hash. "
            "Maxima are historical navigation data, not correctness proof or enforcement._", "",
            *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
                        "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows),

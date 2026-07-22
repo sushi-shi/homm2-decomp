@@ -105,7 +105,7 @@ Using `OD_STEER(idx)` in both index/start comparisons made `DrawBoundedString` e
 using `OD_STEER(x)` in its three width comparisons made `LineLength` exact; and
 `OD_STEER(p) < size` restored exact `LineWidth`. Directly commuting the relations,
 `maxW | 0`, and `OD_STEER(maxW)` were byte-neutral and did not solve the load order. This is a local steering
-step to try before any TU-state permutation or soft defer.
+fallback after a controlled disposable TU-state search fails to close the unchanged source.
 
 ## Confirm, steer, then keep the residual live
 
@@ -117,7 +117,10 @@ step to try before any TU-state permutation or soft defer.
    mutation; never use the regex permuter.
 6. Try exact-preserving AST variants in predecessors. Reject any variant that changes a
    predecessor byte or relocation, and retest every candidate on the combined root.
-7. If the residual still consists solely of operand/register order, record the reproducible
+7. Run `scripts/tu_state_noise.py` before adding new persistent compiler steering. Its generated
+   predecessor declarations are disposable; only an exact size/byte/ordered-relocation closure
+   may update the hash-scoped retained maximum.
+8. If the residual still consists solely of operand/register order, record the reproducible
    combined-root evidence in the external search ledger and keep the function in the live queue.
    Do not put scores, standalone maxima, attempted-spelling history, or revisit state in source comments.
 
