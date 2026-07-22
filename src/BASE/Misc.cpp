@@ -860,7 +860,7 @@ void SetGameDefaults(void) {
 VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void) {
     sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
-    if (_access(gText, 0) == -1) {
+    if (access(gText, 0) == -1) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
         strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
