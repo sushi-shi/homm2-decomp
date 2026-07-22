@@ -25,7 +25,8 @@ inline CombatSide OppositeCombatSide(CombatSide side) {
 H2_ENUM_CLASS_BEGIN(ArmyFacing)
     ARMY_FACING_NONE  = -1,
     ARMY_FACING_LEFT  = 0,
-    ARMY_FACING_RIGHT = 1
+    ARMY_FACING_RIGHT = 1,
+    ARMY_FACING_COUNT = 2
 H2_ENUM_CLASS_END(ArmyFacing)
 
 inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
