@@ -1090,7 +1090,7 @@ SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	100.0000	4a0ec7d1d78a
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	147ac5b5bff9
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	6522bf603985
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	100.0000	2dc774edf3eb
-SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	98.9933	b45552ead0ff
+SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	98.9933	f4801cc215c0
 SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	100.0000	0e30e6d32a60
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	100.0000	e2568fb24936
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	fdb75cb7f10d
@@ -1423,7 +1423,7 @@ SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	c81032caf298
 SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	a77098748396
 SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	3d2bd416f787
 SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	c18b1f4f65e5
-SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	77122ab8d0ab
+SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	e8570f831b47
 SOURCE/netwin	@nb_init@8	100.0000	838bdf0d5519
 SOURCE/netwin	@nb_rcv@8	100.0000	c857f3054cd4
 SOURCE/netwin	@nb_snd@12	100.0000	80f8827572bf
@@ -1458,7 +1458,7 @@ SOURCE/wingraph	?InitializePalette@@YIXXZ	100.0000	814a0b99eacd
 SOURCE/wingraph	?QueryNewPalette@@YIHXZ	100.0000	a9bc25fcd6bd
 SOURCE/wingraph	?RestoreDisplayMode@@YIXXZ	100.0000	15d5f9a9d0dd
 SOURCE/wingraph	?SetFullScreenStatus@@YIXH@Z	100.0000	c490c52b017e
-SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	100.0000	d04d2cebf1cf
+SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	100.0000	476ad7418d06
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	59993b9f1d36
 SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	f51e776c746d
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	100.0000	d2c96363c18e

@@ -12,7 +12,9 @@ from pathlib import Path
 
 from homm2.build.annotated_functions import (
     csv_bytes as private_function_csv_bytes,
+    source_function_spans,
     source_private_functions,
+    span_csv_bytes,
 )
 pe = sys.argv[1]; REPO = sys.argv[2]; srcpaths = sys.argv[3] if len(sys.argv)>3 else None
 d = open(pe, "rb").read()
@@ -212,6 +214,8 @@ for tier in ("BASE","SOURCE","EDITOR"):
 # and a reviewed VA/span. Clang supplies the Microsoft-decorated local COFF name.
 private_procs=[]
 private_rows=source_private_functions(Path(REPO) / "src", Path(REPO))
+source_span_rows=source_function_spans(Path(REPO) / "src", Path(REPO))
+source_spans={row.rva:row for row in source_span_rows}
 for private in private_rows:
     va=imgbase+private.rva
     if sec_of(private.rva)!=".text":
@@ -339,6 +343,12 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
                 size=next(iter(lengths)); unit=unit_of(records[0][3]); provenance=records[0][4]
             else:
                 size=fsize(va); provenance="cv-public-gap"
+                source_span=source_spans.get(rva)
+                if source_span is not None and source_span.size != size:
+                    if source_span.unit != unit:
+                        raise SystemExit("source VA 0x%x belongs to %s, not %s"%
+                                         (rva,source_span.unit,unit))
+                    size=source_span.size; provenance="cv-public-source-va"
         f.write(f"0x{rva:x},{raw},{unit},0x{size:x},{kind},{provenance}\n")
         emitted.add((va,raw))
     public_rvas={va for va,_ in pubs}
@@ -367,6 +377,8 @@ with open(os.path.join(REPO,"build","gen","compiler_generated_functions.csv"),"w
 
 Path(REPO,"build","gen","source_private_functions.csv").write_bytes(
     private_function_csv_bytes(private_rows))
+Path(REPO,"build","gen","source_function_spans.csv").write_bytes(
+    span_csv_bytes(source_span_rows))
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]

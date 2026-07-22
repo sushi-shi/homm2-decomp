@@ -2,7 +2,10 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from homm2.build.annotated_functions import definitions_for_file
+from homm2.build.annotated_functions import (
+    definitions_for_file,
+    source_function_spans,
+)
 
 
 class AnnotatedFunctionsTest(unittest.TestCase):
@@ -25,6 +28,7 @@ class AnnotatedFunctionsTest(unittest.TestCase):
                 encoding="utf-8")
 
             rows = definitions_for_file(path, source_root, repo)
+            spans = source_function_spans(source_root, repo)
 
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0].rva, 0x1230)
@@ -32,6 +36,8 @@ class AnnotatedFunctionsTest(unittest.TestCase):
         self.assertEqual(rows[0].name, "helper")
         self.assertEqual(rows[0].mangled_name, "?helper@@YIXH@Z")
         self.assertEqual(rows[1].mangled_name, "?callback@@YGXPAUControl@@@Z")
+        self.assertEqual([(row.rva, row.size) for row in spans], [
+            (0x1230, 0x20), (0x1250, 0x18), (0x1268, 0x10)])
 
 
 if __name__ == "__main__":

@@ -17,12 +17,13 @@ symbol also owns embedded tables or alternate entries. Assembly entry points wit
 own COFF function symbol require an exact owner-relative match. A missing library, changed
 hash, ambiguous identity, stale name, or stale size fails the build.
 
-The source-private identity gate regenerates the inventory of `static`
-`VA(address, size)` definitions through Clang's Microsoft ABI mangler and requires it to
-match `build/gen/source_private_functions.csv`. This keeps file-local procedures in the
-synthetic PDB without a second handwritten manifest. After compilation, the same gate requires
-each derived decorated name to resolve to exactly one static function definition in the owning
-candidate COFF.
+The source-function gate requires every `VA(address, size)` definition to match
+`build/gen/source_function_spans.csv` and `symbol_names.csv`. For `static` definitions it also
+derives the identity through Clang's Microsoft ABI mangler and requires
+`build/gen/source_private_functions.csv` to match. This keeps file-local procedures and reviewed
+public-span overrides in the synthetic PDB without a second handwritten manifest. After
+compilation, the same gate requires each derived private name to resolve to exactly one static
+function definition in the owning candidate COFF.
 
 ## 1. Compile + header-dependency tracking (ninja)
 

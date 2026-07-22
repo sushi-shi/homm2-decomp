@@ -2,6 +2,3 @@
 # runtime FID. Source static functions carrying VA are added automatically
 # to the synthetic PDB and do not belong here.
 rva,size,name,unit,provenance
-0x37595,0x21a,?SetGraphicsType@@YIHH@Z,SOURCE/wingraph,disassembly-ret
-0x47211,0x483,?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z,SOURCE/PHILAI,disassembly-ret
-0xa7758,0x26e,?nb_thr_ctl@@YIXXZ,SOURCE/netwin,disassembly-ret
