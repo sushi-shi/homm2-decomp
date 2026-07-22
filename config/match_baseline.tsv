@@ -503,7 +503,7 @@ SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	d609d0eb4408
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.6436	ef40e660735c
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	0.0000	fac43992be08
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	5e4ebd2056bb
-SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	0004f43e43eb
+SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	cacaad795532
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	94.7808	fc575a367dbc
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.1583	6d482fa2f787
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	44697e428ed6

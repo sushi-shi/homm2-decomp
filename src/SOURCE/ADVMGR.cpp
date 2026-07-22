@@ -8503,8 +8503,11 @@ void advManager::TownGate(SpellType spellId) {
         }
     } else {
         for (townListIndex = 0; townListIndex < gpCurPlayer->m_townCount; ++townListIndex) {
-            distance0 = abs(gpGame->m_castleRecs[gpCurPlayer->m_townIds[townListIndex]].m_y
-                            - targetHero->m_y)
+            distance0 = abs(
+                            OD_STEER(
+                                gpGame->m_castleRecs[gpCurPlayer->m_townIds[townListIndex]].m_y
+                            ) - targetHero->m_y
+                        )
                         + abs(
                             gpGame->m_castleRecs[gpCurPlayer->m_townIds[townListIndex]].m_x
                             - targetHero->m_x
