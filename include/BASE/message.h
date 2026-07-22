@@ -234,7 +234,10 @@ SIZE(tag_messageWidgetData, 0x4);
 struct tag_messageWidgetPayload {
     BaseWidgetCommand command;
     i32 id;
-    i32 parameter;
+    union {
+        i32 parameter;
+        MessageModifier modifiers;
+    };
     i32 screenX;
     i32 screenY;
     tag_messageWidgetData data;

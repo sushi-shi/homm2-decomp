@@ -436,7 +436,7 @@ i32 game::SetupGame(void) {
     xIsPlayingExpansionCampaign = 0;
     xIsExpansionMap = 0;
     gbInCampaign = false;
-    gbCampaignSideChoice = false;
+    gbCampaignSideChoice = CAMPAIGN_ROLAND;
     iMPExtendedType = REMOTE_GAME_UNINITIALIZED;
     iMPBaseType = MULTIPLAYER_BASE_UNINITIALIZED;
     giNumHumanPlayers = 1;
@@ -694,7 +694,7 @@ VA(0x00412694, 0x13e)
 MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -734,7 +734,7 @@ VA(0x004127d2, 0x13e)
 MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -774,7 +774,7 @@ VA(0x00412910, 0x118)
 MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FIVE);
@@ -799,7 +799,7 @@ VA(0x00412a28, 0x12e)
 MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -839,7 +839,7 @@ VA(0x00412b56, 0x108)
 MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
@@ -864,7 +864,7 @@ VA(0x00412c5e, 0xd7)
 MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -889,7 +889,7 @@ VA(0x00412d35, 0xf8)
 MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -914,7 +914,7 @@ VA(0x00412e2d, 0x14b)
 MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
         if (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
             helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
@@ -950,7 +950,7 @@ VA(0x00412f78, 0xd7)
 MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -975,7 +975,7 @@ VA(0x0041304f, 0xd7)
 MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
@@ -1000,7 +1000,7 @@ VA(0x00413126, 0xd7)
 MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
-    if ((HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
+    if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
         helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);

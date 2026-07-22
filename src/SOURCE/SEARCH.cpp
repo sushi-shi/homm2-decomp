@@ -276,7 +276,7 @@ seed_loop:
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
-                            static_cast<i8>(s_directionCosts[IDX(s_direction)]),
+                            s_directionCosts[IDX(s_direction)],
                             s_hasAdjacentMonster,
                             s_adjacentMonsterX,
                             s_adjacentY,

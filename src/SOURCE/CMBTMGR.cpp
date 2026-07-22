@@ -2331,7 +2331,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
     if (message.type == COMBAT_SYSTEM_OPTION_EVENT) {
         if (HAS(
-                static_cast<MessageModifier>(message.payload.widget.parameter),
+                message.payload.widget.modifiers,
                 MESSAGE_MODIFIER_RIGHT_BUTTON
             )) {
             if (message.payload.widget.command == COMBAT_SYSTEM_OPTION_BUTTON_EVENT

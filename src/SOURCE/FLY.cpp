@@ -100,7 +100,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     u32 directionMask;
     i32 adjacentHex;
     i32 fittingHex;
-    i32 i;
+    CombatHexDirection i;
 
     if (!ValidHex(destination)) {
         return 0;
@@ -168,9 +168,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
                 attackMask = ~GetAttackMask(
                     m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
                 );
-                for (i = 0; i < ARMY_COMBAT_DIRECTION_COUNT; i++) {
-                    if (attackMask & (1 << i)) {
-                        m_attackDirection = static_cast<CombatHexDirection>(i);
+                for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < ARMY_COMBAT_DIRECTION_COUNT; i++) {
+                    if (attackMask & BIT(i)) {
+                        m_attackDirection = i;
                     }
                 }
             }

@@ -7,6 +7,7 @@
 
 void ConvertSmackerPalette(u8*);
 class icon;
+H2_ENUM_CLASS_FORWARD(ExpansionCampaignId);
 
 H2_ENUM_BEGIN(SmackManagerStorageConstant)
     SMACK_OPTION_FILENAME_SIZE = 9,
@@ -49,7 +50,7 @@ void DoAdvance(Smack*, i32, i32, i32, i32);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
 i32 PlaySmacker(i32);
-i32 ExpansionCampaignRect(i32, i32);
+ExpansionCampaignId ExpansionCampaignRect(i32, i32);
 i8 PointInRect(i32, i32, struct tag_rect*);
 void PrintSummaryInfo(SmackSum*);
 

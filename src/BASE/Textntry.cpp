@@ -204,7 +204,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                 return MESSAGE_DISPATCH_FORWARD;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width

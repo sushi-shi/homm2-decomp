@@ -237,7 +237,7 @@ DATA(0x004f2ab0) i32
     xShrineBuildingCost[X_GLOBAL_BUILDING_RESOURCE_COUNT] = {10, 0, 0, 0, 10, 0, 4000};
 DATA(0x00527e78) i32 xPasswordStringsIndex[X_GLOBAL_PASSWORD_STRING_INDEX_COUNT];
 DATA(0x00527e98) i8 xIsExpansionMap;
-DATA(0x00527e9c) i32 xLastChoice;
+DATA(0x00527e9c) ExpansionCampaignId xLastChoice;
 DATA(0x00527e20) u8 xIsPlayingExpansionCampaign;
 DATA(0x00527e28) ExpCampaign xCampaign;
 DATA(0x00527ea0) i32 xTheSpell;

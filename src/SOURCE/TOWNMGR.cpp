@@ -1218,7 +1218,7 @@ VA(0x0041595d, 0x1830)
 MessageDispatchResult townManager::Main(tag_message& message) {
     char description_b[BUILDING_DESCRIPTION_CAPACITY];
     i32 exitTown_i = 0;
-    i32 quickView_k = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
+    i32 quickView_k = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
     i32 debugBuilding_e;
     i32 index_i;
     i32 marketplaceCount_m;
@@ -2665,7 +2665,7 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                quickView_f = HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON);
+                quickView_f = HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON);
                 spellSlot = -1;
                 if (message.payload.widget.id >= TOWN_MAGE_FIRST_SPELL_CONTROL
                     && message.payload.widget.id
@@ -2877,7 +2877,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
                 break;
         }
     }
-    if (static_cast<i32l>(KBTickCount()) > glTimers[0]) {
+    if (KBTickCount() > glTimers[0]) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = TAVERN_ANIMATION_CONTROL;

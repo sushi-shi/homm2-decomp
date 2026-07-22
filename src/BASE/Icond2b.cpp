@@ -79,7 +79,7 @@ void DimIconToBitmap(
                 u32 paletteOffset;
                 gDimCnt = 0;
                 gDimDst = dst;
-                if (static_cast<i32>(cmd) > 0) {
+                if (cmd > 0) {
                     paletteOffset = color * sizeof(uDimPal[0][0]);
                     gDimCnt = cmd;
                     cnt = cmd;

@@ -510,7 +510,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
         } else {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_LOCKED;
         }
-        if (iCurViewMap == static_cast<i32>(map)) {
+        if (iCurViewMap == map) {
             if (map + 1 == SCENARIO_FIVE && iCampaignTrackType == ROLAND_TO_ARCHIBALD)
                 message.payload.widget.data.value += TRACK_SELECTED_FRAME_FOUR_STEPS;
             else if (map + 1 == SCENARIO_FIVE
@@ -775,7 +775,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
                                     gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
                                     gpGame->m_campaignType =
-                                        static_cast<CampaignSide>(1 - IDX(gpGame->m_campaignType));
+                                        OppositeCampaignSide(gpGame->m_campaignType);
                                     gpGame->m_campaignMapEnabled[IDX(gpGame->m_campaignType)]
                                                                 [gpGame->m_campaignScenario] = 1;
                                     gpGame->m_campaignScenarioBonus[IDX(gpGame->m_campaignType)]

@@ -120,7 +120,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
             if (m_x <= relativeX && m_y <= relativeY && relativeX < m_x + m_width
                 && relativeY < m_y + m_height) {
                 if (eventType == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     msg.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 } else {
                     m_flags = flags | WIDGET_FLAG_SELECTED;

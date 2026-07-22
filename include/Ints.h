@@ -32,6 +32,7 @@ typedef i8 b8;
     name;
 #define H2_ENUM_CLASS_BEGIN(name) enum class name : i32 {
 #define H2_ENUM_CLASS_FORWARD(name) enum class name : i32
+#define H2_ENUM_CLASS_FORWARD_SPLIT(name, storage) enum class name : storage
 #define H2_ENUM_CLASS_END(name)                                                                    \
     }                                                                                              \
     ;                                                                                              \
@@ -257,6 +258,7 @@ constexpr i32 H2EnumIndex(Value value) {
     typedef i32 name;
 #define H2_ENUM_CLASS_BEGIN(name) enum {
 #define H2_ENUM_CLASS_FORWARD(name) typedef i32 name
+#define H2_ENUM_CLASS_FORWARD_SPLIT(name, storage) typedef i32 name
 #define H2_ENUM_CLASS_END(name)                                                                    \
     }                                                                                              \
     ;                                                                                              \
@@ -315,6 +317,15 @@ constexpr i32 H2EnumIndex(Value value) {
     inline constexpr name operator-(name a, i32 amount) {                                          \
         return static_cast<name>(static_cast<i64>(a) - amount);                                    \
     }                                                                                              \
+    inline constexpr name operator%(name a, i32 modulus) {                                         \
+        return static_cast<name>(static_cast<i64>(a) % modulus);                                   \
+    }                                                                                              \
+    inline constexpr name operator%(name a, name modulus) {                                        \
+        return static_cast<name>(static_cast<i64>(a) % static_cast<i64>(modulus));                  \
+    }                                                                                              \
+    inline constexpr name operator&(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i64>(a) & mask);                                      \
+    }                                                                                              \
     inline name& operator+=(name& a, i32 amount) {                                                 \
         return a = a + amount;                                                                     \
     }                                                                                              \
@@ -337,8 +348,11 @@ constexpr i32 H2EnumIndex(Value value) {
         --a;                                                                                       \
         return old;                                                                                \
     }                                                                                              \
+    inline name& operator%=(name& a, i32 modulus) {                                                \
+        return a = a % modulus;                                                                    \
+    }                                                                                              \
     inline name& operator%=(name& a, name modulus) {                                               \
-        return a = static_cast<name>(static_cast<i64>(a) % static_cast<i64>(modulus));             \
+        return a = a % modulus;                                                                    \
     }
 #else
 #define H2_ENUM_STEPPED(name)

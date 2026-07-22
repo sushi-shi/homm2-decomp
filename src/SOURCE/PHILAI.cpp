@@ -2323,7 +2323,7 @@ void philAI::ProbableOutcomeOfBattle(
                     gArtifactBaseRV[IDX(attackerHero->m_artifacts[artifactIndex15])];
         }
         if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
-            && static_cast<u8>(attackerHero->m_id) == gpGame->m_mapHeader.victoryConditionValue)
+            && attackerHero->m_id == gpGame->m_mapHeader.victoryConditionValue)
             attackerArtifacts7 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
 
         outcomeValue = static_cast<i32>(
@@ -2349,7 +2349,7 @@ void philAI::ProbableOutcomeOfBattle(
                     gArtifactBaseRV[IDX(defenderHero->m_artifacts[artifactIndex15])];
         }
         if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_HERO
-            && static_cast<u8>(defenderHero->m_id) == gpGame->m_mapHeader.lossConditionValue)
+            && defenderHero->m_id == gpGame->m_mapHeader.lossConditionValue)
             defenderArtifacts18 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
 
         if (gbHumanPlayer[defenderHero->m_owner] != 0)
@@ -2579,7 +2579,7 @@ void philAI::ValueOfBuyingBuilding(
             );
             adjustedValue = static_cast<float>(
                 (1.0
-                 - gpCurPlayer->BuildingsOwned(currentTownRace, BuildingSlotType(building), 0)
+                 - gpCurPlayer->BuildingsOwned(currentTownRace, building, 0)
                        * 0.05)
                 * adjustedValue
             );
@@ -3072,9 +3072,7 @@ void philAI::GetGameAttentionValue(i32 player) {
          + 1.0)
         * attention->gameWeightA
     );
-    attention->gameRemainder = static_cast<float>(
-        (1.0f - attention->gameWeightB) - attention->gameWeightA
-    );
+    attention->gameRemainder = ((1.0f - attention->gameWeightB) - attention->gameWeightA);
 }
 // NOLINTEND(readability-magic-numbers)
 
@@ -4172,8 +4170,8 @@ void philAI::HeroInteractionAtHero(
     hero* savedHero9;
 
     *value = 0;
-    if (evaluateOnly != 0 && static_cast<u8>(firstHero->m_id) != iAlphaMale
-        && static_cast<u8>(secondHero->m_id) != iAlphaMale)
+    if (evaluateOnly != 0 && firstHero->m_id != iAlphaMale
+        && secondHero->m_id != iAlphaMale)
         return;
     {
         if (evaluateOnly == 0) {
@@ -4220,7 +4218,7 @@ void philAI::HeroInteractionAtHero(
             recipientHero36 = firstHero;
             dominantShare19 = static_cast<float>(1.0 - dominantShare19);
         }
-        if (evaluateOnly != 0 && static_cast<u8>(recipientHero36->m_id) == iAlphaMale
+        if (evaluateOnly != 0 && recipientHero36->m_id == iAlphaMale
             && dominantShare19 < AI_HERO_INTERACTION_ALPHA_SHARE) {
             savedHero9 = recipientHero36;
             recipientHero36 = dominantHero19;
@@ -4418,7 +4416,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     else if (giCurTurn <= AI_THIRD_WEEK_END_TURN)
         desiredShare0 =
             static_cast<float>(desiredShare0 * AI_THIRD_WEEK_TOWN_SHARE_FACTOR);
-    if (static_cast<u8>(heroPtr->m_id) == iAlphaMale)
+    if (heroPtr->m_id == iAlphaMale)
         desiredShare0 = static_cast<float>(desiredShare0 * 0.5);
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && townPtr->m_x == gpGame->m_mapHeader.victoryConditionValue
@@ -4796,7 +4794,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     townX37 = townPtr->m_x;
     townY9 = townPtr->m_y;
     newHero6 = &gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(availableHeroIndex)];
-    gpGame->SetRandomHeroArmies(static_cast<u8>(newHero6->m_id), 1);
+    gpGame->SetRandomHeroArmies(newHero6->m_id, 1);
     newHero6->m_lastHeroInteractionTurn = AI_HERO_BUILD_COORDINATE_UNSET;
     newHero6->m_lastTownInteractionTurn = AI_HERO_BUILD_COORDINATE_UNSET;
     newHero6->m_owner = static_cast<char>(giCurPlayer);
@@ -4813,7 +4811,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
         (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION);
     gpGame->m_worldMap.GetCell(townX37, townY9)->m_objectMetadata =
         gpCurPlayer->m_availableHeroIds[availableHeroIndex];
-    gpGame->m_availableHeroes[static_cast<u8>(newHero6->m_id)] = townPtr->m_owner;
+    gpGame->m_availableHeroes[newHero6->m_id] = townPtr->m_owner;
 
     CheckValidAvailableHeroes();
     SendMapChange(

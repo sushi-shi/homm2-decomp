@@ -811,7 +811,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     switch (message.type) {
         case MESSAGE_WIDGET:
             if (HAS(
-                    static_cast<MessageModifier>(message.payload.widget.parameter),
+                    message.payload.widget.modifiers,
                     MESSAGE_MODIFIER_RIGHT_BUTTON
                 )) {
                 if (message.payload.widget.command == WIDGET_COMMAND_SELECT
@@ -2388,9 +2388,7 @@ i32 combatManager::DoSurrender(void) {
     for (armyIndex_n = 0; armyIndex_n < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_n) {
         if (m_armies[IDX(m_currentSide)][armyIndex_n].IsAlive()) {
             giSurrenderCost +=
-                static_cast<i16>(
-                    gMonsterDatabase[IDX(m_armies[IDX(m_currentSide)][armyIndex_n].m_monsterType)].cost
-                )
+                gMonsterDatabase[IDX(m_armies[IDX(m_currentSide)][armyIndex_n].m_monsterType)].cost
                 * m_armies[IDX(m_currentSide)][armyIndex_n].m_quantity;
         }
     }
@@ -2876,11 +2874,11 @@ void combatManager::CycleCombatScreen(void) {
                 }
             } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
                        && m_heroCycleTimer[IDX(side)] + HERO_IDLE_DELAY < KBTickCount()) {
-                if (static_cast<u8>(sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount) > 1) {
+                if (sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount > 1) {
                     nextHeroAnimation[IDX(side)] =
                         Random(
                             0,
-                            static_cast<u8>(sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount)
+                            sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount
                                 - 1
                         )
                         + HERO_ANIMATION_IDLE_FIRST;

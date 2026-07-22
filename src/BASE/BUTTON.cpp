@@ -118,7 +118,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
         gpWindowManager
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
         SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-        msg.payload.widget.parameter = IDX(iLeftRightSave);
+        msg.payload.widget.modifiers = iLeftRightSave;
         iLeftRightSave = MESSAGE_MODIFIER_NONE;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -158,7 +158,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     m_height
                 );
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                msg.payload.widget.parameter = IDX(iLeftRightSave);
+                msg.payload.widget.modifiers = iLeftRightSave;
                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
                 return MESSAGE_DISPATCH_FORWARD;
             }
@@ -177,7 +177,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 if (m_x <= relativeX && m_y <= relativeY && relativeX < m_x + m_width
                     && relativeY < m_y + m_height) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
-                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
                 return MESSAGE_DISPATCH_CONTINUE;
@@ -208,7 +208,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                                     m_height
                                 );
                                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                                msg.payload.widget.parameter = IDX(iLeftRightSave);
+                                msg.payload.widget.modifiers = iLeftRightSave;
                                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
                             }
                         } else if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
@@ -230,7 +230,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                         m_height
                     );
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                    msg.payload.widget.parameter = IDX(iLeftRightSave);
+                    msg.payload.widget.modifiers = iLeftRightSave;
                     iLeftRightSave = MESSAGE_MODIFIER_NONE;
                     return MESSAGE_DISPATCH_FORWARD;
                 }
@@ -253,7 +253,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     m_height
                 );
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                msg.payload.widget.parameter = IDX(iLeftRightSave);
+                msg.payload.widget.modifiers = iLeftRightSave;
                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
                 return MESSAGE_DISPATCH_FORWARD;
             }
@@ -295,7 +295,7 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
     }
     glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
-    iLeftRightSave = static_cast<MessageModifier>(msg.payload.widget.parameter)
+    iLeftRightSave = msg.payload.widget.modifiers
         & MESSAGE_MODIFIER_BUTTON_MASK;
     return MESSAGE_DISPATCH_FORWARD;
 }
@@ -311,7 +311,7 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& 
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-    msg.payload.widget.parameter = IDX(iLeftRightSave);
+    msg.payload.widget.modifiers = iLeftRightSave;
     iLeftRightSave = MESSAGE_MODIFIER_NONE;
     return MESSAGE_DISPATCH_FORWARD;
 }
