@@ -1633,10 +1633,32 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
                         if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                            helpIndexState = message.payload.widget.id - PANEL_NEXT_HERO;
-                            if (message.payload.widget.id < PANEL_NEXT_HERO
-                                || message.payload.widget.id > PANEL_CAST_SPELL) {
-                                helpIndexState = -1;
+                            helpIndexState = -1;
+                            switch (message.payload.widget.id) {
+                                case PANEL_NEXT_HERO:
+                                    helpIndexState = 0;
+                                    break;
+                                case PANEL_CONTINUE_ROUTE:
+                                    helpIndexState = 1;
+                                    break;
+                                case PANEL_OVERVIEW:
+                                    helpIndexState = 2;
+                                    break;
+                                case PANEL_END_TURN:
+                                    helpIndexState = 3;
+                                    break;
+                                case PANEL_ADVENTURE_OPTIONS:
+                                    helpIndexState = 4;
+                                    break;
+                                case PANEL_CONTROL_OPTIONS:
+                                    helpIndexState = 5;
+                                    break;
+                                case PANEL_SYSTEM_OPTIONS:
+                                    helpIndexState = 6;
+                                    break;
+                                case PANEL_CAST_SPELL:
+                                    helpIndexState = 7;
+                                    break;
                             }
                             if (helpIndexState >= 0) {
                                 NormalDialog(
@@ -1702,7 +1724,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         }
                         break;
                     case INPUT_SCAN_F8:
-                    case INPUT_SCAN_ESCAPE:
                         break;
                     case INPUT_SCAN_F9:
                         for (cheatDigitLocal = 0; cheatDigitLocal < IDX(RES_COUNT);
@@ -1838,10 +1859,12 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             NormalDialog(
                                 gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
                             );
-                            break;
                         }
                         break;
                     }
+                    // Retail places this case after the cheat-digit block in source order.
+                    case INPUT_SCAN_ESCAPE:
+                        break;
                     case INPUT_SCAN_NUMPAD_8:
                         if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
                             ScreenScroll(MAP_DIRECTION_NORTH, 0);
@@ -2016,7 +2039,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                 }
 
                 if (gpCurPlayer->m_currentHero != INVALID_HERO
-                    && moveDirectionState != MAP_DIRECTION_NONE) {
+                    && moveDirectionState >= MAP_DIRECTION_NORTH) {
                     HideRoute(1, 1, 1);
                     gpMouseManager->HideColorPointer();
                     i32 movementChanged;

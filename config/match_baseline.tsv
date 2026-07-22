@@ -476,7 +476,7 @@ SOURCE/ADVMGR	?HideRoute@advManager@@QAEXHHH@Z	100.0000	59b94f1c26d6
 SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	24d061448b62
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	98.2769	320a44746fe8
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	100.0000	7c48cc55e1a7
-SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	b0fdf739bae9
+SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	100.0000	93eac7cefc48
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.8591	2a0eecd577ff
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	8e4bc8dd471f
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	d02799371e9a
