@@ -6761,7 +6761,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
 // NOLINTEND(readability-magic-numbers)
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
-VA(0x00447211, 0x4fa)
+VA(0x00447211, 0x483)
 i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChance) {
     float ra;     // attack bonus
     i32 py;       // town value

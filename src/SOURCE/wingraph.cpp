@@ -1006,7 +1006,7 @@ i32 QueryNewPalette(void) {
         return DDQueryNewPalette();
 }
 
-VA(0x00437595, 0x286)
+VA(0x00437595, 0x21a)
 i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     i32 fullScreen;
     i32 x;

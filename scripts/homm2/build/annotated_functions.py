@@ -1,4 +1,4 @@
-"""Recover source-annotated file-local functions for delinking.
+"""Recover source-annotated function spans and file-local identities for delinking.
 
 Retail NB09 contains linker publics only, so a ``static`` function cannot appear
 there even though its candidate COFF carries a decorated local symbol. ``VA``
@@ -29,7 +29,12 @@ IMAGE_BASE = 0x400000
 REPO = next((parent for parent in Path(__file__).resolve().parents
              if (parent / "flake.nix").exists()), Path.cwd())
 DEFAULT_OUTPUT = REPO / "build/gen/source_private_functions.csv"
+DEFAULT_SPANS_OUTPUT = REPO / "build/gen/source_function_spans.csv"
+DEFAULT_SYMBOLS = REPO / "build/gen/symbol_names.csv"
 VA_TOKEN = re.compile(rb"\bVA\s*\(")
+VA_MARKER = re.compile(
+    rb"^[ \t]*VA\(\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*\)",
+    re.M)
 STATIC_VA_TOKEN = re.compile(
     rb"\bVA\s*\([^)]*\)\s*(?:(?!\{).){0,1024}\bstatic\b", re.S)
 VA_ANNOTATION = re.compile(r"^va:(0x[0-9a-fA-F]+) size:(0x[0-9a-fA-F]+|[0-9]+)$")
@@ -40,6 +45,14 @@ class AnnotatedPrivateFunction:
     unit: str
     name: str
     mangled_name: str
+    rva: int
+    size: int
+    location: str
+
+
+@dataclass(frozen=True, order=True)
+class AnnotatedFunctionSpan:
+    unit: str
     rva: int
     size: int
     location: str
@@ -114,6 +127,33 @@ def source_private_functions(source_root: Path,
     return sorted(rows, key=lambda row: (row.unit, row.rva))
 
 
+def source_function_spans(source_root: Path,
+                          repo: Path) -> list[AnnotatedFunctionSpan]:
+    source_root = Path(source_root).resolve()
+    repo = Path(repo).resolve()
+    rows = []
+    for path in sorted(source_root.rglob("*.cpp")):
+        blob = path.read_bytes()
+        masked = _mask_lexical_noise(blob)
+        unit = path.relative_to(source_root).with_suffix("").as_posix()
+        for match in VA_MARKER.finditer(masked):
+            va = int(match.group(1), 16)
+            size = int(match.group(2), 0)
+            line = blob.count(b"\n", 0, match.start()) + 1
+            if va < IMAGE_BASE or size <= 0:
+                raise ValueError(f"{path}:{line}: invalid VA function span")
+            rows.append(AnnotatedFunctionSpan(
+                unit=unit,
+                rva=va - IMAGE_BASE,
+                size=size,
+                location=f"{path.relative_to(repo).as_posix()}:{line}",
+            ))
+    identities = {row.rva for row in rows}
+    if len(identities) != len(rows):
+        raise ValueError("duplicate source function RVA")
+    return sorted(rows, key=lambda row: (row.unit, row.rva))
+
+
 def csv_bytes(rows: list[AnnotatedPrivateFunction]) -> bytes:
     stream = io.StringIO(newline="")
     writer = csv.writer(stream, lineterminator="\n")
@@ -121,6 +161,16 @@ def csv_bytes(rows: list[AnnotatedPrivateFunction]) -> bytes:
     for row in rows:
         writer.writerow((f"0x{row.rva:x}", row.mangled_name, row.unit,
                          f"0x{row.size:x}", row.name, row.location))
+    return stream.getvalue().encode("utf-8")
+
+
+def span_csv_bytes(rows: list[AnnotatedFunctionSpan]) -> bytes:
+    stream = io.StringIO(newline="")
+    writer = csv.writer(stream, lineterminator="\n")
+    writer.writerow(("rva", "unit", "size", "source"))
+    for row in rows:
+        writer.writerow((f"0x{row.rva:x}", row.unit,
+                         f"0x{row.size:x}", row.location))
     return stream.getvalue().encode("utf-8")
 
 
@@ -150,26 +200,54 @@ def validate_candidate_symbols(rows: list[AnnotatedPrivateFunction],
         raise ValueError("source-private COFF validation failed:\n" + "\n".join(failures))
 
 
+def validate_symbol_manifest(spans: list[AnnotatedFunctionSpan], path: Path) -> None:
+    if not path.is_file():
+        raise ValueError(f"missing generated symbol manifest: {path}")
+    with path.open(newline="") as stream:
+        rows = {int(row["rva"], 16): row for row in csv.DictReader(stream)
+                if row.get("kind") == "func"}
+    failures = []
+    for span in spans:
+        row = rows.get(span.rva)
+        if row is None:
+            failures.append(f"{span.location}: no generated function at 0x{span.rva:x}")
+        elif int(row["size"], 16) != span.size or row["unit"] != span.unit:
+            failures.append(
+                f"{span.location}: source {span.unit} size 0x{span.size:x}, generated "
+                f"{row['unit']} size {row['size']}")
+    if failures:
+        raise ValueError("source function span validation failed:\n" + "\n".join(failures))
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=REPO / "src")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--spans-output", type=Path, default=DEFAULT_SPANS_OUTPUT)
+    parser.add_argument("--symbols", type=Path, default=DEFAULT_SYMBOLS)
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--objects", type=Path)
     args = parser.parse_args(argv)
     rows = source_private_functions(args.source_root, REPO)
+    spans = source_function_spans(args.source_root, REPO)
     payload = csv_bytes(rows)
+    spans_payload = span_csv_bytes(spans)
     if args.check:
         if not args.output.is_file() or args.output.read_bytes() != payload:
             raise SystemExit(f"source-private function manifest is stale: {args.output}")
+        if (not args.spans_output.is_file() or
+                args.spans_output.read_bytes() != spans_payload):
+            raise SystemExit(f"source function span manifest is stale: {args.spans_output}")
+        validate_symbol_manifest(spans, args.symbols)
         if args.objects is not None:
             validate_candidate_symbols(rows, args.objects)
-        print(f"source-private functions: {args.output} is current")
+        print("source function manifests are current")
         return 0
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_bytes(payload)
-    print(f"source-private functions: wrote {len(rows)} rows "
-          f"to {args.output}")
+    args.spans_output.parent.mkdir(parents=True, exist_ok=True)
+    args.spans_output.write_bytes(spans_payload)
+    print(f"source functions: wrote {len(rows)} private identities and {len(spans)} spans")
     return 0
 
 
