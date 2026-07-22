@@ -1417,9 +1417,10 @@ MessageDispatchResult NullHandler(struct tag_message& msg) {
 
 VA(0x004993e0, 0x1a9)
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
-    // Retail initializes these otherwise-unused /Od frame locals.
+    // Retail initializes these otherwise-unused /Od frame locals. Their suffixes preserve the
+    // observed identifier-bucket order; their original purpose remains unknown.
     // NOLINTBEGIN(readability-magic-numbers)
-    i16 unusedLocal0 = 2, unusedLocal1 = 3, unusedLocal2 = 8, unusedLocal3 = 9;
+    i16 unusedLocal0J = 2, unusedLocal1G = 3, unusedLocal2A = 8, unusedLocal3N = 9;
     // NOLINTEND(readability-magic-numbers)
     i32 shouldClose = 0;
     i32 unusedResult;
