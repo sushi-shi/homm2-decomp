@@ -338,7 +338,7 @@ public:
         i32,
         i32,
         i32,
-        i32,
+        H2_ENUM_PARAM(CombatResult, i32),
         i32,
         i32
     );
@@ -355,7 +355,7 @@ public:
         i32*,
         i32*,
         i32*,
-        i8*,
+        H2_ENUM_STORAGE(CombatResult, i8)*,
         i8*,
         i8*
     );
