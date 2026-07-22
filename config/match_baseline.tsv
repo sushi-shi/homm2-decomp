@@ -501,7 +501,7 @@ SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	100.0000	faa7847d703d
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	100.0000	1181389cd4cb
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	99.4259	d609d0eb4408
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.6436	ef40e660735c
-SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	0.0000	fac43992be08
+SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	100.0000	704f29a6e38d
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	5e4ebd2056bb
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	cacaad795532
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	94.7808	fc575a367dbc

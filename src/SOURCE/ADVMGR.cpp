@@ -51,7 +51,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
+H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
     SYSTEM_OPTION_MUSIC_VOLUME   = 10,
     SYSTEM_OPTION_SOUND_VOLUME   = 11,
     SYSTEM_OPTION_HERO_SPEED     = 12,
@@ -63,8 +63,9 @@ H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
     SYSTEM_OPTION_COLOR_CURSOR   = 18,
     SYSTEM_OPTION_FIRST          = SYSTEM_OPTION_MUSIC_VOLUME,
     SYSTEM_OPTION_LAST           = SYSTEM_OPTION_COLOR_CURSOR,
-    SYSTEM_OPTION_COUNT          = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1
-H2_ENUM_CLASS_END(AdventureSystemOption)
+    SYSTEM_OPTION_COUNT          = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1,
+    SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800
+H2_ENUM_CLASS_END(AdventureSystemOptionsWidgetId)
 
 H2_ENUM_BEGIN(AdventureScreenConstant)
     SCREEN_WIDTH     = 640,
@@ -349,10 +350,6 @@ H2_ENUM_BEGIN(AdventureInterfaceConstant)
     INTERFACE_EVIL              = 2,
     INTERFACE_TRANSLATION_COUNT = 37
 H2_ENUM_END(AdventureInterfaceConstant)
-
-H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
-    SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800,
-H2_ENUM_END(AdventureSystemOptionsMessage)
 
 H2_ENUM_BEGIN(AdventureSystemOptionConstant)
     OPTION_INTERFACE_COUNT = 3,
@@ -928,9 +925,18 @@ H2_ENUM_BEGIN(AdventurePanelDialogConstant)
 H2_ENUM_END(AdventurePanelDialogConstant)
 
 H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
-    SYSTEM_OPTIONS_HELP_ACCEPT       = 0,
-    SYSTEM_OPTIONS_HELP_FIRST_OPTION = 1,
-    SYSTEM_OPTIONS_TEXT_CAPACITY     = 120
+    SYSTEM_OPTIONS_HELP_ACCEPT          = 0,
+    SYSTEM_OPTIONS_HELP_MUSIC_VOLUME    = 1,
+    SYSTEM_OPTIONS_HELP_SOUND_VOLUME    = 2,
+    SYSTEM_OPTIONS_HELP_HERO_SPEED      = 3,
+    SYSTEM_OPTIONS_HELP_MUSIC_SOURCE    = 4,
+    SYSTEM_OPTIONS_HELP_SHOW_ROUTE      = 5,
+    SYSTEM_OPTIONS_HELP_COMPUTER_SPEED  = 6,
+    SYSTEM_OPTIONS_HELP_INTERFACE       = 7,
+    SYSTEM_OPTIONS_HELP_VIDEO           = 8,
+    SYSTEM_OPTIONS_HELP_COLOR_CURSOR    = 9,
+    SYSTEM_OPTIONS_HELP_FIRST_OPTION    = SYSTEM_OPTIONS_HELP_MUSIC_VOLUME,
+    SYSTEM_OPTIONS_TEXT_CAPACITY        = 120
 H2_ENUM_END(AdventureSystemOptionsPrivateConstant)
 
 H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
@@ -10214,12 +10220,39 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
 
-                if (message.payload.widget.id == SYSTEM_OPTIONS_DIALOG_ACCEPT) {
-                    helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
-                } else if (message.payload.widget.id >= IDX(SYSTEM_OPTION_FIRST)
-                           && message.payload.widget.id <= IDX(SYSTEM_OPTION_LAST)) {
-                    helpIndex = message.payload.widget.id - IDX(SYSTEM_OPTION_FIRST)
-                        + SYSTEM_OPTIONS_HELP_FIRST_OPTION;
+                switch (static_cast<AdventureSystemOptionsWidgetId>(
+                    message.payload.widget.id
+                )) {
+                    case SYSTEM_OPTIONS_DIALOG_ACCEPT:
+                        helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
+                        break;
+                    case SYSTEM_OPTION_MUSIC_VOLUME:
+                        helpIndex = SYSTEM_OPTIONS_HELP_MUSIC_VOLUME;
+                        break;
+                    case SYSTEM_OPTION_SOUND_VOLUME:
+                        helpIndex = SYSTEM_OPTIONS_HELP_SOUND_VOLUME;
+                        break;
+                    case SYSTEM_OPTION_HERO_SPEED:
+                        helpIndex = SYSTEM_OPTIONS_HELP_HERO_SPEED;
+                        break;
+                    case SYSTEM_OPTION_MUSIC_SOURCE:
+                        helpIndex = SYSTEM_OPTIONS_HELP_MUSIC_SOURCE;
+                        break;
+                    case SYSTEM_OPTION_SHOW_ROUTE:
+                        helpIndex = SYSTEM_OPTIONS_HELP_SHOW_ROUTE;
+                        break;
+                    case SYSTEM_OPTION_COMPUTER_SPEED:
+                        helpIndex = SYSTEM_OPTIONS_HELP_COMPUTER_SPEED;
+                        break;
+                    case SYSTEM_OPTION_INTERFACE:
+                        helpIndex = SYSTEM_OPTIONS_HELP_INTERFACE;
+                        break;
+                    case SYSTEM_OPTION_VIDEO:
+                        helpIndex = SYSTEM_OPTIONS_HELP_VIDEO;
+                        break;
+                    case SYSTEM_OPTION_COLOR_CURSOR:
+                        helpIndex = SYSTEM_OPTIONS_HELP_COLOR_CURSOR;
+                        break;
                 }
 
                 if (helpIndex >= 0) {
@@ -10240,7 +10273,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
         } else {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DESELECT:
-                    switch (message.payload.widget.id) {
+                    switch (static_cast<AdventureSystemOptionsWidgetId>(
+                        message.payload.widget.id
+                    )) {
                         case SYSTEM_OPTIONS_DIALOG_ACCEPT:
                             accepted = 1;
                             break;
@@ -10248,9 +10283,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                     break;
 
                 case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
-                    AdventureSystemOption option =
-                        static_cast<AdventureSystemOption>(message.payload.widget.id);
-                    switch (option) {
+                    switch (static_cast<AdventureSystemOptionsWidgetId>(
+                        message.payload.widget.id
+                    )) {
                         case SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
@@ -10269,8 +10304,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            ++gConfig.musicVolume;
-                            gConfig.musicVolume %= CONFIG_VOLUME_LEVEL_COUNT;
+                            gConfig.musicVolume =
+                                (gConfig.musicVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustMusicVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
@@ -10292,8 +10327,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 );
                                 break;
                             }
-                            ++gConfig.soundVolume;
-                            gConfig.soundVolume %= CONFIG_VOLUME_LEVEL_COUNT;
+                            gConfig.soundVolume =
+                                (gConfig.soundVolume + 1) % CONFIG_VOLUME_LEVEL_COUNT;
                             gpSoundManager->AdjustSoundVolumes();
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
@@ -10351,9 +10386,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                     gpSoundManager->MIDIStartup();
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = gConfig.useOpera == CONFIG_OPERA_DISABLED
-                                                          ? CONFIG_OPERA_ENABLED
-                                                          : CONFIG_OPERA_DISABLED;
+                                    gConfig.useOpera = static_cast<ConfigOperaMode>(
+                                        1 - IDX(gConfig.useOpera)
+                                    );
                                 } else {
                                     gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
                                 }
@@ -10426,7 +10461,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command =
+            static_cast<BaseWidgetCommand>(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
