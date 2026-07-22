@@ -63,13 +63,13 @@ void SetupRecruitWin(
     i32 resourceCost,
     i32 available
 ) {
-    char creatureName[NAME_SIZE];
+    char recruitName[NAME_SIZE];
     char label[LABEL_SIZE];
     tag_message message;
 
-    strcpy(creatureName, GetMonsterName(creatureType));
-    creatureName[0] -= 'a' - 'A';
-    sprintf(label, "%s %s", "Recruit", creatureName);
+    strcpy(recruitName, GetMonsterName(creatureType));
+    recruitName[0] -= 'a' - 'A';
+    sprintf(label, "%s %s", "Recruit", recruitName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
