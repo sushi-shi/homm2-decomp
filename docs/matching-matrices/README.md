@@ -83,6 +83,26 @@ pinned sibling; eighteen other exact target trials are rejected because the disp
 train perturbs a sibling. The matrix records both target populations and the eligible exact subset.
 No source change or probe declaration is retained.
 
+## SOURCE/PHILAI HeroInteractionAtHero compiler-state census
+
+`philai-herointeractionathero-tu-state-6072a7.tsv` records the deterministic 128-trial
+typedef sweep after recovering the function's real local topology. Retail reuses one integer loop
+slot for primary stats, secondary skills, and artifacts. Modeling that reuse removes the separate
+secondary-skill local, reduces the frame from `0x6c` to the retail `0x68`, and aligns every modeled
+stack displacement.
+
+The sweep has six normalized states. All are 1058 bytes and share the complete retail 29-site
+ordered relocation stream. Thirty trials produce the exact state; the canonical state differs only
+in the load order of four repeated commutative fight-value additions. The other four states expose
+three independent scheduling axes around the secondary-skill index, hero-value comparison, and x87
+compare/store sequence. Representatives of all six states were compared against canonical, retail,
+and each other, and the matrix records every transition span and complete trial partition.
+
+Every exact trial perturbs at least one sibling while the declaration train is present, so none is
+a source-eligible change. The probe is disposable evidence that the clean reconstructed function
+has a reachable exact compiler state; no generated declaration remains in `PHILAI.cpp`. Its exact
+state contributes only to the normalized-source-hash-scoped fuzzy maximum.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,

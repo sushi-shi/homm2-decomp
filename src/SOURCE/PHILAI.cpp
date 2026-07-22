@@ -4180,7 +4180,6 @@ void philAI::HeroInteractionAtHero(
     i32 heroValues27[HERO_INTERACTION_HERO_COUNT];
     hero* recipientHero36;
     i32 statIndex8;
-    HeroSecondarySkill secondarySkill;
     i32 recipientFightValue10;
     hero* currentHero9;
     hero* savedHero9;
@@ -4210,15 +4209,14 @@ void philAI::HeroInteractionAtHero(
                     heroValues27[heroIndex9] += currentHero9->Stats(HeroPrimaryStat(statIndex8))
                                                 * HERO_INTERACTION_PRIMARY_STAT_VALUE;
             }
-            for (secondarySkill = HERO_SKILL_PATHFINDING; secondarySkill < HERO_SKILL_COUNT;
-                 secondarySkill++) {
-                if (secondarySkill == HERO_SKILL_ESTATES)
+            for (statIndex8 = IDX(HERO_SKILL_PATHFINDING); statIndex8 < IDX(HERO_SKILL_COUNT);
+                 statIndex8++) {
+                if (HeroSecondarySkill(statIndex8) == HERO_SKILL_ESTATES)
                     continue;
-                if (currentHero9->m_secondarySkills[IDX(secondarySkill)]
-                    != HERO_SKILL_LEVEL_NONE) {
+                if (currentHero9->m_secondarySkills[statIndex8] != HERO_SKILL_LEVEL_NONE) {
                     heroValues27[heroIndex9] +=
-                        gSSValues[IDX(secondarySkill)]
-                                 [IDX(currentHero9->m_secondarySkills[IDX(secondarySkill)])
+                        gSSValues[statIndex8]
+                                 [IDX(currentHero9->m_secondarySkills[statIndex8])
                                   - SECONDARY_SKILL_LEVEL_OFFSET];
                 }
             }

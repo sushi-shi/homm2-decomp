@@ -1,0 +1,19 @@
+# SOURCE/PHILAI philAI::HeroInteractionAtHero controlled typedef-state census
+# checkpoint	e4ae9c9d602b8279b75e093b5fee34b825bed4a1
+# normalized_source_hash	6072a702190d
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/PHILAI.cpp --rva 0x41419 --trials 128 --families typedef --seed 0x48494148 --state-summary /tmp/herointeraction-shared-index-states.json
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	128 typedef trials produce six normalized target states; no generated declaration remains in source
+state	state_identity	representative_trial	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	diff_bytes_from_canonical	diff_bytes_from_retail	trials_in_1_through_128
+canonical	dcc8331a82625b9c	5	50	99.973690	1058	077bf6e7ddb99626	8b363e01bde1af82	0	8	5-8,15-17,22-25,32-34,39-42,49-51,56-59,69-72,79-81,86-89,96-98,103-106,113-115,120-123
+index-and-fight-sums	3cc179c281fde48b	10	8	99.993420	1058	25796f035e44363a	8b363e01bde1af82	10	2	10,27,44,61,74,91,108,125
+hero-value-sum-and-compare	5f7628819d030ab3	1	8	99.763160	1058	bb80b989f39fd9d6	8b363e01bde1af82	5	13	1,18,35,52,65,82,99,116
+secondary-index	649adcfd12b4ca6c	9	8	99.967100	1058	eb340b54ea3fe1d9	8b363e01bde1af82	2	10	9,26,43,60,73,90,107,124
+exact-fight-sums	9f52ac1c18adc126	11	30	100.000000	1058	601547b0491c6b22	8b363e01bde1af82	8	0	11-14,28-31,45-48,62-64,75-78,92-95,109-112,126-128
+x87-order	c7f1ac1a243f825e	2	24	99.371710	1058	3331f6020e3abdc7	8b363e01bde1af82	8	16	2-4,19-21,36-38,53-55,66-68,83-85,100-102,117-119
+# The state cardinality is six. The canonical state has 51 observations when the unmodified baseline is included; the table counts only its 50 generated trials.
+# Before this census, one shared statIndex8 loop variable replaced separate stat-index and secondary-skill locals. Retail reuses that slot across the primary-stat, secondary-skill, and artifact loops; the reconstruction reduces the frame from 0x6c to the retail 0x68 and aligns every modeled stack displacement.
+# All six states retain the 1058-byte CodeView/objdiff boundary and the same complete 29-site ordered relocation stream. The two extra bytes exposed by the raw retail COFF function extent are trailing alignment NOPs outside the CodeView boundary.
+# Four independent compiler-state axes were observed. A changes the hero/secondary-index load order at +0x15b/+0x15e. BC changes the heroValues sum and comparison at +0x190/+0x193 and +0x1b5/+0x1b8/+0x1ba. D changes the four commutative dominantFightValue4/recipientFightValue10 additions at +0x276/+0x279, +0x2df/+0x2e2, +0x384/+0x387, and +0x3c0/+0x3c3. EG changes x87 compare/store ordering at +0x296..+0x29b and +0x373..+0x37d.
+# The six observed combinations are none (canonical), A, D (exact), A+D, BC, and EG. Representative objects for every state were compared both pairwise with canonical and against retail; no other instruction or relocation transition was present.
+# Trial 11 is the first exact-closure representative. Every exact trial perturbs at least one sibling under a retained probe, so no declaration train is source-eligible. The disposable probe is evidence of a reachable exact compiler state only and was removed before the source-hash-scoped fuzzy maximum was recorded.
