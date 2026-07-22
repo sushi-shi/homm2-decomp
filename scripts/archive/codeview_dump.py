@@ -2,7 +2,7 @@
 # Exhaustively dump an embedded CodeView NB09 (VC4) blob:
 #   - tooling versions (S_COMPILE)         -> stdout
 #   - linked libraries (sstLibraries)      -> <out>/pol-libraries.txt
-#   - compilands + address ranges          -> <out>/pol-compilands.txt
+#   - compilands + library ownership/ranges -> <out>/pol-compilands.txt
 #   - public symbols attributed to .obj    -> <out>/pol-symbols-by-module.txt
 import sys, struct, subprocess, os
 from collections import Counter, defaultdict
@@ -26,7 +26,7 @@ cbH,cbE=struct.unpack_from("<HH",d,D); cDir=struct.unpack_from("<I",d,D+4)[0]
 ents=[struct.unpack_from("<HHii",d,D+cbH+i*cbE) for i in range(cDir)]
 
 # --- modules + their address ranges (iMod is 1-based) -----------------------
-modname={}; modrange=defaultdict(list)
+modname={}; modrange=defaultdict(list); modlibidx={}
 imod=0
 for sst,iMod,lfo,cb in ents:
     if sst!=0x120: continue
@@ -38,7 +38,7 @@ for sst,iMod,lfo,cb in ents:
         va=s2va(seg,off)
         if va: rngs.append((va,va+cbseg))
     nl=b[p]; nm=b[p+1:p+1+nl].decode("latin1","replace")
-    modname[iMod]=nm; modrange[iMod]=rngs
+    modname[iMod]=nm; modrange[iMod]=rngs; modlibidx[iMod]=iLib
 
 # --- linked libraries (sstLibraries) ----------------------------------------
 libs=[]
@@ -51,6 +51,11 @@ for sst,iMod,lfo,cb in ents:
         s=b[p+1:p+1+n].decode("latin1","replace");
         if s.strip(): libs.append(s)
         p+=1+n
+
+def module_library(im):
+    iLib=modlibidx.get(im,0)
+    if iLib==0: return "(direct)"
+    return libs[iLib-1] if iLib<=len(libs) else f"(library #{iLib})"
 
 # --- publics (name+addr) ----------------------------------------------------
 def pstr(buf,p): n=buf[p]; return buf[p+1:p+1+n].decode("latin1"), p+1+n
@@ -81,13 +86,13 @@ for va,nm in pubs:
 
 # write artifacts
 with open(f"{outdir}/pol-libraries.txt","w") as f:
-    f.write("# static libraries linked into PoL HEROES2W.EXE (from CodeView sstLibraries)\n")
+    f.write("# libraries named by PoL HEROES2W.EXE CodeView sstLibraries\n")
     for l in libs: f.write(l+"\n")
 with open(f"{outdir}/pol-compilands.txt","w") as f:
     f.write(f"# {len(modname)} compilands (CodeView sstModule) with address ranges\n")
     for im in sorted(modname):
         rg=" ".join(f"{s:#08x}-{e:#08x}" for s,e in modrange[im])
-        f.write(f"{modname[im]:40} {rg}\n")
+        f.write(f"{modname[im]:40} {module_library(im):32} {rg}\n")
 # demangle + group symbols by module
 def dem(n):
     try: return subprocess.run(["toolbin/rabin2","-D","msvc",n],capture_output=True,text=True,timeout=5).stdout.strip() or n
@@ -96,12 +101,15 @@ with open(f"{outdir}/pol-symbols-by-module.txt","w") as f:
     for im in sorted(bymod, key=lambda x:(x is None,x)):
         nm = modname.get(im,"<unattributed>")
         syms=sorted(bymod[im])
-        f.write(f"\n===== {nm}  ({len(syms)} symbols) =====\n")
+        f.write(f"\n===== {nm}  from {module_library(im)}  ({len(syms)} symbols) =====\n")
         for va,raw in syms: f.write(f"0x{va:08x}  {dem(raw)}\n")
 
 print(f"compilands: {len(modname)}   libraries: {len(libs)}   publics: {len(pubs)}")
-print("\n== linked static libraries ==")
+print("\n== linked libraries ==")
 for l in libs: print("  ",l)
+print("\n== module ownership ==")
+for lib,count in Counter(module_library(im) for im in modname).most_common():
+    print(f"  {count:4}  {lib}")
 print("\n== biggest game modules by symbol count ==")
 top=sorted(((len(v),modname.get(k,'<none>')) for k,v in bymod.items()),reverse=True)[:20]
 for c,nm in top: print(f"  {c:4}  {nm}")
