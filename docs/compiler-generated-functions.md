@@ -33,9 +33,12 @@ and owner, such as
 
 The disposable COFF normalizer does not trust the `$E` number. It classifies constructor
 and destructor thunks by their owner and special-member relocations, then identifies the
-`atexit` registration and dispatcher through their calls to those classified thunks. It
-renames only when every claim has exactly one candidate and the proved extent has the
-declared size. The target object already carries the semantic identity; candidate and
-target therefore compare without relying on compiler counters.
+`atexit` registration and dispatcher through the complete local relocation graph. Sibling
+functions need not have their own `VA_COMPGEN` declarations. Each claim is renamed only when
+it has exactly one candidate and the proved extent has the declared size. A missing or
+ambiguous candidate produces a warning and remains unrenamed; the tool never guesses. Invalid
+placement, duplicate semantic identities, overlaps, and a wrong proved size remain errors.
+The target object already carries the semantic identity; candidate and target therefore
+compare without relying on compiler counters.
 The focused and hard relocation audits follow these normalized identities, so the generated
 functions receive the same relocation checks as ordinary named functions.
