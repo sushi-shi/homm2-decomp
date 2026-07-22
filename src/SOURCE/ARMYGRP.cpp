@@ -225,13 +225,13 @@ i32 armyGroup::Add(
 
 VA(0x0048c75d, 0x75)
 void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
-    CreatureType temporaryCreature = m_creatureTypes[slot];
+    i32 temporary = m_creatureTypes[slot];
     m_creatureTypes[slot] = otherGroup->m_creatureTypes[otherSlot];
-    otherGroup->m_creatureTypes[otherSlot] = temporaryCreature;
+    otherGroup->m_creatureTypes[otherSlot] = temporary;
 
-    i32 temporaryCount = m_creatureCounts[slot];
+    temporary = m_creatureCounts[slot];
     m_creatureCounts[slot] = otherGroup->m_creatureCounts[otherSlot];
-    otherGroup->m_creatureCounts[otherSlot] = temporaryCount;
+    otherGroup->m_creatureCounts[otherSlot] = temporary;
 }
 
 VA(0x0048c7d2, 0x14d)
