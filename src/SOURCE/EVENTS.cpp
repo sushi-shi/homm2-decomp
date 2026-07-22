@@ -5827,65 +5827,60 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
     i32 sourceArtifactSlot;
 
-    if (sourceHero != NULL) {
-        if (destinationHero == NULL) {
-        } else {
-            for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
-                if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
-                    for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
-                         sourceArtifactSlot++) {
-                        if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
-                            && sourceHero->m_artifacts[sourceArtifactSlot]
-                                   != ARTIFACT_MAGIC_BOOK) {
-                            if (sourceHero->m_artifacts[sourceArtifactSlot]
-                                <= ARTIFACT_ULTIMATE_WAND) {
-                                if (gbThisNetHumanPlayer[sourceHero->m_owner]
-                                    || gbThisNetHumanPlayer[destinationHero->m_owner]) {
-                                    sprintf(
-                                        gText,
-                                        "As you reach for the %s, it mysteriously disappears.",
-                                        gArtifactNames
-                                            [IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
-                                    );
-                                    NormalDialog(
-                                        gText,
-                                        NORMAL_DIALOG_INFO,
-                                        -1,
-                                        -1,
-                                        NORMAL_DIALOG_ARTIFACT,
-                                        IDX(sourceHero->m_artifacts[sourceArtifactSlot]),
-                                        -1,
-                                        0,
-                                        -1,
-                                        0
-                                    );
-                                }
-                            } else {
-                                GiveTakeArtifactStat(
-                                    destinationHero,
-                                    sourceHero->m_artifacts[sourceArtifactSlot],
-                                    false
-                                );
-                                destinationHero->m_artifacts[targetSlot] =
-                                    sourceHero->m_artifacts[sourceArtifactSlot];
-                                destinationHero->m_artifactExtra[targetSlot] =
-                                    sourceHero->m_artifactExtra[sourceArtifactSlot];
-                            }
-                            GiveTakeArtifactStat(
-                                sourceHero,
-                                sourceHero->m_artifacts[sourceArtifactSlot],
-                                true
+    if (sourceHero == NULL || destinationHero == NULL) {
+        return;
+    }
+    for (targetSlot = 0; targetSlot < EVENT_ARTIFACT_SLOT_COUNT; targetSlot++) {
+        if (destinationHero->m_artifacts[targetSlot] == ARTIFACT_NONE) {
+            for (sourceArtifactSlot = 0; sourceArtifactSlot < EVENT_ARTIFACT_SLOT_COUNT;
+                 sourceArtifactSlot++) {
+                if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
+                    && sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
+                    if (sourceHero->m_artifacts[sourceArtifactSlot] <= ARTIFACT_ULTIMATE_WAND) {
+                        if (gbThisNetHumanPlayer[sourceHero->m_owner]
+                            || gbThisNetHumanPlayer[destinationHero->m_owner]) {
+                            sprintf(
+                                gText,
+                                "As you reach for the %s, it mysteriously disappears.",
+                                gArtifactNames[IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
-                            sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
-                            sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
-                            break;
+                            NormalDialog(
+                                gText,
+                                NORMAL_DIALOG_INFO,
+                                -1,
+                                -1,
+                                NORMAL_DIALOG_ARTIFACT,
+                                IDX(sourceHero->m_artifacts[sourceArtifactSlot]),
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                         }
+                    } else {
+                        GiveTakeArtifactStat(
+                            destinationHero,
+                            sourceHero->m_artifacts[sourceArtifactSlot],
+                            false
+                        );
+                        destinationHero->m_artifacts[targetSlot] =
+                            sourceHero->m_artifacts[sourceArtifactSlot];
+                        destinationHero->m_artifactExtra[targetSlot] =
+                            sourceHero->m_artifactExtra[sourceArtifactSlot];
                     }
+                    GiveTakeArtifactStat(
+                        sourceHero,
+                        sourceHero->m_artifacts[sourceArtifactSlot],
+                        true
+                    );
+                    sourceHero->m_artifacts[sourceArtifactSlot] = ARTIFACT_NONE;
+                    sourceHero->m_artifactExtra[sourceArtifactSlot] = IDX(ARTIFACT_NONE);
+                    break;
                 }
             }
-            destinationHero->CheckAnduranPieces(0);
         }
     }
+    destinationHero->CheckAnduranPieces(0);
 }
 
 VA(0x004b1b50, 0x7f)
