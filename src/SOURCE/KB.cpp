@@ -4275,8 +4275,8 @@ H2_ENUM_END(PlayerExitLocalConstant)
 
 VA(0x004a02c5, 0xaa)
 void HandleRemoteSuddenExit(void) {
-    i32 destination;
     SPlayerExit exitInfo;
+    i32 destination;
     if (!gbGameInitialized)
         return;
     if (!gbRemoteOn)
