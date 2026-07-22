@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Canonicalize delinked interior-data relocations using exact paired sites.
+"""Canonicalize delinked public-data relocation owners using paired sites.
 
 The synthetic PDB has to name every absolute relocation target so the delinker
 can represent it in COFF.  Unnamed fields therefore become ``const_<RVA>``
@@ -8,21 +8,21 @@ owner symbol plus a field offset.  Objdiff's ``data_value`` relocation mode
 correctly treats those spellings as different.
 
 This pass uses the current candidate only as site-specific proof of an
-equivalent spelling.  A relocation is rewritten when:
+equivalent spelling. A relocation is rewritten when:
 
-* the function is byte-exact under objdiff's relocation-masked report;
-* both sides have a DIR32 relocation at the same function-relative site;
+* both sides name the same function and have a DIR32 relocation at the same
+  function-relative site;
 * the candidate names a CodeView public data symbol; and
 * ``public owner RVA + candidate addend == retail PE target RVA`` exactly.
 
 A wrong candidate offset cannot authorize a rewrite and remains visible to
-strict objdiff.  Input and output trees must differ: callers regenerate the
-output from an immutable raw delink tree on every pass.
+strict objdiff. The disposable target receives a separate undefined COFF symbol
+for each proven owner, so a synthetic nearest-public symbol shared by unrelated
+relocations is never renamed globally. Input and output paths must differ.
 """
 
 import argparse
 import csv
-import json
 import shutil
 import struct
 from collections import defaultdict
@@ -66,7 +66,7 @@ class Relocation(NamedTuple):
 
 @dataclass
 class Coverage:
-    exact_functions: int = 0
+    functions: int = 0
     paired_functions: int = 0
     base_sites: int = 0
     same_site_same_type: int = 0
@@ -102,7 +102,7 @@ class CoffFile:
         self.symbols = self._read_symbols()
         self.relocations = self._read_relocations()
         self._string_offsets = self._read_string_offsets()
-        self._renames = {}
+        self._new_symbols = {}
 
     def _read_sections(self, first):
         sections = []
@@ -178,32 +178,41 @@ class CoffFile:
         symbol = self.symbols.get(reloc.symbol_index)
         if symbol is None or symbol.name != expected_symbol:
             return False
-        previous = self._renames.get(symbol.index)
-        if previous is not None and previous != new_symbol:
-            return False
         section = self.sections[function.section - 1]
         if absolute_site + 4 > section.raw_size:
             return False
+        new_index = self._new_symbols.setdefault(
+            new_symbol, self.symbol_count + len(self._new_symbols))
+        struct.pack_into("<I", self.data, reloc.offset + 4, new_index)
         struct.pack_into("<I", self.data,
                          section.raw_offset + absolute_site, addend & 0xFFFFFFFF)
-        self._renames[symbol.index] = new_symbol
         return True
 
     def finish(self):
-        for symbol_index, name in sorted(self._renames.items()):
-            symbol = self.symbols[symbol_index]
+        if not self._new_symbols:
+            self.path.write_bytes(self.data)
+            return
+        string_table = bytearray(
+            self.data[self.string_offset:self.string_offset + self.string_size])
+        records = bytearray()
+        for name, _symbol_index in sorted(
+                self._new_symbols.items(), key=lambda item: item[1]):
             encoded = name.encode("latin-1")
             if len(encoded) <= 8:
-                self.data[symbol.offset:symbol.offset + 8] = encoded.ljust(8, b"\0")
-                continue
-            string_offset = self._string_offsets.get(encoded)
-            if string_offset is None:
-                string_offset = self.string_size
-                self._string_offsets[encoded] = string_offset
-                self.data.extend(encoded + b"\0")
-                self.string_size += len(encoded) + 1
-            struct.pack_into("<II", self.data, symbol.offset, 0, string_offset)
-        struct.pack_into("<I", self.data, self.string_offset, self.string_size)
+                name_field = encoded.ljust(8, b"\0")
+            else:
+                string_offset = self._string_offsets.get(encoded)
+                if string_offset is None:
+                    string_offset = len(string_table)
+                    self._string_offsets[encoded] = string_offset
+                    string_table.extend(encoded + b"\0")
+                name_field = struct.pack("<II", 0, string_offset)
+            records.extend(name_field)
+            records.extend(struct.pack("<IhHBB", 0, 0, 0, 2, 0))
+        struct.pack_into("<I", string_table, 0, len(string_table))
+        self.data = (self.data[:self.string_offset] + records + string_table)
+        struct.pack_into("<I", self.data, 12,
+                         self.symbol_count + len(self._new_symbols))
         self.path.write_bytes(self.data)
 
 
@@ -233,15 +242,11 @@ def authorize_owner_alias(public_data, base_type, base_symbol, base_addend,
     return base_symbol
 
 
-def exact_functions(report_path):
-    report = json.loads(Path(report_path).read_text())
-    return {
-        unit["name"]: {
-            function["name"] for function in unit.get("functions", [])
-            if function.get("fuzzy_match_percent") == 100.0
-        }
-        for unit in report["units"]
-    }
+def function_inventory(function_rvas):
+    result = defaultdict(set)
+    for unit, name in function_rvas:
+        result[unit].add(name)
+    return result
 
 
 def _has_duplicate_name(duplicates, relocation):
@@ -281,7 +286,7 @@ def canonicalize_unit(unit, names, public_data, function_rvas, symbols, data,
     patched_functions = set()
     patched_aliases = set()
     patched_sites = 0
-    coverage = Coverage(exact_functions=len(names))
+    coverage = Coverage(functions=len(names))
     for name in sorted(names):
         if (name not in base_sites or name not in target_sites or
                 name not in target_functions or
@@ -326,9 +331,40 @@ def main(argv=None):
     parser.add_argument("--base-dir", default="build/objdiff/base")
     parser.add_argument("--target-dir", default="build/delink")
     parser.add_argument("--output-dir", default="build/delink-paired")
-    parser.add_argument("--report", default="build/objdiff/report.json")
     parser.add_argument("--symbols", default="build/gen/symbol_names.csv")
+    parser.add_argument("--unit")
+    parser.add_argument("--base")
+    parser.add_argument("--target")
+    parser.add_argument("--output")
     args = parser.parse_args(argv)
+    single_paths = (args.base, args.target, args.output)
+    if args.unit or any(single_paths):
+        if not args.unit or not all(single_paths):
+            parser.error("--unit, --base, --target, and --output must be used together")
+        output = Path(args.output)
+        if Path(args.target).resolve() == output.resolve():
+            parser.error("--target and --output must differ")
+        output.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(args.target, output)
+        public_data, function_rvas = load_retail_symbols(args.symbols)
+        symbols, data, duplicates = load_symbols()
+        names = function_inventory(function_rvas).get(args.unit, set())
+        functions, aliases, sites, coverage = canonicalize_unit(
+            args.unit, names, public_data, function_rvas, symbols, data,
+            duplicates, Path(args.base), output)
+        print("canonicalized %d relocation sites (%d aliases, %d functions)" %
+              (sites, aliases, functions))
+        print("coverage: functions=%d paired_functions=%d base_sites=%d "
+              "same_site_same_type=%d missing_target_site=%d type_mismatch=%d "
+              "unresolved_base=%d unresolved_target=%d "
+              "duplicate_string_ambiguity=%d unknown_compiler_local=%d" % (
+                  coverage.functions, coverage.paired_functions,
+                  coverage.base_sites, coverage.same_site_same_type,
+                  coverage.missing_target_site, coverage.type_mismatch,
+                  coverage.unresolved_base, coverage.unresolved_target,
+                  coverage.duplicate_string_ambiguity,
+                  coverage.unknown_compiler_local))
+        return 0
     base_dir = Path(args.base_dir)
     target_dir = Path(args.target_dir)
     output_dir = Path(args.output_dir)
@@ -345,11 +381,11 @@ def main(argv=None):
 
     public_data, function_rvas = load_retail_symbols(args.symbols)
     symbols, data, duplicates = load_symbols()
-    exact = exact_functions(args.report)
+    inventory = function_inventory(function_rvas)
     function_count = alias_count = site_count = 0
     unit_count = 0
     coverage = Coverage()
-    for unit, names in sorted(exact.items()):
+    for unit, names in sorted(inventory.items()):
         base_path = base_dir / (unit + ".obj")
         target_path = output_dir / (unit + ".c.obj")
         if not names or not base_path.exists() or not target_path.exists():
@@ -363,13 +399,13 @@ def main(argv=None):
             function_count += functions
             alias_count += aliases
             site_count += sites
-    print("canonicalized %d relocation sites (%d aliases, %d exact functions, %d units)" %
+    print("canonicalized %d relocation sites (%d aliases, %d functions, %d units)" %
           (site_count, alias_count, function_count, unit_count))
-    print("coverage: exact_functions=%d paired_functions=%d base_sites=%d "
+    print("coverage: functions=%d paired_functions=%d base_sites=%d "
           "same_site_same_type=%d missing_target_site=%d type_mismatch=%d "
           "unresolved_base=%d unresolved_target=%d duplicate_string_ambiguity=%d "
           "unknown_compiler_local=%d" % (
-              coverage.exact_functions, coverage.paired_functions,
+              coverage.functions, coverage.paired_functions,
               coverage.base_sites, coverage.same_site_same_type,
               coverage.missing_target_site, coverage.type_mismatch,
               coverage.unresolved_base, coverage.unresolved_target,

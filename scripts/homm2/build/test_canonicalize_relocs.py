@@ -1,7 +1,12 @@
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from homm2.build.canonicalize_relocs import (
-    Coverage, authorize_owner_alias, record_site_coverage,
+    CoffFile, Coverage, authorize_owner_alias, record_site_coverage,
+)
+from homm2.build.test_canonicalize_data_symbols import (
+    DIR32, TEXT, SectionSpec, make_coff,
 )
 
 
@@ -60,6 +65,38 @@ class CoverageTest(unittest.TestCase):
         self.assertEqual(coverage.unresolved_base, 1)
         self.assertEqual(coverage.unresolved_target, 0)
         self.assertEqual(coverage.unknown_compiler_local, 1)
+
+
+class CoffOwnerRewriteTest(unittest.TestCase):
+    def test_shared_synthetic_owner_is_not_renamed_globally(self):
+        obj = make_coff([SectionSpec(
+            ".text", bytes(8), TEXT,
+            ((0, 1, DIR32), (4, 1, DIR32)),
+        )], [
+            ("function", 0, 1, 0x20, 2),
+            ("synthetic_owner", 0, 0, 0, 2),
+        ])
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "test.obj"
+            path.write_bytes(obj)
+            coff = CoffFile(path)
+            function = coff.unique_text_functions()["function"]
+
+            self.assertTrue(coff.patch_dir32(
+                function, 0, "synthetic_owner", "public_owner_one", 0))
+            self.assertTrue(coff.patch_dir32(
+                function, 4, "synthetic_owner", "public_owner_two", 4))
+            coff.finish()
+
+            parsed = CoffFile(path)
+            relocation_names = [
+                parsed.symbols[relocation.symbol_index].name
+                for relocation in parsed.relocations.values()
+            ]
+            self.assertEqual(
+                relocation_names, ["public_owner_one", "public_owner_two"])
+            self.assertIn(
+                "synthetic_owner", {symbol.name for symbol in parsed.symbols.values()})
 
 
 if __name__ == "__main__":
