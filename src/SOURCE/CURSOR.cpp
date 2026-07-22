@@ -1563,8 +1563,8 @@ void SendMapChange(
     change.player = static_cast<i8>(player);
     // The two bytes are a tagged payload; movement packets interpret them as
     // direction and stop-after-move, while other packet types currently send zeroes.
-    change.wire.direction = static_cast<i8>(direction);
     change.wire.stopAfterMove = static_cast<i8>(stopAfterMove);
+    change.wire.direction = static_cast<i8>(direction);
     change.sequence = giMapChangeCtr;
     ++giMapChangeCtr;
     memmove(

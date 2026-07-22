@@ -682,7 +682,7 @@ SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	2e37
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	56b74033ef11
 SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	99.2439	c9087bc3e620
 SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	100.0000	3c3e0517398e
-SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	99.9535	9f91c354e2df
+SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	0994e484a5f3
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	9cc5b7e4f21f
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	5647da2ccbb5
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fe9be41b7595
