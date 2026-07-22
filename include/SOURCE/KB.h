@@ -6,6 +6,8 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
+H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
+
 struct SAMPLE2;
 struct SSpellInfo;
 struct SWinSetup;
@@ -650,7 +652,7 @@ extern void* hmnuAdv;
 extern void* hmnuCmbt;
 extern void* hmnuDflt;
 extern void* hmnuTown;
-extern i32 iCDRomErr;
+extern H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr;
 extern i32 iMaxMapExtra;
 extern i32 iNextShingleAnim;
 extern i32 iShingleAnimFrame;

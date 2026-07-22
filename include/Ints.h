@@ -31,6 +31,7 @@ typedef i8 b8;
     }                                                                                              \
     name;
 #define H2_ENUM_CLASS_BEGIN(name) enum class name : i32 {
+#define H2_ENUM_CLASS_FORWARD(name) enum class name : i32
 #define H2_ENUM_CLASS_END(name)                                                                    \
     }                                                                                              \
     ;                                                                                              \
@@ -221,6 +222,7 @@ constexpr i32 H2EnumIndex(Value value) {
     ;                                                                                              \
     typedef i32 name;
 #define H2_ENUM_CLASS_BEGIN(name) enum {
+#define H2_ENUM_CLASS_FORWARD(name) typedef i32 name
 #define H2_ENUM_CLASS_END(name)                                                                    \
     }                                                                                              \
     ;                                                                                              \
