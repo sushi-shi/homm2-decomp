@@ -12,7 +12,7 @@ RVA, or paired-object information. `objdiff.json` points at the normalized
 copies. Compilation, linking, disassembly, and hard gates continue to use the
 original objects in `build/objdiff/base/` and `build/delink/`.
 
-## Public relocation owners
+## Paired relocation identities
 
 The synthetic delink target can spell a relocation as the nearest known public
 symbol plus an addend even when the retail address has another exact public
@@ -27,6 +27,14 @@ candidate addend equals the raw retail operand address exactly. It then adds a
 separate undefined COFF symbol and redirects only that relocation. It never
 renames a shared target symbol globally, and it does not require a prior match
 score to authorize the address proof.
+
+The same pass handles `REL32` aliases such as retail `_open` versus candidate
+`__open`. It rewrites only when both names resolve to one unique public RVA and
+the encoded COFF addends are equal. The raw linker inputs retain their original
+names; only the disposable comparison target receives the candidate spelling.
+Thus neither a compiler-private counter nor an alternate external alias is
+itself matching evidence: resolved identity, addend, payload, occurrence, and
+topology are the evidence.
 
 Anonymous definitions use these forms:
 
