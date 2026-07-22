@@ -236,7 +236,7 @@ BASE/Misc	?PrintMemoryLeaks@@YIXXZ	96.0439	9c12d64b4782
 BASE/Misc	?ProcessAssert@@YIXHPADH@Z	100.0000	77afd930b77f
 BASE/Misc	?Random@@YIHHH@Z	100.0000	d928b4abff55
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	85feb0fdc330
-BASE/Misc	?ReadPrefsFromFile@@YIXXZ	99.9515	cbcc23329c1d
+BASE/Misc	?ReadPrefsFromFile@@YIXXZ	100.0000	b763f536a5a4
 BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	100.0000	c749a46347f2
 BASE/Misc	?SGenRand@@YIHXZ	90.4091	3fcf21237aa1
 BASE/Misc	?SIncRandomize@@YIXHH@Z	100.0000	a088c6532cdd
