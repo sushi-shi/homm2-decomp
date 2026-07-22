@@ -1323,7 +1323,7 @@ SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	ecb91422c9ad
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.9394	b7b109f820f8
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	86558c3cb0e1
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	98.3772	5751f5f9a186
-SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	99.7778	0a039ddc2282
+SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	100.0000	b5cef3365f19
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	97.6573	44de7e60443d
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	1bf8cf1b8845
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	99.7059	3adaceec0542
