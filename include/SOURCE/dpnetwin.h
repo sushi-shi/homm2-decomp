@@ -30,6 +30,30 @@ struct DirectPlayStartupMessage {
     u8 netPosition;
     i32 playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 };
+
+H2_ENUM_CLASS_BEGIN(DirectPlayHostAcceptStatus)
+    HOST_ACCEPT_PENDING  = 0,
+    HOST_ACCEPT_ACCEPTED = 1,
+    HOST_ACCEPT_REJECTED = 2
+H2_ENUM_CLASS_END(DirectPlayHostAcceptStatus)
+
+H2_ENUM_CLASS_BEGIN(DirectPlayFirstGuestState)
+    FIRST_GUEST_CREATE_SESSION      = 0,
+    FIRST_GUEST_DISABLE_COMPRESSION = 1,
+    FIRST_GUEST_CREATE_PLAYER       = 2,
+    FIRST_GUEST_WAIT_FOR_PLAYER     = 3
+H2_ENUM_CLASS_END(DirectPlayFirstGuestState)
+H2_ENUM_STEPPED(DirectPlayFirstGuestState)
+
+H2_ENUM_CLASS_BEGIN(DirectPlayHostState)
+    HOST_ENUMERATE_SESSIONS = 0,
+    HOST_JOIN_SESSION       = 1,
+    HOST_CREATE_PLAYER      = 2,
+    HOST_ANNOUNCE_PLAYER    = 3,
+    HOST_WAIT_FOR_ACCEPT    = 4,
+    HOST_WAIT_FOR_STARTUP   = 5
+H2_ENUM_CLASS_END(DirectPlayHostState)
+H2_ENUM_STEPPED(DirectPlayHostState)
 #pragma pack(pop)
 SIZE(DirectPlayStartupMessage, 0x1a);
 
@@ -61,8 +85,8 @@ extern u8** ppDPRcvBuffer;
 extern i32* piDPRcvBufferSize;
 extern i32 bStartUpInfoReceived;
 extern HMODULE hinstDplayx;
-extern i32 iDPWaitForFirstGuestStatus;
-extern i32 iDPWaitForHostStatus;
+extern H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32) iDPWaitForFirstGuestStatus;
+extern H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus;
 extern i32 iWaitForHostWaitCount;
 extern i32 iEnumCount;
 extern i32 iLastHereIAmTickCount;
@@ -70,7 +94,7 @@ extern i32 bInDPSD;
 extern i32 iGUIDCount;
 extern i32 iLastMsgNumHumanPlayers;
 extern i32 iMaxSession;
-extern i32 giHostAcceptStatus;
+extern H2_ENUM_STORAGE(DirectPlayHostAcceptStatus, i32) giHostAcceptStatus;
 extern struct _GUID* g_lpGuid;
 extern i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 extern i32 iSessionToTry;

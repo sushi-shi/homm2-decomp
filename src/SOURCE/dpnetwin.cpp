@@ -32,28 +32,6 @@ H2_ENUM_BEGIN(DirectPlayStorageConstant)
     STATUS_TEXT_SIZE               = 32
 H2_ENUM_END(DirectPlayStorageConstant)
 
-H2_ENUM_BEGIN(DirectPlayHostAcceptStatus)
-    HOST_ACCEPT_PENDING  = 0,
-    HOST_ACCEPT_ACCEPTED = 1,
-    HOST_ACCEPT_REJECTED = 2
-H2_ENUM_END(DirectPlayHostAcceptStatus)
-
-H2_ENUM_BEGIN(DirectPlayFirstGuestState)
-    FIRST_GUEST_CREATE_SESSION      = 0,
-    FIRST_GUEST_DISABLE_COMPRESSION = 1,
-    FIRST_GUEST_CREATE_PLAYER       = 2,
-    FIRST_GUEST_WAIT_FOR_PLAYER     = 3
-H2_ENUM_END(DirectPlayFirstGuestState)
-
-H2_ENUM_BEGIN(DirectPlayHostState)
-    HOST_ENUMERATE_SESSIONS = 0,
-    HOST_JOIN_SESSION       = 1,
-    HOST_CREATE_PLAYER      = 2,
-    HOST_ANNOUNCE_PLAYER    = 3,
-    HOST_WAIT_FOR_ACCEPT    = 4,
-    HOST_WAIT_FOR_STARTUP   = 5
-H2_ENUM_END(DirectPlayHostState)
-
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
 VA(0x0041eda0, 0x95)
@@ -675,8 +653,11 @@ DATA(0x004ef7e4) u8** ppDPRcvBuffer = NULL;
 DATA(0x004ef7e8) i32* piDPRcvBufferSize = NULL;
 DATA(0x004ef7ec) i32 bStartUpInfoReceived = 0;
 DATA(0x004ef7f0) HMODULE hinstDplayx = NULL;
-DATA(0x004ef7f4) i32 iDPWaitForFirstGuestStatus = 0;
-DATA(0x004ef7f8) i32 iDPWaitForHostStatus = 0;
+DATA(0x004ef7f4)
+H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
+iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
+DATA(0x004ef7f8)
+H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
 DATA(0x004ef7fc) i32 iWaitForHostWaitCount = 0;
 DATA(0x004ef800) i32 iEnumCount = 0;
 DATA(0x004ef804) i32 iLastHereIAmTickCount = 0;
@@ -684,7 +665,7 @@ DATA(0x004ef808) i32 bInDPSD = 0;
 DATA(0x004ef80c) i32 iGUIDCount = 0;
 DATA(0x004ef810) i32 iLastMsgNumHumanPlayers = 1;
 DATA(0x00525060) i32 iMaxSession;
-DATA(0x00525064) i32 giHostAcceptStatus;
+DATA(0x00525064) H2_ENUM_STORAGE(DirectPlayHostAcceptStatus, i32) giHostAcceptStatus;
 DATA(0x00525068) struct _GUID* g_lpGuid;
 DATA(0x00525070) i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 DATA(0x00525088) i32 iSessionToTry;
