@@ -1,18 +1,18 @@
-# Archived controlled MSVC 4.2 TU-state noise search
+# Controlled MSVC 4.2 TU-state noise search
 
 MSVC 4.2 can change a later function's allocation/evaluation choices after parsing an
 otherwise irrelevant earlier source surface. This makes a bounded TU-state probe useful
 after a function is semantically and structurally complete but remains at a compiler-shape
 wall. It does **not** make arbitrary dummy C++ declarations acceptable reconstructed source.
 
-The retired implementation is preserved as `scripts/archive/tu_state_noise.py` for historical
-reproduction. It was used only after the target's semantics,
-types/layout, frame/slots, CFG, inline boundaries, and external relocations have been audited.
-Before starting, check the function's `@match-note` and target-specific matrix so an unchanged
-state tuple is not searched twice.
+The active implementation is `scripts/tu_state_noise.py`. Use it only after the target's
+semantics, types/layout, frame/slots, CFG, inline boundaries, and external relocations have
+been audited. Prefer this disposable search to adding a persistent `OD_STEER` solely to
+select one unstable compiler state. Before starting, check the external residual queue and
+target-specific matrix so an unchanged state tuple is not searched twice.
 
 ```sh
-python3 scripts/archive/tu_state_noise.py \
+python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
@@ -23,9 +23,15 @@ continues with the next variant. A baseline timeout fails closed. The end-of-run
 summary and successful manifest separately report compile, target-integrity, objdiff,
 COFF-metric, and regression-gate costs.
 
-The default is diagnostic-only. Add `--record-max` only when asking the tool to close an unchanged
-target at exact 100.0000%. It never retains a sub-100 improvement. Generated probe text is never
-retained in reconstructed source, even when it produces 100%.
+The default is diagnostic-only. Add `--record-max` only when asking the tool to close an
+unchanged target at exact 100.0000%. It never retains a sub-100 improvement. Generated probe
+text is never retained in reconstructed source, even when it produces 100%.
+
+An accepted closure contributes to the hash-scoped `functions exact-max` and `fuzzy-max`
+metrics. It does not contribute to live `functions exact` or `fuzzy`: those continue to
+describe the canonical source under the canonical TU state. This separation makes compiler
+instability measurable without pretending that the disposable declarations are reconstructed
+program content.
 
 Use `--dry-run` only to inspect generated input without compiling or matching. It is explicitly a
 non-matching diagnostic and intentionally retains snippets. Normal compiled mode instead builds in
@@ -129,6 +135,6 @@ not cite them as a retained maximum or commit them as durable evidence; compiled
 at clean exit. Preserve the successful exact-100 manifest as the reproducible closure audit; it
 contains the seed and complete probe body regardless of whether `--record-max` was requested.
 
-Related: [msvc42-tu-declaration-state.md](../patterns/msvc42-tu-declaration-state.md),
-[o2-tu-cumulative-register-steering.md](../patterns/o2-tu-cumulative-register-steering.md), and
-[tu-cumulative-eval-order.md](../patterns/tu-cumulative-eval-order.md).
+Related: [msvc42-tu-declaration-state.md](patterns/msvc42-tu-declaration-state.md),
+[o2-tu-cumulative-register-steering.md](patterns/o2-tu-cumulative-register-steering.md), and
+[tu-cumulative-eval-order.md](patterns/tu-cumulative-eval-order.md).

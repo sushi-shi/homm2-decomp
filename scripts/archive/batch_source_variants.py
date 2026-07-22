@@ -52,6 +52,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
 from tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,

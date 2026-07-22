@@ -27,6 +27,8 @@ one-run progress summaries belong under `build/`, not here.
 
 - `build-asserts.md`, `od-stack-layout.md`, `jump-tables.md`, and `patterns/` are reusable
   matching references.
+- `msvc42-tu-state-noise-search.md` defines the controlled disposable compiler-state probe
+  and its exact-only contribution to retained maximum metrics.
 - `config/match_baseline.tsv` is the observation-only score ledger. It preserves a
   per-function maximum for the current normalized source hash, but has no ratchet or
   acceptance role.

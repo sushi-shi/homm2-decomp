@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Archived parser-visible TU-state experiment engine.
+"""Controlled parser-visible TU-state experiment engine.
 
-This remains the standalone diagnostic/record-max compatibility engine. New combined
-searches should use ``scripts/match_variants.py``, which imports these state families and
-crosses them with libclang mutations and hand-authored axes. It does not rewrite the target. Each
-trial temporarily inserts deterministic parser-visible declarations, definitions, or
+This standalone diagnostic does not rewrite the target. Each trial temporarily inserts
+deterministic parser-visible declarations, definitions, or
 curated includes before the target's ``VA`` metadata block, compiles the real translation
 unit with VC 4.2, scores the requested symbol with objdiff, and restores the source
 immediately.  Probe-emitted symbols/storage exist only in the disposable candidate object.
@@ -21,8 +19,8 @@ Run inside ``nix develop .#build`` after entering the worktree first::
       --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40
 
 This is appropriate only after semantics, frame/slots, CFG, and external relocations
-have already been audited.  It is not a substitute for reconstruction, od_slots.py,
-or scripts/match_variants.py.
+have already been audited. It is not a substitute for reconstruction, od_slots.py,
+or a bounded source-variant search.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-# Tests for the archived TU-state experiment engine.
+# Tests for the controlled TU-state experiment engine.
 from __future__ import annotations
 
 import importlib.util
