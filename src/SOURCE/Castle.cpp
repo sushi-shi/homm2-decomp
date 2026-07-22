@@ -426,8 +426,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     i32 result;
     i16 textControl;
     i32 quickFlag;
-    BuildingSlotType selectedBuilding;
-    i32 formationControl;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) selectedBuilding;
     i32 loopIndex;
     i32 cannotRecruitHero;
     i32 hoverMessage;
@@ -435,7 +434,6 @@ MessageDispatchResult CastleHandler(tag_message& message) {
 
     textControl = IDX(CONTROL_STATUS_TEXT);
     selectedBuilding = BUILDING_SLOT_NONE;
-    formationControl = 0;
     result = 0;
     hoverMessage = 0;
 
@@ -447,41 +445,40 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
             selectedBuilding = CASTLE_CAPTAIN;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
-            formationControl = CONTROL_CAPTAIN_FORMATION_GROUPED;
+            selectedBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED);
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
-            formationControl = CONTROL_CAPTAIN_FORMATION_SPREAD;
+            selectedBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD);
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
                        < CONTROL_BUILDING_NAME_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                selectedBuilding = castleSlotsUse
-                    [message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST];
+                selectedBuilding = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_ICON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_ICON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                selectedBuilding = castleSlotsUse
-                    [message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST];
+                selectedBuilding = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_BUTTON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                selectedBuilding = castleSlotsUse
-                    [message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST];
+                selectedBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
+            if (selectedBuilding != BUILDING_SLOT_NONE)
+                selectedBuilding = castleSlotsUse[IDX(selectedBuilding)];
         }
     }
 
     if (hoverMessage) {
-        if (message.payload.widget.id == gpTownManager->m_lastHoverId)
+        if (gpTownManager->m_lastHoverId == message.payload.widget.id)
             return MESSAGE_DISPATCH_CONSUME;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
-        if (formationControl == CONTROL_CAPTAIN_FORMATION_GROUPED) {
-            sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
-            goto hover_text_ready;
-        }
-        if (formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD) {
-            sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
-            goto hover_text_ready;
-        }
         switch (selectedBuilding) {
+
+            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+                sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
+                goto hover_text_ready;
+
+            case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+                sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
+                goto hover_text_ready;
 
             case TOWN_OBJECT_MAGE_GUILD:
                 if (!(gpTownManager->m_buildableBuildings & BIT(selectedBuilding))) {
@@ -645,9 +642,10 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
                 quickFlag = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) != 0;
-                if (formationControl != 0) {
-                    if (quickFlag) {
-                        if (formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD)
+                switch (selectedBuilding) {
+
+                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
+                        if (quickFlag) {
                             NormalDialog(
                                 "{Spread Formation}\n\n'Spread' combat formation spreads your "
                                 "armies from the top to the bottom of the battlefield, with at "
@@ -662,7 +660,15 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                        else
+                        } else {
+                            gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
+                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
+                            gpTownManager->m_heroWindow0->DrawWindow();
+                        }
+                        break;
+
+                    case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
+                        if (quickFlag) {
                             NormalDialog(
                                 "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
                                 "army together in the center of your side of the battlefield.",
@@ -676,17 +682,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                    } else {
-                        gpTownManager->m_town->m_formation =
-                            formationControl == CONTROL_CAPTAIN_FORMATION_SPREAD
-                                ? TOWN_FORMATION_SPREAD
-                                : TOWN_FORMATION_GROUPED;
-                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                        gpTownManager->m_heroWindow0->DrawWindow();
-                    }
-                    goto selection_done;
-                }
-                switch (selectedBuilding) {
+                        } else {
+                            gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
+                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
+                            gpTownManager->m_heroWindow0->DrawWindow();
+                        }
+                        break;
 
                     case TOWN_OBJECT_MAGE_GUILD:
                         if (quickFlag
