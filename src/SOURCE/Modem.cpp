@@ -114,7 +114,9 @@ i32l Dial(void) {
     sprintf(gText, "%s %s", "Dialing...", numbuf);
     GUIModemCommand(gText, dialCommand);
     sprintf(gText, "%s %s", "Dialing...", numbuf);
-    return GUIModemResponse(gText, "CONNECT") != 0;
+    if (GUIModemResponse(gText, "CONNECT") != 0)
+        return 1;
+    return 0;
 }
 
 VA(0x0040cbdc, 0x54)
