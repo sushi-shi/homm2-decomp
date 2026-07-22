@@ -202,13 +202,12 @@ def main(argv=None):
     argv = list(argv or sys.argv[1:])
     exe = argv[0] if argv else "build/orig/HEROES2W.EXE"
     manifest = argv[1] if len(argv) > 1 else "build/gen/symbol_names.csv"
-    procedures = argv[2] if len(argv) > 2 else "config/delink_procedures.csv"
     library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")
     rejection_path = Path("config/delink_candidate_rejections.csv")
     exclusion_path = Path("config/delink_text_exclusions.csv")
     jump_table_path = Path("build/gen/jump_tables.csv")
-    output_path = Path(argv[3]) if len(argv) > 3 else None
+    output_path = Path(argv[2]) if len(argv) > 2 else None
 
     image_base, text_rva, text = text_section(exe)
     text_end = text_rva + len(text)
@@ -241,13 +240,10 @@ def main(argv=None):
             source_configured[start] = (size, row["name"], row["unit"], provenance)
 
     configured = dict(source_configured)
-    for path, is_fid in ((procedures, False), (library_labels, True)):
-        if not Path(path).exists():
-            continue
-        for row in rows_without_comments(path):
+    if Path(library_labels).exists():
+        for row in rows_without_comments(library_labels):
             rva = int(row["rva"], 16)
-            provenance = ("fid-%s-%s" % (row["library"].lower(), row["source"])
-                          if is_fid else row["provenance"])
+            provenance = "fid-%s-%s" % (row["library"].lower(), row["source"])
             configured[rva] = (int(row["size"], 16), row["name"], row["unit"],
                                provenance)
     rejected = {int(row["rva"], 16): row["reason"]

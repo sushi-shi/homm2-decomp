@@ -1,4 +1,0 @@
-# Reviewed procedure spans that cannot be generated from source annotations or
-# runtime FID. Source static functions carrying VA are added automatically
-# to the synthetic PDB and do not belong here.
-rva,size,name,unit,provenance

@@ -5,12 +5,12 @@ inventory. Their identities come from different evidence and are kept separate.
 
 ## Runtime-library functions
 
-The runtime FID database is `config/library_labels.csv`. All CRT identities live there, not in
-`config/delink_procedures.csv`. `runtime_fid.py` compares each reviewed retail RVA against
-the same-named compiland in the pinned VC 4.0 `LIBCMT.LIB`. It masks only relocation
-operands and accepts exactly one signature identity. A reviewed procedure span can be a
-proved prefix when the library symbol extent continues into embedded data or a separately
-modeled alternate entry. An assembly entry without a standalone COFF symbol is named as
+The runtime FID database is `config/library_labels.csv`. `runtime_fid.py` compares each
+reviewed retail RVA against the same-named compiland in the pinned VC 4.0 `LIBCMT.LIB`.
+It masks only relocation operands and accepts exactly one signature identity. A reviewed
+procedure span can be a proved prefix when the library symbol extent continues into embedded
+data or a separately modeled alternate entry. An assembly entry without a standalone COFF
+symbol is named as
 `$entry_0x<owner-relative-offset>` after the containing library function is proved.
 
 Run `python3 -m homm2.build.runtime_fid --check` to verify the tracked database. A normal
@@ -25,9 +25,7 @@ writes `build/gen/source_private_functions.csv`. `gen_manifest.py` merges those 
 `symbol_names.csv`, so `synth_pdb.py` gives Vostok a procedure record even though the
 linker-public retail NB09 stream necessarily omits it.
 
-`homm2 build` checks this generated private-function inventory for freshness. Such functions
-must not be duplicated in `config/delink_procedures.csv`; that manifest is reserved for
-reviewed spans that cannot be generated from source annotations or runtime FID.
+`homm2 build` checks this generated private-function inventory for freshness.
 
 Ordinary public definitions also carry reviewed `VA(address, size)` spans. CodeView remains
 authoritative for their decorated names and RVAs, but when a source span differs from the

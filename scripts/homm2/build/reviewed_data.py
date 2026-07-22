@@ -470,8 +470,7 @@ def _build_coverage_proposal(allocations):
     except FileNotFoundError:
         pass
     text_result = audit_text_coverage([
-        str(EXE), str(SYMBOLS), str(REPO / "config/delink_procedures.csv"),
-        str(TEXT_COVERAGE_PROPOSAL),
+        str(EXE), str(SYMBOLS), str(TEXT_COVERAGE_PROPOSAL),
     ])
     if text_result:
         diagnostics.append(CoverageDiagnostic(

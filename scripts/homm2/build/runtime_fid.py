@@ -25,7 +25,6 @@ from homm2.build.link_exe import PINNED_VC40_LIBCMT_SHA256
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_ARCHIVE = REPO / "build/toolchain/link300/lib/LIBCMT.LIB"
 DEFAULT_EXE = REPO / "build/orig/HEROES2W.EXE"
-DEFAULT_PROCEDURES = REPO / "config/delink_procedures.csv"
 DEFAULT_LABELS = REPO / "config/library_labels.csv"
 
 IMAGE_SCN_CNT_CODE = 0x00000020
@@ -201,13 +200,6 @@ def _matches(retail: bytes, signature: Signature) -> bool:
         for left, right, mask in zip(retail, signature.payload, signature.mask))
 
 
-def procedure_rows(path: Path) -> list[dict[str, str]]:
-    with path.open(newline="") as stream:
-        rows = csv.DictReader(
-            line for line in stream if not line.lstrip().startswith("#"))
-        return list(rows)
-
-
 def _prefix_matches(retail: bytes, signature: Signature, size: int) -> bool:
     return size <= signature.size and _matches(
         retail[:size], Signature(
@@ -257,14 +249,11 @@ def _interior_match(row, rows, member_signatures, image):
     return candidates[0] if len(candidates) == 1 else None
 
 
-def identify(procedures: Path, archive: Path, exe: Path,
+def identify(archive: Path, exe: Path,
              seeds: list[dict[str, str]] | None = None) -> list[dict[str, str]]:
     candidates = library_signatures(archive)
     image = _pe_image(exe)
-    rows = procedure_rows(procedures)
-    seed_rows = list(seeds or (
-        candidate for candidate in rows if not candidate["name"].strip()))
-    anchor_rows = rows + seed_rows
+    seed_rows = list(seeds or ())
     output = []
     failures = []
     seed_starts = {(int(seed["rva"], 16), seed["unit"])
@@ -285,7 +274,7 @@ def identify(procedures: Path, archive: Path, exe: Path,
             matched = named_matches
         if not matched:
             interior = _interior_match(
-                row, anchor_rows, candidates.get(member, ()), image)
+                row, seed_rows, candidates.get(member, ()), image)
             if interior is not None:
                 name, matched_member = interior
                 output.append({
@@ -371,7 +360,6 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, default=DEFAULT_ARCHIVE)
     parser.add_argument("--exe", type=Path, default=DEFAULT_EXE)
-    parser.add_argument("--procedures", type=Path, default=DEFAULT_PROCEDURES)
     parser.add_argument("--output", type=Path, default=DEFAULT_LABELS)
     parser.add_argument("--seeds", type=Path, default=DEFAULT_LABELS)
     parser.add_argument("--check", action="store_true")
@@ -379,7 +367,7 @@ def main(argv=None):
     seeds = label_seeds(args.seeds)
     if not seeds:
         raise SystemExit("runtime FID requires reviewed RVA/unit seeds: %s" % args.seeds)
-    labels = identify(args.procedures, args.archive, args.exe, seeds)
+    labels = identify(args.archive, args.exe, seeds)
     payload = csv_bytes(labels)
     if args.check:
         if not args.output.exists() or args.output.read_bytes() != payload:
