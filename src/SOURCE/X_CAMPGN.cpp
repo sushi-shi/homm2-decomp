@@ -596,7 +596,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
             InitMap();
             gpAdvManager->m_visibilityMapValid = 0;
-            giBottomViewOverride = 0;
+            giBottomViewOverride = BOTTOM_VIEW_NONE;
             gpWindowManager->FadeScreen(FADE_OUT, CAMPAIGN_DIALOG_FADE_STEPS, gPalette);
             gpAdvManager->SetInitialMapOrigin();
             gpAdvManager->RedrawAdvScreen(1, 0);

@@ -531,7 +531,6 @@ H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
 H2_ENUM_END(AdventureTownQuickViewConstant)
 
 H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
-    BOTTOM_HERO_VIEW_ID                   = 3,
     BOTTOM_HERO_ARMY_SLOTS                = ARMY_GROUP_SLOT_COUNT,
     BOTTOM_HERO_EMPTY_SLOT                = -1,
     BOTTOM_HERO_LABEL_BYTES               = 6,
@@ -736,7 +735,6 @@ H2_ENUM_BEGIN(AdventureVisionsConstant)
 H2_ENUM_END(AdventureVisionsConstant)
 
 H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
-    ENEMY_TURN_VIEW_ID            = 4,
     ENEMY_TURN_BACKGROUND_X       = 480,
     ENEMY_TURN_BACKGROUND_Y       = 392,
     ENEMY_TURN_BACKGROUND_WIDTH   = 143,
@@ -1024,7 +1022,7 @@ advManager::advManager(void) {
 
 VA(0x0045665f, 0x9c9)
 i32 advManager::Open(i32 id) {
-    iCurBottomView = 0;
+    iCurBottomView = BOTTOM_VIEW_NONE;
     m_openState = 0;
     bShowIt = 0;
     m_adventureBorder = NULL;
@@ -1227,7 +1225,7 @@ i32 advManager::Open(i32 id) {
     KBChangeMenu(hmnuAdv);
     ForceNewHover();
     gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, gPalette);
-    giBottomViewOverride = 0;
+    giBottomViewOverride = BOTTOM_VIEW_NONE;
     gConfig.soundVolume = oldSampleVolumeState;
     gpSoundManager->AdjustSoundVolumes();
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
@@ -1307,7 +1305,7 @@ void advManager::Close(void) {
         delete m_visibilityMap;
     }
     m_visibilityMap = NULL;
-    iCurBottomView = 0;
+    iCurBottomView = BOTTOM_VIEW_NONE;
     m_active = false;
 }
 
@@ -5425,7 +5423,7 @@ void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen
         return;
     }
 
-    if (giBottomViewOverride > 0) {
+    if (giBottomViewOverride > BOTTOM_VIEW_NONE) {
         if (KBTickCount() > giBottomViewOverrideEndTime) {
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         } else {
@@ -5504,11 +5502,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 
     updated = 0;
     message.type = ADVMGR_ENEMY_TURN_MESSAGE_TYPE;
-    if (iCurBottomView != ENEMY_TURN_VIEW_ID) {
+    if (iCurBottomView != BOTTOM_VIEW_ENEMY_TURN) {
         updated = 1;
         gbForceUpdate = true;
         ClearBottomView();
-        iCurBottomView = ENEMY_TURN_VIEW_ID;
+        iCurBottomView = BOTTOM_VIEW_ENEMY_TURN;
 
         m_bottomViewBackground = new iconWidget(
             ENEMY_TURN_BACKGROUND_X,
@@ -6015,12 +6013,12 @@ i32 advManager::UpdBottomViewHero(void) {
     i32 labelX;
     i32 creatureBoundsLocal[BOTTOM_HERO_CREATURE_BOUND_COUNT];
 
-    if (!gbForceUpdate && iCurBottomView == BOTTOM_HERO_VIEW_ID) {
+    if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_HERO) {
         return 0;
     }
 
     ClearBottomView();
-    iCurBottomView = BOTTOM_HERO_VIEW_ID;
+    iCurBottomView = BOTTOM_VIEW_HERO;
     targetHero = gpGame->GetHero(gpCurPlayer->CurrentHero());
     occupiedSlotsLocal = 0;
 
@@ -10626,7 +10624,7 @@ DATA(0x004f57b8) i32 iSandAnim = 0;
 DATA(0x004f57bc) i32 giLastHourGlassUpdateTime = 0;
 DATA(0x004f57c0) i32 TrigX = 0;
 DATA(0x004f57c4) i32 TrigY = 0;
-DATA(0x004f57c8) i32 iCurBottomView = 0;
+DATA(0x004f57c8) H2_ENUM_STORAGE(BottomViewMode, i32) iCurBottomView = BOTTOM_VIEW_NONE;
 DATA(0x004f57cc) i32 iCurBottomViewEnemy = -1;
 DATA(0x004f57d0) i32 iCurHourGlassPhase = 0;
 DATA(0x004f57d4) i32 iLastHourGlassPhase = 1;

@@ -10005,7 +10005,7 @@ DATA(0x005290ac) b8 gbRetreatWin;
 DATA(0x005290b0) DialogWaitType giWaitType;
 DATA(0x005290b4) class icon* gCurLoadedSpellIcon;
 DATA(0x005290b8) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
-DATA(0x005290f4) i32 giBottomViewOverride;
+DATA(0x005290f4) H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 DATA(0x005290f8) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x00529110) u8 giSetupGameType;
 DATA(0x00529118) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
