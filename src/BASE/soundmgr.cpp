@@ -103,7 +103,7 @@ void soundManager::CDStop(void) {
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    if (stricmp(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
+    if (strcmpi(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
         wsprintfA(CommandString, "status CD position");
         nMCIError = mciSendStringA(CommandString, position, sizeof(position), NULL);
         if (nMCIError != 0)
@@ -125,7 +125,7 @@ i32 soundManager::CDIsPlaying(void) {
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    return stricmp(lpszReturnString, "playing") == 0;
+    return strcmpi(lpszReturnString, "playing") == 0;
 }
 
 VA(0x004cb970, 0xf3)
