@@ -76,7 +76,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_cursorMapX += directionX_a;
     m_cursorMapY += directionY_a1;
     cellX = m_cursorMapX + m_mapOriginX;
-    cellY = m_cursorMapY + m_mapOriginY;
+    cellY = OD_STEER(m_cursorMapY) + m_mapOriginY;
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
