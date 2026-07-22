@@ -7767,11 +7767,17 @@ void CompressTest2(void) {
 
     dataSize2 = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
     sourceData6 =
-        static_cast<char*>(H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, 8057));
+        static_cast<char*>(
+            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 7)
+        );
     encodedData6 =
-        static_cast<char*>(H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, 8058));
+        static_cast<char*>(
+            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 8)
+        );
     decodedData6 =
-        static_cast<char*>(H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, 8059));
+        static_cast<char*>(
+            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 9)
+        );
     for (index7 = 0; index7 < dataSize2; index7++)
         // Random() is inclusive, so this covers every byte payload value.
         sourceData6[index7] = static_cast<char>(Random(0, 255)); // NOLINT(readability-magic-numbers)
@@ -7780,9 +7786,9 @@ void CompressTest2(void) {
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), dataSize2);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    H2_FREE(sourceData6, 8076);
-    H2_FREE(encodedData6, 8077);
-    H2_FREE(decodedData6, 8078);
+    H2_FREE(sourceData6, gCompressTest2SourceLine + 26);
+    H2_FREE(encodedData6, gCompressTest2SourceLine + 27);
+    H2_FREE(decodedData6, gCompressTest2SourceLine + 28);
 }
 
 VA(0x00486494, 0x1be)
