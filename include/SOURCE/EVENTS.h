@@ -275,19 +275,19 @@ H2_ENUM_BEGIN(MapEventConstant)
     COAST_FIZZLE_HEIGHT                  = 96
 H2_ENUM_END(MapEventConstant)
 
-H2_ENUM_BEGIN(UndeadEventLevel)
+H2_ENUM_CLASS_BEGIN(UndeadEventLevel)
     EVENT_LEVEL_SMALL  = 2,
     EVENT_LEVEL_MEDIUM = 3,
     EVENT_LEVEL_LARGE  = 4,
     EVENT_LEVEL_HUGE   = 5
-H2_ENUM_END(UndeadEventLevel)
+H2_ENUM_CLASS_END(UndeadEventLevel)
 
-H2_ENUM_BEGIN(FlotsamReward)
+H2_ENUM_CLASS_BEGIN(FlotsamReward)
     FLOTSAM_EMPTY          = 0,
     FLOTSAM_WOOD           = 1,
     FLOTSAM_WOOD_AND_GOLD  = 2,
     FLOTSAM_LARGE_TREASURE = 3
-H2_ENUM_END(FlotsamReward)
+H2_ENUM_CLASS_END(FlotsamReward)
 
 H2_ENUM_BEGIN(MonsterInteractionConstant)
     MONSTER_JOIN_FORCED                     = 0x1000,

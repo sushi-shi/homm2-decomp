@@ -716,9 +716,9 @@ SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	8
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	a6747cb7ab84
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	99.0581	0a15e01aa6b6
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1456	9afdaff41bdd
-SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.0408	424d922a08b6
+SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.0089	6963340cd26b
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	97.9523	96fd9411a588
-SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	95.9555	18741dff6d66
+SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	95.9555	23f52ff57304
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	92.7800	b6cf6f8bb437
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	100.0000	4ad2728af490
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	c535299c2379
@@ -728,7 +728,7 @@ SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	52
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	595626a17313
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	92.1260	ff6f5562b903
 SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	96.6994	755846dd200d
-SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	286a817f2e59
+SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	7a710a18d623
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	450575d0ccdb
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	100.0000	70189f16034c
 SOURCE/EVENTS	?GiveRandomArtifact@advManager@@QAEHPAVhero@@@Z	100.0000	3f6a66011cd7
@@ -748,11 +748,11 @@ SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	98.943
 SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	99.0171	0a8fbe4d0e46
 SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	99.9167	7729cdd50c7e
 SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	98.4470	9ed9bba350a9
-SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	ec5cd142dbb6
+SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	af699c5d42f3
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	100.0000	bd4c306312e7
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	656a665cd5c5
 SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9153	3652f43a3da9
-SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	50380686ae96
+SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	7acd29fd2098
 SOURCE/FINDPATH	??0searchArray@@QAE@XZ	83.3333	d5770adbbb3f
 SOURCE/FINDPATH	??1searchArray@@QAE@XZ	92.8571	46073cce9dc0
 SOURCE/FINDPATH	?CalcTerrainCost@@YIHHHHHHH@Z	82.1556	5e91b3c7bba9
@@ -833,7 +833,7 @@ SOURCE/GAME	?ProcessOnMapHeroes@game@@QAEXXZ	99.4598	d7739cd1b8f4
 SOURCE/GAME	?ProcessRandomObjects@game@@QAEXXZ	100.0000	13defe0a53e5
 SOURCE/GAME	?RandomScan@game@@QAEHPACHHHC@Z	100.0000	823cc4914545
 SOURCE/GAME	?RandomizeBarrier@game@@QAEXPAVmapCell@@@Z	100.0000	283318c47dd3
-SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.2054	7cbd26f7acb6
+SOURCE/GAME	?RandomizeEvents@game@@QAEXXZ	98.2054	0e32640ca1a7
 SOURCE/GAME	?RandomizeHeroPool@game@@QAEXXZ	100.0000	551b3d30b6b6
 SOURCE/GAME	?RandomizeMine@game@@QAEXHH@Z	99.1548	5401ca5f6fb8
 SOURCE/GAME	?RandomizePassword@game@@QAEXPAVmapCell@@@Z	100.0000	3a5de17df20b
