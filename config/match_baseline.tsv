@@ -955,7 +955,7 @@ SOURCE/KB	?GetMonsterName@@YIPADH@Z	100.0000	c8ce2f470dae
 SOURCE/KB	?GetTownName@@YIPADH@Z	100.0000	a9667a63e424
 SOURCE/KB	?HandleAppSpecificMenuCommands@@YIHH@Z	68.4209	51c953595cda
 SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	100.0000	782a9174369b
-SOURCE/KB	?HandleRemoteSuddenExit@@YIXXZ	99.8000	11706841dcbd
+SOURCE/KB	?HandleRemoteSuddenExit@@YIXXZ	100.0000	5b160afa3bd7
 SOURCE/KB	?InMapArea@@YIHHH@Z	100.0000	6446a1f5e2bd
 SOURCE/KB	?InitMainClasses@@YIXXZ	100.0000	49c271ace967
 SOURCE/KB	?InitMenuHandler@@YIHAAUtag_message@@@Z	99.6079	cee49c7f8e9e
