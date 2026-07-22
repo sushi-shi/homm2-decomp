@@ -34,9 +34,11 @@ because several distinct objects may share one percentage. Public target identit
 sites/types/addends, and all other spellings remain part of the state. The report also counts the
 raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
 JSON census with one complete reproducible probe body per state while the sub-100 COFF objects
-themselves remain disposable. This summary is diagnostic evidence only: it does not update a
-retained maximum. If one normalized state ever receives multiple fuzzy scores, the census reports
-the complete score set instead of silently choosing one.
+themselves remain disposable. Each state also records the ordered list of every trial that reached
+it, so occurrence populations and representative selection can be reproduced after the temporary
+objects are removed. This summary is diagnostic evidence only: it does not update a retained
+maximum. If one normalized state ever receives multiple fuzzy scores, the census reports the
+complete score set instead of silently choosing one.
 
 Treat normalized state cardinality as a diagnostic metric alongside fuzzy score. Record the total
 number of states, each state's occurrence count, representative trial, function size, text digest,
