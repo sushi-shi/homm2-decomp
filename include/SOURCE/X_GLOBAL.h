@@ -109,16 +109,16 @@ H2_ENUM_BEGIN(GameBalanceConstant)
     TOWN_VISIBILITY_RADIUS          = 5
 H2_ENUM_END(GameBalanceConstant)
 
-H2_ENUM_BEGIN(SpellEffectDisplayType)
+H2_ENUM_CLASS_BEGIN(SpellEffectDisplayType)
     SPELL_EFFECT_DISPLAY_HIGHLIGHT     = 0,
     SPELL_EFFECT_DISPLAY_SPELL_ICON    = 1,
     SPELL_EFFECT_DISPLAY_EFFECT_STATUS = 2,
     SPELL_EFFECT_DISPLAY_COUNT         = 3
-H2_ENUM_END(SpellEffectDisplayType)
+H2_ENUM_CLASS_END(SpellEffectDisplayType)
 
 inline SpellEffectDisplayType NextSpellEffectDisplayType(SpellEffectDisplayType type) {
     return static_cast<SpellEffectDisplayType>(
-        (IDX(type) + 1) % SPELL_EFFECT_DISPLAY_COUNT
+        (IDX(type) + 1) % IDX(SPELL_EFFECT_DISPLAY_COUNT)
     );
 }
 
