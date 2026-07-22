@@ -3,7 +3,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from homm2.build.canonicalize_relocs import (
-    CoffFile, Coverage, authorize_owner_alias, record_site_coverage,
+    CoffFile, Coverage, authorize_owner_alias, authorize_rel32_alias,
+    record_site_coverage,
 )
 from homm2.build.test_canonicalize_data_symbols import (
     DIR32, TEXT, SectionSpec, make_coff,
@@ -33,6 +34,34 @@ class OwnerAliasAuthorizationTest(unittest.TestCase):
         self.assertIsNone(authorize_owner_alias(
             public, "DIR32", "?notConfig@@3UconfigStruct@@A", 0x30,
             0x128D50))
+
+
+class Rel32AliasAuthorizationTest(unittest.TestCase):
+    def test_same_unique_rva_and_addend_authorize(self):
+        symbols = {"_open": 0xE0760, "__open": 0xE0760}
+
+        self.assertEqual(authorize_rel32_alias(
+            symbols, {}, {}, ("REL32", "__open", 0),
+            ("REL32", "_open", 0)), "__open")
+
+    def test_different_rva_or_addend_cannot_authorize(self):
+        symbols = {"_open": 0xE0760, "__open": 0xE0770}
+
+        self.assertIsNone(authorize_rel32_alias(
+            symbols, {}, {}, ("REL32", "__open", 0),
+            ("REL32", "_open", 0)))
+        symbols["__open"] = symbols["_open"]
+        self.assertIsNone(authorize_rel32_alias(
+            symbols, {}, {}, ("REL32", "__open", 4),
+            ("REL32", "_open", 0)))
+
+    def test_ambiguous_name_cannot_authorize(self):
+        symbols = {"left": 0x1000, "right": 0x1000}
+        duplicates = {"right": {0x1000, 0x2000}}
+
+        self.assertIsNone(authorize_rel32_alias(
+            symbols, {}, duplicates, ("REL32", "left", 0),
+            ("REL32", "right", 0)))
 
 
 class CoverageTest(unittest.TestCase):
@@ -97,6 +126,31 @@ class CoffOwnerRewriteTest(unittest.TestCase):
                 relocation_names, ["public_owner_one", "public_owner_two"])
             self.assertIn(
                 "synthetic_owner", {symbol.name for symbol in parsed.symbols.values()})
+
+    def test_rel32_alias_is_rewritten_only_at_the_paired_site(self):
+        obj = make_coff([SectionSpec(
+            ".text", bytes(8), TEXT,
+            ((0, 1, 0x14), (4, 1, 0x14)),
+        )], [
+            ("function", 0, 1, 0x20, 2),
+            ("_open", 0, 0, 0, 2),
+        ])
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / "test.obj"
+            path.write_bytes(obj)
+            coff = CoffFile(path)
+            function = coff.unique_text_functions()["function"]
+
+            self.assertTrue(coff.patch_rel32(
+                function, 0, "_open", "__open"))
+            coff.finish()
+
+            parsed = CoffFile(path)
+            relocation_names = [
+                parsed.symbols[relocation.symbol_index].name
+                for relocation in parsed.relocations.values()
+            ]
+            self.assertEqual(relocation_names, ["__open", "_open"])
 
 
 if __name__ == "__main__":

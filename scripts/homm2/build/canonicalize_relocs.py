@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Canonicalize delinked public-data relocation owners using paired sites.
+"""Canonicalize equivalent delinked relocation identities using paired sites.
 
 The synthetic PDB has to name every absolute relocation target so the delinker
 can represent it in COFF.  Unnamed fields therefore become ``const_<RVA>``
@@ -16,9 +16,11 @@ equivalent spelling. A relocation is rewritten when:
 * ``public owner RVA + candidate addend == retail PE target RVA`` exactly.
 
 A wrong candidate offset cannot authorize a rewrite and remains visible to
-strict objdiff. The disposable target receives a separate undefined COFF symbol
-for each proven owner, so a synthetic nearest-public symbol shared by unrelated
-relocations is never renamed globally. Input and output paths must differ.
+strict objdiff. Equivalent REL32 aliases are likewise rewritten only at paired
+sites when both names resolve to the same unique public RVA and carry the same
+COFF addend. The disposable target receives a separate undefined COFF symbol
+for each proven identity, so a synthetic symbol shared by unrelated relocations
+is never renamed globally. Input and output paths must differ.
 """
 
 import argparse
@@ -36,6 +38,7 @@ from homm2.build.assert_relocs import (
 
 
 DIR32 = 0x0006
+REL32 = 0x0014
 SYMBOL_SIZE = 18
 OUTPUT_MARKER = ".homm2-reloc-canonical"
 
@@ -188,6 +191,19 @@ class CoffFile:
                          section.raw_offset + absolute_site, addend & 0xFFFFFFFF)
         return True
 
+    def patch_rel32(self, function, site, expected_symbol, new_symbol):
+        absolute_site = function.value + site
+        reloc = self.relocations.get((function.section, absolute_site))
+        if reloc is None or reloc.typ != REL32:
+            return False
+        symbol = self.symbols.get(reloc.symbol_index)
+        if symbol is None or symbol.name != expected_symbol:
+            return False
+        new_index = self._new_symbols.setdefault(
+            new_symbol, self.symbol_count + len(self._new_symbols))
+        struct.pack_into("<I", self.data, reloc.offset + 4, new_index)
+        return True
+
     def finish(self):
         if not self._new_symbols:
             self.path.write_bytes(self.data)
@@ -238,6 +254,24 @@ def authorize_owner_alias(public_data, base_type, base_symbol, base_addend,
     if owner_rva is None:
         return None
     if (owner_rva + base_addend) & 0xFFFFFFFF != retail_target_rva:
+        return None
+    return base_symbol
+
+
+def authorize_rel32_alias(symbols, data, duplicates, base, target):
+    """Return the candidate spelling for one proven same-address call target."""
+    base_type, base_symbol, base_addend = base
+    target_type, target_symbol, target_addend = target
+    if base_type != "REL32" or target_type != "REL32":
+        return None
+    if base_symbol == target_symbol or base_addend != target_addend:
+        return None
+    if (_has_duplicate_name(duplicates, base) or
+            _has_duplicate_name(duplicates, target)):
+        return None
+    base_rva = resolve(symbols, data, *base)
+    target_rva = resolve(symbols, data, *target)
+    if base_rva is None or base_rva != target_rva:
         return None
     return base_symbol
 
@@ -303,6 +337,18 @@ def canonicalize_unit(unit, names, public_data, function_rvas, symbols, data,
                     coverage, base, target_reloc, symbols, data, duplicates):
                 continue
             target_type, target_symbol, target_addend = target_reloc
+            if target_type == "REL32" and base_type == "REL32":
+                alias = authorize_rel32_alias(
+                    symbols, data, duplicates, base, target_reloc)
+                if alias is None:
+                    continue
+                if not target.patch_rel32(
+                        target_functions[name], site, target_symbol, alias):
+                    continue
+                patched_functions.add(name)
+                patched_aliases.add((target_symbol, base_symbol, base_addend))
+                patched_sites += 1
+                continue
             if target_type != "DIR32" or base_type != "DIR32":
                 continue
             retail_operand = _pe_read(function_rva + site, 4)
