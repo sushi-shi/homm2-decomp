@@ -1094,7 +1094,7 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_visibilityMap == NULL) {
-        m_visibilityMap = new u16[MAP_WIDTH * MAP_HEIGHT];
+        m_visibilityMap = new u16[OD_STEER(MAP_WIDTH) * MAP_HEIGHT];
         if (m_visibilityMap == NULL) {
             MemError();
         }
