@@ -448,13 +448,6 @@ H2_ENUM_BEGIN(ResourceGenerationConstant)
     RESOURCE_SCARCE_AMOUNT_MAX = 6
 H2_ENUM_END(ResourceGenerationConstant)
 
-H2_ENUM_BEGIN(EventSpellLevel)
-    SHRINE_FIRST_CIRCLE_SPELL_LEVEL  = 1,
-    SHRINE_SECOND_CIRCLE_SPELL_LEVEL = 2,
-    SHRINE_THIRD_CIRCLE_SPELL_LEVEL  = 3,
-    PYRAMID_SPELL_LEVEL              = 5
-H2_ENUM_END(EventSpellLevel)
-
 H2_ENUM_BEGIN(GameVisibilityConstant)
     EARLY_TURN_LAST        = 20,
     MIDDLE_TURN_LAST       = 40,
@@ -673,7 +666,7 @@ inline b32 CanGenerateMonsterGuard(CreatureType monsterType) {
            && monsterType != CREATURE_WATER_ELEMENTAL;
 }
 
-inline i32 GetRandomEventSpell(EventSpellLevel spellLevel) {
+inline i32 GetRandomEventSpell(SpellLevel spellLevel) {
     i32 spellMetadata =
         Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
     while (gsSpellInfo[spellMetadata - MAP_EVENT_SPELL_OFFSET].level != spellLevel) {
@@ -2473,18 +2466,18 @@ void game::RandomizeEvents(void) {
                 }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_FIRST_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SHRINE_FIRST_CIRCLE_SPELL_LEVEL);
+                        GetRandomEventSpell(SPELL_LEVEL_FIRST);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_SECOND_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SHRINE_SECOND_CIRCLE_SPELL_LEVEL);
+                        GetRandomEventSpell(SPELL_LEVEL_SECOND);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_THIRD_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SHRINE_THIRD_CIRCLE_SPELL_LEVEL);
+                        GetRandomEventSpell(SPELL_LEVEL_THIRD);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PYRAMID:
-                    cell2->m_objectMetadata = GetRandomEventSpell(PYRAMID_SPELL_LEVEL);
+                    cell2->m_objectMetadata = GetRandomEventSpell(SPELL_LEVEL_FIFTH);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
                     // Retail recruit-site and guarded-bank quantities are balance payload.
@@ -6040,7 +6033,7 @@ void game::SetupTowns(void) {
                 spell = SPELL_DEATH_RIPPLE;
             else
                 spell = SPELL_DEATH_WAVE;
-            spellLevel = gsSpellInfo[IDX(spell)].level - 1;
+            spellLevel = IDX(gsSpellInfo[IDX(spell)].level) - 1;
             castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
             spellsPerLevel[spellLevel]++;
         }
@@ -6054,7 +6047,7 @@ void game::SetupTowns(void) {
             spell = SPELL_ANTI_MAGIC;
         else
             spell = SPELL_CURE;
-        spellLevel = gsSpellInfo[IDX(spell)].level - 1;
+        spellLevel = IDX(gsSpellInfo[IDX(spell)].level) - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
         spellsPerLevel[spellLevel]++;
 
@@ -6069,7 +6062,7 @@ void game::SetupTowns(void) {
             spell = SPELL_COLD_RAY;
         else
             spell = SPELL_COLD_RING;
-        spellLevel = gsSpellInfo[IDX(spell)].level - 1;
+        spellLevel = IDX(gsSpellInfo[IDX(spell)].level) - 1;
         castle->m_spells[spellLevel][spellsPerLevel[spellLevel]] = spell;
         spellsPerLevel[spellLevel]++;
 
@@ -6087,7 +6080,7 @@ void game::SetupTowns(void) {
                     do {
                         spell =
                             SpellType(Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN)));
-                        while (gsSpellInfo[IDX(spell)].level - 1 != spellLevel)
+                        while (IDX(gsSpellInfo[IDX(spell)].level) - 1 != spellLevel)
                             spell = SpellType(
                                 Random(IDX(SPELL_FIREBALL), IDX(SPELL_SET_WATER_GUARDIAN))
                             );

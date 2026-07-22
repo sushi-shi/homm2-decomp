@@ -140,10 +140,10 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
     NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
 H2_ENUM_END(NewGameDialogConstant)
 
-H2_ENUM_BEGIN(NewGameMapChoice)
+H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
     MAP_CHOICE_STANDARD  = 1,
     MAP_CHOICE_EXPANSION = 2
-H2_ENUM_END(NewGameMapChoice)
+H2_ENUM_CLASS_END(NewGameMapChoice)
 
 H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
     PLAYER_SLOT_FIRST  = 0,
@@ -434,15 +434,16 @@ i32 game::NewGame(void) {
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
+        i16 dialogResult = static_cast<i16>(gpWindowManager->m_dialogResult);
+        if (dialogResult == GAME_DIALOG_CANCEL)
+            return 0;
+        switch (static_cast<NewGameMapChoice>(dialogResult)) {
             case MAP_CHOICE_STANDARD:
                 xIsExpansionMap = 0;
                 break;
             case MAP_CHOICE_EXPANSION:
                 xIsExpansionMap = 1;
                 break;
-            case GAME_DIALOG_CANCEL:
-                return 0;
         }
     }
 

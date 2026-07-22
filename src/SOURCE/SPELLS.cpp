@@ -679,7 +679,7 @@ void combatManager::CastSpell(
         && m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]
                != HERO_SKILL_LEVEL_NONE
         && IDX(m_heroes[1 - m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) + 1
-               >= gsSpellInfo[IDX(spell)].level) {
+               >= IDX(gsSpellInfo[IDX(spell)].level)) {
         if (SRandom(0, SPELL_EAGLE_EYE_ROLL_MAX)
             <= IDX(m_heroes[1 - m_currentSide]
                        ->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)])) {
