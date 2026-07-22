@@ -601,7 +601,7 @@ SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	4c163a4c4cf0
 SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	99.9977	0a9f3cc7ad7e
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	99.5000	112f353da0db
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	99.4917	e079088ff4a3
-SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	99.7261	8d891237cdd9
+SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	682d56f7498d
 SOURCE/CMBTMGR	?CombatSystemOptions@combatManager@@QAEXXZ	100.0000	f23cd0cb4861
 SOURCE/CMBTMGR	?CombatSystemOptionsHandler@@YIHAAUtag_message@@@Z	100.0000	a710e708a18b
 SOURCE/CMBTMGR	?CombineGroups@combatManager@@QAEXPAVarmyGroup@@0@Z	100.0000	f95be84e3357

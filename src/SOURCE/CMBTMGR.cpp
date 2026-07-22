@@ -569,9 +569,9 @@ void combatManager::Close(void) {
     i32 total;
     CombatSide groupSide;
     i32 index;
-    CombatSide side;
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++)
-        UpdateArmyGroup(side);
+    // Retail reuses this integer counter for the side and army-group loops.
+    for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++)
+        UpdateArmyGroup(static_cast<CombatSide>(index));
 
     total = 0;
     if (m_playerId[IDX(COMBAT_DEFENDER_SIDE)] == -1)
