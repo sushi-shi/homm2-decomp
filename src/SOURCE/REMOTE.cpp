@@ -373,25 +373,31 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
 
 VA(0x004a3aa7, 0x13a)
 i32 DecodePacket(u8* data, i32) {
-    u16 receivedCRC;
-    u16 calculatedCRC[CRC_STORAGE_WORD_COUNT];
+    u16 receivedCRC4;
+    i32 ignored;
+    u16 calculatedCRC0[CRC_STORAGE_WORD_COUNT];
     u32 length;
-    char errorText[REMOTE_ERROR_TEXT_SIZE];
+    char errorText5[REMOTE_ERROR_TEXT_SIZE];
 
-    calculatedCRC[0] = 0;
+    calculatedCRC0[0] = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
-        sprintf(errorText, "not mine %d\n", REMOTE_PACKET(packet)->destination);
-        LogStr(errorText);
+        sprintf(errorText5, "not mine %d\n", REMOTE_PACKET(packet)->destination);
+        LogStr(errorText5);
         return 0;
     }
     length = static_cast<u8>(REMOTE_PACKET(packet)->payloadSize);
-    receivedCRC = REMOTE_PACKET(packet)->crc;
+    receivedCRC4 = REMOTE_PACKET(packet)->crc;
     REMOTE_PACKET(packet)->crc = 0;
-    calc_crc(calculatedCRC, reinterpret_cast<u8*>(packet), length + REMOTE_PACKET_HEADER_SIZE);
-    if (receivedCRC != calculatedCRC[0]) {
-        sprintf(errorText, "CRC Check Failed CRC 1 %d CRC 2 %d\n", receivedCRC, calculatedCRC[0]);
-        LogStr(errorText);
+    calc_crc(calculatedCRC0, reinterpret_cast<u8*>(packet), length + REMOTE_PACKET_HEADER_SIZE);
+    if (receivedCRC4 != calculatedCRC0[0]) {
+        sprintf(
+            errorText5,
+            "CRC Check Failed CRC 1 %d CRC 2 %d\n",
+            receivedCRC4,
+            calculatedCRC0[0]
+        );
+        LogStr(errorText5);
         return 0;
     }
     memcpy(data, packet + REMOTE_PACKET_HEADER_SIZE, length);
