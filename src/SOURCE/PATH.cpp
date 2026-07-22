@@ -108,7 +108,7 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
         directionCountNext = COMBAT_DIRECTION_ADJACENT_COUNT;
 
     for (directionResult = COMBAT_DIRECTION_NORTHEAST;
-         directionResult < directionCountNext;
+         IDX(directionResult) < directionCountNext;
          directionResult++) {
         if (!ValidAttack(sourceHex, directionResult, targetMode, targetHex, &attackHexNext))
             blockedMaskValue |= directionBitFlag;
@@ -290,7 +290,7 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
             direction = COMBAT_DIRECTION_SOUTHEAST;
     }
 
-    return direction
+    return IDX(direction)
         [gpCombatManager->m_adjacency[0] + sourceHex * COMBAT_AI_ADJACENT_DIRECTION_COUNT];
 }
 
@@ -303,7 +303,7 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
         direction = COMBAT_DIRECTION_NORTHWEST;
     else if (direction == COMBAT_DIRECTION_WIDE_EAST)
         direction = COMBAT_DIRECTION_SOUTHWEST;
-    return OD_STEER(direction)[gpCombatManager->m_adjacency[sourceHex]];
+    return IDX(OD_STEER(direction))[gpCombatManager->m_adjacency[sourceHex]];
 }
 
 VA(0x004be59d, 0x44a)
@@ -411,7 +411,7 @@ i32 army::ValidRange(i32 targetHex) {
 
 VA(0x004be9e7, 0x58)
 CombatHexDirection OppositeDirection(CombatHexDirection direction) {
-    if (direction < COMBAT_DIRECTION_ADJACENT_COUNT) {
+    if (IDX(direction) < COMBAT_DIRECTION_ADJACENT_COUNT) {
         return static_cast<CombatHexDirection>(
             (IDX(direction) + COMBAT_DIRECTION_OPPOSITE_OFFSET)
             % COMBAT_DIRECTION_ADJACENT_COUNT
@@ -460,74 +460,74 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     if ((leftFlag | 0) == isMovingRight) {
         if (isMovingUp == 1) {
             if (sourceRow & 1) {
-                if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+                if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                     return COMBAT_DIRECTION_NORTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                     return COMBAT_DIRECTION_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                     return COMBAT_DIRECTION_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                     return COMBAT_DIRECTION_SOUTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                     return COMBAT_DIRECTION_WIDE_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                     return COMBAT_DIRECTION_WIDE_EAST;
             } else {
-                if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+                if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                     return COMBAT_DIRECTION_NORTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                     return COMBAT_DIRECTION_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                     return COMBAT_DIRECTION_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                     return COMBAT_DIRECTION_SOUTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                     return COMBAT_DIRECTION_WIDE_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                     return COMBAT_DIRECTION_WIDE_EAST;
             }
         } else {
             if (sourceRow & 1) {
-                if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+                if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                     return COMBAT_DIRECTION_SOUTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                     return COMBAT_DIRECTION_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                     return COMBAT_DIRECTION_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                     return COMBAT_DIRECTION_NORTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                     return COMBAT_DIRECTION_WIDE_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                     return COMBAT_DIRECTION_WIDE_WEST;
             } else {
-                if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+                if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                     return COMBAT_DIRECTION_SOUTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                     return COMBAT_DIRECTION_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                     return COMBAT_DIRECTION_WEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                     return COMBAT_DIRECTION_NORTHEAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                     return COMBAT_DIRECTION_WIDE_EAST;
-                else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+                else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                     return COMBAT_DIRECTION_WIDE_WEST;
             }
         }
@@ -535,108 +535,108 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
 
     if (leftFlag == 1) {
         if (isMovingUp == 1) {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
         } else if (isMovingDown == 1) {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
         } else {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
         }
     } else if (isMovingRight == 1) {
         if (isMovingUp == 1) {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
         } else if (isMovingDown == 1) {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
         } else {
-            if (!(blockedMask & (1 << COMBAT_DIRECTION_EAST)))
+            if (!(blockedMask & BIT(COMBAT_DIRECTION_EAST)))
                 return COMBAT_DIRECTION_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
                 return COMBAT_DIRECTION_NORTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHEAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
                 return COMBAT_DIRECTION_SOUTHEAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_NORTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_SOUTHWEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                 return COMBAT_DIRECTION_SOUTHWEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WEST)))
                 return COMBAT_DIRECTION_WEST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_EAST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_EAST)))
                 return COMBAT_DIRECTION_WIDE_EAST;
-            else if (!(blockedMask & (1 << COMBAT_DIRECTION_WIDE_WEST)))
+            else if (!(blockedMask & BIT(COMBAT_DIRECTION_WIDE_WEST)))
                 return COMBAT_DIRECTION_WIDE_WEST;
         }
     }

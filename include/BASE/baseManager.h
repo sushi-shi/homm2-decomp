@@ -23,11 +23,11 @@ H2_ENUM_CLASS_END_T(BaseManagerMessageMask, i32)
 H2_ENUM_FLAGS(BaseManagerMessageMask)
 
 // Executive ordering keys stay arithmetic; the catalog names each manager.
-H2_ENUM_BEGIN(BaseManagerPriority)
+H2_ENUM_BEGIN(BaseManagerPriorityConstant)
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1,
     INPUT_MANAGER_PRIORITY           = BASE_MANAGER_PRIORITY_UNASSIGNED,
     SOUND_MANAGER_PRIORITY           = BASE_MANAGER_PRIORITY_UNASSIGNED
-H2_ENUM_END(BaseManagerPriority)
+H2_ENUM_END(BaseManagerPriorityConstant)
 
 H2_ENUM_BEGIN(BaseManagerConstant)
     BASE_MANAGER_NAME_CAPACITY = 0x1e
@@ -39,7 +39,7 @@ public:
     baseManager* m_next;
     baseManager* m_prev;
     BaseManagerMessageMask m_messageMask;
-    BaseManagerPriority m_priority;
+    i32 m_priority;
     char m_name[BASE_MANAGER_NAME_CAPACITY];
     b32 m_active;
     baseManager(void);

@@ -3650,20 +3650,20 @@ void combatManager::Earthquake(void) {
     i32 impactCount = 0;
     i32 structure;
     for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
-        newWallStates[structure] = m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST];
-        if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+        newWallStates[structure] = m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)];
+        if (m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                 != COMBAT_WALL_STATE_DESTROYED
-            && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+            && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                    != COMBAT_WALL_STATE_SECTION_DESTROYED
             && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX) < EARTHQUAKE_WALL_HIT_CHANCE) {
             ++newWallStates[structure];
-            if (m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+            if (m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                     != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_TOWER_STANDING
-                && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED
-                && m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DAMAGE_LAST
                 && SRandom(0, EARTHQUAKE_CHANCE_ROLL_MAX)
                        < EARTHQUAKE_WALL_SECOND_HIT_CHANCE)
@@ -3750,7 +3750,7 @@ void combatManager::Earthquake(void) {
             DelayTil(&glTimers[1]);
             if (frame == EARTHQUAKE_APPLY_DAMAGE_FRAME) {
                 for (structure = 0; structure < EARTHQUAKE_STRUCTURE_COUNT; ++structure) {
-                    m_wallStates[structure + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                    m_wallStates[structure + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                         newWallStates[structure];
                     m_wallStates[structure] = newTowerStates[structure];
                 }

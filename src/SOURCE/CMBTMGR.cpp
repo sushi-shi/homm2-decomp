@@ -427,11 +427,13 @@ void combatManager::SetupAdjacencyArray(void) {
     i32 sourceHex;
     for (sourceHex = 0; sourceHex < COMBAT_HEX_COUNT; sourceHex++) {
         i32 rowIndex = sourceHex / COMBAT_GRID_ROW_LENGTH;
-        i32 direction;
-        for (direction = 0; direction < COMBAT_AI_ADJACENT_DIRECTION_COUNT; direction++) {
+        CombatHexDirection direction;
+        for (direction = COMBAT_DIRECTION_NORTHEAST;
+             IDX(direction) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             direction++) {
             if (sourceHex % COMBAT_GRID_ROW_LENGTH == 0
                 || sourceHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
-                m_adjacency[sourceHex][direction] = -1;
+                m_adjacency[sourceHex][IDX(direction)] = -1;
             } else {
                 switch (direction) {
                     case COMBAT_DIRECTION_NORTHEAST:
@@ -469,9 +471,9 @@ void combatManager::SetupAdjacencyArray(void) {
                 if (destinationHex % COMBAT_GRID_ROW_LENGTH == 0
                     || destinationHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1
                     || destinationHex < 0 || destinationHex >= COMBAT_HEX_COUNT)
-                    m_adjacency[sourceHex][direction] = -1;
+                    m_adjacency[sourceHex][IDX(direction)] = -1;
                 else
-                    m_adjacency[sourceHex][direction] = static_cast<i8>(destinationHex);
+                    m_adjacency[sourceHex][IDX(direction)] = static_cast<i8>(destinationHex);
             }
         }
     }
@@ -541,7 +543,7 @@ i32 combatManager::Open(i32 openFlags) {
     gpInputManager->Flush();
     ResetMouse();
     m_messageMask = BASE_MANAGER_ACCEPT_WIDGET;
-    m_priority = BaseManagerPriority(openFlags);
+    m_priority = openFlags;
     m_active = true;
     strcpy(m_name, "combatManager");
     LogStr("Op5");
@@ -1291,9 +1293,9 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         wallIndex17 = -1;
         while (random8 != 0) {
             wallIndex17++;
-            if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+            if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                     != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED)
                 random8--;
         }
@@ -1570,26 +1572,26 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
              || (frame18 == COMBAT_CATAPULT_GATE_IMPACT_FRAME && gateIndex2 != -1))
             && !missShot19) {
             if (wallIndex17 != -1) {
-                if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         >= COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST
-                    && m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                    && m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                            <= COMBAT_WALL_STATE_SECTION_DAMAGE_LAST) {
-                    m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] +=
+                    m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] +=
                         IDX(damageLevel13);
-                    if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                    if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         > COMBAT_WALL_STATE_SECTION_DAMAGE_LAST)
-                        m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                             COMBAT_WALL_STATE_SECTION_DESTROYED;
                 } else {
                     if (damageLevel13 > CATAPULT_DAMAGE_NORMAL)
-                        m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                             COMBAT_WALL_STATE_DESTROYED;
                     else
-                        m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]++;
+                        m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]++;
                 }
-                if (m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                if (m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                         == COMBAT_WALL_STATE_DESTROYED
-                    || m_wallStates[wallIndex17 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                    || m_wallStates[wallIndex17 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                            == COMBAT_WALL_STATE_SECTION_DESTROYED)
                     m_hexCells[iWallToHexCell[wallIndex17]].m_blocked = 0;
             } else if (towerIndex27 != COMBAT_WALL_SLOT_NONE) {
@@ -1822,12 +1824,12 @@ void combatManager::SetupAndLoadObstacles(void) {
     if (m_inCastleCombat) {
         m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] = COMBAT_WALL_STATE_KEEP_STANDING;
         for (cellIndex1 = 0; cellIndex1 < COMBAT_CASTLE_STRUCTURE_COUNT; cellIndex1++) {
-            m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
+            m_wallStates[cellIndex1 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                 COMBAT_WALL_STATE_KEEP_STANDING;
             if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
                 && (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings
                     & IDX(TOWN_BUILDING_FORTIFICATIONS))) {
-                m_wallStates[cellIndex1 + COMBAT_WALL_SLOT_SECTION_FIRST] =
+                m_wallStates[cellIndex1 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)] =
                     COMBAT_WALL_STATE_SECTION_DAMAGE_FIRST;
             }
             m_wallStates[cellIndex1] = COMBAT_WALL_STATE_KEEP_STANDING;
@@ -2080,9 +2082,9 @@ i32 combatManager::ShotIsThroughWall(
         for (structureIndex0 = 0; structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
              structureIndex0++) {
             if (iWallToHexCell[structureIndex0] == traceHex11
-                && m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structureIndex0 + COMBAT_WALL_SLOT_SECTION_FIRST]
+                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }

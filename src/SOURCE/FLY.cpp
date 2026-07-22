@@ -151,9 +151,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             targetHex--;
         }
         if (target->m_facing == ARMY_FACING_RIGHT) {
-            directionMask = 1 << COMBAT_DIRECTION_WEST;
+            directionMask = BIT(COMBAT_DIRECTION_WEST);
         } else {
-            directionMask = 1 << COMBAT_DIRECTION_EAST;
+            directionMask = BIT(COMBAT_DIRECTION_EAST);
         }
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
@@ -187,9 +187,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             targetHex++;
         }
         if (target->m_facing == ARMY_FACING_RIGHT) {
-            directionMask = 1 << COMBAT_DIRECTION_EAST;
+            directionMask = BIT(COMBAT_DIRECTION_EAST);
         } else {
-            directionMask = 1 << COMBAT_DIRECTION_WEST;
+            directionMask = BIT(COMBAT_DIRECTION_WEST);
         }
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
             direction = GetBestDirection(targetHex, m_hex, directionMask);
