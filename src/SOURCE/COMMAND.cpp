@@ -650,66 +650,66 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     if (m_validDirectionCount <= 1 && m_mouseDirection >= 0)
         return;
 
-    i32 relativeX = mouseX - (targetHex % COMBAT_GRID_ROW_LENGTH - 1) * COMBAT_HEX_HORIZONTAL_STEP;
-    relativeX -= COMBAT_HEX_GRID_LEFT_ORIGIN;
+    i32 relativeX1 = mouseX - (targetHex % COMBAT_GRID_ROW_LENGTH - 1) * COMBAT_HEX_HORIZONTAL_STEP;
+    relativeX1 -= COMBAT_HEX_GRID_LEFT_ORIGIN;
     if (((targetHex / COMBAT_GRID_ROW_LENGTH) & 1) == 0)
-        relativeX -= COMBAT_HEX_ROW_STAGGER;
-    i32 relativeY = mouseY - COMBAT_HEX_CENTER_Y_ORIGIN
-                    - targetHex / COMBAT_GRID_ROW_LENGTH * COMBAT_HEX_VERTICAL_STEP;
-    relativeY -= DIRECTION_MOUSE_TOP_OFFSET;
-    relativeX -= COMBAT_HEX_ROW_STAGGER;
-    relativeY -= DIRECTION_MOUSE_CENTER_OFFSET;
+        relativeX1 -= COMBAT_HEX_ROW_STAGGER;
+    i32 relativeY10 = mouseY - COMBAT_HEX_CENTER_Y_ORIGIN
+                      - targetHex / COMBAT_GRID_ROW_LENGTH * COMBAT_HEX_VERTICAL_STEP;
+    relativeY10 -= DIRECTION_MOUSE_TOP_OFFSET;
+    relativeX1 -= COMBAT_HEX_ROW_STAGGER;
+    relativeY10 -= DIRECTION_MOUSE_CENTER_OFFSET;
 
-    i32 sector = 0;
-    if (relativeX < 0) {
-        if (relativeY < 0)
-            sector += DIRECTION_SECTOR_THREE_QUARTERS;
+    i32 sector6 = 0;
+    if (relativeX1 < 0) {
+        if (relativeY10 < 0)
+            sector6 += DIRECTION_SECTOR_THREE_QUARTERS;
         else
-            sector += DIRECTION_SECTOR_HALF;
+            sector6 += DIRECTION_SECTOR_HALF;
     } else {
-        if (relativeY < 0) {
+        if (relativeY10 < 0) {
         } else {
-            sector += DIRECTION_SECTOR_QUARTER;
+            sector6 += DIRECTION_SECTOR_QUARTER;
         }
     }
 
-    relativeX = abs(relativeX);
-    relativeY = abs(relativeY);
-    float ratio = static_cast<float>(relativeX) / relativeY;
-    if (sector == 0 || sector == DIRECTION_SECTOR_HALF) {
-        if (ratio > COMBAT_DIRECTION_SLOPE_STEEPEST)
-            sector += DIRECTION_SECTOR_OFFSET_STEEPEST;
-        else if (ratio > COMBAT_DIRECTION_SLOPE_STEEP)
-            sector += DIRECTION_SECTOR_OFFSET_STEEP;
-        else if (ratio > COMBAT_DIRECTION_SLOPE_DIAGONAL)
-            sector += DIRECTION_SECTOR_OFFSET_DIAGONAL;
-        else if (ratio > COMBAT_DIRECTION_SLOPE_SHALLOW)
-            sector += DIRECTION_SECTOR_OFFSET_SHALLOW;
-        else if (ratio > COMBAT_DIRECTION_SLOPE_SHALLOWEST)
-            sector++;
+    relativeX1 = abs(relativeX1);
+    relativeY10 = abs(relativeY10);
+    float ratio7 = static_cast<float>(relativeX1) / relativeY10;
+    if (sector6 == 0 || sector6 == DIRECTION_SECTOR_HALF) {
+        if (ratio7 > COMBAT_DIRECTION_SLOPE_STEEPEST)
+            sector6 += DIRECTION_SECTOR_OFFSET_STEEPEST;
+        else if (ratio7 > COMBAT_DIRECTION_SLOPE_STEEP)
+            sector6 += DIRECTION_SECTOR_OFFSET_STEEP;
+        else if (ratio7 > COMBAT_DIRECTION_SLOPE_DIAGONAL)
+            sector6 += DIRECTION_SECTOR_OFFSET_DIAGONAL;
+        else if (ratio7 > COMBAT_DIRECTION_SLOPE_SHALLOW)
+            sector6 += DIRECTION_SECTOR_OFFSET_SHALLOW;
+        else if (ratio7 > COMBAT_DIRECTION_SLOPE_SHALLOWEST)
+            sector6++;
     } else {
-        if (ratio < COMBAT_DIRECTION_SLOPE_SHALLOWEST)
-            sector += DIRECTION_SECTOR_OFFSET_STEEPEST;
-        else if (ratio < COMBAT_DIRECTION_SLOPE_SHALLOW)
-            sector += DIRECTION_SECTOR_OFFSET_STEEP;
-        else if (ratio < COMBAT_DIRECTION_SLOPE_DIAGONAL)
-            sector += DIRECTION_SECTOR_OFFSET_DIAGONAL;
-        else if (ratio < COMBAT_DIRECTION_SLOPE_STEEP)
-            sector += DIRECTION_SECTOR_OFFSET_SHALLOW;
-        else if (ratio < COMBAT_DIRECTION_SLOPE_STEEPEST)
-            sector++;
+        if (ratio7 < COMBAT_DIRECTION_SLOPE_SHALLOWEST)
+            sector6 += DIRECTION_SECTOR_OFFSET_STEEPEST;
+        else if (ratio7 < COMBAT_DIRECTION_SLOPE_SHALLOW)
+            sector6 += DIRECTION_SECTOR_OFFSET_STEEP;
+        else if (ratio7 < COMBAT_DIRECTION_SLOPE_DIAGONAL)
+            sector6 += DIRECTION_SECTOR_OFFSET_DIAGONAL;
+        else if (ratio7 < COMBAT_DIRECTION_SLOPE_STEEP)
+            sector6 += DIRECTION_SECTOR_OFFSET_SHALLOW;
+        else if (ratio7 < COMBAT_DIRECTION_SLOPE_STEEPEST)
+            sector6++;
     }
 
-    if (m_directionMap[sector] == m_mouseDirection)
+    if (m_directionMap[sector6] == m_mouseDirection)
         return;
 
-    m_mouseDirection = m_directionMap[sector];
-    CombatHexDirection directionResult =
-        OppositeDirection(static_cast<CombatHexDirection>(m_directionMap[sector]));
-    CombatHexDirection direction = directionResult;
+    m_mouseDirection = m_directionMap[sector6];
+    CombatHexDirection direction =
+        OppositeDirection(static_cast<CombatHexDirection>(m_directionMap[sector6]));
+    CombatHexDirection directionCopy = direction;
     CombatHexDirection alternateDirection = COMBAT_DIRECTION_INVALID;
     army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    army* targetArmy = &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
+    army* targetArmy1 = &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
 
     if (direction == COMBAT_DIRECTION_WIDE_WEST || direction == COMBAT_DIRECTION_WIDE_EAST) {
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
@@ -754,19 +754,19 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     }
 
     m_directionTargetHex = m_adjacency[targetHex][IDX(direction)];
-    i32 rearHex = IGNORED_HEX;
+    i32 rearHex3 = IGNORED_HEX;
     if (currentArmy->m_facing == ARMY_FACING_LEFT
         && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
-        rearHex = m_directionTargetHex - 1;
+        rearHex3 = m_directionTargetHex - 1;
     }
     if (currentArmy->m_facing == ARMY_FACING_RIGHT
         && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
-        rearHex = m_directionTargetHex + 1;
+        rearHex3 = m_directionTargetHex + 1;
     }
-    if (ValidHexToStandOn(m_directionTargetHex) == 0 || ValidHexToStandOn(rearHex) == 0) {
+    if (ValidHexToStandOn(m_directionTargetHex) == 0 || ValidHexToStandOn(rearHex3) == 0) {
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
-            && (direction == COMBAT_DIRECTION_WIDE_WEST
-                || direction == COMBAT_DIRECTION_WIDE_EAST)) {
+            && (directionCopy == COMBAT_DIRECTION_WIDE_WEST
+                || directionCopy == COMBAT_DIRECTION_WIDE_EAST)) {
             if (currentArmy->m_facing == ARMY_FACING_RIGHT)
                 m_directionTargetHex++;
             else
