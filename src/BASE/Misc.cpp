@@ -10,6 +10,7 @@
 #include <BASE/font.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
+#include <BASE/MiscEnums.h>
 #include <BASE/MISC_TYPES.h>
 H2_ENUM_BEGIN(DataEntryLayout)
     WINDOW_X                    = 0xb1,
@@ -98,13 +99,6 @@ H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_RETRY_DELAY_MILLISECONDS = 3000,
     CD_RETRY_LIMIT              = 2
 H2_ENUM_END(MiscCDDriveConstant)
-
-H2_ENUM_CLASS_BEGIN(MiscCDDriveResult)
-    CD_DRIVE_READY              = 0,
-    CD_DRIVE_NOT_FOUND          = 2,
-    CD_APP_PATH_UNAVAILABLE     = 3,
-    CD_DATA_ARCHIVE_UNAVAILABLE = 4
-H2_ENUM_CLASS_END(MiscCDDriveResult)
 
 H2_ENUM_BEGIN(PCXConstant)
     MANUFACTURER_ZSOFT    = 10,
@@ -1734,7 +1728,7 @@ i32 IsCDDrive(i32 driveIndex) {
 }
 
 VA(0x004c5a60, 0x3ed)
-i32 SetupCDDrive(void) {
+H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     char registryPath[CD_PATH_BUFFER_SIZE];
     char registryKey[CD_PATH_BUFFER_SIZE];
     char cdDrives[CD_DRIVE_SLOT_COUNT];
@@ -1746,10 +1740,10 @@ i32 SetupCDDrive(void) {
     i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
-            return IDX(CD_APP_PATH_UNAVAILABLE);
+            return CD_ROM_GAME_DIRECTORY_MISSING;
         file = _open(gText, _O_BINARY);
         if (file == -1)
-            return IDX(CD_DATA_ARCHIVE_UNAVAILABLE);
+            return CD_ROM_DATA_FILES_MISSING;
     }
     _close(file);
 
@@ -1775,7 +1769,7 @@ i32 SetupCDDrive(void) {
             _close(file);
             sprintf(gText + CD_PATH_PREFIX_BYTES, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
-            return IDX(CD_DRIVE_READY);
+            return CD_ROM_READY;
         }
     }
 
@@ -1825,13 +1819,13 @@ i32 SetupCDDrive(void) {
                         gcAnimPath
                     );
                     strcpy(gcAnimPath, gText);
-                    return IDX(CD_DRIVE_READY);
+                    return CD_ROM_READY;
                 }
             }
             Sleep(CD_RETRY_DELAY_MILLISECONDS);
             ++attempts;
             if (attempts >= CD_RETRY_LIMIT)
-                return IDX(CD_DRIVE_NOT_FOUND);
+                return CD_ROM_EXPANSION_DISC_MISSING;
         }
     }
 }

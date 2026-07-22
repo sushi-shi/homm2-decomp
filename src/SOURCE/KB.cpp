@@ -8,6 +8,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <BASE/Misc.h>
+#include <BASE/MiscEnums.h>
 #include <BASE/MiscGraphicsConstants.h>
 #include <BASE/WINMGR.h>
 #include <SOURCE/ADVMGR.h>
@@ -195,14 +196,6 @@ H2_ENUM_BEGIN(PollSoundConstant)
     SOUND_POLL_INTERVAL             = 30,
     PALETTED_VIDEO_MODE_COLOR_DEPTH = 8
 H2_ENUM_END(PollSoundConstant)
-
-H2_ENUM_BEGIN(CDRomSetupResult)
-    CD_ROM_READY                  = 0,
-    CD_ROM_DRIVE_UNAVAILABLE      = 1,
-    CD_ROM_EXPANSION_DISC_MISSING = 2,
-    CD_ROM_GAME_DIRECTORY_MISSING = 3,
-    CD_ROM_DATA_FILES_MISSING     = 4
-H2_ENUM_END(CDRomSetupResult)
 
 H2_ENUM_BEGIN(CongratsConstant)
     CONGRATS_PALETTE_BUFFER_SIZE = 0x304,
@@ -9912,7 +9905,7 @@ DATA(0x00500168) void* gLowPage = NULL;
 DATA(0x0050016c) b32 gbLowPageGrabbed = false;
 DATA(0x00500170) i8 xSmackFromNetwork = 0;
 DATA(0x00500174) b32 gbInPollSound = false;
-DATA(0x005157a8) i32 iCDRomErr = 0;
+DATA(0x005157a8) H2_ENUM_STORAGE(CDRomSetupResult, i32) iCDRomErr = CD_ROM_READY;
 DATA(0x005157ac) i32 bEarlySetupDone = 0;
 DATA(0x005159f8) i32 bKBDone = 0;
 DATA(0x005159fc) struct _REDBOOK* hRedbookz = NULL;

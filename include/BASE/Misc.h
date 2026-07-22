@@ -4,6 +4,8 @@
 #include <va.h>
 #include <BASE/message.h>
 
+H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
+
 class bitmap;
 class heroWindow;
 class icon;
@@ -96,7 +98,7 @@ void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
 i32 IsCDDrive(i32);
-i32 SetupCDDrive(void);
+H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void);
 void BitmapToScreen(class bitmap*);
 void SetPalette(i8*, i32);
 void BlitBitmapToScreenNoMouseCheck(class bitmap*, i32, i32, i32, i32, i32, i32);
