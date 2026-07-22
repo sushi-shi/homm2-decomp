@@ -14,6 +14,13 @@ H2_ENUM_BEGIN(CombatSideConstant)
     COMBAT_SIDE_COUNT = 2
 H2_ENUM_END(CombatSideConstant)
 
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline CombatSide& operator^=(CombatSide& side, i32 mask) {
+    side = static_cast<CombatSide>(static_cast<i32>(side) ^ mask);
+    return side;
+}
+#endif
+
 inline CombatSide OppositeCombatSide(CombatSide side) {
 #ifdef HOMM2_STRICT_ENUM_TYPES
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;

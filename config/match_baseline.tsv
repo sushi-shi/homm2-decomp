@@ -615,7 +615,7 @@ SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	b0b0fe92a7d7
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	96.0502	9cecec0bb27e
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	9958022caed6
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	cf7a75230ca8
-SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	89.6552	d04bf9db8a95
+SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	9c177c0261ad
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	100.0000	940f329ba10d
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	5ba667017fb8
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	99fa007b9da6
