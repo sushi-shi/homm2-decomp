@@ -1224,16 +1224,16 @@ VA(0x00493049, 0xd6)
 i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 winner;
     i32 index;
-    CombatSide opposingSide = OppositeCombatSide(side);
 
-    if (m_sideDefeated[IDX(opposingSide)])
+    if (m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
         return 1;
-    if (m_sideRetreated[IDX(opposingSide)])
+    if (m_sideRetreated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
         return 1;
 
+    side ^= 1;
     winner = 1;
-    for (index = 0; index < m_armyCount[IDX(opposingSide)]; index++) {
-        if (!(m_armies[IDX(opposingSide)][index].m_monster.flags.abilityFlags
+    for (index = 0; index < m_armyCount[IDX(side)]; index++) {
+        if (!(m_armies[IDX(side)][index].m_monster.flags.abilityFlags
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
             winner = 0;
     }
