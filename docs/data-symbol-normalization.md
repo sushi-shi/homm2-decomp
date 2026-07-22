@@ -79,15 +79,15 @@ function plus a function-relative addend. Those are two COFF spellings of the
 same table value.
 
 In the disposable comparison copies, a same-function `.text` `DIR32`
-relocation to a semantic local label (`type == 0`, storage class 6) is rewritten
-to the unambiguous containing external function. The encoded addend is adjusted
-so the resolved section offset is unchanged. This also covers MSVC labels such
-as `$normalEvent` that do not use the `$L<number>` spelling.
+relocation to a semantic local label (`type == 0`, storage class 6) or through
+another function plus an interior addend is rewritten to the unambiguous
+containing function, including a uniquely owned static function. The encoded addend is adjusted so the
+resolved section offset is unchanged. This also covers MSVC labels such as
+`$normalEvent` that do not use the `$L<number>` spelling.
 
-The rewrite does not apply to `REL32` branches, cross-function references,
-ambiguous function owners, or static function symbols (`type == 0x20`, storage
-class 3). Static callback/function-pointer initializers therefore retain their
-original identity. A wrong switch destination remains a different
+The rewrite does not apply to `REL32` branches, cross-function references, or
+ambiguous function owners. Static callback/function-pointer initializers that
+target another function therefore retain their original identity. A wrong switch destination remains a different
 function-relative addend and remains visible to objdiff.
 
 ## Safety properties
