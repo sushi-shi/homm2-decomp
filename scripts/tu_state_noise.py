@@ -34,6 +34,7 @@ import math
 import os
 import random
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -46,6 +47,13 @@ from pathlib import Path
 from typing import Iterable
 
 from tu_state_metrics import read_coff
+from homm2.build.assert_relocs import load_symbols
+from homm2.build.canonicalize_data_symbols import canonicalize_coff
+from homm2.build.canonicalize_relocs import (
+    canonicalize_unit,
+    function_inventory,
+    load_retail_symbols,
+)
 
 
 IMAGE_BASE = 0x400000
@@ -153,6 +161,18 @@ def _leading_metadata_offset(text: str, marker_offset: int) -> int:
         stripped = line.strip()
         if not stripped or stripped.startswith("//"):
             offset -= len(line)
+            continue
+        break
+    return offset
+
+
+def _top_level_insertion_offset(text: str) -> int:
+    """Return the first authored token after the leading preprocessor/include block."""
+    offset = 0
+    for line in text.splitlines(keepends=True):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            offset += len(line)
             continue
         break
     return offset
@@ -429,9 +449,19 @@ def make_variants(
     return variants
 
 
-def insert_variant(original: str, target: Target, variant: Variant) -> str:
-    block = variant.block(target.logical_line)
-    return original[: target.insertion_offset] + block + original[target.insertion_offset :]
+def insert_variant(
+    original: str,
+    target: Target,
+    variant: Variant,
+    insertion: str = "target",
+) -> str:
+    insertion_offset = (
+        target.insertion_offset
+        if insertion == "target"
+        else _top_level_insertion_offset(original)
+    )
+    block = variant.block(logical_line_at(original, insertion_offset))
+    return original[:insertion_offset] + block + original[insertion_offset:]
 
 
 @contextmanager
@@ -637,6 +667,56 @@ def object_metrics(path: Path) -> dict[str, dict]:
     }
 
 
+def load_pairing_context(root: Path, unit: str) -> dict:
+    public_data, function_rvas = load_retail_symbols(root / "build/gen/symbol_names.csv")
+    previous_directory = Path.cwd()
+    try:
+        os.chdir(root)
+        symbols, data, duplicates = load_symbols()
+    finally:
+        os.chdir(previous_directory)
+    return {
+        "unit": unit,
+        "names": function_inventory(function_rvas).get(unit, set()),
+        "public_data": public_data,
+        "function_rvas": function_rvas,
+        "symbols": symbols,
+        "data": data,
+        "duplicates": duplicates,
+    }
+
+
+def normalize_comparison_pair(
+    candidate_raw: Path,
+    retail_raw: Path,
+    prefix: Path,
+    pairing: dict,
+) -> tuple[Path, Path, list[Path]]:
+    """Build the same candidate-paired normalized copies used by canonical objdiff."""
+    paired_retail = prefix.with_suffix(".paired-retail.obj")
+    normalized_candidate = prefix.with_suffix(".normalized-candidate.obj")
+    normalized_retail = prefix.with_suffix(".normalized-retail.obj")
+    shutil.copy2(retail_raw, paired_retail)
+    canonicalize_unit(
+        pairing["unit"],
+        pairing["names"],
+        pairing["public_data"],
+        pairing["function_rvas"],
+        pairing["symbols"],
+        pairing["data"],
+        pairing["duplicates"],
+        candidate_raw,
+        paired_retail,
+    )
+    normalized_candidate.write_bytes(canonicalize_coff(candidate_raw.read_bytes()).data)
+    normalized_retail.write_bytes(canonicalize_coff(paired_retail.read_bytes()).data)
+    return normalized_candidate, normalized_retail, [
+        paired_retail,
+        normalized_candidate,
+        normalized_retail,
+    ]
+
+
 def normalized_relocation_stream(metrics: dict) -> list[str]:
     """Hide unstable compiler-private counters while preserving relocation topology."""
     return [
@@ -832,6 +912,10 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--seed", type=parse_int, default=0x484F4D32)
     parser.add_argument(
+        "--insertion", choices=("target", "top"), default="target",
+        help="insert immediately before the target or after the TU's leading include block",
+    )
+    parser.add_argument(
         "--max-declarations", type=positive_count, default=DEFAULT_MAX_DECLARATIONS,
         help=(
             "largest deterministic typedef/extern/static-data/prototype train "
@@ -922,6 +1006,7 @@ def main(argv: list[str] | None = None) -> int:
         ).stdout.strip(),
         "source": str(source_rel),
         "source_sha256": sha256_bytes(original_bytes),
+        "insertion": args.insertion,
         "target": {
             "unit": target.unit,
             "rva": f"0x{target.rva:x}",
@@ -945,6 +1030,7 @@ def main(argv: list[str] | None = None) -> int:
             "record_max_requires_unrounded_exact_100_size_and_ordered_relocations": True,
             "sibling_score_regressions_allowed": False,
             "exact_sibling_raw_or_reloc_changes_allowed": False,
+            "exact_target_closure_allows_disposable_sibling_changes": True,
             "target_size_or_reloc_count_distance_may_not_worsen": True,
             "compiler_process_group_terminated_on_timeout": True,
         },
@@ -972,6 +1058,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     assert scratch is not None
+    pairing = load_pairing_context(root, target.unit)
 
     baseline_obj = output / "baseline.obj"
     with measure_stage(timings, "baseline_compile"):
@@ -985,14 +1072,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"baseline compile {reason}; disposable artifacts removed", file=sys.stderr)
         source_lock.close()
         return 2
+    with measure_stage(timings, "baseline_normalize"):
+        baseline_normalized, baseline_target_normalized, _baseline_generated = (
+            normalize_comparison_pair(baseline_obj, target_obj, output / "baseline", pairing)
+        )
     with measure_stage(timings, "baseline_objdiff"):
         baseline_scores, baseline_sizes, baseline_counts, diff_log = objdiff_scores(
-            target_obj, baseline_obj, target.symbol
+            baseline_target_normalized, baseline_normalized, target.symbol
         )
     (output / "baseline.objdiff.log").write_text(diff_log)
     with measure_stage(timings, "baseline_coff_metrics"):
-        baseline_metrics = object_metrics(baseline_obj)
-        retail_metrics = object_metrics(target_obj)
+        baseline_metrics = object_metrics(baseline_normalized)
+        retail_metrics = object_metrics(baseline_target_normalized)
     if baseline_counts.get(target.symbol) != 1:
         finalize_compiled_artifacts(scratch, output, final_output, False)
         print(f"target symbol is not unique in baseline objdiff: {target.symbol}", file=sys.stderr)
@@ -1040,13 +1131,15 @@ def main(argv: list[str] | None = None) -> int:
                 "raw_reloc_detail_shas": [],
                 "objdiff_size": metrics.get("objdiff_size"),
                 "relocs": metrics["relocs"],
-                "score": score,
+                "scores": [],
                 "occurrences": 0,
                 "baseline": False,
                 "representative": None,
             },
         )
         state["occurrences"] += 1
+        if score not in state["scores"]:
+            state["scores"].append(score)
         if metrics["reloc_detail_sha"] not in state["raw_reloc_detail_shas"]:
             state["raw_reloc_detail_shas"].append(metrics["reloc_detail_sha"])
         if label == "baseline":
@@ -1074,9 +1167,10 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGTERM, stop_for_signal)
     try:
         for variant in variants:
-            candidate = insert_variant(original, target, variant)
+            candidate = insert_variant(original, target, variant, args.insertion)
             candidate_bytes = candidate.encode("utf-8")
             trial_obj = output / f"trial-{variant.trial:04d}.obj"
+            trial_generated = []
             include_guard = include_macro_guard(root, variant.body, canonical_target_tokens)
             compile_timed_out = False
             with temporary_source(target.source, original_bytes, candidate_bytes):
@@ -1130,14 +1224,24 @@ def main(argv: list[str] | None = None) -> int:
                 else:
                     trial["rejections"].append("compile failed")
             else:
+                with measure_stage(timings, "trial_normalize"):
+                    trial_normalized, trial_target_normalized, trial_generated = (
+                        normalize_comparison_pair(
+                            trial_obj,
+                            target_obj,
+                            output / f"trial-{variant.trial:04d}",
+                            pairing,
+                        )
+                    )
                 with measure_stage(timings, "trial_objdiff"):
                     scores, sizes, symbol_counts, trial_diff_log = objdiff_scores(
-                        target_obj, trial_obj, target.symbol
+                        trial_target_normalized, trial_normalized, target.symbol
                     )
                 if trial_diff_log:
                     (output / f"trial-{variant.trial:04d}.objdiff.log").write_text(trial_diff_log)
                 with measure_stage(timings, "trial_coff_metrics"):
-                    metrics = object_metrics(trial_obj)
+                    metrics = object_metrics(trial_normalized)
+                    trial_retail_metrics = object_metrics(trial_target_normalized)
                 score = scores.get(target.symbol)
                 target_metrics = metrics.get(target.symbol)
                 if symbol_counts.get(target.symbol) != 1:
@@ -1183,11 +1287,9 @@ def main(argv: list[str] | None = None) -> int:
                             candidate_size,
                             target.retail_size,
                             target_metrics,
-                            retail_target,
+                            trial_retail_metrics.get(target.symbol, retail_target),
                         )
-                        trial["exact_closure_eligible"] = (
-                            trial["eligible"] and not trial["exact_closure_rejections"]
-                        )
+                        trial["exact_closure_eligible"] = not trial["exact_closure_rejections"]
                     if trial["exact_closure_eligible"] and exact_closure is None:
                         exact_closure = trial
                     if trial["eligible"] and score > baseline_score + 1e-6:
@@ -1195,6 +1297,8 @@ def main(argv: list[str] | None = None) -> int:
                             best_observed = trial
                 trial_obj.unlink(missing_ok=True)
                 Path(str(trial_obj) + ".d").unlink(missing_ok=True)
+                for generated in trial_generated:
+                    generated.unlink(missing_ok=True)
             manifest["trials"].append(trial)
             rows.append(
                 f"{variant.trial}\t{variant.family}\t"
@@ -1223,9 +1327,10 @@ def main(argv: list[str] | None = None) -> int:
     for index, state in enumerate(state_rows, 1):
         representative = state["representative"]
         source = "baseline" if state["baseline"] else f"trial {representative['trial']}"
+        scores = ",".join(f"{score:.6f}" for score in sorted(state["scores"]))
         print(
             f"  state {index:02d} {state['state']}: {source}; occurrences={state['occurrences']} "
-            f"score={state['score']:.6f}% size={state['objdiff_size']} "
+            f"scores={scores}% size={state['objdiff_size']} "
             f"text={state['text_sha']} relocs={state['normalized_reloc_sha']} "
             f"raw-label-spellings={len(state['raw_reloc_detail_shas'])}",
             flush=True,
@@ -1246,6 +1351,7 @@ def main(argv: list[str] | None = None) -> int:
                     "seed": args.seed,
                     "families": families,
                     "max_declarations": args.max_declarations,
+                    "insertion": args.insertion,
                     "states": state_rows,
                 },
                 indent=2,

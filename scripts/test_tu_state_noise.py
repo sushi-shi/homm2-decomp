@@ -47,6 +47,15 @@ class TuStateNoiseTests(unittest.TestCase):
         )
         self.assertIn("#line 81\nVA(0x00401234", candidate)
 
+    def test_top_insertion_follows_leading_preprocessor_block(self):
+        original = "#include <a.h>\n\n#define VALUE 1\n\nint predecessor;\nVA(0x00401234, 0x1)\n"
+        target = self.target(original)
+        variant = noise.Variant(1, "typedef", "tag", "typedef int PROBE_ALIAS;\n")
+        candidate = noise.insert_variant(original, target, variant, "top")
+        self.assertLess(candidate.index("#define VALUE"), candidate.index("PROBE_ALIAS"))
+        self.assertLess(candidate.index("PROBE_ALIAS"), candidate.index("int predecessor"))
+        self.assertIn("#line 5\nint predecessor", candidate)
+
     def test_resolver_ignores_va_text_in_comment_before_real_marker(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
