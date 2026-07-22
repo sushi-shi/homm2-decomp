@@ -3,18 +3,18 @@
 
 #include <Ints.h>
 
-H2_ENUM_CLASS_BEGIN(NetbiosSetupState)
+H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosSetupState, i8)
     SETUP_INITIALIZE          = 0,
     SETUP_CHECK_LOCAL_NAME    = 1,
     SETUP_REGISTER_LOCAL_NAME = 2,
     SETUP_WAIT_FOR_LOCAL_NAME = 3,
     SETUP_START_RECEIVE       = 4
-H2_ENUM_CLASS_END(NetbiosSetupState)
+H2_ENUM_CLASS_END_SPLIT(NetbiosSetupState, i8)
 
-H2_ENUM_CLASS_BEGIN(NetbiosWaitState)
+H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosWaitState, i8)
     WAIT_START = 0,
     WAIT_POLL  = 1
-H2_ENUM_CLASS_END(NetbiosWaitState)
+H2_ENUM_CLASS_END_SPLIT(NetbiosWaitState, i8)
 
 i8 InitNetHost(void);
 i8 InitNetGuest(void);

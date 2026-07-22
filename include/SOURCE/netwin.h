@@ -24,7 +24,7 @@ H2_ENUM_BEGIN(NetbiosConstant)
     NETBIOS_RECEIVE_RETRY_DELAY         = 0x32
 H2_ENUM_END(NetbiosConstant)
 
-H2_ENUM_CLASS_BEGIN(NetbiosCommand)
+H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosCommand, u8)
     NETBIOS_COMMAND_CALL              = 0x10,
     NETBIOS_COMMAND_LISTEN            = 0x11,
     NETBIOS_COMMAND_HANGUP            = 0x12,
@@ -39,10 +39,10 @@ H2_ENUM_CLASS_BEGIN(NetbiosCommand)
     NETBIOS_COMMAND_CANCEL            = 0x35,
     NETBIOS_COMMAND_PROBE             = 0x7f,
     NETBIOS_COMMAND_ASYNC             = 0x80
-H2_ENUM_CLASS_END(NetbiosCommand)
+H2_ENUM_CLASS_END_SPLIT(NetbiosCommand, u8)
 H2_ENUM_FLAGS(NetbiosCommand)
 
-H2_ENUM_CLASS_BEGIN(NetbiosResult)
+H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosResult, u8)
     NETBIOS_RESULT_SUCCESS               = 0,
     NETBIOS_RESULT_ILLEGAL_COMMAND       = 3,
     NETBIOS_RESULT_SESSION_OUT_OF_RANGE  = 8,
@@ -57,7 +57,7 @@ H2_ENUM_CLASS_BEGIN(NetbiosResult)
     NETBIOS_RESULT_DUPLICATE_ENVIRONMENT = 0x30,
     NETBIOS_RESULT_ENVIRONMENT_UNDEFINED = 0x34,
     NETBIOS_RESULT_PENDING               = 0xFF
-H2_ENUM_CLASS_END(NetbiosResult)
+H2_ENUM_CLASS_END_SPLIT(NetbiosResult, u8)
 
 H2_ENUM_CLASS_BEGIN(NetbiosSessionOperation)
     NETBIOS_SESSION_REGISTER        = 0,
@@ -71,12 +71,12 @@ H2_ENUM_CLASS_BEGIN(NetbiosSessionOperation)
     NETBIOS_SESSION_GET_NAME        = 9
 H2_ENUM_CLASS_END(NetbiosSessionOperation)
 
-H2_ENUM_CLASS_BEGIN(NetbiosSessionStatus)
+H2_ENUM_CLASS_BEGIN_SPLIT(NetbiosSessionStatus, u8)
     NETBIOS_SESSION_ACTIVE          = 1,
     NETBIOS_SESSION_NAME_REGISTERED = 2,
     NETBIOS_SESSION_CONNECTED       = 8,
     NETBIOS_SESSION_ERROR           = 0x80
-H2_ENUM_CLASS_END(NetbiosSessionStatus)
+H2_ENUM_CLASS_END_SPLIT(NetbiosSessionStatus, u8)
 H2_ENUM_FLAGS(NetbiosSessionStatus)
 
 #pragma pack(push, 1)
