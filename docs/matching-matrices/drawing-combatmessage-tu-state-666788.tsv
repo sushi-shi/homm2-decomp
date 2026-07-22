@@ -1,0 +1,13 @@
+# SOURCE/DRAWING combatManager::CombatMessage(char*, i32, i32, i32) controlled typedef-state census
+# checkpoint	c66d599419f2ae721c89acdd404655239546f19b
+# normalized_source_hash	6667886ea83a
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/DRAWING.cpp --rva 0x2a88 --trials 128 --families typedef --max-declarations 128 --seed 0x434d5347 --state-summary /tmp/combatmessage-states.json --record-max
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	128 typedef counts produce two normalized target states; no generated declaration remains in source
+state	state_identity	representative_count	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	counts_in_1_through_128
+canonical	45fed4b9c3aab776	1	84	99.682820	1016	a5e8b19be4f00db7	d3922710191ea4f0	1-5,12-22,29-40,47-57,64-74,81-92,99-109,116-126
+exact	2b981f89941dfe4a	6	44	100.000000	1016	d00171cd087aa046	d3922710191ea4f0	6-11,23-28,41-46,58-63,75-80,93-98,110-115,127-128
+# The state cardinality is two. The canonical state's occurrence total is 85 when the unmodified baseline is included; the table counts only its 84 generated trials.
+# Both states have the retail 1016-byte objdiff boundary and complete retail 38-site ordered relocation stream. Their only normalized code difference is the pointer comparison at function offsets +0x211..+0x220: canonical loads message then compares newlinePtr and branches JBE; retail and exact load newlinePtr then compare message and branch JAE. The predicates are equivalent.
+# Twenty-six exact trials pass every non-target sibling and exact-sibling raw/relocation gate: 10-11,25,27-28,41-42,44-46,58-59,61-62,75-76,78-79,93,95-96,98,110,112-113,127. The other eighteen exact target states are rejected only because their disposable declaration train perturbs a pinned sibling.
+# Trial 6 represents the exact target state; trial 10 is the first exact state that also passes all regression gates. The existing hash-scoped exact maximum was reproduced, not changed, and every probe body was removed.
