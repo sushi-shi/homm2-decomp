@@ -155,7 +155,7 @@ public:
     HeroSpellType m_viewSpellsType;
     i32 m_viewSpellsTop[IDX(SPELL_TYPE_CATEGORY_COUNT)];
     i32 m_viewSpellsCount[IDX(SPELL_TYPE_CATEGORY_COUNT)];
-    SpellType m_viewSpell;
+    H2_ENUM_STORAGE(SpellType, i32) m_viewSpell;
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
