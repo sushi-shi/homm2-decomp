@@ -1133,6 +1133,7 @@ def main(argv: list[str] | None = None) -> int:
                 "relocs": metrics["relocs"],
                 "scores": [],
                 "occurrences": 0,
+                "trials": [],
                 "baseline": False,
                 "representative": None,
             },
@@ -1144,13 +1145,15 @@ def main(argv: list[str] | None = None) -> int:
             state["raw_reloc_detail_shas"].append(metrics["reloc_detail_sha"])
         if label == "baseline":
             state["baseline"] = True
-        elif state["representative"] is None and variant is not None:
-            state["representative"] = {
-                "trial": variant.trial,
-                "family": variant.family,
-                "tag": variant.tag,
-                "body": variant.body,
-            }
+        elif variant is not None:
+            state["trials"].append(variant.trial)
+            if state["representative"] is None:
+                state["representative"] = {
+                    "trial": variant.trial,
+                    "family": variant.family,
+                    "tag": variant.tag,
+                    "body": variant.body,
+                }
         return state_id
 
     observe_state("baseline", baseline_score, baseline_target)
