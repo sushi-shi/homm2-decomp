@@ -8470,7 +8470,7 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
     }
     strncpy(answerPrefix, answer, RIDDLE_PREFIX_LENGTH);
     answerPrefix[strlen(expectedPrefix)] = 0;
-    return stricmp(expectedPrefix, answerPrefix) == 0;
+    return strcmpi(expectedPrefix, answerPrefix) == 0;
 }
 
 DATA(0x0051cc0c) b32 gbNoShowCombat = false;
