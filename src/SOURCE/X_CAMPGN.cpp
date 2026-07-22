@@ -1152,7 +1152,7 @@ VA(0x004bd639, 0x32e)
 MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == true)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
