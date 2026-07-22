@@ -484,11 +484,11 @@ i32 searchArray::FindCombatPath(
             }
 
             u32 moveMask = unit->GetMoveMask(currentHex);
-            for (i32 direction = 0; direction < SEARCH_DIRECTION_COUNT; direction++) {
-                if ((moveMask & (1U << direction)) == 0) {
-                    i32 nextHex = unit->GetAdjacentCellIndex(
-                        currentHex, static_cast<CombatHexDirection>(direction)
-                    );
+            for (CombatHexDirection direction = COMBAT_DIRECTION_NORTHEAST;
+                 IDX(direction) < SEARCH_DIRECTION_COUNT;
+                 direction++) {
+                if ((moveMask & BIT(direction)) == 0) {
+                    i32 nextHex = unit->GetAdjacentCellIndex(currentHex, direction);
                     i32 moatCost = 0;
                     if (bIsMoatSlowed[nextHex])
                         moatCost = unit->m_speed + MOAT_MOVEMENT_PENALTY;
@@ -553,7 +553,9 @@ reconstructPath:
 }
 
 VA(0x004a5800, 0x100)
-void searchArray::PushCombatPoint(i32 hex, i32 direction, i32 distance, i32 speed) {
+void searchArray::PushCombatPoint(
+    i32 hex, H2_ENUM_PARAM(CombatHexDirection, i32) direction, i32 distance, i32 speed
+) {
     if (ValidHex(hex)) {
         i32 low = 0;
         i32 high = m_queueCount;

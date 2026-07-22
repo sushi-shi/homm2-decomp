@@ -265,7 +265,7 @@ i32 resourceManager::Open(i32 priority) {
     if (LoadAggregateHeader(DEFAULT_AGGREGATE_NAME) != LOAD_SUCCESS)
         return LOAD_ERROR;
     m_messageMask = BASE_MANAGER_ACCEPT_RESOURCE;
-    m_priority = BaseManagerPriority(priority);
+    m_priority = priority;
     m_active = true;
     strcpy(m_name, "resourceManager");
     m_resourceListHead = NULL;

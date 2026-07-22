@@ -461,19 +461,19 @@ void combatManager::SetCombatDirections(i32 targetHex) {
 
     i32 direction_27;
     for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
-        if (direction_27 == COMBAT_DIRECTION_WIDE_WEST
-            || direction_27 == COMBAT_DIRECTION_WIDE_EAST) {
+        if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST)
+            || direction_27 == IDX(COMBAT_DIRECTION_WIDE_EAST)) {
             if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
                 if (currentArmy_3->m_facing == ARMY_FACING_RIGHT) {
-                    if (direction_27 == COMBAT_DIRECTION_WIDE_WEST)
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][COMBAT_DIRECTION_NORTHWEST];
-                    if (direction_27 == COMBAT_DIRECTION_WIDE_EAST)
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][COMBAT_DIRECTION_SOUTHWEST];
+                    if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHWEST)];
+                    if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_EAST))
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHWEST)];
                 } else {
-                    if (direction_27 == COMBAT_DIRECTION_WIDE_WEST)
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][COMBAT_DIRECTION_NORTHEAST];
-                    if (direction_27 == COMBAT_DIRECTION_WIDE_EAST)
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][COMBAT_DIRECTION_SOUTHEAST];
+                    if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHEAST)];
+                    if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_EAST))
+                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHEAST)];
                 }
             } else {
                 directionHexes_4[direction_27] = INVALID_HEX;
@@ -486,9 +486,9 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0
             && directionHexes_4[direction_27] != INVALID_HEX) {
             if (currentArmy_3->m_facing == ARMY_FACING_RIGHT) {
-                if (direction_27 == COMBAT_DIRECTION_NORTHWEST
-                    || direction_27 == COMBAT_DIRECTION_WEST
-                    || direction_27 == COMBAT_DIRECTION_SOUTHWEST) {
+                if (direction_27 == IDX(COMBAT_DIRECTION_NORTHWEST)
+                    || direction_27 == IDX(COMBAT_DIRECTION_WEST)
+                    || direction_27 == IDX(COMBAT_DIRECTION_SOUTHWEST)) {
                     if (directionHexes_4[direction_27] % COMBAT_GRID_ROW_LENGTH
                         == COMBAT_GRID_FIRST_COLUMN)
                         directionHexes_4[direction_27] = INVALID_HEX;
@@ -501,9 +501,9 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                 else
                     rearHexes_15[direction_27] = directionHexes_4[direction_27] + 1;
             } else {
-                if (direction_27 == COMBAT_DIRECTION_NORTHEAST
-                    || direction_27 == COMBAT_DIRECTION_EAST
-                    || direction_27 == COMBAT_DIRECTION_SOUTHEAST) {
+                if (direction_27 == IDX(COMBAT_DIRECTION_NORTHEAST)
+                    || direction_27 == IDX(COMBAT_DIRECTION_EAST)
+                    || direction_27 == IDX(COMBAT_DIRECTION_SOUTHEAST)) {
                     if (directionHexes_4[direction_27] % COMBAT_GRID_ROW_LENGTH
                         == COMBAT_GRID_REVERSE_FIRST_COLUMN)
                         directionHexes_4[direction_27] = INVALID_HEX;
@@ -553,7 +553,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             m_validDirectionCount++;
     }
     if (m_validDirectionCount == 0)
-        pathValid_1[COMBAT_DIRECTION_WIDE_WEST] = 1;
+        pathValid_1[IDX(COMBAT_DIRECTION_WIDE_WEST)] = 1;
 
     memset(m_directionMap, -1, sizeof(m_directionMap));
     for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
@@ -561,29 +561,29 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         i32 mappedDirection_7;
         if (direction_27 < COMBAT_DIRECTION_ADJACENT_COUNT)
             mappedDirection_7 = (direction_27 + COMBAT_DIRECTION_OPPOSITE_OFFSET) % COMBAT_DIRECTION_ADJACENT_COUNT;
-        else if (direction_27 == COMBAT_DIRECTION_WIDE_WEST)
-            mappedDirection_7 = COMBAT_DIRECTION_WIDE_EAST;
+        else if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
+            mappedDirection_7 = IDX(COMBAT_DIRECTION_WIDE_EAST);
         else
-            mappedDirection_7 = COMBAT_DIRECTION_WIDE_WEST;
+            mappedDirection_7 = IDX(COMBAT_DIRECTION_WIDE_WEST);
 
         if (pathValid_1[mappedDirection_7] != 0) {
             if (HAS(targetArmy_1->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
-                if (direction_27 == COMBAT_DIRECTION_NORTHEAST
+                if (direction_27 == IDX(COMBAT_DIRECTION_NORTHEAST)
                     && m_hexCells[targetHex - 1].m_occupantSide == targetSide_36
                     && m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_6) {
-                    outputDirection_11 = COMBAT_DIRECTION_WIDE_WEST;
-                } else if (direction_27 == COMBAT_DIRECTION_NORTHWEST
+                    outputDirection_11 = IDX(COMBAT_DIRECTION_WIDE_WEST);
+                } else if (direction_27 == IDX(COMBAT_DIRECTION_NORTHWEST)
                            && m_hexCells[targetHex + 1].m_occupantSide == targetSide_36
                            && m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_6) {
-                    outputDirection_11 = COMBAT_DIRECTION_WIDE_WEST;
-                } else if (direction_27 == COMBAT_DIRECTION_SOUTHEAST
+                    outputDirection_11 = IDX(COMBAT_DIRECTION_WIDE_WEST);
+                } else if (direction_27 == IDX(COMBAT_DIRECTION_SOUTHEAST)
                            && m_hexCells[targetHex - 1].m_occupantSide == targetSide_36
                            && m_hexCells[targetHex - 1].m_occupantIndex == targetIndex_6) {
-                    outputDirection_11 = COMBAT_DIRECTION_WIDE_EAST;
-                } else if (direction_27 == COMBAT_DIRECTION_SOUTHWEST
+                    outputDirection_11 = IDX(COMBAT_DIRECTION_WIDE_EAST);
+                } else if (direction_27 == IDX(COMBAT_DIRECTION_SOUTHWEST)
                            && m_hexCells[targetHex + 1].m_occupantSide == targetSide_36
                            && m_hexCells[targetHex + 1].m_occupantIndex == targetIndex_6) {
-                    outputDirection_11 = COMBAT_DIRECTION_WIDE_EAST;
+                    outputDirection_11 = IDX(COMBAT_DIRECTION_WIDE_EAST);
                 }
             }
 
@@ -593,7 +593,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                     outputDirection_11,
                     DIRECTION_SECTORS_PER_ADJACENT
                 );
-            } else if (direction_27 == COMBAT_DIRECTION_WIDE_WEST) {
+            } else if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST)) {
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_START] =
                     static_cast<i8>(outputDirection_11);
                 m_directionMap[DIRECTION_SPECIAL_FIRST_SECTOR_CENTER] =
@@ -619,11 +619,11 @@ void combatManager::SetCombatDirections(i32 targetHex) {
                 i32 previous_1 = (direction_27 + DIRECTION_SECTOR_COUNT - 1)
                                  % DIRECTION_SECTOR_COUNT;
                 if (m_directionMap[next_3] >= 0
-                    && m_directionMap[next_3] <= COMBAT_DIRECTION_WIDE_EAST) {
+                    && m_directionMap[next_3] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
                     m_directionMap[direction_27] =
                         m_directionMap[next_3] + DIRECTION_PENDING_OFFSET;
                 } else if (m_directionMap[previous_1] >= 0
-                           && m_directionMap[previous_1] <= COMBAT_DIRECTION_WIDE_EAST) {
+                           && m_directionMap[previous_1] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
                     m_directionMap[direction_27] =
                         m_directionMap[previous_1] + DIRECTION_PENDING_OFFSET;
                 }

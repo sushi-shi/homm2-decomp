@@ -124,8 +124,8 @@ H2_ENUM_BEGIN(ProjectileConstant)
     MAGE_BOLT_ANGLE_DISTANCE_BASE    = 15,
     MAGE_BOLT_FRAME_DELAY            = 10,
     MISSILE_DIAMETER_MULTIPLIER      = 2,
-    LICH_SPLASH_DIRECTION_COUNT      = COMBAT_DIRECTION_WIDE_WEST + 1,
-    LICH_SPLASH_CENTER_DIRECTION     = COMBAT_DIRECTION_WIDE_WEST
+    LICH_SPLASH_DIRECTION_COUNT      = IDX(COMBAT_DIRECTION_WIDE_WEST) + 1,
+    LICH_SPLASH_CENTER_DIRECTION     = IDX(COMBAT_DIRECTION_WIDE_WEST)
 H2_ENUM_END(ProjectileConstant)
 
 H2_ENUM_BEGIN(DamageConstant)
@@ -1356,7 +1356,7 @@ void army::DoHydraAttack(i32) {
     i32 damage_8;
     i32 killed_4;
     i32 targetIndex_9;
-    i32 direction;
+    CombatHexDirection direction;
     CombatSide targetSide_8;
     i32 targetHex_2;
     i32 totalKilled_7;
@@ -1380,8 +1380,10 @@ void army::DoHydraAttack(i32) {
     CheckLuck();
     gpCombatManager->ResetLimitCreature();
     gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index]++;
-    for (direction = 0; direction < ARMY_COMBAT_DIRECTION_COUNT; direction++) {
-        if (!(attackMask_7 & (1 << direction))) {
+    for (direction = COMBAT_DIRECTION_NORTHEAST;
+         IDX(direction) < ARMY_COMBAT_DIRECTION_COUNT;
+         direction++) {
+        if (!(attackMask_7 & BIT(direction))) {
             targetHex_2 = m_hex;
             if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)
                 && ((m_facing == ARMY_FACING_LEFT
@@ -1395,10 +1397,7 @@ void army::DoHydraAttack(i32) {
                     targetHex_2 = m_hex + 1;
                 }
             }
-            targetHex_2 = GetAdjacentCellIndex(
-                targetHex_2,
-                static_cast<CombatHexDirection>(direction)
-            );
+            targetHex_2 = GetAdjacentCellIndex(targetHex_2, direction);
             if (ValidHex(targetHex_2)) {
                 targetSide_8 = gpCombatManager->m_hexCells[targetHex_2].m_occupantSide;
                 targetIndex_9 = gpCombatManager->m_hexCells[targetHex_2].m_occupantIndex;
@@ -3072,7 +3071,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
     i32 targetAttackMask;
     i32 sourceHex;
     i32 adjacentHex;
-    i32 direction;
+    CombatHexDirection direction;
     hexcell* adjacentCell;
 
     while (1) {
@@ -3117,8 +3116,10 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
     } else if (baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
         AttackTo();
     } else {
-        for (direction = 0; direction < ARMY_COMBAT_DIRECTION_COUNT; direction++) {
-            if (direction < ARMY_ADJACENT_DIRECTION_COUNT
+        for (direction = COMBAT_DIRECTION_NORTHEAST;
+             IDX(direction) < ARMY_COMBAT_DIRECTION_COUNT;
+             direction++) {
+            if (IDX(direction) < ARMY_ADJACENT_DIRECTION_COUNT
                 || HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
                 sourceHex = m_hex;
                 if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)
@@ -3140,15 +3141,12 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
                         sourceHex--;
                     }
                 }
-                adjacentHex = GetAdjacentCellIndex(
-                    sourceHex,
-                    static_cast<CombatHexDirection>(direction)
-                );
+                adjacentHex = GetAdjacentCellIndex(sourceHex, direction);
                 if (ValidHex(adjacentHex)) {
                     adjacentCell = &gpCombatManager->m_hexCells[adjacentHex];
                     if (adjacentCell->m_occupantSide == m_targetSide
                         && adjacentCell->m_occupantIndex == m_targetIndex) {
-                        m_attackDirection = static_cast<CombatHexDirection>(direction);
+                        m_attackDirection = direction;
                     }
                 }
             }

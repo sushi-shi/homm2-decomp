@@ -103,7 +103,7 @@ H2_ENUM_BEGIN(NewGameConstant)
     GAME_SCENARIO_LOSS                    = 206
 H2_ENUM_END(NewGameConstant)
 
-H2_ENUM_BEGIN(NewGameKeyCode)
+H2_ENUM_CLASS_BEGIN(NewGameKeyCode)
     GAME_KEY_ENTER          = 10,
     GAME_KEY_BACKSPACE      = 0x7f,
     GAME_KEY_FIRST_EXTENDED = 0x100,
@@ -117,7 +117,7 @@ H2_ENUM_BEGIN(NewGameKeyCode)
     GAME_KEYPAD_DOWN        = 0x50,
     GAME_KEYPAD_PAGE_DOWN   = 0x51,
     GAME_KEYPAD_INSERT      = 0x52
-H2_ENUM_END(NewGameKeyCode)
+H2_ENUM_CLASS_END(NewGameKeyCode)
 
 H2_ENUM_BEGIN(NewGameStorageConstant)
     FILE_MASK_CAPACITY      = 16,
@@ -153,16 +153,6 @@ H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
     PLAYER_SLOT_FIFTH  = 4,
     PLAYER_SLOT_SIXTH  = 5
 H2_ENUM_CLASS_END(NewGamePlayerSlot)
-
-#ifdef HOMM2_STRICT_ENUM_TYPES
-constexpr i32 operator+(NewGameControl first, GameDifficulty slot) {
-    return static_cast<i32>(first) + static_cast<i32>(slot);
-}
-
-constexpr i32 operator+(NewGameControl first, NewGamePlayerSlot slot) {
-    return static_cast<i32>(first) + static_cast<i32>(slot);
-}
-#endif
 
 H2_ENUM_BEGIN(NewGameMapSizeIndex)
     MAP_SIZE_SMALL_INDEX  = 0,
@@ -1267,19 +1257,19 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
 
         case NEW_GAME_EVENT_PRESS:
             switch (message.payload.widget.id) {
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_EASY:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_NORMAL:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_HARD:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_EXPERT:
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + DIFFICULTY_IMPOSSIBLE:
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_HARD):
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EXPERT):
+                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
                     goto setDifficulty;
 
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_EASY:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_NORMAL:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_HARD:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_EXPERT:
-                case NEW_GAME_DIFFICULTY_FIRST + DIFFICULTY_IMPOSSIBLE:
+                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):
+                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_NORMAL):
+                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_HARD):
+                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EXPERT):
+                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
                 setDifficulty:
                     gpGame->m_difficulty = static_cast<GameDifficulty>(currentPlayerLocal);
@@ -1287,21 +1277,21 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     redrawWindow = 1;
                     break;
 
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_HANDICAP_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
                     goto cycleHandicap;
 
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_PLAYER_HUMAN_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
                 cycleHandicap:
                     synchronizeSetupResult = 1;
@@ -1316,39 +1306,39 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     }
                     break;
 
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_RACE_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_FIRST;
                     goto selectPlayer;
 
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_COLOR_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_COLOR_FIRST;
                     goto selectPlayer;
 
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_PLAYER_SELECT_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
                     goto selectPlayer;
 
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_PLAYER_NAME_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
                 selectPlayer:
                     synchronizeSetupResult = 1;
@@ -1417,21 +1407,21 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     }
                     break;
 
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_RACE_CYCLE_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
                     goto cycleRace;
 
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_FIRST:
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_SECOND:
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_THIRD:
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_FOURTH:
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_FIFTH:
-                case NEW_GAME_RACE_ICON_FIRST + PLAYER_SLOT_SIXTH:
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIRST):
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SECOND):
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_THIRD):
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SIXTH):
                     currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
                 cycleRace:
                     if (gpGame->m_mapHeader
@@ -1554,10 +1544,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
         default:
             gpInputManager->AsciiConvert(message);
-            if (message.payload.keyboard.keyCode == GAME_KEY_ENTER)
+            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_ENTER))
                 return 1;
 
-            if (message.payload.keyboard.keyCode == GAME_KEY_BACKSPACE) {
+            if (message.payload.keyboard.keyCode == IDX(GAME_KEY_BACKSPACE)) {
                 if (NGKPcursorIndex > 0) {
                     strcpy(gText, cNGKPCore + NGKPcursorIndex);
                     strcpy(cNGKPCore + (NGKPcursorIndex - 1), gText);
@@ -1567,7 +1557,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                        && message.payload.keyboard.keyCode != 0) {
                 strcpy(workText, cNGKPCore);
                 keyChar = 0;
-                if (message.payload.keyboard.keyCode >= GAME_KEY_FIRST_EXTENDED) {
+                if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
                     scanCode =
                         static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode)
                                         >> KEY_SCAN_CODE_SHIFT);
