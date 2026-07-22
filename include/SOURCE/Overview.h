@@ -15,11 +15,11 @@ H2_ENUM_CLASS_BEGIN(OverviewType)
     OVERVIEW_TYPE_COUNT = 2
 H2_ENUM_CLASS_END(OverviewType)
 
-H2_ENUM_BEGIN(OverviewReturnAction)
+H2_ENUM_CLASS_BEGIN(OverviewReturnAction)
     OVERVIEW_RETURN_NONE = -1,
     OVERVIEW_RETURN_HERO = 1,
     OVERVIEW_RETURN_TOWN = 2
-H2_ENUM_END(OverviewReturnAction)
+H2_ENUM_CLASS_END(OverviewReturnAction)
 
 H2_ENUM_BEGIN(OverviewLayoutConstant)
     OVERVIEW_VISIBLE_ROWS            = 4,

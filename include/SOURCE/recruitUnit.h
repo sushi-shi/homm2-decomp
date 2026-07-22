@@ -11,10 +11,10 @@ class town;
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_BEGIN(RecruitSourceType)
+H2_ENUM_CLASS_BEGIN(RecruitSourceType)
     RECRUIT_SOURCE_EVENT = -1,
     RECRUIT_SOURCE_TOWN  = 0x23
-H2_ENUM_END(RecruitSourceType)
+H2_ENUM_CLASS_END(RecruitSourceType)
 
 #pragma pack(push, 1)
 class recruitUnit : public baseManager {

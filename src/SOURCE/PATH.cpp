@@ -13,7 +13,13 @@ H2_ENUM_BEGIN(CombatPathConstant)
 H2_ENUM_END(CombatPathConstant)
 
 VA(0x004bdbf0, 0x14a)
-i32 army::FindPath(i32 sourceHex, i32 targetHex, i32, i32 ignoreSpeed, i32 pathMode) {
+i32 army::FindPath(
+    i32 sourceHex,
+    i32 targetHex,
+    i32,
+    i32 ignoreSpeed,
+    ArmyPathTarget pathMode
+) {
     i32 pathResult;
     i32 savedSpeed;
 

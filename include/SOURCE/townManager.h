@@ -19,7 +19,7 @@ H2_ENUM_BEGIN(TownManagerStorageConstant)
     TOWN_MANAGER_STATUS_TEXT_SIZE = 0x50
 H2_ENUM_END(TownManagerStorageConstant)
 
-H2_ENUM_BEGIN(TownManagerArmyCommand)
+H2_ENUM_CLASS_BEGIN(TownManagerArmyCommand)
     ARMY_COMMAND_NONE      = -1,
     ARMY_COMMAND_SELECT    = 0,
     ARMY_COMMAND_VIEW      = 1,
@@ -27,7 +27,7 @@ H2_ENUM_BEGIN(TownManagerArmyCommand)
     ARMY_COMMAND_SWAP      = 3,
     ARMY_COMMAND_VIEW_HERO = 4,
     ARMY_COMMAND_SPLIT     = 5
-H2_ENUM_END(TownManagerArmyCommand)
+H2_ENUM_CLASS_END(TownManagerArmyCommand)
 
 #pragma pack(push, 1)
 class townManager : public baseManager {

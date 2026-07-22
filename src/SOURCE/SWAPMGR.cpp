@@ -182,11 +182,11 @@ i32 swapManager::Open(i32 id) {
 
     for (SwapManagerSide side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
         for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
-            if (skillSlot < m_heroes[side_6]->m_secondarySkillCount) {
+            if (skillSlot < m_heroes[IDX(side_6)]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
                 message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = IDX(m_heroes[side_6]->GetNthSS(skillSlot));
+                message.payload.widget.data.value = IDX(m_heroes[IDX(side_6)]->GetNthSS(skillSlot));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -196,7 +196,7 @@ i32 swapManager::Open(i32 id) {
                 sprintf(
                     gText,
                     "%d",
-                    m_heroes[side_6]->GetSSLevel(m_heroes[side_6]->GetNthSS(skillSlot))
+                    m_heroes[IDX(side_6)]->GetSSLevel(m_heroes[IDX(side_6)]->GetNthSS(skillSlot))
                 );
                 m_window->BroadcastMessage(message);
             } else {
@@ -568,12 +568,12 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 } else if ((message.payload.widget.parameter
                                             & IDX(SPLIT_MODIFIER_MASK))
                                                != 0
-                                           && (m_heroes[m_targetSide]
+                                           && (m_heroes[IDX(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
                                                    == CREATURE_NONE
                                                || m_heroes[IDX(m_selectedSide)]
                                                           ->m_army.m_creatureTypes[m_selectedSlot]
-                                                      == m_heroes[m_targetSide]
+                                                      == m_heroes[IDX(m_targetSide)]
                                                              ->m_army
                                                              .m_creatureTypes[m_targetSlot])) {
                                     SplitMons();
@@ -634,12 +634,12 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 } else if ((message.payload.widget.parameter
                                             & IDX(SPLIT_MODIFIER_MASK))
                                                != 0
-                                           && (m_heroes[m_targetSide]
+                                           && (m_heroes[IDX(m_targetSide)]
                                                        ->m_army.m_creatureTypes[m_targetSlot]
                                                    == CREATURE_NONE
                                                || m_heroes[IDX(m_selectedSide)]
                                                           ->m_army.m_creatureTypes[m_selectedSlot]
-                                                      == m_heroes[m_targetSide]
+                                                      == m_heroes[IDX(m_targetSide)]
                                                              ->m_army
                                                              .m_creatureTypes[m_targetSlot])) {
                                     SplitMons();
@@ -702,22 +702,22 @@ void swapManager::SwapArtifacts(void) {
     H2_ENUM_STORAGE(ArtifactType, i32) selectedArtifact =
         m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot];
     H2_ENUM_STORAGE(ArtifactType, i32) targetArtifact_2 =
-        m_heroes[m_targetSide]->m_artifacts[m_targetSlot];
+        m_heroes[IDX(m_targetSide)]->m_artifacts[m_targetSlot];
 
     GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], selectedArtifact, 1);
-    GiveTakeArtifactStat(m_heroes[m_targetSide], targetArtifact_2, 1);
+    GiveTakeArtifactStat(m_heroes[IDX(m_targetSide)], targetArtifact_2, 1);
     m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot] = targetArtifact_2;
-    m_heroes[m_targetSide]->m_artifacts[m_targetSlot] = selectedArtifact;
+    m_heroes[IDX(m_targetSide)]->m_artifacts[m_targetSlot] = selectedArtifact;
 
     i8 extra = m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot];
     m_heroes[IDX(m_selectedSide)]->m_artifactExtra[m_selectedSlot] =
-        m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot];
-    m_heroes[m_targetSide]->m_artifactExtra[m_targetSlot] = extra;
+        m_heroes[IDX(m_targetSide)]->m_artifactExtra[m_targetSlot];
+    m_heroes[IDX(m_targetSide)]->m_artifactExtra[m_targetSlot] = extra;
 
     GiveTakeArtifactStat(m_heroes[IDX(m_selectedSide)], targetArtifact_2, 0);
-    GiveTakeArtifactStat(m_heroes[m_targetSide], selectedArtifact, 0);
+    GiveTakeArtifactStat(m_heroes[IDX(m_targetSide)], selectedArtifact, 0);
     m_heroes[IDX(m_selectedSide)]->CheckAnduranPieces(1);
-    m_heroes[m_targetSide]->CheckAnduranPieces(1);
+    m_heroes[IDX(m_targetSide)]->CheckAnduranPieces(1);
 
     if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
         || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
@@ -725,7 +725,7 @@ void swapManager::SwapArtifacts(void) {
         message_1.type = MESSAGE_WIDGET;
         for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
             for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
-                if (skillSlot < m_heroes[side]->m_secondarySkillCount) {
+                if (skillSlot < m_heroes[IDX(side)]->m_secondarySkillCount) {
                     message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                     message_1.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
                                                   + skillSlot + CONTROL_LEFT_SKILL_LEVEL_FIRST;
@@ -733,7 +733,7 @@ void swapManager::SwapArtifacts(void) {
                     sprintf(
                         gText,
                         "%d",
-                        m_heroes[side]->GetSSLevel(m_heroes[side]->GetNthSS(skillSlot))
+                        m_heroes[IDX(side)]->GetSSLevel(m_heroes[IDX(side)]->GetNthSS(skillSlot))
                     );
                     m_window->BroadcastMessage(message_1);
                 }
@@ -752,7 +752,7 @@ void swapManager::SwapMons(void) {
     }
 
     armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
-    armyGroup* targetArmy = &m_heroes[m_targetSide]->m_army;
+    armyGroup* targetArmy = &m_heroes[IDX(m_targetSide)]->m_army;
     if (OD_STEER(selectedArmy->m_creatureTypes[m_selectedSlot])
         == targetArmy->m_creatureTypes[m_targetSlot]) {
         if (selectedArmy->GetNumArmies() == 1)
@@ -889,7 +889,7 @@ void swapManager::SplitMons(void) {
     i16 unusedAmountControl_29 = SPLIT_AMOUNT_CONTROL;
     i32 unusedState = 0;
     armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
-    armyGroup* targetArmy = &m_heroes[m_targetSide]->m_army;
+    armyGroup* targetArmy = &m_heroes[IDX(m_targetSide)]->m_army;
     i32 emptySlot;
     unusedState = 0;
     i16 unusedTextControl_2 = SPLIT_TEXT_CONTROL;
@@ -911,7 +911,7 @@ void swapManager::SplitMons(void) {
             "Move how many %s troops from %s to %s?",
             gArmyNames[IDX(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[IDX(m_selectedSide)]->m_name,
-            m_heroes[m_targetSide]->m_name
+            m_heroes[IDX(m_targetSide)]->m_name
         );
     }
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
