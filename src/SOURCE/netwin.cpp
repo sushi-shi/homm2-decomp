@@ -347,7 +347,7 @@ extern "C" char __fastcall nb_stat(i16 session) {
     return static_cast<char>(gNetStatus[session]);
 }
 
-VA(0x004a7758, 0xdd2)
+VA(0x004a7758, 0x26e)
 void nb_thr_ctl(void) {
     DATA(0x0051751c) static i16 gNbThreadSourceLineBase = 412;
     i32 keepRunning;

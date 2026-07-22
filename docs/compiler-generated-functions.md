@@ -29,6 +29,12 @@ linker-public retail NB09 stream necessarily omits it.
 must not be duplicated in `config/delink_procedures.csv`; that manifest is reserved for
 reviewed spans that cannot be generated from source annotations or runtime FID.
 
+Ordinary public definitions also carry reviewed `VA(address, size)` spans. CodeView remains
+authoritative for their decorated names and RVAs, but when a source span differs from the
+provisional next-public gap, `gen_manifest.py` uses the source size and records
+`cv-public-source-va`. The complete generated span inventory is
+`build/gen/source_function_spans.csv`.
+
 ## Source compiler-generated functions
 
 MSVC's `$E<n>` names use a translation-unit counter and are not stable identities. Source
