@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""assert_no_fake_labels.py — soundness gate: every FUNCTION symbol a TU's object defines
-must actually exist in the original CodeView/PDB symbol set (build/gen/symbol_names.csv).
+"""assert_no_fake_labels.py — soundness gate: every external FUNCTION symbol a TU's object
+defines must exist in the retained-public/recovered inventory (build/gen/symbol_names.csv).
 Catches invented labels and wrong signatures that mangle to a name the retail binary
 never had. Run from repo root after a build; exits 1 if any object defines a function
 symbol absent from CodeView.
@@ -55,4 +55,4 @@ print("\n%d fake label(s), %d misattributed, across %d objects" % (nf, nm, len(o
 if nf:
     print("FAIL: objects define function symbols that do not exist in CodeView.")
     sys.exit(1)
-print("no-fake-labels OK: every emitted function symbol exists in CodeView.")
+print("no-fake-labels OK: every emitted external function is in the reviewed inventory.")

@@ -52,14 +52,27 @@ def _clang_args(repo: Path, source: Path) -> list[str]:
         if value.resolve() == source:
             raw = entry.get("arguments", [])
             break
-    args = ["-x", "c++", "-std=c++14", "-fms-compatibility",
-            "-fdelayed-template-parsing", "-ferror-limit=0"]
+    args = [
+        "-x", "c++", "-std=c++14", "--target=i386-pc-windows-msvc",
+        "-fms-compatibility-version=10.20", "-fms-extensions",
+        "-fdelayed-template-parsing", "-ferror-limit=0",
+        "-Xclang", "-fdefault-calling-conv=fastcall",
+        "-D_X86_", "-DWIN32", "-D_WINDOWS", "-D_MT",
+    ]
     project_includes = [repo / "include"]
     vendor = repo / "vendor"
     if vendor.is_dir():
         project_includes.extend(sorted(path for path in vendor.iterdir() if path.is_dir()))
     for include in project_includes:
         args.extend(("-I", str(include)))
+    if not raw:
+        msvc_include = repo / "build/toolchain/msvc/include"
+        if msvc_include.is_dir():
+            from homm2.init.clangd import build_lowercase_mirror
+            lowercase = build_lowercase_mirror(
+                msvc_include, repo / "build/clangd/inc-lower/msvc")
+            args.extend(("-isystem", str(lowercase),
+                         "-isystem", str(msvc_include)))
     index = 0
     while index < len(raw):
         value = raw[index]
@@ -72,8 +85,6 @@ def _clang_args(repo: Path, source: Path) -> list[str]:
         elif value.startswith(("--target=", "-fms", "-fdelayed")):
             args.append(value)
         index += 1
-    if not raw:
-        args.extend(("-D__fastcall=", "-D__stdcall="))
     return args
 
 

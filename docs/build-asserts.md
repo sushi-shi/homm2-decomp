@@ -5,10 +5,10 @@
 the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
 from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
 
-Ordering in `cli.py`: the runtime FID database is verified first, then compilation must
-succeed (ninja), followed by the source/object gates below.
+Ordering in `cli.py`: the source-private and runtime FID inventories are verified first,
+then compilation must succeed (ninja), followed by the source/object gates below.
 
-## 0. Runtime FID identity
+## 0. Source-private and runtime FID identity
 
 `runtime_fid --check` re-identifies every row in `config/library_labels.csv` from the
 pinned VC 4.0 `LIBCMT.LIB`. It requires an exact function identity after masking only
@@ -16,6 +16,13 @@ COFF relocation operands; reviewed code-only spans may be exact prefixes when th
 symbol also owns embedded tables or alternate entries. Assembly entry points without their
 own COFF function symbol require an exact owner-relative match. A missing library, changed
 hash, ambiguous identity, stale name, or stale size fails the build.
+
+The source-private identity gate regenerates the inventory of `static`
+`VA(address, size)` definitions through Clang's Microsoft ABI mangler and requires it to
+match `build/gen/source_private_functions.csv`. This keeps file-local procedures in the
+synthetic PDB without a second handwritten manifest. After compilation, the same gate requires
+each derived decorated name to resolve to exactly one static function definition in the owning
+candidate COFF.
 
 ## 1. Compile + header-dependency tracking (ninja)
 
@@ -35,9 +42,10 @@ drift by declaring the same entity differently (the retail already had `_open` 2
 `extern "C" T f(){}` and linkage blocks) and `#include`s.
 
 ### 3. `assert_no_fake_labels` — no invented symbols
-Every external **function** symbol a `.cpp` emits (defined, `.text`) must exist in CodeView
-(`build/gen/symbol_names.csv`). Catches hand-written functions/labels that don't correspond to
-a real retail symbol — the source may only reconstruct symbols the binary actually has.
+Every external **function** symbol a `.cpp` emits (defined, `.text`) must exist in the
+retained-public/recovered inventory (`build/gen/symbol_names.csv`). Catches hand-written
+functions/labels that don't correspond to a reviewed retail symbol. File-local `static`
+functions follow the separate source-private `VA` inventory described above.
 
 ### 4. `assert_globals_data` — DATA(VA) discipline
 `DATA(0x<VA>)` rides the global's **definition** in its owner `.cpp`, not the header `extern`:

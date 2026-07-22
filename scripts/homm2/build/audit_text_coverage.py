@@ -236,7 +236,8 @@ def main(argv=None):
             nb09_starts.add(start)
         elif provenance.startswith("cv-thunk"):
             nb09_starts.add(start)
-        elif provenance.startswith("source-compgen"):
+        elif (provenance.startswith("source-compgen") or
+              provenance.startswith("source-private")):
             source_configured[start] = (size, row["name"], row["unit"], provenance)
 
     configured = dict(source_configured)
@@ -348,6 +349,7 @@ def main(argv=None):
             shared_tail = end in configured and "direct-rel32-entry" in provenance
             if ("disassembly-ret" in provenance or "static-init" in provenance or
                     "source-compgen" in provenance or
+                    "source-private" in provenance or
                     "callback-disassembly" in provenance) and not terminates:
                 candidate_failures.append((rva, "%s extent lacks a terminal return/jump" % name))
             elif "direct-rel32-entry" in provenance and not terminates and not shared_tail:

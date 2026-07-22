@@ -8,6 +8,12 @@
 #   config/units.toml         one [[unit]] per NWC compiland with src/<tier>/<stem>.cpp
 import sys, struct, re, os, bisect
 from collections import defaultdict
+from pathlib import Path
+
+from homm2.build.annotated_functions import (
+    csv_bytes as private_function_csv_bytes,
+    source_private_functions,
+)
 pe = sys.argv[1]; REPO = sys.argv[2]; srcpaths = sys.argv[3] if len(sys.argv)>3 else None
 d = open(pe, "rb").read()
 
@@ -201,9 +207,28 @@ for tier in ("BASE","SOURCE","EDITOR"):
             compgen_procs.append((va,size,semantic,unit,
                                   "source-compgen-"+kind.lower(),kind,owner,path,line_number))
 
-# Procedures absent from CodeView are admitted only through this reviewed
-# manifest. Each row has an explicit executable span and evidence provenance;
-# no address is inferred from padding, jump-table bytes, or a source-only label.
+# File-local functions are absent from the linker-public NB09 stream by design.
+# Their source definition already carries static linkage, a semantic signature,
+# and a reviewed VA/span. Clang supplies the Microsoft-decorated local COFF name.
+private_procs=[]
+private_rows=source_private_functions(Path(REPO) / "src", Path(REPO))
+for private in private_rows:
+    va=imgbase+private.rva
+    if sec_of(private.rva)!=".text":
+        raise SystemExit("source-private function outside .text: 0x%x"%private.rva)
+    contribution_unit=unit_of(which(va))
+    if contribution_unit!=private.unit:
+        raise SystemExit("source-private function 0x%x belongs to %s, not %s"%
+                         (private.rva,contribution_unit,private.unit))
+    if (va,private.mangled_name) in pubs:
+        raise SystemExit("static source function unexpectedly has an NB09 public: %s"%
+                         private.mangled_name)
+    private_procs.append((va,private.size,private.mangled_name,private.unit,
+                          "source-private-static",private.name,private.location))
+
+# Reviewed public span overrides and other procedures not recoverable from source
+# are admitted through these manifests. No address is inferred from padding,
+# jump-table bytes, or a source-only label.
 validated_procs=[]
 procedure_manifests=[
     (os.path.join(REPO,"config","delink_procedures.csv"),False),
@@ -229,6 +254,8 @@ for vp,is_fid in procedure_manifests:
                 raise SystemExit("delink procedure 0x%x belongs to %s, not %s"%
                                  (rva,contribution_unit,unit))
             validated_procs.append((va,size,name,unit,"validated-"+proof))
+for va,size,name,unit,proof,_,_ in private_procs:
+    validated_procs.append((va,size,name,unit,proof))
 for va,size,name,unit,proof,_,_,_,_ in compgen_procs:
     validated_procs.append((va,size,name,unit,proof))
 seen=set()
@@ -337,6 +364,9 @@ with open(os.path.join(REPO,"build","gen","compiler_generated_functions.csv"),"w
         f.write("0x%x,%s,%s,0x%x,%s,%s,%s,%d\n"%(
             va-imgbase,name,unit,size,kind,owner,
             os.path.relpath(path,REPO),line_number))
+
+Path(REPO,"build","gen","source_private_functions.csv").write_bytes(
+    private_function_csv_bytes(private_rows))
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]

@@ -1,19 +1,7 @@
-# Procedures absent from the original NB09 procedure records. Every span has
-# executable entry/exit and instruction/data-boundary evidence. Exact names are
-# retained when the reconstructed MSVC object emits them; blank names become the
-# deterministic delink_proc_<RVA> identity.
+# Reviewed procedure spans that cannot be generated from source annotations or
+# runtime FID. Source static functions carrying VA are added automatically
+# to the synthetic PDB and do not belong here.
 rva,size,name,unit,provenance
 0x37595,0x21a,?SetGraphicsType@@YIHH@Z,SOURCE/wingraph,disassembly-ret
 0x47211,0x483,?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z,SOURCE/PHILAI,disassembly-ret
 0xa7758,0x26e,?nb_thr_ctl@@YIXXZ,SOURCE/netwin,disassembly-ret
-0xa79c6,0xbb,?nb_add_name@@YIXXZ,SOURCE/netwin,direct-rel32-entry
-0xa7a81,0x1ca,?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z,SOURCE/netwin,callback-disassembly
-0xa7c4b,0xbe,?nb_recv_any@@YIGH@Z,SOURCE/netwin,direct-rel32-entry
-0xa7d09,0x142,?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z,SOURCE/netwin,callback-disassembly
-0xa7e4b,0xcf,?nb_call@@YIGHPAX@Z,SOURCE/netwin,direct-rel32-entry
-0xa7f1a,0xcf,?nb_listen@@YIGHPAX@Z,SOURCE/netwin,direct-rel32-entry
-0xa7fe9,0x130,?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z,SOURCE/netwin,callback-disassembly
-0xa8119,0x14f,?nb_arm_recv@@YIXH@Z,SOURCE/netwin,direct-rel32-entry
-0xa8268,0xc2,?nb_close_session@@YIXH@Z,SOURCE/netwin,direct-rel32-entry
-0xa832a,0x179,?nb_recv_complete@@YIXH@Z,SOURCE/netwin,direct-rel32-entry
-0xa84a3,0x87,?nb_format_name@@YIXPADPAE@Z,SOURCE/netwin,direct-rel32-entry
