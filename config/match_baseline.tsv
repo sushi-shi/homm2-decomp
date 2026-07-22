@@ -1226,7 +1226,7 @@ SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	98.2639	c21f605a0daa
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	100.0000	8bbb78255a15
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	98.8248	602a896e999b
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	99.5782	68be440790be
-SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	88.0561	2bf3610cd77e
+SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	99.4128	1fc9401f6186
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	4bae0180aca2
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	0c7938c0620e
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.3982	eae6ae32c88c
@@ -1240,7 +1240,7 @@ SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.5277	585b3db2d4a1
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	97.3554	c204aea72535
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
-SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.2271	b271f1ddf5c5
+SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.3629	b271f1ddf5c5
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	94.1497	caafc846138d
 SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	99.8939	dcd353b4a76c
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	11f655fc0932
