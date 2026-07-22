@@ -710,7 +710,7 @@ void playerData::Write(i32 file) {
     write(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
     write(file, m_townIds, sizeof(m_townIds));
     write(file, m_resources, sizeof(m_resources));
-    write(file, m_income, sizeof(m_income));
+    write(file, m_aiData.m_income, sizeof(m_aiData.m_income));
     write(file, &m_barrierTents, sizeof(m_barrierTents));
     write(file, &m_barrierTents, sizeof(m_barrierTents));
     write(file, m_unknownad, sizeof(m_unknownad));
@@ -741,7 +741,7 @@ void playerData::Read(i32 file) {
     read(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
     read(file, m_townIds, sizeof(m_townIds));
     read(file, m_resources, sizeof(m_resources));
-    read(file, m_income, sizeof(m_income));
+    read(file, m_aiData.m_income, sizeof(m_aiData.m_income));
     read(file, &m_barrierTents, sizeof(m_barrierTents));
     read(file, &m_barrierTents, sizeof(m_barrierTents));
     read(file, m_unknownad, sizeof(m_unknownad));
@@ -4281,7 +4281,7 @@ void game::PerDay(void) {
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_COUNT; resource8++) {
-            gpGame->m_players[player].m_income[IDX(resource8)] =
+            gpGame->m_players[player].m_aiData.m_income[IDX(resource8)] =
                 -m_players[player].m_resources[IDX(resource8)];
         }
     }
@@ -4373,7 +4373,7 @@ void game::PerDay(void) {
                 else
                     penaltyRate9 = GAME_HANDICAP_SEVERE_DAILY_PENALTY;
                 m_players[player].m_resources[IDX(resource8)] -= static_cast<i32>(
-                    (gpGame->m_players[player].m_income[IDX(resource8)]
+                    (gpGame->m_players[player].m_aiData.m_income[IDX(resource8)]
                      + m_players[player].m_resources[IDX(resource8)])
                     * penaltyRate9
                 );
@@ -4383,7 +4383,7 @@ void game::PerDay(void) {
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_COUNT; resource8++) {
-            gpGame->m_players[player].m_income[IDX(resource8)] +=
+            gpGame->m_players[player].m_aiData.m_income[IDX(resource8)] +=
                 m_players[player].m_resources[IDX(resource8)];
         }
     }
