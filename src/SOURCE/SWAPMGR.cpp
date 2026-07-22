@@ -106,13 +106,6 @@ inline i32 NormalizeSwapControl(i32 control) {
     return NormalizeControlRange(control, CONTROL_RIGHT_ARMY_FIRST, CONTROL_RIGHT_ARMY_LAST);
 }
 
-inline void BroadcastAdventureControls(tag_message& message) {
-    for (i32 control = ADVENTURE_WIDGET_FIRST; control <= ADVENTURE_WIDGET_LAST; ++control) {
-        message.payload.widget.id = control;
-        gpAdvManager->m_adventureWindow->BroadcastMessage(message);
-    }
-}
-
 VA(0x004543c0, 0x84)
 swapManager::swapManager(void) {
     m_window = NULL;
@@ -212,7 +205,18 @@ i32 swapManager::Open(i32 id) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    BroadcastAdventureControls(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
@@ -240,7 +244,18 @@ void swapManager::Close(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     message.payload.widget.data.value = ADVENTURE_DISABLE_VALUE;
-    BroadcastAdventureControls(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 1;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 2;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 3;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_FIRST + 4;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
+    message.payload.widget.id = ADVENTURE_WIDGET_LAST;
+    gpAdvManager->m_adventureWindow->BroadcastMessage(message);
 }
 
 VA(0x004549eb, 0x1f8)
