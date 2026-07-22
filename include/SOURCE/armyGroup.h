@@ -16,13 +16,13 @@ H2_ENUM_BEGIN(ArmyGroupConstant)
     ARMY_GROUP_MORALE_MAX         = 3
 H2_ENUM_END(ArmyGroupConstant)
 
-H2_ENUM_BEGIN(ArmyGroupAlignmentResult)
+H2_ENUM_CLASS_BEGIN(ArmyGroupAlignmentResult)
     ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE = -3,
     ARMY_GROUP_ALIGNMENT_FOUR         = -2,
     ARMY_GROUP_ALIGNMENT_THREE        = -1,
     ARMY_GROUP_ALIGNMENT_NO_MODIFIER  = 0,
     ARMY_GROUP_ALIGNMENT_SAME         = 1
-H2_ENUM_END(ArmyGroupAlignmentResult)
+H2_ENUM_CLASS_END(ArmyGroupAlignmentResult)
 
 #pragma pack(push, 1)
 class armyGroup {

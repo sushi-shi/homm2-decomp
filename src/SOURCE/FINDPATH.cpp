@@ -397,7 +397,7 @@ i32 searchArray::FindCombatPath(
     i32 sourceHex,
     i32 targetHex,
     class army* unit,
-    i32 attackPath,
+    ArmyPathTarget attackPath,
     i32 ignoreTargetMoat
 ) {
     u8 savedMoatState[KB_MOAT_CELL_COUNT];
@@ -428,7 +428,7 @@ i32 searchArray::FindCombatPath(
     i32 bestDistance = INITIAL_BEST_DISTANCE;
     i32 bestHex = -1;
     i32 attackTargetHex = targetHex;
-    if (attackPath == 0)
+    if (attackPath == ARMY_PATH_ANY_TARGET_HEX)
         attackTargetHex = -1;
     memset(m_queue, 0, sizeof(m_queue));
     memset(m_storage.cells, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell));

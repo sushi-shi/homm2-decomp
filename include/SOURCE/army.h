@@ -9,21 +9,16 @@
 
 class sample;
 
-H2_ENUM_BEGIN(ArmyAttackTarget)
+H2_ENUM_CLASS_BEGIN(ArmyAttackTarget)
     ARMY_ATTACK_TARGET_ASSIGNED = 0,
     ARMY_ATTACK_TARGET_ENEMY    = 1,
     ARMY_ATTACK_TARGET_OCCUPIED = 2
-H2_ENUM_END(ArmyAttackTarget)
+H2_ENUM_CLASS_END(ArmyAttackTarget)
 
-H2_ENUM_BEGIN(ArmyPathTarget)
-    ARMY_PATH_ANY_TARGET_HEX   = 0,
-    ARMY_PATH_EXACT_TARGET_HEX = 1
-H2_ENUM_END(ArmyPathTarget)
-
-H2_ENUM_BEGIN(ArmyDamagePenalty)
+H2_ENUM_CLASS_BEGIN(ArmyDamagePenalty)
     ARMY_DAMAGE_PENALTY_NONE = 0,
     ARMY_DAMAGE_PENALTY_HALF = 2
-H2_ENUM_END(ArmyDamagePenalty)
+H2_ENUM_CLASS_END(ArmyDamagePenalty)
 
 H2_ENUM_BEGIN(ArmyHexConstant)
     ARMY_ATTACK_HEX_COUNT = 2,
@@ -140,10 +135,10 @@ public:
     i32 OtherArmyAdjacent(i32, i32);
     i32 GetPowBaseY(void);
     i32 CanFit(i32, i32, i32*);
-    i32 ValidFlight(i32, i32);
+    i32 ValidFlight(i32, ArmyPathTarget);
     i32 FlyTo(void);
     i32 FlyTo(i32);
-    i32 FindPath(i32, i32, i32, i32, i32);
+    i32 FindPath(i32, i32, i32, i32, ArmyPathTarget);
     i32 ValidPath(i32, ArmyPathTarget);
     i32 GetMoveMask(i32);
     i32 GetAttackMask(i32, ArmyAttackTarget, i32);
