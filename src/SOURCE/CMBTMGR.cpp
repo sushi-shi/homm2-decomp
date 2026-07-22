@@ -1424,7 +1424,9 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 spriteFrame27 = 0;
     float projectileX11 = static_cast<float>(startX7);
     float projectileY4 = static_cast<float>(startY9);
-    float midpointX19 = static_cast<float>((impactX5 + startX7) / COMBAT_CATAPULT_MIDPOINT_DIVISOR);
+    float midpointX19 = static_cast<float>(
+        (OD_STEER(impactX5) + startX7) / COMBAT_CATAPULT_MIDPOINT_DIVISOR
+    );
     bounceY0 = static_cast<float>(
         (impactY0 - (impactX5 - startX7) * COMBAT_CATAPULT_DISTANCE_ARC_SCALE)
         - impactY0 * COMBAT_CATAPULT_TARGET_ARC_SCALE
