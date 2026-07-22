@@ -6,6 +6,7 @@
 #include <SOURCE/REMOTE_TYPES.h>
 #include <va.h>
 #include <SOURCE/CURSOR.h>
+#include <SOURCE/combatTypes.h>
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/Overview.h>
@@ -32,10 +33,6 @@ H2_ENUM_BEGIN(TownEligibleBuildMaskConstant)
     TOWN_ELIGIBLE_BUILD_WIZARD_MASK      = 0x35f8bf9f,
     TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK = 0x1ff8bf9b
 H2_ENUM_END(TownEligibleBuildMaskConstant)
-
-H2_ENUM_BEGIN(CombatControlConstant)
-    COMBAT_CONTROL_SIDE_COUNT = 2
-H2_ENUM_END(CombatControlConstant)
 
 H2_ENUM_CLASS_BEGIN(AdventureDisposeLevel)
     ADV_DISPOSE_NONE    = 0,
@@ -557,7 +554,7 @@ extern i32 giMaxExtentX;
 extern i32 giMaxExtentY;
 extern i32 giRandomClouds;
 extern char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
-extern i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
+extern i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 extern b32 gbInCampaign;
 extern i32 giResExtra1;
 extern i32 giResExtra2;
@@ -604,14 +601,14 @@ extern char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 extern u8 giSetupGameType;
 extern char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 extern i32 giFullySeeded;
-extern i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
+extern i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbMoveShown;
 extern b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
 extern char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern class heroWindow* heroWin;
 extern i32 giOverviewReturnActionExtra;
-extern i32 giCurGeneral;
+extern H2_ENUM_STORAGE(CombatSide, i32) giCurGeneral;
 extern b32 gbIconClipOn;
 extern b32 gbRemoteGameOpen;
 extern i32 giTCPNumPlayers;

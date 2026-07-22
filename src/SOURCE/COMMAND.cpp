@@ -164,7 +164,6 @@ H2_ENUM_BEGIN(CombatCommandConstant)
     INVALID_ARMY_INDEX       = -1,
     INVALID_HEX              = -1,
     PLAYER_NONE              = -1,
-    SMALL_VIEW_SIDE_NONE     = -1,
     SMALL_VIEW_POSITION_NONE = -1,
     IGNORED_HEX              = -2,
     CASTLE_GATE_HEX          = 59
@@ -382,7 +381,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     }
 
     {
-        army* currentArmy = &m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex];
+        army* currentArmy = &m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex];
         if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
@@ -404,7 +403,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
 ProcessAction:
     if (giNextAction == ACTION_NONE) {
-        if (m_playerId[m_currentSide] == -1 || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0
+        if (m_playerId[IDX(m_currentSide)] == -1 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || m_gridSelectionDisabled != 0) {
             CheckGetAIMove();
         } else {
@@ -431,11 +430,11 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
                       && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                      .m_occupantSide
-                                 != COMBAT_OCCUPANT_NONE
+                                 != COMBAT_SIDE_NONE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                      .m_deadOccupantCount
                                  != 0))))
-          || (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE
+          || (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
               && (m_hexCells[hexIndex].m_occupantSide != m_currentArmySide
                   || m_hexCells[hexIndex].m_occupantIndex != m_currentArmyIndex)))) {
         return 1;
@@ -453,12 +452,12 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     i32 directionHexes_4[COMBAT_DIRECTION_COUNT];
     i32 rearHexes_15[COMBAT_DIRECTION_COUNT];
     char pathValid_1[COMBAT_DIRECTION_COUNT];
-    army* currentArmy_3 = &m_armies[m_currentArmySide][m_currentArmyIndex];
-    i32 targetSide_36 = currentArmy_3->m_targetSide;
+    army* currentArmy_3 = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+    CombatSide targetSide_36 = currentArmy_3->m_targetSide;
     i32 targetIndex_6 = currentArmy_3->m_targetIndex;
-    currentArmy_3->m_targetSide = -1;
+    currentArmy_3->m_targetSide = COMBAT_SIDE_NONE;
     currentArmy_3->m_targetIndex = -1;
-    army* targetArmy_1 = &m_armies[targetSide_36][targetIndex_6];
+    army* targetArmy_1 = &m_armies[IDX(targetSide_36)][targetIndex_6];
 
     i32 direction_27;
     for (direction_27 = 0; direction_27 < COMBAT_DIRECTION_COUNT; direction_27++) {
@@ -709,8 +708,8 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
         OppositeDirection(static_cast<CombatHexDirection>(m_directionMap[sector]));
     CombatHexDirection direction = directionResult;
     CombatHexDirection alternateDirection = COMBAT_DIRECTION_INVALID;
-    army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
-    army* targetArmy = &m_armies[currentArmy->m_targetSide][currentArmy->m_targetIndex];
+    army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+    army* targetArmy = &m_armies[IDX(currentArmy->m_targetSide)][currentArmy->m_targetIndex];
 
     if (direction == COMBAT_DIRECTION_WIDE_WEST || direction == COMBAT_DIRECTION_WIDE_EAST) {
         if (HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
@@ -983,15 +982,15 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 case KEY_DEBUG_CREATURE_EFFECT:
                     if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)) {
-                        VaporizeCreature(1, 1);
+                        VaporizeCreature(COMBAT_DEFENDER_SIDE, 1);
                     } else if (HAS(
                                    message.payload.keyboard.modifiers,
                                    MESSAGE_MODIFIER_CONTROL_KEYS
                                )) {
-                        RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_RIPPLE);
-                        RippleCreature(1, 1, COMBAT_RIPPLE_DEATH_WAVE);
+                        RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_DEATH_RIPPLE);
+                        RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_DEATH_WAVE);
                     } else {
-                        RippleCreature(1, 1, COMBAT_RIPPLE_WAVE);
+                        RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_WAVE);
                     }
                     break;
                 case KEY_WAIT:
@@ -1004,7 +1003,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 }
                 case KEY_VIEW_GENERAL:
-                    if (m_heroes[m_currentSide] != NULL) {
+                    if (m_heroes[IDX(m_currentSide)] != NULL) {
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                         ViewGeneral(m_currentSide, 1, 0);
                         ResetMouse();
@@ -1012,11 +1011,11 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                     break;
                 case KEY_VIEW_ARMY:
                     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-                    ViewArmy(&m_armies[m_currentArmySide][m_currentArmyIndex], 0);
+                    ViewArmy(&m_armies[IDX(m_currentArmySide)][m_currentArmyIndex], 0);
                     ResetMouse();
                     break;
                 case KEY_CAST_SPELL:
-                    if (m_heroes[m_currentSide] == NULL) {
+                    if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
                             "You have no hero to cast a spell.",
                             NORMAL_DIALOG_INFO,
@@ -1043,7 +1042,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                             NORMAL_DIALOG_NO_RESOURCE,
                             0
                         );
-                    } else if (m_heroCastSpell[m_currentSide] != 0 && giDebugLevel == 0) {
+                    } else if (m_heroCastSpell[IDX(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
                             "You have already cast a spell this round.",
                             NORMAL_DIALOG_INFO,
@@ -1072,9 +1071,9 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
 
 VA(0x0042c40a, 0x70)
 i32 combatManager::IsNegationSphereInEffect(void) {
-    i32 side;
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
-        if (m_heroes[side] != NULL && m_heroes[side]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
+    CombatSide side;
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
+        if (m_heroes[IDX(side)] != NULL && m_heroes[IDX(side)]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
             return 1;
     }
     return 0;
@@ -1097,11 +1096,11 @@ void combatManager::ResetRound(void) {
     memset(gpCombatManager->m_removedArmies, 0, sizeof(gpCombatManager->m_removedArmies));
     gpCombatManager->m_removedArmyPresent = 0;
 
-    i32 side;
+    CombatSide side;
     i32 armyIndex;
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; side++) {
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
-            army* currentArmy = m_armies[side] + armyIndex;
+            army* currentArmy = m_armies[IDX(side)] + armyIndex;
             if (currentArmy->m_quantity > 0) {
                 currentArmy->m_monster.flags.abilityFlags &=
                     MONSTER_FLAGS_ROUND_PERSISTENT_MASK;
@@ -1125,13 +1124,13 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     i32 combatEnded = 0;
     if (IsWinner(m_currentSide) != 0) {
         combatEnded = 1;
-        if (IsWinner(1 - m_currentSide) != 0)
+        if (IsWinner(OppositeCombatSide(m_currentSide)) != 0)
             m_combatResult = COMBAT_RESULT_DRAW;
         else
-            m_combatResult = m_currentSide;
-    } else if (IsWinner(1 - m_currentSide) != 0) {
+            m_combatResult = IDX(m_currentSide);
+    } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
         combatEnded = 1;
-        m_combatResult = 1 - m_currentSide;
+        m_combatResult = IDX(OppositeCombatSide(m_currentSide));
     } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
         combatEnded = 1;
         gbRetreatWin = true;
@@ -1181,7 +1180,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
         switch (hexIndex) {
             case COMBAT_GRID_RIGHT_HERO_HEX:
                 if (m_heroes[1] != NULL) {
-                    if (m_currentSide == 1)
+                    if (m_currentSide == COMBAT_DEFENDER_SIDE)
                         command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                     else
                         command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
@@ -1191,7 +1190,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                 break;
             case COMBAT_GRID_LEFT_SPECIAL_HEX:
                 if (m_heroes[0] != NULL) {
-                    if (m_currentSide == 0)
+                    if (m_currentSide == COMBAT_ATTACKER_SIDE)
                         command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                     else
                         command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
@@ -1211,10 +1210,10 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                     break;
                 }
 
-                i32 targetSide = m_hexCells[hexIndex].m_occupantSide;
+                CombatSide targetSide = m_hexCells[hexIndex].m_occupantSide;
                 i32 targetIndex = m_hexCells[hexIndex].m_occupantIndex;
-                army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
-                currentArmy->m_targetSide = -1;
+                army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+                currentArmy->m_targetSide = COMBAT_SIDE_NONE;
                 currentArmy->m_targetIndex = -1;
 
                 if (m_hexCells[hexIndex].m_blocked != 0
@@ -1225,12 +1224,12 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                                 || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                            .m_occupantSide
-                                       != COMBAT_OCCUPANT_NONE
+                                       != COMBAT_SIDE_NONE
                                 || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                            .m_deadOccupantCount
                                        != 0)))) {
                     command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                } else if (targetSide != -1) {
+                } else if (targetSide != COMBAT_SIDE_NONE) {
                     if (m_currentArmySide != targetSide || m_currentArmyIndex != targetIndex) {
                         showSmallView = 1;
                         if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
@@ -1240,8 +1239,8 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                         }
                     }
                     switch (targetSide) {
-                        case 0:
-                        case 1:
+                        case COMBAT_ATTACKER_SIDE:
+                        case COMBAT_DEFENDER_SIDE:
                             if (m_currentSide == targetSide
                                 || (m_currentArmySide == targetSide
                                     && m_currentArmyIndex == targetIndex)) {
@@ -1267,17 +1266,17 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             }
                             if (currentArmy->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
-                            currentArmy->m_targetSide = -1;
+                            currentArmy->m_targetSide = COMBAT_SIDE_NONE;
                             currentArmy->m_targetIndex = -1;
                     }
                     command = COMBAT_MESSAGE_COMMAND_DEFAULT;
                 } else {
-                    if (m_armies[m_currentArmySide][m_currentArmyIndex].ValidPath(
+                    if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].ValidPath(
                             hexIndex, ARMY_PATH_ANY_TARGET_HEX
                         )
                         == 1) {
                         command = HAS(
-                                      m_armies[m_currentArmySide][m_currentArmyIndex]
+                                      m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
                                           .m_monster.flags.all,
                                       MONSTER_FLAGS_FLYING
                                   )
@@ -1291,7 +1290,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     }
 
     if (showSmallView == 0 && gbProcessingCombatAction == 0) {
-        m_smallViewSide[1] = -1;
+        m_smallViewSide[1] = COMBAT_SIDE_NONE;
         DrawSmallView(1, 1);
     }
     return command;
@@ -1311,13 +1310,13 @@ i32 combatManager::RightClick(i32 hexIndex) {
             return 0;
         case COMBAT_GRID_RIGHT_HERO_HEX:
             if (m_heroes[1] != NULL) {
-                ViewGeneral(1, 0, 1);
+                ViewGeneral(COMBAT_DEFENDER_SIDE, 0, 1);
                 ResetMouse();
             }
             return 0;
         case COMBAT_GRID_LEFT_SPECIAL_HEX:
             if (m_heroes[0] != NULL) {
-                ViewGeneral(0, 0, 1);
+                ViewGeneral(COMBAT_ATTACKER_SIDE, 0, 1);
                 ResetMouse();
             }
             return 0;
@@ -1325,7 +1324,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
             if (hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1)
                 return 0;
 
-            i32 side = m_hexCells[hexIndex].m_occupantSide;
+            CombatSide side = m_hexCells[hexIndex].m_occupantSide;
             i32 armyIndex = m_hexCells[hexIndex].m_occupantIndex;
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
@@ -1335,18 +1334,18 @@ i32 combatManager::RightClick(i32 hexIndex) {
                         && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_occupantSide
-                                   != COMBAT_OCCUPANT_NONE
+                                   != COMBAT_SIDE_NONE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_deadOccupantCount
                                    != 0))))
                 return 0;
 
-            if (side != -1) {
+            if (side != COMBAT_SIDE_NONE) {
                 switch (side) {
-                    case 0:
-                    case 1:
+                    case COMBAT_ATTACKER_SIDE:
+                    case COMBAT_DEFENDER_SIDE:
                         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-                        ViewArmy(&m_armies[side][m_hexCells[m_selectedHex].m_occupantIndex], 1);
+                        ViewArmy(&m_armies[IDX(side)][m_hexCells[m_selectedHex].m_occupantIndex], 1);
                         ResetMouse();
                         return 0;
                 }
@@ -1359,7 +1358,7 @@ VA(0x0042d0bf, 0x3b3)
 void combatManager::DoCommand(CombatMessageCommand command) {
     i32 unusedCommandWord2;
     i32 unusedCommandWord5;
-    army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     switch (command) {
         case COMBAT_MESSAGE_COMMAND_DEFAULT:
             break;
@@ -1373,7 +1372,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
             giNextActionGridIndex = m_selectedHex;
-            if (m_playerId[m_currentSide] == -1 || gbHumanPlayer[m_playerId[m_currentSide]] == 0
+            if (m_playerId[IDX(m_currentSide)] == -1 || gbHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
                 || m_gridSelectionDisabled != 0) {
                 giNextAction = ACTION_MOVE;
                 giNextActionExtra = -1;
@@ -1389,7 +1388,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
             gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-            ViewGeneral(1 - m_currentSide, 1, 0);
+            ViewGeneral(OppositeCombatSide(m_currentSide), 1, 0);
             ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_VIEW_INFO:
@@ -1398,7 +1397,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 ViewBallista(0);
             else
                 ViewArmy(
-                    &m_armies[m_hexCells[m_selectedHex].m_occupantSide]
+                    &m_armies[IDX(m_hexCells[m_selectedHex].m_occupantSide)]
                              [m_hexCells[m_selectedHex].m_occupantIndex],
                     0
                 );
@@ -1443,7 +1442,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_SURRENDER:
             if (DoSurrender() == 1) {
-                if (gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)]
+                if (gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
                         "You don't have enough gold!",
@@ -1859,7 +1858,7 @@ VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
     DATA(0x004f0ca0) static i16 casualtySourceLineBase = 0x74b; // NOLINT(readability-magic-numbers)
     i32 casualtyQuantity_0[CASUALTY_QUANTITY_STORAGE_COUNT];
-    i32 casualtyType_1[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    i32 casualtyType_1[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 side_9;
     i32 armyIndex_8;
     i32 y_29;
@@ -1882,7 +1881,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         m_winLoseBottomWidgets[side_9] = NULL;
         m_winLoseBottomTextWidgets[side_9] = NULL;
     }
-    for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
+    for (side_9 = 0; side_9 < COMBAT_SIDE_COUNT; ++side_9) {
         casualtyQuantity_0[side_9] = 0;
         for (armyIndex_8 = 0; armyIndex_8 < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_8) {
             if (m_armies[side_9][armyIndex_8].m_monsterType != CREATURE_NONE
@@ -1890,7 +1889,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                        < m_armies[side_9][armyIndex_8].m_initialQuantity) {
                 *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + casualtyQuantity_0[side_9]) = IDX(m_armies[side_9][armyIndex_8].m_monsterType);
-                *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
+                *(&casualtyQuantity_0[COMBAT_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + casualtyQuantity_0[side_9]) = m_armies[side_9][armyIndex_8].m_initialQuantity
                                                   - m_armies[side_9][armyIndex_8].m_quantity;
                 ++casualtyQuantity_0[side_9];
@@ -1916,13 +1915,13 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         MemError();
     window->AddWidget(m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET], -1);
 
-    for (side_9 = 0; side_9 < COMBAT_MANAGER_SIDE_COUNT; ++side_9) {
-        if (side_9 == COMBAT_ATTACKER_SIDE)
+    for (side_9 = 0; side_9 < COMBAT_SIDE_COUNT; ++side_9) {
+        if (side_9 == IDX(COMBAT_ATTACKER_SIDE))
             y_29 = CASUALTY_ATTACKER_Y;
         else
             y_29 = CASUALTY_DEFENDER_Y;
         text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_HEADING_CAPACITY, 1923));
-        sprintf(text_27, side_9 == COMBAT_ATTACKER_SIDE ? "Attacker" : "Defender");
+        sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? "Attacker" : "Defender");
         m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] = new textWidget(
             CASUALTY_TITLE_X,
             y_29 + CASUALTY_SIDE_LABEL_Y_OFFSET,
@@ -2019,7 +2018,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             sprintf(
                 text_27,
                 "%d",
-                *(&casualtyQuantity_0[COMBAT_MANAGER_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
+                *(&casualtyQuantity_0[COMBAT_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + armyIndex_8)
             );
             m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] =
@@ -2057,7 +2056,7 @@ void combatManager::DoVictory(i32 winningSide) {
     i32 experienceLevels = 0;
     i32 deadCreatureCount;
     i32 eligibleWinnerStacks;
-    i32 side;
+    CombatSide side;
     i32 armyIndex;
     i32 lastLivingArmy;
     i32 livingCreatureCount;
@@ -2068,8 +2067,8 @@ void combatManager::DoVictory(i32 winningSide) {
     i32 emptyArtifactSlots;
     tag_message message;
 
-    if (m_heroes[COMBAT_DEFENDER_SIDE] != NULL && m_heroes[COMBAT_DEFENDER_SIDE]->m_isCaptain != 0)
-        m_heroes[COMBAT_DEFENDER_SIDE] = NULL;
+    if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
+        m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = NULL;
     gbShowingLoseWindow = false;
     gbWhichAnimationPlaying = true;
     giWinCmbtFrame = 0;
@@ -2080,12 +2079,12 @@ void combatManager::DoVictory(i32 winningSide) {
     deadCreatureCount = 0;
     eligibleWinnerStacks = 0;
 
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         livingCreatureCount = 0;
         lastLivingArmy = -1;
-        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[side]; ++armyIndex) {
-            currentArmy =
-                side * COMBAT_ARMY_STORAGE_SLOT_COUNT + &m_armies[COMBAT_ATTACKER_SIDE][armyIndex];
+        for (armyIndex = 0; armyIndex < gpCombatManager->m_armyCount[IDX(side)]; ++armyIndex) {
+            currentArmy = IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT
+                           + &m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex];
             if (currentArmy->m_quantity > 0) {
                 lastLivingArmy = armyIndex;
                 if (currentArmy->m_temporaryResurrectionQuantity > 0)
@@ -2094,7 +2093,7 @@ void combatManager::DoVictory(i32 winningSide) {
                     currentArmy->m_quantity = 0;
                 livingCreatureCount += currentArmy->m_quantity;
             }
-            if (side == winningSide && currentArmy->m_quantity > 0
+            if (IDX(side) == winningSide && currentArmy->m_quantity > 0
                 && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
                 && currentArmy->m_monsterType != CREATURE_EARTH_ELEMENTAL
                 && currentArmy->m_monsterType != CREATURE_AIR_ELEMENTAL
@@ -2103,13 +2102,13 @@ void combatManager::DoVictory(i32 winningSide) {
                 && currentArmy->m_monsterType != CREATURE_GHOST) {
                 ++eligibleWinnerStacks;
             }
-            if (winningSide == COMBAT_DEFENDER_SIDE - side) {
+            if (winningSide == COMBAT_RESULT_DEFENDER - IDX(side)) {
                 deadCreatureCount += currentArmy->m_initialQuantity - currentArmy->m_quantity;
             }
         }
         if (livingCreatureCount == 0 && lastLivingArmy != -1)
-            (side * COMBAT_ARMY_STORAGE_SLOT_COUNT
-             + &m_armies[COMBAT_ATTACKER_SIDE][lastLivingArmy])
+            (IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT
+             + &m_armies[IDX(COMBAT_ATTACKER_SIDE)][lastLivingArmy])
                 ->m_quantity = 1;
     }
 
@@ -2155,30 +2154,34 @@ void combatManager::DoVictory(i32 winningSide) {
             gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
             DoLoseWindow();
             break;
-        case COMBAT_ATTACKER_SIDE:
-        case COMBAT_DEFENDER_SIDE:
+        case COMBAT_RESULT_ATTACKER:
+        case COMBAT_RESULT_DEFENDER:
             if (m_heroes[winningSide] != NULL) {
                 if (m_eagleEyeSpell[winningSide] != SPELL_NONE) {
                     m_heroes[winningSide]->m_spells[IDX(m_eagleEyeSpell[winningSide])] = 1;
                 }
-                m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] =
-                    ExperienceValueOfStack(COMBAT_DEFENDER_SIDE - winningSide);
+                m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] =
+                    ExperienceValueOfStack(
+                        winningSide == COMBAT_RESULT_ATTACKER ? COMBAT_DEFENDER_SIDE
+                                                             : COMBAT_ATTACKER_SIDE
+                    );
                 if (gbRetreatWin != 0)
-                    m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] -=
+                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
-                if (m_combatTowns[COMBAT_DEFENDER_SIDE] != NULL && winningSide == COMBAT_ATTACKER_SIDE)
-                    m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide] +=
+                if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL
+                    && winningSide == COMBAT_RESULT_ATTACKER)
+                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] +=
                         COMBAT_HERO_EXPERIENCE_VALUE;
                 experienceLevels = gpAdvManager->GiveExperience(
                     m_heroes[winningSide],
-                    m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide],
+                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide],
                     gbThisNetHumanPlayer[m_heroes[winningSide]->m_owner] == 0
                 );
 
                 if (gbRetreatWin == 0) {
                     emptyArtifactSlots = 0;
-                    if (m_heroes[COMBAT_ATTACKER_SIDE] != NULL
-                        && m_heroes[COMBAT_DEFENDER_SIDE] != NULL) {
+                    if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
+                        && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
                             if (m_heroes[winningSide]->m_artifacts[fadeIndex]
                                 == ARTIFACT_NONE) {
@@ -2186,17 +2189,17 @@ void combatManager::DoVictory(i32 winningSide) {
                             }
                         }
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
-                            if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->m_artifacts[fadeIndex]
+                            if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->m_artifacts[fadeIndex]
                                     >= ARTIFACT_ARCANE_NECKLACE
-                                && m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                && m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
                                            ->m_artifacts[fadeIndex]
                                        != ARTIFACT_MAGIC_BOOK
                                 && emptyArtifactSlots > iMaxTransferArtifacts) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
-                                    m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
                                         ->m_artifacts[fadeIndex];
                                 iTransferArtifactsInfo[iMaxTransferArtifacts] =
-                                    m_heroes[COMBAT_DEFENDER_SIDE - winningSide]
+                                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
                                         ->m_artifactExtra[fadeIndex];
                                 ++iMaxTransferArtifacts;
                             }
@@ -2229,13 +2232,13 @@ void combatManager::DoVictory(i32 winningSide) {
                     } else {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_VICTORY)]);
                     }
-                    if (experienceLevels > 0 && winningSide == COMBAT_DEFENDER_SIDE
+                    if (experienceLevels > 0 && winningSide == COMBAT_RESULT_DEFENDER
                         && giNumHumanPlayers > 1) {
                         sprintf(
                             experienceText,
                             cBattleResults[IDX(RESULT_TEXT_NETWORK_EXPERIENCE)],
                             m_heroes[winningSide]->m_name,
-                            m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide],
+                            m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide],
                             experienceLevels
                         );
                     } else {
@@ -2243,7 +2246,7 @@ void combatManager::DoVictory(i32 winningSide) {
                             experienceText,
                             cBattleResults[IDX(RESULT_TEXT_EXPERIENCE)],
                             m_heroes[winningSide]->m_name,
-                            m_experienceValue[COMBAT_DEFENDER_SIDE - winningSide]
+                            m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide]
                         );
                     }
                     strcat(gText, experienceText);
@@ -2268,13 +2271,13 @@ void combatManager::DoVictory(i32 winningSide) {
                 gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
                 giDialogTimeout = 0;
                 delete m_winLoseWindow;
-                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != NULL)
-                    m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->ApplyBattleLossTemps();
+                if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide] != NULL)
+                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->ApplyBattleLossTemps();
             } else {
                 if (m_heroes[winningSide] != NULL)
                     m_heroes[winningSide]->ApplyBattleWinTemps();
-                if (m_heroes[COMBAT_DEFENDER_SIDE - winningSide] != NULL)
-                    m_heroes[COMBAT_DEFENDER_SIDE - winningSide]->ApplyBattleLossTemps();
+                if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide] != NULL)
+                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->ApplyBattleLossTemps();
                 gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
                 DoLoseWindow();
             }
@@ -2286,22 +2289,22 @@ void combatManager::DoVictory(i32 winningSide) {
 
 VA(0x0042f834, 0x3bc)
 void combatManager::DoLoseWindow(void) {
-    i32 unusedLoseWord_h = COMBAT_ATTACKER_SIDE;
+    i32 unusedLoseWord_h = COMBAT_RESULT_ATTACKER;
     i32 losingSide_h;
     char animationFile_j[WIN_LOSE_ANIMATION_FILENAME_SIZE];
     tag_message message;
 
-    if (m_playerId[COMBAT_ATTACKER_SIDE] == giCurPlayer
-        && gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        losingSide_h = COMBAT_ATTACKER_SIDE;
-    } else if (m_playerId[COMBAT_DEFENDER_SIDE] == giCurPlayer
-               && gbThisNetHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0) {
-        losingSide_h = COMBAT_DEFENDER_SIDE;
-    } else if (m_playerId[COMBAT_ATTACKER_SIDE] != -1
-               && gbThisNetHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
-        losingSide_h = COMBAT_ATTACKER_SIDE;
+    if (m_playerId[IDX(COMBAT_ATTACKER_SIDE)] == giCurPlayer
+        && gbThisNetHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0) {
+        losingSide_h = COMBAT_RESULT_ATTACKER;
+    } else if (m_playerId[IDX(COMBAT_DEFENDER_SIDE)] == giCurPlayer
+               && gbThisNetHumanPlayer[m_playerId[IDX(COMBAT_DEFENDER_SIDE)]] != 0) {
+        losingSide_h = COMBAT_RESULT_DEFENDER;
+    } else if (m_playerId[IDX(COMBAT_ATTACKER_SIDE)] != -1
+               && gbThisNetHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0) {
+        losingSide_h = COMBAT_RESULT_ATTACKER;
     } else {
-        losingSide_h = COMBAT_DEFENDER_SIDE;
+        losingSide_h = COMBAT_RESULT_DEFENDER;
     }
 
     gbShowingLoseWindow = true;
@@ -2383,22 +2386,22 @@ i32 combatManager::DoSurrender(void) {
 
     giSurrenderCost = 0;
     for (armyIndex_n = 0; armyIndex_n < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_n) {
-        if (m_armies[m_currentSide][armyIndex_n].IsAlive()) {
+        if (m_armies[IDX(m_currentSide)][armyIndex_n].IsAlive()) {
             giSurrenderCost +=
                 static_cast<i16>(
-                    gMonsterDatabase[IDX(m_armies[m_currentSide][armyIndex_n].m_monsterType)].cost
+                    gMonsterDatabase[IDX(m_armies[IDX(m_currentSide)][armyIndex_n].m_monsterType)].cost
                 )
-                * m_armies[m_currentSide][armyIndex_n].m_quantity;
+                * m_armies[IDX(m_currentSide)][armyIndex_n].m_quantity;
         }
     }
-    if (m_heroes[m_currentSide]->HasArtifact(ARTIFACT_STATESMANS_QUILL) != 0)
+    if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_STATESMANS_QUILL) != 0)
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_QUILL_FACTOR);
     else
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_BASE_FACTOR);
     giSurrenderCost = static_cast<i32>(
         giSurrenderCost
         * (1.0
-           - IDX(m_heroes[m_currentSide]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
+           - IDX(m_heroes[IDX(m_currentSide)]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
 
@@ -2414,24 +2417,24 @@ i32 combatManager::DoSurrender(void) {
     sprintf(
         gText,
         "port%04d.icn",
-        static_cast<i32>(m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_portrait)
+        static_cast<i32>(m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_portrait)
     );
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
-    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_isCaptain != 0)
+    if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0)
         message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_PORTRAIT_COMMAND;
     else
         message.payload.widget.command = COMBAT_SURRENDER_HERO_PORTRAIT_COMMAND;
     message.payload.widget.id = SURRENDER_PORTRAIT_WIDGET_ID;
     message.payload.widget.data.value = SURRENDER_PORTRAIT_DEFAULT_COLOR;
     window->BroadcastMessage(message);
-    if (m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_isCaptain != 0) {
+    if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0) {
         message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_OVERLAY_COMMAND;
-        if (m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide] == -1)
+        if (m_playerId[IDX(OppositeCombatSide(m_currentSide))] == -1)
             message.payload.widget.data.value = COMBAT_NEUTRAL_HERO_COLOR;
         else
             message.payload.widget.data.value =
-                gpGame->m_players[m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]].m_color;
+                gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]].m_color;
         window->BroadcastMessage(message);
     }
     message.payload.widget.data.text = gText;
@@ -2441,7 +2444,7 @@ i32 combatManager::DoSurrender(void) {
         gText,
         "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
         "for the price of %d gold.\"",
-        m_heroes[COMBAT_DEFENDER_SIDE - m_currentSide]->m_name,
+        m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
     );
     window->BroadcastMessage(message);
@@ -2454,7 +2457,7 @@ VA(0x0043002d, 0xdc)
 void combatManager::CheckChangeSelector(void) {
     if (gbNoShowCombat != 0)
         return;
-    army* currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     if (m_limitCreature == 0 || currentArmy->m_hex != m_limitCreatureHex) {
         UpdateGrid(0, 1);
         giNewMonsterCycleFrame = SELECTOR_INITIAL_FRAME;
@@ -2467,18 +2470,18 @@ void combatManager::CheckChangeSelector(void) {
 
 VA(0x00430109, 0xea)
 void combatManager::CheckCastleAttack(void) {
-    if (m_inCastleCombat != 0 && m_currentSide == 0) {
-        while (m_catapultAttacksRemaining[m_currentSide] > 0) {
+    if (m_inCastleCombat != 0 && m_currentSide == COMBAT_ATTACKER_SIDE) {
+        while (m_catapultAttacksRemaining[IDX(m_currentSide)] > 0) {
             CatAttack(m_currentSide);
-            --m_catapultAttacksRemaining[m_currentSide];
+            --m_catapultAttacksRemaining[IDX(m_currentSide)];
         }
     }
-    if (m_inCastleCombat != 0 && m_currentSide == 1) {
-        while (m_keepAttacksRemaining[m_currentSide] > 0) {
+    if (m_inCastleCombat != 0 && m_currentSide == COMBAT_DEFENDER_SIDE) {
+        while (m_keepAttacksRemaining[IDX(m_currentSide)] > 0) {
             KeepAttack(COMBAT_TOWER_GARRISON);
             KeepAttack(COMBAT_TOWER_TOP);
             KeepAttack(COMBAT_TOWER_BOTTOM);
-            --m_keepAttacksRemaining[m_currentSide];
+            --m_keepAttacksRemaining[IDX(m_currentSide)];
         }
     }
 }
@@ -2486,8 +2489,8 @@ void combatManager::CheckCastleAttack(void) {
 VA(0x004301f3, 0xdd)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
-    if (m_heroCastSpell[m_currentSide] == 0
-        && (m_playerId[m_currentSide] == -1 || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0
+    if (m_heroCastSpell[IDX(m_currentSide)] == 0
+        && (m_playerId[IDX(m_currentSide)] == -1 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || gConfig.autoCombatUseSpells != 0)) {
         if (DoSpellAI(m_currentSide, retreat) != 0)
             return;
@@ -2507,21 +2510,21 @@ void combatManager::GetControl(void) {
     if (gpCombatManager->m_active)
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     CheckChangeSelector();
-    if (gbRemoteOn == 0 || m_playerId[COMBAT_ATTACKER_SIDE] < 0
-        || m_playerId[COMBAT_DEFENDER_SIDE] < 0
-        || gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] == 0
-        || (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] == 0
-            && (gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0
-                || m_playerId[COMBAT_DEFENDER_SIDE] == 0))) {
+    if (gbRemoteOn == 0 || m_playerId[IDX(COMBAT_ATTACKER_SIDE)] < 0
+        || m_playerId[IDX(COMBAT_DEFENDER_SIDE)] < 0
+        || gbHumanPlayer[m_playerId[IDX(COMBAT_DEFENDER_SIDE)]] == 0
+        || (gbHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] == 0
+            && (gbHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0
+                || m_playerId[IDX(COMBAT_DEFENDER_SIDE)] == 0))) {
         gbThisNetHasControl = true;
     } else {
-        if (m_playerId[m_currentSide] != -1 && gbHumanPlayer[m_playerId[m_currentSide]] != 0
-            && gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0)
+        if (m_playerId[IDX(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0
+            && gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0)
             gbThisNetHasControl = false;
         else
             gbThisNetHasControl = true;
     }
-    m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
+    m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
     SetupSmallView();
     ResetMouse();
 }
@@ -2534,8 +2537,8 @@ void combatManager::ResetMouse(void) {
 
     if (gbNoShowCombat != 0)
         return;
-    if (gbThisNetHasControl != 0 && m_playerId[m_currentSide] >= 0
-        && gbHumanPlayer[m_playerId[m_currentSide]] != 0) {
+    if (gbThisNetHasControl != 0 && m_playerId[IDX(m_currentSide)] >= 0
+        && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0) {
         m_selectedHex = INVALID_HEX;
         ClearCombatMessages(0);
         gpMouseManager->MouseCoords(mouseX_f, mouseY_g);
@@ -2561,10 +2564,10 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     result = MESSAGE_DISPATCH_CONSUME;
     redraw = 0;
     gbProcessingCombatAction = true;
-    if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != -1
-        || m_smallViewSide[COMBAT_DEFENDER_SIDE] != -1) {
-        m_smallViewSide[COMBAT_DEFENDER_SIDE] = -1;
-        m_smallViewSide[COMBAT_ATTACKER_SIDE] = m_smallViewSide[COMBAT_DEFENDER_SIDE];
+    if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
+        || m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
+        m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
+        m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)];
         redraw = 1;
     }
     if (giNextAction != ACTION_NONE) {
@@ -2574,9 +2577,9 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             giNextActionGridIndex,
             giNextActionGridIndex2,
             giNextActionExtra,
-            m_currentArmySide,
+            IDX(m_currentArmySide),
             m_currentArmyIndex,
-            m_armies[m_currentArmySide][m_currentArmyIndex].m_hex
+            m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].m_hex
         );
     }
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
@@ -2587,17 +2590,17 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     if (redraw != 0)
         DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 
-    if (gbThisNetHasControl != 0 && gbRemoteOn != 0 && m_playerId[COMBAT_ATTACKER_SIDE] >= 0
-        && m_playerId[COMBAT_DEFENDER_SIDE] >= 0
-        && gbHumanPlayer[m_playerId[COMBAT_DEFENDER_SIDE]] != 0
-        && gbHumanPlayer[m_playerId[COMBAT_ATTACKER_SIDE]] != 0) {
+    if (gbThisNetHasControl != 0 && gbRemoteOn != 0 && m_playerId[IDX(COMBAT_ATTACKER_SIDE)] >= 0
+        && m_playerId[IDX(COMBAT_DEFENDER_SIDE)] >= 0
+        && gbHumanPlayer[m_playerId[IDX(COMBAT_DEFENDER_SIDE)]] != 0
+        && gbHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0) {
         actionData[IDX(ACTION_DATA_ACTION)] = IDX(giNextAction);
         actionData[IDX(ACTION_DATA_EXTRA)] = giNextActionExtra;
         actionData[IDX(ACTION_DATA_GRID)] = giNextActionGridIndex;
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
         LogInt(
             "About to T",
-            iCombatControlNetPos[COMBAT_DEFENDER_SIDE - m_currentSide],
+            iCombatControlNetPos[IDX(OppositeCombatSide(m_currentSide))],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -2607,7 +2610,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         );
         transmitResult = TransmitRemoteData(
             reinterpret_cast<char*>(actionData),
-            iCombatControlNetPos[COMBAT_DEFENDER_SIDE - m_currentSide],
+            iCombatControlNetPos[IDX(OppositeCombatSide(m_currentSide))],
             sizeof(actionData),
             REMOTE_COMMAND_ACTION,
             1,
@@ -2619,7 +2622,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             ShutDown(NULL);
     }
 
-    currentArmy = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     advanceArmy = 0;
     if (CheckWin(&message) == 0) {
         switch (giNextAction) {
@@ -2633,7 +2636,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                     0,
                     giNextActionGridIndex2
                 );
-                if (m_armies[m_currentArmySide][m_currentArmyIndex].m_quantity < 1)
+                if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].m_quantity < 1)
                     advanceArmy = 1;
                 ResetCycleTimers();
                 break;
@@ -2665,17 +2668,17 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
                 ResetCycleTimers();
                 break;
             case ACTION_RETREAT:
-                m_sideRetreated[m_currentSide] = 1;
+                m_sideRetreated[IDX(m_currentSide)] = 1;
                 gbRetreatWin = true;
                 ResetCycleTimers();
                 break;
             case ACTION_SURRENDER:
                 gbCombatSurrender = true;
                 gbRetreatWin = true;
-                m_sideDefeated[m_currentSide] = 1;
-                gpGame->m_players[m_playerId[m_currentSide]].m_resources[IDX(RES_GOLD)] -=
+                m_sideDefeated[IDX(m_currentSide)] = 1;
+                gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)] -=
                     giNextActionExtra;
-                gpGame->m_players[m_playerId[COMBAT_DEFENDER_SIDE - m_currentSide]]
+                gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]]
                     .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
                 ResetCycleTimers();
                 break;
@@ -2711,40 +2714,40 @@ VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void) {
     army* currentArmy_p = NULL;
     i32 cyclingCount = 0;
-    i32 side;
+    CombatSide side;
     i32 index;
     i32 unusedCyclingWord6;
 
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-            currentArmy_p = gpCombatManager->m_armies[side] + index;
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+            currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
             if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0
                 && currentArmy_p->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
                 && currentArmy_p->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
                 ++cyclingCount;
-                ++gpCombatManager->m_limitCreatureCount[side][index];
+                ++gpCombatManager->m_limitCreatureCount[IDX(side)][index];
             }
         }
     }
     if (cyclingCount == 0) {
     } else {
         gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
-        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-                currentArmy_p = gpCombatManager->m_armies[side] + index;
+        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+            for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+                currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
                 if (HAS(currentArmy_p->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0) {
-                    currentArmy_p = gpCombatManager->m_armies[side] + index;
+                    currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
                     currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
                     currentArmy_p->m_animationFrame = 0;
                     currentArmy_p->m_lastAnimationTime = KBTickCount();
                 }
             }
         }
-        m_heroCycleTimer[COMBAT_ATTACKER_SIDE] = KBTickCount();
-        m_heroCycleTimer[COMBAT_DEFENDER_SIDE] = KBTickCount();
+        m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
+        m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
         gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     }
 }
@@ -2752,15 +2755,15 @@ void combatManager::ResetCyclingCreatures(void) {
 VA(0x00430dc8, 0xf9)
 void combatManager::ResetCycleTimers(void) {
     i32l currentTime_r = KBTickCount();
-    i32 side;
+    CombatSide side;
     i32 index;
     army* currentArmy_p;
 
-    m_heroCycleTimer[COMBAT_ATTACKER_SIDE] = KBTickCount();
-    m_heroCycleTimer[COMBAT_DEFENDER_SIDE] = KBTickCount();
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-            currentArmy_p = &gpCombatManager->m_armies[side][index];
+    m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
+    m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
             currentArmy_p->m_lastAnimationTime = currentTime_r;
             if (currentArmy_p->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
                 currentArmy_p->m_lastAnimationTime -= Random(
@@ -2783,9 +2786,9 @@ i32 InCombatArea(i32 x, i32 y) {
 VA(0x00430f14, 0x9d9)
 void combatManager::CycleCombatScreen(void) {
     army* currentArmy;
-    u8 cycleArmy[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    u8 cycleArmy[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 nextHeroAnimation[COMBAT_HERO_ANIMATION_TRACK_COUNT];
-    i32 side;
+    CombatSide side;
     i32 index;
     i32 animationIndex;
     float roll;
@@ -2793,21 +2796,21 @@ void combatManager::CycleCombatScreen(void) {
 
     CheckUpdateCombatMessages();
     currentArmy = NULL;
-    nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] = 0;
+    nextHeroAnimation[COMBAT_SIDE_COUNT] = 0;
     gpCombatManager->ResetLimitCreature();
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        if (m_heroOverlayIcons[side] == NULL) {
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        if (m_heroOverlayIcons[IDX(side)] == NULL) {
         } else {
-            if (m_heroes[side] != NULL)
-                m_heroOverlayFrame[side] = (m_heroOverlayFrame[side] + 1) % COMBAT_HERO_OVERLAY_FRAME_COUNT;
-            ++m_drawHeroOverlay[side];
+            if (m_heroes[IDX(side)] != NULL)
+                m_heroOverlayFrame[IDX(side)] = (m_heroOverlayFrame[IDX(side)] + 1) % COMBAT_HERO_OVERLAY_FRAME_COUNT;
+            ++m_drawHeroOverlay[IDX(side)];
         }
     }
 
     memset(cycleArmy, 0, sizeof(cycleArmy));
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-            currentArmy = gpCombatManager->m_armies[side] + index;
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+            currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
             if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0
                 && currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] == 0
@@ -2819,88 +2822,88 @@ void combatManager::CycleCombatScreen(void) {
                         && currentArmy->m_frameInfo.standStillDelay
                                    + currentArmy->m_lastAnimationTime
                                < KBTickCount()))) {
-                ++nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT];
-                ++cycleArmy[side][index];
-                ++m_limitCreatureCount[side][index];
+                ++nextHeroAnimation[COMBAT_SIDE_COUNT];
+                ++cycleArmy[IDX(side)][index];
+                ++m_limitCreatureCount[IDX(side)][index];
             }
         }
     }
 
-    for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-        nextHeroAnimation[side] = -1;
-        if (m_heroIcons[side] == NULL) {
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        nextHeroAnimation[IDX(side)] = -1;
+        if (m_heroIcons[IDX(side)] == NULL) {
         } else {
-            if (m_heroAnimationState[side] == HERO_ANIMATION_DEATH_FIRST
-                || m_heroAnimationState[side] == HERO_ANIMATION_DEATH_SECOND
-                || m_heroAnimationState[side] == HERO_ANIMATION_IDLE_FIRST
-                || m_heroAnimationState[side] == HERO_ANIMATION_IDLE_SECOND
-                || m_heroAnimationState[side] == HERO_ANIMATION_IDLE_LAST) {
-                m_drawHero[side] = 1;
-            } else if (m_heroAnimationState[side] == HERO_ANIMATION_STAND
-                       && m_heroDeathAnimationPlayed[side] == 0 && m_heroDeathPending[side] != 0) {
-                if (m_playerId[m_currentSide] == -1
-                    || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0) {
-                    m_heroAlternateDeathPending[side] = 0;
-                    m_heroDeathPending[side] = m_heroAlternateDeathPending[side];
+            if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_DEATH_FIRST
+                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_DEATH_SECOND
+                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_FIRST
+                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_SECOND
+                || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_LAST) {
+                m_drawHero[IDX(side)] = 1;
+            } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
+                       && m_heroDeathAnimationPlayed[IDX(side)] == 0 && m_heroDeathPending[IDX(side)] != 0) {
+                if (m_playerId[IDX(m_currentSide)] == -1
+                    || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
+                    m_heroAlternateDeathPending[IDX(side)] = 0;
+                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
                 } else {
-                    m_heroAlternateDeathPending[side] = 0;
-                    m_heroDeathPending[side] = m_heroAlternateDeathPending[side];
-                    m_heroDeathAnimationPlayed[side] = 1;
-                    if (sCmbtHero[m_heroSpriteIndex[side]]
+                    m_heroAlternateDeathPending[IDX(side)] = 0;
+                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
+                    m_heroDeathAnimationPlayed[IDX(side)] = 1;
+                    if (sCmbtHero[m_heroSpriteIndex[IDX(side)]]
                             .animationFrameCount[HERO_ANIMATION_DEATH_FIRST]
                         > 0) {
-                        nextHeroAnimation[side] = HERO_ANIMATION_DEATH_FIRST;
-                        m_drawHero[side] = 1;
+                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_DEATH_FIRST;
+                        m_drawHero[IDX(side)] = 1;
                     }
                 }
-            } else if (m_heroAnimationState[side] == HERO_ANIMATION_STAND
-                       && m_heroAlternateDeathAnimationPlayed[side] == 0
-                       && m_heroAlternateDeathPending[side] != 0) {
-                if (m_playerId[m_currentSide] == -1
-                    || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0) {
-                    m_heroAlternateDeathPending[side] = 0;
-                    m_heroDeathPending[side] = m_heroAlternateDeathPending[side];
+            } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
+                       && m_heroAlternateDeathAnimationPlayed[IDX(side)] == 0
+                       && m_heroAlternateDeathPending[IDX(side)] != 0) {
+                if (m_playerId[IDX(m_currentSide)] == -1
+                    || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
+                    m_heroAlternateDeathPending[IDX(side)] = 0;
+                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
                 } else {
-                    m_heroAlternateDeathPending[side] = 0;
-                    m_heroDeathPending[side] = m_heroAlternateDeathPending[side];
-                    m_heroAlternateDeathAnimationPlayed[side] = 1;
-                    if (sCmbtHero[m_heroSpriteIndex[side]]
+                    m_heroAlternateDeathPending[IDX(side)] = 0;
+                    m_heroDeathPending[IDX(side)] = m_heroAlternateDeathPending[IDX(side)];
+                    m_heroAlternateDeathAnimationPlayed[IDX(side)] = 1;
+                    if (sCmbtHero[m_heroSpriteIndex[IDX(side)]]
                             .animationFrameCount[HERO_ANIMATION_DEATH_SECOND]
                         > 0) {
-                        nextHeroAnimation[side] = HERO_ANIMATION_DEATH_SECOND;
-                        m_drawHero[side] = 1;
+                        nextHeroAnimation[IDX(side)] = HERO_ANIMATION_DEATH_SECOND;
+                        m_drawHero[IDX(side)] = 1;
                     }
                 }
-            } else if (m_heroAnimationState[side] == HERO_ANIMATION_STAND
-                       && m_heroCycleTimer[side] + HERO_IDLE_DELAY < KBTickCount()) {
-                if (static_cast<u8>(sCmbtHero[m_heroSpriteIndex[side]].idleAnimationCount) > 1) {
-                    nextHeroAnimation[side] =
+            } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
+                       && m_heroCycleTimer[IDX(side)] + HERO_IDLE_DELAY < KBTickCount()) {
+                if (static_cast<u8>(sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount) > 1) {
+                    nextHeroAnimation[IDX(side)] =
                         Random(
                             0,
-                            static_cast<u8>(sCmbtHero[m_heroSpriteIndex[side]].idleAnimationCount)
+                            static_cast<u8>(sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount)
                                 - 1
                         )
                         + HERO_ANIMATION_IDLE_FIRST;
                 } else {
-                    nextHeroAnimation[side] = HERO_ANIMATION_IDLE_FIRST;
+                    nextHeroAnimation[IDX(side)] = HERO_ANIMATION_IDLE_FIRST;
                 }
-                m_drawHero[side] = 1;
+                m_drawHero[IDX(side)] = 1;
             }
         }
     }
-    if (m_heroIcons[COMBAT_ATTACKER_SIDE] != NULL)
-        m_drawHero[COMBAT_ATTACKER_SIDE] = 1;
-    if (m_heroIcons[COMBAT_DEFENDER_SIDE] != NULL)
-        m_drawHero[COMBAT_DEFENDER_SIDE] = 1;
+    if (m_heroIcons[IDX(COMBAT_ATTACKER_SIDE)] != NULL)
+        m_drawHero[IDX(COMBAT_ATTACKER_SIDE)] = 1;
+    if (m_heroIcons[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
+        m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] = 1;
 
-    if (nextHeroAnimation[COMBAT_MANAGER_SIDE_COUNT] != 0 || m_drawHero[COMBAT_ATTACKER_SIDE] != 0
-        || m_drawHero[COMBAT_DEFENDER_SIDE] != 0 || m_drawHeroOverlay[COMBAT_ATTACKER_SIDE] != 0
-        || m_drawHeroOverlay[COMBAT_DEFENDER_SIDE] != 0) {
+    if (nextHeroAnimation[COMBAT_SIDE_COUNT] != 0 || m_drawHero[IDX(COMBAT_ATTACKER_SIDE)] != 0
+        || m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] != 0 || m_drawHeroOverlay[IDX(COMBAT_ATTACKER_SIDE)] != 0
+        || m_drawHeroOverlay[IDX(COMBAT_DEFENDER_SIDE)] != 0) {
         gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
-        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-            for (index = 0; index < gpCombatManager->m_armyCount[side]; ++index) {
-                currentArmy = gpCombatManager->m_armies[side] + index;
-                if (cycleArmy[side][index] != 0) {
+        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+            for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+                currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
+                if (cycleArmy[IDX(side)][index] != 0) {
                     if (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND) {
                         roll =
                             static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
@@ -2951,19 +2954,19 @@ void combatManager::CycleCombatScreen(void) {
                 }
             }
         }
-        for (side = 0; side < COMBAT_MANAGER_SIDE_COUNT; ++side) {
-            if (m_drawHero[side] != 0) {
-                if (nextHeroAnimation[side] != -1) {
-                    m_heroAnimationState[side] = nextHeroAnimation[side];
-                    m_heroAnimationFrame[side] = 0;
+        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+            if (m_drawHero[IDX(side)] != 0) {
+                if (nextHeroAnimation[IDX(side)] != -1) {
+                    m_heroAnimationState[IDX(side)] = nextHeroAnimation[IDX(side)];
+                    m_heroAnimationFrame[IDX(side)] = 0;
                 } else {
-                    ++m_heroAnimationFrame[side];
-                    if (m_heroAnimationFrame[side]
-                        >= sCmbtHero[m_heroSpriteIndex[side]]
-                               .animationFrameCount[m_heroAnimationState[side]]) {
-                        m_heroAnimationState[side] = HERO_ANIMATION_STAND;
-                        m_heroAnimationFrame[side] = 0;
-                        m_heroCycleTimer[side] = KBTickCount();
+                    ++m_heroAnimationFrame[IDX(side)];
+                    if (m_heroAnimationFrame[IDX(side)]
+                        >= sCmbtHero[m_heroSpriteIndex[IDX(side)]]
+                               .animationFrameCount[m_heroAnimationState[IDX(side)]]) {
+                        m_heroAnimationState[IDX(side)] = HERO_ANIMATION_STAND;
+                        m_heroAnimationFrame[IDX(side)] = 0;
+                        m_heroCycleTimer[IDX(side)] = KBTickCount();
                     }
                 }
             }
@@ -2993,7 +2996,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     gConfig.showCombatMouseHex = showMouseHex;
     gConfig.combatShadeLevel = shadeLevel;
     m_backgroundDrawn = 0;
-    SetupGridForArmy(&m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex]);
+    SetupGridForArmy(&m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex]);
     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     ResetMouse();
     WritePrefs();
@@ -3001,7 +3004,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
 
 VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(
-    i32 side,
+    H2_ENUM_PARAM(CombatSide, i32) side,
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 quantity,
     i32 hex,
@@ -3013,17 +3016,17 @@ void combatManager::AddArmy(
     i32 index_g;
     army* newArmy;
     for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[side][index_g].m_monsterType == CREATURE_NONE) {
+        if (m_armies[IDX(side)][index_g].m_monsterType == CREATURE_NONE) {
             armyIndex_r = index_g;
             break;
         }
-        if (m_armies[side][index_g].m_quantity == 0
-            && HAS(m_armies[side][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[side][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
-                || m_armies[side][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
-                || m_armies[side][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
-                || m_armies[side][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
-                || m_armies[side][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
+        if (m_armies[IDX(side)][index_g].m_quantity == 0
+            && HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
             armyIndex_r = index_g;
             reusedArmy_m = 1;
             break;
@@ -3031,21 +3034,21 @@ void combatManager::AddArmy(
     }
 
     if (armyIndex_r != INVALID_ARMY_INDEX) {
-        if (m_hexCells[hex].m_occupantSide != INVALID_HEX)
+        if (m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
             return;
 
-        newArmy = &m_armies[side][armyIndex_r];
+        newArmy = &m_armies[IDX(side)][armyIndex_r];
         newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
         newArmy->LoadResources();
         newArmy->m_monster.flags.all |= flags;
         if (reusedArmy_m == 0)
-            ++m_armyCount[side];
+            ++m_armyCount[IDX(side)];
 
         if (animate == 0)
             return;
 
         ResetLimitCreature();
-        m_limitCreatureCount[side][armyIndex_r] += 1;
+        m_limitCreatureCount[IDX(side)][armyIndex_r] += 1;
         gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
         gpWindowManager->SaveFizzleSource(
             giMinExtentX,
@@ -3072,29 +3075,29 @@ void combatManager::SetupSmallView(void) {
     i32 unusedSmallViewWord1;
     i32 unusedSmallViewWord2;
 
-    if (m_smallViewSide[COMBAT_DEFENDER_SIDE] == SMALL_VIEW_SIDE_NONE
-        && m_smallViewLastX[COMBAT_DEFENDER_SIDE] != SMALL_VIEW_POSITION_NONE) {
-        DrawSmallView(COMBAT_DEFENDER_SIDE, 1);
+    if (m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] == COMBAT_SIDE_NONE
+        && m_smallViewLastX[IDX(COMBAT_DEFENDER_SIDE)] != SMALL_VIEW_POSITION_NONE) {
+        DrawSmallView(IDX(COMBAT_DEFENDER_SIDE), 1);
     }
 
-    if (gbThisNetHasControl != 0 && m_playerId[m_currentSide] != PLAYER_NONE
-        && gbHumanPlayer[m_playerId[m_currentSide]] != 0) {
-        if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != m_currentSide
-            || m_smallViewArmyIndex[COMBAT_ATTACKER_SIDE] != m_currentArmyIndex) {
-            if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != SMALL_VIEW_SIDE_NONE
-                && m_smallViewSide[COMBAT_ATTACKER_SIDE] != m_currentSide
-                && m_smallViewLastX[COMBAT_ATTACKER_SIDE] != SMALL_VIEW_POSITION_NONE) {
-                m_smallViewSide[COMBAT_ATTACKER_SIDE] = SMALL_VIEW_SIDE_NONE;
-                DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+    if (gbThisNetHasControl != 0 && m_playerId[IDX(m_currentSide)] != PLAYER_NONE
+        && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0) {
+        if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != m_currentSide
+            || m_smallViewArmyIndex[IDX(COMBAT_ATTACKER_SIDE)] != m_currentArmyIndex) {
+            if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
+                && m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != m_currentSide
+                && m_smallViewLastX[IDX(COMBAT_ATTACKER_SIDE)] != SMALL_VIEW_POSITION_NONE) {
+                m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = COMBAT_SIDE_NONE;
+                DrawSmallView(IDX(COMBAT_ATTACKER_SIDE), 1);
             }
-            m_smallViewSide[COMBAT_ATTACKER_SIDE] = m_currentSide;
-            m_smallViewArmyIndex[COMBAT_ATTACKER_SIDE] = m_currentArmyIndex;
-            DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+            m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = m_currentSide;
+            m_smallViewArmyIndex[IDX(COMBAT_ATTACKER_SIDE)] = m_currentArmyIndex;
+            DrawSmallView(IDX(COMBAT_ATTACKER_SIDE), 1);
         }
     } else {
-        m_smallViewSide[COMBAT_ATTACKER_SIDE] = SMALL_VIEW_SIDE_NONE;
-        if (m_smallViewLastX[COMBAT_ATTACKER_SIDE] != SMALL_VIEW_POSITION_NONE)
-            DrawSmallView(COMBAT_ATTACKER_SIDE, 1);
+        m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = COMBAT_SIDE_NONE;
+        if (m_smallViewLastX[IDX(COMBAT_ATTACKER_SIDE)] != SMALL_VIEW_POSITION_NONE)
+            DrawSmallView(IDX(COMBAT_ATTACKER_SIDE), 1);
     }
 }
 
@@ -3104,7 +3107,7 @@ void combatManager::ViewBallista(i32 quickView) {
     i32 attackBonus;
     char description[VIEW_DESCRIPTION_SIZE];
 
-    m_combatTowns[COMBAT_DEFENDER_SIDE]->CalcNumLevelArchers(&archerCount, &attackBonus);
+    m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&archerCount, &attackBonus);
     sprintf(gText, "Ballista");
     strcpy(description, "");
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
@@ -3129,7 +3132,7 @@ void combatManager::ViewBallista(i32 quickView) {
     strcat(gText, description);
 
     strcpy(description, "");
-    if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
+    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
@@ -3155,7 +3158,7 @@ void combatManager::ViewBallista(i32 quickView) {
         strcat(gText, description);
     }
 
-    if ((m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
+    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
         strcpy(description, "");
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");

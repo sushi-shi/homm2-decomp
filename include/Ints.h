@@ -105,6 +105,40 @@ private:
 };
 
 template <typename Enum, typename Storage>
+constexpr bool operator==(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return static_cast<Enum>(lhs) == rhs;
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator==(Enum lhs, H2EnumStorage<Enum, Storage> rhs) {
+    return lhs == static_cast<Enum>(rhs);
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator!=(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator!=(Enum lhs, H2EnumStorage<Enum, Storage> rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Enum, typename LeftStorage, typename RightStorage>
+constexpr bool operator==(
+    H2EnumStorage<Enum, LeftStorage> lhs, H2EnumStorage<Enum, RightStorage> rhs
+) {
+    return static_cast<Enum>(lhs) == static_cast<Enum>(rhs);
+}
+
+template <typename Enum, typename LeftStorage, typename RightStorage>
+constexpr bool operator!=(
+    H2EnumStorage<Enum, LeftStorage> lhs, H2EnumStorage<Enum, RightStorage> rhs
+) {
+    return !(lhs == rhs);
+}
+
+template <typename Enum, typename Storage>
 class H2SteppedEnumStorage {
 public:
     H2SteppedEnumStorage() = default;

@@ -102,7 +102,6 @@ H2_ENUM_CLASS_END(ArmySpellCancelType)
 
 H2_ENUM_BEGIN(ArmyAttackConstant)
     ARMY_COMBAT_TEXT_SIZE              = 200,
-    ARMY_COMBAT_SIDE_COUNT             = 2,
     ARMY_COMBAT_DIRECTION_COUNT        = 8,
     ARMY_ADJACENT_DIRECTION_COUNT      = 6,
     ARMY_MOAT_CELL_COUNT               = 9,
