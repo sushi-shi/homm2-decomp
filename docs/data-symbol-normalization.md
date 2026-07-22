@@ -6,11 +6,27 @@ and are not stable identities. Comparing those names directly makes equivalent
 data and code relocations look different.
 
 `scripts/homm2/build/canonicalize_data_symbols.py` rewrites those names in
-disposable COFF copies under `build/objdiff/normalized/`. It processes each
-object independently and uses no source, manifest, retail RVA, or paired-object
-information. `objdiff.json` points at the normalized copies. Compilation,
-linking, disassembly, and hard gates continue to use the original objects in
-`build/objdiff/base/` and `build/delink/`.
+disposable COFF copies under `build/objdiff/normalized/`. This anonymous-data
+pass processes each object independently and uses no source, manifest, retail
+RVA, or paired-object information. `objdiff.json` points at the normalized
+copies. Compilation, linking, disassembly, and hard gates continue to use the
+original objects in `build/objdiff/base/` and `build/delink/`.
+
+## Public relocation owners
+
+The synthetic delink target can spell a relocation as the nearest known public
+symbol plus an addend even when the retail address has another exact public
+identity. Those names are supplied by the reconstruction pipeline, so such a
+spelling is not retail evidence and must not create a comparison residual.
+
+Before anonymous-data normalization,
+`scripts/homm2/build/canonicalize_relocs.py` makes a disposable paired target
+under `build/objdiff/paired/`. At the same function-relative relocation site it
+accepts the candidate spelling only when the CodeView public owner RVA plus the
+candidate addend equals the raw retail operand address exactly. It then adds a
+separate undefined COFF symbol and redirects only that relocation. It never
+renames a shared target symbol globally, and it does not require a prior match
+score to authorize the address proof.
 
 Anonymous definitions use these forms:
 
