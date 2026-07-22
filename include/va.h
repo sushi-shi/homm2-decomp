@@ -11,6 +11,7 @@
 #define SYMBOL(mangled) __attribute__((annotate("symbol:" #mangled)))
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
 #define VTBL(cls, va)
+#define VTBL2(derived, base, va)
 #define OVERRIDE override
 #define SIZE(type, bytes) static_assert(sizeof(type) == (bytes), "sizeof(" #type ") != " #bytes)
 
@@ -22,6 +23,7 @@
 #define SYMBOL(mangled)
 #define DATA(addr)
 #define VTBL(cls, va)
+#define VTBL2(derived, base, va)
 #define OVERRIDE
 
 #define SIZE(type, bytes)

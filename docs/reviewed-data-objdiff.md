@@ -39,9 +39,9 @@ The reviewed manifest is a bootstrap input, not a self-updating baseline. Normal
 the delinker. Bootstrap targets carry a bootstrap provenance stamp and remain fixed until an
 explicit init.
 
-Candidate topology is generated from source DATA definitions plus the only versioned supplement,
-`config/delink_data_supplemental.tsv`. The combined symbol/section manifests, contribution replay,
-and exact coverage partition live under `build/gen`. An explicit
+Candidate topology is generated from source `DATA`, `VTBL`, and `VTBL2` annotations plus the only
+versioned supplement, `config/delink_data_supplemental.tsv`. The combined symbol/section manifests,
+contribution replay, and exact coverage partition live under `build/gen`. An explicit
 `homm2 data-topology regenerate` delinks into a temporary directory, verifies every owner object,
 and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
 the retail EXE, synthetic delinker-input PDB, and delinker executable. Normal commands refuse a

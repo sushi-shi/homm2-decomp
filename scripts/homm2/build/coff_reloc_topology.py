@@ -19,6 +19,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
+from homm2.build.annotated_vtables import source_vtables as annotated_source_vtables
 from homm2.build.data_manifest_adapter import SYMBOL_HEADER, validate_symbol_rows
 
 
@@ -592,7 +593,7 @@ def load_homm2_provenance(root: Path) -> dict:
     source_path = root / "build" / "gen" / "delink_data_from_source.tsv"
     supplemental_path = root / "config" / "delink_data_supplemental.tsv"
     merged_path = root / "build" / "gen" / "delink_data_manifest.tsv"
-    source_rows = _load_symbol_manifest(source_path, "source DATA", diagnostics)
+    source_rows = _load_symbol_manifest(source_path, "source annotations", diagnostics)
     supplemental_rows = _load_symbol_manifest(
         supplemental_path, "supplemental", diagnostics)
     merged_rows = _load_symbol_manifest(merged_path, "merged", diagnostics)
@@ -620,6 +621,7 @@ def load_homm2_provenance(root: Path) -> dict:
         (_unit_from_object(row["object"]), int(row["rva"], 0), int(row["size"], 0),
          row["provenance"])
         for row in source_rows
+        if row["provenance"].startswith("source-DATA:")
     )
     if actual_source != expected_source:
         diagnostics.append({
@@ -628,13 +630,48 @@ def load_homm2_provenance(root: Path) -> dict:
             "extra": [list(row) for row in sorted((actual_source - expected_source).elements())],
         })
 
+    try:
+        vtables = annotated_source_vtables(root / "src", root)
+    except Exception as error:
+        vtables = []
+        diagnostics.append({"kind": "invalid-source-vtable-inventory", "error": str(error)})
+    expected_vtables = Counter(
+        (row.unit, row.rva, row.mangled_name,
+         f"source-{'VTBL2' if row.base else 'VTBL'}:{row.location}")
+        for row in vtables
+    )
+    actual_vtables = Counter(
+        (_unit_from_object(row["object"]), int(row["rva"], 0), row["name"],
+         row["provenance"].removesuffix(":candidate-coff-alias"))
+        for row in source_rows
+        if row["provenance"].startswith(("source-VTBL:", "source-VTBL2:"))
+    )
+    if actual_vtables != expected_vtables:
+        diagnostics.append({
+            "kind": "source-vtable-manifest-inventory-mismatch",
+            "missing": [list(row) for row in sorted(
+                (expected_vtables - actual_vtables).elements())],
+            "extra": [list(row) for row in sorted(
+                (actual_vtables - expected_vtables).elements())],
+        })
+
+    unknown_source_rows = [
+        row for row in source_rows if not row["provenance"].startswith(
+            ("source-DATA:", "source-VTBL:", "source-VTBL2:"))
+    ]
+    if unknown_source_rows:
+        diagnostics.append({
+            "kind": "unknown-source-annotation-provenance",
+            "rows": unknown_source_rows,
+        })
+
     source_identities = {(row["object"], row["name"]) for row in source_rows}
     source_rvas = {int(row["rva"], 0) for row in source_rows}
     for row in supplemental_rows:
         if ((row["object"], row["name"]) in source_identities
                 or int(row["rva"], 0) in source_rvas):
             diagnostics.append({
-                "kind": "supplemental-source-DATA-overlap", "row": row,
+                "kind": "supplemental-source-annotation-overlap", "row": row,
             })
 
     anchors_by_unit: dict[str, dict[str, dict]] = {}

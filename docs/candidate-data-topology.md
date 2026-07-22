@@ -42,8 +42,9 @@ ambiguous contribution leaves the subsection explicitly unassigned.
 
 The direct candidate-tool manifest records closed-group section offsets and symbol scope as
 discovery evidence only. It is not reviewed and is never a delinker input in the canonical path.
-The pinned delinker consumes the separate source-DATA-plus-reviewed-supplemental manifest, resolves
-interior references as owner plus addend, and errors if a relocation reaches an uncovered address.
+The pinned delinker consumes the separate source-annotation-plus-reviewed-supplemental
+manifest, resolves interior references as owner plus addend, and errors if a relocation
+reaches an uncovered address.
 Undefined candidate externs remain undefined; retail storage is never copied into the referring
 object.
 
@@ -63,14 +64,16 @@ counts, even when `--require-all` refuses to write the manifest.
 
 `homm2 init` has two distinct modes. Before canonical manifests exist, it creates a permissive
 bootstrap target using `--recover-data-relocs-from-pdb`; that target exists only so candidate
-objects can be compiled and inspected. Once source DATA and the reviewed supplemental manifest are
-available, init assembles their exact generated union and reproduces the strict target from it.
+objects can be compiled and inspected. Once source annotations and the reviewed supplemental
+manifest are available, init assembles their exact generated union and reproduces the strict
+target from it.
 
 The explicit topology commands are:
 
 - `homm2 data-topology audit` is the normal iterative entrypoint. It runs Ninja's parallel,
-  incremental `all` target to refresh candidate COFFs, assembles the canonical source-DATA plus
-  reviewed-supplement inputs, derives the review queue once, and refreshes whole-image coverage.
+  incremental `all` target to refresh candidate COFFs, assembles the canonical source
+  annotations plus reviewed-supplement inputs, derives the review queue once, and refreshes
+  whole-image coverage.
   It never regenerates or replaces target objects. `--jobs N` controls Ninja parallelism;
   `--strict` fails while any symbol group, section assignment, or coverage diagnostic remains.
   MSVC compiler-local counters are not canonical identities. A counter-only `$SG`, `$T`, or
@@ -87,7 +90,7 @@ The explicit topology commands are:
   and `const_`/`string_`/`data_`/`bss_` inventories. Exact topology records are proved mappings;
   same-name records with different definition/scope/storage topology are reported separately as
   provisional real mappings. These are review diagnostics only; the canonical symbol manifest and
-  target may contain only source DATA and explicitly reviewed supplemental rows. `const_`,
+  target may contain only source annotations and explicitly reviewed supplemental rows. `const_`,
   `string_`, `data_`, `bss_`, `empty_stub`, and `[section-N]` fallback identities are always hard
   errors.
 
@@ -107,8 +110,8 @@ The explicit topology commands are:
   Candidate definitions which map to those source names are reported as DATA-covered; remaining
   candidate definitions are compiler-private derived topology. Rows in
   `config/delink_data_supplemental.tsv` are supplemental linker metadata only. A supplemental row which
-  repeats a canonical DATA allocation, or disagrees with its owner/RVA/storage evidence, is a hard
-  error rather than a second definition. Normal assembly preserves reviewed supplemental rows
+  repeats a canonical source-annotated allocation, or disagrees with its owner/RVA/storage
+  evidence, is a hard error rather than a second definition. Normal assembly preserves reviewed supplemental rows
   byte-for-byte. Semantic/public names remain exact. For local compiler-private counters only, an
   exact-coordinate fallback additionally requires unchanged size/storage/alignment/scope and a
   matching canonical payload plus relocation identity against the fixed reviewed target object.
@@ -148,24 +151,25 @@ The explicit topology commands are:
 - `homm2 data-topology propose` writes only structured candidate diagnostics and
   `build/gen/data_topology_review_queue.tsv`. The queue is deliberately not a Vostok manifest: its
   header adds evidence kind, proof count, group blockers, and group contradictions. It contains
-  real candidate identities absent from the canonical source-DATA-plus-supplemental union when an
-  individual placement has public-RVA, aligned relocation/addend, unique literal-payload, or
+  real candidate identities absent from the canonical source-annotation-plus-supplemental union
+  when an individual placement has public-RVA, aligned relocation/addend, unique literal-payload, or
   section-replay evidence. An open group does not erase that evidence, but its contradictions ride
   every proposed row. Unmapped rows remain diagnostic-only. Synthetic/fallback identities are
   filtered, and canonical identities are omitted. `row_kind=allocation-symbol` makes explicit that
   the current queue contains COFF allocation symbols; aliases and section-definition metadata are
   not flattened into fake allocations and remain in topology diagnostics until separately modeled.
-  A group whose every candidate definition already has an exact source-DATA or reviewed
+  A group whose every candidate definition already has an exact source-annotation or reviewed
   supplemental row is closed directly from that canonical evidence after candidate section,
   offset, storage, scope, alignment, and extent validation. This permits a reviewed retail owner
   order to differ from candidate allocation order without asking for the same rows again.
 
-  Proposal does not refresh coverage, source-DATA, combined symbol/section, contribution, or target
-  artifacts. The queue is review input only: it is never read by promote, finalize, regenerate, or
+  Proposal does not refresh coverage, source-annotation, combined symbol/section, contribution,
+  or target artifacts. The queue is review input only: it is never read by promote, finalize, regenerate, or
   the delinker, and its rows are never auto-promoted.
 - `homm2 data-topology promote` refreshes diagnostics and coverage evidence, then regenerates the
-  canonical symbol/section manifests strictly from source `DATA()` definitions plus the explicitly
-  reviewed `config/delink_data_supplemental.tsv`. Candidate facts and the review queue cannot enter
+  canonical symbol/section manifests strictly from source `DATA()`, `VTBL()`, and `VTBL2()`
+  annotations plus the explicitly reviewed `config/delink_data_supplemental.tsv`. Candidate facts
+  and the review queue cannot enter
   that union. Promote does not replace target objects.
 - `homm2 data-topology finalize` is the program-wide closure gate. It writes no canonical manifest
   unless every candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data
@@ -177,7 +181,7 @@ The explicit topology commands are:
 - `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
   replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
   synthetic delinker-input PDB, and the pinned delinker executable. Its data symbols come only from
-  source `DATA()` plus reviewed supplemental rows; it never reads the review queue or the legacy
+  source annotations plus reviewed supplemental rows; it never reads the review queue or the legacy
   direct-tool `candidate_delink_data.tsv` output. Proposal evidence comes from candidate COFF,
   retail PE/contribution bytes, NB09 public RVAs, and retail relocations, never from the old delinked
   target's `const_*` or `empty_stub` identities.
