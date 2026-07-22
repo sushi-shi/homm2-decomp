@@ -282,6 +282,22 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_FLAGS(name)
 #endif
 
+// Preserve a retail integer assignment chain while allowing strict enum views
+// of individual fields to receive the same value without cross-domain casts at
+// the reconstructed call site.
+#ifdef HOMM2_STRICT_ENUM_TYPES
+#define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value)                                               \
+    do {                                                                                           \
+        (e) = static_cast<decltype(e)>(value);                                                     \
+        (d) = static_cast<decltype(d)>(value);                                                     \
+        (c) = static_cast<decltype(c)>(value);                                                     \
+        (b) = static_cast<decltype(b)>(value);                                                     \
+        (a) = static_cast<decltype(a)>(value);                                                     \
+    } while (0)
+#else
+#define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value) ((a) = (b) = (c) = (d) = (e) = (value))
+#endif
+
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at
 // the site. Production expands to the bare value, so bytes cannot change.
 #ifdef HOMM2_STRICT_ENUM_TYPES
