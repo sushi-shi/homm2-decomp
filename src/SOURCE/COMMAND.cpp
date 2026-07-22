@@ -2494,10 +2494,11 @@ void combatManager::CheckGetAIMove(void) {
             return;
     }
     retreat = AICheckRetreat();
-    if (retreat != 0)
+    if (retreat != 0) {
         giNextAction = ACTION_RETREAT;
-    else
-        DoCompAI(m_currentSide);
+        return;
+    }
+    DoCompAI(m_currentSide);
 }
 
 VA(0x004302d0, 0x18f)
