@@ -3580,7 +3580,8 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
          IDX(directionResult) < ARMY_ADJACENT_DIRECTION_COUNT;
          directionResult++) {
         adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-        if (adjacentHex == otherHex1 || (adjacentHex != -1 && adjacentHex == otherRearHex)) {
+        if (OD_STEER(otherHex1) == adjacentHex
+            || (adjacentHex != -1 && OD_STEER(otherRearHex) == adjacentHex)) {
             return 1;
         }
     }
@@ -3590,7 +3591,8 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
              IDX(directionResult) < ARMY_ADJACENT_DIRECTION_COUNT;
              directionResult++) {
             adjacentHex = GetAdjacentCellIndex(rearHex, directionResult);
-            if (adjacentHex == otherHex1 || (adjacentHex != -1 && adjacentHex == otherRearHex)) {
+            if (OD_STEER(otherHex1) == adjacentHex
+                || (adjacentHex != -1 && OD_STEER(otherRearHex) == adjacentHex)) {
                 return 1;
             }
         }
