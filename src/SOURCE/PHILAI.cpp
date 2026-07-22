@@ -3160,162 +3160,162 @@ i32 philAI::RVOfPosition(
     i32 eventMode,
     i32 extraDistance
 ) {
-    i32 strategicEventValue;
-    i32 targetLiveChance;
-    i32 adjacentEventChance;
-    MapObjectType triggerType;
-    MapObjectType objectType;
-    i32 currentStrategicValue;
-    i32 targetStrategicValue;
-    i32 strategicDelta;
-    i32 totalValue;
-    i32 primaryEventChance;
-    i32 strategicLiveChance;
-    i32 adjacentX;
+    MapObjectType triggerType3;
+    i32 primaryEventChance1;
     i32 adjacentY;
-    i32 eventValue;
-    i32 adjacentEventValue;
-    float distanceFactor;
-    char debugText[POSITION_DEBUG_TEXT_CAPACITY];
-    char* objectName;
+    i32 adjacentX2;
+    i32 eventValue9;
+    i32 currentStrategicValue3;
+    i32 targetLiveChance1;
+    i32 currentLiveChance1;
+    i32 strategicLiveChance;
+    i32 adjacentEventChance8;
+    i32 adjacentMonsterEventChance3;
+    i32 strategicDelta7;
+    MapObjectType objectType1;
+    char debugText1[POSITION_DEBUG_TEXT_CAPACITY];
+    float distanceFactor5;
+    i32 strategicEventValue5;
+    i32 totalValue8;
 
-    strategicEventValue = 0;
-    targetLiveChance = POSITION_FULL_CHANCE;
-    adjacentEventChance = POSITION_FULL_CHANCE;
-    triggerType = gpAdvManager->GetCell(x, y)->m_triggerType;
-    objectType = triggerType & MAP_TRIGGER_TYPE_MASK;
-    primaryEventChance = POSITION_FULL_CHANCE;
+    strategicEventValue5 = 0;
+    targetLiveChance1 = POSITION_FULL_CHANCE;
+    adjacentEventChance8 = POSITION_FULL_CHANCE;
+    triggerType3 = gpAdvManager->GetCell(x, y)->m_triggerType;
+    objectType1 = triggerType3 & MAP_TRIGGER_TYPE_MASK;
+    primaryEventChance1 = POSITION_FULL_CHANCE;
     strategicLiveChance = POSITION_FULL_CHANCE;
-    targetLiveChance = POSITION_FULL_CHANCE;
+    adjacentMonsterEventChance3 = POSITION_FULL_CHANCE;
 
     if (abs(x - gpCurAIHero->m_x) <= AI_POSITION_NEARBY_DELTA
         && abs(y - gpCurAIHero->m_y) <= AI_POSITION_NEARBY_DELTA) {
-        currentStrategicValue = 0;
-        strategicDelta = 0;
+        currentStrategicValue3 = 0;
+        strategicDelta7 = 0;
     } else {
-        currentStrategicValue = StrategicValueOfPosition(
+        currentStrategicValue3 = StrategicValueOfPosition(
             gpCurAIHero->m_x,
             gpCurAIHero->m_y,
             0,
             1,
-            &targetLiveChance,
+            &currentLiveChance1,
             0
         );
-        strategicDelta = StrategicValueOfPosition(x, y, 0, 1, &targetLiveChance, extraDistance);
-        strategicDelta -= currentStrategicValue;
+        strategicDelta7 = StrategicValueOfPosition(x, y, 0, 1, &targetLiveChance1, extraDistance);
+        strategicDelta7 -= currentStrategicValue3;
     }
-    if (objectType == MAP_OBJECT_BOAT && strategicDelta < 0)
-        strategicDelta = 0;
+    if (objectType1 == MAP_OBJECT_BOAT && strategicDelta7 < 0)
+        strategicDelta7 = 0;
 
-    totalValue = 0;
+    totalValue8 = 0;
     if (hasEvent)
-        totalValue += ValueOfEventAtPosition(eventX, eventY, 1, &strategicLiveChance);
+        totalValue8 += ValueOfEventAtPosition(eventX, eventY, 1, &strategicLiveChance);
     if (hasStrategicEvent) {
-        strategicEventValue =
-            StrategicValueOfPosition(strategicX, strategicY, 1, 1, &adjacentEventChance, 0);
-        if (strategicEventValue < 0)
-            totalValue += strategicEventValue;
+        strategicEventValue5 =
+            StrategicValueOfPosition(strategicX, strategicY, 1, 1, &adjacentEventChance8, 0);
+        if (strategicEventValue5 < 0)
+            totalValue8 += strategicEventValue5;
     }
 
-    if (gpAdvManager->FindAdjacentMonster(x, y, &adjacentX, &adjacentY, -1, -1)) {
+    if (gpAdvManager->FindAdjacentMonster(x, y, &adjacentX2, &adjacentY, -1, -1)) {
         if (StopOnTrigger(gpAdvManager->GetCell(x, y))) {
-            adjacentEventValue =
-                ValueOfEventAtPosition(adjacentX, adjacentY, 1, &primaryEventChance);
-            if (adjacentEventValue < 0)
-                totalValue += adjacentEventValue;
+            eventValue9 =
+                ValueOfEventAtPosition(adjacentX2, adjacentY, 1, &adjacentMonsterEventChance3);
+            if (eventValue9 < 0)
+                totalValue8 += eventValue9;
             if (strategicLiveChance == POSITION_FULL_CHANCE)
-                strategicLiveChance = primaryEventChance;
+                strategicLiveChance = adjacentMonsterEventChance3;
             else
-                strategicLiveChance =
-                    strategicLiveChance * primaryEventChance / POSITION_FULL_CHANCE;
+                strategicLiveChance = strategicLiveChance * adjacentMonsterEventChance3
+                                      / POSITION_FULL_CHANCE;
         }
     }
 
-    if (HAS(triggerType, MAP_TRIGGER_ACTION_FLAG)
+    if (HAS(triggerType3, MAP_TRIGGER_ACTION_FLAG)
         || (gpCurPlayer->m_ultimateArtifactHintX == x
             && gpCurPlayer->m_ultimateArtifactHintY == y)) {
-        eventValue = ValueOfEventAtPosition(x, y, eventMode, &primaryEventChance);
+        eventValue9 = ValueOfEventAtPosition(x, y, eventMode, &primaryEventChance1);
     } else {
-        eventValue = 0;
+        eventValue9 = 0;
     }
-    if (primaryEventChance < POSITION_FULL_CHANCE)
-        strategicDelta = strategicDelta * primaryEventChance / POSITION_FULL_CHANCE;
+    if (primaryEventChance1 < POSITION_FULL_CHANCE)
+        strategicDelta7 = strategicDelta7 * primaryEventChance1 / POSITION_FULL_CHANCE;
 
-    if (targetLiveChance < POSITION_MINIMUM_LIVE_CHANCE)
+    if (targetLiveChance1 < POSITION_MINIMUM_LIVE_CHANCE)
         return POSITION_FAILED_VALUE;
-    if (targetLiveChance < POSITION_FULL_CHANCE) {
-        eventValue = targetLiveChance * eventValue / POSITION_FULL_CHANCE;
-        strategicDelta = strategicDelta * targetLiveChance / POSITION_FULL_CHANCE;
+    if (targetLiveChance1 < POSITION_FULL_CHANCE) {
+        eventValue9 = targetLiveChance1 * eventValue9 / POSITION_FULL_CHANCE;
+        strategicDelta7 = strategicDelta7 * targetLiveChance1 / POSITION_FULL_CHANCE;
     }
-    if (adjacentEventChance < POSITION_MINIMUM_LIVE_CHANCE)
+    if (adjacentEventChance8 < POSITION_MINIMUM_LIVE_CHANCE)
         return POSITION_FAILED_VALUE;
-    if (adjacentEventChance < POSITION_FULL_CHANCE) {
-        eventValue = adjacentEventChance * eventValue / POSITION_FULL_CHANCE;
-        strategicDelta = strategicDelta * adjacentEventChance / POSITION_FULL_CHANCE;
+    if (adjacentEventChance8 < POSITION_FULL_CHANCE) {
+        eventValue9 = adjacentEventChance8 * eventValue9 / POSITION_FULL_CHANCE;
+        strategicDelta7 = strategicDelta7 * adjacentEventChance8 / POSITION_FULL_CHANCE;
     }
     if (strategicLiveChance < POSITION_FULL_CHANCE) {
-        if (totalValue > 0) {
-            totalValue = (strategicDelta + totalValue + eventValue) * strategicLiveChance
+        if (totalValue8 > 0) {
+            totalValue8 = (strategicDelta7 + totalValue8 + eventValue9) * strategicLiveChance
                          / POSITION_FULL_CHANCE;
         } else {
-            totalValue +=
-                (strategicDelta + eventValue) * strategicLiveChance / POSITION_FULL_CHANCE;
+            totalValue8 +=
+                (strategicDelta7 + eventValue9) * strategicLiveChance / POSITION_FULL_CHANCE;
         }
     } else {
-        totalValue += eventValue;
+        totalValue8 += eventValue9;
     }
 
-    distanceFactor = static_cast<float>(gpSearchArray->GetRow(y, MAP_WIDTH)[x].distance)
+    distanceFactor5 = static_cast<float>(gpSearchArray->GetRow(y, MAP_WIDTH)[x].distance)
                      / gpCurAIHero->m_mobility;
     if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-        distanceFactor = static_cast<float>(
-            distanceFactor * AI_POSITION_EMBARKED_DISTANCE_FACTOR
+        distanceFactor5 = static_cast<float>(
+            distanceFactor5 * AI_POSITION_EMBARKED_DISTANCE_FACTOR
             + AI_POSITION_EMBARKED_DISTANCE_FACTOR
         );
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_6) {
-        distanceFactor *= AI_POSITION_LAND_FACTOR_FAR;
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_5) {
-        distanceFactor = static_cast<float>(distanceFactor * AI_POSITION_LAND_FACTOR_6);
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_4) {
-        distanceFactor = static_cast<float>(distanceFactor * AI_POSITION_LAND_FACTOR_5);
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_3) {
-        distanceFactor = static_cast<float>(distanceFactor * AI_POSITION_LAND_FACTOR_4);
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_2) {
-        distanceFactor = static_cast<float>(distanceFactor * AI_POSITION_LAND_FACTOR_3);
-    } else if (distanceFactor > AI_POSITION_LAND_DISTANCE_1) {
-        distanceFactor = static_cast<float>(distanceFactor * AI_POSITION_LAND_FACTOR_2);
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_6) {
+        distanceFactor5 *= AI_POSITION_LAND_FACTOR_FAR;
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_5) {
+        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_6);
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_4) {
+        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_5);
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_3) {
+        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_4);
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_2) {
+        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_3);
+    } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_1) {
+        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_2);
     }
 
-    totalValue = static_cast<i32>(totalValue / (distanceFactor + AI_POSITION_DISTANCE_BASE));
-    strategicDelta = static_cast<i32>(
-        strategicDelta * POSITION_STRATEGIC_MULTIPLIER
-        / (distanceFactor + AI_POSITION_STRATEGIC_DISTANCE_BASE)
+    totalValue8 = static_cast<i32>(totalValue8 / (distanceFactor5 + AI_POSITION_DISTANCE_BASE));
+    strategicDelta7 = static_cast<i32>(
+        strategicDelta7 * POSITION_STRATEGIC_MULTIPLIER
+        / (distanceFactor5 + AI_POSITION_STRATEGIC_DISTANCE_BASE)
     );
     if (strategicLiveChance == POSITION_FULL_CHANCE)
-        totalValue += strategicDelta;
-    if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) && triggerType == MAP_OBJECT_COAST) {
-        totalValue += POSITION_EMBARKED_BOAT_BONUS;
+        totalValue8 += strategicDelta7;
+    if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) && triggerType3 == MAP_OBJECT_COAST) {
+        totalValue8 += POSITION_EMBARKED_BOAT_BONUS;
     }
 
     if (giDebugLevel > POSITION_DEBUG_LEVEL - 1) {
-        MapObjectType debugObjectType = triggerType & MAP_TRIGGER_TYPE_MASK;
+        MapObjectType debugObjectType = triggerType3 & MAP_TRIGGER_TYPE_MASK;
+        char* objectName5;
         if (debugObjectType > MAP_OBJECT_NONE && IDX(debugObjectType) < POSITION_OBJECT_NAME_COUNT)
-            objectName = gQuickViewText[IDX(debugObjectType)];
+            objectName5 = gQuickViewText[IDX(debugObjectType)];
         else
-            objectName = " ";
-        sprintf(debugText, "FUN U :% 15s", objectName);
+            objectName5 = " ";
+        sprintf(debugText1, "FUN U :% 15s", objectName5);
         LogInt(
-            debugText,
+            debugText1,
             x,
             y,
-            totalValue,
-            eventValue,
-            strategicDelta,
-            targetLiveChance * POSITION_FULL_CHANCE,
+            totalValue8,
+            eventValue9,
+            strategicDelta7,
+            targetLiveChance1 * POSITION_FULL_CHANCE,
             POSITION_DEBUG_UNUSED
         );
     }
-    return totalValue;
+    return totalValue8;
 }
 
 // Search horizons, danger decay, crowding penalties, and score clamps are retail AI strategy payload.
