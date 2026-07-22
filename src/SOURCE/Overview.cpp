@@ -1260,10 +1260,10 @@ void game::DoKnob(void) {
                 if (static_cast<float>(message9.payload.mouse.y) < scrollTop11) {
                     message9.payload.mouse.y = static_cast<i32>(scrollTop11);
                 }
-                if (scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
+                if (scrollRange13 + OD_STEER(scrollTop11) - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     < static_cast<float>(message9.payload.mouse.y)) {
                     message9.payload.mouse.y = static_cast<i32>(
-                        scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
+                        scrollRange13 + OD_STEER(scrollTop11) - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     );
                 }
                 gpMouseManager->Main(message9);
