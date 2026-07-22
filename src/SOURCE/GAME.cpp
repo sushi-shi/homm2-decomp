@@ -7893,7 +7893,7 @@ DATA(0x00528458) b32 gbUpgradeArmy;
 DATA(0x00528460) i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
 DATA(0x00528470) char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 DATA(0x00528480) i8* gbNGDifficulty;
-DATA(0x00528488) CreatureType iViewArmyUpgradeToType;
+DATA(0x00528488) H2_ENUM_STORAGE(CreatureType, i32) iViewArmyUpgradeToType;
 DATA(0x0052848c) i32 viewArmyBaseX;
 DATA(0x00528490) i32 viewArmyBaseY;
 DATA(0x00528498) i8* gbNGColor;

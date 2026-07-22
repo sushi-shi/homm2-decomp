@@ -418,7 +418,7 @@ extern class icon* pVWGround;
 extern i32 iVWViewableCells;
 extern class icon* pVWFlags;
 extern i32 iVWDrawAllTerrains;
-extern SpellType iVWWhatToDraw;
+extern H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
 extern i32 iVWDrawAllObjs;
 extern i32 iVWMapOriginX;
 extern i32 iVWMapOriginY;

@@ -868,7 +868,7 @@ DATA(0x0052511c) class icon* pVWGround;
 DATA(0x00525120) i32 iVWViewableCells;
 DATA(0x00525124) class icon* pVWFlags;
 DATA(0x00525128) i32 iVWDrawAllTerrains;
-DATA(0x0052512c) SpellType iVWWhatToDraw;
+DATA(0x0052512c) H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
 DATA(0x00525130) i32 iVWDrawAllObjs;
 DATA(0x00525134) i32 iVWMapOriginX;
 DATA(0x00525138) i32 iVWMapOriginY;

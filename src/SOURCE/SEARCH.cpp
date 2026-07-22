@@ -32,7 +32,7 @@ DATA(0x0052a220) static i32 s_adjacentCost;
 DATA(0x0052a224) static i32 s_mapX;
 DATA(0x0052a228) static i32 s_neighborY;
 DATA(0x0052a22c) static i32 s_hasAdjacentMonster;
-DATA(0x0052a230) static MapDirection s_direction;
+DATA(0x0052a230) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
 DATA(0x0052a234) static i32 s_targetStepCost;
 DATA(0x0052a238) static i32 s_candidateY;
 DATA(0x0052a23c) static searchNode* s_neighborNode;
