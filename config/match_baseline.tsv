@@ -727,7 +727,7 @@ SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	2d135034f8fd
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	52d3e5726afd
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	595626a17313
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	92.1260	ff6f5562b903
-SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	96.3242	982b2cd375f7
+SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	96.3242	755846dd200d
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	286a817f2e59
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	450575d0ccdb
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	100.0000	70189f16034c
@@ -736,7 +736,7 @@ SOURCE/EVENTS	?GiveResource@advManager@@QAEXPAVhero@@HH@Z	100.0000	f74c21bc572f
 SOURCE/EVENTS	?GiveTakeArtifactStat@@YIXPAVhero@@HH@Z	100.0000	7cbfb596c345
 SOURCE/EVENTS	?HeroLoses@advManager@@QAEXPAVhero@@@Z	100.0000	8aff4a2b44f3
 SOURCE/EVENTS	?HeroSwap@advManager@@QAEXPAVhero@@0@Z	100.0000	0f2c235cc022
-SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	100.0000	0d49bfef684b
+SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	100.0000	8708d0ae25cd
 SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9180	3cf2a646a26e
 SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9408	1185339f6d28
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	656210d8c95c
