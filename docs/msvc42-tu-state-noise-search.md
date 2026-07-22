@@ -16,6 +16,21 @@ python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
+Typedef, extern, static-data, and prototype trials systematically walk declaration-train
+lengths from one through `--max-declarations` (64 by default), then wrap. Increase the bound
+when a target appears sensitive to a later compiler counter; the generated train is still fully
+disposable and the exact authored target suffix remains guarded.
+
+The tool reports a target-state census after every compiled sweep. A state is identified by the
+target's raw text digest, objdiff function boundary, and ordered relocation stream after replacing
+only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not by fuzzy score,
+because several distinct objects may share one percentage. Public target identities, relocation
+sites/types/addends, and all other spellings remain part of the state. The report also counts the
+raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
+JSON census with one complete reproducible probe body per state while the sub-100 COFF objects
+themselves remain disposable. This summary is diagnostic evidence only: it does not update a
+retained maximum.
+
 Each baseline and trial compile has a 120-second default ceiling. Override it with a
 positive finite `--compile-timeout-seconds`; expiry terminates the complete compiler
 process group, including Wine/MSVC descendants, records a rejected timeout trial, and
