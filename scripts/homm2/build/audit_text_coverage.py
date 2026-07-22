@@ -204,7 +204,6 @@ def main(argv=None):
     manifest = argv[1] if len(argv) > 1 else "build/gen/symbol_names.csv"
     library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")
-    rejection_path = Path("config/delink_candidate_rejections.csv")
     exclusion_path = Path("config/delink_text_exclusions.csv")
     jump_table_path = Path("build/gen/jump_tables.csv")
     output_path = Path(argv[2]) if len(argv) > 2 else None
@@ -246,8 +245,6 @@ def main(argv=None):
             provenance = "fid-%s-%s" % (row["library"].lower(), row["source"])
             configured[rva] = (int(row["size"], 16), row["name"], row["unit"],
                                provenance)
-    rejected = {int(row["rva"], 16): row["reason"]
-                for row in rows_without_comments(rejection_path)}
     exclusions = []
     for row in rows_without_comments(exclusion_path):
         start = int(row["rva"], 16)
@@ -281,7 +278,7 @@ def main(argv=None):
             candidates.append((rva, owner_start, owner_end))
 
     candidate_failures = []
-    accepted_count = rejected_count = 0
+    accepted_count = 0
     print("nested-entry candidates: count=%d" % len(candidates))
     for rva, owner_start, owner_end in candidates:
         owner_name, owner_unit = public_by_rva[owner_start]
@@ -301,10 +298,6 @@ def main(argv=None):
                 unit_display = unit
             if "direct-rel32-entry" in provenance and not incoming:
                 candidate_failures.append((rva, "configured direct entry has no decoded caller"))
-        elif rva in rejected:
-            disposition = "rejected: " + rejected[rva]
-            rejected_count += 1
-            unit_display = owner_unit
         else:
             disposition = "UNREVIEWED"
             unit_display = owner_unit
@@ -350,10 +343,6 @@ def main(argv=None):
                 candidate_failures.append((rva, "%s extent lacks a terminal return/jump" % name))
             elif "direct-rel32-entry" in provenance and not terminates and not shared_tail:
                 candidate_failures.append((rva, "%s direct-entry extent lacks a terminal boundary" % name))
-
-    for rva in rejected:
-        if rva not in {candidate[0] for candidate in candidates}:
-            candidate_failures.append((rva, "stale rejected-candidate entry"))
 
     unique = {}
     for start, end, name, provenance in intervals:
@@ -409,10 +398,10 @@ def main(argv=None):
               (start, end, kind, contained_tables, reason))
 
     print("coverage: functions=%d unique_spans=%d padding_gaps=%d unexplained_gaps=%d "
-          "overlaps=%d candidates=%d accepted=%d rejected=%d exclusions=%d jump_tables=%d "
+          "overlaps=%d candidates=%d accepted=%d exclusions=%d jump_tables=%d "
           "failures=%d" %
           (len(intervals), len(spans), padding_count, len(unexplained), len(overlap),
-           len(candidates), accepted_count, rejected_count, len(exclusions), len(jump_tables),
+           len(candidates), accepted_count, len(exclusions), len(jump_tables),
            len(candidate_failures) + len(exclusion_failures)))
     for start, end, size in unexplained[:40]:
         print("  UNEXPLAINED 0x%x..0x%x (%d bytes)" % (start, end, size))
