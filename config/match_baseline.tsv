@@ -1038,7 +1038,7 @@ SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	32e7cc8e72ad
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	98.1373	6e285957978c
 SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	96.7731	285bad479fef
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	e5afc10b5a3e
-SOURCE/Overview	?SetupResources@game@@QAEXXZ	99.7297	54d31cc22e9d
+SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	cda91a0d88f6
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	5a6fcace7afa
 SOURCE/PATH	?GetAdjacentCellIndex@army@@QAEHHH@Z	93.1000	f1186c11a368
 SOURCE/PATH	?GetAdjacentCellIndexNoArmy@@YIHHH@Z	100.0000	1ab15848b052
