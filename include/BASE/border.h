@@ -25,7 +25,7 @@ public:
         i16,
         char*
     );
-    virtual ~border() OVERRIDE;
+    __declspec(dllexport) virtual inline ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);
