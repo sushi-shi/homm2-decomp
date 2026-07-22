@@ -3056,6 +3056,11 @@ i32 WaitForOtherPlayer(void) {
     return result;
 }
 
+// @semantic
+// All 131 relocations and the control-flow topology agree. The first residual is
+// the printable-key range test: retail compares the stored byte directly, while
+// MSVC zero-extends the equivalent u8/u32 expression. Literal, narrowed,
+// inline-helper, and bit-field spellings did not reproduce that lowering.
 VA(0x0049d4a6, 0xb85)
 void PopNetBox(char* text, i32 netPlayer) {
     i32 textY_d;
@@ -3081,7 +3086,6 @@ void PopNetBox(char* text, i32 netPlayer) {
     KbRemotePacket* remoteData_g;
     i32 redrawAdventure_i;
     i32 cursorState;
-    i32 lineIndex;
 
     if (!gbRemoteOn)
         return;
@@ -3114,18 +3118,31 @@ void PopNetBox(char* text, i32 netPlayer) {
 
     updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
     updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
-    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
-        updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + lineIndex;
-        updateMessage_f.payload.widget.data.text = cNetBoxLine[lineIndex];
-        netWindow_j->BroadcastMessage(updateMessage_f);
-    }
+    updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 1;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 2;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 3;
+    updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
+    netWindow_j->BroadcastMessage(updateMessage_f);
     updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
-        updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + lineIndex;
-        updateMessage_f.payload.widget.data.value =
-            cNetBoxColor[lineIndex] + BOX_COLOR_FRAME_OFFSET;
-        netWindow_j->BroadcastMessage(updateMessage_f);
-    }
+    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
+    netWindow_j->BroadcastMessage(updateMessage_f);
+    updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
+    updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
+    netWindow_j->BroadcastMessage(updateMessage_f);
     updateMessage_f.payload.widget.id = BOX_THIS_PLAYER_COLOR_ID;
     updateMessage_f.payload.widget.data.value =
         gpGame->m_players[NetPosToGamePos(giThisNetPos)].m_color + BOX_COLOR_FRAME_OFFSET;
@@ -3151,7 +3168,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 switch (remoteData_g->command) {
                     case BOX_REMOTE_MAP_CHANGE:
                         gbLeaveNetBoxAlone = true;
-                        if (gpAdvManager->m_active) {
+                        if (gpAdvManager->m_active == 1) {
                             bShowIt = savedShowIt_a;
                             gpAdvManager->ProcessIncomingGroupMapChange(remoteData_g->payload.data);
                             bShowIt = 1;
@@ -3210,8 +3227,10 @@ void PopNetBox(char* text, i32 netPlayer) {
                         sendText_e = 1;
                         break;
                     default:
-                        if (event_a.payload.keyboard.keyByte < BOX_FIRST_PRINTABLE
-                            || event_a.payload.keyboard.keyByte > BOX_LAST_PRINTABLE)
+                        if (event_a.payload.keyboard.keyByte
+                                < static_cast<u32>(BOX_FIRST_PRINTABLE)
+                            || event_a.payload.keyboard.keyByte
+                                > static_cast<u32>(BOX_LAST_PRINTABLE))
                             break;
                         if (inputLength_a < BOX_MAX_INPUT
                             && event_a.payload.keyboard.keyCode != 0) {
@@ -3258,18 +3277,35 @@ void PopNetBox(char* text, i32 netPlayer) {
             redrawLines_f = 0;
             updateMessage_f.type = NET_BOX_UPDATE_MESSAGE;
             updateMessage_f.payload.widget.command = NET_BOX_TEXT_COMMAND;
-            for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
-                updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + lineIndex;
-                updateMessage_f.payload.widget.data.text = cNetBoxLine[lineIndex];
-                netWindow_j->BroadcastMessage(updateMessage_f);
-            }
+            updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[0];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 1;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[1];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 2;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[2];
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_LINE_ID + 3;
+            updateMessage_f.payload.widget.data.text = cNetBoxLine[3];
+            netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
-            for (lineIndex = 0; lineIndex < BOX_LINE_COUNT; lineIndex++) {
-                updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + lineIndex;
-                updateMessage_f.payload.widget.data.value =
-                    cNetBoxColor[lineIndex] + BOX_COLOR_FRAME_OFFSET;
-                netWindow_j->BroadcastMessage(updateMessage_f);
-            }
+            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
+            updateMessage_f.payload.widget.data.value =
+                cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
+            updateMessage_f.payload.widget.data.value =
+                cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
+            updateMessage_f.payload.widget.data.value =
+                cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
+            netWindow_j->BroadcastMessage(updateMessage_f);
+            updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
+            updateMessage_f.payload.widget.data.value =
+                cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
+            netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
         }
