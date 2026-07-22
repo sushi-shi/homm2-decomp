@@ -349,7 +349,7 @@ void comm_wrt_task(void) {
         if (packetNode == NULL)
             packetNode = pop_node(&comPort->normalQueue);
         if (packetNode == NULL)
-            break;
+            return;
         writtenTotal = 0;
         while (comPort->handle != INVALID_HANDLE_VALUE && writtenTotal < packetNode->len) {
             callResult = WriteFile(

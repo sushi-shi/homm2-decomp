@@ -1376,7 +1376,7 @@ SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	feb4b7abd747
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	15983804e0fb
 SOURCE/comwin	?com_stat@@YIEFG@Z	100.0000	2b9d847c69ac
 SOURCE/comwin	?com_term@@YIXF@Z	100.0000	9b68a6d13f43
-SOURCE/comwin	?comm_wrt_task@@YIXXZ	99.9275	56b089c76a08
+SOURCE/comwin	?comm_wrt_task@@YIXXZ	100.0000	4c89adb4eda3
 SOURCE/comwin	?init_anchor@@YIXPAUtag_Anchor@@HH@Z	100.0000	2700f88bbd71
 SOURCE/comwin	?pop_node@@YIPAUtag_Node@@PAUtag_Anchor@@@Z	100.0000	ca42897db25b
 SOURCE/dpnetwin	?CleanupDPVars@@YIXXZ	100.0000	7832ca98a276
