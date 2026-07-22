@@ -138,7 +138,7 @@ void highScoreManager::Update(void) {
         sprintf(filename, "%sCAMPAIGN.HS", ".\\DATA\\");
     else
         sprintf(filename, "%sSTANDARD.HS", ".\\DATA\\");
-    inputFile = _open(filename, HIGH_SCORE_FILE_READ_FLAGS);
+    inputFile = open(filename, HIGH_SCORE_FILE_READ_FLAGS);
     if (inputFile == -1)
         missingFile = 1;
 
@@ -174,7 +174,7 @@ void highScoreManager::Update(void) {
         if (missingFile != 0)
             scoreEntry.score = HIGH_SCORE_EMPTY;
         else
-            _read(inputFile, &scoreEntry, sizeof(scoreEntry));
+            read(inputFile, &scoreEntry, sizeof(scoreEntry));
 
         if (scoreEntry.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[entry] = 0;
@@ -299,7 +299,7 @@ void highScoreManager::Update(void) {
         }
     }
     if (missingFile == 0)
-        _close(inputFile);
+        close(inputFile);
 }
 
 
