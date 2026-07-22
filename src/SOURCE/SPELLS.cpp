@@ -390,6 +390,7 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
                 gpCombatManager->CombatMessage(cSpellHelp[HELP_DEFAULT], 1, 0, 0);
                 break;
         }
+        return MESSAGE_DISPATCH_CONSUME;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
