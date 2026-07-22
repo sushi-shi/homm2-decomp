@@ -1022,7 +1022,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         boat->id = static_cast<i8>(boatIdx);
         boat->x = static_cast<i8>(x);
         boat->y = static_cast<i8>(y);
-        boat->direction = MAP_SPRITE_INITIAL_DIRECTION;
+        boat->direction = MAP_DIRECTION_EAST;
         boat->owner = static_cast<i8>(giCurPlayer);
         mapCell* cell = WORLDMAP->Row(y) + x;
         boat->savedTriggerType = cell->m_triggerType;
@@ -1357,7 +1357,7 @@ void game::SetupOrigData(void) {
         m_heroRecs[i].m_id = static_cast<i8>(i);
         m_heroRecs[i].m_portrait = static_cast<u8>(i);
         m_heroRecs[i].m_owner = HERO_OWNER_NONE;
-        m_heroRecs[i].m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+        m_heroRecs[i].m_direction = MAP_DIRECTION_EAST;
         strcpy(m_heroRecs[i].m_name, gHeroDefaultNames[i]);
         m_heroRecs[i].m_cursorType = static_cast<FactionType>(i / INITIAL_RECORD_TYPE_STRIDE);
         for (j = 0; j < HERO_STARTING_STAT_COUNT; j++)

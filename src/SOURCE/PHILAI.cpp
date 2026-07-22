@@ -3385,7 +3385,7 @@ i32 philAI::StrategicValueOfPosition(
     search5->SeedPosition(
         targetX,
         targetY,
-        2,
+        MAP_DIRECTION_EAST,
         seedMobility2,
         IDX(eventFlags8),
         0,
@@ -4802,7 +4802,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     newHero6->m_x = townX37;
     newHero6->m_y = townY9;
     newHero6->m_eventFlags = HERO_EVENT_NONE;
-    newHero6->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+    newHero6->m_direction = MAP_DIRECTION_EAST;
     newHero6->m_remainingMobility = newHero6->CalcMobility();
     newHero6->m_mobility = newHero6->m_remainingMobility;
 

@@ -125,23 +125,23 @@ i32 CalcTerrainCost(
     H2_ENUM_PARAM(TerrainType, i32) terrain,
     i32 diagonal,
     i32 mobility,
-    i32 direction,
+    i32 pathfindingLevel,
     i32 useRoad,
     i32 usePathfinding
 ) {
     i32 roadCost;
 
-    if (mobility < giTerrainCost[IDX(terrain)][direction][1]) {
-        i32 baseCost = giTerrainCost[IDX(terrain)][direction][0];
+    if (mobility < giTerrainCost[IDX(terrain)][pathfindingLevel][1]) {
+        i32 baseCost = giTerrainCost[IDX(terrain)][pathfindingLevel][0];
         if (mobility < baseCost) {
             if (useRoad == 0)
                 goto terrainCost;
-            roadCost = giTerrainCost[IDX(TERRAIN_ROAD)][direction][0];
+            roadCost = giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
             if (mobility < roadCost)
                 goto pathfindingCost;
         }
         if (useRoad != 0)
-            return giTerrainCost[IDX(TERRAIN_ROAD)][direction][0];
+            return giTerrainCost[IDX(TERRAIN_ROAD)][pathfindingLevel][0];
     } else {
     pathfindingCost:
         if (useRoad != 0 && usePathfinding != 0)
@@ -149,14 +149,14 @@ i32 CalcTerrainCost(
     }
 
 terrainCost:
-    return giTerrainCost[IDX(terrain)][direction][diagonal & SEARCH_DIAGONAL_COST_MASK];
+    return giTerrainCost[IDX(terrain)][pathfindingLevel][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
 VA(0x004a4c20, 0x270)
 void searchArray::PushPoint(
     i32 x,
     i32 y,
-    i32 direction,
+    H2_ENUM_PARAM(MapDirection, i32) direction,
     i32 cost,
     i32 mobility,
     i32 unknownFlag,
@@ -200,8 +200,10 @@ void searchArray::PushPoint(
 
             if (giCurTempMobility < cost && rvFlag2 == 0) {
                 gSearchQueueNode->rvFlag2 = 1;
-                gSearchQueueNode->previousX = static_cast<i8>(x - normalDirTable[direction].x);
-                gSearchQueueNode->previousY = static_cast<i8>(y - normalDirTable[direction].y);
+                gSearchQueueNode->previousX =
+                    static_cast<i8>(x - normalDirTable[IDX(direction)].x);
+                gSearchQueueNode->previousY =
+                    static_cast<i8>(y - normalDirTable[IDX(direction)].y);
             } else {
                 gSearchQueueNode->rvFlag2 = static_cast<u8>(rvFlag2);
                 gSearchQueueNode->previousX = static_cast<i8>(previousX);
@@ -209,7 +211,7 @@ void searchArray::PushPoint(
             }
             gSearchQueueNode->x = static_cast<u8>(x);
             gSearchQueueNode->y = static_cast<u8>(y);
-            gSearchQueueNode->direction = static_cast<u8>(direction);
+            gSearchQueueNode->direction = static_cast<u8>(IDX(direction));
             gSearchQueueNode->distance = static_cast<u16>(cost);
             gSearchQueueNode->unknownFlag = static_cast<u8>(unknownFlag);
             gSearchQueueNode->rvFlag1 = static_cast<u8>(rvFlag1);
