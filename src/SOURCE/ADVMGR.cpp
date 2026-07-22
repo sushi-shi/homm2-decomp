@@ -264,14 +264,8 @@ H2_ENUM_BEGIN(AdventureStateConstant)
 H2_ENUM_END(AdventureStateConstant)
 
 H2_ENUM_BEGIN(AdventureMainConstant)
-    ADVENTURE_MAIN_CONTINUE           = 1,
-    ADVENTURE_MAIN_EXIT               = 2,
     ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
 H2_ENUM_END(AdventureMainConstant)
-
-H2_ENUM_BEGIN(AdventureRemoteWaitConstant)
-    REMOTE_WAIT_EXIT_RESULT = 2
-H2_ENUM_END(AdventureRemoteWaitConstant)
 
 H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_ORIGIN_NONE          = -1,
@@ -1559,14 +1553,14 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
 }
 
 VA(0x00457d6c, 0xfda)
-i32 advManager::Main(struct tag_message& message) {
+MessageDispatchResult advManager::Main(struct tag_message& message) {
     if (KBTickCount() > glTimers[0] && ComboDraw(1)) {
         UpdateScreen(1, 0);
     }
     if (gbGameOver) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-        return ADVENTURE_MAIN_EXIT;
+        return MESSAGE_DISPATCH_FORWARD;
     }
 
     CheckHandleNet();
@@ -1576,7 +1570,7 @@ i32 advManager::Main(struct tag_message& message) {
     if (!gbHumanPlayer[giCurPlayer]) {
         gpPhilAI->DoAI(giCurPlayer);
         gpGame->NextPlayer();
-        return ADVENTURE_MAIN_CONTINUE;
+        return MESSAGE_DISPATCH_CONSUME;
     }
     if (giScreenScroll && gbForegroundApp) {
         CheckScreenScroll();
@@ -1594,7 +1588,7 @@ i32 advManager::Main(struct tag_message& message) {
         );
     }
 
-    i32 processResult = ADVENTURE_MAIN_CONTINUE;
+    MessageDispatchResult processResult = MESSAGE_DISPATCH_CONSUME;
     i32 exitRequestedFlag = 0;
     // Retail reserves three result slots; only the first is used.
     mapCell* eventCellsResult[ADVENTURE_EVENT_CELL_RESULT_COUNT];
@@ -2043,7 +2037,7 @@ finish_message:
     if (gbGameOver || exitRequestedFlag == 1 || giMenuCommand != -1) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-        return ADVENTURE_MAIN_EXIT;
+        return MESSAGE_DISPATCH_FORWARD;
     }
     return processResult;
 }
@@ -2054,7 +2048,8 @@ void advManager::Reseed(i32, i32) {
 }
 
 VA(0x00458d68, 0xeb1)
-i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
+MessageDispatchResult
+advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 mouseX;
     mapCell* currentCell;
     i32 objectTypeState;
@@ -2411,11 +2406,11 @@ i32 advManager::ProcessSelect(struct tag_message* message, class mapCell** event
             0
         );
     }
-    return 1;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00459c19, 0x463)
-i32 advManager::ProcessDeSelect(
+MessageDispatchResult advManager::ProcessDeSelect(
     struct tag_message* message,
     i32* result,
     class mapCell** eventCell
@@ -2548,7 +2543,7 @@ i32 advManager::ProcessDeSelect(
         giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_DURATION;
         UpdBottomView(1, 1, 1);
     }
-    return 1;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0045a07c, 0x5c8)
@@ -2723,7 +2718,7 @@ search_end:
 }
 
 VA(0x0045a644, 0xa50)
-i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
+MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroXHero;
     i32 heroYCoordinate;
     i32 cellXPosition;
@@ -2737,7 +2732,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     if (InMapArea(mouseX, mouseY)) {
         if (mouseX > DRAW_CLIP_WIDTH) {
             gpMouseManager->SetPointer(POINTER_DEFAULT);
-            return 1;
+            return MESSAGE_DISPATCH_CONSUME;
         }
 
         cellXPosition = mouseX / CELL_PIXELS;
@@ -2767,7 +2762,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 || m_commandTargetY > MAP_HEIGHT - 1
                 || !(giCurPlayerBit & mapExtra[m_commandTargetY * MAP_WIDTH + m_commandTargetX])) {
                 gpMouseManager->SetPointer(POINTER_DEFAULT);
-                return 1;
+                return MESSAGE_DISPATCH_CONSUME;
             }
 
             hoverCellLocal = GetCell(m_commandTargetX, m_commandTargetY);
@@ -2776,7 +2771,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                     && gpGame->GetTown(hoverCellLocal->m_objectMetadata)->m_owner == giCurPlayer) {
                     gpMouseManager->SetPointer(POINTER_TOWN);
                     m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
-                    return 1;
+                    return MESSAGE_DISPATCH_CONSUME;
                 } else {
                     if ((hoverCellLocal->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                             == MAP_OBJECT_HERO_INTERACTION
@@ -2784,10 +2779,10 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                == giCurPlayer) {
                         gpMouseManager->SetPointer(POINTER_HERO);
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
-                        return 1;
+                        return MESSAGE_DISPATCH_CONSUME;
                     } else {
                         gpMouseManager->SetPointer(POINTER_DEFAULT);
-                        return 1;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
             } else {
@@ -2797,7 +2792,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                 if (cellXPosition == heroXHero && cellYCurrent == heroYCoordinate) {
                     gpMouseManager->SetPointer(POINTER_HERO);
                     m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
-                    return 1;
+                    return MESSAGE_DISPATCH_CONSUME;
                 }
 
                 if (hoverCellLocal->m_flags & HOVER_OBJECT_BLOCKED) {
@@ -2807,12 +2802,12 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                         if (hoverTownCell->m_owner == giCurPlayer) {
                             gpMouseManager->SetPointer(POINTER_TOWN);
                             m_selectedCell = ADVMGR_COMMAND_SELECT_TOWN;
-                            return 1;
+                            return MESSAGE_DISPATCH_CONSUME;
                         }
                     }
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
-                    return 1;
+                    return MESSAGE_DISPATCH_CONSUME;
                 }
 
                 if (!((m_cursorType == HERO_TYPE_BOAT
@@ -2829,7 +2824,7 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                           || hoverCellLocal->m_triggerType == MAP_OBJECT_COAST))) {
                     gpSearchArray->m_pathLength = 0;
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
-                    return 1;
+                    return MESSAGE_DISPATCH_CONSUME;
                 }
                 SeedTo(m_commandTargetX, m_commandTargetY);
                 if (gpSearchArray->GetCell(m_commandTargetX, m_commandTargetY).flags) {
@@ -2961,20 +2956,20 @@ i32 advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             m_selectedCell = ADVMGR_COMMAND_MOVE_TO;
                             break;
                     }
-                    return 1;
+                    return MESSAGE_DISPATCH_CONSUME;
                 } else {
                     gpMouseManager->SetPointer(POINTER_DEFAULT);
                 }
             }
         }
-        return 1;
+        return MESSAGE_DISPATCH_CONSUME;
     } else {
         if (!(gpMouseManager->m_cursorFrame >= HOVER_SCROLL_FRAME_FIRST
               && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END
               && MouseInScrollZone())) {
             gpMouseManager->SetPointer(POINTER_DEFAULT);
         }
-        return 1;
+        return MESSAGE_DISPATCH_CONSUME;
     }
 }
 
@@ -7417,7 +7412,7 @@ void advManager::CheckCastSpell(void) {
 }
 
 VA(0x00465191, 0x31c)
-WidgetDispatchResult DimensionDoorHandler(tag_message& message) {
+MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
         gpAdvManager->UpdateScreen(0, 0);
@@ -7492,7 +7487,7 @@ WidgetDispatchResult DimensionDoorHandler(tag_message& message) {
             } else {
                 gpWindowManager->m_dialogResult = 0;
                 gpMouseManager->SetPointer(POINTER_DEFAULT);
-                return WIDGET_DISPATCH_CONSUME;
+                return MESSAGE_DISPATCH_CONSUME;
             }
             break;
     }
@@ -7500,9 +7495,9 @@ WidgetDispatchResult DimensionDoorHandler(tag_message& message) {
     if (handled) {
         message.payload.widget.id = DIMENSION_DOOR_FIRST_BUTTON;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004654ad, 0x11a9)
@@ -8386,7 +8381,7 @@ void advManager::DimensionDoor(void) {
 }
 
 VA(0x00467734, 0x129)
-WidgetDispatchResult TownPortalHandler(tag_message& message) {
+MessageDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active) {
@@ -8409,7 +8404,7 @@ WidgetDispatchResult TownPortalHandler(tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -8419,7 +8414,7 @@ WidgetDispatchResult TownPortalHandler(tag_message& message) {
         }
     }
 
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046785d, 0x43e)
@@ -9267,7 +9262,8 @@ char* advManager::CheckHandleNet(void) {
 }
 
 VA(0x0046952a, 0xcd)
-i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
+MessageDispatchResult
+advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE) {
         gpMouseManager->Main(message);
     }
@@ -9286,7 +9282,7 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
                     )) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-                    return REMOTE_WAIT_EXIT_RESULT;
+                    return MESSAGE_DISPATCH_FORWARD;
                 }
 
             default:
@@ -9295,7 +9291,7 @@ i32 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain
     }
 
     UpdBottomView(0, 1, 1);
-    return 0;
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004695f7, 0x1d5)
@@ -9823,7 +9819,7 @@ void advManager::AdvPanel(void) {
 }
 
 VA(0x0046a9d0, 0x1ca)
-WidgetDispatchResult APanelHandler(tag_message& message) {
+MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
@@ -9872,9 +9868,9 @@ WidgetDispatchResult APanelHandler(tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046ab9a, 0x1e4)
@@ -9931,7 +9927,7 @@ i32 advManager::ControlPanel(void) {
 }
 
 VA(0x0046ad7e, 0x304)
-WidgetDispatchResult CPanelHandler(tag_message& message) {
+MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
@@ -10031,9 +10027,9 @@ WidgetDispatchResult CPanelHandler(tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046b082, 0x197)
@@ -10184,7 +10180,7 @@ void UpdateSystemOptions(i32 initialDraw) {
 }
 
 VA(0x0046b578, 0x672)
-WidgetDispatchResult SystemOptionsHandler(struct tag_message& message) {
+MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];
     i32 accepted = 0;
@@ -10409,9 +10405,9 @@ WidgetDispatchResult SystemOptionsHandler(struct tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = ADVMGR_SYSTEM_OPTION_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046bbea, 0x7f)

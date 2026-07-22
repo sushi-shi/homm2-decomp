@@ -6,7 +6,7 @@
 
 struct tag_message;
 
-WidgetDispatchResult HandleViewGeneral(struct tag_message&);
+MessageDispatchResult HandleViewGeneral(struct tag_message&);
 extern i32 iViewGeneralWhichSide;
 
 #endif

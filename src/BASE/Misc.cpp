@@ -2429,14 +2429,14 @@ void GetDataEntry(
 }
 
 VA(0x004c6e50, 0x173)
-WidgetDispatchResult DataEntryWindowHandler(struct tag_message& message) {
+MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
         message.payload.mouse.y = inBoxY;
         DataEntryWin->BroadcastMessage(message);
-        return WIDGET_DISPATCH_CONSUME;
+        return MESSAGE_DISPATCH_CONSUME;
     }
 
     if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT)
@@ -2473,7 +2473,7 @@ WidgetDispatchResult DataEntryWindowHandler(struct tag_message& message) {
             gpWindowManager->m_dialogResult = message.payload.widget.id;
             message.payload.widget.id = ENTRY_TEXT_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-            return WIDGET_DISPATCH_FORWARD;
+            return MESSAGE_DISPATCH_FORWARD;
         }
     }
 
@@ -2482,7 +2482,7 @@ possibleCancelEvent:
         goto normalEvent;
     message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-    return WIDGET_DISPATCH_FORWARD;
+    return MESSAGE_DISPATCH_FORWARD;
 
 normalEvent:
     return EventWindowHandler(message);

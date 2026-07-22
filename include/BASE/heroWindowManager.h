@@ -38,12 +38,12 @@ public:
     heroWindowManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
-    i32 ConvertToHover(struct tag_message&);
-    i32 BroadcastMessage(MessageType, BaseWidgetCommand, i32, i32);
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    MessageDispatchResult ConvertToHover(struct tag_message&);
+    MessageDispatchResult BroadcastMessage(MessageType, BaseWidgetCommand, i32, i32);
     void AddWindow(class heroWindow*, i32, i32);
     void RemoveWindow(class heroWindow*);
-    i32 DoDialog(class heroWindow*, WidgetMessageHandler, i32);
+    i32 DoDialog(class heroWindow*, MessageDispatchHandler, i32);
     void UpdateScreen(void);
     void UpdateScreenRegion(i32, i32, i32, i32);
     void RedrawScreen(void);

@@ -260,11 +260,11 @@ void listBoxWidget::DeleteItem(i32 index) {
 }
 
 VA(0x004db520, 0x368)
-WidgetDispatchResult listBoxWidget::Main(tag_message& message) {
+MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE:
@@ -280,13 +280,13 @@ WidgetDispatchResult listBoxWidget::Main(tag_message& message) {
             i16 my = message.payload.mouse.y - m_owner->m_posY;
             i16 left = m_x;
             if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
                 message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
             return ProcessMouseMessage(message);
         }
@@ -295,13 +295,13 @@ WidgetDispatchResult listBoxWidget::Main(tag_message& message) {
                 case WIDGET_COMMAND_SET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         m_selectedIndex = message.payload.widget.data.value;
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_GET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         message.payload.widget.data.value = m_selectedIndex;
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_REPLACE_ITEM:
@@ -493,7 +493,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
 }
 
 VA(0x004dbbe0, 0x312)
-WidgetDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
+MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX - m_owner->m_posX;
     i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;
     i32 adjY = mouseY - m_listY;
@@ -525,7 +525,7 @@ WidgetDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                     goto done;
                 m_topIndex = newTop;
             } else {
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
             goto redraw;
         case MESSAGE_LEFT_BUTTON_DOWN:
@@ -591,15 +591,15 @@ WidgetDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 }
                 m_lastSelectedIndex = m_selectedIndex;
                 m_lastClickTime = KBTickCount();
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
     }
     goto done;
 redraw:
     DrawLBStuff(1);
 done:
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 

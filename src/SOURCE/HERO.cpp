@@ -1166,7 +1166,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 }
 
 VA(0x0046e816, 0xaef)
-WidgetDispatchResult HeroHandler(struct tag_message& message) {
+MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
     i32 temp1;
     i32 armySlot7;
@@ -1188,10 +1188,10 @@ WidgetDispatchResult HeroHandler(struct tag_message& message) {
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
         if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-            return WIDGET_DISPATCH_CONSUME;
+            return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
         UpdateHeroScreenStatusBar(message);
-        return WIDGET_DISPATCH_CONSUME;
+        return MESSAGE_DISPATCH_CONSUME;
     }
 
     if (message.type == MESSAGE_KEY_UP) {
@@ -1554,9 +1554,9 @@ WidgetDispatchResult HeroHandler(struct tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0046f305, 0x4f)

@@ -154,9 +154,9 @@ H2_ENUM_END(TownManagerConstant)
 
 extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 
-WidgetDispatchResult MageGuildHandler(struct tag_message&);
-WidgetDispatchResult TavernHandler(struct tag_message&);
-WidgetDispatchResult SplitArmyHandler(struct tag_message&);
+MessageDispatchResult MageGuildHandler(struct tag_message&);
+MessageDispatchResult TavernHandler(struct tag_message&);
+MessageDispatchResult SplitArmyHandler(struct tag_message&);
 void GetCategoryStats(
     H2_ENUM_PARAM(TownThievesGuildCategory, i32),
     i32l* const,

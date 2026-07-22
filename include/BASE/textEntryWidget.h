@@ -62,7 +62,7 @@ public:
     );
     virtual ~textEntryWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual WidgetDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(i32);
     void SetupDisplayString(char*, u16);
 };

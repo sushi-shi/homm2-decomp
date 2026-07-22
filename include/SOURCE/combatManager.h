@@ -622,7 +622,7 @@ public:
     combatManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void NoShowCombatLog(char*);
     void ClearCombatMessages(i32);
     void CheckUpdateCombatMessages(void);
@@ -718,7 +718,7 @@ public:
     void SetCombatDirections(i32);
     void CheckSetMouseDirection(i32, i32, i32);
     i32 GetPointer(CombatMessageCommand, i32);
-    i32 ProcessCombatMsg(struct tag_message&);
+    MessageDispatchResult ProcessCombatMsg(struct tag_message&);
     i32 IsNegationSphereInEffect(void);
     void ResetRound(void);
     i32 CheckWin(struct tag_message*);
@@ -738,7 +738,7 @@ public:
     void CheckGetAIMove(void);
     void GetControl(void);
     void ResetMouse(void);
-    i32 ProcessNextAction(struct tag_message&);
+    MessageDispatchResult ProcessNextAction(struct tag_message&);
     void ResetCyclingCreatures(void);
     void ResetCycleTimers(void);
     void CycleCombatScreen(void);

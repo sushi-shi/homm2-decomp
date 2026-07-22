@@ -43,11 +43,6 @@
 
 namespace {
 
-H2_ENUM_CLASS_BEGIN(CombatMainResult)
-    MAIN_CONTINUE = 1,
-    MAIN_FINISHED = 2
-H2_ENUM_CLASS_END(CombatMainResult)
-
 H2_ENUM_CLASS_BEGIN(CombatKeyCommand)
     KEY_MOUSE_COORDS          = 2,
     KEY_VIEW_ARMY             = 0x14,
@@ -335,8 +330,8 @@ H2_ENUM_END(CombatStorageConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
 VA(0x0042a6d0, 0x36d)
-i32 combatManager::Main(tag_message& message) {
-    i32 result = IDX(MAIN_CONTINUE);
+MessageDispatchResult combatManager::Main(tag_message& message) {
+    MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
 
     if (gbNoShowCombat == 0) {
         if (KBTickCount() > glTimers[0]) {
@@ -355,7 +350,7 @@ i32 combatManager::Main(tag_message& message) {
 
     CheckCastleAttack();
     if (CheckWin(&message) != 0)
-        return IDX(MAIN_FINISHED);
+        return MESSAGE_DISPATCH_FORWARD;
 
     if (gbNoShowCombat == 0) {
         CombatRemotePacket* packet =
@@ -382,7 +377,7 @@ i32 combatManager::Main(tag_message& message) {
                         break;
                 }
             }
-            return IDX(MAIN_CONTINUE);
+            return MESSAGE_DISPATCH_CONSUME;
         }
     }
 
@@ -391,7 +386,7 @@ i32 combatManager::Main(tag_message& message) {
         if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
-                return IDX(MAIN_FINISHED);
+                return MESSAGE_DISPATCH_FORWARD;
         }
     }
 
@@ -787,7 +782,7 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 
 VA(0x0042ba9b, 0x8b)
 i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
-    CombatMainResult result;
+    i32 result;
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
         return POINTER_VIEW;
     } else {
@@ -807,7 +802,7 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
 }
 
 VA(0x0042bb26, 0x8e4)
-i32 combatManager::ProcessCombatMsg(tag_message& message) {
+MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;
     i32 unusedResult_14 = 0;
@@ -941,7 +936,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
                     }
                 }
             }
-            return IDX(MAIN_CONTINUE);
+            return MESSAGE_DISPATCH_CONSUME;
 
         case MESSAGE_KEY_DOWN:
             switch (static_cast<CombatKeyCommand>(message.payload.keyboard.keyCode)) {
@@ -1072,7 +1067,7 @@ i32 combatManager::ProcessCombatMsg(tag_message& message) {
             break;
     }
 
-    return IDX(MAIN_CONTINUE);
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0042c40a, 0x70)
@@ -1473,7 +1468,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
 }
 
 VA(0x0042d472, 0x57b)
-WidgetDispatchResult WinCombatHandler(struct tag_message& message) {
+MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     char iconFile[WIN_LOSE_ICON_FILENAME_SIZE];
     tag_message animationMessage;
     i32 finalDelay = WIN_LOSE_INITIAL_DELAY;
@@ -1486,7 +1481,7 @@ WidgetDispatchResult WinCombatHandler(struct tag_message& message) {
         message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
 
     if (message.type == MESSAGE_WIDGET) {
@@ -1524,7 +1519,7 @@ WidgetDispatchResult WinCombatHandler(struct tag_message& message) {
                                 message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
                                 message.payload.widget.command =
                                     BaseWidgetCommand(message.payload.widget.id);
-                                return WIDGET_DISPATCH_FORWARD;
+                                return MESSAGE_DISPATCH_FORWARD;
                             }
                         }
                         break;
@@ -1618,7 +1613,7 @@ WidgetDispatchResult WinCombatHandler(struct tag_message& message) {
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
         glTimers[0] = KBTickCount() + iDelay;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0042d9ed, 0x110)
@@ -2554,16 +2549,16 @@ void combatManager::ResetMouse(void) {
 }
 
 VA(0x00430536, 0x65b)
-i32 combatManager::ProcessNextAction(struct tag_message& message) {
+MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;
     army* currentArmy;
     i32 advanceArmy;
     i32 redraw;
-    CombatMainResult result;
+    MessageDispatchResult result;
 
     ClearCombatMessages(0);
-    result = MAIN_CONTINUE;
+    result = MESSAGE_DISPATCH_CONSUME;
     redraw = 0;
     gbProcessingCombatAction = true;
     if (m_smallViewSide[COMBAT_ATTACKER_SIDE] != -1
@@ -2647,7 +2642,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 currentArmy->MoveAttack(giNextActionGridIndex, 0);
                 currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 if (CheckWin(&message) != 0) {
-                    result = MAIN_FINISHED;
+                    result = MESSAGE_DISPATCH_FORWARD;
                     goto Finished;
                 }
                 CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
@@ -2662,7 +2657,7 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
                 currentArmy->MoveAttack(giNextActionGridIndex, 0);
                 currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
                 if (CheckWin(&message) != 0) {
-                    result = MAIN_FINISHED;
+                    result = MESSAGE_DISPATCH_FORWARD;
                     goto Finished;
                 }
                 CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
@@ -2702,14 +2697,14 @@ i32 combatManager::ProcessNextAction(struct tag_message& message) {
             }
             CheckChangeSelector();
         } else {
-            result = MAIN_FINISHED;
+            result = MESSAGE_DISPATCH_FORWARD;
         }
     }
 
 Finished:
     gbProcessingCombatAction = false;
     ResetMouse();
-    return IDX(result);
+    return result;
 }
 
 VA(0x00430b91, 0x237)

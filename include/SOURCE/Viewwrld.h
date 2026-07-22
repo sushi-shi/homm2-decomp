@@ -12,6 +12,6 @@ H2_ENUM_CLASS_BEGIN(ViewWorldScale)
     VIEW_WORLD_SCALE_NEAR   = 12
 H2_ENUM_CLASS_END(ViewWorldScale)
 
-WidgetDispatchResult ViewWorldDialogHandler(struct tag_message&);
+MessageDispatchResult ViewWorldDialogHandler(struct tag_message&);
 
 #endif

@@ -176,7 +176,7 @@ H2_ENUM_END(SpellCastConstant)
 
 #define SPELL_GOLEM_DAMAGE_MULTIPLIER 0.5
 
-WidgetDispatchResult CombatSpecialHandler(struct tag_message&);
-WidgetDispatchResult HandleCastSpell(struct tag_message&);
+MessageDispatchResult CombatSpecialHandler(struct tag_message&);
+MessageDispatchResult HandleCastSpell(struct tag_message&);
 
 #endif

@@ -14,12 +14,10 @@
 #include <SOURCE/X_GLOBAL.h>
 
 H2_ENUM_BEGIN(ExecutiveManagerConstant)
-    MANAGER_DEFAULT_PRIORITY         = -1,
-    MANAGER_SUCCESS                  = 0,
-    MANAGER_STOP_DISPATCH            = 1,
-    MANAGER_HANDLE_EXECUTIVE_MESSAGE = 2,
-    MANAGER_ERROR                    = 3,
-    DIALOG_MANAGER_CAPACITY          = 20
+    MANAGER_DEFAULT_PRIORITY = -1,
+    MANAGER_SUCCESS          = 0,
+    MANAGER_ERROR            = 3,
+    DIALOG_MANAGER_CAPACITY  = 20
 H2_ENUM_END(ExecutiveManagerConstant)
 
 DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
@@ -240,7 +238,7 @@ void executive::MainLoop(void) {
     tag_message message;
     i32 keepDispatching;
     i32 done = 0;
-    i32 result;
+    MessageDispatchResult result;
     baseManager* manager;
     if (m_managerListHead != NULL) {
         gpInputManager->Flush();
@@ -261,10 +259,10 @@ void executive::MainLoop(void) {
                     && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {
-                        case MANAGER_STOP_DISPATCH:
+                        case MESSAGE_DISPATCH_CONSUME:
                             keepDispatching = 0;
                             break;
-                        case MANAGER_HANDLE_EXECUTIVE_MESSAGE:
+                        case MESSAGE_DISPATCH_FORWARD:
                             if ((message.type & MESSAGE_EXECUTIVE) == MESSAGE_NONE)
                                 break;
                             switch (message.payload.executive.command) {

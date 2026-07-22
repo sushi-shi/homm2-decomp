@@ -129,7 +129,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static WidgetDispatchResult MessageHandler(struct tag_message&);
+    static MessageDispatchResult MessageHandler(struct tag_message&);
 
 public:
     void Autosave(void);

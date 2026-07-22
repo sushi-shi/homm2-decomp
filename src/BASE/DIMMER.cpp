@@ -27,7 +27,7 @@ void dimmerWidget::Read(void) {
 }
 
 VA(0x004dd3f0, 0xd)
-WidgetDispatchResult dimmerWidget::Main(struct tag_message& msg) {
+MessageDispatchResult dimmerWidget::Main(struct tag_message& msg) {
     return widget::Main(msg);
 }
 

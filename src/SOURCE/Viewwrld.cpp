@@ -707,7 +707,7 @@ void advManager::VWCompleteDraw(void) {
 }
 
 VA(0x00434c1a, 0x5e2)
-WidgetDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
+MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale6;
     i32 radarY1;
     i32 radarX0;
@@ -838,7 +838,7 @@ WidgetDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -847,7 +847,7 @@ WidgetDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                 break;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 // Retail scale/kind/axis pixel-offset payload.

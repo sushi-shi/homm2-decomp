@@ -585,8 +585,8 @@ soundClosed:
 }
 
 VA(0x004cca50, 0x1a)
-i32 soundManager::Main(struct tag_message&) {
-    return 0;
+MessageDispatchResult soundManager::Main(struct tag_message&) {
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004cca70, 0x1a)

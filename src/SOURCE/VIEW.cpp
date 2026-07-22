@@ -235,7 +235,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
 }
 
 VA(0x0040c433, 0x351)
-WidgetDispatchResult HandleViewGeneral(tag_message& message) {
+MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 messageConstant1;
     i16 messageConstant2;
     i16 messageConstant3;
@@ -321,7 +321,7 @@ WidgetDispatchResult HandleViewGeneral(tag_message& message) {
         case MESSAGE_MOUSE_MOVE:
             gpWindowManager->ConvertToHover(message);
             if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-                return WIDGET_DISPATCH_CONSUME;
+                return MESSAGE_DISPATCH_CONSUME;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
                 case GENERAL_CLOSE:
@@ -349,9 +349,9 @@ WidgetDispatchResult HandleViewGeneral(tag_message& message) {
     if (handled) {
         message.payload.widget.id = GENERAL_CLOSE;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0040c784, 0x165)

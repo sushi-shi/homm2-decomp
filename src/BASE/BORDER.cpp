@@ -80,12 +80,12 @@ void border::Read(void) {
 }
 
 VA(0x004d22f0, 0x181)
-WidgetDispatchResult border::Main(struct tag_message& msg) {
+MessageDispatchResult border::Main(struct tag_message& msg) {
     WidgetFlag flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
     MessageType type = msg.type;
     switch (type) {
@@ -117,9 +117,9 @@ hoverEvent: {
         }
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = m_id;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONTINUE;
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 leaveEvent:
@@ -128,9 +128,9 @@ leaveEvent:
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
         msg.payload.widget.id = m_id;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONTINUE;
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004d2480, 0xab)

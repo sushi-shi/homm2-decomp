@@ -175,11 +175,11 @@ void dropListWidget::DeleteItem(i32 index) {
 }
 
 VA(0x004dc2e0, 0x350)
-WidgetDispatchResult dropListWidget::Main(tag_message& message) {
+MessageDispatchResult dropListWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
 
     switch (message.type) {
@@ -196,9 +196,9 @@ WidgetDispatchResult dropListWidget::Main(tag_message& message) {
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = m_id;
                         message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     }
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
                 } else {
                     if (x >= m_dropButtonX && y >= m_dropButtonY
                         && x < m_dropButtonX + m_dropButtonWidth
@@ -207,9 +207,9 @@ WidgetDispatchResult dropListWidget::Main(tag_message& message) {
                         message.payload.widget.command = WIDGET_COMMAND_SELECT;
                         message.type = MESSAGE_WIDGET;
                         message.payload.widget.id = m_id;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     }
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
                 }
             }
             break;
@@ -218,13 +218,13 @@ WidgetDispatchResult dropListWidget::Main(tag_message& message) {
                 case WIDGET_COMMAND_SET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         m_selectedIndex = static_cast<i16>(message.payload.widget.data.value);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_GET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         message.payload.widget.data.value = m_selectedIndex;
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_APPEND_ITEM:
