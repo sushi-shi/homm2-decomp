@@ -88,7 +88,7 @@ void iconWidget::Read(void) {
 }
 
 VA(0x004d0ca0, 0x21)
-iconWidget::~iconWidget() {
+inline iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
