@@ -22,7 +22,7 @@ H2_ENUM_CLASS_BEGIN(HighScoreType)
     HIGH_SCORE_EXPANSION_CAMPAIGN = 2
 H2_ENUM_CLASS_END(HighScoreType)
 
-H2_ENUM_CLASS_BEGIN(HeroPortrait)
+H2_ENUM_CLASS_BEGIN_SPLIT(HeroPortrait, u8)
     CAMPAIGN_HERO_ROLAND           = 54,
     CAMPAIGN_HERO_CORLAGON         = 55,
     CAMPAIGN_HERO_ELIZA            = 56,
@@ -35,7 +35,7 @@ H2_ENUM_CLASS_BEGIN(HeroPortrait)
     HERO_GALLAVANT                 = 65,
     HERO_CEALLACH                  = 67,
     HERO_CAPTAIN_PORTRAIT_FIRST    = 90
-H2_ENUM_CLASS_END(HeroPortrait)
+H2_ENUM_CLASS_END_SPLIT(HeroPortrait, u8)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_NONE            = -1,
@@ -83,7 +83,7 @@ H2_ENUM_CLASS_END(CoordinateAxis)
 
 // Mine records use the resource ids for ordinary mines and reserve two
 // additional ids for map facilities tracked through the same table.
-H2_ENUM_CLASS_BEGIN(MineType)
+H2_ENUM_CLASS_BEGIN_SPLIT(MineType, i8)
     MINE_TYPE_WOOD          = 0,
     MINE_TYPE_MERCURY       = 1,
     MINE_TYPE_ORE           = 2,
@@ -93,7 +93,7 @@ H2_ENUM_CLASS_BEGIN(MineType)
     MINE_TYPE_GOLD          = 6,
     MINE_TYPE_LIGHTHOUSE    = 100,
     MINE_TYPE_ALCHEMIST_LAB = 101
-H2_ENUM_CLASS_END(MineType)
+H2_ENUM_CLASS_END_SPLIT(MineType, i8)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_NONE                = -1,
@@ -175,13 +175,13 @@ inline CreatureType NextCreatureType(CreatureType creatureType) {
     return creatureType;
 }
 
-H2_ENUM_CLASS_BEGIN(ArtifactLevelMask)
+H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactLevelMask, u8)
     ARTIFACT_LEVEL_ULTIMATE = 0x01,
     ARTIFACT_LEVEL_MAJOR    = 0x02,
     ARTIFACT_LEVEL_MINOR    = 0x04,
     ARTIFACT_LEVEL_TREASURE = 0x08,
     ARTIFACT_LEVEL_RANDOM   = 0x0e
-H2_ENUM_CLASS_END(ArtifactLevelMask)
+H2_ENUM_CLASS_END_SPLIT(ArtifactLevelMask, u8)
 H2_ENUM_FLAGS(ArtifactLevelMask)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
@@ -740,7 +740,7 @@ struct SCmbtHero {
 SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
 
-H2_ENUM_CLASS_BEGIN(CombatEffectType)
+H2_ENUM_CLASS_BEGIN_SPLIT(CombatEffectType, i8)
     COMBAT_EFFECT_INVALID       = -1,
     COMBAT_EFFECT_EMPTY         = 0,
     COMBAT_EFFECT_MAGIC_01      = 1,
@@ -775,7 +775,7 @@ H2_ENUM_CLASS_BEGIN(CombatEffectType)
     COMBAT_EFFECT_STONE_SKIN    = 30,
     COMBAT_EFFECT_STEEL_SKIN    = 31,
     COMBAT_EFFECT_COUNT         = 32
-H2_ENUM_CLASS_END(CombatEffectType)
+H2_ENUM_CLASS_END_SPLIT(CombatEffectType, i8)
 
 H2_ENUM_CLASS_BEGIN_T(SpellInfoAttribute, u8)
     SPELL_INFO_ATTRIBUTE_POWER     = 0x01,
@@ -790,13 +790,13 @@ H2_ENUM_BEGIN(SpellInfoConstant)
     SPELL_INFO_RACE_COUNT      = IDX(FACTION_COUNT)
 H2_ENUM_END(SpellInfoConstant)
 
-H2_ENUM_CLASS_BEGIN(SpellLevel)
+H2_ENUM_CLASS_BEGIN_SPLIT(SpellLevel, u8)
     SPELL_LEVEL_FIRST  = 1,
     SPELL_LEVEL_SECOND = 2,
     SPELL_LEVEL_THIRD  = 3,
     SPELL_LEVEL_FOURTH = 4,
     SPELL_LEVEL_FIFTH  = 5
-H2_ENUM_CLASS_END(SpellLevel)
+H2_ENUM_CLASS_END_SPLIT(SpellLevel, u8)
 
 struct SSpellInfo {
     char soundName[SPELL_INFO_SOUND_NAME_SIZE];

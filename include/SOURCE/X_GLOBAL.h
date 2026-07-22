@@ -570,7 +570,7 @@ extern i32 gIndex;
 extern i32 giWeekTypeExtra;
 extern i32 giTCPType;
 // Retail name retained; the payload indexes gCombatFxNames, not the spell table.
-extern CombatEffectType gCurLoadedSpellEffect;
+extern H2_ENUM_STORAGE(CombatEffectType, i32) gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
 extern OverviewReturnAction giOverviewReturnAction;
 extern char cOverrideMIDIDriver[GLOBAL_DRIVER_NAME_SIZE];

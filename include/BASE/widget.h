@@ -8,7 +8,7 @@
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(WidgetFlag)
+H2_ENUM_CLASS_BEGIN_SPLIT(WidgetFlag, i16)
     WIDGET_FLAG_NONE     = 0,
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED  = 2,
@@ -16,7 +16,7 @@ H2_ENUM_CLASS_BEGIN(WidgetFlag)
     WIDGET_FLAG_DIMMED   = 8,
     WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
-H2_ENUM_CLASS_END(WidgetFlag)
+H2_ENUM_CLASS_END_SPLIT(WidgetFlag, i16)
 H2_ENUM_FLAGS(WidgetFlag)
 
 H2_ENUM_CLASS_BEGIN(WidgetCommandArgument)
