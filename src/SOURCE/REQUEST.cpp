@@ -447,9 +447,9 @@ void fileRequester::SetOK(i32 enabled) {
     }
     message.payload.widget.id = FILE_REQUESTER_OK;
     if (m_active) {
-        message.payload.widget.data.value = WIDGET_FLAG_DIMMED;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DIMMED);
     } else {
-        message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
     }
     m_window->BroadcastMessage(message);
     if (enabled) {
@@ -457,7 +457,7 @@ void fileRequester::SetOK(i32 enabled) {
     } else {
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     }
-    message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
     m_window->BroadcastMessage(message);
 }
 
@@ -1024,7 +1024,7 @@ void fileRequester::Update(i32 drawWindow) {
     for (i = 0; iMaxListSize > i; ++i) {
         if (m_topIndex + i >= m_fileCount) {
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            broadcastMessage.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            broadcastMessage.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             m_window->BroadcastMessage(broadcastMessage);
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1040,7 +1040,7 @@ void fileRequester::Update(i32 drawWindow) {
         } else {
             broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            broadcastMessage.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            broadcastMessage.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             m_window->BroadcastMessage(broadcastMessage);
 
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
@@ -1105,7 +1105,7 @@ void fileRequester::Update(i32 drawWindow) {
 
     broadcastMessage.payload.widget.id = FILE_REQUESTER_FILENAME_ENTRY;
     broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    broadcastMessage.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+    broadcastMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
     m_window->BroadcastMessage(broadcastMessage);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1120,7 +1120,7 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_LOAD_GAME
         || m_mode == FILE_REQUESTER_MAP) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        broadcastMessage.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+        broadcastMessage.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         m_window->BroadcastMessage(broadcastMessage);
     }
 

@@ -108,10 +108,10 @@ inline button::~button() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004dd6d0, 0x595)
-i32 button::Main(tag_message& msg) {
-    if (m_kind == WIDGET_KIND_AUTO_REPEAT && (m_flags & WIDGET_FLAG_SELECTED) != 0
+WidgetDispatchResult button::Main(tag_message& msg) {
+    if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
-        if ((m_flags & WIDGET_FLAG_SELECTED) == 0)
+        if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
             return WIDGET_DISPATCH_CONTINUE;
         m_flags &= ~WIDGET_FLAG_SELECTED;
         Draw();
@@ -123,7 +123,7 @@ i32 button::Main(tag_message& msg) {
         return WIDGET_DISPATCH_FORWARD;
     }
 
-    if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
+    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return WIDGET_DISPATCH_CONTINUE;
@@ -132,8 +132,8 @@ i32 button::Main(tag_message& msg) {
     MessageType eventType = msg.type;
     switch (eventType) {
         case MESSAGE_KEY_DOWN:
-            if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0
-                && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
+            if (HAS(m_flags, WIDGET_FLAG_ENABLED) && HAS(m_flags, WIDGET_FLAG_DRAW)
+                && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
                     return Select(msg);
                 return WIDGET_DISPATCH_CONTINUE;
@@ -141,12 +141,12 @@ i32 button::Main(tag_message& msg) {
             break;
 
         case MESSAGE_KEY_UP:
-            if ((m_flags & WIDGET_FLAG_ENABLED) != 0 && (m_flags & WIDGET_FLAG_DRAW) != 0
-                && (m_flags & WIDGET_FLAG_DIMMED) == 0) {
+            if (HAS(m_flags, WIDGET_FLAG_ENABLED) && HAS(m_flags, WIDGET_FLAG_DRAW)
+                && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return WIDGET_DISPATCH_CONTINUE;
-                i16 keyFlags = m_flags;
-                if ((keyFlags & WIDGET_FLAG_SELECTED) == 0)
+                WidgetFlag keyFlags = m_flags;
+                if (!HAS(keyFlags, WIDGET_FLAG_SELECTED))
                     return WIDGET_DISPATCH_CONTINUE;
                 keyFlags &= ~WIDGET_FLAG_SELECTED;
                 m_flags = keyFlags;
@@ -166,7 +166,7 @@ i32 button::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            if ((m_flags & WIDGET_FLAG_DRAW) == 0)
+            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
                 goto normalEvent;
 
             i16 relativeX =
@@ -183,7 +183,7 @@ i32 button::Main(tag_message& msg) {
                 return WIDGET_DISPATCH_CONTINUE;
             }
 
-            if ((m_flags & WIDGET_FLAG_DIMMED) == 0 && m_x <= relativeX && m_y <= relativeY
+            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && m_x <= relativeX && m_y <= relativeY
                 && relativeX < m_x + m_width && relativeY < m_y + m_height) {
                 Select(msg);
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
@@ -196,8 +196,8 @@ i32 button::Main(tag_message& msg) {
                                     - static_cast<i16>(m_owner->m_posY);
                         if (m_x > relativeX || m_y > relativeY || relativeX >= m_x + m_width
                             || relativeY >= m_y + m_height) {
-                            i16 moveFlags = m_flags;
-                            if ((moveFlags & WIDGET_FLAG_SELECTED) != 0) {
+                            WidgetFlag moveFlags = m_flags;
+                            if (HAS(moveFlags, WIDGET_FLAG_SELECTED)) {
                                 moveFlags &= ~WIDGET_FLAG_SELECTED;
                                 m_flags = moveFlags;
                                 Draw();
@@ -211,15 +211,15 @@ i32 button::Main(tag_message& msg) {
                                 msg.payload.widget.parameter = IDX(iLeftRightSave);
                                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
                             }
-                        } else if ((m_flags & WIDGET_FLAG_SELECTED) == 0) {
+                        } else if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                             Select(msg);
                         }
                     }
                     Process1WindowsMessage();
                     msg = gpInputManager->GetEvent();
                 }
-                i16 releaseFlags = m_flags;
-                if ((releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
+                WidgetFlag releaseFlags = m_flags;
+                if (HAS(releaseFlags, WIDGET_FLAG_SELECTED)) {
                     releaseFlags &= ~WIDGET_FLAG_SELECTED;
                     m_flags = releaseFlags;
                     Draw();
@@ -240,9 +240,9 @@ i32 button::Main(tag_message& msg) {
         }
 
         case MESSAGE_LEFT_BUTTON_UP: {
-            i16 releaseFlags = m_flags;
-            if ((releaseFlags & WIDGET_FLAG_DRAW) != 0
-                && (releaseFlags & WIDGET_FLAG_SELECTED) != 0) {
+            WidgetFlag releaseFlags = m_flags;
+            if (HAS(releaseFlags, WIDGET_FLAG_DRAW)
+                && HAS(releaseFlags, WIDGET_FLAG_SELECTED)) {
                 releaseFlags &= ~WIDGET_FLAG_SELECTED;
                 m_flags = releaseFlags;
                 Draw();
@@ -280,7 +280,7 @@ normalEvent:
 }
 
 VA(0x004ddc70, 0x96)
-i16 button::Select(struct tag_message& msg) {
+H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = static_cast<i16>(window->m_posX + m_x);
     i16 y = static_cast<i16>(window->m_posY + m_y);
@@ -301,9 +301,9 @@ i16 button::Select(struct tag_message& msg) {
 }
 
 VA(0x004ddd10, 0x83)
-i16 button::Deselect(struct tag_message& msg) {
-    i16 flags = m_flags;
-    if ((flags & WIDGET_FLAG_SELECTED) == 0)
+H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Deselect(struct tag_message& msg) {
+    WidgetFlag flags = m_flags;
+    if (!HAS(flags, WIDGET_FLAG_SELECTED))
         return WIDGET_DISPATCH_CONTINUE;
     flags &= ~WIDGET_FLAG_SELECTED;
     m_flags = flags;
@@ -321,7 +321,7 @@ i16 button::Deselect(struct tag_message& msg) {
 VA(0x004ddda0, 0x55)
 void button::Draw(void) {
     heroWindow* win = m_owner;
-    if ((m_flags & WIDGET_FLAG_SELECTED) != 0) {
+    if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
         m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_pressedFrame, ICON_DRAW_NORMAL);
         return;
     }

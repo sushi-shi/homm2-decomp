@@ -2,6 +2,7 @@
 #define HOMM2_OVERVIEW_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 
 struct tag_message;
 class iconWidget;
@@ -36,6 +37,6 @@ H2_ENUM_END(OverviewLayoutConstant)
 typedef iconWidget* OverviewIconWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 typedef textWidget* OverviewTextWidgetRow[OVERVIEW_DYNAMIC_WIDGETS_PER_ROW];
 
-i32 OverviewHandler(struct tag_message&);
+WidgetDispatchResult OverviewHandler(struct tag_message&);
 
 #endif

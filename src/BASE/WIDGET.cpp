@@ -62,7 +62,7 @@ VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 VA(0x004ddee0, 0x2f4)
-i32 widget::Main(tag_message& message) {
+WidgetDispatchResult widget::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE: {
             i16 x = static_cast<i16>(message.payload.mouse.x);
@@ -80,9 +80,9 @@ i32 widget::Main(tag_message& message) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DRAW:
-                    if ((m_flags & WIDGET_FLAG_DRAW) != 0)
+                    if (HAS(m_flags, WIDGET_FLAG_DRAW))
                         Draw();
-                    if ((m_flags & WIDGET_FLAG_DIMMED) != 0
+                    if (HAS(m_flags, WIDGET_FLAG_DIMMED)
                         && m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                         i16 x = m_x + static_cast<i16>(m_owner->m_posX);
                         i16 y = m_y + static_cast<i16>(m_owner->m_posY);
@@ -93,13 +93,14 @@ i32 widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_SET_FLAGS:
                     if (m_id == message.payload.widget.id) {
-                        if (message.payload.widget.data.value == WIDGET_COMMAND_DIMMED) {
+                        if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return WIDGET_DISPATCH_CONSUME;
                         }
-                        u16 flags = m_flags | static_cast<u16>(message.payload.widget.data.value);
+                        WidgetFlag flags = m_flags
+                            | static_cast<WidgetFlag>(message.payload.widget.data.value);
                         m_flags = flags;
-                        if ((flags & WIDGET_FLAG_DIMMED) != 0) {
+                        if (HAS(flags, WIDGET_FLAG_DIMMED)) {
                             Draw();
                             if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
                                 i16 x = m_x + static_cast<i16>(m_owner->m_posX);
@@ -114,7 +115,7 @@ i32 widget::Main(tag_message& message) {
                                 );
                             }
                         }
-                        if ((m_flags & WIDGET_FLAG_UPDATE) != 0) {
+                        if (HAS(m_flags, WIDGET_FLAG_UPDATE)) {
                             gpWindowManager->UpdateScreenRegion(
                                 m_x + m_owner->m_posX,
                                 m_y + m_owner->m_posY,
@@ -129,15 +130,16 @@ i32 widget::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_CLEAR_FLAGS:
                     if (m_id == message.payload.widget.id) {
-                        u32 flags = message.payload.widget.data.value;
-                        if (flags == WIDGET_COMMAND_DIMMED) {
+                        i32 rawFlags = message.payload.widget.data.value;
+                        if (rawFlags == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
                             return WIDGET_DISPATCH_CONSUME;
                         }
-                        m_flags &= ~static_cast<u16>(flags);
-                        if ((static_cast<u16>(flags) & WIDGET_FLAG_DIMMED) != 0)
+                        WidgetFlag flags = static_cast<WidgetFlag>(rawFlags);
+                        m_flags &= ~flags;
+                        if (HAS(flags, WIDGET_FLAG_DIMMED))
                             Draw();
-                        if ((static_cast<u16>(flags) & WIDGET_FLAG_UPDATE) != 0)
+                        if (HAS(flags, WIDGET_FLAG_UPDATE))
                             gpWindowManager->UpdateScreenRegion(
                                 m_x + m_owner->m_posX,
                                 m_y + m_owner->m_posY,

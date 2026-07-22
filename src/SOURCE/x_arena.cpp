@@ -141,7 +141,7 @@ i32 DoArenaDialog(void) {
 }
 
 VA(0x004c03dc, 0x25f)
-i32 ArenaWindowHandler(struct tag_message& message_1) {
+WidgetDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     tag_message dialogMessage_12;
     i32 widgetIndex_5;
     i32 type_13;
@@ -157,7 +157,7 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
         message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         message_1.payload.widget.command = BaseWidgetCommand(message_1.payload.widget.id);
         giDialogTimeout = 0;
-        return EVENT_WINDOW_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
 
     if (message_1.type == MESSAGE_KEY_DOWN) {
@@ -210,7 +210,7 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
                         message_1.payload.widget.command =
                             BaseWidgetCommand(message_1.payload.widget.id);
                         giDialogTimeout = 0;
-                        return EVENT_WINDOW_CLOSE;
+                        return WIDGET_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -219,7 +219,7 @@ i32 ArenaWindowHandler(struct tag_message& message_1) {
                 break;
         }
     }
-    return EVENT_WINDOW_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x004c063b, 0x150)

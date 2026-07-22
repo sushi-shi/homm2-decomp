@@ -2,6 +2,7 @@
 #define HOMM2_ADVMGR_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 
@@ -124,14 +125,14 @@ H2_ENUM_BEGIN(AdventureAIStorageConstant)
 H2_ENUM_END(AdventureAIStorageConstant)
 
 i32 SaveGame(void);
-i32 DimensionDoorHandler(struct tag_message&);
-i32 TownPortalHandler(struct tag_message&);
+WidgetDispatchResult DimensionDoorHandler(struct tag_message&);
+WidgetDispatchResult TownPortalHandler(struct tag_message&);
 void ComputeAdvNetControl(void);
 i32 MapExtraPosAndAdjacentsSet(i32, i32, u8);
-i32 APanelHandler(struct tag_message&);
-i32 CPanelHandler(struct tag_message&);
+WidgetDispatchResult APanelHandler(struct tag_message&);
+WidgetDispatchResult CPanelHandler(struct tag_message&);
 void UpdateSystemOptions(i32);
-i32 SystemOptionsHandler(struct tag_message&);
+WidgetDispatchResult SystemOptionsHandler(struct tag_message&);
 i32 GetMobilityFrame(i32);
 i32 GetManaFrame(i32);
 u8 StopOnTrigger(class mapCell*);

@@ -2,6 +2,7 @@
 #define HOMM2_COMMAND_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
 struct tag_message;
@@ -37,7 +38,7 @@ struct CombatRemotePacket {
 #pragma pack(pop)
 SIZE(CombatRemotePacket, 0x19);
 
-i32 WinCombatHandler(struct tag_message&);
+WidgetDispatchResult WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);
 
 #endif

@@ -175,17 +175,17 @@ void dropListWidget::DeleteItem(i32 index) {
 }
 
 VA(0x004dc2e0, 0x350)
-i32 dropListWidget::Main(tag_message& message) {
-    if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
+WidgetDispatchResult dropListWidget::Main(tag_message& message) {
+    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     }
 
     switch (message.type) {
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN:
-            if (m_flags & WIDGET_FLAG_DRAW) {
+            if (HAS(m_flags, WIDGET_FLAG_DRAW)) {
                 i16 x =
                     static_cast<i16>(message.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
                 i16 y =
@@ -198,7 +198,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                         return WIDGET_DISPATCH_FORWARD;
                     }
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
                 } else {
                     if (x >= m_dropButtonX && y >= m_dropButtonY
                         && x < m_dropButtonX + m_dropButtonWidth
@@ -209,7 +209,7 @@ i32 dropListWidget::Main(tag_message& message) {
                         message.payload.widget.id = m_id;
                         return WIDGET_DISPATCH_FORWARD;
                     }
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
                 }
             }
             break;
@@ -218,13 +218,13 @@ i32 dropListWidget::Main(tag_message& message) {
                 case WIDGET_COMMAND_SET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         m_selectedIndex = static_cast<i16>(message.payload.widget.data.value);
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_GET_SELECTION:
                     if (m_id == message.payload.widget.id) {
                         message.payload.widget.data.value = m_selectedIndex;
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_APPEND_ITEM:
@@ -304,7 +304,7 @@ void dropListWidget::Draw(void) {
     );
     if (m_itemCount > 0 && m_selectedIndex >= 0) {
         FontDrawMode color = FONT_DRAW_DIMMED;
-        if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
+        if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
             color = m_normalColor;
         m_font->DrawBoundedString(
             m_items[m_selectedIndex],

@@ -85,9 +85,9 @@ textWidget::~textWidget() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004d1280, 0x210)
-i32 textWidget::Main(tag_message& msg) {
-    u16 flags = m_flags;
-    if ((flags & WIDGET_FLAG_ENABLED) == 0) {
+WidgetDispatchResult textWidget::Main(tag_message& msg) {
+    WidgetFlag flags = m_flags;
+    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return WIDGET_DISPATCH_CONTINUE;
@@ -112,7 +112,7 @@ i32 textWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if ((flags & WIDGET_FLAG_SELECTED) != 0) {
+            if (HAS(flags, WIDGET_FLAG_SELECTED)) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
@@ -169,7 +169,7 @@ normalEvent:
 VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {
     FontDrawMode color = FONT_DRAW_DIMMED;
-    if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
+    if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
         color = m_color;
     m_font->DrawBoundedString(
         m_text,

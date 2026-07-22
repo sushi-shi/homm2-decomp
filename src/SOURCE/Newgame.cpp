@@ -138,8 +138,6 @@ H2_ENUM_BEGIN(NewGameDialogConstant)
     SCENARIO_WINDOW_X         = 90,
     SCENARIO_WINDOW_Y         = 4,
     NEW_GAME_HELP_DIALOG_TYPE = NORMAL_DIALOG_QUICK_VIEW,
-    NEW_GAME_HANDLER_CONTINUE = 1,
-    NEW_GAME_HANDLER_CLOSE    = 2
 H2_ENUM_END(NewGameDialogConstant)
 
 H2_ENUM_BEGIN(NewGameMapChoice)
@@ -1020,7 +1018,7 @@ void game::UpdateNewGameWindow(void) {
 }
 
 VA(0x004b8e72, 0xf46)
-i32 NewGameHandler(struct tag_message& message) {
+WidgetDispatchResult NewGameHandler(struct tag_message& message) {
     i32 transmitResultTemp;
     i32 redrawWindow = 0;
     i32 oldNetworkId;
@@ -1059,7 +1057,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
                     message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-                    return NEW_GAME_HANDLER_CLOSE;
+                    return WIDGET_DISPATCH_FORWARD;
 
                 case GAME_REMOTE_CANCEL:
                     NormalDialog(
@@ -1240,7 +1238,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
                     message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
                     gbNewGameDialogOver = true;
-                    return NEW_GAME_HANDLER_CLOSE;
+                    return WIDGET_DISPATCH_FORWARD;
 
                 case GAME_DIALOG_CANCEL:
                     if (gbRemoteOn) {
@@ -1259,7 +1257,7 @@ i32 NewGameHandler(struct tag_message& message) {
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
                     message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
                     gbNewGameDialogOver = true;
-                    return NEW_GAME_HANDLER_CLOSE;
+                    return WIDGET_DISPATCH_FORWARD;
 
                 default:
                     break;
@@ -1516,7 +1514,7 @@ finish:
         if (!transmitResultTemp)
             ShutDown(NULL);
     }
-    return NEW_GAME_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x004b9db8, 0x418)

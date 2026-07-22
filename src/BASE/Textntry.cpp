@@ -181,11 +181,11 @@ void textEntryWidget::Read(i32 type) {
 }
 
 VA(0x004d8b90, 0x874)
-i32 textEntryWidget::Main(struct tag_message& message) {
-    if ((m_flags & WIDGET_FLAG_ENABLED) == 0) {
+WidgetDispatchResult textEntryWidget::Main(struct tag_message& message) {
+    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
-        return 0;
+        return WIDGET_DISPATCH_CONTINUE;
     }
     switch (message.type) {
         default:
@@ -200,7 +200,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (mouseX < m_x || mouseY < m_y || mouseX >= m_x + m_width
                     || mouseY >= m_y + m_height)
-                    return 0;
+                    return WIDGET_DISPATCH_CONTINUE;
                 message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
@@ -367,7 +367,7 @@ i32 textEntryWidget::Main(struct tag_message& message) {
                 message.payload.widget.id = m_id;
                 return WIDGET_DISPATCH_FORWARD;
             }
-            return 0;
+            return WIDGET_DISPATCH_CONTINUE;
         }
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
@@ -420,7 +420,7 @@ void textEntryWidget::Draw(void) {
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, ICON_DRAW_NORMAL);
         FontDrawMode color = FONT_DRAW_DIMMED;
-        if ((m_flags & WIDGET_FLAG_DIMMED) == 0)
+        if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
             color = m_color;
         m_font->DrawBoundedString(
             m_text,

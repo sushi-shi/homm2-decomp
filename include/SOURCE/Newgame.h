@@ -2,6 +2,7 @@
 #define HOMM2_NEWGAME_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 #include <SOURCE/REQUEST.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
@@ -44,6 +45,6 @@ struct NewGameRemotePacket {
 
 #pragma pack(pop)
 
-i32 NewGameHandler(struct tag_message&);
+WidgetDispatchResult NewGameHandler(struct tag_message&);
 
 #endif

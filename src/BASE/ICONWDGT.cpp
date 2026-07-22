@@ -98,9 +98,9 @@ iconWidget::~iconWidget() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004d0cd0, 0x291)
-i32 iconWidget::Main(tag_message& msg) {
-    u16 flags = m_flags;
-    if ((flags & WIDGET_FLAG_ENABLED) == 0
+WidgetDispatchResult iconWidget::Main(tag_message& msg) {
+    WidgetFlag flags = m_flags;
+    if (!HAS(flags, WIDGET_FLAG_ENABLED)
         && (msg.type != MESSAGE_WIDGET
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
         if (msg.type == MESSAGE_WIDGET)
@@ -134,7 +134,7 @@ i32 iconWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if ((flags & WIDGET_FLAG_SELECTED) != 0) {
+            if (HAS(flags, WIDGET_FLAG_SELECTED)) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
                 SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);

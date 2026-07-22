@@ -2,6 +2,7 @@
 #define HOMM2_MISC_H
 
 #include <va.h>
+#include <BASE/message.h>
 
 class bitmap;
 class heroWindow;
@@ -124,7 +125,7 @@ void SRand(i32 seed);
 i32 SGenRand(void);
 i32 MemSize(i32);
 void GetDataEntry(char*, char*, i32, char*, i32, i32);
-i32 DataEntryWindowHandler(struct tag_message& message);
+WidgetDispatchResult DataEntryWindowHandler(struct tag_message& message);
 
 H2_ENUM_CLASS_BEGIN(DataEntryPhase)
     ENTRY_PHASE_IMMEDIATE    = 0,

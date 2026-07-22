@@ -1473,7 +1473,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
 }
 
 VA(0x0042d472, 0x57b)
-i32 WinCombatHandler(struct tag_message& message) {
+WidgetDispatchResult WinCombatHandler(struct tag_message& message) {
     char iconFile[WIN_LOSE_ICON_FILENAME_SIZE];
     tag_message animationMessage;
     i32 finalDelay = WIN_LOSE_INITIAL_DELAY;
@@ -1486,7 +1486,7 @@ i32 WinCombatHandler(struct tag_message& message) {
         message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return IDX(MAIN_FINISHED);
+        return WIDGET_DISPATCH_FORWARD;
     }
 
     if (message.type == MESSAGE_WIDGET) {
@@ -1524,7 +1524,7 @@ i32 WinCombatHandler(struct tag_message& message) {
                                 message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
                                 message.payload.widget.command =
                                     BaseWidgetCommand(message.payload.widget.id);
-                                return IDX(MAIN_FINISHED);
+                                return WIDGET_DISPATCH_FORWARD;
                             }
                         }
                         break;
@@ -1618,7 +1618,7 @@ i32 WinCombatHandler(struct tag_message& message) {
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
         glTimers[0] = KBTickCount() + iDelay;
     }
-    return IDX(MAIN_CONTINUE);
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0042d9ed, 0x110)

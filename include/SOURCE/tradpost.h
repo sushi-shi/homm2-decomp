@@ -2,6 +2,7 @@
 #define HOMM2_TRADPOST_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 #include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
@@ -31,7 +32,7 @@ void UpdateTradingPost(i32);
 void ComputeTradeRatios(i32, i32, i32*, i32*, i32*);
 void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
-i32 TradingPostHandler(struct tag_message&);
+WidgetDispatchResult TradingPostHandler(struct tag_message&);
 
 extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
 extern class iconWidget* tradeKnob;
