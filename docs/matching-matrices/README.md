@@ -103,6 +103,22 @@ a source-eligible change. The probe is disposable evidence that the clean recons
 has a reachable exact compiler state; no generated declaration remains in `PHILAI.cpp`. Its exact
 state contributes only to the normalized-source-hash-scoped fuzzy maximum.
 
+## SOURCE/RECRUIT Update compiler-state census
+
+`recruit-update-tu-state-0183dd.tsv` records the deterministic 128-trial typedef sweep
+after recovering `recruitUnit::Update`'s missing 20-byte local. The function's accessed fields,
+instructions, and relocations had already appeared aligned in the lite view, but raw stack
+displacements showed a `0x20` candidate frame against retail's `0x34`. An otherwise unused
+`char text[NAME_SIZE]` occupies those 20 bytes before the 28-byte `tag_message`; MSVC 4.2 `/Od`
+preserves the declaration without a cast, fake reference, or steering macro.
+
+The corrected canonical source is exact. Its 128 trials collapse to two states: 120 exact trials
+and eight trials that reverse the load order in the two commutative quantity/cost multiplications.
+Both states are 290 bytes and retain the complete retail 18-site ordered relocation stream.
+Representatives were compared against retail and each other; the matrix records the four changed
+displacement bytes, complete trial partition, and sibling eligibility. No probe declaration remains
+in `RECRUIT.cpp`.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,

@@ -207,6 +207,8 @@ void recruitUnit::Close(void) {
 
 VA(0x0048b7ce, 0x122)
 void recruitUnit::Update(void) {
+    // Retail reserves this scratch buffer even though the formatted text is stored in gText.
+    char text[NAME_SIZE];
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
