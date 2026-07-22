@@ -480,7 +480,7 @@ SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	1.4700	b0fdf739bae9
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.8591	2a0eecd577ff
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	8e4bc8dd471f
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	d02799371e9a
-SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	896f70515ab2
+SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	8e32e0d14a4f
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	838c9d2cef93
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	99.9835	d94fbd07b178
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	99.4859	83a05ee47938
