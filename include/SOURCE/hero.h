@@ -8,9 +8,10 @@
 class town;
 
 H2_ENUM_CLASS_BEGIN(HeroSpellType)
-    SPELL_TYPE_COMBAT    = 0,
-    SPELL_TYPE_ADVENTURE = 1,
-    SPELL_TYPE_ALL       = 2
+    SPELL_TYPE_COMBAT         = 0,
+    SPELL_TYPE_ADVENTURE      = 1,
+    SPELL_TYPE_CATEGORY_COUNT = 2,
+    SPELL_TYPE_ALL            = SPELL_TYPE_CATEGORY_COUNT
 H2_ENUM_CLASS_END(HeroSpellType)
 
 H2_ENUM_CLASS_BEGIN(HeroSecondarySkill)

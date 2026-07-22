@@ -129,8 +129,7 @@ H2_ENUM_BEGIN(ArmyFrameConstant)
     ARMY_PROJECTILE_ANGLE_COUNT   = 12,
     ARMY_ANIMATION_SEQUENCE_COUNT = 34,
     ARMY_ANIMATION_FRAME_COUNT    = 16,
-    ARMY_STANDING_CHANCE_COUNT    = 10,
-    ARMY_QUANTITY_SIDE_COUNT      = 2
+    ARMY_STANDING_CHANCE_COUNT    = 10
 H2_ENUM_END(ArmyFrameConstant)
 
 #pragma pack(push, 1)
@@ -153,7 +152,7 @@ struct SMonFrameInfo {
     struct MissileOffset missileOffsets[ARMY_MISSILE_OFFSET_COUNT];
     u8 projectileDirectionCount;
     float projectileAngles[ARMY_PROJECTILE_ANGLE_COUNT];
-    i32 quantityX[ARMY_QUANTITY_SIDE_COUNT];
+    i32 quantityX[IDX(ARMY_FACING_COUNT)];
     i8 animationFrameCount[ARMY_ANIMATION_SEQUENCE_COUNT];
     i8 animationFrames[ARMY_ANIMATION_SEQUENCE_COUNT][ARMY_ANIMATION_FRAME_COUNT];
 };

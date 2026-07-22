@@ -3079,10 +3079,12 @@ game::ViewSpells(
             m_viewSpellsType = SPELL_TYPE_ADVENTURE;
         else
             m_viewSpellsType = spellType;
-        m_viewSpellsTop[0] = 0;
-        m_viewSpellsCount[0] = spellHero->GetNumSpells(SPELL_TYPE_COMBAT);
-        m_viewSpellsTop[1] = 0;
-        m_viewSpellsCount[1] = spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
+        m_viewSpellsTop[IDX(SPELL_TYPE_COMBAT)] = 0;
+        m_viewSpellsCount[IDX(SPELL_TYPE_COMBAT)] =
+            spellHero->GetNumSpells(SPELL_TYPE_COMBAT);
+        m_viewSpellsTop[IDX(SPELL_TYPE_ADVENTURE)] = 0;
+        m_viewSpellsCount[IDX(SPELL_TYPE_ADVENTURE)] =
+            spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
         m_viewSpellsWindow = new heroWindow(
             VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>("spellwin.bin")
         );

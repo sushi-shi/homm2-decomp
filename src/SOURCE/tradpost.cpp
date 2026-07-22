@@ -26,14 +26,20 @@ H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_EXECUTE          = 0x1d
 H2_ENUM_END(TradingPostWidgetId)
 
+H2_ENUM_CLASS_BEGIN(OfferSide)
+    OFFER_LEFT  = 0,
+    OFFER_RIGHT = 1,
+    OFFER_COUNT = 2
+H2_ENUM_CLASS_END(OfferSide)
+H2_ENUM_STEPPED(OfferSide)
+
 H2_ENUM_BEGIN(TradingPostPrivateConstant)
-    KNOB_WIDTH       = 17,
-    KNOB_HEIGHT      = 8,
-    KNOB_FRAME       = 2,
-    OFFER_SIDE_COUNT = 2,
-    REDRAW_X_OFFSET  = 32,
-    REDRAW_WIDTH     = 258,
-    REDRAW_HEIGHT    = 418
+    KNOB_WIDTH      = 17,
+    KNOB_HEIGHT     = 8,
+    KNOB_FRAME      = 2,
+    REDRAW_X_OFFSET = 32,
+    REDRAW_WIDTH    = 258,
+    REDRAW_HEIGHT   = 418
 H2_ENUM_END(TradingPostPrivateConstant)
 
 VA(0x004bf340, 0x165)
@@ -79,7 +85,7 @@ void UpdateTradingPost(i32 draw) {
     i32 leftDenominatedLocal;
     i32 offeredValue;
     i32 requestedValue;
-    i32 sideCurrent;
+    OfferSide sideCurrent;
     i32 resource;
 
     messageTemp.type = MESSAGE_WIDGET;
@@ -133,15 +139,15 @@ void UpdateTradingPost(i32 draw) {
         tpWindow->BroadcastMessage(messageTemp);
     }
 
-    for (sideCurrent = 0; sideCurrent < OFFER_SIDE_COUNT; sideCurrent++) {
+    for (sideCurrent = OFFER_LEFT; sideCurrent < OFFER_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
             messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
-            if (sideCurrent == 0) {
+            if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_ICON;
             } else {
                 messageTemp.payload.widget.id = POST_RIGHT_OFFER_ICON;
             }
-            if (sideCurrent == 0) {
+            if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.data.value = leftResource;
             } else {
                 messageTemp.payload.widget.data.value = rightResource;
@@ -149,7 +155,7 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
-            if (sideCurrent == 0) {
+            if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = POST_LEFT_OFFER_TEXT;
                 if (bLeftDenominated != 0)
                     sprintf(gText, "%d", qtyToTrade);
@@ -168,7 +174,7 @@ void UpdateTradingPost(i32 draw) {
         for (resource = 0; resource < TRADING_POST_RESOURCE_COUNT; resource++) {
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
-            if (sideCurrent == 0) {
+            if (sideCurrent == OFFER_LEFT) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + resource;
                 sprintf(gText, "%d", gpCurPlayer->m_resources[resource]);
             } else {
@@ -194,12 +200,12 @@ void UpdateTradingPost(i32 draw) {
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
-            if ((sideCurrent == 0 && leftResource == resource)
-                || (sideCurrent == 1 && rightResource == resource))
+            if ((sideCurrent == OFFER_LEFT && leftResource == resource)
+                || (sideCurrent == OFFER_RIGHT && rightResource == resource))
                 messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             else
                 messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            if (sideCurrent == 0)
+            if (sideCurrent == OFFER_LEFT)
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_ICON_FIRST + resource;
             else
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_ICON_FIRST + resource;

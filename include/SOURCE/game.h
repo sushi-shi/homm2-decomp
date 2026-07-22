@@ -69,7 +69,6 @@ H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_RUMOUR_EVENT_CAPACITY           = 30,
     GAME_TIME_EVENT_CAPACITY             = 50,
     GAME_MAP_EVENT_CAPACITY              = 50,
-    GAME_VIEW_SPELLS_SIDE_COUNT          = 2,
     GAME_CURRENT_MAP_NAME_SIZE           = 16,
     GAME_CAMPAIGN_TRACK_COORDINATE_COUNT = 2,
     GAME_RECEIVED_TEXT_BUFFER_COUNT      = 3
@@ -154,8 +153,8 @@ public:
     class heroWindow* m_viewSpellsWindow;
     class hero* m_viewSpellsHero;
     HeroSpellType m_viewSpellsType;
-    i32 m_viewSpellsTop[GAME_VIEW_SPELLS_SIDE_COUNT];
-    i32 m_viewSpellsCount[GAME_VIEW_SPELLS_SIDE_COUNT];
+    i32 m_viewSpellsTop[IDX(SPELL_TYPE_CATEGORY_COUNT)];
+    i32 m_viewSpellsCount[IDX(SPELL_TYPE_CATEGORY_COUNT)];
     SpellType m_viewSpell;
     MessageDispatchHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;

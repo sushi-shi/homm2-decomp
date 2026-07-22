@@ -344,7 +344,7 @@ BASE/WINMGR	?CreateFizzleTables@@YIXXZ	100.0000	2437ef506d03
 BASE/WINMGR	?CycleColors@@YIXH@Z	99.3678	bfceb1b0a91e
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	100.0000	b24d0de4089c
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	2b641dfbe708
-BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	99.4901	16fa8665a555
+BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	99.7204	16fa8665a555
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	100.0000	2441f00946a4
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	100.0000	63815ed2ee74
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	100.0000	80af7c93e8e5
@@ -568,7 +568,7 @@ SOURCE/ARMY	?MidY@army@@QAEHXZ	100.0000	265d4afaef62
 SOURCE/ARMY	?ModifyFrameInfo@@YIXPAUSMonFrameInfo@@H@Z	100.0000	9956f21d508a
 SOURCE/ARMY	?MoveAttack@army@@QAEXHH@Z	96.9151	ff535ad0c0e5
 SOURCE/ARMY	?OtherArmyAdjacent@army@@QAEHHH@Z	99.9238	5a40b44a5913
-SOURCE/ARMY	?PowEffect@army@@QAEXHHHH@Z	89.6454	b448bc68d5df
+SOURCE/ARMY	?PowEffect@army@@QAEXHHHH@Z	89.7410	b448bc68d5df
 SOURCE/ARMY	?ProcessDeath@army@@QAEXH@Z	94.9219	a741af78a5b5
 SOURCE/ARMY	?ResetPath@army@@QAEXXZ	100.0000	e28a4fc537db
 SOURCE/ARMY	?RightX@army@@QAEHXZ	100.0000	6c05f5b649d1
@@ -861,7 +861,7 @@ SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	100.0000	7988d6d4e435
 SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	98.5322	d782e06aa676
 SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	99.9795	d959609d3bfb
 SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	98.6198	825bc087832e
-SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	3f9d0240903c
+SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	100.0000	8d1783021bf5
 SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	99.7841	3d6fb45eb6c7
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	100.0000	6a299171dda6
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	6c2375b0c0dc
@@ -891,7 +891,7 @@ SOURCE/HERO	?GetSSLevel@hero@@QAECH@Z	99.6949	90dc745bfce6
 SOURCE/HERO	?GiveSS@hero@@QAEHHH@Z	100.0000	f6201c920184
 SOURCE/HERO	?HasArtifact@hero@@QAEHH@Z	100.0000	aac082f5c295
 SOURCE/HERO	?HasSpell@hero@@QAEHH@Z	100.0000	343b652d6731
-SOURCE/HERO	?HeroHandler@@YIHAAUtag_message@@@Z	94.4044	d14d41d5798c
+SOURCE/HERO	?HeroHandler@@YIHAAUtag_message@@@Z	94.6560	d14d41d5798c
 SOURCE/HERO	?HeroMessageUpdate@@YIXPAD@Z	100.0000	2eb3518a54a6
 SOURCE/HERO	?HeroScreenUpdate@hero@@QAEXXZ	100.0000	6d0056dc1fc6
 SOURCE/HERO	?HeroView@@YIHHHH@Z	99.9621	e46b1ab46292
@@ -1171,7 +1171,7 @@ SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	f516f695692c
 SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	99.8958	55a7621c39ba
 SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.9846	436ccdc04a4a
 SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	93.6818	b763c398c76d
-SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	94.3012	2eb7bc719d6f
+SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	94.6182	2eb7bc719d6f
 SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	89.9655	c41e6481a11f
 SOURCE/SETUP	?ExpLoadCampaignHandler@@YIHAAUtag_message@@@Z	73.9123	ff682992e53c
 SOURCE/SETUP	?ExpNewCampaignHandler@@YIHAAUtag_message@@@Z	73.9123	cb1fa5ba44f2
@@ -1434,8 +1434,8 @@ SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	99.8611	9bdafa5ee081
 SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	100.0000	beb0b09b4df8
 SOURCE/tradpost	?DoTradingPost@@YIXHM@Z	100.0000	9eb0be3c66d0
 SOURCE/tradpost	?SetupNewTrade@@YIXXZ	100.0000	aa8fcd45981d
-SOURCE/tradpost	?TradingPostHandler@@YIHAAUtag_message@@@Z	99.4931	d2ab4ea0b576
-SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	100.0000	d96b06c6aef1
+SOURCE/tradpost	?TradingPostHandler@@YIHAAUtag_message@@@Z	99.5990	d2ab4ea0b576
+SOURCE/tradpost	?UpdateTradingPost@@YIXH@Z	99.6418	46b0276916fb
 SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	2bd1b422b78b
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	4296e85bfa13
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	3d152ef9baab
