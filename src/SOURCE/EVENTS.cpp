@@ -169,14 +169,15 @@ namespace {
         SITE_STRING_LIMIT = 10
     H2_ENUM_END(GenericSiteConstant)
 
-    H2_ENUM_BEGIN(StableVisitResult)
+    H2_ENUM_CLASS_BEGIN(StableVisitResult)
         STABLE_VISIT_NONE = 0,
         STABLE_VISIT_MOBILITY = 1,
         STABLE_VISIT_UPGRADE = 2,
         STABLE_VISIT_MOBILITY_UPGRADE = STABLE_VISIT_MOBILITY | STABLE_VISIT_UPGRADE
-    H2_ENUM_END(StableVisitResult)
+    H2_ENUM_CLASS_END(StableVisitResult)
+    H2_ENUM_FLAGS(StableVisitResult)
 
-    H2_ENUM_BEGIN(HouseRecruitmentSite)
+    H2_ENUM_CLASS_BEGIN(HouseRecruitmentSite)
         RECRUIT_ARCHER = 0,
         RECRUIT_GOBLIN = 1,
         RECRUIT_PEASANT = 2,
@@ -188,7 +189,7 @@ namespace {
         RECRUIT_CAVE = 8,
         RECRUIT_EXCAVATION = 9,
         RECRUIT_SITE_COUNT = 10
-    H2_ENUM_END(HouseRecruitmentSite)
+    H2_ENUM_CLASS_END(HouseRecruitmentSite)
 
     H2_ENUM_BEGIN(HouseEventConstant)
         EVENT_HOUSE_DIALOG_STRIDE = 3,
@@ -4003,9 +4004,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 unusedSite;
     SAMPLE2 eventSample5;
     i32 cursedArtifactCount9;
-    i32 unusedOne18;
-    i8 stableResult26;
-    i32 unusedTwo6;
+    H2_ENUM_STORAGE(StableVisitResult, i32) unusedOne18;
+    H2_ENUM_STORAGE(StableVisitResult, i8) stableResult26;
+    H2_ENUM_STORAGE(StableVisitResult, i32) unusedTwo6;
     CreatureType creatureType;
     i32 experience11;
     i32 oldQuantity4;
@@ -4278,8 +4279,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
                 );
             }
-            sprintf(gText, xStableText[stableResult26]);
-            if (stableResult26 & STABLE_VISIT_UPGRADE) {
+            sprintf(gText, xStableText[IDX(stableResult26)]);
+            if (HAS(stableResult26, STABLE_VISIT_UPGRADE)) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5238,8 +5239,8 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
 
 VA(0x004b0add, 0x274)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
-    i32 siteIndex = RECRUIT_ARCHER;
-    CreatureType creatureTypes[RECRUIT_SITE_COUNT];
+    HouseRecruitmentSite siteIndex = RECRUIT_ARCHER;
+    CreatureType creatureTypes[IDX(RECRUIT_SITE_COUNT)];
 
     switch (cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_ARCHER_HOUSE:
@@ -5277,7 +5278,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
 
     if (cell->m_objectMetadata == 0) {
         EventWindow(
-            siteIndex * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
+            IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
             NORMAL_DIALOG_INFO,
             "",
             -1,
@@ -5287,19 +5288,19 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             -1
         );
     } else {
-        creatureTypes[RECRUIT_ARCHER] = CREATURE_ARCHER;
-        creatureTypes[RECRUIT_GOBLIN] = CREATURE_GOBLIN;
-        creatureTypes[RECRUIT_PEASANT] = CREATURE_PEASANT;
-        creatureTypes[RECRUIT_DWARF] = CREATURE_DWARF;
-        creatureTypes[RECRUIT_LOG_CABIN] = CREATURE_DWARF;
-        creatureTypes[RECRUIT_TREE_HOUSE] = CREATURE_SPRITE;
-        creatureTypes[RECRUIT_HALFLING] = CREATURE_HALFLING;
-        creatureTypes[RECRUIT_WATCH_TOWER] = CREATURE_ORC;
-        creatureTypes[RECRUIT_CAVE] = CREATURE_CENTAUR;
-        creatureTypes[RECRUIT_EXCAVATION] = CREATURE_SKELETON;
+        creatureTypes[IDX(RECRUIT_ARCHER)] = CREATURE_ARCHER;
+        creatureTypes[IDX(RECRUIT_GOBLIN)] = CREATURE_GOBLIN;
+        creatureTypes[IDX(RECRUIT_PEASANT)] = CREATURE_PEASANT;
+        creatureTypes[IDX(RECRUIT_DWARF)] = CREATURE_DWARF;
+        creatureTypes[IDX(RECRUIT_LOG_CABIN)] = CREATURE_DWARF;
+        creatureTypes[IDX(RECRUIT_TREE_HOUSE)] = CREATURE_SPRITE;
+        creatureTypes[IDX(RECRUIT_HALFLING)] = CREATURE_HALFLING;
+        creatureTypes[IDX(RECRUIT_WATCH_TOWER)] = CREATURE_ORC;
+        creatureTypes[IDX(RECRUIT_CAVE)] = CREATURE_CENTAUR;
+        creatureTypes[IDX(RECRUIT_EXCAVATION)] = CREATURE_SKELETON;
 
         EventWindow(
-            siteIndex * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
+            IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
             NORMAL_DIALOG_CONFIRM,
             "",
             -1,
@@ -5309,12 +5310,14 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
             -1
         );
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-            if (eventHero->m_army.CanJoin(creatureTypes[siteIndex])) {
-                eventHero->m_army.Add(creatureTypes[siteIndex], cell->m_objectMetadata, -1);
+            if (eventHero->m_army.CanJoin(creatureTypes[IDX(siteIndex)])) {
+                eventHero->m_army.Add(
+                    creatureTypes[IDX(siteIndex)], cell->m_objectMetadata, -1
+                );
                 cell->m_objectMetadata = 0;
             } else {
                 EventWindow(
-                    siteIndex * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
+                    IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
                     NORMAL_DIALOG_INFO,
                     "",
                     -1,
