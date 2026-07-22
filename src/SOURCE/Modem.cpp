@@ -123,7 +123,9 @@ VA(0x0040cbdc, 0x54)
 i32l Wait(void) {
     GUIModemResponse("Waiting for ring...", "RING");
     GUIModemCommand("Initializing modem...", "ATA");
-    return GUIModemResponse("Establishing connection...", "CONNECT") != 0;
+    if (GUIModemResponse("Establishing connection...", "CONNECT") != 0)
+        return 1;
+    return 0;
 }
 
 VA(0x0040cc30, 0x79)
