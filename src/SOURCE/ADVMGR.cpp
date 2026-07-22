@@ -7009,18 +7009,18 @@ void advManager::SetTownContext(i32 townId) {
     m_mapOriginX = currentTownValue->m_x - VIEW_CENTER_OFFSET;
     m_mapOriginY = currentTownValue->m_y - VIEW_CENTER_OFFSET;
 
-    i32 selectedIndex7 = 0;
+    i32 contextValue7 = 0;
     i32 index;
     for (index = 0; index < gpCurPlayer->m_townCount; ++index) {
         if (gpCurPlayer->m_townIds[index] == townId) {
-            selectedIndex7 = index;
+            contextValue7 = index;
         }
     }
-    if (selectedIndex7 < gpCurPlayer->m_townLocatorPage) {
-        gpCurPlayer->m_townLocatorPage = static_cast<i8>(selectedIndex7);
-    } else if (gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < selectedIndex7) {
+    if (contextValue7 < gpCurPlayer->m_townLocatorPage) {
+        gpCurPlayer->m_townLocatorPage = static_cast<i8>(contextValue7);
+    } else if (gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < contextValue7) {
         gpCurPlayer->m_townLocatorPage =
-            static_cast<i8>(selectedIndex7 - (LOCATOR_VISIBLE_COUNT - 1));
+            static_cast<i8>(contextValue7 - (LOCATOR_VISIBLE_COUNT - 1));
     }
 
     UpdateHeroLocators(1, 1);
@@ -7036,11 +7036,12 @@ void advManager::SetTownContext(i32 townId) {
         1
     );
 
-    H2_ENUM_STORAGE(TerrainType, i32) terrain =
+    contextValue7 = IDX(
         giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
-                              ->m_terrainImageIndex];
-    if (m_currentTerrain != terrain) {
-        m_currentTerrain = terrain;
+                              ->m_terrainImageIndex]
+    );
+    if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
+        m_currentTerrain = contextValue7;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     gpInputManager->ForceMouseMove();
