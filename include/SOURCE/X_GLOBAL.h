@@ -43,6 +43,13 @@ H2_ENUM_CLASS_BEGIN(AdventureDisposeLevel)
     ADV_DISPOSE_FULL    = 2
 H2_ENUM_CLASS_END(AdventureDisposeLevel)
 
+H2_ENUM_CLASS_BEGIN(CalendarPeriodType)
+    CALENDAR_PERIOD_NONE     = -1,
+    CALENDAR_PERIOD_NORMAL   = 0,
+    CALENDAR_PERIOD_CREATURE = 1,
+    CALENDAR_PERIOD_PLAGUE   = 2
+H2_ENUM_CLASS_END(CalendarPeriodType)
+
 H2_ENUM_BEGIN(DiffSendRecipient)
     DIFF_SEND_FORCE_WHOLE = -2,
     DIFF_SEND_NONE        = -1
@@ -576,7 +583,7 @@ extern i32 giMinExtentY;
 extern MultiplayerBaseType iMPBaseType;
 extern b32 gbTCPFirstTime;
 extern i32 giHeroScreenSrcIndex;
-extern i32 giWeekType;
+extern H2_ENUM_STORAGE(CalendarPeriodType, i32) giWeekType;
 extern class palette* gpBufferPalette;
 extern b32 gbCampaignSideChoice;
 extern i32 giMonthTypeExtra;
@@ -610,7 +617,7 @@ extern b32 gbRemoteGameOpen;
 extern i32 giTCPNumPlayers;
 extern void* hMainWindow;
 extern i32 giCurWindowsStyleFlags;
-extern i32 giMonthType;
+extern H2_ENUM_STORAGE(CalendarPeriodType, i32) giMonthType;
 extern char* DEFAULT_AGGREGATE_NAME;
 extern i32 gCurSpellEffectFrame;
 extern char cAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
