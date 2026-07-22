@@ -33,10 +33,13 @@ import hashlib
 import itertools
 import json
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import clang.cindex as ci
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tu_state_noise import (
     DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,

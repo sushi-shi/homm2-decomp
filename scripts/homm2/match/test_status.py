@@ -144,6 +144,7 @@ class LiveStatusTest(unittest.TestCase):
         self.assertIn("2 / 2 functions exact-max", block)
         self.assertIn("98.20% fuzzy", block)
         self.assertIn("100.00% fuzzy-max", block)
+        self.assertIn("audited exact disposable TU-state probes", block)
 
     def test_status_prints_live_and_max_exact_counts(self):
         self.maxima.write_text(
