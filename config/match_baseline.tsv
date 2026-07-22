@@ -429,7 +429,7 @@ EDITOR/mapcell	?Init@fullMap@@QAEXHH@Z	100.0000	c04f466bc074
 EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	98.7330	107173601e1d
 EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	34dea1fbd9ba
 SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	363ca89e79c0
-SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	0.0000	07a5019e47c4
+SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	100.0000	486136d3324b
 SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	9b1fd3d74715
 SOURCE/ADVMGR	?CPanelHandler@@YIHAAUtag_message@@@Z	95.0247	85c910b5c47b
 SOURCE/ADVMGR	?CastSpell@advManager@@QAEXH@Z	100.0000	6ebb9f8d38a1
@@ -515,7 +515,7 @@ SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	97.9912	08e0c4ce262a
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	97.6769	02e46998ebf6
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	99.0610	ef8d7000f589
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	c9fe2a838f11
-SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5570	599bdd13c692
+SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5579	599bdd13c692
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	94.7222	29987c5467ab
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	d3d802baf1c9
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	c30d67476922
