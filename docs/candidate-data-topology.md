@@ -172,8 +172,8 @@ The explicit topology commands are:
   partition audits have zero blockers.
 - The only versioned storage-topology supplement is `config/delink_data_supplemental.tsv`; the
   source tree is the canonical input for annotated definitions. Reviewed COFF relocation spellings
-  are independent and live in `config/delink_reloc_aliases.tsv`. The three text-delink CSVs remain
-  independent.
+  are independent and live in `config/delink_reloc_aliases.tsv`. Reviewed non-function `.text`
+  ranges are independently modeled in `config/delink_text_exclusions.csv`.
 - `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
   replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
   synthetic delinker-input PDB, and the pinned delinker executable. Its data symbols come only from
