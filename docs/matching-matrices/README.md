@@ -38,6 +38,22 @@ Before replaying a source state, compare its hash here and confirm the canonical
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
 
+## SOURCE/kbwin AppWndProc compiler-state census
+
+`kbwin-appwndproc-tu-state-15fa64.tsv` records the deterministic 1-through-128 typedef-train
+sweep before `AppWndProc`. It collapses to three normalized target states, not 128: 51 exact
+trials, 63 intermediate trials, and 14 trials in the canonical state. Including the unmodified
+baseline gives the canonical state 15 observations. Private `$SG`/`$T` counter changes are folded
+only for this census and do not create additional states.
+
+Representatives 1, 8, and 17 were compared over the complete function range against retail and
+against each other. The canonical state reverses two equality evaluation orders, the intermediate
+state fixes only the `WM_PALETTECHANGED` comparison, and the exact state fixes that comparison and
+the independent `WM_CLOSE` comparison. The exact state also restores the required extra byte and
+all dependent switch-table owner-relative addends. The matrix retains the reproducible state
+partition, identities, sizes, text and relocation digests, and concrete transition spans; no
+generated declaration remains in source.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,
