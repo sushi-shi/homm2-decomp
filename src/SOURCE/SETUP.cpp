@@ -59,14 +59,6 @@ H2_ENUM_BEGIN(HotSeatPlayerCount)
     SIX_PLAYERS   = 6
 H2_ENUM_END(HotSeatPlayerCount)
 
-static inline i32 GetSetupHelpIndex(i32 widgetId, i32 lastChoice) {
-    if (widgetId >= CHOICE_ONE && widgetId <= lastChoice)
-        return widgetId - CHOICE_ONE;
-    if (widgetId == DIALOG_CANCEL)
-        return lastChoice;
-    return NO_HELP;
-}
-
 VA(0x00410e90, 0x2f)
 i32 game::SetupCampaignGame(void) {
     PlaySmacker(CAMPAIGN_INTRO);
@@ -696,7 +688,24 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case CHOICE_FOUR:
+                helpIndex = 3;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 4;
+                break;
+        }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
@@ -736,7 +745,24 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case CHOICE_FOUR:
+                helpIndex = 3;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 4;
+                break;
+        }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
@@ -776,7 +802,27 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FIVE);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case CHOICE_FOUR:
+                helpIndex = 3;
+                break;
+            case CHOICE_FIVE:
+                helpIndex = 4;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 5;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupHotSeatGameHelp[helpIndex],
@@ -801,7 +847,21 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 3;
+                break;
+        }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
                 NormalDialog(
@@ -841,7 +901,24 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_FOUR);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case CHOICE_FOUR:
+                helpIndex = 3;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 4;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupMultiPlayerGameHelp[helpIndex],
@@ -866,7 +943,18 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 2;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupNetworkGameHelp[helpIndex],
@@ -891,7 +979,21 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case CHOICE_THREE:
+                helpIndex = 2;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 3;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 gSetupNetworkGame2Help[helpIndex],
@@ -916,7 +1018,21 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0) {
         if (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
-            helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_THREE);
+            helpIndex = NO_HELP;
+            switch (message.payload.widget.id) {
+                case CHOICE_ONE:
+                    helpIndex = 0;
+                    break;
+                case CHOICE_TWO:
+                    helpIndex = 1;
+                    break;
+                case CHOICE_THREE:
+                    helpIndex = 2;
+                    break;
+                case DIALOG_CANCEL:
+                    helpIndex = 3;
+                    break;
+            }
             if (helpIndex >= FIRST_HELP)
                 NormalDialog(
                     gSetupGameHelp[helpIndex],
@@ -952,7 +1068,18 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 2;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupCampaignGameHelp[helpIndex],
@@ -977,7 +1104,18 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 2;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupCampaignGameHelp[helpIndex],
@@ -1002,7 +1140,18 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     if ((HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0
         && (message.payload.widget.command == WIDGET_COMMAND_SELECT
             || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT)) {
-        helpIndex = GetSetupHelpIndex(message.payload.widget.id, CHOICE_TWO);
+        helpIndex = NO_HELP;
+        switch (message.payload.widget.id) {
+            case CHOICE_ONE:
+                helpIndex = 0;
+                break;
+            case CHOICE_TWO:
+                helpIndex = 1;
+                break;
+            case DIALOG_CANCEL:
+                helpIndex = 2;
+                break;
+        }
         if (helpIndex >= FIRST_HELP)
             NormalDialog(
                 xSetupStandardGameHelp[helpIndex],
