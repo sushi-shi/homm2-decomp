@@ -174,9 +174,14 @@ end
 
 -- ----------------------------------------------------- cursor -> function ---
 
+local function annotated_va(line)
+  return line:match("VA%s*%(%s*(0[xX]%x+)")
+    or line:match("VA_COMPGEN%s*%(%s*(0[xX]%x+)")
+end
+
 --- {name, unit, addr} for the function the cursor sits in, or nil + reason.
 --- An exact 0x.. function address under the cursor wins; otherwise the nearest
---- VA(0x..)/VAU(0x..) at or above the cursor selects the function.
+--- VA(...)/VA_COMPGEN(...) at or above the cursor selects the function.
 local function symbol_at(root, buf, lnum)
   local db = load_symbols(root)
   if not db then return nil, "no " .. CSV .. " - run :Homm2Build first" end
@@ -190,7 +195,7 @@ local function symbol_at(root, buf, lnum)
 
   local lines = vim.api.nvim_buf_get_lines(buf, 0, lnum, false)
   for i = #lines, 1, -1 do
-    local a = lines[i]:match("VAU?%s*%(%s*(0[xX]%x+)")
+    local a = annotated_va(lines[i])
     if a then
       local e = db.by_addr[tonumber(a)]
       if e then return { name = e.name, unit = e.unit, addr = a } end
@@ -798,7 +803,7 @@ function M.hints(buf)
   if not db then return end
   local rep = load_report(root)
   for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
-    local a = line:match("VAU?%s*%(%s*(0[xX]%x+)")
+    local a = annotated_va(line)
     if a then
       local e = db.by_addr[tonumber(a)]
       local lp = e and live_pct[root] and live_pct[root][e.unit]  -- fresher than report
@@ -1014,7 +1019,7 @@ local function unit_of_buf(root, buf)
   local db = load_symbols(root)
   if not db then return nil end
   for _, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
-    local a = line:match("VAU?%s*%(%s*(0[xX]%x+)")
+    local a = annotated_va(line)
     if a then
       local e = db.by_addr[tonumber(a)]
       if e then return e.unit end
