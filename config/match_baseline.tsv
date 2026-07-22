@@ -1413,7 +1413,7 @@ SOURCE/kbwin	?UpdateDfltMenu@@YIXPAX@Z	100.0000	9ddb82bd16eb
 SOURCE/kbwin	_WinMain@16	100.0000	4568c22cdc6e
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	a19a8f247e3f
 SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	8c387d04e674
-SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	99.7041	0fb740654221
+SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	0fb740654221
 SOURCE/netwin	?nb_arm_recv@@YIXH@Z	100.0000	41b2b45b7fc3
 SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	e5428558d4f9
 SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	c0fca3921016
@@ -1422,7 +1422,7 @@ SOURCE/netwin	?nb_format_name@@YIXPADPAE@Z	100.0000	442b0aa1a554
 SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	c81032caf298
 SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	a77098748396
 SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	3d2bd416f787
-SOURCE/netwin	?nb_recv_complete@@YIXH@Z	99.7518	c18b1f4f65e5
+SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	c18b1f4f65e5
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	77122ab8d0ab
 SOURCE/netwin	@nb_init@8	100.0000	838bdf0d5519
 SOURCE/netwin	@nb_rcv@8	100.0000	c857f3054cd4
