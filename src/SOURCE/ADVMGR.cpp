@@ -9570,7 +9570,9 @@ VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
         gbThisNetGotAdventureControl = true;
-    } else {
+        return;
+    }
+    {
         i32 selectedPlayer = -1;
         i32 player;
         i32 currentPlayer;
