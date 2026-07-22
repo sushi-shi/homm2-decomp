@@ -32,7 +32,7 @@ DATA(0x0052a220) static i32 s_adjacentCost;
 DATA(0x0052a224) static i32 s_mapX;
 DATA(0x0052a228) static i32 s_neighborY;
 DATA(0x0052a22c) static i32 s_hasAdjacentMonster;
-DATA(0x0052a230) static i32 s_direction;
+DATA(0x0052a230) static MapDirection s_direction;
 DATA(0x0052a234) static i32 s_targetStepCost;
 DATA(0x0052a238) static i32 s_candidateY;
 DATA(0x0052a23c) static searchNode* s_neighborNode;
@@ -67,9 +67,10 @@ i32 searchArray::BuildPath(
                 break;
             }
         }
-        i32 reverseDirection = (node->direction + SEARCH_DIRECTION_REVERSE) & SEARCH_DIRECTION_MASK;
-        currentDestinationX += normalDirTable[reverseDirection].x;
-        currentDestinationY += normalDirTable[reverseDirection].y;
+        MapDirection reverseDirection =
+            OppositeMapDirection(static_cast<MapDirection>(node->direction));
+        currentDestinationX += normalDirTable[IDX(reverseDirection)].x;
+        currentDestinationY += normalDirTable[IDX(reverseDirection)].y;
     }
     return m_pathLength;
 }
@@ -78,7 +79,7 @@ VA(0x004a26a0, 0x9df)
 void searchArray::SeedPosition(
     i32 seedX,
     i32 seedY,
-    i32 seedDirection,
+    H2_ENUM_PARAM(MapDirection, i32) seedDirection,
     i32 maximumCost,
     i32 waterMode,
     i32 findAdjacentMonster,
@@ -238,12 +239,12 @@ seed_loop:
             s_terrain = giGroundToTerrain[gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)
                                               ->m_terrainImageIndex];
             s_currentWater = gpAdvManager->GetCell(s_currentNode.x, s_currentNode.y)->m_isRoad;
-            s_direction = 0;
+            s_direction = MAP_DIRECTION_NORTH;
             s_remainingMobility = giCurTempMobility - s_currentNode.distance;
             do {
-                if (s_possibleDirections[s_direction] != TERRAIN_INVALID) {
-                    s_neighborX = normalDirTable[s_direction].x + s_currentNode.x;
-                    s_neighborY = normalDirTable[s_direction].y + s_currentNode.y;
+                if (s_possibleDirections[IDX(s_direction)] != TERRAIN_INVALID) {
+                    s_neighborX = normalDirTable[IDX(s_direction)].x + s_currentNode.x;
+                    s_neighborY = normalDirTable[IDX(s_direction)].y + s_currentNode.y;
                     i32 neighborIndex = MAP_WIDTH * s_neighborY + s_neighborX;
                     s_neighborNode = &search->m_storage.nodes[neighborIndex];
                     if (!findAdjacentMonster || s_currentNode.rvFlag1
@@ -268,14 +269,14 @@ seed_loop:
                             s_currentNode.distance
                                 + CalcTerrainCost(
                                     s_terrain,
-                                    s_direction,
+                                    IDX(s_direction),
                                     s_remainingMobility,
                                     pathfindingSkill,
                                     s_currentWater,
                                     gpAdvManager->GetCell(s_neighborX, s_neighborY)->m_isRoad
                                 ),
                             maximumCost,
-                            static_cast<i8>(s_directionCosts[s_direction]),
+                            static_cast<i8>(s_directionCosts[IDX(s_direction)]),
                             s_hasAdjacentMonster,
                             s_adjacentMonsterX,
                             s_adjacentY,
@@ -288,8 +289,8 @@ seed_loop:
                             && !s_currentNode.rvFlag1) {
                             mapCell* neighborCell = gpAdvManager->GetCell(s_neighborX, s_neighborY);
                             s_targetStepCost = CalcTerrainCost(
-                                s_possibleDirections[s_direction],
-                                s_direction,
+                                s_possibleDirections[IDX(s_direction)],
+                                IDX(s_direction),
                                 giCurTempMobility - s_currentNode.distance,
                                 pathfindingSkill,
                                 neighborCell->m_isRoad,
@@ -302,7 +303,7 @@ seed_loop:
                     }
                 }
                 ++s_direction;
-            } while (s_direction < SEARCH_DIRECTION_COUNT);
+            } while (s_direction < MAP_DIRECTION_COUNT);
         }
 
     point_complete:
@@ -320,16 +321,16 @@ seed_loop:
                         if ((mapPosition->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                             == MAP_OBJECT_MONSTER) {
                             s_targetCell = gpAdvManager->GetCell(s_mapX, s_mapY);
-                            s_direction = 0;
+                            s_direction = MAP_DIRECTION_NORTH;
                             do {
-                                s_adjacentX = normalDirTable[s_direction].x + s_mapX;
-                                s_candidateY = normalDirTable[s_direction].y + s_mapY;
+                                s_adjacentX = normalDirTable[IDX(s_direction)].x + s_mapX;
+                                s_candidateY = normalDirTable[IDX(s_direction)].y + s_mapY;
                                 if (s_adjacentX >= 0 && s_adjacentX < MAP_WIDTH && s_candidateY >= 0
                                     && s_candidateY < MAP_HEIGHT) {
                                     s_neighborCell =
                                         gpAdvManager->GetCell(s_adjacentX, s_candidateY);
                                     s_directionBlocked = 1;
-                                    if (((1 << s_direction) & SEARCH_DIRECTION_OBJECT_MASK) != 0
+                                    if (((1 << IDX(s_direction)) & SEARCH_DIRECTION_OBJECT_MASK) != 0
                                         && s_neighborCell->m_objectIndex != SEARCH_NO_OBJECT
                                         && (s_neighborCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
                                                != SEARCH_BLOCKING_OBJECT_TYPE
@@ -349,12 +350,11 @@ seed_loop:
                                         search->PushPoint(
                                             s_mapX,
                                             s_mapY,
-                                            (s_direction + SEARCH_DIRECTION_REVERSE)
-                                                & SEARCH_DIRECTION_MASK,
+                                            OppositeMapDirection(s_direction),
                                             s_adjacentCost
                                                 + CalcTerrainCost(
                                                     s_terrain,
-                                                    s_direction,
+                                                    IDX(s_direction),
                                                     giCurTempMobility - s_adjacentCost,
                                                     pathfindingSkill,
                                                     s_neighborCell->m_isRoad,
@@ -372,7 +372,7 @@ seed_loop:
                                     }
                                 }
                                 ++s_direction;
-                            } while (s_direction < SEARCH_DIRECTION_COUNT);
+                            } while (s_direction < MAP_DIRECTION_COUNT);
                         }
                         ++s_mapY;
                     } while (s_mapY < MAP_WIDTH);

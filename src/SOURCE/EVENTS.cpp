@@ -4416,7 +4416,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         releasedHero1->m_x = x;
         releasedHero1->m_y = y;
         releasedHero1->m_eventFlags = HERO_EVENT_NONE;
-        releasedHero1->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+        releasedHero1->m_direction = MAP_DIRECTION_EAST;
         releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
         releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
         releasedHero1->m_locationType = cell->m_triggerType;
@@ -7297,7 +7297,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             releasedHero13->m_x = x;
             releasedHero13->m_y = y;
             releasedHero13->m_eventFlags = HERO_EVENT_NONE;
-            releasedHero13->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+            releasedHero13->m_direction = MAP_DIRECTION_EAST;
             releasedHero13->m_remainingMobility = releasedHero13->CalcMobility();
             releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
             releasedHero13->m_locationType = cell->m_triggerType;

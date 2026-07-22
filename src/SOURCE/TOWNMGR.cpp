@@ -2793,7 +2793,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         m_recruitHero->m_x = townXh;
         m_recruitHero->m_y = townYWork;
         m_recruitHero->m_eventFlags = HERO_EVENT_NONE;
-        m_recruitHero->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+        m_recruitHero->m_direction = MAP_DIRECTION_EAST;
         m_recruitHero->m_remainingMobility = m_recruitHero->CalcMobility();
         m_recruitHero->m_mobility = m_recruitHero->m_remainingMobility;
         m_recruitHero->m_locationType =
