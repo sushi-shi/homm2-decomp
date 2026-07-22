@@ -285,14 +285,13 @@ VA(0x004b7115, 0x77)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
     m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
-    if (m_newGameWindow == NULL) {
-    } else {
-        CleanUpNewGameWindow();
-        InitNewGame(header);
-        InitNewGameWindow();
-        UpdateNewGameWindow();
-        m_newGameWindow->DrawWindow();
-    }
+    if (m_newGameWindow == NULL)
+        return;
+    CleanUpNewGameWindow();
+    InitNewGame(header);
+    InitNewGameWindow();
+    UpdateNewGameWindow();
+    m_newGameWindow->DrawWindow();
 }
 
 VA(0x004b718c, 0x491)
