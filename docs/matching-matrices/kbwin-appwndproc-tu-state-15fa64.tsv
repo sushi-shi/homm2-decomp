@@ -1,0 +1,15 @@
+# SOURCE/kbwin AppWndProc controlled typedef-state census
+# checkpoint	d1efb83d4fd440bea39ee7f904d9bb6332579404
+# normalized_source_hash	15fa64617e58
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/kbwin.cpp --rva 0x1c190 --trials 128 --families typedef --max-declarations 128 --seed 0x41575052 --state-summary /tmp/appwndproc-states.json
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	128 typedef counts produce three normalized states; no generated declaration remains in source
+state	state_identity	representative_count	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	counts_in_1_through_128
+canonical	53bb93a77ac70fd9	17	14	99.710060	1405	12008afd7fdccfdd	6f12fbf54f2c1ce1	17-18,34-35,51-52,68-69,85-86,102-103,119-120
+intermediate	85660e80e90b5a0a	8	63	99.714005	1405	c8bd1c18510ca5f1	6f12fbf54f2c1ce1	8-16,25-33,42-50,59-67,76-84,93-101,111-118,128
+exact	ff8167c5cd87f7c6	1	51	100.000000	1406	cbffb7b8fe11f400	fe2754a9eaa92269	1-7,19-24,36-41,53-58,70-75,87-92,104-110,121-127
+# The state cardinality is three. The canonical state's occurrence total is 15 when the unmodified baseline is included; the table counts only its 14 generated trials.
+# Full-range disassembly is required because candidate-private $L labels make symbol-only llvm-objdump stop after the switch dispatch. The normal helper's apparent missing function body is therefore a boundary-display artifact, not a CFG difference.
+# Canonical reverses both retail equality evaluation orders: WM_PALETTECHANGED loads messageParam before comparing window, and WM_CLOSE loads hwndApp before comparing window. Intermediate fixes only WM_PALETTECHANGED. Exact fixes both, grows the function by the required byte, and consequently restores the retail jump-table owner-relative addends.
+# Apart from those two comparisons and the dependent switch-table addends, representative full-range disassemblies agree. The exact state has the retail 1406-byte boundary and the complete retail 88-site ordered relocation stream.
+# Trials 1, 8, and 17 reproduce exact, intermediate, and canonical respectively from the command and seed above. All three disposable declaration bodies were removed after comparison.
