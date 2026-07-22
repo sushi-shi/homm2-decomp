@@ -6446,8 +6446,10 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
         return result1;
     else {
         mineValue0 = static_cast<i32>(
-            static_cast<float>(gMineCharacteristics[gpGame->m_mines[mineIndex].resourceType])
-            * gafAITurnCostResource[gpGame->m_mines[mineIndex].resourceType]
+            static_cast<float>(
+                gMineCharacteristics[IDX(gpGame->m_mines[mineIndex].resourceType)]
+            )
+            * gafAITurnCostResource[IDX(gpGame->m_mines[mineIndex].resourceType)]
             * gaiTurnValueOfMine[x + MAP_WIDTH * y]
         );
         if (gpGame->m_mineOwners[mineIndex] >= 0) {

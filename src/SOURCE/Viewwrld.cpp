@@ -236,7 +236,7 @@ void advManager::VWCompleteDraw(void) {
     i32 playerColor26;
     u32 groundShape1;
     u32 groundFrame29;
-    i32 resourceType9;
+    MineType resourceType9;
     H2_ENUM_STORAGE(IconDrawOrientation, u32) flipped5;
     i32 unusedExtraState29;
     mapCellExtra* extra15;
@@ -687,7 +687,7 @@ void advManager::VWCompleteDraw(void) {
                     pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
                     mineLetterY0[giViewWorldScaleLookup] + pixelY2
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
-                    resourceType9,
+                    IDX(resourceType9),
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,

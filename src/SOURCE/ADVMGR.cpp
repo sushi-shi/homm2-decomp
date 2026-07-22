@@ -4973,8 +4973,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s %s",
-                            gResourceNames[gpGame->m_mines[currentCell->m_objectMetadata]
-                                               .resourceType],
+                            gResourceNames[IDX(
+                                gpGame->m_mines[currentCell->m_objectMetadata].resourceType
+                            )],
                             "Mine"
                         );
                     quick_info_guarded:
@@ -4994,8 +4995,9 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         sprintf(
                             gText,
                             "%s %s",
-                            gResourceNames[gpGame->m_mines[currentCell->m_objectMetadata]
-                                               .resourceType],
+                            gResourceNames[IDX(
+                                gpGame->m_mines[currentCell->m_objectMetadata].resourceType
+                            )],
                             "Mine"
                         );
                     }
