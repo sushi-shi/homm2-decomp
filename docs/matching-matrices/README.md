@@ -119,6 +119,19 @@ Representatives were compared against retail and each other; the matrix records 
 displacement bytes, complete trial partition, and sibling eligibility. No probe declaration remains
 in `RECRUIT.cpp`.
 
+## SOURCE/RECRUIT Open compiler-state census
+
+`recruit-open-tu-state-0dc16a.tsv` records the deterministic 128-trial typedef sweep of
+`recruitUnit::Open`. After candidate-paired data normalization, the live residual is not the raw
+`$SG` counter spelling: every anonymous string has the same payload-derived identity. The only
+residual is the load order of the two correctly modeled locals in the gold/resource minimum.
+
+The sweep has two normalized states. Fourteen trials reach exact 100.000000%; both states keep the
+587-byte CodeView boundary and complete 26-site ordered relocation stream. All exact trials pass
+the sibling gates. Reversing the symmetric ternary operands is byte-neutral, so the readable
+canonical source remains unchanged. Trial 8 proves the unchanged source can emit the retail state;
+its exact maximum is retained for the current source hash, and no generated declaration remains.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,
