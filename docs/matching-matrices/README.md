@@ -27,7 +27,12 @@ those numeric counters collapses the run to the three actual byte/relocation-top
 
 The matrix records the complete declaration-count partition and representative counts 15, 14,
 and 1, so later work can reproduce and disassemble all three states without repeating 128 builds.
-No generated declaration or unnatural reversed-subscript expression is retained in game source.
+The completed three-way disassembly review shows that the canonical state gets the town store but
+misses four hero stores, the high state gets all four hero stores but misses the town store, and
+the intermediate state misses both regions. Compiler state toggles those regions in opposite
+directions, so the next useful lever is a local structural or inline spelling that decouples the
+town store. No generated declaration or unnatural reversed-subscript expression is retained in
+game source.
 
 Before replaying a source state, compare its hash here and confirm the canonical source and pinned
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header

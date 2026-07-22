@@ -21,6 +21,12 @@ lengths from one through `--max-declarations` (64 by default), then wrap. Increa
 when a target appears sensitive to a later compiler counter; the generated train is still fully
 disposable and the exact authored target suffix remains guarded.
 
+The default `--insertion target` isolates declarations immediately before the target metadata.
+Use `--insertion top` to place the same disposable block after the TU's leading includes and
+preprocessor directives. Top insertion lets the probe state flow through real predecessor parsing
+and code generation, which can reach states unavailable to adjacent insertion. Both modes reset
+the original logical line at the insertion boundary and preserve the exact authored target suffix.
+
 The tool reports a target-state census after every compiled sweep. A state is identified by the
 target's raw text digest, objdiff function boundary, and ordered relocation stream after replacing
 only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not by fuzzy score,
@@ -29,7 +35,8 @@ sites/types/addends, and all other spellings remain part of the state. The repor
 raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
 JSON census with one complete reproducible probe body per state while the sub-100 COFF objects
 themselves remain disposable. This summary is diagnostic evidence only: it does not update a
-retained maximum.
+retained maximum. If one normalized state ever receives multiple fuzzy scores, the census reports
+the complete score set instead of silently choosing one.
 
 Each baseline and trial compile has a 120-second default ceiling. Override it with a
 positive finite `--compile-timeout-seconds`; expiry terminates the complete compiler
@@ -57,6 +64,13 @@ The RVA may be image-relative (`0xca6d0`) or an image VA (`0x4ca6d0`), but it mu
 exactly one CodeView function in the configured source TU. The tool recompiles with that TU's
 real profile from `config/units.toml` and scores the exact mangled symbol from
 `build/gen/symbol_names.csv`.
+
+Every trial is scored through fresh candidate-paired comparison copies: retail relocations are
+paired against that trial's raw object, then both sides pass through the repository's reviewed
+data-symbol canonicalizer. This is the same semantic normalization pipeline used by the normal
+objdiff build. Scoring raw trial objects is invalid because harmless probe declarations renumber
+private compiler labels and can otherwise create a false fuzzy loss—or prevent a real exact
+closure from being recognized.
 
 ## Parser-visible probe classes
 
@@ -116,8 +130,10 @@ candidate from best-candidate selection when:
 - target code-size distance from retail worsens; or
 - target relocation-count distance from retail worsens.
 
-Those gates make a trial useful as a diagnostic. Exact closure is stricter: the unrounded objdiff
-score must equal numeric `100.0`, the CodeView-delimited size must equal retail, and the complete
+Those gates govern sub-100 best-candidate diagnostics. Exact closure is target-scoped: disposable
+sibling or predecessor changes do not invalidate it because the probe block is removed and only
+the unchanged target hash's maximum is updated. Exact closure still requires the unrounded objdiff
+score to equal numeric `100.0`, the CodeView-delimited size to equal retail, and the complete
 ordered relocation offset/type/identity/addend stream must equal retail. Comparing every relocation
 is deliberately stronger than checking only external references; a local-label/delinker identity
 caveat remains evidence-only until it is byte-proven under the matcher guide.
