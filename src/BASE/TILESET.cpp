@@ -22,7 +22,7 @@ tileset::tileset(u32l id)
 }
 
 VA(0x004dad30, 0x21)
-tileset::~tileset() {
+inline tileset::~tileset() {
     H2_FREE_AT(m_data, gTilesetSourceFiles.destruction, 0x1c);
 }
 

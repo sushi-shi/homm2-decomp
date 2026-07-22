@@ -12,7 +12,7 @@ public:
     u16 m_tileCount;
     char* m_data;
     tileset(u32l);
-    virtual ~tileset();
+    __declspec(dllexport) virtual inline ~tileset();
 };
 #pragma pack(pop)
 SIZE(tileset, 0x1a);
