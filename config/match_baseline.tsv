@@ -1019,7 +1019,7 @@ SOURCE/Netbios	?nbnet_init@@YIHXZ	100.0000	7288897687c3
 SOURCE/Newgame	?CleanUpNewGameWindow@game@@QAEXXZ	100.0000	82ccd7a98e62
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	100.0000	228f4a437eec
 SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	100.0000	f5c2ac97b316
-SOURCE/Newgame	?GetMap@game@@QAEXXZ	99.9621	905f48bf5ec8
+SOURCE/Newgame	?GetMap@game@@QAEXXZ	100.0000	a3c5cd6196ad
 SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	100.0000	883cb6418718
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	100.0000	265cb4b89a28
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	96.4662	dd2491936751
