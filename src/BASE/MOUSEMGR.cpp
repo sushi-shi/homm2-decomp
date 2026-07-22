@@ -230,7 +230,7 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
 
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
-    if (m_forcePointerUpdate != 0 || frame < 0 || !m_active || m_cursorFrame == frame
+    if (m_forcePointerUpdate != 0 || frame < 0 || m_active != true || m_cursorFrame == frame
         || gbInSetPointer != 0)
         return;
 
