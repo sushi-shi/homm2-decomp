@@ -1257,7 +1257,7 @@ void advManager::Close(void) {
     }
 
     i32 index;
-    if (gAdvDisposeLevel <= 1) {
+    if (gAdvDisposeLevel <= ADV_DISPOSE_PARTIAL) {
         for (index = 0; index < OBJECT_ICON_COUNT; ++index) {
             if (m_objectIcons[index] != NULL) {
                 gpResourceManager->Dispose(m_objectIcons[index]);
@@ -1265,7 +1265,7 @@ void advManager::Close(void) {
             m_objectIcons[index] = NULL;
         }
     }
-    if (gAdvDisposeLevel <= 0) {
+    if (gAdvDisposeLevel <= ADV_DISPOSE_NONE) {
         gpResourceManager->Dispose(m_puzzleIcon);
         m_puzzleIcon = NULL;
         gpResourceManager->Dispose(m_cloudOverlayIcon);
