@@ -3879,16 +3879,80 @@ void UpdateSystemOptionsMenu(void) {
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    checkedCommand = APP_MENU_MUSIC_FIRST;
-    if (gConfig.musicVolume >= CONFIG_VOLUME_MIN && gConfig.musicVolume <= CONFIG_VOLUME_MAX)
-        checkedCommand += IDX(gConfig.musicVolume);
+    switch (gConfig.musicVolume) {
+        case CONFIG_VOLUME_MIN:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 1;
+            break;
+        case CONFIG_VOLUME_MIN + 1:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 2;
+            break;
+        case CONFIG_VOLUME_MIN + 2:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 3;
+            break;
+        case CONFIG_VOLUME_MIN + 3:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 4;
+            break;
+        case CONFIG_VOLUME_MIN + 4:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 5;
+            break;
+        case CONFIG_VOLUME_MIN + 5:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 6;
+            break;
+        case CONFIG_VOLUME_MIN + 6:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 7;
+            break;
+        case CONFIG_VOLUME_MIN + 7:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 8;
+            break;
+        case CONFIG_VOLUME_MIN + 8:
+            checkedCommand = APP_MENU_MUSIC_FIRST + 9;
+            break;
+        case CONFIG_VOLUME_MAX:
+            checkedCommand = APP_MENU_MUSIC_LAST;
+            break;
+        default:
+            checkedCommand = APP_MENU_MUSIC_FIRST;
+            break;
+    }
     CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
 
     for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST; menuCommand++)
         CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    checkedCommand = APP_MENU_SOUND_FIRST;
-    if (gConfig.soundVolume >= CONFIG_VOLUME_MIN && gConfig.soundVolume <= CONFIG_VOLUME_MAX)
-        checkedCommand += IDX(gConfig.soundVolume);
+    switch (gConfig.soundVolume) {
+        case CONFIG_VOLUME_MIN:
+            checkedCommand = APP_MENU_SOUND_FIRST + 1;
+            break;
+        case CONFIG_VOLUME_MIN + 1:
+            checkedCommand = APP_MENU_SOUND_FIRST + 2;
+            break;
+        case CONFIG_VOLUME_MIN + 2:
+            checkedCommand = APP_MENU_SOUND_FIRST + 3;
+            break;
+        case CONFIG_VOLUME_MIN + 3:
+            checkedCommand = APP_MENU_SOUND_FIRST + 4;
+            break;
+        case CONFIG_VOLUME_MIN + 4:
+            checkedCommand = APP_MENU_SOUND_FIRST + 5;
+            break;
+        case CONFIG_VOLUME_MIN + 5:
+            checkedCommand = APP_MENU_SOUND_FIRST + 6;
+            break;
+        case CONFIG_VOLUME_MIN + 6:
+            checkedCommand = APP_MENU_SOUND_FIRST + 7;
+            break;
+        case CONFIG_VOLUME_MIN + 7:
+            checkedCommand = APP_MENU_SOUND_FIRST + 8;
+            break;
+        case CONFIG_VOLUME_MIN + 8:
+            checkedCommand = APP_MENU_SOUND_FIRST + 9;
+            break;
+        case CONFIG_VOLUME_MAX:
+            checkedCommand = APP_MENU_SOUND_LAST;
+            break;
+        default:
+            checkedCommand = APP_MENU_SOUND_FIRST;
+            break;
+    }
     CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
 
     for (menuCommand = APP_MENU_SPEED_FIRST; menuCommand <= APP_MENU_SPEED_LAST; menuCommand++)
