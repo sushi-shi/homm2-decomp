@@ -639,7 +639,7 @@ SOURCE/COMMAND	?AddArmy@combatManager@@QAEXHHHHHH@Z	99.9828	a1d53884f9cc
 SOURCE/COMMAND	?CheckCastleAttack@combatManager@@QAEXXZ	100.0000	3217fe5ea0d5
 SOURCE/COMMAND	?CheckChangeSelector@combatManager@@QAEXXZ	100.0000	b56874f5932f
 SOURCE/COMMAND	?CheckGetAIMove@combatManager@@QAEXXZ	100.0000	49657b4d70ae
-SOURCE/COMMAND	?CheckSetMouseDirection@combatManager@@QAEXHHH@Z	99.8278	2501ccc50d7c
+SOURCE/COMMAND	?CheckSetMouseDirection@combatManager@@QAEXHHH@Z	100.0000	81ed1069226f
 SOURCE/COMMAND	?CheckWin@combatManager@@QAEHPAUtag_message@@@Z	96.6879	df34b08d7a5c
 SOURCE/COMMAND	?ClearWinLoseBottom@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	398a4d26ec25
 SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.3993	0e0e69f70c5e
