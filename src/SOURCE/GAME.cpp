@@ -7506,9 +7506,8 @@ void game::SetupNewRumour(void) {
     rumourEventExtra* event4;
     i32 eventIndex11;
     i32 attempts13;
-    TownThievesGuildCategory category10;
-    i32 ultimateRumourRoll;
     i32 roll2;
+    i32 selectionRoll;
     i32 direction9;
     // Retail's event chances, category weights, and cDirections indices are
     // tavern-rumour selection payload.
@@ -7537,25 +7536,29 @@ void game::SetupNewRumour(void) {
         if (roll2 < 80 && giCurTurn > 1) {
             attempts13 = 0;
             while (attempts13++ < 200) {
-                category10 = static_cast<TownThievesGuildCategory>(Random(
+                selectionRoll = Random(
                     IDX(THIEVES_CATEGORY_OBELISKS), IDX(THIEVES_CATEGORY_INCOME)
-                ));
-                GetCategoryStats(category10, categoryStats7, categoryOrder2);
+                );
+                GetCategoryStats(
+                    static_cast<TownThievesGuildCategory>(selectionRoll),
+                    categoryStats7,
+                    categoryOrder2
+                );
                 SortStats(categoryStats7, categoryOrder2);
                 if (categoryStats7[1] != categoryStats7[0]) {
-                    if (category10 == THIEVES_CATEGORY_OBELISKS)
+                    if (selectionRoll == IDX(THIEVES_CATEGORY_OBELISKS))
                         sprintf(
                             m_rumour,
                             "%s has found the most obelisks.",
                             cPlayerNames[categoryOrder2[0]]
                         );
-                    else if (category10 == THIEVES_CATEGORY_ARTIFACTS)
+                    else if (selectionRoll == IDX(THIEVES_CATEGORY_ARTIFACTS))
                         sprintf(
                             m_rumour,
                             "%s has found the most artifacts.",
                             cPlayerNames[categoryOrder2[0]]
                         );
-                    else if (category10 == THIEVES_CATEGORY_ARMY_STRENGTH)
+                    else if (selectionRoll == IDX(THIEVES_CATEGORY_ARMY_STRENGTH))
                         sprintf(
                             m_rumour,
                             "%s has the most powerful forces.",
@@ -7573,8 +7576,8 @@ void game::SetupNewRumour(void) {
             goto ultimateRumour;
         } else {
         ultimateRumour:
-            ultimateRumourRoll = Random(0, 100);
-            if (ultimateRumourRoll < 33) {
+            selectionRoll = Random(0, 100);
+            if (selectionRoll < 33) {
                 if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
                       || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
@@ -7603,7 +7606,7 @@ void game::SetupNewRumour(void) {
                     "The ultimate artifact may be found in the %s regions of the world.",
                     cDirections[direction9]
                 );
-            } else if (ultimateRumourRoll < 66) {
+            } else if (selectionRoll < 66) {
                 sprintf(
                     m_rumour,
                     "The ultimate artifact may be found %s.",
