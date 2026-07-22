@@ -5,12 +5,13 @@ definitions. Their identities come from different evidence and are kept separate
 
 ## Runtime-library functions
 
-The runtime FID database is `config/library_labels.csv`. Exact CRT identities live there, not in
+The runtime FID database is `config/library_labels.csv`. All CRT identities live there, not in
 `config/delink_procedures.csv`. `runtime_fid.py` compares each reviewed retail RVA against
 the same-named compiland in the pinned VC 4.0 `LIBCMT.LIB`. It masks only relocation
-operands and accepts exactly one equal-sized signature. An assembly entry without a
-standalone COFF symbol is named as `$entry_0x<owner-relative-offset>` after the containing
-library function is proved.
+operands and accepts exactly one signature identity. A reviewed procedure span can be a
+proved prefix when the library symbol extent continues into embedded data or a separately
+modeled alternate entry. An assembly entry without a standalone COFF symbol is named as
+`$entry_0x<owner-relative-offset>` after the containing library function is proved.
 
 Run `python3 -m homm2.build.runtime_fid --check` to verify the tracked database. A normal
 `homm2 build` runs the same check as a hard gate.
