@@ -172,7 +172,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_GRID_COLUMN_END                  = 12,
     COMBAT_GRID_REVERSE_FIRST_COLUMN        = 11,
     COMBAT_GRID_REVERSE_COLUMN_END          = 0,
-    COMBAT_MANAGER_SIDE_COUNT               = 2,
     COMBAT_ARMY_SLOT_COUNT                  = 20,
     COMBAT_ARMY_STORAGE_SLOT_COUNT          = 21,
     COMBAT_RUNTIME_ALIGNMENT_SIZE           = 4,
@@ -188,7 +187,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_REVERSE_ROW               = 5,
     COMBAT_CASTLE_GATE_ROW                  = 4,
     COMBAT_CASTLE_GATE_APPROACH_HEX         = 58,
-    COMBAT_SIDE_COUNT_DRAWING               = 2,
     COMBAT_ARMY_SLOT_COUNT_DRAWING          = COMBAT_ARMY_SLOT_COUNT,
     COMBAT_HERO_LEFT_X                      = 30,
     COMBAT_HERO_LEFT_Y                      = 183,
@@ -270,8 +268,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_SMALL_VIEW_MODIFIER_RIGHT_X      = 57,
     COMBAT_SMALL_VIEW_NEUTRAL_MORALE_X      = 45,
     COMBAT_SMALL_VIEW_NEUTRAL_LUCK_X        = 50,
-    COMBAT_ATTACKER_SIDE                    = 0,
-    COMBAT_DEFENDER_SIDE                    = 1,
     COMBAT_MESSAGE_LINE_SIZE                = 120,
     COMBAT_MESSAGE_WRAP_BUFFER_SIZE         = 400,
     COMBAT_MESSAGE_LOG_BUFFER_SIZE          = 700,
@@ -340,8 +336,10 @@ H2_ENUM_BEGIN(CombatGridConstant)
 H2_ENUM_END(CombatGridConstant)
 
 H2_ENUM_BEGIN(CombatResultConstant)
-    COMBAT_RESULT_DRAW    = -1,
-    COMBAT_RESULT_PENDING = 3
+    COMBAT_RESULT_DRAW     = -1,
+    COMBAT_RESULT_ATTACKER = 0,
+    COMBAT_RESULT_DEFENDER = 1,
+    COMBAT_RESULT_PENDING  = 3
 H2_ENUM_END(CombatResultConstant)
 
 H2_ENUM_CLASS_BEGIN(BattlefieldFringeFrame)
@@ -393,13 +391,12 @@ H2_ENUM_BEGIN(CombatRuntimeConstant)
     COMBAT_NEUTRAL_HERO_COLOR             = IDX(FACTION_COUNT),
     COMBAT_POINTER_DEFAULT                = 6,
     COMBAT_HERO_OVERLAY_FRAME_COUNT       = 5,
-    COMBAT_HERO_ANIMATION_TRACK_COUNT     = COMBAT_MANAGER_SIDE_COUNT + 1,
+    COMBAT_HERO_ANIMATION_TRACK_COUNT     = COMBAT_SIDE_COUNT + 1,
     COMBAT_INITIAL_COMMAND                = 15,
     COMBAT_INVALID_HISTORY_INDEX          = -99
 H2_ENUM_END(CombatRuntimeConstant)
 
 H2_ENUM_BEGIN(CombatAIConstant)
-    COMBAT_AI_SIDE_COUNT               = 2,
     COMBAT_AI_ARMY_SLOT_COUNT          = 20,
     COMBAT_AI_GROUP_SLOT_COUNT         = 5,
     COMBAT_AI_GROUP_SCAN_DONE          = 999,
@@ -514,7 +511,7 @@ public:
     class icon* m_combatIcons[COMBAT_FIXED_ICON_COUNT];
     class icon* m_obstacleIcons[COMBAT_OBSTACLE_ICON_LOAD_COUNT];
     i32 m_obstacleCount;
-    H2_ENUM_STORAGE(SpellType, i16) m_eagleEyeSpell[COMBAT_MANAGER_SIDE_COUNT];
+    H2_ENUM_STORAGE(SpellType, i16) m_eagleEyeSpell[COMBAT_SIDE_COUNT];
     CombatDrawbridgeState m_drawbridgeState;
     i32 m_drawbridgeBackgroundVisible;
     H2_ENUM_STORAGE_STEPPED(CombatCastleWallState, u8)
@@ -524,42 +521,42 @@ public:
     class bitmap* m_mouseGridBuffer;
     i32 m_backgroundDrawn;
     class mapCell* m_battlefieldCell;
-    class town* m_combatTowns[COMBAT_MANAGER_SIDE_COUNT];
-    class hero* m_heroes[COMBAT_MANAGER_SIDE_COUNT];
+    class town* m_combatTowns[COMBAT_SIDE_COUNT];
+    class hero* m_heroes[COMBAT_SIDE_COUNT];
     class hero m_captain;
-    i32 m_spellPower[COMBAT_MANAGER_SIDE_COUNT];
-    class armyGroup* m_armyGroups[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_spellPower[COMBAT_SIDE_COUNT];
+    class armyGroup* m_armyGroups[COMBAT_SIDE_COUNT];
     i32 m_mouseGridHex;
-    u8 m_heroDeathPending[COMBAT_MANAGER_SIDE_COUNT];
-    u8 m_heroAlternateDeathPending[COMBAT_MANAGER_SIDE_COUNT];
-    u8 m_heroDeathAnimationPlayed[COMBAT_MANAGER_SIDE_COUNT];
-    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_heroAnimationState[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_heroAnimationFrame[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_heroSpriteIndex[COMBAT_MANAGER_SIDE_COUNT];
-    i32l m_heroCycleTimer[COMBAT_MANAGER_SIDE_COUNT];
-    class icon* m_heroIcons[COMBAT_MANAGER_SIDE_COUNT];
-    class icon* m_heroOverlayIcons[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_heroOverlayFrame[COMBAT_MANAGER_SIDE_COUNT];
-    struct SLimitData m_heroLimits[COMBAT_MANAGER_SIDE_COUNT];
-    struct SLimitData m_heroOverlayLimits[COMBAT_MANAGER_SIDE_COUNT];
+    u8 m_heroDeathPending[COMBAT_SIDE_COUNT];
+    u8 m_heroAlternateDeathPending[COMBAT_SIDE_COUNT];
+    u8 m_heroDeathAnimationPlayed[COMBAT_SIDE_COUNT];
+    u8 m_heroAlternateDeathAnimationPlayed[COMBAT_SIDE_COUNT];
+    i32 m_heroAnimationState[COMBAT_SIDE_COUNT];
+    i32 m_heroAnimationFrame[COMBAT_SIDE_COUNT];
+    i32 m_heroSpriteIndex[COMBAT_SIDE_COUNT];
+    i32l m_heroCycleTimer[COMBAT_SIDE_COUNT];
+    class icon* m_heroIcons[COMBAT_SIDE_COUNT];
+    class icon* m_heroOverlayIcons[COMBAT_SIDE_COUNT];
+    i32 m_heroOverlayFrame[COMBAT_SIDE_COUNT];
+    struct SLimitData m_heroLimits[COMBAT_SIDE_COUNT];
+    struct SLimitData m_heroOverlayLimits[COMBAT_SIDE_COUNT];
     struct SLimitData m_moatLimits[IDX(COMBAT_WALL_SLOT_COUNT)];
     i32l m_previousCombatMessageExpiration;
     i32l m_combatMessageExpiration;
     i32 m_combatMessagePending;
     char _pad_0x34b9[COMBAT_MESSAGE_STATE_PAD_SIZE];
-    H2_ENUM_STORAGE(CreatureType, u8) m_summonedCreatureType[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_sideDefeated[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_networkArmyPresent[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_playerId[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_experienceValue[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_heroCastSpell[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_armyCount[COMBAT_MANAGER_SIDE_COUNT];
-    class army m_armies[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_STORAGE_SLOT_COUNT];
-    i32 m_currentArmySide;
+    H2_ENUM_STORAGE(CreatureType, u8) m_summonedCreatureType[COMBAT_SIDE_COUNT];
+    i32 m_sideDefeated[COMBAT_SIDE_COUNT];
+    i32 m_networkArmyPresent[COMBAT_SIDE_COUNT];
+    i32 m_playerId[COMBAT_SIDE_COUNT];
+    i32 m_experienceValue[COMBAT_SIDE_COUNT];
+    i32 m_heroCastSpell[COMBAT_SIDE_COUNT];
+    i32 m_armyCount[COMBAT_SIDE_COUNT];
+    class army m_armies[COMBAT_SIDE_COUNT][COMBAT_ARMY_STORAGE_SLOT_COUNT];
+    H2_ENUM_STORAGE(CombatSide, i32) m_currentArmySide;
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
-    i32 m_currentSide;
+    H2_ENUM_STORAGE(CombatSide, i32) m_currentSide;
     i32 m_gridSelectionDisabled;
     i32 m_limitCreature;
     i32 m_limitCreatureHex;
@@ -572,27 +569,27 @@ public:
     struct SLimitData m_gateLimits;
     struct SLimitData m_upperWallLimits;
     struct SLimitData m_middleWallLimits;
-    i32 m_catapultFrame[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_catapultAttackCount[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_catapultAttacksRemaining[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_keepAttacksRemaining[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_catapultFrame[COMBAT_SIDE_COUNT];
+    i32 m_catapultAttackCount[COMBAT_SIDE_COUNT];
+    i32 m_catapultAttacksRemaining[COMBAT_SIDE_COUNT];
+    i32 m_keepAttacksRemaining[COMBAT_SIDE_COUNT];
     b32 m_inCastleCombat;
-    i32 m_unknownF337[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_visitingHeroPresent[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_unknownF337[COMBAT_SIDE_COUNT];
+    i32 m_visitingHeroPresent[COMBAT_SIDE_COUNT];
     char _pad_0xf347[COMBAT_RUNTIME_ALIGNMENT_SIZE];
     i32 m_unknownF34B;
     i32 m_unknownF34F;
     i32 m_unknownF353;
     i32 m_nonVisualCombat;
     i32 m_unknownF35B;
-    i32 m_killBenefit[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_killBenefit[COMBAT_SIDE_COUNT];
     class heroWindow* m_combatWindow;
     char _pad_0xf36b[COMBAT_RUNTIME_DOUBLE_PAD_SIZE];
     i32 m_unknownF373;
-    i32 m_sideRetreated[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_limitCreatureCount[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
-    i32 m_drawHero[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_drawHeroOverlay[COMBAT_MANAGER_SIDE_COUNT];
+    i32 m_sideRetreated[COMBAT_SIDE_COUNT];
+    i32 m_limitCreatureCount[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    i32 m_drawHero[COMBAT_SIDE_COUNT];
+    i32 m_drawHeroOverlay[COMBAT_SIDE_COUNT];
     i32 m_combatWindowOpen;
     class widget* m_winLoseBottomWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
     class widget* m_winLoseBottomTextWidgets[COMBAT_WIN_LOSE_WIDGET_COUNT];
@@ -603,14 +600,14 @@ public:
     i32 m_validDirectionCount;
     struct SLimitData m_smallViewLimits;
     char _pad_0xf533[COMBAT_SMALL_VIEW_PAD_SIZE];
-    i32 m_smallViewSide[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_smallViewArmyIndex[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_smallViewLastX[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_smallViewLastY[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_smallViewWidth[COMBAT_MANAGER_SIDE_COUNT];
-    i32 m_smallViewHeight[COMBAT_MANAGER_SIDE_COUNT];
+    H2_ENUM_STORAGE(CombatSide, i32) m_smallViewSide[COMBAT_SIDE_COUNT];
+    i32 m_smallViewArmyIndex[COMBAT_SIDE_COUNT];
+    i32 m_smallViewLastX[COMBAT_SIDE_COUNT];
+    i32 m_smallViewLastY[COMBAT_SIDE_COUNT];
+    i32 m_smallViewWidth[COMBAT_SIDE_COUNT];
+    i32 m_smallViewHeight[COMBAT_SIDE_COUNT];
     char _pad_0xf573[COMBAT_RUNTIME_ALIGNMENT_SIZE];
-    u8 m_removedArmies[COMBAT_MANAGER_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
+    u8 m_removedArmies[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     u8 m_removedArmyPresent;
     char m_battlefieldBackgroundName[COMBAT_BACKGROUND_NAME_SIZE];
     i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
@@ -634,11 +631,13 @@ public:
     void UpdateMouseGrid(i32, i32);
     void DrawFrame(i32, i32, i32, i32, i32, i32, i32);
     void DrawSmallView(i32, i32);
-    i32 ViewGeneral(i32, i32, i32);
+    i32 ViewGeneral(H2_ENUM_PARAM(CombatSide, i32), i32, i32);
     void ViewArmy(class army*, i32);
     i32 HasValidSpellTarget(SpellType);
     i32 ViewSpells(i32);
-    i32 FindResurrectArmyIndex(i32, H2_ENUM_PARAM(SpellType, i32), i32);
+    i32 FindResurrectArmyIndex(
+        H2_ENUM_PARAM(CombatSide, i32), H2_ENUM_PARAM(SpellType, i32), i32
+    );
     i32 ValidSpellTarget(SpellType, i32);
     void SpellMessage(SpellType, i32);
     void CastSpell(SpellType, i32, i32, i32);
@@ -689,8 +688,8 @@ public:
     );
     i32 GetNextChainLightningTarget(class army*, i32);
     void ChainLightning(i32, i32);
-    void VaporizeCreature(i32, i32);
-    void RippleCreature(i32, i32, CombatRippleMode);
+    void VaporizeCreature(H2_ENUM_PARAM(CombatSide, i32), i32);
+    void RippleCreature(H2_ENUM_PARAM(CombatSide, i32), i32, CombatRippleMode);
     void ShowMassSpell(
         i8 (*const)[COMBAT_ARMY_SLOT_COUNT],
         H2_ENUM_PARAM(CombatEffectType, i32),
@@ -699,7 +698,7 @@ public:
     void CastMassSpell(SpellType, i32);
     void MirrorImage(i32);
     void SummonElemental(H2_ENUM_PARAM(CreatureType, i32), i32);
-    void DoLuck(i32, i32);
+    void DoLuck(H2_ENUM_PARAM(CombatSide, i32), i32);
     void DoBlast(i32, H2_ENUM_PARAM(SpellType, i32));
     void Resurrect(H2_ENUM_PARAM(SpellType, i32), i32, i32);
     i32 SpaceForElementalExists(void);
@@ -743,7 +742,7 @@ public:
     void SetCombatViewArmySmallLevel(i32);
     void SetCombatGrid(i32, i32, i32);
     void AddArmy(
-        i32,
+        H2_ENUM_PARAM(CombatSide, i32),
         H2_ENUM_PARAM(CreatureType, i32),
         i32,
         i32,
@@ -752,7 +751,7 @@ public:
     );
     void SetupSmallView(void);
     void ViewBallista(i32);
-    i32 DoSpellAI(i32, i32);
+    i32 DoSpellAI(H2_ENUM_PARAM(CombatSide, i32), i32);
     void DetermineEffectOfSpell(SpellType, i32*, i32*);
     i32 EffectSpellCreateCreature(i32, SpellType);
     i32 RawEffectSpellInfluence(class army*, ArmySpellInfluence);
@@ -778,7 +777,7 @@ public:
     );
     void InitNonVisualVars(void);
     void SetupAdjacencyArray(void);
-    void UpdateArmyGroup(i32);
+    void UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32));
     void GenerateMap(void);
     char* GetBackgroundName(void);
     i32 MoreTreesNear(void);
@@ -787,13 +786,13 @@ public:
     void LoadArmies(void);
     void FreeArmies(void);
     i32 GetGridIndex(i32, i32);
-    void CheckApplyGoodMorale(i32, i32);
-    i32 CheckApplyBadMorale(i32, i32);
+    void CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32), i32);
+    i32 CheckApplyBadMorale(H2_ENUM_PARAM(CombatSide, i32), i32);
     i32 GetNextArmy(i32);
-    i32 IsWinner(i32);
-    void CatAttack(i32);
+    i32 IsWinner(H2_ENUM_PARAM(CombatSide, i32));
+    void CatAttack(H2_ENUM_PARAM(CombatSide, i32));
     void KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32));
-    i32 ExperienceValueOfStack(i32);
+    i32 ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32));
     void ResetHitByCreature(void);
     void SaveCombatBorder(void);
     void DrawCombatBorder(void);
@@ -803,34 +802,34 @@ public:
     void RaiseDoor(void);
     void TestRaiseDoor(void);
     i32 InCastle(i32);
-    i32 ShotIsThroughWall(i32, i32, i32);
+    i32 ShotIsThroughWall(H2_ENUM_PARAM(CombatSide, i32), i32, i32);
     void ShootMissile(i32, i32, i32, i32, float*, class icon*);
     void CombatSystemOptions(void);
     i32 AICheckRetreat(void);
-    void DoCompAI(i32);
+    void DoCompAI(H2_ENUM_PARAM(CombatSide, i32));
     float GetModLichDamage(class army*, float);
     void DoLichShot(class army*);
-    i32 GetShooterMask(i32);
-    i32 GetMirrorImageMask(i32);
-    i32 GetFlyerMask(i32);
-    i32 GetAllMask(i32);
-    i32 GetWalkerMask(i32);
-    i32 GetOutOfItMask(i32);
-    i32 GetTraitorMask(i32);
-    i32 GetBestArmy(i32, i32);
-    i32 GetWorstArmy(i32, i32);
-    i32 GetClosestArmy(class army*, i32, i32);
-    u32l GetStrength(i32, i32);
-    i32 AttemptAttack(class army*, i32, i32);
+    i32 GetShooterMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetAllMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32));
+    i32 GetBestArmy(H2_ENUM_PARAM(CombatSide, i32), i32);
+    i32 GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32), i32);
+    i32 GetClosestArmy(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
+    u32l GetStrength(H2_ENUM_PARAM(CombatSide, i32), i32);
+    i32 AttemptAttack(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
     i32 AttemptAdjacentAttack(class army*);
-    i32 WalkTowardArmyFront(class army*, i32, i32);
-    i32 WalkTowardArmy(class army*, i32, i32);
+    i32 WalkTowardArmyFront(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
+    i32 WalkTowardArmy(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
 };
 #pragma pack(pop)
 SIZE(combatManager, 0xf877);
 extern i32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
-extern i32 iViewGeneralWhichSide;
+extern H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide;
 extern i32 castX;
 extern i32 castY;
 extern i32 bInTeleportGetDest;

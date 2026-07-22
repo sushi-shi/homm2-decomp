@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/KB_TYPES.h>
+#include <SOURCE/combatTypes.h>
 
 struct tag_message;
 
@@ -32,7 +33,6 @@ H2_ENUM_BEGIN(SpellCastConstant)
     SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION         = 3,
     SPELL_MINIMUM_DEFENSE                          = 1,
     SPELL_BLOOD_LUST_DURATION                      = 3,
-    COMBAT_SIDE_COUNT                              = 2,
     COMBAT_HEX_EMPTY                               = -1,
     COMBAT_DRAW_DELAY                              = 75,
     COMBAT_SPELL_TARGET_Y_OFFSET                   = 17,

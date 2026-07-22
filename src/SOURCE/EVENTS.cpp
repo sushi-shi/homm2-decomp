@@ -7782,12 +7782,12 @@ i32 advManager::DoNetCombat(char* packet) {
     // Original-source anchor consumed by H2_FREE line reconstruction.
     static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
     hero* secondHero9;
-    i32 secondSide15;
+    i32 setupCombatY15;
     i32 combatX1;
     i32 combatY8;
     i32 randomSeed1;
     i8 combatResult16;
-    i32 firstSide2;
+    i32 setupCombatX2;
     hero* firstHero29;
     i32 remotePlayer8;
     i32 firstPlayer3;
@@ -7810,8 +7810,8 @@ i32 advManager::DoNetCombat(char* packet) {
         &combatTown,
         &secondHero9,
         &secondArmy10,
-        &firstSide2,
-        &secondSide15,
+        &setupCombatX2,
+        &setupCombatY15,
         &randomSeed1,
         &combatResult16,
         &gbRetreatWin,
@@ -7826,8 +7826,8 @@ i32 advManager::DoNetCombat(char* packet) {
         combatTown,
         secondHero9,
         secondArmy10,
-        firstSide2,
-        secondSide15,
+        setupCombatX2,
+        setupCombatY15,
         randomSeed1,
         0
     ));
@@ -7840,8 +7840,8 @@ i32 advManager::DoNetCombat(char* packet) {
             combatTown,
             secondHero9,
             secondArmy10,
-            firstSide2,
-            secondSide15,
+            setupCombatX2,
+            setupCombatY15,
             randomSeed1,
             remotePlayer8,
             combatResult16,
@@ -7872,8 +7872,8 @@ i32 advManager::DoCombat(
     town* combatTown,
     hero* secondHero,
     armyGroup* secondArmy,
-    i32 firstSide,
-    i32 secondSide,
+    i32 setupCombatX,
+    i32 setupCombatY,
     i32 randomSeed,
     i32 processLosses
 ) {
@@ -7903,8 +7903,8 @@ i32 advManager::DoCombat(
             combatTown,
             secondHero,
             secondArmy,
-            firstSide,
-            secondSide,
+            setupCombatX,
+            setupCombatY,
             randomSeed,
             processLosses
         );
@@ -7919,8 +7919,8 @@ i32 advManager::DoCombat(
 
     if (firstPlayer4 >= 0 && secondPlayer7 >= 0 && gbHumanPlayer[secondPlayer7]) {
         if (!gbThisNetHumanPlayer[secondPlayer7]) {
-            iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = giThisNetPos;
-            iCombatControlNetPos[COMBAT_DEFENDER_SIDE] = gbGamePosToNetPos[secondPlayer7];
+            iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = giThisNetPos;
+            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = gbGamePosToNetPos[secondPlayer7];
             SendHeroTownData(
                 x,
                 y,
@@ -7929,8 +7929,8 @@ i32 advManager::DoCombat(
                 combatTown,
                 secondHero,
                 secondArmy,
-                firstSide,
-                secondSide,
+                setupCombatX,
+                setupCombatY,
                 randomSeed,
                 gbGamePosToNetPos[secondPlayer7],
                 0,
@@ -7962,8 +7962,8 @@ i32 advManager::DoCombat(
                                     &receivedTown,
                                     &receivedSecondHero9,
                                     &receivedSecondArmy2,
-                                    &firstSide,
-                                    &secondSide,
+                                    &setupCombatX,
+                                    &setupCombatY,
                                     &randomSeed,
                                     &combatResult3,
                                     &gbRetreatWin,
@@ -8084,8 +8084,8 @@ void advManager::SendHeroTownData(
     town* combatTown,
     hero* secondHero,
     armyGroup* secondArmy,
-    i32 firstSide,
-    i32 secondSide,
+    i32 setupCombatX,
+    i32 setupCombatY,
     i32 randomSeed,
     i32 remotePlayer,
     i32 combatResult,
@@ -8106,8 +8106,8 @@ void advManager::SendHeroTownData(
     buffer->hasFirstHero = firstHero != NULL;
     buffer->hasTown = combatTown != NULL;
     buffer->hasSecondHero = secondHero != NULL;
-    buffer->firstSide = static_cast<i8>(firstSide);
-    buffer->secondSide = static_cast<i8>(secondSide);
+    buffer->setupCombatX = static_cast<i8>(setupCombatX);
+    buffer->setupCombatY = static_cast<i8>(setupCombatY);
     buffer->randomSeed = randomSeed;
     buffer->combatResult = static_cast<i8>(combatResult);
     buffer->retreatWin = static_cast<i8>(retreatWin);
@@ -8226,8 +8226,8 @@ void advManager::ReceiveHeroTownData(
     town** combatTown,
     hero** secondHero,
     armyGroup** secondArmy,
-    i32* firstSide,
-    i32* secondSide,
+    i32* setupCombatX,
+    i32* setupCombatY,
     i32* randomSeed,
     i8* combatResult,
     i8* retreatWin,
@@ -8259,8 +8259,8 @@ void advManager::ReceiveHeroTownData(
     hasFirstHero7 = EVENTS_REMOTE_COMBAT(packet)->hasFirstHero;
     hasTown0 = EVENTS_REMOTE_COMBAT(packet)->hasTown;
     hasSecondHero8 = EVENTS_REMOTE_COMBAT(packet)->hasSecondHero;
-    *firstSide = EVENTS_REMOTE_COMBAT(packet)->firstSide;
-    *secondSide = EVENTS_REMOTE_COMBAT(packet)->secondSide;
+    *setupCombatX = EVENTS_REMOTE_COMBAT(packet)->setupCombatX;
+    *setupCombatY = EVENTS_REMOTE_COMBAT(packet)->setupCombatY;
     *randomSeed = EVENTS_REMOTE_COMBAT(packet)->randomSeed;
     *combatResult = EVENTS_REMOTE_COMBAT(packet)->combatResult;
     *retreatWin = EVENTS_REMOTE_COMBAT(packet)->retreatWin;
@@ -8283,8 +8283,8 @@ void advManager::ReceiveHeroTownData(
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
-    iCombatControlNetPos[COMBAT_ATTACKER_SIDE] = *remotePlayer;
-    iCombatControlNetPos[COMBAT_DEFENDER_SIDE] = giThisNetPos;
+    iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = *remotePlayer;
+    iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = giThisNetPos;
     result7 = TransmitRemoteData(
         NULL,
         *remotePlayer,
@@ -8379,8 +8379,8 @@ i32 advManager::AutoResolveCombat(
     town* combatTown,
     hero* secondHero,
     armyGroup* secondArmy,
-    i32 firstSide,
-    i32 secondSide,
+    i32 setupCombatX,
+    i32 setupCombatY,
     i32 randomSeed,
     i32 processLosses
 ) {

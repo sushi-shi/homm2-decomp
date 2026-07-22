@@ -5,10 +5,6 @@
 #include <BASE/icon.h>
 #include <SOURCE/combatTypes.h>
 
-H2_ENUM_BEGIN(CombatOccupant)
-    COMBAT_OCCUPANT_NONE = -1
-H2_ENUM_END(CombatOccupant)
-
 H2_ENUM_BEGIN(HexcellConstant)
     COMBAT_DEAD_OCCUPANT_CAPACITY = 14,
     HEXCELL_LIMIT_COUNT           = 2
@@ -26,11 +22,11 @@ public:
     i16 m_gridBottom;
     u8 m_blocked;
     i8 m_obstacleIndex;
-    i8 m_occupantSide;
+    H2_ENUM_STORAGE(CombatSide, i8) m_occupantSide;
     i8 m_occupantIndex;
     H2_ENUM_STORAGE(ArmyFacing, i8) m_occupantFrame;
     i32 m_deadOccupantCount;
-    i8 m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
+    H2_ENUM_STORAGE(CombatSide, i8) m_deadOccupantSides[COMBAT_DEAD_OCCUPANT_CAPACITY];
     i8 m_deadOccupantIndices[COMBAT_DEAD_OCCUPANT_CAPACITY];
     H2_ENUM_STORAGE(ArmyFacing, i8) m_deadOccupantFrames[COMBAT_DEAD_OCCUPANT_CAPACITY];
     u8 m_pathReachable;

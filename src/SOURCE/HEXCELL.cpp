@@ -16,7 +16,7 @@ VA(0x0044a3c0, 0x46)
 hexcell::hexcell(void) {
     m_obstacleIndex = -1;
     m_blocked = 0;
-    m_occupantSide = -1;
+    m_occupantSide = COMBAT_SIDE_NONE;
     m_occupantIndex = 0;
     m_occupantFrame = ARMY_FACING_NONE;
     m_deadOccupantCount = 0;
@@ -35,7 +35,8 @@ void hexcell::DrawLowerDeadOccupants(void) {
 
     if (m_deadOccupantCount > 0) {
         for (i = 0; i < m_deadOccupantCount - 1; ++i) {
-            occupant = &gpCombatManager->m_armies[m_deadOccupantSides[i]][m_deadOccupantIndices[i]];
+            occupant =
+                &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             currentFrame = occupant->m_facing;
             if (m_deadOccupantFrames[i] != currentFrame)
                 occupant->DrawToBuffer(m_x, m_y, 0);
@@ -51,7 +52,8 @@ void hexcell::DrawUpperDeadOccupant(void) {
 
     if (m_deadOccupantCount > 0) {
         for (i = m_deadOccupantCount - 1; i < m_deadOccupantCount; ++i) {
-            occupant = &gpCombatManager->m_armies[m_deadOccupantSides[i]][m_deadOccupantIndices[i]];
+            occupant =
+                &gpCombatManager->m_armies[IDX(m_deadOccupantSides[i])][m_deadOccupantIndices[i]];
             currentFrame = occupant->m_facing;
             if (m_deadOccupantFrames[i] != currentFrame)
                 occupant->DrawToBuffer(m_x, m_y, 0);
@@ -61,16 +63,18 @@ void hexcell::DrawUpperDeadOccupant(void) {
 
 VA(0x0044a5aa, 0x165)
 void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
-    if (m_occupantSide != COMBAT_OCCUPANT_NONE) {
+    if (m_occupantSide != COMBAT_SIDE_NONE) {
         if (drawState != ARMY_DRAW_ALL) {
-            if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_drawState != drawState)
+            if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_drawState
+                != drawState)
                 return;
         }
         if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
             && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
             gbCurrArmyDrawn = true;
-        if (gpCombatManager->m_armies[m_occupantSide][m_occupantIndex].m_facing != m_occupantFrame)
-            gpCombatManager->m_armies[m_occupantSide][m_occupantIndex]
+        if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_facing
+            != m_occupantFrame)
+            gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex]
                 .DrawToBuffer(m_x, m_y, frame);
     }
 }

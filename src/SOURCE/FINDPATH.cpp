@@ -359,8 +359,11 @@ void searchArray::SeedCombatPosition(class army* unit) {
         }
     }
 
-    for (i32 index = 0; index < gpCombatManager->m_armyCount[1 - unit->m_side]; index++) {
-        army* enemy = &gpCombatManager->m_armies[1 - unit->m_side][index];
+    for (i32 index = 0;
+         index < gpCombatManager->m_armyCount[IDX(OppositeCombatSide(unit->m_side))];
+         index++) {
+        army* enemy =
+            &gpCombatManager->m_armies[IDX(OppositeCombatSide(unit->m_side))][index];
         unit->m_targetSide = enemy->m_side;
         unit->m_targetIndex = enemy->m_index;
         hex = enemy->m_hex;
@@ -391,7 +394,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
         }
     }
     unit->m_targetIndex = -1;
-    unit->m_targetSide = -1;
+    unit->m_targetSide = COMBAT_SIDE_NONE;
 }
 
 VA(0x004a53f0, 0x410)
@@ -464,7 +467,7 @@ i32 searchArray::FindCombatPath(
                     - gpCombatManager->m_hexCells[targetHex].m_y);
             i32 distance = ApproximateGridDistance(xDistance, yDistance);
 
-            if (unit->m_targetSide != -1) {
+            if (unit->m_targetSide != COMBAT_SIDE_NONE) {
                 attackMask =
                     unit->GetAttackMask(currentHex, ARMY_ATTACK_TARGET_ASSIGNED, attackTargetHex);
                 if (attackMask != ATTACK_MASK_SURROUNDED) {
@@ -514,7 +517,7 @@ i32 searchArray::FindCombatPath(
         goto searchComplete;
 
     searchComplete:
-        if (unit->m_targetSide != -1) {
+        if (unit->m_targetSide != COMBAT_SIDE_NONE) {
             if (m_pathLength == 0)
                 goto restoreMoatFailure;
         } else if (bestHex != targetHex) {

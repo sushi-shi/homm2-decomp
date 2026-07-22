@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_KB_TYPES_H
 
 #include <va.h>
+#include <SOURCE/combatTypes.h>
 
 class sample;
 
@@ -725,14 +726,13 @@ struct tag_monsterInfo {
 SIZE(tag_monsterInfo, 0x1a);
 H2_ENUM_BEGIN(CombatHeroAnimationConstant)
     COMBAT_HERO_ANIMATION_COUNT       = 12,
-    COMBAT_HERO_ANIMATION_FRAME_COUNT = 9,
-    COMBAT_HERO_SIDE_COUNT            = 2
+    COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
 H2_ENUM_END(CombatHeroAnimationConstant)
 
 #pragma pack(push, 1)
 struct SCmbtHero {
-    i16 x[COMBAT_HERO_SIDE_COUNT];
-    i16 y[COMBAT_HERO_SIDE_COUNT];
+    i16 x[COMBAT_SIDE_COUNT];
+    i16 y[COMBAT_SIDE_COUNT];
     u8 idleAnimationCount;
     i8 animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
     i8 animationFrames[COMBAT_HERO_ANIMATION_COUNT][COMBAT_HERO_ANIMATION_FRAME_COUNT];

@@ -3855,7 +3855,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
                         gpCombatManager->m_hexCells[formationHexIndex].m_blocked = 1;
                 }
                 gpCombatManager->SetupGridForArmy(
-                    &gpCombatManager->m_armies[gpCombatManager->m_currentArmySide]
+                    &gpCombatManager->m_armies[IDX(gpCombatManager->m_currentArmySide)]
                                               [gpCombatManager->m_currentArmyIndex]
                 );
                 gpCombatManager->DrawFrame(1, 0, 0, 0, 0, 1, 1);
@@ -9931,7 +9931,7 @@ DATA(0x005285b8) i32 giMaxExtentY;
 DATA(0x005285bc) i32 giRandomClouds;
 DATA(0x005285c0) char cOverrideDigitalDriver[GLOBAL_DRIVER_NAME_SIZE];
 DATA(0x005285d0) i32 giBottomViewOverrideEndTime;
-DATA(0x005285d8) i8 gArmyEffected[COMBAT_CONTROL_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
+DATA(0x005285d8) i8 gArmyEffected[COMBAT_SIDE_COUNT][KB_ARMY_EFFECT_COUNT];
 DATA(0x00528600) H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
 DATA(0x00528604) b32 gbInCampaign;
 DATA(0x00528608) i32 giResExtra1;
@@ -10005,7 +10005,7 @@ DATA(0x00529118) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x00529278) i32 giFullySeeded;
 DATA(0x0052927c) icon* gBuyBuildIcons;
 DATA(0x00529280) b32 gbNoSound;
-DATA(0x00529288) i32 iCombatControlNetPos[COMBAT_CONTROL_SIDE_COUNT];
+DATA(0x00529288) i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 DATA(0x00529290) char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005293f0) b32 gbMoveShown;
 DATA(0x005293f4) void** ppMapExtra;
@@ -10015,7 +10015,7 @@ DATA(0x00529458) b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
 DATA(0x00529460) char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 DATA(0x005295c0) class heroWindow* heroWin;
 DATA(0x005295c4) i32 giOverviewReturnActionExtra;
-DATA(0x005295c8) i32 giCurGeneral;
+DATA(0x005295c8) H2_ENUM_STORAGE(CombatSide, i32) giCurGeneral;
 DATA(0x005295cc) i32 giThisGamePos;
 DATA(0x005295d0) i32 giNumHumanPlayers;
 DATA(0x005295d4) b32 gbIconClipOn;
