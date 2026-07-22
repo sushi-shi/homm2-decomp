@@ -335,13 +335,6 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_CASTLE_BACKGROUND_DEFAULT_FRAME  = 3
 H2_ENUM_END(CombatGridConstant)
 
-H2_ENUM_BEGIN(CombatResultConstant)
-    COMBAT_RESULT_DRAW     = -1,
-    COMBAT_RESULT_ATTACKER = 0,
-    COMBAT_RESULT_DEFENDER = 1,
-    COMBAT_RESULT_PENDING  = 3
-H2_ENUM_END(CombatResultConstant)
-
 H2_ENUM_CLASS_BEGIN(BattlefieldFringeFrame)
     FRINGE_NONE        = -1,
     FRINGE_BEACH       = 2,
@@ -613,7 +606,7 @@ public:
     i8 m_adjacency[COMBAT_HEX_COUNT][COMBAT_AI_ADJACENT_DIRECTION_COUNT];
     class heroWindow* m_winLoseWindow;
     SpellType m_selectedSpell;
-    i32 m_combatResult;
+    H2_ENUM_STORAGE(CombatResult, i32) m_combatResult;
     combatManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
@@ -727,7 +720,7 @@ public:
     void ShowSkeletons(class heroWindow*);
     void ShowEagleEyeSpell(class heroWindow*);
     void ShowDeadArmies(class heroWindow*);
-    void DoVictory(i32);
+    void DoVictory(H2_ENUM_PARAM(CombatResult, i32));
     void DoLoseWindow(void);
     i32 DoSurrender(void);
     void CheckChangeSelector(void);

@@ -637,7 +637,7 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
         }
     }
 
-    if (giSkeletonsCreated && m_combatResult == IDX(side))
+    if (giSkeletonsCreated && m_combatResult == CombatResultForSide(side))
         m_armyGroups[IDX(side)]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
 

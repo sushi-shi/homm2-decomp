@@ -54,7 +54,7 @@ public:
     i32 m_hex;
     ArmyAnimationSequence m_animationSequence;
     i32 m_animationFrame;
-    ArmyFacing m_facing;
+    H2_ENUM_STORAGE(ArmyFacing, i32) m_facing;
     CombatHexDirection m_walkDirection;
     i32 m_facingChanged;
     i32 m_initialQuantity;
