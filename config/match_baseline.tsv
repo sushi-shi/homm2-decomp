@@ -427,7 +427,7 @@ EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	97.2789	
 EDITOR/mapcell	?GetNewCellExtraOverlay@fullMap@@QAEPAUmapCellExtra@@HH@Z	97.2789	16627ff13c5e
 EDITOR/mapcell	?Init@fullMap@@QAEXHH@Z	100.0000	c04f466bc074
 EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	98.7330	107173601e1d
-EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	4a2aaa54ffdc
+EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	34dea1fbd9ba
 SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	363ca89e79c0
 SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	0.0000	07a5019e47c4
 SOURCE/ADVMGR	?AdvPanel@advManager@@QAEXXZ	100.0000	9b1fd3d74715
