@@ -2375,7 +2375,7 @@ void GetDataEntry(
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
     message.payload.widget.id = ENTRY_BUTTON_ONE;
-    message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     DataEntryWin->BroadcastMessage(message);
     message.payload.widget.id = ENTRY_BUTTON_SEVEN;
     DataEntryWin->BroadcastMessage(message);
@@ -2429,14 +2429,14 @@ void GetDataEntry(
 }
 
 VA(0x004c6e50, 0x173)
-i32 DataEntryWindowHandler(struct tag_message& message) {
+WidgetDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
         message.payload.mouse.x = inBoxX;
         message.payload.mouse.y = inBoxY;
         DataEntryWin->BroadcastMessage(message);
-        return EVENT_WINDOW_CONTINUE;
+        return WIDGET_DISPATCH_CONSUME;
     }
 
     if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT)
@@ -2473,7 +2473,7 @@ i32 DataEntryWindowHandler(struct tag_message& message) {
             gpWindowManager->m_dialogResult = message.payload.widget.id;
             message.payload.widget.id = ENTRY_TEXT_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-            return EVENT_WINDOW_CLOSE;
+            return WIDGET_DISPATCH_FORWARD;
         }
     }
 
@@ -2482,7 +2482,7 @@ possibleCancelEvent:
         goto normalEvent;
     message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-    return EVENT_WINDOW_CLOSE;
+    return WIDGET_DISPATCH_FORWARD;
 
 normalEvent:
     return EventWindowHandler(message);

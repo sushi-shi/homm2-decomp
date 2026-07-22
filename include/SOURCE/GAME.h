@@ -2,6 +2,7 @@
 #define HOMM2_GAME_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
@@ -157,9 +158,9 @@ H2_ENUM_END(GameHeroPoolConstant)
 i32 GetNumObelisks(i32 color);
 void ComputeUALoc(i32);
 void GenerateStandardFileName(char*, char*);
-i32 ViewSpellsHandler(struct tag_message&);
-i32 ViewSpecialHandler(struct tag_message&);
-i32 ViewArmyHandler(struct tag_message&);
+WidgetDispatchResult ViewSpellsHandler(struct tag_message&);
+WidgetDispatchResult ViewSpecialHandler(struct tag_message&);
+WidgetDispatchResult ViewArmyHandler(struct tag_message&);
 i32 IsCursedItem(ArtifactType item);
 i32 CalcBaseScore(i32);
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos);

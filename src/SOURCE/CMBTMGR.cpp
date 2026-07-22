@@ -59,8 +59,6 @@ H2_ENUM_END(CombatSystemOptionWidget)
 H2_ENUM_BEGIN(CombatSystemOptionConstant)
     SYSTEM_OPTION_CYCLE_COUNT             = 3,
     SYSTEM_OPTION_HELP_DIALOG             = 4,
-    SYSTEM_OPTION_HANDLER_CONTINUE        = 1,
-    SYSTEM_OPTION_HANDLER_CLOSE           = 2,
     SYSTEM_OPTION_SPEED_STATE_OFFSET      = 0,
     SYSTEM_OPTION_ARMY_INFO_STATE_OFFSET  = 3,
     SYSTEM_OPTION_AUTO_SPELL_STATE_OFFSET = 6,
@@ -2318,7 +2316,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
 }
 
 VA(0x004960a9, 0x39a)
-i32 CombatSystemOptionsHandler(tag_message& message) {
+WidgetDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;
     i32 bDone = 0;
     char optionText[COMBAT_MESSAGE_LINE_SIZE];
@@ -2422,9 +2420,9 @@ i32 CombatSystemOptionsHandler(tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = SYSTEM_OPTION_SPEED_BUTTON;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return SYSTEM_OPTION_HANDLER_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return SYSTEM_OPTION_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 

@@ -301,8 +301,6 @@ H2_ENUM_BEGIN(AdventureTravelSpellConstant)
     DIMENSION_DOOR_FIRST_BUTTON = 10,
     DIMENSION_DOOR_LAST_BUTTON  = 11,
     DIMENSION_DOOR_CLOSE_BUTTON = 0x7800,
-    DIMENSION_DOOR_UNHANDLED    = 1,
-    DIMENSION_DOOR_HANDLED      = 2,
     TOWN_PORTAL_WINDOW_X        = 159,
     TOWN_PORTAL_WINDOW_Y        = 65,
     TOWN_PORTAL_DISTANCE_LIMIT  = 1000
@@ -314,8 +312,6 @@ H2_ENUM_BEGIN(AdventureTownPortalMessage)
     TOWN_PORTAL_CLOSE_WIDGET  = 10,
     TOWN_PORTAL_FIRST_CHOICE  = 0x7801,
     TOWN_PORTAL_LAST_CHOICE   = 0x7802,
-    TOWN_PORTAL_UNHANDLED     = 1,
-    TOWN_PORTAL_HANDLED       = 2
 H2_ENUM_END(AdventureTownPortalMessage)
 
 H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
@@ -327,15 +323,16 @@ H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
 H2_ENUM_END(AdventureSoundTilesetConstant)
 
 H2_ENUM_BEGIN(AdventureOpenConstant)
-    SCROLL_Y           = 195,
-    SCROLL_LEFT_X      = 540,
-    SCROLL_RIGHT_X     = 612,
-    SCROLL_WIDTH       = 8,
-    SCROLL_HEIGHT      = 17,
-    SCROLL_LEFT_FRAME  = 26,
-    SCROLL_RIGHT_FRAME = 27,
-    TIMER_DELAY        = 120,
-    MANAGER_MESSAGE    = 0x400
+    SCROLL_Y          = 195,
+    SCROLL_LEFT_X     = 540,
+    SCROLL_RIGHT_X    = 612,
+    SCROLL_WIDTH      = 8,
+    SCROLL_HEIGHT     = 17,
+    SCROLL_ICON_FRAME = 4,
+    SCROLL_LEFT_ID    = 26,
+    SCROLL_RIGHT_ID   = 27,
+    TIMER_DELAY       = 120,
+    MANAGER_MESSAGE   = 0x400
 H2_ENUM_END(AdventureOpenConstant)
 
 H2_ENUM_BEGIN(AdventureInterfaceConstant)
@@ -347,8 +344,6 @@ H2_ENUM_END(AdventureInterfaceConstant)
 
 H2_ENUM_BEGIN(AdventureSystemOptionsMessage)
     SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800,
-    SYSTEM_OPTIONS_UNHANDLED     = 1,
-    SYSTEM_OPTIONS_HANDLED       = 2
 H2_ENUM_END(AdventureSystemOptionsMessage)
 
 H2_ENUM_BEGIN(AdventureSystemOptionConstant)
@@ -1058,9 +1053,9 @@ i32 advManager::Open(i32 id) {
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
             "scroll.icn",
-            WIDGET_FLAG_DRAW,
+            SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
-            SCROLL_LEFT_FRAME,
+            SCROLL_LEFT_ID,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -1074,9 +1069,9 @@ i32 advManager::Open(i32 id) {
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
             "scroll.icn",
-            WIDGET_FLAG_DRAW,
+            SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
-            SCROLL_RIGHT_FRAME,
+            SCROLL_RIGHT_ID,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -6629,14 +6624,14 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         || BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
-        messageLocal.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         townQuickWindow->BroadcastMessage(messageLocal);
     }
 
     if (quickTownLocal->m_owner == -1) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
-        messageLocal.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         townQuickWindow->BroadcastMessage(messageLocal);
         ++messageLocal.payload.widget.id;
         townQuickWindow->BroadcastMessage(messageLocal);
@@ -7422,7 +7417,7 @@ void advManager::CheckCastSpell(void) {
 }
 
 VA(0x00465191, 0x31c)
-i32 DimensionDoorHandler(tag_message& message) {
+WidgetDispatchResult DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
         gpAdvManager->UpdateScreen(0, 0);
@@ -7497,7 +7492,7 @@ i32 DimensionDoorHandler(tag_message& message) {
             } else {
                 gpWindowManager->m_dialogResult = 0;
                 gpMouseManager->SetPointer(POINTER_DEFAULT);
-                return DIMENSION_DOOR_UNHANDLED;
+                return WIDGET_DISPATCH_CONSUME;
             }
             break;
     }
@@ -7505,9 +7500,9 @@ i32 DimensionDoorHandler(tag_message& message) {
     if (handled) {
         message.payload.widget.id = DIMENSION_DOOR_FIRST_BUTTON;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return DIMENSION_DOOR_HANDLED;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return DIMENSION_DOOR_UNHANDLED;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x004654ad, 0x11a9)
@@ -8391,7 +8386,7 @@ void advManager::DimensionDoor(void) {
 }
 
 VA(0x00467734, 0x129)
-i32 TownPortalHandler(tag_message& message) {
+WidgetDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active) {
@@ -8414,7 +8409,7 @@ i32 TownPortalHandler(tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                        return TOWN_PORTAL_HANDLED;
+                        return WIDGET_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -8424,7 +8419,7 @@ i32 TownPortalHandler(tag_message& message) {
         }
     }
 
-    return TOWN_PORTAL_UNHANDLED;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0046785d, 0x43e)
@@ -9774,7 +9769,7 @@ void advManager::AdvPanel(void) {
             adventurePanel->BroadcastMessage(message);
             message.payload.widget.id = PANEL_DISABLED_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
             adventurePanel->BroadcastMessage(message);
         }
 
@@ -9828,7 +9823,7 @@ void advManager::AdvPanel(void) {
 }
 
 VA(0x0046a9d0, 0x1ca)
-i32 APanelHandler(tag_message& message) {
+WidgetDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
@@ -9877,9 +9872,9 @@ i32 APanelHandler(tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return DIMENSION_DOOR_HANDLED;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return DIMENSION_DOOR_UNHANDLED;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0046ab9a, 0x1e4)
@@ -9900,14 +9895,14 @@ i32 advManager::ControlPanel(void) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.id = CONTROL_RESTART;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         controlPanel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
         controlPanel->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEW_GAME;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
         controlPanel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
@@ -9936,7 +9931,7 @@ i32 advManager::ControlPanel(void) {
 }
 
 VA(0x0046ad7e, 0x304)
-i32 CPanelHandler(tag_message& message) {
+WidgetDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
         if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_LEFT_SHIFT)) {
@@ -10036,9 +10031,9 @@ i32 CPanelHandler(tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return DIMENSION_DOOR_HANDLED;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return DIMENSION_DOOR_UNHANDLED;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0046b082, 0x197)
@@ -10189,7 +10184,7 @@ void UpdateSystemOptions(i32 initialDraw) {
 }
 
 VA(0x0046b578, 0x672)
-i32 SystemOptionsHandler(struct tag_message& message) {
+WidgetDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];
     i32 accepted = 0;
@@ -10414,9 +10409,9 @@ i32 SystemOptionsHandler(struct tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = ADVMGR_SYSTEM_OPTION_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return SYSTEM_OPTIONS_HANDLED;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return SYSTEM_OPTIONS_UNHANDLED;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0046bbea, 0x7f)

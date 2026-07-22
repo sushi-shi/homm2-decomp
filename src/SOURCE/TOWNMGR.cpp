@@ -789,7 +789,7 @@ void townManager::SetupTown(void) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & BIT(objectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
-                            ~TOWN_OBJECT_BORDER_ENABLED;
+                            ~WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
                     }
                     m_townWindow->AddWidget(
@@ -810,11 +810,11 @@ void townManager::SetupTown(void) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & BIT(existingObjectId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
-                            ~TOWN_OBJECT_BORDER_ENABLED;
+                            ~WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
                     } else {
                         m_townObjects[m_townObjectCount]->m_border->m_flags |=
-                            TOWN_OBJECT_BORDER_ENABLED;
+                            WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 1;
                     }
                 }
@@ -1594,10 +1594,10 @@ i32 townManager::Main(tag_message& message) {
                                         message.type = MESSAGE_WIDGET;
                                         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
                                         message.payload.widget.id = DIALOG_BUILD_BOAT;
-                                        message.payload.widget.data.value = WIDGET_FLAG_GRAYED;
+                                        message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                                        message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+                                        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
                                         m_heroWindow0->BroadcastMessage(message);
                                     }
                                     gpWindowManager
@@ -2392,15 +2392,15 @@ i32 townManager::BuyBuild(
     m_selectedBuilding = BUILDING_SLOT_NONE;
     if (quickView != 0) {
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message_m.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message_m.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message_m.payload.widget.id = IDX(DIALOG_CANCEL_ID);
         window_a->BroadcastMessage(message_m);
         message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message_m.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message_m.payload.widget.id = 0;
         window_a->BroadcastMessage(message_m);
         gpWindowManager->AddWindow(window_a, -1, 1);
@@ -2410,11 +2410,11 @@ i32 townManager::BuyBuild(
         if (cannotBuy != 0) {
             message_m.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message_m.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+            message_m.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             window_a->BroadcastMessage(message_m);
             message_m.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message_m.payload.widget.id = TOWN_DIALOG_CONFIRM;
-            message_m.payload.widget.data.value = WIDGET_FLAG_GRAYED;
+            message_m.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
             window_a->BroadcastMessage(message_m);
         }
         gpWindowManager->DoDialog(window_a, TrueFalseDialogHandler, 0);
@@ -2461,10 +2461,10 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
         for (index_j = 0; index_j < m_townObjectCount; ++index_j) {
             if (m_town->m_buildings & BIT(m_townObjects[index_j]->m_buildingId)) {
                 m_townObjects[index_j]->m_visible = 1;
-                m_townObjects[index_j]->m_border->m_flags |= TOWN_OBJECT_BORDER_ENABLED;
+                m_townObjects[index_j]->m_border->m_flags |= WIDGET_FLAG_ENABLED;
             } else {
                 m_townObjects[index_j]->m_visible = 0;
-                m_townObjects[index_j]->m_border->m_flags &= ~TOWN_OBJECT_BORDER_ENABLED;
+                m_townObjects[index_j]->m_border->m_flags &= ~WIDGET_FLAG_ENABLED;
             }
         }
 
@@ -2586,7 +2586,7 @@ void townManager::SetupMage(heroWindow* window) {
                 message_b.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             message_b.payload.widget.id =
                 level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m + TOWN_MAGE_FIRST_SPELL_CONTROL;
-            message_b.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            message_b.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             window->BroadcastMessage(message_b);
 
             if (spellState_m != TOWN_MAGE_SPELL_UNAVAILABLE) {
@@ -2599,7 +2599,7 @@ void townManager::SetupMage(heroWindow* window) {
 
             if (spellState_m != 0) {
                 message_b.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                message_b.payload.widget.data.value = WIDGET_FLAG_DRAW;
+                message_b.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
                 message_b.payload.widget.id =
                     level * TOWN_MAGE_SPELLS_PER_LEVEL + slot_m + TOWN_MAGE_FIRST_ICON_CONTROL;
                 window->BroadcastMessage(message_b);
@@ -2653,7 +2653,7 @@ void townManager::SetupMage(heroWindow* window) {
 }
 
 VA(0x00419393, 0x190)
-i32 MageGuildHandler(tag_message& message) {
+WidgetDispatchResult MageGuildHandler(tag_message& message) {
     i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
     i16 unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
     i16 unusedFirstDescription_l = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
@@ -2688,7 +2688,7 @@ i32 MageGuildHandler(tag_message& message) {
                     level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
                     slot_p = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
                     if (level[gpTownManager->m_town->m_spellCounts + 1] <= slot_p)
-                        return 1;
+                        return WIDGET_DISPATCH_CONSUME;
                     spell = gpTownManager->m_town->m_spells[level][slot_p];
                     NormalDialog(
                         gSpellDesc[IDX(spell)],
@@ -2702,7 +2702,7 @@ i32 MageGuildHandler(tag_message& message) {
                         -1,
                         0
                     );
-                    return 1;
+                    return WIDGET_DISPATCH_CONSUME;
                 }
         }
     }
@@ -2739,7 +2739,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
 
     if (cannotRecruit != 0) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        messageLocal.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
         messageLocal.payload.widget.id = RECRUIT_BUTTON_TEXT_CONTROL;
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.id = RECRUIT_BUTTON_ICON_CONTROL;
@@ -2747,7 +2747,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         messageLocal.payload.widget.id = TOWN_DIALOG_CONFIRM;
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        messageLocal.payload.widget.data.value = WIDGET_FLAG_GRAYED;
+        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
         messageLocal.payload.widget.id = RECRUIT_BUTTON_TEXT_CONTROL;
         m_heroWindow1->BroadcastMessage(messageLocal);
         messageLocal.payload.widget.id = RECRUIT_BUTTON_ICON_CONTROL;
@@ -2856,7 +2856,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
 }
 
 VA(0x00419c29, 0x153)
-i32 TavernHandler(tag_message& message) {
+WidgetDispatchResult TavernHandler(tag_message& message) {
     i32 unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
     i16 unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
 
@@ -2870,7 +2870,7 @@ i32 TavernHandler(tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                        return EVENT_WINDOW_CLOSE;
+                        return WIDGET_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -2891,7 +2891,7 @@ i32 TavernHandler(tag_message& message) {
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
         glTimers[0] = static_cast<i32>(KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY);
     }
-    return EVENT_WINDOW_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x00419d7c, 0x110)
@@ -2918,7 +2918,7 @@ void townManager::DoTavern(void) {
 }
 
 VA(0x00419e8c, 0x328)
-i32 SplitArmyHandler(tag_message& message) {
+WidgetDispatchResult SplitArmyHandler(tag_message& message) {
     i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
     i16 minusButton = TOWN_SPLIT_DECREASE_CONTROL;
     i16 amountControl = TOWN_SPLIT_AMOUNT_CONTROL;
@@ -2975,9 +2975,9 @@ i32 SplitArmyHandler(tag_message& message) {
     if (handled == 1) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return EVENT_WINDOW_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return EVENT_WINDOW_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 
 update_amount:
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
@@ -2988,7 +2988,7 @@ update_amount:
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpTownManager->m_heroWindow1
         ->DrawWindow(1, TOWN_SPLIT_AMOUNT_CONTROL, TOWN_SPLIT_AMOUNT_CONTROL);
-    return EVENT_WINDOW_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0041a1b4, 0x5cf)
@@ -3198,7 +3198,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         message_n.type = MESSAGE_WIDGET;
         message_n.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_RANK_CONTROL;
-        message_n.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        message_n.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message_n);
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
         window->BroadcastMessage(message_n);
@@ -3209,7 +3209,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         message_n.type = MESSAGE_WIDGET;
         message_n.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message_n.payload.widget.id = position_current + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
-        message_n.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        message_n.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         window->BroadcastMessage(message_n);
     }
 

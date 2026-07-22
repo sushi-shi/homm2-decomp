@@ -99,8 +99,6 @@ H2_ENUM_BEGIN(HeroUiConstant)
     UI_CLOSE                       = 0x7800,
     UI_DISMISS                     = 0x7803,
     UI_DIALOG_CLOSE_COMMAND        = 10,
-    UI_HANDLER_CONTINUE            = 1,
-    UI_HANDLER_CLOSE               = 2,
     UI_VIEW_ARMY_X                 = 0x77,
     UI_VIEW_ARMY_Y                 = 0x14,
     UI_VIEW_SPELLS_SPECIAL         = 1,
@@ -1168,7 +1166,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
 }
 
 VA(0x0046e816, 0xaef)
-i32 HeroHandler(struct tag_message& message) {
+WidgetDispatchResult HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
     i32 temp1;
     i32 armySlot7;
@@ -1190,10 +1188,10 @@ i32 HeroHandler(struct tag_message& message) {
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
         if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-            return UI_HANDLER_CONTINUE;
+            return WIDGET_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
         UpdateHeroScreenStatusBar(message);
-        return UI_HANDLER_CONTINUE;
+        return WIDGET_DISPATCH_CONSUME;
     }
 
     if (message.type == MESSAGE_KEY_UP) {
@@ -1556,9 +1554,9 @@ i32 HeroHandler(struct tag_message& message) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = UI_DIALOG_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return UI_HANDLER_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return UI_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0046f305, 0x4f)

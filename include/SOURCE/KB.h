@@ -153,8 +153,6 @@ H2_ENUM_BEGIN(EventWindowConstant)
     EVENT_WINDOW_SIXTH_BUTTON           = 0x7806,
     EVENT_WINDOW_SEVENTH_BUTTON         = 0x7807,
     EVENT_WINDOW_EIGHTH_BUTTON          = 0x7808,
-    EVENT_WINDOW_CONTINUE               = 1,
-    EVENT_WINDOW_CLOSE                  = 2,
     EVENT_WINDOW_LUCK                   = 10,
     EVENT_WINDOW_BAD_LUCK               = 11,
     EVENT_WINDOW_MORALE                 = 12,
@@ -471,9 +469,9 @@ i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
 i32 InterpretCommandLine(void);
-i32 InitMenuHandler(struct tag_message&);
-i32 NullHandler(struct tag_message& msg);
-i32 RecruitHeroHandler(tag_message& msg);
+WidgetDispatchResult InitMenuHandler(struct tag_message&);
+WidgetDispatchResult NullHandler(struct tag_message& msg);
+WidgetDispatchResult RecruitHeroHandler(tag_message& msg);
 char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode);
 char* GetBuildingName(FactionType race, BuildingSlotType building);
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel);
@@ -482,9 +480,9 @@ void GetMonsterCost(CreatureType monster, i32* const cost);
 i32 CanBuild(town* t, BuildingSlotType building);
 i32 CanBuy(town* t, BuildingSlotType type);
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level);
-i32 WaitHandler(tag_message& msg);
-i32 EventWindowHandler(struct tag_message&);
-i32 TrueFalseDialogHandler(struct tag_message& msg);
+WidgetDispatchResult WaitHandler(tag_message& msg);
+WidgetDispatchResult EventWindowHandler(struct tag_message&);
+WidgetDispatchResult TrueFalseDialogHandler(struct tag_message& msg);
 void PlayerDead(i32 player);
 void CheckEndGame(H2_ENUM_PARAM(CheckEndGameForcedResult, i32), b32);
 void QuickViewWait(void);

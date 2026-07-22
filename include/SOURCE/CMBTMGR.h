@@ -2,6 +2,7 @@
 #define HOMM2_CMBTMGR_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 
 struct tag_message;
 
@@ -12,6 +13,6 @@ struct CombatTowerOrigin {
 
 i32 ValidHex(i32);
 void UpdateCombatSystemOptions(i32);
-i32 CombatSystemOptionsHandler(struct tag_message&);
+WidgetDispatchResult CombatSystemOptionsHandler(struct tag_message&);
 
 #endif

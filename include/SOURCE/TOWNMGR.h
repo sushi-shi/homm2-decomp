@@ -2,6 +2,7 @@
 #define HOMM2_TOWNMGR_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
 
@@ -116,7 +117,6 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_SPLIT_AMOUNT_CONTROL                = 0x44,
     TOWN_SPLIT_INCREASE_CONTROL              = 0x45,
     TOWN_SPLIT_DECREASE_CONTROL              = 0x46,
-    TOWN_OBJECT_BORDER_ENABLED               = 2,
     TOWN_FACTION_COUNT                       = 6,
     TOWN_ARMY_SLOT_COUNT                     = 5,
     TOWN_REDRAW_INTERVAL                     = 150,
@@ -154,9 +154,9 @@ H2_ENUM_END(TownManagerConstant)
 
 extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 
-i32 MageGuildHandler(struct tag_message&);
-i32 TavernHandler(struct tag_message&);
-i32 SplitArmyHandler(struct tag_message&);
+WidgetDispatchResult MageGuildHandler(struct tag_message&);
+WidgetDispatchResult TavernHandler(struct tag_message&);
+WidgetDispatchResult SplitArmyHandler(struct tag_message&);
 void GetCategoryStats(
     H2_ENUM_PARAM(TownThievesGuildCategory, i32),
     i32l* const,

@@ -2,6 +2,7 @@
 #define HOMM2_SPELLS_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 #include <SOURCE/KB_TYPES.h>
 
 struct tag_message;
@@ -175,7 +176,7 @@ H2_ENUM_END(SpellCastConstant)
 
 #define SPELL_GOLEM_DAMAGE_MULTIPLIER 0.5
 
-i32 CombatSpecialHandler(struct tag_message&);
-i32 HandleCastSpell(struct tag_message&);
+WidgetDispatchResult CombatSpecialHandler(struct tag_message&);
+WidgetDispatchResult HandleCastSpell(struct tag_message&);
 
 #endif

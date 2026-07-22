@@ -31,6 +31,8 @@ H2_ENUM_BEGIN(RecruitConstant)
     DRAW_DEPTH       = 0x7fff,
     VIEW_ARMY_X      = 0x77,
     VIEW_ARMY_Y      = 0x20,
+    MAIN_CONTINUE    = 1,
+    MAIN_FINISHED    = 2,
     NO_ROOM_DIALOG_X = 177,
     NO_ROOM_DIALOG_Y = 100
 H2_ENUM_END(RecruitConstant)
@@ -155,7 +157,7 @@ i32 recruitUnit::Open(i32 priority) {
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             CONFIRM_CONTROL,
-            WIDGET_FLAG_ENABLED
+            IDX(WIDGET_FLAG_ENABLED)
         );
         gpWindowManager->BroadcastMessage(
             MESSAGE_WIDGET,
@@ -333,10 +335,10 @@ i32 recruitUnit::Main(struct tag_message& message) {
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
-            return WIDGET_DISPATCH_FORWARD;
+            return MAIN_FINISHED;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MAIN_CONTINUE;
 }
 
 VA(0x0048bd0b, 0xdf)

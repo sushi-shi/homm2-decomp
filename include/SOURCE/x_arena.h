@@ -2,11 +2,12 @@
 #define HOMM2_X_ARENA_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 
 struct tag_message;
 
 i32 DoArenaDialog(void);
-i32 ArenaWindowHandler(struct tag_message&);
+WidgetDispatchResult ArenaWindowHandler(struct tag_message&);
 void UpdateArenaIcons(void);
 
 extern i32 choice;
