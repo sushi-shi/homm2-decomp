@@ -169,12 +169,12 @@ namespace {
         SITE_STRING_LIMIT = 10
     H2_ENUM_END(GenericSiteConstant)
 
-    H2_ENUM_CLASS_BEGIN(StableVisitResult)
+    H2_ENUM_CLASS_BEGIN_SPLIT(StableVisitResult, u8)
         STABLE_VISIT_NONE = 0,
         STABLE_VISIT_MOBILITY = 1,
         STABLE_VISIT_UPGRADE = 2,
         STABLE_VISIT_MOBILITY_UPGRADE = STABLE_VISIT_MOBILITY | STABLE_VISIT_UPGRADE
-    H2_ENUM_CLASS_END(StableVisitResult)
+    H2_ENUM_CLASS_END_SPLIT(StableVisitResult, u8)
     H2_ENUM_FLAGS(StableVisitResult)
 
     H2_ENUM_CLASS_BEGIN(HouseRecruitmentSite)
