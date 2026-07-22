@@ -1636,7 +1636,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         haveMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
     if (haveMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
         haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
-    if ((reqMask & haveMask) == reqMask) {
+    if ((OD_STEER(reqMask) & haveMask) == reqMask) {
         if (t->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
