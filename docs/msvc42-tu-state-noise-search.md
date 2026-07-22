@@ -38,6 +38,19 @@ themselves remain disposable. This summary is diagnostic evidence only: it does 
 retained maximum. If one normalized state ever receives multiple fuzzy scores, the census reports
 the complete score set instead of silently choosing one.
 
+Treat normalized state cardinality as a diagnostic metric alongside fuzzy score. Record the total
+number of states, each state's occurrence count, representative trial, function size, text digest,
+ordered-relocation digest, and complete score set. Repeated trials in an already-observed state add
+frequency evidence but no new code-shape evidence. Private `$SG`/`$T` counter renumbering must not
+inflate the cardinality.
+
+When a sweep is reviewed, compare one reproducible representative of every normalized state both
+against retail and against the other states. Attribute each state transition to concrete instruction
+or relocation spans; do not inspect only the highest-scoring state. This distinguishes independent
+compiler choices that happen to move the aggregate score in opposite directions. Target-specific
+matrices under `docs/matching-matrices/` retain that comparison without retaining disposable source
+or COFF objects.
+
 Each baseline and trial compile has a 120-second default ceiling. Override it with a
 positive finite `--compile-timeout-seconds`; expiry terminates the complete compiler
 process group, including Wine/MSVC descendants, records a rejected timeout trial, and
