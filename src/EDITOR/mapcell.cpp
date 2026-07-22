@@ -84,7 +84,7 @@ VA(0x0040b73c, 0x9e)
 void fullMap::Write(i32 handle) {
     write(handle, &width, sizeof(width));
     write(handle, &height, sizeof(height));
-    write(handle, cells, width * height * sizeof(mapCell));
+    write(handle, cells, OD_STEER(width) * height * sizeof(mapCell));
     write(handle, &extraCount, sizeof(extraCount));
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
