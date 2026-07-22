@@ -7190,8 +7190,8 @@ void game::SetMapSize(i32 w, i32 h) {
         gpSearchArray->Init();
     }
     if (mapExtra)
-        H2_FREE(mapExtra, 7449);
-    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, 7450));
+        H2_FREE(mapExtra, setMapSizeSourceLineBase + 12);
+    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, setMapSizeSourceLineBase + 13));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
