@@ -723,3 +723,22 @@ either residual. This confirms that combined predecessor/TU-state variants must 
 also closing these specific combinations. The canonical source/header hashes were restored to
 `ac8dd08884961ba6d73e8a312391cdeecac71ba132f5badef5f79201a63b34d8` and
 `8207f088751e59f5a467c7a7e582c4870d82c3fb4e060262d02d5e3a07a17517`.
+
+## SOURCE/PHILAI RVOfPosition chance topology and TU states
+
+`philai-rvofposition-tu-state-2061cf.tsv` records the nine compiler states observed in a controlled
+128-trial typedef census of corrected source hash `2061cfe28805`. Every representative was compiled
+and compared both with the canonical object and retail. Six states preserve the retail 1,581-byte
+CodeView boundary and complete 56-site relocation stream; three shorten the function by one byte
+and consequently shift the latter 35 relocation source sites.
+
+The reconstruction itself fixes real AI behavior. The current-position and target-position
+strategic queries now have independent chance outputs, the adjacent-monster chance no longer
+overwrites the primary event chance, and the adjacent and main event values reuse one retail stack
+slot only after their lifetimes stop overlapping. The retail `0xc8` frame and all modeled stack
+displacements now agree.
+
+No observed state is exact. The best two disposable states reach 99.990585% and differ from retail
+in four CodeView bytes: both reverse one chance-product accumulator, while each chooses a different
+non-retail order for the final three-term sum. The canonical readable source remains at 99.971760%.
+No probe was retained and no maximum was recorded from a sub-100 state.
