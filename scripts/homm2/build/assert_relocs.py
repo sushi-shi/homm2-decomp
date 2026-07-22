@@ -1021,19 +1021,33 @@ def review_fields(resolved_addresses=False):
             continue
         base_functions = parse_obj(base_obj, with_sites=True)
         target_functions = parse_obj(target_obj, with_sites=True)
+        normalized_base = normalized_target = None
         for name in sorted(functions):
-            if name not in base_functions or name not in target_functions:
+            selected_base = base_functions
+            selected_target = target_functions
+            if (name.startswith("__h2cg$") and
+                    (name not in selected_base or name not in selected_target)):
+                if normalized_base is None:
+                    normalized_base = parse_obj(
+                        "build/objdiff/normalized/base/%s.obj" % unit,
+                        with_sites=True)
+                    normalized_target = parse_obj(
+                        "build/objdiff/normalized/target/%s.c.obj" % unit,
+                        with_sites=True)
+                selected_base = normalized_base
+                selected_target = normalized_target
+            if name not in selected_base or name not in selected_target:
                 continue
             checked_functions += 1
-            checked_sites += len(base_functions[name])
+            checked_sites += len(selected_base[name])
             problems = check_owner_offset_multisets(
                 sym, data, owners,
-                base_functions[name], target_functions[name])
+                selected_base[name], selected_target[name])
             if resolved_addresses:
                 if functions[name] >= FIELD_AUDIT_THRESHOLD:
                     problems.extend(check_ordered_reloc_addresses(
                         sym, data, dups, owners,
-                        base_functions[name], target_functions[name]))
+                        selected_base[name], selected_target[name]))
             for problem in problems:
                 destination = (bad if functions[name] >= FIELD_AUDIT_THRESHOLD
                                else review)
@@ -1380,6 +1394,10 @@ def review(rva):
     target_obj = "build/delink/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
+    if name.startswith("__h2cg$") and (not B or not T):
+        B = parse_obj("build/objdiff/normalized/base/%s.obj" % unit).get(name, [])
+        T = parse_obj(
+            "build/objdiff/normalized/target/%s.c.obj" % unit).get(name, [])
     for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):
@@ -1606,10 +1624,24 @@ def main():
         if not (os.path.exists(base_obj) and os.path.exists(tgt_obj)):
             continue
         bf, tf = parse_obj(base_obj), parse_obj(tgt_obj)
+        normalized_base = normalized_target = None
         for name in sorted(near_exact_audited):
-            if name not in bf or name not in tf:
+            selected_base = bf
+            selected_target = tf
+            if (name.startswith("__h2cg$") and
+                    (name not in selected_base or name not in selected_target)):
+                if normalized_base is None:
+                    normalized_base = parse_obj(
+                        "build/objdiff/normalized/base/%s.obj" % unit)
+                    normalized_target = parse_obj(
+                        "build/objdiff/normalized/target/%s.c.obj" % unit)
+                selected_base = normalized_base
+                selected_target = normalized_target
+            if name not in selected_base or name not in selected_target:
                 continue
-            for p in check_fn(sym, data, dups, unit, name, bf[name], tf[name]):
+            for p in check_fn(
+                    sym, data, dups, unit, name,
+                    selected_base[name], selected_target[name]):
                 bad.append((unit, name, p))
     for unit, name, p in bad:
         print("  %s  %s: %s" % (unit, name, p))

@@ -51,6 +51,7 @@ def main(argv=None):
             return 1
         return m(["--" + rest[0]])
     if cmd == "build":
+        if sh("python3", "-m", "homm2.build.runtime_fid", "--check"): return 1
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
         # HARD gates: every declaration comes from a header (no drift), and every emitted

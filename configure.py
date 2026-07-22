@@ -57,7 +57,9 @@ def main():
                description="cl $unit")
         w.rule("canonicalize_data_symbols",
                command=(f"{PY} -m homm2.build.canonicalize_data_symbols "
-                        "--input $in --output $out --sidecar $sidecar"),
+                        "--input $in --output $out --sidecar $sidecar "
+                        "--unit $unit --compgen-manifest "
+                        "build/gen/compiler_generated_functions.csv"),
                description="normalize-data $unit")
         w.rule("canonicalize_relocs",
                command=(f"{PY} -m homm2.build.canonicalize_relocs "
@@ -84,7 +86,8 @@ def main():
                         "--exe build/orig/HEROES2W.EXE --out build/link/HEROES2W.res "
                         "--report build/link/HEROES2W.resources.json"),
                description="link-resources HEROES2W.res")
-        normalizer = "scripts/homm2/build/canonicalize_data_symbols.py"
+        normalizer = ["scripts/homm2/build/canonicalize_data_symbols.py",
+                      "build/gen/compiler_generated_functions.csv"]
         reloc_normalizer = "scripts/homm2/build/canonicalize_relocs.py"
         normalized_dummy = "build/objdiff/normalized/dummy.obj"
         normalized_dummy_sidecar = "build/objdiff/normalized/dummy.symbols.tsv"

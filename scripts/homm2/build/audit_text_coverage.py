@@ -203,6 +203,7 @@ def main(argv=None):
     exe = argv[0] if argv else "build/orig/HEROES2W.EXE"
     manifest = argv[1] if len(argv) > 1 else "build/gen/symbol_names.csv"
     procedures = argv[2] if len(argv) > 2 else "config/delink_procedures.csv"
+    library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")
     rejection_path = Path("config/delink_candidate_rejections.csv")
     exclusion_path = Path("config/delink_text_exclusions.csv")
@@ -220,6 +221,7 @@ def main(argv=None):
     unit_by_name = {}
     public_by_rva = {}
     nb09_starts = set()
+    source_configured = {}
     for row in manifest_rows:
         if row.get("kind") != "func":
             continue
@@ -234,12 +236,19 @@ def main(argv=None):
             nb09_starts.add(start)
         elif provenance.startswith("cv-thunk"):
             nb09_starts.add(start)
+        elif provenance.startswith("source-compgen"):
+            source_configured[start] = (size, row["name"], row["unit"], provenance)
 
-    configured = {}
-    for row in rows_without_comments(procedures):
-        rva = int(row["rva"], 16)
-        configured[rva] = (int(row["size"], 16), row["name"], row["unit"],
-                           row["provenance"])
+    configured = dict(source_configured)
+    for path, is_fid in ((procedures, False), (library_labels, True)):
+        if not Path(path).exists():
+            continue
+        for row in rows_without_comments(path):
+            rva = int(row["rva"], 16)
+            provenance = ("fid-%s-%s" % (row["library"].lower(), row["source"])
+                          if is_fid else row["provenance"])
+            configured[rva] = (int(row["size"], 16), row["name"], row["unit"],
+                               provenance)
     rejected = {int(row["rva"], 16): row["reason"]
                 for row in rows_without_comments(rejection_path)}
     exclusions = []
@@ -338,6 +347,7 @@ def main(argv=None):
                 (mnemonic.startswith("ret") or mnemonic in ("jmp", "jmpl", "ud2"))
             shared_tail = end in configured and "direct-rel32-entry" in provenance
             if ("disassembly-ret" in provenance or "static-init" in provenance or
+                    "source-compgen" in provenance or
                     "callback-disassembly" in provenance) and not terminates:
                 candidate_failures.append((rva, "%s extent lacks a terminal return/jump" % name))
             elif "direct-rel32-entry" in provenance and not terminates and not shared_tail:

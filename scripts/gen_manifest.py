@@ -170,12 +170,47 @@ def unit_of(im):
     t=tier_of(im); st=stem_of(modname.get(im,""))
     return f"{t}/{st}" if t in ("BASE","SOURCE","EDITOR") else st
 
+# Compiler-generated procedures have no source definition on which ``VA`` can
+# sit.  ``VA_COMPGEN`` carries a stable kind/owner identity; the volatile native
+# COFF spelling (for example ``_$E4``) is deliberately not source metadata.
+compgen_procs=[]
+compgen_re=re.compile(
+    r"^\s*VA_COMPGEN\(\s*(0x[0-9a-fA-F]+)\s*,\s*(0x[0-9a-fA-F]+|[0-9]+)\s*,\s*"
+    r"([A-Z][A-Z0-9_]*)\s*,\s*([A-Za-z_]\w*)\s*\)\s*$")
+compgen_kinds={"STATIC_INIT_DISPATCH","STATIC_ATEXIT","STATIC_DTOR","STATIC_CTOR"}
+for tier in ("BASE","SOURCE","EDITOR"):
+    source_dir=os.path.join(REPO,"src",tier)
+    if not os.path.isdir(source_dir): continue
+    for filename in sorted(os.listdir(source_dir)):
+        if not filename.lower().endswith((".cpp",".c")): continue
+        path=os.path.join(source_dir,filename)
+        unit="%s/%s"%(tier,filename.rsplit(".",1)[0])
+        for line_number,line in enumerate(open(path,encoding="latin-1"),1):
+            match=compgen_re.match(line)
+            if not match: continue
+            va=int(match.group(1),16); size=int(match.group(2),0)
+            kind,owner=match.group(3),match.group(4)
+            if kind not in compgen_kinds or size<=0 or sec_of(va-imgbase)!=".text":
+                raise SystemExit("invalid VA_COMPGEN at %s:%d"%(path,line_number))
+            contribution_unit=unit_of(which(va))
+            if contribution_unit!=unit:
+                raise SystemExit("VA_COMPGEN 0x%x belongs to %s, not %s"%
+                                 (va-imgbase,contribution_unit,unit))
+            semantic="__h2cg$%s$%s$%s"%(
+                unit.replace("/","$"),kind.lower(),owner)
+            compgen_procs.append((va,size,semantic,unit,
+                                  "source-compgen-"+kind.lower(),kind,owner,path,line_number))
+
 # Procedures absent from CodeView are admitted only through this reviewed
 # manifest. Each row has an explicit executable span and evidence provenance;
 # no address is inferred from padding, jump-table bytes, or a source-only label.
 validated_procs=[]
-vp=os.path.join(REPO,"config","delink_procedures.csv")
-if os.path.exists(vp):
+procedure_manifests=[
+    (os.path.join(REPO,"config","delink_procedures.csv"),False),
+    (os.path.join(REPO,"config","library_labels.csv"),True),
+]
+for vp,is_fid in procedure_manifests:
+  if os.path.exists(vp):
     import csv
     with open(vp,newline="") as vf:
         rows=(ln for ln in vf if not ln.lstrip().startswith("#"))
@@ -183,7 +218,8 @@ if os.path.exists(vp):
             rva=int(row["rva"],16); va=imgbase+rva; size=int(row["size"],16)
             name=row["name"].strip() or ("delink_proc_%08x"%rva)
             unit=row["unit"].strip()
-            proof=row["provenance"].strip()
+            proof=(("fid-%s-%s"%(row["library"].lower(),row["source"]))
+                   if is_fid else row["provenance"].strip())
             if size<=0 or not name or not unit or not proof:
                 raise SystemExit("invalid delink procedure row at 0x%x"%rva)
             if sec_of(rva)!=".text":
@@ -193,19 +229,21 @@ if os.path.exists(vp):
                 raise SystemExit("delink procedure 0x%x belongs to %s, not %s"%
                                  (rva,contribution_unit,unit))
             validated_procs.append((va,size,name,unit,"validated-"+proof))
-    seen=set()
-    for va,size,name,unit,proof in sorted(validated_procs):
-        key=(va,name)
-        if key in seen:
-            raise SystemExit("duplicate delink procedure: 0x%x %s"%(va-imgbase,name))
-        seen.add(key)
-        o=va2off(va); body=d[o:o+size] if o is not None else b""
-        if len(body)!=size or body[:1] in (b"\xcc",b"\x90"):
-            raise SystemExit("delink procedure is padding/truncated: 0x%x %s"%(va-imgbase,name))
-    spans=sorted((va,va+size,name) for va,size,name,_,_ in validated_procs)
-    for (_,end,name),(start2,_,name2) in zip(spans,spans[1:]):
-        if start2<end:
-            raise SystemExit("overlapping delink procedures: %s and %s"%(name,name2))
+for va,size,name,unit,proof,_,_,_,_ in compgen_procs:
+    validated_procs.append((va,size,name,unit,proof))
+seen=set()
+for va,size,name,unit,proof in sorted(validated_procs):
+    key=(va,name)
+    if key in seen:
+        raise SystemExit("duplicate delink procedure: 0x%x %s"%(va-imgbase,name))
+    seen.add(key)
+    o=va2off(va); body=d[o:o+size] if o is not None else b""
+    if len(body)!=size or body[:1] in (b"\xcc",b"\x90"):
+        raise SystemExit("delink procedure is padding/truncated: 0x%x %s"%(va-imgbase,name))
+spans=sorted((va,va+size,name) for va,size,name,_,_ in validated_procs)
+for (_,end,name),(start2,_,name2) in zip(spans,spans[1:]):
+    if start2<end:
+        raise SystemExit("overlapping delink procedures: %s and %s"%(name,name2))
 
 # ---- per-TU optimization level (empirical, from the PE itself) -------------
 # Retail optimization is PER-COMPILAND, not uniform /Od: the basewin.lib UI
@@ -292,6 +330,13 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
         rva = tgt - imgbase
         f.write(f"0x{rva:x},const_{rva:08x},_const,0x0,data,pe-reloc-constant\n")
         n_const += 1; n_data += 1
+
+with open(os.path.join(REPO,"build","gen","compiler_generated_functions.csv"),"w") as f:
+    f.write("rva,name,unit,size,kind,owner,source,line\n")
+    for va,size,name,unit,_,kind,owner,path,line_number in sorted(compgen_procs):
+        f.write("0x%x,%s,%s,0x%x,%s,%s,%s,%d\n"%(
+            va-imgbase,name,unit,size,kind,owner,
+            os.path.relpath(path,REPO),line_number))
 
 # ---- emit units.toml (NWC reconstruction units only) ----
 units=[]
