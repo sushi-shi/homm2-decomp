@@ -92,7 +92,10 @@ void advManager::StopCursor(i32 stopSound) {
     }
     m_cursorCycle = 0;
     if (m_previousCursorMapX != -1) {
-        m_mapData->GetCell(m_previousCursorMapX + m_mapOriginX, m_previousCursorMapY + m_mapOriginY)
+        m_mapData->GetCell(
+            OD_STEER(m_previousCursorMapX) + m_mapOriginX,
+            m_previousCursorMapY + m_mapOriginY
+        )
             ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
         m_previousCursorMapY = -1;
         m_previousCursorMapX = m_previousCursorMapY;
