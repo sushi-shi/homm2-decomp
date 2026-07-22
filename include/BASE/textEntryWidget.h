@@ -7,17 +7,17 @@
 
 struct tag_message;
 
-H2_ENUM_BEGIN(TextEntryReadMode)
+H2_ENUM_CLASS_BEGIN(TextEntryReadMode)
     TEXT_ENTRY_READ_DEFAULT    = 1,
     TEXT_ENTRY_READ_RECT       = 2,
     TEXT_ENTRY_READ_MULTILINE  = 3,
     TEXT_ENTRY_READ_INSET_FIVE = 4,
     TEXT_ENTRY_READ_INSET_FOUR = 5
-H2_ENUM_END(TextEntryReadMode)
+H2_ENUM_CLASS_END(TextEntryReadMode)
 
-H2_ENUM_BEGIN(TextEntryLayout)
+H2_ENUM_CLASS_BEGIN(TextEntryLayout)
     TEXT_ENTRY_LAYOUT_INSET = 4
-H2_ENUM_END(TextEntryLayout)
+H2_ENUM_CLASS_END(TextEntryLayout)
 
 #pragma pack(push, 1)
 class resource;
@@ -39,7 +39,7 @@ public:
     i16 m_innerY;
     i16 m_maxLines;
     i16 m_preserveTextOnFocus;
-    i16 m_entryType;
+    H2_ENUM_STORAGE(TextEntryReadMode, i16) m_entryType;
     i16 m_displayOffset;
     char m_cursorBlink;
     textEntryWidget(void);
@@ -56,14 +56,14 @@ public:
         i16 iconFrame,
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind,
-        i16 layout,
+        H2_ENUM_PARAM(TextEntryLayout, i16) layout,
         i32 horizontalInset,
         i32 verticalInset
     );
     virtual ~textEntryWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
-    void Read(i32);
+    void Read(H2_ENUM_PARAM(TextEntryReadMode, i32));
     void SetupDisplayString(char*, u16);
 };
 #pragma pack(pop)

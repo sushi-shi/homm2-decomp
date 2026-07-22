@@ -29,7 +29,6 @@ H2_ENUM_BEGIN(DataEntryLayout)
     TEXT_FIELD_WIDTH            = 251,
     TEXT_FIELD_HEIGHT           = 20,
     TEXT_FIELD_ICON_FRAME       = 3,
-    TEXT_FIELD_LAYOUT           = 4,
     TEXT_FIELD_HORIZONTAL_INSET = 10,
     TEXT_FIELD_VERTICAL_INSET   = 3,
     INPUT_BOX_X                 = 213,
@@ -2403,7 +2402,7 @@ void GetDataEntry(
         TEXT_FIELD_ICON_FRAME,
         ENTRY_TEXT_WIDGET,
         WIDGET_KIND_NONE,
-        TEXT_FIELD_LAYOUT,
+        TEXT_ENTRY_LAYOUT_INSET,
         TEXT_FIELD_HORIZONTAL_INSET,
         TEXT_FIELD_VERTICAL_INSET
     );

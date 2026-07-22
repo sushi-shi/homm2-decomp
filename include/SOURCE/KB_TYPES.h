@@ -5,6 +5,12 @@
 
 class sample;
 
+H2_ENUM_CLASS_BEGIN(HighScoreType)
+    HIGH_SCORE_CAMPAIGN           = 0,
+    HIGH_SCORE_STANDARD           = 1,
+    HIGH_SCORE_EXPANSION_CAMPAIGN = 2
+H2_ENUM_CLASS_END(HighScoreType)
+
 H2_ENUM_CLASS_BEGIN(HeroPortrait)
     CAMPAIGN_HERO_ROLAND           = 54,
     CAMPAIGN_HERO_CORLAGON         = 55,

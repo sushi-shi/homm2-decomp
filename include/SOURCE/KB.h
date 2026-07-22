@@ -255,12 +255,6 @@ H2_ENUM_CLASS_BEGIN(CheckEndGameForcedResult)
     END_GAME_FORCE_DEFEAT  = 2
 H2_ENUM_CLASS_END(CheckEndGameForcedResult)
 
-H2_ENUM_BEGIN(HighScoreType)
-    HIGH_SCORE_CAMPAIGN           = 0,
-    HIGH_SCORE_STANDARD           = 1,
-    HIGH_SCORE_EXPANSION_CAMPAIGN = 2
-H2_ENUM_END(HighScoreType)
-
 H2_ENUM_BEGIN(HighScoreConstant)
     HIGH_SCORE_ENTRY_COUNT        = 10,
     HIGH_SCORE_NAME_LENGTH        = 16,
@@ -335,7 +329,7 @@ H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_CHEAT_RESOURCES = 0x9cd0
 H2_ENUM_END(AppMenuCommand)
 
-H2_ENUM_BEGIN(DialogWaitType)
+H2_ENUM_CLASS_BEGIN(DialogWaitType)
     DIALOG_WAIT_OTHER_PLAYER           = 0,
     DIALOG_WAIT_NETBIOS_GUEST          = 1,
     DIALOG_WAIT_NETBIOS_HOST           = 2,
@@ -350,7 +344,7 @@ H2_ENUM_BEGIN(DialogWaitType)
     DIALOG_WAIT_WINSOCK_FIRST_GUEST    = 11,
     DIALOG_WAIT_WINSOCK_GUESTS         = 12,
     DIALOG_WAIT_WINSOCK_HOST           = 13
-H2_ENUM_END(DialogWaitType)
+H2_ENUM_CLASS_END(DialogWaitType)
 
 H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_PLAYER_COUNT                     = 6,

@@ -37,11 +37,11 @@ H2_ENUM_BEGIN(CombatControlConstant)
     COMBAT_CONTROL_SIDE_COUNT = 2
 H2_ENUM_END(CombatControlConstant)
 
-H2_ENUM_BEGIN(AdventureDisposeLevel)
+H2_ENUM_CLASS_BEGIN(AdventureDisposeLevel)
     ADV_DISPOSE_NONE    = 0,
     ADV_DISPOSE_PARTIAL = 1,
     ADV_DISPOSE_FULL    = 2
-H2_ENUM_END(AdventureDisposeLevel)
+H2_ENUM_CLASS_END(AdventureDisposeLevel)
 
 H2_ENUM_BEGIN(DiffSendRecipient)
     DIFF_SEND_FORCE_WHOLE = -2,
@@ -531,9 +531,9 @@ extern b32 gbComputeExtent;
 extern b32 gbSaveBiggestExtent;
 extern b32 gbLimitToExtent;
 extern b32 gbCurrArmyDrawn;
-extern i32 gAdvDisposeLevel;
+extern H2_ENUM_STORAGE(AdventureDisposeLevel, i32) gAdvDisposeLevel;
 extern i32 giHighScoreRank;
-extern i32 giHighScoreType;
+extern H2_ENUM_STORAGE(HighScoreType, i32) giHighScoreType;
 extern b32 gbShowHighScore;
 extern b32 gbLowMemory;
 extern void* gLowPage;
