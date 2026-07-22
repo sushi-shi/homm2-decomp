@@ -2,6 +2,7 @@
 #define HOMM2_EVENTS_TYPES_H
 
 #include <va.h>
+#include <SOURCE/combatTypes.h>
 #include <SOURCE/EVENTS.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/town.h>
@@ -17,7 +18,7 @@ struct combatRemoteData {
     i8 setupCombatX;
     i8 setupCombatY;
     i32 randomSeed;
-    i8 combatResult;
+    H2_ENUM_STORAGE(CombatResult, i8) combatResult;
     i8 retreatWin;
     i8 combatSurrender;
     i8 firstOwner;

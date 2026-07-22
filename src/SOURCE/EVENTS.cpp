@@ -7786,7 +7786,7 @@ i32 advManager::DoNetCombat(char* packet) {
     i32 combatX1;
     i32 combatY8;
     i32 randomSeed1;
-    i8 combatResult16;
+    H2_ENUM_STORAGE(CombatResult, i8) combatResult16;
     i32 setupCombatX2;
     hero* firstHero29;
     i32 remotePlayer8;
@@ -7818,7 +7818,7 @@ i32 advManager::DoNetCombat(char* packet) {
         &gbCombatSurrender
     );
     firstPlayer3 = firstHero29->m_owner;
-    combatResult16 = static_cast<i8>(DoCombat(
+    combatResult16 = static_cast<CombatResult>(DoCombat(
         combatX1,
         combatY8,
         firstHero29,
@@ -7886,7 +7886,7 @@ i32 advManager::DoCombat(
     town* receivedTown;
     i32 remotePlayer;
     char* packet8;
-    i8 combatResult3;
+    H2_ENUM_STORAGE(CombatResult, i8) combatResult3;
     tag_message message9;
     i32 secondPlayer7;
     i32 firstPlayer4;
@@ -7933,7 +7933,7 @@ i32 advManager::DoCombat(
                 setupCombatY,
                 randomSeed,
                 gbGamePosToNetPos[secondPlayer7],
-                0,
+                COMBAT_RESULT_ATTACKER, // Placeholder ignored until the remote combat finishes.
                 0,
                 0
             );
@@ -8039,17 +8039,17 @@ combatFinished:
         secondHero->CheckLevel();
     if (processLosses) {
         switch (gpCombatManager->m_combatResult) {
-            case 0:
+            case COMBAT_RESULT_ATTACKER:
                 if (!gbRetreatWin)
                     TransferArtifacts(secondHero, firstHero);
                 HeroLoses(secondHero);
                 break;
-            case 1:
+            case COMBAT_RESULT_DEFENDER:
                 if (!gbRetreatWin)
                     TransferArtifacts(firstHero, secondHero);
                 HeroLoses(firstHero);
                 break;
-            case -1:
+            case COMBAT_RESULT_DRAW:
                 HeroLoses(firstHero);
                 HeroLoses(secondHero);
                 break;
@@ -8072,7 +8072,7 @@ combatFinished:
     gbInCombat = false;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
-    return gpCombatManager->m_combatResult;
+    return IDX(gpCombatManager->m_combatResult);
 }
 
 VA(0x004b645e, 0x36f)
@@ -8088,7 +8088,7 @@ void advManager::SendHeroTownData(
     i32 setupCombatY,
     i32 randomSeed,
     i32 remotePlayer,
-    i32 combatResult,
+    H2_ENUM_PARAM(CombatResult, i32) combatResult,
     i32 retreatWin,
     i32 combatSurrender
 ) {
@@ -8109,7 +8109,7 @@ void advManager::SendHeroTownData(
     buffer->setupCombatX = static_cast<i8>(setupCombatX);
     buffer->setupCombatY = static_cast<i8>(setupCombatY);
     buffer->randomSeed = randomSeed;
-    buffer->combatResult = static_cast<i8>(combatResult);
+    buffer->combatResult = combatResult;
     buffer->retreatWin = static_cast<i8>(retreatWin);
     buffer->combatSurrender = static_cast<i8>(combatSurrender);
     if (firstHero) {
@@ -8229,7 +8229,7 @@ void advManager::ReceiveHeroTownData(
     i32* setupCombatX,
     i32* setupCombatY,
     i32* randomSeed,
-    i8* combatResult,
+    H2_ENUM_STORAGE(CombatResult, i8)* combatResult,
     i8* retreatWin,
     i8* combatSurrender
 ) {
@@ -8417,19 +8417,19 @@ i32 advManager::AutoResolveCombat(
         secondHero->CheckLevel();
     if (processLosses) {
         switch (gpCombatManager->m_combatResult) {
-            case 0:
+            case COMBAT_RESULT_ATTACKER:
                 if (!gbRetreatWin)
                     TransferArtifacts(secondHero, firstHero);
                 HeroLoses(secondHero);
                 break;
-            case 1:
+            case COMBAT_RESULT_DEFENDER:
                 if (!gbRetreatWin)
                     TransferArtifacts(firstHero, secondHero);
                 HeroLoses(firstHero);
                 break;
             case COMBAT_RESULT_PENDING:
                 break;
-            case -1:
+            case COMBAT_RESULT_DRAW:
                 HeroLoses(firstHero);
                 HeroLoses(secondHero);
         }
@@ -8447,7 +8447,7 @@ i32 advManager::AutoResolveCombat(
         gbRetreatWin = false;
     gbInCombat = false;
     gpMouseManager->m_forcePointerUpdate = 0;
-    return gpCombatManager->m_combatResult;
+    return IDX(gpCombatManager->m_combatResult);
 }
 
 VA(0x004b6e83, 0xb8)

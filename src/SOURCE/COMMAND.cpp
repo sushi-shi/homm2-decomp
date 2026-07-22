@@ -1127,17 +1127,17 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         if (IsWinner(OppositeCombatSide(m_currentSide)) != 0)
             m_combatResult = COMBAT_RESULT_DRAW;
         else
-            m_combatResult = IDX(m_currentSide);
+            m_combatResult = CombatResultForSide(m_currentSide);
     } else if (IsWinner(OppositeCombatSide(m_currentSide)) != 0) {
         combatEnded = 1;
-        m_combatResult = IDX(OppositeCombatSide(m_currentSide));
+        m_combatResult = CombatResultForSide(OppositeCombatSide(m_currentSide));
     } else if (m_sideRetreated[0] != 0 || m_sideRetreated[1] != 0) {
         combatEnded = 1;
         gbRetreatWin = true;
         if (m_sideRetreated[0] != 0)
-            m_combatResult = 1;
+            m_combatResult = COMBAT_RESULT_DEFENDER;
         else
-            m_combatResult = 0;
+            m_combatResult = COMBAT_RESULT_ATTACKER;
     }
 
     if (combatEnded != 0 && m_combatResult != COMBAT_RESULT_DRAW) {
@@ -1145,9 +1145,9 @@ i32 combatManager::CheckWin(struct tag_message* message) {
         i32 unusedWinWord37;
         i32 armyIndex;
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
-            if (m_armies[m_combatResult][armyIndex].m_monsterType != CREATURE_NONE
-                && m_armies[m_combatResult][armyIndex].m_quantity > 0
-                && HAS(m_armies[m_combatResult][armyIndex].m_monster.flags.all,
+            if (m_armies[IDX(m_combatResult)][armyIndex].m_monsterType != CREATURE_NONE
+                && m_armies[IDX(m_combatResult)][armyIndex].m_quantity > 0
+                && HAS(m_armies[IDX(m_combatResult)][armyIndex].m_monster.flags.all,
                        MONSTER_FLAGS_SUMMONED)
                        == 0) {
                 armyAlive = 1;
@@ -1502,7 +1502,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                             gpCombatManager->ClearWinLoseBottom(gpCombatManager->m_winLoseWindow);
                             gpCombatManager->ShowSkeletons(gpCombatManager->m_winLoseWindow);
                         } else {
-                            if (gpCombatManager->m_eagleEyeSpell[gpCombatManager->m_combatResult]
+                            if (gpCombatManager->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)]
                                 != SPELL_NONE) {
                                 gpCombatManager->ClearWinLoseBottom(
                                     gpCombatManager->m_winLoseWindow
@@ -1510,7 +1510,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                                 gpCombatManager->ShowEagleEyeSpell(
                                     gpCombatManager->m_winLoseWindow
                                 );
-                                gpCombatManager->m_eagleEyeSpell[gpCombatManager->m_combatResult] =
+                                gpCombatManager->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)] =
                                     SPELL_NONE;
                             } else {
                             ExitDialog:
@@ -1778,7 +1778,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
 VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     DATA(0x004f0be4) static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
-    SpellType displayedSpell = m_eagleEyeSpell[m_combatResult];
+    SpellType displayedSpell = m_eagleEyeSpell[IDX(m_combatResult)];
     i32 x = EAGLE_PANEL_X;
     i32 y = EAGLE_PANEL_Y;
     tag_message spellMessage;
@@ -1838,7 +1838,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         gText,
         "Through eagle-eyed observation, %s is able to learn the magic "
         "spell '%s'.",
-        m_heroes[m_combatResult]->m_name,
+        m_heroes[IDX(m_combatResult)]->m_name,
         gSpellNames[IDX(displayedSpell)]
     );
     spellMessage.type = MESSAGE_WIDGET;
@@ -2051,7 +2051,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
 }
 
 VA(0x0042ec8b, 0xba9)
-void combatManager::DoVictory(i32 winningSide) {
+void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
     i32 experienceLevels = 0;
     i32 deadCreatureCount;
@@ -2093,7 +2093,7 @@ void combatManager::DoVictory(i32 winningSide) {
                     currentArmy->m_quantity = 0;
                 livingCreatureCount += currentArmy->m_quantity;
             }
-            if (IDX(side) == winningSide && currentArmy->m_quantity > 0
+            if (CombatResultForSide(side) == winningSide && currentArmy->m_quantity > 0
                 && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
                 && currentArmy->m_monsterType != CREATURE_EARTH_ELEMENTAL
                 && currentArmy->m_monsterType != CREATURE_AIR_ELEMENTAL
@@ -2102,7 +2102,7 @@ void combatManager::DoVictory(i32 winningSide) {
                 && currentArmy->m_monsterType != CREATURE_GHOST) {
                 ++eligibleWinnerStacks;
             }
-            if (winningSide == COMBAT_RESULT_DEFENDER - IDX(side)) {
+            if (winningSide == OppositeCombatResult(CombatResultForSide(side))) {
                 deadCreatureCount += currentArmy->m_initialQuantity - currentArmy->m_quantity;
             }
         }
@@ -2113,11 +2113,11 @@ void combatManager::DoVictory(i32 winningSide) {
     }
 
     if (winningSide != COMBAT_RESULT_DRAW && eligibleWinnerStacks < VICTORY_NECROMANCY_STACK_LIMIT
-        && m_heroes[winningSide] != NULL
-        && m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
+        && m_heroes[IDX(winningSide)] != NULL
+        && m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         giSkeletonsCreated = static_cast<i32>(
             deadCreatureCount
-            * (m_heroes[winningSide]->GetSSLevel(HERO_SKILL_NECROMANCY)
+            * (m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY)
                * COMBAT_NECROMANCY_LEVEL_FACTOR)
         );
         if (giSkeletonsCreated <= 0 && deadCreatureCount != 0)
@@ -2156,26 +2156,26 @@ void combatManager::DoVictory(i32 winningSide) {
             break;
         case COMBAT_RESULT_ATTACKER:
         case COMBAT_RESULT_DEFENDER:
-            if (m_heroes[winningSide] != NULL) {
-                if (m_eagleEyeSpell[winningSide] != SPELL_NONE) {
-                    m_heroes[winningSide]->m_spells[IDX(m_eagleEyeSpell[winningSide])] = 1;
+            if (m_heroes[IDX(winningSide)] != NULL) {
+                if (m_eagleEyeSpell[IDX(winningSide)] != SPELL_NONE) {
+                    m_heroes[IDX(winningSide)]->m_spells[IDX(m_eagleEyeSpell[IDX(winningSide)])] = 1;
                 }
-                m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] =
+                m_experienceValue[IDX(OppositeCombatResult(winningSide))] =
                     ExperienceValueOfStack(
                         winningSide == COMBAT_RESULT_ATTACKER ? COMBAT_DEFENDER_SIDE
                                                              : COMBAT_ATTACKER_SIDE
                     );
                 if (gbRetreatWin != 0)
-                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] -=
+                    m_experienceValue[IDX(OppositeCombatResult(winningSide))] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL
                     && winningSide == COMBAT_RESULT_ATTACKER)
-                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide] +=
+                    m_experienceValue[IDX(OppositeCombatResult(winningSide))] +=
                         COMBAT_HERO_EXPERIENCE_VALUE;
                 experienceLevels = gpAdvManager->GiveExperience(
-                    m_heroes[winningSide],
-                    m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide],
-                    gbThisNetHumanPlayer[m_heroes[winningSide]->m_owner] == 0
+                    m_heroes[IDX(winningSide)],
+                    m_experienceValue[IDX(OppositeCombatResult(winningSide))],
+                    gbThisNetHumanPlayer[m_heroes[IDX(winningSide)]->m_owner] == 0
                 );
 
                 if (gbRetreatWin == 0) {
@@ -2183,23 +2183,23 @@ void combatManager::DoVictory(i32 winningSide) {
                     if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
                         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
-                            if (m_heroes[winningSide]->m_artifacts[fadeIndex]
+                            if (m_heroes[IDX(winningSide)]->m_artifacts[fadeIndex]
                                 == ARTIFACT_NONE) {
                                 ++emptyArtifactSlots;
                             }
                         }
                         for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex) {
-                            if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->m_artifacts[fadeIndex]
+                            if (m_heroes[IDX(OppositeCombatResult(winningSide))]->m_artifacts[fadeIndex]
                                     >= ARTIFACT_ARCANE_NECKLACE
-                                && m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
+                                && m_heroes[IDX(OppositeCombatResult(winningSide))]
                                            ->m_artifacts[fadeIndex]
                                        != ARTIFACT_MAGIC_BOOK
                                 && emptyArtifactSlots > iMaxTransferArtifacts) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
-                                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
+                                    m_heroes[IDX(OppositeCombatResult(winningSide))]
                                         ->m_artifacts[fadeIndex];
                                 iTransferArtifactsInfo[iMaxTransferArtifacts] =
-                                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]
+                                    m_heroes[IDX(OppositeCombatResult(winningSide))]
                                         ->m_artifactExtra[fadeIndex];
                                 ++iMaxTransferArtifacts;
                             }
@@ -2209,22 +2209,22 @@ void combatManager::DoVictory(i32 winningSide) {
             }
 
             if (!(giCurPlayer == -1 || gbThisNetHumanPlayer[giCurPlayer] == 0
-                  || m_playerId[winningSide] != giCurPlayer)
+                  || m_playerId[IDX(winningSide)] != giCurPlayer)
                 || !(
-                    giCurPlayer == -1 || m_playerId[winningSide] == -1
+                    giCurPlayer == -1 || m_playerId[IDX(winningSide)] == -1
                     || gbThisNetHumanPlayer[giCurPlayer] != 0
-                    || gbThisNetHumanPlayer[m_playerId[winningSide]] == 0
+                    || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )
                 || !(
-                    m_playerId[winningSide] == -1
-                    || gbThisNetHumanPlayer[m_playerId[winningSide]] == 0
+                    m_playerId[IDX(winningSide)] == -1
+                    || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
                 m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
                 if (m_winLoseWindow == NULL)
                     MemError();
 
-                if (m_heroes[winningSide] != NULL) {
+                if (m_heroes[IDX(winningSide)] != NULL) {
                     if (gbCombatSurrender != 0) {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_ENEMY_SURRENDERED)]);
                     } else if (gbRetreatWin != 0) {
@@ -2237,20 +2237,20 @@ void combatManager::DoVictory(i32 winningSide) {
                         sprintf(
                             experienceText,
                             cBattleResults[IDX(RESULT_TEXT_NETWORK_EXPERIENCE)],
-                            m_heroes[winningSide]->m_name,
-                            m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide],
+                            m_heroes[IDX(winningSide)]->m_name,
+                            m_experienceValue[IDX(OppositeCombatResult(winningSide))],
                             experienceLevels
                         );
                     } else {
                         sprintf(
                             experienceText,
                             cBattleResults[IDX(RESULT_TEXT_EXPERIENCE)],
-                            m_heroes[winningSide]->m_name,
-                            m_experienceValue[COMBAT_RESULT_DEFENDER - winningSide]
+                            m_heroes[IDX(winningSide)]->m_name,
+                            m_experienceValue[IDX(OppositeCombatResult(winningSide))]
                         );
                     }
                     strcat(gText, experienceText);
-                    m_heroes[winningSide]->ApplyBattleWinTemps();
+                    m_heroes[IDX(winningSide)]->ApplyBattleWinTemps();
                 } else {
                     if (gbCombatSurrender != 0) {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_ENEMY_SURRENDERED)]);
@@ -2271,13 +2271,13 @@ void combatManager::DoVictory(i32 winningSide) {
                 gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
                 giDialogTimeout = 0;
                 delete m_winLoseWindow;
-                if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide] != NULL)
-                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->ApplyBattleLossTemps();
+                if (m_heroes[IDX(OppositeCombatResult(winningSide))] != NULL)
+                    m_heroes[IDX(OppositeCombatResult(winningSide))]->ApplyBattleLossTemps();
             } else {
-                if (m_heroes[winningSide] != NULL)
-                    m_heroes[winningSide]->ApplyBattleWinTemps();
-                if (m_heroes[COMBAT_RESULT_DEFENDER - winningSide] != NULL)
-                    m_heroes[COMBAT_RESULT_DEFENDER - winningSide]->ApplyBattleLossTemps();
+                if (m_heroes[IDX(winningSide)] != NULL)
+                    m_heroes[IDX(winningSide)]->ApplyBattleWinTemps();
+                if (m_heroes[IDX(OppositeCombatResult(winningSide))] != NULL)
+                    m_heroes[IDX(OppositeCombatResult(winningSide))]->ApplyBattleLossTemps();
                 gpSoundManager->SwitchAmbientMusic(LOSS_MUSIC);
                 DoLoseWindow();
             }
@@ -2289,8 +2289,8 @@ void combatManager::DoVictory(i32 winningSide) {
 
 VA(0x0042f834, 0x3bc)
 void combatManager::DoLoseWindow(void) {
-    i32 unusedLoseWord_h = COMBAT_RESULT_ATTACKER;
-    i32 losingSide_h;
+    i32 unusedLoseWord_h = IDX(COMBAT_RESULT_ATTACKER);
+    CombatResult losingSide_h;
     char animationFile_j[WIN_LOSE_ANIMATION_FILENAME_SIZE];
     tag_message message;
 
@@ -2323,24 +2323,24 @@ void combatManager::DoLoseWindow(void) {
     if (m_winLoseWindow == NULL)
         MemError();
 
-    if (m_heroes[losingSide_h] != NULL) {
+    if (m_heroes[IDX(losingSide_h)] != NULL) {
         if (gbCombatSurrender != 0) {
             sprintf(
                 gText,
                 cBattleResults[IDX(RESULT_TEXT_HERO_SURRENDER)],
-                m_heroes[losingSide_h]->m_name
+                m_heroes[IDX(losingSide_h)]->m_name
             );
         } else if (gbRetreatWin != 0) {
             sprintf(
                 gText,
                 cBattleResults[IDX(RESULT_TEXT_HERO_FLEE)],
-                m_heroes[losingSide_h]->m_name
+                m_heroes[IDX(losingSide_h)]->m_name
             );
         } else {
             sprintf(
                 gText,
                 cBattleResults[IDX(RESULT_TEXT_HERO_DEFEAT)],
-                m_heroes[losingSide_h]->m_name
+                m_heroes[IDX(losingSide_h)]->m_name
             );
         }
     } else {
