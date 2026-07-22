@@ -2500,10 +2500,12 @@ MessageDispatchResult advManager::ProcessDeSelect(
                     SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                 }
                 TrimLoopingSounds(0);
+                // Retail uses the action discriminator for this occupied-town lookup;
+                // HeroView receives the selected hero ID separately.
                 HeroView(
                     giOverviewReturnActionExtra,
                     reinterpret_cast<i32>(
-                        gpGame->GetHero(giOverviewReturnActionExtra)->GetOccupiedTown()
+                        gpGame->GetHero(IDX(giOverviewReturnAction))->GetOccupiedTown()
                     ),
                     1
                 );
