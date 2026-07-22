@@ -738,7 +738,7 @@ SOURCE/EVENTS	?HeroLoses@advManager@@QAEXPAVhero@@@Z	100.0000	8aff4a2b44f3
 SOURCE/EVENTS	?HeroSwap@advManager@@QAEXPAVhero@@0@Z	100.0000	0f2c235cc022
 SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	100.0000	8708d0ae25cd
 SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9180	205f521cc6b6
-SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9408	58d43e612a96
+SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	9233acf260aa
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	656210d8c95c
 SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	56ea18966b49
 SOURCE/EVENTS	?PlayerMonsterInteract@advManager@@QAEXPAVmapCell@@0PAVhero@@PAHHHHHH@Z	100.0000	807d84621aa8
