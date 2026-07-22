@@ -261,11 +261,9 @@ H2_ENUM_BEGIN(OverviewDwellingIndex)
 H2_ENUM_END(OverviewDwellingIndex)
 
 H2_ENUM_BEGIN(OverviewDialogConstant)
-    OVERVIEW_HANDLER_CONTINUE = 1,
-    OVERVIEW_HANDLER_CLOSE    = 2,
-    OVERVIEW_RETURN_ID_NONE   = -1,
-    OVERVIEW_VIEW_ARMY_X      = 119,
-    OVERVIEW_VIEW_ARMY_Y      = 20
+    OVERVIEW_RETURN_ID_NONE = -1,
+    OVERVIEW_VIEW_ARMY_X    = 119,
+    OVERVIEW_VIEW_ARMY_Y    = 20
 H2_ENUM_END(OverviewDialogConstant)
 
 }
@@ -1203,7 +1201,7 @@ void game::Overview(void) {
         if (OD_STEER(lighthouseCount4) < mine4) {
             message8.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message8.payload.widget.id = mine4 + LIGHTHOUSE_WIDGET_ID_OFFSET;
-            message8.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            message8.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             overWin->BroadcastMessage(message8);
         }
     }
@@ -1319,7 +1317,7 @@ void game::DoKnob(void) {
 }
 
 VA(0x0040a66f, 0x4fd)
-i32 OverviewHandler(struct tag_message& message) {
+WidgetDispatchResult OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;
     i32 quickView15;
     i32 scrollItemCount0;
@@ -1456,9 +1454,9 @@ i32 OverviewHandler(struct tag_message& message) {
     if (closeDialog5 == 1) {
         message.payload.widget.id = SCROLL_UP_WIDGET;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return OVERVIEW_HANDLER_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return OVERVIEW_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0040ab6c, 0x4fa)

@@ -43,7 +43,7 @@ public:
     i32 BroadcastMessage(MessageType, BaseWidgetCommand, i32, i32);
     void AddWindow(class heroWindow*, i32, i32);
     void RemoveWindow(class heroWindow*);
-    i32 DoDialog(class heroWindow*, i32 (*)(struct tag_message&), i32);
+    i32 DoDialog(class heroWindow*, WidgetMessageHandler, i32);
     void UpdateScreen(void);
     void UpdateScreenRegion(i32, i32, i32, i32);
     void RedrawScreen(void);

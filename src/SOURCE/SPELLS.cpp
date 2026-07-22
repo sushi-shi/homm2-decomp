@@ -68,8 +68,6 @@ H2_ENUM_BEGIN(CombatSpellUiConstant)
     HELP_CLOSE            = 4,
     HELP_MANA             = 6,
     HELP_DEFAULT          = 7,
-    HANDLER_CONTINUE      = 1,
-    HANDLER_CLOSE         = 2,
     NO_SELECTION          = -1,
     HEX_COLUMN_COUNT      = 13,
     HEX_RIGHT_BORDER      = 12,
@@ -363,11 +361,11 @@ i32 combatManager::ViewSpells(i32) {
 }
 
 VA(0x00420990, 0x15c)
-i32 CombatSpecialHandler(tag_message& message) {
+WidgetDispatchResult CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
         if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
-            return HANDLER_CONTINUE;
+            return WIDGET_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
 
         switch (message.payload.hover.id) {
@@ -391,11 +389,11 @@ i32 CombatSpecialHandler(tag_message& message) {
                 break;
         }
     }
-    return HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x00420aec, 0x2aa)
-i32 HandleCastSpell(tag_message& message) {
+WidgetDispatchResult HandleCastSpell(tag_message& message) {
     i32 hex;
 
     switch (message.type) {
@@ -434,13 +432,13 @@ i32 HandleCastSpell(tag_message& message) {
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
                         gpCombatManager->CombatMessage("Select teleport destination.", 1, 0, 0);
-                        return HANDLER_CONTINUE;
+                        return WIDGET_DISPATCH_CONSUME;
                     }
                 }
                 bInTeleportGetDest = 0;
                 message.type = SPELL_MESSAGE_DIALOG;
                 message.payload.widget.command = SPELL_COMMAND_CLOSE;
-                return HANDLER_CLOSE;
+                return WIDGET_DISPATCH_FORWARD;
             }
             break;
 
@@ -455,9 +453,9 @@ i32 HandleCastSpell(tag_message& message) {
             message.type = SPELL_MESSAGE_DIALOG;
             message.payload.widget.command = SPELL_COMMAND_CLOSE;
             bInTeleportGetDest = 0;
-            return HANDLER_CLOSE;
+            return WIDGET_DISPATCH_FORWARD;
     }
-    return HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x00420d96, 0x2e5)

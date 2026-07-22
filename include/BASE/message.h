@@ -3,6 +3,16 @@
 
 #include <va.h>
 
+struct tag_message;
+
+H2_ENUM_CLASS_BEGIN(WidgetDispatchResult)
+    WIDGET_DISPATCH_CONTINUE = 0,
+    WIDGET_DISPATCH_CONSUME  = 1,
+    WIDGET_DISPATCH_FORWARD  = 2
+H2_ENUM_CLASS_END(WidgetDispatchResult)
+
+typedef WidgetDispatchResult (*WidgetMessageHandler)(tag_message&);
+
 // Shared event ABI emitted by inputManager and consumed by BASE and SOURCE managers.
 // The complete definition is required anywhere a message is passed or returned by value.
 

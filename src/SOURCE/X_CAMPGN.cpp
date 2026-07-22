@@ -565,13 +565,13 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     if (viewOnly == 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
     if (gbLowMemory != 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
-        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(EXPANSION_CAMPAIGN_MUSIC);
@@ -1149,7 +1149,7 @@ i8 ExpCampaign::IsThisMapCompleted(void) {
 }
 
 VA(0x004bd639, 0x32e)
-i32 ExpCampaign::MessageHandler(struct tag_message& message) {
+WidgetDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
@@ -1162,7 +1162,7 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return CAMPAIGN_HANDLER_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -1235,7 +1235,7 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
-                        return CAMPAIGN_HANDLER_CLOSE;
+                        return WIDGET_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -1244,7 +1244,7 @@ i32 ExpCampaign::MessageHandler(struct tag_message& message) {
                 break;
         }
     }
-    return CAMPAIGN_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x004bd967, 0x6c)

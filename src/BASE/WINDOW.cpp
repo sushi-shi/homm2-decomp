@@ -289,8 +289,8 @@ void heroWindow::RemoveWidget(class widget* w) {
 }
 
 VA(0x004cf620, 0x95)
-i32 heroWindow::BroadcastMessage(struct tag_message& message) {
-    i32 local_8 = WIDGET_DISPATCH_CONTINUE;
+WidgetDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) {
+    WidgetDispatchResult local_8 = WIDGET_DISPATCH_CONTINUE;
     widget* local_c = m_widgetListHead;
     while (local_c != NULL) {
         switch (local_8 = local_c->Main(message)) {

@@ -126,7 +126,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
         message.payload.widget.command =
             m_heroes[side]->m_isCaptain ? WIDGET_COMMAND_SET_FLAGS : WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.id = GENERAL_CAPTAIN_WIDGET;
-        message.payload.widget.data.value = WIDGET_FLAG_DRAW;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
         generalWindow->BroadcastMessage(message);
         if (m_heroes[side]->m_isCaptain) {
             message.payload.widget.command = VIEW_GENERAL_SET_FRAME;
@@ -191,20 +191,20 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             || m_currentSide != giCurGeneral) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = GENERAL_CLOSE;
-            message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
             generalWindow->BroadcastMessage(message);
         }
         if (allowActions == 0 || m_heroes[1 - m_currentSide] == NULL || m_currentSide != giCurGeneral
             || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = GENERAL_SURRENDER;
-            message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
             generalWindow->BroadcastMessage(message);
         }
         if (allowActions == 0 || m_currentSide != giCurGeneral
@@ -212,10 +212,10 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
             || m_sideRetreated[1] != 0 || m_heroes[side]->m_isCaptain != 0) {
             message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message.payload.widget.id = GENERAL_RETREAT;
-            message.payload.widget.data.value = WIDGET_FLAG_ENABLED;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
             generalWindow->BroadcastMessage(message);
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = WIDGET_COMMAND_DIMMED;
+            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
             generalWindow->BroadcastMessage(message);
         }
 
@@ -235,7 +235,7 @@ i32 combatManager::ViewGeneral(i32 side, i32 allowActions, i32 quickView) {
 }
 
 VA(0x0040c433, 0x351)
-i32 HandleViewGeneral(tag_message& message) {
+WidgetDispatchResult HandleViewGeneral(tag_message& message) {
     i16 messageConstant1;
     i16 messageConstant2;
     i16 messageConstant3;

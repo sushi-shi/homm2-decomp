@@ -90,7 +90,7 @@ public:
     dropListWidget(void);
     virtual ~dropListWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual WidgetDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);
     void DeleteItem(i32);
     void DrawDropStuff(void);

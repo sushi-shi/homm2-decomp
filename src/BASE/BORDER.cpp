@@ -80,9 +80,9 @@ void border::Read(void) {
 }
 
 VA(0x004d22f0, 0x181)
-i32 border::Main(struct tag_message& msg) {
-    i16 flags = m_flags;
-    if ((flags & WIDGET_FLAG_ENABLED) == 0) {
+WidgetDispatchResult border::Main(struct tag_message& msg) {
+    WidgetFlag flags = m_flags;
+    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return WIDGET_DISPATCH_CONTINUE;
@@ -123,7 +123,7 @@ hoverEvent: {
 }
 
 leaveEvent:
-    if ((flags & WIDGET_FLAG_SELECTED) != 0) {
+    if (HAS(flags, WIDGET_FLAG_SELECTED)) {
         m_flags = flags & ~WIDGET_FLAG_SELECTED;
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_DESELECT;

@@ -579,8 +579,6 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_ICON_ID_10              = 110,
     VIEW_SPELL_ICON_ID_11              = 111,
     VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
-    VIEW_SPELL_WIDGET_VISIBLE_FLAGS    = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW,
-    VIEW_SPELL_WIDGET_READ_ONLY_FLAGS  = WIDGET_FLAG_ENABLED,
     VIEW_SPELL_UNAVAILABLE_COLOR       = 3,
     VIEW_SPELL_NAME_WIDTH              = 78,
     VIEW_SPELL_MANA_MAX                = 999,
@@ -623,7 +621,6 @@ H2_ENUM_BEGIN(GameViewArmyConstant)
     VIEW_ARMY_ASCII_CASE_OFFSET       = 32,
     VIEW_ARMY_DETAIL_BUFFER_SIZE      = 550,
     VIEW_ARMY_TEXT_NEUTRAL_OFFSET     = 3,
-    VIEW_ARMY_WIDGET_VISIBLE_FLAGS    = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW,
     VIEW_ARMY_COUNT_TEXT_SIZE         = 12,
     VIEW_ARMY_SPELL_BASE_Y            = 169,
     VIEW_ARMY_SPELL_CENTER_X          = 420,
@@ -3080,7 +3077,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
 VA(0x00479856, 0x1e2)
 SpellType
 game::ViewSpells(
-    hero* spellHero, HeroSpellType spellType, i32 (*callback)(tag_message&), i32 readOnly
+    hero* spellHero, HeroSpellType spellType, WidgetMessageHandler callback, i32 readOnly
 ) {
     tag_message message;
 
@@ -3112,7 +3109,7 @@ game::ViewSpells(
                 message.payload.widget.id = VIEW_SPELL_COMBAT_TAB_ID;
             else
                 message.payload.widget.id = VIEW_SPELL_ADVENTURE_TAB_ID;
-            message.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message);
         }
         UpdateSpellWidgets();
@@ -3134,7 +3131,7 @@ void game::UpdateSpellWidgets(void) {
     spellPoints0 = m_viewSpellsHero->m_spellPoints;
     if (spellPoints0 > VIEW_SPELL_MANA_MAX)
         spellPoints0 = VIEW_SPELL_MANA_MAX;
-    message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
+    message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
     if (spellPoints0 > VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
         message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     else
@@ -3177,7 +3174,7 @@ void game::UpdateSpellWidgets(void) {
             >= m_viewSpellsCount[IDX(m_viewSpellsType)]) {
             message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
-            message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
+            message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
             m_viewSpellsWindow->BroadcastMessage(message9);
@@ -3194,13 +3191,13 @@ void game::UpdateSpellWidgets(void) {
                 message9.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message9.payload.widget.data.value = VIEW_SPELL_WIDGET_VISIBLE_FLAGS;
+            message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
             m_viewSpellsWindow->BroadcastMessage(message9);
             message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
             m_viewSpellsWindow->BroadcastMessage(message9);
             if (m_viewSpellsReadOnly) {
                 message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                message9.payload.widget.data.value = VIEW_SPELL_WIDGET_READ_ONLY_FLAGS;
+                message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
                 m_viewSpellsWindow->BroadcastMessage(message9);
             }
             message9.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
@@ -3231,7 +3228,7 @@ void game::UpdateSpellWidgets(void) {
 }
 
 VA(0x00479e3b, 0x692)
-i32 ViewSpellsHandler(tag_message& msg) {
+WidgetDispatchResult ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
 
     if (msg.type == MESSAGE_MOUSE_MOVE) {
@@ -3470,7 +3467,7 @@ i32 ViewSpellsHandler(tag_message& msg) {
 }
 
 VA(0x0047a4cd, 0x17c)
-i32 ViewSpecialHandler(tag_message& msg) {
+WidgetDispatchResult ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
             return WIDGET_DISPATCH_CONSUME;
@@ -3508,7 +3505,7 @@ i32 ViewSpecialHandler(tag_message& msg) {
         HeroMessageUpdate(gText);
         return WIDGET_DISPATCH_CONSUME;
     }
-    return 1;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x0047a649, 0xc86)
@@ -3735,25 +3732,25 @@ void game::ViewArmy(
     m_viewArmyWindow->BroadcastMessage(message6);
     if (!gbAllowUpgrade) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message6.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (disableUpgrade) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message6.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (quickView) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message6.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
     }
     if (numTroops < 1) {
         message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = VIEW_ARMY_WIDGET_VISIBLE_FLAGS;
+        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         message6.payload.widget.id = VIEW_ARMY_BLANK_WIDGET_ID;
         m_viewArmyWindow->BroadcastMessage(message6);
         message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
@@ -3826,7 +3823,7 @@ void game::ViewArmy(
 }
 
 VA(0x0047b2cf, 0x3f5)
-i32 ViewArmyHandler(tag_message& msg) {
+WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
     ResourceType resourceType0;
     i32 resourceCost5;
@@ -5713,7 +5710,7 @@ void game::CancelComputerScreen(void) {
             MESSAGE_WIDGET,
             WIDGET_COMMAND_CLEAR_FLAGS,
             i,
-            WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED
+            IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
         );
     }
 }
@@ -5729,7 +5726,7 @@ void game::ShowComputerScreen(void) {
                 MESSAGE_WIDGET,
                 WIDGET_COMMAND_SET_FLAGS,
                 i,
-                WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED
+                IDX(WIDGET_FLAG_UPDATE | WIDGET_FLAG_DIMMED)
             );
         gbAllBlack = true;
         gpAdvManager->CompleteDraw(1);

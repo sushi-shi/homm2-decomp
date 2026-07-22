@@ -182,6 +182,7 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_STORAGE_STEPPED(name, storage) H2SteppedEnumStorage<name, storage>
 #define H2_ENUM_BITFIELD(name, storage) name
 #define H2_ENUM_PARAM(name, storage) name
+#define H2_ENUM_RETURN(name, storage) name
 #define H2_ENUM_FLAGS(name)                                                                        \
     inline constexpr name operator|(name a, name b) {                                              \
         return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
@@ -239,6 +240,7 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_STORAGE_STEPPED(name, storage) storage
 #define H2_ENUM_BITFIELD(name, storage) storage
 #define H2_ENUM_PARAM(name, storage) storage
+#define H2_ENUM_RETURN(name, storage) storage
 #define H2_ENUM_FLAGS(name)
 #endif
 

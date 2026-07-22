@@ -2,29 +2,26 @@
 #define HOMM2_BASE_WIDGET_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <BASE/widgetKind.h>
 
 class heroWindow;
 struct tag_message;
 
-H2_ENUM_BEGIN(WidgetDispatchResult)
-    WIDGET_DISPATCH_CONTINUE = 0,
-    WIDGET_DISPATCH_CONSUME  = 1,
-    WIDGET_DISPATCH_FORWARD  = 2
-H2_ENUM_END(WidgetDispatchResult)
-
-H2_ENUM_BEGIN(WidgetFlag)
+H2_ENUM_CLASS_BEGIN(WidgetFlag)
+    WIDGET_FLAG_NONE     = 0,
     WIDGET_FLAG_SELECTED = 1,
     WIDGET_FLAG_ENABLED  = 2,
     WIDGET_FLAG_DRAW     = 4,
     WIDGET_FLAG_DIMMED   = 8,
     WIDGET_FLAG_GRAYED   = 0x1000,
     WIDGET_FLAG_UPDATE   = 0x4000
-H2_ENUM_END(WidgetFlag)
+H2_ENUM_CLASS_END(WidgetFlag)
+H2_ENUM_FLAGS(WidgetFlag)
 
-H2_ENUM_BEGIN(WidgetCommandArgument)
+H2_ENUM_CLASS_BEGIN(WidgetCommandArgument)
     WIDGET_COMMAND_DIMMED = 0x1000
-H2_ENUM_END(WidgetCommandArgument)
+H2_ENUM_CLASS_END(WidgetCommandArgument)
 
 #pragma pack(push, 1)
 class widget {
@@ -35,7 +32,7 @@ public:
     i16 m_id;
     i16 m_zOrder;
     H2_ENUM_STORAGE(WidgetKind, i16) m_kind;
-    i16 m_flags;
+    H2_ENUM_STORAGE(WidgetFlag, i16) m_flags;
     i16 m_x;
     i16 m_y;
     i16 m_width;
@@ -51,7 +48,7 @@ public:
     widget(void);
     virtual void Draw(void) = 0;
     virtual ~widget(void) = 0;
-    virtual i32 Main(struct tag_message& message) = 0;
+    virtual WidgetDispatchResult Main(struct tag_message& message) = 0;
     i32 Open(i32 zOrder, class heroWindow* owner);
     void Close(void);
     void Dim(void);

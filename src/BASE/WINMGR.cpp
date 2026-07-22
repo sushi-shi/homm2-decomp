@@ -357,7 +357,7 @@ void heroWindowManager::Close(void) {
 
 VA(0x004cac00, 0x2d)
 i32 heroWindowManager::Main(struct tag_message& msg) {
-    i32 result = WIDGET_DISPATCH_CONTINUE;
+    WidgetDispatchResult result = WIDGET_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
     while (w != NULL) {
         result = w->BroadcastMessage(msg);
@@ -365,7 +365,7 @@ i32 heroWindowManager::Main(struct tag_message& msg) {
             break;
         w = w->m_prevWindow;
     }
-    return result;
+    return IDX(result);
 }
 
 VA(0x004cac30, 0xf)
@@ -466,7 +466,7 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
 VA(0x004cadd0, 0x1cf)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
-    i32 (*handler)(struct tag_message&),
+    WidgetMessageHandler handler,
     i32 fade
 ) {
     tag_message message;
@@ -515,15 +515,15 @@ i32 heroWindowManager::DoDialog(
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
         if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
-            result = window->BroadcastMessage(message);
-            if (result == WIDGET_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
+            result = IDX(window->BroadcastMessage(message));
+            if (result == IDX(WIDGET_DISPATCH_FORWARD) && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
                 m_dialogResult = message.payload.widget.id;
                 done = 1;
             }
         }
-        result = handler(message);
-        if (result == WIDGET_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
+        result = IDX(handler(message));
+        if (result == IDX(WIDGET_DISPATCH_FORWARD) && message.type == MESSAGE_WIDGET
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
     } while (done == 0);

@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_EXPCAMPAIGN_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <SOURCE/Campaign.h>
 
 class heroWindow;
@@ -128,7 +129,7 @@ public:
     i8 IsThisMapCompleted(void);
 
 private:
-    static i32 MessageHandler(struct tag_message&);
+    static WidgetDispatchResult MessageHandler(struct tag_message&);
 
 public:
     void Autosave(void);

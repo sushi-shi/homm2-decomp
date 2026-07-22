@@ -23,7 +23,8 @@ def free_decls(path):
         sig = (line[:brace] if brace >= 0 else line).strip()   # body may be on next line
         if '(' not in sig or not HEAD_RE.search(sig):
             continue
-        namepart = sig[:sig.index('(')]
+        semantic_sig = re.sub(r'^H2_ENUM_RETURN\s*\([^)]*\)\s*', '', sig)
+        namepart = semantic_sig[:semantic_sig.index('(')]
         # free functions only: members (Class::name) live in class headers; skip ctor/dtor; skip
         # file-static helpers (file-local — no CodeView symbol, never declared in the owner header)
         if '::' in namepart or '~' in namepart or namepart.split()[:1] == ['static']:

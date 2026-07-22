@@ -26,11 +26,6 @@ H2_ENUM_BEGIN(TradingPostWidgetId)
     POST_EXECUTE          = 0x1d
 H2_ENUM_END(TradingPostWidgetId)
 
-H2_ENUM_CLASS_BEGIN(TradingPostHandlerResult)
-    POST_HANDLER_CONTINUE = 1,
-    POST_HANDLER_EXIT     = 2
-H2_ENUM_CLASS_END(TradingPostHandlerResult)
-
 H2_ENUM_BEGIN(TradingPostPrivateConstant)
     KNOB_WIDTH       = 17,
     KNOB_HEIGHT      = 8,
@@ -134,7 +129,7 @@ void UpdateTradingPost(i32 draw) {
         else
             messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageTemp.payload.widget.id = resource;
-        messageTemp.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         tpWindow->BroadcastMessage(messageTemp);
     }
 
@@ -208,7 +203,7 @@ void UpdateTradingPost(i32 draw) {
                 messageTemp.payload.widget.id = TRADING_POST_LEFT_ICON_FIRST + resource;
             else
                 messageTemp.payload.widget.id = TRADING_POST_RIGHT_ICON_FIRST + resource;
-            messageTemp.payload.widget.data.value = WIDGET_FLAG_DRAW;
+            messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             tpWindow->BroadcastMessage(messageTemp);
         }
     }
@@ -294,7 +289,7 @@ void SetupNewTrade(void) {
 }
 
 VA(0x004bfcbb, 0x3b6)
-i32 TradingPostHandler(struct tag_message& message) {
+WidgetDispatchResult TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
     i32 updateDisplay = 0;
     i32 resourceData;
@@ -393,9 +388,9 @@ i32 TradingPostHandler(struct tag_message& message) {
     if (exitFlag) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return IDX(POST_HANDLER_EXIT);
+        return WIDGET_DISPATCH_FORWARD;
     }
-    return IDX(POST_HANDLER_CONTINUE);
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};

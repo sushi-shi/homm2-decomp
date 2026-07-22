@@ -2,6 +2,7 @@
 #define HOMM2_CAMPAIGN_H
 
 #include <Ints.h>
+#include <BASE/message.h>
 #include <SOURCE/KB.h>
 
 struct tag_message;
@@ -23,8 +24,6 @@ H2_ENUM_CLASS_END(CampaignAward)
 
 H2_ENUM_BEGIN(CampaignMessageConstant)
     CAMPAIGN_CLOSE_COMMAND               = 10,
-    CAMPAIGN_HANDLER_CLOSE               = 2,
-    CAMPAIGN_HANDLER_CONTINUE            = 1,
     CAMPAIGN_DIALOG_CANCEL               = 0x7801,
     CAMPAIGN_DIALOG_ACCEPT               = 0x7802,
     CAMPAIGN_DIALOG_RESTART              = 0x385,
@@ -74,6 +73,6 @@ H2_ENUM_BEGIN(CampaignDisplayConstant)
     CAMPAIGN_EVIL_MUSIC            = 22
 H2_ENUM_END(CampaignDisplayConstant)
 
-i32 CampaignHandler(struct tag_message&);
+WidgetDispatchResult CampaignHandler(struct tag_message&);
 
 #endif

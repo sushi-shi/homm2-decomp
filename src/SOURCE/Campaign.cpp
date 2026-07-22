@@ -446,13 +446,13 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (!viewOnly) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         campWin->BroadcastMessage(message);
     }
     if (gbLowMemory) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
-        message.payload.widget.data.value = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
@@ -697,7 +697,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
 }
 
 VA(0x00448e52, 0x521)
-i32 CampaignHandler(struct tag_message& message) {
+WidgetDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
@@ -710,7 +710,7 @@ i32 CampaignHandler(struct tag_message& message) {
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return CAMPAIGN_HANDLER_CLOSE;
+        return WIDGET_DISPATCH_FORWARD;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -812,12 +812,12 @@ i32 CampaignHandler(struct tag_message& message) {
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
-                        return CAMPAIGN_HANDLER_CLOSE;
+                        return WIDGET_DISPATCH_FORWARD;
                 }
                 break;
         }
     }
-    return CAMPAIGN_HANDLER_CONTINUE;
+    return WIDGET_DISPATCH_CONSUME;
 }
 
 VA(0x00449373, 0x47)

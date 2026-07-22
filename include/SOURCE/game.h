@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_GAME_H
 
 #include <va.h>
+#include <BASE/message.h>
 #include <EDITOR/fullMap.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/combatTypes.h>
@@ -154,7 +155,7 @@ public:
     i32 m_viewSpellsTop[GAME_VIEW_SPELLS_SIDE_COUNT];
     i32 m_viewSpellsCount[GAME_VIEW_SPELLS_SIDE_COUNT];
     SpellType m_viewSpell;
-    i32 (*m_viewSpellsCallback)(struct tag_message&);
+    WidgetMessageHandler m_viewSpellsCallback;
     i8 m_viewSpellsReadOnly;
     u8 m_gameLoaded;
     void SetupDynamicStuff(i32, i32, i32);
@@ -217,7 +218,7 @@ public:
     i32 LoadMap(char*);
     void ClaimTown(i32, i32, i32);
     void ClaimMine(i32, i32);
-    SpellType ViewSpells(class hero*, HeroSpellType, i32 (*)(struct tag_message&), i32);
+    SpellType ViewSpells(class hero*, HeroSpellType, WidgetMessageHandler, i32);
     void UpdateSpellWidgets(void);
     void ViewArmy(
         i32,
