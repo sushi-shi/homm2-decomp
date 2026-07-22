@@ -1300,7 +1300,7 @@ SOURCE/TOWNMGR	?RecruitHero@townManager@@QAEHHH@Z	100.0000	2311ebd09bde
 SOURCE/TOWNMGR	?RedrawTownScreen@townManager@@QAEXXZ	100.0000	33ce6c5f99e7
 SOURCE/TOWNMGR	?ResetStrips@townManager@@QAEXXZ	100.0000	4d3683c7e2e7
 SOURCE/TOWNMGR	?SetArmyCommand@townManager@@QAEXH@Z	100.0000	82353d0ebd46
-SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	0.0000	a275d5485767
+SOURCE/TOWNMGR	?SetCommandAndText@townManager@@QAEXAAUtag_message@@@Z	100.0000	4eca3a95c17d
 SOURCE/TOWNMGR	?SetupExtraStuff@townManager@@QAEXXZ	100.0000	cdd098bc3ca2
 SOURCE/TOWNMGR	?SetupMage@townManager@@QAEXPAVheroWindow@@@Z	99.9000	ba002b6ecc7d
 SOURCE/TOWNMGR	?SetupThievesGuild@townManager@@QAEXPAVheroWindow@@H@Z	98.9791	ed6772920cd6
