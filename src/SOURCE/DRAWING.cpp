@@ -1520,7 +1520,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         NULL
     );
     viewX += COMBAT_SMALL_VIEW_INSET_X;
-    if (drawn6 == ICON_DRAW_COMPLETED) {
+    if (drawn6 != ICON_DRAW_SKIPPED) {
         if (viewArmy1->m_quantity > 1)
             sprintf(
                 gText,
@@ -1745,7 +1745,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                                  ? viewArmy1->m_spellCount
                                  : COMBAT_SMALL_VIEW_MAX_SPELLS;
         spellFrame1 = -1;
-        for (spellSlot = 0; spellSlot < visibleSpellCount5; spellSlot++) {
+        for (spellSlot = 0; OD_STEER(spellSlot) < visibleSpellCount5; spellSlot++) {
             spellFrame1++;
             while (viewArmy1->m_spellInfluence[spellFrame1] == 0)
                 spellFrame1++;
