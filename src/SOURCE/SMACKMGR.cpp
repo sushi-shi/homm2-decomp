@@ -12,6 +12,7 @@
 #include <BASE/resourceManager.h>
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/ExpCampaign.h>
 #include <SOURCE/SMACKMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/kbwin.h>
@@ -90,7 +91,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
     if (drawFrame) {
         while (SmackToBufferRect(smack, SMACKSURFACESLOW)) {
             if (bSmackNum == CHOOSE_CAMPAIGN) {
-                if (gbCampaignSideChoice == 1) {
+                if (gbCampaignSideChoice == CAMPAIGN_ARCHIBALD) {
                     brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
                     brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                 } else {
@@ -98,7 +99,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
                     brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_RIGHT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                 }
             }
-            if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice != -1)
+            if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice != EXPANSION_CAMPAIGN_NONE)
                 backImage->DrawToBuffer(0, 0, 1, ICON_DRAW_NORMAL);
             if (bSmackNum == CONGRATS && smack->FrameNum >= CONGRATS_FIRST_FRAME) {
                 smallFont->DrawBoundedString(
@@ -162,7 +163,8 @@ void SmackManagerMain(void) {
 
         brotherIcon = gpResourceManager->GetIcon("brothers.icn");
         gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
-        gbCampaignSideChoice = initialMouseX3 < CAMPAIGN_DIVIDER_X;
+        gbCampaignSideChoice = initialMouseX3 < CAMPAIGN_DIVIDER_X ? CAMPAIGN_ARCHIBALD
+                                                                  : CAMPAIGN_ROLAND;
     }
 
     KBChangeMenu(hmnuDflt);
@@ -369,14 +371,15 @@ void SmackManagerMain(void) {
                 if (bSmackNum == CHOOSE_CAMPAIGN) {
                     i32 campaignMouseX5;
                     i32 campaignMouseY3;
-                    i32 campaignChoice4;
+                    CampaignSide campaignChoice4;
 
                     gpMouseManager->MouseCoords(campaignMouseX5, campaignMouseY3);
-                    campaignChoice4 = campaignMouseX5 < CAMPAIGN_DIVIDER_X;
+                    campaignChoice4 = campaignMouseX5 < CAMPAIGN_DIVIDER_X ? CAMPAIGN_ARCHIBALD
+                                                                          : CAMPAIGN_ROLAND;
                     if (campaignChoice4 == gbCampaignSideChoice)
                         break;
                     gbCampaignSideChoice = campaignChoice4;
-                    if (gbCampaignSideChoice == 1) {
+                    if (gbCampaignSideChoice == CAMPAIGN_ARCHIBALD) {
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_FRAME, ICON_DRAW_NORMAL);
                         brotherIcon->DrawToBuffer(0, 0, CAMPAIGN_LEFT_SELECTED_FRAME, ICON_DRAW_NORMAL);
                     } else {
@@ -395,7 +398,7 @@ void SmackManagerMain(void) {
                 } else if (bSmackNum == EXPANSION_CAMPAIGN) {
                     i32 expansionMouseX6;
                     i32 expansionMouseY4;
-                    i32 expansionChoice1;
+                    ExpansionCampaignId expansionChoice1;
 
                     gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
                     expansionChoice1 = ExpansionCampaignRect(expansionMouseX6, expansionMouseY4);
@@ -415,7 +418,7 @@ void SmackManagerMain(void) {
                             SmackClose(smk2);
                             smk2 = NULL;
                         }
-                        if (expansionChoice1 != -1) {
+                        if (expansionChoice1 != EXPANSION_CAMPAIGN_NONE) {
                             bExpansionSmackNum =
                                 static_cast<i8>(expansionChoice1 + EXPANSION_FIRST_MOVIE);
                             sprintf(
@@ -454,7 +457,7 @@ void SmackManagerMain(void) {
             case MESSAGE_LEFT_BUTTON_DOWN:
                 if (bSmackNum == SMACK_EARTH)
                     break;
-                if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice == -1)
+                if (bSmackNum == EXPANSION_CAMPAIGN && xLastChoice == EXPANSION_CAMPAIGN_NONE)
                     break;
                 goto playbackDone;
                 break;
@@ -564,7 +567,7 @@ i32 PlaySmacker(i32 smackNumber) {
     i8 savedPalette[PALETTE_DATA_SIZE];
     i32 oldUpdateFlags;
 
-    xLastChoice = -1;
+    xLastChoice = EXPANSION_CAMPAIGN_NONE;
     if (gbNoCDRom)
         return 0;
 
@@ -605,13 +608,13 @@ DATA(0x004ec048) static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
 VA(0x004025ce, 0x65)
-i32 ExpansionCampaignRect(i32 x, i32 y) {
-    i32 i;
-    for (i = 0; i < EXPANSION_RECT_COUNT; ++i) {
-        if (PointInRect(x, y, &expansionCampaignRects[i]))
-            return i;
+ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
+    ExpansionCampaignId campaign = EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY;
+    for (; IDX(campaign) < EXPANSION_RECT_COUNT; ++campaign) {
+        if (PointInRect(x, y, &expansionCampaignRects[IDX(campaign)]))
+            return campaign;
     }
-    return -1;
+    return EXPANSION_CAMPAIGN_NONE;
 }
 
 VA(0x00402633, 0x89)

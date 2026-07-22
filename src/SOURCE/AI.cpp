@@ -51,7 +51,7 @@ i32 combatManager::AICheckRetreat(void) {
     if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
         return 0;
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
-        && static_cast<u8>(m_heroes[IDX(m_currentSide)]->m_id)
+        && m_heroes[IDX(m_currentSide)]->m_id
                == gpGame->m_mapHeader.victoryConditionValue)
         return 0;
     if (gpGame->m_players[m_heroes[IDX(m_currentSide)]->m_owner].m_townCount == 0
@@ -202,7 +202,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     u32 walkerMasks15[COMBAT_SIDE_COUNT];
     CombatSide enemySide12;
     u32l totalArmyStrength11;
-    i32 adjacentDirection6;
+    CombatHexDirection adjacentDirection6;
     army* currentArmy9;
     i32 targetArmy16;
     combatManager* combat2;
@@ -494,10 +494,11 @@ finish:
     if (giNextAction == ACTION_MOVE && giNextActionGridIndex > 0
         && giNextActionGridIndex < COMBAT_HEX_COUNT
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == COMBAT_SIDE_NONE) {
-        for (adjacentDirection6 = 0; adjacentDirection6 < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+        for (adjacentDirection6 = COMBAT_DIRECTION_NORTHEAST;
+             IDX(adjacentDirection6) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
              adjacentDirection6++) {
             adjacentHex8 = currentArmy9->GetAdjacentCellIndex(
-                giNextActionGridIndex, static_cast<CombatHexDirection>(adjacentDirection6)
+                giNextActionGridIndex, adjacentDirection6
             );
             if (adjacentHex8 > 0 && adjacentHex8 < COMBAT_HEX_COUNT
                 && gpCombatManager->m_hexCells[adjacentHex8].m_occupantSide
@@ -522,10 +523,8 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0)
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
-    modifiedDamage = static_cast<float>(
-        (target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
-        / COMBAT_AI_LICH_HIT_POINT_SCALE
-    );
+    modifiedDamage = ((target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
+        / COMBAT_AI_LICH_HIT_POINT_SCALE);
     return modifiedDamage;
 }
 
@@ -538,7 +537,7 @@ void combatManager::DoLichShot(class army* lich) {
     u8 damaged19[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
     float damageValue10;
     float adjacentDamage6;
-    i32 direction37;
+    CombatHexDirection direction37;
     i32 adjacentHex13;
     i32 targetHex36;
     army* target17;
@@ -555,10 +554,10 @@ void combatManager::DoLichShot(class army* lich) {
         damageValue10 = GetModLichDamage(target17, lichDamage5);
         damaged19[IDX(target17->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + target17->m_index] = 1;
         targetHex36 = target17->m_hex;
-        for (direction37 = 0; direction37 < COMBAT_AI_ADJACENT_DIRECTION_COUNT; direction37++) {
-            adjacentHex13 = GetAdjacentCellIndexNoArmy(
-                targetHex36, static_cast<CombatHexDirection>(direction37)
-            );
+        for (direction37 = COMBAT_DIRECTION_NORTHEAST;
+             IDX(direction37) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             direction37++) {
+            adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
             if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT
                 && m_hexCells[adjacentHex13].m_occupantSide != COMBAT_SIDE_NONE
                 && m_hexCells[adjacentHex13].m_occupantIndex != -1
@@ -899,7 +898,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         );
     u32 bit0;
     u32 targetMask29;
-    i32 direction36;
+    CombatHexDirection direction36;
     i32 attackHexes5[ARMY_ATTACK_HEX_COUNT];
     i32 targetArmy15;
 
@@ -908,11 +907,13 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
 
     bit0 = COMBAT_AI_MASK_FIRST_BIT;
     targetMask29 = 0;
-    for (direction36 = 0; direction36 < COMBAT_AI_ATTACK_DIRECTION_COUNT; direction36++) {
+    for (direction36 = COMBAT_DIRECTION_NORTHEAST;
+         IDX(direction36) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
+         direction36++) {
         if ((availableMask4 & bit0) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
-                static_cast<CombatHexDirection>(direction36),
+                direction36,
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
                 attackHexes5

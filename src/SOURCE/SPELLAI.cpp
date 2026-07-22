@@ -1411,7 +1411,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                               [m_hexCells[currentHex].m_occupantIndex]) {
                 gArmyEffected[IDX(m_hexCells[currentHex].m_occupantSide)]
                              [m_hexCells[currentHex].m_occupantIndex] = 1;
-                workChanceWork = targetCreature->SpellCastWorkChance(SpellType(spell));
+                workChanceWork = targetCreature->SpellCastWorkChance(spell);
                 if (workChanceWork > 0.0f) {
                     spellDamageWork = static_cast<i32l>(damage * workChanceWork);
                     monsterTotal = targetCreature->m_monsterType;

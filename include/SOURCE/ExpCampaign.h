@@ -9,12 +9,14 @@ class heroWindow;
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(ExpansionCampaignId)
+    EXPANSION_CAMPAIGN_NONE             = -1,
     EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY = 0,
     EXPANSION_CAMPAIGN_DESCENDANTS      = 1,
     EXPANSION_CAMPAIGN_WIZARDS_ISLE     = 2,
     EXPANSION_CAMPAIGN_VOYAGE_HOME      = 3,
     EXPANSION_CAMPAIGN_COUNT            = 4
 H2_ENUM_CLASS_END(ExpansionCampaignId)
+H2_ENUM_STEPPED(ExpansionCampaignId)
 
 H2_ENUM_CLASS_BEGIN(ExpansionCampaignMap)
     MAP_NONE                                    = -1,

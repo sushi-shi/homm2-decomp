@@ -61,6 +61,14 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CampaignSide, u8)
     CAMPAIGN_SIDE_COUNT = 2
 H2_ENUM_CLASS_END_SPLIT(CampaignSide, u8)
 
+inline CampaignSide OppositeCampaignSide(CampaignSide side) {
+#ifdef HOMM2_STRICT_ENUM_TYPES
+    return side == CAMPAIGN_ROLAND ? CAMPAIGN_ARCHIBALD : CAMPAIGN_ROLAND;
+#else
+    return 1 - side;
+#endif
+}
+
 H2_ENUM_CLASS_BEGIN(MonsterScoreField)
     MONSTER_SCORE_THRESHOLD   = 0,
     MONSTER_SCORE_TYPE        = 1,

@@ -70,9 +70,7 @@ H2_ENUM_BEGIN(MapDirectionConstant)
 H2_ENUM_END(MapDirectionConstant)
 
 inline MapDirection OppositeMapDirection(MapDirection direction) {
-    return static_cast<MapDirection>(
-        (IDX(direction) + MAP_DIRECTION_OPPOSITE_OFFSET) & MAP_DIRECTION_INDEX_MASK
-    );
+    return (direction + MAP_DIRECTION_OPPOSITE_OFFSET) & MAP_DIRECTION_INDEX_MASK;
 }
 
 H2_ENUM_CLASS_BEGIN(CoordinateAxis)

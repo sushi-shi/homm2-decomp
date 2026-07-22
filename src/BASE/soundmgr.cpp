@@ -265,7 +265,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
                 notify ? " notify" : ""
             );
         if (notify != 0)
-            wnd = static_cast<HWND>(hwndApp);
+            wnd = hwndApp;
         else
             wnd = NULL;
         nMCIError =
@@ -284,7 +284,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
                 notify ? " notify" : ""
             );
         if (notify != 0)
-            wndn = static_cast<HWND>(hwndApp);
+            wndn = hwndApp;
         else
             wndn = NULL;
         nMCIError =
@@ -399,7 +399,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     }
     if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
         MessageBoxA(
-            static_cast<HWND>(hwndApp),
+            hwndApp,
             "Sound initialization error!  No wave devices found.",
             "Startup Error",
             0
@@ -420,7 +420,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     if (rc != 0) {
         if (showErrors != 0)
             MessageBoxA(
-                static_cast<HWND>(hwndApp),
+                hwndApp,
                 AIL_last_error(),
                 "Sound initialization error!",
                 0

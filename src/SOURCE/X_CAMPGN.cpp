@@ -1264,7 +1264,7 @@ void ExpCampaign::Autosave(void) {
 VA(0x004bd9d3, 0x25)
 ExpansionCampaignId ExpCampaign::Choose(void) {
     PlaySmacker(SMACKER_CAMPAIGN_CHOICE);
-    return static_cast<ExpansionCampaignId>(xLastChoice);
+    return xLastChoice;
 }
 
 VA(0x004bd9f8, 0x64)

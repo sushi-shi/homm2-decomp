@@ -275,7 +275,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
     switch (message.type) {
         case MESSAGE_WIDGET:
-            if (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 helpIndex = -1;
                 if (message.payload.widget.command != WIDGET_COMMAND_SELECT
                     && message.payload.widget.command != WIDGET_COMMAND_ALTERNATE_SELECT)
