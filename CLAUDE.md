@@ -83,8 +83,9 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 - One TU lives at `src/<TIER>/<TU>.cpp`; its declarations live in
   `include/<TIER>/<TU>.h`. Define functions in retail-RVA order.
 - Mark functions with `VA(0x........, 0x..)`, global definitions with `DATA(<VA>)`,
-  and owned vtables with `VTBL(...)`. These are audit metadata, not linker placement
-  directives.
+  primary vtables with `VTBL(Class, <VA>)`, and secondary base-specific vtables with
+  `VTBL2(Derived, Base, <VA>)`. These are source-owned audit and delinker metadata,
+  not compiler placement directives.
 - Definitions and declarations follow the owner-header model. Do not add local
   `class`, `struct`, `extern`, or forward declarations in `.cpp` files. A
   `typedef enum` used by exactly one TU is private and lives in that `.cpp`;
@@ -97,8 +98,9 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 - Comparison-only anonymous-data normalization happens under
   `build/objdiff/normalized/`. Raw compiler and delinker objects remain authoritative
   for linking, disassembly, and hard gates.
-- Reviewed static-data topology is described by source `DATA(...)` definitions plus
-  `config/delink_data_supplemental.tsv`. Generated manifests belong in `build/gen`.
+- Reviewed static-data topology is described by source `DATA(...)`, `VTBL(...)`, and
+  `VTBL2(...)` annotations plus `config/delink_data_supplemental.tsv`. Generated
+  manifests belong in `build/gen`.
 - `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
   current normalized source hash. A changed hash starts a new current-score epoch. It is
   queue evidence only: no build or command rejects a regression against an older maximum.

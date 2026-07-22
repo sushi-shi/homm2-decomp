@@ -1,10 +1,10 @@
 """Build HoMM2 data manifests from source annotations and candidate COFF topology.
 
-``DATA()`` is the address authority for reconstructed storage.  Candidate objects
-provide the exact decorated identity, section ordinal/value, extent, alignment, and
-storage class.  The only versioned supplement contains compiler/linker allocations
-which have no source annotation; combined Vostok inputs are generated under
-``build/gen``.
+``DATA()``, ``VTBL()``, and ``VTBL2()`` are the address authorities for reconstructed
+storage.  Candidate objects provide the exact decorated identity, section
+ordinal/value, extent, alignment, and storage class.  The only versioned supplement
+contains compiler/linker allocations which have no source annotation; combined
+Vostok inputs are generated under ``build/gen``.
 """
 
 from __future__ import annotations
@@ -25,6 +25,7 @@ from homm2.build.annotated_data import (
     AnnotatedDataDefinition as SourceDefinition,
     source_definitions as annotated_source_definitions,
 )
+from homm2.build.annotated_vtables import source_vtables
 from homm2.build.canonicalize_relocs import CoffFile
 from homm2.build.canonicalize_data_symbols import _family, canonicalize_coff
 from homm2.build.data_topology_census import (
@@ -327,6 +328,66 @@ def _symbol_row(source: SourceDefinition, candidate: CandidateDefinition,
     }
 
 
+def resolve_vtable_definitions(claims, topology_by_unit, public_by_rva):
+    """Bind each source VTBL/VTBL2 claim to one emitted candidate definition."""
+    resolved = []
+    public_locations = defaultdict(set)
+    for (unit, rva), names in public_by_rva.items():
+        for name in names:
+            public_locations[name].add((unit, rva))
+    for claim in claims:
+        candidates = [
+            row for row in topology_by_unit.get(claim.unit, ([], []))[0]
+            if row.symbol == claim.mangled_name
+        ]
+        if len(candidates) != 1:
+            raise ValueError(
+                f"{claim.location}: expected one candidate {claim.mangled_name}, "
+                f"found {len(candidates)}")
+        candidate = candidates[0]
+        if candidate.storage != "rdata" or candidate.storage_class != 2:
+            raise ValueError(
+                f"{claim.location}: vtable {claim.mangled_name} is not external rdata")
+        public_names = set(public_by_rva.get((claim.unit, claim.rva), ()))
+        if claim.base is None and claim.mangled_name not in public_names:
+            raise ValueError(
+                f"{claim.location}: primary vtable {claim.mangled_name} has no "
+                "matching CodeView public")
+        if (public_locations.get(claim.mangled_name)
+                and claim.mangled_name not in public_names):
+            raise ValueError(
+                f"{claim.location}: CodeView places {claim.mangled_name} at another RVA")
+        resolved.append((claim, candidate))
+    return resolved
+
+
+def _vtable_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
+    return {
+        "name": candidate.symbol,
+        "object": candidate.unit.replace("/", "\\") + ".c",
+        "rva": f"0x{claim.rva:x}",
+        "size": f"0x{candidate.size:x}",
+        "storage": candidate.storage,
+        "alignment": f"0x{candidate.alignment:x}",
+        "section_ordinal": str(candidate.section_ordinal),
+        "section_offset": f"0x{candidate.section_value:x}",
+        "scope": "external",
+        "provenance": f"source-{'VTBL2' if claim.base else 'VTBL'}:{claim.location}",
+    }
+
+
+def _mark_vtable_aliases(rows: list[dict[str, str]]) -> None:
+    """Mark source vtable names which candidate COFF aliases at one allocation."""
+    by_rva = defaultdict(list)
+    for row in rows:
+        by_rva[int(row["rva"], 0)].append(row)
+    for aliases in by_rva.values():
+        if len(aliases) < 2:
+            continue
+        for row in aliases:
+            row["provenance"] += ":candidate-coff-alias"
+
+
 def _read_tsv(path: Path) -> list[dict[str, str]]:
     if not Path(path).is_file():
         return []
@@ -473,7 +534,7 @@ def migrate_supplemental(legacy: Path, output: Path, source_rows, topology_by_un
         rows.append(_normalize_symbol_row(legacy_row, topology_by_unit))
     validate_symbol_rows(rows, "supplemental")
     _write_tsv(output, SYMBOL_HEADER, _sorted_symbol_rows(rows),
-               "Compiler/linker allocations without a source DATA() definition.")
+               "Compiler/linker allocations without a source DATA()/VTBL()/VTBL2() definition.")
     return rows
 
 
@@ -502,7 +563,9 @@ def validate_symbol_rows(rows, label: str) -> None:
             raise ValueError(f"{label} invalid size/alignment for {identity}")
         if rva in rvas:
             previous_identity, previous_row = rvas[rva]
-            alias_fields = ("object", "size", "storage", "section_ordinal", "section_offset")
+            alias_fields = (
+                "object", "size", "storage", "alignment", "section_ordinal",
+                "section_offset", "scope")
             proved_alias = (
                 "candidate-coff-alias" in row["provenance"]
                 and "candidate-coff-alias" in previous_row["provenance"]
@@ -1145,7 +1208,14 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
                 for index, rva in enumerate(retail_rvas)}
     source_rows = [_symbol_row(source, candidate, next_rva[source.rva])
                    for source, candidate in resolved]
-    validate_symbol_rows(source_rows, "source DATA")
+    vtable_claims = source_vtables(Path(source_root), REPO)
+    resolved_vtables = resolve_vtable_definitions(
+        vtable_claims, topology_by_unit, public_by_rva)
+    vtable_rows = [_vtable_row(claim, candidate)
+                   for claim, candidate in resolved_vtables]
+    _mark_vtable_aliases(vtable_rows)
+    source_rows.extend(vtable_rows)
+    validate_symbol_rows(source_rows, "source annotations")
     if migrate_from is not None:
         supplemental_rows = migrate_supplemental(
             Path(migrate_from), Path(supplemental), source_rows, topology_by_unit)
@@ -1172,7 +1242,7 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     classified_contributions.sort(key=lambda row: (
         int(row["rva"]), row["object"], row["storage"]))
     _write_tsv(SOURCE_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(source_rows),
-               "Generated from source DATA() plus exact candidate COFF identity.")
+               "Generated from source DATA()/VTBL()/VTBL2() plus exact candidate COFF identity.")
     _write_tsv(COMBINED_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(combined),
                "Generated Vostok symbol manifest; do not edit.")
     _write_tsv(SECTION_MANIFEST, SECTION_HEADER, section_rows,
@@ -1185,7 +1255,8 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     BREAKPOINTS.parent.mkdir(parents=True, exist_ok=True)
     BREAKPOINTS.write_text(json.dumps(report, indent=2) + "\n")
     summary = {
-        "source_definitions": len(source_rows),
+        "source_definitions": len(resolved),
+        "source_vtables": len(vtable_rows),
         "supplemental_definitions": len(supplemental_rows),
         "combined_definitions": len(combined),
         "sections": len(section_rows),

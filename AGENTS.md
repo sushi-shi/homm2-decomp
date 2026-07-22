@@ -97,9 +97,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Candidate objects supply reconstructed COFF symbol spelling and topology; retail PE,
   NB09 contributions, bytes, and relocations supply placement evidence. Vostok emits the
   reviewed model; it does not discover private identities automatically.
-- The canonical data manifest is the conflict-free union of generated source `DATA(...)`
-  definitions and reviewed `config/delink_data_supplemental.tsv` rows. Skip unverified
-  private placement instead of guessing or falling back to synthetic names.
+- The canonical data manifest is the conflict-free union of generated source `DATA(...)`,
+  `VTBL(...)`, and `VTBL2(...)` definitions and reviewed
+  `config/delink_data_supplemental.tsv` rows. Skip unverified private placement instead
+  of guessing or falling back to synthetic names.
 - Preserve storage class and section alignment. Padding is not a symbol. Do not insert
   giant arrays to reproduce final-image gaps, and do not classify `.data`/`.bss` solely
   from the PE raw-size boundary.
