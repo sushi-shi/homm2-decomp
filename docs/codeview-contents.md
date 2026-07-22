@@ -5,22 +5,35 @@ Exhaustive byte-level mine of the embedded CodeView NB09 debug stream (the sourc
 **linker-merged, publics-only** image — rich in names/addresses/ownership, but with **no type
 information whatsoever**.
 
-## Static-link manifest (from `sstLibraries`)
+## Link manifest (from `sstLibraries` and `sstModule`)
 
 The 19 libraries linked into the retail EXE — this is the game's whole dependency stack:
 
 | Category | Libraries |
 | :--- | :--- |
 | **Win32 imports** | `kernel32` `user32` `gdi32` `winmm` `winspool` `comdlg32` `advapi32` `shell32` `ole32` `oleaut32` `uuid` `wsock32` `netapi32` |
-| **Middleware (vendor, NOT NWC source)** | `basewin.lib` (NWC UI framework, `/O2`) · `Mss32.lib` (Miles Sound System) · `Wing32.lib` (WinG graphics) · `Smkw32ms.lib` (Smacker video) |
+| **NWC static framework** | `basewin.lib` (mixed-profile UI and low-level utility objects) |
+| **Vendor imports** | `Mss32.lib` (Miles Sound System) · `Wing32.lib` (WinG graphics) · `Smkw32ms.lib` (Smacker video) |
 | **CRT / misc** | `LIBCMT.lib` (static CRT) · `oldnames.lib` |
 
 **Static vs dynamic (from each lib's `.text` contribution to the EXE):** only three things are
-real static code *in the EXE* — the directly-linked NWC objects (`Win32_Re`/`winextra`, ~797 KB),
+real static code *in the EXE* — the no-library NWC objects (`Win32_Re`, ~797 KB),
 `basewin.lib` (NWC's own UI framework, ~108 KB), and `LIBCMT.lib` (static MS CRT, ~51 KB). Every
 other lib — the Win32 system libs **and the middleware `Mss32`(Miles) / `Smkw32ms`(Smacker) /
 `Wing32`(WinG)** — is an **import library → DLL**: it contributes only 6-byte `jmp [__imp__X]`
 thunk stubs (30–510 bytes each), while the actual code lives in the DLL, loaded at runtime.
+
+The per-module `iLib` field gives the exact NWC split. There are 53 no-library module records:
+51 reconstructed code objects, `heroes.res`, and the linker-generated `HEROES2W.exp`. There are
+44 `basewin.lib` members: 42 objects under `Win32_RE` plus `winextra\BITS.obj` and
+`winextra\TILE.obj`. Thus an object's recorded source path does not establish how it reached the
+link. In particular, both `winextra` objects are archive members, not direct link inputs.
+
+Archive membership also does not establish compiler flags. The selected reconstruction profiles
+inside `basewin.lib` are 38 `/O2` objects, three `/Od` objects, two `/Od /Oi` objects, and BITS
+under an optimized frame-pointer profile. BITS and TILE are both low-level `winextra` members;
+their exact reconstructions are inline assembly. The precise C/C++ optimization sub-profile for
+BITS is consequently not observable from its instruction body.
 
 **Consequences:** (1) the middleware is **dynamically linked and closed** — its code is *not in
 this binary* (hence not in CodeView beyond the import thunks), and the devs had only the DLL +
