@@ -4339,7 +4339,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 minYOffset;
     i32 minXSlot;
     i32 skipFrameIndex;
-    TilesetId objectTilesetLocal;
+    H2_ENUM_STORAGE(TilesetId, i32) objectTilesetLocal;
 
 
     if (partial == 0) {
@@ -4460,7 +4460,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                             radarColorValue = gOwnerColors[ownerColorIndex];
                         }
                     } else {
-                        objectTilesetLocal = static_cast<TilesetId>(-1);
+                        objectTilesetLocal = -1;
                         if (cellValue->m_objectIndex != MAPCELL_SPRITE_NONE) {
                             objectTilesetLocal = cellValue->m_objectTileset;
                         } else if (cellValue->m_overlayIndex != MAPCELL_SPRITE_NONE) {

@@ -665,7 +665,7 @@ void philAI::CheckBuyStuff(void) {
             if (best.type != PURCHASE_NONE && CanBuyBHC(best)) {
                 switch (best.type) {
                     case PURCHASE_BUILDING:
-                        BuildBuilding(best.pTown, static_cast<BuildingSlotType>(best.what));
+                        BuildBuilding(best.pTown, best.building);
                         break;
                     case PURCHASE_HERO:
                         BuildHero(best.pTown, best.what);
@@ -716,7 +716,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     float node;
     i32 nb;
     i32 kn;
-    i32 directionIndex;
+    MapDirection directionIndex;
     MapDirection bestDirection;
     i32 heroId;
 
@@ -730,11 +730,11 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
          & MAP_TRIGGER_TYPE_MASK)
         == MAP_OBJECT_MONSTER)
         return 0;
-    for (directionIndex = 0; directionIndex < NORMAL_DIRECTION_COUNT; directionIndex++) {
-        MapDirection candidateDirection = static_cast<MapDirection>(directionIndex);
-        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, candidateDirection)) {
-            kn = normalDirTable[directionIndex].x + gpCurAIHero->m_x;
-            nb = normalDirTable[directionIndex].y + gpCurAIHero->m_y;
+    for (directionIndex = MAP_DIRECTION_NORTH; IDX(directionIndex) < NORMAL_DIRECTION_COUNT;
+         directionIndex++) {
+        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, directionIndex)) {
+            kn = normalDirTable[IDX(directionIndex)].x + gpCurAIHero->m_x;
+            nb = normalDirTable[IDX(directionIndex)].y + gpCurAIHero->m_y;
             if (HAS(gpAdvManager->GetCell(kn, nb)->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                 && !(mapExtra[kn + (MAP_WIDTH | 0) * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
@@ -759,7 +759,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
                 if (p > 80)
                     if (bestValue < val) {
                         bestValue = val;
-                        bestDirection = candidateDirection;
+                        bestDirection = directionIndex;
                     }
             }
         }
@@ -2639,12 +2639,12 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     BuildingSlotType node;
     float nb;  // best randomized benefit-cost ratio
     float kn;  // best raw benefit-cost ratio
-    i32 jb;    // best building index
+    BuildingSlotType jb; // best building
     float idx; // raw benefit-cost ratio
     i32 cost;
     nb = -99.0f;
     kn = -99.0f;
-    jb = -1;
+    jb = BUILDING_SLOT_NONE;
     for (node = BUILDING_SLOT_MAGE_GUILD; node <= BUILDING_SLOT_DISABLED_LAST; node++) {
         if (!(t->m_buildings & (1 << IDX(node)))
             || (node == BUILDING_SLOT_MAGE_GUILD && t->m_buildState < AI_MAX_MAGE_GUILD_LEVEL)) {
@@ -2654,7 +2654,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                     cost = static_cast<i32>(cost * 1.3);
                 score = (Random(1, 5) + 95) * idx / 100.0f;
                 if (score > OD_STEER(kn)) {
-                    jb = IDX(node);
+                    jb = node;
                     nb = idx;
                     kn = score;
                 }
@@ -2674,7 +2674,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     }
     bhc.pTown = t;
     bhc.type = PURCHASE_BUILDING;
-    bhc.what = jb;
+    bhc.building = jb;
     fOut = nb;
 }
 // NOLINTEND(readability-magic-numbers)
@@ -4916,7 +4916,7 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     switch (bhc.type) {
         case PURCHASE_BUILDING:
-            if (CanBuy(bhc.pTown, BuildingSlotType(bhc.what)))
+            if (CanBuy(bhc.pTown, bhc.building))
                 return 1;
             break;
         case PURCHASE_HERO:

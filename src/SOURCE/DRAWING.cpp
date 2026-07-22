@@ -1154,12 +1154,11 @@ void combatManager::DrawFrame(
                 i32 wallX7;
                 i32 wallFrame1;
                 i32 wallY;
-                CombatCastleHex hexIndex6;
+                H2_ENUM_STORAGE(CombatCastleHex, i32) hexIndex6;
+
+                hexIndex6 = IDX(row) * COMBAT_GRID_ROW_LENGTH + column1;
 
                 if (m_inCastleCombat != 0 && drawState5 == ARMY_DRAW_BEHIND) {
-                    hexIndex6 = static_cast<CombatCastleHex>(
-                        static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
-                    );
                     wallFrame1 = 0;
                     wallX7 = 0;
                     wallY = 0;
@@ -1252,14 +1251,8 @@ void combatManager::DrawFrame(
                 }
 
                 if (skipSpecialOccupants6 == 0
-                    || (static_cast<CombatCastleHex>(
-                            static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
-                        )
-                            != COMBAT_CASTLE_SPECIAL_HEX_FIRST
-                        && static_cast<CombatCastleHex>(
-                               static_cast<i32>(row) * COMBAT_GRID_ROW_LENGTH + column1
-                           )
-                               != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
+                    || (hexIndex6 != COMBAT_CASTLE_SPECIAL_HEX_FIRST
+                        && hexIndex6 != COMBAT_CASTLE_SPECIAL_HEX_SECOND)) {
                     m_hexCells[IDX(row) * COMBAT_GRID_ROW_LENGTH + column1].DrawOccupant(
                         drawState5,
                         0
@@ -1278,13 +1271,11 @@ void combatManager::DrawFrame(
             || moatCell[IDX(row)] == giWalkingFrom || moatCell[IDX(row)] == giWalkingFrom2) {
             if (abs(giWalkingTo - giWalkingFrom) <= 1)
                 goto drawMoat;
-            if (static_cast<CombatDrawLayer>(
-                    giWalkingFrom / COMBAT_GRID_ROW_LENGTH
-                            > giWalkingTo / COMBAT_GRID_ROW_LENGTH
-                        ? giWalkingFrom / COMBAT_GRID_ROW_LENGTH
-                        : giWalkingTo / COMBAT_GRID_ROW_LENGTH
-                )
-                != row)
+            if ((giWalkingFrom / COMBAT_GRID_ROW_LENGTH
+                         > giWalkingTo / COMBAT_GRID_ROW_LENGTH
+                     ? giWalkingFrom / COMBAT_GRID_ROW_LENGTH
+                     : giWalkingTo / COMBAT_GRID_ROW_LENGTH)
+                != IDX(row))
                 goto endRow;
 
             if (gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN

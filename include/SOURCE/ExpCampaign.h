@@ -62,6 +62,7 @@ H2_ENUM_CLASS_BEGIN(ExpansionCampaignAward)
     AWARD_SET_GUARDIAN        = 9,
     AWARD_SPHERE_NEGATION     = 10
 H2_ENUM_CLASS_END(ExpansionCampaignAward)
+H2_ENUM_STEPPED(ExpansionCampaignAward)
 
 H2_ENUM_BEGIN(ExpansionCampaignConstant)
     EXPANSION_CAMPAIGN_MAX_MAP_COUNT           = 8,

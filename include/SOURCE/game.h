@@ -31,6 +31,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(PlayerHandicap, i8)
     PLAYER_HANDICAP_SEVERE   = 2,
     PLAYER_HANDICAP_COUNT    = 3
 H2_ENUM_CLASS_END_SPLIT(PlayerHandicap, i8)
+H2_ENUM_STEPPED(PlayerHandicap)
 
 #pragma pack(push, 1)
 struct mineRecord {
@@ -97,7 +98,7 @@ public:
     char m_saveName[GAME_SAVE_NAME_SIZE];
     SMapHeader m_mapHeader;
     i8 m_setupPlayerColor[MAP_HEADER_PLAYER_COUNT];
-    H2_ENUM_STORAGE(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
+    H2_ENUM_STORAGE_STEPPED(PlayerHandicap, i8) m_playerHandicap[MAP_HEADER_PLAYER_COUNT];
     H2_ENUM_STORAGE_STEPPED(FactionType, i8) m_setupPlayerRace[MAP_HEADER_PLAYER_COUNT];
     i8 m_setupPlayerNetworkId[MAP_HEADER_PLAYER_COUNT];
     H2_ENUM_STORAGE(GameDifficulty, i8) m_difficulty;

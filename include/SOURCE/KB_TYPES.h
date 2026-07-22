@@ -511,6 +511,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
     FACTION_RANDOM        = 7,
     FACTION_COUNT         = 6
 H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
+H2_ENUM_STEPPED(FactionType)
 
 // Hero cursor slots 0-5 reuse faction ids; slot 6 selects the boat sprites.
 typedef FactionType HeroCursorType;

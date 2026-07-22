@@ -3782,10 +3782,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (gbInCampaign)
                 gpGame->m_campaignCheated = 1;
             if (currentHeroRec != NULL) {
-                for (loopIndex = 0; loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
-                    currentHeroRec->AddSpell(
-                        static_cast<SpellType>(loopIndex), APP_MENU_SPELL_COUNT
-                    );
+                for (SpellType spell = SPELL_FIREBALL; IDX(spell) < APP_MENU_MAX_SPELLS; ++spell)
+                    currentHeroRec->AddSpell(spell, APP_MENU_SPELL_COUNT);
                 currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
             }
             break;

@@ -1741,7 +1741,7 @@ void game::GiveTroopsToNeutralTowns(void) {
 VA(0x00474678, 0x1dd0)
 void game::NewMap(char* filename) {
     char* extension0;
-    i32 randomColor2;
+    FactionType randomColor2;
     i32 nextHuman6;
     i32 player2;
     i32 townIndex9;
@@ -1775,7 +1775,7 @@ void game::NewMap(char* filename) {
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
-    randomColor2 = Random(0, GAME_PLAYER_COUNT - 1);
+    randomColor2 = static_cast<FactionType>(Random(0, GAME_PLAYER_COUNT - 1));
     nextHuman6 = giNumHumanPlayers;
 
     for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
@@ -1793,7 +1793,7 @@ void game::NewMap(char* filename) {
         gcColorToPlayerPos[player2] = -1;
         gcColorToSetupPos[player2] = -1;
         if (gpGame->m_setupPlayerRace[player2] == FACTION_RANDOM)
-            gpGame->m_setupPlayerRace[player2] = static_cast<FactionType>(randomColor2);
+            gpGame->m_setupPlayerRace[player2] = randomColor2;
         randomColor2 = (randomColor2 + 1) % GAME_PLAYER_COUNT;
     }
     for (player2 = 0; player2 < m_playerCount; player2++)
@@ -1967,9 +1967,7 @@ void game::NewMap(char* filename) {
             m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
         }
     secondHero:
-        heroClass5 = static_cast<FactionType>(
-            (Random(1, IDX(FACTION_COUNT) - 1) + IDX(heroClass5)) % IDX(FACTION_COUNT)
-        );
+        heroClass5 = (heroClass5 + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
         m_players[player2].m_availableHeroIds[1] =
             static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
         m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
@@ -4486,9 +4484,8 @@ void game::PerWeek(void) {
                 heroClass18 =
                     m_heroRecs[gpGame->m_players[outerIndex5].m_availableHeroIds[0]].m_cursorType;
             }
-            heroClass18 = static_cast<FactionType>(
-                (Random(1, IDX(FACTION_COUNT) - 1) + IDX(heroClass18)) % IDX(FACTION_COUNT)
-            );
+            heroClass18 =
+                (heroClass18 + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
             desiredClass1 = heroClass18;
             if (innerIndex3 == 0
                 && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
@@ -4906,12 +4903,12 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     town* castle0 = GetTown(townId0);
     mapTownExtra* extra =
         reinterpret_cast<mapTownExtra*>(ppMapExtra[WORLDMAP->GetCell(x, y)->m_objectMetadata]);
-    i32 race0;
+    FactionType race0;
 
     if (extra->color == RANDOM_TOWN_UNOWNED_COLOR)
-        race0 = Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX);
+        race0 = static_cast<FactionType>(Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX));
     else
-        race0 = IDX(m_setupPlayerRace[gcColorToSetupPos[extra->color]]);
+        race0 = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
 
     castle0->m_turnsOwned = RANDOM_TOWN_AGE;
     ConvertObject(
@@ -4923,7 +4920,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
-        race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
     );
@@ -4936,7 +4933,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
-        race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
     );
@@ -4949,7 +4946,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
-        race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
     );
@@ -4962,11 +4959,11 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
-        race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
     );
-    m_castleRecs[townId0].m_type = static_cast<FactionType>(race0);
+    m_castleRecs[townId0].m_type = race0;
 }
 
 VA(0x0047f5f1, 0x619)
@@ -5274,7 +5271,7 @@ void game::ProcessRandomObjects(void) {
     i32 minValue7;
     mapCell* cell6;
     i32 randomType0;
-    i32 randomObjectType3;
+    MapObjectType randomObjectType3;
 
     giUABaseX = -1;
     giUABaseY = -1;
@@ -5327,8 +5324,10 @@ void game::ProcessRandomObjects(void) {
                     if (cell6->m_objectTileset == TILESET_MONS32
                         && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
                         && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
-                        randomObjectType3 = cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER;
-                        switch (static_cast<MapObjectType>(randomObjectType3)) {
+                        randomObjectType3 = static_cast<MapObjectType>(
+                            cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER
+                        );
+                        switch (randomObjectType3) {
                             case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
                                 minValue7 = 0;
                                 maxValue17 = 400;
@@ -6132,12 +6131,13 @@ void game::ProcessOnMapHeroes(void) {
     mapHeroExtra* extra0;
     mapCell* townCell1;
     i32 heroId1;
+    i32 heroClassFrame;
     i32 armySlot0;
     i32 mapY15;
     i32 recordSlot10;
     i32 mapX0;
     i32 townId4;
-    i32 heroClass6;
+    FactionType heroClass6;
     i32 owner1;
     town* occupiedTown4;
 
@@ -6178,20 +6178,22 @@ void game::ProcessOnMapHeroes(void) {
                         if (isJail6) {
                             heroClass6 = extra0->heroClass;
                         } else {
-                            heroClass6 = cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE;
-                            if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
-                                heroClass6 = IDX(m_setupPlayerRace
-                                    [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]]);
+                            heroClassFrame = cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE;
+                            if (heroClassFrame == MAP_HERO_RANDOM_FACTION_FRAME) {
+                                heroClass6 = m_setupPlayerRace
+                                    [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
+                            } else {
+                                heroClass6 = static_cast<FactionType>(heroClassFrame);
                             }
                         }
 
                         if (extra0->hasAssignedHero) {
                             mapHero0 = GetHero(extra0->heroId);
-                            mapHero0->m_cursorType = static_cast<FactionType>(heroClass6);
+                            mapHero0->m_cursorType = heroClass6;
                         } else {
                             heroId1 = RandomScan(
                                 usedHeroes4,
-                                heroClass6 * MAP_HEROES_PER_FACTION,
+                                IDX(heroClass6) * MAP_HEROES_PER_FACTION,
                                 MAP_HEROES_PER_FACTION,
                                 MAP_HERO_CLASS_SCAN_RETRY_LIMIT,
                                 0
@@ -6204,11 +6206,12 @@ void game::ProcessOnMapHeroes(void) {
                                     RANDOM_SCAN_RETRY_LIMIT,
                                     0
                                 );
-                                heroClass6 = heroId1 / MAP_HEROES_PER_FACTION;
+                                heroClass6 =
+                                    static_cast<FactionType>(heroId1 / MAP_HEROES_PER_FACTION);
                             }
                             usedHeroes4[heroId1] = 1;
                             mapHero0 = GetHero(heroId1);
-                            mapHero0->m_cursorType = static_cast<FactionType>(heroClass6);
+                            mapHero0->m_cursorType = heroClass6;
                             if (extra0->hasCustomHero && extra0->heroId >= GAME_HERO_COUNT)
                                 mapHero0->m_portrait = extra0->heroId;
                             extra0->heroId = static_cast<i8>(heroId1);
@@ -7503,7 +7506,8 @@ void game::SetupNewRumour(void) {
     rumourEventExtra* event4;
     i32 eventIndex11;
     i32 attempts13;
-    i32 category10;
+    TownThievesGuildCategory category10;
+    i32 ultimateRumourRoll;
     i32 roll2;
     i32 direction9;
     // Retail's event chances, category weights, and cDirections indices are
@@ -7533,27 +7537,25 @@ void game::SetupNewRumour(void) {
         if (roll2 < 80 && giCurTurn > 1) {
             attempts13 = 0;
             while (attempts13++ < 200) {
-                category10 = Random(6, 9);
-                GetCategoryStats(
-                    static_cast<TownThievesGuildCategory>(category10),
-                    categoryStats7,
-                    categoryOrder2
-                );
+                category10 = static_cast<TownThievesGuildCategory>(Random(
+                    IDX(THIEVES_CATEGORY_OBELISKS), IDX(THIEVES_CATEGORY_INCOME)
+                ));
+                GetCategoryStats(category10, categoryStats7, categoryOrder2);
                 SortStats(categoryStats7, categoryOrder2);
                 if (categoryStats7[1] != categoryStats7[0]) {
-                    if (category10 == 6)
+                    if (category10 == THIEVES_CATEGORY_OBELISKS)
                         sprintf(
                             m_rumour,
                             "%s has found the most obelisks.",
                             cPlayerNames[categoryOrder2[0]]
                         );
-                    else if (category10 == 7)
+                    else if (category10 == THIEVES_CATEGORY_ARTIFACTS)
                         sprintf(
                             m_rumour,
                             "%s has found the most artifacts.",
                             cPlayerNames[categoryOrder2[0]]
                         );
-                    else if (category10 == 8)
+                    else if (category10 == THIEVES_CATEGORY_ARMY_STRENGTH)
                         sprintf(
                             m_rumour,
                             "%s has the most powerful forces.",
@@ -7571,8 +7573,8 @@ void game::SetupNewRumour(void) {
             goto ultimateRumour;
         } else {
         ultimateRumour:
-            category10 = Random(0, 100);
-            if (category10 < 33) {
+            ultimateRumourRoll = Random(0, 100);
+            if (ultimateRumourRoll < 33) {
                 if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
                       || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
@@ -7601,7 +7603,7 @@ void game::SetupNewRumour(void) {
                     "The ultimate artifact may be found in the %s regions of the world.",
                     cDirections[direction9]
                 );
-            } else if (category10 < 66) {
+            } else if (ultimateRumourRoll < 66) {
                 sprintf(
                     m_rumour,
                     "The ultimate artifact may be found %s.",
