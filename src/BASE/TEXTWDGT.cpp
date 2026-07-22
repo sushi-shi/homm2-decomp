@@ -73,7 +73,7 @@ void textWidget::Read(void) {
 }
 
 VA(0x004d1250, 0x30)
-textWidget::~textWidget() {
+inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
