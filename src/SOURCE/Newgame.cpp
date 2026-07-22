@@ -271,7 +271,7 @@ void game::GetMap(void) {
     if (resultCode == FILE_REQUESTER_OK) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
-        if (_strcmpi(savedName, gMapName) != 0) {
+        if (strcmpi(savedName, gMapName) != 0) {
             strcpy(m_mapFilename, gMapName);
             ProcessNewMap(NULL);
         }
