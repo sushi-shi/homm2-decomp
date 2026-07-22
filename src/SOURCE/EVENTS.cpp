@@ -6846,7 +6846,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     spellValueFactor_i = 1.0f;
                 }
                 pyramidBattleValue_l = static_cast<i32>(
-                    gsSpellInfo[index_h].aiValue * gpCurPlayer->m_upgradeValueWeight
+                    gsSpellInfo[index_h].aiValue * gpCurPlayer->m_aiData.m_upgradeValueWeight
                     * spellValueFactor_i
                 );
                 gpPhilAI->ChooseEvaluateBattle(
