@@ -1758,7 +1758,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     i32 type;
     i32 extra;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == true)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
