@@ -34,7 +34,6 @@ H2_ENUM_BEGIN(SetupConstant)
     CAMPAIGN_INTRO               = 4,
     CAMPAIGN_SELECTION           = 35,
     HELP_DIALOG                  = NORMAL_DIALOG_QUICK_VIEW,
-    DIALOG_RESULT_MIN            = 1,
     DIALOG_RESULT_MAX            = 1000,
 H2_ENUM_END(SetupConstant)
 
@@ -1177,7 +1176,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                if ((message.payload.widget.id >= DIALOG_RESULT_MIN
+                if ((message.payload.widget.id > 0
                      && message.payload.widget.id <= DIALOG_RESULT_MAX)
                     || message.payload.widget.id == DIALOG_CANCEL)
                     handled = 1;
@@ -1187,7 +1186,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     if (handled || giMenuCommand != -1) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         if (giMenuCommand != -1)
             gpWindowManager->m_dialogResult = DIALOG_CANCEL;
         return MESSAGE_DISPATCH_FORWARD;
