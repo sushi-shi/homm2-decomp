@@ -1221,7 +1221,7 @@ SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	97.3131	69edb307b072
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	96.6375	51b1ad384d6e
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	f34b11bf342f
-SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	90.4262	52a95844e94a
+SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	99.9306	1e387ec36b2a
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	100.0000	8bbb78255a15
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	98.8248	602a896e999b
