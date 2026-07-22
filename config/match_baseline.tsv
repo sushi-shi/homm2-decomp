@@ -1089,7 +1089,7 @@ SOURCE/PHILAI	?EvaluateMineEvent@philAI@@QAEHHHHPAH@Z	100.0000	2db6b4f2fea6
 SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	100.0000	4a0ec7d1d78a
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	20e5c7e976ea
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	6522bf603985
-SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	99.9043	bb6ee5fca61f
+SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	100.0000	2dc774edf3eb
 SOURCE/PHILAI	?EvaluateTownEvent@philAI@@QAEHHHHHPAH@Z	98.9933	b45552ead0ff
 SOURCE/PHILAI	?FightEvent@philAI@@QAEHPAVhero@@PAVmapCell@@H@Z	100.0000	b3acb160cc67
 SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	100.0000	e2568fb24936
