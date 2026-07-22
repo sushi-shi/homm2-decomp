@@ -263,7 +263,7 @@ public:
     void ExpansionRecruitEvent(class hero*, H2_ENUM_PARAM(CreatureType, i32), i16*);
     void JailEvent(class mapCell*, class hero*, i32, i32);
     void TownEvent(class mapCell*, i32, i32);
-    void EventSound(i32, i32, struct SAMPLE2*);
+    void EventSound(H2_ENUM_PARAM(MapObjectType, i32), i32, struct SAMPLE2*);
     void EventWindow(i32, i32, char*, i32, i32, i32, i32, i32);
     ArtifactType GiveRandomArtifact(class hero*);
     i32 GiveExperience(class hero*, i32, i32);

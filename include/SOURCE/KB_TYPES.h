@@ -355,7 +355,8 @@ H2_ENUM_CLASS_BEGIN(SpellType)
 H2_ENUM_CLASS_END(SpellType)
 H2_ENUM_STEPPED(SpellType)
 
-H2_ENUM_BEGIN(MapObjectType)
+H2_ENUM_CLASS_BEGIN(MapObjectType)
+    MAP_OBJECT_NO_CONVERSION              = -1,
     MAP_TRIGGER_ACTION_FLAG               = 0x80,
     MAP_TRIGGER_TYPE_MASK                 = 0x7f,
     MAP_OBJECT_NONE                       = 0,
@@ -483,7 +484,7 @@ H2_ENUM_BEGIN(MapObjectType)
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
     MAP_OBJECT_JAIL                       = 123
-H2_ENUM_END(MapObjectType)
+H2_ENUM_CLASS_END(MapObjectType)
 H2_ENUM_FLAGS(MapObjectType)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)

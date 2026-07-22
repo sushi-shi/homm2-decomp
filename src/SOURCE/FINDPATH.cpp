@@ -251,7 +251,7 @@ void searchArray::TestPossibleDirections(
                 && (giCurPlayerBit & mapExtra[gSearchNextY * MAP_WIDTH + gSearchNextX]) == 0))
             goto invalidDirection;
 
-        if ((gSearchNextCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) != 0) {
+        if (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
             if (!allowOccupied) {
                 if (m_specialTargetX != gSearchNextX || m_specialTargetY != gSearchNextY)
                     goto invalidDirection;
@@ -315,7 +315,7 @@ void searchArray::TestPossibleDirections(
                 || (gSearchNextCell->m_objTypeBits & SEARCH_OBJECT_TYPE_MASK)
                        == SEARCH_BLOCKING_OBJECT_TYPE
                 || (gSearchNextCell->m_flags & SEARCH_CELL_BLOCKED) != 0
-                || ((gSearchNextCell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) != 0
+                || (HAS(gSearchNextCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                     && (gSearchTriggerType =
                             gSearchNextCell->m_triggerType & MAP_TRIGGER_TYPE_MASK,
                         StopOnTrigger(gSearchNextCell) != 0))) {

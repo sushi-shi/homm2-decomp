@@ -338,7 +338,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     signEventExtra* signExtra_k;
     SAMPLE2 playedSample3;
     tag_message unusedEventMessage;
-    i32 eventType_g;
+    MapObjectType eventType_g;
     hero* eventHero2;
     char sphinxAnswer_a[SPHINX_ANSWER_BUFFER_SIZE];
     i32 eraseObject;
@@ -1133,7 +1133,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_BOAT:
             boat_j = &gpGame->m_boats[cell->m_objectMetadata];
-            gpGame->RestoreCell(-1, -1, boat_j->x, boat_j->y, cell, BOAT_RESTORE_MODE);
+            gpGame->RestoreCell(
+                -1,
+                -1,
+                boat_j->savedTriggerType,
+                boat_j->savedEventData,
+                cell,
+                BOAT_RESTORE_MODE
+            );
             eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_EMBARKED;
             eventHero2->m_remainingMobility = 0;
             boat_j->heroId = eventHero2->m_id;
@@ -2606,7 +2613,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
                 for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
                     if ((gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_triggerType
-                            == (eventType_g | TELEPORT_TRIGGER_FLAG)
+                            == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex
                                == cell->m_objectIndex
                         && (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
@@ -2622,7 +2629,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
                     for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
                         if ((gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_triggerType
-                                == (eventType_g | TELEPORT_TRIGGER_FLAG)
+                                == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX3 != x || teleportY != y)
@@ -3581,8 +3588,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         MINE_TOP_A_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_A,
                         MINE_BOTTOM_A_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -3594,8 +3601,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         MINE_SECOND_A_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_A,
                         MINE_SECOND_BOTTOM_A_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -3607,8 +3614,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         MINE_TOP_B_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_B,
                         MINE_BOTTOM_B_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -3620,8 +3627,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         MINE_SECOND_B_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_B,
                         MINE_SECOND_BOTTOM_B_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x,
@@ -3633,8 +3640,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         MINE_CENTER_GHOST_FRAME,
                         ABANDONED_MINE_TILESET_CENTER,
                         MINE_CENTER_GOLD_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
@@ -4482,7 +4489,11 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
 }
 
 VA(0x004afa56, 0x516)
-void advManager::EventSound(i32 eventType, i32 eventData, struct SAMPLE2* outSample) {
+void advManager::EventSound(
+    H2_ENUM_PARAM(MapObjectType, i32) eventType,
+    i32 eventData,
+    struct SAMPLE2* outSample
+) {
     const i32 treasureSound_a = SOUND_TREASURE;
     const i32 experienceSound_o = SOUND_EXPERIENCE;
     const i32 moraleSound_e = SOUND_MORALE;
@@ -6016,7 +6027,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 battleWon_j;
     i32 pyramidBattleValue_l;
     i32 oldPlayer_o;
-    i32 eventType_g;
+    MapObjectType eventType_g;
     playerData* oldPlayerData_h;
     i32 battleResult_l;
     i32 purchaseCost_i;
@@ -6600,7 +6611,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
                 for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
                     if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType
-                            == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                            == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                         && gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex
                                == cell->m_objectIndex
                         && abs(exitY_d - y) + abs(exitX - x)
@@ -6617,7 +6628,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
                     for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
                         if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType
-                                == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
+                                == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
                             && gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex
                                    == cell->m_objectIndex
                             && abs(exitY_d - y) + abs(exitX - x)
@@ -6927,8 +6938,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         MINE_TOP_A_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_A,
                         MINE_BOTTOM_A_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -6940,8 +6951,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         MINE_SECOND_A_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_A,
                         MINE_SECOND_BOTTOM_A_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -6953,8 +6964,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         MINE_TOP_B_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_B,
                         MINE_BOTTOM_B_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
@@ -6966,8 +6977,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         MINE_SECOND_B_LAST_FRAME,
                         ABANDONED_MINE_TILESET_BOTTOM_B,
                         MINE_SECOND_BOTTOM_B_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->ConvertObject(
                         x,
@@ -6979,8 +6990,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                         MINE_CENTER_GHOST_FRAME,
                         ABANDONED_MINE_TILESET_CENTER,
                         MINE_CENTER_GOLD_FRAME,
-                        ABANDONED_MINE_OBJECT,
-                        ABANDONED_MINE_EVENT
+                        MAP_OBJECT_ABANDONED_MINE,
+                        MAP_OBJECT_MINE
                     );
                     gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;

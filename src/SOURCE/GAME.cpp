@@ -4797,7 +4797,7 @@ void game::PerMonth(void) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
             for (mapY5 = 0; mapY5 < MAP_HEIGHT; mapY5++) {
                 cell0 = gpAdvManager->GetCell(mapX8, mapY5);
-                if (cell0->m_triggerType == 0 && !cell0->m_objectLayerBit1
+                if (cell0->m_triggerType == MAP_OBJECT_NONE && !cell0->m_objectLayerBit1
                     && !cell0->m_objectLayerBit0
                     && giGroundToTerrain[cell0->m_terrainImageIndex] != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
@@ -4835,8 +4835,8 @@ void game::ConvertObject(
     i32 oldLastIndex,
     TilesetId newTileset,
     i32 newFirstIndex,
-    i32 oldTrigger,
-    i32 newTrigger
+    H2_ENUM_PARAM(MapObjectType, i32) oldTrigger,
+    H2_ENUM_PARAM(MapObjectType, i32) newTrigger
 ) {
     i32 x;
     i32 y;
@@ -4856,9 +4856,8 @@ void game::ConvertObject(
                         static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
                 }
                 if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
-                    cell->m_triggerType = static_cast<u8>(
-                        (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger
-                    );
+                    cell->m_triggerType =
+                        (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger;
 
                 if (cell->m_extraIndex != 0
                     && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
@@ -4937,8 +4936,8 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
         race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
-        RANDOM_TOWN_FIRST_TRIGGER,
-        RANDOM_TOWN_TRIGGER
+        MAP_OBJECT_RANDOM_TOWN,
+        MAP_OBJECT_CASTLE
     );
     ConvertObject(
         x + RANDOM_TOWN_LEFT,
@@ -4950,8 +4949,8 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
         race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
-        RANDOM_TOWN_FIRST_TRIGGER,
-        RANDOM_TOWN_TRIGGER
+        MAP_OBJECT_RANDOM_TOWN,
+        MAP_OBJECT_CASTLE
     );
     ConvertObject(
         x + RANDOM_TOWN_LEFT,
@@ -4963,8 +4962,8 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
         race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
-        RANDOM_TOWN_SECOND_TRIGGER,
-        RANDOM_TOWN_TRIGGER
+        MAP_OBJECT_RANDOM_CASTLE,
+        MAP_OBJECT_CASTLE
     );
     ConvertObject(
         x + RANDOM_TOWN_LEFT,
@@ -4976,8 +4975,8 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
         race0 << RANDOM_TOWN_RACE_FRAME_SHIFT,
-        RANDOM_TOWN_SECOND_TRIGGER,
-        RANDOM_TOWN_TRIGGER
+        MAP_OBJECT_RANDOM_CASTLE,
+        MAP_OBJECT_CASTLE
     );
     m_castleRecs[townId0].m_type = static_cast<FactionType>(race0);
 }
@@ -4992,7 +4991,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     i32 retry4;
     i32 rowOffset0;
     u8 mineFrame36;
-    i32 triggerType19;
+    MapObjectType triggerType19;
 
     terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
     for (retry4 = 0; retry4 < RANDOM_MINE_RETRY_LIMIT; retry4++) {
@@ -5092,7 +5091,7 @@ void game::RandomizeMine(i32 x, i32 y) {
 
     if (mineType29 == MINE_TYPE_MERCURY) {
         WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
-        triggerType19 = 1;
+        triggerType19 = MAP_OBJECT_ALCHEMIST_LAB;
     } else if (mineType29 == MINE_TYPE_WOOD) {
         triggerType19 = MAP_OBJECT_SAWMILL;
     } else {
@@ -5113,8 +5112,8 @@ void game::RandomizeMine(i32 x, i32 y) {
         for (columnOffset4 = 0; columnOffset4 < RANDOM_MINE_FOOTPRINT_WIDTH; columnOffset4++) {
             if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                  & MAP_TRIGGER_TYPE_MASK)
-                > 0)
-                if (static_cast<i32>(
+                > MAP_OBJECT_NONE)
+                if (IDX(
                         WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
                         & MAP_TRIGGER_TYPE_MASK
                     )
@@ -5380,8 +5379,8 @@ void game::ProcessRandomObjects(void) {
                         16,
                         TILESET_OBJNRSRC,
                         randomType0 * 2,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
                         x10,
@@ -5393,8 +5392,8 @@ void game::ProcessRandomObjects(void) {
                         17,
                         TILESET_OBJNRSRC,
                         randomType0 * 2 + 1,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     switch (randomType0) {
                         case 0:
@@ -5422,8 +5421,8 @@ void game::ProcessRandomObjects(void) {
                         162,
                         TILESET_OBJNARTI,
                         artifactId18 * 2,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
                         x10,
@@ -5435,8 +5434,8 @@ void game::ProcessRandomObjects(void) {
                         163,
                         TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TREASURE_ARTIFACT:
@@ -5452,8 +5451,8 @@ void game::ProcessRandomObjects(void) {
                         166,
                         TILESET_OBJNARTI,
                         artifactId18 * 2,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
                         x10,
@@ -5465,8 +5464,8 @@ void game::ProcessRandomObjects(void) {
                         167,
                         TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MINOR_ARTIFACT:
@@ -5482,8 +5481,8 @@ void game::ProcessRandomObjects(void) {
                         168,
                         TILESET_OBJNARTI,
                         artifactId18 * 2,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
                         x10,
@@ -5495,8 +5494,8 @@ void game::ProcessRandomObjects(void) {
                         169,
                         TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MAJOR_ARTIFACT:
@@ -5512,8 +5511,8 @@ void game::ProcessRandomObjects(void) {
                         170,
                         TILESET_OBJNARTI,
                         artifactId18 * 2,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
                         x10,
@@ -5525,8 +5524,8 @@ void game::ProcessRandomObjects(void) {
                         171,
                         TILESET_OBJNARTI,
                         artifactId18 * 2 + 1,
-                        -1,
-                        -1
+                        MAP_OBJECT_NO_CONVERSION,
+                        MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 // NOLINTEND(readability-magic-numbers)
@@ -7165,18 +7164,25 @@ i32 CalcBaseScore(i32 days) {
 }
 
 VA(0x0048480a, 0xb5)
-void game::RestoreCell(i32 x, i32 y, i32 obj, i32 barrier, mapCell* passedCell, i32 p6) {
+void game::RestoreCell(
+    i32 x,
+    i32 y,
+    H2_ENUM_PARAM(MapObjectType, i32) objectType,
+    i32 barrier,
+    mapCell* passedCell,
+    i32 p6
+) {
     mapCell* cell;
     if (passedCell)
         cell = passedCell;
     else
         cell = gpAdvManager->GetCell(x, y);
-    if (y > 0 && obj == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+    if (y > 0 && objectType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
     } else {
-        cell->m_triggerType = static_cast<u8>(obj);
+        cell->m_triggerType = objectType;
         cell->m_objectMetadata = barrier;
     }
 }

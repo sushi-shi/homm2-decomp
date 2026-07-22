@@ -59,6 +59,10 @@ H2_ENUM_BEGIN(CursorConstant)
     CURSOR_REMOTE_RELIABLE              = 1
 H2_ENUM_END(CursorConstant)
 
+H2_ENUM_BEGIN(BoatHeroConstant)
+    BOAT_OCCUPIED_FLAG = 0x80
+H2_ENUM_END(BoatHeroConstant)
+
 H2_ENUM_BEGIN(MapChangeConstant)
     MAP_CHANGE_CURRENT_PLAYER = -999
 H2_ENUM_END(MapChangeConstant)

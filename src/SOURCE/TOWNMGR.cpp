@@ -1576,7 +1576,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 if (gpGame->GetBoatsBuilt() < TOWN_MAX_BOATS
                                     && gpAdvManager->GetCell(m_town->m_boatX, m_town->m_boatY)
                                                ->m_triggerType
-                                           == 0) {
+                                           == MAP_OBJECT_NONE) {
                                     m_heroWindow0 = new heroWindow(
                                         SMALL_DIALOG_WINDOW_X,
                                         SMALL_DIALOG_WINDOW_Y,
