@@ -327,10 +327,10 @@ void wsProcessMessages(void) {
         if (iRc == SOCKET_ERROR) {
             iRc = WSAGetLastError();
             if (iRc == WSAEWOULDBLOCK)
-                break;
+                return;
         }
         if (iRc == 0)
-            break;
+            return;
         if (giNetPosToDCOPos[giThisNetPos] == static_cast<i32>(remote.sin_addr.s_addr)) {
         } else {
             wsEvaluateMessage(iRc, static_cast<i32>(remote.sin_addr.s_addr));
