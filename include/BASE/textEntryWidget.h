@@ -60,7 +60,7 @@ public:
         i32 horizontalInset,
         i32 verticalInset
     );
-    virtual ~textEntryWidget() OVERRIDE;
+    __declspec(dllexport) virtual inline ~textEntryWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(H2_ENUM_PARAM(TextEntryReadMode, i32));
