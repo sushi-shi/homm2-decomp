@@ -4133,7 +4133,7 @@ i32 philAI::QuickCombat(
         for (armyIndex0 = 0; armyIndex0 < IDX(SPELL_COUNT); armyIndex0++) {
             if (defeatedHero5->HasSpell(SpellType(armyIndex0)) != 0
                 && victoriousHero4->HasSpell(SpellType(armyIndex0)) == 0
-                && gsSpellInfo[armyIndex0].level
+                && IDX(gsSpellInfo[armyIndex0].level)
                        <= IDX(victoriousHero4->m_secondarySkills[IDX(HERO_SKILL_EAGLE_EYE)]) + 1
                 && HAS(gsSpellInfo[armyIndex0].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)) {
                 victoriousHero4->m_spells[armyIndex0] = 1;
@@ -5545,7 +5545,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 if (gpCurAIHero->Stats(HERO_PRIMARY_KNOWLEDGE) > 0
                     && gpCurAIHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
                     && !gpCurAIHero->HasSpell(SpellType(cell_k->m_objectMetadata - 1))) {
-                    if (gsSpellInfo[cell_k->m_objectMetadata - 1].level
+                    if (IDX(gsSpellInfo[cell_k->m_objectMetadata - 1].level)
                         <= IDX(gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                                + WISDOM_SPELL_LEVEL_BONUS) {
                         value_h = gsSpellInfo[cell_k->m_objectMetadata - 1].aiValue;

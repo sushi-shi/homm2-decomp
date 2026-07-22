@@ -2574,7 +2574,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                            eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
                        )
                            + SHRINE_WISDOM_BONUS
-                       < gsSpellInfo[eventValue1].level) {
+                       < IDX(gsSpellInfo[eventValue1].level)) {
                 strcat(
                     gText,
                     "Unfortunately, you do not have the wisdom to understand the spell, and you "
@@ -6588,7 +6588,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             if (eventHero->HasArtifact(ARTIFACT_MAGIC_BOOK)
-                && gsSpellInfo[cell->m_objectMetadata - 1].level
+                && IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
                        <= IDX(eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                               + WISDOM_SPELL_LEVEL_BONUS) {
                 eventHero->AddSpell(

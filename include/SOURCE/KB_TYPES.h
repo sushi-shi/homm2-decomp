@@ -790,9 +790,17 @@ H2_ENUM_BEGIN(SpellInfoConstant)
     SPELL_INFO_RACE_COUNT      = IDX(FACTION_COUNT)
 H2_ENUM_END(SpellInfoConstant)
 
+H2_ENUM_CLASS_BEGIN(SpellLevel)
+    SPELL_LEVEL_FIRST  = 1,
+    SPELL_LEVEL_SECOND = 2,
+    SPELL_LEVEL_THIRD  = 3,
+    SPELL_LEVEL_FOURTH = 4,
+    SPELL_LEVEL_FIFTH  = 5
+H2_ENUM_CLASS_END(SpellLevel)
+
 struct SSpellInfo {
     char soundName[SPELL_INFO_SOUND_NAME_SIZE];
-    u8 level;
+    H2_ENUM_STORAGE(SpellLevel, u8) level;
     u8 iconIndex;
     H2_ENUM_STORAGE(CombatEffectType, u8) combatEffect;
     i16 aiValue;
