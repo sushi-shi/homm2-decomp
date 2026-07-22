@@ -2664,10 +2664,14 @@ void InitVars(void) {
     strcpy(gpGame->m_mapFilename, "brokena.mp2");
     gpGame->m_newGameInitialized = 0;
     gbInNewGameSetup = false;
-    for (i = 0; i < BOX_LINE_COUNT; i++) {
-        strcpy(cNetBoxLine[i], "");
-        cNetBoxColor[i] = BOX_DEFAULT_COLOR;
-    }
+    strcpy(cNetBoxLine[0], "");
+    strcpy(cNetBoxLine[1], "");
+    strcpy(cNetBoxLine[2], "");
+    strcpy(cNetBoxLine[3], "");
+    cNetBoxColor[0] = BOX_DEFAULT_COLOR;
+    cNetBoxColor[1] = BOX_DEFAULT_COLOR;
+    cNetBoxColor[2] = BOX_DEFAULT_COLOR;
+    cNetBoxColor[3] = BOX_DEFAULT_COLOR;
     ppMapExtra = NULL;
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
