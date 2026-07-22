@@ -59,6 +59,9 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArmyFacing, i8)
     ARMY_FACING_COUNT = 2
 H2_ENUM_CLASS_END_SPLIT(ArmyFacing, i8)
 
+// VC4.2 must see these arithmetic forms at the call site; an inline wrapper emits /Ob1
+// continuation jumps that are absent from retail.
+#ifdef HOMM2_STRICT_ENUM_TYPES
 inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
 }
@@ -66,6 +69,11 @@ inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
 inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? 1 : -1;
 }
+#else
+#define OppositeArmyFacing(facing) (ARMY_FACING_RIGHT - (facing))
+#define ArmyFacingRearHexOffset(facing)                                                        \
+    (static_cast<u32>((facing) - ARMY_FACING_RIGHT) < 1 ? 1 : -1)
+#endif
 
 H2_ENUM_CLASS_BEGIN(ArmyDrawState)
     ARMY_DRAW_BEHIND      = 0,
