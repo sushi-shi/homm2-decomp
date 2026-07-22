@@ -1593,10 +1593,10 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     }
                 } else {
                     keyChar = static_cast<char>(message.payload.keyboard.keyCode);
-                }
 
-                if (keyChar == '{' || keyChar == '}')
-                    keyChar = 0;
+                    if (keyChar == '{' || keyChar == '}')
+                        keyChar = 0;
+                }
 
                 if (keyChar != 0) {
                     strcpy(gText, cNGKPCore);
