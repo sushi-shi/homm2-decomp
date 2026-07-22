@@ -20,10 +20,10 @@ H2_ENUM_CLASS_END(RecruitSourceType)
 class recruitUnit : public baseManager {
 public:
     RecruitSourceType m_sourceType;
-    CreatureType m_creatureType;
+    H2_ENUM_STORAGE(CreatureType, i32) m_creatureType;
     char m_padding3e[4];
     i32 m_goldCost;
-    ResourceType m_resourceType;
+    H2_ENUM_STORAGE(ResourceType, i32) m_resourceType;
     i32 m_resourceCost;
     i32 m_refreshTown;
     heroWindow* m_window;

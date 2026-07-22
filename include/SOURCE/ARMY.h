@@ -4,7 +4,7 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-H2_ENUM_CLASS_BEGIN(ArmyAnimationSequence)
+H2_ENUM_CLASS_BEGIN_SPLIT(ArmyAnimationSequence, i8)
     ARMY_ANIMATION_NONE                  = -1,
     ARMY_ANIMATION_WALK_BEGIN            = 0,
     ARMY_ANIMATION_WALK_BEGIN_STANDING   = 1,
@@ -40,7 +40,7 @@ H2_ENUM_CLASS_BEGIN(ArmyAnimationSequence)
     ARMY_ANIMATION_SHOOT_FORWARD_RETURN  = 31,
     ARMY_ANIMATION_SHOOT_DOWN            = 32,
     ARMY_ANIMATION_SHOOT_DOWN_RETURN     = 33
-H2_ENUM_CLASS_END(ArmyAnimationSequence)
+H2_ENUM_CLASS_END_SPLIT(ArmyAnimationSequence, i8)
 H2_ENUM_STEPPED(ArmyAnimationSequence)
 
 H2_ENUM_CLASS_BEGIN(ArmySampleType)

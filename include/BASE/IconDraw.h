@@ -8,10 +8,10 @@ H2_ENUM_CLASS_BEGIN(IconDrawClipMode)
     ICON_DRAW_CLIP    = 1
 H2_ENUM_CLASS_END(IconDrawClipMode)
 
-H2_ENUM_CLASS_BEGIN(IconDrawOrientation)
+H2_ENUM_CLASS_BEGIN_SPLIT(IconDrawOrientation, i8)
     ICON_DRAW_NORMAL  = 0,
     ICON_DRAW_FLIPPED = 1
-H2_ENUM_CLASS_END(IconDrawOrientation)
+H2_ENUM_CLASS_END_SPLIT(IconDrawOrientation, i8)
 
 H2_ENUM_CLASS_BEGIN(IconDrawResult)
     ICON_DRAW_SKIPPED   = 0,

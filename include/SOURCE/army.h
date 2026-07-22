@@ -50,9 +50,9 @@ public:
     i32 m_mirrorSourceIndex;
     i32 m_mirrorImageIndex;
     i32 m_roundCounter;
-    CreatureType m_monsterType;
+    H2_ENUM_STORAGE(CreatureType, i32) m_monsterType;
     i32 m_hex;
-    ArmyAnimationSequence m_animationSequence;
+    H2_ENUM_STORAGE_STEPPED(ArmyAnimationSequence, i32) m_animationSequence;
     i32 m_animationFrame;
     H2_ENUM_STORAGE(ArmyFacing, i32) m_facing;
     CombatHexDirection m_walkDirection;
@@ -72,7 +72,7 @@ public:
     i32 m_damagePending;
     i32 m_killPending;
     i32 m_deathPending;
-    SpellType m_spellEffect;
+    H2_ENUM_STORAGE(SpellType, i32) m_spellEffect;
     H2_ENUM_STORAGE(CombatSide, i32) m_side;
     i32 m_index;
     i32 m_lastAnimationTime;

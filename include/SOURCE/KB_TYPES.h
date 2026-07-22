@@ -37,7 +37,7 @@ H2_ENUM_CLASS_BEGIN(HeroPortrait)
     HERO_CAPTAIN_PORTRAIT_FIRST    = 90
 H2_ENUM_CLASS_END(HeroPortrait)
 
-H2_ENUM_CLASS_BEGIN(ResourceType)
+H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_NONE            = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,
     RES_WOOD            = 0,
@@ -48,9 +48,9 @@ H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_GEMS            = 5,
     RES_GOLD            = 6,
     RES_COUNT           = 7
-H2_ENUM_CLASS_END(ResourceType)
+H2_ENUM_CLASS_END_SPLIT(ResourceType, i16)
 
-H2_ENUM_CLASS_BEGIN(MapDirection)
+H2_ENUM_CLASS_BEGIN_SPLIT(MapDirection, i8)
     MAP_DIRECTION_NONE       = -1,
     MAP_DIRECTION_NORTH      = 0,
     MAP_DIRECTION_NORTH_EAST = 1,
@@ -61,7 +61,7 @@ H2_ENUM_CLASS_BEGIN(MapDirection)
     MAP_DIRECTION_WEST       = 6,
     MAP_DIRECTION_NORTH_WEST = 7,
     MAP_DIRECTION_COUNT      = 8
-H2_ENUM_CLASS_END(MapDirection)
+H2_ENUM_CLASS_END_SPLIT(MapDirection, i8)
 H2_ENUM_STEPPED(MapDirection)
 
 H2_ENUM_BEGIN(MapDirectionConstant)
@@ -95,7 +95,7 @@ H2_ENUM_CLASS_BEGIN(MineType)
     MINE_TYPE_ALCHEMIST_LAB = 101
 H2_ENUM_CLASS_END(MineType)
 
-H2_ENUM_CLASS_BEGIN(CreatureType)
+H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_NONE                = -1,
     CREATURE_PEASANT             = 0,
     CREATURE_SUMMONED_NONE       = CREATURE_PEASANT,
@@ -167,7 +167,7 @@ H2_ENUM_CLASS_BEGIN(CreatureType)
     CREATURE_FIRE_ELEMENTAL      = 64,
     CREATURE_WATER_ELEMENTAL     = 65,
     CREATURE_COUNT               = 66
-H2_ENUM_CLASS_END(CreatureType)
+H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
 H2_ENUM_STEPPED(CreatureType)
 
 inline CreatureType NextCreatureType(CreatureType creatureType) {
@@ -184,7 +184,7 @@ H2_ENUM_CLASS_BEGIN(ArtifactLevelMask)
 H2_ENUM_CLASS_END(ArtifactLevelMask)
 H2_ENUM_FLAGS(ArtifactLevelMask)
 
-H2_ENUM_CLASS_BEGIN(ArtifactType)
+H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_NONE                  = -1,
     ARTIFACT_ULTIMATE_BOOK         = 0,
     ARTIFACT_ULTIMATE_SWORD        = 1,
@@ -291,9 +291,9 @@ H2_ENUM_CLASS_BEGIN(ArtifactType)
     ARTIFACT_SWORD_ANDURAN         = 101,
     ARTIFACT_SPADE_NECROMANCY      = 102,
     ARTIFACT_COUNT                 = 103
-H2_ENUM_CLASS_END(ArtifactType)
+H2_ENUM_CLASS_END_SPLIT(ArtifactType, i8)
 
-H2_ENUM_CLASS_BEGIN(SpellType)
+H2_ENUM_CLASS_BEGIN_SPLIT(SpellType, i8)
     SPELL_NONE                   = -1,
     SPELL_FIREBALL               = 0,
     SPELL_FIREBLAST              = 1,
@@ -363,10 +363,10 @@ H2_ENUM_CLASS_BEGIN(SpellType)
     SPELL_COUNT                  = 65,
     CREATURE_SPELL_PETRIFY       = 101,
     CREATURE_SPELL_DISPEL        = 102
-H2_ENUM_CLASS_END(SpellType)
+H2_ENUM_CLASS_END_SPLIT(SpellType, i8)
 H2_ENUM_STEPPED(SpellType)
 
-H2_ENUM_CLASS_BEGIN(MapObjectType)
+H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_NO_CONVERSION              = -1,
     MAP_TRIGGER_ACTION_FLAG               = 0x80,
     MAP_TRIGGER_TYPE_MASK                 = 0x7f,
@@ -495,7 +495,7 @@ H2_ENUM_CLASS_BEGIN(MapObjectType)
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
     MAP_OBJECT_JAIL                       = 123
-H2_ENUM_CLASS_END(MapObjectType)
+H2_ENUM_CLASS_END_SPLIT(MapObjectType, i16)
 H2_ENUM_FLAGS(MapObjectType)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
@@ -517,7 +517,7 @@ H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
 // Hero cursor slots 0-5 reuse faction ids; slot 6 selects the boat sprites.
 typedef FactionType HeroCursorType;
 
-H2_ENUM_CLASS_BEGIN(TerrainType)
+H2_ENUM_CLASS_BEGIN_SPLIT(TerrainType, i8)
     TERRAIN_INVALID   = -1,
     TERRAIN_WATER     = 0,
     TERRAIN_GRASS     = 1,
@@ -530,9 +530,9 @@ H2_ENUM_CLASS_BEGIN(TerrainType)
     TERRAIN_BEACH     = 8,
     TERRAIN_COUNT     = 9,
     TERRAIN_ROAD      = TERRAIN_COUNT
-H2_ENUM_CLASS_END(TerrainType)
+H2_ENUM_CLASS_END_SPLIT(TerrainType, i8)
 
-H2_ENUM_CLASS_BEGIN(BuildingSlotType)
+H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_NONE                          = -1,
     TOWN_OBJECT_NONE                            = BUILDING_SLOT_NONE,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
@@ -611,7 +611,7 @@ H2_ENUM_CLASS_BEGIN(BuildingSlotType)
     BUILDING_SLOT_DWELLING_LAST                 = 30,
     BUILDING_SLOT_DISABLED_LAST                 = 31,
     TOWN_OBJECT_BARBARIAN_OVERLAY               = BUILDING_SLOT_DISABLED_LAST
-H2_ENUM_CLASS_END(BuildingSlotType)
+H2_ENUM_CLASS_END_SPLIT(BuildingSlotType, i8)
 H2_ENUM_STEPPED(BuildingSlotType)
 
 H2_ENUM_CLASS_BEGIN(MonsterFlags)
