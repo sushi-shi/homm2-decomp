@@ -23,6 +23,8 @@ class playerData;
 class town;
 struct tag_message;
 
+H2_ENUM_CLASS_FORWARD(CampaignTrackType);
+
 H2_ENUM_CLASS_BEGIN_SPLIT(PlayerHandicap, i8)
     PLAYER_HANDICAP_NONE     = 0,
     PLAYER_HANDICAP_MODERATE = 1,
@@ -341,7 +343,7 @@ extern i32 iOverviewItems;
 extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
 extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
 extern H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-extern i32 iCampaignTrackType;
+extern H2_ENUM_STORAGE(CampaignTrackType, i32) iCampaignTrackType;
 extern i32 bCampaignViewOnly;
 extern i32 iCurViewMap;
 extern char* cNGKPDisplay;
