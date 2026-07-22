@@ -11,10 +11,11 @@ succeed (ninja), followed by the source/object gates below.
 ## 0. Runtime FID identity
 
 `runtime_fid --check` re-identifies every row in `config/library_labels.csv` from the
-pinned VC 4.0 `LIBCMT.LIB`. It requires an exact equal-sized function-body match after
-masking only COFF relocation operands. Assembly entry points without their own COFF
-function symbol require an exact owner-relative match. A missing library, changed hash,
-ambiguous identity, stale name, or stale size fails the build.
+pinned VC 4.0 `LIBCMT.LIB`. It requires an exact function identity after masking only
+COFF relocation operands; reviewed code-only spans may be exact prefixes when the library
+symbol also owns embedded tables or alternate entries. Assembly entry points without their
+own COFF function symbol require an exact owner-relative match. A missing library, changed
+hash, ambiguous identity, stale name, or stale size fails the build.
 
 ## 1. Compile + header-dependency tracking (ninja)
 

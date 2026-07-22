@@ -1,10 +1,11 @@
 """Identify reviewed retail CRT procedures against the pinned LIBCMT archive.
 
-The matcher is intentionally narrow and fail-closed.  It takes the unnamed
-runtime boundaries already proved in ``config/delink_procedures.csv``, restricts
-candidate signatures to the LIBCMT member with the same compiland name, and
-requires one relocation-masked, equal-sized COFF function match at the retail
-RVA.  The tracked output is ``config/library_labels.csv``.
+The matcher is intentionally narrow and fail-closed. It takes reviewed runtime
+seeds from ``config/library_labels.csv``, restricts candidate signatures to the
+LIBCMT member with the same compiland name, and requires one relocation-masked
+COFF identity at the retail RVA. Reviewed code-only spans may be an exact prefix
+of a library symbol extent that also owns embedded tables or alternate entries.
+The tracked output is ``config/library_labels.csv``.
 """
 
 from __future__ import annotations
@@ -266,6 +267,8 @@ def identify(procedures: Path, archive: Path, exe: Path,
     anchor_rows = rows + seed_rows
     output = []
     failures = []
+    seed_starts = {(int(seed["rva"], 16), seed["unit"])
+                   for seed in seed_rows}
     for row in seed_rows:
         rva = int(row["rva"], 16)
         size = int(row["size"], 16)
@@ -276,6 +279,10 @@ def identify(procedures: Path, archive: Path, exe: Path,
             candidate_retail = _pe_bytes(image, rva, signature.size)
             if _matches(candidate_retail, signature):
                 matched.append(signature)
+        named_matches = [signature for signature in matched
+                         if signature.name == row.get("name", "").strip()]
+        if named_matches:
+            matched = named_matches
         if not matched:
             interior = _interior_match(
                 row, anchor_rows, candidates.get(member, ()), image)
@@ -312,7 +319,11 @@ def identify(procedures: Path, archive: Path, exe: Path,
                 ",".join(descriptions) or "none"))
             continue
         signature = matched[0]
-        if signature.size != size:
+        split_entry = any(
+            unit == row["unit"] and rva < start < rva + signature.size
+            for start, unit in seed_starts)
+        reviewed_prefix = bool(row.get("name", "").strip()) and size < signature.size
+        if signature.size != size and not reviewed_prefix:
             size = signature.size
         output.append({
             "rva": "0x%x" % rva,
@@ -322,7 +333,9 @@ def identify(procedures: Path, archive: Path, exe: Path,
             "library": "LIBCMT",
             "member": signature.member,
             "confidence": "HIGH",
-            "source": "exact-member-signature",
+            "source": ("exact-member-prefix-before-entry" if split_entry else
+                       "exact-member-prefix-reviewed-span" if reviewed_prefix else
+                       "exact-member-signature"),
         })
     if failures:
         raise ValueError("runtime FID failed:\n" + "\n".join(failures))
@@ -349,7 +362,7 @@ def label_seeds(path: Path) -> list[dict[str, str]]:
         rows = csv.DictReader(
             line for line in stream if not line.lstrip().startswith("#"))
         return [{
-            "rva": row["rva"], "size": row["size"], "name": "",
+            "rva": row["rva"], "size": row["size"], "name": row["name"],
             "unit": row["unit"], "provenance": "fid-rebuild",
         } for row in rows]
 
