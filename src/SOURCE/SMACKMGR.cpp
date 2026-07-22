@@ -163,8 +163,10 @@ void SmackManagerMain(void) {
 
         brotherIcon = gpResourceManager->GetIcon("brothers.icn");
         gpMouseManager->MouseCoords(initialMouseX3, initialMouseY29);
-        gbCampaignSideChoice = initialMouseX3 < CAMPAIGN_DIVIDER_X ? CAMPAIGN_ARCHIBALD
-                                                                  : CAMPAIGN_ROLAND;
+        if (initialMouseX3 < CAMPAIGN_DIVIDER_X)
+            gbCampaignSideChoice = CAMPAIGN_ARCHIBALD;
+        else
+            gbCampaignSideChoice = CAMPAIGN_ROLAND;
     }
 
     KBChangeMenu(hmnuDflt);
@@ -374,8 +376,10 @@ void SmackManagerMain(void) {
                     CampaignSide campaignChoice4;
 
                     gpMouseManager->MouseCoords(campaignMouseX5, campaignMouseY3);
-                    campaignChoice4 = campaignMouseX5 < CAMPAIGN_DIVIDER_X ? CAMPAIGN_ARCHIBALD
-                                                                          : CAMPAIGN_ROLAND;
+                    if (campaignMouseX5 < CAMPAIGN_DIVIDER_X)
+                        campaignChoice4 = CAMPAIGN_ARCHIBALD;
+                    else
+                        campaignChoice4 = CAMPAIGN_ROLAND;
                     if (campaignChoice4 == gbCampaignSideChoice)
                         break;
                     gbCampaignSideChoice = campaignChoice4;
@@ -402,7 +406,7 @@ void SmackManagerMain(void) {
 
                     gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
                     expansionChoice1 = ExpansionCampaignRect(expansionMouseX6, expansionMouseY4);
-                    if (expansionChoice1 != xLastChoice) {
+                    if (xLastChoice != OD_STEER(expansionChoice1)) {
                         backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
                         BlitBitmapToScreen(
                             gpWindowManager->m_screen,
