@@ -101,7 +101,7 @@ extern class hero* viewSpellsHero;
 extern b32 gbUpgradeArmy;
 extern i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
 extern i8* gbNGDifficulty;
-extern CreatureType iViewArmyUpgradeToType;
+extern H2_ENUM_STORAGE(CreatureType, i32) iViewArmyUpgradeToType;
 extern i32 viewArmyBaseX;
 extern i32 viewArmyBaseY;
 extern i8* gbNGColor;
