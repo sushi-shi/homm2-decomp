@@ -59,6 +59,11 @@ def main():
                command=(f"{PY} -m homm2.build.canonicalize_data_symbols "
                         "--input $in --output $out --sidecar $sidecar"),
                description="normalize-data $unit")
+        w.rule("canonicalize_relocs",
+               command=(f"{PY} -m homm2.build.canonicalize_relocs "
+                        "--unit $unit --base $base --target $in --output $out "
+                        "--symbols build/gen/symbol_names.csv"),
+               description="normalize-relocs $unit")
         w.rule("link_exe",
                command=(f"{PY} -m homm2.build.link_exe --out $exe "
                         "--order build/link/objects.rsp "
@@ -80,6 +85,7 @@ def main():
                         "--report build/link/HEROES2W.resources.json"),
                description="link-resources HEROES2W.res")
         normalizer = "scripts/homm2/build/canonicalize_data_symbols.py"
+        reloc_normalizer = "scripts/homm2/build/canonicalize_relocs.py"
         normalized_dummy = "build/objdiff/normalized/dummy.obj"
         normalized_dummy_sidecar = "build/objdiff/normalized/dummy.symbols.tsv"
         w.build(normalized_dummy, "canonicalize_data_symbols",
@@ -105,12 +111,20 @@ def main():
             target = delink / f"{u['unit']}.c.obj"
             if target.exists() or u["unit"] in reviewed_units:
                 target_input = f"build/delink/{u['unit']}.c.obj"
+                paired_target = (
+                    f"build/objdiff/paired/target/{u['unit']}.c.obj")
+                w.build(paired_target, "canonicalize_relocs", inputs=target_input,
+                        implicit=[obj, reloc_normalizer,
+                                  "scripts/homm2/build/assert_relocs.py",
+                                  "build/gen/symbol_names.csv",
+                                  "build/orig/HEROES2W.EXE"],
+                        variables={"base": obj, "unit": u["unit"]})
                 target_normalized = (
                     f"build/objdiff/normalized/target/{u['unit']}.c.obj")
                 target_sidecar = (
                     f"build/objdiff/normalized/target/{u['unit']}.symbols.tsv")
                 w.build(target_normalized, "canonicalize_data_symbols",
-                        inputs=target_input, implicit=normalizer,
+                        inputs=paired_target, implicit=normalizer,
                         implicit_outputs=target_sidecar,
                         variables={"sidecar": target_sidecar, "unit": u["unit"]})
                 comparison_inputs.append(target_normalized)
