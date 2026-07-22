@@ -1594,132 +1594,132 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
 
 VA(0x004741e6, 0x3ee)
 void game::GiveTroopsToNeutralTown(i32 townId) {
-    i32 kn;
-    i32 tierKey;
-    CreatureType creature;
-    i32 roll;
-    i32 count;
-    i32 turnRollRange;
+    i32 unused28;
+    i32 tierKey36;
+    CreatureType creature28;
+    i32 reinforcementRandom;
+    i32 count1;
+    i32 turnRollRange10;
 
     if ((m_castleRecs[townId].m_x > 0 || m_castleRecs[townId].m_y > 0)
         && m_castleRecs[townId].m_owner < 0) {
-        roll = Random(REINFORCEMENT_ROLL_MIN, REINFORCEMENT_ROLL_MAX);
-        turnRollRange = giCurTurn / REINFORCEMENT_TURN_ROLL_DIVISOR;
-        if (turnRollRange != 0)
-            roll += Random(0, turnRollRange);
+        reinforcementRandom = Random(REINFORCEMENT_ROLL_MIN, REINFORCEMENT_ROLL_MAX);
+        turnRollRange10 = giCurTurn / REINFORCEMENT_TURN_ROLL_DIVISOR;
+        if (turnRollRange10 != 0)
+            reinforcementRandom += Random(0, turnRollRange10);
 
-        if (roll <= REINFORCEMENT_TIER_ONE_THRESHOLD) {
-            tierKey = REINFORCEMENT_TIER_ONE_KEY;
-            count = Random(REINFORCEMENT_TIER_ONE_COUNT_MIN, REINFORCEMENT_TIER_ONE_COUNT_MAX);
-        } else if (roll <= REINFORCEMENT_TIER_TWO_THRESHOLD) {
-            tierKey = REINFORCEMENT_TIER_TWO_KEY;
-            count = Random(REINFORCEMENT_TIER_TWO_COUNT_MIN, REINFORCEMENT_TIER_TWO_COUNT_MAX);
-        } else if (roll <= REINFORCEMENT_TIER_THREE_THRESHOLD) {
-            tierKey = REINFORCEMENT_TIER_THREE_KEY;
-            count = Random(REINFORCEMENT_TIER_THREE_COUNT_MIN, REINFORCEMENT_TIER_THREE_COUNT_MAX);
-        } else if (roll <= REINFORCEMENT_TIER_FOUR_THRESHOLD) {
-            tierKey = REINFORCEMENT_TIER_FOUR_KEY;
-            count = Random(REINFORCEMENT_TIER_FOUR_COUNT_MIN, REINFORCEMENT_TIER_FOUR_COUNT_MAX);
+        if (reinforcementRandom <= REINFORCEMENT_TIER_ONE_THRESHOLD) {
+            tierKey36 = REINFORCEMENT_TIER_ONE_KEY;
+            count1 = Random(REINFORCEMENT_TIER_ONE_COUNT_MIN, REINFORCEMENT_TIER_ONE_COUNT_MAX);
+        } else if (reinforcementRandom <= REINFORCEMENT_TIER_TWO_THRESHOLD) {
+            tierKey36 = REINFORCEMENT_TIER_TWO_KEY;
+            count1 = Random(REINFORCEMENT_TIER_TWO_COUNT_MIN, REINFORCEMENT_TIER_TWO_COUNT_MAX);
+        } else if (reinforcementRandom <= REINFORCEMENT_TIER_THREE_THRESHOLD) {
+            tierKey36 = REINFORCEMENT_TIER_THREE_KEY;
+            count1 = Random(REINFORCEMENT_TIER_THREE_COUNT_MIN, REINFORCEMENT_TIER_THREE_COUNT_MAX);
+        } else if (reinforcementRandom <= REINFORCEMENT_TIER_FOUR_THRESHOLD) {
+            tierKey36 = REINFORCEMENT_TIER_FOUR_KEY;
+            count1 = Random(REINFORCEMENT_TIER_FOUR_COUNT_MIN, REINFORCEMENT_TIER_FOUR_COUNT_MAX);
         } else {
-            tierKey = REINFORCEMENT_TIER_FIVE_KEY;
-            count = REINFORCEMENT_TIER_FIVE_COUNT;
+            tierKey36 = REINFORCEMENT_TIER_FIVE_KEY;
+            count1 = REINFORCEMENT_TIER_FIVE_COUNT;
         }
 
-        count += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
-        switch (IDX(m_castleRecs[townId].m_type) + tierKey) {
+        count1 += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
+        switch (IDX(m_castleRecs[townId].m_type) + tierKey36) {
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_KNIGHT):
-                creature = CREATURE_PEASANT;
+                creature28 = CREATURE_PEASANT;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_KNIGHT):
-                creature = CREATURE_ARCHER;
+                creature28 = CREATURE_ARCHER;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_KNIGHT):
-                creature = CREATURE_PIKEMAN;
+                creature28 = CREATURE_PIKEMAN;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_KNIGHT):
-                creature = CREATURE_SWORDSMAN;
+                creature28 = CREATURE_SWORDSMAN;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_KNIGHT):
-                creature = CREATURE_CAVALRY;
+                creature28 = CREATURE_CAVALRY;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_BARBARIAN):
-                creature = CREATURE_GOBLIN;
+                creature28 = CREATURE_GOBLIN;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_BARBARIAN):
-                creature = CREATURE_ORC;
+                creature28 = CREATURE_ORC;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_BARBARIAN):
-                creature = CREATURE_WOLF;
+                creature28 = CREATURE_WOLF;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_BARBARIAN):
-                creature = CREATURE_OGRE;
+                creature28 = CREATURE_OGRE;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_BARBARIAN):
-                creature = CREATURE_TROLL;
+                creature28 = CREATURE_TROLL;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_SORCERESS):
-                creature = CREATURE_SPRITE;
+                creature28 = CREATURE_SPRITE;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_SORCERESS):
-                creature = CREATURE_DWARF;
+                creature28 = CREATURE_DWARF;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_SORCERESS):
-                creature = CREATURE_ELF;
+                creature28 = CREATURE_ELF;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_SORCERESS):
-                creature = CREATURE_DRUID;
+                creature28 = CREATURE_DRUID;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_SORCERESS):
-                creature = CREATURE_UNICORN;
+                creature28 = CREATURE_UNICORN;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WARLOCK):
-                creature = CREATURE_CENTAUR;
+                creature28 = CREATURE_CENTAUR;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WARLOCK):
-                creature = CREATURE_GARGOYLE;
+                creature28 = CREATURE_GARGOYLE;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WARLOCK):
-                creature = CREATURE_GRIFFIN;
+                creature28 = CREATURE_GRIFFIN;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WARLOCK):
-                creature = CREATURE_MINOTAUR;
+                creature28 = CREATURE_MINOTAUR;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WARLOCK):
-                creature = CREATURE_HYDRA;
+                creature28 = CREATURE_HYDRA;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WIZARD):
-                creature = CREATURE_HALFLING;
+                creature28 = CREATURE_HALFLING;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WIZARD):
-                creature = CREATURE_BOAR;
+                creature28 = CREATURE_BOAR;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WIZARD):
-                creature = CREATURE_IRON_GOLEM;
+                creature28 = CREATURE_IRON_GOLEM;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WIZARD):
-                creature = CREATURE_ROC;
+                creature28 = CREATURE_ROC;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WIZARD):
-                creature = CREATURE_MAGE;
+                creature28 = CREATURE_MAGE;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_NECROMANCER):
-                creature = CREATURE_SKELETON;
+                creature28 = CREATURE_SKELETON;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_NECROMANCER):
-                creature = CREATURE_ZOMBIE;
+                creature28 = CREATURE_ZOMBIE;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_NECROMANCER):
-                creature = CREATURE_MUMMY;
+                creature28 = CREATURE_MUMMY;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_NECROMANCER):
-                creature = CREATURE_VAMPIRE;
+                creature28 = CREATURE_VAMPIRE;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_NECROMANCER):
-                creature = CREATURE_LICH;
+                creature28 = CREATURE_LICH;
                 break;
             default:;
         }
-        GiveArmy(&m_castleRecs[townId].m_army, creature, count, ARMY_GROUP_EMPTY_SLOT);
+        GiveArmy(&m_castleRecs[townId].m_army, creature28, count1, ARMY_GROUP_EMPTY_SLOT);
     }
 }
 
