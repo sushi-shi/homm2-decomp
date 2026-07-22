@@ -6262,15 +6262,15 @@ void InitAIMapVars(void) {
 VA(0x00445fe6, 0x112)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != NULL)
-        H2_FREE(gaiLiveChanceOfPos, 7063);
+        H2_FREE_AT(gaiLiveChanceOfPos, RETAIL_FILE, s_closeAIMapLineBase + 1);
     if (gaiHeroStrategicRVOfPos != NULL)
-        H2_FREE(gaiHeroStrategicRVOfPos, 7064);
+        H2_FREE_AT(gaiHeroStrategicRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 2);
     if (gaiHeroEventStratRVOfPos != NULL)
-        H2_FREE(gaiHeroEventStratRVOfPos, 7065);
+        H2_FREE_AT(gaiHeroEventStratRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 3);
     if (gaiTurnValueOfMine != NULL)
-        H2_FREE(gaiTurnValueOfMine, 7066);
+        H2_FREE_AT(gaiTurnValueOfMine, RETAIL_FILE, s_closeAIMapLineBase + 4);
     if (gaiEnemyHeroReachable != NULL)
-        H2_FREE(gaiEnemyHeroReachable, 7067);
+        H2_FREE_AT(gaiEnemyHeroReachable, RETAIL_FILE, s_closeAIMapLineBase + 5);
     gaiLiveChanceOfPos = NULL;
     gaiHeroStrategicRVOfPos = NULL;
     gaiHeroEventStratRVOfPos = NULL;
