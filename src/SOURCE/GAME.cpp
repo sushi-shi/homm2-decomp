@@ -4162,7 +4162,7 @@ void game::NextPlayer(void) {
                 ShutDown(NULL);
         }
         if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED)
-            giBottomViewOverride = 0;
+            giBottomViewOverride = BOTTOM_VIEW_NONE;
     } else {
         SetNoDialogMenus(1);
         gpInputManager->Flush();
@@ -5765,7 +5765,8 @@ void game::WaitForPlayer(char* text, i32 player) {
         gpMouseManager->SetPointer(0);
         gbAllBlack = true;
         giBottomViewOverrideEndTime = KBTickCount() + WAIT_BOTTOM_VIEW_TIMEOUT;
-        giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] != 0;
+        giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] ? BOTTOM_VIEW_NEW_TURN
+                                                                 : BOTTOM_VIEW_NONE;
         gpSoundManager->m_samplesReady = 1;
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
         gpAdvManager->CompleteDraw(1);
@@ -6661,7 +6662,7 @@ transmitCleanup:
 
     AiPrint(const_cast<char*>("Transmit End"));
     if (gpAdvManager->m_active) {
-        giBottomViewOverride = 0;
+        giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
     if (oldTrack != -1) {
@@ -6931,7 +6932,7 @@ i32 game::ReceiveSaveGame(
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>("Receive End"));
     if (gpAdvManager->m_active) {
-        giBottomViewOverride = 0;
+        giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
     if (oldTrack != -1) {
@@ -6973,7 +6974,7 @@ void game::DoNewTurn(void) {
         return;
     }
     giBottomViewOverrideEndTime = KBTickCount() + NEW_TURN_BOTTOM_VIEW_DURATION;
-    giBottomViewOverride = 1;
+    giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
     gpAdvManager->UpdBottomView(1, 1, 1);
     gpAdvManager->SetInitialMapOrigin();
     gpAdvManager->CompleteDraw(0);

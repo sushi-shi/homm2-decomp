@@ -596,7 +596,7 @@ extern H2_ENUM_STORAGE(CreatureType, i8) gDwellingType[][KB_DWELLING_TYPE_COUNT]
 extern i32 gGameCommand;
 extern i32 gHeroGoldCost;
 extern u32l gHierarchyMask[][KB_DWELLING_TYPE_COUNT];
-extern i32 giBottomViewOverride;
+extern H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 extern i32 giBottomViewOverrideEndTime;
 extern H2_ENUM_STORAGE(ResourceType, i32) giBottomViewResource;
 extern i32 giBottomViewResourceQty;
