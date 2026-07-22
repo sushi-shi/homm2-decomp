@@ -236,7 +236,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    if (stricmp(lpszReturnString, "stopped") != 0) {
+    if (strcmpi(lpszReturnString, "stopped") != 0) {
         wsprintfA(CommandString, "status CD position");
         nMCIError = mciSendStringA(CommandString, buffer, CD_POSITION_BUFFER_CAPACITY, NULL);
         if (nMCIError != 0)
