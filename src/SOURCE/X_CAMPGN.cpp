@@ -437,10 +437,10 @@ void ExpCampaign::InitMap(void) {
             break;
     }
 
-    i32 award;
-    for (award = 0; award < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
-        if (m_awards[award] != 0) {
-            switch (static_cast<ExpansionCampaignAward>(award)) {
+    ExpansionCampaignAward award;
+    for (award = AWARD_ELVEN_ALLIANCE; IDX(award) < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
+        if (m_awards[IDX(award)] != 0) {
+            switch (award) {
                 case AWARD_ELVEN_ALLIANCE:
                     break;
                 case AWARD_BREASTPLATE_ANDURAN:

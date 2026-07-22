@@ -118,7 +118,7 @@ struct mapHeroExtra {
     u8 hasPatrol;
     union {
         i8 patrolRadius;
-        i8 heroClass;
+        H2_ENUM_STORAGE(FactionType, i8) heroClass;
     };
     i8 hasAssignedHero;
 };

@@ -2725,7 +2725,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i32 indexValue;
     i32 townXh;
     i32 townYWork;
-    i32 newHeroClassCount;
+    FactionType newHeroClass;
 
     m_heroWindow1 = new heroWindow(RECRUIT_WINDOW_X, RECRUIT_WINDOW_Y, "rcrthero.bin");
     if (m_heroWindow1 == NULL)
@@ -2821,16 +2821,13 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         if (m_town->m_buildings & 1)
             m_town->GiveSpells(NULL);
 
-        newHeroClassCount =
-            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION;
-        newHeroClassCount =
-            (Random(1, IDX(FACTION_COUNT) - 1) + newHeroClassCount) % TOWN_FACTION_COUNT;
+        newHeroClass = static_cast<FactionType>(
+            gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
+        );
+        newHeroClass =
+            (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
-            static_cast<i8>(gpGame->GetNewHeroId(
-                giCurPlayer,
-                static_cast<FactionType>(newHeroClassCount),
-                0
-            ));
+            static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
             AI_HERO_AVAILABLE_FLAG;
     } else {
