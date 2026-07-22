@@ -79,7 +79,7 @@ H2_ENUM_BEGIN(SpellCastConstant)
     BOLT_RANDOM_WIDTH_LOW                          = 7,
     BOLT_RANDOM_WIDTH_HIGH                         = 12,
     BOLT_NEAR_TARGET_DISTANCE                      = 15,
-    BOLT_FINISHED_DISTANCE                         = 3,
+    BOLT_FINISHED_DISTANCE_MAX                     = 2,
     BOLT_ANGLE_PERCENT_SCALE                       = 100,
     BOLT_ANGLE_AVERAGE_DIVISOR                     = 200,
     BOLT_RAINBOW_LAST_INDEX                        = 14,
