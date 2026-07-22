@@ -578,7 +578,7 @@ mapCell* advManager::MoveHero(
     destinationCell_j = GetCell(movingHero_f->m_x + directionX_b, movingHero_f->m_y + directionY_b);
     terrainCost_e = CalcTerrainCost(
         currentTerrain_b,
-        direction & 1,
+        IDX(direction) & 1,
         movingHero_f->m_remainingMobility,
         IDX(movingHero_f->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
         currentCell_f->m_isRoad,
@@ -1092,8 +1092,8 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
         return 0;
     }
 
-    northDirection_b = (1 << direction) & CURSOR_NORTH_DIRECTION_MASK;
-    southDirection_e = (1 << direction) & CURSOR_SOUTH_DIRECTION_MASK;
+    northDirection_b = (1 << IDX(direction)) & CURSOR_NORTH_DIRECTION_MASK;
+    southDirection_e = (1 << IDX(direction)) & CURSOR_SOUTH_DIRECTION_MASK;
     if (northDirection_b) {
         if (currentCell_c->m_objectIndex != CURSOR_EMPTY_OBJECT_INDEX
             && currentCell_c->m_objectTileset != TILESET_DUMMY
@@ -1201,7 +1201,7 @@ void advManager::ProcessMapChange(SMapChange change) {
                 change.id,
                 change.x,
                 change.y,
-                change.movement.direction,
+                IDX(change.movement.direction),
                 change.sequence,
                 gpGame->GetHero(change.id)->m_x,
                 gpGame->GetHero(change.id)->m_y
@@ -1351,7 +1351,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             mapHero_n->m_x = change.x;
             mapHero_n->m_y = change.y;
             mapHero_n->m_eventFlags = HERO_EVENT_NONE;
-            mapHero_n->m_direction = MAP_SPRITE_INITIAL_DIRECTION;
+            mapHero_n->m_direction = MAP_DIRECTION_EAST;
             mapHero_n->m_locationType =
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_triggerType;
             mapHero_n->m_occupiedTown =
@@ -1592,7 +1592,7 @@ DATA(0x00524bc0) i32 S1cursorCycle;
 DATA(0x00524bc4) i32 S1cursorFrameCount;
 DATA(0x00524bc8) i32 S1cursorTurning;
 DATA(0x00524bcc) i32 S1cursorBaseFrame;
-DATA(0x00524bd0) i32 S1cursorDirection;
+DATA(0x00524bd0) H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
 DATA(0x00524bd8) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 #undef SLOW_TURN_DELAY_SCALE

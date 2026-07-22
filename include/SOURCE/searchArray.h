@@ -9,8 +9,6 @@ extern i32 MAP_WIDTH;
 
 H2_ENUM_BEGIN(SearchConstant)
     SEARCH_DIRECTION_COUNT            = 8,
-    SEARCH_DIRECTION_REVERSE          = 4,
-    SEARCH_DIRECTION_MASK             = 7,
     SEARCH_QUEUE_CAPACITY             = 1024,
     SEARCH_PATH_CAPACITY              = 256,
     SEARCH_FLAG_BIT_COUNT             = 1,
@@ -121,12 +119,38 @@ public:
     searchArray(void);
     ~searchArray();
     i32 BuildPath(i32, i32, i32, i32, i32);
-    void SeedPosition(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void SeedPosition(
+        i32,
+        i32,
+        H2_ENUM_PARAM(MapDirection, i32),
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32
+    );
     void Init(void);
     void Close(void);
     void Clear(void);
     i32 QuickDistance(i32, i32, i32, i32);
-    void PushPoint(i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32, i32);
+    void PushPoint(
+        i32,
+        i32,
+        H2_ENUM_PARAM(MapDirection, i32),
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32,
+        i32
+    );
     void TestPossibleDirections(
         i32,
         i32,

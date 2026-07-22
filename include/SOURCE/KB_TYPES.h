@@ -39,7 +39,7 @@ H2_ENUM_CLASS_BEGIN(ResourceType)
     RES_COUNT           = 7
 H2_ENUM_CLASS_END(ResourceType)
 
-H2_ENUM_BEGIN(MapDirection)
+H2_ENUM_CLASS_BEGIN(MapDirection)
     MAP_DIRECTION_NONE       = -1,
     MAP_DIRECTION_NORTH      = 0,
     MAP_DIRECTION_NORTH_EAST = 1,
@@ -50,7 +50,19 @@ H2_ENUM_BEGIN(MapDirection)
     MAP_DIRECTION_WEST       = 6,
     MAP_DIRECTION_NORTH_WEST = 7,
     MAP_DIRECTION_COUNT      = 8
-H2_ENUM_END(MapDirection)
+H2_ENUM_CLASS_END(MapDirection)
+H2_ENUM_STEPPED(MapDirection)
+
+H2_ENUM_BEGIN(MapDirectionConstant)
+    MAP_DIRECTION_OPPOSITE_OFFSET = 4,
+    MAP_DIRECTION_INDEX_MASK      = 7
+H2_ENUM_END(MapDirectionConstant)
+
+inline MapDirection OppositeMapDirection(MapDirection direction) {
+    return static_cast<MapDirection>(
+        (IDX(direction) + MAP_DIRECTION_OPPOSITE_OFFSET) & MAP_DIRECTION_INDEX_MASK
+    );
+}
 
 H2_ENUM_CLASS_BEGIN(CoordinateAxis)
     COORDINATE_AXIS_X     = 0,

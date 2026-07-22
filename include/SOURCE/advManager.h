@@ -410,7 +410,7 @@ extern i32 S1cursorCycle;
 extern i32 S1cursorFrameCount;
 extern i32 S1cursorTurning;
 extern i32 S1cursorBaseFrame;
-extern i32 S1cursorDirection;
+extern H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
 extern class icon* pVWMisc;
 extern class icon* pVWLetters;
 extern i32 iVWYPixelOffset;
