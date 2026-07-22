@@ -68,6 +68,21 @@ the shrine/artifact bonus first. The matrix records both populations, their comp
 count partition, and representative identities. No probe declaration is retained in `HERO.cpp`;
 the exact state contributes only to the hash-scoped maximum.
 
+## SOURCE/DRAWING CombatMessage compiler-state census
+
+`drawing-combatmessage-tu-state-666788.tsv` rechecks the retained exact maximum for the four-
+argument `combatManager::CombatMessage` under the current verifier. Its 128 typedef counts collapse
+to two normalized target states: 84 canonical trials and 44 exact trials. Including the unmodified
+baseline gives 85 canonical observations. Both states are 1016 bytes with the complete retail
+38-site ordered relocation stream.
+
+The only normalized code transition is the equivalent pointer comparison before appending one or
+two spaces: canonical loads `message`, compares `newlinePtr`, and branches `JBE`; exact and retail
+load `newlinePtr`, compare `message`, and branch `JAE`. Twenty-six exact trials also preserve every
+pinned sibling; eighteen other exact target trials are rejected because the disposable declaration
+train perturbs a sibling. The matrix records both target populations and the eligible exact subset.
+No source change or probe declaration is retained.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,
