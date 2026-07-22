@@ -19,12 +19,12 @@ H2_ENUM_BEGIN(RequestConstant)
     MAP_HEADER_MAGIC_EXPANSION_GAME = 92
 H2_ENUM_END(RequestConstant)
 
-H2_ENUM_BEGIN(MapDimension)
+H2_ENUM_BEGIN(MapDimensionConstant)
     MAP_DIMENSION_SMALL  = 36,
     MAP_DIMENSION_MEDIUM = 72,
     MAP_DIMENSION_LARGE  = 108,
     MAP_DIMENSION_XLARGE = 144
-H2_ENUM_END(MapDimension)
+H2_ENUM_END(MapDimensionConstant)
 
 H2_ENUM_CLASS_BEGIN_T(MapVictoryCondition, u8)
     MAP_VICTORY_DEFEAT_ALL      = 0,
@@ -47,8 +47,8 @@ struct SMapHeader {
     u32 magic;
     H2_ENUM_STORAGE(GameDifficulty, u8) difficulty;
     u8 unknown5;
-    H2_ENUM_STORAGE(MapDimension, u8) width;
-    H2_ENUM_STORAGE(MapDimension, u8) height;
+    u8 width;
+    u8 height;
     u8 playerEnabled[MAP_HEADER_PLAYER_COUNT];
     u8 playerCanHuman[MAP_HEADER_PLAYER_COUNT];
     u8 playerCanComputer[MAP_HEADER_PLAYER_COUNT];
