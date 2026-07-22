@@ -709,7 +709,8 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     army* currentArmy10;
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        currentArmy10 = m_armies[IDX(side)] + armyIndex2;
+        currentArmy10 =
+            m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2;
         if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
