@@ -14,7 +14,7 @@ def run(*cmd):
     return subprocess.run([str(c) for c in cmd], cwd=REPO).returncode
 
 def main(argv=None):
-    # 1. manifest straight from CodeView (units.toml + symbol_names.csv) - cl-free
+    # 1. linker publics plus source-annotated private functions -> symbol manifest
     if run("python3", "scripts/gen_manifest.py", "build/orig/HEROES2W.EXE", "."): return 1
     if run("python3", "-m", "homm2.build.audit_text_coverage"): return 1
     # 2. give string-literal constants their real ??_C@ names (cl oracle)
