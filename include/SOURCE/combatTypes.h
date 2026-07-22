@@ -3,6 +3,25 @@
 
 #include <va.h>
 
+H2_ENUM_CLASS_BEGIN(CombatSide)
+    COMBAT_SIDE_NONE     = -1,
+    COMBAT_ATTACKER_SIDE = 0,
+    COMBAT_DEFENDER_SIDE = 1
+H2_ENUM_CLASS_END(CombatSide)
+H2_ENUM_STEPPED(CombatSide)
+
+H2_ENUM_BEGIN(CombatSideConstant)
+    COMBAT_SIDE_COUNT = 2
+H2_ENUM_END(CombatSideConstant)
+
+inline CombatSide OppositeCombatSide(CombatSide side) {
+#ifdef HOMM2_STRICT_ENUM_TYPES
+    return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
+#else
+    return COMBAT_DEFENDER_SIDE - side;
+#endif
+}
+
 H2_ENUM_CLASS_BEGIN(ArmyFacing)
     ARMY_FACING_NONE  = -1,
     ARMY_FACING_LEFT  = 0,

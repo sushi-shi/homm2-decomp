@@ -137,7 +137,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         return 0;
 
     frontValid = 0;
-    if (gpCombatManager->m_hexCells[destinationHexNext].m_occupantSide == COMBAT_OCCUPANT_NONE
+    if (gpCombatManager->m_hexCells[destinationHexNext].m_occupantSide == COMBAT_SIDE_NONE
         && (!gpCombatManager->m_hexCells[destinationHexNext].m_blocked
             || (gpCombatManager->m_inCastleCombat
                 && (destinationHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
@@ -146,7 +146,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                     || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
                         && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                    .m_occupantSide
-                               == COMBAT_OCCUPANT_NONE
+                               == COMBAT_SIDE_NONE
                         && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                    .m_deadOccupantCount
                                == 0))))) {
@@ -171,7 +171,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         }
 
         rearValidResult = 0;
-        if (ValidHex(rearHex) && gpCombatManager->m_hexCells[rearHex].m_occupantSide == COMBAT_OCCUPANT_NONE
+        if (ValidHex(rearHex) && gpCombatManager->m_hexCells[rearHex].m_occupantSide == COMBAT_SIDE_NONE
             && (!gpCombatManager->m_hexCells[rearHex].m_blocked
                 || (gpCombatManager->m_inCastleCombat
                     && (rearHex == COMBAT_CASTLE_GATE_APPROACH_HEX
@@ -180,7 +180,7 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
                         || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
                             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_occupantSide
-                                   == COMBAT_OCCUPANT_NONE
+                                   == COMBAT_SIDE_NONE
                             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_deadOccupantCount
                                    == 0))))) {
@@ -208,7 +208,7 @@ i32 army::ValidAttack(
     i32* attackHex
 ) {
     i32 adjacentSourceHex;
-    i32 occupantSide;
+    CombatSide occupantSide;
 
     if (!ValidHex(sourceHex))
         return 0;
@@ -262,11 +262,11 @@ i32 army::ValidAttack(
                 return 1;
             break;
         case ARMY_ATTACK_TARGET_ENEMY:
-            if (1 - gpCombatManager->m_currentSide == occupantSide)
+            if (OppositeCombatSide(gpCombatManager->m_currentSide) == occupantSide)
                 return 1;
             break;
         case ARMY_ATTACK_TARGET_OCCUPIED:
-            if (occupantSide != -1)
+            if (occupantSide != COMBAT_SIDE_NONE)
                 return 1;
             break;
     }

@@ -47,7 +47,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
         || candidateHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1) {
         return 0;
     }
-    if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_OCCUPANT_NONE
+    if (gpCombatManager->m_hexCells[candidateHex].m_occupantSide != COMBAT_SIDE_NONE
         || gpCombatManager->m_hexCells[candidateHex].m_blocked) {
         return 0;
     }
@@ -57,7 +57,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
             cell_9 = &gpCombatManager->m_hexCells[candidateHex];
         }
         if (ValidHex(candidateHex)
-            && (cell_9->m_occupantSide == COMBAT_OCCUPANT_NONE
+            && (cell_9->m_occupantSide == COMBAT_SIDE_NONE
                 || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
                     && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
             && !cell_9->m_blocked) {
@@ -73,7 +73,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
             } else {
                 return 0;
             }
-            if ((cell_9->m_occupantSide == COMBAT_OCCUPANT_NONE
+            if ((cell_9->m_occupantSide == COMBAT_SIDE_NONE
                  || (cell_9->m_occupantSide == gpCombatManager->m_currentArmySide
                      && cell_9->m_occupantIndex == gpCombatManager->m_currentArmyIndex))
                 && !cell_9->m_blocked) {
@@ -105,7 +105,8 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     if (!ValidHex(destination)) {
         return 0;
     }
-    if (m_targetSide < 0 || m_targetSide > COMBAT_DEFENDER_SIDE || m_targetIndex < 0
+    if ((m_targetSide != COMBAT_ATTACKER_SIDE && m_targetSide != COMBAT_DEFENDER_SIDE)
+        || m_targetIndex < 0
         || m_targetIndex > COMBAT_ARMY_SLOT_COUNT - 1) {
         if (CanFit(destination, 0, NULL)) {
             m_moveTargetHex = destination;
@@ -114,7 +115,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         return 0;
     }
 
-    target = &gpCombatManager->m_armies[m_targetSide][m_targetIndex];
+    target = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
     if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         targetHex = destination;
     } else {
@@ -285,12 +286,12 @@ i32 army::FlyTo(i32 destination) {
     yStep = static_cast<float>(yDistance) / flightSegmentCount;
 
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
-    gpCombatManager->m_hexCells[m_hex].m_occupantSide = -1;
+    gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         sourceRearHex = ArmyFacingRearHexOffset(m_facing) + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
-        gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = -1;
+        gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
     }
 

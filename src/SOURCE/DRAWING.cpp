@@ -235,12 +235,12 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
     if (gbNoShowCombat != 0)
         return;
 
-    currentArmyPtr = &m_armies[m_currentArmySide][m_currentArmyIndex];
+    currentArmyPtr = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
     actingMonsterType = currentArmyPtr->m_monsterType;
     targetArmy = NULL;
     targetMonsterType = CreatureType(0);
-    if (currentArmyPtr->m_targetSide >= 0 && currentArmyPtr->m_targetIndex >= 0) {
-        targetArmy = &m_armies[currentArmyPtr->m_targetSide][currentArmyPtr->m_targetIndex];
+    if (currentArmyPtr->m_targetSide != COMBAT_SIDE_NONE && currentArmyPtr->m_targetIndex >= 0) {
+        targetArmy = &m_armies[IDX(currentArmyPtr->m_targetSide)][currentArmyPtr->m_targetIndex];
         targetMonsterType = targetArmy->m_monsterType;
     }
 
@@ -282,13 +282,14 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
             );
             break;
         case COMBAT_MESSAGE_COMMAND_OPTIONS:
-            if (m_heroes[m_currentSide] != NULL && m_heroes[m_currentSide]->m_isCaptain != 0)
+            if (m_heroes[IDX(m_currentSide)] != NULL && m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_CAPTAIN_OPTIONS)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_HERO_OPTIONS)]);
             break;
         case COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS:
-            if (m_heroes[1 - m_currentSide] != NULL && m_heroes[1 - m_currentSide]->m_isCaptain != 0)
+            if (m_heroes[IDX(OppositeCombatSide(m_currentSide))] != NULL
+                && m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0)
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_CAPTAIN)]);
             else
                 strcpy(gText, cCombatMessage[IDX(MESSAGE_TEXT_OPPOSING_HERO)]);
@@ -298,7 +299,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                 sprintf(gText, cCombatMessage[IDX(MESSAGE_TEXT_BALLISTA)]);
             } else {
                 actingMonsterType =
-                    m_armies[m_currentArmySide][m_hexCells[m_selectedHex].m_occupantIndex]
+                    m_armies[IDX(m_currentArmySide)][m_hexCells[m_selectedHex].m_occupantIndex]
                         .m_monsterType;
                 if (actingMonsterType >= CREATURE_PEASANT)
                     sprintf(
@@ -316,17 +317,17 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
 
 VA(0x0040327e, 0x126)
 void combatManager::ResetLimitCreature(void) {
-    i32 side;
+    CombatSide side;
     i32 armySlotIndex;
 
-    for (side = 0; side < COMBAT_SIDE_COUNT_DRAWING; side++) {
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
         for (armySlotIndex = 0; armySlotIndex < COMBAT_ARMY_SLOT_COUNT_DRAWING; armySlotIndex++) {
-            if (HAS(m_armies[side][armySlotIndex].m_monster.flags.all,
+            if (HAS(m_armies[IDX(side)][armySlotIndex].m_monster.flags.all,
                     COMBAT_ARMY_FLAG_MIRROR_IMAGE)
                 != 0)
-                m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = -1;
+                m_limitCreatureCount[IDX(side)][OD_STEER(armySlotIndex)] = -1;
             else
-                m_limitCreatureCount[side][OD_STEER(armySlotIndex)] = 0;
+                m_limitCreatureCount[IDX(side)][OD_STEER(armySlotIndex)] = 0;
         }
     }
     m_drawHero[0] = 0;
@@ -354,7 +355,7 @@ void combatManager::UpdateCombatArea(void) {
 VA(0x0040340e, 0x213)
 void combatManager::SetupGridForArmy(army* armyPtr) {
     i32 attackMask;
-    i32 savedTargetSide;
+    CombatSide savedTargetSide;
     i32 targetIndexSave;
     i32 hexIndex;
 
@@ -368,7 +369,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
     savedTargetSide = armyPtr->m_targetSide;
     targetIndexSave = armyPtr->m_targetIndex;
-    armyPtr->m_targetSide = -1;
+    armyPtr->m_targetSide = COMBAT_SIDE_NONE;
     armyPtr->m_targetIndex = -1;
     gpSearchArray->SeedCombatPosition(armyPtr);
     armyPtr->m_targetSide = savedTargetSide;
@@ -378,14 +379,14 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
         if (armyPtr->m_hex == hexIndex) {
             m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
         } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
-            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE) {
+            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE) {
                 if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
                     m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
             } else {
                 m_gridState[hexIndex] = GRID_SHADE_EMPTY_BLOCKED;
             }
-        } else if (m_hexCells[hexIndex].m_occupantSide != COMBAT_OCCUPANT_NONE
-                   && m_hexCells[hexIndex].m_occupantSide != 1 - m_currentSide
+        } else if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
+                   && m_hexCells[hexIndex].m_occupantSide != OppositeCombatSide(m_currentSide)
                    && (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
             m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
         }
@@ -408,11 +409,11 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         return 0;
 
     if (rebuildGrid != 0) {
-        if (m_playerId[m_currentSide] == -1 || gbThisNetHumanPlayer[m_playerId[m_currentSide]] == 0
+        if (m_playerId[IDX(m_currentSide)] == -1 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || m_gridSelectionDisabled != 0) {
             memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
         } else {
-            SetupGridForArmy(&m_armies[OD_STEER(m_currentArmySide)][m_currentArmyIndex]);
+            SetupGridForArmy(&m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex]);
         }
     }
     if (resetGridDisplay != 0)
@@ -592,7 +593,7 @@ void combatManager::DrawBackground(void) {
                 ICON_DRAW_CLIP,
                 0,
                 0,
-                COMBAT_SCREEN_WIDTH / COMBAT_MANAGER_SIDE_COUNT,
+                COMBAT_SCREEN_WIDTH / IDX(COMBAT_SIDE_COUNT),
                 COMBAT_AREA_HEIGHT,
                 0
             );
@@ -616,7 +617,7 @@ void combatManager::DrawBackground(void) {
         sprintf(
             gText,
             "castbkg%c.icn",
-            cHeroTypeInitial[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+            cHeroTypeInitial[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(
@@ -646,8 +647,8 @@ void combatManager::DrawBackground(void) {
                 COMBAT_AREA_HEIGHT,
                 0
             );
-        if (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type == FACTION_KNIGHT
-            && (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_RAINBOW)) != 0)
+        if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type == FACTION_KNIGHT
+            && (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RAINBOW)) != 0)
             IconToBitmap(
                 backgroundIcon,
                 m_backgroundBuffer,
@@ -870,7 +871,7 @@ void combatManager::DrawFrame(
 
     if (computeExtent != 0) {
         extentChanged1 = 0;
-        for (side5 = 0; side5 < COMBAT_SIDE_COUNT_DRAWING; side5++) {
+        for (side5 = 0; side5 < COMBAT_SIDE_COUNT; side5++) {
             for (armyIndex2 = 0; armyIndex2 < COMBAT_ARMY_SLOT_COUNT_DRAWING; armyIndex2++) {
                 if (m_limitCreatureCount[side5][armyIndex2] > 0) {
                     extentChanged1 = 1;
@@ -889,7 +890,7 @@ void combatManager::DrawFrame(
             }
         }
 
-        for (side5 = 0; side5 < COMBAT_SIDE_COUNT_DRAWING; side5++) {
+        for (side5 = 0; side5 < COMBAT_SIDE_COUNT; side5++) {
             if (m_drawHero[side5] != 0) {
                 extentChanged1 = 1;
                 gbComputeExtent = true;
@@ -999,9 +1000,9 @@ void combatManager::DrawFrame(
                 ((m_heroes[1]->m_isCaptain ? -1 : 0)
                  & (COMBAT_HERO_RIGHT_ALT_Y - COMBAT_HERO_RIGHT_Y))
                     + COMBAT_HERO_RIGHT_Y,
-                sCmbtHero[m_heroSpriteIndex[COMBAT_DEFENDER_SIDE]]
-                    .animationFrames[m_heroAnimationState[COMBAT_DEFENDER_SIDE]]
-                                    [m_heroAnimationFrame[COMBAT_DEFENDER_SIDE]],
+                sCmbtHero[m_heroSpriteIndex[IDX(COMBAT_DEFENDER_SIDE)]]
+                    .animationFrames[m_heroAnimationState[IDX(COMBAT_DEFENDER_SIDE)]]
+                                    [m_heroAnimationFrame[IDX(COMBAT_DEFENDER_SIDE)]],
                 &m_heroLimits[1],
                 ICON_DRAW_FLIPPED,
                 0,
@@ -1024,9 +1025,9 @@ void combatManager::DrawFrame(
             m_heroIcons[0]->CombatClipDrawToBuffer(
                 COMBAT_HERO_LEFT_X,
                 COMBAT_HERO_LEFT_Y,
-                sCmbtHero[m_heroSpriteIndex[COMBAT_ATTACKER_SIDE]]
-                    .animationFrames[m_heroAnimationState[COMBAT_ATTACKER_SIDE]]
-                                    [m_heroAnimationFrame[COMBAT_ATTACKER_SIDE]],
+                sCmbtHero[m_heroSpriteIndex[IDX(COMBAT_ATTACKER_SIDE)]]
+                    .animationFrames[m_heroAnimationState[IDX(COMBAT_ATTACKER_SIDE)]]
+                                    [m_heroAnimationFrame[IDX(COMBAT_ATTACKER_SIDE)]],
                 &m_heroLimits[0],
                 ICON_DRAW_NORMAL,
                 0,
@@ -1058,7 +1059,7 @@ void combatManager::DrawFrame(
             m_combatIcons[IDX(COMBAT_ICON_CATAPULT)]->CombatClipDrawToBuffer(
                 COMBAT_CATAPULT_X,
                 COMBAT_CATAPULT_Y,
-                m_catapultFrame[COMBAT_ATTACKER_SIDE],
+                m_catapultFrame[IDX(COMBAT_ATTACKER_SIDE)],
                 &m_catapultLimits,
                 ICON_DRAW_NORMAL,
                 0,
@@ -1195,40 +1196,40 @@ void combatManager::DrawFrame(
                             wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_TOP_X];
                             wallY =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_TOP_Y];
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_WALL:
                             wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_SECOND_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_SECOND_X];
                             wallY =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_SECOND_Y];
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_WALL:
                             wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_THIRD_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_THIRD_X];
                             wallY =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_THIRD_Y];
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_WALL:
                             wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_BOTTOM_X];
                             wallY =
-                                wallCoordinates1[IDX(m_combatTowns[COMBAT_DEFENDER_SIDE]->m_type)]
+                                wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
                                                 [WALL_BOTTOM_Y];
                             break;
                         case COMBAT_CASTLE_HEX_GATE:
@@ -1268,7 +1269,7 @@ void combatManager::DrawFrame(
         }
 
         if (m_inCastleCombat == 0
-            || (m_combatTowns[COMBAT_DEFENDER_SIDE]->m_buildings & IDX(TOWN_BUILDING_MOAT)) == 0)
+            || (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_MOAT)) == 0)
             goto endRow;
         if (row == DRAW_CASTLE_GATE_ROW && m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN)
             goto endRow;
@@ -1330,7 +1331,7 @@ void combatManager::DrawFrame(
                 goto endRow;
             }
         } else {
-            if (m_hexCells[moatCell[IDX(row)]].m_occupantSide == COMBAT_OCCUPANT_NONE)
+            if (m_hexCells[moatCell[IDX(row)]].m_occupantSide == COMBAT_SIDE_NONE)
                 goto endRow;
         drawMoat:
             m_combatIcons[IDX(COMBAT_ICON_MOAT)]
@@ -1345,7 +1346,7 @@ void combatManager::DrawFrame(
         gridWasShowing1 = 0;
     }
 
-    if (gConfig.combatArmyInfoLevel > 0 && m_smallViewSide[0] != -1) {
+    if (gConfig.combatArmyInfoLevel > 0 && m_smallViewSide[0] != COMBAT_SIDE_NONE) {
         DrawSmallView(0, 0);
         DrawSmallView(1, 0);
     }
@@ -1451,11 +1452,11 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         return;
 
     gbInDrawSmallView = true;
-    if (m_smallViewSide[viewIndex] == -1
+    if (m_smallViewSide[viewIndex] == COMBAT_SIDE_NONE
         || (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_LEFT_X
-            && m_smallViewSide[viewIndex] == 1)
+            && m_smallViewSide[viewIndex] == COMBAT_DEFENDER_SIDE)
         || (m_smallViewLastX[viewIndex] == COMBAT_SMALL_VIEW_RIGHT_X
-            && m_smallViewSide[viewIndex] == 0)) {
+            && m_smallViewSide[viewIndex] == COMBAT_ATTACKER_SIDE)) {
         if (m_smallViewLastX[viewIndex] >= 0) {
             gbLimitToExtent = true;
             giMinExtentX = m_smallViewLastX[viewIndex];
@@ -1472,7 +1473,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             gbLimitToExtent = false;
             m_smallViewLastX[viewIndex] = -1;
         }
-        if (m_smallViewSide[viewIndex] == -1) {
+        if (m_smallViewSide[viewIndex] == COMBAT_SIDE_NONE) {
             gbInDrawSmallView = false;
             return;
         }
@@ -1480,12 +1481,14 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
 
     if (gConfig.combatArmyInfoLevel == COMBAT_SMALL_VIEW_FULL_INFO) {
         if (viewIndex == 0) {
-            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
-                                                    : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewX = m_smallViewSide[viewIndex] == COMBAT_ATTACKER_SIDE
+                        ? COMBAT_SMALL_VIEW_LEFT_X
+                        : COMBAT_SMALL_VIEW_RIGHT_X;
             viewY2 = COMBAT_SMALL_VIEW_FULL_Y;
         } else {
-            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
-                                                    : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewX = m_smallViewSide[viewIndex] == COMBAT_ATTACKER_SIDE
+                        ? COMBAT_SMALL_VIEW_LEFT_X
+                        : COMBAT_SMALL_VIEW_RIGHT_X;
             viewY2 = m_smallViewSide[1] == m_smallViewSide[0] ? COMBAT_SMALL_VIEW_FULL_RIGHT_Y
                                                               : COMBAT_SMALL_VIEW_FULL_Y;
         }
@@ -1493,12 +1496,14 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
         m_smallViewHeight[viewIndex] = COMBAT_SMALL_VIEW_FULL_HEIGHT;
     } else {
         if (viewIndex == 0) {
-            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
-                                                    : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewX = m_smallViewSide[viewIndex] == COMBAT_ATTACKER_SIDE
+                        ? COMBAT_SMALL_VIEW_LEFT_X
+                        : COMBAT_SMALL_VIEW_RIGHT_X;
             viewY2 = COMBAT_SMALL_VIEW_COMPACT_Y;
         } else {
-            viewX = m_smallViewSide[viewIndex] == 0 ? COMBAT_SMALL_VIEW_LEFT_X
-                                                    : COMBAT_SMALL_VIEW_RIGHT_X;
+            viewX = m_smallViewSide[viewIndex] == COMBAT_ATTACKER_SIDE
+                        ? COMBAT_SMALL_VIEW_LEFT_X
+                        : COMBAT_SMALL_VIEW_RIGHT_X;
             viewY2 = m_smallViewSide[1] == m_smallViewSide[0] ? COMBAT_SMALL_VIEW_COMPACT_RIGHT_Y
                                                               : COMBAT_SMALL_VIEW_COMPACT_Y;
         }
@@ -1512,7 +1517,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     if (updateScreen != 0)
         gbLimitToExtent = false;
 
-    viewArmy1 = &m_armies[m_smallViewSide[viewIndex]][m_smallViewArmyIndex[viewIndex]];
+    viewArmy1 = &m_armies[IDX(m_smallViewSide[viewIndex])][m_smallViewArmyIndex[viewIndex]];
     drawn6 = m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_BACKGROUND)]->CombatClipDrawToBuffer(
         viewX,
         viewY2,

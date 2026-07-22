@@ -41,7 +41,7 @@ public:
     struct SLimitData m_spellLimits;
     i32 m_standingAnimation;
     i32 m_showQuantity;
-    i32 m_targetSide;
+    H2_ENUM_STORAGE(CombatSide, i32) m_targetSide;
     i32 m_targetIndex;
     CombatHexDirection m_attackDirection;
     i32 m_unknown5e;
@@ -73,7 +73,7 @@ public:
     i32 m_killPending;
     i32 m_deathPending;
     SpellType m_spellEffect;
-    i32 m_side;
+    H2_ENUM_STORAGE(CombatSide, i32) m_side;
     i32 m_index;
     i32 m_lastAnimationTime;
     i32 m_morale;
@@ -94,7 +94,7 @@ public:
     army(void);
     void WaitSample(ArmySampleType);
     void InitClean(void);
-    void Init(CreatureType, i32, i32, i32, i32, i32);
+    void Init(CreatureType, i32, H2_ENUM_PARAM(CombatSide, i32), i32, i32, i32);
     void LoadResources(void);
     void FreeResources(void);
     void DrawToBuffer(i32, i32, i32);
@@ -132,7 +132,7 @@ public:
     i32 TopY(void);
     i32 RightX(void);
     i32 LeftX(void);
-    i32 OtherArmyAdjacent(i32, i32);
+    i32 OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32), i32);
     i32 GetPowBaseY(void);
     i32 CanFit(i32, i32, i32*);
     i32 ValidFlight(i32, ArmyPathTarget);
