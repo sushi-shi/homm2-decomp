@@ -7808,12 +7808,15 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C1"));
     strcpy(filename3, "c:\\TEMP\\Z.DIF");
     fileSize7 = FileSize(filename3);
-    sourceData6 =
-        static_cast<char*>(H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, 8094));
-    encodedData6 =
-        static_cast<char*>(H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, 8095));
-    decodedData6 =
-        static_cast<char*>(H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, 8096));
+    sourceData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 9)
+    );
+    encodedData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 10)
+    );
+    decodedData6 = static_cast<char*>(
+        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 11)
+    );
     LogStr(const_cast<char*>("C2"));
     fileHandle4 = open(filename3, _O_BINARY);
     if (fileHandle4 == -1)
@@ -7830,9 +7833,9 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C7"));
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), fileSize7);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    H2_FREE(sourceData6, 8121);
-    H2_FREE(encodedData6, 8122);
-    H2_FREE(decodedData6, 8123);
+    H2_FREE(sourceData6, gCompressTestSourceLine + 36);
+    H2_FREE(encodedData6, gCompressTestSourceLine + 37);
+    H2_FREE(decodedData6, gCompressTestSourceLine + 38);
     LogStr(const_cast<char*>("C8"));
 }
 
