@@ -1100,15 +1100,15 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
 
 VA(0x00409e05, 0x84)
 void game::SetupResources(void) {
-    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resource;
+    H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resourceIdx;
     tag_message message;
 
     message.type = MESSAGE_WIDGET;
-    for (resource = RES_WOOD; resource < RES_COUNT; resource++) {
+    for (resourceIdx = RES_WOOD; resourceIdx < RES_COUNT; resourceIdx++) {
         message.payload.widget.command = OVERVIEW_WIDGET_SET_TEXT;
         message.payload.widget.data.text = gText;
-        sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resource)]);
-        message.payload.widget.id = IDX(resource) + RESOURCE_FIRST_WIDGET;
+        sprintf(gText, "%d", gpCurPlayer->m_resources[IDX(resourceIdx)]);
+        message.payload.widget.id = IDX(resourceIdx) + RESOURCE_FIRST_WIDGET;
         overWin->BroadcastMessage(message);
     }
 }
