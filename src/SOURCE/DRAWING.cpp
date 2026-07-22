@@ -1167,33 +1167,33 @@ void combatManager::DrawFrame(
                         case COMBAT_CASTLE_HEX_TOP_TOWER:
                             wallFrame1 =
                                 wallFrameOffsets1[IDX(
-                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_FIRST]
+                                    m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                                 )]
                                 + TOP_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_TOWER:
                             wallFrame1 =
                                 wallFrameOffsets1[IDX(
-                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_SECOND]
+                                    m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_SECOND)]
                                 )]
                                 + SECOND_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_TOWER:
                             wallFrame1 =
                                 wallFrameOffsets1[IDX(
-                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_THIRD]
+                                    m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_THIRD)]
                                 )]
                                 + THIRD_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_TOWER:
                             wallFrame1 =
                                 wallFrameOffsets1[IDX(
-                                    m_wallStates[COMBAT_WALL_SLOT_SECTION_FOURTH]
+                                    m_wallStates[IDX(COMBAT_WALL_SLOT_SECTION_FOURTH)]
                                 )]
                                 + BOTTOM_TOWER_BASE_FRAME;
                             break;
                         case COMBAT_CASTLE_HEX_TOP_WALL:
-                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_TOP_TOWER])
+                            wallFrame1 = IDX(m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
@@ -1203,7 +1203,7 @@ void combatManager::DrawFrame(
                                                 [WALL_TOP_Y];
                             break;
                         case COMBAT_CASTLE_HEX_SECOND_WALL:
-                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_SECOND_TOWER])
+                            wallFrame1 = IDX(m_wallStates[IDX(COMBAT_WALL_SLOT_SECOND_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
@@ -1213,7 +1213,7 @@ void combatManager::DrawFrame(
                                                 [WALL_SECOND_Y];
                             break;
                         case COMBAT_CASTLE_HEX_THIRD_WALL:
-                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_THIRD_TOWER])
+                            wallFrame1 = IDX(m_wallStates[IDX(COMBAT_WALL_SLOT_THIRD_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
@@ -1223,7 +1223,7 @@ void combatManager::DrawFrame(
                                                 [WALL_THIRD_Y];
                             break;
                         case COMBAT_CASTLE_HEX_BOTTOM_WALL:
-                            wallFrame1 = IDX(m_wallStates[COMBAT_WALL_SLOT_BOTTOM_TOWER])
+                            wallFrame1 = IDX(m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)])
                                          + COMBAT_CASTLE_WALL_BASE_FRAME;
                             wallX7 =
                                 wallCoordinates1[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]

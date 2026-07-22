@@ -81,7 +81,7 @@ H2_ENUM_CLASS_BEGIN(CombatDrawbridgeState)
 H2_ENUM_CLASS_END(CombatDrawbridgeState)
 H2_ENUM_STEPPED(CombatDrawbridgeState)
 
-H2_ENUM_BEGIN(CombatCastleWallSlot)
+H2_ENUM_CLASS_BEGIN(CombatCastleWallSlot)
     COMBAT_WALL_SLOT_NONE           = -1,
     COMBAT_WALL_SLOT_TOP_TOWER      = 0,
     COMBAT_WALL_SLOT_SECOND_TOWER   = 1,
@@ -91,10 +91,13 @@ H2_ENUM_BEGIN(CombatCastleWallSlot)
     COMBAT_WALL_SLOT_SECTION_SECOND = 5,
     COMBAT_WALL_SLOT_SECTION_THIRD  = 6,
     COMBAT_WALL_SLOT_SECTION_FOURTH = 7,
-    COMBAT_WALL_SLOT_KEEP           = 8,
-    COMBAT_WALL_SLOT_COUNT          = 9,
-    COMBAT_WALL_SECTION_COUNT       = 4
-H2_ENUM_END(CombatCastleWallSlot)
+    COMBAT_WALL_SLOT_KEEP           = 8
+H2_ENUM_CLASS_END(CombatCastleWallSlot)
+
+H2_ENUM_BEGIN(CombatCastleWallConstant)
+    COMBAT_WALL_SLOT_COUNT    = 9,
+    COMBAT_WALL_SECTION_COUNT = 4
+H2_ENUM_END(CombatCastleWallConstant)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CombatCastleWallState, u8)
     COMBAT_WALL_STATE_KEEP_STANDING        = 0,

@@ -142,7 +142,7 @@ i32 mouseManager::Open(i32 priority) {
         ShowCursor(0);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
     m_active = true;
-    m_priority = BaseManagerPriority(priority);
+    m_priority = priority;
     return 0;
 }
 
