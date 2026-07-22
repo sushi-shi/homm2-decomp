@@ -907,6 +907,10 @@ H2_ENUM_BEGIN(AdventurePanelDialogConstant)
     PANEL_FIRST_WIDGET        = 1,
     PANEL_LAST_WIDGET         = 4,
     PANEL_CLOSE_WIDGET        = 0x7800,
+    PANEL_VIEW_WORLD_HELP     = 0,
+    PANEL_VIEW_PUZZLE_HELP    = 1,
+    PANEL_SCENARIO_INFO_HELP  = 2,
+    PANEL_SEARCH_HELP         = 3,
     PANEL_CLOSE_HELP          = 4,
     PANEL_VIEW_WORLD          = 1,
     PANEL_VIEW_PUZZLE         = 2,
@@ -9848,15 +9852,26 @@ VA(0x0046a9d0, 0x1ca)
 MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
-                if (message.payload.widget.id >= PANEL_VIEW_WORLD
-                    && message.payload.widget.id <= PANEL_SEARCH) {
-                    helpIndex = message.payload.widget.id - PANEL_VIEW_WORLD;
-                } else if (message.payload.widget.id == PANEL_CLOSE_WIDGET) {
-                    helpIndex = PANEL_CLOSE_HELP;
+                switch (message.payload.widget.id) {
+                    case PANEL_VIEW_WORLD:
+                        helpIndex = PANEL_VIEW_WORLD_HELP;
+                        break;
+                    case PANEL_VIEW_PUZZLE:
+                        helpIndex = PANEL_VIEW_PUZZLE_HELP;
+                        break;
+                    case PANEL_SCENARIO_INFO:
+                        helpIndex = PANEL_SCENARIO_INFO_HELP;
+                        break;
+                    case PANEL_SEARCH:
+                        helpIndex = PANEL_SEARCH_HELP;
+                        break;
+                    case PANEL_CLOSE_WIDGET:
+                        helpIndex = PANEL_CLOSE_HELP;
+                        break;
                 }
                 if (helpIndex >= 0) {
                     NormalDialog(
@@ -9886,6 +9901,8 @@ MessageDispatchResult APanelHandler(tag_message& message) {
                             break;
                     }
                     break;
+                default:
+                    break;
             }
         }
     }
@@ -9893,7 +9910,8 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command =
+            static_cast<BaseWidgetCommand>(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
