@@ -33,6 +33,20 @@ struct playerAttentionWeights {
 };
 SIZE(playerAttentionWeights, 0x18);
 
+class playerAIData {
+public:
+    playerAttentionWeights m_attentionWeights;
+    char m_unknown18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
+    i32 m_income[IDX(RES_COUNT)];
+    i32 m_obeliskValue;
+    i32 m_totalObeliskValue;
+    i32 m_unexploredValue;
+    float m_upgradeValueWeight;
+    float m_artifactValue;
+    float m_artifactPoolShare;
+};
+SIZE(playerAIData, 0x68);
+
 class playerData {
 public:
     i8 m_color;
@@ -57,15 +71,7 @@ public:
     i8 m_evilInterface;
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
-    playerAttentionWeights m_attentionWeights;
-    char m_unknownCb[PLAYER_RUNTIME_TAIL_GAP_SIZE];
-    i32 m_income[IDX(RES_COUNT)];
-    i32 m_obeliskValue;
-    i32 m_totalObeliskValue;
-    i32 m_unexploredValue;
-    float m_upgradeValueWeight;
-    float m_artifactValue;
-    float m_artifactPoolShare;
+    playerAIData m_aiData;
     void Write(i32);
     void Read(i32);
     i32 NextHero(i32);
