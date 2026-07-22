@@ -18,7 +18,8 @@ EXTERN_DECL_RE = re.compile(r'^\s*extern\b')
 # Column-0 (bodies/statements are indented), `<ret> name(params);`, no body, no '=' (that's a
 # definition/initializer), and not an annotation macro or control keyword.
 FWD_DECL_RE = re.compile(r'^[A-Za-z_][\w\s\*&:<>]*\b[A-Za-z_]\w*\s*\([^{;=]*\)\s*(const\s*)?;')
-_FWD_SKIP = re.compile(r'^\s*(VA|VAU|DATA|SIZE|SYMBOL|return|typedef|extern)\b')
+_FWD_SKIP = re.compile(
+    r'^\s*(VA|VA_COMPGEN|DATA|VTBL|VTBL2|SIZE|return|typedef|extern)\b')
 
 def violations(path):
     out = []
