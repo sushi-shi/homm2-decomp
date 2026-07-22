@@ -1,0 +1,13 @@
+# SOURCE/GAME game::SetupOrigData controlled typedef-state census
+# checkpoint	881cdf39aac0b25bdda86e70abea43d26d5198bd
+# normalized_source_hash	39240dddfbe6
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/GAME.cpp --rva 0x72a7b --trials 128 --families typedef --max-declarations 128 --seed 0x53455455
+# identity	raw target text + objdiff boundary + ordered relocation stream after normalizing only numeric $SG/$T counters
+# result	128 probe counts produce three meaningful states; no probe is exact and no generated declaration remains in source
+state	representative_count	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	counts_in_1_through_128
+canonical	15	15	97.747420	2888	381561b38953f4dc	b9dc9d209fc8e432	15,16,17,33,34,50,51,67,68,85,86,102,103,119,120
+intermediate	14	8	97.847940	2886	2d47eed972cc706e	567802a97eba99a6	14,31,32,49,66,84,101,118
+high	1	105	99.747420	2882	16dbdd8ec2e6b528	083a7939868e0330	all other counts
+# The first raw census appeared to contain 129 states because every trial renumbered private $SG/$T symbols. The normalized census deliberately folds only those numeric counters; public targets, relocation sites/types/addends, code bytes, and function boundaries remain identity-bearing.
+# Reproduction bodies are deterministic from the command and representative count. A later byte audit should compare the canonical state plus trials 14 and 1 against retail; do not compare all 129 private-label spellings as if they were code states.
+# The high state fixes the four hero-record nested-store evaluation-order blocks. Its remaining six-byte residual is the town-record creature-type store: retail loads j before scaling i, while the high candidate folds j into a later add. No reversed-subscript or other unnatural source spelling was retained.
