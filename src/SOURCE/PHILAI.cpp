@@ -6163,19 +6163,19 @@ i32 philAI::EvaluatePassword(mapCell* cell) {
 VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // result
-    H2_ENUM_STORAGE(RecruitSiteType, i32) siteType;
+    H2_ENUM_STORAGE(RecruitSiteType, i32) recruitmentSiteType;
     i32 nb;   // monster type
     i32 kn;
     i32 jb;
     i32 idx;
     i16 lvl;  // monster level
-    siteType = cell->m_tentColor;
-    siteType = IDX(siteType) & EVENT_RECRUIT_TYPE_MASK;
+    recruitmentSiteType = cell->m_tentColor;
+    recruitmentSiteType = IDX(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK;
     lvl = cell->m_tentColor;
     lvl >>= EVENT_RECRUIT_COUNT_SHIFT;
     nb = 0;
     val = 0;
-    switch (siteType) {
+    switch (recruitmentSiteType) {
         case RECRUITMENT_SITE_BARROW_MOUNDS:
             nb = IDX(CREATURE_GHOST);
             break;
