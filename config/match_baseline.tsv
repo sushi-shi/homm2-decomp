@@ -1172,7 +1172,7 @@ SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	100.0000	392a04627671
 SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.9846	436ccdc04a4a
 SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	93.6818	b763c398c76d
 SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	94.6110	af4eef145cec
-SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	89.9655	c41e6481a11f
+SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	100.0000	d0e4404ce919
 SOURCE/SETUP	?ExpLoadCampaignHandler@@YIHAAUtag_message@@@Z	100.0000	ef7277c94eab
 SOURCE/SETUP	?ExpNewCampaignHandler@@YIHAAUtag_message@@@Z	100.0000	fda4fed670b2
 SOURCE/SETUP	?ExpStdGameHandler@@YIHAAUtag_message@@@Z	100.0000	59c914279306
