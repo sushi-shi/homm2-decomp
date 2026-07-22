@@ -60,7 +60,7 @@ H2_ENUM_CLASS_END(CoordinateAxis)
 
 // Mine records use the resource ids for ordinary mines and reserve two
 // additional ids for map facilities tracked through the same table.
-H2_ENUM_BEGIN(MineType)
+H2_ENUM_CLASS_BEGIN(MineType)
     MINE_TYPE_WOOD          = 0,
     MINE_TYPE_MERCURY       = 1,
     MINE_TYPE_ORE           = 2,
@@ -70,7 +70,7 @@ H2_ENUM_BEGIN(MineType)
     MINE_TYPE_GOLD          = 6,
     MINE_TYPE_LIGHTHOUSE    = 100,
     MINE_TYPE_ALCHEMIST_LAB = 101
-H2_ENUM_END(MineType)
+H2_ENUM_CLASS_END(MineType)
 
 H2_ENUM_CLASS_BEGIN(CreatureType)
     CREATURE_NONE                = -1,
