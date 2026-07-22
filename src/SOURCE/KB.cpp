@@ -3316,14 +3316,17 @@ void PopNetBox(char* text, i32 netPlayer) {
 
 VA(0x0049e02b, 0xc7)
 void AddNetBoxLine(char* str, char color) {
-    i32 lineIndex;
     if (color < 0 || color > BOX_MAX_COLOR)
         color = BOX_DEFAULT_COLOR;
-    for (lineIndex = 0; lineIndex < BOX_LINE_COUNT - 1; lineIndex++) {
-        strcpy(cNetBoxLine[lineIndex], cNetBoxLine[lineIndex + 1]);
-        cNetBoxColor[lineIndex] = cNetBoxColor[lineIndex + 1];
-    }
+
+    strcpy(cNetBoxLine[0], cNetBoxLine[1]);
+    strcpy(cNetBoxLine[1], cNetBoxLine[2]);
+    strcpy(cNetBoxLine[2], cNetBoxLine[3]);
     strcpy(cNetBoxLine[BOX_LINE_COUNT - 1], str);
+
+    cNetBoxColor[0] = cNetBoxColor[1];
+    cNetBoxColor[1] = cNetBoxColor[2];
+    cNetBoxColor[2] = cNetBoxColor[3];
     cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
 
