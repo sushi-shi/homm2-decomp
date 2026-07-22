@@ -394,7 +394,7 @@ extern i32 iSandAnim;
 extern i32 giLastHourGlassUpdateTime;
 extern i32 TrigX;
 extern i32 TrigY;
-extern i32 iCurBottomView;
+extern H2_ENUM_STORAGE(BottomViewMode, i32) iCurBottomView;
 extern i32 iCurBottomViewEnemy;
 extern i32 iCurHourGlassPhase;
 extern i32 iLastHourGlassPhase;

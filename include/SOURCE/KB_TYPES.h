@@ -5,6 +5,16 @@
 
 class sample;
 
+H2_ENUM_CLASS_BEGIN(BottomViewMode)
+    BOTTOM_VIEW_NONE              = 0,
+    BOTTOM_VIEW_NEW_TURN          = 1,
+    BOTTOM_VIEW_KINGDOM           = 2,
+    BOTTOM_VIEW_HERO              = 3,
+    BOTTOM_VIEW_ENEMY_TURN        = 4,
+    BOTTOM_VIEW_RESOURCE          = 5,
+    BOTTOM_VIEW_OVERRIDE_DISABLED = 6
+H2_ENUM_CLASS_END(BottomViewMode)
+
 H2_ENUM_CLASS_BEGIN(HighScoreType)
     HIGH_SCORE_CAMPAIGN           = 0,
     HIGH_SCORE_STANDARD           = 1,
