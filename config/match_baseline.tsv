@@ -751,7 +751,7 @@ SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	51e1cc174045
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	100.0000	bd4c306312e7
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	267e5f754bc5
-SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9153	3652f43a3da9
+SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	100.0000	80ea91b503ad
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	d6bcc1342ba3
 SOURCE/FINDPATH	??0searchArray@@QAE@XZ	83.3333	d5770adbbb3f
 SOURCE/FINDPATH	??1searchArray@@QAE@XZ	92.8571	46073cce9dc0
