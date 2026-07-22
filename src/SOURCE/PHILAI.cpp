@@ -409,6 +409,11 @@ DATA(0x004f2474) static i16 s_closeAIMapLineBase = 0x1b96; // NOLINT(readability
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
+VA_COMPGEN(0x004377b0, 0x1a, STATIC_INIT_DISPATCH, SVSearchArray)
+VA_COMPGEN(0x004377ca, 0x1d, STATIC_ATEXIT, SVSearchArray)
+VA_COMPGEN(0x004377e7, 0x1a, STATIC_DTOR, SVSearchArray)
+VA_COMPGEN(0x00437801, 0x1a, STATIC_CTOR, SVSearchArray)
+
 inline i32 HeroRVByteOffset(i32 x, i32 y) {
     return x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16);
 }

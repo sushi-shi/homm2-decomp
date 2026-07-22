@@ -8,6 +8,7 @@ from unittest import mock
 
 from homm2.build.canonicalize_data_symbols import (
     CoffObject,
+    CompgenClaim,
     canonicalize_coff,
     main,
     sidecar_bytes,
@@ -122,6 +123,56 @@ def army_style_jump_table(canonical=False, unequal_destination=False):
 
 
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
+    def test_compiler_function_names_come_from_semantic_relocation_roles(self):
+        payload = make_coff([SectionSpec(
+            ".text", bytes(0x6B), TEXT, (
+                (0x04, 1, REL32), (0x0C, 2, REL32),
+                (0x1E, 4, DIR32), (0x26, 5, REL32),
+                (0x38, 3, DIR32), (0x40, 7, REL32),
+                (0x55, 4, DIR32), (0x5D, 6, REL32),
+            ),
+        )], [
+            ("_$E91", 0x00, 1, 0x20, 3),
+            ("_$E12", 0x1A, 1, 0x20, 3),
+            ("_$E73", 0x34, 1, 0x20, 3),
+            ("_$E44", 0x51, 1, 0x20, 3),
+            ("_Widget", 0, 0, 0, 2),
+            ("??0Widget@@QAE@XZ", 0, 0, 0x20, 2),
+            ("??1Widget@@QAE@XZ", 0, 0, 0x20, 2),
+            ("_atexit", 0, 0, 0x20, 2),
+        ])
+        claims = tuple(CompgenClaim(
+            "__h2cg$MODULE$%s$Widget" % kind.lower(), kind, "Widget", size)
+            for kind, size in (
+                ("STATIC_INIT_DISPATCH", 0x1A),
+                ("STATIC_ATEXIT", 0x1D),
+                ("STATIC_DTOR", 0x1A),
+                ("STATIC_CTOR", 0x1A),
+            ))
+
+        result = canonicalize_coff(payload, claims)
+        parsed = CoffObject(result.data)
+
+        self.assertEqual(
+            [parsed.symbols[index].name for index in range(4)],
+            [
+                "__h2cg$MODULE$static_init_dispatch$Widget",
+                "__h2cg$MODULE$static_ctor$Widget",
+                "__h2cg$MODULE$static_atexit$Widget",
+                "__h2cg$MODULE$static_dtor$Widget",
+            ],
+        )
+        self.assertEqual(
+            {row.original_name: row.preview for row in result.rows
+             if row.family == "compgen"},
+            {
+                "_$E91": "STATIC_INIT_DISPATCH:Widget",
+                "_$E12": "STATIC_CTOR:Widget",
+                "_$E73": "STATIC_ATEXIT:Widget",
+                "_$E44": "STATIC_DTOR:Widget",
+            },
+        )
+
     def test_army_style_repeated_jump_labels_match_owner_addends(self):
         candidate = canonicalize_coff(army_style_jump_table()).data
         target = canonicalize_coff(army_style_jump_table(canonical=True)).data
