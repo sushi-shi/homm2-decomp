@@ -2254,7 +2254,8 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = shrineId8++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FLOTSAM:
-                    cell2->m_objectMetadata = Random(FLOTSAM_EMPTY, FLOTSAM_LARGE_TREASURE);
+                    cell2->m_objectMetadata =
+                        Random(IDX(FLOTSAM_EMPTY), IDX(FLOTSAM_LARGE_TREASURE));
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
                     if (!HasObjectTilesetIndex(
@@ -2378,20 +2379,20 @@ void game::RandomizeEvents(void) {
                         case 0:
                         case 1:
                         case 2:
-                            cell2->m_objectMetadata = EVENT_LEVEL_SMALL;
+                            cell2->m_objectMetadata = IDX(EVENT_LEVEL_SMALL);
                             break;
                         case 3:
                         case 4:
                         case 5:
-                            cell2->m_objectMetadata = EVENT_LEVEL_MEDIUM;
+                            cell2->m_objectMetadata = IDX(EVENT_LEVEL_MEDIUM);
                             break;
                         case 6:
                         case 7:
                         case 8:
-                            cell2->m_objectMetadata = EVENT_LEVEL_LARGE;
+                            cell2->m_objectMetadata = IDX(EVENT_LEVEL_LARGE);
                             break;
                         case 9:
-                            cell2->m_objectMetadata = EVENT_LEVEL_HUGE;
+                            cell2->m_objectMetadata = IDX(EVENT_LEVEL_HUGE);
                             break;
                     }
                     // NOLINTEND(readability-magic-numbers)

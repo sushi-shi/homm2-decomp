@@ -794,7 +794,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FLOTSAM: {
-            switch (cell->m_objectMetadata) {
+            switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
                         "{Flotsam}\n\nYou search through the flotsam, but find nothing.",
@@ -4789,7 +4789,7 @@ VA(0x004b02e9, 0x261)
 i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
 
-    switch (cell->m_objectMetadata) {
+    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -4933,7 +4933,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
 VA(0x004b054a, 0x29b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
-    switch (cell->m_objectMetadata) {
+    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -5090,7 +5090,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
 VA(0x004b07e5, 0x2f8)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
-    switch (cell->m_objectMetadata) {
+    switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
         case EVENT_LEVEL_SMALL:
             if (CombatMonsterEvent(
                     eventHero,
@@ -6304,7 +6304,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FLOTSAM:
-            switch (cell->m_objectMetadata) {
+            switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     break;
                 case FLOTSAM_WOOD:
