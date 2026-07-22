@@ -54,6 +54,20 @@ all dependent switch-table owner-relative addends. The matrix retains the reprod
 partition, identities, sizes, text and relocation digests, and concrete transition spans; no
 generated declaration remains in source.
 
+## SOURCE/HERO GetSSLevel compiler-state census
+
+`hero-getsslevel-tu-state-71d5d1.tsv` records the deterministic 1-through-128 typedef-train
+sweep after the function's real local topology was recovered. Reusing `baseLevel` for the final
+effective level reduces the frame from 16 to the retail 12 bytes and removes `OD_STEER`. The clean
+canonical source is 99.9661%; seven disposable counts produce exact 100% for the same source hash.
+
+The sweep has only two normalized states. Both are 195 bytes and share the complete retail
+three-site ordered relocation stream. Their sole difference is the load order for the final
+commutative add: canonical loads `baseLevel` into EAX first, while the exact state and retail load
+the shrine/artifact bonus first. The matrix records both populations, their complete declaration-
+count partition, and representative identities. No probe declaration is retained in `HERO.cpp`;
+the exact state contributes only to the hash-scoped maximum.
+
 ## BASE/icon2bc clean reconstruction
 
 `icon2bc-clean-reconstruction-04f798c.tsv` preserves the complete stale-header clean-room search,

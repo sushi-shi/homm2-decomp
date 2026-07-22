@@ -1,0 +1,13 @@
+# SOURCE/HERO hero::GetSSLevel controlled typedef-state census
+# checkpoint	42a3e0305df51bae9cc263910d12f4cf9c2cf4e0
+# normalized_source_hash	71d5d1c8e4f7
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/HERO.cpp --rva 0x705c2 --trials 128 --families typedef --max-declarations 128 --seed 0x4753534c --state-summary /tmp/getsslevel-states.json
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	128 typedef counts produce two normalized states; no generated declaration remains in source
+state	state_identity	representative_count	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	counts_in_1_through_128
+canonical	b9ae2af1ebe07663	1	121	99.966100	195	608a97af06c3f064	b9a970aa997ba663	1-15,17-32,34-50,52-67,69-84,86-102,104-119,121-128
+exact	66da3ba65fe8faa8	16	7	100.000000	195	bc586b8071b420be	b9a970aa997ba663	16,33,51,68,85,103,120
+# The state cardinality is two. The canonical state's occurrence total is 122 when the unmodified baseline is included; the table counts only its 121 generated trials.
+# Before this census, reusing baseLevel for the effective level recovered retail's 12-byte frame and removed OD_STEER. Both states retain that storage topology, the 195-byte objdiff boundary, and the complete retail 3-site ordered relocation stream.
+# The only canonical-versus-retail difference is the commutative add at function offsets +0x96..+0xa1: canonical loads baseLevel[-4] into EAX and shrineAndArtifactBonus[-8] into ECX, while retail and the exact state load the bonus into EAX and baseLevel into ECX. The ADD and every other instruction agree.
+# Trial 16 is the exact-closure representative and is reproducible from the command, seed, and count above. Its disposable sixteen-typedef body was removed before the hash-scoped maximum was updated.
