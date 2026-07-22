@@ -42,7 +42,7 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004c7ad0, 0x21)
-icon::~icon() {
+inline icon::~icon() {
     DATA(0x0051e974) static char destructionSourceFile[] = RETAIL_FILE;
     H2_FREE_AT(m_data, destructionSourceFile, 0x1a);
 }

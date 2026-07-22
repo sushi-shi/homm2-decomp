@@ -25,7 +25,7 @@ public:
         return reinterpret_cast<struct IconEntry*>(m_data);
     }
     icon(u32l id);
-    virtual ~icon();
+    __declspec(dllexport) virtual inline ~icon();
     void DrawToBuffer(
         i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
     );
