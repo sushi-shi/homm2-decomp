@@ -4509,101 +4509,101 @@ void advManager::EventSound(
     i32 musicTrack_e = SOUND_NONE;
 
     switch (eventType) {
-        case MAP_OBJECT_ARTESIAN_SPRING:
-        case MAP_OBJECT_FLOTSAM:
+        case MAP_OBJECT_WAGON:
+        case MAP_OBJECT_LEAN_TO:
             musicTrack_e = pickupSound_o;
         case MAP_OBJECT_ARCHER_HOUSE:
         case MAP_OBJECT_GOBLIN_HUT:
         case MAP_OBJECT_DWARF_COTTAGE:
         case MAP_OBJECT_PEASANT_HUT:
         case MAP_OBJECT_LOG_CABIN:
-        case MAP_OBJECT_TREE_CITY:
-        case MAP_OBJECT_RUINS:
-        case MAP_OBJECT_IDOL:
-        case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
-        case MAP_OBJECT_WAGON:
-        case MAP_OBJECT_MAGELLAN_MAPS:
+        case MAP_OBJECT_WATCH_TOWER:
+        case MAP_OBJECT_TREE_HOUSE:
+        case MAP_OBJECT_SIRENS:
+        case MAP_OBJECT_HALFLING_HOLE:
+        case MAP_OBJECT_EXCAVATION:
+        case MAP_OBJECT_CAVE:
             musicTrack_e = experienceSound_o;
             break;
-        case MAP_OBJECT_WATER_WHEEL:
-        case MAP_OBJECT_LEAN_TO:
+        case MAP_OBJECT_LIGHTHOUSE:
+        case MAP_OBJECT_XANADU:
             musicTrack_e = SOUND_TRACK_40;
             break;
-        case MAP_OBJECT_SEA_CHEST:
-        case MAP_OBJECT_PYRAMID:
-        case MAP_OBJECT_CITY_OF_DEAD:
+        case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
+        case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
+        case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
             musicTrack_e = treasureSound_a;
             break;
-        case MAP_OBJECT_BOAT:
+        case MAP_OBJECT_ARTIFACT:
             if (static_cast<EventSoundVariant>(eventData) == SOUND_VARIANT_1)
                 musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_SKELETON:
-        case MAP_OBJECT_MINE:
-        case MAP_OBJECT_MERMAID:
+        case MAP_OBJECT_WATER_WHEEL:
+        case MAP_OBJECT_WINDMILL:
             musicTrack_e = treasureSound_a;
             break;
         case MAP_OBJECT_DAEMON_CAVE:
             musicTrack_e = SOUND_TRACK_36;
             break;
-        case MAP_OBJECT_SHIPWRECK:
-        case MAP_OBJECT_WATERING_HOLE:
-        case MAP_OBJECT_OBSERVATION_TOWER:
+        case MAP_OBJECT_ORACLE:
+        case MAP_OBJECT_ARTESIAN_SPRING:
+        case MAP_OBJECT_MAGIC_WELL:
             musicTrack_e = SOUND_TRACK_32;
             break;
         case MAP_OBJECT_FAERIE_RING:
         case MAP_OBJECT_FOUNTAIN:
-        case MAP_OBJECT_WITCH_DOCTOR_HUT:
+        case MAP_OBJECT_IDOL:
             musicTrack_e = luckSound_g;
             break;
         case MAP_OBJECT_BUOY:
-        case MAP_OBJECT_RESOURCE:
-        case MAP_OBJECT_HALFLING_HOLE:
-        case MAP_OBJECT_XANADU:
+        case MAP_OBJECT_OASIS:
+        case MAP_OBJECT_TEMPLE:
+        case MAP_OBJECT_WATERING_HOLE:
             musicTrack_e = moraleSound_e;
             break;
         case MAP_OBJECT_GAZEBO:
-        case MAP_OBJECT_TEMPLE:
-        case MAP_OBJECT_CAVE:
+        case MAP_OBJECT_TREE_OF_KNOWLEDGE:
+        case MAP_OBJECT_WITCH_HUT:
             musicTrack_e = SOUND_TRACK_37;
             break;
         case MAP_OBJECT_ANCIENT_LAMP:
-        case MAP_OBJECT_TAR_PIT:
+        case MAP_OBJECT_SPHINX:
             musicTrack_e = SOUND_TRACK_33;
             break;
         case MAP_OBJECT_GRAVEYARD:
-        case MAP_OBJECT_DESERT_TENT:
-        case MAP_OBJECT_STANDING_STONES:
+        case MAP_OBJECT_SHIPWRECK:
+        case MAP_OBJECT_ABANDONED_MINE:
+        case MAP_OBJECT_MAGELLAN_MAPS:
         case MAP_OBJECT_DERELICT_SHIP:
-        case MAP_OBJECT_BOTTLE:
-        case MAP_OBJECT_REEFS:
+        case MAP_OBJECT_OBSERVATION_TOWER:
             musicTrack_e = SOUND_TRACK_39;
             break;
-        case MAP_OBJECT_LIGHTHOUSE:
-        case MAP_OBJECT_EXCAVATION:
-        case MAP_OBJECT_SPHINX:
-        case MAP_OBJECT_WITCH_HUT:
+        case MAP_OBJECT_DRAGON_CITY:
+        case MAP_OBJECT_PYRAMID:
+        case MAP_OBJECT_CITY_OF_DEAD:
+        case MAP_OBJECT_TROLL_BRIDGE:
             musicTrack_e = SOUND_TRACK_31;
             break;
-        case MAP_OBJECT_OASIS:
+        case MAP_OBJECT_OBELISK:
             musicTrack_e = experienceSound_o;
             break;
-        case MAP_OBJECT_ABANDONED_MINE:
-        case MAP_OBJECT_TREE_OF_KNOWLEDGE:
-        case MAP_OBJECT_HILL_FORT:
-        case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
+        case MAP_OBJECT_FORT:
+        case MAP_OBJECT_STANDING_STONES:
+        case MAP_OBJECT_WITCH_DOCTOR_HUT:
+        case MAP_OBJECT_MERCENARY_CAMP:
             musicTrack_e = SOUND_TRACK_38;
             break;
-        case MAP_OBJECT_STONE_LITHS:
-        case MAP_OBJECT_MERCENARY_CAMP:
+        case MAP_OBJECT_DESERT_TENT:
+        case MAP_OBJECT_HILL_FORT:
             musicTrack_e = SOUND_TRACK_34;
             break;
-        case MAP_OBJECT_HUT_OF_MAGI:
+        case MAP_OBJECT_STONE_LITHS:
             musicTrack_e = SOUND_TRACK_1;
             break;
-        case MAP_OBJECT_WHIRLPOOL:
-        case MAP_OBJECT_FORT:
-        case MAP_OBJECT_FREEMANS_FOUNDRY:
+        case MAP_OBJECT_WAGON_CAMP:
+        case MAP_OBJECT_TREE_CITY:
+        case MAP_OBJECT_MAGIC_GARDEN:
             musicTrack_e = SOUND_TRACK_35;
             break;
         case MAP_OBJECT_BARRIER:
