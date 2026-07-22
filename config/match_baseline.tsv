@@ -365,7 +365,7 @@ BASE/droplist	?Draw@dropListWidget@@UAEXXZ	100.0000	98081568f29e
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	100.0000	ab5b7660aea9
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	100.0000	4538c35cbe7e
 BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	96.5839	b7aa95eec415
-BASE/droplist	?Read@dropListWidget@@QAEXXZ	90.6721	7ecd3cb00e25
+BASE/droplist	?Read@dropListWidget@@QAEXXZ	96.2623	06275ececd86
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	a12dd5677fbf
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	33440694b7af
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	81.4765	f76322860209

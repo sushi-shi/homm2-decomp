@@ -126,20 +126,19 @@ void dropListWidget::Read(void) {
     m_scrollTrackLastFrame = IDX(FRAME_SCROLL_TRACK_LAST);
     m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
     m_id = id;
-    IconEntry* iconEntries = m_icon->Entries();
     i16 iconX = m_x;
     i16 iconY = m_y;
-    IconEntry* closedContentEntry = &iconEntries[IDX(FRAME_CLOSED_CONTENT)];
+    IconEntry* closedContentEntry = &m_icon->Entries()[IDX(FRAME_CLOSED_CONTENT)];
     m_iconX = iconX;
     m_iconY = iconY;
     m_closedContentWidth = closedContentEntry->w;
     m_closedContentHeight = closedContentEntry->h;
-    IconEntry* dropButtonEntry = &iconEntries[IDX(FRAME_DROP_BUTTON)];
+    IconEntry* dropButtonEntry = &m_icon->Entries()[IDX(FRAME_DROP_BUTTON)];
     m_dropButtonX = iconX + m_closedContentWidth;
     m_dropButtonY = iconY;
     m_dropButtonWidth = dropButtonEntry->w;
     m_dropButtonHeight = dropButtonEntry->h;
-    IconEntry* scrollThumbEntry = &iconEntries[IDX(FRAME_SCROLL_THUMB)];
+    IconEntry* scrollThumbEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_THUMB)];
     m_scrollThumbWidth = scrollThumbEntry->w;
     m_scrollThumbHeight = scrollThumbEntry->h;
 }
