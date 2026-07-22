@@ -1298,11 +1298,9 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     redrawWindow = 1;
                     if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
                         != GAME_COMPUTER_PLAYER) {
-                        gpGame->m_playerHandicap[currentPlayerLocal] =
-                            static_cast<PlayerHandicap>(
-                                (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
-                                % IDX(PLAYER_HANDICAP_COUNT)
-                            );
+                        gpGame->m_playerHandicap[currentPlayerLocal]++;
+                        if (gpGame->m_playerHandicap[currentPlayerLocal] == PLAYER_HANDICAP_COUNT)
+                            gpGame->m_playerHandicap[currentPlayerLocal] = PLAYER_HANDICAP_NONE;
                     }
                     break;
 

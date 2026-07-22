@@ -1813,6 +1813,7 @@ i32 army::WalkTo(void) {
 VA(0x0044f443, 0x2ee)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
+    CombatHexDirection moatDirection;
     i32 steps;
     i32 moatDestination;
     i32 moatIndex_1;
@@ -1840,12 +1841,11 @@ i32 army::WalkTo(i32 destination) {
                 || (moatIndex_1 < ARMY_MOAT_CELL_COUNT - 1 && moatCell[moatIndex_1 + 1] == m_hex)) {
                 canEnterMoat_1 = 1;
             }
-            for (direction_3 = 0; direction_3 < ARMY_ADJACENT_DIRECTION_COUNT; direction_3++) {
+            for (moatDirection = COMBAT_DIRECTION_NORTHEAST;
+                 IDX(moatDirection) < ARMY_ADJACENT_DIRECTION_COUNT;
+                 moatDirection++) {
                 if (moatCell[moatIndex_1]
-                    == GetAdjacentCellIndex(
-                        m_hex,
-                        static_cast<CombatHexDirection>(direction_3)
-                    )) {
+                    == GetAdjacentCellIndex(m_hex, moatDirection)) {
                     canEnterMoat_1 = 1;
                 }
             }
@@ -2921,7 +2921,7 @@ VA(0x00452495, 0x644)
 void army::GoBerserk(void) {
     i32 masks_28[IDX(BERSERK_MASK_COUNT)];
     i32 savedQuantity_10;
-    i32 direction_4;
+    CombatHexDirection direction_4;
     i32 targetHex_9;
     CombatSide nearestSide_8;
     i32 nearestIndex_19;
@@ -2931,7 +2931,7 @@ void army::GoBerserk(void) {
     i32 distance_6;
 
     masks_28[IDX(BERSERK_MASK_TARGET_FOUND)] = 0;
-    direction_4 = 0;
+    direction_4 = COMBAT_DIRECTION_NORTHEAST;
     masks_28[IDX(BERSERK_MASK_UNUSED)] = 0;
     savedQuantity_10 = m_quantity;
     m_quantity = 0;
@@ -2943,15 +2943,17 @@ void army::GoBerserk(void) {
     if (masks_28[IDX(BERSERK_MASK_ATTACK)] != ARMY_ALL_ATTACK_DIRECTIONS) {
         do {
             if (!masks_28[IDX(BERSERK_MASK_TARGET_FOUND)]) {
-                direction_4 = Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1);
+                direction_4 = static_cast<CombatHexDirection>(
+                    Random(0, ARMY_COMBAT_DIRECTION_COUNT - 1)
+                );
             } else {
                 goto walkToward;
             }
-        } while (masks_28[IDX(BERSERK_MASK_ATTACK)] & (1 << direction_4));
+        } while (masks_28[IDX(BERSERK_MASK_ATTACK)] & BIT(direction_4));
         giNextAction = ACTION_MOVE;
         ValidAttack(
             m_hex,
-            static_cast<CombatHexDirection>(direction_4),
+            direction_4,
             ARMY_ATTACK_TARGET_OCCUPIED,
             ARMY_HEX_INVALID,
             &targetHex_9

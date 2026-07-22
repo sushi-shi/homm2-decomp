@@ -20,7 +20,10 @@ H2_ENUM_CLASS_END(AIPurchaseType)
 struct BHC {
     town* pTown;
     AIPurchaseType type;
-    i32 what;
+    union {
+        i32 what;
+        H2_ENUM_STORAGE(BuildingSlotType, i32) building;
+    };
     i32 num;
 };
 
