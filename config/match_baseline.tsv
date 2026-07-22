@@ -986,7 +986,7 @@ SOURCE/KB	?TrueFalseDialogHandler@@YIHAAUtag_message@@@Z	100.0000	cf97a1428274
 SOURCE/KB	?UnloadSystemwideIcons@@YIXXZ	100.0000	1cec3ccdc3f4
 SOURCE/KB	?UpdateAppSpecificMenus@@YIXPAX@Z	100.0000	eb94b45d747c
 SOURCE/KB	?UpdateNormalDialog@@YIXPAD@Z	100.0000	dfd81e08f508
-SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	1.5655	a529e5665104
+SOURCE/KB	?UpdateSystemOptionsMenu@@YIXXZ	100.0000	98cef649b770
 SOURCE/KB	?WaitEndSample@@YIXUSAMPLE2@@H@Z	100.0000	004ef458080f
 SOURCE/KB	?WaitForOtherPlayer@@YIHXZ	100.0000	3c6ed860fa37
 SOURCE/KB	?WaitHandler@@YIHAAUtag_message@@@Z	100.0000	dbd11765dc0c
