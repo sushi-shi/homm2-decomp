@@ -1967,9 +1967,6 @@ void army::CheckLuck(void) {
         m_luckOutcome = -1;
     }
     if (m_luckOutcome) {
-        char* badLuckArmyName;
-        char* goodLuckArmyName;
-
         luckSample = NULL_SAMPLE2;
         if (m_luckOutcome < 0) {
             sprintf(gText, "badluck.82m");
@@ -1978,21 +1975,21 @@ void army::CheckLuck(void) {
         }
         luckSample = LoadPlaySample(gText);
         if (m_luckOutcome < 0) {
-            if (m_quantity > 1) {
-                badLuckArmyName = gArmyNamesPlural[IDX(m_monsterType)];
-            } else {
-                badLuckArmyName = gArmyNames[IDX(m_monsterType)];
-            }
-            sprintf(gText, "Bad luck descends on the %s", badLuckArmyName);
+            sprintf(
+                gText,
+                "Bad luck descends on the %s",
+                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
+                               : gArmyNames[IDX(m_monsterType)]
+            );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
-            if (m_quantity > 1) {
-                goodLuckArmyName = gArmyNamesPlural[IDX(m_monsterType)];
-            } else {
-                goodLuckArmyName = gArmyNames[IDX(m_monsterType)];
-            }
-            sprintf(gText, "Good luck shines on the %s", goodLuckArmyName);
+            sprintf(
+                gText,
+                "Good luck shines on the %s",
+                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
+                               : gArmyNames[IDX(m_monsterType)]
+            );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
         }
