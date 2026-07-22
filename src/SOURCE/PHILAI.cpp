@@ -6250,13 +6250,23 @@ VA(0x00445ef0, 0xf6)
 void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7054));
+    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC_AT(
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 8
+    ));
     gaiHeroStrategicRVOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7055));
+        static_cast<i16*>(H2_ALLOC_AT(
+            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 9
+        ));
     gaiHeroEventStratRVOfPos =
-        static_cast<i16*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, 7056));
-    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7057));
-    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(OD_STEER(MAP_WIDTH) * MAP_HEIGHT, 7058));
+        static_cast<i16*>(H2_ALLOC_AT(
+            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 10
+        ));
+    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC_AT(
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 11
+    ));
+    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC_AT(
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 12
+    ));
 }
 
 VA(0x00445fe6, 0x112)
