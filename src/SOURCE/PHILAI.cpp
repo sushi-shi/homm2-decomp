@@ -4329,7 +4329,8 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     if (doInteraction != 0) {
         if ((townPtr->m_buildings & AI_BUILDING_SHIPYARD_MASK)
             && townPtr->m_id != giBestShipyardId) {
-            index7 = abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
+            index7 =
+                (abs(townPtr->m_y - heroPtr->m_y) | 0) + abs(townPtr->m_x - heroPtr->m_x);
             if (gbActualShipyardFound) {
                 if (giBestShipyardDist > index7) {
                     giBestShipyardDist = index7;
@@ -4346,7 +4347,8 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
                                             ->m_terrainImageIndex]
                           == TERRAIN_WATER
                    && !gbActualShipyardFound && townPtr->m_id != giBestShipyardId) {
-            index7 = abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
+            index7 =
+                (abs(townPtr->m_y - heroPtr->m_y) | 0) + abs(townPtr->m_x - heroPtr->m_x);
             if (gbPossibleShipyardFound) {
                 if (giBestShipyardDist > index7) {
                     giBestShipyardDist = index7;
@@ -4386,7 +4388,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
              <= IDX(heroPtr->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                     + WISDOM_SPELL_LEVEL_BONUS;
              spellLevel14++) {
-            for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14 - 1];
+            for (spellIndex = 0; spellIndex < townPtr->m_spellCounts[spellLevel14];
                  spellIndex++) {
                 if (!heroPtr->HasSpell(townPtr->m_spells[spellLevel14 - 1][spellIndex])) {
                     if (HAS(gsSpellInfo[IDX(townPtr->m_spells[spellLevel14 - 1][spellIndex])]
@@ -4435,96 +4437,93 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         && (gpGame->m_mapHeader.victoryTownY | 0) == townPtr->m_y) {
         desiredShare0 = 0.8f;
     }
-    if (desiredShare0 < townShare5)
-        shareDifference7 = townShare5 - desiredShare0;
-    else
+    if (desiredShare0 >= townShare5)
         shareDifference7 = desiredShare0 - townShare5;
+    else
+        shareDifference7 = townShare5 - desiredShare0;
     transferShare9 = shareDifference7;
-    if (desiredShare0 * AI_TOWN_SHARE_DIFFERENCE_FACTOR <= transferShare9) {
-        if (transferShare9 < AI_MINIMUM_TOWN_SHARE_DIFFERENCE) {
+    if (!(desiredShare0 * AI_TOWN_SHARE_DIFFERENCE_FACTOR <= transferShare9)
+        || transferShare9 < AI_MINIMUM_TOWN_SHARE_DIFFERENCE)
+        return;
+    townWins2 = 0;
+    if (desiredShare0 < townShare5)
+        townWins2 = 1;
+    if (doInteraction != 0) {
+        if ((heroStrength | 0) < townStrength6)
+            transferFactor = AI_WEAKER_ARMY_TRANSFER_FACTOR;
+        else
+            transferFactor = AI_STRONGER_ARMY_TRANSFER_FACTOR;
+        transferCurve = static_cast<float>(
+            transferShare9 + AI_TOWN_TRANSFER_CURVE_OFFSET - AI_TOWN_TRANSFER_CURVE_CENTER
+        );
+        estimatedTransfer16 = static_cast<i32>(
+            (townStrength6 + (heroStrength | 0))
+            * ((transferCurve * transferCurve - AI_TOWN_TRANSFER_CURVE_OFFSET)
+               * gpCurPlayer->m_aiData.m_upgradeValueWeight)
+            * transferFactor
+        );
+        if (estimatedTransfer16 < 0)
+            estimatedTransfer16 = 0;
+        canMerge2 = 0;
+        if (townWins2) {
+            for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
+                if (heroPtr->m_army.m_quantities[index7] <= 0)
+                    canMerge2 = 1;
+            }
         } else {
-            townWins2 = 0;
-            if (desiredShare0 < townShare5)
-                townWins2 = 1;
-            if (doInteraction != 0) {
-                if ((heroStrength | 0) < townStrength6)
-                    transferFactor = AI_WEAKER_ARMY_TRANSFER_FACTOR;
-                else
-                    transferFactor = AI_STRONGER_ARMY_TRANSFER_FACTOR;
-                transferCurve = static_cast<float>(
-                    transferShare9 + AI_TOWN_TRANSFER_CURVE_OFFSET - AI_TOWN_TRANSFER_CURVE_CENTER
-                );
-                estimatedTransfer16 = static_cast<i32>(
-                    (townStrength6 + (heroStrength | 0))
-                    * ((transferCurve * transferCurve - AI_TOWN_TRANSFER_CURVE_OFFSET)
-                       * gpCurPlayer->m_aiData.m_upgradeValueWeight)
-                    * transferFactor
-                );
-                if (estimatedTransfer16 < 0)
-                    estimatedTransfer16 = 0;
-                canMerge2 = 0;
-                if (townWins2) {
-                    for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
-                        if (heroPtr->m_army.m_quantities[index7] <= 0)
-                            canMerge2 = 1;
-                    }
-                } else {
-                    for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
-                        if (townPtr->m_army.m_quantities[index7] <= 0)
-                            canMerge2 = 1;
-                    }
-                }
-                if (!canMerge2) {
-                    for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
-                        for (otherIndex9 = 0; otherIndex9 < AI_TOWN_ARMY_SLOTS; otherIndex9++) {
-                            if (heroPtr->m_army.m_creatureTypes[otherIndex9]
-                                == townPtr->m_army.m_creatureTypes[index7]) {
-                                canMerge2 = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!canMerge2)
-                    estimatedTransfer16 = 0;
-                *value += estimatedTransfer16;
-                if (townPtr->m_threat != 0 && townPtr->m_occupyingHeroId == -1)
-                    *value += AI_UNGUARDED_TOWN_VALUE;
-            } else {
-                townPtr->GiveSpells(NULL);
-                if (townWins2)
-                    transferShare9 = static_cast<float>(transferShare9 + AI_TOWN_TRANSFER_BONUS);
-                transferCount6 =
-                    static_cast<i32>((townStrength6 + (heroStrength | 0)) * transferShare9);
-                if (townWins2)
-                    firstArmy0 = &townPtr->m_army;
-                else
-                    firstArmy0 = &heroPtr->m_army;
-                if (townWins2)
-                    secondArmy8 = &heroPtr->m_army;
-                else
-                    secondArmy8 = &townPtr->m_army;
-                if (townWins2) {
-                    firstStrength3 = townStrength6;
-                    secondStrength0 = heroStrength;
-                } else {
-                    firstStrength3 = heroStrength;
-                    secondStrength0 = townStrength6;
-                }
-                RedistributeTroops(
-                    firstArmy0,
-                    secondArmy8,
-                    !townWins2,
-                    townWins2,
-                    firstStrength3,
-                    secondStrength0,
-                    transferCount6
-                );
-                if (townPtr->m_id == giHumanTownConquered
-                    && heroPtr->m_remainingMobility <= AI_CONQUERED_HERO_MOBILITY_LIMIT)
-                    heroPtr->m_remainingMobility = 0;
+            for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
+                if (townPtr->m_army.m_quantities[index7] <= 0)
+                    canMerge2 = 1;
             }
         }
+        if (!canMerge2) {
+            for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
+                for (otherIndex9 = 0; otherIndex9 < AI_TOWN_ARMY_SLOTS; otherIndex9++) {
+                    if (OD_STEER(heroPtr->m_army.m_creatureTypes[otherIndex9])
+                        == townPtr->m_army.m_creatureTypes[index7]) {
+                        canMerge2 = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!canMerge2)
+            estimatedTransfer16 = 0;
+        *value += estimatedTransfer16;
+        if (townPtr->m_threat != 0 && townPtr->m_occupyingHeroId == -1)
+            *value += AI_UNGUARDED_TOWN_VALUE;
+    } else {
+        townPtr->GiveSpells(NULL);
+        if (townWins2)
+            transferShare9 = static_cast<float>(transferShare9 + AI_TOWN_TRANSFER_BONUS);
+        transferCount6 = static_cast<i32>((townStrength6 + (heroStrength | 0)) * transferShare9);
+        if (townWins2)
+            firstArmy0 = &townPtr->m_army;
+        else
+            firstArmy0 = &heroPtr->m_army;
+        if (townWins2)
+            secondArmy8 = &heroPtr->m_army;
+        else
+            secondArmy8 = &townPtr->m_army;
+        if (townWins2) {
+            firstStrength3 = townStrength6;
+            secondStrength0 = heroStrength;
+        } else {
+            firstStrength3 = heroStrength;
+            secondStrength0 = townStrength6;
+        }
+        RedistributeTroops(
+            firstArmy0,
+            secondArmy8,
+            !townWins2,
+            townWins2,
+            firstStrength3,
+            secondStrength0,
+            transferCount6
+        );
+        if (townPtr->m_id == giHumanTownConquered
+            && heroPtr->m_remainingMobility <= AI_CONQUERED_HERO_MOBILITY_LIMIT)
+            heroPtr->m_remainingMobility = 0;
     }
 }
 // NOLINTEND(readability-magic-numbers)
