@@ -2492,7 +2492,7 @@ MessageDispatchResult advManager::ProcessDeSelect(
                 HeroView(
                     giOverviewReturnActionExtra,
                     reinterpret_cast<i32>(
-                        gpGame->GetHero(giOverviewReturnAction)->GetOccupiedTown()
+                        gpGame->GetHero(giOverviewReturnActionExtra)->GetOccupiedTown()
                     ),
                     1
                 );

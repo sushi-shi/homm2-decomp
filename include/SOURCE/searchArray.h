@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_SEARCHARRAY_H
 
 #include <va.h>
+#include <SOURCE/combatTypes.h>
 
 class army;
 extern i32 MAP_WIDTH;
@@ -135,7 +136,7 @@ public:
         i32
     );
     void SeedCombatPosition(class army*);
-    i32 FindCombatPath(i32, i32, class army*, i32, i32);
+    i32 FindCombatPath(i32, i32, class army*, ArmyPathTarget, i32);
     void PushCombatPoint(i32, i32, i32, i32);
     searchCell& GetCell(i32 x, i32 y) {
         return (m_storage.cells + y * MAP_WIDTH)[x];

@@ -3094,7 +3094,8 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
         baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)
             && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
-            if (m_hex != m_moveTargetHex && !ValidFlight(m_moveTargetHex, 0)) {
+            if (m_hex != m_moveTargetHex
+                && !ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
                 return;
             }
             FlyTo(m_moveTargetHex);
@@ -3154,7 +3155,7 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
 move:
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
         m_moveTargetHex = destination;
-        if (!ValidFlight(m_moveTargetHex, 0)) {
+        if (!ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
             return;
         }
         FlyTo(m_moveTargetHex);

@@ -90,7 +90,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
 }
 
 VA(0x004a5b95, 0x405)
-i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
+i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     army* target;
     i32 targetHex;
     i32 attackMask;
@@ -115,7 +115,7 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     }
 
     target = &gpCombatManager->m_armies[m_targetSide][m_targetIndex];
-    if (fromTargetHex) {
+    if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         targetHex = destination;
     } else {
         targetHex = target->m_hex;
@@ -142,7 +142,8 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     }
 
     directionMask = 0;
-    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE) && !fromTargetHex) {
+    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         if (target->m_facing == ARMY_FACING_RIGHT) {
             targetHex++;
         } else {
@@ -157,7 +158,8 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
         direction = GetBestDirection(targetHex, m_hex, directionMask);
         adjacentHex = GetAdjacentCellIndex(targetHex, direction);
-        if (ValidHex(adjacentHex) && CanFit(adjacentHex, 1 - fromTargetHex, &fittingHex)) {
+        if (ValidHex(adjacentHex)
+            && CanFit(adjacentHex, pathMode == ARMY_PATH_ANY_TARGET_HEX, &fittingHex)) {
             m_moveTargetHex = fittingHex;
             if (!HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
                 m_attackDirection = OppositeDirection(direction);
@@ -176,7 +178,8 @@ i32 army::ValidFlight(i32 destination, i32 fromTargetHex) {
         directionMask |= 1 << IDX(direction);
     }
 
-    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE) && !fromTargetHex) {
+    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+        && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         if (target->m_facing == ARMY_FACING_RIGHT) {
             targetHex--;
         } else {
