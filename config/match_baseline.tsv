@@ -1027,7 +1027,7 @@ SOURCE/Newgame	?InitNewGameWindow@game@@QAEXXZ	100.0000	a1aea6fe91ec
 SOURCE/Newgame	?NGKPSetupDisplayString@game@@QAEXPADG@Z	100.0000	49a796d8bafa
 SOURCE/Newgame	?NewGame@game@@QAEHXZ	96.2465	066322da4bcb
 SOURCE/Newgame	?NewGameHandler@@YIHAAUtag_message@@@Z	96.9144	d08a4e3223f5
-SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	99.9890	8d81d6c7223e
+SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	100.0000	db6c4c8ed155
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	100.0000	267d76ee27a3
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	7913d1c9fc43
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	d6ef22258aa2
