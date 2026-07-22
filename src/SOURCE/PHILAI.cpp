@@ -1753,41 +1753,41 @@ firstWeekDone:
 // NOLINTBEGIN(readability-magic-numbers)
 VA(0x0043b154, 0x5f4)
 void philAI::GetBestBHC(i32 player, BHC& best) {
-    i32 townStrength[IDX(GAME_TOWN_COUNT)];
-    i32 desiredStrength[IDX(GAME_TOWN_COUNT)];
-    BHC candidate;
-    float value = 1.0f;
-    float bestValue = -99.0f;
-    i32 totalStrength = 0;
-    i32 totalWeight = 0;
-    i32 averageStrength;
-    i32 i;
-    town* townPtr;
+    i32 townStrength6[IDX(GAME_TOWN_COUNT)];
+    i32 desiredStrength5[IDX(GAME_TOWN_COUNT)];
+    BHC candidate10;
+    float value19 = 1.0f;
+    float bestValue29 = -99.0f;
+    i32 totalStrength16 = 0;
+    i32 totalWeight1 = 0;
+    i32 averageStrength19;
+    i32 i36;
+    town* townPtr7;
 
-    for (i = 0; i < gpCurPlayer->m_townCount; i++) {
-        townPtr = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]];
-        townStrength[i] = FightValueOfStack(&townPtr->m_army, NULL, 0, 0, 0, 0) + 400;
-        totalStrength += townStrength[i];
-        if (townPtr->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))
-            totalWeight += 10;
+    for (i36 = 0; i36 < gpCurPlayer->m_townCount; i36++) {
+        townPtr7 = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i36]];
+        townStrength6[i36] = FightValueOfStack(&townPtr7->m_army, NULL, 0, 0, 0, 0) + 400;
+        totalStrength16 += townStrength6[i36];
+        if (townPtr7->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+            totalWeight1 += 10;
         else
-            totalWeight += 7;
+            totalWeight1 += 7;
     }
-    if (totalWeight < 1)
-        totalWeight = 1;
-    averageStrength = totalStrength / totalWeight;
-    for (i = 0; i < gpCurPlayer->m_townCount; i++) {
-        townPtr = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]];
-        desiredStrength[i] = ((townPtr->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG)) ? 10 : 7)
-                                 * averageStrength
-                             + 400;
+    if (totalWeight1 < 1)
+        totalWeight1 = 1;
+    averageStrength19 = totalStrength16 / totalWeight1;
+    for (i36 = 0; i36 < gpCurPlayer->m_townCount; i36++) {
+        townPtr7 = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i36]];
+        desiredStrength5[i36] = ((townPtr7->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? 10 : 7)
+                                     * averageStrength19
+                                 + 400;
     }
 
-    for (i = 0; i < gpCurPlayer->m_townCount; i++) {
-        townPtr = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i]];
+    for (i36 = 0; i36 < gpCurPlayer->m_townCount; i36++) {
+        townPtr7 = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i36]];
         LogInt(
             "Turns Owned",
-            townPtr->m_turnsOwned,
+            townPtr7->m_turnsOwned,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -1795,51 +1795,54 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE
         );
-        if (giCurTurn > 4 && townPtr->m_turnsOwned < 2)
+        if (giCurTurn > 3 && townPtr7->m_turnsOwned < 3)
             continue;
         {
             CheckDoMain(0, 0);
-            GetBestBuilding(townPtr, candidate, value);
-            value = static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value);
-            if (value > bestValue) {
-                bestValue = value;
-                best = candidate;
+            GetBestBuilding(townPtr7, candidate10, value19);
+            value19 =
+                static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value19);
+            if (value19 > bestValue29) {
+                bestValue29 = value19;
+                best = candidate10;
             }
 
             CheckDoMain(0, 0);
-            GetBestCreature(townPtr, candidate, value);
-            value = static_cast<float>(
-                (static_cast<float>(desiredStrength[i]) / townStrength[i] / 3.0f
+            GetBestCreature(townPtr7, candidate10, value19);
+            value19 = static_cast<float>(
+                (static_cast<float>(desiredStrength5[i36]) / townStrength6[i36] / 3.0f
                  + AI_CREATURE_BALANCE_BASE)
-                * value
+                * value19
             );
-            value = static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value);
-            if (value > bestValue) {
-                bestValue = value;
-                best = candidate;
+            value19 =
+                static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value19);
+            if (value19 > bestValue29) {
+                bestValue29 = value19;
+                best = candidate10;
             }
 
             CheckDoMain(0, 0);
             if (gpCurPlayer->m_heroCount < giMaxHeroesForThisPlayer
-                && (townPtr->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
-                GetBestHero(townPtr, candidate, value);
-                value =
-                    static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value);
-                if (!bHeroBuiltThisTurn && giCurTurn > 5 && value > 0.0f) {
+                && (townPtr7->m_buildings & IDX(TOWN_BUILDING_CASTLE))) {
+                GetBestHero(townPtr7, candidate10, value19);
+                value19 = static_cast<float>(
+                    (100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value19
+                );
+                if (!bHeroBuiltThisTurn && giCurTurn > 5 && value19 > 0.0f) {
                     if (!((gpCurPlayer->m_aiData.m_income[IDX(RES_GOLD)] < 1250
                            || giMaxHeroesForThisPlayer - 2 <= gpCurPlayer->m_heroCount)
                           && gpCurPlayer->m_heroCount > 1)) {
-                        value += AI_HERO_PURCHASE_BONUS;
+                        value19 += AI_HERO_PURCHASE_BONUS;
                     } else if (gpCurPlayer->m_aiData.m_income[IDX(RES_GOLD)] >= 1500
                                && gpCurPlayer->m_heroCount < giMaxHeroesForThisPlayer - 1) {
-                        value = static_cast<float>(value * AI_HERO_PURCHASE_FACTOR);
+                        value19 = static_cast<float>(value19 * AI_HERO_PURCHASE_FACTOR);
                     }
                 } else if (gpCurPlayer->m_heroCount == 0) {
-                    value += AI_HERO_PURCHASE_BONUS;
+                    value19 += AI_HERO_PURCHASE_BONUS;
                 }
-                if (value > bestValue) {
-                    bestValue = value;
-                    best = candidate;
+                if (value19 > bestValue29) {
+                    bestValue29 = value19;
+                    best = candidate10;
                 }
             }
         }
@@ -1847,15 +1850,15 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
     LogInt(
         "BestBHC ",
         IDX(best.type),
-        static_cast<i32>(bestValue * 100.0f),
+        static_cast<i32>(bestValue29 * 100.0f),
         best.what,
         0,
         0,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    if (bestValue < AI_MINIMUM_PURCHASE_VALUE)
-    best.type = PURCHASE_NONE;
+    if (bestValue29 < AI_MINIMUM_PURCHASE_VALUE)
+        best.type = PURCHASE_NONE;
 }
 // NOLINTEND(readability-magic-numbers)
 
