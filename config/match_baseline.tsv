@@ -387,13 +387,13 @@ BASE/soundmgr	??0soundManager@@QAE@XZ	100.0000	2f50cdc25ef1
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	100.0000	76e8a54d256e
 BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	100.0000	0fa46f4dc003
 BASE/soundmgr	?AllocateSampleHandles@soundManager@@QAEXXZ	100.0000	d1623e77e613
-BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	99.8913	be6aaa0af5d6
+BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	100.0000	00269a6521a4
 BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	100.0000	0f282b3d0af3
 BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	100.0000	bd401e25eee3
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	100.0000	b59e5965d570
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	3577c99b0359
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	100.0000	c93c4e1b701a
-BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	99.9351	3a2f4237e370
+BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	e0a1980cbfa0
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	98.3947	d74b66cf8d0c
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	5a02d04cf9ed
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	100.0000	fc8d72b8c192
