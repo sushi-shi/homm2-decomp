@@ -1,0 +1,21 @@
+# SOURCE/CMBTMGR combatManager::CatAttack controlled typedef-state census
+# checkpoint	53636cf4
+# normalized_source_hash	0a9f3cc7ad7e
+# target_command	python3 scripts/tu_state_noise.py --source src/SOURCE/CMBTMGR.cpp --rva 0x9311f --trials 128 --seed 0x43415441 --families typedef --state-summary /tmp/catattack-states-with-trials.json
+# top_command	python3 scripts/tu_state_noise.py --source src/SOURCE/CMBTMGR.cpp --rva 0x9311f --trials 128 --seed 0x43415441 --families typedef --insertion top --state-summary /tmp/catattack-top-states.json
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	target-adjacent and top-of-TU insertion each produce the same six normalized target states; no generated declaration remains in source and no state is exact
+state	state_identity	representative_trial	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	diff_bytes_from_canonical	diff_bytes_from_retail_cv	differing_candidate_offsets	trials_in_1_through_128
+miss-direction-and-projectile	708ca67542f29c20	1	58	99.995440	4110	4592dbf975b90393	2601b4fed8ce3baf	0	10	0x636-0x63d,0xac5,0xac8	1-6,17-23,34-41,51-58,65-70,81-87,98-105,115-122
+all-three	2efdd21f7bc6e22b	15	12	99.993160	4110	eab4ac7e00c5f181	2601b4fed8ce3baf	8	18	0x636-0x63d,0xac5,0xac8,0xe94-0xe9b	15-16,32-33,49-50,79-80,96-97,113-114
+miss-direction-and-wall-index	595db2909c2a6e3f	8	30	99.995440	4110	413fdda6e58dcfde	2601b4fed8ce3baf	10	16	0x636-0x63d,0xe94-0xe9b	8-10,25-28,42-45,59-62,72-74,89-92,106-109,123-126
+wall-index-only	678cef1a8f9d70a3	11	20	99.997720	4110	ce3a087bfeeb7820	2601b4fed8ce3baf	18	8	0xe94-0xe9b	11-13,29-30,46-48,63-64,75-77,93-94,110-112,127-128
+miss-direction-only	bb50fdbd38e207bc	7	4	99.997720	4110	76fefc1d38617edc	2601b4fed8ce3baf	2	8	0x636-0x63d	7,24,71,88
+projectile-and-wall-index	fcc36371b7a78405	14	4	99.995440	4110	ce595b62a81aded6	2601b4fed8ce3baf	16	10	0xac5,0xac8,0xe94-0xe9b	14,31,78,95
+# The state cardinality is six. The canonical state has 59 observations when the unmodified baseline is included; the table counts only its 58 generated trials. The top-of-TU sweep reproduced the same identities, populations, scores, sizes, and relocation digest.
+# Every state retains the 4110-byte CodeView boundary and the same complete 150-site ordered relocation stream. The raw retail COFF extent is 4112 bytes because it carries two trailing alignment NOPs outside the CodeView boundary; diff_bytes_from_retail_cv excludes them.
+# Raw disassembly initially made the residual look like private-label spelling only. Disposable data normalization proves every $SG/$T relocation has the same payload-derived stable name on both sides, and paired relocation normalization resolves the __adjust_fdiv/iLeftRightSave spellings. Those names do not contribute to the normalized score.
+# The remaining bytes form three independent, non-relocation evaluation-order axes. A at +0x636..+0x63d chooses the accumulator for (startDirection + frame18) before the direction modulus. B at +0xac5/+0xac8 chooses the x87 load order for projectileX11 += xStep0. C at +0xe94..+0xe9b chooses whether wallIndex17 or this is loaded first for the damaged-wall increment.
+# The observed combinations are A+B (canonical), A+B+C, A+C, C, A, and B+C. The missing combinations are exact (none) and B alone. The two best states each leave one eight-byte axis: trial 7 leaves A, while trial 11 leaves C.
+# Representative objects for all six states were compiled and compared pairwise with canonical and against retail. Reversing the direction operands and spelling the projectile update as compound assignment are byte-neutral under the canonical state, so the established source spelling and its existing hash-scoped maximum remain unchanged. No relocation, frame, CFG, or payload transition accompanies any state.
+# No state reaches exact closure, so neither sweep records a retained exact/fuzzy maximum. The disposable 99.997720% states are state-space evidence only, not source results or canonical maxima.

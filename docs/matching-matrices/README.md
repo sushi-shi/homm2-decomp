@@ -742,3 +742,21 @@ No observed state is exact. The best two disposable states reach 99.990585% and 
 in four CodeView bytes: both reverse one chance-product accumulator, while each chooses a different
 non-retail order for the final three-term sum. The canonical readable source remains at 99.971760%.
 No probe was retained and no maximum was recorded from a sub-100 state.
+
+## SOURCE/CMBTMGR CatAttack evaluation-order states
+
+`cmbtmgr-catattack-tu-state-0a9f3c.tsv` records six normalized states from both target-adjacent and
+top-of-TU 128-trial typedef sweeps. The two insertion modes produce the same state identities and
+populations. Every representative retains the 4,110-byte CodeView boundary and the complete
+150-site ordered relocation stream.
+
+Canonical data-symbol normalization proves that the raw `$SG`/`$T` counter differences are not
+residuals: their payload-derived names agree, as do the paired `__adjust_fdiv` relocation aliases.
+The live mismatch instead consists of three independent evaluation-order choices in the miss
+direction sum, projectile-X update, and damaged-wall indexed increment. Six of eight binary
+combinations are reachable; the exact combination is one of the two missing states.
+
+The best two disposable states reach 99.997720%, each with one eight-byte load-order span left.
+Neither is exact, so no probe or new sub-100 maximum is retained. Reversing the direction operands
+and using `projectileX11 += xStep0` are byte-neutral; the established source spelling remains in
+place so its existing hash-scoped maximum is not invalidated without new structural evidence.
