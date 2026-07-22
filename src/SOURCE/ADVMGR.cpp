@@ -933,11 +933,11 @@ H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
     SYSTEM_OPTIONS_TEXT_CAPACITY     = 120
 H2_ENUM_END(AdventureSystemOptionsPrivateConstant)
 
-H2_ENUM_BEGIN(AdventureMusicQuality)
+H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
     MUSIC_QUALITY_MIDI      = 0,
     MUSIC_QUALITY_CD_STEREO = 1,
     MUSIC_QUALITY_CD_OPERA  = 2
-H2_ENUM_END(AdventureMusicQuality)
+H2_ENUM_CLASS_END(AdventureMusicQuality)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
