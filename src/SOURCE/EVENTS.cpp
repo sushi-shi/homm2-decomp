@@ -4385,7 +4385,10 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             0
         );
         EraseObj(cell, x, y);
-    } else if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
+        return;
+    }
+
+    if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
             "You already have 8 heroes, and regretfully must leave the prisoner in this jail to "
             "languish in agony for untold days.",
@@ -4399,47 +4402,48 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             -1,
             0
         );
-    } else {
-        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample1);
-        NormalDialog(
-            "In a dazzling display of daring, you break into the local jail and free the hero "
-            "imprisoned there, who, in return, pledges loyalty to your cause.",
-            NORMAL_DIALOG_INFO,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
-        gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
-        gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
-        releasedHero1 = &gpGame->m_heroRecs[heroId9];
-        EraseObj(cell, x, y);
-        gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId9);
-        gpCurPlayer->m_heroCount++;
-        releasedHero1->m_x = x;
-        releasedHero1->m_y = y;
-        releasedHero1->m_eventFlags = HERO_EVENT_NONE;
-        releasedHero1->m_direction = MAP_DIRECTION_EAST;
-        releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
-        releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
-        releasedHero1->m_locationType = cell->m_triggerType;
-        releasedHero1->m_occupiedTown = cell->m_objectMetadata;
-        cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-        cell->m_objectMetadata = heroId9;
-        SendMapChange(
-            MAP_CHANGE_RECRUIT_HERO,
-            static_cast<i8>(heroId9),
-            x,
-            y,
-            MAP_CHANGE_CURRENT_PLAYER,
-            0,
-            0
-        );
+        return;
     }
+
+    EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample1);
+    NormalDialog(
+        "In a dazzling display of daring, you break into the local jail and free the hero "
+        "imprisoned there, who, in return, pledges loyalty to your cause.",
+        NORMAL_DIALOG_INFO,
+        -1,
+        -1,
+        -1,
+        0,
+        -1,
+        0,
+        -1,
+        0
+    );
+    gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
+    gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
+    releasedHero1 = &gpGame->m_heroRecs[heroId9];
+    EraseObj(cell, x, y);
+    gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId9);
+    gpCurPlayer->m_heroCount++;
+    releasedHero1->m_x = x;
+    releasedHero1->m_y = y;
+    releasedHero1->m_eventFlags = HERO_EVENT_NONE;
+    releasedHero1->m_direction = MAP_DIRECTION_EAST;
+    releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
+    releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
+    releasedHero1->m_locationType = cell->m_triggerType;
+    releasedHero1->m_occupiedTown = cell->m_objectMetadata;
+    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+    cell->m_objectMetadata = heroId9;
+    SendMapChange(
+        MAP_CHANGE_RECRUIT_HERO,
+        static_cast<i8>(heroId9),
+        x,
+        y,
+        MAP_CHANGE_CURRENT_PLAYER,
+        0,
+        0
+    );
 }
 
 VA(0x004af87c, 0x1da)
