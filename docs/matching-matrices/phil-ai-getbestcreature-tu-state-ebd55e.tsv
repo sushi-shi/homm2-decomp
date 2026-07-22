@@ -1,0 +1,13 @@
+# SOURCE/PHILAI philAI::GetBestCreature controlled typedef-state census
+# checkpoint	3317ea16adaf0ca2f1c497dd3bbdf848d81b6388
+# normalized_source_hash	ebd55e53ed54
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/PHILAI.cpp --rva 0x3db58 --trials 128 --families typedef --max-declarations 128 --seed 0x47424352 --state-summary /tmp/getbestcreature-states.json --record-max
+# identity	candidate-paired and data-canonicalized target text + objdiff boundary + ordered relocation stream, with only numeric $SG/$T counters folded by the census
+# result	128 typedef counts produce two normalized states; the exact state closes the unchanged target hash and no generated declaration remains in source
+state	state_identity	representative_count	trial_occurrences	score	objdiff_size	text_sha	normalized_reloc_sha	counts_in_1_through_128
+canonical	d2f8ec7fd25ee098	1	86	99.459460	859	a49a2862d16c6aae	fba66a3fbb4b0d6b	all counts not listed for exact
+exact	8d4caddc53218ba0	9	42	100.000000	859	403a6d8d354ff088	fba66a3fbb4b0d6b	9-14,26-31,43-48,60-65,78-83,95-100,112-117
+# The state cardinality is two. The canonical state's occurrence total is 87 when the unmodified baseline is included; the table's 86 counts only generated trials.
+# Comparing a representative of each state with retail isolates one x87 evaluation-order choice. Canonical emits `fcoms bestRandomizedScore; fstps jitteredValue`; exact and retail emit `fsts jitteredValue; fcomps bestRandomizedScore`. Every other instruction and stack displacement agrees.
+# Both states have the same 859-byte boundary and the same complete 23-site ordered relocation stream. The differing private $SG/$T spellings shown by raw objects are not additional states, and the misleading provisional label attached to one lite-diff relocation is not present in the candidate-paired normalized relocation stream.
+# Trial 9 is the exact-closure representative and is reproducible from the command, seed, and count above. Its disposable nine-typedef body was removed before the hash-scoped maximum was updated.

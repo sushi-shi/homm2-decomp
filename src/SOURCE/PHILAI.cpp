@@ -2787,48 +2787,48 @@ void philAI::ValueOfBuyingCreature(
 
 VA(0x0043db58, 0x35b)
 void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
+    i32 canAddUnit;
+    float unrandomizedValue;
+    i32 numberToBuy;
+    float bestRandomizedScore;
     i32 bestDwelling;
-    i32 purchaseCount;
-    float bestRaw;
-    float bestRandomized;
-    i32 dwelling;
-    CreatureType creature;
-    i32 leastArmyValue;
-    i32 canJoin;
+    float bestRawValue;
     i32 armyIndex;
-    i32 currentPurchaseCount;
+    i32 availableUnits;
+    i32 dwelling;
+    float jitteredValue;
+    CreatureType candidateMonster;
+    i32 weakestArmyValue;
     i32 resourceValue;
-    float rawValue;
-    float randomizedValue;
 
     bestDwelling = CREATURE_PURCHASE_NO_SLOT;
-    purchaseCount = 0;
-    bestRaw = AI_PURCHASE_INITIAL_VALUE;
-    bestRandomized = AI_PURCHASE_INITIAL_VALUE;
+    numberToBuy = 0;
+    bestRawValue = AI_PURCHASE_INITIAL_VALUE;
+    bestRandomizedScore = AI_PURCHASE_INITIAL_VALUE;
     for (dwelling = 0; dwelling < CREATURE_PURCHASE_DWELLING_COUNT; dwelling++) {
-        creature = gDwellingType[IDX(townPtr->m_type)][dwelling];
-        leastArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
+        candidateMonster = gDwellingType[IDX(townPtr->m_type)][dwelling];
+        weakestArmyValue = CREATURE_PURCHASE_VALUE_LIMIT;
         if ((townPtr->m_buildings & BIT(dwelling + IDX(BUILDING_SLOT_DWELLING_FIRST)))
             && townPtr->m_garrison[dwelling] > 0) {
-            canJoin = 0;
+            canAddUnit = 0;
             for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] == CREATURE_NONE
-                    || townPtr->m_army.m_creatureTypes[armyIndex] == creature) {
-                    canJoin = 1;
+                    || townPtr->m_army.m_creatureTypes[armyIndex] == candidateMonster) {
+                    canAddUnit = 1;
                 }
             }
             for (armyIndex = 0; armyIndex < CREATURE_PURCHASE_ARMY_SLOT_COUNT; armyIndex++) {
                 if (townPtr->m_army.m_creatureTypes[armyIndex] != CREATURE_NONE
                     && gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].randomValue
-                           < leastArmyValue) {
-                    leastArmyValue =
+                           < weakestArmyValue) {
+                    weakestArmyValue =
                         gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].randomValue;
                 }
             }
-            if (leastArmyValue < gMonsterDatabase[IDX(creature)].randomValue
-                && gMonsterDatabase[IDX(creature)].randomValue
+            if (weakestArmyValue < gMonsterDatabase[IDX(candidateMonster)].randomValue
+                && gMonsterDatabase[IDX(candidateMonster)].randomValue
                        > CREATURE_PURCHASE_EXPENSIVE_VALUE) {
-                canJoin = 1;
+                canAddUnit = 1;
             }
             if (dwelling == 0 && townPtr->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT
                 && ((townPtr->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_5))
@@ -2836,42 +2836,43 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))
                     || (townPtr->m_buildings & IDX(TOWN_BUILDING_DWELLING_6)))) {
-                canJoin = 0;
+                canAddUnit = 0;
             }
-            if (canJoin) {
-                currentPurchaseCount = CreaturesToBuy(townPtr, dwelling);
-                if (currentPurchaseCount > 0) {
+            if (canAddUnit) {
+                availableUnits = CreaturesToBuy(townPtr, dwelling);
+                if (availableUnits > 0) {
                     ValueOfBuyingCreature(
                         townPtr,
-                        creature,
+                        candidateMonster,
                         resourceValue,
-                        currentPurchaseCount,
-                        rawValue
+                        availableUnits,
+                        unrandomizedValue
                     );
                     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
                         resourceValue =
                             static_cast<i32>(resourceValue * AI_CREATURE_EASY_COST_FACTOR);
                     if (townPtr->m_threat != 0)
                         resourceValue <<= 1;
-                    randomizedValue = static_cast<float>(
+                    jitteredValue = static_cast<float>(
                         // Candidate jitter range is retail AI purchase policy.
-                        (Random(1, 10) + AI_CREATURE_RANDOM_BASE) * rawValue // NOLINT(readability-magic-numbers)
+                        (Random(1, 10) + AI_CREATURE_RANDOM_BASE)
+                        * unrandomizedValue // NOLINT(readability-magic-numbers)
                         / AI_PURCHASE_RANDOM_DIVISOR
                     );
-                    if (randomizedValue > bestRandomized) {
+                    if (jitteredValue > bestRandomizedScore) {
                         bestDwelling = dwelling;
-                        bestRaw = rawValue;
-                        bestRandomized = randomizedValue;
-                        purchaseCount = currentPurchaseCount;
+                        bestRawValue = unrandomizedValue;
+                        bestRandomizedScore = jitteredValue;
+                        numberToBuy = availableUnits;
                     }
                     if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                         sprintf(
                             gText,
                             "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                             townPtr->m_id,
-                            GetMonsterName(creature),
-                            rawValue,
-                            randomizedValue
+                            GetMonsterName(candidateMonster),
+                            unrandomizedValue,
+                            jitteredValue
                         );
                         LogStr(gText);
                     }
@@ -2882,8 +2883,8 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
     best.pTown = townPtr;
     best.type = PURCHASE_CREATURE;
     best.what = bestDwelling;
-    best.num = purchaseCount;
-    bestValue = bestRaw;
+    best.num = numberToBuy;
+    bestValue = bestRawValue;
 }
 
 VA(0x0043deb3, 0x48)
