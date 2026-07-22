@@ -506,7 +506,6 @@ i32 game::SetupGame(void) {
                     || iMPExtendedType == REMOTE_GAME_MODEM_GUEST)
                     gbWaitForRemoteReceive = true;
                 break;
-            default:;
         }
 
     menuDone:

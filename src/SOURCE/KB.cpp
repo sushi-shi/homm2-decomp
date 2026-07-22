@@ -4022,7 +4022,7 @@ void SetupDynamicWindow(
     leftCornerPaddingLocal = CONTENT_TOP;
     rightCornerPaddingValue = CONTENT_TOP;
     centeredPadding = CONTENT_LEFT;
-    stoneWidgetColorSize = TILE_SIZE;
+    stoneWidgetColorSize = CONTENT_TOP;
     newWidgetTemp = NULL;
     columnsSize = (contentWidth - 1) / TILE_SIZE + 1;
     numRows = (contentHeight - 1) / TILE_SIZE + 1;

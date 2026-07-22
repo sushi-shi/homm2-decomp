@@ -975,7 +975,7 @@ SOURCE/KB	?ReceiveRemotePlayerExit@@YIXUSPlayerExit@@@Z	100.0000	38339e4d1a11
 SOURCE/KB	?RecruitHeroHandler@@YIHAAUtag_message@@@Z	99.9278	70317d070fa7
 SOURCE/KB	?SetWinText@@YIXPAVheroWindow@@H@Z	100.0000	3f8195a3806e
 SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	4e5c50c123c7
-SOURCE/KB	?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z	99.9980	5d69e4febc9c
+SOURCE/KB	?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z	100.0000	f5a2098beaf8
 SOURCE/KB	?ShowCongrats@@YIXH@Z	100.0000	a808b97c93bb
 SOURCE/KB	?ShowLuckInfo@game@@QAEXPAVhero@@H@Z	100.0000	6e1be3b4feb3
 SOURCE/KB	?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z	99.4730	024a67dc30ab
@@ -1183,7 +1183,7 @@ SOURCE/SETUP	?SetupCampaignGame@game@@QAEHXZ	100.0000	24e564277d68
 SOURCE/SETUP	?SetupCampaignGameHandler@@YIHAAUtag_message@@@Z	100.0000	9bcefc97b6de
 SOURCE/SETUP	?SetupComPort@game@@QAEHXZ	100.0000	03ae458cacde
 SOURCE/SETUP	?SetupComPortHandler@@YIHAAUtag_message@@@Z	22.6846	066463fb4c39
-SOURCE/SETUP	?SetupGame@game@@QAEHXZ	99.9952	8b62b69bd8c4
+SOURCE/SETUP	?SetupGame@game@@QAEHXZ	100.0000	60d233470dd9
 SOURCE/SETUP	?SetupGameHandler@@YIHAAUtag_message@@@Z	76.4268	58941fa3c4f1
 SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	100.0000	73708c5e7cb8
 SOURCE/SETUP	?SetupHotSeatGameHandler@@YIHAAUtag_message@@@Z	25.9813	3bbcb2b8a5d8
