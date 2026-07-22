@@ -281,41 +281,42 @@ void combatManager::SetupCombat(
         m_playerId[IDX(COMBAT_DEFENDER_SIDE)] = -1;
     }
 
-    CombatSide side;
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        if (m_playerId[IDX(side)] >= 0)
-            m_networkArmyPresent[IDX(side)] = gbHumanPlayer[m_playerId[IDX(side)]];
+    // Retail reuses this integer counter for the side and captain-array loops.
+    i32 index;
+    for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++) {
+        if (m_playerId[index] >= 0)
+            m_networkArmyPresent[index] = gbHumanPlayer[m_playerId[index]];
         else
-            m_networkArmyPresent[IDX(side)] = 0;
+            m_networkArmyPresent[index] = 0;
 
-        if (side == COMBAT_ATTACKER_SIDE)
-            m_heroes[IDX(side)] = attackerHero;
+        if (index == IDX(COMBAT_ATTACKER_SIDE))
+            m_heroes[index] = attackerHero;
         else
-            m_heroes[IDX(side)] = defenderHero;
+            m_heroes[index] = defenderHero;
 
-        if (m_heroes[IDX(side)] != NULL)
-            m_heroes[IDX(side)]->m_isCaptain = 0;
+        if (m_heroes[index] != NULL)
+            m_heroes[index]->m_isCaptain = 0;
 
-        if (side == COMBAT_ATTACKER_SIDE)
-            m_armyGroups[IDX(side)] = attackerGroup;
+        if (index == IDX(COMBAT_ATTACKER_SIDE))
+            m_armyGroups[index] = attackerGroup;
         else
-            m_armyGroups[IDX(side)] = defenderGroup;
+            m_armyGroups[index] = defenderGroup;
 
-        m_catapultAttacksRemaining[IDX(side)] = 1;
-        m_catapultAttackCount[IDX(side)] = m_catapultAttacksRemaining[IDX(side)];
-        if (m_heroes[IDX(side)] != NULL && m_heroes[IDX(side)]->HasArtifact(ARTIFACT_BALLISTA)) {
-            m_catapultAttacksRemaining[IDX(side)] = BALLISTA_CATAPULT_ATTACK_COUNT;
-            m_catapultAttackCount[IDX(side)] = m_catapultAttacksRemaining[IDX(side)];
+        m_catapultAttacksRemaining[index] = 1;
+        m_catapultAttackCount[index] = m_catapultAttacksRemaining[index];
+        if (m_heroes[index] != NULL && m_heroes[index]->HasArtifact(ARTIFACT_BALLISTA)) {
+            m_catapultAttacksRemaining[index] = BALLISTA_CATAPULT_ATTACK_COUNT;
+            m_catapultAttackCount[index] = m_catapultAttacksRemaining[index];
         }
-        if (m_heroes[IDX(side)] != NULL
-            && m_heroes[IDX(side)]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
+        if (m_heroes[index] != NULL
+            && m_heroes[index]->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                    >= HERO_SKILL_LEVEL_ADVANCED) {
-            m_catapultAttackCount[IDX(side)]++;
-            m_catapultAttacksRemaining[IDX(side)]++;
+            m_catapultAttackCount[index]++;
+            m_catapultAttacksRemaining[index]++;
         }
-        m_keepAttacksRemaining[IDX(side)] = 1;
-        m_visitingHeroPresent[IDX(side)] = 0;
-        m_heroCastSpell[IDX(side)] = 0;
+        m_keepAttacksRemaining[index] = 1;
+        m_visitingHeroPresent[index] = 0;
+        m_heroCastSpell[index] = 0;
     }
 
     m_drawbridgeBackgroundVisible = 0;
@@ -346,13 +347,12 @@ void combatManager::SetupCombat(
 
         if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] == NULL
             && (defenderTown->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS))) {
-            i32 captainIndex;
             m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = &m_captain;
             memset(&m_captain, 0, sizeof(m_captain));
-            for (captainIndex = 0; captainIndex < HERO_PRIMARY_STAT_COUNT; captainIndex++)
-                m_captain.m_primaryStats[captainIndex] =
+            for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++)
+                m_captain.m_primaryStats[index] =
                     captainStats[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
-                                [captainIndex];
+                                [index];
             m_captain.m_spellPoints =
                 m_captain.Stats(HERO_PRIMARY_KNOWLEDGE) * COMBAT_CAPTAIN_SPELL_POINT_MULTIPLIER;
             m_captain.m_cursorType = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type;
@@ -361,10 +361,10 @@ void combatManager::SetupCombat(
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
             strcpy(m_captain.m_name, "Captain");
-            for (captainIndex = 0; captainIndex < ARMY_GROUP_SLOT_COUNT; captainIndex++)
-                m_captain.m_army.m_creatureTypes[captainIndex] = CREATURE_NONE;
-            for (captainIndex = 0; captainIndex < HERO_ARTIFACT_SLOT_COUNT; captainIndex++)
-                m_captain.m_artifacts[captainIndex] = ARTIFACT_NONE;
+            for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
+                m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
+            for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++)
+                m_captain.m_artifacts[index] = ARTIFACT_NONE;
             m_captain.m_artifacts[0] = ARTIFACT_MAGIC_BOOK;
             m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->GiveSpells(&m_captain);
             m_captain.m_isCaptain = 1;
