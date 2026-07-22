@@ -3212,9 +3212,11 @@ float army::SpellCastWorkChance(SpellType spell) {
         && HAS(m_monster.flags.all, MONSTER_FLAGS_UNDEAD)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
-    if (m_monsterType == CREATURE_PHOENIX && spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST
-        && spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING
-        && spell != SPELL_COLD_RAY && spell != SPELL_COLD_RING && spell != SPELL_ELEMENTAL_STORM) {
+    if (m_monsterType == CREATURE_PHOENIX
+        && (spell == SPELL_FIREBALL || spell == SPELL_FIREBLAST
+            || spell == SPELL_LIGHTNING_BOLT || spell == SPELL_CHAIN_LIGHTNING
+            || spell == SPELL_COLD_RAY || spell == SPELL_COLD_RING
+            || spell == SPELL_ELEMENTAL_STORM)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (m_monsterType == CREATURE_CRUSADER && (spell == SPELL_CURSE || spell == SPELL_MASS_CURSE)) {
