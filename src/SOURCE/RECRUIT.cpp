@@ -392,41 +392,41 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
 VA(0x0048bee5, 0x14f)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RESOURCE_COUNT + 1];
-    i32 goldCost;
-    ResourceType resourceType;
-    CreatureType creatureType;
-    i32 resourceCost;
-    heroWindow* window;
-    i32 available;
-    i32 resource;
+    i32 goldPrice;
+    ResourceType paymentType;
+    CreatureType unitType;
+    i32 resourcePrice;
+    heroWindow* recruitWindow;
+    i32 amount;
+    i32 resourceIndex;
 
-    creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
-    available = townData->m_garrison[dwelling];
-    GetMonsterCost(creatureType, costs);
-    goldCost = costs[GOLD_RESOURCE];
-    for (resource = 0; resource < RESOURCE_COUNT; ++resource) {
-        if (costs[resource] != 0)
+    unitType = gDwellingType[IDX(townData->m_type)][dwelling];
+    amount = townData->m_garrison[dwelling];
+    GetMonsterCost(unitType, costs);
+    goldPrice = costs[GOLD_RESOURCE];
+    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+        if (costs[resourceIndex] != 0)
             break;
     }
-    if (resource < RESOURCE_COUNT) {
-        resourceType = ResourceType(resource);
-        resourceCost = costs[resource];
+    if (resourceIndex < RESOURCE_COUNT) {
+        paymentType = ResourceType(resourceIndex);
+        resourcePrice = costs[IDX(paymentType)];
     } else {
-        resourceType = RECRUIT_NO_RESOURCE;
-        resourceCost = 0;
+        paymentType = RECRUIT_NO_RESOURCE;
+        resourcePrice = 0;
     }
 
-    window = new heroWindow(
+    recruitWindow = new heroWindow(
         QUICK_WINDOW_X,
         QUICK_WINDOW_Y,
-        const_cast<char*>(resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
+        const_cast<char*>(paymentType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
     );
-    if (window == NULL)
+    if (recruitWindow == NULL)
         MemError();
-    SetupRecruitWin(window, creatureType, goldCost, resourceType, resourceCost, available);
-    gpWindowManager->AddWindow(window, -1, 1);
+    SetupRecruitWin(recruitWindow, unitType, goldPrice, paymentType, resourcePrice, amount);
+    gpWindowManager->AddWindow(recruitWindow, -1, 1);
     QuickViewWait();
-    gpWindowManager->RemoveWindow(window);
+    gpWindowManager->RemoveWindow(recruitWindow);
 }
 
 
