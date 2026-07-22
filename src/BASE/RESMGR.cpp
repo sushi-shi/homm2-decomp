@@ -254,8 +254,8 @@ class resource* resourceManager::Query(u32l resourceId) {
 }
 
 VA(0x004c8880, 0x1a)
-i32 resourceManager::Main(struct tag_message&) {
-    return LOAD_SUCCESS;
+MessageDispatchResult resourceManager::Main(struct tag_message&) {
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004c88a0, 0xab)

@@ -13,6 +13,6 @@ struct CombatTowerOrigin {
 
 i32 ValidHex(i32);
 void UpdateCombatSystemOptions(i32);
-WidgetDispatchResult CombatSystemOptionsHandler(struct tag_message&);
+MessageDispatchResult CombatSystemOptionsHandler(struct tag_message&);
 
 #endif

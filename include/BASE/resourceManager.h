@@ -43,7 +43,7 @@ public:
     resourceManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void GetBackdrop(char*, class bitmap*, i32);
     void GetBackdropAtLoc(char*, class bitmap*, i32, i32, i32);
     class palette* GetPalette(char*);

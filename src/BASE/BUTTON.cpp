@@ -108,11 +108,11 @@ inline button::~button() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004dd6d0, 0x595)
-WidgetDispatchResult button::Main(tag_message& msg) {
+MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
         if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
         m_flags &= ~WIDGET_FLAG_SELECTED;
         Draw();
         gpWindowManager
@@ -120,13 +120,13 @@ WidgetDispatchResult button::Main(tag_message& msg) {
         SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
         msg.payload.widget.parameter = IDX(iLeftRightSave);
         iLeftRightSave = MESSAGE_MODIFIER_NONE;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
 
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
 
     MessageType eventType = msg.type;
@@ -136,7 +136,7 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                 && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
                     return Select(msg);
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
             break;
 
@@ -144,10 +144,10 @@ WidgetDispatchResult button::Main(tag_message& msg) {
             if (HAS(m_flags, WIDGET_FLAG_ENABLED) && HAS(m_flags, WIDGET_FLAG_DRAW)
                 && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
                 WidgetFlag keyFlags = m_flags;
                 if (!HAS(keyFlags, WIDGET_FLAG_SELECTED))
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
                 keyFlags &= ~WIDGET_FLAG_SELECTED;
                 m_flags = keyFlags;
                 Draw();
@@ -160,7 +160,7 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 msg.payload.widget.parameter = IDX(iLeftRightSave);
                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
             break;
 
@@ -178,9 +178,9 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                     && relativeY < m_y + m_height) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                    return WIDGET_DISPATCH_FORWARD;
+                    return MESSAGE_DISPATCH_FORWARD;
                 }
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
 
             if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && m_x <= relativeX && m_y <= relativeY
@@ -232,11 +232,11 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                     msg.payload.widget.parameter = IDX(iLeftRightSave);
                     iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                    return WIDGET_DISPATCH_FORWARD;
+                    return MESSAGE_DISPATCH_FORWARD;
                 }
-                return WIDGET_DISPATCH_CONSUME;
+                return MESSAGE_DISPATCH_CONSUME;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
         }
 
         case MESSAGE_LEFT_BUTTON_UP: {
@@ -255,7 +255,7 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 msg.payload.widget.parameter = IDX(iLeftRightSave);
                 iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
             goto normalEvent;
         }
@@ -267,7 +267,7 @@ WidgetDispatchResult button::Main(tag_message& msg) {
                     gpResourceManager->Dispose(m_icon);
                     m_icon = gpResourceManager->GetIcon(msg.payload.widget.data.value);
                 }
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
             goto normalEvent;
 
@@ -280,7 +280,7 @@ normalEvent:
 }
 
 VA(0x004ddc70, 0x96)
-H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Select(struct tag_message& msg) {
+H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = static_cast<i16>(window->m_posX + m_x);
     i16 y = static_cast<i16>(window->m_posY + m_y);
@@ -297,14 +297,14 @@ H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Select(struct tag_message& msg
     glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
     iLeftRightSave = static_cast<MessageModifier>(msg.payload.widget.parameter)
         & MESSAGE_MODIFIER_BUTTON_MASK;
-    return WIDGET_DISPATCH_FORWARD;
+    return MESSAGE_DISPATCH_FORWARD;
 }
 
 VA(0x004ddd10, 0x83)
-H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Deselect(struct tag_message& msg) {
+H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
     WidgetFlag flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_SELECTED))
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     flags &= ~WIDGET_FLAG_SELECTED;
     m_flags = flags;
     Draw();
@@ -313,7 +313,7 @@ H2_ENUM_RETURN(WidgetDispatchResult, i16) button::Deselect(struct tag_message& m
     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
     msg.payload.widget.parameter = IDX(iLeftRightSave);
     iLeftRightSave = MESSAGE_MODIFIER_NONE;
-    return WIDGET_DISPATCH_FORWARD;
+    return MESSAGE_DISPATCH_FORWARD;
 }
 
 #undef SET_WIDGET_MESSAGE

@@ -1317,7 +1317,7 @@ void game::DoKnob(void) {
 }
 
 VA(0x0040a66f, 0x4fd)
-WidgetDispatchResult OverviewHandler(struct tag_message& message) {
+MessageDispatchResult OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;
     i32 quickView15;
     i32 scrollItemCount0;
@@ -1454,9 +1454,9 @@ WidgetDispatchResult OverviewHandler(struct tag_message& message) {
     if (closeDialog5 == 1) {
         message.payload.widget.id = SCROLL_UP_WIDGET;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0040ab6c, 0x4fa)

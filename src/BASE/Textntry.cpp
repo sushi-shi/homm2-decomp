@@ -181,11 +181,11 @@ void textEntryWidget::Read(i32 type) {
 }
 
 VA(0x004d8b90, 0x874)
-WidgetDispatchResult textEntryWidget::Main(struct tag_message& message) {
+MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
     switch (message.type) {
         default:
@@ -200,12 +200,12 @@ WidgetDispatchResult textEntryWidget::Main(struct tag_message& message) {
             if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (mouseX < m_x || mouseY < m_y || mouseX >= m_x + m_width
                     || mouseY >= m_y + m_height)
-                    return WIDGET_DISPATCH_CONTINUE;
+                    return MESSAGE_DISPATCH_CONTINUE;
                 message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
                 message.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
             if (mouseX >= m_x && mouseY >= m_y && mouseX < m_x + m_width
                 && mouseY < m_y + m_height) {
@@ -365,28 +365,28 @@ WidgetDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 message.payload.widget.command = WIDGET_COMMAND_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
         }
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SET_TEXT:
                     if (message.payload.widget.id == m_id) {
                         SetText(message.payload.widget.data.text);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_GET_TEXT:
                     if (message.payload.widget.id == m_id) {
                         message.payload.widget.data.text = m_text;
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
                 case WIDGET_COMMAND_SET_MAX_LENGTH:
                     if (message.payload.widget.id == m_id) {
                         m_maxLength = static_cast<u16>(message.payload.widget.data.value);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
             }

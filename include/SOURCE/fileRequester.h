@@ -31,8 +31,6 @@ H2_ENUM_BEGIN(FileRequesterControlId)
     FILE_REQUESTER_EXTENSION_PLAYER_DIGIT      = 3,
     FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH = 2,
     FILE_REQUESTER_SELECTION_NONE              = -1,
-    FILE_REQUESTER_MAIN_CONTINUE               = 1,
-    FILE_REQUESTER_MAIN_CLOSE                  = 2,
     FILE_REQUESTER_SCROLL_UP                   = 1,
     FILE_REQUESTER_SCROLL_DOWN                 = 2,
     FILE_REQUESTER_SCROLL_GUTTER               = 3,
@@ -102,7 +100,7 @@ public:
     fileRequester(i32, i32, FileRequesterMode, char*, char*, char*);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     i32 InitializeFiles(char*, char*, i32);
     i32 MapExistsForFilter(FileRequesterMapSizeFilter);
     void SetupFiles(void);

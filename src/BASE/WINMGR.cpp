@@ -356,25 +356,26 @@ void heroWindowManager::Close(void) {
 }
 
 VA(0x004cac00, 0x2d)
-i32 heroWindowManager::Main(struct tag_message& msg) {
-    WidgetDispatchResult result = WIDGET_DISPATCH_CONTINUE;
+MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
+    MessageDispatchResult result = MESSAGE_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
     while (w != NULL) {
         result = w->BroadcastMessage(msg);
-        if (result >= WIDGET_DISPATCH_CONSUME && result <= WIDGET_DISPATCH_FORWARD)
+        if (result >= MESSAGE_DISPATCH_CONSUME && result <= MESSAGE_DISPATCH_FORWARD)
             break;
         w = w->m_prevWindow;
     }
-    return IDX(result);
+    return result;
 }
 
 VA(0x004cac30, 0xf)
-i32 heroWindowManager::ConvertToHover(struct tag_message& msg) {
+MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
 VA(0x004cac40, 0x35)
-i32 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
+MessageDispatchResult
+heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
     msg.type = type;
     msg.payload.widget.command = p2;
@@ -466,12 +467,12 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
 VA(0x004cadd0, 0x1cf)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
-    WidgetMessageHandler handler,
+    MessageDispatchHandler handler,
     i32 fade
 ) {
     tag_message message;
     i32 done;
-    i32 result;
+    MessageDispatchResult result;
 
     gbInDialog = true;
     if (iDialogNestCount == 0)
@@ -515,15 +516,15 @@ i32 heroWindowManager::DoDialog(
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
         if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
-            result = IDX(window->BroadcastMessage(message));
-            if (result == IDX(WIDGET_DISPATCH_FORWARD) && message.type == MESSAGE_WIDGET
+            result = window->BroadcastMessage(message);
+            if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
                 && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT) {
                 m_dialogResult = message.payload.widget.id;
                 done = 1;
             }
         }
-        result = IDX(handler(message));
-        if (result == IDX(WIDGET_DISPATCH_FORWARD) && message.type == MESSAGE_WIDGET
+        result = handler(message);
+        if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
     } while (done == 0);
@@ -537,9 +538,9 @@ i32 heroWindowManager::DoDialog(
     return 0;
 }
 
-#undef WIDGET_DISPATCH_CONTINUE
-#undef WIDGET_DISPATCH_CONSUME
-#undef WIDGET_DISPATCH_FORWARD
+#undef MESSAGE_DISPATCH_CONTINUE
+#undef MESSAGE_DISPATCH_CONSUME
+#undef MESSAGE_DISPATCH_FORWARD
 
 VA(0x004cafa0, 0x17)
 void heroWindowManager::UpdateScreen(void) {

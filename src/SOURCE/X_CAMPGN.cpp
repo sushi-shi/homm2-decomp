@@ -1149,7 +1149,7 @@ i8 ExpCampaign::IsThisMapCompleted(void) {
 }
 
 VA(0x004bd639, 0x32e)
-WidgetDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
+MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
@@ -1162,7 +1162,7 @@ WidgetDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -1235,7 +1235,7 @@ WidgetDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -1244,7 +1244,7 @@ WidgetDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                 break;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004bd967, 0x6c)

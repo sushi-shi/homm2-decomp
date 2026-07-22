@@ -281,8 +281,8 @@ void inputManager::Close(void) {
 }
 
 VA(0x004ce2d0, 0x5)
-i32 inputManager::Main(struct tag_message&) {
-    return 0;
+MessageDispatchResult inputManager::Main(struct tag_message&) {
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004ce2e0, 0xf)

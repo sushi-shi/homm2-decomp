@@ -697,7 +697,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
 }
 
 VA(0x00448e52, 0x521)
-WidgetDispatchResult CampaignHandler(struct tag_message& message) {
+MessageDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
@@ -710,7 +710,7 @@ WidgetDispatchResult CampaignHandler(struct tag_message& message) {
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         giDialogTimeout = 0;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
@@ -812,12 +812,12 @@ WidgetDispatchResult CampaignHandler(struct tag_message& message) {
                         message.payload.widget.command =
                             BaseWidgetCommand(message.payload.widget.id);
                         giDialogTimeout = 0;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                 }
                 break;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00449373, 0x47)

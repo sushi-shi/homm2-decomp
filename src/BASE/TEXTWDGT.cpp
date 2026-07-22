@@ -85,12 +85,12 @@ textWidget::~textWidget() {
     messageValue.payload.widget.id = idValue
 
 VA(0x004d1280, 0x210)
-WidgetDispatchResult textWidget::Main(tag_message& msg) {
+MessageDispatchResult textWidget::Main(tag_message& msg) {
     WidgetFlag flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
-        return WIDGET_DISPATCH_CONTINUE;
+        return MESSAGE_DISPATCH_CONTINUE;
     }
 
     switch (msg.type) {
@@ -102,12 +102,12 @@ WidgetDispatchResult textWidget::Main(tag_message& msg) {
                 static_cast<i16>(msg.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
             if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                 || relativeY >= m_y + m_height)
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             m_flags = flags | WIDGET_FLAG_SELECTED;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
                 msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
             SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
-            return WIDGET_DISPATCH_FORWARD;
+            return MESSAGE_DISPATCH_FORWARD;
         }
 
         case MESSAGE_LEFT_BUTTON_UP:
@@ -117,9 +117,9 @@ WidgetDispatchResult textWidget::Main(tag_message& msg) {
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                return WIDGET_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_FORWARD;
             }
-            return WIDGET_DISPATCH_CONTINUE;
+            return MESSAGE_DISPATCH_CONTINUE;
 
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
@@ -129,7 +129,7 @@ WidgetDispatchResult textWidget::Main(tag_message& msg) {
                     char* newText = msg.payload.widget.data.text;
                     if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
                         m_text = newText;
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     u16 newLen = strlen(newText);
                     if (strlen(m_text) < newLen) {
@@ -143,14 +143,14 @@ WidgetDispatchResult textWidget::Main(tag_message& msg) {
                         );
                     }
                     strcpy(m_text, newText);
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
                 }
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
                     m_color = static_cast<FontDrawMode>(msg.payload.widget.data.value);
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
 
                 default:
                     goto normalEvent;

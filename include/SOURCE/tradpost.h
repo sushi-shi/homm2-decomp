@@ -32,7 +32,7 @@ void UpdateTradingPost(i32);
 void ComputeTradeRatios(i32, i32, i32*, i32*, i32*);
 void DoTradeKnob(struct tag_message);
 void SetupNewTrade(void);
-WidgetDispatchResult TradingPostHandler(struct tag_message&);
+MessageDispatchResult TradingPostHandler(struct tag_message&);
 
 extern u16 coreRatio[TRADING_POST_RESOURCE_COUNT];
 extern class iconWidget* tradeKnob;

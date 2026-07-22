@@ -1224,7 +1224,7 @@ i32 InterpretCommandLine(void) {
 }
 
 VA(0x00498d2d, 0x698)
-WidgetDispatchResult InitMenuHandler(struct tag_message& msg) {
+MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     i32 handled = 0;
     i32 idx;
     i32 menu;
@@ -1295,7 +1295,7 @@ WidgetDispatchResult InitMenuHandler(struct tag_message& msg) {
         } else if (msg.type == INIT_MENU_MESSAGE) {
             if (msg.payload.widget.id < MENU_FIRST_COMMAND
                 || msg.payload.widget.id > MENU_LAST_ACTION) {
-                return WIDGET_DISPATCH_CONTINUE;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
             switch (msg.payload.widget.command) {
                 case INIT_MENU_HOVER_COMMAND:
@@ -1413,19 +1413,19 @@ WidgetDispatchResult InitMenuHandler(struct tag_message& msg) {
         msg.type = INIT_MENU_MESSAGE;
         msg.payload.widget.id = MENU_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
     CheckShingleUpdate();
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004993c5, 0x1b)
-WidgetDispatchResult NullHandler(struct tag_message& msg) {
-    return WIDGET_DISPATCH_CONSUME;
+MessageDispatchResult NullHandler(struct tag_message& msg) {
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x004993e0, 0x1a9)
-WidgetDispatchResult RecruitHeroHandler(tag_message& msg) {
+MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     // Retail initializes these otherwise-unused /Od frame locals.
     // NOLINTBEGIN(readability-magic-numbers)
     i16 unusedLocal0 = 2, unusedLocal1 = 3, unusedLocal2 = 8, unusedLocal3 = 9;
@@ -1471,9 +1471,9 @@ WidgetDispatchResult RecruitHeroHandler(tag_message& msg) {
     if (shouldClose == 1) {
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00499589, 0x1a7)
@@ -1687,7 +1687,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
 }
 
 VA(0x00499e81, 0x21e)
-WidgetDispatchResult WaitHandler(tag_message& msg) {
+MessageDispatchResult WaitHandler(tag_message& msg) {
     i32 result = 0;
     gbFunctionComplete = true;
     PollSound();
@@ -1756,13 +1756,13 @@ WidgetDispatchResult WaitHandler(tag_message& msg) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0049a09f, 0x472)
-WidgetDispatchResult EventWindowHandler(struct tag_message& msg) {
+MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     i32 type;
     i32 extra;
 
@@ -1776,7 +1776,7 @@ WidgetDispatchResult EventWindowHandler(struct tag_message& msg) {
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
         giDialogTimeout = 0;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
@@ -1982,7 +1982,7 @@ WidgetDispatchResult EventWindowHandler(struct tag_message& msg) {
                         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
                         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
                         giDialogTimeout = 0;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_IGNORED_BUTTON:
                     default:
                         break;
@@ -1992,11 +1992,11 @@ WidgetDispatchResult EventWindowHandler(struct tag_message& msg) {
                 break;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0049a511, 0x1e)
-WidgetDispatchResult TrueFalseDialogHandler(struct tag_message& msg) {
+MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg) {
     return EventWindowHandler(msg);
 }
 

@@ -130,7 +130,7 @@ public:
     inputManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);

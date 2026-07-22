@@ -27,7 +27,7 @@ public:
     );
     virtual ~border() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual WidgetDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);
 };
 #pragma pack(pop)

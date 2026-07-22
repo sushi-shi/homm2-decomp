@@ -38,7 +38,7 @@ public:
     swapManager(class hero*, class hero*);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
-    virtual i32 Main(struct tag_message&) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Reset(void);
     i32 DrawSwapWin(void);
     void DrawSelector(void);

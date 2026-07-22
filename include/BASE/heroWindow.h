@@ -58,7 +58,7 @@ public:
     void Close(void);
     void AddWidget(class widget*, i32);
     void RemoveWidget(class widget*);
-    WidgetDispatchResult BroadcastMessage(struct tag_message&);
+    MessageDispatchResult BroadcastMessage(struct tag_message&);
     void DrawWindow(void);
     void DrawWindow(i32);
     void DrawWindow(i32, i32, i32);

@@ -422,7 +422,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
 }
 
 VA(0x0041e0fb, 0xca3)
-WidgetDispatchResult CastleHandler(tag_message& message) {
+MessageDispatchResult CastleHandler(tag_message& message) {
     i32 result;
     i16 textControl;
     i32 quickFlag;
@@ -471,7 +471,7 @@ WidgetDispatchResult CastleHandler(tag_message& message) {
 
     if (hoverMessage) {
         if (message.payload.widget.id == gpTownManager->m_lastHoverId)
-            return WIDGET_DISPATCH_CONSUME;
+            return MESSAGE_DISPATCH_CONSUME;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         if (formationControl == CONTROL_CAPTAIN_FORMATION_GROUPED) {
             sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
@@ -634,7 +634,7 @@ WidgetDispatchResult CastleHandler(tag_message& message) {
         gpTownManager->m_heroWindow0->DrawWindow(0, CONTROL_STATUS_FIRST, CONTROL_STATUS_TEXT);
         gpWindowManager
             ->UpdateScreenRegion(INTERFACE_X, INTERFACE_Y, INTERFACE_WIDTH, INTERFACE_HEIGHT);
-        return WIDGET_DISPATCH_CONSUME;
+        return MESSAGE_DISPATCH_CONSUME;
     }
 
     if (message.type == MESSAGE_WIDGET) {
@@ -776,10 +776,10 @@ WidgetDispatchResult CastleHandler(tag_message& message) {
 
 selection_done:
     if (result == 0)
-        return WIDGET_DISPATCH_CONSUME;
+        return MESSAGE_DISPATCH_CONSUME;
     message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
     message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-    return WIDGET_DISPATCH_FORWARD;
+    return MESSAGE_DISPATCH_FORWARD;
 }
 
 // Retail castle building-slot order payload.

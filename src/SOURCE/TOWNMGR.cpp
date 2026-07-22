@@ -131,9 +131,7 @@ H2_ENUM_BEGIN(TownMainConstant)
     MARKETPLACE_EFFICIENCY_MAX_INDEX = KB_TRADING_POST_EFFICIENCY_COUNT - 1,
     TOWN_REDRAW_FIRST_CONTROL        = 136,
     TOWN_REDRAW_LAST_CONTROL         = 137,
-    TOWN_VIEWPORT_HEIGHT             = TOWN_GARRISON_STRIP_Y,
-    TOWN_MAIN_CONTINUE               = 1,
-    TOWN_MAIN_EXIT                   = 2
+    TOWN_VIEWPORT_HEIGHT             = TOWN_GARRISON_STRIP_Y
 H2_ENUM_END(TownMainConstant)
 
 H2_ENUM_BEGIN(TownSplitConstant)
@@ -1217,7 +1215,7 @@ void townManager::ShowText(char*) {
 }
 
 VA(0x0041595d, 0x1830)
-i32 townManager::Main(tag_message& message) {
+MessageDispatchResult townManager::Main(tag_message& message) {
     char description_b[BUILDING_DESCRIPTION_CAPACITY];
     i32 exitTown_i = 0;
     i32 quickView_k = (HAS(static_cast<MessageModifier>(message.payload.widget.parameter), MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
@@ -1801,11 +1799,11 @@ i32 townManager::Main(tag_message& message) {
             gpWindowManager->ConvertToHover(message);
             if (message.payload.hover.id == m_lastHoverId
                 && message.payload.hover.subId == m_lastHoverSubId)
-                return 1;
+                return MESSAGE_DISPATCH_CONSUME;
             m_lastHoverId = message.payload.hover.id;
             m_lastHoverSubId = message.payload.hover.subId;
             SetCommandAndText(message);
-            return 1;
+            return MESSAGE_DISPATCH_CONSUME;
 
         case MESSAGE_KEY_UP:
             switch (message.payload.keyboard.keyCode) {
@@ -1833,9 +1831,9 @@ i32 townManager::Main(tag_message& message) {
     if (exitTown_i == 1) {
         message.type = MESSAGE_EXECUTIVE;
         message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-        return TOWN_MAIN_EXIT;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return TOWN_MAIN_CONTINUE;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0041718d, 0x4e3)
@@ -2653,7 +2651,7 @@ void townManager::SetupMage(heroWindow* window) {
 }
 
 VA(0x00419393, 0x190)
-WidgetDispatchResult MageGuildHandler(tag_message& message) {
+MessageDispatchResult MageGuildHandler(tag_message& message) {
     i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
     i16 unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
     i16 unusedFirstDescription_l = TOWN_MAGE_FIRST_DESCRIPTION_CONTROL;
@@ -2688,7 +2686,7 @@ WidgetDispatchResult MageGuildHandler(tag_message& message) {
                     level = spellSlot / TOWN_MAGE_SPELLS_PER_LEVEL;
                     slot_p = spellSlot % TOWN_MAGE_SPELLS_PER_LEVEL;
                     if (level[gpTownManager->m_town->m_spellCounts + 1] <= slot_p)
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     spell = gpTownManager->m_town->m_spells[level][slot_p];
                     NormalDialog(
                         gSpellDesc[IDX(spell)],
@@ -2702,7 +2700,7 @@ WidgetDispatchResult MageGuildHandler(tag_message& message) {
                         -1,
                         0
                     );
-                    return WIDGET_DISPATCH_CONSUME;
+                    return MESSAGE_DISPATCH_CONSUME;
                 }
         }
     }
@@ -2856,7 +2854,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
 }
 
 VA(0x00419c29, 0x153)
-WidgetDispatchResult TavernHandler(tag_message& message) {
+MessageDispatchResult TavernHandler(tag_message& message) {
     i32 unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
     i16 unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
 
@@ -2870,7 +2868,7 @@ WidgetDispatchResult TavernHandler(tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
                         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
                 }
@@ -2891,7 +2889,7 @@ WidgetDispatchResult TavernHandler(tag_message& message) {
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
         glTimers[0] = static_cast<i32>(KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY);
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x00419d7c, 0x110)
@@ -2918,7 +2916,7 @@ void townManager::DoTavern(void) {
 }
 
 VA(0x00419e8c, 0x328)
-WidgetDispatchResult SplitArmyHandler(tag_message& message) {
+MessageDispatchResult SplitArmyHandler(tag_message& message) {
     i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
     i16 minusButton = TOWN_SPLIT_DECREASE_CONTROL;
     i16 amountControl = TOWN_SPLIT_AMOUNT_CONTROL;
@@ -2975,9 +2973,9 @@ WidgetDispatchResult SplitArmyHandler(tag_message& message) {
     if (handled == 1) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 
 update_amount:
     sprintf(gText, "%d", gpTownManager->m_splitAmount);
@@ -2988,7 +2986,7 @@ update_amount:
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
     gpTownManager->m_heroWindow1
         ->DrawWindow(1, TOWN_SPLIT_AMOUNT_CONTROL, TOWN_SPLIT_AMOUNT_CONTROL);
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0041a1b4, 0x5cf)

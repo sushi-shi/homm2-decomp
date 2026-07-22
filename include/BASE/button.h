@@ -49,10 +49,10 @@ public:
     );
     __declspec(dllexport) virtual inline ~button() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
-    virtual WidgetDispatchResult Main(struct tag_message& message) OVERRIDE;
+    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
     void Read(void);
-    H2_ENUM_RETURN(WidgetDispatchResult, i16) Select(struct tag_message& message);
-    H2_ENUM_RETURN(WidgetDispatchResult, i16) Deselect(struct tag_message& message);
+    H2_ENUM_RETURN(MessageDispatchResult, i16) Select(struct tag_message& message);
+    H2_ENUM_RETURN(MessageDispatchResult, i16) Deselect(struct tag_message& message);
 };
 #pragma pack(pop)
 SIZE(button, 0x30);

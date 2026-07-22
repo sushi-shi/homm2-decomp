@@ -62,7 +62,7 @@ VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
 VA(0x004ddee0, 0x2f4)
-WidgetDispatchResult widget::Main(tag_message& message) {
+MessageDispatchResult widget::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE: {
             i16 x = static_cast<i16>(message.payload.mouse.x);
@@ -74,7 +74,7 @@ WidgetDispatchResult widget::Main(tag_message& message) {
             if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
                 break;
             message.payload.hover.id = m_id;
-            return WIDGET_DISPATCH_FORWARD;
+            return MESSAGE_DISPATCH_FORWARD;
         }
 
         case MESSAGE_WIDGET:
@@ -87,7 +87,7 @@ WidgetDispatchResult widget::Main(tag_message& message) {
                         i16 x = m_x + static_cast<i16>(m_owner->m_posX);
                         i16 y = m_y + static_cast<i16>(m_owner->m_posY);
                         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
-                        return WIDGET_DISPATCH_CONTINUE;
+                        return MESSAGE_DISPATCH_CONTINUE;
                     }
                     break;
 
@@ -95,7 +95,7 @@ WidgetDispatchResult widget::Main(tag_message& message) {
                     if (m_id == message.payload.widget.id) {
                         if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
-                            return WIDGET_DISPATCH_CONSUME;
+                            return MESSAGE_DISPATCH_CONSUME;
                         }
                         WidgetFlag flags = m_flags
                             | static_cast<WidgetFlag>(message.payload.widget.data.value);
@@ -124,7 +124,7 @@ WidgetDispatchResult widget::Main(tag_message& message) {
                             );
                             m_flags &= ~WIDGET_FLAG_UPDATE;
                         }
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
@@ -133,7 +133,7 @@ WidgetDispatchResult widget::Main(tag_message& message) {
                         i32 rawFlags = message.payload.widget.data.value;
                         if (rawFlags == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
-                            return WIDGET_DISPATCH_CONSUME;
+                            return MESSAGE_DISPATCH_CONSUME;
                         }
                         WidgetFlag flags = static_cast<WidgetFlag>(rawFlags);
                         m_flags &= ~flags;
@@ -146,34 +146,34 @@ WidgetDispatchResult widget::Main(tag_message& message) {
                                 m_width,
                                 m_height
                             );
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_X:
                     if (m_id == message.payload.widget.id) {
                         m_x = static_cast<i16>(message.payload.widget.data.value);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_Y:
                     if (m_id == message.payload.widget.id) {
                         m_y = static_cast<i16>(message.payload.widget.data.value);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_WIDTH:
                     if (m_id == message.payload.widget.id) {
                         m_width = static_cast<i16>(message.payload.widget.data.value);
-                        return WIDGET_DISPATCH_CONSUME;
+                        return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
             }
             break;
     }
-    return WIDGET_DISPATCH_CONTINUE;
+    return MESSAGE_DISPATCH_CONTINUE;
 }
 
 VA(0x004de1e0, 0x47)

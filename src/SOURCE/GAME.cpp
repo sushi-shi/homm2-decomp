@@ -3077,7 +3077,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
 VA(0x00479856, 0x1e2)
 SpellType
 game::ViewSpells(
-    hero* spellHero, HeroSpellType spellType, WidgetMessageHandler callback, i32 readOnly
+    hero* spellHero, HeroSpellType spellType, MessageDispatchHandler callback, i32 readOnly
 ) {
     tag_message message;
 
@@ -3228,13 +3228,13 @@ void game::UpdateSpellWidgets(void) {
 }
 
 VA(0x00479e3b, 0x692)
-WidgetDispatchResult ViewSpellsHandler(tag_message& msg) {
+MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
 
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         gpWindowManager->ConvertToHover(msg);
         if (msg.payload.hover.id == gpWindowManager->m_lastHoverId) {
-            return WIDGET_DISPATCH_CONSUME;
+            return MESSAGE_DISPATCH_CONSUME;
         } else {
             return gpGame->m_viewSpellsCallback(msg);
         }
@@ -3432,7 +3432,7 @@ WidgetDispatchResult ViewSpellsHandler(tag_message& msg) {
                                     -1,
                                     0
                                 );
-                                return WIDGET_DISPATCH_CONSUME;
+                                return MESSAGE_DISPATCH_CONSUME;
                             }
                             if (GetManaCost(spell, viewSpellsHero)
                                 > viewSpellsHero->m_spellPoints) {
@@ -3446,11 +3446,11 @@ WidgetDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 NormalDialog(
                                     gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0
                                 );
-                                return WIDGET_DISPATCH_CONTINUE;
+                                return MESSAGE_DISPATCH_CONTINUE;
                             }
                             gpGame->m_viewSpell = spell;
                             msg.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                            return WIDGET_DISPATCH_FORWARD;
+                            return MESSAGE_DISPATCH_FORWARD;
                     }
                 }
                 break;
@@ -3460,17 +3460,17 @@ WidgetDispatchResult ViewSpellsHandler(tag_message& msg) {
 
         if (msg.payload.widget.id == VIEW_SPELL_CLOSE_ID) {
             msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-            return WIDGET_DISPATCH_FORWARD;
+            return MESSAGE_DISPATCH_FORWARD;
         }
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0047a4cd, 0x17c)
-WidgetDispatchResult ViewSpecialHandler(tag_message& msg) {
+MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
-            return WIDGET_DISPATCH_CONSUME;
+            return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = msg.payload.hover.id;
         switch (msg.payload.hover.id) {
             case VIEW_SPELL_PREVIOUS_ID:
@@ -3503,9 +3503,9 @@ WidgetDispatchResult ViewSpecialHandler(tag_message& msg) {
                 break;
         }
         HeroMessageUpdate(gText);
-        return WIDGET_DISPATCH_CONSUME;
+        return MESSAGE_DISPATCH_CONSUME;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0047a649, 0xc86)
@@ -3823,7 +3823,7 @@ void game::ViewArmy(
 }
 
 VA(0x0047b2cf, 0x3f5)
-WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
+MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
     ResourceType resourceType0;
     i32 resourceCost5;
@@ -3842,7 +3842,7 @@ WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                         msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-                        return WIDGET_DISPATCH_FORWARD;
+                        return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
                             const_cast<char*>("Are you sure you want to dismiss this army?"),
@@ -3860,7 +3860,7 @@ WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
                             gbDismissArmy = true;
                             msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                             msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
-                            return WIDGET_DISPATCH_FORWARD;
+                            return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
                     case VIEW_ARMY_UPGRADE_ACTION_ID:
@@ -3905,7 +3905,7 @@ WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
                                 msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                                 msg.payload.widget.command =
                                     BaseWidgetCommand(msg.payload.widget.id);
-                                return WIDGET_DISPATCH_FORWARD;
+                                return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
                             NormalDialog(
@@ -3952,7 +3952,7 @@ WidgetDispatchResult ViewArmyHandler(tag_message& msg) {
                   / sViewArmyMonFrameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
         );
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 VA(0x0047b6c4, 0x671)

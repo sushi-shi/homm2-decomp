@@ -289,7 +289,7 @@ void SetupNewTrade(void) {
 }
 
 VA(0x004bfcbb, 0x3b6)
-WidgetDispatchResult TradingPostHandler(struct tag_message& message) {
+MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
     i32 updateDisplay = 0;
     i32 resourceData;
@@ -388,9 +388,9 @@ WidgetDispatchResult TradingPostHandler(struct tag_message& message) {
     if (exitFlag) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-        return WIDGET_DISPATCH_FORWARD;
+        return MESSAGE_DISPATCH_FORWARD;
     }
-    return WIDGET_DISPATCH_CONSUME;
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 DATA(0x0051d9d0) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
