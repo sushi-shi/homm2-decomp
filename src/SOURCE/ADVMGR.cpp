@@ -8759,7 +8759,11 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         ROUTE_PATH_COST_LIMIT
     );
     if (gpSearchArray->m_pathLength > 0 && pathFound5 > 0) {
-        memset(m_visibilityMap, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(*m_visibilityMap));
+        memset(
+            m_visibilityMap,
+            0,
+            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * sizeof(*m_visibilityMap)
+        );
         m_visibilityMapValid = 1;
         remainingMobility2 = currentHero0->m_remainingMobility;
         routeX1 = currentHero0->m_x;
