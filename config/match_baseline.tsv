@@ -206,7 +206,7 @@ BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	100.0000	e2bd1038a70f
 BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	100.0000	f36c146e2cab
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	100.0000	89469517e98a
 BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	7ebae2079855
-BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	91.3716	7a9e0d9e1180
+BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	95.4595	7a9e0d9e1180
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	94.0482	726d44a910aa
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	dd72828a17e3
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.7333	9f6ec1136f50
@@ -222,7 +222,7 @@ BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	98.3333	eab5d9a90dbb
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	f58301bc96e4
 BASE/Misc	?FindStringInString@@YIPADPAD0@Z	98.6000	fc35ef3ab6a6
 BASE/Misc	?FindToken@@YIPADPADD@Z	99.6552	8628e536dfbc
-BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	cf07d8648c5c
+BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	925348162363
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	b037247edc8b
 BASE/Misc	?InitMemEntry@@YIXXZ	100.0000	c5947b61c623
 BASE/Misc	?IsCDDrive@@YIHH@Z	100.0000	af3039a3900c
@@ -304,12 +304,12 @@ BASE/TEXTWDGT	?SetText@textWidget@@QAEXPAD@Z	96.1290	26257eb295eb
 BASE/TILE	_TileToBitmap	100.0000	4c92a0567d35
 BASE/TILESET	??0tileset@@QAE@K@Z	100.0000	19730d03b381
 BASE/TILESET	??1tileset@@UAE@XZ	100.0000	8afda7fbf75c
-BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	0e1ba4e600e8
+BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	30d7a00ded1e
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	8e0b611ea549
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	b69d22a3f592
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	8f55fa1b3dac
 BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	99.7955	dc9792c53a47
-BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	3859132f040d
+BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	6588e8f96d88
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	100.0000	7e8c231abf9b
 BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	100.0000	5646c40cb889
 BASE/WIDGET	??0widget@@QAE@XZ	100.0000	66d0ca65d534
@@ -442,7 +442,7 @@ SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	113bdc258cdb
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	bb736892e4b6
 SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	99.8370	fd42bdf03c53
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	fb49c92a6a6c
-SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	99.0848	04649b362bc0
+SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	99.0848	f590f6515b58
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHH@Z	100.0000	e3655562a8de
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	98.7009	20bbaa390993
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXH@Z	100.0000	51da8a03dd11

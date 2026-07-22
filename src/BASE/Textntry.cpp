@@ -72,7 +72,7 @@ textEntryWidget::textEntryWidget(
     i16 iconFrame,
     i16 id,
     H2_ENUM_PARAM(WidgetKind, i16) kind,
-    i16 layout,
+    H2_ENUM_PARAM(TextEntryLayout, i16) layout,
     i32 horizontalInset,
     i32 verticalInset
 )
@@ -113,7 +113,7 @@ textEntryWidget::~textEntryWidget() {
 }
 
 VA(0x004d8920, 0x26c)
-void textEntryWidget::Read(i32 type) {
+void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -135,7 +135,7 @@ void textEntryWidget::Read(i32 type) {
     gpResourceManager->SavePosition();
     m_icon = gpResourceManager->GetIcon(resourceName);
     gpResourceManager->RestorePosition();
-    m_entryType = static_cast<i16>(type);
+    m_entryType = type;
     if (type == TEXT_ENTRY_READ_RECT) {
         m_rectX = gpResourceManager->ReadWord();
         m_rectY = gpResourceManager->ReadWord();
