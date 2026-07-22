@@ -30,7 +30,7 @@ public:
         H2_ENUM_PARAM(WidgetKind, i16) kind,
         H2_ENUM_PARAM(FontAlignment, i16) alignment
     );
-    virtual ~textWidget() OVERRIDE;
+    __declspec(dllexport) virtual inline ~textWidget() OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);
