@@ -230,51 +230,45 @@ for private in private_rows:
     private_procs.append((va,private.size,private.mangled_name,private.unit,
                           "source-private-static",private.name,private.location))
 
-# Reviewed public span overrides and other procedures not recoverable from source
-# are admitted through these manifests. No address is inferred from padding,
-# jump-table bytes, or a source-only label.
-validated_procs=[]
-procedure_manifests=[
-    (os.path.join(REPO,"config","delink_procedures.csv"),False),
-    (os.path.join(REPO,"config","library_labels.csv"),True),
-]
-for vp,is_fid in procedure_manifests:
-  if os.path.exists(vp):
+# Runtime-library functions are admitted only through the verified FID database.
+# Source-private and compiler-generated functions are derived above.
+validated_functions=[]
+vp=os.path.join(REPO,"config","library_labels.csv")
+if os.path.exists(vp):
     import csv
     with open(vp,newline="") as vf:
         rows=(ln for ln in vf if not ln.lstrip().startswith("#"))
         for row in csv.DictReader(rows):
             rva=int(row["rva"],16); va=imgbase+rva; size=int(row["size"],16)
-            name=row["name"].strip() or ("delink_proc_%08x"%rva)
+            name=row["name"].strip()
             unit=row["unit"].strip()
-            proof=(("fid-%s-%s"%(row["library"].lower(),row["source"]))
-                   if is_fid else row["provenance"].strip())
+            proof="fid-%s-%s"%(row["library"].lower(),row["source"])
             if size<=0 or not name or not unit or not proof:
-                raise SystemExit("invalid delink procedure row at 0x%x"%rva)
+                raise SystemExit("invalid runtime FID row at 0x%x"%rva)
             if sec_of(rva)!=".text":
-                raise SystemExit("delink procedure outside .text: 0x%x"%rva)
+                raise SystemExit("runtime FID function outside .text: 0x%x"%rva)
             contribution_unit=unit_of(which(va))
             if contribution_unit!=unit:
-                raise SystemExit("delink procedure 0x%x belongs to %s, not %s"%
+                raise SystemExit("runtime FID function 0x%x belongs to %s, not %s"%
                                  (rva,contribution_unit,unit))
-            validated_procs.append((va,size,name,unit,"validated-"+proof))
+            validated_functions.append((va,size,name,unit,"validated-"+proof))
 for va,size,name,unit,proof,_,_ in private_procs:
-    validated_procs.append((va,size,name,unit,proof))
+    validated_functions.append((va,size,name,unit,proof))
 for va,size,name,unit,proof,_,_,_,_ in compgen_procs:
-    validated_procs.append((va,size,name,unit,proof))
+    validated_functions.append((va,size,name,unit,proof))
 seen=set()
-for va,size,name,unit,proof in sorted(validated_procs):
+for va,size,name,unit,proof in sorted(validated_functions):
     key=(va,name)
     if key in seen:
-        raise SystemExit("duplicate delink procedure: 0x%x %s"%(va-imgbase,name))
+        raise SystemExit("duplicate reviewed function: 0x%x %s"%(va-imgbase,name))
     seen.add(key)
     o=va2off(va); body=d[o:o+size] if o is not None else b""
     if len(body)!=size or body[:1] in (b"\xcc",b"\x90"):
-        raise SystemExit("delink procedure is padding/truncated: 0x%x %s"%(va-imgbase,name))
-spans=sorted((va,va+size,name) for va,size,name,_,_ in validated_procs)
+        raise SystemExit("reviewed function is padding/truncated: 0x%x %s"%(va-imgbase,name))
+spans=sorted((va,va+size,name) for va,size,name,_,_ in validated_functions)
 for (_,end,name),(start2,_,name2) in zip(spans,spans[1:]):
     if start2<end:
-        raise SystemExit("overlapping delink procedures: %s and %s"%(name,name2))
+        raise SystemExit("overlapping reviewed functions: %s and %s"%(name,name2))
 
 # ---- per-TU optimization level (empirical, from the PE itself) -------------
 # Retail optimization is PER-COMPILAND, not uniform /Od: the basewin.lib UI
@@ -322,7 +316,7 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
     procs_by_va=defaultdict(list)
     for rec in proc_records: procs_by_va[rec[0]].append(rec)
     validated_by_key={(va,name):(size,unit,proof)
-                      for va,size,name,unit,proof in validated_procs}
+                      for va,size,name,unit,proof in validated_functions}
     emitted=set()
     for va,raw in pubs:
         im=which(va); unit=unit_of(im)
@@ -358,7 +352,7 @@ with open(os.path.join(REPO,"build","gen","symbol_names.csv"),"w") as f:
         if (va,raw) in emitted: continue
         f.write(f"0x{va-imgbase:x},{raw},{unit_of(im)},0x{size:x},func,{provenance}\n")
         emitted.add((va,raw)); n_func+=1
-    for va,size,raw,unit,provenance in sorted(validated_procs):
+    for va,size,raw,unit,provenance in sorted(validated_functions):
         if (va,raw) in emitted: continue           # reviewed same-RVA size override
         f.write(f"0x{va-imgbase:x},{raw},{unit},0x{size:x},func,{provenance}\n")
         emitted.add((va,raw)); n_func+=1
