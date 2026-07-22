@@ -110,6 +110,32 @@ class TuStateNoiseTests(unittest.TestCase):
                 self.assertTrue(headers)
                 self.assertTrue(set(headers) <= set(noise.CURATED_INCLUDES))
 
+    def test_declaration_trains_cover_requested_range(self):
+        variants = noise.make_variants(6, ("typedef",), 123, max_declarations=4)
+        self.assertEqual(
+            [variant.body.count("typedef ") for variant in variants],
+            [1, 2, 3, 4, 1, 2],
+        )
+
+    def test_target_state_identity_covers_bytes_relocations_and_boundary(self):
+        base = {
+            "objdiff_size": 4,
+            "text_sha": "text",
+            "reloc_stream": ["00000001:0006:$SG123:00000000"],
+        }
+        self.assertEqual(noise.target_state_identity(base), noise.target_state_identity(dict(base)))
+        for key, value in (
+            ("objdiff_size", 5),
+            ("text_sha", "other-text"),
+            ("reloc_stream", ["00000002:0006:$SG123:00000000"]),
+        ):
+            changed = dict(base)
+            changed[key] = value
+            self.assertNotEqual(noise.target_state_identity(base), noise.target_state_identity(changed))
+        renumbered = dict(base)
+        renumbered["reloc_stream"] = ["00000001:0006:$SG999:00000000"]
+        self.assertEqual(noise.target_state_identity(base), noise.target_state_identity(renumbered))
+
     def test_temporary_source_restores_byte_identically_after_exception(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "unit.cpp"

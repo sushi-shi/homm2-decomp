@@ -62,6 +62,7 @@ CURATED_INCLUDES = (
     "<BASE/IconEntry.h>", "<BASE/WINMGR.h>",
 )
 DEFAULT_COMPILE_TIMEOUT_SECONDS = 120.0
+DEFAULT_MAX_DECLARATIONS = 64
 PROCESS_GROUP_TERMINATION_GRACE_SECONDS = 1.0
 
 
@@ -92,6 +93,13 @@ def positive_seconds(value: str) -> float:
     if not math.isfinite(seconds) or seconds <= 0:
         raise argparse.ArgumentTypeError("timeout must be a positive finite number")
     return seconds
+
+
+def positive_count(value: str) -> int:
+    count = parse_int(value)
+    if count <= 0:
+        raise argparse.ArgumentTypeError("count must be positive")
+    return count
 
 
 @dataclass(frozen=True)
@@ -155,6 +163,7 @@ _INCLUDE_DIRECTIVE = re.compile(r'^\s*#\s*include\s*[<"]([^>"]+)[>"]', re.M)
 _DEFINE_DIRECTIVE = re.compile(r'^\s*#\s*define\s+([A-Za-z_]\w*)', re.M)
 _IDENTIFIER = re.compile(r'\b[A-Za-z_]\w*\b')
 _VA_MARKER_LINE = re.compile(r'^[ \t]*VA\(0x[0-9a-f]+,', re.M | re.I)
+_COMPILER_PRIVATE_COUNTER = re.compile(r'(\$(?:SG|T))\d+')
 
 
 def logical_line_at(text: str, offset: int) -> int:
@@ -293,7 +302,12 @@ def resolve_target(root: Path, source_arg: Path, requested_rva: int) -> tuple[Ta
     ), cfg["flags"]
 
 
-def make_variants(count: int, families: Iterable[str], seed: int) -> list[Variant]:
+def make_variants(
+    count: int,
+    families: Iterable[str],
+    seed: int,
+    max_declarations: int = DEFAULT_MAX_DECLARATIONS,
+) -> list[Variant]:
     selected = tuple(families)
     unknown = sorted(set(selected) - set(ALL_FAMILIES))
     if unknown:
@@ -306,7 +320,10 @@ def make_variants(count: int, families: Iterable[str], seed: int) -> list[Varian
         family = selected[(trial - 1) % len(selected)]
         tag = f"{seed:08x}-{trial:04d}-{rng.getrandbits(32):08x}"
         ident = f"HOMM2_TU_STATE_PROBE_{tag.replace('-', '_').upper()}"
-        repeat = 1 + rng.randrange(4)
+        # Walk the complete declaration-train range instead of sampling only a
+        # few short blocks. Old MSVC front-end state can remain unchanged for
+        # several declarations and then flip at a later counter value.
+        repeat = 1 + ((trial - 1) % max_declarations)
         aliases = "".join(
             f"typedef {rng.choice(SAFE_SCALAR_TYPES)} {ident}_ALIAS_{i};\n"
             for i in range(repeat)
@@ -620,6 +637,26 @@ def object_metrics(path: Path) -> dict[str, dict]:
     }
 
 
+def normalized_relocation_stream(metrics: dict) -> list[str]:
+    """Hide unstable compiler-private counters while preserving relocation topology."""
+    return [
+        _COMPILER_PRIVATE_COUNTER.sub(r"\1#", relocation)
+        for relocation in metrics.get("reloc_stream", [])
+    ]
+
+
+def target_state_identity(metrics: dict) -> str:
+    """Identify codegen state without treating private label counters as new states."""
+    normalized_reloc_sha = sha256_bytes(
+        "\n".join(normalized_relocation_stream(metrics)).encode("utf-8")
+    )[:16]
+    payload = (
+        f"{metrics.get('objdiff_size')}\n{metrics.get('text_sha')}\n"
+        f"{normalized_reloc_sha}\n"
+    )
+    return sha256_bytes(payload.encode("utf-8"))[:16]
+
+
 def exact_closure_rejections(
     score: float,
     candidate_size: int | None,
@@ -795,10 +832,24 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--seed", type=parse_int, default=0x484F4D32)
     parser.add_argument(
+        "--max-declarations", type=positive_count, default=DEFAULT_MAX_DECLARATIONS,
+        help=(
+            "largest deterministic typedef/extern/static-data/prototype train "
+            f"(default: {DEFAULT_MAX_DECLARATIONS})"
+        ),
+    )
+    parser.add_argument(
         "--families", default=",".join(DEFAULT_FAMILIES),
         help=f"comma-separated subset of {','.join(DEFAULT_FAMILIES)}",
     )
     parser.add_argument("--output", type=Path, help="artifact directory (default: build/tu-state-noise/...)")
+    parser.add_argument(
+        "--state-summary", type=Path,
+        help=(
+            "write a compact reproducible JSON census of unique target byte/relocation "
+            "states even when no exact closure is found"
+        ),
+    )
     parser.add_argument("--dry-run", action="store_true", help="resolve target and emit snippets without compiling")
     parser.add_argument(
         "--record-max", action="store_true",
@@ -814,7 +865,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         target, flags = resolve_target(root, args.source, args.rva)
         families = tuple(item.strip() for item in args.families.split(",") if item.strip())
-        variants = make_variants(args.trials, families, args.seed)
+        variants = make_variants(args.trials, families, args.seed, args.max_declarations)
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
 
@@ -974,6 +1025,43 @@ def main(argv: list[str] | None = None) -> int:
         flush=True,
     )
 
+    observed_states = {}
+
+    def observe_state(label: str, score: float, metrics: dict, variant: Variant | None = None):
+        state_id = target_state_identity(metrics)
+        state = observed_states.setdefault(
+            state_id,
+            {
+                "state": state_id,
+                "text_sha": metrics["text_sha"],
+                "normalized_reloc_sha": sha256_bytes(
+                    "\n".join(normalized_relocation_stream(metrics)).encode("utf-8")
+                )[:16],
+                "raw_reloc_detail_shas": [],
+                "objdiff_size": metrics.get("objdiff_size"),
+                "relocs": metrics["relocs"],
+                "score": score,
+                "occurrences": 0,
+                "baseline": False,
+                "representative": None,
+            },
+        )
+        state["occurrences"] += 1
+        if metrics["reloc_detail_sha"] not in state["raw_reloc_detail_shas"]:
+            state["raw_reloc_detail_shas"].append(metrics["reloc_detail_sha"])
+        if label == "baseline":
+            state["baseline"] = True
+        elif state["representative"] is None and variant is not None:
+            state["representative"] = {
+                "trial": variant.trial,
+                "family": variant.family,
+                "tag": variant.tag,
+                "body": variant.body,
+            }
+        return state_id
+
+    observe_state("baseline", baseline_score, baseline_target)
+
     best_observed = None
     exact_closure = None
     rows = []
@@ -1061,6 +1149,7 @@ def main(argv: list[str] | None = None) -> int:
                     trial["score"] = score
                     trial["score_delta"] = score - baseline_score
                     trial["candidate"] = target_metrics
+                    trial["state"] = observe_state("trial", score, target_metrics, variant)
                     with measure_stage(timings, "regression_gates"):
                         trial["rejections"].extend(
                             _regressions(baseline_scores, scores, target.symbol)
@@ -1128,6 +1217,41 @@ def main(argv: list[str] | None = None) -> int:
     (output / "trials.tsv").write_text(
         "trial\tfamily\tscore\tdelta\teligible\trejections\n" + "".join(rows)
     )
+    state_rows = sorted(observed_states.values(), key=lambda row: (not row["baseline"], row["state"]))
+    manifest["target_states"] = state_rows
+    print(f"target states: {len(state_rows)} unique byte/relocation states", flush=True)
+    for index, state in enumerate(state_rows, 1):
+        representative = state["representative"]
+        source = "baseline" if state["baseline"] else f"trial {representative['trial']}"
+        print(
+            f"  state {index:02d} {state['state']}: {source}; occurrences={state['occurrences']} "
+            f"score={state['score']:.6f}% size={state['objdiff_size']} "
+            f"text={state['text_sha']} relocs={state['normalized_reloc_sha']} "
+            f"raw-label-spellings={len(state['raw_reloc_detail_shas'])}",
+            flush=True,
+        )
+    if args.state_summary:
+        state_summary_path = (
+            (root / args.state_summary).resolve()
+            if not args.state_summary.is_absolute()
+            else args.state_summary
+        )
+        state_summary_path.parent.mkdir(parents=True, exist_ok=True)
+        state_summary_path.write_text(
+            json.dumps(
+                {
+                    "schema": 1,
+                    "source": str(source_rel),
+                    "target": manifest["target"],
+                    "seed": args.seed,
+                    "families": families,
+                    "max_declarations": args.max_declarations,
+                    "states": state_rows,
+                },
+                indent=2,
+            )
+            + "\n"
+        )
     if best_observed is not None:
         manifest["best_observed_disposable"] = {
             "trial": best_observed["trial"],

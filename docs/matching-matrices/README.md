@@ -16,6 +16,19 @@ whole-source-file SHA-256<TAB>focused function match percentage
 Newer matrices add a third `outcome` column. Always follow the file's header; the outcome records
 whether all pins held or names the raw pin/review that rejected the state.
 
+## SOURCE/GAME SetupOrigData compiler-state census
+
+`game-setuporigdata-tu-state-39240.tsv` records a deterministic 1-through-128 typedef-train
+sweep before `game::SetupOrigData` at normalized source hash `39240dddfbe6`. It finds three
+meaningful target states: the canonical 2888-byte shape, an intermediate 2886-byte shape, and a
+2882-byte high shape. None is exact. A raw relocation-name census misleadingly produced 129 rows
+because each disposable declaration train renumbered private `$SG`/`$T` labels; normalizing only
+those numeric counters collapses the run to the three actual byte/relocation-topology states.
+
+The matrix records the complete declaration-count partition and representative counts 15, 14,
+and 1, so later work can reproduce and disassemble all three states without repeating 128 builds.
+No generated declaration or unnatural reversed-subscript expression is retained in game source.
+
 Before replaying a source state, compare its hash here and confirm the canonical source and pinned
 sibling hashes have not changed. A listed hash should not be rebuilt under the same compiler/header
 state.
