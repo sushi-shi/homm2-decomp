@@ -1455,15 +1455,17 @@ void combatManager::MeteorShower(i32 targetHex) {
     army* target_k = &m_armies[IDX(m_currentSide)][0] + m_currentArmyIndex;
     i32 affectedHexes_f[SPELL_METEOR_AFFECTED_HEX_COUNT];
     affectedHexes_f[0] = targetHex;
-    CombatHexDirection adjacentDirection;
+    // Retail reuses this integer counter for adjacency, animation-pass, and affected-hex loops.
     i32 direction;
-    i32 frame;
-    for (adjacentDirection = COMBAT_DIRECTION_NORTHEAST;
-         IDX(adjacentDirection) < SPELL_ADJACENT_DIRECTION_COUNT;
-         ++adjacentDirection) {
-        affectedHexes_f[IDX(adjacentDirection) + 1] =
-            GetAdjacentCellIndexNoArmy(targetHex, adjacentDirection);
+    for (direction = IDX(COMBAT_DIRECTION_NORTHEAST);
+         direction < SPELL_ADJACENT_DIRECTION_COUNT;
+         ++direction) {
+        affectedHexes_f[direction + 1] = GetAdjacentCellIndexNoArmy(
+            targetHex,
+            static_cast<CombatHexDirection>(direction)
+        );
     }
+    i32 frame;
 
     if (!gbNoShowCombat) {
         icon* meteorIcon = gpResourceManager->GetIcon("meteor.icn");
