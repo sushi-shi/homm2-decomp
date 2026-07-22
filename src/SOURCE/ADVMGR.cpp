@@ -51,6 +51,21 @@
 #include <stdlib.h>
 #include <string.h>
 
+H2_ENUM_CLASS_BEGIN(AdventureSystemOption)
+    SYSTEM_OPTION_MUSIC_VOLUME   = 10,
+    SYSTEM_OPTION_SOUND_VOLUME   = 11,
+    SYSTEM_OPTION_HERO_SPEED     = 12,
+    SYSTEM_OPTION_MUSIC_SOURCE   = 13,
+    SYSTEM_OPTION_SHOW_ROUTE     = 14,
+    SYSTEM_OPTION_COMPUTER_SPEED = 15,
+    SYSTEM_OPTION_INTERFACE      = 16,
+    SYSTEM_OPTION_VIDEO          = 17,
+    SYSTEM_OPTION_COLOR_CURSOR   = 18,
+    SYSTEM_OPTION_FIRST          = SYSTEM_OPTION_MUSIC_VOLUME,
+    SYSTEM_OPTION_LAST           = SYSTEM_OPTION_COLOR_CURSOR,
+    SYSTEM_OPTION_COUNT          = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1
+H2_ENUM_CLASS_END(AdventureSystemOption)
+
 H2_ENUM_BEGIN(AdventureScreenConstant)
     SCREEN_WIDTH     = 640,
     SCREEN_HEIGHT    = 480,
@@ -10080,21 +10095,21 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_VOLUME);
     message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SOUND_VOLUME;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
     if (gConfig.soundVolume == CONFIG_VOLUME_MUTED) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     } else {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_HERO_SPEED;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
     message.payload.widget.data.value =
         IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
@@ -10105,11 +10120,11 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.data.value =
         IDX(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_SHOW_ROUTE;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_SHOW_ROUTE);
     message.payload.widget.data.value =
         (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.value =
             IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
@@ -10117,15 +10132,15 @@ void UpdateSystemOptions(i32 initialDraw) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_INTERFACE;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
     message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_VIDEO;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO);
     message.payload.widget.data.value =
         ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE + (gConfig.slowVideo != 0);
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = ADVMGR_SYSTEM_OPTION_COLOR_CURSOR;
+    message.payload.widget.id = IDX(SYSTEM_OPTION_COLOR_CURSOR);
     message.payload.widget.data.value =
         gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
@@ -10133,27 +10148,27 @@ void UpdateSystemOptions(i32 initialDraw) {
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     } else {
@@ -10161,15 +10176,15 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(ADVMGR_SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        IDX(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text =
         cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(message);
@@ -10196,9 +10211,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                 if (message.payload.widget.id == SYSTEM_OPTIONS_DIALOG_ACCEPT) {
                     helpIndex = SYSTEM_OPTIONS_HELP_ACCEPT;
-                } else if (message.payload.widget.id >= ADVMGR_SYSTEM_OPTION_FIRST
-                           && message.payload.widget.id <= ADVMGR_SYSTEM_OPTION_LAST) {
-                    helpIndex = message.payload.widget.id - ADVMGR_SYSTEM_OPTION_FIRST
+                } else if (message.payload.widget.id >= IDX(SYSTEM_OPTION_FIRST)
+                           && message.payload.widget.id <= IDX(SYSTEM_OPTION_LAST)) {
+                    helpIndex = message.payload.widget.id - IDX(SYSTEM_OPTION_FIRST)
                         + SYSTEM_OPTIONS_HELP_FIRST_OPTION;
                 }
 
@@ -10228,8 +10243,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                     break;
 
                 case ADVMGR_SYSTEM_OPTIONS_ACTIVATE: {
-                    switch (message.payload.widget.id) {
-                        case ADVMGR_SYSTEM_OPTION_MUSIC_VOLUME:
+                    AdventureSystemOption option =
+                        static_cast<AdventureSystemOption>(message.payload.widget.id);
+                    switch (option) {
+                        case SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
                                 NormalDialog(
@@ -10254,7 +10271,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_SOUND_VOLUME:
+                        case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
@@ -10277,14 +10294,14 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_HERO_SPEED:
+                        case SYSTEM_OPTION_HERO_SPEED:
                             ++gConfig.walkSpeed;
                             gConfig.walkSpeed %= CONFIG_WALK_SPEED_COUNT;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_COMPUTER_SPEED:
+                        case SYSTEM_OPTION_COMPUTER_SPEED:
                             if (gConfig.blackoutComputer) {
                                 gConfig.blackoutComputer = 0;
                                 gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_NORMAL;
@@ -10298,7 +10315,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_MUSIC_SOURCE:
+                        case SYSTEM_OPTION_MUSIC_SOURCE:
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
                                 if (gpSoundManager->m_cdStarted == 0) {
                                     gpSoundManager->CDStartup();
@@ -10340,20 +10357,20 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_SHOW_ROUTE:
+                        case SYSTEM_OPTION_SHOW_ROUTE:
                             gConfig.showRoute = 1 - gConfig.showRoute;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_INTERFACE:
+                        case SYSTEM_OPTION_INTERFACE:
                             gConfig.evilInterfaceUsage =
                                 (gConfig.evilInterfaceUsage + 1) % OPTION_INTERFACE_COUNT;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_VIDEO:
+                        case SYSTEM_OPTION_VIDEO:
                             if (gbLowMemory) {
                                 NormalDialog(
                                     "You don't have enough memory for non-interlaced video.",
@@ -10378,7 +10395,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             bPrefsChanged = 1;
                             break;
 
-                        case ADVMGR_SYSTEM_OPTION_COLOR_CURSOR:
+                        case SYSTEM_OPTION_COLOR_CURSOR:
                             gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
                                 1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
                             preferencesChanged = 1;
@@ -10388,7 +10405,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             );
                             break;
 #ifdef HOMM2_STRICT_ENUM_TYPES
-                        case ADVMGR_SYSTEM_OPTION_COUNT:
+                        case SYSTEM_OPTION_COUNT:
                             break;
 #endif
                     }
@@ -10403,7 +10420,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     }
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = ADVMGR_SYSTEM_OPTION_FIRST;
+        message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
