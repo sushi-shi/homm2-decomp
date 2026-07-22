@@ -9708,7 +9708,7 @@ void advManager::ViewPuzzle(void) {
         pixelIterator = gpWindowManager->m_screen->m_pixels + rowCounterNumber * SCREEN_WIDTH
                         + PUZZLE_VIEW_ORIGIN;
         rowLimitAddress = pixelIterator + PUZZLE_VIEW_SIZE;
-        for (; pixelIterator < rowLimitAddress; ++pixelIterator) {
+        for (; OD_STEER(pixelIterator) < rowLimitAddress; ++pixelIterator) {
             *pixelIterator = gColorTableTan[*pixelIterator];
         }
     }
