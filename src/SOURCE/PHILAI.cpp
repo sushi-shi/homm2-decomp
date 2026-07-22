@@ -6545,7 +6545,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
         else
             result5 = 0;
         result5 = static_cast<i32>(
-            result5 * AI_MONSTER_JOIN_PURCHASE_WEIGHT
+            OD_STEER(result5) * AI_MONSTER_JOIN_PURCHASE_WEIGHT
             + outcomeValue0 * AI_MONSTER_JOIN_OUTCOME_WEIGHT
         );
     } else if (strengthRatio26 > AI_MONSTER_OVERWHELMING_RATIO) {

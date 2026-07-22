@@ -1086,7 +1086,7 @@ SOURCE/PHILAI	?EvaluateGenericSite@philAI@@QAEHPAVmapCell@@@Z	98.5542	d85960439d
 SOURCE/PHILAI	?EvaluateHeroEvent@philAI@@QAEHHHHHPAH@Z	96.3857	37d9c8a13eb9
 SOURCE/PHILAI	?EvaluateJail@philAI@@QAEHPAVmapCell@@@Z	100.0000	1cbd6b1668fe
 SOURCE/PHILAI	?EvaluateMineEvent@philAI@@QAEHHHHPAH@Z	100.0000	2db6b4f2fea6
-SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	99.9916	fca1b702b151
+SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	100.0000	4a0ec7d1d78a
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	100.0000	20e5c7e976ea
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	6522bf603985
 SOURCE/PHILAI	?EvaluateRecruitSite@philAI@@QAEHPAVmapCell@@@Z	99.9043	bb6ee5fca61f
