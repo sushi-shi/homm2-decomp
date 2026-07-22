@@ -2723,9 +2723,6 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     tag_message messageLocal;
     i32 artifactCountb;
     i32 indexValue;
-    i32 townXh;
-    i32 townYWork;
-    FactionType newHeroClass;
 
     m_heroWindow1 = new heroWindow(RECRUIT_WINDOW_X, RECRUIT_WINDOW_Y, "rcrthero.bin");
     if (m_heroWindow1 == NULL)
@@ -2782,6 +2779,10 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     gpWindowManager->DoDialog(m_heroWindow1, RecruitHeroHandler, 0);
     delete m_heroWindow1;
     if (m_recruitState != -1) {
+        FactionType newHeroClass;
+        i32 townXh;
+        i32 townYWork;
+
         m_recruitState = availableHeroIndex;
         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= gHeroGoldCost;
         gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] =
