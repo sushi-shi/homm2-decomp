@@ -245,7 +245,7 @@ class ReviewedDataTest(unittest.TestCase):
             write_symbol_manifest(supplemental, [])
             write_symbol_manifest(combined, [])
 
-            with self.assertRaisesRegex(RuntimeError, "not the exact source DATA"):
+            with self.assertRaisesRegex(RuntimeError, "not the exact source annotations"):
                 review_queue_bytes(
                     [candidate("private$S1", 0x1100)], [],
                     source, supplemental, combined)

@@ -9,15 +9,19 @@ from homm2.build.data_manifest_adapter import (
     CandidateSection,
     _CanonicalPrivateRenameProof,
     candidate_topology,
+    resolve_vtable_definitions,
     resolve_source_definitions,
     source_definitions,
     validate_symbol_rows,
     _classified_contribution_rows,
     _normalize_symbol_row,
+    _mark_vtable_aliases,
     _section_rows,
     _symbol_row,
+    _vtable_row,
     _validate_supplemental_row,
 )
+from homm2.build.annotated_vtables import AnnotatedVtable
 from homm2.build.test_data_topology_census import (
     COMDAT_DATA_FLAGS,
     DATA_FLAGS,
@@ -63,6 +67,36 @@ def anchor(unit, ordinal, rva, offset=0, name="anchor"):
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_source_vtables_bind_exact_candidate_and_allow_proved_aliases(self):
+        primary = AnnotatedVtable(
+            "A", 0x100, "Derived", None, "??_7Derived@@6B@", "src/A.cpp:1")
+        secondary = AnnotatedVtable(
+            "A", 0x100, "Derived", "Base", "??_7Derived@@6BBase@@@",
+            "src/A.cpp:2")
+        definitions = [
+            replace(candidate("A", primary.mangled_name, ordinal=2),
+                    section_name=".rdata", storage="rdata"),
+            replace(candidate("A", secondary.mangled_name, ordinal=2),
+                    section_name=".rdata", storage="rdata"),
+        ]
+        resolved = resolve_vtable_definitions(
+            [primary, secondary], {"A": (definitions, [])},
+            {("A", 0x100): [primary.mangled_name]})
+        rows = [_vtable_row(claim, definition)
+                for claim, definition in resolved]
+        _mark_vtable_aliases(rows)
+        validate_symbol_rows(rows, "fixture")
+        self.assertTrue(all("candidate-coff-alias" in row["provenance"]
+                            for row in rows))
+
+    def test_primary_vtable_requires_matching_codeview_public(self):
+        claim = AnnotatedVtable(
+            "A", 0x100, "Derived", None, "??_7Derived@@6B@", "src/A.cpp:1")
+        definition = replace(candidate("A", claim.mangled_name),
+                             section_name=".rdata", storage="rdata")
+        with self.assertRaisesRegex(ValueError, "no matching CodeView public"):
+            resolve_vtable_definitions([claim], {"A": ([definition], [])}, {})
+
     def test_stale_local_identity_migrates_by_section_local_position(self):
         topology = {"A": ([
             candidate("A", "$Tnew", ordinal=7, value=0),

@@ -297,7 +297,7 @@ def _canonical_union_rows(source_manifest=None, supplemental=None,
     source_manifest = source_manifest or DATA_SOURCE_MANIFEST
     supplemental = supplemental or CANONICAL_SUPPLEMENTAL
     combined_manifest = combined_manifest or CANONICAL_MANIFEST
-    source_rows = _read_symbol_manifest(source_manifest, "source DATA")
+    source_rows = _read_symbol_manifest(source_manifest, "source annotations")
     supplemental_rows = _read_symbol_manifest(supplemental, "reviewed supplemental")
     combined_rows = _read_symbol_manifest(combined_manifest, "canonical combined")
 
@@ -308,7 +308,7 @@ def _canonical_union_rows(source_manifest=None, supplemental=None,
     actual = Counter(row_tuple(row) for row in combined_rows)
     if actual != expected:
         raise RuntimeError(
-            "canonical data manifest is not the exact source DATA plus reviewed "
+            "canonical data manifest is not the exact source annotations plus reviewed "
             "supplemental union; run `homm2 data-topology assemble`")
     return combined_rows
 
@@ -388,7 +388,7 @@ def review_queue_bytes(allocations, diagnostics=(), source_manifest=None,
 
 
 def _build_reviewed_canonical_manifests(strict):
-    """Assemble canonical rows only from source DATA and the reviewed supplement."""
+    """Assemble canonical rows only from source annotations and the reviewed supplement."""
     supplemental_rows = _read_symbol_manifest(
         CANONICAL_SUPPLEMENTAL, "reviewed supplemental")
     synthetic = [row["name"] for row in supplemental_rows
