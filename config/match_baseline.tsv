@@ -519,7 +519,7 @@ SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5570	599bdd13c692
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	94.7222	29987c5467ab
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	d3d802baf1c9
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	c30d67476922
-SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.8050	6581687e102e
+SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	100.0000	33e3a25b38d2
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	97.5202	cd7f85b03cdb
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	96.4159	708837c2fb5e
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	f08cc32d483b
