@@ -1729,11 +1729,6 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
 
     i32 killed29 = target0->Damage(damage8, SPELL_NONE);
     if (killed29 > 0) {
-        char* armyNameValue;
-        if (killed29 > 1)
-            armyNameValue = gArmyNamesPlural[IDX(target0->m_monsterType)];
-        else
-            armyNameValue = gArmyNames[IDX(target0->m_monsterType)];
         sprintf(
             gText,
             "%s %d %s.\n%d %s %s.",
@@ -1741,7 +1736,8 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
             damage8,
             "damage",
             killed29,
-            armyNameValue,
+            killed29 > 1 ? gArmyNamesPlural[IDX(target0->m_monsterType)]
+                         : gArmyNames[IDX(target0->m_monsterType)],
             killed29 <= 1 ? "perishes" : "perish"
         );
     } else {
