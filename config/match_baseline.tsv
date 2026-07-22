@@ -1032,7 +1032,7 @@ SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	99.8571	6f616e09157a
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	7913d1c9fc43
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	d6ef22258aa2
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	d0aecfb4550d
-SOURCE/Overview	?DoKnob@game@@QAEXXZ	99.9797	bb29541d1cfa
+SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	ee56a714e068
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	afd5c417a59b
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	32e7cc8e72ad
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	98.1373	6e285957978c
