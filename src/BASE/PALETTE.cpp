@@ -21,7 +21,7 @@ palette::palette(u32l id)
 }
 
 VA(0x004d2660, 0x2c)
-palette::~palette() {
+inline palette::~palette() {
     if (m_data != NULL)
         H2_FREE_AT(m_data, RETAIL_FILE "\0\0", 21);
     m_data = NULL;
