@@ -122,25 +122,29 @@ def army_style_jump_table(canonical=False, unequal_destination=False):
     ])
 
 
+def compiler_function_graph():
+    return make_coff([SectionSpec(
+        ".text", bytes(0x6B), TEXT, (
+            (0x04, 1, REL32), (0x0C, 2, REL32),
+            (0x1E, 4, DIR32), (0x26, 5, REL32),
+            (0x38, 3, DIR32), (0x40, 7, REL32),
+            (0x55, 4, DIR32), (0x5D, 6, REL32),
+        ),
+    )], [
+        ("_$E91", 0x00, 1, 0x20, 3),
+        ("_$E12", 0x1A, 1, 0x20, 3),
+        ("_$E73", 0x34, 1, 0x20, 3),
+        ("_$E44", 0x51, 1, 0x20, 3),
+        ("_Widget", 0, 0, 0, 2),
+        ("??0Widget@@QAE@XZ", 0, 0, 0x20, 2),
+        ("??1Widget@@QAE@XZ", 0, 0, 0x20, 2),
+        ("_atexit", 0, 0, 0x20, 2),
+    ])
+
+
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
     def test_compiler_function_names_come_from_semantic_relocation_roles(self):
-        payload = make_coff([SectionSpec(
-            ".text", bytes(0x6B), TEXT, (
-                (0x04, 1, REL32), (0x0C, 2, REL32),
-                (0x1E, 4, DIR32), (0x26, 5, REL32),
-                (0x38, 3, DIR32), (0x40, 7, REL32),
-                (0x55, 4, DIR32), (0x5D, 6, REL32),
-            ),
-        )], [
-            ("_$E91", 0x00, 1, 0x20, 3),
-            ("_$E12", 0x1A, 1, 0x20, 3),
-            ("_$E73", 0x34, 1, 0x20, 3),
-            ("_$E44", 0x51, 1, 0x20, 3),
-            ("_Widget", 0, 0, 0, 2),
-            ("??0Widget@@QAE@XZ", 0, 0, 0x20, 2),
-            ("??1Widget@@QAE@XZ", 0, 0, 0x20, 2),
-            ("_atexit", 0, 0, 0x20, 2),
-        ])
+        payload = compiler_function_graph()
         claims = tuple(CompgenClaim(
             "__h2cg$MODULE$%s$Widget" % kind.lower(), kind, "Widget", size)
             for kind, size in (
@@ -172,6 +176,35 @@ class CanonicalizeDataSymbolsTest(unittest.TestCase):
                 "_$E44": "STATIC_DTOR:Widget",
             },
         )
+
+    def test_dispatcher_binding_does_not_require_sibling_claims(self):
+        claim = CompgenClaim(
+            "__h2cg$MODULE$static_init_dispatch$Widget",
+            "STATIC_INIT_DISPATCH", "Widget", 0x1A)
+
+        result = canonicalize_coff(compiler_function_graph(), (claim,))
+        parsed = CoffObject(result.data)
+
+        self.assertEqual(parsed.symbols[0].name, claim.name)
+        self.assertEqual(
+            [parsed.symbols[index].name for index in (1, 2, 3)],
+            ["_$E12", "_$E73", "_$E44"],
+        )
+
+    def test_unresolved_compiler_function_claim_warns_without_renaming(self):
+        payload = make_coff([
+            SectionSpec(".text", bytes(0x1A), TEXT),
+        ], [
+            ("_$E1", 0, 1, 0x20, 3),
+        ])
+        claim = CompgenClaim(
+            "__h2cg$MODULE$static_ctor$Widget",
+            "STATIC_CTOR", "Widget", 0x1A)
+
+        with self.assertWarnsRegex(RuntimeWarning, "has 0 semantic"):
+            result = canonicalize_coff(payload, (claim,))
+
+        self.assertEqual(CoffObject(result.data).symbols[0].name, "_$E1")
 
     def test_army_style_repeated_jump_labels_match_owner_addends(self):
         candidate = canonicalize_coff(army_style_jump_table()).data
