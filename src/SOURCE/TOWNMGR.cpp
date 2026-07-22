@@ -53,6 +53,47 @@ H2_ENUM_BEGIN(TownManagerInputCode)
     DIALOG_BUY_SPELL_BOOK = 0x7805
 H2_ENUM_END(TownManagerInputCode)
 
+H2_ENUM_CLASS_BEGIN(TownManagerWidgetId)
+    TOWN_WIDGET_NONE                            = TOWN_WIDGET_ID_NONE,
+    TOWN_WIDGET_BUILDING_MAGE_GUILD             = IDX(TOWN_OBJECT_MAGE_GUILD),
+    TOWN_WIDGET_BUILDING_THIEVES_GUILD          = IDX(TOWN_OBJECT_THIEVES_GUILD),
+    TOWN_WIDGET_BUILDING_TAVERN                  = IDX(TOWN_OBJECT_TAVERN),
+    TOWN_WIDGET_BUILDING_DOCK                    = IDX(TOWN_OBJECT_DOCK),
+    TOWN_WIDGET_BUILDING_WELL                    = IDX(TOWN_OBJECT_WELL),
+    TOWN_WIDGET_BUILDING_TENT                    = IDX(TOWN_OBJECT_TENT),
+    TOWN_WIDGET_BUILDING_CASTLE                  = IDX(TOWN_OBJECT_CASTLE),
+    TOWN_WIDGET_BUILDING_STATUE                  = IDX(TOWN_OBJECT_STATUE),
+    TOWN_WIDGET_BUILDING_LEFT_TURRET             = IDX(TOWN_OBJECT_LEFT_TURRET),
+    TOWN_WIDGET_BUILDING_RIGHT_TURRET            = IDX(TOWN_OBJECT_RIGHT_TURRET),
+    TOWN_WIDGET_BUILDING_MARKETPLACE             = IDX(TOWN_OBJECT_MARKETPLACE),
+    TOWN_WIDGET_BUILDING_SECOND_WELL             = IDX(TOWN_OBJECT_SECOND_WELL),
+    TOWN_WIDGET_BUILDING_MOAT                    = IDX(TOWN_OBJECT_MOAT),
+    TOWN_WIDGET_BUILDING_SPECIAL                 = IDX(TOWN_OBJECT_SPECIAL_BUILDING),
+    TOWN_WIDGET_BUILDING_BOAT                    = IDX(TOWN_OBJECT_BOAT),
+    TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS        = IDX(TOWN_OBJECT_CAPTAIN_QUARTERS),
+    TOWN_WIDGET_BUILDING_DWELLING_1              = IDX(TOWN_OBJECT_DWELLING_1),
+    TOWN_WIDGET_BUILDING_DWELLING_2              = IDX(TOWN_OBJECT_DWELLING_2),
+    TOWN_WIDGET_BUILDING_DWELLING_3              = IDX(TOWN_OBJECT_DWELLING_3),
+    TOWN_WIDGET_BUILDING_DWELLING_4              = IDX(TOWN_OBJECT_DWELLING_4),
+    TOWN_WIDGET_BUILDING_DWELLING_5              = IDX(TOWN_OBJECT_DWELLING_5),
+    TOWN_WIDGET_BUILDING_DWELLING_6              = IDX(TOWN_OBJECT_DWELLING_6),
+    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_2     = IDX(TOWN_OBJECT_UPGRADED_DWELLING_2),
+    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_3     = IDX(TOWN_OBJECT_UPGRADED_DWELLING_3),
+    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_4     = IDX(TOWN_OBJECT_UPGRADED_DWELLING_4),
+    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5     = IDX(TOWN_OBJECT_UPGRADED_DWELLING_5),
+    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6     = IDX(TOWN_OBJECT_UPGRADED_DWELLING_6),
+    TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6    = IDX(TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6),
+    TOWN_WIDGET_GARRISON_FIRST                   = TOWN_GARRISON_SLOT_FIRST,
+    TOWN_WIDGET_GARRISON_LAST                    = TOWN_GARRISON_SLOT_LAST,
+    TOWN_WIDGET_HERO_CONTROL                     = TOWN_HERO_FIRST_CONTROL,
+    TOWN_WIDGET_HERO_FIRST                       = TOWN_HERO_SLOT_FIRST,
+    TOWN_WIDGET_HERO_LAST                        = TOWN_HERO_SLOT_LAST,
+    TOWN_WIDGET_EMPTY_FIRST                      = TOWN_EMPTY_STATUS_CONTROL_FIRST,
+    TOWN_WIDGET_EMPTY_LAST                       = TOWN_EMPTY_STATUS_CONTROL_LAST,
+    TOWN_WIDGET_CLOSE                            = CONTROL_CLOSE
+H2_ENUM_CLASS_END(TownManagerWidgetId)
+H2_ENUM_STEPPED(TownManagerWidgetId)
+
 H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
     RENDER_KNIGHT_LEFT_GATE           = 0x4,
     RENDER_KNIGHT_LEFT_FIRST_OPTION   = 0x1,
@@ -1039,101 +1080,24 @@ void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
     m_command = ARMY_COMMAND_NONE;
-    if (objectId >= IDX(BUILDING_SLOT_MAGE_GUILD)
-        && objectId <= IDX(BUILDING_SLOT_DISABLED_LAST)) {
-        BuildingSlotType building = static_cast<BuildingSlotType>(objectId);
-        switch (building) {
-            case TOWN_OBJECT_MAGE_GUILD:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_MAGE_GUILD)]);
-                break;
-            case TOWN_OBJECT_THIEVES_GUILD:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
-                break;
-            case TOWN_OBJECT_TAVERN:
-                if (m_town->m_type == FACTION_NECROMANCER)
-                    strcpy(m_statusText, xNecromancerShrine);
-                else
-                    strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
-                break;
-            case TOWN_OBJECT_DOCK:
-            case TOWN_OBJECT_BOAT:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_DOCK)]);
-                break;
-            case TOWN_OBJECT_WELL:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_WELL)]);
-                break;
-            case TOWN_OBJECT_TENT:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_TENT)]);
-                break;
-            case TOWN_OBJECT_CASTLE:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_CASTLE)]);
-                break;
-            case TOWN_OBJECT_STATUE:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_STATUE)]);
-                break;
-            case TOWN_OBJECT_LEFT_TURRET:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_LEFT_TURRET)]);
-                break;
-            case TOWN_OBJECT_RIGHT_TURRET:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_RIGHT_TURRET)]);
-                break;
-            case TOWN_OBJECT_MOAT:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_MOAT)]);
-                break;
-            case TOWN_OBJECT_MARKETPLACE:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_MARKETPLACE)]);
-                break;
-            case TOWN_OBJECT_CAPTAIN_QUARTERS:
-                strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
-                break;
-            case TOWN_OBJECT_SPECIAL_BUILDING:
-                strcpy(m_statusText, gSpecialBuildingNames[IDX(m_town->m_type)]);
-                break;
-            case TOWN_OBJECT_SECOND_WELL:
-                strcpy(m_statusText, gWellExtraNames[IDX(m_town->m_type)]);
-                break;
-            case TOWN_OBJECT_DWELLING_1:
-            case TOWN_OBJECT_DWELLING_2:
-            case TOWN_OBJECT_DWELLING_3:
-            case TOWN_OBJECT_DWELLING_4:
-            case TOWN_OBJECT_DWELLING_5:
-            case TOWN_OBJECT_DWELLING_6:
-            case TOWN_OBJECT_UPGRADED_DWELLING_2:
-            case TOWN_OBJECT_UPGRADED_DWELLING_3:
-            case TOWN_OBJECT_UPGRADED_DWELLING_4:
-            case TOWN_OBJECT_UPGRADED_DWELLING_5:
-            case TOWN_OBJECT_UPGRADED_DWELLING_6:
-            case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
-                sprintf(
-                    m_statusText,
-                    cTownCommand[IDX(TEXT_RECRUIT)],
-                    gArmyNames[IDX(gDwellingType[IDX(m_town->m_type)]
-                                                [IDX(building)
-                                                 - IDX(TOWN_OBJECT_DWELLING_1)])]
-                );
-                break;
-        }
-        ShowText(m_statusText);
-        return;
-    }
-    switch (objectId) {
-        case CONTROL_CLOSE:
+    switch (static_cast<TownManagerWidgetId>(objectId)) {
+        case TOWN_WIDGET_CLOSE:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EXIT)]);
             break;
-        case TOWN_WIDGET_ID_NONE:
-        case TOWN_EMPTY_STATUS_CONTROL_FIRST:
-        case TOWN_EMPTY_STATUS_CONTROL_LAST:
+        case TOWN_WIDGET_NONE:
+        case TOWN_WIDGET_EMPTY_FIRST:
+        case TOWN_WIDGET_EMPTY_LAST:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_STATUS)]);
             break;
-        case TOWN_GARRISON_SLOT_FIRST:
-        case TOWN_GARRISON_SLOT_FIRST + 1:
+        case TOWN_WIDGET_GARRISON_FIRST:
+        case TOWN_WIDGET_GARRISON_FIRST + 1:
         // The strip exposes five contiguous army-slot controls; the interior offsets
         // are topology, not distinct commands.
         // NOLINTBEGIN(readability-magic-numbers)
-        case TOWN_GARRISON_SLOT_FIRST + 2:
-        case TOWN_GARRISON_SLOT_FIRST + 3:
+        case TOWN_WIDGET_GARRISON_FIRST + 2:
+        case TOWN_WIDGET_GARRISON_FIRST + 3:
         // NOLINTEND(readability-magic-numbers)
-        case TOWN_GARRISON_SLOT_LAST:
+        case TOWN_WIDGET_GARRISON_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_garrisonStrip;
                 m_pendingArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
@@ -1156,18 +1120,18 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 }
             }
             break;
-        case TOWN_HERO_FIRST_CONTROL:
+        case TOWN_WIDGET_HERO_CONTROL:
             strcpy(m_statusText, cTownCommand[IDX(TEXT_VIEW_HERO)]);
             m_command = ARMY_COMMAND_VIEW_HERO;
             break;
-        case TOWN_HERO_SLOT_FIRST:
-        case TOWN_HERO_SLOT_FIRST + 1:
+        case TOWN_WIDGET_HERO_FIRST:
+        case TOWN_WIDGET_HERO_FIRST + 1:
         // The hero strip uses the same five-control topology as the garrison strip.
         // NOLINTBEGIN(readability-magic-numbers)
-        case TOWN_HERO_SLOT_FIRST + 2:
-        case TOWN_HERO_SLOT_FIRST + 3:
+        case TOWN_WIDGET_HERO_FIRST + 2:
+        case TOWN_WIDGET_HERO_FIRST + 3:
         // NOLINTEND(readability-magic-numbers)
-        case TOWN_HERO_SLOT_LAST:
+        case TOWN_WIDGET_HERO_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_heroStrip;
                 m_pendingArmySlot = objectId - TOWN_HERO_SLOT_FIRST;
@@ -1191,6 +1155,76 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                     m_command = ARMY_COMMAND_SELECT;
                 }
             }
+            break;
+        case TOWN_WIDGET_BUILDING_MAGE_GUILD:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MAGE_GUILD)]);
+            break;
+        case TOWN_WIDGET_BUILDING_THIEVES_GUILD:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_THIEVES_GUILD)]);
+            break;
+        case TOWN_WIDGET_BUILDING_TAVERN:
+            if (m_town->m_type == FACTION_NECROMANCER)
+                strcpy(m_statusText, xNecromancerShrine);
+            else
+                strcpy(m_statusText, cTownCommand[IDX(TEXT_TAVERN)]);
+            break;
+        case TOWN_WIDGET_BUILDING_DOCK:
+        case TOWN_WIDGET_BUILDING_BOAT:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_DOCK)]);
+            break;
+        case TOWN_WIDGET_BUILDING_WELL:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_WELL)]);
+            break;
+        case TOWN_WIDGET_BUILDING_TENT:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_TENT)]);
+            break;
+        case TOWN_WIDGET_BUILDING_CASTLE:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_CASTLE)]);
+            break;
+        case TOWN_WIDGET_BUILDING_STATUE:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_STATUE)]);
+            break;
+        case TOWN_WIDGET_BUILDING_LEFT_TURRET:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_LEFT_TURRET)]);
+            break;
+        case TOWN_WIDGET_BUILDING_RIGHT_TURRET:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_RIGHT_TURRET)]);
+            break;
+        case TOWN_WIDGET_BUILDING_MOAT:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MOAT)]);
+            break;
+        case TOWN_WIDGET_BUILDING_MARKETPLACE:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_MARKETPLACE)]);
+            break;
+        case TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS:
+            strcpy(m_statusText, cTownCommand[IDX(TEXT_CAPTAIN_QUARTERS)]);
+            break;
+        case TOWN_WIDGET_BUILDING_SPECIAL:
+            strcpy(m_statusText, gSpecialBuildingNames[IDX(m_town->m_type)]);
+            break;
+        case TOWN_WIDGET_BUILDING_SECOND_WELL:
+            strcpy(m_statusText, gWellExtraNames[IDX(m_town->m_type)]);
+            break;
+        case TOWN_WIDGET_BUILDING_DWELLING_1:
+        case TOWN_WIDGET_BUILDING_DWELLING_2:
+        case TOWN_WIDGET_BUILDING_DWELLING_3:
+        case TOWN_WIDGET_BUILDING_DWELLING_4:
+        case TOWN_WIDGET_BUILDING_DWELLING_5:
+        case TOWN_WIDGET_BUILDING_DWELLING_6:
+        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_2:
+        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_3:
+        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_4:
+        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5:
+        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6:
+        case TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6:
+            sprintf(
+                m_statusText,
+                cTownCommand[IDX(TEXT_RECRUIT)],
+                gArmyNames[IDX(
+                    gDwellingType[IDX(m_town->m_type)][objectId
+                                                       - IDX(TOWN_OBJECT_DWELLING_1)]
+                )]
+            );
             break;
     }
     ShowText(m_statusText);
