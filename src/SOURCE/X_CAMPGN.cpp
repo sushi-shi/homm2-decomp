@@ -862,42 +862,42 @@ i32 ExpCampaign::HandleVictory(void) {
 
 VA(0x004bcde0, 0x167)
 void ExpCampaign::HandleVictory1(void) {
-    switch (m_currentMap) {
-        case MAP_NONE:
+    switch (m_currentMap + 1) {
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_POL_INTRO);
             m_mapChoices[IDX(MAP_POL_UPRISING)] = 1;
             break;
-        case MAP_POL_UPRISING:
+        case MAP_POL_UPRISING + 1:
             PlaySmacker(SMACKER_POL_UPRISING);
             m_mapChoices[IDX(MAP_POL_ISLAND_OF_CHAOS)] = 1;
             break;
-        case MAP_POL_ISLAND_OF_CHAOS:
+        case MAP_POL_ISLAND_OF_CHAOS + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             m_mapChoices[IDX(MAP_POL_ARROWS_FLIGHT)] = 1;
             m_mapChoices[IDX(MAP_POL_ABYSS)] = 1;
             m_awards[IDX(AWARD_BREASTPLATE_ANDURAN)] = 1;
             break;
-        case MAP_POL_ARROWS_FLIGHT:
+        case MAP_POL_ARROWS_FLIGHT + 1:
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
             m_mapChoices[IDX(MAP_POL_GIANTS_PASS)] = 1;
             m_awards[IDX(AWARD_ELVEN_ALLIANCE)] = 1;
             m_awards[IDX(AWARD_WOOD_BONUS)] = 1;
             break;
-        case MAP_POL_ABYSS:
+        case MAP_POL_ABYSS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             m_mapChoices[IDX(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case MAP_POL_GIANTS_PASS:
+        case MAP_POL_GIANTS_PASS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             m_mapChoices[IDX(MAP_POL_AURORA_BOREALIS)] = 1;
             break;
-        case MAP_POL_AURORA_BOREALIS:
+        case MAP_POL_AURORA_BOREALIS + 1:
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
             m_mapChoices[IDX(MAP_POL_BETRAYALS_END)] = 1;
             m_mapChoices[IDX(MAP_POL_CORRUPTIONS_HEART)] = 1;
             m_awards[IDX(AWARD_HELMET_ANDURAN)] = 1;
             break;
-        case MAP_POL_BETRAYALS_END:
+        case MAP_POL_BETRAYALS_END + 1:
             PlaySmacker(SMACKER_POL_BETRAYALS_END);
             m_mapChoices[IDX(MAP_POL_CORRUPTIONS_HEART)] = 1;
             m_awards[IDX(AWARD_BATTLE_GARB)] = 1;
@@ -905,7 +905,7 @@ void ExpCampaign::HandleVictory1(void) {
             m_awards[IDX(AWARD_HELMET_ANDURAN)] = 0;
             m_awards[IDX(AWARD_DEFEAT_KRAEGER)] = 1;
             break;
-        case MAP_POL_CORRUPTIONS_HEART:
+        case MAP_POL_CORRUPTIONS_HEART + 1:
             PlaySmacker(SMACKER_POL_CORRUPTIONS_HEART);
             break;
     }
@@ -913,46 +913,46 @@ void ExpCampaign::HandleVictory1(void) {
 
 VA(0x004bcf47, 0x14b)
 void ExpCampaign::HandleVictory2(void) {
-    switch (m_currentMap) {
-        case MAP_NONE:
+    switch (m_currentMap + 1) {
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_DES_INTRO);
             m_mapChoices[IDX(MAP_DES_CONQUER_AND_UNIFY)] = 1;
             break;
-        case MAP_DES_CONQUER_AND_UNIFY:
+        case MAP_DES_CONQUER_AND_UNIFY + 1:
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
             m_mapChoices[IDX(MAP_DES_BORDER_TOWNS)] = 1;
             break;
-        case MAP_DES_BORDER_TOWNS:
+        case MAP_DES_BORDER_TOWNS + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             m_mapChoices[IDX(MAP_DES_WAYWARD_SON)] = 1;
             m_mapChoices[IDX(MAP_DES_UNCLE_IVAN)] = 1;
             break;
-        case MAP_DES_WAYWARD_SON:
+        case MAP_DES_WAYWARD_SON + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             m_mapChoices[IDX(MAP_DES_SOUTHERN_WAR)] = 1;
             m_awards[IDX(AWARD_WAYWARD_SON)] = 1;
             break;
-        case MAP_DES_UNCLE_IVAN:
+        case MAP_DES_UNCLE_IVAN + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             m_mapChoices[IDX(MAP_DES_SOUTHERN_WAR)] = 1;
             m_awards[IDX(AWARD_UNCLE_IVAN)] = 1;
             break;
-        case MAP_DES_SOUTHERN_WAR:
+        case MAP_DES_SOUTHERN_WAR + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             m_mapChoices[IDX(MAP_DES_IVORY_GATES)] = 1;
             m_mapChoices[IDX(MAP_DES_ELVEN_LANDS)] = 1;
             break;
-        case MAP_DES_IVORY_GATES:
+        case MAP_DES_IVORY_GATES + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             m_mapChoices[IDX(MAP_DES_EPIC_BATTLE)] = 1;
             m_awards[IDX(AWARD_LEGENDARY_SCEPTER)] = 1;
             break;
-        case MAP_DES_ELVEN_LANDS:
+        case MAP_DES_ELVEN_LANDS + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             m_mapChoices[IDX(MAP_DES_EPIC_BATTLE)] = 1;
             m_awards[IDX(AWARD_ELVEN_ALLIANCE)] = 1;
             break;
-        case MAP_DES_EPIC_BATTLE:
+        case MAP_DES_EPIC_BATTLE + 1:
             PlaySmacker(SMACKER_DES_EPIC_BATTLE);
             break;
     }
@@ -960,27 +960,27 @@ void ExpCampaign::HandleVictory2(void) {
 
 VA(0x004bd092, 0xce)
 void ExpCampaign::HandleVictory3(void) {
-    switch (m_currentMap) {
-        case MAP_NONE:
+    switch (m_currentMap + 1) {
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_WIZ_INTRO);
             m_mapChoices[IDX(MAP_WIZ_SHROUDED_ISLES)] = 1;
             break;
-        case MAP_WIZ_SHROUDED_ISLES:
+        case MAP_WIZ_SHROUDED_ISLES + 1:
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
             m_mapChoices[IDX(MAP_WIZ_ETERNAL_SCROLLS)] = 1;
             break;
-        case MAP_WIZ_ETERNAL_SCROLLS:
+        case MAP_WIZ_ETERNAL_SCROLLS + 1:
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
             m_mapChoices[IDX(MAP_WIZ_POWERS_END)] = 1;
             m_mapChoices[IDX(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
             m_awards[IDX(AWARD_SET_GUARDIAN)] = 1;
             break;
-        case MAP_WIZ_POWERS_END:
+        case MAP_WIZ_POWERS_END + 1:
             PlaySmacker(SMACKER_WIZ_POWERS_END);
             m_mapChoices[IDX(MAP_WIZ_FOUNT_OF_WIZARDRY)] = 1;
             m_awards[IDX(AWARD_SPHERE_NEGATION)] = 1;
             break;
-        case MAP_WIZ_FOUNT_OF_WIZARDRY:
+        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
             PlaySmacker(SMACKER_WIZ_FOUNT_OF_WIZARDRY);
             break;
     }
@@ -988,24 +988,24 @@ void ExpCampaign::HandleVictory3(void) {
 
 VA(0x004bd160, 0xb9)
 void ExpCampaign::HandleVictory4(void) {
-    switch (m_currentMap) {
-        case MAP_NONE:
+    switch (m_currentMap + 1) {
+        case MAP_NONE + 1:
             PlaySmacker(SMACKER_VOY_INTRO);
             m_mapChoices[IDX(MAP_VOY_STRANDED)] = 1;
             break;
-        case MAP_VOY_STRANDED:
+        case MAP_VOY_STRANDED + 1:
             PlaySmacker(SMACKER_VOY_STRANDED);
             m_mapChoices[IDX(MAP_VOY_PIRATE_ISLES)] = 1;
             break;
-        case MAP_VOY_PIRATE_ISLES:
+        case MAP_VOY_PIRATE_ISLES + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
             m_mapChoices[IDX(MAP_VOY_KING_AND_COUNTRY)] = 1;
             m_mapChoices[IDX(MAP_VOY_BLOOD_IS_THICKER)] = 1;
             break;
-        case MAP_VOY_KING_AND_COUNTRY:
+        case MAP_VOY_KING_AND_COUNTRY + 1:
             PlaySmacker(SMACKER_VOY_KING_AND_COUNTRY);
             break;
-        case MAP_VOY_BLOOD_IS_THICKER:
+        case MAP_VOY_BLOOD_IS_THICKER + 1:
             PlaySmacker(SMACKER_VOY_BLOOD_IS_THICKER);
             break;
     }
