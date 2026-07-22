@@ -409,6 +409,15 @@ DATA(0x004f2474) static i16 s_closeAIMapLineBase = 0x1b96; // NOLINT(readability
 
 DATA(0x005256f0) searchArray SVSearchArray;
 
+inline i32 HeroRVByteOffset(i32 x, i32 y) {
+    return x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16);
+}
+
+#define HERO_RV_AT(values, byteOffset) \
+    (*reinterpret_cast<i16*>(reinterpret_cast<u8*>(values) + (byteOffset)))
+
+// @early-stop
+// All instructions and relocations match retail; only its three trailing alignment NOPs remain.
 VA(0x0043781b, 0x1b5)
 void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     i32 idx;
@@ -417,18 +426,31 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     if (x != -1) {
         if (y == -1)
             return;
-        for (node = 0; node < MAP_WIDTH; node++) {
-            for (idx = 0; idx < MAP_HEIGHT; idx++) {
+        for (node = 0; MAP_WIDTH > node; node++) {
+            for (idx = 0; MAP_HEIGHT > idx; idx++) {
                 if (resetAll != 0) {
                     if (abs(x - node) + abs(y - idx) < NEARBY_RADIUS)
-                        gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = IDX(RV_UNSET);
+                        // Row-major i16 map: byte offset = x * 2 + y * MAP_WIDTH * 2.
+                        HERO_RV_AT(
+                            gaiHeroStrategicRVOfPos,
+                            node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
+                        ) = IDX(RV_UNSET);
                 } else {
-                    gaiHeroStrategicRVOfPos[node + idx * MAP_WIDTH] = IDX(RV_UNSET);
-                    gaiHeroEventStratRVOfPos[node + idx * MAP_WIDTH] = IDX(RV_UNSET);
+                    HERO_RV_AT(
+                        gaiHeroStrategicRVOfPos,
+                        node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
+                    ) = IDX(RV_UNSET);
+                    HERO_RV_AT(
+                        gaiHeroEventStratRVOfPos,
+                        node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
+                    ) = IDX(RV_UNSET);
                 }
             }
         }
-        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = IDX(RV_UNSET);
+        HERO_RV_AT(
+            gaiHeroEventStratRVOfPos,
+            x * sizeof(i16) + (MAP_WIDTH | 0) * y * sizeof(i16)
+        ) = IDX(RV_UNSET);
         for (node = 0; node < GAME_HERO_COUNT; node++) {
             // Original bug: both axes compare the hero's X coordinate.
             if (resetAll == 0
@@ -437,6 +459,14 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
                 gaiHeroLiveChance[node] = IDX(RV_UNSET);
         }
     }
+}
+
+#undef HERO_RV_AT
+
+inline i16& HeroRVAt(i16* values, i32 x, i32 y) {
+    return *reinterpret_cast<i16*>(
+        reinterpret_cast<u8*>(values) + HeroRVByteOffset(x, y)
+    );
 }
 
 VA(0x004379d0, 0x180)
@@ -3351,9 +3381,9 @@ i32 philAI::StrategicValueOfPosition(
     i32 score4;
 
     if (!extraDistance && !immediate
-        && gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH] != RV_UNSET) {
-        *liveChance = gaiLiveChanceOfPos[targetX + targetY * MAP_WIDTH];
-        return gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH];
+        && HeroRVAt(gaiHeroStrategicRVOfPos, targetX, targetY) != RV_UNSET) {
+        *liveChance = HeroRVAt(gaiLiveChanceOfPos, targetX, targetY);
+        return HeroRVAt(gaiHeroStrategicRVOfPos, targetX, targetY);
     }
 
     score4 = 0;
@@ -3521,8 +3551,8 @@ i32 philAI::StrategicValueOfPosition(
     if (score4 > 32000)
         score4 = 32000;
     if (!immediate && !extraDistance) {
-        gaiHeroStrategicRVOfPos[targetX + targetY * MAP_WIDTH] = static_cast<i16>(score4);
-        gaiLiveChanceOfPos[targetX + targetY * MAP_WIDTH] = static_cast<i16>(*liveChance);
+        HeroRVAt(gaiHeroStrategicRVOfPos, targetX, targetY) = static_cast<i16>(score4);
+        HeroRVAt(gaiLiveChanceOfPos, targetX, targetY) = static_cast<i16>(*liveChance);
     }
     return score4;
 }
