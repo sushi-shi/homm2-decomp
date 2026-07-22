@@ -95,14 +95,15 @@ H2_ENUM_BEGIN(CampaignScenarioNumber)
     SCENARIO_THIRTEEN = 13
 H2_ENUM_END(CampaignScenarioNumber)
 
-H2_ENUM_BEGIN(CampaignTrackType)
-    TRACK_ROLAND_TO_ARCHIBALD          = 1,
-    TRACK_ARCHIBALD_TO_ROLAND          = 2,
-    TRACK_REGULAR_COUNT                = 4,
-    TRACK_SWITCH_TO_ROLAND             = 4,
-    TRACK_SWITCH_TO_ARCHIBALD_COMPLETE = 5,
-    TRACK_SWITCH_TO_ARCHIBALD_OPEN     = 6
-H2_ENUM_END(CampaignTrackType)
+H2_ENUM_CLASS_BEGIN(CampaignTrackType)
+    ROLAND_TO_ROLAND             = 0,
+    ROLAND_TO_ARCHIBALD          = 1,
+    ARCHIBALD_TO_ROLAND          = 2,
+    ARCHIBALD_TO_ARCHIBALD       = 3,
+    SWITCH_TO_ROLAND             = 4,
+    SWITCH_TO_ARCHIBALD_COMPLETE = 5,
+    SWITCH_TO_ARCHIBALD_OPEN     = 6
+H2_ENUM_CLASS_END(CampaignTrackType)
 
 H2_ENUM_BEGIN(CampaignTrackConstant)
     TRACK_X                          = 0,
@@ -393,14 +394,15 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     iCurViewMap = m_campaignScenario;
     if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO && !viewOnly) {
         if (m_campaignType == CAMPAIGN_ROLAND)
-            iCampaignTrackType = TRACK_SWITCH_TO_ROLAND;
+            iCampaignTrackType = SWITCH_TO_ROLAND;
         else if (m_campaignScenarioCompleted[IDX(CAMPAIGN_ARCHIBALD)][MAP_THREE])
-            iCampaignTrackType = TRACK_SWITCH_TO_ARCHIBALD_COMPLETE;
+            iCampaignTrackType = SWITCH_TO_ARCHIBALD_COMPLETE;
         else
-            iCampaignTrackType = TRACK_SWITCH_TO_ARCHIBALD_OPEN;
+            iCampaignTrackType = SWITCH_TO_ARCHIBALD_OPEN;
     } else {
-        iCampaignTrackType =
-            IDX(m_campaignType) + IDX(m_campaignStartingSide) * IDX(CAMPAIGN_SIDE_COUNT);
+        iCampaignTrackType = static_cast<CampaignTrackType>(
+            IDX(m_campaignType) + IDX(m_campaignStartingSide) * IDX(CAMPAIGN_SIDE_COUNT)
+        );
     }
 
     campWin = new heroWindow(0, 0, "campaign.bin");
@@ -408,13 +410,14 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
         MemError();
     trackWidget = NULL;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
-        if (iCampaignTrackType < TRACK_REGULAR_COUNT && map >= CAMPAIGN_REGULAR_MAP_COUNT)
+        if (IDX(iCampaignTrackType) < IDX(SWITCH_TO_ROLAND)
+            && map >= CAMPAIGN_REGULAR_MAP_COUNT)
             continue;
-        if (iCampaignTrackType == TRACK_SWITCH_TO_ROLAND && map == MAP_THIRTEEN)
+        if (iCampaignTrackType == SWITCH_TO_ROLAND && map == MAP_THIRTEEN)
             continue;
-        if (iCampaignTrackType == TRACK_SWITCH_TO_ARCHIBALD_COMPLETE && map == MAP_THIRTEEN)
+        if (iCampaignTrackType == SWITCH_TO_ARCHIBALD_COMPLETE && map == MAP_THIRTEEN)
             continue;
-        if (iCampaignTrackType == TRACK_SWITCH_TO_ARCHIBALD_OPEN && map == MAP_TWELVE)
+        if (iCampaignTrackType == SWITCH_TO_ARCHIBALD_OPEN && map == MAP_TWELVE)
             continue;
         if (trackXY[IDX(iCurViewSide)][map][TRACK_X] != -1) {
             trackMapIndex = map;
@@ -508,10 +511,10 @@ void game::CampaignInfoUpdate(i32 redraw) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_LOCKED;
         }
         if (iCurViewMap == static_cast<i32>(map)) {
-            if (map + 1 == SCENARIO_FIVE && iCampaignTrackType == TRACK_ROLAND_TO_ARCHIBALD)
+            if (map + 1 == SCENARIO_FIVE && iCampaignTrackType == ROLAND_TO_ARCHIBALD)
                 message.payload.widget.data.value += TRACK_SELECTED_FRAME_FOUR_STEPS;
             else if (map + 1 == SCENARIO_FIVE
-                     && iCampaignTrackType == TRACK_ARCHIBALD_TO_ROLAND)
+                     && iCampaignTrackType == ARCHIBALD_TO_ROLAND)
                 message.payload.widget.data.value += TRACK_SELECTED_FRAME_THREE_STEPS;
             else if (map + 1 > CAMPAIGN_REGULAR_MAP_COUNT) {
                 if (m_campaignStartingSide == CAMPAIGN_ROLAND)
@@ -537,7 +540,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
     message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, "ctrack%02d.icn", iCampaignTrackType);
+    sprintf(gText, "ctrack%02d.icn", IDX(iCampaignTrackType));
     campWin->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
@@ -1096,6 +1099,6 @@ DATA(0x004f4f28) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUN
 // NOLINTEND(readability-magic-numbers)
 DATA(0x004f4f90) class heroWindow* campWin = NULL;
 DATA(0x00527ea4) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-DATA(0x00527ea8) i32 iCampaignTrackType;
+DATA(0x00527ea8) H2_ENUM_STORAGE(CampaignTrackType, i32) iCampaignTrackType;
 DATA(0x00527eac) i32 bCampaignViewOnly;
 DATA(0x00527eb0) i32 iCurViewMap;
