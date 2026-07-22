@@ -1,4 +1,0 @@
-# Ghidra-only starts nested in an NB09 public span that are not procedure
-# entries. The coverage audit fails on every unreviewed nested direct-call or
-# Ghidra candidate, so this file is the durable evidence for the rejected set.
-rva,reason
