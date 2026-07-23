@@ -43,29 +43,29 @@
 #define AI_RELOAD_NUMERATOR 3.0f
 #define AI_EASY_STRENGTH_FACTOR 1.15
 #define AI_BERSERK_FACTOR 0.75
-#define AI_HERO_VALUE_SCALE 0.00004
+#define AI_HERO_VALUE_SCALE DATA_COMPGEN(0x004eb2e8, vALUESCALEConstant, 0.00004)
 #define AI_HERO_VALUE_BASE 0.4
-#define AI_ARTIFACT_POOL_DIVISOR 33.0
-#define AI_BATTLE_TOWN_DEFENDER_FACTOR 1.11
-#define AI_BATTLE_DIFFICULTY_STEP 0.15
+#define AI_ARTIFACT_POOL_DIVISOR DATA_COMPGEN(0x004eb300, pOOLDIVISORConstant, 33.0)
+#define AI_BATTLE_TOWN_DEFENDER_FACTOR DATA_COMPGEN(0x004eb398, dEFENDERFACTORConstant2, 1.11)
+#define AI_BATTLE_DIFFICULTY_STEP DATA_COMPGEN(0x004eb3a0, dIFFICULTYSTEPConstant, 0.15)
 #define AI_BATTLE_BASE_STRENGTH_FACTOR 0.7
-#define AI_BATTLE_EASY_STRENGTH_FACTOR 1.08
-#define AI_BATTLE_HUMAN_DEFENDER_FACTOR 1.14
+#define AI_BATTLE_EASY_STRENGTH_FACTOR DATA_COMPGEN(0x004eb3a8, sTRENGTHFACTORConstant, 1.08)
+#define AI_BATTLE_HUMAN_DEFENDER_FACTOR DATA_COMPGEN(0x004eb3b0, dEFENDERFACTORConstant, 1.14)
 #define AI_BATTLE_MINIMUM_STRENGTH 1.0f
 #define AI_BATTLE_FULL_CHANCE 1.0f
-#define AI_BATTLE_LARGE_STRENGTH 1000000.0f
-#define AI_BATTLE_NORMAL_POWER 2.75f
+#define AI_BATTLE_LARGE_STRENGTH DATA_COMPGEN(0x004eb3bc, lARGESTRENGTHConstant, 1000000.0f)
+#define AI_BATTLE_NORMAL_POWER DATA_COMPGEN(0x004eb3b8, nORMALPOWERConstant, 2.75f)
 #define AI_BATTLE_LARGE_POWER 2.0f
-#define AI_BATTLE_ZERO_CHANCE 0.08
+#define AI_BATTLE_ZERO_CHANCE DATA_COMPGEN(0x004eb3c0, zEROCHANCEConstant, 0.08)
 #define AI_BATTLE_LOW_CHANCE 0.12
 #define AI_BATTLE_LOW_PENALTY 0.07
 #define AI_BATTLE_MEDIUM_CHANCE 0.2
 #define AI_BATTLE_MEDIUM_PENALTY 0.05
 #define AI_BATTLE_HIGH_CHANCE 0.3
-#define AI_BATTLE_HIGH_PENALTY 0.04
+#define AI_BATTLE_HIGH_PENALTY DATA_COMPGEN(0x004eb3e0, hIGHPENALTYConstant, 0.04)
 #define AI_BATTLE_TOP_CHANCE 0.4
-#define AI_BATTLE_TOP_PENALTY 0.02
-#define AI_BATTLE_LOSS_FACTOR_BASE 1.33
+#define AI_BATTLE_TOP_PENALTY DATA_COMPGEN(0x004eb370, tOPPENALTYConstant, 0.02)
+#define AI_BATTLE_LOSS_FACTOR_BASE DATA_COMPGEN(0x004eb3e8, fACTORBASEConstant, 1.33)
 #define AI_BATTLE_PLAYER_FACTOR_BASE 0.66
 #define AI_BATTLE_HERO_EXPERIENCE_FACTOR 0.8
 #define AI_BATTLE_PERCENT_SCALE 100.0f
@@ -74,7 +74,7 @@
 #define AI_QUICK_COMBAT_WIN_BONUS 0.65
 #define AI_QUICK_COMBAT_HIGH_WIN_CHANCE 0.8
 #define AI_QUICK_COMBAT_MINIMUM_CASUALTY 0.2
-#define AI_QUICK_COMBAT_CASUALTY_CAP_CHANCE 0.96
+#define AI_QUICK_COMBAT_CASUALTY_CAP_CHANCE DATA_COMPGEN(0x004eb440, cAPCHANCEConstant, 0.96)
 #define AI_QUICK_COMBAT_CASUALTY_DIVISOR 2.0f
 #define AI_QUICK_COMBAT_DAMAGE_PENALTY_LOW 0.6
 #define AI_QUICK_COMBAT_DAMAGE_PENALTY_HIGH 0.99
@@ -87,7 +87,7 @@
 #define AI_TOWN_ARCHER_ADVANTAGE_FACTOR 0.9
 #define AI_UPGRADE_EXISTING_STACK_FACTOR 1.2
 #define AI_HERO_INTERACTION_ALPHA_SHARE 0.6
-#define AI_HERO_INTERACTION_TARGET_SHARE 0.7f
+#define AI_HERO_INTERACTION_TARGET_SHARE DATA_COMPGEN(0x004eb538, tARGETSHAREConstant, 0.7f)
 #define AI_HERO_INTERACTION_MINIMUM_TRANSFER 0.15
 #define AI_HERO_INTERACTION_VALUE_FACTOR 0.1
 #define AI_PURCHASE_RANDOM_DIVISOR 100.0
@@ -103,8 +103,8 @@
 #define AI_HERO_PURCHASE_GOLD_COST 2500
 #define AI_HERO_PURCHASE_EXPERIENCE_BASE 2000
 #define AI_HERO_PURCHASE_CELL_PENALTY 200.0f
-#define AI_HERO_PURCHASE_RANDOM_BASE 90.0
-#define AI_PURCHASE_INITIAL_VALUE -99.0f
+#define AI_HERO_PURCHASE_RANDOM_BASE DATA_COMPGEN(0x004eb448, rANDOMBASEConstant, 90.0)
+#define AI_PURCHASE_INITIAL_VALUE DATA_COMPGEN(0x004eb340, iNITIALVALUEConstant, -99.0f)
 #define AI_MINIMUM_PURCHASE_VALUE 0.02
 #define AI_DIMENSION_DOOR_SPELL_POINTS 30
 #define AI_MAX_MAGE_GUILD_LEVEL 5
@@ -123,10 +123,10 @@
 #define AI_TOWN_SHARE_DIFFERENCE_FACTOR 0.15
 #define AI_TOWN_TRANSFER_BONUS 0.04
 #define AI_THIRD_WEEK_TOWN_SHARE_FACTOR 0.8
-#define AI_WEAKER_ARMY_TRANSFER_FACTOR 0.25f
-#define AI_STRONGER_ARMY_TRANSFER_FACTOR 0.13f
+#define AI_WEAKER_ARMY_TRANSFER_FACTOR DATA_COMPGEN(0x004eb550, tRANSFERFACTORConstant, 0.25f)
+#define AI_STRONGER_ARMY_TRANSFER_FACTOR DATA_COMPGEN(0x004eb554, tRANSFERFACTORConstant2, 0.13f)
 #define AI_TOWN_TRANSFER_CURVE_OFFSET 1.0f
-#define AI_TOWN_TRANSFER_CURVE_CENTER 0.22
+#define AI_TOWN_TRANSFER_CURVE_CENTER DATA_COMPGEN(0x004eb558, cURVECENTERConstant, 0.22)
 #define AI_CONQUERED_HERO_MOBILITY_LIMIT 20
 #define AI_UNGUARDED_TOWN_VALUE 500
 #define AI_TROOP_EMPTY_SLOT -1
@@ -137,9 +137,9 @@
 #define AI_TROOP_REDISTRIBUTION_STACK_SHARE 0.65
 #define AI_TROOP_REDISTRIBUTION_REMAINDER_FACTOR 0.2
 #define AI_TROOP_REDISTRIBUTION_BUDGET_FACTOR 1.2
-#define AI_CREATURE_SELECTION_WORST_VALUE 1000000000.0f
-#define AI_CREATURE_OFF_RACE_FACTOR 0.35
-#define AI_CREATURE_SELECTION_BASE_VALUE 500.0
+#define AI_CREATURE_SELECTION_WORST_VALUE DATA_COMPGEN(0x004eb560, wORSTVALUEConstant, 1000000000.0f)
+#define AI_CREATURE_OFF_RACE_FACTOR DATA_COMPGEN(0x004eb568, rACEFACTORConstant, 0.35)
+#define AI_CREATURE_SELECTION_BASE_VALUE DATA_COMPGEN(0x004eb458, bASEVALUEConstant, 500.0)
 #define AI_DWELLING_LEVELS 12
 #define AI_GOLD_RESOURCE_MULTIPLIER 100
 #define AI_CAMPFIRE_RESOURCE_AMOUNT 5.0f
@@ -147,14 +147,14 @@
 #define AI_CAMPFIRE_AVERAGE_DIVISOR 6.0f
 #define AI_OASIS_VALUE_FACTOR 350.0f
 #define AI_TREASURE_CHEST_GOLD_AMOUNT 1600.0f
-#define AI_BUOY_VALUE_FACTOR 400.0f
+#define AI_BUOY_VALUE_FACTOR DATA_COMPGEN(0x004eb594, vALUEFACTORConstant, 400.0f)
 #define AI_MORALE_LUCK_SITE_VALUE_FACTOR 200.0f
 #define AI_WATERING_HOLE_VALUE_FACTOR 300.0f
 #define AI_GAZEBO_VALUE_FACTOR 1000.0f
 #define AI_TRAINING_SITE_VALUE_FACTOR 1000.0f
 #define AI_TREE_KNOWLEDGE_VALUE_FACTOR 1500.0f
-#define AI_TREE_KNOWLEDGE_GOLD_COST 2000.0f
-#define AI_TREE_KNOWLEDGE_GEM_COST 10.0f
+#define AI_TREE_KNOWLEDGE_GOLD_COST DATA_COMPGEN(0x004eb574, gOLDCOSTConstant, 2000.0f)
+#define AI_TREE_KNOWLEDGE_GEM_COST DATA_COMPGEN(0x004eb59c, gEMCOSTConstant, 10.0f)
 #define AI_XANADU_VALUE_FACTOR 8000.0f
 #define AI_TRAVEL_GATE_INITIAL_VALUE -9999
 #define AI_TRAVEL_GATE_EXIT_SCALE 0.85
@@ -170,35 +170,35 @@
 #define AI_POSITION_LAND_DISTANCE_2 1.5
 #define AI_POSITION_LAND_DISTANCE_3 2.0f
 #define AI_POSITION_LAND_DISTANCE_4 3.0f
-#define AI_POSITION_LAND_DISTANCE_5 4.0f
+#define AI_POSITION_LAND_DISTANCE_5 DATA_COMPGEN(0x004eb494, dISTANCE5Constant, 4.0f)
 #define AI_POSITION_LAND_DISTANCE_6 5.0f
 #define AI_POSITION_LAND_FACTOR_2 1.2
 #define AI_POSITION_LAND_FACTOR_3 1.4
 #define AI_POSITION_LAND_FACTOR_4 1.7
 #define AI_POSITION_LAND_FACTOR_5 2.0
-#define AI_POSITION_LAND_FACTOR_6 2.5
+#define AI_POSITION_LAND_FACTOR_6 DATA_COMPGEN(0x004eb498, fACTOR6Constant, 2.5)
 #define AI_POSITION_LAND_FACTOR_FAR 3.0f
 #define AI_ATTENTION_RANDOM_DIVISOR 500.0
-#define AI_ATTENTION_RANDOM_BASE 0.23
+#define AI_ATTENTION_RANDOM_BASE DATA_COMPGEN(0x004eb460, rANDOMBASEConstant2, 0.23)
 #define AI_ATTENTION_WEIGHT_A_PLAYER_FACTOR 0.07
 #define AI_ATTENTION_WEIGHT_B_PLAYER_FACTOR 0.15
-#define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_BASE 0.54
+#define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_BASE DATA_COMPGEN(0x004eb540, sHAREBASEConstant, 0.54)
 #define AI_TOWN_CASTLE_PRIMARY_SKILL_SHARE_STEP 0.02
 #define AI_TOWN_PRIMARY_SKILL_SHARE_BASE 0.33
-#define AI_TOWN_PRIMARY_SKILL_SHARE_STEP 0.01
-static const float AI_TARGET_HUMAN_VALUE_FACTOR = 1.5f;
+#define AI_TOWN_PRIMARY_SKILL_SHARE_STEP DATA_COMPGEN(0x004eb548, sHARESTEPConstant, 0.01)
+DATA(0x004eb280) static const float AI_TARGET_HUMAN_VALUE_FACTOR = 1.5f;
 #define AI_EVENT_HUMAN_VALUE_FACTOR 1.5
-static const float AI_STRATEGIC_POSITION_SCORE_FACTOR = 1.25f;
-static const float AI_CREATURE_SAME_RACE_FACTOR = 1.1f;
-static const float AI_FUTURE_DEFLATION_RATE = 0.15f;
-static const float AI_HERO_PURCHASE_SAME_RACE_FACTOR = 0.16f;
-static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
+DATA(0x004eb284) static const float AI_STRATEGIC_POSITION_SCORE_FACTOR = 1.25f;
+DATA(0x004eb288) static const float AI_CREATURE_SAME_RACE_FACTOR = DATA_COMPGEN(0x004eb4d4, rACEFACTORConstant2, 1.1f);
+DATA(0x004eb28c) static const float AI_FUTURE_DEFLATION_RATE = DATA_COMPGEN(0x004eb454, dEFLATIONRATEConstant, 0.15f);
+DATA(0x004eb290) static const float AI_HERO_PURCHASE_SAME_RACE_FACTOR = 0.16f;
+DATA(0x004eb294) static const float AI_ATTENTION_IDENTITY_FLOAT = 1.0f;
 #define AI_HERO_PURCHASE_CLASS_DIVISOR 2.0f
 #define AI_HERO_PURCHASE_IDENTITY 1.0
-static const float AI_ATTENTION_IDENTITY = 1.0f;
+DATA(0x004eb298) static const float AI_ATTENTION_IDENTITY = 1.0f;
 #define AI_ATTENTION_PLAYER_CENTER 3.0
-#define AI_ATTENTION_NORMALIZER 4.0
-#define AI_ATTENTION_UPPER_BOUND 5.0
+#define AI_ATTENTION_NORMALIZER DATA_COMPGEN(0x004eb468, aTTENTIONNORMALIZERConstant, 4.0)
+#define AI_ATTENTION_UPPER_BOUND DATA_COMPGEN(0x004eb470, uPPERBOUNDConstant, 5.0)
 #define AI_MONSTER_JOIN_RATIO 2.0f
 #define AI_MONSTER_OVERWHELMING_RATIO 5.0f
 #define AI_MONSTER_JOIN_CHANCE_SCALE 60.0f
@@ -407,6 +407,7 @@ H2_ENUM_END(AITownEvaluationConstant)
 DATA(0x004f2394) static i16 s_initAIMapLineBase = 0x1b86; // NOLINT(readability-magic-numbers)
 DATA(0x004f2474) static i16 s_closeAIMapLineBase = 0x1b96; // NOLINT(readability-magic-numbers)
 
+DATA_COMPGEN_GUARD(0x004ec004, sVSearchArrayInitializationGuard, SVSearchArray)
 DATA(0x005256f0) searchArray SVSearchArray;
 
 VA_COMPGEN(0x004377b0, 0x1a, STATIC_INIT_DISPATCH, SVSearchArray)
@@ -642,7 +643,7 @@ void philAI::CheckBuyStuff(void) {
             && gpCurPlayer->m_heroCount == 0)
             return;
         LogInt(
-            "CheckBuy Start",
+            DATA_COMPGEN(0x004f2120, checkBuyStuffCheckBuyStart, "CheckBuy Start"),
             gpCurPlayer->m_resources[IDX(RES_GOLD)],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -723,7 +724,7 @@ void philAI::CheckBuyStuff(void) {
         }
         DoAllHeroInteractions();
         LogInt(
-            "CheckBuy End  ",
+            DATA_COMPGEN(0x004f2130, checkBuyStuffCheckBuyEnd, "CheckBuy End  "),
             gpCurPlayer->m_resources[IDX(RES_GOLD)],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -822,7 +823,7 @@ void philAI::CheckReload(void) {
     float friendly;
 
     gbTroopReload = false;
-    fReduceFactor = 1.0f;
+    fReduceFactor = DATA_COMPGEN(0x004eb29c, checkReloadConstant, 1.0f);
     friendly = 0.0f;
     idx = 0.0f;
     kn = FightValueOfStack(&gpCurAIHero->m_army, gpCurAIHero, 0, 0, 0, 0);
@@ -1195,7 +1196,7 @@ void philAI::DoAI(i32 player) {
     i32 savedShow10;
 
     LogInt(
-        "DO AI 1",
+        DATA_COMPGEN(0x004f2140, doAIDOAI1, "DO AI 1"),
         player,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -1212,7 +1213,7 @@ void philAI::DoAI(i32 player) {
             goto aiCleanup;
     }
     LogInt(
-        "DO AI",
+        DATA_COMPGEN(0x004f2148, doAIDOAI, "DO AI"),
         player,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -1234,7 +1235,7 @@ void philAI::DoAI(i32 player) {
     for (pathIndex3[0] = 0; pathIndex3[0] < IDX(RES_COUNT); pathIndex3[0]++) {
         sprintf(
             gText,
-            "RES - %15s  %d  %d",
+            DATA_COMPGEN(0x004f2150, doAIRES15sDD, "RES - %15s  %d  %d"),
             gResourceNames[pathIndex3[0]],
             gpCurPlayer->m_resources[pathIndex3[0]],
             gpCurPlayer->m_aiData.m_income[pathIndex3[0]]
@@ -1260,10 +1261,10 @@ void philAI::DoAI(i32 player) {
         if (gbGameOver != 0)
             goto aiCleanup;
 
-        LogStr("\n\n\n\n");
-        LogStr("===================================");
+        LogStr(DATA_COMPGEN(0x004f2164, doAIEmptyString, "\n\n\n\n"));
+        LogStr(DATA_COMPGEN(0x004f216c, doAIEmptyString2, "==================================="));
         LogInt(
-            "Player with HeroTOMOVE",
+            DATA_COMPGEN(0x004f2190, doAIPlayerWithHeroTOMOVE, "Player with HeroTOMOVE"),
             player,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -1273,7 +1274,7 @@ void philAI::DoAI(i32 player) {
             LOG_UNUSED_VALUE
         );
         LogStr(gpCurAIHero->m_name);
-        LogStr("\n");
+        LogStr(DATA_COMPGEN(0x004f21a8, doAIEmptyString3, "\n"));
         CheckReload();
         CheckBerserk();
         giShowComputerRoute = 0;
@@ -1295,9 +1296,9 @@ void philAI::DoAI(i32 player) {
         stepLimit36 = HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) ? 15 : 5;
         minimumValue9 = gpCurAIHero->m_mobility + 800;
         stepLimit36 =
-            static_cast<i32>(stepLimit36 * (1.7 - IDX(gpGame->m_difficulty) * 0.1));
+            static_cast<i32>(stepLimit36 * (DATA_COMPGEN(0x004eb2c8, doAIConstant4, 1.7) - IDX(gpGame->m_difficulty) * DATA_COMPGEN(0x004eb2c0, doAIConstant3, 0.1)));
         minimumValue9 = static_cast<i32>(
-            minimumValue9 * ((IDX(gpGame->m_difficulty) - 1) * 0.06 + 0.8)
+            minimumValue9 * ((IDX(gpGame->m_difficulty) - 1) * DATA_COMPGEN(0x004eb2d0, doAIConstant, 0.06) + DATA_COMPGEN(0x004eb2d8, doAIConstant2, 0.8))
         );
 
         while (!heroDone5 && gpCurAIHero->m_remainingMobility >= AI_MINIMUM_SITE_MOBILITY) {
@@ -1568,9 +1569,9 @@ void philAI::GetTurnAIVars(i32 player) {
     }
 
     unusedFightValue7 = 0;
-    fightValueFloat15 = 0.0f;
+    fightValueFloat15 = DATA_COMPGEN(0x004eb2f8, getTurnAIVarsConstant2, 0.0);
     if (giCurTurn <= 8) {
-        fFirstWeekTownFV = 0.0f;
+        fFirstWeekTownFV = DATA_COMPGEN(0x004eb338, getTurnAIVarsConstant3, 0.0);
         for (firstWeekIndex0 = 0; firstWeekIndex0 < gpCurPlayer->m_townCount; firstWeekIndex0++) {
             townPtr9 = GetCastleSlot(gpCurPlayer->m_townIds[firstWeekIndex0]);
             for (innerIndex27 = 0; innerIndex27 < GAME_HERO_COUNT; innerIndex27++) {
@@ -1580,7 +1581,7 @@ void philAI::GetTurnAIVars(i32 player) {
                     } else if (abs(heroPtr5->m_y - townPtr9->m_y)
                                    + abs(heroPtr5->m_x - townPtr9->m_x)
                                < 16) {
-                        fFirstWeekTownFV = 0.3f;
+                        fFirstWeekTownFV = DATA_COMPGEN(0x004eb2e0, getTurnAIVarsConstant8, 0.3f);
                         goto firstWeekDone;
                     }
             }
@@ -1721,17 +1722,17 @@ firstWeekDone:
     for (generalIndex4 = 0; generalIndex4 < GAME_HERO_COUNT; generalIndex4++)
         gfHeroInteractionBonus[generalIndex4] = 1.0f;
     if (gpGame->m_difficulty == DIFFICULTY_EASY) {
-        gfAttackHumanBonus = 0.6f;
-        gfAttackComputerBonus = 1.3f;
+        gfAttackHumanBonus = DATA_COMPGEN(0x004eb310, getTurnAIVarsConstant7, 0.6f);
+        gfAttackComputerBonus = DATA_COMPGEN(0x004eb314, getTurnAIVarsConstant6, 1.3f);
     } else if (gpGame->m_difficulty == DIFFICULTY_NORMAL) {
         gfAttackHumanBonus = 1.0f;
         gfAttackComputerBonus = 1.0f;
     } else {
-        gfAttackHumanBonus = static_cast<float>(IDX(gpGame->m_difficulty) * 0.07 + 1.0);
-        gfAttackComputerBonus = static_cast<float>(1.1 - IDX(gpGame->m_difficulty) * 0.12);
+        gfAttackHumanBonus = static_cast<float>(IDX(gpGame->m_difficulty) * DATA_COMPGEN(0x004eb318, getTurnAIVarsConstant5, 0.07) + 1.0);
+        gfAttackComputerBonus = static_cast<float>(DATA_COMPGEN(0x004eb328, getTurnAIVarsConstant4, 1.1) - IDX(gpGame->m_difficulty) * DATA_COMPGEN(0x004eb320, getTurnAIVarsConstant, 0.12));
     }
     if (gbIAmGreatest)
-        gfAttackComputerBonus = 0.1f;
+        gfAttackComputerBonus = DATA_COMPGEN(0x004eb330, getTurnAIVarsConstant9, 0.1f);
 
     townCountValue5 = 0.1f;
     for (generalIndex4 = 0; generalIndex4 < gpCurPlayer->m_townCount; generalIndex4++) {
@@ -1821,7 +1822,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
     for (i36 = 0; i36 < gpCurPlayer->m_townCount; i36++) {
         townPtr7 = &gpGame->m_castleRecs[gpCurPlayer->m_townIds[i36]];
         LogInt(
-            "Turns Owned",
+            DATA_COMPGEN(0x004f21ac, getBestBHCTurnsOwned, "Turns Owned"),
             townPtr7->m_turnsOwned,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -1836,7 +1837,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
             CheckDoMain(0, 0);
             GetBestBuilding(townPtr7, candidate10, value19);
             value19 =
-                static_cast<float>((100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value19);
+                static_cast<float>((100 - Random(0, 10)) / DATA_COMPGEN(0x004eb348, getBestBHCConstant2, AI_PURCHASE_RANDOM_DIVISOR) * value19);
             if (value19 > bestValue29) {
                 bestValue29 = value19;
                 best = candidate10;
@@ -1845,7 +1846,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
             CheckDoMain(0, 0);
             GetBestCreature(townPtr7, candidate10, value19);
             value19 = static_cast<float>(
-                (static_cast<float>(desiredStrength5[i36]) / townStrength6[i36] / 3.0f
+                (static_cast<float>(desiredStrength5[i36]) / townStrength6[i36] / DATA_COMPGEN(0x004eb2a8, getBestBHCConstant4, 3.0f)
                  + AI_CREATURE_BALANCE_BASE)
                 * value19
             );
@@ -1863,7 +1864,7 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
                 value19 = static_cast<float>(
                     (100 - Random(0, 10)) / AI_PURCHASE_RANDOM_DIVISOR * value19
                 );
-                if (!bHeroBuiltThisTurn && giCurTurn > 5 && value19 > 0.0f) {
+                if (!bHeroBuiltThisTurn && giCurTurn > 5 && value19 > DATA_COMPGEN(0x004eb2a0, getBestBHCConstant, 0.0f)) {
                     if (!((gpCurPlayer->m_aiData.m_income[IDX(RES_GOLD)] < 1250
                            || giMaxHeroesForThisPlayer - 2 <= gpCurPlayer->m_heroCount)
                           && gpCurPlayer->m_heroCount > 1)) {
@@ -1883,9 +1884,9 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
         }
     }
     LogInt(
-        "BestBHC ",
+        DATA_COMPGEN(0x004f21b8, getBestBHCBestBHC, "BestBHC "),
         IDX(best.type),
-        static_cast<i32>(bestValue29 * 100.0f),
+        static_cast<i32>(bestValue29 * DATA_COMPGEN(0x004eb368, getBestBHCConstant3, 100.0f)),
         best.what,
         0,
         0,
@@ -1975,15 +1976,15 @@ i32 philAI::DetermineTargetPosition(
     if (gpCurAIHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]
         <= HERO_SKILL_LEVEL_BASIC) {
         if (mapTerrain == TERRAIN_SNOW || mapTerrain == TERRAIN_SWAMP)
-            mobility = static_cast<i32>(mobility * 1.15);
+            mobility = static_cast<i32>(mobility * DATA_COMPGEN(0x004eb2b0, determineTargetPositionConstant, 1.15));
         if (mapTerrain == TERRAIN_DESERT)
-            mobility = static_cast<i32>(mobility * 1.35);
+            mobility = static_cast<i32>(mobility * DATA_COMPGEN(0x004eb378, determineTargetPositionConstant2, 1.35));
         if (mapTerrain == TERRAIN_WASTELAND)
-            mobility = static_cast<i32>(mobility * 1.25);
+            mobility = static_cast<i32>(mobility * DATA_COMPGEN(0x004eb380, determineTargetPositionConstant3, 1.25));
     } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_SMALL) {
-        mobility = static_cast<i32>(mobility * 0.9);
+        mobility = static_cast<i32>(mobility * DATA_COMPGEN(0x004eb388, determineTargetPositionConstant4, 0.9));
     } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_LARGE) {
-        mobility = static_cast<i32>(mobility * 1.05);
+        mobility = static_cast<i32>(mobility * DATA_COMPGEN(0x004eb390, determineTargetPositionConstant5, 1.05));
     } else if (gpGame->m_mapHeader.width == MAP_DIMENSION_XLARGE) {
         mobility = static_cast<i32>(mobility * 1.1);
     }
@@ -2211,7 +2212,7 @@ i32 philAI::DetermineTargetPosition(
         targetY = static_cast<u8>(gpCurAIHero->m_boatDestY);
     }
     LogInt(
-        "Hero, Best RV target XY  current XY",
+        DATA_COMPGEN(0x004f21c4, determineTargetPositionHeroBestRVTargetXYCurrent, "Hero, Best RV target XY  current XY"),
         gpCurAIHero->m_owner,
         bestValue,
         targetX,
@@ -2220,7 +2221,7 @@ i32 philAI::DetermineTargetPosition(
         gpCurAIHero->m_y,
         LOG_UNUSED_VALUE
     );
-    LogStr("\n\n****");
+    LogStr(DATA_COMPGEN(0x004f21e8, determineTargetPositionEmptyString, "\n\n****"));
     return bestValue;
 }
 // NOLINTEND(readability-magic-numbers)
@@ -2405,7 +2406,7 @@ void philAI::ProbableOutcomeOfBattle(
 
     if (giDebugLevel >= AI_BATTLE_DEBUG_LEVEL) {
         LogInt(
-            "POBA",
+            DATA_COMPGEN(0x004f21f0, probableOutcomeOfBattlePOBA, "POBA"),
             static_cast<i32>(attackerStrength0),
             static_cast<i32>(defenderStrength4),
             static_cast<i32>(
@@ -2417,7 +2418,7 @@ void philAI::ProbableOutcomeOfBattle(
             static_cast<i32>(gpCurPlayer->m_aiData.m_upgradeValueWeight)
         );
         LogInt(
-            "POB",
+            DATA_COMPGEN(0x004f21f8, probableOutcomeOfBattlePOB, "POB"),
             static_cast<i32>(attackerFightValue26),
             static_cast<i32>(defenderFightValue5),
             static_cast<i32>(winChance * AI_BATTLE_PERCENT_SCALE),
@@ -2515,15 +2516,15 @@ void philAI::ValueOfBuyingBuilding(
                 if ((townPtr->m_buildState >= 4 && giCurTurn < 40)
                     || (townPtr->m_buildState >= 3 && giCurTurn < 30)
                     || (townPtr->m_buildState >= 2 && giCurTurn < 20))
-                    adjustedValue = static_cast<float>(adjustedValue * 0.4);
+                    adjustedValue = static_cast<float>(adjustedValue * DATA_COMPGEN(0x004eb2f0, valueOfBuyingBuildingConstant6, 0.4));
                 else
-                    adjustedValue = static_cast<float>(adjustedValue * 0.65);
+                    adjustedValue = static_cast<float>(adjustedValue * DATA_COMPGEN(0x004eb3f0, valueOfBuyingBuildingConstant5, 0.65));
             } else if (townPtr->m_buildState == 0) {
-                adjustedValue = static_cast<float>(adjustedValue * 1.2);
+                adjustedValue = static_cast<float>(adjustedValue * DATA_COMPGEN(0x004eb3f8, valueOfBuyingBuildingConstant, 1.2));
             } else if ((townPtr->m_buildState >= 4 && giCurTurn < 35)
                        || (townPtr->m_buildState >= 3 && giCurTurn < 25)
                        || (townPtr->m_buildState >= 2 && giCurTurn < 15)) {
-                adjustedValue = static_cast<float>(adjustedValue * 0.55);
+                adjustedValue = static_cast<float>(adjustedValue * DATA_COMPGEN(0x004eb400, valueOfBuyingBuildingConstant7, 0.55));
             }
             break;
         case BUILDING_SLOT_SPECIAL_ONE:
@@ -2531,7 +2532,7 @@ void philAI::ValueOfBuyingBuilding(
                 && (townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
                 adjustedValue = 1500.0f;
             else if (giCurTurn < 21)
-                adjustedValue = 0.0f;
+                adjustedValue = DATA_COMPGEN(0x004eb428, valueOfBuyingBuildingConstant2, 0.0);
             break;
         case BUILDING_SLOT_SPECIAL_SEVEN:
             if (giCurTurn < 3 && !(townPtr->m_buildings & BIT(BUILDING_SLOT_DWELLING_THIRD)))
@@ -2567,10 +2568,10 @@ void philAI::ValueOfBuyingBuilding(
             break;
         case BUILDING_SLOT_SPECIAL_FOUR:
             adjustedValue = static_cast<float>(
-                (gpCurPlayer->m_aiData.m_attentionWeights.buildingValue + 0.66) * adjustedValue
+                (gpCurPlayer->m_aiData.m_attentionWeights.buildingValue + DATA_COMPGEN(0x004eb350, valueOfBuyingBuildingConstant4, 0.66)) * adjustedValue
             );
             adjustedValue = static_cast<float>(
-                (gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase * 2.0f + 0.33)
+                (gpCurPlayer->m_aiData.m_attentionWeights.upgradeBase * DATA_COMPGEN(0x004eb2a4, valueOfBuyingBuildingConstant3, 2.0f) + DATA_COMPGEN(0x004eb410, valueOfBuyingBuildingConstant9, 0.33))
                 * adjustedValue
             );
             adjustedValue = static_cast<float>((dwellingTotal * 0.33 + 0.66) * adjustedValue);
@@ -2625,12 +2626,12 @@ void philAI::ValueOfBuyingBuilding(
             adjustedValue = static_cast<float>(
                 (1.0
                  - gpCurPlayer->BuildingsOwned(currentTownRace, building, 0)
-                       * 0.05)
+                       * DATA_COMPGEN(0x004eb3d0, valueOfBuyingBuildingConstant8, 0.05))
                 * adjustedValue
             );
             if (static_cast<i32>(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)
                 < highestDwellingId)
-                adjustedValue = static_cast<float>((1.66 - dwellingTotal * 0.33) * adjustedValue);
+                adjustedValue = static_cast<float>((DATA_COMPGEN(0x004eb420, valueOfBuyingBuildingConstant11, 1.66) - dwellingTotal * 0.33) * adjustedValue);
             if (townPtr->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
                 adjustedValue = static_cast<float>(adjustedValue * 1.1);
             for (buildingLevel = 0; buildingLevel < AI_DWELLING_LEVELS; buildingLevel++) {
@@ -2661,7 +2662,7 @@ void philAI::ValueOfBuyingBuilding(
     );
     adjustedValue = static_cast<float>((1.0 - dangerRating * 3.0) * adjustedValue);
     if (townPtr->m_originalOwner != giCurPlayer)
-        adjustedValue = static_cast<float>(adjustedValue * 0.85);
+        adjustedValue = static_cast<float>(adjustedValue * DATA_COMPGEN(0x004eb430, valueOfBuyingBuildingConstant10, 0.85));
     if (adjustedValue < 0.0f)
         adjustedValue = 0.0f;
     GetBuildingCost(
@@ -2696,7 +2697,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
             if (CanBuild(t, node)) {
                 ValueOfBuyingBuilding(t, node, cost, idx);
                 if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_BUILDER)
-                    cost = static_cast<i32>(cost * 1.3);
+                    cost = static_cast<i32>(cost * DATA_COMPGEN(0x004eb360, getBestBuildingConstant, 1.3));
                 score = (Random(1, 5) + 95) * idx / 100.0f;
                 if (score > OD_STEER(kn)) {
                     jb = node;
@@ -2706,7 +2707,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                 if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                     sprintf(
                         gText,
-                        "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
+                        DATA_COMPGEN(0x004f21fc, getBestBuildingTown2dBuilding18sRawBC, "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f."),
                         t->m_id,
                         GetBuildingName(t->m_type, node),
                         idx,
@@ -2903,7 +2904,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                     if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                         sprintf(
                             gText,
-                            "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
+                            DATA_COMPGEN(0x004f223c, getBestCreatureTown2dCreature18sRawBC, "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f."),
                             townPtr->m_id,
                             GetMonsterName(candidateMonster),
                             unrandomizedValue,
@@ -3046,7 +3047,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
         if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
             sprintf(
                 gText,
-                "Town:%2d  Hero    : % 15i   Raw BC = %8.2f,  RandBC = %8.2f.",
+                DATA_COMPGEN(0x004f227c, getBestHeroTown2dHero15iRawBC, "Town:%2d  Hero    : % 15i   Raw BC = %8.2f,  RandBC = %8.2f."),
                 townPtr->m_id,
                 heroIndex,
                 benefitCost,
@@ -3128,7 +3129,7 @@ void philAI::GetGameAttentionValue(i32 player) {
 VA(0x0043e6b0, 0xf2)
 void philAI::GetTurnAttentionValue(i32 player) {
     playerAttentionWeights* ptr = &gpGame->m_players[player].m_aiData.m_attentionWeights;
-    ptr->gameWeightA = 0.4f;
+    ptr->gameWeightA = DATA_COMPGEN(0x004eb478, getTurnAttentionValueConstant4, 0.4f);
     ptr->gameWeightB = 0.3f;
     ptr->gameRemainder = 0.3f;
     ptr->buildingValue = ptr->gameWeightA;
@@ -3136,15 +3137,15 @@ void philAI::GetTurnAttentionValue(i32 player) {
     ptr->upgradeBase = ptr->gameRemainder;
     float factor;
     if (giCurTurn < 5)
-        factor = 1.6f;
+        factor = DATA_COMPGEN(0x004eb47c, getTurnAttentionValueConstant5, 1.6f);
     else if (giCurTurn < 10)
-        factor = 1.4f;
+        factor = DATA_COMPGEN(0x004eb480, getTurnAttentionValueConstant, 1.4f);
     else if (giCurTurn < 20)
-        factor = 1.2f;
+        factor = DATA_COMPGEN(0x004eb484, getTurnAttentionValueConstant2, 1.2f);
     else if (giCurTurn < 30)
         factor = 1.0f;
     else
-        factor = 0.8f;
+        factor = DATA_COMPGEN(0x004eb488, getTurnAttentionValueConstant3, 0.8f);
     ptr->heroValue = ptr->heroValue * factor;
 }
 // NOLINTEND(readability-magic-numbers)
@@ -3174,7 +3175,7 @@ float philAI::TurnsToBuy(i32* const p) {
                     (p[i] - gpCurPlayer->m_resources[i]) / gpCurPlayer->m_aiData.m_income[i] + 1
                 );
             else
-                turns = 99.0f;
+                turns = DATA_COMPGEN(0x004eb48c, turnsToBuyConstant, 99.0f);
             maxT = turns > maxT ? turns : maxT;
         }
     }
@@ -3311,7 +3312,7 @@ i32 philAI::RVOfPosition(
     } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_5) {
         distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_6);
     } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_4) {
-        distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_5);
+        distanceFactor5 = static_cast<float>(distanceFactor5 * DATA_COMPGEN(0x004eb4a0, rVOfPositionConstant, AI_POSITION_LAND_FACTOR_5));
     } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_3) {
         distanceFactor5 = static_cast<float>(distanceFactor5 * AI_POSITION_LAND_FACTOR_4);
     } else if (distanceFactor5 > AI_POSITION_LAND_DISTANCE_2) {
@@ -3337,8 +3338,8 @@ i32 philAI::RVOfPosition(
         if (debugObjectType > MAP_OBJECT_NONE && IDX(debugObjectType) < POSITION_OBJECT_NAME_COUNT)
             objectName5 = gQuickViewText[IDX(debugObjectType)];
         else
-            objectName5 = " ";
-        sprintf(debugText1, "FUN U :% 15s", objectName5);
+            objectName5 = DATA_COMPGEN(0x004f22c0, rVOfPositionEmptyString, " ");
+        sprintf(debugText1, DATA_COMPGEN(0x004f22c4, rVOfPositionFUNU15s, "FUN U :% 15s"), objectName5);
         LogInt(
             debugText1,
             x,
@@ -3456,7 +3457,7 @@ i32 philAI::StrategicValueOfPosition(
                     CheckDoMain(0, 0);
                     eventValue13 = static_cast<i32>(
                         (ValueOfEventAtPosition(x13, yCounter, 0, &iDummy) * 25)
-                        / (search5->GetNode(x13, yCounter).distance + 50.0)
+                        / (search5->GetNode(x13, yCounter).distance + DATA_COMPGEN(0x004eb4b8, strategicValueOfPositionConstant2, 50.0))
                     );
                     if (!friendlyTown1
                         || cell9->m_triggerType
@@ -3490,7 +3491,7 @@ i32 philAI::StrategicValueOfPosition(
                                     }
                                 } else {
                                     danger26 = static_cast<i32>(
-                                        (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) * 0.2
+                                        (100 - gaiHeroLiveChance[cell9->m_objectMetadata]) * DATA_COMPGEN(0x004eb3c8, strategicValueOfPositionConstant, 0.2)
                                     );
                                 }
                             } else {
@@ -3574,7 +3575,7 @@ i32 philAI::ValueOfTown(town* t) {
         if (t->m_buildings & (1 << IDX(building)))
             sum += GetBuildingBaseResourceValue(t->m_type, building, t->m_buildState);
     }
-    sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * 1250.0f * 1.5 + sum);
+    sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb4c0, valueOfTownConstant, 1250.0f) * DATA_COMPGEN(0x004eb4a8, valueOfTownConstant2, 1.5) + sum);
     sum += 750;
     if (gpGame->m_mapHeader.lossCondition == MAP_LOSS_TOWN
         && t->m_x == gpGame->m_mapHeader.lossConditionValue
@@ -3602,7 +3603,7 @@ void philAI::TurnCostResource(i32 player) {
     total = 0;
     for (nb = 0; nb < AI_PURCHASE_RESOURCE_COUNT; nb++) {
         cost[nb] = (i32)(
-            ((double)(kn->m_income[nb] * 5) * 0.7
+            ((double)(kn->m_income[nb] * 5) * DATA_COMPGEN(0x004eb308, turnCostResourceConstant, 0.7)
              + (double)gpGame->m_players[player].m_resources[nb])
             * (double)gResourceBaseValue[nb]
         );
@@ -3632,11 +3633,15 @@ float philAI::TurnValueOfObelisk(i32 player) {
         return 0.0f;
     ta->m_obeliskValue = idx * GAME_OBELISK_VISITOR_COUNT / gpGame->m_obeliskCount;
     if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_EXPLORER)
-        ta->m_obeliskValue = (i32)(ta->m_obeliskValue * 1.4);
+        ta->m_obeliskValue = (i32)(ta->m_obeliskValue * DATA_COMPGEN(0x004eb4b0, turnValueOfObeliskConstant, 1.4));
     ta->m_obeliskValue = (i32)(
         (1.5
          - abs(GAME_OBELISK_VISITOR_COUNT - gpGame->SetupPuzzlePieces(giCurPlayer, 1))
-               / static_cast<float>(GAME_OBELISK_VISITOR_COUNT))
+               / DATA_COMPGEN(
+                   0x004eb4c4,
+                   obeliskVisitorCount,
+                   static_cast<float>(GAME_OBELISK_VISITOR_COUNT)
+               ))
         * ta->m_obeliskValue
     );
     ta->m_obeliskValue =
@@ -3649,7 +3654,7 @@ VA(0x0043fe81, 0x51)
 float philAI::FutureDeflator(i32* const p) {
     float t = TurnsToBuy(p);
     float v = 1.0f - t * AI_FUTURE_DEFLATION_RATE;
-    if (v < 0.0)
+    if (v < DATA_COMPGEN(0x004eb4c8, futureDeflatorConstant, 0.0))
         v = 0;
     return v;
 }
@@ -3695,9 +3700,9 @@ i32 philAI::FightValueOfStack(
     armyValue = 0;
     spellValueMap = 0;
     townArcherValueValue = 0;
-    enemyRangedModifier27 = 0.9f;
+    enemyRangedModifier27 = DATA_COMPGEN(0x004eb4d0, fightValueOfStackConstant11, 0.9f);
     enemyMeleeModifierIndex = 1.1f;
-    enemyFlyingModifier36 = 0.75f;
+    enemyFlyingModifier36 = DATA_COMPGEN(0x004eb4d8, fightValueOfStackConstant5, 0.75f);
     unusedModifierRange = 0.1f;
     townRecord19 = NULL;
 
@@ -3705,8 +3710,8 @@ i32 philAI::FightValueOfStack(
         if (heroPtr->HasArtifact(ARTIFACT_BALLISTA) || heroPtr->HasSpell(SPELL_EARTHQUAKE)
             || heroPtr->m_secondarySkills[IDX(HERO_SKILL_BALLISTICS)]
                    != HERO_SKILL_LEVEL_NONE) {
-            enemyMeleeModifierIndex = 1.05f;
-            enemyFlyingModifier36 = 0.95f;
+            enemyMeleeModifierIndex = DATA_COMPGEN(0x004eb4dc, fightValueOfStackConstant12, 1.05f);
+            enemyFlyingModifier36 = DATA_COMPGEN(0x004eb4e0, fightValueOfStackConstant7, 0.95f);
         }
         if (heroPtr->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)] != HERO_SKILL_LEVEL_NONE
             || heroPtr->HasArtifact(ARTIFACT_GOLDEN_BOW))
@@ -3725,17 +3730,17 @@ i32 philAI::FightValueOfStack(
                             * group->m_quantities[armySlotRecord];
             if (useHero) {
                 if (group->m_quantities[armySlotRecord] > 500)
-                    quantityModifierTarget = 4.4f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4e4, fightValueOfStackConstant16, 4.4f);
                 else if (group->m_quantities[armySlotRecord] > 300)
-                    quantityModifierTarget = 3.9f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4e8, fightValueOfStackConstant13, 3.9f);
                 else if (group->m_quantities[armySlotRecord] > 180)
-                    quantityModifierTarget = 3.08f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4ec, fightValueOfStackConstant15, 3.08f);
                 else if (group->m_quantities[armySlotRecord] > 140)
-                    quantityModifierTarget = 2.42f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4f0, fightValueOfStackConstant9, 2.42f);
                 else if (group->m_quantities[armySlotRecord] > 100)
-                    quantityModifierTarget = 2.1f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4f4, fightValueOfStackConstant10, 2.1f);
                 else if (group->m_quantities[armySlotRecord] > 75)
-                    quantityModifierTarget = 1.63f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4f8, fightValueOfStackConstant19, 1.63f);
                 else if (group->m_quantities[armySlotRecord] > 50)
                     quantityModifierTarget = 1.4f;
                 else if (group->m_quantities[armySlotRecord] > 35)
@@ -3743,21 +3748,21 @@ i32 philAI::FightValueOfStack(
                 else if (group->m_quantities[armySlotRecord] > 23)
                     quantityModifierTarget = 0.75f;
                 else if (group->m_quantities[armySlotRecord] > 16)
-                    quantityModifierTarget = 0.5f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb4fc, fightValueOfStackConstant4, 0.5f);
                 else if (group->m_quantities[armySlotRecord] > 11)
-                    quantityModifierTarget = 0.32f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb500, fightValueOfStackConstant6, 0.32f);
                 else if (group->m_quantities[armySlotRecord] > 8)
-                    quantityModifierTarget = 0.21f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb504, fightValueOfStackConstant8, 0.21f);
                 else if (group->m_quantities[armySlotRecord] > 5)
-                    quantityModifierTarget = 0.0f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb2b8, fightValueOfStackConstant2, 0.0);
                 else if (group->m_quantities[armySlotRecord] > 3)
-                    quantityModifierTarget = -0.1f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb508, fightValueOfStackConstant17, -0.1f);
                 else if (group->m_quantities[armySlotRecord] > 2)
-                    quantityModifierTarget = -0.3f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb50c, fightValueOfStackConstant14, -0.3f);
                 else if (group->m_quantities[armySlotRecord] > 2)
-                    quantityModifierTarget = -0.4f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb510, fightValueOfStackConstant18, -0.4f);
                 else
-                    quantityModifierTarget = -0.58f;
+                    quantityModifierTarget = DATA_COMPGEN(0x004eb514, fightValueOfStackConstant20, -0.58f);
 
                 if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[armySlotRecord])].attributes,
                         MONSTER_ATTRIBUTE_RANGED)
@@ -3779,10 +3784,10 @@ i32 philAI::FightValueOfStack(
                 if (useTown) {
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[armySlotRecord])].attributes,
                             MONSTER_ATTRIBUTE_RANGED))
-                        stackValueMap = static_cast<i32>(stackValueMap * 1.18);
+                        stackValueMap = static_cast<i32>(stackValueMap * DATA_COMPGEN(0x004eb438, fightValueOfStackConstant, 1.18));
                     if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[armySlotRecord])].attributes,
                             MONSTER_ATTRIBUTE_FLYING))
-                        stackValueMap = static_cast<i32>(stackValueMap * 0.95);
+                        stackValueMap = static_cast<i32>(stackValueMap * DATA_COMPGEN(0x004eb518, fightValueOfStackConstant3, 0.95));
                 }
                 if (HAS(gMonsterDatabase[IDX(group->m_creatureTypes[armySlotRecord])].attributes,
                         MONSTER_ATTRIBUTE_RANGED)
@@ -3909,7 +3914,7 @@ i32 philAI::FightValueOfStack(
             static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
     if (giDebugLevel == AI_BATTLE_DEBUG_LEVEL)
         LogInt(
-            "FV3",
+            DATA_COMPGEN(0x004f22d4, fightValueOfStackFV3, "FV3"),
             armyValue,
             spellValueMap,
             townArcherValueValue,
@@ -4133,7 +4138,7 @@ i32 philAI::QuickCombat(
         && Random(0, QUICK_COMBAT_RANDOM_LIMIT) < QUICK_COMBAT_RETREAT_CHANCE)
         gbRetreatWin = true;
     if (gbRetreatWin == 0) {
-        if (attackerDamage > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
+        if (attackerDamage > DATA_COMPGEN(0x004eb528, quickCombatConstant, AI_QUICK_COMBAT_DEFEAT_THRESHOLD))
             gpAdvManager->TransferArtifacts(attackerHero, defenderHero);
         else if (defenderDamage > AI_QUICK_COMBAT_DEFEAT_THRESHOLD)
             gpAdvManager->TransferArtifacts(defenderHero, attackerHero);
@@ -4152,7 +4157,7 @@ i32 philAI::QuickCombat(
             necromancyCount6 = 1;
         attackerHero->m_army
             .Add(CREATURE_SKELETON, necromancyCount6, CREATURE_PURCHASE_NO_SLOT);
-    } else if (defenderHero != NULL && defenderDamage <= AI_QUICK_COMBAT_NECROMANCY_THRESHOLD
+    } else if (defenderHero != NULL && defenderDamage <= DATA_COMPGEN(0x004eb530, quickCombatConstant2, AI_QUICK_COMBAT_NECROMANCY_THRESHOLD)
                && defenderHero->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         necromancyCount6 = static_cast<i32>(
             static_cast<float>(attackerTroopCount5)
@@ -4268,7 +4273,7 @@ void philAI::HeroInteractionAtHero(
             dominantShare19 = static_cast<float>(1.0 - dominantShare19);
         }
         if (evaluateOnly != 0 && recipientHero36->m_id == iAlphaMale
-            && dominantShare19 < AI_HERO_INTERACTION_ALPHA_SHARE) {
+            && dominantShare19 < DATA_COMPGEN(0x004eb520, heroInteractionAtHeroConstant, AI_HERO_INTERACTION_ALPHA_SHARE)) {
             savedHero9 = recipientHero36;
             recipientHero36 = dominantHero19;
             dominantHero19 = recipientHero36;
@@ -4804,7 +4809,7 @@ void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) buildin
     i32 i;
     sprintf(
         gText,
-        "Player %d built %s in town %d.\n",
+        DATA_COMPGEN(0x004f22d8, buildBuildingPlayerDBuiltSInTown, "Player %d built %s in town %d.\n"),
         giCurPlayer,
         GetBuildingName(t->m_type, building),
         t->m_id
@@ -4827,7 +4832,7 @@ void philAI::BuildHero(town* townPtr, i32 availableHeroIndex) {
     i32 townY9;
     hero* newHero6;
 
-    sprintf(gText, "Player %d built hero in town %d.\n", giCurPlayer, townPtr->m_id);
+    sprintf(gText, DATA_COMPGEN(0x004f22f8, buildHeroPlayerDBuiltHeroInTown, "Player %d built hero in town %d.\n"), giCurPlayer, townPtr->m_id);
     LogStr(gText);
     if (giDebugLevel >= AI_PURCHASE_DEBUG_LEVEL) {
         AiPrint(gText);
@@ -4895,7 +4900,7 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
 
     sprintf(
         gText,
-        "Player %d built %d %s in town %d.\n",
+        DATA_COMPGEN(0x004f231c, buildCreaturePlayerDBuiltDSIn, "Player %d built %d %s in town %d.\n"),
         giCurPlayer,
         purchaseCount,
         GetMonsterName(gDwellingType[IDX(townPtr->m_type)][dwelling]),
@@ -5092,7 +5097,10 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
                     break;
                 case FIGHT_EVENT_LEVEL_3:
                     rewardValue7 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_3000)
+                        gafAITurnCostResource[IDX(RES_GOLD)]
+                        * DATA_COMPGEN(
+                            0x004eb570, fightEventReward3000, IDX(FIGHT_EVENT_REWARD_3000)
+                        )
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_4:
@@ -5117,7 +5125,10 @@ i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
                     break;
                 case FIGHT_EVENT_LEVEL_3:
                     rewardValue7 = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * IDX(FIGHT_EVENT_REWARD_5000)
+                        gafAITurnCostResource[IDX(RES_GOLD)]
+                        * DATA_COMPGEN(
+                            0x004eb578, fightEventReward5000, IDX(FIGHT_EVENT_REWARD_5000)
+                        )
                     );
                     break;
                 case FIGHT_EVENT_LEVEL_4:
@@ -5365,7 +5376,7 @@ i32 philAI::ComputeValueOfSS(
     if (skill != HERO_SKILL_ESTATES) {
         value28 = static_cast<i32>(
             (static_cast<float>(fightValue7) / gpCurPlayer->m_aiData.m_upgradeValueWeight
-                 / AI_SECONDARY_SKILL_FIGHT_SCALE
+                 / DATA_COMPGEN(0x004eb57c, computeValueOfSSConstant, AI_SECONDARY_SKILL_FIGHT_SCALE)
              + AI_SECONDARY_SKILL_BASE_FACTOR)
             * value28
         );
@@ -5394,7 +5405,7 @@ i32 philAI::ComputeValueOfSS(
             rangedShare2 =
                 static_cast<float>(rangedArmyValue28) / static_cast<float>(totalArmyValue2);
             value28 = static_cast<i32>(
-                (rangedShare2 / AI_SECONDARY_SKILL_ARCHERY_SHARE + AI_SECONDARY_SKILL_ARCHERY_BASE)
+                (rangedShare2 / AI_SECONDARY_SKILL_ARCHERY_SHARE + DATA_COMPGEN(0x004eb580, computeValueOfSSConstant2, AI_SECONDARY_SKILL_ARCHERY_BASE))
                 * value28
             );
             break;
@@ -5508,7 +5519,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_TREASURE_CHEST:
                 value_h = static_cast<i32>(
-                    gafAITurnCostResource[IDX(RES_GOLD)] * AI_TREASURE_CHEST_GOLD_AMOUNT
+                    gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb588, valueOfEventAtPositionConstant4, AI_TREASURE_CHEST_GOLD_AMOUNT)
                 );
                 break;
             case MAP_OBJECT_HERO_INTERACTION:
@@ -5525,7 +5536,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                         + gafAITurnCostResource[IDX(RES_ORE)])
                        + gafAITurnCostResource[IDX(RES_MERCURY)])
                       + gafAITurnCostResource[IDX(RES_WOOD)])
-                     / AI_CAMPFIRE_AVERAGE_DIVISOR * AI_CAMPFIRE_RESOURCE_AMOUNT)
+                     / DATA_COMPGEN(0x004eb58c, valueOfEventAtPositionConstant5, AI_CAMPFIRE_AVERAGE_DIVISOR) * DATA_COMPGEN(0x004eb490, valueOfEventAtPositionConstant6, AI_CAMPFIRE_RESOURCE_AMOUNT))
                     + gafAITurnCostResource[IDX(RES_GOLD)] * AI_CAMPFIRE_GOLD_AMOUNT
                 );
                 break;
@@ -5547,7 +5558,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_OASIS:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_OASIS))
-                    value_h = static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_OASIS_VALUE_FACTOR);
+                    value_h = static_cast<i32>(gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb590, valueOfEventAtPositionConstant7, AI_OASIS_VALUE_FACTOR));
                 break;
             case MAP_OBJECT_BUOY:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_BUOY)
@@ -5569,7 +5580,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_IDOL:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_IDOL) && giCurAIHeroLuck < 3)
                     value_h = static_cast<i32>(
-                        gpCurAIHero->m_aiFightValue * AI_MORALE_LUCK_SITE_VALUE_FACTOR
+                        gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb450, valueOfEventAtPositionConstant2, AI_MORALE_LUCK_SITE_VALUE_FACTOR)
                     );
                 break;
             case MAP_OBJECT_FOUNTAIN:
@@ -5581,7 +5592,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_WATERING_HOLE:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_WATERING_HOLE))
                     value_h = static_cast<i32>(
-                        gpCurAIHero->m_aiFightValue * AI_WATERING_HOLE_VALUE_FACTOR
+                        gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb598, valueOfEventAtPositionConstant8, AI_WATERING_HOLE_VALUE_FACTOR)
                     );
                 break;
             case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
@@ -5612,7 +5623,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = 0;
                 else
                     value_h =
-                        static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_GAZEBO_VALUE_FACTOR);
+                        static_cast<i32>(gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb418, valueOfEventAtPositionConstant, AI_GAZEBO_VALUE_FACTOR));
                 break;
             case MAP_OBJECT_TREE_OF_KNOWLEDGE:
                 value_h = 0;
@@ -5669,7 +5680,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = 0;
                 else if (cell_k->m_objectMetadata - 1 == IDX(RES_GOLD))
                     value_h = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * AI_MAGIC_GARDEN_GOLD_AMOUNT
+                        gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb358, valueOfEventAtPositionConstant3, AI_MAGIC_GARDEN_GOLD_AMOUNT)
                     );
                 else
                     value_h =
@@ -5679,7 +5690,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_FLOTSAM:
                 value_h =
-                    static_cast<i32>(gafAITurnCostResource[IDX(RES_GOLD)] * AI_FLOTSAM_GOLD_AMOUNT);
+                    static_cast<i32>(gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb5a0, valueOfEventAtPositionConstant10, AI_FLOTSAM_GOLD_AMOUNT));
                 value_h =
                     static_cast<i32>(gafAITurnCostResource[IDX(RES_WOOD)] * AI_FLOTSAM_WOOD_AMOUNT);
                 break;
@@ -5691,7 +5702,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     );
                 else if (cell_k->m_objectMetadata == 1)
                     value_h = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * AI_SEA_CHEST_LARGE_GOLD_AMOUNT
+                        gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb408, valueOfEventAtPositionConstant9, AI_SEA_CHEST_LARGE_GOLD_AMOUNT)
                     );
                 else
                     value_h = static_cast<i32>(
@@ -5866,8 +5877,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = 0;
                 else {
                     value_h = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_PENALTY
-                        + (gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_FACTOR
+                        gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb5b0, valueOfEventAtPositionConstant12, AI_DAEMON_GOLD_PENALTY)
+                        + (gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb5a8, valueOfEventAtPositionConstant11, AI_DAEMON_FIGHT_VALUE_FACTOR)
                            + ((gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR
                                + gpCurPlayer->m_aiData.m_artifactValue)
                               + (gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_VALUE_FACTOR
@@ -5995,7 +6006,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                                       * 2
                             >= 10)
                         value_h =
-                            static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_XANADU_VALUE_FACTOR);
+                            static_cast<i32>(gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb5b8, valueOfEventAtPositionConstant13, AI_XANADU_VALUE_FACTOR));
                     else
                         value_h = 0;
                 }
@@ -6075,8 +6086,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             default:
                 sprintf(
                     gText,
-                    "AI encountered object type %d and doesn't know how to deal with it.   Tell "
-                    "Phil",
+                    DATA_COMPGEN(0x004f2344, valueOfEventAtPositionAIEncounteredObjectTypeDAnd, "AI encountered object type %d and doesn't know how to deal with it.   Tell "
+                    "Phil"),
                     cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -6256,36 +6267,66 @@ void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
     gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 8
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+        DATA_COMPGEN(0x004f2398, initAILiveChanceMapSourceFile, RETAIL_FILE),
+        s_initAIMapLineBase + 8
     ));
     gaiHeroStrategicRVOfPos =
         static_cast<i16*>(H2_ALLOC_AT(
-            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 9
+            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+            DATA_COMPGEN(0x004f23c4, initAIHeroStrategicMapSourceFile, RETAIL_FILE),
+            s_initAIMapLineBase + 9
         ));
     gaiHeroEventStratRVOfPos =
         static_cast<i16*>(H2_ALLOC_AT(
-            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2, RETAIL_FILE, s_initAIMapLineBase + 10
+            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+            DATA_COMPGEN(0x004f23f0, initAIHeroEventMapSourceFile, RETAIL_FILE),
+            s_initAIMapLineBase + 10
         ));
     gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 11
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT,
+        DATA_COMPGEN(0x004f241c, initAITurnValueMapSourceFile, RETAIL_FILE),
+        s_initAIMapLineBase + 11
     ));
     gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT, RETAIL_FILE, s_initAIMapLineBase + 12
+        OD_STEER(MAP_WIDTH) * MAP_HEIGHT,
+        DATA_COMPGEN(0x004f2448, initAIEnemyReachabilityMapSourceFile, RETAIL_FILE),
+        s_initAIMapLineBase + 12
     ));
 }
 
 VA(0x00445fe6, 0x112)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != NULL)
-        H2_FREE_AT(gaiLiveChanceOfPos, RETAIL_FILE, s_closeAIMapLineBase + 1);
+        H2_FREE_AT(
+            gaiLiveChanceOfPos,
+            DATA_COMPGEN(0x004f2478, closeAILiveChanceMapSourceFile, RETAIL_FILE),
+            s_closeAIMapLineBase + 1
+        );
     if (gaiHeroStrategicRVOfPos != NULL)
-        H2_FREE_AT(gaiHeroStrategicRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 2);
+        H2_FREE_AT(
+            gaiHeroStrategicRVOfPos,
+            DATA_COMPGEN(0x004f24a4, closeAIHeroStrategicMapSourceFile, RETAIL_FILE),
+            s_closeAIMapLineBase + 2
+        );
     if (gaiHeroEventStratRVOfPos != NULL)
-        H2_FREE_AT(gaiHeroEventStratRVOfPos, RETAIL_FILE, s_closeAIMapLineBase + 3);
+        H2_FREE_AT(
+            gaiHeroEventStratRVOfPos,
+            DATA_COMPGEN(0x004f24d0, closeAIHeroEventMapSourceFile, RETAIL_FILE),
+            s_closeAIMapLineBase + 3
+        );
     if (gaiTurnValueOfMine != NULL)
-        H2_FREE_AT(gaiTurnValueOfMine, RETAIL_FILE, s_closeAIMapLineBase + 4);
+        H2_FREE_AT(
+            gaiTurnValueOfMine,
+            DATA_COMPGEN(0x004f24fc, closeAITurnValueMapSourceFile, RETAIL_FILE),
+            s_closeAIMapLineBase + 4
+        );
     if (gaiEnemyHeroReachable != NULL)
-        H2_FREE_AT(gaiEnemyHeroReachable, RETAIL_FILE, s_closeAIMapLineBase + 5);
+        H2_FREE_AT(
+            gaiEnemyHeroReachable,
+            DATA_COMPGEN(0x004f2528, closeAIEnemyReachabilityMapSourceFile, RETAIL_FILE),
+            s_closeAIMapLineBase + 5
+        );
     gaiLiveChanceOfPos = NULL;
     gaiHeroStrategicRVOfPos = NULL;
     gaiHeroEventStratRVOfPos = NULL;
@@ -6596,7 +6637,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
         && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
         *liveChance = POSITION_FULL_CHANCE;
         *liveChance = static_cast<i32>(
-            winChance9 * AI_MONSTER_JOIN_CHANCE_SCALE + AI_MONSTER_JOIN_CHANCE_BASE
+            winChance9 * DATA_COMPGEN(0x004eb5bc, evaluateMonsterEventConstant, AI_MONSTER_JOIN_CHANCE_SCALE) + DATA_COMPGEN(0x004eb5c0, evaluateMonsterEventConstant2, AI_MONSTER_JOIN_CHANCE_BASE)
         );
         if (gpCurAIHero->m_army.CanJoin(monsterType))
             result5 = attackerLoss6;
@@ -6729,13 +6770,13 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     if (winChance9 > AI_EVENT_CERTAIN_ODDS)
         gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
     else if (winChance9 > AI_EVENT_HIGH_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_HIGH_CHANCE_SCALE);
+        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c4, evaluateHeroEventConstant2, AI_EVENT_HIGH_CHANCE_SCALE));
     else if (winChance9 > AI_EVENT_GOOD_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_GOOD_CHANCE_SCALE);
-    else if (winChance9 > AI_EVENT_POOR_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_POOR_CHANCE_SCALE);
+        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c8, evaluateHeroEventConstant3, AI_EVENT_GOOD_CHANCE_SCALE));
+    else if (winChance9 > DATA_COMPGEN(0x004eb3d8, evaluateHeroEventConstant, AI_EVENT_POOR_ODDS))
+        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5cc, evaluateHeroEventConstant4, AI_EVENT_POOR_CHANCE_SCALE));
     else if (winChance9 > AI_EVENT_BAD_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_BAD_CHANCE_SCALE);
+        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5d0, evaluateHeroEventConstant5, AI_EVENT_BAD_CHANCE_SCALE));
     else
         gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_CERTAIN_CHANCE);
     if (gaiHeroLiveChance[heroId] > POSITION_FULL_CHANCE)
@@ -6868,7 +6909,7 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
     if (p->m_owner != TOWN_OWNER_NONE && gbHumanPlayer[p->m_owner]
         && node > EVENT_HUMAN_VALUE_THRESHOLD) {
         if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
-            node = static_cast<i32>(node * AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR);
+            node = static_cast<i32>(node * DATA_COMPGEN(0x004eb5d8, evaluateTownEventConstant, AI_TOWN_PRIMARY_HUMAN_VALUE_FACTOR));
         else
             node = static_cast<i32>(node * AI_TOWN_OTHER_HUMAN_VALUE_FACTOR);
     }

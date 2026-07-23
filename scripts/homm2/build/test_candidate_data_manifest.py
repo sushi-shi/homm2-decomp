@@ -147,7 +147,7 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(allocation.rva, 0x120)
         self.assertEqual(allocation.size, 4)
 
-    def test_reviewed_private_counter_drift_associates_by_exact_position(self):
+    def test_private_counter_drift_is_not_a_reviewed_identity(self):
         candidate = {
             "name": "$SG2", "storage": "data", "section": 2,
             "section_offset": 8, "size": 8, "alignment": 8,
@@ -161,10 +161,9 @@ class CandidateDataManifestTest(unittest.TestCase):
         }
         allocation = _reviewed_candidate_allocation(
             "A", "data", candidate, {}, {("A.c", 2, 8): row})
-        self.assertEqual(allocation.name, "$SG2")
-        self.assertEqual(allocation.rva, 0x120)
+        self.assertIsNone(allocation)
 
-    def test_reviewed_private_counter_reuse_prefers_position_over_raw_name(self):
+    def test_exact_raw_name_does_not_override_wrong_position(self):
         candidate = {
             "name": "$SG2", "storage": "data", "section": 2,
             "section_offset": 8, "size": 4, "alignment": 4,
@@ -178,12 +177,13 @@ class CandidateDataManifestTest(unittest.TestCase):
         }
         correct_position = dict(
             wrong_raw, name="$SG1", rva="0x120", section_offset="0x8")
-        allocation = _reviewed_candidate_allocation(
-            "A", "data", candidate, {("A.c", "$SG2"): wrong_raw},
-            {("A.c", 2, 8): correct_position, ("A.c", 2, 12): wrong_raw})
-        self.assertEqual(allocation.rva, 0x120)
+        with self.assertRaisesRegex(ValueError, "topology mismatch"):
+            _reviewed_candidate_allocation(
+                "A", "data", candidate, {("A.c", "$SG2"): wrong_raw},
+                {("A.c", 2, 8): correct_position,
+                 ("A.c", 2, 12): wrong_raw})
 
-    def test_reviewed_position_fallback_rejects_semantic_or_topology_drift(self):
+    def test_data_compgen_semantic_identity_binds_by_exact_position(self):
         candidate = {
             "name": "$SG2", "storage": "data", "section": 2,
             "section_offset": 8, "size": 4, "alignment": 4,
@@ -193,15 +193,17 @@ class CandidateDataManifestTest(unittest.TestCase):
             "name": "meaningful", "object": "A.c", "rva": "0x120",
             "size": "0x4", "storage": "data", "alignment": "0x4",
             "section_ordinal": "2", "section_offset": "0x8",
-            "scope": "local", "provenance": "reviewed",
+            "scope": "local", "provenance": "source-DATA_COMPGEN:A.cpp:1",
         }
-        self.assertIsNone(_reviewed_candidate_allocation(
-            "A", "data", candidate, {}, {("A.c", 2, 8): semantic}))
+        allocation = _reviewed_candidate_allocation(
+            "A", "data", candidate, {}, {("A.c", 2, 8): semantic})
+        self.assertEqual(allocation.name, "meaningful")
+        self.assertEqual(allocation.rva, 0x120)
 
-        wrong_prefix = dict(semantic, name="_other$S1")
-        named_candidate = dict(candidate, name="_value$S2")
-        self.assertIsNone(_reviewed_candidate_allocation(
-            "A", "data", named_candidate, {}, {("A.c", 2, 8): wrong_prefix}))
+        wrong_topology = dict(semantic, storage="rdata")
+        with self.assertRaisesRegex(ValueError, "topology mismatch"):
+            _reviewed_candidate_allocation(
+                "A", "data", candidate, {}, {("A.c", 2, 8): wrong_topology})
 
     def test_function_relocation_offsets_must_align_exactly(self):
         candidate = [

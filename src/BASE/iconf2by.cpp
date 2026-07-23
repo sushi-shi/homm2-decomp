@@ -7,24 +7,24 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-static IconEntry* gFYEntry;
-static u8* gFYSrc;
-static i32 gFYX0;
-static i32 gFYXEnd;
-static i32 gFYY;
-static i32 gFYX;
-static i32 gFYClipB;
-static u8* gFYRow;
-static i32 gFYRun;
-static u8 gFYColor;
-static i32 gFYDimLen;
-static u32 gFYDimLen2;
-static u8* gFYDimPal;
-static i32 gFYDimIdx;
-static u8* gFYDimDst;
-static u8* gFYDst;
-static i32 gFYSkip;
-static i32 gFYClipR;
+DATA(0x00538118) static IconEntry* gFYEntry;
+DATA(0x00538128) static u8* gFYSrc;
+DATA(0x00538110) static i32 gFYX0;
+DATA(0x00538108) static i32 gFYXEnd;
+DATA(0x00538148) static i32 gFYY;
+DATA(0x00538120) static i32 gFYX;
+DATA(0x00538134) static i32 gFYClipB;
+DATA(0x00538140) static u8* gFYRow;
+DATA(0x00538144) static i32 gFYRun;
+DATA(0x0053812c) static u8 gFYColor;
+DATA(0x00538130) static i32 gFYDimLen;
+DATA(0x00538114) static u32 gFYDimLen2;
+DATA(0x0053810c) static u8* gFYDimPal;
+DATA(0x00538138) static i32 gFYDimIdx;
+DATA(0x0053814c) static u8* gFYDimDst;
+DATA(0x0053811c) static u8* gFYDst;
+DATA(0x00538124) static i32 gFYSkip;
+DATA(0x0053813c) static i32 gFYClipR;
 
 static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
     return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;

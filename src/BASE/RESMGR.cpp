@@ -37,7 +37,7 @@ resourceManager::resourceManager(void) : baseManager() {
     m_active = false;
     m_resourceListHead = NULL;
     m_expunging = 0;
-    strcpy(m_lastFileName, "");
+    strcpy(m_lastFileName, DATA_COMPGEN(0x0051e9a0, resourceManagerEmptyString, ""));
     m_lastFileId = 0;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         m_aggregateFd[aggregateIndex] = INVALID_FILE;
@@ -267,7 +267,7 @@ i32 resourceManager::Open(i32 priority) {
     m_messageMask = BASE_MANAGER_ACCEPT_RESOURCE;
     m_priority = priority;
     m_active = true;
-    strcpy(m_name, "resourceManager");
+    strcpy(m_name, DATA_COMPGEN(0x0051e9a4, openResourceManager, "resourceManager"));
     m_resourceListHead = NULL;
     return LOAD_SUCCESS;
 }
@@ -298,7 +298,7 @@ void resourceManager::Close(void) {
     m_resourceListHead = NULL;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != NULL)
-            H2_FREE(m_aggregateDir[aggregateIndex], 0x1da);
+            H2_FREE_AT(m_aggregateDir[aggregateIndex], DATA_COMPGEN(0x0051e9b4, closeSourceFile, RETAIL_FILE), 0x1da);
         if (m_aggregateFd[aggregateIndex] != INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = INVALID_FILE;
@@ -314,13 +314,13 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     i32 aggregateFile;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
-        sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
+        sprintf(gText, DATA_COMPGEN(0x0051e9dc, loadAggregateHeaderOnlyDAGGFilesCanBe, "Only %d .AGG files can be used at once."), RESOURCE_MANAGER_AGGREGATE_LIMIT);
         ShutDown(gText);
         return LOAD_ERROR;
     }
     aggregateFile = open(aggregateName, BINARY_OPEN_MODE);
     if (aggregateFile == INVALID_FILE) {
-        sprintf(gText, "Can't open file: %s", aggregateName);
+        sprintf(gText, DATA_COMPGEN(0x0051ea04, loadAggregateHeaderCanTOpenFileS, "Can't open file: %s"), aggregateName);
         ShutDown(gText);
         return LOAD_ERROR;
     }
@@ -330,7 +330,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
-    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes, 542));
+    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC_AT(directoryBytes, DATA_COMPGEN(0x0051ea18, loadAggregateHeaderSourceFile, RETAIL_FILE), 542));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return LOAD_SUCCESS;
 }
@@ -358,7 +358,7 @@ void resourceManager::PointToFile(u32l fileId) {
     if (!isFound) {
         sprintf(
             gText,
-            "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+            DATA_COMPGEN(0x0051ea40, pointToFileResMgrPointToFileFailureThisFileIdDLastFileId, "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s"),
             fileId,
             m_lastFileId,
             m_lastFileName
@@ -393,7 +393,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
     if (!isFound) {
         sprintf(
             gText,
-            "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
+            DATA_COMPGEN(0x0051ea8c, getFileSizeResMgrPointToFileFailureThisFileIdDLastFileId, "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s"),
             fileId,
             m_lastFileId,
             m_lastFileName
@@ -419,7 +419,7 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004c8ee0, 0x81)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 703);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, DATA_COMPGEN(0x0051ead8, readByteIProjectsHeroesProgBASERESMGR, RETAIL_FILE), 703);
     i8 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -433,7 +433,7 @@ i8 resourceManager::ReadByte(void) {
 
 VA(0x004c8f70, 0x84)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 732);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, DATA_COMPGEN(0x0051eb00, readWordIProjectsHeroesProgBASERESMGR, RETAIL_FILE), 732);
     i16 value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -447,7 +447,7 @@ i16 resourceManager::ReadWord(void) {
 
 VA(0x004c9000, 0x84)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 760);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, DATA_COMPGEN(0x0051eb28, readLongIProjectsHeroesProgBASERESMGR, RETAIL_FILE), 760);
     i32l value = 0;
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     if (bytesRead == 0) {
@@ -481,14 +481,14 @@ void resourceManager::Read13(i8* destination) {
 
 VA(0x004c91b0, 0xbd)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 816);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, DATA_COMPGEN(0x0051eb50, readBlockIProjectsHeroesProgBASERESMGR, RETAIL_FILE), 816);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
         i32 errorCode = errno;
         sprintf(
             gText,
-            "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
+            DATA_COMPGEN(0x0051eb78, readBlockFileErrorBytesReadDBytes, "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'"),
             bytesRead,
             size,
             errno,

@@ -48,7 +48,6 @@ from homm2.build.data_manifest_adapter import (
     COMBINED_MANIFEST as CANONICAL_MANIFEST,
     SECTION_MANIFEST as CANONICAL_SECTION_MANIFEST,
     SOURCE_MANIFEST as DATA_SOURCE_MANIFEST,
-    SUPPLEMENTAL as CANONICAL_SUPPLEMENTAL,
     SYMBOL_HEADER as DATA_SYMBOL_HEADER,
     build_manifests as build_data_manifests,
     validate_symbol_rows,
@@ -241,10 +240,9 @@ def _identity(manifest, contribution_manifest, delinker):
 
 def _canonical_identity_inputs(delinker):
     return {
-        "schema": 7,
+        "schema": 8,
         "mode": "canonical",
         "source_data_manifest_sha256": _digest(DATA_SOURCE_MANIFEST),
-        "supplemental_manifest_sha256": _digest(CANONICAL_SUPPLEMENTAL),
         "data_manifest_sha256": _digest(CANONICAL_MANIFEST),
         "data_section_manifest_sha256": _digest(CANONICAL_SECTION_MANIFEST),
         "data_breakpoints_sha256": _digest(DATA_BREAKPOINTS),
@@ -292,24 +290,21 @@ def _read_symbol_manifest(path, label):
     return rows
 
 
-def _canonical_union_rows(source_manifest=None, supplemental=None,
-                          combined_manifest=None):
+def _canonical_union_rows(source_manifest=None, combined_manifest=None):
     source_manifest = source_manifest or DATA_SOURCE_MANIFEST
-    supplemental = supplemental or CANONICAL_SUPPLEMENTAL
     combined_manifest = combined_manifest or CANONICAL_MANIFEST
     source_rows = _read_symbol_manifest(source_manifest, "source annotations")
-    supplemental_rows = _read_symbol_manifest(supplemental, "reviewed supplemental")
     combined_rows = _read_symbol_manifest(combined_manifest, "canonical combined")
 
     def row_tuple(row):
         return tuple(row[key] for key in DATA_SYMBOL_HEADER)
 
-    expected = Counter(row_tuple(row) for row in [*source_rows, *supplemental_rows])
+    expected = Counter(row_tuple(row) for row in source_rows)
     actual = Counter(row_tuple(row) for row in combined_rows)
     if actual != expected:
         raise RuntimeError(
-            "canonical data manifest is not the exact source annotations plus reviewed "
-            "supplemental union; run `homm2 data-topology assemble`")
+            "canonical data manifest is not the exact generated source manifest; "
+            "run `homm2 data-topology assemble`")
     return combined_rows
 
 
@@ -327,10 +322,10 @@ def _synthetic_candidate_identity(name):
 
 
 def review_queue_bytes(allocations, diagnostics=(), source_manifest=None,
-                       supplemental=None, combined_manifest=None):
+                       combined_manifest=None):
     """Return non-canonical real candidate rows as a review-only queue."""
     canonical = _canonical_union_rows(
-        source_manifest, supplemental, combined_manifest)
+        source_manifest, combined_manifest)
     canonical_identities = {(row["object"], row["name"]) for row in canonical}
     proposed = [(allocation, (), ()) for allocation in allocations]
     proposed.extend(
@@ -388,17 +383,8 @@ def review_queue_bytes(allocations, diagnostics=(), source_manifest=None,
 
 
 def _build_reviewed_canonical_manifests(strict):
-    """Assemble canonical rows only from source annotations and the reviewed supplement."""
-    supplemental_rows = _read_symbol_manifest(
-        CANONICAL_SUPPLEMENTAL, "reviewed supplemental")
-    synthetic = [row["name"] for row in supplemental_rows
-                 if _synthetic_candidate_identity(row["name"])]
-    if synthetic:
-        raise RuntimeError(
-            "reviewed supplemental contains forbidden synthetic identities: %s" %
-            ", ".join(sorted(synthetic)))
-    return build_data_manifests(
-        supplemental=CANONICAL_SUPPLEMENTAL, migrate_from=None, strict=strict)
+    """Assemble canonical rows from source annotations and candidate topology."""
+    return build_data_manifests(strict=strict)
 
 
 def refresh_required(current, expected):
@@ -429,7 +415,7 @@ def ensure_reviewed_targets(delinker=None):
         raise RuntimeError("delinked target has no valid provenance stamp; run `homm2 init`")
     if current.get("mode") == "canonical":
         missing = [path for path in (
-            DATA_SOURCE_MANIFEST, CANONICAL_SUPPLEMENTAL, CANONICAL_MANIFEST,
+            DATA_SOURCE_MANIFEST, CANONICAL_MANIFEST,
             CANONICAL_SECTION_MANIFEST, DATA_BREAKPOINTS,
             CANONICAL_CONTRIBUTION_MANIFEST,
             CANONICAL_COVERAGE, CANONICAL_COVERAGE_DIAGNOSTICS,
@@ -513,7 +499,7 @@ def regenerate_canonical_targets(delinker=None):
             "canonical regeneration requires closed data and whole-image coverage; "
             "see %s and %s" % (CANDIDATE_DIAGNOSTICS, COVERAGE_DIAGNOSTICS))
     missing = [path for path in (
-        DATA_SOURCE_MANIFEST, CANONICAL_SUPPLEMENTAL, CANONICAL_MANIFEST,
+        DATA_SOURCE_MANIFEST, CANONICAL_MANIFEST,
         CANONICAL_SECTION_MANIFEST, DATA_BREAKPOINTS,
         CANONICAL_CONTRIBUTION_MANIFEST,
         CANONICAL_COVERAGE, CANONICAL_COVERAGE_DIAGNOSTICS,

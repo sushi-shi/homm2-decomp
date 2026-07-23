@@ -127,24 +127,24 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
 
-    sprintf(gText, "viewlgnd.bin");
+    sprintf(gText, DATA_COMPGEN(0x004f11e8, viewWorldViewlgndBin, "viewlgnd.bin"));
     viewWorldWindow = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
     if (viewWorldWindow == NULL)
         MemError();
 
     i32 legendMode;
-    viewIconNames[LEGEND_MINES] = "MINE";
-    viewIconNames[LEGEND_RESOURCES] = "RSRC";
-    viewIconNames[LEGEND_ARTIFACTS] = "RTFX";
-    viewIconNames[LEGEND_TOWNS] = "TWNS";
-    viewIconNames[LEGEND_HEROES] = "HROS";
-    viewIconNames[LEGEND_ALL] = "_ALL";
-    viewIconNames[LEGEND_WORLD] = "WRLD";
+    viewIconNames[LEGEND_MINES] = DATA_COMPGEN(0x004f11f8, viewWorldMINE, "MINE");
+    viewIconNames[LEGEND_RESOURCES] = DATA_COMPGEN(0x004f1200, viewWorldRSRC, "RSRC");
+    viewIconNames[LEGEND_ARTIFACTS] = DATA_COMPGEN(0x004f1208, viewWorldRTFX, "RTFX");
+    viewIconNames[LEGEND_TOWNS] = DATA_COMPGEN(0x004f1210, viewWorldTWNS, "TWNS");
+    viewIconNames[LEGEND_HEROES] = DATA_COMPGEN(0x004f1218, viewWorldHROS, "HROS");
+    viewIconNames[LEGEND_ALL] = DATA_COMPGEN(0x004f1220, viewWorldALL, "_ALL");
+    viewIconNames[LEGEND_WORLD] = DATA_COMPGEN(0x004f1228, viewWorldWRLD, "WRLD");
     if (whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
         legendMode = LEGEND_WORLD;
     else
         legendMode = IDX(whatToDraw) - IDX(SPELL_VIEW_MINES);
-    sprintf(gText, "view%s.icn", viewIconNames[legendMode]);
+    sprintf(gText, DATA_COMPGEN(0x004f1230, viewWorldViewSIcn, "view%s.icn"), viewIconNames[legendMode]);
     dialogMessage.type = VIEW_WORLD_MESSAGE;
     dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
     dialogMessage.payload.widget.id = WORLD_ICON_WIDGET;
@@ -201,14 +201,14 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 
     iVWXPixelOffset = (WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
-    gpMouseManager->SetPointer("advmice.mse", WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
-    sprintf(gText, "ground%d.icn", giViewWorldScale);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f123c, vWInitAdvmiceMse, "advmice.mse"), WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
+    sprintf(gText, DATA_COMPGEN(0x004f1248, vWInitGroundDIcn, "ground%d.icn"), giViewWorldScale);
     pVWGround = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "vwflag%d.icn", giViewWorldScale);
+    sprintf(gText, DATA_COMPGEN(0x004f1258, vWInitVwflagDIcn, "vwflag%d.icn"), giViewWorldScale);
     pVWFlags = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "misc%d.icn", giViewWorldScale);
+    sprintf(gText, DATA_COMPGEN(0x004f1268, vWInitMiscDIcn, "misc%d.icn"), giViewWorldScale);
     pVWMisc = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "letter%d.icn", giViewWorldScale);
+    sprintf(gText, DATA_COMPGEN(0x004f1274, vWInitLetterDIcn, "letter%d.icn"), giViewWorldScale);
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
 }
@@ -734,16 +734,16 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                     // NOLINTBEGIN(readability-magic-numbers)
                     switch (MAP_HEIGHT) {
                         case MAP_DIMENSION_SMALL:
-                            radarScale6 = 4.0f;
+                            radarScale6 = DATA_COMPGEN(0x004eb26c, viewWorldDialogHandlerConstant3, 4.0f);
                             break;
                         case MAP_DIMENSION_MEDIUM:
-                            radarScale6 = 2.0f;
+                            radarScale6 = DATA_COMPGEN(0x004eb270, viewWorldDialogHandlerConstant, 2.0f);
                             break;
                         case MAP_DIMENSION_LARGE:
-                            radarScale6 = 1.3333f;
+                            radarScale6 = DATA_COMPGEN(0x004eb274, viewWorldDialogHandlerConstant4, 1.3333f);
                             break;
                         default:
-                            radarScale6 = 1.0f;
+                            radarScale6 = DATA_COMPGEN(0x004eb278, viewWorldDialogHandlerConstant2, 1.0f);
                             break;
                     }
                     // NOLINTEND(readability-magic-numbers)

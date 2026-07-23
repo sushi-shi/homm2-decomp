@@ -78,9 +78,9 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
         (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
 
     if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
-        LogStr("InvalidateRect Failed");
+        LogStr(DATA_COMPGEN(0x00520cc0, blitBitmapToScreenVesaInvalidateRectFailed, "InvalidateRect Failed"));
     if (UpdateWindow(hwndApp) == 0)
-        LogStr("UpdateWindow Failed");
+        LogStr(DATA_COMPGEN(0x00520cd8, blitBitmapToScreenVesaUpdateWindowFailed, "UpdateWindow Failed"));
 }
 
 VA(0x004d8730, 0x4)

@@ -20,7 +20,10 @@ OUTPUT = REPO / "build" / "constants"
 DATABASE = REPO / "build" / "clangd" / "compile_commands.json"
 REVIEW_MANIFEST = REPO / "config" / "constants_review.tsv"
 SOURCE_PATTERN = r"src/(BASE|SOURCE|EDITOR)/.*\.cpp"
-ANNOTATION_MACROS = {"DATA", "SIZE", "VA", "VA_COMPGEN", "VTBL", "VTBL2"}
+ANNOTATION_MACROS = {
+    "DATA", "DATA_COMPGEN", "DATA_COMPGEN_GUARD", "SIZE", "VA", "VA_COMPGEN",
+    "VTBL", "VTBL2",
+}
 SOURCE_LINE_ARGUMENTS = {
     "DDSD": 2,
     "DPSD": 2,

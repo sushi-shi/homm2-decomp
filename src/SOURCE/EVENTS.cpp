@@ -39,7 +39,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/x_arena.h>
 
-#define GENERIC_SITE_SIREN_ARMY_REMAINDER 0.7
+#define GENERIC_SITE_SIREN_ARMY_REMAINDER DATA_COMPGEN(0x004eb920, aRMYREMAINDERConstant, 0.7)
 #define MONSTER_NECROMANCY_FRACTION 0.1
 #define MONSTER_AI_JOIN_COST_FRACTION 0.75
 
@@ -317,7 +317,7 @@ namespace {
 
 } // namespace
 
-#define TRADING_POST_EFFICIENCY 0.2f
+#define TRADING_POST_EFFICIENCY DATA_COMPGEN(0x004eb918, pOSTEFFICIENCYConstant, 0.2f)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\EVENTS.CPP")
 #define EVENTS_REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
@@ -397,9 +397,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Magic Garden}\n\nYou've found a magic garden, the kind of place that "
+                    DATA_COMPGEN(0x00517620, doEventMagicGardenYouVeFoundA, "{Magic Garden}\n\nYou've found a magic garden, the kind of place that "
                     "leprechauns and faeries like to cavort in, but there is no one here today.  "
-                    "Perhaps you should try again next week.",
+                    "Perhaps you should try again next week."),
                     -1,
                     0,
                     -1,
@@ -414,9 +414,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster "
+                    DATA_COMPGEN(0x005176d8, doEventMagicGardenYouCatchALeprechaun, "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster "
                     "of magic mushrooms.  In exchange for his freedom, he guides you to a small "
-                    "pot filled with precious things.",
+                    "pot filled with precious things."),
                     IDX(resourceType),
                     resourceType == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT : MAP_EVENT_RESOURCE_AMOUNT,
                     -1,
@@ -437,8 +437,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventExtra1 = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
             if (!eventExtra1->active) {
                 NormalDialog(
-                    "{Sphinx}\n\nYou come across a giant Sphinx.  The Sphinx remains strangely "
-                    "quiet.",
+                    DATA_COMPGEN(0x00517790, doEventSphinxYouComeAcrossAGiant, "{Sphinx}\n\nYou come across a giant Sphinx.  The Sphinx remains strangely "
+                    "quiet."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -452,15 +452,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 sprintf(
                     gText,
-                    "\"I have a riddle for you,\" the Sphinx says.  \"Answer correctly, and you "
+                    DATA_COMPGEN(0x005177e0, doEventIHaveARiddleForYou, "\"I have a riddle for you,\" the Sphinx says.  \"Answer correctly, and you "
                     "shall be rewarded.  Answer incorrectly, and you shall be eaten.  Do you "
-                    "accept the challenge?\""
+                    "accept the challenge?\"")
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
-                        "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?",
+                        DATA_COMPGEN(0x00517888, doEventTheSphinxAsksYouTheFollowing, "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?"),
                         eventExtra1->riddle
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
@@ -503,8 +503,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
 
                         NormalDialog(
-                            "Looking somewhat disappointed, the Sphinx sighs.  You've answered my "
-                            "riddle so here's your reward.  Now begone.",
+                            DATA_COMPGEN(0x005178c8, doEventLookingSomewhatDisappointedTheSphinxSighs, "Looking somewhat disappointed, the Sphinx sighs.  You've answered my "
+                            "riddle so here's your reward.  Now begone."),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -518,9 +518,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventExtra1->active = 0;
                     } else {
                         NormalDialog(
-                            "\"You guessed incorrectly,\" the Sphinx says, smiling.  The Sphinx "
+                            DATA_COMPGEN(0x00517938, doEventYouGuessedIncorrectlyTheSphinxSays, "\"You guessed incorrectly,\" the Sphinx says, smiling.  The Sphinx "
                             "swipes at you with a paw, knocking you to the ground.  Another blow "
-                            "makes the world go black, and you know no more.",
+                            "makes the world go black, and you know no more."),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -540,8 +540,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{Observation Tower}\n\nFrom the observation tower, you are able to see distant "
-                "lands.",
+                DATA_COMPGEN(0x005179f0, doEventObservationTowerFromTheObservationTower, "{Observation Tower}\n\nFrom the observation tower, you are able to see distant "
+                "lands."),
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -582,9 +582,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Hill Fort}\n\nAn unusual alliance of Orcs, Ogres, and Dwarves offer to train "
+                    DATA_COMPGEN(0x00517bf4, doEventHillFortAnUnusualAllianceOf, "{Hill Fort}\n\nAn unusual alliance of Orcs, Ogres, and Dwarves offer to train "
                     "(upgrade) any such troops brought to them.  Unfortunately, you have none with "
-                    "you.",
+                    "you."),
                     -1,
                     0,
                     -1,
@@ -600,17 +600,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     if (secondUpgrade1 == CREATURE_NONE) {
                         sprintf(
                             gText,
-                            "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
-                            "by the battle masters of the fort.  Your army now contains %s.",
+                            DATA_COMPGEN(0x00517b70, doEventHillFortAllOfTheS, "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
+                            "by the battle masters of the fort.  Your army now contains %s."),
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                         );
                     } else {
                         sprintf(
                             gText,
-                            "{Hill Fort}\n\nAll of the %s and %s you have in your army have been "
+                            DATA_COMPGEN(0x00517ae0, doEventHillFortAllOfTheS2, "{Hill Fort}\n\nAll of the %s and %s you have in your army have been "
                             "trained by the battle masters of the fort.  Your army now contains %s "
-                            "and %s.",
+                            "and %s."),
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(secondUpgrade1)],
                             gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
@@ -620,9 +620,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Hill Fort}\n\n All of the %s, %s and %s you have in your army have been "
+                        DATA_COMPGEN(0x00517a44, doEventHillFortAllOfTheS3, "{Hill Fort}\n\n All of the %s, %s and %s you have in your army have been "
                         "trained by the battle masters of the fort.  Your army now contains %s, "
-                        "%s, and %s.",
+                        "%s, and %s."),
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(thirdUpgrade)],
@@ -669,11 +669,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Freeman's Foundry}\n\nA blacksmith working at the foundry offers to convert "
+                    DATA_COMPGEN(0x00517d7c, doEventFreemanSFoundryABlacksmithWorking, "{Freeman's Foundry}\n\nA blacksmith working at the foundry offers to convert "
                     "all Pikemen and Swordsmen's weapons brought to him from iron to steel. He "
                     "also says that he knows a process that will convert Iron Golems into Steel "
                     "Golems.  Unfortunately, you have none of these troops in your army, so he "
-                    "can't help you.",
+                    "can't help you."),
                     -1,
                     0,
                     -1,
@@ -692,15 +692,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     if (secondUpgrade1 == CREATURE_NONE) {
                         sprintf(
                             gText,
-                            "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
+                            DATA_COMPGEN(0x00517d3c, doEventFreemanSFoundryAllOfYour, "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s."),
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                         );
                     } else {
                         sprintf(
                             gText,
-                            "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into "
-                            "%s and %s.",
+                            DATA_COMPGEN(0x00517cec, doEventFreemanSFoundryAllOfYour2, "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into "
+                            "%s and %s."),
                             gArmyNamesPlural[IDX(firstUpgrade_e)],
                             gArmyNamesPlural[IDX(secondUpgrade1)],
                             gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
@@ -710,8 +710,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into "
-                        "%s, %s, and %s.",
+                        DATA_COMPGEN(0x00517c94, doEventFreemanSFoundryAllOfYour3, "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into "
+                        "%s, %s, and %s."),
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(thirdUpgrade)],
@@ -738,8 +738,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 || eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
                 if (cell->m_objectMetadata == SEA_CHEST_OUTCOME_EMPTY) {
                     NormalDialog(
-                        "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
-                        "you open it, only to find it empty.",
+                        DATA_COMPGEN(0x00517f9c, doEventChestAfterSpendingHoursTryingTo, "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
+                        "you open it, only to find it empty."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -752,8 +752,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     );
                 } else {
                     NormalDialog(
-                        "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
-                        "you open it and find 1500 gold pieces.",
+                        DATA_COMPGEN(0x00517f2c, doEventChestAfterSpendingHoursTryingTo2, "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
+                        "you open it and find 1500 gold pieces."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -770,8 +770,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you "
-                    "open it and find 1000 gold and the %s",
+                    DATA_COMPGEN(0x00517eb8, doEventChestAfterSpendingHoursTryingTo3, "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you "
+                    "open it and find 1000 gold and the %s"),
                     gArtifactNames[eventValue1]
                 );
                 NormalDialog(
@@ -797,7 +797,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, but find nothing.",
+                        DATA_COMPGEN(0x00518008, doEventFlotsamYouSearchThroughTheFlotsam, "{Flotsam}\n\nYou search through the flotsam, but find nothing."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -811,7 +811,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, and find some wood.",
+                        DATA_COMPGEN(0x00518048, doEventFlotsamYouSearchThroughTheFlotsam2, "{Flotsam}\n\nYou search through the flotsam, and find some wood."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -826,8 +826,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, and find some wood and some "
-                        "gold.",
+                        DATA_COMPGEN(0x00518088, doEventFlotsamYouSearchThroughTheFlotsam3, "{Flotsam}\n\nYou search through the flotsam, and find some wood and some "
+                        "gold."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -843,8 +843,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_LARGE_TREASURE:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam and find some wood and some "
-                        "gold.",
+                        DATA_COMPGEN(0x005180d8, doEventFlotsamYouSearchThroughTheFlotsam4, "{Flotsam}\n\nYou search through the flotsam and find some wood and some "
+                        "gold."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -868,9 +868,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
+                    DATA_COMPGEN(0x00518124, doEventShipwreckSurvivorYouVePulledA, "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
                     "in an unforgiving ocean.  Grateful, he rewards you for your act of kindness "
-                    "by giving you the %s.",
+                    "by giving you the %s."),
                     gArtifactNames[cell->m_objectMetadata]
                 );
                 NormalDialog(
@@ -888,9 +888,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), 1, -1);
             } else {
                 NormalDialog(
-                    "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
+                    DATA_COMPGEN(0x005181d4, doEventShipwreckSurvivorYouVePulledA2, "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
                     "in an unforgiving ocean.  Grateful, he says, \"I would give you an artifact "
-                    "as a reward, but you're all full.\"",
+                    "as a reward, but you're all full.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -909,8 +909,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{Magellan's Maps}\n\nThe captain sighs.  \"You don't have enough money, eh?  "
-                    "You can't expect me to give my maps away for free!\"",
+                    DATA_COMPGEN(0x00518290, doEventMagellanSMapsTheCaptainSighs, "{Magellan's Maps}\n\nThe captain sighs.  \"You don't have enough money, eh?  "
+                    "You can't expect me to give my maps away for free!\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -924,9 +924,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Magellan's Maps}\n\nA retired captain living on this refurbished fishing "
+                    DATA_COMPGEN(0x00518310, doEventMagellanSMapsARetiredCaptain, "{Magellan's Maps}\n\nA retired captain living on this refurbished fishing "
                     "platform offers to sell you maps of the sea he made in his younger days for "
-                    "1,000 gold.  Do you wish to buy the maps?",
+                    "1,000 gold.  Do you wish to buy the maps?"),
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -953,8 +953,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     sprintf(
                         gText,
-                        "{Witch's Hut}\n\nAn ancient and immortal witch living in a hut with "
-                        "bird's legs for stilts teaches you %s for her own inscrutable purposes.",
+                        DATA_COMPGEN(0x005185ac, doEventWitchSHutAnAncientAnd, "{Witch's Hut}\n\nAn ancient and immortal witch living in a hut with "
+                        "bird's legs for stilts teaches you %s for her own inscrutable purposes."),
                         gSecondarySkills[cell->m_objectMetadata]
                     );
                     EventWindow(
@@ -974,10 +974,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying "
+                        DATA_COMPGEN(0x005184a4, doEventWitchSHutYouApproachThe, "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying "
                         "an ancient tome on %s.  As you approach, she turns and focuses her one "
                         "glass eye on you.  \"You already know everything you deserve to learn!\" "
-                        "the witch screeches. \"NOW GET OUT OF MY HOUSE!\"",
+                        "the witch screeches. \"NOW GET OUT OF MY HOUSE!\""),
                         gSecondarySkills[cell->m_objectMetadata]
                     );
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -985,9 +985,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 sprintf(
                     gText,
-                    "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying an "
+                    DATA_COMPGEN(0x005183d0, doEventWitchSHutYouApproachThe2, "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying an "
                     "ancient tome on %s.  As you approach, she turns and speaks.  \"You already "
-                    "know that which I would teach you. I can help you no further.\"",
+                    "know that which I would teach you. I can help you no further.\""),
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -997,8 +997,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Artesian Spring}\n\nThe spring only refills once a week, and someone's "
-                    "already been here this week.",
+                    DATA_COMPGEN(0x00518638, doEventArtesianSpringTheSpringOnlyRefills, "{Artesian Spring}\n\nThe spring only refills once a week, and someone's "
+                    "already been here this week."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1017,8 +1017,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 if (eventHero2->m_spellPoints
                     < springSpellPoints * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{Artesian Spring}\n\nA drink from the spring fills your blood with magic! "
-                        " You have twice your normal spell points in reserve.",
+                        DATA_COMPGEN(0x00518720, doEventArtesianSpringADrinkFromThe, "{Artesian Spring}\n\nA drink from the spring fills your blood with magic! "
+                        " You have twice your normal spell points in reserve."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1032,8 +1032,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_spellPoints = springSpellPoints * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 } else {
                     NormalDialog(
-                        "{Artesian Spring}\n\nA drink at the spring is supposed to give you twice "
-                        "your normal spell points, but you are already at that level.",
+                        DATA_COMPGEN(0x0051869c, doEventArtesianSpringADrinkAtThe, "{Artesian Spring}\n\nA drink at the spring is supposed to give you twice "
+                        "your normal spell points, but you are already at that level."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1056,8 +1056,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
                 if (eventHero2->m_spellPoints < wellSpellPoints5) {
                     NormalDialog(
-                        "{Magic Well}\n\nA drink from the well has restored your spell points to "
-                        "maximum.",
+                        DATA_COMPGEN(0x00518854, doEventMagicWellADrinkFromThe, "{Magic Well}\n\nA drink from the well has restored your spell points to "
+                        "maximum."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1072,8 +1072,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_spellPoints = wellSpellPoints5;
                 } else {
                     NormalDialog(
-                        "{Magic Well}\n\nA drink at the well is supposed to restore your spell "
-                        "points, but you are already at maximum.",
+                        DATA_COMPGEN(0x005187e8, doEventMagicWellADrinkAtThe, "{Magic Well}\n\nA drink at the well is supposed to restore your spell "
+                        "points, but you are already at maximum."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1087,7 +1087,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
             } else {
                 NormalDialog(
-                    "{Magic Well}\n\nA second drink at the well in one day will not help you.",
+                    DATA_COMPGEN(0x005187a0, doEventMagicWellASecondDrinkAt, "{Magic Well}\n\nA second drink at the well in one day will not help you."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1109,7 +1109,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 m_cursorType = eventHero2->m_cursorType;
                 m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
                 m_cursorActive = 1;
-                playedSample3 = LoadPlaySample("killfade.82m");
+                playedSample3 = LoadPlaySample(DATA_COMPGEN(0x005188a4, doEventKillfade82m, "killfade.82m"));
                 gpWindowManager->SaveFizzleSource(
                     COAST_FIZZLE_X,
                     COAST_FIZZLE_Y,
@@ -1189,7 +1189,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
                         + MINE_RESOURCE_ICON_OFFSET,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x0051b4d4, doEventEmptyString, ""),
                     IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
                     -resourceAmount6,
                     -1,
@@ -1207,7 +1207,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_ALCHEMIST_CAPTURED,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x0051b4d8, doEventEmptyString2, ""),
                     IDX(RES_MERCURY),
                     NORMAL_DIALOG_NO_VALUE,
                     -1,
@@ -1224,7 +1224,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_SAWMILL_CAPTURED,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005188b4, doEventSecondaryEmptyString, ""),
                     IDX(RES_WOOD),
                     -MINE_ORE_INCOME,
                     -1,
@@ -1242,7 +1242,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_LIGHTHOUSE_CAPTURED,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005188b8, doEventSecondaryEmptyString2, ""),
                     -1,
                     0,
                     -1,
@@ -1258,9 +1258,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Chest}\n\nAfter scouring the area, you fall upon a hidden treasure cache.  "
+                    DATA_COMPGEN(0x0051892c, doEventChestAfterScouringTheAreaYou, "{Chest}\n\nAfter scouring the area, you fall upon a hidden treasure cache.  "
                     "You may take the gold or distribute the gold to the peasants for experience.  "
-                    "Do you wish to keep the gold?",
+                    "Do you wish to keep the gold?"),
                     IDX(RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     NORMAL_DIALOG_EXPERIENCE,
@@ -1291,8 +1291,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{Chest}\n\nAfter scouring the area, you fall upon a hidden chest, containing "
-                    "the ancient artifact '%s'",
+                    DATA_COMPGEN(0x005188c4, doEventChestAfterScouringTheAreaYou2, "{Chest}\n\nAfter scouring the area, you fall upon a hidden chest, containing "
+                    "the ancient artifact '%s'"),
                     gArtifactNames[eventValue1]
                 );
                 NormalDialog(
@@ -1322,7 +1322,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_BUOY_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005188bc, doEventEmptyString3, ""),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1330,7 +1330,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1
                 );
             } else {
-                EventWindow(EVENT_TEXT_BUOY_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_BUOY_VISITED, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005188c0, doEventEmptyString4, ""), -1, 0, -1, 0, -1);
             }
             break;
 
@@ -1342,7 +1342,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005189e4, doEventEmptyString5, ""),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1353,7 +1353,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_VISITED,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005189e8, doEventEmptyString6, ""),
                     -1,
                     0,
                     -1,
@@ -1371,8 +1371,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is "
-                    "supposed to be lucky, so you do.  The stone is very cold to the touch.",
+                    DATA_COMPGEN(0x00518a9c, doEventIdolYouVeFoundAnAncient, "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is "
+                    "supposed to be lucky, so you do.  The stone is very cold to the touch."),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1383,9 +1383,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Idol}\n\nYou've found an ancient and weathered stone idol.  It is supposed "
+                    DATA_COMPGEN(0x005189f4, doEventIdolYouVeFoundAnAncient2, "{Idol}\n\nYou've found an ancient and weathered stone idol.  It is supposed "
                     "to grant luck to visitors, but since the stars are already smiling upon you, "
-                    "it does nothing.",
+                    "it does nothing."),
                     -1,
                     0,
                     -1,
@@ -1403,7 +1403,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_FOUNTAIN_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005189ec, doEventEmptyString7, ""),
                     NORMAL_DIALOG_LUCK_BONUS,
                     0,
                     -1,
@@ -1411,7 +1411,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1
                 );
             } else {
-                EventWindow(EVENT_TEXT_FOUNTAIN_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_FOUNTAIN_VISITED, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005189f0, doEventEmptyString8, ""), -1, 0, -1, 0, -1);
             }
             break;
 
@@ -1425,8 +1425,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Watering Hole}\n\nA drink at the watering hole fills your troops with "
-                    "strength and lifts their spirits.  You can travel a bit further today.",
+                    DATA_COMPGEN(0x00518bd4, doEventWateringHoleADrinkAtThe, "{Watering Hole}\n\nA drink at the watering hole fills your troops with "
+                    "strength and lifts their spirits.  You can travel a bit further today."),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1437,9 +1437,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Watering Hole}\n\nThe drink at the watering hole is refreshing, but offers "
+                    DATA_COMPGEN(0x00518b34, doEventWateringHoleTheDrinkAtThe, "{Watering Hole}\n\nThe drink at the watering hole is refreshing, but offers "
                     "no further benefit.  The watering hole might help again if you fought a "
-                    "battle first.",
+                    "battle first."),
                     -1,
                     0,
                     -1,
@@ -1459,8 +1459,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Oasis}\n\nA drink at the oasis fills your troops with strength and lifts "
-                    "their spirits.  You can travel a bit further today.",
+                    DATA_COMPGEN(0x00518ce8, doEventOasisADrinkAtTheOasis, "{Oasis}\n\nA drink at the oasis fills your troops with strength and lifts "
+                    "their spirits.  You can travel a bit further today."),
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     -1,
@@ -1471,8 +1471,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Oasis}\n\nThe drink at the oasis is refreshing, but offers no further "
-                    "benefit.  The oasis might help again if you fought a battle first.",
+                    DATA_COMPGEN(0x00518c60, doEventOasisTheDrinkAtTheOasis, "{Oasis}\n\nThe drink at the oasis is refreshing, but offers no further "
+                    "benefit.  The oasis might help again if you fought a battle first."),
                     -1,
                     0,
                     -1,
@@ -1488,8 +1488,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_TEMPLE;
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
-                    "{Temple}\n\nA visit and a prayer at the temple raises the morale of your "
-                    "troops.",
+                    DATA_COMPGEN(0x00518dc0, doEventTempleAVisitAndAPrayer, "{Temple}\n\nA visit and a prayer at the temple raises the morale of your "
+                    "troops."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1502,8 +1502,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 NormalDialog(
-                    "{Temple}\n\nIt doesn't help to pray twice before a battle.  Come back after "
-                    "you've fought.",
+                    DATA_COMPGEN(0x00518d64, doEventTempleItDoesnTHelpTo, "{Temple}\n\nIt doesn't help to pray twice before a battle.  Come back after "
+                    "you've fought."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1520,7 +1520,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Lean To}\n\nThe lean-to is long abandoned.  There is nothing of value here.",
+                    DATA_COMPGEN(0x00518e10, doEventLeanToTheLeanToIs, "{Lean To}\n\nThe lean-to is long abandoned.  There is nothing of value here."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1539,8 +1539,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 resourceAmount6 =
                     (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT;
                 NormalDialog(
-                    "{Lean To}\n\nYou've found an abandoned lean-to.  Poking about, you discover "
-                    "some resources hidden nearby.",
+                    DATA_COMPGEN(0x00518e5c, doEventLeanToYouVeFoundAn, "{Lean To}\n\nYou've found an abandoned lean-to.  Poking about, you discover "
+                    "some resources hidden nearby."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1568,9 +1568,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
+                        DATA_COMPGEN(0x00518ff4, doEventWagonYouComeAcrossAnOld, "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
                         "make it to safe terrain.  Inside, you find some of the wagon's cargo "
-                        "still intact.",
+                        "still intact."),
                         IDX(resourceType),
                         resourceAmount6,
                         -1,
@@ -1586,8 +1586,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
                     sprintf(
                         gText,
-                        "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
-                        "make it to safe terrain.  Searching inside, you find the '%s'.",
+                        DATA_COMPGEN(0x00518f6c, doEventWagonYouComeAcrossAnOld2, "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
+                        "make it to safe terrain.  Searching inside, you find the '%s'."),
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -1608,9 +1608,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_INFO,
-                "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it "
+                DATA_COMPGEN(0x00518ec4, doEventWagonYouComeAcrossAnOld3, "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it "
                 "to safe terrain.  Unfortunately, others have found it first, and the wagon is "
-                "empty.",
+                "empty."),
                 -1,
                 0,
                 -1,
@@ -1626,7 +1626,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         EVENT_TEXT_SKELETON_EMPTY,
                         NORMAL_DIALOG_INFO,
-                        "",
+                        DATA_COMPGEN(0x00518b2c, doEventEmptyString9, ""),
                         -1,
                         0,
                         -1,
@@ -1637,7 +1637,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 default:
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
-                        sprintf(gText, "%s.", "Treasure");
+                        sprintf(gText, DATA_COMPGEN(0x005190a0, doEventS, "%s."), DATA_COMPGEN(0x00519094, doEventTreasure, "Treasure"));
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1679,7 +1679,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 EVENT_TEXT_CAMPFIRE,
                 NORMAL_DIALOG_INFO,
-                "",
+                DATA_COMPGEN(0x00518b30, doEventEmptyString10, ""),
                 IDX(RES_GOLD),
                 (cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT) * CAMPFIRE_GOLD_MULTIPLIER,
                 cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK,
@@ -1712,9 +1712,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                               * XANADU_DIPLOMACY_MULTIPLIER
                     < XANADU_ADMISSION_LEVEL) {
                     NormalDialog(
-                        "{Xanadu}\n\nThe butler opens the door and looks you up and down.  \"You "
+                        DATA_COMPGEN(0x005191a4, doEventXanaduTheButlerOpensTheDoor, "{Xanadu}\n\nThe butler opens the door and looks you up and down.  \"You "
                         "are neither famous nor diplomatic enough to be admitted to see my "
-                        "master,\" he sniffs.  \"Come back when you think yourself worthy.\"",
+                        "master,\" he sniffs.  \"Come back when you think yourself worthy.\""),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1728,8 +1728,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     NormalDialog(
-                        "{Xanadu}\n\nThe butler admits you to see the master of the house.  He "
-                        "trains you in the four skills a hero should know.",
+                        DATA_COMPGEN(0x0051912c, doEventXanaduTheButlerAdmitsYouTo, "{Xanadu}\n\nThe butler admits you to see the master of the house.  He "
+                        "trains you in the four skills a hero should know."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1748,8 +1748,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
             } else {
                 NormalDialog(
-                    "{Xanadu}\n\nRecognizing you, the butler refuses to admit you.  \"The "
-                    "master,\" he says, \"will not see the same student twice.\"",
+                    DATA_COMPGEN(0x005190b0, doEventXanaduRecognizingYouTheButlerRefuses, "{Xanadu}\n\nRecognizing you, the butler refuses to admit you.  \"The "
+                    "master,\" he says, \"will not see the same student twice.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1767,8 +1767,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!(eventHero2->m_fortVisits & (1 << cell->m_objectMetadata))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Fort}\n\n The soldiers living in the fort teach you a few new defensive "
-                    "tricks.",
+                    DATA_COMPGEN(0x005192dc, doEventFortTheSoldiersLivingInThe, "{Fort}\n\n The soldiers living in the fort teach you a few new defensive "
+                    "tricks."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1783,8 +1783,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_fortVisits |= 1 << cell->m_objectMetadata;
             } else {
                 NormalDialog(
-                    "{Fort}\n\n \"I'm sorry sir,\" The leader of the soldiers says, \"but you "
-                    "already know everything we have to teach.\"",
+                    DATA_COMPGEN(0x0051926c, doEventFortIMSorrySirThe, "{Fort}\n\n \"I'm sorry sir,\" The leader of the soldiers says, \"but you "
+                    "already know everything we have to teach.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1802,9 +1802,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!(eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
+                    DATA_COMPGEN(0x005193e8, doEventStandingStonesYouVeFoundA, "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
                     "their strange stone edifices.  Silently, they teach you new ways to cast "
-                    "spells.",
+                    "spells."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1819,9 +1819,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_standingStoneVisits |= 1 << cell->m_objectMetadata;
             } else {
                 NormalDialog(
-                    "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
+                    DATA_COMPGEN(0x0051932c, doEventStandingStonesYouVeFoundA2, "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
                     "their strange stone edifices.  Silently, the Druids turn you away, indicating "
-                    "they have nothing new to teach you.",
+                    "they have nothing new to teach you."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1839,9 +1839,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!(eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your "
+                    DATA_COMPGEN(0x005194d8, doEventWitchDoctorSHutAnOrcish, "{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your "
                     "knowledge of magic by showing you how to cast stones, read portents, and "
-                    "decipher the intricacies of chicken entrails.",
+                    "decipher the intricacies of chicken entrails."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1856,8 +1856,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_witchDoctorVisits |= 1 << cell->m_objectMetadata;
             } else {
                 NormalDialog(
-                    "{Witch Doctor's Hut}\n\n\"Go 'way!\", the witch doctor barks, \"you know all "
-                    "I know.\"",
+                    DATA_COMPGEN(0x00519484, doEventWitchDoctorSHutGoWay, "{Witch Doctor's Hut}\n\n\"Go 'way!\", the witch doctor barks, \"you know all "
+                    "I know.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1875,9 +1875,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!(eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
+                    DATA_COMPGEN(0x00519644, doEventMercenaryCampYouVeComeUpon, "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
                     "tactics.  The mercenaries welcome you and your troops and invite you to train "
-                    "with them.",
+                    "with them."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1892,9 +1892,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_mercenaryCampVisits |= 1 << cell->m_objectMetadata;
             } else {
                 NormalDialog(
-                    "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
+                    DATA_COMPGEN(0x0051959c, doEventMercenaryCampYouVeComeUpon2, "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
                     "tactics.  \"You're too advanced for us,\" the mercenary captain says.  \"We "
-                    "can teach nothing more.\"",
+                    "can teach nothing more.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1914,7 +1914,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_GAZEBO_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x00519090, doEventEmptyString11, ""),
                     NORMAL_DIALOG_EXPERIENCE,
                     GAZEBO_EXPERIENCE,
                     -1,
@@ -1925,19 +1925,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->m_gazeboVisits |= 1 << cell->m_objectMetadata;
                 eventHero2->CheckLevel();
             } else {
-                EventWindow(EVENT_TEXT_GAZEBO_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_GAZEBO_VISITED, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005190ac, doEventEmptyString12, ""), -1, 0, -1, 0, -1);
             }
             break;
 
         case MAP_OBJECT_WATER_WHEEL:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_WATER_WHEEL_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_WATER_WHEEL_EMPTY, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005196e4, doEventEmptyString13, ""), -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_WATER_WHEEL_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005196e8, doEventEmptyString14, ""),
                     IDX(RES_GOLD),
                     cell->m_objectMetadata * MAP_EVENT_GOLD_AMOUNT,
                     -1,
@@ -1976,7 +1976,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     EVENT_TEXT_WINDMILL_REWARD,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x005196ec, doEventEmptyString15, ""),
                     cell->m_objectMetadata,
                     WINDMILL_RESOURCE_AMOUNT,
                     -1,
@@ -1990,13 +1990,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 cell->m_objectMetadata = WINDMILL_EMPTY;
             } else {
-                EventWindow(EVENT_TEXT_WINDMILL_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_WINDMILL_EMPTY, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005196f0, doEventEmptyString16, ""), -1, 0, -1, 0, -1);
             }
             break;
 
         case MAP_OBJECT_ANCIENT_LAMP:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_GENIE_LAMP, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+            EventWindow(EVENT_TEXT_GENIE_LAMP, NORMAL_DIALOG_CONFIRM, DATA_COMPGEN(0x005196f4, doEventEmptyString17, ""), -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
@@ -2011,8 +2011,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the "
-                    "Sprites living there wish to join an army.  Maybe next week.",
+                    DATA_COMPGEN(0x00519700, doEventTreeCityYouVeFoundA, "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the "
+                    "Sprites living there wish to join an army.  Maybe next week."),
                     -1,
                     0,
                     -1,
@@ -2024,8 +2024,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Tree City}\n\nSome of the Sprites living in the tree city are willing to "
-                    "join your army for a price.  Do you want to recruit Sprites?",
+                    DATA_COMPGEN(0x00519788, doEventTreeCitySomeOfTheSprites, "{Tree City}\n\nSome of the Sprites living in the tree city are willing to "
+                    "join your army for a price.  Do you want to recruit Sprites?"),
                     -1,
                     0,
                     -1,
@@ -2042,8 +2042,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are "
-                    "gone.  Perhaps there will be more next week.",
+                    DATA_COMPGEN(0x00519810, doEventRuinsYouSearchTheRuinsBut, "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are "
+                    "gone.  Perhaps there will be more next week."),
                     -1,
                     0,
                     -1,
@@ -2055,8 +2055,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing "
-                    "to join your army for a price.  Do you want to recruit Medusas?",
+                    DATA_COMPGEN(0x00519888, doEventRuinsYouVeFoundSomeMedusas, "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing "
+                    "to join your army for a price.  Do you want to recruit Medusas?"),
                     -1,
                     0,
                     -1,
@@ -2073,9 +2073,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond "
+                    DATA_COMPGEN(0x00519914, doEventTrollBridgeYouVeFoundOne, "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond "
                     "of living under, but there are none here.  Perhaps there will be some next "
-                    "week.",
+                    "week."),
                     -1,
                     0,
                     -1,
@@ -2086,8 +2086,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you "
-                    "fight them?",
+                    DATA_COMPGEN(0x005199b0, doEventTrollBridgeTrollsLivingUnderThe, "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you "
+                    "fight them?"),
                     -1,
                     0,
                     -1,
@@ -2121,9 +2121,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They "
+                    DATA_COMPGEN(0x00519a04, doEventTrollBridgeAFewTrollsRemain, "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They "
                     "approach you and offer to join your forces as mercenaries.  Do you want to "
-                    "buy any Trolls?",
+                    "buy any Trolls?"),
                     -1,
                     0,
                     -1,
@@ -2137,8 +2137,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your "
-                    "army, but for a price.  Do you want to recruit Trolls?",
+                    DATA_COMPGEN(0x00519aa8, doEventTrollBridgeSomeTrollsLivingUnder, "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your "
+                    "army, but for a price.  Do you want to recruit Trolls?"),
                     -1,
                     0,
                     -1,
@@ -2157,8 +2157,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of "
-                    "unlife as well.  Perhaps some undead will move in next week.",
+                    DATA_COMPGEN(0x00519b2c, doEventCityOfTheDeadTheCity, "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of "
+                    "unlife as well.  Perhaps some undead will move in next week."),
                     -1,
                     0,
                     -1,
@@ -2169,8 +2169,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nYou've found the ruins of an ancient city, now "
-                    "inhabited solely by the undead.  Will you search?",
+                    DATA_COMPGEN(0x00519bb4, doEventCityOfTheDeadYouVe, "{City of the Dead}\n\nYou've found the ruins of an ancient city, now "
+                    "inhabited solely by the undead.  Will you search?"),
                     -1,
                     0,
                     -1,
@@ -2204,9 +2204,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nSome of the surviving Liches are impressed by your "
+                    DATA_COMPGEN(0x00519c2c, doEventCityOfTheDeadSomeOf, "{City of the Dead}\n\nSome of the surviving Liches are impressed by your "
                     "victory over their fellows, and offer to join you for a price.  Do you want "
-                    "to recruit Liches?",
+                    "to recruit Liches?"),
                     -1,
                     0,
                     -1,
@@ -2220,8 +2220,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nSome Liches living here are willing to join your army "
-                    "for a price.  Do you want to recruit Liches?",
+                    DATA_COMPGEN(0x00519cd4, doEventCityOfTheDeadSomeLiches, "{City of the Dead}\n\nSome Liches living here are willing to join your army "
+                    "for a price.  Do you want to recruit Liches?"),
                     -1,
                     0,
                     -1,
@@ -2240,8 +2240,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this "
-                    "week.  Perhaps a Dragon will become available next week.",
+                    DATA_COMPGEN(0x00519d4c, doEventDragonCityTheDragonCityHas, "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this "
+                    "week.  Perhaps a Dragon will become available next week."),
                     -1,
                     0,
                     -1,
@@ -2252,9 +2252,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere "
+                    DATA_COMPGEN(0x00519dcc, doEventDragonCityYouStandBeforeThe, "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere "
                     "humans.  Do you wish to violate this rule and challenge the Dragons to a "
-                    "fight?",
+                    "fight?"),
                     -1,
                     0,
                     -1,
@@ -2295,9 +2295,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders "
+                    DATA_COMPGEN(0x00519e68, doEventDragonCityHavingDefeatedTheDragon, "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders "
                     "agree to supply some Dragons to your army for a price.  Do you wish to "
-                    "recruit Dragons?",
+                    "recruit Dragons?"),
                     -1,
                     0,
                     -1,
@@ -2311,8 +2311,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your "
-                    "army for a price.  Do you wish to recruit Dragons?",
+                    DATA_COMPGEN(0x00519f08, doEventDragonCityTheDragonCityIs, "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your "
+                    "army for a price.  Do you wish to recruit Dragons?"),
                     -1,
                     0,
                     -1,
@@ -2328,10 +2328,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_WAGON_CAMP:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_WAGON_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_WAGON_EMPTY, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x005196f8, doEventEmptyString18, ""), -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(EVENT_TEXT_WAGON_RECRUIT, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_WAGON_RECRUIT, NORMAL_DIALOG_CONFIRM, DATA_COMPGEN(0x005196fc, doEventEmptyString19, ""), -1, 0, -1, 0, -1);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     RecruitEvent(eventHero2, CREATURE_ROGUE, cell);
             }
@@ -2339,13 +2339,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_DESERT_TENT:
             if (!cell->m_objectMetadata) {
-                EventWindow(EVENT_TEXT_DESERT_TENT_EMPTY, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_DESERT_TENT_EMPTY, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x00519f84, doEventEmptyString20, ""), -1, 0, -1, 0, -1);
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_DESERT_TENT_RECRUIT,
                     NORMAL_DIALOG_CONFIRM,
-                    "",
+                    DATA_COMPGEN(0x00519f88, doEventEmptyString21, ""),
                     -1,
                     0,
                     -1,
@@ -2381,10 +2381,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (!(gpGame->m_obeliskVisitors[cell->m_objectMetadata] & (1 << eventHero2->m_owner))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 gpGame->m_obeliskVisitors[cell->m_objectMetadata] |= 1 << eventHero2->m_owner;
-                EventWindow(EVENT_TEXT_OBELISK_REWARD, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_OBELISK_REWARD, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x00519f8c, doEventEmptyString22, ""), -1, 0, -1, 0, -1);
                 ViewPuzzle();
             } else {
-                EventWindow(EVENT_TEXT_OBELISK_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_OBELISK_VISITED, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x00519f90, doEventEmptyString23, ""), -1, 0, -1, 0, -1);
             }
             break;
 
@@ -2397,9 +2397,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
                         NormalDialog(
-                            "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
+                            DATA_COMPGEN(0x0051a038, doEventTreeOfKnowledgeUponYourApproach, "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
                             "delight.  \"Ahh, an adventurer!  Allow me to teach you a little of "
-                            "what I have learned over the ages.\"",
+                            "what I have learned over the ages.\""),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -2417,9 +2417,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GOLD:
                         if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < TREE_KNOWLEDGE_GOLD_COST) {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
+                                DATA_COMPGEN(0x0051a1cc, doEventTreeOfKnowledgeTearsBrimIn, "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
                                 "need 2000 gold.\" it whispers. (sniff)  \"Well, come back when "
-                                "you can pay me.\"",
+                                "you can pay me.\""),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2432,10 +2432,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nUpon your approach, the tree opens its "
+                                DATA_COMPGEN(0x0051a0e4, doEventTreeOfKnowledgeUponYourApproach2, "{Tree of Knowledge}\n\nUpon your approach, the tree opens its "
                                 "eyes in delight.  \"Ahh, an adventurer! I will be happy to teach "
                                 "you a little of what I have learned over the ages for a mere 2000 "
-                                "gold.\"  (Just bury it around my roots.)",
+                                "gold.\"  (Just bury it around my roots.)"),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2457,9 +2457,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     case TREE_KNOWLEDGE_GEMS:
                         if (gpCurPlayer->m_resources[IDX(RES_GEMS)] < TREE_KNOWLEDGE_GEM_COST) {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
+                                DATA_COMPGEN(0x0051a304, doEventTreeOfKnowledgeTearsBrimIn2, "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
                                 "need 10 gems.\" it whispers. (sniff)  \"Well, come back when you "
-                                "can pay me.\"",
+                                "can pay me.\""),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2472,9 +2472,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nAhh, an adventurer! I will be happy to "
+                                DATA_COMPGEN(0x0051a258, doEventTreeOfKnowledgeAhhAnAdventurer, "{Tree of Knowledge}\n\nAhh, an adventurer! I will be happy to "
                                 "teach you a little of what I have learned over the ages for a "
-                                "mere 10 gems.\"  (Just bury it around my roots.)",
+                                "mere 10 gems.\"  (Just bury it around my roots.)"),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2495,9 +2495,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 }
             } else {
                 NormalDialog(
-                    "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
+                    DATA_COMPGEN(0x00519f9c, doEventTreeOfKnowledgeUponYourApproach3, "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
                     "delight.  \"It is good to see you, my student.  I hope my teachings have "
-                    "helped you.\"",
+                    "helped you.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2515,13 +2515,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_ORACLE:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_ORACLE, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
-            oracleWindow = new heroWindow(0, 0, "thiefwin.bin");
+            EventWindow(EVENT_TEXT_ORACLE, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x00519f94, doEventEmptyString24, ""), -1, 0, -1, 0, -1);
+            oracleWindow = new heroWindow(0, 0, DATA_COMPGEN(0x0051a394, doEventThiefwinBin, "thiefwin.bin"));
             if (oracleWindow == NULL)
                 MemError();
             SetWinText(oracleWindow, ORACLE_WINDOW_TEXT_ID);
             gpTownManager->SetupThievesGuild(oracleWindow, ORACLE_THIEVES_GUILD_RANK);
-            strcpy(gText, "Shrine - Player Rankings");
+            strcpy(gText, DATA_COMPGEN(0x0051a3a4, doEventShrinePlayerRankings, "Shrine - Player Rankings"));
             oracleMessage1.type = MESSAGE_WIDGET;
             oracleMessage1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             oracleMessage1.payload.widget.id = 0;
@@ -2536,10 +2536,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group "
+                DATA_COMPGEN(0x0051a470, doEventSS, "%s'%s'.  "),
+                DATA_COMPGEN(0x0051a3c0, doEventShrineOfThe1stCircleYou, "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group "
                 "of novice acolytes.  In exchange for your protection, they agree to teach you a "
-                "simple spell - ",
+                "simple spell - "),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2548,10 +2548,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a "
+                DATA_COMPGEN(0x0051a524, doEventSS2, "%s'%s'.  "),
+                DATA_COMPGEN(0x0051a47c, doEventShrineOfThe2ndCircleYou, "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a "
                 "group of rotund friars.  In exchange for your protection, they agree to teach you "
-                "a spell - ",
+                "a spell - "),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
@@ -2560,15 +2560,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
-                "%s'%s'.  ",
-                "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group "
+                DATA_COMPGEN(0x0051b7f4, doEventSS3, "%s'%s'.  "),
+                DATA_COMPGEN(0x0051a530, doEventShrineOfThe3rdCircleYou, "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group "
                 "of high priests.  In exchange for your protection, they agree to teach you a "
-                "sophisticated spell - ",
+                "sophisticated spell - "),
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
             if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
-                strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
+                strcat(gText, DATA_COMPGEN(0x0051a658, doEventUnfortunatelyYouHaveNoMagicBook, "Unfortunately, you have no Magic Book to record the spell with."));
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             } else if (static_cast<i32>(
                            eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
@@ -2577,8 +2577,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                        < IDX(gsSpellInfo[eventValue1].level)) {
                 strcat(
                     gText,
-                    "Unfortunately, you do not have the wisdom to understand the spell, and you "
-                    "are unable to learn it.  "
+                    DATA_COMPGEN(0x0051a5f0, doEventUnfortunatelyYouDoNotHaveThe, "Unfortunately, you do not have the wisdom to understand the spell, and you "
+                    "are unable to learn it.  ")
                 );
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             } else {
@@ -2659,7 +2659,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "You cannot pick up this artifact, you already have a full load!",
+                    DATA_COMPGEN(0x0051a698, doEventYouCannotPickUpThisArtifact, "You cannot pick up this artifact, you already have a full load!"),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2677,9 +2677,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 strcpy(
                     gText,
-                    "The fabled golden bow of the elves lies here in the dust.  You take it and "
+                    DATA_COMPGEN(0x0051a6d8, doEventTheFabledGoldenBowOfThe, "The fabled golden bow of the elves lies here in the dust.  You take it and "
                     "journey back to the elven towns.  They shower you with their graciousness and "
-                    "the king promises that his people will aid you whenever you seek help."
+                    "the king promises that his people will aid you whenever you seek help.")
                 );
                 EventWindow(
                     -1,
@@ -2737,8 +2737,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "2000 gold.  Do you wish to buy this artifact?",
+                            DATA_COMPGEN(0x0051aaa8, doEventArtifactALeprechaunOffersYouThe, "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
+                            "2000 gold.  Do you wish to buy this artifact?"),
                             gArtifactNames[IDX(artifact8)]
                         );
                         EventWindow(
@@ -2759,8 +2759,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051ac6c, doEventYouTryToPayTheLeprechaun, "You try to pay the leprechaun, but realize that you can't afford "
+                                "it.  The leprechaun stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2773,8 +2773,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051ace4, doEventInsultedByYourRefusalOfHis, "Insulted by your refusal of his generous offer, the leprechaun "
+                                "stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2794,9 +2794,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{Artifact}\n\nYou've found the humble dwelling of a withered hermit.  "
+                            DATA_COMPGEN(0x0051a95c, doEventArtifactYouVeFoundTheHumble, "{Artifact}\n\nYou've found the humble dwelling of a withered hermit.  "
                             "The hermit tells you that he is willing to give the %s to the first "
-                            "wise person he meets.",
+                            "wise person he meets."),
                             gArtifactNames[IDX(artifact8)]
                         );
                         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2808,9 +2808,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             goto artifactPickup;
                         sprintf(
                             gText,
-                            "{Artifact}\n\nYou've come across the spartan quarters of a retired "
+                            DATA_COMPGEN(0x0051a9fc, doEventArtifactYouVeComeAcrossThe, "{Artifact}\n\nYou've come across the spartan quarters of a retired "
                             "soldier.  The soldier tells you that he is willing to pass on the %s "
-                            "to the first true leader he meets.",
+                            "to the first true leader he meets."),
                             gArtifactNames[IDX(artifact8)]
                         );
                         NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2822,8 +2822,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sphinxAnswer_a[0] += ' ';
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "2500 gold and 3 %s.  Do you wish to buy this artifact?",
+                            DATA_COMPGEN(0x0051abf0, doEventArtifactALeprechaunOffersYouThe2, "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
+                            "2500 gold and 3 %s.  Do you wish to buy this artifact?"),
                             gArtifactNames[IDX(artifact8)],
                             sphinxAnswer_a
                         );
@@ -2853,8 +2853,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051ab18, doEventLeprechaunPaymentRefusal, "You try to pay the leprechaun, but realize that you can't afford "
+                                "it.  The leprechaun stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2867,8 +2867,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051ab90, doEventLeprechaunInsultResponse, "Insulted by your refusal of his generous offer, the leprechaun "
+                                "stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2888,8 +2888,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         sphinxAnswer_a[0] += ' ';
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "3000 gold and 5 %s.  Do you wish to buy this artifact?",
+                            DATA_COMPGEN(0x0051ad44, doEventArtifactALeprechaunOffersYouThe3, "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
+                            "3000 gold and 5 %s.  Do you wish to buy this artifact?"),
                             gArtifactNames[IDX(artifact8)],
                             sphinxAnswer_a
                         );
@@ -2919,8 +2919,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051adc0, doEventYouTryToPayTheLeprechaun2, "You try to pay the leprechaun, but realize that you can't afford "
+                                "it.  The leprechaun stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2933,8 +2933,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                DATA_COMPGEN(0x0051ae38, doEventInsultedByYourRefusalOfHis2, "Insulted by your refusal of his generous offer, the leprechaun "
+                                "stamps his foot and ignores you."),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2952,8 +2952,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 if (guardedMonster5 == CREATURE_ROGUE) {
                     NormalDialog(
-                        "{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a "
-                        "pack of Rogues leap out of the brush to guard their stolen loot.",
+                        DATA_COMPGEN(0x0051a7b8, doEventArtifactYouComeUponAnAncient, "{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a "
+                        "pack of Rogues leap out of the brush to guard their stolen loot."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -2969,17 +2969,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     guardedCount = 1;
                     sprintf(
                         gText,
-                        "{Artifact}\n\nThrough a clearing you observe an ancient artifact.  "
+                        DATA_COMPGEN(0x0051a840, doEventArtifactThroughAClearingYouObserve, "{Artifact}\n\nThrough a clearing you observe an ancient artifact.  "
                         "Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s "
-                        "for the artifact?",
+                        "for the artifact?"),
                         gArmyNames[IDX(guardedMonster5)],
                         gArmyNames[IDX(guardedMonster5)]
                     );
                     NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                     if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES) {
                         NormalDialog(
-                            "Discretion is the better part of valor, and you decide to avoid this "
-                            "fight for today.",
+                            DATA_COMPGEN(0x0051a904, doEventDiscretionIsTheBetterPartOf, "Discretion is the better part of valor, and you decide to avoid this "
+                            "fight for today."),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -3015,7 +3015,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->CheckLevel();
                 sprintf(
                     gText,
-                    "Victorious, you take your prize, the %s",
+                    DATA_COMPGEN(0x0051a8dc, doEventVictoriousYouTakeYourPrizeThe, "Victorious, you take your prize, the %s"),
                     gArtifactNames[IDX(artifact8)]
                 );
                 NormalDialog(
@@ -3113,8 +3113,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Daemon Cave}\n\nThe entrance to the cave is dark, and a foul, sulfurous smell "
-                "issues from the cave mouth.  Will you enter?",
+                DATA_COMPGEN(0x0051ae98, doEventDaemonCaveTheEntranceToThe, "{Daemon Cave}\n\nThe entrance to the cave is dark, and a foul, sulfurous smell "
+                "issues from the cave mouth.  Will you enter?"),
                 -1,
                 0,
                 -1,
@@ -3127,7 +3127,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "Except for evidence of a terrible battle, the cave is empty.",
+                    DATA_COMPGEN(0x0051af14, doEventExceptForEvidenceOfATerrible, "Except for evidence of a terrible battle, the cave is empty."),
                     -1,
                     0,
                     -1,
@@ -3143,9 +3143,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             );
             sprintf(
                 gText,
-                "You find a powerful and grotesque Demon in the cave.  \"Today,\" it rasps, \"you "
+                DATA_COMPGEN(0x0051af54, doEventYouFindAPowerfulAndGrotesque, "You find a powerful and grotesque Demon in the cave.  \"Today,\" it rasps, \"you "
                 "will fight and surely die.  But I will give you a choice of deaths.  You may "
-                "fight me, or you may fight my servants.  Do you prefer to fight my servants?\""
+                "fight me, or you may fight my servants.  Do you prefer to fight my servants?\"")
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
@@ -3169,8 +3169,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
-                        "Upon defeating the daemon's servants, you find a hidden cache with 2500 "
-                        "gold.",
+                        DATA_COMPGEN(0x0051b040, doEventUponDefeatingTheDaemonSServants, "Upon defeating the daemon's servants, you find a hidden cache with 2500 "
+                        "gold."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3193,8 +3193,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
-                        "battle, you slay the monster and receive 1,000 experience points.",
+                        DATA_COMPGEN(0x0051b090, doEventTheDemonScreamsItsChallengeAnd, "The Demon screams its challenge and attacks!  After a short, desperate "
+                        "battle, you slay the monster and receive 1,000 experience points."),
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
                         -1,
@@ -3213,8 +3213,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventValue1 = IDX(GiveRandomArtifact(eventHero2));
                     sprintf(
                         gText,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
-                        "battle, you slay the monster and find the %s in the back of the cave.",
+                        DATA_COMPGEN(0x0051b11c, doEventTheDemonScreamsItsChallengeAnd2, "The Demon screams its challenge and attacks!  After a short, desperate "
+                        "battle, you slay the monster and find the %s in the back of the cave."),
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -3236,9 +3236,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
+                        DATA_COMPGEN(0x0051b1ac, doEventTheDemonScreamsItsChallengeAnd3, "The Demon screams its challenge and attacks!  After a short, desperate "
                         "battle, you slay the monster and receive 1,000 experience points and "
-                        "2,500 gold.",
+                        "2,500 gold."),
                         IDX(RES_GOLD),
                         DAEMON_GOLD,
                         NORMAL_DIALOG_EXPERIENCE,
@@ -3255,9 +3255,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "The Demon leaps upon you and has its claws at your throat before you can "
+                        DATA_COMPGEN(0x0051b244, doEventTheDemonLeapsUponYouAnd, "The Demon leaps upon you and has its claws at your throat before you can "
                         "even draw your sword.  \"Your life is mine,\" it says.  \"I will sell it "
-                        "back to you for 2,500 gold.\"",
+                        "back to you for 2,500 gold.\""),
                         -1,
                         0,
                         -1,
@@ -3270,8 +3270,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                "Seeing that you do not have 2500 gold, the demon slashes you with "
-                                "its claws, and the last thing you see is a red haze.",
+                                DATA_COMPGEN(0x0051b2f0, doEventSeeingThatYouDoNotHave, "Seeing that you do not have 2500 gold, the demon slashes you with "
+                                "its claws, and the last thing you see is a red haze."),
                                 -1,
                                 0,
                                 -1,
@@ -3297,8 +3297,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Shipwreck}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
-                "pushed against the rocks.  Do you wish to search the shipwreck?",
+                DATA_COMPGEN(0x0051b368, doEventShipwreckTheRottingHulkOfA, "{Shipwreck}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
+                "pushed against the rocks.  Do you wish to search the shipwreck?"),
                 -1,
                 0,
                 -1,
@@ -3311,9 +3311,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Upon defeating the Ghosts you spend several hours sifting through the "
+                            DATA_COMPGEN(0x0051b3f4, doEventUponDefeatingTheGhostsYouSpend, "Upon defeating the Ghosts you spend several hours sifting through the "
                             "debris and find nothing.  Such a despicable act reduces your army's "
-                            "morale.",
+                            "morale."),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3330,8 +3330,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (GhostEvent(
                                 eventHero2,
                                 cell,
-                                "Upon defeating the Ghosts you sift through the debris and find "
-                                "something!",
+                                DATA_COMPGEN(0x0051b488, doEventUponDefeatingTheGhostsYouSift, "Upon defeating the Ghosts you sift through the debris and find "
+                                "something!"),
                                 x,
                                 y
                             ))
@@ -3344,14 +3344,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_GRAVEYARD: {
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(EVENT_TEXT_GRAVEYARD_PROMPT, NORMAL_DIALOG_CONFIRM, "", -1, 0, -1, 0, -1);
+            EventWindow(EVENT_TEXT_GRAVEYARD_PROMPT, NORMAL_DIALOG_CONFIRM, DATA_COMPGEN(0x00519f98, doEventEmptyString25, ""), -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 switch (cell->m_objectMetadata) {
                     case SKELETON_EMPTY:
                         EventWindow(
                             EVENT_TEXT_GRAVEYARD_EMPTY,
                             NORMAL_DIALOG_INFO,
-                            "",
+                            DATA_COMPGEN(0x0051a390, doEventEmptyString26, ""),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3388,8 +3388,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Derelict Ship}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
-                "pushed against the rocks.  Do you wish to search the ship?",
+                DATA_COMPGEN(0x0051b4dc, doEventDerelictShipTheRottingHulkOf, "{Derelict Ship}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
+                "pushed against the rocks.  Do you wish to search the ship?"),
                 -1,
                 0,
                 -1,
@@ -3402,9 +3402,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Upon defeating the Skeletons you spend several hours sifting through "
+                            DATA_COMPGEN(0x0051b568, doEventUponDefeatingTheSkeletonsYouSpend, "Upon defeating the Skeletons you spend several hours sifting through "
                             "the debris and find nothing.  Such a despicable act reduces your "
-                            "army's morale.",
+                            "army's morale."),
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3425,8 +3425,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (SkeletonEvent(
                                 eventHero2,
                                 skeletonCell1,
-                                "Upon defeating the Skeletons you sift through the debris and find "
-                                "something!",
+                                DATA_COMPGEN(0x0051b600, doEventUponDefeatingTheSkeletonsYouSift, "Upon defeating the Skeletons you sift through the debris and find "
+                                "something!"),
                                 x,
                                 y
                             ))
@@ -3442,9 +3442,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "You come upon the pyramid of a great and ancient king.  You are tempted to search "
+                DATA_COMPGEN(0x0051b650, doEventYouComeUponThePyramidOf, "You come upon the pyramid of a great and ancient king.  You are tempted to search "
                 "it for treasure, but all the old stories warn of fearful curses and undead "
-                "guardians.  Will you search?",
+                "guardians.  Will you search?"),
                 -1,
                 0,
                 -1,
@@ -3454,8 +3454,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
-                        "You come upon the pyramid of a great and ancient king.  Routine "
-                        "exploration reveals that the pyramid is completely empty.",
+                        DATA_COMPGEN(0x0051b70c, doEventYouComeUponThePyramidOf2, "You come upon the pyramid of a great and ancient king.  Routine "
+                        "exploration reveals that the pyramid is completely empty."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3493,23 +3493,23 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         eventValue1 = cell->m_objectMetadata - 1;
                         sprintf(
                             eventText,
-                            "%s'%s'.  ",
-                            "Upon defeating the monsters, you decipher an ancient glyph on the "
-                            "wall, telling the secret of the spell - ",
+                            DATA_COMPGEN(0x0051a5e4, doEventNamedMessageFormat, "%s'%s'.  "),
+                            DATA_COMPGEN(0x0051b788, doEventUponDefeatingTheMonstersYouDecipher, "Upon defeating the monsters, you decipher an ancient glyph on the "
+                            "wall, telling the secret of the spell - "),
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
                                 eventText,
-                                "  Unfortunately, you have no Magic Book to record the spell with."
+                                DATA_COMPGEN(0x0051b800, doEventNoMagicBookFollowup, "  Unfortunately, you have no Magic Book to record the spell with.")
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
                                    < HERO_SKILL_LEVEL_EXPERT) {
                             strcat(
                                 eventText,
-                                "  Unfortunately, you do not have the wisdom to understand the "
-                                "spell, and you are unable to learn it.  "
+                                DATA_COMPGEN(0x0051b844, doEventUnfortunatelyYouDoNotHaveThe2, "  Unfortunately, you do not have the wisdom to understand the "
+                                "spell, and you are unable to learn it.  ")
                             );
                             EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
                         } else {
@@ -3539,8 +3539,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "You come upon an abandoned gold mine.  The mine appears to be haunted.  Do you "
-                "wish to enter?",
+                DATA_COMPGEN(0x0051b8ac, doEventYouComeUponAnAbandonedGold, "You come upon an abandoned gold mine.  The mine appears to be haunted.  Do you "
+                "wish to enter?"),
                 -1,
                 0,
                 -1,
@@ -3570,7 +3570,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "You beat the Ghosts and are able to restore the mine to production.",
+                        DATA_COMPGEN(0x0051b90c, doEventYouBeatTheGhostsAndAre, "You beat the Ghosts and are able to restore the mine to production."),
                         -1,
                         0,
                         -1,
@@ -3912,8 +3912,8 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 
     sprintf(
         gText,
-        "A magical %s barrier stands tall before you, blocking your way.  "
-        "Runes on the arch read, \"Speak the key and you may pass.\"",
+        DATA_COMPGEN(0x0051b950, barrierEventAMagicalSBarrierStandsTall, "A magical %s barrier stands tall before you, blocking your way.  "
+        "Runes on the arch read, \"Speak the key and you may pass.\""),
         xBarrierColor[color]
     );
     GetDataEntry(gText, response, INPUT_LENGTH, NULL, 0, 1);
@@ -3921,8 +3921,8 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         && (gpCurPlayer->m_barrierTents & (1 << color))) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &eventSample);
         NormalDialog(
-            "As you speak the magic word, the glowing barrier dissolves into "
-            "nothingness.",
+            DATA_COMPGEN(0x0051b9cc, barrierEventAsYouSpeakTheMagicWord, "As you speak the magic word, the glowing barrier dissolves into "
+            "nothingness."),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -3936,7 +3936,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         return 1;
     } else {
         NormalDialog(
-            "You speak, and nothing happens.",
+            DATA_COMPGEN(0x0051ba1c, barrierEventYouSpeakAndNothingHappens, "You speak, and nothing happens."),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -3987,10 +3987,10 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &eventSample);
     sprintf(
         gText,
-        "You enter the tent and see an old woman gazing into a magic gem.  She "
+        DATA_COMPGEN(0x0051ba3c, passwordEventYouEnterTheTentAndSee, "You enter the tent and see an old woman gazing into a magic gem.  She "
         "looks up and says, \"In my travels, I have learned much in the way of "
         "arcane magic.  A great oracle taught me his skill.  I have the answer "
-        "you seek.  The %s keyword is '%s'.\"",
+        "you seek.  The %s keyword is '%s'.\""),
         xBarrierColor[color],
         xPasswordStrings[passwordIndex]
     );
@@ -4037,18 +4037,18 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 if (cursedArtifactCount9 == 1) {
                     sprintf(
                         gText,
-                        "As you enter the Alchemist's Tower, a hobbled, graying man "
+                        DATA_COMPGEN(0x0051bb34, genericSiteEventAsYouEnterTheAlchemistS, "As you enter the Alchemist's Tower, a hobbled, graying man "
                         "in a brown cloak makes his way towards you.  He checks your "
                         "pack, and sees that you have 1 cursed item.  For 750 gold, "
-                        "the alchemist will remove it for you.  Do you pay?"
+                        "the alchemist will remove it for you.  Do you pay?")
                     );
                 } else {
                     sprintf(
                         gText,
-                        "As you enter the Alchemist's Tower, a hobbled, graying man "
+                        DATA_COMPGEN(0x0051bc1c, genericSiteEventAsYouEnterTheAlchemistS2, "As you enter the Alchemist's Tower, a hobbled, graying man "
                         "in a brown cloak makes his way towards you.  He checks your "
                         "pack, and sees that you have %d cursed items.  For 750 gold, "
-                        " the alchemist will remove them for you.  Do you pay?",
+                        " the alchemist will remove them for you.  Do you pay?"),
                         cursedArtifactCount9
                     );
                 }
@@ -4062,8 +4062,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SITE_ALCHEMIST_COST;
                     } else {
                         NormalDialog(
-                            "You hear a voice from behind the locked door, \"You "
-                            "don't have enough gold to pay for my services.\"",
+                            DATA_COMPGEN(0x0051bd08, genericSiteEventYouHearAVoiceFromBehind, "You hear a voice from behind the locked door, \"You "
+                            "don't have enough gold to pay for my services.\""),
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -4078,8 +4078,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 }
             } else {
                 NormalDialog(
-                    "You hear a voice from high above in the tower, \"Go away! I "
-                    "can't help you!\"",
+                    DATA_COMPGEN(0x0051bd6c, genericSiteEventYouHearAVoiceFromHigh, "You hear a voice from high above in the tower, \"Go away! I "
+                    "can't help you!\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4096,7 +4096,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_ARENA:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_ARENA)) {
                 NormalDialog(
-                    "The Arena guards turn you away.",
+                    DATA_COMPGEN(0x0051bdb8, genericSiteEventTheArenaGuardsTurnYouAway, "The Arena guards turn you away."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4120,8 +4120,8 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_MERMAID:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MERMAID)) {
                 NormalDialog(
-                    "The mermaids silently entice you to return later and be "
-                    "blessed again.",
+                    DATA_COMPGEN(0x0051bdd8, genericSiteEventTheMermaidsSilentlyEnticeYouTo, "The mermaids silently entice you to return later and be "
+                    "blessed again."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4141,10 +4141,10 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "The magical, soothing beauty of the Mermaids reaches you and "
+                    DATA_COMPGEN(0x0051be20, genericSiteEventTheMagicalSoothingBeautyOfThe, "The magical, soothing beauty of the Mermaids reaches you and "
                     "your crew.  Just for a moment, you forget your worries and "
                     "bask in the beauty of the moment.  The mermaids charms bless "
-                    "you with increased luck for your next combat.",
+                    "you with increased luck for your next combat."),
                     SITE_MERMAID_WINDOW_ICON,
                     0,
                     -1,
@@ -4157,9 +4157,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_HUT_OF_MAGI:
             EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5);
             NormalDialog(
-                "You enter a rickety hut and talk to the magician who lives there.  "
+                DATA_COMPGEN(0x0051bf04, genericSiteEventYouEnterARicketyHutAnd, "You enter a rickety hut and talk to the magician who lives there.  "
                 "He tells you of places near and far which may aid you in your "
-                "journeys.",
+                "journeys."),
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -4188,7 +4188,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
         case GENERIC_SITE_EYE_OF_MAGI:
             NormalDialog(
-                "This eye seems to be intently studying its surroundings.",
+                DATA_COMPGEN(0x0051bf90, genericSiteEventThisEyeSeemsToBeIntently, "This eye seems to be intently studying its surroundings."),
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -4204,9 +4204,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
         case GENERIC_SITE_SIRENS:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_SIRENS)) {
                 NormalDialog(
-                    "You have your crew stop up their ears with wax before the "
+                    DATA_COMPGEN(0x0051bfcc, genericSiteEventYouHaveYourCrewStopUp, "You have your crew stop up their ears with wax before the "
                     "sirens' eerie song has any chance of luring them to a watery "
-                    "grave.",
+                    "grave."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -4239,19 +4239,19 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                     );
                     sprintf(
                         gText,
-                        "An eerie wailing song emanates from the sirens perched "
+                        DATA_COMPGEN(0x0051c04c, genericSiteEventAnEerieWailingSongEmanatesFrom, "An eerie wailing song emanates from the sirens perched "
                         "upon the rocks.  Many of your crew fall under its spell, "
                         "and dive into the water where they drown.  You are now "
-                        "wiser for the visit, and gain %d experience.",
+                        "wiser for the visit, and gain %d experience."),
                         experience11
                     );
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                     GiveExperience(eventHero, experience11, 1);
                 } else {
                     NormalDialog(
-                        "As the sirens sing their eerie song, your small, "
+                        DATA_COMPGEN(0x0051c120, genericSiteEventAsTheSirensSingTheirEerie, "As the sirens sing their eerie song, your small, "
                         "determined army manages to overcome the urge to dive "
-                        "headlong into the sea.",
+                        "headlong into the sea."),
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -4372,8 +4372,8 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     heroId9 = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId9] != EVENT_JAILED_HERO) {
         NormalDialog(
-            "The jailer tells you that the hero who was imprisoned here has been released by the "
-            "king who imprisoned him.",
+            DATA_COMPGEN(0x0051c1a0, jailEventTheJailerTellsYouThatThe, "The jailer tells you that the hero who was imprisoned here has been released by the "
+            "king who imprisoned him."),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4390,8 +4390,8 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
-            "You already have 8 heroes, and regretfully must leave the prisoner in this jail to "
-            "languish in agony for untold days.",
+            DATA_COMPGEN(0x0051c210, jailEventYouAlreadyHave8HeroesAnd, "You already have 8 heroes, and regretfully must leave the prisoner in this jail to "
+            "languish in agony for untold days."),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4407,8 +4407,8 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample1);
     NormalDialog(
-        "In a dazzling display of daring, you break into the local jail and free the hero "
-        "imprisoned there, who, in return, pledges loyalty to your cause.",
+        DATA_COMPGEN(0x0051c288, jailEventInADazzlingDisplayOfDaring, "In a dazzling display of daring, you break into the local jail and free the hero "
+        "imprisoned there, who, in return, pledges loyalty to your cause."),
         NORMAL_DIALOG_INFO,
         -1,
         -1,
@@ -4505,7 +4505,7 @@ void advManager::EventSound(
     const i32 pickupSound_o = SOUND_PICKUP;
     const i32 mineSound_c = SOUND_MINE;
     char sampleFile_m[SOUND_FILENAME_LENGTH];
-    strcpy(sampleFile_m, "");
+    strcpy(sampleFile_m, DATA_COMPGEN(0x0051c31c, eventSoundEmptyString, ""));
     i32 musicTrack_e = SOUND_NONE;
 
     switch (eventType) {
@@ -4651,22 +4651,22 @@ void advManager::EventSound(
     if (musicTrack_e != SOUND_NONE) {
         switch (musicTrack_e) {
             case SOUND_TREASURE:
-                strcpy(sampleFile_m, "treasure.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c320, eventSoundTreasure82m, "treasure.82m"));
                 break;
             case SOUND_EXPERIENCE:
-                strcpy(sampleFile_m, "expernce.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c330, eventSoundExpernce82m, "expernce.82m"));
                 break;
             case SOUND_MORALE:
-                strcpy(sampleFile_m, "goodmrle.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c340, eventSoundGoodmrle82m, "goodmrle.82m"));
                 break;
             case SOUND_LUCK:
-                strcpy(sampleFile_m, "goodluck.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c350, eventSoundGoodluck82m, "goodluck.82m"));
                 break;
             case SOUND_PICKUP:
-                strcpy(sampleFile_m, "pickup01.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c360, eventSoundPickup0182m, "pickup01.82m"));
                 break;
             case SOUND_MINE:
-                strcpy(sampleFile_m, "h2mine.82m");
+                strcpy(sampleFile_m, DATA_COMPGEN(0x0051c370, eventSoundH2mine82m, "h2mine.82m"));
                 break;
             default:
                 gpSoundManager->SwitchAmbientMusic(musicTrack_e);
@@ -4707,7 +4707,7 @@ void advManager::EventWindow(
     else if (eventId == MAP_EVENT_REWARD_NONE)
         sprintf(eventText, text);
     else
-        sprintf(eventText, "Event ID %d", eventId);
+        sprintf(eventText, DATA_COMPGEN(0x0051c37c, eventWindowEventIDD, "Event ID %d"), eventId);
 
     NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
 }
@@ -5114,7 +5114,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(gText, DATA_COMPGEN(0x0051c388, ghostEventS, "%s"), text);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5149,7 +5149,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(gText, DATA_COMPGEN(0x0051c38c, ghostEventS2, "%s"), text);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5184,7 +5184,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                     0
                 )
                 == COMBAT_RESULT_ATTACKER) {
-                sprintf(gText, "%s", text);
+                sprintf(gText, DATA_COMPGEN(0x0051c390, ghostEventS3, "%s"), text);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
@@ -5220,7 +5220,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
                 )
                 == COMBAT_RESULT_ATTACKER) {
                 artifactId = GiveRandomArtifact(eventHero);
-                sprintf(gText, "%s", text);
+                sprintf(gText, DATA_COMPGEN(0x0051c394, ghostEventS4, "%s"), text);
                 if (artifactId != ARTIFACT_NONE)
                     EventWindow(
                         -1,
@@ -5295,7 +5295,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
         EventWindow(
             IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_EMPTY_DIALOG_BASE,
             NORMAL_DIALOG_INFO,
-            "",
+            DATA_COMPGEN(0x0051c398, houseEventEmptyString, ""),
             -1,
             0,
             -1,
@@ -5317,7 +5317,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
         EventWindow(
             IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_RECRUIT_DIALOG_BASE,
             NORMAL_DIALOG_CONFIRM,
-            "",
+            DATA_COMPGEN(0x0051c39c, houseEventEmptyString2, ""),
             -1,
             0,
             -1,
@@ -5334,7 +5334,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
                 EventWindow(
                     IDX(siteIndex) * EVENT_HOUSE_DIALOG_STRIDE + EVENT_ARMY_FULL_DIALOG_BASE,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    DATA_COMPGEN(0x0051c3a0, houseEventEmptyString3, ""),
                     -1,
                     0,
                     -1,
@@ -5841,7 +5841,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                             || gbThisNetHumanPlayer[destinationHero->m_owner]) {
                             sprintf(
                                 gText,
-                                "As you reach for the %s, it mysteriously disappears.",
+                                DATA_COMPGEN(0x0051c3a4, transferArtifactsAsYouReachForTheS, "As you reach for the %s, it mysteriously disappears."),
                                 gArtifactNames[IDX(sourceHero->m_artifacts[sourceArtifactSlot])]
                             );
                             NormalDialog(
@@ -5944,12 +5944,12 @@ void advManager::FizzleCenter(i32 fizzleType) {
     {
         switch (fizzleType) {
             case EVENT_FIZZLE_HERO_LOSS:
-                sprintf(gText, "killfade.82M");
+                sprintf(gText, DATA_COMPGEN(0x0051c3dc, fizzleCenterKillfade82M, "killfade.82M"));
                 break;
             case EVENT_FIZZLE_ARTIFACT:
                 sprintf(
                     gText,
-                    "pickup%02d.82M",
+                    DATA_COMPGEN(0x0051c3ec, fizzleCenterPickup02d82M, "pickup%02d.82M"),
                     Random(ARTIFACT_PICKUP_SOUND_FIRST, ARTIFACT_PICKUP_SOUND_LAST)
                 );
                 break;
@@ -6843,7 +6843,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             : gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)];
                     spellValueFactor_i = battleStatValue_o;
                 } else {
-                    spellValueFactor_i = 1.0f;
+                    spellValueFactor_i = DATA_COMPGEN(0x004eb928, doAIEventConstant, 1.0f);
                 }
                 pyramidBattleValue_l = static_cast<i32>(
                     gsSpellInfo[index_h].aiValue * gpCurPlayer->m_aiData.m_upgradeValueWeight
@@ -7368,8 +7368,8 @@ void advManager::PlayerMonsterInteract(
         if (!eventHero->m_army.CanJoin(monster_n)) {
             if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may "
-                    "pass.\"",
+                    DATA_COMPGEN(0x0051c3fc, playerMonsterInteractTheDwarvesHailYouAnyFriend, "The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may "
+                    "pass.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7382,7 +7382,7 @@ void advManager::PlayerMonsterInteract(
                 );
             else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "The ogres give you a grunt of recognition, \"Archibald's allies may pass.\"",
+                    DATA_COMPGEN(0x0051c450, playerMonsterInteractTheOgresGiveYouAGrunt, "The ogres give you a grunt of recognition, \"Archibald's allies may pass.\""),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7395,9 +7395,9 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "The dragons see you and call out.  \"Our alliance with Archibald compels us "
+                    DATA_COMPGEN(0x0051c49c, playerMonsterInteractTheDragonsSeeYouAndCall, "The dragons see you and call out.  \"Our alliance with Archibald compels us "
                     "to join you.  Unfortunately you have no room.  A pity!\"  They quickly "
-                    "scatter.",
+                    "scatter."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7412,7 +7412,7 @@ void advManager::PlayerMonsterInteract(
         } else {
             if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "The dwarves recognize their allies and gladly join your forces.",
+                    DATA_COMPGEN(0x0051c538, playerMonsterInteractTheDwarvesRecognizeTheirAlliesAnd, "The dwarves recognize their allies and gladly join your forces."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7425,7 +7425,7 @@ void advManager::PlayerMonsterInteract(
                 );
             else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "The ogres recognize you as the Dwarfbane and lumber over to join you.",
+                    DATA_COMPGEN(0x0051c578, playerMonsterInteractTheOgresRecognizeYouAsThe, "The ogres recognize you as the Dwarfbane and lumber over to join you."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7438,8 +7438,8 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "The dragons, snarling and growling, agree to join forces with you, their "
-                    "'Ally'.",
+                    DATA_COMPGEN(0x0051c5c0, playerMonsterInteractTheDragonsSnarlingAndGrowlingAgree, "The dragons, snarling and growling, agree to join forces with you, their "
+                    "'Ally'."),
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7459,7 +7459,7 @@ void advManager::PlayerMonsterInteract(
     if (gbInCampaign && gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)]
         && (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
-            "\"The Dwarfbane!!!!, run for your lives.\"",
+            DATA_COMPGEN(0x0051c614, playerMonsterInteractTheDwarfbaneRunForYourLives, "\"The Dwarfbane!!!!, run for your lives.\""),
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -7479,9 +7479,9 @@ void advManager::PlayerMonsterInteract(
         *handled = 1;
         if (eventHero->m_army.CanJoin(monster_n)) {
             NormalDialog(
-                "As you approach the group of elves, their leader calls them all to attention.  He "
+                DATA_COMPGEN(0x0051c640, playerMonsterInteractAsYouApproachTheGroupOf, "As you approach the group of elves, their leader calls them all to attention.  He "
                 "shouts to them, \"Who of you is brave enough to join this fearless ally of "
-                "ours?\"  The group explodes with cheers as they run to join your ranks.",
+                "ours?\"  The group explodes with cheers as they run to join your ranks."),
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -7495,9 +7495,9 @@ void advManager::PlayerMonsterInteract(
             eventHero->m_army.Add(monster_n, monsterCount_n, -1);
         } else {
             NormalDialog(
-                "The elves stand at attention as you approach.  Their leader calls to you and "
+                DATA_COMPGEN(0x0051c724, playerMonsterInteractTheElvesStandAtAttentionAs, "The elves stand at attention as you approach.  Their leader calls to you and "
                 "says, \"Let us not impede your progress, ally!  Move on, and may victory be "
-                "yours.\"",
+                "yours.\""),
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -7512,7 +7512,9 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monster_n) && strengthRatio_p > MONSTER_STRENGTH_JOIN
+    if (eventHero->m_army.CanJoin(monster_n)
+        && strengthRatio_p
+            > DATA_COMPGEN(0x004eb930, monsterStrengthJoinThreshold, MONSTER_STRENGTH_JOIN)
         && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monster_n != CREATURE_GHOST
         && monster_n != CREATURE_EARTH_ELEMENTAL && monster_n != CREATURE_AIR_ELEMENTAL
         && monster_n != CREATURE_FIRE_ELEMENTAL && monster_n != CREATURE_WATER_ELEMENTAL) {
@@ -7524,7 +7526,7 @@ void advManager::PlayerMonsterInteract(
                 *handled = 1;
                 return;
             } else {
-                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x0051c7c4, playerMonsterInteractEmptyString, ""), -1, 0, -1, 0, -1);
                 goto fightMonsters;
             }
         } else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
@@ -7542,7 +7544,10 @@ void advManager::PlayerMonsterInteract(
 
             joiningCost_i = gMonsterDatabase[IDX(monster_n)].cost * monsterCount_n;
             if (joiningCost_i > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
-                if (strengthRatio_p > MONSTER_STRENGTH_FLEE)
+                if (strengthRatio_p
+                    > DATA_COMPGEN(
+                        0x004eb938, monsterStrengthFleeThreshold, MONSTER_STRENGTH_FLEE
+                    ))
                     goto monstersFlee;
                 else
                     goto fightMonsters;
@@ -7551,21 +7556,21 @@ void advManager::PlayerMonsterInteract(
             if (monsterCount_n == 1) {
                 sprintf(
                     gText,
-                    "The %s is swayed by your diplomatic tongue, and offers to join your army for "
-                    "the sum of %d gold.  Do you accept?",
+                    DATA_COMPGEN(0x0051c7c8, playerMonsterInteractTheSIsSwayedByYour, "The %s is swayed by your diplomatic tongue, and offers to join your army for "
+                    "the sum of %d gold.  Do you accept?"),
                     gArmyNames[IDX(monster_n)],
                     joiningCost_i
                 );
             } else {
                 sprintf(
                     gText,
-                    "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n"
+                    DATA_COMPGEN(0x0051c83c, playerMonsterInteractTheCreaturesAreSwayedByYour, "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n")
                 );
                 if (OD_STEER(monsterCount_n) == joining)
                     sprintf(
                         offerText_g,
-                        "All %d of the %s will join your army for the sum of %d gold.  Do you "
-                        "accept?",
+                        DATA_COMPGEN(0x0051c88c, playerMonsterInteractAllDOfTheSWill, "All %d of the %s will join your army for the sum of %d gold.  Do you "
+                        "accept?"),
                         monsterCount_n,
                         gArmyNamesPlural[IDX(monster_n)],
                         joiningCost_i
@@ -7573,8 +7578,8 @@ void advManager::PlayerMonsterInteract(
                 else
                     sprintf(
                         offerText_g,
-                        "%d of the %d %s will join your army, and the rest will leave you alone, "
-                        "for the sum of %d gold.  Do you accept?",
+                        DATA_COMPGEN(0x0051c8dc, playerMonsterInteractDOfTheDSWill, "%d of the %d %s will join your army, and the rest will leave you alone, "
+                        "for the sum of %d gold.  Do you accept?"),
                         joining,
                         monsterCount_n,
                         gArmyNamesPlural[IDX(monster_n)],
@@ -7601,7 +7606,7 @@ void advManager::PlayerMonsterInteract(
                 gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost_i;
                 return;
             } else {
-                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+                EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, DATA_COMPGEN(0x0051c94c, playerMonsterInteractEmptyString2, ""), -1, 0, -1, 0, -1);
                 goto fightMonsters;
             }
         }
@@ -7611,8 +7616,8 @@ void advManager::PlayerMonsterInteract(
     monstersFlee:
         sprintf(
             gText,
-            "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue "
-            "and engage them?",
+            DATA_COMPGEN(0x0051c950, playerMonsterInteractTheSAwedByThePower, "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue "
+            "and engage them?"),
             gArmyNamesPlural[IDX(monster_n)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
@@ -7708,7 +7713,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
                 i32 joiningCost = static_cast<i32>(
                     gMonsterDatabase[IDX(monsterType)].cost * joiningCount
-                    * MONSTER_AI_JOIN_COST_FRACTION
+                    * DATA_COMPGEN(0x004eb940, computerMonsterInteractConstant, MONSTER_AI_JOIN_COST_FRACTION)
                 );
                 if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
                     < joiningCost) {
@@ -7755,7 +7760,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 static_cast<i32>(
                     static_cast<double>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
                     * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
-                    * MONSTER_NECROMANCY_FRACTION
+                    * DATA_COMPGEN(0x004eb948, computerMonsterInteractConstant2, MONSTER_NECROMANCY_FRACTION)
                 ),
                 -1
             );
@@ -7779,7 +7784,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 VA(0x004b5c40, 0x1d0)
 i32 advManager::DoNetCombat(char* packet) {
     // Original-source anchor consumed by H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
+    DATA(0x0051c9b4) static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
     hero* secondHero9;
     i32 setupCombatY15;
     i32 combatX1;
@@ -7849,15 +7854,15 @@ i32 advManager::DoNetCombat(char* packet) {
         );
     }
     if (firstArmy6)
-        H2_FREE(firstArmy6, 5787);
+        H2_FREE_AT(firstArmy6, DATA_COMPGEN(0x0051c9b8, doNetCombatSourceFile, RETAIL_FILE), 5787);
     if (secondArmy10)
-        H2_FREE(secondArmy10, 5790);
+        H2_FREE_AT(secondArmy10, DATA_COMPGEN(0x0051c9e4, doNetCombatSourceFile2, RETAIL_FILE), 5790);
     if (combatTown)
-        H2_FREE(combatTown, 5793);
+        H2_FREE_AT(combatTown, DATA_COMPGEN(0x0051ca10, doNetCombatSourceFile3, RETAIL_FILE), 5793);
     if (secondHero9)
-        H2_FREE(secondHero9, 5796);
+        H2_FREE_AT(secondHero9, DATA_COMPGEN(0x0051ca3c, doNetCombatSourceFile4, RETAIL_FILE), 5796);
     if (firstHero29)
-        H2_FREE(firstHero29, 5799);
+        H2_FREE_AT(firstHero29, DATA_COMPGEN(0x0051ca68, doNetCombatSourceFile5, RETAIL_FILE), 5799);
     gbRetreatWin = false;
     return 1;
 }
@@ -7877,7 +7882,7 @@ CombatResult advManager::DoCombat(
     i32 processLosses
 ) {
     // Original-source anchor consumed by H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x16ba; // NOLINT(readability-magic-numbers)
+    DATA(0x0051ca94) static i16 sourceLineBase = 0x16ba; // NOLINT(readability-magic-numbers)
     armyGroup* receivedSecondArmy2;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
@@ -7970,23 +7975,23 @@ CombatResult advManager::DoCombat(
                                 );
                                 if (receivedFirstArmy) {
                                     memcpy(firstArmy, receivedFirstArmy, sizeof(armyGroup));
-                                    H2_FREE(receivedFirstArmy, 5931);
+                                    H2_FREE_AT(receivedFirstArmy, DATA_COMPGEN(0x0051ca98, doCombatSourceFile, RETAIL_FILE), 5931);
                                 }
                                 if (receivedSecondArmy2) {
                                     memcpy(secondArmy, receivedSecondArmy2, sizeof(armyGroup));
-                                    H2_FREE(receivedSecondArmy2, 5937);
+                                    H2_FREE_AT(receivedSecondArmy2, DATA_COMPGEN(0x0051cac4, doCombatSourceFile2, RETAIL_FILE), 5937);
                                 }
                                 if (receivedTown) {
                                     memcpy(combatTown, receivedTown, sizeof(town));
-                                    H2_FREE(receivedTown, 5943);
+                                    H2_FREE_AT(receivedTown, DATA_COMPGEN(0x0051caf0, doCombatSourceFile3, RETAIL_FILE), 5943);
                                 }
                                 if (receivedSecondHero9) {
                                     memcpy(secondHero, receivedSecondHero9, sizeof(hero));
-                                    H2_FREE(receivedSecondHero9, 5949);
+                                    H2_FREE_AT(receivedSecondHero9, DATA_COMPGEN(0x0051cb1c, doCombatSourceFile4, RETAIL_FILE), 5949);
                                 }
                                 if (receivedFirstHero1) {
                                     memcpy(firstHero, receivedFirstHero1, sizeof(hero));
-                                    H2_FREE(receivedFirstHero1, 5955);
+                                    H2_FREE_AT(receivedFirstHero1, DATA_COMPGEN(0x0051cb48, doCombatSourceFile5, RETAIL_FILE), 5955);
                                 }
                                 gpCombatManager->m_combatResult = combatResult3;
                                 goto combatFinished;
@@ -8002,9 +8007,9 @@ CombatResult advManager::DoCombat(
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
-                "%s's %s is under attack!",
+                DATA_COMPGEN(0x0051cb84, doCombatSSSIsUnderAttack, "%s's %s is under attack!"),
                 cPlayerNames[secondPlayer7],
-                combatTown ? "Town" : "Hero"
+                combatTown ? DATA_COMPGEN(0x0051cb74, doCombatTown, "Town") : DATA_COMPGEN(0x0051cb7c, doCombatHero, "Hero")
             );
             gpGame->WaitForPlayer(gText, secondPlayer7);
         }
@@ -8028,7 +8033,7 @@ CombatResult advManager::DoCombat(
     } else if (giHighMemBuffer > COMBAT_LOW_MEMORY_LIMIT)
         gAdvDisposeLevel = ADV_DISPOSE_PARTIAL;
     gpExec->CallManager(gpCombatManager);
-    gpMouseManager->SetPointer(const_cast<char*>("advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(const_cast<char*>(DATA_COMPGEN(0x0051cba0, doCombatAdvmiceMse, "advmice.mse")), 0, MOUSE_AUTO_CURSOR_TYPE);
     gAdvDisposeLevel = ADV_DISPOSE_NONE;
 
 combatFinished:
@@ -8092,12 +8097,12 @@ void advManager::SendHeroTownData(
     i32 combatSurrender
 ) {
     // Original-source anchor consumed by H2_ALLOC/H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x17cc; // NOLINT(readability-magic-numbers)
+    DATA(0x0051cbac) static i16 sourceLineBase = 0x17cc; // NOLINT(readability-magic-numbers)
     char* reply;
     i32 result;
     combatRemoteData* buffer = NULL;
 
-    buffer = static_cast<combatRemoteData*>(H2_ALLOC(COMBAT_REMOTE_BUFFER_SIZE, 6095));
+    buffer = static_cast<combatRemoteData*>(H2_ALLOC_AT(COMBAT_REMOTE_BUFFER_SIZE, DATA_COMPGEN(0x0051cbb0, sendHeroTownDataSourceFile, RETAIL_FILE), 6095));
     reply = NULL;
     buffer->fragment = 0;
     buffer->x = static_cast<i8>(x);
@@ -8211,7 +8216,7 @@ void advManager::SendHeroTownData(
         if (!result)
             ShutDown(NULL);
     }
-    H2_FREE(buffer, 6184);
+    H2_FREE_AT(buffer, DATA_COMPGEN(0x0051cbdc, sendHeroTownDataSourceFile2, RETAIL_FILE), 6184);
 }
 
 VA(0x004b67cd, 0x462)
@@ -8233,7 +8238,7 @@ void advManager::ReceiveHeroTownData(
     i8* combatSurrender
 ) {
     // Original-source anchor consumed by H2_ALLOC line reconstruction.
-    static i16 sourceLineBase = 0x183d; // NOLINT(readability-magic-numbers)
+    DATA(0x0051cc08) static i16 sourceLineBase = 0x183d; // NOLINT(readability-magic-numbers)
     i32 hasFirstHero7;
     i32 hasTown0;
     i32 hasSecondHero8;
@@ -8273,12 +8278,12 @@ void advManager::ReceiveHeroTownData(
         gpGame->m_players[secondOwner28].m_resources[IDX(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
-    *firstArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup), 6243));
+    *firstArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc10, receiveHeroTownDataSourceFile, RETAIL_FILE), 6243));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
-    *secondArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup), 6246));
+    *secondArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc3c, receiveHeroTownDataSourceFile2, RETAIL_FILE), 6246));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
     if (hasTown0) {
-        *combatTown = static_cast<town*>(H2_ALLOC(sizeof(town), 6251));
+        *combatTown = static_cast<town*>(H2_ALLOC_AT(sizeof(town), DATA_COMPGEN(0x0051cc68, receiveHeroTownDataSourceFile3, RETAIL_FILE), 6251));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
@@ -8302,12 +8307,12 @@ void advManager::ReceiveHeroTownData(
     gotSecondHeroFirst13 = 1;
     gotSecondHeroSecond6 = 1;
     if (hasFirstHero7) {
-        *firstHero = static_cast<hero*>(H2_ALLOC(sizeof(hero), 6276));
+        *firstHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051cc94, receiveHeroTownDataSourceFile4, RETAIL_FILE), 6276));
         gotFirstHeroFirst3 = 0;
         gotFirstHeroSecond9 = 0;
     }
     if (hasSecondHero8) {
-        *secondHero = static_cast<hero*>(H2_ALLOC(sizeof(hero), 6282));
+        *secondHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051ccc0, receiveHeroTownDataSourceFile5, RETAIL_FILE), 6282));
         gotSecondHeroFirst13 = 0;
         gotSecondHeroSecond6 = 0;
     }
@@ -8317,7 +8322,7 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime36 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("Error receiving data.  Keep trying?"),
+                const_cast<char*>(DATA_COMPGEN(0x0051ccec, receiveHeroTownDataErrorReceivingDataKeepTrying, "Error receiving data.  Keep trying?")),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -8331,7 +8336,7 @@ void advManager::ReceiveHeroTownData(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime36 = KBTickCount();
             else
-                ShutDown(const_cast<char*>("Game canceled."));
+                ShutDown(const_cast<char*>(DATA_COMPGEN(0x0051cd10, receiveHeroTownDataGameCanceled, "Game canceled.")));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE

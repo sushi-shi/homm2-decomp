@@ -237,17 +237,22 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             "?gValue@@3HA", "SOURCE/A", 0x1000,
             provenance="source-DATA:src/SOURCE/A.cpp:10",
         )
-        supplemental = [
-            manifest_row("private$S1", "SOURCE/A", 0x1100, scope="local"),
-            manifest_row("private$S1", "SOURCE/B", 0x1200, scope="local"),
-            manifest_row("?gUnique@@3HA", "SOURCE/B", 0x1300),
-            manifest_row("??_C@shared", "SOURCE/A", 0x1400),
-            manifest_row("??_C@shared", "SOURCE/B", 0x1500),
+        compgen = [
+            manifest_row("private$S1", "SOURCE/A", 0x1100, scope="local",
+                         provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:11"),
+            manifest_row("private$S1", "SOURCE/B", 0x1200, scope="local",
+                         provenance="source-DATA_COMPGEN:src/SOURCE/B.cpp:12"),
+            manifest_row("?gUnique@@3HA", "SOURCE/B", 0x1300,
+                         provenance="source-DATA_COMPGEN:src/SOURCE/B.cpp:13"),
+            manifest_row("??_C@shared", "SOURCE/A", 0x1400,
+                         provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:14"),
+            manifest_row("??_C@shared", "SOURCE/B", 0x1500,
+                         provenance="source-DATA_COMPGEN:src/SOURCE/B.cpp:15"),
         ]
-        write_manifest(self.root / "build/gen/delink_data_from_source.tsv", [source])
-        write_manifest(self.root / "config/delink_data_supplemental.tsv", supplemental)
+        write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
+                       [source, *compgen])
         write_manifest(self.root / "build/gen/delink_data_manifest.tsv",
-                       [*supplemental, source])
+                       [*compgen, source])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,
@@ -259,8 +264,7 @@ class CoffRelocationTopologyTests(unittest.TestCase):
 
         self.assertEqual([], provenance["diagnostics"])
         self.assertEqual(1, provenance["source_DATA_count"])
-        self.assertEqual(1, provenance["source_manifest_count"])
-        self.assertEqual(5, provenance["supplemental_count"])
+        self.assertEqual(6, provenance["source_manifest_count"])
         self.assertEqual(6, provenance["merged_count"])
         self.assertEqual(0x1100, topology._anchor_for(
             provenance, "SOURCE/A", "private$S1")["rva"])
@@ -292,9 +296,11 @@ class CoffRelocationTopologyTests(unittest.TestCase):
             "?gValue@@3HA", "SOURCE/A", 0x1000,
             provenance="source-DATA:src/SOURCE/A.cpp:10",
         )
-        supplemental = manifest_row("private$S1", "SOURCE/A", 0x1100, scope="local")
-        write_manifest(self.root / "build/gen/delink_data_from_source.tsv", [source])
-        write_manifest(self.root / "config/delink_data_supplemental.tsv", [supplemental])
+        compgen = manifest_row(
+            "private$S1", "SOURCE/A", 0x1100, scope="local",
+            provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:11")
+        write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
+                       [source, compgen])
         write_manifest(self.root / "build/gen/delink_data_manifest.tsv", [source])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
@@ -307,18 +313,20 @@ class CoffRelocationTopologyTests(unittest.TestCase):
 
         diagnostic = next(row for row in provenance["diagnostics"]
                           if row["kind"] == "merged-manifest-not-exact-union")
-        self.assertEqual(supplemental["name"], diagnostic["missing"][0][0])
+        self.assertEqual(compgen["name"], diagnostic["missing"][0][0])
 
     def test_generated_manifest_rejects_union_with_overlapping_allocations(self):
         source = manifest_row(
             "?gValue@@3HA", "SOURCE/A", 0x1000,
             provenance="source-DATA:src/SOURCE/A.cpp:10",
         )
-        supplemental = manifest_row("private$S1", "SOURCE/A", 0x1002, scope="local")
-        write_manifest(self.root / "build/gen/delink_data_from_source.tsv", [source])
-        write_manifest(self.root / "config/delink_data_supplemental.tsv", [supplemental])
+        compgen = manifest_row(
+            "private$S1", "SOURCE/A", 0x1002, scope="local",
+            provenance="source-DATA_COMPGEN:src/SOURCE/A.cpp:11")
+        write_manifest(self.root / "build/gen/delink_data_from_source.tsv",
+                       [source, compgen])
         write_manifest(self.root / "build/gen/delink_data_manifest.tsv",
-                       [source, supplemental])
+                       [source, compgen])
         definitions = [AnnotatedDataDefinition(
             "SOURCE/A", "gValue", "gValue", 0x1000, 4,
             "src/SOURCE/A.cpp:10", False,

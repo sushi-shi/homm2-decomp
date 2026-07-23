@@ -7,22 +7,22 @@
 #include <SOURCE/hero.h>
 #define COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER 0.5
 #define COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER 1.5
-static const float COMBAT_SPELL_AI_BLIND_MODIFIER = -0.4f;
-static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = -0.55f;
-static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = -0.5f;
-static const float COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER = -0.65f;
-static const float COMBAT_SPELL_AI_PETRIFIED_MODIFIER = -0.25f;
-static const float COMBAT_SPELL_AI_BLOODLUST_MODIFIER = 0.14f;
-static const float COMBAT_SPELL_AI_STONE_SKIN_MODIFIER = 0.16f;
-static const float COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER = 0.28f;
-static const float COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER = 0.2f;
-static const float COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER = 0.28f;
-static const float COMBAT_SPELL_AI_SHIELD_MODIFIER = 0.45f;
+DATA(0x004eb798) static const float COMBAT_SPELL_AI_BLIND_MODIFIER = -0.4f;
+DATA(0x004eb79c) static const float COMBAT_SPELL_AI_BERSERK_MODIFIER = -0.55f;
+DATA(0x004eb7a0) static const float COMBAT_SPELL_AI_PARALYZE_MODIFIER = -0.5f;
+DATA(0x004eb7a4) static const float COMBAT_SPELL_AI_HYPNOTIZE_MODIFIER = -0.65f;
+DATA(0x004eb7a8) static const float COMBAT_SPELL_AI_PETRIFIED_MODIFIER = -0.25f;
+DATA(0x004eb7ac) static const float COMBAT_SPELL_AI_BLOODLUST_MODIFIER = 0.14f;
+DATA(0x004eb7b0) static const float COMBAT_SPELL_AI_STONE_SKIN_MODIFIER = DATA_COMPGEN(0x004eb7d8, sKINMODIFIERConstant, 0.16f);
+DATA(0x004eb7b4) static const float COMBAT_SPELL_AI_DRAGON_SLAYER_MODIFIER = 0.28f;
+DATA(0x004eb7b8) static const float COMBAT_SPELL_AI_ANTI_MAGIC_MODIFIER = DATA_COMPGEN(0x004eb7dc, mAGICMODIFIERConstant, 0.2f);
+DATA(0x004eb7bc) static const float COMBAT_SPELL_AI_STEEL_SKIN_MODIFIER = 0.28f;
+DATA(0x004eb7c0) static const float COMBAT_SPELL_AI_SHIELD_MODIFIER = 0.45f;
 #define COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER 1.0f
 #define COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER
 #define COMBAT_SPELL_AI_MIRROR_POWER_ONE_MODIFIER 0.16f
 #define COMBAT_SPELL_AI_MIRROR_POWER_TWO_MODIFIER 0.2f
-#define COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER 0.22f
+#define COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER DATA_COMPGEN(0x004eb7e0, dEFAULTMODIFIERConstant, 0.22f)
 #define COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER 1.4
 #define COMBAT_SPELL_AI_TURN_CAP 7.0f
 #define COMBAT_SPELL_AI_TURN_DIVISOR 10.0f
@@ -313,7 +313,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                 } else {
                     EffectSpellDamage(&effect, spell, hexIndex);
                     if (hasDamageReductionResult)
-                        effect = static_cast<i32>(effect * COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER);
+                        effect = static_cast<i32>(effect * DATA_COMPGEN(0x004eb7c8, determineEffectOfSpellConstant, COMBAT_SPELL_AI_REDUCED_EFFECT_MODIFIER));
                 }
                 break;
             case SPELL_HASTE:
@@ -579,7 +579,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
                                 && targetCreature->m_side == COMBAT_ATTACKER_SIDE
                                 && HAS(targetCreature->m_monster.flags.all, MONSTER_FLAGS_SHOOTER))
                                 effect = static_cast<i32>(
-                                    effect * COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER
+                                    effect * DATA_COMPGEN(0x004eb7d0, determineEffectOfSpellConstant2, COMBAT_SPELL_AI_SIEGE_SHOOTER_MODIFIER)
                                 );
                             if (hasDamageReductionResult)
                                 effect = static_cast<i32>(
@@ -840,7 +840,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
                 MONSTER_ABILITY_FLAG_SHOOTER
             ))
             creatureEffect =
-                static_cast<i32>(creatureEffect * COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER);
+                static_cast<i32>(creatureEffect * DATA_COMPGEN(0x004eb7e8, effectSpellCreateCreatureConstant, COMBAT_SPELL_AI_MIRROR_SHOOTER_MODIFIER));
     }
     return static_cast<i32>(creatureEffect * workChance);
 }
@@ -851,7 +851,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     army* otherArmy = NULL;
     float workChance =
         target->SpellCastWorkChance(SpellType(giSpellInfluenceToSpell[IDX(influence)]));
-    if (workChance <= COMBAT_SPELL_AI_ZERO_EFFECT)
+    if (workChance <= DATA_COMPGEN(0x004eb7f0, rawEffectSpellInfluenceConstant, COMBAT_SPELL_AI_ZERO_EFFECT))
         return 0;
 
     i32 armyValue = target->m_monster.fightValue * target->m_quantity;
@@ -895,12 +895,12 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             else
                 oldTurns = static_cast<float>(distance) / target->m_monster.speed;
             float newTurns = static_cast<float>(distance) / newSpeed;
-            if (newTurns > COMBAT_SPELL_AI_TURN_CAP)
+            if (newTurns > DATA_COMPGEN(0x004eb7f8, rawEffectSpellInfluenceConstant2, COMBAT_SPELL_AI_TURN_CAP))
                 newTurns = COMBAT_SPELL_AI_TURN_CAP;
             if (oldTurns > COMBAT_SPELL_AI_TURN_CAP)
                 oldTurns = COMBAT_SPELL_AI_TURN_CAP;
             effect =
-                static_cast<i32>((oldTurns - newTurns) / COMBAT_SPELL_AI_TURN_DIVISOR * armyValue);
+                static_cast<i32>((oldTurns - newTurns) / DATA_COMPGEN(0x004eb7fc, rawEffectSpellInfluenceConstant3, COMBAT_SPELL_AI_TURN_DIVISOR) * armyValue);
             break;
         }
         case ARMY_SPELL_INFLUENCE_BLESS:
@@ -910,7 +910,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
                                   * COMBAT_SPELL_AI_AVERAGE_DAMAGE_MODIFIER;
             float damageEffect = static_cast<float>(
                 (target->m_monster.damageMax - averageDamage) / averageDamage * armyValue
-                * COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER
+                * DATA_COMPGEN(0x004eb800, rawEffectSpellInfluenceConstant4, COMBAT_SPELL_AI_BLESS_CURSE_MODIFIER)
             );
             effect = static_cast<i32>(
                 influence == ARMY_SPELL_INFLUENCE_BLESS ? damageEffect : -damageEffect
@@ -977,8 +977,8 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
             }
             float shooterMod = static_cast<float>(shooterCount / m_armyCount[IDX(OppositeCombatSide(target->m_side))]);
             if (target->m_side == COMBAT_ATTACKER_SIDE && m_inCastleCombat) {
-                shooterMod = static_cast<float>(shooterMod + COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS);
-                if (shooterMod > COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER)
+                shooterMod = static_cast<float>(shooterMod + DATA_COMPGEN(0x004eb808, rawEffectSpellInfluenceConstant5, COMBAT_SPELL_AI_SIEGE_SHIELD_BONUS));
+                if (shooterMod > DATA_COMPGEN(0x004eb7c4, rawEffectSpellInfluenceConstant6, COMBAT_SPELL_AI_FULL_EFFECT_MODIFIER))
                     shooterMod = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
             }
             effect = static_cast<i32>(COMBAT_SPELL_AI_SHIELD_MODIFIER * shooterMod);
@@ -1083,7 +1083,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                         + static_cast<float>(
                               gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue
                           ) * curePointsTotal
-                              * COMBAT_SPELL_AI_CURE_VALUE_MODIFIER
+                              * DATA_COMPGEN(0x004eb810, effectSpellCureConstant, COMBAT_SPELL_AI_CURE_VALUE_MODIFIER)
                               / combatTarget->m_monster.hitPoints
                     );
                 }
@@ -1185,7 +1185,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
     *effect = gMonsterDatabase[IDX(targetStack->m_monsterType)].fightValue * quantityResult[0];
     *effect = static_cast<i32>(*effect * targetStack->SpellCastWorkChance(spell));
     if (spell == SPELL_RESURRECT)
-        *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
+        *effect = static_cast<i32>(*effect * DATA_COMPGEN(0x004eb818, effectSpellResurrectConstant, COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER));
 }
 
 VA(0x00488d58, 0xcc9)
@@ -1412,7 +1412,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                 gArmyEffected[IDX(m_hexCells[currentHex].m_occupantSide)]
                              [m_hexCells[currentHex].m_occupantIndex] = 1;
                 workChanceWork = targetCreature->SpellCastWorkChance(spell);
-                if (workChanceWork > 0.0f) {
+                if (workChanceWork > DATA_COMPGEN(0x004eb820, effectSpellDamageConstant, 0.0f)) {
                     spellDamageWork = static_cast<i32l>(damage * workChanceWork);
                     monsterTotal = targetCreature->m_monsterType;
                     switch (spell) {
@@ -1518,7 +1518,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                             + gMonsterDatabase[IDX(targetCreature->m_monsterType)].fightValue
                                   * (targetCreature->m_monster.defense - newDefense)
                                   * (targetCreature->m_quantity - creaturesKilledResult)
-                                  * COMBAT_SPELL_AI_DISRUPTING_RAY_MODIFIER
+                                  * DATA_COMPGEN(0x004eb828, effectSpellDamageConstant2, COMBAT_SPELL_AI_DISRUPTING_RAY_MODIFIER)
                         );
                     }
                 }
@@ -1537,7 +1537,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
                   + disruptingRayValueTotal;
     }
     if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat)
-        *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER);
+        *effect = static_cast<i32>(*effect * DATA_COMPGEN(0x004eb830, effectSpellDamageConstant3, COMBAT_SPELL_AI_CASTLE_EFFECT_MODIFIER));
 }
 
 DATA(0x004f80b8) float gfDurationMods[COMBAT_DURATION_MOD_COUNT] =

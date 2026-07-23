@@ -47,7 +47,7 @@ void DDRestoreDisplayMode(void) {
     if (lpDD != NULL) {
         result = lpDD->RestoreDisplayMode();
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDRestoreLineBase + 7);
+            DDSD(result, DATA_COMPGEN(0x004f16c8, dDRestoreDisplayModeSourceFile, RETAIL_FILE), gDDRestoreLineBase + 7);
     }
 }
 
@@ -70,7 +70,7 @@ void CreatePrimary(void) {
     if (lpClipper != NULL) {
         result = lpDDSPrimary->SetClipper(NULL);
         if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
-            DDSD(result, RETAIL_FILE, gCreatePrimaryLineBase + 10);
+            DDSD(result, DATA_COMPGEN(0x004f16f8, createPrimaryIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gCreatePrimaryLineBase + 10);
         lpClipper->Release();
         lpClipper = NULL;
     }
@@ -83,13 +83,13 @@ void SetupClipper(void) {
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
         result = lpDD->CreateClipper(0, &lpClipper, NULL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 8);
+            DDSD(result, DATA_COMPGEN(0x004f1728, setupClipperIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gSetupClipperLineBase + 8);
         result = lpClipper->SetHWnd(0, hwndApp);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 13);
+            DDSD(result, DATA_COMPGEN(0x004f1754, setupClipperIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE), gSetupClipperLineBase + 13);
         result = lpDDSPrimary->SetClipper(lpClipper);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 18);
+            DDSD(result, DATA_COMPGEN(0x004f1780, setupClipperIProjectsHeroesProgSOURCEWingraph3, RETAIL_FILE), gSetupClipperLineBase + 18);
     }
 }
 
@@ -101,7 +101,7 @@ void DDInitGraphics(void) {
         return;
     result = lpDirectDrawCreate(NULL, &lpDD, NULL);
     if (result != DD_OK)
-        DDSD(result, RETAIL_FILE, gDDInitLineBase + 8);
+        DDSD(result, DATA_COMPGEN(0x004f17b4, dDInitGraphicsIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gDDInitLineBase + 8);
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         SetMenuStatus(0);
         result = lpDD->SetCooperativeLevel(
@@ -109,14 +109,14 @@ void DDInitGraphics(void) {
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
         );
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 20);
+            DDSD(result, DATA_COMPGEN(0x004f17e0, dDInitGraphicsIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE), gDDInitLineBase + 20);
         result = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 24);
+            DDSD(result, DATA_COMPGEN(0x004f180c, dDInitGraphicsIProjectsHeroesProgSOURCEWingraph3, RETAIL_FILE), gDDInitLineBase + 24);
     } else {
         result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 31);
+            DDSD(result, DATA_COMPGEN(0x004f1838, dDInitGraphicsIProjectsHeroesProgSOURCEWingraph4, RETAIL_FILE), gDDInitLineBase + 31);
     }
     CreatePrimary();
     SetupClipper();
@@ -176,7 +176,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         OffsetRect(&gDDDestinationRect, point0.x, point0.y);
         gDDResult = lpDDSOne->Unlock(NULL);
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 71);
+            DDSD(gDDResult, DATA_COMPGEN(0x004f1868, dDAppPaintIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gDDPaintLineBase + 71);
 
         if (gDDSourceRect.left < 0)
             gDDSourceRect.left = 0;
@@ -194,23 +194,23 @@ i32 DDAppPaint(void* window, void* paintDC) {
             if (gDDResult == DDERR_SURFACELOST) {
                 gDDResult = lpDDSPrimary->Restore();
                 if (gDDResult == DDERR_WRONGMODE) {
-                    LogStr("ResetDisplayMode");
+                    LogStr(DATA_COMPGEN(0x004f1894, dDAppPaintResetDisplayMode, "ResetDisplayMode"));
                     gDDResult =
                         lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
                     if (gDDResult != DD_OK)
-                        DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 91);
+                        DDSD(gDDResult, DATA_COMPGEN(0x004f18a8, dDAppPaintIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE), gDDPaintLineBase + 91);
                     gDDResult = lpDDSPrimary->Restore();
                     if (gDDResult != DD_OK)
-                        DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 95);
+                        DDSD(gDDResult, DATA_COMPGEN(0x004f18d4, dDAppPaintIProjectsHeroesProgSOURCEWingraph3, RETAIL_FILE), gDDPaintLineBase + 95);
                     gDDDestinationRect = gDDSourceRect;
                 }
                 if (gDDResult != DD_OK)
-                    DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 103);
+                    DDSD(gDDResult, DATA_COMPGEN(0x004f1900, dDAppPaintIProjectsHeroesProgSOURCEWingraph4, RETAIL_FILE), gDDPaintLineBase + 103);
             } else if (gDDResult == DDERR_SURFACEBUSY
                        && KBTickCount() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
                 iBusyRetry++;
             } else if (gDDResult != DD_OK) {
-                DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 108);
+                DDSD(gDDResult, DATA_COMPGEN(0x004f192c, dDAppPaintIProjectsHeroesProgSOURCEWingraph5, RETAIL_FILE), gDDPaintLineBase + 108);
             } else {
                 break;
             }
@@ -220,7 +220,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         gDDSurfaceDesc.dwSize = sizeof(gDDSurfaceDesc);
         gDDResult = lpDDSOne->Lock(NULL, &gDDSurfaceDesc, DDLOCK_WAIT, NULL);
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 118);
+            DDSD(gDDResult, DATA_COMPGEN(0x004f1958, dDAppPaintIProjectsHeroesProgSOURCEWingraph6, RETAIL_FILE), gDDPaintLineBase + 118);
         if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(gDDSurfaceDesc.lpSurface);
             lpInitWin = gDDSurfaceDesc.lpSurface;
@@ -228,7 +228,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
             lpInitWin = gDDSurfaceDesc.lpSurface;
         }
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 129);
+            DDSD(gDDResult, DATA_COMPGEN(0x004f1984, dDAppPaintIProjectsHeroesProgSOURCEWingraph7, RETAIL_FILE), gDDPaintLineBase + 129);
         EndPaint(reinterpret_cast<HWND>(window), &paint3);
         gbWinGraphBusy = false;
     }
@@ -270,7 +270,7 @@ void DDInitializePalette(void) {
         if (result0 != DD_OK)
             DDSD(
                 result0,
-                RETAIL_FILE,
+                DATA_COMPGEN(0x004f19b4, dDInitializePaletteIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE),
                 gDDInitializePaletteLineBase + 63
             );
         SetPalette();
@@ -289,7 +289,7 @@ i32 DDSetPalette(void) {
         return 1;
     result = lpDDSPrimary->SetPalette(lpDDPal);
     if (result != DD_OK)
-        DDSD(result, RETAIL_FILE, gDDSetPaletteLineBase + 15);
+        DDSD(result, DATA_COMPGEN(0x004f19e4, dDSetPaletteIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gDDSetPaletteLineBase + 15);
     return 0;
 }
 
@@ -315,11 +315,11 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     }
     rv = lpDD->CreateSurface(&description, &surface, NULL);
     if (rv != DD_OK)
-        DDSD(rv, RETAIL_FILE, gDDCreateSurfaceLineBase + 28);
+        DDSD(rv, DATA_COMPGEN(0x004f1a18, dDCreateSurfaceIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gDDCreateSurfaceLineBase + 28);
     if (primary == 0) {
         rv = surface->Lock(NULL, &description, DDLOCK_WAIT, NULL);
         if (rv != DD_OK)
-            DDSD(rv, RETAIL_FILE, gDDCreateSurfaceLineBase + 36);
+            DDSD(rv, DATA_COMPGEN(0x004f1a44, dDCreateSurfaceIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE), gDDCreateSurfaceLineBase + 36);
         if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(description.lpSurface);
             lpInitWin = description.lpSurface;
@@ -345,91 +345,91 @@ void DDSD(i32 error, char* file, i32 line) {
         case DD_OK:
             return;
         case DDERR_GENERIC:
-            strcpy(errorMessage0, "DDERR_GENERIC            ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1a70, dDSDDDERRGENERIC, "DDERR_GENERIC            "));
             break;
         case DDERR_INVALIDCLIPLIST:
-            strcpy(errorMessage0, "DDERR_INVALIDCLIPLIST\t   ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1a8c, dDSDDDERRINVALIDCLIPLIST, "DDERR_INVALIDCLIPLIST\t   "));
             break;
         case DDERR_INVALIDOBJECT:
-            strcpy(errorMessage0, "DDERR_INVALIDOBJECT      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1aa8, dDSDDDERRINVALIDOBJECT, "DDERR_INVALIDOBJECT      "));
             break;
         case DDERR_INVALIDPARAMS:
-            strcpy(errorMessage0, "DDERR_INVALIDPARAMS\t   ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1ac4, dDSDDDERRINVALIDPARAMS, "DDERR_INVALIDPARAMS\t   "));
             break;
         case DDERR_INVALIDRECT:
-            strcpy(errorMessage0, "DDERR_INVALIDRECT\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1adc, dDSDDDERRINVALIDRECT, "DDERR_INVALIDRECT\t      "));
             break;
         case DDERR_NOALPHAHW:
-            strcpy(errorMessage0, "DDERR_NOALPHAHW          ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1af8, dDSDDDERRNOALPHAHW, "DDERR_NOALPHAHW          "));
             break;
         case DDERR_NOBLTHW:
-            strcpy(errorMessage0, "DDERR_NOBLTHW\t         ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b14, dDSDDDERRNOBLTHW, "DDERR_NOBLTHW\t         "));
             break;
         case DDERR_NOCLIPLIST:
-            strcpy(errorMessage0, "DDERR_NOCLIPLIST         ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b2c, dDSDDDERRNOCLIPLIST, "DDERR_NOCLIPLIST         "));
             break;
         case DDERR_NODDROPSHW:
-            strcpy(errorMessage0, "DDERR_NODDROPSHW\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b48, dDSDDDERRNODDROPSHW, "DDERR_NODDROPSHW\t      "));
             break;
         case DDERR_SURFACELOST:
-            strcpy(errorMessage0, "DDERR_SURFACELOST        ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b60, dDSDDDERRSURFACELOST, "DDERR_SURFACELOST        "));
             break;
         case DDERR_UNSUPPORTED:
-            strcpy(errorMessage0, "DDERR_UNSUPPORTED\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b7c, dDSDDDERRUNSUPPORTED, "DDERR_UNSUPPORTED\t      "));
             break;
         case DDERR_NOMIRRORHW:
-            strcpy(errorMessage0, "DDERR_NOMIRRORHW         ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1b98, dDSDDDERRNOMIRRORHW, "DDERR_NOMIRRORHW         "));
             break;
         case DDERR_NORASTEROPHW:
-            strcpy(errorMessage0, "DDERR_NORASTEROPHW\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1bb4, dDSDDDERRNORASTEROPHW, "DDERR_NORASTEROPHW\t      "));
             break;
         case DDERR_NOROTATIONHW:
-            strcpy(errorMessage0, "DDERR_NOROTATIONHW       ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1bd0, dDSDDDERRNOROTATIONHW, "DDERR_NOROTATIONHW       "));
             break;
         case DDERR_NOSTRETCHHW:
-            strcpy(errorMessage0, "DDERR_NOSTRETCHHW\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1bec, dDSDDDERRNOSTRETCHHW, "DDERR_NOSTRETCHHW\t      "));
             break;
         case DDERR_SURFACEBUSY:
-            strcpy(errorMessage0, "DDERR_SURFACEBUSY        ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c08, dDSDDDERRSURFACEBUSY, "DDERR_SURFACEBUSY        "));
             break;
         case DDERR_NOZBUFFERHW:
-            strcpy(errorMessage0, "DDERR_NOZBUFFERHW        ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c24, dDSDDDERRNOZBUFFERHW, "DDERR_NOZBUFFERHW        "));
             break;
         case DDERR_OUTOFMEMORY:
-            strcpy(errorMessage0, "DDERR_OUTOFMEMORY\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c40, dDSDDDERROUTOFMEMORY, "DDERR_OUTOFMEMORY\t      "));
             break;
         case DDERR_CLIPPERISUSINGHWND:
-            strcpy(errorMessage0, "DDERR_CLIPPERISUSINGHWND ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c5c, dDSDDDERRCLIPPERISUSINGHWND, "DDERR_CLIPPERISUSINGHWND "));
             break;
         case DDERR_NOEXCLUSIVEMODE:
-            strcpy(errorMessage0, "DDERR_NOEXCLUSIVEMODE\t   ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c78, dDSDDDERRNOEXCLUSIVEMODE, "DDERR_NOEXCLUSIVEMODE\t   "));
             break;
         case DDERR_NOT8BITCOLOR:
-            strcpy(errorMessage0, "DDERR_NOT8BITCOLOR       ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1c94, dDSDDDERRNOT8BITCOLOR, "DDERR_NOT8BITCOLOR       "));
             break;
         case DDERR_NOPALETTEATTACHED:
-            strcpy(errorMessage0, "DDERR_NOPALETTEATTACHED  ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1cb0, dDSDDDERRNOPALETTEATTACHED, "DDERR_NOPALETTEATTACHED  "));
             break;
         case DDERR_NOPALETTEHW:
-            strcpy(errorMessage0, "DDERR_NOPALETTEHW\t      ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1ccc, dDSDDDERRNOPALETTEHW, "DDERR_NOPALETTEHW\t      "));
             break;
         case DDERR_LOCKEDSURFACES:
-            strcpy(errorMessage0, "DDERR_LOCKEDSURFACES     ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1ce8, dDSDDDERRLOCKEDSURFACES, "DDERR_LOCKEDSURFACES     "));
             break;
         case DDERR_IMPLICITLYCREATED:
-            strcpy(errorMessage0, "DDERR_IMPLICITLYCREATED  ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1d04, dDSDDDERRIMPLICITLYCREATED, "DDERR_IMPLICITLYCREATED  "));
             break;
         case DDERR_WRONGMODE:
-            strcpy(errorMessage0, "DDERR_WRONGMODE          ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1d20, dDSDDDERRWRONGMODE, "DDERR_WRONGMODE          "));
             break;
         case DDERR_INCOMPATIBLEPRIMARY:
-            strcpy(errorMessage0, "DDERR_INCOMPATIBLEPRIMARY");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1d3c, dDSDDDERRINCOMPATIBLEPRIMARY, "DDERR_INCOMPATIBLEPRIMARY"));
             break;
         case DDERR_NOCLIPPERATTACHED:
-            strcpy(errorMessage0, "DDERR_NOCLIPPERATTACHED  ");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1d58, dDSDDDERRNOCLIPPERATTACHED, "DDERR_NOCLIPPERATTACHED  "));
             break;
         default:
-            strcpy(errorMessage0, "Error type unknown");
+            strcpy(errorMessage0, DATA_COMPGEN(0x004f1d74, dDSDErrorTypeUnknown, "Error type unknown"));
             break;
     }
     MessageBeep(0);
@@ -437,7 +437,7 @@ void DDSD(i32 error, char* file, i32 line) {
     MessageBeep(0);
     sprintf(
         gText,
-        "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d",
+        DATA_COMPGEN(0x004f1d88, dDSDDirectDrawErrorSFileSLine, "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d"),
         errorMessage0,
         file,
         line
@@ -471,7 +471,7 @@ void DDUpdatePalette(i8* paletteData) {
     }
     ProcessAssert(
         reinterpret_cast<i32>(lpDDPal),
-        RETAIL_FILE,
+        DATA_COMPGEN(0x004f1dc0, dDUpdatePaletteIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE),
         gDDUpdatePaletteLineBase + 18
     );
     result0 = lpDDPal->SetEntries(
@@ -484,7 +484,7 @@ void DDUpdatePalette(i8* paletteData) {
     if (result0 != DD_OK)
         DDSD(
             result0,
-            RETAIL_FILE,
+            DATA_COMPGEN(0x004f1dec, dDUpdatePaletteIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE),
             gDDUpdatePaletteLineBase + 22
         );
 }
@@ -500,7 +500,7 @@ void DDCleanUpWinGraphics(void) {
             if (lpDDSPrimary != NULL) {
                 result = lpDDSPrimary->SetClipper(NULL);
                 if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
-                    DDSD(result, RETAIL_FILE, gDDCleanUpLineBase + 14);
+                    DDSD(result, DATA_COMPGEN(0x004f1e1c, dDCleanUpWinGraphicsIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE), gDDCleanUpLineBase + 14);
             }
             lpClipper->Release();
             lpClipper = NULL;
@@ -519,7 +519,7 @@ void DDCleanUpWinGraphics(void) {
         }
         result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDCleanUpLineBase + 38);
+            DDSD(result, DATA_COMPGEN(0x004f1e48, dDCleanUpWinGraphicsIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE), gDDCleanUpLineBase + 38);
         lpDD->Release();
         lpDD = NULL;
     }
@@ -554,7 +554,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         if (result0 != DD_OK)
             DDSD(
                 result0,
-                RETAIL_FILE,
+                DATA_COMPGEN(0x004f1e84, dDSetFullScreenStatusIProjectsHeroesProgSOURCEWingraph, RETAIL_FILE),
                 gDDSetFullScreenLineBase + 21
             );
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
@@ -562,7 +562,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             if (result0 != DD_OK)
                 DDSD(
                     result0,
-                    RETAIL_FILE,
+                    DATA_COMPGEN(0x004f1eb0, dDSetFullScreenStatusIProjectsHeroesProgSOURCEWingraph2, RETAIL_FILE),
                     gDDSetFullScreenLineBase + 27
                 );
         } else {
@@ -570,14 +570,14 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             if (result0 != DD_OK)
                 DDSD(
                     result0,
-                    RETAIL_FILE,
+                    DATA_COMPGEN(0x004f1edc, dDSetFullScreenStatusIProjectsHeroesProgSOURCEWingraph3, RETAIL_FILE),
                     gDDSetFullScreenLineBase + 34
                 );
             result0 = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
             if (result0 != DD_OK)
                 DDSD(
                     result0,
-                    RETAIL_FILE,
+                    DATA_COMPGEN(0x004f1f08, dDSetFullScreenStatusIProjectsHeroesProgSOURCEWingraph4, RETAIL_FILE),
                     gDDSetFullScreenLineBase + 39
                 );
         }
@@ -590,7 +590,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         if (result0 != DD_OK)
             DDSD(
                 result0,
-                RETAIL_FILE,
+                DATA_COMPGEN(0x004f1f34, dDSetFullScreenStatusIProjectsHeroesProgSOURCEWingraph5, RETAIL_FILE),
                 gDDSetFullScreenLineBase + 51
             );
         WritePrefs();
@@ -865,10 +865,10 @@ void WGCleanUpWinGraphics(void) {
 
 VA(0x00437187, 0x80)
 void ConnectToDLLs(void) {
-    hDDrawLibrary = LoadLibraryA("DDRAW.DLL");
+    hDDrawLibrary = LoadLibraryA(DATA_COMPGEN(0x004f1f68, connectToDLLsDDRAWDLL, "DDRAW.DLL"));
     if (reinterpret_cast<u32l>(hDDrawLibrary) >= WINGRAPH_LOAD_LIBRARY_SUCCESS) {
         lpDirectDrawCreate = reinterpret_cast<DirectDrawCreateProc>(
-            GetProcAddress(hDDrawLibrary, "DirectDrawCreate")
+            GetProcAddress(hDDrawLibrary, DATA_COMPGEN(0x004f1f74, connectToDLLsDirectDrawCreate, "DirectDrawCreate"))
         );
     }
     if (lpDirectDrawCreate != NULL) {
@@ -915,31 +915,31 @@ void GetGraphicsInfo(void) {
         ReleaseDC(NULL, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
             ShutDown(
-                "Heroes II requires 256 color mode or higher.\n\n"
+                DATA_COMPGEN(0x004f1f88, getGraphicsInfoHeroesIIRequires256ColorMode, "Heroes II requires 256 color mode or higher.\n\n"
                 "To change color mode, right click in an open area on the Windows 95 "
                 "background, choose 'Properties', then the 'Settings' tab, then change "
-                "the entry in the 'Color Palette Box'."
+                "the entry in the 'Color Palette Box'.")
             );
     }
 }
 
 VA(0x00437308, 0xa0)
 void InitGraphics(void) {
-    LogStr("IG1");
+    LogStr(DATA_COMPGEN(0x004f2068, initGraphicsIG1, "IG1"));
     ConnectToDLLs();
-    LogStr("IG2");
+    LogStr(DATA_COMPGEN(0x004f206c, initGraphicsIG2, "IG2"));
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
         giGraphicsType = WINGRAPH_GRAPHICS_DIRECT_DRAW;
     else
         giGraphicsType = WINGRAPH_GRAPHICS_WING;
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
-        LogStr("IG3");
+        LogStr(DATA_COMPGEN(0x004f2070, initGraphicsIG3, "IG3"));
         WGInitGraphics();
-        LogStr("IG4");
+        LogStr(DATA_COMPGEN(0x004f2074, initGraphicsIG4, "IG4"));
     } else {
-        LogStr("IG5");
+        LogStr(DATA_COMPGEN(0x004f2078, initGraphicsIG5, "IG5"));
         DDInitGraphics();
-        LogStr("IG6");
+        LogStr(DATA_COMPGEN(0x004f207c, initGraphicsIG6, "IG6"));
     }
 }
 
@@ -1027,10 +1027,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     y = gConfig.gfx[IDX(giCurExe)].y;
     width = gConfig.gfx[IDX(giCurExe)].width;
     height7 = gConfig.gfx[IDX(giCurExe)].height;
-    screenBuffer = H2_ALLOC(
-        WINGRAPH_WIDTH * WINGRAPH_HEIGHT,
-        gSetGraphicsTypeLineBase + 18
-    );
+    screenBuffer = H2_ALLOC_AT(WINGRAPH_WIDTH * WINGRAPH_HEIGHT, DATA_COMPGEN(0x004f2088, setGraphicsTypeAllocationSourceFile, RETAIL_FILE), gSetGraphicsTypeLineBase + 18);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
         gConfig.gfx[IDX(giCurExe)].fullScreen = 0;
@@ -1045,7 +1042,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
         gpWindowManager->m_screen->m_pixels = static_cast<u8*>(lpInitWin);
     }
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
-    H2_FREE(screenBuffer, gSetGraphicsTypeLineBase + 39);
+    H2_FREE_AT(screenBuffer, DATA_COMPGEN(0x004f20b4, setGraphicsTypeFreeSourceFile, RETAIL_FILE), gSetGraphicsTypeLineBase + 39);
     if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
         SetMenuStatus(1);
         ResizeWindow(x, y, width, height7);

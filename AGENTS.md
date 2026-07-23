@@ -97,10 +97,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Candidate objects supply reconstructed COFF symbol spelling and topology; retail PE,
   NB09 contributions, bytes, and relocations supply placement evidence. Vostok emits the
   reviewed model; it does not discover private identities automatically.
-- The canonical data manifest is the conflict-free union of generated source `DATA(...)`,
-  `VTBL(...)`, and `VTBL2(...)` definitions and reviewed
-  `config/delink_data_supplemental.tsv` rows. Skip unverified private placement instead
-  of guessing or falling back to synthetic names.
+- The canonical data manifest is generated entirely from source `DATA(...)`,
+  `DATA_COMPGEN(...)`, `VTBL(...)`, and `VTBL2(...)` annotations. Candidate COFF
+  supplies physical topology; source supplies semantic identity. Missing or ambiguous
+  private placement warns normally and fails strict assembly instead of falling back to
+  a synthetic name or a second hand-maintained ledger.
 - Preserve storage class and section alignment. Padding is not a symbol. Do not insert
   giant arrays to reproduce final-image gaps, and do not classify `.data`/`.bss` solely
   from the PE raw-size boundary.
@@ -111,7 +112,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 
 Detailed contracts live in `docs/delinker-contribution-manifest.md`,
 `docs/data-symbol-normalization.md`, `docs/coff-data-relocations.md`, and
-`docs/static-storage-link-audit.md`.
+`docs/static-storage-link-audit.md`. The compiler-generated data contract lives in
+`docs/candidate-data-topology.md`.
 
 ## Orchestration
 
