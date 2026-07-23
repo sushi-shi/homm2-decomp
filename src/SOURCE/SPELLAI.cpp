@@ -64,8 +64,7 @@ VA(0x004867c0, 0x279)
 i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted) {
     SpellType bestSpellChoice;
     i32 effectScore;
-    i32 sideIndex;
-    SpellType spell;
+    H2_ENUM_STORAGE_STEPPED(SpellType, i32) spell;
     i32 bestHexWork;
     i32 candidateHex;
     i32 bestEffectWork;
@@ -78,9 +77,10 @@ i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted
     if (m_heroes[IDX(side)] == NULL)
         return 0;
 
-    for (sideIndex = 0; sideIndex < COMBAT_SIDE_COUNT; sideIndex++) {
-        if (m_heroes[sideIndex] != NULL
-            && m_heroes[sideIndex]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
+    // Retail reuses the hero-side scan slot as the spell iterator below.
+    for (spell = IDX(COMBAT_ATTACKER_SIDE); IDX(spell) < COMBAT_SIDE_COUNT; spell++) {
+        if (m_heroes[IDX(spell)] != NULL
+            && m_heroes[IDX(spell)]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
 
