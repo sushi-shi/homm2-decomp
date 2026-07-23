@@ -1229,7 +1229,7 @@ SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	99.5782	68be440790be
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	99.4329	a54ce9edc9d4
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.0636	222058889a73
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	c8f4e9cd5cff
-SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.3982	0ff4fd5fd196
+SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.5133	f259c474d379
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	99.4337	693c7b02347f
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	4b7950edea9a
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	99.2147	1026b76ae31f
