@@ -27,7 +27,7 @@ from homm2.build.annotated_data import (
 
 
 IMAGE_BASE = 0x400000
-CACHE_SCHEMA = 1
+CACHE_SCHEMA = 2
 TOKEN = re.compile(rb"\bDATA_COMPGEN\s*\(")
 GUARD_TOKEN = re.compile(rb"\bDATA_COMPGEN_GUARD\s*\(")
 IDENTIFIER = re.compile(rb"^[A-Za-z_][A-Za-z0-9_]*$")
@@ -424,6 +424,7 @@ def _cache_key(path: Path, repo: Path) -> str:
     digest = hashlib.sha256()
     digest.update(f"annotated-compgen-data-v{CACHE_SCHEMA}\0".encode("ascii"))
     digest.update(Path(__file__).read_bytes())
+    digest.update(Path(__file__).with_name("annotated_data.py").read_bytes())
     compile_database = repo / "build/clangd/compile_commands.json"
     if compile_database.is_file():
         digest.update(compile_database.read_bytes())

@@ -141,6 +141,7 @@ def main():
                     "./normalized/dummy.obj",
                 )
         w.build("all", "phony", inputs=comparison_inputs)
+        w.build("base", "phony", inputs=objs)
         order_inputs = ["config/units.toml", "build/gen/symbol_names.csv",
                         "build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"]
         w.build("build/link/objects.rsp", "link_order", inputs=order_inputs)

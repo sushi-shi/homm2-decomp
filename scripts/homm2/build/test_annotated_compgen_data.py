@@ -1,8 +1,9 @@
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest import mock
 
-from homm2.build.annotated_compgen_data import source_compgen_data
+from homm2.build.annotated_compgen_data import _cache_key, source_compgen_data
 
 
 REPO = next(path for path in Path(__file__).resolve().parents
@@ -10,6 +11,29 @@ REPO = next(path for path in Path(__file__).resolve().parents
 
 
 class AnnotatedCompgenDataTest(unittest.TestCase):
+    def test_cache_key_tracks_shared_annotated_data_parser(self):
+        with TemporaryDirectory(dir=REPO / "build") as directory:
+            source = Path(directory) / "Literal.cpp"
+            source.write_bytes(b"source")
+
+            def key(shared):
+                def content(path):
+                    if path.name == "annotated_data.py":
+                        return shared
+                    if path == source:
+                        return b"source"
+                    return b"compgen parser"
+
+                with (mock.patch(
+                        "homm2.build.annotated_compgen_data.Path.read_bytes",
+                        autospec=True, side_effect=content),
+                      mock.patch(
+                          "homm2.build.annotated_compgen_data._source_dependencies",
+                          return_value=[])):
+                    return _cache_key(source, REPO)
+
+            self.assertNotEqual(key(b"shared parser v1"), key(b"shared parser v2"))
+
     def test_clang_derives_literal_kind_and_logical_size(self):
         with TemporaryDirectory(dir=REPO / "build") as directory:
             source = Path(directory) / "SOURCE"
