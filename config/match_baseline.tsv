@@ -1218,7 +1218,7 @@ SOURCE/SPELLS	?AddBolt@combatManager@@QAEXPAUSBolt@@HHHHHHHHHHHH@Z	100.0000	76cd
 SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.4703	cc7676b69045
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	95.6462	07083e58c58c
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
-SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	97.3131	f79924658445
+SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	d968a1690475
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	96.6375	1a0fc7f3adc9
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	f34b11bf342f
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
