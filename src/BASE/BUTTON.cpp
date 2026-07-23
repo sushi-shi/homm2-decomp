@@ -107,20 +107,27 @@ inline button::~button() {
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
+inline H2_ENUM_RETURN(MessageDispatchResult, i16)
+    button::DeselectSelected(tag_message& msg) {
+    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
+    if (!HAS(flags, WIDGET_FLAG_SELECTED))
+        return MESSAGE_DISPATCH_CONTINUE;
+    flags &= ~WIDGET_FLAG_SELECTED;
+    m_flags = flags;
+    Draw();
+    gpWindowManager
+        ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
+    msg.payload.widget.modifiers = iLeftRightSave;
+    iLeftRightSave = MESSAGE_MODIFIER_NONE;
+    return MESSAGE_DISPATCH_FORWARD;
+}
+
 VA(0x004dd6d0, 0x595)
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
-        if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
-            return MESSAGE_DISPATCH_CONTINUE;
-        m_flags &= ~WIDGET_FLAG_SELECTED;
-        Draw();
-        gpWindowManager
-            ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-        SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-        msg.payload.widget.modifiers = iLeftRightSave;
-        iLeftRightSave = MESSAGE_MODIFIER_NONE;
-        return MESSAGE_DISPATCH_FORWARD;
+        return DeselectSelected(msg);
     }
 
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
@@ -145,22 +152,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return MESSAGE_DISPATCH_CONTINUE;
-                H2_ENUM_STORAGE(WidgetFlag, i16) keyFlags = m_flags;
-                if (!HAS(keyFlags, WIDGET_FLAG_SELECTED))
-                    return MESSAGE_DISPATCH_CONTINUE;
-                keyFlags &= ~WIDGET_FLAG_SELECTED;
-                m_flags = keyFlags;
-                Draw();
-                gpWindowManager->UpdateScreenRegion(
-                    m_x + m_owner->m_posX,
-                    m_y + m_owner->m_posY,
-                    m_width,
-                    m_height
-                );
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                msg.payload.widget.modifiers = iLeftRightSave;
-                iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                return MESSAGE_DISPATCH_FORWARD;
+                return DeselectSelected(msg);
             }
             break;
 
@@ -197,17 +189,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                         if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                             || relativeY >= m_y + m_height) {
                             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                                m_flags &= ~WIDGET_FLAG_SELECTED;
-                                Draw();
-                                gpWindowManager->UpdateScreenRegion(
-                                    m_x + m_owner->m_posX,
-                                    m_y + m_owner->m_posY,
-                                    m_width,
-                                    m_height
-                                );
-                                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                                msg.payload.widget.modifiers = iLeftRightSave;
-                                iLeftRightSave = MESSAGE_MODIFIER_NONE;
+                                DeselectSelected(msg);
                             }
                         } else if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                             Select(msg);
@@ -217,18 +199,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     msg = gpInputManager->GetEvent();
                 }
                 if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                    m_flags &= ~WIDGET_FLAG_SELECTED;
-                    Draw();
-                    gpWindowManager->UpdateScreenRegion(
-                        m_x + m_owner->m_posX,
-                        m_y + m_owner->m_posY,
-                        m_width,
-                        m_height
-                    );
-                    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                    msg.payload.widget.modifiers = iLeftRightSave;
-                    iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                    return MESSAGE_DISPATCH_FORWARD;
+                    return DeselectSelected(msg);
                 }
                 return MESSAGE_DISPATCH_CONSUME;
             }
@@ -238,18 +209,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
         case MESSAGE_LEFT_BUTTON_UP: {
             if (HAS(m_flags, WIDGET_FLAG_DRAW)
                 && HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                m_flags &= ~WIDGET_FLAG_SELECTED;
-                Draw();
-                gpWindowManager->UpdateScreenRegion(
-                    m_x + m_owner->m_posX,
-                    m_y + m_owner->m_posY,
-                    m_width,
-                    m_height
-                );
-                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-                msg.payload.widget.modifiers = iLeftRightSave;
-                iLeftRightSave = MESSAGE_MODIFIER_NONE;
-                return MESSAGE_DISPATCH_FORWARD;
+                return DeselectSelected(msg);
             }
             goto normalEvent;
         }
@@ -296,18 +256,7 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
 
 VA(0x004ddd10, 0x83)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
-    WidgetFlag flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_SELECTED))
-        return MESSAGE_DISPATCH_CONTINUE;
-    flags &= ~WIDGET_FLAG_SELECTED;
-    m_flags = flags;
-    Draw();
-    gpWindowManager
-        ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
-    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
-    msg.payload.widget.modifiers = iLeftRightSave;
-    iLeftRightSave = MESSAGE_MODIFIER_NONE;
-    return MESSAGE_DISPATCH_FORWARD;
+    return DeselectSelected(msg);
 }
 
 #undef SET_WIDGET_MESSAGE
