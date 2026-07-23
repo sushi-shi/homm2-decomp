@@ -314,7 +314,7 @@ def _fn_fuzzy(data):
 
 
 def load_maxima():
-    """Load ``(maximum, source hash)`` for source-backed functions."""
+    """Load ``(maximum, effective-source hash)`` for source-backed functions."""
     maxima = {}
     if not MAXIMA.exists():
         return maxima
@@ -337,14 +337,26 @@ def _updated_maxima(data, maxima, hashes):
         if not source_hash:
             continue
         old_maximum, old_hash = maxima.get(key, (0.0, None))
-        maximum = max(old_maximum, current) if old_hash == source_hash else current
+        same_source = old_hash == source_hash
+        # One-time migration from the historical body-only hash to the
+        # body.dependency composite. The body prefix proves that the annotated
+        # function itself is unchanged; later dependency changes alter the
+        # already-composite hash and reset the maximum normally.
+        dependency_hash_upgrade = (
+            old_hash is not None
+            and "." not in old_hash
+            and source_hash.startswith(old_hash + ".")
+        )
+        maximum = (
+            max(old_maximum, current)
+            if same_source or dependency_hash_upgrade else current)
         out[key] = (maximum, source_hash)
     return out
 
 
 def write_maxima(maxima):
     lines = [
-        "# homm2 retained match maxima by normalized function source hash.",
+        "# homm2 retained match maxima by normalized effective-source hash.",
         "# Observational only; never an enforcement baseline.",
         "# Updated by `homm2 status update` and `homm2 build`; do not hand-edit.",
         "# unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash",
@@ -441,9 +453,10 @@ def readme_block(data, maxima):
            f"{DM:,} / {DT:,} data bytes ({overall_d:.3f}%) &middot; "
            f"{DE} / {DU} data-bearing units exact.**", "",
            "_**Functions exact** = byte-identical now. **Functions exact-max** = observed at "
-           "100% at least once for the current source hash, including audited exact disposable "
-           "TU-state probes. **Fuzzy** is the live size-weighted instruction match; "
-           "**fuzzy-max** retains each function's best observed score for its current source hash. "
+           "100% at least once for the current effective-source hash, including audited exact "
+           "disposable TU-state probes. **Fuzzy** is the live size-weighted instruction match; "
+           "**fuzzy-max** retains each function's best observed score for its current "
+           "effective-source hash. "
            "Maxima are historical navigation data, not correctness proof or enforcement._", "",
            *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
                        "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows),

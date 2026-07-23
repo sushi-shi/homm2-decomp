@@ -73,6 +73,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   accessor and expression context before considering it a wall.
 - TU-wide compiler state can perturb unchanged siblings. Only current raw bytes and
   relocations decide correctness.
+- Retained MAX is historical evidence for unchanged effective function source, not the
+  current/live score. Never lower it merely because a live object regresses. Carry it
+  through hash-schema or dependency-hash migrations when the function body and all
+  tracked codegen dependencies are unchanged; reset it only for a real effective-source
+  change.
 - Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
 - Never retain source objects, labels, globals, aliases, padding, or fake code solely to
