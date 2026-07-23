@@ -354,6 +354,73 @@ class TuStateNoiseTests(unittest.TestCase):
                 semantic,
             )
 
+    def test_target_compgen_data_binding_survives_extra_control_relocation(self):
+        semantic = "__h2cg$BASE$unit$data$message"
+        candidate_payload = make_coff(
+            [
+                SectionSpec(
+                    ".text",
+                    bytes(8),
+                    0x60000020,
+                    ((0, 1, 0x0006), (4, 2, 0x0006)),
+                ),
+                SectionSpec(".data", b"rb\0\0", DATA),
+            ],
+            [
+                ("?Target@@YIXXZ", 0, 1, 0x20, 2),
+                ("$L123", 0, 1, 0, 3),
+                ("$SG123", 0, 2, 0, 3),
+                ("$L124", 4, 1, 0, 3),
+            ],
+        )
+        retail_payload = make_coff(
+            [
+                SectionSpec(".text", bytes(4), 0x60000020, ((0, 1, 0x0006),)),
+                SectionSpec(".data", b"rb\0\0", DATA),
+            ],
+            [
+                ("?Target@@YIXXZ", 0, 1, 0x20, 2),
+                (semantic, 0, 2, 0, 3),
+            ],
+        )
+        pairing = {
+            "unit": "BASE/unit",
+            "names": set(),
+            "public_data": {},
+            "function_rvas": {},
+            "symbols": {},
+            "data": {},
+            "duplicates": {},
+            "compgen": (),
+            "compgen_data": (
+                CompgenDataClaim(semantic, 2, 0, 3, "data", "local"),
+            ),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate.obj"
+            retail = root / "retail.obj"
+            candidate.write_bytes(candidate_payload)
+            retail.write_bytes(retail_payload)
+            with mock.patch.object(noise, "canonicalize_unit"):
+                normalized_candidate, normalized_retail, _generated = (
+                    noise.normalize_comparison_pair(
+                        candidate,
+                        retail,
+                        root / "pair",
+                        pairing,
+                        "?Target@@YIXXZ",
+                    )
+                )
+            self.assertEqual(
+                CoffObject(normalized_candidate.read_bytes()).symbols[2].name,
+                semantic,
+            )
+            self.assertEqual(
+                CoffObject(normalized_retail.read_bytes()).symbols[1].name,
+                semantic,
+            )
+
     def test_target_compgen_data_binding_ignores_unreferenced_stale_claim(self):
         payload = make_coff(
             [

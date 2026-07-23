@@ -1088,10 +1088,10 @@ def target_compgen_data_claims(
     Parser-visible probes may insert anonymous storage and move unrelated private
     definitions away from their reviewed manifest offsets. Pairing every TU-wide
     DATA_COMPGEN claim against such a disposable object would either bind the wrong
-    datum or fail before the target can be scored. The target's ordered relocations
-    provide the stronger local evidence: after retail pairing, a semantic claim name
-    identifies the retail site, and the relocation at the same ordinal identifies the
-    corresponding candidate definition even when its physical offset moved.
+    datum or fail before the target can be scored. After retail pairing, a semantic
+    claim name identifies the retail site. The reviewed payload then identifies the
+    corresponding referenced candidate definition even when control-flow relocations
+    differ or its physical offset moved.
     """
     if target_symbol is None or not claims:
         return claims, claims
@@ -1100,12 +1100,6 @@ def target_compgen_data_claims(
     retail = CoffObject(paired_retail.read_bytes())
     candidate_relocations = _function_relocations(candidate, target_symbol)
     retail_relocations = _function_relocations(retail, target_symbol)
-    if len(candidate_relocations) != len(retail_relocations):
-        raise ValueError(
-            f"{target_symbol} relocation count differs while binding DATA_COMPGEN: "
-            f"candidate {len(candidate_relocations)}, retail {len(retail_relocations)}"
-        )
-
     claims_by_name = {claim.name: claim for claim in claims}
     candidate_definitions = {
         definition.symbol.index: definition for definition in _definitions(candidate)
@@ -1116,21 +1110,58 @@ def target_compgen_data_claims(
     candidate_claims = []
     retail_claims = []
     seen = set()
-    for candidate_relocation, retail_relocation in zip(
-        candidate_relocations, retail_relocations
-    ):
+    used_candidate_definitions = set()
+    for retail_ordinal, retail_relocation in enumerate(retail_relocations):
         retail_symbol = retail.symbols[retail_relocation.symbol_index]
         claim = claims_by_name.get(retail_symbol.name)
         if claim is None or claim.name in seen:
             continue
-        candidate_definition = candidate_definitions.get(
-            candidate_relocation.symbol_index
-        )
         retail_definition = retail_definitions.get(retail_relocation.symbol_index)
-        if candidate_definition is None or retail_definition is None:
+        if retail_definition is None:
             raise ValueError(
-                f"{claim.name} target relocation does not reference a data definition"
+                f"{claim.name} retail target relocation does not reference a data definition"
             )
+        retail_payload = retail.section_bytes(retail_definition.section)[
+            retail_definition.start:retail_definition.start + claim.size
+        ]
+        candidate_matches = []
+        for candidate_ordinal, candidate_relocation in enumerate(candidate_relocations):
+            candidate_definition = candidate_definitions.get(
+                candidate_relocation.symbol_index
+            )
+            if (
+                candidate_definition is None
+                or candidate_definition.symbol.index in used_candidate_definitions
+                or candidate_definition.storage != retail_definition.storage
+                or candidate_definition.end - candidate_definition.start < claim.size
+            ):
+                continue
+            candidate_payload = candidate.section_bytes(candidate_definition.section)[
+                candidate_definition.start:candidate_definition.start + claim.size
+            ]
+            if candidate_payload == retail_payload:
+                candidate_matches.append((candidate_ordinal, candidate_definition))
+
+        same_ordinal = [
+            definition
+            for ordinal, definition in candidate_matches
+            if ordinal == retail_ordinal
+        ]
+        if len(same_ordinal) == 1:
+            candidate_definition = same_ordinal[0]
+        elif len(candidate_matches) == 1:
+            candidate_definition = candidate_matches[0][1]
+        elif not candidate_matches:
+            raise ValueError(
+                f"{claim.name} has no payload-identical candidate target relocation"
+            )
+        else:
+            ordinals = ", ".join(str(ordinal) for ordinal, _ in candidate_matches)
+            raise ValueError(
+                f"{claim.name} candidate target relocation is payload-ambiguous "
+                f"at ordinals {ordinals}"
+            )
+
         for side, definition in (
             ("candidate", candidate_definition),
             ("retail", retail_definition),
@@ -1168,6 +1199,7 @@ def target_compgen_data_claims(
             retail_scope,
         ))
         seen.add(claim.name)
+        used_candidate_definitions.add(candidate_definition.symbol.index)
     return tuple(candidate_claims), tuple(retail_claims)
 
 
