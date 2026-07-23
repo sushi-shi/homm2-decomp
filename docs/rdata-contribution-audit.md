@@ -2,8 +2,8 @@
 
 This audit separates section placement, allocation topology, and relocation
 destination identity. Retail `.rdata` starts at RVA `0xeb000`; the current pinned
-LINK 3.00 candidate starts at `0xea000` because its preceding `.text` is one page
-shorter. Both sections have raw size `0xe00` and virtual size `0xc9d`.
+LINK 3.00 candidate now starts at the same RVA. Both sections have raw size `0xe00`
+and virtual size `0xc9d`.
 
 All 31 retained public `.rdata` symbols now have the exact retail
 section-relative offset. This includes the TOWNMGR vtable at `0x140`, the
@@ -11,14 +11,14 @@ swapManager vtable at `0x650`, the advManager vtable, FONT, and RESMGR. The old
 claim that the first relative drift was `+0x8` at swapManager is obsolete: it
 described a PHILAI candidate constant-pool excess which has been removed.
 
-Raw `.rdata` agrees in 3,401 of 3,584 bytes. Every one of the 183 differences is
-classified: 151 bytes are inside the 76 HIGHLOW operands at identical
-section-relative sites, 18 are build-dependent fields in the PE debug directory
-at `+0x0`, and 14 are image-relative fields in the export directory at `+0xc40`.
-No ordinary readonly payload byte remains unexplained, so these differences do
-not imply an allocation-order defect. The final-link report records the raw
-comparison separately from public section-relative topology and direct code
-relocation targets. The exhaustive pass sees 781 retail and 762 candidate
+Raw `.rdata` agrees in 3,418 of 3,584 bytes. Every one of the 166 differences is
+classified under the 76 HIGHLOW operands at identical section-relative sites, the
+PE debug directory at `+0x0`, or the export directory at `+0xc40`. The final-link
+report records the exact current count in each class and verifies every relocated
+target, debug-record topology, export surface, and exported decorated target before
+excluding those bytes. No ordinary readonly payload byte remains unexplained, so
+these differences do not imply an allocation-order defect. The exhaustive pass sees
+781 retail and 762 candidate
 `.rdata` references: all 762 candidate identities match retail, while 19 retail
 occurrences are absent from structurally incomplete candidate code. The ordered
 context pass compares 507 `.rdata` sites and finds no section-offset divergence.

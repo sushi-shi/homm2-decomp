@@ -37,7 +37,10 @@ final link, `retopologize_data.py` makes a disposable copy of each fully reviewe
 and projects its allocations into the owning NB09 contribution. It updates section bytes, symbols,
 relocation source sites, section-symbol addends, alignment, and section-definition length together.
 Relocations naming a real allocation retain their owner-relative addend, including reviewed
-base-minus-N expressions.
+base-minus-N expressions. When one TU has multiple independent reviewed sections of the same class,
+the disposable copy also orders their COFF headers by retail RVA and remaps every affected symbol
+and associative-COMDAT section ordinal. This expresses reviewed final-link topology without moving
+anonymous constants between TUs or steering their declaration order in reconstructed source.
 
 This projection accepts only the conflict-free reviewed manifest. Uncovered nonzero bytes,
 overlapping allocations, an allocation outside either section, or a relocation which cannot be

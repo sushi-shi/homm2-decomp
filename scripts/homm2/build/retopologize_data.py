@@ -323,6 +323,49 @@ def _rewrite_one(payload: bytearray, layout: SectionLayout) -> bytearray:
     return payload
 
 
+def _order_reviewed_sections(payload: bytearray,
+                             layouts: tuple[SectionLayout, ...]) -> bytearray:
+    """Order equivalent candidate section headers by reviewed retail contribution RVA."""
+    sections, symbols, _ = _coff(payload)
+    by_name = {}
+    for layout in layouts:
+        section = sections[layout.ordinal - 1]
+        by_name.setdefault(section.name, []).append(layout)
+    ordinal_map = {}
+    header_copies = {
+        section.ordinal: bytes(payload[section.header:section.header + SECTION_HEADER_SIZE])
+        for section in sections
+    }
+    for rows in by_name.values():
+        if len(rows) < 2:
+            continue
+        destinations = sorted(row.ordinal for row in rows)
+        for destination, row in zip(
+                destinations, sorted(rows, key=lambda item: (item.retail_rva, item.ordinal))):
+            ordinal_map[row.ordinal] = destination
+            target = sections[destination - 1]
+            payload[target.header:target.header + SECTION_HEADER_SIZE] = header_copies[row.ordinal]
+    if not any(old != new for old, new in ordinal_map.items()):
+        return payload
+
+    for symbol in symbols.values():
+        new_section = ordinal_map.get(symbol.section)
+        if new_section is not None:
+            struct.pack_into("<h", payload, symbol.offset + 12, new_section)
+        if (not 1 <= symbol.section <= len(sections) or
+                not _is_section_symbol(symbol, sections[symbol.section - 1])):
+            continue
+        auxiliary = symbol.offset + SYMBOL_SIZE
+        selection = payload[auxiliary + 14]
+        if selection != 5:  # IMAGE_COMDAT_SELECT_ASSOCIATIVE
+            continue
+        associated = struct.unpack_from("<h", payload, auxiliary + 12)[0]
+        if associated in ordinal_map:
+            struct.pack_into("<h", payload, auxiliary + 12, ordinal_map[associated])
+    _coff(payload)
+    return payload
+
+
 def rewrite_coff_data_topology(source: Path, destination: Path,
                                layouts: tuple[SectionLayout, ...]) -> int:
     payload = bytearray(Path(source).read_bytes())
@@ -330,6 +373,7 @@ def rewrite_coff_data_topology(source: Path, destination: Path,
     for layout in sorted(layouts, key=lambda item: item.ordinal):
         payload = _rewrite_one(payload, layout)
         changed += 1
+    payload = _order_reviewed_sections(payload, layouts)
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(payload)

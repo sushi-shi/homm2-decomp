@@ -8,9 +8,37 @@ forcing retail addresses.
 The same report compares the complete raw `.rdata` and `.data` payloads at
 section-relative offsets under `static_storage.section_bytes`. Exactness, SHA-256
 identities, equal/mismatched byte counts, and the first contiguous mismatch ranges
-are recorded. This whole-section comparison is the final authority: a normalized
-object-level 100% score is not proof when either linked section differs. Per-symbol
-and contribution diagnostics exist to attribute the first whole-section mismatch.
+are recorded. Raw equality remains visible and is never replaced by a normalized
+score.
+
+`static_storage.section_semantics` is the strict linked-image topology gate. For
+`.rdata` and initialized `.data`, it requires exact RVA/raw/virtual sizes, exact
+HIGHLOW source sites, and byte equality after the reviewed link-owned fields are
+removed. It does not accept pointer masking alone: every relocated value must either
+retain its RVA or resolve through an exact decorated-name anchor in the same retail
+unit and candidate MAP object with the same owner-relative addend. Reviewed source
+compiler-generated anchors map their semantic names to the emitted `_$E1` through
+`_$E4` spellings for this check.
+
+The only other excluded fields are PE debug and export records. Their section offset
+and extent must match. Debug record kinds and version topology must match; export
+module name, versions, ordinal base, function count, named exports, and unnamed
+ordinals must match. Each exported target must also resolve to the decorated symbol
+named by the generated module definition in both images. Timestamps, debug payload
+locations/sizes, and the resulting exported function RVA values remain raw differences
+because they are consequences of the still-changing code image. Any byte outside these
+proven ownership classes is a semantic mismatch.
+
+The `.bss` entry names the loader-zero virtual tail embedded in PE `.data`; the
+shipping image has no standalone `.bss` section. It requires equal tail size, exact
+RVAs for every retained loader-zero public symbol, exact placement of every reviewed
+game-owned BSS section, and exact placement of every reviewed runtime BSS definition
+and COMMON declaration. Public/private MAP symbols anchor a game section directly;
+when LINK omits its private symbols, a DIR32 reference from an anchored code section
+recovers the same final section base from the linked operand, COFF addend, and target
+offset. Thus the complete reviewed allocation topology is covered, not only sections
+with public names. A semantic mismatch makes `ninja link` fail while the raw
+diagnostics remain available for attribution.
 
 `python3 -m homm2.build.assert_relocs --pe-data` supplies the complementary
 code-site audit for all 1,499 unique configured functions. Its exhaustive pass
@@ -109,7 +137,11 @@ candidate coordinates into its NB09 owner range. The projection covers both affi
 and non-affine sections, including DRAWING's public zero globals among its private
 literals and TILE's retail-evidenced raw-backed zero contribution. Game-owned
 initialized topology is exact through the final source contribution; no padding
-object or source-layout steering is involved.
+object or source-layout steering is involved. If one TU contains multiple independent
+reviewed sections of the same COFF class, the disposable final-link copy orders those
+section headers by retail RVA and remaps symbol/associative-COMDAT section ordinals.
+This keeps equivalent anonymous constants local to the TU without requiring source
+declaration order to steer the linker.
 
 The pinned VC 4.0 `LIBCMT.LIB` is the selected runtime input. Its disposable link
 copy assigns each retained initialized section a sortable `.data$NN` subsection
@@ -120,12 +152,26 @@ raw extent plus bounded alignment padding. The resulting initialized topology is
 exact through the retail raw-data boundary, including `wincrt0`, `perror`, and the
 runtime literal members.
 
-The remaining writable drift starts in the loader-zero tail at `handler`'s
-`_pnhHeap`. Runtime `.bss` sections and linker common symbols share that tail, and
-their order still follows archive demand. Renaming `.bss` subsections matched only
-the aggregate size while displacing identities, so that experiment is deliberately
-not retained. Current section sizes and the first relative divergence are recorded
-in `build/link/HEROES2W.link.json` rather than copied into this durable document.
+Runtime `.bss` sections and linker COMMON allocations share the loader-zero tail but
+obey different LINK 3 ordering rules. The pinned archive remains the code owner. In
+its disposable link copy, each reviewed runtime BSS payload definition is made
+external and its original section extent is set to zero. A generated link-only COFF
+carrier declares the same symbols and offsets in retail NB09 contribution order, so
+relocations from the archive continue to name their real CRT identities. This is
+link topology, not reconstructed source storage or padding.
+
+Before mutation, the selected archive section must be raw-free, relocation-free, and
+have exactly one ordinary section definition. Every moved definition must have a
+supported storage class, no auxiliary records, an in-bounds unique offset, and a
+unique name. Both the rewritten archive member and generated carrier are reparsed as
+COFF before LINK sees them.
+
+LINK 3 allocates COMMON declarations in reverse COFF symbol-table order. The carrier
+therefore emits the reviewed COMMON set in reverse retail-RVA order. The audit checks
+the resulting MAP address of every BSS definition and COMMON symbol, including the
+ordering of `___pioinfo`, `__crtheap`, `__acmdln`, and the on-exit anchors. Section
+size, public identities, private carrier definitions, and the final virtual extent
+are consequently checked as one loader-zero model.
 
 The current exhaustive census covers all 1,499 unique functions and 21,664 retail
 data targets: 781 into `.rdata` and 20,883 into `.data`. Candidate code has 21,380
@@ -163,14 +209,11 @@ current/previous player-count comparison in Wsnetwin, and two quantity/ratio
 comparisons in tradpost. They remain visible because balanced identities alone do
 not prove semantic equivalence.
 
-The linked `.rdata` raw payloads are both `0xe00` bytes and agree in 3,401 of 3,584
-bytes. All 183 differing bytes have PE-format causes rather than unaccounted storage:
-151 are within the 76 HIGHLOW pointer operands at identical section-relative sites,
-18 are in the `0x54`-byte debug directory at offset zero, and 14 are in the
-`0x5d`-byte export directory at offset `0xc40`. The pointer values change with the
-candidate image layout; the debug records contain the build timestamp and debug
-payload addresses/sizes; and the export records contain image-relative addresses.
-No raw `.rdata` mismatch byte remains outside those three reviewed classes.
+Linked `.rdata` can remain raw-different while its storage topology is exact. Its
+three admissible classes are HIGHLOW operands with proven semantic targets, the PE
+debug directory, and the PE export directory. The report records the current raw
+counts and every excluded span; no raw mismatch outside those classes can satisfy
+the semantic gate.
 
 ## Recovered source and model divergences
 

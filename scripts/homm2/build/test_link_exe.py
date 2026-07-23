@@ -6,8 +6,10 @@ from pathlib import Path
 from unittest import mock
 
 from homm2.build.link_exe import (
+    _compare_pointer_identities,
     LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
     SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, build_retail_runtime_data_library,
+    build_runtime_zero_topology_object,
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
     compare_pe_section_bytes, decode_s_compile_banner, load_required_initialized_storage,
@@ -18,9 +20,70 @@ from homm2.build.link_exe import (
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics)
 from homm2.build.link_exe import strip_coff_export_directives, write_module_definition
+from homm2.build.canonicalize_data_symbols import CoffObject
 
 
 class LinkExeTest(unittest.TestCase):
+    def test_pointer_identity_uses_compgen_owner_relative_anchor(self):
+        retail = {
+            "image_base": 0x400000,
+            "payload": struct.pack("<I", 0x401080),
+            "highlow_relative_offsets": [0],
+        }
+        candidate = {
+            "image_base": 0x400000,
+            "payload": struct.pack("<I", 0x401180),
+            "highlow_relative_offsets": [0],
+        }
+        with tempfile.TemporaryDirectory() as temp:
+            symbols = Path(temp) / "symbols.csv"
+            symbols.write_text(
+                "rva,name,unit,size,kind,provenance\n"
+                "0x1000,__h2cg$SOURCE$OWNER$static_init_dispatch$value,"
+                "SOURCE/OWNER,0x20,func,source-compgen-static_init_dispatch\n")
+            map_path = Path(temp) / "image.map"
+            map_path.write_text(
+                " 0001:00001100 _$E4 00401100 f OWNER.obj\n")
+            result = _compare_pointer_identities(
+                retail, candidate, map_path, symbols)
+            candidate["payload"] = struct.pack("<I", 0x401184)
+            mismatch = _compare_pointer_identities(
+                retail, candidate, map_path, symbols)
+        self.assertTrue(result["exact"])
+        self.assertEqual(result["same_owner_relative_addend"], 1)
+        self.assertFalse(mismatch["exact"])
+        self.assertEqual(len(mismatch["failures"]), 1)
+
+    def test_runtime_zero_topology_object_preserves_bss_and_common_shape(self):
+        payload = build_runtime_zero_topology_object(
+            [{"size": 0x28, "characteristics": 0xC0400080},
+             {"size": 0x4, "characteristics": 0xC0300080}],
+            [{"name": "private_runtime_state", "value": 0x10,
+              "carrier_section": 1, "type": 0},
+             {"name": "public_runtime_state", "value": 0,
+              "carrier_section": 2, "type": 0}],
+            [{"name": "last_common", "size": 4},
+             {"name": "first_common", "size": 0x100}],
+        )
+        coff = CoffObject(payload)
+        self.assertEqual(
+            [(section.name, section.raw_size) for section in coff.sections],
+            [(".bss", 0x28), (".bss", 0x4)])
+        definitions = {
+            symbol.name: (symbol.section, symbol.value, symbol.storage_class)
+            for symbol in coff.symbols.values()
+            if symbol.name in {"private_runtime_state", "public_runtime_state"}
+        }
+        self.assertEqual(definitions, {
+            "private_runtime_state": (1, 0x10, 2),
+            "public_runtime_state": (2, 0, 2),
+        })
+        commons = [
+            (symbol.name, symbol.value) for symbol in coff.symbols.values()
+            if symbol.section == 0 and symbol.value
+        ]
+        self.assertEqual(commons, [("last_common", 4), ("first_common", 0x100)])
+
     def test_runtime_library_ranks_retained_data_sections_from_nb09(self):
         raw_offset = 60
         symbol_offset = raw_offset + 4
@@ -52,7 +115,9 @@ class LinkExeTest(unittest.TestCase):
                 "homm2.build.link_exe.read_nb09_module_contributions",
                 return_value=modules), mock.patch(
                 "homm2.build.link_exe.read_pe",
-                return_value={"sections": {".data": {"raw_size": 0x100}}}):
+                return_value={"sections": {".data": {
+                    "rva": 0x2000, "raw_size": 0x100, "virtual_size": 0x100,
+                }}}):
             source = Path(directory) / "LIBCMT.LIB"
             output = Path(directory) / "ordered" / "LIBCMT.LIB"
             source.write_bytes(archive)
@@ -63,6 +128,58 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual(result[member + symbol_offset:member + symbol_offset + 8],
                          b".data$00")
         self.assertEqual(report["initialized_ranked_sections"], 1)
+
+    def test_runtime_library_moves_reviewed_bss_definition_to_carrier(self):
+        symbol_offset = 60
+        coff = bytearray(symbol_offset + 3 * 18 + 4)
+        struct.pack_into("<HHIIIHH", coff, 0, 0x14C, 1, 0, symbol_offset, 3, 0, 0)
+        struct.pack_into(
+            "<8sIIIIIIHHI", coff, 20, b".bss\0\0\0\0", 0, 0, 4,
+            0, 0, 0, 0, 0, 0xC0300080)
+        struct.pack_into("<8sIhHBB", coff, symbol_offset,
+                         b".bss\0\0\0\0", 0, 1, 0, 3, 1)
+        struct.pack_into("<I", coff, symbol_offset + 18, 4)
+        struct.pack_into("<8sIhHBB", coff, symbol_offset + 36,
+                         b"state\0\0\0", 0, 1, 0, 2, 0)
+        struct.pack_into("<I", coff, symbol_offset + 54, 4)
+        archive_header = (
+            b"unit.obj/       " + b"0           " + b"0     " + b"0     " +
+            b"100644  " + str(len(coff)).encode("ascii").ljust(10) + b"`\n")
+        archive = b"!<arch>\n" + archive_header + bytes(coff)
+        if len(coff) & 1:
+            archive += b"\n"
+        modules = {"unit": [{
+            "module": r"build\intel\mt_obj\unit.obj",
+            "contributions": [{
+                "section_name": ".data", "offset": 0x100, "size": 4,
+            }],
+        }]}
+        with tempfile.TemporaryDirectory() as directory, mock.patch(
+                "homm2.build.link_exe.PINNED_VC40_LIBCMT_SHA256",
+                hashlib.sha256(archive).hexdigest()), mock.patch(
+                "homm2.build.link_exe.read_nb09_module_contributions",
+                return_value=modules), mock.patch(
+                "homm2.build.link_exe.read_pe",
+                return_value={"sections": {".data": {
+                    "rva": 0x2000, "raw_size": 0x100, "virtual_size": 0x104,
+                }}}):
+            source = Path(directory) / "LIBCMT.LIB"
+            output = Path(directory) / "ordered" / "LIBCMT.LIB"
+            source.write_bytes(archive)
+            report = build_retail_runtime_data_library(source, output)
+            member = CoffObject(output.read_bytes()[8 + 60:8 + 60 + len(coff)])
+            carrier = CoffObject(Path(
+                report["zero_fill_topology"]["object"]).read_bytes())
+        member_state = next(symbol for symbol in member.symbols.values()
+                            if symbol.name == "state")
+        carrier_state = next(symbol for symbol in carrier.symbols.values()
+                             if symbol.name == "state")
+        self.assertEqual((member.sections[0].raw_size, member_state.section,
+                          member_state.value, member_state.storage_class),
+                         (0, 0, 0, 2))
+        self.assertEqual((carrier.sections[0].raw_size, carrier_state.section,
+                          carrier_state.value, carrier_state.storage_class),
+                         (4, 1, 0, 2))
 
     def test_module_definition_has_retail_description_and_exports(self):
         with tempfile.TemporaryDirectory() as directory:

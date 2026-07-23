@@ -24,6 +24,7 @@ from homm2.build.extract_resources import read_pe_resources
 from homm2.build.build_libcmt_gfy import (
     archive_entries, build_library as build_gfy_libcmt, expected_retail_literals,
 )
+from homm2.build.canonicalize_data_symbols import CoffObject
 from homm2.build.gen_vendor_imports import LINK300_FORCED_VENDOR_IMPORTS
 from homm2.build.retopologize_data import (
     RetailDataTopology,
@@ -47,16 +48,23 @@ PE32_MAGIC = 0x10B
 COFF_SECTION_HEADER_SIZE = 40
 COFF_FILE_HEADER_SIZE = 20
 IMAGE_SCN_ALIGN_MASK = 0x00F00000
+IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
+IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
+IMAGE_SCN_LNK_COMDAT = 0x00001000
 IMAGE_SCN_MEM_EXECUTE = 0x20000000
 IMAGE_DIRECTORY_ENTRY_IMPORT = 1
 IMAGE_DIRECTORY_ENTRY_BASERELOC = 5
+IMAGE_DIRECTORY_ENTRY_DEBUG = 6
+IMAGE_DIRECTORY_ENTRY_EXPORT = 0
 IMPORT_DESCRIPTOR_SIZE = 20
 IMPORT_ORDINAL_FLAG32 = 0x80000000
 IMAGE_REL_BASED_HIGHLOW = 3
+IMAGE_REL_I386_DIR32 = 0x0006
 NB09_SST_MODULE = 0x120
 NB09_SST_ALIGN_SYM = 0x125
 CODEVIEW_S_COMPILE = 0x0001
 CODEVIEW_S_THUNK32 = 0x0206
+COFF_SYMBOL_SIZE = 18
 
 RETAIL_LINK_FLAGS = (
     "/MACHINE:IX86",
@@ -81,6 +89,10 @@ SYSTEM_LIBS_AFTER_VENDOR = (
     "NETAPI32.LIB",
     "WINMM.LIB",
     "ADVAPI32.LIB",
+)
+RETAIL_EXPORTS = (
+    ("AppAbout", "?AppAbout@@YGHPAXIIJ@Z"),
+    ("AppWndProc", "?AppWndProc@@YGJPAXIIJ@Z"),
 )
 
 
@@ -164,12 +176,12 @@ def final_link_objects(objects, units, output_root, topology):
 def write_module_definition(path):
     """Write the retail executable description and public export surface."""
     path = Path(path)
+    exports = "".join("    %s=%s\n" % row for row in RETAIL_EXPORTS)
     path.write_text(
         "NAME HEROES2W.EXE\n"
         "DESCRIPTION 'Heroes of Might and Magic 2'\n"
         "EXPORTS\n"
-        "    AppAbout=?AppAbout@@YGHPAXIIJ@Z\n"
-        "    AppWndProc=?AppWndProc@@YGJPAXIIJ@Z\n",
+        + exports,
         encoding="ascii",
     )
     return path
@@ -342,6 +354,222 @@ def read_nb09_module_contributions(path, executable_only=True):
     return modules
 
 
+def _coff_name_field(name, strings, offsets):
+    raw = name.encode("latin-1")
+    if len(raw) <= 8:
+        return raw.ljust(8, b"\0")
+    offset = offsets.get(raw)
+    if offset is None:
+        offset = len(strings)
+        offsets[raw] = offset
+        strings.extend(raw + b"\0")
+    return struct.pack("<II", 0, offset)
+
+
+def build_runtime_zero_topology_object(sections, definitions, commons):
+    """Build a zero-byte COFF carrier for reviewed CRT BSS and COMMON topology.
+
+    Definitions retain their pinned CRT spelling and section-relative offsets.  COMMON
+    declarations remain undefined externals with nonzero sizes; LINK 3 allocates them in
+    reverse symbol-table order, so callers provide ``commons`` in that proven order.
+    """
+    strings = bytearray(b"\0\0\0\0")
+    offsets = {}
+    symbols = bytearray()
+    symbol_count = 0
+    for index, section in enumerate(sections, 1):
+        symbols.extend(_coff_name_field(".bss", strings, offsets))
+        symbols.extend(struct.pack("<IhHBB", 0, index, 0, 3, 1))
+        symbols.extend(struct.pack(
+            "<IHHIhBBH", section["size"], 0, 0, 0, 0, 0, 0, 0))
+        symbol_count += 2
+    for row in definitions:
+        symbols.extend(_coff_name_field(row["name"], strings, offsets))
+        symbols.extend(struct.pack(
+            "<IhHBB", row["value"], row["carrier_section"], row["type"], 2, 0))
+        symbol_count += 1
+    for row in commons:
+        symbols.extend(_coff_name_field(row["name"], strings, offsets))
+        symbols.extend(struct.pack("<IhHBB", row["size"], 0, 0, 2, 0))
+        symbol_count += 1
+    struct.pack_into("<I", strings, 0, len(strings))
+
+    headers = bytearray()
+    for section in sections:
+        headers.extend(struct.pack(
+            "<8sIIIIIIHHI", b".bss\0\0\0\0", 0, 0, section["size"],
+            0, 0, 0, 0, 0, section["characteristics"]))
+    symbol_offset = COFF_FILE_HEADER_SIZE + len(headers)
+    header = struct.pack(
+        "<HHIIIHH", 0x14C, len(sections), 0, symbol_offset,
+        symbol_count, 0, 0)
+    return bytes(header + headers + symbols + strings)
+
+
+def _runtime_common_order(payload, retail_data_rva, raw_size, virtual_size,
+                          retail_symbols=None):
+    sizes = defaultdict(set)
+    for entry in archive_entries(payload):
+        basename = entry.name.replace("\\", "/").rsplit("/", 1)[-1].lower()
+        if not basename.endswith(".obj"):
+            continue
+        try:
+            coff = CoffObject(payload[entry.data_offset:entry.data_end])
+        except ValueError:
+            continue
+        for symbol in coff.symbols.values():
+            if symbol.section == 0 and symbol.value and symbol.storage_class == 2:
+                sizes[symbol.name].add(symbol.value)
+    publics = {
+        row["name"]: row for row in (
+            load_retail_data_symbols() if retail_symbols is None else retail_symbols)
+        if retail_data_rva + raw_size <= row["rva"] < retail_data_rva + virtual_size
+    }
+    rows = []
+    for name, row in publics.items():
+        candidates = sizes.get(name)
+        if not candidates:
+            continue
+        if len(candidates) != 1:
+            raise ValueError("runtime COMMON size differs for %s: %s" % (
+                name, ", ".join("0x%x" % size for size in sorted(candidates))))
+        rows.append({"name": name, "size": next(iter(candidates)), "rva": row["rva"]})
+    # LINK 3 walks COMMON declarations backward when assigning the aggregate pool.
+    return list(reversed(sorted(rows, key=lambda row: (row["rva"], row["name"]))))
+
+
+def build_runtime_zero_topology_library(payload, members, runtime_rows, retail,
+                                        carrier_path, retail_symbols=None):
+    """Move selected CRT BSS sections into one retail-ordered link-only carrier."""
+    data_section = retail["sections"][".data"]
+    raw_size = data_section["raw_size"]
+    positioned = sorted(
+        (contribution["offset"], name, contribution)
+        for name, row in runtime_rows.items()
+        for contribution in row["contributions"]
+        if contribution["section_name"] == ".data"
+        and contribution["offset"] >= raw_size)
+    output = bytearray(payload)
+    sections = []
+    definitions = []
+    for carrier_section, (retail_offset, name, contribution) in enumerate(positioned, 1):
+        entry = members[name]
+        member = bytearray(output[entry.data_offset:entry.data_end])
+        coff = CoffObject(member)
+        matches = [
+            section for section in coff.sections
+            if section.name == ".bss" and section.raw_size == contribution["size"]
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                "runtime zero-fill contribution shape differs in %s at 0x%x: "
+                "expected one 0x%x-byte .bss, found %d" % (
+                    name, retail_offset, contribution["size"], len(matches)))
+        section = matches[0]
+        if section.characteristics & IMAGE_SCN_LNK_COMDAT:
+            raise ValueError("runtime BSS COMDAT cannot use the plain carrier: %s" % name)
+        if section.raw_offset != 0:
+            raise ValueError("runtime BSS section unexpectedly has raw bytes: %s" % name)
+        if any(relocation.section == section.index for relocation in coff.relocations):
+            raise ValueError("runtime BSS section unexpectedly owns relocations: %s" % name)
+        section_symbols = [
+            symbol for symbol in coff.symbols.values()
+            if symbol.section == section.index and symbol.name == ".bss"
+            and symbol.value == 0 and symbol.storage_class == 3 and symbol.aux_count
+        ]
+        if len(section_symbols) != 1:
+            raise ValueError("runtime BSS section-definition shape differs in %s" % name)
+        section_symbol_indexes = {symbol.index for symbol in section_symbols}
+        if any(relocation.symbol_index in section_symbol_indexes
+               for relocation in coff.relocations):
+            raise ValueError(
+                "runtime relocation targets the BSS section symbol in %s" % name)
+        alignment_code = (section.characteristics & IMAGE_SCN_ALIGN_MASK) >> 20
+        section_row = {
+            "member": name,
+            "retail_offset": retail_offset,
+            "size": section.raw_size,
+            "alignment": 1 << (alignment_code - 1) if alignment_code else 1,
+            "characteristics": section.characteristics,
+        }
+        sections.append(section_row)
+        for symbol in coff.symbols.values():
+            if symbol.section != section.index:
+                continue
+            is_section = (
+                symbol.name == ".bss" and symbol.value == 0
+                and symbol.storage_class == 3 and symbol.aux_count)
+            if is_section:
+                struct.pack_into("<I", member, symbol.offset + COFF_SYMBOL_SIZE, 0)
+                continue
+            if symbol.aux_count:
+                raise ValueError("runtime BSS allocation has auxiliaries: %s:%s" % (
+                    name, symbol.name))
+            if symbol.storage_class not in (2, 3):
+                raise ValueError("unsupported runtime BSS storage class in %s:%s" % (
+                    name, symbol.name))
+            if not 0 <= symbol.value < section.raw_size:
+                raise ValueError("runtime BSS symbol is outside its section: %s:%s" % (
+                    name, symbol.name))
+            if any(row["name"] == symbol.name for row in definitions):
+                raise ValueError("duplicate runtime BSS identity: %s" % symbol.name)
+            if any(row["carrier_section"] == carrier_section and
+                   row["value"] == symbol.value for row in definitions):
+                raise ValueError("aliased runtime BSS definitions in %s at 0x%x" % (
+                    name, symbol.value))
+            definitions.append({
+                "name": symbol.name,
+                "value": symbol.value,
+                "type": symbol.typ,
+                "carrier_section": carrier_section,
+                "member": name,
+            })
+            struct.pack_into("<Ih", member, symbol.offset + 8, 0, 0)
+            member[symbol.offset + 16] = 2
+        struct.pack_into("<I", member, section.header_offset + 16, 0)
+        rewritten = CoffObject(bytes(member))
+        rewritten_section = rewritten.sections[section.index - 1]
+        if rewritten_section.raw_size != 0:
+            raise ValueError("runtime BSS section was not removed from %s" % name)
+        for row in definitions:
+            if row["member"] != name:
+                continue
+            symbols = [symbol for symbol in rewritten.symbols.values()
+                       if symbol.name == row["name"]]
+            if len(symbols) != 1 or (
+                    symbols[0].section, symbols[0].value,
+                    symbols[0].storage_class) != (0, 0, 2):
+                raise ValueError("runtime BSS externalization differs for %s:%s" % (
+                    name, row["name"]))
+        output[entry.data_offset:entry.data_end] = member
+
+    commons = _runtime_common_order(
+        bytes(output), data_section["rva"], raw_size,
+        data_section["virtual_size"], retail_symbols)
+    carrier_path = Path(carrier_path)
+    carrier_path.parent.mkdir(parents=True, exist_ok=True)
+    carrier_payload = build_runtime_zero_topology_object(
+        sections, definitions, commons)
+    CoffObject(carrier_payload)
+    carrier_path.write_bytes(carrier_payload)
+    return bytes(output), {
+        "object": str(carrier_path.resolve()),
+        "order_evidence": "retail NB09 loader-zero contributions and public RVAs",
+        "sections": sections,
+        "definition_count": len(definitions),
+        "definitions": [
+            {"name": row["name"], "value": row["value"],
+             "carrier_section": row["carrier_section"], "member": row["member"]}
+            for row in definitions
+        ],
+        "common_declarations": [
+            {"name": row["name"], "size": row["size"], "retail_rva": row["rva"]}
+            for row in reversed(commons)
+        ],
+        "common_allocation_rule": "LINK 3 reverse COFF symbol-table order",
+    }
+
+
 def build_retail_runtime_data_library(library, destination, retail_exe=RETAIL_EXE):
     """Give pinned CRT writable sections their retail NB09 order."""
     library = Path(library)
@@ -450,6 +678,9 @@ def build_retail_runtime_data_library(library, destination, retail_exe=RETAIL_EX
         output[entry.data_offset:entry.data_end] = member
 
     destination = Path(destination)
+    zero_topology_path = destination.parent / "runtime-zero-topology.obj"
+    output, zero_topology = build_runtime_zero_topology_library(
+        bytes(output), members, runtime_rows, retail, zero_topology_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(output)
     return {
@@ -461,6 +692,7 @@ def build_retail_runtime_data_library(library, destination, retail_exe=RETAIL_EX
         "member_count": len(runtime_rows),
         "initialized_ranked_sections": len(contribution_ranks),
         "renamed_sections": changed_sections,
+        "zero_fill_topology": zero_topology,
     }
 
 
@@ -704,6 +936,569 @@ def compare_pe_section_bytes(retail_path, candidate_path, name, range_limit=32):
         "candidate_sha256": hashlib.sha256(candidate).hexdigest(),
         "first_mismatch_ranges": ranges,
         "range_limit": range_limit,
+    }
+
+
+def _pe_semantic_section(path, name):
+    """Read one PE section plus the linker structures that may own its bytes."""
+    data = Path(path).read_bytes()
+    pe_offset = struct.unpack_from("<I", data, 0x3C)[0]
+    coff = pe_offset + 4
+    section_count = struct.unpack_from("<H", data, coff + 2)[0]
+    optional_size = struct.unpack_from("<H", data, coff + 16)[0]
+    optional = coff + 20
+    image_base = struct.unpack_from("<I", data, optional + 28)[0]
+    section_offset = optional + optional_size
+    sections = []
+    for index in range(section_count):
+        offset = section_offset + index * COFF_SECTION_HEADER_SIZE
+        section_name = data[offset:offset + 8].split(b"\0", 1)[0].decode(
+            "ascii", "replace")
+        virtual_size, rva, raw_size, raw_offset = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append({
+            "name": section_name,
+            "rva": rva,
+            "virtual_size": virtual_size,
+            "raw_size": raw_size,
+            "raw_offset": raw_offset,
+            "characteristics": struct.unpack_from("<I", data, offset + 36)[0],
+        })
+    section = next((row for row in sections if row["name"] == name), None)
+    if section is None:
+        raise ValueError("missing PE section %s in %s" % (name, path))
+
+    def raw_offset(rva):
+        for row in sections:
+            if row["rva"] <= rva < row["rva"] + max(
+                    row["virtual_size"], row["raw_size"]):
+                delta = rva - row["rva"]
+                return row["raw_offset"] + delta if delta < row["raw_size"] else None
+        return None
+
+    def c_string(rva):
+        offset = raw_offset(rva)
+        if offset is None:
+            raise ValueError("string RVA 0x%x has no raw PE bytes in %s" % (rva, path))
+        end = data.index(0, offset)
+        return data[offset:end].decode("ascii", "replace")
+
+    relocation_rvas = []
+    directory = optional + 96 + IMAGE_DIRECTORY_ENTRY_BASERELOC * 8
+    relocation_rva, relocation_size = struct.unpack_from("<II", data, directory)
+    if relocation_rva and relocation_size:
+        cursor = raw_offset(relocation_rva)
+        if cursor is None:
+            raise ValueError("PE base-relocation directory has no raw bytes in %s" % path)
+        end = cursor + relocation_size
+        while cursor + 8 <= end:
+            page_rva, block_size = struct.unpack_from("<II", data, cursor)
+            if block_size < 8 or cursor + block_size > end:
+                raise ValueError("invalid PE base-relocation block in %s" % path)
+            for entry_offset in range(cursor + 8, cursor + block_size, 2):
+                entry = struct.unpack_from("<H", data, entry_offset)[0]
+                if entry >> 12 == IMAGE_REL_BASED_HIGHLOW:
+                    relocation_rvas.append(page_rva + (entry & 0x0FFF))
+            cursor += block_size
+    relative_relocations = sorted(
+        rva - section["rva"] for rva in relocation_rvas
+        if section["rva"] <= rva < section["rva"] + section["raw_size"])
+
+    directories = {}
+    for kind, index in (("export", IMAGE_DIRECTORY_ENTRY_EXPORT),
+                        ("debug", IMAGE_DIRECTORY_ENTRY_DEBUG)):
+        rva, size = struct.unpack_from("<II", data, optional + 96 + index * 8)
+        if (rva and size and section["rva"] <= rva and
+                rva + size <= section["rva"] + section["raw_size"]):
+            directories[kind] = {"offset": rva - section["rva"], "size": size}
+
+    if "debug" in directories:
+        row = directories["debug"]
+        offset = section["raw_offset"] + row["offset"]
+        if row["size"] % 28:
+            raise ValueError("PE debug directory size is not a record multiple in %s" % path)
+        row["records"] = [
+            {
+                "characteristics": struct.unpack_from("<I", data, cursor)[0],
+                "major_version": struct.unpack_from("<H", data, cursor + 8)[0],
+                "minor_version": struct.unpack_from("<H", data, cursor + 10)[0],
+                "type": struct.unpack_from("<I", data, cursor + 12)[0],
+            }
+            for cursor in range(offset, offset + row["size"], 28)
+        ]
+
+    if "export" in directories:
+        row = directories["export"]
+        offset = section["raw_offset"] + row["offset"]
+        (_characteristics, _timestamp, major, minor, module_rva, ordinal_base,
+         function_count, name_count, functions_rva, names_rva,
+         ordinals_rva) = struct.unpack_from("<IIHHIIIIIII", data, offset)
+        names_offset = raw_offset(names_rva)
+        ordinals_offset = raw_offset(ordinals_rva)
+        functions_offset = raw_offset(functions_rva)
+        if None in (names_offset, ordinals_offset, functions_offset):
+            raise ValueError("PE export tables have no raw bytes in %s" % path)
+        exports = []
+        named_ordinals = set()
+        for index in range(name_count):
+            export_name_rva = struct.unpack_from("<I", data, names_offset + index * 4)[0]
+            ordinal_index = struct.unpack_from("<H", data, ordinals_offset + index * 2)[0]
+            named_ordinals.add(ordinal_index)
+            exports.append({
+                "name": c_string(export_name_rva),
+                "ordinal": ordinal_base + ordinal_index,
+                "target_rva": struct.unpack_from(
+                    "<I", data, functions_offset + ordinal_index * 4)[0],
+            })
+        row["surface"] = {
+            "module": c_string(module_rva),
+            "major_version": major,
+            "minor_version": minor,
+            "ordinal_base": ordinal_base,
+            "function_count": function_count,
+            "named_exports": sorted(exports, key=lambda item: (item["ordinal"], item["name"])),
+            "unnamed_ordinals": [
+                ordinal_base + index for index in range(function_count)
+                if index not in named_ordinals and
+                struct.unpack_from("<I", data, functions_offset + index * 4)[0]
+            ],
+        }
+
+    return {
+        "path": str(path),
+        "image_base": image_base,
+        "rva": section["rva"],
+        "virtual_size": section["virtual_size"],
+        "raw_size": section["raw_size"],
+        "characteristics": section["characteristics"],
+        "payload": data[section["raw_offset"]:
+                        section["raw_offset"] + section["raw_size"]],
+        "highlow_relative_offsets": relative_relocations,
+        "directories": directories,
+    }
+
+
+def _unit_object_name(unit):
+    return unit.replace("\\", "/").rsplit("/", 1)[-1].lower() + ".obj"
+
+
+def _candidate_pointer_anchors(map_path, retail_symbols):
+    records = parse_map_symbol_records(map_path)
+    by_name = defaultdict(list)
+    for record in records:
+        by_name[record["name"]].append(record)
+    compgen_names = {
+        "source-compgen-static_init_dispatch": "_$E4",
+        "source-compgen-static_atexit": "_$E3",
+        "source-compgen-static_dtor": "_$E2",
+        "source-compgen-static_ctor": "_$E1",
+    }
+    anchors = []
+    for symbol in retail_symbols:
+        candidate_name = compgen_names.get(symbol["provenance"], symbol["name"])
+        object_name = _unit_object_name(symbol["unit"])
+        matches = [
+            record for record in by_name.get(candidate_name, [])
+            if (record["object"] or "").lower().split(":")[-1] == object_name
+        ]
+        if len(matches) == 1:
+            anchors.append({
+                "name": symbol["name"],
+                "unit": symbol["unit"],
+                "retail_rva": symbol["rva"],
+                "candidate_rva": matches[0]["va"] - IMAGE_BASE,
+            })
+    return anchors, records
+
+
+def _compare_pointer_identities(retail, candidate, map_path, symbols_path=None):
+    retail_symbols = load_retail_symbols(symbols_path)
+    anchors, map_records = _candidate_pointer_anchors(map_path, retail_symbols)
+    candidate_records = sorted(map_records, key=lambda row: row["va"])
+    retail_order = sorted(retail_symbols, key=lambda row: row["rva"])
+    failures = []
+    same_rva = 0
+    same_owner_addend = 0
+    for offset in retail["highlow_relative_offsets"]:
+        retail_target = struct.unpack_from("<I", retail["payload"], offset)[0]
+        candidate_target = struct.unpack_from("<I", candidate["payload"], offset)[0]
+        retail_target -= retail["image_base"]
+        candidate_target -= candidate["image_base"]
+        if retail_target == candidate_target:
+            same_rva += 1
+            continue
+        retail_owner = next((row for row in reversed(retail_order)
+                             if row["rva"] <= retail_target), None)
+        candidate_owner = next((row for row in reversed(candidate_records)
+                                if row["va"] - IMAGE_BASE <= candidate_target), None)
+        owner_unit = retail_owner["unit"] if retail_owner else None
+        owner_object = ((candidate_owner["object"] or "").lower().split(":")[-1]
+                        if candidate_owner else None)
+        matches = [
+            anchor for anchor in anchors
+            if anchor["unit"] == owner_unit
+            and _unit_object_name(anchor["unit"]) == owner_object
+            and retail_target - anchor["retail_rva"] ==
+            candidate_target - anchor["candidate_rva"]
+        ]
+        if matches:
+            same_owner_addend += 1
+            continue
+        failures.append({
+            "section_offset": offset,
+            "retail_target_rva": retail_target,
+            "candidate_target_rva": candidate_target,
+            "retail_owner": retail_owner["name"] if retail_owner else None,
+            "retail_unit": owner_unit,
+            "candidate_owner": candidate_owner["name"] if candidate_owner else None,
+            "candidate_object": candidate_owner["object"] if candidate_owner else None,
+        })
+    return {
+        "exact": not failures,
+        "relocation_count": len(retail["highlow_relative_offsets"]),
+        "same_target_rva": same_rva,
+        "same_owner_relative_addend": same_owner_addend,
+        "failures": failures,
+        "model": (
+            "Exact target RVA, or equal owner-relative addend from an exact decorated-name "
+            "anchor in the same retail unit/candidate MAP object; source compiler-generated "
+            "anchors use their reviewed _$E1.._$E4 spellings."),
+    }
+
+
+def _export_surface_signature(surface):
+    return {
+        **{key: value for key, value in surface.items() if key != "named_exports"},
+        "named_exports": [
+            {"name": row["name"], "ordinal": row["ordinal"]}
+            for row in surface["named_exports"]
+        ],
+    }
+
+
+def _compare_export_targets(retail, candidate, map_path, symbols_path=None):
+    retail_exports = {
+        row["name"]: row for row in retail["directories"]["export"]["surface"][
+            "named_exports"]
+    }
+    candidate_exports = {
+        row["name"]: row for row in candidate["directories"]["export"]["surface"][
+            "named_exports"]
+    }
+    retail_symbols = defaultdict(list)
+    for symbol in load_retail_symbols(symbols_path):
+        retail_symbols[symbol["name"]].append(symbol)
+    candidate_symbols = defaultdict(list)
+    for record in parse_map_symbol_records(map_path):
+        candidate_symbols[record["name"]].append(record)
+    rows = []
+    for export_name, symbol_name in RETAIL_EXPORTS:
+        expected = retail_exports.get(export_name)
+        actual = candidate_exports.get(export_name)
+        retail_matches = retail_symbols.get(symbol_name, [])
+        candidate_matches = candidate_symbols.get(symbol_name, [])
+        exact = bool(
+            expected and actual and len(retail_matches) == 1 and
+            len(candidate_matches) == 1 and
+            expected["target_rva"] == retail_matches[0]["rva"] and
+            actual["target_rva"] == candidate_matches[0]["va"] - IMAGE_BASE)
+        rows.append({
+            "export": export_name,
+            "symbol": symbol_name,
+            "exact": exact,
+            "retail_target_rva": expected["target_rva"] if expected else None,
+            "candidate_target_rva": actual["target_rva"] if actual else None,
+        })
+    return {"exact": all(row["exact"] for row in rows), "exports": rows}
+
+
+def compare_pe_section_semantics(retail_path, candidate_path, name, map_path,
+                                 symbols_path=None):
+    """Compare linked storage while accounting for relocation and linker ownership."""
+    retail = _pe_semantic_section(retail_path, name)
+    candidate = _pe_semantic_section(candidate_path, name)
+    same_shape = all(retail[key] == candidate[key]
+                     for key in ("rva", "raw_size", "virtual_size", "characteristics"))
+    same_relocations = (
+        retail["highlow_relative_offsets"] == candidate["highlow_relative_offsets"])
+    pointer_identities = (
+        _compare_pointer_identities(retail, candidate, map_path, symbols_path)
+        if same_relocations else {
+            "exact": False,
+            "relocation_count": len(retail["highlow_relative_offsets"]),
+            "same_target_rva": 0,
+            "same_owner_relative_addend": 0,
+            "failures": [{"reason": "HIGHLOW relocation topology differs"}],
+        })
+    directory_kinds = sorted(set(retail["directories"]) | set(candidate["directories"]))
+    directory_topology = {}
+    export_targets = None
+    for kind in directory_kinds:
+        expected = retail["directories"].get(kind)
+        actual = candidate["directories"].get(kind)
+        signature_key = "records" if kind == "debug" else "surface"
+        expected_signature = expected.get(signature_key) if expected else None
+        actual_signature = actual.get(signature_key) if actual else None
+        if kind == "export" and expected_signature and actual_signature:
+            expected_signature = _export_surface_signature(expected_signature)
+            actual_signature = _export_surface_signature(actual_signature)
+            export_targets = _compare_export_targets(
+                retail, candidate, map_path, symbols_path)
+        directory_topology[kind] = {
+            "retail": expected,
+            "candidate": actual,
+            "exact": bool(
+                expected and actual and
+                (expected["offset"], expected["size"], expected_signature) ==
+                (actual["offset"], actual["size"], actual_signature) and
+                (kind != "export" or export_targets["exact"])),
+        }
+        if kind == "export":
+            directory_topology[kind]["target_identities"] = export_targets
+    linker_directories_match = all(row["exact"] for row in directory_topology.values())
+
+    retail_normalized = bytearray(retail["payload"])
+    candidate_normalized = bytearray(candidate["payload"])
+    masks = defaultdict(set)
+    if same_relocations:
+        for offset in retail["highlow_relative_offsets"]:
+            masks["highlow-pointer"].update(range(offset, offset + 4))
+    for kind, row in directory_topology.items():
+        if not row["exact"]:
+            continue
+        offset = row["retail"]["offset"]
+        masks["linker-%s-directory" % kind].update(
+            range(offset, offset + row["retail"]["size"]))
+    for offsets in masks.values():
+        for offset in offsets:
+            retail_normalized[offset] = 0
+            candidate_normalized[offset] = 0
+    common_size = min(len(retail_normalized), len(candidate_normalized))
+    unaccounted = [
+        offset for offset in range(common_size)
+        if retail_normalized[offset] != candidate_normalized[offset]
+    ]
+    if len(retail_normalized) != len(candidate_normalized):
+        unaccounted.extend(range(common_size, max(
+            len(retail_normalized), len(candidate_normalized))))
+    semantic_mismatch = len(unaccounted)
+    if not pointer_identities["exact"]:
+        semantic_mismatch += 4 * len(pointer_identities["failures"])
+    if not same_shape or not same_relocations or not linker_directories_match:
+        semantic_mismatch = max(semantic_mismatch, 1)
+    total = max(len(retail_normalized), len(candidate_normalized))
+    exact = bool(
+        same_shape and same_relocations and pointer_identities["exact"] and
+        linker_directories_match and not unaccounted)
+    raw_mismatches = {
+        offset for offset in range(common_size)
+        if retail["payload"][offset] != candidate["payload"][offset]
+    }
+    accounted = set().union(*masks.values()) if masks else set()
+    return {
+        "exact": exact,
+        "match_percent": round(
+            max(total - semantic_mismatch, 0) * 100.0 / total, 6) if total else 100.0,
+        "section_shape_matches": same_shape,
+        "highlow_topology_matches": same_relocations,
+        "highlow_relative_offsets": retail["highlow_relative_offsets"],
+        "pointer_identities": pointer_identities,
+        "linker_directories": directory_topology,
+        "normalized_payload_matches": not unaccounted,
+        "normalized_sha256": hashlib.sha256(retail_normalized).hexdigest(),
+        "raw_mismatched_bytes": len(raw_mismatches),
+        "accounted_raw_mismatched_bytes": len(raw_mismatches & accounted),
+        "unaccounted_mismatch_offsets": unaccounted[:32],
+        "excluded_byte_classes": {
+            kind: len(offsets) for kind, offsets in sorted(masks.items())
+        },
+        "raw_mismatched_bytes_by_class": {
+            kind: len(raw_mismatches & offsets)
+            for kind, offsets in sorted(masks.items())
+        },
+        "note": (
+            "Raw bytes remain separately reported. HIGHLOW operands are accepted only when "
+            "their sites and semantic owner-relative targets match. Linker debug/export "
+            "records are accepted only when their placement and semantic surface match."),
+    }
+
+
+def audit_reviewed_loader_zero_layouts(objects, units, topology, map_path,
+                                       candidate_path):
+    """Prove every reviewed game-owned BSS section at its final linked RVA."""
+    map_records = parse_map_symbol_records(map_path)
+    by_object_name = defaultdict(list)
+    for record in map_records:
+        by_object_name[((record["object"] or "").lower(), record["name"])].append(record)
+    allocations = []
+    failures = []
+    section_count = 0
+    candidate_text = _pe_semantic_section(candidate_path, ".text")
+    for object_path, unit in zip(objects, units):
+        layouts = topology.layouts_for(unit)
+        bss_layouts = [layout for layout in layouts if layout.storage == "bss"]
+        if not bss_layouts:
+            continue
+        section_count += len(bss_layouts)
+        destination_ordinals = {}
+        by_name = defaultdict(list)
+        for layout in layouts:
+            effective_name = (
+                ".data" if layout.storage == "bss" and layout.raw_backed
+                else layout.name)
+            by_name[effective_name].append(layout)
+        for rows in by_name.values():
+            destinations = sorted(row.ordinal for row in rows)
+            for destination, row in zip(
+                    destinations, sorted(rows, key=lambda item: (
+                        item.retail_rva, item.ordinal))):
+                destination_ordinals[row.ordinal] = destination
+        coff = CoffObject(Path(object_path).read_bytes())
+        object_name = Path(object_path).name.lower()
+        linked_section_bases = defaultdict(set)
+        for symbol in coff.symbols.values():
+            if symbol.section <= 0:
+                continue
+            for record in by_object_name.get((object_name, symbol.name), []):
+                linked_section_bases[symbol.section].add(
+                    record["va"] - IMAGE_BASE - symbol.value)
+        for layout in bss_layouts:
+            section_ordinal = destination_ordinals.get(layout.ordinal, layout.ordinal)
+            section = coff.sections[section_ordinal - 1]
+            storage_shape_matches = (
+                (layout.raw_backed and section.name == ".data" and
+                 section.raw_offset != 0 and
+                 section.characteristics & IMAGE_SCN_CNT_INITIALIZED_DATA and
+                 not section.characteristics & IMAGE_SCN_CNT_UNINITIALIZED_DATA) or
+                (not layout.raw_backed and section.name == ".bss" and
+                 section.raw_offset == 0 and
+                 section.characteristics & IMAGE_SCN_CNT_UNINITIALIZED_DATA and
+                 not section.characteristics & IMAGE_SCN_CNT_INITIALIZED_DATA))
+            section_shape_matches = (
+                storage_shape_matches and section.raw_size == layout.size and
+                section.characteristics & IMAGE_SCN_ALIGN_MASK ==
+                layout.alignment.bit_length() << 20)
+            section_bases = set(linked_section_bases.get(section_ordinal, ()))
+            direct_anchor_count = len(section_bases)
+            relocation_anchor_count = 0
+            for relocation in coff.relocations:
+                target = coff.symbols[relocation.symbol_index]
+                if (target.section != section_ordinal or
+                        relocation.typ != IMAGE_REL_I386_DIR32):
+                    continue
+                source_bases = linked_section_bases.get(relocation.section, ())
+                if len(source_bases) != 1:
+                    continue
+                source_section = coff.sections[relocation.section - 1]
+                if source_section.name != ".text" or source_section.raw_offset == 0:
+                    continue
+                site_rva = next(iter(source_bases)) + relocation.site
+                text_offset = site_rva - candidate_text["rva"]
+                if not 0 <= text_offset <= len(candidate_text["payload"]) - 4:
+                    continue
+                addend = struct.unpack_from(
+                    "<i", coff.data, source_section.raw_offset + relocation.site)[0]
+                linked_value = struct.unpack_from(
+                    "<I", candidate_text["payload"], text_offset)[0]
+                section_bases.add(
+                    linked_value - candidate_text["image_base"] - addend - target.value)
+                relocation_anchor_count += 1
+            section_exact = bool(
+                section_shape_matches and section_bases == {layout.retail_rva})
+            if not section_exact:
+                failures.append({
+                    "unit": unit,
+                    "section_ordinal": section_ordinal,
+                    "retail_rva": layout.retail_rva,
+                    "candidate_section_bases": sorted(section_bases),
+                    "direct_anchor_count": direct_anchor_count,
+                    "relocation_anchor_count": relocation_anchor_count,
+                    "reason": ("final COFF BSS section shape or linked base differs"
+                               if section_bases else
+                               "reviewed private BSS section has no final-link anchor"),
+                })
+            for move in layout.allocations:
+                raw_symbols = [
+                    symbol.name for symbol in coff.symbols.values()
+                    if symbol.section == section_ordinal
+                    and symbol.value == move.new_offset
+                    and not (symbol.name == section.name and
+                             symbol.storage_class == 3 and symbol.aux_count)
+                ]
+                row = {
+                    "name": move.name,
+                    "unit": unit,
+                    "retail_rva": layout.retail_rva + move.new_offset,
+                    "raw_symbols": sorted(set(raw_symbols)),
+                    "exact": section_exact,
+                }
+                allocations.append(row)
+    return {
+        "exact": not failures,
+        "section_count": section_count,
+        "allocation_count": len(allocations),
+        "exact_allocations": sum(row["exact"] for row in allocations),
+        "failures": failures,
+    }
+
+
+def compare_loader_zero_semantics(static_storage, runtime_zero, map_path,
+                                  reviewed_layouts):
+    """Audit the virtual `.bss` contribution embedded in the PE `.data` section."""
+    rows = [
+        row for row in static_storage["public_symbols"]["symbols"]
+        if row["retail_storage"]["class"].startswith("data-loader-zero")
+    ]
+    public_failures = [row for row in rows if row["status"] != "exact"]
+    by_name = defaultdict(list)
+    for record in parse_map_symbol_records(map_path):
+        by_name[record["name"]].append(record)
+    data_rva = static_storage["writable"]["retail"]["rva"]
+    carrier_failures = []
+    sections = runtime_zero["sections"]
+    for definition in runtime_zero.get("definitions", []):
+        section = sections[definition["carrier_section"] - 1]
+        expected_rva = data_rva + section["retail_offset"] + definition["value"]
+        matches = [record for record in by_name.get(definition["name"], [])
+                   if (record["object"] or "").lower() == "runtime-zero-topology.obj"]
+        if len(matches) != 1 or matches[0]["va"] - IMAGE_BASE != expected_rva:
+            carrier_failures.append({
+                "name": definition["name"],
+                "expected_rva": expected_rva,
+                "candidate_rvas": [record["va"] - IMAGE_BASE for record in matches],
+            })
+    for common in runtime_zero["common_declarations"]:
+        matches = [record for record in by_name.get(common["name"], [])
+                   if (record["object"] or "").lower() == "<common>"]
+        if len(matches) != 1 or matches[0]["va"] - IMAGE_BASE != common["retail_rva"]:
+            carrier_failures.append({
+                "name": common["name"],
+                "expected_rva": common["retail_rva"],
+                "candidate_rvas": [record["va"] - IMAGE_BASE for record in matches],
+            })
+    tail_matches = (
+        static_storage["retail_writable_loader_zero_tail_bytes"] ==
+        static_storage["candidate_writable_loader_zero_tail_bytes"])
+    exact = (tail_matches and reviewed_layouts["exact"] and
+             not public_failures and not carrier_failures)
+    return {
+        "exact": exact,
+        "match_percent": 100.0 if exact else 0.0,
+        "retail_tail_bytes": static_storage["retail_writable_loader_zero_tail_bytes"],
+        "candidate_tail_bytes": static_storage[
+            "candidate_writable_loader_zero_tail_bytes"],
+        "public_loader_zero_symbols": len(rows),
+        "public_symbols_exact": len(rows) - len(public_failures),
+        "runtime_bss_sections": len(sections),
+        "runtime_bss_definitions": len(runtime_zero.get("definitions", [])),
+        "runtime_common_declarations": len(runtime_zero["common_declarations"]),
+        "reviewed_game_bss": reviewed_layouts,
+        "public_failures": public_failures[:32],
+        "carrier_failures": carrier_failures,
+        "note": (
+            "The retail PE has no standalone .bss section. This audits the loader-zero tail "
+            "of .data, every retained public loader-zero RVA, and each reviewed CRT BSS/COMMON "
+            "carrier definition."),
     }
 
 
@@ -1048,6 +1843,15 @@ def read_coff_section(path, section_name):
 
 
 def load_retail_data_symbols(path=None):
+    return [
+        {key: row[key] for key in ("name", "unit", "rva", "size", "provenance")}
+        for row in load_retail_symbols(path)
+        if row["kind"] == "data" and row["provenance"] == "cv-public-data"
+    ]
+
+
+def load_retail_symbols(path=None):
+    """Load the complete reviewed retail symbol topology used by pointer audits."""
     path = Path(path or REPO / "build/gen/symbol_names.csv")
     symbols = []
     with path.open(newline="") as f:
@@ -1059,13 +1863,12 @@ def load_retail_data_symbols(path=None):
                 # originate in the retained public stream.
                 provenance = ("pe-reloc-constant" if row["unit"] == "_const"
                               else "cv-public-data")
-            if row["kind"] != "data" or provenance != "cv-public-data":
-                continue
             symbols.append({
                 "name": row["name"],
                 "unit": row["unit"],
                 "rva": int(row["rva"], 16),
                 "size": int(row["size"], 16),
+                "kind": row["kind"],
                 "provenance": provenance,
             })
     symbols.sort(key=lambda row: (row["rva"], row["name"]))
@@ -1750,6 +2553,8 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     link_objects, stripped_export_objects, rebuilt_writable_sections = final_link_objects(
         response_objects, [row["unit"] for row in order],
         output.parent / "objects-final", data_topology)
+    runtime_zero_object = Path(runtime_data_order["zero_fill_topology"]["object"])
+    link_objects.append(runtime_zero_object)
     definition_path = write_module_definition(output.parent / "HEROES2W.def")
     command = build_link_command(
         link_exe,
@@ -1826,6 +2631,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
             "vendor_import_libraries": [str(path) for path in imports_libraries],
             "system_libraries_after_vendor": list(SYSTEM_LIBS_AFTER_VENDOR),
             "objects": [str(path) for path in response_objects],
+            "runtime_zero_topology_object": str(runtime_zero_object),
             "resource": str(resource_path),
         },
         "library_search": {"mechanism": "LIB environment", "path": library_path},
@@ -1854,11 +2660,30 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
         "units": [],
     }
     required_storage_ok = True
+    static_semantics_ok = True
     if report["static_storage"]:
         report["static_storage"]["section_bytes"] = {
             name: compare_pe_section_bytes(RETAIL_EXE, output, name)
             for name in (".rdata", ".data")
         }
+        report["static_storage"]["section_semantics"] = {
+            name: compare_pe_section_semantics(
+                RETAIL_EXE, output, name, map_path)
+            for name in (".rdata", ".data")
+        }
+        reviewed_loader_zero = audit_reviewed_loader_zero_layouts(
+            link_objects[:len(order)], [row["unit"] for row in order],
+            data_topology, map_path, output)
+        report["static_storage"]["section_semantics"][".bss"] = (
+            compare_loader_zero_semantics(
+                report["static_storage"],
+                runtime_data_order["zero_fill_topology"], map_path,
+                reviewed_loader_zero))
+        static_semantics_ok = all(
+            row["exact"]
+            for row in report["static_storage"]["section_semantics"].values())
+        if not static_semantics_ok and report["status"] == "linked":
+            report["status"] = "static-section-semantic-mismatch"
         required = load_required_initialized_storage(required_initialized_path)
         source_sizes = {
             (row.unit, row.rva): row.size
@@ -1937,6 +2762,11 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
                    byte_audit["matched_bytes"],
                    max(byte_audit["retail_size"], byte_audit["candidate_size"]),
                    byte_audit["match_percent"], byte_audit["mismatched_bytes"]))
+        for name in (".rdata", ".data", ".bss"):
+            semantic = storage["section_semantics"][name]
+            print("link audit: %s semantic topology %s (%.6f%%)" %
+                  (name, "EXACT" if semantic["exact"] else "DIFFERS",
+                   semantic["match_percent"]))
         print("link audit: candidate map initialized/zero-fill contributions %d/%d bytes" %
               (storage["candidate_map_initialized_contribution_bytes"],
                storage["candidate_map_zero_fill_common_contribution_bytes"]))
@@ -2011,7 +2841,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     print("link audit: %s" % missing_data_path)
     return (0 if run.returncode == 0 and output.exists() and vendor_import_abi_match and
             vendor_import_order_match and advapi_import_abi_match and resource_match and
-            required_storage_ok and runtime_literals_ok else
+            required_storage_ok and runtime_literals_ok and static_semantics_ok else
             (run.returncode or 1))
 
 

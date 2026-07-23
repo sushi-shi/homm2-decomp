@@ -26,6 +26,8 @@ class SectionSpec:
     data: bytes
     flags: int
     relocations: tuple = ()
+    associative_ordinal: int = 0
+    comdat_selection: int = 0
 
 
 def make_coff(sections, symbols):
@@ -69,9 +71,13 @@ def make_coff(sections, symbols):
 
     records = []
     for index, section in enumerate(sections, 1):
-        aux = struct.pack("<IHHIhBBH", len(section.data), 0, 0, 0, 0, 0, 0, 0)
+        aux = struct.pack(
+            "<IHHIhBBH", len(section.data), 0, 0, 0,
+            section.associative_ordinal, section.comdat_selection, 0, 0)
         records.append((section.name, 0, index, 0, 3, (aux,)))
-    records.extend((*symbol, ()) for symbol in symbols)
+    records.extend(
+        (*symbol, ()) if len(symbol) == 5 else symbol
+        for symbol in symbols)
     symbol_table = bytearray()
     for name, value, section, symbol_type, storage, auxiliary in records:
         symbol_table.extend(encoded_name(name))
@@ -87,6 +93,75 @@ def make_coff(sections, symbols):
 
 
 class RetopologizeDataTest(unittest.TestCase):
+    def test_raw_backed_bss_joins_data_section_retail_order(self):
+        payload = make_coff([
+            SectionSpec(".data", b"late", DATA),
+            SectionSpec(".bss", bytes(4), BSS),
+        ], [
+            ("late_symbol", 0, 1, 0, 3),
+            ("early_zero", 0, 2, 0, 3),
+        ])
+        layouts = (
+            SectionLayout(
+                1, ".data", "data", 0x3008, 4, 1, True,
+                (AllocationMove("late_symbol", 0, 0, 4),)),
+            SectionLayout(
+                2, ".bss", "bss", 0x3000, 4, 1, True,
+                (AllocationMove("early_zero", 0, 0, 4),)),
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "source.obj"
+            output = Path(directory) / "output.obj"
+            source.write_bytes(payload)
+            rewrite_coff_data_topology(source, output, layouts)
+            result = bytearray(output.read_bytes())
+
+        sections, symbols, _ = _coff(result)
+        self.assertEqual([section.name for section in sections], [".data", ".data"])
+        self.assertEqual(
+            [bytes(result[row.raw:row.raw + row.size]) for row in sections],
+            [bytes(4), b"late"])
+        self.assertEqual((symbols[4].section, symbols[5].section), (2, 1))
+
+    def test_orders_independent_reviewed_sections_by_retail_rva(self):
+        payload = make_coff([
+            SectionSpec(".data", b"late", DATA, associative_ordinal=2,
+                        comdat_selection=5),
+            SectionSpec(".data", b"early", DATA),
+        ], [
+            ("late_symbol", 0, 1, 0, 3),
+            ("early_symbol", 0, 2, 0, 3),
+            ("non_section_aux", 0, 1, 0x20, 2,
+             (bytes(12) + struct.pack("<hBBH", 0x1234, 5, 0, 0),)),
+        ])
+        layouts = (
+            SectionLayout(
+                1, ".data", "data", 0x2008, 4, 1, True,
+                (AllocationMove("late_symbol", 0, 0, 4),)),
+            SectionLayout(
+                2, ".data", "data", 0x2000, 5, 1, True,
+                (AllocationMove("early_symbol", 0, 0, 5),)),
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "source.obj"
+            output = Path(directory) / "output.obj"
+            source.write_bytes(payload)
+            rewrite_coff_data_topology(source, output, layouts)
+            result = bytearray(output.read_bytes())
+
+        sections, symbols, _ = _coff(result)
+        self.assertEqual(
+            [bytes(result[row.raw:row.raw + row.size]) for row in sections],
+            [b"early", b"late"])
+        self.assertEqual((symbols[4].section, symbols[5].section), (2, 1))
+        self.assertEqual(
+            struct.unpack_from("<h", result, symbols[0].offset + 18 + 12)[0], 1)
+        self.assertEqual(
+            struct.unpack_from("<h", result, symbols[6].offset + 18 + 12)[0],
+            0x1234)
+
     def test_reorders_bytes_symbols_and_relocation_coordinates(self):
         text = bytearray(8)
         struct.pack_into("<i", text, 0, -4)
