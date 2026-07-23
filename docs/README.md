@@ -32,6 +32,11 @@ one-run progress summaries belong under `build/`, not here.
 - `config/match_baseline.tsv` is the observation-only score ledger. It preserves a
   per-function maximum for the current normalized source hash, but has no ratchet or
   acceptance role.
+- `scripts/historical_exact_losses.py` compares every committed score-ledger epoch with the
+  current live objdiff report. Its TSV separates unchanged effective-source hashes,
+  body-to-dependency hash upgrades, changed hashes, and pre-hash evidence, and marks hash
+  transitions whose immediately preceding maximum was exact. Write campaign output to `/tmp`
+  rather than committing a queue snapshot.
 - `constants-audit.md` defines the whole-tree numeric-literal inventory and per-file review
   contract.
 - `iconf2bc-experiment-matrix.md` and `matching-matrices/` retain negative experiment evidence.

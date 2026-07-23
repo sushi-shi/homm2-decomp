@@ -13,3 +13,11 @@ exact-retail-load-order	63a4162855805a66	8	14	100.000000	587	39b07b66a5cffe99	a9
 # Reversing the symmetric ternary operands is byte-neutral under the canonical TU state, so the clearer established source spelling remains. This is a declaration-sensitive compiler evaluation-order choice rather than missing source structure.
 # All 14 exact trials pass the sibling score, exact-sibling raw/relocation, predecessor, size, and relocation gates. Trial 8 is the retained reproducible representative. The generated typedef train is disposable and does not remain in RECRUIT.cpp.
 # The exact state updates only the normalized-source-hash-scoped retained maximum from 99.9879% to 100.0000%. Live canonical score remains 99.987880%.
+#
+# Current-hash replay after compiler-generated-data modelling
+# checkpoint	df45876f
+# normalized_source_hash	e6ec0a1c1561
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/RECRUIT.cpp --rva 0x8b49c --trials 128 --seed 0x524f504e --insertion target --families forest --max-declarations 64 --record-max
+# result	baseline plus 128 forest trials again produce only two states: canonical ffc4f272a0126be2 occurs 112 times including baseline, while exact 2e35f4983e886c4e occurs 17 times; trial 4 is the exact representative
+# Both states retain the retail 587-byte CodeView boundary and complete normalized 26-site relocation stream (9fedf7407ddbf72a). The only differences remain the two local displacement bytes at +0x157 and +0x15a: canonical loads resourceMaximum before goldMaximum, while exact and retail reverse those equivalent loads.
+# This proves that the compiler-generated-data hash transition did not introduce a missing semantic structure in Open. The current-hash maximum is exact without retaining probe declarations.
