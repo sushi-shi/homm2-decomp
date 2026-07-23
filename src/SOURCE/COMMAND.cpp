@@ -2720,7 +2720,7 @@ void combatManager::ResetCyclingCreatures(void) {
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
+            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
             if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0
                 && currentArmy_p->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
@@ -2730,26 +2730,26 @@ void combatManager::ResetCyclingCreatures(void) {
             }
         }
     }
-    if (cyclingCount == 0) {
-    } else {
-        gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-            for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-                currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
-                if (HAS(currentArmy_p->m_monster.flags.abilityFlags,
-                        MONSTER_ABILITY_FLAG_AI_EXCLUDED)
-                    == 0) {
-                    currentArmy_p = gpCombatManager->m_armies[IDX(side)] + index;
-                    currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
-                    currentArmy_p->m_animationFrame = 0;
-                    currentArmy_p->m_lastAnimationTime = KBTickCount();
-                }
+    if (cyclingCount == 0)
+        return;
+
+    gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
+            if (HAS(currentArmy_p->m_monster.flags.abilityFlags,
+                    MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+                == 0) {
+                currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
+                currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
+                currentArmy_p->m_animationFrame = 0;
+                currentArmy_p->m_lastAnimationTime = KBTickCount();
             }
         }
-        m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
-        m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
-        gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     }
+    m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
+    m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
+    gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 }
 
 VA(0x00430dc8, 0xf9)

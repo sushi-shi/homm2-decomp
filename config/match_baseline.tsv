@@ -656,7 +656,7 @@ SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	b122dcacbed9
 SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.2062	048284a2459a
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	94.4106	0cbae1ae2977
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	6898d4037c16
-SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	99.9673	ce42819b8c04
+SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	100.0000	bcc2bb1d844a
 SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	100.0000	14c539520e75
 SOURCE/COMMAND	?ResetRound@combatManager@@QAEXXZ	100.0000	6accf29bee34
 SOURCE/COMMAND	?RightClick@combatManager@@QAEHH@Z	97.1868	002d586c1d3d
