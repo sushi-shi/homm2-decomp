@@ -22,8 +22,8 @@ In short (full rules in the two agent docs):
    On startup, reuse any that exist (`git -C … reset --hard master`; their `build/`
    survives — no cold re-provision); only create + provision missing slots
    (`orchestrator.md` § Pool setup). A restart does NOT regenerate the pool.
-2. **Queue:** regenerate objdiff, then select **every live non-100% function** in descending
-   fuzzy-percentage order (closest to exact first). Source comments never remove a function from
+2. **Queue:** regenerate objdiff, then select **every live non-100% function** in ascending
+   fuzzy-percentage order (least matched first). Source comments never remove a function from
    this residual-audit queue. Note src `VA()` carries
    **absolute VAs (RVA + 0x400000)** while the queue lists RVAs — normalise before any
    hand cross-check.
@@ -35,7 +35,8 @@ In short (full rules in the two agent docs):
    relocation, and push to exactness where retail evidence permits; otherwise keep the residual
    live and report its byte/relocation evidence outside source comments. Report per-function results
    plus a one-line summary and full `git diff`. **Lane discipline:** each lane
-   owns one TU and works it in 20+ batches until done, then takes the highest remaining TU-safe batch.
+   owns one TU and works it in 20+ batches until done, then takes the least-matched remaining
+   TU-safe batch.
    **Any new `docs/patterns/*.md` MUST carry real asm (retail vs ours, side by side) +
    what made it match** — never prose alone (`docs/patterns/INDEX.md` header).
 4. **Integrate SERIALLY:** one at a time — guard master clean → apply only that matcher's
