@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import difflib
 import fcntl
 import hashlib
 import json
@@ -830,15 +831,65 @@ def finalize_compiled_artifacts(
     scratch: tempfile.TemporaryDirectory,
     scratch_path: Path,
     final_path: Path,
-    preserve_exact_closure: bool,
+    preserve_artifacts: bool,
 ) -> Path | None:
-    """Delete a compiled run by default, or atomically retain an audited exact closure."""
-    if preserve_exact_closure:
+    """Delete a compiled run by default, or atomically retain its reviewed artifacts."""
+    if preserve_artifacts:
         scratch_path.rename(final_path)
         scratch.cleanup()
         return final_path
     scratch.cleanup()
     return None
+
+
+def preserve_best_objects(
+    output: Path,
+    raw_candidate: Path,
+    normalized_candidate: Path,
+    normalized_retail: Path,
+) -> None:
+    """Replace the retained best comparison triple while all inputs still exist."""
+    shutil.copy2(raw_candidate, output / "best.raw.obj")
+    shutil.copy2(normalized_candidate, output / "best.candidate.obj")
+    shutil.copy2(normalized_retail, output / "best.retail.obj")
+
+
+def write_best_disassembly(output: Path, symbol: str) -> dict[str, str]:
+    """Disassemble the retained best candidate and its paired retail target."""
+    paths = {
+        "candidate_object": "best.candidate.obj",
+        "retail_object": "best.retail.obj",
+        "candidate_assembly": "best.candidate.asm",
+        "retail_assembly": "best.retail.asm",
+        "assembly_diff": "best.diff",
+    }
+    assemblies = {}
+    for side in ("candidate", "retail"):
+        result = subprocess.run(
+            [
+                "llvm-objdump",
+                "-dr",
+                f"--disassemble-symbols={symbol}",
+                str(output / paths[f"{side}_object"]),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        assembly = result.stdout + result.stderr
+        if result.returncode:
+            raise RuntimeError(
+                f"llvm-objdump failed for retained {side} object ({result.returncode})"
+            )
+        assemblies[side] = assembly
+        (output / paths[f"{side}_assembly"]).write_text(assembly)
+    diff = difflib.unified_diff(
+        assemblies["retail"].splitlines(keepends=True),
+        assemblies["candidate"].splitlines(keepends=True),
+        fromfile="retail",
+        tofile="candidate",
+    )
+    (output / paths["assembly_diff"]).write_text("".join(diff))
+    return paths
 
 
 def _terminate_process_group(process: subprocess.Popen) -> tuple[str, str]:
@@ -1276,11 +1327,11 @@ def record_target_max(
     current_hash: str | None,
     new_score: float | None,
 ) -> dict:
-    """Validate one retained-max row and move only its max field to exact 100.
+    """Validate one retained-max row and raise only its max field.
 
     All non-target bytes and all other target-row fields are preserved exactly.  Validation
-    happens even when *new_score* is None or sub-100, so ``--record-max`` never silently
-    accepts a missing, duplicate, or stale-hash ledger.
+    happens even when *new_score* is absent or non-improving, so ``--record-max`` never
+    silently accepts a missing, duplicate, or stale-hash ledger.
     """
     original = baseline_path.read_bytes()
     lines = original.splitlines(keepends=True)
@@ -1322,26 +1373,23 @@ def record_target_max(
         "new_max": old_max,
     }
     if new_score is None:
-        result["reason"] = "no_exact_closure"
+        result["reason"] = "no_observed_score"
         return result
     if not math.isfinite(new_score) or not 0.0 <= new_score <= 100.0:
-        raise BaselineUpdateError(f"invalid exact-closure score for {unit}::{symbol}: {new_score}")
+        raise BaselineUpdateError(f"invalid observed score for {unit}::{symbol}: {new_score}")
     result["observed_score"] = new_score
-    if new_score != 100.0:
-        result["reason"] = "sub_100_is_disposable"
+    written_max = float(f"{new_score:.4f}")
+    if written_max <= old_max:
+        result["reason"] = "not_higher"
         return result
-    if old_max == 100.0:
-        result["reason"] = "already_exact"
-        return result
-    formatted_score = "100.0000"
-    written_max = 100.0
+    formatted_score = f"{written_max:.4f}"
     ending = line[len(line.rstrip(b"\r\n")) :]
     replacement_fields = list(fields)
     replacement_fields[2] = formatted_score.encode("ascii")
     lines[index] = b"\t".join(replacement_fields) + ending
     updated = b"".join(lines)
     if updated == original:
-        result["reason"] = "already_exact"
+        result["reason"] = "not_higher"
         return result
 
     mode = baseline_path.stat().st_mode & 0o777
@@ -1357,7 +1405,7 @@ def record_target_max(
     finally:
         if temporary_name is not None and temporary_name.exists():
             temporary_name.unlink()
-    result.update({"updated": True, "new_max": written_max, "reason": "exact_closure"})
+    result.update({"updated": True, "new_max": written_max, "reason": "higher_observation"})
     return result
 
 
@@ -1430,7 +1478,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true", help="resolve target and emit snippets without compiling")
     parser.add_argument(
         "--record-max", action="store_true",
-        help="after restoration, set only this target's max to 100 for an audited exact closure",
+        help="after restoration, raise only this target's max to its best observed score",
+    )
+    parser.add_argument(
+        "--retain-best", action="store_true",
+        help="retain the best paired objects, disassemblies, diff, and reproducible probe manifest",
     )
     args = parser.parse_args(argv)
     if args.trials < 1:
@@ -1534,8 +1586,9 @@ def main(argv: list[str] | None = None) -> int:
             "source_restored_after_every_trial": True,
             "generated_noise_retained_in_source": False,
             "default_repository_mutation": False,
-            "sub_100_results_are_disposable": True,
-            "record_max_requires_unrounded_exact_100_size_and_ordered_relocations": True,
+            "sub_100_source_is_disposable": True,
+            "record_max_accepts_higher_target_observations": True,
+            "exact_closure_requires_unrounded_100_size_and_ordered_relocations": True,
             "only_target_function_is_evaluated": True,
             "sibling_scores_or_metrics_checked": False,
             "compiler_process_group_terminated_on_timeout": True,
@@ -1627,6 +1680,13 @@ def main(argv: list[str] | None = None) -> int:
         f"relocs {baseline_target['relocs']}/{retail_target.get('relocs', '?')}",
         flush=True,
     )
+    if args.retain_best:
+        preserve_best_objects(
+            output,
+            baseline_obj,
+            baseline_normalized,
+            baseline_target_normalized,
+        )
 
     observed_states = {}
 
@@ -1677,7 +1737,17 @@ def main(argv: list[str] | None = None) -> int:
 
     observe_state("baseline", baseline_score, baseline_target)
 
+    best_score = baseline_score
     best_observed = None
+    best_origin = {
+        "origin": "baseline",
+        "trial": None,
+        "score": baseline_score,
+        "score_delta": 0.0,
+        "candidate": baseline_target,
+        "body": "",
+        "permutation": (),
+    }
     exact_closure = None
     rows = []
     interrupted = False
@@ -1799,6 +1869,26 @@ def main(argv: list[str] | None = None) -> int:
                     if trial["observed"] and score > baseline_score + 1e-6:
                         if best_observed is None or score > best_observed["score"] + 1e-6:
                             best_observed = trial
+                    if trial["observed"] and score > best_score + 1e-6:
+                        best_score = score
+                        best_origin = {
+                            "origin": "trial",
+                            "trial": trial["trial"],
+                            "family": trial["family"],
+                            "tag": trial["tag"],
+                            "score": score,
+                            "score_delta": trial["score_delta"],
+                            "candidate": target_metrics,
+                            "body": trial["body"],
+                            "permutation": trial["permutation"],
+                        }
+                        if args.retain_best:
+                            preserve_best_objects(
+                                output,
+                                trial_obj,
+                                trial_normalized,
+                                trial_target_normalized,
+                            )
                 trial_obj.unlink(missing_ok=True)
                 Path(str(trial_obj) + ".d").unlink(missing_ok=True)
                 for generated in trial_generated:
@@ -1912,6 +2002,14 @@ def main(argv: list[str] | None = None) -> int:
             "source_hash_unchanged": True,
             "generated_noise_retained": False,
         }
+    if args.retain_best:
+        best_paths = write_best_disassembly(output, target.symbol)
+        manifest["best_retained"] = {
+            **best_origin,
+            "source_hash_unchanged": True,
+            "generated_noise_retained_in_source": False,
+            "artifacts": best_paths,
+        }
     if exact_closure is not None:
         manifest["exact_closure"] = {
             "trial": exact_closure["trial"],
@@ -1948,7 +2046,7 @@ def main(argv: list[str] | None = None) -> int:
                 target.unit,
                 target.symbol,
                 restored_target_hash,
-                exact_closure["score"] if exact_closure is not None else None,
+                best_score,
             )
         except (OSError, BaselineUpdateError) as exc:
             record_error = True
@@ -1971,18 +2069,29 @@ def main(argv: list[str] | None = None) -> int:
         return 130
 
     if exact_closure is None:
-        finalize_compiled_artifacts(scratch, output, final_output, False)
+        retained_output = finalize_compiled_artifacts(
+            scratch, output, final_output, args.retain_best
+        )
         if best_observed is None:
-            print("no audited exact closure; source restored; disposable artifacts removed")
+            print("no audited exact closure; source restored; baseline remains the best state")
         else:
             print(
-                f"best observed (disposable) {baseline_score:.6f}% -> "
+                f"best observed {baseline_score:.6f}% -> "
                 f"{best_observed['score']:.6f}% (trial {best_observed['trial']}); "
-                "no audited exact closure; source restored; artifacts removed",
+                "no audited exact closure; source restored",
             )
+        if retained_output is not None:
+            print(f"best objects and assembly retained: {retained_output}")
         if args.record_max:
             state = manifest["record_max"]
-            print(f"no exact closure retained; baseline unchanged: {state['reason']}")
+            if state["updated"]:
+                print(
+                    f"best observation retained {state['old_max']:.4f}% -> "
+                    f"{state['new_max']:.4f}% for unchanged source hash "
+                    f"{state['source_hash']}"
+                )
+            else:
+                print(f"retained maximum unchanged: {state['reason']}")
         source_lock.close()
         return 0
 
@@ -1996,7 +2105,8 @@ def main(argv: list[str] | None = None) -> int:
         state = manifest["record_max"]
         if state["updated"]:
             print(
-                f"exact closure retained {state['old_max']:.4f}% -> 100.0000% "
+                f"best observation retained {state['old_max']:.4f}% -> "
+                f"{state['new_max']:.4f}% "
                 f"for unchanged source hash {state['source_hash']}; generated probe not retained"
             )
         else:
