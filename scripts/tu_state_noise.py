@@ -57,13 +57,14 @@ from homm2.build.canonicalize_relocs import (
 
 
 IMAGE_BASE = 0x400000
-DEFAULT_FAMILIES = (
-    "typedef", "enum", "struct", "class", "packed", "member", "extern",
-    "static-data", "prototype", "function", "include", "mixed",
+DEFAULT_FAMILIES = ("forest",)
+ALL_FAMILIES = (
+    "forest", "typedef", "enum", "struct", "class", "packed", "member",
+    "extern", "static-data", "prototype", "function", "include", "mixed",
 )
-ALL_FAMILIES = DEFAULT_FAMILIES
 SAFE_ENUM_VALUES = (-32768, -1, 0, 1, 2, 7, 31, 255, 256, 1024, 32767, 65535)
 SAFE_SCALAR_TYPES = ("char", "unsigned char", "short", "unsigned short", "int", "unsigned long")
+SAFE_CALLING_CONVENTIONS = ("__cdecl", "__fastcall", "__stdcall")
 CURATED_INCLUDES = (
     "<stddef.h>", "<limits.h>", "<string.h>", "<stdlib.h>",
     "<va.h>", "<Ints.h>", "<windows.h>", "<BASE/bitmap.h>",
@@ -71,6 +72,7 @@ CURATED_INCLUDES = (
 )
 DEFAULT_COMPILE_TIMEOUT_SECONDS = 120.0
 DEFAULT_MAX_DECLARATIONS = 64
+DEFAULT_MIN_FOREST_WIDTH = 10
 PROCESS_GROUP_TERMINATION_GRACE_SECONDS = 1.0
 
 
@@ -129,11 +131,206 @@ class Variant:
     family: str
     tag: str
     body: str
+    permutation: tuple[str, ...] = ()
 
     def block(self, logical_line: int) -> str:
         # Restore the pre-existing logical line before any authored source token.
         # No filename is supplied, so an earlier #line filename remains unchanged.
         return f"{self.body}#line {logical_line}\n"
+
+
+def make_declaration_forest(
+    rng: random.Random,
+    ident: str,
+    width: int,
+) -> tuple[str, tuple[str, ...]]:
+    """Build a broad, independently permuted parser-visible declaration surface."""
+    atoms = []
+
+    typedef_shapes = (
+        lambda name, scalar, index: f"typedef {scalar} {name};\n",
+        lambda name, scalar, index: f"typedef {scalar} *{name};\n",
+        lambda name, scalar, index: (
+            f"typedef {scalar} {name}[{2 + index % 7}];\n"
+        ),
+        lambda name, scalar, index: (
+            f"typedef {scalar} (__cdecl *{name})(int, unsigned long);\n"
+        ),
+        lambda name, scalar, index: (
+            f"typedef const {scalar} *{name};\n"
+        ),
+    )
+    for index in range(width):
+        name = f"{ident}_FOREST_TYPEDEF_{index}"
+        scalar = rng.choice(SAFE_SCALAR_TYPES)
+        shape = rng.randrange(len(typedef_shapes))
+        atoms.append((
+            f"typedef:{shape}:{index}",
+            typedef_shapes[shape](name, scalar, index),
+        ))
+
+    for index in range(width):
+        name = f"{ident}_FOREST_CLASS_{index}"
+        scalar = rng.choice(SAFE_SCALAR_TYPES)
+        constant = rng.choice((1, 2, 3, 7, 15, 31))
+        shape = rng.randrange(10)
+        if shape == 0:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    {scalar} m_value;\n"
+                f"    int ProbeRead(int value);\n"
+                f"}};\n"
+            )
+        elif shape == 1:
+            body = (
+                f"class {name} {{\n"
+                f"private:\n"
+                f"    {scalar} m_value;\n"
+                f"public:\n"
+                f"    int ProbeIdentity(int value) {{ return value; }}\n"
+                f"protected:\n"
+                f"    unsigned long m_state;\n"
+                f"}};\n"
+            )
+        elif shape == 2:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    typedef {scalar} ProbeValue;\n"
+                f"    enum ProbeKind {{ PROBE_ZERO = 0, PROBE_LIMIT = {constant} }};\n"
+                f"    ProbeValue m_values[{2 + index % 4}];\n"
+                f"}};\n"
+            )
+        elif shape == 3:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    static {scalar} s_value;\n"
+                f"    static int ProbeStatic(int value);\n"
+                f"    int ProbeMember(unsigned long value) const;\n"
+                f"}};\n"
+            )
+        elif shape == 4:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    virtual int ProbeVirtual(int value);\n"
+                f"    virtual unsigned long ProbeWide(unsigned long value);\n"
+                f"}};\n"
+            )
+        elif shape == 5:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    int ProbeOverload(int value);\n"
+                f"    int ProbeOverload(unsigned long value);\n"
+                f"    int ProbeOverload(const char *value);\n"
+                f"}};\n"
+            )
+        elif shape == 6:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    {name}();\n"
+                f"    ~{name}();\n"
+                f"    {scalar} ProbeConvert({scalar} value) "
+                f"{{ return value; }}\n"
+                f"}};\n"
+            )
+        elif shape == 7:
+            body = (
+                f"class {name} {{\n"
+                f"private:\n"
+                f"    unsigned int m_low : {1 + index % 7};\n"
+                f"    unsigned int m_high : {1 + (index + 3) % 7};\n"
+                f"public:\n"
+                f"    int ProbeBits() const;\n"
+                f"}};\n"
+            )
+        elif shape == 8:
+            body = (
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    union ProbeUnion {{ int i; unsigned long u; }};\n"
+                f"    ProbeUnion m_value;\n"
+                f"    {scalar} *m_pointer;\n"
+                f"}};\n"
+            )
+        else:
+            pack_value = (1, 2, 4, 8)[index % 4]
+            body = (
+                f"#pragma pack(push, {pack_value})\n"
+                f"class {name} {{\n"
+                f"public:\n"
+                f"    char m_tag;\n"
+                f"    {scalar} m_value;\n"
+                f"    int ProbePacked(int value) {{ return value ^ {constant}; }}\n"
+                f"}};\n"
+                f"#pragma pack(pop)\n"
+            )
+        atoms.append((f"class:{shape}:{index}", body))
+
+    prototype_shapes = (
+        lambda name, convention, scalar: (
+            f"{scalar} {convention} {name}({scalar} value);\n"
+        ),
+        lambda name, convention, scalar: (
+            f"int {convention} {name}(int left, unsigned long right);\n"
+        ),
+        lambda name, convention, scalar: (
+            f"{scalar} *{convention} {name}({scalar} *value, unsigned int count);\n"
+        ),
+        lambda name, convention, scalar: (
+            f"void {convention} {name}(const {scalar} *first, const {scalar} *last);\n"
+        ),
+    )
+    for index in range(width):
+        name = f"{ident}_FOREST_PROTOTYPE_{index}"
+        convention = rng.choice(SAFE_CALLING_CONVENTIONS)
+        scalar = rng.choice(SAFE_SCALAR_TYPES)
+        shape = rng.randrange(len(prototype_shapes))
+        atoms.append((
+            f"prototype:{shape}:{index}",
+            prototype_shapes[shape](name, convention, scalar),
+        ))
+
+    function_shapes = (
+        lambda name, convention, constant: (
+            f"static int {convention} {name}(int value) "
+            f"{{ return value; }}\n"
+        ),
+        lambda name, convention, constant: (
+            f"static int {convention} {name}(int value) "
+            f"{{ return value ^ {constant}; }}\n"
+        ),
+        lambda name, convention, constant: (
+            f"static unsigned long {convention} {name}"
+            f"(unsigned long left, unsigned long right) "
+            f"{{ return (left + right) ^ {constant}UL; }}\n"
+        ),
+        lambda name, convention, constant: (
+            f"static int {convention} {name}(int left, int right) "
+            f"{{ return left < right ? left + {constant} : right - {constant}; }}\n"
+        ),
+        lambda name, convention, constant: (
+            f"static unsigned short {convention} {name}(unsigned short value) "
+            f"{{ return value | {constant}; }}\n"
+        ),
+    )
+    for index in range(width):
+        name = f"{ident}_FOREST_FUNCTION_{index}"
+        convention = rng.choice(SAFE_CALLING_CONVENTIONS)
+        constant = rng.choice((1, 2, 3, 7, 15, 31, 63, 127))
+        shape = rng.randrange(len(function_shapes))
+        atoms.append((
+            f"function:{shape}:{index}",
+            function_shapes[shape](name, convention, constant),
+        ))
+
+    rng.shuffle(atoms)
+    permutation = tuple(label for label, _body in atoms)
+    return "".join(body for _label, body in atoms), permutation
 
 
 def load_units(root: Path) -> dict[str, dict]:
@@ -334,6 +531,14 @@ def make_variants(
         raise ValueError(f"unknown noise families: {', '.join(unknown)}")
     if not selected:
         raise ValueError("at least one noise family is required")
+    if (
+        {"forest", "mixed"} & set(selected)
+        and max_declarations < DEFAULT_MIN_FOREST_WIDTH
+    ):
+        raise ValueError(
+            "forest probes require --max-declarations of at least "
+            f"{DEFAULT_MIN_FOREST_WIDTH}"
+        )
     rng = random.Random(seed)
     variants = []
     for trial in range(1, count + 1):
@@ -428,7 +633,17 @@ def make_variants(
             "".join(f"#include {header}\n" for header in include_choices[:include_count])
             + f"typedef int {ident}_INCLUDE_MARKER;\n"
         )
+        declaration_forest = ""
+        forest_permutation = ()
+        if family in ("forest", "mixed"):
+            forest_width = DEFAULT_MIN_FOREST_WIDTH + (
+                (trial - 1) % (max_declarations - DEFAULT_MIN_FOREST_WIDTH + 1)
+            )
+            declaration_forest, forest_permutation = make_declaration_forest(
+                rng, ident, forest_width
+            )
         bodies = {
+            "forest": declaration_forest,
             "typedef": aliases,
             "enum": enum_decl,
             "struct": struct_decl,
@@ -441,12 +656,35 @@ def make_variants(
             "function": function_defs,
             "include": includes,
             "mixed": (
-                includes + aliases + enum_decl + struct_decl + class_decl + packed_decl
-                + member_decl + extern_decl + static_data + prototype_decl + function_defs
+                includes + declaration_forest + enum_decl + struct_decl + class_decl
+                + packed_decl + member_decl + extern_decl + static_data
             ),
         }
-        variants.append(Variant(trial, family, tag, bodies[family]))
+        variants.append(Variant(
+            trial,
+            family,
+            tag,
+            bodies[family],
+            forest_permutation if family in ("forest", "mixed") else (),
+        ))
     return variants
+
+
+def select_variants(
+    variants: list[Variant],
+    requested_trials: Iterable[int] | None,
+    generation_horizon: int,
+) -> list[Variant]:
+    requested = set(requested_trials or ())
+    if not requested:
+        return variants
+    unavailable = sorted(trial for trial in requested if trial > generation_horizon)
+    if unavailable:
+        raise ValueError(
+            "--only-trial exceeds --trials generation horizon: "
+            + ", ".join(str(trial) for trial in unavailable)
+        )
+    return [variant for variant in variants if variant.trial in requested]
 
 
 def insert_variant(
@@ -657,6 +895,7 @@ def object_metrics(path: Path) -> dict[str, dict]:
         row["function"]: {
             "size": row["size"],
             "text_sha": row["text_sha"],
+            "text_hex": row["bytes"].hex(),
             "relocs": row["relocs"],
             "reloc_sha": row["reloc_sha"],
             "reloc_stream": row["reloc_stream"],
@@ -722,6 +961,21 @@ def normalized_relocation_stream(metrics: dict) -> list[str]:
     return [
         _COMPILER_PRIVATE_COUNTER.sub(r"\1#", relocation)
         for relocation in metrics.get("reloc_stream", [])
+    ]
+
+
+def byte_differences(left_hex: str, right_hex: str) -> list[dict[str, str | int | None]]:
+    """Return every differing byte, including bytes present on only one side."""
+    left = bytes.fromhex(left_hex)
+    right = bytes.fromhex(right_hex)
+    return [
+        {
+            "offset": offset,
+            "candidate": f"{left[offset]:02x}" if offset < len(left) else None,
+            "retail": f"{right[offset]:02x}" if offset < len(right) else None,
+        }
+        for offset in range(max(len(left), len(right)))
+        if offset >= len(left) or offset >= len(right) or left[offset] != right[offset]
     ]
 
 
@@ -902,6 +1156,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--rva", required=True, type=parse_int, help="exact CodeView RVA or image VA")
     parser.add_argument("--trials", type=int, default=30, help="number of deterministic trials")
     parser.add_argument(
+        "--only-trial",
+        type=positive_count,
+        action="append",
+        help=(
+            "compile only this deterministic trial index after generating the full "
+            "--trials sequence; repeat to replay several island representatives"
+        ),
+    )
+    parser.add_argument(
         "--compile-timeout-seconds",
         type=positive_seconds,
         default=DEFAULT_COMPILE_TIMEOUT_SECONDS,
@@ -918,13 +1181,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--max-declarations", type=positive_count, default=DEFAULT_MAX_DECLARATIONS,
         help=(
-            "largest deterministic typedef/extern/static-data/prototype train "
-            f"(default: {DEFAULT_MAX_DECLARATIONS})"
+            "largest deterministic declaration-forest width or compact-family train; "
+            f"the default forest walks from {DEFAULT_MIN_FOREST_WIDTH} through this "
+            f"value (default: {DEFAULT_MAX_DECLARATIONS})"
         ),
     )
     parser.add_argument(
         "--families", default=",".join(DEFAULT_FAMILIES),
-        help=f"comma-separated subset of {','.join(DEFAULT_FAMILIES)}",
+        help=(
+            f"comma-separated subset of {','.join(ALL_FAMILIES)} "
+            f"(default: {','.join(DEFAULT_FAMILIES)})"
+        ),
     )
     parser.add_argument("--output", type=Path, help="artifact directory (default: build/tu-state-noise/...)")
     parser.add_argument(
@@ -950,6 +1217,7 @@ def main(argv: list[str] | None = None) -> int:
         target, flags = resolve_target(root, args.source, args.rva)
         families = tuple(item.strip() for item in args.families.split(",") if item.strip())
         variants = make_variants(args.trials, families, args.seed, args.max_declarations)
+        variants = select_variants(variants, args.only_trial, args.trials)
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
 
@@ -1020,6 +1288,8 @@ def main(argv: list[str] | None = None) -> int:
         "compiler_flags": flags,
         "compile_timeout_seconds": args.compile_timeout_seconds,
         "seed": args.seed,
+        "generated_trial_horizon": args.trials,
+        "selected_trials": sorted(args.only_trial) if args.only_trial else None,
         "policy": {
             "parser_visible_temporary_probes": True,
             "probe_symbols_or_storage_may_exist_only_in_candidate_object": True,
@@ -1125,9 +1395,11 @@ def main(argv: list[str] | None = None) -> int:
             {
                 "state": state_id,
                 "text_sha": metrics["text_sha"],
+                "text_hex": metrics["text_hex"],
                 "normalized_reloc_sha": sha256_bytes(
                     "\n".join(normalized_relocation_stream(metrics)).encode("utf-8")
                 )[:16],
+                "normalized_reloc_stream": normalized_relocation_stream(metrics),
                 "raw_reloc_detail_shas": [],
                 "objdiff_size": metrics.get("objdiff_size"),
                 "relocs": metrics["relocs"],
@@ -1148,11 +1420,16 @@ def main(argv: list[str] | None = None) -> int:
         elif variant is not None:
             state["trials"].append(variant.trial)
             if state["representative"] is None:
+                permutation_text = "\n".join(variant.permutation)
                 state["representative"] = {
                     "trial": variant.trial,
                     "family": variant.family,
                     "tag": variant.tag,
                     "body": variant.body,
+                    "permutation": variant.permutation,
+                    "permutation_sha": sha256_bytes(
+                        permutation_text.encode("utf-8")
+                    )[:16],
                 }
         return state_id
 
@@ -1325,17 +1602,43 @@ def main(argv: list[str] | None = None) -> int:
         "trial\tfamily\tscore\tdelta\teligible\trejections\n" + "".join(rows)
     )
     state_rows = sorted(observed_states.values(), key=lambda row: (not row["baseline"], row["state"]))
+    retail_text_hex = retail_target["text_hex"][: target.retail_size * 2]
+    for state in state_rows:
+        state_text_hex = state["text_hex"][: state["objdiff_size"] * 2]
+        state["retail_byte_differences"] = byte_differences(
+            state_text_hex, retail_text_hex
+        )
+    state_byte_delta_matrix = {
+        left["state"]: {
+            right["state"]: len(byte_differences(
+                left["text_hex"][: left["objdiff_size"] * 2],
+                right["text_hex"][: right["objdiff_size"] * 2],
+            ))
+            for right in state_rows
+        }
+        for left in state_rows
+    }
     manifest["target_states"] = state_rows
     print(f"target states: {len(state_rows)} unique byte/relocation states", flush=True)
     for index, state in enumerate(state_rows, 1):
         representative = state["representative"]
         source = "baseline" if state["baseline"] else f"trial {representative['trial']}"
+        permutation = (
+            ""
+            if representative is None
+            else (
+                f" tag={representative['tag']}"
+                f" permutation={representative['permutation_sha']}"
+                f"/{len(representative['permutation'])}"
+            )
+        )
         scores = ",".join(f"{score:.6f}" for score in sorted(state["scores"]))
         print(
             f"  state {index:02d} {state['state']}: {source}; occurrences={state['occurrences']} "
             f"scores={scores}% size={state['objdiff_size']} "
+            f"retail-byte-delta={len(state['retail_byte_differences'])} "
             f"text={state['text_sha']} relocs={state['normalized_reloc_sha']} "
-            f"raw-label-spellings={len(state['raw_reloc_detail_shas'])}",
+            f"raw-label-spellings={len(state['raw_reloc_detail_shas'])}{permutation}",
             flush=True,
         )
     if args.state_summary:
@@ -1348,14 +1651,20 @@ def main(argv: list[str] | None = None) -> int:
         state_summary_path.write_text(
             json.dumps(
                 {
-                    "schema": 1,
+                    "schema": 2,
                     "source": str(source_rel),
                     "target": manifest["target"],
                     "seed": args.seed,
+                    "generated_trial_horizon": args.trials,
+                    "selected_trials": (
+                        sorted(args.only_trial) if args.only_trial else None
+                    ),
                     "families": families,
                     "max_declarations": args.max_declarations,
                     "insertion": args.insertion,
+                    "retail": retail_target,
                     "states": state_rows,
+                    "state_byte_delta_matrix": state_byte_delta_matrix,
                 },
                 indent=2,
             )
@@ -1368,6 +1677,7 @@ def main(argv: list[str] | None = None) -> int:
             "score": best_observed["score"],
             "score_delta": best_observed["score_delta"],
             "candidate": best_observed["candidate"],
+            "permutation": best_observed["permutation"],
             "source_hash_unchanged": True,
             "generated_noise_retained": False,
         }
@@ -1378,6 +1688,7 @@ def main(argv: list[str] | None = None) -> int:
             "tag": exact_closure["tag"],
             "score": exact_closure["score"],
             "body": exact_closure["body"],
+            "permutation": exact_closure["permutation"],
             "target_size": exact_closure["candidate"]["objdiff_size"],
             "reloc_detail_sha": exact_closure["candidate"]["reloc_detail_sha"],
             "source_hash_unchanged": True,

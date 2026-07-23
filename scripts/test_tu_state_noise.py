@@ -97,7 +97,7 @@ class TuStateNoiseTests(unittest.TestCase):
             )
 
     def test_variants_are_deterministic_unique_and_parser_visible(self):
-        count = len(noise.DEFAULT_FAMILIES) * 2
+        count = 8
         left = noise.make_variants(count, noise.DEFAULT_FAMILIES, 123)
         right = noise.make_variants(count, noise.DEFAULT_FAMILIES, 123)
         self.assertEqual(left, right)
@@ -107,6 +107,12 @@ class TuStateNoiseTests(unittest.TestCase):
             self.assertNotIn("//", variant.body)
             self.assertNotIn("/*", variant.body)
             self.assertIn(variant.tag.replace("-", "_").upper(), variant.body)
+
+        compact = noise.make_variants(
+            len(noise.ALL_FAMILIES), noise.ALL_FAMILIES, 321
+        )
+        self.assertEqual({variant.family for variant in compact}, set(noise.ALL_FAMILIES))
+        for variant in compact:
             if variant.family == "packed":
                 self.assertEqual(variant.body.count("#pragma pack(push"), 1)
                 self.assertEqual(variant.body.count("#pragma pack(pop)"), 1)
@@ -118,6 +124,51 @@ class TuStateNoiseTests(unittest.TestCase):
                 ]
                 self.assertTrue(headers)
                 self.assertTrue(set(headers) <= set(noise.CURATED_INCLUDES))
+
+    def test_default_forest_has_at_least_ten_of_each_major_surface(self):
+        variants = noise.make_variants(12, noise.DEFAULT_FAMILIES, 123)
+        permutations = set()
+        for variant in variants:
+            self.assertEqual(variant.family, "forest")
+            width = noise.DEFAULT_MIN_FOREST_WIDTH + variant.trial - 1
+            self.assertEqual(
+                sum(
+                    line.startswith("class ") and "_FOREST_CLASS_" in line
+                    for line in variant.body.splitlines()
+                ),
+                width,
+            )
+            self.assertGreaterEqual(variant.body.count("typedef "), width)
+            self.assertEqual(
+                sum(
+                    "_FOREST_PROTOTYPE_" in line
+                    for line in variant.body.splitlines()
+                ),
+                width,
+            )
+            self.assertEqual(
+                sum(
+                    "_FOREST_FUNCTION_" in line
+                    for line in variant.body.splitlines()
+                ),
+                width,
+            )
+            self.assertEqual(len(variant.permutation), width * 4)
+            permutations.add(variant.permutation)
+        self.assertEqual(len(permutations), len(variants))
+
+    def test_forest_refuses_a_width_below_ten(self):
+        with self.assertRaisesRegex(ValueError, "at least 10"):
+            noise.make_variants(1, ("forest",), 123, max_declarations=9)
+
+    def test_only_trial_replays_original_deterministic_index(self):
+        variants = noise.make_variants(12, ("forest",), 123)
+        selected = noise.select_variants(variants, (4, 11), 12)
+        self.assertEqual([variant.trial for variant in selected], [4, 11])
+        self.assertEqual(selected[0], variants[3])
+        self.assertEqual(selected[1], variants[10])
+        with self.assertRaisesRegex(ValueError, "exceeds --trials"):
+            noise.select_variants(variants, (13,), 12)
 
     def test_declaration_trains_cover_requested_range(self):
         variants = noise.make_variants(6, ("typedef",), 123, max_declarations=4)
@@ -144,6 +195,15 @@ class TuStateNoiseTests(unittest.TestCase):
         renumbered = dict(base)
         renumbered["reloc_stream"] = ["00000001:0006:$SG999:00000000"]
         self.assertEqual(noise.target_state_identity(base), noise.target_state_identity(renumbered))
+
+    def test_byte_differences_cover_changed_and_one_sided_bytes(self):
+        self.assertEqual(
+            noise.byte_differences("001122", "00113344"),
+            [
+                {"offset": 2, "candidate": "22", "retail": "33"},
+                {"offset": 3, "candidate": None, "retail": "44"},
+            ],
+        )
 
     def test_temporary_source_restores_byte_identically_after_exception(self):
         with tempfile.TemporaryDirectory() as directory:
