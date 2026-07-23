@@ -293,6 +293,117 @@ class TuStateNoiseTests(unittest.TestCase):
                 semantic,
             )
 
+    def test_target_compgen_data_binding_follows_relocation_after_probe_storage(self):
+        semantic = "__h2cg$BASE$unit$data$message"
+        candidate_payload = make_coff(
+            [
+                SectionSpec(".text", bytes(4), 0x60000020, ((0, 2, 0x0006),)),
+                SectionSpec(".data", b"\x01\0\0\0rb\0\0", DATA),
+            ],
+            [
+                ("?Target@@YIXXZ", 0, 1, 0x20, 2),
+                ("_probe", 0, 2, 0, 3),
+                ("$SG123", 4, 2, 0, 3),
+            ],
+        )
+        retail_payload = make_coff(
+            [
+                SectionSpec(".text", bytes(4), 0x60000020, ((0, 1, 0x0006),)),
+                SectionSpec(".data", b"rb\0\0", DATA),
+            ],
+            [
+                ("?Target@@YIXXZ", 0, 1, 0x20, 2),
+                (semantic, 0, 2, 0, 3),
+            ],
+        )
+        pairing = {
+            "unit": "BASE/unit",
+            "names": set(),
+            "public_data": {},
+            "function_rvas": {},
+            "symbols": {},
+            "data": {},
+            "duplicates": {},
+            "compgen": (),
+            "compgen_data": (
+                CompgenDataClaim(semantic, 2, 0, 3, "data", "local"),
+            ),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate.obj"
+            retail = root / "retail.obj"
+            candidate.write_bytes(candidate_payload)
+            retail.write_bytes(retail_payload)
+            with mock.patch.object(noise, "canonicalize_unit"):
+                normalized_candidate, normalized_retail, _generated = (
+                    noise.normalize_comparison_pair(
+                        candidate,
+                        retail,
+                        root / "pair",
+                        pairing,
+                        "?Target@@YIXXZ",
+                    )
+                )
+            self.assertEqual(
+                CoffObject(normalized_candidate.read_bytes()).symbols[2].name,
+                semantic,
+            )
+            self.assertEqual(
+                CoffObject(normalized_retail.read_bytes()).symbols[1].name,
+                semantic,
+            )
+
+    def test_target_compgen_data_binding_ignores_unreferenced_stale_claim(self):
+        payload = make_coff(
+            [
+                SectionSpec(".text", bytes(4), 0x60000020),
+                SectionSpec(".data", b"\x01\0\0\0", DATA),
+            ],
+            [
+                ("?Target@@YIXXZ", 0, 1, 0x20, 2),
+                ("_probe", 0, 2, 0, 3),
+            ],
+        )
+        pairing = {
+            "unit": "BASE/unit",
+            "names": set(),
+            "public_data": {},
+            "function_rvas": {},
+            "symbols": {},
+            "data": {},
+            "duplicates": {},
+            "compgen": (),
+            "compgen_data": (
+                CompgenDataClaim(
+                    "__h2cg$BASE$unit$data$unrelated",
+                    2,
+                    0,
+                    8,
+                    "data",
+                    "local",
+                ),
+            ),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate.obj"
+            retail = root / "retail.obj"
+            candidate.write_bytes(payload)
+            retail.write_bytes(payload)
+            with mock.patch.object(noise, "canonicalize_unit"):
+                normalized_candidate, normalized_retail, _generated = (
+                    noise.normalize_comparison_pair(
+                        candidate,
+                        retail,
+                        root / "pair",
+                        pairing,
+                        "?Target@@YIXXZ",
+                    )
+                )
+            self.assertTrue(normalized_candidate.exists())
+            self.assertTrue(normalized_retail.exists())
+
     def test_temporary_source_restores_byte_identically_after_exception(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "unit.cpp"
