@@ -2088,6 +2088,13 @@ void AbsAiPrint(char* text) {
     giDebugLevel = saved;
 }
 
+static inline i32 FadeThreshold(i32 level, i32 increment) {
+    i32 index = MISC_PALETTE_LEVEL_COUNT - level - increment;
+    if (index < 0)
+        index = 0;
+    return giChangeThreshold[index];
+}
+
 VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
@@ -2099,23 +2106,19 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     do {
         i32 delayUntil = KBTickCount() + FADE_TO_FRAME_DELAY;
         PollSound();
-        i32 thresholdIndex = MISC_PALETTE_LEVEL_COUNT - level - increment;
-        if (thresholdIndex < 0)
-            thresholdIndex = 0;
-        u8 threshold = giChangeThreshold[thresholdIndex];
+        i32 threshold = FadeThreshold(level, increment);
         u8* current = colors;
         u8* target = destination;
         i32 count = MISC_PALETTE_BYTE_COUNT;
         do {
-            u8 value = *current;
-            i32 difference = static_cast<i32>(*target) - static_cast<i32>(value);
+            i32 difference = static_cast<i32>(*target) - static_cast<i32>(*current);
             i32 distance = difference < 0 ? -difference : difference;
             if (distance > threshold) {
                 distance -= threshold;
                 if (difference > 0)
-                    *current = static_cast<u8>(value + distance);
+                    *current += static_cast<u8>(distance);
                 else
-                    *current = static_cast<u8>(value - distance);
+                    *current -= static_cast<u8>(distance);
             }
             ++current;
             ++target;
