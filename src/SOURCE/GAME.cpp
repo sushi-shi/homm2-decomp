@@ -6376,7 +6376,7 @@ void game::CheckHeroConsistency(void) {
             cell1 = gpAdvManager->GetCell(x11, y8);
             if (cell1->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
                 if (cell1->m_objectMetadata >= 0 && cell1->m_objectMetadata < GAME_HERO_COUNT) {
-                    mapHero3 = &m_heroRecs[cell1->m_objectMetadata];
+                    mapHero3 = GetHero(cell1->m_objectMetadata);
                     if (mapHero3->m_x != x11 || mapHero3->m_y != y8) {
                         cell1->m_triggerType = 0;
                         cell1->m_objectMetadata = 0;
@@ -6384,7 +6384,7 @@ void game::CheckHeroConsistency(void) {
                     if (mapHero3->m_owner < 0 || mapHero3->m_owner >= GAME_PLAYER_COUNT) {
                         if (mapHero3->m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                            occupiedTown9 = GetCastle(mapHero3->m_occupiedTown);
+                            occupiedTown9 = gpGame->GetTown(mapHero3->m_occupiedTown);
                             occupiedTown9->m_occupyingHeroId = -1;
                         }
                         if (mapHero3->m_x == x11 && mapHero3->m_y == y8) {
