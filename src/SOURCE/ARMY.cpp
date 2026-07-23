@@ -2310,7 +2310,9 @@ void army::PowEffect(
     gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     if (effectX != NO_POW_EFFECT_COORDINATE) {
         for (index_10 = 0; index_10 < gCurLoadedSpellIcon->m_frameCount; index_10++) {
-            entry_1 = &gCurLoadedSpellIcon->Entries()[index_10];
+            entry_1 = reinterpret_cast<IconEntry*>(
+                gCurLoadedSpellIcon->m_data + index_10 * sizeof(IconEntry)
+            );
             giMinExtentX =
                 entry_1->x + effectX < giMinExtentX ? entry_1->x + effectX : giMinExtentX;
             giMinExtentY =
@@ -2483,10 +2485,10 @@ void army::PowEffect(
                 current = &gpCombatManager->m_armies[IDX(side_4)][index_10];
                 if (current->m_animationSequence == ARMY_ANIMATION_WINCE
                     || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP
-                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN
-                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD
                     || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD
+                    || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN
                     || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP
+                    || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD
                     || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN
                     || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP
                     || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD
@@ -2497,10 +2499,10 @@ void army::PowEffect(
                 } else if (current->m_animationSequence == ARMY_ANIMATION_DEATH
                            || current->m_animationSequence == ARMY_ANIMATION_WINCE_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_ATTACK_UP_RETURN
-                           || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN_RETURN
-                           || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_ATTACK_FORWARD_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_ATTACK_DOWN_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_BREATH_UP_RETURN
+                           || current->m_animationSequence == ARMY_ANIMATION_BREATH_FORWARD_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_BREATH_DOWN_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_SHOOT_UP_RETURN
                            || current->m_animationSequence == ARMY_ANIMATION_SHOOT_FORWARD_RETURN
