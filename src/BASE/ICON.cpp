@@ -29,6 +29,10 @@ H2_ENUM_BEGIN(IconDrawExtentConstant)
     DRAW_COMBAT_HEIGHT = 444
 H2_ENUM_END(IconDrawExtentConstant)
 
+inline IconEntry& icon::Entries(i32 frame) {
+    return Entries()[frame];
+}
+
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c7a20, 0x67)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
@@ -94,17 +98,15 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     i8* yModify
 ) {
     if (gbComputeExtent != 0) {
-        IconDrawOrientation mirror = orientation;
-        IconEntry* entry = &Entries()[frame];
-        if (mirror == ICON_DRAW_FLIPPED) {
-            limits->right = x - entry->x;
-            limits->left = limits->right - entry->w + 1;
+        if (orientation == ICON_DRAW_FLIPPED) {
+            limits->right = x - Entries(frame).x;
+            limits->left = limits->right - Entries(frame).w + 1;
         } else {
-            limits->left = entry->x + x;
-            limits->right = entry->w + limits->left - 1;
+            limits->left = Entries(frame).x + x;
+            limits->right = Entries(frame).w + limits->left - 1;
         }
-        limits->top = entry->y + y;
-        limits->bottom = entry->h + limits->top - 1;
+        limits->top = Entries(frame).y + y;
+        limits->bottom = Entries(frame).h + limits->top - 1;
         if (gbSaveBiggestExtent != 0) {
             if (limits->left < giMinExtentX)
                 giMinExtentX = limits->left;
