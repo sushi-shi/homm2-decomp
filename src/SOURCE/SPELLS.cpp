@@ -2898,7 +2898,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     switch (spell) {
         case SPELL_MASS_SLOW:
         case SPELL_MASS_CURSE:
-            side_i = OppositeCombatSide(m_currentSide);
+            side_i = COMBAT_DEFENDER_SIDE - IDX(m_currentSide);
             for (armyIndex_k = 0; armyIndex_k < m_armyCount[IDX(side_i)]; ++armyIndex_k) {
                 if (m_armies[IDX(side_i)][armyIndex_k].SpellCastWorks(spell))
                     affected[IDX(side_i)][armyIndex_k] = 1;
@@ -2992,69 +2992,70 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
         }
     }
 
-    if (!gbNoShowCombat) {
-        anyAffected_i = 0;
-        for (side_i = COMBAT_ATTACKER_SIDE; IDX(side_i) < COMBAT_SIDE_COUNT; ++side_i) {
-            for (armyIndex_k = 0; armyIndex_k < m_armyCount[IDX(side_i)]; ++armyIndex_k) {
-                if (affected[IDX(side_i)][armyIndex_k] != 0)
-                    anyAffected_i = 1;
-            }
-        }
-        if (anyAffected_i)
-            ShowMassSpell(affected, effect, animateCreatures_k);
-    }
+    if (gbNoShowCombat)
+        goto applySpellInfluence;
 
+    anyAffected_i = 0;
     for (side_i = COMBAT_ATTACKER_SIDE; IDX(side_i) < COMBAT_SIDE_COUNT; ++side_i) {
         for (armyIndex_k = 0; armyIndex_k < m_armyCount[IDX(side_i)]; ++armyIndex_k) {
-            if (affected[IDX(side_i)][armyIndex_k] != 0) {
-                target_i = &m_armies[IDX(side_i)][armyIndex_k];
-                switch (spell) {
-                    case SPELL_MASS_CURSE:
-                        target_i->SetSpellInfluence(
-                            ARMY_SPELL_INFLUENCE_CURSE,
-                            spellPower
-                        );
-                        break;
-                    case SPELL_MASS_SLOW:
-                        target_i->SetSpellInfluence(
-                            ARMY_SPELL_INFLUENCE_SLOW,
-                            spellPower
-                        );
-                        break;
-                    case SPELL_MASS_HASTE:
-                        target_i->SetSpellInfluence(
-                            ARMY_SPELL_INFLUENCE_HASTE,
-                            spellPower
-                        );
-                        break;
-                    case SPELL_MASS_BLESS:
-                        target_i->SetSpellInfluence(
-                            ARMY_SPELL_INFLUENCE_BLESS,
-                            spellPower
-                        );
-                        break;
-                    case SPELL_MASS_SHIELD:
-                        target_i->SetSpellInfluence(
-                            ARMY_SPELL_INFLUENCE_SHIELD,
-                            spellPower
-                        );
-                        break;
-                    case SPELL_MASS_CURE:
-                        target_i->Cure(spellPower);
-                        break;
-                    case SPELL_MASS_DISPEL: {
-                        for (influence_e = ARMY_SPELL_INFLUENCE_HASTE;
-                             influence_e < ARMY_SPELL_INFLUENCE_COUNT;
-                             ++influence_e)
-                            target_i->CancelIndividualSpell(influence_e);
-                        break;
-                    }
-                    case SPELL_HOLY_WORD:
-                    case SPELL_HOLY_SHOUT:
-                    case SPELL_DEATH_RIPPLE:
-                    case SPELL_DEATH_WAVE:
-                        break;
+            if (affected[IDX(side_i)][armyIndex_k] != 0)
+                anyAffected_i = 1;
+        }
+    }
+    if (anyAffected_i)
+        ShowMassSpell(affected, effect, animateCreatures_k);
+
+applySpellInfluence:
+    for (side_i = COMBAT_ATTACKER_SIDE; IDX(side_i) < COMBAT_SIDE_COUNT; ++side_i) {
+        for (armyIndex_k = 0; armyIndex_k < m_armyCount[IDX(side_i)]; ++armyIndex_k) {
+            if (affected[IDX(side_i)][armyIndex_k] == 0)
+                continue;
+
+            target_i = &m_armies[IDX(side_i)][armyIndex_k];
+            switch (spell) {
+                case SPELL_MASS_CURSE:
+                    target_i->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_CURSE,
+                        spellPower
+                    );
+                    break;
+                case SPELL_MASS_SLOW:
+                    target_i->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_SLOW,
+                        spellPower
+                    );
+                    break;
+                case SPELL_MASS_HASTE:
+                    target_i->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_HASTE,
+                        spellPower
+                    );
+                    break;
+                case SPELL_MASS_BLESS:
+                    target_i->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_BLESS,
+                        spellPower
+                    );
+                    break;
+                case SPELL_MASS_SHIELD:
+                    target_i->SetSpellInfluence(
+                        ARMY_SPELL_INFLUENCE_SHIELD,
+                        spellPower
+                    );
+                    break;
+                case SPELL_MASS_CURE:
+                    target_i->Cure(spellPower);
+                    break;
+                case SPELL_MASS_DISPEL: {
+                    for (influence_e = ARMY_SPELL_INFLUENCE_HASTE;
+                         influence_e < ARMY_SPELL_INFLUENCE_COUNT;
+                         ++influence_e)
+                        target_i->CancelIndividualSpell(influence_e);
+                    break;
                 }
+                case SPELL_DEATH_RIPPLE:
+                case SPELL_DEATH_WAVE:
+                    break;
             }
         }
     }
