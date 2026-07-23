@@ -105,9 +105,9 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 - `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
   current normalized source hash. A changed hash starts a new current-score epoch. It is
   queue evidence only: no build or command rejects a regression against an older maximum.
-  An audited exact closure from `scripts/tu_state_noise.py` may set the unchanged function's
-  maximum to 100 after the generated predecessor input is removed; sub-100 synthetic scores
-  are never retained.
+  A controlled run from `scripts/tu_state_noise.py` may raise the unchanged function's maximum
+  after generated predecessor input is removed. Best paired objects, disassemblies, and diffs
+  may remain under `build/`; generated source input is never retained.
 
 See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md`,
 `docs/reviewed-data-objdiff.md`, and `docs/static-storage-link-audit.md`.

@@ -80,8 +80,8 @@ only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not
 because several distinct objects may share one percentage. Public target identities, relocation
 sites/types/addends, and all other spellings remain part of the state. The report also counts the
 raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
-JSON census with one complete reproducible probe body and atom permutation per state while the
-sub-100 COFF objects themselves remain disposable. Each state also records the ordered list of
+JSON census with one complete reproducible probe body and atom permutation per state. With
+`--retain-best`, only the best sub-100 COFF pair and assembly are kept. Each state also records the ordered list of
 every trial that reached it, so occurrence populations and representative selection can be
 reproduced after the temporary objects are removed. This summary is diagnostic evidence only: it
 does not update a retained maximum. If one normalized state ever receives multiple fuzzy scores,
@@ -119,9 +119,10 @@ continues with the next variant. A baseline timeout fails closed. The end-of-run
 summary and successful manifest separately report compile, target-integrity, objdiff,
 COFF-metric, and regression-gate costs.
 
-The default is diagnostic-only. Add `--record-max` only when asking the tool to close an
-unchanged target at exact 100.0000%. It never retains a sub-100 improvement. Generated probe
-text is never retained in reconstructed source, even when it produces 100%.
+The default is diagnostic-only. Add `--record-max` to raise the unchanged target's
+hash-scoped maximum to its best observed score. Add `--retain-best` to preserve paired
+candidate/retail objects, disassemblies, an assembly diff, and the reproducible best probe
+manifest under `build/`. Generated probe text is never retained in reconstructed source.
 
 An accepted closure contributes to the hash-scoped `functions exact-max` and `fuzzy-max`
 metrics. It does not contribute to live `functions exact` or `fuzzy`: those continue to
@@ -131,8 +132,8 @@ program content.
 
 Use `--dry-run` only to inspect generated input without compiling or matching. It is explicitly a
 non-matching diagnostic and intentionally retains snippets. Normal compiled mode instead builds in
-a temporary run directory. A clean run preserves that directory only after an audited exact closure;
-sub-100, interrupted, and fatal runs delete it by default.
+a temporary run directory. `--retain-best` preserves a clean sub-100 run; interrupted and fatal
+runs are always deleted.
 
 The RVA may be image-relative (`0xca6d0`) or an image VA (`0x4ca6d0`), but it must identify
 exactly one CodeView function in the configured source TU. The tool recompiles with that TU's
@@ -210,33 +211,24 @@ retail. Comparing every target relocation is deliberately stronger than checking
 references; a local-label/delinker identity caveat remains evidence-only until it is byte-proven
 under the matcher guide.
 
-Only a successful exact-100 compiled run preserves `manifest.json`. It records the commit, source
+An exact-100 run, or a clean run requested with `--retain-best`, preserves `manifest.json`. It records the commit, source
 hash, compiler flags, each seed-derived tag and complete generated probe body, every score, target
 text/relocation metrics, rejection reasons, and the best observed disposable trial from that
 successful run. `trials.tsv` is its compact score/family/rejection log. No generated `.cpp` or patch
-is emitted. The preserved exact artifact retains the seed, tag, and complete winning snippet for
-audit and reproduction, but never a source patch. Without exact closure, the tool prints only a
-concise path-free summary and removes all snippets, manifests, objects, and logs.
+is emitted. The preserved artifact retains the seed, tag, complete winning snippet, paired objects,
+disassemblies, and diff for audit and later structural work, but never a source patch.
 
 `--record-max` is the only optional repository mutation. It runs after byte-for-byte source
 restoration and uses the project's normalized `source_hashes()` API. The mode requires exactly
 one target row in `config/match_baseline.tsv`, requires its stored hash to equal the current hash,
-and never lowers a maximum. Only an exact closure satisfying the size and ordered-
-relocation proof above can replace that row's max field with literal `100.0000`; every other byte
-and field in the ledger is preserved. Missing/duplicate rows and hash mismatches are refused. Any
-sub-100 run—including 99.99 above the stored maximum—leaves the entire baseline byte-identical.
+and never lowers a maximum. A higher sub-100 observation may raise that row after source
+restoration; exact 100 still additionally requires the size and ordered-relocation proof above.
+Every other byte and field in the ledger is preserved, and missing/duplicate rows or hash
+mismatches are refused. Retained sub-100 objects and assembly are clue evidence, not correctness
+proof.
 
-This strict rule prevents a synthetic sub-100 score from becoming a phantom retained maximum that
-the canonical checked-in TU never produces. Such a maximum would distort hardest-first queue
-priority and teach later agents to fear legitimate structural changes as apparent regressions.
-Exact 100 is the sole exception because it proves that the unchanged target source can emit the
-retail-sized function with the retail relocation stream under a reproducible controlled TU state
-and therefore closes the target.
-
-Never apply or commit generated TU-state noise. Sub-100 artifacts are disposable diagnostics: do
-not cite them as a retained maximum or commit them as durable evidence; compiled mode deletes them
-at clean exit. Preserve the successful exact-100 manifest as the reproducible closure audit; it
-contains the seed and complete probe body regardless of whether `--record-max` was requested.
+Never apply or commit generated TU-state noise. Retained artifacts live only under `build/`; the
+authored source is restored before either artifacts or MAX evidence are accepted.
 
 Related: [msvc42-tu-declaration-state.md](patterns/msvc42-tu-declaration-state.md),
 [o2-tu-cumulative-register-steering.md](patterns/o2-tu-cumulative-register-steering.md), and
