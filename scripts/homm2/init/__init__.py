@@ -21,12 +21,15 @@ def main(argv=None):
     if run("python3", "scripts/name_strings.py"): return 1
     # 3. synthesize the PDB the delinker needs
     if run("python3", "-m", "homm2.build.synth_pdb"): return 1
-    # Source annotations plus candidate COFF topology deterministically regenerate
+    # 4. Candidate COFF topology must exist before source data claims can be bound.
+    if run("python3", "configure.py"): return 1
+    if run("ninja", "base"): return 1
+    # 5. Source annotations plus candidate COFF topology deterministically regenerate
     # every Vostok data/section/contribution input.
     if run("python3", "-m", "homm2.build.reviewed_data", "--regenerate"): return 1
-    # 5. configure the base build + objdiff project
+    # 6. Reconfigure now that canonical delinked targets exist.
     if run("python3", "configure.py"): return 1
-    # 6. generate the clangd compile DB (editor tooling: resolves <va.h> + MSVC headers)
+    # 7. generate the clangd compile DB (editor tooling: resolves <va.h> + MSVC headers)
     if run("python3", "-m", "homm2.init.clangd"):
         print("[init] WARN: clangd DB step failed (editor-only; build is unaffected)")
     print("[init] done. Next: `homm2 build`")
