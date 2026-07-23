@@ -30,7 +30,7 @@ public:
     void DrawToBuffer(
         i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
     );
-    IconDrawResult CombatClipDrawToBuffer(
+    H2_ENUM_RETURN(IconDrawResult, i32) CombatClipDrawToBuffer(
         i32 x,
         i32 y,
         i32 frame,

@@ -1,7 +1,11 @@
 #ifndef HOMM2_ICONF2BY_H
 #define HOMM2_ICONF2BY_H
 
+#include <Ints.h>
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
 #include <BASE/IconDraw.h>
+#endif
 
 class bitmap;
 class icon;
