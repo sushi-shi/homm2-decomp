@@ -6,7 +6,8 @@
 # constant gets the SAME ??_C@ name our base obj will emit for that literal, objdiff
 # pairs them by name (no reloc-masking). The ??_C@ hash isn't a standard CRC, so we
 # use cl as the exact oracle: compile each unique string, read which ??_C@ symbol its
-# global points to via the .data relocation. Run once by `homm2 init` (needs wine cl).
+# global points to via the .data relocation. Run by `homm2 init`/`homm2 redelink`
+# (needs wine cl).
 #
 # Rewrites build/gen/symbol_names.csv in place: rows whose unit is "_const" and whose
 # bytes are a printable null-terminated string get name = the real ??_C@ symbol.

@@ -60,10 +60,12 @@ counters are candidate topology only and never enter canonical identity. A sourc
 when its payload, extent, storage, placement evidence, and relocation topology select a candidate;
 missing or ambiguous bindings warn normally and fail strict assembly.
 
-On a clean checkout, `homm2 init` configures and builds the candidate-only `ninja base`
-target before strict canonical assembly. It then runs Vostok once and reconfigures the
-comparison graph against the new fixed target. Ordinary `homm2 build` does not repeat
-manifest assembly or delinking.
+`homm2 redelink` is the explicit full refresh after introducing a modeled symbol. It
+refreshes function/PDB inputs, configures and builds the candidate-only `ninja base`
+target before strict canonical assembly, runs Vostok once, and reconfigures the
+comparison graph against the new fixed target. `homm2 init` invokes the same pipeline
+and additionally prepares editor tooling. Ordinary `homm2 build` does not repeat
+manifest assembly or delinking; its lightweight model census only warns about drift.
 
 Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
 `build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced
