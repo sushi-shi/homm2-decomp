@@ -35,8 +35,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    begin with raw offset arithmetic or compiler steering.
 3. Build the TU with `ninja`, refresh `homm2 status`, and advance from the first real
    disassembly divergence. Keep stack displacements visible.
-4. For `/Od` slot mismatches, use `scripts/od_slots.py`. For large switches, recover
-   body order separately from case values and compare ordered jump-table destinations.
+4. Run `homm2 od-frames` to expose `/Od` frame and slot drift, then use
+   `scripts/od_slots.py` for individual name-sensitive layouts. For large switches,
+   recover body order separately from case values and compare ordered jump-table
+   destinations.
 5. Audit external targets and owner-relative addends with `homm2 relocs 0x<RVA>`.
    Compare raw `llvm-objdump -r` ranges when a provisional boundary confuses the helper.
 6. Use relocation-masked bytes only to isolate code-shape differences. They do not prove
