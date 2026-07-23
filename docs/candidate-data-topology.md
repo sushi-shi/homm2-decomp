@@ -27,6 +27,13 @@ The generated Vostok manifest comes only from source annotations:
 - `DATA_COMPGEN_GUARD(rva, semanticName, owner)` marks a compiler-emitted initialization
   guard whose value is implicit.
 
+Disposable objdiff copies apply the same reviewed `DATA_COMPGEN` identity to the
+candidate symbol only after the generated manifest's unit, section ordinal, section
+offset, storage class, and scope select exactly one definition, and the reviewed
+logical extent fits its physical allocation (which may include alignment padding).
+This changes only the comparison symbol table: candidate payload, relocations, linked
+objects, and canonical layout inputs remain untouched.
+
 `DATA_COMPGEN` is intentionally explicit. A source string occurrence alone has no final
 RVA and identical literals may be pooled or repeated, so automatic string inference does
 not establish retail identity. The semantic name describes the allocation's role in its

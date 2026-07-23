@@ -136,6 +136,22 @@ def load_symbols():
                 # name (e.g. two "!" literals). Record every address per name so an ambiguous target
                 # reloc can match ANY of them (they're value-identical), not just the last one loaded.
                 sym.setdefault(k, v); dups.setdefault(k, set()).add(v)
+    manifest = Path("build/gen/delink_data_manifest.tsv")
+    if manifest.is_file():
+        with manifest.open(newline="", encoding="latin-1") as stream:
+            rows = csv.DictReader(
+                (line for line in stream
+                 if not line.lstrip().startswith("#")),
+                delimiter="\t")
+            for row in rows:
+                try:
+                    v = int(row["rva"], 0)
+                except (KeyError, ValueError):
+                    continue
+                name = row.get("name", "")
+                if name:
+                    sym.setdefault(name, v)
+                    dups.setdefault(name, set()).add(v)
     data = {}                                    # DATA() lives on canonical .cpp definitions;
     for f in glob.glob("src/**/*.cpp", recursive=True) + glob.glob("include/**/*.h", recursive=True):
         for ln in open(f, encoding="latin-1"):   # headers are scanned to diagnose stale violations
@@ -1386,17 +1402,13 @@ def _function_for_arg(arg):
     raise SystemExit("function not found in build/gen/symbol_names.csv: %s" % arg)
 
 def review(rva):
-    """Single-function multiset review (order-independent; usable on <100% walls)."""
+    """Single-function normalized multiset review (usable on <100% walls)."""
     sym, data, dups = load_symbols()
     unit, name, _function_rva = _function_for_arg(rva)
-    base_obj = "build/objdiff/base/%s.obj" % unit
-    target_obj = "build/delink/%s.c.obj" % unit
+    base_obj = "build/objdiff/normalized/base/%s.obj" % unit
+    target_obj = "build/objdiff/normalized/target/%s.c.obj" % unit
     B = parse_obj(base_obj).get(name, [])
     T = parse_obj(target_obj).get(name, [])
-    if name.startswith("__h2cg$") and (not B or not T):
-        B = parse_obj("build/objdiff/normalized/base/%s.obj" % unit).get(name, [])
-        T = parse_obj(
-            "build/objdiff/normalized/target/%s.c.obj" % unit).get(name, [])
     for s in sorted({r[1] for r in B if is_fake(sym, data, r[1])}):
         print("  !! FAKE base references '%s'" % s)
     def bvas(rs):

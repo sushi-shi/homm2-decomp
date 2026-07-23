@@ -9,6 +9,7 @@ from unittest import mock
 from homm2.build.canonicalize_data_symbols import (
     CoffObject,
     CompgenClaim,
+    CompgenDataClaim,
     canonicalize_coff,
     main,
     sidecar_bytes,
@@ -143,6 +144,44 @@ def compiler_function_graph():
 
 
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
+    def test_source_compgen_data_binding_uses_semantic_name(self):
+        obj = make_coff([
+            SectionSpec(".text", bytes(4), TEXT, ((0, 1, DIR32),)),
+            SectionSpec(".data", b"Unknown\0", DATA),
+        ], [
+            ("constructor", 0, 1, 0x20, 2),
+            ("??_C@_07PCHH@Unknown?$AA@", 0, 2, 0, 2),
+        ])
+        semantic = "__h2cg$BASE$BASEMGR$data$defaultManagerName"
+        result = canonicalize_coff(obj, compgen_data=(
+            CompgenDataClaim(semantic, 2, 0, 8, "data", "external"),
+        ))
+        normalized = CoffObject(result.data)
+        self.assertEqual(normalized.symbols[1].name, semantic)
+        self.assertEqual(normalized.relocations[0].symbol_index, 1)
+        self.assertEqual(
+            [normalized.section_bytes(section) for section in normalized.sections],
+            [CoffObject(obj).section_bytes(section)
+             for section in CoffObject(obj).sections],
+        )
+        self.assertEqual(result.rows[0].proof, "source-DATA_COMPGEN")
+
+    def test_source_compgen_data_binding_overrides_generic_private_name(self):
+        obj = make_coff([
+            SectionSpec(".data", b"rb\0\0", DATA),
+        ], [
+            ("$SG123", 0, 1, 0, 3),
+        ])
+        semantic = "__h2cg$BASE$TEST$data$name"
+        result = canonicalize_coff(obj, compgen_data=(
+            CompgenDataClaim(semantic, 1, 0, 3, "data", "local"),
+        ))
+        self.assertEqual(CoffObject(result.data).symbols[0].name, semantic)
+        self.assertEqual(len(result.rows), 1)
+        self.assertEqual(result.rows[0].canonical_name, semantic)
+        self.assertEqual(result.rows[0].physical_size, 4)
+        self.assertEqual(result.rows[0].meaningful_size, 3)
+
     def test_compiler_function_names_come_from_semantic_relocation_roles(self):
         payload = compiler_function_graph()
         claims = tuple(CompgenClaim(
