@@ -50,7 +50,7 @@ def residual_rows(report, symbols):
         sample = ", ".join("%s:%s" % row for row in missing[:5])
         raise ValueError("%d report functions lack an RVA inventory row: %s" %
                          (len(missing), sample))
-    rows.sort(key=lambda row: (-row["fuzzy"], row["rva"], row["unit"], row["name"]))
+    rows.sort(key=lambda row: (row["fuzzy"], row["rva"], row["unit"], row["name"]))
     for rank, row in enumerate(rows, 1):
         row["rank"] = rank
     return rows
