@@ -66,11 +66,16 @@ inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
 }
 
+inline ArmyFacing ArmyFacingForSide(CombatSide side) {
+    return side == COMBAT_ATTACKER_SIDE ? ARMY_FACING_RIGHT : ARMY_FACING_LEFT;
+}
+
 inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? 1 : -1;
 }
 #else
 #define OppositeArmyFacing(facing) (ARMY_FACING_RIGHT - (facing))
+#define ArmyFacingForSide(side) (ARMY_FACING_RIGHT - (side))
 #define ArmyFacingRearHexOffset(facing)                                                        \
     (static_cast<u32>((facing) - ARMY_FACING_RIGHT) < 1 ? 1 : -1)
 #endif
