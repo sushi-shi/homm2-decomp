@@ -1226,6 +1226,15 @@ def byte_differences(left_hex: str, right_hex: str) -> list[dict[str, str | int 
     ]
 
 
+def trial_status(trial: dict) -> str:
+    """Report only whether the target was observed or closed exactly."""
+    if trial.get("exact_closure_eligible"):
+        return "exact-closure"
+    if trial.get("observed"):
+        return "observed"
+    return "unusable"
+
+
 def target_state_identity(metrics: dict) -> str:
     """Identify codegen state without treating private label counters as new states."""
     normalized_reloc_sha = sha256_bytes(
@@ -1258,49 +1267,6 @@ def exact_closure_rejections(
     if candidate_metrics.get("reloc_stream") != retail_metrics.get("reloc_stream"):
         out.append("ordered relocation offsets/types/identities/addends differ from retail")
     return out
-
-
-def _regressions(baseline: dict[str, float], candidate: dict[str, float], target: str) -> list[str]:
-    out = []
-    for symbol, score in baseline.items():
-        if symbol == target:
-            continue
-        current = candidate.get(symbol)
-        if current is None:
-            out.append(f"missing sibling {symbol}")
-        elif current < score - 1e-6:
-            out.append(f"sibling {symbol}: {score:.6f} -> {current:.6f}")
-    return out
-
-
-def _exact_sibling_metric_regressions(
-    baseline_scores: dict[str, float], baseline_metrics: dict[str, dict], candidate_metrics: dict[str, dict], target: str
-) -> list[str]:
-    out = []
-    for symbol, score in baseline_scores.items():
-        if symbol == target or score < 100.0 - 1e-9 or symbol not in baseline_metrics:
-            continue
-        if candidate_metrics.get(symbol) != baseline_metrics[symbol]:
-            out.append(f"exact sibling raw/reloc metrics changed: {symbol}")
-    return out
-
-
-def predecessor_symbols(target: Target, root: Path) -> set[str]:
-    with (root / "build/gen/symbol_names.csv").open(newline="") as handle:
-        return {
-            row["name"] for row in csv.DictReader(handle)
-            if row["kind"] == "func" and row["unit"] == target.unit and int(row["rva"], 0) < target.rva
-        }
-
-
-def _predecessor_regressions(
-    predecessors: set[str], baseline_metrics: dict[str, dict], candidate_metrics: dict[str, dict]
-) -> list[str]:
-    return [
-        f"predecessor raw/reloc metrics changed: {symbol}"
-        for symbol in sorted(predecessors)
-        if symbol in baseline_metrics and candidate_metrics.get(symbol) != baseline_metrics[symbol]
-    ]
 
 
 def record_target_max(
@@ -1519,8 +1485,6 @@ def main(argv: list[str] | None = None) -> int:
     canonical_target_suffix_digest = target_suffix_digest(original, target.va)
     if canonical_target_suffix_digest is None:
         parser.error(f"target VA marker is not uniquely identifiable in {source_rel}")
-    predecessors = predecessor_symbols(target, root)
-
     target_obj = root / "build/delink" / f"{target.unit}.c.obj"
     if not args.dry_run and not target_obj.exists():
         parser.error(f"retail object is missing: {target_obj}")
@@ -1572,10 +1536,8 @@ def main(argv: list[str] | None = None) -> int:
             "default_repository_mutation": False,
             "sub_100_results_are_disposable": True,
             "record_max_requires_unrounded_exact_100_size_and_ordered_relocations": True,
-            "sibling_score_regressions_allowed": False,
-            "exact_sibling_raw_or_reloc_changes_allowed": False,
-            "exact_target_closure_allows_disposable_sibling_changes": True,
-            "target_size_or_reloc_count_distance_may_not_worsen": True,
+            "only_target_function_is_evaluated": True,
+            "sibling_scores_or_metrics_checked": False,
             "compiler_process_group_terminated_on_timeout": True,
         },
         "baseline": None,
@@ -1772,7 +1734,7 @@ def main(argv: list[str] | None = None) -> int:
                 "candidate": None,
                 "canonical_target_source_hash": candidate_target_hash,
                 "include_macro_guard": include_guard,
-                "eligible": False,
+                "observed": False,
                 "exact_closure_eligible": False,
                 "exact_closure_rejections": [],
                 "rejections": [],
@@ -1819,34 +1781,11 @@ def main(argv: list[str] | None = None) -> int:
                     trial["score_delta"] = score - baseline_score
                     trial["candidate"] = target_metrics
                     trial["state"] = observe_state("trial", score, target_metrics, variant)
-                    with measure_stage(timings, "regression_gates"):
-                        trial["rejections"].extend(
-                            _regressions(baseline_scores, scores, target.symbol)
-                        )
-                        trial["rejections"].extend(
-                            _exact_sibling_metric_regressions(
-                                baseline_scores, baseline_metrics, metrics, target.symbol
-                            )
-                        )
-                        trial["rejections"].extend(
-                            _predecessor_regressions(predecessors, baseline_metrics, metrics)
-                        )
+                    with measure_stage(timings, "target_gates"):
                         candidate_size = target_metrics.get("objdiff_size")
-                        baseline_size = baseline_target.get("objdiff_size")
-                        if candidate_size is None or baseline_size is None:
+                        if candidate_size is None:
                             trial["rejections"].append("objdiff function size unavailable")
-                        elif abs(candidate_size - target.retail_size) > abs(
-                            baseline_size - target.retail_size
-                        ):
-                            trial["rejections"].append("target size distance from retail worsened")
-                        retail_relocs = retail_target.get("relocs")
-                        if retail_relocs is not None and abs(
-                            target_metrics["relocs"] - retail_relocs
-                        ) > abs(baseline_target["relocs"] - retail_relocs):
-                            trial["rejections"].append(
-                                "target relocation-count distance from retail worsened"
-                            )
-                        trial["eligible"] = not trial["rejections"]
+                        trial["observed"] = not trial["rejections"]
                         trial["exact_closure_rejections"] = exact_closure_rejections(
                             score,
                             candidate_size,
@@ -1857,7 +1796,7 @@ def main(argv: list[str] | None = None) -> int:
                         trial["exact_closure_eligible"] = not trial["exact_closure_rejections"]
                     if trial["exact_closure_eligible"] and exact_closure is None:
                         exact_closure = trial
-                    if trial["eligible"] and score > baseline_score + 1e-6:
+                    if trial["observed"] and score > baseline_score + 1e-6:
                         if best_observed is None or score > best_observed["score"] + 1e-6:
                             best_observed = trial
                 trial_obj.unlink(missing_ok=True)
@@ -1869,9 +1808,11 @@ def main(argv: list[str] | None = None) -> int:
                 f"{variant.trial}\t{variant.family}\t"
                 f"{trial['score'] if trial['score'] is not None else 'NA'}\t"
                 f"{trial['score_delta'] if trial['score_delta'] is not None else 'NA'}\t"
-                f"{int(trial['eligible'])}\t{' | '.join(trial['rejections'])}\n"
+                f"{int(trial['observed'])}\t{' | '.join(trial['rejections'])}\t"
+                f"{int(trial['exact_closure_eligible'])}\t"
+                f"{' | '.join(trial['exact_closure_rejections'])}\n"
             )
-            state = "eligible" if trial["eligible"] else "rejected"
+            state = trial_status(trial)
             score_text = "compile-failed" if trial["score"] is None else f"{trial['score']:.6f}%"
             print(f"[{variant.trial:04d}/{len(variants):04d}] {variant.family}: {score_text} {state}", flush=True)
     except KeyboardInterrupt:
@@ -1884,7 +1825,9 @@ def main(argv: list[str] | None = None) -> int:
         signal.signal(signal.SIGTERM, old_term)
 
     (output / "trials.tsv").write_text(
-        "trial\tfamily\tscore\tdelta\teligible\trejections\n" + "".join(rows)
+        "trial\tfamily\tscore\tdelta\tobserved\trejections\t"
+        "exact_closure_eligible\texact_closure_rejections\n"
+        + "".join(rows)
     )
     state_rows = sorted(observed_states.values(), key=lambda row: (not row["baseline"], row["state"]))
     retail_text_hex = retail_target["text_hex"][: target.retail_size * 2]

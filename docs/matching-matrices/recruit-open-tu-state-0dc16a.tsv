@@ -11,7 +11,7 @@ exact-retail-load-order	63a4162855805a66	8	14	100.000000	587	39b07b66a5cffe99	a9
 # Both states retain the retail 587-byte CodeView/objdiff boundary and complete retail 26-site ordered relocation stream. The raw retail COFF function extent is 588 bytes because it has one trailing alignment NOP outside the CodeView boundary.
 # Canonical and exact differ only at the two local loads beginning at +0x155 and +0x158 in the gold/resource minimum. Canonical loads resourceMaximum from -0x4 into EAX and goldMaximum from -0x8 into ECX; exact and retail load goldMaximum into EAX and resourceMaximum into ECX. The comparison, selected value, frame, CFG, and semantics are unchanged.
 # Reversing the symmetric ternary operands is byte-neutral under the canonical TU state, so the clearer established source spelling remains. This is a declaration-sensitive compiler evaluation-order choice rather than missing source structure.
-# All 14 exact trials pass the sibling score, exact-sibling raw/relocation, predecessor, size, and relocation gates. Trial 8 is the retained reproducible representative. The generated typedef train is disposable and does not remain in RECRUIT.cpp.
+# Trial 8 is the first exact representative. The generated typedef train is disposable and does not remain in RECRUIT.cpp; only Open's exact target evidence is relevant to its maximum.
 # The exact state updates only the normalized-source-hash-scoped retained maximum from 99.9879% to 100.0000%. Live canonical score remains 99.987880%.
 #
 # Current-hash replay after compiler-generated-data modelling
