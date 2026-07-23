@@ -2,7 +2,7 @@
 # Observational only; never an enforcement baseline.
 # Updated by `homm2 status update` and `homm2 build`; do not hand-edit.
 # unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash
-BASE/BASEMGR	??0baseManager@@QAE@XZ	79.6667	253fbef3d970
+BASE/BASEMGR	??0baseManager@@QAE@XZ	100.0000	338b8cf19694
 BASE/BITMAP	??0bitmap@@QAE@FFF@Z	100.0000	4e5940b2b9a8
 BASE/BITMAP	??0bitmap@@QAE@K@Z	100.0000	58f00b709aac
 BASE/BITMAP	??0bitmap@@QAE@XZ	100.0000	7057cc29a8e7
