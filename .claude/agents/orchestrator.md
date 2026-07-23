@@ -55,20 +55,20 @@ to the worktree, not master:
 **`cd` AFTER `nix develop` builds master** (`HOMM2_DIR` is fixed at shell entry).
 Better: open ONE `nix develop .#build` shell per slot.
 
-## Target selection — exhaustive residual audit, closest-first
+## Target selection — exhaustive residual audit, least-matched-first
 
 1. **Regenerate objdiff and build the residual queue** from every function whose live fuzzy
-   percentage is below exactly 100%. Sort globally by fuzzy percentage descending, then retail
-   RVA for deterministic ties. This campaign intentionally starts with the smallest residuals.
+   percentage is below exactly 100%. Sort globally by fuzzy percentage ascending, then retail
+   RVA for deterministic ties. This campaign intentionally starts with the least-matched functions.
 2. **Skip only live exact functions.** Source `VA()` macros carry **absolute VAs**
    (`RVA + 0x400000`), so normalise before comparing to report RVAs. Source comments and old proof
    notes never remove a non-exact function from the queue; reproduce evidence from current objects.
 3. **Match TU-by-TU, not function-by-function.** Hand a lane a **whole TU** (or a
    **20+ function chunk** of a large one) and keep that lane on that TU until it is
-   **fully audited for its assigned residuals**, then give the lane the next highest-priority TU.
+   **fully audited for its assigned residuals**, then give the lane the next least-matched TU.
    Tiny TUs (1–8 funcs):
    bundle a few **adjacent, non-overlapping** TUs into one ≥20-func dispatch on a single
-   lane. The closest-first ordering takes precedence over optimization profile. With `/Od` + the
+   lane. The least-matched-first ordering takes precedence over optimization profile. With `/Od` + the
    solved stack hash, ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
    Do NOT interleave small functions across many TUs (the old size-band order) — a
    half-touched TU per lane multiplies the shared-header/top-of-file churn.

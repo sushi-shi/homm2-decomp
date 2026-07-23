@@ -19,7 +19,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - During coverage, prioritize high unmatched-byte weight and drain each chosen TU in
   retail order. Recover all predecessors that can affect cumulative compiler state.
 - During the exhaustive residual campaign, queue every live non-100% function by fuzzy
-  percentage descending, then RVA.
+  percentage ascending, then RVA, so the least-matched functions are handled first.
 - Source comments never remove a live residual from an exhaustive queue. Reproduce all
   evidence from current objects.
 - Do not spend unlimited time on compiler shape. Once semantics, frame, CFG, slots, and
