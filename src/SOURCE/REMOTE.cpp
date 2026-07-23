@@ -429,22 +429,25 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
             } else if (bUseWinsock != 0) {
                 sendStatus = wsnet_snd(destination, size, PacketSend);
             } else {
-                sendStatus = static_cast<i16>(
-                    nb_snd(static_cast<i16>(destination), static_cast<i16>(size), PacketSend)
-                );
-                if (sendStatus != 0) {
-                    LogInt(
-                        DATA_COMPGEN(0x005170dc, sendRemoteDataBadReturnOnSendData, "Bad return on Send Data"),
-                        destination,
-                        sendStatus,
-                        size,
-                        0,
-                        0,
-                        LOG_UNUSED_VALUE,
-                        LOG_UNUSED_VALUE
+                do {
+                    sendStatus = static_cast<i16>(
+                        nb_snd(static_cast<i16>(destination), static_cast<i16>(size), PacketSend)
                     );
-                    out = 0;
-                }
+                    if (sendStatus != 0) {
+                        LogInt(
+                            DATA_COMPGEN(0x005170dc, sendRemoteDataBadReturnOnSendData, "Bad return on Send Data"),
+                            destination,
+                            sendStatus,
+                            size,
+                            0,
+                            0,
+                            LOG_UNUSED_VALUE,
+                            LOG_UNUSED_VALUE
+                        );
+                        out = 0;
+                        goto finished;
+                    }
+                } while (sendStatus != 0);
             }
             break;
         case REMOTE_GAME_MODEM_HOST:
@@ -453,6 +456,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
             out = 1;
             break;
     }
+finished:
     return out;
 }
 
