@@ -286,7 +286,7 @@ i32 font::LineWidth(char* str) {
     i32 y = 0, t = 0, r = 0, x = 0, p = 0,
         w = 0;
     char* v = str;
-    while (OD_STEER(p) < s && v[p] != 0) {
+    while (p < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
             p++;
