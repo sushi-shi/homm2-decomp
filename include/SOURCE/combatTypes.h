@@ -21,13 +21,15 @@ inline CombatSide& operator^=(CombatSide& side, i32 mask) {
 }
 #endif
 
-inline CombatSide OppositeCombatSide(CombatSide side) {
+// VC4.2 must see these arithmetic forms at the call site; an inline wrapper emits /Ob1
+// continuation jumps that are absent from retail.
 #ifdef HOMM2_STRICT_ENUM_TYPES
+inline CombatSide OppositeCombatSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
-#else
-    return COMBAT_DEFENDER_SIDE - side;
-#endif
 }
+#else
+#define OppositeCombatSide(side) (COMBAT_DEFENDER_SIDE - (side))
+#endif
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CombatResult, i8)
     COMBAT_RESULT_DRAW     = -1,
@@ -36,21 +38,18 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CombatResult, i8)
     COMBAT_RESULT_PENDING  = 3
 H2_ENUM_CLASS_END_SPLIT(CombatResult, i8)
 
-inline CombatResult CombatResultForSide(CombatSide side) {
 #ifdef HOMM2_STRICT_ENUM_TYPES
+inline CombatResult CombatResultForSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_RESULT_ATTACKER : COMBAT_RESULT_DEFENDER;
-#else
-    return side;
-#endif
 }
 
 inline CombatResult OppositeCombatResult(CombatResult result) {
-#ifdef HOMM2_STRICT_ENUM_TYPES
     return result == COMBAT_RESULT_ATTACKER ? COMBAT_RESULT_DEFENDER : COMBAT_RESULT_ATTACKER;
-#else
-    return COMBAT_RESULT_DEFENDER - result;
-#endif
 }
+#else
+#define CombatResultForSide(side) (side)
+#define OppositeCombatResult(result) (COMBAT_RESULT_DEFENDER - (result))
+#endif
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArmyFacing, i8)
     ARMY_FACING_NONE  = -1,
@@ -59,8 +58,6 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArmyFacing, i8)
     ARMY_FACING_COUNT = 2
 H2_ENUM_CLASS_END_SPLIT(ArmyFacing, i8)
 
-// VC4.2 must see these arithmetic forms at the call site; an inline wrapper emits /Ob1
-// continuation jumps that are absent from retail.
 #ifdef HOMM2_STRICT_ENUM_TYPES
 inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;

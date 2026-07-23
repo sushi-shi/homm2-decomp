@@ -52,7 +52,7 @@ i32 searchArray::BuildPath(
 ) {
     register i32 currentDestinationX = destinationX;
     register i32 currentDestinationY = destinationY;
-    i8* pathDirection = &m_storage.path.directions[1];
+    u8* pathDirection = &m_storage.path.directions[1];
     m_pathLength = 0;
     while (startX != currentDestinationX || startY != currentDestinationY) {
         searchNode* node = m_storage.nodes + currentDestinationY * MAP_WIDTH + currentDestinationX;

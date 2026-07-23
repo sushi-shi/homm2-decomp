@@ -48,7 +48,7 @@ union searchStorage {
     struct searchNode* nodes;
     struct {
         char pad[SEARCH_PATH_HEADER_SIZE];
-        i8 directions[SEARCH_PATH_CAPACITY + 1];
+        u8 directions[SEARCH_PATH_CAPACITY + 1];
     } path;
     struct {
         char pad[SEARCH_AI_PATH_HEADER_SIZE];
