@@ -1,4 +1,4 @@
-"""Normalized per-function source hashes used to scope retained match maxima."""
+"""Normalized effective-source hashes used to scope retained function maxima."""
 import csv, hashlib, os, re
 from pathlib import Path
 
@@ -82,6 +82,9 @@ def _normalize(block, cmap):
 _VA_MARKER_RE = re.compile(r"VA\(0x([0-9a-fA-F]+)\s*,")
 _TOP_LEVEL_BOUNDARY_RE = re.compile(
     r"[ \t]*(?:DATA\(|VTBL\(|// ===|#endif\b)")
+_STATIC_INLINE_RE = re.compile(
+    r"(?m)^static\s+inline\s+[^\n;{}]*?\b([A-Za-z_]\w*)\s*"
+    r"\([^;{}]*\)\s*\{")
 
 
 def _source_function_blocks(text):
@@ -300,22 +303,73 @@ def _matched_function_end(text, block_start, legacy_end):
     return None
 
 
+def _static_inline_helpers(text):
+    """Return file-scope ``static inline`` definitions by unqualified name.
+
+    These helpers can be fully folded into a reconstructed function while
+    living outside its ``VA(...)`` span. Their bodies are therefore source-hash
+    dependencies of every function that calls them.
+    """
+    helpers = {}
+    for match in _STATIC_INLINE_RE.finditer(text):
+        end = _matched_function_end(text, match.start(), len(text))
+        if end is not None:
+            helpers[match.group(1)] = text[match.start():end]
+    return helpers
+
+
+def _helper_dependencies(block, helpers):
+    """Return transitively called static-inline helper blocks in name order."""
+    found = {}
+    pending = [
+        name for name in helpers
+        if re.search(r"\b" + re.escape(name) + r"\s*\(", block)
+    ]
+    while pending:
+        name = pending.pop()
+        if name in found:
+            continue
+        helper = helpers[name]
+        found[name] = helper
+        pending.extend(
+            dependency for dependency in helpers
+            if dependency not in found and re.search(
+                r"\b" + re.escape(dependency) + r"\s*\(", helper)
+        )
+    return [(name, found[name]) for name in sorted(found)]
+
+
 def source_hashes():
-    """{(unit, function): 12-hex sha1 of its normalized, brace-bounded source body}.
+    """Return normalized effective-source hashes keyed by ``(unit, function)``.
 
     Blocks begin inside ``VA(...)`` for historical compatibility and end after
     the matched function brace plus legacy trailing whitespace. Names are
     normalized by :func:`_normalize`, so codegen-neutral argument/member renames
-    do not perturb the hash.
+    do not perturb the hash. Functions that call TU-private ``static inline``
+    helpers use ``body-hash.dependency-hash`` so helper edits invalidate only
+    their callers' retained maxima.
     """
     sym = _rva_to_sym(); cmap = _class_members()
     out = {}
     for cpp in sorted((REPO / "src").rglob("*.cpp")):
         text = cpp.read_text(errors="replace")
+        helpers = _static_inline_helpers(text)
         for absolute_va, block in _source_function_blocks(text):
             rva = absolute_va - RVA_BASE
             key = sym.get(rva)
             if key:
                 norm = _normalize(block, cmap)
-                out[key] = hashlib.sha1(norm.encode("utf-8", "replace")).hexdigest()[:12]
+                body_hash = hashlib.sha1(
+                    norm.encode("utf-8", "replace")).hexdigest()[:12]
+                dependencies = _helper_dependencies(block, helpers)
+                if dependencies:
+                    dependency_text = "\n".join(
+                        "\n@static-inline " + name + "\n"
+                        + _normalize(helper, cmap)
+                        for name, helper in dependencies)
+                    dependency_hash = hashlib.sha1(
+                        dependency_text.encode("utf-8", "replace")).hexdigest()[:12]
+                    out[key] = body_hash + "." + dependency_hash
+                else:
+                    out[key] = body_hash
     return out

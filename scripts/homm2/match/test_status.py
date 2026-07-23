@@ -193,6 +193,34 @@ class LiveStatusTest(unittest.TestCase):
         self.assertEqual(maxima[("SOURCE/UNIT", "partial")],
                          (97.0, "hash-partial"))
 
+    def test_dependency_hash_upgrade_preserves_body_hash_maximum(self):
+        report = self.report()
+        hashes = {
+            ("SOURCE/UNIT", "exact"): "hash-exact",
+            ("SOURCE/UNIT", "partial"): "bodyhash.dependency",
+        }
+        previous = {
+            ("SOURCE/UNIT", "partial"): (99.0, "bodyhash"),
+        }
+        maxima = status._updated_maxima(report, previous, hashes)
+        self.assertEqual(
+            maxima[("SOURCE/UNIT", "partial")],
+            (99.0, "bodyhash.dependency"))
+
+    def test_changed_composite_dependency_hash_resets_maximum(self):
+        report = self.report()
+        hashes = {
+            ("SOURCE/UNIT", "exact"): "hash-exact",
+            ("SOURCE/UNIT", "partial"): "bodyhash.new-dependency",
+        }
+        previous = {
+            ("SOURCE/UNIT", "partial"): (99.0, "bodyhash.old-dependency"),
+        }
+        maxima = status._updated_maxima(report, previous, hashes)
+        self.assertEqual(
+            maxima[("SOURCE/UNIT", "partial")],
+            (97.0, "bodyhash.new-dependency"))
+
     def test_recording_adds_new_observations(self):
         maxima = status.record_maxima(self.report())
         self.assertEqual(maxima[("SOURCE/UNIT", "partial")], (97.0, "hash-partial"))

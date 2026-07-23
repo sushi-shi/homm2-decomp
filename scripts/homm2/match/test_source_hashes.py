@@ -65,6 +65,45 @@ i32 Second(void)
         self.assertNotEqual(before[first], after[first])
         self.assertEqual(before[second], after[second])
 
+    def test_static_inline_edit_changes_callers_hash(self):
+        first = ("SOURCE/UNIT", "?First@@YAHXZ")
+        second = ("SOURCE/UNIT", "?Second@@YAHXZ")
+        helper = """static inline i32 AddOne(i32 value)
+{
+    return value + %d;
+}
+
+"""
+        self.source_path.write_text(
+            helper % 1 + self.source(first_return="AddOne(localValue)"))
+        before = source_hashes.source_hashes()
+        self.source_path.write_text(
+            helper % 2 + self.source(first_return="AddOne(localValue)"))
+        after = source_hashes.source_hashes()
+        self.assertNotEqual(before[first], after[first])
+        self.assertEqual(before[second], after[second])
+
+    def test_static_inline_dependencies_are_transitive(self):
+        first = ("SOURCE/UNIT", "?First@@YAHXZ")
+        helpers = """static inline i32 AddOne(i32 value)
+{
+    return Inner(value) + 1;
+}
+
+static inline i32 Inner(i32 value)
+{
+    return value + %d;
+}
+
+"""
+        self.source_path.write_text(
+            helpers % 1 + self.source(first_return="AddOne(localValue)"))
+        before = source_hashes.source_hashes()
+        self.source_path.write_text(
+            helpers % 2 + self.source(first_return="AddOne(localValue)"))
+        after = source_hashes.source_hashes()
+        self.assertNotEqual(before[first], after[first])
+
 
 if __name__ == "__main__":
     unittest.main()
