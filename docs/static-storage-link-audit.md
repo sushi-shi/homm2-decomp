@@ -2,7 +2,7 @@
 
 `ninja link` writes a per-symbol static-storage audit to
 `build/link/HEROES2W.link.json` under `static_storage.public_symbols`. This is a
-link-layout diagnostic, not an objdiff data-matching score and not a mechanism for
+final-link diagnostic, not an objdiff data-matching score and not a mechanism for
 forcing retail addresses.
 
 The same report compares the complete raw `.rdata` and `.data` payloads at
