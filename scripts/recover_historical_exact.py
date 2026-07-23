@@ -21,6 +21,7 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -29,12 +30,22 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from historical_exact_losses import parse_baseline
+from tu_state_noise import (
+    BaselineUpdateError,
+    SourceMutationError,
+    acquire_source_mutation_lock,
+    record_target_max,
+    resolve_target,
+)
 
 
 DEFAULT_QUEUE = Path("/tmp/homm2-historical-exact-recovery-queue.tsv")
 DEFAULT_RESULTS = Path("/tmp/homm2-historical-exact-recovery-results.tsv")
 DEFAULT_LOG_DIR = Path("/tmp/homm2-historical-exact-recovery-logs")
 TERMINATION_GRACE_SECONDS = 3.0
+ROLLBACK_TIMEOUT_SECONDS = 180.0
+VA_MARKER_LINE = re.compile(r"^[ \t]*VA\(0x[0-9a-f]+,", re.M | re.I)
+OD_STEER_NAME = "OD_STEER"
 RESULT_FIELDS = (
     "timestamp",
     "profile",
@@ -52,6 +63,110 @@ RESULT_FIELDS = (
     "log",
     "artifact",
 )
+
+
+class RecoveryError(RuntimeError):
+    pass
+
+
+def target_source_span(text: str, marker_offset: int) -> tuple[int, int]:
+    """Return the VA-delimited source block for one resolved function."""
+    if marker_offset < 0 or marker_offset >= len(text):
+        raise ValueError("target marker offset is outside the source")
+    if re.match(r"VA\(0x[0-9a-f]+,", text[marker_offset:], re.I) is None:
+        raise ValueError("target marker offset does not begin a VA marker")
+    following = VA_MARKER_LINE.search(text, marker_offset + 1)
+    return marker_offset, following.start() if following else len(text)
+
+
+def _quoted_end(text: str, start: int, quote: str) -> int:
+    cursor = start + 1
+    while cursor < len(text):
+        if text[cursor] == "\\":
+            cursor += 2
+        elif text[cursor] == quote:
+            return cursor + 1
+        else:
+            cursor += 1
+    raise ValueError("unterminated string or character literal")
+
+
+def _comment_end(text: str, start: int) -> int:
+    if text.startswith("//", start):
+        newline = text.find("\n", start + 2)
+        return len(text) if newline < 0 else newline
+    end = text.find("*/", start + 2)
+    if end < 0:
+        raise ValueError("unterminated block comment")
+    return end + 2
+
+
+def _matching_paren(text: str, opening: int) -> int:
+    depth = 1
+    cursor = opening + 1
+    while cursor < len(text):
+        if text.startswith("//", cursor) or text.startswith("/*", cursor):
+            cursor = _comment_end(text, cursor)
+        elif text[cursor] in {'"', "'"}:
+            cursor = _quoted_end(text, cursor, text[cursor])
+        elif text[cursor] == "(":
+            depth += 1
+            cursor += 1
+        elif text[cursor] == ")":
+            depth -= 1
+            if depth == 0:
+                return cursor
+            cursor += 1
+        else:
+            cursor += 1
+    raise ValueError("unterminated OD_STEER invocation")
+
+
+def unwrap_od_steer(text: str) -> tuple[str, int]:
+    """Remove real OD_STEER calls while leaving comments and literals untouched."""
+    pieces: list[str] = []
+    cursor = 0
+    count = 0
+    while cursor < len(text):
+        if text.startswith("//", cursor) or text.startswith("/*", cursor):
+            end = _comment_end(text, cursor)
+            pieces.append(text[cursor:end])
+            cursor = end
+            continue
+        if text[cursor] in {'"', "'"}:
+            end = _quoted_end(text, cursor, text[cursor])
+            pieces.append(text[cursor:end])
+            cursor = end
+            continue
+        if text.startswith(OD_STEER_NAME, cursor):
+            before = text[cursor - 1] if cursor else ""
+            after_index = cursor + len(OD_STEER_NAME)
+            after = text[after_index] if after_index < len(text) else ""
+            if (before.isalnum() or before == "_") or (after.isalnum() or after == "_"):
+                pieces.append(text[cursor])
+                cursor += 1
+                continue
+            opening = after_index
+            while opening < len(text) and text[opening].isspace():
+                opening += 1
+            if opening >= len(text) or text[opening] != "(":
+                raise ValueError("OD_STEER token is not a function-like invocation")
+            closing = _matching_paren(text, opening)
+            inner, nested = unwrap_od_steer(text[opening + 1 : closing])
+            pieces.append(inner)
+            count += nested + 1
+            cursor = closing + 1
+            continue
+        pieces.append(text[cursor])
+        cursor += 1
+    return "".join(pieces), count
+
+
+def clean_target_od_steer(text: str, marker_offset: int) -> tuple[str, int]:
+    """Unwrap OD_STEER only within the resolved target's VA-delimited block."""
+    start, end = target_source_span(text, marker_offset)
+    cleaned_block, count = unwrap_od_steer(text[start:end])
+    return text[:start] + cleaned_block + text[end:], count
 
 
 def positive_int(value: str) -> int:
@@ -166,19 +281,50 @@ def terminate_process(process: subprocess.Popen) -> None:
         process.wait()
 
 
-def run_target(
+def run_logged_process(
+    root: Path,
+    command: list[str],
+    log_path: Path,
+    deadline: float,
+    mode: str = "a",
+) -> tuple[int, float]:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+        return 124, 0.0
+    started = time.monotonic()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    with log_path.open(mode, encoding="utf-8") as log:
+        log.write("command: " + " ".join(command) + "\n")
+        log.flush()
+        process = subprocess.Popen(
+            command,
+            cwd=root,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+            start_new_session=True,
+            text=True,
+        )
+        try:
+            exit_code = process.wait(timeout=remaining)
+        except subprocess.TimeoutExpired:
+            terminate_process(process)
+            return 124, time.monotonic() - started
+        except KeyboardInterrupt:
+            terminate_process(process)
+            raise
+    return exit_code, time.monotonic() - started
+
+
+def noise_command(
     root: Path,
     row: dict[str, str],
     args: argparse.Namespace,
-    log_path: Path,
-) -> tuple[str, int, float, float | None, Path]:
-    source = source_for_unit(root, row["unit"])
-    output = (
-        root / "build/tu-state-noise/historical-exact-recovery"
-        / artifact_name(row)
-    )
-    if not source.is_file():
-        return "error", 2, 0.0, None, output
+    source: Path,
+    output: Path,
+    *,
+    record_max: bool,
+    only_trial: int | None = None,
+) -> list[str]:
     command = [
         sys.executable,
         str(root / "scripts/tu_state_noise.py"),
@@ -200,39 +346,282 @@ def run_target(
         str(args.compile_timeout_seconds),
         "--output",
         str(output),
-        "--record-max",
         "--retain-best",
     ]
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    started = time.monotonic()
-    with log_path.open("w", encoding="utf-8") as log:
-        log.write("command: " + " ".join(command) + "\n")
-        log.flush()
-        process = subprocess.Popen(
-            command,
-            cwd=root,
-            stdout=log,
-            stderr=subprocess.STDOUT,
-            start_new_session=True,
-            text=True,
+    if record_max:
+        command.append("--record-max")
+    if only_trial is not None:
+        command.extend(("--only-trial", str(only_trial)))
+    return command
+
+
+def load_manifest(output: Path) -> dict:
+    path = output / "manifest.json"
+    return json.loads(path.read_text()) if path.exists() else {}
+
+
+def write_source_guarded(
+    root: Path,
+    source: Path,
+    expected: bytes,
+    replacement: bytes,
+) -> None:
+    lock = acquire_source_mutation_lock(root, source)
+    try:
+        current = source.read_bytes()
+        if current != expected:
+            raise SourceMutationError(f"source changed before guarded write: {source}")
+        source.write_bytes(replacement)
+    finally:
+        lock.close()
+
+
+def rebuild_normalized_unit(
+    root: Path,
+    unit: str,
+    log_path: Path,
+    deadline: float,
+) -> None:
+    target = f"build/objdiff/normalized/base/{unit}.obj"
+    exit_code, _elapsed = run_logged_process(
+        root, ["ninja", target], log_path, deadline
+    )
+    if exit_code != 0:
+        raise RecoveryError(f"canonical rebuild failed with exit code {exit_code}")
+
+
+def rollback_cleanup(
+    root: Path,
+    source: Path,
+    clean_bytes: bytes,
+    original_bytes: bytes,
+    baseline_path: Path,
+    baseline_bytes: bytes,
+    expected_baseline_bytes: bytes,
+    unit: str,
+    log_path: Path,
+    deadline: float,
+) -> None:
+    write_source_guarded(root, source, clean_bytes, original_bytes)
+    current_baseline_bytes = baseline_path.read_bytes()
+    if current_baseline_bytes != baseline_bytes:
+        if current_baseline_bytes != expected_baseline_bytes:
+            raise RecoveryError(
+                "baseline changed outside the cleanup transaction; refusing rollback overwrite"
+            )
+        baseline_path.write_bytes(baseline_bytes)
+    rebuild_normalized_unit(root, unit, log_path, deadline)
+    exit_code, _elapsed = run_logged_process(
+        root, ["homm2", "status", "--force-refresh"], log_path, deadline
+    )
+    if exit_code != 0:
+        raise RecoveryError(
+            f"rollback status refresh failed with exit code {exit_code}"
         )
+
+
+def retire_target_od_steer(
+    root: Path,
+    row: dict[str, str],
+    args: argparse.Namespace,
+    log_path: Path,
+    output: Path,
+    original_bytes: bytes,
+    clean_bytes: bytes,
+    count: int,
+    deadline: float,
+) -> Path:
+    """Keep a target-local OD_STEER removal only after clean exact revalidation."""
+    source = source_for_unit(root, row["unit"])
+    baseline_path = root / "config/match_baseline.tsv"
+    baseline_bytes = baseline_path.read_bytes()
+    suffix = f"-no-od-steer-{time.time_ns()}"
+    clean_output = output.with_name(output.name + suffix)
+    replay_output = output.with_name(output.name + suffix + "-record")
+    cleanup_manifest = output / "od-steer-cleanup.json"
+    state = {
+        "target_local_invocations": count,
+        "source_retained": False,
+        "clean_search_artifact": str(clean_output),
+        "record_artifact": str(replay_output),
+    }
+
+    expected_baseline_bytes = baseline_bytes
+    source_cleaned = False
+    try:
+        write_source_guarded(root, source, original_bytes, clean_bytes)
+        source_cleaned = True
+        command = noise_command(
+            root, row, args, source, clean_output, record_max=False
+        )
+        exit_code, _elapsed = run_logged_process(
+            root, command, log_path, deadline
+        )
+        clean_manifest = load_manifest(clean_output)
+        exact = clean_manifest.get("exact_closure")
+        if exit_code != 0 or exact is None:
+            raise RecoveryError(
+                "clean OD_STEER-free target did not reproduce an audited exact state"
+            )
+
+        rebuild_normalized_unit(root, row["unit"], log_path, deadline)
+        exit_code, _elapsed = run_logged_process(
+            root,
+            ["homm2", "status", "update", "--force-refresh"],
+            log_path,
+            deadline,
+        )
+        expected_baseline_bytes = baseline_path.read_bytes()
+        if exit_code != 0:
+            raise RecoveryError(
+                f"clean-source status transition failed with exit code {exit_code}"
+            )
+
+        trial = int(exact["trial"])
+        command = noise_command(
+            root,
+            row,
+            args,
+            source,
+            replay_output,
+            record_max=True,
+            only_trial=trial,
+        )
+        exit_code, _elapsed = run_logged_process(
+            root, command, log_path, deadline
+        )
+        expected_baseline_bytes = baseline_path.read_bytes()
+        replay_manifest = load_manifest(replay_output)
+        recorded = replay_manifest.get("record_max", {})
+        if (
+            exit_code != 0
+            or replay_manifest.get("exact_closure") is None
+            or float(recorded.get("new_max", 0.0)) < 100.0
+        ):
+            raise RecoveryError(
+                "clean exact replay did not retain MAX 100 for the new source hash"
+            )
+        if source.read_bytes() != clean_bytes:
+            raise RecoveryError("clean exact replay did not restore the clean source")
+        state.update(
+            {
+                "source_retained": True,
+                "exact_trial": trial,
+                "new_source_hash": recorded.get("source_hash"),
+            }
+        )
+        cleanup_manifest.write_text(json.dumps(state, indent=2) + "\n")
+        return replay_output
+    except (OSError, RecoveryError, SourceMutationError, ValueError) as exc:
+        state["error"] = str(exc)
         try:
-            exit_code = process.wait(timeout=args.target_timeout_seconds)
-        except subprocess.TimeoutExpired:
-            terminate_process(process)
-            return "timeout", 124, time.monotonic() - started, None, output
-        except KeyboardInterrupt:
-            terminate_process(process)
-            raise
+            if source_cleaned or source.read_bytes() == clean_bytes:
+                rollback_cleanup(
+                    root,
+                    source,
+                    clean_bytes,
+                    original_bytes,
+                    baseline_path,
+                    baseline_bytes,
+                    expected_baseline_bytes,
+                    row["unit"],
+                    log_path,
+                    max(deadline, time.monotonic() + ROLLBACK_TIMEOUT_SECONDS),
+                )
+            elif (
+                source.read_bytes() != original_bytes
+                or baseline_path.read_bytes() != baseline_bytes
+            ):
+                raise RecoveryError(
+                    "cleanup failed before ownership was established and state changed"
+                )
+            state["rollback_complete"] = True
+        except (OSError, RecoveryError, SourceMutationError) as rollback_exc:
+            state["rollback_complete"] = False
+            state["rollback_error"] = str(rollback_exc)
+        cleanup_manifest.write_text(json.dumps(state, indent=2) + "\n")
+        raise RecoveryError(state["error"]) from exc
+
+
+def run_target(
+    root: Path,
+    row: dict[str, str],
+    args: argparse.Namespace,
+    log_path: Path,
+) -> tuple[str, int, float, float | None, Path]:
+    source = source_for_unit(root, row["unit"])
+    output = (
+        root / "build/tu-state-noise/historical-exact-recovery"
+        / getattr(args, "profile", "manual")
+        / artifact_name(row)
+    )
+    if output.exists():
+        output = output.with_name(output.name + f"-retry-{time.time_ns()}")
+    if not source.is_file():
+        return "error", 2, 0.0, None, output
+    started = time.monotonic()
+    deadline = started + args.target_timeout_seconds
+    original_bytes = source.read_bytes()
+    try:
+        target, _flags = resolve_target(root, source, int(row["rva"], 0))
+        clean_text, steer_count = clean_target_od_steer(
+            original_bytes.decode("utf-8"), target.marker_offset
+        )
+    except (OSError, UnicodeError, ValueError) as exc:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        log_path.write_text(f"target OD_STEER inspection failed: {exc}\n")
+        return "error", 2, time.monotonic() - started, None, output
+    clean_bytes = clean_text.encode("utf-8")
+    command = noise_command(
+        root,
+        row,
+        args,
+        source,
+        output,
+        record_max=steer_count == 0,
+    )
+    exit_code, _elapsed = run_logged_process(
+        root, command, log_path, deadline, mode="w"
+    )
     elapsed = time.monotonic() - started
+    if exit_code == 124:
+        return "timeout", exit_code, elapsed, None, output
     if exit_code != 0:
         return "error", exit_code, elapsed, None, output
-    manifest_path = output / "manifest.json"
-    best_score = None
-    if manifest_path.exists():
-        best_score = json.loads(manifest_path.read_text()).get(
-            "best_retained", {}
-        ).get("score")
+    manifest = load_manifest(output)
+    best_score = manifest.get("best_retained", {}).get("score")
+    exact = manifest.get("exact_closure") is not None
+    if steer_count and not exact:
+        try:
+            record_target_max(
+                root / "config/match_baseline.tsv",
+                row["unit"],
+                row["symbol"],
+                row["current_hash"],
+                best_score,
+            )
+        except (OSError, BaselineUpdateError) as exc:
+            with log_path.open("a", encoding="utf-8") as log:
+                log.write(f"recording non-exact target maximum failed: {exc}\n")
+            return "error", 4, time.monotonic() - started, best_score, output
+    if steer_count and exact:
+        try:
+            output = retire_target_od_steer(
+                root,
+                row,
+                args,
+                log_path,
+                output,
+                original_bytes,
+                clean_bytes,
+                steer_count,
+                deadline,
+            )
+        except RecoveryError as exc:
+            with log_path.open("a", encoding="utf-8") as log:
+                log.write(f"target-local OD_STEER retirement failed: {exc}\n")
+            return "error", 5, time.monotonic() - started, best_score, output
+        return "exact", 0, time.monotonic() - started, 100.0, output
     maximum, source_hash = current_baseline(root).get(
         (row["unit"], row["symbol"]), (0.0, "")
     )
@@ -307,6 +696,7 @@ def main(argv: list[str] | None = None) -> int:
     baseline = current_baseline(root)
     queue_rows = pending_losses(read_tsv(queue), baseline)
     profile = profile_id(root, args)
+    args.profile = profile
     done = completed_keys(results, profile)
     pending = [
         row for row in queue_rows

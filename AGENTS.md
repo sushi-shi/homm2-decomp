@@ -57,8 +57,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    retain only the best paired object, disassembly, and diff under `build/` as clue evidence.
 8. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
-   the clean unchanged source, and retain no generated probe declarations or functions. A
-   A higher observed score may update the clean function's hash-scoped maximum after source
+   the clean unchanged source, and retain no generated probe declarations or functions. The
+   recovery loop performs this migration immediately when an exact target itself contains
+   `OD_STEER`; it must never remove steering from a predecessor or sibling. A higher observed
+   score may update the clean function's hash-scoped maximum after source
    restoration; exact closure additionally requires retail size, exact-100 bytes, and complete
    ordered-relocation identity. The reconstructed source remains free of compiler-state hacks.
 9. If the clean-source sweep has no exact island, make one evidence-based targeted source change
