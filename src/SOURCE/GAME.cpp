@@ -5119,11 +5119,12 @@ void game::RandomizeMine(i32 x, i32 y) {
 
 VA(0x0047fc0a, 0xc6)
 void game::InitRandomArtifacts(void) {
-    i32 xx;
+    // Retail /Od retains this otherwise unused local between the loop-index slots.
+    i32 ignoredIndex;
+    i32 y;
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
-    i32 x;
-    for (x = 0; x < MAP_WIDTH; x++) {
-        for (i32 y = 0; y < MAP_HEIGHT; y++) {
+    for (i32 x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->Row(y) + x;
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT))
                 m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
