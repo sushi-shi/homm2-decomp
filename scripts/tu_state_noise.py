@@ -49,6 +49,9 @@ from typing import Iterable
 from tu_state_metrics import read_coff
 from homm2.build.assert_relocs import load_symbols
 from homm2.build.canonicalize_data_symbols import (
+    CoffObject,
+    CompgenDataClaim,
+    _definitions,
     canonicalize_coff,
     load_compgen_claims,
     load_compgen_data_claims,
@@ -997,6 +1000,7 @@ def normalize_comparison_pair(
     retail_raw: Path,
     prefix: Path,
     pairing: dict,
+    target_symbol: str | None = None,
 ) -> tuple[Path, Path, list[Path]]:
     """Build the same candidate-paired normalized copies used by canonical objdiff."""
     paired_retail = prefix.with_suffix(".paired-retail.obj")
@@ -1014,18 +1018,24 @@ def normalize_comparison_pair(
         candidate_raw,
         paired_retail,
     )
+    candidate_compgen_data, retail_compgen_data = target_compgen_data_claims(
+        candidate_raw,
+        paired_retail,
+        target_symbol,
+        pairing["compgen_data"],
+    )
     normalized_candidate.write_bytes(
         canonicalize_coff(
             candidate_raw.read_bytes(),
             compgen=pairing["compgen"],
-            compgen_data=pairing["compgen_data"],
+            compgen_data=candidate_compgen_data,
         ).data
     )
     normalized_retail.write_bytes(
         canonicalize_coff(
             paired_retail.read_bytes(),
             compgen=pairing["compgen"],
-            compgen_data=pairing["compgen_data"],
+            compgen_data=retail_compgen_data,
         ).data
     )
     return normalized_candidate, normalized_retail, [
@@ -1033,6 +1043,132 @@ def normalize_comparison_pair(
         normalized_candidate,
         normalized_retail,
     ]
+
+
+def _function_relocations(coff: CoffObject, symbol_name: str):
+    functions = [
+        symbol for symbol in coff.symbols.values()
+        if symbol.name == symbol_name and symbol.section > 0 and symbol.typ == 0x20
+    ]
+    if len(functions) != 1:
+        raise ValueError(
+            f"{symbol_name} has {len(functions)} external function definitions"
+        )
+    function = functions[0]
+    following = [
+        symbol.value for symbol in coff.symbols.values()
+        if (
+            symbol.section == function.section
+            and symbol.typ == 0x20
+            and symbol.storage_class == 2
+            and symbol.value > function.value
+        )
+    ]
+    end = min(following, default=coff.sections[function.section - 1].raw_size)
+    return sorted(
+        (
+            relocation for relocation in coff.relocations
+            if (
+                relocation.section == function.section
+                and function.value <= relocation.site < end
+            )
+        ),
+        key=lambda relocation: (relocation.site, relocation.offset),
+    )
+
+
+def target_compgen_data_claims(
+    candidate_raw: Path,
+    paired_retail: Path,
+    target_symbol: str | None,
+    claims: tuple[CompgenDataClaim, ...],
+) -> tuple[tuple[CompgenDataClaim, ...], tuple[CompgenDataClaim, ...]]:
+    """Bind only reviewed compiler data referenced by the target function.
+
+    Parser-visible probes may insert anonymous storage and move unrelated private
+    definitions away from their reviewed manifest offsets. Pairing every TU-wide
+    DATA_COMPGEN claim against such a disposable object would either bind the wrong
+    datum or fail before the target can be scored. The target's ordered relocations
+    provide the stronger local evidence: after retail pairing, a semantic claim name
+    identifies the retail site, and the relocation at the same ordinal identifies the
+    corresponding candidate definition even when its physical offset moved.
+    """
+    if target_symbol is None or not claims:
+        return claims, claims
+
+    candidate = CoffObject(candidate_raw.read_bytes())
+    retail = CoffObject(paired_retail.read_bytes())
+    candidate_relocations = _function_relocations(candidate, target_symbol)
+    retail_relocations = _function_relocations(retail, target_symbol)
+    if len(candidate_relocations) != len(retail_relocations):
+        raise ValueError(
+            f"{target_symbol} relocation count differs while binding DATA_COMPGEN: "
+            f"candidate {len(candidate_relocations)}, retail {len(retail_relocations)}"
+        )
+
+    claims_by_name = {claim.name: claim for claim in claims}
+    candidate_definitions = {
+        definition.symbol.index: definition for definition in _definitions(candidate)
+    }
+    retail_definitions = {
+        definition.symbol.index: definition for definition in _definitions(retail)
+    }
+    candidate_claims = []
+    retail_claims = []
+    seen = set()
+    for candidate_relocation, retail_relocation in zip(
+        candidate_relocations, retail_relocations
+    ):
+        retail_symbol = retail.symbols[retail_relocation.symbol_index]
+        claim = claims_by_name.get(retail_symbol.name)
+        if claim is None or claim.name in seen:
+            continue
+        candidate_definition = candidate_definitions.get(
+            candidate_relocation.symbol_index
+        )
+        retail_definition = retail_definitions.get(retail_relocation.symbol_index)
+        if candidate_definition is None or retail_definition is None:
+            raise ValueError(
+                f"{claim.name} target relocation does not reference a data definition"
+            )
+        for side, definition in (
+            ("candidate", candidate_definition),
+            ("retail", retail_definition),
+        ):
+            physical_size = definition.end - definition.start
+            if claim.size > physical_size:
+                raise ValueError(
+                    f"{claim.name} logical size 0x{claim.size:x} exceeds {side} "
+                    f"target extent 0x{physical_size:x}"
+                )
+        candidate_scope = (
+            "external"
+            if candidate_definition.symbol.storage_class == 2
+            else "local"
+        )
+        retail_scope = (
+            "external"
+            if retail_definition.symbol.storage_class == 2
+            else "local"
+        )
+        candidate_claims.append(CompgenDataClaim(
+            claim.name,
+            candidate_definition.section.index,
+            candidate_definition.start,
+            claim.size,
+            candidate_definition.storage,
+            candidate_scope,
+        ))
+        retail_claims.append(CompgenDataClaim(
+            claim.name,
+            retail_definition.section.index,
+            retail_definition.start,
+            claim.size,
+            retail_definition.storage,
+            retail_scope,
+        ))
+        seen.add(claim.name)
+    return tuple(candidate_claims), tuple(retail_claims)
 
 
 def normalized_relocation_stream(metrics: dict) -> list[str]:
@@ -1450,7 +1586,13 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     with measure_stage(timings, "baseline_normalize"):
         baseline_normalized, baseline_target_normalized, _baseline_generated = (
-            normalize_comparison_pair(baseline_obj, target_obj, output / "baseline", pairing)
+            normalize_comparison_pair(
+                baseline_obj,
+                target_obj,
+                output / "baseline",
+                pairing,
+                target.symbol,
+            )
         )
     with measure_stage(timings, "baseline_objdiff"):
         baseline_scores, baseline_sizes, baseline_counts, diff_log = objdiff_scores(
@@ -1621,6 +1763,7 @@ def main(argv: list[str] | None = None) -> int:
                             target_obj,
                             output / f"trial-{variant.trial:04d}",
                             pairing,
+                            target.symbol,
                         )
                     )
                 with measure_stage(timings, "trial_objdiff"):
