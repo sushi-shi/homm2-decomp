@@ -7135,23 +7135,24 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         4
     );
 
-    i32 selectedIndex7 = 0;
+    // Retail reuses this locator index slot for the terrain value below.
+    i32 contextValue7 = 0;
     i32 index;
     for (index = 0; index < gpCurPlayer->m_heroCount; ++index) {
         if (gpCurPlayer->m_heroIds[index] == heroId) {
-            selectedIndex7 = index;
+            contextValue7 = index;
         }
     }
-    if (selectedIndex7 < gpCurPlayer->m_heroLocatorPage) {
-        gpCurPlayer->m_heroLocatorPage = static_cast<i8>(selectedIndex7);
-    } else if (gpCurPlayer->m_heroLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < selectedIndex7) {
+    if (contextValue7 < gpCurPlayer->m_heroLocatorPage) {
+        gpCurPlayer->m_heroLocatorPage = static_cast<i8>(contextValue7);
+    } else if (gpCurPlayer->m_heroLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < contextValue7) {
         gpCurPlayer->m_heroLocatorPage =
-            static_cast<i8>(selectedIndex7 - (LOCATOR_VISIBLE_COUNT - 1));
+            static_cast<i8>(contextValue7 - (LOCATOR_VISIBLE_COUNT - 1));
     }
 
     UpdateHeroLocators(1, 1);
     UpdateTownLocators(1, 1);
-    if (!update && (m_active || gbThisNetHumanPlayer[giCurPlayer])) {
+    if (!update && (m_active == 1 || gbThisNetHumanPlayer[giCurPlayer])) {
         Reseed(0, 0);
         SeedTo(currentHero->m_destinationX, currentHero->m_destinationY);
         ShowRoute(0, 0, !update);
@@ -7167,10 +7168,10 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         1
     );
 
-    H2_ENUM_STORAGE(TerrainType, i32) terrain =
-        giGroundToTerrain[currentCell->m_terrainImageIndex];
-    if (m_currentTerrain != terrain) {
-        m_currentTerrain = terrain;
+    contextValue7 =
+        static_cast<i32>(giGroundToTerrain[currentCell->m_terrainImageIndex]);
+    if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
+        m_currentTerrain = contextValue7;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     if (!gbHeroMoving) {

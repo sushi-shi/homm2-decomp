@@ -2691,7 +2691,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     nb = -99.0f;
     kn = -99.0f;
     jb = BUILDING_SLOT_NONE;
-    for (node = BUILDING_SLOT_MAGE_GUILD; node <= BUILDING_SLOT_DISABLED_LAST; node++) {
+    for (node = BUILDING_SLOT_MAGE_GUILD; node < BUILDING_SLOT_COUNT; node++) {
         if (!(t->m_buildings & (1 << IDX(node)))
             || (node == BUILDING_SLOT_MAGE_GUILD && t->m_buildState < AI_MAX_MAGE_GUILD_LEVEL)) {
             if (CanBuild(t, node)) {
