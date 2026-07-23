@@ -1581,6 +1581,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
     parser.add_argument("--run", action="store_true", help="compile and score the emitted manifest")
     parser.add_argument("--top", type=int, default=12, help="ranked results printed by --run")
     parser.add_argument("--compile-timeout", type=float, default=120.0)
+    parser.add_argument("--wall-time-seconds", type=float, default=1200.0)
     parser.add_argument("--batch-output", type=Path, help="artifact directory used by --run")
     parser.add_argument(
         "--show-best-disasm", action="store_true",
@@ -1591,7 +1592,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         args.min_depth < 1 or args.max_depth < args.min_depth
         or args.limit < 1 or args.helper_name_count < 1
         or not 1 <= args.rename_name_count <= len(RENAME_SUFFIXES) or args.state_trials < 0
-        or args.top < 1 or args.compile_timeout <= 0
+        or args.top < 1 or args.compile_timeout <= 0 or args.wall_time_seconds <= 0
     ):
         parser.error("require 1 <= --min-depth <= --max-depth and positive limit/name count")
 
@@ -1743,6 +1744,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         batch_args = [
             str(args.output), "--limit", str(len(candidates) * max(1, _axis_product(payload))),
             "--top", str(args.top), "--compile-timeout", str(args.compile_timeout),
+            "--wall-time-seconds", str(args.wall_time_seconds),
         ]
         if args.batch_output is not None:
             batch_args.extend(("--output", str(args.batch_output)))
