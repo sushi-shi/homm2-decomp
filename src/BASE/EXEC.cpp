@@ -255,7 +255,7 @@ void executive::MainLoop(void) {
                 if (done)
                     return;
                 manager = m_activeManager;
-                if (manager->m_active
+                if (manager->m_active == true
                     && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
                     result = manager->Main(message);
                     switch (result) {
