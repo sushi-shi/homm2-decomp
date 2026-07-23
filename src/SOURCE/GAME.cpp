@@ -916,21 +916,18 @@ H2_ENUM_BEGIN(PuzzleSetupConstant)
     PUZZLE_FALLBACK_RETRY_LIMIT     = 100
 H2_ENUM_END(PuzzleSetupConstant)
 
-inline float PuzzleCompletionCurve(float ratio) {
-    return (ratio * ratio + ratio)
-           / DATA_COMPGEN(
-               0x004eb6e0,
-               puzzleInterpolationTermCount,
-               static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
-           );
-}
-
 VA(0x00471500, 0x2ac)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
     float ratio = static_cast<float>(GetNumObelisks(player)) / m_obeliskCount;
-    float interpolation = PuzzleCompletionCurve(ratio);
+    float interpolation =
+        (ratio * ratio + ratio)
+        / DATA_COMPGEN(
+            0x004eb6e0,
+            puzzleInterpolationTermCount,
+            static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
+        );
     pieceCountTotal = static_cast<i32>(pieceCountTotal + unvisitedObelisks * interpolation);
 
     if (GetNumObelisks(player) == m_obeliskCount)
