@@ -2555,13 +2555,13 @@ VA(0x00430536, 0x65b)
 MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;
-    army* currentArmy;
-    i32 advanceArmy;
+    army* actingArmy;
+    i32 shouldAdvance;
     i32 redraw;
-    MessageDispatchResult result;
+    MessageDispatchResult dispatchResult;
 
     ClearCombatMessages(0);
-    result = MESSAGE_DISPATCH_CONSUME;
+    dispatchResult = MESSAGE_DISPATCH_CONSUME;
     redraw = 0;
     gbProcessingCombatAction = true;
     if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
@@ -2600,7 +2600,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
         LogInt(
             DATA_COMPGEN(0x004f0ed0, processNextActionAboutToT, "About to T"),
-            iCombatControlNetPos[IDX(OppositeCombatSide(m_currentSide))],
+            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -2610,7 +2610,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         );
         transmitResult = TransmitRemoteData(
             reinterpret_cast<char*>(actionData),
-            iCombatControlNetPos[IDX(OppositeCombatSide(m_currentSide))],
+            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)],
             sizeof(actionData),
             REMOTE_COMMAND_ACTION,
             1,
@@ -2622,92 +2622,92 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             ShutDown(NULL);
     }
 
-    currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    advanceArmy = 0;
-    if (CheckWin(&message) == 0) {
-        switch (giNextAction) {
-            case ACTION_NONE:
-                break;
-            case ACTION_CAST_SPELL:
-                ResetCyclingCreatures();
-                CastSpell(
-                    SpellType(giNextActionExtra),
-                    giNextActionGridIndex,
-                    0,
-                    giNextActionGridIndex2
-                );
-                if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].m_quantity < 1)
-                    advanceArmy = 1;
-                ResetCycleTimers();
-                break;
-            case ACTION_MOVE:
-                ResetCyclingCreatures();
-                currentArmy->MoveAttack(giNextActionGridIndex, 0);
-                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
-                if (CheckWin(&message) != 0) {
-                    result = MESSAGE_DISPATCH_FORWARD;
-                    goto Finished;
-                }
-                CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-                advanceArmy = 1;
-                ResetCycleTimers();
-                break;
-            case ACTION_ATTACK:
-                ResetCyclingCreatures();
-                if (giNextActionExtra != -1 && currentArmy->m_hex != giNextActionExtra) {
-                    currentArmy->MoveAttack(giNextActionExtra, 1);
-                }
-                currentArmy->MoveAttack(giNextActionGridIndex, 0);
-                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
-                if (CheckWin(&message) != 0) {
-                    result = MESSAGE_DISPATCH_FORWARD;
-                    goto Finished;
-                }
-                CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
-                advanceArmy = 1;
-                ResetCycleTimers();
-                break;
-            case ACTION_RETREAT:
-                m_sideRetreated[IDX(m_currentSide)] = 1;
-                gbRetreatWin = true;
-                ResetCycleTimers();
-                break;
-            case ACTION_SURRENDER:
-                gbCombatSurrender = true;
-                gbRetreatWin = true;
-                m_sideDefeated[IDX(m_currentSide)] = 1;
-                gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)] -=
-                    giNextActionExtra;
-                gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]]
-                    .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
-                ResetCycleTimers();
-                break;
-            case ACTION_WAIT:
-                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
-                advanceArmy = 1;
-                break;
-            case ACTION_DEFEND:
-                currentArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
-                advanceArmy = 1;
-                break;
-        }
-        giNextAction = ACTION_NONE;
-        if (CheckWin(&message) == 0) {
-            TestRaiseDoor();
-            if (advanceArmy != 0 && GetNextArmy(1) == 0) {
-                ResetRound();
-                GetNextArmy(1);
+    actingArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+    shouldAdvance = 0;
+    if (CheckWin(&message) != 0)
+        goto Finished;
+    switch (giNextAction) {
+        case ACTION_NONE:
+            break;
+        case ACTION_CAST_SPELL:
+            ResetCyclingCreatures();
+            CastSpell(
+                SpellType(giNextActionExtra),
+                giNextActionGridIndex,
+                0,
+                giNextActionGridIndex2
+            );
+            if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].m_quantity <= 0)
+                shouldAdvance = 1;
+            ResetCycleTimers();
+            break;
+        case ACTION_MOVE:
+            ResetCyclingCreatures();
+            actingArmy->MoveAttack(giNextActionGridIndex, 0);
+            actingArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            if (CheckWin(&message) != 0) {
+                dispatchResult = MESSAGE_DISPATCH_FORWARD;
+                goto Finished;
             }
-            CheckChangeSelector();
-        } else {
-            result = MESSAGE_DISPATCH_FORWARD;
-        }
+            CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
+            shouldAdvance = 1;
+            ResetCycleTimers();
+            break;
+        case ACTION_ATTACK:
+            ResetCyclingCreatures();
+            if (giNextActionExtra != -1 && actingArmy->m_hex != giNextActionExtra) {
+                actingArmy->MoveAttack(giNextActionExtra, 1);
+            }
+            actingArmy->MoveAttack(giNextActionGridIndex, 0);
+            actingArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            if (CheckWin(&message) != 0) {
+                dispatchResult = MESSAGE_DISPATCH_FORWARD;
+                goto Finished;
+            }
+            CheckApplyGoodMorale(m_currentArmySide, m_currentArmyIndex);
+            shouldAdvance = 1;
+            ResetCycleTimers();
+            break;
+        case ACTION_RETREAT:
+            m_sideRetreated[IDX(m_currentSide)] = 1;
+            gbRetreatWin = true;
+            ResetCycleTimers();
+            break;
+        case ACTION_SURRENDER:
+            gbCombatSurrender = true;
+            gbRetreatWin = true;
+            m_sideDefeated[IDX(m_currentSide)] = 1;
+            gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)] -=
+                giNextActionExtra;
+            gpGame->m_players[m_playerId[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)]]
+                .m_resources[IDX(RES_GOLD)] += giNextActionExtra;
+            ResetCycleTimers();
+            break;
+        case ACTION_WAIT:
+            actingArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
+            shouldAdvance = 1;
+            break;
+        case ACTION_DEFEND:
+            actingArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_DEFERRED_TURN;
+            shouldAdvance = 1;
+            break;
     }
+    giNextAction = ACTION_NONE;
+    if (CheckWin(&message) != 0) {
+        dispatchResult = MESSAGE_DISPATCH_FORWARD;
+        goto Finished;
+    }
+    TestRaiseDoor();
+    if (shouldAdvance != 0 && GetNextArmy(1) == 0) {
+        ResetRound();
+        GetNextArmy(1);
+    }
+    CheckChangeSelector();
 
 Finished:
     gbProcessingCombatAction = false;
     ResetMouse();
-    return result;
+    return dispatchResult;
 }
 
 VA(0x00430b91, 0x237)
