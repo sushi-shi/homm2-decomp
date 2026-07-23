@@ -10,6 +10,9 @@ import unittest
 from unittest import mock
 from pathlib import Path
 
+from homm2.build.canonicalize_data_symbols import CoffObject, CompgenDataClaim
+from homm2.build.test_canonicalize_data_symbols import DATA, SectionSpec, make_coff
+
 
 SCRIPT = Path(__file__).with_name("tu_state_noise.py")
 SPEC = importlib.util.spec_from_file_location("tu_state_noise", SCRIPT)
@@ -249,6 +252,46 @@ class TuStateNoiseTests(unittest.TestCase):
                 {"offset": 3, "candidate": None, "retail": "44"},
             ],
         )
+
+    def test_comparison_pair_applies_reviewed_compgen_data_names(self):
+        semantic = "__h2cg$BASE$unit$data$message"
+        payload = make_coff(
+            [SectionSpec(".data", b"rb\0\0", DATA)],
+            [("$SG123", 0, 1, 0, 3)],
+        )
+        pairing = {
+            "unit": "BASE/unit",
+            "names": set(),
+            "public_data": {},
+            "function_rvas": {},
+            "symbols": {},
+            "data": {},
+            "duplicates": {},
+            "compgen": (),
+            "compgen_data": (
+                CompgenDataClaim(semantic, 1, 0, 3, "data", "local"),
+            ),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            candidate = root / "candidate.obj"
+            retail = root / "retail.obj"
+            candidate.write_bytes(payload)
+            retail.write_bytes(payload)
+            with mock.patch.object(noise, "canonicalize_unit"):
+                normalized_candidate, normalized_retail, _generated = (
+                    noise.normalize_comparison_pair(
+                        candidate, retail, root / "pair", pairing
+                    )
+                )
+            self.assertEqual(
+                CoffObject(normalized_candidate.read_bytes()).symbols[0].name,
+                semantic,
+            )
+            self.assertEqual(
+                CoffObject(normalized_retail.read_bytes()).symbols[0].name,
+                semantic,
+            )
 
     def test_temporary_source_restores_byte_identically_after_exception(self):
         with tempfile.TemporaryDirectory() as directory:
