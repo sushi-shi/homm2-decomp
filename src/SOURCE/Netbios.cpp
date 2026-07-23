@@ -32,7 +32,7 @@ i8 InitNetHost(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS is not loaded.");
+                ShutDown(DATA_COMPGEN(0x004ee5d4, initNetHostNETBIOSIsNotLoaded, "NETBIOS is not loaded."));
             else {
                 iInitNetHostStatus++;
                 gbRemoteOn = true;
@@ -50,14 +50,14 @@ i8 InitNetHost(void) {
                 return 1;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
-            sprintf(localName, "H2H%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
+            sprintf(localName, DATA_COMPGEN(0x004ee5ec, initNetHostH2HD, "H2H%d"), Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
             if (static_cast<NetbiosResult>(
                     static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
                 )
                 == NETBIOS_RESULT_SUCCESS)
                 iInitNetHostStatus++;
             else
-                ShutDown("Network initialization failed");
+                ShutDown(DATA_COMPGEN(0x004ee5f4, initNetHostNetworkInitializationFailed, "Network initialization failed"));
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             status = static_cast<u8>(nb_stat(HOST_SESSION));
@@ -78,7 +78,7 @@ i8 InitNetGuest(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS is not loaded.");
+                ShutDown(DATA_COMPGEN(0x004ee618, initNetGuestNETBIOSIsNotLoaded, "NETBIOS is not loaded."));
             else {
                 gbRemoteOn = true;
                 iInitNetGuestStatus++;
@@ -94,7 +94,7 @@ i8 InitNetGuest(void) {
                 iInitNetGuestStatus++;
             break;
         case SETUP_REGISTER_LOCAL_NAME:
-            sprintf(localName, "H2G%d", Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
+            sprintf(localName, DATA_COMPGEN(0x004ee630, initNetGuestH2GD, "H2G%d"), Random(RANDOM_NAME_MIN, RANDOM_NAME_MAX));
             if (static_cast<NetbiosResult>(
                     static_cast<i16>(nb_sess(NETBIOS_SESSION_REGISTER, localName))
                 )
@@ -125,7 +125,7 @@ i8 InitNetGuest(void) {
                     )
                 )
                 != NETBIOS_RESULT_SUCCESS) {
-                sprintf(gText, "Network initialization failed");
+                sprintf(gText, DATA_COMPGEN(0x004ee638, initNetGuestNetworkInitializationFailed, "Network initialization failed"));
                 ShutDown(gText);
             }
             return 1;
@@ -192,37 +192,37 @@ i32 nbnet_init(void) {
     char scratch[SCRATCH_BUFFER_SIZE];
     i32 unused;
 
-    LogStr("GUON1");
+    LogStr(DATA_COMPGEN(0x004ee660, nbnetInitGUON1, "GUON1"));
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_HOST;
-            sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x004ee668, nbnetInitInitializingNetworkPressCANCELToAbort, "Initializing network.\n\n  Press 'CANCEL' to abort."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_GUEST;
-            sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
-            LogStr("GUON2");
+            sprintf(gText, DATA_COMPGEN(0x004ee69c, nbnetInitWaitingOnGuestPressCANCELTo, "Waiting On Guest.\n\n  Press 'CANCEL' to abort."));
+            LogStr(DATA_COMPGEN(0x004ee6cc, nbnetInitGUON2, "GUON2"));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
-            LogStr("GUON3");
+            LogStr(DATA_COMPGEN(0x004ee6d4, nbnetInitGUON3, "GUON3"));
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
-            LogStr("GUON4");
+            LogStr(DATA_COMPGEN(0x004ee6dc, nbnetInitGUON4, "GUON4"));
             break;
         case REMOTE_GAME_NETWORK_GUEST:
             giWaitType = DIALOG_WAIT_NETBIOS_INIT_GUEST;
-            sprintf(gText, "Initializing network.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x004ee6e4, nbnetInitInitializingNetworkPressCANCELToAbort2, "Initializing network.\n\n  Press 'CANCEL' to abort."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             giWaitType = DIALOG_WAIT_NETBIOS_HOST;
-            sprintf(gText, "Waiting On Host.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x004ee718, nbnetInitWaitingOnHostPressCANCELTo, "Waiting On Host.\n\n  Press 'CANCEL' to abort."));
             NormalDialog(gText, OLD_MAIN_DIALOG_WAIT, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
             break;
     }
-    LogStr("GUON5");
+    LogStr(DATA_COMPGEN(0x004ee748, nbnetInitGUON5, "GUON5"));
     return 0;
 }
 

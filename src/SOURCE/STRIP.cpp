@@ -40,14 +40,14 @@ strip::strip(
     m_portraitIcon = gpResourceManager->GetIcon(portraitIconId);
     m_portraitFrame = portraitFrame;
     m_army = army;
-    m_stripIcon = gpResourceManager->GetIcon("strip.icn");
+    m_stripIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f116c, stripStripIcn, "strip.icn"));
 
     for (i32 slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         m_creatureIcons[slot] = NULL;
         m_cachedCreatureTypes[slot] = CREATURE_NONE;
     }
 
-    m_flagIcon = gpResourceManager->GetIcon("portcflg.icn");
+    m_flagIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f1178, stripPortcflgIcn, "portcflg.icn"));
     m_flagFrame = flagFrame;
     m_window = new heroWindow(
         m_x,
@@ -154,7 +154,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 m_creatureIcons[slot] = NULL;
                 m_cachedCreatureTypes[slot] = CREATURE_NONE;
             } else {
-                sprintf(gText, "monh%04d.icn", IDX(m_army->m_creatureTypes[slot]));
+                sprintf(gText, DATA_COMPGEN(0x004f1188, drawIconsMonh04dIcn, "monh%04d.icn"), IDX(m_army->m_creatureTypes[slot]));
                 m_creatureIcons[slot] = gpResourceManager->GetIcon(gText);
                 m_cachedCreatureTypes[slot] = m_army->m_creatureTypes[slot];
             }
@@ -180,7 +180,7 @@ void strip::DrawIcons(i32 drawWindow) {
                 0,
                 ICON_DRAW_NORMAL
             );
-            sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
+            sprintf(gText, DATA_COMPGEN(0x004f1198, drawIconsD, "%d"), m_army->m_creatureCounts[slot]);
             smallFont->DrawBoundedString(
                 gText,
                 m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
@@ -220,7 +220,7 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_player = player;
     m_x = x;
     m_y = y;
-    m_window = new heroWindow(m_x, m_y, "bankbox.bin");
+    m_window = new heroWindow(m_x, m_y, DATA_COMPGEN(0x004f119c, bankBoxBankboxBin, "bankbox.bin"));
     if (m_window == NULL)
         MemError();
     gpWindowManager->AddWindow(m_window, BOX_WINDOW_Z_ORDER, BOX_WINDOW_ACTIVE);
@@ -242,12 +242,12 @@ void bankBox::Update(i32 drawWindow) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
     for (resource_1 = 0; resource_1 < BOX_NON_GOLD_RESOURCE_COUNT; resource_1++) {
-        sprintf(text, "%d", m_player->m_resources[resource_1]);
+        sprintf(text, DATA_COMPGEN(0x004f11a8, updateD, "%d"), m_player->m_resources[resource_1]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource_1;
         message.payload.widget.data.text = text;
         m_window->BroadcastMessage(message);
     }
-    sprintf(text, "%d", m_player->m_resources[IDX(RES_GOLD)]);
+    sprintf(text, DATA_COMPGEN(0x004f11ac, updateD2, "%d"), m_player->m_resources[IDX(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
     message.payload.widget.data.text = text;
     m_window->BroadcastMessage(message);

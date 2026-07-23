@@ -142,7 +142,7 @@ i32 swapManager::DrawSwapWin(void) {
 VA(0x00454502, 0x3bc)
 i32 swapManager::Open(i32 id) {
     Reset();
-    m_window = new heroWindow(0, 0, "swapwin.bin");
+    m_window = new heroWindow(0, 0, DATA_COMPGEN(0x004f56b8, openSwapwinBin, "swapwin.bin"));
     if (m_window == NULL)
         MemError();
 
@@ -151,19 +151,19 @@ i32 swapManager::Open(i32 id) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
-    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
+    sprintf(gText, DATA_COMPGEN(0x004f56c4, openPort04dIcn, "port%04d.icn"), IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
     message.payload.widget.id = LEFT_PORTRAIT_WIDGET;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait));
+    sprintf(gText, DATA_COMPGEN(0x004f56d4, openPort04dIcn2, "port%04d.icn"), IDX(m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_portrait));
     message.payload.widget.id = RIGHT_PORTRAIT_WIDGET;
     m_window->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     sprintf(
         gText,
-        "%s meets %s",
+        DATA_COMPGEN(0x004f56e4, openSMeetsS, "%s meets %s"),
         m_heroes[IDX(SWAP_SIDE_LEFT)]->m_name,
         m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_name
     );
@@ -186,7 +186,7 @@ i32 swapManager::Open(i32 id) {
                 message.payload.widget.data.text = gText;
                 sprintf(
                     gText,
-                    "%d",
+                    DATA_COMPGEN(0x004f56f0, openD, "%d"),
                     m_heroes[IDX(side_6)]->GetSSLevel(m_heroes[IDX(side_6)]->GetNthSS(skillSlot))
                 );
                 m_window->BroadcastMessage(message);
@@ -220,13 +220,13 @@ i32 swapManager::Open(i32 id) {
     gpWindowManager->AddWindow(m_window, -1, 1);
     KBChangeMenu(hmnuAdv);
     giMonoIconSkip = MONO_ICON_SKIP;
-    m_selectorIcon = gpResourceManager->GetIcon("swapbtn.icn");
+    m_selectorIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f56f4, openSwapbtnIcn, "swapbtn.icn"));
     giMonoIconSkip = MONO_ICON_DEFAULT;
     gpMouseManager->SetPointer(0);
     m_messageMask = BASE_MANAGER_ACCEPT_SWAP;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, "swapManager");
+    strcpy(m_name, DATA_COMPGEN(0x004f5700, openSwapManager, "swapManager"));
     return 0;
 }
 
@@ -422,7 +422,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    "This item can't be traded.",
+                                    DATA_COMPGEN(0x004f570c, mainThisItemCanTBeTraded, "This item can't be traded."),
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -481,7 +481,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                 && m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 NormalDialog(
-                                    "This item can't be traded.",
+                                    DATA_COMPGEN(0x004f5728, mainThisItemCanTBeTraded2, "This item can't be traded."),
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_VALUE,
                                     NORMAL_DIALOG_NO_VALUE,
@@ -745,7 +745,7 @@ void swapManager::SwapArtifacts(void) {
                     message_1.payload.widget.data.text = gText;
                     sprintf(
                         gText,
-                        "%d",
+                        DATA_COMPGEN(0x004f5744, swapArtifactsD, "%d"),
                         m_heroes[IDX(side)]->GetSSLevel(m_heroes[IDX(side)]->GetNthSS(skillSlot))
                     );
                     m_window->BroadcastMessage(message_1);
@@ -793,10 +793,10 @@ void swapManager::Update(void) {
 
     for (slot = 0; slot < PRIMARY_SKILL_COUNT; ++slot) {
         message_1.payload.widget.id = slot + LEFT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
+        sprintf(gText, DATA_COMPGEN(0x004f5748, updateD, "%d"), m_heroes[IDX(SWAP_SIDE_LEFT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message_1);
         message_1.payload.widget.id = slot + RIGHT_PRIMARY_SKILL_FIRST;
-        sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->Stats(HeroPrimaryStat(slot)));
+        sprintf(gText, DATA_COMPGEN(0x004f574c, updateD2, "%d"), m_heroes[IDX(SWAP_SIDE_RIGHT)]->Stats(HeroPrimaryStat(slot)));
         m_window->BroadcastMessage(message_1);
     }
 
@@ -826,7 +826,7 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
+            sprintf(gText, DATA_COMPGEN(0x004f5750, updateD3, "%d"), m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureCounts[slot]);
             message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
@@ -858,7 +858,7 @@ void swapManager::Update(void) {
             message_1.payload.widget.data.value = EMPTY_ITEM_VALUE;
             m_window->BroadcastMessage(message_1);
             message_1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            sprintf(gText, "%d", m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
+            sprintf(gText, DATA_COMPGEN(0x004f5754, updateD4, "%d"), m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureCounts[slot]);
             message_1.payload.widget.data.text = gText;
         }
         m_window->BroadcastMessage(message_1);
@@ -908,7 +908,7 @@ void swapManager::SplitMons(void) {
     i16 unusedTextControl_2 = SPLIT_TEXT_CONTROL;
 
     gpTownManager->m_heroWindow1 =
-        new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
+        new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, DATA_COMPGEN(0x004f5758, splitMonsSplitwinBin, "splitwin.bin"));
     if (gpTownManager->m_heroWindow1 == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
@@ -917,11 +917,11 @@ void swapManager::SplitMons(void) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     if (m_selectedSide == m_targetSide) {
-        sprintf(gText, "Move how many troops?");
+        sprintf(gText, DATA_COMPGEN(0x004f5768, splitMonsMoveHowManyTroops, "Move how many troops?"));
     } else {
         sprintf(
             gText,
-            "Move how many %s troops from %s to %s?",
+            DATA_COMPGEN(0x004f5780, splitMonsMoveHowManySTroopsFrom, "Move how many %s troops from %s to %s?"),
             gArmyNames[IDX(selectedArmy->m_creatureTypes[m_selectedSlot])],
             m_heroes[IDX(m_selectedSide)]->m_name,
             m_heroes[IDX(m_targetSide)]->m_name
@@ -931,7 +931,7 @@ void swapManager::SplitMons(void) {
     message.payload.widget.id = SPLIT_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    sprintf(gText, DATA_COMPGEN(0x004f57a8, splitMonsD, "%d"), gpTownManager->m_splitAmount);
     message.payload.widget.id = SPLIT_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);

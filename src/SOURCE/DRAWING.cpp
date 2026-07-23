@@ -109,7 +109,7 @@ H2_ENUM_END(CombatSmallViewStatRow)
 VA(0x00402910, 0x41)
 void combatManager::NoShowCombatLog(char* message) {
     char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
-    sprintf(logMessage, "NC: %s", message);
+    sprintf(logMessage, DATA_COMPGEN(0x004ed22c, noShowCombatLogNCS, "NC: %s"), message);
     LogStr(logMessage);
 }
 
@@ -119,11 +119,11 @@ void combatManager::ClearCombatMessages(i32 force) {
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
         return;
     if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
-        strcpy(m_previousCombatMessage, "");
-        strcpy(m_currentCombatMessage, "");
+        strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004ed234, clearCombatMessagesEmptyString, ""));
+        strcpy(m_currentCombatMessage, DATA_COMPGEN(0x004ed238, clearCombatMessagesEmptyString2, ""));
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = m_previousCombatMessageExpiration;
-        CombatMessage("", 1, 0, 0);
+        CombatMessage(DATA_COMPGEN(0x004ed23c, clearCombatMessagesEmptyString3, ""), 1, 0, 0);
     }
 }
 
@@ -131,7 +131,7 @@ VA(0x00402a2b, 0x5d)
 void combatManager::CheckUpdateCombatMessages(void) {
     if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0
         && m_combatMessageExpiration < KBTickCount())
-        CombatMessage("", 1, 0, 1);
+        CombatMessage(DATA_COMPGEN(0x004ed240, checkUpdateCombatMessagesEmptyString, ""), 1, 0, 1);
 }
 
 VA(0x00402a88, 0x3f8)
@@ -153,7 +153,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
         return;
 
     if (clear != 0) {
-        strcpy(m_previousCombatMessage, "");
+        strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004ed244, combatMessageEmptyString, ""));
         strcpy(m_currentCombatMessage, message);
         m_previousCombatMessageExpiration = 0;
         m_combatMessageExpiration = m_previousCombatMessageExpiration;
@@ -163,7 +163,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             if (KBTickCount() < m_combatMessageExpiration) {
                 return;
             } else {
-                strcpy(m_previousCombatMessage, "");
+                strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004ed248, combatMessageEmptyString2, ""));
                 m_previousCombatMessageExpiration = 0;
                 m_combatMessageExpiration = m_previousCombatMessageExpiration;
             }
@@ -171,7 +171,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             if (m_combatMessageExpiration != 0)
                 strcpy(m_previousCombatMessage, m_currentCombatMessage);
             else
-                strcpy(m_previousCombatMessage, "");
+                strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004ed24c, combatMessageEmptyString3, ""));
             m_previousCombatMessageExpiration = m_combatMessageExpiration;
             m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
         }
@@ -181,9 +181,9 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
             *newlinePtr = 0;
             strcpy(wrappedMessage, message);
             if (newlinePtr > message && newlinePtr[-1] == '.')
-                strcat(wrappedMessage, "  ");
+                strcat(wrappedMessage, DATA_COMPGEN(0x004ed250, combatMessageEmptyString4, "  "));
             else
-                strcat(wrappedMessage, " ");
+                strcat(wrappedMessage, DATA_COMPGEN(0x004ed254, combatMessageEmptyString5, " "));
             strcat(wrappedMessage, newlinePtr + 1);
             if (bigFont->LineLength(wrappedMessage, COMBAT_MESSAGE_LINE_WIDTH) <= 1) {
                 strcpy(m_currentCombatMessage, wrappedMessage);
@@ -308,7 +308,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
                         gArmyNames[IDX(actingMonsterType)]
                     );
                 else
-                    sprintf(gText, "");
+                    sprintf(gText, DATA_COMPGEN(0x004ed258, combatMessageClearedText, ""));
             }
             break;
     }
@@ -563,7 +563,7 @@ void combatManager::DrawBackground(void) {
     gpResourceManager->Dispose(backgroundIcon);
 
     if (m_debugFormation != 0) {
-        sprintf(gText, "covr%04d.icn", m_debugFormation);
+        sprintf(gText, DATA_COMPGEN(0x004ed260, drawBackgroundCovr04dIcn, "covr%04d.icn"), m_debugFormation);
         backgroundIcon = gpResourceManager->GetIcon(gText);
         IconToBitmap(
             backgroundIcon,
@@ -581,7 +581,7 @@ void combatManager::DrawBackground(void) {
         gpResourceManager->Dispose(backgroundIcon);
     }
     if (m_battlefieldFringe != FRINGE_NONE) {
-        sprintf(gText, "frng%04d.icn", IDX(m_battlefieldFringe));
+        sprintf(gText, DATA_COMPGEN(0x004ed270, drawBackgroundFrng04dIcn, "frng%04d.icn"), IDX(m_battlefieldFringe));
         backgroundIcon = gpResourceManager->GetIcon(gText);
         if (m_inCastleCombat != 0)
             IconToBitmap(
@@ -616,7 +616,7 @@ void combatManager::DrawBackground(void) {
     if (m_inCastleCombat != 0) {
         sprintf(
             gText,
-            "castbkg%c.icn",
+            DATA_COMPGEN(0x004ed280, drawBackgroundCastbkgCIcn, "castbkg%c.icn"),
             cHeroTypeInitial[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
         backgroundIcon = gpResourceManager->GetIcon(gText);
@@ -1615,7 +1615,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                     FONT_ALIGN_LEFT
                 );
 
-            sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.attack));
+            sprintf(gText, DATA_COMPGEN(0x004ed294, drawSmallViewD, "%d"), static_cast<i32>(viewArmy1->m_monster.attack));
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1626,7 +1626,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.defense));
+            sprintf(gText, DATA_COMPGEN(0x004ed298, drawSmallViewD2, "%d"), static_cast<i32>(viewArmy1->m_monster.defense));
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1637,7 +1637,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
                 FONT_DRAW_DEFAULT,
                 FONT_ALIGN_RIGHT
             );
-            sprintf(gText, "%d", static_cast<u32>(viewArmy1->m_monster.hitPoints));
+            sprintf(gText, DATA_COMPGEN(0x004ed29c, drawSmallViewD3, "%d"), static_cast<u32>(viewArmy1->m_monster.hitPoints));
             smallFont->DrawBoundedString(
                 gText,
                 viewX + COMBAT_SMALL_VIEW_TEXT_X,
@@ -1650,7 +1650,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             );
             sprintf(
                 gText,
-                "%d-%d",
+                DATA_COMPGEN(0x004ed2a0, drawSmallViewDD, "%d-%d"),
                 static_cast<i32>(viewArmy1->m_monster.damageMin),
                 static_cast<i32>(viewArmy1->m_monster.damageMax)
             );
@@ -1728,7 +1728,7 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
             }
 
             if (HAS(viewArmy1->m_monster.flags.all, COMBAT_ARMY_FLAG_SHOOTER)) {
-                sprintf(gText, "%d", static_cast<i32>(viewArmy1->m_monster.shots));
+                sprintf(gText, DATA_COMPGEN(0x004ed2a8, drawSmallViewD4, "%d"), static_cast<i32>(viewArmy1->m_monster.shots));
                 smallFont->DrawBoundedString(
                     gText,
                     viewX + COMBAT_SMALL_VIEW_TEXT_X,

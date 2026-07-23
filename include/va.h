@@ -8,6 +8,8 @@
 #define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
 #define VA_COMPGEN(addr, size, kind, owner)
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
+#define DATA_COMPGEN(addr, name, value) value
+#define DATA_COMPGEN_GUARD(addr, name, owner)
 #define VTBL(cls, va)
 #define VTBL2(derived, base, va)
 #define OVERRIDE override
@@ -18,6 +20,8 @@
 #define VA(addr, size)
 #define VA_COMPGEN(addr, size, kind, owner)
 #define DATA(addr)
+#define DATA_COMPGEN(addr, name, value) value
+#define DATA_COMPGEN_GUARD(addr, name, owner)
 #define VTBL(cls, va)
 #define VTBL2(derived, base, va)
 #define OVERRIDE

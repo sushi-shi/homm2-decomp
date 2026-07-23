@@ -61,12 +61,12 @@ void HandleMCIError(i32 errorCode, char* commandString) {
     mciGetErrorStringA(errorCode, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT);
     sprintf(
         gText,
-        "CD MUSIC ERROR\n\n"
+        DATA_COMPGEN(0x0051f4b4, handleMCIErrorCDMUSICERRORDescriptionSCommand, "CD MUSIC ERROR\n\n"
         "Description '%s'\n\n"
         "Command '%s'\n\n\n"
         "Because of this problem running with CD stereo music, Heroes II has been "
         "configured to run with MIDI music in the future.  You can always manually "
-        "change this setting in the control panel within the game.",
+        "change this setting in the control panel within the game."),
         lpszReturnString,
         commandString
     );
@@ -80,7 +80,11 @@ VA(0x004cb6a0, 0xc7)
 void soundManager::ValidatePreviousPosition(i32 track) {
     char buf[CD_POSITION_BUFFER_CAPACITY];
     char* cur;
-    H2_ASSERT(track >= 0 && track < MIDI_TRACK_COUNT, RETAIL_FILE, 66);
+    H2_ASSERT(
+        track >= 0 && track < MIDI_TRACK_COUNT,
+        DATA_COMPGEN(0x0051f5b4, validatePreviousPositionSourceFile, RETAIL_FILE),
+        66
+    );
     if (CDPreviousPosition[track][0] == 0)
         return;
     strcpy(buf, CDPreviousPosition[track]);
@@ -98,13 +102,13 @@ void soundManager::CDStop(void) {
         return;
     if (m_cdReady == 0)
         return;
-    wsprintfA(CommandString, "stop CD wait");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f5e0, cDStopStopCDWait, "stop CD wait"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    if (strcmpi(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
-        wsprintfA(CommandString, "status CD position");
+    if (strcmpi(lpszReturnString, DATA_COMPGEN(0x0051f5f0, cDStopStopped, "stopped")) != 0 && m_currentTrack >= 0) {
+        wsprintfA(CommandString, DATA_COMPGEN(0x0051f5f8, cDStopStatusCDPosition, "status CD position"));
         nMCIError = mciSendStringA(CommandString, position, sizeof(position), NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
@@ -120,12 +124,12 @@ i32 soundManager::CDIsPlaying(void) {
         return 0;
     if (m_cdReady == 0)
         return 0;
-    wsprintfA(CommandString, "status CD mode");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f60c, cDIsPlayingStatusCDMode, "status CD mode"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    return strcmpi(lpszReturnString, "playing") == 0;
+    return strcmpi(lpszReturnString, DATA_COMPGEN(0x0051f61c, cDIsPlayingPlaying, "playing")) == 0;
 }
 
 VA(0x004cb970, 0xf3)
@@ -140,7 +144,7 @@ void soundManager::CDStartup(void) {
         return;
     if (gbDontTryRedbook != 0)
         return;
-    wsprintfA(CommandString, "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f624, cDStartupOpenCTypeCdaudioAliasCD, "open %c: type cdaudio alias CD shareable"), gcAnimPath[0]);
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0) {
@@ -159,12 +163,12 @@ void soundManager::CDShutdown(void) {
         return;
     if (m_cdReady == 0)
         return;
-    wsprintfA(CommandString, "stop CD");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f650, cDShutdownStopCD, "stop CD"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    wsprintfA(CommandString, "close CD");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f658, cDShutdownCloseCD, "close CD"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
@@ -226,18 +230,18 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     Process1WindowsMessage();
     ServiceSound();
     t1 = KBTickCount();
-    wsprintfA(CommandString, "set CD time format tmsf");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f664, cDPlaySetCDTimeFormatTmsf, "set CD time format tmsf"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    wsprintfA(CommandString, "status CD mode");
+    wsprintfA(CommandString, DATA_COMPGEN(0x0051f67c, cDPlayStatusCDMode, "status CD mode"));
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    if (strcmpi(lpszReturnString, "stopped") != 0) {
-        wsprintfA(CommandString, "status CD position");
+    if (strcmpi(lpszReturnString, DATA_COMPGEN(0x0051f68c, cDPlayStopped, "stopped")) != 0) {
+        wsprintfA(CommandString, DATA_COMPGEN(0x0051f694, cDPlayStatusCDPosition, "status CD position"));
         nMCIError = mciSendStringA(CommandString, buffer, CD_POSITION_BUFFER_CAPACITY, NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
@@ -252,17 +256,17 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         if (track == CD_SINGLE_TRACK)
             wsprintfA(
                 CommandString,
-                "play CD from %s %s",
+                DATA_COMPGEN(0x0051f6b4, cDPlayPlayCDFromSS, "play CD from %s %s"),
                 CDPreviousPosition[track],
-                notify ? " notify" : ""
+                notify ? DATA_COMPGEN(0x0051f6a8, cDPlayNotify, " notify") : DATA_COMPGEN(0x0051f6b0, cDPlayEmptyString, "")
             );
         else
             wsprintfA(
                 CommandString,
-                "play CD from %s to %d%s",
+                DATA_COMPGEN(0x0051f6d4, cDPlayPlayCDFromSToD, "play CD from %s to %d%s"),
                 CDPreviousPosition[track],
                 track + 1,
-                notify ? " notify" : ""
+                notify ? DATA_COMPGEN(0x0051f6c8, cDPlayNotify2, " notify") : DATA_COMPGEN(0x0051f6d0, cDPlayEmptyString2, "")
             );
         if (notify != 0)
             wnd = hwndApp;
@@ -274,14 +278,14 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
             HandleMCIError(nMCIError, CommandString);
     } else {
         if (track == CD_SINGLE_TRACK)
-            wsprintfA(CommandString, "play CD from %d %s", track, notify ? " notify" : "");
+            wsprintfA(CommandString, DATA_COMPGEN(0x0051f6f8, cDPlayPlayCDFromDS, "play CD from %d %s"), track, notify ? DATA_COMPGEN(0x0051f6ec, cDPlayNotify3, " notify") : DATA_COMPGEN(0x0051f6f4, cDPlayEmptyString3, ""));
         else
             wsprintfA(
                 CommandString,
-                "play CD from %d to %d%s",
+                DATA_COMPGEN(0x0051f718, cDPlayPlayCDFromDToD, "play CD from %d to %d%s"),
                 track,
                 track + 1,
-                notify ? " notify" : ""
+                notify ? DATA_COMPGEN(0x0051f70c, cDPlayNotify4, " notify") : DATA_COMPGEN(0x0051f714, cDPlayEmptyString4, "")
             );
         if (notify != 0)
             wndn = hwndApp;
@@ -400,8 +404,8 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
         MessageBoxA(
             hwndApp,
-            "Sound initialization error!  No wave devices found.",
-            "Startup Error",
+            DATA_COMPGEN(0x0051f740, initDriverSoundInitializationErrorNoWaveDevices, "Sound initialization error!  No wave devices found."),
+            DATA_COMPGEN(0x0051f730, initDriverStartupError, "Startup Error"),
             0
         );
         drvr = NULL;
@@ -422,7 +426,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
             MessageBoxA(
                 hwndApp,
                 AIL_last_error(),
-                "Sound initialization error!",
+                DATA_COMPGEN(0x0051f774, initDriverSoundInitializationError, "Sound initialization error!"),
                 0
             );
         drvr = NULL;
@@ -547,7 +551,7 @@ managerReady:
     m_messageMask = BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP;
     m_priority = SOUND_MANAGER_PRIORITY;
     m_active = true;
-    strcpy(m_name, "soundManager");
+    strcpy(m_name, DATA_COMPGEN(0x0051f790, openSoundManager, "soundManager"));
     return 0;
 }
 
@@ -572,13 +576,13 @@ void soundManager::Close(void) {
         return;
     if (gbNoSound != 0)
         goto soundClosed;
-    LogStr("SD1");
+    LogStr(DATA_COMPGEN(0x0051f7a0, closeSD1, "SD1"));
     CDShutdown();
-    LogStr("SD2");
+    LogStr(DATA_COMPGEN(0x0051f7a4, closeSD2, "SD2"));
     MIDIShutdown();
-    LogStr("SD3");
+    LogStr(DATA_COMPGEN(0x0051f7a8, closeSD3, "SD3"));
     AIL_shutdown();
-    LogStr("SD4");
+    LogStr(DATA_COMPGEN(0x0051f7ac, closeSD4, "SD4"));
 soundClosed:
     m_active = false;
     gbNoSound = true;
@@ -605,7 +609,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
         return;
     if (m_samplesReady == 0)
         return;
-    LogStr("SAS 1");
+    LogStr(DATA_COMPGEN(0x0051f7b0, stopAllSamplesSAS1, "SAS 1"));
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
         sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
         if (sampleStatus == SAMPLE_STATUS_PLAYING)
@@ -622,7 +626,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
         ServiceSound();
         DelayMilli(1);
     }
-    LogStr("SAS 2");
+    LogStr(DATA_COMPGEN(0x0051f7b8, stopAllSamplesSAS2, "SAS 2"));
 }
 
 VA(0x004ccbc0, 0xb1)
@@ -634,7 +638,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
     if (m_digitalDriver == NULL)
         return;
     local_10 = 0;
-    LogStr("Stop Sample 1");
+    LogStr(DATA_COMPGEN(0x0051f7c0, stopSampleStopSample1, "Stop Sample 1"));
     if (m_sampleHandles[0] == sample)
         local_10 = 1;
     AIL_end_sample(sample);
@@ -644,7 +648,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
             DelayMilli(1);
         }
     }
-    LogStr("Stop Sample 2");
+    LogStr(DATA_COMPGEN(0x0051f7d0, stopSampleStopSample2, "Stop Sample 2"));
 }
 
 VA(0x004ccc80, 0x202)
@@ -666,7 +670,7 @@ void soundManager::ModifySample(
     if (m_ready == 0)
         return;
 
-    LogStr("Modify Sample 1");
+    LogStr(DATA_COMPGEN(0x0051f7e0, modifySampleModifySample1, "Modify Sample 1"));
     foundChannel = -1;
     for (sampleIndex = 0; sampleIndex < m_numSampleHandles; sampleIndex++) {
         if (m_sampleHandles[sampleIndex] == sampleHandle)
@@ -681,7 +685,11 @@ void soundManager::ModifySample(
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
-            H2_ASSERT(gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI, RETAIL_FILE, 1327);
+            H2_ASSERT(
+                gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI,
+                DATA_COMPGEN(0x0051f7f0, modifySampleSourceFile, RETAIL_FILE),
+                1327
+            );
             AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
@@ -692,7 +700,7 @@ void soundManager::ModifySample(
     }
 
     Process1WindowsMessage();
-    LogStr("Modify Sample 2");
+    LogStr(DATA_COMPGEN(0x0051f81c, modifySampleModifySample2, "Modify Sample 2"));
 }
 
 VA(0x004cce90, 0xa3)
@@ -725,7 +733,7 @@ void soundManager::AdjustSoundVolumes(void) {
     if (m_samplesReady == 0)
         return;
 
-    LogStr("Adjust Sound Volumes 1");
+    LogStr(DATA_COMPGEN(0x0051f82c, adjustSoundVolumesAdjustSoundVolumes1, "Adjust Sound Volumes 1"));
     for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
         sampleHandle = m_sampleHandles[sampleIndex];
         if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
@@ -739,7 +747,7 @@ void soundManager::AdjustSoundVolumes(void) {
             ModifySample(sampleHandle, SOUND_SAMPLE_OPERATION_VOLUME, 0);
         }
     }
-    LogStr("Adjust Sound Volumes 2");
+    LogStr(DATA_COMPGEN(0x0051f844, adjustSoundVolumesAdjustSoundVolumes2, "Adjust Sound Volumes 2"));
 }
 
 VA(0x004cd030, 0xee)
@@ -750,7 +758,7 @@ void soundManager::AdjustMusicVolumes(void) {
         return;
     if (m_currentTrack < 0)
         return;
-    LogStr("Adjust Music Volumes 1");
+    LogStr(DATA_COMPGEN(0x0051f85c, adjustMusicVolumesAdjustMusicVolumes1, "Adjust Music Volumes 1"));
     i32 local_4 = 0;
     if (bSaveMusicPosition[m_currentTrack] != 0)
         local_4 = 1;
@@ -765,7 +773,7 @@ void soundManager::AdjustMusicVolumes(void) {
         else
             MIDISetVolume();
     }
-    LogStr("Adjust Music Volumes 2");
+    LogStr(DATA_COMPGEN(0x0051f874, adjustMusicVolumesAdjustMusicVolumes2, "Adjust Music Volumes 2"));
 }
 
 VA(0x004cd120, 0x3a)
@@ -837,9 +845,9 @@ void soundManager::PollSound(void) {
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    LogStr("Poll Sound 1");
+    LogStr(DATA_COMPGEN(0x0051f88c, pollSoundPollSound1, "Poll Sound 1"));
     if (m_fadeSteps > 0) {
-        LogStr("Poll Sound 1a");
+        LogStr(DATA_COMPGEN(0x0051f89c, pollSoundPollSound1a, "Poll Sound 1a"));
         Process1WindowsMessage();
         if (m_currentTrack < CD_MUSIC_TRACK_FIRST
             || m_currentTrack > CD_MUSIC_TRACK_LAST)
@@ -848,11 +856,15 @@ void soundManager::PollSound(void) {
         m_fadeSteps = delta / FADE_STEP_TICKS;
         if (m_fadeSteps < 1)
             m_fadeSteps = 0;
-        LogStr("Poll Sound 1b");
+        LogStr(DATA_COMPGEN(0x0051f8ac, pollSoundPollSound1b, "Poll Sound 1b"));
         if (m_fadeSteps <= FADE_HOLD_STEPS && m_currentTrack != m_fadeTargetTrack) {
             if (m_midiFile != NULL && bSaveMusicPosition[m_currentTrack] != 0) {
                 if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                    H2_ASSERT(reinterpret_cast<i32>(m_midiFile), RETAIL_FILE, 0x61a);
+                    H2_ASSERT(
+                        reinterpret_cast<i32>(m_midiFile),
+                        DATA_COMPGEN(0x0051f8bc, pollSoundSourceFile, RETAIL_FILE),
+                        0x61a
+                    );
                     m_savedTrackPositions[m_currentTrack] = ftell(m_midiFile);
                 }
             } else {
@@ -879,7 +891,7 @@ void soundManager::PollSound(void) {
             volume = SAMPLE_VOLUME_MAX;
         if (volume < 0)
             volume = 0;
-        LogStr("Poll Sound 1c");
+        LogStr(DATA_COMPGEN(0x0051f8e8, pollSoundPollSound1c, "Poll Sound 1c"));
         smp = m_sampleHandles[0];
         if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
             volume = (IDX(CONFIG_VOLUME_MAX) + 1 - IDX(gConfig.musicVolume)) * volume
@@ -892,9 +904,9 @@ void soundManager::PollSound(void) {
         } else {
             MIDISetVolume();
         }
-        LogStr("Poll Sound 1d");
+        LogStr(DATA_COMPGEN(0x0051f8f8, pollSoundPollSound1d, "Poll Sound 1d"));
     }
-    LogStr("Poll Sound 2");
+    LogStr(DATA_COMPGEN(0x0051f908, pollSoundPollSound2, "Poll Sound 2"));
     m_pollRequested = 0;
 }
 
@@ -914,7 +926,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     }
     if (m_currentTrack == track)
         return;
-    LogStr("Switch Ambient Music 1");
+    LogStr(DATA_COMPGEN(0x0051f918, switchAmbientMusicSwitchAmbientMusic1, "Switch Ambient Music 1"));
     Process1WindowsMessage();
     if ((m_fadeSteps != 0 && m_fadeTargetTrack != track)
         || (m_fadeSteps == 0 && m_currentTrack != track)) {
@@ -926,7 +938,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
         m_fadeTargetTrack = track;
         PollSound();
     }
-    LogStr("Switch Ambient Music 2");
+    LogStr(DATA_COMPGEN(0x0051f930, switchAmbientMusicSwitchAmbientMusic2, "Switch Ambient Music 2"));
 }
 
 VA(0x004cd7f0, 0x28f)
@@ -946,7 +958,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     playbackData = &sampleResource->m_playbackData;
     if (m_ready == 0 || playbackData->volume == 0)
         return NULL;
-    LogStr("Memory Sample 1");
+    LogStr(DATA_COMPGEN(0x0051f948, memorySampleMemorySample1, "Memory Sample 1"));
     // The one-past channel type reads the zeroed record-shaped prefix of adjacent storage.
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
@@ -955,7 +967,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     }
     if (scs->endChannel == ch) {
         if (playbackData->channelType == NO_SAMPLE_CHANNEL_TYPE) {
-            LogStr("Memory Sample 2a");
+            LogStr(DATA_COMPGEN(0x0051f958, memorySampleMemorySample2a, "Memory Sample 2a"));
             return NULL;
         }
         ch = static_cast<i16>(scs->currentChannel);
@@ -983,7 +995,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     m_channelSamples[ch] = smp;
     m_channelSampleData[ch] = playbackData->data;
     m_channelSampleSizes[ch] = playbackData->size;
-    LogStr("Memory Sample 2b");
+    LogStr(DATA_COMPGEN(0x0051f96c, memorySampleMemorySample2b, "Memory Sample 2b"));
     return smp;
 }
 
@@ -1017,19 +1029,19 @@ VTBL(soundManager, 0x004eba20);
 
 
 DATA(0x0051f018) char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT] = {
-    "",
-    "ultra.dig",
-    "sndsys.dig",
-    "sndscape.dig",
-    "jammer.dig",
-    "audiodrv.dig",
-    "proaudio.dig",
-    "rap10.dig",
-    "iwav.dig",
-    "nvdig.dig",
-    "sb16.dig",
-    "sbpro.dig",
-    "sblaster.dig",
+    DATA_COMPGEN(0x0051f410, digitalDriverNamesEmptyString, ""),
+    DATA_COMPGEN(0x0051f414, digitalDriverNamesUltraDig, "ultra.dig"),
+    DATA_COMPGEN(0x0051f420, digitalDriverNamesSndsysDig, "sndsys.dig"),
+    DATA_COMPGEN(0x0051f42c, digitalDriverNamesSndscapeDig, "sndscape.dig"),
+    DATA_COMPGEN(0x0051f43c, digitalDriverNamesJammerDig, "jammer.dig"),
+    DATA_COMPGEN(0x0051f448, digitalDriverNamesAudiodrvDig, "audiodrv.dig"),
+    DATA_COMPGEN(0x0051f458, digitalDriverNamesProaudioDig, "proaudio.dig"),
+    DATA_COMPGEN(0x0051f468, digitalDriverNamesRap10Dig, "rap10.dig"),
+    DATA_COMPGEN(0x0051f474, digitalDriverNamesIwavDig, "iwav.dig"),
+    DATA_COMPGEN(0x0051f480, digitalDriverNamesNvdigDig, "nvdig.dig"),
+    DATA_COMPGEN(0x0051f48c, digitalDriverNamesSb16Dig, "sb16.dig"),
+    DATA_COMPGEN(0x0051f498, digitalDriverNamesSbproDig, "sbpro.dig"),
+    DATA_COMPGEN(0x0051f4a4, digitalDriverNamesSblasterDig, "sblaster.dig"),
     NULL
 };
 DATA(0x0051f050)

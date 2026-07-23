@@ -39,8 +39,8 @@ The reviewed manifest is a bootstrap input, not a self-updating baseline. Normal
 the delinker. Bootstrap targets carry a bootstrap provenance stamp and remain fixed until an
 explicit init.
 
-Candidate topology is generated from source `DATA`, `VTBL`, and `VTBL2` annotations plus the only
-versioned supplement, `config/delink_data_supplemental.tsv`. The combined symbol/section manifests,
+Candidate topology is generated from source `DATA`, `DATA_COMPGEN`, `VTBL`, and `VTBL2`
+annotations. The combined symbol/section manifests,
 contribution replay, and exact coverage partition live under `build/gen`. An explicit
 `homm2 data-topology regenerate` delinks into a temporary directory, verifies every owner object,
 and replaces `build/delink` only after success. Its canonical stamp hashes all committed configs,
@@ -55,21 +55,18 @@ the section manifest retains the candidate storage/ordinal/size with `rva=-`; th
 zero-initializes that candidate-shaped section, copies each definition and its relocations from the
 definition's own retail RVA, and rejects candidate-offset overflow or overlap. Such rows are exact
 classifications in `delink_data_breakpoints.json`, not unresolved diagnostics.
-Normal assembly never rewrites the versioned supplemental manifest. Semantic/public identities and
-all topology fields remain strict. A local compiler-private counter rename may be associated at its
-exact reviewed section coordinate only when the current candidate and fixed target canonicalize to
-the same symbol family, payload, extent, and relocation identity. This avoids manifest churn from
-MSVC `$SG`/`$T` counters without accepting reordered or changed data. Every unproved rename or real
-topology/content change remains a hard error; the explicit migration path still produces a
-reviewable versioned diff for those changes.
+Normal assembly regenerates semantic compiler-data rows from source. MSVC `$SG`/`$T`
+counters are candidate topology only and never enter canonical identity. A source claim binds only
+when its payload, extent, storage, placement evidence, and relocation topology select a candidate;
+missing or ambiguous bindings warn normally and fail strict assembly.
 
 Candidate discovery is separated from that canonical path. `homm2 data-topology propose` writes
 `build/gen/data_topology_review_queue.tsv`, whose non-manifest schema records individually evidenced
 real placements absent from the canonical union together with proof counts and the containing open
 group's blockers/contradictions. It writes no canonical or target artifact. Synthetic identities and
 unevidenced rows cannot enter the queue. Promote and regenerate never read it: a reviewed row becomes
-canonical only by reconstructing a source `DATA()` definition or by an explicit human edit to the
-versioned supplemental manifest followed by canonical assembly.
+canonical only by reconstructing a source `DATA()` definition or adding an explicit
+`DATA_COMPGEN()` source claim followed by canonical assembly.
 
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
 about NB09 and `required_initialized_storage.tsv`, so another reconstruction project

@@ -36,7 +36,7 @@ H2_ENUM_END(DirectPlayStorageConstant)
 
 VA(0x0041eda0, 0x95)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
-    LogStr("ServiceProvider:");
+    LogStr(DATA_COMPGEN(0x004ef814, dpEnumServiceProviderServiceProvider, "ServiceProvider:"));
     _strupr(name);
     LogInt(
         name,
@@ -48,9 +48,9 @@ BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, 
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    if (FindStringInString(name, "IPX") != NULL)
+    if (FindStringInString(name, DATA_COMPGEN(0x004ef828, dpEnumServiceProviderIPX, "IPX")) != NULL)
         IPXGuid = guid;
-    else if (FindStringInString(name, "TCP") != NULL)
+    else if (FindStringInString(name, DATA_COMPGEN(0x004ef82c, dpEnumServiceProviderTCP, "TCP")) != NULL)
         TCPGuid = guid;
     return 1;
 }
@@ -59,7 +59,7 @@ VA(0x0041ee35, 0x7a)
 BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & DPESC_TIMEDOUT)
         return 0;
-    LogStr("Sessions:");
+    LogStr(DATA_COMPGEN(0x004ef830, dpEnumSessionSessions, "Sessions:"));
     LogInt(
         session->szSessionName,
         session->dwSession,
@@ -89,31 +89,31 @@ i16 dpnet_init(void) {
     if (lpIDC != NULL)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*),
+        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC_AT(
+            DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), DATA_COMPGEN(0x004ef86c, dpnet_initSourceFile, RETAIL_FILE),
             initSourceLineBase + 7
         ));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(i32),
+        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC_AT(
+            DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), DATA_COMPGEN(0x004ef918, dpnet_initSourceFile2, RETAIL_FILE),
             initSourceLineBase + 8
         ));
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
-        hinstDplayx = LoadLibraryA("DPLAYX.DLL");
+        hinstDplayx = LoadLibraryA(DATA_COMPGEN(0x004ef898, dpnetInitDPLAYXDLL, "DPLAYX.DLL"));
         if (hinstDplayx == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(0x004ef8a4, dpnetInitCanTLoadDPLAYXDLL, "Can't load 'DPLAYX.DLL'"));
         enumerateFunction = NULL;
         createFunction = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
-            GetProcAddress(hinstDplayx, "DirectPlayCreate")
+            GetProcAddress(hinstDplayx, DATA_COMPGEN(0x004ef8bc, dpnetInitDirectPlayCreate, "DirectPlayCreate"))
         );
         if (createFunction == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(0x004ef8d0, dpnetInitCanTLoadDPLAYXDLL2, "Can't load 'DPLAYX.DLL'"));
         enumerateFunction = reinterpret_cast<DirectPlayEnumerateFunction>(
-            GetProcAddress(hinstDplayx, "DirectPlayEnumerateA")
+            GetProcAddress(hinstDplayx, DATA_COMPGEN(0x004ef8e8, dpnetInitDirectPlayEnumerateA, "DirectPlayEnumerateA"))
         );
         if (enumerateFunction == NULL)
-            ShutDown("Can't load 'DPLAYX.DLL'");
+            ShutDown(DATA_COMPGEN(0x004ef900, dpnetInitCanTLoadDPLAYXDLL3, "Can't load 'DPLAYX.DLL'"));
         enumerateFunction(dpEnumServiceProvider, NULL);
         switch (iMPNetProtocol) {
             case DP_PROTOCOL_IPX:
@@ -125,12 +125,12 @@ i16 dpnet_init(void) {
         }
         result = createFunction(g_lpGuid, &lpIDC, NULL);
         if (result != RESULT_OK)
-            DPSD(result, RETAIL_FILE, initSourceLineBase + 41);
+            DPSD(result, DATA_COMPGEN(0x004ef840, dpnetInitIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), initSourceLineBase + 41);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
             giWaitType = DIALOG_WAIT_DIRECTPLAY_FIRST_GUEST;
-            sprintf(gText, "Waiting On Guest.\n\n  Press 'CANCEL' to abort.");
+            sprintf(gText, DATA_COMPGEN(0x004ef944, dpnetInitWaitingOnGuestPressCANCELTo, "Waiting On Guest.\n\n  Press 'CANCEL' to abort."));
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
@@ -138,8 +138,8 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
-                "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
-                "additional guests.",
+                DATA_COMPGEN(0x004ef974, dpnetInitYouHaveDGuestSNow, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
+                "additional guests."),
                 giNumHumanPlayers - 1
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -157,7 +157,7 @@ i16 dpnet_init(void) {
             }
         } else {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_HOST;
-            sprintf(gText, "Waiting for other remote player to set up game.");
+            sprintf(gText, DATA_COMPGEN(0x004ef9d0, dpnetInitWaitingForOtherRemotePlayerTo, "Waiting for other remote player to set up game."));
             NormalDialog(gText, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             if (gbFunctionComplete == 0)
                 ShutDown(NULL);
@@ -203,10 +203,10 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != NULL)
-        H2_FREE(ppDPRcvBuffer, termSourceLineBase + 14);
+        H2_FREE_AT(ppDPRcvBuffer, DATA_COMPGEN(0x004efa04, dpnet_termSourceFile, RETAIL_FILE), termSourceLineBase + 14);
     ppDPRcvBuffer = NULL;
     if (piDPRcvBufferSize != NULL)
-        H2_FREE(piDPRcvBufferSize, termSourceLineBase + 18);
+        H2_FREE_AT(piDPRcvBufferSize, DATA_COMPGEN(0x004efa30, dpnet_termSourceFile2, RETAIL_FILE), termSourceLineBase + 18);
     piDPRcvBufferSize = NULL;
     if (hinstDplayx != NULL)
         FreeLibrary(hinstDplayx);
@@ -222,7 +222,7 @@ void dpSendMessage(
     void* data
 ) {
     DATA(0x004efa5c) static i16 sendSourceLineBase = 254; // NOLINT(readability-magic-numbers)
-    u8* message = static_cast<u8*>(H2_ALLOC(size + 1, sendSourceLineBase + 2));
+    u8* message = static_cast<u8*>(H2_ALLOC_AT(size + 1, DATA_COMPGEN(0x004efa8c, dpSendMessageSourceFile, RETAIL_FILE), sendSourceLineBase + 2));
     i32 result;
 
     message[0] = static_cast<u8>(type);
@@ -231,9 +231,9 @@ void dpSendMessage(
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (result != RESULT_OK && result != RESULT_INVALID_PLAYER
         && result != RESULT_INVALID_ARGUMENT) {
-        DPSD(result, RETAIL_FILE, sendSourceLineBase + 14);
+        DPSD(result, DATA_COMPGEN(0x004efa60, dpSendMessageIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), sendSourceLineBase + 14);
     }
-    H2_FREE(message, sendSourceLineBase + 16);
+    H2_FREE_AT(message, DATA_COMPGEN(0x004efab8, dpSendMessageSourceFile2, RETAIL_FILE), sendSourceLineBase + 16);
 }
 
 VA(0x0041f492, 0x5a)
@@ -259,8 +259,8 @@ i16 dpnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    H2_FREE(
-        ppDPRcvBuffer[iDPRcvBufferTail], receiveSourceLineBase + 9
+    H2_FREE_AT(
+        ppDPRcvBuffer[iDPRcvBufferTail], DATA_COMPGEN(0x004efae8, dpnet_rcvSourceFile, RETAIL_FILE), receiveSourceLineBase + 9
     );
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
@@ -298,7 +298,7 @@ void dpProcessMessages(void) {
         if (receiveResult == RESULT_NO_MESSAGES)
             return;
         if (receiveResult != RESULT_OK)
-            DPSD(receiveResult, RETAIL_FILE, processSourceLineBase + 23);
+            DPSD(receiveResult, DATA_COMPGEN(0x004efb18, dpProcessMessagesIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), processSourceLineBase + 23);
         if (senderId == 0) {
         } else {
             if (destinationIds[0] == 0 || destinationIds[0] == OD_STEER(dcoID))
@@ -317,8 +317,8 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(static_cast<u8>(rcvBufIn[0]))) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(
-                size - 1, evaluateSourceLineBase + 8
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC_AT(
+                size - 1, DATA_COMPGEN(0x004efb48, dpEvaluateMessageSourceFile, RETAIL_FILE), evaluateSourceLineBase + 8
             ));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
@@ -355,7 +355,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             giNumHumanPlayers = startup->playerCount;
             giThisNetPos = startup->netPosition;
             LogInt(
-                "DPMSGSTARTUP",
+                DATA_COMPGEN(0x004efb74, dpEvaluateMessageDPMSGSTARTUP, "DPMSGSTARTUP"),
                 giThisNetPos,
                 sender,
                 LOG_UNUSED_VALUE,
@@ -368,7 +368,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             bStartUpInfoReceived = 1;
             break;
         default:
-            sprintf(gText, "Unknown message: %d\n", static_cast<i32>(rcvBufIn[0]));
+            sprintf(gText, DATA_COMPGEN(0x004efb84, dpEvaluateMessageUnknownMessageD, "Unknown message: %d\n"), static_cast<i32>(rcvBufIn[0]));
             LogStr(gText);
             break;
     }
@@ -387,10 +387,10 @@ i32 dpWaitForFirstGuest(void) {
             session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
             session.guidSession = *g_lpGuid;
             session.dwFlags = IDX(SESSION_OPEN_CREATE);
-            strcpy(session.szSessionName, "Heroes 2");
+            strcpy(session.szSessionName, DATA_COMPGEN(0x004efba0, dpWaitForFirstGuestHeroes2, "Heroes 2"));
             result = lpIDC->Open(&session);
             if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, firstGuestSourceLineBase + 16);
+                DPSD(result, DATA_COMPGEN(0x004efbac, dpWaitForFirstGuestIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), firstGuestSourceLineBase + 16);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -399,9 +399,9 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            result = lpIDC->CreatePlayer(&dcoID, DATA_COMPGEN(0x004efbe8, dpWaitForFirstGuestDude, "Dude"), DATA_COMPGEN(0x004efbd8, dpWaitForFirstGuestHeroesPlayer, "Heroes Player"), &dphEvent);
             if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, firstGuestSourceLineBase + 46);
+                DPSD(result, DATA_COMPGEN(0x004efbf0, dpWaitForFirstGuestIProjectsHeroesProgSOURCEDpnetwin2, RETAIL_FILE), firstGuestSourceLineBase + 46);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -423,8 +423,8 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
-            "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional "
-            "guests.",
+            DATA_COMPGEN(0x004efc1c, dpWaitForExtraGuestsYouHaveDGuestSNow, "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional "
+            "guests."),
             giNumHumanPlayers - 1
         );
         message.type = MESSAGE_WIDGET;
@@ -445,7 +445,7 @@ i32 dpWaitForHost(void) {
     i32 playResult;
     char statusString[STATUS_TEXT_SIZE];
 
-    sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
+    sprintf(statusString, DATA_COMPGEN(0x004efc7c, dpWaitForHostWFHSD, "WFHS %d"), iDPWaitForHostStatus);
     AiPrint(statusString);
     switch (iDPWaitForHostStatus) {
         case HOST_ENUMERATE_SESSIONS:
@@ -471,7 +471,7 @@ i32 dpWaitForHost(void) {
                 return 0;
             }
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 38);
+                DPSD(playResult, DATA_COMPGEN(0x004efc84, dpWaitForHostIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), hostSourceLineBase + 38);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -484,16 +484,16 @@ i32 dpWaitForHost(void) {
             sessionDescription.guidSession = *g_lpGuid;
             sessionDescription.dwFlags = IDX(SESSION_OPEN_JOIN);
             sessionDescription.dwSession = lSessions[iSessionToTry];
-            strcpy(sessionDescription.szSessionName, "Heroes 2");
+            strcpy(sessionDescription.szSessionName, DATA_COMPGEN(0x004efcb0, dpWaitForHostHeroes2, "Heroes 2"));
             playResult = lpIDC->Open(&sessionDescription);
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 57);
+                DPSD(playResult, DATA_COMPGEN(0x004efcbc, dpWaitForHostIProjectsHeroesProgSOURCEDpnetwin2, RETAIL_FILE), hostSourceLineBase + 57);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            playResult = lpIDC->CreatePlayer(&dcoID, DATA_COMPGEN(0x004efcf8, dpWaitForHostDude, "Dude"), DATA_COMPGEN(0x004efce8, dpWaitForHostHeroesPlayer, "Heroes Player"), &dphEvent);
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 67);
+                DPSD(playResult, DATA_COMPGEN(0x004efd00, dpWaitForHostIProjectsHeroesProgSOURCEDpnetwin3, RETAIL_FILE), hostSourceLineBase + 67);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -520,7 +520,7 @@ i32 dpWaitForHost(void) {
                 }
                 playResult = lpIDC->Close();
                 if (playResult != RESULT_OK)
-                    DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 93);
+                    DPSD(playResult, DATA_COMPGEN(0x004efd2c, dpWaitForHostIProjectsHeroesProgSOURCEDpnetwin4, RETAIL_FILE), hostSourceLineBase + 93);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }
@@ -547,97 +547,97 @@ void DPSD(i32 result, char* file, i32 line) {
         case RESULT_OK:
             return;
         case DPERR_ALREADYINITIALIZED:
-            strcpy(errorText, "DPERR_ALREADYINITIALIZED ");
+            strcpy(errorText, DATA_COMPGEN(0x004efd58, dPSDDPERRALREADYINITIALIZED, "DPERR_ALREADYINITIALIZED "));
             break;
         case DPERR_ACCESSDENIED:
-            strcpy(errorText, "DPERR_ACCESSDENIED       ");
+            strcpy(errorText, DATA_COMPGEN(0x004efd74, dPSDDPERRACCESSDENIED, "DPERR_ACCESSDENIED       "));
             break;
         case DPERR_ACTIVEPLAYERS:
-            strcpy(errorText, "DPERR_ACTIVEPLAYERS      ");
+            strcpy(errorText, DATA_COMPGEN(0x004efd90, dPSDDPERRACTIVEPLAYERS, "DPERR_ACTIVEPLAYERS      "));
             break;
         case DPERR_BUFFERTOOSMALL:
-            strcpy(errorText, "DPERR_BUFFERTOOSMALL     ");
+            strcpy(errorText, DATA_COMPGEN(0x004efdac, dPSDDPERRBUFFERTOOSMALL, "DPERR_BUFFERTOOSMALL     "));
             break;
         case DPERR_CANTADDPLAYER:
-            strcpy(errorText, "DPERR_CANTADDPLAYER      ");
+            strcpy(errorText, DATA_COMPGEN(0x004efdc8, dPSDDPERRCANTADDPLAYER, "DPERR_CANTADDPLAYER      "));
             break;
         case DPERR_CANTCREATEGROUP:
-            strcpy(errorText, "DPERR_CANTCREATEGROUP    ");
+            strcpy(errorText, DATA_COMPGEN(0x004efde4, dPSDDPERRCANTCREATEGROUP, "DPERR_CANTCREATEGROUP    "));
             break;
         case DPERR_CANTCREATEPLAYER:
-            strcpy(errorText, "DPERR_CANTCREATEPLAYER   ");
+            strcpy(errorText, DATA_COMPGEN(0x004efe00, dPSDDPERRCANTCREATEPLAYER, "DPERR_CANTCREATEPLAYER   "));
             break;
         case DPERR_CANTCREATESESSION:
-            strcpy(errorText, "DPERR_CANTCREATESESSION  ");
+            strcpy(errorText, DATA_COMPGEN(0x004efe1c, dPSDDPERRCANTCREATESESSION, "DPERR_CANTCREATESESSION  "));
             break;
         case DPERR_CAPSNOTAVAILABLEYET:
-            strcpy(errorText, "DPERR_CAPSNOTAVAILABLEYET");
+            strcpy(errorText, DATA_COMPGEN(0x004efe38, dPSDDPERRCAPSNOTAVAILABLEYET, "DPERR_CAPSNOTAVAILABLEYET"));
             break;
         case DPERR_EXCEPTION:
-            strcpy(errorText, "DPERR_EXCEPTION          ");
+            strcpy(errorText, DATA_COMPGEN(0x004efe54, dPSDDPERREXCEPTION, "DPERR_EXCEPTION          "));
             break;
         case DPERR_GENERIC:
-            strcpy(errorText, "DPERR_GENERIC            ");
+            strcpy(errorText, DATA_COMPGEN(0x004efe70, dPSDDPERRGENERIC, "DPERR_GENERIC            "));
             break;
         case DPERR_INVALIDFLAGS:
-            strcpy(errorText, "DPERR_INVALIDFLAGS       ");
+            strcpy(errorText, DATA_COMPGEN(0x004efe8c, dPSDDPERRINVALIDFLAGS, "DPERR_INVALIDFLAGS       "));
             break;
         case DPERR_INVALIDOBJECT:
-            strcpy(errorText, "DPERR_INVALIDOBJECT      ");
+            strcpy(errorText, DATA_COMPGEN(0x004efea8, dPSDDPERRINVALIDOBJECT, "DPERR_INVALIDOBJECT      "));
             break;
         case DPERR_INVALIDPARAMS:
-            strcpy(errorText, "DPERR_INVALIDPARAMS      ");
+            strcpy(errorText, DATA_COMPGEN(0x004efec4, dPSDDPERRINVALIDPARAMS, "DPERR_INVALIDPARAMS      "));
             break;
         case DPERR_INVALIDPLAYER:
-            strcpy(errorText, "DPERR_INVALIDPLAYER      ");
+            strcpy(errorText, DATA_COMPGEN(0x004efee0, dPSDDPERRINVALIDPLAYER, "DPERR_INVALIDPLAYER      "));
             break;
         case DPERR_NOCAPS:
-            strcpy(errorText, "DPERR_NOCAPS             ");
+            strcpy(errorText, DATA_COMPGEN(0x004efefc, dPSDDPERRNOCAPS, "DPERR_NOCAPS             "));
             break;
         case DPERR_NOCONNECTION:
-            strcpy(errorText, "DPERR_NOCONNECTION       ");
+            strcpy(errorText, DATA_COMPGEN(0x004eff18, dPSDDPERRNOCONNECTION, "DPERR_NOCONNECTION       "));
             break;
         case DPERR_OUTOFMEMORY:
-            strcpy(errorText, "DPERR_OUTOFMEMORY        ");
+            strcpy(errorText, DATA_COMPGEN(0x004eff34, dPSDDPERROUTOFMEMORY, "DPERR_OUTOFMEMORY        "));
             break;
         case DPERR_NOMESSAGES:
-            strcpy(errorText, "DPERR_NOMESSAGES         ");
+            strcpy(errorText, DATA_COMPGEN(0x004eff50, dPSDDPERRNOMESSAGES, "DPERR_NOMESSAGES         "));
             break;
         case DPERR_NONAMESERVERFOUND:
-            strcpy(errorText, "DPERR_NONAMESERVERFOUND  ");
+            strcpy(errorText, DATA_COMPGEN(0x004eff6c, dPSDDPERRNONAMESERVERFOUND, "DPERR_NONAMESERVERFOUND  "));
             break;
         case DPERR_NOPLAYERS:
-            strcpy(errorText, "DPERR_NOPLAYERS          ");
+            strcpy(errorText, DATA_COMPGEN(0x004eff88, dPSDDPERRNOPLAYERS, "DPERR_NOPLAYERS          "));
             break;
         case DPERR_NOSESSIONS:
-            strcpy(errorText, "DPERR_NOSESSIONS         ");
+            strcpy(errorText, DATA_COMPGEN(0x004effa4, dPSDDPERRNOSESSIONS, "DPERR_NOSESSIONS         "));
             break;
         case DPERR_SENDTOOBIG:
-            strcpy(errorText, "DPERR_SENDTOOBIG         ");
+            strcpy(errorText, DATA_COMPGEN(0x004effc0, dPSDDPERRSENDTOOBIG, "DPERR_SENDTOOBIG         "));
             break;
         case DPERR_TIMEOUT:
-            strcpy(errorText, "DPERR_TIMEOUT            ");
+            strcpy(errorText, DATA_COMPGEN(0x004effdc, dPSDDPERRTIMEOUT, "DPERR_TIMEOUT            "));
             break;
         case DPERR_UNAVAILABLE:
-            strcpy(errorText, "DPERR_UNAVAILABLE        ");
+            strcpy(errorText, DATA_COMPGEN(0x004efff8, dPSDDPERRUNAVAILABLE, "DPERR_UNAVAILABLE        "));
             break;
         case DPERR_UNSUPPORTED:
-            strcpy(errorText, "DPERR_UNSUPPORTED        ");
+            strcpy(errorText, DATA_COMPGEN(0x004f0014, dPSDDPERRUNSUPPORTED, "DPERR_UNSUPPORTED        "));
             break;
         case DPERR_BUSY:
-            strcpy(errorText, "DPERR_BUSY               ");
+            strcpy(errorText, DATA_COMPGEN(0x004f0030, dPSDDPERRBUSY, "DPERR_BUSY               "));
             break;
         case DPERR_USERCANCEL:
-            strcpy(errorText, "DPERR_USERCANCEL         ");
+            strcpy(errorText, DATA_COMPGEN(0x004f004c, dPSDDPERRUSERCANCEL, "DPERR_USERCANCEL         "));
             break;
         default:
-            strcpy(errorText, "Error type unknown");
+            strcpy(errorText, DATA_COMPGEN(0x004f0068, dPSDErrorTypeUnknown, "Error type unknown"));
             break;
     }
     MessageBeep(0);
     MessageBeep(0);
     MessageBeep(0);
-    sprintf(gText, "DirectPlay Error:\n\n'%s'\n\n  File:'%s'\n Line# %d", errorText, file, line);
+    sprintf(gText, DATA_COMPGEN(0x004f007c, dPSDDirectPlayErrorSFileSLine, "DirectPlay Error:\n\n'%s'\n\n  File:'%s'\n Line# %d"), errorText, file, line);
     LogStr(gText);
     ShutDown(gText);
 }

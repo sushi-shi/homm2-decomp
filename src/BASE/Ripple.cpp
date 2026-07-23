@@ -38,7 +38,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     do {
         PollSound();
         // Keep the retail anonymous constant-pool relocation.
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f; // NOLINT(readability-magic-numbers)
+        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * DATA_COMPGEN(0x004eba80, deadlineConstant, 9.0f); // NOLINT(readability-magic-numbers)
 
         for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
             i32 column = profileIndex + position - PROFILE_RADIUS;

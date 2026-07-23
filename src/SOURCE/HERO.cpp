@@ -442,7 +442,7 @@ void hero::UpdateArmies(void) {
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
-            sprintf(gText, "monh%04d.icn", IDX(m_army.m_creatureTypes[index]));
+            sprintf(gText, DATA_COMPGEN(0x004f6c90, updateArmiesMonh04dIcn, "monh%04d.icn"), IDX(m_army.m_creatureTypes[index]));
             message.payload.widget.id = index + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
@@ -451,7 +451,7 @@ void hero::UpdateArmies(void) {
             message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
 
-            sprintf(gText, "%d", m_army.m_creatureCounts[index]);
+            sprintf(gText, DATA_COMPGEN(0x004f6ca0, updateArmiesD, "%d"), m_army.m_creatureCounts[index]);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
             message.payload.widget.id = index + UI_ARMY_COUNT_FIRST;
             message.payload.widget.data.text = gText;
@@ -515,7 +515,7 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
 VA(0x0046ce8b, 0x5d)
 i32 hero::Dismiss(void) {
     NormalDialog(
-        "Are you sure you want to dismiss this Hero?",
+        DATA_COMPGEN(0x004f6ca4, dismissAreYouSureYouWantTo, "Are you sure you want to dismiss this Hero?"),
         NORMAL_DIALOG_CONFIRM,
         -1,
         -1,
@@ -664,7 +664,7 @@ i32 hero::GetExperience(i32 level) {
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
                [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
-        * HERO_EXPERIENCE_GROWTH_FACTOR
+        * DATA_COMPGEN(0x004eb6d8, getExperienceConstant, HERO_EXPERIENCE_GROWTH_FACTOR)
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
     while (levelCounter < level) {
@@ -824,7 +824,7 @@ void hero::CheckLevel(void) {
                 if (statBonuses[indexValue] > 0) {
                     m_primaryStats[indexValue] =
                         m_primaryStats[indexValue] + statBonuses[indexValue];
-                    sprintf(line, "\n%s +%d", gStatNames[indexValue], statBonuses[indexValue]);
+                    sprintf(line, DATA_COMPGEN(0x004f6ce8, checkLevelSD, "\n%s +%d"), gStatNames[indexValue], statBonuses[indexValue]);
                     strcat(gText, line);
                 }
             }
@@ -871,13 +871,13 @@ void hero::CheckLevel(void) {
             }
 
             if (!gbInNewGameSetup && m_owner >= 0 && gbThisNetHumanPlayer[m_owner]) {
-                sampleValue = LoadPlaySample(const_cast<char*>("nwherolv.82m"));
+                sampleValue = LoadPlaySample(const_cast<char*>(DATA_COMPGEN(0x004f6cf0, checkLevelNwherolv82m, "nwherolv.82m")));
                 if (skillChoicesResult[0] == HERO_SKILL_NONE) {
                     NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
                 } else if (skillChoicesResult[1] == HERO_SKILL_NONE) {
                     sprintf(
                         line,
-                        "\n\nYou have learned %s %s.",
+                        DATA_COMPGEN(0x004f6d00, checkLevelYouHaveLearnedSS, "\n\nYou have learned %s %s."),
                         gSecondarySkillLevels
                             [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
                         gSecondarySkills[IDX(skillChoicesResult[0])]
@@ -900,7 +900,7 @@ void hero::CheckLevel(void) {
                 } else {
                     sprintf(
                         line,
-                        "\n\nYou may learn either %s %s or %s %s.",
+                        DATA_COMPGEN(0x004f6d1c, checkLevelYouMayLearnEitherSS, "\n\nYou may learn either %s %s or %s %s."),
                         gSecondarySkillLevels
                             [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
                         gSecondarySkills[IDX(skillChoicesResult[0])],
@@ -1288,9 +1288,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_SPREAD:
                         if (quickView0) {
                             NormalDialog(
-                                "{Spread Formation}\n\n'Spread' combat formation spreads your "
+                                DATA_COMPGEN(0x004f6d44, heroHandlerSpreadFormationSpreadCombatFormationSpreads, "{Spread Formation}\n\n'Spread' combat formation spreads your "
                                 "armies from the top to the bottom of the battlefield, with at "
-                                "least one empty space between each army.",
+                                "least one empty space between each army."),
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -1311,8 +1311,8 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_FORMATION_GROUPED:
                         if (quickView0) {
                             NormalDialog(
-                                "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
-                                "army together in the center of your side of the battlefield.",
+                                DATA_COMPGEN(0x004f6de8, heroHandlerGroupedFormationGroupedCombatFormationBunches, "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
+                                "army together in the center of your side of the battlefield."),
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -1334,10 +1334,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_SPELL_POINTS_LAST:
                         sprintf(
                             gText,
-                            "{Spell Points}\n\n%s currently has %d spell points out of a maximum "
+                            DATA_COMPGEN(0x004f6e64, heroHandlerSpellPointsSCurrentlyHasD, "{Spell Points}\n\n%s currently has %d spell points out of a maximum "
                             "of %d.  The maximum number of spell points is 10 times your "
                             "knowledge.  It is occasionally possible to have more than your "
-                            "maximum spell points via special events.",
+                            "maximum spell points via special events."),
                             gpHVHero->m_name,
                             gpHVHero->m_spellPoints,
                             gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE)
@@ -1363,7 +1363,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         nextExperience12 = gpHVHero->GetExperience(level14 + 1);
                         sprintf(
                             gText,
-                            "{Level %d}\n\nCurrent experience %d\nNext level %d",
+                            DATA_COMPGEN(0x004f6f4c, heroHandlerLevelDCurrentExperienceDNext, "{Level %d}\n\nCurrent experience %d\nNext level %d"),
                             level14,
                             gpHVHero->m_experience,
                             nextExperience12
@@ -1560,7 +1560,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 VA(0x0046f305, 0x4f)
 void RedrawHeroScreen(void) {
     gpResourceManager
-        ->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
+        ->GetBackdrop(DATA_COMPGEN(0x004f6f7c, redrawHeroScreenHerobkgIcn, "herobkg.icn"), gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
     heroWin->DrawWindow();
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
@@ -1577,7 +1577,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     if (fadeAlreadyOut == 0)
         gpWindowManager->FadeScreen(FADE_OUT, UI_FADE_STEPS, NULL);
 
-    heroWin = new heroWindow(0, 0, "herowind.bin");
+    heroWin = new heroWindow(0, 0, DATA_COMPGEN(0x004f6f88, heroViewHerowindBin, "herowind.bin"));
     if (heroWin == NULL)
         MemError();
     SetWinText(heroWin, UI_WINDOW_TEXT_ID);
@@ -1627,7 +1627,7 @@ void SetupHeroView(void) {
         cannotDismiss = 1;
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "%s the %s", gpHVHero->m_name, gAlignmentNames[IDX(gpHVHero->m_cursorType)]);
+    sprintf(gText, DATA_COMPGEN(0x004f6f98, setupHeroViewSTheS, "%s the %s"), gpHVHero->m_name, gAlignmentNames[IDX(gpHVHero->m_cursorType)]);
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_HERO_TITLE;
     message.payload.widget.data.text = gText;
@@ -1666,7 +1666,7 @@ void SetupHeroView(void) {
     message.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(message);
 
-    sprintf(gText, "port%04d.icn", IDX(gpHVHero->m_portrait));
+    sprintf(gText, DATA_COMPGEN(0x004f6fa4, setupHeroViewPort04dIcn, "port%04d.icn"), IDX(gpHVHero->m_portrait));
     message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     message.payload.widget.id = UI_HERO_PORTRAIT;
     message.payload.widget.data.text = gText;
@@ -1674,7 +1674,7 @@ void SetupHeroView(void) {
 
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     for (index = 0; index < HERO_PRIMARY_STAT_COUNT; index++) {
-        sprintf(gText, "%d", gpHVHero->Stats(HeroPrimaryStat(index)));
+        sprintf(gText, DATA_COMPGEN(0x004f6fb4, setupHeroViewD, "%d"), gpHVHero->Stats(HeroPrimaryStat(index)));
         message.payload.widget.id = UI_PRIMARY_STAT_VALUE_FIRST + index;
         message.payload.widget.data.text = gText;
         heroWin->BroadcastMessage(message);
@@ -1742,7 +1742,7 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%d", gpHVHero->m_experience);
+    sprintf(gText, DATA_COMPGEN(0x004f6fb8, setupHeroViewD2, "%d"), gpHVHero->m_experience);
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_EXPERIENCE_LAST;
     message.payload.widget.data.text = gText;
@@ -1765,7 +1765,7 @@ void SetupHeroView(void) {
 
     sprintf(
         gText,
-        "%d/%d",
+        DATA_COMPGEN(0x004f6fbc, setupHeroViewDD, "%d/%d"),
         gpHVHero->m_spellPoints,
         gpHVHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
     );
@@ -1774,7 +1774,7 @@ void SetupHeroView(void) {
     message.payload.widget.data.text = gText;
     heroWin->BroadcastMessage(message);
 
-    sprintf(gText, "crest.icn");
+    sprintf(gText, DATA_COMPGEN(0x004f6fc4, setupHeroViewCrestIcn, "crest.icn"));
     message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
     message.payload.widget.id = UI_PLAYER_CREST;
     heroWin->BroadcastMessage(message);
@@ -1810,7 +1810,7 @@ void SetupHeroView(void) {
             if (secondarySkillBonus > 0) {
                 sprintf(
                     gText,
-                    "%s+%d",
+                    DATA_COMPGEN(0x004f6fd0, setupHeroViewSD, "%s+%d"),
                     gSecondarySkillLevels
                         [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1],
                     secondarySkillBonus
@@ -1818,7 +1818,7 @@ void SetupHeroView(void) {
             } else {
                 sprintf(
                     gText,
-                    "%s",
+                    DATA_COMPGEN(0x004f6fd8, setupHeroViewS, "%s"),
                     gSecondarySkillLevels
                         [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1]
                 );
@@ -1872,19 +1872,19 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
-        new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, "splitwin.bin");
+        new heroWindow(UI_SPLIT_WINDOW_X, UI_SPLIT_WINDOW_Y, DATA_COMPGEN(0x004f6fdc, doHeroSplitSplitwinBin, "splitwin.bin"));
     if (gpTownManager->m_heroWindow1 == NULL)
         MemError();
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "Move how many troops?");
+    sprintf(gText, DATA_COMPGEN(0x004f6fec, doHeroSplitMoveHowManyTroops, "Move how many troops?"));
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
-    sprintf(gText, "%d", gpTownManager->m_splitAmount);
+    sprintf(gText, DATA_COMPGEN(0x004f7004, doHeroSplitD, "%d"), gpTownManager->m_splitAmount);
     message.payload.widget.id = UI_SPLIT_AMOUNT;
     message.payload.widget.data.text = gText;
     gpTownManager->m_heroWindow1->BroadcastMessage(message);
@@ -2059,8 +2059,8 @@ void hero::DoSSLevelDialog(
         skillLevelText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
         sprintf(
             gText,
-            "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
-            "killed in combat to be brought back from the dead as Skeletons.",
+            DATA_COMPGEN(0x004f7008, doSSLevelDialogSNecromancyDSNecromancyD, "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
+            "killed in combat to be brought back from the dead as Skeletons."),
             skillLevelText,
             skillBonusValue,
             skillLevelText,
@@ -2108,9 +2108,9 @@ void hero::CheckAnduranPieces(i32 showDialog) {
         }
         GiveArtifact(this, ARTIFACT_BATTLE_GARB, showDialog, IDX(ARTIFACT_NONE));
         if (gbThisNetHumanPlayer[m_owner]) {
-            LoadPlaySample("treasure.82m");
+            LoadPlaySample(DATA_COMPGEN(0x004f7098, checkAnduranPiecesTreasure82m, "treasure.82m"));
             NormalDialog(
-                "The three Anduran artifacts magically combine into one.",
+                DATA_COMPGEN(0x004f70a8, checkAnduranPiecesTheThreeAnduranArtifactsMagicallyCombine, "The three Anduran artifacts magically combine into one."),
                 NORMAL_DIALOG_INFO,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,

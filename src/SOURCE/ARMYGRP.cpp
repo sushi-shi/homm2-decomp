@@ -237,7 +237,12 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 VA(0x0048c7d2, 0x14d)
 void armyGroup::DamageGroup(float damagePercent) {
     i32 numKilled;
-    i32 percentChance = static_cast<i32>(damagePercent * IDX(ARMY_GROUP_RANDOM_PERCENT_MAX));
+    i32 percentChance = static_cast<i32>(
+        damagePercent
+        * DATA_COMPGEN(
+            0x004eb858, armyGroupRandomPercentMaximum, IDX(ARMY_GROUP_RANDOM_PERCENT_MAX)
+        )
+    );
     i32 i;
     i32 isFirstTroop = 1;
     i32 j;
@@ -250,10 +255,10 @@ void armyGroup::DamageGroup(float damagePercent) {
                     ++numKilled;
             }
             if (isFirstTroop && m_creatureCounts[i] == numKilled
-                && damagePercent < 0.999) // NOLINT(readability-magic-numbers)
+                && damagePercent < DATA_COMPGEN(0x004eb860, damageGroupConstant, 0.999)) // NOLINT(readability-magic-numbers)
                 --numKilled;
             m_creatureCounts[i] -= numKilled;
-            if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
+            if (m_creatureCounts[i] <= 0 || damagePercent >= DATA_COMPGEN(0x004eb868, damageGroupConstant2, 1.0)) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
             }

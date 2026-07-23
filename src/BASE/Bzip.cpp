@@ -167,7 +167,7 @@ VA(0x004d40d0, 0x64)
 BitStream* bsOpenReadStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
-        panic(const_cast<char*>("bsOpenReadStream"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x00520364, bsOpenReadStreamBsOpenReadStream, "bsOpenReadStream")));
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -181,7 +181,7 @@ VA(0x004d4140, 0x64)
 BitStream* bsOpenWriteStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
-        panic(const_cast<char*>("bsOpenWriteStream"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x00520378, bsOpenWriteStreamBsOpenWriteStream, "bsOpenWriteStream")));
     bsInUse = 1;
     bs = &aBitStreamBuffer;
     bs->handle = f;
@@ -248,7 +248,7 @@ VA(0x004d4380, 0xe8)
 void bsClose(BitStream* bs) {
     IntNative retVal;
     if (!bsInUse)
-        panic(const_cast<char*>("bsClose"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x0052038c, bsCloseBsClose, "bsClose")));
     bsInUse = False;
 
     if (bs->mode == 'w') {
@@ -356,7 +356,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
     arithCodeRenormalise_Encode(bs);
 
     if (bitsOutstanding > MAX_BITS_OUTSTANDING)
-        panic(const_cast<char*>("arithCodeSymbol: too many bits outstanding"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x00520394, arithCodeSymbolArithCodeSymbolTooManyBitsOutstanding, "arithCodeSymbol: too many bits outstanding")));
 }
 
 VA(0x004d47a0, 0xfe)
@@ -424,7 +424,7 @@ void initModel(
 
 VA(0x004d4980, 0x3f)
 void dumpModelStats(Model* m) {
-    sprintf(gText, "model %s:\t scalings %d\n", m->name, m->numScalings);
+    sprintf(gText, DATA_COMPGEN(0x005203c0, dumpModelStatsModelSScalingsD, "model %s:\t scalings %d\n"), m->name, m->numScalings);
     LogStr(gText);
 }
 
@@ -462,7 +462,7 @@ Int32 getSymbol(Model* m, BitStream* bs) {
 
 VA(0x004d4ae0, 0x2b)
 void initBogusModel(void) {
-    initModel(&bogusModel, const_cast<char*>("bogus"), 256, 0, 256);
+    initModel(&bogusModel, const_cast<char*>(DATA_COMPGEN(0x005203d8, initBogusModelBogus, "bogus")), 256, 0, 256);
 }
 
 VA(0x004d4b10, 0x2f)
@@ -515,14 +515,14 @@ UInt32 getUInt32(BitStream* bs) {
 
 VA(0x004d4d30, 0xda)
 void initModels(void) {
-    initModel(&models[BASIS], const_cast<char*>("basis"), 11, 12, 1000);
-    initModel(&models[MODEL_2_3], const_cast<char*>("2-3"), 2, 4, 1000);
-    initModel(&models[MODEL_4_7], const_cast<char*>("4-7"), 4, 3, 1000);
-    initModel(&models[MODEL_8_15], const_cast<char*>("8-15"), 8, 3, 1000);
-    initModel(&models[MODEL_16_31], const_cast<char*>("16-31"), 16, 3, 1000);
-    initModel(&models[MODEL_32_63], const_cast<char*>("32-63"), 32, 3, 1000);
-    initModel(&models[MODEL_64_127], const_cast<char*>("64-127"), 64, 2, 1000);
-    initModel(&models[MODEL_128_255], const_cast<char*>("128-255"), 128, 1, 1000);
+    initModel(&models[BASIS], const_cast<char*>(DATA_COMPGEN(0x005203e0, initModelsBasis, "basis")), 11, 12, 1000);
+    initModel(&models[MODEL_2_3], const_cast<char*>(DATA_COMPGEN(0x005203e8, initModels23, "2-3")), 2, 4, 1000);
+    initModel(&models[MODEL_4_7], const_cast<char*>(DATA_COMPGEN(0x005203ec, initModels47, "4-7")), 4, 3, 1000);
+    initModel(&models[MODEL_8_15], const_cast<char*>(DATA_COMPGEN(0x005203f0, initModels815, "8-15")), 8, 3, 1000);
+    initModel(&models[MODEL_16_31], const_cast<char*>(DATA_COMPGEN(0x005203f8, initModels1631, "16-31")), 16, 3, 1000);
+    initModel(&models[MODEL_32_63], const_cast<char*>(DATA_COMPGEN(0x00520400, initModels3263, "32-63")), 32, 3, 1000);
+    initModel(&models[MODEL_64_127], const_cast<char*>(DATA_COMPGEN(0x00520408, initModels64127, "64-127")), 64, 2, 1000);
+    initModel(&models[MODEL_128_255], const_cast<char*>(DATA_COMPGEN(0x00520410, initModels128255, "128-255")), 128, 1, 1000);
 }
 
 VA(0x004d4e10, 0x71)
@@ -629,18 +629,18 @@ void sendMTFVal(BitStream* bs, Int32 n) {
         putSymbol(&models[MODEL_128_255], n - 128 + 1, bs);
     } else {
 
-        panic(const_cast<char*>("sendMTFVal: bad value!"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x00520418, sendMTFValSendMTFValBadValue, "sendMTFVal: bad value!")));
     }
 }
 
 VA(0x004d5270, 0x94)
 void FreeCompressStructures(void) {
     if (words != NULL)
-        H2_FREE(words, 0x461);
+        H2_FREE_AT(words, DATA_COMPGEN(0x00520430, freeCompressStructuresSourceFile, RETAIL_FILE), 0x461);
     if (ftab != NULL)
-        H2_FREE(ftab, 0x462);
+        H2_FREE_AT(ftab, DATA_COMPGEN(0x00520458, freeCompressStructuresSourceFile2, RETAIL_FILE), 0x462);
     if (zptr != NULL)
-        H2_FREE(zptr, 0x463);
+        H2_FREE_AT(zptr, DATA_COMPGEN(0x00520480, freeCompressStructuresSourceFile3, RETAIL_FILE), 0x463);
     words = NULL;
     ftab = NULL;
     zptr = NULL;
@@ -650,9 +650,9 @@ VA(0x004d5310, 0xcf)
 void allocateCompressStructures(void) {
     Int32 n = 100000 * blockSize100k;
     FreeCompressStructures();
-    words = (UInt32*)H2_ALLOC((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, 0x475);
-    zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, 0x476);
-    ftab = (Int32*)H2_ALLOC(65537 * sizeof(Int32) + 1, 0x477);
+    words = (UInt32*)H2_ALLOC_AT((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, DATA_COMPGEN(0x005204a8, allocateCompressStructuresSourceFile, RETAIL_FILE), 0x475);
+    zptr = (Int32*)H2_ALLOC_AT(n * sizeof(Int32) + 1, DATA_COMPGEN(0x005204d0, allocateCompressStructuresSourceFile2, RETAIL_FILE), 0x476);
+    ftab = (Int32*)H2_ALLOC_AT(65537 * sizeof(Int32) + 1, DATA_COMPGEN(0x005204f8, allocateCompressStructuresSourceFile3, RETAIL_FILE), 0x477);
 
     if (words == NULL || zptr == NULL || ftab == NULL) {
         Int32 totalDraw =
@@ -665,11 +665,11 @@ void allocateCompressStructures(void) {
 VA(0x004d53e0, 0x94)
 void FreeDecompressStructures(void) {
     if (block != NULL)
-        H2_FREE(block, 0x489);
+        H2_FREE_AT(block, DATA_COMPGEN(0x00520520, freeDecompressStructuresSourceFile, RETAIL_FILE), 0x489);
     if (ll != NULL)
-        H2_FREE(ll, 0x48a);
+        H2_FREE_AT(ll, DATA_COMPGEN(0x00520548, freeDecompressStructuresSourceFile2, RETAIL_FILE), 0x48a);
     if (zptr != NULL)
-        H2_FREE(zptr, 0x48b);
+        H2_FREE_AT(zptr, DATA_COMPGEN(0x00520570, freeDecompressStructuresSourceFile3, RETAIL_FILE), 0x48b);
     block = NULL;
     ll = NULL;
     zptr = NULL;
@@ -685,9 +685,9 @@ void setDecompressStructureSizes(Int32 newSize100k) {
 
     if (newSize100k != 0) {
         Int32 n = 100000 * newSize100k;
-        block = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, 0x4a1);
-        ll = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1, 0x4a2);
-        zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1, 0x4a3);
+        block = (UChar*)H2_ALLOC_AT(n * sizeof(UChar) + 1, DATA_COMPGEN(0x00520598, setDecompressStructureSizesSourceFile, RETAIL_FILE), 0x4a1);
+        ll = (UChar*)H2_ALLOC_AT(n * sizeof(UChar) + 1, DATA_COMPGEN(0x005205c0, setDecompressStructureSizesSourceFile2, RETAIL_FILE), 0x4a2);
+        zptr = (Int32*)H2_ALLOC_AT(n * sizeof(Int32) + 1, DATA_COMPGEN(0x005205e8, setDecompressStructureSizesSourceFile3, RETAIL_FILE), 0x4a3);
 
         if (block == NULL || ll == NULL || zptr == NULL) {
             Int32 totalDraw = 6 * n * sizeof(UChar);
@@ -904,9 +904,9 @@ LOOPSTART:
         goto LOOPSTART;
     }
 
-    sprintf(gText, "bad MTF value %d\n", nextSym);
+    sprintf(gText, DATA_COMPGEN(0x00520610, getAndMoveToFrontDecodeBadMTFValueD, "bad MTF value %d\n"), nextSym);
     LogStr(gText);
-    panic(const_cast<char*>("getAndMoveToFrontDecode\n"));
+    panic(const_cast<char*>(DATA_COMPGEN(0x00520624, getAndMoveToFrontDecodeGetAndMoveToFrontDecode, "getAndMoveToFrontDecode\n")));
     return True;
 }
 
@@ -1126,14 +1126,14 @@ void sortIt(void) {
         Int32 i;
 
         if (veryVerbose) {
-            sprintf(gText, "trivialSort ...\n");
+            sprintf(gText, DATA_COMPGEN(0x00520640, sortItTrivialSort, "trivialSort ...\n"));
             LogStr(gText);
         }
         for (i = 0; OD_STEER(i) <= last; i++)
             zptr[i] = i;
         shellTrivial();
         if (veryVerbose) {
-            sprintf(gText, "trivialSort done.\n");
+            sprintf(gText, DATA_COMPGEN(0x00520654, sortItTrivialSortDone, "trivialSort done.\n"));
             LogStr(gText);
         }
 
@@ -1145,7 +1145,7 @@ void sortIt(void) {
         stripe();
 
         if (veryVerbose) {
-            sprintf(gText, "bucket sorting ...\n");
+            sprintf(gText, DATA_COMPGEN(0x00520668, sortItBucketSorting, "bucket sorting ...\n"));
             LogStr(gText);
         }
 
@@ -1192,7 +1192,7 @@ void sortIt(void) {
                     hiBound = 900000;
                     break;
                 default:
-                    panic(const_cast<char*>("gradedSort"));
+                    panic(const_cast<char*>(DATA_COMPGEN(0x0052067c, sortItGradedSort, "gradedSort")));
                     break;
             }
             if (loBound > lastPP)
@@ -1214,7 +1214,7 @@ void sortIt(void) {
                     if (veryVerbose) {
                         sprintf(
                             gText,
-                            "   %d -> %d:  cand %5d,   freq = %6d,   notdone = %6d",
+                            DATA_COMPGEN(0x00520688, sortItDDCand5dFreq6d, "   %d -> %d:  cand %5d,   freq = %6d,   notdone = %6d"),
                             loBound,
                             hiBound,
                             candNo,
@@ -1235,7 +1235,7 @@ void sortIt(void) {
                         }
                     }
                     if (veryVerbose) {
-                        sprintf(gText, " ");
+                        sprintf(gText, DATA_COMPGEN(0x005206c0, sortItEmptyString, " "));
                         LogStr(gText);
                     }
                 }
@@ -1249,7 +1249,7 @@ void doReversibleTransformation(void) {
     Int32 i;
 
     if (veryVerbose) {
-        sprintf(gText, " ");
+        sprintf(gText, DATA_COMPGEN(0x005206c4, doReversibleTransformationEmptyString, " "));
         LogStr(gText);
     }
 
@@ -1263,7 +1263,7 @@ void doReversibleTransformation(void) {
         }
 
     if (origPtr == -1)
-        panic(const_cast<char*>("doReversibleTransformation"));
+        panic(const_cast<char*>(DATA_COMPGEN(0x005206c8, doReversibleTransformationDoReversibleTransformation, "doReversibleTransformation")));
 }
 
 VA(0x004d6c10, 0x158)
@@ -1318,7 +1318,7 @@ void spotBlock(Bool weAreCompressing) {
             n = 255;
 
         if (!(n >= 0 && n <= 255))
-            panic(const_cast<char*>("spotBlock"));
+            panic(const_cast<char*>(DATA_COMPGEN(0x005206e4, spotBlockSpotBlock, "spotBlock")));
 
         if (weAreCompressing)
             SETFIRST(spotPos, (UChar)n);
@@ -1384,7 +1384,7 @@ Int32 getRLEpair(FILE* src) {
 
     if (latestCh != EOF) {
         if (ungetc(latestCh, src) == EOF)
-            panic(const_cast<char*>("getRLEpair: ungetc failed"));
+            panic(const_cast<char*>(DATA_COMPGEN(0x005206f0, getRLEpairGetRLEpairUngetcFailed, "getRLEpair: ungetc failed")));
     } else {
         ERROR_IF_NOT_ZERO(errno);
     }
@@ -1527,7 +1527,7 @@ void compressStream(FILE* stream, FILE* zStream) {
 
     do {
         if (veryVerbose) {
-            sprintf(gText, "\nBEGIN block %d\n", blockNo);
+            sprintf(gText, DATA_COMPGEN(0x0052070c, compressStreamBEGINBlockD, "\nBEGIN block %d\n"), blockNo);
             LogStr(gText);
         }
         blockNo++;
@@ -1540,7 +1540,7 @@ void compressStream(FILE* stream, FILE* zStream) {
     crcToSend = getFinalCRC();
     putUInt32(zbs, crcToSend);
     if (veryVerbose) {
-        sprintf(gText, "\nCRC = 0x%x\n", crcToSend);
+        sprintf(gText, DATA_COMPGEN(0x00520720, compressStreamCRC0xX, "\nCRC = 0x%x\n"), crcToSend);
         LogStr(gText);
     }
 
@@ -1551,10 +1551,10 @@ void compressStream(FILE* stream, FILE* zStream) {
     ERROR_IF_EOF(retVal);
 
     if (veryVerbose) {
-        sprintf(gText, " ");
+        sprintf(gText, DATA_COMPGEN(0x00520730, compressStreamEmptyString, " "));
         LogStr(gText);
         dumpAllModelStats();
-        sprintf(gText, " ");
+        sprintf(gText, DATA_COMPGEN(0x00520734, compressStreamEmptyString2, " "));
         LogStr(gText);
     }
 
@@ -1566,11 +1566,11 @@ void compressStream(FILE* stream, FILE* zStream) {
     if (verbose) {
         sprintf(
             gText,
-            "%6.3f:1, %6.3f bits/byte, "
-            "%5.2f%% saved, %d in, %d out.\n",
+            DATA_COMPGEN(0x00520738, compressStream63f163fBits, "%6.3f:1, %6.3f bits/byte, "
+            "%5.2f%% saved, %d in, %d out.\n"),
             (float)bytesIn / (float)bytesOut,
-            (8.0 * (float)bytesOut) / (float)bytesIn,
-            100.0 * (1.0 - (float)bytesOut / (float)bytesIn),
+            (DATA_COMPGEN(0x004eba98, compressStreamConstant3, 8.0) * (float)bytesOut) / (float)bytesIn,
+            DATA_COMPGEN(0x004eba90, compressStreamConstant2, 100.0) * (DATA_COMPGEN(0x004eba88, compressStreamConstant, 1.0) - (float)bytesOut / (float)bytesIn),
             bytesIn,
             bytesOut
         );
@@ -1578,7 +1578,7 @@ void compressStream(FILE* stream, FILE* zStream) {
     }
 
     if (veryVerbose) {
-        sprintf(gText, "\n");
+        sprintf(gText, DATA_COMPGEN(0x00520774, compressStreamEmptyString3, "\n"));
         LogStr(gText);
     }
 }
@@ -1612,35 +1612,35 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     arithCodeStartDecoding(zbs);
 
     if (veryVerbose) {
-        sprintf(gText, "  ");
+        sprintf(gText, DATA_COMPGEN(0x00520778, uncompressStreamEmptyString, "  "));
         LogStr(gText);
     }
     currBlockNo = 0;
     do {
         currBlockNo++;
         if (veryVerbose) {
-            sprintf(gText, "[%d: ac+mtf ", currBlockNo);
+            sprintf(gText, DATA_COMPGEN(0x0052077c, uncompressStreamDAcMtf, "[%d: ac+mtf "), currBlockNo);
             LogStr(gText);
         }
         thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
         if (veryVerbose)
-            LogStr("rt ");
+            LogStr(DATA_COMPGEN(0x0052078c, uncompressStreamRt, "rt "));
         undoReversibleTransformation();
         spotBlock(False);
         if (veryVerbose)
-            LogStr("rld");
+            LogStr(DATA_COMPGEN(0x00520790, uncompressStreamRld, "rld"));
         unRLEandDump(stream, thisIsTheLastBlock);
         if (veryVerbose)
-            LogStr("] ");
+            LogStr(DATA_COMPGEN(0x00520794, uncompressStreamEmptyString2, "] "));
     } while (!thisIsTheLastBlock);
 
     if (veryVerbose)
-        LogStr(" ");
+        LogStr(DATA_COMPGEN(0x00520798, uncompressStreamEmptyString3, " "));
 
     crcStored = getUInt32(zbs);
     crcComputed = getFinalCRC();
     if (veryVerbose) {
-        sprintf(gText, "CRCs: stored = 0x%x, computed = 0x%x\n  ", crcStored, crcComputed);
+        sprintf(gText, DATA_COMPGEN(0x0052079c, uncompressStreamCRCsStored0xXComputed0x, "CRCs: stored = 0x%x, computed = 0x%x\n  "), crcStored, crcComputed);
         LogStr(gText);
     }
     if (crcStored != crcComputed)
@@ -1668,10 +1668,10 @@ VA(0x004d79c0, 0x4d)
 void crcError(UInt32 crcStored, UInt32 crcComputed) {
     sprintf(
         gText,
-        "\n%s: Data integrity error when decompressing.\n"
+        DATA_COMPGEN(0x005207c4, crcErrorSDataIntegrityErrorWhenDecompressing, "\n%s: Data integrity error when decompressing.\n"
         "\tStored CRC = 0x%x, computed CRC = 0x%x\n"
         "\tThis could be a bug -- please report it to me at:\n"
-        "\tsewardj@cs.man.ac.uk.\n",
+        "\tsewardj@cs.man.ac.uk.\n"),
         progName,
         crcStored,
         crcComputed
@@ -1685,8 +1685,8 @@ VA(0x004d7a10, 0x4a)
 void compressedStreamEOF(void) {
     sprintf(
         gText,
-        "\n%s: Compressed file ends unexpectedly;\n\t"
-        "perhaps it is corrupted?  *Possible* reason follows.\n",
+        DATA_COMPGEN(0x00520868, compressedStreamEOFSCompressedFileEndsUnexpectedlyPerhaps, "\n%s: Compressed file ends unexpectedly;\n\t"
+        "perhaps it is corrupted?  *Possible* reason follows.\n"),
         progName
     );
     LogStr(gText);
@@ -1697,7 +1697,7 @@ void compressedStreamEOF(void) {
 
 VA(0x004d7a60, 0x4a)
 void ioError(void) {
-    sprintf(gText, "\n%s: I/O or other error, bailing out.  Possible reason follows.\n", progName);
+    sprintf(gText, DATA_COMPGEN(0x005208c8, ioErrorSIOOrOtherError, "\n%s: I/O or other error, bailing out.  Possible reason follows.\n"), progName);
     LogStr(gText);
     perror(progName);
     showFileNames();
@@ -1708,9 +1708,9 @@ VA(0x004d7ab0, 0x3c)
 void blockOverrun(void) {
     sprintf(
         gText,
-        "\n%s: block overrun during decompression,\n"
+        DATA_COMPGEN(0x0052090c, blockOverrunSBlockOverrunDuringDecompressionWhich, "\n%s: block overrun during decompression,\n"
         "\twhich probably means the compressed file\n"
-        "\tis corrupted.\n",
+        "\tis corrupted.\n"),
         progName
     );
     LogStr(gText);
@@ -1722,8 +1722,8 @@ VA(0x004d7af0, 0x3c)
 void unblockError(void) {
     sprintf(
         gText,
-        "\n%s: compressed file didn't unblock correctly,\n"
-        "\twhich probably means it is corrupted.\n",
+        DATA_COMPGEN(0x00520970, unblockErrorSCompressedFileDidnTUnblock, "\n%s: compressed file didn't unblock correctly,\n"
+        "\twhich probably means it is corrupted.\n"),
         progName
     );
     LogStr(gText);
@@ -1735,8 +1735,8 @@ VA(0x004d7b30, 0x3c)
 void bitStreamEOF(void) {
     sprintf(
         gText,
-        "\n%s: read past the end of compressed data,\n"
-        "\twhich probably means it is corrupted.\n",
+        DATA_COMPGEN(0x005209c8, bitStreamEOFSReadPastTheEndOf, "\n%s: read past the end of compressed data,\n"
+        "\twhich probably means it is corrupted.\n"),
         progName
     );
     LogStr(gText);
@@ -1746,7 +1746,7 @@ void bitStreamEOF(void) {
 
 VA(0x004d7b70, 0x37)
 void __cdecl mySignalCatcher(IntNative* n) {
-    sprintf(gText, "\n%s: Control-C (or similar) caught, quitting.\n", progName);
+    sprintf(gText, DATA_COMPGEN(0x00520a1c, mySignalCatcherSControlCOrSimilarCaught, "\n%s: Control-C (or similar) caught, quitting.\n"), progName);
     LogStr(gText);
     cleanUpAndFail();
 }
@@ -1756,18 +1756,18 @@ void mySIGSEGVorSIGBUScatcher(IntNative* n) {
     if (compressing) {
         sprintf(
             gText,
-            "\n%s: Caught a SIGSEGV or SIGBUS whilst compressing,\n"
+            DATA_COMPGEN(0x00520a4c, mySIGSEGVorSIGBUScatcherSCaughtASIGSEGVOrSIGBUS, "\n%s: Caught a SIGSEGV or SIGBUS whilst compressing,\n"
             "\twhich probably indicates a bug in BZIP.  Please\n"
-            "\treport it to me at: sewardj@cs.man.ac.uk\n",
+            "\treport it to me at: sewardj@cs.man.ac.uk\n"),
             progName
         );
         LogStr(gText);
     } else {
         sprintf(
             gText,
-            "\n%s: Caught a SIGSEGV or SIGBUS whilst decompressing,\n"
+            DATA_COMPGEN(0x00520adc, mySIGSEGVorSIGBUScatcherSCaughtASIGSEGVOrSIGBUS2, "\n%s: Caught a SIGSEGV or SIGBUS whilst decompressing,\n"
             "\twhich probably indicates that the compressed data\n"
-            "\tis corrupted.\n",
+            "\tis corrupted.\n"),
             progName
         );
         LogStr(gText);
@@ -1781,9 +1781,9 @@ VA(0x004d7c30, 0x4d)
 void uncompressOutOfMemory(Int32 draw, Int32 blockSize) {
     sprintf(
         gText,
-        "\n%s: Can't allocate enough memory for decompression.\n"
+        DATA_COMPGEN(0x00520b58, uncompressOutOfMemorySCanTAllocateEnoughMemory, "\n%s: Can't allocate enough memory for decompression.\n"
         "\tRequested %d bytes for a block size of %d.\n"
-        "\tFind a machine with more memory, perhaps?\n",
+        "\tFind a machine with more memory, perhaps?\n"),
         progName,
         draw,
         blockSize
@@ -1797,9 +1797,9 @@ VA(0x004d7c80, 0x4d)
 void compressOutOfMemory(Int32 draw, Int32 blockSize) {
     sprintf(
         gText,
-        "\n%s: Can't allocate enough memory for compression.\n"
+        DATA_COMPGEN(0x00520be8, compressOutOfMemorySCanTAllocateEnoughMemory, "\n%s: Can't allocate enough memory for compression.\n"
         "\tRequested %d bytes for a block size of %d.\n"
-        "\tReduce the block size, and/or use the -e flag.\n",
+        "\tReduce the block size, and/or use the -e flag.\n"),
         progName,
         draw,
         blockSize
@@ -1825,10 +1825,10 @@ void compress(Char* name) {
 
     strcpy(inName, name);
     strcpy(outName, name);
-    strcat(outName, ".nw");
+    strcat(outName, DATA_COMPGEN(0x00520c78, compressNw, ".nw"));
 
-    inStr = fopen(inName, "rb");
-    outStr = fopen(outName, "wb");
+    inStr = fopen(inName, DATA_COMPGEN(0x00520c7c, compressRb, "rb"));
+    outStr = fopen(outName, DATA_COMPGEN(0x00520c80, compressWb, "wb"));
 
     errno = 0;
     outputHandleJustInCase = outStr;
@@ -1850,8 +1850,8 @@ void uncompress(Char* name) {
     if (endsInBz(inName))
         outName[strlen(outName) - 3] = '\0';
 
-    inStr = fopen(inName, "rb");
-    outStr = fopen(outName, "wb");
+    inStr = fopen(inName, DATA_COMPGEN(0x00520c84, uncompressRb, "rb"));
+    outStr = fopen(outName, DATA_COMPGEN(0x00520c88, uncompressWb, "wb"));
 
     errno = 0;
     outputHandleJustInCase = outStr;
@@ -1874,11 +1874,11 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     bsInUse = 0;
     errno = 0;
     blockSize100k = 3;
-    LogStr("Encode 1");
+    LogStr(DATA_COMPGEN(0x00520c8c, encodeDataEncode1, "Encode 1"));
     allocateCompressStructures();
 
-    strcpy(fname, ".\\DATA\\");
-    strcat(fname, "H2C");
+    strcpy(fname, DATA_COMPGEN(0x00520c98, encodeDataDATA, ".\\DATA\\"));
+    strcat(fname, DATA_COMPGEN(0x00520ca0, encodeDataH2C, "H2C"));
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
@@ -1891,8 +1891,8 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     _close(fd);
     compress(fname);
 
-    strcat(fname, ".nw");
-    fp = fopen(fname, "rb");
+    strcat(fname, DATA_COMPGEN(0x00520ca4, encodeDataNw, ".nw"));
+    fp = fopen(fname, DATA_COMPGEN(0x00520ca8, encodeDataRb, "rb"));
     retVal = fseek(fp, 0, 2);
     flen = ftell(fp);
     retVal = fseek(fp, 0, 0);
@@ -1918,13 +1918,13 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     blockSize100k = 0;
     allocateCompressStructures();
 
-    strcpy(fname, ".\\DATA\\");
-    strcat(fname, "H2C");
+    strcpy(fname, DATA_COMPGEN(0x00520cac, decodeDataDATA, ".\\DATA\\"));
+    strcat(fname, DATA_COMPGEN(0x00520cb4, decodeDataH2C, "H2C"));
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
-    strcat(fname, ".nw");
+    strcat(fname, DATA_COMPGEN(0x00520cb8, decodeDataNw, ".nw"));
 
     fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd == -1)
@@ -1934,7 +1934,7 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     uncompress(fname);
 
     fname[strlen(fname) - 3] = '\0';
-    fp = fopen(fname, "rb");
+    fp = fopen(fname, DATA_COMPGEN(0x00520cbc, decodeDataRb, "rb"));
     retVal = fseek(fp, 0, 2);
     flen = ftell(fp);
     retVal = fseek(fp, 0, 0);

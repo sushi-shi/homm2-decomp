@@ -7,31 +7,22 @@ from unittest import mock
 from homm2.build.data_manifest_adapter import (
     CandidateDefinition,
     CandidateSection,
-    _CanonicalPrivateRenameProof,
     candidate_topology,
     resolve_vtable_definitions,
     resolve_source_definitions,
     source_definitions,
     validate_symbol_rows,
     _classified_contribution_rows,
-    _normalize_symbol_row,
     _mark_vtable_aliases,
     _section_rows,
     _symbol_row,
     _vtable_row,
-    _validate_supplemental_row,
 )
 from homm2.build.annotated_vtables import AnnotatedVtable
 from homm2.build.test_data_topology_census import (
     COMDAT_DATA_FLAGS,
     DATA_FLAGS,
     _coff,
-)
-from homm2.build.test_canonicalize_data_symbols import (
-    DATA,
-    DIR32,
-    SectionSpec,
-    make_coff,
 )
 
 
@@ -97,20 +88,6 @@ class DataManifestAdapterTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no matching CodeView public"):
             resolve_vtable_definitions([claim], {"A": ([definition], [])}, {})
 
-    def test_stale_local_identity_migrates_by_section_local_position(self):
-        topology = {"A": ([
-            candidate("A", "$Tnew", ordinal=7, value=0),
-        ], [])}
-        row = anchor("A", 7, 0x100, name="$Told")
-        row.update({
-            "size": "0x4", "storage": "data", "alignment": "0x4",
-            "scope": "local", "provenance": "reviewed",
-        })
-        normalized = _normalize_symbol_row(row, topology)
-        self.assertEqual(normalized["name"], "$Tnew")
-        self.assertEqual(normalized["section_ordinal"], "7")
-        self.assertEqual(normalized["section_offset"], "0x0")
-
     def test_source_scanner_handles_multiline_arrays_and_initializers(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -149,109 +126,6 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual([row.symbol for _source, row in resolved], [
             "?global@@3HA", "_local$S12", "?member@Owner@@2HA",
         ])
-
-    def test_normal_assembly_accepts_proved_counter_only_private_rename(self):
-        current = candidate("A", "_private$S2")
-        topology = {"A": ([current], [])}
-        row = {
-            "name": "_private$S1", "object": "A.c", "rva": "0x100",
-            "size": "0x4", "storage": "data", "alignment": "0x4",
-            "section_ordinal": "1", "section_offset": "0x0",
-            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
-        }
-        proof = mock.Mock()
-        self.assertEqual(_validate_supplemental_row(row, topology, proof), row)
-        proof.require.assert_called_once_with("A", "_private$S1", current)
-        migrated = _normalize_symbol_row(row, topology)
-        self.assertEqual(migrated["name"], "_private$S2")
-
-    def test_normal_assembly_rejects_unproved_private_rename(self):
-        topology = {"A": ([candidate("A", "$SG2")], [])}
-        row = anchor("A", 1, 0x100, name="$SG1")
-        with self.assertRaisesRegex(ValueError, "lacks a canonical identity proof"):
-            _validate_supplemental_row(row, topology)
-
-    def test_normal_assembly_rejects_semantic_or_prefix_rename(self):
-        proof = mock.Mock()
-        row = anchor("A", 1, 0x100, name="semantic")
-        topology = {"A": ([candidate("A", "$SG2")], [])}
-        with self.assertRaisesRegex(ValueError, "stale reviewed supplemental"):
-            _validate_supplemental_row(row, topology, proof)
-        row["name"] = "_first$S1"
-        topology = {"A": ([candidate("A", "_second$S2")], [])}
-        with self.assertRaisesRegex(ValueError, "stale reviewed supplemental"):
-            _validate_supplemental_row(row, topology, proof)
-        proof.require.assert_not_called()
-
-    def test_counter_rename_still_requires_identical_topology(self):
-        current = replace(candidate("A", "$T2"), alignment=8)
-        topology = {"A": ([current], [])}
-        row = anchor("A", 1, 0x100, name="$T1")
-        with self.assertRaisesRegex(ValueError, "topology"):
-            _validate_supplemental_row(row, topology, mock.Mock())
-
-    def test_counter_rename_canonical_identity_covers_payload_and_relocations(self):
-        with TemporaryDirectory() as directory:
-            root = Path(directory)
-            base = root / "base/A.obj"
-            target = root / "target/A.c.obj"
-            base.parent.mkdir(parents=True)
-            target.parent.mkdir(parents=True)
-            target.write_bytes(make_coff(
-                [SectionSpec(".data", b"same\0\0\0\0", DATA)],
-                [("$SG1", 0, 1, 0, 3)],
-            ))
-            base.write_bytes(make_coff(
-                [SectionSpec(".data", b"same\0\0\0\0", DATA)],
-                [("$SG2", 0, 1, 0, 3)],
-            ))
-            proof = _CanonicalPrivateRenameProof(root / "base", root / "target")
-            proof.require("A", "$SG1", candidate("A", "$SG2"))
-
-            base.write_bytes(make_coff(
-                [SectionSpec(".data", b"else\0\0\0\0", DATA)],
-                [("$SG2", 0, 1, 0, 3)],
-            ))
-            changed = _CanonicalPrivateRenameProof(root / "base", root / "target")
-            with self.assertRaisesRegex(ValueError, "content/relocation identity"):
-                changed.require("A", "$SG1", candidate("A", "$SG2"))
-
-            target.write_bytes(make_coff(
-                [SectionSpec(".data", bytes(8), DATA, ((0, 1, DIR32),))],
-                [("$T1", 0, 1, 0, 3), ("target_a", 4, 1, 0, 2)],
-            ))
-            base.write_bytes(make_coff(
-                [SectionSpec(".data", bytes(8), DATA, ((0, 1, DIR32),))],
-                [("$T2", 0, 1, 0, 3), ("target_b", 4, 1, 0, 2)],
-            ))
-            relocated = _CanonicalPrivateRenameProof(root / "base", root / "target")
-            with self.assertRaisesRegex(ValueError, "content/relocation identity"):
-                relocated.require("A", "$T1", candidate("A", "$T2"))
-
-    def test_normal_assembly_preserves_exact_reviewed_supplemental_row(self):
-        current = candidate("A", "_private$S2")
-        topology = {"A": ([current], [])}
-        row = {
-            "name": "_private$S2", "object": "A.c", "rva": "0x100",
-            "size": "0x4", "storage": "data", "alignment": "0x4",
-            "section_ordinal": "1", "section_offset": "0x0",
-            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
-        }
-        self.assertEqual(_validate_supplemental_row(row, topology), row)
-
-    def test_normal_assembly_preserves_logical_size_below_candidate_span(self):
-        current = replace(candidate("A", "_private$S2"), size=8)
-        topology = {"A": ([current], [])}
-        row = {
-            "name": "_private$S2", "object": "A.c", "rva": "0x100",
-            "size": "0x3", "storage": "data", "alignment": "0x4",
-            "section_ordinal": "1", "section_offset": "0x0",
-            "scope": "local", "provenance": "candidate-coff-reloc-bijection",
-        }
-        self.assertEqual(_validate_supplemental_row(row, topology), row)
-        row["size"] = "0x9"
-        with self.assertRaisesRegex(ValueError, "exceeds candidate span"):
-            _validate_supplemental_row(row, topology)
 
     def test_duplicate_raw_comdat_section_names_keep_distinct_ordinals(self):
         with TemporaryDirectory() as directory:
@@ -363,7 +237,7 @@ class DataManifestAdapterTest(unittest.TestCase):
         self.assertEqual(classified[0]["storage"], "data")
         self.assertEqual(classified[0]["size"], 0x30)
 
-    def test_fully_reviewed_section_accepts_proved_private_counter_names(self):
+    def test_private_counter_renames_do_not_count_as_source_review(self):
         definitions = [
             candidate("A", "$SG2", ordinal=1, value=0),
             candidate("A", "_cache$S2", ordinal=1, value=4),
@@ -375,10 +249,10 @@ class DataManifestAdapterTest(unittest.TestCase):
         ]
         rows, diagnostics, _physical, classifications = _section_rows(
             topology, reviewed, {}, {}, [contribution("A", 0x100, 0x30)])
-        self.assertEqual(rows[0]["provenance"],
-                         "reviewed-definition-nonaffine-section")
-        self.assertEqual(diagnostics, [])
-        self.assertEqual(len(classifications), 1)
+        self.assertEqual(rows[0]["provenance"], "retail-contribution-replay")
+        self.assertEqual([row["cause"] for row in diagnostics],
+                         ["inconsistent-anchor-bases"])
+        self.assertEqual(classifications, [])
 
     def test_partial_nonaffine_section_remains_a_blocking_diagnostic(self):
         definitions = [

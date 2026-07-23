@@ -77,13 +77,12 @@ and unresolved/fallback names are unconditional errors even if a mapping mention
 
 ## HoMM2 provenance
 
-`--homm2-root .` reads the shared Clang `VarDecl` inventory used by the data-manifest
-adapter and cross-checks it against `build/gen/delink_data_from_source.tsv`. Compiler and
-linker allocations without a source annotation live only in
-`config/delink_data_supplemental.tsv`. The generated
-`build/gen/delink_data_manifest.tsv` must be exactly the conflict-free union of those two
-inputs: missing rows, extra rows, duplicate identities/RVAs, overlaps, malformed schemas,
-and source-inventory drift are hard provenance diagnostics.
+`--homm2-root .` reads the shared `DATA`, `DATA_COMPGEN`, `VTBL`, and `VTBL2`
+inventories used by the data-manifest adapter and cross-checks them against
+`build/gen/delink_data_from_source.tsv`. The generated
+`build/gen/delink_data_manifest.tsv` must contain exactly the same source-derived rows.
+Missing rows, extra rows, duplicate identities/RVAs, overlaps, malformed schemas, and
+source-inventory drift are hard provenance diagnostics.
 
 Anchors are indexed by translation unit. A relocation resolves against its current unit
 first, which preserves private identities and repeated compiler names. Cross-unit lookup

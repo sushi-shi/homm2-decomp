@@ -69,28 +69,28 @@ void SetupRecruitWin(
 
     strcpy(recruitName, GetMonsterName(creatureType));
     recruitName[0] -= 'a' - 'A';
-    sprintf(label, "%s %s", "Recruit", recruitName);
+    sprintf(label, DATA_COMPGEN(0x004f8594, setupRecruitWinSS, "%s %s"), DATA_COMPGEN(0x004f858c, setupRecruitWinRecruit, "Recruit"), recruitName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
     message.payload.widget.data.text = label;
     window->BroadcastMessage(message);
 
-    sprintf(label, "%d", goldCost);
+    sprintf(label, DATA_COMPGEN(0x004f859c, setupRecruitWinD, "%d"), goldCost);
     message.payload.widget.id = GOLD_ICON_CONTROL;
     window->BroadcastMessage(message);
     if (resourceType != RECRUIT_NO_RESOURCE) {
-        sprintf(label, "%d", resourceCost);
+        sprintf(label, DATA_COMPGEN(0x004f85a0, setupRecruitWinD2, "%d"), resourceCost);
         message.payload.widget.id = RESOURCE_COST_CONTROL;
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "Available: ", available);
+    sprintf(gText, DATA_COMPGEN(0x004f85b0, setupRecruitWinSD, "%s%d"), DATA_COMPGEN(0x004f85a4, setupRecruitWinAvailable, "Available: "), available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
 
-    sprintf(gText, "monh%04d.icn", IDX(creatureType));
+    sprintf(gText, DATA_COMPGEN(0x004f85b8, setupRecruitWinMonh04dIcn, "monh%04d.icn"), IDX(creatureType));
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     message.payload.widget.id = CREATURE_CONTROL;
@@ -115,7 +115,7 @@ i32 recruitUnit::Open(i32 priority) {
     m_window = new heroWindow(
         WINDOW_X,
         WINDOW_Y,
-        const_cast<char*>(m_resourceType == RECRUIT_NO_RESOURCE ? "recruit0.bin" : "recruit1.bin")
+        const_cast<char*>(m_resourceType == RECRUIT_NO_RESOURCE ? DATA_COMPGEN(0x004f85c8, openRecruit0Bin, "recruit0.bin") : DATA_COMPGEN(0x004f85d8, openRecruit1Bin, "recruit1.bin"))
     );
     if (m_window == NULL)
         MemError();
@@ -130,7 +130,7 @@ i32 recruitUnit::Open(i32 priority) {
         m_resourceCost,
         *m_available
     );
-    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f85e8, openAdvmiceMse, "advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
     Update();
     gpWindowManager->BroadcastMessage(
         MESSAGE_WIDGET,
@@ -169,7 +169,7 @@ i32 recruitUnit::Open(i32 priority) {
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
     m_active = true;
-    strcpy(m_name, "recruitManager");
+    strcpy(m_name, DATA_COMPGEN(0x004f85f4, openRecruitManager, "recruitManager"));
     return 0;
 }
 
@@ -179,7 +179,7 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "There is no room in the garrison for this army.",
+            DATA_COMPGEN(0x004f8604, closeThereIsNoRoomInThe, "There is no room in the garrison for this army."),
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
             NO_ROOM_DIALOG_Y,
@@ -213,20 +213,20 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "Available: ", *m_available);
+    sprintf(gText, DATA_COMPGEN(0x004f8640, updateSD, "%s%d"), DATA_COMPGEN(0x004f8634, updateAvailable, "Available: "), *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
-    sprintf(gText, "%d", m_quantity);
+    sprintf(gText, DATA_COMPGEN(0x004f8648, updateD, "%d"), m_quantity);
     message.payload.widget.id = QUANTITY_CONTROL;
     m_window->BroadcastMessage(message);
     m_goldTotal = m_quantity * m_goldCost;
-    sprintf(gText, "%d", m_goldTotal);
+    sprintf(gText, DATA_COMPGEN(0x004f864c, updateD2, "%d"), m_goldTotal);
     message.payload.widget.id = GOLD_TOTAL_CONTROL;
     m_window->BroadcastMessage(message);
     if (m_resourceType != RECRUIT_NO_RESOURCE) {
         m_resourceTotal = m_quantity * m_resourceCost;
-        sprintf(gText, "%d", m_resourceTotal);
+        sprintf(gText, DATA_COMPGEN(0x004f8650, updateD3, "%d"), m_resourceTotal);
         message.payload.widget.id = RESOURCE_TOTAL_CONTROL;
         m_window->BroadcastMessage(message);
     }
@@ -421,7 +421,7 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     recruitWindow = new heroWindow(
         QUICK_WINDOW_X,
         QUICK_WINDOW_Y,
-        const_cast<char*>(paymentType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
+        const_cast<char*>(paymentType == RECRUIT_NO_RESOURCE ? DATA_COMPGEN(0x004f8654, quickViewRecruitRecruiq0Bin, "recruiq0.bin") : DATA_COMPGEN(0x004f8664, quickViewRecruitRecruiq1Bin, "recruiq1.bin"))
     );
     if (recruitWindow == NULL)
         MemError();

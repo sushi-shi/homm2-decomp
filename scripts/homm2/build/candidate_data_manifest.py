@@ -18,7 +18,6 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from homm2.build.canonicalize_relocs import CoffFile
-from homm2.build.canonicalize_data_symbols import _family
 from homm2.build.contribution_manifest import contribution_rows
 
 
@@ -148,20 +147,11 @@ def _reviewed_candidate_allocation(unit, storage, candidate, reviewed,
     """Validate and return one reviewed candidate allocation when present."""
     object_name = unit.replace("/", "\\") + ".c"
     row = reviewed.get((object_name, candidate["name"]))
-    candidate_family = _family(candidate["name"])
-    exact_position = (candidate["section"], candidate["section_offset"])
-    raw_name_reused_at_other_position = (
-        row is not None and candidate_family is not None and
-        (int(row["section_ordinal"], 0), int(row["section_offset"], 0)) !=
-        exact_position
-    )
-    if ((row is None or raw_name_reused_at_other_position) and
-            reviewed_by_position is not None):
+    if row is None and reviewed_by_position is not None:
         positional = reviewed_by_position.get((
             object_name, candidate["section"], candidate["section_offset"]))
-        if (positional is not None and candidate["scope"] == "local" and
-                candidate_family is not None and
-                _family(positional["name"]) == candidate_family):
+        if (positional is not None and positional["provenance"].startswith(
+                "source-DATA_COMPGEN:")):
             row = positional
     if row is None:
         return None
@@ -192,7 +182,7 @@ def _reviewed_candidate_allocation(unit, storage, candidate, reviewed,
             "reviewed candidate topology mismatch for %s:%s: %s" %
             (unit, candidate["name"], mismatches))
     return CandidateAllocation(
-        unit, object_name, candidate["name"], storage,
+        unit, object_name, row["name"], storage,
         candidate["section_offset"], logical_size, candidate["alignment"],
         int(row["rva"], 0), 1, candidate["scope"], row["provenance"])
 
