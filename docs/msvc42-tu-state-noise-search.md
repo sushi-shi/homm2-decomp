@@ -16,10 +16,13 @@ python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
-Typedef, extern, static-data, and prototype trials systematically walk declaration-train
-lengths from one through `--max-declarations` (64 by default), then wrap. Increase the bound
-when a target appears sensitive to a later compiler counter; the generated train is still fully
-disposable and the exact authored target suffix remains guarded.
+The default `forest` trials are deliberately expansive. Their width walks from 10 through
+`--max-declarations` (64 by default), then wraps. A width-N forest contains N independently
+shaped classes, N typedefs, N function prototypes, and N harmless internal function definitions;
+all 4N atoms are shuffled into a recorded permutation. Thus even the smallest default trial has
+ten classes and forty independently ordered declaration atoms. The compact single-surface
+families remain available through an explicit `--families` selection for isolating a transition
+after the broad search discovers it.
 
 The default `--insertion target` isolates declarations immediately before the target metadata.
 Use `--insertion top` to place the same disposable block after the TU's leading includes and
@@ -33,12 +36,12 @@ only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not
 because several distinct objects may share one percentage. Public target identities, relocation
 sites/types/addends, and all other spellings remain part of the state. The report also counts the
 raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
-JSON census with one complete reproducible probe body per state while the sub-100 COFF objects
-themselves remain disposable. Each state also records the ordered list of every trial that reached
-it, so occurrence populations and representative selection can be reproduced after the temporary
-objects are removed. This summary is diagnostic evidence only: it does not update a retained
-maximum. If one normalized state ever receives multiple fuzzy scores, the census reports the
-complete score set instead of silently choosing one.
+JSON census with one complete reproducible probe body and atom permutation per state while the
+sub-100 COFF objects themselves remain disposable. Each state also records the ordered list of
+every trial that reached it, so occurrence populations and representative selection can be
+reproduced after the temporary objects are removed. This summary is diagnostic evidence only: it
+does not update a retained maximum. If one normalized state ever receives multiple fuzzy scores,
+the census reports the complete score set instead of silently choosing one.
 
 Treat normalized state cardinality as a diagnostic metric alongside fuzzy score. Record the total
 number of states, each state's occurrence count, representative trial, function size, text digest,
@@ -46,12 +49,24 @@ ordered-relocation digest, and complete score set. Repeated trials in an already
 frequency evidence but no new code-shape evidence. Private `$SG`/`$T` counter renumbering must not
 inflate the cardinality.
 
+Use `--only-trial N` with the original seed, families, declaration bound, and a `--trials`
+generation horizon of at least N to replay one representative without compiling its predecessors.
+The generator still advances deterministically through the complete sequence before selecting the
+requested index, so the body and permutation are byte-for-byte identical to the census trial.
+Repeat `--only-trial` to replay several representatives in one run. This is the preferred way to
+re-prove an exact island after intentionally interrupting a long population experiment.
+
 When a sweep is reviewed, compare one reproducible representative of every normalized state both
-against retail and against the other states. Attribute each state transition to concrete instruction
-or relocation spans; do not inspect only the highest-scoring state. This distinguishes independent
-compiler choices that happen to move the aggregate score in opposite directions. Target-specific
-matrices under `docs/matching-matrices/` retain that comparison without retaining disposable source
-or COFF objects.
+against retail and against the other states. The console and JSON summary identify the
+representative tag, permutation digest, atom count, and complete ordered permutation for every
+island. It also stores the representative target bytes, normalized ordered relocation stream, every
+retail byte difference, and a pairwise byte-delta matrix across all islands. These are sufficient to
+disassemble and compare every target state after the disposable objects are deleted. Attribute each
+state transition to concrete instruction or relocation spans; do not inspect only the highest-scoring
+state. This distinguishes independent compiler choices that happen to move the aggregate score in
+opposite directions. Target-specific matrices under
+`docs/matching-matrices/` retain that comparison without retaining disposable source or COFF
+objects.
 
 Each baseline and trial compile has a 120-second default ceiling. Override it with a
 positive finite `--compile-timeout-seconds`; expiry terminates the complete compiler
@@ -94,15 +109,21 @@ comment/warning variants before `BASE/bmap2::DimBitmapArea` all produced one ide
 Comments and whitespace disappear before the C++ parser, and unused macro text is erased by the
 preprocessor, so those are not search families.
 
-The default deterministic families now exercise compiler state that VC 4.2 actually parses:
+The default forest permutes all of these VC 4.2 parser-visible surfaces together:
 
-- plain typedef aliases and typedef enums with varied explicit values/order;
-- unused structs, classes, packed records with balanced `#pragma pack(push/pop)`, and classes with
-  member declarations plus simple in-class bodies;
-- extern/global declarations and internal-linkage initialized data definitions;
-- function prototypes and harmless internal-linkage function definitions;
-- deterministic selections from a curated VC 4.2-compatible project/standard include list; and
-- mixed bundles combining those declaration surfaces.
+- scalar, pointer, array, const-pointer, and function-pointer typedefs;
+- at least ten classes per trial, varying access sections, nested typedefs/enums/unions, arrays,
+  bitfields, packed layouts, static/overloaded/virtual declarations, constructors/destructors, and
+  simple in-class bodies;
+- varied calling conventions, scalar/pointer parameter shapes, and return types in function
+  prototypes; and
+- harmless internal-linkage function definitions with varied signatures and expression/control
+  shapes.
+
+Explicit compact families additionally isolate typedef enums, structs, classes, packed records,
+member-bearing classes, extern declarations, initialized static data, prototypes, functions, and
+curated includes. The explicit `mixed` family combines the expansive forest with those additional
+surfaces.
 
 Every block finishes with a `#line` reset, without a filename, so authored source retains its
 existing logical line and logical filename. Identifiers include the seed/trial tag, pack state is

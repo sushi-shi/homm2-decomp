@@ -16,6 +16,20 @@ whole-source-file SHA-256<TAB>focused function match percentage
 Newer matrices add a third `outcome` column. Always follow the file's header; the outcome records
 whether all pins held or names the raw pin/review that rejected the state.
 
+## BASE/BITMAP DrawToBufferCareful compiler-state census
+
+`bitmap-draw-to-buffer-careful-tu-state-424d4150.tsv` records 1,152 expansive declaration-forest
+trials for the clean `destinationX + width` source. The run reaches 18 normalized target states:
+several displayed fuzzy values contain multiple distinct byte streams, so score alone would
+undercount the orbit. The exact state first appears at trial 311 and occurs three times.
+
+The common near-exact state differs from retail in only the SIB byte selecting which commutative
+LEA operand is the base: `lea ebp, [edx + ecx]` instead of retail's
+`lea ebp, [ecx + edx]`. The exact state selects the retail encoding and matches the complete
+255-byte span and seven-site ordered relocation stream. Trial 311 was replayed alone with the
+same seed and full generation horizon before updating the hash-scoped maximum. The declaration
+forest remains disposable.
+
 ## SOURCE/GAME SetupOrigData compiler-state census
 
 `game-setuporigdata-tu-state-39240.tsv` records a deterministic 1-through-128 typedef-train
