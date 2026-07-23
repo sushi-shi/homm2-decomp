@@ -9,9 +9,10 @@ selection is otherwise very literal, but every local references a frame offset, 
 those offsets are a function of the **identifier spelling**, not declaration order
 or type.
 
-Tools: **`scripts/od_slots.py`** (predict a layout / solve names for a target layout,
-no compiler in the loop) and **`scripts/od_oracle.py`** (ground-truth: compile a probe
-and read the real offsets).
+Tools: **`homm2 od-frames`** (audit every paired `/Od` function for frame and slot
+drift), **`scripts/od_slots.py`** (predict a layout / solve names for a target layout,
+no compiler in the loop), and **`scripts/od_oracle.py`** (ground-truth: compile a
+probe and read the real offsets).
 
 ---
 
@@ -185,6 +186,22 @@ int probe(){ int s=1; { int n; {int x;} int p; } ... }   // n before block, p af
   can't be used as identifiers — avoid them in name searches.
 
 ## 7. Tooling
+
+`homm2 od-frames` compares the reconstructed and retail normalized objects in one
+batched pass per `/Od` TU. It reports:
+
+* stack allocation differences from the function prologue;
+* callee-saved register push differences;
+* different sets of negative `ebp` displacements; and
+* different reference order when the displacement sets agree.
+
+Run `homm2 od-frames --output build/od-frame-audit.tsv` for the complete repository
+census, or `homm2 od-frames --rva 0x7fc0a` for one function. A target frame four
+bytes larger than the candidate is flagged as a likely missing dword local. The
+audit is intentionally diagnostic: incomplete functions are expected to differ,
+so only the opt-in `--check` form returns nonzero for findings. Disassembly still
+decides whether a frame-size delta is truly an absent local, a different temporary,
+or downstream control-flow drift.
 
 `scripts/od_slots.py` (pure functions, no compiler):
 * `bucket(name)`, `key16(name)`, `ident_hash(name)` — the hash.

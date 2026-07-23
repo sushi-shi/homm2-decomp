@@ -34,6 +34,8 @@ def main(argv=None):
         from homm2.constants_audit import main as m; return m(rest)
     if cmd == "strict-allocations":
         from homm2.build.strict_allocations import main as m; return m(rest)
+    if cmd == "od-frames":
+        from homm2.build.od_frame_audit import main as m; return m(rest)
     if cmd == "data-relocs":
         from homm2.build.coff_reloc_topology import main as m; return m(rest)
     if cmd == "data-topology":
@@ -94,6 +96,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1
