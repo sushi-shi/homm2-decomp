@@ -1,6 +1,9 @@
 """Canonicalize MSVC compiler-private names in a disposable COFF copy.
 
 The data transform is deliberately local to one object and content-derived.
+Reviewed ``DATA_COMPGEN`` bindings additionally replace the physical candidate
+symbol with its source-owned semantic identity after proving section, offset,
+extent, storage, and scope against the generated data manifest.
 Compiler-generated functions may additionally consume source ``VA_COMPGEN``
 claims, then prove their semantic role from the object's relocation graph before
 renaming volatile ``$E`` symbols. Symbol indices do not change. In embedded
@@ -131,6 +134,16 @@ class CompgenClaim:
     kind: str
     owner: str
     size: int
+
+
+@dataclass(frozen=True)
+class CompgenDataClaim:
+    name: str
+    section: int
+    offset: int
+    size: int
+    storage: str
+    scope: str
 
 
 @dataclass(frozen=True)
@@ -527,6 +540,75 @@ def _compgen_renames(coff: CoffObject, claims: tuple[CompgenClaim, ...]):
     return renames, tuple(rows)
 
 
+def _compgen_data_renames(
+        coff: CoffObject,
+        definitions: tuple[Definition, ...],
+        claims: tuple[CompgenDataClaim, ...]):
+    if not claims:
+        return {}, ()
+    by_location = defaultdict(list)
+    for definition in definitions:
+        by_location[(
+            definition.section.index,
+            definition.start,
+            definition.storage,
+            "external" if definition.symbol.storage_class == EXTERNAL_STORAGE
+            else "local",
+        )].append(definition)
+    renames = {}
+    rows = []
+    claimed_names = set()
+    for claim in claims:
+        if claim.name in claimed_names:
+            raise ValueError(
+                f"duplicate semantic compiler-data claim: {claim.name}")
+        claimed_names.add(claim.name)
+        key = (
+            claim.section,
+            claim.offset,
+            claim.storage,
+            claim.scope,
+        )
+        matches = by_location.get(key, ())
+        if len(matches) != 1:
+            raise ValueError(
+                f"{claim.name} has {len(matches)} candidate definitions at "
+                f"section {claim.section}+0x{claim.offset:x}")
+        definition = matches[0]
+        physical_size = definition.end - definition.start
+        if not 0 < claim.size <= physical_size:
+            raise ValueError(
+                f"{claim.name} logical size 0x{claim.size:x} exceeds candidate "
+                f"extent 0x{physical_size:x}")
+        collision = next((
+            symbol for symbol in coff.symbols.values()
+            if symbol.name == claim.name
+            and symbol.index != definition.symbol.index
+        ), None)
+        if collision is not None:
+            raise ValueError(
+                "semantic compiler-data name collides with existing symbol: "
+                f"{claim.name}")
+        renames[definition.symbol.index] = claim.name
+        meaningful = coff.section_bytes(definition.section)[
+            definition.start:definition.start + claim.size]
+        rows.append(CanonicalRow(
+            definition.symbol.name,
+            claim.name,
+            "semantic-data",
+            definition.storage,
+            definition.section.index,
+            definition.start,
+            physical_size,
+            claim.size,
+            0,
+            hashlib.sha256(meaningful).hexdigest(),
+            "source-DATA_COMPGEN",
+            _escaped_preview(meaningful),
+        ))
+    return renames, tuple(rows)
+
+
 def _rewrite_jump_table_relocations(
         original: CoffObject, payload: bytes) -> tuple[bytes, tuple[JumpTableRewrite, ...]]:
     """Rewrite same-function .text DIR32 sites to owner+relative addend."""
@@ -723,7 +805,9 @@ def _assert_only_canonical_changes(
 
 
 def canonicalize_coff(payload: bytes,
-                      compgen: tuple[CompgenClaim, ...] = ()) -> CanonicalizedObject:
+                      compgen: tuple[CompgenClaim, ...] = (),
+                      compgen_data: tuple[CompgenDataClaim, ...] = (),
+                      ) -> CanonicalizedObject:
     """Return a normalized comparison copy and its readable rename records."""
     coff = CoffObject(payload)
     definitions = _definitions(coff)
@@ -912,6 +996,21 @@ def canonicalize_coff(payload: bytes,
             section_offset, physical_size, 0, 0, "-", f"skipped-{status}", "",
         ))
 
+    compgen_data_rename, compgen_data_rows = _compgen_data_renames(
+        coff, definitions, compgen_data)
+    if compgen_data_rename:
+        claimed_locations = {
+            (definition.section.index, definition.start)
+            for definition in definitions
+            if definition.symbol.index in compgen_data_rename
+        }
+        rows = [
+            row for row in rows
+            if (row.section_ordinal, row.section_offset) not in claimed_locations
+        ]
+        renames.update(compgen_data_rename)
+        rows.extend(compgen_data_rows)
+
     compgen_rename, compgen_rows = _compgen_renames(coff, compgen)
     overlap = set(renames) & set(compgen_rename)
     if overlap:
@@ -994,6 +1093,36 @@ def load_compgen_claims(path: Path | None, unit: str | None):
             for row in rows if row["unit"] == unit)
 
 
+def load_compgen_data_claims(path: Path | None, unit: str | None):
+    if path is None or unit is None:
+        return ()
+    if not path.exists():
+        raise FileNotFoundError(
+            f"compiler-data manifest does not exist: {path}")
+    with path.open(newline="") as stream:
+        rows = csv.DictReader(
+            (line for line in stream if not line.lstrip().startswith("#")),
+            delimiter="\t")
+        claims = []
+        for row in rows:
+            if not row["provenance"].startswith("source-DATA_COMPGEN:"):
+                continue
+            object_unit = row["object"].replace("\\", "/")
+            if object_unit.lower().endswith(".c"):
+                object_unit = object_unit[:-2]
+            if object_unit != unit:
+                continue
+            claims.append(CompgenDataClaim(
+                row["name"],
+                int(row["section_ordinal"], 0),
+                int(row["section_offset"], 0),
+                int(row["size"], 0),
+                row["storage"],
+                row["scope"],
+            ))
+        return tuple(claims)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path)
@@ -1001,6 +1130,7 @@ def main(argv=None):
     parser.add_argument("--sidecar", type=Path)
     parser.add_argument("--unit")
     parser.add_argument("--compgen-manifest", type=Path)
+    parser.add_argument("--data-manifest", type=Path)
     parser.add_argument("--summary-root", type=Path, action="append")
     parser.add_argument("--summary-output", type=Path)
     args = parser.parse_args(argv)
@@ -1022,7 +1152,8 @@ def main(argv=None):
     if len(set(resolved_paths)) != len(resolved_paths):
         parser.error("input, output, and sidecar paths must be distinct")
     claims = load_compgen_claims(args.compgen_manifest, args.unit)
-    result = canonicalize_coff(args.input.read_bytes(), claims)
+    data_claims = load_compgen_data_claims(args.data_manifest, args.unit)
+    result = canonicalize_coff(args.input.read_bytes(), claims, data_claims)
     _atomic_write(args.output, result.data)
     _atomic_write(args.sidecar, sidecar_bytes(result.rows))
     return 0
