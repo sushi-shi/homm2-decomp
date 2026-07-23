@@ -16,4 +16,20 @@ x87-order	c7f1ac1a243f825e	2	24	99.371710	1058	3331f6020e3abdc7	8b363e01bde1af82
 # All six states retain the 1058-byte CodeView/objdiff boundary and the same complete 29-site ordered relocation stream. The two extra bytes exposed by the raw retail COFF function extent are trailing alignment NOPs outside the CodeView boundary.
 # Four independent compiler-state axes were observed. A changes the hero/secondary-index load order at +0x15b/+0x15e. BC changes the heroValues sum and comparison at +0x190/+0x193 and +0x1b5/+0x1b8/+0x1ba. D changes the four commutative dominantFightValue4/recipientFightValue10 additions at +0x276/+0x279, +0x2df/+0x2e2, +0x384/+0x387, and +0x3c0/+0x3c3. EG changes x87 compare/store ordering at +0x296..+0x29b and +0x373..+0x37d.
 # The six observed combinations are none (canonical), A, D (exact), A+D, BC, and EG. Representative objects for every state were compared both pairwise with canonical and against retail; no other instruction or relocation transition was present.
-# Trial 11 is the first exact-closure representative. Every exact trial perturbs at least one sibling under a retained probe, so no declaration train is source-eligible. The disposable probe is evidence of a reachable exact compiler state only and was removed before the source-hash-scoped fuzzy maximum was recorded.
+# Trial 11 is the first exact-closure representative. The disposable probe was removed before the source-hash-scoped maximum was recorded; sibling output from its whole-TU object is outside this target-only experiment.
+#
+# Current-hash forest replay after compiler-generated-data modelling
+# checkpoint	b04b5d87
+# normalized_source_hash	443b62810f68
+# command	python3 scripts/tu_state_noise.py --source src/SOURCE/PHILAI.cpp --rva 0x41419 --trials 128 --seed 0x48494148 --insertion target --families forest --max-declarations 64 --record-max
+# result	baseline plus 128 forest trials produce seven target states; 28 trials reach exact closure and trial 5 is the first exact representative
+state	state_identity	representative_trial	occurrences_including_baseline	score	objdiff_size	text_sha	normalized_reloc_sha	diff_bytes_from_retail
+canonical	754a6c98ced89dae	3	58	99.973690	1058	077bf6e7ddb99626	b983a859086c54fe	8
+index-and-fight-sums	3c8f85b9a5cc424a	7	12	99.993420	1058	25796f035e44363a	b983a859086c54fe	2
+exact-fight-sums	40ee8d65547975ea	5	28	100.000000	1058	601547b0491c6b22	b983a859086c54fe	0
+x87-order-extended	ab593a55ff6bb652	77	2	99.161190	1058	9d161e902c88a400	b983a859086c54fe	21
+x87-order	ba599eb2980ff5ed	11	16	99.371710	1058	3331f6020e3abdc7	b983a859086c54fe	16
+secondary-index	ef6aac19e70d2490	1	6	99.967100	1058	eb340b54ea3fe1d9	b983a859086c54fe	10
+hero-value-sum-and-compare	fc50a83ab5ffdbc3	2	7	99.763160	1058	bb80b989f39fd9d6	b983a859086c54fe	13
+# All seven states retain the retail 1058-byte CodeView boundary and complete normalized 29-site ordered relocation stream. The current hash therefore preserves the same compiler-state axes as the older exact epoch and adds one rare 21-byte state.
+# A target-only replay of trial 5 under the simplified tool reports `100.000000% exact-closure`; it neither checks nor updates any sibling.
