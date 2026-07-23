@@ -20,11 +20,14 @@ preserves legacy behavior for addresses outside the supplied ranges.
 its proven extent before contribution-level fallback runs; contribution ranges are not symbol sizes
 and never authorize materializing an entire TU data interval as one object.
 
-Bootstrap `homm2 init` generates and passes `build/gen/delink_contributions.tsv`. Canonical
+`homm2 init` and explicit `homm2 redelink` generate and pass
+`build/gen/delink_contributions.tsv`. Canonical
 regeneration deterministically refreshes the same generated path; it is never copied into versioned
 configuration. Its digest is part of
 `.reviewed-data-stamp.json`. A changed canonical input makes normal build/status fail until the
-explicit `homm2 data-topology regenerate` command replaces the target.
+explicit `homm2 redelink` command replaces the complete target. The narrower
+`homm2 data-topology regenerate` remains available when only already-current data/PDB
+inputs need replay.
 The whole-image coverage gate loads and validates this exact generated manifest, so Vostok owner
 resolution and TU `.data`/`.rdata`/`.bss` coverage cannot silently use different storage classes.
 

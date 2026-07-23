@@ -4,7 +4,7 @@
 vostok-delinker consumes a PDB (not CodeView) to slice HEROES2W.EXE into per-symbol
 COFF .obj files. HEROES2W ships a publics-only CodeView NB09 stream, but the delinker
 wants a PDB, so we build one from retail publics plus reviewed runtime/compiler and
-source-annotated private identities. This is a deterministic `homm2 init` input: every
+source-annotated private identities. This is a deterministic `homm2 redelink` input: every
 function is named and unit-attributed before delinking, so we always emit per-unit line
 info (no Ghidra functions.csv or address-bucketed remainder).
 
