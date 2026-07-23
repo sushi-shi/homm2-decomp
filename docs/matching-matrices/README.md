@@ -326,6 +326,20 @@ not replay a matrix row solely because of its historical score. Neither the
 AST nor regex permuter was used; AST permutation remains inappropriate until the function is truly
 structurally aligned at 96-97%, and the regex permuter is prohibited for this campaign.
 
+`icon2b-tu-state-5feed25d.tsv` records the current-header controlled residual pass. Sixty-four
+deterministic top-of-TU trials yielded 58 compiled probes and 17 distinct normalized target states.
+The matrix compares every state by retail score, size, `.text` identity, and ordered relocation
+identity. The best disposable state reaches 75.258240% but drops to 79/83 relocations; none recovers
+the missing `gIcX0`, `gIcY`, and `gIcCnt2` identities.
+
+The July 14 session transcript also preserved the complete 83/83 clean-room source that the older
+score ratchet had rejected. Replaying its meaningful lifetime shapes under current headers does not
+reproduce the retail relocation distribution, and the old body contains a clipped-fill semantic
+error: it advances the decoder X position by the visible clipped length instead of the full run
+length. The current correct split-count implementation is retained. Direct byte reads are
+byte-identical to `ReadIconRleByte`, so the shared inline helper is retained as well. No probe or
+rejected spelling remains in source.
+
 ## BASE/SAMPLE whole-TU audit and constructor shapes
 
 `sample-tu-audit-66dafcc.tsv` is the retail-order audit of all eight CodeView functions at
