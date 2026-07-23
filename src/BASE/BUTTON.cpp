@@ -145,7 +145,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return MESSAGE_DISPATCH_CONTINUE;
-                WidgetFlag keyFlags = m_flags;
+                H2_ENUM_STORAGE(WidgetFlag, i16) keyFlags = m_flags;
                 if (!HAS(keyFlags, WIDGET_FLAG_SELECTED))
                     return MESSAGE_DISPATCH_CONTINUE;
                 keyFlags &= ~WIDGET_FLAG_SELECTED;
@@ -174,7 +174,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
             i16 relativeY =
                 static_cast<i16>(msg.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
             if (eventType == MESSAGE_RIGHT_BUTTON_DOWN) {
-                if (m_x <= relativeX && m_y <= relativeY && relativeX < m_x + m_width
+                if (relativeX >= m_x && relativeY >= m_y && relativeX < m_x + m_width
                     && relativeY < m_y + m_height) {
                     SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_ALTERNATE_SELECT, m_id);
                     msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
@@ -183,7 +183,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
 
-            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && m_x <= relativeX && m_y <= relativeY
+            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && relativeX >= m_x && relativeY >= m_y
                 && relativeX < m_x + m_width && relativeY < m_y + m_height) {
                 Select(msg);
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
@@ -194,12 +194,10 @@ MessageDispatchResult button::Main(tag_message& msg) {
                                     - static_cast<i16>(m_owner->m_posX);
                         relativeY = static_cast<i16>(msg.payload.mouse.y)
                                     - static_cast<i16>(m_owner->m_posY);
-                        if (m_x > relativeX || m_y > relativeY || relativeX >= m_x + m_width
+                        if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                             || relativeY >= m_y + m_height) {
-                            WidgetFlag moveFlags = m_flags;
-                            if (HAS(moveFlags, WIDGET_FLAG_SELECTED)) {
-                                moveFlags &= ~WIDGET_FLAG_SELECTED;
-                                m_flags = moveFlags;
+                            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                                m_flags &= ~WIDGET_FLAG_SELECTED;
                                 Draw();
                                 gpWindowManager->UpdateScreenRegion(
                                     m_x + m_owner->m_posX,
@@ -218,10 +216,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     Process1WindowsMessage();
                     msg = gpInputManager->GetEvent();
                 }
-                WidgetFlag releaseFlags = m_flags;
-                if (HAS(releaseFlags, WIDGET_FLAG_SELECTED)) {
-                    releaseFlags &= ~WIDGET_FLAG_SELECTED;
-                    m_flags = releaseFlags;
+                if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                    m_flags &= ~WIDGET_FLAG_SELECTED;
                     Draw();
                     gpWindowManager->UpdateScreenRegion(
                         m_x + m_owner->m_posX,
@@ -240,11 +236,9 @@ MessageDispatchResult button::Main(tag_message& msg) {
         }
 
         case MESSAGE_LEFT_BUTTON_UP: {
-            WidgetFlag releaseFlags = m_flags;
-            if (HAS(releaseFlags, WIDGET_FLAG_DRAW)
-                && HAS(releaseFlags, WIDGET_FLAG_SELECTED)) {
-                releaseFlags &= ~WIDGET_FLAG_SELECTED;
-                m_flags = releaseFlags;
+            if (HAS(m_flags, WIDGET_FLAG_DRAW)
+                && HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                m_flags &= ~WIDGET_FLAG_SELECTED;
                 Draw();
                 gpWindowManager->UpdateScreenRegion(
                     m_x + m_owner->m_posX,
