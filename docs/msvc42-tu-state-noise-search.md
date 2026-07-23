@@ -87,6 +87,12 @@ reproduced after the temporary objects are removed. This summary is diagnostic e
 does not update a retained maximum. If one normalized state ever receives multiple fuzzy scores,
 the census reports the complete score set instead of silently choosing one.
 
+The historical recovery driver also retires target-local `OD_STEER` in this loop. It scopes the
+edit to the exact target's `VA(...)` block, searches the clean source again, rebuilds the canonical
+object, advances the source-hash epoch, and replays the exact trial before retaining MAX 100.
+Failure restores the authored source and baseline. Steering in predecessors and siblings is not
+part of the target and remains untouched.
+
 Treat normalized state cardinality as a diagnostic metric alongside fuzzy score. Record the total
 number of states, each state's occurrence count, representative trial, function size, text digest,
 ordered-relocation digest, and complete score set. Repeated trials in an already-observed state add
