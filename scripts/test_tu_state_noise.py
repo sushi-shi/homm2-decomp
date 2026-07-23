@@ -56,6 +56,51 @@ class TuStateNoiseTests(unittest.TestCase):
         self.assertLess(candidate.index("PROBE_ALIAS"), candidate.index("int predecessor"))
         self.assertIn("#line 5\nint predecessor", candidate)
 
+    def test_layer_body_precedes_generated_variant_at_same_insertion(self):
+        original = "#include <a.h>\n\nint predecessor;\nVA(0x00401234, 0x1)\n"
+        target = self.target(original)
+        variant = noise.Variant(2, "enum", "tag", "typedef int SECOND;\n")
+        candidate = noise.insert_variant(
+            original,
+            target,
+            variant,
+            "top",
+            "typedef int FIRST;\n",
+        )
+        self.assertLess(candidate.index("FIRST"), candidate.index("SECOND"))
+        self.assertLess(candidate.index("SECOND"), candidate.index("int predecessor"))
+        self.assertIn("#line 3\nint predecessor", candidate)
+
+    def test_layer_body_loads_a_matching_census_representative(self):
+        original = "int predecessor;\nVA(0x00401234, 0x1)\n"
+        target = self.target(original)
+        summary = {
+            "insertion": "top",
+            "target": {
+                "unit": target.unit,
+                "rva": f"0x{target.rva:x}",
+                "symbol": target.symbol,
+            },
+            "states": [{
+                "state": "state-id",
+                "scores": [96.5],
+                "representative": {
+                    "trial": 17,
+                    "family": "typedef",
+                    "tag": "tag",
+                    "body": "typedef int LAYER;",
+                },
+            }],
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "states.json"
+            path.write_text(__import__("json").dumps(summary))
+            body, metadata = noise.load_layer_body(path, 17, target, "top")
+        self.assertEqual(body, "typedef int LAYER;\n")
+        self.assertEqual(metadata["state"], "state-id")
+        self.assertEqual(metadata["score"], 96.5)
+        self.assertEqual(metadata["family"], "typedef")
+
     def test_resolver_ignores_va_text_in_comment_before_real_marker(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

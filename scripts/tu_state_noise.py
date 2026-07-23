@@ -687,18 +687,75 @@ def select_variants(
     return [variant for variant in variants if variant.trial in requested]
 
 
+def load_layer_body(
+    summary_path: Path,
+    trial: int,
+    target: Target,
+    insertion: str,
+) -> tuple[str, dict]:
+    """Recover one audited representative from an earlier state census."""
+    summary = json.loads(summary_path.read_text())
+    summary_target = summary.get("target", {})
+    expected = {
+        "unit": target.unit,
+        "rva": f"0x{target.rva:x}",
+        "symbol": target.symbol,
+    }
+    actual = {
+        "unit": summary_target.get("unit"),
+        "rva": str(summary_target.get("rva", "")).lower(),
+        "symbol": summary_target.get("symbol"),
+    }
+    if actual != expected:
+        raise ValueError(
+            "layer state summary targets "
+            f"{actual['unit']}::{actual['symbol']}@{actual['rva']}, expected "
+            f"{expected['unit']}::{expected['symbol']}@{expected['rva']}"
+        )
+    if summary.get("insertion") != insertion:
+        raise ValueError(
+            "layer state summary insertion "
+            f"{summary.get('insertion')!r} does not match {insertion!r}"
+        )
+    matches = [
+        state
+        for state in summary.get("states", [])
+        if state.get("representative", {}).get("trial") == trial
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"layer trial {trial} has {len(matches)} representative states in {summary_path}"
+        )
+    representative = matches[0]["representative"]
+    body = representative.get("body")
+    if not isinstance(body, str) or not body.strip():
+        raise ValueError(f"layer trial {trial} has no parser-visible body")
+    if not body.endswith("\n"):
+        body += "\n"
+    return body, {
+        "summary": str(summary_path),
+        "trial": trial,
+        "state": matches[0].get("state"),
+        "score": matches[0].get("scores", [None])[0],
+        "family": representative.get("family"),
+        "tag": representative.get("tag"),
+        "body_sha256": sha256_bytes(body.encode("utf-8")),
+    }
+
+
 def insert_variant(
     original: str,
     target: Target,
     variant: Variant,
     insertion: str = "target",
+    layer_body: str = "",
 ) -> str:
     insertion_offset = (
         target.insertion_offset
         if insertion == "target"
         else _top_level_insertion_offset(original)
     )
-    block = variant.block(logical_line_at(original, insertion_offset))
+    block = layer_body + variant.block(logical_line_at(original, insertion_offset))
     return original[:insertion_offset] + block + original[insertion_offset:]
 
 
@@ -1201,6 +1258,19 @@ def main(argv: list[str] | None = None) -> int:
             "states even when no exact closure is found"
         ),
     )
+    parser.add_argument(
+        "--layer-state-summary",
+        type=Path,
+        help=(
+            "layer every generated trial on one representative body recovered from "
+            "an earlier --state-summary census"
+        ),
+    )
+    parser.add_argument(
+        "--layer-trial",
+        type=positive_count,
+        help="representative trial number to recover from --layer-state-summary",
+    )
     parser.add_argument("--dry-run", action="store_true", help="resolve target and emit snippets without compiling")
     parser.add_argument(
         "--record-max", action="store_true",
@@ -1211,6 +1281,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("--trials must be positive")
     if args.dry_run and args.record_max:
         parser.error("--record-max requires compiled trials, not --dry-run")
+    if (args.layer_state_summary is None) != (args.layer_trial is None):
+        parser.error("--layer-state-summary and --layer-trial must be used together")
 
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     try:
@@ -1218,6 +1290,17 @@ def main(argv: list[str] | None = None) -> int:
         families = tuple(item.strip() for item in args.families.split(",") if item.strip())
         variants = make_variants(args.trials, families, args.seed, args.max_declarations)
         variants = select_variants(variants, args.only_trial, args.trials)
+        layer_body = ""
+        layer = None
+        if args.layer_state_summary is not None:
+            layer_path = (
+                (root / args.layer_state_summary).resolve()
+                if not args.layer_state_summary.is_absolute()
+                else args.layer_state_summary
+            )
+            layer_body, layer = load_layer_body(
+                layer_path, args.layer_trial, target, args.insertion
+            )
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
 
@@ -1290,6 +1373,7 @@ def main(argv: list[str] | None = None) -> int:
         "seed": args.seed,
         "generated_trial_horizon": args.trials,
         "selected_trials": sorted(args.only_trial) if args.only_trial else None,
+        "layer": layer,
         "policy": {
             "parser_visible_temporary_probes": True,
             "probe_symbols_or_storage_may_exist_only_in_candidate_object": True,
@@ -1316,7 +1400,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         for variant in variants:
             snippet_path = output / f"trial-{variant.trial:04d}-{variant.family}.snippet"
-            snippet_path.write_text(variant.block(target.logical_line))
+            snippet_path.write_text(layer_body + variant.block(target.logical_line))
             manifest["trials"].append({**asdict(variant), "snippet": snippet_path.name})
         manifest["source_restored"] = target.source.read_bytes() == original_bytes
         restored_target_hash = project_source_hashes().get(target_key)
@@ -1447,11 +1531,15 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGTERM, stop_for_signal)
     try:
         for variant in variants:
-            candidate = insert_variant(original, target, variant, args.insertion)
+            candidate = insert_variant(
+                original, target, variant, args.insertion, layer_body
+            )
             candidate_bytes = candidate.encode("utf-8")
             trial_obj = output / f"trial-{variant.trial:04d}.obj"
             trial_generated = []
-            include_guard = include_macro_guard(root, variant.body, canonical_target_tokens)
+            include_guard = include_macro_guard(
+                root, layer_body + variant.body, canonical_target_tokens
+            )
             compile_timed_out = False
             with temporary_source(target.source, original_bytes, candidate_bytes):
                 with measure_stage(timings, "target_hash_check"):
@@ -1662,6 +1750,7 @@ def main(argv: list[str] | None = None) -> int:
                     "families": families,
                     "max_declarations": args.max_declarations,
                     "insertion": args.insertion,
+                    "layer": layer,
                     "retail": retail_target,
                     "states": state_rows,
                     "state_byte_delta_matrix": state_byte_delta_matrix,
