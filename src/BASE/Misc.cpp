@@ -2304,14 +2304,12 @@ i32 SGenRand(void) {
     iLastSeed &= RANDOM_SEED_MASK;
     i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
     mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
-    i32 i = RANDOM_TOP_BIT;
-    do {
+    for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
         if (mix & (1 << i)) {
             result |= 1 << i;
         }
-        --i;
         iLastSeed = mix;
-    } while (i >= 0);
+    }
     return result;
 }
 
