@@ -41,18 +41,22 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Compare raw `llvm-objdump -r` ranges when a provisional boundary confuses the helper.
 6. Use relocation-masked bytes only to isolate code-shape differences. They do not prove
    correctness; ordered relocation identity/addend/destination checks still apply.
-7. On a structurally aligned compiler-state residual, run the disposable island search in
-   `scripts/tu_state_noise.py` before adding persistent compiler steering. Use the expansive
-   declaration-forest default and preserve a state census. Inspect one representative of every
-   byte/relocation island, not only the highest score.
-8. Treat retained `OD_STEER` expressions as migration debt: the macro is a semantic no-op whose
-   purpose is persistent compiler steering. Remove it, search islands for the clean unchanged
-   expression, and retain no generated probe source. With `--record-max`, only a retail-sized
-   exact-100 result with complete ordered-relocation identity may update the hash-scoped maximum.
-9. If a clean-source sweep has no exact island, make one evidence-based targeted source change
-   at the first real divergence, then search and compare the complete island set again. Island
-   reachability is conditioned on the authored target. Never invent a source change merely to
-   perturb the compiler, and never record a sub-100 probe.
+7. For a structurally aligned compiler-state residual, island search is the current
+   last-mile policy. Run `scripts/tu_state_noise.py` before adding or retaining persistent
+   compiler steering. Use the expansive declaration-forest default, with at least ten varied
+   classes, typedefs, prototypes, and functions per trial, and preserve a complete state census.
+   Inspect one representative of every distinct byte/relocation island, not only the best score.
+8. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
+   state while contributing no program semantics. Remove it incrementally, search islands for
+   the clean unchanged source, and retain no generated probe declarations or functions. A
+   disposable exact probe may update the maximum only when the function has retail size,
+   exact-100 bytes, complete ordered-relocation identity, and the clean function's source hash.
+   Revert the probe after recording that reproducible maximum; the reconstructed source remains
+   free of compiler-state hacks.
+9. If the clean-source sweep has no exact island, make one evidence-based targeted source change
+   at the first real divergence, then resweep and compare every resulting island. A legitimate
+   change can expose a different compiler-state orbit. Never invent a source change merely to
+   perturb the compiler, never retain a probe, and never record a sub-100 probe as a maximum.
 10. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
