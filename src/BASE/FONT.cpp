@@ -9,13 +9,13 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(FontConstant)
+typedef enum FontConstant {
     LARGE_FONT_HEIGHT_THRESHOLD = 14,
     FONT_DRAW_SCREEN_WIDTH      = 640,
     FONT_DRAW_SCREEN_HEIGHT     = 480,
     CENTER_DIVISOR              = 2,
     WRAP_HEIGHT_LINE_COUNT      = 2
-H2_ENUM_END(FontConstant)
+} FontConstant;
 
 VA(0x004c6fd0, 0xc8)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
