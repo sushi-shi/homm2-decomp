@@ -24,6 +24,10 @@ DATA(0x00538184) static u8 gYMColor;
 DATA(0x00538188) static u32 gYMDimLen2;
 DATA(0x0053818c) static i32 gYMClipR;
 
+static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
+    return shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipTop <= gYMY && gYMY <= gYMClipB;
+}
+
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(
     class icon* srcIcon,
@@ -88,10 +92,8 @@ void IconToBitmapYModify(
                 gYMDimPal =
                     reinterpret_cast<u8*>(uDimPal)
                     + (gYMRun & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                i32 currentY;
-                if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= (currentY = gYMY)
-                    && currentY <= gYMClipB && static_cast<i32>(gYMDimLen + gYMX) > clipX
-                    && gYMClipR >= gYMX) {
+                if (IconRowVisible(shear, clipY)
+                    && static_cast<i32>(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
                     i32 dimRight = gYMDimLen + gYMX;
                     if (clipX <= gYMX) {
                         if (gYMClipR < dimRight)
@@ -117,9 +119,7 @@ void IconToBitmapYModify(
             gYMX = gYMX + gYMDimLen2;
             continue;
         do_fill:
-            i32 currentY;
-            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= (currentY = gYMY)
-                && currentY <= gYMClipB && static_cast<i32>(gYMX + gYMRun) > clipX
+            if (IconRowVisible(shear, clipY) && static_cast<i32>(gYMX + gYMRun) > clipX
                 && gYMClipR >= gYMX) {
                 i32 fillRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
@@ -140,9 +140,7 @@ void IconToBitmapYModify(
             continue;
         }
         if (gYMRun != 0) {
-            i32 currentY;
-            if (shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipY <= (currentY = gYMY)
-                && currentY <= gYMClipB && static_cast<i32>(gYMX + gYMRun) > clipX
+            if (IconRowVisible(shear, clipY) && static_cast<i32>(gYMX + gYMRun) > clipX
                 && gYMClipR >= gYMX) {
                 i32 copyRight = gYMX + gYMRun;
                 if (clipX <= gYMX) {
