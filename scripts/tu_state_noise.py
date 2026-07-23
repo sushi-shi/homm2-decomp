@@ -48,7 +48,11 @@ from typing import Iterable
 
 from tu_state_metrics import read_coff
 from homm2.build.assert_relocs import load_symbols
-from homm2.build.canonicalize_data_symbols import canonicalize_coff
+from homm2.build.canonicalize_data_symbols import (
+    canonicalize_coff,
+    load_compgen_claims,
+    load_compgen_data_claims,
+)
 from homm2.build.canonicalize_relocs import (
     canonicalize_unit,
     function_inventory,
@@ -979,6 +983,12 @@ def load_pairing_context(root: Path, unit: str) -> dict:
         "symbols": symbols,
         "data": data,
         "duplicates": duplicates,
+        "compgen": load_compgen_claims(
+            root / "build/gen/compiler_generated_functions.csv", unit
+        ),
+        "compgen_data": load_compgen_data_claims(
+            root / "build/gen/delink_data_manifest.tsv", unit
+        ),
     }
 
 
@@ -1004,8 +1014,20 @@ def normalize_comparison_pair(
         candidate_raw,
         paired_retail,
     )
-    normalized_candidate.write_bytes(canonicalize_coff(candidate_raw.read_bytes()).data)
-    normalized_retail.write_bytes(canonicalize_coff(paired_retail.read_bytes()).data)
+    normalized_candidate.write_bytes(
+        canonicalize_coff(
+            candidate_raw.read_bytes(),
+            compgen=pairing["compgen"],
+            compgen_data=pairing["compgen_data"],
+        ).data
+    )
+    normalized_retail.write_bytes(
+        canonicalize_coff(
+            paired_retail.read_bytes(),
+            compgen=pairing["compgen"],
+            compgen_data=pairing["compgen_data"],
+        ).data
+    )
     return normalized_candidate, normalized_retail, [
         paired_retail,
         normalized_candidate,
