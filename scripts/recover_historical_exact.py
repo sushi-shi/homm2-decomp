@@ -233,7 +233,7 @@ def completed_keys(path: Path, profile: str) -> set[tuple[str, str, str]]:
     for row in read_tsv(path):
         if row.get("profile") != profile:
             continue
-        if row.get("status") not in {"exact", "no-exact"}:
+        if row.get("status") not in {"exact", "no-exact", "wall"}:
             continue
         completed.add((row["unit"], row["symbol"], row["current_hash"]))
     return completed
@@ -550,8 +550,15 @@ def run_target(
     log_path: Path,
 ) -> tuple[str, int, float, float | None, Path]:
     source = source_for_unit(root, row["unit"])
+    artifact_root = Path(
+        getattr(
+            args,
+            "artifact_root",
+            root / "build/tu-state-noise/historical-exact-recovery",
+        )
+    )
     output = (
-        root / "build/tu-state-noise/historical-exact-recovery"
+        artifact_root
         / getattr(args, "profile", "manual")
         / artifact_name(row)
     )
@@ -622,13 +629,13 @@ def run_target(
                 log.write(f"target-local OD_STEER retirement failed: {exc}\n")
             return "error", 5, time.monotonic() - started, best_score, output
         return "exact", 0, time.monotonic() - started, 100.0, output
-    maximum, source_hash = current_baseline(root).get(
+    _maximum, source_hash = current_baseline(root).get(
         (row["unit"], row["symbol"]), (0.0, "")
     )
     if source_hash != row["current_hash"]:
         return "error", 3, elapsed, best_score, output
     return (
-        "exact" if maximum >= 100.0 else "no-exact",
+        "exact" if exact else "no-exact",
         exit_code,
         elapsed,
         best_score,

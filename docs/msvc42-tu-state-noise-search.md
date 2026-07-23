@@ -93,6 +93,13 @@ object, advances the source-hash epoch, and replays the exact trial before retai
 Failure restores the authored source and baseline. Steering in predecessors and siblings is not
 part of the target and remains untouched.
 
+The exhaustive frontend is `scripts/recover_residual_functions.py`. It refreshes a persistent
+`/tmp` queue and completion ledger keyed by search profile plus effective source hash. Its first
+tier is the historical-exact/current-MAX-below-100 set, followed by all other live 93%-or-higher
+functions and then every lower residual. Compiler-generated functions without a source `VA(...)`
+block remain explicit object-hash-scoped modelling walls instead of disappearing from the queue.
+Every completed batch verifies that matched data remains equal to total data.
+
 Treat normalized state cardinality as a diagnostic metric alongside fuzzy score. Record the total
 number of states, each state's occurrence count, representative trial, function size, text digest,
 ordered-relocation digest, and complete score set. Repeated trials in an already-observed state add
