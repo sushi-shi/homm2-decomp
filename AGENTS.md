@@ -53,19 +53,19 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Cartesian dimensions. A selected source shape must be compiled against the clean state and
    every requested probe state; never rely on a truncated mixed mutation list. Use the expansive
    declaration-forest default, with at least ten varied classes, typedefs, prototypes, and
-   functions per trial, and preserve a complete normalized state census. Inspect one
-   representative of every distinct byte/relocation island, not only the best score.
+   functions per trial. Stop at the first audited exact closure. If no exact state appears,
+   retain only the best paired object, disassembly, and diff under `build/` as clue evidence.
 8. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
    the clean unchanged source, and retain no generated probe declarations or functions. A
-   disposable exact probe may update the maximum only when the function has retail size,
-   exact-100 bytes, complete ordered-relocation identity, and the clean function's source hash.
-   Revert the probe after recording that reproducible maximum; the reconstructed source remains
-   free of compiler-state hacks.
+   A higher observed score may update the clean function's hash-scoped maximum after source
+   restoration; exact closure additionally requires retail size, exact-100 bytes, and complete
+   ordered-relocation identity. The reconstructed source remains free of compiler-state hacks.
 9. If the clean-source sweep has no exact island, make one evidence-based targeted source change
    at the first real divergence, then resweep and compare every resulting island. A legitimate
    change can expose a different compiler-state orbit. Never invent a source change merely to
-   perturb the compiler, never retain a probe, and never record a sub-100 probe as a maximum.
+   perturb the compiler. Generated source is never retained; best compiled clue artifacts may
+   remain under `build/`, and a higher sub-100 observation may advance hash-scoped MAX.
 10. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
@@ -87,9 +87,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   change.
 - Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
-- Never retain source objects, labels, globals, aliases, padding, or fake code solely to
-  improve a metric. The controlled TU-state probe is disposable compiler input, not
-  reconstructed source; its exact-only retained-maximum contract is documented in
+- Never retain generated labels, globals, aliases, padding, or fake code in reconstructed
+  source solely to improve a metric. The controlled TU-state probe is disposable compiler
+  input; its best object/assembly may remain under `build/` as clue evidence. Its contract is documented in
   `docs/msvc42-tu-state-noise-search.md`.
 
 ## Source Conventions
