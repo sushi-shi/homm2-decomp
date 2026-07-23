@@ -575,7 +575,6 @@ def main(argv=None) -> int:
                     rejections.append("sibling regression")
                 row.update({
                     "score": score,
-                    "scores": [],
                     "score_delta": score - baseline_score,
                     "candidate_size": candidate_size,
                     "retail_size": target.retail_size,
@@ -595,6 +594,7 @@ def main(argv=None) -> int:
                     "representative_trial": index,
                     "representative_choices": labels,
                     "score": score,
+                    "scores": [],
                     "size": candidate_size,
                     "relocs": candidate_target["relocs"],
                     "text_sha": candidate_target["text_sha"],
