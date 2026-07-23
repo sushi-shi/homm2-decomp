@@ -3018,58 +3018,57 @@ void combatManager::AddArmy(
     i32 index_g;
     army* newArmy;
     for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[IDX(side)][index_g].m_monsterType == CREATURE_NONE) {
+        if (m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_NONE) {
             armyIndex_r = index_g;
             break;
         }
-        if (m_armies[IDX(side)][index_g].m_quantity == 0
-            && HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
+        if (m_armies[IDX(OD_STEER(side))][index_g].m_quantity == 0
+            && HAS(m_armies[IDX(OD_STEER(side))][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && (HAS(m_armies[IDX(OD_STEER(side))][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
+                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
+                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
+                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
+                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
             armyIndex_r = index_g;
             reusedArmy_m = 1;
             break;
         }
     }
 
-    if (armyIndex_r != INVALID_ARMY_INDEX) {
-        if (m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
-            return;
+    if (armyIndex_r == INVALID_ARMY_INDEX
+        || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+        return;
 
-        newArmy = &m_armies[IDX(side)][armyIndex_r];
-        newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
-        newArmy->LoadResources();
-        newArmy->m_monster.flags.all |= flags;
-        if (reusedArmy_m == 0)
-            ++m_armyCount[IDX(side)];
+    newArmy = &m_armies[IDX(OD_STEER(side))][armyIndex_r];
+    newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
+    newArmy->LoadResources();
+    newArmy->m_monster.flags.all |= flags;
+    if (reusedArmy_m == 0)
+        ++m_armyCount[IDX(side)];
 
-        if (animate == 0)
-            return;
+    if (animate == 0)
+        return;
 
-        ResetLimitCreature();
-        m_limitCreatureCount[IDX(side)][armyIndex_r] += 1;
-        gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
-        gpWindowManager->SaveFizzleSource(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1
-        );
-        UpdateGrid(0, 1);
-        DrawFrame(0, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
-        gpWindowManager->FizzleForward(
-            giMinExtentX,
-            giMinExtentY,
-            giMaxExtentX - giMinExtentX + 1,
-            giMaxExtentY - giMinExtentY + 1,
-            COMMAND_FRAME_DELAY,
-            NULL,
-            NULL
-        );
-    }
+    ResetLimitCreature();
+    ++m_limitCreatureCount[IDX(side)][armyIndex_r];
+    gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
+    gpWindowManager->SaveFizzleSource(
+        giMinExtentX,
+        giMinExtentY,
+        giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1
+    );
+    UpdateGrid(0, 1);
+    DrawFrame(0, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+    gpWindowManager->FizzleForward(
+        giMinExtentX,
+        giMinExtentY,
+        giMaxExtentX - giMinExtentX + 1,
+        giMaxExtentY - giMinExtentY + 1,
+        COMMAND_FRAME_DELAY,
+        NULL,
+        NULL
+    );
 }
 
 VA(0x00431db6, 0x169)
