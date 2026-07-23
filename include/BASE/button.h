@@ -53,6 +53,10 @@ public:
     void Read(void);
     H2_ENUM_RETURN(MessageDispatchResult, i16) Select(struct tag_message& message);
     H2_ENUM_RETURN(MessageDispatchResult, i16) Deselect(struct tag_message& message);
+
+private:
+    inline H2_ENUM_RETURN(MessageDispatchResult, i16)
+        DeselectSelected(struct tag_message& message);
 };
 #pragma pack(pop)
 SIZE(button, 0x30);
