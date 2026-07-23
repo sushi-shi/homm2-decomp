@@ -1815,6 +1815,8 @@ def main(argv: list[str] | None = None) -> int:
             state = trial_status(trial)
             score_text = "compile-failed" if trial["score"] is None else f"{trial['score']:.6f}%"
             print(f"[{variant.trial:04d}/{len(variants):04d}] {variant.family}: {score_text} {state}", flush=True)
+            if trial["exact_closure_eligible"]:
+                break
     except KeyboardInterrupt:
         interrupted = True
         manifest["interrupted"] = True
