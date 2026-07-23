@@ -45,10 +45,12 @@ RESULT_FIELDS = (
     "current_hash",
     "live_score",
     "status",
+    "best_score",
     "trial_budget",
     "elapsed_seconds",
     "exit_code",
     "log",
+    "artifact",
 )
 
 
@@ -169,14 +171,14 @@ def run_target(
     row: dict[str, str],
     args: argparse.Namespace,
     log_path: Path,
-) -> tuple[str, int, float]:
+) -> tuple[str, int, float, float | None, Path]:
     source = source_for_unit(root, row["unit"])
-    if not source.is_file():
-        return "error", 2, 0.0
     output = (
         root / "build/tu-state-noise/historical-exact-recovery"
         / artifact_name(row)
     )
+    if not source.is_file():
+        return "error", 2, 0.0, None, output
     command = [
         sys.executable,
         str(root / "scripts/tu_state_noise.py"),
@@ -199,6 +201,7 @@ def run_target(
         "--output",
         str(output),
         "--record-max",
+        "--retain-best",
     ]
     log_path.parent.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -217,19 +220,31 @@ def run_target(
             exit_code = process.wait(timeout=args.target_timeout_seconds)
         except subprocess.TimeoutExpired:
             terminate_process(process)
-            return "timeout", 124, time.monotonic() - started
+            return "timeout", 124, time.monotonic() - started, None, output
         except KeyboardInterrupt:
             terminate_process(process)
             raise
     elapsed = time.monotonic() - started
     if exit_code != 0:
-        return "error", exit_code, elapsed
+        return "error", exit_code, elapsed, None, output
+    manifest_path = output / "manifest.json"
+    best_score = None
+    if manifest_path.exists():
+        best_score = json.loads(manifest_path.read_text()).get(
+            "best_retained", {}
+        ).get("score")
     maximum, source_hash = current_baseline(root).get(
         (row["unit"], row["symbol"]), (0.0, "")
     )
     if source_hash != row["current_hash"]:
-        return "error", 3, elapsed
-    return ("exact" if maximum >= 100.0 else "no-exact"), exit_code, elapsed
+        return "error", 3, elapsed, best_score, output
+    return (
+        "exact" if maximum >= 100.0 else "no-exact",
+        exit_code,
+        elapsed,
+        best_score,
+        output,
+    )
 
 
 def refresh_queue(root: Path, queue: Path) -> None:
@@ -313,7 +328,9 @@ def main(argv: list[str] | None = None) -> int:
         if latest != (float(row["current_max"]), row["current_hash"]):
             if latest is not None and latest[0] >= 100.0:
                 continue
-            status, exit_code, elapsed = "error", 3, 0.0
+            status, exit_code, elapsed, best_score, artifact = (
+                "error", 3, 0.0, None, Path()
+            )
         else:
             log_path = log_dir / f"{artifact_name(row)}.log"
             print(
@@ -322,7 +339,7 @@ def main(argv: list[str] | None = None) -> int:
                 flush=True,
             )
             try:
-                status, exit_code, elapsed = run_target(
+                status, exit_code, elapsed, best_score, artifact = run_target(
                     root, row, args, log_path
                 )
             except KeyboardInterrupt:
@@ -341,10 +358,12 @@ def main(argv: list[str] | None = None) -> int:
                 "current_hash": row["current_hash"],
                 "live_score": row["live_score"],
                 "status": status,
+                "best_score": "" if best_score is None else f"{best_score:.6f}",
                 "trial_budget": args.trials,
                 "elapsed_seconds": f"{elapsed:.3f}",
                 "exit_code": exit_code,
                 "log": log_path,
+                "artifact": artifact,
             },
         )
         if status == "exact":
