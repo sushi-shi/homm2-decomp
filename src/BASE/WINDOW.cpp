@@ -42,7 +42,7 @@ H2_ENUM_END(WindowConstant)
 
 VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {
-    strcpy(name, "Default Construct");
+    strcpy(name, DATA_COMPGEN(0x0051f9d0, heroWindowDefaultConstruct, "Default Construct"));
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;
@@ -61,7 +61,7 @@ VA(0x004cec20, 0xa5)
 heroWindow::heroWindow(
     i32 x, i32 y, i32 w, i32 h, H2_ENUM_PARAM(WindowFlag, i32) flags
 ) {
-    strcpy(name, "Dynamic Construct");
+    strcpy(name, DATA_COMPGEN(0x0051f9e4, heroWindowDynamicConstruct, "Dynamic Construct"));
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;

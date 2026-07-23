@@ -591,14 +591,11 @@ def load_homm2_provenance(root: Path) -> dict:
     root = root.resolve()
     diagnostics: list[dict] = []
     source_path = root / "build" / "gen" / "delink_data_from_source.tsv"
-    supplemental_path = root / "config" / "delink_data_supplemental.tsv"
     merged_path = root / "build" / "gen" / "delink_data_manifest.tsv"
     source_rows = _load_symbol_manifest(source_path, "source annotations", diagnostics)
-    supplemental_rows = _load_symbol_manifest(
-        supplemental_path, "supplemental", diagnostics)
     merged_rows = _load_symbol_manifest(merged_path, "merged", diagnostics)
 
-    expected_merged = Counter(map(_row_tuple, [*source_rows, *supplemental_rows]))
+    expected_merged = Counter(map(_row_tuple, source_rows))
     actual_merged = Counter(map(_row_tuple, merged_rows))
     if actual_merged != expected_merged:
         diagnostics.append({
@@ -657,22 +654,14 @@ def load_homm2_provenance(root: Path) -> dict:
 
     unknown_source_rows = [
         row for row in source_rows if not row["provenance"].startswith(
-            ("source-DATA:", "source-VTBL:", "source-VTBL2:"))
+            ("source-DATA:", "source-DATA_COMPGEN:",
+             "source-VTBL:", "source-VTBL2:"))
     ]
     if unknown_source_rows:
         diagnostics.append({
             "kind": "unknown-source-annotation-provenance",
             "rows": unknown_source_rows,
         })
-
-    source_identities = {(row["object"], row["name"]) for row in source_rows}
-    source_rvas = {int(row["rva"], 0) for row in source_rows}
-    for row in supplemental_rows:
-        if ((row["object"], row["name"]) in source_identities
-                or int(row["rva"], 0) in source_rvas):
-            diagnostics.append({
-                "kind": "supplemental-source-annotation-overlap", "row": row,
-            })
 
     anchors_by_unit: dict[str, dict[str, dict]] = {}
     external_by_name: dict[str, list[dict]] = {}
@@ -702,7 +691,6 @@ def load_homm2_provenance(root: Path) -> dict:
         "unique_external_anchors": unique_external_anchors,
         "source_DATA_count": len(definitions),
         "source_manifest_count": len(source_rows),
-        "supplemental_count": len(supplemental_rows),
         "merged_count": len(merged_rows),
         "diagnostics": diagnostics,
     }

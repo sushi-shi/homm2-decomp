@@ -23,11 +23,11 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     MSG message;
 
     hInstApp = instance;
-    gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
+    gEventHandle = CreateEventA(NULL, 0, 0, DATA_COMPGEN(0x004ef504, winMainHeroesII, "Heroes II"));
     lastError = GetLastError();
     if (gEventHandle == NULL || lastError == ERROR_ALREADY_EXISTS) {
-        sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
-        MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
+        sprintf(gText, DATA_COMPGEN(0x004ef530, winMainOnlyOneCopyOfSMay, "Only one copy of %s may run at a time"), DATA_COMPGEN(0x004ef510, winMainHeroesOfMightAndMagicII, "Heroes of Might and Magic II"));
+        MessageBoxA(NULL, gText, DATA_COMPGEN(0x004ef558, winMainStartupError, "Startup Error"), MB_ICONHAND);
         return 0;
     }
 
@@ -60,7 +60,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     WNDCLASSA appClass;
 
     LogInt(
-        "hInstApp",
+        DATA_COMPGEN(0x004ef568, appInitHInstApp, "hInstApp"),
         reinterpret_cast<i32>(hInstApp),
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -96,7 +96,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
 
     if (previousInstance == NULL) {
         appClass.hCursor = NULL;
-        appClass.hIcon = LoadIconA(instance, "Heroes II");
+        appClass.hIcon = LoadIconA(instance, DATA_COMPGEN(0x004ef574, appInitHeroesII, "Heroes II"));
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
         appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
@@ -140,7 +140,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
             hwndApp,
             WM_SETICON,
             ICON_SMALL,
-            reinterpret_cast<LPARAM>(LoadIconA(instance, "Heroes"))
+            reinterpret_cast<LPARAM>(LoadIconA(instance, DATA_COMPGEN(0x004ef580, appInitHeroes, "Heroes")))
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
@@ -264,7 +264,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (hwndApp == window) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "Are you sure you want to quit?",
+                        DATA_COMPGEN(0x004ef598, appWndProcAreYouSureYouWantTo, "Are you sure you want to quit?"),
                         NORMAL_DIALOG_CONFIRM,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -387,10 +387,10 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     switch (static_cast<KbWinMenuCommand>(command)) {
         case KBWIN_MENU_ABOUT:
             appDialogProc = reinterpret_cast<DLGPROC>(AppAbout);
-            DialogBoxParamA(hInstApp, "HEROES", window, appDialogProc, 0);
+            DialogBoxParamA(hInstApp, DATA_COMPGEN(0x004ef5c0, appCommandHEROES, "HEROES"), window, appDialogProc, 0);
             break;
         case KBWIN_MENU_HELP:
-            WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
+            WinHelpA(hwndApp, DATA_COMPGEN(0x004ef5c8, appCommandHELPHEROES2HLP, ".\\HELP\\HEROES2.HLP"), HELP_FINDER, 0);
             break;
         case KBWIN_MENU_SIZE_640_480:
             ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);

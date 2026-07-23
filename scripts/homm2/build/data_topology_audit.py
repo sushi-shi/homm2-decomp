@@ -7,7 +7,7 @@ from homm2.build.candidate_data_manifest import (
     diagnostics_bytes as candidate_diagnostics_bytes,
     derive_allocations,
 )
-from homm2.build.data_manifest_adapter import SUPPLEMENTAL, build_manifests
+from homm2.build.data_manifest_adapter import build_manifests
 from homm2.build.reviewed_data import (
     CANDIDATE_DIAGNOSTICS,
     REVIEW_QUEUE,
@@ -18,7 +18,7 @@ from homm2.build.reviewed_data import (
 )
 
 
-def audit_candidate_topology(jobs=None, migrate_identities=False):
+def audit_candidate_topology(jobs=None):
     """Build candidates and refresh manifests, proposals, and coverage once."""
     subprocess.run(["python3", "configure.py"], check=True)
     command = ["ninja"]
@@ -27,10 +27,7 @@ def audit_candidate_topology(jobs=None, migrate_identities=False):
     command.append("all")
     subprocess.run(command, check=True)
 
-    manifest_summary = build_manifests(
-        strict=False,
-        migrate_from=SUPPLEMENTAL if migrate_identities else None,
-    )
+    manifest_summary = build_manifests(strict=False)
     canonical = _canonical_union_rows()
     allocations, stats, group_diagnostics = derive_allocations(
         reviewed_rows=canonical)
@@ -55,18 +52,12 @@ def audit_candidate_topology(jobs=None, migrate_identities=False):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--jobs", type=int)
-    parser.add_argument(
-        "--migrate-identities", action="store_true",
-        help=("update compiler-local names only where reviewed candidate section "
-              "topology remains invariant"),
-    )
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     if args.jobs is not None and args.jobs <= 0:
         parser.error("--jobs must be positive")
 
-    summary, stats, groups, coverage, queue = audit_candidate_topology(
-        args.jobs, args.migrate_identities)
+    summary, stats, groups, coverage, queue = audit_candidate_topology(args.jobs)
     blockers = len(groups) + len(coverage) + summary["section_assignment_diagnostics"]
     print(
         "candidate data audit: %d/%d individually evidenced; %d/%d in %d "

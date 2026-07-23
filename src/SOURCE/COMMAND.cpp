@@ -26,20 +26,21 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
+#define COMBAT_NECROMANCY_LEVEL_FACTOR DATA_COMPGEN(0x004eb238, lEVELFACTORConstant, 0.1)
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
-#define COMBAT_SURRENDER_BASE_FACTOR 0.5
-#define COMBAT_SURRENDER_DIPLOMACY_FACTOR 0.2
-#define COMBAT_IDLE_ROLL_DIVISOR 100.0f
-#define COMBAT_STAND_DELAY_BASE_FACTOR 0.25
+#define COMBAT_SURRENDER_BASE_FACTOR                                                   \
+    DATA_COMPGEN(0x004eb240, combatSharedHalfFactor, 0.5)
+#define COMBAT_SURRENDER_DIPLOMACY_FACTOR DATA_COMPGEN(0x004eb248, dIPLOMACYFACTORConstant, 0.2)
+#define COMBAT_IDLE_ROLL_DIVISOR DATA_COMPGEN(0x004eb258, rOLLDIVISORConstant, 100.0f)
+#define COMBAT_STAND_DELAY_BASE_FACTOR DATA_COMPGEN(0x004eb260, bASEFACTORConstant, 0.25)
 #define COMBAT_STAND_DELAY_RANDOM_FACTOR 0.5
-#define COMBAT_CYCLE_TIMER_FACTOR 150.0f
-#define COMBAT_SOUND_POLL_DELAY 75.0f
-#define COMBAT_DIRECTION_SLOPE_STEEPEST 3.73
-#define COMBAT_DIRECTION_SLOPE_STEEP 1.73
-#define COMBAT_DIRECTION_SLOPE_DIAGONAL 1.0f
-#define COMBAT_DIRECTION_SLOPE_SHALLOW 0.58
-#define COMBAT_DIRECTION_SLOPE_SHALLOWEST 0.27
+#define COMBAT_CYCLE_TIMER_FACTOR DATA_COMPGEN(0x004eb268, tIMERFACTORConstant, 150.0f)
+#define COMBAT_SOUND_POLL_DELAY DATA_COMPGEN(0x004eb208, pOLLDELAYConstant, 75.0f)
+#define COMBAT_DIRECTION_SLOPE_STEEPEST DATA_COMPGEN(0x004eb210, sLOPESTEEPESTConstant, 3.73)
+#define COMBAT_DIRECTION_SLOPE_STEEP DATA_COMPGEN(0x004eb218, sLOPESTEEPConstant, 1.73)
+#define COMBAT_DIRECTION_SLOPE_DIAGONAL DATA_COMPGEN(0x004eb220, sLOPEDIAGONALConstant, 1.0f)
+#define COMBAT_DIRECTION_SLOPE_SHALLOW DATA_COMPGEN(0x004eb228, sLOPESHALLOWConstant, 0.58)
+#define COMBAT_DIRECTION_SLOPE_SHALLOWEST DATA_COMPGEN(0x004eb230, sLOPESHALLOWESTConstant, 0.27)
 
 namespace {
 
@@ -1017,7 +1018,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            "You have no hero to cast a spell.",
+                            DATA_COMPGEN(0x004f0860, processCombatMsgYouHaveNoHeroToCast, "You have no hero to cast a spell."),
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1030,8 +1031,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (IsNegationSphereInEffect() != 0) {
                         NormalDialog(
-                            "The Sphere of Negation artifact is in effect for this battle, "
-                            "disabling all combat spells.",
+                            DATA_COMPGEN(0x004f0884, processCombatMsgTheSphereOfNegationArtifactIs, "The Sphere of Negation artifact is in effect for this battle, "
+                            "disabling all combat spells."),
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1044,7 +1045,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (m_heroCastSpell[IDX(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
-                            "You have already cast a spell this round.",
+                            DATA_COMPGEN(0x004f08e0, processCombatMsgYouHaveAlreadyCastASpell, "You have already cast a spell this round."),
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1406,8 +1407,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
             if (IsNegationSphereInEffect() != 0) {
                 NormalDialog(
-                    "The Sphere of Negation artifact is in effect for this battle, disabling all "
-                    "combat spells.",
+                    DATA_COMPGEN(0x004f090c, doCommandTheSphereOfNegationArtifactIs, "The Sphere of Negation artifact is in effect for this battle, disabling all "
+                    "combat spells."),
                     NORMAL_DIALOG_INFO,
                     NORMAL_DIALOG_NO_RESOURCE,
                     NORMAL_DIALOG_NO_VALUE,
@@ -1425,7 +1426,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
-                "Are you sure you want to retreat?",
+                DATA_COMPGEN(0x004f0968, doCommandAreYouSureYouWantTo, "Are you sure you want to retreat?"),
                 NORMAL_DIALOG_CONFIRM,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
@@ -1445,7 +1446,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 if (gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
-                        "You don't have enough gold!",
+                        DATA_COMPGEN(0x004f098c, doCommandYouDonTHaveEnoughGold, "You don't have enough gold!"),
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -1550,14 +1551,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             case WIN_LOSE_ANIMATION_FLEE:
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile, "cmbtfle2.icn");
+                    sprintf(iconFile, DATA_COMPGEN(0x004f09a8, winCombatHandlerCmbtfle2Icn, "cmbtfle2.icn"));
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile, "cmbtfle3.icn");
+                    sprintf(iconFile, DATA_COMPGEN(0x004f09b8, winCombatHandlerCmbtfle3Icn, "cmbtfle3.icn"));
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1576,14 +1577,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             default:
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile, "cmbtlos2.icn");
+                    sprintf(iconFile, DATA_COMPGEN(0x004f09c8, winCombatHandlerCmbtlos2Icn, "cmbtlos2.icn"));
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile, "cmbtlos3.icn");
+                    sprintf(iconFile, DATA_COMPGEN(0x004f09d8, winCombatHandlerCmbtlos3Icn, "cmbtlos3.icn"));
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1642,7 +1643,7 @@ void combatManager::ShowWinLoseArtifact(
     tag_message message;
     char* capturedArtifactName;
 
-    sprintf(gText, "You have captured an enemy artifact!");
+    sprintf(gText, DATA_COMPGEN(0x004f09ec, showWinLoseArtifactYouHaveCapturedAnEnemyArtifact, "You have captured an enemy artifact!"));
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = WIN_LOSE_TEXT_ID;
@@ -1654,7 +1655,7 @@ void combatManager::ShowWinLoseArtifact(
         ARTIFACT_BACKGROUND_Y,
         ARTIFACT_BACKGROUND_SIZE,
         ARTIFACT_BACKGROUND_SIZE,
-        "winloseb.icn",
+        DATA_COMPGEN(0x004f0a14, showWinLoseArtifactWinlosebIcn, "winloseb.icn"),
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_ICON_ID,
@@ -1670,7 +1671,7 @@ void combatManager::ShowWinLoseArtifact(
         ARTIFACT_ICON_Y,
         ARTIFACT_ICON_SIZE,
         ARTIFACT_ICON_SIZE,
-        "artifact.icn",
+        DATA_COMPGEN(0x004f0a24, showWinLoseArtifactArtifactIcn, "artifact.icn"),
         IDX(artifact) + 1,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_IMAGE_ID,
@@ -1681,7 +1682,7 @@ void combatManager::ShowWinLoseArtifact(
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
-    capturedArtifactName = static_cast<char*>(H2_ALLOC(ARTIFACT_NAME_CAPACITY, 1707));
+    capturedArtifactName = static_cast<char*>(H2_ALLOC_AT(ARTIFACT_NAME_CAPACITY, DATA_COMPGEN(0x004f0a34, showWinLoseArtifactSourceFile, RETAIL_FILE), 1707));
     sprintf(capturedArtifactName, gArtifactNames[IDX(artifact)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         ARTIFACT_TEXT_X,
@@ -1689,7 +1690,7 @@ void combatManager::ShowWinLoseArtifact(
         CASUALTY_WINDOW_WIDTH,
         ARTIFACT_TEXT_HEIGHT,
         capturedArtifactName,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f0a60, showWinLoseArtifactSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         WIN_LOSE_ARTIFACT_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1701,7 +1702,7 @@ void combatManager::ShowWinLoseArtifact(
 
     gpCombatManager->m_winLoseWindow->DrawWindow();
     SAMPLE2 pickupSample = NULL_SAMPLE2;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, DATA_COMPGEN(0x004f0a70, showWinLoseArtifactPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
     WaitEndSample(pickupSample, -1);
 }
@@ -1717,7 +1718,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         SKELETON_ICON_Y,
         SKELETON_ICON_WIDTH,
         SKELETON_ICON_HEIGHT,
-        "mons32.icn",
+        DATA_COMPGEN(0x004f0a84, showSkeletonsMons32Icn, "mons32.icn"),
         IDX(CREATURE_SKELETON),
         ICON_DRAW_NORMAL,
         WIN_LOSE_SKELETON_ICON_ID,
@@ -1727,15 +1728,15 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
 
-    skeletonCount = static_cast<char*>(H2_ALLOC(SKELETON_COUNT_CAPACITY, 1755));
-    sprintf(skeletonCount, "%d", giSkeletonsCreated);
+    skeletonCount = static_cast<char*>(H2_ALLOC_AT(SKELETON_COUNT_CAPACITY, DATA_COMPGEN(0x004f0a90, showSkeletonsSourceFile, RETAIL_FILE), 1755));
+    sprintf(skeletonCount, DATA_COMPGEN(0x004f0abc, showSkeletonsD, "%d"), giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         SKELETON_TEXT_X,
         SKELETON_TEXT_Y,
         SKELETON_TEXT_WIDTH,
         SKELETON_TEXT_HEIGHT,
         skeletonCount,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f0ac0, showSkeletonsSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         WIN_LOSE_SKELETON_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1749,17 +1750,17 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (giSkeletonsCreated > 1) {
         sprintf(
             gText,
-            "Practicing the dark arts of necromancy, you are able to "
+            DATA_COMPGEN(0x004f0ad0, showSkeletonsPracticingTheDarkArtsOfNecromancy, "Practicing the dark arts of necromancy, you are able to "
             "raise %d of the enemy's dead to return under your service "
-            "as Skeletons.",
+            "as Skeletons."),
             giSkeletonsCreated
         );
     } else {
         sprintf(
             gText,
-            "Practicing the dark arts of necromancy, you are able to "
+            DATA_COMPGEN(0x004f0b50, showSkeletonsPracticingTheDarkArtsOfNecromancy2, "Practicing the dark arts of necromancy, you are able to "
             "raise one of the enemy's dead to return under your service "
-            "as a Skeleton."
+            "as a Skeleton.")
         );
     }
     message.type = MESSAGE_WIDGET;
@@ -1770,7 +1771,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 pickupSample = NULL_SAMPLE2;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, DATA_COMPGEN(0x004f0bd4, showSkeletonsPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
     WaitEndSample(pickupSample, -1);
 }
@@ -1789,7 +1790,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         y,
         0,
         0,
-        "townwind.icn",
+        DATA_COMPGEN(0x004f0be8, showEagleEyeSpellTownwindIcn, "townwind.icn"),
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_BACKGROUND_ID,
@@ -1804,7 +1805,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         y + EAGLE_ICON_Y_OFFSET,
         EAGLE_ICON_WIDTH,
         EAGLE_ICON_HEIGHT,
-        "spells.icn",
+        DATA_COMPGEN(0x004f0bf8, showEagleEyeSpellSpellsIcn, "spells.icn"),
         static_cast<i16>(gsSpellInfo[IDX(displayedSpell)].iconIndex),
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
@@ -1814,15 +1815,15 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     if (m_winLoseBottomWidgets[1] == NULL)
         MemError();
 
-    spellName = static_cast<char*>(H2_ALLOC(EAGLE_SPELL_NAME_CAPACITY, 1828));
-    sprintf(spellName, "%s", gSpellNames[IDX(displayedSpell)]);
+    spellName = static_cast<char*>(H2_ALLOC_AT(EAGLE_SPELL_NAME_CAPACITY, DATA_COMPGEN(0x004f0c04, showEagleEyeSpellSourceFile, RETAIL_FILE), 1828));
+    sprintf(spellName, DATA_COMPGEN(0x004f0c30, showEagleEyeSpellS, "%s"), gSpellNames[IDX(displayedSpell)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + EAGLE_TEXT_X_OFFSET,
         y + EAGLE_TEXT_Y_OFFSET,
         EAGLE_TEXT_WIDTH,
         EAGLE_TEXT_HEIGHT,
         spellName,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f0c34, showEagleEyeSpellSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         WIN_LOSE_EAGLE_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1836,8 +1837,8 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
     sprintf(
         gText,
-        "Through eagle-eyed observation, %s is able to learn the magic "
-        "spell '%s'.",
+        DATA_COMPGEN(0x004f0c44, showEagleEyeSpellThroughEagleEyedObservationSIs, "Through eagle-eyed observation, %s is able to learn the magic "
+        "spell '%s'."),
         m_heroes[IDX(m_combatResult)]->m_name,
         gSpellNames[IDX(displayedSpell)]
     );
@@ -1849,7 +1850,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 playedSample = NULL_SAMPLE2;
-    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, DATA_COMPGEN(0x004f0c90, showEagleEyeSpellPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playedSample = LoadPlaySample(gText);
     WaitEndSample(playedSample, -1);
 }
@@ -1897,15 +1898,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         }
     }
 
-    text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_HEADING_CAPACITY, 1902));
-    sprintf(text_27, "Battlefield Casualties");
+    text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0ca4, showDeadArmiesSourceFile, RETAIL_FILE), 1902));
+    sprintf(text_27, DATA_COMPGEN(0x004f0cd0, showDeadArmiesBattlefieldCasualties, "Battlefield Casualties"));
     m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] = new textWidget(
         CASUALTY_TITLE_X,
         CASUALTY_TITLE_Y,
         CASUALTY_WINDOW_WIDTH,
         CASUALTY_TEXT_HEIGHT,
         text_27,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f0ce8, showDeadArmiesSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         CASUALTY_TEXT_WIDGET_ID,
         WIDGET_KIND_TEXT,
@@ -1920,15 +1921,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             y_29 = CASUALTY_ATTACKER_Y;
         else
             y_29 = CASUALTY_DEFENDER_Y;
-        text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_HEADING_CAPACITY, 1923));
-        sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? "Attacker" : "Defender");
+        text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0cf8, showDeadArmiesSourceFile2, RETAIL_FILE), 1923));
+        sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? DATA_COMPGEN(0x004f0d24, showDeadArmiesAttacker, "Attacker") : DATA_COMPGEN(0x004f0d30, showDeadArmiesDefender, "Defender"));
         m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] = new textWidget(
             CASUALTY_TITLE_X,
             y_29 + CASUALTY_SIDE_LABEL_Y_OFFSET,
             CASUALTY_WINDOW_WIDTH,
             CASUALTY_TEXT_HEIGHT,
             text_27,
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004f0d3c, showDeadArmiesSmalfontFnt2, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             CASUALTY_TEXT_WIDGET_ID,
             WIDGET_KIND_TEXT,
@@ -1939,15 +1940,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         window->AddWidget(m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9], -1);
 
         if (casualtyQuantity_0[side_9] <= 0) {
-            text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_NONE_CAPACITY, 1942));
-            sprintf(text_27, "None");
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_NONE_CAPACITY, DATA_COMPGEN(0x004f0d4c, showDeadArmiesSourceFile3, RETAIL_FILE), 1942));
+            sprintf(text_27, DATA_COMPGEN(0x004f0d78, showDeadArmiesNone, "None"));
             m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 CASUALTY_TITLE_X,
                 y_29 + CASUALTY_NONE_Y_OFFSET,
                 CASUALTY_WINDOW_WIDTH,
                 CASUALTY_TEXT_HEIGHT,
                 text_27,
-                "smalfont.fnt",
+                DATA_COMPGEN(0x004f0d80, showDeadArmiesSmalfontFnt3, "smalfont.fnt"),
                 FONT_DRAW_DEFAULT,
                 side_9 * CASUALTY_WIDGET_ID_STRIDE + CASUALTY_TEXT_WIDGET_ID_FIRST,
                 WIDGET_KIND_TEXT,
@@ -1961,7 +1962,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             );
         }
 
-        monsterIcons_2 = gpResourceManager->GetIcon("mons32.icn");
+        monsterIcons_2 = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0d90, showDeadArmiesMons32Icn, "mons32.icn"));
         displayedCount_11 = casualtyQuantity_0[side_9] < CASUALTY_DISPLAY_LIMIT
                                 ? casualtyQuantity_0[side_9]
                                 : CASUALTY_DISPLAY_LIMIT;
@@ -2003,7 +2004,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                         + CASUALTY_ICON_BASE_Y_OFFSET,
                     CASUALTY_ICON_WIDTH,
                     CASUALTY_ICON_HEIGHT,
-                    "mons32.icn",
+                    DATA_COMPGEN(0x004f0d9c, showDeadArmiesMons32Icn2, "mons32.icn"),
                     *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
                     ICON_DRAW_NORMAL,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_ICON_WIDGET_ID_FIRST,
@@ -2014,10 +2015,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 == NULL)
                 MemError();
 
-            text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_QUANTITY_CAPACITY, 1986));
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_QUANTITY_CAPACITY, DATA_COMPGEN(0x004f0da8, showDeadArmiesSourceFile4, RETAIL_FILE), 1986));
             sprintf(
                 text_27,
-                "%d",
+                DATA_COMPGEN(0x004f0dd4, showDeadArmiesD, "%d"),
                 *(&casualtyQuantity_0[COMBAT_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + armyIndex_8)
             );
@@ -2028,7 +2029,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     CASUALTY_QUANTITY_WIDTH,
                     CASUALTY_QUANTITY_HEIGHT,
                     text_27,
-                    "smalfont.fnt",
+                    DATA_COMPGEN(0x004f0dd8, showDeadArmiesSmalfontFnt4, "smalfont.fnt"),
                     FONT_DRAW_DEFAULT,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_TEXT_WIDGET_ID_FIRST,
                     WIDGET_KIND_TEXT,
@@ -2126,7 +2127,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 
     m_nonVisualCombat = 1;
     FreeArmies();
-    CombatMessage("", 1, 1, 0);
+    CombatMessage(DATA_COMPGEN(0x004f0de8, doVictoryEmptyString, ""), 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     fadeCount = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
@@ -2220,7 +2221,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
-                m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
+                m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, DATA_COMPGEN(0x004f0dec, doVictoryWincmbtBin, "wincmbt.bin"));
                 if (m_winLoseWindow == NULL)
                     MemError();
 
@@ -2309,17 +2310,17 @@ void combatManager::DoLoseWindow(void) {
 
     gbShowingLoseWindow = true;
     if (gbCombatSurrender != 0) {
-        sprintf(animationFile_j, "cmbtsurr.icn");
+        sprintf(animationFile_j, DATA_COMPGEN(0x004f0df8, doLoseWindowCmbtsurrIcn, "cmbtsurr.icn"));
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_CYCLE_SECOND;
     } else if (gbRetreatWin != 0) {
-        sprintf(animationFile_j, "cmbtfle1.icn");
+        sprintf(animationFile_j, DATA_COMPGEN(0x004f0e08, doLoseWindowCmbtfle1Icn, "cmbtfle1.icn"));
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_FLEE;
     } else {
-        sprintf(animationFile_j, "cmbtlos1.icn");
+        sprintf(animationFile_j, DATA_COMPGEN(0x004f0e18, doLoseWindowCmbtlos1Icn, "cmbtlos1.icn"));
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_LOSS;
     }
 
-    m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
+    m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, DATA_COMPGEN(0x004f0e28, doLoseWindowWincmbtBin, "wincmbt.bin"));
     if (m_winLoseWindow == NULL)
         MemError();
 
@@ -2398,7 +2399,7 @@ i32 combatManager::DoSurrender(void) {
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_BASE_FACTOR);
     giSurrenderCost = static_cast<i32>(
         giSurrenderCost
-        * (1.0
+        * (DATA_COMPGEN(0x004eb250, doSurrenderConstant, 1.0)
            - IDX(m_heroes[IDX(m_currentSide)]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
@@ -2406,7 +2407,7 @@ i32 combatManager::DoSurrender(void) {
     dialogType = SURRENDER_DIALOG_TYPE;
     dialogResult = SURRENDER_DIALOG_ACCEPT_RESULT;
     textWidth_t = SURRENDER_TEXT_WIDTH;
-    window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, "surrendr.bin");
+    window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, DATA_COMPGEN(0x004f0e34, doSurrenderSurrendrBin, "surrendr.bin"));
     if (window == NULL)
         MemError();
     message.type = MESSAGE_WIDGET;
@@ -2414,7 +2415,7 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_PORTRAIT_RESOURCE_ID;
     sprintf(
         gText,
-        "port%04d.icn",
+        DATA_COMPGEN(0x004f0e44, doSurrenderPort04dIcn, "port%04d.icn"),
         static_cast<i32>(m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_portrait)
     );
     message.payload.widget.data.text = gText;
@@ -2440,8 +2441,8 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
-        "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
-        "for the price of %d gold.\"",
+        DATA_COMPGEN(0x004f0e54, doSurrenderSStatesIWillAcceptYour, "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
+        "for the price of %d gold.\""),
         m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
     );
@@ -2571,7 +2572,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     }
     if (giNextAction != ACTION_NONE) {
         LogInt(
-            "Process Act",
+            DATA_COMPGEN(0x004f0ec4, processNextActionProcessAct, "Process Act"),
             IDX(giNextAction),
             giNextActionGridIndex,
             giNextActionGridIndex2,
@@ -2598,7 +2599,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         actionData[IDX(ACTION_DATA_GRID)] = giNextActionGridIndex;
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
         LogInt(
-            "About to T",
+            DATA_COMPGEN(0x004f0ed0, processNextActionAboutToT, "About to T"),
             iCombatControlNetPos[IDX(OppositeCombatSide(m_currentSide))],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -2616,7 +2617,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             1,
             REMOTE_MESSAGE_DEFAULT
         );
-        LogStr("Post T");
+        LogStr(DATA_COMPGEN(0x004f0edc, processNextActionPostT, "Post T"));
         if (transmitResult == 0)
             ShutDown(NULL);
     }
@@ -2907,7 +2908,9 @@ void combatManager::CycleCombatScreen(void) {
                         roll =
                             static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
                             / COMBAT_IDLE_ROLL_DIVISOR;
-                        accumulatedChance = 0.0f;
+                        accumulatedChance = DATA_COMPGEN(
+                            0x004eb25c, standingAnimationInitialChance, 0.0f
+                        );
                         currentArmy->m_standingAnimation =
                             currentArmy->m_frameInfo.standingAnimationCount - 1;
                         for (animationIndex = 0;
@@ -3107,49 +3110,49 @@ void combatManager::ViewBallista(i32 quickView) {
     char description[VIEW_DESCRIPTION_SIZE];
 
     m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&archerCount, &attackBonus);
-    sprintf(gText, "Ballista");
-    strcpy(description, "");
+    sprintf(gText, DATA_COMPGEN(0x004f0ee4, viewBallistaBallista, "Ballista"));
+    strcpy(description, DATA_COMPGEN(0x004f0ef0, viewBallistaEmptyString, ""));
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
-        sprintf(description, "\n\nThe %s is destroyed.", "Ballista");
+        sprintf(description, DATA_COMPGEN(0x004f0f00, viewBallistaTheSIsDestroyed, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f0ef4, viewBallistaBallista2, "Ballista"));
     } else if (attackBonus > 0) {
         sprintf(
             description,
-            "\n\nThe %s fires with the strength of %d Archers, each "
-            "with a +%d bonus to their attack skill.",
-            "Ballista",
+            DATA_COMPGEN(0x004f0f24, viewBallistaTheSFiresWithTheStrength, "\n\nThe %s fires with the strength of %d Archers, each "
+            "with a +%d bonus to their attack skill."),
+            DATA_COMPGEN(0x004f0f18, viewBallistaBallista3, "Ballista"),
             archerCount,
             attackBonus
         );
     } else {
         sprintf(
             description,
-            "\n\nThe %s fires with the strength of %d Archers.",
-            "Ballista",
+            DATA_COMPGEN(0x004f0f90, viewBallistaTheSFiresWithTheStrength2, "\n\nThe %s fires with the strength of %d Archers."),
+            DATA_COMPGEN(0x004f0f84, viewBallistaBallista4, "Ballista"),
             archerCount
         );
     }
     strcat(gText, description);
 
-    strcpy(description, "");
+    strcpy(description, DATA_COMPGEN(0x004f0fc0, viewBallistaEmptyString2, ""));
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
+            sprintf(description, DATA_COMPGEN(0x004f0fd0, viewBallistaTheSIsDestroyed2, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f0fc4, viewBallistaLeftTurret, "Left Turret"));
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
-                    "\n\nThe %s fires with the strength of %d Archers, "
-                    "each with a +%d bonus to their attack skill.",
-                    "Left Turret",
+                    DATA_COMPGEN(0x004f0ff4, viewBallistaTheSFiresWithTheStrength3, "\n\nThe %s fires with the strength of %d Archers, "
+                    "each with a +%d bonus to their attack skill."),
+                    DATA_COMPGEN(0x004f0fe8, viewBallistaLeftTurret2, "Left Turret"),
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackBonus
                 );
             } else {
                 sprintf(
                     description,
-                    "\n\nThe %s fires with the strength of %d Archers.",
-                    "Left Turret",
+                    DATA_COMPGEN(0x004f1060, viewBallistaTheSFiresWithTheStrength4, "\n\nThe %s fires with the strength of %d Archers."),
+                    DATA_COMPGEN(0x004f1054, viewBallistaLeftTurret3, "Left Turret"),
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }
@@ -3158,25 +3161,25 @@ void combatManager::ViewBallista(i32 quickView) {
     }
 
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
-        strcpy(description, "");
+        strcpy(description, DATA_COMPGEN(0x004f1090, viewBallistaEmptyString3, ""));
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
+            sprintf(description, DATA_COMPGEN(0x004f10a4, viewBallistaTheSIsDestroyed3, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f1094, viewBallistaRightTurret, "Right Turret"));
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
-                    "\n\nThe %s fires with the strength of %d Archers, "
-                    "each with a +%d bonus to their attack skill.",
-                    "Right Turret",
+                    DATA_COMPGEN(0x004f10cc, viewBallistaTheSFiresWithTheStrength5, "\n\nThe %s fires with the strength of %d Archers, "
+                    "each with a +%d bonus to their attack skill."),
+                    DATA_COMPGEN(0x004f10bc, viewBallistaRightTurret2, "Right Turret"),
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackBonus
                 );
             } else {
                 sprintf(
                     description,
-                    "\n\nThe %s fires with the strength of %d Archers.",
-                    "Right Turret",
+                    DATA_COMPGEN(0x004f113c, viewBallistaTheSFiresWithTheStrength6, "\n\nThe %s fires with the strength of %d Archers."),
+                    DATA_COMPGEN(0x004f112c, viewBallistaRightTurret3, "Right Turret"),
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }

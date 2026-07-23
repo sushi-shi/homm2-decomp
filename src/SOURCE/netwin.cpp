@@ -27,8 +27,8 @@ DATA(0x005173ac) static u8 gNbMaxSess = NETBIOS_INVALID_ID;
 DATA(0x005173b0) static u8 gNbLocalNum = 0; // local netbios name number
 DATA(0x005173b4)
 static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
-DATA(0x005173c0) static char* gNbGroupName = "Empire Too ";
-DATA(0x005173c4) static char* gNbListenName = "*";
+DATA(0x005173c0) static char* gNbGroupName = DATA_COMPGEN(0x005173c8, gNbGroupNameEmpireToo, "Empire Too ");
+DATA(0x005173c4) static char* gNbListenName = DATA_COMPGEN(0x005173d4, gNbListenNameEmptyString, "*");
 
 
 DATA(0x0052ae68) static tag_Anchor gNbFreeQueueRuntime;
@@ -107,8 +107,8 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(NULL, 1, 0, NULL);
         memset(&localNcb, 0, sizeof(localNcb));
-        statusBuffer = static_cast<u8*>(H2_ALLOC(
-            NETBIOS_ADAPTER_STATUS_SIZE, gNbInitSourceLineBase + 40
+        statusBuffer = static_cast<u8*>(H2_ALLOC_AT(
+            NETBIOS_ADAPTER_STATUS_SIZE, DATA_COMPGEN(0x005173dc, functionSourceFile, RETAIL_FILE), gNbInitSourceLineBase + 40
         ));
         localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
         localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
@@ -122,7 +122,7 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
             localNcb.callName[RESET_NAME_LIMIT_INDEX] = RESET_NAME_LIMIT;
             Netbios(&localNcb);
         }
-        H2_FREE(statusBuffer, gNbInitSourceLineBase + 54);
+        H2_FREE_AT(statusBuffer, DATA_COMPGEN(0x00517408, functionSourceFile2, RETAIL_FILE), gNbInitSourceLineBase + 54);
         gNbShutdown = 0;
         return 0;
     }
@@ -154,9 +154,9 @@ extern "C" void __fastcall nb_term(void) {
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != NULL)
-        H2_FREE(node, gNbTermSourceLineBase + 31);
+        H2_FREE_AT(node, DATA_COMPGEN(0x00517438, functionSourceFile3, RETAIL_FILE), gNbTermSourceLineBase + 31);
     while ((node = pop_node(&gNbFreeQueue)) != NULL)
-        H2_FREE(node, gNbTermSourceLineBase + 35);
+        H2_FREE_AT(node, DATA_COMPGEN(0x00517464, functionSourceFile4, RETAIL_FILE), gNbTermSourceLineBase + 35);
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -167,7 +167,7 @@ extern "C" void __fastcall nb_term(void) {
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
     while ((node = pop_node(&gNbRcvQueue)) != NULL)
-        H2_FREE(node, gNbTermSourceLineBase + 50);
+        H2_FREE_AT(node, DATA_COMPGEN(0x00517490, functionSourceFile5, RETAIL_FILE), gNbTermSourceLineBase + 50);
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
@@ -187,7 +187,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         else
             len = node->len;
         memcpy(buf, node->data, len);
-        H2_FREE(node, gNbReceiveSourceLineBase + 11);
+        H2_FREE_AT(node, DATA_COMPGEN(0x005174c0, functionSourceFile6, RETAIL_FILE), gNbReceiveSourceLineBase + 11);
         return len;
     }
     return 0;
@@ -204,8 +204,8 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     }
     if (!HAS(gNetStatus[session], NETBIOS_SESSION_ACTIVE))
         return IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE);
-    node = static_cast<tag_Node*>(H2_ALLOC(
-        len + NETBIOS_PACKET_HEADER_SIZE, gNbSendSourceLineBase + 15
+    node = static_cast<tag_Node*>(H2_ALLOC_AT(
+        len + NETBIOS_PACKET_HEADER_SIZE, DATA_COMPGEN(0x005174f0, functionSourceFile7, RETAIL_FILE), gNbSendSourceLineBase + 15
     ));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);
@@ -397,7 +397,7 @@ void nb_thr_ctl(void) {
                             case NETBIOS_RESULT_PENDING:
                                 ProcessAssert(
                                     0,
-                                    RETAIL_FILE,
+                                    DATA_COMPGEN(0x00517520, thrCtlIProjectsHeroesProgSOURCENetwin, RETAIL_FILE),
                                     gNbThreadSourceLineBase + 83
                                 );
                                 break;
@@ -411,7 +411,7 @@ void nb_thr_ctl(void) {
                         }
                     }
                 }
-                H2_FREE(node, gNbThreadSourceLineBase + 96);
+                H2_FREE_AT(node, DATA_COMPGEN(0x0051754c, nb_thr_ctlSourceFile, RETAIL_FILE), gNbThreadSourceLineBase + 96);
             }
         }
     }
@@ -443,7 +443,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(
         &gNbSessNcb[gNbMaxSess] == ncb,
-        RETAIL_FILE,
+        DATA_COMPGEN(0x0051757c, nameDoneIProjectsHeroesProgSOURCENetwin, RETAIL_FILE),
         gNbAddNameSourceLineBase + 3
     );
     switch (ncb->returnCode) {
@@ -467,7 +467,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
         case NETBIOS_RESULT_CANCELLED:
             break;
         default:
-            sprintf(gText, "Add Name Error %02x\n", IDX(ncb->returnCode));
+            sprintf(gText, DATA_COMPGEN(0x005175a8, nameDoneAddNameError02x, "Add Name Error %02x\n"), IDX(ncb->returnCode));
             ShutDown(gText);
             gNetStatus[gNbMaxSess] |= NETBIOS_SESSION_ERROR;
             break;
@@ -579,7 +579,7 @@ static void __fastcall nb_arm_recv(i32 session) {
     for (;;) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
-            RETAIL_FILE,
+            DATA_COMPGEN(0x005175c4, armRecvIProjectsHeroesProgSOURCENetwin, RETAIL_FILE),
             gNbArmReceiveSourceLineBase + 5
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
@@ -633,8 +633,8 @@ static void __fastcall nb_recv_complete(i32 session) {
             switch (gNbSessNcb[session].returnCode) {
                 case NETBIOS_RESULT_SUCCESS:
                     node = static_cast<tag_Node*>(
-                        H2_ALLOC(
-                            gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE,
+                        H2_ALLOC_AT(
+                            gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, DATA_COMPGEN(0x005175f4, nb_recv_completeSourceFile, RETAIL_FILE),
                             gNbReceiveCompleteSourceLineBase + 16
                         )
                     );

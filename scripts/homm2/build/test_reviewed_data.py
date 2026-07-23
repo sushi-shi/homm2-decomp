@@ -137,7 +137,7 @@ class ReviewedDataTest(unittest.TestCase):
             stamp = target / ".reviewed-data-stamp.json"
             stamp.write_text('{"mode": "canonical", "digest": "old"}\n')
             inputs = [root / name for name in (
-                "source.tsv", "supplement.tsv", "data.tsv", "sections.tsv",
+                "source.tsv", "data.tsv", "sections.tsv",
                 "breakpoints.json", "contrib.tsv", "coverage.tsv", "coverage.json",
                 "game.exe", "game.pdb")]
             for path in inputs:
@@ -147,16 +147,15 @@ class ReviewedDataTest(unittest.TestCase):
             with (mock.patch("homm2.build.reviewed_data.TARGET", target),
                   mock.patch("homm2.build.reviewed_data.STAMP", stamp),
                   mock.patch("homm2.build.reviewed_data.DATA_SOURCE_MANIFEST", inputs[0]),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_SUPPLEMENTAL", inputs[1]),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_MANIFEST", inputs[2]),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_SECTION_MANIFEST", inputs[3]),
-                  mock.patch("homm2.build.reviewed_data.DATA_BREAKPOINTS", inputs[4]),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_CONTRIBUTION_MANIFEST", inputs[5]),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_COVERAGE", inputs[6]),
+                  mock.patch("homm2.build.reviewed_data.CANONICAL_MANIFEST", inputs[1]),
+                  mock.patch("homm2.build.reviewed_data.CANONICAL_SECTION_MANIFEST", inputs[2]),
+                  mock.patch("homm2.build.reviewed_data.DATA_BREAKPOINTS", inputs[3]),
+                  mock.patch("homm2.build.reviewed_data.CANONICAL_CONTRIBUTION_MANIFEST", inputs[4]),
+                  mock.patch("homm2.build.reviewed_data.CANONICAL_COVERAGE", inputs[5]),
                   mock.patch("homm2.build.reviewed_data.CANONICAL_COVERAGE_DIAGNOSTICS",
-                             inputs[7]),
-                  mock.patch("homm2.build.reviewed_data.EXE", inputs[8]),
-                  mock.patch("homm2.build.reviewed_data.PDB", inputs[9]),
+                             inputs[6]),
+                  mock.patch("homm2.build.reviewed_data.EXE", inputs[7]),
+                  mock.patch("homm2.build.reviewed_data.PDB", inputs[8]),
                   mock.patch("homm2.build.reviewed_data._canonical_identity_inputs",
                              return_value={"mode": "canonical", "digest": "new"})):
                 with self.assertRaisesRegex(RuntimeError, "regenerate.*explicitly"):
@@ -168,8 +167,6 @@ class ReviewedDataTest(unittest.TestCase):
             data_manifest = root / "data.tsv"
             data_manifest.write_bytes(b"data\n")
             contribution_manifest = root / "contrib.tsv"
-            supplemental = root / "reviewed-supplemental.tsv"
-            write_symbol_manifest(supplemental, [])
             diagnostics = root / "diagnostics.json"
             stats = DerivationStats(candidate_definitions=1, open_groups=1)
             open_group = GroupDiagnostic("SOURCE/Test", "data", ("unmapped_definition",),
@@ -177,8 +174,6 @@ class ReviewedDataTest(unittest.TestCase):
             with (mock.patch("homm2.build.reviewed_data.derive_allocations",
                              return_value=([], stats, [open_group])),
                   mock.patch("homm2.build.reviewed_data.CANONICAL_MANIFEST", data_manifest),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_SUPPLEMENTAL",
-                             supplemental),
                   mock.patch("homm2.build.reviewed_data.CANONICAL_CONTRIBUTION_MANIFEST",
                              contribution_manifest),
                   mock.patch("homm2.build.reviewed_data.CANDIDATE_DIAGNOSTICS", diagnostics),
@@ -193,19 +188,16 @@ class ReviewedDataTest(unittest.TestCase):
                 _stats, open_groups = promote_canonical_topology()
             self.assertEqual(open_groups, [open_group])
             self.assertTrue(diagnostics.is_file())
-            build.assert_called_once_with(
-                supplemental=supplemental, migrate_from=None, strict=False)
+            build.assert_called_once_with(strict=False)
             self.assertFalse(contribution_manifest.exists())
 
     def test_review_queue_contains_only_noncanonical_evidenced_real_rows(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             source = root / "source.tsv"
-            supplemental = root / "supplemental.tsv"
             combined = root / "combined.tsv"
             canonical = symbol_row("?gCanonical@@3HA", "SOURCE/Test", 0x1000)
             write_symbol_manifest(source, [canonical])
-            write_symbol_manifest(supplemental, [])
             write_symbol_manifest(combined, [canonical])
             open_candidate = candidate("private$S1", 0x1100)
             diagnostic = GroupDiagnostic(
@@ -216,7 +208,7 @@ class ReviewedDataTest(unittest.TestCase):
             payload, stats = review_queue_bytes(
                 [candidate("?gCanonical@@3HA", 0x1000),
                  candidate("const_00110000", 0x1200)],
-                [diagnostic], source, supplemental, combined)
+                [diagnostic], source, combined)
 
             lines = [line for line in payload.decode().splitlines()
                      if line and not line.startswith("#")]
@@ -238,23 +230,20 @@ class ReviewedDataTest(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             source = root / "source.tsv"
-            supplemental = root / "supplemental.tsv"
             combined = root / "combined.tsv"
             write_symbol_manifest(
                 source, [symbol_row("?gCanonical@@3HA", "SOURCE/Test", 0x1000)])
-            write_symbol_manifest(supplemental, [])
             write_symbol_manifest(combined, [])
 
-            with self.assertRaisesRegex(RuntimeError, "not the exact source annotations"):
+            with self.assertRaisesRegex(RuntimeError, "not the exact generated source"):
                 review_queue_bytes(
                     [candidate("private$S1", 0x1100)], [],
-                    source, supplemental, combined)
+                    source, combined)
 
     def test_propose_writes_only_review_queue_and_diagnostics(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             source = root / "source.tsv"
-            supplemental = root / "config" / "supplemental.tsv"
             combined = root / "combined.tsv"
             queue = root / "review-queue.tsv"
             diagnostics_path = root / "candidate-diagnostics.json"
@@ -262,13 +251,12 @@ class ReviewedDataTest(unittest.TestCase):
             target = root / "delink" / "SOURCE" / "Test.c.obj"
             canonical = symbol_row("?gCanonical@@3HA", "SOURCE/Test", 0x1000)
             write_symbol_manifest(source, [canonical])
-            write_symbol_manifest(supplemental, [])
             write_symbol_manifest(combined, [canonical])
             coverage.parent.mkdir(parents=True, exist_ok=True)
             coverage.write_bytes(b"canonical coverage\n")
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(b"fixed target")
-            protected = [source, supplemental, combined, coverage, target]
+            protected = [source, combined, coverage, target]
             before = {path: path.read_bytes() for path in protected}
             stats = DerivationStats(candidate_definitions=1, mapped_definitions=1,
                                     closed_groups=1)
@@ -276,7 +264,6 @@ class ReviewedDataTest(unittest.TestCase):
             with (mock.patch("homm2.build.reviewed_data.derive_allocations",
                              return_value=([candidate("private$S1", 0x1100)], stats, [])),
                   mock.patch("homm2.build.reviewed_data.DATA_SOURCE_MANIFEST", source),
-                  mock.patch("homm2.build.reviewed_data.CANONICAL_SUPPLEMENTAL", supplemental),
                   mock.patch("homm2.build.reviewed_data.CANONICAL_MANIFEST", combined),
                   mock.patch("homm2.build.reviewed_data.REVIEW_QUEUE", queue),
                   mock.patch("homm2.build.reviewed_data.CANDIDATE_DIAGNOSTICS",
@@ -293,24 +280,11 @@ class ReviewedDataTest(unittest.TestCase):
             self.assertTrue(diagnostics_path.is_file())
             self.assertEqual(before, {path: path.read_bytes() for path in protected})
 
-    def test_canonical_builder_accepts_only_reviewed_supplemental_input(self):
-        with TemporaryDirectory() as directory:
-            reviewed = Path(directory) / "config" / "reviewed.tsv"
-            write_symbol_manifest(reviewed, [])
-            with (mock.patch("homm2.build.reviewed_data.CANONICAL_SUPPLEMENTAL", reviewed),
-                  mock.patch("homm2.build.reviewed_data.build_data_manifests",
-                             return_value={}) as build):
-                _build_reviewed_canonical_manifests(strict=True)
-            build.assert_called_once_with(
-                supplemental=reviewed, migrate_from=None, strict=True)
-
-            write_symbol_manifest(
-                reviewed, [symbol_row("const_00110000", "SOURCE/Test", 0x1100)])
-            with (mock.patch("homm2.build.reviewed_data.CANONICAL_SUPPLEMENTAL", reviewed),
-                  mock.patch("homm2.build.reviewed_data.build_data_manifests") as build):
-                with self.assertRaisesRegex(RuntimeError, "forbidden synthetic"):
-                    _build_reviewed_canonical_manifests(strict=False)
-            build.assert_not_called()
+    def test_canonical_builder_assembles_source_claims(self):
+        with mock.patch("homm2.build.reviewed_data.build_data_manifests",
+                        return_value={}) as build:
+            _build_reviewed_canonical_manifests(strict=True)
+        build.assert_called_once_with(strict=True)
 
     def test_finalization_refuses_open_groups_before_writing_configs(self):
         stats = DerivationStats(candidate_definitions=1, open_groups=1)

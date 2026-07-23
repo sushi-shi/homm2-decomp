@@ -66,17 +66,17 @@ i32 DoArenaDialog(void) {
     if (windowY_12 > WINDOW_MAX_Y)
         windowY_12 = WINDOW_MAX_Y;
     choice = 0;
-    sprintf(windowName_3, "evntwin%d.bin", windowLines_7);
+    sprintf(windowName_3, DATA_COMPGEN(0x0051dbcc, doArenaDialogEvntwinDBin, "evntwin%d.bin"), windowLines_7);
     arenaWinPtr = new heroWindow(windowX_9, windowY_12, windowName_3);
     if (arenaWinPtr == NULL)
         MemError();
 
     strcpy(
         gText,
-        "You enter the arena and face a pack of vicious lions.  You handily "
+        DATA_COMPGEN(0x0051dbdc, doArenaDialogYouEnterTheArenaAndFace, "You enter the arena and face a pack of vicious lions.  You handily "
         "defeat them, to the wild cheers of the crowd.  Impressed by your "
         "skill, the aged trainer of gladiators agrees to train you in a "
-        "skill of your choice."
+        "skill of your choice.")
     );
     lineCount_3 = bigFont->LineLength(gText, TEXT_WIDTH);
     textHeight_11 = lineCount_3 << TEXT_LINE_SHIFT;
@@ -92,7 +92,7 @@ i32 DoArenaDialog(void) {
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
-            "xprimary.icn",
+            DATA_COMPGEN(0x0051dcb8, doArenaDialogXprimaryIcn, "xprimary.icn"),
             widgetIndex_12 == choice ? widgetIndex_12 + SELECTED_FRAME_OFFSET
                                      : widgetIndex_12,
             ICON_DRAW_NORMAL,
@@ -109,7 +109,7 @@ i32 DoArenaDialog(void) {
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
             gStatNames[widgetIndex_12],
-            "smalfont.fnt",
+            DATA_COMPGEN(0x0051dcc8, doArenaDialogSmalfontFnt, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
             WIDGET_KIND_TEXT,
@@ -235,7 +235,7 @@ void UpdateArenaIcons(void) {
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
-            "xprimary.icn",
+            DATA_COMPGEN(0x0051dcd8, updateArenaIconsXprimaryIcn, "xprimary.icn"),
             widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET : widgetIndex,
             ICON_DRAW_NORMAL,
             widgetIndex + WIDGET_FIRST_ID,

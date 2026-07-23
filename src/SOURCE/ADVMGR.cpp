@@ -953,7 +953,7 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 
-static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
+DATA(0x004eb660) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
 DATA(0x00527eb8) static u16 s_drawGroundTile;
 DATA(0x00527ebc) static i32 s_adjacentMonsterX;
@@ -1059,7 +1059,7 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_adventureWindow == NULL) {
-        m_adventureWindow = new heroWindow(0, 0, "adv_wind.bin");
+        m_adventureWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f57dc, openAdvWindBin, "adv_wind.bin"));
         if (m_adventureWindow == NULL) {
             MemError();
         }
@@ -1068,7 +1068,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            "scroll.icn",
+            DATA_COMPGEN(0x004f57ec, openScrollIcn, "scroll.icn"),
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_LEFT_ID,
@@ -1084,7 +1084,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            "scroll.icn",
+            DATA_COMPGEN(0x004f57f8, openScrollIcn2, "scroll.icn"),
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_RIGHT_ID,
@@ -1098,9 +1098,9 @@ i32 advManager::Open(i32 id) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f5804, openAdvmiceMse, "advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
     } else {
-        gpMouseManager->SetPointer("advmice.mse", 1, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f5810, openAdvmiceMse2, "advmice.mse"), 1, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     if (m_visibilityMap == NULL) {
@@ -1113,16 +1113,16 @@ i32 advManager::Open(i32 id) {
     gpWindowManager->AddWindow(m_adventureWindow, 0, 1);
 
     if (m_groundTiles == NULL) {
-        m_groundTiles = gpResourceManager->GetTileset("ground32.til");
+        m_groundTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f581c, openGround32Til, "ground32.til"));
     }
     if (m_cloudTiles == NULL) {
-        m_cloudTiles = gpResourceManager->GetTileset("clof32.til");
+        m_cloudTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f582c, openClof32Til, "clof32.til"));
     }
     if (m_stoneTiles == NULL) {
-        m_stoneTiles = gpResourceManager->GetTileset("ston.til");
+        m_stoneTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f5838, openStonTil, "ston.til"));
     }
     if (m_cloudOverlayIcon == NULL) {
-        m_cloudOverlayIcon = gpResourceManager->GetIcon("clop32.icn");
+        m_cloudOverlayIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5844, openClop32Icn, "clop32.icn"));
     }
 
     for (resourceIndex = 0; resourceIndex < OBJECT_ICON_COUNT; ++resourceIndex) {
@@ -1134,79 +1134,79 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
-        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon("kngt32.icn");
+        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5850, openKngt32Icn, "kngt32.icn"));
     }
     if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
-        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon("barb32.icn");
+        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f585c, openBarb32Icn, "barb32.icn"));
     }
     if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
-        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon("sorc32.icn");
+        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5868, openSorc32Icn, "sorc32.icn"));
     }
     if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
-        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon("wrlk32.icn");
+        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5874, openWrlk32Icn, "wrlk32.icn"));
     }
     if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
-        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon("wzrd32.icn");
+        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5880, openWzrd32Icn, "wzrd32.icn"));
     }
     if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
-        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon("necr32.icn");
+        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f588c, openNecr32Icn, "necr32.icn"));
     }
     if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
-        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon("boat32.icn");
+        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5898, openBoat32Icn, "boat32.icn"));
     }
     if (m_heroIcons[HERO_ICON_FROTH] == NULL) {
-        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon("froth.icn");
+        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58a4, openFrothIcn, "froth.icn"));
     }
 
     gbLoadingMonoIcon = true;
     if (m_shadowIcon == NULL) {
-        m_shadowIcon = gpResourceManager->GetIcon("shadow32.icn");
+        m_shadowIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58b0, openShadow32Icn, "shadow32.icn"));
     }
     if (m_boatShadowIcon == NULL) {
-        m_boatShadowIcon = gpResourceManager->GetIcon("boatshad.icn");
+        m_boatShadowIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58c0, openBoatshadIcn, "boatshad.icn"));
     }
     gbLoadingMonoIcon = false;
 
     if (m_flagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58d0, openBFlag32Icn, "b-flag32.icn"));
     }
     if (m_flagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58e0, openGFlag32Icn, "g-flag32.icn"));
     }
     if (m_flagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58f0, openRFlag32Icn, "r-flag32.icn"));
     }
     if (m_flagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5900, openYFlag32Icn, "y-flag32.icn"));
     }
     if (m_flagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5910, openOFlag32Icn, "o-flag32.icn"));
     }
     if (m_flagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-flag32.icn");
+        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5920, openPFlag32Icn, "p-flag32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5930, openBBflg32Icn, "b-bflg32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5940, openGBflg32Icn, "g-bflg32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5950, openRBflg32Icn, "r-bflg32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5960, openYBflg32Icn, "y-bflg32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5970, openOBflg32Icn, "o-bflg32.icn"));
     }
     if (m_boatFlagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-bflg32.icn");
+        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5980, openPBflg32Icn, "p-bflg32.icn"));
     }
 
     gbLoadingMonoIcon = true;
     if (m_puzzleIcon == NULL) {
-        m_puzzleIcon = gpResourceManager->GetIcon("radar.icn");
+        m_puzzleIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5990, openRadarIcn, "radar.icn"));
     }
     gbLoadingMonoIcon = false;
 
@@ -1256,7 +1256,7 @@ i32 advManager::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, "advManager");
+    strcpy(m_name, DATA_COMPGEN(0x004f599c, openAdvManager, "advManager"));
     return 0;
 }
 
@@ -1274,7 +1274,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != NULL) {
-        H2_FREE(m_adventureBorder, 292 + BORDER_INITIAL_FREE_LINE_OFFSET);
+        H2_FREE_AT(m_adventureBorder, DATA_COMPGEN(0x004f59ac, closeSourceFile, RETAIL_FILE), 292 + BORDER_INITIAL_FREE_LINE_OFFSET);
         m_adventureBorder = NULL;
     }
 
@@ -1342,7 +1342,7 @@ void advManager::GetCursorSampleSet(H2_ENUM_PARAM(ConfigWalkSpeed, i32) walkSpee
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
     // NOLINTEND(readability-magic-numbers)
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
-        sprintf(gText, "wsnd%1d%1d.82M", sampleSet, sampleSuffix[index]);
+        sprintf(gText, DATA_COMPGEN(0x004f59d8, getCursorSampleSetWsnd1d1d82M, "wsnd%1d%1d.82M"), sampleSet, sampleSuffix[index]);
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
         m_cursorSamples[index]->m_playbackData.volume = CURSOR_SAMPLE_VOLUME;
         m_cursorSamples[index]->m_playbackData.channelType = CURSOR_SAMPLE_CHANNEL;
@@ -1852,7 +1852,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
                             sprintf(
                                 gText,
-                                "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
+                                DATA_COMPGEN(0x004f59f0, mainCoordinatesAtTopLeftCornerOf, "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d"),
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
@@ -1937,20 +1937,20 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         cheatDigitLocal = 'e';
                         strcpy(
                             gText,
-                            "Are you sure you want to restart?  (Your current game will be lost)"
+                            DATA_COMPGEN(0x004f5a2c, mainAreYouSureYouWantTo, "Are you sure you want to restart?  (Your current game will be lost)")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         cheatDigitLocal = 'f';
                         strcpy(
                             gText,
-                            "Are you sure you want to load a new game?  (Your current game will be "
-                            "lost)"
+                            DATA_COMPGEN(0x004f5a70, mainAreYouSureYouWantTo2, "Are you sure you want to load a new game?  (Your current game will be "
+                            "lost)")
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         cheatDigitLocal = 'i';
-                        strcpy(gText, "Are you sure you want to quit?");
+                        strcpy(gText, DATA_COMPGEN(0x004f5abc, mainAreYouSureYouWantTo3, "Are you sure you want to quit?"));
                         goto confirm_game_command;
                     confirm_game_command:
                         exitRequestedFlag = 1;
@@ -2324,8 +2324,8 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         case PANEL_RADAR:
             if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 NormalDialog(
-                    "{World Map}\n\nA miniature view of the known world.  "
-                    "Left click to move viewing area.",
+                    DATA_COMPGEN(0x004f5adc, processSelectWorldMapAMiniatureViewOf, "{World Map}\n\nA miniature view of the known world.  "
+                    "Left click to move viewing area."),
                     NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
@@ -2343,16 +2343,16 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             // NOLINTBEGIN(readability-magic-numbers)
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    radarScale = 4.0f;
+                    radarScale = DATA_COMPGEN(0x004eb680, processSelectConstant3, 4.0f);
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    radarScale = 2.0f;
+                    radarScale = DATA_COMPGEN(0x004eb684, processSelectConstant, 2.0f);
                     break;
                 case MAP_DIMENSION_LARGE:
-                    radarScale = 1.3333f;
+                    radarScale = DATA_COMPGEN(0x004eb688, processSelectConstant4, 1.3333f);
                     break;
                 default:
-                    radarScale = 1.0f;
+                    radarScale = DATA_COMPGEN(0x004eb68c, processSelectConstant2, 1.0f);
                     break;
             }
             // NOLINTEND(readability-magic-numbers)
@@ -2436,9 +2436,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            "{Status Window}\n\nThis window provides information on the status "
+            DATA_COMPGEN(0x004f5b30, processSelectStatusWindowThisWindowProvidesInformation, "{Status Window}\n\nThis window provides information on the status "
             "of your hero or kingdom, and shows the date.  Left click here to "
-            "cycle through these windows.",
+            "cycle through these windows."),
             NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
@@ -2499,7 +2499,7 @@ MessageDispatchResult advManager::ProcessDeSelect(
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    "One or more heroes may still move, are you sure you want to end your turn?",
+                    DATA_COMPGEN(0x004f5bd0, processDeSelectOneOrMoreHeroesMayStill, "One or more heroes may still move, are you sure you want to end your turn?"),
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -2610,7 +2610,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Digging for artifacts requires a whole day, try again tomorrow.",
+            DATA_COMPGEN(0x004f5c1c, processSearchDiggingForArtifactsRequiresAWhole, "Digging for artifacts requires a whole day, try again tomorrow."),
             1,
             -1,
             -1,
@@ -2628,8 +2628,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            "Searching for the Ultimate Artifact is fruitless.  Your hero could not carry it even "
-            "if he found it - all his artifact slots are full.",
+            DATA_COMPGEN(0x004f5c5c, processSearchSearchingForTheUltimateArtifactIs, "Searching for the Ultimate Artifact is fruitless.  Your hero could not carry it even "
+            "if he found it - all his artifact slots are full."),
             1,
             -1,
             -1,
@@ -2657,19 +2657,19 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
-        NormalDialog("Try searching on clear ground.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(DATA_COMPGEN(0x004f5ce4, processSearchTrySearchingOnClearGround, "Try searching on clear ground."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
     if (giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
-        NormalDialog("Try looking on land!!!", 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(DATA_COMPGEN(0x004f5d04, processSearchTryLookingOnLand, "Try looking on land!!!"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
 
     if (gbHumanPlayer[giCurPlayer]) {
-        digSampleState = LoadPlaySample("DIGSOUND.82M");
+        digSampleState = LoadPlaySample(DATA_COMPGEN(0x004f5d1c, processSearchDIGSOUND82M, "DIGSOUND.82M"));
     }
     if (currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
         || currentCell->m_objectTileset == TILESET_DUMMY) {
@@ -2687,7 +2687,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (searchingHeroState->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    "You have no room to carry another artifact!",
+                    DATA_COMPGEN(0x004f5d2c, processSearchYouHaveNoRoomToCarry, "You have no room to carry another artifact!"),
                     1,
                     -1,
                     -1,
@@ -2709,17 +2709,17 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 if (specialArtifactValue) {
                     sprintf(
                         gText,
-                        "%s%s",
-                        "Congratulations! After spending many hours digging here, you have "
-                        "uncovered the ",
+                        DATA_COMPGEN(0x004f5dac, processSearchSS, "%s%s"),
+                        DATA_COMPGEN(0x004f5d58, processSearchCongratulationsAfterSpendingManyHoursDigging, "Congratulations! After spending many hours digging here, you have "
+                        "uncovered the "),
                         gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
-                        "%s%s",
-                        "Congratulations! After spending many hours digging here, you have "
-                        "uncovered the ",
+                        DATA_COMPGEN(0x004f5e08, processSearchSS2, "%s%s"),
+                        DATA_COMPGEN(0x004f5db4, processSearchCongratulationsAfterSpendingManyHoursDigging2, "Congratulations! After spending many hours digging here, you have "
+                        "uncovered the "),
                         gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
                     );
                 }
@@ -2744,7 +2744,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
-        NormalDialog("Nothing here.\nWhere could it be?", 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(DATA_COMPGEN(0x004f5e10, processSearchNothingHereWhereCouldItBe, "Nothing here.\nWhere could it be?"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     }
     if (gbHumanPlayer[giCurPlayer]) {
         WaitEndSample(digSampleState, -1);
@@ -4700,7 +4700,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             case MAP_DIMENSION_LARGE:
                 // Retail approximates the large-map radar ratio rather than using 4/3.
                 // NOLINTNEXTLINE(readability-magic-numbers)
-                radarScaleState = 1.33f;
+                radarScaleState = DATA_COMPGEN(0x004eb690, updateRadarConstant, 1.33f);
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
                 } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
@@ -4746,8 +4746,14 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (skipFrameIndex == 0) {
         if (gbInViewWorld != 0) {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(iVWMapOriginX * radarScaleState + IDX(RADAR_LEFT)),
-                static_cast<i32>(iVWMapOriginY * radarScaleState + IDX(RADAR_TOP)),
+                static_cast<i32>(
+                    iVWMapOriginX * radarScaleState
+                    + DATA_COMPGEN(0x004eb698, radarLeftFloat, IDX(RADAR_LEFT))
+                ),
+                static_cast<i32>(
+                    iVWMapOriginY * radarScaleState
+                    + DATA_COMPGEN(0x004eb694, radarTopFloat, IDX(RADAR_TOP))
+                ),
                 radarFrameLocal,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4829,7 +4835,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         dialogTopPosition = QUICK_INFO_BOTTOM_Y;
     }
 
-    windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, "qwikinfo.bin");
+    windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, DATA_COMPGEN(0x004f5e4c, quickInfoQwikinfoBin, "qwikinfo.bin"));
     if (windowLocal == NULL) {
         MemError();
     }
@@ -4837,29 +4843,29 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
-        sprintf(gText, "%s", "Border");
+        sprintf(gText, DATA_COMPGEN(0x004f5e64, quickInfoS, "%s"), DATA_COMPGEN(0x004f5e5c, quickInfoBorder, "Border"));
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
         if ((giCurPlayerBit & (mapExtra + (m_mapOriginY + cellY) * MAP_WIDTH)[m_mapOriginX + cellX])
             == 0) {
-            sprintf(gText, "%s", "Uncharted Territory");
+            sprintf(gText, DATA_COMPGEN(0x004f5e7c, quickInfoS2, "%s"), DATA_COMPGEN(0x004f5e68, quickInfoUnchartedTerritory, "Uncharted Territory"));
         } else {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case MAP_OBJECT_ARTIFACT:
-                    sprintf(gText, "%s", "Artifact");
+                    sprintf(gText, DATA_COMPGEN(0x004f5e8c, quickInfoS3, "%s"), DATA_COMPGEN(0x004f5e80, quickInfoArtifact, "Artifact"));
                     break;
                 case MAP_OBJECT_OBELISK:
                     if HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5eb4, quickInfoSS, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5e90, quickInfoAlreadyVisited, "(already visited)")
+                                : DATA_COMPGEN(0x004f5ea4, quickInfoNotVisited, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4869,12 +4875,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5ee0, quickInfoSS2, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5ebc, quickInfoAlreadyVisited2, "(already visited)")
+                                : DATA_COMPGEN(0x004f5ed0, quickInfoNotVisited2, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4884,12 +4890,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5f0c, quickInfoSS3, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5ee8, quickInfoAlreadyVisited3, "(already visited)")
+                                : DATA_COMPGEN(0x004f5efc, quickInfoNotVisited3, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4899,12 +4905,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5f38, quickInfoSS4, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5f14, quickInfoAlreadyVisited4, "(already visited)")
+                                : DATA_COMPGEN(0x004f5f28, quickInfoNotVisited4, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4914,12 +4920,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5f64, quickInfoSS5, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5f40, quickInfoAlreadyVisited5, "(already visited)")
+                                : DATA_COMPGEN(0x004f5f54, quickInfoNotVisited5, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4929,12 +4935,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5f90, quickInfoSS6, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5f6c, quickInfoAlreadyVisited6, "(already visited)")
+                                : DATA_COMPGEN(0x004f5f80, quickInfoNotVisited6, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4944,12 +4950,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5fbc, quickInfoSS7, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5f98, quickInfoAlreadyVisited7, "(already visited)")
+                                : DATA_COMPGEN(0x004f5fac, quickInfoNotVisited7, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -4959,12 +4965,12 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f5fe8, quickInfoSS8, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? "(already visited)"
-                                : "(not visited)"
+                                ? DATA_COMPGEN(0x004f5fc4, quickInfoAlreadyVisited8, "(already visited)")
+                                : DATA_COMPGEN(0x004f5fd8, quickInfoNotVisited8, "(not visited)")
                         );
                     } else {
                         goto quick_info_default;
@@ -5001,7 +5007,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_MOSSY_ROCK:
                     sprintf(
                         gText,
-                        "%s",
+                        DATA_COMPGEN(0x004f5ff0, quickInfoS4, "%s"),
                         gTerrainNames[IDX(giGroundToTerrain
                                               [currentCell->m_terrainImageIndex])]
                     );
@@ -5009,7 +5015,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(
                         gText,
-                        "%s",
+                        DATA_COMPGEN(0x004f5ff4, quickInfoS5, "%s"),
                         gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
                     goto quick_info_guarded;
@@ -5018,16 +5024,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         != CREATURE_NONE) {
                         sprintf(
                             gText,
-                            "%s %s",
+                            DATA_COMPGEN(0x004f6000, quickInfoSS9, "%s %s"),
                             gResourceNames[IDX(
                                 gpGame->m_mines[currentCell->m_objectMetadata].resourceType
                             )],
-                            "Mine"
+                            DATA_COMPGEN(0x004f5ff8, quickInfoMine, "Mine")
                         );
                     quick_info_guarded:
                         sprintf(
                             guardCaption,
-                            "\n\nguarded by %s %s",
+                            DATA_COMPGEN(0x004f6008, quickInfoGuardedBySS, "\n\nguarded by %s %s"),
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
@@ -5040,18 +5046,18 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     } else {
                         sprintf(
                             gText,
-                            "%s %s",
+                            DATA_COMPGEN(0x004f6024, quickInfoSS10, "%s %s"),
                             gResourceNames[IDX(
                                 gpGame->m_mines[currentCell->m_objectMetadata].resourceType
                             )],
-                            "Mine"
+                            DATA_COMPGEN(0x004f601c, quickInfoMine2, "Mine")
                         );
                     }
                     break;
                 case MAP_OBJECT_RESOURCE:
                     sprintf(
                         gText,
-                        "%s",
+                        DATA_COMPGEN(0x004f602c, quickInfoS6, "%s"),
                         gResourceNames
                             [(currentCell->m_objectIndex & RESOURCE_FRAME_PAIR_MASK)
                              / RESOURCE_FRAME_PAIR_STRIDE]
@@ -5065,14 +5071,14 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         )) {
                         sprintf(
                             gText,
-                            "%d %s",
+                            DATA_COMPGEN(0x004f6030, quickInfoDS, "%d %s"),
                             currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
                         sprintf(
                             gText,
-                            "%s %s",
+                            DATA_COMPGEN(0x004f6038, quickInfoSS11, "%s %s"),
                             GetArmySizeName(
                                 currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
                                 ARMY_SIZE_NAME_SENTENCE
@@ -5147,16 +5153,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (genericSiteType == GENERIC_SITE_UNKNOWN) {
-                        sprintf(gText, "Unknown");
+                        sprintf(gText, DATA_COMPGEN(0x004f6040, quickInfoUnknown, "Unknown"));
                     } else {
                         sprintf(gText, xGenericSiteNames[IDX(genericSiteType)]);
                     }
                     if (heroLocal != NULL && visitedMaskValue != HERO_EVENT_NONE) {
-                        strcat(gText, "\n\n");
+                        strcat(gText, DATA_COMPGEN(0x004f6048, quickInfoEmptyString, "\n\n"));
                         strcat(
                             gText,
-                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? "(already visited)"
-                                                                           : "(not visited)"
+                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? DATA_COMPGEN(0x004f604c, quickInfoAlreadyVisited9, "(already visited)")
+                                                                           : DATA_COMPGEN(0x004f6060, quickInfoNotVisited9, "(not visited)")
                         );
                     }
                     break;
@@ -5191,7 +5197,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                             break;
                     }
                     if (recruitSiteType == RECRUITMENT_SITE_UNKNOWN) {
-                        sprintf(gText, "Unknown");
+                        sprintf(gText, DATA_COMPGEN(0x004f6070, quickInfoUnknown2, "Unknown"));
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[IDX(recruitSiteType)]);
                     }
@@ -5199,7 +5205,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 }
                 case MAP_OBJECT_ROCK:
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
-                        sprintf(gText, "Reefs");
+                        sprintf(gText, DATA_COMPGEN(0x004f6078, quickInfoReefs, "Reefs"));
                     } else {
                         goto quick_info_default;
                     }
@@ -5209,15 +5215,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (visitedMaskValue != HERO_EVENT_NONE && heroLocal != NULL) {
                         sprintf(
                             gText,
-                            "%s\n\n%s",
+                            DATA_COMPGEN(0x004f60a4, quickInfoSS12, "%s\n\n%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
-                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? "(already visited)"
-                                                                           : "(not visited)"
+                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? DATA_COMPGEN(0x004f6080, quickInfoAlreadyVisited10, "(already visited)")
+                                                                           : DATA_COMPGEN(0x004f6094, quickInfoNotVisited10, "(not visited)")
                         );
                     } else {
                         sprintf(
                             gText,
-                            "%s",
+                            DATA_COMPGEN(0x004f60ac, quickInfoS7, "%s"),
                             gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                         );
                     }
@@ -5231,7 +5237,7 @@ quick_info_ready:
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
             gText,
-            "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
+            DATA_COMPGEN(0x004f60b0, quickInfoGiDObtileDObiD, "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d"),
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
@@ -5375,10 +5381,15 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_heroCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollLeftButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        scrollStep = static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
+        scrollStep = DATA_COMPGEN(
+                         0x004eb6a0,
+                         heroLocatorScrollSpan,
+                         static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
+                     )
                      / (gpCurPlayer->m_heroCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollLeftButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_heroLocatorPage * scrollStep + IDX(LOCATOR_SCROLL_BASE_Y)
+            gpCurPlayer->m_heroLocatorPage * scrollStep
+            + DATA_COMPGEN(0x004eb6a8, locatorScrollBaseY, IDX(LOCATOR_SCROLL_BASE_Y))
         );
     }
     if (drawWindow) {
@@ -5450,7 +5461,11 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_townCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollRightButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        scrollStep = static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
+        scrollStep = DATA_COMPGEN(
+                         0x004eb6b0,
+                         townLocatorScrollSpan,
+                         static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
+                     )
                      / (gpCurPlayer->m_townCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollRightButton->m_y = static_cast<i16>(
             gpCurPlayer->m_townLocatorPage * scrollStep + IDX(LOCATOR_SCROLL_BASE_Y)
@@ -5561,7 +5576,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_BACKGROUND_Y,
             ENEMY_TURN_BACKGROUND_WIDTH,
             ENEMY_TURN_BACKGROUND_HEIGHT,
-            "stonback.icn",
+            DATA_COMPGEN(0x004f60e8, updBottomViewEnemyTurnStonbackIcn, "stonback.icn"),
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_BACKGROUND_ID,
@@ -5578,7 +5593,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_HOURGLASS_Y,
             ENEMY_TURN_HOURGLASS_WIDTH,
             ENEMY_TURN_HOURGLASS_HEIGHT,
-            "hourglas.icn",
+            DATA_COMPGEN(0x004f60f8, updBottomViewEnemyTurnHourglasIcn, "hourglas.icn"),
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_HOURGLASS_ID,
@@ -5616,7 +5631,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
                     ENEMY_TURN_ANIMATION_HEIGHT,
-                    "hourglas.icn",
+                    DATA_COMPGEN(0x004f6108, updBottomViewEnemyTurnHourglasIcn2, "hourglas.icn"),
                     iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET,
                     ICON_DRAW_NORMAL,
                     ENEMY_TURN_SAND_ID,
@@ -5652,7 +5667,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                "brcrest.icn",
+                DATA_COMPGEN(0x004f6118, updBottomViewEnemyTurnBrcrestIcn, "brcrest.icn"),
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_CREST_ID,
@@ -5687,7 +5702,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                "hourglas.icn",
+                DATA_COMPGEN(0x004f6124, updBottomViewEnemyTurnHourglasIcn3, "hourglas.icn"),
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_PHASE_ID,
@@ -5733,7 +5748,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004f6138, updBottomViewNewTurnStonbackIcn, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -5750,7 +5765,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_ICON_Y,
         NEW_TURN_DATE_ICON_WIDTH,
         NEW_TURN_DATE_ICON_HEIGHT,
-        "sunmoon.icn",
+        DATA_COMPGEN(0x004f6148, updBottomViewNewTurnSunmoonIcn, "sunmoon.icn"),
         dateIconFrame,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -5763,19 +5778,19 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     weekText = static_cast<char*>(
-        H2_ALLOC(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE,
+        H2_ALLOC_AT(
+            BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f6154, updBottomViewNewTurnSourceFile, RETAIL_FILE),
             NEW_TURN_LINE_BASE + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
         )
     );
-    sprintf(weekText, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
+    sprintf(weekText, DATA_COMPGEN(0x004f6190, updBottomViewNewTurnSDSD, "%s: %d  %s: %d"), DATA_COMPGEN(0x004f6188, updBottomViewNewTurnMonth, "Month"), gpGame->m_month, DATA_COMPGEN(0x004f6180, updBottomViewNewTurnWeek, "Week"), gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_WEEK_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_WEEK_TEXT_HEIGHT,
         weekText,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f61a0, updBottomViewNewTurnSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5787,19 +5802,19 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     dayText = static_cast<char*>(
-        H2_ALLOC(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE,
+        H2_ALLOC_AT(
+            BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f61b0, updBottomViewNewTurnSourceFile2, RETAIL_FILE),
             NEW_TURN_LINE_BASE + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
         )
     );
-    sprintf(dayText, "%s: %d", "Day", gpGame->m_day);
+    sprintf(dayText, DATA_COMPGEN(0x004f61e0, updBottomViewNewTurnSD, "%s: %d"), DATA_COMPGEN(0x004f61dc, updBottomViewNewTurnDay, "Day"), gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_DAY_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_DAY_TEXT_HEIGHT,
         dayText,
-        "bigfont.fnt",
+        DATA_COMPGEN(0x004f61e8, updBottomViewNewTurnBigfontFnt, "bigfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5834,7 +5849,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004f61f8, updBottomViewResMsgStonbackIcn, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -5852,8 +5867,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
     }
-    messageText2 = static_cast<char*>(H2_ALLOC(
-        strlen(gcBottomViewText) + 1,
+    messageText2 = static_cast<char*>(H2_ALLOC_AT(
+        strlen(gcBottomViewText) + 1, DATA_COMPGEN(0x004f6208, updBottomViewResMsgSourceFile, RETAIL_FILE),
         RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
     ));
     sprintf(messageText2, gcBottomViewText);
@@ -5863,7 +5878,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_WIDTH,
         RESOURCE_VIEW_TEXT_HEIGHT,
         messageText2,
-        "smalfont.fnt",
+        DATA_COMPGEN(0x004f6234, updBottomViewResMsgSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5889,7 +5904,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
                 - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
             iconWidth6,
             iconHeight11,
-            "resource.icn",
+            DATA_COMPGEN(0x004f6244, updBottomViewResMsgResourceIcn, "resource.icn"),
             IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
@@ -5901,18 +5916,18 @@ i32 advManager::UpdBottomViewResMsg(void) {
         }
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-        resourceCountText6 = static_cast<char*>(H2_ALLOC(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE,
+        resourceCountText6 = static_cast<char*>(H2_ALLOC_AT(
+            BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f6254, updBottomViewResMsgSourceFile2, RETAIL_FILE),
             RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
-        sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
+        sprintf(resourceCountText6, DATA_COMPGEN(0x004f6280, updBottomViewResMsgD, "%d"), giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
             RESOURCE_VIEW_COUNT_X,
             RESOURCE_VIEW_COUNT_Y,
             RESOURCE_VIEW_COUNT_WIDTH,
             RESOURCE_VIEW_COUNT_HEIGHT,
             resourceCountText6,
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004f6284, updBottomViewResMsgSecondarySmalfontFnt, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
             WIDGET_KIND_TEXT,
@@ -5969,7 +5984,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004f6298, updBottomViewKingdomStonbackIcn, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -5986,7 +6001,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         KINGDOM_VIEW_ICON_Y,
         BOTTOM_VIEW_PANEL_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        "ressmall.icn",
+        DATA_COMPGEN(0x004f62a8, updBottomViewKingdomRessmallIcn, "ressmall.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6008,16 +6023,16 @@ i32 advManager::UpdBottomViewKingdom(void) {
     }
 
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
-        countText14[index11] = static_cast<char*>(H2_ALLOC(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE,
+        countText14[index11] = static_cast<char*>(H2_ALLOC_AT(
+            BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f62b8, updBottomViewKingdomSourceFile, RETAIL_FILE),
             KINGDOM_VIEW_LINE_BASE + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
-            sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
+            sprintf(countText14[index11], DATA_COMPGEN(0x004f62e4, updBottomViewKingdomD, "%d"), gpCurPlayer->m_resources[index11]);
         } else if (index11 == KINGDOM_VIEW_CASTLE_ENTRY) {
-            sprintf(countText14[index11], "%d", castleCount12);
+            sprintf(countText14[index11], DATA_COMPGEN(0x004f62e8, updBottomViewKingdomD2, "%d"), castleCount12);
         } else {
-            sprintf(countText14[index11], "%d", villageCount37);
+            sprintf(countText14[index11], DATA_COMPGEN(0x004f62ec, updBottomViewKingdomD3, "%d"), villageCount37);
         }
 
         m_bottomViewAllTexts[index11] = new textWidget(
@@ -6026,7 +6041,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
             KINGDOM_VIEW_TEXT_WIDTH,
             KINGDOM_VIEW_TEXT_HEIGHT,
             countText14[index11],
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004f62f0, updBottomViewKingdomSmalfontFnt, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             index11 + BOTTOM_VIEW_TEXT_ID,
             WIDGET_KIND_TEXT,
@@ -6075,7 +6090,7 @@ i32 advManager::UpdBottomViewHero(void) {
         BOTTOM_HERO_PANEL_Y,
         BOTTOM_HERO_PANEL_WIDTH,
         BOTTOM_HERO_PANEL_HEIGHT,
-        "stonback.icn",
+        DATA_COMPGEN(0x004f6304, updBottomViewHeroStonbackIcn, "stonback.icn"),
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FIRST_MESSAGE,
@@ -6095,7 +6110,7 @@ i32 advManager::UpdBottomViewHero(void) {
 
     if (occupiedSlotsLocal != 0) {
         displayIndexData = 0;
-        monsterIconsLocal = gpResourceManager->GetIcon("mons32.icn");
+        monsterIconsLocal = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f6314, updBottomViewHeroMons32Icn, "mons32.icn"));
         for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
             creature = IDX(targetHero->m_army.m_creatureTypes[armySlot]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
@@ -6113,22 +6128,22 @@ i32 advManager::UpdBottomViewHero(void) {
                 };
                 // NOLINTEND(readability-magic-numbers)
 
-                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(
-                    BOTTOM_HERO_LABEL_BYTES,
+                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC_AT(
+                    BOTTOM_HERO_LABEL_BYTES, DATA_COMPGEN(0x004f6320, updBottomViewHeroSourceFile, RETAIL_FILE),
                     BOTTOM_HERO_LINE_BASE + BOTTOM_HERO_ALLOC_LINE_OFFSET
                 ));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
                         armyCountLabelsResult[displayIndexData],
-                        "%dk",
+                        DATA_COMPGEN(0x004f634c, updBottomViewHeroDk, "%dk"),
                         targetHero->m_army.m_creatureCounts[armySlot]
                             / BOTTOM_HERO_COUNT_DIVISOR
                     );
                 } else {
                     sprintf(
                         armyCountLabelsResult[displayIndexData],
-                        "%d",
+                        DATA_COMPGEN(0x004f6350, updBottomViewHeroD, "%d"),
                         targetHero->m_army.m_creatureCounts[armySlot]
                     );
                 }
@@ -6162,7 +6177,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     iconY + BOTTOM_HERO_PANEL_Y,
                     BOTTOM_HERO_ICON_WIDTH,
                     BOTTOM_HERO_ICON_HEIGHT,
-                    "mons32.icn",
+                    DATA_COMPGEN(0x004f6354, updBottomViewHeroSecondaryMons32Icn, "mons32.icn"),
                     creature,
                     ICON_DRAW_NORMAL,
                     displayIndexData + BOTTOM_HERO_FIRST_ICON_ID,
@@ -6184,7 +6199,7 @@ i32 advManager::UpdBottomViewHero(void) {
                               * BOTTOM_HERO_CHARACTER_WIDTH,
                     BOTTOM_HERO_LABEL_HEIGHT,
                     armyCountLabelsResult[displayIndexData],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(0x004f6360, updBottomViewHeroSmalfontFnt, "smalfont.fnt"),
                     FONT_DRAW_DEFAULT,
                     displayIndexData + BOTTOM_HERO_FIRST_TEXT_ID,
                     WIDGET_KIND_TEXT,
@@ -6234,7 +6249,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    monsterIconRef = gpResourceManager->GetIcon("mons32.icn");
+    monsterIconRef = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f6374, heroQuickViewMons32Icn, "mons32.icn"));
     targetHero = gpGame->GetHero(heroId);
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
@@ -6242,13 +6257,13 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             windowX = HERO_QUICK_DEFAULT_WINDOW_X;
             windowY = locatorSlot * HERO_QUICK_LOCATOR_ROW_HEIGHT + HERO_QUICK_LOCATOR_BASE_Y;
         }
-        quickWindowSlot = new heroWindow(windowX, windowY, "qhero0.bin");
+        quickWindowSlot = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f6380, heroQuickViewQhero0Bin, "qhero0.bin"));
         if (quickWindowSlot == NULL) {
             MemError();
         }
         SetWinText(quickWindowSlot, HERO_QUICK_WINDOW_TEXT);
     } else {
-        quickWindowSlot = new heroWindow(windowX, windowY, "qhero1.bin");
+        quickWindowSlot = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f638c, heroQuickViewQhero1Bin, "qhero1.bin"));
         if (quickWindowSlot == NULL) {
             MemError();
         }
@@ -6266,7 +6281,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     ++quickViewMessageState.payload.widget.id;
     ++quickViewMessageState.payload.widget.data.value;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
-    sprintf(gText, "%s", targetHero->m_name);
+    sprintf(gText, DATA_COMPGEN(0x004f6398, heroQuickViewS, "%s"), targetHero->m_name);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     quickViewMessageState.payload.widget.id = HERO_QUICK_NAME_WIDGET;
     quickViewMessageState.payload.widget.data.text = gText;
@@ -6282,14 +6297,14 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
         for (armyIndex = 0; armyIndex < HERO_PRIMARY_STAT_COUNT; ++armyIndex) {
-            sprintf(gText, "%d", targetHero->Stats(HeroPrimaryStat(armyIndex)));
+            sprintf(gText, DATA_COMPGEN(0x004f639c, heroQuickViewD, "%d"), targetHero->Stats(HeroPrimaryStat(armyIndex)));
             quickViewMessageState.payload.widget.id = armyIndex + HERO_QUICK_PRIMARY_STAT_WIDGET;
             quickViewMessageState.payload.widget.data.text = gText;
             quickWindowSlot->BroadcastMessage(quickViewMessageState);
         }
         sprintf(
             gText,
-            "%d/%d",
+            DATA_COMPGEN(0x004f63a0, heroQuickViewDD, "%d/%d"),
             targetHero->m_spellPoints,
             targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
         );
@@ -6327,7 +6342,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_ICON_SIZE,
-                        "mons32.icn",
+                        DATA_COMPGEN(0x004f63a8, heroQuickViewMons32Icn2, "mons32.icn"),
                         static_cast<i16>(creature),
                         ICON_DRAW_NORMAL,
                         -1,
@@ -6338,14 +6353,14 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         MemError();
                     }
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
-                        H2_ALLOC(
-                            HERO_QUICK_ARMY_LABEL_CAPACITY,
+                        H2_ALLOC_AT(
+                            HERO_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f63b4, heroQuickViewSourceFile, RETAIL_FILE),
                             QUICK_VIEW_LINE_BASE + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
                         )
                     );
                     sprintf(
                         armyLabelsStrings[armyIndex],
-                        "%d",
+                        DATA_COMPGEN(0x004f63e0, heroQuickViewD2, "%d"),
                         targetHero->m_army.m_creatureCounts[displayIndexStateOffset]
                     );
                     creatureTextWidgetsLocal[armyIndex] = new textWidget(
@@ -6356,7 +6371,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
                         armyLabelsStrings[armyIndex],
-                        "smalfont.fnt",
+                        DATA_COMPGEN(0x004f63e4, heroQuickViewSmalfontFnt, "smalfont.fnt"),
                         FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
@@ -6419,7 +6434,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                "mons32.icn",
+                DATA_COMPGEN(0x004f63f4, heroQuickViewMons32Icn3, "mons32.icn"),
                 static_cast<i16>(creatureTypeId),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6430,7 +6445,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsStrings[armyIndex] =
-                static_cast<char*>(H2_ALLOC(15, 4982 + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
+                static_cast<char*>(H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6400, heroQuickViewSourceFile2, RETAIL_FILE), 4982 + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(
@@ -6444,7 +6459,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 armySpacing,
                 ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsStrings[armyIndex],
-                "smalfont.fnt",
+                DATA_COMPGEN(0x004f642c, heroQuickViewSmalfontFnt2, "smalfont.fnt"),
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6486,7 +6501,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    "mons32.icn",
+                    DATA_COMPGEN(0x004f643c, heroQuickViewMons32Icn4, "mons32.icn"),
                     static_cast<i16>(creatureTypeId),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6497,7 +6512,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsStrings[armyIndex] = static_cast<char*>(
-                    H2_ALLOC(15, 4982 + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6448, heroQuickViewSourceFile3, RETAIL_FILE), 4982 + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
@@ -6515,7 +6530,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     armySpacing,
                     ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsStrings[armyIndex],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(0x004f6474, heroQuickViewSmalfontFnt3, "smalfont.fnt"),
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -6558,7 +6573,7 @@ char* advManager::GetArmySizeName(
     H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar
 ) {
     if (giDebugLevel > 0) {
-        sprintf(cArmySizeName, "%d", armySize);
+        sprintf(cArmySizeName, DATA_COMPGEN(0x004f6484, getArmySizeNameD, "%d"), armySize);
         return cArmySizeName;
     }
     if (armySize < ARMY_FEW_LIMIT) {
@@ -6623,13 +6638,13 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    monsterIconLocal = gpResourceManager->GetIcon("mons32.icn");
+    monsterIconLocal = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f648c, townQuickViewMons32Icn, "mons32.icn"));
     quickTownLocal = gpGame->GetTown(townId);
     if (windowX == -1) {
         windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
         windowY = TOWN_QUICK_DEFAULT_WINDOW_Y;
     }
-    townQuickWindow = new heroWindow(windowX, windowY, "qtown1.bin");
+    townQuickWindow = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f6498, townQuickViewQtown1Bin, "qtown1.bin"));
     if (townQuickWindow == NULL) {
         MemError();
     }
@@ -6703,14 +6718,14 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN || armyCountLocal == 0) {
-        emptyArmyLabel = static_cast<char*>(H2_ALLOC(
-            TOWN_QUICK_EMPTY_LABEL_CAPACITY,
+        emptyArmyLabel = static_cast<char*>(H2_ALLOC_AT(
+            TOWN_QUICK_EMPTY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64a4, townQuickViewSourceFile, RETAIL_FILE),
             TOWN_VIEW_LINE_BASE + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
         ));
         if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN) {
-            sprintf(emptyArmyLabel, "Unknown");
+            sprintf(emptyArmyLabel, DATA_COMPGEN(0x004f64d0, townQuickViewUnknown, "Unknown"));
         } else {
-            sprintf(emptyArmyLabel, "None");
+            sprintf(emptyArmyLabel, DATA_COMPGEN(0x004f64d8, townQuickViewNone, "None"));
         }
         emptyArmyTextState = new textWidget(
             TOWN_QUICK_EMPTY_LABEL_X,
@@ -6718,7 +6733,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             TOWN_QUICK_EMPTY_LABEL_WIDTH,
             ARMY_QUICK_LABEL_HEIGHT,
             emptyArmyLabel,
-            "smalfont.fnt",
+            DATA_COMPGEN(0x004f64e0, townQuickViewSmalfontFnt, "smalfont.fnt"),
             FONT_DRAW_DEFAULT,
             -1,
             WIDGET_KIND_TEXT,
@@ -6794,7 +6809,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                "mons32.icn",
+                DATA_COMPGEN(0x004f64f0, townQuickViewSecondaryMons32Icn, "mons32.icn"),
                 static_cast<i16>(creatureLocal),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6804,14 +6819,14 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (armyIcons[widgetIndexWidget] == NULL) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(
-                TOWN_QUICK_ARMY_LABEL_CAPACITY,
+            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
+                TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64fc, townQuickViewSourceFile2, RETAIL_FILE),
                 TOWN_VIEW_LINE_BASE + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
             ));
             if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
-                    "%d",
+                    DATA_COMPGEN(0x004f6528, townQuickViewD, "%d"),
                     quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                 );
             } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -6823,7 +6838,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     )
                 );
             } else {
-                strcpy(armyLabelsResult[widgetIndexWidget], "???");
+                strcpy(armyLabelsResult[widgetIndexWidget], DATA_COMPGEN(0x004f652c, townQuickViewEmptyString, "???"));
             }
             armyTexts[widgetIndexWidget] = new textWidget(
                 static_cast<i16>(
@@ -6834,7 +6849,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ARMY_QUICK_TEXT_WIDTH,
                 ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsResult[widgetIndexWidget],
-                "smalfont.fnt",
+                DATA_COMPGEN(0x004f6530, townQuickViewSmalfontFnt2, "smalfont.fnt"),
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6878,7 +6893,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    "mons32.icn",
+                    DATA_COMPGEN(0x004f6540, townQuickViewMons32Icn2, "mons32.icn"),
                     static_cast<i16>(creatureLocal),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6888,14 +6903,14 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (armyIcons[widgetIndexWidget] == NULL) {
                     MemError();
                 }
-                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(
-                    TOWN_QUICK_ARMY_LABEL_CAPACITY,
+                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
+                    TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f654c, townQuickViewSourceFile3, RETAIL_FILE),
                     TOWN_VIEW_LINE_BASE + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
                 ));
                 if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         armyLabelsResult[widgetIndexWidget],
-                        "%d",
+                        DATA_COMPGEN(0x004f6578, townQuickViewD2, "%d"),
                         quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                     );
                 } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -6907,7 +6922,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                         )
                     );
                 } else {
-                    strcpy(armyLabelsResult[widgetIndexWidget], "???");
+                    strcpy(armyLabelsResult[widgetIndexWidget], DATA_COMPGEN(0x004f657c, townQuickViewEmptyString2, "???"));
                 }
                 armyTexts[widgetIndexWidget] = new textWidget(
                     static_cast<i16>(
@@ -6918,7 +6933,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ARMY_QUICK_TEXT_WIDTH,
                     ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsResult[widgetIndexWidget],
-                    "smalfont.fnt",
+                    DATA_COMPGEN(0x004f6580, townQuickViewSmalfontFnt3, "smalfont.fnt"),
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -6962,10 +6977,10 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     if (!bShowIt) {
         return;
     }
-    gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop(DATA_COMPGEN(0x004f6594, redrawAdvScreenAdvbordIcn, "advbord.icn"), gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        H2_FREE(
-            m_adventureBorder,
+        H2_FREE_AT(
+            m_adventureBorder, DATA_COMPGEN(0x004f65a0, redrawAdvScreenSourceFile, RETAIL_FILE),
             REDRAW_BORDER_FREE_LINE_BASE + BORDER_SECONDARY_FREE_LINE_OFFSET
         );
         m_adventureBorder = NULL;
@@ -7292,8 +7307,8 @@ void advManager::CastSpell(SpellType spell) {
             currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
             if (currentCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    "You must be standing on the entrance to a mine (sawmills and alchemists don't "
-                    "count) to cast this spell.",
+                    DATA_COMPGEN(0x004f65cc, castSpellYouMustBeStandingOnThe, "You must be standing on the entrance to a mine (sawmills and alchemists don't "
+                    "count) to cast this spell."),
                     1,
                     -1,
                     -1,
@@ -7329,7 +7344,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                "Enemy heroes are now fully identifiable.",
+                DATA_COMPGEN(0x004f6638, castSpellEnemyHeroesAreNowFullyIdentifiable, "Enemy heroes are now fully identifiable."),
                 1,
                 -1,
                 -1,
@@ -7349,7 +7364,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (currentHeroSlot->m_remainingMobility == 0) {
                 NormalDialog(
-                    "Your hero is too tired to cast this spell today.  Try again tomorrow.",
+                    DATA_COMPGEN(0x004f6664, castSpellYourHeroIsTooTiredTo, "Your hero is too tired to cast this spell today.  Try again tomorrow."),
                     1,
                     -1,
                     -1,
@@ -7393,7 +7408,7 @@ i32 SaveGame(void) {
     i32 result11 = 0;
     i32 humanPlayerCount1 = 0;
     gpAdvManager->DisableButtons();
-    gpMouseManager->SetPointer("advmice.mse", SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f66ac, saveGameAdvmiceMse, "advmice.mse"), SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
     i32 playerLocal;
     for (playerLocal = 0; playerLocal < SAVE_PLAYER_COUNT; ++playerLocal) {
         if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal]) {
@@ -7404,17 +7419,17 @@ i32 SaveGame(void) {
     char extension7[SAVE_EXTENSION_SIZE];
     char patternState[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(extension7, ".GMC");
-        sprintf(patternState, "*.GMC");
+        sprintf(extension7, DATA_COMPGEN(0x004f66b8, saveGameGMC, ".GMC"));
+        sprintf(patternState, DATA_COMPGEN(0x004f66c0, saveGameGMC2, "*.GMC"));
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(extension7, ".GXC");
-        sprintf(patternState, "*.GXC");
+        sprintf(extension7, DATA_COMPGEN(0x004f66c8, saveGameGXC, ".GXC"));
+        sprintf(patternState, DATA_COMPGEN(0x004f66d0, saveGameGXC2, "*.GXC"));
     } else if (xIsExpansionMap) {
-        sprintf(extension7, ".GX%d", humanPlayerCount1);
-        sprintf(patternState, "*.GX%d", humanPlayerCount1);
+        sprintf(extension7, DATA_COMPGEN(0x004f66d8, saveGameGXD, ".GX%d"), humanPlayerCount1);
+        sprintf(patternState, DATA_COMPGEN(0x004f66e0, saveGameGXD2, "*.GX%d"), humanPlayerCount1);
     } else {
-        sprintf(extension7, ".GM%d", humanPlayerCount1);
-        sprintf(patternState, "*.GM%d", humanPlayerCount1);
+        sprintf(extension7, DATA_COMPGEN(0x004f66e8, saveGameGMD, ".GM%d"), humanPlayerCount1);
+        sprintf(patternState, DATA_COMPGEN(0x004f66f0, saveGameGMD2, "*.GM%d"), humanPlayerCount1);
     }
 
     fileRequester* requester2 = new fileRequester(
@@ -7434,7 +7449,7 @@ i32 SaveGame(void) {
         bFreshSave = 1;
         result11 = gpGame->SaveGame(gLastFilename, 0, 0);
         if (result11) {
-            NormalDialog("Game saved successfully.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog(DATA_COMPGEN(0x004f66f8, saveGameGameSavedSuccessfully, "Game saved successfully."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     delete requester2;
@@ -7448,7 +7463,7 @@ void advManager::CheckCastSpell(void) {
         MobilizeCurrHero(0);
         CompleteDraw(0);
         UpdateScreen(0, 0);
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f6714, checkCastSpellAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         CastSpell(gpGame->ViewSpells(
             gpGame->GetHero(gpCurPlayer->m_currentHero), SPELL_TYPE_ADVENTURE, NullHandler, 0
         ));
@@ -7952,7 +7967,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     for (edgeOffset = 0; edgeOffset < SOUND_CELL_COUNT; ++edgeOffset) {
         if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             LogInt(
-                "SEO a",
+                DATA_COMPGEN(0x004f6724, setEnvironmentOriginSEOA, "SEO a"),
                 edgeOffset,
                 ENVIRONMENT_SOUND_LOG_UNUSED,
                 ENVIRONMENT_SOUND_LOG_UNUSED,
@@ -7963,7 +7978,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
             );
             if (stopSounds != 0) {
                 LogInt(
-                    "SEO b",
+                    DATA_COMPGEN(0x004f672c, setEnvironmentOriginSEOB, "SEO b"),
                     edgeOffset,
                     ENVIRONMENT_SOUND_LOG_UNUSED,
                     ENVIRONMENT_SOUND_LOG_UNUSED,
@@ -8052,7 +8067,7 @@ VA(0x004669c6, 0x69)
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        sprintf(gText, "loop%04d.82M", index);
+        sprintf(gText, DATA_COMPGEN(0x004f6734, checkLoadSampleLoop04d82M, "loop%04d.82M"), index);
         m_loopingSamples[index] = gpResourceManager->GetSample(gText);
     }
 }
@@ -8384,7 +8399,7 @@ void advManager::DimensionDoor(void) {
     i32 y;
     mapCell* targetCell;
 
-    dimensionDoorWindow = new heroWindow(0, 0, "dimdoor.bin");
+    dimensionDoorWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f6744, dimensionDoorDimdoorBin, "dimdoor.bin"));
     if (dimensionDoorWindow == NULL) {
         MemError();
     }
@@ -8401,7 +8416,7 @@ void advManager::DimensionDoor(void) {
             || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                "Dimension Door failed!!!",
+                DATA_COMPGEN(0x004f6750, dimensionDoorDimensionDoorFailed, "Dimension Door failed!!!"),
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8476,7 +8491,7 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            "No available town.  Spell Failed!!!",
+            DATA_COMPGEN(0x004f676c, townGateNoAvailableTownSpellFailed, "No available town.  Spell Failed!!!"),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8491,7 +8506,7 @@ void advManager::TownGate(SpellType spellId) {
     }
     if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
         NormalDialog(
-            "Spell Failed!!!  You must be on land for this spell to work.",
+            DATA_COMPGEN(0x004f6790, townGateSpellFailedYouMustBeOn, "Spell Failed!!!  You must be on land for this spell to work."),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8509,9 +8524,9 @@ void advManager::TownGate(SpellType spellId) {
         townPortalWin = new heroWindow(
             TOWN_PORTAL_WINDOW_X,
             TOWN_PORTAL_WINDOW_Y,
-            "townport.bin"
+            DATA_COMPGEN(0x004f67d0, townGateTownportBin, "townport.bin")
         );
-        sprintf(gText, "{Town Portal}\n\nSelect town to port to.");
+        sprintf(gText, DATA_COMPGEN(0x004f67e0, townGateTownPortalSelectTownToPort, "{Town Portal}\n\nSelect town to port to."));
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
         message.payload.widget.id = TOWN_PORTAL_TITLE_WIDGET;
@@ -8556,7 +8571,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            "Nearest town occupied.  Spell Failed!!!",
+            DATA_COMPGEN(0x004f6808, townGateNearestTownOccupiedSpellFailed, "Nearest town occupied.  Spell Failed!!!"),
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8735,7 +8750,7 @@ void advManager::SummonBoat(void) {
         Reseed(0, 0);
         if (!foundBoat) {
             NormalDialog(
-                "Summon Boat failed!!!",
+                DATA_COMPGEN(0x004f6830, summonBoatSummonBoatFailed, "Summon Boat failed!!!"),
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -9210,7 +9225,7 @@ void advManager::SetInitialMapOrigin(void) {
 VA(0x00469160, 0x1be)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f6848, loadRemoteAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -9288,12 +9303,12 @@ char* advManager::CheckHandleNet(void) {
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
-                LogStr("Receive Remote Player Exit");
+                LogStr(DATA_COMPGEN(0x004f6854, checkHandleNetReceiveRemotePlayerExit, "Receive Remote Player Exit"));
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
-                LogStr("Host Reports Player Exit");
+                LogStr(DATA_COMPGEN(0x004f6870, checkHandleNetHostReportsPlayerExit, "Host Reports Player Exit"));
                 ReceiveHostReportsPlayerExit(
                     packet9->sender,
                     ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
@@ -9452,7 +9467,7 @@ void advManager::SaveAdventureBorder(void) {
     }
 
     m_adventureBorder = static_cast<u8*>(
-        H2_ALLOC(BORDER_BUFFER_SIZE, SAVE_BORDER_ALLOC_LINE_BASE + BORDER_ALLOC_LINE_OFFSET)
+        H2_ALLOC_AT(BORDER_BUFFER_SIZE, DATA_COMPGEN(0x004f6890, saveAdventureBorderSourceFile, RETAIL_FILE), SAVE_BORDER_ALLOC_LINE_BASE + BORDER_ALLOC_LINE_OFFSET)
     );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
@@ -9668,8 +9683,8 @@ void advManager::ViewPuzzle(void) {
     i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
-    icon* puzzleIconObjectPointer = gpResourceManager->GetIcon("puzzle.icn");
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68bc, viewPuzzleAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    icon* puzzleIconObjectPointer = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f68c8, puzzleIconObjectPointerPuzzleIcn, "puzzle.icn"));
     i32 pieceIndexPosition;
     for (pieceIndexPosition = 0; pieceIndexPosition < PUZZLE_PIECE_COUNT;
          ++pieceIndexPosition) {
@@ -9689,7 +9704,7 @@ void advManager::ViewPuzzle(void) {
         PUZZLE_VIEW_SIZE
     );
     heroWindow* puzzleWindowObject =
-        new heroWindow(PUZZLE_WINDOW_X, PUZZLE_WINDOW_Y, "viewpuzl.bin");
+        new heroWindow(PUZZLE_WINDOW_X, PUZZLE_WINDOW_Y, DATA_COMPGEN(0x004f68d4, puzzleWindowObjectViewpuzlBin, "viewpuzl.bin"));
     if (puzzleWindowObject == NULL) {
         MemError();
     }
@@ -9801,12 +9816,12 @@ void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68e4, advPanelAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         i32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
 
-        adventurePanel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "apanel.bin");
+        adventurePanel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, DATA_COMPGEN(0x004f68f0, advPanelApanelBin, "apanel.bin"));
         if (adventurePanel == NULL) {
             MemError();
         }
@@ -9944,12 +9959,12 @@ VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68fc, controlPanelAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
     heroWindow* controlPanel =
-        new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "cpanel.bin");
+        new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, DATA_COMPGEN(0x004f6908, controlPanelCpanelBin, "cpanel.bin"));
     if (controlPanel == NULL) {
         MemError();
     }
@@ -10041,19 +10056,19 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 confirmation,
-                                "Are you sure you want to restart?  (Your current game will be "
-                                "lost)"
+                                DATA_COMPGEN(0x004f6914, cPanelHandlerAreYouSureYouWantTo, "Are you sure you want to restart?  (Your current game will be "
+                                "lost)")
                             );
                             break;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 confirmation,
-                                "Are you sure you want to load a new game?  (Your current game "
-                                "will be lost)"
+                                DATA_COMPGEN(0x004f6958, cPanelHandlerAreYouSureYouWantTo2, "Are you sure you want to load a new game?  (Your current game "
+                                "will be lost)")
                             );
                             break;
                         case CONTROL_MAIN_MENU:
-                            strcpy(confirmation, "Are you sure you want to quit?");
+                            strcpy(confirmation, DATA_COMPGEN(0x004f69a4, cPanelHandlerAreYouSureYouWantTo3, "Are you sure you want to quit?"));
                             break;
                         case CONTROL_SAVE_GAME:
                         case PANEL_CLOSE_WIDGET:
@@ -10102,7 +10117,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f69c4, systemOptionsAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 oldInterfaceMode = gConfig.evilInterfaceUsage;
     ConfigWalkSpeed oldWalkSpeed = gConfig.walkSpeed;
     i32 heroWasMobilized = m_heroContextLocked;
@@ -10112,7 +10127,7 @@ void advManager::SystemOptions(void) {
     cPanel = new heroWindow(
         ADVMGR_SYSTEM_OPTIONS_WINDOW_X,
         ADVMGR_SYSTEM_OPTIONS_WINDOW_Y,
-        "spanel.bin"
+        DATA_COMPGEN(0x004f69d0, systemOptionsSpanelBin, "spanel.bin")
     );
     if (cPanel == NULL) {
         MemError();
@@ -10224,7 +10239,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     if (gConfig.blackoutComputer == 0) {
         message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     } else {
-        message.payload.widget.data.text = "Don't Show";
+        message.payload.widget.data.text = DATA_COMPGEN(0x004f69dc, updateSystemOptionsDonTShow, "Don't Show");
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
@@ -10331,8 +10346,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
                                 NormalDialog(
-                                    "Neither MIDI nor Redbook music is currently available on this "
-                                    "system.",
+                                    DATA_COMPGEN(0x004f69e8, systemOptionsHandlerNeitherMIDINorRedbookMusicIs, "Neither MIDI nor Redbook music is currently available on this "
+                                    "system."),
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10355,7 +10370,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
                                 NormalDialog(
-                                    "Digital sound is not currently available on this system.",
+                                    DATA_COMPGEN(0x004f6a30, systemOptionsHandlerDigitalSoundIsNotCurrentlyAvailable, "Digital sound is not currently available on this system."),
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10403,9 +10418,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 if (gpSoundManager->m_cdReady == 0) {
                                     NormalDialog(
-                                        "Unable to set up CD stereo music.  Your CD player might "
+                                        DATA_COMPGEN(0x004f6a6c, systemOptionsHandlerUnableToSetUpCDStereo, "Unable to set up CD stereo music.  Your CD player might "
                                         "be in use by another program, or your sound driver might "
-                                        "not support CD stereo.",
+                                        "not support CD stereo."),
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
                                         OPTION_DIALOG_NONE,
@@ -10454,7 +10469,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         case SYSTEM_OPTION_VIDEO:
                             if (gbLowMemory) {
                                 NormalDialog(
-                                    "You don't have enough memory for non-interlaced video.",
+                                    DATA_COMPGEN(0x004f6af4, systemOptionsHandlerYouDonTHaveEnoughMemory, "You don't have enough memory for non-interlaced video."),
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10582,7 +10597,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearestDistanceState == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            "You must be within 3 spaces of a monster for the Visions spell to work.",
+            DATA_COMPGEN(0x004f6b2c, doVisionsYouMustBeWithin3Spaces, "You must be within 3 spaces of a monster for the Visions spell to work."),
             1,
             -1,
             -1,
@@ -10600,18 +10615,19 @@ i32 advManager::DoVisions(hero* visionHero) {
     creatureData = static_cast<CreatureType>(cellData->m_objectIndex);
     forcedJoinState = cellData->m_objectMetadata & MONSTER_JOIN_FORCED;
     monsterCountIndex = cellData->m_objectMetadata & MONSTER_COUNT_MASK;
-    sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[IDX(creatureData)]);
+    sprintf(gText, DATA_COMPGEN(0x004f6b74, doVisionsDS, "{%d %s}\n\n"), monsterCountIndex, gArmyNamesPlural[IDX(creatureData)]);
     strengthRatioCurrent =
         static_cast<float>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0))
         / static_cast<float>(gMonsterDatabase[IDX(creatureData)].fightValue * monsterCountIndex);
 
     if (visionHero->m_army.CanJoin(creatureData)
-        && strengthRatioCurrent > MONSTER_STRENGTH_JOIN
+        && strengthRatioCurrent
+            > DATA_COMPGEN(0x004eb6b8, monsterStrengthJoinThreshold, MONSTER_STRENGTH_JOIN)
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && creatureData != CREATURE_GHOST
         && creatureData != CREATURE_EARTH_ELEMENTAL && creatureData != CREATURE_AIR_ELEMENTAL
         && creatureData != CREATURE_FIRE_ELEMENTAL && creatureData != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoinState) {
-            sprintf(visionMessageResult, "The creatures are willing to join us!");
+            sprintf(visionMessageResult, DATA_COMPGEN(0x004f6b80, doVisionsTheCreaturesAreWillingToJoin, "The creatures are willing to join us!"));
             strcat(gText, visionMessageResult);
             goto showVision;
         } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
@@ -10633,7 +10649,10 @@ i32 advManager::DoVisions(hero* visionHero) {
                 * VISIONS_JOIN_COST_MULTIPLIER;
             if (joiningCostIndex
                 > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
-                if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
+                if (strengthRatioCurrent
+                    > DATA_COMPGEN(
+                        0x004eb6c0, monsterStrengthFleeThreshold, MONSTER_STRENGTH_FLEE
+                    )) {
                     goto creaturesFlee;
                 } else {
                     goto creaturesFight;
@@ -10643,13 +10662,13 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joiningCount == monsterCountIndex) {
                 sprintf(
                     visionMessageResult,
-                    "All the creatures will join us...\n\nfor a fee of %d gold.",
+                    DATA_COMPGEN(0x004f6ba8, doVisionsAllTheCreaturesWillJoinUs, "All the creatures will join us...\n\nfor a fee of %d gold."),
                     joiningCostIndex
                 );
             } else {
                 sprintf(
                     visionMessageResult,
-                    "%d of the creatures will join us...\n\nfor a fee of %d gold.",
+                    DATA_COMPGEN(0x004f6be4, doVisionsDOfTheCreaturesWillJoin, "%d of the creatures will join us...\n\nfor a fee of %d gold."),
                     monsterCountIndex,
                     joiningCostIndex
                 );
@@ -10661,12 +10680,12 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
     creaturesFlee:
-        sprintf(visionMessageResult, "These weak creatures will surely flee before us.");
+        sprintf(visionMessageResult, DATA_COMPGEN(0x004f6c20, doVisionsTheseWeakCreaturesWillSurelyFlee, "These weak creatures will surely flee before us."));
         strcat(gText, visionMessageResult);
         goto showVision;
     }
 creaturesFight:
-    sprintf(visionMessageResult, "I fear these creatures are in the mood for a fight.");
+    sprintf(visionMessageResult, DATA_COMPGEN(0x004f6c54, doVisionsIFearTheseCreaturesAreIn, "I fear these creatures are in the mood for a fight."));
     strcat(gText, visionMessageResult);
     goto showVision;
 

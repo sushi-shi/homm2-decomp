@@ -50,7 +50,7 @@ H2_ENUM_BEGIN(CursorPrivateConstant)
     GROUP_FREE_LINE_OFFSET   = 25
 H2_ENUM_END(CursorPrivateConstant)
 
-#define SLOW_TURN_DELAY_SCALE 1.5
+#define SLOW_TURN_DELAY_SCALE DATA_COMPGEN(0x004eb078, dELAYSCALEConstant, 1.5)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
@@ -649,7 +649,7 @@ mapCell* advManager::MoveHero(
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = 0;
-                fizzleSample_h = LoadPlaySample("killfade.82m");
+                fizzleSample_h = LoadPlaySample(DATA_COMPGEN(0x004ee06c, moveHeroKillfade82m, "killfade.82m"));
                 gpWindowManager->SaveFizzleSource(
                     CURSOR_FIZZLE_X,
                     CURSOR_FIZZLE_Y,
@@ -1200,7 +1200,7 @@ void advManager::ProcessMapChange(SMapChange change) {
     switch (change.type) {
         case MAP_CHANGE_MOVE_HERO:
             LogInt(
-                "MC Move Hero",
+                DATA_COMPGEN(0x004ee07c, processMapChangeMCMoveHero, "MC Move Hero"),
                 change.id,
                 change.x,
                 change.y,
@@ -1213,9 +1213,9 @@ void advManager::ProcessMapChange(SMapChange change) {
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y) {
                 sprintf(
                     gText,
-                    "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
+                    DATA_COMPGEN(0x004ee08c, processMapChangeDataMiscommunicationInHeroPositionFirst, "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
                     "give Phil a copy of  your Autosave and, if possible, instructions to recreate "
-                    "this error",
+                    "this error"),
                     mapHero_n->m_x,
                     mapHero_n->m_y,
                     change.x,
@@ -1247,7 +1247,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_MY_TURN:
             LogInt(
-                "MC My Turn",
+                DATA_COMPGEN(0x004ee134, processMapChangeMCMyTurn, "MC My Turn"),
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1260,7 +1260,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_TELEPORT_HERO:
             LogInt(
-                "MC Teleport Hero",
+                DATA_COMPGEN(0x004ee140, processMapChangeMCTeleportHero, "MC Teleport Hero"),
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1275,7 +1275,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_CLAIM_MINE:
             LogInt(
-                "MC ClaimMine",
+                DATA_COMPGEN(0x004ee154, processMapChangeMCClaimMine, "MC ClaimMine"),
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1291,7 +1291,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_CLAIM_TOWN:
             LogInt(
-                "MC ClaimTown",
+                DATA_COMPGEN(0x004ee164, processMapChangeMCClaimTown, "MC ClaimTown"),
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1307,7 +1307,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_BUILD_BOAT:
             LogInt(
-                "MC BuildBoat",
+                DATA_COMPGEN(0x004ee174, processMapChangeMCBuildBoat, "MC BuildBoat"),
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1323,7 +1323,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_ERASE_OBJECT:
             LogInt(
-                "MC Erase Object",
+                DATA_COMPGEN(0x004ee184, processMapChangeMCEraseObject, "MC Erase Object"),
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1339,7 +1339,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_DEAD_HERO:
-            LogStr("MC DeadHero");
+            LogStr(DATA_COMPGEN(0x004ee194, processMapChangeMCDeadHero, "MC DeadHero"));
             mapHero_n = gpGame->GetHero(change.id);
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y)
                 break;
@@ -1349,7 +1349,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_RECRUIT_HERO:
-            LogStr("MC RecruitHero");
+            LogStr(DATA_COMPGEN(0x004ee1a0, processMapChangeMCRecruitHero, "MC RecruitHero"));
             mapHero_n = gpGame->GetHero(change.id);
             mapHero_n->m_x = change.x;
             mapHero_n->m_y = change.y;
@@ -1370,8 +1370,8 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_DEAD_PLAYER:
-            LogStr("Dead Player");
-            sprintf(gText, "%s has been vanquished!", cPlayerNames[change.id]);
+            LogStr(DATA_COMPGEN(0x004ee1b0, processMapChangeDeadPlayer, "Dead Player"));
+            sprintf(gText, DATA_COMPGEN(0x004ee1bc, processMapChangeSHasBeenVanquished, "%s has been vanquished!"), cPlayerNames[change.id]);
             NormalDialog(
                 gText,
                 NORMAL_DIALOG_INFO,
@@ -1407,7 +1407,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
             if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == incoming->sequence) {
                 LogInt(
-                    "OQ",
+                    DATA_COMPGEN(0x004ee1d4, processIncomingSingleMapChangeOQ, "OQ"),
                     incoming->sequence,
                     giMapChangeCtr,
                     LOG_UNUSED_VALUE,
@@ -1423,7 +1423,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type == MAP_CHANGE_NONE) {
                 LogInt(
-                    "SQ",
+                    DATA_COMPGEN(0x004ee1d8, processIncomingSingleMapChangeSQ, "SQ"),
                     incoming->sequence,
                     giMapChangeCtr,
                     LOG_UNUSED_VALUE,
@@ -1456,7 +1456,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(H2_ALLOC(size, s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
+    buf = static_cast<SMapChange*>(H2_ALLOC_AT(size, DATA_COMPGEN(0x004ee1e0, processIncomingGroupMapChangeSourceFile, RETAIL_FILE), s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];
@@ -1466,7 +1466,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
             processed = 0;
         }
     }
-    H2_FREE(buf, s_groupLineBase + GROUP_FREE_LINE_OFFSET);
+    H2_FREE_AT(buf, DATA_COMPGEN(0x004ee20c, processIncomingGroupMapChangeSourceFile2, RETAIL_FILE), s_groupLineBase + GROUP_FREE_LINE_OFFSET);
 }
 
 VA(0x00410b29, 0x75)
@@ -1546,7 +1546,7 @@ void SendMapChange(
     if (player == MAP_CHANGE_CURRENT_PLAYER)
         player = giCurPlayer;
     LogInt(
-        "Send Map Change",
+        DATA_COMPGEN(0x004ee238, sendMapChangeSendMapChange, "Send Map Change"),
         type,
         id,
         x,

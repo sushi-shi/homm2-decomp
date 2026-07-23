@@ -29,14 +29,14 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR 12.5
-#define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR 78.0f
-#define COMBAT_CATAPULT_DISTANCE_ARC_SCALE 0.3
-#define COMBAT_CATAPULT_TARGET_ARC_SCALE 0.35
-#define COMBAT_MISSILE_DEGREES_PER_RADIAN 180.0
-#define COMBAT_MISSILE_PI 3.14159
-#define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR 2.0f
-#define COMBAT_CREATURE_VANISH_DURATION 150.0f
+#define COMBAT_CATAPULT_HORIZONTAL_STEP_DIVISOR DATA_COMPGEN(0x004eb8b8, sTEPDIVISORConstant, 12.5)
+#define COMBAT_CATAPULT_VERTICAL_STEP_DIVISOR DATA_COMPGEN(0x004eb8c0, sTEPDIVISORConstant2, 78.0f)
+#define COMBAT_CATAPULT_DISTANCE_ARC_SCALE DATA_COMPGEN(0x004eb8a8, aRCSCALEConstant, 0.3)
+#define COMBAT_CATAPULT_TARGET_ARC_SCALE DATA_COMPGEN(0x004eb8b0, aRCSCALEConstant2, 0.35)
+#define COMBAT_MISSILE_DEGREES_PER_RADIAN DATA_COMPGEN(0x004eb8f8, pERRADIANConstant, 180.0)
+#define COMBAT_MISSILE_PI DATA_COMPGEN(0x004eb900, mISSILEPIConstant, 3.14159)
+#define COMBAT_MISSILE_DIRECTION_AVERAGE_DIVISOR DATA_COMPGEN(0x004eb908, aVERAGEDIVISORConstant, 2.0f)
+#define COMBAT_CREATURE_VANISH_DURATION DATA_COMPGEN(0x004eb8f0, vANISHDURATIONConstant, 150.0f)
 
 namespace {
 
@@ -200,8 +200,8 @@ combatManager::combatManager(void) {
     m_inCastleCombat = false;
     m_mouseGridHex = -1;
     m_combatWindowOpen = 0;
-    strcpy(m_previousCombatMessage, "");
-    strcpy(m_currentCombatMessage, "");
+    strcpy(m_previousCombatMessage, DATA_COMPGEN(0x004f8908, combatManagerEmptyString, ""));
+    strcpy(m_currentCombatMessage, DATA_COMPGEN(0x004f890c, combatManagerEmptyString2, ""));
 }
 
 VA(0x0048ff0a, 0x128)
@@ -360,7 +360,7 @@ void combatManager::SetupCombat(
                 static_cast<i32>(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)
                 + static_cast<i32>(HERO_CAPTAIN_PORTRAIT_FIRST)
             );
-            strcpy(m_captain.m_name, "Captain");
+            strcpy(m_captain.m_name, DATA_COMPGEN(0x004f8910, setupCombatCaptain, "Captain"));
             for (index = 0; index < ARMY_GROUP_SLOT_COUNT; index++)
                 m_captain.m_army.m_creatureTypes[index] = CREATURE_NONE;
             for (index = 0; index < HERO_ARTIFACT_SLOT_COUNT; index++)
@@ -481,7 +481,7 @@ void combatManager::SetupAdjacencyArray(void) {
 
 VA(0x00490aa0, 0x43f)
 i32 combatManager::Open(i32 openFlags) {
-    LogStr("Op1");
+    LogStr(DATA_COMPGEN(0x004f8918, openOp1, "Op1"));
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = 1;
     i32 savedShowMouseHex = gConfig.showCombatMouseHex;
@@ -505,9 +505,9 @@ i32 combatManager::Open(i32 openFlags) {
     GetNextArmy(0);
     m_backgroundDrawn = 0;
 
-    LogStr("Op2");
+    LogStr(DATA_COMPGEN(0x004f891c, openOp2, "Op2"));
     SAMPLE2 preBattleSample = NULL_SAMPLE2;
-    preBattleSample = LoadPlaySample("PREBATTL.82M");
+    preBattleSample = LoadPlaySample(DATA_COMPGEN(0x004f8920, openPREBATTL82M, "PREBATTL.82M"));
     gpWindowManager->FadeScreen(FADE_OUT, FADE_STEPS, NULL);
     giCycleType = m_colorCycleType;
     CycleColors(1);
@@ -515,19 +515,19 @@ i32 combatManager::Open(i32 openFlags) {
     gCurLoadedSpellIcon = NULL;
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
     gpMouseManager->m_forcePointerUpdate = 0;
-    gpMouseManager->SetPointer("cmbtmous.mse", COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f8930, openCmbtmousMse, "cmbtmous.mse"), COMBAT_POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     bMouseWasVis = gpMouseManager->IsVis();
     gpMouseManager->ShowColorPointer();
-    m_combatWindow = new heroWindow(0, 0, "cmbtwin.bin");
+    m_combatWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f8940, openCmbtwinBin, "cmbtwin.bin"));
     if (m_combatWindow == NULL)
         MemError();
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = 1;
     DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
     glTimers[0] = KBTickCount();
-    m_combatPalette = gpResourceManager->GetPalette("kb.pal");
+    m_combatPalette = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f894c, openKbPal, "kb.pal"));
     KBChangeMenu(hmnuCmbt);
-    CombatMessage("", 1, 1, 0);
+    CombatMessage(DATA_COMPGEN(0x004f8954, openEmptyString, ""), 1, 1, 0);
     gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
@@ -535,18 +535,18 @@ i32 combatManager::Open(i32 openFlags) {
     gbLimitedCombatUpdatePalette = true;
     WaitEndSample(preBattleSample, -1);
 
-    LogStr("Op3");
+    LogStr(DATA_COMPGEN(0x004f8958, openOp3, "Op3"));
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
     ResetCycleTimers();
-    LogStr("Op4");
+    LogStr(DATA_COMPGEN(0x004f895c, openOp4, "Op4"));
     gpInputManager->Flush();
     ResetMouse();
     m_messageMask = BASE_MANAGER_ACCEPT_WIDGET;
     m_priority = openFlags;
     m_active = true;
-    strcpy(m_name, "combatManager");
-    LogStr("Op5");
+    strcpy(m_name, DATA_COMPGEN(0x004f8960, openCombatManager, "combatManager"));
+    LogStr(DATA_COMPGEN(0x004f8970, openOp5, "Op5"));
     return 0;
 }
 
@@ -826,28 +826,28 @@ void combatManager::LoadIcons(void) {
     for (index = 0; index < COMBAT_OBSTACLE_ICON_LOAD_COUNT; index++)
         m_obstacleIcons[index] = NULL;
 
-    m_combatIcons[IDX(COMBAT_ICON_SPELLS)] = gpResourceManager->GetIcon("spells.icn");
-    m_combatIcons[IDX(COMBAT_ICON_STATUS)] = gpResourceManager->GetIcon("textbar.icn");
-    m_combatIcons[IDX(COMBAT_ICON_GRID)] = gpResourceManager->GetIcon("cmbtmisc.icn");
+    m_combatIcons[IDX(COMBAT_ICON_SPELLS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8974, loadIconsSpellsIcn, "spells.icn"));
+    m_combatIcons[IDX(COMBAT_ICON_STATUS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8980, loadIconsTextbarIcn, "textbar.icn"));
+    m_combatIcons[IDX(COMBAT_ICON_GRID)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f898c, loadIconsCmbtmiscIcn, "cmbtmisc.icn"));
     m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_BACKGROUND)] =
-        gpResourceManager->GetIcon("viewarsm.icn");
+        gpResourceManager->GetIcon(DATA_COMPGEN(0x004f899c, loadIconsViewarsmIcn, "viewarsm.icn"));
     m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_MODIFIER)] =
-        gpResourceManager->GetIcon("minilkmr.icn");
-    m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon("spellinf.icn");
+        gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89ac, loadIconsMinilkmrIcn, "minilkmr.icn"));
+    m_combatIcons[IDX(COMBAT_ICON_SMALL_VIEW_SPELL)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89bc, loadIconsSpellinfIcn, "spellinf.icn"));
 
     if (m_inCastleCombat) {
         if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_MOAT)) {
-            m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon("moatpart.icn");
-            m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon("moatwhol.icn");
+            m_combatIcons[IDX(COMBAT_ICON_MOAT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89cc, loadIconsMoatpartIcn, "moatpart.icn"));
+            m_combatIcons[IDX(COMBAT_ICON_DRAWBRIDGE)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89dc, loadIconsMoatwholIcn, "moatwhol.icn"));
         }
-        m_combatIcons[IDX(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon("catapult.icn");
+        m_combatIcons[IDX(COMBAT_ICON_CATAPULT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f89ec, loadIconsCatapultIcn, "catapult.icn"));
         sprintf(
             gText,
-            "castle%c.icn",
+            DATA_COMPGEN(0x004f89fc, loadIconsCastleCIcn, "castle%c.icn"),
             cHeroTypeInitial[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)]
         );
         m_combatIcons[IDX(COMBAT_ICON_TOWER)] = gpResourceManager->GetIcon(gText);
-        m_combatIcons[IDX(COMBAT_ICON_KEEP)] = gpResourceManager->GetIcon("keep.icn");
+        m_combatIcons[IDX(COMBAT_ICON_KEEP)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8a0c, loadIconsKeepIcn, "keep.icn"));
     }
 
     for (index = 0; index < COMBAT_SIDE_COUNT; index++) {
@@ -859,12 +859,12 @@ void combatManager::LoadIcons(void) {
 
         if (m_heroes[index]) {
             if (m_heroes[index]->m_isCaptain) {
-                sprintf(gText, "cmbtcap%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, DATA_COMPGEN(0x004f8a18, loadIconsCmbtcapCIcn, "cmbtcap%c.icn"), cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] =
                     IDX(m_heroes[index]->m_cursorType) + COMBAT_CAPTAIN_SPRITE_OFFSET;
             } else {
-                sprintf(gText, "cmbthro%c.icn", cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
+                sprintf(gText, DATA_COMPGEN(0x004f8a28, loadIconsCmbthroCIcn, "cmbthro%c.icn"), cHeroTypeInitial[IDX(m_heroes[index]->m_cursorType)]);
                 m_heroIcons[index] = gpResourceManager->GetIcon(gText);
                 m_heroSpriteIndex[index] = IDX(m_heroes[index]->m_cursorType);
             }
@@ -875,7 +875,7 @@ void combatManager::LoadIcons(void) {
                 heroColor = COMBAT_NEUTRAL_HERO_COLOR;
             else
                 heroColor = gpGame->GetPlayerColor(static_cast<i8>(m_playerId[index]));
-            sprintf(gText, "herofl%02d.icn", heroColor);
+            sprintf(gText, DATA_COMPGEN(0x004f8a38, loadIconsHerofl02dIcn, "herofl%02d.icn"), heroColor);
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
         }
     }
@@ -1061,18 +1061,18 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     bInHighMoraleBonus = 1;
     SAMPLE2 moraleSample;
     if (!gbNoShowCombat) {
-        sprintf(gText, "goodmrle.82M");
+        sprintf(gText, DATA_COMPGEN(0x004f8a48, checkApplyGoodMoraleGoodmrle82M, "goodmrle.82M"));
         moraleSample = LoadPlaySample(gText);
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "High morale enables the \n%s to attack again.",
+                DATA_COMPGEN(0x004f8a58, checkApplyGoodMoraleHighMoraleEnablesTheSTo, "High morale enables the \n%s to attack again."),
                 gArmyNames[IDX(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "High morale enables the \n%s to attack again.",
+                DATA_COMPGEN(0x004f8a88, checkApplyGoodMoraleHighMoraleEnablesTheSTo2, "High morale enables the \n%s to attack again."),
                 gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1108,17 +1108,17 @@ i32 combatManager::CheckApplyBadMorale(
     SAMPLE2 moraleSample;
     if (!gbNoShowCombat) {
         moraleSample = NULL_SAMPLE2;
-        moraleSample = LoadPlaySample("BADMRLE.82M");
+        moraleSample = LoadPlaySample(DATA_COMPGEN(0x004f8ab8, checkApplyBadMoraleBADMRLE82M, "BADMRLE.82M"));
         if (activeArmy->m_quantity <= 1)
             sprintf(
                 gText,
-                "Low morale causes the \n%s to freeze in panic.",
+                DATA_COMPGEN(0x004f8ac4, checkApplyBadMoraleLowMoraleCausesTheSTo, "Low morale causes the \n%s to freeze in panic."),
                 gArmyNames[IDX(activeArmy->m_monsterType)]
             );
         else
             sprintf(
                 gText,
-                "Low morale causes the \n%s to freeze in panic.",
+                DATA_COMPGEN(0x004f8af4, checkApplyBadMoraleLowMoraleCausesTheSTo2, "Low morale causes the \n%s to freeze in panic."),
                 gArmyNamesPlural[IDX(activeArmy->m_monsterType)]
             );
         CombatMessage(gText, 1, 1, 0);
@@ -1245,7 +1245,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     if (!m_inCastleCombat)
         return;
 
-    LogStr("CA1");
+    LogStr(DATA_COMPGEN(0x004f8b24, catAttackCA1, "CA1"));
     if (m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] != COMBAT_SIDE_NONE
         || m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] != COMBAT_SIDE_NONE) {
         m_smallViewSide[IDX(COMBAT_ATTACKER_SIDE)] = m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
@@ -1317,13 +1317,13 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         && keepIndex6 == -1)
         return;
 
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    sprintf(gText, DATA_COMPGEN(0x004f8b28, catAttackCatsnd02d82M, "catsnd%02d.82M"), COMBAT_CATAPULT_IMPACT_SOUND);
     sample* loadedSample26 = gpResourceManager->GetSample(gText);
     i32 unknown15;
     SAMPLE2 catapultSound37 = NULL_SAMPLE2;
     SAMPLE2 impactSound1 = NULL_SAMPLE2;
-    icon* boulder37 = gpResourceManager->GetIcon("boulder.icn");
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
+    icon* boulder37 = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f8b38, boulder37BoulderIcn, "boulder.icn"));
+    sprintf(gText, DATA_COMPGEN(0x004f8b44, catAttackCatsnd02d82M2, "catsnd%02d.82M"), COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound37 = LoadPlaySample(gText);
 
     i32 impactX5 = -1;
@@ -1444,7 +1444,12 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             giMinExtentX = previousX5 - COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS;
             giMaxExtentX =
                 static_cast<i32l>(
-                    projectileX11 + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                    projectileX11
+                    + DATA_COMPGEN(
+                        0x004eb8c4,
+                        catapultProjectileExtentRadius,
+                        IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                    )
                 );
             giMinExtentY =
                 static_cast<i32l>(
@@ -1500,7 +1505,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             m_catapultFrame[IDX(side)]++;
     }
 
-    sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
+    sprintf(gText, DATA_COMPGEN(0x004f8b54, catAttackCatsnd02d82M3, "catsnd%02d.82M"), COMBAT_CATAPULT_IMPACT_SOUND);
     impactSound1 = LoadPlaySample(gText);
     m_unknownF34B = 0;
     m_unknownF34F = 0;
@@ -1521,7 +1526,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         giMaxExtentY = COMBAT_MAX_EXTENT_Y;
 
     icon* cloud29 =
-        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? "smalclod.icn" : "lichclod.icn"));
+        gpResourceManager->GetIcon(const_cast<char*>(missShot19 ? DATA_COMPGEN(0x004f8b64, cloud29SmalclodIcn, "smalclod.icn") : DATA_COMPGEN(0x004f8b74, cloud29LichclodIcn, "lichclod.icn")));
 
     for (frame18 = 0; frame18 < COMBAT_CATAPULT_CLOUD_FRAME_COUNT; frame18++) {
         if (frame18 >= COMBAT_CATAPULT_CLOUD_VISIBLE_FRAME_COUNT
@@ -1529,7 +1534,12 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             continue;
         glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
             KBTickCount()
-            + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_CATAPULT_ANIMATION_DELAY)
+            + gfCombatSpeedMod[gConfig.combatSpeed]
+                * DATA_COMPGEN(
+                    0x004eb8c8,
+                    catapultAnimationDelay,
+                    IDX(COMBAT_CATAPULT_ANIMATION_DELAY)
+                )
         );
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
         if (gateIndex2 != -1 && frame18 >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot19) {
@@ -1614,7 +1624,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     WaitEndSample(catapultSound37, -1);
     if (loadedSample26)
         gpResourceManager->Dispose(loadedSample26);
-    LogStr("CA2");
+    LogStr(DATA_COMPGEN(0x004f8b84, catAttackCA2, "CA2"));
 }
 
 VA(0x0049412d, 0x74f)
@@ -1631,7 +1641,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
                    != COMBAT_WALL_STATE_TOWER_STANDING))
         return;
 
-    LogStr("KA1");
+    LogStr(DATA_COMPGEN(0x004f8b88, keepAttackKA1, "KA1"));
 
     CombatKeepTargetPriority bestPriority0 = KEEP_PRIORITY_NONE;
     i32 bestValue10 = 0;
@@ -1672,7 +1682,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         return;
 
     target0 = &gpCombatManager->m_armies[IDX(COMBAT_ATTACKER_SIDE)][bestArmyIndex5];
-    sprintf(gText, "keepshot.82M");
+    sprintf(gText, DATA_COMPGEN(0x004f8b8c, keepAttackKeepshot82M, "keepshot.82M"));
     SAMPLE2 keepSample19 = NULL_SAMPLE2;
     keepSample19 = LoadPlaySample(gText);
 
@@ -1695,7 +1705,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     // Retail keep-missile direction payload.
     // NOLINTBEGIN(readability-magic-numbers)
     float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] =
-        {90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};
+        {DATA_COMPGEN(0x004eb8cc, missileAngles0Constant6, 90.0f), DATA_COMPGEN(0x004eb8d0, missileAngles0Constant4, 68.5f), DATA_COMPGEN(0x004eb8d4, missileAngles0Constant2, 45.0f), DATA_COMPGEN(0x004eb8d8, missileAngles0Constant8, 20.8f), DATA_COMPGEN(0x004eb8dc, missileAngles0Constant, 0.0f), DATA_COMPGEN(0x004eb8e0, missileAngles0Constant9, -20.8f), DATA_COMPGEN(0x004eb8e4, missileAngles0Constant3, -45.0f), DATA_COMPGEN(0x004eb8e8, missileAngles0Constant5, -68.5f), DATA_COMPGEN(0x004eb8ec, missileAngles0Constant7, -90.0f)};
     // NOLINTEND(readability-magic-numbers)
     ShootMissile(
         sourceX9,
@@ -1733,29 +1743,29 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (killed29 > 0) {
         sprintf(
             gText,
-            "%s %d %s.\n%d %s %s.",
-            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
+            DATA_COMPGEN(0x004f8bd4, keepAttackSDSDSS, "%s %d %s.\n%d %s %s."),
+            tower == COMBAT_TOWER_GARRISON ? DATA_COMPGEN(0x004f8bb8, keepAttackGarrisonDoes, "Garrison does") : DATA_COMPGEN(0x004f8bc8, keepAttackTowerDoes, "Tower does"),
             damage8,
-            "damage",
+            DATA_COMPGEN(0x004f8bb0, keepAttackDamage, "damage"),
             killed29,
             killed29 > 1 ? gArmyNamesPlural[IDX(target0->m_monsterType)]
                          : gArmyNames[IDX(target0->m_monsterType)],
-            killed29 <= 1 ? "perishes" : "perish"
+            killed29 <= 1 ? DATA_COMPGEN(0x004f8b9c, keepAttackPerishes, "perishes") : DATA_COMPGEN(0x004f8ba8, keepAttackPerish, "perish")
         );
     } else {
         sprintf(
             gText,
-            "%s %d %s.",
-            tower == COMBAT_TOWER_GARRISON ? "Garrison does" : "Tower does",
+            DATA_COMPGEN(0x004f8c0c, keepAttackSDS, "%s %d %s."),
+            tower == COMBAT_TOWER_GARRISON ? DATA_COMPGEN(0x004f8bf0, keepAttackGarrisonDoes2, "Garrison does") : DATA_COMPGEN(0x004f8c00, keepAttackTowerDoes2, "Tower does"),
             damage8,
-            "damage"
+            DATA_COMPGEN(0x004f8be8, keepAttackDamage2, "damage")
         );
     }
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target0->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
     target0->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     WaitEndSample(keepSample19, -1);
-    LogStr("KA2");
+    LogStr(DATA_COMPGEN(0x004f8c18, keepAttackKA2, "KA2"));
 }
 
 VA(0x0049487c, 0x17b)
@@ -1909,7 +1919,7 @@ void combatManager::SetupAndLoadObstacles(void) {
                                      + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1]]
                                         .m_blocked = 1;
                             }
-                            sprintf(gText, "cobj%04d.icn", obstacleType4);
+                            sprintf(gText, DATA_COMPGEN(0x004f8c20, setupAndLoadObstaclesCobj04dIcn, "cobj%04d.icn"), obstacleType4);
                             m_obstacleIcons[m_obstacleCount] = gpResourceManager->GetIcon(gText);
                             m_hexCells[anchorHex9].m_obstacleIndex =
                                 static_cast<i8>(m_obstacleCount);
@@ -1972,7 +1982,7 @@ void combatManager::MakeCreaturesVanish(void) {
 VA(0x0049525a, 0xbd)
 void combatManager::LowerDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
-    drawbridgeSample = LoadPlaySample("drawbrg.82m");
+    drawbridgeSample = LoadPlaySample(DATA_COMPGEN(0x004f8c30, lowerDoorDrawbrg82m, "drawbrg.82m"));
     giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
@@ -1990,7 +2000,7 @@ void combatManager::LowerDoor(void) {
 VA(0x00495317, 0xe6)
 void combatManager::RaiseDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
-    drawbridgeSample = LoadPlaySample("drawbrg.82m");
+    drawbridgeSample = LoadPlaySample(DATA_COMPGEN(0x004f8c3c, raiseDoorDrawbrg82m, "drawbrg.82m"));
     giMinExtentX = COMBAT_DOOR_EXTENT_MIN_X;
     giMinExtentY = COMBAT_DOOR_EXTENT_MIN_Y;
     giMaxExtentX = COMBAT_DOOR_EXTENT_MAX_X;
@@ -2064,7 +2074,11 @@ i32 combatManager::ShotIsThroughWall(
         rowStep2 = rowDistance17 > 0 ? 1 : -1;
         columnStep5 = static_cast<float>(columnDistance4) / static_cast<float>(abs(rowDistance17));
     }
-    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    columnStep5 /= DATA_COMPGEN(
+        0x004eb8f4,
+        combatWallTraceSubdivisions,
+        static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
+    );
     rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     float traceColumn6 = static_cast<float>(sourceColumn1);
     float traceRow1 = static_cast<float>(sourceRow9);
@@ -2228,7 +2242,11 @@ void combatManager::ShootMissile(
             gpWindowManager->UpdateScreenRegion(minX8, minY5, maxX9 - minX8 + 1, maxY6 - minY5 + 1);
         }
         glTimers[0] = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_MISSILE_TIMER_DELAY)
+            KBTickCount()
+            + gfCombatSpeedMod[gConfig.combatSpeed]
+                * DATA_COMPGEN(
+                    0x004eb90c, combatMissileTimerDelay, IDX(COMBAT_MISSILE_TIMER_DELAY)
+                )
         );
         oldX8 = missileX16;
         oldY5 = missileY7;
@@ -2256,7 +2274,7 @@ VA(0x00495dcd, 0xf2)
 void combatManager::CombatSystemOptions(void) {
     tag_message message;
     bCPrefsChanged = 0;
-    CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, "cspanel.bin");
+    CSPanel = new heroWindow(SYSTEM_OPTION_WINDOW_X, SYSTEM_OPTION_WINDOW_Y, DATA_COMPGEN(0x004f8c48, combatSystemOptionsCspanelBin, "cspanel.bin"));
     if (!CSPanel)
         MemError();
     SetWinText(CSPanel, 1);

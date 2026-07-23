@@ -46,10 +46,10 @@
 #include <SOURCE/ARMY.h>
 #include <SOURCE/kbwin.h>
 
-#define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
-#define GAME_SCORE_LARGE_DAY_SCALE 0.8
-#define GAME_SCORE_SMALL_DAY_SCALE 1.4
-#define GAME_VIEW_ARMY_FRAME_DELAY_SCALE 1.35
+#define GAME_SCORE_EXTRA_LARGE_DAY_SCALE DATA_COMPGEN(0x004eb748, dAYSCALEConstant, 0.6)
+#define GAME_SCORE_LARGE_DAY_SCALE DATA_COMPGEN(0x004eb750, dAYSCALEConstant3, 0.8)
+#define GAME_SCORE_SMALL_DAY_SCALE DATA_COMPGEN(0x004eb758, dAYSCALEConstant2, 1.4)
+#define GAME_VIEW_ARMY_FRAME_DELAY_SCALE DATA_COMPGEN(0x004eb6f8, dELAYSCALEConstant, 1.35)
 
 H2_ENUM_BEGIN(MapTilesetConstant)
     WAGON_CAMP_ACTIVE_FRAME = 129
@@ -288,11 +288,11 @@ H2_ENUM_BEGIN(DiffRuntimeConstant)
     DIFF_COPY_FLAG_SHIFT  = 7
 H2_ENUM_END(DiffRuntimeConstant)
 
-#define SCORE_SECOND_TIER_FACTOR 0.5
-#define SCORE_SECOND_TIER_BASE_DEDUCTION 30.0
+#define SCORE_SECOND_TIER_FACTOR DATA_COMPGEN(0x004eb760, tIERFACTORConstant2, 0.5)
+#define SCORE_SECOND_TIER_BASE_DEDUCTION DATA_COMPGEN(0x004eb768, bASEDEDUCTIONConstant, 30.0)
 #define SCORE_THIRD_TIER_FACTOR 0.25
-#define SCORE_THIRD_TIER_BASE_DEDUCTION 60.0
-#define SCORE_FINAL_TIER_FACTOR 0.125
+#define SCORE_THIRD_TIER_BASE_DEDUCTION DATA_COMPGEN(0x004eb778, bASEDEDUCTIONConstant2, 60.0)
+#define SCORE_FINAL_TIER_FACTOR DATA_COMPGEN(0x004eb780, tIERFACTORConstant, 0.125)
 
 H2_ENUM_BEGIN(GameDiffEncoding)
     COMMAND_SHIFT      = 7,
@@ -634,17 +634,17 @@ H2_ENUM_BEGIN(GameArmyDetailText)
     ARMY_DETAIL_SHOTS_OUTSIDE = 8
 H2_ENUM_END(GameArmyDetailText)
 
-#define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR 0.85
+#define GAME_HANDICAP_MODERATE_RESOURCE_FACTOR DATA_COMPGEN(0x004eb6e8, rESOURCEFACTORConstant, 0.85)
 #define GAME_HANDICAP_SEVERE_RESOURCE_FACTOR 0.7
-#define GAME_HANDICAP_MODERATE_DAILY_PENALTY 0.15
-#define GAME_HANDICAP_SEVERE_DAILY_PENALTY 0.30
-#define GAME_DIFFICULTY_EASY_GOLD_FACTOR 0.75
-#define GAME_DIFFICULTY_HARD_GOLD_FACTOR 1.29
-#define GAME_DIFFICULTY_EXPERT_GOLD_FACTOR 1.45
-#define GAME_DIFFICULTY_IMPOSSIBLE_GOLD_FACTOR 1.6
-#define WEEKLY_HARD_GROWTH_FACTOR 1.20
-#define WEEKLY_EXPERT_GROWTH_FACTOR 1.32
-#define WEEKLY_IMPOSSIBLE_GROWTH_FACTOR 1.44
+#define GAME_HANDICAP_MODERATE_DAILY_PENALTY DATA_COMPGEN(0x004eb720, dAILYPENALTYConstant, 0.15)
+#define GAME_HANDICAP_SEVERE_DAILY_PENALTY DATA_COMPGEN(0x004eb728, dAILYPENALTYConstant2, 0.30)
+#define GAME_DIFFICULTY_EASY_GOLD_FACTOR DATA_COMPGEN(0x004eb700, gOLDFACTORConstant, 0.75)
+#define GAME_DIFFICULTY_HARD_GOLD_FACTOR DATA_COMPGEN(0x004eb708, gOLDFACTORConstant4, 1.29)
+#define GAME_DIFFICULTY_EXPERT_GOLD_FACTOR DATA_COMPGEN(0x004eb710, gOLDFACTORConstant2, 1.45)
+#define GAME_DIFFICULTY_IMPOSSIBLE_GOLD_FACTOR DATA_COMPGEN(0x004eb718, gOLDFACTORConstant3, 1.6)
+#define WEEKLY_HARD_GROWTH_FACTOR DATA_COMPGEN(0x004eb730, gROWTHFACTORConstant3, 1.20)
+#define WEEKLY_EXPERT_GROWTH_FACTOR DATA_COMPGEN(0x004eb738, gROWTHFACTORConstant2, 1.32)
+#define WEEKLY_IMPOSSIBLE_GROWTH_FACTOR DATA_COMPGEN(0x004eb740, gROWTHFACTORConstant, 1.44)
 
 H2_ENUM_BEGIN(ViewArmyControlId)
     VIEW_ARMY_QUICK_VIEW_ID = 0x7800,
@@ -917,7 +917,12 @@ H2_ENUM_BEGIN(PuzzleSetupConstant)
 H2_ENUM_END(PuzzleSetupConstant)
 
 inline float PuzzleCompletionCurve(float ratio) {
-    return (ratio * ratio + ratio) / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT);
+    return (ratio * ratio + ratio)
+           / DATA_COMPGEN(
+               0x004eb6e0,
+               puzzleInterpolationTermCount,
+               static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
+           );
 }
 
 VA(0x00471500, 0x2ac)
@@ -1125,7 +1130,7 @@ void GenerateStandardFileName(char* source, char* destination) {
 
 VA(0x00471eb7, 0xbc4)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
-    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE, gSaveSourceLine + 10);
+    void* emptyPayload = H2_ALLOC_AT(GAME_SAVE_BUFFER_SIZE, DATA_COMPGEN(0x004f70e8, saveGameSourceFile, RETAIL_FILE), gSaveSourceLine + 10);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
         expansionFormat = 1;
@@ -1142,9 +1147,9 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     i32 compatibilityReserved;
     if (generateName) {
         if (gbInCampaign) {
-            sprintf(generatedNameStorage, "%s.%s", filename, "GMC");
+            sprintf(generatedNameStorage, DATA_COMPGEN(0x004f7114, saveGameSS, "%s.%s"), filename, DATA_COMPGEN(0x004f7110, saveGameGMC, "GMC"));
         } else if (xIsPlayingExpansionCampaign) {
-            sprintf(generatedNameStorage, "%s.%s", filename, "GXC");
+            sprintf(generatedNameStorage, DATA_COMPGEN(0x004f7120, saveGameSS2, "%s.%s"), filename, DATA_COMPGEN(0x004f711c, saveGameGXC, "GXC"));
         } else {
             humanPlayersVar = 0;
             for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
@@ -1152,20 +1157,20 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
                     humanPlayersVar++;
             }
             if (xIsExpansionMap && !expansionFormat)
-                sprintf(generatedNameStorage, "%s.GX%d", filename, humanPlayersVar);
+                sprintf(generatedNameStorage, DATA_COMPGEN(0x004f7128, saveGameSGXD, "%s.GX%d"), filename, humanPlayersVar);
             else
-                sprintf(generatedNameStorage, "%s.GM%d", filename, humanPlayersVar);
+                sprintf(generatedNameStorage, DATA_COMPGEN(0x004f7130, saveGameSGMD, "%s.GM%d"), filename, humanPlayersVar);
         }
     } else {
         sprintf(generatedNameStorage, filename);
     }
 
-    if (strnicmp(generatedNameStorage, "RMT", sizeof("RMT") - 1) == 0) {
-        sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
+    if (strnicmp(generatedNameStorage, DATA_COMPGEN(0x004f7138, saveGameRMT, "RMT"), sizeof("RMT") - 1) == 0) {
+        sprintf(savePathValue, DATA_COMPGEN(0x004f7144, saveGameSS3, "%s%s"), DATA_COMPGEN(0x004f713c, saveGameDATA, ".\\DATA\\"), generatedNameStorage);
     } else {
-        sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
-        if (strnicmp(generatedNameStorage, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
-            && strnicmp(generatedNameStorage, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
+        sprintf(savePathValue, DATA_COMPGEN(0x004f714c, saveGameSS4, "%s%s"), gcGamePath, generatedNameStorage);
+        if (strnicmp(generatedNameStorage, DATA_COMPGEN(0x004f7154, saveGameAUTOSAVE, "AUTOSAVE"), sizeof("AUTOSAVE") - 1) != 0
+            && strnicmp(generatedNameStorage, DATA_COMPGEN(0x004f7160, saveGamePLYREXIT, "PLYREXIT"), sizeof("PLYREXIT") - 1) != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
@@ -1280,7 +1285,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     m_worldMap.Write(fileInfo);
     write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
     close(fileInfo);
-    H2_FREE(emptyPayload, gSaveSourceLine + 0xed);
+    H2_FREE_AT(emptyPayload, DATA_COMPGEN(0x004f716c, saveGameSourceFile2, RETAIL_FILE), gSaveSourceLine + 0xed);
     return 1;
 }
 
@@ -1296,7 +1301,7 @@ void game::SetupOrigData(void) {
     m_cheated = 0;
     gpAdvManager->PurgeMapChangeQueue();
     giMapChangeCtr = INITIAL_MAP_CHANGE_SEQUENCE;
-    strcpy(m_saveName, "NEWGAME");
+    strcpy(m_saveName, DATA_COMPGEN(0x004f7194, setupOrigDataNEWGAME, "NEWGAME"));
     m_playerCount = INITIAL_PLAYER_COUNT;
     m_deadPlayerCount = 0;
     memset(m_playerDead, 0, sizeof(m_playerDead));
@@ -1308,7 +1313,7 @@ void game::SetupOrigData(void) {
     i32 i;
     i32 j;
     for (i = 0; i < GAME_PLAYER_COUNT; i++) {
-        strcpy(m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE, "");
+        strcpy(m_defaultPlayerNames + i * GAME_DEFAULT_PLAYER_NAME_SIZE, DATA_COMPGEN(0x004f719c, setupOrigDataEmptyString, ""));
         if (i < (&giNumHumanPlayers)[0]) {
             if (i == 0 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
                 gbThisNetHumanPlayer[i] = 1;
@@ -1411,7 +1416,7 @@ void game::SetupOrigData(void) {
     m_ultimateArtifactY = HINT_COORDINATE_UNKNOWN;
     m_ultimateArtifactX = m_ultimateArtifactY;
     memset(m_obeliskVisitors, 0, sizeof(m_obeliskVisitors));
-    strcpy(gpGame->m_saveName, "NEWGAME");
+    strcpy(gpGame->m_saveName, DATA_COMPGEN(0x004f71a0, setupOrigDataNEWGAME2, "NEWGAME"));
     giCurPlayer = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
@@ -1425,21 +1430,21 @@ void game::SetupOrigData(void) {
 
 VA(0x004735bf, 0xc27)
 void game::LoadGame(char* filename, i32 loadFromFile, i32) {
-    LogStr("LG1");
+    LogStr(DATA_COMPGEN(0x004f71ac, loadGameLG1, "LG1"));
     if (loadFromFile) {
         SetupOrigData();
         return;
     }
-    LogStr("LG2");
+    LogStr(DATA_COMPGEN(0x004f71b0, loadGameLG2, "LG2"));
     i32 humansLoaded3 = 0;
     gbGameOver = false;
     m_gameLoaded = 1;
 
     char path28[SAVE_PATH_CAPACITY];
-    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
-        sprintf(path28, "%s%s", ".\\DATA\\", filename);
+    if (loadFromFile || strnicmp(filename, DATA_COMPGEN(0x004f71b4, loadGameRMT, "RMT"), sizeof(DATA_COMPGEN(0x004f71d0, loadGameRMT2, "RMT")) - 1) == 0)
+        sprintf(path28, DATA_COMPGEN(0x004f71c0, loadGameSS, "%s%s"), DATA_COMPGEN(0x004f71b8, loadGameDATA, ".\\DATA\\"), filename);
     else
-        sprintf(path28, "%s%s", gcGamePath, filename);
+        sprintf(path28, DATA_COMPGEN(0x004f71c8, loadGameSS2, "%s%s"), gcGamePath, filename);
 
     i32 file0 = open(path28, _O_BINARY);
     if (file0 == -1)
@@ -1559,17 +1564,17 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     read(file0, &iMaxMapExtra, sizeof(iMaxMapExtra));
     read(file0, marker0, sizeof(i32));
     ppMapExtra = reinterpret_cast<void**>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra), gLoadSourceLine + 0xcb)
+        H2_ALLOC_AT(iMaxMapExtra * sizeof(*ppMapExtra), DATA_COMPGEN(0x004f71d4, loadGameSourceFile, RETAIL_FILE), gLoadSourceLine + 0xcb)
     );
     pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(*pwSizeOfMapExtra), gLoadSourceLine + 0xcc)
+        H2_ALLOC_AT(iMaxMapExtra * sizeof(*pwSizeOfMapExtra), DATA_COMPGEN(0x004f71fc, loadGameSourceFile2, RETAIL_FILE), gLoadSourceLine + 0xcc)
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
         read(file0, marker0, sizeof(i32));
         read(file0, pwSizeOfMapExtra + i29, sizeof(pwSizeOfMapExtra[i29]));
-        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29], gLoadSourceLine + 0xd5);
+        ppMapExtra[i29] = H2_ALLOC_AT(pwSizeOfMapExtra[i29], DATA_COMPGEN(0x004f7224, loadGameSourceFile3, RETAIL_FILE), gLoadSourceLine + 0xd5);
         read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
     }
     read(file0, marker0, sizeof(i32));
@@ -1588,7 +1593,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     giCurWatchPlayerBit = static_cast<u8>(1 << giCurWatchPlayer);
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
     SetupAdjacentMons();
-    LogStr("LG3");
+    LogStr(DATA_COMPGEN(0x004f724c, loadGameLG3, "LG3"));
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
@@ -1762,7 +1767,7 @@ void game::NewMap(char* filename) {
     i32 resource13;
 
     extension0 = FindLastToken(gMapName, '.');
-    if (extension0 != NULL && StrEqNoCase(extension0 + 1, "MX2"))
+    if (extension0 != NULL && StrEqNoCase(extension0 + 1, DATA_COMPGEN(0x004f7250, newMapMX2, "MX2")))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
         gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= NECROMANCER_SHRINE_BUILD_MASK;
@@ -1911,12 +1916,12 @@ void game::NewMap(char* filename) {
                 if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
                     m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
-                    strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
+                    strcpy(m_heroRecs[campaignHero15].m_name, DATA_COMPGEN(0x004f7254, newMapSisterEliza, "Sister Eliza"));
                     m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
                     m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
                     m_heroRecs[campaignHero15].CheckLevel();
-                    strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
+                    strcpy(m_heroRecs[campaignHero15].m_name, DATA_COMPGEN(0x004f7264, newMapBrotherBrax, "Brother Brax"));
                     m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
                 m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
@@ -2837,7 +2842,7 @@ i32 game::LoadMap(char* filename) {
     char type5[LOAD_MAP_RECORD_SCRATCH_SIZE];
     char trailer15[LOAD_MAP_RECORD_SCRATCH_SIZE];
 
-    sprintf(gText, "%s%s", gcMapPath, filename);
+    sprintf(gText, DATA_COMPGEN(0x004f7278, loadMapSS, "%s%s"), gcMapPath, filename);
     file2 = open(gText, _O_BINARY);
     if (file2 == -1)
         FileError(gText);
@@ -2896,15 +2901,15 @@ i32 game::LoadMap(char* filename) {
     m_timeEventCount = m_mapHeader.timeEventCount;
     read(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
     ppMapExtra =
-        reinterpret_cast<void**>(H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]), 2893));
+        reinterpret_cast<void**>(H2_ALLOC_AT(iMaxMapExtra * sizeof(ppMapExtra[0]), DATA_COMPGEN(0x004f7280, loadMapSourceFile, RETAIL_FILE), 2893));
     pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]), 2894)
+        H2_ALLOC_AT(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]), DATA_COMPGEN(0x004f72a8, loadMapSourceFile2, RETAIL_FILE), 2894)
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
         read(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
-        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37], 2902);
+        ppMapExtra[i37] = H2_ALLOC_AT(pwSizeOfMapExtra[i37], DATA_COMPGEN(0x004f72d0, loadMapSourceFile3, RETAIL_FILE), 2902);
         read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
     read(file2, trailer15, sizeof(u16));
@@ -3068,7 +3073,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("No spells to cast."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(const_cast<char*>(DATA_COMPGEN(0x004f72f8, viewSpellsNoSpellsToCast, "No spells to cast.")), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -3084,7 +3089,7 @@ game::ViewSpells(
         m_viewSpellsCount[IDX(SPELL_TYPE_ADVENTURE)] =
             spellHero->GetNumSpells(SPELL_TYPE_ADVENTURE);
         m_viewSpellsWindow = new heroWindow(
-            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>("spellwin.bin")
+            VIEW_SPELLS_WINDOW_X, VIEW_SPELLS_WINDOW_Y, const_cast<char*>(DATA_COMPGEN(0x004f730c, viewSpellsSpellwinBin, "spellwin.bin"))
         );
         if (m_viewSpellsWindow == NULL)
             MemError();
@@ -3133,7 +3138,7 @@ void game::UpdateSpellWidgets(void) {
 
     sprintf(
         gText,
-        "%d",
+        DATA_COMPGEN(0x004f731c, updateSpellWidgetsD, "%d"),
         (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
     message9.payload.widget.data.text = gText;
@@ -3142,14 +3147,14 @@ void game::UpdateSpellWidgets(void) {
     m_viewSpellsWindow->BroadcastMessage(message9);
     sprintf(
         gText,
-        "%d",
+        DATA_COMPGEN(0x004f7320, updateSpellWidgetsD2, "%d"),
         (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
     message9.payload.widget.data.text = gText;
     message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message9.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
     m_viewSpellsWindow->BroadcastMessage(message9);
-    sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
+    sprintf(gText, DATA_COMPGEN(0x004f7324, updateSpellWidgetsD3, "%d"), spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
     message9.payload.widget.data.text = gText;
     message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message9.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
@@ -3193,14 +3198,14 @@ void game::UpdateSpellWidgets(void) {
             if (lineLength0 == 1) {
                 sprintf(
                     gText,
-                    "%s\n[%d]",
+                    DATA_COMPGEN(0x004f7328, updateSpellWidgetsSD, "%s\n[%d]"),
                     gSpellNames[IDX(spell2)],
                     GetManaCost(spell2, m_viewSpellsHero)
                 );
             } else {
                 sprintf(
                     gText,
-                    "%s [%d]",
+                    DATA_COMPGEN(0x004f7330, updateSpellWidgetsSD2, "%s [%d]"),
                     gSpellNames[IDX(spell2)],
                     GetManaCost(spell2, m_viewSpellsHero)
                 );
@@ -3424,8 +3429,8 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                                 > viewSpellsHero->m_spellPoints) {
                                 sprintf(
                                     gText,
-                                    "That spell costs %d mana.  You only have %d mana, so you "
-                                    "can't cast the spell.",
+                                    DATA_COMPGEN(0x004f7338, viewSpellsHandlerThatSpellCostsDManaYou, "That spell costs %d mana.  You only have %d mana, so you "
+                                    "can't cast the spell."),
                                     GetManaCost(spell, viewSpellsHero),
                                     viewSpellsHero->m_spellPoints
                                 );
@@ -3556,7 +3561,7 @@ void game::ViewArmy(
 
     x = VIEW_ARMY_WINDOW_X;
     y = VIEW_ARMY_WINDOW_Y;
-    m_viewArmyWindow = new heroWindow(x, y, const_cast<char*>("armywin.bin"));
+    m_viewArmyWindow = new heroWindow(x, y, const_cast<char*>(DATA_COMPGEN(0x004f738c, viewArmyArmywinBin, "armywin.bin")));
     if (!m_viewArmyWindow)
         MemError();
 
@@ -3573,7 +3578,7 @@ void game::ViewArmy(
     viewArmyBaseX = VIEW_ARMY_MONSTER_BASE_X;
     char filename4[VIEW_ARMY_FILENAME_SIZE];
     if (gbLowMemory)
-        sprintf(filename4, "monh%04d.icn", IDX(monsterType));
+        sprintf(filename4, DATA_COMPGEN(0x004f7398, viewArmyMonh04dIcn, "monh%04d.icn"), IDX(monsterType));
     else
         strcpy(filename4, cMonFilename[IDX(monsterType)]);
 
@@ -3617,16 +3622,16 @@ void game::ViewArmy(
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE, 3684));
+    char* details9 = static_cast<char*>(H2_ALLOC_AT(VIEW_ARMY_DETAIL_BUFFER_SIZE, DATA_COMPGEN(0x004f73a8, viewArmySourceFile, RETAIL_FILE), 3684));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
     if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale2 = 0;
 
-    sprintf(details9, "");
+    sprintf(details9, DATA_COMPGEN(0x004f73d0, viewArmyEmptyString, ""));
     i32 modifier15 = 0;
     sprintf(
         gText,
-        "%s%d",
+        DATA_COMPGEN(0x004f73d4, viewArmySD, "%s%d"),
         cArmyDetail[ARMY_DETAIL_ATTACK],
         static_cast<i32>(monster8->attack)
     );
@@ -3636,14 +3641,14 @@ void game::ViewArmy(
     if (theArmy)
         modifier15 = theArmy->m_monster.attack - monster8->attack;
     if (modifier15) {
-        sprintf(gText, " (%d)", monster8->attack + modifier15);
+        sprintf(gText, DATA_COMPGEN(0x004f73dc, viewArmyD, " (%d)"), monster8->attack + modifier15);
         strcat(details9, gText);
     }
 
     modifier15 = 0;
     sprintf(
         gText,
-        "\n%s%d",
+        DATA_COMPGEN(0x004f73e4, viewArmySD2, "\n%s%d"),
         cArmyDetail[ARMY_DETAIL_DEFENSE],
         static_cast<i32>(monster8->defense)
     );
@@ -3653,7 +3658,7 @@ void game::ViewArmy(
     if (theArmy)
         modifier15 = theArmy->m_monster.defense - monster8->defense;
     if (modifier15) {
-        sprintf(gText, " (%d)", monster8->defense + modifier15);
+        sprintf(gText, DATA_COMPGEN(0x004f73ec, viewArmyD2, " (%d)"), monster8->defense + modifier15);
         strcat(details9, gText);
     }
 
@@ -3661,27 +3666,27 @@ void game::ViewArmy(
         i32 shots8 = armyMonster11->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active)
-                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
+                sprintf(gText, DATA_COMPGEN(0x004f73f4, viewArmySD3, "\n%s%d"), cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
             else
-                sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
+                sprintf(gText, DATA_COMPGEN(0x004f73fc, viewArmySD4, "\n%s%d"), cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
             strcat(details9, gText);
         }
     }
 
     sprintf(
         gText,
-        "\n%s%d",
+        DATA_COMPGEN(0x004f7404, viewArmySD5, "\n%s%d"),
         cArmyDetail[ARMY_DETAIL_DAMAGE],
         static_cast<i32>(monster8->damageMin)
     );
     strcat(details9, gText);
     if (monster8->damageMin != monster8->damageMax) {
-        sprintf(gText, "-%d", static_cast<i32>(monster8->damageMax));
+        sprintf(gText, DATA_COMPGEN(0x004f740c, viewArmyD3, "-%d"), static_cast<i32>(monster8->damageMax));
         strcat(details9, gText);
     }
     sprintf(
         gText,
-        "\n%s%d",
+        DATA_COMPGEN(0x004f7410, viewArmySD6, "\n%s%d"),
         cArmyDetail[ARMY_DETAIL_HIT_POINTS],
         static_cast<u32>(monster8->hitPoints)
     );
@@ -3689,17 +3694,17 @@ void game::ViewArmy(
     if (gpCombatManager->m_active) {
         sprintf(
             gText,
-            "\n%s%d",
-            "Hit Points Left: ",
+            DATA_COMPGEN(0x004f742c, viewArmySD7, "\n%s%d"),
+            DATA_COMPGEN(0x004f7418, viewArmyHitPointsLeft, "Hit Points Left: "),
             static_cast<u32>(monster8->hitPoints) - theArmy->m_hitPointsLost
         );
         strcat(details9, gText);
     }
-    sprintf(gText, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster11->speed]);
+    sprintf(gText, DATA_COMPGEN(0x004f7434, viewArmySS, "\n%s%s"), cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster11->speed]);
     strcat(details9, gText);
     sprintf(
         gText,
-        "\n%s%s",
+        DATA_COMPGEN(0x004f743c, viewArmySS2, "\n%s%s"),
         cArmyDetail[ARMY_DETAIL_MORALE],
         gMoraleText[morale2 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
     );
@@ -3707,7 +3712,7 @@ void game::ViewArmy(
     i32 luck1 = GetLuck(theHero, theArmy, castle);
     sprintf(
         gText,
-        "\n%s%s",
+        DATA_COMPGEN(0x004f7444, viewArmySS3, "\n%s%s"),
         cArmyDetail[ARMY_DETAIL_LUCK],
         gLuckText[luck1 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
     );
@@ -3743,7 +3748,7 @@ void game::ViewArmy(
         m_viewArmyWindow->BroadcastMessage(message6);
     } else {
         char countText[VIEW_ARMY_COUNT_TEXT_SIZE];
-        sprintf(countText, "%d", numTroops);
+        sprintf(countText, DATA_COMPGEN(0x004f744c, viewArmyD4, "%d"), numTroops);
         message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
         message6.payload.widget.data.text = countText;
@@ -3776,7 +3781,7 @@ void game::ViewArmy(
                 static_cast<i16>(spellY3 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
                 0,
                 0,
-                const_cast<char*>("spellinl.icn"),
+                const_cast<char*>(DATA_COMPGEN(0x004f7450, spellWidgetSpellinlIcn, "spellinl.icn")),
                 static_cast<i16>(IDX(spellIndex9)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
@@ -3804,7 +3809,7 @@ void game::ViewArmy(
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = iViewArmyUpgradeToType;
     }
-    H2_FREE(details9, 3893);
+    H2_FREE_AT(details9, DATA_COMPGEN(0x004f7460, viewArmySourceFile2, RETAIL_FILE), 3893);
     delete m_viewArmyWindow;
 }
 
@@ -3831,7 +3836,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>("Are you sure you want to dismiss this army?"),
+                            const_cast<char*>(DATA_COMPGEN(0x004f7488, viewArmyHandlerAreYouSureYouWantTo, "Are you sure you want to dismiss this army?")),
                             NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
@@ -3870,8 +3875,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                                 || gpCurPlayer->m_resources[IDX(resourceType0)] >= resourceCost5)) {
                             NormalDialog(
                                 const_cast<char*>(
-                                    "Your troops can be upgraded, but it will cost you dearly.  "
-                                    "Do you wish to upgrade them?"
+                                    DATA_COMPGEN(0x004f74b4, viewArmyHandlerYourTroopsCanBeUpgradedBut, "Your troops can be upgraded, but it will cost you dearly.  "
+                                    "Do you wish to upgrade them?")
                                 ),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
@@ -3895,7 +3900,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                             }
                         } else {
                             NormalDialog(
-                                const_cast<char*>("You can't afford to upgrade your troops!"),
+                                const_cast<char*>(DATA_COMPGEN(0x004f750c, viewArmyHandlerYouCanTAffordToUpgrade, "You can't afford to upgrade your troops!")),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -4114,7 +4119,7 @@ void game::NextPlayer(void) {
             if (m_playerDead[index] == 0 && gbHumanPlayer[index])
                 humanCount++;
         }
-        SaveGame(const_cast<char*>("AUTOSAVE"), 1, 0);
+        SaveGame(const_cast<char*>(DATA_COMPGEN(0x004f7538, nextPlayerAUTOSAVE, "AUTOSAVE")), 1, 0);
     }
 
     gpAdvManager->m_identifyHeroActive = 0;
@@ -4164,7 +4169,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
-            sprintf(gText, "%s's turn.", cPlayerNames[giCurPlayer]);
+            sprintf(gText, DATA_COMPGEN(0x004f7544, nextPlayerSSTurn, "%s's turn."), cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
         }
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -4261,7 +4266,7 @@ i32 game::ComputeDailyGold(i32 player) {
     if (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE)
         gold = static_cast<i32>(gold * GAME_HANDICAP_MODERATE_RESOURCE_FACTOR);
     else if (m_playerHandicap[player] == PLAYER_HANDICAP_SEVERE)
-        gold = static_cast<i32>(gold * GAME_HANDICAP_SEVERE_RESOURCE_FACTOR);
+        gold = static_cast<i32>(gold * DATA_COMPGEN(0x004eb6f0, computeDailyGoldConstant, GAME_HANDICAP_SEVERE_RESOURCE_FACTOR));
     return gold;
 }
 
@@ -5730,7 +5735,7 @@ VA(0x0048135e, 0xa0)
 void game::ShowHeroesLogo(void) {
     if (gpAdvManager->m_openState == 0) {
         gpAdvManager->m_openState = 1;
-        icon* theIcon = gpResourceManager->GetIcon("herologo.icn");
+        icon* theIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f755c, theIconHerologoIcn, "herologo.icn"));
         IconToBitmap(
             theIcon,
             gpWindowManager->m_screen,
@@ -6114,7 +6119,7 @@ void game::SetupTowns(void) {
             }
         }
         // NOLINTEND(readability-magic-numbers)
-        H2_FREE(ppMapExtra[extraIndex], 6375);
+        H2_FREE_AT(ppMapExtra[extraIndex], DATA_COMPGEN(0x004f7570, setupTownsSourceFile, RETAIL_FILE), 6375);
         ppMapExtra[extraIndex] = NULL;
     }
 }
@@ -6317,7 +6322,7 @@ void game::ProcessOnMapHeroes(void) {
                                                    [MAP_HERO_SCOUTING_SKILL_INDEX])]
                             );
                         }
-                        H2_FREE(ppMapExtra[extraIndex0], 6604);
+                        H2_FREE_AT(ppMapExtra[extraIndex0], DATA_COMPGEN(0x004f759c, processOnMapHeroesSourceFile, RETAIL_FILE), 6604);
                         ppMapExtra[extraIndex0] = NULL;
                     }
                 }
@@ -6484,12 +6489,12 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gpSoundManager->m_samplesReady = samplesReady;
 
-    LogStr(const_cast<char*>("Transmit Game Start"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f75c8, transmitSaveGameTransmitGameStart, "Transmit Game Start")));
     if (gpAdvManager->m_active)
-        BVResMsg(const_cast<char*>("Sending Data"), RES_NONE, 0);
-    AiPrint(const_cast<char*>("Transmit Start - Compressing"));
+        BVResMsg(const_cast<char*>(DATA_COMPGEN(0x004f75dc, transmitSaveGameSendingData, "Sending Data")), RES_NONE, 0);
+    AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f75ec, transmitSaveGameTransmitStartCompressing, "Transmit Start - Compressing")));
 
-    acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY, 6777));
+    acknowledged = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f760c, transmitSaveGameSourceFile, RETAIL_FILE), 6777));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
@@ -6501,10 +6506,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         remotePlayer,
         useCurrentSave
     );
-    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtSDName);
+    sprintf(filename, DATA_COMPGEN(0x004f763c, transmitSaveGameSS, "%s%s"), DATA_COMPGEN(0x004f7634, transmitSaveGameDATA, ".\\DATA\\"), gConfig.rmtSDName);
     fileSize = FileSize(filename);
     LogInt(
-        const_cast<char*>("PostDiffFileSize"),
+        const_cast<char*>(DATA_COMPGEN(0x004f7644, transmitSaveGamePostDiffFileSize, "PostDiffFileSize")),
         fileSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6514,10 +6519,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         LOG_UNUSED_VALUE
     );
 
-    header = static_cast<i32*>(H2_ALLOC(REMOTE_HEADER_CAPACITY, 6797));
+    header = static_cast<i32*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7658, transmitSaveGameSourceFile2, RETAIL_FILE), 6797));
     if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA, 6799));
-    fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA, 6800));
+        transmitData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7680, transmitSaveGameSourceFile3, RETAIL_FILE), 6799));
+    fileData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f76a8, transmitSaveGameSourceFile4, RETAIL_FILE), 6800));
 
     file = open(filename, _O_BINARY);
     if (file == -1)
@@ -6538,13 +6543,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         else
             transmitData = fileData;
 
-        AiPrint(const_cast<char*>("Transmit Start - Sending"));
+        AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f76d0, transmitSaveGameTransmitStartSending, "Transmit Start - Sending")));
         if (gbUseRegularCompression)
             transmitCrc = calc_crc_long(transmitData, fileSize);
         else
             transmitCrc = fileCrc;
         LogInt(
-            const_cast<char*>("Send"),
+            const_cast<char*>(DATA_COMPGEN(0x004f76ec, transmitSaveGameSend, "Send")),
             fileSize,
             transmitCrc,
             LOG_UNUSED_VALUE,
@@ -6608,7 +6613,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                             ShutDown(NULL);
                     }
                 }
-                LogStr(const_cast<char*>("PreWait"));
+                LogStr(const_cast<char*>(DATA_COMPGEN(0x004f76f4, transmitSaveGamePreWait, "PreWait")));
                 *reinterpret_cast<i16*>(header) =
                     static_cast<i16>(batch * REMOTE_PACKET_BATCH_SIZE);
                 result = TransmitAndWait(
@@ -6619,7 +6624,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                     REMOTE_SAVE_ACK_RESPONSE_COMMAND,
                     &reply
                 );
-                LogStr(const_cast<char*>("PostWait"));
+                LogStr(const_cast<char*>(DATA_COMPGEN(0x004f76fc, transmitSaveGamePostWait, "PostWait")));
                 if (!result)
                     ShutDown(NULL);
                 for (packet = 0; packetsInBatch > packet; packet++) {
@@ -6651,15 +6656,15 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
 transmitCleanup:
     if (header)
-        H2_FREE(header, 6933);
+        H2_FREE_AT(header, DATA_COMPGEN(0x004f7708, transmitSaveGameSourceFile5, RETAIL_FILE), 6933);
     if (transmitData)
-        H2_FREE(transmitData, 6934);
+        H2_FREE_AT(transmitData, DATA_COMPGEN(0x004f7730, transmitSaveGameSourceFile6, RETAIL_FILE), 6934);
     if (fileData && fileData != transmitData)
-        H2_FREE(fileData, 6935);
+        H2_FREE_AT(fileData, DATA_COMPGEN(0x004f7758, transmitSaveGameSourceFile7, RETAIL_FILE), 6935);
     if (acknowledged)
-        H2_FREE(acknowledged, 6936);
+        H2_FREE_AT(acknowledged, DATA_COMPGEN(0x004f7780, transmitSaveGameSourceFile8, RETAIL_FILE), 6936);
 
-    AiPrint(const_cast<char*>("Transmit End"));
+    AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f77a8, transmitSaveGameTransmitEnd, "Transmit End")));
     if (gpAdvManager->m_active) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
@@ -6740,7 +6745,7 @@ i32 game::ReceiveSaveGame(
     u8* decodedData;
 
     LogInt(
-        const_cast<char*>("FW1"),
+        const_cast<char*>(DATA_COMPGEN(0x004f77bc, receiveSaveGameFW1, "FW1")),
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6749,8 +6754,8 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    LogStr(const_cast<char*>("RSG1"));
-    AiPrint(const_cast<char*>("Receive Start - Getting Data"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f77c0, receiveSaveGameRSG1, "RSG1")));
+    AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f77c8, receiveSaveGameReceiveStartGettingData, "Receive Start - Getting Data")));
     gpAdvManager->TrimLoopingSounds(REMOTE_LOOPING_SOUND_COUNT);
 
     ackBuffer = NULL;
@@ -6766,7 +6771,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active)
-        BVResMsg(const_cast<char*>("Receiving Data"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>(DATA_COMPGEN(0x004f77e8, receiveSaveGameReceivingData, "Receiving Data")), RES_NONE, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
     oldTrack = static_cast<i8>(gpSoundManager->m_currentTrack);
@@ -6774,7 +6779,7 @@ i32 game::ReceiveSaveGame(
     gpSoundManager->SwitchAmbientMusic(-1);
     gpSoundManager->m_samplesReady = samplesReady;
 
-    LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f77f8, receiveSaveGameBeginTransmitInitConfirm, "Begin Transmit Init Confirm")));
     result = TransmitRemoteData(
         NULL,
         remotePlayer,
@@ -6784,20 +6789,20 @@ i32 game::ReceiveSaveGame(
         1,
         REMOTE_MESSAGE_DEFAULT
     );
-    LogStr(const_cast<char*>("End Transmit Init Confirm"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f7814, receiveSaveGameEndTransmitInitConfirm, "End Transmit Init Confirm")));
     if (!result)
         ShutDown(NULL);
 
-    received = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY, 7008));
+    received = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f7830, receiveSaveGameSourceFile, RETAIL_FILE), 7008));
     memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC(REMOTE_DECODE_BUFFER_SIZE, 7012));
-    ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY, 7014));
-    incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA, 7015));
+        decodedData = static_cast<u8*>(H2_ALLOC_AT(REMOTE_DECODE_BUFFER_SIZE, DATA_COMPGEN(0x004f7858, receiveSaveGameSourceFile2, RETAIL_FILE), 7012));
+    ackBuffer = static_cast<u8*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7880, receiveSaveGameSourceFile3, RETAIL_FILE), 7014));
+    incomingData = static_cast<u8*>(H2_ALLOC_AT(dataSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f78a8, receiveSaveGameSourceFile4, RETAIL_FILE), 7015));
 
     lastPacketTime = KBTickCount();
     LogInt(
-        const_cast<char*>("FW2"),
+        const_cast<char*>(DATA_COMPGEN(0x004f78d0, receiveSaveGameFW2, "FW2")),
         remotePlayer,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -6811,7 +6816,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (KBTickCount() > lastPacketTime + REMOTE_RECEIVE_TIMEOUT) {
             NormalDialog(
-                const_cast<char*>("Error receiving data.  Keep trying?"),
+                const_cast<char*>(DATA_COMPGEN(0x004f78d4, receiveSaveGameErrorReceivingDataKeepTrying, "Error receiving data.  Keep trying?")),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,
@@ -6849,7 +6854,7 @@ i32 game::ReceiveSaveGame(
                          index++)
                         *(ackBuffer + index - packetStart) = received[index];
                     LogInt(
-                        const_cast<char*>("FW3"),
+                        const_cast<char*>(DATA_COMPGEN(0x004f78f8, receiveSaveGameFW3, "FW3")),
                         remotePlayer,
                         LOG_UNUSED_VALUE,
                         LOG_UNUSED_VALUE,
@@ -6877,10 +6882,10 @@ i32 game::ReceiveSaveGame(
         }
     }
 
-    AiPrint(const_cast<char*>("Receive Start - Decompressing Data"));
+    AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f78fc, receiveSaveGameReceiveStartDecompressingData, "Receive Start - Decompressing Data")));
     receivedCrc = calc_crc_long(incomingData, dataSize);
     LogInt(
-        const_cast<char*>("Receive"),
+        const_cast<char*>(DATA_COMPGEN(0x004f7920, receiveSaveGameReceive, "Receive")),
         dataSize,
         receivedCrc,
         expectedTransmitCrc,
@@ -6901,7 +6906,7 @@ i32 game::ReceiveSaveGame(
         computedCrc = receivedCrc;
     }
     LogInt(
-        const_cast<char*>("Receive"),
+        const_cast<char*>(DATA_COMPGEN(0x004f7928, receiveSaveGameReceive2, "Receive")),
         dataSize,
         computedCrc,
         expectedCrc,
@@ -6911,7 +6916,7 @@ i32 game::ReceiveSaveGame(
         LOG_UNUSED_VALUE
     );
 
-    sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
+    sprintf(filename, DATA_COMPGEN(0x004f7938, receiveSaveGameSS, "%s%s"), DATA_COMPGEN(0x004f7930, receiveSaveGameDATA, ".\\DATA\\"), gConfig.rmtRDName);
     file = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (file == -1)
         FileError(filename);
@@ -6920,16 +6925,16 @@ i32 game::ReceiveSaveGame(
     success = 1;
 
     if (received)
-        H2_FREE(received, 7118);
+        H2_FREE_AT(received, DATA_COMPGEN(0x004f7940, receiveSaveGameSourceFile5, RETAIL_FILE), 7118);
     if (ackBuffer)
-        H2_FREE(ackBuffer, 7119);
+        H2_FREE_AT(ackBuffer, DATA_COMPGEN(0x004f7968, receiveSaveGameSourceFile6, RETAIL_FILE), 7119);
     if (incomingData)
-        H2_FREE(incomingData, 7120);
+        H2_FREE_AT(incomingData, DATA_COMPGEN(0x004f7990, receiveSaveGameSourceFile7, RETAIL_FILE), 7120);
     if (decodedData && incomingData != decodedData)
-        H2_FREE(decodedData, 7121);
+        H2_FREE_AT(decodedData, DATA_COMPGEN(0x004f79b8, receiveSaveGameSourceFile8, RETAIL_FILE), 7121);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
-    AiPrint(const_cast<char*>("Receive End"));
+    AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f79e0, receiveSaveGameReceiveEnd, "Receive End")));
     if (gpAdvManager->m_active) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
@@ -7014,7 +7019,7 @@ void game::DoNewTurn(void) {
             musicTrack2 = -1;
             if (m_week == 1) {
                 musicTrack2 = NEW_MONTH_MUSIC_TRACK;
-                strcpy(musicFile18, "newmonth.82m");
+                strcpy(musicFile18, DATA_COMPGEN(0x004f79ec, doNewTurnNewmonth82m, "newmonth.82m"));
                 if (giMonthType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(
                         gText,
@@ -7035,7 +7040,7 @@ void game::DoNewTurn(void) {
                 }
             } else {
                 musicTrack2 = NEW_WEEK_MUSIC_TRACK;
-                strcpy(musicFile18, "newweek.82m");
+                strcpy(musicFile18, DATA_COMPGEN(0x004f79fc, doNewTurnNewweek82m, "newweek.82m"));
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
@@ -7139,7 +7144,7 @@ i32 CalcBaseScore(i32 days) {
             score = static_cast<i32>(score - SCORE_SECOND_TIER_BASE_DEDUCTION);
             if (days <= SCORE_THIRD_TIER) {
                 score = static_cast<i32>(
-                    score - (days - SCORE_SECOND_TIER) * SCORE_THIRD_TIER_FACTOR
+                    score - (days - SCORE_SECOND_TIER) * DATA_COMPGEN(0x004eb770, calcBaseScoreConstant, SCORE_THIRD_TIER_FACTOR)
                 );
             } else {
                 score = static_cast<i32>(score - SCORE_THIRD_TIER_BASE_DEDUCTION);
@@ -7190,8 +7195,8 @@ void game::SetMapSize(i32 w, i32 h) {
         gpSearchArray->Init();
     }
     if (mapExtra)
-        H2_FREE(mapExtra, setMapSizeSourceLineBase + 12);
-    mapExtra = static_cast<u8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT, setMapSizeSourceLineBase + 13));
+        H2_FREE_AT(mapExtra, DATA_COMPGEN(0x004f7a10, setMapSizeSourceFile, RETAIL_FILE), setMapSizeSourceLineBase + 12);
+    mapExtra = static_cast<u8*>(H2_ALLOC_AT(MAP_WIDTH * MAP_HEIGHT, DATA_COMPGEN(0x004f7a38, setMapSizeSourceFile2, RETAIL_FILE), setMapSizeSourceLineBase + 13));
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
@@ -7278,17 +7283,17 @@ void CreateDiffFile(
         sendWhole4 = 1;
     iLastDiffSendTo = remotePlayer;
 
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    sprintf(gText, DATA_COMPGEN(0x004f7a6c, createDiffFileSS, "%s%s"), DATA_COMPGEN(0x004f7a64, createDiffFileDATA, ".\\DATA\\"), joinName);
     joinSize36 = FileSize(gText);
-    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36, 7550));
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    joinData29 = static_cast<u8*>(H2_ALLOC_AT(joinSize36, DATA_COMPGEN(0x004f7a74, createDiffFileSourceFile, RETAIL_FILE), 7550));
+    sprintf(gText, DATA_COMPGEN(0x004f7aa4, createDiffFileSS2, "%s%s"), DATA_COMPGEN(0x004f7a9c, createDiffFileDATA2, ".\\DATA\\"), joinName);
     joinFile1 = open(gText, _O_BINARY);
     if (joinFile1 == -1)
         FileError(gText);
     read(joinFile1, joinData29, joinSize36);
     close(joinFile1);
     LogInt(
-        const_cast<char*>("Orig Join CRC"),
+        const_cast<char*>(DATA_COMPGEN(0x004f7aac, createDiffFileOrigJoinCRC, "Orig Join CRC")),
         calc_crc_long(joinData29, joinSize36),
         joinSize36,
         LOG_UNUSED_VALUE,
@@ -7299,10 +7304,10 @@ void CreateDiffFile(
     );
 
     if (!forceWhole) {
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        sprintf(gText, DATA_COMPGEN(0x004f7ac4, createDiffFileSS3, "%s%s"), DATA_COMPGEN(0x004f7abc, createDiffFileDATA3, ".\\DATA\\"), oldName);
         oldSize37 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37, 7571));
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        oldData13 = static_cast<u8*>(H2_ALLOC_AT(oldSize37, DATA_COMPGEN(0x004f7acc, createDiffFileSourceFile2, RETAIL_FILE), 7571));
+        sprintf(gText, DATA_COMPGEN(0x004f7afc, createDiffFileSS4, "%s%s"), DATA_COMPGEN(0x004f7af4, createDiffFileDATA4, ".\\DATA\\"), oldName);
         oldFile17 = open(gText, _O_BINARY);
         if (oldFile17 == -1)
             FileError(gText);
@@ -7310,8 +7315,8 @@ void CreateDiffFile(
         close(oldFile17);
     }
 
-    diffData6 = static_cast<u8*>(H2_ALLOC(
-        (oldSize37 > joinSize36 ? oldSize37 : joinSize36) + DIFF_BUFFER_EXTRA,
+    diffData6 = static_cast<u8*>(H2_ALLOC_AT(
+        (oldSize37 > joinSize36 ? oldSize37 : joinSize36) + DIFF_BUFFER_EXTRA, DATA_COMPGEN(0x004f7b04, createDiffFileSourceFile3, RETAIL_FILE),
         7581
     ));
     if (sendWhole4) {
@@ -7368,14 +7373,14 @@ void CreateDiffFile(
         }
     }
 
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    sprintf(gText, DATA_COMPGEN(0x004f7b34, createDiffFileSS5, "%s%s"), DATA_COMPGEN(0x004f7b2c, createDiffFileDATA5, ".\\DATA\\"), diffName);
     joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile1 == -1)
         FileError(gText);
     write(joinFile1, diffData6, diffSize29);
     close(joinFile1);
 
-    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    sprintf(gText, DATA_COMPGEN(0x004f7b44, createDiffFileSS6, "%s%s"), DATA_COMPGEN(0x004f7b3c, createDiffFileDATA6, ".\\DATA\\"), oldName);
     joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile1 == -1)
         FileError(gText);
@@ -7383,11 +7388,11 @@ void CreateDiffFile(
     close(joinFile1);
 
     if (oldData13 != NULL)
-        H2_FREE(oldData13, 7687);
+        H2_FREE_AT(oldData13, DATA_COMPGEN(0x004f7b4c, createDiffFileSourceFile4, RETAIL_FILE), 7687);
     if (joinData29 != NULL)
-        H2_FREE(joinData29, 7689);
+        H2_FREE_AT(joinData29, DATA_COMPGEN(0x004f7b74, createDiffFileSourceFile5, RETAIL_FILE), 7689);
     if (diffData6 != NULL)
-        H2_FREE(diffData6, 7691);
+        H2_FREE_AT(diffData6, DATA_COMPGEN(0x004f7b9c, createDiffFileSourceFile6, RETAIL_FILE), 7691);
     return;
 }
 
@@ -7406,25 +7411,25 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     i32 position1;
     i32 joinFile0;
 
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    sprintf(gText, DATA_COMPGEN(0x004f7bd0, createJoinFileSS, "%s%s"), DATA_COMPGEN(0x004f7bc8, createJoinFileDATA, ".\\DATA\\"), diffName);
     diffSize1 = FileSize(gText);
-    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1, 7708));
-    sprintf(gText, "%s%s", ".\\DATA\\", diffName);
+    diffData5 = static_cast<u8*>(H2_ALLOC_AT(diffSize1, DATA_COMPGEN(0x004f7bd8, createJoinFileSourceFile, RETAIL_FILE), 7708));
+    sprintf(gText, DATA_COMPGEN(0x004f7c08, createJoinFileSS2, "%s%s"), DATA_COMPGEN(0x004f7c00, createJoinFileDATA2, ".\\DATA\\"), diffName);
     diffFile2 = open(gText, _O_BINARY);
     if (diffFile2 == -1)
         FileError(gText);
     read(diffFile2, diffData5, diffSize1);
     close(diffFile2);
 
-    joinData9 = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE, 7717));
+    joinData9 = static_cast<u8*>(H2_ALLOC_AT(JOIN_BUFFER_SIZE, DATA_COMPGEN(0x004f7c10, createJoinFileSourceFile2, RETAIL_FILE), 7717));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + JOIN_HEADER_SIZE, diffSize1 - JOIN_HEADER_SIZE);
         joinSize37 = diffSize1 - JOIN_HEADER_SIZE;
     } else {
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        sprintf(gText, DATA_COMPGEN(0x004f7c40, createJoinFileSS3, "%s%s"), DATA_COMPGEN(0x004f7c38, createJoinFileDATA3, ".\\DATA\\"), oldName);
         oldSize10 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10, 7728));
-        sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+        oldData13 = static_cast<u8*>(H2_ALLOC_AT(oldSize10, DATA_COMPGEN(0x004f7c48, createJoinFileSourceFile3, RETAIL_FILE), 7728));
+        sprintf(gText, DATA_COMPGEN(0x004f7c78, createJoinFileSS4, "%s%s"), DATA_COMPGEN(0x004f7c70, createJoinFileDATA4, ".\\DATA\\"), oldName);
         diffFile2 = open(gText, _O_BINARY);
         if (diffFile2 == -1)
             FileError(gText);
@@ -7446,14 +7451,14 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         }
     }
 
-    sprintf(gText, "%s%s", ".\\DATA\\", joinName);
+    sprintf(gText, DATA_COMPGEN(0x004f7c88, createJoinFileSS5, "%s%s"), DATA_COMPGEN(0x004f7c80, createJoinFileDATA5, ".\\DATA\\"), joinName);
     joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile0 == -1)
         FileError(gText);
     write(joinFile0, joinData9, joinSize37);
     close(joinFile0);
     LogInt(
-        const_cast<char*>("New Join CRC"),
+        const_cast<char*>(DATA_COMPGEN(0x004f7c90, createJoinFileNewJoinCRC, "New Join CRC")),
         calc_crc_long(joinData9, joinSize37),
         joinSize37,
         LOG_UNUSED_VALUE,
@@ -7463,7 +7468,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         LOG_UNUSED_VALUE
     );
 
-    sprintf(gText, "%s%s", ".\\DATA\\", oldName);
+    sprintf(gText, DATA_COMPGEN(0x004f7ca8, createJoinFileSS6, "%s%s"), DATA_COMPGEN(0x004f7ca0, createJoinFileDATA6, ".\\DATA\\"), oldName);
     joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile0 == -1)
         FileError(gText);
@@ -7471,11 +7476,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(joinFile0);
 
     if (oldData13)
-        H2_FREE(oldData13, 7778);
+        H2_FREE_AT(oldData13, DATA_COMPGEN(0x004f7cb0, createJoinFileSourceFile4, RETAIL_FILE), 7778);
     if (diffData5)
-        H2_FREE(diffData5, 7780);
+        H2_FREE_AT(diffData5, DATA_COMPGEN(0x004f7cd8, createJoinFileSourceFile5, RETAIL_FILE), 7780);
     if (joinData9)
-        H2_FREE(joinData9, 7782);
+        H2_FREE_AT(joinData9, DATA_COMPGEN(0x004f7d00, createJoinFileSourceFile6, RETAIL_FILE), 7782);
 }
 
 VA(0x004854d5, 0x5d)
@@ -7549,25 +7554,25 @@ void game::SetupNewRumour(void) {
                     if (selectionRoll == IDX(THIEVES_CATEGORY_OBELISKS))
                         sprintf(
                             m_rumour,
-                            "%s has found the most obelisks.",
+                            DATA_COMPGEN(0x004f7d28, setupNewRumourSHasFoundTheMostObelisks, "%s has found the most obelisks."),
                             cPlayerNames[categoryOrder2[0]]
                         );
                     else if (selectionRoll == IDX(THIEVES_CATEGORY_ARTIFACTS))
                         sprintf(
                             m_rumour,
-                            "%s has found the most artifacts.",
+                            DATA_COMPGEN(0x004f7d48, setupNewRumourSHasFoundTheMostArtifacts, "%s has found the most artifacts."),
                             cPlayerNames[categoryOrder2[0]]
                         );
                     else if (selectionRoll == IDX(THIEVES_CATEGORY_ARMY_STRENGTH))
                         sprintf(
                             m_rumour,
-                            "%s has the most powerful forces.",
+                            DATA_COMPGEN(0x004f7d6c, setupNewRumourSHasTheMostPowerfulForces, "%s has the most powerful forces."),
                             cPlayerNames[categoryOrder2[0]]
                         );
                     else
                         sprintf(
                             m_rumour,
-                            "%s earns the most gold.",
+                            DATA_COMPGEN(0x004f7d90, setupNewRumourSEarnsTheMostGold, "%s earns the most gold."),
                             cPlayerNames[categoryOrder2[0]]
                         );
                     return;
@@ -7578,11 +7583,11 @@ void game::SetupNewRumour(void) {
         ultimateRumour:
             selectionRoll = Random(0, 100);
             if (selectionRoll < 33) {
-                if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
+                if (!(IDX(m_mapHeader.width) * DATA_COMPGEN(0x004eb788, setupNewRumourConstant, 0.33) <= m_ultimateArtifactX
                       || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 7;
                 } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
-                             || m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
+                             || m_ultimateArtifactX <= IDX(m_mapHeader.height) * DATA_COMPGEN(0x004eb790, setupNewRumourConstant2, 0.66))) {
                     direction9 = 5;
                 } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX)) {
                     direction9 = 6;
@@ -7603,13 +7608,13 @@ void game::SetupNewRumour(void) {
                 }
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found in the %s regions of the world.",
+                    DATA_COMPGEN(0x004f7da8, setupNewRumourTheUltimateArtifactMayBeFound, "The ultimate artifact may be found in the %s regions of the world."),
                     cDirections[direction9]
                 );
             } else if (selectionRoll < 66) {
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found %s.",
+                    DATA_COMPGEN(0x004f7dec, setupNewRumourTheUltimateArtifactMayBeFound2, "The ultimate artifact may be found %s."),
                     cRumourTerrainDescriptions
                         [IDX(giGroundToTerrain
                                  [gpAdvManager
@@ -7619,7 +7624,7 @@ void game::SetupNewRumour(void) {
             } else {
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact is really the %s.",
+                    DATA_COMPGEN(0x004f7e14, setupNewRumourTheUltimateArtifactIsReallyThe, "The ultimate artifact is really the %s."),
                     gArtifactNames[IDX(m_ultimateArtifactId)]
                 );
             }
@@ -7741,14 +7746,14 @@ VA(0x00486296, 0xab)
 i32 CalcFileCRC(char* filename) {
     DATA(0x004f7e3c) static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
-    char* block = static_cast<char*>(H2_ALLOC(size, 8033));
+    char* block = static_cast<char*>(H2_ALLOC_AT(size, DATA_COMPGEN(0x004f7e40, calcFileCRCSourceFile, RETAIL_FILE), 8033));
     i32 hand = open(filename, _O_BINARY);
     if (hand == -1)
         FileError(filename);
     read(hand, block, size);
     i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
     close(hand);
-    H2_FREE(block, 8044);
+    H2_FREE_AT(block, DATA_COMPGEN(0x004f7e68, calcFileCRCSourceFile2, RETAIL_FILE), 8044);
     return crc;
 }
 
@@ -7768,15 +7773,15 @@ void CompressTest2(void) {
     dataSize2 = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
     sourceData6 =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 7)
+            H2_ALLOC_AT(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, DATA_COMPGEN(0x004f7e94, compressTest2SourceFile, RETAIL_FILE), gCompressTest2SourceLine + 7)
         );
     encodedData6 =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 8)
+            H2_ALLOC_AT(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, DATA_COMPGEN(0x004f7ebc, compressTest2SourceFile2, RETAIL_FILE), gCompressTest2SourceLine + 8)
         );
     decodedData6 =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, gCompressTest2SourceLine + 9)
+            H2_ALLOC_AT(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, DATA_COMPGEN(0x004f7ee4, compressTest2SourceFile3, RETAIL_FILE), gCompressTest2SourceLine + 9)
         );
     for (index7 = 0; index7 < dataSize2; index7++)
         // Random() is inclusive, so this covers every byte payload value.
@@ -7786,9 +7791,9 @@ void CompressTest2(void) {
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), dataSize2);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    H2_FREE(sourceData6, gCompressTest2SourceLine + 26);
-    H2_FREE(encodedData6, gCompressTest2SourceLine + 27);
-    H2_FREE(decodedData6, gCompressTest2SourceLine + 28);
+    H2_FREE_AT(sourceData6, DATA_COMPGEN(0x004f7f0c, compressTest2SourceFile4, RETAIL_FILE), gCompressTest2SourceLine + 26);
+    H2_FREE_AT(encodedData6, DATA_COMPGEN(0x004f7f34, compressTest2SourceFile5, RETAIL_FILE), gCompressTest2SourceLine + 27);
+    H2_FREE_AT(decodedData6, DATA_COMPGEN(0x004f7f5c, compressTest2SourceFile6, RETAIL_FILE), gCompressTest2SourceLine + 28);
 }
 
 VA(0x00486494, 0x1be)
@@ -7805,38 +7810,38 @@ void CompressTest(void) {
     char* encodedData6;
     char filename3[TEST_FILENAME_SIZE];
 
-    LogStr(const_cast<char*>("C1"));
-    strcpy(filename3, "c:\\TEMP\\Z.DIF");
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f7f88, compressTestC1, "C1")));
+    strcpy(filename3, DATA_COMPGEN(0x004f7f8c, compressTestCTEMPZDIF, "c:\\TEMP\\Z.DIF"));
     fileSize7 = FileSize(filename3);
     sourceData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 9)
+        H2_ALLOC_AT(fileSize7 + TEST_FILE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7f9c, compressTestSourceFile, RETAIL_FILE), gCompressTestSourceLine + 9)
     );
     encodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 10)
+        H2_ALLOC_AT(fileSize7 + TEST_FILE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7fc4, compressTestSourceFile2, RETAIL_FILE), gCompressTestSourceLine + 10)
     );
     decodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA, gCompressTestSourceLine + 11)
+        H2_ALLOC_AT(fileSize7 + TEST_FILE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7fec, compressTestSourceFile3, RETAIL_FILE), gCompressTestSourceLine + 11)
     );
-    LogStr(const_cast<char*>("C2"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f8014, compressTestC2, "C2")));
     fileHandle4 = open(filename3, _O_BINARY);
     if (fileHandle4 == -1)
         FileError(filename3);
     read(fileHandle4, sourceData6, fileSize7);
-    LogStr(const_cast<char*>("C3"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f8018, compressTestC3, "C3")));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    LogStr(const_cast<char*>("C4"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f801c, compressTestC4, "C4")));
     close(fileHandle4);
-    LogStr(const_cast<char*>("C5"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f8020, compressTestC5, "C5")));
     encodedSize14 = EncodeData(encodedData6, sourceData6, fileSize7);
-    LogStr(const_cast<char*>("C6"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f8024, compressTestC6, "C6")));
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
-    LogStr(const_cast<char*>("C7"));
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f8028, compressTestC7, "C7")));
     decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), fileSize7);
     sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    H2_FREE(sourceData6, gCompressTestSourceLine + 36);
-    H2_FREE(encodedData6, gCompressTestSourceLine + 37);
-    H2_FREE(decodedData6, gCompressTestSourceLine + 38);
-    LogStr(const_cast<char*>("C8"));
+    H2_FREE_AT(sourceData6, DATA_COMPGEN(0x004f802c, compressTestSourceFile4, RETAIL_FILE), gCompressTestSourceLine + 36);
+    H2_FREE_AT(encodedData6, DATA_COMPGEN(0x004f8054, compressTestSourceFile5, RETAIL_FILE), gCompressTestSourceLine + 37);
+    H2_FREE_AT(decodedData6, DATA_COMPGEN(0x004f807c, compressTestSourceFile6, RETAIL_FILE), gCompressTestSourceLine + 38);
+    LogStr(const_cast<char*>(DATA_COMPGEN(0x004f80a4, compressTestC8, "C8")));
 }
 
 VA(0x00486652, 0x53)
@@ -7844,7 +7849,7 @@ void CompressTest3(void) {
     char buf[TEST_MESSAGE_CAPACITY];
     i32 i;
     for (i = 0; i < COMPRESS_TEST_ITERATIONS; i++) {
-        sprintf(buf, "Test # %d", i);
+        sprintf(buf, DATA_COMPGEN(0x004f80a8, compressTest3TestD, "Test # %d"), i);
         AiPrint(buf);
         CompressTest2();
     }

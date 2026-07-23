@@ -378,7 +378,10 @@ void DoBlur(
         ->FizzleForward(0, 0, SCREEN_WIDTH, height, FIZZLE_DELAY, oldPalette, newPalette);
     DelayMilli(
         static_cast<i32l>(
-            gfCombatSpeedMod[gConfig.combatSpeed] * IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
+            gfCombatSpeedMod[gConfig.combatSpeed]
+            * DATA_COMPGEN(
+                0x004eba84, combatSpeedDelayMilliseconds, IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
+            )
         )
     );
     gpWindowManager->SaveFizzleSource(0, 0, SCREEN_WIDTH, height);

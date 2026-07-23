@@ -65,16 +65,16 @@ DATA(0x00517148) static i16 gPollRemoteLineBase = 757; // NOLINT(readability-mag
 
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {
-    LogStr("RC1");
+    LogStr(DATA_COMPGEN(0x00516fd4, remoteCleanupRC1, "RC1"));
     if (gbRemoteOn == 0) {
     } else {
-        LogStr("RC2");
+        LogStr(DATA_COMPGEN(0x00516fd8, remoteCleanupRC2, "RC2"));
         if (gbInRemoteMain != 0) {
         } else {
             if (gbInRemoteCleanup != 0) {
             } else {
                 gbInRemoteCleanup = true;
-                LogStr("RC3");
+                LogStr(DATA_COMPGEN(0x00516fdc, remoteCleanupRC3, "RC3"));
                 switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
@@ -125,20 +125,20 @@ void RemoteMain(RemoteGameMode gameMode) {
 
     gbInRemoteMain = true;
     bGotGameType = 0;
-    LogStr("In Remote Main");
-    LogStr("RM 1");
+    LogStr(DATA_COMPGEN(0x00516fe0, remoteMainInRemoteMain, "In Remote Main"));
+    LogStr(DATA_COMPGEN(0x00516ff0, remoteMainRM1, "RM 1"));
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
-        sprintf(gsNetPlayerInfo[player].name, "Player %d", player + 1);
+        sprintf(gsNetPlayerInfo[player].name, DATA_COMPGEN(0x00516ff8, remoteMainPlayerD, "Player %d"), player + 1);
     }
-    LogStr("RM 2");
+    LogStr(DATA_COMPGEN(0x00517004, remoteMainRM2, "RM 2"));
     gbRemoteGameOpen = true;
     if (bLastMouseOffscreen != 0)
         savedColorMice = bLastOnscreenMouseColor;
     else
         savedColorMice = gbColorMice;
     gpMouseManager->SetColorMice(0);
-    LogStr("RM 3");
+    LogStr(DATA_COMPGEN(0x0051700c, remoteMainRM3, "RM 3"));
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
         bUseDirectPlay = 1;
@@ -148,17 +148,17 @@ void RemoteMain(RemoteGameMode gameMode) {
         bUseWinsock = 0;
         bUseDirectPlay = bUseWinsock;
     }
-    LogStr("RM 4");
+    LogStr(DATA_COMPGEN(0x00517014, remoteMainRM4, "RM 4"));
     memset(sMapChangeQueue, 0, sizeof(sMapChangeQueue));
     for (player = 0; player < REMOTE_QUEUE_CAPACITY; player++)
         rcvBuf[player] = NULL;
-    LogStr("RM 5");
+    LogStr(DATA_COMPGEN(0x0051701c, remoteMainRM5, "RM 5"));
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
     GameMode = gameMode;
-    LogStr("RM 6");
+    LogStr(DATA_COMPGEN(0x00517024, remoteMainRM6, "RM 6"));
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
-    LogStr("RM 7");
+    LogStr(DATA_COMPGEN(0x0051702c, remoteMainRM7, "RM 7"));
     if (giTCPHostStatus != -1) {
         if (strlen(gcTCPName) == 0)
             strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
@@ -166,7 +166,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             strcpy(gsThisNetPlayerInfo.name, gcTCPName);
     } else {
         GetDataEntry(
-            "Please enter a 'handle' by which you will be known.",
+            DATA_COMPGEN(0x00517034, remoteMainPleaseEnterAHandleByWhich, "Please enter a 'handle' by which you will be known."),
             gsThisNetPlayerInfo.name,
             NET_NAME_INPUT_LIMIT,
             gConfig.networkDefaultName,
@@ -205,12 +205,12 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
             break;
                     case REMOTE_GAME_MODEM_HOST:
-            LogStr("MH1");
+            LogStr(DATA_COMPGEN(0x00517068, remoteMainMH1, "MH1"));
             gbRemoteOn = true;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
             ModemSetup(IDX(gameMode));
-            LogStr("MH2");
+            LogStr(DATA_COMPGEN(0x0051706c, remoteMainMH2, "MH2"));
             break;
                     case REMOTE_GAME_MODEM_GUEST:
             gbRemoteOn = true;
@@ -225,15 +225,15 @@ void RemoteMain(RemoteGameMode gameMode) {
     gpMouseManager->SetColorMice(savedColorMice);
 
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
-        LogStr("RM 2");
+        LogStr(DATA_COMPGEN(0x00517070, remoteMainRM22, "RM 2"));
         if (giThisNetPos == 0) {
             waitingForPlayers = 1;
             memset(receivedPlayers, 0, REMOTE_PLAYER_COUNT);
             while (waitingForPlayers != 0) {
                 PollSound();
-                LogStr("RM 3");
+                LogStr(DATA_COMPGEN(0x00517078, remoteMainRM32, "RM 3"));
                 incomingData = GetRemoteData(1);
-                LogStr("RM 4");
+                LogStr(DATA_COMPGEN(0x00517080, remoteMainRM42, "RM 4"));
                 if (incomingData != NULL
                     && REMOTE_MESSAGE(incomingData)->type == REMOTE_MESSAGE_RELIABLE) {
                     switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(incomingData)->command)) {
@@ -254,7 +254,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 }
             }
         } else {
-            LogStr("RM 5");
+            LogStr(DATA_COMPGEN(0x00517088, remoteMainRM52, "RM 5"));
             TransmitRemoteData(
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
@@ -264,7 +264,7 @@ void RemoteMain(RemoteGameMode gameMode) {
                 1,
                 REMOTE_MESSAGE_DEFAULT
             );
-            LogStr("RM 6");
+            LogStr(DATA_COMPGEN(0x00517090, remoteMainRM62, "RM 6"));
         }
     }
     remoteGameType = NULL;
@@ -305,7 +305,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
         }
     }
-    LogStr("Out Remote Main");
+    LogStr(DATA_COMPGEN(0x00517098, remoteMainOutRemoteMain, "Out Remote Main"));
     gbInRemoteMain = false;
 }
 
@@ -382,7 +382,7 @@ i32 DecodePacket(u8* data, i32) {
     calculatedCRC0[0] = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
-        sprintf(errorText5, "not mine %d\n", REMOTE_PACKET(packet)->destination);
+        sprintf(errorText5, DATA_COMPGEN(0x005170a8, decodePacketNotMineD, "not mine %d\n"), REMOTE_PACKET(packet)->destination);
         LogStr(errorText5);
         return 0;
     }
@@ -393,7 +393,7 @@ i32 DecodePacket(u8* data, i32) {
     if (receivedCRC4 != calculatedCRC0[0]) {
         sprintf(
             errorText5,
-            "CRC Check Failed CRC 1 %d CRC 2 %d\n",
+            DATA_COMPGEN(0x005170b8, decodePacketCRCCheckFailedCRC1D, "CRC Check Failed CRC 1 %d CRC 2 %d\n"),
             receivedCRC4,
             calculatedCRC0[0]
         );
@@ -434,7 +434,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                 );
                 if (sendStatus != 0) {
                     LogInt(
-                        "Bad return on Send Data",
+                        DATA_COMPGEN(0x005170dc, sendRemoteDataBadReturnOnSendData, "Bad return on Send Data"),
                         destination,
                         sendStatus,
                         size,
@@ -552,7 +552,7 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && attempt0 == REMOTE_RETRY_COUNT && result == 0) {
             NormalDialog(
-                "Error sending data.  Keep trying??",
+                DATA_COMPGEN(0x005170f4, transmitRemoteDataErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -590,8 +590,8 @@ char* GetRemoteData(i8 remove) {
     if (selected >= 0) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
-            H2_FREE(
-                rcvBuf[selected], gGetRemoteDataLineBase + GET_REMOTE_DATA_FREE_LINE_OFFSET
+            H2_FREE_AT(
+                rcvBuf[selected], DATA_COMPGEN(0x0051711c, getRemoteDataSourceFile, RETAIL_FILE), gGetRemoteDataLineBase + GET_REMOTE_DATA_FREE_LINE_OFFSET
             );
             rcvBuf[selected] = NULL;
         }
@@ -666,8 +666,8 @@ void PollRemote(void) {
                         gbInPollSound = false;
                         sprintf(
                             gText,
-                            "%s's computer is not responding.  Do you wish to keep waiting for a "
-                            "response?",
+                            DATA_COMPGEN(0x0051714c, pollRemoteSSComputerIsNotResponding, "%s's computer is not responding.  Do you wish to keep waiting for a "
+                            "response?"),
                             gsNetPlayerInfo[queueIndex].name
                         );
                         NormalDialog(
@@ -697,15 +697,15 @@ void PollRemote(void) {
                     if (giThisNetPos == 1) {
                         sprintf(
                             gText,
-                            "%s's computer is not responding.  Do you wish to keep waiting for a "
-                            "response?",
+                            DATA_COMPGEN(0x0051719c, pollRemoteSSComputerIsNotResponding2, "%s's computer is not responding.  Do you wish to keep waiting for a "
+                            "response?"),
                             gsNetPlayerInfo[0].name
                         );
                     } else {
                         sprintf(
                             gText,
-                            "Your remote connection to the other players appears to be broken.  Do "
-                            "you wish to keep waiting for a response?"
+                            DATA_COMPGEN(0x005171ec, pollRemoteYourRemoteConnectionToTheOther, "Your remote connection to the other players appears to be broken.  Do "
+                            "you wish to keep waiting for a response?")
                         );
                     }
                     NormalDialog(
@@ -721,11 +721,11 @@ void PollRemote(void) {
                         guestExit.eliminated = 0;
                         ReceiveRemotePlayerExit(guestExit);
                     } else {
-                        gpGame->SaveGame("PLYREXIT", 1, 0);
+                        gpGame->SaveGame(DATA_COMPGEN(0x0051725c, pollRemotePLYREXIT, "PLYREXIT"), 1, 0);
                         sprintf(
                             gText,
-                            "The current game has been saved as 'PLYREXIT'. Do you wish to keep "
-                            "playing with the computer filling in for the other humans?"
+                            DATA_COMPGEN(0x00517268, pollRemoteTheCurrentGameHasBeenSaved, "The current game has been saved as 'PLYREXIT'. Do you wish to keep "
+                            "playing with the computer filling in for the other humans?")
                         );
                         NormalDialog(
                             gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
@@ -733,7 +733,7 @@ void PollRemote(void) {
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                             DropDownToOnePlayer();
                         else
-                            ShutDown("");
+                            ShutDown(DATA_COMPGEN(0x005172e8, pollRemoteEmptyString, ""));
                     }
                     gbInPollSound = savedInPollSound;
                     bInTimeoutFail = 1;
@@ -800,8 +800,8 @@ void PollRemote(void) {
                 }
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
-                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC(
-                    REMOTE_MESSAGE_SIZE, gPollRemoteLineBase + POLL_REMOTE_ALLOC_LINE_OFFSET
+                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC_AT(
+                    REMOTE_MESSAGE_SIZE, DATA_COMPGEN(0x005172ec, pollRemoteSourceFile, RETAIL_FILE), gPollRemoteLineBase + POLL_REMOTE_ALLOC_LINE_OFFSET
                 ));
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
@@ -849,7 +849,7 @@ i32 TransmitAndWait(
         while (complete == 0) {
             if (waitStart + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
                 NormalDialog(
-                    "Error sending data.  Keep trying??",
+                    DATA_COMPGEN(0x00517318, transmitAndWaitErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
