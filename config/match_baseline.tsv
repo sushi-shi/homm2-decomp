@@ -813,7 +813,7 @@ SOURCE/GAME	?HasLateOverlay@game@@QAEHHH@Z	94.6753	746b740eaadc
 SOURCE/GAME	?HasMobileHero@playerData@@QAEHXZ	100.0000	f37f428833ac
 SOURCE/GAME	?HasObjectTilesetIndex@game@@QAEHHHHH@Z	95.4945	5a5a8bdc4d39
 SOURCE/GAME	?HeroIDToHeroPos@game@@QAEHPAVplayerData@@H@Z	100.0000	ad23e1bf1d76
-SOURCE/GAME	?InitRandomArtifacts@game@@QAEXXZ	100.0000	fb8ff493c436
+SOURCE/GAME	?InitRandomArtifacts@game@@QAEXXZ	100.0000	bf6d96025187
 SOURCE/GAME	?InitializePasswords@game@@QAEXXZ	100.0000	c40be4b68951
 SOURCE/GAME	?IsCursedItem@@YIHH@Z	100.0000	e1129e9bb5d1
 SOURCE/GAME	?IsMobile@game@@QAEHH@Z	100.0000	dc81ffb55021
