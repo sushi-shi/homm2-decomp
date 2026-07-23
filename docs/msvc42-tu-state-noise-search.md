@@ -200,22 +200,14 @@ suffix gate is stronger than recomputing the normalized target hash and avoids a
 source-hash census for every trial. The canonical normalized hash is still captured once for the
 retained-max audit. Target resolution ignores incidental `VA(...)` text in trailing comments and
 vtable annotations. Include-bearing trials must additionally pass the allowlist/macro-intersection
-guard above. Invariant predecessor symbols are likewise collected once. The tool also rejects a
-candidate from best-candidate selection when:
-
-- any non-target sibling's objdiff score regresses;
-- any already-exact sibling's raw text or ordered relocation digest changes;
-- an earlier function's raw text or ordered relocation digest changes;
-- target code-size distance from retail worsens; or
-- target relocation-count distance from retail worsens.
-
-Those gates govern sub-100 best-candidate diagnostics. Exact closure is target-scoped: disposable
-sibling or predecessor changes do not invalidate it because the probe block is removed and only
-the unchanged target hash's maximum is updated. Exact closure still requires the unrounded objdiff
-score to equal numeric `100.0`, the CodeView-delimited size to equal retail, and the complete
-ordered relocation offset/type/identity/addend stream must equal retail. Comparing every relocation
-is deliberately stronger than checking only external references; a local-label/delinker identity
-caveat remains evidence-only until it is byte-proven under the matcher guide.
+guard above. The tool evaluates only the requested target function. It does not inspect or gate on
+sibling scores, sibling bytes, or predecessor metrics: the generated declarations and their whole
+candidate object are disposable, and no sibling live state or maximum is updated. A target exact
+closure requires the unrounded objdiff score to equal numeric `100.0`, the CodeView-delimited size
+to equal retail, and the complete ordered relocation offset/type/identity/addend stream to equal
+retail. Comparing every target relocation is deliberately stronger than checking only external
+references; a local-label/delinker identity caveat remains evidence-only until it is byte-proven
+under the matcher guide.
 
 Only a successful exact-100 compiled run preserves `manifest.json`. It records the commit, source
 hash, compiler flags, each seed-derived tag and complete generated probe body, every score, target
@@ -228,7 +220,7 @@ concise path-free summary and removes all snippets, manifests, objects, and logs
 `--record-max` is the only optional repository mutation. It runs after byte-for-byte source
 restoration and uses the project's normalized `source_hashes()` API. The mode requires exactly
 one target row in `config/match_baseline.tsv`, requires its stored hash to equal the current hash,
-and never lowers a maximum. Only an eligible exact closure satisfying the size and ordered-
+and never lowers a maximum. Only an exact closure satisfying the size and ordered-
 relocation proof above can replace that row's max field with literal `100.0000`; every other byte
 and field in the ledger is preserved. Missing/duplicate rows and hash mismatches are refused. Any
 sub-100 run—including 99.99 above the stored maximum—leaves the entire baseline byte-identical.

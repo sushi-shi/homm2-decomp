@@ -253,6 +253,29 @@ class TuStateNoiseTests(unittest.TestCase):
             ],
         )
 
+    def test_trial_status_reports_only_target_observation_and_closure(self):
+        self.assertEqual(
+            noise.trial_status({
+                "observed": True,
+                "exact_closure_eligible": True,
+            }),
+            "exact-closure",
+        )
+        self.assertEqual(
+            noise.trial_status({
+                "observed": True,
+                "exact_closure_eligible": False,
+            }),
+            "observed",
+        )
+        self.assertEqual(
+            noise.trial_status({
+                "observed": False,
+                "exact_closure_eligible": False,
+            }),
+            "unusable",
+        )
+
     def test_comparison_pair_applies_reviewed_compgen_data_names(self):
         semantic = "__h2cg$BASE$unit$data$message"
         payload = make_coff(
