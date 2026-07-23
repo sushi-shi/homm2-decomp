@@ -423,10 +423,10 @@ EDITOR/mapcell	?ChangeTilesetIndex@fullMap@@QAEXPAVmapCell@@HHHHHH@Z	100.0000	f9
 EDITOR/mapcell	?ClearCellExtra@fullMap@@QAEXH@Z	100.0000	d08517fc8a74
 EDITOR/mapcell	?Close@fullMap@@QAEXXZ	100.0000	5a0c9c6b056b
 EDITOR/mapcell	?GetNewCellExtraIndex@fullMap@@QAEHXZ	100.0000	c92dbc479cf1
-EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	97.2789	9aaa6f7b4030
-EDITOR/mapcell	?GetNewCellExtraOverlay@fullMap@@QAEPAUmapCellExtra@@HH@Z	97.2789	16627ff13c5e
+EDITOR/mapcell	?GetNewCellExtraObject@fullMap@@QAEPAUmapCellExtra@@HH@Z	100.0000	9aaa6f7b4030
+EDITOR/mapcell	?GetNewCellExtraOverlay@fullMap@@QAEPAUmapCellExtra@@HH@Z	100.0000	16627ff13c5e
 EDITOR/mapcell	?Init@fullMap@@QAEXHH@Z	100.0000	c04f466bc074
-EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	98.7330	107173601e1d
+EDITOR/mapcell	?Read@fullMap@@QAEXHH@Z	100.0000	09941574d493
 EDITOR/mapcell	?Write@fullMap@@QAEXH@Z	100.0000	34dea1fbd9ba
 SOURCE/ADVMGR	??0advManager@@QAE@XZ	100.0000	363ca89e79c0
 SOURCE/ADVMGR	?APanelHandler@@YIHAAUtag_message@@@Z	100.0000	486136d3324b
