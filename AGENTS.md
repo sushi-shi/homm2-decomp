@@ -25,6 +25,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Do not spend unlimited time on compiler shape. Once semantics, frame, CFG, slots, and
   relocations are credible, try the obvious spellings or at most ten non-improving
   last-mile attempts, record the residual, and continue.
+- Spend at most 20 minutes total on one function, including inspection, source-shape
+  generation, compilation, and island classification. Size permutation matrices to fit.
+  A wall-time-truncated matrix is diagnostic only and does not count as complete state coverage.
 
 ## Matching Loop
 

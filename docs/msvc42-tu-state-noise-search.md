@@ -25,7 +25,10 @@ reviewed hand choices × (clean + conservative AST shapes) × (clean + TU-state 
 
 The candidate limit reduces the number of AST source shapes first. Every selected source shape
 is still compiled against every requested state; a capped run never silently samples only some
-islands for one source idea. `--axes-from` supplies exact authored choices such as `value++`,
+islands for one source idea. Searches also have a 1,200-second wall-clock limit by default, matching
+the repository's 20-minute per-function budget. A wall-time stop restores the source and writes an
+explicitly incomplete diagnostic census; it is not complete state evidence. `--axes-from` supplies
+exact authored choices such as `value++`,
 `++value`, and `value += 1`. An option may also contain `extra_edits`, allowing one indivisible
 choice to insert an inline helper above the target and replace its call site:
 

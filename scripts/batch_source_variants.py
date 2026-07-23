@@ -399,14 +399,21 @@ def main(argv=None) -> int:
     parser.add_argument("--limit", type=int, default=4096)
     parser.add_argument("--top", type=int, default=12)
     parser.add_argument("--compile-timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--wall-time-seconds", type=float, default=1200.0,
+        help="stop cleanly after this per-function search budget (default: 20 minutes)",
+    )
     parser.add_argument("--output", type=Path)
     parser.add_argument(
         "--show-best-disasm", action="store_true",
         help="print the best candidate object disassembly before deleting disposable artifacts",
     )
     args = parser.parse_args(argv)
-    if args.limit < 1 or args.top < 1 or args.compile_timeout <= 0:
-        parser.error("--limit, --top, and --compile-timeout must be positive")
+    if (
+        args.limit < 1 or args.top < 1
+        or args.compile_timeout <= 0 or args.wall_time_seconds <= 0
+    ):
+        parser.error("--limit, --top, --compile-timeout, and --wall-time-seconds must be positive")
 
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     try:
@@ -456,6 +463,7 @@ def main(argv=None) -> int:
     best_disasm = None
     original_handler = signal.getsignal(signal.SIGTERM)
     restoration_conflict = False
+    wall_time_reached = False
 
     def interrupt(_signum, _frame):
         raise KeyboardInterrupt
@@ -504,6 +512,10 @@ def main(argv=None) -> int:
                 flush=True,
             )
             for index, (candidate, labels) in enumerate(iter_variants(original, axes, candidates)):
+                remaining_wall_time = args.wall_time_seconds - (time.perf_counter() - started)
+                if remaining_wall_time <= 0:
+                    wall_time_reached = True
+                    break
                 digest = sha256(candidate)
                 if digest in seen:
                     results.append({
@@ -517,8 +529,11 @@ def main(argv=None) -> int:
                 candidate_obj = scratch / f"trial-{index:04d}.obj"
                 with temporary_source(source, original, candidate):
                     ok, compile_log, timed_out = compile_object(
-                        root, source, candidate_obj, flags, args.compile_timeout
+                        root, source, candidate_obj, flags,
+                        min(args.compile_timeout, max(0.1, remaining_wall_time)),
                     )
+                if time.perf_counter() - started >= args.wall_time_seconds:
+                    wall_time_reached = True
                 row = {
                     "trial": index,
                     "choices": labels,
@@ -668,6 +683,9 @@ def main(argv=None) -> int:
         "rva": f"0x{target.rva:x}",
         "symbol": target.symbol,
         "variant_count": combinations,
+        "completed_variant_count": len(results),
+        "wall_time_seconds": args.wall_time_seconds,
+        "truncated_by_wall_time": wall_time_reached,
         "unique_source_count": len(seen),
         "elapsed_seconds": time.perf_counter() - started,
         "source_restored": source.read_bytes() == original,
@@ -695,7 +713,11 @@ def main(argv=None) -> int:
     if exact_source is not None:
         (output / "exact.cpp").write_bytes(exact_source)
 
-    print(f"completed {combinations} variants in {summary['elapsed_seconds']:.2f}s; source restored")
+    disposition = (
+        f"stopped after {len(results)}/{combinations} variants at the wall-time limit"
+        if wall_time_reached else f"completed {combinations} variants"
+    )
+    print(f"{disposition} in {summary['elapsed_seconds']:.2f}s; source restored")
     for row in ranked[: args.top]:
         labels = " ".join(f"{name}={value}" for name, value in row["choices"].items())
         print(
