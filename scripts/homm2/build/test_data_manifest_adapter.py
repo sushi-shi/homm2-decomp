@@ -7,7 +7,9 @@ from unittest import mock
 from homm2.build.data_manifest_adapter import (
     CandidateDefinition,
     CandidateSection,
+    _bind_compgen_edges,
     candidate_topology,
+    resolve_compgen_definitions,
     resolve_vtable_definitions,
     resolve_source_definitions,
     source_definitions,
@@ -18,6 +20,7 @@ from homm2.build.data_manifest_adapter import (
     _symbol_row,
     _vtable_row,
 )
+from homm2.build.annotated_compgen_data import CompgenDataClaim
 from homm2.build.annotated_vtables import AnnotatedVtable
 from homm2.build.test_data_topology_census import (
     COMDAT_DATA_FLAGS,
@@ -58,6 +61,54 @@ def anchor(unit, ordinal, rva, offset=0, name="anchor"):
 
 
 class DataManifestAdapterTest(unittest.TestCase):
+    def test_compgen_binder_accepts_only_unique_or_ordered_bindings(self):
+        assignments, failures = _bind_compgen_edges(
+            {0: {0, 1}}, [0], [0, 1])
+        self.assertEqual(assignments, {})
+        self.assertEqual(failures, [("ambiguous", [0], [0, 1])])
+
+        assignments, failures = _bind_compgen_edges(
+            {0: {0, 1}, 1: {1}}, [0, 1], [0, 1])
+        self.assertEqual(assignments, {0: 0, 1: 1})
+        self.assertEqual(failures, [])
+
+        assignments, failures = _bind_compgen_edges(
+            {0: {0, 1}, 1: {0, 1}}, [1, 0], [1, 0])
+        self.assertEqual(assignments, {1: 1, 0: 0})
+        self.assertEqual(failures, [])
+
+    def test_ambiguous_compgen_binding_warns_and_strict_fails(self):
+        claim = CompgenDataClaim(
+            "A", 0x100, "message", "STRING_LITERAL", 4,
+            "A.cpp:1", "A.cpp:1", ())
+        definitions = [
+            replace(candidate("A", "$SG1", value=0), storage="rdata"),
+            replace(candidate("A", "$SG2", value=4), storage="rdata"),
+        ]
+        topology = {"A": (definitions, [])}
+        patches = (
+            mock.patch("homm2.build.data_manifest_adapter.read_pe", return_value={}),
+            mock.patch("homm2.build.data_manifest_adapter._pe_layout",
+                       return_value=(0, set(), None,
+                                     lambda _rva, size: b"same"[:size])),
+            mock.patch("homm2.build.data_manifest_adapter._retail_storage_name",
+                       return_value="rdata"),
+            mock.patch("homm2.build.data_manifest_adapter._candidate_bytes",
+                       return_value=b"same"),
+            mock.patch("homm2.build.data_manifest_adapter.CoffFile"),
+            mock.patch("homm2.build.data_manifest_adapter.derive_allocations",
+                       return_value=([], mock.Mock(), [])),
+        )
+        with patches[0], patches[1], patches[2], patches[3], patches[4], patches[5]:
+            with self.assertWarnsRegex(UserWarning, "ambiguous.*message"):
+                resolved, diagnostics = resolve_compgen_definitions(
+                    [claim], topology, Path("base"), Path("game.exe"))
+            self.assertEqual(resolved, [])
+            self.assertEqual(len(diagnostics), 1)
+            with self.assertRaisesRegex(ValueError, "ambiguous.*message"):
+                resolve_compgen_definitions(
+                    [claim], topology, Path("base"), Path("game.exe"), strict=True)
+
     def test_source_vtables_bind_exact_candidate_and_allow_proved_aliases(self):
         primary = AnnotatedVtable(
             "A", 0x100, "Derived", None, "??_7Derived@@6B@", "src/A.cpp:1")

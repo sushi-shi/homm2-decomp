@@ -295,6 +295,97 @@ def _retail_storage_name(pe, rva: int) -> str | None:
     }.get(storage)
 
 
+def _maximum_claim_matching(edges, claims, forbidden=None):
+    """Return a deterministic matching covering ``claims``, if one exists."""
+    candidate_owner = {}
+    assignment = {}
+
+    def augment(claim_index, seen):
+        for candidate_index in sorted(edges[claim_index]):
+            if forbidden == (claim_index, candidate_index):
+                continue
+            if candidate_index in seen:
+                continue
+            seen.add(candidate_index)
+            owner = candidate_owner.get(candidate_index)
+            if owner is None or augment(owner, seen):
+                candidate_owner[candidate_index] = claim_index
+                assignment[claim_index] = candidate_index
+                return True
+        return False
+
+    for claim_index in sorted(claims, key=lambda value: (len(edges[value]), value)):
+        if not augment(claim_index, set()):
+            return None
+    return assignment
+
+
+def _bind_compgen_edges(edges, claim_order, candidate_order):
+    """Resolve bipartite claim/candidate edges without arbitrary assignments.
+
+    A non-order-derived binding must be the only matching which covers every
+    claim in its connected component. Equal-sized, order-compatible components
+    are the explicitly supported compiler-counter case and pair in preserved
+    stream/RVA order.
+    """
+    claim_rank = {value: index for index, value in enumerate(claim_order)}
+    candidate_rank = {value: index for index, value in enumerate(candidate_order)}
+    reverse = defaultdict(set)
+    for claim_index, choices in edges.items():
+        for candidate_index in choices:
+            reverse[candidate_index].add(claim_index)
+
+    assignments = {}
+    failures = []
+    remaining = set(edges)
+    while remaining:
+        seed = min(remaining, key=lambda value: claim_rank[value])
+        component_claims = {seed}
+        component_candidates = set()
+        frontier = [seed]
+        while frontier:
+            claim_index = frontier.pop()
+            for candidate_index in edges[claim_index]:
+                if candidate_index in component_candidates:
+                    continue
+                component_candidates.add(candidate_index)
+                for peer in reverse[candidate_index]:
+                    if peer in remaining and peer not in component_claims:
+                        component_claims.add(peer)
+                        frontier.append(peer)
+
+        ordered_claims = sorted(
+            component_claims, key=lambda value: claim_rank[value])
+        ordered_candidates = sorted(
+            component_candidates, key=lambda value: candidate_rank[value])
+        ordered_counter_group = (
+            len(ordered_claims) == len(ordered_candidates)
+            and all(candidate_index in edges[claim_index]
+                    for claim_index, candidate_index
+                    in zip(ordered_claims, ordered_candidates)))
+        if ordered_counter_group:
+            assignments.update(zip(ordered_claims, ordered_candidates))
+            remaining -= component_claims
+            continue
+
+        matching = _maximum_claim_matching(edges, component_claims)
+        if matching is None:
+            failures.append(("missing", ordered_claims, ordered_candidates))
+            remaining -= component_claims
+            continue
+        alternative = any(
+            _maximum_claim_matching(
+                edges, component_claims,
+                forbidden=(claim_index, candidate_index)) is not None
+            for claim_index, candidate_index in matching.items())
+        if alternative:
+            failures.append(("ambiguous", ordered_claims, ordered_candidates))
+        else:
+            assignments.update(matching)
+        remaining -= component_claims
+    return assignments, failures
+
+
 def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
                                 exe: Path, reserved=(), strict=False,
                                 symbols: Path = SYMBOLS, units: Path = UNITS):
@@ -380,82 +471,21 @@ def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
                             else placed_edges if len(placed_edges) == 1
                             else payload_edges)
 
-        assignments = {}
-        used = set()
-        changed = True
-        while changed:
-            changed = False
-            reverse = defaultdict(list)
-            for claim_index, choices in edges.items():
-                if claim_index in assignments:
-                    continue
-                for candidate_index in choices - used:
-                    reverse[candidate_index].append(claim_index)
-            for claim_index in sorted(edges):
-                if claim_index in assignments:
-                    continue
-                choices = edges[claim_index] - used
-                if (len(choices) == 1
-                        and len(reverse[next(iter(choices))]) == 1):
-                    candidate_index = next(iter(choices))
-                    assignments[claim_index] = candidate_index
-                    used.add(candidate_index)
-                    changed = True
-            reverse = defaultdict(list)
-            for claim_index, choices in edges.items():
-                if claim_index in assignments:
-                    continue
-                for candidate_index in choices - used:
-                    reverse[candidate_index].append(claim_index)
-            for candidate_index, claim_indices in sorted(reverse.items()):
-                if len(claim_indices) == 1:
-                    claim_index = claim_indices[0]
-                    assignments[claim_index] = candidate_index
-                    used.add(candidate_index)
-                    changed = True
-
-        remaining_claims = set(edges) - set(assignments)
-        remaining_reverse = defaultdict(set)
-        for claim_index in remaining_claims:
-            for candidate_index_value in edges[claim_index] - used:
-                remaining_reverse[candidate_index_value].add(claim_index)
-        while remaining_claims:
-            seed = min(remaining_claims)
-            component_claims = {seed}
-            component_candidates = set()
-            frontier = [seed]
-            while frontier:
-                claim_index = frontier.pop()
-                for candidate_index in edges[claim_index] - used:
-                    if candidate_index in component_candidates:
-                        continue
-                    component_candidates.add(candidate_index)
-                    for peer in remaining_reverse[candidate_index]:
-                        if peer in remaining_claims and peer not in component_claims:
-                            component_claims.add(peer)
-                            frontier.append(peer)
-            claim_order = sorted(component_claims,
-                                 key=lambda value: unit_claims[value].rva)
-            candidate_order = sorted(
-                component_candidates,
-                key=lambda value: (candidates[value].storage,
-                                   candidates[value].stream_offset,
-                                   candidates[value].symbol))
-            if (len(claim_order) == len(candidate_order)
-                    and all(candidate_index in edges[claim_index]
-                            for claim_index, candidate_index
-                            in zip(claim_order, candidate_order))):
-                for claim_index, candidate_index in zip(
-                        claim_order, candidate_order):
-                    assignments[claim_index] = candidate_index
-                    used.add(candidate_index)
-            else:
-                diagnostics.append(
-                    f"{unit}: cannot bind {len(claim_order)} semantic claims to "
-                    f"{len(candidate_order)} anonymous candidate allocations: "
-                    + ", ".join(unit_claims[value].semantic_name
-                                for value in claim_order[:6]))
-            remaining_claims -= component_claims
+        claim_order = sorted(edges, key=lambda value: unit_claims[value].rva)
+        candidate_order = sorted(
+            range(len(candidates)),
+            key=lambda value: (candidates[value].storage,
+                               candidates[value].stream_offset,
+                               candidates[value].symbol))
+        assignments, failures = _bind_compgen_edges(
+            edges, claim_order, candidate_order)
+        for cause, failed_claims, failed_candidates in failures:
+            diagnostics.append(
+                f"{unit}: {cause} compiler-generated binding for "
+                f"{len(failed_claims)} semantic claims and "
+                f"{len(failed_candidates)} anonymous candidate allocations: "
+                + ", ".join(unit_claims[value].semantic_name
+                            for value in failed_claims[:6]))
 
         for claim_index, candidate_index in sorted(assignments.items()):
             resolved.append((unit_claims[claim_index], candidates[candidate_index]))
