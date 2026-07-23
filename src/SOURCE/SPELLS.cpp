@@ -485,8 +485,9 @@ i32 combatManager::FindResurrectArmyIndex(
             && (m_hexCells[hex].m_deadOccupantFrames[corpse] != ARMY_FACING_LEFT
                 || m_hexCells[hex + 1].m_occupantSide == COMBAT_SIDE_NONE)
             && (m_hexCells[hex].m_deadOccupantFrames[corpse] != ARMY_FACING_RIGHT
-                || m_hexCells[hex - 1].m_occupantSide == COMBAT_SIDE_NONE)
-            && m_hexCells[hex].m_deadOccupantSides[corpse] == side) {
+                || m_hexCells[hex - 1].m_occupantSide == COMBAT_SIDE_NONE)) {
+            if (m_hexCells[hex].m_deadOccupantSides[corpse] != side)
+                continue;
             target_j = &m_armies[IDX(m_hexCells[hex].m_deadOccupantSides[corpse])]
                                 [m_hexCells[hex].m_deadOccupantIndices[corpse]];
             if (target_j->SpellCastWorkChance(spell) > 0.0f)
