@@ -679,13 +679,18 @@ Neither permutation tool was used. Full source/header hashes and every ineffecti
 source shape are recorded so the direct relation, `maxW | 0`, and `0[&maxW]` forms are not
 repeated.
 
-The successful form is the scalar-lvalue SIB identity, now spelled `OD_STEER(local)`
-(the `va.h` macro expanding to `0[&(local)]`). It makes VC4.2 `/Od` load the
+The historically successful form was the scalar-lvalue SIB identity spelled
+`OD_STEER(local)` (the `va.h` macro expanding to `0[&(local)]`). It made VC4.2 `/Od` load the
 other comparison operand first without changing semantics, slots, instruction count, CFG, or
 relocations. Applying it to the two index/start comparisons in `DrawBoundedString`, the three
 width/argument comparisons in `LineLength`, and the length/index comparison in `LineWidth` makes
-all three functions raw-exact. The prior stale source completion claims on the first two are removed.
-The reusable byte-level before/after form is documented in
+all three functions raw-exact at that checkpoint.
+
+`font-clean-tu-state-464f4e54-424f554e.tsv` supersedes the retained-source disposition. All six
+wrappers are removed. `LineWidth` stays live exact; clean `LineLength` and
+`DrawBoundedString` reach reproducible exact declaration-forest islands at trials 4 and 6,
+respectively. Each was replayed alone with exact size and ordered relocations before its clean
+source hash retained 100%. The reusable historical byte-level before/after form is documented in
 [`tu-cumulative-eval-order.md`](../patterns/tu-cumulative-eval-order.md).
 
 The two deleting-destructor report rows remain unscored because delinking materializes two retail

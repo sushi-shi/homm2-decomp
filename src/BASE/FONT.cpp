@@ -203,7 +203,7 @@ void font::DrawBoundedString(
         if (w < lineWidth3) {
             idx--;
             wordBreak0 = 0;
-            while (text2[idx] != ' ' && OD_STEER(idx) >= lineStartD) {
+            while (text2[idx] != ' ' && idx >= lineStartD) {
                 lineWidth3 -= GetCharacterWidth(text2[idx]);
                 if (m_height * WRAP_HEIGHT_LINE_COUNT + yOffC > h && lineWidth3 < w)
                     break;
@@ -211,7 +211,7 @@ void font::DrawBoundedString(
                     wordBreak0 = idx;
                 idx--;
             }
-            if (OD_STEER(idx) <= lineStartD) {
+            if (idx <= lineStartD) {
                 idx = wordBreak0;
                 lineWidth3 = savedWidth;
             }
@@ -252,16 +252,16 @@ i32 font::LineLength(char* str, i32 maxW) {
     char* w = str;
     i32 q, v;
     while (p < s && w[p] != 0) {
-        while (w[p] != 0 && w[p] != '\n' && OD_STEER(x) <= maxW) {
+        while (w[p] != 0 && w[p] != '\n' && x <= maxW) {
             x += GetCharacterWidth(w[p]);
             p++;
         }
-        if (OD_STEER(x) > maxW) {
+        if (x > maxW) {
             p--;
             gap = 0;
             while (w[p] != ' ' && p >= r) {
                 x -= GetCharacterWidth(w[p]);
-                if (gap == 0 && OD_STEER(x) < maxW)
+                if (gap == 0 && x < maxW)
                     gap = p;
                 p--;
             }
