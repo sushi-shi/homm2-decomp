@@ -4,6 +4,10 @@ These scripts preserve one-off recovery and compiler-shape experiments. They are
 not part of the supported matching workflow, are excluded from active test
 discovery, and may refer to historical reports or commands that no longer exist.
 
+The supported unified compiler-shape search is `scripts/match_variants.py`; it
+combines reviewed exact-span choices, conservative AST variants, and disposable
+TU-state island probes.
+
 The archived `carcass_fill.py`, `gen_queue.py`, and `verify_carcass.py` belong to
 the completed placeholder/bootstrap phase. The live exhaustive residual queue is
 implemented separately and remains supported.

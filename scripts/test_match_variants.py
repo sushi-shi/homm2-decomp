@@ -1,4 +1,4 @@
-# Tests for the archived variant-search frontend.
+# Tests for the variant-search frontend.
 import unittest
 from unittest.mock import patch
 
