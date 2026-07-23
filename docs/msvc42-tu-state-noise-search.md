@@ -73,7 +73,8 @@ preprocessor directives. Top insertion lets the probe state flow through real pr
 and code generation, which can reach states unavailable to adjacent insertion. Both modes reset
 the original logical line at the insertion boundary and preserve the exact authored target suffix.
 
-The tool reports a target-state census after every compiled sweep. A state is identified by the
+The tool stops at the first audited exact closure; later generated trials are not compiled. If no
+exact closure is found, it reports a target-state census after the compiled sweep. A state is identified by the
 target's raw text digest, objdiff function boundary, and ordered relocation stream after replacing
 only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not by fuzzy score,
 because several distinct objects may share one percentage. Public target identities, relocation

@@ -12,6 +12,8 @@ IMAGE_BASE = 0x400000
 REPORT = REPO / "build/objdiff/report.json"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 OUTPUT = REPO / "build/gen/residual_function_queue.tsv"
+
+
 def symbol_inventory(path):
     rows = {}
     with Path(path).open(encoding="latin-1", newline="") as stream:
@@ -50,7 +52,7 @@ def residual_rows(report, symbols):
         sample = ", ".join("%s:%s" % row for row in missing[:5])
         raise ValueError("%d report functions lack an RVA inventory row: %s" %
                          (len(missing), sample))
-    rows.sort(key=lambda row: (row["fuzzy"], row["rva"], row["unit"], row["name"]))
+    rows.sort(key=lambda row: (-row["fuzzy"], row["rva"], row["unit"], row["name"]))
     for rank, row in enumerate(rows, 1):
         row["rank"] = rank
     return rows
