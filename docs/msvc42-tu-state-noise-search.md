@@ -5,7 +5,7 @@ otherwise irrelevant earlier source surface. This makes a bounded TU-state probe
 after a function is semantically and structurally complete but remains at a compiler-shape
 wall. It does **not** make arbitrary dummy C++ declarations acceptable reconstructed source.
 
-The active implementation is `scripts/tu_state_noise.py`. Use it only after the target's
+The unchanged-source implementation is `scripts/tu_state_noise.py`. Use it only after the target's
 semantics, types/layout, frame/slots, CFG, inline boundaries, and external relocations have
 been audited. Prefer this disposable search to adding a persistent `OD_STEER` solely to
 select one unstable compiler state. Before starting, check the external residual queue and
@@ -15,6 +15,46 @@ target-specific matrix so an unchanged state tuple is not searched twice.
 python3 scripts/tu_state_noise.py \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
+
+When the audit leaves several legitimate source spellings to test, use the unified
+`scripts/match_variants.py` frontend. Its search is a true product:
+
+```text
+reviewed hand choices × (clean + conservative AST shapes) × (clean + TU-state probes)
+```
+
+The candidate limit reduces the number of AST source shapes first. Every selected source shape
+is still compiled against every requested state; a capped run never silently samples only some
+islands for one source idea. `--axes-from` supplies exact authored choices such as `value++`,
+`++value`, and `value += 1`. An option may also contain `extra_edits`, allowing one indivisible
+choice to insert an inline helper above the target and replace its call site:
+
+```json
+{
+  "name": "increment",
+  "find": "value++;",
+  "options": [
+    {"name": "postfix"},
+    {"name": "prefix", "replace": "++value;"},
+    {"name": "compound", "replace": "value += 1;"},
+    {
+      "name": "inline_inc",
+      "replace": "Inc(value);",
+      "extra_edits": [{
+        "insert_before": "VA(0x00400000, 0x20)\n",
+        "text": "inline void Inc(u8 &value) { value++; }\n\n"
+      }]
+    }
+  ]
+}
+```
+
+Extra edits use exact unique anchors and may instead specify `find`/`replace` or `insert_after`.
+The generator suppresses AST rewrites that overlap a reviewed hand axis. Its automatic control-flow
+surface is deliberately narrow: `terminal_return_order` only inverts a terminal
+`if (condition) return a; return b;` pair while preserving the branch payloads. Broader early-return
+or nesting rewrites require an authored multi-edit option until lifetime, label, and scope safety
+can be proved.
 
 The default `forest` trials are deliberately expansive. Their width walks from 10 through
 `--max-declarations` (64 by default), then wraps. A width-N forest contains N independently

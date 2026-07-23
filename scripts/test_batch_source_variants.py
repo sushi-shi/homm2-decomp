@@ -1,4 +1,4 @@
-# Tests for the archived source-variant runner.
+# Tests for the source-variant runner.
 import json
 import tempfile
 import unittest
@@ -8,6 +8,7 @@ from batch_source_variants import (
     iter_variants,
     load_manifest,
     render_candidate,
+    render_edits,
     render_variant,
     result_rank,
 )
@@ -55,6 +56,51 @@ class BatchSourceVariantManifestTests(unittest.TestCase):
         _payload, _source, original, axes, _candidates, _rva = load_manifest(manifest, root)
         choices = (axes[0].options[1], axes[1].options[0])
         self.assertEqual(render_variant(original, axes, choices), b"ALPHA beta g\n")
+
+    def test_named_baseline_candidate_may_have_no_edits(self):
+        root, manifest = self.write_case("alpha\n", [{
+            "name": "word",
+            "find": "alpha",
+            "options": [{"name": "base"}, {"name": "upper", "replace": "ALPHA"}],
+        }])
+        payload = json.loads(manifest.read_text())
+        payload["candidates"] = [{"name": "baseline", "edits": []}]
+        manifest.write_text(json.dumps(payload))
+        _payload, _source, original, axes, candidates, _rva = load_manifest(manifest, root)
+        rendered = list(iter_variants(original, axes, candidates))
+        self.assertEqual([variant for variant, _labels in rendered], [b"alpha\n", b"ALPHA\n"])
+
+    def test_axis_option_can_insert_inline_helper_and_replace_call_site(self):
+        root, manifest = self.write_case("MARK\nvoid f() { value++; }\n", [{
+            "name": "increment",
+            "find": "value++;",
+            "options": [
+                {"name": "postfix"},
+                {
+                    "name": "inline_inc",
+                    "replace": "Inc(value);",
+                    "extra_edits": [{
+                        "insert_before": "MARK\n",
+                        "text": "inline void Inc(int &value) { ++value; }\n",
+                    }],
+                },
+            ],
+        }])
+        _payload, _source, original, axes, _candidates, _rva = load_manifest(manifest, root)
+        self.assertEqual(
+            render_variant(original, axes, (axes[0].options[1],)),
+            b"inline void Inc(int &value) { ++value; }\nMARK\nvoid f() { Inc(value); }\n",
+        )
+
+    def test_same_point_insertions_preserve_dimension_order(self):
+        self.assertEqual(
+            render_edits(b"MARK\n", [
+                (0, 0, b"state\n"),
+                (0, 0, b"generated helper\n"),
+                (0, 0, b"authored helper\n"),
+            ]),
+            b"state\ngenerated helper\nauthored helper\nMARK\n",
+        )
 
     def test_find_span_must_be_unique(self):
         root, manifest = self.write_case("same same\n", [{

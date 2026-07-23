@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Archived source-shape experiment runner.
+"""Source-shape experiment runner.
 
-This is not a source permuter.  It performs only byte-exact substitutions declared in
-a JSON manifest, so every option is authored or AST-generated and semantically reviewed
-before the run.  No regular expression rewrites are used.  The Cartesian product is
-useful for testing interacting hand-authored source idioms.  A manifest may instead
-contain an explicit ``candidates`` list, used by ``generate_ast_variants.py`` for bounded
-combinations of non-overlapping libclang edits.
+It performs only byte-exact substitutions declared in a JSON manifest, so every option is
+authored or AST-generated and semantically reviewable before the run. No regular expression
+rewrites are used. Axes form a Cartesian product with generated candidates. An axis option may
+carry exact ``extra_edits`` so a helper definition and its call-site rewrite remain one choice.
 
 Example manifest::
 
@@ -52,27 +50,19 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
 from tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
+    byte_differences,
     compile_object,
     exact_closure_rejections,
+    normalized_relocation_stream,
     object_metrics,
     objdiff_scores,
     resolve_target,
+    target_state_identity,
     temporary_source,
 )
-
-
-@dataclass(frozen=True)
-class Axis:
-    name: str
-    start: int
-    end: int
-    original: bytes
-    options: tuple[tuple[str, bytes], ...]
 
 
 @dataclass(frozen=True)
@@ -81,6 +71,22 @@ class Edit:
     end: int
     original: bytes
     replacement: bytes
+
+
+@dataclass(frozen=True)
+class AxisOption:
+    name: str
+    replacement: bytes
+    extra_edits: tuple[Edit, ...]
+
+
+@dataclass(frozen=True)
+class Axis:
+    name: str
+    start: int
+    end: int
+    original: bytes
+    options: tuple[AxisOption, ...]
 
 
 @dataclass(frozen=True)
@@ -100,6 +106,48 @@ def result_rank(row: dict, retail_size: int, retail_relocs: int):
         abs(row["candidate_relocs"] - retail_relocs),
         row["trial"],
     )
+
+
+def parse_axis_extra_edit(raw_edit: dict, original: bytes, axis_name: str, option_name: str) -> Edit:
+    if not isinstance(raw_edit, dict):
+        raise ValueError(f"axis {axis_name}/{option_name}: every extra edit must be an object")
+    find = raw_edit.get("find")
+    replace = raw_edit.get("replace")
+    insert_before = raw_edit.get("insert_before")
+    insert_after = raw_edit.get("insert_after")
+    text = raw_edit.get("text")
+    modes = sum(value is not None for value in (find, insert_before, insert_after))
+    if modes != 1:
+        raise ValueError(
+            f"axis {axis_name}/{option_name}: extra edit requires exactly one of "
+            "find, insert_before, or insert_after"
+        )
+    if find is not None:
+        if not isinstance(find, str) or not find or not isinstance(replace, str):
+            raise ValueError(
+                f"axis {axis_name}/{option_name}: find/replace must be non-empty string/string"
+            )
+        needle = find.encode("utf-8")
+        replacement = replace.encode("utf-8")
+        offset = original.find(needle)
+        end = offset + len(needle)
+    else:
+        anchor = insert_before if insert_before is not None else insert_after
+        if not isinstance(anchor, str) or not anchor or not isinstance(text, str):
+            raise ValueError(
+                f"axis {axis_name}/{option_name}: insertion anchor/text must be strings"
+            )
+        needle = anchor.encode("utf-8")
+        anchor_offset = original.find(needle)
+        offset = anchor_offset + (len(needle) if insert_after is not None else 0)
+        end = offset
+        replacement = text.encode("utf-8")
+    if original.count(needle) != 1:
+        raise ValueError(
+            f"axis {axis_name}/{option_name}: extra-edit anchor occurs "
+            f"{original.count(needle)} times, expected 1"
+        )
+    return Edit(offset, end, original[offset:end], replacement)
 
 
 def load_manifest(path: Path, root: Path):
@@ -161,13 +209,54 @@ def load_manifest(path: Path, root: Path):
                 replacement = raw_option.get("replace", find)
                 if not isinstance(replacement, str):
                     raise ValueError(f"axis {name}/{option_name}: replace must be a string")
-                parsed_options.append((option_name, replacement.encode("utf-8")))
+                raw_extra_edits = raw_option.get("extra_edits", [])
+                if not isinstance(raw_extra_edits, list):
+                    raise ValueError(f"axis {name}/{option_name}: extra_edits must be a list")
+                extra_edits = tuple(
+                    parse_axis_extra_edit(raw_edit, original, name, option_name)
+                    for raw_edit in raw_extra_edits
+                )
+                option_edits = (
+                    Edit(start, start + len(needle), needle, replacement.encode("utf-8")),
+                    *extra_edits,
+                )
+                ordered_option_edits = sorted(
+                    option_edits, key=lambda edit: (edit.start, edit.end)
+                )
+                for left, right in zip(ordered_option_edits, ordered_option_edits[1:]):
+                    if ranges_overlap(left.start, left.end, right.start, right.end):
+                        raise ValueError(f"axis {name}/{option_name}: edits overlap")
+                parsed_options.append(AxisOption(
+                    option_name, replacement.encode("utf-8"), extra_edits,
+                ))
             axes.append(Axis(name, start, start + len(needle), needle, tuple(parsed_options)))
 
-        ordered = sorted(axes, key=lambda axis: axis.start)
-        for left, right in zip(ordered, ordered[1:]):
-            if left.end > right.start:
-                raise ValueError(f"axes overlap: {left.name} and {right.name}")
+        for axis_index, left_axis in enumerate(axes):
+            for right_axis in axes[axis_index + 1:]:
+                for left_option in left_axis.options:
+                    left_edits = (
+                        Edit(
+                            left_axis.start, left_axis.end, left_axis.original,
+                            left_option.replacement,
+                        ),
+                        *left_option.extra_edits,
+                    )
+                    for right_option in right_axis.options:
+                        right_edits = (
+                            Edit(
+                                right_axis.start, right_axis.end, right_axis.original,
+                                right_option.replacement,
+                            ),
+                            *right_option.extra_edits,
+                        )
+                        if any(
+                            ranges_overlap(left.start, left.end, right.start, right.end)
+                            for left in left_edits for right in right_edits
+                        ):
+                            raise ValueError(
+                                f"axes overlap: {left_axis.name}/{left_option.name} and "
+                                f"{right_axis.name}/{right_option.name}"
+                            )
     if raw_candidates is not None:
         if not isinstance(raw_candidates, list) or not raw_candidates:
             raise ValueError("manifest candidates must be a non-empty list")
@@ -180,8 +269,12 @@ def load_manifest(path: Path, root: Path):
             if not isinstance(name, str) or not name or name in candidate_names:
                 raise ValueError(f"candidate names must be unique non-empty strings: {name!r}")
             candidate_names.add(name)
-            if not isinstance(raw_edits, list) or not raw_edits:
-                raise ValueError(f"candidate {name}: edits must be a non-empty list")
+            if not isinstance(raw_edits, list):
+                raise ValueError(f"candidate {name}: edits must be a list")
+            if not raw_edits and name != "baseline":
+                raise ValueError(
+                    f"candidate {name}: only the named baseline candidate may have no edits"
+                )
             edits = []
             for raw_edit in raw_edits:
                 if not isinstance(raw_edit, dict):
@@ -209,17 +302,26 @@ def load_manifest(path: Path, root: Path):
             candidates.append(Candidate(name, tuple(edits)))
     for axis in axes:
         for candidate in candidates:
-            for edit in candidate.edits:
-                if ranges_overlap(axis.start, axis.end, edit.start, edit.end):
-                    raise ValueError(
-                        f"axis {axis.name} overlaps an edit in candidate {candidate.name}"
-                    )
+            for option in axis.options:
+                axis_edits = (
+                    Edit(axis.start, axis.end, axis.original, option.replacement),
+                    *option.extra_edits,
+                )
+                for axis_edit in axis_edits:
+                    for edit in candidate.edits:
+                        if ranges_overlap(
+                            axis_edit.start, axis_edit.end, edit.start, edit.end
+                        ):
+                            raise ValueError(
+                                f"axis {axis.name}/{option.name} overlaps an edit in "
+                                f"candidate {candidate.name}"
+                            )
     return payload, source, original, tuple(axes), tuple(candidates), rva
 
 
 def ranges_overlap(first_start: int, first_end: int, second_start: int, second_end: int) -> bool:
     if first_start == first_end and second_start == second_end:
-        return first_start == second_start
+        return False
     if first_start == first_end:
         return second_start < first_start < second_end
     if second_start == second_end:
@@ -227,15 +329,33 @@ def ranges_overlap(first_start: int, first_end: int, second_start: int, second_e
     return first_start < second_end and second_start < first_end
 
 
-def render_variant(original: bytes, axes: tuple[Axis, ...], choices) -> bytes:
-    replacements = sorted(
-        ((axis.start, axis.end, replacement) for axis, (_name, replacement) in zip(axes, choices)),
-        reverse=True,
+def render_edits(original: bytes, edits) -> bytes:
+    insertions = {}
+    replacements = []
+    for start, end, replacement in edits:
+        if start == end:
+            insertions.setdefault(start, []).append(replacement)
+        else:
+            replacements.append((start, end, replacement))
+    replacements.extend(
+        (offset, offset, b"".join(parts)) for offset, parts in insertions.items()
     )
-    candidate = original
-    for start, end, replacement in replacements:
-        candidate = candidate[:start] + replacement + candidate[end:]
-    return candidate
+    rendered = original
+    for start, end, replacement in sorted(
+        replacements, key=lambda item: (item[0], item[1]), reverse=True
+    ):
+        rendered = rendered[:start] + replacement + rendered[end:]
+    return rendered
+
+
+def render_variant(original: bytes, axes: tuple[Axis, ...], choices) -> bytes:
+    replacements = []
+    for axis, option in zip(axes, choices):
+        replacements.append((axis.start, axis.end, option.replacement))
+        replacements.extend(
+            (edit.start, edit.end, edit.replacement) for edit in option.extra_edits
+        )
+    return render_edits(original, replacements)
 
 
 def render_candidate(original: bytes, candidate: Candidate) -> bytes:
@@ -246,18 +366,17 @@ def render_candidate(original: bytes, candidate: Candidate) -> bytes:
 
 
 def render_combined(original: bytes, axes: tuple[Axis, ...], choices, candidate: Candidate | None):
-    replacements = [
-        (axis.start, axis.end, replacement)
-        for axis, (_name, replacement) in zip(axes, choices)
-    ]
+    replacements = []
     if candidate is not None:
         replacements.extend(
             (edit.start, edit.end, edit.replacement) for edit in candidate.edits
         )
-    rendered = original
-    for start, end, replacement in sorted(replacements, key=lambda item: (item[0], item[1]), reverse=True):
-        rendered = rendered[:start] + replacement + rendered[end:]
-    return rendered
+    for axis, option in zip(axes, choices):
+        replacements.append((axis.start, axis.end, option.replacement))
+        replacements.extend(
+            (edit.start, edit.end, edit.replacement) for edit in option.extra_edits
+        )
+    return render_edits(original, replacements)
 
 
 def iter_variants(original: bytes, axes: tuple[Axis, ...], candidates: tuple[Candidate, ...]):
@@ -267,7 +386,7 @@ def iter_variants(original: bytes, axes: tuple[Axis, ...], candidates: tuple[Can
     for candidate in candidate_values:
         for axis_choices in choices:
             labels = {
-                axis.name: choice[0] for axis, choice in zip(axes, axis_choices)
+                axis.name: choice.name for axis, choice in zip(axes, axis_choices)
             }
             if candidate is not None:
                 labels["candidate"] = candidate.name
@@ -327,6 +446,7 @@ def main(argv=None) -> int:
         parser.error(f"target symbol absent from retail object: {target.symbol}")
 
     results = []
+    states = {}
     seen = {}
     started = time.perf_counter()
     best_score = -1.0
@@ -421,6 +541,13 @@ def main(argv=None) -> int:
                     results.append(row)
                     continue
                 candidate_size = sizes.get(target.symbol)
+                identity_metrics = dict(candidate_target)
+                identity_metrics["objdiff_size"] = candidate_size
+                state_id = target_state_identity(identity_metrics)
+                normalized_relocations = normalized_relocation_stream(candidate_target)
+                normalized_reloc_sha = sha256(
+                    "\n".join(normalized_relocations).encode("utf-8")
+                )[:16]
                 rejections = exact_closure_rejections(
                     score, candidate_size, target.retail_size, candidate_target, retail_target
                 )
@@ -448,6 +575,7 @@ def main(argv=None) -> int:
                     rejections.append("sibling regression")
                 row.update({
                     "score": score,
+                    "scores": [],
                     "score_delta": score - baseline_score,
                     "candidate_size": candidate_size,
                     "retail_size": target.retail_size,
@@ -455,11 +583,36 @@ def main(argv=None) -> int:
                     "retail_relocs": retail_target["relocs"],
                     "text_sha": candidate_target["text_sha"],
                     "reloc_sha": candidate_target["reloc_sha"],
+                    "normalized_reloc_sha": normalized_reloc_sha,
+                    "state_id": state_id,
                     "sibling_regressions": sibling_regressions,
                     "exact": not rejections,
                     "exact_rejections": rejections,
                 })
                 results.append(row)
+                state = states.setdefault(state_id, {
+                    "state_id": state_id,
+                    "representative_trial": index,
+                    "representative_choices": labels,
+                    "score": score,
+                    "size": candidate_size,
+                    "relocs": candidate_target["relocs"],
+                    "text_sha": candidate_target["text_sha"],
+                    "text_hex": candidate_target["text_hex"],
+                    "normalized_reloc_sha": normalized_reloc_sha,
+                    "normalized_reloc_stream": normalized_relocations,
+                    "retail_byte_differences": byte_differences(
+                        candidate_target["text_hex"], retail_target["text_hex"]
+                    ),
+                    "raw_reloc_detail_shas": [],
+                    "observation_count": 0,
+                })
+                state["observation_count"] += 1
+                if score not in state["scores"]:
+                    state["scores"].append(score)
+                raw_detail_sha = candidate_target["reloc_detail_sha"]
+                if raw_detail_sha not in state["raw_reloc_detail_shas"]:
+                    state["raw_reloc_detail_shas"].append(raw_detail_sha)
                 rank = result_rank(row, target.retail_size, retail_target["relocs"])
                 if args.show_best_disasm and (
                     best_object_rank is None or rank < best_object_rank
@@ -520,6 +673,11 @@ def main(argv=None) -> int:
         "source_restored": source.read_bytes() == original,
         "baseline": baseline_summary,
         "best": ranked[0] if ranked else None,
+        "state_count": len(states),
+        "states": sorted(
+            states.values(),
+            key=lambda state: (-state["score"], state["size"], state["state_id"]),
+        ),
         "results": results,
     }
     (output / "results.json").write_text(json.dumps(summary, indent=2) + "\n")

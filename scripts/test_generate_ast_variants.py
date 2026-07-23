@@ -1,4 +1,4 @@
-# Tests for the archived AST experiment generator.
+# Tests for the AST and TU-state experiment generator.
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,6 +13,7 @@ from generate_ast_variants import (
     clang_args,
     classify_parse_errors,
     configure_libclang,
+    crossed_candidate_payloads,
     declaration_edits,
     declaration_hoist_edits,
     expression_edits,
@@ -26,6 +27,7 @@ from generate_ast_variants import (
     identifier_rename_edits,
     mutation_name,
     statement_order_edits,
+    terminal_return_order_edits,
     utf8_byte_offset,
 )
 
@@ -51,6 +53,48 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertFalse(truncated)
         self.assertEqual(len(candidates), 3)
         self.assertEqual(len(candidates[-1]["edits"]), 2)
+
+    def test_tu_states_are_a_complete_independent_dimension(self):
+        blob = b"abcdefghij"
+        source_mutations = [
+            AstMutation("source", "first", (AstEdit(2, 3, b"C"),)),
+            AstMutation("source", "second", (AstEdit(5, 6, b"F"),)),
+        ]
+        state_mutations = [
+            AstMutation("tu_state", "island-1", (AstEdit(0, 0, b"one "),)),
+            AstMutation("tu_state", "island-2", (AstEdit(0, 0, b"two "),)),
+        ]
+        candidates, truncated, source_shapes, state_shapes = crossed_candidate_payloads(
+            blob, source_mutations, state_mutations, max_depth=1, limit=6,
+        )
+        self.assertTrue(truncated)
+        self.assertEqual((source_shapes, state_shapes, len(candidates)), (2, 3, 6))
+        self.assertEqual(
+            [candidate["families"] for candidate in candidates],
+            [
+                [],
+                ["tu_state"],
+                ["tu_state"],
+                ["source"],
+                ["source", "tu_state"],
+                ["source", "tu_state"],
+            ],
+        )
+        # The cap selected one source mutation, but that selected spelling was crossed
+        # with baseline and every state island.
+        self.assertTrue(all(
+            any(edit["find"] == "c" for edit in candidate["edits"])
+            for candidate in candidates[3:]
+        ))
+
+    def test_tu_state_dimension_must_fit_the_limit(self):
+        blob = b"abc"
+        states = [
+            AstMutation("tu_state", str(index), (AstEdit(0, 0, str(index).encode()),))
+            for index in range(3)
+        ]
+        with self.assertRaisesRegex(ValueError, "complete TU-state dimension"):
+            crossed_candidate_payloads(blob, [], states, 1, 3)
 
     def test_helpers_at_the_same_insertion_point_are_merged(self):
         blob = b"abcdefghij"
@@ -301,6 +345,16 @@ class AstVariantSemanticTests(unittest.TestCase):
     def test_direct_independent_local_stores_remain_available(self):
         function = self.functions["SafeStatementOrder"]
         self.assertEqual(len(statement_order_edits(function, self.blob)), 1)
+
+    def test_terminal_return_pair_can_be_inverted(self):
+        function = self.functions["SafeTerminalReturnOrder"]
+        mutations = terminal_return_order_edits(function, self.blob)
+        self.assertEqual(len(mutations), 1)
+        edits = mutations[0].edits
+        self.assertEqual(len(edits), 3)
+        self.assertEqual(edits[0].replacement, b"!(value < 0)")
+        self.assertEqual(edits[1].replacement, b"return value + 1")
+        self.assertEqual(edits[2].replacement, b"return -value")
 
     def test_volatile_member_read_is_not_reordered(self):
         function = self.functions["RejectedVolatileOrder"]

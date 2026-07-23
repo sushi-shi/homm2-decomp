@@ -90,6 +90,13 @@ int SafeStatementOrder(int firstInput, int secondInput)
     return first + second;
 }
 
+int SafeTerminalReturnOrder(int value)
+{
+    if (value < 0)
+        return -value;
+    return value + 1;
+}
+
 int SafeDeclarations()
 {
     int first = 1, second = 2;
