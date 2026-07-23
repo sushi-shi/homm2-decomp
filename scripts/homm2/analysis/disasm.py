@@ -5,8 +5,9 @@ Two sides, both via `llvm-objdump` on the per-symbol COFF objects the pipeline a
 produces (so no raw-EXE byte carving, and both sides share ONE disassembler - the
 cross-tool syntax normalization gruntz needs is unnecessary here):
 
-  TARGET (default) : build/delink/<unit>.c.obj      - the retail bytes, delinked
-  BASE  (--base)   : build/objdiff/base/<unit>.obj  - YOUR compiled fn (what objdiff diffs)
+  TARGET (default) : build/delink/<unit>.c.obj      - raw retail bytes, delinked
+  BASE  (--base)   : build/objdiff/base/<unit>.obj  - raw compiled function
+  DIFF             : build/objdiff/normalized/...   - disposable objdiff copies
 
 Modes:
   (default)  TARGET disasm + relocs
@@ -30,6 +31,8 @@ REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
 SYMCSV = REPO / "build/gen/symbol_names.csv"
 DELINK = REPO / "build/delink"
 BASE = REPO / "build/objdiff/base"
+NORMAL_BASE = REPO / "build/objdiff/normalized/base"
+NORMAL_TARGET = REPO / "build/objdiff/normalized/target"
 LINES = REPO / "build/lines"
 
 
@@ -174,8 +177,8 @@ def main():
 
     if "--diff" in flags:
         import difflib
-        base = _norm(_objdump(BASE / f"{unit}.obj", name))
-        tgt = _norm(_objdump(DELINK / f"{unit}.c.obj", name))
+        base = _norm(_objdump(NORMAL_BASE / f"{unit}.obj", name))
+        tgt = _norm(_objdump(NORMAL_TARGET / f"{unit}.c.obj", name))
         if base == tgt:
             print(f"identical asm ({len(tgt)} instruction(s); addresses/relocs masked)")
             sys.exit(0)
