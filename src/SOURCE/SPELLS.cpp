@@ -3372,20 +3372,20 @@ void combatManager::Resurrect(
     i32 targetHex,
     i32 spellPower
 ) {
+    i32 unusedResurrectWord3;
     i32 armyIndex_f;
     army* target_i;
     i32 processedOtherHex_p;
     i32 oldQuantity_b;
     i32 otherHex_i;
     i32 deadIndex_e;
+    i32 unusedResurrectWord9;
     i32 keepSearching_m;
     i32 deadHex_k;
     i32 index_o;
     i32 effectX_p;
     i32 effectY_j;
     icon* resurrectIcon;
-    i32 unusedResurrectWord3;
-    i32 unusedResurrectWord9;
 
     if (m_heroes[IDX(m_currentSide)] != NULL && m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ANKH))
         spellPower <<= 1;
@@ -3489,19 +3489,19 @@ void combatManager::Resurrect(
                 0
             );
             UpdateCombatArea();
-            target_i->m_facing = target_i->m_side == COMBAT_ATTACKER_SIDE
-                ? ARMY_FACING_RIGHT
-                : ARMY_FACING_LEFT;
+            target_i->m_facing = ArmyFacingForSide(target_i->m_side);
             if (target_i->m_animationSequence == ARMY_ANIMATION_DEATH) {
                 if (index_o >= RESURRECT_DEATH_REVERSE_FRAME) {
                     target_i->m_animationSequence = ARMY_ANIMATION_STAND;
                     target_i->m_animationFrame = 0;
                 } else {
-                    register i32 reverseFrame =
-                        target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1;
-                    if (RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o <= reverseFrame)
-                        reverseFrame = RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o;
-                    target_i->m_animationFrame = reverseFrame;
+                    target_i->m_animationFrame =
+                        target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1
+                                < RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
+                            ? target_i->m_frameInfo
+                                      .animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
+                                  - 1
+                            : RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o;
                 }
             }
             DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -3510,7 +3510,7 @@ void combatManager::Resurrect(
         gpResourceManager->Dispose(resurrectIcon);
     }
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    target_i->m_monster.flags.abilityFlags &= ~MONSTER_ABILITY_FLAG_AI_EXCLUDED;
+    target_i->m_monster.flags.abilityFlags &= MONSTER_FLAGS_RESURRECTED_MASK;
 }
 
 VA(0x004296de, 0xb9)
