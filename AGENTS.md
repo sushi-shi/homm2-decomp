@@ -44,10 +44,14 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 6. Use relocation-masked bytes only to isolate code-shape differences. They do not prove
    correctness; ordered relocation identity/addend/destination checks still apply.
 7. For a structurally aligned compiler-state residual, island search is the current
-   last-mile policy. Run `scripts/tu_state_noise.py` before adding or retaining persistent
-   compiler steering. Use the expansive declaration-forest default, with at least ten varied
-   classes, typedefs, prototypes, and functions per trial, and preserve a complete state census.
-   Inspect one representative of every distinct byte/relocation island, not only the best score.
+   last-mile policy. Run `scripts/tu_state_noise.py` for an unchanged-source census. When
+   several legitimate source shapes must also be tested, use `scripts/match_variants.py` so
+   reviewed exact-span choices, conservative AST variants, and TU-state probes are independent
+   Cartesian dimensions. A selected source shape must be compiled against the clean state and
+   every requested probe state; never rely on a truncated mixed mutation list. Use the expansive
+   declaration-forest default, with at least ten varied classes, typedefs, prototypes, and
+   functions per trial, and preserve a complete normalized state census. Inspect one
+   representative of every distinct byte/relocation island, not only the best score.
 8. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
    the clean unchanged source, and retain no generated probe declarations or functions. A

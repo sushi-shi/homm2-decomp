@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Archived libclang source-variant generator.
+"""Generate reviewable libclang and TU-state source variants.
 
 The generator never compiles or modifies the source file.  It locates one reconstructed
 function by its ``VA(...)`` marker, derives conservative AST mutations, combines only
 non-overlapping edits, and writes their exact byte ranges and before/after text to JSON.
 The batch runner validates those ranges against the unchanged source before compiling.
 
-Generated families are operand order for commutative/relational expressions, reorder of
-independent local assignments, split/merge/hoist of simple local declarations, extraction of a
-pure expression into an inline helper, and extraction of the common read-then-advance cursor
-idiom.  It can merge several helper definitions at the same insertion point and generate a
-two-level helper chain for nested pure expressions.  Other sequencing changes are intentionally
-absent: author those as explicit literal axes after a semantic audit.
+Generated families include operand order for commutative/relational expressions, reorder of
+independent local assignments, terminal return-pair inversion, split/merge/hoist of simple local
+declarations, extraction of a pure expression into an inline helper, and extraction of the common
+read-then-advance cursor idiom. It can merge several helper definitions at the same insertion
+point and generate a two-level helper chain for nested pure expressions. Other sequencing changes
+are intentionally absent: author those as explicit literal axes after a semantic audit.
 
 Generated helpers pass scalar/pointer/enum values directly, preserve existing defensible lvalue
 references, and bind read-only record objects by const reference. Record returns, volatile access,
@@ -33,13 +33,10 @@ import hashlib
 import itertools
 import json
 import os
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
 import clang.cindex as ci
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tu_state_noise import (
     DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,
@@ -412,6 +409,71 @@ def statement_order_edits(fn, blob: bytes) -> list[AstMutation]:
                 (AstEdit(first_start, second_end, replacement),),
             ))
     return edits
+
+
+def single_return_statement(statement):
+    if statement.kind == ci.CursorKind.RETURN_STMT:
+        return statement
+    if statement.kind != ci.CursorKind.COMPOUND_STMT:
+        return None
+    children = list(statement.get_children())
+    if len(children) == 1 and children[0].kind == ci.CursorKind.RETURN_STMT:
+        return children[0]
+    return None
+
+
+def terminal_return_order_edits(fn, blob: bytes) -> list[AstMutation]:
+    """Invert a terminal if-return/return pair while preserving branch payloads."""
+    mutations = []
+    for compound in fn.walk_preorder():
+        if compound.kind != ci.CursorKind.COMPOUND_STMT:
+            continue
+        statements = list(compound.get_children())
+        if len(statements) < 2:
+            continue
+        guard, fallback = statements[-2:]
+        if guard.kind != ci.CursorKind.IF_STMT or fallback.kind != ci.CursorKind.RETURN_STMT:
+            continue
+        children = list(guard.get_children())
+        if len(children) != 2:
+            continue
+        condition, guarded_statement = children
+        guarded_return = single_return_statement(guarded_statement)
+        if guarded_return is None:
+            continue
+        condition_kind = canonical_kind(condition.type)
+        if condition_kind not in (
+            INTEGRAL_TYPE_KINDS | {ci.TypeKind.ENUM, ci.TypeKind.POINTER, ci.TypeKind.BOOL}
+        ):
+            continue
+        condition_start, condition_end = cursor_range(condition)
+        guarded_start, guarded_end = cursor_range(guarded_return)
+        fallback_start, fallback_end = cursor_range(fallback)
+        if not (
+            condition_start < condition_end
+            and guarded_start < guarded_end <= fallback_start < fallback_end
+        ):
+            continue
+        condition_text = blob[condition_start:condition_end]
+        guarded_text = blob[guarded_start:guarded_end]
+        fallback_text = blob[fallback_start:fallback_end]
+        if (
+            guarded_text == fallback_text
+            or contains_context_sensitive_tokens(
+                condition_text + guarded_text + fallback_text
+            )
+        ):
+            continue
+        mutations.append(AstMutation(
+            "terminal_return_order",
+            f"lines-{line_number(blob, guarded_start)}-{line_number(blob, fallback_start)}",
+            (
+                AstEdit(condition_start, condition_end, b"!(" + condition_text + b")"),
+                AstEdit(guarded_start, guarded_end, fallback_text),
+                AstEdit(fallback_start, fallback_end, guarded_text),
+            ),
+        ))
+    return mutations
 
 
 def simple_declaration(cursor, blob: bytes):
@@ -1156,7 +1218,12 @@ def atomic_mutations(
     fn, blob: bytes, insertion: int, families: set[str], helper_name_count: int,
     rename_name_count: int, rename_identifiers: set[str], rename_candidates: tuple[str, ...],
 ) -> list[AstMutation]:
-    mutations = expression_edits(fn, blob) + statement_order_edits(fn, blob) + declaration_edits(fn, blob)
+    mutations = (
+        expression_edits(fn, blob)
+        + statement_order_edits(fn, blob)
+        + terminal_return_order_edits(fn, blob)
+        + declaration_edits(fn, blob)
+    )
     if "declaration_hoist" in families:
         mutations += declaration_hoist_edits(fn, blob)
     if "inline_expression" in families:
@@ -1264,11 +1331,98 @@ def mutation_name(mutation: AstMutation) -> str:
     return f"{mutation.family}:{mutation.label}@{anchor}-{digest.hexdigest()[:8]}"
 
 
-def candidate_payloads(
-    blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1,
+def ranges_overlap(first_start: int, first_end: int, second_start: int, second_end: int) -> bool:
+    if first_start == first_end and second_start == second_end:
+        return False
+    if first_start == first_end:
+        return second_start < first_start < second_end
+    if second_start == second_end:
+        return first_start < second_start < first_end
+    return first_start < second_end and second_start < first_end
+
+
+def load_axes_payload(path: Path | None, source_name: str, rva: int, blob: bytes):
+    if path is None:
+        return None, ()
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read --axes-from manifest: {exc}") from exc
+    if payload.get("schema") != 1 or not isinstance(payload.get("axes"), list):
+        raise ValueError("--axes-from must be a schema-1 manifest containing axes")
+    if payload.get("source") != source_name:
+        raise ValueError("--axes-from source does not match generated manifest source")
+    axes_rva = payload.get("rva")
+    try:
+        parsed_axes_rva = int(axes_rva, 0) if isinstance(axes_rva, str) else axes_rva
+    except ValueError:
+        parsed_axes_rva = None
+    if parsed_axes_rva != rva:
+        raise ValueError("--axes-from RVA does not match generated manifest RVA")
+    spans = []
+    for axis in payload["axes"]:
+        name = axis.get("name") if isinstance(axis, dict) else None
+        find = axis.get("find") if isinstance(axis, dict) else None
+        if not isinstance(name, str) or not name or not isinstance(find, str) or not find:
+            raise ValueError("--axes-from contains an axis without a non-empty name/find")
+        needle = find.encode("utf-8")
+        if blob.count(needle) != 1:
+            raise ValueError(
+                f"--axes-from axis {name}: find must occur exactly once, got {blob.count(needle)}"
+            )
+        start = blob.index(needle)
+        spans.append((start, start + len(needle), name))
+        options = axis.get("options")
+        if not isinstance(options, list):
+            raise ValueError(f"--axes-from axis {name}: options must be a list")
+        for option in options:
+            option_name = option.get("name") if isinstance(option, dict) else None
+            extra_edits = option.get("extra_edits", []) if isinstance(option, dict) else None
+            if not isinstance(extra_edits, list):
+                raise ValueError(
+                    f"--axes-from axis {name}/{option_name}: extra_edits must be a list"
+                )
+            for extra in extra_edits:
+                if not isinstance(extra, dict):
+                    raise ValueError(
+                        f"--axes-from axis {name}/{option_name}: invalid extra edit"
+                    )
+                anchor = extra.get("find")
+                insertion = False
+                if anchor is None:
+                    anchor = extra.get("insert_before", extra.get("insert_after"))
+                    insertion = True
+                if not isinstance(anchor, str) or not anchor:
+                    raise ValueError(
+                        f"--axes-from axis {name}/{option_name}: invalid extra-edit anchor"
+                    )
+                anchor_bytes = anchor.encode("utf-8")
+                if blob.count(anchor_bytes) != 1:
+                    raise ValueError(
+                        f"--axes-from axis {name}/{option_name}: extra-edit anchor must "
+                        f"occur exactly once, got {blob.count(anchor_bytes)}"
+                    )
+                extra_start = blob.index(anchor_bytes)
+                if extra.get("insert_after") is not None:
+                    extra_start += len(anchor_bytes)
+                extra_end = extra_start if insertion else extra_start + len(anchor_bytes)
+                spans.append((extra_start, extra_end, f"{name}/{option_name}"))
+    return payload, tuple(spans)
+
+
+def mutation_overlaps_axes(mutation: AstMutation, axis_spans) -> bool:
+    return any(
+        ranges_overlap(edit.start, edit.end, axis_start, axis_end)
+        for edit in mutation.edits
+        for axis_start, axis_end, _name in axis_spans
+    )
+
+
+def candidate_combinations(
+    mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1,
     required_names: set[str] | None = None,
 ):
-    candidates = []
+    combinations = []
     required_names = required_names or set()
     for depth in range(min_depth, max_depth + 1):
         for combination in itertools.combinations(mutations, depth):
@@ -1280,25 +1434,85 @@ def candidate_payloads(
             )
             if not non_overlapping(edits):
                 continue
-            ordered = sorted(edits, key=lambda edit: edit.start)
-            candidates.append({
-                "name": "+".join(
-                    mutation_name(mutation) for mutation in combination
-                ),
-                "families": sorted({mutation.family for mutation in combination}),
-                "edits": [
-                    {
-                        "start": edit.start,
-                        "end": edit.end,
-                        "find": blob[edit.start:edit.end].decode("utf-8"),
-                        "replace": edit.replacement.decode("utf-8"),
-                    }
-                    for edit in ordered
-                ],
-            })
-            if len(candidates) >= limit:
-                return candidates, True
-    return candidates, False
+            combinations.append(combination)
+            if len(combinations) >= limit:
+                return combinations, True
+    return combinations, False
+
+
+def combination_payload(blob: bytes, combination: tuple[AstMutation, ...]) -> dict:
+    edits = merge_insertions(tuple(
+        edit for mutation in combination for edit in mutation.edits
+    ))
+    ordered = sorted(edits, key=lambda edit: edit.start)
+    return {
+        "name": (
+            "+".join(mutation_name(mutation) for mutation in combination)
+            if combination else "baseline"
+        ),
+        "families": sorted({mutation.family for mutation in combination}),
+        "edits": [
+            {
+                "start": edit.start,
+                "end": edit.end,
+                "find": blob[edit.start:edit.end].decode("utf-8"),
+                "replace": edit.replacement.decode("utf-8"),
+            }
+            for edit in ordered
+        ],
+    }
+
+
+def candidate_payloads(
+    blob: bytes, mutations: list[AstMutation], max_depth: int, limit: int, min_depth: int = 1,
+    required_names: set[str] | None = None,
+):
+    combinations, truncated = candidate_combinations(
+        mutations, max_depth, limit, min_depth=min_depth, required_names=required_names,
+    )
+    return [combination_payload(blob, combination) for combination in combinations], truncated
+
+
+def crossed_candidate_payloads(
+    blob: bytes, source_mutations: list[AstMutation], state_mutations: list[AstMutation],
+    max_depth: int, limit: int, min_depth: int = 1,
+    required_names: set[str] | None = None,
+):
+    """Cross every selected source shape with every TU-state island.
+
+    ``limit`` bounds the final matrix.  When the full mutation population is larger,
+    source-shape combinations are reduced first; a selected source shape is never tested
+    against only a subset of the requested state trials.
+    """
+    required_names = required_names or set()
+    state_width = len(state_mutations) + 1
+    if limit < state_width:
+        raise ValueError(
+            f"--limit {limit} is smaller than the complete TU-state dimension "
+            f"({state_width}: baseline plus {len(state_mutations)} trials)"
+        )
+    include_source_baseline = not required_names
+    source_slots = limit // state_width - int(include_source_baseline)
+    if source_slots < 0:
+        source_slots = 0
+    source_combinations, truncated = candidate_combinations(
+        source_mutations, max_depth, source_slots, min_depth=min_depth,
+        required_names=required_names,
+    ) if source_slots else ([], bool(source_mutations))
+    source_options = ([()] if include_source_baseline else []) + source_combinations
+    state_options: list[AstMutation | None] = [None, *state_mutations]
+    candidates = []
+    for source_combination in source_options:
+        for state_mutation in state_options:
+            # State declarations are deliberately emitted before any generated inline
+            # helper at the shared insertion point: they model prior TU compiler state,
+            # while the helper remains immediately adjacent to the target function.
+            combination = (
+                ((state_mutation,) if state_mutation is not None else ())
+                + source_combination
+            )
+            candidates.append(combination_payload(blob, combination))
+    return candidates, truncated, len(source_options), state_width
 
 
 def main(argv=None, *, prog=None, description=None) -> int:
@@ -1316,7 +1530,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         default=(
             "commutative_order,relational_order,independent_statement_order,declaration_split,"
             "declaration_merge,declaration_hoist,inline_expression,inline_read_advance"
-            ",inline_nested_expression,inline_member_access"
+            ",inline_nested_expression,inline_member_access,terminal_return_order"
         ),
         help="comma-separated AST edit families",
     )
@@ -1388,8 +1602,16 @@ def main(argv=None, *, prog=None, description=None) -> int:
     except ValueError:
         parser.error("source must be inside the worktree")
     families = {family for family in args.families.split(",") if family}
+    source_name = str(source.relative_to(root))
+    try:
+        axes_payload, axis_spans = load_axes_payload(
+            args.axes_from, source_name, args.rva, source.read_bytes(),
+        )
+    except ValueError as exc:
+        parser.error(str(exc))
     known_families = {
         "commutative_order", "relational_order", "independent_statement_order",
+        "terminal_return_order",
         "declaration_split", "declaration_merge", "declaration_hoist", "inline_expression", "inline_read_advance",
         "inline_nested_expression", "inline_member_access", "identifier_rename",
         "inline_global_read",
@@ -1426,6 +1648,13 @@ def main(argv=None, *, prog=None, description=None) -> int:
         fn, blob, insertion, families, args.helper_name_count, args.rename_name_count,
         set(args.rename_identifier), tuple(args.rename_candidate),
     )
+    overlapping_mutations = [
+        mutation_name(mutation) for mutation in mutations
+        if mutation_overlaps_axes(mutation, axis_spans)
+    ]
+    mutations = [
+        mutation for mutation in mutations if not mutation_overlaps_axes(mutation, axis_spans)
+    ]
     state_families = tuple(
         family.strip() for family in args.state_families.split(",") if family.strip()
     )
@@ -1435,7 +1664,6 @@ def main(argv=None, *, prog=None, description=None) -> int:
         )
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
-    mutations += state_mutations
     mutations = balance_mutations(mutations)
     available_names = {mutation_name(mutation) for mutation in mutations}
     required_names = set(args.require_mutation)
@@ -1444,20 +1672,26 @@ def main(argv=None, *, prog=None, description=None) -> int:
         parser.error("required mutations not generated:\n" + "\n".join(sorted(unknown_required)))
     if len(required_names) > args.max_depth:
         parser.error("number of required mutations exceeds --max-depth")
-    candidates, truncated = candidate_payloads(
-        blob, mutations, args.max_depth, args.limit, min_depth=args.min_depth,
-        required_names=required_names,
-    )
+    try:
+        candidates, truncated, source_shape_count, state_shape_count = crossed_candidate_payloads(
+            blob, mutations, state_mutations, args.max_depth, args.limit,
+            min_depth=args.min_depth, required_names=required_names,
+        )
+    except ValueError as exc:
+        parser.error(str(exc))
     if not candidates:
-        parser.error("no AST variants generated")
+        parser.error("no source variants generated")
     payload = {
         "schema": 1,
-        "source": str(source.relative_to(root)),
+        "source": source_name,
         "rva": f"0x{args.rva:x}",
         "generator": {
             "tool": "scripts/generate_ast_variants.py",
             "families": sorted(families),
             "atomic_mutation_count": len(mutations),
+            "composition": "hand_axes_x_source_shapes_x_tu_states",
+            "source_shapes_emitted": source_shape_count,
+            "state_shapes_emitted": state_shape_count,
             "max_depth": args.max_depth,
             "min_depth": args.min_depth,
             "limit": args.limit,
@@ -1465,6 +1699,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
             "ignored_trailing_diagnostics": trailing_diagnostics,
             "allowed_external_diagnostics": allowed_diagnostics,
             "required_mutations": sorted(required_names),
+            "mutations_suppressed_by_hand_axes": overlapping_mutations,
             "rename_name_count": args.rename_name_count,
             "rename_candidates": args.rename_candidate,
             "rename_identifiers": sorted(set(args.rename_identifier)),
@@ -1478,22 +1713,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         },
         "candidates": candidates,
     }
-    if args.axes_from is not None:
-        try:
-            axes_payload = json.loads(args.axes_from.read_text())
-        except (OSError, json.JSONDecodeError) as exc:
-            parser.error(f"cannot read --axes-from manifest: {exc}")
-        if axes_payload.get("schema") != 1 or not isinstance(axes_payload.get("axes"), list):
-            parser.error("--axes-from must be a schema-1 manifest containing axes")
-        if axes_payload.get("source") != payload["source"]:
-            parser.error("--axes-from source does not match generated manifest source")
-        axes_rva = axes_payload.get("rva")
-        try:
-            parsed_axes_rva = int(axes_rva, 0) if isinstance(axes_rva, str) else axes_rva
-        except ValueError:
-            parsed_axes_rva = None
-        if parsed_axes_rva != args.rva:
-            parser.error("--axes-from RVA does not match generated manifest RVA")
+    if axes_payload is not None:
         payload["axes"] = axes_payload["axes"]
     args.output.write_text(json.dumps(payload, indent=2) + "\n")
     counts = {
@@ -1501,7 +1721,8 @@ def main(argv=None, *, prog=None, description=None) -> int:
         for family in sorted(families)
     }
     print(
-        f"wrote {len(candidates)} candidates from {len(mutations)} atomic mutations "
+        f"wrote {len(candidates)} candidates as {source_shape_count} source shapes x "
+        f"{state_shape_count} TU states from {len(mutations)} atomic source mutations "
         f"({', '.join(f'{name}={count}' for name, count in counts.items())})"
         + ("; limit reached" if truncated else "")
     )
