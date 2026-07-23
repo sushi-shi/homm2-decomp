@@ -24,7 +24,7 @@ class DataTopologyAuditTest(unittest.TestCase):
             mock.patch("homm2.build.data_topology_audit._build_coverage_proposal",
                        return_value=(b"coverage", [], ["coverage"])) as coverage,
         ):
-            result = audit_candidate_topology(jobs=7, migrate_identities=True)
+            result = audit_candidate_topology(jobs=7)
 
         self.assertEqual(
             [call.args[0] for call in run.call_args_list],
@@ -36,10 +36,7 @@ class DataTopologyAuditTest(unittest.TestCase):
         )
         self.assertTrue(all(call.kwargs == {"check": True}
                             for call in run.call_args_list))
-        assemble.assert_called_once_with(
-            strict=False,
-            migrate_from=mock.ANY,
-        )
+        assemble.assert_called_once_with(strict=False)
         canonical.assert_called_once_with()
         derive.assert_called_once_with(reviewed_rows=["canonical"])
         queue.assert_called_once_with(["allocation"], ["group"])

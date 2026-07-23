@@ -224,7 +224,6 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "--base-root", str(root / "base"),
                 "--target-root", str(root / "target"),
                 "--source-root", str(root / "src"),
-                "--supplemental", str(root / "missing.tsv"),
                 "--symbols", str(root / "missing.csv"),
                 "--source-manifest", str(root / "missing-source.tsv"),
                 "--data-manifest", str(root / "missing-data.tsv"),
@@ -261,7 +260,6 @@ class DataTopologyCensusTest(unittest.TestCase):
                 "--base-root", str(root / "base"),
                 "--target-root", str(root / "target"),
                 "--source-root", str(root / "src"),
-                "--supplemental", str(root / "missing.tsv"),
                 "--symbols", str(root / "symbols.csv"),
                 "--source-manifest", str(root / "missing-source.tsv"),
                 "--data-manifest", str(root / "missing-data.tsv"),
@@ -284,7 +282,7 @@ class DataTopologyCensusTest(unittest.TestCase):
                  for row in payload["objects"][0]["fallback_identities"]["target"]],
                 ["empty_stub", "section"])
 
-    def test_separates_source_private_and_supplemental_provenance(self):
+    def test_separates_source_data_and_compgen_provenance(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             sections = [(".data", 16, DATA_FLAGS)]
@@ -304,40 +302,26 @@ class DataTopologyCensusTest(unittest.TestCase):
             (root / "symbols.csv").write_text(
                 "rva,name,unit,size,kind\n"
                 "0x100,?global@@3HA,A,0x4,data\n")
-            (root / "supplemental.tsv").write_text(
-                "name\tobject\trva\tsize\tstorage\talignment\tsection_offset\t"
-                "scope\tprovenance\n"
-                "?global@@3HA\tA.c\t0x100\t0x4\tdata\t0x4\t0x0\texternal\ttest\n"
-                "?local@?1???func@@YIXXZ@4HA\tA.c\t0x108\t0x4\trdata\t0x4\t0x4\tlocal\ttest\n"
-                "compiler_private\tA.c\t0x200\t0x4\tdata\t0x4\t0x8\tlocal\ttest\n")
             (root / "source-manifest.tsv").write_text(
                 "name\tobject\trva\tsize\tstorage\talignment\tsection_ordinal\t"
                 "section_offset\tscope\tprovenance\n"
                 "?global@@3HA\tA.c\t0x100\t0x4\tdata\t0x4\t1\t0x0\t"
-                "external\tsource-DATA\n"
+                "external\tsource-DATA:A.cpp:2\n"
                 "?local@?1???func@@YIXXZ@4HA\tA.c\t0x104\t0x4\tdata\t0x4\t"
-                "1\t0x4\tlocal\tsource-DATA\n")
+                "1\t0x4\tlocal\tsource-DATA:A.cpp:4\n"
+                "__h2cg$A$data$compilerPrivate\tA.c\t0x108\t0x4\tdata\t0x4\t"
+                "1\t0x8\tlocal\tsource-DATA_COMPGEN:A.cpp:5\n")
 
             payload = build_census(
                 ["A"], root / "base", root / "target",
                 source_root=root / "src",
-                supplemental_path=root / "supplemental.tsv",
                 symbols_path=root / "symbols.csv",
                 source_manifest_path=root / "source-manifest.tsv")
             provenance = payload["provenance"]
             self.assertEqual(provenance["summary"]["source_data_definitions"], 2)
             self.assertEqual(provenance["summary"]["candidate_data_covered"], 2)
-            self.assertEqual(provenance["summary"]["candidate_compiler_private"], 1)
-            self.assertEqual(
-                provenance["summary"]["supplemental_by_candidate_class"],
-                {"compiler-private": 1, "source-data": 2})
-            self.assertEqual(
-                provenance["summary"]["source_data_duplicates_in_supplemental"], 2)
-            self.assertEqual(
-                provenance["summary"]["source_data_supplemental_disagreements"], 1)
-            self.assertEqual(
-                provenance["supplemental_disagreements"][0]["differences"],
-                ["rva", "storage"])
+            self.assertEqual(provenance["summary"]["candidate_private"], 1)
+            self.assertEqual(provenance["summary"]["source_compgen_rows"], 1)
 
     def test_exact_and_missing_objects_are_counted_separately(self):
         with TemporaryDirectory() as directory:

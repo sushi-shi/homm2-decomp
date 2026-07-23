@@ -15,7 +15,8 @@ reason the numeric spelling remains intact.
 
 ## Classification
 
-- `annotation` covers `VA`, `VA_COMPGEN`, `DATA`, `VTBL`, `VTBL2`, and `SIZE`. These values are
+- `annotation` covers `VA`, `VA_COMPGEN`, `DATA`, `DATA_COMPGEN`,
+  `DATA_COMPGEN_GUARD`, `VTBL`, `VTBL2`, and `SIZE`. These values are
   evidence, not gameplay constants.
 - `enum` is an already declared numeric domain. Shared domains live in their owning header;
   domains used by one translation unit live in that `.cpp` and use prefix-free names where clear.

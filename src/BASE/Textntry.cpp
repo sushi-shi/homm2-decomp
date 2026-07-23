@@ -46,7 +46,8 @@ H2_ENUM_BEGIN(InputManagerExtendedKey)
 H2_ENUM_END(InputManagerExtendedKey)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
-#define TEXT_ENTRY_MAIN_SOURCE_FILES RETAIL_FILE "\0\0\0" RETAIL_FILE
+#define TEXT_ENTRY_MAIN_SOURCE_FILES                                                    \
+    DATA_COMPGEN(0x00520d44, textEntryWidgetMainSourceFiles, RETAIL_FILE "\0\0\0" RETAIL_FILE)
 
 VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
@@ -95,7 +96,11 @@ textEntryWidget::textEntryWidget(
     m_rectH = m_height;
 #line 61 RETAIL_FILE
     m_text = static_cast<char*>(
-        H2_ALLOC(static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING, 62)
+        H2_ALLOC_AT(
+            static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING,
+            DATA_COMPGEN(0x00520cec, textEntryWidgetConstructorSourceFile, RETAIL_FILE),
+            62
+        )
     );
     strcpy(m_text, text);
     if (layout == TEXT_ENTRY_LAYOUT_INSET) {
@@ -122,7 +127,11 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
     m_text = static_cast<char*>(
-        H2_ALLOC_AT(m_maxLength + TEXT_ALLOCATION_PADDING, RETAIL_FILE "\0", 99)
+        H2_ALLOC_AT(
+            m_maxLength + TEXT_ALLOCATION_PADDING,
+            DATA_COMPGEN(0x00520d18, textEntryWidgetReadSourceFile, RETAIL_FILE "\0"),
+            99
+        )
     );
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));

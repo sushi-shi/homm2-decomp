@@ -361,13 +361,12 @@ def load_canonical_data_names(
 
 
 def load_candidate_local_rvas(
-        manifests=("config/delink_data_supplemental.tsv",
-                   "build/gen/delink_data_from_source.tsv"),
+        manifests=("build/gen/delink_data_from_source.tsv",),
         base_root="build/objdiff/base"):
     """Map current candidate local spellings to canonical retail RVAs.
 
-    Reviewed compiler counters are deliberately stable in the supplemental file,
-    while an MSVC rebuild may rename them.  The topology audit proves such a rename
+    Generated semantic identities are deliberately stable while an MSVC rebuild may
+    rename compiler counters. The topology audit proves such a rename
     by exact COFF section ordinal/offset plus canonical payload and relocation
     identity.  Recreate that association here from the current candidate symbol
     table; a discovery-only review-queue payload match is never treated as proof.

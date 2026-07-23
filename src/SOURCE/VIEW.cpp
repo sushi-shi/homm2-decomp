@@ -116,10 +116,10 @@ i32 combatManager::ViewGeneral(
         giCurGeneral = side;
 
         message.type = MESSAGE_WIDGET;
-        generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
+        generalWindow = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, DATA_COMPGEN(0x004eddf8, viewGeneralVgenwinBin, "vgenwin.bin"));
         if (generalWindow == NULL)
             MemError();
-        sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(side)]->m_portrait));
+        sprintf(gText, DATA_COMPGEN(0x004ede04, viewGeneralPort04dIcn, "port%04d.icn"), IDX(m_heroes[IDX(side)]->m_portrait));
         message.payload.widget.command = VIEW_GENERAL_SET_ICON;
         message.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
         message.payload.widget.data.text = gText;
@@ -145,11 +145,11 @@ i32 combatManager::ViewGeneral(
         generalWindow->BroadcastMessage(message);
 
         if (m_heroes[IDX(side)]->m_isCaptain != 0)
-            sprintf(gText, "Captain");
+            sprintf(gText, DATA_COMPGEN(0x004ede14, viewGeneralCaptain, "Captain"));
         else
             sprintf(
                 gText,
-                "%s the %s",
+                DATA_COMPGEN(0x004ede1c, viewGeneralSTheS, "%s the %s"),
                 m_heroes[IDX(side)]->m_name,
                 gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
             );
@@ -166,7 +166,7 @@ i32 combatManager::ViewGeneral(
         luck = gpGame->GetLuck(m_heroes[IDX(side)], NULL, m_combatTowns[IDX(side)]);
         sprintf(
             gText,
-            "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
+            DATA_COMPGEN(0x004ede28, viewGeneralSDSDSD, "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d"),
             cViewGeneralLabels[IDX(HERO_PRIMARY_ATTACK)],
             m_heroes[IDX(side)]->Stats(HERO_PRIMARY_ATTACK),
             cViewGeneralLabels[IDX(HERO_PRIMARY_DEFENSE)],

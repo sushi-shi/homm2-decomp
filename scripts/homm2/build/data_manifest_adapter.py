@@ -1,10 +1,9 @@
 """Build HoMM2 data manifests from source annotations and candidate COFF topology.
 
-``DATA()``, ``VTBL()``, and ``VTBL2()`` are the address authorities for reconstructed
-storage.  Candidate objects provide the exact decorated identity, section
-ordinal/value, extent, alignment, and storage class.  The only versioned supplement
-contains compiler/linker allocations which have no source annotation; combined
-Vostok inputs are generated under ``build/gen``.
+``DATA()``, ``DATA_COMPGEN()``, ``VTBL()``, and ``VTBL2()`` are the address
+authorities for reconstructed storage. Candidate objects provide the physical COFF
+topology. Combined Vostok inputs are generated under ``build/gen``; no hand-maintained
+private-data supplement participates in the build.
 """
 
 from __future__ import annotations
@@ -17,6 +16,7 @@ import re
 import struct
 import tempfile
 import tomllib
+import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,9 +25,9 @@ from homm2.build.annotated_data import (
     AnnotatedDataDefinition as SourceDefinition,
     source_definitions as annotated_source_definitions,
 )
+from homm2.build.annotated_compgen_data import source_compgen_data
 from homm2.build.annotated_vtables import source_vtables
 from homm2.build.canonicalize_relocs import CoffFile
-from homm2.build.canonicalize_data_symbols import _family, canonicalize_coff
 from homm2.build.data_topology_census import (
     _is_data_section,
     _scope,
@@ -37,17 +37,16 @@ from homm2.build.data_topology_census import (
     _storage,
 )
 from homm2.build.contribution_manifest import contribution_rows
-from homm2.build.link_exe import read_pe
+from homm2.build.link_exe import classify_pe_storage, read_pe
+from homm2.build.candidate_data_manifest import _pe_layout, derive_allocations
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 SOURCE_ROOT = REPO / "src"
 BASE_ROOT = REPO / "build/objdiff/base"
-TARGET_ROOT = REPO / "build/delink"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNITS = REPO / "config/units.toml"
 EXE = REPO / "build/orig/HEROES2W.EXE"
-SUPPLEMENTAL = REPO / "config/delink_data_supplemental.tsv"
 SOURCE_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
 COMBINED_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 SECTION_MANIFEST = REPO / "build/gen/delink_data_sections.tsv"
@@ -99,76 +98,6 @@ class CandidateSection:
     storage: str | None
     comdat_selection: int
     associative_ordinal: int | None
-
-
-def _private_counter_family(name: str):
-    """Return the stable family key for a counter-only private data name."""
-    family = _family(name)
-    if family is None:
-        return None
-    kind, prefix = family
-    return kind, prefix or ""
-
-
-def _canonical_private_identity(row):
-    return (
-        row.canonical_name, row.family, row.storage, row.physical_size,
-        row.meaningful_size, row.digest, row.proof,
-    )
-
-
-class _CanonicalPrivateRenameProof:
-    """Prove reviewed-to-current counter drift against the fixed target COFF."""
-
-    def __init__(self, base_root: Path, target_root: Path):
-        self.base_root = Path(base_root)
-        self.target_root = Path(target_root)
-        self._cache = {}
-
-    @staticmethod
-    def _rows(path: Path):
-        result = canonicalize_coff(path.read_bytes())
-        rows = {}
-        for row in result.rows:
-            if row.section_ordinal <= 0 or row.physical_size <= 0:
-                continue
-            key = (row.section_ordinal, row.section_offset)
-            if key in rows:
-                raise ValueError(
-                    f"ambiguous canonical data identity at {path}:{key[0]}+0x{key[1]:x}")
-            rows[key] = row
-        return rows
-
-    def _unit_rows(self, unit: str):
-        if unit not in self._cache:
-            self._cache[unit] = (
-                self._rows(self.base_root / f"{unit}.obj"),
-                self._rows(self.target_root / f"{unit}.c.obj"),
-            )
-        return self._cache[unit]
-
-    def require(self, unit: str, reviewed_name: str,
-                candidate: CandidateDefinition) -> None:
-        key = (candidate.section_ordinal, candidate.section_value)
-        current_rows, reviewed_rows = self._unit_rows(unit)
-        current = current_rows.get(key)
-        reviewed = reviewed_rows.get(key)
-        if current is None or reviewed is None:
-            raise ValueError(
-                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
-                f"lacks canonical identity at section {key[0]}+0x{key[1]:x}")
-        if (current.original_name != candidate.symbol or
-                reviewed.original_name != reviewed_name):
-            raise ValueError(
-                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
-                "does not identify the reviewed/current symbols at the exact coordinate")
-        before = _canonical_private_identity(reviewed)
-        after = _canonical_private_identity(current)
-        if before != after:
-            raise ValueError(
-                f"compiler-private rename {unit}:{reviewed_name} -> {candidate.symbol} "
-                f"changes canonical content/relocation identity at section "
-                f"{key[0]}+0x{key[1]:x}: reviewed={before}, candidate={after}")
 
 
 def source_definitions(source_root: Path = SOURCE_ROOT,
@@ -295,6 +224,16 @@ def resolve_source_definitions(definitions, topology_by_unit, public_by_rva) -> 
             if not matches and source.qualified_name == source.name:
                 matches = [row for row in candidates
                            if source.name in _decoded_symbol_names(row.symbol)]
+        if len(matches) > 1:
+            source_peers = sorted(
+                (row for row in definitions
+                 if row.unit == source.unit and row.name == source.name
+                 and row.qualified_name == source.qualified_name),
+                key=lambda row: row.rva)
+            candidate_peers = sorted(matches, key=lambda row: (
+                row.storage, row.stream_offset, row.symbol))
+            if len(source_peers) == len(candidate_peers) and source in source_peers:
+                matches = [candidate_peers[source_peers.index(source)]]
         if len(matches) != 1:
             identities = [f"{row.symbol}@{row.section_ordinal}:{row.section_value:#x}"
                           for row in matches]
@@ -325,6 +264,228 @@ def _symbol_row(source: SourceDefinition, candidate: CandidateDefinition,
         "section_offset": f"0x{candidate.section_value:x}",
         "scope": "external" if candidate.storage_class == 2 else "local",
         "provenance": f"source-DATA:{source.location}",
+    }
+
+
+def _candidate_bytes(coff: CoffFile, candidate: CandidateDefinition,
+                     size: int) -> bytes:
+    section = coff.sections[candidate.section_ordinal - 1]
+    if section.raw_offset == 0:
+        return b"\0" * size
+    start = section.raw_offset + candidate.section_value
+    return bytes(coff.data[start:start + size])
+
+
+def _compgen_candidate_kind(candidate: CandidateDefinition) -> str | None:
+    if candidate.symbol.startswith(("$SG", "??_C@")):
+        return "STRING_LITERAL"
+    if candidate.symbol.startswith("$T"):
+        return "FLOAT_LITERAL"
+    if candidate.symbol.startswith("_$S5$"):
+        return "STATIC_INIT_GUARD"
+    return None
+
+
+def _retail_storage_name(pe, rva: int) -> str | None:
+    storage = classify_pe_storage(pe, rva)["class"]
+    return {
+        "rdata": "rdata",
+        "data-initialized": "data",
+        "data-loader-zero-tail": "bss",
+    }.get(storage)
+
+
+def resolve_compgen_definitions(claims, topology_by_unit, base_root: Path,
+                                exe: Path, reserved=(), strict=False,
+                                symbols: Path = SYMBOLS, units: Path = UNITS):
+    """Bind semantic source claims to anonymous candidate COFF allocations.
+
+    Retail RVA/type/size comes from the source claim. Candidate section bytes and
+    topology identify the physical allocation. Unique payload edges are consumed
+    first; indistinguishable compiler-counter siblings are paired only by the
+    preserved candidate allocation order and retail RVA order.
+    """
+    reserved = {(row.unit, row.section_ordinal, row.section_value)
+                for row in reserved}
+    pe = read_pe(exe)
+    _image_base, highlow, _read_u32, read_bytes = _pe_layout(exe)
+    highlow = set(highlow)
+    coff_by_unit = {}
+    resolved = []
+    diagnostics = []
+    claims_by_unit = defaultdict(list)
+    for claim in claims:
+        claims_by_unit[claim.unit].append(claim)
+    derived, _stats, derivation_diagnostics = derive_allocations(
+        base_dir=base_root, exe=exe, symbols_path=symbols,
+        units_path=units, reviewed_rows=())
+    derived_by_rva = defaultdict(list)
+    for allocation in [
+            *derived,
+            *(allocation for diagnostic in derivation_diagnostics
+              for allocation in diagnostic.proposed_allocations)]:
+        derived_by_rva[(allocation.unit, allocation.rva)].append(allocation.name)
+
+    for unit, unit_claims in sorted(claims_by_unit.items()):
+        candidates = [
+            candidate
+            for candidate in topology_by_unit.get(unit, ([], []))[0]
+            if (unit, candidate.section_ordinal, candidate.section_value) not in reserved
+            and _compgen_candidate_kind(candidate) is not None
+        ]
+        coff = coff_by_unit.setdefault(
+            unit, CoffFile(Path(base_root) / f"{unit}.obj"))
+        requested_sizes = defaultdict(set)
+        for claim in unit_claims:
+            expected_kind = ("FLOAT_LITERAL" if claim.kind.startswith("FLOAT")
+                             else claim.kind)
+            requested_sizes[(expected_kind,
+                             _retail_storage_name(pe, claim.rva))].add(claim.size)
+        candidates_by_payload = defaultdict(list)
+        for candidate_index_value, candidate in enumerate(candidates):
+            candidate_kind = _compgen_candidate_kind(candidate)
+            for size in requested_sizes.get(
+                    (candidate_kind, candidate.storage), ()):
+                if candidate.size >= size:
+                    candidates_by_payload[(
+                        candidate_kind, candidate.storage, size,
+                        _candidate_bytes(coff, candidate, size)
+                    )].append(candidate_index_value)
+        edges = {}
+        for index, claim in enumerate(unit_claims):
+            claim_storage = _retail_storage_name(pe, claim.rva)
+            expected_kind = ("FLOAT_LITERAL" if claim.kind.startswith("FLOAT")
+                             else claim.kind)
+            retail_payload = bytearray(read_bytes(claim.rva, claim.size))
+            for site in range(claim.rva, claim.rva + claim.size - 3):
+                if site in highlow:
+                    offset = site - claim.rva
+                    retail_payload[offset:offset + 4] = b"\0\0\0\0"
+            retail_payload = bytes(retail_payload)
+            payload_edges = set(candidates_by_payload.get(
+                (expected_kind, claim_storage, claim.size, retail_payload), ()))
+            placed_names = set(derived_by_rva.get((unit, claim.rva), ()))
+            placed_edges = {
+                candidate_index_value
+                for candidate_index_value in payload_edges
+                if candidates[candidate_index_value].symbol in placed_names
+            }
+            decorated_exact_edges = {
+                value for value in payload_edges
+                if (candidates[value].size == claim.size
+                    and candidates[value].symbol.startswith("??_C@"))
+            }
+            edges[index] = (decorated_exact_edges
+                            if len(decorated_exact_edges) == 1
+                            else placed_edges if len(placed_edges) == 1
+                            else payload_edges)
+
+        assignments = {}
+        used = set()
+        changed = True
+        while changed:
+            changed = False
+            reverse = defaultdict(list)
+            for claim_index, choices in edges.items():
+                if claim_index in assignments:
+                    continue
+                for candidate_index in choices - used:
+                    reverse[candidate_index].append(claim_index)
+            for claim_index in sorted(edges):
+                if claim_index in assignments:
+                    continue
+                choices = edges[claim_index] - used
+                if (len(choices) == 1
+                        and len(reverse[next(iter(choices))]) == 1):
+                    candidate_index = next(iter(choices))
+                    assignments[claim_index] = candidate_index
+                    used.add(candidate_index)
+                    changed = True
+            reverse = defaultdict(list)
+            for claim_index, choices in edges.items():
+                if claim_index in assignments:
+                    continue
+                for candidate_index in choices - used:
+                    reverse[candidate_index].append(claim_index)
+            for candidate_index, claim_indices in sorted(reverse.items()):
+                if len(claim_indices) == 1:
+                    claim_index = claim_indices[0]
+                    assignments[claim_index] = candidate_index
+                    used.add(candidate_index)
+                    changed = True
+
+        remaining_claims = set(edges) - set(assignments)
+        remaining_reverse = defaultdict(set)
+        for claim_index in remaining_claims:
+            for candidate_index_value in edges[claim_index] - used:
+                remaining_reverse[candidate_index_value].add(claim_index)
+        while remaining_claims:
+            seed = min(remaining_claims)
+            component_claims = {seed}
+            component_candidates = set()
+            frontier = [seed]
+            while frontier:
+                claim_index = frontier.pop()
+                for candidate_index in edges[claim_index] - used:
+                    if candidate_index in component_candidates:
+                        continue
+                    component_candidates.add(candidate_index)
+                    for peer in remaining_reverse[candidate_index]:
+                        if peer in remaining_claims and peer not in component_claims:
+                            component_claims.add(peer)
+                            frontier.append(peer)
+            claim_order = sorted(component_claims,
+                                 key=lambda value: unit_claims[value].rva)
+            candidate_order = sorted(
+                component_candidates,
+                key=lambda value: (candidates[value].storage,
+                                   candidates[value].stream_offset,
+                                   candidates[value].symbol))
+            if (len(claim_order) == len(candidate_order)
+                    and all(candidate_index in edges[claim_index]
+                            for claim_index, candidate_index
+                            in zip(claim_order, candidate_order))):
+                for claim_index, candidate_index in zip(
+                        claim_order, candidate_order):
+                    assignments[claim_index] = candidate_index
+                    used.add(candidate_index)
+            else:
+                diagnostics.append(
+                    f"{unit}: cannot bind {len(claim_order)} semantic claims to "
+                    f"{len(candidate_order)} anonymous candidate allocations: "
+                    + ", ".join(unit_claims[value].semantic_name
+                                for value in claim_order[:6]))
+            remaining_claims -= component_claims
+
+        for claim_index, candidate_index in sorted(assignments.items()):
+            resolved.append((unit_claims[claim_index], candidates[candidate_index]))
+
+    if diagnostics:
+        detail = "\n".join(diagnostics)
+        if strict:
+            raise ValueError(detail)
+        warnings.warn(detail, stacklevel=2)
+    return resolved, diagnostics
+
+
+def _compgen_row(claim, candidate: CandidateDefinition) -> dict[str, str]:
+    if claim.size <= 0 or claim.size > candidate.size:
+        raise ValueError(
+            f"logical compiler-generated size 0x{claim.size:x} exceeds candidate "
+            f"span 0x{candidate.size:x} at {claim.location}")
+    semantic = "__h2cg$" + candidate.unit.replace("/", "$")
+    semantic += "$data$" + claim.semantic_name
+    return {
+        "name": semantic,
+        "object": candidate.unit.replace("/", "\\") + ".c",
+        "rva": f"0x{claim.rva:x}",
+        "size": f"0x{claim.size:x}",
+        "storage": candidate.storage,
+        "alignment": f"0x{candidate.alignment:x}",
+        "section_ordinal": str(candidate.section_ordinal),
+        "section_offset": f"0x{candidate.section_value:x}",
+        "scope": "external" if candidate.storage_class == 2 else "local",
+        "provenance": f"source-DATA_COMPGEN:{claim.location}",
     }
 
 
@@ -388,15 +549,6 @@ def _mark_vtable_aliases(rows: list[dict[str, str]]) -> None:
             row["provenance"] += ":candidate-coff-alias"
 
 
-def _read_tsv(path: Path) -> list[dict[str, str]]:
-    if not Path(path).is_file():
-        return []
-    with Path(path).open(newline="", encoding="utf-8") as stream:
-        return list(csv.DictReader(
-            (line for line in stream if not line.lstrip().startswith("#")),
-            delimiter="\t"))
-
-
 def _write_tsv(path: Path, header, rows, comment: str | None = None) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", newline="", encoding="utf-8",
@@ -410,132 +562,6 @@ def _write_tsv(path: Path, header, rows, comment: str | None = None) -> None:
         writer.writeheader()
         writer.writerows(rows)
     os.replace(temporary, path)
-
-
-def _normalize_symbol_row(row: dict[str, str], topology_by_unit) -> dict[str, str]:
-    unit = row["object"].replace("\\", "/").removesuffix(".c")
-    definitions = topology_by_unit.get(unit, ([], []))[0]
-    matches = [value for value in definitions if value.symbol == row["name"]]
-    if matches and row.get("section_ordinal"):
-        matches = [value for value in matches
-                   if value.section_ordinal == int(row["section_ordinal"], 0)]
-    if matches and row.get("section_offset") not in (None, "", "-"):
-        offset = int(row["section_offset"], 0)
-        matches = [value for value in matches
-                   if value.stream_offset == offset or value.section_value == offset]
-    if not matches and row.get("section_offset") not in (None, "", "-"):
-        # MSVC's compiler-local $T number is TU-state-sensitive.  The reviewed
-        # section ordinal/local offset, storage, and scope identify the current
-        # exact COFF symbol without carrying the stale spelling forward. Legacy
-        # supplements used the concatenated storage-stream offset, so retain it
-        # only when no section-local match exists.
-        offset = int(row["section_offset"], 0)
-        ordinal = int(row["section_ordinal"], 0)
-        expected_scope = "global" if row.get("scope") == "external" else "local"
-        matches = [value for value in definitions
-                   if value.storage == row.get("storage")
-                   and value.scope == expected_scope
-                   and value.section_ordinal == ordinal
-                   and value.section_value == offset]
-        if not matches:
-            matches = [value for value in definitions
-                       if value.storage == row.get("storage")
-                       and value.scope == expected_scope
-                       and value.stream_offset == offset]
-    if len(matches) != 1:
-        raise ValueError(f"supplemental {unit}:{row['name']} has {len(matches)} candidate definitions")
-    candidate = matches[0]
-    normalized = dict(row)
-    normalized.update({
-        "name": candidate.symbol,
-        "object": unit.replace("/", "\\") + ".c",
-        "storage": candidate.storage,
-        "alignment": f"0x{candidate.alignment:x}",
-        "section_ordinal": str(candidate.section_ordinal),
-        "section_offset": f"0x{candidate.section_value:x}",
-        "scope": "external" if candidate.storage_class == 2 else "local",
-    })
-    return {key: normalized.get(key, "") for key in SYMBOL_HEADER}
-
-
-def _validate_supplemental_row(row: dict[str, str], topology_by_unit,
-                               rename_proof=None) -> dict[str, str]:
-    """Require a reviewed row to name its current candidate allocation exactly."""
-    unit = row["object"].replace("\\", "/").removesuffix(".c")
-    definitions = topology_by_unit.get(unit, ([], []))[0]
-    ordinal = int(row["section_ordinal"], 0)
-    offset = int(row["section_offset"], 0)
-    matches = [
-        value for value in definitions
-        if value.symbol == row["name"]
-        and value.section_ordinal == ordinal
-        and value.section_value == offset
-    ]
-    renamed = False
-    if len(matches) == 1:
-        candidate = matches[0]
-    else:
-        positional = [
-            value for value in definitions
-            if value.section_ordinal == ordinal and value.section_value == offset
-        ]
-        reviewed_family = _private_counter_family(row["name"])
-        if (len(matches) or len(positional) != 1 or reviewed_family is None or
-                _private_counter_family(positional[0].symbol) != reviewed_family or
-                positional[0].storage_class != 3 or row.get("scope") != "local"):
-            raise ValueError(
-                f"stale reviewed supplemental {unit}:{row['name']}: expected one "
-                f"candidate definition at section {ordinal}+0x{offset:x}, found "
-                f"{len(matches)} exact and {len(positional)} positional; use explicit "
-                "--migrate-from and review the diff")
-        candidate = positional[0]
-        renamed = candidate.symbol != row["name"]
-    logical_size = int(row["size"], 0)
-    if logical_size <= 0 or logical_size > candidate.size:
-        raise ValueError(
-            f"stale reviewed supplemental {unit}:{row['name']} logical size "
-            f"0x{logical_size:x} exceeds candidate span 0x{candidate.size:x}; "
-            "update only after reviewing candidate evidence")
-    expected = {
-        "object": unit.replace("/", "\\") + ".c",
-        "storage": candidate.storage,
-        "alignment": f"0x{candidate.alignment:x}",
-        "section_ordinal": str(candidate.section_ordinal),
-        "section_offset": f"0x{candidate.section_value:x}",
-        "scope": "external" if candidate.storage_class == 2 else "local",
-    }
-    mismatches = {
-        key: {"reviewed": row.get(key, ""), "candidate": value}
-        for key, value in expected.items() if row.get(key, "") != value
-    }
-    if mismatches:
-        raise ValueError(
-            f"stale reviewed supplemental {unit}:{row['name']} topology: "
-            f"{mismatches}; update only after reviewing candidate evidence")
-    if renamed:
-        if rename_proof is None:
-            raise ValueError(
-                f"stale reviewed supplemental {unit}:{row['name']} -> "
-                f"{candidate.symbol} lacks a canonical identity proof")
-        rename_proof.require(unit, row["name"], candidate)
-        # Keep the reviewed spelling in the generated canonical union. The
-        # current candidate spelling is associated independently by coordinate.
-    return {key: row.get(key, "") for key in SYMBOL_HEADER}
-
-
-def migrate_supplemental(legacy: Path, output: Path, source_rows, topology_by_unit) -> list[dict[str, str]]:
-    source_identity = {(row["object"], row["name"]) for row in source_rows}
-    source_rvas = {int(row["rva"], 0) for row in source_rows}
-    rows = []
-    for legacy_row in _read_tsv(legacy):
-        identity = (legacy_row["object"], legacy_row["name"])
-        if identity in source_identity or int(legacy_row["rva"], 0) in source_rvas:
-            continue
-        rows.append(_normalize_symbol_row(legacy_row, topology_by_unit))
-    validate_symbol_rows(rows, "supplemental")
-    _write_tsv(output, SYMBOL_HEADER, _sorted_symbol_rows(rows),
-               "Compiler/linker allocations without a source DATA()/VTBL()/VTBL2() definition.")
-    return rows
 
 
 def _sorted_symbol_rows(rows):
@@ -814,18 +840,14 @@ def _section_rows(topology_by_unit, symbol_rows, public_by_symbol,
                     (row["name"], int(row["section_offset"], 0))
                     for row in reviewed_by_section.get((unit, section.ordinal), [])
                 }
-                reviewed_private_keys = {
-                    (_private_counter_family(row["name"]),
-                     int(row["section_offset"], 0))
+                reviewed_compgen_positions = {
+                    int(row["section_offset"], 0)
                     for row in reviewed_by_section.get((unit, section.ordinal), [])
-                    if _private_counter_family(row["name"]) is not None
-                    and row["scope"] == "local"
+                    if row["provenance"].startswith("source-DATA_COMPGEN:")
                 }
                 fully_reviewed = bool(candidate_definitions) and all(
                     ((definition.symbol, definition.section_value) in reviewed_keys or
-                     (definition.storage_class == 3 and
-                      (_private_counter_family(definition.symbol),
-                       definition.section_value) in reviewed_private_keys))
+                     definition.section_value in reviewed_compgen_positions)
                     for definition in candidate_definitions
                 )
                 predicted = None
@@ -1190,9 +1212,7 @@ def breakpoint_report(topology_by_unit, section_rows, section_diagnostics,
 
 
 def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOLS,
-                    units=UNITS, exe=EXE, supplemental=SUPPLEMENTAL,
-                    migrate_from: Path | None = None, strict=False,
-                    target_root=TARGET_ROOT):
+                    units=UNITS, exe=EXE, strict=False):
     definitions = source_definitions(Path(source_root), Path(base_root))
     manifest = tomllib.loads(Path(units).read_text())
     topology_by_unit = {}
@@ -1215,17 +1235,17 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
                    for claim, candidate in resolved_vtables]
     _mark_vtable_aliases(vtable_rows)
     source_rows.extend(vtable_rows)
+    compgen_claims = source_compgen_data(Path(source_root), REPO)
+    resolved_compgen, compgen_diagnostics = resolve_compgen_definitions(
+        compgen_claims, topology_by_unit, Path(base_root), Path(exe),
+        reserved=[candidate for _source, candidate in resolved]
+                 + [candidate for _claim, candidate in resolved_vtables],
+        strict=strict, symbols=Path(symbols), units=Path(units))
+    compgen_rows = [_compgen_row(claim, candidate)
+                    for claim, candidate in resolved_compgen]
+    source_rows.extend(compgen_rows)
     validate_symbol_rows(source_rows, "source annotations")
-    if migrate_from is not None:
-        supplemental_rows = migrate_supplemental(
-            Path(migrate_from), Path(supplemental), source_rows, topology_by_unit)
-    else:
-        rename_proof = _CanonicalPrivateRenameProof(base_root, target_root)
-        supplemental_rows = [_validate_supplemental_row(
-                                 row, topology_by_unit, rename_proof)
-                             for row in _read_tsv(Path(supplemental))]
-        validate_symbol_rows(supplemental_rows, "supplemental")
-    combined = [*source_rows, *supplemental_rows]
+    combined = list(source_rows)
     validate_symbol_rows(combined, "combined")
     retail_contributions = contribution_rows(exe, units)
     section_rows, section_diagnostics, physical, section_classifications = _section_rows(
@@ -1242,7 +1262,7 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     classified_contributions.sort(key=lambda row: (
         int(row["rva"]), row["object"], row["storage"]))
     _write_tsv(SOURCE_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(source_rows),
-               "Generated from source DATA()/VTBL()/VTBL2() plus exact candidate COFF identity.")
+               "Generated from source DATA()/DATA_COMPGEN()/VTBL()/VTBL2() plus exact candidate COFF identity.")
     _write_tsv(COMBINED_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(combined),
                "Generated Vostok symbol manifest; do not edit.")
     _write_tsv(SECTION_MANIFEST, SECTION_HEADER, section_rows,
@@ -1257,7 +1277,8 @@ def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOL
     summary = {
         "source_definitions": len(resolved),
         "source_vtables": len(vtable_rows),
-        "supplemental_definitions": len(supplemental_rows),
+        "source_compgen_definitions": len(compgen_rows),
+        "source_compgen_diagnostics": len(compgen_diagnostics),
         "combined_definitions": len(combined),
         "sections": len(section_rows),
         "section_assignment_diagnostics": len(section_diagnostics),
@@ -1281,14 +1302,12 @@ def main(argv=None) -> int:
     parser.add_argument("--symbols", type=Path, default=SYMBOLS)
     parser.add_argument("--units", type=Path, default=UNITS)
     parser.add_argument("--exe", type=Path, default=EXE)
-    parser.add_argument("--supplemental", type=Path, default=SUPPLEMENTAL)
-    parser.add_argument("--migrate-from", type=Path)
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args(argv)
     try:
         summary = build_manifests(
             args.source_root, args.base_root, args.symbols, args.units, args.exe,
-            args.supplemental, args.migrate_from, args.strict)
+            args.strict)
     except (OSError, KeyError, ValueError, struct.error) as exc:
         parser.error(str(exc))
     print(json.dumps(summary, indent=2))

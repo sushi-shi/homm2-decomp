@@ -32,9 +32,9 @@ i32 highScoreManager::Open(i32 id) {
         m_showCampaignScores = 0;
 
     gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
-    sprintf(gText, "hsbkg.icn");
+    sprintf(gText, DATA_COMPGEN(0x004f8114, openHsbkgIcn, "hsbkg.icn"));
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
-    m_window = new heroWindow(0, 0, "hiscore.bin");
+    m_window = new heroWindow(0, 0, DATA_COMPGEN(0x004f8120, openHiscoreBin, "hiscore.bin"));
     if (m_window == NULL)
         MemError();
     Update();
@@ -42,7 +42,7 @@ i32 highScoreManager::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, "highScoreManager");
+    strcpy(m_name, DATA_COMPGEN(0x004f812c, openHighScoreManager, "highScoreManager"));
     KBChangeMenu(hmnuDflt);
     gpWindowManager->FadeScreen(FADE_IN, HIGH_SCORE_FADE_STEPS, NULL);
     glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
@@ -135,14 +135,14 @@ void highScoreManager::Update(void) {
 
     missingFile = 0;
     if (m_showCampaignScores)
-        sprintf(filename, "%sCAMPAIGN.HS", ".\\DATA\\");
+        sprintf(filename, DATA_COMPGEN(0x004f8148, updateSCAMPAIGNHS, "%sCAMPAIGN.HS"), DATA_COMPGEN(0x004f8140, updateDATA, ".\\DATA\\"));
     else
-        sprintf(filename, "%sSTANDARD.HS", ".\\DATA\\");
+        sprintf(filename, DATA_COMPGEN(0x004f8160, updateSSTANDARDHS, "%sSTANDARD.HS"), DATA_COMPGEN(0x004f8158, updateDATA2, ".\\DATA\\"));
     inputFile = open(filename, HIGH_SCORE_FILE_READ_FLAGS);
     if (inputFile == -1)
         missingFile = 1;
 
-    sprintf(gText, "hsbkg.icn");
+    sprintf(gText, DATA_COMPGEN(0x004f8170, updateHsbkgIcn, "hsbkg.icn"));
     gpResourceManager->GetBackdrop(gText, gpWindowManager->m_screen, 1);
 
     messageValue.type = MESSAGE_WIDGET;
@@ -178,7 +178,7 @@ void highScoreManager::Update(void) {
 
         if (scoreEntry.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[entry] = 0;
-            sprintf(gText, "");
+            sprintf(gText, DATA_COMPGEN(0x004f817c, updateEmptyString, ""));
         } else {
             m_monsterTypes[entry] = GetMonType(
                 scoreEntry.score,
@@ -216,16 +216,16 @@ void highScoreManager::Update(void) {
 
         messageValue.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         messageValue.payload.widget.data.text = gText;
-        sprintf(gText, "");
+        sprintf(gText, DATA_COMPGEN(0x004f8180, updateEmptyString2, ""));
         messageValue.payload.widget.id =
             entry * HIGH_SCORE_TEXT_WIDGET_STRIDE + HIGH_SCORE_FIRST_TEXT_WIDGET;
         if (scoreEntry.score != HIGH_SCORE_EMPTY)
             sprintf(gText, scoreEntry.playerName);
         if (scoreEntry.cheated)
-            strcat(gText, "\n(Cheater)");
+            strcat(gText, DATA_COMPGEN(0x004f8184, updateCheater, "\n(Cheater)"));
         m_window->BroadcastMessage(messageValue);
 
-        sprintf(gText, "");
+        sprintf(gText, DATA_COMPGEN(0x004f8190, updateEmptyString3, ""));
         messageValue.payload.widget.id = entry * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCENARIO_OFFSET;
@@ -233,25 +233,25 @@ void highScoreManager::Update(void) {
             sprintf(gText, scoreEntry.scenarioName);
         m_window->BroadcastMessage(messageValue);
 
-        sprintf(gText, "");
+        sprintf(gText, DATA_COMPGEN(0x004f8194, updateEmptyString4, ""));
         messageValue.payload.widget.id = entry * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_RATING_OFFSET;
         if (scoreEntry.score != HIGH_SCORE_EMPTY) {
             if (m_showCampaignScores == 0)
-                sprintf(gText, "%d", scoreEntry.days);
+                sprintf(gText, DATA_COMPGEN(0x004f8198, updateD, "%d"), scoreEntry.days);
             else
-                sprintf(gText, "%d", scoreEntry.score);
+                sprintf(gText, DATA_COMPGEN(0x004f819c, updateD2, "%d"), scoreEntry.score);
         }
         m_window->BroadcastMessage(messageValue);
 
-        sprintf(gText, "");
+        sprintf(gText, DATA_COMPGEN(0x004f81a0, updateEmptyString5, ""));
         messageValue.payload.widget.id = entry * HIGH_SCORE_TEXT_WIDGET_STRIDE
                                          + HIGH_SCORE_FIRST_TEXT_WIDGET
                                          + HIGH_SCORE_TEXT_SCORE_OFFSET;
-        sprintf(gText, "");
+        sprintf(gText, DATA_COMPGEN(0x004f81a4, updateEmptyString6, ""));
         if (m_showCampaignScores == 0 && scoreEntry.score != HIGH_SCORE_EMPTY)
-            sprintf(gText, "%d", scoreEntry.score);
+            sprintf(gText, DATA_COMPGEN(0x004f81a8, updateD3, "%d"), scoreEntry.score);
         m_window->BroadcastMessage(messageValue);
 
         messageValue.payload.widget.command = HIGH_SCORE_WIDGET_RESIZE;

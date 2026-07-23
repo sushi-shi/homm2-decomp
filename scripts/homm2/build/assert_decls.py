@@ -19,7 +19,8 @@ EXTERN_DECL_RE = re.compile(r'^\s*extern\b')
 # definition/initializer), and not an annotation macro or control keyword.
 FWD_DECL_RE = re.compile(r'^[A-Za-z_][\w\s\*&:<>]*\b[A-Za-z_]\w*\s*\([^{;=]*\)\s*(const\s*)?;')
 _FWD_SKIP = re.compile(
-    r'^\s*(VA|VA_COMPGEN|DATA|VTBL|VTBL2|SIZE|return|typedef|extern)\b')
+    r'^\s*(VA|VA_COMPGEN|DATA|DATA_COMPGEN|DATA_COMPGEN_GUARD|VTBL|VTBL2|SIZE|'
+    r'return|typedef|extern)\b')
 
 def violations(path):
     out = []

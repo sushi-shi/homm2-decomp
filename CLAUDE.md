@@ -98,9 +98,10 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 - Comparison-only anonymous-data normalization happens under
   `build/objdiff/normalized/`. Raw compiler and delinker objects remain authoritative
   for linking, disassembly, and hard gates.
-- Reviewed static-data topology is described by source `DATA(...)`, `VTBL(...)`, and
-  `VTBL2(...)` annotations plus `config/delink_data_supplemental.tsv`. Generated
-  manifests belong in `build/gen`.
+- Reviewed static-data topology is described entirely by source `DATA(...)`,
+  `DATA_COMPGEN(...)`, `VTBL(...)`, and `VTBL2(...)` annotations. Candidate COFF
+  supplies the physical topology for compiler-generated objects. Generated manifests
+  belong in `build/gen`; there is no hand-maintained private-data supplement.
 - `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
   current normalized source hash. A changed hash starts a new current-score epoch. It is
   queue evidence only: no build or command rejects a regression against an older maximum.

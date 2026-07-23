@@ -72,7 +72,7 @@ H2_ENUM_END(FileRequesterPrivateConstant)
 
 VA(0x0048c920, 0x80)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
-    sprintf(gText, "%s%s", gcMapPath, filename);
+    sprintf(gText, DATA_COMPGEN(0x004f8678, getMapHeaderSS, "%s%s"), gcMapPath, filename);
     i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
         return 0;
@@ -100,7 +100,7 @@ i32 ShowThisMapGame(char* filename) {
             mapName[ix] = 0;
         }
     }
-    if (strcmpi(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
+    if (strcmpi(mapName, DATA_COMPGEN(0x004f8680, showThisMapGameBROKENA, "BROKENA")) == 0 && CheckSumIsDemoOK(filename)) {
         return 1;
     }
     return 0;
@@ -125,7 +125,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     i32 moveValue;
     i32 indexData;
 
-    sprintf(gText, "%s%s", directory, pattern);
+    sprintf(gText, DATA_COMPGEN(0x004f8688, initializeFilesSS, "%s%s"), directory, pattern);
     m_fileCount = 0;
     moreFilesHandle = 1;
     findHandleWork = FindFirstFile(gText, &findDataPath);
@@ -178,12 +178,12 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     for (indexData = 0; indexData < m_fileCount; ++indexData) {
-        strcpy(m_fileNames[indexData].text, "");
-        strcpy(m_extensions[indexData].text, "");
+        strcpy(m_fileNames[indexData].text, DATA_COMPGEN(0x004f8690, initializeFilesEmptyString, ""));
+        strcpy(m_extensions[indexData].text, DATA_COMPGEN(0x004f8694, initializeFilesEmptyString2, ""));
     }
 
     insertedCountResult = 0;
-    sprintf(gText, "%s%s", directory, pattern);
+    sprintf(gText, DATA_COMPGEN(0x004f8698, initializeFilesSS2, "%s%s"), directory, pattern);
     findHandleWork = FindFirstFile(gText, &findDataPath);
     if (findHandleWork != INVALID_HANDLE_VALUE) {
         moreFilesHandle = 1;
@@ -236,7 +236,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
         for (indexData = 0; insertedCountResult > indexData; ++indexData) {
-            sprintf(fullPath, "%s%s", m_fileNames[indexData].text, m_extensions[indexData].text);
+            sprintf(fullPath, DATA_COMPGEN(0x004f86a0, initializeFilesSS3, "%s%s"), m_fileNames[indexData].text, m_extensions[indexData].text);
             GetMapHeader(fullPath, &m_mapHeaders[indexData]);
         }
     }
@@ -265,11 +265,15 @@ fileRequester::fileRequester(
     m_mode = mode;
     strcpy(m_defaultExtension, defaultExtension);
     if (mode == FILE_REQUESTER_MAP_GAME || mode == FILE_REQUESTER_MAP) {
-        fGutterTravelLength = MAP_LIST_GUTTER_TRAVEL;
-        fGutterMinY = GUTTER_MIN_Y;
+        fGutterTravelLength = DATA_COMPGEN(
+            0x004eb870, mapListGutterTravelLength, MAP_LIST_GUTTER_TRAVEL
+        );
+        fGutterMinY = DATA_COMPGEN(0x004eb874, gutterMinimumY, GUTTER_MIN_Y);
         iMaxListSize = MAP_LIST_VISIBLE_COUNT;
     } else {
-        fGutterTravelLength = STANDARD_LIST_GUTTER_TRAVEL;
+        fGutterTravelLength = DATA_COMPGEN(
+            0x004eb878, standardListGutterTravelLength, STANDARD_LIST_GUTTER_TRAVEL
+        );
         fGutterMinY = GUTTER_MIN_Y;
         iMaxListSize = STANDARD_LIST_VISIBLE_COUNT;
     }
@@ -330,7 +334,7 @@ void fileRequester::Close(void) {
 
 VA(0x0048d5e1, 0x466)
 i32 fileRequester::Open(i32 id) {
-    strcpy(gLastFilename, "");
+    strcpy(gLastFilename, DATA_COMPGEN(0x004f86a8, openEmptyString, ""));
     m_previousMenu = hmnuCurrent;
     KBChangeMenu(hmnuDflt);
 
@@ -338,8 +342,8 @@ i32 fileRequester::Open(i32 id) {
         m_x,
         m_y,
         const_cast<char*>(
-            m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? "requests.bin"
-                                                                              : "request.bin"
+            m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP ? DATA_COMPGEN(0x004f86ac, openRequestsBin, "requests.bin")
+                                                                              : DATA_COMPGEN(0x004f86bc, openRequestBin, "request.bin")
         )
     );
     if (m_window == NULL) {
@@ -351,7 +355,7 @@ i32 fileRequester::Open(i32 id) {
         static_cast<i16>(fGutterMinY),
         SCROLL_KNOB_WIDTH,
         SCROLL_KNOB_HEIGHT,
-        "scrollcn.icn",
+        DATA_COMPGEN(0x004f86c8, openScrollcnIcn, "scrollcn.icn"),
         SCROLL_KNOB_FRAME,
         ICON_DRAW_NORMAL,
         FILE_REQUESTER_SCROLL_KNOB,
@@ -379,7 +383,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = m_filename;
         m_window->BroadcastMessage(message);
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, "File to Save:");
+        sprintf(gText, DATA_COMPGEN(0x004f86d8, openFileToSave, "File to Save:"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
@@ -406,7 +410,7 @@ i32 fileRequester::Open(i32 id) {
             }
         }
         message.payload.widget.id = FILE_REQUESTER_FILENAME_LABEL;
-        sprintf(gText, "File to Load:");
+        sprintf(gText, DATA_COMPGEN(0x004f86e8, openFileToLoad, "File to Load:"));
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
     }
@@ -424,7 +428,7 @@ i32 fileRequester::Open(i32 id) {
     if (m_fileCount == 0) {
         okEnabled3 = 0;
     }
-    if (m_mode == FILE_REQUESTER_SAVE_GAME && strcmpi(m_filename, "NEWGAME") == 0
+    if (m_mode == FILE_REQUESTER_SAVE_GAME && strcmpi(m_filename, DATA_COMPGEN(0x004f86f8, openNEWGAME, "NEWGAME")) == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
         okEnabled3 = 1;
     }
@@ -432,7 +436,7 @@ i32 fileRequester::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, "fileRequester");
+    strcpy(m_name, DATA_COMPGEN(0x004f8700, openFileRequester, "fileRequester"));
     return 0;
 }
 
@@ -484,7 +488,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                         strcpy(cycleNameBuffer, m_fileNames[m_selectedIndex].text);
                     } else {
-                        strcpy(cycleNameBuffer, "");
+                        strcpy(cycleNameBuffer, DATA_COMPGEN(0x004f8710, mainEmptyString, ""));
                     }
                     giMapSizeFilter = static_cast<FileRequesterMapSizeFilter>(
                         (IDX(giMapSizeFilter) + 1) % IDX(FILE_REQUESTER_MAP_SIZE_COUNT)
@@ -544,7 +548,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
                             && m_filename[0] == 0) {
                             NormalDialog(
-                                "Please make a selection from the list, or press cancel.",
+                                DATA_COMPGEN(0x004f8714, mainPleaseMakeASelectionFromThe, "Please make a selection from the list, or press cancel."),
                                 NORMAL_DIALOG_INFO,
                                 NORMAL_DIALOG_NO_RESOURCE,
                                 NORMAL_DIALOG_NO_VALUE,
@@ -670,13 +674,13 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (giNumHumanPlayers == 1) {
                                         sprintf(
                                             gText,
-                                            "No maps exist for %d human player at that size.",
+                                            DATA_COMPGEN(0x004f874c, mainNoMapsExistForDHuman, "No maps exist for %d human player at that size."),
                                             giNumHumanPlayers
                                         );
                                     } else {
                                         sprintf(
                                             gText,
-                                            "No maps exist for %d human players at that size.",
+                                            DATA_COMPGEN(0x004f877c, mainNoMapsExistForDHuman2, "No maps exist for %d human players at that size."),
                                             giNumHumanPlayers
                                         );
                                     }
@@ -698,7 +702,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
                                         strcpy(filteredNameMap, m_fileNames[m_selectedIndex].text);
                                     } else {
-                                        strcpy(filteredNameMap, "");
+                                        strcpy(filteredNameMap, DATA_COMPGEN(0x004f87b0, mainEmptyString2, ""));
                                     }
                                     SetupFiles();
                                     if (strlen(filteredNameMap) != 0) {
@@ -732,7 +736,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                           || newNameData[iResult] == '_'
                                           || newNameData[iResult] == ' '
                                           || FindToken(
-                                                 "$%'-_@~`!(){}^#&+,;=[].",
+                                                 DATA_COMPGEN(0x004f87b4, mainEmptyString3, "$%'-_@~`!(){}^#&+,;=[]."),
                                                  newNameData[iResult]
                                              ) != NULL)) {
                                         newNameData[iResult] = 0;
@@ -761,7 +765,12 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 if (positions < 1)
                                     positions = 1;
                                 gutterStepScreen = static_cast<i32>(
-                                    (fGutterTravelLength * IDX(FILE_REQUESTER_GUTTER_SCALE))
+                                    (fGutterTravelLength
+                                     * DATA_COMPGEN(
+                                         0x004eb87c,
+                                         fileRequesterGutterScale,
+                                         IDX(FILE_REQUESTER_GUTTER_SCALE)
+                                     ))
                                     / positions
                                 );
                                 mouseXIndex = message.payload.widget.screenX;
@@ -840,16 +849,16 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     if (acceptStep == 1) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
-            && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
-            && strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
+            && strcmpi(m_extensions[m_selectedIndex].text, DATA_COMPGEN(0x004f87cc, mainGMC, ".GMC")) != 0
+            && strcmpi(m_extensions[m_selectedIndex].text, DATA_COMPGEN(0x004f87d4, mainGXC, ".GXC")) != 0) {
             iResult =
                 m_extensions[m_selectedIndex].text[FILE_REQUESTER_EXTENSION_PLAYER_DIGIT] - '0';
             if (iResult < giNumHumanPlayers
                 && giDebugLevel < FILE_REQUESTER_DEBUG_ALLOW_PLAYER_MISMATCH) {
                 sprintf(
                     gText,
-                    "The game you have chosen only has slots for %d human(s).  You need one with "
-                    "room for at least %d humans.",
+                    DATA_COMPGEN(0x004f87dc, mainTheGameYouHaveChosenOnly, "The game you have chosen only has slots for %d human(s).  You need one with "
+                    "room for at least %d humans."),
                     iResult,
                     giNumHumanPlayers
                 );
@@ -870,8 +879,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
             if (iResult > giNumHumanPlayers) {
                 sprintf(
                     gText,
-                    "The game you have chosen was being played with %d humans. Is it OK if the "
-                    "computer takes the place of the last %d human(s)?",
+                    DATA_COMPGEN(0x004f8848, mainTheGameYouHaveChosenWas, "The game you have chosen was being played with %d humans. Is it OK if the "
+                    "computer takes the place of the last %d human(s)?"),
                     iResult,
                     iResult - giNumHumanPlayers
                 );
@@ -1008,15 +1017,15 @@ void fileRequester::Update(i32 drawWindow) {
 
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         broadcastMessage.payload.widget.data.text = gText;
-        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+        sprintf(gText, DATA_COMPGEN(0x004f88c8, updateS, "%s"), m_mapHeaders[m_selectedIndex].name);
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_NAME;
         m_window->BroadcastMessage(broadcastMessage);
 
-        sprintf(gText, "%s", cDifficulty[IDX(m_mapHeaders[m_selectedIndex].difficulty)]);
+        sprintf(gText, DATA_COMPGEN(0x004f88cc, updateS2, "%s"), cDifficulty[IDX(m_mapHeaders[m_selectedIndex].difficulty)]);
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_DIFFICULTY_TEXT;
         m_window->BroadcastMessage(broadcastMessage);
 
-        sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].description);
+        sprintf(gText, DATA_COMPGEN(0x004f88d0, updateS3, "%s"), m_mapHeaders[m_selectedIndex].description);
         broadcastMessage.payload.widget.id = FILE_REQUESTER_MAP_DESCRIPTION;
         m_window->BroadcastMessage(broadcastMessage);
     }
@@ -1084,9 +1093,9 @@ void fileRequester::Update(i32 drawWindow) {
 
             broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             if (m_mode == FILE_REQUESTER_MAP || m_mode == FILE_REQUESTER_MAP_GAME) {
-                sprintf(gText, "%s", m_mapHeaders[m_topIndex + i].name);
+                sprintf(gText, DATA_COMPGEN(0x004f88d4, updateS4, "%s"), m_mapHeaders[m_topIndex + i].name);
             } else {
-                sprintf(gText, "%s", m_fileNames[m_topIndex + i].text);
+                sprintf(gText, DATA_COMPGEN(0x004f88d8, updateS5, "%s"), m_fileNames[m_topIndex + i].text);
             }
             broadcastMessage.payload.widget.data.text = gText;
             broadcastMessage.payload.widget.id = i + FILE_REQUESTER_LIST_TEXT_FIRST;
@@ -1110,9 +1119,9 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
         broadcastMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
-            sprintf(gText, "%s", m_mapHeaders[m_selectedIndex].name);
+            sprintf(gText, DATA_COMPGEN(0x004f88dc, updateS6, "%s"), m_mapHeaders[m_selectedIndex].name);
         } else {
-            sprintf(gText, "%s", m_fileNames[m_selectedIndex].text);
+            sprintf(gText, DATA_COMPGEN(0x004f88e0, updateS7, "%s"), m_fileNames[m_selectedIndex].text);
         }
         broadcastMessage.payload.widget.data.text = gText;
         m_window->BroadcastMessage(broadcastMessage);
@@ -1127,7 +1136,11 @@ void fileRequester::Update(i32 drawWindow) {
     if (m_fileCount <= iMaxListSize) {
         m_scrollKnob->m_y =
             static_cast<i16>(
-                fGutterTravelLength / IDX(SCROLL_CENTER_DIVISOR) + fGutterMinY
+                fGutterTravelLength
+                    / DATA_COMPGEN(
+                        0x004eb880, scrollCenterDivisor, IDX(SCROLL_CENTER_DIVISOR)
+                    )
+                + fGutterMinY
             );
     } else {
         gutterStepCount = fGutterTravelLength / (m_fileCount - iMaxListSize);
@@ -1146,17 +1159,17 @@ char* fileRequester::GetFilename(void) {
     }
 
     if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
-        sprintf(gText, "%s%s", m_filename, m_defaultExtension);
+        sprintf(gText, DATA_COMPGEN(0x004f88e8, getFilenameSS, "%s%s"), m_filename, m_defaultExtension);
     } else if (m_mode == FILE_REQUESTER_LOAD_GAME || m_mode == FILE_REQUESTER_MAP
                || m_mode == FILE_REQUESTER_MAP_GAME) {
         sprintf(
             gText,
-            "%s%s",
+            DATA_COMPGEN(0x004f88f0, getFilenameSS2, "%s%s"),
             m_fileNames[m_selectedIndex].text,
             m_extensions[m_selectedIndex].text
         );
     } else {
-        sprintf(gText, "%s%s", m_fileNames[m_selectedIndex].text, m_defaultExtension);
+        sprintf(gText, DATA_COMPGEN(0x004f88f8, getFilenameSS3, "%s%s"), m_fileNames[m_selectedIndex].text, m_defaultExtension);
     }
     strcpy(m_filename, gText);
     return m_filename;
@@ -1167,7 +1180,7 @@ VTBL(fileRequester, 0x004eb888);
 
 
 DATA(0x004f8674) FileRequesterMapSizeFilter giMapSizeFilter = FILE_REQUESTER_MAP_SIZE_ALL;
-DATA(0x004f88c4) char* cFRDummy = "";
+DATA(0x004f88c4) char* cFRDummy = DATA_COMPGEN(0x004f88e4, cFRDummyEmptyString, "");
 DATA(0x0052857c) float fGutterMinY;
 DATA(0x00528580) float fGutterTravelLength;
 DATA(0x00528584) i32 iMaxListSize;

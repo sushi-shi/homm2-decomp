@@ -27,32 +27,33 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define RIPPLE_MODE_ZERO_AMPLITUDE_BASE 0.3f
-#define RIPPLE_MODE_ZERO_AMPLITUDE_STEP 0.05f
-#define RIPPLE_OTHER_AMPLITUDE_BASE 0.2f
-#define RIPPLE_OTHER_AMPLITUDE_STEP 0.1f
-#define SPELL_VANISH_END_DELAY 500.0f
-#define CHAIN_LIGHTNING_FRAME_DELAY 100.0f
-#define MIRROR_SLIDE_FRAME_DELAY 50.0f
-#define BLAST_FRAME_DELAY static_cast<float>(10.0)
-#define SPELL_COLD_RAY_DELAY 175.0f
+#define RIPPLE_MODE_ZERO_AMPLITUDE_BASE DATA_COMPGEN(0x004eb1ec, aMPLITUDEBASEConstant, 0.3f)
+#define RIPPLE_MODE_ZERO_AMPLITUDE_STEP DATA_COMPGEN(0x004eb1f0, aMPLITUDESTEPConstant, 0.05f)
+#define RIPPLE_OTHER_AMPLITUDE_BASE DATA_COMPGEN(0x004eb1f4, aMPLITUDEBASEConstant2, 0.2f)
+#define RIPPLE_OTHER_AMPLITUDE_STEP DATA_COMPGEN(0x004eb1f8, aMPLITUDESTEPConstant2, 0.1f)
+#define SPELL_VANISH_END_DELAY DATA_COMPGEN(0x004eb1e8, eNDDELAYConstant, 500.0f)
+#define CHAIN_LIGHTNING_FRAME_DELAY DATA_COMPGEN(0x004eb160, fRAMEDELAYConstant2, 100.0f)
+#define MIRROR_SLIDE_FRAME_DELAY DATA_COMPGEN(0x004eb1fc, fRAMEDELAYConstant, 50.0f)
+#define BLAST_FRAME_DELAY                                                                  \
+    DATA_COMPGEN(0x004eb200, blastFrameDelay, static_cast<float>(10.0))
+#define SPELL_COLD_RAY_DELAY DATA_COMPGEN(0x004eb154, rAYDELAYConstant, 175.0f)
 #define SPELL_MAGIC_ARROW_DELAY 100.0f
-#define SPELL_AREA_ANIMATION_DELAY 75.0f
-#define SPELL_METEOR_ANIMATION_DELAY 112.5
-#define SPELL_ARMAGEDDON_PALETTE_DELAY 20.0f
-#define SPELL_ARMAGEDDON_SHAKE_DELAY 15.0f
-#define SPELL_ARMAGEDDON_SHAKE_SCALE 0.75
+#define SPELL_AREA_ANIMATION_DELAY DATA_COMPGEN(0x004eb184, aNIMATIONDELAYConstant2, 75.0f)
+#define SPELL_METEOR_ANIMATION_DELAY DATA_COMPGEN(0x004eb188, aNIMATIONDELAYConstant, 112.5)
+#define SPELL_ARMAGEDDON_PALETTE_DELAY DATA_COMPGEN(0x004eb190, pALETTEDELAYConstant, 20.0f)
+#define SPELL_ARMAGEDDON_SHAKE_DELAY DATA_COMPGEN(0x004eb1a0, sHAKEDELAYConstant, 15.0f)
+#define SPELL_ARMAGEDDON_SHAKE_SCALE DATA_COMPGEN(0x004eb198, sHAKESCALEConstant, 0.75)
 #define SPELL_ARTIFACT_DAMAGE_BONUS 1.5
 #define SPELL_ARTIFACT_DAMAGE_REDUCTION 0.5
-#define BOLT_INITIAL_ANGLE_BIAS 2.5
-#define BOLT_INITIAL_ANGLE_DIVISOR 2.0
-#define BOLT_RANDOM_ANGLE_BIAS 2.0f
+#define BOLT_INITIAL_ANGLE_BIAS DATA_COMPGEN(0x004eb1a8, aNGLEBIASConstant, 2.5)
+#define BOLT_INITIAL_ANGLE_DIVISOR DATA_COMPGEN(0x004eb1b0, aNGLEDIVISORConstant, 2.0)
+#define BOLT_RANDOM_ANGLE_BIAS DATA_COMPGEN(0x004eb1c0, aNGLEBIASConstant2, 2.0f)
 #define BOLT_RANDOM_ANGLE_DIVISOR 1.5
 #define BOLT_ANGLE_DISTANCE_FACTOR 1.5
 #define BOLT_BRANCH_COOLDOWN_FACTOR 0.75
-#define BOLT_CHILD_ANGLE_SCALE 0.66
-#define BOLT_CHILD_ANGLE_OFFSET 20.0
-#define BOLT_CHILD_MIN_ANGLE_OFFSET -20.0
+#define BOLT_CHILD_ANGLE_SCALE DATA_COMPGEN(0x004eb1d0, aNGLESCALEConstant, 0.66)
+#define BOLT_CHILD_ANGLE_OFFSET DATA_COMPGEN(0x004eb1d8, aNGLEOFFSETConstant, 20.0)
+#define BOLT_CHILD_MIN_ANGLE_OFFSET DATA_COMPGEN(0x004eb1e0, aNGLEOFFSETConstant2, -20.0)
 
 namespace {
 
@@ -187,7 +188,7 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_EARTHQUAKE:
                 if (m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] == NULL) {
                     NormalDialog(
-                        "An earthquake will do you no good unless there are town walls to damage.",
+                        DATA_COMPGEN(0x004f00bc, viewSpellsAnEarthquakeWillDoYouNo, "An earthquake will do you no good unless there are town walls to damage."),
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -218,7 +219,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_summonedCreatureType[IDX(m_currentSide)] != CREATURE_SUMMONED_NONE
                     && m_summonedCreatureType[IDX(m_currentSide)] != elementalType) {
                     NormalDialog(
-                        "You may only summon one type of elemental per combat.",
+                        DATA_COMPGEN(0x004f0108, viewSpellsYouMayOnlySummonOneType, "You may only summon one type of elemental per combat."),
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -234,7 +235,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[IDX(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "You already have %d creatures groups in combat and cannot add any more.",
+                        DATA_COMPGEN(0x004f0140, viewSpellsYouAlreadyHaveDCreaturesGroups, "You already have %d creatures groups in combat and cannot add any more."),
                         m_armyCount[IDX(m_currentSide)]
                     );
                     NormalDialog(
@@ -254,7 +255,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (!SpaceForElementalExists()) {
                     sprintf(
                         gText,
-                        "There is no open space adjacent to your hero to summon an Elemental to."
+                        DATA_COMPGEN(0x004f0188, viewSpellsThereIsNoOpenSpaceAdjacent, "There is no open space adjacent to your hero to summon an Elemental to.")
                     );
                     NormalDialog(
                         gText,
@@ -287,7 +288,7 @@ i32 combatManager::ViewSpells(i32) {
             case SPELL_MASS_SHIELD:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "That spell will affect no one!",
+                        DATA_COMPGEN(0x004f01d0, viewSpellsThatSpellWillAffectNoOne, "That spell will affect no one!"),
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -309,7 +310,7 @@ i32 combatManager::ViewSpells(i32) {
                 if (m_armyCount[IDX(m_currentSide)] >= ELEMENTAL_ARMY_LIMIT) {
                     sprintf(
                         gText,
-                        "You already have %d creatures groups in combat and cannot add any more.",
+                        DATA_COMPGEN(0x004f01f0, viewSpellsYouAlreadyHaveDCreaturesGroups2, "You already have %d creatures groups in combat and cannot add any more."),
                         m_armyCount[IDX(m_currentSide)]
                     );
                     NormalDialog(
@@ -330,7 +331,7 @@ i32 combatManager::ViewSpells(i32) {
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
-                        "That spell will affect no one!",
+                        DATA_COMPGEN(0x004f0238, viewSpellsThatSpellWillAffectNoOne2, "That spell will affect no one!"),
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -346,7 +347,7 @@ i32 combatManager::ViewSpells(i32) {
                 giNextAction = ACTION_CAST_SPELL;
                 giNextActionExtra = IDX(m_selectedSpell);
                 gpMouseManager->SetPointer(
-                    "spelmous.mse",
+                    DATA_COMPGEN(0x004f0258, viewSpellsSpelmousMse, "spelmous.mse"),
                     gsSpellInfo[IDX(m_selectedSpell)].iconIndex,
                     MOUSE_AUTO_CURSOR_TYPE
                 );
@@ -355,7 +356,7 @@ i32 combatManager::ViewSpells(i32) {
         }
 
     restore_pointer:
-        gpMouseManager->SetPointer("cmbtmous.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f0268, viewSpellsCmbtmousMse, "cmbtmous.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
         if (m_selectedSpell != SPELL_NONE)
             return 1;
     }
@@ -407,9 +408,9 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                     indexToCastOn = NO_SELECTION;
                     gpMouseManager->SetPointer(0);
                     if (gpCombatManager->m_selectedSpell == SPELL_TELEPORT && bInTeleportGetDest) {
-                        gpCombatManager->CombatMessage("Invalid Teleport Destination", 1, 0, 0);
+                        gpCombatManager->CombatMessage(DATA_COMPGEN(0x004f027c, handleCastSpellInvalidTeleportDestination, "Invalid Teleport Destination"), 1, 0, 0);
                     } else {
-                        gpCombatManager->CombatMessage("Select Spell Target", 1, 0, 0);
+                        gpCombatManager->CombatMessage(DATA_COMPGEN(0x004f029c, handleCastSpellSelectSpellTarget, "Select Spell Target"), 1, 0, 0);
                     }
                 } else {
                     indexToCastOn = hex;
@@ -434,7 +435,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
                         message.payload.mouse.x = message.payload.mouse.screenX;
                         message.payload.mouse.y = message.payload.mouse.screenY;
                         HandleCastSpell(message);
-                        gpCombatManager->CombatMessage("Select teleport destination.", 1, 0, 0);
+                        gpCombatManager->CombatMessage(DATA_COMPGEN(0x004f02b0, handleCastSpellSelectTeleportDestination, "Select teleport destination."), 1, 0, 0);
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                 }
@@ -473,7 +474,7 @@ i32 combatManager::FindResurrectArmyIndex(
     if (m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE) {
         if (m_hexCells[hex].m_occupantSide == side) {
             target_j = &m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex];
-            if (target_j->SpellCastWorkChance(spell) > 0.0f)
+            if (target_j->SpellCastWorkChance(spell) > DATA_COMPGEN(0x004eb150, findResurrectArmyIndexConstant, 0.0f))
                 return m_hexCells[hex].m_occupantIndex;
         }
         return NO_SELECTION;
@@ -619,11 +620,11 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
         case SPELL_FIREBLAST:
         case SPELL_METEOR_SHOWER:
         case SPELL_COLD_RING:
-            sprintf(gText, "Cast %s", gSpellNames[IDX(spell)]);
+            sprintf(gText, DATA_COMPGEN(0x004f02d0, spellMessageCastS, "Cast %s"), gSpellNames[IDX(spell)]);
             break;
         case SPELL_TELEPORT:
             if (bInTeleportGetDest) {
-                sprintf(gText, "Teleport Here");
+                sprintf(gText, DATA_COMPGEN(0x004f02d8, spellMessageTeleportHere, "Teleport Here"));
                 break;
             }
             goto occupied_target;
@@ -641,7 +642,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
                 armyName = gArmyNames[IDX(target_i->m_monsterType)];
             else
                 armyName = gArmyNamesPlural[IDX(target_i->m_monsterType)];
-            sprintf(gText, "Cast %s on %s", gSpellNames[IDX(spell)], armyName);
+            sprintf(gText, DATA_COMPGEN(0x004f02e8, spellMessageCastSOnS, "Cast %s on %s"), gSpellNames[IDX(spell)], armyName);
             break;
     }
 
@@ -806,7 +807,7 @@ void combatManager::CastSpell(
     if (spell == CREATURE_SPELL_DISPEL)
         soundSpell_q = SPELL_DISPEL;
     if (strlen(gsSpellInfo[IDX(soundSpell_q)].soundName) != 0)
-        sprintf(sampleName_i, "%s.82M", gsSpellInfo[IDX(soundSpell_q)].soundName);
+        sprintf(sampleName_i, DATA_COMPGEN(0x004f02f8, castSpellS82M, "%s.82M"), gsSpellInfo[IDX(soundSpell_q)].soundName);
 
     if (castByCreature == 0 && target_i != NULL && !target_i->SpellCastWorks(spell)) {
         ShowSpellCastFailure(target_i, IDX(spell));
@@ -833,7 +834,7 @@ void combatManager::CastSpell(
                 if (gbNoShowCombat == 0)
                     WaitEndSample(spellSample, -1);
                 if (gbNoShowCombat == 0) {
-                    sprintf(gText, "telptin.82m");
+                    sprintf(gText, DATA_COMPGEN(0x004f0300, castSpellTelptin82m, "telptin.82m"));
                     spellSample = LoadPlaySample(gText);
                 }
                 if (HAS(teleportArmy_i->m_monster.flags.all, MONSTER_FLAGS_WIDE)
@@ -905,7 +906,7 @@ void combatManager::CastSpell(
                     target_i->m_monster.defense = SPELL_MINIMUM_DEFENSE;
                 sprintf(
                     gText,
-                    "The disrupting ray reduces defense by %d.",
+                    DATA_COMPGEN(0x004f030c, castSpellTheDisruptingRayReducesDefenseBy, "The disrupting ray reduces defense by %d."),
                     oldDefense - target_i->m_monster.defense
                 );
                 CombatMessage(gText, 1, 1, 0);
@@ -933,7 +934,7 @@ void combatManager::CastSpell(
                                         : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
                     gText,
-                    "The cold ray does %d\n damage to the %s.",
+                    DATA_COMPGEN(0x004f0338, castSpellTheColdRayDoesDDamage, "The cold ray does %d\n damage to the %s."),
                     damage_m,
                     coldRayArmyName_f
                 );
@@ -964,23 +965,23 @@ void combatManager::CastSpell(
                                            : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
                     gText,
-                    "The magic arrow does %d\n damage to the %s.",
+                    DATA_COMPGEN(0x004f0360, castSpellTheMagicArrowDoesDDamage, "The magic arrow does %d\n damage to the %s."),
                     damage_m,
                     magicArrowArmyName_n
                 );
                 CombatMessage(gText, 1, 1, 0);
-                missileIcon_p = gpResourceManager->GetIcon("keep.icn");
+                missileIcon_p = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f038c, castSpellKeepIcn, "keep.icn"));
                 // Retail projectile-angle lookup, ordered from vertical up to vertical down.
                 // NOLINTBEGIN(readability-magic-numbers)
-                missileAngles[0] = 90.0f;
-                missileAngles[1] = 68.5f;
-                missileAngles[2] = 45.0f;
-                missileAngles[3] = 20.8f;
-                missileAngles[4] = 0.0f;
-                missileAngles[5] = -20.8f;
-                missileAngles[6] = -45.0f;
-                missileAngles[7] = -68.5f;
-                missileAngles[8] = -90.0f;
+                missileAngles[0] = DATA_COMPGEN(0x004eb164, castSpellConstant6, 90.0f);
+                missileAngles[1] = DATA_COMPGEN(0x004eb168, castSpellConstant4, 68.5f);
+                missileAngles[2] = DATA_COMPGEN(0x004eb16c, castSpellConstant2, 45.0f);
+                missileAngles[3] = DATA_COMPGEN(0x004eb170, castSpellConstant8, 20.8f);
+                missileAngles[4] = DATA_COMPGEN(0x004eb158, castSpellConstant, 0.0);
+                missileAngles[5] = DATA_COMPGEN(0x004eb174, castSpellConstant9, -20.8f);
+                missileAngles[6] = DATA_COMPGEN(0x004eb178, castSpellConstant3, -45.0f);
+                missileAngles[7] = DATA_COMPGEN(0x004eb17c, castSpellConstant5, -68.5f);
+                missileAngles[8] = DATA_COMPGEN(0x004eb180, castSpellConstant7, -90.0f);
                 // NOLINTEND(readability-magic-numbers)
                 ShootMissile(
                     castX,
@@ -1012,7 +1013,7 @@ void combatManager::CastSpell(
                                           : gArmyNamesPlural[IDX(target_i->m_monsterType)];
                 sprintf(
                     gText,
-                    "The lightning bolt does %d\n damage to the %s.",
+                    DATA_COMPGEN(0x004f0398, castSpellTheLightningBoltDoesDDamage, "The lightning bolt does %d\n damage to the %s."),
                     damage_m,
                     lightningArmyName_d
                 );
@@ -1299,11 +1300,11 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (!gbNoShowCombat) {
         frameCount_i = SPELL_FIREBALL_FRAME_COUNT;
         if (spell == SPELL_FIREBALL)
-            spellIcon_n = gpResourceManager->GetIcon("fireball.icn");
+            spellIcon_n = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f03c8, fireballFireballIcn, "fireball.icn"));
         else if (spell == SPELL_FIREBLAST)
-            spellIcon_n = gpResourceManager->GetIcon("firebal2.icn");
+            spellIcon_n = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f03d8, fireballFirebal2Icn, "firebal2.icn"));
         else {
-            spellIcon_n = gpResourceManager->GetIcon("coldring.icn");
+            spellIcon_n = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f03e8, fireballColdringIcn, "coldring.icn"));
             frameCount_i = SPELL_COLD_RING_FRAME_COUNT;
         }
 
@@ -1440,9 +1441,9 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[IDX(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "The cold ring does %d damage.", baseDamage_w);
+            sprintf(gText, DATA_COMPGEN(0x004f03f8, fireballTheColdRingDoesDDamage, "The cold ring does %d damage."), baseDamage_w);
         else
-            sprintf(gText, "The fireball does %d damage.", baseDamage_w);
+            sprintf(gText, DATA_COMPGEN(0x004f0418, fireballTheFireballDoesDDamage, "The fireball does %d damage."), baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
         target_n->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1469,7 +1470,7 @@ void combatManager::MeteorShower(i32 targetHex) {
     i32 frame;
 
     if (!gbNoShowCombat) {
-        icon* meteorIcon = gpResourceManager->GetIcon("meteor.icn");
+        icon* meteorIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0438, meteorIconMeteorIcn, "meteor.icn"));
         for (direction = 0; direction < SPELL_METEOR_PASS_COUNT; ++direction) {
             for (frame = 0; frame < SPELL_METEOR_FRAME_COUNT; ++frame) {
                 glTimers[0] = static_cast<i32>(
@@ -1525,7 +1526,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         }
     }
     if (anyAffected_h) {
-        sprintf(gText, "The meteor shower does %d damage.", baseDamage_w);
+        sprintf(gText, DATA_COMPGEN(0x004f0444, meteorShowerTheMeteorShowerDoesDDamage, "The meteor shower does %d damage."), baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
         target_k->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1547,7 +1548,7 @@ void combatManager::ElementalStorm(void) {
     SLimitData limits_n;
 
     if (!gbNoShowCombat) {
-        stormIcon_i = gpResourceManager->GetIcon("storm.icn");
+        stormIcon_i = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0468, elementalStormStormIcn, "storm.icn"));
         for (pass_c = 0; pass_c < SPELL_STORM_PASS_COUNT; ++pass_c) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
                 glTimers[0] = static_cast<i32>(
@@ -1600,7 +1601,7 @@ void combatManager::ElementalStorm(void) {
         }
     }
     if (anyAffected_f) {
-        sprintf(gText, "The elemental storm does %d damage.", baseDamage_w);
+        sprintf(gText, DATA_COMPGEN(0x004f0474, elementalStormTheElementalStormDoesDDamage, "The elemental storm does %d damage."), baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
         target_m->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1631,7 +1632,7 @@ void combatManager::Armageddon(void) {
         }
     }
     if (anyAffected6) {
-        sprintf(gText, "The armaggedon does %d damage.", baseDamage2);
+        sprintf(gText, DATA_COMPGEN(0x004f0498, armageddonTheArmaggedonDoesDDamage, "The armaggedon does %d damage."), baseDamage2);
         CombatMessage(gText, 1, 1, 0);
     }
 
@@ -1639,7 +1640,7 @@ void combatManager::Armageddon(void) {
     palette* effectPalette4 = NULL;
     if (!gbNoShowCombat) {
         gpWindowManager->m_updateFlags = 0;
-        originalPalette5 = gpResourceManager->GetPalette("kb.pal");
+        originalPalette5 = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f04b8, armageddonKbPal, "kb.pal"));
         effectPalette4 = new palette;
         if (!effectPalette4)
             MemError();
@@ -1967,7 +1968,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     bolt->angle = averageAngle + bolt->baseAngle;
 
     if (bolt->minAngle != 0 || bolt->maxAngle != 0) {
-        if (!(bolt->angleDistance * BOLT_ANGLE_DISTANCE_FACTOR < distance || bolt->forceAngle != 0))
+        if (!(bolt->angleDistance * DATA_COMPGEN(0x004eb1b8, resetBoltAngleConstant, BOLT_ANGLE_DISTANCE_FACTOR) < distance || bolt->forceAngle != 0))
             return;
         float randomAngle;
         if (bolt->minAngle == bolt->maxAngle)
@@ -2016,7 +2017,11 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
             bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
-            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1);
+            bolt->currentX = DATA_COMPGEN(
+                0x004eb1c4,
+                combatScreenMaximumX,
+                static_cast<float>(COMBAT_SCREEN_WIDTH - 1)
+            );
         }
         if (bolt->pixelY < 0) {
             bolt->pixelY = 0;
@@ -2024,7 +2029,11 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_AREA_HEIGHT - 1 < bolt->pixelY) {
             bolt->pixelY = COMBAT_AREA_HEIGHT - 1;
-            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
+            bolt->currentY = DATA_COMPGEN(
+                0x004eb1c8,
+                combatAreaMaximumY,
+                static_cast<float>(COMBAT_AREA_HEIGHT - 1)
+            );
         }
 
         drawX = bolt->pixelX;
@@ -2225,7 +2234,7 @@ void combatManager::DoBolt(
     palette* originalPalette = NULL;
     palette* effectPalette = NULL;
     if (brightenPalette != 0) {
-        originalPalette = gpResourceManager->GetPalette("kb.pal");
+        originalPalette = gpResourceManager->GetPalette(DATA_COMPGEN(0x004f04d8, doBoltKbPal, "kb.pal"));
         effectPalette = new palette;
         if (!effectPalette)
             MemError();
@@ -2560,8 +2569,8 @@ void combatManager::VaporizeCreature(
     ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<i8*>(
-        H2_ALLOC(
-            SPELL_MODIFIER_ROW_COUNT,
+        H2_ALLOC_AT(
+            SPELL_MODIFIER_ROW_COUNT, DATA_COMPGEN(0x004f04e8, vaporizeCreatureSourceFile, RETAIL_FILE),
             vaporizeSourceLineBase + 0x09
         )
     );
@@ -2607,7 +2616,7 @@ void combatManager::VaporizeCreature(
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, vaporizeSourceLineBase + 0x38);
+    H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f0514, vaporizeCreatureSourceFile2, RETAIL_FILE), vaporizeSourceLineBase + 0x38);
     gyModify = NULL;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
@@ -2652,13 +2661,13 @@ void combatManager::RippleCreature(
 
     i32 extentHeight = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(
-        H2_ALLOC(
-            SPELL_MODIFIER_ROW_COUNT,
+        H2_ALLOC_AT(
+            SPELL_MODIFIER_ROW_COUNT, DATA_COMPGEN(0x004f0544, rippleCreatureSourceFile, RETAIL_FILE),
             rippleSourceLineBase + 0x2c
         )
     );
-    float* wave = static_cast<float*>(H2_ALLOC(
-        sizeof(float) * SPELL_MODIFIER_ROW_COUNT,
+    float* wave = static_cast<float*>(H2_ALLOC_AT(
+        sizeof(float) * SPELL_MODIFIER_ROW_COUNT, DATA_COMPGEN(0x004f0570, rippleCreatureSourceFile2, RETAIL_FILE),
         rippleSourceLineBase + 0x2d
     ));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
@@ -2735,8 +2744,8 @@ void combatManager::RippleCreature(
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_drawEnabled = 1;
-    H2_FREE(gyModify, rippleSourceLineBase + 0x8e);
-    H2_FREE(wave, rippleSourceLineBase + 0x8f);
+    H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f059c, rippleCreatureSourceFile3, RETAIL_FILE), rippleSourceLineBase + 0x8e);
+    H2_FREE_AT(wave, DATA_COMPGEN(0x004f05c8, rippleCreatureSourceFile4, RETAIL_FILE), rippleSourceLineBase + 0x8f);
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -2944,7 +2953,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
             }
             sprintf(
                 gText,
-                "The %s spell does %d damage\nto all undead creatures.",
+                DATA_COMPGEN(0x004f05f4, castMassSpellTheSSpellDoesDDamage, "The %s spell does %d damage\nto all undead creatures."),
                 gSpellNames[IDX(spell)],
                 damage_c
             );
@@ -2977,7 +2986,7 @@ void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
                         m_armies[IDX(side_i)][armyIndex_k].Damage(damage_c, SPELL_NONE);
                 }
             }
-            sprintf(gText, "The Death spell does %d damage\nto all living creatures.", damage_c);
+            sprintf(gText, DATA_COMPGEN(0x004f062c, castMassSpellTheDeathSpellDoesDDamage, "The Death spell does %d damage\nto all living creatures."), damage_c);
             CombatMessage(gText, 1, 1, 0);
             break;
         }
@@ -3097,7 +3106,7 @@ void combatManager::MirrorImage(i32 targetHex) {
             }
         }
     }
-    sprintf(gText, "Mirror Image spell failed!");
+    sprintf(gText, DATA_COMPGEN(0x004f0664, mirrorImageMirrorImageSpellFailed, "Mirror Image spell failed!"));
     NormalDialog(
         gText,
         NORMAL_DIALOG_INFO,
@@ -3292,10 +3301,10 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     i32 segmentCount_f;
 
     if (spell == SPELL_COLD_RAY) {
-        blastIcon_h = gpResourceManager->GetIcon("coldray.icn");
+        blastIcon_h = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0680, doBlastColdrayIcn, "coldray.icn"));
         frameSpacing_c = BLAST_COLD_RAY_FRAME_SPACING;
     } else {
-        blastIcon_h = gpResourceManager->GetIcon("disrray.icn");
+        blastIcon_h = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f068c, doBlastDisrrayIcn, "disrray.icn"));
         frameSpacing_c = BLAST_DISRUPTING_RAY_FRAME_SPACING;
     }
     target_i =
@@ -3446,21 +3455,21 @@ void combatManager::Resurrect(
     if (target_i->m_quantity - oldQuantity_b > 1)
         sprintf(
             gText,
-            "%d %s rise from the dead!",
+            DATA_COMPGEN(0x004f0698, resurrectDSRiseFromTheDead, "%d %s rise from the dead!"),
             target_i->m_quantity - oldQuantity_b,
             gArmyNamesPlural[IDX(target_i->m_monsterType)]
         );
     else
         sprintf(
             gText,
-            "%d %s rises from the dead!",
+            DATA_COMPGEN(0x004f06b4, resurrectDSRisesFromTheDead, "%d %s rises from the dead!"),
             target_i->m_quantity - oldQuantity_b,
             gArmyNames[IDX(target_i->m_monsterType)]
         );
     CombatMessage(gText, 1, 1, 0);
 
     if (!gbNoShowCombat) {
-        resurrectIcon = gpResourceManager->GetIcon("yinyang.icn");
+        resurrectIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f06d0, resurrectYinyangIcn, "yinyang.icn"));
         for (index_o = 0; index_o < RESURRECT_ANIMATION_FRAME_COUNT; ++index_o) {
             glTimers[0] = static_cast<i32>(
                 KBTickCount()
@@ -3522,7 +3531,7 @@ i32 combatManager::SpaceForElementalExists(void) {
 VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 sample = NULL_SAMPLE2;
-    sample = LoadPlaySample("rsbryfzl.82m");
+    sample = LoadPlaySample(DATA_COMPGEN(0x004f06dc, showSpellCastFailureRsbryfzl82m, "rsbryfzl.82m"));
     char* armyName;
     if (target->m_quantity == 1)
         armyName = gArmyNames[IDX(target->m_monsterType)];
@@ -3530,9 +3539,9 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
         armyName = gArmyNamesPlural[IDX(target->m_monsterType)];
     sprintf(
         gText,
-        "The %s %s the spell!",
+        DATA_COMPGEN(0x004f06fc, showSpellCastFailureTheSSTheSpell, "The %s %s the spell!"),
         armyName,
-        target->m_quantity == 1 ? "resists" : "resist"
+        target->m_quantity == 1 ? DATA_COMPGEN(0x004f06ec, showSpellCastFailureResists, "resists") : DATA_COMPGEN(0x004f06f4, showSpellCastFailureResist, "resist")
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     WaitEndSample(sample, -1);
@@ -3734,7 +3743,7 @@ void combatManager::Earthquake(void) {
     giMaxExtentX = EARTHQUAKE_EXTENT_MAX_X;
     giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
     if (impactCount != 0) {
-        icon* cloudIcon = gpResourceManager->GetIcon("lichclod.icn");
+        icon* cloudIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0714, cloudIconLichclodIcn, "lichclod.icn"));
         i32 frame;
         for (frame = 0; frame < EARTHQUAKE_CLOUD_FRAME_COUNT; ++frame) {
             glTimers[1] = static_cast<i32>(
@@ -3802,15 +3811,15 @@ void combatManager::ShowSpellMessage(
     }
     if (castByCreature != 0) {
         if (spell == SPELL_PARALYZE)
-            sprintf(message_m, "The %s are paralyzed by the Cyclopes!", targetName_b);
+            sprintf(message_m, DATA_COMPGEN(0x004f0724, showSpellMessageTheSAreParalyzedByThe, "The %s are paralyzed by the Cyclopes!"), targetName_b);
         else if (spell == SPELL_BLIND)
-            sprintf(message_m, "The Unicorns' attack blinds the %s!", targetName_b);
+            sprintf(message_m, DATA_COMPGEN(0x004f074c, showSpellMessageTheUnicornsAttackBlindsTheS, "The Unicorns' attack blinds the %s!"), targetName_b);
         else if (spell == CREATURE_SPELL_PETRIFY)
-            sprintf(message_m, "The Medusas' gaze turns the %s to stone!", targetName_b);
+            sprintf(message_m, DATA_COMPGEN(0x004f0770, showSpellMessageTheMedusasGazeTurnsTheS, "The Medusas' gaze turns the %s to stone!"), targetName_b);
         else if (spell == SPELL_CURSE)
-            sprintf(message_m, "The Mummies' curse falls upon the %s!", targetName_b);
+            sprintf(message_m, DATA_COMPGEN(0x004f079c, showSpellMessageTheMummiesCurseFallsUponThe, "The Mummies' curse falls upon the %s!"), targetName_b);
         else if (spell == CREATURE_SPELL_DISPEL)
-            sprintf(message_m, "The Archmages dispel all good spells\non your %s!", targetName_b);
+            sprintf(message_m, DATA_COMPGEN(0x004f07c4, showSpellMessageTheArchmagesDispelAllGoodSpells, "The Archmages dispel all good spells\non your %s!"), targetName_b);
         else {
             unhandledSpell_j = 0;
             ++unhandledSpell_j;
@@ -3820,25 +3829,25 @@ void combatManager::ShowSpellMessage(
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
                 sprintf(
                     message_m,
-                    "The captain casts '%s' on the %s.",
+                    DATA_COMPGEN(0x004f07f8, showSpellMessageTheCaptainCastsSOnThe, "The captain casts '%s' on the %s."),
                     gSpellNames[IDX(spell)],
                     targetName_b
                 );
             else
                 sprintf(
                     message_m,
-                    "%s casts '%s' on the %s.",
+                    DATA_COMPGEN(0x004f081c, showSpellMessageSCastsSOnTheS, "%s casts '%s' on the %s."),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)],
                     targetName_b
                 );
         } else {
             if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
-                sprintf(message_m, "The captain casts '%s'.", gSpellNames[IDX(spell)]);
+                sprintf(message_m, DATA_COMPGEN(0x004f0838, showSpellMessageTheCaptainCastsS, "The captain casts '%s'."), gSpellNames[IDX(spell)]);
             else
                 sprintf(
                     message_m,
-                    "%s casts '%s'.",
+                    DATA_COMPGEN(0x004f0850, showSpellMessageSCastsS, "%s casts '%s'."),
                     m_heroes[IDX(m_currentSide)]->m_name,
                     gSpellNames[IDX(spell)]
                 );

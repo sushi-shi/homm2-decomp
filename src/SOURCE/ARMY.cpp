@@ -26,19 +26,19 @@
 #include <SOURCE/SPELLS.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define ARMY_HASTE_WALK_DURATION_SCALE 0.65
-#define ARMY_SLOW_WALK_DURATION_SCALE 1.5
-#define ARMY_PROJECTILE_PI 3.14159
-#define ARMY_SHOOT_UP_MIN_ANGLE 25.0f
-#define ARMY_SHOOT_FORWARD_MIN_ANGLE -25.0f
-#define ARMY_SPELL_CHANCE_NONE 0.0f
-#define ARMY_SPELL_CHANCE_DWARF 0.75f
-#define ARMY_SPELL_CHANCE_ALWAYS 1.0f
-#define ARMY_SPELL_CHANCE_PERCENT 100.0f
-#define ARMY_RANGER_ATTACK_DURATION_SCALE 0.78
-#define ARMY_DURATION_BASE_SCALE 1.0
-#define ARMY_ATTACK_DURATION_SPEED_SCALE 0.08
-#define ARMY_WALK_DURATION_SPEED_SCALE 0.12
+#define ARMY_HASTE_WALK_DURATION_SCALE DATA_COMPGEN(0x004eb618, dURATIONSCALEConstant2, 0.65)
+#define ARMY_SLOW_WALK_DURATION_SCALE DATA_COMPGEN(0x004eb620, dURATIONSCALEConstant, 1.5)
+#define ARMY_PROJECTILE_PI DATA_COMPGEN(0x004eb5e8, pROJECTILEPIConstant, 3.14159)
+#define ARMY_SHOOT_UP_MIN_ANGLE DATA_COMPGEN(0x004eb5f4, mINANGLEConstant, 25.0f)
+#define ARMY_SHOOT_FORWARD_MIN_ANGLE DATA_COMPGEN(0x004eb5f8, mINANGLEConstant2, -25.0f)
+#define ARMY_SPELL_CHANCE_NONE DATA_COMPGEN(0x004eb608, cHANCENONEConstant, 0.0f)
+#define ARMY_SPELL_CHANCE_DWARF DATA_COMPGEN(0x004eb628, cHANCEDWARFConstant, 0.75f)
+#define ARMY_SPELL_CHANCE_ALWAYS DATA_COMPGEN(0x004eb62c, cHANCEALWAYSConstant, 1.0f)
+#define ARMY_SPELL_CHANCE_PERCENT DATA_COMPGEN(0x004eb604, cHANCEPERCENTConstant, 100.0f)
+#define ARMY_RANGER_ATTACK_DURATION_SCALE DATA_COMPGEN(0x004eb630, dURATIONSCALEConstant3, 0.78)
+#define ARMY_DURATION_BASE_SCALE DATA_COMPGEN(0x004eb640, bASESCALEConstant, 1.0)
+#define ARMY_ATTACK_DURATION_SPEED_SCALE DATA_COMPGEN(0x004eb638, attackDurationSpeedScale, 0.08)
+#define ARMY_WALK_DURATION_SPEED_SCALE DATA_COMPGEN(0x004eb648, sPEEDSCALEConstant, 0.12)
 
 namespace {
 
@@ -143,11 +143,11 @@ H2_ENUM_CLASS_BEGIN(BerserkMaskIndex)
     BERSERK_MASK_COUNT        = 5
 H2_ENUM_CLASS_END(BerserkMaskIndex)
 
-#define PROJECTILE_HALF_TURN_DEGREES_FLOAT 180.0
-#define PROJECTILE_DIRECTION_MIDPOINT_DIVISOR 2.0f
+#define PROJECTILE_HALF_TURN_DEGREES_FLOAT DATA_COMPGEN(0x004eb5e0, dEGREESFLOATConstant, 180.0)
+#define PROJECTILE_DIRECTION_MIDPOINT_DIVISOR DATA_COMPGEN(0x004eb5f0, mIDPOINTDIVISORConstant, 2.0f)
 #define DAMAGE_DOUBLE_MULTIPLIER 2.0f
 #define DAMAGE_HALF_DIVISOR 2.0f
-#define DAMAGE_ROUNDING_OFFSET 0.5
+#define DAMAGE_ROUNDING_OFFSET DATA_COMPGEN(0x004eb610, rOUNDINGOFFSETConstant, 0.5)
 
 }
 
@@ -293,48 +293,48 @@ void army::LoadResources(void) {
     ModifyFrameInfo(&m_frameInfo, m_monsterType);
     m_walkDuration = m_frameInfo.walkDuration;
 
-    sprintf(gText, "%smove.82M", m_monster.spriteName);
+    sprintf(gText, DATA_COMPGEN(0x004f53c4, loadResourcesSmove82M, "%smove.82M"), m_monster.spriteName);
     m_samples[IDX(ARMY_SAMPLE_MOVE)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%sattk.82M", m_monster.spriteName);
+    sprintf(gText, DATA_COMPGEN(0x004f53d0, loadResourcesSattk82M, "%sattk.82M"), m_monster.spriteName);
     m_samples[IDX(ARMY_SAMPLE_ATTACK)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%swnce.82M", m_monster.spriteName);
+    sprintf(gText, DATA_COMPGEN(0x004f53dc, loadResourcesSwnce82M, "%swnce.82M"), m_monster.spriteName);
     m_samples[IDX(ARMY_SAMPLE_WINCE)] = gpResourceManager->GetSample(gText);
-    sprintf(gText, "%skill.82M", m_monster.spriteName);
+    sprintf(gText, DATA_COMPGEN(0x004f53e8, loadResourcesSkill82M, "%skill.82M"), m_monster.spriteName);
     m_samples[IDX(ARMY_SAMPLE_KILL)] = gpResourceManager->GetSample(gText);
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
-        sprintf(gText, "%sshot.82M", m_monster.spriteName);
+        sprintf(gText, DATA_COMPGEN(0x004f53f4, loadResourcesSshot82M, "%sshot.82M"), m_monster.spriteName);
         m_samples[IDX(ARMY_SAMPLE_SHOT)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_VAMPIRE || m_monsterType == CREATURE_VAMPIRE_LORD) {
-        sprintf(gText, "%sext1.82M", m_monster.spriteName);
+        sprintf(gText, DATA_COMPGEN(0x004f5400, loadResourcesSext182M, "%sext1.82M"), m_monster.spriteName);
         m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
-        sprintf(gText, "%sext2.82M", m_monster.spriteName);
+        sprintf(gText, DATA_COMPGEN(0x004f540c, loadResourcesSext282M, "%sext2.82M"), m_monster.spriteName);
         m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)] = gpResourceManager->GetSample(gText);
     }
     if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-        sprintf(gText, "%sexpl.82M", m_monster.spriteName);
+        sprintf(gText, DATA_COMPGEN(0x004f5418, loadResourcesSexpl82M, "%sexpl.82M"), m_monster.spriteName);
         m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)] = gpResourceManager->GetSample(gText);
     }
 
     m_creatureIcon = gpResourceManager->GetIcon(cMonFilename[IDX(m_monsterType)]);
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER)) {
         if (m_monsterType == CREATURE_GIANT || m_monsterType == CREATURE_TITAN) {
-            sprintf(gText, "titanmsl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5424, loadResourcesTitanmslIcn, "titanmsl.icn"));
         } else if (m_monsterType == CREATURE_HALFLING) {
-            sprintf(gText, "halflmsl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5434, loadResourcesHalflmslIcn, "halflmsl.icn"));
         } else if (m_monsterType == CREATURE_ARCHER || m_monsterType == CREATURE_RANGER) {
-            sprintf(gText, "arch_msl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5444, loadResourcesArchMslIcn, "arch_msl.icn"));
         } else if (m_monsterType == CREATURE_LICH || m_monsterType == CREATURE_POWER_LICH) {
-            sprintf(gText, "lich_msl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5454, loadResourcesLichMslIcn, "lich_msl.icn"));
         } else if (m_monsterType == CREATURE_ORC || m_monsterType == CREATURE_ORC_CHIEF) {
-            sprintf(gText, "orc__msl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5464, loadResourcesOrcMslIcn, "orc__msl.icn"));
         } else if (m_monsterType == CREATURE_DRUID || m_monsterType == CREATURE_GREATER_DRUID) {
-            sprintf(gText, "druidmsl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5474, loadResourcesDruidmslIcn, "druidmsl.icn"));
         } else if (m_monsterType == CREATURE_TROLL || m_monsterType == CREATURE_WAR_TROLL) {
-            sprintf(gText, "trollmsl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5484, loadResourcesTrollmslIcn, "trollmsl.icn"));
         } else {
-            sprintf(gText, "elf__msl.icn");
+            sprintf(gText, DATA_COMPGEN(0x004f5494, loadResourcesElfMslIcn, "elf__msl.icn"));
         }
         m_missileIcon = gpResourceManager->GetIcon(gText);
     } else {
@@ -564,7 +564,7 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
                 );
         }
         if (drawn1 == ICON_DRAW_COMPLETED) {
-            sprintf(quantityText3, "%d", m_lastTargetHex == -1 ? m_quantity : m_lastTargetHex);
+            sprintf(quantityText3, DATA_COMPGEN(0x004f54a4, drawToBufferD, "%d"), m_lastTargetHex == -1 ? m_quantity : m_lastTargetHex);
             smallFont->DrawBoundedString(
                 quantityText3,
                 quantityX5,
@@ -1089,7 +1089,10 @@ void army::SpecialAttack(void) {
             giMaxExtentY - giMinExtentY + 1
         );
         DelayMilli(
-            static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_MAGE_BOLT_DELAY))
+            static_cast<i32l>(
+                gfCombatSpeedMod[gConfig.combatSpeed]
+                * DATA_COMPGEN(0x004eb5fc, mageBoltDelayFloat, IDX(ARMY_MAGE_BOLT_DELAY))
+            )
         );
         gpCombatManager->DoBolt(
             1,
@@ -1279,31 +1282,31 @@ void army::SpecialAttack(void) {
 
     if (killed_13 > 0) {
         if (damage == -1) {
-            sprintf(gText, "The mirror image is destroyed!");
+            sprintf(gText, DATA_COMPGEN(0x004f54ac, specialAttackTheMirrorImageIsDestroyed, "The mirror image is destroyed!"));
         } else {
             sprintf(
                 gText,
-                "%s %s %d %s.\n%d %s %s.",
+                DATA_COMPGEN(0x004f54f4, specialAttackSSDSDS, "%s %s %d %s.\n%d %s %s."),
                 m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                : gArmyNames[IDX(m_monsterType)],
-                m_quantity > 1 ? "do" : "does",
+                m_quantity > 1 ? DATA_COMPGEN(0x004f54f0, specialAttackDo, "do") : DATA_COMPGEN(0x004f54e8, specialAttackDoes, "does"),
                 damage,
-                "damage",
+                DATA_COMPGEN(0x004f54e0, specialAttackDamage, "damage"),
                 killed_13,
                 killed_13 > 1 ? gArmyNamesPlural[IDX(target_1->m_monsterType)]
                               : gArmyNames[IDX(target_1->m_monsterType)],
-                killed_13 > 1 ? "perish" : "perishes"
+                killed_13 > 1 ? DATA_COMPGEN(0x004f54d8, specialAttackPerish, "perish") : DATA_COMPGEN(0x004f54cc, specialAttackPerishes, "perishes")
             );
             gText[0] -= ARMY_ASCII_CASE_OFFSET;
         }
     } else {
         sprintf(
             gText,
-            "%s %s %d %s.",
+            DATA_COMPGEN(0x004f5520, specialAttackSSDS, "%s %s %d %s."),
             m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)] : gArmyNames[IDX(m_monsterType)],
-            m_quantity > 1 ? "do" : "does",
+            m_quantity > 1 ? DATA_COMPGEN(0x004f551c, specialAttackDo2, "do") : DATA_COMPGEN(0x004f5514, specialAttackDoes2, "does"),
             damage,
-            "damage"
+            DATA_COMPGEN(0x004f550c, specialAttackDamage2, "damage")
         );
         gText[0] -= ARMY_ASCII_CASE_OFFSET;
     }
@@ -1422,23 +1425,23 @@ void army::DoHydraAttack(i32) {
     if (totalKilled_7 > 0) {
         sprintf(
             gText,
-            "%s %s %d %s.\n%d %s %s.",
+            DATA_COMPGEN(0x004f5570, doHydraAttackSSDSDS, "%s %s %d %s.\n%d %s %s."),
             m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)] : gArmyNames[IDX(m_monsterType)],
-            m_quantity > 1 ? "do" : "does",
+            m_quantity > 1 ? DATA_COMPGEN(0x004f556c, doHydraAttackDo, "do") : DATA_COMPGEN(0x004f5564, doHydraAttackDoes, "does"),
             totalDamage_1,
-            "damage",
+            DATA_COMPGEN(0x004f555c, doHydraAttackDamage, "damage"),
             totalKilled_7,
-            totalKilled_7 > 1 ? "creatures" : "creature",
-            totalKilled_7 > 1 ? "perish" : "perishes"
+            totalKilled_7 > 1 ? DATA_COMPGEN(0x004f5550, doHydraAttackCreatures, "creatures") : DATA_COMPGEN(0x004f5544, doHydraAttackCreature, "creature"),
+            totalKilled_7 > 1 ? DATA_COMPGEN(0x004f553c, doHydraAttackPerish, "perish") : DATA_COMPGEN(0x004f5530, doHydraAttackPerishes, "perishes")
         );
     } else {
         sprintf(
             gText,
-            "%s %s %d %s.",
+            DATA_COMPGEN(0x004f559c, doHydraAttackSSDS, "%s %s %d %s."),
             m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)] : gArmyNames[IDX(m_monsterType)],
-            m_quantity > 1 ? "do" : "does",
+            m_quantity > 1 ? DATA_COMPGEN(0x004f5598, doHydraAttackDo2, "do") : DATA_COMPGEN(0x004f5590, doHydraAttackDoes2, "does"),
             totalDamage_1,
-            "damage"
+            DATA_COMPGEN(0x004f5588, doHydraAttackDamage2, "damage")
         );
     }
     gText[0] -= ARMY_ASCII_CASE_OFFSET;
@@ -1572,41 +1575,41 @@ void army::DoAttack(i32 retaliation) {
             DamageEnemy(breathTarget_6, &breathDamage, &breathKilled, 0, 0);
         }
         if (damage == -1) {
-            sprintf(gText, "The mirror image is destroyed!");
+            sprintf(gText, DATA_COMPGEN(0x004f55ac, doAttackTheMirrorImageIsDestroyed, "The mirror image is destroyed!"));
         } else if (gbGenieHalf) {
             sprintf(
                 gText,
-                "%s %s half the enemy troops!",
+                DATA_COMPGEN(0x004f55e0, doAttackSSHalfTheEnemyTroops, "%s %s half the enemy troops!"),
                 m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                : gArmyNames[IDX(m_monsterType)],
-                m_quantity > 1 ? "destroy" : "destroys"
+                m_quantity > 1 ? DATA_COMPGEN(0x004f55d8, doAttackDestroy, "destroy") : DATA_COMPGEN(0x004f55cc, doAttackDestroys, "destroys")
             );
             gText[0] -= ARMY_ASCII_CASE_OFFSET;
         } else {
             if (killed_13 > 0) {
                 sprintf(
                     gText,
-                    "%s %s %d %s.\n%d %s %s.",
+                    DATA_COMPGEN(0x004f5628, doAttackSSDSDS, "%s %s %d %s.\n%d %s %s."),
                     m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                    : gArmyNames[IDX(m_monsterType)],
-                    m_quantity > 1 ? "do" : "does",
+                    m_quantity > 1 ? DATA_COMPGEN(0x004f5624, doAttackCasualtyMessagePluralVerb, "do") : DATA_COMPGEN(0x004f561c, doAttackDoes, "does"),
                     damage,
-                    "damage",
+                    DATA_COMPGEN(0x004f5614, doAttackDamage, "damage"),
                     killed_13,
                     killed_13 > 1 ? gArmyNamesPlural[IDX(target_1->m_monsterType)]
                                   : gArmyNames[IDX(target_1->m_monsterType)],
-                    killed_13 > 1 ? "perish" : "perishes"
+                    killed_13 > 1 ? DATA_COMPGEN(0x004f560c, doAttackPerish, "perish") : DATA_COMPGEN(0x004f5600, doAttackPerishes, "perishes")
                 );
                 gText[0] -= ARMY_ASCII_CASE_OFFSET;
             } else {
                 sprintf(
                     gText,
-                    "%s %s %d %s.",
+                    DATA_COMPGEN(0x004f5654, doAttackSSDS, "%s %s %d %s."),
                     m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                    : gArmyNames[IDX(m_monsterType)],
-                    m_quantity > 1 ? "do" : "does",
+                    m_quantity > 1 ? DATA_COMPGEN(0x004f5650, doAttackDo, "do") : DATA_COMPGEN(0x004f5648, doAttackDoes2, "does"),
                     damage,
-                    "damage"
+                    DATA_COMPGEN(0x004f5640, doAttackDamage2, "damage")
                 );
                 gText[0] -= ARMY_ASCII_CASE_OFFSET;
             }
@@ -1712,7 +1715,10 @@ void army::DoAttack(i32 retaliation) {
             && !effectStopsRetaliation_4 && !retaliation) {
             DelayMilli(
                 static_cast<i32l>(
-                    gfCombatSpeedMod[gConfig.combatSpeed] * IDX(ARMY_RETALIATION_DELAY)
+                    gfCombatSpeedMod[gConfig.combatSpeed]
+                    * DATA_COMPGEN(
+                        0x004eb600, retaliationDelayFloat, IDX(ARMY_RETALIATION_DELAY)
+                    )
                 )
             );
             target_1->m_attackDirection = OppositeDirection(m_attackDirection);
@@ -1969,15 +1975,15 @@ void army::CheckLuck(void) {
     if (m_luckOutcome) {
         luckSample = NULL_SAMPLE2;
         if (m_luckOutcome < 0) {
-            sprintf(gText, "badluck.82m");
+            sprintf(gText, DATA_COMPGEN(0x004f5664, checkLuckBadluck82m, "badluck.82m"));
         } else {
-            sprintf(gText, "goodluck.82m");
+            sprintf(gText, DATA_COMPGEN(0x004f5670, checkLuckGoodluck82m, "goodluck.82m"));
         }
         luckSample = LoadPlaySample(gText);
         if (m_luckOutcome < 0) {
             sprintf(
                 gText,
-                "Bad luck descends on the %s",
+                DATA_COMPGEN(0x004f5680, checkLuckBadLuckDescendsOnTheS, "Bad luck descends on the %s"),
                 m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                : gArmyNames[IDX(m_monsterType)]
             );
@@ -1986,7 +1992,7 @@ void army::CheckLuck(void) {
         } else {
             sprintf(
                 gText,
-                "Good luck shines on the %s",
+                DATA_COMPGEN(0x004f569c, checkLuckGoodLuckShinesOnTheS, "Good luck shines on the %s"),
                 m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
                                : gArmyNames[IDX(m_monsterType)]
             );

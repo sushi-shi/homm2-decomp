@@ -358,26 +358,9 @@ def _public_symbol_kinds(path):
     return kinds
 
 
-def _supplemental_rows(path):
-    if path is None or not path.is_file():
-        return []
-    with path.open(encoding="utf-8", newline="") as stream:
-        reader = csv.DictReader(
-            (line for line in stream if not line.lstrip().startswith("#")),
-            delimiter="\t")
-        rows = []
-        for row in reader:
-            normalized = dict(row)
-            normalized["unit"] = row["object"].replace("\\", "/").removesuffix(".c")
-            normalized["rva"] = int(row["rva"], 0)
-            normalized["size"] = int(row["size"], 0)
-            rows.append(normalized)
-        return rows
-
-
-def provenance_census(units, base_root, source_root, supplemental_path,
-                      source_manifest_path, base_suffix=".obj"):
-    """Separate canonical DATA definitions from derived and supplemental rows."""
+def provenance_census(units, base_root, source_root, source_manifest_path,
+                      base_suffix=".obj"):
+    """Audit source DATA and DATA_COMPGEN claims against candidate identities."""
     definitions = source_definitions(source_root) if source_root is not None else []
     definitions_by_rva = {}
     definitions_by_unit_rva = {}
@@ -386,13 +369,18 @@ def provenance_census(units, base_root, source_root, supplemental_path,
         definitions_by_unit_rva.setdefault((row.unit, row.rva), []).append(row)
 
     source_identities = {}
+    compgen_rows = []
     unmatched_source_manifest = []
     for row in _source_manifest_rows(source_manifest_path):
-        matches = definitions_by_unit_rva.get((row["unit"], row["rva"]), [])
-        if len(matches) != 1:
-            unmatched_source_manifest.append(row)
-            continue
-        source_identities[(row["unit"], row["name"])] = matches[0]
+        provenance = row.get("provenance", "")
+        if provenance.startswith("source-DATA_COMPGEN:"):
+            compgen_rows.append(row)
+        elif provenance.startswith("source-DATA:"):
+            matches = definitions_by_unit_rva.get((row["unit"], row["rva"]), [])
+            if len(matches) != 1:
+                unmatched_source_manifest.append(row)
+                continue
+            source_identities[(row["unit"], row["name"])] = matches[0]
 
     object_rows = {}
     candidate_class = {}
@@ -418,7 +406,7 @@ def provenance_census(units, base_root, source_root, supplemental_path,
                 candidate_class[(unit, symbol.name)] = "source-data"
             else:
                 private[symbol.name] += 1
-                candidate_class[(unit, symbol.name)] = "compiler-private"
+                candidate_class[(unit, symbol.name)] = "unmodeled-private"
             storage_by_name.setdefault(symbol.name, set()).add(symbol.storage)
         source_rows = [row for row in definitions if row.unit == unit]
         object_rows[unit] = {
@@ -427,69 +415,9 @@ def provenance_census(units, base_root, source_root, supplemental_path,
                 {"symbol": symbol, "source_name": source_name, "count": count}
                 for (symbol, source_name), count in sorted(covered.items())
             ],
-            "candidate_compiler_private": _name_rows(private),
+            "candidate_private": _name_rows(private),
             "candidate_storage": storage_by_name,
-            "supplemental_linker_metadata": [],
         }
-
-    supplemental = _supplemental_rows(supplemental_path)
-    duplicate_rows = []
-    disagreement_rows = []
-    supplemental_counts = Counter()
-    supplemental_classes = Counter()
-    for row in supplemental:
-        unit = row["unit"]
-        named_definition = source_identities.get((unit, row["name"]))
-        rva_definitions = definitions_by_rva.get(row["rva"], [])
-        duplicate_definitions = list(rva_definitions)
-        if named_definition is not None and named_definition not in duplicate_definitions:
-            duplicate_definitions.append(named_definition)
-        candidate_provenance = candidate_class.get((unit, row["name"]), "unclassified")
-        supplemental_counts[row.get("provenance") or "unknown"] += 1
-        supplemental_classes[candidate_provenance] += 1
-        if unit in object_rows:
-            object_rows[unit]["supplemental_linker_metadata"].append({
-                "name": row["name"],
-                "rva": row["rva"],
-                "size": row["size"],
-                "storage": row["storage"],
-                "scope": row.get("scope") or "",
-                "provenance": row.get("provenance") or "",
-                "candidate_class": candidate_provenance,
-            })
-        if duplicate_definitions:
-            duplicate_rows.append({
-                "supplemental_name": row["name"],
-                "supplemental_unit": unit,
-                "supplemental_rva": row["rva"],
-                "supplemental_storage": row["storage"],
-                "provenance": row.get("provenance") or "",
-                "source_definitions": [asdict(value)
-                                       for value in sorted(duplicate_definitions)],
-            })
-        if named_definition is not None:
-            differences = []
-            if unit != named_definition.unit:
-                differences.append("unit")
-            if row["rva"] != named_definition.rva:
-                differences.append("rva")
-            expected_storage = object_rows.get(named_definition.unit, {}).get(
-                "candidate_storage", {}).get(row["name"], set())
-            if expected_storage and row["storage"] not in expected_storage:
-                differences.append("storage")
-            if differences:
-                disagreement_rows.append({
-                    "supplemental_name": row["name"],
-                    "source_name": named_definition.name,
-                    "supplemental_unit": unit,
-                    "source_unit": named_definition.unit,
-                    "supplemental_rva": row["rva"],
-                    "source_rva": named_definition.rva,
-                    "supplemental_storage": row["storage"],
-                    "candidate_storage": sorted(expected_storage),
-                    "differences": differences,
-                    "source_location": named_definition.location,
-                })
 
     # Sets are retained above for comparisons only; JSON gets stable lists.
     for row in object_rows.values():
@@ -516,21 +444,15 @@ def provenance_census(units, base_root, source_root, supplemental_path,
         "candidate_data_covered": sum(
             item["count"] for row in object_rows.values()
             for item in row["candidate_data_covered"]),
-        "candidate_compiler_private": sum(
+        "candidate_private": sum(
             item["count"] for row in object_rows.values()
-            for item in row["candidate_compiler_private"]),
-        "supplemental_rows": len(supplemental),
-        "supplemental_by_provenance": dict(sorted(supplemental_counts.items())),
-        "supplemental_by_candidate_class": dict(sorted(supplemental_classes.items())),
-        "source_data_duplicates_in_supplemental": len(duplicate_rows),
-        "source_data_supplemental_disagreements": len(disagreement_rows),
+            for item in row["candidate_private"]),
+        "source_compgen_rows": len(compgen_rows),
         "duplicate_source_rvas": len(source_duplicate_rvas),
     }
     return {
         "summary": summary,
         "objects": object_rows,
-        "supplemental_duplicates": duplicate_rows,
-        "supplemental_disagreements": disagreement_rows,
         "duplicate_source_rvas": source_duplicate_rvas,
         "unmatched_source_manifest": unmatched_source_manifest,
         "candidate_source_identities_missing": candidate_source_identities_missing,
@@ -579,6 +501,7 @@ def _source_manifest_rows(path):
                 "unit": row["object"].replace("\\", "/").removesuffix(".c"),
                 "name": row["name"],
                 "rva": int(row["rva"], 0),
+                "provenance": row.get("provenance", ""),
             })
         return rows
 
@@ -826,8 +749,8 @@ def _path(root, unit, suffix):
 
 def build_census(units, base_root, target_root, base_suffix=".obj",
                  target_suffix=".c.obj", source_root=None,
-                 supplemental_path=None, symbols_path=None,
-                 source_manifest_path=None, data_manifest_path=None):
+                 symbols_path=None, source_manifest_path=None,
+                 data_manifest_path=None):
     data_names, function_names = _candidate_symbol_inventory(
         units, base_root, base_suffix, symbols_path, data_manifest_path)
     objects = []
@@ -924,14 +847,11 @@ def build_census(units, base_root, target_root, base_suffix=".obj",
     }
     if source_root is not None:
         provenance = provenance_census(
-            units, base_root, source_root, supplemental_path,
-            source_manifest_path,
+            units, base_root, source_root, source_manifest_path,
             base_suffix)
         payload["provenance"] = provenance
         summary["provenance"] = provenance["summary"]
         canonical_hard_errors += (
-            provenance["summary"]["source_data_duplicates_in_supplemental"] +
-            provenance["summary"]["source_data_supplemental_disagreements"] +
             provenance["summary"]["duplicate_source_rvas"] +
             provenance["summary"]["source_manifest_unmatched"] +
             provenance["summary"]["source_definitions_without_manifest_identity"] +
@@ -968,13 +888,10 @@ def _print_summary(payload, output):
     provenance = summary.get("provenance")
     if provenance is not None:
         print(
-            "provenance DATA/private/supplemental: %d/%d/%d; "
-            "duplicates/disagreements: %d/%d" % (
+            "provenance DATA/DATA_COMPGEN/private: %d/%d/%d" % (
                 provenance["candidate_data_covered"],
-                provenance["candidate_compiler_private"],
-                provenance["supplemental_rows"],
-                provenance["source_data_duplicates_in_supplemental"],
-                provenance["source_data_supplemental_disagreements"]))
+                provenance["source_compgen_rows"],
+                provenance["candidate_private"]))
 
 
 def main(argv=None):
@@ -985,8 +902,6 @@ def main(argv=None):
                         default=Path("build/objdiff/base"))
     parser.add_argument("--target-root", type=Path, default=Path("build/delink"))
     parser.add_argument("--source-root", type=Path, default=Path("src"))
-    parser.add_argument("--supplemental", type=Path,
-                        default=Path("build/gen/delink_data_from_supplemental.tsv"))
     parser.add_argument("--symbols", type=Path,
                         default=Path("build/gen/symbol_names.csv"))
     parser.add_argument("--source-manifest", type=Path,
@@ -1008,8 +923,8 @@ def main(argv=None):
         payload = build_census(
             _load_units(units_path), _resolve(args.base_root),
             _resolve(args.target_root), args.base_suffix, args.target_suffix,
-            _resolve(args.source_root), _resolve(args.supplemental),
-            _resolve(args.symbols), _resolve(args.source_manifest),
+            _resolve(args.source_root), _resolve(args.symbols),
+            _resolve(args.source_manifest),
             _resolve(args.data_manifest))
     except (OSError, ValueError, tomllib.TOMLDecodeError) as error:
         parser.error(str(error))

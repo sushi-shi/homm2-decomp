@@ -1,227 +1,111 @@
 # Candidate COFF data topology
 
-`python3 -m homm2.build.candidate_data_manifest` inventories definitions directly from each
-compiled candidate object. Candidate COFF proves symbol names, local/external scope, storage
-class, section-relative topology, alignment, and relocation spelling. Retail PE bytes and NB09
-public symbol RVAs and `sstModule` contribution ranges remain authoritative for addresses and
-contents. The shipping NB09 stream has no game procedure, local, type, or line records; this
-process does not infer any of those from CodeView.
+Candidate objects and retail evidence have different jobs. Candidate COFF proves
+symbol spelling, local/external storage class, section ordinal and offset, alignment,
+allocation order, and relocation topology. The retail PE, NB09 contribution ranges,
+bytes, and relocations prove placement and contents. CodeView publics are anchors, but
+do not prove private identity, extent, TU ownership, or storage layout.
 
-The primary mapper replays candidate sections into independent `.rdata`, `.data`, and `.bss`
-streams in COFF section-table order with their encoded alignment. A retail contribution start plus
-the replayed section/symbol offset derives private RVAs directly. NB09 public RVAs are hard anchors;
-candidate DIR32 versus retail HIGHLOW sites and literal payload bytes validate identity. When the
-current source has a real stream-layout divergence, the individual-evidence mapper records only a
-hard public RVA, a unique aligned relocation proof, or a unique literal payload occurrence.
-Ambiguity, overlap, a missing definition, or an uncovered reference leaves the whole group open.
-Those individual placements may enter the review queue with their contradictions, but never a
-canonical manifest or target.
+The primary mapper replays candidate sections into independent `.rdata`, `.data`, and
+`.bss` streams in COFF section-table order with their encoded alignment. Public RVAs,
+unique literal payloads, and relocation/addend bijections may prove individual retail
+placements. Ambiguity, overlap, missing definitions, and uncovered references remain
+diagnostics. Linker-sorted `.CRT$...` subsections are assigned only from an unambiguous
+physical retail contribution of the same owner, domain, and size.
 
-This proves allocation identity and placement; it does not inspect the relocation
-operand in retail code. The retail PE does provide that missing fact, so it is an
-error to infer a code-to-allocation edge from payload/topology pairing when the
-operand is available. The direct retail-PE operand audit (`assert_relocs --pe-data`)
-reads that edge authoritatively. PHILAI's former `1.1f` reconstruction is the
-regression fixture: the old analysis paired an anonymous candidate allocation with
-equal `1.1f` bytes, but failed to check that the retail instruction actually points
-to the retained `1.5f` allocation. The synthesized delinked target is not an
-original retail object and cannot override the shipping operand or establish that
-retail emitted an additional dead slot.
+Candidate discovery is not a canonical naming source. Counter spellings such as
+`$SG39045`, `$T40070`, and `name$S123` are compiler state, not semantic identities.
+The generated Vostok manifest comes only from source annotations:
 
-The same rule applies to identical zero-fill owners. `BASE/iconf2by` has 18 distinct
-four-byte private BSS objects with identical payloads. Candidate section-order
-translation produced a closed allocation group but attached the semantic names to
-the wrong retail addresses, making 66 valid candidate references appear novel.
-Repeated retail setup and decoder operands determine the full owner permutation;
-those code-edge placements, not section order, are the reviewed identities.
+- `DATA(rva)` marks an ordinary named definition. Clang supplies its declaration name,
+  type, and logical `sizeof`.
+- `VTBL(Class, rva)` and `VTBL2(Derived, Base, rva)` mark primary and secondary
+  vtables; the tooling derives the MSVC decorated identity.
+- `DATA_COMPGEN(rva, semanticName, value)` marks an anonymous compiler-generated
+  allocation. The annotation owns the retail RVA, semantic identity, value expression,
+  and inferred logical size. Candidate COFF supplies physical topology and scope.
+- `DATA_COMPGEN_GUARD(rva, semanticName, owner)` marks a compiler-emitted initialization
+  guard whose value is implicit.
 
-Linker-sorted `.CRT$...` subsections do not participate in ordinary `.data` cursor replay. The
-mapper assigns one only when the same owner has exactly one physical retail contribution with the
-same writable domain and size, then removes that contribution from ordinary replay. A missing or
-ambiguous contribution leaves the subsection explicitly unassigned.
+`DATA_COMPGEN` is intentionally explicit. A source string occurrence alone has no final
+RVA and identical literals may be pooled or repeated, so automatic string inference does
+not establish retail identity. The semantic name describes the allocation's role in its
+TU; it must not copy an unstable COFF counter. The generated Vostok spelling is
+`__h2cg$<unit>$data$<semanticName>`. One semantic identity is allowed per TU and one
+compiler-generated identity per RVA. Repeated expansions of one source macro definition
+coalesce; different names at one RVA are rejected.
 
-The direct candidate-tool manifest records closed-group section offsets and symbol scope as
-discovery evidence only. It is not reviewed and is never a delinker input in the canonical path.
-The pinned delinker consumes the separate source-annotation-plus-reviewed-supplemental
-manifest, resolves interior references as owner plus addend, and errors if a relocation
-reaches an uncovered address.
-Undefined candidate externs remain undefined; retail storage is never copied into the referring
-object.
+For example:
 
-The compatibility option `--recover-data-relocs-from-pdb` retains permissive nearest-PDB-symbol
-recovery. It now preserves read-only `.rdata`, initialized `.data`, and zero-fill `.bss` storage;
-it can still produce synthetic `const_` or string identities and is not proof for canonical data
-ownership.
+```cpp
+stream = fopen(DATA_COMPGEN(
+    0x00520364, bsOpenReadStream, "rb"));
 
-`--require-all` turns the inventory command into a discovery-closure gate: it writes no manifest
-and exits unsuccessfully if any candidate data-bearing group remains open. Without that flag the
-tool emits only independently closed groups for diagnostics. That partial output is neither a
-canonical input nor evidence that the program-wide topology is complete.
-`--diagnostics-output` always writes a stable JSON queue, including overlapping cause and storage
-counts, even when `--require-all` refuses to write the manifest.
+duration *= DATA_COMPGEN(
+    0x004eb638, attackDurationSpeedScale, 0.08);
 
-## Target lifecycle
+DATA_COMPGEN_GUARD(
+    0x004ec004, sVSearchArrayInitializationGuard, SVSearchArray)
+```
 
-`homm2 init` has two distinct modes. Before canonical manifests exist, it creates a permissive
-bootstrap target using `--recover-data-relocs-from-pdb`; that target exists only so candidate
-objects can be compiled and inspected. Once source annotations and the reviewed supplemental
-manifest are available, init assembles their exact generated union and reproduces the strict
-target from it.
+The annotation expands to the original value in both supported compilers and therefore
+does not create a declaration. The value spelling must express the emitted allocation's
+type: for example, an x87 `fmull` pool entry is written as `0.0`, not `0.0f`, even when
+the eventual assignment narrows to `float`. The parser handles string literals, numeric
+literals, casts, and project macros directly. It invokes the configured Clang
+only for context-dependent expressions and caches per-TU results using the source,
+headers, compile database, candidate object, and parser implementation.
 
-The explicit topology commands are:
+The binder first validates the source-inferred payload and logical extent against retail
+bytes. It then uses candidate anonymous-symbol class, storage, ordered relocations,
+section replay, public anchors, and unique placement evidence to find one candidate
+definition. Exact decorated string extents take priority. If multiple remaining objects
+are physically indistinguishable, candidate stream order is paired with retail RVA order.
+The output keeps the source semantic name and retail RVA while taking section ordinal,
+section offset, alignment, storage, and local/external scope from that candidate.
 
-- `homm2 data-topology audit` is the normal iterative entrypoint. It runs Ninja's parallel,
-  incremental `all` target to refresh candidate COFFs, assembles the canonical source
-  annotations plus reviewed-supplement inputs, derives the review queue once, and refreshes
-  whole-image coverage.
-  It never regenerates or replaces target objects. `--jobs N` controls Ninja parallelism;
-  `--strict` fails while any symbol group, section assignment, or coverage diagnostic remains.
-  MSVC compiler-local counters are not canonical identities. A counter-only `$SG`, `$T`, or
-  `name$S<number>` drift is accepted without rewriting the reviewed manifest only when the fixed
-  target and current candidate have the same private-symbol family at the exact section
-  ordinal/offset and canonical payload/relocation identity. Structural or content changes still
-  fail and require review.
-- `homm2 data-topology census` compares every configured candidate object with its fixed delinked
-  target and writes `build/gen/data_topology_census.json`. It treats symbol names and complete COFF
-  topology records as multisets, so duplicated target symbols remain visible. `missing` means an
-  expected candidate identity is absent from the target; `extra` means a target-only identity. The
-  report includes per-object and whole-tree common/union counts and both lists with multiplicity,
-  defined/common/undefined state, data section, local/global scope, raw storage-class mismatches,
-  and `const_`/`string_`/`data_`/`bss_` inventories. Exact topology records are proved mappings;
-  same-name records with different definition/scope/storage topology are reported separately as
-  provisional real mappings. These are review diagnostics only; the canonical symbol manifest and
-  target may contain only source annotations and explicitly reviewed supplemental rows. `const_`,
-  `string_`, `data_`, `bss_`, `empty_stub`, and `[section-N]` fallback identities are always hard
-  errors.
+A normal assembly warns and omits a missing or ambiguous compiler-generated binding so
+iterative work can continue. Strict assembly fails. It never guesses an identity or emits
+`const_*`, `string_*`, `data_*`, `bss_*`, or another fallback spelling.
 
-  Symbol equality is not sufficient for an exact object. A separate raw COFF data-section
-  multiset retains section-table ordinal/order, duplicate raw names such as Midi's COMDAT `.data`
-  contributions, size, characteristics, decoded alignment, COMDAT selection/associative parent,
-  relocation count, and section-definition symbol plus auxiliary metadata. It never uses objdiff's
-  synthesized `[.data-N]` display labels. Exact-object status requires both symbol and section
-  topology equality; section drift is also a strict hard error. The default iterative mode exits
-  successfully after writing all available diagnostics; `--strict` fails on a missing/invalid
-  object, any target fallback identity, or any real identity without a counterpart. Input roots,
-  suffixes, unit manifest, and output path are command-line options so the same COFF audit can be
-  run against another build tree.
+## Generated manifests and lifecycle
 
-  The same JSON keeps allocation provenance separate. A shared Clang `VarDecl` inventory attaches
-  each token-aware `DATA()` marker to exactly one definition and records its logical `sizeof`.
-  Candidate definitions which map to those source names are reported as DATA-covered; remaining
-  candidate definitions are compiler-private derived topology. Rows in
-  `config/delink_data_supplemental.tsv` are supplemental linker metadata only. A supplemental row which
-  repeats a canonical source-annotated allocation, or disagrees with its owner/RVA/storage
-  evidence, is a hard error rather than a second definition. Normal assembly preserves reviewed supplemental rows
-  byte-for-byte. Semantic/public names remain exact. For local compiler-private counters only, an
-  exact-coordinate fallback additionally requires unchanged size/storage/alignment/scope and a
-  matching canonical payload plus relocation identity against the fixed reviewed target object.
-  Any unproved rename or topology/content change fails. Explicit `--migrate-from` remains available
-  for a real reviewed identity/topology change, whose versioned output must be reviewed before use.
-  Ordinary COFF symbols do not carry logical sizes, so a reviewed size may be smaller than the
-  physical span to the next symbol; assembly preserves that size and requires it to fit the span.
-  `--source-root`, `--supplemental`, and `--symbols` select these inputs for another tree.
-- `homm2 data-topology assemble` creates all HoMM2-specific Vostok inputs. It resolves every source
-  definition to one exact candidate decorated symbol, COFF section ordinal and value, scope, and
-  storage class. The generated `build/gen/delink_data_from_source.tsv` and versioned
-  `config/delink_data_supplemental.tsv` are validated separately, then merged without logical
-  duplicates or overlaps into `build/gen/delink_data_manifest.tsv`. Logical `sizeof` is never
-  replaced by a padded next-symbol span; padding exists only in section size/alignment.
+`homm2 data-topology assemble` writes both
+`build/gen/delink_data_from_source.tsv` and
+`build/gen/delink_data_manifest.tsv`. They must be byte-for-byte equivalent row sets:
+there is no versioned private-data supplement and no second naming ledger. The section,
+breakpoint, contribution, and coverage manifests under `build/gen` retain the physical
+candidate model and retail placement evidence used by Vostok.
 
-  `build/gen/delink_data_sections.tsv` preserves every candidate section ordinal, including
-  multiple same-name COMDAT sections, characteristics, alignment, selection, and associative
-  parent. An affine section records one retail RVA used as its byte-copy source. A fully reviewed
-  non-affine section records `rva=-` while retaining its storage class: Vostok creates the exact
-  candidate COFF section, zero-fills gaps, and copies each enrolled definition and its relocations
-  from that definition's independent reviewed retail RVA. Non-data sections remain explicit `-`
-  placeholders with no storage class. Candidate-offset bounds and overlaps are hard errors.
+An affine candidate section records one retail copy RVA. A fully modeled non-affine
+section records `rva=-`; Vostok creates the candidate-shaped section, zero-fills gaps,
+and copies each enrolled definition and relocation from its independently reviewed
+retail RVA. Candidate-offset overflow, overlap, storage disagreement, and uncovered
+relocation targets are hard errors. Padding is section topology, never a symbol.
 
-  The companion `build/gen/delink_data_breakpoints.json` separates blocking assignment
-  diagnostics from exact non-affine classifications. Candidate-order replay remains discovery
-  evidence for sections without complete reviewed definitions. A unique complete reviewed base
-  overrides replay and is not required to retain the candidate input section alignment: NB09
-  contribution ranges exclude final-link padding. `--strict` rejects unresolved sections, not
-  reviewed non-affine placement. The generated contribution and whole-image
-  coverage manifests remain hard regeneration inputs under `build/gen`; they are not copied into
-  version control. The Clang DATA inventory is cached under `build/gen` per TU, keyed by source,
-  recursively resolved project/vendor headers, candidate object, compile database, and parser
-  implementation. Missing objects disable reuse; source or header changes reparse the affected TU.
-  Final linking consumes the same reviewed coordinates through a disposable projection described
-  in [`delinker-contribution-manifest.md`](delinker-contribution-manifest.md). This restores retail
-  allocation order without changing the candidate-shaped objects used for objdiff.
-- `homm2 data-topology propose` writes only structured candidate diagnostics and
-  `build/gen/data_topology_review_queue.tsv`. The queue is deliberately not a Vostok manifest: its
-  header adds evidence kind, proof count, group blockers, and group contradictions. It contains
-  real candidate identities absent from the canonical source-annotation-plus-supplemental union
-  when an individual placement has public-RVA, aligned relocation/addend, unique literal-payload, or
-  section-replay evidence. An open group does not erase that evidence, but its contradictions ride
-  every proposed row. Unmapped rows remain diagnostic-only. Synthetic/fallback identities are
-  filtered, and canonical identities are omitted. `row_kind=allocation-symbol` makes explicit that
-  the current queue contains COFF allocation symbols; aliases and section-definition metadata are
-  not flattened into fake allocations and remain in topology diagnostics until separately modeled.
-  A group whose every candidate definition already has an exact source-annotation or reviewed
-  supplemental row is closed directly from that canonical evidence after candidate section,
-  offset, storage, scope, alignment, and extent validation. This permits a reviewed retail owner
-  order to differ from candidate allocation order without asking for the same rows again.
+The command roles are:
 
-  Proposal does not refresh coverage, source-annotation, combined symbol/section, contribution,
-  or target artifacts. The queue is review input only: it is never read by promote, finalize, regenerate, or
-  the delinker, and its rows are never auto-promoted.
-- `homm2 data-topology promote` refreshes diagnostics and coverage evidence, then regenerates the
-  canonical symbol/section manifests strictly from source `DATA()`, `VTBL()`, and `VTBL2()`
-  annotations plus the explicitly reviewed `config/delink_data_supplemental.tsv`. Candidate facts
-  and the review queue cannot enter
-  that union. Promote does not replace target objects.
-- `homm2 data-topology finalize` is the program-wide closure gate. It writes no canonical manifest
-  unless every candidate group is closed and the `.text`, retail file, loaded-RVA, and TU-data
-  partition audits have zero blockers.
-- The only versioned storage-topology supplement is `config/delink_data_supplemental.tsv`; the
-  source tree is the canonical input for annotated definitions. Reviewed COFF relocation spellings
-  are independent and live in `config/delink_reloc_aliases.tsv`. Reviewed non-function `.text`
-  ranges are independently modeled in `config/delink_text_exclusions.csv`.
-- `homm2 data-topology regenerate` deterministically rebuilds the generated inputs and atomically
-  replaces `build/delink`. Its provenance stamp hashes every config, the retail executable, the
-  synthetic delinker-input PDB, and the pinned delinker executable. Its data symbols come only from
-  source annotations plus reviewed supplemental rows; it never reads the review queue or the legacy
-  direct-tool `candidate_delink_data.tsv` output. Proposal evidence comes from candidate COFF,
-  retail PE/contribution bytes, NB09 public RVAs, and retail relocations, never from the old delinked
-  target's `const_*` or `empty_stub` identities.
-  It passes the reviewed relocation-alias config directly to Vostok; candidate-derived alias
-  proposals under `build/gen/` are never canonical input.
+- `audit` refreshes candidate objects, generated source manifests, diagnostics, and
+  coverage without replacing the delinked target. `--strict` requires closure.
+- `census` compares candidate and target COFF symbol/section topology as multisets and
+  reports source `DATA` and generated `DATA_COMPGEN` provenance separately.
+- `propose` writes a diagnostic-only review queue. Nothing reads it as canonical input.
+- `promote` refreshes generated evidence from source annotations only.
+- `finalize` requires all symbol, section, contribution, and coverage diagnostics to be
+  closed.
+- `regenerate` rebuilds generated inputs and atomically replaces `build/delink`; it has
+  no unresolved-data fallback.
 
-Normal `homm2 build` and `homm2 status` consume the fixed target. They never run the candidate
-mapper, rewrite a topology config, or refresh target objects. If a canonical input changes, they
-fail with an explicit regeneration instruction.
+Normal `homm2 build` and `homm2 status` consume the fixed target. They never derive a
+candidate identity or rewrite target objects. If canonical inputs change, regeneration
+must be requested explicitly.
 
-Canonical regeneration has no unresolved-data fallback. Every emitted data relocation must resolve
-through the generated symbol and section manifests.
+During reconstruction, annotations stay next to the expression or definition whose
+semantics they record. This supports half-built TUs because source supplies the semantic
+claim while missing candidate evidence is only a normal-mode warning. After the entire
+project is matched, a cleanup branch may mechanically extract all `VA`, `VA_COMPGEN`,
+`DATA`, `DATA_COMPGEN`, `VTBL`, and related annotations into generated tables. That is a
+representation-only finalization step, not a second source of truth during decompilation.
 
-The coverage manifest contains independent exact partitions. `file` covers every byte from offset
-zero through the end of the appended debug payload, including headers, raw sections, alignment,
-FPO/MISC records, and the embedded NB09 stream. `loaded` covers RVA zero through `SizeOfImage`,
-including every section and virtual alignment/BSS tail. `text` is emitted only by the existing
-fail-closed procedure/jump-table/exclusion/padding audit. `tu-data` partitions every configured
-`.rdata`, initialized `.data`, and zero-fill `.bss` contribution into literal, constant, allocation,
-or explicit zero-padding records. Nonzero gaps, overlaps, cross-owner allocations, unowned publics,
-invalid HIGHLOW sites/targets, or any text evidence failure block promotion.
-Canonical coverage consumes the same generated, candidate-classified contribution manifest passed
-to Vostok; it never silently reverts to the raw PE-boundary split during promotion.
-
-## Checkpoint census
-
-The recorded candidate census contains 6,734 definitions: 1,232 resolve to source `DATA()` and 5,502
-are non-DATA candidate allocations. The reviewed supplemental manifest covers 634 of the latter,
-leaving 4,868 unreviewed definitions. This denominator includes public data, compiler-local statics,
-string literals, constant pools, vtables, and other compiler-emitted definitions.
-
-At the reviewed checkpoint, every row in the independently closed candidate-tool manifest already
-exists in the canonical union, so subtracting only closed groups would produce an empty review
-queue. The proposal command therefore also surfaces individually evidenced placements from open
-groups while retaining their blockers. Definitions without individual candidate-plus-retail
-evidence remain only in the JSON group diagnostics; the old target is never used to fill this gap.
-
-`BASE/Icondf2b` is the regression fixture. Its 37 candidate/retail `DIR32` sites, including two
-public `uDimPal` anchors, prove a bijection for all thirteen four-byte function statics. The target
-now emits their exact `_gFD*$S...` names and candidate offsets in a 52-byte BSS section, replacing
-the former `const_001381xx` and unrelated string identities. Its focused score changes from
-80.283134% to 81.06626% under `data_value` and to 81.03615% under `name_address`; the ordinary code
-score remains 81.1265%.
+The permissive Vostok option `--recover-data-relocs-from-pdb` remains bootstrap-only. It
+may create synthetic nearest-symbol identities and is never canonical ownership evidence.
