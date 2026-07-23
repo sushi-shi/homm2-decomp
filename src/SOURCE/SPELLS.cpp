@@ -97,9 +97,9 @@ H2_ENUM_BEGIN(SpellBoltConstant)
 H2_ENUM_END(SpellBoltConstant)
 
 H2_ENUM_BEGIN(SpellAreaConstant)
-    FIREBLAST_SOUTHEAST_FIRST_RING = IDX(COMBAT_DIRECTION_SOUTHEAST) + 1,
-    FIREBLAST_NORTHWEST_FIRST_RING = IDX(COMBAT_DIRECTION_NORTHWEST) + 1,
-    ELEMENTAL_WEAKNESS_MULTIPLIER  = 2
+    FIREBLAST_EAST_FIRST_RING     = IDX(COMBAT_DIRECTION_EAST) + 1,
+    FIREBLAST_WEST_FIRST_RING     = IDX(COMBAT_DIRECTION_WEST) + 1,
+    ELEMENTAL_WEAKNESS_MULTIPLIER = 2
 H2_ENUM_END(SpellAreaConstant)
 
 H2_ENUM_BEGIN(VaporizeConstant)
@@ -150,6 +150,17 @@ H2_ENUM_BEGIN(LuckConstant)
     LUCK_LEFT_FACING_FLIP_X  = 200,
     LUCK_DIAGONAL_DIVISOR    = 2
 H2_ENUM_END(LuckConstant)
+
+#ifdef HOMM2_STRICT_ENUM_TYPES
+inline BoltColorMode LuckBoltColor(i32 targetX, i32 startX) {
+    return targetX >= startX ? BOLT_COLOR_RAINBOW_REVERSE : BOLT_COLOR_RAINBOW_FORWARD;
+}
+#else
+#define LuckBoltColor(targetX, startX)                                                        \
+    (BOLT_COLOR_RAINBOW_REVERSE                                                              \
+     + (((((targetX) | 0) >= (startX)) - 1)                                                  \
+        & (BOLT_COLOR_RAINBOW_FORWARD - BOLT_COLOR_RAINBOW_REVERSE)))
+#endif
 
 H2_ENUM_BEGIN(EarthquakeConstant)
     EARTHQUAKE_CHANCE_ROLL_MAX   = 100,
@@ -1289,7 +1300,6 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     army* target_n;
     i32 targetX_n;
     i32 frame_i;
-    CombatHexDirection direction;
     i32 targetY_p;
     i16 affectedHexes_e[SPELL_FIREBALL_AFFECTED_HEX_COUNT];
     i32 anyAffected_g;
@@ -1309,7 +1319,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             frameCount_i = SPELL_COLD_RING_FRAME_COUNT;
         }
 
-        for (frame_i = 0; frame_i < frameCount_i; ++frame_i) {
+        for (frame_i = 0; frameCount_i > frame_i; ++frame_i) {
             glTimers[0] = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
             );
@@ -1356,15 +1366,20 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (spell != SPELL_COLD_RING)
         affectedHexes_e[0] = static_cast<i16>(targetHex);
 
-    for (direction = COMBAT_DIRECTION_NORTHEAST;
-         IDX(direction) < SPELL_ADJACENT_DIRECTION_COUNT;
-         ++direction) {
-        affectedHexes_e[IDX(direction) + 1] =
-            static_cast<i16>(GetAdjacentCellIndexNoArmy(targetHex, direction));
+    for (frame_i = IDX(COMBAT_DIRECTION_NORTHEAST);
+         frame_i < SPELL_ADJACENT_DIRECTION_COUNT;
+         ++frame_i) {
+        affectedHexes_e[frame_i + 1] = static_cast<i16>(
+            GetAdjacentCellIndexNoArmy(
+                targetHex,
+                static_cast<CombatHexDirection>(frame_i)
+            )
+        );
         if (spell == SPELL_FIREBLAST) {
-            affectedHexes_e[IDX(direction) + SPELL_FIREBLAST_SECOND_RING_FIRST] = static_cast<i16>(
+            affectedHexes_e[frame_i + SPELL_FIREBLAST_SECOND_RING_FIRST] = static_cast<i16>(
                 target_n->GetAdjacentCellIndex(
-                    affectedHexes_e[IDX(direction) + 1], direction
+                    affectedHexes_e[frame_i + 1],
+                    static_cast<CombatHexDirection>(frame_i)
                 )
             );
         }
@@ -1380,19 +1395,19 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             affectedHexes_e[SPELL_FIREBLAST_AXIAL_SECOND] = COMBAT_HEX_EMPTY;
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FIRST] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[FIREBLAST_SOUTHEAST_FIRST_RING], COMBAT_DIRECTION_NORTHEAST
+                affectedHexes_e[FIREBLAST_EAST_FIRST_RING], COMBAT_DIRECTION_NORTHEAST
             ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_SECOND] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[FIREBLAST_SOUTHEAST_FIRST_RING], COMBAT_DIRECTION_SOUTHEAST
+                affectedHexes_e[FIREBLAST_EAST_FIRST_RING], COMBAT_DIRECTION_SOUTHEAST
             ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_THIRD] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[FIREBLAST_NORTHWEST_FIRST_RING], COMBAT_DIRECTION_NORTHWEST
+                affectedHexes_e[FIREBLAST_WEST_FIRST_RING], COMBAT_DIRECTION_NORTHWEST
             ));
         affectedHexes_e[SPELL_FIREBLAST_CORNER_FOURTH] =
             static_cast<i16>(GetAdjacentCellIndexNoArmy(
-                affectedHexes_e[FIREBLAST_NORTHWEST_FIRST_RING], COMBAT_DIRECTION_SOUTHWEST
+                affectedHexes_e[FIREBLAST_WEST_FIRST_RING], COMBAT_DIRECTION_SOUTHWEST
             ));
     }
 
@@ -3269,7 +3284,7 @@ void combatManager::DoLuck(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex) {
         0,
         LUCK_BOLT_WIDTH,
         LUCK_BOLT_WIDTH,
-        targetX_k >= startX_b ? BOLT_COLOR_RAINBOW_FORWARD : BOLT_COLOR_RAINBOW_REVERSE,
+        LuckBoltColor(targetX_k, startX_b),
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_ANGLE,
         LUCK_BOLT_DISTANCE,
