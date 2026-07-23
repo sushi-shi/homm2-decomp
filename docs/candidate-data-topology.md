@@ -54,13 +54,15 @@ type: for example, an x87 `fmull` pool entry is written as `0.0`, not `0.0f`, ev
 the eventual assignment narrows to `float`. The parser handles string literals, numeric
 literals, casts, and project macros directly. It invokes the configured Clang
 only for context-dependent expressions and caches per-TU results using the source,
-headers, compile database, candidate object, and parser implementation.
+headers, compile database, and both parser implementations. Candidate objects are
+bound after parsing and are therefore not part of this source-claim cache.
 
 The binder first validates the source-inferred payload and logical extent against retail
-bytes. It then uses candidate anonymous-symbol class, storage, ordered relocations,
-section replay, public anchors, and unique placement evidence to find one candidate
-definition. Exact decorated string extents take priority. If multiple remaining objects
-are physically indistinguishable, candidate stream order is paired with retail RVA order.
+bytes. It then uses candidate anonymous-symbol class, storage, section replay, public
+anchors, and placement evidence already derived from retail/candidate relocation analysis
+to find one candidate definition. Exact decorated string extents take priority. If
+multiple remaining objects are physically indistinguishable, candidate stream order is
+paired with retail RVA order.
 The output keeps the source semantic name and retail RVA while taking section ordinal,
 section offset, alignment, storage, and local/external scope from that candidate.
 
