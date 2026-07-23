@@ -1,4 +1,4 @@
-"""homm2 CLI - python -m homm2 {init|configure|build|link|status}."""
+"""homm2 reconstruction CLI."""
 import os, subprocess, sys
 from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
@@ -11,6 +11,10 @@ def main(argv=None):
     cmd = argv[0] if argv else "help"; rest = argv[1:]
     if cmd == "init":
         from homm2.init import main as m; return m(rest)
+    if cmd == "redelink":
+        from homm2.redelink import main as m; return m(rest)
+    if cmd == "model-drift":
+        from homm2.build.symbol_model_drift import main as m; return m(rest)
     if cmd == "configure":
         return sh("python3", "configure.py")
     if cmd == "clangd":
@@ -55,6 +59,8 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.runtime_fid", "--check"): return 1
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
+        # Fast and warning-only: half-built TUs may intentionally need a later redelink.
+        sh("python3", "-m", "homm2.build.symbol_model_drift")
         if sh("python3", "-m", "homm2.build.annotated_functions", "--check",
               "--objects", "build/objdiff/base"): return 1
         # HARD gates: every declaration comes from a header (no drift), and every emitted
@@ -90,6 +96,6 @@ def main(argv=None):
         from homm2.analysis.sema import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|configure|build|link|link-layout|clangd|format|constants|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|redelink|model-drift|configure|build|link|link-layout|clangd|format|constants|strict-allocations|data-relocs|data-topology|status|relocs|sema|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

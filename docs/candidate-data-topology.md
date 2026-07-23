@@ -87,6 +87,10 @@ relocation targets are hard errors. Padding is section topology, never a symbol.
 
 The command roles are:
 
+- `homm2 redelink` refreshes function manifests and the synthetic PDB, builds current
+  candidate objects, performs strict data assembly, invokes Vostok, atomically replaces
+  `build/delink`, and reconfigures the comparison graph. This is the normal explicit
+  command after introducing a new modeled symbol.
 - `audit` refreshes candidate objects, generated source manifests, diagnostics, and
   coverage without replacing the delinked target. `--strict` requires closure.
 - `census` compares candidate and target COFF symbol/section topology as multisets and
@@ -101,6 +105,15 @@ The command roles are:
 Normal `homm2 build` and `homm2 status` consume the fixed target. They never derive a
 candidate identity or rewrite target objects. If canonical inputs change, regeneration
 must be requested explicitly.
+
+After compilation, `homm2 build` runs a fast warning-only inventory comparison. It reads
+candidate COFF and existing generated manifests but does not inspect retail placement,
+invoke Clang, assemble canonical inputs, or run Vostok. New or missing function/data
+definitions and fallback target identities print a `homm2 redelink` reminder without
+failing the build; strict modeling remains the responsibility of explicit redelinking.
+An MSVC `$S<number>` suffix on an ordinary source-named static is accepted because its
+`DATA` row supplies the semantic identity and exact candidate binding. Anonymous `$SG`,
+`$T`, `$E`, and fallback target identities are not accepted.
 
 During reconstruction, annotations stay next to the expression or definition whose
 semantics they record. This supports half-built TUs because source supplies the semantic
