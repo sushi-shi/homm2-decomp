@@ -7179,10 +7179,10 @@ void game::RestoreCell(
         && gpAdvManager->GetCell(x, y - 1)->m_triggerType != MAP_OBJECT_CASTLE) {
         cell->m_triggerType = 0;
         cell->m_objectMetadata = 0;
-    } else {
-        cell->m_triggerType = objectType;
-        cell->m_objectMetadata = barrier;
+        return;
     }
+    cell->m_triggerType = objectType;
+    cell->m_objectMetadata = barrier;
 }
 
 VA(0x004848bf, 0xe3)
