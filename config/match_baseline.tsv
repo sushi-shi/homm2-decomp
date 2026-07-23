@@ -32,7 +32,7 @@ BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	95.2000	58a382b37172
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	8d0d1d6cbd3e
 BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	92.4497	c7feeeabb5a3
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	7490095a6316
-BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	94.7174	382807a1bf06
+BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	100.0000	1cda229372ff
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	89.4979	f2b1504a7518
 BASE/Bzip	?DecodeData@@YIJPAD0K@Z	99.9293	5d0c79c31230
 BASE/Bzip	?EncodeData@@YIJPAD0K@Z	99.9266	63bc2e230607
