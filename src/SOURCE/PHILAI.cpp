@@ -5476,8 +5476,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     float shrinePowerMod_p;
     i32 resources_e[AI_PURCHASE_RESOURCE_COUNT];
 
-    if (!immediate && gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] != RV_UNSET)
-        return gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH];
+    if (!immediate && HeroRVAt(gaiHeroEventStratRVOfPos, x, y) != RV_UNSET)
+        return HeroRVAt(gaiHeroEventStratRVOfPos, x, y);
 
     gbReduceByReload = true;
     gbReduceByBerserk = true;
