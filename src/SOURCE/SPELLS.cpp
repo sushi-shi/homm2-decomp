@@ -2476,7 +2476,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
                     distance = static_cast<i32>(
                         sqrt(static_cast<double>(deltaX_e * deltaX_e + deltaY_n * deltaY_n))
                     );
-                    if (OD_STEER(distance) < closestDistance) {
+                    if (distance < closestDistance) {
                         closestDistance = distance;
                         closestHex_f = candidate_p->m_hex;
                     }
