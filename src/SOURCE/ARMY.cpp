@@ -1523,8 +1523,8 @@ void army::DoAttack(i32 retaliation) {
         gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index]++;
         gpCombatManager->m_limitCreatureCount[IDX(target_1->m_side)][target_1->m_index]++;
         if (breathTarget_6) {
-            breathTarget_6
-                ->m_index[gpCombatManager->m_limitCreatureCount[IDX(breathTarget_6->m_side)]]++;
+            gpCombatManager
+                ->m_limitCreatureCount[IDX(breathTarget_6->m_side)][breathTarget_6->m_index]++;
         }
         gpCombatManager->DrawFrame(0, 1, 0, 1, ARMY_COMBAT_FRAME_DELAY, 1, 1);
         targetOriginalFacing_5 = target_1->m_facing;
@@ -1677,7 +1677,7 @@ void army::DoAttack(i32 retaliation) {
         }
         PowEffect(COMBAT_EFFECT_INVALID, 0, -1, -1);
         gpCombatManager->CombatMessage(combatText, 1, 1, 0);
-        m_index[gpCombatManager->m_limitCreatureCount[IDX(m_side)]] = 1;
+        gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index] = 1;
 
         if (m_monsterType == CREATURE_GHOST) {
             m_quantity +=

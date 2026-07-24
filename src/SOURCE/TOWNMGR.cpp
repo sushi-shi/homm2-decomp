@@ -2586,6 +2586,8 @@ void townManager::SetupMage(heroWindow* window) {
     i32 hasLibrary_k;
     i32 lineCount_m;
     i32 unusedGuildFrame_n;
+    // Retail keeps one unreferenced four-byte local at EBP-0x48.
+    i32 unusedLocal_n;
 
     message_b.type = MESSAGE_WIDGET;
     if (m_town->m_occupyingHeroId == -1) {
@@ -2672,10 +2674,10 @@ void townManager::SetupMage(heroWindow* window) {
         }
     }
 
-    message_b.payload.widget.data.value = m_town->m_buildState - 1;
+    unusedGuildFrame_n = m_town->m_buildState - 1;
     message_b.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     message_b.payload.widget.id = TOWN_MAGE_GUILD_ICON_CONTROL;
-    unusedGuildFrame_n = message_b.payload.widget.data.value;
+    message_b.payload.widget.data.value = unusedGuildFrame_n;
     window->BroadcastMessage(message_b);
     sprintf(gText, DATA_COMPGEN(0x004ef2b8, setupMageMagegldCIcn, "magegld%c.icn"), cHeroTypeInitial[IDX(m_town->m_type)]);
     message_b.payload.widget.command = WIDGET_COMMAND_SET_ICON;
