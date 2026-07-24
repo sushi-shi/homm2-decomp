@@ -9794,6 +9794,14 @@ void advManager::ViewPuzzle(void) {
 
 VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
+    // Retail reserves six unreferenced four-byte locals before the implicit `this` slot.
+    i32 unusedPuzzle0;
+    i32 unused1;
+    i32 unused2;
+    i32 unused3;
+    i32 unused4;
+    i32 unused6;
+
     gbDrawingPuzzle = true;
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = false;
