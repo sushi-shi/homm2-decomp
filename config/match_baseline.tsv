@@ -650,7 +650,7 @@ SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3766	d77fb5a0f4d7
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.7906	4ff757e8e5b7
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	d35c05e10854
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
-SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	99.8000	3c566432facc
+SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	100.0000	1b0cb7be1ca7
 SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	23c1d15c2606
 SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	b122dcacbed9
 SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.2062	048284a2459a
