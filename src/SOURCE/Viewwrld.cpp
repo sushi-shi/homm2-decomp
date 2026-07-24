@@ -132,7 +132,6 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     if (viewWorldWindow == NULL)
         MemError();
 
-    i32 legendMode;
     viewIconNames[LEGEND_MINES] = DATA_COMPGEN(0x004f11f8, viewWorldMINE, "MINE");
     viewIconNames[LEGEND_RESOURCES] = DATA_COMPGEN(0x004f1200, viewWorldRSRC, "RSRC");
     viewIconNames[LEGEND_ARTIFACTS] = DATA_COMPGEN(0x004f1208, viewWorldRTFX, "RTFX");
@@ -140,11 +139,13 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     viewIconNames[LEGEND_HEROES] = DATA_COMPGEN(0x004f1218, viewWorldHROS, "HROS");
     viewIconNames[LEGEND_ALL] = DATA_COMPGEN(0x004f1220, viewWorldALL, "_ALL");
     viewIconNames[LEGEND_WORLD] = DATA_COMPGEN(0x004f1228, viewWorldWRLD, "WRLD");
-    if (whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0)
-        legendMode = LEGEND_WORLD;
-    else
-        legendMode = IDX(whatToDraw) - IDX(SPELL_VIEW_MINES);
-    sprintf(gText, DATA_COMPGEN(0x004f1230, viewWorldViewSIcn, "view%s.icn"), viewIconNames[legendMode]);
+    sprintf(
+        gText,
+        DATA_COMPGEN(0x004f1230, viewWorldViewSIcn, "view%s.icn"),
+        viewIconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
+                          ? LEGEND_WORLD
+                          : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
+    );
     dialogMessage.type = VIEW_WORLD_MESSAGE;
     dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
     dialogMessage.payload.widget.id = WORLD_ICON_WIDGET;
