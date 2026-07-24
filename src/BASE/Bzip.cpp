@@ -339,7 +339,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
 
     totalFrequency14 = m->totFreq;
     cumulativeLow8 = 0;
-    for (symbolIndex9 = 1; symbolIndex9 < OD_STEER(symbol); symbolIndex9++)
+    for (symbolIndex9 = 1; symbolIndex9 < symbol; symbolIndex9++)
         cumulativeLow8 += m->freq[symbolIndex9];
     cumulativeHigh2 = cumulativeLow8 + m->freq[symbol];
 
