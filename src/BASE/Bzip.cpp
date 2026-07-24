@@ -1867,8 +1867,8 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;
     i32 retVal;
-    FILE* fp;
-    i32l flen;
+    FILE* fp9;
+    i32l flen3;
 
     outputHandleJustInCase = NULL;
     bsInUse = 0;
@@ -1892,16 +1892,16 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     compress(fname);
 
     strcat(fname, DATA_COMPGEN(0x00520ca4, encodeDataNw, ".nw"));
-    fp = fopen(fname, DATA_COMPGEN(0x00520ca8, encodeDataRb, "rb"));
-    retVal = fseek(fp, 0, 2);
-    flen = ftell(fp);
-    retVal = fseek(fp, 0, 0);
-    retVal = fread(dst, flen, 1, fp);
-    retVal = fclose(fp);
+    fp9 = fopen(fname, DATA_COMPGEN(0x00520ca8, encodeDataRb, "rb"));
+    retVal = fseek(fp9, 0, 2);
+    flen3 = ftell(fp9);
+    retVal = fseek(fp9, 0, 0);
+    retVal = fread(dst, flen3, 1, fp9);
+    retVal = fclose(fp9);
     retVal = remove(fname);
     FreeCompressStructures();
 
-    return flen;
+    return flen3;
 }
 
 VA(0x004d8240, 0x2f3)
@@ -1909,8 +1909,8 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;
     i32 retVal;
-    FILE* fp;
-    i32l flen;
+    FILE* fp9;
+    i32l flen3;
 
     outputHandleJustInCase = NULL;
     bsInUse = 0;
@@ -1934,16 +1934,16 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     uncompress(fname);
 
     fname[strlen(fname) - 3] = '\0';
-    fp = fopen(fname, DATA_COMPGEN(0x00520cbc, decodeDataRb, "rb"));
-    retVal = fseek(fp, 0, 2);
-    flen = ftell(fp);
-    retVal = fseek(fp, 0, 0);
-    retVal = fread(dst, flen, 1, fp);
-    retVal = fclose(fp);
+    fp9 = fopen(fname, DATA_COMPGEN(0x00520cbc, decodeDataRb, "rb"));
+    retVal = fseek(fp9, 0, 2);
+    flen3 = ftell(fp9);
+    retVal = fseek(fp9, 0, 0);
+    retVal = fread(dst, flen3, 1, fp9);
+    retVal = fclose(fp9);
     retVal = remove(fname);
     FreeCompressStructures();
 
-    return flen;
+    return flen3;
 }
 
 DATA(0x00534ee4) i32 longestFileName;
