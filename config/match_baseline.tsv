@@ -1238,7 +1238,7 @@ SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	6774124ff592
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	93.6271	d72888096592
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	483384c46f98
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.5277	7c7c19a026ac
-SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	93.2627	d7ad683b1e99
+SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	100.0000	4cc2eb9bf1df
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.2271	f3c8c624bbd9
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	94.2880	caafc846138d
