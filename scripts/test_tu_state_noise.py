@@ -622,6 +622,22 @@ class TuStateNoiseTests(unittest.TestCase):
             self.assertFalse(scratch_path.exists())
             self.assertEqual((final_path / "manifest.json").read_text(), manifest)
 
+    def test_retained_subpath_is_written_through_staging_directory(self):
+        root = Path("/tmp/tu-state-noise-test")
+        final_path = root / "retained-run"
+        scratch_path = root / ".retained-run.tmp"
+        self.assertEqual(
+            noise.staged_artifact_path(
+                final_path / "states.json", scratch_path, final_path
+            ),
+            scratch_path / "states.json",
+        )
+        external = root / "summaries" / "states.json"
+        self.assertEqual(
+            noise.staged_artifact_path(external, scratch_path, final_path),
+            external,
+        )
+
     def test_include_macro_guard_is_transitive_and_fail_closed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
