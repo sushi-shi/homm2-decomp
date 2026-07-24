@@ -1841,9 +1841,9 @@ void compress(Char* name) {
 VA(0x004d7e50, 0x110)
 void uncompress(Char* name) {
     FILE* inStr;
-    FILE* outStr;
+    FILE* outStr2;
     Bool magicNumberOK;
-    IntNative retVal;
+    IntNative retVal3;
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1851,15 +1851,15 @@ void uncompress(Char* name) {
         outName[strlen(outName) - 3] = '\0';
 
     inStr = fopen(inName, DATA_COMPGEN(0x00520c84, uncompressRb, "rb"));
-    outStr = fopen(outName, DATA_COMPGEN(0x00520c88, uncompressWb, "wb"));
+    outStr2 = fopen(outName, DATA_COMPGEN(0x00520c88, uncompressWb, "wb"));
 
     errno = 0;
-    outputHandleJustInCase = outStr;
-    magicNumberOK = uncompressStream(inStr, outStr);
+    outputHandleJustInCase = outStr2;
+    magicNumberOK = uncompressStream(inStr, outStr2);
     outputHandleJustInCase = NULL;
 
-    retVal = remove(inName);
-    ERROR_IF_NOT_ZERO(retVal);
+    retVal3 = remove(inName);
+    ERROR_IF_NOT_ZERO(retVal3);
 }
 
 VA(0x004d7f60, 0x2d5)
