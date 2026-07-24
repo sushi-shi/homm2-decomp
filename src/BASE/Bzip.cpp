@@ -793,13 +793,13 @@ void sendZeroes(BitStream* outStream, Int32 zeroesPending) {
 
 VA(0x004d5930, 0x189)
 void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
-    UChar yy[256];
-    Int32 i, j;
-    UChar tmp;
-    UChar tmp2;
-    Int32 zeroesPending;
+    UChar yy0[256];
+    Int32 i9, j6;
+    UChar tmp8;
+    UChar tmp2a6;
+    Int32 zeroesPending9;
 
-    zeroesPending = 0;
+    zeroesPending9 = 0;
     if (thisIsTheLastBlock)
         putInt32(outStream, -(origPtr + 1));
     else
@@ -807,33 +807,33 @@ void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
 
     initModels();
 
-    for (i = 0; i <= 255; i++)
-        yy[i] = (UChar)i;
+    for (i9 = 0; i9 <= 255; i9++)
+        yy0[i9] = (UChar)i9;
 
-    for (i = 0; i <= last; i++) {
+    for (i9 = 0; i9 <= last; i9++) {
         UChar ll_i;
 
-        ll_i = GETFIRST(NORMALISELO(zptr[i] - 1));
+        ll_i = GETFIRST(NORMALISELO(zptr[i9] - 1));
 
-        j = 0;
-        tmp = yy[j];
-        while (ll_i != tmp) {
-            j++;
-            tmp2 = tmp;
-            tmp = yy[j];
-            yy[j] = tmp2;
+        j6 = 0;
+        tmp8 = yy0[j6];
+        while (ll_i != tmp8) {
+            j6++;
+            tmp2a6 = tmp8;
+            tmp8 = yy0[j6];
+            yy0[j6] = tmp2a6;
         }
-        yy[0] = tmp;
+        yy0[0] = tmp8;
 
-        if (j == 0) {
-            zeroesPending++;
+        if (j6 == 0) {
+            zeroesPending9++;
         } else {
-            sendZeroes(outStream, zeroesPending);
-            zeroesPending = 0;
-            sendMTFVal(outStream, j);
+            sendZeroes(outStream, zeroesPending9);
+            zeroesPending9 = 0;
+            sendMTFVal(outStream, j6);
         }
     }
-    sendZeroes(outStream, zeroesPending);
+    sendZeroes(outStream, zeroesPending9);
     sendMTFVal(outStream, EOB);
 }
 
