@@ -318,7 +318,7 @@ void arithCodeDoneDecoding(BitStream* bs) {
 VA(0x004d4620, 0x98)
 void arithCodeRenormalise_Encode(BitStream* bs) {
     while (bigR <= TWO_TO_THE(smallB - 2)) {
-        if ((OD_STEER(bigR) + bigL) <= TWO_TO_THE(smallB - 1)) {
+        if ((bigR + bigL) <= TWO_TO_THE(smallB - 1)) {
             arithCodeBitPlusFollow(bs, 0);
         } else if (TWO_TO_THE(smallB - 1) <= bigL) {
             arithCodeBitPlusFollow(bs, 1);
@@ -677,7 +677,7 @@ void FreeDecompressStructures(void) {
 
 VA(0x004d5480, 0xe4)
 void setDecompressStructureSizes(Int32 newSize100k) {
-    if (OD_STEER(newSize100k) == blockSize100k)
+    if (newSize100k == blockSize100k)
         return;
 
     blockSize100k = newSize100k;
@@ -747,7 +747,7 @@ Int32 NORMALISE(Int32 p) {
 
 VA(0x004d57d0, 0x36)
 Int32 NORMALISEHI(Int32 p) {
-    return IF_THEN_ELSE(((p) >= OD_STEER(lastPP)), ((p)-lastPP), (p));
+    return IF_THEN_ELSE(((p) >= lastPP), ((p)-lastPP), (p));
 }
 
 VA(0x004d5810, 0x31)
@@ -914,7 +914,7 @@ VA(0x004d5da0, 0x84)
 void stripe(void) {
     Int32 i;
 
-    for (i = 0; OD_STEER(i) < lastPP; i++) {
+    for (i = 0; i < lastPP; i++) {
         UChar c = GETFIRST(i);
         SETSECOND(NORMALISELO(i - 1), c);
         SETTHIRD(NORMALISELO(i - 2), c);
@@ -1072,7 +1072,7 @@ VA(0x004d6550, 0xbc)
 Bool trivialGt(Int32 i1, Int32 i2) {
     Int32 k;
 
-    for (k = 0; OD_STEER(k) <= last; k++) {
+    for (k = 0; k <= last; k++) {
         UChar c1 = GETFIRST(i1);
         UChar c2 = GETFIRST(i2);
         if (c1 == c2) {
@@ -1274,7 +1274,7 @@ void undoReversibleTransformation(void) {
     for (i = 0; i <= 255; i++)
         frequencyByChar[i] = 0;
 
-    for (i = 0; OD_STEER(i) <= last; i++) {
+    for (i = 0; i <= last; i++) {
         UChar ll_i = ll[i];
         zptr[i] = frequencyByChar[ll_i];
         frequencyByChar[ll_i]++;
@@ -1303,7 +1303,7 @@ void spotBlock(Bool weAreCompressing) {
     spotPos = SPOT_BASIS_STEP;
     delta = 1;
 
-    while (OD_STEER(spotPos) < last) {
+    while (spotPos < last) {
 
         Int32 n;
 
@@ -1394,7 +1394,7 @@ Int32 getRLEpair(FILE* src) {
         return (1 << 16) | ch;
     } else {
         Int32 i;
-        for (i = 1; OD_STEER(i) <= runLen; i++)
+        for (i = 1; i <= runLen; i++)
             UPDATE_CRC(globalCrc, (UChar)ch);
         return (runLen << 16) | ch;
     }
@@ -1409,7 +1409,7 @@ Bool loadAndRLEsource(FILE* src) {
 
     allowableBlockSize = 100000 * blockSize100k - 20;
 
-    while (last < OD_STEER(allowableBlockSize) && currentChar != MY_EOF) {
+    while (last < allowableBlockSize && currentChar != MY_EOF) {
         Int32 rlePair, runLength;
         rlePair = getRLEpair(src);
         currentChar = rlePair & 0xFFFF;
