@@ -1533,11 +1533,16 @@ class mapCell* advManager::DoAdvCommand(void) {
 
 VA(0x00457bdb, 0x191)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
+    i32 shouldChange;
+    i32 translationIndex;
+    i32 savedShowIt;
+    tag_message interfaceMessage;
+
     if (player == -1) {
         player = giCurWatchPlayer;
     }
 
-    i32 shouldChange = 0;
+    shouldChange = 0;
     if (gConfig.evilInterfaceUsage == INTERFACE_EVIL && !gbUseEvilInterface) {
         shouldChange = 1;
     } else if (gConfig.evilInterfaceUsage == INTERFACE_GOOD && gbUseEvilInterface) {
@@ -1550,10 +1555,8 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     if (shouldChange) {
         gbUseEvilInterface = 1 - gbUseEvilInterface;
         if (redraw) {
-            tag_message interfaceMessage;
             interfaceMessage.type = ADVMGR_INTERFACE_MESSAGE;
             interfaceMessage.payload.widget.command = ADVMGR_INTERFACE_REPLACE_RESOURCE;
-            i32 translationIndex;
             for (translationIndex = 0; translationIndex < INTERFACE_TRANSLATION_COUNT;
                  ++translationIndex) {
                 interfaceMessage.payload.widget.id = gpResourceManager->MakeId(
@@ -1566,7 +1569,7 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
                 );
                 m_adventureWindow->BroadcastMessage(interfaceMessage);
             }
-            i32 savedShowIt = bShowIt;
+            savedShowIt = bShowIt;
             bShowIt = 1;
             RedrawAdvScreen(1, 1);
             bShowIt = savedShowIt;
