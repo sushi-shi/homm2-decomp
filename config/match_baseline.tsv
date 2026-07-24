@@ -57,7 +57,7 @@ BASE/Bzip	?arithCodeDoneEncoding@@YIXPAUBitStream@@@Z	100.0000	2ffb39799595
 BASE/Bzip	?arithCodeRenormalise_Encode@@YIXPAUBitStream@@@Z	100.0000	913680f5b4ca
 BASE/Bzip	?arithCodeStartDecoding@@YIXPAUBitStream@@@Z	100.0000	9cd01a9c0916
 BASE/Bzip	?arithCodeStartEncoding@@YIXPAUBitStream@@@Z	100.0000	0042c6482e14
-BASE/Bzip	?arithCodeSymbol@@YIXPAUBitStream@@PAUModel@@H@Z	100.0000	e58641c9680c
+BASE/Bzip	?arithCodeSymbol@@YIXPAUBitStream@@PAUModel@@H@Z	100.0000	1739be0f6c90
 BASE/Bzip	?arithDecodeSymbol@@YIHPAUBitStream@@PAUModel@@@Z	100.0000	fe0ed042dff4
 BASE/Bzip	?bitStreamEOF@@YIXXZ	100.0000	9a670533f5a3
 BASE/Bzip	?blockOverrun@@YIXXZ	100.0000	f77bba4410ca
@@ -220,7 +220,7 @@ BASE/Misc	?FadeToColorTable@@YIXPAEH@Z	96.0323	ffaad35d640c
 BASE/Misc	?FileSize@@YIJPAD@Z	100.0000	73993529f329
 BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	98.3333	eab5d9a90dbb
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	f58301bc96e4
-BASE/Misc	?FindStringInString@@YIPADPAD0@Z	98.6000	fc35ef3ab6a6
+BASE/Misc	?FindStringInString@@YIPADPAD0@Z	100.0000	fc35ef3ab6a6
 BASE/Misc	?FindToken@@YIPADPADD@Z	99.6552	8628e536dfbc
 BASE/Misc	?GetDataEntry@@YIXPAD0H0HH@Z	99.1020	925348162363
 BASE/Misc	?GetIconEntry@@YIPAUIconEntry@@PAVicon@@H@Z	100.0000	b037247edc8b
@@ -308,7 +308,7 @@ BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	05f589f60615
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	8e0b611ea549
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	fb5b4863612a
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	8f55fa1b3dac
-BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	99.7955	74de7c193243
+BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	74de7c193243
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	e4bd175b08e2
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	100.0000	7e8c231abf9b
 BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	100.0000	5646c40cb889
@@ -379,7 +379,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	0c7ef3a9e420
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	0628dc7098ba
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	81919949cfc2
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	100.0000	691fa6dd198c
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	99.4215	6dd9b5b019af
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	6dd9b5b019af
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	8c338153991b
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	97733f0d7f3c
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	3d20026eb4c4
@@ -503,7 +503,7 @@ SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	98.4735	bd79e40bea31
 SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.6436	b4f58c71e4f1
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	100.0000	3435063a897c
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	5e4ebd2056bb
-SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	7fa5f339074b
+SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	b0b5b175db8c
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	94.7808	fc575a367dbc
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.1583	e43839917952
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	44697e428ed6
@@ -536,7 +536,7 @@ SOURCE/AI	?GetShooterMask@combatManager@@QAEHH@Z	100.0000	fd8646b27389
 SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	100.0000	0800d05d8708
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	f4bc452ff45c
 SOURCE/AI	?GetWalkerMask@combatManager@@QAEHH@Z	100.0000	5d80474ee13a
-SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	98.9123	1f995e6ce676
+SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	100.0000	1f995e6ce676
 SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	98.9752	869b34dbc719
 SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	99.0120	76c933ef404b
 SOURCE/ARMY	??0army@@QAE@XZ	100.0000	e94f637d29ec
@@ -548,7 +548,7 @@ SOURCE/ARMY	?CancelSpellType@army@@QAEXH@Z	100.0000	dfc5ea9ac9d9
 SOURCE/ARMY	?CheckLuck@army@@QAEXXZ	100.0000	aeafafb378db
 SOURCE/ARMY	?Cure@army@@QAEXH@Z	100.0000	d5bb8726c91d
 SOURCE/ARMY	?Damage@army@@QAEHJH@Z	96.2847	5ef019a1dfe8
-SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	99.8127	f0b75b41890a
+SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	100.0000	f0b75b41890a
 SOURCE/ARMY	?DecrementSpellRounds@army@@QAEXXZ	100.0000	cab025023e40
 SOURCE/ARMY	?DirDoAttack@army@@QAEXH@Z	100.0000	9f6c0d7ac47d
 SOURCE/ARMY	?DispelGood@army@@QAEXXZ	100.0000	34656c7b2e67
@@ -630,9 +630,9 @@ SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	100.0000	c8d4562fcf14
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	98.2420	634ce6694196
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	100.0000	3c73f59913aa
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	99.4894	236a32669264
-SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.7469	f3cbdd0f69ee
+SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	100.0000	f3cbdd0f69ee
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	100.0000	3fb21042a8e5
-SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	99.6377	38a4cd079d21
+SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	38a4cd079d21
 SOURCE/CMBTMGR	?UpdateCombatSystemOptions@@YIXH@Z	100.0000	970159970d64
 SOURCE/CMBTMGR	?ValidHex@@YIHH@Z	100.0000	a8181fb37b5f
 SOURCE/COMMAND	?AddArmy@combatManager@@QAEXHHHHHH@Z	100.0000	845e5d1569c1
@@ -704,7 +704,7 @@ SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXH@Z	100.0000	a54042d79222
 SOURCE/DRAWING	?CombatMessage@combatManager@@QAEXPADHHH@Z	100.0000	43c4fec42fa0
 SOURCE/DRAWING	?DrawBackground@combatManager@@QAEXXZ	100.0000	68141f6394ad
 SOURCE/DRAWING	?DrawFrame@combatManager@@QAEXHHHHHHH@Z	97.9184	d8cf98c9236a
-SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	c75829326c1f
+SOURCE/DRAWING	?DrawSmallView@combatManager@@QAEXHH@Z	100.0000	ecb64497ab5f
 SOURCE/DRAWING	?NoShowCombatLog@combatManager@@QAEXPAD@Z	100.0000	bd5d671e2bca
 SOURCE/DRAWING	?ResetLimitCreature@combatManager@@QAEXXZ	100.0000	55068685feb7
 SOURCE/DRAWING	?SetupGridForArmy@combatManager@@QAEXPAVarmy@@@Z	100.0000	7f074fe59b5b
@@ -775,7 +775,7 @@ SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	848cde3b3403
 SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	92.6786	20c73e6c2d13
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	bb8bad91f670
 SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	100.0000	85b7f64886a5
-SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	99.4556	18acd0234f22
+SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	100.0000	18acd0234f22
 SOURCE/GAME	?CheckValidAvailableHeroes@@YIXXZ	100.0000	b0e96768cc13
 SOURCE/GAME	?ClaimMine@game@@QAEXHH@Z	99.1489	58d4f7859ca2
 SOURCE/GAME	?ClaimTown@game@@QAEXHHH@Z	98.8540	936f4611651d
@@ -1231,7 +1231,7 @@ SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.0636	222058889a73
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	c8f4e9cd5cff
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.5133	f259c474d379
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	4931b5563db6
-SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	4b7950edea9a
+SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	618d8a12237c
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	1026b76ae31f
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	b8992a064a40
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	6774124ff592
