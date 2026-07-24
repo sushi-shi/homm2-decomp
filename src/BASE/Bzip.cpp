@@ -1506,24 +1506,24 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
 VA(0x004d7420, 0x2e6)
 void compressStream(FILE* stream, FILE* zStream) {
     IntNative retVal;
-    Bool thisIsTheLastBlock;
-    BitStream* zbs;
+    Bool thisIsTheLastBlock9;
+    BitStream* zbs2;
     UInt32 crcToSend;
     Int32 blockNo = 1;
 
     bytesIn = 0;
     bytesOut = 0;
 
-    zbs = bsOpenWriteStream(zStream);
+    zbs2 = bsOpenWriteStream(zStream);
 
-    bsPutUChar(zbs, 'B');
-    bsPutUChar(zbs, 'Z');
-    bsPutUChar(zbs, '0');
-    bsPutUChar(zbs, '0' + blockSize100k);
+    bsPutUChar(zbs2, 'B');
+    bsPutUChar(zbs2, 'Z');
+    bsPutUChar(zbs2, '0');
+    bsPutUChar(zbs2, '0' + blockSize100k);
 
     initialiseCRC();
     initBogusModel();
-    arithCodeStartEncoding(zbs);
+    arithCodeStartEncoding(zbs2);
 
     do {
         if (veryVerbose) {
@@ -1531,21 +1531,21 @@ void compressStream(FILE* stream, FILE* zStream) {
             LogStr(gText);
         }
         blockNo++;
-        thisIsTheLastBlock = loadAndRLEsource(stream);
+        thisIsTheLastBlock9 = loadAndRLEsource(stream);
         spotBlock(True);
         doReversibleTransformation();
-        moveToFrontCodeAndSend(zbs, thisIsTheLastBlock);
-    } while (!thisIsTheLastBlock);
+        moveToFrontCodeAndSend(zbs2, thisIsTheLastBlock9);
+    } while (!thisIsTheLastBlock9);
 
     crcToSend = getFinalCRC();
-    putUInt32(zbs, crcToSend);
+    putUInt32(zbs2, crcToSend);
     if (veryVerbose) {
         sprintf(gText, DATA_COMPGEN(0x00520720, compressStreamCRC0xX, "\nCRC = 0x%x\n"), crcToSend);
         LogStr(gText);
     }
 
-    arithCodeDoneEncoding(zbs);
-    bsClose(zbs);
+    arithCodeDoneEncoding(zbs2);
+    bsClose(zbs2);
     ERROR_IF_NOT_ZERO(ferror(stream));
     retVal = fclose(stream);
     ERROR_IF_EOF(retVal);
