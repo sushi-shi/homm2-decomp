@@ -4472,7 +4472,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         desiredShare0 = static_cast<float>(desiredShare0 * 0.5);
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_CAPTURE_TOWN
         && townPtr->m_x == gpGame->m_mapHeader.victoryConditionValue
-        && (gpGame->m_mapHeader.victoryTownY | 0) == townPtr->m_y) {
+        && townPtr->m_y == gpGame->m_mapHeader.victoryTownY) {
         desiredShare0 = 0.8f;
     }
     if (desiredShare0 >= townShare5)
