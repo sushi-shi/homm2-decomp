@@ -3331,7 +3331,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     deltaX_a = targetX_a - startX_d;
     deltaY_a = targetY_a - startY_d;
     distance_d = static_cast<i32>(
-        sqrt(static_cast<double>(OD_STEER(deltaX_a) * deltaX_a + deltaY_a * deltaY_a))
+        sqrt(static_cast<double>(deltaX_a * deltaX_a + deltaY_a * deltaY_a))
     );
     segmentCount_f = distance_d / frameSpacing_c;
     currentX_i = static_cast<float>(startX_d);
@@ -3343,8 +3343,8 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
         ResetLimitCreature();
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;
-        currentX_i = OD_STEER(currentX_i) + stepX_a;
-        currentY_d = OD_STEER(currentY_d) + stepY_e;
+        currentX_i = currentX_i + stepX_a;
+        currentY_d = currentY_d + stepY_e;
         frame_j = (segment_h * BLAST_FRAME_COUNT - 1) / segmentCount_f;
         blastIcon_h->CombatClipDrawToBuffer(
             static_cast<i32>(currentX_i),

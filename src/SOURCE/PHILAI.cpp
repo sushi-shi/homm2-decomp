@@ -4061,7 +4061,7 @@ i32 philAI::QuickCombat(
     float randomRoll8 = static_cast<float>(
         Random(0, QUICK_COMBAT_RANDOM_LIMIT) / static_cast<double>(QUICK_COMBAT_RANDOM_LIMIT)
     );
-    if (randomRoll8 < OD_STEER(winChance37)) {
+    if (randomRoll8 < winChance37) {
         attackerWon2 = 1;
         winnerChance0 = winChance37;
         selectedGroup36 = attacker;
@@ -4070,7 +4070,7 @@ i32 philAI::QuickCombat(
         selectedGroup36 = defender;
     }
 
-    if (OD_STEER(winChance37) < randomRoll8)
+    if (winChance37 < randomRoll8)
         rollDifference8 = randomRoll8 - winChance37;
     else
         rollDifference8 = winChance37 - randomRoll8;
@@ -6263,29 +6263,29 @@ void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
     gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+        MAP_WIDTH * MAP_HEIGHT * 2,
         DATA_COMPGEN(0x004f2398, initAILiveChanceMapSourceFile, RETAIL_FILE),
         s_initAIMapLineBase + 8
     ));
     gaiHeroStrategicRVOfPos =
         static_cast<i16*>(H2_ALLOC_AT(
-            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+            MAP_WIDTH * MAP_HEIGHT * 2,
             DATA_COMPGEN(0x004f23c4, initAIHeroStrategicMapSourceFile, RETAIL_FILE),
             s_initAIMapLineBase + 9
         ));
     gaiHeroEventStratRVOfPos =
         static_cast<i16*>(H2_ALLOC_AT(
-            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * 2,
+            MAP_WIDTH * MAP_HEIGHT * 2,
             DATA_COMPGEN(0x004f23f0, initAIHeroEventMapSourceFile, RETAIL_FILE),
             s_initAIMapLineBase + 10
         ));
     gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT,
+        MAP_WIDTH * MAP_HEIGHT,
         DATA_COMPGEN(0x004f241c, initAITurnValueMapSourceFile, RETAIL_FILE),
         s_initAIMapLineBase + 11
     ));
     gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC_AT(
-        OD_STEER(MAP_WIDTH) * MAP_HEIGHT,
+        MAP_WIDTH * MAP_HEIGHT,
         DATA_COMPGEN(0x004f2448, initAIEnemyReachabilityMapSourceFile, RETAIL_FILE),
         s_initAIMapLineBase + 12
     ));

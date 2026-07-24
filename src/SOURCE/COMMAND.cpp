@@ -3015,17 +3015,17 @@ void combatManager::AddArmy(
     i32 index_g;
     army* newArmy;
     for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_NONE) {
+        if (m_armies[IDX(side)][index_g].m_monsterType == CREATURE_NONE) {
             armyIndex_r = index_g;
             break;
         }
-        if (m_armies[IDX(OD_STEER(side))][index_g].m_quantity == 0
-            && HAS(m_armies[IDX(OD_STEER(side))][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[IDX(OD_STEER(side))][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
-                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
-                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
-                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
-                || m_armies[IDX(OD_STEER(side))][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
+        if (m_armies[IDX(side)][index_g].m_quantity == 0
+            && HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
+                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
             armyIndex_r = index_g;
             reusedArmy_m = 1;
             break;
@@ -3036,7 +3036,7 @@ void combatManager::AddArmy(
         || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
-    newArmy = &m_armies[IDX(OD_STEER(side))][armyIndex_r];
+    newArmy = &m_armies[IDX(side)][armyIndex_r];
     newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
     newArmy->LoadResources();
     newArmy->m_monster.flags.all |= flags;

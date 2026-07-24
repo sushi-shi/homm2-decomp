@@ -405,11 +405,11 @@ void initModel(
 
     if (initIncValue == 0) {
         m->totFreq = initNumSymbols;
-        for (i = 1; i <= OD_STEER(initNumSymbols); i++)
+        for (i = 1; i <= initNumSymbols; i++)
             m->freq[i] = 1;
     } else {
         m->totFreq = initNumSymbols * initIncValue;
-        for (i = 1; i <= OD_STEER(initNumSymbols); i++)
+        for (i = 1; i <= initNumSymbols; i++)
             m->freq[i] = initIncValue;
     }
 
@@ -875,7 +875,7 @@ LOOPSTART:
         } while (nextSym == RUNA || nextSym == RUNB);
         while (n > 0) {
             last++;
-            if (last >= OD_STEER(blockLimit))
+            if (last >= blockLimit)
                 blockOverrun();
             ll[last] = symbols[0];
             n--;
@@ -885,7 +885,7 @@ LOOPSTART:
 
     if (nextSym >= 1 && nextSym <= 255) {
         last++;
-        if (last >= OD_STEER(blockLimit))
+        if (last >= blockLimit)
             blockOverrun();
         ll[last] = symbols[nextSym];
 

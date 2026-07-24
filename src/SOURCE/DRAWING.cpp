@@ -326,9 +326,9 @@ void combatManager::ResetLimitCreature(void) {
             if (HAS(m_armies[IDX(side)][armySlotIndex].m_monster.flags.all,
                     COMBAT_ARMY_FLAG_MIRROR_IMAGE)
                 != 0)
-                m_limitCreatureCount[IDX(side)][OD_STEER(armySlotIndex)] = -1;
+                m_limitCreatureCount[IDX(side)][armySlotIndex] = -1;
             else
-                m_limitCreatureCount[IDX(side)][OD_STEER(armySlotIndex)] = 0;
+                m_limitCreatureCount[IDX(side)][armySlotIndex] = 0;
         }
     }
     m_drawHero[0] = 0;
@@ -414,7 +414,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
             || m_gridSelectionDisabled != 0) {
             memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
         } else {
-            SetupGridForArmy(&m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex]);
+            SetupGridForArmy(&m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]);
         }
     }
     if (resetGridDisplay != 0)
@@ -435,7 +435,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
         goto DrawCombatGrid;
 
     for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-        if (OD_STEER(m_previousGridState[cellIndex]) != m_gridState[cellIndex])
+        if (m_previousGridState[cellIndex] != m_gridState[cellIndex])
             gridChanged = 1;
         if (m_gridState[cellIndex] != GRID_SHADE_NONE)
             drawShading = 1;
@@ -451,7 +451,7 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
             return 0;
         if (hadOldShade != 0) {
             for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-                if (OD_STEER(m_previousGridState[cellIndex]) != m_gridState[cellIndex]
+                if (m_previousGridState[cellIndex] != m_gridState[cellIndex]
                     || m_gridState[cellIndex] != GRID_SHADE_NONE) {
                     if (m_hexCells[cellIndex].m_gridLeft < minX)
                         minX = m_hexCells[cellIndex].m_gridLeft;

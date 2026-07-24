@@ -866,17 +866,17 @@ i32 combatManager::AttemptAttack(
 
         currentArmy->m_targetSide = side;
         currentArmy->m_targetIndex = targetArmy;
-        targetHex = OD_STEER(targetArmy)[m_armies[IDX(side)]].m_hex;
+        targetHex = targetArmy[m_armies[IDX(side)]].m_hex;
         currentArmy->m_moveTargetHex = targetHex;
         if (currentArmy->ValidPath(targetHex, ARMY_PATH_ANY_TARGET_HEX)) {
             giNextAction = ACTION_MOVE;
             giNextActionGridIndex = targetHex;
             return 1;
         }
-        if (HAS(OD_STEER(targetArmy)[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
+        if (HAS(targetArmy[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
                 MONSTER_ABILITY_FLAG_WIDE)
             != 0) {
-            if (OD_STEER(targetArmy)[m_armies[IDX(side)]].m_facing == ARMY_FACING_LEFT)
+            if (targetArmy[m_armies[IDX(side)]].m_facing == ARMY_FACING_LEFT)
                 targetHex--;
             else
                 targetHex++;
