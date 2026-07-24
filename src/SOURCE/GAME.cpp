@@ -856,57 +856,56 @@ void ComputeUALoc(i32 player) {
         gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
         gpGame->m_players[player].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
         gpGame->m_players[player].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
-        return;
-    }
+    } else {
+        i32 probability =
+            (result - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
+        if (probability > HINT_CHANCE_MAXIMUM)
+            probability = HINT_CHANCE_MAXIMUM;
+        if (probability < HINT_CHANCE_MINIMUM)
+            probability = HINT_CHANCE_MINIMUM;
+        gpGame->m_players[player].m_ultimateArtifactHintChance = static_cast<i8>(probability);
 
-    i32 probability =
-        (result - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
-    if (probability > HINT_CHANCE_MAXIMUM)
-        probability = HINT_CHANCE_MAXIMUM;
-    if (probability < HINT_CHANCE_MINIMUM)
-        probability = HINT_CHANCE_MINIMUM;
-    gpGame->m_players[player].m_ultimateArtifactHintChance = static_cast<i8>(probability);
-
-    if (Random(HINT_CHANCE_MINIMUM, HINT_CHANCE_MAXIMUM)
-        <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
-        gpGame->m_players[player].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
-        gpGame->m_players[player].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
-        return;
-    }
-
-    i32 x = HINT_COORDINATE_UNKNOWN;
-    i32 y = HINT_COORDINATE_UNKNOWN;
-    i32 direction = 0;
-    i32 tries = 0;
-    while (
-        !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
-          && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
-          && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
-          && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
-          && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex] != TERRAIN_WATER)
-    ) {
-        tries++;
-        direction = 0;
-        while (direction == 0)
-            direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
-                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
-                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
-        x = gpGame->m_ultimateArtifactX + direction;
-        direction = 0;
-        while (direction == 0)
-            direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
-                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
-                        - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
-        y = gpGame->m_ultimateArtifactY + direction;
-        if (tries >= HINT_LOCATION_RETRY_LIMIT) {
-            x = gpGame->m_ultimateArtifactX;
-            y = gpGame->m_ultimateArtifactY;
-            goto saveLocation;
+        if (Random(HINT_CHANCE_MINIMUM, HINT_CHANCE_MAXIMUM)
+            <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
+            gpGame->m_players[player].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
+            gpGame->m_players[player].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
+        } else {
+            i32 x = HINT_COORDINATE_UNKNOWN;
+            i32 y = HINT_COORDINATE_UNKNOWN;
+            i32 direction = 0;
+            i32 tries = 0;
+            while (
+                !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
+                  && gpGame->m_worldMap.Row(y)[x].m_triggerType == MAP_OBJECT_NONE
+                  && gpGame->m_worldMap.Row(y)[x].m_objectIndex == MAPCELL_SPRITE_NONE
+                  && gpGame->m_worldMap.Row(y)[x].m_overlayIndex == MAPCELL_SPRITE_NONE
+                  && giGroundToTerrain[gpGame->m_worldMap.Row(y)[x].m_terrainImageIndex]
+                         != TERRAIN_WATER)
+            ) {
+                tries++;
+                direction = 0;
+                while (direction == 0)
+                    direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                                - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                                - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
+                x = gpGame->m_ultimateArtifactX + direction;
+                direction = 0;
+                while (direction == 0)
+                    direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                                - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                                - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
+                y = gpGame->m_ultimateArtifactY + direction;
+                if (tries >= HINT_LOCATION_RETRY_LIMIT) {
+                    x = gpGame->m_ultimateArtifactX;
+                    y = gpGame->m_ultimateArtifactY;
+                    goto saveLocation;
+                }
+            }
+        saveLocation:
+            gpGame->m_players[player].m_ultimateArtifactHintX = static_cast<i8>(x);
+            gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<i8>(y);
         }
     }
-saveLocation:
-    gpGame->m_players[player].m_ultimateArtifactHintX = static_cast<i8>(x);
-    gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<i8>(y);
 }
 
 H2_ENUM_BEGIN(PuzzleSetupConstant)
