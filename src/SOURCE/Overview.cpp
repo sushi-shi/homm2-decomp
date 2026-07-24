@@ -1198,7 +1198,7 @@ void game::Overview(void) {
         overWin->BroadcastMessage(message8);
     }
     for (mine4 = OVERVIEW_VISIBLE_ROWS; mine4 > 0; mine4--) {
-        if (OD_STEER(lighthouseCount4) < mine4) {
+        if (lighthouseCount4 < mine4) {
             message8.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
             message8.payload.widget.id = mine4 + LIGHTHOUSE_WIDGET_ID_OFFSET;
             message8.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);

@@ -3650,7 +3650,7 @@ void SortStats(i32l* const stats, i8* const order) {
 
     for (firstPlayer = 0; firstPlayer < gpGame->m_playerCount - 1; ++firstPlayer) {
         for (secondPlayer = firstPlayer + 1; secondPlayer < gpGame->m_playerCount; ++secondPlayer) {
-            if (stats[OD_STEER(secondPlayer)] > stats[firstPlayer]) {
+            if (stats[secondPlayer] > stats[firstPlayer]) {
                 tempStat = stats[firstPlayer];
                 stats[firstPlayer] = stats[secondPlayer];
                 stats[secondPlayer] = tempStat;

@@ -937,7 +937,7 @@ void fileRequester::DoKnob(void) {
             m_scrollKnob->m_y = dragMessage.payload.mouse.y - mouseOffset2;
             if (m_fileCount > iMaxListSize) {
                 newTopIndex = static_cast<i32>((m_scrollKnob->m_y - fGutterMinY) / gutterStep9);
-                if (OD_STEER(newTopIndex) != oldTopIndex) {
+                if (newTopIndex != oldTopIndex) {
                     if (newTopIndex > m_fileCount - iMaxListSize) {
                         newTopIndex = m_fileCount - iMaxListSize;
                     }

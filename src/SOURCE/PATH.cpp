@@ -303,7 +303,7 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
         direction = COMBAT_DIRECTION_NORTHWEST;
     else if (direction == COMBAT_DIRECTION_WIDE_EAST)
         direction = COMBAT_DIRECTION_SOUTHWEST;
-    return IDX(OD_STEER(direction))[gpCombatManager->m_adjacency[sourceHex]];
+    return IDX(direction)[gpCombatManager->m_adjacency[sourceHex]];
 }
 
 VA(0x004be59d, 0x44a)

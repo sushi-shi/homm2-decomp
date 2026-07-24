@@ -1104,7 +1104,7 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_visibilityMap == NULL) {
-        m_visibilityMap = new u16[OD_STEER(MAP_WIDTH) * MAP_HEIGHT];
+        m_visibilityMap = new u16[MAP_WIDTH * MAP_HEIGHT];
         if (m_visibilityMap == NULL) {
             MemError();
         }
@@ -8202,7 +8202,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
 
-    if (x < 0 || mapY < 0 || MAP_WIDTH <= OD_STEER(x) || mapY >= MAP_HEIGHT) {
+    if (x < 0 || mapY < 0 || MAP_WIDTH <= x || mapY >= MAP_HEIGHT) {
         return;
     }
 
@@ -8812,7 +8812,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
         memset(
             m_visibilityMap,
             0,
-            OD_STEER(MAP_WIDTH) * MAP_HEIGHT * sizeof(*m_visibilityMap)
+            MAP_WIDTH * MAP_HEIGHT * sizeof(*m_visibilityMap)
         );
         m_visibilityMapValid = 1;
         remainingMobility2 = currentHero0->m_remainingMobility;

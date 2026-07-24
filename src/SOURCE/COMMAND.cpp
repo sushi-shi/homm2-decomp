@@ -382,7 +382,7 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     }
 
     {
-        army* currentArmy = &m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex];
+        army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
         if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
             currentArmy->GoBerserk();
             if (CheckWin(&message) != 0)
@@ -2995,7 +2995,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     gConfig.showCombatMouseHex = showMouseHex;
     gConfig.combatShadeLevel = shadeLevel;
     m_backgroundDrawn = 0;
-    SetupGridForArmy(&m_armies[IDX(OD_STEER(m_currentArmySide))][m_currentArmyIndex]);
+    SetupGridForArmy(&m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]);
     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     ResetMouse();
     WritePrefs();
