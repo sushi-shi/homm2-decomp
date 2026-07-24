@@ -392,7 +392,7 @@ void advManager::DrawCursorShadow(void) {
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                shadowFrame + IDX(shadowOffset),
+                shadowOffset + shadowFrame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
