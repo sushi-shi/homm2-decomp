@@ -598,7 +598,7 @@ SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	100.0000	8aba11d40d54
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	100.0000	e44d86eb8559
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	10ef94b0363f
 SOURCE/CMBTMGR	??0combatManager@@QAE@XZ	100.0000	640634a95fcf
-SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	99.9977	6c255a14feb0
+SOURCE/CMBTMGR	?CatAttack@combatManager@@QAEXH@Z	99.9977	4f07ce5b1159
 SOURCE/CMBTMGR	?CheckApplyBadMorale@combatManager@@QAEHHH@Z	100.0000	a1f36abd811a
 SOURCE/CMBTMGR	?CheckApplyGoodMorale@combatManager@@QAEXHH@Z	100.0000	3c22c30c8e55
 SOURCE/CMBTMGR	?Close@combatManager@@UAEXXZ	100.0000	682d56f7498d
@@ -642,11 +642,11 @@ SOURCE/COMMAND	?CheckGetAIMove@combatManager@@QAEXXZ	100.0000	49657b4d70ae
 SOURCE/COMMAND	?CheckSetMouseDirection@combatManager@@QAEXHHH@Z	100.0000	81ed1069226f
 SOURCE/COMMAND	?CheckWin@combatManager@@QAEHPAUtag_message@@@Z	100.0000	df34b08d7a5c
 SOURCE/COMMAND	?ClearWinLoseBottom@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	398a4d26ec25
-SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	96.2696	26c4b5e2962c
-SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9808	d02255fe1557
+SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	26c4b5e2962c
+SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.0860	d77fb5a0f4d7
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3766	d77fb5a0f4d7
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.7906	4ff757e8e5b7
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	96.7778	d35c05e10854
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
