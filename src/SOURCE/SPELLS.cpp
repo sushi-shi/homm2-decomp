@@ -3547,15 +3547,11 @@ VA(0x00429797, 0xd9)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 sample = NULL_SAMPLE2;
     sample = LoadPlaySample(DATA_COMPGEN(0x004f06dc, showSpellCastFailureRsbryfzl82m, "rsbryfzl.82m"));
-    char* armyName;
-    if (target->m_quantity == 1)
-        armyName = gArmyNames[IDX(target->m_monsterType)];
-    else
-        armyName = gArmyNamesPlural[IDX(target->m_monsterType)];
     sprintf(
         gText,
         DATA_COMPGEN(0x004f06fc, showSpellCastFailureTheSSTheSpell, "The %s %s the spell!"),
-        armyName,
+        target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
+                                : gArmyNamesPlural[IDX(target->m_monsterType)],
         target->m_quantity == 1 ? DATA_COMPGEN(0x004f06ec, showSpellCastFailureResists, "resists") : DATA_COMPGEN(0x004f06f4, showSpellCastFailureResist, "resist")
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
