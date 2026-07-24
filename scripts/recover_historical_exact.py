@@ -31,10 +31,8 @@ from pathlib import Path
 
 from historical_exact_losses import parse_baseline
 from tu_state_noise import (
-    BaselineUpdateError,
     SourceMutationError,
     acquire_source_mutation_lock,
-    record_target_max,
     resolve_target,
 )
 
@@ -598,19 +596,6 @@ def run_target(
     manifest = load_manifest(output)
     best_score = manifest.get("best_retained", {}).get("score")
     exact = manifest.get("exact_closure") is not None
-    if steer_count and not exact:
-        try:
-            record_target_max(
-                root / "config/match_baseline.tsv",
-                row["unit"],
-                row["symbol"],
-                row["current_hash"],
-                best_score,
-            )
-        except (OSError, BaselineUpdateError) as exc:
-            with log_path.open("a", encoding="utf-8") as log:
-                log.write(f"recording non-exact target maximum failed: {exc}\n")
-            return "error", 4, time.monotonic() - started, best_score, output
     if steer_count and exact:
         try:
             output = retire_target_od_steer(
