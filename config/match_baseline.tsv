@@ -1242,7 +1242,7 @@ SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	93.2627	d7ad683b1e99
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.2271	f3c8c624bbd9
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	94.2880	caafc846138d
-SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	99.8939	3b997c2890f3
+SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	100.0000	33be0f61891c
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	9e47c17c18ef
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	44b2c7e9391a
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
