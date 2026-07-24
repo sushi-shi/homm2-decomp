@@ -41,7 +41,11 @@ def die(msg: str):
 
 
 def _resolve(arg):
-    """(name, unit, rva) for an RVA (0x..) or a (mangled) symbol name, from CodeView."""
+    """(name, unit, rva, size, ordinal) for an RVA (0x..) or a mangled symbol name.
+
+    The ordinal distinguishes duplicate public names within one object. Name lookup
+    intentionally selects the first occurrence; an RVA selects the corresponding one.
+    """
     if not SYMCSV.is_file():
         die(f"{SYMCSV} missing - run `homm2 init`")
     want_rva = None
@@ -49,6 +53,7 @@ def _resolve(arg):
         want_rva = int(arg, 16)
     except ValueError:
         pass
+    rows = []
     for r in csv.DictReader(SYMCSV.open()):
         if (r.get("kind") or "func") != "func":
             continue
@@ -56,19 +61,92 @@ def _resolve(arg):
             rva = int(r["rva"], 16)
         except ValueError:
             continue
+        try:
+            size = int(r.get("size") or "0", 16)
+        except ValueError:
+            size = 0
+        rows.append((r, rva, size))
+
+    chosen = None
+    for r, rva, size in rows:
         if (want_rva is not None and rva == want_rva) or \
            (want_rva is None and r["name"] == arg):
-            return r["name"], r.get("unit", ""), rva
+            chosen = (r, rva, size)
+            break
+    if chosen:
+        r, rva, size = chosen
+        unit = r.get("unit", "")
+        same_name = sorted(
+            (entry for entry in rows
+             if entry[0].get("unit", "") == unit and entry[0]["name"] == r["name"]),
+            key=lambda entry: entry[1])
+        ordinal = next(i for i, entry in enumerate(same_name) if entry[0] is r)
+        return r["name"], unit, rva, size, ordinal
     die(f"'{arg}' is not a known function RVA/name in symbol_names.csv")
 
 
-def _objdump(obj: Path, name: str) -> str:
+def _text_span(obj: Path, name: str, size_hint: int, ordinal: int) -> tuple[int, int]:
+    """Return the full public-text-symbol span containing *name*.
+
+    `llvm-objdump --disassemble-symbols` stops when it reaches an internal COFF label,
+    truncating functions that contain compiler-generated `$L...` symbols. Public `T`
+    symbols delimit functions; private `t` labels remain inside the selected range.
+    """
+    res = subprocess.run(
+        ["llvm-nm", "-P", str(obj)],
+        capture_output=True, text=True)
+    if res.returncode != 0:
+        die(f"llvm-nm failed on {obj.name}:\n{res.stderr.strip()}")
+
+    text_symbols = []
+    named = []
+    for line in res.stdout.splitlines():
+        fields = line.split()
+        if len(fields) < 3 or fields[1] != "T":
+            continue
+        try:
+            offset = int(fields[2], 16)
+        except ValueError:
+            continue
+        text_symbols.append(offset)
+        if fields[0] == name:
+            named.append(offset)
+
+    named.sort()
+    if ordinal >= len(named):
+        die(f"symbol {name} not found in {obj.relative_to(REPO)} "
+            "(unit not implemented yet? base objs of un-bodied units are stubs)")
+    start = named[ordinal]
+    following = [offset for offset in text_symbols if offset > start]
+    stop = min(following) if following else 0
+    if not stop:
+        sections = subprocess.run(
+            ["llvm-objdump", "-h", str(obj)],
+            capture_output=True, text=True)
+        if sections.returncode == 0:
+            for line in sections.stdout.splitlines():
+                fields = line.split()
+                if len(fields) >= 4 and fields[1] == ".text":
+                    try:
+                        stop = int(fields[3], 16) + int(fields[2], 16)
+                    except ValueError:
+                        pass
+                    break
+    if not stop:
+        stop = start + size_hint
+    if stop <= start:
+        die(f"cannot determine the text span of {name} in {obj.relative_to(REPO)}")
+    return start, stop
+
+
+def _objdump(obj: Path, name: str, size_hint: int, ordinal: int) -> str:
     if not obj.is_file():
         die(f"{obj.relative_to(REPO)} missing - "
             + ("run `homm2 build` first" if BASE in obj.parents else "run `homm2 init` first"))
+    start, stop = _text_span(obj, name, size_hint, ordinal)
     res = subprocess.run(
         ["llvm-objdump", "-dr", "--x86-asm-syntax=intel",
-         f"--disassemble-symbols={name}", str(obj)],
+         f"--start-address=0x{start:x}", f"--stop-address=0x{stop:x}", str(obj)],
         capture_output=True, text=True)
     if res.returncode != 0:
         die(f"llvm-objdump failed on {obj.name}:\n{res.stderr.strip()}")
@@ -127,12 +205,12 @@ def _norm(text: str) -> list:
     return out
 
 
-def _rich(name: str, unit: str) -> str:
+def _rich(name: str, unit: str, size: int, ordinal: int) -> str:
     """BASE disasm interleaved with the CodeView source line each code offset came from
     (build/lines/<unit>.json: {mangled: [[code_off, src_line, text], ...]}). Degrades to
     plain base asm if the line map is absent."""
     obj = BASE / f"{unit}.obj"
-    body = _objdump(obj, name)
+    body = _objdump(obj, name, size, ordinal)
     lm = {}
     lj = LINES / f"{unit}.json"
     if lj.is_file():
@@ -167,18 +245,18 @@ def main():
     pos = [a for a in args if not a.startswith("--")]
     if not pos:
         sys.exit(__doc__)
-    name, unit, rva = _resolve(pos[0])
+    name, unit, rva, size, ordinal = _resolve(pos[0])
     if not unit:
         die(f"{name} has no unit in symbol_names.csv")
 
     if "--rich" in flags:
-        print(_rich(name, unit), end="")
+        print(_rich(name, unit, size, ordinal), end="")
         sys.exit(0)
 
     if "--diff" in flags:
         import difflib
-        base = _norm(_objdump(NORMAL_BASE / f"{unit}.obj", name))
-        tgt = _norm(_objdump(NORMAL_TARGET / f"{unit}.c.obj", name))
+        base = _norm(_objdump(NORMAL_BASE / f"{unit}.obj", name, size, ordinal))
+        tgt = _norm(_objdump(NORMAL_TARGET / f"{unit}.c.obj", name, size, ordinal))
         if base == tgt:
             print(f"identical asm ({len(tgt)} instruction(s); addresses/relocs masked)")
             sys.exit(0)
@@ -190,10 +268,10 @@ def main():
 
     if "--base" in flags:
         print(f"[disasm BASE (compiled): {name}  build/objdiff/base/{unit}.obj]")
-        text = _objdump(BASE / f"{unit}.obj", name)
+        text = _objdump(BASE / f"{unit}.obj", name, size, ordinal)
     else:
         print(f"[disasm TARGET (retail): {name}  build/delink/{unit}.c.obj]")
-        text = _objdump(DELINK / f"{unit}.c.obj", name)
+        text = _objdump(DELINK / f"{unit}.c.obj", name, size, ordinal)
     print(_lite(text) if "--lite" in flags else text, end="")
     sys.exit(0)
 

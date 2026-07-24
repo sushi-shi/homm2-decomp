@@ -1327,11 +1327,11 @@ def record_target_max(
     current_hash: str | None,
     new_score: float | None,
 ) -> dict:
-    """Validate one retained-max row and raise only its max field.
+    """Validate one retained-max row and record only an audited exact score.
 
     All non-target bytes and all other target-row fields are preserved exactly.  Validation
-    happens even when *new_score* is absent or non-improving, so ``--record-max`` never
-    silently accepts a missing, duplicate, or stale-hash ledger.
+    happens even when *new_score* is absent, non-exact, or non-improving, so
+    ``--record-max`` never silently accepts a missing, duplicate, or stale-hash ledger.
     """
     original = baseline_path.read_bytes()
     lines = original.splitlines(keepends=True)
@@ -1378,6 +1378,9 @@ def record_target_max(
     if not math.isfinite(new_score) or not 0.0 <= new_score <= 100.0:
         raise BaselineUpdateError(f"invalid observed score for {unit}::{symbol}: {new_score}")
     result["observed_score"] = new_score
+    if new_score != 100.0:
+        result["reason"] = "not_audited_exact"
+        return result
     written_max = float(f"{new_score:.4f}")
     if written_max <= old_max:
         result["reason"] = "not_higher"
@@ -1478,7 +1481,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true", help="resolve target and emit snippets without compiling")
     parser.add_argument(
         "--record-max", action="store_true",
-        help="after restoration, raise only this target's max to its best observed score",
+        help="after restoration, record 100 only for an audited exact target closure",
     )
     parser.add_argument(
         "--retain-best", action="store_true",
@@ -1587,7 +1590,7 @@ def main(argv: list[str] | None = None) -> int:
             "generated_noise_retained_in_source": False,
             "default_repository_mutation": False,
             "sub_100_source_is_disposable": True,
-            "record_max_accepts_higher_target_observations": True,
+            "record_max_requires_audited_exact_closure": True,
             "exact_closure_requires_unrounded_100_size_and_ordered_relocations": True,
             "only_target_function_is_evaluated": True,
             "sibling_scores_or_metrics_checked": False,
@@ -2046,7 +2049,7 @@ def main(argv: list[str] | None = None) -> int:
                 target.unit,
                 target.symbol,
                 restored_target_hash,
-                best_score,
+                exact_closure["score"] if exact_closure is not None else None,
             )
         except (OSError, BaselineUpdateError) as exc:
             record_error = True
@@ -2084,14 +2087,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"best objects and assembly retained: {retained_output}")
         if args.record_max:
             state = manifest["record_max"]
-            if state["updated"]:
-                print(
-                    f"best observation retained {state['old_max']:.4f}% -> "
-                    f"{state['new_max']:.4f}% for unchanged source hash "
-                    f"{state['source_hash']}"
-                )
-            else:
-                print(f"retained maximum unchanged: {state['reason']}")
+            print(f"retained maximum unchanged: {state['reason']}")
         source_lock.close()
         return 0
 
@@ -2105,7 +2101,7 @@ def main(argv: list[str] | None = None) -> int:
         state = manifest["record_max"]
         if state["updated"]:
             print(
-                f"best observation retained {state['old_max']:.4f}% -> "
+                f"audited exact maximum retained {state['old_max']:.4f}% -> "
                 f"{state['new_max']:.4f}% "
                 f"for unchanged source hash {state['source_hash']}; generated probe not retained"
             )

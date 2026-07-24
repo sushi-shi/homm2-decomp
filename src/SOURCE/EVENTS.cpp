@@ -7295,36 +7295,35 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     heroId9 = cell->m_objectMetadata;
     if (gpGame->m_availableHeroes[heroId9] != EVENT_JAILED_HERO) {
         EraseObj(cell, x, y);
-    } else {
-        if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
-        } else {
-            gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
-            gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
-            releasedHero13 = &gpGame->m_heroRecs[heroId9];
-            EraseObj(cell, x, y);
-            gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId9);
-            gpCurPlayer->m_heroCount++;
-            releasedHero13->m_x = x;
-            releasedHero13->m_y = y;
-            releasedHero13->m_eventFlags = HERO_EVENT_NONE;
-            releasedHero13->m_direction = MAP_DIRECTION_EAST;
-            releasedHero13->m_remainingMobility = releasedHero13->CalcMobility();
-            releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
-            releasedHero13->m_locationType = cell->m_triggerType;
-            releasedHero13->m_occupiedTown = cell->m_objectMetadata;
-            cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-            cell->m_objectMetadata = heroId9;
-            SendMapChange(
-                MAP_CHANGE_RECRUIT_HERO,
-                static_cast<i8>(heroId9),
-                x,
-                y,
-                MAP_CHANGE_CURRENT_PLAYER,
-                0,
-                0
-            );
-        }
+        return;
     }
+    if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT)
+        return;
+    gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
+    gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
+    releasedHero13 = &gpGame->m_heroRecs[heroId9];
+    EraseObj(cell, x, y);
+    gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId9);
+    gpCurPlayer->m_heroCount++;
+    releasedHero13->m_x = x;
+    releasedHero13->m_y = y;
+    releasedHero13->m_eventFlags = HERO_EVENT_NONE;
+    releasedHero13->m_direction = MAP_DIRECTION_EAST;
+    releasedHero13->m_remainingMobility = releasedHero13->CalcMobility();
+    releasedHero13->m_mobility = releasedHero13->m_remainingMobility;
+    releasedHero13->m_locationType = cell->m_triggerType;
+    releasedHero13->m_occupiedTown = cell->m_objectMetadata;
+    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
+    cell->m_objectMetadata = heroId9;
+    SendMapChange(
+        MAP_CHANGE_RECRUIT_HERO,
+        static_cast<i8>(heroId9),
+        x,
+        y,
+        MAP_CHANGE_CURRENT_PLAYER,
+        0,
+        0
+    );
 }
 
 VA(0x004b4fd5, 0x82b)

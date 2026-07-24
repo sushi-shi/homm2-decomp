@@ -1481,33 +1481,33 @@ void advManager::PurgeMapChangeQueue(void) {
 
 VA(0x00410b9e, 0x1d4)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
-    i32 queuedChanges;
+    i32 queueCount;
     i32 unwoundChanges;
-    i32 lowestSlot;
+    i32 bestSlot;
     i32 lowestSequence;
     i32 continueUnwinding;
     i32 slot;
 
-    queuedChanges = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
+    queueCount = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
     unwoundChanges = 0;
-    while (queuedChanges > 0 && unwoundChanges < maximumToUnwind) {
-        lowestSlot = -1;
+    while (queueCount > 0 && unwoundChanges < maximumToUnwind) {
+        bestSlot = -1;
         lowestSequence = CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL;
-        queuedChanges = 0;
+        queueCount = 0;
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE) {
-                ++queuedChanges;
+                ++queueCount;
                 if (sMapChangeQueue[slot].sequence < lowestSequence) {
                     lowestSequence = sMapChangeQueue[slot].sequence;
-                    lowestSlot = slot;
+                    bestSlot = slot;
                 }
             }
         }
-        if (lowestSlot != -1) {
-            --queuedChanges;
+        if (bestSlot != -1) {
+            --queueCount;
             if (processChanges)
-                ProcessMapChange(sMapChangeQueue[lowestSlot]);
-            sMapChangeQueue[lowestSlot].type = MAP_CHANGE_NONE;
+                ProcessMapChange(sMapChangeQueue[bestSlot]);
+            sMapChangeQueue[bestSlot].type = MAP_CHANGE_NONE;
             ++unwoundChanges;
         }
     }
