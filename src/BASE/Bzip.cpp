@@ -1821,7 +1821,7 @@ VA(0x004d7d60, 0xe2)
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    IntNative retVal;
+    IntNative retVal3;
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1835,7 +1835,7 @@ void compress(Char* name) {
     compressStream(inStr, outStr);
     outputHandleJustInCase = NULL;
 
-    retVal = remove(inName);
+    retVal3 = remove(inName);
 }
 
 VA(0x004d7e50, 0x110)
