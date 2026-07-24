@@ -1280,13 +1280,11 @@ void combatManager::CastSpell(
 
 VA(0x00423688, 0xda)
 void combatManager::DefaultSpell(i32 targetHex) {
-    if (ValidHex(targetHex)) {
-        if (m_hexCells[targetHex].m_occupantSide < COMBAT_ATTACKER_SIDE)
-            return;
-        army* target =
-            &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
-        target->SpellEffect(gsSpellInfo[IDX(m_selectedSpell)].combatEffect, 0, 1);
-    }
+    if (!ValidHex(targetHex) || m_hexCells[targetHex].m_occupantSide < COMBAT_ATTACKER_SIDE)
+        return;
+    army* target =
+        &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
+    target->SpellEffect(gsSpellInfo[IDX(m_selectedSpell)].combatEffect, 0, 1);
 }
 
 VA(0x00423762, 0x623)
