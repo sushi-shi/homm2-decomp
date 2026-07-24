@@ -162,7 +162,7 @@ void ModemCommand(char* command) {
     char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
     i32 commandPosition0;
-    for (commandPosition0 = 0; commandPosition0 < OD_STEER(commandLength); ++commandPosition0) {
+    for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
         write_buffer(command + commandPosition0, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
     }
@@ -260,7 +260,7 @@ void Connect(void) {
         }
 
         stime = KBTickCount();
-        if (OD_STEER(oldsec) / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
+        if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
             oldsec = stime;
             sprintf(idMessage, DATA_COMPGEN(0x004edfac, connectIDSI, "ID%s_%i"), idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
@@ -303,7 +303,7 @@ i32 WaitForDirectConnect(void) {
                 oldsec = -1;
             }
             stime = KBTickCount();
-            if (OD_STEER(oldsec) / MILLISECONDS_PER_SECOND
+            if (oldsec / MILLISECONDS_PER_SECOND
                 != stime / MILLISECONDS_PER_SECOND) {
                 oldsec = stime;
                 sprintf(idMessage, DATA_COMPGEN(0x004edff0, waitForDirectConnectIDSI, "ID%s_%i"), idstr, localstage);

@@ -166,7 +166,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
             sourceHeight3 = WINGRAPH_SCROLL_SIZE;
         }
         gDDSourceRect.left = sourceLeft3;
-        gDDSourceRect.right = OD_STEER(sourceWidth5) + sourceLeft3 - 1;
+        gDDSourceRect.right = sourceWidth5 + sourceLeft3 - 1;
         gDDSourceRect.top = sourceTop4;
         gDDSourceRect.bottom = sourceTop4 + sourceHeight3 - 1;
 
@@ -1015,7 +1015,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     i32 height7;
     void* screenBuffer;
 
-    if (OD_STEER(giGraphicsType) == graphicsType)
+    if (giGraphicsType == graphicsType)
         return 1;
     if (graphicsType == WINGRAPH_GRAPHICS_WING && gbWinGAttached == 0)
         return 0;

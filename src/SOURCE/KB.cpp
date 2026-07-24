@@ -1637,7 +1637,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         haveMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
     if (haveMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
         haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
-    if ((OD_STEER(reqMask) & haveMask) == reqMask) {
+    if ((reqMask & haveMask) == reqMask) {
         if (t->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;
@@ -2877,7 +2877,7 @@ VA(0x0049cc9e, 0xd7)
 void ClearMapExtra(void) {
     DATA(0x005164bc) static i16 clearMapExtraSourceLineBase = 0x0cbe;
     i32 i;
-    for (i = 0; OD_STEER(i) < iMaxMapExtra; i++) {
+    for (i = 0; i < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
             H2_FREE_AT(
                 ppMapExtra[i], DATA_COMPGEN(0x005164c0, clearMapExtraSourceFile, RETAIL_FILE),
@@ -2962,7 +2962,7 @@ i32 AddScoreToHighScore(
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destination = HIGH_SCORE_LAST_SHIFT_SOURCE; destination >= OD_STEER(entry);
+        for (destination = HIGH_SCORE_LAST_SHIFT_SOURCE; destination >= entry;
              destination--)
             entries_a[destination + 1] = entries_a[destination];
 
@@ -3980,7 +3980,7 @@ void UpdateSystemOptionsMenu(void) {
         return;
     if (hmnuApp == NULL)
         return;
-    if (OD_STEER(hmnuAdv) != hmnuApp)
+    if (hmnuAdv != hmnuApp)
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)

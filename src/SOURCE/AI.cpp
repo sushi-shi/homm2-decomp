@@ -580,7 +580,7 @@ void combatManager::DoLichShot(class army* lich) {
                     damageValue10 += adjacentDamage6;
             }
         }
-        if (bestArmy12 == COMBAT_AI_NO_ARMY || OD_STEER(damageValue10) > bestDamage15) {
+        if (bestArmy12 == COMBAT_AI_NO_ARMY || damageValue10 > bestDamage15) {
             bestDamage15 = damageValue10;
             bestArmy12 = armyIndex37;
             giNextAction = ACTION_MOVE;

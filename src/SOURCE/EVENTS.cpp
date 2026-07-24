@@ -3965,7 +3965,7 @@ i8 StrEqNoCase(char* firstString, char* secondString) {
             return 1;
         firstUpper = static_cast<char>(toupper(static_cast<i32>(*firstPosition)));
         secondUpper = static_cast<char>(toupper(static_cast<i32>(*secondPos)));
-        if (OD_STEER(firstUpper) == secondUpper) {
+        if (firstUpper == secondUpper) {
             if (firstUpper == 0)
                 return 1;
             firstPosition++;
@@ -5918,7 +5918,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
                 armyValue =
                     gMonsterDatabase[IDX(eventHero->m_army.m_creatureTypes[slotIndex])].fightValue
                     * eventHero->m_army.m_creatureCounts[slotIndex];
-                if (armyValue < OD_STEER(weakestValue)) {
+                if (armyValue < weakestValue) {
                     weakestValue = armyValue;
                     selectedSlot = slotIndex;
                 }
@@ -7565,7 +7565,7 @@ void advManager::PlayerMonsterInteract(
                     gText,
                     DATA_COMPGEN(0x0051c83c, playerMonsterInteractTheCreaturesAreSwayedByYour, "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n")
                 );
-                if (OD_STEER(monsterCount_n) == joining)
+                if (monsterCount_n == joining)
                     sprintf(
                         offerText_g,
                         DATA_COMPGEN(0x0051c88c, playerMonsterInteractAllDOfTheSWill, "All %d of the %s will join your army for the sum of %d gold.  Do you "
