@@ -737,7 +737,7 @@ SOURCE/EVENTS	?GiveTakeArtifactStat@@YIXPAVhero@@HH@Z	100.0000	7cbfb596c345
 SOURCE/EVENTS	?HeroLoses@advManager@@QAEXPAVhero@@@Z	100.0000	8aff4a2b44f3
 SOURCE/EVENTS	?HeroSwap@advManager@@QAEXPAVhero@@0@Z	100.0000	0f2c235cc022
 SOURCE/EVENTS	?HouseEvent@advManager@@QAEXPAVhero@@PAVmapCell@@@Z	100.0000	835041341b33
-SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	99.9180	205f521cc6b6
+SOURCE/EVENTS	?JailAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	464db2942234
 SOURCE/EVENTS	?JailEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	e7b6326d10a6
 SOURCE/EVENTS	?PasswordAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	656210d8c95c
 SOURCE/EVENTS	?PasswordEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	2ff9e956371c
