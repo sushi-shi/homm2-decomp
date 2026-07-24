@@ -1457,47 +1457,47 @@ Bool loadAndRLEsource(FILE* src) {
 
 VA(0x004d7290, 0x18d)
 void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
-    IntNative retVal;
-    Int32 lastCharToSpew, i, count, chPrev, ch;
-    UInt32 localCrc;
+    IntNative retVal6;
+    Int32 lastCharToSpew0, i01, count19, chPrev, ch04;
+    UInt32 localCrc02;
 
     if (thisIsTheLastBlock)
-        lastCharToSpew = last - 1;
+        lastCharToSpew0 = last - 1;
     else
-        lastCharToSpew = last;
+        lastCharToSpew0 = last;
 
-    count = 0;
-    i = 0;
-    ch = 256;
-    localCrc = getGlobalCRC();
+    count19 = 0;
+    i01 = 0;
+    ch04 = 256;
+    localCrc02 = getGlobalCRC();
 
-    while (i <= lastCharToSpew) {
-        chPrev = ch;
-        ch = block[i];
-        i++;
+    while (i01 <= lastCharToSpew0) {
+        chPrev = ch04;
+        ch04 = block[i01];
+        i01++;
 
-        retVal = putc(ch, dst);
-        ERROR_IF_EOF(retVal);
-        UPDATE_CRC(localCrc, (UChar)ch);
+        retVal6 = putc(ch04, dst);
+        ERROR_IF_EOF(retVal6);
+        UPDATE_CRC(localCrc02, (UChar)ch04);
 
-        if (ch != chPrev) {
-            count = 1;
+        if (ch04 != chPrev) {
+            count19 = 1;
         } else {
-            count++;
-            if (count >= 4) {
+            count19++;
+            if (count19 >= 4) {
                 Int32 j;
-                for (j = 0; j < (Int32)block[i]; j++) {
-                    retVal = putc(ch, dst);
-                    ERROR_IF_EOF(retVal);
-                    UPDATE_CRC(localCrc, (UChar)ch);
+                for (j = 0; j < (Int32)block[i01]; j++) {
+                    retVal6 = putc(ch04, dst);
+                    ERROR_IF_EOF(retVal6);
+                    UPDATE_CRC(localCrc02, (UChar)ch04);
                 }
-                i++;
-                count = 0;
+                i01++;
+                count19 = 0;
             }
         }
     }
 
-    setGlobalCRC(localCrc);
+    setGlobalCRC(localCrc02);
 
     if (thisIsTheLastBlock && block[last] != 42)
         unblockError();

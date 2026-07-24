@@ -115,7 +115,7 @@ BASE/Bzip	?sortIt@@YIXXZ	99.1210	f3ac5266e2ee
 BASE/Bzip	?spotBlock@@YIXH@Z	100.0000	9842ca999a79
 BASE/Bzip	?stripe@@YIXXZ	100.0000	e7fd06a29e40
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000	923bed540da7
-BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	99.7273	d8b9ef4234a6
+BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	100.0000	bb0cb487dca3
 BASE/Bzip	?unblockError@@YIXXZ	100.0000	3cc487307672
 BASE/Bzip	?uncompress@@YIXPAD@Z	100.0000	4f7f5347cbea
 BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	100.0000	5216c7593f67
