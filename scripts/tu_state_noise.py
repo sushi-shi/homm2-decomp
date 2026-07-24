@@ -827,6 +827,15 @@ def format_timings(timings: dict[str, dict[str, float | int]]) -> str:
     return "timings: " + "; ".join(fields)
 
 
+def staged_artifact_path(requested: Path, scratch_path: Path, final_path: Path) -> Path:
+    """Write paths inside the retained directory through its temporary staging tree."""
+    try:
+        relative = requested.relative_to(final_path)
+    except ValueError:
+        return requested
+    return scratch_path / relative
+
+
 def finalize_compiled_artifacts(
     scratch: tempfile.TemporaryDirectory,
     scratch_path: Path,
@@ -1970,8 +1979,11 @@ def main(argv: list[str] | None = None) -> int:
             if not args.state_summary.is_absolute()
             else args.state_summary
         )
-        state_summary_path.parent.mkdir(parents=True, exist_ok=True)
-        state_summary_path.write_text(
+        state_summary_output = staged_artifact_path(
+            state_summary_path, output, final_output
+        )
+        state_summary_output.parent.mkdir(parents=True, exist_ok=True)
+        state_summary_output.write_text(
             json.dumps(
                 {
                     "schema": 2,
