@@ -308,7 +308,7 @@ BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	98.6522	05f589f60615
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	8e0b611ea549
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	fb5b4863612a
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	100.0000	8f55fa1b3dac
-BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	99.7955	74de7c193243
+BASE/Textntry	?Main@textEntryWidget@@UAEHAAUtag_message@@@Z	100.0000	74de7c193243
 BASE/Textntry	?Read@textEntryWidget@@QAEXH@Z	98.6755	e4bd175b08e2
 BASE/Textntry	?SetupDisplayString@textEntryWidget@@QAEXPADG@Z	100.0000	7e8c231abf9b
 BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	100.0000	5646c40cb889
@@ -379,7 +379,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	0c7ef3a9e420
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	0628dc7098ba
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	100.0000	81919949cfc2
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	100.0000	691fa6dd198c
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	99.4215	6dd9b5b019af
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	100.0000	6dd9b5b019af
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	100.0000	8c338153991b
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	97733f0d7f3c
 BASE/miscwin	@BlitBitmapToScreenVesa@28	100.0000	3d20026eb4c4
@@ -536,7 +536,7 @@ SOURCE/AI	?GetShooterMask@combatManager@@QAEHH@Z	100.0000	fd8646b27389
 SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	100.0000	0800d05d8708
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	f4bc452ff45c
 SOURCE/AI	?GetWalkerMask@combatManager@@QAEHH@Z	100.0000	5d80474ee13a
-SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	98.9123	1f995e6ce676
+SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	100.0000	1f995e6ce676
 SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	98.9752	869b34dbc719
 SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	99.0120	76c933ef404b
 SOURCE/ARMY	??0army@@QAE@XZ	100.0000	e94f637d29ec
