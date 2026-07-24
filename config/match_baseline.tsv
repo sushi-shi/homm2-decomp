@@ -1020,7 +1020,7 @@ SOURCE/Newgame	?CleanUpNewGameWindow@game@@QAEXXZ	100.0000	82ccd7a98e62
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	100.0000	228f4a437eec
 SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	100.0000	41adaed34036
 SOURCE/Newgame	?GetMap@game@@QAEXXZ	100.0000	db959b13d594
-SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	100.0000	f70c05520f1d
+SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	100.0000	d0d9dc07a8f6
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	100.0000	8abf06a6d0c0
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	96.4662	dd2491936751
 SOURCE/Newgame	?InitNewGameWindow@game@@QAEXXZ	100.0000	9a817edb836c
