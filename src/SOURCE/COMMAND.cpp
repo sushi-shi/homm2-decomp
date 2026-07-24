@@ -1419,10 +1419,10 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                     NORMAL_DIALOG_NO_RESOURCE,
                     0
                 );
-            } else {
-                ViewSpells(0);
-                ResetMouse();
+                break;
             }
+            ViewSpells(0);
+            ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(

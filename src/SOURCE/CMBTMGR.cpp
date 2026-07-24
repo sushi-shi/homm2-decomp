@@ -1390,7 +1390,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             i32 adjacentHex = GetAdjacentCellIndexNoArmy(
                 IDX(targetHex4),
                 static_cast<CombatHexDirection>(
-                    (frame18 + startDirection) % COMBAT_CATAPULT_DIRECTION_COUNT
+                    (startDirection + frame18) % COMBAT_CATAPULT_DIRECTION_COUNT
                 )
             );
             if (adjacentHex != -1 && m_hexCells[adjacentHex].m_occupantSide == COMBAT_SIDE_NONE) {
@@ -1425,7 +1425,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     float projectileX11 = static_cast<float>(startX7);
     float projectileY4 = static_cast<float>(startY9);
     float midpointX19 = static_cast<float>(
-        (OD_STEER(impactX5) + startX7) / COMBAT_CATAPULT_MIDPOINT_DIVISOR
+        (impactX5 + startX7) / COMBAT_CATAPULT_MIDPOINT_DIVISOR
     );
     bounceY0 = static_cast<float>(
         (impactY0 - (impactX5 - startX7) * COMBAT_CATAPULT_DISTANCE_ARC_SCALE)
@@ -1497,7 +1497,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
         );
         previousX5 = static_cast<i32l>(projectileX11);
         previousY2 = static_cast<i32l>(projectileY4);
-        projectileX11 = projectileX11 + xStep0;
+        projectileX11 += xStep0;
         projectileY4 = (COMBAT_CATAPULT_DESCENT_FRAME - frame18) * yStep15 + projectileY4;
         spriteFrame27++;
         spriteFrame27 %= COMBAT_CATAPULT_BOULDER_FRAME_COUNT;
