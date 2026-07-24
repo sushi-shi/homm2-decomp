@@ -85,12 +85,12 @@ def _resolve(arg):
     die(f"'{arg}' is not a known function RVA/name in symbol_names.csv")
 
 
-def _text_span(obj: Path, name: str, size_hint: int, ordinal: int) -> tuple[int, int]:
-    """Return the full public-text-symbol span containing *name*.
+def _public_text_symbols(obj: Path) -> set[str]:
+    """Return external text symbol names from *obj*.
 
-    `llvm-objdump --disassemble-symbols` stops when it reaches an internal COFF label,
-    truncating functions that contain compiler-generated `$L...` symbols. Public `T`
-    symbols delimit functions; private `t` labels remain inside the selected range.
+    Candidate library objects commonly place each function in a distinct COMDAT
+    `.text` section whose address starts at zero.  Consequently, numeric address
+    ranges cannot select one function from the whole object.
     """
     res = subprocess.run(
         ["llvm-nm", "-P", str(obj)],
@@ -98,60 +98,62 @@ def _text_span(obj: Path, name: str, size_hint: int, ordinal: int) -> tuple[int,
     if res.returncode != 0:
         die(f"llvm-nm failed on {obj.name}:\n{res.stderr.strip()}")
 
-    text_symbols = []
-    named = []
+    names = set()
     for line in res.stdout.splitlines():
         fields = line.split()
         if len(fields) < 3 or fields[1] != "T":
             continue
-        try:
-            offset = int(fields[2], 16)
-        except ValueError:
-            continue
-        text_symbols.append(offset)
-        if fields[0] == name:
-            named.append(offset)
+        names.add(fields[0])
+    return names
 
-    named.sort()
-    if ordinal >= len(named):
-        die(f"symbol {name} not found in {obj.relative_to(REPO)} "
-            "(unit not implemented yet? base objs of un-bodied units are stubs)")
-    start = named[ordinal]
-    following = [offset for offset in text_symbols if offset > start]
-    stop = min(following) if following else 0
-    if not stop:
-        sections = subprocess.run(
-            ["llvm-objdump", "-h", str(obj)],
-            capture_output=True, text=True)
-        if sections.returncode == 0:
-            for line in sections.stdout.splitlines():
-                fields = line.split()
-                if len(fields) >= 4 and fields[1] == ".text":
-                    try:
-                        stop = int(fields[3], 16) + int(fields[2], 16)
-                    except ValueError:
-                        pass
-                    break
-    if not stop:
-        stop = start + size_hint
-    if stop <= start:
-        die(f"cannot determine the text span of {name} in {obj.relative_to(REPO)}")
-    return start, stop
+
+_SYMBOL_TITLE = re.compile(r"^\s*[0-9a-fA-F]+ <(.+)>:$")
+
+
+def _slice_public_symbol(
+        text: str, name: str, ordinal: int, public_names: set[str]) -> str | None:
+    """Select one complete public function from a full object disassembly.
+
+    Unlike `--disassemble-symbols`, this keeps compiler-generated private labels
+    inside the function.  A new public label or section ends the selected span;
+    private `$L...` labels do not.
+    """
+    selected = False
+    occurrence = 0
+    body = []
+    for line in text.splitlines():
+        title = _SYMBOL_TITLE.match(line)
+        if not selected:
+            if title and title.group(1) == name:
+                if occurrence == ordinal:
+                    selected = True
+                    body.append(line)
+                occurrence += 1
+            continue
+
+        if line.startswith("Disassembly of section "):
+            break
+        if title and title.group(1) in public_names:
+            break
+        body.append(line)
+
+    if not selected:
+        return None
+    return "\n".join(body).rstrip() + "\n"
 
 
 def _objdump(obj: Path, name: str, size_hint: int, ordinal: int) -> str:
     if not obj.is_file():
         die(f"{obj.relative_to(REPO)} missing - "
             + ("run `homm2 build` first" if BASE in obj.parents else "run `homm2 init` first"))
-    start, stop = _text_span(obj, name, size_hint, ordinal)
+    public_names = _public_text_symbols(obj)
     res = subprocess.run(
-        ["llvm-objdump", "-dr", "--x86-asm-syntax=intel",
-         f"--start-address=0x{start:x}", f"--stop-address=0x{stop:x}", str(obj)],
+        ["llvm-objdump", "-dr", "--x86-asm-syntax=intel", str(obj)],
         capture_output=True, text=True)
     if res.returncode != 0:
         die(f"llvm-objdump failed on {obj.name}:\n{res.stderr.strip()}")
-    body = res.stdout
-    if f"<{name}>:" not in body:
+    body = _slice_public_symbol(res.stdout, name, ordinal, public_names)
+    if body is None:
         die(f"symbol {name} not found in {obj.relative_to(REPO)} "
             "(unit not implemented yet? base objs of un-bodied units are stubs)")
     return body
