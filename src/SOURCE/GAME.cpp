@@ -5582,10 +5582,10 @@ void game::MakeAllWaterVisible(i32 player) {
     char mask = static_cast<char>(1 << player);
     i32 x;
     i32 y;
-    for (x = 0; x < OD_STEER(MAP_WIDTH); x++) {
-        for (y = 0; OD_STEER(y) < MAP_HEIGHT; y++) {
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
             if (giGroundToTerrain[WORLDMAP->Row(y)[x].m_terrainImageIndex] == TERRAIN_WATER)
-                mapExtra[MAP_WIDTH * OD_STEER(y) + x] |= mask;
+                mapExtra[y * MAP_WIDTH + x] |= mask;
         }
     }
 }
