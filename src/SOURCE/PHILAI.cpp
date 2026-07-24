@@ -422,48 +422,44 @@ inline i32 HeroRVByteOffset(i32 x, i32 y) {
 #define HERO_RV_AT(values, byteOffset) \
     (*reinterpret_cast<i16*>(reinterpret_cast<u8*>(values) + (byteOffset)))
 
-// @early-stop
-// All instructions and relocations match retail; only its three trailing alignment NOPs remain.
 VA(0x0043781b, 0x1b5)
 void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     i32 idx;
     i32 node;
 
-    if (x != -1) {
-        if (y == -1)
-            return;
-        for (node = 0; MAP_WIDTH > node; node++) {
-            for (idx = 0; MAP_HEIGHT > idx; idx++) {
-                if (resetAll != 0) {
-                    if (abs(x - node) + abs(y - idx) < NEARBY_RADIUS)
-                        // Row-major i16 map: byte offset = x * 2 + y * MAP_WIDTH * 2.
-                        HERO_RV_AT(
-                            gaiHeroStrategicRVOfPos,
-                            node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
-                        ) = IDX(RV_UNSET);
-                } else {
+    if (x == -1 || y == -1)
+        return;
+    for (node = 0; MAP_WIDTH > node; node++) {
+        for (idx = 0; MAP_HEIGHT > idx; idx++) {
+            if (resetAll != 0) {
+                if (abs(x - node) + abs(y - idx) < NEARBY_RADIUS)
+                    // Row-major i16 map: byte offset = x * 2 + y * MAP_WIDTH * 2.
                     HERO_RV_AT(
                         gaiHeroStrategicRVOfPos,
                         node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
                     ) = IDX(RV_UNSET);
-                    HERO_RV_AT(
-                        gaiHeroEventStratRVOfPos,
-                        node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
-                    ) = IDX(RV_UNSET);
-                }
+            } else {
+                HERO_RV_AT(
+                    gaiHeroStrategicRVOfPos,
+                    node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
+                ) = IDX(RV_UNSET);
+                HERO_RV_AT(
+                    gaiHeroEventStratRVOfPos,
+                    node * sizeof(i16) + MAP_WIDTH * idx * sizeof(i16)
+                ) = IDX(RV_UNSET);
             }
         }
-        HERO_RV_AT(
-            gaiHeroEventStratRVOfPos,
-            x * sizeof(i16) + (MAP_WIDTH | 0) * y * sizeof(i16)
-        ) = IDX(RV_UNSET);
-        for (node = 0; node < GAME_HERO_COUNT; node++) {
-            // Original bug: both axes compare the hero's X coordinate.
-            if (resetAll == 0
-                || abs(y - gpGame->m_heroRecs[node].m_x) + abs(x - gpGame->m_heroRecs[node].m_x)
-                       < NEARBY_RADIUS)
-                gaiHeroLiveChance[node] = IDX(RV_UNSET);
-        }
+    }
+    HERO_RV_AT(
+        gaiHeroEventStratRVOfPos,
+        x * sizeof(i16) + (MAP_WIDTH | 0) * y * sizeof(i16)
+    ) = IDX(RV_UNSET);
+    for (node = 0; node < GAME_HERO_COUNT; node++) {
+        // Original bug: both axes compare the hero's X coordinate.
+        if (resetAll == 0
+            || abs(y - gpGame->m_heroRecs[node].m_x) + abs(x - gpGame->m_heroRecs[node].m_x)
+                   < NEARBY_RADIUS)
+            gaiHeroLiveChance[node] = IDX(RV_UNSET);
     }
 }
 
@@ -2358,7 +2354,7 @@ void philAI::ProbableOutcomeOfBattle(
     if (attackerHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (attackerHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+            if (attackerHero->m_artifacts[artifactIndex15] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(attackerHero->m_artifacts[artifactIndex15])
                        < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 attackerArtifacts7 +=
@@ -2384,7 +2380,7 @@ void philAI::ProbableOutcomeOfBattle(
     if (defenderHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (defenderHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+            if (defenderHero->m_artifacts[artifactIndex15] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(defenderHero->m_artifacts[artifactIndex15])
                        < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 defenderArtifacts18 +=

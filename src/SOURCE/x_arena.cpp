@@ -147,7 +147,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     i32 type_13;
     i32 extra_18;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
