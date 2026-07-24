@@ -1079,9 +1079,9 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         ));
         strcpy(titleCopy, cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
-            titleLefts[IDX(giOverviewType)][OD_STEER(title)],
+            titleLefts[IDX(giOverviewType)][title],
             OVERVIEW_TITLE_Y,
-            titleWidth[IDX(giOverviewType)][OD_STEER(title)],
+            titleWidth[IDX(giOverviewType)][title],
             OVERVIEW_TITLE_HEIGHT,
             titleCopy,
             const_cast<char*>(DATA_COMPGEN(0x004edcd8, setupNewOverviewTypeSmalfontFnt, "smalfont.fnt")),
@@ -1262,7 +1262,7 @@ void game::DoKnob(void) {
                 if (static_cast<float>(message9.payload.mouse.y) < scrollTop11) {
                     message9.payload.mouse.y = static_cast<i32>(scrollTop11);
                 }
-                if (scrollRange13 + OD_STEER(scrollTop11)
+                if (scrollRange13 + scrollTop11
                         - DATA_COMPGEN(
                             0x004eb074,
                             overviewScrollLastPixelAdjust,
@@ -1270,14 +1270,14 @@ void game::DoKnob(void) {
                         )
                     < static_cast<float>(message9.payload.mouse.y)) {
                     message9.payload.mouse.y = static_cast<i32>(
-                        scrollRange13 + OD_STEER(scrollTop11) - IDX(SCROLL_LAST_PIXEL_ADJUST)
+                        scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     );
                 }
                 gpMouseManager->Main(message9);
                 OVScrollKnob->m_y =
                     static_cast<i16>(message9.payload.mouse.y - SCROLL_KNOB_OFFSET);
                 newTop8 = static_cast<i32>((OVScrollKnob->m_y - scrollTop11) / pixelsPerItem13);
-                if (OD_STEER(previousTop6) != newTop8) {
+                if (previousTop6 != newTop8) {
                     if (newTop8 > giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
                         newTop8 = giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
                     }

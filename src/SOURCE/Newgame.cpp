@@ -796,7 +796,7 @@ void game::InitNewGameWindow(void) {
         iconControlLocal = new iconWidget(
             static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_RACE_ICON_X_OFFSET),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + PLAYER_RACE_ICON_Y),
             PLAYER_RACE_ICON_WIDTH,
             PLAYER_RACE_ICON_HEIGHT,
@@ -828,7 +828,7 @@ void game::InitNewGameWindow(void) {
                 playerSpacingTemp * playerCounter + firstPlayerXLocal + PLAYER_RACE_NAME_X_OFFSET
                 - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
             ),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + PLAYER_RACE_NAME_Y),
             static_cast<i16>(raceTextWidth + PLAYER_RACE_NAME_BASE_WIDTH),
             PLAYER_RACE_NAME_HEIGHT,
@@ -846,7 +846,7 @@ void game::InitNewGameWindow(void) {
         iconControlLocal = new iconWidget(
             static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_RACE_CYCLE_X_OFFSET),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + PLAYER_RACE_CYCLE_Y),
             PLAYER_RACE_CYCLE_WIDTH,
             PLAYER_RACE_CYCLE_HEIGHT,
@@ -1757,7 +1757,7 @@ void game::ShowScenInfo(void) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
                 static_cast<i16>(
-                    OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+                    playerSpacingTemp * playerCounter + firstPlayerXLocal
                     + PLAYER_HUMAN_X_OFFSET
                 ),
                 static_cast<i16>(multiplayerYOffsetValue + SCENARIO_PLAYER_HUMAN_Y),
@@ -1776,7 +1776,7 @@ void game::ShowScenInfo(void) {
 
             iconControlLocal = new iconWidget(
                 static_cast<i16>(
-                    OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+                    playerSpacingTemp * playerCounter + firstPlayerXLocal
                     + PLAYER_HANDICAP_X_OFFSET
                 ),
                 static_cast<i16>(multiplayerYOffsetValue + SCENARIO_PLAYER_HANDICAP_Y),
@@ -1795,7 +1795,7 @@ void game::ShowScenInfo(void) {
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_RACE_X_OFFSET),
             SCENARIO_PLAYER_RACE_Y,
             PLAYER_RACE_WIDTH,
@@ -1820,7 +1820,7 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_COLOR_X_OFFSET),
             SCENARIO_PLAYER_COLOR_Y,
             PLAYER_COLOR_WIDTH,
@@ -1847,7 +1847,7 @@ void game::ShowScenInfo(void) {
             sprintf(label, DATA_COMPGEN(0x0051d180, showScenInfoEmptyString2, " "));
             textControlLocal = new textWidget(
                 static_cast<i16>(
-                    OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+                    playerSpacingTemp * playerCounter + firstPlayerXLocal
                     + PLAYER_NAME_X_OFFSET
                 ),
                 SCENARIO_PLAYER_NAME_Y,
@@ -1867,9 +1867,9 @@ void game::ShowScenInfo(void) {
 
         singlePlayerYOffsetValue = 0;
         iconControlLocal = new iconWidget(
-            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_RACE_ICON_X_OFFSET),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + SCENARIO_PLAYER_RACE_ICON_Y),
             PLAYER_RACE_ICON_WIDTH,
             PLAYER_RACE_ICON_HEIGHT,
@@ -1898,10 +1898,10 @@ void game::ShowScenInfo(void) {
         }
         textControlLocal = new textWidget(
             static_cast<i16>(
-                OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+                playerSpacingTemp * playerCounter + firstPlayerXLocal
                 + PLAYER_RACE_NAME_X_OFFSET - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
             ),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + SCENARIO_PLAYER_RACE_NAME_Y),
             static_cast<i16>(raceTextWidth + PLAYER_RACE_NAME_BASE_WIDTH),
             PLAYER_RACE_NAME_HEIGHT,
@@ -1917,9 +1917,9 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(OD_STEER(playerSpacingTemp) * playerCounter + firstPlayerXLocal
+            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
                              + PLAYER_RACE_CYCLE_X_OFFSET),
-            static_cast<i16>(OD_STEER(multiplayerYOffsetValue) + singlePlayerYOffsetValue
+            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
                              + SCENARIO_PLAYER_RACE_CYCLE_Y),
             PLAYER_RACE_CYCLE_WIDTH,
             PLAYER_RACE_CYCLE_HEIGHT,

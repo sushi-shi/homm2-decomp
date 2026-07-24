@@ -253,8 +253,8 @@ i32 game::HandleCampaignWin(void) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
         for (sideIndex = CAMPAIGN_ROLAND; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
-                if (m_campaignMapEnabled[IDX(sideIndex)][OD_STEER(mapIndex)]) {
-                    gpGame->m_campaignScenarioBonus[IDX(sideIndex)][OD_STEER(mapIndex)] =
+                if (m_campaignMapEnabled[IDX(sideIndex)][mapIndex]) {
+                    gpGame->m_campaignScenarioBonus[IDX(sideIndex)][mapIndex] =
                         m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
                         m_campaignType = sideIndex;

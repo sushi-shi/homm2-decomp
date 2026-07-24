@@ -87,9 +87,9 @@ void resourceManager::GetBackdropAtLoc(
         ReadWord();
         dataWidth = ReadWord();
         imageHeight = ReadWord();
-        for (row = destinationY; row < OD_STEER(imageHeight) + destinationY; row++) {
+        for (row = destinationY; row < imageHeight + destinationY; row++) {
             ReadBlock(
-                (OD_STEER(row) * BACKDROP_ROW_BYTES)
+                (row * BACKDROP_ROW_BYTES)
                     + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
                 dataWidth
             );
