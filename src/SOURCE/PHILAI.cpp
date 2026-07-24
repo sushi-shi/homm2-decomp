@@ -2695,7 +2695,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                 if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_BUILDER)
                     cost = static_cast<i32>(cost * DATA_COMPGEN(0x004eb360, getBestBuildingConstant, 1.3));
                 score = (Random(1, 5) + 95) * idx / 100.0f;
-                if (score > OD_STEER(kn)) {
+                if (score > kn) {
                     jb = node;
                     nb = idx;
                     kn = score;
@@ -6640,7 +6640,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
         else
             result5 = 0;
         result5 = static_cast<i32>(
-            OD_STEER(result5) * AI_MONSTER_JOIN_PURCHASE_WEIGHT
+            result5 * AI_MONSTER_JOIN_PURCHASE_WEIGHT
             + outcomeValue0 * AI_MONSTER_JOIN_OUTCOME_WEIGHT
         );
     } else if (strengthRatio26 > AI_MONSTER_OVERWHELMING_RATIO) {

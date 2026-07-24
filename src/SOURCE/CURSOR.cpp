@@ -76,7 +76,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_cursorMapX += directionX_a;
     m_cursorMapY += directionY_a1;
     cellX = m_cursorMapX + m_mapOriginX;
-    cellY = OD_STEER(m_cursorMapY) + m_mapOriginY;
+    cellY = m_cursorMapY + m_mapOriginY;
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
@@ -93,7 +93,7 @@ void advManager::StopCursor(i32 stopSound) {
     m_cursorCycle = 0;
     if (m_previousCursorMapX != -1) {
         m_mapData->GetCell(
-            OD_STEER(m_previousCursorMapX) + m_mapOriginX,
+            m_previousCursorMapX + m_mapOriginX,
             m_previousCursorMapY + m_mapOriginY
         )
             ->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
