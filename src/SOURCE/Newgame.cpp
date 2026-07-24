@@ -2166,7 +2166,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             localPlayerIndex = player5;
     }
 
-    if (OD_STEER(localPlayerIndex) >= firstPlayer && OD_STEER(localPlayerIndex) <= lastPlayer)
+    if (localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer)
         localPlayerOnSide = 1;
     else
         localPlayerOnSide = 0;
@@ -2182,8 +2182,8 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
                 sprintf(text, DATA_COMPGEN(0x0051d3f4, getSideDescYouAndYourAlly, "You and your ally "));
 
             listedPlayerCount5 = 0;
-            for (player5 = firstPlayer; OD_STEER(player5) <= lastPlayer; ++player5) {
-                if (player5 != OD_STEER(localPlayerIndex)) {
+            for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
+                if (localPlayerIndex != player5) {
                     ++listedPlayerCount5;
                     sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
                     colorName3[0] -= 'a' - 'A';
@@ -2204,7 +2204,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             strcpy(text, DATA_COMPGEN(0x0051d430, getSideDescTheEnemy, "the enemy - "));
 
         listedPlayerCount5 = 0;
-        for (player5 = firstPlayer; OD_STEER(player5) <= lastPlayer; ++player5) {
+        for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
             ++listedPlayerCount5;
             sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
             colorName3[0] -= 'a' - 'A';
