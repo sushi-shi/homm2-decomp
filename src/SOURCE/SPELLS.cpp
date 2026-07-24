@@ -3387,6 +3387,7 @@ void combatManager::Resurrect(
     i32 targetHex,
     i32 spellPower
 ) {
+    i32 unusedResurrectWord11;
     i32 unusedResurrectWord3;
     i32 armyIndex_f;
     army* target_i;
