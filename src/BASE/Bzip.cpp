@@ -1585,72 +1585,72 @@ void compressStream(FILE* stream, FILE* zStream) {
 
 VA(0x004d7710, 0x26e)
 Bool uncompressStream(FILE* zStream, FILE* stream) {
-    Bool thisIsTheLastBlock;
-    BitStream* zbs;
-    Int32 magic1, magic2, magic3, magic4;
-    UInt32 crcStored, crcComputed;
-    Int32 currBlockNo;
-    IntNative retVal;
+    Bool thisIsTheLastBlock2;
+    BitStream* zbs02;
+    Int32 magic1h, magic2g, magic3b, magic4a;
+    UInt32 crcStored, crcComputed6;
+    Int32 currBlockNo9;
+    IntNative retVal5;
 
-    zbs = (bsOpenReadStream(zStream));
+    zbs02 = (bsOpenReadStream(zStream));
 
-    magic1 = (Int32)bsGetUChar(zbs);
-    magic2 = (Int32)bsGetUChar(zbs);
-    magic3 = (Int32)bsGetUChar(zbs);
-    magic4 = (Int32)bsGetUChar(zbs);
-    if (magic1 != 'B' || magic2 != 'Z' || magic3 != '0' || magic4 < '1' || magic4 > '9') {
-        bsClose(zbs);
-        retVal = fclose(stream);
-        ERROR_IF_EOF(retVal);
+    magic1h = (Int32)bsGetUChar(zbs02);
+    magic2g = (Int32)bsGetUChar(zbs02);
+    magic3b = (Int32)bsGetUChar(zbs02);
+    magic4a = (Int32)bsGetUChar(zbs02);
+    if (magic1h != 'B' || magic2g != 'Z' || magic3b != '0' || magic4a < '1' || magic4a > '9') {
+        bsClose(zbs02);
+        retVal5 = fclose(stream);
+        ERROR_IF_EOF(retVal5);
         FreeDecompressStructures();
         return False;
     }
 
-    setDecompressStructureSizes(magic4 - '0');
+    setDecompressStructureSizes(magic4a - '0');
     initialiseCRC();
     initBogusModel();
-    arithCodeStartDecoding(zbs);
+    arithCodeStartDecoding(zbs02);
 
     if (veryVerbose) {
         sprintf(gText, DATA_COMPGEN(0x00520778, uncompressStreamEmptyString, "  "));
         LogStr(gText);
     }
-    currBlockNo = 0;
+    currBlockNo9 = 0;
     do {
-        currBlockNo++;
+        currBlockNo9++;
         if (veryVerbose) {
-            sprintf(gText, DATA_COMPGEN(0x0052077c, uncompressStreamDAcMtf, "[%d: ac+mtf "), currBlockNo);
+            sprintf(gText, DATA_COMPGEN(0x0052077c, uncompressStreamDAcMtf, "[%d: ac+mtf "), currBlockNo9);
             LogStr(gText);
         }
-        thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
+        thisIsTheLastBlock2 = getAndMoveToFrontDecode(zbs02);
         if (veryVerbose)
             LogStr(DATA_COMPGEN(0x0052078c, uncompressStreamRt, "rt "));
         undoReversibleTransformation();
         spotBlock(False);
         if (veryVerbose)
             LogStr(DATA_COMPGEN(0x00520790, uncompressStreamRld, "rld"));
-        unRLEandDump(stream, thisIsTheLastBlock);
+        unRLEandDump(stream, thisIsTheLastBlock2);
         if (veryVerbose)
             LogStr(DATA_COMPGEN(0x00520794, uncompressStreamEmptyString2, "] "));
-    } while (!thisIsTheLastBlock);
+    } while (!thisIsTheLastBlock2);
 
     if (veryVerbose)
         LogStr(DATA_COMPGEN(0x00520798, uncompressStreamEmptyString3, " "));
 
-    crcStored = getUInt32(zbs);
-    crcComputed = getFinalCRC();
+    crcStored = getUInt32(zbs02);
+    crcComputed6 = getFinalCRC();
     if (veryVerbose) {
-        sprintf(gText, DATA_COMPGEN(0x0052079c, uncompressStreamCRCsStored0xXComputed0x, "CRCs: stored = 0x%x, computed = 0x%x\n  "), crcStored, crcComputed);
+        sprintf(gText, DATA_COMPGEN(0x0052079c, uncompressStreamCRCsStored0xXComputed0x, "CRCs: stored = 0x%x, computed = 0x%x\n  "), crcStored, crcComputed6);
         LogStr(gText);
     }
-    if (crcStored != crcComputed)
-        crcError(crcStored, crcComputed);
+    if (crcStored != crcComputed6)
+        crcError(crcStored, crcComputed6);
 
-    arithCodeDoneDecoding(zbs);
-    bsClose(zbs);
+    arithCodeDoneDecoding(zbs02);
+    bsClose(zbs02);
     ERROR_IF_NOT_ZERO(ferror(stream));
-    retVal = fclose(stream);
-    ERROR_IF_EOF(retVal);
+    retVal5 = fclose(stream);
+    ERROR_IF_EOF(retVal5);
     FreeDecompressStructures();
     return True;
 }

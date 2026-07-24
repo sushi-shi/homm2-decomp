@@ -119,7 +119,7 @@ BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	99.7273	d8b9ef4234a6
 BASE/Bzip	?unblockError@@YIXXZ	100.0000	3cc487307672
 BASE/Bzip	?uncompress@@YIXPAD@Z	100.0000	4f7f5347cbea
 BASE/Bzip	?uncompressOutOfMemory@@YIXHH@Z	100.0000	5216c7593f67
-BASE/Bzip	?uncompressStream@@YIHPAU_iobuf@@0@Z	99.7484	3d491641932f
+BASE/Bzip	?uncompressStream@@YIHPAU_iobuf@@0@Z	100.0000	25703dab0cbb
 BASE/Bzip	?undoReversibleTransformation@@YIXXZ	100.0000	46046e5b4047
 BASE/Bzip	?updateModel@@YIXPAUModel@@H@Z	100.0000	87503babf80b
 BASE/DIMMER	??0dimmerWidget@@QAE@FFFFFF@Z	100.0000	78d744e07651
