@@ -654,7 +654,7 @@ H2_ENUM_END(ViewArmyControlId)
 #define WORLDMAP (&m_worldMap)
 
 inline town* GetCastle(i32 idx) {
-    return gpGame->GetTown(idx);
+    return &gpGame->m_castleRecs[idx];
 }
 inline i8 PlayerEventByte(i8 color) {
     return gpGame->m_players[color].m_color;
@@ -1889,7 +1889,8 @@ void game::NewMap(char* filename) {
                 m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x,
                 m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y,
                 player2,
-                giVisRange[IDX(m_heroRecs[m_players[player2].m_heroIds[0]].m_cursorType)]
+                giVisRange[static_cast<i8>(
+                    m_heroRecs[m_players[player2].m_heroIds[0]].m_cursorType)]
             );
             m_players[player2].m_heroCount++;
         }
