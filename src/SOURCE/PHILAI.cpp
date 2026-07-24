@@ -2358,7 +2358,7 @@ void philAI::ProbableOutcomeOfBattle(
     if (attackerHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (attackerHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+            if (attackerHero->m_artifacts[artifactIndex15] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(attackerHero->m_artifacts[artifactIndex15])
                        < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 attackerArtifacts7 +=
@@ -2384,7 +2384,7 @@ void philAI::ProbableOutcomeOfBattle(
     if (defenderHero != NULL) {
         for (artifactIndex15 = 0; artifactIndex15 < AI_BATTLE_ARTIFACT_SLOT_COUNT;
              artifactIndex15++) {
-            if (defenderHero->m_artifacts[artifactIndex15] != ARTIFACT_NONE
+            if (defenderHero->m_artifacts[artifactIndex15] >= ARTIFACT_ULTIMATE_BOOK
                 && IDX(defenderHero->m_artifacts[artifactIndex15])
                        < AI_BATTLE_BASE_ARTIFACT_LIMIT)
                 defenderArtifacts18 +=

@@ -1041,7 +1041,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
 
 VA(0x0049290f, 0x1eb)
 void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
-    if (side == COMBAT_SIDE_NONE || index < 0)
+    if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return;
     if (bInHighMoraleBonus) {
         bInHighMoraleBonus = 0;
@@ -1091,7 +1091,7 @@ VA(0x00492afa, 0x1cd)
 i32 combatManager::CheckApplyBadMorale(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 index
 ) {
-    if (side == COMBAT_SIDE_NONE || index < 0)
+    if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return 0;
 
     army* activeArmy = &m_armies[IDX(side)][index];
