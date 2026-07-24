@@ -1603,10 +1603,10 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
         return UI_VIEW_DISMISSED;
     } else {
         gpHVHero->m_mobility = gpHVHero->CalcMobility();
-        gbHeroWindShowing = false;
-        gpHVHero = NULL;
-        return UI_VIEW_CLOSED;
     }
+    gbHeroWindShowing = false;
+    gpHVHero = NULL;
+    return UI_VIEW_CLOSED;
 }
 
 VA(0x0046f56c, 0x9c5)
