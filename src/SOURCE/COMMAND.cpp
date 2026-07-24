@@ -1419,10 +1419,10 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                     NORMAL_DIALOG_NO_RESOURCE,
                     0
                 );
-            } else {
-                ViewSpells(0);
-                ResetMouse();
+                break;
             }
+            ViewSpells(0);
+            ResetMouse();
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
@@ -2775,12 +2775,9 @@ void combatManager::ResetCycleTimers(void) {
     }
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00430ec1, 0x53)
 i32 InCombatArea(i32 x, i32 y) {
-    if (x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT)
-        return 1;
-    return 0;
+    return x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT;
 }
 
 VA(0x00430f14, 0x9d9)

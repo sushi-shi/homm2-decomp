@@ -239,7 +239,8 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
     actingMonsterType = currentArmyPtr->m_monsterType;
     targetArmy = NULL;
     targetMonsterType = CreatureType(0);
-    if (currentArmyPtr->m_targetSide != COMBAT_SIDE_NONE && currentArmyPtr->m_targetIndex >= 0) {
+    if (currentArmyPtr->m_targetSide >= COMBAT_ATTACKER_SIDE
+        && currentArmyPtr->m_targetIndex >= 0) {
         targetArmy = &m_armies[IDX(currentArmyPtr->m_targetSide)][currentArmyPtr->m_targetIndex];
         targetMonsterType = targetArmy->m_monsterType;
     }
