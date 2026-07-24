@@ -3490,18 +3490,18 @@ void SmackFade(u8* src, u8* dst) {
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, WINGRAPH_PALETTE_SIZE);
     for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_COLOR_LIMIT; h++) {
-        e = (OD_STEER(src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-             + OD_STEER(src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT])
+        e = (src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT]
+             + src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
              + src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT])
             / MISC_PALETTE_COMPONENT_BYTES;
         d = SMACK_FADE_DISTANCE_SENTINEL;
         for (i = SMACK_FADE_FIRST_COLOR; i < SMACK_FADE_MATCH_COLOR_LIMIT; i++) {
-            b = (OD_STEER(dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT])
-                 + OD_STEER(dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT])
+            b = (dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT]
+                 + dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
                  + dst[i * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_GREEN_COMPONENT])
                 / MISC_PALETTE_COMPONENT_BYTES;
             p = abs(e - b);
-            if (OD_STEER(d) > p) {
+            if (d > p) {
                 d = p;
                 k = i;
             }
@@ -4224,8 +4224,8 @@ void SetupDynamicWindow(
     rightOffset = *contentRight - x;
     bottomOffsetLocal = *contentBottom - y;
 
-    for (tileRowPos = 0; OD_STEER(tileRowPos) < numRows; tileRowPos++) {
-        for (columnIndex = 0; OD_STEER(columnIndex) < columnsSize; columnIndex++) {
+    for (tileRowPos = 0; tileRowPos < numRows; tileRowPos++) {
+        for (columnIndex = 0; columnIndex < columnsSize; columnIndex++) {
             newWidgetTemp = new iconWidget(
                 columnIndex * TILE_SIZE + leftOffset,
                 tileRowPos * TILE_SIZE + topOffsetNum,
@@ -4308,7 +4308,7 @@ void SetupDynamicWindow(
         MemError();
     (*window)->AddWidget(newWidgetTemp, -1);
 
-    for (edge = 0; columnsSize > OD_STEER(edge); edge++) {
+    for (edge = 0; columnsSize > edge; edge++) {
         newWidgetTemp = new iconWidget(
             edge * TILE_SIZE + leftOffset - EDGE_OFFSET,
             topOffsetNum - CORNER_LEFT,
@@ -4342,7 +4342,7 @@ void SetupDynamicWindow(
         (*window)->AddWidget(newWidgetTemp, -1);
     }
 
-    for (edge = 0; OD_STEER(edge) < numRows; edge++) {
+    for (edge = 0; edge < numRows; edge++) {
         newWidgetTemp = new iconWidget(
             leftOffset - CORNER_LEFT,
             edge * TILE_SIZE + topOffsetNum - EDGE_OFFSET,

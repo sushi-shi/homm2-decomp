@@ -183,7 +183,7 @@ void advManager::DrawCursor(void) {
             if (m_cursorCycle == 0) {
                 drawFrame_f =
                     m_updateMaxY % CURSOR_DIRECTION_COUNT
-                    + ((OD_STEER(m_cursorFrame) & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
+                    + ((m_cursorFrame & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
             }
             FlipIconToBitmap(
                 m_flagIcons[gpCurPlayer->m_color],
@@ -259,7 +259,7 @@ void advManager::DrawCursor(void) {
             if (m_cursorCycle == 0) {
                 drawFrame_f =
                     m_updateMaxY % CURSOR_DIRECTION_COUNT
-                    + ((OD_STEER(m_cursorFrame) & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
+                    + ((m_cursorFrame & CURSOR_FRAME_MASK) + CURSOR_FLAG_FRAME_BASE);
             }
             IconToBitmap(
                 m_flagIcons[gpCurPlayer->m_color],

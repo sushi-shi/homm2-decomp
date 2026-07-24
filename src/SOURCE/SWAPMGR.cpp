@@ -766,18 +766,18 @@ void swapManager::SwapMons(void) {
 
     armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
     armyGroup* targetArmy = &m_heroes[IDX(m_targetSide)]->m_army;
-    if (OD_STEER(selectedArmy->m_creatureTypes[m_selectedSlot])
+    if (selectedArmy->m_creatureTypes[m_selectedSlot]
         == targetArmy->m_creatureTypes[m_targetSlot]) {
         if (selectedArmy->GetNumArmies() == 1)
             return;
         targetArmy->m_creatureCounts[m_targetSlot] =
-            OD_STEER(selectedArmy->m_creatureCounts[m_selectedSlot])
+            selectedArmy->m_creatureCounts[m_selectedSlot]
             + targetArmy->m_creatureCounts[m_targetSlot];
         selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
         selectedArmy->m_creatureCounts[m_selectedSlot] = 0;
         return;
     }
-    if (OD_STEER(selectedArmy) != targetArmy && selectedArmy->GetNumArmies() == 1
+    if (selectedArmy != targetArmy && selectedArmy->GetNumArmies() == 1
         && targetArmy->m_creatureTypes[m_targetSlot] == CREATURE_NONE)
         return;
     selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);

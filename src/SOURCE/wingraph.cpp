@@ -825,8 +825,8 @@ i32 WGAppPaint(void* window, void* paintDC) {
                 destWidth0,
                 destHeight3,
                 hdcImage,
-                OD_STEER(giScrollX) + destX7,
-                OD_STEER(giScrollY) + destY1
+                giScrollX + destX7,
+                giScrollY + destY1
             );
         } else {
             WinGStretchBlt(

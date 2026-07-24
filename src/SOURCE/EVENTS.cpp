@@ -3836,8 +3836,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             continue;
 
         if (currentCell_k->m_extraIndex
-            && OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex)->objectIndex != EMPTY_INDEX)
-            extra_i = OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex);
+            && m_mapData->Extra(currentCell_k->m_extraIndex)->objectIndex != EMPTY_INDEX)
+            extra_i = m_mapData->Extra(currentCell_k->m_extraIndex);
         else
             continue;
 
@@ -3864,8 +3864,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
             goto cellDone;
 
         if (currentCell_k->m_extraIndex
-            && OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex)->objectIndex != EMPTY_INDEX)
-            extra_i = OD_STEER(m_mapData)->Extra(currentCell_k->m_extraIndex);
+            && m_mapData->Extra(currentCell_k->m_extraIndex)->objectIndex != EMPTY_INDEX)
+            extra_i = m_mapData->Extra(currentCell_k->m_extraIndex);
         else
             extra_i = NULL;
 
@@ -3875,8 +3875,8 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 goto cellDone;
 
             if (extra_i->nextIndex
-                && OD_STEER(m_mapData)->Extra(extra_i->nextIndex)->objectIndex != EMPTY_INDEX)
-                extra_i = OD_STEER(m_mapData)->Extra(extra_i->nextIndex);
+                && m_mapData->Extra(extra_i->nextIndex)->objectIndex != EMPTY_INDEX)
+                extra_i = m_mapData->Extra(extra_i->nextIndex);
             else
                 extra_i = NULL;
         }
