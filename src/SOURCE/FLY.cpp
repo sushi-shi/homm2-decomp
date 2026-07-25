@@ -90,16 +90,18 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
 
 VA(0x004a5b95, 0x405)
 i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
-    army* target;
-    i32 targetHex;
-    i32 attackMask;
-    CombatHexDirection initialDirection;
-    CombatHexDirection direction;
-    i32 attackHex[ARMY_ATTACK_HEX_COUNT];
+    i32 attackHex7[ARMY_ATTACK_HEX_COUNT];
     u32 directionMask;
-    i32 adjacentHex;
-    i32 fittingHex;
-    CombatHexDirection i;
+    army* target0;
+    i32 spare;
+    i32 adjacentHex1;
+    i32 attackMask29;
+    CombatHexDirection direction4;
+    i32 cost;
+    CombatHexDirection i5;
+    i32 fittingHex3;
+    CombatHexDirection initialDirection4;
+    i32 targetHex;
 
     if (!ValidHex(destination)) {
         return 0;
@@ -114,91 +116,91 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         return 0;
     }
 
-    target = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
+    target0 = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
     if (pathMode != ARMY_PATH_ANY_TARGET_HEX) {
         targetHex = destination;
     } else {
-        targetHex = target->m_hex;
+        targetHex = target0->m_hex;
     }
     if (!ValidHex(targetHex)) {
         return 0;
     }
 
-    attackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-    while (attackMask != ARMY_ALL_ATTACK_DIRECTIONS) {
-        initialDirection = GetBestDirection(m_hex, targetHex, attackMask);
+    attackMask29 = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
+    while (attackMask29 != ARMY_ALL_ATTACK_DIRECTIONS) {
+        initialDirection4 = GetBestDirection(m_hex, targetHex, attackMask29);
         if (ValidAttack(
                 m_hex,
-                initialDirection,
+                initialDirection4,
                 ARMY_ATTACK_TARGET_ASSIGNED,
                 ARMY_HEX_INVALID,
-                attackHex
+                attackHex7
             )) {
-            m_attackDirection = initialDirection;
+            m_attackDirection = initialDirection4;
             m_moveTargetHex = m_hex;
             return 1;
         }
-        attackMask |= 1 << IDX(initialDirection);
+        attackMask29 |= 1 << IDX(initialDirection4);
     }
 
     directionMask = 0;
-    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+    if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        if (target->m_facing == ARMY_FACING_RIGHT) {
+        if (target0->m_facing == ARMY_FACING_RIGHT) {
             targetHex++;
         } else {
             targetHex--;
         }
-        if (target->m_facing == ARMY_FACING_RIGHT) {
+        if (target0->m_facing == ARMY_FACING_RIGHT) {
             directionMask = BIT(COMBAT_DIRECTION_WEST);
         } else {
             directionMask = BIT(COMBAT_DIRECTION_EAST);
         }
     }
     while (directionMask != ALL_ADJACENT_DIRECTIONS) {
-        direction = GetBestDirection(targetHex, m_hex, directionMask);
-        adjacentHex = GetAdjacentCellIndex(targetHex, direction);
-        if (ValidHex(adjacentHex)
-            && CanFit(adjacentHex, pathMode == ARMY_PATH_ANY_TARGET_HEX, &fittingHex)) {
-            m_moveTargetHex = fittingHex;
+        direction4 = GetBestDirection(targetHex, m_hex, directionMask);
+        adjacentHex1 = GetAdjacentCellIndex(targetHex, direction4);
+        if (ValidHex(adjacentHex1)
+            && CanFit(adjacentHex1, pathMode == ARMY_PATH_ANY_TARGET_HEX, &fittingHex3)) {
+            m_moveTargetHex = fittingHex3;
             if (!HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-                m_attackDirection = OppositeDirection(direction);
+                m_attackDirection = OppositeDirection(direction4);
             } else {
-                attackMask = ~GetAttackMask(
+                attackMask29 = ~GetAttackMask(
                     m_moveTargetHex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
                 );
-                for (i = COMBAT_DIRECTION_NORTHEAST; IDX(i) < ARMY_COMBAT_DIRECTION_COUNT; i++) {
-                    if (attackMask & BIT(i)) {
-                        m_attackDirection = i;
+                for (i5 = COMBAT_DIRECTION_NORTHEAST; IDX(i5) < ARMY_COMBAT_DIRECTION_COUNT; i5++) {
+                    if (attackMask29 & BIT(i5)) {
+                        m_attackDirection = i5;
                     }
                 }
             }
             return 1;
         }
-        directionMask |= 1 << IDX(direction);
+        directionMask |= 1 << IDX(direction4);
     }
 
-    if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+    if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
-        if (target->m_facing == ARMY_FACING_RIGHT) {
+        if (target0->m_facing == ARMY_FACING_RIGHT) {
             targetHex--;
         } else {
             targetHex++;
         }
-        if (target->m_facing == ARMY_FACING_RIGHT) {
+        if (target0->m_facing == ARMY_FACING_RIGHT) {
             directionMask = BIT(COMBAT_DIRECTION_EAST);
         } else {
             directionMask = BIT(COMBAT_DIRECTION_WEST);
         }
         while (directionMask != ALL_ADJACENT_DIRECTIONS) {
-            direction = GetBestDirection(targetHex, m_hex, directionMask);
-            adjacentHex = GetAdjacentCellIndex(targetHex, direction);
-            if (ValidHex(adjacentHex) && CanFit(adjacentHex, 0, NULL)) {
-                m_moveTargetHex = adjacentHex;
+            direction4 = GetBestDirection(targetHex, m_hex, directionMask);
+            adjacentHex1 = GetAdjacentCellIndex(targetHex, direction4);
+            if (ValidHex(adjacentHex1) && CanFit(adjacentHex1, 0, NULL)) {
+                m_moveTargetHex = adjacentHex1;
                 m_attackDirection = GetBestDirection(m_moveTargetHex, targetHex, 0);
                 return 1;
             }
-            directionMask |= 1 << IDX(direction);
+            directionMask |= 1 << IDX(direction4);
         }
     }
     return 0;
