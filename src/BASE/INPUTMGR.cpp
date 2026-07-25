@@ -45,7 +45,7 @@ VA(0x004cdb50, 0x308)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
-    if (!gpInputManager->m_active)
+    if (gpInputManager->m_active != 1)
         return 1;
 
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
@@ -135,7 +135,7 @@ VA(0x004cde60, 0x36c)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
-    if (!gpInputManager->m_active)
+    if (gpInputManager->m_active != 1)
         return 1;
     if (gpInputManager->m_mouseMessageActive != 0)
         return 1;
@@ -301,14 +301,18 @@ VA(0x004ce2f0, 0xa8)
 tag_message inputManager::GetEvent(void) {
     tag_message event;
     PollSound();
-    if (gpInputManager->m_active && m_readIndex != m_writeIndex) {
+    if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
         m_readIndex++;
         m_readIndex %= IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
-    } else
-        InitializeEmptyEvent(event);
+    } else {
+        event.type = MESSAGE_NONE;
+        event.payload.unknown.unknown0x08 = 0;
+        event.payload.unknown.unknown0x04 = 0;
+        event.payload.unknown.unknown0x0c = 0;
+    }
     return event;
 }
 
@@ -316,13 +320,17 @@ VA(0x004ce3a0, 0xa1)
 tag_message inputManager::PeekEvent(void) {
     tag_message event;
     PollSound();
-    if (gpInputManager->m_active && m_readIndex != m_writeIndex) {
+    if (gpInputManager->m_active == 1 && m_readIndex != m_writeIndex) {
         event = m_eventRing[m_readIndex];
         m_readIndex = m_readIndex % IDX(INPUT_EVENT_RING_CAPACITY);
         if (event.type == MESSAGE_KEY_DOWN && m_keyCodeType == INPUT_KEY_CODE_ASCII)
             AsciiConvert(event);
-    } else
-        InitializeEmptyEvent(event);
+    } else {
+        event.type = MESSAGE_NONE;
+        event.payload.unknown.unknown0x08 = 0;
+        event.payload.unknown.unknown0x04 = 0;
+        event.payload.unknown.unknown0x0c = 0;
+    }
     return event;
 }
 
