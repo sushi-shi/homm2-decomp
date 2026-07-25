@@ -1324,7 +1324,7 @@ SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	100.0000	ea3281255b20
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	9c26f4f21a5b
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4e143dee7a0b
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	100.0000	b5cef3365f19
-SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	96.4336	9b0fa0deeae8
+SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	99.9650	a7a9c6e67963
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	82640c9237fc
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	100.0000	dd74e3783d21
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	fca0d109cc86
