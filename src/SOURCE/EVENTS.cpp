@@ -6245,14 +6245,16 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_MAGIC_GARDEN:
             if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
-                resourceType_a = static_cast<ResourceType>(
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
-                );
                 GiveResource(
                     eventHero,
-                    resourceType_a,
-                    resourceType_a == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT
-                                               : MAP_EVENT_RESOURCE_AMOUNT
+                    static_cast<ResourceType>(
+                        cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                    ),
+                    static_cast<ResourceType>(
+                        cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                    ) == RES_GOLD
+                        ? MAP_EVENT_GOLD_AMOUNT
+                        : MAP_EVENT_RESOURCE_AMOUNT
                 );
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
