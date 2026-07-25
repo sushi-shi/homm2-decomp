@@ -450,7 +450,7 @@ void fileRequester::SetOK(i32 enabled) {
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
     }
     message.payload.widget.id = FILE_REQUESTER_OK;
-    if (m_active) {
+    if (m_active == 1) {
         message.payload.widget.data.value = IDX(WIDGET_FLAG_DIMMED);
     } else {
         message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);

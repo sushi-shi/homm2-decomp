@@ -1019,7 +1019,7 @@ VA(0x004886ad, 0xa1)
 i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
     while (startHex <= SPELL_AI_LAST_HEX) {
         if (IDX(m_hexCells[startHex].m_occupantSide) == side
-            || (side == SPELL_AI_ANY_SIDE && m_hexCells[startHex].m_occupantSide != COMBAT_SIDE_NONE)) {
+            || (side == SPELL_AI_ANY_SIDE && IDX(m_hexCells[startHex].m_occupantSide) >= 0)) {
             *hex = startHex;
             return 0;
         }

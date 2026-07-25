@@ -3689,8 +3689,9 @@ void EarlyShutDownSystem(void) {}
 
 VA(0x0049eb90, 0x75)
 i32 GameUnsaved(void) {
-    if ((gpAdvManager && gpAdvManager->m_active) || (gpCombatManager && gpCombatManager->m_active)
-        || (gpTownManager && gpTownManager->m_active))
+    if ((gpAdvManager && gpAdvManager->m_active == 1)
+        || (gpCombatManager && gpCombatManager->m_active == 1)
+        || (gpTownManager && gpTownManager->m_active == 1))
         return 1;
     else
         return 0;

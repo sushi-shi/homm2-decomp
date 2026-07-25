@@ -365,7 +365,7 @@ void hero::UseSpell(SpellType spell) {
     m_spellPoints -= GetManaCost(spell, this);
     if (m_spellPoints < 0)
         m_spellPoints = 0;
-    if (gpAdvManager->m_active && gbThisNetHumanPlayer[giCurPlayer])
+    if (gpAdvManager->m_active == 1 && gbThisNetHumanPlayer[giCurPlayer])
         gpAdvManager->UpdateHeroLocator(-1, 1, 1);
 }
 
