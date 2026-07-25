@@ -616,7 +616,7 @@ SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	0bb0b75876fa
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	9958022caed6
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	cf7a75230ca8
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	9c177c0261ad
-SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	99.8420	76a4e6e60008
+SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	100.0000	76a4e6e60008
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	5ba667017fb8
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	52eda7315333
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	f13fafc4223c
@@ -687,7 +687,7 @@ SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	c28caa0e307f
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	7245d8dba01f
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fe9be41b7595
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	82f219fa1091
-SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.2711	69592df80f97
+SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	69592df80f97
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	9ca9e9ded8fc
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	97.0881	126e83005de4
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	1ab552cbd038
