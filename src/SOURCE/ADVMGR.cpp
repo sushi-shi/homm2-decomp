@@ -5732,11 +5732,12 @@ VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
     DATA(0x004f6134) static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
 
-    i32 dateIconFrame;
+    i32 frameIndex;
+    i32 month;
     char* weekText;
     char* dayText;
 
-    dateIconFrame = 0;
+    frameIndex = 0;
     if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_NEW_TURN) {
         return 0;
     }
@@ -5747,7 +5748,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         && (gpGame->m_month != NEW_TURN_FIRST_DAY
             || gpGame->m_week != NEW_TURN_FIRST_DAY
             || gpGame->m_day != NEW_TURN_FIRST_DAY)) {
-        dateIconFrame = gpGame->m_week;
+        frameIndex = gpGame->m_week;
     }
 
     m_bottomViewBackground = new iconWidget(
@@ -5773,7 +5774,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_ICON_WIDTH,
         NEW_TURN_DATE_ICON_HEIGHT,
         DATA_COMPGEN(0x004f6148, updBottomViewNewTurnSunmoonIcn, "sunmoon.icn"),
-        dateIconFrame,
+        frameIndex,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
         WIDGET_KIND_ICON_DIRECT,
