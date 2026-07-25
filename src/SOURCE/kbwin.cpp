@@ -436,13 +436,16 @@ VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu) {
     if (menu == NULL)
         menu = hmnuCurrent;
-    hmnuCurrent = menu;
+    else
+        hmnuCurrent = menu;
     hmnuApp = menu;
-    if (gConfig.gfx[IDX(giCurExe)].showMenu && menu != NULL) {
-        SetMenu(hwndApp, menu);
-        UpdateDfltMenu(menu);
-        UpdateAppSpecificMenus(menu);
-        DrawMenuBar(hwndApp);
+    if (gConfig.gfx[IDX(giCurExe)].showMenu) {
+        if (menu != NULL) {
+            SetMenu(hwndApp, menu);
+            UpdateDfltMenu(menu);
+            UpdateAppSpecificMenus(menu);
+            DrawMenuBar(hwndApp);
+        }
     } else {
         SetMenu(hwndApp, NULL);
         DrawMenuBar(hwndApp);

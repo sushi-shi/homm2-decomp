@@ -539,8 +539,10 @@ i32 TransmitRemoteData(
             destination,
             length + REMOTE_MESSAGE_HEADER_SIZE
         );
-        if (reliable == 0 && result != 0)
+        if (reliable == 0 && result != 0) {
             return 1;
+            break;
+        }
         if (result != 0) {
             poll = 0;
             while (poll < REMOTE_CONFIRM_POLL_COUNT) {
