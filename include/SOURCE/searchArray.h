@@ -52,7 +52,7 @@ union searchStorage {
     } path;
     struct {
         char pad[SEARCH_AI_PATH_HEADER_SIZE];
-        i8 directions[SEARCH_PATH_CAPACITY];
+        u8 directions[SEARCH_PATH_CAPACITY];
     } aiPath;
 };
 

@@ -1682,7 +1682,7 @@ void combatManager::ShowWinLoseArtifact(
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
-    capturedArtifactName = static_cast<char*>(H2_ALLOC_AT(ARTIFACT_NAME_CAPACITY, DATA_COMPGEN(0x004f0a34, showWinLoseArtifactSourceFile, RETAIL_FILE), 1707));
+    capturedArtifactName = static_cast<char*>(H2_ALLOC_AT(ARTIFACT_NAME_CAPACITY, DATA_COMPGEN(0x004f0a34, showWinLoseArtifactSourceFile, RETAIL_FILE), artifactSourceLineBase + 0x2b));
     sprintf(capturedArtifactName, gArtifactNames[IDX(artifact)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         ARTIFACT_TEXT_X,
@@ -1728,7 +1728,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
 
-    skeletonCount = static_cast<char*>(H2_ALLOC_AT(SKELETON_COUNT_CAPACITY, DATA_COMPGEN(0x004f0a90, showSkeletonsSourceFile, RETAIL_FILE), 1755));
+    skeletonCount = static_cast<char*>(H2_ALLOC_AT(SKELETON_COUNT_CAPACITY, DATA_COMPGEN(0x004f0a90, showSkeletonsSourceFile, RETAIL_FILE), skeletonSourceLineBase + 0x13));
     sprintf(skeletonCount, DATA_COMPGEN(0x004f0abc, showSkeletonsD, "%d"), giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         SKELETON_TEXT_X,
@@ -1815,7 +1815,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     if (m_winLoseBottomWidgets[1] == NULL)
         MemError();
 
-    spellName = static_cast<char*>(H2_ALLOC_AT(EAGLE_SPELL_NAME_CAPACITY, DATA_COMPGEN(0x004f0c04, showEagleEyeSpellSourceFile, RETAIL_FILE), 1828));
+    spellName = static_cast<char*>(H2_ALLOC_AT(EAGLE_SPELL_NAME_CAPACITY, DATA_COMPGEN(0x004f0c04, showEagleEyeSpellSourceFile, RETAIL_FILE), eagleEyeSourceLineBase + 0x22));
     sprintf(spellName, DATA_COMPGEN(0x004f0c30, showEagleEyeSpellS, "%s"), gSpellNames[IDX(displayedSpell)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + EAGLE_TEXT_X_OFFSET,
@@ -2518,13 +2518,15 @@ void combatManager::GetControl(void) {
             && (gbHumanPlayer[m_playerId[IDX(COMBAT_ATTACKER_SIDE)]] != 0
                 || m_playerId[IDX(COMBAT_DEFENDER_SIDE)] == 0))) {
         gbThisNetHasControl = true;
-    } else {
-        if (m_playerId[IDX(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0
-            && gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0)
-            gbThisNetHasControl = false;
-        else
-            gbThisNetHasControl = true;
+        goto setup_view;
     }
+    if (m_playerId[IDX(m_currentSide)] != -1 && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0
+        && gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0)
+        gbThisNetHasControl = false;
+    else
+        gbThisNetHasControl = true;
+
+setup_view:
     m_smallViewSide[IDX(COMBAT_DEFENDER_SIDE)] = COMBAT_SIDE_NONE;
     SetupSmallView();
     ResetMouse();
