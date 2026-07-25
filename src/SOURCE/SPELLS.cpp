@@ -2589,13 +2589,13 @@ void combatManager::VaporizeCreature(
         )
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
-    i32 rowCount = giMaxExtentY - giMinExtentY + 1;
+    i32 height = giMaxExtentY - giMinExtentY + 1;
     target->m_palette = gyModify;
     target->m_drawEnabled = 0;
 
     i32 firstY = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
     i32 lastY = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
-    rowCount = (lastY - firstY) / VAPORIZE_STRIPE_WIDTH + 1;
+    i32 rowCount = (lastY - firstY) / VAPORIZE_STRIPE_WIDTH + 1;
     i32 phase;
     for (phase = 0; phase < VAPORIZE_PHASE_COUNT; ++phase) {
         i32 topOffset;
