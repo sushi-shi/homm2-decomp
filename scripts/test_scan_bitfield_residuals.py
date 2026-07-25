@@ -225,6 +225,75 @@ class BitfieldResidualScannerTests(unittest.TestCase):
         reports.sort(key=scanner._finding_sort_key)
         self.assertEqual([report["artifact"] for report in reports], ["a", "c", "b"])
 
+    def test_discovers_live_normalized_unit_pairs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            paired = root / "paired"
+            base = root / "base"
+            (paired / "SOURCE").mkdir(parents=True)
+            (base / "SOURCE").mkdir(parents=True)
+            candidate = paired / "SOURCE" / "ADVMGR.c.obj"
+            retail = base / "SOURCE" / "ADVMGR.obj"
+            candidate.write_bytes(b"candidate")
+            retail.write_bytes(b"retail")
+            (paired / "SOURCE" / "missing.c.obj").write_bytes(b"candidate")
+
+            artifacts = scanner.discover_live_artifacts(paired, base)
+
+        self.assertEqual(len(artifacts), 1)
+        self.assertEqual(artifacts[0].unit, "SOURCE/ADVMGR")
+        self.assertEqual(artifacts[0].candidate, candidate)
+        self.assertEqual(artifacts[0].retail, retail)
+
+    def test_live_analysis_scans_every_aligned_function_in_one_objdiff(self):
+        first_name = "?Draw@@QAEXXZ"
+        second_name = "?Other@@QAEXXZ"
+        retail_rows = [
+            instruction(None),
+            instruction("mov al, [eax+0x8]"),
+            instruction("and ax, 0x1f"),
+            instruction("and eax, 0xffff"),
+        ]
+        candidate_rows = [
+            instruction("xor ecx, ecx"),
+            instruction("mov cl, [eax+0x8]"),
+            instruction(None),
+            instruction(None),
+        ]
+        payload = {
+            "left": {"symbols": [
+                {
+                    **symbol(first_name, retail_rows, 20, 92.5),
+                    "target_symbol": 0,
+                },
+                {
+                    **symbol(second_name, [instruction("ret")], 1, 100.0),
+                    "target_symbol": 1,
+                },
+            ]},
+            "right": {"symbols": [
+                symbol(first_name, candidate_rows, 17, 92.5),
+                symbol(second_name, [instruction("ret")], 1, 100.0),
+            ]},
+        }
+        artifact = scanner.LiveArtifact(
+            "SOURCE/ADVMGR",
+            Path("/tmp/ADVMGR.c.obj"),
+            Path("/tmp/ADVMGR.obj"),
+        )
+        with mock.patch.object(scanner, "run_live_objdiff", return_value=payload):
+            findings = scanner.analyze_live_artifact(
+                artifact,
+                executable="unused",
+                rvas={("SOURCE/ADVMGR", first_name): "0x5bb7c"},
+                cwd=Path("/tmp"),
+            )
+
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0]["function"], first_name)
+        self.assertEqual(findings[0]["rva"], "0x5bb7c")
+        self.assertEqual(findings[0]["occurrence_count"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()
