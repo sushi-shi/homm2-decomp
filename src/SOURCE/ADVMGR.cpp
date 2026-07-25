@@ -6807,7 +6807,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
             armyIcons[widgetIndexWidget] = new iconWidget(
                 static_cast<i16>(
-                    slotWidthSlot * (widgetIndexWidget | 0) + slotStartState + fiveArmyShiftValue
+                    slotWidthSlot * OR_STEER(widgetIndexWidget) + slotStartState + fiveArmyShiftValue
                     - GetIconEntry(monsterIconLocal, creatureLocal)->x
                     + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconLocal, creatureLocal)->w)
                           / ARMY_QUICK_CENTER_DIVISOR
@@ -6852,7 +6852,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             }
             armyTexts[widgetIndexWidget] = new textWidget(
                 static_cast<i16>(
-                    slotWidthSlot * (widgetIndexWidget | 0) + slotStartState + fiveArmyShiftValue
+                    slotWidthSlot * OR_STEER(widgetIndexWidget) + slotStartState + fiveArmyShiftValue
                     - ARMY_QUICK_TEXT_X_ADJUSTMENT
                 ),
                 static_cast<i16>(rowY + ARMY_QUICK_ICON_SIZE),
@@ -8888,18 +8888,18 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             }
 
             if (pathIndex == 0) {
-                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] = 1;
+                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] = 1;
             } else {
                 previousDirection0 =
                     static_cast<u8>(gpSearchArray->m_storage.path.directions[pathIndex]);
-                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] = static_cast<u16>(
+                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] = static_cast<u16>(
                     gbArrow[previousDirection0][direction | 0]
                     + routeFrame * ROUTE_ARROW_FRAME_STRIDE + ROUTE_ARROW_FRAME_OFFSET
                 );
             }
 
             if (remainingMobility2 < 0) {
-                m_visibilityMap[routeY1 * (MAP_WIDTH | 0) + routeX1] += ROUTE_DAY_MASK;
+                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] += ROUTE_DAY_MASK;
             } else {
                 routeReachable8 = 1;
             }

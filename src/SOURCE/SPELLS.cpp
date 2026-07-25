@@ -158,7 +158,7 @@ inline BoltColorMode LuckBoltColor(i32 targetX, i32 startX) {
 #else
 #define LuckBoltColor(targetX, startX)                                                        \
     (BOLT_COLOR_RAINBOW_REVERSE                                                              \
-     + (((((targetX) | 0) >= (startX)) - 1)                                                  \
+     + (((OR_STEER((targetX)) >= (startX)) - 1)                                                  \
         & (BOLT_COLOR_RAINBOW_FORWARD - BOLT_COLOR_RAINBOW_REVERSE)))
 #endif
 
@@ -1575,7 +1575,7 @@ void combatManager::ElementalStorm(void) {
                         stormIcon_i->CombatClipDrawToBuffer(
                             column_e * SPELL_STORM_TILE_SIZE,
                             row_b * SPELL_STORM_TILE_SIZE,
-                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + (frame_i | 0) + row_b)
+                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + OR_STEER(frame_i) + row_b)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits_n,
                             ICON_DRAW_NORMAL,
@@ -2203,7 +2203,7 @@ void combatManager::AddBolt(
             bolt->drawVertically = 1;
         else
             bolt->drawVertically = 0;
-    } else if ((abs(endX - startX) | 0) > abs(endY - startY))
+    } else if (OR_STEER(abs(endX - startX)) > abs(endY - startY))
         bolt->drawVertically = 1;
     else
         bolt->drawVertically = 0;
@@ -2211,7 +2211,7 @@ void combatManager::AddBolt(
     i32 deltaX = abs(endX - startX);
     i32 deltaY = abs(endY - startY);
     bolt->totalDistance =
-        static_cast<i32>(sqrt(static_cast<double>((deltaX * deltaX | 0) + deltaY * deltaY)));
+        static_cast<i32>(sqrt(static_cast<double>(OR_STEER(deltaX * deltaX) + deltaY * deltaY)));
     ResetBoltAngle(bolt);
 }
 
@@ -3211,12 +3211,12 @@ void combatManager::SummonElemental(
     i32 offset;
     for (offset = 0; offset < SUMMON_HEXES_PER_SIDE; ++offset) {
         if (m_hexCells[summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                     + ((randomOffset_a | 0) + offset)
+                                     + (OR_STEER(randomOffset_a) + offset)
                                            % SUMMON_HEXES_PER_SIDE]]
                 .m_occupantSide
             == COMBAT_SIDE_NONE)
             summonHex = summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                      + ((randomOffset_a | 0) + offset)
+                                      + (OR_STEER(randomOffset_a) + offset)
                                             % SUMMON_HEXES_PER_SIDE];
     }
     m_summonedCreatureType[IDX(m_currentSide)] = monsterType;
@@ -3339,7 +3339,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     stepX_a = static_cast<float>(deltaX_a) / segmentCount_f;
     stepY_e = static_cast<float>(deltaY_a) / segmentCount_f;
     deadline_j = 0;
-    for (segment_h = 0; segmentCount_f > (segment_h | 0); ++segment_h) {
+    for (segment_h = 0; segmentCount_f > OR_STEER(segment_h); ++segment_h) {
         ResetLimitCreature();
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;

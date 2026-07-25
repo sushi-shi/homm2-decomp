@@ -323,7 +323,7 @@ void soundManager::CDPoll(void) {
     {
         if (bMusicIsLooping[m_currentTrack] == 0)
             return;
-        if ((KBTickCount() | 0) < m_pollTimer + CD_POLL_INTERVAL_TICKS)
+        if (OR_STEER(KBTickCount()) < m_pollTimer + CD_POLL_INTERVAL_TICKS)
             return;
         m_pollTimer = KBTickCount();
         if (CDIsPlaying() == 0)
