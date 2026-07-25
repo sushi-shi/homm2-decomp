@@ -1820,8 +1820,7 @@ VA(0x0044f443, 0x2ee)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
     CombatHexDirection moatDirection;
-    i32 steps;
-    i32 moatDestination;
+    i32 numSteps;
     i32 moatIndex_1;
     i32 canEnterMoat_1;
 
@@ -1829,15 +1828,15 @@ i32 army::WalkTo(i32 destination) {
     m_targetSide = m_targetIndex;
     if (gpCombatManager->m_drawbridgeBackgroundVisible
         && HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        moatDestination = 0;
+        numSteps = 0;
         moatIndex_1 = 0;
         for (direction_3 = 0; direction_3 < ARMY_MOAT_CELL_COUNT; direction_3++) {
             if (moatCell[direction_3] == destination) {
-                moatDestination = 1;
+                numSteps = 1;
                 moatIndex_1 = direction_3;
             }
         }
-        if (moatDestination) {
+        if (numSteps) {
             canEnterMoat_1 = 0;
             if (moatIndex_1 == ARMY_MOAT_GATE_INDEX
                 && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
@@ -1874,7 +1873,7 @@ i32 army::WalkTo(i32 destination) {
         return ARMY_PATH_BLOCKED;
     }
 
-    steps = 0;
+    numSteps = 0;
     for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
         Walk(
             static_cast<CombatHexDirection>(
@@ -1883,8 +1882,8 @@ i32 army::WalkTo(i32 destination) {
             0,
             gpSearchArray->m_pathLength - 1 != direction_3
         );
-        steps++;
-        if (steps >= m_monster.speed) {
+        numSteps++;
+        if (numSteps >= m_monster.speed) {
             direction_3 = -1;
         }
     }
@@ -1905,7 +1904,7 @@ VA(0x0044f756, 0x1e8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
     i32 pathIndex_4;
-    i32 steps;
+    i32 numSteps;
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
         if (m_hex != destination) {
@@ -1927,10 +1926,10 @@ i32 army::AttackTo(i32 destination) {
             DoAttack(0);
         } else {
             pathIndex_4 = 0;
-            steps = 0;
+            numSteps = 0;
             for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
-                steps++;
-                if (pathIndex_4 == 1 || steps >= m_monster.speed) {
+                numSteps++;
+                if (pathIndex_4 == 1 || numSteps >= m_monster.speed) {
                     finishStanding = 1;
                 } else {
                     finishStanding = 0;
@@ -1942,7 +1941,7 @@ i32 army::AttackTo(i32 destination) {
                     finishStanding,
                     gpSearchArray->m_pathLength - 1 != pathIndex_4
                 );
-                if (steps >= m_monster.speed && pathIndex_4 != 1) {
+                if (numSteps >= m_monster.speed && pathIndex_4 != 1) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
