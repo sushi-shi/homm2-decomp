@@ -1387,9 +1387,9 @@ SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8b7cbda874d4
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	100.0000	642ee837031e
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	ed9c8b7ec742
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	c83cd47ceeee
-SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	98.9806	1d967854267b
+SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	ee547f2be814
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	42421cf83f8a
-SOURCE/dpnetwin	?dpnet_init@@YIFXZ	99.9691	017a79a881fd
+SOURCE/dpnetwin	?dpnet_init@@YIFXZ	99.9691	53c0f03ea3b1
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	a9f81bca269c
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	98e6d54e9737
 SOURCE/dpnetwin	?dpnet_snd@@YIHHHPAX@Z	100.0000	2ad8ba35990d

@@ -146,7 +146,7 @@ i16 dpnet_init(void) {
             gbRemoteGameOpen = false;
             startup.playerCount = static_cast<u8>(giNumHumanPlayers);
             memcpy(startup.playerIds, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
-            for (guestIndex = 1; guestIndex < giNumHumanPlayers; guestIndex++) {
+            for (guestIndex = 1; giNumHumanPlayers > guestIndex; guestIndex++) {
                 startup.netPosition = static_cast<u8>(guestIndex);
                 dpSendMessage(
                     giNetPosToDCOPos[guestIndex],
@@ -407,7 +407,6 @@ i32 dpWaitForFirstGuest(void) {
             dpProcessMessages();
             if (giNumHumanPlayers > 1)
                 return 1;
-            break;
     }
     return 0;
 }
