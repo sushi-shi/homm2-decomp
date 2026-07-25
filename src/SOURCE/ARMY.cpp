@@ -1826,7 +1826,7 @@ i32 army::WalkTo(i32 destination) {
     i32 canEnterMoat_1;
 
     m_targetIndex = -1;
-    m_targetSide = COMBAT_SIDE_NONE;
+    m_targetSide = m_targetIndex;
     if (gpCombatManager->m_drawbridgeBackgroundVisible
         && HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
         moatDestination = 0;
