@@ -1986,8 +1986,8 @@ void townManager::SplitArmy(void) {
     i16 unusedValue = 1;
     // splitwin.bin's setup record retains this otherwise-unused control value.
     // NOLINTNEXTLINE(readability-magic-numbers)
-    i16 unusedDialogValue = 4;
-    i32 sameCreature;
+    i16 unusedControl = 4;
+    i32 sameType;
     tag_message message;
 
     m_heroWindow1 =
@@ -2020,11 +2020,11 @@ void townManager::SplitArmy(void) {
     gpWindowManager->DoDialog(m_heroWindow1, SplitArmyHandler, 0);
     delete m_heroWindow1;
     if (gpWindowManager->m_dialogResult == TOWN_DIALOG_CONFIRM) {
-        sameCreature = 0;
+        sameType = 0;
         if (m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot]
             == m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot])
-            sameCreature = 1;
-        if (sameCreature != 0) {
+            sameType = 1;
+        if (sameType != 0) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] += m_splitAmount;
         } else {
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
