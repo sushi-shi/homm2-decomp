@@ -484,7 +484,7 @@ SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	100.0000	3f839f16237e
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	100.0000	ea15a8aa4893
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	99.9835	d94fbd07b178
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	c7dda1e5cee0
-SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	97.6539	5670597ac046
+SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	97.7696	fb15a7c68afd
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	100.0000	c03d3d9a6025
 SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	100.0000	bd997176bc92
 SOURCE/ADVMGR	?RedrawAdvScreen@advManager@@QAEXHH@Z	97.5000	a5406cf91347
