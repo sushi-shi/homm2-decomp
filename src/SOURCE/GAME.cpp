@@ -5854,46 +5854,48 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
 
 VA(0x004819b2, 0x295)
 void game::ProcessMapExtra(void) {
-    i32 row;
-    i32 col;
+    i32 unused;
+    i32 cost;
+    i32 row16;
+    mapCell* cell10;
+    i32 col6;
     i32 townId;
-    mapCell* cell;
 
-    for (row = 0; row < MAP_HEIGHT; row++) {
-        for (col = 0; MAP_WIDTH > col; col++) {
-            cell = WORLDMAP->Row(row) + col;
-            switch (cell->m_triggerType) {
+    for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
+        for (col6 = 0; MAP_WIDTH > col6; col6++) {
+            cell10 = WORLDMAP->Row(row16) + col6;
+            switch (cell10->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
-                    townId = GetTownId(col, row);
-                    m_castleRecs[townId].m_extraIndex = cell->m_objectMetadata;
-                    cell->m_objectMetadata = townId;
+                    townId = GetTownId(col6, row16);
+                    m_castleRecs[townId].m_extraIndex = cell10->m_objectMetadata;
+                    cell10->m_objectMetadata = townId;
                     break;
             }
         }
     }
 
-    for (row = 0; row < MAP_HEIGHT; row++) {
-        for (col = 0; MAP_WIDTH > col; col++) {
-            cell = WORLDMAP->Row(row) + col;
-            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE) && row > 0
-                && HasLateOverlay(col, row - 1)) {
-                ConvertFlagToLateOverlay(col, row);
+    for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
+        for (col6 = 0; MAP_WIDTH > col6; col6++) {
+            cell10 = WORLDMAP->Row(row16) + col6;
+            if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE) && row16 > 0
+                && HasLateOverlay(col6, row16 - 1)) {
+                ConvertFlagToLateOverlay(col6, row16);
             }
-            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB)) {
-                if (row > 0)
-                    ConvertFlagToLateOverlay(col, row - 1);
-                if (row > 1)
-                    ConvertFlagToLateOverlay(col, row - ALCHEMIST_LATE_OVERLAY_OFFSET);
+            if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB)) {
+                if (row16 > 0)
+                    ConvertFlagToLateOverlay(col6, row16 - 1);
+                if (row16 > 1)
+                    ConvertFlagToLateOverlay(col6, row16 - ALCHEMIST_LATE_OVERLAY_OFFSET);
             }
         }
     }
 
-    for (row = 0; row < MAP_HEIGHT; row++) {
-        for (col = 0; MAP_WIDTH > col; col++) {
-            if (HasLateOverlay(col, row))
-                ConvertAllToLateOverlay(col, row);
+    for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
+        for (col6 = 0; MAP_WIDTH > col6; col6++) {
+            if (HasLateOverlay(col6, row16))
+                ConvertAllToLateOverlay(col6, row16);
         }
     }
 }
