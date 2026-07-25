@@ -54,7 +54,7 @@ struct RemoteMessage {
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     i16 payloadSize;
-    u8 payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
+    char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 #pragma pack(pop)
 SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);

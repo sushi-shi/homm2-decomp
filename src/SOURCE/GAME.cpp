@@ -6492,7 +6492,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         BVResMsg(const_cast<char*>(DATA_COMPGEN(0x004f75dc, transmitSaveGameSendingData, "Sending Data")), RES_NONE, 0);
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f75ec, transmitSaveGameTransmitStartCompressing, "Transmit Start - Compressing")));
 
-    acknowledged = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f760c, transmitSaveGameSourceFile, RETAIL_FILE), 6777));
+    acknowledged = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f760c, transmitSaveGameSourceFile, RETAIL_FILE), gTransmitSourceLine + 0x2b));
     memset(acknowledged, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     SaveGame(gConfig.rmtSCName, 0, 0);
     if (!gbUseDiffCompression)
@@ -6517,10 +6517,10 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         LOG_UNUSED_VALUE
     );
 
-    header = static_cast<i32*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7658, transmitSaveGameSourceFile2, RETAIL_FILE), 6797));
+    header = static_cast<i32*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7658, transmitSaveGameSourceFile2, RETAIL_FILE), gTransmitSourceLine + 0x3f));
     if (gbUseRegularCompression)
-        transmitData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7680, transmitSaveGameSourceFile3, RETAIL_FILE), 6799));
-    fileData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f76a8, transmitSaveGameSourceFile4, RETAIL_FILE), 6800));
+        transmitData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f7680, transmitSaveGameSourceFile3, RETAIL_FILE), gTransmitSourceLine + 0x41));
+    fileData = static_cast<u8*>(H2_ALLOC_AT(fileSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f76a8, transmitSaveGameSourceFile4, RETAIL_FILE), gTransmitSourceLine + 0x42));
 
     file = open(filename, _O_BINARY);
     if (file == -1)
@@ -6625,7 +6625,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
                 LogStr(const_cast<char*>(DATA_COMPGEN(0x004f76fc, transmitSaveGamePostWait, "PostWait")));
                 if (!result)
                     ShutDown(NULL);
-                for (packet = 0; packetsInBatch > packet; packet++) {
+                for (packet = 0; packet < packetsInBatch; packet++) {
                     if (reinterpret_cast<RemoteMessage*>(reply)->payload[packet] > 0)
                         acknowledged[batch * REMOTE_PACKET_BATCH_SIZE + packet] = 1;
                 }
@@ -6654,13 +6654,13 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
 transmitCleanup:
     if (header)
-        H2_FREE_AT(header, DATA_COMPGEN(0x004f7708, transmitSaveGameSourceFile5, RETAIL_FILE), 6933);
+        H2_FREE_AT(header, DATA_COMPGEN(0x004f7708, transmitSaveGameSourceFile5, RETAIL_FILE), gTransmitSourceLine + 0xc7);
     if (transmitData)
-        H2_FREE_AT(transmitData, DATA_COMPGEN(0x004f7730, transmitSaveGameSourceFile6, RETAIL_FILE), 6934);
+        H2_FREE_AT(transmitData, DATA_COMPGEN(0x004f7730, transmitSaveGameSourceFile6, RETAIL_FILE), gTransmitSourceLine + 0xc8);
     if (fileData && fileData != transmitData)
-        H2_FREE_AT(fileData, DATA_COMPGEN(0x004f7758, transmitSaveGameSourceFile7, RETAIL_FILE), 6935);
+        H2_FREE_AT(fileData, DATA_COMPGEN(0x004f7758, transmitSaveGameSourceFile7, RETAIL_FILE), gTransmitSourceLine + 0xc9);
     if (acknowledged)
-        H2_FREE_AT(acknowledged, DATA_COMPGEN(0x004f7780, transmitSaveGameSourceFile8, RETAIL_FILE), 6936);
+        H2_FREE_AT(acknowledged, DATA_COMPGEN(0x004f7780, transmitSaveGameSourceFile8, RETAIL_FILE), gTransmitSourceLine + 0xca);
 
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f77a8, transmitSaveGameTransmitEnd, "Transmit End")));
     if (gpAdvManager->m_active == 1) {
