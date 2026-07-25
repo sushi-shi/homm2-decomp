@@ -611,7 +611,7 @@ void PollRemote(void) {
     i32 timeout;
     i32 queueIndex;
     i32 receiveResult;
-    i8 netCommand;
+    u8 netCommand;
     i8 queueFull;
     i32 destination;
     SPlayerExit hostExit;
@@ -759,8 +759,7 @@ void PollRemote(void) {
                 if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_CONFIRM) {
                     giLastConfirm = REMOTE_MESSAGE(rcvBufIn)->id;
                     return;
-                }
-                if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_HEARTBEAT) {
+                } else if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_HEARTBEAT) {
                     lLastHeartbeatReceive[REMOTE_MESSAGE(rcvBufIn)->sender] = KBTickCount();
                     netCommand = REMOTE_MESSAGE(rcvBufIn)->command;
                     if ((netCommand & REMOTE_HEARTBEAT_CONTROL_FLAG) == 0)
@@ -769,9 +768,9 @@ void PollRemote(void) {
                         return;
                     iCurHourGlassPhase = netCommand & REMOTE_HEARTBEAT_PHASE_MASK;
                     return;
-                }
-                if (queueFull)
+                } else if (queueFull) {
                     return;
+                }
                 if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_RELIABLE) {
                     REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
                     REMOTE_MESSAGE(sndBuf)->id = REMOTE_MESSAGE(rcvBufIn)->id;
