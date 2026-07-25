@@ -5251,7 +5251,7 @@ quick_info_ready:
             currentCell->m_objectIndex,
             IDX(currentCell->m_triggerType),
             currentCell->m_objectMetadata,
-            currentCell->HasFlag(MAP_CELL_OCCUPIED),
+            currentCell->m_flags & IDX(MAP_CELL_OCCUPIED),
             savedTextLocal,
             m_mapOriginX + cellX,
             m_mapOriginY + cellY
