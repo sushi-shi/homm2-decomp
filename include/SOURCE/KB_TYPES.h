@@ -168,10 +168,14 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
 H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
 H2_ENUM_STEPPED(CreatureType)
 
+#ifdef HOMM2_STRICT_ENUM_TYPES
 inline CreatureType NextCreatureType(CreatureType creatureType) {
     ++creatureType;
     return creatureType;
 }
+#else
+#define NextCreatureType(creatureType) (static_cast<CreatureType>((creatureType) + 1))
+#endif
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactLevelMask, u8)
     ARTIFACT_LEVEL_ULTIMATE = 0x01,

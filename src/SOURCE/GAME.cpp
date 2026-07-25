@@ -3619,7 +3619,7 @@ void game::ViewArmy(
     message6.payload.widget.data.text = armyName8;
     m_viewArmyWindow->BroadcastMessage(message6);
 
-    char* details9 = static_cast<char*>(H2_ALLOC_AT(VIEW_ARMY_DETAIL_BUFFER_SIZE, DATA_COMPGEN(0x004f73a8, viewArmySourceFile, RETAIL_FILE), 3684));
+    char* details9 = static_cast<char*>(H2_ALLOC_AT(VIEW_ARMY_DETAIL_BUFFER_SIZE, DATA_COMPGEN(0x004f73a8, viewArmySourceFile, RETAIL_FILE), viewArmySourceLineBase + 0x93));
     i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
     if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale2 = 0;
@@ -3806,7 +3806,7 @@ void game::ViewArmy(
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = iViewArmyUpgradeToType;
     }
-    H2_FREE_AT(details9, DATA_COMPGEN(0x004f7460, viewArmySourceFile2, RETAIL_FILE), 3893);
+    H2_FREE_AT(details9, DATA_COMPGEN(0x004f7460, viewArmySourceFile2, RETAIL_FILE), viewArmySourceLineBase + 0x164);
     delete m_viewArmyWindow;
 }
 
