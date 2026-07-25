@@ -113,7 +113,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
         }
         gpInputManager->m_field_0x85a = 0;
 
-        if (gpWindowManager->m_active) {
+        if (gpWindowManager->m_active == 1) {
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F12
                 && (event->payload.keyboard.modifiers
                     & (MESSAGE_MODIFIER_RIGHT_SHIFT | MESSAGE_MODIFIER_LEFT_SHIFT))

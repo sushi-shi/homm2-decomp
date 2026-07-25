@@ -3529,7 +3529,7 @@ void game::ViewArmy(
     iViewArmyNumTroops = numTroops;
     gbAllowUpgrade = false;
 
-    if (castle && (gpAdvManager->m_active || gpTownManager->m_active)) {
+    if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
         for (loopIndex0 = IDX(BUILDING_SLOT_DWELLING_SECOND);
              loopIndex0 <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
              loopIndex0++) {
@@ -3662,7 +3662,7 @@ void game::ViewArmy(
     if (HAS(monster8->flags.all, MONSTER_FLAGS_SHOOTER)) {
         i32 shots8 = armyMonster11->shots;
         if (shots8 > 0) {
-            if (gpCombatManager->m_active)
+            if (gpCombatManager->m_active == 1)
                 sprintf(gText, DATA_COMPGEN(0x004f73f4, viewArmySD3, "\n%s%d"), cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
             else
                 sprintf(gText, DATA_COMPGEN(0x004f73fc, viewArmySD4, "\n%s%d"), cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
@@ -3688,7 +3688,7 @@ void game::ViewArmy(
         static_cast<u32>(monster8->hitPoints)
     );
     strcat(details9, gText);
-    if (gpCombatManager->m_active) {
+    if (gpCombatManager->m_active == 1) {
         sprintf(
             gText,
             DATA_COMPGEN(0x004f742c, viewArmySD7, "\n%s%d"),
@@ -6488,7 +6488,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     gpSoundManager->m_samplesReady = samplesReady;
 
     LogStr(const_cast<char*>(DATA_COMPGEN(0x004f75c8, transmitSaveGameTransmitGameStart, "Transmit Game Start")));
-    if (gpAdvManager->m_active)
+    if (gpAdvManager->m_active == 1)
         BVResMsg(const_cast<char*>(DATA_COMPGEN(0x004f75dc, transmitSaveGameSendingData, "Sending Data")), RES_NONE, 0);
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f75ec, transmitSaveGameTransmitStartCompressing, "Transmit Start - Compressing")));
 
@@ -6663,7 +6663,7 @@ transmitCleanup:
         H2_FREE_AT(acknowledged, DATA_COMPGEN(0x004f7780, transmitSaveGameSourceFile8, RETAIL_FILE), 6936);
 
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f77a8, transmitSaveGameTransmitEnd, "Transmit End")));
-    if (gpAdvManager->m_active) {
+    if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
@@ -6768,7 +6768,7 @@ i32 game::ReceiveSaveGame(
     oldTrack = -1;
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
-    if (gpAdvManager->m_active)
+    if (gpAdvManager->m_active == 1)
         BVResMsg(const_cast<char*>(DATA_COMPGEN(0x004f77e8, receiveSaveGameReceivingData, "Receiving Data")), RES_NONE, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
@@ -6933,7 +6933,7 @@ i32 game::ReceiveSaveGame(
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f79e0, receiveSaveGameReceiveEnd, "Receive End")));
-    if (gpAdvManager->m_active) {
+    if (gpAdvManager->m_active == 1) {
         giBottomViewOverride = BOTTOM_VIEW_NONE;
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
