@@ -7789,18 +7789,20 @@ i32 advManager::DoNetCombat(char* packet) {
     // Original-source anchor consumed by H2_FREE line reconstruction.
     DATA(0x0051c9b4) static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
     hero* secondHero9;
-    i32 setupCombatY15;
+    i32 setupCombatY8;
     i32 combatX1;
     i32 combatY8;
     i32 randomSeed1;
     H2_ENUM_STORAGE(CombatResult, i8) combatResult16;
-    i32 setupCombatX2;
+    i32 setupCombatX11;
     hero* firstHero29;
     i32 remotePlayer8;
     i32 firstPlayer3;
     armyGroup* secondArmy10;
     armyGroup* firstArmy6;
     town* combatTown;
+    i32 size;
+    i32 result;
 
     firstHero29 = NULL;
     firstArmy6 = NULL;
@@ -7817,8 +7819,8 @@ i32 advManager::DoNetCombat(char* packet) {
         &combatTown,
         &secondHero9,
         &secondArmy10,
-        &setupCombatX2,
-        &setupCombatY15,
+        &setupCombatX11,
+        &setupCombatY8,
         &randomSeed1,
         &combatResult16,
         &gbRetreatWin,
@@ -7833,8 +7835,8 @@ i32 advManager::DoNetCombat(char* packet) {
         combatTown,
         secondHero9,
         secondArmy10,
-        setupCombatX2,
-        setupCombatY15,
+        setupCombatX11,
+        setupCombatY8,
         randomSeed1,
         0
     );
@@ -7847,8 +7849,8 @@ i32 advManager::DoNetCombat(char* packet) {
             combatTown,
             secondHero9,
             secondArmy10,
-            setupCombatX2,
-            setupCombatY15,
+            setupCombatX11,
+            setupCombatY8,
             randomSeed1,
             remotePlayer8,
             combatResult16,
@@ -7857,15 +7859,15 @@ i32 advManager::DoNetCombat(char* packet) {
         );
     }
     if (firstArmy6)
-        H2_FREE_AT(firstArmy6, DATA_COMPGEN(0x0051c9b8, doNetCombatSourceFile, RETAIL_FILE), 5787);
+        H2_FREE_AT(firstArmy6, DATA_COMPGEN(0x0051c9b8, doNetCombatSourceFile, RETAIL_FILE), sourceLineBase + 0x46);
     if (secondArmy10)
-        H2_FREE_AT(secondArmy10, DATA_COMPGEN(0x0051c9e4, doNetCombatSourceFile2, RETAIL_FILE), 5790);
+        H2_FREE_AT(secondArmy10, DATA_COMPGEN(0x0051c9e4, doNetCombatSourceFile2, RETAIL_FILE), sourceLineBase + 0x49);
     if (combatTown)
-        H2_FREE_AT(combatTown, DATA_COMPGEN(0x0051ca10, doNetCombatSourceFile3, RETAIL_FILE), 5793);
+        H2_FREE_AT(combatTown, DATA_COMPGEN(0x0051ca10, doNetCombatSourceFile3, RETAIL_FILE), sourceLineBase + 0x4c);
     if (secondHero9)
-        H2_FREE_AT(secondHero9, DATA_COMPGEN(0x0051ca3c, doNetCombatSourceFile4, RETAIL_FILE), 5796);
+        H2_FREE_AT(secondHero9, DATA_COMPGEN(0x0051ca3c, doNetCombatSourceFile4, RETAIL_FILE), sourceLineBase + 0x4f);
     if (firstHero29)
-        H2_FREE_AT(firstHero29, DATA_COMPGEN(0x0051ca68, doNetCombatSourceFile5, RETAIL_FILE), 5799);
+        H2_FREE_AT(firstHero29, DATA_COMPGEN(0x0051ca68, doNetCombatSourceFile5, RETAIL_FILE), sourceLineBase + 0x52);
     gbRetreatWin = false;
     return 1;
 }
@@ -7978,23 +7980,23 @@ CombatResult advManager::DoCombat(
                                 );
                                 if (receivedFirstArmy) {
                                     memcpy(firstArmy, receivedFirstArmy, sizeof(armyGroup));
-                                    H2_FREE_AT(receivedFirstArmy, DATA_COMPGEN(0x0051ca98, doCombatSourceFile, RETAIL_FILE), 5931);
+                                    H2_FREE_AT(receivedFirstArmy, DATA_COMPGEN(0x0051ca98, doCombatSourceFile, RETAIL_FILE), sourceLineBase + 0x71);
                                 }
                                 if (receivedSecondArmy2) {
                                     memcpy(secondArmy, receivedSecondArmy2, sizeof(armyGroup));
-                                    H2_FREE_AT(receivedSecondArmy2, DATA_COMPGEN(0x0051cac4, doCombatSourceFile2, RETAIL_FILE), 5937);
+                                    H2_FREE_AT(receivedSecondArmy2, DATA_COMPGEN(0x0051cac4, doCombatSourceFile2, RETAIL_FILE), sourceLineBase + 0x77);
                                 }
                                 if (receivedTown) {
                                     memcpy(combatTown, receivedTown, sizeof(town));
-                                    H2_FREE_AT(receivedTown, DATA_COMPGEN(0x0051caf0, doCombatSourceFile3, RETAIL_FILE), 5943);
+                                    H2_FREE_AT(receivedTown, DATA_COMPGEN(0x0051caf0, doCombatSourceFile3, RETAIL_FILE), sourceLineBase + 0x7d);
                                 }
                                 if (receivedSecondHero9) {
                                     memcpy(secondHero, receivedSecondHero9, sizeof(hero));
-                                    H2_FREE_AT(receivedSecondHero9, DATA_COMPGEN(0x0051cb1c, doCombatSourceFile4, RETAIL_FILE), 5949);
+                                    H2_FREE_AT(receivedSecondHero9, DATA_COMPGEN(0x0051cb1c, doCombatSourceFile4, RETAIL_FILE), sourceLineBase + 0x83);
                                 }
                                 if (receivedFirstHero1) {
                                     memcpy(firstHero, receivedFirstHero1, sizeof(hero));
-                                    H2_FREE_AT(receivedFirstHero1, DATA_COMPGEN(0x0051cb48, doCombatSourceFile5, RETAIL_FILE), 5955);
+                                    H2_FREE_AT(receivedFirstHero1, DATA_COMPGEN(0x0051cb48, doCombatSourceFile5, RETAIL_FILE), sourceLineBase + 0x89);
                                 }
                                 gpCombatManager->m_combatResult = combatResult3;
                                 goto combatFinished;
