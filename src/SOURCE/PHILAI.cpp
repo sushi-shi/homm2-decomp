@@ -3202,7 +3202,7 @@ i32 philAI::RVOfPosition(
     i32 strategicLiveChance;
     i32 adjacentEventChance8;
     i32 adjacentMonsterEventChance3;
-    i32 strategicDelta7;
+    i32 strategicDelta;
     MapObjectType objectType1;
     char debugText1[POSITION_DEBUG_TEXT_CAPACITY];
     float distanceFactor5;
@@ -3221,7 +3221,7 @@ i32 philAI::RVOfPosition(
     if (abs(x - gpCurAIHero->m_x) <= AI_POSITION_NEARBY_DELTA
         && abs(y - gpCurAIHero->m_y) <= AI_POSITION_NEARBY_DELTA) {
         currentStrategicValue3 = 0;
-        strategicDelta7 = 0;
+        strategicDelta = 0;
     } else {
         currentStrategicValue3 = StrategicValueOfPosition(
             gpCurAIHero->m_x,
@@ -3231,11 +3231,11 @@ i32 philAI::RVOfPosition(
             &currentLiveChance1,
             0
         );
-        strategicDelta7 = StrategicValueOfPosition(x, y, 0, 1, &targetLiveChance1, extraDistance);
-        strategicDelta7 -= currentStrategicValue3;
+        strategicDelta = StrategicValueOfPosition(x, y, 0, 1, &targetLiveChance1, extraDistance);
+        strategicDelta -= currentStrategicValue3;
     }
-    if (objectType1 == MAP_OBJECT_BOAT && strategicDelta7 < 0)
-        strategicDelta7 = 0;
+    if (objectType1 == MAP_OBJECT_BOAT && strategicDelta < 0)
+        strategicDelta = 0;
 
     totalValue8 = 0;
     if (hasEvent)
@@ -3269,27 +3269,27 @@ i32 philAI::RVOfPosition(
         eventValue9 = 0;
     }
     if (primaryEventChance1 < POSITION_FULL_CHANCE)
-        strategicDelta7 = strategicDelta7 * primaryEventChance1 / POSITION_FULL_CHANCE;
+        strategicDelta = strategicDelta * primaryEventChance1 / POSITION_FULL_CHANCE;
 
     if (targetLiveChance1 < POSITION_MINIMUM_LIVE_CHANCE)
         return POSITION_FAILED_VALUE;
     if (targetLiveChance1 < POSITION_FULL_CHANCE) {
         eventValue9 = targetLiveChance1 * eventValue9 / POSITION_FULL_CHANCE;
-        strategicDelta7 = strategicDelta7 * targetLiveChance1 / POSITION_FULL_CHANCE;
+        strategicDelta = strategicDelta * targetLiveChance1 / POSITION_FULL_CHANCE;
     }
     if (adjacentEventChance8 < POSITION_MINIMUM_LIVE_CHANCE)
         return POSITION_FAILED_VALUE;
     if (adjacentEventChance8 < POSITION_FULL_CHANCE) {
         eventValue9 = adjacentEventChance8 * eventValue9 / POSITION_FULL_CHANCE;
-        strategicDelta7 = strategicDelta7 * adjacentEventChance8 / POSITION_FULL_CHANCE;
+        strategicDelta = strategicDelta * adjacentEventChance8 / POSITION_FULL_CHANCE;
     }
     if (strategicLiveChance < POSITION_FULL_CHANCE) {
         if (totalValue8 > 0) {
-            totalValue8 = (strategicDelta7 + totalValue8 + eventValue9) * strategicLiveChance
+            totalValue8 = (strategicDelta + totalValue8 + eventValue9) * strategicLiveChance
                          / POSITION_FULL_CHANCE;
         } else {
             totalValue8 +=
-                (strategicDelta7 + eventValue9) * strategicLiveChance / POSITION_FULL_CHANCE;
+                (strategicDelta + eventValue9) * strategicLiveChance / POSITION_FULL_CHANCE;
         }
     } else {
         totalValue8 += eventValue9;
@@ -3317,12 +3317,12 @@ i32 philAI::RVOfPosition(
     }
 
     totalValue8 = static_cast<i32>(totalValue8 / (distanceFactor5 + AI_POSITION_DISTANCE_BASE));
-    strategicDelta7 = static_cast<i32>(
-        strategicDelta7 * POSITION_STRATEGIC_MULTIPLIER
+    strategicDelta = static_cast<i32>(
+        strategicDelta * POSITION_STRATEGIC_MULTIPLIER
         / (distanceFactor5 + AI_POSITION_STRATEGIC_DISTANCE_BASE)
     );
     if (strategicLiveChance == POSITION_FULL_CHANCE)
-        totalValue8 += strategicDelta7;
+        totalValue8 += strategicDelta;
     if (HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED) && triggerType3 == MAP_OBJECT_COAST) {
         totalValue8 += POSITION_EMBARKED_BOAT_BONUS;
     }
