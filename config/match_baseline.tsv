@@ -664,7 +664,7 @@ SOURCE/COMMAND	?SetCombatDirections@combatManager@@QAEXH@Z	98.5415	a333698de38c
 SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	c959d36505cb
 SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	ff78d34345c0
 SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	ee3bfad7a352
-SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	97.5897	6a25ad55d140
+SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	98.9000	1ff4f81c6ac6
 SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	5a17cb885bf5
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	5f2d1c7e6d85
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	100.0000	9083c9bbbca3

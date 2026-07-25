@@ -1898,7 +1898,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         }
     }
 
-    text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0ca4, showDeadArmiesSourceFile, RETAIL_FILE), 1902));
+    text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0ca4, showDeadArmiesSourceFile, RETAIL_FILE), casualtySourceLineBase + 0x23));
     sprintf(text_27, DATA_COMPGEN(0x004f0cd0, showDeadArmiesBattlefieldCasualties, "Battlefield Casualties"));
     m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] = new textWidget(
         CASUALTY_TITLE_X,
@@ -1921,7 +1921,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             y_29 = CASUALTY_ATTACKER_Y;
         else
             y_29 = CASUALTY_DEFENDER_Y;
-        text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0cf8, showDeadArmiesSourceFile2, RETAIL_FILE), 1923));
+        text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0cf8, showDeadArmiesSourceFile2, RETAIL_FILE), casualtySourceLineBase + 0x38));
         sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? DATA_COMPGEN(0x004f0d24, showDeadArmiesAttacker, "Attacker") : DATA_COMPGEN(0x004f0d30, showDeadArmiesDefender, "Defender"));
         m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] = new textWidget(
             CASUALTY_TITLE_X,
@@ -1940,7 +1940,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         window->AddWidget(m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9], -1);
 
         if (casualtyQuantity_0[side_9] <= 0) {
-            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_NONE_CAPACITY, DATA_COMPGEN(0x004f0d4c, showDeadArmiesSourceFile3, RETAIL_FILE), 1942));
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_NONE_CAPACITY, DATA_COMPGEN(0x004f0d4c, showDeadArmiesSourceFile3, RETAIL_FILE), casualtySourceLineBase + 0x4b));
             sprintf(text_27, DATA_COMPGEN(0x004f0d78, showDeadArmiesNone, "None"));
             m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 CASUALTY_TITLE_X,
@@ -2015,7 +2015,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 == NULL)
                 MemError();
 
-            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_QUANTITY_CAPACITY, DATA_COMPGEN(0x004f0da8, showDeadArmiesSourceFile4, RETAIL_FILE), 1986));
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_QUANTITY_CAPACITY, DATA_COMPGEN(0x004f0da8, showDeadArmiesSourceFile4, RETAIL_FILE), casualtySourceLineBase + 0x77));
             sprintf(
                 text_27,
                 DATA_COMPGEN(0x004f0dd4, showDeadArmiesD, "%d"),
