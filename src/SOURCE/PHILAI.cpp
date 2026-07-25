@@ -147,7 +147,7 @@
 #define AI_CAMPFIRE_AVERAGE_DIVISOR 6.0f
 #define AI_OASIS_VALUE_FACTOR 350.0f
 #define AI_TREASURE_CHEST_GOLD_AMOUNT 1600.0f
-#define AI_BUOY_VALUE_FACTOR DATA_COMPGEN(0x004eb594, vALUEFACTORConstant, 400.0f)
+#define AI_TEMPLE_VALUE_FACTOR DATA_COMPGEN(0x004eb594, vALUEFACTORConstant, 400.0f)
 #define AI_MORALE_LUCK_SITE_VALUE_FACTOR 200.0f
 #define AI_WATERING_HOLE_VALUE_FACTOR 300.0f
 #define AI_GAZEBO_VALUE_FACTOR 1000.0f
@@ -5441,6 +5441,9 @@ i32 philAI::ManaRefreshValue(hero* h, i32 level) {
     return v;
 }
 
+#define HERO_RV_AT(values, byteOffset) \
+    (*reinterpret_cast<i16*>(reinterpret_cast<u8*>(values) + (byteOffset)))
+
 VA(0x00443fc4, 0x1ac5)
 // Event rewards, penalties, scratch-slot extents, and score clamps are retail AI policy.
 // NOLINTBEGIN(readability-magic-numbers)
@@ -5476,8 +5479,10 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     float shrinePowerMod_p;
     i32 resources_e[AI_PURCHASE_RESOURCE_COUNT];
 
-    if (!immediate && HeroRVAt(gaiHeroEventStratRVOfPos, x, y) != RV_UNSET)
-        return HeroRVAt(gaiHeroEventStratRVOfPos, x, y);
+    if (!immediate
+        && HERO_RV_AT(gaiHeroEventStratRVOfPos, x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16))
+               != RV_UNSET)
+        return HERO_RV_AT(gaiHeroEventStratRVOfPos, x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16));
 
     gbReduceByReload = true;
     gbReduceByBerserk = true;
@@ -5559,12 +5564,12 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_BUOY:
                 if (!(gpCurAIHero->m_eventFlags & HERO_EVENT_BUOY)
                     && giCurAIHeroMorale < ARMY_GROUP_MORALE_MAX)
-                    value_h = static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_BUOY_VALUE_FACTOR);
+                    value_h = static_cast<i32>(gpCurAIHero->m_aiFightValue * AI_MORALE_LUCK_SITE_VALUE_FACTOR);
                 break;
             case MAP_OBJECT_TEMPLE:
                 if (!HAS(gpCurAIHero->m_eventFlags, HERO_EVENT_TEMPLE) && giCurAIHeroMorale < 3)
                     value_h = static_cast<i32>(
-                        gpCurAIHero->m_aiFightValue * AI_MORALE_LUCK_SITE_VALUE_FACTOR
+                        gpCurAIHero->m_aiFightValue * AI_TEMPLE_VALUE_FACTOR
                     );
                 break;
             case MAP_OBJECT_FAERIE_RING:
@@ -6109,14 +6114,14 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             value_h = 32000;
         else if (value_h < -32000)
             value_h = -32000;
-        *reinterpret_cast<i16*>(
-            reinterpret_cast<u8*>(gaiHeroEventStratRVOfPos)
-            + (x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16))
-        ) = static_cast<i16>(value_h);
+        HERO_RV_AT(gaiHeroEventStratRVOfPos, x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16)) =
+            static_cast<i16>(value_h);
     }
     return value_h;
 }
 // NOLINTEND(readability-magic-numbers)
+
+#undef HERO_RV_AT
 
 VA(0x00445a89, 0x299)
 i32 philAI::EvaluateGenericSite(mapCell* cell) {
