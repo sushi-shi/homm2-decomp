@@ -152,10 +152,10 @@ void ShutdownComError(char* function) {
 VA(0x0048ab13, 0x34a)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
-    BOOL result;
-    DCB state;
+    BOOL success;
+    DCB portState;
     i32 portIndex;
-    COMMTIMEOUTS timeouts;
+    COMMTIMEOUTS commTimeouts;
 
     for (portIndex = 0; portIndex < PORT_COUNT; ++portIndex)
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
@@ -175,63 +175,63 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
         return -1;
     }
 
-    state.DCBlength = sizeof(DCB);
-    GetCommState(s_comPorts[portIndex].handle, &state);
-    s_comPorts[portIndex].savedState = state;
+    portState.DCBlength = sizeof(DCB);
+    GetCommState(s_comPorts[portIndex].handle, &portState);
+    s_comPorts[portIndex].savedState = portState;
     GetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
 
     switch (baudRate) {
         case COM_BAUD_2400:
-            state.BaudRate = BAUD_VALUE_2400;
+            portState.BaudRate = BAUD_VALUE_2400;
             break;
         case COM_BAUD_4800:
-            state.BaudRate = BAUD_VALUE_4800;
+            portState.BaudRate = BAUD_VALUE_4800;
             break;
         case COM_BAUD_9600:
-            state.BaudRate = BAUD_VALUE_9600;
+            portState.BaudRate = BAUD_VALUE_9600;
             break;
         case COM_BAUD_19200:
-            state.BaudRate = BAUD_VALUE_19200;
+            portState.BaudRate = BAUD_VALUE_19200;
             break;
         case COM_BAUD_38400:
-            state.BaudRate = BAUD_VALUE_38400;
+            portState.BaudRate = BAUD_VALUE_38400;
             break;
         default:
-            state.BaudRate = IDX(baudRate);
+            portState.BaudRate = IDX(baudRate);
             break;
     }
 
-    state.fParity = 0;
-    state.fOutxCtsFlow = 1;
+    portState.fParity = 0;
+    portState.fOutxCtsFlow = 1;
     if (useDtr != 0)
-        state.fOutxDsrFlow = 1;
+        portState.fOutxDsrFlow = 1;
     else
-        state.fOutxDsrFlow = 0;
-    state.fDtrControl = DTR_CONTROL_ENABLE;
-    state.fInX = 0;
-    state.fOutX = 0;
-    state.fNull = 0;
-    state.fRtsControl = RTS_CONTROL_HANDSHAKE;
-    state.fAbortOnError = 1;
-    state.ByteSize = COM_SERIAL_BYTE_SIZE;
-    state.Parity = NOPARITY;
-    state.StopBits = ONESTOPBIT;
+        portState.fOutxDsrFlow = 0;
+    portState.fDtrControl = DTR_CONTROL_ENABLE;
+    portState.fInX = 0;
+    portState.fOutX = 0;
+    portState.fNull = 0;
+    portState.fRtsControl = RTS_CONTROL_HANDSHAKE;
+    portState.fAbortOnError = 1;
+    portState.ByteSize = COM_SERIAL_BYTE_SIZE;
+    portState.Parity = NOPARITY;
+    portState.StopBits = ONESTOPBIT;
 
-    result =
+    success =
         SetupComm(s_comPorts[portIndex].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
-    if (result == 0)
+    if (success == 0)
         ShutdownComError(DATA_COMPGEN(0x004f83d8, comInitInitializeCommunicationsParamaters, "Initialize communications paramaters"));
-    result = SetCommState(s_comPorts[portIndex].handle, &state);
-    if (result == 0)
+    success = SetCommState(s_comPorts[portIndex].handle, &portState);
+    if (success == 0)
         ShutdownComError(DATA_COMPGEN(0x004f8400, comInitConfigureCommunicationsDevice, "Configure communications device"));
 
-    timeouts.ReadIntervalTimeout = MAXDWORD;
-    timeouts.ReadTotalTimeoutConstant = 0;
-    timeouts.ReadTotalTimeoutMultiplier = 0;
-    timeouts.WriteTotalTimeoutConstant = 0;
-    timeouts.WriteTotalTimeoutMultiplier = 0;
-    result = SetCommTimeouts(s_comPorts[portIndex].handle, &timeouts);
-    if (result == 0)
+    commTimeouts.ReadIntervalTimeout = MAXDWORD;
+    commTimeouts.ReadTotalTimeoutConstant = 0;
+    commTimeouts.ReadTotalTimeoutMultiplier = 0;
+    commTimeouts.WriteTotalTimeoutConstant = 0;
+    commTimeouts.WriteTotalTimeoutMultiplier = 0;
+    success = SetCommTimeouts(s_comPorts[portIndex].handle, &commTimeouts);
+    if (success == 0)
         ShutdownComError(DATA_COMPGEN(0x004f8420, comInitSetCommunicationsTimeouts, "Set communications timeouts"));
 
     init_anchor(&s_comPorts[portIndex].normalQueue, 1, 0);
