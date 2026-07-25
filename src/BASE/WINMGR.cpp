@@ -341,7 +341,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
 
 VA(0x004cabb0, 0x45)
 void heroWindowManager::Close(void) {
-    if (m_active) {
+    if (m_active == 1) {
         heroWindow* w = m_windowListTail;
         while (w != NULL) {
             heroWindow* prev = w->m_prevWindow;

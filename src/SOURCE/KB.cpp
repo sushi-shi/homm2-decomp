@@ -3008,7 +3008,7 @@ void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
 
 VA(0x0049d326, 0x2d)
 void GOut(char* str) {
-    if (gpAdvManager->m_active)
+    if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
 
