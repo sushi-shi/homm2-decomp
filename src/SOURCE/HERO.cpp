@@ -1390,7 +1390,6 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_ARMY_SELECTOR_SLOT_4: {
                         tag_message dialogMessage;
                         i32 armyValue;
-                        CreatureType temporaryCreature;
 
                         armySlot7 = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
                         if (quickView0 == 0
@@ -1439,8 +1438,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                     gpHVHero->HeroScreenUpdate();
                                 }
                             } else if (quickView0 == 0) {
-                                temporaryCreature =
-                                    gpHVHero->m_army.m_creatureTypes[armySlot7];
+                                temp1 = IDX(gpHVHero->m_army.m_creatureTypes[armySlot7]);
                                 if (!HAS(
                                         message.payload.widget.modifiers,
                                         MESSAGE_MODIFIER_SHIFT_KEYS
@@ -1460,7 +1458,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                         gpHVHero->m_army.m_creatureTypes[armySlot7] =
                                             gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex];
                                         gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex] =
-                                            temporaryCreature;
+                                            static_cast<CreatureType>(temp1);
                                         temp1 = gpHVHero->m_army.m_creatureCounts[armySlot7];
                                         gpHVHero->m_army.m_creatureCounts[armySlot7] =
                                             gpHVHero->m_army.m_creatureCounts[giHeroScreenSrcIndex];
