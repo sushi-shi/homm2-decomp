@@ -1085,7 +1085,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
             if (giGroundToTerrain[m_mapData->GetCell(centerX_p + directionX_j, centerY_n)
                                       ->m_terrainImageIndex]
                     != TERRAIN_WATER
-                || giGroundToTerrain[m_mapData->GetCell(centerX_p, centerY_n + (directionY_h | 0))
+                || giGroundToTerrain[m_mapData->GetCell(centerX_p, centerY_n + OR_STEER(directionY_h))
                                          ->m_terrainImageIndex]
                        != TERRAIN_WATER)
                 return 0;
