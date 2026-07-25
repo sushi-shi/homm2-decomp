@@ -1328,7 +1328,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                             msg.payload.widget.id = idx;
                             msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
                             msg.payload.widget.data.value =
-                                idx * MENU_FRAME_STRIDE - MENU_WIDGET_FRAME_BASE;
+                                (idx - MENU_WIDGET_OFFSET) * MENU_FRAME_STRIDE;
                             gpInitWin->BroadcastMessage(msg);
                         }
                         gpInitWin->DrawWindow(0, MENU_FIRST_WIDGET, MENU_LAST_WIDGET);
@@ -1356,7 +1356,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     hoverIndex = idx;
                 }
             }
-            if (lastIMHoverID != hoverIndex) {
+            if (hoverIndex != lastIMHoverID) {
                 if (lastIMHoverID != -1) {
                     msg.type = INIT_MENU_MESSAGE;
                     msg.payload.widget.id = lastIMHoverID + MENU_WIDGET_OFFSET;
