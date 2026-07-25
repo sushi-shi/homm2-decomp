@@ -704,16 +704,12 @@ void combatManager::CastSpell(
         }
     }
 
-    spellSample = GetNullSample();
+    spellSample = NULL_SAMPLE2;
     if (m_limitCreature != 0) {
         ResetLimitCreature();
-        if (ValidHex(m_limitCreatureHex) && m_hexCells[m_limitCreatureHex].m_occupantSide != COMBAT_SIDE_NONE) {
-            m_limitCreatureCount
-                [IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
-                [m_hexCells[m_limitCreatureHex].m_occupantIndex] =
-                    m_limitCreatureCount[IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
-                                        [m_hexCells[m_limitCreatureHex].m_occupantIndex]
-                    + 1;
+        if (ValidHex(m_limitCreatureHex) && m_hexCells[m_limitCreatureHex].m_occupantSide >= 0) {
+            ++m_limitCreatureCount[IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
+                                  [m_hexCells[m_limitCreatureHex].m_occupantIndex];
         }
         m_limitCreature = 0;
         m_limitCreatureHex = COMBAT_HEX_EMPTY;
@@ -734,7 +730,7 @@ void combatManager::CastSpell(
         || spell == SPELL_ARMAGEDDON || spell == SPELL_ELEMENTAL_STORM
         || spell == SPELL_MASS_DISPEL) {
         target_i = NULL;
-    } else if (ValidHex(targetHex) && m_hexCells[targetHex].m_occupantSide != COMBAT_SIDE_NONE) {
+    } else if (ValidHex(targetHex) && m_hexCells[targetHex].m_occupantSide >= 0) {
         target_i =
             &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
         targetSide_i = m_hexCells[targetHex].m_occupantSide;
@@ -824,431 +820,442 @@ void combatManager::CastSpell(
 
     if (castByCreature == 0 && target_i != NULL && !target_i->SpellCastWorks(spell)) {
         ShowSpellCastFailure(target_i, IDX(spell));
-    } else {
-        spellSample = LoadPlaySample(sampleName_i);
-        switch (spell) {
-            case SPELL_TELEPORT:
-                teleportArmy_i = target_i;
-                targetHex = teleportDestination;
+        goto cast_done;
+    }
+    spellSample = LoadPlaySample(sampleName_i);
+    switch (spell) {
+        case SPELL_TELEPORT:
+            teleportArmy_i = target_i;
+            targetHex = teleportDestination;
+            RippleCreature(
+                teleportArmy_i->m_side,
+                teleportArmy_i->m_index,
+                COMBAT_RIPPLE_DEATH_RIPPLE
+            );
+            m_hexCells[teleportArmy_i->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
+            m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
+            if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
+                m_hexCells[teleportArmy_i->m_hex + 1].m_occupantSide = COMBAT_SIDE_NONE;
+                m_hexCells[teleportArmy_i->m_hex + 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+            } else if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_RIGHT) {
+                m_hexCells[teleportArmy_i->m_hex - 1].m_occupantSide = COMBAT_SIDE_NONE;
+                m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
+            }
+            if (gbNoShowCombat == 0)
+                WaitEndSample(spellSample, -1);
+            if (gbNoShowCombat == 0) {
+                sprintf(gText, DATA_COMPGEN(0x004f0300, castSpellTelptin82m, "telptin.82m"));
+                spellSample = LoadPlaySample(gText);
+            }
+            if (HAS(teleportArmy_i->m_monster.flags.all, MONSTER_FLAGS_WIDE)
+                != 0) {
+                adjacentHex_q = teleportDestination;
+                if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
+                    adjacentHex_q =
+                        teleportArmy_i->GetAdjacentCellIndex(
+                            teleportDestination, COMBAT_DIRECTION_EAST
+                        );
+                    if (adjacentHex_q == COMBAT_HEX_EMPTY
+                        || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_SIDE_NONE
+                            && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
+                                || m_hexCells[adjacentHex_q].m_occupantIndex != targetIndex_k))
+                        || m_hexCells[adjacentHex_q].m_blocked != 0) {
+                        targetHex--;
+                    }
+                }
+                if (teleportArmy_i->m_facing == ARMY_FACING_LEFT) {
+                    adjacentHex_q = teleportArmy_i->GetAdjacentCellIndex(
+                        adjacentHex_q, COMBAT_DIRECTION_WEST
+                    );
+                    if (adjacentHex_q == COMBAT_HEX_EMPTY
+                        || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_SIDE_NONE
+                            && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
+                                || m_hexCells[adjacentHex_q].m_occupantIndex != targetIndex_k))
+                        || m_hexCells[adjacentHex_q].m_blocked != 0) {
+                        targetHex++;
+                    }
+                }
+                teleportArmy_i->m_hex = targetHex;
+                switch (teleportArmy_i->m_facing) {
+                    case ARMY_FACING_RIGHT:
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
+                            static_cast<i8>(targetIndex_k);
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_LEFT;
+                        m_hexCells[teleportArmy_i->m_hex + 1].m_occupantSide = targetSide_i;
+                        m_hexCells[teleportArmy_i->m_hex + 1].m_occupantIndex =
+                            static_cast<i8>(targetIndex_k);
+                        m_hexCells[teleportArmy_i->m_hex + 1].m_occupantFrame =
+                            ARMY_FACING_RIGHT;
+                        break;
+                    case ARMY_FACING_LEFT:
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
+                            static_cast<i8>(targetIndex_k);
+                        m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_RIGHT;
+                        m_hexCells[teleportArmy_i->m_hex - 1].m_occupantSide = targetSide_i;
+                        m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex =
+                            static_cast<i8>(targetIndex_k);
+                        m_hexCells[teleportArmy_i->m_hex - 1].m_occupantFrame =
+                            ARMY_FACING_LEFT;
+                        break;
+                }
                 RippleCreature(
                     teleportArmy_i->m_side,
                     teleportArmy_i->m_index,
-                    COMBAT_RIPPLE_DEATH_RIPPLE
+                    COMBAT_RIPPLE_DEATH_WAVE
                 );
-                m_hexCells[teleportArmy_i->m_hex].m_occupantSide = COMBAT_SIDE_NONE;
-                m_hexCells[teleportArmy_i->m_hex].m_occupantIndex = COMBAT_HEX_EMPTY;
-                if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_LEFT) {
-                    m_hexCells[teleportArmy_i->m_hex + 1].m_occupantSide = COMBAT_SIDE_NONE;
-                    m_hexCells[teleportArmy_i->m_hex + 1].m_occupantIndex = COMBAT_HEX_EMPTY;
-                } else if (m_hexCells[teleportArmy_i->m_hex].m_occupantFrame == ARMY_FACING_RIGHT) {
-                    m_hexCells[teleportArmy_i->m_hex - 1].m_occupantSide = COMBAT_SIDE_NONE;
-                    m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
-                }
-                if (gbNoShowCombat == 0)
-                    WaitEndSample(spellSample, -1);
-                if (gbNoShowCombat == 0) {
-                    sprintf(gText, DATA_COMPGEN(0x004f0300, castSpellTelptin82m, "telptin.82m"));
-                    spellSample = LoadPlaySample(gText);
-                }
-                if (HAS(teleportArmy_i->m_monster.flags.all, MONSTER_FLAGS_WIDE)
-                    != 0) {
-                    adjacentHex_q = teleportDestination;
-                    if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
-                        adjacentHex_q =
-                            teleportArmy_i->GetAdjacentCellIndex(
-                                teleportDestination, COMBAT_DIRECTION_EAST
-                            );
-                        if (adjacentHex_q == COMBAT_HEX_EMPTY
-                            || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_SIDE_NONE
-                                && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
-                                    || m_hexCells[adjacentHex_q].m_occupantIndex != targetIndex_k))
-                            || m_hexCells[adjacentHex_q].m_blocked != 0) {
-                            targetHex = teleportDestination - 1;
-                        }
-                    }
-                    if (teleportArmy_i->m_facing == ARMY_FACING_LEFT) {
-                        adjacentHex_q = teleportArmy_i->GetAdjacentCellIndex(
-                            adjacentHex_q, COMBAT_DIRECTION_WEST
-                        );
-                        if (adjacentHex_q == COMBAT_HEX_EMPTY
-                            || (m_hexCells[adjacentHex_q].m_occupantSide != COMBAT_SIDE_NONE
-                                && (m_hexCells[adjacentHex_q].m_occupantSide != targetSide_i
-                                    || m_hexCells[adjacentHex_q].m_occupantIndex != targetIndex_k))
-                            || m_hexCells[adjacentHex_q].m_blocked != 0) {
-                            targetHex++;
-                        }
-                    }
-                    teleportArmy_i->m_hex = targetHex;
-                    if (teleportArmy_i->m_facing == ARMY_FACING_LEFT) {
-                        m_hexCells[targetHex].m_occupantSide = targetSide_i;
-                        m_hexCells[targetHex].m_occupantIndex = static_cast<i8>(targetIndex_k);
-                        m_hexCells[targetHex].m_occupantFrame = ARMY_FACING_RIGHT;
-                        m_hexCells[targetHex - 1].m_occupantSide = targetSide_i;
-                        m_hexCells[targetHex - 1].m_occupantIndex = static_cast<i8>(targetIndex_k);
-                        m_hexCells[targetHex - 1].m_occupantFrame = ARMY_FACING_LEFT;
-                    } else if (teleportArmy_i->m_facing == ARMY_FACING_RIGHT) {
-                        m_hexCells[targetHex].m_occupantSide = targetSide_i;
-                        m_hexCells[targetHex].m_occupantIndex = static_cast<i8>(targetIndex_k);
-                        m_hexCells[targetHex].m_occupantFrame = ARMY_FACING_LEFT;
-                        m_hexCells[targetHex + 1].m_occupantSide = targetSide_i;
-                        m_hexCells[targetHex + 1].m_occupantIndex = static_cast<i8>(targetIndex_k);
-                        m_hexCells[targetHex + 1].m_occupantFrame = ARMY_FACING_RIGHT;
-                    }
-                    RippleCreature(
-                        teleportArmy_i->m_side,
-                        teleportArmy_i->m_index,
-                        COMBAT_RIPPLE_DEATH_WAVE
-                    );
-                } else {
-                    teleportArmy_i->m_hex = teleportDestination;
-                    m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
-                    m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
-                        static_cast<i8>(targetIndex_k);
-                    m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_NONE;
-                    RippleCreature(
-                        teleportArmy_i->m_side,
-                        teleportArmy_i->m_index,
-                        COMBAT_RIPPLE_DEATH_WAVE
-                    );
-                }
-                break;
-            case SPELL_DISRUPTING_RAY:
-                oldDefense = target_i->m_monster.defense;
-                target_i->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
-                if (target_i->m_monster.defense < SPELL_MINIMUM_DEFENSE)
-                    target_i->m_monster.defense = SPELL_MINIMUM_DEFENSE;
-                sprintf(
-                    gText,
-                    DATA_COMPGEN(0x004f030c, castSpellTheDisruptingRayReducesDefenseBy, "The disrupting ray reduces defense by %d."),
-                    oldDefense - target_i->m_monster.defense
+            } else {
+                teleportArmy_i->m_hex = teleportDestination;
+                m_hexCells[teleportArmy_i->m_hex].m_occupantSide = targetSide_i;
+                m_hexCells[teleportArmy_i->m_hex].m_occupantIndex =
+                    static_cast<i8>(targetIndex_k);
+                m_hexCells[teleportArmy_i->m_hex].m_occupantFrame = ARMY_FACING_NONE;
+                RippleCreature(
+                    teleportArmy_i->m_side,
+                    teleportArmy_i->m_index,
+                    COMBAT_RIPPLE_DEATH_WAVE
                 );
-                CombatMessage(gText, 1, 1, 0);
-                DoBlast(targetHex, spell);
-                RippleCreature(target_i->m_side, target_i->m_index, COMBAT_RIPPLE_WAVE);
-                break;
-            case SPELL_COLD_RAY:
-                DelayMilli(
-                    static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY)
-                );
-                damage_m = spellPower_i * SPELL_COLD_RAY_DAMAGE_PER_POWER;
-                if (target_i->m_monsterType == CREATURE_FIRE_ELEMENTAL)
-                    damage_m = spellPower_i * SPELL_COLD_RAY_FIRE_ELEMENTAL_DAMAGE_PER_POWER;
-                if (target_i->m_monsterType == CREATURE_IRON_GOLEM
-                    || target_i->m_monsterType == CREATURE_STEEL_GOLEM)
-                    damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                ModifyDamageForArtifacts(
-                    &damage_m,
-                    spell,
-                    m_heroes[IDX(m_currentSide)],
-                    m_heroes[IDX(OppositeCombatSide(m_currentSide))]
-                );
-                coldRayArmyName_f = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
-                                        ? gArmyNames[IDX(target_i->m_monsterType)]
-                                        : gArmyNamesPlural[IDX(target_i->m_monsterType)];
-                sprintf(
-                    gText,
-                    DATA_COMPGEN(0x004f0338, castSpellTheColdRayDoesDDamage, "The cold ray does %d\n damage to the %s."),
-                    damage_m,
-                    coldRayArmyName_f
-                );
-                CombatMessage(gText, 1, 1, 0);
-                DoBlast(targetHex, spell);
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_COLD_RAY)].combatEffect, 0, 0);
-                target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-                break;
-            case SPELL_CHAIN_LIGHTNING:
-                ChainLightning(targetHex, spellPower_i);
-                break;
-            case SPELL_MAGIC_ARROW:
-                DelayMilli(
-                    static_cast<i32l>(
-                        gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_MAGIC_ARROW_DELAY
-                    )
-                );
-                damage_m = spellPower_i * SPELL_MAGIC_ARROW_DAMAGE_PER_POWER;
-                ModifyDamageForArtifacts(
-                    &damage_m,
-                    spell,
-                    m_heroes[IDX(m_currentSide)],
-                    m_heroes[IDX(OppositeCombatSide(m_currentSide))]
-                );
-                magicArrowArmyName_n = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
-                                           ? gArmyNames[IDX(target_i->m_monsterType)]
-                                           : gArmyNamesPlural[IDX(target_i->m_monsterType)];
-                sprintf(
-                    gText,
-                    DATA_COMPGEN(0x004f0360, castSpellTheMagicArrowDoesDDamage, "The magic arrow does %d\n damage to the %s."),
-                    damage_m,
-                    magicArrowArmyName_n
-                );
-                CombatMessage(gText, 1, 1, 0);
-                missileIcon_p = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f038c, castSpellKeepIcn, "keep.icn"));
-                // Retail projectile-angle lookup, ordered from vertical up to vertical down.
-                // NOLINTBEGIN(readability-magic-numbers)
-                missileAngles[0] = DATA_COMPGEN(0x004eb164, castSpellConstant6, 90.0f);
-                missileAngles[1] = DATA_COMPGEN(0x004eb168, castSpellConstant4, 68.5f);
-                missileAngles[2] = DATA_COMPGEN(0x004eb16c, castSpellConstant2, 45.0f);
-                missileAngles[3] = DATA_COMPGEN(0x004eb170, castSpellConstant8, 20.8f);
-                missileAngles[4] = DATA_COMPGEN(0x004eb158, castSpellConstant, 0.0);
-                missileAngles[5] = DATA_COMPGEN(0x004eb174, castSpellConstant9, -20.8f);
-                missileAngles[6] = DATA_COMPGEN(0x004eb178, castSpellConstant3, -45.0f);
-                missileAngles[7] = DATA_COMPGEN(0x004eb17c, castSpellConstant5, -68.5f);
-                missileAngles[8] = DATA_COMPGEN(0x004eb180, castSpellConstant7, -90.0f);
-                // NOLINTEND(readability-magic-numbers)
-                ShootMissile(
-                    castX,
-                    castY,
-                    target_i->MidX(),
-                    target_i->MidY(),
-                    missileAngles,
-                    missileIcon_p
-                );
-                gpResourceManager->Dispose(missileIcon_p);
-                target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-                break;
-            case SPELL_LIGHTNING_BOLT:
-                damage_m = spellPower_i * SPELL_LIGHTNING_DAMAGE_PER_POWER;
-                if (target_i->m_monsterType == CREATURE_AIR_ELEMENTAL)
-                    damage_m = spellPower_i * SPELL_LIGHTNING_AIR_ELEMENTAL_DAMAGE_PER_POWER;
-                if (target_i->m_monsterType == CREATURE_IRON_GOLEM
-                    || target_i->m_monsterType == CREATURE_STEEL_GOLEM)
-                    damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-                ModifyDamageForArtifacts(
-                    &damage_m,
-                    spell,
-                    m_heroes[IDX(m_currentSide)],
-                    m_heroes[IDX(OppositeCombatSide(m_currentSide))]
-                );
-                lightningArmyName_d = target_i->m_quantity < PLURAL_QUANTITY_MINIMUM
-                                          ? gArmyNames[IDX(target_i->m_monsterType)]
-                                          : gArmyNamesPlural[IDX(target_i->m_monsterType)];
-                sprintf(
-                    gText,
-                    DATA_COMPGEN(0x004f0398, castSpellTheLightningBoltDoesDDamage, "The lightning bolt does %d\n damage to the %s."),
-                    damage_m,
-                    lightningArmyName_d
-                );
-                CombatMessage(gText, 1, 1, 0);
-                DoBolt(
-                    1,
-                    castX,
-                    castY,
-                    target_i->MidX(),
-                    target_i->MidY(),
-                    LIGHTNING_BRANCH_DISTANCE,
-                    LIGHTNING_BRANCH_LENGTH,
-                    LIGHTNING_START_WIDTH,
-                    LIGHTNING_END_WIDTH,
-                    BOLT_COLOR_LIGHTNING,
-                    LIGHTNING_MIN_ANGLE,
-                    LIGHTNING_MAX_ANGLE,
-                    LIGHTNING_ANGLE_DISTANCE,
-                    1,
-                    0,
-                    0,
-                    1
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_LIGHTNING_BOLT)].combatEffect, 0, 0);
-                target_i->Damage(damage_m, SPELL_NONE);
-                target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-                break;
-            case SPELL_MASS_CURE:
-            case SPELL_MASS_HASTE:
-            case SPELL_MASS_SLOW:
-            case SPELL_MASS_BLESS:
-            case SPELL_MASS_CURSE:
-            case SPELL_HOLY_WORD:
-            case SPELL_HOLY_SHOUT:
-            case SPELL_MASS_DISPEL:
-            case SPELL_DEATH_RIPPLE:
-            case SPELL_DEATH_WAVE:
-            case SPELL_MASS_SHIELD:
-                CastMassSpell(spell, spellPower_i);
-                break;
-            case SPELL_MIRROR_IMAGE:
-                MirrorImage(targetHex);
-                break;
-            case SPELL_SUMMON_EARTH_ELEMENTAL:
-                SummonElemental(CREATURE_EARTH_ELEMENTAL, spellPower_i);
-                break;
-            case SPELL_SUMMON_AIR_ELEMENTAL:
-                SummonElemental(CREATURE_AIR_ELEMENTAL, spellPower_i);
-                break;
-            case SPELL_SUMMON_FIRE_ELEMENTAL:
-                SummonElemental(CREATURE_FIRE_ELEMENTAL, spellPower_i);
-                break;
-            case SPELL_SUMMON_WATER_ELEMENTAL:
-                SummonElemental(CREATURE_WATER_ELEMENTAL, spellPower_i);
-                break;
-            case SPELL_RESURRECT:
-            case SPELL_TRUE_RESURRECT:
-            case SPELL_ANIMATE_DEAD:
-                Resurrect(spell, targetHex, spellPower_i);
-                break;
-            case SPELL_CURE:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURE)].combatEffect, 0, 0);
-                target_i->Cure(spellPower_i);
-                DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-                break;
-            case SPELL_SLOW:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_SLOW,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SLOW)].combatEffect, 0, 0);
-                break;
-            case SPELL_HASTE:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_HASTE,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HASTE)].combatEffect, 0, 0);
-                break;
-            case SPELL_SHIELD:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_SHIELD,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SHIELD)].combatEffect, 0, 0);
-                break;
-            case SPELL_DRAGON_SLAYER:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_DRAGON_SLAYER,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DRAGON_SLAYER)].combatEffect, 0, 0);
-                break;
-            case SPELL_BLESS:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_BLESS,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLESS)].combatEffect, 0, 0);
-                break;
-            case SPELL_STONE_SKIN:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_STONESKIN,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STONE_SKIN)].combatEffect, 0, 0);
-                break;
-            case SPELL_STEEL_SKIN:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_STEELSKIN,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STEEL_SKIN)].combatEffect, 0, 0);
-                break;
-            case SPELL_CURSE:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_CURSE,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURSE)].combatEffect, 0, 0);
-                break;
-            case SPELL_BERSERKER:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_BERSERK,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BERSERKER)].combatEffect, 0, 0);
-                break;
-            case SPELL_HYPNOTIZE:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_HYPNOTIZE,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HYPNOTIZE)].combatEffect, 0, 0);
-                break;
-            case SPELL_PARALYZE:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_PARALYZE,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_PARALYZE)].combatEffect, 0, 0);
-                break;
-            case CREATURE_SPELL_DISPEL:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->DispelGood();
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 1);
-                break;
-            case SPELL_DISPEL:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->DispelGood();
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 0);
-                for (influence = ARMY_SPELL_INFLUENCE_HASTE;
-                     influence < ARMY_SPELL_INFLUENCE_COUNT;
-                     influence++)
-                    target_i->CancelIndividualSpell(influence);
-                break;
-            case SPELL_BLIND:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_BLIND,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLIND)].combatEffect, 0, 0);
-                break;
-            case SPELL_BLOOD_LUST:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                BloodLustEffect(target_i, MONSTER_ABILITY_FLAG_BLOOD_LUST);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_BLOODLUST,
-                    SPELL_BLOOD_LUST_DURATION
-                );
-                break;
-            case SPELL_ANTI_MAGIC:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                target_i->SetSpellInfluence(
-                    ARMY_SPELL_INFLUENCE_ANTI_MAGIC,
-                    spellPower_i
-                );
-                target_i->SpellEffect(gsSpellInfo[IDX(SPELL_ANTI_MAGIC)].combatEffect, 0, 0);
-                break;
-            case CREATURE_SPELL_PETRIFY:
-                ShowSpellMessage(castByCreature, spell, target_i);
-                TurnToStone(target_i);
-                break;
-            case SPELL_COLD_RING:
-                Fireball(targetHex, SPELL_COLD_RING);
-                break;
-            case SPELL_FIREBALL:
-                Fireball(targetHex, SPELL_FIREBALL);
-                break;
-            case SPELL_FIREBLAST:
-                Fireball(targetHex, SPELL_FIREBLAST);
-                break;
-            case SPELL_METEOR_SHOWER:
-                MeteorShower(targetHex);
-                break;
-            case SPELL_ELEMENTAL_STORM:
-                ElementalStorm();
-                break;
-            case SPELL_ARMAGEDDON:
-                Armageddon();
-                break;
-            case SPELL_EARTHQUAKE:
-                Earthquake();
-                break;
-            default:
-                DefaultSpell(targetHex);
-                break;
-        }
+            }
+            break;
+        case SPELL_DISRUPTING_RAY:
+            oldDefense = target_i->m_monster.defense;
+            target_i->m_monster.defense -= SPELL_DISRUPTING_RAY_DEFENSE_REDUCTION;
+            if (target_i->m_monster.defense < SPELL_MINIMUM_DEFENSE)
+                target_i->m_monster.defense = SPELL_MINIMUM_DEFENSE;
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004f030c, castSpellTheDisruptingRayReducesDefenseBy, "The disrupting ray reduces defense by %d."),
+                oldDefense - target_i->m_monster.defense
+            );
+            CombatMessage(gText, 1, 1, 0);
+            DoBlast(targetHex, spell);
+            RippleCreature(target_i->m_side, target_i->m_index, COMBAT_RIPPLE_WAVE);
+            break;
+        case SPELL_COLD_RAY:
+            DelayMilli(
+                static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_COLD_RAY_DELAY)
+            );
+            damage_m = spellPower_i * SPELL_COLD_RAY_DAMAGE_PER_POWER;
+            if (target_i->m_monsterType == CREATURE_FIRE_ELEMENTAL)
+                damage_m <<= 1;
+            if (target_i->m_monsterType == CREATURE_IRON_GOLEM
+                || target_i->m_monsterType == CREATURE_STEEL_GOLEM)
+                damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+            ModifyDamageForArtifacts(
+                &damage_m,
+                SPELL_COLD_RAY,
+                m_heroes[IDX(m_currentSide)],
+                m_heroes[IDX(OppositeCombatSide(m_currentSide))]
+            );
+            coldRayArmyName_f = target_i->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
+                                    ? gArmyNames[IDX(target_i->m_monsterType)]
+                                    : gArmyNamesPlural[IDX(target_i->m_monsterType)];
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004f0338, castSpellTheColdRayDoesDDamage, "The cold ray does %d\n damage to the %s."),
+                damage_m,
+                coldRayArmyName_f
+            );
+            CombatMessage(gText, 1, 1, 0);
+            DoBlast(targetHex, spell);
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_COLD_RAY)].combatEffect, 0, 0);
+            target_i->Damage(damage_m, SPELL_NONE);
+            target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+            break;
+        case SPELL_CHAIN_LIGHTNING:
+            ChainLightning(targetHex, spellPower_i);
+            break;
+        case SPELL_MAGIC_ARROW:
+            DelayMilli(
+                static_cast<i32l>(
+                    gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_MAGIC_ARROW_DELAY
+                )
+            );
+            damage_m = spellPower_i * SPELL_MAGIC_ARROW_DAMAGE_PER_POWER;
+            ModifyDamageForArtifacts(
+                &damage_m,
+                SPELL_MAGIC_ARROW,
+                m_heroes[IDX(m_currentSide)],
+                m_heroes[IDX(OppositeCombatSide(m_currentSide))]
+            );
+            magicArrowArmyName_n = target_i->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
+                                       ? gArmyNames[IDX(target_i->m_monsterType)]
+                                       : gArmyNamesPlural[IDX(target_i->m_monsterType)];
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004f0360, castSpellTheMagicArrowDoesDDamage, "The magic arrow does %d\n damage to the %s."),
+                damage_m,
+                magicArrowArmyName_n
+            );
+            CombatMessage(gText, 1, 1, 0);
+            missileIcon_p = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f038c, castSpellKeepIcn, "keep.icn"));
+            // Retail projectile-angle lookup, ordered from vertical up to vertical down.
+            // NOLINTBEGIN(readability-magic-numbers)
+            missileAngles[0] = DATA_COMPGEN(0x004eb164, castSpellConstant6, 90.0f);
+            missileAngles[1] = DATA_COMPGEN(0x004eb168, castSpellConstant4, 68.5f);
+            missileAngles[2] = DATA_COMPGEN(0x004eb16c, castSpellConstant2, 45.0f);
+            missileAngles[3] = DATA_COMPGEN(0x004eb170, castSpellConstant8, 20.8f);
+            missileAngles[4] = DATA_COMPGEN(0x004eb158, castSpellConstant, 0.0);
+            missileAngles[5] = DATA_COMPGEN(0x004eb174, castSpellConstant9, -20.8f);
+            missileAngles[6] = DATA_COMPGEN(0x004eb178, castSpellConstant3, -45.0f);
+            missileAngles[7] = DATA_COMPGEN(0x004eb17c, castSpellConstant5, -68.5f);
+            missileAngles[8] = DATA_COMPGEN(0x004eb180, castSpellConstant7, -90.0f);
+            // NOLINTEND(readability-magic-numbers)
+            ShootMissile(
+                castX,
+                castY,
+                target_i->MidX(),
+                target_i->MidY(),
+                missileAngles,
+                missileIcon_p
+            );
+            gpResourceManager->Dispose(missileIcon_p);
+            target_i->Damage(damage_m, SPELL_NONE);
+            target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+            break;
+        case SPELL_LIGHTNING_BOLT:
+            damage_m = spellPower_i * SPELL_LIGHTNING_DAMAGE_PER_POWER;
+            if (target_i->m_monsterType == CREATURE_AIR_ELEMENTAL)
+                damage_m <<= 1;
+            if (target_i->m_monsterType == CREATURE_IRON_GOLEM
+                || target_i->m_monsterType == CREATURE_STEEL_GOLEM)
+                damage_m = static_cast<i32l>(damage_m * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+            ModifyDamageForArtifacts(
+                &damage_m,
+                SPELL_COLD_RAY,
+                m_heroes[IDX(m_currentSide)],
+                m_heroes[IDX(OppositeCombatSide(m_currentSide))]
+            );
+            lightningArmyName_d = target_i->m_quantity <= PLURAL_QUANTITY_MINIMUM - 1
+                                      ? gArmyNames[IDX(target_i->m_monsterType)]
+                                      : gArmyNamesPlural[IDX(target_i->m_monsterType)];
+            sprintf(
+                gText,
+                DATA_COMPGEN(0x004f0398, castSpellTheLightningBoltDoesDDamage, "The lightning bolt does %d\n damage to the %s."),
+                damage_m,
+                lightningArmyName_d
+            );
+            CombatMessage(gText, 1, 1, 0);
+            DoBolt(
+                1,
+                castX,
+                castY,
+                target_i->MidX(),
+                target_i->MidY(),
+                LIGHTNING_BRANCH_DISTANCE,
+                LIGHTNING_BRANCH_LENGTH,
+                LIGHTNING_START_WIDTH,
+                LIGHTNING_END_WIDTH,
+                BOLT_COLOR_LIGHTNING,
+                LIGHTNING_MIN_ANGLE,
+                LIGHTNING_MAX_ANGLE,
+                LIGHTNING_ANGLE_DISTANCE,
+                1,
+                0,
+                0,
+                1
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_LIGHTNING_BOLT)].combatEffect, 0, 0);
+            target_i->Damage(damage_m, SPELL_NONE);
+            target_i->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+            break;
+        case SPELL_MASS_CURE:
+        case SPELL_MASS_HASTE:
+        case SPELL_MASS_SLOW:
+        case SPELL_MASS_BLESS:
+        case SPELL_MASS_CURSE:
+        case SPELL_HOLY_WORD:
+        case SPELL_HOLY_SHOUT:
+        case SPELL_MASS_DISPEL:
+        case SPELL_DEATH_RIPPLE:
+        case SPELL_DEATH_WAVE:
+        case SPELL_MASS_SHIELD:
+            CastMassSpell(spell, spellPower_i);
+            break;
+        case SPELL_MIRROR_IMAGE:
+            MirrorImage(targetHex);
+            break;
+        case SPELL_SUMMON_EARTH_ELEMENTAL:
+            SummonElemental(CREATURE_EARTH_ELEMENTAL, spellPower_i);
+            break;
+        case SPELL_SUMMON_AIR_ELEMENTAL:
+            SummonElemental(CREATURE_AIR_ELEMENTAL, spellPower_i);
+            break;
+        case SPELL_SUMMON_FIRE_ELEMENTAL:
+            SummonElemental(CREATURE_FIRE_ELEMENTAL, spellPower_i);
+            break;
+        case SPELL_SUMMON_WATER_ELEMENTAL:
+            SummonElemental(CREATURE_WATER_ELEMENTAL, spellPower_i);
+            break;
+        case SPELL_RESURRECT:
+        case SPELL_TRUE_RESURRECT:
+        case SPELL_ANIMATE_DEAD:
+            Resurrect(spell, targetHex, spellPower_i);
+            break;
+        case SPELL_CURE:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURE)].combatEffect, 0, 0);
+            target_i->Cure(spellPower_i);
+            DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
+            break;
+        case SPELL_SLOW:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_SLOW,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SLOW)].combatEffect, 0, 0);
+            break;
+        case SPELL_HASTE:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_HASTE,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HASTE)].combatEffect, 0, 0);
+            break;
+        case SPELL_SHIELD:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_SHIELD,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_SHIELD)].combatEffect, 0, 0);
+            break;
+        case SPELL_DRAGON_SLAYER:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_DRAGON_SLAYER,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DRAGON_SLAYER)].combatEffect, 0, 0);
+            break;
+        case SPELL_BLESS:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_BLESS,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLESS)].combatEffect, 0, 0);
+            break;
+        case SPELL_STONE_SKIN:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_STONESKIN,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STONE_SKIN)].combatEffect, 0, 0);
+            break;
+        case SPELL_STEEL_SKIN:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_STEELSKIN,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_STEEL_SKIN)].combatEffect, 0, 0);
+            break;
+        case SPELL_CURSE:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_CURSE,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_CURSE)].combatEffect, 0, 0);
+            break;
+        case SPELL_BERSERKER:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_BERSERK,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BERSERKER)].combatEffect, 0, 0);
+            break;
+        case SPELL_HYPNOTIZE:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_HYPNOTIZE,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_HYPNOTIZE)].combatEffect, 0, 0);
+            break;
+        case SPELL_PARALYZE:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_PARALYZE,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_PARALYZE)].combatEffect, 0, 0);
+            break;
+        case CREATURE_SPELL_DISPEL:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->DispelGood();
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 1);
+            break;
+        case SPELL_DISPEL:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->DispelGood();
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_DISPEL)].combatEffect, 0, 0);
+            for (influence = ARMY_SPELL_INFLUENCE_HASTE;
+                 influence < ARMY_SPELL_INFLUENCE_COUNT;
+                 influence++)
+                target_i->CancelIndividualSpell(influence);
+            break;
+        case SPELL_BLIND:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_BLIND,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_BLIND)].combatEffect, 0, 0);
+            break;
+        case SPELL_BLOOD_LUST:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            BloodLustEffect(target_i, MONSTER_ABILITY_FLAG_BLOOD_LUST);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_BLOODLUST,
+                SPELL_BLOOD_LUST_DURATION
+            );
+            break;
+        case SPELL_ANTI_MAGIC:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            target_i->SetSpellInfluence(
+                ARMY_SPELL_INFLUENCE_ANTI_MAGIC,
+                spellPower_i
+            );
+            target_i->SpellEffect(gsSpellInfo[IDX(SPELL_ANTI_MAGIC)].combatEffect, 0, 0);
+            break;
+        case CREATURE_SPELL_PETRIFY:
+            ShowSpellMessage(castByCreature, spell, target_i);
+            TurnToStone(target_i);
+            break;
+        case SPELL_COLD_RING:
+            Fireball(targetHex, SPELL_COLD_RING);
+            break;
+        case SPELL_FIREBALL:
+            Fireball(targetHex, SPELL_FIREBALL);
+            break;
+        case SPELL_FIREBLAST:
+            Fireball(targetHex, SPELL_FIREBLAST);
+            break;
+        case SPELL_METEOR_SHOWER:
+            MeteorShower(targetHex);
+            break;
+        case SPELL_ELEMENTAL_STORM:
+            ElementalStorm();
+            break;
+        case SPELL_ARMAGEDDON:
+            Armageddon();
+            break;
+        case SPELL_EARTHQUAKE:
+            Earthquake();
+            break;
+        default:
+            DefaultSpell(targetHex);
+            break;
     }
+
+cast_done:
 
     for (side_i = 0; side_i < COMBAT_SIDE_COUNT; side_i++) {
         for (armyIndex = 0; armyIndex < m_armyCount[IDX(side_i)]; armyIndex++) {
@@ -1451,7 +1458,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (anyAffected_g) {
         ModifyDamageForArtifacts(
             &baseDamage_w,
-            spell,
+            SPELL_MAGIC_ARROW,
             m_heroes[IDX(m_currentSide)],
             m_heroes[IDX(OppositeCombatSide(m_currentSide))]
         );
