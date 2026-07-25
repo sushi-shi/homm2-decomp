@@ -5514,7 +5514,9 @@ void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen
     if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack
         || gpGame->m_players[giCurPlayer].m_color != gpCurPlayer->m_color) {
         updated = UpdBottomViewEnemyTurn();
-    } else if (gpCurPlayer->m_currentHero == INVALID_HERO) {
+        goto update_bottom_view;
+    }
+    if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         updated = UpdBottomViewKingdom();
     } else {
         updated = UpdBottomViewHero();

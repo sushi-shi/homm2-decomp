@@ -4980,10 +4980,11 @@ void NormalDialog(
                 sizingIconHeight_l = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_EXPERIENCE:
-                sizingIconHeight_l = resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE
-                    ? NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
-                    : NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
-                        + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
+                if (resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE)
+                    sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
+                else
+                    sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
+                                         + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
                 break;
             case NORMAL_DIALOG_CREST:
                 sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
