@@ -255,6 +255,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 messageConstant14;
     i32 handled;
     i32 helpIndex;
+    i32 hintIndex;
     messageConstant1 = GENERAL_NAME_WIDGET;
     messageConstant2 = GENERAL_PORTRAIT_WIDGET;
     messageConstant3 = GENERAL_COLOR_WIDGET;
@@ -328,25 +329,25 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
                 case GENERAL_CLOSE:
-                    helpIndex = GENERAL_HOVER_HELP_CLOSE;
+                    hintIndex = GENERAL_HOVER_HELP_CLOSE;
                     break;
                 case GENERAL_RETREAT:
-                    helpIndex = GENERAL_HOVER_HELP_RETREAT;
+                    hintIndex = GENERAL_HOVER_HELP_RETREAT;
                     break;
                 case GENERAL_SURRENDER:
-                    helpIndex = GENERAL_HOVER_HELP_SURRENDER;
+                    hintIndex = GENERAL_HOVER_HELP_SURRENDER;
                     break;
                 case GENERAL_CAST_SPELL:
-                    helpIndex = GENERAL_HOVER_HELP_CAST;
+                    hintIndex = GENERAL_HOVER_HELP_CAST;
                     break;
                 default:
-                    helpIndex = GENERAL_HOVER_HELP_HERO;
+                    hintIndex = GENERAL_HOVER_HELP_HERO;
                     break;
             }
-            if (helpIndex == GENERAL_HOVER_HELP_HERO
+            if (hintIndex == GENERAL_HOVER_HELP_HERO
                 && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
-                helpIndex = GENERAL_HOVER_HELP_CAPTAIN;
-            gpCombatManager->CombatMessage(cViewGeneralHelp[helpIndex], 1, 0, 0);
+                hintIndex = GENERAL_HOVER_HELP_CAPTAIN;
+            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex], 1, 0, 0);
             break;
     }
     if (handled) {
