@@ -1982,9 +1982,9 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
                    * averageAngle;
     bolt->angle = averageAngle + bolt->baseAngle;
 
-    if (bolt->minAngle != 0 || bolt->maxAngle != 0) {
-        if (!(bolt->angleDistance * DATA_COMPGEN(0x004eb1b8, resetBoltAngleConstant, BOLT_ANGLE_DISTANCE_FACTOR) < distance || bolt->forceAngle != 0))
-            return;
+    if (bolt->minAngle == 0 && bolt->maxAngle == 0)
+        return;
+    if (bolt->angleDistance * DATA_COMPGEN(0x004eb1b8, resetBoltAngleConstant, BOLT_ANGLE_DISTANCE_FACTOR) < distance || bolt->forceAngle != 0) {
         float randomAngle;
         if (bolt->minAngle == bolt->maxAngle)
             randomAngle = static_cast<float>(bolt->minAngle) / IDX(BOLT_ANGLE_PERCENT_SCALE);
@@ -2065,8 +2065,10 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                     drawY = bolt->pixelY + beamOffset;
                 else
                     drawX = bolt->pixelX + beamOffset;
-                if (drawX >= 0 && drawX < COMBAT_SCREEN_WIDTH && drawY >= 0
-                    && drawY < COMBAT_AREA_HEIGHT) {
+                if (drawX < 0 || drawX >= COMBAT_SCREEN_WIDTH || drawY < 0
+                    || drawY >= COMBAT_AREA_HEIGHT)
+                    continue;
+                {
                     if (beamOffset < 0)
                         edgeShade = -(widthFirst - beamOffset);
                     else
@@ -2507,7 +2509,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     for (strike = 0; strike < CHAIN_LIGHTNING_MAX_TARGETS; ++strike) {
         army* target =
             &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
-        if (strike < CHAIN_LIGHTNING_MAX_TARGETS - 1
+        if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2
             && m_hexCells[targetHex].m_occupantSide == m_currentSide)
             gpCombatManager->m_heroDeathPending[IDX(m_currentSide)] = 1;
 
@@ -2533,7 +2535,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         if (branchDistance < CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE)
             branchDistance = CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE;
         i32 forceAngle =
-            branchDistance < CHAIN_LIGHTNING_SHORT_BRANCH_THRESHOLD
+            branchDistance <= CHAIN_LIGHTNING_SHORT_BRANCH_MAX
                 ? CHAIN_LIGHTNING_SHORT_FORCE_ANGLE
                 : CHAIN_LIGHTNING_LONG_FORCE_ANGLE;
         DoBolt(
