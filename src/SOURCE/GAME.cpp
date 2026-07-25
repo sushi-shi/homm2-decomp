@@ -86,6 +86,10 @@ H2_ENUM_BEGIN(GameHeroSelectionConstant)
     HERO_SELECTION_CAMPAIGN_RETRY_LIMIT   = 500
 H2_ENUM_END(GameHeroSelectionConstant)
 
+H2_ENUM_BEGIN(GameNextPlayerConstant)
+    NEXT_PLAYER_SCRATCH_SIZE = 20
+H2_ENUM_END(GameNextPlayerConstant)
+
 H2_ENUM_BEGIN(GameInitialStateConstant)
     INITIAL_DIFFICULTY_RATING   = 1,
     INITIAL_PLAYER_COUNT        = 4,
@@ -4101,6 +4105,7 @@ void game::TurnOffAIMusic(void) {
 
 VA(0x0047bd99, 0x596)
 void game::NextPlayer(void) {
+    char scratch[NEXT_PLAYER_SCRATCH_SIZE];
     i32 humanCount;
     i32 index;
 
