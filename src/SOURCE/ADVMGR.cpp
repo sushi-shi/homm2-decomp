@@ -8452,7 +8452,7 @@ VA(0x00467734, 0x129)
 MessageDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active) {
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );

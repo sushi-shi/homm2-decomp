@@ -1135,7 +1135,7 @@ VA(0x00492cc7, 0x382)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
     army* activeArmy;
     i32 speedLoop;
-    CombatSide stackSide;
+    i32 stackSide;
     i32 armyCounter;
     i32 sideLoop;
     i32 hasDeferred;
@@ -1148,10 +1148,10 @@ restart:
     m_currentSpeed = COMBAT_MAX_SPEED;
     for (speedLoop = 0; speedLoop < COMBAT_SPEED_LEVEL_COUNT; speedLoop++) {
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
-            stackSide = OppositeCombatSide(stackSide);
-            for (armyCounter = 0; armyCounter < m_armyCount[IDX(stackSide)]; armyCounter++) {
+            stackSide ^= 1;
+            for (armyCounter = 0; armyCounter < m_armyCount[stackSide]; armyCounter++) {
                 skipEntry = 0;
-                activeArmy = armyCounter + m_armies[IDX(stackSide)];
+                activeArmy = armyCounter + m_armies[stackSide];
                 if (HAS(activeArmy->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
                     || IDX(activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
@@ -1182,10 +1182,10 @@ restart:
                     break;
             }
 
-            if (armyCounter != m_armyCount[IDX(stackSide)]) {
+            if (armyCounter != m_armyCount[stackSide]) {
                 m_currentArmySide = stackSide;
                 m_currentArmyIndex = armyCounter;
-                if ((armyCounter + m_armies[IDX(stackSide)])
+                if ((armyCounter + m_armies[stackSide])
                         ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
                     m_currentSide = OppositeCombatSide(stackSide);
                 else
