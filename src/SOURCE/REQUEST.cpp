@@ -514,7 +514,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     }
                     break;
                 case INPUT_SCAN_NUMPAD_2:
-                    if (m_fileCount - 1 > m_selectedIndex) {
+                    if (m_selectedIndex < m_fileCount - 1) {
                         ++m_selectedIndex;
                         if (m_selectedIndex >= m_topIndex + iMaxListSize) {
                             ++m_topIndex;
@@ -527,42 +527,46 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DESELECT:
-                    if (message.payload.widget.id < FILE_REQUESTER_OK) {
-                        if (message.payload.widget.id == FILE_REQUESTER_CANCEL) {
-                            message.payload.widget.data.value = message.payload.widget.id;
-                            acceptStep = 1;
-                        } else if (message.payload.widget.id == FILE_REQUESTER_SCROLL_UP) {
+                    switch (message.payload.widget.id) {
+                        case FILE_REQUESTER_SCROLL_UP:
                             if (m_topIndex > 0) {
                                 --m_topIndex;
                                 Update(1);
                             }
-                        } else if (message.payload.widget.id == FILE_REQUESTER_SCROLL_DOWN
-                                   && m_topIndex + iMaxListSize < m_fileCount) {
-                            ++m_topIndex;
-                            if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
-                                m_topIndex = m_fileCount - iMaxListSize;
+                            break;
+                        case FILE_REQUESTER_SCROLL_DOWN:
+                            if (m_topIndex + iMaxListSize < m_fileCount) {
+                                ++m_topIndex;
+                                if (m_topIndex + iMaxListSize - 1 >= m_fileCount) {
+                                    m_topIndex = m_fileCount - iMaxListSize;
+                                }
+                                Update(1);
                             }
-                            Update(1);
-                        }
-                    } else if (message.payload.widget.id == FILE_REQUESTER_OK) {
-                        if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
-                            && m_filename[0] == 0) {
-                            NormalDialog(
-                                DATA_COMPGEN(0x004f8714, mainPleaseMakeASelectionFromThe, "Please make a selection from the list, or press cancel."),
-                                NORMAL_DIALOG_INFO,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                NORMAL_DIALOG_NO_VALUE,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0,
-                                NORMAL_DIALOG_NO_RESOURCE,
-                                0
-                            );
-                        } else {
+                            break;
+                        case FILE_REQUESTER_OK:
+                            if (m_selectedIndex == FILE_REQUESTER_SELECTION_NONE
+                                && m_filename[0] == 0) {
+                                NormalDialog(
+                                    DATA_COMPGEN(0x004f8714, mainPleaseMakeASelectionFromThe, "Please make a selection from the list, or press cancel."),
+                                    NORMAL_DIALOG_INFO,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    NORMAL_DIALOG_NO_VALUE,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0,
+                                    NORMAL_DIALOG_NO_RESOURCE,
+                                    0
+                                );
+                            } else {
+                                message.payload.widget.data.value = message.payload.widget.id;
+                                acceptStep = 1;
+                            }
+                            break;
+                        case FILE_REQUESTER_CANCEL:
                             message.payload.widget.data.value = message.payload.widget.id;
                             acceptStep = 1;
-                        }
+                            break;
                     }
                     break;
                 case WIDGET_COMMAND_SELECT:
@@ -573,31 +577,6 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                         )) {
                         helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {
-                            case FILE_REQUESTER_FILENAME_ENTRY:
-                                helpIndexMouse = REQUESTER_HELP_FILENAME;
-                                break;
-                            case FILE_REQUESTER_MAP_NAME:
-                                helpIndexMouse = REQUESTER_HELP_MAP_NAME;
-                                break;
-                            case FILE_REQUESTER_MAP_PLAYER_COUNT:
-                                helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
-                                break;
-                            case FILE_REQUESTER_MAP_SIZE:
-                                helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
-                                break;
-                            case FILE_REQUESTER_MAP_DIFFICULTY_ICON:
-                            case FILE_REQUESTER_MAP_DIFFICULTY_TEXT:
-                                helpIndexMouse = REQUESTER_HELP_DIFFICULTY;
-                                break;
-                            case FILE_REQUESTER_MAP_DESCRIPTION:
-                                helpIndexMouse = REQUESTER_HELP_DESCRIPTION;
-                                break;
-                            case FILE_REQUESTER_MAP_VICTORY:
-                                helpIndexMouse = REQUESTER_HELP_VICTORY;
-                                break;
-                            case FILE_REQUESTER_MAP_LOSS:
-                                helpIndexMouse = REQUESTER_HELP_LOSS;
-                                break;
                             case FILE_REQUESTER_FILTER_SMALL:
                                 helpIndexMouse = REQUESTER_HELP_FILTER_SMALL;
                                 break;
@@ -613,11 +592,38 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             case FILE_REQUESTER_FILTER_ALL:
                                 helpIndexMouse = REQUESTER_HELP_FILTER_ALL;
                                 break;
-                            case FILE_REQUESTER_CANCEL:
-                                helpIndexMouse = REQUESTER_HELP_CANCEL;
+                            case FILE_REQUESTER_FILENAME_ENTRY:
+                                helpIndexMouse = REQUESTER_HELP_FILENAME;
                                 break;
                             case FILE_REQUESTER_OK:
                                 helpIndexMouse = REQUESTER_HELP_OK;
+                                break;
+                            case FILE_REQUESTER_CANCEL:
+                                helpIndexMouse = REQUESTER_HELP_CANCEL;
+                                break;
+                            case FILE_REQUESTER_MAP_SIZE:
+                                helpIndexMouse = REQUESTER_HELP_MAP_SIZE;
+                                break;
+                            case FILE_REQUESTER_MAP_PLAYER_COUNT:
+                                helpIndexMouse = REQUESTER_HELP_PLAYER_COUNT;
+                                break;
+                            case FILE_REQUESTER_MAP_VICTORY:
+                                helpIndexMouse = REQUESTER_HELP_VICTORY;
+                                break;
+                            case FILE_REQUESTER_MAP_LOSS:
+                                helpIndexMouse = REQUESTER_HELP_LOSS;
+                                break;
+                            case FILE_REQUESTER_MAP_NAME:
+                                helpIndexMouse = REQUESTER_HELP_MAP_NAME;
+                                break;
+                            case FILE_REQUESTER_MAP_DESCRIPTION:
+                                helpIndexMouse = REQUESTER_HELP_DESCRIPTION;
+                                break;
+                            case FILE_REQUESTER_MAP_DIFFICULTY_ICON:
+                                helpIndexMouse = REQUESTER_HELP_DIFFICULTY;
+                                break;
+                            case FILE_REQUESTER_MAP_DIFFICULTY_TEXT:
+                                helpIndexMouse = REQUESTER_HELP_DIFFICULTY;
                                 break;
                             default:
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
@@ -646,7 +652,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 }
                                 break;
                         }
-                        if (helpIndexMouse != REQUESTER_HELP_NONE) {
+                        if (helpIndexMouse >= 0) {
                             NormalDialog(
                                 gFileRequestHelp[IDX(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
@@ -775,8 +781,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 );
                                 mouseXIndex = message.payload.widget.screenX;
                                 screenY = message.payload.widget.screenY;
-                                screenY = static_cast<i32>(screenY - (m_y + fGutterMinY))
-                                          - FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
+                                screenY = static_cast<i32>(screenY - (m_y + fGutterMinY));
+                                screenY -= FILE_REQUESTER_SCROLL_KNOB_HALF_HEIGHT;
                                 newTopIndexBuffer =
                                     (screenY * FILE_REQUESTER_GUTTER_SCALE) / gutterStepScreen;
                                 m_topIndex = newTopIndexBuffer;
@@ -793,36 +799,36 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                             default: {
                                 if (message.payload.widget.id >= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
                                     && message.payload.widget.id
-                                           < FILE_REQUESTER_MAP_SIZE_ICON_FIRST
-                                                 + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                  <= FILE_REQUESTER_MAP_SIZE_ICON_FIRST
+                                                         + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_SIZE_ICON_FIRST;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
                                            && message.payload.widget.id
-                                                  < FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                  <= FILE_REQUESTER_MAP_PLAYER_ICON_FIRST
+                                                         + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_PLAYER_ICON_FIRST;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
                                            && message.payload.widget.id
-                                                  < FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                  <= FILE_REQUESTER_MAP_VICTORY_ICON_FIRST
+                                                         + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_VICTORY_ICON_FIRST;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
                                            && message.payload.widget.id
-                                                  < FILE_REQUESTER_MAP_LOSS_ICON_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                  <= FILE_REQUESTER_MAP_LOSS_ICON_FIRST
+                                                         + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
                                     iResult = message.payload.widget.id
                                               - FILE_REQUESTER_MAP_LOSS_ICON_FIRST;
                                 } else if (message.payload.widget.id
                                                >= FILE_REQUESTER_LIST_TEXT_FIRST
                                            && message.payload.widget.id
-                                                  < FILE_REQUESTER_LIST_TEXT_FIRST
-                                                        + FILE_REQUESTER_LIST_RANGE_SIZE) {
+                                                  <= FILE_REQUESTER_LIST_TEXT_FIRST
+                                                         + FILE_REQUESTER_LIST_RANGE_SIZE - 1) {
                                     iResult =
                                         message.payload.widget.id - FILE_REQUESTER_LIST_TEXT_FIRST;
                                 } else {
