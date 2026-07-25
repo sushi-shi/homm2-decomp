@@ -3071,7 +3071,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
         }
         glTimers[0] = KBTickCount() + TIMER_DELAY;
 
-        if (m_updateMaxX & 1) {
+        if (m_updateMaxX == 1 || m_updateMaxX == 3 || m_updateMaxX == 5) {
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_1];
             m_animationPhases[ANIMATION_PHASE_COLUMN_1] %= UPDATE_FRAME_CYCLE;
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_3];
@@ -9423,7 +9423,7 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
 
 VA(0x004697cc, 0xd5)
 void advManager::DisableButtons(void) {
-    if (!gpAdvManager->m_active) {
+    if (gpAdvManager->m_active != 1) {
         return;
     }
     tag_message msg;
@@ -9446,7 +9446,7 @@ void advManager::DisableButtons(void) {
 
 VA(0x004698a1, 0xd5)
 void advManager::EnableButtons(void) {
-    if (!gpAdvManager->m_active) {
+    if (gpAdvManager->m_active != 1) {
         return;
     }
     tag_message msg;
