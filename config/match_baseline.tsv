@@ -1249,7 +1249,7 @@ SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
 SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	91fcda85feeb
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a107f077d8
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	93.2154	42b1d993bfeb
-SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	96.8547	8757527d0937
+SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	92.4860	4f0d1aa2a5da
 SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	0b0070c4c421
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	14b8b962e913
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	def64d7d216d
