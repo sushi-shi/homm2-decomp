@@ -256,7 +256,7 @@ BASE/PALETTE	??1palette@@UAE@XZ	100.0000	329cf2beae18
 BASE/PALETTE	?Data@palette@@QAEPACXZ	100.0000	a79273e275a2
 BASE/RESMGR	??0resourceManager@@QAE@XZ	100.0000	db93eb6df4cc
 BASE/RESMGR	?AddResource@resourceManager@@QAEXPAVresource@@@Z	100.0000	72732e6010fc
-BASE/RESMGR	?Close@resourceManager@@UAEXXZ	98.8704	b0de1f9c0b3f
+BASE/RESMGR	?Close@resourceManager@@UAEXXZ	100.0000	80637e8ef3b8
 BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	91ebf8c168b8
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	100.0000	c0471d4361bf
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	100.0000	b3b580ada322
@@ -336,7 +336,7 @@ BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b3a5e9e584e1
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	a76cec9c7460
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	98.9730	39fa997a64a8
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	427bcb755878
-BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	95.7143	5d7aab395f80
+BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	bc30261b61e9
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	e83b4d15b45f
 BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	5281ad28d06b
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	e13620843518
@@ -394,7 +394,7 @@ BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	100.0000	b59e5965d570
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	848c51e3064c
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	100.0000	08e5e410ec57
 BASE/soundmgr	?CDStop@soundManager@@QAEXXZ	100.0000	fe8f53d25e02
-BASE/soundmgr	?Close@soundManager@@UAEXXZ	98.3947	ab13f17b8cfa
+BASE/soundmgr	?Close@soundManager@@UAEXXZ	100.0000	1f31d7776c04
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	100.0000	5a02d04cf9ed
 BASE/soundmgr	?DigitalReport@soundManager@@QAEJPAU_SAMPLE@@F@Z	100.0000	fc8d72b8c192
 BASE/soundmgr	?ForcePollSound@soundManager@@QAEXXZ	100.0000	19cb8a8d1fc2
@@ -467,7 +467,7 @@ SOURCE/ADVMGR	?ForceNewHover@advManager@@QAEXXZ	100.0000	009fdde9fbd9
 SOURCE/ADVMGR	?GetArmySizeName@advManager@@QAEPADHH@Z	100.0000	5d717f580c73
 SOURCE/ADVMGR	?GetCell@advManager@@QAEPAVmapCell@@HH@Z	100.0000	b584d66179f2
 SOURCE/ADVMGR	?GetCloudLookup@advManager@@QAEHHH@Z	100.0000	793c7f912a43
-SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	94.8333	8fee4c079e67
+SOURCE/ADVMGR	?GetCursorSampleSet@advManager@@QAEXH@Z	100.0000	76fdf62c7998
 SOURCE/ADVMGR	?GetManaFrame@@YIHH@Z	100.0000	5313adfe20ff
 SOURCE/ADVMGR	?GetMobilityFrame@@YIHH@Z	100.0000	11ff82621dc9
 SOURCE/ADVMGR	?GetSoundId@advManager@@QAEHHH@Z	100.0000	467d8b4f64fe
@@ -772,7 +772,7 @@ SOURCE/FLY	?ValidFlight@army@@QAEHHH@Z	97.2014	5a2a425b4098
 SOURCE/GAME	?BuildingsOwned@playerData@@QAEHHHH@Z	100.0000	345649ce05f8
 SOURCE/GAME	?CalcBaseScore@@YIHH@Z	92.8346	63986722b793
 SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	848cde3b3403
-SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	92.6786	20c73e6c2d13
+SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	100.0000	a44df7421117
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	bb8bad91f670
 SOURCE/GAME	?CheckForTimeEvent@game@@QAEXXZ	100.0000	85b7f64886a5
 SOURCE/GAME	?CheckHeroConsistency@game@@QAEXXZ	100.0000	18acd0234f22
@@ -895,7 +895,7 @@ SOURCE/HERO	?HeroHandler@@YIHAAUtag_message@@@Z	94.5363	78af3dbfc354
 SOURCE/HERO	?HeroMessageUpdate@@YIXPAD@Z	100.0000	2eb3518a54a6
 SOURCE/HERO	?HeroScreenUpdate@hero@@QAEXXZ	100.0000	2da58450a8a1
 SOURCE/HERO	?HeroView@@YIHHHH@Z	100.0000	fbb2766e8679
-SOURCE/HERO	?NumArtifacts@hero@@QAEHXZ	95.5556	15a365f7cd75
+SOURCE/HERO	?NumArtifacts@hero@@QAEHXZ	100.0000	f3db41197fc1
 SOURCE/HERO	?Read@hero@@QAEXHC@Z	100.0000	3605845c8fe8
 SOURCE/HERO	?RedrawHeroScreen@@YIXXZ	100.0000	1edb0508c3ea
 SOURCE/HERO	?SetSS@hero@@QAEXHH@Z	100.0000	27acc45cfc17
@@ -942,7 +942,7 @@ SOURCE/KB	?EarlyShutdown@@YIXPAD0@Z	100.0000	58d98231130b
 SOURCE/KB	?EventWindowHandler@@YIHAAUtag_message@@@Z	100.0000	582a867d3726
 SOURCE/KB	?FileError@@YIXPAD@Z	100.0000	012e205f8ca4
 SOURCE/KB	?ForcePollSound@@YIXXZ	100.0000	b1de967650ab
-SOURCE/KB	?GOut@@YIXPAD@Z	96.6111	6a07561b06e1
+SOURCE/KB	?GOut@@YIXPAD@Z	100.0000	8f5a5969900a
 SOURCE/KB	?GameUnsaved@@YIHXZ	93.9000	63fe89cc18cd
 SOURCE/KB	?GetBuildingBaseResourceValue@@YIHHHH@Z	100.0000	81d892db1492
 SOURCE/KB	?GetBuildingCost@@YIXHHQAHH@Z	100.0000	35bf4a669e96

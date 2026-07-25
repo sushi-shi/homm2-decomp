@@ -1335,8 +1335,9 @@ void advManager::Close(void) {
 }
 
 VA(0x00457432, 0xe9)
-void advManager::GetCursorSampleSet(H2_ENUM_PARAM(ConfigWalkSpeed, i32) walkSpeed) {
-    i32 sampleSet = walkSpeed > CONFIG_WALK_SPEED_SLOWEST ? CURSOR_SAMPLE_FAST_SET : 0;
+void advManager::GetCursorSampleSet(i32 sampleSet) {
+    if (sampleSet >= 1)
+        sampleSet = CURSOR_SAMPLE_FAST_SET;
     // Ordered filename suffixes select the retail walking-sound variants.
     // NOLINTBEGIN(readability-magic-numbers)
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};

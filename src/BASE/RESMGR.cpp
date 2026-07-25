@@ -292,7 +292,7 @@ void resourceManager::RemoveResource(class resource* resourceToRemove) {
 VA(0x004c89e0, 0xc8)
 void resourceManager::Close(void) {
     i32 aggregateIndex;
-    if (!m_active)
+    if (m_active != 1)
         return;
     Expunge();
     m_resourceListHead = NULL;
