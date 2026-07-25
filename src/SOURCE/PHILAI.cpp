@@ -526,7 +526,7 @@ VA(0x00437bb5, 0xac)
 void philAI::DoAllHeroInteractions(void) {
     i32 i;
     for (i = 0; i < gpCurPlayer->m_townCount; i++) {
-        town* pTown = gpGame->GetTown(gpCurPlayer->TownId(i));
+        town* pTown = gpGame->GetTown(gpCurPlayer->m_townIds[i]);
         if (pTown->m_occupyingHeroId != -1)
             HeroInteractionAtTown(gpGame->GetHero(pTown->m_occupyingHeroId), pTown, 0, &iDummy);
     }
