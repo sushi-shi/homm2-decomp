@@ -1118,7 +1118,7 @@ void GenerateStandardFileName(char* source, char* destination) {
             indexOut++;
         }
         if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
-            break;
+            i = 999; // NOLINT(readability-magic-numbers)
     }
     *extension = '.';
     strcpy(destination + indexOut, extension);
