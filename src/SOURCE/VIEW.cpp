@@ -380,7 +380,7 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
         windowX = m_hexCells[viewedArmy->m_hex].m_x;
         windowY_5 = m_hexCells[viewedArmy->m_hex].m_y;
         xOffset_9 =
-            (-(viewedArmy->m_facing == ARMY_FACING_LEFT) & ARMY_FACING_OFFSET_DELTA)
+            (viewedArmy->m_facing == ARMY_FACING_LEFT ? ARMY_FACING_OFFSET_DELTA : 0)
             + ARMY_RIGHT_FACING_X_OFFSET;
         windowX -= xOffset_9;
         if (windowX < 0)
