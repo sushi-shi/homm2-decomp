@@ -1314,7 +1314,7 @@ SOURCE/TOWNMGR	?SplitArmyHandler@@YIHAAUtag_message@@@Z	96.9477	9892c168a3fe
 SOURCE/TOWNMGR	?TavernHandler@@YIHAAUtag_message@@@Z	96.1905	c9fff9caf18a
 SOURCE/TOWNMGR	?Toggle@townManager@@QAEXH@Z	100.0000	847524603247
 SOURCE/TOWNMGR	?UnloadTown@townManager@@QAEXXZ	100.0000	b5145e795877
-SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	97.0266	b8f7a552231d
+SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	97.2128	2e747dd9678e
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	100.0000	01bd0ece3096
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	99.4590	ee5334def1bd
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	0767d2df11cf
