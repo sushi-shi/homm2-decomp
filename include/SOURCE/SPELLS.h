@@ -135,7 +135,7 @@ H2_ENUM_BEGIN(SpellCastConstant)
     RIPPLE_SKIP_DISTANCE_2                         = 0,
     RIPPLE_SKIP_DISTANCE_3                         = 1,
     RIPPLE_SKIP_DISTANCE_4                         = 3,
-    MIRROR_SEARCH_MAX_DISTANCE                     = 9,
+    MIRROR_SEARCH_DISTANCE_LIMIT                   = 10,
     MIRROR_SLIDE_FRAME_COUNT                       = 16,
     ELEMENTAL_SUMMON_QUANTITY_PER_POWER            = 3,
     LUCK_MIN_TARGET_Y                              = 75,
