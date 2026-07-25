@@ -99,6 +99,23 @@ class AstVariantGenerationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complete TU-state dimension"):
             crossed_candidate_payloads(blob, [], states, 1, 3)
 
+    def test_zero_depth_cross_emits_one_clean_shape_per_state(self):
+        blob = b"abc"
+        source_mutations = [
+            AstMutation("source", "first", (AstEdit(1, 2, b"B"),)),
+        ]
+        states = [
+            AstMutation("tu_state", "island", (AstEdit(0, 0, b"state "),)),
+        ]
+        candidates, _truncated, source_shapes, state_shapes = crossed_candidate_payloads(
+            blob, source_mutations, states, max_depth=0, limit=4, min_depth=0,
+        )
+        self.assertEqual((source_shapes, state_shapes, len(candidates)), (1, 2, 2))
+        self.assertEqual([candidate["name"] for candidate in candidates], [
+            "baseline",
+            mutation_name(states[0]),
+        ])
+
     def test_tu_state_top_insertion_precedes_authored_declarations(self):
         blob = b"#include <a>\n\nint global;\nVA(0x1234, 1)\nvoid Target() {}\n"
         target_offset = blob.index(b"VA(")
