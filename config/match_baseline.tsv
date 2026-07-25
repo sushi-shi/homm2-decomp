@@ -1264,7 +1264,7 @@ SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	100.0000	81b7a6572b97
 SOURCE/SWAPMGR	?Close@swapManager@@UAEXXZ	100.0000	94582d4a70e9
 SOURCE/SWAPMGR	?DrawSelector@swapManager@@QAEXXZ	100.0000	dfd2be2beeb0
 SOURCE/SWAPMGR	?DrawSwapWin@swapManager@@QAEHXZ	100.0000	2acb9982858c
-SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	92.0454	cf0e9ce05625
+SOURCE/SWAPMGR	?Main@swapManager@@UAEHAAUtag_message@@@Z	100.0000	d8b18b613df4
 SOURCE/SWAPMGR	?Open@swapManager@@UAEHH@Z	100.0000	cf75b105f3fe
 SOURCE/SWAPMGR	?Reset@swapManager@@QAEXXZ	100.0000	d328cbc3c13d
 SOURCE/SWAPMGR	?SplitMons@swapManager@@QAEXXZ	100.0000	957bf3f2552a
@@ -1314,7 +1314,7 @@ SOURCE/TOWNMGR	?SplitArmyHandler@@YIHAAUtag_message@@@Z	96.9477	9892c168a3fe
 SOURCE/TOWNMGR	?TavernHandler@@YIHAAUtag_message@@@Z	96.1905	c9fff9caf18a
 SOURCE/TOWNMGR	?Toggle@townManager@@QAEXH@Z	100.0000	847524603247
 SOURCE/TOWNMGR	?UnloadTown@townManager@@QAEXXZ	100.0000	b5145e795877
-SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	97.3830	fa4b52cbbdf4
+SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	99.3511	3165566557b0
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	100.0000	01bd0ece3096
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	100.0000	e6c61c44ffa4
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	0767d2df11cf
