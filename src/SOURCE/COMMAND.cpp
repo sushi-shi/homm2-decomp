@@ -2507,7 +2507,7 @@ void combatManager::GetControl(void) {
     m_selectedHex = INVALID_HEX;
     m_previousCommand = COMBAT_INVALID_COMMAND;
     m_previousCommand = COMBAT_INVALID_COMMAND;
-    if (gpCombatManager->m_active)
+    if (gpCombatManager->m_active == 1)
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     CheckChangeSelector();
     if (gbRemoteOn == 0 || m_playerId[IDX(COMBAT_ATTACKER_SIDE)] < 0

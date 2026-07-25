@@ -77,9 +77,9 @@ void executive::ShutDownSystem(void) {
         if (cur != gpWindowManager && cur != gpMouseManager)
             RemoveManager(cur);
     }
-    if (gpWindowManager->m_active)
+    if (gpWindowManager->m_active == 1)
         RemoveManager(gpWindowManager);
-    if (gpMouseManager->m_active)
+    if (gpMouseManager->m_active == 1)
         RemoveManager(gpMouseManager);
     gpInputManager->Close();
     gpResourceManager->Close();
