@@ -2220,7 +2220,7 @@ void combatManager::ShootMissile(
                 static_cast<i16>(missileY7 - missileHalfHeight28)
             );
         } else {
-            if (giMinExtentX > minX8)
+            if (minX8 < giMinExtentX)
                 giMinExtentX = minX8;
             if (maxX9 > giMaxExtentX)
                 giMaxExtentX = maxX9;
