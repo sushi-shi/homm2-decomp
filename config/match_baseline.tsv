@@ -1241,7 +1241,7 @@ SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.5277	7c7c19a026
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	100.0000	4cc2eb9bf1df
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	99.5014	05d1b8a5bb72
-SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	94.2880	caafc846138d
+SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	99.8594	690d89f47a27
 SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	100.0000	33be0f61891c
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	9e47c17c18ef
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	44b2c7e9391a
@@ -1249,7 +1249,7 @@ SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
 SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	91fcda85feeb
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a107f077d8
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	93.2154	42b1d993bfeb
-SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	92.4860	4f0d1aa2a5da
+SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	92.2849	74ed43dc383b
 SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	0b0070c4c421
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	14b8b962e913
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	def64d7d216d

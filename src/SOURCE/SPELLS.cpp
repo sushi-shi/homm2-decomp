@@ -2790,103 +2790,105 @@ void combatManager::ShowMassSpell(
     H2_ENUM_PARAM(CombatEffectType, i32) effect,
     i32 animateCreatures
 ) {
-    u32l effectFile = MAKEFILEID(gCombatFxNames[IDX(effect)]);
-    i32 effectFrames = giNumPowFrames[IDX(effect)] - 1;
-    i32 returnFrames = 0;
+    i32 frame9;
+    CombatSide side8;
+    i32 creatureDied0;
+    i32 unusedMassSpellWord2;
+    army* target0;
+    i32 armyIndex0;
+    i32 returnFrames7;
+    u32l effectFile3;
+    i32 effectFrames;
+
+    effectFile3 = MAKEFILEID(gCombatFxNames[IDX(effect)]);
+    effectFrames = giNumPowFrames[IDX(effect)] - 1;
+    returnFrames7 = 0;
     if (gCurLoadedSpellEffect != effect) {
         gpResourceManager->Dispose(gCurLoadedSpellIcon);
-        gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFile);
+        gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFile3);
         gCurLoadedSpellEffect = effect;
     }
 
-    CombatSide side;
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        i32 armyIndex;
-        for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex) {
-            army* target = &m_armies[IDX(side)][armyIndex];
-            if (affected[IDX(side)][armyIndex] != 0)
-                target->m_drawSpellEffect = 1;
-            if (animateCreatures != 0 && affected[IDX(side)][armyIndex] != 0
-                && target->m_animationSequence != ARMY_ANIMATION_WINCE
-                && target->m_animationSequence != ARMY_ANIMATION_WINCE_RETURN) {
-                if (target->m_quantity == 0) {
+    for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
+        for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0) {
+            target0 = &m_armies[IDX(side8)][armyIndex0];
+            if (affected[IDX(side8)][armyIndex0] != 0)
+                target0->m_drawSpellEffect = 1;
+            if (animateCreatures != 0 && affected[IDX(side8)][armyIndex0] != 0
+                && target0->m_animationSequence != ARMY_ANIMATION_WINCE
+                && target0->m_animationSequence != ARMY_ANIMATION_WINCE_RETURN) {
+                if (target0->m_quantity == 0) {
                     if (effectFrames
-                        < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)])
+                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)])
                         effectFrames =
-                            target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
-                    gpSoundManager->MemorySample(target->m_samples[IDX(ARMY_SAMPLE_KILL)]);
+                            target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
+                    gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_KILL)]);
                 } else {
                     if (effectFrames
-                        < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)])
+                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)])
                         effectFrames =
-                            target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
-                    if (returnFrames
-                        < target->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)])
-                        returnFrames = target->m_frameInfo
+                            target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
+                    if (returnFrames7
+                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)])
+                        returnFrames7 = target0->m_frameInfo
                                            .animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
-                    gpSoundManager->MemorySample(target->m_samples[IDX(ARMY_SAMPLE_WINCE)]);
+                    gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_WINCE)]);
                 }
             }
         }
     }
 
-    i32 frame;
-    for (frame = 0; frame < effectFrames; ++frame) {
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-            i32 armyIndex;
-            for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex) {
-                army* target = &m_armies[IDX(side)][armyIndex];
-                target->m_spellEffectYOffset = 0;
-                if (animateCreatures != 0 && affected[IDX(side)][armyIndex] != 0) {
-                    if (target->m_quantity == 0) {
-                        if (target->m_animationSequence == ARMY_ANIMATION_DEATH) {
-                            if (target->m_animationFrame + 1
-                                < target->m_frameInfo
-                                      .animationFrameCount[IDX(target->m_animationSequence)])
-                                ++target->m_animationFrame;
-                        } else {
-                            target->m_animationSequence = ARMY_ANIMATION_DEATH;
-                            target->m_animationFrame = 0;
+    for (frame9 = 0; effectFrames > frame9; ++frame9) {
+        for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
+            for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0) {
+                target0 = &m_armies[IDX(side8)][armyIndex0];
+                target0->m_spellEffectYOffset = 0;
+                if (animateCreatures != 0 && affected[IDX(side8)][armyIndex0] != 0) {
+                    if (target0->m_quantity == 0) {
+                        if (target0->m_animationSequence != ARMY_ANIMATION_DEATH) {
+                            target0->m_animationSequence = ARMY_ANIMATION_DEATH;
+                            target0->m_animationFrame = 0;
+                        } else if (target0->m_animationFrame + 1
+                                   < target0->m_frameInfo
+                                         .animationFrameCount[IDX(target0->m_animationSequence)]) {
+                            ++target0->m_animationFrame;
                         }
-                    } else if (target->m_animationSequence == ARMY_ANIMATION_WINCE) {
-                        if (target->m_animationFrame + 1
-                            < target->m_frameInfo
-                                  .animationFrameCount[IDX(target->m_animationSequence)])
-                            ++target->m_animationFrame;
-                    } else {
-                        target->m_animationSequence = ARMY_ANIMATION_WINCE;
-                        target->m_animationFrame = 0;
+                    } else if (target0->m_animationSequence != ARMY_ANIMATION_WINCE) {
+                        target0->m_animationSequence = ARMY_ANIMATION_WINCE;
+                        target0->m_animationFrame = 0;
+                    } else if (target0->m_animationFrame + 1
+                               < target0->m_frameInfo
+                                     .animationFrameCount[IDX(target0->m_animationSequence)]) {
+                        ++target0->m_animationFrame;
                     }
                 }
-                if (frame + 1 < giNumPowFrames[IDX(effect)])
-                    gCurSpellEffectFrame = frame;
+                if (frame9 + 1 < giNumPowFrames[IDX(effect)])
+                    gCurSpellEffectFrame = frame9;
             }
         }
         DrawFrame(1, 0, 0, 0, MASS_SPELL_FRAME_DELAY, 1, 1);
     }
 
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        i32 armyIndex;
-        for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex)
-            m_armies[IDX(side)][armyIndex].m_drawSpellEffect = 0;
+    for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
+        for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0)
+            m_armies[IDX(side8)][armyIndex0].m_drawSpellEffect = 0;
     }
-    for (frame = 0; frame < returnFrames + 1; ++frame) {
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-            i32 armyIndex;
-            for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex) {
-                army* target = &m_armies[IDX(side)][armyIndex];
-                if (animateCreatures != 0 && affected[IDX(side)][armyIndex] != 0
-                    && target->m_animationSequence != ARMY_ANIMATION_STAND) {
-                    if (target->m_animationSequence == ARMY_ANIMATION_WINCE) {
-                        target->m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
-                        target->m_animationFrame = 0;
-                    } else if (target->m_animationFrame + 1
-                               < target->m_frameInfo
-                                     .animationFrameCount[IDX(target->m_animationSequence)]) {
-                        ++target->m_animationFrame;
-                    } else if (target->m_animationSequence != ARMY_ANIMATION_DEATH) {
-                        target->m_animationSequence = ARMY_ANIMATION_STAND;
-                        target->m_animationFrame = 0;
+    for (frame9 = 0; frame9 < returnFrames7 + 1; ++frame9) {
+        for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
+            for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0) {
+                target0 = &m_armies[IDX(side8)][armyIndex0];
+                if (animateCreatures != 0 && affected[IDX(side8)][armyIndex0] != 0
+                    && target0->m_animationSequence != ARMY_ANIMATION_STAND) {
+                    if (target0->m_animationSequence == ARMY_ANIMATION_WINCE) {
+                        target0->m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
+                        target0->m_animationFrame = 0;
+                    } else if (target0->m_animationFrame + 1
+                               < target0->m_frameInfo
+                                     .animationFrameCount[IDX(target0->m_animationSequence)]) {
+                        ++target0->m_animationFrame;
+                    } else if (target0->m_animationSequence != ARMY_ANIMATION_DEATH) {
+                        target0->m_animationSequence = ARMY_ANIMATION_STAND;
+                        target0->m_animationFrame = 0;
                     }
                 }
             }
@@ -2894,20 +2896,19 @@ void combatManager::ShowMassSpell(
         DrawFrame(1, 0, 0, 0, MASS_SPELL_FRAME_DELAY, 1, 1);
     }
 
-    i32 creatureDied = 0;
+    creatureDied0 = 0;
     memset(m_removedArmies, 0, sizeof(m_removedArmies));
     m_removedArmyPresent = 0;
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        i32 armyIndex;
-        for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex) {
-            army* target = &m_armies[IDX(side)][armyIndex];
-            if (affected[IDX(side)][armyIndex] != 0 && target->m_quantity == 0) {
-                target->ProcessDeath(0);
-                creatureDied = 1;
+    for (side8 = COMBAT_ATTACKER_SIDE; IDX(side8) < COMBAT_SIDE_COUNT; ++side8) {
+        for (armyIndex0 = 0; armyIndex0 < m_armyCount[IDX(side8)]; ++armyIndex0) {
+            target0 = &m_armies[IDX(side8)][armyIndex0];
+            if (affected[IDX(side8)][armyIndex0] != 0 && target0->m_quantity == 0) {
+                target0->ProcessDeath(0);
+                creatureDied0 = 1;
             }
         }
     }
-    if (creatureDied)
+    if (creatureDied0)
         DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     if (m_removedArmyPresent != 0)
         MakeCreaturesVanish();
