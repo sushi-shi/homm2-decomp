@@ -932,8 +932,9 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         giNextAction = ACTION_MOVE;
         giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][targetArmy15].m_hex;
         return 1;
+    } else {
+        return 0;
     }
-    return 0;
 }
 
 VA(0x004c35ea, 0x240)
