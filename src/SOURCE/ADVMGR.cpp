@@ -10128,11 +10128,17 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
 VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
+    tag_message message6;
+    i32 oldInterfaceMode;
+    ConfigWalkSpeed prevWalkSpeed;
+    i32 heroContextLocked;
+    i32 sampleIndex;
+
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     gpMouseManager->SetPointer(DATA_COMPGEN(0x004f69c4, systemOptionsAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
-    i32 oldInterfaceMode = gConfig.evilInterfaceUsage;
-    ConfigWalkSpeed oldWalkSpeed = gConfig.walkSpeed;
-    i32 heroWasMobilized = m_heroContextLocked;
+    prevWalkSpeed = gConfig.walkSpeed;
+    oldInterfaceMode = gConfig.evilInterfaceUsage;
+    heroContextLocked = m_heroContextLocked;
     bPrefsChanged = 0;
     DemobilizeCurrHero();
 
@@ -10149,8 +10155,7 @@ void advManager::SystemOptions(void) {
     gpWindowManager->DoDialog(cPanel, SystemOptionsHandler, 0);
     delete cPanel;
 
-    if (gConfig.walkSpeed != oldWalkSpeed) {
-        i32 sampleIndex;
+    if (gConfig.walkSpeed != prevWalkSpeed) {
         for (sampleIndex = 0; sampleIndex < CURSOR_SAMPLE_COUNT; ++sampleIndex) {
             gpResourceManager->Dispose(m_cursorSamples[sampleIndex]);
         }
@@ -10162,7 +10167,7 @@ void advManager::SystemOptions(void) {
     if (gConfig.evilInterfaceUsage != oldInterfaceMode) {
         CheckSetEvilInterface(1, -1);
     }
-    if (heroWasMobilized) {
+    if (heroContextLocked) {
         MobilizeCurrHero(0);
     }
 }
