@@ -486,7 +486,7 @@ SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	99.9835	d94fbd07b178
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	100.0000	c7dda1e5cee0
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	97.6539	5670597ac046
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	100.0000	c03d3d9a6025
-SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	96.7055	ba564872a12d
+SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	99.9523	1d5ec4fcb976
 SOURCE/ADVMGR	?RedrawAdvScreen@advManager@@QAEXHH@Z	97.5000	a5406cf91347
 SOURCE/ADVMGR	?Reseed@advManager@@QAEXHH@Z	100.0000	e0ec284215fa
 SOURCE/ADVMGR	?SaveAdventureBorder@advManager@@QAEXXZ	97.6163	2ca3c0acc915
