@@ -135,7 +135,8 @@ i32 combatManager::ViewGeneral(
         if (m_playerId[IDX(side)] == -1)
             message15.payload.widget.data.value = GENERAL_CAPTAIN_FRAME;
         else
-            message15.payload.widget.data.value = gpGame->GetPlayerColor(m_playerId[IDX(side)]);
+            message15.payload.widget.data.value =
+                gpGame->m_players[m_playerId[IDX(side)]].m_color;
         generalWindow18->BroadcastMessage(message15);
     }
 
@@ -212,7 +213,7 @@ i32 combatManager::ViewGeneral(
     }
     if (allowActions == 0 || m_currentSide != giCurGeneral
         || (giCurGeneral == COMBAT_DEFENDER_SIDE
-            && m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL)
+            && m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
         || m_sideRetreated[IDX(COMBAT_ATTACKER_SIDE)] != 0
         || m_sideRetreated[1] != 0 || m_heroes[IDX(side)]->m_isCaptain != 0) {
         message15.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
@@ -325,7 +326,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             break;
         case MESSAGE_MOUSE_MOVE:
             gpWindowManager->ConvertToHover(message);
-            if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
+            if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
                 return MESSAGE_DISPATCH_CONSUME;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
