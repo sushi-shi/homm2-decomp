@@ -401,8 +401,8 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             }
             break;
         case NETWORK_PACKET_STARTUP:
-            giNumHumanPlayers = message[0]; // startup->playerCount
-            giThisNetPos = message[1];      // startup->netPosition
+            giNumHumanPlayers = *(message + offsetof(WinsockStartupMessage, playerCount));
+            giThisNetPos = *(message + offsetof(WinsockStartupMessage, netPosition));
             LogInt(
                 DATA_COMPGEN(0x004ed8a4, wsEvaluateMessageWSMSGSTARTUP, "WSMSGSTARTUP"),
                 giThisNetPos,
@@ -415,7 +415,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             );
             memcpy(
                 giNetPosToDCOPos,
-                message + offsetof(WinsockStartupMessage, playerAddresses), // startup->playerAddresses
+                message + offsetof(WinsockStartupMessage, playerAddresses),
                 sizeof(giNetPosToDCOPos)
             );
             bStartUpInfoReceived = 1;
