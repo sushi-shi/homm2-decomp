@@ -2640,29 +2640,42 @@ void combatManager::RippleCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex, CombatRippleMode mode
 ) {
     DATA(0x004f0540) static i16 rippleSourceLineBase = 2587;
-    army* target = &m_armies[IDX(side)][armyIndex];
-    i32 phaseStep;
+    i32 end;
+    float amplitudeStep1;
+    i32 start0;
+    float amplitude0;
+    i32 skipDistance5;
+    i32 extentHeight;
     i32 frameDelay;
+    i32 row9;
+    i32 height0;
+    i32 amplitudeIndex1;
+    army* target2;
     float amplitudeBase;
-    float amplitudeStep;
+    i32 waveIndex;
+    i32 phase;
+    float* wave8;
+    i32 phaseStep0;
+
+    target2 = &m_armies[IDX(side)][armyIndex];
     switch (mode) {
         case COMBAT_RIPPLE_WAVE:
-            phaseStep = RIPPLE_WAVE_PHASE_STEP;
+            phaseStep0 = RIPPLE_WAVE_PHASE_STEP;
             frameDelay = RIPPLE_WAVE_FRAME_DELAY;
             amplitudeBase = RIPPLE_MODE_ZERO_AMPLITUDE_BASE;
-            amplitudeStep = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
+            amplitudeStep1 = RIPPLE_MODE_ZERO_AMPLITUDE_STEP;
             break;
         case COMBAT_RIPPLE_DEATH_RIPPLE:
-            phaseStep = RIPPLE_DEFAULT_PHASE_STEP;
+            phaseStep0 = RIPPLE_DEFAULT_PHASE_STEP;
             frameDelay = RIPPLE_DEFAULT_FRAME_DELAY;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
-            amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
+            amplitudeStep1 = RIPPLE_OTHER_AMPLITUDE_STEP;
             break;
         default:
-            phaseStep = RIPPLE_DEFAULT_PHASE_STEP;
+            phaseStep0 = RIPPLE_DEFAULT_PHASE_STEP;
             frameDelay = RIPPLE_DEFAULT_FRAME_DELAY;
             amplitudeBase = RIPPLE_OTHER_AMPLITUDE_BASE;
-            amplitudeStep = RIPPLE_OTHER_AMPLITUDE_STEP;
+            amplitudeStep1 = RIPPLE_OTHER_AMPLITUDE_STEP;
             break;
     }
 
@@ -2673,93 +2686,92 @@ void combatManager::RippleCreature(
     else
         gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 
-    i32 extentHeight = giMaxExtentY - giMinExtentY + 1;
+    height0 = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(
         H2_ALLOC_AT(
             SPELL_MODIFIER_ROW_COUNT, DATA_COMPGEN(0x004f0544, rippleCreatureSourceFile, RETAIL_FILE),
             rippleSourceLineBase + 0x2c
         )
     );
-    float* wave = static_cast<float*>(H2_ALLOC_AT(
+    wave8 = static_cast<float*>(H2_ALLOC_AT(
         sizeof(float) * SPELL_MODIFIER_ROW_COUNT, DATA_COMPGEN(0x004f0570, rippleCreatureSourceFile2, RETAIL_FILE),
         rippleSourceLineBase + 0x2d
     ));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
-    i32 row;
-    for (row = 0; row < SPELL_MODIFIER_ROW_COUNT; ++row) {
-        wave[row] = static_cast<float>(
-            (sin(static_cast<float>(row % RIPPLE_WAVE_PERIOD)
-                 / static_cast<float>(RIPPLE_WAVE_DIVISOR))
+    for (row9 = 0; row9 < SPELL_MODIFIER_ROW_COUNT; ++row9) {
+        wave8[row9] = static_cast<float>(
+            (sin(static_cast<double>(
+                 static_cast<float>(row9 % RIPPLE_WAVE_PERIOD)
+                 / static_cast<float>(RIPPLE_WAVE_DIVISOR)
+             ))
              - RIPPLE_WAVE_CENTER)
             * RIPPLE_WAVE_RANGE
         );
     }
-    target->m_palette = gyModify;
-    target->m_drawEnabled = 0;
+    target2->m_palette = gyModify;
+    target2->m_showQuantity = 0;
     giMinExtentX -= RIPPLE_MARGIN;
     giMaxExtentX += RIPPLE_MARGIN;
     if (giMinExtentX < 0)
         giMinExtentX = 0;
-    if (giMaxExtentX >= COMBAT_SCREEN_WIDTH)
+    if (giMaxExtentX > COMBAT_SCREEN_WIDTH - 1)
         giMaxExtentX = COMBAT_SCREEN_WIDTH - 1;
     extentHeight = giMaxExtentY - giMinExtentY + 1;
 
-    i32 phase;
-    for (phase = RIPPLE_PHASE_START; phase < RIPPLE_PHASE_END; phase += phaseStep) {
-        i32 skipDistance =
+    for (phase = RIPPLE_PHASE_START; phase < RIPPLE_PHASE_END; phase += phaseStep0) {
+        skipDistance5 =
             abs(RIPPLE_PHASE_CENTER - phase % RIPPLE_PHASE_PERIOD) - RIPPLE_SKIP_CENTER_OFFSET;
-        i32 amplitudeIndex = (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
+        amplitudeIndex1 = (phase - RIPPLE_PHASE_START) / RIPPLE_AMPLITUDE_INDEX_DIVISOR + 1;
         if (mode == COMBAT_RIPPLE_DEATH_WAVE)
-            amplitudeIndex = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex;
+            amplitudeIndex1 = RIPPLE_MODE_TWO_AMPLITUDE_START - amplitudeIndex1;
         else if (mode == COMBAT_RIPPLE_WAVE) {
-            if (amplitudeIndex == 0)
-                amplitudeIndex = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
+            if (amplitudeIndex1 == 0)
+                amplitudeIndex1 = RIPPLE_MODE_ZERO_CENTER_AMPLITUDE;
             else
-                amplitudeIndex = RIPPLE_MODE_ZERO_AMPLITUDE_START - amplitudeIndex;
+                amplitudeIndex1 = RIPPLE_MODE_ZERO_AMPLITUDE_START - amplitudeIndex1;
         }
-        if (phase <= RIPPLE_PHASE_CENTER || phase >= RIPPLE_PHASE_END - RIPPLE_SKIP_CENTER_OFFSET
-            || (skipDistance != RIPPLE_SKIP_DISTANCE_0 && skipDistance != RIPPLE_SKIP_DISTANCE_1
-                && skipDistance != RIPPLE_SKIP_DISTANCE_2 && skipDistance != RIPPLE_SKIP_DISTANCE_3
-                && skipDistance != RIPPLE_SKIP_DISTANCE_4)) {
-            float amplitude = (amplitudeIndex * amplitudeStep + amplitudeBase) * skipDistance;
-            memset(gyModify + giMinExtentY, 0, extentHeight);
-            for (row = giMinExtentY; row < giMaxExtentY; ++row) {
-                i32 waveIndex;
-                if (mode == COMBAT_RIPPLE_DEATH_WAVE)
-                    waveIndex = -RIPPLE_PHASE_CENTER - giMaxExtentY
-                                + phase * RIPPLE_WAVE_PHASE_MULTIPLIER + row;
-                else
-                    waveIndex = phase * RIPPLE_WAVE_PHASE_MULTIPLIER - RIPPLE_PHASE_CENTER - row
-                                + giMinExtentY;
-                waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
-                if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
-                    gyModify[row] = static_cast<i8>(wave[waveIndex] * amplitude);
-            }
-            if (mode == COMBAT_RIPPLE_DEATH_RIPPLE
-                && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
-                i32 start = giMinExtentY - 1;
-                i32 end = giMinExtentY
-                          + (RIPPLE_DEATH_RIPPLE_FADE_BASE - (RIPPLE_PHASE_END - phase))
-                                * extentHeight / RIPPLE_FADE_DIVISOR
-                          + 1;
-                memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
-            }
-            if (mode == COMBAT_RIPPLE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
-                i32 start = giMinExtentY - 1;
-                i32 end =
-                    giMaxExtentY - 1
-                    - (phase - RIPPLE_DEATH_WAVE_FADE_BASE) * extentHeight / RIPPLE_FADE_DIVISOR;
-                memset(gyModify + start, VAPORIZE_MASKED, end - start + 1);
-            }
-            gbLimitToExtent = true;
-            gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
+        if (phase > RIPPLE_PHASE_CENTER && phase < RIPPLE_PHASE_END - RIPPLE_SKIP_CENTER_OFFSET
+            && (skipDistance5 == RIPPLE_SKIP_DISTANCE_0 || skipDistance5 == RIPPLE_SKIP_DISTANCE_1
+                || skipDistance5 == RIPPLE_SKIP_DISTANCE_2 || skipDistance5 == RIPPLE_SKIP_DISTANCE_3
+                || skipDistance5 == RIPPLE_SKIP_DISTANCE_4))
+            continue;
+        amplitude0 = (amplitudeIndex1 * amplitudeStep1 + amplitudeBase) * skipDistance5;
+        memset(gyModify + giMinExtentY, 0, extentHeight);
+        for (row9 = giMinExtentY; row9 < giMaxExtentY; ++row9) {
+            if (mode == COMBAT_RIPPLE_DEATH_WAVE)
+                waveIndex = -giMaxExtentY
+                            + (phase - RIPPLE_PHASE_START) * RIPPLE_WAVE_PHASE_MULTIPLIER + row9;
+            else
+                waveIndex = (phase - RIPPLE_PHASE_START) * RIPPLE_WAVE_PHASE_MULTIPLIER - row9
+                            + giMinExtentY;
+            waveIndex += RIPPLE_WAVE_INDEX_OFFSET;
+            if (waveIndex >= 0 && waveIndex < SPELL_MODIFIER_ROW_COUNT)
+                gyModify[row9] = static_cast<i8>(wave8[waveIndex] * amplitude0);
         }
+        if (mode == COMBAT_RIPPLE_DEATH_RIPPLE
+            && phase >= RIPPLE_DEATH_RIPPLE_FADE_START) {
+            start0 = giMinExtentY - 1;
+            end = giMinExtentY
+                  + (RIPPLE_DEATH_RIPPLE_FADE_BASE - (RIPPLE_PHASE_END - phase))
+                        * extentHeight / RIPPLE_FADE_DIVISOR
+                  + 1;
+            memset(gyModify + start0, VAPORIZE_MASKED, end - start0 + 1);
+        }
+        if (mode == COMBAT_RIPPLE_DEATH_WAVE && phase < RIPPLE_DEATH_WAVE_FADE_END) {
+            start0 = giMinExtentY - 1;
+            end =
+                giMaxExtentY - 1
+                - (phase - RIPPLE_DEATH_WAVE_FADE_BASE) * extentHeight / RIPPLE_FADE_DIVISOR;
+            memset(gyModify + start0, VAPORIZE_MASKED, end - start0 + 1);
+        }
+        gbLimitToExtent = true;
+        gpCombatManager->DrawFrame(1, 0, 1, 0, frameDelay, 1, 1);
     }
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
-    target->m_palette = NULL;
-    target->m_drawEnabled = 1;
+    target2->m_palette = NULL;
+    target2->m_showQuantity = 1;
     H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f059c, rippleCreatureSourceFile3, RETAIL_FILE), rippleSourceLineBase + 0x8e);
-    H2_FREE_AT(wave, DATA_COMPGEN(0x004f05c8, rippleCreatureSourceFile4, RETAIL_FILE), rippleSourceLineBase + 0x8f);
+    H2_FREE_AT(wave8, DATA_COMPGEN(0x004f05c8, rippleCreatureSourceFile4, RETAIL_FILE), rippleSourceLineBase + 0x8f);
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
