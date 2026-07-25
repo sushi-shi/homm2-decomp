@@ -2391,10 +2391,12 @@ void combatManager::DoBolt(
                             if ((remainingDistance >> 1) < childDistance)
                                 childDistance = remainingDistance >> 1;
                             i32 childX = static_cast<i32>(
-                                sin(childAngle) * childDistance + bolts[boltIndex].pixelX
+                                sin(static_cast<double>(childAngle)) * childDistance
+                                + bolts[boltIndex].pixelX
                             );
                             i32 childY = static_cast<i32>(
-                                cos(childAngle) * childDistance + bolts[boltIndex].pixelY
+                                cos(static_cast<double>(childAngle)) * childDistance
+                                + bolts[boltIndex].pixelY
                             );
                             i32 childWidth;
                             if (bolts[boltIndex].endWidth < bolts[boltIndex].startWidth)
