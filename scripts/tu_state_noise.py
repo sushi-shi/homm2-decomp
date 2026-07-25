@@ -1216,11 +1216,13 @@ def target_compgen_data_claims(
                 f"{claim.name} has no payload-identical candidate target relocation"
             )
         else:
-            ordinals = ", ".join(str(ordinal) for ordinal, _ in candidate_matches)
-            raise ValueError(
-                f"{claim.name} candidate target relocation is payload-ambiguous "
-                f"at ordinals {ordinals}"
-            )
+            # Payload duplicates: bind order-preservingly. Claims are processed in
+            # retail relocation order and consumed definitions are excluded above,
+            # so the lowest unused candidate ordinal pairs the k-th retail duplicate
+            # with the k-th candidate duplicate. The exact-closure audit still
+            # verifies complete byte and ordered-relocation identity, so a wrong
+            # pairing can only fail to close, never falsely close.
+            candidate_definition = candidate_matches[0][1]
 
         for side, definition in (
             ("candidate", candidate_definition),
