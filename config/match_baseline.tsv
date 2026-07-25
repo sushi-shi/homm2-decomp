@@ -1383,7 +1383,7 @@ SOURCE/dpnetwin	?CleanupDPVars@@YIXXZ	100.0000	7832ca98a276
 SOURCE/dpnetwin	?DPSD@@YIXHPADH@Z	100.0000	032fd8fca8b4
 SOURCE/dpnetwin	?dpEnumServiceProvider@@YGHPAU_GUID@@PADKKPAX@Z	100.0000	e28889dca67e
 SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	100.0000	86abfb62be5f
-SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	98.7654	8b7cbda874d4
+SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8b7cbda874d4
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	100.0000	642ee837031e
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	ed9c8b7ec742
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	c83cd47ceeee
