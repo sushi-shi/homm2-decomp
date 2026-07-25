@@ -6109,7 +6109,10 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             value_h = 32000;
         else if (value_h < -32000)
             value_h = -32000;
-        gaiHeroEventStratRVOfPos[x + y * MAP_WIDTH] = static_cast<i16>(value_h);
+        *reinterpret_cast<i16*>(
+            reinterpret_cast<u8*>(gaiHeroEventStratRVOfPos)
+            + (x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16))
+        ) = static_cast<i16>(value_h);
     }
     return value_h;
 }
