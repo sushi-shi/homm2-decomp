@@ -2102,7 +2102,6 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     i32 mouseX;
     mapCell* currentCell;
     i32 objectTypeState;
-    MapObjectType mapObjectTypeState;
     i32 objectIdIndex;
     i32 mouseY;
     i32 visible;
@@ -2222,13 +2221,13 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
                         && gpCurPlayer->CurrentHero() != INVALID_HERO
                         && m_heroContextLocked) {
-                        mapObjectTypeState = MAP_OBJECT_HERO_INTERACTION;
+                        objectTypeState = IDX(MAP_OBJECT_HERO_INTERACTION);
                         objectIdIndex = gpCurPlayer->CurrentHero();
                     } else {
-                        mapObjectTypeState = currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
+                        objectTypeState = IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                         objectIdIndex = currentCell->m_objectMetadata;
                     }
-                    switch (mapObjectTypeState) {
+                    switch (static_cast<MapObjectType>(objectTypeState)) {
                         case MAP_OBJECT_HERO_INTERACTION:
                             mouseX = m_lastHoverCell * CELL_PIXELS - HERO_QUICK_VIEW_X_OFFSET;
                             if (mouseX < QUICK_VIEW_MIN_X) {
@@ -2303,9 +2302,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         *eventCell = DoAdvCommand();
                     }
                 } else {
-                    mapObjectTypeState = currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
+                    objectTypeState = IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                     objectIdIndex = currentCell->m_objectMetadata;
-                    if (mapObjectTypeState == MAP_OBJECT_HERO_INTERACTION) {
+                    if (objectTypeState == IDX(MAP_OBJECT_HERO_INTERACTION)) {
                         if (gpCurPlayer->CurrentHero() == objectIdIndex) {
                             m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                             DoAdvCommand();
@@ -2313,7 +2312,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                             SetHeroContext(objectIdIndex, 0);
                         }
                     }
-                    if (mapObjectTypeState == MAP_OBJECT_CASTLE) {
+                    if (objectTypeState == IDX(MAP_OBJECT_CASTLE)) {
                         if (gpCurPlayer->CurrentTown() == objectIdIndex) {
                             m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                             *eventCell = DoAdvCommand();
