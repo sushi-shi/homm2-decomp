@@ -87,6 +87,7 @@ dropListWidget::~dropListWidget() {
 VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {
     i8 name[RESOURCE_NAME_CAPACITY];
+    u8** entries;
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -126,21 +127,22 @@ void dropListWidget::Read(void) {
     m_scrollTrackLastFrame = IDX(FRAME_SCROLL_TRACK_LAST);
     m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
     m_id = id;
+    entries = &m_icon->m_data;
     i16 iconX = m_x;
     i16 iconY = m_y;
-    IconEntry* closedContentEntry = &m_icon->Entries()[IDX(FRAME_CLOSED_CONTENT)];
+    IconEntry* topEntry = reinterpret_cast<IconEntry*>(*entries);
     m_iconX = iconX;
     m_iconY = iconY;
-    m_closedContentWidth = closedContentEntry->w;
-    m_closedContentHeight = closedContentEntry->h;
-    IconEntry* dropButtonEntry = &m_icon->Entries()[IDX(FRAME_DROP_BUTTON)];
+    m_closedContentWidth = topEntry->w;
+    m_closedContentHeight = topEntry->h;
+    IconEntry* middleEntry = reinterpret_cast<IconEntry*>(*entries) + IDX(FRAME_DROP_BUTTON);
     m_dropButtonX = iconX + m_closedContentWidth;
     m_dropButtonY = iconY;
-    m_dropButtonWidth = dropButtonEntry->w;
-    m_dropButtonHeight = dropButtonEntry->h;
-    IconEntry* scrollThumbEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_THUMB)];
-    m_scrollThumbWidth = scrollThumbEntry->w;
-    m_scrollThumbHeight = scrollThumbEntry->h;
+    m_dropButtonWidth = middleEntry->w;
+    m_dropButtonHeight = middleEntry->h;
+    IconEntry* bottomEntry = reinterpret_cast<IconEntry*>(*entries) + IDX(FRAME_SCROLL_THUMB);
+    m_scrollThumbWidth = bottomEntry->w;
+    m_scrollThumbHeight = bottomEntry->h;
 }
 
 VA(0x004dc200, 0xd5)
