@@ -231,7 +231,7 @@ void wsSendMessage(
     peerAddress.sin_family = AF_INET;
     peerAddress.sin_port = htons(WS_TRANSPORT_PORT);
     if (destination == 0) {
-        for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
+        for (netPlayer = 0; giNumHumanPlayers > netPlayer; netPlayer++) {
             if (giThisNetPos == netPlayer)
                 continue;
             attemptCount = 0;
@@ -250,7 +250,7 @@ void wsSendMessage(
                     DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
                 } else {
                     sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed7bc, wsSendMessageTCPIPErrorDuringCommandSendto, "TCP/IP Error During command 'sendto()' # %d"), error);
-                    ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+                    NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
                     return;
                 }
             }
@@ -267,7 +267,7 @@ void wsSendMessage(
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed7e8, wsSendMessageErrorDuringSendtoD, "Error During sendto(): %d"), WSAGetLastError());
-            ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
         }
     }
