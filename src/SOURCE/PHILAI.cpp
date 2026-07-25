@@ -5532,11 +5532,11 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
             case MAP_OBJECT_CAMPFIRE:
                 value_h = static_cast<i32>(
                     ((((((gafAITurnCostResource[IDX(RES_GEMS)]
-                          + gafAITurnCostResource[IDX(RES_CRYSTAL)])
-                         + gafAITurnCostResource[IDX(RES_SULFUR)])
-                        + gafAITurnCostResource[IDX(RES_ORE)])
-                       + gafAITurnCostResource[IDX(RES_MERCURY)])
-                      + gafAITurnCostResource[IDX(RES_WOOD)])
+                          + gafAITurnCostResource[IDX(RES_MERCURY)])
+                         + gafAITurnCostResource[IDX(RES_ORE)])
+                        + gafAITurnCostResource[IDX(RES_SULFUR)])
+                       + gafAITurnCostResource[IDX(RES_WOOD)])
+                      + gafAITurnCostResource[IDX(RES_CRYSTAL)])
                      / DATA_COMPGEN(0x004eb58c, valueOfEventAtPositionConstant5, AI_CAMPFIRE_AVERAGE_DIVISOR) * DATA_COMPGEN(0x004eb490, valueOfEventAtPositionConstant6, AI_CAMPFIRE_RESOURCE_AMOUNT))
                     + gafAITurnCostResource[IDX(RES_GOLD)] * AI_CAMPFIRE_GOLD_AMOUNT
                 );
@@ -5880,8 +5880,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = static_cast<i32>(
                         (gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb5a8, valueOfEventAtPositionConstant11, AI_DAEMON_FIGHT_VALUE_FACTOR)
                          + gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_VALUE_FACTOR)
-                        + (gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR
-                           + gpCurPlayer->m_aiData.m_artifactValue)
+                        + gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR
+                        + gpCurPlayer->m_aiData.m_artifactValue
                         + gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_FACTOR
                         + gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb5b0, valueOfEventAtPositionConstant12, AI_DAEMON_GOLD_PENALTY)
                     );
