@@ -2578,7 +2578,18 @@ void combatManager::VaporizeCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex
 ) {
     DATA(0x004f04e4) static i16 vaporizeSourceLineBase = 2524;
-    army* target = &m_armies[IDX(side)][armyIndex];
+    i32 rowCount;
+    i32 row9;
+    i32 height0;
+    i32 firstY8;
+    i32 unusedVaporizeWord;
+    i32 lastY11;
+    i32 phase11;
+    i32 bottomOffset4;
+    i32 topOffset8;
+    army* target;
+
+    target = &m_armies[IDX(side)][armyIndex];
     ResetLimitCreature();
     ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
@@ -2589,47 +2600,43 @@ void combatManager::VaporizeCreature(
         )
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
-    i32 height = giMaxExtentY - giMinExtentY + 1;
+    height0 = giMaxExtentY - giMinExtentY + 1;
     target->m_palette = gyModify;
-    target->m_drawEnabled = 0;
+    target->m_showQuantity = 0;
 
-    i32 firstY = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
-    i32 lastY = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
-    i32 rowCount = (lastY - firstY) / VAPORIZE_STRIPE_WIDTH + 1;
-    i32 phase;
-    for (phase = 0; phase < VAPORIZE_PHASE_COUNT; ++phase) {
-        i32 topOffset;
-        i32 bottomOffset;
+    firstY8 = (giMinExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
+    lastY11 = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
+    rowCount = (lastY11 - firstY8) / VAPORIZE_STRIPE_WIDTH + 1;
+    for (phase11 = 0; phase11 < VAPORIZE_PHASE_COUNT; ++phase11) {
         // The three phases erase paired stripes from the outside toward the center.
         // NOLINTBEGIN(readability-magic-numbers)
-        switch (phase) {
+        switch (phase11) {
             case 0:
-                topOffset = 0;
-                bottomOffset = 1;
+                topOffset8 = 0;
+                bottomOffset4 = 1;
                 break;
             case 1:
-                topOffset = 1;
-                bottomOffset = 3;
+                topOffset8 = 1;
+                bottomOffset4 = 3;
                 break;
             default:
-                topOffset = 3;
-                bottomOffset = 2;
+                topOffset8 = 3;
+                bottomOffset4 = 2;
                 break;
         }
         // NOLINTEND(readability-magic-numbers)
-        if (phase == VAPORIZE_PHASE_COUNT - 1)
+        if (phase11 == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
-        i32 row;
-        for (row = 0; row < rowCount; ++row) {
-            gyModify[row * VAPORIZE_STRIPE_WIDTH + firstY + topOffset] = VAPORIZE_MASKED;
-            gyModify[lastY + (row * -VAPORIZE_STRIPE_WIDTH - bottomOffset)] = VAPORIZE_MASKED;
+        for (row9 = 0; row9 < rowCount; ++row9) {
+            gyModify[row9 * VAPORIZE_STRIPE_WIDTH + firstY8 + topOffset8] = VAPORIZE_MASKED;
+            gyModify[lastY11 + (row9 * -VAPORIZE_STRIPE_WIDTH - bottomOffset4)] = VAPORIZE_MASKED;
             gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
     }
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
-    target->m_drawEnabled = 1;
+    target->m_showQuantity = 1;
     H2_FREE_AT(gyModify, DATA_COMPGEN(0x004f0514, vaporizeCreatureSourceFile2, RETAIL_FILE), vaporizeSourceLineBase + 0x38);
     gyModify = NULL;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
