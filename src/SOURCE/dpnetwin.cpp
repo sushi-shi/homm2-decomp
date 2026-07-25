@@ -81,8 +81,8 @@ i16 dpnet_init(void) {
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
     typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void*);
-    DirectPlayCreateFunction createFunction;
     DirectPlayEnumerateFunction enumerateFunction;
+    DirectPlayCreateFunction createFunction;
     i32 guestIndex;
     i32 result;
 
