@@ -56,7 +56,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
                 break;
         }
     }
-    m_playbackData.format |= formatFlags;
+    m_playbackData.format += formatFlags;
 
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
