@@ -440,7 +440,7 @@ i32 searchArray::FindCombatPath(
     m_pathLength = 0;
     m_queueCount = 0;
 
-    i8* path;
+    u8* path;
     if (ValidHex(sourceHex) && ValidHex(targetHex) && unit != NULL) {
         path = m_storage.aiPath.directions;
         u32 attackMask;
