@@ -3351,6 +3351,9 @@ i32 philAI::RVOfPosition(
 
 // Search horizons, danger decay, crowding penalties, and score clamps are retail AI strategy payload.
 // NOLINTBEGIN(readability-magic-numbers)
+#define HERO_RV_AT(values, byteOffset) \
+    (*reinterpret_cast<i16*>(reinterpret_cast<u8*>(values) + (byteOffset)))
+
 VA(0x0043ef45, 0xaf9)
 i32 philAI::StrategicValueOfPosition(
     i32 targetX,
@@ -3552,11 +3555,20 @@ i32 philAI::StrategicValueOfPosition(
     if (score4 > 32000)
         score4 = 32000;
     if (!immediate && !extraDistance) {
-        HeroRVAt(gaiHeroStrategicRVOfPos, targetX, targetY) = static_cast<i16>(score4);
-        HeroRVAt(gaiLiveChanceOfPos, targetX, targetY) = static_cast<i16>(*liveChance);
+        // Retail writes the maps through the flat byte-offset form (see the
+        // ResetHeroRVs macro note); the inline reference form keeps a temp.
+        HERO_RV_AT(
+            gaiHeroStrategicRVOfPos,
+            targetX * sizeof(i16) + MAP_WIDTH * targetY * sizeof(i16)
+        ) = static_cast<i16>(score4);
+        HERO_RV_AT(
+            gaiLiveChanceOfPos,
+            targetX * sizeof(i16) + MAP_WIDTH * targetY * sizeof(i16)
+        ) = static_cast<i16>(*liveChance);
     }
     return score4;
 }
+#undef HERO_RV_AT
 // NOLINTEND(readability-magic-numbers)
 
 // Town base value and scenario-objective bonuses are retail AI strategy payload.
