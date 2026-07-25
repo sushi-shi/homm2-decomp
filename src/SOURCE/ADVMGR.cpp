@@ -6990,7 +6990,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     if (freeBorder) {
         H2_FREE_AT(
             m_adventureBorder, DATA_COMPGEN(0x004f65a0, redrawAdvScreenSourceFile, RETAIL_FILE),
-            REDRAW_BORDER_FREE_LINE_BASE + BORDER_SECONDARY_FREE_LINE_OFFSET
+            s_redrawBorderFreeLineBase + BORDER_SECONDARY_FREE_LINE_OFFSET
         );
         m_adventureBorder = NULL;
     }
@@ -8211,7 +8211,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
 
-    if (x < 0 || mapY < 0 || MAP_WIDTH <= x || mapY >= MAP_HEIGHT) {
+    if (x < 0 || mapY < 0 || MAP_WIDTH <= x || MAP_HEIGHT <= mapY) {
         return;
     }
 
@@ -9477,7 +9477,7 @@ void advManager::SaveAdventureBorder(void) {
     }
 
     m_adventureBorder = static_cast<u8*>(
-        H2_ALLOC_AT(BORDER_BUFFER_SIZE, DATA_COMPGEN(0x004f6890, saveAdventureBorderSourceFile, RETAIL_FILE), SAVE_BORDER_ALLOC_LINE_BASE + BORDER_ALLOC_LINE_OFFSET)
+        H2_ALLOC_AT(BORDER_BUFFER_SIZE, DATA_COMPGEN(0x004f6890, saveAdventureBorderSourceFile, RETAIL_FILE), s_saveBorderAllocLineBase + BORDER_ALLOC_LINE_OFFSET)
     );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
