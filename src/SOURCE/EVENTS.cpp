@@ -8281,12 +8281,12 @@ void advManager::ReceiveHeroTownData(
         gpGame->m_players[secondOwner28].m_resources[IDX(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->secondGold;
 
-    *firstArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc10, receiveHeroTownDataSourceFile, RETAIL_FILE), 6243));
+    *firstArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc10, receiveHeroTownDataSourceFile, RETAIL_FILE), sourceLineBase + 0x26));
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
-    *secondArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc3c, receiveHeroTownDataSourceFile2, RETAIL_FILE), 6246));
+    *secondArmy = static_cast<armyGroup*>(H2_ALLOC_AT(sizeof(armyGroup), DATA_COMPGEN(0x0051cc3c, receiveHeroTownDataSourceFile2, RETAIL_FILE), sourceLineBase + 0x29));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
     if (hasTown0) {
-        *combatTown = static_cast<town*>(H2_ALLOC_AT(sizeof(town), DATA_COMPGEN(0x0051cc68, receiveHeroTownDataSourceFile3, RETAIL_FILE), 6251));
+        *combatTown = static_cast<town*>(H2_ALLOC_AT(sizeof(town), DATA_COMPGEN(0x0051cc68, receiveHeroTownDataSourceFile3, RETAIL_FILE), sourceLineBase + 0x2e));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
@@ -8310,12 +8310,12 @@ void advManager::ReceiveHeroTownData(
     gotSecondHeroFirst13 = 1;
     gotSecondHeroSecond6 = 1;
     if (hasFirstHero7) {
-        *firstHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051cc94, receiveHeroTownDataSourceFile4, RETAIL_FILE), 6276));
+        *firstHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051cc94, receiveHeroTownDataSourceFile4, RETAIL_FILE), sourceLineBase + 0x47));
         gotFirstHeroFirst3 = 0;
         gotFirstHeroSecond9 = 0;
     }
     if (hasSecondHero8) {
-        *secondHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051ccc0, receiveHeroTownDataSourceFile5, RETAIL_FILE), 6282));
+        *secondHero = static_cast<hero*>(H2_ALLOC_AT(sizeof(hero), DATA_COMPGEN(0x0051ccc0, receiveHeroTownDataSourceFile5, RETAIL_FILE), sourceLineBase + 0x4d));
         gotSecondHeroFirst13 = 0;
         gotSecondHeroSecond6 = 0;
     }
