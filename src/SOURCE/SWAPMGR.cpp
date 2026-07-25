@@ -83,29 +83,6 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SPLIT_CONFIRM                = 0x7802
 H2_ENUM_END(SwapManagerConstant)
 
-inline i32 NormalizeControlRange(i32 control, i32 first, i32 last) {
-    return control > first && control < last ? first : control;
-}
-
-inline i32 NormalizeSwapControl(i32 control) {
-    control = NormalizeControlRange(control, CONTROL_LEFT_SKILL_FIRST, CONTROL_LEFT_SKILL_LAST);
-    control = NormalizeControlRange(
-        control, CONTROL_LEFT_SKILL_LEVEL_FIRST, CONTROL_LEFT_SKILL_LEVEL_LAST
-    );
-    control = NormalizeControlRange(control, CONTROL_RIGHT_SKILL_FIRST, CONTROL_RIGHT_SKILL_LAST);
-    control = NormalizeControlRange(
-        control, CONTROL_RIGHT_SKILL_LEVEL_FIRST, CONTROL_RIGHT_SKILL_LEVEL_LAST
-    );
-    control = NormalizeControlRange(
-        control, CONTROL_LEFT_ARTIFACT_FIRST, CONTROL_LEFT_ARTIFACT_LAST
-    );
-    control = NormalizeControlRange(
-        control, CONTROL_RIGHT_ARTIFACT_FIRST, CONTROL_RIGHT_ARTIFACT_LAST
-    );
-    control = NormalizeControlRange(control, CONTROL_LEFT_ARMY_FIRST, CONTROL_LEFT_ARMY_LAST);
-    return NormalizeControlRange(control, CONTROL_RIGHT_ARMY_FIRST, CONTROL_RIGHT_ARMY_LAST);
-}
-
 VA(0x004543c0, 0x84)
 swapManager::swapManager(void) {
     m_window = NULL;
@@ -356,8 +333,14 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
 
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT:
-                    switch (NormalizeSwapControl(message.payload.widget.id)) {
+                    switch (message.payload.widget.id) {
                         case CONTROL_LEFT_SKILL_FIRST:
+                        case CONTROL_LEFT_SKILL_FIRST + 1:
+                        case CONTROL_LEFT_SKILL_FIRST + 2:
+                        case CONTROL_LEFT_SKILL_FIRST + 3:
+                        case CONTROL_LEFT_SKILL_FIRST + 4:
+                        case CONTROL_LEFT_SKILL_FIRST + 5:
+                        case CONTROL_LEFT_SKILL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LAST:
                             side = SWAP_SIDE_LEFT;
                             slotIndex_8 = message.payload.widget.id - CONTROL_LEFT_SKILL_FIRST;
@@ -365,6 +348,12 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_SKILL_LEVEL_FIRST:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 1:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 2:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 3:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 4:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 5:
+                        case CONTROL_LEFT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_LEFT_SKILL_LEVEL_LAST:
                             side = SWAP_SIDE_LEFT;
                             slotIndex_8 =
@@ -373,6 +362,12 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_SKILL_FIRST:
+                        case CONTROL_RIGHT_SKILL_FIRST + 1:
+                        case CONTROL_RIGHT_SKILL_FIRST + 2:
+                        case CONTROL_RIGHT_SKILL_FIRST + 3:
+                        case CONTROL_RIGHT_SKILL_FIRST + 4:
+                        case CONTROL_RIGHT_SKILL_FIRST + 5:
+                        case CONTROL_RIGHT_SKILL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LAST:
                             side = SWAP_SIDE_RIGHT;
                             slotIndex_8 =
@@ -381,6 +376,12 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_SKILL_LEVEL_FIRST:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 1:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 2:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 3:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 4:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 5:
+                        case CONTROL_RIGHT_SKILL_LEVEL_FIRST + 6:
                         case CONTROL_RIGHT_SKILL_LEVEL_LAST:
                             side = SWAP_SIDE_RIGHT;
                             slotIndex_8 =
@@ -415,6 +416,18 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_ARTIFACT_FIRST:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 1:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 2:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 3:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 4:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 5:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 6:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 7:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 8:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 9:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 10:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 11:
+                        case CONTROL_LEFT_ARTIFACT_FIRST + 12:
                         case CONTROL_LEFT_ARTIFACT_LAST:
                             artifactSlot_2 =
                                 message.payload.widget.id - CONTROL_LEFT_ARTIFACT_FIRST;
@@ -433,7 +446,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     NORMAL_DIALOG_NO_VALUE,
                                     0
                                 );
-                            } else if (quickView) {
+                                break;
+                            }
+                            if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                     == ARTIFACT_NONE)
                                     break;
@@ -442,7 +457,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifactExtra[artifactSlot_2]
                                 );
-                            } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
+                                break;
+                            }
+                            if (m_itemType != SWAP_ITEM_ARTIFACT) {
                                 if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_artifacts[artifactSlot_2]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_LEFT;
@@ -474,6 +491,18 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_ARTIFACT_FIRST:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 1:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 2:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 3:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 4:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 5:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 6:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 7:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 8:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 9:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 10:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 11:
+                        case CONTROL_RIGHT_ARTIFACT_FIRST + 12:
                         case CONTROL_RIGHT_ARTIFACT_LAST:
                             artifactSlot_2 =
                                 message.payload.widget.id - CONTROL_RIGHT_ARTIFACT_FIRST;
@@ -492,7 +521,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     NORMAL_DIALOG_NO_VALUE,
                                     0
                                 );
-                            } else if (quickView) {
+                                break;
+                            }
+                            if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                     == ARTIFACT_NONE)
                                     break;
@@ -501,7 +532,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                     VIEW_QUICK,
                                     m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifactExtra[artifactSlot_2]
                                 );
-                            } else if (m_itemType != SWAP_ITEM_ARTIFACT) {
+                                break;
+                            }
+                            if (m_itemType != SWAP_ITEM_ARTIFACT) {
                                 if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_artifacts[artifactSlot_2]
                                     != ARTIFACT_NONE) {
                                     m_selectedSide = SWAP_SIDE_RIGHT;
@@ -533,6 +566,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_LEFT_ARMY_FIRST:
+                        case CONTROL_LEFT_ARMY_FIRST + 1:
+                        case CONTROL_LEFT_ARMY_FIRST + 2:
+                        case CONTROL_LEFT_ARMY_FIRST + 3:
                         case CONTROL_LEFT_ARMY_LAST:
                             if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
@@ -557,7 +593,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST
                                     );
                                 }
-                            } else if (m_itemType != SWAP_ITEM_ARMY) {
+                                break;
+                            }
+                            if (m_itemType != SWAP_ITEM_ARMY) {
                                 if (m_heroes[IDX(SWAP_SIDE_LEFT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - CONTROL_LEFT_ARMY_FIRST]
                                     != CREATURE_NONE) {
@@ -599,6 +637,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                             break;
 
                         case CONTROL_RIGHT_ARMY_FIRST:
+                        case CONTROL_RIGHT_ARMY_FIRST + 1:
+                        case CONTROL_RIGHT_ARMY_FIRST + 2:
+                        case CONTROL_RIGHT_ARMY_FIRST + 3:
                         case CONTROL_RIGHT_ARMY_LAST:
                             if (quickView) {
                                 if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
@@ -623,7 +664,9 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
                                         message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST
                                     );
                                 }
-                            } else if (m_itemType != SWAP_ITEM_ARMY) {
+                                break;
+                            }
+                            if (m_itemType != SWAP_ITEM_ARMY) {
                                 if (m_heroes[IDX(SWAP_SIDE_RIGHT)]->m_army.m_creatureTypes
                                         [message.payload.widget.id - CONTROL_RIGHT_ARMY_FIRST]
                                     != CREATURE_NONE) {
