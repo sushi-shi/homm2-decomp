@@ -1315,14 +1315,14 @@ SOURCE/TOWNMGR	?TavernHandler@@YIHAAUtag_message@@@Z	96.1905	c9fff9caf18a
 SOURCE/TOWNMGR	?Toggle@townManager@@QAEXH@Z	100.0000	847524603247
 SOURCE/TOWNMGR	?UnloadTown@townManager@@QAEXXZ	100.0000	b5145e795877
 SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	97.0266	b8f7a552231d
-SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	98.0198	a7586a5b085a
+SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	100.0000	01bd0ece3096
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	99.4590	dd336c4d0a1f
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	0767d2df11cf
 SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	98.1725	acd3a735d084
 SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	100.0000	75d256eb2bf8
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	100.0000	ea3281255b20
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	9c26f4f21a5b
-SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	aeb0a99eaa4d
+SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4e143dee7a0b
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	100.0000	b5cef3365f19
 SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	96.4336	9b0fa0deeae8
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	82640c9237fc
