@@ -1219,7 +1219,7 @@ SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.4703	cc7676b69045
 SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	3fe5f115ec84
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	d968a1690475
-SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.3125	1a0fc7f3adc9
+SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	99.5854	a2797720f92f
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.7711	dbccaeb094a4
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	a2360f525f06
@@ -1230,7 +1230,7 @@ SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	99.9920	97403325a850
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	222058889a73
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	96a95cd26e60
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.5133	f259c474d379
-SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	4931b5563db6
+SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	99.6043	ef43bcc90d68
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0000	618d8a12237c
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	1026b76ae31f
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	b8992a064a40
