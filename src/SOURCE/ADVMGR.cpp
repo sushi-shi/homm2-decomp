@@ -4819,6 +4819,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
     TilesetId objectTilesetLocal;
     char uppercaseResult;
     char mapObjectKindValue;
+    i32 expansionSite;
     tag_message message;
 
     if (gpCurPlayer->CurrentHero() != -1) {
@@ -5107,7 +5108,6 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     gText[0] = uppercaseResult;
                     break;
                 case MAP_OBJECT_EXPANSION_OBJECT: {
-                    H2_ENUM_STORAGE(GenericSiteType, i32) genericSiteType;
                     mapObjectKindValue = -1;
                     if (currentCell->m_objectIndex != MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
@@ -5116,16 +5116,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    genericSiteType = GENERIC_SITE_UNKNOWN;
+                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_1_END) {
-                                    genericSiteType = GENERIC_SITE_ALCHEMIST_TOWER;
+                                    expansionSite = IDX(GENERIC_SITE_ALCHEMIST_TOWER);
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_2_END) {
-                                    genericSiteType = GENERIC_SITE_ARENA;
+                                    expansionSite = IDX(GENERIC_SITE_ARENA);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
@@ -5135,15 +5135,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_ALTAR_END) {
-                                    genericSiteType = GENERIC_SITE_STABLES;
+                                    expansionSite = IDX(GENERIC_SITE_STABLES);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (siteFrameLocal[0] < GENERIC_UNUSED_END) {
-                                    genericSiteType = GENERIC_SITE_UNKNOWN;
+                                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
                                 } else if (siteFrameLocal[0] < GENERIC_TOWER_END) {
-                                    genericSiteType = GENERIC_SITE_MERMAID;
+                                    expansionSite = IDX(GENERIC_SITE_MERMAID);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SPRING_END) {
-                                    genericSiteType = GENERIC_SITE_SIRENS;
+                                    expansionSite = IDX(GENERIC_SITE_SIRENS);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
@@ -5153,17 +5153,17 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_3_SPLIT) {
-                                    genericSiteType = GENERIC_SITE_HUT_OF_MAGI;
+                                    expansionSite = IDX(GENERIC_SITE_HUT_OF_MAGI);
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_3_END) {
-                                    genericSiteType = GENERIC_SITE_EYE_OF_MAGI;
+                                    expansionSite = IDX(GENERIC_SITE_EYE_OF_MAGI);
                                 }
                             }
                             break;
                     }
-                    if (genericSiteType == GENERIC_SITE_UNKNOWN) {
+                    if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
                         sprintf(gText, DATA_COMPGEN(0x004f6040, quickInfoUnknown, "Unknown"));
                     } else {
-                        sprintf(gText, xGenericSiteNames[IDX(genericSiteType)]);
+                        sprintf(gText, xGenericSiteNames[expansionSite]);
                     }
                     if (heroLocal != NULL && visitedMaskValue != HERO_EVENT_NONE) {
                         strcat(gText, DATA_COMPGEN(0x004f6048, quickInfoEmptyString, "\n\n"));
@@ -5176,7 +5176,6 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     break;
                 }
                 case MAP_OBJECT_EXPANSION_DWELLING: {
-                    H2_ENUM_STORAGE(RecruitSiteType, i32) recruitSiteType;
                     if (currentCell->m_overlayIndex == MAPCELL_SPRITE_NONE) {
                         siteFrameLocal[0] = currentCell->m_objectIndex;
                         objectTilesetLocal = currentCell->m_objectTileset;
@@ -5184,30 +5183,30 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    recruitSiteType = RECRUITMENT_SITE_UNKNOWN;
+                    expansionSite = IDX(RECRUITMENT_SITE_UNKNOWN);
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < RECRUITMENT_START) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < RECRUITMENT_1_END) {
-                                    recruitSiteType = RECRUITMENT_SITE_BARROW_MOUNDS;
+                                    expansionSite = IDX(RECRUITMENT_SITE_BARROW_MOUNDS);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_2_END) {
-                                    recruitSiteType = RECRUITMENT_SITE_EARTH_ALTAR;
+                                    expansionSite = IDX(RECRUITMENT_SITE_EARTH_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_3_END) {
-                                    recruitSiteType = RECRUITMENT_SITE_AIR_ALTAR;
+                                    expansionSite = IDX(RECRUITMENT_SITE_AIR_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_4_END) {
-                                    recruitSiteType = RECRUITMENT_SITE_FIRE_ALTAR;
+                                    expansionSite = IDX(RECRUITMENT_SITE_FIRE_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_5_END) {
-                                    recruitSiteType = RECRUITMENT_SITE_WATER_ALTAR;
+                                    expansionSite = IDX(RECRUITMENT_SITE_WATER_ALTAR);
                                 }
                             }
                             break;
                     }
-                    if (recruitSiteType == RECRUITMENT_SITE_UNKNOWN) {
+                    if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
                         sprintf(gText, DATA_COMPGEN(0x004f6070, quickInfoUnknown2, "Unknown"));
                     } else {
-                        sprintf(gText, xRecruitmentSiteNames[IDX(recruitSiteType)]);
+                        sprintf(gText, xRecruitmentSiteNames[expansionSite]);
                     }
                     break;
                 }
