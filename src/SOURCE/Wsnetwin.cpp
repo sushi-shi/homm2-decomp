@@ -236,23 +236,24 @@ void wsSendMessage(
                 continue;
             attemptCount = 0;
             peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
-            while ((iRc = sendto(
-                        sd_dg,
-                        reinterpret_cast<char*>(packetBuffer),
-                        size + 1,
-                        0,
-                        reinterpret_cast<struct sockaddr*>(&peerAddress),
-                        sizeof(peerAddress)
-                    ))
-                   == SOCKET_ERROR) {
+        sendPacket:
+            iRc = sendto(
+                sd_dg,
+                reinterpret_cast<char*>(packetBuffer),
+                size + 1,
+                0,
+                reinterpret_cast<struct sockaddr*>(&peerAddress),
+                sizeof(peerAddress)
+            );
+            if (iRc == SOCKET_ERROR) {
                 error = WSAGetLastError();
                 if (attemptCount < SEND_ATTEMPT_LIMIT) {
                     DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
-                } else {
-                    sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed7bc, wsSendMessageTCPIPErrorDuringCommandSendto, "TCP/IP Error During command 'sendto()' # %d"), error);
-                    NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
-                    return;
+                    goto sendPacket;
                 }
+                sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed7bc, wsSendMessageTCPIPErrorDuringCommandSendto, "TCP/IP Error During command 'sendto()' # %d"), error);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
+                return;
             }
         }
     } else {
