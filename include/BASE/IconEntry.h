@@ -11,7 +11,7 @@ struct IconEntry {
     i16 y;
     i16 w;
     i16 h;
-    u8 flags;
+    u8 flags : 5;
     i32 srcOffset;
 };
 #pragma pack(pop)
