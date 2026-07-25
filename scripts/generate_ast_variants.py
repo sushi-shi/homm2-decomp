@@ -1515,6 +1515,10 @@ def crossed_candidate_payloads(
         source_mutations, max_depth, source_slots, min_depth=min_depth,
         required_names=required_names,
     ) if source_slots else ([], bool(source_mutations))
+    if include_source_baseline:
+        source_combinations = [
+            combination for combination in source_combinations if combination
+        ]
     source_options = ([()] if include_source_baseline else []) + source_combinations
     state_options: list[AstMutation | None] = [None, *state_mutations]
     candidates = []
