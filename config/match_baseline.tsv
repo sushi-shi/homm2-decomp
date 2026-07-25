@@ -1240,7 +1240,7 @@ SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.5277	7c7c19a026ac
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	100.0000	4cc2eb9bf1df
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
-SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.2271	f3c8c624bbd9
+SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	99.5014	05d1b8a5bb72
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	94.2880	caafc846138d
 SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	100.0000	33be0f61891c
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	100.0000	9e47c17c18ef
