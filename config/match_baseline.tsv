@@ -442,7 +442,7 @@ SOURCE/ADVMGR	?CheckLoadSample@advManager@@QAEXH@Z	100.0000	5dd34e6c1baf
 SOURCE/ADVMGR	?CheckScreenScroll@advManager@@QAEXXZ	100.0000	bb736892e4b6
 SOURCE/ADVMGR	?CheckSetEvilInterface@advManager@@QAEXHH@Z	100.0000	7b6dfadf5043
 SOURCE/ADVMGR	?ClearBottomView@advManager@@QAEXXZ	100.0000	fb49c92a6a6c
-SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	99.0848	fd3fcfc049ac
+SOURCE/ADVMGR	?Close@advManager@@UAEXXZ	100.0000	c3bb543f8faf
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHH@Z	100.0000	e3655562a8de
 SOURCE/ADVMGR	?ComboDraw@advManager@@QAEHHHH@Z	98.5928	a8c8660c2187
 SOURCE/ADVMGR	?CompleteDraw@advManager@@QAEXH@Z	100.0000	51da8a03dd11
