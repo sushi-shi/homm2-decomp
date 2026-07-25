@@ -2595,6 +2595,10 @@ MessageDispatchResult advManager::ProcessDeSelect(
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+inline hero* GetHeroSlot(i32 i) {
+    return &gpGame->m_heroRecs[i];
+}
+
 VA(0x0045a07c, 0x5c8)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
@@ -2605,8 +2609,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     SAMPLE2 digSampleState;
     i32 artifactResultLocal;
 
-    digSampleState = GetNullSample();
-    searchingHeroState = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
+    digSampleState = NULL_SAMPLE2;
+    searchingHeroState = GetHeroSlot(gpCurPlayer->m_currentHero);
 
     if (searchingHeroState->m_mobility != searchingHeroState->m_remainingMobility) {
         if (!gbHumanPlayer[giCurPlayer]) {
