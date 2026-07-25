@@ -6162,7 +6162,9 @@ i32 advManager::UpdBottomViewHero(void) {
                     layoutIndexIndex * BOTTOM_HERO_POSITION_COMPONENT_COUNT + 1
                 ];
                 labelY = iconY + BOTTOM_HERO_LABEL_Y_OFFSET;
-                iconEntryValue = &monsterIconsLocal->Entries()[creature];
+                iconEntryValue = reinterpret_cast<IconEntry*>(
+                    creature * sizeof(IconEntry) + monsterIconsLocal->m_data
+                );
                 if (layoutIndexIndex == 0 || layoutIndexIndex == 1) {
                     labelY -= BOTTOM_HERO_TOP_LABEL_SHIFT;
                     if (iconEntryValue->h < BOTTOM_HERO_TOP_MIN_HEIGHT) {
