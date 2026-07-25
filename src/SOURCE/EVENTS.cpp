@@ -8436,11 +8436,12 @@ CombatResult advManager::AutoResolveCombat(
                     TransferArtifacts(firstHero, secondHero);
                 HeroLoses(firstHero);
                 break;
-            case COMBAT_RESULT_PENDING:
-                break;
             case COMBAT_RESULT_DRAW:
                 HeroLoses(firstHero);
                 HeroLoses(secondHero);
+                break;
+            case COMBAT_RESULT_PENDING:
+                break;
         }
     }
     bShowIt = savedShowIt37;
