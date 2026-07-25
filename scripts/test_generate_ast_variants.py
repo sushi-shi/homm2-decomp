@@ -137,6 +137,22 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertEqual(len(candidates), 2)
         self.assertTrue(all(required in candidate["name"] for candidate in candidates))
 
+    def test_all_required_mutations_at_max_depth_emit_one_combination(self):
+        blob = b"abcdefghijkl"
+        mutations = [
+            AstMutation("family", str(index), (
+                AstEdit(index, index + 1, bytes([ord("A") + index])),
+            ))
+            for index in range(8)
+        ]
+        required = {mutation_name(mutation) for mutation in mutations}
+        candidates, truncated = candidate_payloads(
+            blob, mutations, 8, 20, min_depth=8, required_names=required
+        )
+        self.assertFalse(truncated)
+        self.assertEqual(len(candidates), 1)
+        self.assertTrue(required <= set(candidates[0]["name"].split("+")))
+
     def test_character_offsets_are_converted_for_utf8_manifests(self):
         text = "// en dash –\nVA()\n"
         character_offset = text.index("VA")
