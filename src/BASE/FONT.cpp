@@ -158,7 +158,7 @@ i32 font::GetCharacterWidth(u8 c) {
         c -= ' ';
         if (c < 0 || c > FONT_GLYPH_FALLBACK)
             c = FONT_GLYPH_FALLBACK;
-        return m_glyphIcon->Entries()[c].w + m_isLarge;
+        return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[c].w + m_isLarge;
     }
 }
 
