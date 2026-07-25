@@ -1266,7 +1266,7 @@ void advManager::Close(void) {
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gConfig.useOpera != CONFIG_OPERA_DISABLED
+    if (!bEnteringTown || gConfig.useOpera
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         gpSoundManager->SwitchAmbientMusic(-1);
         gpSoundManager->StopAllSamples(1);
@@ -1274,7 +1274,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != NULL) {
-        H2_FREE_AT(m_adventureBorder, DATA_COMPGEN(0x004f59ac, closeSourceFile, RETAIL_FILE), 292 + BORDER_INITIAL_FREE_LINE_OFFSET);
+        H2_FREE_AT(m_adventureBorder, DATA_COMPGEN(0x004f59ac, closeSourceFile, RETAIL_FILE), s_closeBorderFreeLineBase + BORDER_INITIAL_FREE_LINE_OFFSET);
         m_adventureBorder = NULL;
     }
 
