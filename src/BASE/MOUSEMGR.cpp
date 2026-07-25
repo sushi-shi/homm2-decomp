@@ -15,6 +15,7 @@
 #include <SOURCE/kbwin.h>
 #include <BASE/INPUTMGR.h>
 
+#define MOUSE_CURSOR_MASK_SHIFT 3
 #define MOUSE_MANAGER_SPELL_ICON "SPELCO.ICN"
 #define MOUSE_MANAGER_COMBAT_ICON "CMSECO.ICN"
 #define MOUSE_MANAGER_SPELL_BITMAP "SPELBW%02d.BMP"
@@ -230,8 +231,11 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
 
 VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
-    if (m_forcePointerUpdate != 0 || frame < 0 || m_active != true || m_cursorFrame == frame
-        || gbInSetPointer != 0)
+    if (m_forcePointerUpdate != 0)
+        return;
+    if (frame < 0)
+        return;
+    if (m_active != true || m_cursorFrame == frame || gbInSetPointer != 0)
         return;
 
     gbInSetPointer = true;
@@ -284,32 +288,24 @@ void mouseManager::SetPointer(i32 frame) {
             );
             memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);
             {
-                i32 sourceOffset = 0;
-                i32 maskOffset = 0;
-                while (sourceOffset < MOUSE_CURSOR_COLOR_BYTES) {
+                for (i32 row = 0; row < MOUSE_CURSOR_BITMAP_WIDTH; row++) {
                     for (i32 column = 0; column < MOUSE_CURSOR_BITMAP_WIDTH; column++) {
-                        if (static_cast<u8*>(cColorBits[m_cursorSizeIndex])[sourceOffset + column]
-                            == 0)
-                            static_cast<u8*>(
-                                cAndBits[m_cursorSizeIndex]
-                            )[maskOffset + column / MOUSE_CURSOR_MASK_BITS_PER_BYTE] |= 1
-                                                          << (MOUSE_CURSOR_MASK_HIGH_BIT
-                                                              - (column
-                                                                 & MOUSE_CURSOR_MASK_HIGH_BIT));
-                        else if (static_cast<u8*>(
-                                     cColorBits[m_cursorSizeIndex]
-                                 )[sourceOffset + column]
-                                 == 1)
-                            static_cast<u8*>(
-                                cAndBits[m_cursorSizeIndex]
-                            )[MOUSE_CURSOR_MASK_PLANE_BYTES + maskOffset
-                              + column / MOUSE_CURSOR_MASK_BITS_PER_BYTE] |=
+                        u8* colorBits = static_cast<u8*>(cColorBits[m_cursorSizeIndex]);
+                        u8* andBits = static_cast<u8*>(cAndBits[m_cursorSizeIndex]);
+                        if (colorBits[row * MOUSE_CURSOR_BITMAP_WIDTH + column] == 0)
+                            andBits[row * MOUSE_CURSOR_MASK_ROW_BYTES
+                                    + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
+                                1
+                                << (MOUSE_CURSOR_MASK_HIGH_BIT
+                                    - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
+                        else if (colorBits[row * MOUSE_CURSOR_BITMAP_WIDTH + column] == 1)
+                            andBits[MOUSE_CURSOR_MASK_PLANE_BYTES
+                                    + row * MOUSE_CURSOR_MASK_ROW_BYTES
+                                    + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
                                 1
                                 << (MOUSE_CURSOR_MASK_HIGH_BIT
                                     - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
                     }
-                    sourceOffset += MOUSE_CURSOR_BITMAP_WIDTH;
-                    maskOffset += MOUSE_CURSOR_MASK_ROW_BYTES;
                 }
             }
 
