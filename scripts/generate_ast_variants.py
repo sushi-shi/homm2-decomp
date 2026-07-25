@@ -1530,7 +1530,10 @@ def main(argv=None, *, prog=None, description=None) -> int:
     parser.add_argument("--max-depth", type=int, default=3)
     parser.add_argument(
         "--min-depth", type=int, default=1,
-        help="minimum number of compatible AST mutations in each emitted candidate",
+        help=(
+            "minimum number of compatible AST mutations in each emitted candidate; "
+            "zero permits an unchanged AST source shape for exact-span axis products"
+        ),
     )
     parser.add_argument("--limit", type=int, default=4096)
     parser.add_argument(
@@ -1597,12 +1600,12 @@ def main(argv=None, *, prog=None, description=None) -> int:
     )
     args = parser.parse_args(argv)
     if (
-        args.min_depth < 1 or args.max_depth < args.min_depth
+        args.min_depth < 0 or args.max_depth < args.min_depth
         or args.limit < 1 or args.helper_name_count < 1
         or not 1 <= args.rename_name_count <= len(RENAME_SUFFIXES) or args.state_trials < 0
         or args.top < 1 or args.compile_timeout <= 0 or args.wall_time_seconds <= 0
     ):
-        parser.error("require 1 <= --min-depth <= --max-depth and positive limit/name count")
+        parser.error("require 0 <= --min-depth <= --max-depth and positive limit/name count")
 
     root = Path(os.environ.get("HOMM2_DIR", Path.cwd())).resolve()
     source = (root / args.source).resolve()
