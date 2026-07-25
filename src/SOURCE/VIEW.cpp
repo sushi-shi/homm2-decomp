@@ -278,55 +278,57 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 helpIndex36 = -1;
-                if (message.payload.widget.command != WIDGET_COMMAND_SELECT
-                    && message.payload.widget.command != WIDGET_COMMAND_ALTERNATE_SELECT)
+                if (message.payload.widget.command == WIDGET_COMMAND_SELECT
+                    || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
+                    switch (message.payload.widget.id) {
+                        case GENERAL_CLOSE:
+                            helpIndex36 = GENERAL_LONG_HELP_CLOSE;
+                            break;
+                        case GENERAL_RETREAT:
+                            helpIndex36 = GENERAL_LONG_HELP_RETREAT;
+                            break;
+                        case GENERAL_SURRENDER:
+                            helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
+                            break;
+                        case GENERAL_CAST_SPELL:
+                            helpIndex36 = GENERAL_LONG_HELP_CAST;
+                            break;
+                    }
+                    if (helpIndex36 != -1)
+                        NormalDialog(
+                            cViewGeneralLongHelp[helpIndex36],
+                            NORMAL_DIALOG_QUICK_VIEW,
+                            -1,
+                            -1,
+                            -1,
+                            0,
+                            -1,
+                            0,
+                            -1,
+                            0
+                        );
+                }
+                break;
+            }
+            switch (message.payload.widget.command) {
+                case WIDGET_COMMAND_DESELECT:
+                    switch (message.payload.widget.id) {
+                        case GENERAL_CLOSE:
+                        case GENERAL_RETREAT:
+                        case GENERAL_SURRENDER:
+                        case GENERAL_CAST_SPELL:
+                            gpWindowManager->m_dialogResult = message.payload.widget.id;
+                            handled3 = 1;
+                            break;
+                    }
                     break;
-                switch (message.payload.widget.id) {
-                    case GENERAL_CLOSE:
-                        helpIndex36 = GENERAL_LONG_HELP_CLOSE;
-                        break;
-                    case GENERAL_RETREAT:
-                        helpIndex36 = GENERAL_LONG_HELP_RETREAT;
-                        break;
-                    case GENERAL_SURRENDER:
-                        helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
-                        break;
-                    case GENERAL_CAST_SPELL:
-                        helpIndex36 = GENERAL_LONG_HELP_CAST;
-                        break;
-                }
-                if (helpIndex36 != -1)
-                    NormalDialog(
-                        cViewGeneralLongHelp[helpIndex36],
-                        NORMAL_DIALOG_QUICK_VIEW,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
-            } else {
-                switch (message.payload.widget.command) {
-                    case WIDGET_COMMAND_DESELECT:
-                        switch (message.payload.widget.id) {
-                            case GENERAL_CLOSE:
-                            case GENERAL_RETREAT:
-                            case GENERAL_SURRENDER:
-                            case GENERAL_CAST_SPELL:
-                                gpWindowManager->m_dialogResult = message.payload.widget.id;
-                                handled3 = 1;
-                                break;
-                        }
-                        break;
-                }
+                default:
+                    break;
             }
             break;
         case MESSAGE_MOUSE_MOVE:
             gpWindowManager->ConvertToHover(message);
-            if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
+            if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
                 return MESSAGE_DISPATCH_CONSUME;
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
@@ -350,7 +352,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                 && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
                 hintIndex11 = GENERAL_HOVER_HELP_CAPTAIN;
             gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex11], 1, 0, 0);
-            break;
+            return MESSAGE_DISPATCH_CONSUME;
     }
     if (handled3) {
         message.payload.widget.id = GENERAL_CLOSE;
