@@ -2,8 +2,11 @@
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
 
 import clang.cindex as ci
+import generate_ast_variants as generator
 
 from generate_ast_variants import (
     AstEdit,
@@ -95,6 +98,39 @@ class AstVariantGenerationTests(unittest.TestCase):
         ]
         with self.assertRaisesRegex(ValueError, "complete TU-state dimension"):
             crossed_candidate_payloads(blob, [], states, 1, 3)
+
+    def test_tu_state_top_insertion_precedes_authored_declarations(self):
+        blob = b"#include <a>\n\nint global;\nVA(0x1234, 1)\nvoid Target() {}\n"
+        target_offset = blob.index(b"VA(")
+        target = SimpleNamespace(insertion_offset=target_offset, logical_line=4)
+
+        class Variant:
+            trial = 1
+            family = "forest"
+            tag = "tag"
+            body = "struct Probe {};"
+
+            def block(self, logical_line):
+                return f"#line {logical_line}\nstruct Probe {{}};\n"
+
+        with (
+            mock.patch.object(generator, "resolve_state_target", return_value=(target, [])),
+            mock.patch.object(generator, "target_identifiers", return_value=set()),
+            mock.patch.object(generator, "make_state_variants", return_value=[Variant()]),
+            mock.patch.object(
+                generator,
+                "include_macro_guard",
+                return_value={"passed": True},
+            ),
+        ):
+            mutations, rejected = generator.tu_state_mutations(
+                Path("."), Path("sample.cpp"), 0x1234, blob, 1, ("forest",), 7, "top"
+            )
+
+        self.assertEqual(rejected, [])
+        insertion = mutations[0].edits[0].start
+        self.assertEqual(insertion, blob.index(b"int global;"))
+        self.assertLess(insertion, target_offset)
 
     def test_helpers_at_the_same_insertion_point_are_merged(self):
         blob = b"abcdefghij"

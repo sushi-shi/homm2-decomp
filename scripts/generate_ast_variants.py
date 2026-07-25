@@ -40,7 +40,9 @@ import clang.cindex as ci
 
 from tu_state_noise import (
     DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,
+    _top_level_insertion_offset,
     include_macro_guard,
+    logical_line_at,
     make_variants as make_state_variants,
     resolve_target as resolve_state_target,
     target_identifiers,
@@ -1265,7 +1267,7 @@ def balance_mutations(mutations) -> list[AstMutation]:
 
 def tu_state_mutations(
     root: Path, source: Path, rva: int, blob: bytes, count: int,
-    families: tuple[str, ...], seed: int,
+    families: tuple[str, ...], seed: int, insertion: str = "target",
 ) -> tuple[list[AstMutation], list[dict]]:
     if count == 0:
         return [], []
@@ -1274,7 +1276,13 @@ def tu_state_mutations(
     tokens = target_identifiers(decoded, target)
     # tu_state_noise operates on Python string offsets; manifests and libclang ranges
     # are byte offsets.  Convert explicitly because reconstructed comments contain UTF-8.
-    insertion_offset = utf8_byte_offset(decoded, target.insertion_offset)
+    character_offset = (
+        target.insertion_offset
+        if insertion == "target"
+        else _top_level_insertion_offset(decoded)
+    )
+    insertion_offset = utf8_byte_offset(decoded, character_offset)
+    logical_line = logical_line_at(decoded, character_offset)
     mutations = []
     rejected = []
     for variant in make_state_variants(count, families, seed):
@@ -1289,7 +1297,7 @@ def tu_state_mutations(
             record["rejected"] = True
             rejected.append(record)
             continue
-        body = variant.block(target.logical_line).encode()
+        body = variant.block(logical_line).encode()
         mutations.append(AstMutation(
             f"tu_state_{variant.family}",
             f"trial-{variant.trial}-{variant.tag}",
@@ -1577,6 +1585,12 @@ def main(argv=None, *, prog=None, description=None) -> int:
         "--state-families", default=",".join(DEFAULT_STATE_FAMILIES),
         help="comma-separated TU-state families from tu_state_noise.py",
     )
+    parser.add_argument(
+        "--state-insertion",
+        choices=("target", "top"),
+        default="target",
+        help="insert generated TU states beside the target or after leading includes",
+    )
     parser.add_argument("--state-seed", type=lambda value: int(value, 0), default=0x484F4D32)
     parser.add_argument(
         "--axes-from", type=Path,
@@ -1672,7 +1686,14 @@ def main(argv=None, *, prog=None, description=None) -> int:
     )
     try:
         state_mutations, rejected_state_mutations = tu_state_mutations(
-            root, source, args.rva, blob, args.state_trials, state_families, args.state_seed
+            root,
+            source,
+            args.rva,
+            blob,
+            args.state_trials,
+            state_families,
+            args.state_seed,
+            args.state_insertion,
         )
     except (OSError, KeyError, ValueError) as exc:
         parser.error(str(exc))
@@ -1720,6 +1741,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
                 "mutations_emitted": len(state_mutations),
                 "families": list(state_families),
                 "seed": args.state_seed,
+                "insertion": args.state_insertion,
                 "rejected": rejected_state_mutations,
             },
         },
