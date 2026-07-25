@@ -1224,7 +1224,7 @@ SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.2811	f34b11bf342f
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	a2360f525f06
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	99.9912	78466d1b70fd
-SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	98.7464	b7b68a63a61a
+SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	99.2693	73ed71e645cc
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	100.0000	5454e637526f
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	99.4409	a54ce9edc9d4
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	222058889a73
@@ -1249,7 +1249,7 @@ SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	100.0000	7adec6418856
 SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	100.0000	91fcda85feeb
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a107f077d8
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	93.2154	42b1d993bfeb
-SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	92.2849	74ed43dc383b
+SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	97.0726	74ed43dc383b
 SOURCE/SPELLS	?ViewSpells@combatManager@@QAEHH@Z	100.0000	0b0070c4c421
 SOURCE/STRIP	??0bankBox@@QAE@HHPAVplayerData@@@Z	100.0000	14b8b962e913
 SOURCE/STRIP	??0strip@@QAE@HHHKHPAVarmyGroup@@HHH@Z	100.0000	def64d7d216d
