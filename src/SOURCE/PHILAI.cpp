@@ -3341,7 +3341,7 @@ i32 philAI::RVOfPosition(
             y,
             totalValue8,
             eventValue9,
-            strategicDelta7,
+            strategicDelta,
             targetLiveChance1 * POSITION_FULL_CHANCE,
             POSITION_DEBUG_UNUSED
         );
