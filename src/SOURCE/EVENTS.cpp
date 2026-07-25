@@ -408,25 +408,32 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                resourceType = static_cast<ResourceType>(
-                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
-                );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
                     DATA_COMPGEN(0x005176d8, doEventMagicGardenYouCatchALeprechaun, "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster "
                     "of magic mushrooms.  In exchange for his freedom, he guides you to a small "
                     "pot filled with precious things."),
-                    IDX(resourceType),
-                    resourceType == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT : MAP_EVENT_RESOURCE_AMOUNT,
+                    cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
+                    static_cast<ResourceType>(
+                        cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                    ) == RES_GOLD
+                        ? MAP_EVENT_GOLD_AMOUNT
+                        : MAP_EVENT_RESOURCE_AMOUNT,
                     -1,
                     0,
                     -1
                 );
                 GiveResource(
                     eventHero2,
-                    resourceType,
-                    resourceType == RES_GOLD ? MAP_EVENT_GOLD_AMOUNT : MAP_EVENT_RESOURCE_AMOUNT
+                    static_cast<ResourceType>(
+                        cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                    ),
+                    static_cast<ResourceType>(
+                        cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
+                    ) == RES_GOLD
+                        ? MAP_EVENT_GOLD_AMOUNT
+                        : MAP_EVENT_RESOURCE_AMOUNT
                 );
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
             }
@@ -558,9 +565,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_HILL_FORT:
-            thirdUpgrade = CREATURE_NONE;
-            secondUpgrade1 = CREATURE_NONE;
-            firstUpgrade_e = CREATURE_NONE;
+            thirdUpgrade = secondUpgrade1 = firstUpgrade_e = CREATURE_NONE;
             if (eventHero2->CreatureTypeCount(CREATURE_OGRE))
                 firstUpgrade_e = CREATURE_OGRE;
             if (eventHero2->CreatureTypeCount(CREATURE_ORC)) {
