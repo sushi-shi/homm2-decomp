@@ -149,7 +149,7 @@ i32 mouseManager::Open(i32 priority) {
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
-    if (m_active) {
+    if (m_active == 1) {
         m_active = false;
         if (m_savedUnderlying != NULL)
             delete m_savedUnderlying;
