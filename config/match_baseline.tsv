@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	26c4b5e2962c
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.3766	d77fb5a0f4d7
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.2808	acb89fcb99c3
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	94.7906	4ff757e8e5b7
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	97.4691	c1f92c2d546a
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
