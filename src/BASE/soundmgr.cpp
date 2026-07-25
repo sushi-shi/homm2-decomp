@@ -572,7 +572,7 @@ void soundManager::AllocateSampleHandles(void) {
 
 VA(0x004cc9b0, 0x96)
 void soundManager::Close(void) {
-    if (!m_active)
+    if (m_active != 1)
         return;
     if (gbNoSound != 0)
         goto soundClosed;

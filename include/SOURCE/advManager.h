@@ -171,7 +171,7 @@ public:
     void VWCleanup(void);
     void VWInit(i32, i32);
     void VWCompleteDraw(void);
-    void GetCursorSampleSet(H2_ENUM_PARAM(ConfigWalkSpeed, i32));
+    void GetCursorSampleSet(i32);
     class mapCell* DoAdvCommand(void);
     i32 GetCommandTargetX(void) {
         return m_commandTargetX;

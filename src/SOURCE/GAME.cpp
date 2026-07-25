@@ -7744,14 +7744,14 @@ VA(0x00486296, 0xab)
 i32 CalcFileCRC(char* filename) {
     DATA(0x004f7e3c) static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
-    char* block = static_cast<char*>(H2_ALLOC_AT(size, DATA_COMPGEN(0x004f7e40, calcFileCRCSourceFile, RETAIL_FILE), 8033));
+    char* block = static_cast<char*>(H2_ALLOC_AT(size, DATA_COMPGEN(0x004f7e40, calcFileCRCSourceFile, RETAIL_FILE), calcFileCrcSourceLineBase + 3));
     i32 hand = open(filename, _O_BINARY);
     if (hand == -1)
         FileError(filename);
     read(hand, block, size);
     i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
     close(hand);
-    H2_FREE_AT(block, DATA_COMPGEN(0x004f7e68, calcFileCRCSourceFile2, RETAIL_FILE), 8044);
+    H2_FREE_AT(block, DATA_COMPGEN(0x004f7e68, calcFileCRCSourceFile2, RETAIL_FILE), calcFileCrcSourceLineBase + 14);
     return crc;
 }
 
