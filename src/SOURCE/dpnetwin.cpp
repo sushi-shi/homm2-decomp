@@ -311,11 +311,10 @@ void dpProcessMessages(void) {
 VA(0x0041f681, 0x274)
 void dpEvaluateMessage(u32l size, i32 sender) {
     DATA(0x004efb44) static i16 evaluateSourceLineBase = 355; // NOLINT(readability-magic-numbers)
-    char* ptr = rcvBufIn + 1;
-    DirectPlayStartupMessage* startup;
+    DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
     i32 i;
 
-    switch (static_cast<NetworkPacketType>(static_cast<u8>(rcvBufIn[0]))) {
+    switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC_AT(
                 size - 1, DATA_COMPGEN(0x004efb48, dpEvaluateMessageSourceFile, RETAIL_FILE), evaluateSourceLineBase + 8
@@ -326,7 +325,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-                for (i = 1; i < giNumHumanPlayers; i++) {
+                for (i = 1; giNumHumanPlayers > i; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
                         dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                         return;
@@ -334,7 +333,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 }
                 if (gbRemoteGameOpen != 0) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                    gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(ptr);
+                    gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(startup);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = 1;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
@@ -351,7 +350,6 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             giHostAcceptStatus = HOST_ACCEPT_REJECTED;
             break;
         case NETWORK_PACKET_STARTUP:
-            startup = reinterpret_cast<DirectPlayStartupMessage*>(ptr);
             giNumHumanPlayers = startup->playerCount;
             giThisNetPos = startup->netPosition;
             LogInt(

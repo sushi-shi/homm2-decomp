@@ -26,8 +26,8 @@ H2_ENUM_END(DirectPlayTransportConstant)
 
 #pragma pack(push, 1)
 struct DirectPlayStartupMessage {
-    u8 playerCount;
-    u8 netPosition;
+    char playerCount;
+    char netPosition;
     i32 playerIds[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 };
 

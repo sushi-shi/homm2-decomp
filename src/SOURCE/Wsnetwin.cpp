@@ -338,6 +338,9 @@ void wsProcessMessages(void) {
     }
 }
 
+// Byte-exact against retail: the startup fields are read through the raw
+// message bytes (sign-extended char loads, no struct-typed local) and the
+// three INFO/CONFIRM dialogs call NormalDialog directly. Keep these spellings.
 VA(0x004072e3, 0x37d)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
@@ -398,8 +401,8 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             }
             break;
         case NETWORK_PACKET_STARTUP:
-            giNumHumanPlayers = message[0];
-            giThisNetPos = message[1];
+            giNumHumanPlayers = message[0]; // startup->playerCount
+            giThisNetPos = message[1];      // startup->netPosition
             LogInt(
                 DATA_COMPGEN(0x004ed8a4, wsEvaluateMessageWSMSGSTARTUP, "WSMSGSTARTUP"),
                 giThisNetPos,
@@ -412,7 +415,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             );
             memcpy(
                 giNetPosToDCOPos,
-                message + offsetof(WinsockStartupMessage, playerAddresses),
+                message + offsetof(WinsockStartupMessage, playerAddresses), // startup->playerAddresses
                 sizeof(giNetPosToDCOPos)
             );
             bStartUpInfoReceived = 1;
