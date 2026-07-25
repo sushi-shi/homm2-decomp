@@ -512,7 +512,7 @@ VA(0x0042107b, 0x521)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
     i32 unusedSpellWord5;
-    i32 teleportBlocked;
+    i32 destHex;
     if (!ValidHex(hex))
         return 0;
 
@@ -593,16 +593,15 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
             break;
 
         case SPELL_TELEPORT:
-            if (!bInTeleportGetDest) {
-                if (m_hexCells[hex].m_occupantSide != m_currentSide)
-                    return 0;
-            } else {
-                teleportBlocked =
-                    hex == giNextActionGridIndex
+            if (bInTeleportGetDest) {
+                destHex = hex;
+                if (destHex == giNextActionGridIndex
                     || !m_armies[IDX(gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide)]
                                 [gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantIndex]
-                                    .CanFit(hex, 0, NULL);
-                if (teleportBlocked)
+                            .CanFit(destHex, 0, NULL))
+                    return 0;
+            } else {
+                if (m_hexCells[hex].m_occupantSide != m_currentSide)
                     return 0;
             }
             break;
@@ -614,6 +613,8 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
             if (hex == COMBAT_HEX_EMPTY || hex % HEX_COLUMN_COUNT == 0
                 || hex % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
                 return 0;
+            break;
+        default:
             break;
     }
     return 1;
