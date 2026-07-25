@@ -1370,7 +1370,7 @@ SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	100.0000	cc3c9baf1205
 SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	97.9024	f8bdc76c35ff
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	98.4430	9528e4b87158
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	100.0000	f23b4e9b39c0
-SOURCE/comwin	?com_init@@YIFEHH@Z	98.9419	0e4442d64e65
+SOURCE/comwin	?com_init@@YIFEHH@Z	98.9860	e90015f2f631
 SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	100.0000	0180862d8ec3
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	feb4b7abd747
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	25dc598c7cc9
