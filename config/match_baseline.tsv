@@ -1235,7 +1235,7 @@ SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	100.0
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	100.0000	1026b76ae31f
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	b8992a064a40
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	6774124ff592
-SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	93.6271	d72888096592
+SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	98.8329	f37a76ea9d61
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	483384c46f98
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	98.5277	7c7c19a026ac
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	100.0000	4cc2eb9bf1df
