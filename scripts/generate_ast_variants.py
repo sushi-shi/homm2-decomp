@@ -1424,11 +1424,19 @@ def candidate_combinations(
 ):
     combinations = []
     required_names = required_names or set()
+    required = tuple(
+        mutation for mutation in mutations if mutation_name(mutation) in required_names
+    )
+    optional = tuple(
+        mutation for mutation in mutations if mutation_name(mutation) not in required_names
+    )
     for depth in range(min_depth, max_depth + 1):
-        for combination in itertools.combinations(mutations, depth):
-            combination_names = {mutation_name(mutation) for mutation in combination}
-            if not required_names <= combination_names:
-                continue
+        optional_depth = depth - len(required)
+        if optional_depth < 0:
+            continue
+        for optional_combination in itertools.combinations(optional, optional_depth):
+            selected = set(required) | set(optional_combination)
+            combination = tuple(mutation for mutation in mutations if mutation in selected)
             edits = merge_insertions(
                 tuple(edit for mutation in combination for edit in mutation.edits)
             )
