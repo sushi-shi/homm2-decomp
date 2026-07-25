@@ -1039,9 +1039,6 @@ VA(0x0049859c, 0x791)
 i32 InterpretCommandLine(void) {
     i32 len;
     i32 i;
-    i32 commandIndex;
-    i32 valueIndex;
-    i32 secondValueIndex;
     i32 helpRequested;
     gbTCPFirstTime = true;
     giTCPType = -1;
@@ -1062,76 +1059,73 @@ i32 InterpretCommandLine(void) {
     strcpy(gFullMapName, DATA_COMPGEN(0x00515ce0, interpretCommandLineChaos, "Chaos"));
 
     len = strlen(gcCommandLine);
-    for (i = 0; OD_STEER(len) > i; i++) {
-        commandIndex = i + 1;
-        valueIndex = commandIndex + 1;
-        secondValueIndex = valueIndex + 1;
-        if (gcCommandLine[i] == ' ' && commandIndex < len
-            && (gcCommandLine[commandIndex] == '?' || gcCommandLine[commandIndex] == 'h'
-                || gcCommandLine[commandIndex] == 'H')) {
+    for (i = 0; i < len; i++) {
+        if (gcCommandLine[i] == ' ' && i + 1 < len
+            && (gcCommandLine[i + 1] == '?' || gcCommandLine[i + 1] == 'h'
+                || gcCommandLine[i + 1] == 'H')) {
             helpRequested = 1;
         }
-        if (gcCommandLine[i] == '/' && commandIndex < len) {
-            switch (toupper(gcCommandLine[commandIndex])) {
+        if (gcCommandLine[i] == '/' && i + 1 < len) {
+            switch (toupper(gcCommandLine[i + 1])) {
                 case 'Z':
                     gbDoMemCheck = false;
                     break;
                 case 'W':
                     gbUseWaveout = true;
-                    if (valueIndex < len)
-                        gbUseWaveout = gcCommandLine[valueIndex] - '0';
+                    if (i + 2 < len)
+                        gbUseWaveout = gcCommandLine[i + 2] - '0';
                     break;
                 case 'V':
                     gConfig.slowVideo = 1;
                     WritePrefs();
                     break;
                 case 'N':
-                    if (secondValueIndex < len && toupper(gcCommandLine[valueIndex]) == 'W'
-                        && toupper(gcCommandLine[secondValueIndex]) == 'C') {
+                    if (i + 3 < len && toupper(gcCommandLine[i + 2]) == 'W'
+                        && toupper(gcCommandLine[i + 3]) == 'C') {
                         gbCheatMenus = true;
                     }
                     break;
                 case 'M':
-                    if (valueIndex < len)
-                        gbDontTryMIDI = 1 - (gcCommandLine[valueIndex] - '0');
+                    if (i + 2 < len)
+                        gbDontTryMIDI = 1 - (gcCommandLine[i + 2] - '0');
                     break;
                 case 'R':
-                    if (valueIndex < len)
-                        gbDontTryRedbook = 1 - (gcCommandLine[valueIndex] - '0');
+                    if (i + 2 < len)
+                        gbDontTryRedbook = 1 - (gcCommandLine[i + 2] - '0');
                     break;
                 case 'D':
-                    if (valueIndex < len)
-                        gbDontTryDigital = 1 - (gcCommandLine[valueIndex] - '0');
+                    if (i + 2 < len)
+                        gbDontTryDigital = 1 - (gcCommandLine[i + 2] - '0');
                     break;
                 case 'S':
-                    if (valueIndex < len)
-                        gbNoSound = 1 - (gcCommandLine[valueIndex] - '0');
+                    if (i + 2 < len)
+                        gbNoSound = 1 - (gcCommandLine[i + 2] - '0');
                     break;
                 case 'I':
-                    if (valueIndex < len)
-                        giShowIntro = gcCommandLine[valueIndex] - '0';
+                    if (i + 2 < len)
+                        giShowIntro = gcCommandLine[i + 2] - '0';
                     break;
                 case 'P':
-                    if (valueIndex < len)
-                        giDebugLevel = gcCommandLine[valueIndex] - '0';
+                    if (i + 2 < len)
+                        giDebugLevel = gcCommandLine[i + 2] - '0';
                     break;
                 case 'X':
                     xSmackFromNetwork = 1;
                     break;
                 case 'T':
-                    if (valueIndex < len) {
-                        switch (toupper(gcCommandLine[valueIndex])) {
+                    if (i + 2 < len) {
+                        switch (toupper(gcCommandLine[i + 2])) {
                             case 'T':
-                                if (secondValueIndex < len
-                                    && toupper(gcCommandLine[secondValueIndex]) == 'L') {
+                                if (i + 3 < len
+                                    && toupper(gcCommandLine[i + 3]) == 'L') {
                                     giTCPType = LINE_TCP_TYPE_L;
                                 } else {
                                     giTCPType = LINE_TCP_TYPE_DEFAULT;
                                 }
                                 break;
                             case 'S':
-                                if (secondValueIndex < len
-                                    && toupper(gcCommandLine[secondValueIndex]) == 'H') {
+                                if (i + 3 < len
+                                    && toupper(gcCommandLine[i + 3]) == 'H') {
                                     giTCPHostStatus = LINE_TCP_HOST;
                                 } else {
                                     giTCPHostStatus = LINE_TCP_CLIENT;
@@ -1139,8 +1133,8 @@ i32 InterpretCommandLine(void) {
                                 break;
                             case 'P': {
                                 i32 count = 0;
-                                if (secondValueIndex < len)
-                                    count = gcCommandLine[secondValueIndex] - '0';
+                                if (i + 3 < len)
+                                    count = gcCommandLine[i + 3] - '0';
                                 if (count >= LINE_TCP_MIN_PLAYERS
                                     && count <= LINE_TCP_MAX_PLAYERS) {
                                     giTCPNumPlayers = count;
@@ -1148,9 +1142,9 @@ i32 InterpretCommandLine(void) {
                                 break;
                             }
                             case 'A': {
-                                if (secondValueIndex < len) {
+                                if (i + 3 < len) {
                                     i32 dst = 0;
-                                    i32 src = secondValueIndex;
+                                    i32 src = i + 3;
                                     while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPAddress[dst] = gcCommandLine[src];
@@ -1162,9 +1156,9 @@ i32 InterpretCommandLine(void) {
                                 break;
                             }
                             case 'N': {
-                                if (secondValueIndex < len) {
+                                if (i + 3 < len) {
                                     i32 dst = 0;
-                                    i32 src = secondValueIndex;
+                                    i32 src = i + 3;
                                     while (dst < LINE_TCP_TEXT_LENGTH && gcCommandLine[src]
                                            && gcCommandLine[src] != ' ') {
                                         gcTCPName[dst] = gcCommandLine[src];
