@@ -5878,12 +5878,12 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     value_h = 0;
                 else {
                     value_h = static_cast<i32>(
-                        gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb5b0, valueOfEventAtPositionConstant12, AI_DAEMON_GOLD_PENALTY)
-                        + (gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb5a8, valueOfEventAtPositionConstant11, AI_DAEMON_FIGHT_VALUE_FACTOR)
-                           + ((gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR
-                               + gpCurPlayer->m_aiData.m_artifactValue)
-                              + (gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_VALUE_FACTOR
-                                 + gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_FACTOR)))
+                        (gpCurAIHero->m_aiFightValue * DATA_COMPGEN(0x004eb5a8, valueOfEventAtPositionConstant11, AI_DAEMON_FIGHT_VALUE_FACTOR)
+                         + gafAITurnCostResource[IDX(RES_GOLD)] * AI_DAEMON_GOLD_VALUE_FACTOR)
+                        + (gpCurAIHero->m_aiFightValue * AI_DAEMON_SECONDARY_FIGHT_VALUE_FACTOR
+                           + gpCurPlayer->m_aiData.m_artifactValue)
+                        + gpCurAIHero->m_aiFightValue * AI_DAEMON_FIGHT_VALUE_FACTOR
+                        + gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb5b0, valueOfEventAtPositionConstant12, AI_DAEMON_GOLD_PENALTY)
                     );
                     if (cell_k->m_objectMetadata == 5
                         && gpCurPlayer->m_resources[IDX(RES_GOLD)] < AI_DAEMON_CAVE_GOLD_REQUIRED)
@@ -5924,7 +5924,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 }
                 bEvaluatingTravelGates = 0;
                 bestExitValue_l = AI_TRAVEL_GATE_INITIAL_VALUE;
-                for (exitY_p = 0; exitY_p < MAP_HEIGHT; exitY_p++) {
+                for (exitY_p = 0; MAP_HEIGHT > exitY_p; exitY_p++) {
                     for (exitX_p = 0; exitX_p < MAP_WIDTH; exitX_p++) {
                         otherCell_j = gpAdvManager->GetCell(exitX_p, exitY_p);
                         if (cell_k->m_triggerType == otherCell_j->m_triggerType
