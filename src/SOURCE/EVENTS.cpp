@@ -8105,7 +8105,7 @@ void advManager::SendHeroTownData(
     i32 result;
     combatRemoteData* buffer = NULL;
 
-    buffer = static_cast<combatRemoteData*>(H2_ALLOC_AT(COMBAT_REMOTE_BUFFER_SIZE, DATA_COMPGEN(0x0051cbb0, sendHeroTownDataSourceFile, RETAIL_FILE), 6095));
+    buffer = static_cast<combatRemoteData*>(H2_ALLOC_AT(COMBAT_REMOTE_BUFFER_SIZE, DATA_COMPGEN(0x0051cbb0, sendHeroTownDataSourceFile, RETAIL_FILE), sourceLineBase + 3));
     reply = NULL;
     buffer->fragment = 0;
     buffer->x = static_cast<i8>(x);
@@ -8219,7 +8219,7 @@ void advManager::SendHeroTownData(
         if (!result)
             ShutDown(NULL);
     }
-    H2_FREE_AT(buffer, DATA_COMPGEN(0x0051cbdc, sendHeroTownDataSourceFile2, RETAIL_FILE), 6184);
+    H2_FREE_AT(buffer, DATA_COMPGEN(0x0051cbdc, sendHeroTownDataSourceFile2, RETAIL_FILE), sourceLineBase + 0x5c);
 }
 
 VA(0x004b67cd, 0x462)
