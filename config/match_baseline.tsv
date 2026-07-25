@@ -1216,7 +1216,7 @@ SOURCE/SPELLAI	?NextPos@combatManager@@QAEXPAH@Z	100.0000	90d2fa7538d0
 SOURCE/SPELLAI	?RawEffectSpellInfluence@combatManager@@QAEHPAVarmy@@H@Z	97.7135	75bf22c1daeb
 SOURCE/SPELLS	?AddBolt@combatManager@@QAEXPAUSBolt@@HHHHHHHHHHHH@Z	100.0000	a12276dfd815
 SOURCE/SPELLS	?Armageddon@combatManager@@QAEXXZ	99.4703	cc7676b69045
-SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	95.6462	07083e58c58c
+SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	3fe5f115ec84
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	d968a1690475
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	97.3125	1a0fc7f3adc9
