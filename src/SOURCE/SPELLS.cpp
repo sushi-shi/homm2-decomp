@@ -3102,47 +3102,60 @@ applySpellInfluence:
 
 VA(0x00428389, 0x5c8)
 void combatManager::MirrorImage(i32 targetHex) {
-    army* source =
+    CombatHexDirection searchDirection11;
+    i32 xOffset8;
+    i32 duration9;
+    i32 sourcePart9;
+    army* source6;
+    i32 searchHex;
+    army* image3;
+    i32 step5;
+    i32 yOffset;
+    i32 distance6;
+    i32 candidateHex1;
+    i32 frame;
+    CombatHexDirection direction6;
+    i32 deadline0;
+
+    source6 =
         &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
-    i32 mirrorHex = COMBAT_HEX_EMPTY;
-    i32 distance;
-    for (distance = 1; distance <= MIRROR_SEARCH_MAX_DISTANCE; ++distance) {
-        i32 sourcePart;
-        for (sourcePart = 0; sourcePart < MIRROR_SOURCE_PART_COUNT; ++sourcePart) {
-            i32 searchHex;
-            if (sourcePart == 0) {
-                searchHex = source->m_hex;
+
+    distance6 = 1;
+    while (distance6 < MIRROR_SEARCH_DISTANCE_LIMIT) {
+        for (sourcePart9 = 0; sourcePart9 < MIRROR_SOURCE_PART_COUNT; ++sourcePart9) {
+            if (sourcePart9 == 0) {
+                searchHex = source6->m_hex;
             } else {
-                if (HAS(source->m_monster.flags.all, MONSTER_FLAGS_WIDE) == 0)
+                if (HAS(source6->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+                    if (source6->m_facing == ARMY_FACING_RIGHT)
+                        searchHex = source6->m_hex + 1;
+                    else
+                        searchHex = source6->m_hex - 1;
+                } else {
                     continue;
-                if (source->m_facing == ARMY_FACING_RIGHT)
-                    searchHex = source->m_hex + 1;
-                else
-                    searchHex = source->m_hex - 1;
+                }
             }
 
-            CombatHexDirection direction;
-            for (direction = COMBAT_DIRECTION_NORTHEAST;
-                 IDX(direction) < SPELL_ADJACENT_DIRECTION_COUNT;
-                 ++direction) {
-                CombatHexDirection searchDirection =
-                    source->m_facing == ARMY_FACING_RIGHT
-                        ? direction
-                        : COMBAT_DIRECTION_NORTHWEST - IDX(direction);
-                i32 candidateHex = searchHex;
-                i32 step;
-                for (step = 0; step < distance; ++step) {
-                    candidateHex = GetAdjacentCellIndexNoArmy(candidateHex, searchDirection);
-                    if (candidateHex >= 0 && candidateHex < COMBAT_HEX_COUNT
-                        && candidateHex % HEX_COLUMN_COUNT != 0
-                        && candidateHex % HEX_COLUMN_COUNT != HEX_RIGHT_BORDER
-                        && source->CanFit(candidateHex, 0, NULL)) {
-                        mirrorHex = candidateHex;
+            for (direction6 = COMBAT_DIRECTION_NORTHEAST;
+                 IDX(direction6) < SPELL_ADJACENT_DIRECTION_COUNT;
+                 ++direction6) {
+                if (source6->m_facing == ARMY_FACING_RIGHT)
+                    searchDirection11 = direction6;
+                else
+                    searchDirection11 = COMBAT_DIRECTION_NORTHWEST - IDX(direction6);
+                candidateHex1 = searchHex;
+                for (step5 = 0; step5 < distance6; ++step5) {
+                    candidateHex1 = GetAdjacentCellIndexNoArmy(candidateHex1, searchDirection11);
+                    if (candidateHex1 < 0 || candidateHex1 >= COMBAT_HEX_COUNT
+                        || candidateHex1 % HEX_COLUMN_COUNT == 0
+                        || candidateHex1 % HEX_COLUMN_COUNT == HEX_RIGHT_BORDER)
+                        continue;
+                    if (source6->CanFit(candidateHex1, 0, NULL))
                         goto mirror_found;
-                    }
                 }
             }
         }
+        ++distance6;
     }
     sprintf(gText, DATA_COMPGEN(0x004f0664, mirrorImageMirrorImageSpellFailed, "Mirror Image spell failed!"));
     NormalDialog(
@@ -3162,38 +3175,38 @@ void combatManager::MirrorImage(i32 targetHex) {
 mirror_found:
     AddArmy(
         m_currentSide,
-        source->m_monsterType,
-        source->m_quantity,
-        mirrorHex,
+        source6->m_monsterType,
+        source6->m_quantity,
+        candidateHex1,
         MONSTER_FLAGS_MIRROR_IMAGE,
         0
     );
-    army* image =
-        &m_armies[IDX(m_hexCells[mirrorHex].m_occupantSide)][m_hexCells[mirrorHex].m_occupantIndex];
-    image->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
-    i32 duration = m_spellPower[IDX(m_currentSide)];
+    image3 =
+        &m_armies[IDX(m_hexCells[candidateHex1].m_occupantSide)][m_hexCells[candidateHex1].m_occupantIndex];
+    image3->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_SUMMONED;
+    duration9 = m_spellPower[IDX(m_currentSide)];
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_ENCHANTED_HOURGLASS))
-        duration += SPELL_HOURGLASS_POWER_BONUS;
+        duration9 += SPELL_HOURGLASS_POWER_BONUS;
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_WIZARD_HAT))
-        duration += SPELL_WIZARD_HAT_POWER_BONUS;
-    image->m_roundCounter = duration;
-    source->m_mirrorImageIndex = image->m_index;
-    image->m_mirrorSourceIndex = source->m_index;
+        duration9 += SPELL_WIZARD_HAT_POWER_BONUS;
+    image3->m_roundCounter = duration9;
+    source6->m_mirrorImageIndex = image3->m_index;
+    image3->m_mirrorSourceIndex = source6->m_index;
 
-    i32 xOffset = m_hexCells[source->m_hex].m_x - m_hexCells[image->m_hex].m_x;
-    i32 yOffset = m_hexCells[source->m_hex].m_y - m_hexCells[image->m_hex].m_y;
+    xOffset8 = m_hexCells[source6->m_hex].m_x - m_hexCells[image3->m_hex].m_x;
+    yOffset = m_hexCells[source6->m_hex].m_y - m_hexCells[image3->m_hex].m_y;
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(image->m_side)][image->m_index];
+    ++m_limitCreatureCount[IDX(m_hexCells[candidateHex1].m_occupantSide)]
+                          [m_hexCells[candidateHex1].m_occupantIndex];
     ++m_limitCreatureCount[IDX(m_hexCells[targetHex].m_occupantSide)]
                           [m_hexCells[targetHex].m_occupantIndex];
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
-    i32 deadline = static_cast<i32>(
+    deadline0 = static_cast<i32>(
         KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
     );
-    i32 frame;
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
-        image->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset / MIRROR_SLIDE_FRAME_COUNT;
-        image->m_yOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * yOffset / MIRROR_SLIDE_FRAME_COUNT;
+        image3->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset8 / MIRROR_SLIDE_FRAME_COUNT;
+        image3->m_yOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * yOffset / MIRROR_SLIDE_FRAME_COUNT;
         gbLimitToExtent = true;
         gpCombatManager->DrawFrame(0, 0, 0, 0, 0, 1, 0);
         gpWindowManager->UpdateScreenRegion(
@@ -3203,13 +3216,13 @@ mirror_found:
             giMaxExtentY - giMinExtentY + 1
         );
         gbLimitToExtent = false;
-        DelayTil(&deadline);
-        deadline = static_cast<i32>(
+        DelayTil(&deadline0);
+        deadline0 = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
         );
     }
-    image->m_xOffset = 0;
-    image->m_yOffset = 0;
+    image3->m_xOffset = 0;
+    image3->m_yOffset = 0;
     UpdateGrid(0, 1);
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
