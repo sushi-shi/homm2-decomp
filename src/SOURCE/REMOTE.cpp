@@ -541,9 +541,7 @@ i32 TransmitRemoteData(
         );
         if (reliable == 0 && result != 0) {
             return 1;
-            break;
-        }
-        if (result != 0) {
+        } else if (result != 0) {
             poll = 0;
             while (poll < REMOTE_CONFIRM_POLL_COUNT) {
                 ForcePollSound();
