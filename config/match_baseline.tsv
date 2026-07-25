@@ -747,7 +747,7 @@ SOURCE/EVENTS	?RecruitEvent@advManager@@QAEXPAVhero@@HPAVmapCell@@@Z	100.0000	93
 SOURCE/EVENTS	?RecruitSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	99.8669	7f192df2bb57
 SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	100.0000	6d5cf3889824
 SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	100.0000	109cd3c4bf45
-SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	98.4470	114423c3fcd2
+SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	100.0000	ad8b24f72c91
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	51e1cc174045
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	100.0000	fd1a8f1bfe54
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	100.0000	267e5f754bc5
