@@ -292,7 +292,7 @@ H2_ENUM_BEGIN(AIFightEventConstant)
 H2_ENUM_END(AIFightEventConstant)
 
 H2_ENUM_BEGIN(AIShipwreckSurvivorConstant)
-    SHIPWRECK_SURVIVOR_ARTIFACT_METADATA_OFFSET = 2
+    SKELETON_ARTIFACT_METADATA_OFFSET = 2
 H2_ENUM_END(AIShipwreckSurvivorConstant)
 
 H2_ENUM_BEGIN(AIHeroInteractionConstant)
@@ -5822,14 +5822,14 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 gbReduceByReload = false;
                 break;
             case MAP_OBJECT_SHIPWRECK_SURVIVOR:
-                value_h = gArtifactBaseRV
-                    [cell_k->m_objectMetadata - SHIPWRECK_SURVIVOR_ARTIFACT_METADATA_OFFSET];
+                value_h = gArtifactBaseRV[cell_k->m_objectMetadata];
                 if (value_h < 125)
                     value_h = 125;
                 break;
             case MAP_OBJECT_SKELETON:
-                value_h =
-                    cell_k->m_objectMetadata == 1 ? 0 : gArtifactBaseRV[cell_k->m_objectMetadata];
+                value_h = cell_k->m_objectMetadata == 1
+                    ? 0
+                    : gArtifactBaseRV[cell_k->m_objectMetadata - SKELETON_ARTIFACT_METADATA_OFFSET];
                 break;
             case MAP_OBJECT_GRAVEYARD:
             case MAP_OBJECT_SHIPWRECK:
