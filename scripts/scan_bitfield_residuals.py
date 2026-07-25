@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Rank retained island diffs that look like byte-vs-bitfield load mismatches.
+"""Rank object diffs that look like byte-vs-bitfield load mismatches.
 
-The scanner is read-only.  It recursively discovers retained
+The scanner is read-only.  By default it recursively discovers retained
 ``best.candidate.obj`` / ``best.retail.obj`` pairs, reuses a sibling
 ``best.objdiff.json`` when present, and otherwise asks objdiff for JSON on
 stdout.  The one-shot objdiff invocation uses the repository's relocation-aware
 ``functionRelocDiffs=data_value`` policy.
+
+Pass ``--live`` to additionally compare every current normalized unit pair
+under ``build/objdiff/paired/target`` and ``build/objdiff/base``.  Whole-unit
+objdiff output is generated in memory, so this mode covers live residuals
+without writing a second generated diff corpus.
 
 Run inside ``nix develop .#build`` so ``objdiff-cli`` is available::
 
@@ -27,6 +32,7 @@ operands have already been resolved under the configured comparison policy.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import shutil
@@ -40,6 +46,9 @@ from typing import Iterable, Sequence
 
 DEFAULT_ROOT = Path("build/tu-state-noise")
 DEFAULT_JSON_NAME = "best.objdiff.json"
+DEFAULT_LIVE_PAIRED_ROOT = Path("build/objdiff/paired/target")
+DEFAULT_LIVE_BASE_ROOT = Path("build/objdiff/base")
+DEFAULT_SYMBOLS = Path("build/gen/symbol_names.csv")
 RELOCATION_CONFIG = "functionRelocDiffs=data_value"
 LOW_MASKS = frozenset((1 << width) - 1 for width in range(1, 8))
 REGISTER_FAMILIES = {
@@ -85,6 +94,13 @@ class Artifact:
     retail: Path
     manifest: Path | None
     cached_json: Path | None
+
+
+@dataclass(frozen=True)
+class LiveArtifact:
+    unit: str
+    candidate: Path
+    retail: Path
 
 
 def _parse_int(value) -> int | None:
@@ -413,6 +429,34 @@ def run_objdiff(artifact: Artifact, symbol: str, executable: str) -> dict:
     return payload
 
 
+def run_live_objdiff(artifact: LiveArtifact, executable: str) -> dict:
+    command = [
+        executable,
+        "diff",
+        "-1",
+        str(artifact.retail),
+        "-2",
+        str(artifact.candidate),
+        "-o",
+        "-",
+        "--format",
+        "json",
+        "-c",
+        RELOCATION_CONFIG,
+    ]
+    result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode:
+        detail = (result.stderr or result.stdout).strip()
+        raise RuntimeError(f"objdiff failed ({result.returncode}): {detail}")
+    try:
+        payload = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"objdiff returned invalid JSON: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError("objdiff JSON root is not an object")
+    return payload
+
+
 def load_objdiff(
     artifact: Artifact,
     symbol: str,
@@ -547,6 +591,152 @@ def _finding_sort_key(finding: dict):
     )
 
 
+def discover_live_artifacts(
+    paired_root: Path,
+    base_root: Path,
+) -> list[LiveArtifact]:
+    paired_root = paired_root.resolve()
+    base_root = base_root.resolve()
+    artifacts = []
+    for candidate in sorted(paired_root.rglob("*.c.obj")):
+        relative = candidate.relative_to(paired_root)
+        retail_name = relative.name.removesuffix(".c.obj") + ".obj"
+        retail = base_root / relative.parent / retail_name
+        if not retail.is_file():
+            continue
+        unit = str(relative.parent / relative.name.removesuffix(".c.obj"))
+        artifacts.append(LiveArtifact(unit, candidate, retail))
+    return artifacts
+
+
+def symbol_rvas(path: Path) -> dict[tuple[str, str], str]:
+    grouped: dict[tuple[str, str], list[str]] = {}
+    with path.open(encoding="latin-1", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("kind") != "func":
+                continue
+            grouped.setdefault((row["unit"], row["name"]), []).append(row["rva"])
+    return {
+        key: values[0]
+        for key, values in grouped.items()
+        if len(values) == 1
+    }
+
+
+def analyze_live_artifact(
+    artifact: LiveArtifact,
+    *,
+    executable: str,
+    rvas: dict[tuple[str, str], str],
+    cwd: Path,
+) -> list[dict]:
+    payload = run_live_objdiff(artifact, executable)
+    left_symbols = payload.get("left", {}).get("symbols", [])
+    right_symbols = payload.get("right", {}).get("symbols", [])
+    findings = []
+    for retail in left_symbols:
+        if not isinstance(retail, dict):
+            continue
+        target_index = _parse_int(retail.get("target_symbol"))
+        retail_rows = retail.get("instructions")
+        if (
+            target_index is None
+            or not isinstance(retail_rows, list)
+            or target_index < 0
+            or target_index >= len(right_symbols)
+        ):
+            continue
+        candidate = right_symbols[target_index]
+        if not isinstance(candidate, dict):
+            continue
+        candidate_rows = candidate.get("instructions")
+        symbol = retail.get("name")
+        if (
+            not isinstance(candidate_rows, list)
+            or not isinstance(symbol, str)
+            or candidate.get("name") != symbol
+        ):
+            continue
+        occurrences = detect_occurrences(retail_rows, candidate_rows)
+        if not occurrences:
+            continue
+        masks = Counter(occurrence.mask for occurrence in occurrences)
+        directions = Counter(occurrence.direction for occurrence in occurrences)
+        score = candidate.get("match_percent", retail.get("match_percent"))
+        findings.append({
+            "artifact": _display_path(artifact.candidate, cwd),
+            "objdiff_json": "generated-on-stdout",
+            "unit": artifact.unit,
+            "function": symbol,
+            "rva": rvas.get((artifact.unit, symbol)),
+            "occurrence_count": len(occurrences),
+            "masks": dict(sorted(masks.items())),
+            "directions": dict(sorted(directions.items())),
+            "score": float(score) if score is not None else None,
+            "baseline_score": None,
+            "retail_size": _parse_int(retail.get("size")),
+            "candidate_size": _parse_int(candidate.get("size")),
+            "occurrences": [asdict(occurrence) for occurrence in occurrences],
+        })
+    return findings
+
+
+def scan_live(
+    paired_root: Path,
+    base_root: Path,
+    symbols: Path,
+    *,
+    executable: str = "objdiff-cli",
+    cwd: Path | None = None,
+) -> dict:
+    cwd = cwd or Path.cwd()
+    artifacts = discover_live_artifacts(paired_root, base_root)
+    rvas = symbol_rvas(symbols)
+    findings = []
+    errors = []
+    for artifact in artifacts:
+        try:
+            findings.extend(analyze_live_artifact(
+                artifact,
+                executable=executable,
+                rvas=rvas,
+                cwd=cwd,
+            ))
+        except (OSError, RuntimeError, json.JSONDecodeError) as exc:
+            errors.append({
+                "artifact": _display_path(artifact.candidate, cwd),
+                "error": str(exc),
+            })
+    findings.sort(key=_finding_sort_key)
+    return {
+        "schema": 1,
+        "relocation_config": RELOCATION_CONFIG,
+        "scanned_pairs": len(artifacts),
+        "finding_count": len(findings),
+        "findings": findings,
+        "errors": errors,
+    }
+
+
+def merge_reports(retained: dict, live: dict | None) -> dict:
+    if live is None:
+        return retained
+    findings = retained["findings"] + live["findings"]
+    findings.sort(key=_finding_sort_key)
+    for rank, finding in enumerate(findings, 1):
+        finding["rank"] = rank
+    return {
+        "schema": 1,
+        "relocation_config": RELOCATION_CONFIG,
+        "scanned_pairs": retained["scanned_pairs"] + live["scanned_pairs"],
+        "scanned_retained_pairs": retained["scanned_pairs"],
+        "scanned_live_pairs": live["scanned_pairs"],
+        "finding_count": len(findings),
+        "findings": findings,
+        "errors": retained["errors"] + live["errors"],
+    }
+
+
 def _format_tsv(report: dict) -> str:
     columns = (
         "rank", "occurrences", "masks", "score", "baseline", "sizes",
@@ -606,6 +796,29 @@ def parse_args(argv: Sequence[str] | None = None):
         action="store_true",
         help="ignore cached best.objdiff.json files (generated JSON remains in memory)",
     )
+    parser.add_argument(
+        "--live",
+        action="store_true",
+        help="also scan every current normalized unit pair",
+    )
+    parser.add_argument(
+        "--live-paired-root",
+        type=Path,
+        default=DEFAULT_LIVE_PAIRED_ROOT,
+        help=f"current candidate unit root (default: {DEFAULT_LIVE_PAIRED_ROOT})",
+    )
+    parser.add_argument(
+        "--live-base-root",
+        type=Path,
+        default=DEFAULT_LIVE_BASE_ROOT,
+        help=f"current retail unit root (default: {DEFAULT_LIVE_BASE_ROOT})",
+    )
+    parser.add_argument(
+        "--symbols",
+        type=Path,
+        default=DEFAULT_SYMBOLS,
+        help=f"function RVA inventory (default: {DEFAULT_SYMBOLS})",
+    )
     return parser.parse_args(argv)
 
 
@@ -632,11 +845,20 @@ def main(argv: Sequence[str] | None = None) -> int:
                 file=sys.stderr,
             )
             return 2
-    report = scan(
+    retained_report = scan(
         args.roots,
         executable=args.objdiff_cli,
         refresh=args.refresh,
     )
+    live_report = None
+    if args.live:
+        live_report = scan_live(
+            args.live_paired_root,
+            args.live_base_root,
+            args.symbols,
+            executable=args.objdiff_cli,
+        )
+    report = merge_reports(retained_report, live_report)
     if args.format == "json":
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
@@ -646,9 +868,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 f"warning: {error['artifact']}: {error['error']}",
                 file=sys.stderr,
             )
+        if args.live:
+            summary = (
+                f"scanned {report['scanned_retained_pairs']} retained and "
+                f"{report['scanned_live_pairs']} live pairs"
+            )
+        else:
+            summary = f"scanned {report['scanned_pairs']} retained pairs"
         print(
-            f"scanned {report['scanned_pairs']} retained pairs; "
-            f"found {report['finding_count']} likely bitfield residuals",
+            f"{summary}; found {report['finding_count']} likely bitfield residuals",
             file=sys.stderr,
         )
     return 1 if report["errors"] else 0
