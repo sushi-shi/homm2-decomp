@@ -48,7 +48,14 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Compare raw `llvm-objdump -r` ranges when a provisional boundary confuses the helper.
 6. Use relocation-masked bytes only to isolate code-shape differences. They do not prove
    correctness; ordered relocation identity/addend/destination checks still apply.
-7. For a structurally aligned compiler-state residual, island search is the current
+7. Do not test small evaluation-order, commutative/relational, parenthesization, identifier-
+   spelling, or similar compiler-state-sensitive source changes by editing and compiling them
+   one at a time. Enumerate them with `scripts/match_variants.py` and run a bounded complete
+   permutation matrix. Manual source edits are reserved for evidence-backed structural recovery
+   such as types, fields, scopes, locals, inline accessors, CFG, and switch body order. When a
+   targeted source shape is justified at the first real divergence, add it as a reviewed
+   permuter axis and test it against the clean state and every requested TU-state probe.
+8. For a structurally aligned compiler-state residual, island search is the current
    last-mile policy. Run `scripts/tu_state_noise.py` for an unchanged-source census. When
    several legitimate source shapes must also be tested, use `scripts/match_variants.py` so
    reviewed exact-span choices, conservative AST variants, and TU-state probes are independent
@@ -57,7 +64,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    declaration-forest default, with at least ten varied classes, typedefs, prototypes, and
    functions per trial. Stop at the first audited exact closure. If no exact state appears,
    retain only the best paired object, disassembly, and diff under `build/` as clue evidence.
-8. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
+9. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
    the clean unchanged source, and retain no generated probe declarations or functions. The
    recovery loop performs this migration immediately when an exact target itself contains
@@ -65,12 +72,12 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    score may update the clean function's hash-scoped maximum after source
    restoration; exact closure additionally requires retail size, exact-100 bytes, and complete
    ordered-relocation identity. The reconstructed source remains free of compiler-state hacks.
-9. If the clean-source sweep has no exact island, make one evidence-based targeted source change
+10. If the clean-source sweep has no exact island, make one evidence-based targeted source change
    at the first real divergence, then resweep and compare every resulting island. A legitimate
    change can expose a different compiler-state orbit. Never invent a source change merely to
    perturb the compiler. Generated source is never retained; best compiled clue artifacts may
    remain under `build/`, and a higher sub-100 observation may advance hash-scoped MAX.
-10. Before committing, run `homm2 build`, the focused relocation review, and
+11. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
 
