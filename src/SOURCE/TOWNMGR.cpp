@@ -1876,7 +1876,6 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
     i32 dismissAllowed;
     i32 slot;
     i32 oldValue;
-    CreatureType oldCreature;
 
     switch (command) {
         case ARMY_COMMAND_SELECT:
@@ -1943,10 +1942,11 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             m_pendingStrip->m_army->m_creatureCounts[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot];
             m_swapStrip->m_army->m_creatureCounts[m_swapArmySlot] = oldValue;
-            oldCreature = m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot];
+            oldValue = IDX(m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]);
             m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] =
                 m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot];
-            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] = oldCreature;
+            m_swapStrip->m_army->m_creatureTypes[m_swapArmySlot] =
+                static_cast<CreatureType>(oldValue);
             ResetStrips();
             break;
 
