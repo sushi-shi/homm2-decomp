@@ -108,7 +108,7 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
         directionCountNext = COMBAT_DIRECTION_ADJACENT_COUNT;
 
     for (directionResult = COMBAT_DIRECTION_NORTHEAST;
-         IDX(directionResult) < directionCountNext;
+         directionCountNext > IDX(directionResult);
          directionResult++) {
         if (!ValidAttack(sourceHex, directionResult, targetMode, targetHex, &attackHexNext))
             blockedMaskValue |= directionBitFlag;
