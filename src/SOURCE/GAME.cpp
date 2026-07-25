@@ -1170,50 +1170,50 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
             strcpy(gpGame->m_saveName, filename);
     }
 
-    i32 fileInfo = open(savePathValue, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (fileInfo == -1)
+    i32 handle = open(savePathValue, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (handle == -1)
         FileError(savePathValue);
 
     i32 legacyMarkerTemp = -1;
     if (!expansionFormat)
-        write(fileInfo, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
-    write(fileInfo, &m_worldMap.width, sizeof(m_worldMap.width));
-    write(fileInfo, &m_worldMap.height, sizeof(m_worldMap.height));
-    write(fileInfo, &m_mapHeader, sizeof(m_mapHeader));
-    write(fileInfo, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    write(fileInfo, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(fileInfo, this, sizeof(m_difficultyRating));
-    write(fileInfo, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(fileInfo, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(fileInfo, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(fileInfo, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(fileInfo, cPlayerNames, sizeof(cPlayerNames));
+        write(handle, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
+    write(handle, &m_worldMap.width, sizeof(m_worldMap.width));
+    write(handle, &m_worldMap.height, sizeof(m_worldMap.height));
+    write(handle, &m_mapHeader, sizeof(m_mapHeader));
+    write(handle, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    write(handle, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(handle, this, sizeof(m_difficultyRating));
+    write(handle, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(handle, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(handle, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(handle, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(handle, cPlayerNames, sizeof(cPlayerNames));
 
     char legacyData[SAVE_LEGACY_SCRATCH_SIZE];
     memset(legacyData, 0, SAVE_LEGACY_CLEAR_SIZE);
-    write(fileInfo, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
+    write(handle, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
-        write(fileInfo, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        write(fileInfo, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        write(handle, &campaignTypeInfo, sizeof(campaignTypeInfo));
+        write(handle, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
-        write(fileInfo, &gbInCampaign, sizeof(gbInCampaign));
+        write(handle, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
-            write(fileInfo, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+            write(handle, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
-        write(fileInfo, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        write(handle, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    write(fileInfo, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    write(handle, &giMapChangeCtr, sizeof(giMapChangeCtr));
     GenerateStandardFileName(m_saveName, legacyData);
-    write(fileInfo, legacyData, SAVE_STANDARD_FILENAME_SIZE);
-    write(fileInfo, &m_playerCount, sizeof(m_playerCount));
+    write(handle, legacyData, SAVE_STANDARD_FILENAME_SIZE);
+    write(handle, &m_playerCount, sizeof(m_playerCount));
     char currentPlayerInfo[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
     currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
-    write(fileInfo, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
-    write(fileInfo, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    write(fileInfo, m_playerDead, sizeof(m_playerDead));
+    write(handle, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
+    write(handle, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    write(handle, m_playerDead, sizeof(m_playerDead));
 
     char humanFlagsLocal[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
@@ -1221,66 +1221,66 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         if (m_playerDead[indexFile] != 0)
             humanFlagsLocal[indexFile] = 0;
     }
-    write(fileInfo, humanFlagsLocal, GAME_PLAYER_COUNT);
-    write(fileInfo, &m_day, sizeof(m_day));
-    write(fileInfo, &m_week, sizeof(m_week));
-    write(fileInfo, &m_month, sizeof(m_month));
+    write(handle, humanFlagsLocal, GAME_PLAYER_COUNT);
+    write(handle, &m_day, sizeof(m_day));
+    write(handle, &m_week, sizeof(m_week));
+    write(handle, &m_month, sizeof(m_month));
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
-        m_players[indexFile].Write(fileInfo);
+        m_players[indexFile].Write(handle);
 
-    write(fileInfo, &m_obeliskCount, sizeof(m_obeliskCount));
+    write(handle, &m_obeliskCount, sizeof(m_obeliskCount));
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
-        m_heroRecs[indexFile].Write(fileInfo, !expansionFormat);
-    write(fileInfo, m_availableHeroes, sizeof(m_availableHeroes));
-    write(fileInfo, m_castleRecs, sizeof(m_castleRecs));
-    write(fileInfo, m_castleOwners, sizeof(m_castleOwners));
-    write(fileInfo, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    write(fileInfo, m_mines, sizeof(m_mines));
-    write(fileInfo, m_mineOwners, sizeof(m_mineOwners));
+        m_heroRecs[indexFile].Write(handle, !expansionFormat);
+    write(handle, m_availableHeroes, sizeof(m_availableHeroes));
+    write(handle, m_castleRecs, sizeof(m_castleRecs));
+    write(handle, m_castleOwners, sizeof(m_castleOwners));
+    write(handle, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    write(handle, m_mines, sizeof(m_mines));
+    write(handle, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
-        write(fileInfo, m_randomArtifacts, IDX(ARTIFACT_COUNT));
+        write(handle, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
-        write(fileInfo, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    write(fileInfo, m_boats, sizeof(m_boats));
-    write(fileInfo, m_boatSlots, sizeof(m_boatSlots));
-    write(fileInfo, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    write(fileInfo, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    write(fileInfo, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    write(fileInfo, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    write(fileInfo, m_rumour, sizeof(m_rumour));
-    write(fileInfo, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+        write(handle, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    write(handle, m_boats, sizeof(m_boats));
+    write(handle, m_boatSlots, sizeof(m_boatSlots));
+    write(handle, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    write(handle, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    write(handle, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    write(handle, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    write(handle, m_rumour, sizeof(m_rumour));
+    write(handle, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
     // Each legacy event header persists the count and the first index word.
-    write(fileInfo, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(handle, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     write(
-        fileInfo,
+        handle,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    write(fileInfo, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(fileInfo, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    write(fileInfo, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(fileInfo, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    write(handle, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(handle, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    write(handle, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(handle, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
     i32 markerBuffer[SAVE_MARKER_SCRATCH_COUNT];
     markerBuffer[0] = GAME_FILE_MARKER;
     i32 unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
-    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
-    write(fileInfo, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
+    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    write(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    write(handle, markerBuffer, sizeof(markerBuffer[0]));
     for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
-        write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
-        write(fileInfo, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
+        write(handle, markerBuffer, sizeof(markerBuffer[0]));
+        write(handle, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
         if (ppMapExtra[indexFile] != NULL)
-            write(fileInfo, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
+            write(handle, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
         else
-            write(fileInfo, emptyPayload, pwSizeOfMapExtra[indexFile]);
+            write(handle, emptyPayload, pwSizeOfMapExtra[indexFile]);
     }
-    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
-    write(fileInfo, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
-    m_worldMap.Write(fileInfo);
-    write(fileInfo, markerBuffer, sizeof(markerBuffer[0]));
-    close(fileInfo);
+    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    write(handle, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    m_worldMap.Write(handle);
+    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    close(handle);
     H2_FREE_AT(emptyPayload, DATA_COMPGEN(0x004f716c, saveGameSourceFile2, RETAIL_FILE), gSaveSourceLine + 0xed);
     return 1;
 }
