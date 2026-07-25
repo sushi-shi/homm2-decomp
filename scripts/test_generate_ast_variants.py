@@ -153,6 +153,13 @@ class AstVariantGenerationTests(unittest.TestCase):
         self.assertEqual(len(candidates), 1)
         self.assertTrue(required <= set(candidates[0]["name"].split("+")))
 
+    def test_zero_depth_emits_unchanged_ast_source_shape(self):
+        candidates, truncated = candidate_payloads(
+            b"unchanged", [], 0, 2, min_depth=0
+        )
+        self.assertFalse(truncated)
+        self.assertEqual(candidates, [{"name": "baseline", "families": [], "edits": []}])
+
     def test_character_offsets_are_converted_for_utf8_manifests(self):
         text = "// en dash –\nVA()\n"
         character_offset = text.index("VA")
