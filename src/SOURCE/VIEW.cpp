@@ -240,63 +240,63 @@ i32 combatManager::ViewGeneral(
 
 VA(0x0040c433, 0x351)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
-    i16 messageConstant1;
-    i16 messageConstant2;
-    i16 messageConstant3;
-    i16 messageConstant4;
-    i16 messageConstant0;
-    i16 messageConstant1B;
-    i16 messageConstant7;
-    i16 messageConstant8;
-    i16 messageConstant9;
-    i16 messageConstant10;
-    i16 messageConstant11;
-    i16 messageConstant12;
-    i16 messageConstant13;
-    i16 messageConstant14;
-    i32 handled;
-    i32 helpIndex;
-    i32 hintIndex;
-    messageConstant1 = GENERAL_NAME_WIDGET;
-    messageConstant2 = GENERAL_PORTRAIT_WIDGET;
-    messageConstant3 = GENERAL_COLOR_WIDGET;
-    messageConstant4 = GENERAL_STATS_WIDGET;
-    messageConstant0 = GENERAL_CONTROL_NONE;
-    messageConstant1B = GENERAL_NAME_WIDGET;
-    messageConstant7 = GENERAL_CONTROL_SEVEN;
-    messageConstant8 = GENERAL_CONTROL_EIGHT;
-    messageConstant9 = GENERAL_CONTROL_NINE;
-    messageConstant10 = GENERAL_CLOSE;
-    messageConstant11 = GENERAL_RETREAT;
-    messageConstant12 = GENERAL_SURRENDER;
-    messageConstant13 = GENERAL_CONTROL_THIRTEEN;
-    messageConstant14 = GENERAL_CONTROL_FOURTEEN;
-    handled = 0;
+    i16 msgConst;
+    i16 msgConst27;
+    i16 msgConst0;
+    i16 msgConst28;
+    i16 msgConst71;
+    i32 handled3;
+    i16 msgConst65;
+    i16 msgConst59;
+    i16 msgConst31;
+    i16 msgConst25;
+    i16 msgConst19;
+    i32 helpIndex36;
+    i32 hintIndex11;
+    i16 msgConst72;
+    i16 msgConst66;
+    i16 msgConst32;
+    i16 msgConst26;
+    msgConst59 = GENERAL_NAME_WIDGET;
+    msgConst72 = GENERAL_PORTRAIT_WIDGET;
+    msgConst65 = GENERAL_COLOR_WIDGET;
+    msgConst25 = GENERAL_STATS_WIDGET;
+    msgConst66 = GENERAL_CONTROL_NONE;
+    msgConst28 = GENERAL_NAME_WIDGET;
+    msgConst19 = GENERAL_CONTROL_SEVEN;
+    msgConst32 = GENERAL_CONTROL_EIGHT;
+    msgConst27 = GENERAL_CONTROL_NINE;
+    msgConst26 = GENERAL_CLOSE;
+    msgConst0 = GENERAL_RETREAT;
+    msgConst71 = GENERAL_SURRENDER;
+    msgConst = GENERAL_CONTROL_THIRTEEN;
+    msgConst31 = GENERAL_CONTROL_FOURTEEN;
+    handled3 = 0;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
             if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
-                helpIndex = -1;
+                helpIndex36 = -1;
                 if (message.payload.widget.command != WIDGET_COMMAND_SELECT
                     && message.payload.widget.command != WIDGET_COMMAND_ALTERNATE_SELECT)
                     break;
                 switch (message.payload.widget.id) {
                     case GENERAL_CLOSE:
-                        helpIndex = GENERAL_LONG_HELP_CLOSE;
+                        helpIndex36 = GENERAL_LONG_HELP_CLOSE;
                         break;
                     case GENERAL_RETREAT:
-                        helpIndex = GENERAL_LONG_HELP_RETREAT;
+                        helpIndex36 = GENERAL_LONG_HELP_RETREAT;
                         break;
                     case GENERAL_SURRENDER:
-                        helpIndex = GENERAL_LONG_HELP_SURRENDER;
+                        helpIndex36 = GENERAL_LONG_HELP_SURRENDER;
                         break;
                     case GENERAL_CAST_SPELL:
-                        helpIndex = GENERAL_LONG_HELP_CAST;
+                        helpIndex36 = GENERAL_LONG_HELP_CAST;
                         break;
                 }
-                if (helpIndex != -1)
+                if (helpIndex36 != -1)
                     NormalDialog(
-                        cViewGeneralLongHelp[helpIndex],
+                        cViewGeneralLongHelp[helpIndex36],
                         NORMAL_DIALOG_QUICK_VIEW,
                         -1,
                         -1,
@@ -316,7 +316,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
                             case GENERAL_SURRENDER:
                             case GENERAL_CAST_SPELL:
                                 gpWindowManager->m_dialogResult = message.payload.widget.id;
-                                handled = 1;
+                                handled3 = 1;
                                 break;
                         }
                         break;
@@ -330,28 +330,28 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
             gpWindowManager->m_lastHoverId = message.payload.hover.id;
             switch (message.payload.hover.id) {
                 case GENERAL_CLOSE:
-                    hintIndex = GENERAL_HOVER_HELP_CLOSE;
+                    hintIndex11 = GENERAL_HOVER_HELP_CLOSE;
                     break;
                 case GENERAL_RETREAT:
-                    hintIndex = GENERAL_HOVER_HELP_RETREAT;
+                    hintIndex11 = GENERAL_HOVER_HELP_RETREAT;
                     break;
                 case GENERAL_SURRENDER:
-                    hintIndex = GENERAL_HOVER_HELP_SURRENDER;
+                    hintIndex11 = GENERAL_HOVER_HELP_SURRENDER;
                     break;
                 case GENERAL_CAST_SPELL:
-                    hintIndex = GENERAL_HOVER_HELP_CAST;
+                    hintIndex11 = GENERAL_HOVER_HELP_CAST;
                     break;
                 default:
-                    hintIndex = GENERAL_HOVER_HELP_HERO;
+                    hintIndex11 = GENERAL_HOVER_HELP_HERO;
                     break;
             }
-            if (hintIndex == GENERAL_HOVER_HELP_HERO
+            if (hintIndex11 == GENERAL_HOVER_HELP_HERO
                 && gpCombatManager->m_heroes[IDX(iViewGeneralWhichSide)]->m_isCaptain)
-                hintIndex = GENERAL_HOVER_HELP_CAPTAIN;
-            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex], 1, 0, 0);
+                hintIndex11 = GENERAL_HOVER_HELP_CAPTAIN;
+            gpCombatManager->CombatMessage(cViewGeneralHelp[hintIndex11], 1, 0, 0);
             break;
     }
-    if (handled) {
+    if (handled3) {
         message.payload.widget.id = GENERAL_CLOSE;
         message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
