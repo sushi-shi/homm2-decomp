@@ -6137,7 +6137,8 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 armyValue7;
 
     cursedArtifactCount2 = 0;
-    siteType0 = cell->m_tentColor & GENERIC_SITE_TYPE_MASK;
+    siteType0 = cell->m_tentColor;
+    siteType0 &= GENERIC_SITE_TYPE_MASK;
     siteLevel5 = cell->m_tentColor;
     siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
     value1 = 0;

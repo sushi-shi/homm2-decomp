@@ -105,7 +105,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             m_flags = flags | WIDGET_FLAG_SELECTED;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
             SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
             return MESSAGE_DISPATCH_FORWARD;
         }
@@ -115,7 +115,7 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
             if (HAS(flags, WIDGET_FLAG_SELECTED)) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
