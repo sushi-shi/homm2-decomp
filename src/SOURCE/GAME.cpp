@@ -6791,12 +6791,12 @@ i32 game::ReceiveSaveGame(
     if (!result)
         ShutDown(NULL);
 
-    received = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f7830, receiveSaveGameSourceFile, RETAIL_FILE), 7008));
+    received = static_cast<char*>(H2_ALLOC_AT(REMOTE_PACKET_TRACKING_CAPACITY, DATA_COMPGEN(0x004f7830, receiveSaveGameSourceFile, RETAIL_FILE), gReceiveSourceLine + 0x33));
     memset(received, 0, REMOTE_PACKET_TRACKING_CAPACITY);
     if (gbUseRegularCompression)
-        decodedData = static_cast<u8*>(H2_ALLOC_AT(REMOTE_DECODE_BUFFER_SIZE, DATA_COMPGEN(0x004f7858, receiveSaveGameSourceFile2, RETAIL_FILE), 7012));
-    ackBuffer = static_cast<u8*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7880, receiveSaveGameSourceFile3, RETAIL_FILE), 7014));
-    incomingData = static_cast<u8*>(H2_ALLOC_AT(dataSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f78a8, receiveSaveGameSourceFile4, RETAIL_FILE), 7015));
+        decodedData = static_cast<u8*>(H2_ALLOC_AT(REMOTE_DECODE_BUFFER_SIZE, DATA_COMPGEN(0x004f7858, receiveSaveGameSourceFile2, RETAIL_FILE), gReceiveSourceLine + 0x37));
+    ackBuffer = static_cast<u8*>(H2_ALLOC_AT(REMOTE_HEADER_CAPACITY, DATA_COMPGEN(0x004f7880, receiveSaveGameSourceFile3, RETAIL_FILE), gReceiveSourceLine + 0x39));
+    incomingData = static_cast<u8*>(H2_ALLOC_AT(dataSize + REMOTE_BUFFER_EXTRA, DATA_COMPGEN(0x004f78a8, receiveSaveGameSourceFile4, RETAIL_FILE), gReceiveSourceLine + 0x3a));
 
     lastPacketTime = KBTickCount();
     LogInt(
@@ -6923,13 +6923,13 @@ i32 game::ReceiveSaveGame(
     success = 1;
 
     if (received)
-        H2_FREE_AT(received, DATA_COMPGEN(0x004f7940, receiveSaveGameSourceFile5, RETAIL_FILE), 7118);
+        H2_FREE_AT(received, DATA_COMPGEN(0x004f7940, receiveSaveGameSourceFile5, RETAIL_FILE), gReceiveSourceLine + 0xa1);
     if (ackBuffer)
-        H2_FREE_AT(ackBuffer, DATA_COMPGEN(0x004f7968, receiveSaveGameSourceFile6, RETAIL_FILE), 7119);
+        H2_FREE_AT(ackBuffer, DATA_COMPGEN(0x004f7968, receiveSaveGameSourceFile6, RETAIL_FILE), gReceiveSourceLine + 0xa2);
     if (incomingData)
-        H2_FREE_AT(incomingData, DATA_COMPGEN(0x004f7990, receiveSaveGameSourceFile7, RETAIL_FILE), 7120);
+        H2_FREE_AT(incomingData, DATA_COMPGEN(0x004f7990, receiveSaveGameSourceFile7, RETAIL_FILE), gReceiveSourceLine + 0xa3);
     if (decodedData && incomingData != decodedData)
-        H2_FREE_AT(decodedData, DATA_COMPGEN(0x004f79b8, receiveSaveGameSourceFile8, RETAIL_FILE), 7121);
+        H2_FREE_AT(decodedData, DATA_COMPGEN(0x004f79b8, receiveSaveGameSourceFile8, RETAIL_FILE), gReceiveSourceLine + 0xa4);
 
     CreateJoinFile(gConfig.rmtRLName, gConfig.rmtRDName, gConfig.rmtRCName);
     AiPrint(const_cast<char*>(DATA_COMPGEN(0x004f79e0, receiveSaveGameReceiveEnd, "Receive End")));
