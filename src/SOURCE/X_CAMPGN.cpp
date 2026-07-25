@@ -1032,29 +1032,29 @@ void ExpCampaign::ReplaySmacker(void) {
 
 VA(0x004bd2a5, 0xf8)
 void ExpCampaign::ReplaySmacker1(void) {
-    switch (m_viewMap) {
-        case MAP_POL_UPRISING:
+    switch (m_viewMap + 1) {
+        case MAP_POL_UPRISING + 1:
             PlaySmacker(SMACKER_POL_INTRO);
             break;
-        case MAP_POL_ISLAND_OF_CHAOS:
+        case MAP_POL_ISLAND_OF_CHAOS + 1:
             PlaySmacker(SMACKER_POL_UPRISING);
             break;
-        case MAP_POL_ARROWS_FLIGHT:
+        case MAP_POL_ARROWS_FLIGHT + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case MAP_POL_ABYSS:
+        case MAP_POL_ABYSS + 1:
             PlaySmacker(SMACKER_POL_ISLAND_OF_CHAOS);
             break;
-        case MAP_POL_GIANTS_PASS:
+        case MAP_POL_GIANTS_PASS + 1:
             PlaySmacker(SMACKER_POL_ARROWS_FLIGHT);
             break;
-        case MAP_POL_AURORA_BOREALIS:
+        case MAP_POL_AURORA_BOREALIS + 1:
             PlaySmacker(SMACKER_POL_BRANCH_REUNITED);
             break;
-        case MAP_POL_BETRAYALS_END:
+        case MAP_POL_BETRAYALS_END + 1:
             PlaySmacker(SMACKER_POL_AURORA_BOREALIS);
             break;
-        case MAP_POL_CORRUPTIONS_HEART:
+        case MAP_POL_CORRUPTIONS_HEART + 1:
             if (m_mapsPlayed[IDX(MAP_POL_BETRAYALS_END)])
                 PlaySmacker(SMACKER_POL_BETRAYALS_END);
             else
@@ -1065,29 +1065,29 @@ void ExpCampaign::ReplaySmacker1(void) {
 
 VA(0x004bd39d, 0xd9)
 void ExpCampaign::ReplaySmacker2(void) {
-    switch (m_viewMap) {
-        case MAP_DES_CONQUER_AND_UNIFY:
+    switch (m_viewMap + 1) {
+        case MAP_DES_CONQUER_AND_UNIFY + 1:
             PlaySmacker(SMACKER_DES_INTRO);
             break;
-        case MAP_DES_BORDER_TOWNS:
+        case MAP_DES_BORDER_TOWNS + 1:
             PlaySmacker(SMACKER_DES_CONQUER_AND_UNIFY);
             break;
-        case MAP_DES_WAYWARD_SON:
+        case MAP_DES_WAYWARD_SON + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case MAP_DES_UNCLE_IVAN:
+        case MAP_DES_UNCLE_IVAN + 1:
             PlaySmacker(SMACKER_DES_BORDER_TOWNS);
             break;
-        case MAP_DES_SOUTHERN_WAR:
+        case MAP_DES_SOUTHERN_WAR + 1:
             PlaySmacker(SMACKER_DES_FAMILY_REUNITED);
             break;
-        case MAP_DES_IVORY_GATES:
+        case MAP_DES_IVORY_GATES + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case MAP_DES_ELVEN_LANDS:
+        case MAP_DES_ELVEN_LANDS + 1:
             PlaySmacker(SMACKER_DES_SOUTHERN_WAR);
             break;
-        case MAP_DES_EPIC_BATTLE:
+        case MAP_DES_EPIC_BATTLE + 1:
             PlaySmacker(SMACKER_DES_BRANCH_REUNITED);
             break;
     }
@@ -1095,17 +1095,17 @@ void ExpCampaign::ReplaySmacker2(void) {
 
 VA(0x004bd476, 0xac)
 void ExpCampaign::ReplaySmacker3(void) {
-    switch (m_viewMap) {
-        case MAP_WIZ_SHROUDED_ISLES:
+    switch (m_viewMap + 1) {
+        case MAP_WIZ_SHROUDED_ISLES + 1:
             PlaySmacker(SMACKER_WIZ_INTRO);
             break;
-        case MAP_WIZ_ETERNAL_SCROLLS:
+        case MAP_WIZ_ETERNAL_SCROLLS + 1:
             PlaySmacker(SMACKER_WIZ_SHROUDED_ISLES);
             break;
-        case MAP_WIZ_POWERS_END:
+        case MAP_WIZ_POWERS_END + 1:
             PlaySmacker(SMACKER_WIZ_ETERNAL_SCROLLS);
             break;
-        case MAP_WIZ_FOUNT_OF_WIZARDRY:
+        case MAP_WIZ_FOUNT_OF_WIZARDRY + 1:
             if (m_mapsPlayed[IDX(MAP_WIZ_POWERS_END)])
                 PlaySmacker(SMACKER_WIZ_POWERS_END);
             else
@@ -1116,17 +1116,17 @@ void ExpCampaign::ReplaySmacker3(void) {
 
 VA(0x004bd522, 0x88)
 void ExpCampaign::ReplaySmacker4(void) {
-    switch (m_viewMap) {
-        case MAP_VOY_STRANDED:
+    switch (m_viewMap + 1) {
+        case MAP_VOY_STRANDED + 1:
             PlaySmacker(SMACKER_VOY_INTRO);
             break;
-        case MAP_VOY_PIRATE_ISLES:
+        case MAP_VOY_PIRATE_ISLES + 1:
             PlaySmacker(SMACKER_VOY_STRANDED);
             break;
-        case MAP_VOY_KING_AND_COUNTRY:
+        case MAP_VOY_KING_AND_COUNTRY + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
             break;
-        case MAP_VOY_BLOOD_IS_THICKER:
+        case MAP_VOY_BLOOD_IS_THICKER + 1:
             PlaySmacker(SMACKER_VOY_PIRATE_ISLES);
     }
 }
