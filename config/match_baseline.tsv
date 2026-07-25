@@ -1035,7 +1035,7 @@ SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	100.0000	22490b6df2b5
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	86c2e46cc8b4
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	23359cf8de69
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	32e7cc8e72ad
-SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	98.1373	32f3d169e43f
+SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	99.9254	186ae4724ee0
 SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	98.8953	43376283bae1
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	4ac561d35c85
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	c70e28449273

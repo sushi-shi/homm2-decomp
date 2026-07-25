@@ -1515,9 +1515,8 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
-                selectedHero13->DoSSLevelDialog(
-                    selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST), quickView
-                );
+                i32 ssLevel = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
+                selectedHero13->DoSSLevelDialog(ssLevel, quickView);
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {
