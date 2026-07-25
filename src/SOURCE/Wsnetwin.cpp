@@ -344,7 +344,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     tag_message windowMessage;
     i32 player;
 
-    switch (static_cast<NetworkPacketType>(static_cast<u8>(rcvBufIn[0]))) {
+    switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
             ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC_AT(
                 size - 1, DATA_COMPGEN(0x004ed864, wsEvaluateMessageSourceFile, RETAIL_FILE),
@@ -422,7 +422,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
                 cWSTextBuffer,
                 DATA_COMPGEN(0x004ed8b4, wsEvaluateMessageTheHostAlreadyHasAGame, "The Host already has a game in progress and is not accepting new players.")
             );
-            ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_INFO);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
@@ -439,7 +439,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
             sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed930, wsEvaluateMessageUnknownMessageD, "Unknown message: %d\n"), static_cast<i32>(rcvBufIn[0]));
             if (giDebugLevel > 0) {
                 sprintf(gText, cWSTextBuffer);
-                ShowPlainDialog(gText, NORMAL_DIALOG_INFO);
+                NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             }
             LogStr(cWSTextBuffer);
             break;
@@ -501,7 +501,7 @@ i32 wsWaitForHost(void) {
             iWSAttempts++;
             if (iWSAttempts > WS_TRANSPORT_HOST_RETRY_LIMIT) {
                 sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed9b8, wsWaitForHostTheHostIsNotRespondingKeep, "The Host is not responding.  Keep waiting?"));
-                ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult != NORMAL_DIALOG_BUTTON_FIVE)
                     ShutDown(NULL);
                 iWSAttempts = 0;
