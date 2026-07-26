@@ -11,8 +11,8 @@
 // lower island: 86.934510%, size 1341, relocations 84/83, blocks 76/76.
 // The clipped-root form received 50 trials (38 states); trial 14 returned to
 // 87.035260%, but none beat official MAX 87.0479%.
-// Disposition: retained block-local declarations. The retail mov/test pattern
-// is not selected by these lifetime or scope families at this TU state.
+// Disposition: retained block-local declarations on master. The clipped-root
+// shape remains an active branch seed for deeper structural descendants.
 
 #if 0
 // Near-use assignment arm.

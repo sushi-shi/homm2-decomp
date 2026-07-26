@@ -33,10 +33,11 @@ by one census file because they do not alter the effective function source.
 | `command-and-run-inline-boundaries.cpp` | command reader × shared run visibility, four clean structures | 87.035260% baseline | rejected |
 | `dim-pixel-inline-boundaries.cpp` | unclipped/clipped dim-pixel helper placement, four clean structures | 87.035260% baseline | rejected |
 | `dim-loop-forms.cpp` | independent `do-while`/`while`/`for` forms, nine clean structures | byte-identical | exhausted |
-| `literal-loop-forms.cpp` | five unclipped copy-loop forms; forward-index × 50 states | 87.035260% island | rejected below MAX |
+| `literal-loop-forms.cpp` | five unclipped copy-loop forms; forward-index × 50 states | 87.035260% island | active branch seed |
 | `clipped-literal-loop-forms.cpp` | `cn`/`copyCount`, countdown/index, five clean structures | byte-identical | exhausted |
 | `no-goto-negative-run-dispatch.cpp` | `fillRun` decision replacing all fill/dim labels | 84.113350% | rejected topology |
-| `dim-count-lifetime-and-scope.cpp` | 16 near-use forms + five declaration scopes; clipped-root × 50 states | 87.035260% island | rejected below MAX |
+| `dim-count-lifetime-and-scope.cpp` | 16 near-use forms + five declaration scopes; clipped-root × 50 states | 87.035260% island | active branch seed |
+| `lower-island-descendants.cpp` | forward-index × clipped-root × run helper, then direct setup descendants | 83.073050–86.833755% | active branch tree |
 | `row-visible-inline.cpp` | shared predicate helper × 50 states | 87.0227% official | retained |
 | `tu-state-censuses.cpp` | unchanged-source/top/target seed censuses | 86.720406% historical best | exhausted for old source |
 
