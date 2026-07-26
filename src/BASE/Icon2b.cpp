@@ -38,9 +38,10 @@ void IconToBitmap(
     i32 color
 ) {
     u8* data = srcIcon->m_data;
-    IconEntry* entry = &srcIcon->Entries()[frame];
-    i32 entryX = entry->x;
-    i32 srcOffset = entry->srcOffset;
+    i32 entryOffset = frame * sizeof(IconEntry);
+    i32 entryX = reinterpret_cast<IconEntry*>(data + entryOffset)->x;
+    i32 srcOffset = reinterpret_cast<IconEntry*>(data + entryOffset)->srcOffset;
+    IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
     u8* cursor = data + srcOffset;
     gIcEntry = entry;
     gIcSrc = cursor;
@@ -50,8 +51,9 @@ void IconToBitmap(
     gIcPitch = dest->m_width;
     gIcY = Y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY
-            || clipY + clipH < entry->h + gIcY) {
+        i32 currentY = gIcY;
+        if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || currentY < clipY
+            || clipY + clipH < entry->h + currentY) {
             clip = ICON_DRAW_CLIP;
             gIcClipR = clipX + clipW - 1;
             gIcClipB = clipY + clipH - 1;
@@ -105,8 +107,10 @@ void IconToBitmap(
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gIcColor, count);
             } else {
+                i32 currentY = gIcY;
                 i32 right;
-                if (clipY <= gIcY && gIcClipB >= gIcY && (right = X + count, clipX < right)
+                if (clipY <= currentY && currentY <= gIcClipB
+                    && (right = X + count, clipX < right)
                     && gIcClipR >= X) {
                     if (clipX <= X) {
                         if (gIcClipR >= right)
@@ -148,8 +152,10 @@ void IconToBitmap(
                 } else {
                     gIcCnt2 = count;
                     gIcDimPal = palette;
+                    i32 currentY = gIcY;
                     i32 right;
-                    if (clipY <= gIcY && gIcClipB >= gIcY && (right = X + count, clipX < right)
+                    if (clipY <= currentY && currentY <= gIcClipB
+                        && (right = X + count, clipX < right)
                         && gIcClipR >= X) {
                         u32 cn;
                         u8* dst;
@@ -199,7 +205,8 @@ void IconToBitmap(
                     copyDst = row + X;
                     copySrc = gIcSrc;
                 } else {
-                    if (gIcY < clipY || gIcClipB < gIcY)
+                    i32 currentY = gIcY;
+                    if (currentY < clipY || gIcClipB < currentY)
                         break;
                     right = X + cmd;
                     if (right <= clipX || gIcClipR < X)
