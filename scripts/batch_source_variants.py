@@ -50,6 +50,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from homm2.analysis.disasm import _branch_kind, _cfg, _objdump
 from tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
@@ -106,6 +107,35 @@ def result_rank(row: dict, retail_size: int, retail_relocs: int):
         abs(row["candidate_relocs"] - retail_relocs),
         row["trial"],
     )
+
+
+def cfg_metrics(candidate_cfg, retail_cfg) -> dict:
+    """Return the index-aligned structural signals shown by ``disasm --blocks``."""
+    counts = {
+        "exact": 0,
+        "size_only": 0,
+        "target_shift": 0,
+        "flow_kind": 0,
+        "missing": 0,
+    }
+    for index in range(max(len(candidate_cfg), len(retail_cfg))):
+        if index >= len(candidate_cfg) or index >= len(retail_cfg):
+            counts["missing"] += 1
+            continue
+        candidate_body, candidate_term = candidate_cfg[index][1:]
+        retail_body, retail_term = retail_cfg[index][1:]
+        same_size = len(candidate_body) == len(retail_body)
+        if candidate_term == retail_term:
+            counts["exact" if same_size else "size_only"] += 1
+        elif _branch_kind(candidate_term, index) == _branch_kind(retail_term, index):
+            counts["target_shift"] += 1
+        else:
+            counts["flow_kind"] += 1
+    return {
+        "candidate_blocks": len(candidate_cfg),
+        "retail_blocks": len(retail_cfg),
+        **counts,
+    }
 
 
 def parse_axis_extra_edit(raw_edit: dict, original: bytes, axis_name: str, option_name: str) -> Edit:
@@ -451,6 +481,7 @@ def main(argv=None) -> int:
     retail_target = retail_metrics.get(target.symbol)
     if retail_target is None:
         parser.error(f"target symbol absent from retail object: {target.symbol}")
+    retail_cfg = _cfg(_objdump(target_obj, target.symbol, target.retail_size, 0))
 
     results = []
     states = {}
@@ -504,6 +535,10 @@ def main(argv=None) -> int:
                 "candidate_relocs": baseline_target["relocs"],
                 "text_sha": baseline_target["text_sha"],
                 "reloc_sha": baseline_target["reloc_sha"],
+                "blocks": cfg_metrics(
+                    _cfg(_objdump(baseline_obj, target.symbol, target.retail_size, 0)),
+                    retail_cfg,
+                ),
             }
             print(
                 f"baseline {baseline_score:.6f}% size {baseline_sizes.get(target.symbol)} "
@@ -600,6 +635,10 @@ def main(argv=None) -> int:
                     "sibling_regressions": sibling_regressions,
                     "exact": not rejections,
                     "exact_rejections": rejections,
+                    "blocks": cfg_metrics(
+                        _cfg(_objdump(candidate_obj, target.symbol, target.retail_size, 0)),
+                        retail_cfg,
+                    ),
                 })
                 results.append(row)
                 state = states.setdefault(state_id, {

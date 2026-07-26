@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from batch_source_variants import (
+    cfg_metrics,
     iter_variants,
     load_manifest,
     render_candidate,
@@ -15,6 +16,33 @@ from batch_source_variants import (
 
 
 class BatchSourceVariantManifestTests(unittest.TestCase):
+    def test_cfg_metrics_separates_size_shift_flow_and_missing(self):
+        candidate = [
+            (0, ["mov", "je"], "jcc B2 | fall B1"),
+            (2, ["ret"], "ret"),
+            (3, ["jmp"], "jmp B1^"),
+            (4, ["nop"], "fall B4"),
+        ]
+        retail = [
+            (0, ["mov", "je"], "jcc B2 | fall B1"),
+            (2, ["mov", "ret"], "ret"),
+            (4, ["jmp"], "jmp B2^"),
+            (5, ["nop"], "ret"),
+            (6, ["ret"], "ret"),
+        ]
+        self.assertEqual(
+            cfg_metrics(candidate, retail),
+            {
+                "candidate_blocks": 4,
+                "retail_blocks": 5,
+                "exact": 1,
+                "size_only": 1,
+                "target_shift": 1,
+                "flow_kind": 1,
+                "missing": 1,
+            },
+        )
+
     def test_result_rank_prefers_score_then_size_relocs_and_trial(self):
         rows = [
             {"score": 99.0, "candidate_size": 101, "candidate_relocs": 4, "trial": 4},
