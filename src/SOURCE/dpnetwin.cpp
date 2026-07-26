@@ -102,8 +102,8 @@ i16 dpnet_init(void) {
         hinstDplayx = LoadLibraryA(DATA_COMPGEN(0x004ef898, dpnetInitDPLAYXDLL, "DPLAYX.DLL"));
         if (hinstDplayx == NULL)
             ShutDown(DATA_COMPGEN(0x004ef8a4, dpnetInitCanTLoadDPLAYXDLL, "Can't load 'DPLAYX.DLL'"));
-        enumerateFunction = NULL;
         createFunction = NULL;
+        enumerateFunction = NULL;
         createFunction = reinterpret_cast<DirectPlayCreateFunction>(
             GetProcAddress(hinstDplayx, DATA_COMPGEN(0x004ef8bc, dpnetInitDirectPlayCreate, "DirectPlayCreate"))
         );
