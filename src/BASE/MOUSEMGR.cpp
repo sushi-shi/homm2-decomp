@@ -291,17 +291,18 @@ void mouseManager::SetPointer(i32 frame) {
                 for (i32 row = 0; row < MOUSE_CURSOR_BITMAP_WIDTH; row++) {
                     for (i32 column = 0; column < MOUSE_CURSOR_BITMAP_WIDTH; column++) {
                         u8* colorBits = static_cast<u8*>(cColorBits[m_cursorSizeIndex]);
-                        u8* andBits = static_cast<u8*>(cAndBits[m_cursorSizeIndex]);
                         if (colorBits[row * MOUSE_CURSOR_BITMAP_WIDTH + column] == 0)
-                            andBits[row * MOUSE_CURSOR_MASK_ROW_BYTES
-                                    + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
+                            static_cast<u8*>(cAndBits[m_cursorSizeIndex])[
+                                row * MOUSE_CURSOR_MASK_ROW_BYTES
+                                + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
                                 1
                                 << (MOUSE_CURSOR_MASK_HIGH_BIT
                                     - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
                         else if (colorBits[row * MOUSE_CURSOR_BITMAP_WIDTH + column] == 1)
-                            andBits[MOUSE_CURSOR_MASK_PLANE_BYTES
-                                    + row * MOUSE_CURSOR_MASK_ROW_BYTES
-                                    + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
+                            static_cast<u8*>(cAndBits[m_cursorSizeIndex])[
+                                MOUSE_CURSOR_MASK_PLANE_BYTES
+                                + row * MOUSE_CURSOR_MASK_ROW_BYTES
+                                + (column >> MOUSE_CURSOR_MASK_SHIFT)] |=
                                 1
                                 << (MOUSE_CURSOR_MASK_HIGH_BIT
                                     - (column & MOUSE_CURSOR_MASK_HIGH_BIT));
