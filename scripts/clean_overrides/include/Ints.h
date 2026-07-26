@@ -39,6 +39,27 @@ typedef unsigned long u32l;
 typedef i32 b32;
 typedef i8 b8;
 
+// Calling conventions remain part of the ABI on 32-bit x86. Keep source-owned
+// callback and function-pointer types compatible with Win32 APIs, and preserve
+// the stack contract of hand-written naked assembly. They collapse naturally
+// on targets whose ABI has only one calling convention.
+#if defined(_MSC_VER)
+#define H2_CDECL __cdecl
+#define H2_STDCALL __stdcall
+#define H2_FASTCALL __fastcall
+#define H2_PASCAL __pascal
+#elif defined(__GNUC__) && defined(__i386__)
+#define H2_CDECL __attribute__((cdecl))
+#define H2_STDCALL __attribute__((stdcall))
+#define H2_FASTCALL __attribute__((fastcall))
+#define H2_PASCAL __attribute__((stdcall))
+#else
+#define H2_CDECL
+#define H2_STDCALL
+#define H2_FASTCALL
+#define H2_PASCAL
+#endif
+
 // Values that can act as a mask or operand alongside a stored domain: plain
 // integers, and other enum domains. Retail encodes several fields as one
 // domain masked by constants belonging to a neighbouring domain -- a map

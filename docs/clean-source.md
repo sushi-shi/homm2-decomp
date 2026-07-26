@@ -11,16 +11,19 @@ built from this source. `scripts/clean_source.py` derives a tree without it.
 
 ```sh
 python3 scripts/clean_source.py --out build/clean            # generate
+python3 scripts/clean_source.py --out build/clean --verify \
+  --compat-include ../homm2-decomp-port/include/COMPAT       # native syntax check
 python3 scripts/clean_source.py --out build/clean --publish  # ...and commit to `clean`
 ```
 
 ## Why it is safe
 
-Every rule reproduces the *production* expansion of its macro — the expansion
-MSVC 4.2 already performs when building the matching objects. The transform is
-therefore semantics-preserving by construction rather than by inspection. Keep
-the rule table in step with `include/va.h` and `include/Ints.h`; that agreement
-is the entire correctness argument.
+Metadata and codegen-steering rules reproduce the *production* expansion of
+their macros — the expansion MSVC 4.2 already performs when building matching
+objects. The enum rules deliberately select the strict typed branch, `SIZE`
+becomes a native `static_assert`, and the two documented native behaviour
+patches are explicit exceptions. Keep the rule table and its regression tests in
+step with `include/va.h` and `include/Ints.h`.
 
 The implementation is a lexer, not a set of regexes. It tracks comments and
 string and character literals, and matches balanced parentheses, so it never
@@ -36,18 +39,24 @@ Two self-checks run after generation and fail the run:
   because a lone `;` is also legitimate — the game writes `if (easy) ;` to leave
   a branch of an if/else chain empty.
 
+Generation also fails closed before recursive deletion. Output inside the
+repository must be a child of `build/`; every existing output directory must
+carry the generator marker from a previous run; and a Git worktree is never a
+valid output target.
+
 ## What it produces
 
-| Construct | Sites | Becomes |
-|---|---:|---|
-| `DATA_COMPGEN(addr, name, value)` | 5142 | `value` |
-| `IDX(x)`, `HAS(f,b)`, `BIT(x)` | 5810 | the expression itself |
-| `VA(...)`, `DATA(...)`, `VTBL(...)` | 2868 | deleted |
-| `H2_ENUM_*` declarations | 1443 | real `enum class` declarations |
-| `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | 282 | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
-| `RETAIL_FILE`, `#line N` | 366 | deleted; `__FILE__` where a file operand remains |
-| `OD_STEER(x)`, `OR_STEER(x)` | 96 | `x` |
-| `__fastcall`, `__cdecl`, `__declspec(dllexport)`, `OVERRIDE`, `register` | 121 | deleted, or `override` |
+| Construct | Becomes |
+|---|---|
+| `DATA_COMPGEN(addr, name, value)` | `value` |
+| `IDX(x)`, `HAS(f,b)`, `BIT(x)` | the typed expression |
+| `VA(...)`, `DATA(...)`, `VTBL(...)` | deleted |
+| `H2_ENUM_*` declarations | real `enum class` declarations |
+| `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
+| `RETAIL_FILE`, `#line N` | deleted; `__FILE__` where a file operand remains |
+| `OD_STEER(x)`, `OR_STEER(x)` | `x` |
+| `__fastcall`, `__cdecl`, `__stdcall`, `__pascal` | portable `H2_*CALL` ABI macros |
+| `__declspec(dllexport)`, `OVERRIDE`, `register` | deleted, or `override` |
 
 Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
@@ -57,6 +66,23 @@ Only `include/` and `src/` are carried. The matching toolchain — `configure.py
 `scripts/homm2/`, `config/units.toml`, the delinker and objdiff plumbing — is
 deliberately absent, because none of it means anything to a consumer of the
 source. Anything a downstream branch needs to build with, it adds itself.
+
+Explicit calling conventions are not matching scaffolding. On 32-bit Win32
+they determine stack cleanup, argument passing, and function-pointer
+compatibility. The generated `Ints.h` maps them to MSVC keywords or GNU/Clang
+i386 attributes, preserving contracts such as `DirectDrawCreateProc`, NetBIOS
+post routines, `WinMain`, and the cdecl naked-assembly blitters.
+
+`--publish` accepts only a clean source checkout and either creates a new
+generated branch or advances a branch whose tip already carries the generator
+provenance marker. It refuses dirty generated worktrees, stages only `include/`
+and `src/`, and records unchanged output with an empty descendant commit instead
+of rewriting published history.
+
+With the port compatibility headers, the verifier compiles 93 of the 95
+translation units for i686 Linux. The only accepted failures are `BITS.cpp` and
+`TILE.cpp`, which contain hand-written MSVC assembly and are replaced by portable
+implementations in the native port. Any other failure makes verification fail.
 
 ## Type information is preserved, not discarded
 
