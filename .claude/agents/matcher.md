@@ -53,7 +53,9 @@ line records.
 
 1. **Pull the target's retail bytes.** Prefer **`homm2 sema`** for navigation (semantic;
    grep is lexical): `homm2 sema disasm <rva> --diff` (our compiled vs retail asm, side by
-   side), `homm2 sema xref <rva>` (callers/callees), `homm2 sema strings <rva>`, `homm2 sema rva <rva>` (claim/src/match dossier) —
+   side), `homm2 sema disasm <rva> --blocks --diff --lite` (CFG skeleton),
+   `homm2 sema xref <rva>` (callers/callees), `homm2 sema strings <rva>`,
+   `homm2 sema rva <rva>` (claim/src/match dossier) —
    see `homm2 sema -h`. Raw fallback: `llvm-objdump -dr --start-address=<rva>
    --stop-address=<rva+size> build/delink/<TIER>/<TU>.c.obj`. Read the class layout from
    `include/<TIER>/<TU>.h` (already recovered).
@@ -86,6 +88,31 @@ line records.
    > If `cur@-0x4` here is `cur@-0x10` in retail, that's a SLOT-HASH miss → fix the
    > local NAMES with `od_slots` (below), not the logic. This was hidden on
    > GetNewCellExtra* until diffed with displacements on.
+
+## Basic-block workflow: structural versions first
+
+Before any internal-expression permutation matrix or TU-state island sweep, build
+and compare the credible structural versions: high-level branches, loop and
+shared-tail ownership, inline-accessor boundaries, switch body order, and
+early-exit versus single-exit shape. Use:
+
+- `homm2 sema disasm <rva> --blocks --diff --lite` for the compact structural
+  comparison. It reports flow and block-size differences separately.
+- `homm2 sema disasm <rva> --blocks --diff` for normalized instruction diffs inside
+  aligned blocks.
+- `homm2 sema disasm <rva> --blocks --base/--target --lite` for one side's skeleton,
+  or `--blocks --diff --dot` for a graph with differing target blocks highlighted.
+
+Select a retail-compatible semantic CFG family first. Only then enumerate small
+evaluation-order, relational, parenthesization, identifier-spelling, and equivalent
+internal choices with `scripts/match_variants.py`; never compile those changes
+manually one by one.
+
+The emitted block partition is not a correctness invariant. MSVC TU/compiler state
+can split or merge basic blocks for unchanged source, changing block count,
+numbering, and terminators. Re-run `--blocks` on retained state islands and use it
+to classify structural orbits. Matching blocks are diagnostic evidence only; exact
+bytes and complete ordered relocation identity/addends/destinations decide closure.
 
 ## The dominant /Od lever: stack-slot names are SOLVED — compute, don't grind
 
@@ -186,8 +213,8 @@ accessor `jmp $+0` fingerprint — most plateaus are one of these two, both fixa
    it explains an enduring semantic or codegen fact; never record scores, retained maxima, queue
    state, attempted-spelling ledgers, or a completion claim in source.
 3. **During the exhaustive residual audit,** every live non-100% function remains active work.
-   Reproduce all byte and relocation evidence from current objects and use the audited AST permuter
-   where appropriate.
+   Reproduce all block, byte, and relocation evidence from current objects, compare structural
+   versions first, then use the audited AST permuter for small internal transformations.
 4. **Size is not a reason to defer.** Reconstruct large bodies leaf-first, in full.
 
 **Finish every function in your assigned batch** — never leave one un-attempted and never use a

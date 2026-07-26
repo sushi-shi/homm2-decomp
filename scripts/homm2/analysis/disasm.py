@@ -14,6 +14,8 @@ Modes:
   --base     BASE disasm + relocs
   --diff     unified diff of BASE vs TARGET (addresses/byte-columns masked; rc=1 if differ)
   --lite     asm only - no offset column, no byte columns, no reloc lines
+  --blocks   basic-block/CFG view; combines with --base, --target, --diff, and --lite
+  --dot      Graphviz CFG output (requires --blocks)
   --rich     BASE disasm interleaved with the CodeView source line each instr came from
              (implies --base; needs build/lines/<unit>.json from `gen_lines.py`, build shell)
 
@@ -166,14 +168,22 @@ _HEAD = re.compile(r"^\s*([0-9a-f]+):\s*(?:[0-9a-f]{2} ?)*\s*$")
 
 
 def _parse_ins(ln: str):
-    """(code_offset:int, 'mnemonic operands') for an instruction row, else None."""
+    """(code_offset:int, 'mnemonic operands') for an instruction row, else None.
+
+    Accept llvm-objdump's ``offset: bytes<TAB>op<TAB>args`` and GNU objdump's
+    ``offset:<TAB>bytes<TAB>op args`` so retained raw-byte islands can be
+    classified with the same CFG code.
+    """
     if "\t" not in ln:
         return None
     parts = ln.split("\t")
     if not _HEAD.match(parts[0]):
         return None
     off = int(parts[0].split(":", 1)[0].strip(), 16)
-    return off, " ".join(p.strip() for p in parts[1:] if p.strip())
+    body = [part.strip() for part in parts[1:] if part.strip()]
+    if body and re.fullmatch(r"(?:[0-9a-fA-F]{2}\s*)+", body[0]):
+        body.pop(0)
+    return (off, " ".join(body)) if body else None
 
 
 def _lite(text: str) -> str:
@@ -205,6 +215,336 @@ def _norm(text: str) -> list:
     while out and out[-1] == "nop":
         out.pop()  # trailing COMDAT alignment padding (base only)
     return out
+
+
+_JCC = {
+    "jmp", "je", "jne", "jz", "jnz", "ja", "jae", "jb", "jbe", "jc", "jnc",
+    "jg", "jge", "jl", "jle", "js", "jns", "jo", "jno", "jp", "jnp",
+    "jcxz", "jecxz",
+}
+
+
+def _branch_target(text: str, addresses: set[int]) -> int | None:
+    fields = text.lower().split(None, 1)
+    if len(fields) != 2:
+        return None
+    op, operand = fields
+    if op not in _JCC and not op.startswith("loop"):
+        return None
+    match = re.match(r"0x([0-9a-f]+)\b", operand)
+    if not match:
+        return None
+    target = int(match.group(1), 16)
+    return target if target in addresses else None
+
+
+def _mask_insn(text: str) -> str:
+    """Normalize one instruction without hiding stack slots or small constants."""
+    text = re.sub(r"\s+", " ", text.strip().lower())
+    text = re.sub(r"\s*<[^>]*>", "", text)
+    text = re.sub(r"\[\s*0x[0-9a-f]+\s*\]", "[<addr>]", text)
+    text = re.sub(
+        r"^((?:j[a-z]{1,4}|call|loop\w*)\s+)0x[0-9a-f]+\b.*$",
+        r"\1<tgt>",
+        text,
+    )
+    return text
+
+
+def _cfg(text: str):
+    """Return ordered basic blocks as ``(address, body, terminator)`` tuples.
+
+    Terminators use block indices rather than code addresses, making normalized
+    candidate and retail objects comparable. Emitted block count is deliberately
+    diagnostic rather than authoritative: MSVC TU state can split or merge blocks
+    without any source change.
+    """
+    insns = [parsed for line in text.splitlines()
+             if (parsed := _parse_ins(line)) is not None]
+    while insns and insns[-1][1].lower() == "nop":
+        insns.pop()
+    if not insns:
+        return []
+
+    addresses = {address for address, _ in insns}
+    leaders = {insns[0][0]}
+    for i, (address, instruction) in enumerate(insns):
+        op = instruction.lower().split(None, 1)[0]
+        target = _branch_target(instruction, addresses)
+        following = insns[i + 1][0] if i + 1 < len(insns) else None
+        if target is not None:
+            leaders.add(target)
+            # The byte after every branch starts a new block even when an
+            # unconditional jump makes it unreachable. Otherwise alignment
+            # bytes or a private-label body get folded into the jump block and
+            # replace its terminator.
+            if following is not None:
+                leaders.add(following)
+        elif (op == "jmp" or op.startswith("ret") or op in _JCC
+              or op.startswith("loop")) and following is not None:
+            leaders.add(following)
+
+    import bisect
+    order = sorted(leaders)
+    index = {address: i for i, address in enumerate(order)}
+
+    def block_of(address: int) -> int:
+        return bisect.bisect_right(order, address) - 1
+
+    result = [[address, [], None] for address in order]
+    for i, (address, instruction) in enumerate(insns):
+        block = result[block_of(address)]
+        op = instruction.lower().split(None, 1)[0]
+        target = _branch_target(instruction, addresses)
+        following = insns[i + 1][0] if i + 1 < len(insns) else None
+        block[1].append(_mask_insn(instruction))
+        if following is not None and following not in index:
+            continue
+
+        if target is not None:
+            destination = f"B{block_of(target)}" + ("^" if target <= address else "")
+            if op == "jmp":
+                block[2] = f"jmp {destination}"
+            elif following is not None:
+                block[2] = f"jcc {destination} | fall B{block_of(following)}"
+            else:
+                block[2] = f"jcc {destination}"
+        elif op.startswith("ret"):
+            block[2] = "ret"
+        elif op == "jmp":
+            block[2] = "jmp <ext>"
+        elif following is not None:
+            block[2] = f"fall B{block_of(following)}"
+        else:
+            block[2] = "end"
+    return [(address, body, term) for address, body, term in result]
+
+
+def _predecessor_counts(cfg) -> dict[int, int]:
+    counts = {}
+    for _, _, term in cfg:
+        for match in re.finditer(r"B(\d+)", term or ""):
+            target = int(match.group(1))
+            counts[target] = counts.get(target, 0) + 1
+    return counts
+
+
+def _blocks(text: str, lite: bool = False) -> str:
+    """Render one side's CFG, either as a skeleton or with instruction bodies."""
+    cfg = _cfg(text)
+    if not cfg:
+        return "(no instruction rows found)\n"
+    predecessors = _predecessor_counts(cfg)
+    out = []
+    for i, (address, body, term) in enumerate(cfg):
+        tail = "  <== shared tail" if term == "ret" and predecessors.get(i, 0) > 2 else ""
+        loop = "  LOOP" if "^" in (term or "") else ""
+        if lite:
+            first = body[0].split(None, 1)[0] if body else "?"
+            out.append(
+                f"  B{i:<3} @{address:<8x} {len(body):>3}i  "
+                f"[{term}]{loop}{tail}  ({first}..)"
+            )
+            continue
+        out.append("")
+        out.append(
+            f"block B{i} @{address:x}: {len(body)} instruction(s)  [{term}]"
+            f"{loop}{tail}"
+        )
+        out.extend(f"    {instruction}" for instruction in body)
+    return "\n".join(out).lstrip("\n") + "\n"
+
+
+def _branch_kind(term: str | None, at: int) -> str:
+    parts = []
+    for match in re.finditer(r"(jcc|jmp|ret|fall|end)(?: B(\d+)(\^?))?", term or ""):
+        op, target, back = match.groups()
+        if target is None:
+            parts.append(op)
+        else:
+            direction = "^" if back else ">" if int(target) > at else "<"
+            parts.append(op + direction)
+    return " ".join(parts)
+
+
+def _skeleton_diff(base_cfg, target_cfg) -> tuple[str, bool]:
+    """Side-by-side block sizes/terminators with separate flow/size signals."""
+    out = [f"       {'BASE':48} FLOW SIZE TARGET"]
+    same = len(base_cfg) == len(target_cfg)
+    counts = {"exact": 0, "size": 0, "shift": 0, "flow": 0, "missing": 0}
+    first_flow = None
+
+    def summary(cfg, i):
+        if i >= len(cfg):
+            return "-"
+        _, body, term = cfg[i]
+        first = body[0].split(None, 1)[0] if body else "?"
+        last = body[-1].split(None, 1)[0] if body else "?"
+        return f"{len(body):>3}i {first}..{last} [{term}]"
+
+    for i in range(max(len(base_cfg), len(target_cfg))):
+        base, target = summary(base_cfg, i), summary(target_cfg, i)
+        if i >= len(base_cfg) or i >= len(target_cfg):
+            flow_mark, size_mark = "--", "--"
+            counts["missing"] += 1
+            same = False
+        else:
+            base_term, target_term = base_cfg[i][2], target_cfg[i][2]
+            base_kind = _branch_kind(base_term, i)
+            target_kind = _branch_kind(target_term, i)
+            if base_term == target_term:
+                flow_mark = "=="
+            elif base_kind == target_kind:
+                flow_mark = "~="
+                counts["shift"] += 1
+            else:
+                flow_mark = "!!"
+                counts["flow"] += 1
+                if first_flow is None:
+                    first_flow = (i, base_kind, target_kind)
+            size_mark = "==" if len(base_cfg[i][1]) == len(target_cfg[i][1]) else "##"
+            if flow_mark == "==" and size_mark == "==":
+                counts["exact"] += 1
+            elif flow_mark == "==" and size_mark == "##":
+                counts["size"] += 1
+            same &= flow_mark == "==" and size_mark == "=="
+        out.append(
+            f"  B{i:<3} {base:48}  {flow_mark:^4} {size_mark:^4} {target}"
+        )
+
+    out.insert(
+        0,
+        f"[skeleton diff: base {len(base_cfg)} vs target {len(target_cfg)} blocks; "
+        f"{counts['exact']} exact, {counts['size']} size-only, "
+        f"{counts['shift']} target-shift, {counts['flow']} flow-kind, "
+        f"{counts['missing']} missing]",
+    )
+    out.append("[legend: FLOW == exact, ~= same branch kind/direction with shifted "
+               "block target, !! branch-kind mismatch; SIZE ## differs]")
+    if first_flow is not None:
+        i, base_kind, target_kind = first_flow
+        out.append(
+            f"[first branch-kind divergence B{i}: base [{base_kind}] vs "
+            f"target [{target_kind}]]"
+        )
+    return "\n".join(out) + "\n", bool(same)
+
+
+def _blocks_diff(base_text: str, target_text: str) -> tuple[str, bool]:
+    """Block-aligned body diff; exact only when all normalized blocks align."""
+    import difflib
+    base_cfg, target_cfg = _cfg(base_text), _cfg(target_text)
+    base_rows = ["\n".join(body + [term or ""]) for _, body, term in base_cfg]
+    target_rows = ["\n".join(body + [term or ""]) for _, body, term in target_cfg]
+    base_flow = [term or "" for _, _, term in base_cfg]
+    target_flow = [term or "" for _, _, term in target_cfg]
+    out = [
+        f"[block diff: base {len(base_cfg)} blocks vs target {len(target_cfg)} blocks; "
+        f"flow {'SAME' if base_flow == target_flow else 'DIFFERS'}]"
+    ]
+
+    if base_flow != target_flow:
+        base_kinds = [_branch_kind(term, i) for i, term in enumerate(base_flow)]
+        target_kinds = [_branch_kind(term, i) for i, term in enumerate(target_flow)]
+        first = next(
+            (i for i, pair in enumerate(zip(base_kinds, target_kinds))
+             if pair[0] != pair[1]),
+            None,
+        )
+        if first is not None:
+            out.append(
+                f"[skeleton diverges at B{first}: base [{base_flow[first]}] vs "
+                f"target [{target_flow[first]}]]"
+            )
+        elif len(base_kinds) != len(target_kinds):
+            out.append(
+                f"[same branch-kind skeleton for {min(len(base_kinds), len(target_kinds))} "
+                f"shared blocks; {abs(len(base_kinds) - len(target_kinds))} extra block(s)]"
+            )
+        else:
+            out.append("[same branch-kind skeleton; block-index targets differ]")
+
+    matcher = difflib.SequenceMatcher(a=base_rows, b=target_rows, autojunk=False)
+    differences = 0
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            for offset in range(i2 - i1):
+                bi, ti = i1 + offset, j1 + offset
+                out.append(
+                    f"  B{ti} @{base_cfg[bi][0]:x}/@{target_cfg[ti][0]:x}  == "
+                    f"({len(target_cfg[ti][1])} insns)  [{target_cfg[ti][2]}]"
+                )
+            continue
+        for offset in range(max(i2 - i1, j2 - j1)):
+            bi = i1 + offset if i1 + offset < i2 else None
+            ti = j1 + offset if j1 + offset < j2 else None
+            differences += 1
+            if bi is not None and ti is not None:
+                out.append(
+                    f"  B{ti} @{base_cfg[bi][0]:x}/@{target_cfg[ti][0]:x}  DIFFERS:"
+                )
+                diff = difflib.unified_diff(
+                    base_cfg[bi][1] + [base_cfg[bi][2] or ""],
+                    target_cfg[ti][1] + [target_cfg[ti][2] or ""],
+                    lineterm="",
+                    n=2,
+                )
+                out.extend("      " + line for line in diff
+                           if not line.startswith(("---", "+++", "@@")))
+            elif bi is not None:
+                out.append(
+                    f"  -- @{base_cfg[bi][0]:x}  BASE-ONLY "
+                    f"({len(base_cfg[bi][1])} insns) [{base_cfg[bi][2]}]"
+                )
+            else:
+                out.append(
+                    f"  B{ti} @{target_cfg[ti][0]:x}  TARGET-ONLY "
+                    f"({len(target_cfg[ti][1])} insns) [{target_cfg[ti][2]}]"
+                )
+    out.append(f"[{differences} block(s) differ]" if differences
+               else "[all aligned blocks identical]")
+    return "\n".join(out) + "\n", differences == 0 and base_flow == target_flow
+
+
+def _dot(cfg, differing: set[int] | None = None, title: str = "") -> str:
+    """Render a CFG as Graphviz DOT."""
+    def quote(value: str) -> str:
+        return value.replace("\\", "\\\\").replace('"', '\\"')
+
+    predecessors = _predecessor_counts(cfg)
+    out = [
+        "digraph cfg {",
+        '  graph [rankdir=TB, fontname="monospace"'
+        + (f', label="{quote(title)}", labelloc=t' if title else "") + "];",
+        '  node [shape=box, fontname="monospace", fontsize=10];',
+    ]
+    for i, (address, body, term) in enumerate(cfg):
+        first = quote(body[0] if body else "")
+        last = quote(body[-1] if body else "")
+        label = f"B{i} @{address:x} ({len(body)}i)\\l{first}\\l"
+        if len(body) > 1:
+            label += ("...\\l" if len(body) > 2 else "") + f"{last}\\l"
+        attributes = [f'label="{label}"']
+        if term == "ret" and predecessors.get(i, 0) > 2:
+            attributes.append("peripheries=2")
+        if differing is not None:
+            attributes.append(
+                'style=filled, fillcolor="#ffcccc"'
+                if i in differing else 'style=filled, fillcolor="#ccffcc"'
+            )
+        out.append(f"  B{i} [{', '.join(attributes)}];")
+        for match in re.finditer(r"(jcc|jmp|fall) B(\d+)(\^?)", term or ""):
+            kind, target, back = match.groups()
+            edge = []
+            if kind == "fall":
+                edge.append("style=dashed")
+            if back:
+                edge.append("color=red")
+                edge.append("constraint=false")
+            suffix = f" [{', '.join(edge)}]" if edge else ""
+            out.append(f"  B{i} -> B{target}{suffix};")
+    out.append("}")
+    return "\n".join(out) + "\n"
 
 
 def _rich(name: str, unit: str, size: int, ordinal: int) -> str:
@@ -252,7 +592,56 @@ def main():
         die(f"{name} has no unit in symbol_names.csv")
 
     if "--rich" in flags:
+        if "--blocks" in flags:
+            die("--rich does not combine with --blocks")
         print(_rich(name, unit, size, ordinal), end="")
+        sys.exit(0)
+
+    if "--dot" in flags and "--blocks" not in flags:
+        die("--dot requires --blocks")
+
+    if "--blocks" in flags:
+        if "--diff" in flags:
+            base_text = _objdump(
+                NORMAL_BASE / f"{unit}.obj", name, size, ordinal)
+            target_text = _objdump(
+                NORMAL_TARGET / f"{unit}.c.obj", name, size, ordinal)
+            base_cfg, target_cfg = _cfg(base_text), _cfg(target_text)
+            if "--dot" in flags:
+                import difflib
+                base_rows = ["\n".join(body + [term or ""])
+                             for _, body, term in base_cfg]
+                target_rows = ["\n".join(body + [term or ""])
+                               for _, body, term in target_cfg]
+                differing = set(range(len(target_cfg)))
+                matcher = difflib.SequenceMatcher(
+                    a=base_rows, b=target_rows, autojunk=False)
+                for tag, _, _, j1, j2 in matcher.get_opcodes():
+                    if tag == "equal":
+                        differing.difference_update(range(j1, j2))
+                print(_dot(
+                    target_cfg,
+                    differing,
+                    f"0x{rva:08x} TARGET (red = differs from base)",
+                ), end="")
+                sys.exit(0)
+            if "--lite" in flags:
+                output, exact = _skeleton_diff(base_cfg, target_cfg)
+            else:
+                output, exact = _blocks_diff(base_text, target_text)
+            print(output, end="")
+            sys.exit(0 if exact else 1)
+
+        use_base = "--base" in flags
+        side = "BASE (compiled)" if use_base else "TARGET (retail)"
+        obj = BASE / f"{unit}.obj" if use_base else DELINK / f"{unit}.c.obj"
+        text = _objdump(obj, name, size, ordinal)
+        cfg = _cfg(text)
+        if "--dot" in flags:
+            print(_dot(cfg, title=f"0x{rva:08x} {side}"), end="")
+        else:
+            print(f"[basic blocks: {side} @ 0x{rva:08x} {name}]")
+            print(_blocks(text, lite="--lite" in flags), end="")
         sys.exit(0)
 
     if "--diff" in flags:
