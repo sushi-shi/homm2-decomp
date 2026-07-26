@@ -40,10 +40,10 @@ void IconToBitmap(
 
     u8* data = srcIcon->m_data;
     i32 entryOffset = frame * sizeof(IconEntry);
-    i32 entryX = reinterpret_cast<IconEntry*>(data + entryOffset)->x;
-    i32 sourceOffset = reinterpret_cast<IconEntry*>(data + entryOffset)->srcOffset;
-    u8* savedDst;
     IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
+    i32 entryX = entry->x;
+    i32 sourceOffset = entry->srcOffset;
+    u8* savedDst;
     gIcEntry = entry;
     gIcSrc = data + sourceOffset;
     i32 X = entryX + x;
@@ -121,13 +121,11 @@ void IconToBitmap(
                             memset(row + X, gIcColor, fillLen);
                         }
                     } else {
-                        if (gIcClipR >= right) {
+                        if (gIcClipR >= right)
                             fillLen = (count - clipX) + X;
-                            memset(row + clipX, gIcColor, fillLen);
-                        } else {
+                        else
                             fillLen = clipW;
-                            memset(row + clipX, gIcColor, fillLen);
-                        }
+                        memset(row + clipX, gIcColor, fillLen);
                     }
                 }
             }
