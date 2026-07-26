@@ -41,10 +41,11 @@ void IconToBitmapColorTable(
     i32 dimGate
 ) {
     u8* data = srcIcon->m_data;
-    IconEntry* entry = &srcIcon->Entries()[frame];
-    i32 entryX = entry->x;
-    i32 sourceOffset = entry->srcOffset;
+    i32 entryOffset = frame * sizeof(IconEntry);
+    i32 entryX = reinterpret_cast<IconEntry*>(data + entryOffset)->x;
+    i32 sourceOffset = reinterpret_cast<IconEntry*>(data + entryOffset)->srcOffset;
     u8* savedDst;
+    IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
     gCTEntry = entry;
     gCTSrc = data + sourceOffset;
     i32 X = x + entryX;
@@ -66,7 +67,7 @@ void IconToBitmapColorTable(
     savedDst = gCTDst;
     i32 cmd;
     for (;;) {
-        cmd = ReadIconRleByte(gCTSrc);
+        cmd = *gCTSrc++;
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
@@ -85,16 +86,16 @@ void IconToBitmapColorTable(
             if (count != 0) {
                 // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    count = ReadIconRleByte(gCTSrc);
+                    count = *gCTSrc++;
                 }
-                gCTColor = colorTable[ReadIconRleByte(gCTSrc)];
+                gCTColor = colorTable[*gCTSrc++];
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            flags = ReadIconRleByte(gCTSrc);
+            flags = *gCTSrc++;
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                count = ReadIconRleByte(gCTSrc);
+                count = *gCTSrc++;
             }
             gCTCnt2 = count;
             if (color != 0) {
