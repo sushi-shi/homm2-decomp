@@ -39,15 +39,17 @@ void FlipIconToBitmap(
     i32 clipH,
     i32 color
 ) {
-    IconEntry* entries = reinterpret_cast<IconEntry*>(srcIcon->m_data);
     u8* src = srcIcon->m_data;
-    i32 w = entries[frame].w;
-    IconEntry* entry = &entries[frame];
-    i32 entryX = entry->x;
+    i32 x0 = x;
+    i32 w;
+    IconEntry* entry = reinterpret_cast<IconEntry*>(src) + frame;
+    w = entry->w;
+    x0 = x0 - entry->x;
     src += entry->srcOffset;
     i32 entryY = entry->y;
-    i32 x0 = x - entryX - w + 1;
+    x0 = x0 - w;
     gFlipEntry = entry;
+    x0++;
     gFlipX0 = x0;
     i32 X = w + x0 - 1;
     gFlipXEnd = X;
