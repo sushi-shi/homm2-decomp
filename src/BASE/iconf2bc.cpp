@@ -220,7 +220,7 @@ void FlipIconToBitmapColorTable(
                             } else {
                                 cn = (X - clipX) + 1;
                                 skip = cmd - cn;
-                                goto set_skip;
+                                gFCSkip = skip;
                             }
                         } else {
                             i32 right = gFCClipR;
@@ -233,13 +233,9 @@ void FlipIconToBitmapColorTable(
                             } else {
                                 cn = clipW;
                                 skip = gFCClipR + ((cmd - X) - clipW);
-                                goto set_skip;
+                                gFCSkip = skip;
                             }
                         }
-                        goto skip_set;
-                    set_skip:
-                        gFCSkip = skip;
-                    skip_set:
                         i32 copyCount = cn;
                         gFCCnt2 = cn;
                         gFCCnt = 0;
