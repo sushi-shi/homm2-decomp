@@ -42,10 +42,10 @@ void IconToBitmapColorTable(
 ) {
     u8* data = srcIcon->m_data;
     i32 entryOffset = frame * sizeof(IconEntry);
-    i32 entryX = reinterpret_cast<IconEntry*>(data + entryOffset)->x;
-    i32 sourceOffset = reinterpret_cast<IconEntry*>(data + entryOffset)->srcOffset;
-    u8* savedDst;
     IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
+    i32 entryX = entry->x;
+    i32 sourceOffset = entry->srcOffset;
+    u8* savedDst;
     gCTEntry = entry;
     gCTSrc = data + sourceOffset;
     i32 X = x + entryX;
