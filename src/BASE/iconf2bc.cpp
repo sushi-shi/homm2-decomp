@@ -230,8 +230,8 @@ void FlipIconToBitmapColorTable(
                                 gFCSkip = 0;
                                 cn = (cmd - X) + gFCClipR;
                             } else {
-                                skip = gFCClipR + ((cmd - X) - clipW);
                                 cn = clipW;
+                                skip = gFCClipR + ((cmd - X) - clipW);
                                 goto set_skip;
                             }
                         }
