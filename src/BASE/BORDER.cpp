@@ -81,7 +81,7 @@ void border::Read(void) {
 
 VA(0x004d22f0, 0x181)
 MessageDispatchResult border::Main(struct tag_message& msg) {
-    WidgetFlag flags = m_flags;
+    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
