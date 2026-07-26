@@ -24,7 +24,6 @@ public:
     struct IconEntry* Entries(void) {
         return reinterpret_cast<struct IconEntry*>(m_data);
     }
-    inline struct IconEntry& Entries(i32 frame);
     icon(u32l id);
     __declspec(dllexport) virtual inline ~icon();
     void DrawToBuffer(
