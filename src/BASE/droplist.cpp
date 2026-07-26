@@ -471,12 +471,9 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_visibleItemCount = numItems;
     }
 
-    i16 topHeight = m_icon->Entries()[m_firstRowFrame].h;
-    m_firstRowHeight = topHeight;
-    i16 middleHeight = m_icon->Entries()[m_middleRowFrame].h;
-    m_middleRowHeight = middleHeight;
-    i16 bottomHeight = m_icon->Entries()[m_lastRowFrame].h;
-    m_lastRowHeight = bottomHeight;
+    m_firstRowHeight = m_icon->Entries()[m_firstRowFrame].h;
+    m_middleRowHeight = m_icon->Entries()[m_middleRowFrame].h;
+    m_lastRowHeight = m_icon->Entries()[m_lastRowFrame].h;
     m_listX = m_iconX;
     m_listY = m_iconY + m_closedContentHeight;
     m_listWidth = m_icon->Entries()[m_firstRowFrame].w;
