@@ -86,7 +86,7 @@ inline textWidget::~textWidget() {
 
 VA(0x004d1280, 0x210)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
-    WidgetFlag flags = m_flags;
+    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
