@@ -1,10 +1,10 @@
 # BASE/iconf2bc experiment matrix
 
 Current source SHA-256 is
-`a35111926b019541f74851d17d07ff96153f18c6c2ddc32537fe15f9f36f6b5b`. The official
-generated status reports 87.0227%; the isolated 50-state row-visibility census measured
-87.010080% for its clean baseline and found no better island. The retained source adds the
-same row-visibility inline-accessor shape already present in the sibling icon family.
+`13d55c8c012990cc887118305dcad9b846570ea70234b8ec64c122559732fd7b`. The official
+generated status reports 87.0479%; the isolated 50-state branch-local-skip census measured
+87.035260% for its clean baseline and found no better island. The retained source combines
+the sibling-family row-visibility inline accessor with branch-local skip publication.
 Earlier sections below are historical checkpoints, not the current live classification.
 
 ## Preserved source attempts
@@ -28,11 +28,13 @@ by one census file because they do not alter the effective function source.
 | `direct-family-setup.cpp` | direct sibling-style serialized setup × 120 states | 86.319900% | rejected |
 | `read-icon-rle-byte-all-sites.cpp` | helper at all seven decoder reads | structural regression | rejected |
 | `read-icon-rle-byte-control-sites.cpp` | helper at five control reads | structural regression | rejected |
+| `fill-inline-helper.cpp` | replace shared `do_fill` tail with two inlined helper continuations | 62.231740% | rejected |
+| `branch-local-skip-publication.cpp` | remove `set_skip`/`skip_set`, publish in each branch × 50 states | 87.0479% official | retained |
 | `row-visible-inline.cpp` | shared predicate helper × 50 states | 87.0227% official | retained |
 | `tu-state-censuses.cpp` | unchanged-source/top/target seed censuses | 86.720406% historical best | exhausted for old source |
 
 Still-untried structural families are deliberately not recorded as attempts: removal of
-`do_fill`, `do_dim`, and `set_skip`; a fully no-`goto` run funnel; command/header decode
+`do_dim`; a fully no-`goto` run funnel; command/header decode
 inlining; clip-interval, dim-pixel, literal-map, and run-copy inline helpers; primed
 `while`/`do-while` decoder forms; count-versus-index inner loops; and outer
 clipped/unclipped decoder ownership.
