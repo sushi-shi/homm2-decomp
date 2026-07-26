@@ -1,0 +1,1189 @@
+#!/usr/bin/env python3
+"""clean_source.py - derive a clean C++ tree from the matching source tree.
+
+The matching tree carries scaffolding that exists only to prove the source
+reproduces retail object code: RVA annotations (`VA`, `DATA`, `VTBL`), delinker
+metadata (`DATA_COMPGEN`), codegen steering hacks (`OD_STEER`, `OR_STEER`) and
+the dual-build enum machinery (`H2_ENUM_*`). None of it survives into the
+compiler's view of a production build -- every one of those macros expands to
+either nothing or to one of its own arguments.
+
+This script performs exactly those expansions ahead of time, emitting a tree of
+ordinary C++ that reads like the game it reconstructs. That tree is what the
+native port compiles.
+
+Correctness rests on one property: each rule below reproduces the *production*
+expansion of its macro, the same expansion MSVC 4.2 sees when building the
+matching objects. The transform is therefore semantics-preserving by
+construction, and `--verify` re-checks it by compiling the result.
+
+Usage:
+    python3 scripts/clean_source.py --out build/clean
+    python3 scripts/clean_source.py --out build/clean --verify
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import shutil
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+
+# Sentinel marking a construct that expanded to nothing. Line cleanup uses it to
+# tell "this line went blank because we deleted an annotation" (drop the line)
+# from "this line was always blank" (keep it).
+DROPPED = "\x01"
+
+
+# --------------------------------------------------------------------------
+# Rules
+#
+# Each rule maps a macro invocation to its production expansion. Keep these in
+# step with include/va.h and include/Ints.h: that is the whole correctness
+# argument.
+# --------------------------------------------------------------------------
+
+def _drop(args: list[str]) -> str:
+    return DROPPED
+
+
+def _arg(index: int, parenthesize: bool = False):
+    """Expand to one argument, as `#define M(a, b) b` would.
+
+    `parenthesize` is for the macros whose production expansion is
+    self-delimiting -- `OD_STEER(x)` is `0[&(x)]` and `OR_STEER(x)` is
+    `(x | 0)`. Returning the bare argument there would change precedence:
+    `OR_STEER(a + b) * c` means `((a+b)|0)*c`, not `a + b*c`.
+    """
+    def rule(args: list[str]) -> str:
+        argument = args[index].strip()
+        return "(%s)" % argument if parenthesize else argument
+    return rule
+
+
+def _size_assert(args: list[str]) -> str:
+    type_name, byte_count = args[0].strip(), args[1].strip()
+    return (f'static_assert(sizeof({type_name}) == ({byte_count}), '
+            f'"sizeof({type_name}) != {byte_count}")')
+
+
+# The clean tree is generated in the repository's *strict* configuration: the
+# domains become real `enum class` types, fields keep their retail width through
+# H2EnumStorage, and every `#ifdef HOMM2_STRICT_ENUM_TYPES` resolves to its
+# typed branch. The matching tree cannot build this way -- production needs each
+# domain to *be* an integer so MSVC 4.2 lowers it identically -- but the clean
+# tree has no such constraint and keeps all the type information instead.
+STRICT_MACRO = "HOMM2_STRICT_ENUM_TYPES"
+
+
+# Domains that stay plain integers in the clean tree.
+#
+# Every other domain becomes a real `enum class`. These cannot yet: the game
+# assigns integers back into them, uses them as case labels, or combines them
+# with a bool -- all of which a scoped enum forbids and none of which can be
+# fixed from outside the source.
+#
+# Listing them here is the whole point. The alternative is editing the matching
+# tree to suit the port, and that is not allowed: a token added there can flip
+# /Od codegen parity in unrelated functions and cost a byte-exact match. It has
+# already happened once. The port is not worth a byte.
+#
+# Removing a name from this set is the unit of progress, and should be paired
+# with a typed spelling upstream -- the same work `#ifdef
+# HOMM2_STRICT_ENUM_TYPES` already does for OppositeCampaignSide.
+# Empty on purpose. Demoting a domain to an integer was measured at 68 of 95
+# translation units against 93 for the patch table below, because it takes the
+# type away from every site rather than the handful that need it.
+INTEGER_DOMAINS: set[str] = set()
+
+
+def _plain_enum_open(args: list[str]) -> str:
+    return "typedef enum %s {" % args[0].strip()
+
+
+def _plain_enum_close(args: list[str]) -> str:
+    return "} %s;" % args[0].strip()
+
+
+def _enum_class_open(storage_index: int | None = None):
+    def rule(args: list[str]) -> str:
+        if args[0].strip() in INTEGER_DOMAINS:
+            return "enum {"
+
+        storage = args[storage_index].strip() if storage_index is not None else "i32"
+        return "enum class %s : %s {" % (args[0].strip(), storage)
+    return rule
+
+
+# Flag domains that are also accumulated with `+=` / `-=` between two values of
+# the domain. The matching tree never had to say so -- integer domains get the
+# built-in operators for free -- and these sit alongside H2_ENUM_FLAGS, so only
+# the compound arithmetic is missing. Listing them here keeps the fix in the
+# generator rather than in the matching source, where an added token risks
+# perturbing /Od codegen parity.
+COMPOUND_ARITHMETIC_OPERATORS = """\
+inline {name}& operator+=({name}& a, {name} b) {{
+    return a = static_cast<{name}>(static_cast<i32>(a) + static_cast<i32>(b));
+}}
+inline {name}& operator-=({name}& a, {name} b) {{
+    return a = static_cast<{name}>(static_cast<i32>(a) - static_cast<i32>(b));
+}}"""
+
+# Now covered by the flag operator set above; kept empty because a domain may
+# yet need compound arithmetic without being a flag domain.
+COMPOUND_ARITHMETIC_DOMAINS: set[str] = set()
+
+
+def _enum_class_close(args: list[str]) -> str:
+    # `using enum` re-exports the enumerators into the enclosing scope, which is
+    # what lets the game keep spelling them unqualified.
+    name = args[0].strip()
+    if name in INTEGER_DOMAINS:
+        return "};\ntypedef i32 %s;" % name
+    closed = "};\nusing enum %s;" % name
+    if name in COMPOUND_ARITHMETIC_DOMAINS:
+        closed += "\n" + COMPOUND_ARITHMETIC_OPERATORS.format(name=name)
+    return closed
+
+
+def _enum_class_forward(storage_index: int | None = None):
+    def rule(args: list[str]) -> str:
+        if args[0].strip() in INTEGER_DOMAINS:
+            return "typedef i32 %s" % args[0].strip()
+
+        storage = args[storage_index].strip() if storage_index is not None else "i32"
+        return "enum class %s : %s" % (args[0].strip(), storage)
+    return rule
+
+
+def _enum_storage(template: str):
+    """A field that keeps its retail width but presents the domain type."""
+    def rule(args: list[str]) -> str:
+        return "%s<%s, %s>" % (template, args[0].strip(), args[1].strip())
+    return rule
+
+
+def _enum_index(args: list[str]) -> str:
+    return "H2EnumIndex(%s)" % args[0].strip()
+
+
+def _has(args: list[str]) -> str:
+    return "(H2EnumIndex((%s) & (%s)))" % (args[0].strip(), args[1].strip())
+
+
+def _bit(args: list[str]) -> str:
+    return "(1 << H2EnumIndex(%s))" % args[0].strip()
+
+
+def _assign_chain(args: list[str]) -> str:
+    targets = [a.strip() for a in args[:-1]]
+    value = args[-1].strip()
+    return "(%s = %s)" % (" = ".join(targets), value)
+
+
+# Operator sets for enum domains the game does arithmetic on. In the matching
+# tree these expand to nothing, because the domains are integers there and the
+# built-in operators already apply. With named enums they have to be real, and
+# these are the same operators the repository's strict audit build defines.
+STEPPED_OPERATORS = """\
+inline constexpr {name} operator+({name} a, i32 amount) {{
+    return static_cast<{name}>(static_cast<i32>(a) + amount);
+}}
+inline constexpr {name} operator-({name} a, i32 amount) {{
+    return static_cast<{name}>(static_cast<i32>(a) - amount);
+}}
+inline constexpr i32 operator-({name} a, {name} b) {{
+    return static_cast<i32>(a) - static_cast<i32>(b);
+}}
+inline constexpr {name} operator%({name} a, i32 modulus) {{
+    return static_cast<{name}>(static_cast<i32>(a) % modulus);
+}}
+inline constexpr {name} operator%({name} a, {name} modulus) {{
+    return static_cast<{name}>(static_cast<i32>(a) % static_cast<i32>(modulus));
+}}
+inline constexpr {name} operator&({name} a, i32 mask) {{
+    return static_cast<{name}>(static_cast<i32>(a) & mask);
+}}
+inline {name}& operator+=({name}& a, i32 amount) {{ return a = a + amount; }}
+inline {name}& operator-=({name}& a, i32 amount) {{ return a = a - amount; }}
+inline {name}& operator+=({name}& a, {name} b) {{ return a = a + static_cast<i32>(b); }}
+inline {name}& operator-=({name}& a, {name} b) {{ return a = a - static_cast<i32>(b); }}
+inline {name}& operator%=({name}& a, i32 modulus) {{ return a = a % modulus; }}
+inline {name}& operator%=({name}& a, {name} modulus) {{ return a = a % modulus; }}
+inline {name}& operator++({name}& a) {{ return a = a + 1; }}
+inline {name} operator++({name}& a, int) {{ {name} old = a; a = a + 1; return old; }}
+inline {name}& operator--({name}& a) {{ return a = a - 1; }}
+inline {name} operator--({name}& a, int) {{ {name} old = a; a = a - 1; return old; }}"""
+
+FLAG_OPERATORS = """\
+inline constexpr {name} operator|({name} a, {name} b) {{
+    return static_cast<{name}>(static_cast<i32>(a) | static_cast<i32>(b));
+}}
+inline constexpr {name} operator&({name} a, {name} b) {{
+    return static_cast<{name}>(static_cast<i32>(a) & static_cast<i32>(b));
+}}
+inline constexpr {name} operator^({name} a, {name} b) {{
+    return static_cast<{name}>(static_cast<i32>(a) ^ static_cast<i32>(b));
+}}
+inline constexpr {name} operator~({name} a) {{
+    return static_cast<{name}>(~static_cast<i32>(a));
+}}
+inline constexpr bool operator!({name} a) {{ return !static_cast<i32>(a); }}
+inline {name}& operator|=({name}& a, {name} b) {{ return a = a | b; }}
+inline {name}& operator&=({name}& a, {name} b) {{ return a = a & b; }}
+inline {name}& operator^=({name}& a, {name} b) {{ return a = a ^ b; }}
+// Flag sets are also accumulated and cleared arithmetically.
+inline constexpr {name} operator+({name} a, {name} b) {{
+    return static_cast<{name}>(static_cast<i32>(a) + static_cast<i32>(b));
+}}
+inline constexpr {name} operator-({name} a, {name} b) {{
+    return static_cast<{name}>(static_cast<i32>(a) - static_cast<i32>(b));
+}}
+inline {name}& operator+=({name}& a, {name} b) {{ return a = a + b; }}
+inline {name}& operator-=({name}& a, {name} b) {{ return a = a - b; }}
+// Flag domains are also combined with plain masks held in integer fields.
+inline constexpr {name} operator&({name} a, i32 mask) {{
+    return static_cast<{name}>(static_cast<i32>(a) & mask);
+}}
+inline constexpr {name} operator&(i32 mask, {name} a) {{ return a & mask; }}
+inline constexpr {name} operator|({name} a, i32 mask) {{
+    return static_cast<{name}>(static_cast<i32>(a) | mask);
+}}
+inline constexpr {name} operator|(i32 mask, {name} a) {{ return a | mask; }}
+inline {name}& operator&=({name}& a, i32 mask) {{ return a = a & mask; }}
+inline {name}& operator|=({name}& a, i32 mask) {{ return a = a | mask; }}"""
+
+
+def _operators(template: str):
+    def rule(args: list[str]) -> str:
+        # An integer domain already has every built-in operator; defining more
+        # for it would be redefinition, or illegal on a builtin type.
+        if args[0].strip() in INTEGER_DOMAINS:
+            return DROPPED
+        return template.format(name=args[0].strip())
+    return rule
+
+
+def _assign_chain_typed(args: list[str]) -> str:
+    """Fan one value out to several fields that may differ in storage width."""
+    value = args[-1].strip()
+    assignments = "\n".join(
+        "        (%s) = static_cast<decltype(%s)>(%s);" % (t.strip(), t.strip(), value)
+        for t in reversed(args[:-1])
+    )
+    return "do {\n%s\n    } while (0)" % assignments
+
+
+def _alloc(name: str):
+    """Collapse the file/line-carrying allocation wrappers to their plain form.
+
+    Retail threaded a frozen source path and line number through every
+    allocation so its leak tracker could name the site. The clean tree keeps
+    the tracking but lets the compiler supply __FILE__/__LINE__, which is both
+    accurate and free -- so the operands disappear from ~270 call sites.
+    """
+    def rule(args: list[str]) -> str:
+        return "%s(%s)" % (name, args[0].strip())
+    return rule
+
+
+def _declspec(args: list[str]) -> str:
+    """Retail exported some members; that is linkage metadata, not behaviour.
+
+    `__declspec(naked)` is different -- it is load-bearing for the hand-written
+    assembly blitters -- so it is preserved.
+    """
+    return DROPPED if args[0].strip() == "dllexport" else "__declspec(%s)" % args[0]
+
+
+CALL_RULES = {
+    # Retail-address annotations: audit metadata, no expansion at all.
+    "VA": _drop,
+    "VA_COMPGEN": _drop,
+    "DATA": _drop,
+    "DATA_COMPGEN_GUARD": _drop,
+    "VTBL": _drop,
+    "VTBL2": _drop,
+
+    # Delinker naming for compiler-generated data: expands to the value itself.
+    "DATA_COMPGEN": _arg(2),
+
+    # Codegen steering hacks. `0[&(x)]` and `(x | 0)` exist purely to nudge
+    # MSVC 4.2 register allocation; they mean `x`.
+    "OD_STEER": _arg(0, parenthesize=True),
+    "OR_STEER": _arg(0, parenthesize=True),
+
+    # Enum ergonomics.
+    "IDX": _enum_index,
+    "HAS": _has,
+    "BIT": _bit,
+
+    # Enum domain declarations.
+    "H2_ENUM_BEGIN": _plain_enum_open,
+    "H2_ENUM_END": _plain_enum_close,
+    "H2_ENUM_CLASS_BEGIN": _enum_class_open(),
+    "H2_ENUM_CLASS_END": _enum_class_close,
+    "H2_ENUM_CLASS_BEGIN_T": _enum_class_open(1),
+    "H2_ENUM_CLASS_END_T": _enum_class_close,
+    "H2_ENUM_CLASS_BEGIN_SPLIT": _enum_class_open(1),
+    "H2_ENUM_CLASS_END_SPLIT": _enum_class_close,
+    "H2_ENUM_CLASS_FORWARD": _enum_class_forward(),
+    "H2_ENUM_CLASS_FORWARD_SPLIT": _enum_class_forward(1),
+
+    # Allocation and assertion wrappers, shorn of their frozen file/line
+    # operands. The clean definitions in Misc.h use __FILE__/__LINE__ instead.
+    "H2_ALLOC": _alloc("H2_ALLOC"),
+    "H2_ALLOC_AT": _alloc("H2_ALLOC"),
+    "H2_FREE": _alloc("H2_FREE"),
+    "H2_FREE_AT": _alloc("H2_FREE"),
+    "H2_ASSERT": _alloc("H2_ASSERT"),
+
+    # Parameters and returns carry the domain type outright.
+    "H2_ENUM_PARAM": _arg(0),
+    "H2_ENUM_BITFIELD": _arg(0),
+    "H2_ENUM_RETURN": _arg(0),
+
+    # Fields keep their retail width -- struct layout is load-bearing, because
+    # the game reads these structures straight out of .AGG archives and save
+    # files -- while presenting the domain type to expressions.
+    "H2_ENUM_STORAGE": _enum_storage("H2EnumStorage"),
+    "H2_ENUM_STORAGE_STEPPED": _enum_storage("H2SteppedEnumStorage"),
+
+    # Operator sets for domains used as counters or bit flags.
+    "H2_ENUM_STEPPED": _operators(STEPPED_OPERATORS),
+    "H2_ENUM_FLAGS": _operators(FLAG_OPERATORS),
+    "H2_ENUM_ASSIGN_CHAIN_5": _assign_chain_typed,
+
+    # Structure-size proofs are kept: the port reads retail file formats
+    # straight into these types, so the layout assertions stay useful.
+    "SIZE": _size_assert,
+
+    "__declspec": _declspec,
+}
+
+# Bare identifiers, no call syntax.
+WORD_RULES = {
+    "OVERRIDE": "override",
+
+    # Calling conventions are a Win32 ABI concern. Retail used /Gr to make free
+    # functions __fastcall and spelled __cdecl where it mattered; a native build
+    # picks its own conventions, and the compat layer declares both sides of
+    # every remaining boundary itself.
+    "__cdecl": "",
+    "__stdcall": "",
+    "__fastcall": "",
+    "__pascal": "",
+
+
+    # MSVC 4.2 honoured `register`; C++17 removed the storage class.
+    "register": "",
+}
+
+# `va.h` supplies the annotation macros and, transitively, the integer aliases.
+# With the annotations gone only the aliases are still needed.
+INCLUDE_REWRITES = {
+    "<va.h>": "<Ints.h>",
+    '"va.h"': '"Ints.h"',
+}
+
+
+# --------------------------------------------------------------------------
+# Lexer-aware rewriting
+# --------------------------------------------------------------------------
+
+def _literal_end(text: str, i: int) -> int | None:
+    """If a comment or literal starts at `i`, return the index just past it.
+
+    Rewriting must never reach inside these: retail path strings contain
+    backslashes, and `DATA_COMPGEN` values are frequently format strings full
+    of commas and parentheses.
+    """
+    two = text[i:i + 2]
+    if two == "//":
+        end = text.find("\n", i)
+        return len(text) if end < 0 else end
+    if two == "/*":
+        end = text.find("*/", i + 2)
+        return len(text) if end < 0 else end + 2
+    if text[i] in "\"'":
+        quote = text[i]
+        j = i + 1
+        while j < len(text):
+            if text[j] == "\\":
+                j += 2
+                continue
+            if text[j] == quote:
+                return j + 1
+            if text[j] == "\n":  # unterminated; bail out rather than run away
+                return j
+            j += 1
+        return len(text)
+    return None
+
+
+def _is_ident_start(ch: str) -> bool:
+    return ch.isalpha() or ch == "_"
+
+
+def _is_ident_char(ch: str) -> bool:
+    return ch.isalnum() or ch == "_"
+
+
+def _split_args(text: str) -> list[str]:
+    """Split a macro argument list on top-level commas."""
+    args, depth, start, i = [], 0, 0, 0
+    while i < len(text):
+        end = _literal_end(text, i)
+        if end is not None:
+            i = end
+            continue
+        ch = text[i]
+        if ch in "([{":
+            depth += 1
+        elif ch in ")]}":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            args.append(text[start:i])
+            start = i + 1
+        i += 1
+    args.append(text[start:])
+    return args
+
+
+def _match_call(text: str, open_paren: int) -> tuple[int, list[str]] | None:
+    """Given the index of `(`, return (index past `)`, argument list)."""
+    depth, i = 0, open_paren
+    while i < len(text):
+        end = _literal_end(text, i)
+        if end is not None:
+            i = end
+            continue
+        ch = text[i]
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+            if depth == 0:
+                return i + 1, _split_args(text[open_paren + 1:i])
+        i += 1
+    return None
+
+
+def rewrite(text: str) -> str:
+    """Apply every rule, innermost first, outside of literals and comments."""
+    out, i, n = [], 0, len(text)
+    while i < n:
+        end = _literal_end(text, i)
+        if end is not None:
+            out.append(text[i:end])
+            i = end
+            continue
+
+        if not _is_ident_start(text[i]):
+            out.append(text[i])
+            i += 1
+            continue
+
+        j = i
+        while j < n and _is_ident_char(text[j]):
+            j += 1
+        word = text[i:j]
+
+        if word in CALL_RULES:
+            k = j
+            while k < n and text[k] in " \t\n\r":
+                k += 1
+            if k < n and text[k] == "(":
+                matched = _match_call(text, k)
+                if matched is not None:
+                    close, args = matched
+                    # Recurse first so nested macros (IDX inside HAS, and so on)
+                    # are already expanded when the outer rule runs.
+                    out.append(CALL_RULES[word]([rewrite(a) for a in args]))
+                    i = close
+                    continue
+
+        if word in WORD_RULES:
+            out.append(WORD_RULES[word])
+            i = j
+            continue
+
+        out.append(word)
+        i = j
+    return "".join(out)
+
+
+def tidy(text: str) -> str:
+    """Remove the holes left by dropped annotations."""
+    lines = []
+    for line in text.split("\n"):
+        if DROPPED in line:
+            # Statement-position annotations -- `VTBL(palette, 0x004eba7c);` --
+            # carry a terminator that belongs to the annotation, not to any
+            # surrounding declaration, so it goes with them.
+            if line.replace(DROPPED, "").replace(";", "").strip() == "":
+                continue  # the line held nothing but annotations
+            # `DATA(0x...) i32 gValue = 0;` -> `i32 gValue = 0;`
+            line = line.replace(DROPPED + " ", "").replace(DROPPED, "")
+        lines.append(line.rstrip())
+
+    # Collapse runs of blank lines left where annotation blocks used to sit.
+    tidied, blanks = [], 0
+    for line in lines:
+        blanks = blanks + 1 if line == "" else 0
+        if blanks <= 2:
+            tidied.append(line)
+    return "\n".join(tidied)
+
+
+# Preprocessor definitions that exist only to reproduce retail's debug-heap
+# bookkeeping. Their definitions are deleted and, in the header that owned them,
+# replaced by CLEAN_ALLOC_MACROS below.
+ALLOC_MACRO_NAMES = ("H2_ALLOC_AT", "H2_FREE_AT", "H2_ALLOC", "H2_FREE", "H2_ASSERT")
+
+CLEAN_ALLOC_MACROS = """\
+// Allocation and assertion wrappers. The compiler supplies the call site, so
+// nothing has to thread a source path and line number through by hand.
+//
+// Only the file's base name is passed. The leak tracker copies this into
+// MemEntry::file, a fixed 61-byte field sized for retail's own spellings
+// ("I:\\Projects\\Heroes\\Prog\\BASE\\PALETTE.CPP"); a modern absolute
+// __FILE__ overruns it on the first allocation.
+constexpr const char* H2SourceName(const char* path) {
+    const char* name = path;
+    for (const char* cursor = path; *cursor != '\\0'; ++cursor) {
+        if (*cursor == '/' || *cursor == '\\\\') {
+            name = cursor + 1;
+        }
+    }
+    return name;
+}
+
+#define H2_ALLOC(size) BaseAlloc(size, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+#define H2_FREE(ptr) BaseFree(ptr, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)
+#define H2_ASSERT(condition)                                                                       \\
+    ProcessAssert(condition, const_cast<char*>(H2SourceName(__FILE__)), __LINE__)"""
+
+# Directives that carried retail provenance and mean nothing to a native build:
+# the frozen 1996 source path, and the `#line` markers that existed only to pin
+# MSVC 4.2's /Gi __LINE__ variables to retail values.
+PROVENANCE_MACROS = ("RETAIL_FILE",)
+
+
+def _directive(line: str) -> tuple[str, str] | None:
+    """Classify a preprocessor line as (directive, first token), if it is one."""
+    stripped = line.lstrip()
+    if not stripped.startswith("#"):
+        return None
+    parts = stripped[1:].lstrip().split(None, 2)
+    if not parts:
+        return None
+    return parts[0], (parts[1].split("(")[0] if len(parts) > 1 else "")
+
+
+def _strict_condition(line: str) -> bool | None:
+    """Is this an #if/#ifdef controlled solely by the strict-types macro?
+
+    Returns the branch that is taken, or None when the directive is about
+    something else and must be passed through untouched.
+    """
+    stripped = line.lstrip()
+    if not stripped.startswith("#"):
+        return None
+    body = stripped[1:].lstrip()
+    for prefix, taken in (("ifdef", True), ("ifndef", False)):
+        if body.startswith(prefix):
+            rest = body[len(prefix):].strip()
+            if rest.split("//")[0].strip() == STRICT_MACRO:
+                return taken
+    if body.startswith("if "):
+        condition = body[3:].split("//")[0].strip()
+        if condition == "defined(%s)" % STRICT_MACRO:
+            return True
+        if condition == "!defined(%s)" % STRICT_MACRO:
+            return False
+    return None
+
+
+def resolve_strict_conditionals(text: str) -> str:
+    """Collapse `#ifdef HOMM2_STRICT_ENUM_TYPES` to its typed branch.
+
+    Only conditionals controlled by that one macro are evaluated; every other
+    `#if` is copied through verbatim, with its nesting tracked so the matching
+    `#else`/`#endif` are still identified correctly.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    # Stack of frames for conditionals we are resolving. Each is
+    # [keeping_now, seen_taken_branch]; unrelated conditionals push None.
+    stack: list[list[bool] | None] = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.lstrip()
+        emitting = all(frame is None or frame[0] for frame in stack)
+
+        if stripped.startswith("#"):
+            body = stripped[1:].lstrip()
+            taken = _strict_condition(line)
+
+            if body.startswith(("if", "ifdef", "ifndef")) and not body.startswith("include"):
+                stack.append([taken, taken] if taken is not None else None)
+                if taken is not None:
+                    i += 1
+                    continue
+
+            elif body.startswith(("else", "elif")) and stack:
+                frame = stack[-1]
+                if frame is not None:
+                    # Once the strict branch has been taken, every later arm is
+                    # dead; #else takes over only if it was not.
+                    frame[0] = (not frame[1]) if body.startswith("else") else False
+                    i += 1
+                    continue
+
+            elif body.startswith("endif") and stack:
+                frame = stack.pop()
+                if frame is not None:
+                    i += 1
+                    continue
+
+        if emitting:
+            out.append(line)
+        i += 1
+
+    return "\n".join(out)
+
+
+def rewrite_directives(text: str) -> str:
+    lines = text.split("\n")
+    out: list[str] = []
+    injected = False
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        directive = _directive(line)
+
+        if directive is not None:
+            name, target = directive
+
+            # `#line 28` pinned retail's /Gi line variables. Nothing downstream
+            # of the matching build wants it.
+            if name == "line":
+                i += 1
+                continue
+
+            # Definitions and undefs of scaffolding that no longer exists --
+            # including `#undef DATA`, which only guarded against a collision
+            # with the Windows headers.
+            if (name in ("define", "undef")
+                    and (target in PROVENANCE_MACROS
+                         or (target in CALL_RULES and target not in INTENTIONALLY_KEPT)
+                         or target in WORD_RULES)):
+                while i < len(lines) and lines[i].rstrip().endswith("\\"):
+                    i += 1
+                i += 1
+                continue
+
+            if name == "define" and target in ALLOC_MACRO_NAMES:
+                while i < len(lines) and lines[i].rstrip().endswith("\\"):
+                    i += 1
+                i += 1
+                if not injected:
+                    out.append(CLEAN_ALLOC_MACROS)
+                    injected = True
+                continue
+
+            if name == "include":
+                for old, new in INCLUDE_REWRITES.items():
+                    if old in line:
+                        line = line.replace(old, new)
+
+        out.append(line)
+        i += 1
+
+    return "\n".join(out)
+
+
+def drop_integer_domain_operators(text: str) -> str:
+    """Remove operator definitions written for a domain that stays an integer.
+
+    A few headers define their own operators for a domain inside the strict
+    branch -- combatTypes.h has `inline CombatSide& operator^=(CombatSide&,
+    i32)`. Once the domain is a plain integer typedef those are redefinitions of
+    built-in behaviour, and ill-formed. They are dropped here rather than in the
+    matching source, which the port must not touch.
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        starts_definition = line.startswith("inline") and "operator" in line
+        names_integer_domain = any(domain in line for domain in INTEGER_DOMAINS)
+        if not (starts_definition and names_integer_domain):
+            out.append(line)
+            i += 1
+            continue
+
+        # Skip to the end of the definition by brace balance. A one-line body
+        # opens and closes on the same line.
+        depth = 0
+        seen_brace = False
+        while i < len(lines):
+            depth += lines[i].count("{") - lines[i].count("}")
+            seen_brace = seen_brace or "{" in lines[i]
+            i += 1
+            if seen_brace and depth <= 0:
+                break
+    return "\n".join(out)
+
+
+# Behaviour the port needs that is not a compile fix.
+#
+# These change what the game does, so they cannot be expressed as a macro
+# expansion -- and they still must not be edits to the matching source. They are
+# applied to the generated tree instead, which is the only place a behavioural
+# difference between the matching build and the port belongs.
+# Sites where the generated tree needs an edit the macro rules cannot express:
+# a scoped enum meeting an integer, in a direction C++ will not convert on its
+# own. These are applied to the *generated* text.
+#
+# They are here, and not in the matching source, because that source has one job
+# -- reproducing retail object code -- and a token added to it for the port's
+# benefit can flip /Od codegen parity in unrelated functions. That is not
+# hypothetical: an equivalent edit to ADVMGR.cpp cost advManager::DoVisions its
+# byte-exact match. The generated tree is regenerated from scratch every run, so
+# patching it costs nothing and risks nothing.
+#
+# Each entry is (pattern, replacement, regex?). A missing anchor is a hard
+# error, so a patch cannot silently rot as the source changes upstream.
+PORT_PATCHES = {
+    "src/SOURCE/X_CAMPGN.cpp": [(
+        # A case label needs an integral constant expression; the stepped-enum
+        # operator+ returns the domain.
+        r"case (MAP_[A-Z0-9_]+) \+ 1:", r"case H2EnumIndex(\1) + 1:", True,
+    )],
+    "src/SOURCE/ARMYGRP.cpp": [(
+        "i32 temporary = m_creatureTypes[slot];",
+        "i32 temporary = H2EnumIndex(m_creatureTypes[slot]);", False,
+    )],
+    "src/SOURCE/ADVMGR.cpp": [
+        ("GetCursorSampleSet(gConfig.walkSpeed);",
+         "GetCursorSampleSet(H2EnumIndex(gConfig.walkSpeed));", False),
+        ("if (!bEnteringTown || gConfig.useOpera",
+         "if (!bEnteringTown || H2EnumIndex(gConfig.useOpera)", False),
+    ],
+    "src/SOURCE/CMBTMGR.cpp": [
+        ("stackSide = m_currentArmySide;",
+         "stackSide = H2EnumIndex(m_currentArmySide);", False),
+        ("CheckApplyBadMorale(stackSide, armyCounter)",
+         "CheckApplyBadMorale(static_cast<CombatSide>(stackSide), armyCounter)", False),
+        ("OppositeCombatSide(stackSide)",
+         "OppositeCombatSide(static_cast<CombatSide>(stackSide))", False),
+    ],
+    "src/SOURCE/Overview.cpp": [
+        ("i32 ssLevel = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);",
+         "i32 ssLevel = H2EnumIndex(selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST));",
+         False),
+        ("DoSSLevelDialog(ssLevel, quickView)",
+         "DoSSLevelDialog(static_cast<HeroSecondarySkill>(ssLevel), quickView)", False),
+    ],
+    "src/SOURCE/REQUEST.cpp": [(
+        "if (helpIndexMouse >= 0) {",
+        "if (H2EnumIndex(helpIndexMouse) >= 0) {", False,
+    )],
+}
+
+BEHAVIOUR_PATCHES = {
+    "src/BASE/Misc.cpp": [(
+        # Retail scans the drives for a CD, because the disc carried the copy
+        # protection, the Red Book soundtrack and the cinematics. A native
+        # install has none of that; the only check worth keeping is that the
+        # game can open its own archives.
+        "CDRomSetupResult SetupCDDrive(void) {",
+        "CDRomSetupResult SetupCDDrive(void) {\n"
+        "    // There is no CD; see docs/porting.md. The retail scan, the MCI\n"
+        "    // probing and the registry write are all unreachable below.\n"
+        "    sprintf(gText, gMiscText.cd.dataArchive.text);\n"
+        "    i32 portArchive = _open(gText, _O_BINARY);\n"
+        "    if (portArchive == -1) {\n"
+        "        if (_chdir(gcRegAppPath) == -1)\n"
+        "            return CD_ROM_GAME_DIRECTORY_MISSING;\n"
+        "        portArchive = _open(gText, _O_BINARY);\n"
+        "        if (portArchive == -1)\n"
+        "            return CD_ROM_DATA_FILES_MISSING;\n"
+        "    }\n"
+        "    _close(portArchive);\n"
+        "    return CD_ROM_READY;\n",
+    )],
+    "src/SOURCE/SMACKMGR.cpp": [(
+        # No Smacker decoder yet. Skipping is not a convenience: retail's
+        # failure path is an unbounded "Retry?" loop, so a build that cannot
+        # open a .smk never leaves this function.
+        "i32 PlaySmacker(i32 smackNumber) {",
+        "i32 PlaySmacker(i32 smackNumber) {\n"
+        "    // Cinematics are not decoded yet; see docs/porting.md.\n"
+        "    return 0;\n",
+    )],
+}
+
+
+def apply_patches(relative: str, text: str) -> str:
+    for pattern, replacement, is_regex in PORT_PATCHES.get(relative, []):
+        if is_regex:
+            text, count = re.subn(pattern, replacement, text)
+        else:
+            count = text.count(pattern)
+            text = text.replace(pattern, replacement)
+        if count == 0:
+            raise SystemExit("port patch matched nothing in %s: %r" % (relative, pattern))
+
+    for anchor, replacement in BEHAVIOUR_PATCHES.get(relative, []):
+        if anchor not in text:
+            raise SystemExit("behaviour patch anchor missing in %s: %r" % (relative, anchor))
+        text = text.replace(anchor, replacement, 1)
+    return text
+
+
+def _replace_word(text: str, word: str, replacement: str) -> str:
+    """Replace a bare identifier outside comments and literals."""
+    out, i, n = [], 0, len(text)
+    while i < n:
+        end = _literal_end(text, i)
+        if end is not None:
+            out.append(text[i:end])
+            i = end
+            continue
+        if _is_ident_start(text[i]):
+            j = i
+            while j < n and _is_ident_char(text[j]):
+                j += 1
+            out.append(replacement if text[i:j] == word else text[i:j])
+            i = j
+            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
+def clean(text: str, relative: str = "") -> str:
+    text = resolve_strict_conditionals(text)
+    text = rewrite_directives(text)
+
+    # RETAIL_FILE is the frozen retail source path, and several translation
+    # units store it in fixed-size char arrays sized to it -- 40 bytes in
+    # Blur.cpp. Substituting __FILE__ overruns those the moment the checkout
+    # path is longer than the slot, which for an absolute path is always. The
+    # base name is what the field was for, it is short, and the generator knows
+    # it, so it is spelled out here.
+    #
+    # This runs after the directive pass, which deletes the `#define
+    # RETAIL_FILE` lines; before it, the substitution would rewrite the macro's
+    # own name and produce `#define "Blur.cpp"`.
+    name = relative.rsplit("/", 1)[-1] if relative else "unknown.cpp"
+    text = _replace_word(text, "RETAIL_FILE", '"%s"' % name)
+
+    return drop_integer_domain_operators(tidy(rewrite(text)))
+
+
+# --------------------------------------------------------------------------
+# Tree generation
+# --------------------------------------------------------------------------
+
+# Files whose cleaned form is supplied verbatim rather than derived. `va.h` is
+# pure annotation machinery and disappears; `Ints.h` keeps the integer aliases
+# and the typed storage, but sheds the dual-build scaffolding around them.
+OVERRIDE_DIR = REPO / "scripts/clean_overrides"
+DROP_FILES = {"include/va.h"}
+
+
+def generate(out_root: Path) -> tuple[int, int, list[str]]:
+    if out_root.exists():
+        shutil.rmtree(out_root)
+
+    debris: list[str] = []
+    patched_files: set[str] = set()
+    sources = 0
+    for tier in ("include", "src"):
+        for path in sorted((REPO / tier).rglob("*")):
+            if not path.is_file() or path.suffix not in (".h", ".cpp"):
+                continue
+            relative = path.relative_to(REPO)
+            if str(relative).replace("\\", "/") in DROP_FILES:
+                continue
+            target = out_root / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            source_text = path.read_text()
+            relative_text = str(relative).replace("\\", "/")
+            cleaned_text = apply_patches(relative_text, clean(source_text, relative_text))
+            patched_files.add(relative_text)
+            target.write_text(cleaned_text)
+            for number, line in stranded(source_text, cleaned_text):
+                debris.append(f"{relative}:{number}: {line}")
+            sources += 1
+
+    overrides = 0
+    if OVERRIDE_DIR.is_dir():
+        for path in sorted(OVERRIDE_DIR.rglob("*")):
+            if path.is_file():
+                target = out_root / path.relative_to(OVERRIDE_DIR)
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(path, target)
+                overrides += 1
+
+    # A patch key that no file matched means the source moved and the patch is
+    # now silently doing nothing. For the behaviour patches that would quietly
+    # restore the CD scan and the unbounded cinematic retry loop.
+    for table, label in ((PORT_PATCHES, "port"), (BEHAVIOUR_PATCHES, "behaviour")):
+        for key in table:
+            if key not in patched_files:
+                raise SystemExit("%s patch names a file that was not generated: %s"
+                                 % (label, key))
+
+    return sources, overrides, debris
+
+
+# Macros the clean tree keeps on purpose: the allocation wrappers survive in
+# their argument-free form, and `__declspec` still carries `naked`.
+INTENTIONALLY_KEPT = {"H2_ALLOC", "H2_FREE", "H2_ASSERT", "__declspec"}
+
+
+def residue(out_root: Path) -> dict[str, int]:
+    """Count scaffolding that survived, as a self-check.
+
+    Scans with the same lexer used for rewriting, so occurrences inside string
+    literals (".\\DATA\\HEROES2.AGG") and comments are not miscounted.
+    """
+    names = (set(CALL_RULES) | set(WORD_RULES)) - INTENTIONALLY_KEPT
+    found: dict[str, int] = {}
+    for path in sorted(out_root.rglob("*")):
+        if not path.is_file() or path.suffix not in (".h", ".cpp"):
+            continue
+        text = path.read_text()
+        i, n = 0, len(text)
+        while i < n:
+            end = _literal_end(text, i)
+            if end is not None:
+                i = end
+                continue
+            if _is_ident_start(text[i]):
+                j = i
+                while j < n and _is_ident_char(text[j]):
+                    j += 1
+                word = text[i:j]
+                if word in names:
+                    found[word] = found.get(word, 0) + 1
+                i = j
+                continue
+            i += 1
+    return found
+
+
+def publish(out_root: Path, branch: str) -> int:
+    """Publish the generated tree onto a branch, one commit per source commit.
+
+    The clean tree is a pure function of the matching tree, so it is never
+    edited by hand: as matching advances toward byte-exactness, this is re-run
+    and the improvements flow through to the branch the ports build against.
+    """
+    import subprocess
+
+    def git(*argv: str, **kwargs) -> str:
+        return subprocess.run(("git",) + argv, cwd=REPO, text=True,
+                              capture_output=True, check=True, **kwargs).stdout.strip()
+
+    source_commit = git("rev-parse", "HEAD")
+    source_branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    dirty = bool(git("status", "--porcelain", "--", "src", "include"))
+
+    # A branch can only be checked out in one worktree. If the user already has
+    # one open on `branch` -- handy for browsing the generated tree -- publish
+    # into it rather than fighting over the checkout.
+    existing, current = None, None
+    for line in git("worktree", "list", "--porcelain").split("\n"):
+        if line.startswith("worktree "):
+            current = Path(line.split(" ", 1)[1])
+        elif line.startswith("branch ") and line.split("/")[-1] == branch:
+            existing = current
+
+    temporary = existing is None
+    worktree = existing if existing else REPO / "build/clean-worktree"
+
+    if temporary:
+        shutil.rmtree(worktree, ignore_errors=True)
+        subprocess.run(("git", "worktree", "prune"), cwd=REPO, capture_output=True)
+        exists = subprocess.run(("git", "rev-parse", "--verify", branch),
+                                cwd=REPO, capture_output=True).returncode == 0
+        if exists:
+            git("worktree", "add", str(worktree), branch)
+        else:
+            git("worktree", "add", "--detach", str(worktree))
+            subprocess.run(("git", "checkout", "--orphan", branch),
+                           cwd=worktree, check=True, capture_output=True)
+            subprocess.run(("git", "rm", "-rf", "--quiet", "."),
+                           cwd=worktree, capture_output=True)
+
+    for stale in ("include", "src"):
+        shutil.rmtree(worktree / stale, ignore_errors=True)
+    for tier in ("include", "src"):
+        if (out_root / tier).is_dir():
+            shutil.copytree(out_root / tier, worktree / tier)
+
+    subprocess.run(("git", "add", "-A"), cwd=worktree, check=True, capture_output=True)
+    unchanged = not subprocess.run(("git", "diff", "--cached", "--quiet"),
+                                   cwd=worktree, capture_output=True).returncode
+
+    if unchanged:
+        # The tree is a pure function of the source, so identical output means
+        # nothing to commit -- but the recorded provenance would then still name
+        # an older source commit. Re-point it rather than leave it misleading.
+        recorded = subprocess.run(
+            ("git", "log", "-1", "--format=%B"), cwd=worktree,
+            text=True, capture_output=True).stdout
+        if source_commit in recorded:
+            print(f"[clean] {branch} already matches {source_commit[:9]}")
+        else:
+            subprocess.run(
+                ("git", "commit", "--quiet", "--amend", "-m",
+                 f"clean: regenerate from {source_branch} {source_commit[:9]}\n\n"
+                 f"Generated by scripts/clean_source.py. Output is unchanged from "
+                 f"the previous source commit; this records the newer one.\n\n"
+                 f"Source-Commit: {source_commit}\n"),
+                cwd=worktree, check=True, capture_output=True)
+            print(f"[clean] {branch} output unchanged; re-pointed to "
+                  f"{source_commit[:9]}")
+    else:
+        message = (
+            f"clean: regenerate from {source_branch} {source_commit[:9]}\n\n"
+            f"Generated by scripts/clean_source.py. Do not edit this branch by "
+            f"hand -- it is a pure function of the matching tree, and every "
+            f"change belongs upstream in the generator or the matching source.\n\n"
+            f"Source-Commit: {source_commit}\n"
+        )
+        if dirty:
+            message += "Source-Tree: dirty (uncommitted changes under src/ or include/)\n"
+        subprocess.run(("git", "commit", "--quiet", "-m", message),
+                       cwd=worktree, check=True, capture_output=True)
+        print(f"[clean] committed to {branch} from {source_branch} {source_commit[:9]}"
+              + ("  (source tree was dirty)" if dirty else ""))
+
+    if temporary:
+        subprocess.run(("git", "worktree", "remove", "--force", str(worktree)),
+                       cwd=REPO, capture_output=True)
+    else:
+        print(f"[clean] checkout at {worktree}")
+    return 0
+
+
+def _punctuation_only(text: str) -> list[tuple[int, str]]:
+    lines = []
+    for number, line in enumerate(text.split("\n"), 1):
+        stripped = line.strip()
+        if stripped and not stripped.strip(";,"):
+            lines.append((number, stripped))
+    return lines
+
+
+def stranded(source: str, cleaned: str) -> list[tuple[int, str]]:
+    """Structural debris a dropped construct left behind.
+
+    Expanding a macro to nothing can strand the punctuation that belonged to it
+    -- a lone `;` where `VTBL(palette, 0x004eba7c);` used to be. That still
+    compiles, so nothing else would catch it.
+
+    Reported as a delta against the input, because a bare `;` is also a
+    legitimate empty statement: the game really does write `if (easy) ;` to
+    leave a branch of an if/else chain empty.
+    """
+    introduced = len(_punctuation_only(cleaned)) - len(_punctuation_only(source))
+    return _punctuation_only(cleaned)[-introduced:] if introduced > 0 else []
+
+
+def verify(out_root: Path, compat_include: str | None) -> int:
+    """Syntax-check every generated translation unit.
+
+    Needs a compat layer supplying <windows.h> and friends -- the game speaks
+    Win32 and the generator does not change that -- so the include directory is
+    passed in. Without one this reports what it can and says so, rather than
+    claiming a check it did not perform.
+    """
+    import subprocess
+
+    compiler = os.environ.get("CXX", "g++")
+    includes = ["-I", str(out_root / "include")]
+    if compat_include:
+        includes += ["-I", compat_include]
+
+    sources = sorted((out_root / "src").rglob("*.cpp"))
+    failures = []
+    for source in sources:
+        result = subprocess.run(
+            [compiler, "-m32", "-fsyntax-only", "-std=gnu++20", "-w", "-fpermissive",
+             *includes, "-D_X86_", str(source)],
+            capture_output=True, text=True)
+        if result.returncode != 0:
+            first = next((line for line in result.stderr.split("\n") if ": error:" in line), "")
+            failures.append((source.relative_to(out_root), first))
+
+    print("[clean] verify: %d of %d translation units compile"
+          % (len(sources) - len(failures), len(sources)))
+    if not compat_include:
+        print("[clean]         (no --compat-include given; Win32 headers unavailable)",
+              file=sys.stderr)
+    for path, message in failures[:20]:
+        print("          %s\n            %s" % (path, message.strip()[:120]), file=sys.stderr)
+    return 1 if failures and compat_include else 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out", default="build/clean", help="output tree root")
+    parser.add_argument("--verify", action="store_true",
+                        help="syntax-check every cleaned translation unit after generating")
+    parser.add_argument("--compat-include", metavar="DIR",
+                        help="directory supplying <windows.h> etc., needed by --verify")
+    parser.add_argument("--publish", metavar="BRANCH", nargs="?", const="clean",
+                        help="commit the generated tree onto BRANCH (default: clean)")
+    args = parser.parse_args()
+
+    out_root = (REPO / args.out) if not Path(args.out).is_absolute() else Path(args.out)
+    sources, overrides, debris = generate(out_root)
+    print(f"[clean] wrote {sources} transformed files "
+          f"({overrides} supplied verbatim) to {out_root}")
+
+    left = residue(out_root)
+    if left:
+        print("[clean] WARNING: scaffolding survived the transform:", file=sys.stderr)
+        for name, count in sorted(left.items(), key=lambda kv: -kv[1]):
+            print(f"          {name:<32} {count}", file=sys.stderr)
+        return 1
+
+    if debris:
+        print("[clean] WARNING: stranded punctuation from dropped constructs:",
+              file=sys.stderr)
+        for site in debris[:20]:
+            print(f"          {site}", file=sys.stderr)
+        if len(debris) > 20:
+            print(f"          ... and {len(debris) - 20} more", file=sys.stderr)
+        return 1
+
+    print("[clean] no scaffolding macros or stranded punctuation remain")
+
+    status = 0
+    if args.verify:
+        status = verify(out_root, args.compat_include)
+
+    if args.publish:
+        return publish(out_root, args.publish) or status
+    return status
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
