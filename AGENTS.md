@@ -34,12 +34,16 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 ## Matching Loop
 
 1. Inspect before editing:
-   `homm2 sema rva`, `xref --callees`, `strings`, and `disasm --diff --lite`.
+   `homm2 sema rva`, `xref --callees`, `strings`, `disasm --diff --lite`, and
+   `disasm --blocks --diff --lite`.
    Use cached Ghidra decompilation only when the structure remains unclear.
 2. Reconstruct real types, fields, enums, scopes, locals, and inline accessors. Do not
    begin with raw offset arithmetic or compiler steering.
 3. Build the TU with `ninja`, refresh `homm2 status`, and advance from the first real
-   disassembly divergence. Keep stack displacements visible.
+   disassembly divergence. Keep stack displacements visible. Use
+   `disasm --blocks --diff` to localize differing block bodies;
+   `--blocks --base/--target --lite` for either skeleton; and `--blocks --dot` when
+   graph topology is clearer than a listing.
 4. Run `homm2 od-frames` to expose `/Od` frame and slot drift, then use
    `scripts/od_slots.py` for individual name-sensitive layouts. For large switches,
    recover body order separately from case values and compare ordered jump-table
@@ -55,6 +59,14 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    such as types, fields, scopes, locals, inline accessors, CFG, and switch body order. When a
    targeted source shape is justified at the first real divergence, add it as a reviewed
    permuter axis and test it against the clean state and every requested TU-state probe.
+   **Structural versions come first:** build and compare the credible high-level control-flow,
+   loop/tail, inline-accessor, and switch-order alternatives before generating internal small
+   transformations. Select a retail-compatible semantic CFG family, then permute internal
+   spellings within each surviving structural version. Emitted basic-block count, numbering,
+   and partition are diagnostic rather than correctness invariants: unchanged source can split
+   or merge blocks across legitimate MSVC TU states. Re-run the block view for retained islands,
+   use it to classify structural orbits, and require exact bytes plus complete ordered
+   relocations for closure.
 8. For a structurally aligned compiler-state residual, island search is the current
    last-mile policy. Run `scripts/tu_state_noise.py` for an unchanged-source census. When
    several legitimate source shapes must also be tested, use `scripts/match_variants.py` so

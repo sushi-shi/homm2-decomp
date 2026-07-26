@@ -123,6 +123,10 @@ def cmd_disasm(args) -> None:
         argv.append("--rich")
     if args.lite:
         argv.append("--lite")
+    if args.blocks:
+        argv.append("--blocks")
+    if args.dot:
+        argv.append("--dot")
     sys.exit(_sema_tool("homm2.analysis.disasm", argv))
 
 
@@ -201,7 +205,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "  homm2 sema xref 0x0004a3c0            who calls this fn (attribution)\n"
         "  homm2 sema xref --callees 0x0000126d  its own call targets\n"
         "  homm2 sema xref --tree 0x0004a3c0     caller ancestry tree\n"
-        "  homm2 sema disasm 0x0004a3c0          retail disasm (--base/--diff/--rich/--lite)\n"
+        "  homm2 sema disasm 0x0004a3c0          retail disasm (--base/--diff/--blocks)\n"
         "  homm2 sema strings 0x0000126d         the string set of a fn\n"
         "  homm2 sema strings --find Smack       reverse literal lookup\n"
         "  homm2 sema match SOURCE/SMACKMGR      per-fn % of a unit (or an RVA)\n"
@@ -257,6 +261,10 @@ def _build_parser() -> argparse.ArgumentParser:
     sd.add_argument("--lite", action="store_true", help="asm only - no addresses/bytes")
     sd.add_argument("--diff", action="store_true",
                     help="unified diff of base-vs-target asm (addresses masked; rc=1 if differs)")
+    sd.add_argument("--blocks", action="store_true",
+                    help="basic-block CFG view (combines with --base/--target/--diff/--lite)")
+    sd.add_argument("--dot", action="store_true",
+                    help="Graphviz CFG output (requires --blocks)")
     sd.set_defaults(func=cmd_disasm)
 
     st = ss.add_parser("strings", help="per-fn string set / --find reverse lookup")
