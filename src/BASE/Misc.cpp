@@ -1929,7 +1929,7 @@ VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        i32 fileHandle = _open(
+        i32 fileHandle = open(
             gMiscText.log.truncateFilename.text,
             _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT,
             _S_IWRITE
@@ -1938,8 +1938,8 @@ void LogTruncate(void) {
             strcpy(logText, gMiscText.log.newLogLabel.text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.truncateNewline.text);
-            _write(fileHandle, logText, strlen(logText));
-            _close(fileHandle);
+            write(fileHandle, logText, strlen(logText));
+            close(fileHandle);
         }
     }
 }
