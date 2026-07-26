@@ -6129,10 +6129,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_LIGHTHOUSE:
-            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer) {
-            } else {
-                gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
-            }
+            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+                break;
+            gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             break;
 
         case MAP_OBJECT_TREASURE_CHEST:
@@ -6273,7 +6272,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_WAGON:
-            if (cell->m_objectMetadata != MAP_EVENT_DATA_EMPTY) {
+            if (cell->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
+                break;
+            } else {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT)
                         GiveArtifact(
