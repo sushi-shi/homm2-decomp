@@ -211,7 +211,7 @@ BASE/Misc	?BaseFree@@YIXPAXPADH@Z	94.0482	726d44a910aa
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	dd72828a17e3
 BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	98.7333	9f6ec1136f50
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	5f71e69e1a5b
-BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	97.9054	c462cc84477f
+BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	98.3784	c2764bc2b891.076d7b63a6f7
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	98.8889	45862a5fd2bc
 BASE/Misc	?FadeIn@@YIXH@Z	97.4074	b9092401a5d8
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	68186f6c0fe5
