@@ -980,86 +980,86 @@ Bool fullGt(Int32 i1, Int32 i2) {
 #define RC(x) (x)
 #define SWAP(za, zb)                                                                               \
     {                                                                                              \
-        Int32 zl = (za);                                                                           \
-        Int32 zr = (zb);                                                                           \
-        Int32 zt = zptr[RC(zl)];                                                                   \
-        zptr[RC(zl)] = zptr[RC(zr)];                                                               \
-        zptr[RC(zr)] = zt;                                                                         \
+        Int32 zl0 = (za);                                                                          \
+        Int32 zr8 = (zb);                                                                          \
+        Int32 zt = zptr[RC(zl0)];                                                                  \
+        zptr[RC(zl0)] = zptr[RC(zr8)];                                                             \
+        zptr[RC(zr8)] = zt;                                                                        \
     }
 
 VA(0x004d6000, 0x548)
 void qsortFull(Int32 left, Int32 right) {
-    Int32 pivot, v;
-    Int32 i, j;
-    Int32 wuC;
+    Int32 pivot3, v3;
+    Int32 i, j12;
+    Int32 wuC0;
 
     Int32 stackL[40];
     Int32 stackR[40];
-    Int32 sp = 0;
+    Int32 sp13 = 0;
 
     Int32 wuL = left;
-    Int32 wuR = right;
+    Int32 wuR1 = right;
 
     while (True) {
 
-        if (wuR - wuL > ISORT_BELOW) {
+        if (wuR1 - wuL > ISORT_BELOW) {
 
-            wuC = (wuL + wuR) >> 1;
-            if (fullGt(zptr[RC(wuL)], zptr[RC(wuC)]))
-                SWAP(wuL, wuC);
-            if (fullGt(zptr[RC(wuL)], zptr[RC(wuR)]))
-                SWAP(wuL, wuR);
-            if (fullGt(zptr[RC(wuC)], zptr[RC(wuR)]))
-                SWAP(wuC, wuR);
+            wuC0 = (wuL + wuR1) >> 1;
+            if (fullGt(zptr[RC(wuL)], zptr[RC(wuC0)]))
+                SWAP(wuL, wuC0);
+            if (fullGt(zptr[RC(wuL)], zptr[RC(wuR1)]))
+                SWAP(wuL, wuR1);
+            if (fullGt(zptr[RC(wuC0)], zptr[RC(wuR1)]))
+                SWAP(wuC0, wuR1);
 
-            SWAP(wuC, wuR - 1);
-            pivot = zptr[RC(wuR - 1)];
+            SWAP(wuC0, wuR1 - 1);
+            pivot3 = zptr[RC(wuR1 - 1)];
 
             i = wuL;
-            j = wuR - 1;
+            j12 = wuR1 - 1;
             for (;;) {
                 do
                     i++;
-                while (fullGt(pivot, zptr[RC(i)]));
+                while (fullGt(pivot3, zptr[RC(i)]));
                 do
-                    j--;
-                while (fullGt(zptr[RC(j)], pivot));
-                if (i < j)
-                    SWAP(i, j) else break;
+                    j12--;
+                while (fullGt(zptr[RC(j12)], pivot3));
+                if (i < j12)
+                    SWAP(i, j12) else break;
             }
-            SWAP(i, wuR - 1);
+            SWAP(i, wuR1 - 1);
 
-            if ((i - wuL) > (wuR - i)) {
-                stackL[sp] = wuL;
-                stackR[sp] = i - 1;
-                sp++;
+            if ((i - wuL) > (wuR1 - i)) {
+                stackL[sp13] = wuL;
+                stackR[sp13] = i - 1;
+                sp13++;
                 wuL = i + 1;
             } else {
-                stackL[sp] = i + 1;
-                stackR[sp] = wuR;
-                sp++;
-                wuR = i - 1;
+                stackL[sp13] = i + 1;
+                stackR[sp13] = wuR1;
+                sp13++;
+                wuR1 = i - 1;
             }
 
         } else {
 
-            for (i = wuL + 1; i <= wuR; i++) {
-                v = zptr[RC(i)];
-                j = i;
-                while (fullGt(zptr[RC(j - 1)], v)) {
-                    zptr[RC(j)] = zptr[RC(j - 1)];
-                    j = j - 1;
-                    if (j <= wuL)
+            for (i = wuL + 1; i <= wuR1; i++) {
+                v3 = zptr[RC(i)];
+                j12 = i;
+                while (fullGt(zptr[RC(j12 - 1)], v3)) {
+                    zptr[RC(j12)] = zptr[RC(j12 - 1)];
+                    j12 = j12 - 1;
+                    if (j12 <= wuL)
                         goto zero;
                 }
             zero:
-                zptr[RC(j)] = v;
+                zptr[RC(j12)] = v3;
             }
-            if (sp == 0)
+            if (sp13 == 0)
                 return;
-            sp--;
-            wuL = stackL[sp];
-            wuR = stackR[sp];
+            sp13--;
+            wuL = stackL[sp13];
+            wuR1 = stackR[sp13];
         }
     }
 }
