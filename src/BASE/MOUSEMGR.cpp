@@ -288,8 +288,10 @@ void mouseManager::SetPointer(i32 frame) {
             );
             memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);
             {
-                for (i32 row = 0; row < MOUSE_CURSOR_BITMAP_WIDTH; row++) {
-                    for (i32 column = 0; column < MOUSE_CURSOR_BITMAP_WIDTH; column++) {
+                i32 row;
+                i32 column;
+                for (row = 0; row < MOUSE_CURSOR_BITMAP_WIDTH; row++) {
+                    for (column = 0; column < MOUSE_CURSOR_BITMAP_WIDTH; column++) {
                         u8* colorBits = static_cast<u8*>(cColorBits[m_cursorSizeIndex]);
                         if (colorBits[row * MOUSE_CURSOR_BITMAP_WIDTH + column] == 0)
                             static_cast<u8*>(cAndBits[m_cursorSizeIndex])[
