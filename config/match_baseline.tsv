@@ -800,7 +800,7 @@ SOURCE/GAME	?GetMapEvent@@YIPAUEventExtra@@HH@Z	100.0000	1cdc9b316a40
 SOURCE/GAME	?GetMineId@game@@QAEHHH@Z	100.0000	bfc849985357
 SOURCE/GAME	?GetNewHeroId@game@@QAEHHHH@Z	97.9609	ea1dce90c926
 SOURCE/GAME	?GetNumObelisks@@YIHH@Z	100.0000	5ad0fac382ed
-SOURCE/GAME	?GetNumThievesGuilds@game@@QAEHH@Z	99.9787	940f79353169
+SOURCE/GAME	?GetNumThievesGuilds@game@@QAEHH@Z	100.0000	d80f3564c86e
 SOURCE/GAME	?GetRandomArtifactId@game@@QAEHHH@Z	100.0000	70d213c66681
 SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	100.0000	8b2d89a00ede
 SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	100.0000	367adebf067d
@@ -1122,7 +1122,7 @@ SOURCE/PHILAI	?RedistributeTroops@philAI@@QAEXPAVarmyGroup@@0HHHHH@Z	100.0000	90
 SOURCE/PHILAI	?ResetHeroRVs@@YIXHHH@Z	100.0000	46cad547150c
 SOURCE/PHILAI	?SetupRelativeHeroStrengths@philAI@@QAEXXZ	100.0000	734e57d726eb
 SOURCE/PHILAI	?ShowStatus@@YIXXZ	100.0000	b6ed09fab8fa
-SOURCE/PHILAI	?StrategicValueOfPosition@philAI@@QAEHHHHHPAHH@Z	97.1785	d2de78c50d19
+SOURCE/PHILAI	?StrategicValueOfPosition@philAI@@QAEHHHHHPAHH@Z	97.1813	d2de78c50d19
 SOURCE/PHILAI	?TownEvent@philAI@@QAEXPAVmapCell@@PAVhero@@HH@Z	100.0000	431772b83098
 SOURCE/PHILAI	?TurnCostResource@philAI@@QAEXH@Z	99.4455	294ded4967e6
 SOURCE/PHILAI	?TurnValueOfObelisk@philAI@@QAEMH@Z	100.0000	a20ef81dfda1
@@ -1170,7 +1170,7 @@ SOURCE/REQUEST	?SetupFiles@fileRequester@@QAEXXZ	100.0000	b5f468a0b319
 SOURCE/REQUEST	?ShowThisMap@@YIHPAD@Z	100.0000	f516f695692c
 SOURCE/REQUEST	?ShowThisMapGame@@YIHPAD@Z	100.0000	0c4a9bdfb3c8
 SOURCE/REQUEST	?Update@fileRequester@@QAEXH@Z	99.8151	607a3fbb0534
-SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	93.6061	84468e157f8e
+SOURCE/SEARCH	?BuildPath@searchArray@@QAEHHHHHH@Z	93.6818	84468e157f8e
 SOURCE/SEARCH	?SeedPosition@searchArray@@QAEXHHHHHHHHHHHH@Z	94.6110	af4eef145cec
 SOURCE/SETUP	?BaseSetupHandler@@YIHAAUtag_message@@@Z	100.0000	d0e4404ce919
 SOURCE/SETUP	?ExpLoadCampaignHandler@@YIHAAUtag_message@@@Z	100.0000	ef7277c94eab
@@ -1220,7 +1220,7 @@ SOURCE/SPELLS	?BloodLustEffect@combatManager@@QAEXPAVarmy@@H@Z	100.0000	3fe5f115
 SOURCE/SPELLS	?Blur@combatManager@@QAEXHHH@Z	100.0000	1b0fde3aadea
 SOURCE/SPELLS	?CastMassSpell@combatManager@@QAEXHH@Z	100.0000	d968a1690475
 SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	99.7599	a2797720f92f
-SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	99.7711	dbccaeb094a4
+SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	100.0000	8b1dc06f496a
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	98.7541	bea9d7d1f48a
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	a2360f525f06
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	99.9912	368b5b94227f
@@ -1237,7 +1237,7 @@ SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	b8992a064a40
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	100.0000	6774124ff592
 SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	99.8305	f37a76ea9d61
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	483384c46f98
-SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	99.8894	e3fd42ff621b
+SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	100.0000	0ad74d352645
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	100.0000	4cc2eb9bf1df
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	e8c995ed9287
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	100.0000	05d1b8a5bb72
@@ -1324,11 +1324,11 @@ SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	100.0000	ea3281255b20
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	100.0000	9c26f4f21a5b
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4e143dee7a0b
 SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	100.0000	b5cef3365f19
-SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	99.9650	a7a9c6e67963
+SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	100.0000	9a90ffdf439a
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	82640c9237fc
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	100.0000	dd74e3783d21
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	100.0000	fca0d109cc86
-SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	97.7221	819d26563f8e
+SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	100.0000	4c9198d2f8f6
 SOURCE/Wsnetwin	?wsnet_rcv@@YIFFGPAX@Z	100.0000	3e65b5a1a61f
 SOURCE/Wsnetwin	?wsnet_snd@@YIHHHPAX@Z	100.0000	c15f11ecc242
 SOURCE/Wsnetwin	?wsnet_term@@YIXXZ	100.0000	7f95220fee3f
