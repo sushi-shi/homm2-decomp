@@ -40,8 +40,8 @@ void DimIconToBitmap(
     gDimEntry = entry;
     const i32 entryY = entry->y;
     gDimSrc = srcData;
-    i32 X = x + entryX;
-    gDimX0 = X;
+    gDimX0 = x + entryX;
+    i32 X = gDimX0;
     gDimY = y + entryY;
     i32 right;
     u32 cnt;
