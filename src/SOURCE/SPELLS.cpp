@@ -3384,7 +3384,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     stepX_a = static_cast<float>(deltaX_a) / segmentCount_f;
     stepY_e = static_cast<float>(deltaY_a) / segmentCount_f;
     deadline_j = 0;
-    for (segment_h = 0; segmentCount_f > OR_STEER(segment_h); ++segment_h) {
+    for (segment_h = 0; segmentCount_f > segment_h; ++segment_h) {
         ResetLimitCreature();
         gbComputeExtent = true;
         gbSaveBiggestExtent = true;
