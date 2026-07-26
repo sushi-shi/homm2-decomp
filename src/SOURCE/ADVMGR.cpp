@@ -6806,7 +6806,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
             armyIcons[widgetIndexWidget] = new iconWidget(
                 static_cast<i16>(
-                    slotWidthSlot * OR_STEER(widgetIndexWidget) + slotStartState + fiveArmyShiftValue
+                    slotWidthSlot * widgetIndexWidget + slotStartState + fiveArmyShiftValue
                     - GetIconEntry(monsterIconLocal, creatureLocal)->x
                     + (ARMY_QUICK_ICON_SIZE - GetIconEntry(monsterIconLocal, creatureLocal)->w)
                           / ARMY_QUICK_CENTER_DIVISOR
@@ -6851,7 +6851,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             }
             armyTexts[widgetIndexWidget] = new textWidget(
                 static_cast<i16>(
-                    slotWidthSlot * OR_STEER(widgetIndexWidget) + slotStartState + fiveArmyShiftValue
+                    slotWidthSlot * widgetIndexWidget + slotStartState + fiveArmyShiftValue
                     - ARMY_QUICK_TEXT_X_ADJUSTMENT
                 ),
                 static_cast<i16>(rowY + ARMY_QUICK_ICON_SIZE),
@@ -6880,7 +6880,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 + ARMY_QUICK_AREA_LEFT;
             rowY += ARMY_QUICK_SECOND_ROW_SHIFT;
             for (armyIndex = firstRowCountState;
-                 armyIndex < secondRowCountState + firstRowCountState;
+                 armyIndex < firstRowCountState + secondRowCountState;
                  ++armyIndex) {
                 while (quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]
                        == CREATURE_NONE) {
