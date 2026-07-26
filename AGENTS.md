@@ -74,8 +74,10 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Cartesian dimensions. A selected source shape must be compiled against the clean state and
    every requested probe state; never rely on a truncated mixed mutation list. Use the expansive
    declaration-forest default, with at least ten varied classes, typedefs, prototypes, and
-   functions per trial. Stop at the first audited exact closure. If no exact state appears,
-   retain only the best paired object, disassembly, and diff under `build/` as clue evidence.
+   functions per trial. Stop at the first audited target-local exact closure. TU-state probes
+   may perturb siblings; report those changes as diagnostics, but never reject or withhold the
+   target's exact MAX because of them. If no exact state appears, retain only the best paired
+   object, disassembly, and diff under `build/` as clue evidence.
 9. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
    the clean unchanged source, and retain no generated probe declarations or functions. The
@@ -107,7 +109,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   current/live score. Never lower it merely because a live object regresses. Carry it
   through hash-schema or dependency-hash migrations when the function body and all
   tracked codegen dependencies are unchanged; reset it only for a real effective-source
-  change.
+  change. MAX is the durable campaign memory: when a disposable island has exact target
+  bytes, retail size, and complete ordered-relocation identity, record 100 for that target
+  even if the same TU state perturbs siblings. Recover each sibling through its own search.
 - Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
 - Never retain generated labels, globals, aliases, padding, or fake code in reconstructed
