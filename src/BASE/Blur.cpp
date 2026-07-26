@@ -152,9 +152,9 @@ void DoBlur(
                 PollSound();
             }
             i32 samples[SPILLED_ARRAY_SAMPLE_COUNT];
+            i32 sample15; // south four rows
             i32 sample14; // north one row
             i32 sample13; // west four pixels
-            i32 sample15; // south four rows
             u8* input = destination->m_pixels + rowOffset + BORDER_RADIUS;
             i32 remaining = INTERIOR_COLUMN_COUNT;
             u8* output = source->m_pixels + rowOffset + BORDER_RADIUS;
@@ -282,7 +282,7 @@ void DoBlur(
                     components[IDX(PALETTE_CHANNEL_GREEN)], samples[IDX(NORTH_FOUR_SAMPLE)]
                 );
 
-                i32 blueSum = BLUR_COMPONENT(
+                u32 blueSum = BLUR_COMPONENT(
                     components[IDX(PALETTE_CHANNEL_BLUE)], samples[IDX(SOUTH_ONE_SAMPLE)]
                 )
                               + BLUR_COMPONENT(components[IDX(PALETTE_CHANNEL_BLUE)], sample14);
