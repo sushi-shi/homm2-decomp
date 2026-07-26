@@ -58,9 +58,9 @@ void IconToBitmapScale(
     if (0 < scale) {
         i32 rows = scale;
         do {
-            i32 cols = scale;
             u8* dstPix = dstRow;
             u8* srcPix = srcRow;
+            i32 cols = scale;
             if (0 < scale) {
                 do {
                     if (*srcPix != 0)
