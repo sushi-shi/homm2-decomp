@@ -175,7 +175,7 @@ BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	1ed52c9fa5
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	f14c6312fb28.5e877b076c9a
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	78.4148	67bd0eb9e60b
-BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	80.7356	f657c3618369
+BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.9138	0fec6d993e84
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.2289	f28031689358
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.5942	9008748c57d7
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.9503	47d722d54f7c
