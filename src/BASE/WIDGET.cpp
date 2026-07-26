@@ -97,8 +97,8 @@ MessageDispatchResult widget::Main(tag_message& message) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        WidgetFlag flags = m_flags
-                            | static_cast<WidgetFlag>(message.payload.widget.data.value);
+                        i16 flags = m_flags
+                            | static_cast<i16>(message.payload.widget.data.value);
                         m_flags = flags;
                         if (HAS(flags, WIDGET_FLAG_DIMMED)) {
                             Draw();
@@ -135,7 +135,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                             m_flags &= ~WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        WidgetFlag flags = static_cast<WidgetFlag>(rawFlags);
+                        i16 flags = static_cast<i16>(rawFlags);
                         m_flags &= ~flags;
                         if (HAS(flags, WIDGET_FLAG_DIMMED))
                             Draw();
