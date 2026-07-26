@@ -46,7 +46,7 @@ void DimIconToBitmap(
     i32 right;
     u32 cnt;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (clipX > gDimX0 || gDimX0 + entry->w > clipX + clipW || gDimY < clipY
+        if (gDimX0 < clipX || gDimX0 + entry->w > clipX + clipW || clipY > gDimY
             || gDimY + entry->h > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
             gDimClipR = clipX + clipW - 1;
