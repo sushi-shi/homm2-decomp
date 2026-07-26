@@ -2176,10 +2176,12 @@ i32 army::Damage(i32l damage, SpellType spell) {
         m_deathPending = 1;
     }
     originalFacing = m_facing;
-    m_facing = OppositeArmyFacing(
-        gpCombatManager
-            ->m_armies[IDX(gpCombatManager->m_currentArmySide)][gpCombatManager->m_currentArmyIndex]
-            .m_facing
+    m_facing = static_cast<ArmyFacing>(
+        IDX((gpCombatManager->m_armies[0]
+             + IDX(gpCombatManager->m_currentArmySide) * COMBAT_ARMY_STORAGE_SLOT_COUNT
+             + gpCombatManager->m_currentArmyIndex)
+                ->m_facing)
+        ^ IDX(ARMY_FACING_RIGHT)
     );
     m_facing = originalFacing;
     CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
