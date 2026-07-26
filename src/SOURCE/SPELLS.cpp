@@ -2512,55 +2512,72 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
 
 VA(0x0042685a, 0x361)
 void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
-    i32 firstBolt = 1;
-    i32 damage = spellPower * CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
-    i32 deadline = KBTickCount();
-    i32 startX = castX;
-    i32 startY = castY;
-    i32 unusedChainWord6;
+    i32 damage_l;
+    army* target_j;
+    i32 deltaY_i;
+    i32 unusedChainWord6_s;
+    i32 deltaX_i;
+    i32 targetY;
+    i32 startY_l;
+    i32 targetX_k;
+    i32 startX_l;
+    i32 distance;
+    i32 firstBolt;
+    i32 nextTarget_i;
+    i32 strike_i;
+    i32 forceAngle;
     i32 unusedChainWord5;
+    i32 targetDamage_o;
+    i32 deadline_o;
     i32 unusedChainWord8;
+    i32 branchDistance;
 
+    firstBolt = 1;
+    damage_l = spellPower * CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
+    deadline_o = KBTickCount();
+    startX_l = castX;
+    startY_l = castY;
     ClearEffects();
     gpMouseManager->HideColorPointer();
-    i32 strike;
-    for (strike = 0; strike < CHAIN_LIGHTNING_MAX_TARGETS; ++strike) {
-        army* target =
+    for (strike_i = 0; strike_i < CHAIN_LIGHTNING_MAX_TARGETS; ++strike_i) {
+        target_j =
             &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
-        if (strike <= CHAIN_LIGHTNING_MAX_TARGETS - 2
+        if (strike_i <= CHAIN_LIGHTNING_MAX_TARGETS - 2
             && m_hexCells[targetHex].m_occupantSide == m_currentSide)
             gpCombatManager->m_heroDeathPending[IDX(m_currentSide)] = 1;
 
-        i32 targetDamage = damage;
-        if (target->m_monsterType == CREATURE_AIR_ELEMENTAL)
-            targetDamage *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
-        if (target->m_monsterType == CREATURE_IRON_GOLEM
-            || target->m_monsterType == CREATURE_STEEL_GOLEM)
-            targetDamage = static_cast<i32>(targetDamage * SPELL_GOLEM_DAMAGE_MULTIPLIER);
-        target->Damage(targetDamage, SPELL_NONE);
-        damage >>= 1;
-        gArmyEffected[IDX(target->m_side)][target->m_index] = 1;
+        targetDamage_o = damage_l;
+        if (target_j->m_monsterType == CREATURE_AIR_ELEMENTAL)
+            targetDamage_o *= CHAIN_LIGHTNING_AIR_ELEMENTAL_MULTIPLIER;
+        if (target_j->m_monsterType == CREATURE_IRON_GOLEM
+            || target_j->m_monsterType == CREATURE_STEEL_GOLEM)
+            targetDamage_o =
+                static_cast<i32>(targetDamage_o * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+        target_j->Damage(targetDamage_o, SPELL_NONE);
+        damage_l >>= 1;
+        gArmyEffected[IDX(target_j->m_side)][target_j->m_index] = 1;
 
-        i32 targetX = target->MidX();
-        i32 targetY = target->MidY();
-        i32 deltaX = abs(targetX - startX);
-        i32 deltaY = abs(targetY - startY);
-        i32 distance =
-            static_cast<i32>(sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
-        i32 branchDistance = distance / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
+        targetX_k = target_j->MidX();
+        targetY = target_j->MidY();
+        deltaX_i = abs(targetX_k - startX_l);
+        deltaY_i = abs(targetY - startY_l);
+        distance = static_cast<i32>(
+            sqrt(static_cast<double>(deltaX_i * deltaX_i + deltaY_i * deltaY_i))
+        );
+        branchDistance = distance / CHAIN_LIGHTNING_DISTANCE_DIVISOR;
         if (branchDistance > CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE)
             branchDistance = CHAIN_LIGHTNING_MAX_BRANCH_DISTANCE;
         if (branchDistance < CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE)
             branchDistance = CHAIN_LIGHTNING_MIN_BRANCH_DISTANCE;
-        i32 forceAngle =
+        forceAngle =
             branchDistance <= CHAIN_LIGHTNING_SHORT_BRANCH_MAX
                 ? CHAIN_LIGHTNING_SHORT_FORCE_ANGLE
                 : CHAIN_LIGHTNING_LONG_FORCE_ANGLE;
         DoBolt(
             0,
-            startX,
-            startY,
-            targetX,
+            startX_l,
+            startY_l,
+            targetX_k,
             targetY,
             0,
             CHAIN_LIGHTNING_BOLT_LENGTH,
@@ -2573,21 +2590,21 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
             forceAngle,
             0,
             0,
-            strike == 0
+            strike_i == 0
         );
         firstBolt = 0;
-        startX = targetX;
-        startY = targetY;
+        startX_l = targetX_k;
+        startY_l = targetY;
         DelayMilli(
             static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY)
         );
-        i32 nextTarget = GetNextChainLightningTarget(target, 1);
-        if (nextTarget == COMBAT_HEX_EMPTY)
+        nextTarget_i = GetNextChainLightningTarget(target_j, 1);
+        if (nextTarget_i == COMBAT_HEX_EMPTY)
             break;
-        targetHex = nextTarget;
+        targetHex = nextTarget_i;
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
-        DelayTil(&deadline);
-        deadline = static_cast<i32>(
+        DelayTil(&deadline_o);
+        deadline_o = static_cast<i32>(
             KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY
         );
     }
