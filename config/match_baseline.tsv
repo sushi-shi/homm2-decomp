@@ -368,7 +368,7 @@ BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	98.0654	0f5a69b3c941
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	6bbee93fac00
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	a12dd5677fbf
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	33440694b7af
-BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	82.5587	402ce8f7580b
+BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	82.7277	bed9f3297f53
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.3830	b58551cecec3
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	95.7868	86c5e21c9110.14e6f82ad29f
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	86.6574	93abd4c747fe

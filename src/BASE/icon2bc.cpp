@@ -67,7 +67,8 @@ void IconToBitmapColorTable(
     savedDst = gCTDst;
     i32 cmd;
     for (;;) {
-        cmd = *gCTSrc++;
+        gCTSrc = gCTSrc + 1;
+        cmd = gCTSrc[-1];
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
