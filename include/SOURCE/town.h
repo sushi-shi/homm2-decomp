@@ -9,6 +9,7 @@ class hero;
 
 H2_ENUM_CLASS_BEGIN(TownBuilding)
     TOWN_BUILDING_MAGE_GUILD                    = 0x1,
+    TOWN_BUILDING_THIEVES_GUILD                 = 0x2,
     TOWN_BUILDING_TAVERN                        = 0x4,
     TOWN_BUILDING_DOCK                          = 0x8,
     TOWN_BUILDING_TENT                          = 0x20,
