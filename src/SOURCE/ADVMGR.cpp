@@ -6729,7 +6729,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN || armyCountLocal == 0) {
         emptyArmyLabel = static_cast<char*>(H2_ALLOC_AT(
             TOWN_QUICK_EMPTY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64a4, townQuickViewSourceFile, RETAIL_FILE),
-            TOWN_VIEW_LINE_BASE + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
+            s_townViewLineBase + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
         ));
         if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(emptyArmyLabel, DATA_COMPGEN(0x004f64d0, townQuickViewUnknown, "Unknown"));
@@ -6830,7 +6830,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             }
             armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
                 TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64fc, townQuickViewSourceFile2, RETAIL_FILE),
-                TOWN_VIEW_LINE_BASE + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
+                s_townViewLineBase + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
             ));
             if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
@@ -6914,7 +6914,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 }
                 armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
                     TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f654c, townQuickViewSourceFile3, RETAIL_FILE),
-                    TOWN_VIEW_LINE_BASE + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
+                    s_townViewLineBase + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
                 ));
                 if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
