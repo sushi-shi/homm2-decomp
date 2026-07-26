@@ -102,8 +102,8 @@ void FlipDimIconToBitmap(
                         cn = cmd;
                         dst = (gFDRow - cmd) + X + 1;
                     } else {
-                        dst = gFDRow + clipX;
                         cn = (X - clipX) + 1;
+                        dst = gFDRow + clipX;
                     }
                     gFDCnt2 = cn;
                     gFDDst = dst;
