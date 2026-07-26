@@ -754,16 +754,23 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
         if ((mask & bit1) != 0) {
-            strength8 = (m_armies[IDX(side)] + armyIndex2)->Strength();
-            if ((m_armies[IDX(side)] + armyIndex2)->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] != 0
-                || (m_armies[IDX(side)] + armyIndex2)->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
+            strength8 =
+                (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                    ->Strength();
+            if ((m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                        ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
+                    != 0
+                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
                        != 0
-                || (m_armies[IDX(side)] + armyIndex2)
+                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                        != 0
-                || (m_armies[IDX(side)] + armyIndex2)->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
+                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
                        != 0
-                || (m_armies[IDX(side)] + armyIndex2)->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
+                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                           ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                        != 0)
                 strength8 >>= 1;
             if (bestStrength8 < strength8) {

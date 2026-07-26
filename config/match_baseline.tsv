@@ -526,7 +526,7 @@ SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	4810a6d6edc1
 SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.4966	4b40aa2602ea
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a648267683
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	98c41dde6a5b
-SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	99cfea1a5460
+SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	99.6076	59fc1a2bd34f
 SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	3af62d592f5b
 SOURCE/AI	?GetFlyerMask@combatManager@@QAEHH@Z	100.0000	061a0b1aa1a0
 SOURCE/AI	?GetMirrorImageMask@combatManager@@QAEHH@Z	100.0000	0ddc985b4e29
