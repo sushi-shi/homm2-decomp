@@ -1819,8 +1819,8 @@ i32 army::WalkTo(void) {
 VA(0x0044f443, 0x2ee)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
-    CombatHexDirection moatDirection;
-    i32 numSteps;
+    i32 steps;
+    i32 moatFound;
     i32 moatIndex_1;
     i32 canEnterMoat_1;
 
@@ -1828,15 +1828,15 @@ i32 army::WalkTo(i32 destination) {
     m_targetSide = m_targetIndex;
     if (gpCombatManager->m_drawbridgeBackgroundVisible
         && HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        numSteps = 0;
+        moatFound = 0;
         moatIndex_1 = 0;
         for (direction_3 = 0; direction_3 < ARMY_MOAT_CELL_COUNT; direction_3++) {
             if (moatCell[direction_3] == destination) {
-                numSteps = 1;
+                moatFound = 1;
                 moatIndex_1 = direction_3;
             }
         }
-        if (numSteps) {
+        if (moatFound) {
             canEnterMoat_1 = 0;
             if (moatIndex_1 == ARMY_MOAT_GATE_INDEX
                 && gpCombatManager->m_drawbridgeState != COMBAT_CASTLE_GATE_OPEN) {
@@ -1846,11 +1846,14 @@ i32 army::WalkTo(i32 destination) {
                 || (moatIndex_1 < ARMY_MOAT_CELL_COUNT - 1 && moatCell[moatIndex_1 + 1] == m_hex)) {
                 canEnterMoat_1 = 1;
             }
-            for (moatDirection = COMBAT_DIRECTION_NORTHEAST;
-                 IDX(moatDirection) < ARMY_ADJACENT_DIRECTION_COUNT;
-                 moatDirection++) {
+            for (direction_3 = IDX(COMBAT_DIRECTION_NORTHEAST);
+                 direction_3 < ARMY_ADJACENT_DIRECTION_COUNT;
+                 direction_3++) {
                 if (moatCell[moatIndex_1]
-                    == GetAdjacentCellIndex(m_hex, moatDirection)) {
+                    == GetAdjacentCellIndex(
+                        m_hex,
+                        static_cast<CombatHexDirection>(direction_3)
+                    )) {
                     canEnterMoat_1 = 1;
                 }
             }
@@ -1873,7 +1876,7 @@ i32 army::WalkTo(i32 destination) {
         return ARMY_PATH_BLOCKED;
     }
 
-    numSteps = 0;
+    steps = 0;
     for (direction_3 = gpSearchArray->m_pathLength - 1; direction_3 >= 0; direction_3--) {
         Walk(
             static_cast<CombatHexDirection>(
@@ -1882,8 +1885,8 @@ i32 army::WalkTo(i32 destination) {
             0,
             gpSearchArray->m_pathLength - 1 != direction_3
         );
-        numSteps++;
-        if (numSteps >= m_monster.speed) {
+        steps++;
+        if (steps >= m_monster.speed) {
             direction_3 = -1;
         }
     }
