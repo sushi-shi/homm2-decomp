@@ -685,7 +685,7 @@ class TuStateNoiseTests(unittest.TestCase):
                 original.replace(b"\t90.0000\tabc123\t", b"\t100.0000\tabc123\t"),
             )
 
-    def test_record_target_max_rejects_sub_100_observations(self):
+    def test_record_target_max_records_higher_sub_100_observations(self):
         with tempfile.TemporaryDirectory() as directory:
             baseline = Path(directory) / "match_baseline.tsv"
             original = b"BASE/unit\t?Target@@YIXXZ\t90.0000\tabc123\n"
@@ -693,15 +693,17 @@ class TuStateNoiseTests(unittest.TestCase):
             result = noise.record_target_max(
                 baseline, "BASE/unit", "?Target@@YIXXZ", "abc123", 99.991234
             )
-            self.assertFalse(result["updated"])
-            self.assertEqual(result["new_max"], 90.0)
-            self.assertEqual(result["reason"], "not_audited_exact")
-            self.assertEqual(baseline.read_bytes(), original)
+            self.assertTrue(result["updated"])
+            self.assertEqual(result["new_max"], 99.9912)
+            self.assertEqual(
+                baseline.read_bytes(),
+                b"BASE/unit\t?Target@@YIXXZ\t99.9912\tabc123\n",
+            )
             unchanged = noise.record_target_max(
                 baseline, "BASE/unit", "?Target@@YIXXZ", "abc123", 99.98
             )
             self.assertFalse(unchanged["updated"])
-            self.assertEqual(unchanged["reason"], "not_audited_exact")
+            self.assertEqual(unchanged["reason"], "not_higher")
 
     def test_record_target_max_refuses_hash_mismatch_without_write(self):
         with tempfile.TemporaryDirectory() as directory:
