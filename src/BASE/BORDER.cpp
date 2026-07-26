@@ -135,8 +135,9 @@ leaveEvent:
 
 VA(0x004d2480, 0xab)
 void border::Draw(void) {
-    i16 y = m_y + static_cast<i16>(m_owner->m_posY);
-    i16 x = m_x + static_cast<i16>(m_owner->m_posX);
+    heroWindow* window = m_owner;
+    i16 y = m_y + static_cast<i16>(window->m_posY);
+    i16 x = m_x + static_cast<i16>(window->m_posX);
     WidgetKind kind = m_kind;
     switch (kind) {
         case WIDGET_KIND_SOLID:
