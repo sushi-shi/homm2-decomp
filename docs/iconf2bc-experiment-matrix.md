@@ -1,12 +1,41 @@
 # BASE/iconf2bc experiment matrix
 
-Current structural state is based on integrated tip `a18cc69`, source SHA-256
-`1dff1e69857039210c855dda122d6340c5ebda3edcc9a6cff804f7925e84427d`, live 85.27%
-(historical result 86.2544%), function end `0x53f`, frame `sub esp,8`, and 84/83 relocations.
-It adopts the newly integrated shared IconRle enum domain, the canonical dim-palette owner header,
-the function owner header, and byte-pointer row storage. The complete normalized CFG and every
-relocation target are closed; gFCY 9/8 is the only occurrence excess. This is a structural
-checkpoint and compiler-state residual, not a byte-proven wall classification.
+Current source SHA-256 is
+`a35111926b019541f74851d17d07ff96153f18c6c2ddc32537fe15f9f36f6b5b`. The official
+generated status reports 87.0227%; the isolated 50-state row-visibility census measured
+87.010080% for its clean baseline and found no better island. The retained source adds the
+same row-visibility inline-accessor shape already present in the sibling icon family.
+Earlier sections below are historical checkpoints, not the current live classification.
+
+## Preserved source attempts
+
+Reviewed source shapes are preserved under
+`docs/matching/FlipIconToBitmapColorTable/`. Each file contains the relevant code arms and
+result comments. Generated compiler-state declarations remain disposable and are represented
+by one census file because they do not alter the effective function source.
+
+| Attempt | Coverage | Best observed | Disposition |
+|---|---|---:|---|
+| `ast-expression-matrix.cpp` | 96 generated source shapes | 86.153656% | rejected |
+| `setup-entry-selection-matrix.cpp` | five entry/root shapes × clean/forest states | 86.455920% | rejected |
+| `setup-lifetime-matrix.cpp` | four declaration/lifetime shapes × states | 86.430730% | rejected |
+| `width-endpoint-matrix.cpp` | three endpoint shapes × two clip-width sources | 86.153656% | rejected |
+| `preserve-width-internal.cpp` | internal width-preservation AST screen | 86.408060% | rejected |
+| `current-y-source-matrix.cpp` | published-global versus retained-local Y | 86.380356% | rejected |
+| `decoder-read-advance.cpp` | split read/advance versus postincrement | 86.380356% | rejected |
+| `literal-copy-order.cpp` | right-clipped `cn`/`skip` order × 120 states | 86.644840% | rejected |
+| `family-fusion.cpp` | serialized setup × scratch scope × read advance | 86.380356% | rejected |
+| `direct-family-setup.cpp` | direct sibling-style serialized setup × 120 states | 86.319900% | rejected |
+| `read-icon-rle-byte-all-sites.cpp` | helper at all seven decoder reads | structural regression | rejected |
+| `read-icon-rle-byte-control-sites.cpp` | helper at five control reads | structural regression | rejected |
+| `row-visible-inline.cpp` | shared predicate helper × 50 states | 87.0227% official | retained |
+| `tu-state-censuses.cpp` | unchanged-source/top/target seed censuses | 86.720406% historical best | exhausted for old source |
+
+Still-untried structural families are deliberately not recorded as attempts: removal of
+`do_fill`, `do_dim`, and `set_skip`; a fully no-`goto` run funnel; command/header decode
+inlining; clip-interval, dim-pixel, literal-map, and run-copy inline helpers; primed
+`while`/`do-while` decoder forms; count-versus-index inner loops; and outer
+clipped/unclipped decoder ownership.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,

@@ -74,7 +74,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    Cartesian dimensions. A selected source shape must be compiled against the clean state and
    every requested probe state; never rely on a truncated mixed mutation list. Use the expansive
    declaration-forest default, with at least ten varied classes, typedefs, prototypes, and
-   functions per trial. Stop at the first audited target-local exact closure. TU-state probes
+   functions per trial. Default to 50 TU-state trials per structural version; expand beyond
+   50 only when a near-closing state or unusually sparse state census justifies the extra
+   time. Stop at the first audited target-local exact closure. TU-state probes
    may perturb siblings; report those changes as diagnostics, but never reject or withhold the
    target's exact MAX because of them. If no exact state appears, retain only the best paired
    object, disassembly, and diff under `build/` as clue evidence.
@@ -91,6 +93,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    change can expose a different compiler-state orbit. Never invent a source change merely to
    perturb the compiler. Generated source is never retained; best compiled clue artifacts may
    remain under `build/`, and a higher sub-100 observation may advance hash-scoped MAX.
+   Preserve each reviewed source-shape experiment under
+   `docs/matching/<function-name>/<attempt-name>.cpp`, with the attempted code, the generated
+   matrix/artifact path, and comments recording the result and disposition. One file may describe
+   all arms of a single permutation matrix; TU-state probes do not need separate source files
+   because they leave the effective function source unchanged.
 11. Before committing, run `homm2 build`, the focused relocation review, and
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.

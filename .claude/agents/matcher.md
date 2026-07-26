@@ -106,7 +106,13 @@ early-exit versus single-exit shape. Use:
 Select a retail-compatible semantic CFG family first. Only then enumerate small
 evaluation-order, relational, parenthesization, identifier-spelling, and equivalent
 internal choices with `scripts/match_variants.py`; never compile those changes
-manually one by one.
+manually one by one. Use 50 TU-state trials per structural version by default;
+expand beyond 50 only for a near-closing state or an unusually sparse state census.
+Preserve every reviewed structural attempt in
+`docs/matching/<function-name>/<attempt-name>.cpp`. Include its source arms and comments
+identifying the matrix or retained artifact, measured outcome, and disposition. A
+permutation matrix is one attempt; its compiler-state trials are not separate source
+attempts.
 
 The emitted block partition is not a correctness invariant. MSVC TU/compiler state
 can split or merge basic blocks for unchanged source, changing block count,
