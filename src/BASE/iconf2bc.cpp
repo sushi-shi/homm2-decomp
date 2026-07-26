@@ -25,6 +25,10 @@ DATA(0x005380cc) static u8 gFCColor;
 DATA(0x005380c8) static i32 gFCClipR;
 DATA(0x005380c0) static u8* gFCDst;
 
+static inline i32 FlipColorRowVisible(i32 clipTop) {
+    return clipTop <= gFCY && gFCY <= gFCClipB;
+}
+
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(
     class icon* srcIcon,
@@ -112,10 +116,9 @@ void FlipIconToBitmapColorTable(
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset((gFCRow - count) + 1 + X, gFCColor, count);
             } else {
-                i32 currentY = gFCY;
                 i32 left;
-                if (currentY >= clipY && currentY <= gFCClipB
-                    && (left = (X - count) + 1, clipX <= left) && X <= gFCClipR) {
+                if (FlipColorRowVisible(clipY) && (left = (X - count) + 1, clipX <= left)
+                    && X <= gFCClipR) {
                     if (clipX <= left) {
                         memset((gFCRow - count) + 1 + X, gFCColor, count);
                     } else {
@@ -151,9 +154,8 @@ void FlipIconToBitmapColorTable(
                         } while (count != 0);
                     }
                 } else {
-                    i32 currentY = gFCY;
                     gFCCnt2 = count;
-                    if (currentY >= clipY && currentY <= gFCClipB
+                    if (FlipColorRowVisible(clipY)
                         && clipX <= static_cast<i32>((X - count) + 1) && X <= gFCClipR) {
                         i32 left = (X - count) + 1;
                         u8* dp;
@@ -203,8 +205,7 @@ void FlipIconToBitmapColorTable(
                     } while (k != 0);
                 }
             } else {
-                i32 currentY = gFCY;
-                if (currentY >= clipY && currentY <= gFCClipB) {
+                if (FlipColorRowVisible(clipY)) {
                     i32 left = (X - cmd) + 1;
                     if (left <= gFCClipR && clipX <= X) {
                         u32 cn;
