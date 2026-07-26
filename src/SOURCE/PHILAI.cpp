@@ -6409,7 +6409,8 @@ i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
         if (gpCurAIHero->HasSpell(SpellType(eventData)))
             return artifactValue15;
-        return artifactValue15 + gsSpellInfo[eventData].aiValue;
+        else
+            return artifactValue15 + gsSpellInfo[eventData].aiValue;
     }
 
     defaultValue37 = artifactValue15;
