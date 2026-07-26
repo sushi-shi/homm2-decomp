@@ -127,8 +127,8 @@ void DoBlur(
         H2_ALLOC_AT(LOOKUP_BYTE_COUNT, gBlurText.lookupAllocationSource, 0x19)
     );
     BlurComponentTable redComponents;
-    BlurComponentTable greenComponents;
     BlurComponentTable blueComponents;
+    BlurComponentTable greenComponents;
     i8* paletteColor = gpBufferPalette->m_data;
     i32 componentOffset = 0;
     do {
