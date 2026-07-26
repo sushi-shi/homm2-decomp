@@ -197,7 +197,7 @@ void DoBlur(
                 sample15 = static_cast<u32>(input[SCREEN_WIDTH * BORDER_RADIUS])
                            << COMPONENT_INDEX_SHIFT;
 
-                i32 redSum = BLUR_COMPONENT(
+                u32 redSum = BLUR_COMPONENT(
                     components[IDX(PALETTE_CHANNEL_RED)], samples[IDX(NORTH_FOUR_SAMPLE)]
                 ) + BLUR_COMPONENT(
                     components[IDX(PALETTE_CHANNEL_RED)], samples[IDX(SOUTH_ONE_SAMPLE)]
@@ -239,7 +239,7 @@ void DoBlur(
                 redSum += BLUR_COMPONENT(components[IDX(PALETTE_CHANNEL_RED)], sample14);
                 redSum += BLUR_COMPONENT(components[IDX(PALETTE_CHANNEL_RED)], sample15);
 
-                i32 greenSum = BLUR_COMPONENT(
+                u32 greenSum = BLUR_COMPONENT(
                     components[IDX(PALETTE_CHANNEL_GREEN)], samples[IDX(SOUTH_ONE_SAMPLE)]
                 )
                                + BLUR_COMPONENT(components[IDX(PALETTE_CHANNEL_GREEN)], sample15);
