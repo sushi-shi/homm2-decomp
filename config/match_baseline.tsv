@@ -341,7 +341,7 @@ BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	e
 BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	5281ad28d06b
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	e13620843518
 BASE/WINMGR	?CreateFizzleTables@@YIXXZ	100.0000	2437ef506d03
-BASE/WINMGR	?CycleColors@@YIXH@Z	97.6054	bfceb1b0a91e
+BASE/WINMGR	?CycleColors@@YIXH@Z	100.0000	6497ba380cd2
 BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	100.0000	b24d0de4089c.0c4a5e8cc520
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	100.0000	2b641dfbe708.0c4a5e8cc520
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	99.7204	16fa8665a555

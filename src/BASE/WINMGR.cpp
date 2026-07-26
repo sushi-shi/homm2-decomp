@@ -108,7 +108,8 @@ VA(0x004ca6d0, 0x3a3)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
     iCycle1Count++;
-    if (gpWindowManager == NULL || gpBufferPalette == NULL || !gpWindowManager->m_active)
+    if (gpWindowManager == NULL || gpBufferPalette == NULL
+        || gpWindowManager->m_active != 1)
         return;
     if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
         return;
