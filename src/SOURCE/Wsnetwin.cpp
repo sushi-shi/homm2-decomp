@@ -235,8 +235,8 @@ void wsSendMessage(
             if (giThisNetPos == netPlayer)
                 continue;
             attemptCount = 0;
-            peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
         sendPacket:
+            peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
             iRc = sendto(
                 sd_dg,
                 reinterpret_cast<char*>(packetBuffer),
