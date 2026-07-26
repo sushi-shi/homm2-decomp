@@ -1090,25 +1090,25 @@ Bool trivialGt(Int32 i1, Int32 i2) {
 
 VA(0x004d6610, 0x10f)
 void shellTrivial(void) {
-    Int32 i, j, h, bigN;
+    Int32 i, j, h, bigN2;
     Int32 v;
 
-    Int32 ptrLo = 0;
-    Int32 ptrHi = last;
-    bigN = ptrHi - ptrLo + 1;
+    Int32 ptrLo5 = 0;
+    Int32 ptrHi7 = last;
+    bigN2 = ptrHi7 - ptrLo5 + 1;
     h = 1;
     do {
         h = 3 * h + 1;
-    } while (!(h > bigN));
+    } while (!(h > bigN2));
     do {
         h = h / 3;
-        for (i = ptrLo + h; i <= ptrHi; i++) {
+        for (i = ptrLo5 + h; i <= ptrHi7; i++) {
             v = zptr[i];
             j = i;
             while (trivialGt(zptr[j - h], v)) {
                 zptr[j] = zptr[j - h];
                 j = j - h;
-                if (j <= (ptrLo + h - 1))
+                if (j <= (ptrLo5 + h - 1))
                     goto zero;
             }
         zero:

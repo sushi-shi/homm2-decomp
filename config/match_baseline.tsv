@@ -109,7 +109,7 @@ BASE/Bzip	?sendMTFVal@@YIXPAUBitStream@@H@Z	100.0000	1e34b4a02800
 BASE/Bzip	?sendZeroes@@YIXPAUBitStream@@H@Z	100.0000	bba29ba16ea1
 BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	401de243945f
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	f002f4d25ba8
-BASE/Bzip	?shellTrivial@@YIXXZ	99.5556	a9905d4e7ae3
+BASE/Bzip	?shellTrivial@@YIXXZ	100.0000	7c40e5bd4287
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	b7596b5af6b6
 BASE/Bzip	?sortIt@@YIXXZ	99.1210	f3ac5266e2ee
 BASE/Bzip	?spotBlock@@YIXH@Z	100.0000	9842ca999a79
