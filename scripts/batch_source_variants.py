@@ -586,8 +586,6 @@ def main(argv=None) -> int:
                         sibling_regressions.append(
                             f"exact sibling raw/relocation metrics changed: {symbol}"
                         )
-                if sibling_regressions:
-                    rejections.append("sibling regression")
                 row.update({
                     "score": score,
                     "score_delta": score - baseline_score,

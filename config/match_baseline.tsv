@@ -505,7 +505,7 @@ SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	100.0000	3435063a897c
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	5e4ebd2056bb
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	b0b5b175db8c
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	95.6164	5c00fe0cc843
-SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.1583	a4873fb5f0fe
+SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9973	8df1c11b830b
 SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	44697e428ed6
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	99.0654	026d1e7b1991
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.2903	fca61ae310fd
@@ -526,7 +526,7 @@ SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	4810a6d6edc1
 SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.4966	4b40aa2602ea
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a648267683
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	98c41dde6a5b
-SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	99.6076	59fc1a2bd34f
+SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	59fc1a2bd34f
 SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	3af62d592f5b
 SOURCE/AI	?GetFlyerMask@combatManager@@QAEHH@Z	100.0000	061a0b1aa1a0
 SOURCE/AI	?GetMirrorImageMask@combatManager@@QAEHH@Z	100.0000	0ddc985b4e29
