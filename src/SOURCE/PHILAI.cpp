@@ -3576,11 +3576,11 @@ i32 philAI::StrategicValueOfPosition(
 VA(0x0043fa3e, 0x14e)
 i32 philAI::ValueOfTown(town* t) {
     i32 sum = 0;
-    BuildingSlotType building;
-    for (building = BUILDING_SLOT_MAGE_GUILD; building <= BUILDING_SLOT_DWELLING_SIXTH;
-         building++) {
-        if (t->m_buildings & (1 << IDX(building)))
-            sum += GetBuildingBaseResourceValue(t->m_type, building, t->m_buildState);
+    BuildingSlotType idx;
+    for (idx = BUILDING_SLOT_MAGE_GUILD; idx <= BUILDING_SLOT_DWELLING_SIXTH;
+         idx++) {
+        if (t->m_buildings & (1 << IDX(idx)))
+            sum += GetBuildingBaseResourceValue(t->m_type, idx, t->m_buildState);
     }
     sum = (i32)(gafAITurnCostResource[IDX(RES_GOLD)] * DATA_COMPGEN(0x004eb4c0, valueOfTownConstant, 1250.0f) * DATA_COMPGEN(0x004eb4a8, valueOfTownConstant2, 1.5) + sum);
     sum += 750;
