@@ -7094,7 +7094,7 @@ i32 game::GetNumThievesGuilds(i32 color) {
     i32 i;
     for (i = 0; i < m_players[color].m_townCount; i++) {
         if (gpGame->m_castleRecs[m_players[color].m_townIds[i]].m_buildings
-            & IDX(TOWN_BUILDING_TAVERN))
+            & IDX(TOWN_BUILDING_THIEVES_GUILD))
             num++;
     }
     return num;
