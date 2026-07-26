@@ -438,7 +438,6 @@ void dropListWidget::RestoreDropBackground(void) {
 
 VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {
-    IconEntry* iconEntry;
     i16 scrollWidth[SCROLL_METRIC_SLOT_COUNT];
     i16 scrollTopHeight[SCROLL_METRIC_SLOT_COUNT];
     i16 scrollBottomWidth[SCROLL_METRIC_SLOT_COUNT];
@@ -480,7 +479,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_listHeight =
         (m_visibleItemCount - LIST_EDGE_ROW_COUNT) * m_middleRowHeight + m_firstRowHeight
         + m_lastRowHeight;
-    iconEntry = &m_icon->Entries()[m_scrollUpFrame];
+    IconEntry* iconEntry = &m_icon->Entries()[m_scrollUpFrame];
     scrollWidth[0] = iconEntry->w;
     m_scrollUpWidth = scrollWidth[0];
     scrollTopHeight[0] = iconEntry->h;
