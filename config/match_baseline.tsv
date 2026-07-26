@@ -687,7 +687,7 @@ SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	c28caa0e307f
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	7245d8dba01f
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fe9be41b7595
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	82f219fa1091
-SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	69592df80f97
+SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.9883	ab5e7fe02b27
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	9ca9e9ded8fc
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	97.0881	126e83005de4
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	1ab552cbd038
