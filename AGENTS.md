@@ -66,7 +66,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    and partition are diagnostic rather than correctness invariants: unchanged source can split
    or merge blocks across legitimate MSVC TU states. Re-run the block view for retained islands,
    use it to classify structural orbits, and require exact bytes plus complete ordered
-   relocations for closure.
+   relocations for closure. Fuzzy score is not monotonic across structural changes: a lower-
+   scoring version with credible semantics, retail size, relocations, and CFG remains an active
+   branch seed. Explore evidence-based structural descendants and their bounded permutation
+   matrices before pruning it. Prune a branch for contradictory topology or semantics, not
+   merely because its parent or first compiler-state census scores below the current MAX.
 8. For a structurally aligned compiler-state residual, island search is the current
    last-mile policy. Run `scripts/tu_state_noise.py` for an unchanged-source census. When
    several legitimate source shapes must also be tested, use `scripts/match_variants.py` so

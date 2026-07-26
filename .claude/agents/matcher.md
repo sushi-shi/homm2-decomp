@@ -108,6 +108,12 @@ evaluation-order, relational, parenthesization, identifier-spelling, and equival
 internal choices with `scripts/match_variants.py`; never compile those changes
 manually one by one. Use 50 TU-state trials per structural version by default;
 expand beyond 50 only for a near-closing state or an unusually sparse state census.
+Do not use fuzzy score as a greedy pruning rule. A lower-scoring version that keeps
+credible semantics, retail size, relocations, and CFG is a distinct active branch
+seed: try evidence-based structural descendants and their bounded matrices before
+discarding it. Score can fall when entering the compiler-state orbit that contains
+the exact solution. Prune for contradictory semantics or topology, not merely
+because the parent or its first state census is below the current MAX.
 Preserve every reviewed structural attempt in
 `docs/matching/<function-name>/<attempt-name>.cpp`. Include its source arms and comments
 identifying the matrix or retained artifact, measured outcome, and disposition. A
