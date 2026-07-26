@@ -1129,7 +1129,7 @@ void sortIt(void) {
             sprintf(gText, DATA_COMPGEN(0x00520640, sortItTrivialSort, "trivialSort ...\n"));
             LogStr(gText);
         }
-        for (i = 0; OD_STEER(i) <= last; i++)
+        for (i = 0; i <= last; i++)
             zptr[i] = i;
         shellTrivial();
         if (veryVerbose) {
@@ -1140,7 +1140,7 @@ void sortIt(void) {
     } else {
         Int32 i;
         Int32 grade;
-        Int32 notDone;
+        Int32 notDone0;
 
         stripe();
 
@@ -1151,12 +1151,12 @@ void sortIt(void) {
 
         for (i = 0; i <= 65536; i++)
             ftab[i] = 0;
-        for (i = 0; OD_STEER(i) <= last; i++)
+        for (i = 0; i <= last; i++)
             ftab[GETFIRST16(i)]++;
         for (i = 1; i <= 65536; i++)
             ftab[i] += ftab[i - 1];
 
-        for (i = 0; OD_STEER(i) <= last; i++) {
+        for (i = 0; i <= last; i++) {
             UInt32 j = GETFIRST16(i);
             ftab[j]--;
             zptr[ftab[j]] = i;
@@ -1164,32 +1164,32 @@ void sortIt(void) {
 
         copyOffsetWords();
 
-        notDone = lastPP;
+        notDone0 = lastPP;
         for (grade = 1; grade <= 5; grade++) {
-            Int32 candNo;
-            Int32 loBound = 0;
-            Int32 hiBound = 0;
+            Int32 candNo0;
+            Int32 loBound;
+            Int32 hiBound0;
 
             switch (grade) {
                 case 1:
                     loBound = 2;
-                    hiBound = 15;
+                    hiBound0 = 15;
                     break;
                 case 2:
                     loBound = 16;
-                    hiBound = 255;
+                    hiBound0 = 255;
                     break;
                 case 3:
                     loBound = 256;
-                    hiBound = 4095;
+                    hiBound0 = 4095;
                     break;
                 case 4:
                     loBound = 4096;
-                    hiBound = 65535;
+                    hiBound0 = 65535;
                     break;
                 case 5:
                     loBound = 65536;
-                    hiBound = 900000;
+                    hiBound0 = 900000;
                     break;
                 default:
                     panic(const_cast<char*>(DATA_COMPGEN(0x0052067c, sortItGradedSort, "gradedSort")));
@@ -1198,36 +1198,36 @@ void sortIt(void) {
             if (loBound > lastPP)
                 continue;
 
-            candNo = 0;
+            candNo0 = 0;
             for (i = 0; i <= 65535; i++) {
 
                 Int32 freqHere = ftab[i + 1] - ftab[i];
 
-                if (freqHere >= loBound && freqHere <= hiBound) {
+                if (freqHere >= loBound && hiBound0 >= freqHere) {
                     Int32 j, k;
                     Int32 lower = ftab[i];
-                    Int32 upper = ftab[i + 1] - 1;
+                    Int32 upper5 = ftab[i + 1] - 1;
 
-                    candNo++;
-                    notDone -= freqHere;
+                    candNo0++;
+                    notDone0 -= freqHere;
 
                     if (veryVerbose) {
                         sprintf(
                             gText,
                             DATA_COMPGEN(0x00520688, sortItDDCand5dFreq6d, "   %d -> %d:  cand %5d,   freq = %6d,   notdone = %6d"),
                             loBound,
-                            hiBound,
-                            candNo,
+                            hiBound0,
+                            candNo0,
                             freqHere,
-                            notDone
+                            notDone0
                         );
                         LogStr(gText);
                     }
 
-                    qsortFull(lower, upper);
+                    qsortFull(lower, upper5);
 
                     if (freqHere < 65535) {
-                        for (j = lower, k = 0; j <= upper; j++, k++) {
+                        for (j = lower, k = 0; j <= upper5; j++, k++) {
                             Int32 a2update = zptr[j];
                             SETREST16(a2update, k);
                             if (a2update < (4 * NUM_FULLGT_UNROLLINGS))
