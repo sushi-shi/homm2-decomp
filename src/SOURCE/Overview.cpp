@@ -339,7 +339,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             ROW_BACKGROUND_WIDTH,
             ROW_BACKGROUND_HEIGHT,
             const_cast<char*>(DATA_COMPGEN(0x004edbd4, setupDynamicStuffOverviewIcn, "overview.icn")),
-            static_cast<i16>(giOverviewType) + ROW_BACKGROUND_FRAME_BASE,
+            static_cast<i16>(giOverviewType + ROW_BACKGROUND_FRAME_BASE),
             ICON_DRAW_NORMAL,
             static_cast<i16>(rowWidgetId6 + ROW_BACKGROUND_CONTROL),
             WIDGET_KIND_ICON_DIRECT,
@@ -683,7 +683,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             i32 detailColumn;
             HeroSecondarySkill detailIndex;
             heroData0 =
-                &m_heroRecs[gpCurPlayer->m_heroIds[giOverviewTop[IDX(giOverviewType)] + row]];
+                GetHero(gpCurPlayer->m_heroIds[giOverviewTop[IDX(giOverviewType)] + row]);
 
             OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                 HERO_FRAME_X,
@@ -896,8 +896,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         MemError();
                     }
                     overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                    iconCount++;
 
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] = new iconWidget(
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                         static_cast<i16>(
                             detailColumn * DETAIL_COLUMN_STRIDE + HERO_SKILL_ICON_FIRST_X
                         ),
@@ -914,11 +915,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] == NULL) {
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1], -1);
-                    iconCount += DETAIL_ICON_WIDGET_COUNT;
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                    iconCount++;
 
                     valueText0 = static_cast<char*>(H2_ALLOC_AT(
                         OVERVIEW_SKILL_LEVEL_CAPACITY, DATA_COMPGEN(0x004edc4c, setupDynamicStuffSourceFile6, RETAIL_FILE),
@@ -973,8 +974,9 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         MemError();
                     }
                     overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                    iconCount++;
 
-                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] = new iconWidget(
+                    OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                         static_cast<i16>(
                             detailColumn * DETAIL_COLUMN_STRIDE + HERO_ARTIFACT_ICON_FIRST_X
                         ),
@@ -991,11 +993,11 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         WIDGET_KIND_ICON_DIRECT,
                         OVERVIEW_ICON_FILL_COLOR
                     );
-                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1] == NULL) {
+                    if (OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] == NULL) {
                         MemError();
                     }
-                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount + 1], -1);
-                    iconCount += DETAIL_ICON_WIDGET_COUNT;
+                    overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
+                    iconCount++;
                     displayedArtifacts++;
                 }
             }
