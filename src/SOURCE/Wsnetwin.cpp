@@ -21,7 +21,7 @@
 H2_ENUM_BEGIN(WinsockPrivateConstant)
     IP_ADDRESS_ENTRY_LIMIT       = 20,
     SEND_ATTEMPT_LIMIT           = 20,
-    EXTRA_GUEST_MIN_PLAYER_COUNT = 3
+    EXTRA_GUEST_PLAYER_THRESHOLD = 2
 H2_ENUM_END(WinsockPrivateConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
@@ -31,10 +31,6 @@ DATA(0x004ed730) static i16 s_wsTermSourceLineBase = 248; // NOLINT(readability-
 DATA(0x004ed78c) static i16 s_wsSendSourceLineBase = 279; // NOLINT(readability-magic-numbers)
 DATA(0x004ed830) static i16 s_wsReceiveSourceLineBase = 359; // NOLINT(readability-magic-numbers)
 DATA(0x004ed860) static i16 s_wsEvaluateSourceLineBase = 413; // NOLINT(readability-magic-numbers)
-
-inline void ShowPlainDialog(char* text, i32 type) {
-    NormalDialog(text, type, -1, -1, -1, 0, -1, 0, -1, 0);
-}
 
 VA(0x004068b0, 0x5b5)
 i16 wsnet_init(void) {
@@ -115,21 +111,21 @@ i16 wsnet_init(void) {
                 0,
                 giTCPNumPlayers - 1
             );
-            ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         } else {
             sprintf(
                 cWSTextBuffer,
                 DATA_COMPGEN(0x004ed560, wsnetInitHostingGameAtSWaitingOn, "Hosting game at %s\n\nWaiting On Guest(s).\n\n  Press 'CANCEL' to abort."),
                 inet_ntoa(gIn_addrIP)
             );
-            ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         giWaitType = DIALOG_WAIT_WINSOCK_GUESTS;
         if (giTCPHostStatus != -1) {
-            if (giTCPNumPlayers >= EXTRA_GUEST_MIN_PLAYER_COUNT) {
+            if (giTCPNumPlayers > EXTRA_GUEST_PLAYER_THRESHOLD) {
                 sprintf(
                     cWSTextBuffer,
                     DATA_COMPGEN(0x004ed5a8, wsnetInitHostingGameAtSYouHave2, "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
@@ -139,7 +135,7 @@ i16 wsnet_init(void) {
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
-                ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+                NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
             }
         } else {
             sprintf(
@@ -149,7 +145,7 @@ i16 wsnet_init(void) {
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
-            ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST);
+            NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
         }
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
@@ -164,28 +160,32 @@ i16 wsnet_init(void) {
             );
         }
     } else {
-        while (1) {
-            if (giTCPHostStatus != -1 && strlen(gcTCPAddress) != 0) {
-                strcpy(cWSTextBuffer, gcTCPAddress);
-                strcpy(gcTCPAddress, DATA_COMPGEN(0x004ed6bc, wsnetInitEmptyString, ""));
-            } else {
-                GetDataEntry(
-                    DATA_COMPGEN(0x004ed6c0, wsnetInitEnterTheHostIPAddressI, "Enter the host IP address.\n(i.e. 220.415.119.223)"),
-                    cWSTextBuffer,
-                    IP_ADDRESS_ENTRY_LIMIT,
-                    NULL,
-                    0,
-                    1
-                );
-            }
-            giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
-            if (giNetPosToDCOPos[0] != static_cast<i32>(INADDR_NONE))
-                break;
-            ShowPlainDialog(DATA_COMPGEN(0x004ed6f4, wsnetInitErrorInIPAddressPleaseTry, "Error in IP Address, please try again."), NORMAL_DIALOG_WAIT_FIRST);
+    retryAddress:
+        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) != 0) {
+            strcpy(cWSTextBuffer, gcTCPAddress);
+            strcpy(gcTCPAddress, DATA_COMPGEN(0x004ed6bc, wsnetInitEmptyString, ""));
+        } else {
+            GetDataEntry(
+                DATA_COMPGEN(0x004ed6c0, wsnetInitEnterTheHostIPAddressI, "Enter the host IP address.\n(i.e. 220.415.119.223)"),
+                cWSTextBuffer,
+                IP_ADDRESS_ENTRY_LIMIT,
+                NULL,
+                0,
+                1
+            );
+        }
+        giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
+        if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
+            NormalDialog(
+                DATA_COMPGEN(0x004ed6f4, wsnetInitErrorInIPAddressPleaseTry, "Error in IP Address, please try again."),
+                NORMAL_DIALOG_WAIT_FIRST,
+                -1, -1, -1, 0, -1, 0, -1, 0
+            );
+            goto retryAddress;
         }
         giWaitType = DIALOG_WAIT_WINSOCK_HOST;
         sprintf(cWSTextBuffer, DATA_COMPGEN(0x004ed71c, wsnetInitSearchingForHost, "Searching for host."));
-        ShowPlainDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST);
+        NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
     }
