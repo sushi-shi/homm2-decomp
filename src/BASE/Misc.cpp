@@ -2458,22 +2458,22 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     message.payload.widget.id = ENTRY_TEXT_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
     DataEntryWin->BroadcastMessage(message);
-    if (strlen(message.payload.widget.data.text) != 0) {
-        memset(cDEDest, 0, iDEMaxLen);
-        strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message.payload.widget.id = ENTRY_TEXT_WIDGET;
-        message.payload.widget.data.text = cDEDest;
-        DataEntryWin->BroadcastMessage(message);
-        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
-        if (gbTextEntryEscaped == 0) {
-            gpWindowManager->m_dialogResult = message.payload.widget.id;
-            message.payload.widget.id = ENTRY_TEXT_WIDGET;
-            message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-            return MESSAGE_DISPATCH_FORWARD;
-        }
-    }
+    if (strlen(message.payload.widget.data.text) == 0)
+        goto normalEvent;
+    memset(cDEDest, 0, iDEMaxLen);
+    strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
+    message.payload.widget.data.text = cDEDest;
+    DataEntryWin->BroadcastMessage(message);
+    DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
+    if (gbTextEntryEscaped != 0)
+        goto normalEvent;
+    gpWindowManager->m_dialogResult = message.payload.widget.id;
+    message.payload.widget.id = ENTRY_TEXT_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+    return MESSAGE_DISPATCH_FORWARD;
 
 possibleCancelEvent:
     if (message.payload.widget.id != ENTRY_CANCEL_BUTTON)
