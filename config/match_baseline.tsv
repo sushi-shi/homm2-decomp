@@ -104,7 +104,7 @@ BASE/Bzip	?putInt32@@YIXPAUBitStream@@H@Z	100.0000	1a1e7be637fb
 BASE/Bzip	?putSymbol@@YIXPAUModel@@HPAUBitStream@@@Z	100.0000	5d5684b78945
 BASE/Bzip	?putUChar@@YIXPAUBitStream@@E@Z	100.0000	111692507871
 BASE/Bzip	?putUInt32@@YIXPAUBitStream@@I@Z	100.0000	9c6ace1ed5c6
-BASE/Bzip	?qsortFull@@YIXHH@Z	99.5181	ee595d49e5ff
+BASE/Bzip	?qsortFull@@YIXHH@Z	100.0000	d901d202f669
 BASE/Bzip	?sendMTFVal@@YIXPAUBitStream@@H@Z	100.0000	1e34b4a02800
 BASE/Bzip	?sendZeroes@@YIXPAUBitStream@@H@Z	100.0000	bba29ba16ea1
 BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	401de243945f
