@@ -111,7 +111,7 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	401de243945f
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	f002f4d25ba8
 BASE/Bzip	?shellTrivial@@YIXXZ	100.0000	7c40e5bd4287
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	b7596b5af6b6
-BASE/Bzip	?sortIt@@YIXXZ	99.1210	f3ac5266e2ee
+BASE/Bzip	?sortIt@@YIXXZ	99.9936	527cf020d7cf
 BASE/Bzip	?spotBlock@@YIXH@Z	100.0000	9842ca999a79
 BASE/Bzip	?stripe@@YIXXZ	100.0000	e7fd06a29e40
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000	923bed540da7
