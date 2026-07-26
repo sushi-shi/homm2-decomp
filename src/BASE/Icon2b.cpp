@@ -205,33 +205,35 @@ void IconToBitmap(
         gIcX = X;
         gIcRun = command;
         if (command != 0) {
+            u32 count = command;
             if (clip == ICON_DRAW_NO_CLIP) {
-                memcpy(row + X, gIcSrc, command);
-            } else if (clipY <= gIcY && gIcClipB >= gIcY && X + command > clipX
-                       && gIcClipR >= X) {
-                i32 right = X + command;
+                memcpy(row + X, gIcSrc, count);
+            } else if (!(clipY > gIcY || gIcClipB < gIcY
+                         || clipX >= X + static_cast<i32>(count) || gIcClipR < X)) {
                 if (clipX <= X) {
-                    if (gIcClipR >= right) {
-                        memcpy(row + X, gIcSrc, command);
+                    if (gIcClipR >= X + static_cast<i32>(count)) {
+                        memcpy(row + X, gIcSrc, count);
                     } else {
-                        memcpy(row + X, gIcSrc, (gIcClipR - X) + 1);
+                        count = gIcClipR - X + 1;
+                        memcpy(row + X, gIcSrc, count);
                     }
                 } else {
-                    if (gIcClipR >= right) {
-                        memcpy(row + clipX, gIcSrc + (clipX - X), (command - clipX) + X);
+                    if (gIcClipR >= X + static_cast<i32>(count)) {
+                        count -= clipX - X;
                     } else {
-                        memcpy(row + clipX, gIcSrc + (clipX - X), clipW);
+                        count = clipW;
                     }
+                    memcpy(row + clipX, gIcSrc + clipX - X, count);
                 }
             }
-            X = X + command;
-            gIcSrc = gIcSrc + command;
-            gIcRun = command;
-            continue;
-        }
 
-        X = gIcX0;
-        gIcY = gIcY + 1;
-        row = row + gIcPitch;
+            X += command;
+            gIcRun = command;
+            gIcSrc += command;
+        } else {
+            X = gIcX0;
+            gIcY++;
+            row += gIcPitch;
+        }
     }
 }
