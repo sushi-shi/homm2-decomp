@@ -1341,10 +1341,10 @@ void WritePrefsToFile(void) {
         p++;
     }
     sprintf(gText, gMiscText.writeFile.stringFormat.text, gMiscText.writeFile.configFilename.text);
-    i32 fd = _open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    i32 fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd != -1) {
-        _write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
-        _close(fd);
+        write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
+        close(fd);
     }
 }
 
@@ -1737,15 +1737,15 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     HKEY key;
 
     sprintf(gText, gMiscText.cd.dataArchive.text);
-    i32 file = _open(gText, _O_BINARY);
+    i32 file = open(gText, _O_BINARY);
     if (file == -1) {
         if (_chdir(gcRegAppPath) == -1)
             return CD_ROM_GAME_DIRECTORY_MISSING;
-        file = _open(gText, _O_BINARY);
+        file = open(gText, _O_BINARY);
         if (file == -1)
             return CD_ROM_DATA_FILES_MISSING;
     }
-    _close(file);
+    close(file);
 
     u32l logicalDrives = GetLogicalDrives();
     i32 cdDriveCount = 0;
@@ -1764,9 +1764,9 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
 
     if (strlen(gcRegCDRomPath) != 0) {
         sprintf(gText, gMiscText.cd.configuredAnimationPath.text, gcRegCDRomPath);
-        file = _open(gText, _O_BINARY);
+        file = open(gText, _O_BINARY);
         if (file != -1) {
-            _close(file);
+            close(file);
             sprintf(gText + CD_PATH_PREFIX_BYTES, gMiscText.cd.stringFormat.text, gcAnimPath);
             strcpy(gcAnimPath, gText);
             return CD_ROM_READY;
@@ -1787,12 +1787,12 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
                     mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
                 }
                 sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
-                file = _open(gText, _O_BINARY);
+                file = open(gText, _O_BINARY);
                 if (file != -1) {
-                    if (_lseek(file, 0, SEEK_END) != -1
-                        && _lseek(file, -CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
-                        _read(file, resultBuffer, CD_PROBE_TRAILER_SIZE);
-                    _close(file);
+                    if (lseek(file, 0, SEEK_END) != -1
+                        && lseek(file, -CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
+                        read(file, resultBuffer, CD_PROBE_TRAILER_SIZE);
+                    close(file);
 
                     strcpy(registryKey, gMiscText.cd.registryKey.text);
                     key = NULL;
@@ -2189,10 +2189,10 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     header.planes = PLANE_COUNT;
     header.bytesPerLine = static_cast<u16>(width);
     header.paletteType = PALETTE_TYPE_COLOR;
-    i32 fileHandle = _open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    i32 fileHandle = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fileHandle == -1)
         return;
-    _write(fileHandle, &header, sizeof(header));
+    write(fileHandle, &header, sizeof(header));
     u8* encodedRow =
         static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 1480));
     for (i32 row = 0; row < height; ++row) {
@@ -2214,20 +2214,20 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
                 sourceIndex += runLength;
             }
         }
-        _write(fileHandle, encodedRow, encodedSize);
+        write(fileHandle, encodedRow, encodedSize);
         pixels += width;
     }
     H2_FREE_AT(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
     u8 paletteMarker = VGA_PALETTE_MARKER;
-    _write(fileHandle, &paletteMarker, 1);
+    write(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
         H2_ALLOC_AT(PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
     );
     for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
-    _write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
+    write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
     H2_FREE_AT(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
-    _close(fileHandle);
+    close(fileHandle);
 }
 
 VA(0x004c68c0, 0x52)
