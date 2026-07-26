@@ -61,8 +61,8 @@ void FlipMonoIconToBitmap(
     i16 pitch = dest->m_width;
     gFMRow = dest->m_pixels + gFMY * pitch;
     for (;;) {
-        i32 cmd = ReadIconRleByte(gFMSrc);
         gFMX = X;
+        i32 cmd = ReadIconRleByte(gFMSrc);
         if (static_cast<i8>(cmd) < 0) {
             gFMRun = cmd;
             i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
