@@ -109,6 +109,36 @@
         fi
       '';
 
+      # objdiff shim: open this checkout's generated project unless the caller
+      # explicitly selects another --config.
+      objdiffShimHook = ''
+        if command -v objdiff >/dev/null 2>&1 \
+            && [ -f "$HOMM2_DIR/build/objdiff/objdiff.json" ]; then
+          if [ -z "''${HOMM2_OBJDIFF_REAL:-}" ] || [ ! -x "$HOMM2_OBJDIFF_REAL" ]; then
+            export HOMM2_OBJDIFF_REAL="$(command -v objdiff)"
+          fi
+          export HOMM2_OBJDIFF_CONFIG="$HOMM2_DIR/build/objdiff/objdiff.json"
+          _homm2_objdiff_bin="$HOMM2_DIR/build/objdiff-shim"
+          if mkdir -p "$_homm2_objdiff_bin" \
+              && printf '%s\n' '#!/bin/sh' \
+                'for arg in "$@"; do' \
+                '  case "$arg" in' \
+                '    --config|--config=*) exec "$HOMM2_OBJDIFF_REAL" "$@" ;;' \
+                '  esac' \
+                'done' \
+                'exec "$HOMM2_OBJDIFF_REAL" --config "$HOMM2_OBJDIFF_CONFIG" "$@"' \
+                > "$_homm2_objdiff_bin/objdiff" \
+              && chmod +x "$_homm2_objdiff_bin/objdiff"; then
+            export PATH="$_homm2_objdiff_bin:$PATH"
+            export HOMM2_OBJDIFF_WRAPPED="$HOMM2_DIR"
+            echo "[homm2] objdiff    : WRAPPED -> $HOMM2_OBJDIFF_CONFIG" >&2
+          else
+            echo "[homm2] objdiff    : wrapper setup failed" >&2
+          fi
+          unset _homm2_objdiff_bin
+        fi
+      '';
+
       # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
       # xref: it supplies the WHOLE-.text function-boundary map (incl. the
       # library/runtime funcs CodeView omits). Our CodeView symbols
@@ -150,6 +180,7 @@
             echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
             echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC4.2 + wine)" >&2
             ${nvimShimHook}
+            ${objdiffShimHook}
           '';
         };
 
@@ -183,6 +214,7 @@
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (build/configure/status/sema/ghidra/...)" >&2
             ${nvimShimHook}
+            ${objdiffShimHook}
           '';
         };
       };
