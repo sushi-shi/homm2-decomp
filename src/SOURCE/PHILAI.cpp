@@ -2980,7 +2980,7 @@ void philAI::ValueOfBuyingHero(
     costValue6 = RVConversion(costs2);
     value27 = heroPtr->m_experience + AI_HERO_PURCHASE_EXPERIENCE_BASE;
     for (artifactIndex10 = 0; artifactIndex10 < AI_BATTLE_ARTIFACT_SLOT_COUNT; artifactIndex10++) {
-        if (heroPtr->m_artifacts[artifactIndex10] != ARTIFACT_NONE
+        if (heroPtr->m_artifacts[artifactIndex10] >= ARTIFACT_ULTIMATE_BOOK
             && heroPtr->m_artifacts[artifactIndex10] < ARTIFACT_EDITOR_ANY_ULTIMATE
             && heroPtr->m_artifacts[artifactIndex10] != ARTIFACT_MAGIC_BOOK) {
             value27 += gArtifactBaseRV[IDX(heroPtr->m_artifacts[artifactIndex10])];
