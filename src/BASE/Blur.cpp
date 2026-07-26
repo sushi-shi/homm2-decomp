@@ -80,7 +80,11 @@ H2_ENUM_END(BlurTransitionConstant)
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
 
 #define BLUR_COMPONENT(table, offset)                                                              \
-    (*reinterpret_cast<i32*>(reinterpret_cast<u8*>(table) + (offset)))
+    BlurComponentAt((table), (offset))
+
+static inline i32& BlurComponentAt(BlurComponentTable& table, i32 offset) {
+    return *reinterpret_cast<i32*>(reinterpret_cast<u8*>(table) + offset);
+}
 
 H2_ENUM_BEGIN(BlurTextSlotSize)
     SOURCE_FILE_SLOT_SIZE     = 0x28,
