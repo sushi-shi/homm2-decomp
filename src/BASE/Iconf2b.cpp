@@ -56,9 +56,8 @@ void FlipIconToBitmap(
     y += entryY;
     gFlipY = y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        i32 currentY;
-        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w
-            || (currentY = gFlipY) < clipY || clipY + clipH < entry->h + currentY) {
+        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w || gFlipY < clipY
+            || clipY + clipH < entry->h + gFlipY) {
             clip = ICON_DRAW_CLIP;
             gFlipClipR = clipX + clipW - 1;
             gFlipClipB = clipY + clipH - 1;
