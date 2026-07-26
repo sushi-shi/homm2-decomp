@@ -66,7 +66,7 @@ void IconToBitmap(
     i32 command;
 
     for (;;) {
-        command = *gIcSrc++;
+        command = ReadIconRleByte(gIcSrc);
         if (static_cast<i8>(command) < 0) {
             if ((command & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 gIcX = X;
@@ -83,15 +83,15 @@ void IconToBitmap(
             i32 flags = 0;
             if (count != 0) {
                 if (command == ICON_RLE_LONG_SOLID_COMMAND)
-                    count = *gIcSrc++;
-                gIcColor = *gIcSrc++;
+                    count = ReadIconRleByte(gIcSrc);
+                gIcColor = ReadIconRleByte(gIcSrc);
                 goto fill_run;
             }
 
-            flags = *gIcSrc++;
+            flags = ReadIconRleByte(gIcSrc);
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)
-                count = *gIcSrc++;
+                count = ReadIconRleByte(gIcSrc);
             gIcDimLen = count;
 
             if (color != 0) {
