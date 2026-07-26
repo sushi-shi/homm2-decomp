@@ -2176,6 +2176,10 @@ i32 IsCycleColor(i32 color) {
     return 0;
 }
 
+static inline i32 PCXValueIsLiteral(u8 value) {
+    return (value & RLE_RUN_MARKER) != RLE_RUN_MARKER;
+}
+
 VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
@@ -2205,7 +2209,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
                    && runEnd - sourceIndex + 1 < RLE_RUN_LIMIT)
                 ++runEnd;
             i32 runLength = runEnd - sourceIndex;
-            if (runLength <= 1 && (value & RLE_RUN_MARKER) != RLE_RUN_MARKER) {
+            if (runLength <= 1 && PCXValueIsLiteral(value)) {
                 encodedRow[encodedSize++] = value;
                 ++sourceIndex;
             } else {
