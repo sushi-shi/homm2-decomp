@@ -30,14 +30,23 @@ by one census file because they do not alter the effective function source.
 | `read-icon-rle-byte-control-sites.cpp` | helper at five control reads | structural regression | rejected |
 | `fill-inline-helper.cpp` | replace shared `do_fill` tail with two inlined helper continuations | 62.231740% | rejected |
 | `branch-local-skip-publication.cpp` | remove `set_skip`/`skip_set`, publish in each branch × 50 states | 87.0479% official | retained |
+| `command-and-run-inline-boundaries.cpp` | command reader × shared run visibility, four clean structures | 87.035260% baseline | rejected |
+| `dim-pixel-inline-boundaries.cpp` | unclipped/clipped dim-pixel helper placement, four clean structures | 87.035260% baseline | rejected |
+| `dim-loop-forms.cpp` | independent `do-while`/`while`/`for` forms, nine clean structures | byte-identical | exhausted |
+| `literal-loop-forms.cpp` | five unclipped copy-loop forms; forward-index × 50 states | 87.035260% island | rejected below MAX |
+| `clipped-literal-loop-forms.cpp` | `cn`/`copyCount`, countdown/index, five clean structures | byte-identical | exhausted |
+| `no-goto-negative-run-dispatch.cpp` | `fillRun` decision replacing all fill/dim labels | 84.113350% | rejected topology |
+| `dim-count-lifetime-and-scope.cpp` | 16 near-use forms + five declaration scopes; clipped-root × 50 states | 87.035260% island | rejected below MAX |
 | `row-visible-inline.cpp` | shared predicate helper × 50 states | 87.0227% official | retained |
 | `tu-state-censuses.cpp` | unchanged-source/top/target seed censuses | 86.720406% historical best | exhausted for old source |
 
 Still-untried structural families are deliberately not recorded as attempts: removal of
-`do_dim`; a fully no-`goto` run funnel; command/header decode
-inlining; clip-interval, dim-pixel, literal-map, and run-copy inline helpers; primed
-`while`/`do-while` decoder forms; count-versus-index inner loops; and outer
-clipped/unclipped decoder ownership.
+`do_dim` while preserving the shared fill tail; command/header decode
+inlining beyond the rejected outer byte reader; clip-interval, dim-pixel, literal-map,
+and run-copy inline helpers beyond the rejected dim-pixel forms; primed
+outer decoder forms; count-versus-index inner loops; and outer
+clipped/unclipped decoder ownership. Both literal loops' countdown/index forms are
+now exhausted.
 
 The new-experiment table began at checkpoint `838105c` / source checkpoint `7386907`, SHA-256
 `648ecb4b963c5b97aea5908738d26509ad680853a3041817321b61aa955070f9`, score 83.4333%,
