@@ -1903,8 +1903,8 @@ i32 army::AttackTo(void) {
 VA(0x0044f756, 0x1e8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
-    i32 pathIndex_4;
     i32 numSteps;
+    i32 pathIndex_4;
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
         if (m_hex != destination) {
