@@ -4324,8 +4324,12 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     u32 siteIndex;
     u32 packedSite1;
 
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= EVENT_RECRUIT_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        RecruitSiteType,
+        siteType2,
+        cell->m_objectMetadata,
+        EVENT_RECRUIT_TYPE_MASK
+    );
     availableCount = static_cast<i16>(cell->m_objectMetadata);
     availableCount >>= EVENT_RECRUIT_COUNT_SHIFT;
 
