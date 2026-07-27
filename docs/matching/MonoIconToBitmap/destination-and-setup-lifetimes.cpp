@@ -52,10 +52,12 @@ static inline u8* MonoInitialRow(bitmap* dest, i16 pitch) {
 /*
  * All 6 x 51 = 306 cells completed in 216.76 seconds.  The sibling setup
  * alone reached 83.779010%, size 609, and 37/38 relocations.  Combined with
- * the first-row helper it reached 84.524864%, size 606, 37/38 relocations,
- * and exact 31-block flow with 25 exact plus six size-only block bodies.
- * This is retained: it restores retail's second gMonoX0 load and advances
- * structural and byte evidence.
+ * the first-row helper its retained trial-25 MAX island reached 84.524864%,
+ * size 606, 37/38 relocations, and exact 31-block flow with 25 exact plus
+ * six size-only block bodies.  The clean live object is 80.734810%, size
+ * 609, 37/38 relocations, with 24 exact plus seven size-only block bodies.
+ * This source is retained: it restores retail's second gMonoX0 load and
+ * advances structural and byte evidence.
  *
  * Artifacts:
  *
