@@ -40,7 +40,8 @@ H2_ENUM_CLASS_END_SPLIT(HeroPortrait, u8)
 H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_NONE            = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,
-    RES_WOOD            = 0,
+    RES_VALID_BEGIN     = 0,
+    RES_WOOD            = RES_VALID_BEGIN,
     RES_MERCURY         = 1,
     RES_ORE             = 2,
     RES_SULFUR          = 3,

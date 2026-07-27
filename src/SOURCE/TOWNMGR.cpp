@@ -61,6 +61,7 @@ H2_ENUM_CLASS_BEGIN(TownManagerWidgetId)
     TOWN_WIDGET_BUILDING_DOCK                 = IDX(TOWN_OBJECT_DOCK),
     TOWN_WIDGET_BUILDING_WELL                 = IDX(TOWN_OBJECT_WELL),
     TOWN_WIDGET_BUILDING_TENT                 = IDX(TOWN_OBJECT_TENT),
+    TOWN_WIDGET_BUILDING_CASTLE_UPGRADE       = IDX(TOWN_OBJECT_CASTLE_UPGRADE),
     TOWN_WIDGET_BUILDING_CASTLE               = IDX(TOWN_OBJECT_CASTLE),
     TOWN_WIDGET_BUILDING_STATUE               = IDX(TOWN_OBJECT_STATUE),
     TOWN_WIDGET_BUILDING_LEFT_TURRET          = IDX(TOWN_OBJECT_LEFT_TURRET),
@@ -1289,19 +1290,19 @@ MessageDispatchResult townManager::Main(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT: {
-                    switch (message.payload.widget.id) {
-                        case TOWN_OBJECT_DWELLING_1:
-                        case TOWN_OBJECT_DWELLING_2:
-                        case TOWN_OBJECT_DWELLING_3:
-                        case TOWN_OBJECT_DWELLING_4:
-                        case TOWN_OBJECT_DWELLING_5:
-                        case TOWN_OBJECT_DWELLING_6:
-                        case TOWN_OBJECT_UPGRADED_DWELLING_2:
-                        case TOWN_OBJECT_UPGRADED_DWELLING_3:
-                        case TOWN_OBJECT_UPGRADED_DWELLING_4:
-                        case TOWN_OBJECT_UPGRADED_DWELLING_5:
-                        case TOWN_OBJECT_UPGRADED_DWELLING_6:
-                        case TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6:
+                    switch (static_cast<TownManagerWidgetId>(message.payload.widget.id)) {
+                        case TOWN_WIDGET_BUILDING_DWELLING_1:
+                        case TOWN_WIDGET_BUILDING_DWELLING_2:
+                        case TOWN_WIDGET_BUILDING_DWELLING_3:
+                        case TOWN_WIDGET_BUILDING_DWELLING_4:
+                        case TOWN_WIDGET_BUILDING_DWELLING_5:
+                        case TOWN_WIDGET_BUILDING_DWELLING_6:
+                        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_2:
+                        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_3:
+                        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_4:
+                        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5:
+                        case TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6:
+                        case TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6:
                             if (quickView_k) {
                                 QuickViewRecruit(
                                     m_town,
@@ -1321,7 +1322,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_CASTLE:
+                        case TOWN_WIDGET_BUILDING_CASTLE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1413,7 +1414,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_MAGE_GUILD:
+                        case TOWN_WIDGET_BUILDING_MAGE_GUILD:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1496,7 +1497,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_WELL:
+                        case TOWN_WIDGET_BUILDING_WELL:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1511,7 +1512,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_THIEVES_GUILD:
+                        case TOWN_WIDGET_BUILDING_THIEVES_GUILD:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1527,7 +1528,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_TAVERN:
+                        case TOWN_WIDGET_BUILDING_TAVERN:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1561,7 +1562,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_CASTLE_UPGRADE:
+                        case TOWN_WIDGET_BUILDING_CASTLE_UPGRADE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1590,7 +1591,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_DOCK:
+                        case TOWN_WIDGET_BUILDING_DOCK:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1667,7 +1668,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_MARKETPLACE:
+                        case TOWN_WIDGET_BUILDING_MARKETPLACE:
                             if (quickView_k) {
                                 goto showBuildingInformation;
                             }
@@ -1685,13 +1686,13 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case TOWN_OBJECT_STATUE:
-                        case TOWN_OBJECT_LEFT_TURRET:
-                        case TOWN_OBJECT_RIGHT_TURRET:
-                        case TOWN_OBJECT_MOAT:
-                        case TOWN_OBJECT_SECOND_WELL:
-                        case TOWN_OBJECT_SPECIAL_BUILDING:
-                        case TOWN_OBJECT_CAPTAIN_QUARTERS:
+                        case TOWN_WIDGET_BUILDING_STATUE:
+                        case TOWN_WIDGET_BUILDING_LEFT_TURRET:
+                        case TOWN_WIDGET_BUILDING_RIGHT_TURRET:
+                        case TOWN_WIDGET_BUILDING_MOAT:
+                        case TOWN_WIDGET_BUILDING_SECOND_WELL:
+                        case TOWN_WIDGET_BUILDING_SPECIAL:
+                        case TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS:
                         showBuildingInformation:
                             if (quickView_k) {
                                 sprintf(
@@ -1742,7 +1743,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                             }
                             break;
 
-                        case CONTROL_CLOSE:
+                        case TOWN_WIDGET_CLOSE:
                             if (!quickView_k)
                                 SetCommandAndText(message);
                             break;

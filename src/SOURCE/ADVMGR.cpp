@@ -1275,7 +1275,7 @@ void advManager::Close(void) {
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gConfig.useOpera
+    if (!bEnteringTown || gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         gpSoundManager->SwitchAmbientMusic(-1);
         gpSoundManager->StopAllSamples(1);
@@ -5895,7 +5895,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
     textY19 = 0;
-    if (giBottomViewResource < 0) {
+    if (giBottomViewResource < RES_VALID_BEGIN) {
         textY19 = RESOURCE_VIEW_MULTILINE_HEIGHT;
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
@@ -5922,7 +5922,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    if (giBottomViewResource >= 0) {
+    if (giBottomViewResource >= RES_VALID_BEGIN) {
         if (giBottomViewResource == RES_GOLD) {
             iconWidth6 = RESOURCE_VIEW_GOLD_WIDTH;
             iconHeight11 = RESOURCE_VIEW_GOLD_HEIGHT;
