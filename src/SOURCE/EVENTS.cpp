@@ -7260,8 +7260,12 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 purchaseValue5;
     i32 replacementSlot26;
 
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= EVENT_RECRUIT_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        RecruitSiteType,
+        siteType3,
+        cell->m_objectMetadata,
+        EVENT_RECRUIT_TYPE_MASK
+    );
     availableCount1 = static_cast<i16>(cell->m_objectMetadata);
     availableCount1 >>= EVENT_RECRUIT_COUNT_SHIFT;
 
