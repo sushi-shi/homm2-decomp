@@ -13,6 +13,8 @@ from pathlib import Path
 
 import clang.cindex as ci
 
+from homm2.clang_options import ClangMode
+
 
 IMAGE_BASE = 0x400000
 DATA_TOKEN = re.compile(rb"\bDATA\s*\(\s*(0x[0-9a-fA-F]+)\s*\)")
@@ -40,7 +42,7 @@ def configure_libclang() -> None:
             pass
 
 
-def _clang_args(repo: Path, source: Path) -> list[str]:
+def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
     database_path = repo / "build/clangd/compile_commands.json"
     database = json.loads(database_path.read_text()) if database_path.is_file() else []
     source = source.resolve()
@@ -53,7 +55,7 @@ def _clang_args(repo: Path, source: Path) -> list[str]:
             raw = entry.get("arguments", [])
             break
     args = [
-        "-x", "c++", "-std=c++14", "--target=i386-pc-windows-msvc",
+        "-x", "c++", mode.driver_flag, "--target=i386-pc-windows-msvc",
         "-fms-compatibility-version=10.20", "-fms-extensions",
         "-fdelayed-template-parsing", "-ferror-limit=0",
         "-Xclang", "-fdefault-calling-conv=fastcall",
@@ -170,7 +172,9 @@ def definitions_for_file(path: Path, source_root: Path, repo: Path) -> list[Anno
     # libclang offsets are UTF-8 byte offsets. Decoding as latin-1 would
     # re-encode non-ASCII comments and shift every later cursor.
     text = blob.decode("utf-8")
-    tu = index.parse(str(path), args=_clang_args(repo, path),
+    tu = index.parse(
+        str(path),
+        args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
                      unsaved_files=[(str(path), text)],
                      options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD)
     variables = []
