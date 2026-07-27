@@ -17,6 +17,14 @@ DATA(0x005381ac) static i32 gFMY;
 DATA(0x005381b0) static i32 gFMClipR;
 DATA(0x005381b4) static i32 gFMXEnd;
 
+static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch) {
+    return dest->m_pixels + gFMY * pitch;
+}
+
+static inline i32 FlipMonoRowVisible(i32 clipTop) {
+    return clipTop <= gFMY && gFMY <= gFMClipB;
+}
+
 VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(
     class icon* srcIcon,
@@ -32,14 +40,14 @@ void FlipMonoIconToBitmap(
     i32 clipH
 ) {
     IconEntry* entries = srcIcon->Entries();
-    IconEntry* entry = &entries[frame];
-    u8* srcData = reinterpret_cast<u8*>(entries) + entry->srcOffset;
-    i32 x0 = x;
+    i32 entryX = entries[frame].x;
+    IconEntry* const entry = &entries[frame];
+    u8* const srcData = reinterpret_cast<u8*>(entries) + entries[frame].srcOffset;
     gFMEntry = entry;
+    const i32 entryY = entry->y;
     gFMSrc = srcData;
     i32 w = entry->w;
-    i32 entryY = entry->y;
-    x0 = x0 - entry->x;
+    i32 x0 = x - entryX;
     x0 = x0 - w;
     x0++;
     gFMX0 = x0;
@@ -58,7 +66,7 @@ void FlipMonoIconToBitmap(
         }
     }
     i16 pitch = dest->m_width;
-    gFMRow = dest->m_pixels + gFMY * pitch;
+    gFMRow = FlipMonoInitialRow(dest, pitch);
     for (;;) {
         gFMX = X;
         i32 cmd = ReadIconRleByte(gFMSrc);
@@ -76,8 +84,7 @@ void FlipMonoIconToBitmap(
                 memset((gFMRow - cmd) + 1 + X, color, cmd);
             } else {
                 i32 left;
-                i32 currentY = gFMY;
-                if (clipY <= currentY && currentY <= gFMClipB
+                if (FlipMonoRowVisible(clipY)
                     && (left = (X - cmd) + 1, clipX <= left) && gFMClipR >= X) {
                     if (clipX <= left) {
                         memset((gFMRow - cmd) + 1 + X, color, cmd);
