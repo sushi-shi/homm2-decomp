@@ -168,7 +168,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
 H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
 H2_ENUM_STEPPED(CreatureType)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline CreatureType NextCreatureType(CreatureType creatureType) {
     ++creatureType;
     return creatureType;
