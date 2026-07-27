@@ -101,4 +101,24 @@ It formed a coherent lower orbit: clean was 83.7874%, and trials 4, 5, 17, 21,
 and 46 reached 85.3966%, all at 606 bytes and 35/37 relocations. It did not
 recover the predicate reloads and was rejected. The canonical function-wide
 `right` and `cnt` declarations remain in reconstructed source.
+
+Inline clipping-family matrix
+-----------------------------
+
+The two absent retail relocations are predicate reloads of `gDimX0` and
+`gDimY`, so four developer-plausible ownership shapes were crossed
+independently with the clean state and all 50 forest states:
+
+  build/match-variants/icond2b-inline-clip-family-20260727/
+  build/icond2b-inline-clip-family-manifest-20260727.json
+  build/icond2b-inline-clip-family-axes-20260727.json
+
+The 204-candidate matrix tested the open predicate, one value-argument inline
+helper, zero-argument coordinate accessors used by an inline predicate helper,
+and four independent inline clause helpers. The single value helper reproduced
+the retained 86.2299% island in five states; the coordinate-accessor helper
+peaked at 85.9138%, the open predicate at 84.9943%, and the independent helpers
+at 84.3908%. Every candidate retained only 35/37 relocations. None recovered
+either missing global reload, improved the 34-exact plus 2-size-only block
+classification, or exposed an exact island, so no helper was retained.
 */
