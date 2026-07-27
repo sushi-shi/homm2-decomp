@@ -245,7 +245,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	92.0000	7ff14bd0fc8f
 BASE/Misc	?SetGameDefaults@@YIXXZ	96.7807	dea293463413
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	075aea8e5491
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	018e1124501d
-BASE/Misc	?SetupCDDrive@@YIHXZ	99.9355	b30177f6e271
+BASE/Misc	?SetupCDDrive@@YIHXZ	100.0000	d837ab7cf647
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	100.0000	88cead42c888
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	69ef65d33a9e
 BASE/Misc	?WritePrefsToFile@@YIXXZ	100.0000	a4bf2c25d910
