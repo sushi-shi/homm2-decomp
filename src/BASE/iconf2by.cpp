@@ -129,43 +129,51 @@ void FlipIconToBitmapYModify(
         if (gFYRun != 0) {
             if (IconRowVisible(shear, clipY)) {
                 i32 left = (gFYX - gFYRun) + 1;
+                i32 pendingSkip;
                 if (left <= gFYClipR && clipX <= gFYX) {
                     if (gFYX <= gFYClipR) {
                         gFYDst = gFYRow + gFYX;
                         if (clipX <= left) {
                             gFYSkip = 0;
                             gFYDimLen = gFYRun;
-                        } else {
-                            gFYDimLen = (gFYX - clipX) + 1;
-                            gFYSkip = gFYRun - gFYDimLen;
+                            goto copy_literal;
                         }
+                        gFYDimLen = (gFYX - clipX) + 1;
+                        pendingSkip = gFYRun - gFYDimLen;
+                        goto publish_literal_skip;
                     } else {
-                        gFYSrc += gFYX - gFYClipR;
-                        gFYDst = gFYRow + gFYClipR;
-                        if (clipX <= gFYX - gFYRun) {
+                        gFYSrc = gFYSrc + (gFYX - gFYClipR);
+                        u8* rightDst = gFYRow + gFYClipR;
+                        if (clipX <= (gFYX - gFYRun)) {
+                            gFYDst = rightDst;
                             gFYSkip = 0;
-                            gFYDimLen = gFYRun - gFYX + gFYClipR;
-                        } else {
-                            i32 pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
-                            gFYDimLen = clipWidth;
-                            gFYSkip = pendingSkip;
+                            gFYDimLen = (gFYRun - gFYX) + gFYClipR;
+                            goto copy_literal;
                         }
+                        gFYDst = rightDst;
+                        pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                        gFYDimLen = clipWidth;
+                        goto publish_literal_skip;
                     }
+                publish_literal_skip:
+                    gFYSkip = pendingSkip;
+                copy_literal:
                     gFYDimIdx = 0;
-                    if (gFYDimLen > 0) {
+                    if (0 < gFYDimLen) {
                         do {
-                            *gFYDst-- = *gFYSrc++;
-                            gFYDimIdx++;
+                            *gFYDst = *gFYSrc;
+                            gFYSrc = gFYSrc + 1;
+                            gFYDst = gFYDst - 1;
+                            gFYDimIdx = gFYDimIdx + 1;
                         } while (gFYDimIdx < gFYDimLen);
                     }
-                    gFYSrc += gFYSkip;
-                } else {
-                    gFYSrc += gFYRun;
+                    gFYSrc = gFYSrc + gFYSkip;
+                    goto literal_advance_done;
                 }
-            } else {
-                gFYSrc += gFYRun;
             }
-            gFYX -= gFYRun;
+            gFYSrc = gFYSrc + gFYRun;
+        literal_advance_done:
+            gFYX = gFYX - gFYRun;
             continue;
         }
         gFYX = gFYXEnd - shear[gFYY];
