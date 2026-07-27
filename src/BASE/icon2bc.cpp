@@ -30,6 +30,10 @@ static inline u8* ColorTableDimPixel(u8* dst, u8* palette, i32 dimGate) {
     return dst + 1;
 }
 
+static inline u8* ColorTableOutsideSource(u8* src, i32 currentX, i32 clipX) {
+    return src + (clipX - currentX);
+}
+
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(
     class icon* srcIcon,
@@ -239,7 +243,7 @@ void IconToBitmapColorTable(
                             savedDst = row + clipX;
                             cnt = clipW;
                         }
-                        gCTSrcCopy = gCTSrc + (clipX - X);
+                        gCTSrcCopy = ColorTableOutsideSource(gCTSrc, X, clipX);
                     }
                 }
             } while (0);
