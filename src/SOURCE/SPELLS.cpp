@@ -1325,7 +1325,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             frameCount_i = SPELL_COLD_RING_FRAME_COUNT;
         }
 
-        for (frame_i = 0; frameCount_i > frame_i; ++frame_i) {
+        for (frame_i = 0; frame_i < frameCount_i; ++frame_i) {
             glTimers[0] = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
             );
@@ -1458,7 +1458,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (anyAffected_g) {
         ModifyDamageForArtifacts(
             &baseDamage_w,
-            SPELL_MAGIC_ARROW,
+            spell,
             m_heroes[IDX(m_currentSide)],
             m_heroes[IDX(OppositeCombatSide(m_currentSide))]
         );
