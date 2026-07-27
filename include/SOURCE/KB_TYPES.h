@@ -189,7 +189,8 @@ H2_ENUM_FLAGS(ArtifactLevelMask)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_NONE                  = -1,
-    ARTIFACT_ULTIMATE_BOOK         = 0,
+    ARTIFACT_VALID_BEGIN           = 0,
+    ARTIFACT_ULTIMATE_BOOK         = ARTIFACT_VALID_BEGIN,
     ARTIFACT_ULTIMATE_SWORD        = 1,
     ARTIFACT_ULTIMATE_CLOAK        = 2,
     ARTIFACT_ULTIMATE_WAND         = 3,
