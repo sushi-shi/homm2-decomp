@@ -29,6 +29,10 @@ static inline i32 FlipColorRowVisible(i32 clipTop) {
     return clipTop <= gFCY && gFCY <= gFCClipB;
 }
 
+static inline u8 FlipColorDimValue(u8* dst, u8* palette) {
+    return palette[*dst];
+}
+
 VA(0x004d9790, 0x54d)
 void FlipIconToBitmapColorTable(
     class icon* srcIcon,
@@ -72,6 +76,7 @@ void FlipIconToBitmapColorTable(
     }
     pitch = dest->m_width;
     gFCRow = dest->m_pixels + gFCY * pitch;
+    u8* dp;
     i32 cmd;
     for (;;) {
         cmd = *src++;
@@ -138,7 +143,7 @@ void FlipIconToBitmapColorTable(
                     + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 gFCDimPal = palette;
                 if (clip == ICON_DRAW_NO_CLIP) {
-                    u8* dp = (gFCRow - count) + 1 + X;
+                    dp = (gFCRow - count) + 1 + X;
                     gFCCnt = 0;
                     i32 dimCount = count;
                     gFCDimDst = dp;
@@ -146,11 +151,11 @@ void FlipIconToBitmapColorTable(
                         gFCCnt = dimCount;
                         do {
                             u8* dimPalette = gFCDimPal;
-                            i32 px = *dp;
+                            u8 mapped = FlipColorDimValue(dp, dimPalette);
                             dp++;
                             count--;
                             gFCDimDst = dp;
-                            dp[-1] = dimPalette[px];
+                            dp[-1] = mapped;
                         } while (count != 0);
                     }
                 } else {
@@ -158,7 +163,6 @@ void FlipIconToBitmapColorTable(
                     if (FlipColorRowVisible(clipY)
                         && clipX <= static_cast<i32>((X - count) + 1) && X <= gFCClipR) {
                         i32 left = (X - count) + 1;
-                        u8* dp;
                         if (clipX <= left) {
                             dp = (gFCRow - count) + 1 + X;
                         } else {
@@ -173,11 +177,11 @@ void FlipIconToBitmapColorTable(
                             gFCCnt = dimCount;
                             do {
                                 u8* dimPalette = gFCDimPal;
-                                i32 px = *dp;
+                                u8 mapped = FlipColorDimValue(dp, dimPalette);
                                 dp++;
                                 count--;
                                 gFCDimDst = dp;
-                                dp[-1] = dimPalette[px];
+                                dp[-1] = mapped;
                             } while (count != 0);
                         }
                     }
