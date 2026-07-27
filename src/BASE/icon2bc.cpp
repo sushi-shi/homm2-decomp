@@ -3,7 +3,7 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRle.h>
+#include <BASE/IconRleFill.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 DATA(0x00534ca8) static i32 gCTPitch;
@@ -120,23 +120,17 @@ void IconToBitmapColorTable(
         do_fill:
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gCTColor, count);
-            } else if (clipY <= gCTY && gCTY <= gCTClipB
-                       && static_cast<i32>(X + count) > clipX && gCTClipR >= X) {
-                i32 fillRight = X + count;
-                if (clipX <= X) {
-                    if (gCTClipR >= fillRight) {
-                        memset(row + X, gCTColor, count);
-                    } else {
-                        memset(row + X, gCTColor, (gCTClipR - X) + 1);
-                    }
-                } else {
-                    if (gCTClipR >= fillRight) {
-                        memset(row + clipX, gCTColor, (count - clipX) + X);
-                    } else {
-                        memset(row + clipX, gCTColor, clipW);
-                    }
-                }
-            }
+            } else
+                H2_ICON_RLE_CLIPPED_FILL(
+                    clipY <= gCTY && gCTY <= gCTClipB,
+                    row,
+                    X,
+                    gCTColor,
+                    count,
+                    clipX,
+                    clipW,
+                    gCTClipR
+                );
             X = X + count;
             gCTRun = count;
             continue;
@@ -177,7 +171,7 @@ void IconToBitmapColorTable(
                             i32 clipRight = gCTClipR;
                             gCTCnt = count;
                             if (right <= clipRight)
-                                count = (count - clipX) + X;
+                                count = (gCTCnt - clipX) + X;
                             else
                                 count = clipW;
                             cn = count;

@@ -3,7 +3,7 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRle.h>
+#include <BASE/IconRleFill.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
@@ -118,29 +118,17 @@ void IconToBitmap(
         fill_run:
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gIcColor, count);
-            } else {
-                i32 right;
-                i32 fillLen;
-                if (IconRowVisible(gIcY, gIcClipB, clipY)
-                    && (right = X + count, clipX < right)
-                    && gIcClipR >= X) {
-                    if (X >= clipX) {
-                        if (gIcClipR >= right) {
-                            fillLen = count;
-                            memset(row + X, gIcColor, fillLen);
-                        } else {
-                            fillLen = (gIcClipR - X) + 1;
-                            memset(row + X, gIcColor, fillLen);
-                        }
-                    } else {
-                        if (gIcClipR >= right)
-                            fillLen = (count - clipX) + X;
-                        else
-                            fillLen = clipW;
-                        memset(row + clipX, gIcColor, fillLen);
-                    }
-                }
-            }
+            } else
+                H2_ICON_RLE_CLIPPED_FILL(
+                    IconRowVisible(gIcY, gIcClipB, clipY),
+                    row,
+                    X,
+                    gIcColor,
+                    count,
+                    clipX,
+                    clipW,
+                    gIcClipR
+                );
             X = X + count;
             gIcRun = count;
             continue;
