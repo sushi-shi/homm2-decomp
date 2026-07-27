@@ -448,60 +448,60 @@ updateBoundsReady:
             gOldMouseRight = MOUSE_SCREEN_WIDTH - 1;
         if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
             gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
-    }
 
-    width = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-    if (m_savedLeft + width > MOUSE_SCREEN_WIDTH)
-        m_savedWidth = MOUSE_SCREEN_WIDTH - m_savedLeft;
-    else
-        m_savedWidth = width;
-    height = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
-    if (m_savedTop + height > MOUSE_SCREEN_HEIGHT)
-        m_savedHeight = MOUSE_SCREEN_HEIGHT - m_savedTop;
-    else
-        m_savedHeight = height;
+        width = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
+        if (m_savedLeft + width > MOUSE_SCREEN_WIDTH)
+            m_savedWidth = MOUSE_SCREEN_WIDTH - m_savedLeft;
+        else
+            m_savedWidth = width;
+        height = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+        if (m_savedTop + height > MOUSE_SCREEN_HEIGHT)
+            m_savedHeight = MOUSE_SCREEN_HEIGHT - m_savedTop;
+        else
+            m_savedHeight = height;
 
-    gpWindowManager->m_screen->CopyToCareful(
-        m_savedUnderlying,
-        0,
-        0,
-        m_savedLeft,
-        m_savedTop,
-        m_savedWidth,
-        m_savedHeight
-    );
-    if (m_hideCount == 0)
-        IconToBitmap(
-            m_cursorIcon,
-            gpWindowManager->m_screen,
-            m_cursorLeft,
-            m_cursorTop,
-            m_cursorFrame,
-            ICON_DRAW_CLIP,
+        gpWindowManager->m_screen->CopyToCareful(
+            m_savedUnderlying,
             0,
             0,
-            MOUSE_SCREEN_WIDTH,
-            MOUSE_SCREEN_HEIGHT,
-            0
+            m_savedLeft,
+            m_savedTop,
+            m_savedWidth,
+            m_savedHeight
         );
-    BlitBitmapToScreenNoMouseCheck(
-        gpWindowManager->m_screen,
-        gOldMouseLeft,
-        gOldMouseTop,
-        gOldMouseRight - gOldMouseLeft + 1,
-        gOldMouseBottom - gOldMouseTop + 1,
-        gOldMouseLeft,
-        gOldMouseTop
-    );
-    m_savedUnderlying->CopyToCareful(
-        gpWindowManager->m_screen,
-        m_savedLeft,
-        m_savedTop,
-        0,
-        0,
-        m_savedWidth,
-        m_savedHeight
-    );
+        if (m_hideCount == 0)
+            IconToBitmap(
+                m_cursorIcon,
+                gpWindowManager->m_screen,
+                m_cursorLeft,
+                m_cursorTop,
+                m_cursorFrame,
+                ICON_DRAW_CLIP,
+                0,
+                0,
+                MOUSE_SCREEN_WIDTH,
+                MOUSE_SCREEN_HEIGHT,
+                0
+            );
+        BlitBitmapToScreenNoMouseCheck(
+            gpWindowManager->m_screen,
+            gOldMouseLeft,
+            gOldMouseTop,
+            gOldMouseRight - gOldMouseLeft + 1,
+            gOldMouseBottom - gOldMouseTop + 1,
+            gOldMouseLeft,
+            gOldMouseTop
+        );
+        m_savedUnderlying->CopyToCareful(
+            gpWindowManager->m_screen,
+            m_savedLeft,
+            m_savedTop,
+            0,
+            0,
+            m_savedWidth,
+            m_savedHeight
+        );
+    }
     m_drawnCursorSizeIndex = m_cursorSizeIndex;
 
 updateDone:
