@@ -46,4 +46,3 @@
  * Official trial 32 raised hash-scoped MAX from 87.0479% to 88.4584%; the
  * generated forest input was removed.
  */
-
