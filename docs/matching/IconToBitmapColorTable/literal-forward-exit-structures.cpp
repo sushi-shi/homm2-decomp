@@ -49,6 +49,15 @@
  * do/while is only a source-level spelling of a forward-exit diamond.  It
  * does not establish whether retail source used either spelling.
  *
+ * A fourth no-do form nested the negative row predicate and deliberately
+ * delayed the declaration of `right` until after row visibility was known.
+ * It produced exactly the retained do/break bytes and ordered relocations:
+ * text hash a5315c989795a12e, 82.295780% clean, size 1437, 89/91
+ * relocations, exact 86-block flow, 67 exact blocks plus 19 size-only blocks.
+ * Thus the emitted shape does not uniquely prove a macro.  It does establish
+ * that a natural nested source form and a safe multiline-macro expansion
+ * occupy the same compiler orbit.
+ *
  * Artifacts:
  *   build/icon2bc-natural-literal-counter-axes.json
  *   build/match-variants/icon2bc-natural-literal-counter-clean/
@@ -57,9 +66,16 @@
  *   build/icon2bc-literal-forward-goto-clean.json
  *   build/match-variants/icon2bc-literal-forward-goto-clean/
  *
- * Disposition: retain the do/while spelling because it preserves the stronger
- * audited MAX orbit without retaining a generated label or goto.  Treat it as
- * a single-pass forward-exit scope, never as a reconstructed runtime loop.
+ * A subsequent source-era review identified an important alternative: while
+ * do/while (0) would be unusual as ordinary function control flow, it is the
+ * conventional safe wrapper for a multiline macro.  The related icon
+ * blitters repeat this clipping diamond, so the wrapper may be evidence of a
+ * reusable macro expansion rather than a source smell.  The later paired
+ * expansion/invocation census in macro-era-reuse-boundaries.cpp proved that
+ * this whole literal macro boundary is byte- and relocation-identical in all
+ * 51 states.  Retain the stronger do/break structure.  The natural no-do
+ * forms and byte-identical goto remain diagnostics only; no generated label
+ * or goto is retained.
  */
 
 void IconToBitmapColorTable_literal_forward_exit_structures_attempt() {
