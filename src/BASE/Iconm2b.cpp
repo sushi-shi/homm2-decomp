@@ -34,6 +34,10 @@ static inline i32 MonoRowVisible(i32 clipTop) {
     return clipTop <= gMonoY && gMonoY <= gMonoClipB;
 }
 
+static inline u8* MonoInitialRow(bitmap* dest, i16 pitch) {
+    return dest->m_pixels + gMonoY * pitch;
+}
+
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(
     class icon* srcIcon,
@@ -48,13 +52,16 @@ void MonoIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    u8* data = srcIcon->m_data;
-    IconEntry* entry = &srcIcon->Entries()[frame];
+    IconEntry* entries = srcIcon->Entries();
+    i32 entryX = entries[frame].x;
+    IconEntry* const entry = &entries[frame];
+    u8* const srcData = reinterpret_cast<u8*>(entries) + entries[frame].srcOffset;
     gMonoEntry = entry;
-    gMonoSrc = data + entry->srcOffset;
-    gMonoX0 = entry->x + x;
+    const i32 entryY = entry->y;
+    gMonoSrc = srcData;
+    gMonoX0 = x + entryX;
     gMonoX = gMonoX0;
-    gMonoY = entry->y + y;
+    gMonoY = y + entryY;
     if (clip != ICON_DRAW_NO_CLIP) {
         if (MonoNeedsClipping(entry, gMonoX0, gMonoY, clipX, clipY, clipW, clipH)) {
             clip = ICON_DRAW_CLIP;
@@ -65,7 +72,7 @@ void MonoIconToBitmap(
         }
     }
     i16 pitch = dest->m_width;
-    u8* row = dest->m_pixels + gMonoY * pitch;
+    u8* row = MonoInitialRow(dest, pitch);
     for (;;) {
         i32 cmd = ReadIconRleByte(gMonoSrc);
         if (static_cast<i8>(cmd) < 0) {
