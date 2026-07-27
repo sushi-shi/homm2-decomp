@@ -340,7 +340,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             ROW_BACKGROUND_WIDTH,
             ROW_BACKGROUND_HEIGHT,
             const_cast<char*>(DATA_COMPGEN(0x004edbd4, setupDynamicStuffOverviewIcn, "overview.icn")),
-            static_cast<i16>(giOverviewType + ROW_BACKGROUND_FRAME_BASE),
+            static_cast<i16>(IDX(giOverviewType) + ROW_BACKGROUND_FRAME_BASE),
             ICON_DRAW_NORMAL,
             static_cast<i16>(rowWidgetId6 + ROW_BACKGROUND_CONTROL),
             WIDGET_KIND_ICON_DIRECT,
