@@ -1523,18 +1523,18 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
-                i32 ssLevel = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
-                selectedHero13->DoSSLevelDialog(ssLevel, quickView);
+                selectionIndex2 = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
+                selectedHero13->DoSSLevelDialog(selectionIndex2, quickView);
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {
-                ArtifactType selectedArtifact =
+                selectionIndex2 =
                     selectedHero13->m_artifacts[widgetId - HERO_ARTIFACT_FIRST];
-                if (selectedArtifact == ARTIFACT_MAGIC_BOOK) {
+                if (selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)) {
                     gpGame->ViewSpells(selectedHero13, SPELL_TYPE_ALL, ViewSpecialHandler, 1);
                 } else {
                     NormalDialog(
-                        gArtifactDesc[IDX(selectedArtifact)],
+                        gArtifactDesc[selectionIndex2],
                         quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_MAX_TOP,
