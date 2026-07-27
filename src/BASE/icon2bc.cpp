@@ -24,6 +24,12 @@ DATA(0x00534ce0) static i32 gCTX0;
 DATA(0x00534ce4) static u8 gCTColor;
 DATA(0x00534ce8) static u32 gCTRun;
 
+static inline u8* ColorTableDimPixel(u8* dst, u8* palette, i32 dimGate) {
+    if (dimGate != 0)
+        *dst = palette[*dst];
+    return dst + 1;
+}
+
 VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(
     class icon* srcIcon,
@@ -45,7 +51,7 @@ void IconToBitmapColorTable(
     IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
     i32 entryX = entry->x;
     i32 sourceOffset = entry->srcOffset;
-    u8* savedDst;
+    u8* savedDst = gCTDst;
     gCTEntry = entry;
     gCTSrc = data + sourceOffset;
     i32 X = x + entryX;
@@ -64,7 +70,6 @@ void IconToBitmapColorTable(
         }
     }
     u8* row = dest->m_pixels + gCTPitch * gCTY;
-    savedDst = gCTDst;
     i32 cmd;
     for (;;) {
         gCTSrc = gCTSrc + 1;
@@ -154,9 +159,7 @@ void IconToBitmapColorTable(
                     if (dimCount > 0) {
                         gCTDimLen = dimCount;
                         do {
-                            if (dimGate != 0)
-                                *savedDst = palette[*savedDst];
-                            savedDst = savedDst + 1;
+                            savedDst = ColorTableDimPixel(savedDst, palette, dimGate);
                             gCTDimPal = palette;
                             count--;
                         } while (count != 0);
@@ -190,9 +193,7 @@ void IconToBitmapColorTable(
                         if (dimCount > 0) {
                             gCTDimLen = dimCount;
                             do {
-                                if (dimGate != 0)
-                                    *savedDst = palette[*savedDst];
-                                savedDst = savedDst + 1;
+                                savedDst = ColorTableDimPixel(savedDst, palette, dimGate);
                                 gCTDimPal = palette;
                                 cn--;
                             } while (cn != 0);
