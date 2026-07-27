@@ -18,6 +18,7 @@ from pathlib import Path
 
 import clang.cindex as ci
 
+from homm2.clang_options import ClangMode
 from homm2.build.annotated_data import (
     _clang_args,
     _mask_lexical_noise,
@@ -166,7 +167,10 @@ FUNCTION_KINDS = {
 
 def _literal_inventory(path: Path, repo: Path, wanted_lines: set[int]):
     configure_libclang()
-    translation = ci.Index.create().parse(str(path), args=_clang_args(repo, path))
+    translation = ci.Index.create().parse(
+        str(path),
+        args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
+    )
     errors = [diagnostic for diagnostic in translation.diagnostics
               if diagnostic.severity >= ci.Diagnostic.Error]
     if errors:

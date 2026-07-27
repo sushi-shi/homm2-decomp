@@ -1,35 +1,27 @@
-import tempfile
 import unittest
-from pathlib import Path
 from unittest import mock
 
 from homm2 import cli
 
 
-class CliTest(unittest.TestCase):
-    def test_format_checks_headers_and_enum_sources(self):
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            header = root / "include/Item.h"
-            source = root / "src/Item.cpp"
-            header.parent.mkdir()
-            source.parent.mkdir()
-            header.write_text("")
-            source.write_text("")
-            with mock.patch.object(cli, "REPO", root), mock.patch.object(
-                    cli, "sh", return_value=0) as run:
-                self.assertEqual(cli.main(["format", "--check"]), 0)
-        self.assertEqual(run.call_args_list, [
-            mock.call(
-                "python3", "scripts/format_headers.py", "--check", header),
-            mock.call(
-                "python3", "scripts/format_enums.py", "--check", header, source),
-        ])
+class BuildCommandTest(unittest.TestCase):
+    def test_clean_build_generates_report_before_relocation_field_audit(self):
+        report_ready = False
 
-    def test_format_rejects_unknown_arguments(self):
-        with mock.patch.object(cli, "sh") as run:
-            self.assertEqual(cli.main(["format", "--write"]), 1)
-        run.assert_not_called()
+        def load_report():
+            nonlocal report_ready
+            report_ready = True
+            return {"units": []}
+
+        def run(*command):
+            if command[-2:] == ("homm2.build.assert_relocs", "--fields"):
+                self.assertTrue(report_ready)
+            return 0
+
+        with mock.patch.object(cli, "sh", side_effect=run), mock.patch(
+            "homm2.match.status.load_report", side_effect=load_report
+        ), mock.patch("homm2.match.status.main", return_value=0):
+            self.assertEqual(cli.main(["build"]), 0)
 
 
 if __name__ == "__main__":
