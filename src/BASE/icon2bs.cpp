@@ -55,13 +55,15 @@ void IconToBitmapScale(
     i32 pitch = dest->m_width;
     u8* dstRow = dest->m_pixels + y * pitch + x;
     u8* srcRow = tmp->m_pixels + srcBase * SCALE_WORK_BITMAP_SIZE + srcBase;
-    i32 rows = scale;
+    i32 rows;
     if (0 < scale) {
+        rows = scale;
         do {
             u8* dstPix = dstRow;
             u8* srcPix = srcRow;
-            i32 cols = scale;
+            i32 cols;
             if (0 < scale) {
+                cols = scale;
                 do {
                     if (*srcPix != 0)
                         *dstPix = *srcPix;
