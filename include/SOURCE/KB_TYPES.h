@@ -95,7 +95,8 @@ H2_ENUM_CLASS_END_SPLIT(MineType, i8)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_NONE                = -1,
-    CREATURE_PEASANT             = 0,
+    CREATURE_VALID_BEGIN         = 0,
+    CREATURE_PEASANT             = CREATURE_VALID_BEGIN,
     CREATURE_SUMMONED_NONE       = CREATURE_PEASANT,
     CREATURE_ARCHER              = 1,
     CREATURE_RANGER              = 2,
