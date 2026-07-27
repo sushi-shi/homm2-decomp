@@ -73,6 +73,31 @@
  * making the row snapshot legitimate source evidence.  It is retained even
  * though the current compiler orbit still folds the two reads and leaves the
  * same four retail reloads outstanding.
+ *
+ * A further greedy opening-block census (2026-07-27) crossed twelve complete
+ * setup ownership/declaration structures with the clean state and all 50
+ * forest states:
+ *
+ *   icon2b-greedy-setup-{clean,islands}-20260727
+ *     12 clean and 612 source/state candidates, all completed.  A small inline
+ *     frame-entry helper reached a new 80.890110% island at trial 32, size
+ *     1217, 79/83 relocations, and the same exact 80-block flow with 62 exact
+ *     plus 18 size-only blocks.  Publishing Y before pitch reached 80.876370%.
+ *     A global-coordinate round trip formed a lower but distinct 64-exact /
+ *     16-size-only block island with 84/83 relocations; it was rejected because
+ *     the additional relocation is not in retail.
+ *
+ * The helper result was then tested using the existing shared icon accessor:
+ *
+ *     IconEntry* entry = &srcIcon->Entries()[frame];
+ *
+ *   icon2b-member-entry-islands-20260727
+ *     153/153 variants completed.  Pointer and index spellings were
+ *     byte-identical and reproduced 80.890110% at trial 45.  This is the same
+ *     typed inline mechanism already used throughout the icon family, so the
+ *     member-accessor structure is retained.  It improves the historical MAX
+ *     but does not close the four missing reloads or alter the 62/18 block
+ *     partition.
  */
 
 void IconToBitmap_entry_setup_and_storage_attempts() {
