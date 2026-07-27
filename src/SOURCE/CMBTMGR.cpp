@@ -1135,7 +1135,7 @@ VA(0x00492cc7, 0x382)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
     army* activeArmy;
     i32 speedLoop;
-    i32 stackSide;
+    CombatSide stackSide;
     i32 armyCounter;
     i32 sideLoop;
     i32 hasDeferred;

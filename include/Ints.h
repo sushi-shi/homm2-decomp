@@ -222,6 +222,32 @@ constexpr i32 H2EnumIndex(Value value) {
     return static_cast<i32>(value);
 }
 
+template <typename Value, typename Index, i32 Count>
+class H2EnumArray {
+public:
+    Value& operator[](Index index) { return m_values[H2EnumIndex(index)]; }
+    const Value& operator[](Index index) const { return m_values[H2EnumIndex(index)]; }
+
+    template <typename Integer>
+        requires(__is_integral(Integer))
+    Value& operator[](Integer index) {
+        return m_values[index];
+    }
+
+    template <typename Integer>
+        requires(__is_integral(Integer))
+    const Value& operator[](Integer index) const {
+        return m_values[index];
+    }
+
+private:
+    Value m_values[Count];
+};
+
+#define H2_ENUM_ARRAY(value, name, index, count) H2EnumArray<value, index, count> name
+#define H2_ENUM_ARRAY_2D(value, name, index, count, innerCount)                                    \
+    H2EnumArray<value[innerCount], index, count> name
+
 #define H2_ENUM_STORAGE(name, storage) H2EnumStorage<name, storage>
 #define H2_ENUM_STORAGE_STEPPED(name, storage) H2SteppedEnumStorage<name, storage>
 #define H2_ENUM_BITFIELD(name, storage) name
@@ -288,6 +314,8 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_PARAM(name, storage) storage
 #define H2_ENUM_RETURN(name, storage) storage
 #define H2_ENUM_FLAGS(name)
+#define H2_ENUM_ARRAY(value, name, index, count) value name[count]
+#define H2_ENUM_ARRAY_2D(value, name, index, count, innerCount) value name[count][innerCount]
 #endif
 
 // Preserve a retail integer assignment chain while allowing strict enum views
