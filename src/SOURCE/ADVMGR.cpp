@@ -6138,7 +6138,7 @@ i32 advManager::UpdBottomViewHero(void) {
 
                 armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC_AT(
                     BOTTOM_HERO_LABEL_BYTES, DATA_COMPGEN(0x004f6320, updBottomViewHeroSourceFile, RETAIL_FILE),
-                    BOTTOM_HERO_LINE_BASE + BOTTOM_HERO_ALLOC_LINE_OFFSET
+                    s_bottomHeroLineBase + BOTTOM_HERO_ALLOC_LINE_OFFSET
                 ));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > BOTTOM_HERO_MAX_FULL_COUNT) {
