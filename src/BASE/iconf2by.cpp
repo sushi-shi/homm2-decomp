@@ -151,7 +151,10 @@ void FlipIconToBitmapYModify(
                             goto copy_literal;
                         }
                         gFYDst = rightDst;
-                        pendingSkip = ((gFYRun - gFYX) - clipWidth) + gFYClipR;
+                        pendingSkip = gFYRun;
+                        pendingSkip = pendingSkip - gFYX;
+                        pendingSkip = pendingSkip - clipWidth;
+                        pendingSkip = pendingSkip + gFYClipR;
                         gFYDimLen = clipWidth;
                         goto publish_literal_skip;
                     }
