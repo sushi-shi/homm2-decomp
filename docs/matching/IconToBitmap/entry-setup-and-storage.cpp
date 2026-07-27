@@ -31,8 +31,28 @@
  *     retained historical MAX of 78.788460%, size 1245, 83/83 relocation
  *     count.  It is disposable compiler-state evidence, not retained source.
  *
- * None was exact.  Re-test only when a genuinely different entry ownership or
- * serialization structure is supported by the first disassembly divergence.
+ * A new first-divergence matrix (2026-07-27) tested five X/Y/pitch ownership
+ * structures against the clean state and 50 forest states:
+ *
+ *   icon2b-setup-publication-islands-v2-20260727
+ *     255/255 variants, 62 distinct normalized target states.  Staging the
+ *     fully computed X and Y plus pitch before publishing gIcX0, gIcPitch, and
+ *     gIcY reached 80.780220% at trials 8, 14, 36, 41, 43, and 45.  It has
+ *     80/80 flow-exact blocks, size 1216, and 79/83 relocations.
+ *
+ * A descendant matrix kept Y global and staged only pitch or raw entry->y:
+ *
+ *   icon2b-pitch-entryy-islands-20260727
+ *     255/255 variants, 58 states.  The raw-entry-Y/pitch version reached
+ *     80.640110%, size 1239, 82/83 relocation count, but retained two gIcY
+ *     references that retail does not emit.
+ *
+ * The stronger fully staged structure emits no relocation identity absent
+ * from retail.  It is missing one each of gIcCnt2, gIcPitch, gIcX0, and gIcY.
+ * Retail also computes X, Y, and pitch before their three ordered
+ * publications, so this evidence-led source structure is retained as the next
+ * branch seed.  It is not exact; the four missing reloads remain the targeted
+ * descendants.
  */
 
 void IconToBitmap_entry_setup_and_storage_attempts() {
