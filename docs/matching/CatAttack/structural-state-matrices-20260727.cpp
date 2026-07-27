@@ -93,4 +93,33 @@ matrices do not raise its existing 99.9977% MAX. A future lane should not repeat
 commutative spellings or indexed assignment spellings; it needs a different
 source structure that can change exactly one of A/B/C without altering the
 already exact CFG, frame, size, or relocation stream.
+
+Current-hash completion and corrected inline screen
+---------------------------------------------------
+
+A later lane completed the direct-expression matrix against the integrated
+source hash with the previously omitted retail-directed float spelling:
+
+    projectileX11 = projectileX11 + xStep0;
+
+It crossed all six direction/float forms with the clean state and 50 forest
+states (306/306 candidates completed):
+
+  build/catattack-current-commutative-manifest-20260727.json
+  build/match-variants/catattack-current-commutative-20260727/
+
+All three float spellings and both integer operand orders remained byte-neutral
+within every corresponding state. The best standalone score was 99.978330%,
+size 4110, relocations 150/150.
+
+The malformed earlier inline diagnostic was also corrected and screened as
+four clean structural versions: direct, direction helper, projectile-X helper,
+and both helpers. Both valid one-helper versions emitted a five-byte `/Ob1`
+continuation and grew the function to 4115 bytes; the combined form grew it to
+4120 bytes. Scores fell to 99.862030% and 99.748000%, respectively. Because
+retail remains 4110 bytes with no corresponding continuation, these helper
+orbits contradict retail size and were pruned before state permutations:
+
+  build/catattack-inline-arithmetic-manifest-20260727.json
+  build/match-variants/catattack-inline-arithmetic-20260727/
 */
