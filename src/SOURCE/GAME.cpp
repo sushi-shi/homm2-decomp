@@ -6154,10 +6154,9 @@ void game::ProcessOnMapHeroes(void) {
     mapHeroExtra* extra0;
     mapCell* townCell1;
     i32 heroId1;
-    i32 heroClassFrame;
     i32 armySlot0;
     i32 mapY15;
-    i32 recordSlot10;
+    i32 recordPosition;
     i32 mapX0;
     i32 townId4;
     FactionType heroClass6;
@@ -6201,12 +6200,12 @@ void game::ProcessOnMapHeroes(void) {
                         if (isJail6) {
                             heroClass6 = extra0->heroClass;
                         } else {
-                            heroClassFrame = cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE;
-                            if (heroClassFrame == MAP_HERO_RANDOM_FACTION_FRAME) {
+                            heroClass6 = static_cast<FactionType>(
+                                cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE
+                            );
+                            if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
                                 heroClass6 = m_setupPlayerRace
                                     [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
-                            } else {
-                                heroClass6 = static_cast<FactionType>(heroClassFrame);
                             }
                         }
 
@@ -6260,12 +6259,13 @@ void game::ProcessOnMapHeroes(void) {
                                     mapHero0->m_army.m_troopTypes[armySlot0] = CREATURE_NONE;
                             }
                         }
-                        for (recordSlot10 = 0; recordSlot10 < EVENT_RECORD_HERO_ARTIFACT_COUNT;
-                             recordSlot10++) {
-                            if (extra0->artifacts[recordSlot10] >= 0)
+                        for (recordPosition = 0;
+                             recordPosition < EVENT_RECORD_HERO_ARTIFACT_COUNT;
+                             recordPosition++) {
+                            if (extra0->artifacts[recordPosition] >= 0)
                                 GiveArtifact(
                                     mapHero0,
-                                    ArtifactType(extra0->artifacts[recordSlot10]),
+                                    ArtifactType(extra0->artifacts[recordPosition]),
                                     1,
                                     -1
                                 );
@@ -6313,20 +6313,24 @@ void game::ProcessOnMapHeroes(void) {
 
                         if (extra0->hasCustomSkills) {
                             mapHero0->m_secondarySkillCount = 0;
-                            for (recordSlot10 = 0; recordSlot10 < IDX(HERO_SKILL_COUNT);
-                                 recordSlot10++) {
-                                mapHero0->m_secondarySkills[recordSlot10] =
+                            for (recordPosition = 0;
+                                 recordPosition < IDX(HERO_SKILL_COUNT);
+                                 recordPosition++) {
+                                mapHero0->m_secondarySkills[recordPosition] =
                                     HERO_SKILL_LEVEL_NONE;
-                                mapHero0->m_secondarySkillOrder[recordSlot10] = 0;
+                                mapHero0->m_secondarySkillOrder[recordPosition] = 0;
                             }
-                            for (recordSlot10 = 0; recordSlot10 < EVENT_RECORD_SKILL_CAPACITY;
-                                 recordSlot10++) {
-                                if (extra0->skillTypes[recordSlot10] != -1) {
+                            for (recordPosition = 0;
+                                 recordPosition < EVENT_RECORD_SKILL_CAPACITY;
+                                 recordPosition++) {
+                                if (extra0->skillTypes[recordPosition] != -1) {
                                     mapHero0->GiveSS(
                                         static_cast<HeroSecondarySkill>(
-                                            extra0->skillTypes[recordSlot10]
+                                            extra0->skillTypes[recordPosition]
                                         ),
-                                        static_cast<HeroSkillLevel>(extra0->skillLevels[recordSlot10])
+                                        static_cast<HeroSkillLevel>(
+                                            extra0->skillLevels[recordPosition]
+                                        )
                                     );
                                 }
                             }
@@ -6340,7 +6344,15 @@ void game::ProcessOnMapHeroes(void) {
                                                    [MAP_HERO_SCOUTING_SKILL_INDEX])]
                             );
                         }
-                        H2_FREE_AT(ppMapExtra[extraIndex0], DATA_COMPGEN(0x004f759c, processOnMapHeroesSourceFile, RETAIL_FILE), 6604);
+                        H2_FREE_AT(
+                            ppMapExtra[extraIndex0],
+                            DATA_COMPGEN(
+                                0x004f759c,
+                                processOnMapHeroesSourceFile,
+                                RETAIL_FILE
+                            ),
+                            processOnMapHeroesSourceLineBase + 0xdd
+                        );
                         ppMapExtra[extraIndex0] = NULL;
                     }
                 }
