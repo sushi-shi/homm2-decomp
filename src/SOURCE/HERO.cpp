@@ -709,51 +709,51 @@ void hero::ApplyBattleWinTemps(void) {
 
     if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_GRAVEYARD;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_GRAVEYARD);
     }
     if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_SHIPWRECK;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_SHIPWRECK);
     }
     if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_BUOY;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_BUOY);
     }
     if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_OASIS;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_OASIS);
     }
     if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
         m_morale -= TEMPLE_MORALE_BONUS;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_TEMPLE;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_TEMPLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_FAERIE_RING;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FAERIE_RING);
     }
     if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_IDOL;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_IDOL);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_FOUNTAIN;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FOUNTAIN);
     }
     if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_WATERING_HOLE;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_WATERING_HOLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_DERELICT_SHIP;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_DERELICT_SHIP);
     }
     if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
         m_luck += PYRAMID_LUCK_PENALTY;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_PYRAMID;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_PYRAMID);
     }
     if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
         m_luck = m_luck - 1;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_MERMAID;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_MERMAID);
     }
 }
 
