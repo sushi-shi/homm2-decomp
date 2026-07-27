@@ -39,8 +39,7 @@ void IconToBitmap(
     DATA(0x00534c5c) static u32 gIcCnt2;
 
     u8* data = srcIcon->m_data;
-    i32 entryOffset = frame * sizeof(IconEntry);
-    IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
+    IconEntry* entry = &srcIcon->Entries()[frame];
     i32 entryX = entry->x;
     i32 sourceOffset = entry->srcOffset;
     u8* savedDst;
