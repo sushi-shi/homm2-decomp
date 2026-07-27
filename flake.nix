@@ -110,28 +110,28 @@
       '';
 
       # objdiff shim: open this checkout's generated project unless the caller
-      # explicitly selects another --config.
+      # explicitly selects another project directory.
       objdiffShimHook = ''
         if command -v objdiff >/dev/null 2>&1 \
             && [ -f "$HOMM2_DIR/build/objdiff/objdiff.json" ]; then
           if [ -z "''${HOMM2_OBJDIFF_REAL:-}" ] || [ ! -x "$HOMM2_OBJDIFF_REAL" ]; then
             export HOMM2_OBJDIFF_REAL="$(command -v objdiff)"
           fi
-          export HOMM2_OBJDIFF_CONFIG="$HOMM2_DIR/build/objdiff/objdiff.json"
+          export HOMM2_OBJDIFF_PROJECT="$HOMM2_DIR/build/objdiff"
           _homm2_objdiff_bin="$HOMM2_DIR/build/objdiff-shim"
           if mkdir -p "$_homm2_objdiff_bin" \
               && printf '%s\n' '#!/bin/sh' \
                 'for arg in "$@"; do' \
                 '  case "$arg" in' \
-                '    --config|--config=*) exec "$HOMM2_OBJDIFF_REAL" "$@" ;;' \
+                '    -p|--project-dir|--project-dir=*) exec "$HOMM2_OBJDIFF_REAL" "$@" ;;' \
                 '  esac' \
                 'done' \
-                'exec "$HOMM2_OBJDIFF_REAL" --config "$HOMM2_OBJDIFF_CONFIG" "$@"' \
+                'exec "$HOMM2_OBJDIFF_REAL" --project-dir "$HOMM2_OBJDIFF_PROJECT" "$@"' \
                 > "$_homm2_objdiff_bin/objdiff" \
               && chmod +x "$_homm2_objdiff_bin/objdiff"; then
             export PATH="$_homm2_objdiff_bin:$PATH"
             export HOMM2_OBJDIFF_WRAPPED="$HOMM2_DIR"
-            echo "[homm2] objdiff    : WRAPPED -> $HOMM2_OBJDIFF_CONFIG" >&2
+            echo "[homm2] objdiff    : WRAPPED -> $HOMM2_OBJDIFF_PROJECT/objdiff.json" >&2
           else
             echo "[homm2] objdiff    : wrapper setup failed" >&2
           fi
