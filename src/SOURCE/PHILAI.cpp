@@ -6137,7 +6137,7 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 unusedValue29;
     i32 artifactIndex1;
     i32 siteLevel5;
-    H2_ENUM_STORAGE(GenericSiteType, i32) siteType0;
+    GenericSiteType siteType0;
     i32 value1;
     i32 cursedArtifactCount2;
     CreatureType creatureType2;
@@ -6146,9 +6146,10 @@ i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 armyValue7;
 
     cursedArtifactCount2 = 0;
-    siteType0 = cell->m_tentColor;
-    siteType0 &= GENERIC_SITE_TYPE_MASK;
-    siteLevel5 = cell->m_tentColor;
+    H2_ENUM_DECODE_MASKED(
+        GenericSiteType, siteType0, cell->m_objectMetadata, GENERIC_SITE_TYPE_MASK
+    );
+    siteLevel5 = cell->m_objectMetadata;
     siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
     value1 = 0;
 
