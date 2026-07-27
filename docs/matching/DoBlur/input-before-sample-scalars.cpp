@@ -15,15 +15,31 @@
  * Motivation: in the retained source MSVC assigns input to ESI and sample14
  * to EDX, while retail assigns input to EDX and sample14 to ESI.
  *
- * Result (2026-07-26):
+ * The original 2026-07-26 spot check used an older structural base:
  *   clean fuzzy: 85.299576%, size 1612
  *   first forest state: 89.896620%, size 1707
- *   ordered relocations: 43/43
  *
- * Artifact:
+ * The structure was revisited on 2026-07-27 after retaining the alternate
+ * sample partition and red/blue/green component-table order. Both lifetimes
+ * were crossed with the clean state and exactly 50 forest states:
+ *
+ *   complete matrix: 2 * (clean + 50 states) = 102/102
+ *   early-input clean: 94.719406%, size 1701, relocs 43/43
+ *   retained-lifetime clean: 92.854430%, size 1701, relocs 43/43
+ *   both best: 95.729960%, size 1703, relocs 43/43
+ *
+ * The early-input clean arm gives the retail EDX input pointer and keeps the
+ * 29/29 CFG with only B10 size-different (215 versus retail 216). At trial 13
+ * it canonicalizes to text SHA 2745e498400d169d and normalized relocation SHA
+ * 9101b98c0d3519aa, exactly the retained arm's trial-10 state.
+ *
+ * Artifacts:
  *   build/tu-state-noise/doblur-input-before-scalars-clean
+ *   build/doblur-input-lifetime-full-axes.json
+ *   build/doblur-input-lifetime-full-manifest.json
+ *   build/match-variants/doblur-input-lifetime-full
  *
- * Disposition: rejected without a full island sweep.  Merely extending the
- * pointer lifetime moves the function into two much worse allocation orbits
- * and does not preserve retail's 1700-byte shape.
+ * Disposition: clue only. The revised structure is a much stronger clean
+ * island and repairs the input register, but its complete state census does
+ * not exceed or differ from the retained historical MAX island.
  */
