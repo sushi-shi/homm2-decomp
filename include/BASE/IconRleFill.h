@@ -4,8 +4,8 @@
 #include <BASE/IconRle.h>
 
 #define H2_ICON_RLE_CLIPPED_FILL(                                                               \
-    rowVisible, row, currentX, color, runLength, clipX, clipW, clipRight)                        \
-    if (rowVisible && static_cast<i32>(currentX + runLength) > clipX && clipRight >= currentX) { \
+    runVisible, row, currentX, color, runLength, clipX, clipW, clipRight)                        \
+    if (runVisible) {                                                                            \
         i32 fillRight = currentX + runLength;                                                     \
         if (clipX <= currentX) {                                                                  \
             if (clipRight >= fillRight) {                                                         \
