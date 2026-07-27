@@ -30,6 +30,10 @@ static inline i32 MonoNeedsClipping(
            || currentY + entry->h > clipY + clipH;
 }
 
+static inline i32 MonoRowVisible(i32 clipTop) {
+    return clipTop <= gMonoY && gMonoY <= gMonoClipB;
+}
+
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(
     class icon* srcIcon,
@@ -81,7 +85,7 @@ void MonoIconToBitmap(
                 memset(row + gMonoX, color, cmd);
             } else {
                 i32 right;
-                if (clipY <= gMonoY && gMonoClipB >= gMonoY && (right = gMonoX + cmd, clipX < right)
+                if (MonoRowVisible(clipY) && (right = gMonoX + cmd, clipX < right)
                     && gMonoClipR >= gMonoX) {
                     if (clipX <= gMonoX) {
                         if (gMonoClipR >= right) {
