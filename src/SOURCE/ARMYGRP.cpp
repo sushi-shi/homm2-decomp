@@ -14,6 +14,15 @@ H2_ENUM_BEGIN(MoraleConstant)
     FIVE_ALIGNMENT_COUNT  = 5
 H2_ENUM_END(MoraleConstant)
 
+#if H2_STRICT_ENUMS
+template <typename Value>
+void SwapValues(Value& lhs, Value& rhs) {
+    Value temporary = lhs;
+    lhs = rhs;
+    rhs = temporary;
+}
+#endif
+
 VA(0x0048c040, 0x3c)
 armyGroup::armyGroup(void) {
     memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
@@ -225,6 +234,10 @@ i32 armyGroup::Add(
 
 VA(0x0048c75d, 0x75)
 void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
+#if H2_STRICT_ENUMS
+    SwapValues(m_creatureTypes[slot], otherGroup->m_creatureTypes[otherSlot]);
+    SwapValues(m_creatureCounts[slot], otherGroup->m_creatureCounts[otherSlot]);
+#else
     i32 temporary = m_creatureTypes[slot];
     m_creatureTypes[slot] = otherGroup->m_creatureTypes[otherSlot];
     otherGroup->m_creatureTypes[otherSlot] = temporary;
@@ -232,6 +245,7 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
     temporary = m_creatureCounts[slot];
     m_creatureCounts[slot] = otherGroup->m_creatureCounts[otherSlot];
     otherGroup->m_creatureCounts[otherSlot] = temporary;
+#endif
 }
 
 VA(0x0048c7d2, 0x14d)
