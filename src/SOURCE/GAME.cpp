@@ -6204,7 +6204,7 @@ void game::ProcessOnMapHeroes(void) {
                             heroClass6 = static_cast<FactionType>(
                                 cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE
                             );
-                            if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
+                            if (heroClass6 == FACTION_NEUTRAL) {
                                 heroClass6 = m_setupPlayerRace
                                     [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
                             }
