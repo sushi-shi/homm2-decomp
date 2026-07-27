@@ -5870,14 +5870,14 @@ i32 advManager::UpdBottomViewResMsg(void) {
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
     textY19 = 0;
-    if (giBottomViewResource == RES_NONE) {
+    if (giBottomViewResource < 0) {
         textY19 = RESOURCE_VIEW_MULTILINE_HEIGHT;
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
     }
     messageText2 = static_cast<char*>(H2_ALLOC_AT(
         strlen(gcBottomViewText) + 1, DATA_COMPGEN(0x004f6208, updBottomViewResMsgSourceFile, RETAIL_FILE),
-        RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
+        s_resourceViewLineBase + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
     ));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5897,7 +5897,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    if (giBottomViewResource != RES_NONE) {
+    if (giBottomViewResource >= 0) {
         if (giBottomViewResource == RES_GOLD) {
             iconWidth6 = RESOURCE_VIEW_GOLD_WIDTH;
             iconHeight11 = RESOURCE_VIEW_GOLD_HEIGHT;
@@ -5926,7 +5926,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
         resourceCountText6 = static_cast<char*>(H2_ALLOC_AT(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f6254, updBottomViewResMsgSourceFile2, RETAIL_FILE),
-            RESOURCE_VIEW_LINE_BASE + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
+            s_resourceViewLineBase + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
         sprintf(resourceCountText6, DATA_COMPGEN(0x004f6280, updBottomViewResMsgD, "%d"), giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
@@ -6033,7 +6033,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
         countText14[index11] = static_cast<char*>(H2_ALLOC_AT(
             BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f62b8, updBottomViewKingdomSourceFile, RETAIL_FILE),
-            KINGDOM_VIEW_LINE_BASE + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
+            s_kingdomViewLineBase + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
         ));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], DATA_COMPGEN(0x004f62e4, updBottomViewKingdomD, "%d"), gpCurPlayer->m_resources[index11]);
