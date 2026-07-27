@@ -179,7 +179,7 @@ BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.2299	0fec6d
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	83.3976	079002a41982.ce1dc079e29d
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	88.0265	488893347daa.d97a2149d483
 BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	84.5249	eec82b659fac.065eb853b62d
-BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	80.4192	25c32ca3a4fa
+BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.5808	2a5f3e4009ee.b833f2b08aa6
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	af335173b95f
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	88e22e24424c
 BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	99.6923	e8027ea4b95f
