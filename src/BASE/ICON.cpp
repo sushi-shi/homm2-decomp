@@ -101,14 +101,17 @@ IconDrawResult icon::CombatClipDrawToBuffer(
                 x - reinterpret_cast<IconEntry*>(m_data + entryOffset)->x;
             limits->left =
                 limits->right - reinterpret_cast<IconEntry*>(m_data + entryOffset)->w + 1;
+            limits->top = reinterpret_cast<IconEntry*>(m_data + entryOffset)->y + y;
+            limits->bottom =
+                reinterpret_cast<IconEntry*>(m_data + entryOffset)->h + limits->top - 1;
         } else {
             limits->left = reinterpret_cast<IconEntry*>(m_data + entryOffset)->x + x;
             limits->right =
                 reinterpret_cast<IconEntry*>(m_data + entryOffset)->w + limits->left - 1;
+            limits->top = reinterpret_cast<IconEntry*>(m_data + entryOffset)->y + y;
+            limits->bottom =
+                reinterpret_cast<IconEntry*>(m_data + entryOffset)->h + limits->top - 1;
         }
-        limits->top = reinterpret_cast<IconEntry*>(m_data + entryOffset)->y + y;
-        limits->bottom =
-            reinterpret_cast<IconEntry*>(m_data + entryOffset)->h + limits->top - 1;
         if (gbSaveBiggestExtent != 0) {
             if (limits->left < giMinExtentX)
                 giMinExtentX = limits->left;
