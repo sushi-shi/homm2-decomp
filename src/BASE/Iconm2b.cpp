@@ -17,6 +17,19 @@ DATA(0x00534be4) static i32 gMonoY;
 DATA(0x00534be8) static i32 gMonoClipB;
 DATA(0x00534bec) static i32 gMonoX;
 
+static inline i32 MonoNeedsClipping(
+    IconEntry* entry,
+    i32 x0,
+    i32 currentY,
+    i32 clipX,
+    i32 clipY,
+    i32 clipW,
+    i32 clipH
+) {
+    return clipX > x0 || x0 + entry->w > clipX + clipW || clipY > currentY
+           || currentY + entry->h > clipY + clipH;
+}
+
 VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(
     class icon* srcIcon,
@@ -39,8 +52,7 @@ void MonoIconToBitmap(
     gMonoX = gMonoX0;
     gMonoY = entry->y + y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (clipX > gMonoX0 || gMonoX0 + entry->w > clipX + clipW || clipY > gMonoY
-            || gMonoY + entry->h > clipY + clipH) {
+        if (MonoNeedsClipping(entry, gMonoX0, gMonoY, clipX, clipY, clipW, clipH)) {
             clip = ICON_DRAW_CLIP;
             gMonoClipR = clipX + clipW - 1;
             gMonoClipB = clipY + clipH - 1;
