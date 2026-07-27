@@ -306,6 +306,21 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value) ((a) = (b) = (c) = (d) = (e) = (value))
 #endif
 
+// Decode a semantic enum from a masked packed-storage field. Retail retains
+// the original two-step /Od assignment shape.
+#if H2_STRICT_ENUMS
+#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
+    do {                                                                                           \
+        (target) = static_cast<type>((raw) & (mask));                                              \
+    } while (0)
+#else
+#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
+    do {                                                                                           \
+        (target) = (raw);                                                                          \
+        (target) &= (mask);                                                                        \
+    } while (0)
+#endif
+
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at
 // the site. Production expands to the bare value, so bytes cannot change.
 #if H2_STRICT_ENUMS
