@@ -151,7 +151,7 @@ H2_ENUM_BEGIN(LuckConstant)
     LUCK_DIAGONAL_DIVISOR    = 2
 H2_ENUM_END(LuckConstant)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline BoltColorMode LuckBoltColor(i32 targetX, i32 startX) {
     return targetX >= startX ? BOLT_COLOR_RAINBOW_REVERSE : BOLT_COLOR_RAINBOW_FORWARD;
 }

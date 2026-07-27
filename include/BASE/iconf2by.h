@@ -3,7 +3,7 @@
 
 #include <Ints.h>
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #include <BASE/IconDraw.h>
 #endif
 
