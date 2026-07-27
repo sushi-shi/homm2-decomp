@@ -954,7 +954,7 @@ i32 hero::NumArtifacts(void) {
     i32 i;
 
     for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
-        if (m_artifacts[i] >= 0)
+        if (m_artifacts[i] >= ARTIFACT_VALID_BEGIN)
             cnt++;
     }
     return cnt;
