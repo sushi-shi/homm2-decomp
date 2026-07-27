@@ -42,7 +42,8 @@ void FlipIconToBitmap(
     u8* src = srcIcon->m_data;
     i32 x0 = x;
     i32 w;
-    IconEntry* entry = reinterpret_cast<IconEntry*>(src) + frame;
+    IconEntry* entries = srcIcon->Entries();
+    IconEntry* entry = &entries[frame];
     w = entry->w;
     x0 = x0 - entry->x;
     src += entry->srcOffset;
