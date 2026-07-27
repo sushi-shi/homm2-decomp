@@ -153,7 +153,10 @@ void IconToBitmapYModify(
                     if (gYMClipR >= copyRight) {
                         memcpy(gYMRow + clipX, gYMSrc + (clipX - gYMX), (gYMRun - clipX) + gYMX);
                     } else {
-                        memcpy(gYMRow + clipX, gYMSrc + (clipX - gYMX), clipW);
+                        u8* copySrc = gYMSrc;
+                        copySrc -= gYMX;
+                        copySrc += clipX;
+                        memcpy(gYMRow + clipX, copySrc, clipW);
                     }
                 }
             }
