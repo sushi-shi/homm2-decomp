@@ -7,6 +7,10 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
+static inline i32 IconRowVisible(i32 currentY, i32 clipBottom, i32 clipTop) {
+    return clipTop <= currentY && currentY <= clipBottom;
+}
+
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(
     class icon* srcIcon,
@@ -116,7 +120,8 @@ void IconToBitmap(
             } else {
                 i32 right;
                 i32 fillLen;
-                if (clipY <= gIcY && gIcClipB >= gIcY && (right = X + count, clipX < right)
+                if (IconRowVisible(gIcY, gIcClipB, clipY)
+                    && (right = X + count, clipX < right)
                     && gIcClipR >= X) {
                     if (X >= clipX) {
                         if (gIcClipR >= right) {
