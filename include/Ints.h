@@ -343,6 +343,15 @@ constexpr i32 H2EnumIndex(Value value) {
 #define HAS(flags, bit) ((flags) & (bit))
 #endif
 
+// Clear a known-set flag from its domain. Strict builds express the operation
+// as bit removal; production retains the guarded subtraction shape used by
+// reconstructed retail code.
+#if H2_STRICT_ENUMS
+#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) &= ~(bit))
+#else
+#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) = static_cast<i32>(flags) - (bit))
+#endif
+
 // Bit-index to mask: the domain value is a shift count. Production expands to
 // the plain shift.
 #if H2_STRICT_ENUMS

@@ -11,3 +11,7 @@
   matches the enum's declared storage. Replace redundant wrappers with the
   direct enum type, especially for locals, while verifying layouts, retail
   bytes, and relocations for each affected unit.
+- Audit subtraction in every `H2_ENUM_FLAGS` domain. Replace guarded flag
+  removal with `H2_ENUM_CLEAR_FLAG`, distinguish any genuine numeric-domain
+  arithmetic, and remove `operator-`/`operator-=` from `H2_ENUM_FLAGS` once no
+  legitimate flag subtraction remains.
