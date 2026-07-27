@@ -798,11 +798,11 @@ void SetInstallDefaults(void) {
 // Retail saves ESI/EDI before materializing the main-game graphics slot.
 VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
-    i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
+    i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
     do {
         fullScreen[IDX(GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
         fullScreen[IDX(GRAPHICS_X_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
