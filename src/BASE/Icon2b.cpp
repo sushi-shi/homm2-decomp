@@ -11,6 +11,20 @@ static inline i32 IconRowVisible(i32 currentY, i32 clipBottom, i32 clipTop) {
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
+static inline i32 IconRunVisible(
+    i32 currentY,
+    i32 clipBottom,
+    i32 clipTop,
+    i32 currentX,
+    u32 runLength,
+    i32 clipLeft,
+    i32 clipRight
+) {
+    i32 runRight = currentX + runLength;
+    return IconRowVisible(currentY, clipBottom, clipTop)
+           && clipLeft < runRight && clipRight >= currentX;
+}
+
 VA(0x004d0570, 0x4ed)
 void IconToBitmap(
     class icon* srcIcon,
@@ -120,7 +134,7 @@ void IconToBitmap(
                 memset(row + X, gIcColor, count);
             } else
                 H2_ICON_RLE_CLIPPED_FILL(
-                    IconRowVisible(gIcY, gIcClipB, clipY),
+                    IconRunVisible(gIcY, gIcClipB, clipY, X, count, clipX, gIcClipR),
                     row,
                     X,
                     gIcColor,

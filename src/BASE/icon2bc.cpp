@@ -122,7 +122,8 @@ void IconToBitmapColorTable(
                 memset(row + X, gCTColor, count);
             } else
                 H2_ICON_RLE_CLIPPED_FILL(
-                    clipY <= gCTY && gCTY <= gCTClipB,
+                    clipY <= gCTY && gCTY <= gCTClipB
+                        && static_cast<i32>(X + count) > clipX && gCTClipR >= X,
                     row,
                     X,
                     gCTColor,
