@@ -707,7 +707,8 @@ void combatManager::CastSpell(
     spellSample = NULL_SAMPLE2;
     if (m_limitCreature != 0) {
         ResetLimitCreature();
-        if (ValidHex(m_limitCreatureHex) && m_hexCells[m_limitCreatureHex].m_occupantSide >= 0) {
+        if (ValidHex(m_limitCreatureHex)
+            && m_hexCells[m_limitCreatureHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
             ++m_limitCreatureCount[IDX(m_hexCells[m_limitCreatureHex].m_occupantSide)]
                                   [m_hexCells[m_limitCreatureHex].m_occupantIndex];
         }
@@ -730,7 +731,8 @@ void combatManager::CastSpell(
         || spell == SPELL_ARMAGEDDON || spell == SPELL_ELEMENTAL_STORM
         || spell == SPELL_MASS_DISPEL) {
         target_i = NULL;
-    } else if (ValidHex(targetHex) && m_hexCells[targetHex].m_occupantSide >= 0) {
+    } else if (ValidHex(targetHex)
+               && m_hexCells[targetHex].m_occupantSide >= COMBAT_SIDE_VALID_BEGIN) {
         target_i =
             &m_armies[IDX(m_hexCells[targetHex].m_occupantSide)][m_hexCells[targetHex].m_occupantIndex];
         targetSide_i = m_hexCells[targetHex].m_occupantSide;
