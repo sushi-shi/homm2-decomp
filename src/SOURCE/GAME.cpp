@@ -1061,7 +1061,8 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
         if (m_availableHeroes[heroId] == WEEKLY_AVAILABLE_HERO
             && attempts < HERO_SELECTION_REUSE_RETRY_LIMIT)
             continue;
-        if (heroClass != FACTION_ANY && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
+        if (heroClass >= FACTION_KNIGHT && heroClass <= FACTION_NECROMANCER
+            && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
             && m_heroRecs[heroId].m_cursorType != heroClass)
             continue;
         if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
