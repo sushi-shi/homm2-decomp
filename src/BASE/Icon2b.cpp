@@ -3,7 +3,7 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRleFill.h>
+#include <BASE/IconMacro.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
@@ -130,30 +130,24 @@ void IconToBitmap(
             goto dim_run;
 
         fill_run:
-            if (clip == ICON_DRAW_NO_CLIP) {
-                memset(row + X, gIcColor, count);
-            } else
-                H2_ICON_RLE_CLIPPED_FILL(
-                    IconRunVisible(gIcY, gIcClipB, clipY, X, count, clipX, gIcClipR),
-                    row,
-                    X,
-                    gIcColor,
-                    count,
-                    clipX,
-                    clipW,
-                    gIcClipR
-                );
-            X = X + count;
-            gIcRun = count;
-            continue;
+            H2_ICON_RLE_FILL_RUN(
+                clip,
+                IconRunVisible(gIcY, gIcClipB, clipY, X, count, clipX, gIcClipR),
+                row,
+                X,
+                gIcColor,
+                count,
+                clipX,
+                clipW,
+                gIcClipR,
+                gIcRun
+            );
 
         dim_run:
             gIcCnt2 = count;
             gIcRun = flags;
             if ((flags & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                u8* palette =
-                    reinterpret_cast<u8*>(uDimPal)
-                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                u8* palette = H2_ICON_RLE_DIM_PALETTE(flags);
                 if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
                     gIcDimPal = palette;
