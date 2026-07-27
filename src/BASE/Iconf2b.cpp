@@ -155,10 +155,9 @@ void FlipIconToBitmap(
                         do {
                             u8* dimPalette = gFlipDimPal;
                             i32 px = *dp++;
-                            count--;
                             gFlipDimDst = dp;
                             dp[-1] = dimPalette[px];
-                        } while (count != 0);
+                        } while (--count != 0);
                     }
                 } else {
                     gFlipDimLen = count;
