@@ -19,10 +19,27 @@
  * Retail's B10 is call-free, so this is evidence against whole-kernel
  * acquisition deinlining rather than a candidate for retention.
  *
+ * A narrower follow-up moved only north-four, north-one, and south-four into
+ * one reference-output helper.  The helper was invoked either at the original
+ * early north-four position or at the late north/south positions.  Both call
+ * placements received clean plus 50 states alongside the direct arm:
+ *
+ *   complete matrix: 3 * (clean + 50 states) = 153/153
+ *   early helper best: 88.793250%, size 1667, relocations 43/43
+ *   late helper best:  87.348100%, size 1668, relocations 43/43
+ *
+ * Even this three-load, four-argument helper does not enter the desired
+ * inlined schedule under /Ob1.  Its much shorter target span demonstrates the
+ * same out-of-line call boundary.  Smaller single-read helpers were already
+ * classified separately and canonicalize to known lower islands.
+ *
  * Artifacts:
  *   build/doblur-sample-fill-helper-axes.json
  *   build/doblur-sample-fill-helper-manifest.json
  *   build/match-variants/doblur-sample-fill-helper
+ *   build/doblur-special-sample-helper-axes.json
+ *   build/doblur-special-sample-helper-manifest.json
+ *   build/match-variants/doblur-special-sample-helper
  *
  * Disposition: rejected.  The direct source is restored, no generated probe
  * input is retained, and the durable 95.729960% MAX is unchanged.
