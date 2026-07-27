@@ -20,7 +20,8 @@
 
 H2_ENUM_CLASS_BEGIN(FileRequesterHelpIndex)
     REQUESTER_HELP_NONE          = -1,
-    REQUESTER_HELP_FILTER_SMALL  = 0,
+    REQUESTER_HELP_VALID_BEGIN   = 0,
+    REQUESTER_HELP_FILTER_SMALL  = REQUESTER_HELP_VALID_BEGIN,
     REQUESTER_HELP_FILTER_MEDIUM = 1,
     REQUESTER_HELP_FILTER_LARGE  = 2,
     REQUESTER_HELP_FILTER_XLARGE = 3,
@@ -652,7 +653,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 }
                                 break;
                         }
-                        if (helpIndexMouse >= 0) {
+                        if (helpIndexMouse >= REQUESTER_HELP_VALID_BEGIN) {
                             NormalDialog(
                                 gFileRequestHelp[IDX(helpIndexMouse)],
                                 NORMAL_DIALOG_QUICK_VIEW,
