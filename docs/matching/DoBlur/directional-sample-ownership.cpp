@@ -16,6 +16,12 @@
  *    but is evidence for a different effective source shape and therefore
  *    does not overwrite that hash-scoped maximum.
  *
+ *    Direct retained-object audit rejects the apparent gain structurally:
+ *    frame 0xC60 versus retail 0xC5C, table base 0x70 versus 0x6C, and B10
+ *    217 versus 216 instructions.  Input remains ECX rather than retail EDX.
+ *    West-four/north-one use the retail EBP/ESI, but south-four remains EDX
+ *    rather than ECX: input and south-four retain the parent's wrong ownership.
+ *
  * 2. A horizontal-first grouped owner:
  *
  *      struct SBlurKernelSamples {
@@ -33,6 +39,11 @@
  * byte-neutral.  The flat directional slot order is the valuable new island;
  * wrapping the same storage in grouped fields destroys it.
  *
+ * The remaining bounded family used one generic inline sixteen-term channel
+ * helper for red, green, and blue on the retained parent.  Its complete 51/51
+ * census reached only 91.327000%, size 1708, at trial 2.  The whole-channel
+ * argument/inlining boundary is therefore not the missing B10 structure.
+ *
  * Artifacts:
  *   build/doblur-rbg-directional-flat-samples-manifest.json
  *   build/match-variants/doblur-rbg-directional-flat-samples
@@ -41,6 +52,8 @@
  *   build/match-variants/doblur-rbg-directional-grouped-hv-samples
  *   build/doblur-rbg-directional-grouped-vh-samples-manifest.json
  *   build/match-variants/doblur-rbg-directional-grouped-vh-samples
+ *   build/doblur-rbg-full-channel-inline-helper-manifest.json
+ *   build/match-variants/doblur-rbg-full-channel-inline-helper
  *
  * Disposition: preserve the 95.738396% paired object as a distinct structural
  * clue.  No structure is exact, and no experimental source or generated
