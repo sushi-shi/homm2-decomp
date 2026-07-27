@@ -4010,7 +4010,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 index3;
     i32 siteLevel6;
     i32 primaryStat15;
-    H2_ENUM_STORAGE(GenericSiteType, i32) siteType2;
+    GenericSiteType siteType2;
     i32 mapY9;
     i32 mapX37;
     i32 unusedSite;
@@ -4025,8 +4025,12 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
     cursedArtifactCount9 = 0;
     eventSample5 = NULL_SAMPLE2;
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= GENERIC_SITE_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        GenericSiteType,
+        siteType2,
+        cell->m_objectMetadata,
+        GENERIC_SITE_TYPE_MASK
+    );
     siteLevel6 = cell->m_objectMetadata;
     siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
 
