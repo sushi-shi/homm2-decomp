@@ -60,8 +60,10 @@ void FlipMonoIconToBitmap(
     gFMY = y + entryY;
     i32 right = w + x0;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (x0 < clipX || clipX + clipW < right || gFMY < clipY
-            || entry->h + gFMY > clipY + clipH) {
+        i32 clipRight = clipX + clipW;
+        i32 entryHeight = entry->h;
+        if (x0 < clipX || clipRight < right || gFMY < clipY
+            || entryHeight + gFMY > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
             gFMClipR = clipX + clipW - 1;
             gFMClipB = clipY + clipH - 1;
