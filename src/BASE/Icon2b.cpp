@@ -46,10 +46,12 @@ void IconToBitmap(
     u8* savedDst;
     gIcEntry = entry;
     gIcSrc = data + sourceOffset;
-    i32 X = entryX + x;
+    i32 X = x + entryX;
+    i32 currentY = entry->y + y;
+    i32 pitch = dest->m_width;
     gIcX0 = X;
-    gIcPitch = dest->m_width;
-    gIcY = entry->y + y;
+    gIcPitch = pitch;
+    gIcY = currentY;
 
     if (clip != ICON_DRAW_NO_CLIP) {
         if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY
