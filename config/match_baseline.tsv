@@ -1036,7 +1036,7 @@ SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	86c2e46cc8b4
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	23359cf8de69
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	32e7cc8e72ad
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	99.9254	186ae4724ee0
-SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	97.7034	7c863414a151
+SOURCE/Overview	?SetupDynamicStuff@game@@QAEXHHH@Z	100.0000	dda8d861a39b
 SOURCE/Overview	?SetupNewOverviewType@game@@QAEXHH@Z	100.0000	4ac561d35c85
 SOURCE/Overview	?SetupResources@game@@QAEXXZ	100.0000	c70e28449273
 SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	5a6fcace7afa
