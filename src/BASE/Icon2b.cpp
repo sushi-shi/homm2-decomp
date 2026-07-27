@@ -39,18 +39,21 @@ void IconToBitmap(
     DATA(0x00534c5c) static u32 gIcCnt2;
 
     u8* data = srcIcon->m_data;
-    IconEntry* entry = &srcIcon->Entries()[frame];
-    i32 entryX = entry->x;
-    i32 sourceOffset = entry->srcOffset;
+    i32 entryOffset = frame * sizeof(IconEntry);
+    i32 entryX = reinterpret_cast<IconEntry*>(data + entryOffset)->x;
+    i32 sourceOffset = reinterpret_cast<IconEntry*>(data + entryOffset)->srcOffset;
+    IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
     u8* savedDst;
     gIcEntry = entry;
     gIcSrc = data + sourceOffset;
-    i32 X = x + entryX;
-    i32 currentY = entry->y + y;
+    x += entryX;
+    y += entry->y;
     i32 pitch = dest->m_width;
-    gIcX0 = X;
+    gIcX0 = x;
     gIcPitch = pitch;
-    gIcY = currentY;
+    gIcY = y;
+    i32 X = x;
+    i32 currentY = y;
 
     if (clip != ICON_DRAW_NO_CLIP) {
         if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY
