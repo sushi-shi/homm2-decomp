@@ -64,7 +64,9 @@ void IconToBitmap(
         }
     }
 
-    u8* row = dest->m_pixels + gIcPitch * gIcY;
+    i32 rowPitch = gIcPitch;
+    i32 rowY = gIcY;
+    u8* row = dest->m_pixels + rowPitch * rowY;
     i32 command;
 
     for (;;) {
