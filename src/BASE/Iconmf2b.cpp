@@ -31,23 +31,22 @@ void FlipMonoIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    u8* data = srcIcon->m_data;
-    IconEntry* entry = &srcIcon->Entries()[frame];
-    i32 entryX = entry->x;
-    i32 srcOffset = entry->srcOffset;
-    gFMEntry = entry;
+    IconEntry* entries = srcIcon->Entries();
+    IconEntry* entry = &entries[frame];
+    u8* srcData = reinterpret_cast<u8*>(entries) + entry->srcOffset;
     i32 x0 = x;
-    x0 = x0 - entryX;
-    gFMSrc = data + srcOffset;
+    gFMEntry = entry;
+    gFMSrc = srcData;
     i32 w = entry->w;
-    x0 = x0 - w;
     i32 entryY = entry->y;
-    i32 right = w + x0 + 1;
+    x0 = x0 - entry->x;
+    x0 = x0 - w;
     x0++;
     gFMX0 = x0;
-    i32 X = right - 1;
-    gFMXEnd = X;
     gFMY = y + entryY;
+    i32 X = w + x0 - 1;
+    gFMXEnd = X;
+    i32 right = w + x0;
     if (clip != ICON_DRAW_NO_CLIP) {
         if (x0 < clipX || clipX + clipW < right || gFMY < clipY
             || entry->h + gFMY > clipY + clipH) {
