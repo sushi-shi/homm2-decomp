@@ -148,6 +148,11 @@ constexpr bool operator!=(
 }
 
 template <typename Enum, typename Storage>
+constexpr bool operator<(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return static_cast<Enum>(lhs) < rhs;
+}
+
+template <typename Enum, typename Storage>
 class H2SteppedEnumStorage {
 public:
     H2SteppedEnumStorage() = default;

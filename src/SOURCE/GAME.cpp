@@ -5629,7 +5629,7 @@ void game::GiveArmy(
         }
         if (i >= ARMY_GROUP_SLOT_COUNT) {
             for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-                if (group->m_creatureTypes[i] < 0) {
+                if (group->m_creatureTypes[i] < CREATURE_VALID_BEGIN) {
                     group->m_creatureCounts[i] = 0;
                     break;
                 }
