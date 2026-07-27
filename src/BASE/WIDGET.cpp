@@ -61,17 +61,35 @@ i32 widget::Open(i32 zOrder, class heroWindow* owner) {
 VA(0x004dded0, 0x1)
 void widget::Close(void) {}
 
+static inline void DimWidgetArea(widget* target) {
+    i16 x = target->m_x + static_cast<i16>(target->m_owner->m_posX);
+    i16 y = target->m_y + static_cast<i16>(target->m_owner->m_posY);
+    DimBitmapArea(
+        gpWindowManager->m_screen,
+        x,
+        y,
+        target->m_width,
+        target->m_height,
+        0
+    );
+}
+
+static inline i32 IsInsideWidget(widget* target, i16 x, i16 y) {
+    i16 left = target->m_x;
+    return !(left > x || target->m_y > y || left + target->m_width <= x
+             || target->m_y + target->m_height <= y);
+}
+
 VA(0x004ddee0, 0x2f4)
 MessageDispatchResult widget::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE: {
             i16 x = static_cast<i16>(message.payload.mouse.x);
             i16 y = static_cast<i16>(message.payload.mouse.y);
-            i16 left = m_x;
             heroWindow* window = m_owner;
             x -= static_cast<i16>(window->m_posX);
             y -= static_cast<i16>(window->m_posY);
-            if (left > x || m_y > y || left + m_width <= x || m_y + m_height <= y)
+            if (!IsInsideWidget(this, x, y))
                 break;
             message.payload.hover.id = m_id;
             return MESSAGE_DISPATCH_FORWARD;
@@ -84,9 +102,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                         Draw();
                     if (HAS(m_flags, WIDGET_FLAG_DIMMED)
                         && m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
-                        i16 x = m_x + static_cast<i16>(m_owner->m_posX);
-                        i16 y = m_y + static_cast<i16>(m_owner->m_posY);
-                        DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
+                        DimWidgetArea(this);
                         return MESSAGE_DISPATCH_CONTINUE;
                     }
                     break;
@@ -103,16 +119,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
                         if (HAS(flags, WIDGET_FLAG_DIMMED)) {
                             Draw();
                             if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
-                                i16 x = m_x + static_cast<i16>(m_owner->m_posX);
-                                i16 y = m_y + static_cast<i16>(m_owner->m_posY);
-                                DimBitmapArea(
-                                    gpWindowManager->m_screen,
-                                    x,
-                                    y,
-                                    m_width,
-                                    m_height,
-                                    0
-                                );
+                                DimWidgetArea(this);
                             }
                         }
                         if (HAS(m_flags, WIDGET_FLAG_UPDATE)) {
