@@ -53,6 +53,23 @@ Artifacts:
   build/match-variants/iconm2b-storage-helper-20260727/results.json
   build/tu-state-noise/iconm2b-inline-helper-trial1-record-max-20260727
 
+One targeted descendant matrix then tested whether finer inline boundaries
+could recover the two missing global reloads:
+
+  - zero-argument gMonoX0/gMonoY accessors used twice each;
+  - four independently inlined left/right/top/bottom predicate helpers.
+
+All 3 x 51 = 153 variants completed in 151.49 seconds.  Coordinate accessors
+could reproduce 82.861880% on later states but retained 36/38 relocations.
+The independent clause helpers peaked at 81.950280%, size 601, also 36/38.
+Neither boundary materialized either ordered reload, so the retained single
+value helper remains the clearest source.
+
+Descendant artifacts:
+  build/iconm2b-inline-reload-boundaries-axes-20260727.json
+  build/iconm2b-inline-reload-boundaries-manifest-20260727.json
+  build/match-variants/iconm2b-inline-reload-boundaries-20260727/results.json
+
 Exact closure remains open at the two ordered setup reloads; raw relocation
 count parity alone will not prove them.
 */
