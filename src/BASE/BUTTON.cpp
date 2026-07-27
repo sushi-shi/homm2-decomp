@@ -109,11 +109,9 @@ inline button::~button() {
 
 inline H2_ENUM_RETURN(MessageDispatchResult, i16)
     button::DeselectSelected(tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_SELECTED))
+    if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
         return MESSAGE_DISPATCH_CONTINUE;
-    flags &= ~WIDGET_FLAG_SELECTED;
-    m_flags = flags;
+    m_flags &= ~WIDGET_FLAG_SELECTED;
     Draw();
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
