@@ -21,6 +21,10 @@ DATA(0x005381e0) static i32 gFDY;
 DATA(0x005381e4) static IconEntry* gFDEntry;
 DATA(0x005381e8) static u32 gFDRun;
 
+static inline i32 FlipDimRowVisible(i32 clipTop) {
+    return clipTop <= gFDY && gFDY <= gFDClipB;
+}
+
 VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(
     class icon* srcIcon,
@@ -93,9 +97,8 @@ void FlipDimIconToBitmap(
                 }
             } else {
                 i32 left;
-                i32 currentY = gFDY;
-                if (clipY <= currentY && currentY <= gFDClipB
-                    && (left = (X - cmd) + 1, clipX <= left) && X <= gFDClipR) {
+                if (FlipDimRowVisible(clipY) && (left = (X - cmd) + 1, clipX <= left)
+                    && X <= gFDClipR) {
                     i32 cn;
                     u8* dst;
                     if (clipX <= left) {
