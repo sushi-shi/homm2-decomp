@@ -53,6 +53,26 @@
  * publications, so this evidence-led source structure is retained as the next
  * branch seed.  It is not exact; the four missing reloads remain the targeted
  * descendants.
+ *
+ * The first reload-descendant Cartesian matrix crossed three setup-predicate
+ * coordinate structures with three row-address structures and all 50 forest
+ * states:
+ *
+ *   icon2b-published-reloads-islands-20260727
+ *     459/459 variants, 99 states.  Materializing icon right/bottom endpoints
+ *     adds one wrong block and destroys decoder alignment (81/80 blocks), so
+ *     those six arms were rejected without fuzzy pruning.
+ *
+ *     Snapshotting gIcPitch and gIcY immediately before the row calculation
+ *     preserves the exact 80-block flow family and reaches 80.807690% at
+ *     trials 14, 41, 43, and 45.  Clean size/relocations/block partition are
+ *     unchanged; the best state is size 1216 with 79/83 relocations and 62
+ *     exact plus 18 size-only blocks.
+ *
+ * Retail performs both published-coordinate reloads at this row calculation,
+ * making the row snapshot legitimate source evidence.  It is retained even
+ * though the current compiler orbit still folds the two reads and leaves the
+ * same four retail reloads outstanding.
  */
 
 void IconToBitmap_entry_setup_and_storage_attempts() {
