@@ -3,7 +3,7 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRleFill.h>
+#include <BASE/IconMacro.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 DATA(0x00534ca8) static i32 gCTPitch;
@@ -99,7 +99,7 @@ void IconToBitmapColorTable(
                     count = *gCTSrc++;
                 }
                 gCTColor = colorTable[*gCTSrc++];
-                goto do_fill;
+                goto fill_run;
             }
             // 0xc0 : shadow / dim run
             flags = *gCTSrc++;
@@ -113,35 +113,29 @@ void IconToBitmapColorTable(
                 if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
                     gCTCnt = count;
                     gCTColor = static_cast<u8>(color);
-                    goto do_fill;
+                    goto fill_run;
                 }
             }
             goto do_dim;
-        do_fill:
-            if (clip == ICON_DRAW_NO_CLIP) {
-                memset(row + X, gCTColor, count);
-            } else
-                H2_ICON_RLE_CLIPPED_FILL(
-                    clipY <= gCTY && gCTY <= gCTClipB
-                        && static_cast<i32>(X + count) > clipX && gCTClipR >= X,
-                    row,
-                    X,
-                    gCTColor,
-                    count,
-                    clipX,
-                    clipW,
-                    gCTClipR
-                );
-            X = X + count;
-            gCTRun = count;
-            continue;
+        fill_run:
+            H2_ICON_RLE_FILL_RUN(
+                clip,
+                clipY <= gCTY && gCTY <= gCTClipB
+                    && static_cast<i32>(X + count) > clipX && gCTClipR >= X,
+                row,
+                X,
+                gCTColor,
+                count,
+                clipX,
+                clipW,
+                gCTClipR,
+                gCTRun
+            );
         do_dim:
             gCTCnt = count;
             gCTRun = flags;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                u8* palette =
-                    reinterpret_cast<u8*>(uDimPal)
-                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                u8* palette = H2_ICON_RLE_DIM_PALETTE(flags);
                 gCTDst = savedDst;
                 gCTDimPal = palette;
                 if (clip == ICON_DRAW_NO_CLIP) {

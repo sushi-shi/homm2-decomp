@@ -5,12 +5,16 @@
  * The two forward renderers have the same clipped solid-run operation after
  * substituting their per-TU row visibility, destination, X, color, count, and
  * clip owners.  This experiment represents that common source-era boundary
- * once in BASE/IconRleFill.h:
+ * once in BASE/IconMacro.h:
  */
 #if 0
+#define H2_ICON_RLE_DIM_PALETTE(flags)                                                          \
+    (reinterpret_cast<u8*>(uDimPal)                                                             \
+     + ((flags) & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE)
+
 #define H2_ICON_RLE_CLIPPED_FILL(                                                               \
-    rowVisible, row, currentX, color, runLength, clipX, clipW, clipRight)                        \
-    if (rowVisible && static_cast<i32>(currentX + runLength) > clipX && clipRight >= currentX) { \
+    runVisible, row, currentX, color, runLength, clipX, clipW, clipRight)                        \
+    if (runVisible) {                                                                            \
         i32 fillRight = currentX + runLength;                                                     \
         if (clipX <= currentX) {                                                                  \
             if (clipRight >= fillRight)                                                           \
@@ -24,12 +28,37 @@
                 memset(row + clipX, color, clipW);                                                 \
         }                                                                                         \
     }
+
+#define H2_ICON_RLE_FILL_RUN(                                                                    \
+    clipMode, runVisible, row, currentX, color, runLength, clipX, clipW, clipRight, publishedRun) \
+    if (clipMode == ICON_DRAW_NO_CLIP) {                                                          \
+        memset(row + currentX, color, runLength);                                                  \
+    } else                                                                                        \
+        H2_ICON_RLE_CLIPPED_FILL(                                                                 \
+            runVisible, row, currentX, color, runLength, clipX, clipW, clipRight                  \
+        );                                                                                        \
+    currentX = currentX + runLength;                                                              \
+    publishedRun = runLength;                                                                     \
+    continue
 #endif
 
 /*
- * The macro has no do/while wrapper because each caller deliberately uses it
- * as the body of an `else`, producing the same `else if` CFG as the expanded
- * source.  The dedicated header is included only by Icon2b.cpp and icon2bc.cpp;
+ * Neither macro has a do/while wrapper.  H2_ICON_RLE_CLIPPED_FILL is
+ * deliberately usable as the body of an `else`, preserving the original
+ * `else if` CFG.  H2_ICON_RLE_FILL_RUN includes the loop's `continue`, so an
+ * artificial single-iteration loop would change its meaning.  The complete
+ * fill-run macro now owns the unclipped fill, clipped fill, X advance, run
+ * publication, and shared tail in both forward renderers.  Both source labels
+ * are named `fill_run`.
+ *
+ * The identical dim-palette address expression is also shared as
+ * H2_ICON_RLE_DIM_PALETTE.  Moving it into the header was byte- and
+ * relocation-neutral in both clean objects.  The canonical trial-1 replay
+ * therefore carried the same 79.445050% and 83.737090% observations to the
+ * new dependency hashes through tu_state_noise.py, without hand-editing the
+ * generated ledger.
+ *
+ * The dedicated header is included only by Icon2b.cpp and icon2bc.cpp;
  * placing it in the general IconRle.h was rejected because it unnecessarily
  * changed the tracked dependency hash of unrelated icon TUs.
  *
@@ -87,6 +116,21 @@
  * its stronger 80-block islands; fuzzy score alone does not prune either.
  * Generated probe declarations were removed.  The match ledger was updated
  * only by the canonical scripts.
+ *
+ * The later whole-tail form was also swept independently:
+ *
+ *   build/tu-state-noise/icon2b-full-fill-run-macro-20260727/
+ *   build/icon2b-full-fill-run-macro-states-20260727.json
+ *   build/tu-state-noise/icon2bc-full-fill-run-macro-20260727/
+ *   build/icon2bc-full-fill-run-macro-states-20260727.json
+ *
+ * IconToBitmap produced 30 states.  Trial 1 retained 79.445050%, size 1216,
+ * with the exact 80-block CFG and 79/83 relocations.  The clean object is
+ * 76.546700%, size 1217.  IconToBitmapColorTable produced 13 states; trial 1
+ * retained 83.737090%, size 1449, the exact 86-block CFG, and 91/91
+ * relocations.  Its clean object is 81.145540%, size 1457.  These MAX values
+ * were recorded by tu_state_noise.py --record-max after source restoration;
+ * no generated declaration remains.
  */
 
 void IconToBitmap_shared_forward_fill_fragment_attempt() {

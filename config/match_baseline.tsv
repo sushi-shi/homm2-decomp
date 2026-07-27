@@ -174,7 +174,7 @@ BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	100.0000	65cb9a46a3b2.5e877b076c9a
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	100.0000	1ed52c9fa500
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	100.0000	f14c6312fb28.5e877b076c9a
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
-BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	77.9615	167fb13de03c.72fee5c5e9d9
+BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	79.4450	6864a876cfd1.72fee5c5e9d9
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.2299	0fec6d993e84
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	83.3976	079002a41982.ce1dc079e29d
 BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	88.0663	f12f7656df1f.d97a2149d483
@@ -368,7 +368,7 @@ BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	99.6225	88198e92cdf7
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	100.0000	6bbee93fac00
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	100.0000	a12dd5677fbf
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	33440694b7af
-BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	83.9366	c69ccc24eca1.0e13db56b47b
+BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	83.7371	7b48f3388306.0e13db56b47b
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.8298	95a045323ecc
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	15fda1250f72.852e9521ff86
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	88.4584	139841233a16.685590814e18
