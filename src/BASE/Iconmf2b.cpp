@@ -17,10 +17,6 @@ DATA(0x005381ac) static i32 gFMY;
 DATA(0x005381b0) static i32 gFMClipR;
 DATA(0x005381b4) static i32 gFMXEnd;
 
-static inline u8* FlipMonoSource(IconEntry* entries, i32 frame) {
-    return reinterpret_cast<u8*>(entries) + entries[frame].srcOffset;
-}
-
 static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch) {
     return dest->m_pixels + gFMY * pitch;
 }
@@ -44,21 +40,21 @@ void FlipMonoIconToBitmap(
     i32 clipH
 ) {
     IconEntry* entries = srcIcon->Entries();
-    i32 entryX = entries[frame].x;
-    IconEntry* const entry = &entries[frame];
-    u8* const srcData = FlipMonoSource(entries, frame);
+    IconEntry* entry = &entries[frame];
+    u8* srcData = reinterpret_cast<u8*>(entries) + entry->srcOffset;
+    i32 x0 = x;
     gFMEntry = entry;
-    const i32 entryY = entry->y;
     gFMSrc = srcData;
     i32 w = entry->w;
-    i32 x0 = x - entryX;
+    i32 entryY = entry->y;
+    x0 = x0 - entry->x;
     x0 = x0 - w;
+    i32 right = w + x0 + 1;
     x0++;
     gFMX0 = x0;
-    i32 X = w + x0 - 1;
+    i32 X = right - 1;
     gFMXEnd = X;
     gFMY = y + entryY;
-    i32 right = w + x0;
     if (clip != ICON_DRAW_NO_CLIP) {
         i32 clipRight = clipX + clipW;
         i32 entryHeight = entry->h;
