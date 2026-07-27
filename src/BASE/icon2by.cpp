@@ -28,6 +28,10 @@ static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
     return shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipTop <= gYMY && gYMY <= gYMClipB;
 }
 
+static inline u8* IconOutsideCopySource(u8* src, i32 currentX, i32 clipX) {
+    return src + (clipX - currentX);
+}
+
 VA(0x004da270, 0x588)
 void IconToBitmapYModify(
     class icon* srcIcon,
@@ -153,9 +157,7 @@ void IconToBitmapYModify(
                     if (gYMClipR >= copyRight) {
                         memcpy(gYMRow + clipX, gYMSrc + (clipX - gYMX), (gYMRun - clipX) + gYMX);
                     } else {
-                        u8* copySrc = gYMSrc;
-                        copySrc -= gYMX;
-                        copySrc += clipX;
+                        u8* copySrc = IconOutsideCopySource(gYMSrc, gYMX, clipX);
                         memcpy(gYMRow + clipX, copySrc, clipW);
                     }
                 }
