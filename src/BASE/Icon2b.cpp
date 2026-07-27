@@ -182,7 +182,9 @@ void IconToBitmap(
                                 cn = (gIcClipR - X) + 1;
                             savedDst = row + X;
                         } else {
-                            if (right <= gIcClipR)
+                            i32 clipRight = gIcClipR;
+                            gIcCnt2 = count;
+                            if (right <= clipRight)
                                 count = (count - clipX) + X;
                             else
                                 count = clipW;
