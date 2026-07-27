@@ -28,13 +28,17 @@
  *   retained-lifetime clean: 92.854430%, size 1701, relocs 43/43
  *   both best: 95.729960%, size 1703, relocs 43/43
  *
- * The early-input clean arm gives the retail EDX input pointer and keeps the
- * 29/29 CFG with only B10 size-different (215 versus retail 216). At trial 13
- * it canonicalizes to text SHA 2745e498400d169d and normalized relocation SHA
- * 9101b98c0d3519aa, exactly the retained arm's trial-10 state.
+ * A later isolated replay corrected one statement from the matrix-era notes:
+ * the early-input clean object assigns input to ECX, not retail EDX.  The old
+ * wording had conflated the source lifetime with a different retained state.
+ * The clean object still keeps the 29/29 CFG with only B10 size-different
+ * (215 versus retail 216).  At trial 13 it canonicalizes to text SHA
+ * 2745e498400d169d and normalized relocation SHA 9101b98c0d3519aa, exactly the
+ * retained arm's trial-10 state.
  *
  * Artifacts:
  *   build/tu-state-noise/doblur-input-before-scalars-clean
+ *   build/tu-state-noise/doblur-early-input-clean-replay
  *   build/doblur-input-lifetime-full-axes.json
  *   build/doblur-input-lifetime-full-manifest.json
  *   build/match-variants/doblur-input-lifetime-full
