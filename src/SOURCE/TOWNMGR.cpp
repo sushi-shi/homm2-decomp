@@ -1258,7 +1258,6 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     i32 marketplaceCount_m;
     baseManager* dialogManager_d;
     SAMPLE2 buildSample_m;
-    i32 total;
     i32 unusedTownValue;
 
     if (giDebugBuildingToBuild != -1) {
@@ -1273,10 +1272,10 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                     BuildObj(building);
             }
         } else {
-            BuildingSlotType debugBuilding = static_cast<BuildingSlotType>(debugBuilding_e);
-            if ((gTownEligibleBuildMask[IDX(m_town->m_type)] & BIT(debugBuilding))
-                || debugBuilding == BUILDING_SLOT_CASTLE)
-                BuildObj(debugBuilding);
+            if ((gTownEligibleBuildMask[IDX(m_town->m_type)]
+                 & BIT(static_cast<BuildingSlotType>(debugBuilding_e)))
+                || debugBuilding_e == IDX(BUILDING_SLOT_CASTLE))
+                BuildObj(static_cast<BuildingSlotType>(debugBuilding_e));
         }
     }
 
@@ -1290,14 +1289,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_SELECT:
                 case WIDGET_COMMAND_ALTERNATE_SELECT: {
-                    if (message.payload.widget.id == CONTROL_CLOSE) {
-                        if (!quickView_k)
-                            SetCommandAndText(message);
-                        break;
-                    }
-                    BuildingSlotType selectedBuilding =
-                        static_cast<BuildingSlotType>(message.payload.widget.id);
-                    switch (selectedBuilding) {
+                    switch (message.payload.widget.id) {
                         case TOWN_OBJECT_DWELLING_1:
                         case TOWN_OBJECT_DWELLING_2:
                         case TOWN_OBJECT_DWELLING_3:
@@ -1545,7 +1537,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         description_b,
                                         GetBuildingInfo(
                                             m_town->m_type,
-                                            selectedBuilding,
+                                            static_cast<BuildingSlotType>(
+                                                message.payload.widget.id
+                                            ),
                                             1
                                         )
                                     );
@@ -1704,7 +1698,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        selectedBuilding,
+                                        static_cast<BuildingSlotType>(
+                                            message.payload.widget.id
+                                        ),
                                         1
                                     )
                                 );
@@ -1725,7 +1721,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        selectedBuilding,
+                                        static_cast<BuildingSlotType>(
+                                            message.payload.widget.id
+                                        ),
                                         1
                                     )
                                 );
@@ -1742,6 +1740,11 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     0
                                 );
                             }
+                            break;
+
+                        case CONTROL_CLOSE:
+                            if (!quickView_k)
+                                SetCommandAndText(message);
                             break;
 
                         default:
@@ -1765,10 +1768,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                 if (armySelected
                                     && m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                                            != CREATURE_NONE) {
-                                    if (m_selectedStrip == m_heroStrip)
-                                        viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
-                                    else
-                                        viewedHero = NULL;
+                                    viewedHero = m_selectedStrip == m_heroStrip
+                                        ? gpGame->GetHero(m_town->m_occupyingHeroId)
+                                        : NULL;
                                     gpGame->ViewArmy(
                                         TOWN_ARMY_VIEW_X,
                                         TOWN_ARMY_VIEW_Y,
