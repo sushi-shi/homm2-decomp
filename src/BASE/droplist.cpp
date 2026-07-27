@@ -491,7 +491,11 @@ void dropListWidget::ProcessSelectDialog(void) {
     m_scrollDownHeight = scrollBottomHeight;
     m_savedBackgroundX = m_iconX;
     m_savedBackgroundY = m_listY;
-    m_savedBackgroundWidth = m_scrollRange > 0 ? scrollWidth[0] + m_listWidth : m_listWidth;
+    if (m_scrollRange > 0) {
+        m_savedBackgroundWidth = scrollWidth[0] + m_listWidth;
+    } else {
+        m_savedBackgroundWidth = m_listWidth;
+    }
     m_savedBackgroundHeight = m_listHeight;
 
     if (m_scrollRange > 0) {
