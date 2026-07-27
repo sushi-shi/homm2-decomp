@@ -2901,16 +2901,29 @@ i32 game::LoadMap(char* filename) {
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
     read(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    ppMapExtra =
-        reinterpret_cast<void**>(H2_ALLOC_AT(iMaxMapExtra * sizeof(ppMapExtra[0]), DATA_COMPGEN(0x004f7280, loadMapSourceFile, RETAIL_FILE), 2893));
+    ppMapExtra = reinterpret_cast<void**>(
+        H2_ALLOC_AT(
+            iMaxMapExtra * sizeof(ppMapExtra[0]),
+            DATA_COMPGEN(0x004f7280, loadMapSourceFile, RETAIL_FILE),
+            gMapSourceLine + 0x59
+        )
+    );
     pwSizeOfMapExtra = reinterpret_cast<i16*>(
-        H2_ALLOC_AT(iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]), DATA_COMPGEN(0x004f72a8, loadMapSourceFile2, RETAIL_FILE), 2894)
+        H2_ALLOC_AT(
+            iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]),
+            DATA_COMPGEN(0x004f72a8, loadMapSourceFile2, RETAIL_FILE),
+            gMapSourceLine + 0x5a
+        )
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
         read(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
-        ppMapExtra[i37] = H2_ALLOC_AT(pwSizeOfMapExtra[i37], DATA_COMPGEN(0x004f72d0, loadMapSourceFile3, RETAIL_FILE), 2902);
+        ppMapExtra[i37] = H2_ALLOC_AT(
+            pwSizeOfMapExtra[i37],
+            DATA_COMPGEN(0x004f72d0, loadMapSourceFile3, RETAIL_FILE),
+            gMapSourceLine + 0x62
+        );
         read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
     read(file2, trailer15, sizeof(u16));
