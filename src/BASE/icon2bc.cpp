@@ -120,27 +120,20 @@ void IconToBitmapColorTable(
         do_fill:
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + X, gCTColor, count);
-            } else {
-                i32 right;
-                i32 fillLen;
-                if (clipY <= gCTY && gCTClipB >= gCTY && (right = X + count, clipX < right)
-                    && gCTClipR >= X) {
-                    if (X >= clipX) {
-                        if (gCTClipR >= right) {
-                            fillLen = count;
-                            memset(row + X, gCTColor, fillLen);
-                        } else {
-                            fillLen = (gCTClipR - X) + 1;
-                            memset(row + X, gCTColor, fillLen);
-                        }
+            } else if (clipY <= gCTY && gCTY <= gCTClipB
+                       && static_cast<i32>(X + count) > clipX && gCTClipR >= X) {
+                i32 fillRight = X + count;
+                if (clipX <= X) {
+                    if (gCTClipR >= fillRight) {
+                        memset(row + X, gCTColor, count);
                     } else {
-                        if (gCTClipR >= right) {
-                            fillLen = (count - clipX) + X;
-                            memset(row + clipX, gCTColor, fillLen);
-                        } else {
-                            fillLen = clipW;
-                            memset(row + clipX, gCTColor, fillLen);
-                        }
+                        memset(row + X, gCTColor, (gCTClipR - X) + 1);
+                    }
+                } else {
+                    if (gCTClipR >= fillRight) {
+                        memset(row + clipX, gCTColor, (count - clipX) + X);
+                    } else {
+                        memset(row + clipX, gCTColor, clipW);
                     }
                 }
             }
