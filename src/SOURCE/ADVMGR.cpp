@@ -3378,6 +3378,7 @@ void advManager::DrawCell(
             s_drawPixelX,
             s_drawPixelY
         );
+        return;
     } else {
 
         if (!(((gbAllBlack == 0 && (giCurWatchPlayerBit & mapExtra[mapY * MAP_WIDTH + mapX]) != 0)
