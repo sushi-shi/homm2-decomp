@@ -547,8 +547,14 @@ public:
     i32 m_playerId[COMBAT_SIDE_COUNT];
     i32 m_experienceValue[COMBAT_SIDE_COUNT];
     i32 m_heroCastSpell[COMBAT_SIDE_COUNT];
-    i32 m_armyCount[COMBAT_SIDE_COUNT];
-    class army m_armies[COMBAT_SIDE_COUNT][COMBAT_ARMY_STORAGE_SLOT_COUNT];
+    H2_ENUM_ARRAY(i32, m_armyCount, CombatSide, COMBAT_SIDE_COUNT);
+    H2_ENUM_ARRAY_2D(
+        class army,
+        m_armies,
+        CombatSide,
+        COMBAT_SIDE_COUNT,
+        COMBAT_ARMY_STORAGE_SLOT_COUNT
+    );
     H2_ENUM_STORAGE(CombatSide, i32) m_currentArmySide;
     i32 m_currentArmyIndex;
     i32 m_currentSpeed;
