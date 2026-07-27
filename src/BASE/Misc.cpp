@@ -2312,8 +2312,8 @@ i32 SGenRand(void) {
         if (mix & (1 << i)) {
             result |= 1 << i;
         }
-        iLastSeed = mix;
     }
+    iLastSeed = mix;
     return result;
 }
 
