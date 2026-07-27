@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from homm2.clang_options import ClangMode
 from homm2.build.annotated_data import (
     AnnotatedDataDefinition,
     _clang_args,
@@ -28,10 +29,23 @@ class AnnotatedDataTest(unittest.TestCase):
                 "arguments": ["clang-cl", "/c", str(source), "/I", str(repo / "include")],
             }]))
 
-            args = _clang_args(repo, source)
+            args = _clang_args(repo, source, mode=ClangMode.RETAIL_ANALYSIS)
 
         self.assertIn(str(repo / "include"), args)
         self.assertIn(str(repo / "vendor/smacker"), args)
+        self.assertIn("-std=c++98", args)
+
+    def test_clang_args_select_strict_mode_explicitly(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source = repo / "src/SOURCE/UNIT.cpp"
+            source.parent.mkdir(parents=True)
+            source.touch()
+            (repo / "include").mkdir()
+
+            args = _clang_args(repo, source, mode=ClangMode.STRICT)
+
+        self.assertIn("-std=c++20", args)
 
     def test_inventory_cache_tracks_source_and_candidate_object_content(self):
         with tempfile.TemporaryDirectory() as directory:

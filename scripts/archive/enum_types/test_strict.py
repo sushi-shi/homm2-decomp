@@ -65,7 +65,7 @@ class StrictDiagnosticsTest(unittest.TestCase):
         self.assertNotIn("-Wall", command)
         self.assertIn("/clang:-Wall", command)
         self.assertIn("/clang:-fno-caret-diagnostics", command)
-        self.assertEqual(command.count("/DHOMM2_STRICT_ENUM_TYPES"), 1)
+        self.assertNotIn("/DHOMM2_STRICT_ENUM_TYPES", command)
         for flag in WARNING_FLAGS:
             self.assertIn(f"/clang:{flag}", command)
 

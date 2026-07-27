@@ -17,6 +17,7 @@ from pathlib import Path
 
 import clang.cindex as ci
 
+from homm2.clang_options import ClangMode
 from homm2.build.annotated_data import (
     _clang_args,
     _mask_lexical_noise,
@@ -79,7 +80,10 @@ def definitions_for_file(path: Path, source_root: Path,
     if not VA_TOKEN.search(path.read_bytes()):
         return []
     configure_libclang()
-    translation = ci.Index.create().parse(str(path), args=_clang_args(repo, path))
+    translation = ci.Index.create().parse(
+        str(path),
+        args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS),
+    )
     errors = [diagnostic for diagnostic in translation.diagnostics
               if diagnostic.severity >= ci.Diagnostic.Error]
     if errors:

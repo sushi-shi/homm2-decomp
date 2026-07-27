@@ -20,6 +20,8 @@ provisioned toolchain. Re-run after adding units / headers.
 import json, os, shutil, sys, tomllib
 from pathlib import Path
 
+from homm2.clang_options import ClangMode
+
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
             Path(__file__).resolve().parents[3])
 MANIFEST = REPO / "config" / "units.toml"
@@ -82,6 +84,7 @@ def base_flags(msvc_inc: Path, msvc_low: Path):
         f"-fms-compatibility-version={MSC_COMPAT}",
         "-fms-extensions",
         "-fdelayed-template-parsing",
+        ClangMode.STRICT.clang_cl_flag,
         "/imsvc", str(msvc_low),     # lowercase mirror first (<string.h>)
         "/imsvc", str(msvc_inc),     # then exact-case (<STRING.H>)
         *project_include_flags(REPO),
