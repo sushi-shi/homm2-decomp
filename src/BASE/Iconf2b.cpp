@@ -25,6 +25,10 @@ DATA(0x00534c88) static u8* gFlipDimDst;
 DATA(0x00534ca0) static u8* gFlipDst;
 DATA(0x00534c60) static i32 gFlipSkip;
 
+static inline i32 FlipRowVisible(i32 clipTop) {
+    return clipTop <= gFlipY && gFlipY <= gFlipClipB;
+}
+
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(
     class icon* srcIcon,
@@ -42,12 +46,13 @@ void FlipIconToBitmap(
     u8* src = srcIcon->m_data;
     i32 x0 = x;
     i32 w;
-    IconEntry* entries = srcIcon->Entries();
-    IconEntry* entry = &entries[frame];
+    IconEntry* entry = &srcIcon->Entries()[frame];
     w = entry->w;
-    x0 = x0 - entry->x;
-    src += entry->srcOffset;
+    i32 entryX = entry->x;
     i32 entryY = entry->y;
+    i32 sourceOffset = entry->srcOffset;
+    x0 = x0 - entryX;
+    src += sourceOffset;
     x0 = x0 - w;
     gFlipEntry = entry;
     x0++;
@@ -111,9 +116,8 @@ void FlipIconToBitmap(
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset((gFlipRow - count) + 1 + X, gFlipColor, count);
             } else {
-                i32 currentY = gFlipY;
                 i32 left;
-                if (currentY >= clipY && currentY <= gFlipClipB
+                if (FlipRowVisible(clipY)
                     && (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
                     if (clipX <= left) {
                         memset(
@@ -157,9 +161,8 @@ void FlipIconToBitmap(
                         } while (count != 0);
                     }
                 } else {
-                    const i32 currentY = gFlipY;
                     gFlipDimLen = count;
-                    if (clipY <= currentY && currentY <= gFlipClipB
+                    if (FlipRowVisible(clipY)
                         && clipX <= static_cast<i32>((X - count) + 1) && X <= gFlipClipR) {
                         i32 left = (X - count) + 1;
                         u8* dp;
@@ -207,8 +210,7 @@ void FlipIconToBitmap(
                     } while (k != 0);
                 }
             } else {
-                i32 currentY = gFlipY;
-                if (currentY >= clipY && currentY <= gFlipClipB) {
+                if (FlipRowVisible(clipY)) {
                     i32 left = (X - cmd) + 1;
                     if (left <= gFlipClipR && clipX <= X) {
                         u32 cn;
