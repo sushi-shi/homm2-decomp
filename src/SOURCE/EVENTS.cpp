@@ -7148,7 +7148,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 artifactIndex1;
     i32 siteLevel5;
     HeroPrimaryStat primaryStat16;
-    H2_ENUM_STORAGE(GenericSiteType, i32) siteType3;
+    GenericSiteType siteType3;
     i32 unusedTriple26[3]; // NOLINT(readability-magic-numbers)
     i32 cursedArtifactCount5;
     CreatureType creatureType3;
@@ -7156,8 +7156,12 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 armyValue7;
 
     cursedArtifactCount5 = 0;
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= GENERIC_SITE_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        GenericSiteType,
+        siteType3,
+        cell->m_objectMetadata,
+        GENERIC_SITE_TYPE_MASK
+    );
     siteLevel5 = cell->m_objectMetadata;
     siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
 
