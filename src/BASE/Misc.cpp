@@ -1773,17 +1773,19 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
         }
     }
 
+    typedef i32 (__cdecl *CDFormatCommand)(char*, const char*, ...);
+    CDFormatCommand formatCommand = wsprintfA;
     attempts = 0;
     {
         char resultBuffer[CD_MCI_BUFFER_SIZE];
         char command[CD_MCI_BUFFER_SIZE];
         for (;;) {
             for (i32 index = 0; index < count; ++index) {
-                wsprintfA(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
+                formatCommand(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
                 if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL) == 0) {
-                    wsprintfA(command, gMiscText.cd.audioInfoCommand.text);
+                    formatCommand(command, gMiscText.cd.audioInfoCommand.text);
                     mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
-                    wsprintfA(command, gMiscText.cd.closeAudioCommand.text);
+                    formatCommand(command, gMiscText.cd.closeAudioCommand.text);
                     mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
                 }
                 sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
