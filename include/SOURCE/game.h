@@ -328,6 +328,7 @@ extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;
 extern class iconWidget** iconWidgetDynamic;
+extern OverviewType iLastDynamicType;
 extern OverviewType giOverviewType;
 extern i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)];
 extern class iconWidget* OVScrollKnob;
@@ -337,7 +338,6 @@ extern i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
 extern class heroWindow* campWin;
 extern b32 gbNewGameDialogOver;
 extern i32 NGKPcursorFlashOn;
-extern OverviewType iLastDynamicType;
 extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
 extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
