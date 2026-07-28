@@ -51,65 +51,122 @@ def msvc_dir():
     if env and find_ci(Path(env) / "bin", "cl.exe"):
         return Path(env)
     return HOMM2_DIR / "build/toolchain/msvc"
+_Z_DRIVE_IS_ROOT = None
 def winepath_w(p):
-    return subprocess.check_output(["winepath", "-w", str(p)], text=True, stderr=subprocess.DEVNULL).strip()
+    """Windows spelling of a rooted unix path without spawning a wine client.
+
+    The pinned prefixes map the whole filesystem as the standard `z:` dosdevice,
+    so translation is the pure `Z:` + backslash rewrite (exactly what
+    `winepath -w` prints for these paths). The symlink is verified once per
+    process; an exotic prefix without a root `z:` falls back to real winepath.
+    """
+    global _Z_DRIVE_IS_ROOT
+    if _Z_DRIVE_IS_ROOT is None:
+        prefix = Path(os.environ.get("WINEPREFIX", ""))
+        try:
+            _Z_DRIVE_IS_ROOT = os.readlink(prefix / "dosdevices/z:") == "/"
+        except OSError:
+            _Z_DRIVE_IS_ROOT = False
+    path = str(p)
+    if _Z_DRIVE_IS_ROOT and path.startswith("/"):
+        return "Z:" + path.replace("/", "\\")
+    return subprocess.check_output(["winepath", "-w", path], text=True, stderr=subprocess.DEVNULL).strip()
+_WINESERVER_ENSURED = False
 def ensure_wineserver():
+    global _WINESERVER_ENSURED
+    if _WINESERVER_ENSURED:
+        return
     ws = shutil.which("wineserver")
     if ws: subprocess.run([ws, "-p"], check=False, stdin=subprocess.DEVNULL,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    _WINESERVER_ENSURED = True
 
-def _run_cl(cmd, out):
-    timeout = float(os.environ.get("HOMM2_CL_TIMEOUT", "300"))
+def _run_cl(cmd, out, cl_timeout=None):
+    timeout = cl_timeout if cl_timeout is not None else float(
+        os.environ.get("HOMM2_CL_TIMEOUT", "300"))
+    timed_out = False
     with tempfile.TemporaryFile() as logf:
         proc = subprocess.Popen(cmd, cwd=str(out.parent), stdin=subprocess.DEVNULL,
                                 stdout=logf, stderr=subprocess.STDOUT, start_new_session=True)
         try:
             proc.wait(timeout=timeout); rc = proc.returncode
         except subprocess.TimeoutExpired:
+            timed_out = True
             try: os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
             except (ProcessLookupError, PermissionError): pass
             proc.wait(); rc = 0 if out.exists() else 1
-        logf.seek(0); return logf.read().decode("latin1", "replace"), rc
+        logf.seek(0); return logf.read().decode("latin1", "replace"), rc, timed_out
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--out", required=True); ap.add_argument("--src", required=True)
-    ap.add_argument("flags", nargs=argparse.REMAINDER)
-    a = ap.parse_args()
-    flags = a.flags[1:] if a.flags and a.flags[0] == "--" else a.flags
+_COMPILE_ENV_READY = False
+_CL_PATH = None
+def _prepare_compile_env():
+    """Resolve the toolchain, prefix, wineserver, and INCLUDE once per process."""
+    global _COMPILE_ENV_READY, _CL_PATH
+    if _COMPILE_ENV_READY:
+        return _CL_PATH
     msvc = msvc_dir(); cl = find_ci(msvc / "bin", "cl.exe")
-    if not cl: die(f"CL.EXE not under {msvc}/bin - run inside `nix develop .#build`.")
-    if shutil.which("wine") is None: die("wine not found - run inside `nix develop .#build`.")
-    src = Path(a.src).resolve(); out = Path(a.out).resolve()
-    if not src.exists(): die(f"source missing: {src}")
-    out.parent.mkdir(parents=True, exist_ok=True)
-    if out.exists(): out.unlink()
+    if not cl: raise RuntimeError(f"CL.EXE not under {msvc}/bin - run inside `nix develop .#build`.")
+    if shutil.which("wine") is None:
+        raise RuntimeError("wine not found - run inside `nix develop .#build`.")
     os.environ.setdefault("WINEDEBUG", "fixme-all,err-kerberos")
     if not Path(os.environ.get("WINEPREFIX", "")).is_dir():   # same anti-stale anchor
         os.environ["WINEPREFIX"] = str(HOMM2_DIR / "build/wineprefix")
     ensure_wineserver()
-    # INCLUDE = MSVC headers + repo include/ + vendored middleware SDK headers (cl reads
-    # INCLUDE for <...> system headers). Each vendor/<sdk>/ dir (e.g. vendor/miles-3.6,
-    # vendor/smacker-3.0g, vendor/wing-1.0) is added like the original toolchain's SDK
-    # dirs so `#include <mss.h>` / `<smack.h>` / `<wing.h>` resolves; these are the
-    # closed middleware DLLs HEROES2W.EXE imports (mss32/smackw32/WING32) — headers only,
-    # never built as units. See docs/vendor-middleware.md.
     incs = [msvc / "include"]
     if (HOMM2_DIR / "include").is_dir(): incs.append(HOMM2_DIR / "include")
     if (HOMM2_DIR / "vendor").is_dir():
         incs += sorted(d for d in (HOMM2_DIR / "vendor").iterdir() if d.is_dir())
     os.environ["INCLUDE"] = ";".join(winepath_w(p) for p in incs)
+    _CL_PATH = cl
+    _COMPILE_ENV_READY = True
+    return cl
+
+def run_compile(src, out, flags, *, depfile=True, depfile_target=None, cl_timeout=None):
+    """Compile one TU in-process; returns (rc, log, timed_out).
+
+    Shares one resolved toolchain/INCLUDE per process, so a search engine can
+    call it from worker threads without paying an interpreter, winepath, or
+    wineserver spawn per trial. `depfile=False` skips the ninja header-dep
+    emission for disposable probe objects.
+    """
+    cl = _prepare_compile_env()
+    src = Path(src).resolve(); out = Path(out).resolve()
+    if not src.exists():
+        return 1, f"source missing: {src}\n", False
+    out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists(): out.unlink()
     cmd = ["wine", str(cl), *flags, f"/Fo{winepath_w(out)}", winepath_w(src)]
-    output, rc = _run_cl(cmd, out)
+    output, rc, timed_out = _run_cl(cmd, out, cl_timeout)
     if not out.exists():
+        return (rc or 1), output, timed_out
+    if depfile:
+        deps = scan_header_deps(src, HOMM2_DIR / "include")
+        dep_list = " ".join(d.replace(" ", "\\ ") for d in deps)
+        Path(str(out) + ".d").write_text(f"{depfile_target or out}: {dep_list}\n")
+    return 0, output, timed_out
+
+def main():
+    # INCLUDE = MSVC headers + repo include/ + vendored middleware SDK headers (cl reads
+    # INCLUDE for <...> system headers). Each vendor/<sdk>/ dir (e.g. vendor/miles-3.6,
+    # vendor/smacker-3.0g, vendor/wing-1.0) is added like the original toolchain's SDK
+    # dirs so `#include <mss.h>` / `<smack.h>` / `<wing.h>` resolves; these are the
+    # closed middleware DLLs HEROES2W.EXE imports (mss32/smackw32/WING32) — headers only,
+    # never built as units. See docs/vendor-middleware.md. The depfile target must be
+    # the obj path AS ninja passed it (a.out); `deps=gcc` in build.ninja consumes it.
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", required=True); ap.add_argument("--src", required=True)
+    ap.add_argument("flags", nargs=argparse.REMAINDER)
+    a = ap.parse_args()
+    flags = a.flags[1:] if a.flags and a.flags[0] == "--" else a.flags
+    src = Path(a.src); out = Path(a.out).resolve()
+    try:
+        rc, output, _timed_out = run_compile(
+            src, out, flags, depfile=True, depfile_target=a.out)
+    except RuntimeError as exc:
+        die(str(exc))
+    if rc:
         sys.stderr.write(f"[cc_wrap] FAILED {src.name} -> {out}\n" + "\n".join(output.strip().splitlines()[-15:]) + "\n")
-        sys.exit(rc or 1)
-    # Emit a depfile of the repo headers this obj pulls in, so ninja recompiles on header
-    # edits (ninja doesn't track header deps, and MSVC 4.2 can't /showIncludes). `deps=gcc`
-    # in build.ninja consumes it. Target must be the obj path AS ninja passed it (a.out).
-    deps = scan_header_deps(src, HOMM2_DIR / "include")
-    dep_list = " ".join(d.replace(" ", "\\ ") for d in deps)
-    Path(str(out) + ".d").write_text(f"{a.out}: {dep_list}\n")
+        sys.exit(rc)
     sys.exit(0)
 
 if __name__ == "__main__": main()
