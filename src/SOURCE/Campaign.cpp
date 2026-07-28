@@ -703,7 +703,7 @@ VA(0x00448e52, 0x521)
 MessageDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
-    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active)
+    if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
@@ -1013,7 +1013,7 @@ void game::InitCampaignMap(void) {
         hero* armyHero = gpGame->GetHero(m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
-            if (armyHero->m_army.m_creatureCounts[heroPositionValue] > 0)
+            if (armyHero->m_army.m_creatureCounts[heroPositionValue] >= 1)
                 armyHero->m_army.m_creatureCounts[heroPositionValue] *=
                     CAMPAIGN_TRIPLE_ARMY_MULTIPLIER;
         }
