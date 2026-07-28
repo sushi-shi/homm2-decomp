@@ -68,6 +68,36 @@ participates in the scope state. When adding a hook or accessor flips a
 function's slot pairing, fix it with local renames as usual; and A/B any new
 header declaration before trusting cached deltas (msvc42-tu-declaration-state).
 
+## 6. Condition-spelling truth table (2026-07-29 sweep)
+
+The jcc mnemonic and immediate pin the source spelling exactly; the sweep closed
+or branch-cleaned a dozen more functions on these:
+
+- `cmp x, -1` + `je`  vs retail `cmp x, 0` + `jl`: retail tests the SIGN, not the
+  sentinel — spell `>= 0`, not `!= COMBAT_SIDE_NONE` / `!= PURCHASE_NONE`
+  (DoHydraAttack, DoAttack, CheckBuyStuff).
+- `test x, x` + `jle` vs retail `cmp x, 1` + `jl`: spell `>= 1`, not `> 0`
+  (InitCampaignMap).
+- `je` vs `jne` with the same cmp and SWAPPED arms: the if/else is written with
+  the other polarity — retail often writes the DISABLE/muted/hidden arm first
+  (UpdateSystemOptions, SetupHeroView, RemoteMain's transport chain,
+  CampaignHandler's `m_active == 1`).
+- inc + `cmp x, COUNT; jne / mov 0` wrap vs retail idiv: spell
+  `x = (x + 1) % COUNT` (CheckLevel).
+- A loop guard whose false path jumps to a LOCAL trampoline right before the
+  body is a `continue` statement (`if (...) continue;`); one that jumps to the
+  far after-body is the positive wrap `if (...) { body }`. Retail uses both —
+  read the target (SetupAndLoadObstacles' three continues under one nested
+  terrain gate; ConvertObject's bounds continue; EffectSpellCure's positive
+  wrap where we had a continue). The trailing-jmp count at the previous block
+  end distinguishes them before you compile.
+
+None of the at-state mirrors move for any spelling: relational operand order,
+global-vs-local cmp direction, int add/or term order, and imul factorization
+all canonicalize per TU state (A/B: tradpost byte-identical under operand
+swap). Read the cmp reloc/slot ORDER first — if both sides load different
+operands first it can still be the canonicalizer, not the source.
+
 ## Diagnosis workflow
 
 `homm2 sema disasm <rva> --diff` shows the inserted `+jmp` rows;
