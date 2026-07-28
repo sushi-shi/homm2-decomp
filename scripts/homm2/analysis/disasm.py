@@ -657,7 +657,16 @@ def _branches_compare(bi, ti, max_flips: int = 4) -> dict:
     bb, tb = _branch_seq(bi, bstop), _branch_seq(ti, tstop)
     res = {"kind": None, "rows": [], "nbr": len(bb), "nbr_t": len(tb),
            "rets": (_ret_count(bi, bstop), _ret_count(ti, tstop)),
-           "trunc": (bstop, tstop)}
+           "trunc": (bstop, tstop), "partial": False}
+    # A jump table's bytes decode as garbage on one side and as plausible
+    # instructions on the other, so the two truncation points are NOT
+    # comparable. Comparing the full lists then reports a structural
+    # difference that is purely a decode artifact (MoveHero: 53 vs 85). When
+    # either side stopped early, compare the common PREFIX and say so.
+    if (bstop is not None or tstop is not None) and len(bb) != len(tb):
+        keep = min(len(bb), len(tb))
+        bb, tb = bb[:keep], tb[:keep]
+        res["partial"] = True
     if len(bb) != len(tb):
         res["status"] = "struct"
         return res
@@ -772,7 +781,9 @@ def _branch_view(rva: int, name: str, unit: str, size: int, ordinal: int,
         print("  no conditional branches on either side.")
         return 0
     if status == "clean":
-        print("  branch sequences AGREE (mnemonics and symbolic targets). Whatever "
+        scope = ("the compared PREFIX agrees" if res["partial"] else
+                 "branch sequences AGREE")
+        print(f"  {scope} (mnemonics and symbolic targets). Whatever "
               "is left is instruction selection / slot layout, not control flow.")
         return 0
     print(f"  {res['kind']}:")
