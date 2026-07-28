@@ -3054,8 +3054,7 @@ void philAI::GetBestHero(town* townPtr, BHC& best, float& bestValue) {
     best.type = PURCHASE_HERO;
     best.what = bestHeroIndex;
     bestValue = bestRawLocal;
-    if (gpGame->m_worldMap.cells[gpGame->m_worldMap.width * townPtr->m_y + townPtr->m_x]
-            .m_triggerType
+    if (gpGame->m_worldMap.GetCell(townPtr->m_x, townPtr->m_y)->m_triggerType
         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
         bestValue -= AI_HERO_PURCHASE_CELL_PENALTY;
     }
