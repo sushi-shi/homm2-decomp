@@ -51,7 +51,10 @@ def _report_inputs_identity(objdiff_dir, executable):
             key = str(path)
             if key not in digests:
                 digests[key] = _sha256(path)
-                stale.extend(freshness_problems(path))
+                # Raw candidate and delinker objects are provenance roots;
+                # only derived comparison copies must carry a verified chain.
+                if {"normalized", "paired"} & set(path.parts):
+                    stale.extend(freshness_problems(path))
             objects.append({
                 "unit": unit.get("name", "?"),
                 "role": role,
