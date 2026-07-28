@@ -689,7 +689,7 @@ SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fe9be41b7595
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	82f219fa1091
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	ab5e7fe02b27
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	9ca9e9ded8fc
-SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	97.0881	126e83005de4
+SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	98.3591	126e83005de4
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	1ab552cbd038
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	4566e26f07f6
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	99.2832	5a608c207b2a
@@ -715,7 +715,7 @@ SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtow
 SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	833429ba7aa9
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	c8bc80a5499a
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	100.0000	49aaad966660
-SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	98.1614	74919247e9b2
+SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	99.9684	74eb5ac92014
 SOURCE/EVENTS	?DoAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@HH@Z	97.2296	7c815620edf8
 SOURCE/EVENTS	?DoCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	100.0000	052eb1c94421
 SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	96.1204	b01c3377bea9
@@ -770,7 +770,7 @@ SOURCE/FLY	?FlyTo@army@@QAEHH@Z	98.7267	b7ebefb940f1
 SOURCE/FLY	?FlyTo@army@@QAEHXZ	100.0000	214d2ea93c6c
 SOURCE/FLY	?ValidFlight@army@@QAEHHH@Z	97.3925	3ca9df2c9123
 SOURCE/GAME	?BuildingsOwned@playerData@@QAEHHHH@Z	100.0000	345649ce05f8
-SOURCE/GAME	?CalcBaseScore@@YIHH@Z	92.8346	63986722b793
+SOURCE/GAME	?CalcBaseScore@@YIHH@Z	100.0000	c8dbd972e2b9
 SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	848cde3b3403
 SOURCE/GAME	?CalcFileCRC@@YIHPAD@Z	100.0000	a44df7421117
 SOURCE/GAME	?CancelComputerScreen@game@@QAEXXZ	100.0000	bb8bad91f670
@@ -978,7 +978,7 @@ SOURCE/KB	?SetupCDRom@@YIXXZ	100.0000	9eabc65eb61f
 SOURCE/KB	?SetupDynamicWindow@@YIXHHHHHHHPAH00000PAPAVheroWindow@@H@Z	100.0000	700e41b3aa06
 SOURCE/KB	?ShowCongrats@@YIXH@Z	100.0000	cfd51b1e6c74
 SOURCE/KB	?ShowLuckInfo@game@@QAEXPAVhero@@H@Z	100.0000	6e1be3b4feb3
-SOURCE/KB	?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z	99.4730	024a67dc30ab
+SOURCE/KB	?ShowMoraleInfo@game@@QAEXPAVhero@@H@Z	100.0000	62414191beb1
 SOURCE/KB	?ShutDown@@YIXPAD@Z	100.0000	ba2da571e927
 SOURCE/KB	?SmackFade@@YIXPAE0@Z	100.0000	067d062eabaa
 SOURCE/KB	?TestDynamicWindow@@YIXHH@Z	100.0000	9e0a7989f1b4
@@ -1136,7 +1136,7 @@ SOURCE/PHILAI	?ValueOfTown@philAI@@QAEHPAVtown@@@Z	100.0000	ed5d99694267
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVarmyGroup@@HPAF@Z	100.0000	b9819b03839f
 SOURCE/RECRUIT	??0recruitUnit@@QAE@PAVtown@@HH@Z	100.0000	1b0a01eb9786
 SOURCE/RECRUIT	?Close@recruitUnit@@UAEXXZ	100.0000	b532b0891864
-SOURCE/RECRUIT	?Main@recruitUnit@@UAEHAAUtag_message@@@Z	97.7138	872cdf59c762
+SOURCE/RECRUIT	?Main@recruitUnit@@UAEHAAUtag_message@@@Z	100.0000	0fc46911a94f
 SOURCE/RECRUIT	?Open@recruitUnit@@UAEHH@Z	100.0000	e6ec0a1c1561
 SOURCE/RECRUIT	?QuickViewRecruit@@YIXPAVtown@@H@Z	100.0000	d3c955da1774
 SOURCE/RECRUIT	?SetupRecruitWin@@YIXPAVheroWindow@@HHHHH@Z	100.0000	2ef8097e2e70
