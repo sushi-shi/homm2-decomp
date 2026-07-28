@@ -29,6 +29,8 @@ from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+from homm2.build.normalized_freshness import write_stamp
+
 
 SYMBOL_SIZE = 18
 VOLATILE_SG = re.compile(r"^\$SG[0-9]+$")
@@ -1156,6 +1158,12 @@ def main(argv=None):
     result = canonicalize_coff(args.input.read_bytes(), claims, data_claims)
     _atomic_write(args.output, result.data)
     _atomic_write(args.sidecar, sidecar_bytes(result.rows))
+    stamp_inputs = {"input": args.input}
+    if args.compgen_manifest:
+        stamp_inputs["compgen_manifest"] = args.compgen_manifest
+    if args.data_manifest:
+        stamp_inputs["data_manifest"] = args.data_manifest
+    write_stamp(args.output, stamp_inputs)
     return 0
 
 

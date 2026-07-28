@@ -10,6 +10,7 @@ per-function maximum when appropriate. The maxima are never gates.
 """
 import hashlib, json, os, shutil, struct, subprocess, sys, tempfile
 from pathlib import Path
+from homm2.build.normalized_freshness import freshness_problems
 from homm2.match.source_hashes import source_hashes
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 RM_START, RM_END = "<!-- match-score:start -->", "<!-- match-score:end -->"
@@ -37,6 +38,7 @@ def _report_inputs_identity(objdiff_dir, executable):
     config = json.loads(config_path.read_text())
     digests = {}
     objects = []
+    stale = []
     for unit in config.get("units", []):
         for role in ("base", "target"):
             reference = unit.get(role + "_path")
@@ -49,12 +51,19 @@ def _report_inputs_identity(objdiff_dir, executable):
             key = str(path)
             if key not in digests:
                 digests[key] = _sha256(path)
+                stale.extend(freshness_problems(path))
             objects.append({
                 "unit": unit.get("name", "?"),
                 "role": role,
                 "reference": reference,
                 "sha256": digests[key],
             })
+    if stale:
+        preview = "\n  ".join(stale[:10])
+        if len(stale) > 10:
+            preview += "\n  ... and %d more" % (len(stale) - 10)
+        raise RuntimeError(
+            "stale or unverifiable normalized comparison objects:\n  %s" % preview)
 
     executable = Path(executable).resolve(strict=True)
     if not executable.is_file():

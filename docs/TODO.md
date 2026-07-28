@@ -12,14 +12,3 @@ owners that belong to different segments.
 Add regression coverage for a private-static rename that changes candidate COFF
 order and report the owning TU, symbols, segment, and offending physical pair if
 the generated model or final link no longer preserves reviewed topology.
-
-## Normalized objdiff rebuild dependency
-
-Make every focused candidate-object build invalidate and rebuild the corresponding
-`build/objdiff/normalized/base/` object. Objdiff reports and `homm2 sema` must not
-silently consume a stale normalized copy after
-`build/objdiff/base/<unit>.obj` changes.
-
-Add regression coverage that rebuilds one raw TU object, immediately generates a
-report, and proves the report uses the new raw bytes, relocations, function size,
-and source-owned data identities.
