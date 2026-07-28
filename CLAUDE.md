@@ -112,6 +112,21 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md`,
 `docs/reviewed-data-objdiff.md`, and `docs/static-storage-link-audit.md`.
 
+## Matching Method
+
+- Do not test matching hypotheses as one-off manual edit-compile cycles. Localize the
+  divergence with `homm2 sema disasm --blocks --diff` first, then express every
+  candidate spelling or structure as a reviewed exact-span axis for
+  `scripts/match_variants.py` and run the bounded complete matrix with TU-state
+  probes (`--state-trials 50 --state-families forest`). Judge survivors by block
+  topology and ordered relocations as well as fuzzy score.
+- For a structurally aligned residual with unchanged source, run
+  `scripts/tu_state_noise.py` island censuses (forest family). Record MAX only on an
+  audited exact closure.
+- Manual edits are reserved for integrating the winning arm of a measured matrix and
+  for mechanical fixes pinned directly by byte/relocation evidence (a wrong constant,
+  field, or call target).
+
 ## Proof Vocabulary
 
 - Exact means raw function bytes, size, and ordered relocation semantics agree after
