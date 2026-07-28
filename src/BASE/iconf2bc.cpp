@@ -51,12 +51,12 @@ void FlipIconToBitmapColorTable(
 ) {
     IconEntry* entries = srcIcon->Entries();
     u8* data = srcIcon->m_data;
-    s_entry = &entries[frame];
-    s_src = data + entries[frame].srcOffset;
-    u8* src = s_src;
     i32 w = entries[frame].w;
     i32 x0 = x - entries[frame].x;
     x0 = x0 - w;
+    s_entry = &entries[frame];
+    s_src = data + entries[frame].srcOffset;
+    u8* src = s_src;
     i32 pitch;
     x0++;
     s_left = x0;
