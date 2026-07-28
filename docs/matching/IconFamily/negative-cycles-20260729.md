@@ -16,3 +16,14 @@ sources retained unchanged after every run.
 
 Wide fast censuses with the parallel engine: Iconf2b 88.60 -> 89.10 across
 256 + 1024 states (seeds 777777, 13131313); icon2bs unchanged at 1024.
+
+- **Iconm2b clip-condition reads** (parameterized MonoNeedsClipping vs the
+  inline condition on statics): byte-identical in every state; the retail
+  s_left/s_y static reloads are orbit-born, not spelling-born.
+  `build/iconm2b-static-cond-{axes,manifest}-20260729.json`.
+
+Seed-99999 family sweep (256 states x 8 TUs, parallel engine): every orbit
+reproduces its recorded ceiling (iconf2by hits 94.4102 again at a different
+seed); only FlipDimIconToBitmap ratcheted, 78.69 -> 79.11. Fuzzy ceilings are
+seed-robust; progress comes from steered source axes, not deeper blind state
+search.
