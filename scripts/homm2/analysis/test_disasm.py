@@ -200,6 +200,21 @@ Disassembly of section .text:
         self.assertEqual(res["status"], "topology")
         self.assertEqual(res["rows"], [(1, 2, 1)])
 
+    def test_branches_compare_prefixes_when_one_side_truncates(self):
+        # The jump table decodes as garbage on one side only, so the two
+        # truncation points are not comparable: compare the common prefix
+        # instead of reporting a spurious structural difference.
+        base = [(0x0, "je", "0x8"), (0x4, "jne", "0x8"),
+                (0x8, "jmp", "dword ptr [eax*4 + 0x10]"), (0xe, "loop", "0x4")]
+        target = [(0x0, "je", "0x8"), (0x4, "jne", "0x8"),
+                  (0x8, "jmp", "dword ptr [eax*4 + 0x10]"),
+                  (0xe, "push", "eax"), (0xf, "jge", "0x2")]
+        res = _branches_compare(base, target)
+
+        self.assertEqual(res["status"], "clean")
+        self.assertTrue(res["partial"])
+        self.assertEqual((res["nbr"], res["nbr_t"]), (2, 3))
+
     def test_branches_compare_count_mismatch_is_struct(self):
         base = [(0x0, "je", "0x4"), (0x4, "ret", "")]
         extra = [(0x0, "je", "0x4"), (0x4, "jne", "0x8"), (0x8, "ret", "")]
