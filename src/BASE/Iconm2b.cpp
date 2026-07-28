@@ -54,8 +54,9 @@ void MonoIconToBitmap(
     i32 clipH
 ) {
     IconEntry* entries = srcIcon->Entries();
+    u8* data = srcIcon->m_data;
     s_entry = &entries[frame];
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_src = data + s_entry->srcOffset;
     s_left = x + s_entry->x;
     s_x = s_left;
     s_y = y + s_entry->y;
