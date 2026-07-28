@@ -1171,126 +1171,131 @@ i32 combatManager::CheckWin(struct tag_message* message) {
 VA(0x0042c8ff, 0x51a)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
-    i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
+    i32 rowPos = hexIndex / COMBAT_GRID_ROW_LENGTH;
     CombatMessageCommand command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    i32 showSmallView = 0;
+    i32 showEnemy = 0;
 
     if (hexIndex == INVALID_HEX) {
         command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-    } else {
-        switch (hexIndex) {
-            case COMBAT_GRID_RIGHT_HERO_HEX:
-                if (m_heroes[1] != NULL) {
-                    if (m_currentSide == COMBAT_DEFENDER_SIDE)
-                        command = COMBAT_MESSAGE_COMMAND_OPTIONS;
-                    else
-                        command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
-                } else {
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                }
-                break;
-            case COMBAT_GRID_LEFT_SPECIAL_HEX:
-                if (m_heroes[0] != NULL) {
-                    if (m_currentSide == COMBAT_ATTACKER_SIDE)
-                        command = COMBAT_MESSAGE_COMMAND_OPTIONS;
-                    else
-                        command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
-                } else {
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                }
-                break;
-            case COMBAT_BALLISTA_HEX:
-                if (m_inCastleCombat == 0)
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+        goto smallView;
+    }
+    switch (hexIndex) {
+        case COMBAT_GRID_RIGHT_HERO_HEX:
+            if (m_heroes[1] != NULL) {
+                if (m_currentSide == COMBAT_DEFENDER_SIDE)
+                    command = COMBAT_MESSAGE_COMMAND_OPTIONS;
                 else
-                    command = COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+                    command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
+            } else {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            }
+            break;
+        case COMBAT_GRID_LEFT_SPECIAL_HEX:
+            if (m_heroes[0] != NULL) {
+                if (m_currentSide == COMBAT_ATTACKER_SIDE)
+                    command = COMBAT_MESSAGE_COMMAND_OPTIONS;
+                else
+                    command = COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS;
+            } else {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            }
+            break;
+        case COMBAT_BALLISTA_HEX:
+            if (m_inCastleCombat != 0)
+                command = COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+            else
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            break;
+        default: {
+            if (hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
                 break;
-            default: {
-                if (hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1) {
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                    break;
-                }
+            }
 
-                CombatSide targetSide = m_hexCells[hexIndex].m_occupantSide;
-                i32 targetIndex = m_hexCells[hexIndex].m_occupantIndex;
-                army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-                currentArmy->m_targetSide = COMBAT_SIDE_NONE;
-                currentArmy->m_targetIndex = -1;
+            CombatSide enemySide = m_hexCells[hexIndex].m_occupantSide;
+            i32 targetIndex = m_hexCells[hexIndex].m_occupantIndex;
+            army* ourArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+            ourArmy->m_targetSide = COMBAT_SIDE_NONE;
+            ourArmy->m_targetIndex = -1;
 
-                if (m_hexCells[hexIndex].m_blocked != 0
-                    && (gpCombatManager->m_inCastleCombat == 0
-                        || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
-                            && hexIndex != CASTLE_GATE_HEX)
-                        || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
-                            && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
-                                || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                           .m_occupantSide
-                                       != COMBAT_SIDE_NONE
-                                || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
-                                           .m_deadOccupantCount
-                                       != 0)))) {
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                } else if (targetSide != COMBAT_SIDE_NONE) {
-                    if (m_currentArmySide != targetSide || m_currentArmyIndex != targetIndex) {
-                        showSmallView = 1;
-                        if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
-                            m_smallViewSide[1] = targetSide;
-                            m_smallViewArmyIndex[1] = targetIndex;
-                            DrawSmallView(1, 1);
-                        }
+            if (m_hexCells[hexIndex].m_blocked != 0
+                && (gpCombatManager->m_inCastleCombat == 0
+                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
+                        && hexIndex != CASTLE_GATE_HEX)
+                    || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
+                        && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
+                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                                       .m_occupantSide
+                                   != COMBAT_SIDE_NONE
+                            || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
+                                       .m_deadOccupantCount
+                                   != 0)))) {
+                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+            } else if (enemySide != COMBAT_SIDE_NONE) {
+                if (m_currentArmySide != enemySide || m_currentArmyIndex != targetIndex) {
+                    showEnemy = 1;
+                    if (gbProcessingCombatAction == 0 && giNextAction == ACTION_NONE) {
+                        m_smallViewSide[1] = enemySide;
+                        m_smallViewArmyIndex[1] = targetIndex;
+                        DrawSmallView(1, 1);
                     }
-                    switch (targetSide) {
-                        case COMBAT_ATTACKER_SIDE:
-                        case COMBAT_DEFENDER_SIDE:
-                            if (m_currentSide == targetSide
-                                || (m_currentArmySide == targetSide
-                                    && m_currentArmyIndex == targetIndex)) {
-                                return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
-                            }
-                            currentArmy->m_targetSide = targetSide;
-                            currentArmy->m_targetIndex = targetIndex;
-                            if (currentArmy->m_monster.shots > 0
-                                && currentArmy->GetAttackMask(
-                                    currentArmy->m_hex,
+                }
+                switch (enemySide) {
+                    case COMBAT_ATTACKER_SIDE:
+                    case COMBAT_DEFENDER_SIDE:
+                        if (m_currentSide == enemySide
+                            || (m_currentArmySide == enemySide
+                                && m_currentArmyIndex == targetIndex)) {
+                            return COMBAT_MESSAGE_COMMAND_VIEW_INFO;
+                        } else {
+                            ourArmy->m_targetSide = enemySide;
+                            ourArmy->m_targetIndex = targetIndex;
+                            if (ourArmy->m_monster.shots > 0
+                                && ourArmy->GetAttackMask(
+                                    ourArmy->m_hex,
                                     ARMY_ATTACK_TARGET_ENEMY,
                                     ARMY_HEX_INVALID
                                 )
                                        == ARMY_ALL_ATTACK_DIRECTIONS) {
                                 if (ShotIsThroughWall(
-                                        currentArmy->m_side,
-                                        currentArmy->m_hex,
+                                        ourArmy->m_side,
+                                        ourArmy->m_hex,
                                         hexIndex
                                     )
                                     != 0)
                                     return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
-                                return COMBAT_MESSAGE_COMMAND_SHOOT;
+                                else
+                                    return COMBAT_MESSAGE_COMMAND_SHOOT;
                             }
-                            if (currentArmy->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
+                            if (ourArmy->ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX) == 1)
                                 return COMBAT_MESSAGE_COMMAND_ATTACK;
-                            currentArmy->m_targetSide = COMBAT_SIDE_NONE;
-                            currentArmy->m_targetIndex = -1;
-                    }
-                    command = COMBAT_MESSAGE_COMMAND_DEFAULT;
-                } else {
-                    if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].ValidPath(
-                            hexIndex, ARMY_PATH_ANY_TARGET_HEX
-                        )
-                        == 1) {
-                        command = HAS(
-                                      m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
-                                          .m_monster.flags.all,
-                                      MONSTER_FLAGS_FLYING
-                                  )
-                                      ? COMBAT_MESSAGE_COMMAND_FLY
-                                      : COMBAT_MESSAGE_COMMAND_MOVE;
-                    }
+                            else {
+                                ourArmy->m_targetSide = COMBAT_SIDE_NONE;
+                                ourArmy->m_targetIndex = -1;
+                                command = COMBAT_MESSAGE_COMMAND_DEFAULT;
+                            }
+                        }
                 }
-                break;
+            } else {
+                if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].ValidPath(
+                        hexIndex, ARMY_PATH_ANY_TARGET_HEX
+                    )
+                    == 1) {
+                    command = CombatMessageCommand(static_cast<i8>(
+                        HAS(m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
+                                .m_monster.flags.all,
+                            MONSTER_FLAGS_FLYING)
+                            ? IDX(COMBAT_MESSAGE_COMMAND_FLY)
+                            : IDX(COMBAT_MESSAGE_COMMAND_MOVE)
+                    ));
+                }
             }
+            break;
         }
     }
 
-    if (showSmallView == 0 && gbProcessingCombatAction == 0) {
+smallView:
+    if (showEnemy == 0 && gbProcessingCombatAction == 0) {
         m_smallViewSide[1] = COMBAT_SIDE_NONE;
         DrawSmallView(1, 1);
     }
