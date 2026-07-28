@@ -452,7 +452,7 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
     }
     HERO_RV_AT(
         gaiHeroEventStratRVOfPos,
-        x * sizeof(i16) + OR_STEER(MAP_WIDTH) * y * sizeof(i16)
+        x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16)
     ) = IDX(RV_UNSET);
     for (node = 0; node < GAME_HERO_COUNT; node++) {
         // Original bug: both axes compare the hero's X coordinate.
@@ -768,7 +768,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
             kn = normalDirTable[IDX(directionIndex)].x + gpCurAIHero->m_x;
             nb = normalDirTable[IDX(directionIndex)].y + gpCurAIHero->m_y;
             if (HAS(gpAdvManager->GetCell(kn, nb)->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
-                && !(mapExtra[kn + OR_STEER(MAP_WIDTH) * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+                && !(mapExtra[kn + MAP_WIDTH * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                     != MAP_OBJECT_MONSTER)
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
@@ -1648,7 +1648,7 @@ firstWeekDone:
                 0
             );
             for (x8 = 0; x8 < MAP_WIDTH; x8++) {
-                for (y4 = 0; OR_STEER(y4) < MAP_WIDTH; y4++) {
+                for (y4 = 0; y4 < MAP_WIDTH; y4++) {
                     if (gpSearchArray->GetRow(MAP_WIDTH, y4)[x8].visited) {
                         gaiEnemyHeroReachable[MAP_WIDTH * y4 + x8] = 1;
                         if (!(y4 != 0)) {
@@ -2026,14 +2026,14 @@ i32 philAI::DetermineTargetPosition(
             if (searchPassIndex == 0)
                 continue;
         }
-        for (x = scanMinXValue; OR_STEER(x) < scanMaxXLocal; x++) {
+        for (x = scanMinXValue; x < scanMaxXLocal; x++) {
             pathRowCounter = -1;
             columnCounter++;
-            if (OR_STEER(scanSpacingStep) <= columnCounter)
+            if (scanSpacingStep <= columnCounter)
                 columnCounter = 0;
-            for (y = scanMinY; OR_STEER(y) < scanMaxYCounter; y++) {
+            for (y = scanMinY; y < scanMaxYCounter; y++) {
                 pathRowCounter++;
-                if (OR_STEER(scanSpacingStep) <= pathRowCounter)
+                if (scanSpacingStep <= pathRowCounter)
                     pathRowCounter = 0;
                 if (gpSearchArray->GetNode(x, y).visited) {
                     if (gpCurAIHero->IsEmbarked()) {
@@ -2042,7 +2042,7 @@ i32 philAI::DetermineTargetPosition(
                         if ((searchPassIndex == 0 && travelDistanceRange > 5
                              && (gpCurAIHero->m_destinationX != x
                                  || gpCurAIHero->m_destinationY != y)
-                             && (OR_STEER(travelDistanceRange) >= 16
+                             && (travelDistanceRange >= 16
                                  || (gpAdvManager->GetCell(x, y)->m_triggerType
                                          != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
                                      && (gpAdvManager->GetCell(x, y)->m_triggerType
@@ -2055,7 +2055,7 @@ i32 philAI::DetermineTargetPosition(
                                 && (travelDistanceRange <= 5
                                     || (gpCurAIHero->m_destinationX == x
                                         && gpCurAIHero->m_destinationY == y)
-                                    || (OR_STEER(travelDistanceRange) < 16
+                                    || (travelDistanceRange < 16
                                         && (gpAdvManager->GetCell(x, y)->m_triggerType
                                                 == (MAP_TRIGGER_ACTION_FLAG
                                                     | MAP_OBJECT_HERO_INTERACTION)
@@ -2152,11 +2152,11 @@ i32 philAI::DetermineTargetPosition(
                     }
 
                 candidate_scored:
-                    if (OR_STEER(bestValue) < targetScoreLocal) {
+                    if (bestValue < targetScoreLocal) {
                         targetBestXRange = x;
                         targetBestYLocal = y;
                         bestValue = targetScoreLocal;
-                    } else if (OR_STEER(bestValue) == targetScoreLocal && targetScoreLocal == 0
+                    } else if (bestValue == targetScoreLocal && targetScoreLocal == 0
                                && !HAS(
                                    gpAdvManager->GetCell(x, y)->m_triggerType,
                                    MAP_TRIGGER_ACTION_FLAG
@@ -2166,8 +2166,8 @@ i32 philAI::DetermineTargetPosition(
                                     ->m_triggerType,
                                 MAP_TRIGGER_ACTION_FLAG
                             )
-                            || OR_STEER(abs(targetBestXRange - gpCurAIHero->m_x)
-                                 + abs(targetBestYLocal - gpCurAIHero->m_y))
+                            || abs(targetBestXRange - gpCurAIHero->m_x)
+                                 + abs(targetBestYLocal - gpCurAIHero->m_y)
                                    < abs(x - gpCurAIHero->m_x) + abs(y - gpCurAIHero->m_y)) {
                             targetBestXRange = x;
                             targetBestYLocal = y;
@@ -3441,10 +3441,10 @@ i32 philAI::StrategicValueOfPosition(
         0,
         0
     );
-    search5->GetNode(targetX, OR_STEER(targetY)).visited = 0;
+    search5->GetNode(targetX, targetY).visited = 0;
 
     for (x13 = 0; MAP_WIDTH > x13; x13++) {
-        for (yCounter = 0; MAP_HEIGHT > OR_STEER(yCounter); yCounter++) {
+        for (yCounter = 0; MAP_HEIGHT > yCounter; yCounter++) {
             if (search5->GetNode(x13, yCounter).visited) {
                 cell9 = gpAdvManager->GetCell(x13, yCounter);
                 if ((!immediate && HAS(cell9->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
@@ -3887,11 +3887,11 @@ i32 philAI::FightValueOfStack(
             }
             for (armySlotRecord = 0; armySlotRecord < KB_QUICK_COMBAT_SPELL_TYPE_COUNT;
                  armySlotRecord++) {
-                if (OR_STEER(armySlotRecord) >= spellCount) {
+                if (armySlotRecord >= spellCount) {
                     break;
                 }
                 bestSpellScore8 = 0;
-                for (scoreIndex15 = 0; OR_STEER(spellCount) > scoreIndex15; scoreIndex15++) {
+                for (scoreIndex15 = 0; spellCount > scoreIndex15; scoreIndex15++) {
                     if (spellScores[scoreIndex15] > bestSpellScore8) {
                         bestSpellScore8 = spellScores[scoreIndex15];
                         bestSpellIndexTotal = scoreIndex15;
@@ -3909,14 +3909,14 @@ i32 philAI::FightValueOfStack(
         spellValueMap = static_cast<i32>(armyValue * 1.25);
     else if (spellValueMap > armyValue * 1.5) {
         spellValueMap = armyValue;
-    } else if (OR_STEER(armyValue) < spellValueMap)
+    } else if (armyValue < spellValueMap)
         spellValueMap = static_cast<i32>(armyValue * 0.75);
     if (armyValue * 2 < townArcherValueValue)
         townArcherValueValue = static_cast<i32>(armyValue * 1.5);
     else if (townArcherValueValue > armyValue * 1.5) {
         townArcherValueValue =
             static_cast<i32>(armyValue * AI_TOWN_ARCHER_OVERWHELMING_FACTOR);
-    } else if (OR_STEER(armyValue) < townArcherValueValue)
+    } else if (armyValue < townArcherValueValue)
         townArcherValueValue =
             static_cast<i32>(armyValue * AI_TOWN_ARCHER_ADVANTAGE_FACTOR);
     if (giDebugLevel == AI_BATTLE_DEBUG_LEVEL)
@@ -4379,7 +4379,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         if ((townPtr->m_buildings & AI_BUILDING_SHIPYARD_MASK)
             && townPtr->m_id != giBestShipyardId) {
             index7 =
-                OR_STEER(abs(townPtr->m_y - heroPtr->m_y)) + abs(townPtr->m_x - heroPtr->m_x);
+                abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
             if (gbActualShipyardFound) {
                 if (giBestShipyardDist > index7) {
                     giBestShipyardDist = index7;
@@ -4397,7 +4397,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
                           == TERRAIN_WATER
                    && !gbActualShipyardFound && townPtr->m_id != giBestShipyardId) {
             index7 =
-                OR_STEER(abs(townPtr->m_y - heroPtr->m_y)) + abs(townPtr->m_x - heroPtr->m_x);
+                abs(townPtr->m_y - heroPtr->m_y) + abs(townPtr->m_x - heroPtr->m_x);
             if (gbPossibleShipyardFound) {
                 if (giBestShipyardDist > index7) {
                     giBestShipyardDist = index7;
@@ -4456,7 +4456,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
 
     heroStrength = FightValueOfStack(&heroPtr->m_army, NULL, 0, 0, 0, 0);
     townStrength6 = FightValueOfStack(&townPtr->m_army, NULL, 0, 0, 0, 0);
-    townShare5 = static_cast<float>(townStrength6) / (townStrength6 + OR_STEER(heroStrength));
+    townShare5 = static_cast<float>(townStrength6) / (townStrength6 + heroStrength);
     primarySkills3 = 0;
     primarySkills3 =
         heroPtr->Stats(HERO_PRIMARY_ATTACK) + heroPtr->Stats(HERO_PRIMARY_DEFENSE);
@@ -4498,7 +4498,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     if (desiredShare0 < townShare5)
         townWins2 = 1;
     if (doInteraction != 0) {
-        if (OR_STEER(heroStrength) < townStrength6)
+        if (heroStrength < townStrength6)
             transferFactor = AI_WEAKER_ARMY_TRANSFER_FACTOR;
         else
             transferFactor = AI_STRONGER_ARMY_TRANSFER_FACTOR;
@@ -4506,7 +4506,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
             transferShare9 + AI_TOWN_TRANSFER_CURVE_OFFSET - AI_TOWN_TRANSFER_CURVE_CENTER
         );
         estimatedTransfer16 = static_cast<i32>(
-            (townStrength6 + OR_STEER(heroStrength))
+            (townStrength6 + heroStrength)
             * ((transferCurve * transferCurve - AI_TOWN_TRANSFER_CURVE_OFFSET)
                * gpCurPlayer->m_aiData.m_upgradeValueWeight)
             * transferFactor
@@ -4528,7 +4528,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         if (!canMerge2) {
             for (index7 = 0; index7 < AI_TOWN_ARMY_SLOTS; index7++) {
                 for (otherIndex9 = 0; otherIndex9 < AI_TOWN_ARMY_SLOTS; otherIndex9++) {
-                    if (OD_STEER(heroPtr->m_army.m_creatureTypes[otherIndex9])
+                    if (heroPtr->m_army.m_creatureTypes[otherIndex9]
                         == townPtr->m_army.m_creatureTypes[index7]) {
                         canMerge2 = 1;
                         break;
@@ -4545,7 +4545,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         townPtr->GiveSpells(NULL);
         if (townWins2)
             transferShare9 = static_cast<float>(transferShare9 + AI_TOWN_TRANSFER_BONUS);
-        transferCount6 = static_cast<i32>((townStrength6 + OR_STEER(heroStrength)) * transferShare9);
+        transferCount6 = static_cast<i32>((townStrength6 + heroStrength) * transferShare9);
         if (townWins2)
             firstArmy0 = &townPtr->m_army;
         else
@@ -5903,7 +5903,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 break;
             case MAP_OBJECT_ABANDONED_MINE:
                 battleValue_b = static_cast<i32>(
-                    static_cast<float>(gaiTurnValueOfMine[OR_STEER(MAP_WIDTH) * y + x])
+                    static_cast<float>(gaiTurnValueOfMine[MAP_WIDTH * y + x])
                     * gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]
                 );
                 for (index_k = 0; index_k < AI_TOWN_ARMY_SLOTS; index_k++) {
@@ -5939,8 +5939,8 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     for (exitX_p = 0; exitX_p < MAP_WIDTH; exitX_p++) {
                         otherCell_j = gpAdvManager->GetCell(exitX_p, exitY_p);
                         if (cell_k->m_triggerType == otherCell_j->m_triggerType
-                            && OR_STEER(cell_k->m_objectIndex) == otherCell_j->m_objectIndex
-                            && OR_STEER(abs(x - exitX_p)) + abs(y - exitY_p)
+                            && cell_k->m_objectIndex == otherCell_j->m_objectIndex
+                            && abs(x - exitX_p) + abs(y - exitY_p)
                                    > AI_TRAVEL_GATE_EXIT_RADIUS) {
                             exitValue_i = StrategicValueOfPosition(
                                 exitX_p,
@@ -5951,7 +5951,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                                 AI_TRAVEL_GATE_EXIT_DEPTH
                             );
                             exitValue_i = static_cast<i32>(exitValue_i * AI_TRAVEL_GATE_EXIT_SCALE);
-                            if (OR_STEER(exitValue_i) > bestExitValue_l) {
+                            if (exitValue_i > bestExitValue_l) {
                                 bestExitValue_l = exitValue_i;
                                 bestExitX_c = exitX_p;
                                 bestExitY_c = exitY_p;
@@ -6044,15 +6044,15 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 value_h = 105;
                 break;
             case MAP_OBJECT_HILL_FORT:
-                value_h = OR_STEER(ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF))
-                          + OR_STEER(OR_STEER(ComputeUpgradeValue(CREATURE_ORC, CREATURE_ORC_CHIEF))
-                              + OR_STEER(ComputeUpgradeValue(CREATURE_OGRE, CREATURE_OGRE_LORD)));
+                value_h = ComputeUpgradeValue(CREATURE_DWARF, CREATURE_BATTLE_DWARF)
+                          + ComputeUpgradeValue(CREATURE_ORC, CREATURE_ORC_CHIEF)
+                          + ComputeUpgradeValue(CREATURE_OGRE, CREATURE_OGRE_LORD);
                 break;
             case MAP_OBJECT_FREEMANS_FOUNDRY:
                 value_h =
-                    OR_STEER(ComputeUpgradeValue(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN))
-                    + OR_STEER((ComputeUpgradeValue(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN))
-                        + OR_STEER(ComputeUpgradeValue(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM)));
+                    ComputeUpgradeValue(CREATURE_SWORDSMAN, CREATURE_MASTER_SWORDSMAN)
+                    + ComputeUpgradeValue(CREATURE_PIKEMAN, CREATURE_VETERAN_PIKEMAN)
+                    + ComputeUpgradeValue(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
                 break;
             case MAP_OBJECT_MAGIC_WELL:
                 value_h = ManaRefreshValue(gpCurAIHero, 1);
@@ -6104,7 +6104,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                 value_h = 0;
                 break;
         }
-    } else if (!(giCurPlayerBit & mapExtra[OR_STEER(MAP_WIDTH) * y + x])) {
+    } else if (!(giCurPlayerBit & mapExtra[MAP_WIDTH * y + x])) {
         value_h = 5;
     }
 
@@ -6113,7 +6113,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
     if (gbBerserk && gbReduceByBerserk)
         value_h = static_cast<i32>(value_h * fBerserkFactor);
     if (!immediate) {
-        if (value_h > 0 && (mapExtra[OR_STEER(MAP_WIDTH) * y + x] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
+        if (value_h > 0 && (mapExtra[MAP_WIDTH * y + x] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
             && (cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK) != MAP_OBJECT_MONSTER)
             value_h = 0;
         if (value_h < 0
