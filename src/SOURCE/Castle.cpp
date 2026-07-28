@@ -467,18 +467,18 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     }
 
     if (hoverMessage) {
-        if (gpTownManager->m_lastHoverId == message.payload.widget.id)
+        if (message.payload.widget.id == gpTownManager->m_lastHoverId)
             return MESSAGE_DISPATCH_CONSUME;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
         switch (selectedBuilding) {
 
             case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                 sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
-                goto hover_text_ready;
+                break;
 
             case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                 sprintf(gText, cCastleInfo[IDX(INFO_SPREAD_FORMATION)]);
-                goto hover_text_ready;
+                break;
 
             case TOWN_OBJECT_MAGE_GUILD:
                 if (!(gpTownManager->m_buildableBuildings & BIT(selectedBuilding))) {
@@ -612,11 +612,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             );
                         }
                         break;
+                    case CONTROL_CLOSE:
+                        strcpy(gText, cCastleInfo[IDX(INFO_EXIT)]);
+                        break;
                     default:
-                        if (message.payload.widget.id == CONTROL_CLOSE)
-                            strcpy(gText, cCastleInfo[IDX(INFO_EXIT)]);
-                        else
-                            strcpy(gText, cCastleInfo[IDX(INFO_OPTIONS)]);
+                        strcpy(gText, cCastleInfo[IDX(INFO_OPTIONS)]);
                         break;
                 }
                 break;
@@ -637,7 +637,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
-                result = message.payload.widget.id == CONTROL_CLOSE;
+                if (message.payload.widget.id == CONTROL_CLOSE)
+                    result = 1;
                 break;
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
@@ -776,11 +777,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     }
 
 selection_done:
-    if (result == 0)
-        return MESSAGE_DISPATCH_CONSUME;
-    message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
-    return MESSAGE_DISPATCH_FORWARD;
+    if (result != 0) {
+        message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        return MESSAGE_DISPATCH_FORWARD;
+    }
+    return MESSAGE_DISPATCH_CONSUME;
 }
 
 // Retail castle building-slot order payload.
