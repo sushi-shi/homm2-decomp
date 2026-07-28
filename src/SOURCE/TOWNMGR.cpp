@@ -3312,8 +3312,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         message_n.payload.widget.data.text = gText;
         window->BroadcastMessage(message_n);
 
-        if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_HERO) {
-        } else {
+        if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_HERO)
+            goto nextRank;
+        {
             strongestHeroPosition_first = -1;
             strongestHeroValue_current = 0;
             for (heroPosition_index = 0; heroPosition_index < gpGame->m_players[rank].m_heroCount;
@@ -3369,8 +3370,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 window->AddWidget(iconControl_last, -1);
             }
 
-            if (informationLevel < TOWN_THIEVES_INFO_PRIMARY_STATS) {
-            } else {
+            if (informationLevel < TOWN_THIEVES_INFO_PRIMARY_STATS)
+                goto nextRank;
+            {
                 if (strongestHeroPosition_first != -1) {
                     strongestHero_x = gpGame->GetPlayerHero(rank, strongestHeroPosition_first);
                     sprintf(gText, DATA_COMPGEN(0x004ef3e8, setupThievesGuildAttDefPowerKnowl, "Att.\nDef.\nPower\nKnowl."));
@@ -3434,8 +3436,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     window->AddWidget(textControl_icon, -1);
                 }
 
-                if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY) {
-                } else {
+                if (informationLevel < TOWN_THIEVES_INFO_PERSONALITY)
+                    goto nextRank;
+                {
                     strcpy(gText, cPersonality[IDX(gpGame->m_players[rank].m_aiDifficulty)]);
                     widgetText_control = static_cast<char*>(
                         H2_ALLOC_AT(
@@ -3461,8 +3464,9 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     );
                     window->AddWidget(textControl_icon, -1);
 
-                    if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_CREATURE) {
-                    } else {
+                    if (informationLevel < TOWN_THIEVES_INFO_STRONGEST_CREATURE)
+                        goto nextRank;
+                    {
                         strongestCreature_m = CREATURE_NONE;
                         strongestCreatureValue = 0;
                         for (heroPosition_index = 0;
@@ -3533,6 +3537,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 }
             }
         }
+nextRank:
         ++rank;
     }
 }
