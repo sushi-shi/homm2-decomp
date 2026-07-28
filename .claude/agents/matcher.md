@@ -122,9 +122,16 @@ attempts.
 
 The emitted block partition is not a correctness invariant. MSVC TU/compiler state
 can split or merge basic blocks for unchanged source, changing block count,
-numbering, and terminators. Re-run `--blocks` on retained state islands and use it
-to classify structural orbits. Matching blocks are diagnostic evidence only; exact
-bytes and complete ordered relocation identity/addends/destinations decide closure.
+numbering, and terminators. `tu_state_noise.py` records topology for every unique
+state and, with `--retain-best`, preserves independent `best.*` fuzzy and
+`best-topology.*` artifact sets. Topology assigns canonical labels by entry-rooted
+`jcc`/`fall`/`jmp` traversal and compares both labeled successors and predecessors.
+Ranking compares block-count delta, labeled-edge and predecessor deltas, flow-kind
+mismatches, shifted targets, and size-only blocks before fuzzy tie-breaking.
+Inspect the complete state topology census rather than assuming the fuzzy winner
+represents the structural orbit. Matching blocks are diagnostic evidence only;
+exact bytes and complete ordered relocation identity/addends/destinations decide
+closure.
 
 ## The dominant /Od lever: stack-slot names are SOLVED — compute, don't grind
 
@@ -190,6 +197,24 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 
 ## Source-writing doctrine (same spirit as a /O2 decomp)
 
+- Treat a proven sibling as a structural reference for its function family.
+  Align semantic phases, joins, cursor/counter ownership, and narrow inline
+  helper boundaries before pursuing local byte steering. Preserve explicit
+  per-TU copies when retail evidence supports copied implementations; source
+  deduplication is not a matching objective.
+- For the optimized icon-decoder family, use `FlipIconToBitmapYModify` as the
+  first structural reference. Prefer setup that publishes decoder state
+  directly to its semantic file-static owners, and keep the declarations in a
+  comparable semantic order; test uncertain declaration orders with a bounded
+  generated matrix. Do not split compact cursor operations such as `*s_src++`
+  into incidental statements, and remove locals that merely copy published
+  decoder state when retail and sibling evidence support direct expressions.
+  Treat a small goto cluster with two local joins as a possible expanded
+  multiline macro: test a scoped `do { ... } while (0)` with `break`/`continue`
+  exits. Preserve ordinary semantic gotos where the CFG supports them. Prefer
+  early returns, loop `continue`s, and justified joins over deeply nested
+  decoder control flow. These are family reconstruction priors, not correctness
+  proof; bytes, ordered relocations, and credible CFG still decide.
 - **Model the real type, don't cast.** `void* m_28` → the real `T* m_28` from the
   recovered header; member-type changes are matching-NEUTRAL (same size/offset/
   mangling) and recover the devs' shape. Reserve casts for reinterpretations the

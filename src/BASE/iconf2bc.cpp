@@ -6,27 +6,28 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-DATA(0x005380d4) static i32 gFCSkip;
-DATA(0x00538104) static u32 gFCRun;
-DATA(0x005380f8) static i32 gFCX0;
-DATA(0x005380e4) static i32 gFCXEnd;
-DATA(0x005380e8) static u32 gFCCnt;
-DATA(0x005380e0) static u32 gFCCnt2;
-DATA(0x005380d8) static i32 gFCY;
-DATA(0x005380ec) static IconEntry* gFCEntry;
-DATA(0x005380d0) static i32 gFCX;
-DATA(0x005380f0) static u8* gFCSrc;
-DATA(0x005380dc) static u8* gFCDimPal;
-DATA(0x005380f4) static u8* gFCDimDst;
-DATA(0x005380fc) static i32 gFCClipB;
-DATA(0x00538100) static u8* gFCRow;
-DATA(0x005380c4) static u32 gFCDimLen;
-DATA(0x005380cc) static u8 gFCColor;
-DATA(0x005380c8) static i32 gFCClipR;
-DATA(0x005380c0) static u8* gFCDst;
 
-static inline i32 FlipColorRowVisible(i32 clipTop) {
-    return clipTop <= gFCY && gFCY <= gFCClipB;
+DATA(0x005380fc) static i32 s_clipB;
+DATA(0x005380e8) static u32 s_loopCount;
+DATA(0x005380d8) static i32 s_y;
+DATA(0x005380d0) static i32 s_x;
+DATA(0x005380f4) static u8* s_dimDst;
+DATA(0x005380f8) static i32 s_left;
+DATA(0x005380e4) static i32 s_right;
+DATA(0x00538104) static u32 s_run;
+DATA(0x005380dc) static u8* s_dimPal;
+DATA(0x00538100) static u8* s_row;
+DATA(0x005380c0) static u8* s_dst;
+DATA(0x005380d4) static i32 s_srcSkip;
+DATA(0x005380f0) static u8* s_src;
+DATA(0x005380ec) static IconEntry* s_entry;
+DATA(0x005380e0) static u32 s_spanCount;
+DATA(0x005380cc) static u8 s_color;
+DATA(0x005380c4) static u32 s_dimLen;
+DATA(0x005380c8) static i32 s_clipR;
+
+static inline i32 FlipColorRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
+    return clipTop <= currentY && currentY <= clipBottom;
 }
 
 static inline u8 FlipColorDimValue(u8* dst, u8* palette) {
@@ -49,33 +50,32 @@ void FlipIconToBitmapColorTable(
     u8* colorTable
 ) {
     IconEntry* entries = srcIcon->Entries();
-    u8* src = reinterpret_cast<u8*>(entries);
-    i32 w = entries[frame].w;
-    i32 x0 = x - entries[frame].x;
-    IconEntry* entry = &entries[frame];
+    s_entry = &entries[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    u8* src = s_src;
+    i32 w = s_entry->w;
+    i32 x0 = x - s_entry->x;
     x0 = x0 - w;
     i32 pitch;
-    gFCEntry = entry;
-    src += entry->srcOffset;
     x0++;
-    gFCX0 = x0;
+    s_left = x0;
     w = w + x0;
-    i32 X = (gFCXEnd = w - 1);
-    i32 Y = y + entry->y;
-    gFCY = Y;
+    i32 X = (s_right = w - 1);
+    i32 Y = y + s_entry->y;
+    s_y = Y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        i32 currentY = gFCY;
-        if (x0 < clipX || clipW + clipX < x0 + entry->w || currentY < clipY
-            || clipY + clipH < entry->h + currentY) {
+        i32 currentY = s_y;
+        if (x0 < clipX || clipW + clipX < x0 + s_entry->w || currentY < clipY
+            || clipY + clipH < s_entry->h + currentY) {
             clip = ICON_DRAW_CLIP;
-            gFCClipR = clipX + clipW - 1;
-            gFCClipB = clipY + clipH - 1;
+            s_clipR = clipX + clipW - 1;
+            s_clipB = clipY + clipH - 1;
         } else {
             clip = ICON_DRAW_NO_CLIP;
         }
     }
     pitch = dest->m_width;
-    gFCRow = dest->m_pixels + gFCY * pitch;
+    s_row = dest->m_pixels + s_y * pitch;
     u8* dp;
     i32 cmd;
     for (;;) {
@@ -83,23 +83,23 @@ void FlipIconToBitmapColorTable(
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
-                gFCRun = cmd;
+                s_run = cmd;
                 i32 n = cmd & ICON_RLE_COMMAND_RUN_MASK;
-                gFCX = X;
-                gFCSrc = src;
+                s_x = X;
+                s_src = src;
                 if (n == 0)
                     return;
                 X = X - n;
                 continue;
             }
-            gFCRun = cmd;
+            s_run = cmd;
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
-                gFCColor = colorTable[*src++];
+                s_color = colorTable[*src++];
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
@@ -107,155 +107,156 @@ void FlipIconToBitmapColorTable(
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)
                 count = *src++;
-            gFCDimLen = count;
+            s_dimLen = count;
             if (color != 0) {
-                gFCRun = flags;
+                s_run = flags;
                 if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
-                    gFCCnt2 = count;
-                    gFCColor = static_cast<u8>(color);
+                    s_spanCount = count;
+                    s_color = static_cast<u8>(color);
                     goto do_fill;
                 }
             }
             goto do_dim;
         do_fill:
             if (clip == ICON_DRAW_NO_CLIP) {
-                memset((gFCRow - count) + 1 + X, gFCColor, count);
+                memset((s_row - count) + 1 + X, s_color, count);
             } else {
                 i32 left;
-                if (FlipColorRowVisible(clipY) && (left = (X - count) + 1, clipX <= left)
-                    && X <= gFCClipR) {
+                if (FlipColorRowVisible(clipY, s_y, s_clipB)
+                    && (left = (X - count) + 1, clipX <= left)
+                    && X <= s_clipR) {
                     if (clipX <= left) {
-                        memset((gFCRow - count) + 1 + X, gFCColor, count);
+                        memset((s_row - count) + 1 + X, s_color, count);
                     } else {
-                        memset(gFCRow + clipX, gFCColor, (X - clipX) + 1);
+                        memset(s_row + clipX, s_color, (X - clipX) + 1);
                     }
                 }
             }
             X = X - count;
-            gFCRun = count;
+            s_run = count;
             continue;
         do_dim:
-            gFCRun = flags;
-            gFCCnt2 = count;
+            s_run = flags;
+            s_spanCount = count;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
                 u8* palette =
                     &uDimPal[0][0][0]
                     + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                gFCDimPal = palette;
+                s_dimPal = palette;
                 if (clip == ICON_DRAW_NO_CLIP) {
-                    dp = (gFCRow - count) + 1 + X;
-                    gFCCnt = 0;
+                    dp = (s_row - count) + 1 + X;
+                    s_loopCount = 0;
                     i32 dimCount = count;
-                    gFCDimDst = dp;
+                    s_dimDst = dp;
                     if (dimCount > 0) {
-                        gFCCnt = dimCount;
+                        s_loopCount = dimCount;
                         do {
-                            u8* dimPalette = gFCDimPal;
+                            u8* dimPalette = s_dimPal;
                             u8 mapped = FlipColorDimValue(dp, dimPalette);
                             dp++;
                             count--;
-                            gFCDimDst = dp;
+                            s_dimDst = dp;
                             dp[-1] = mapped;
                         } while (count != 0);
                     }
                 } else {
-                    gFCCnt2 = count;
-                    if (FlipColorRowVisible(clipY)
-                        && clipX <= static_cast<i32>((X - count) + 1) && X <= gFCClipR) {
+                    s_spanCount = count;
+                    if (FlipColorRowVisible(clipY, s_y, s_clipB)
+                        && clipX <= static_cast<i32>((X - count) + 1) && X <= s_clipR) {
                         i32 left = (X - count) + 1;
                         if (clipX <= left) {
-                            dp = (gFCRow - count) + 1 + X;
+                            dp = (s_row - count) + 1 + X;
                         } else {
                             count = (X - clipX) + 1;
-                            dp = gFCRow + clipX;
+                            dp = s_row + clipX;
                         }
-                        gFCCnt2 = count;
-                        gFCDimDst = dp;
+                        s_spanCount = count;
+                        s_dimDst = dp;
                         i32 dimCount = count;
-                        gFCCnt = 0;
+                        s_loopCount = 0;
                         if (dimCount > 0) {
-                            gFCCnt = dimCount;
+                            s_loopCount = dimCount;
                             do {
-                                u8* dimPalette = gFCDimPal;
+                                u8* dimPalette = s_dimPal;
                                 u8 mapped = FlipColorDimValue(dp, dimPalette);
                                 dp++;
                                 count--;
-                                gFCDimDst = dp;
+                                s_dimDst = dp;
                                 dp[-1] = mapped;
                             } while (count != 0);
                         }
                     }
                 }
             }
-            X = X - gFCDimLen;
+            X = X - s_dimLen;
             continue;
         }
-        gFCRun = cmd;
-        gFCX = X;
+        s_run = cmd;
+        s_x = X;
         if (cmd != 0) {
             if (clip == ICON_DRAW_NO_CLIP) {
-                gFCCnt = 0;
-                u8* dst = gFCRow + X;
-                gFCDst = dst;
+                s_loopCount = 0;
+                u8* dst = s_row + X;
+                s_dst = dst;
                 if (cmd > 0) {
-                    gFCCnt = cmd;
+                    s_loopCount = cmd;
                     i32 k = cmd;
                     do {
                         i32 c = *src++;
                         dst--;
-                        gFCDst = dst;
+                        s_dst = dst;
                         dst[1] = colorTable[c];
                         k--;
                     } while (k != 0);
                 }
             } else {
-                if (FlipColorRowVisible(clipY)) {
+                if (FlipColorRowVisible(clipY, s_y, s_clipB)) {
                     i32 left = (X - cmd) + 1;
-                    if (left <= gFCClipR && clipX <= X) {
+                    if (left <= s_clipR && clipX <= X) {
                         u32 cn;
                         u8* selectedDst;
                         i32 skip;
-                        if (X <= gFCClipR) {
-                            selectedDst = gFCRow + X;
-                            gFCDst = selectedDst;
+                        if (X <= s_clipR) {
+                            selectedDst = s_row + X;
+                            s_dst = selectedDst;
                             if (clipX <= left) {
-                                gFCSkip = 0;
+                                s_srcSkip = 0;
                                 cn = cmd;
                             } else {
                                 cn = (X - clipX) + 1;
                                 skip = cmd - cn;
-                                gFCSkip = skip;
+                                s_srcSkip = skip;
                             }
                         } else {
-                            i32 right = gFCClipR;
+                            i32 right = s_clipR;
                             src = src + (X - right);
-                            selectedDst = gFCRow + right;
-                            gFCDst = selectedDst;
+                            selectedDst = s_row + right;
+                            s_dst = selectedDst;
                             if (clipX <= (X - cmd)) {
-                                gFCSkip = 0;
-                                cn = (cmd - X) + gFCClipR;
+                                s_srcSkip = 0;
+                                cn = (cmd - X) + s_clipR;
                             } else {
                                 cn = clipW;
-                                skip = gFCClipR + ((cmd - X) - clipW);
-                                gFCSkip = skip;
+                                skip = s_clipR + ((cmd - X) - clipW);
+                                s_srcSkip = skip;
                             }
                         }
                         i32 copyCount = cn;
-                        gFCCnt2 = cn;
-                        gFCCnt = 0;
+                        s_spanCount = cn;
+                        s_loopCount = 0;
                         if (copyCount > 0) {
-                            gFCCnt = copyCount;
+                            s_loopCount = copyCount;
                             do {
-                                u8* dst = gFCDst;
+                                u8* dst = s_dst;
                                 i32 c = *src++;
                                 dst--;
                                 cn--;
                                 u8 mapped = colorTable[c];
-                                gFCDst = dst;
+                                s_dst = dst;
                                 dst[1] = mapped;
                             } while (cn != 0);
                         }
-                        src = src + gFCSkip;
+                        src = src + s_srcSkip;
                     } else {
                         src = src + cmd;
                     }
@@ -264,11 +265,11 @@ void FlipIconToBitmapColorTable(
                 }
             }
             X = X - cmd;
-            gFCRun = cmd;
+            s_run = cmd;
             continue;
         }
-        X = gFCXEnd;
-        gFCY = gFCY + 1;
-        gFCRow = gFCRow + pitch;
+        X = s_right;
+        s_y = s_y + 1;
+        s_row = s_row + pitch;
     }
 }

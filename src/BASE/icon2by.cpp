@@ -7,25 +7,25 @@
 #include <BASE/IconShear.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-DATA(0x00538150) static i32 gYMClipB;
-DATA(0x00538154) static i32 gYMDimIdx;
-DATA(0x0053815c) static i32 gYMPitch;
-DATA(0x00538158) static i32 gYMY;
-DATA(0x00538160) static i32 gYMX;
-DATA(0x00538164) static u8* gYMDimDst;
-DATA(0x0053816c) static i32 gYMX0;
-DATA(0x00538168) static u32 gYMRun;
-DATA(0x00538170) static u8* gYMDimPal;
-DATA(0x00538174) static u8* gYMRow;
-DATA(0x00538178) static u8* gYMSrc;
-DATA(0x00538180) static IconEntry* gYMEntry;
-DATA(0x0053817c) static u32 gYMDimLen;
-DATA(0x00538184) static u8 gYMColor;
-DATA(0x00538188) static u32 gYMDimLen2;
-DATA(0x0053818c) static i32 gYMClipR;
+DATA(0x00538150) static i32 s_clipB;
+DATA(0x00538154) static i32 s_loopIndex;
+DATA(0x0053815c) static i32 s_pitch;
+DATA(0x00538158) static i32 s_y;
+DATA(0x00538160) static i32 s_x;
+DATA(0x00538164) static u8* s_dimDst;
+DATA(0x0053816c) static i32 s_left;
+DATA(0x00538168) static u32 s_run;
+DATA(0x00538170) static u8* s_dimPal;
+DATA(0x00538174) static u8* s_row;
+DATA(0x00538178) static u8* s_src;
+DATA(0x00538180) static IconEntry* s_entry;
+DATA(0x0053817c) static u32 s_spanCount;
+DATA(0x00538184) static u8 s_color;
+DATA(0x00538188) static u32 s_dimLen;
+DATA(0x0053818c) static i32 s_clipR;
 
-static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
-    return shear[gYMY] != ICON_SHEAR_SKIP_ROW && clipTop <= gYMY && gYMY <= gYMClipB;
+static inline i32 IconRowVisible(i8* shear, i32 clipTop, i32 currentY, i32 clipBottom) {
+    return shear[currentY] != ICON_SHEAR_SKIP_ROW && clipTop <= currentY && currentY <= clipBottom;
 }
 
 static inline u8* IconOutsideCopySource(u8* src, i32 currentX, i32 clipX) {
@@ -47,127 +47,123 @@ void IconToBitmapYModify(
     i32 color,
     i8* shear
 ) {
-    IconEntry* entries = srcIcon->Entries();
-    gYMEntry = &entries[frame];
-    gYMSrc = srcIcon->m_data + gYMEntry->srcOffset;
-    gYMX0 = gYMEntry->x + x;
-    gYMPitch = dest->m_width;
-    gYMY = gYMEntry->y + y;
-    gYMX = shear[gYMY] + gYMX0;
-    gYMClipR = clipX + clipW - 1;
-    gYMClipB = clipY + clipH - 1;
-    gYMRow = dest->m_pixels + gYMPitch * gYMY;
+    s_entry = &srcIcon->Entries()[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = s_entry->x + x;
+    s_pitch = dest->m_width;
+    s_y = s_entry->y + y;
+    s_x = shear[s_y] + s_left;
+    s_clipR = clipX + clipW - 1;
+    s_clipB = clipY + clipH - 1;
+    s_row = dest->m_pixels + s_pitch * s_y;
     for (;;) {
-        gYMRun = *gYMSrc;
-        gYMSrc = gYMSrc + 1;
-        if (static_cast<i8>(gYMRun) < 0) {
-            if ((gYMRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                if ((gYMRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
+        s_run = *s_src++;
+        if (static_cast<i8>(s_run) < 0) {
+            if ((s_run & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
+                if ((s_run & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
-                gYMX = gYMX + (gYMRun & ICON_RLE_COMMAND_RUN_MASK);
+                s_x += s_run & ICON_RLE_COMMAND_RUN_MASK;
                 continue;
             }
-            if ((gYMRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
-                if (gYMRun == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gYMRun = *gYMSrc;
-                    gYMSrc = gYMSrc + 1;
+            if ((s_run & ICON_RLE_COMMAND_RUN_MASK) != 0) {
+                if (s_run == ICON_RLE_LONG_SOLID_COMMAND) {
+                    s_run = *s_src++;
                 } else {
-                    gYMRun = gYMRun & ICON_RLE_COMMAND_RUN_MASK;
+                    s_run &= ICON_RLE_COMMAND_RUN_MASK;
                 }
-                gYMColor = *gYMSrc;
-                gYMSrc = gYMSrc + 1;
+                s_color = *s_src++;
                 goto do_fill;
             }
-            gYMRun = *gYMSrc;
-            gYMSrc = gYMSrc + 1;
-            if ((gYMRun & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
-                gYMDimLen = gYMRun & ICON_RLE_DIM_SHORT_COUNT_MASK;
+            s_run = *s_src++;
+            if ((s_run & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
+                s_spanCount = s_run & ICON_RLE_DIM_SHORT_COUNT_MASK;
             } else {
-                gYMDimLen = *gYMSrc;
-                gYMSrc = gYMSrc + 1;
+                s_spanCount = *s_src++;
             }
-            gYMDimLen2 = gYMDimLen;
-            if (color != 0 && (gYMRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
-                gYMRun = gYMDimLen;
-                gYMColor = static_cast<u8>(color);
+            s_dimLen = s_spanCount;
+            if (color != 0 && (s_run & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
+                s_run = s_spanCount;
+                s_color = static_cast<u8>(color);
                 goto do_fill;
             }
-            if ((gYMRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                gYMDimPal =
+            if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {
+                s_dimPal =
                     reinterpret_cast<u8*>(uDimPal)
-                    + (gYMRun & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                if (IconRowVisible(shear, clipY)
-                    && static_cast<i32>(gYMDimLen + gYMX) > clipX && gYMClipR >= gYMX) {
-                    i32 dimRight = gYMDimLen + gYMX;
-                    if (clipX <= gYMX) {
-                        if (gYMClipR < dimRight)
-                            gYMDimLen = (gYMClipR - gYMX) + 1;
-                        gYMDimDst = gYMRow + gYMX;
+                    + (s_run & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                if (IconRowVisible(shear, clipY, s_y, s_clipB)
+                    && static_cast<i32>(s_spanCount + s_x) > clipX && s_clipR >= s_x) {
+                    i32 dimRight = s_spanCount + s_x;
+                    if (clipX <= s_x) {
+                        if (s_clipR < dimRight)
+                            s_spanCount = (s_clipR - s_x) + 1;
+                        s_dimDst = s_row + s_x;
                     } else {
-                        if (gYMClipR >= dimRight)
-                            gYMDimLen = gYMDimLen + (gYMX - clipX);
+                        if (s_clipR >= dimRight)
+                            s_spanCount += s_x - clipX;
                         else
-                            gYMDimLen = clipW;
-                        gYMDimDst = gYMRow + clipX;
+                            s_spanCount = clipW;
+                        s_dimDst = s_row + clipX;
                     }
-                    gYMDimIdx = 0;
-                    if (0 < static_cast<i32>(gYMDimLen)) {
+                    s_loopIndex = 0;
+                    if (0 < static_cast<i32>(s_spanCount)) {
                         do {
-                            *gYMDimDst = gYMDimPal[*gYMDimDst];
-                            gYMDimDst = 1 + gYMDimDst;
-                            gYMDimIdx = gYMDimIdx + 1;
-                        } while (gYMDimIdx < static_cast<i32>(gYMDimLen));
+                            *s_dimDst = s_dimPal[*s_dimDst];
+                            s_dimDst += 1;
+                            s_loopIndex += 1;
+                        } while (s_loopIndex < static_cast<i32>(s_spanCount));
                     }
                 }
             }
-            gYMX = gYMX + gYMDimLen2;
+            s_x += s_dimLen;
             continue;
         do_fill:
-            if (IconRowVisible(shear, clipY) && static_cast<i32>(gYMX + gYMRun) > clipX
-                && gYMClipR >= gYMX) {
-                i32 fillRight = gYMX + gYMRun;
-                if (clipX <= gYMX) {
-                    if (gYMClipR >= fillRight) {
-                        memset(gYMRow + gYMX, gYMColor, gYMRun);
+            if (IconRowVisible(shear, clipY, s_y, s_clipB)
+                && static_cast<i32>(s_x + s_run) > clipX
+                && s_clipR >= s_x) {
+                i32 fillRight = s_x + s_run;
+                if (clipX <= s_x) {
+                    if (s_clipR >= fillRight) {
+                        memset(s_row + s_x, s_color, s_run);
                     } else {
-                        memset(gYMRow + gYMX, gYMColor, (gYMClipR - gYMX) + 1);
+                        memset(s_row + s_x, s_color, (s_clipR - s_x) + 1);
                     }
                 } else {
-                    if (gYMClipR >= fillRight) {
-                        memset(gYMRow + clipX, gYMColor, (gYMRun - clipX) + gYMX);
+                    if (s_clipR >= fillRight) {
+                        memset(s_row + clipX, s_color, (s_run - clipX) + s_x);
                     } else {
-                        memset(gYMRow + clipX, gYMColor, clipW);
+                        memset(s_row + clipX, s_color, clipW);
                     }
                 }
             }
-            gYMX = gYMX + gYMRun;
+            s_x += s_run;
             continue;
         }
-        if (gYMRun != 0) {
-            if (IconRowVisible(shear, clipY) && static_cast<i32>(gYMX + gYMRun) > clipX
-                && gYMClipR >= gYMX) {
-                i32 copyRight = gYMX + gYMRun;
-                if (clipX <= gYMX) {
-                    if (gYMClipR >= copyRight) {
-                        memcpy(gYMRow + gYMX, gYMSrc, gYMRun);
+        if (s_run != 0) {
+            if (IconRowVisible(shear, clipY, s_y, s_clipB)
+                && static_cast<i32>(s_x + s_run) > clipX
+                && s_clipR >= s_x) {
+                i32 copyRight = s_x + s_run;
+                if (clipX <= s_x) {
+                    if (s_clipR >= copyRight) {
+                        memcpy(s_row + s_x, s_src, s_run);
                     } else {
-                        memcpy(gYMRow + gYMX, gYMSrc, (gYMClipR - gYMX) + 1);
+                        memcpy(s_row + s_x, s_src, (s_clipR - s_x) + 1);
                     }
                 } else {
-                    if (gYMClipR >= copyRight) {
-                        memcpy(gYMRow + clipX, gYMSrc + (clipX - gYMX), (gYMRun - clipX) + gYMX);
+                    if (s_clipR >= copyRight) {
+                        memcpy(s_row + clipX, s_src + (clipX - s_x), (s_run - clipX) + s_x);
                     } else {
-                        u8* copySrc = IconOutsideCopySource(gYMSrc, gYMX, clipX);
-                        memcpy(gYMRow + clipX, copySrc, clipW);
+                        u8* copySrc = IconOutsideCopySource(s_src, s_x, clipX);
+                        memcpy(s_row + clipX, copySrc, clipW);
                     }
                 }
             }
-            gYMX = gYMX + gYMRun;
-            gYMSrc = gYMSrc + gYMRun;
+            s_x += s_run;
+            s_src += s_run;
             continue;
         }
-        gYMX = shear[gYMY] + gYMX0;
-        gYMY = gYMY + 1;
-        gYMRow = gYMRow + gYMPitch;
+        s_x = shear[s_y] + s_left;
+        s_y += 1;
+        s_row += s_pitch;
     }
 }
