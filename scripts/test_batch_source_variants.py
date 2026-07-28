@@ -12,6 +12,8 @@ from batch_source_variants import (
     render_edits,
     render_variant,
     result_rank,
+    structural_frontier_result_rank,
+    topology_result_rank,
 )
 
 
@@ -21,7 +23,7 @@ class BatchSourceVariantManifestTests(unittest.TestCase):
             (0, ["mov", "je"], "jcc B2 | fall B1"),
             (2, ["ret"], "ret"),
             (3, ["jmp"], "jmp B1^"),
-            (4, ["nop"], "fall B4"),
+            (4, ["nop"], "fall B3^"),
         ]
         retail = [
             (0, ["mov", "je"], "jcc B2 | fall B1"),
@@ -35,11 +37,22 @@ class BatchSourceVariantManifestTests(unittest.TestCase):
             {
                 "candidate_blocks": 4,
                 "retail_blocks": 5,
+                "block_count_delta": 1,
+                "graph_exact": False,
+                "labeled_edge_delta": 3,
+                "predecessor_delta": 4,
+                "candidate_graph_sha": "ea7536d6200f2374",
+                "retail_graph_sha": "162f06bfddc7a93a",
+                "leading_exact_blocks": 1,
+                "leading_exact_instructions": 2,
+                "first_structural_divergence": 1,
+                "first_structural_divergence_kind": "size_only",
                 "exact": 1,
                 "size_only": 1,
                 "target_shift": 1,
                 "flow_kind": 1,
                 "missing": 1,
+                "flow_exact": False,
             },
         )
 
@@ -52,6 +65,74 @@ class BatchSourceVariantManifestTests(unittest.TestCase):
         ]
         ranked = sorted(rows, key=lambda row: result_rank(row, 100, 4))
         self.assertEqual([row["trial"] for row in ranked], [1, 2, 3, 4])
+
+    def test_topology_result_rank_can_select_lower_fuzzy_shape(self):
+        exact_graph = {
+            "score": 80.0,
+            "trial": 2,
+            "blocks": {
+                "block_count_delta": 0,
+                "labeled_edge_delta": 0,
+                "predecessor_delta": 0,
+                "flow_kind": 0,
+                "target_shift": 0,
+                "size_only": 3,
+                "exact": 7,
+            },
+        }
+        high_fuzzy_extra_block = {
+            "score": 99.0,
+            "trial": 1,
+            "blocks": {
+                "block_count_delta": 1,
+                "labeled_edge_delta": 0,
+                "predecessor_delta": 0,
+                "flow_kind": 0,
+                "target_shift": 0,
+                "size_only": 0,
+                "exact": 20,
+            },
+        }
+        self.assertLess(
+            topology_result_rank(exact_graph),
+            topology_result_rank(high_fuzzy_extra_block),
+        )
+
+    def test_frontier_result_rank_can_select_lower_fuzzy_shape(self):
+        later = {
+            "score": 80.0,
+            "trial": 2,
+            "blocks": {
+                "leading_exact_blocks": 10,
+                "leading_exact_instructions": 50,
+                "block_count_delta": 0,
+                "labeled_edge_delta": 0,
+                "predecessor_delta": 0,
+                "flow_kind": 0,
+                "target_shift": 0,
+                "size_only": 2,
+                "exact": 20,
+            },
+        }
+        earlier = {
+            "score": 99.0,
+            "trial": 1,
+            "blocks": {
+                "leading_exact_blocks": 9,
+                "leading_exact_instructions": 49,
+                "block_count_delta": 0,
+                "labeled_edge_delta": 0,
+                "predecessor_delta": 0,
+                "flow_kind": 0,
+                "target_shift": 0,
+                "size_only": 1,
+                "exact": 30,
+            },
+        }
+        self.assertLess(
+            structural_frontier_result_rank(later),
+            structural_frontier_result_rank(earlier),
+        )
 
     def write_case(self, source_text, axes):
         temporary = tempfile.TemporaryDirectory()

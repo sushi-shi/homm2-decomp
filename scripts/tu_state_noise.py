@@ -62,6 +62,7 @@ from homm2.build.canonicalize_relocs import (
     function_inventory,
     load_retail_symbols,
 )
+from homm2.analysis.disasm import _branch_kind, _cfg
 
 
 IMAGE_BASE = 0x400000
@@ -851,44 +852,54 @@ def finalize_compiled_artifacts(
     return None
 
 
-def preserve_best_objects(
+def preserve_comparison_objects(
     output: Path,
     raw_candidate: Path,
     normalized_candidate: Path,
     normalized_retail: Path,
+    prefix: str,
 ) -> None:
-    """Replace the retained best comparison triple while all inputs still exist."""
-    shutil.copy2(raw_candidate, output / "best.raw.obj")
-    shutil.copy2(normalized_candidate, output / "best.candidate.obj")
-    shutil.copy2(normalized_retail, output / "best.retail.obj")
+    """Replace one retained comparison triple while all inputs still exist."""
+    shutil.copy2(raw_candidate, output / f"{prefix}.raw.obj")
+    shutil.copy2(normalized_candidate, output / f"{prefix}.candidate.obj")
+    shutil.copy2(normalized_retail, output / f"{prefix}.retail.obj")
 
 
-def write_best_disassembly(output: Path, symbol: str) -> dict[str, str]:
-    """Disassemble the retained best candidate and its paired retail target."""
+def disassemble_symbol(path: Path, symbol: str) -> str:
+    result = subprocess.run(
+        [
+            "llvm-objdump",
+            "-dr",
+            f"--disassemble-symbols={symbol}",
+            str(path),
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assembly = result.stdout + result.stderr
+    if result.returncode:
+        raise RuntimeError(
+            f"llvm-objdump failed for retained object {path} ({result.returncode})"
+        )
+    return assembly
+
+
+def write_comparison_disassembly(
+    output: Path, symbol: str, prefix: str
+) -> dict[str, str]:
+    """Disassemble one retained candidate and its paired retail target."""
     paths = {
-        "candidate_object": "best.candidate.obj",
-        "retail_object": "best.retail.obj",
-        "candidate_assembly": "best.candidate.asm",
-        "retail_assembly": "best.retail.asm",
-        "assembly_diff": "best.diff",
+        "candidate_object": f"{prefix}.candidate.obj",
+        "retail_object": f"{prefix}.retail.obj",
+        "candidate_assembly": f"{prefix}.candidate.asm",
+        "retail_assembly": f"{prefix}.retail.asm",
+        "assembly_diff": f"{prefix}.diff",
     }
     assemblies = {}
     for side in ("candidate", "retail"):
-        result = subprocess.run(
-            [
-                "llvm-objdump",
-                "-dr",
-                f"--disassemble-symbols={symbol}",
-                str(output / paths[f"{side}_object"]),
-            ],
-            capture_output=True,
-            text=True,
+        assembly = disassemble_symbol(
+            output / paths[f"{side}_object"], symbol
         )
-        assembly = result.stdout + result.stderr
-        if result.returncode:
-            raise RuntimeError(
-                f"llvm-objdump failed for retained {side} object ({result.returncode})"
-            )
         assemblies[side] = assembly
         (output / paths[f"{side}_assembly"]).write_text(assembly)
     diff = difflib.unified_diff(
@@ -899,6 +910,245 @@ def write_best_disassembly(output: Path, symbol: str) -> dict[str, str]:
     )
     (output / paths["assembly_diff"]).write_text("".join(diff))
     return paths
+
+
+def cfg_outgoing_edges(term: str | None) -> list[tuple[str, int]]:
+    return [
+        (match.group(1), int(match.group(2)))
+        for match in re.finditer(r"(jcc|jmp|fall) B(\d+)", term or "")
+    ]
+
+
+def canonical_cfg_signature(cfg) -> tuple:
+    """Canonicalize a labeled CFG by entry-rooted edge traversal.
+
+    Address-order block labels are disposable. Edge labels are not: conditional,
+    fallthrough, and jump entries remain distinct, and incoming edges are recorded
+    explicitly alongside their corresponding successors.
+    """
+    if not cfg:
+        return ()
+    mapping = {}
+    order = []
+
+    def visit_component(seed: int) -> None:
+        queue = [seed]
+        if seed not in mapping:
+            mapping[seed] = len(mapping)
+        while queue:
+            source = queue.pop(0)
+            order.append(source)
+            for _kind, target in cfg_outgoing_edges(cfg[source][2]):
+                if target not in mapping:
+                    mapping[target] = len(mapping)
+                    queue.append(target)
+
+    visit_component(0)
+    for seed in range(len(cfg)):
+        if seed not in mapping:
+            visit_component(seed)
+
+    outgoing = [[] for _ in cfg]
+    incoming = [[] for _ in cfg]
+    terminal = []
+    for source in order:
+        term = cfg[source][2] or ""
+        edges = cfg_outgoing_edges(term)
+        canonical_source = mapping[source]
+        for kind, target in edges:
+            canonical_target = mapping[target]
+            outgoing[canonical_source].append((kind, canonical_target))
+            incoming[canonical_target].append((kind, canonical_source))
+        if edges:
+            terminal.append(tuple(kind for kind, _target in edges))
+        elif term.startswith("ret"):
+            terminal.append(("ret",))
+        elif term == "jmp <ext>":
+            terminal.append(("jmp-ext",))
+        elif term:
+            terminal.append((term,))
+        else:
+            terminal.append(())
+    return tuple(
+        (
+            terminal[index],
+            tuple(outgoing[index]),
+            tuple(sorted(incoming[index])),
+        )
+        for index in range(len(cfg))
+    )
+
+
+def signature_edge_delta(candidate: tuple, retail: tuple) -> int:
+    from collections import Counter
+
+    def edges(signature: tuple) -> Counter:
+        return Counter(
+            (source, kind, target)
+            for source, (_terminal, outgoing, _incoming) in enumerate(signature)
+            for kind, target in outgoing
+        )
+
+    candidate_edges = edges(candidate)
+    retail_edges = edges(retail)
+    return sum((candidate_edges - retail_edges).values()) + sum(
+        (retail_edges - candidate_edges).values()
+    )
+
+
+def signature_predecessor_delta(candidate: tuple, retail: tuple) -> int:
+    delta = abs(len(candidate) - len(retail))
+    for index in range(min(len(candidate), len(retail))):
+        if candidate[index][2] != retail[index][2]:
+            delta += 1
+    return delta
+
+
+def structural_frontier(candidate_cfg: list, retail_cfg: list) -> dict[str, int | str | None]:
+    """Measure the exact flow-and-instruction-count prefix of two CFGs.
+
+    This is an experimental clue metric, not an exactness criterion. It answers
+    how far block-by-block reconstruction proceeds before the first structural
+    disagreement, even when a lower fuzzy score reaches farther than MAX.
+    """
+    leading_blocks = 0
+    leading_instructions = 0
+    shared_blocks = min(len(candidate_cfg), len(retail_cfg))
+    for index in range(shared_blocks):
+        candidate_body, candidate_term = candidate_cfg[index][1:]
+        retail_body, retail_term = retail_cfg[index][1:]
+        if candidate_term != retail_term:
+            kind = (
+                "target_shift"
+                if _branch_kind(candidate_term, index)
+                == _branch_kind(retail_term, index)
+                else "flow_kind"
+            )
+            return {
+                "leading_exact_blocks": leading_blocks,
+                "leading_exact_instructions": leading_instructions,
+                "first_structural_divergence": index,
+                "first_structural_divergence_kind": kind,
+            }
+        if len(candidate_body) != len(retail_body):
+            return {
+                "leading_exact_blocks": leading_blocks,
+                "leading_exact_instructions": leading_instructions,
+                "first_structural_divergence": index,
+                "first_structural_divergence_kind": "size_only",
+            }
+        leading_blocks += 1
+        leading_instructions += len(retail_body)
+    if len(candidate_cfg) != len(retail_cfg):
+        return {
+            "leading_exact_blocks": leading_blocks,
+            "leading_exact_instructions": leading_instructions,
+            "first_structural_divergence": shared_blocks,
+            "first_structural_divergence_kind": "missing",
+        }
+    return {
+        "leading_exact_blocks": leading_blocks,
+        "leading_exact_instructions": leading_instructions,
+        "first_structural_divergence": None,
+        "first_structural_divergence_kind": None,
+    }
+
+
+def cfg_topology_metrics(
+    candidate_text: str, retail_text: str
+) -> dict[str, int | bool | str | None]:
+    """Measure CFG proximity independently from byte-level fuzzy similarity."""
+    candidate_cfg = _cfg(candidate_text)
+    retail_cfg = _cfg(retail_text)
+    candidate_signature = canonical_cfg_signature(candidate_cfg)
+    retail_signature = canonical_cfg_signature(retail_cfg)
+    counts = {
+        "exact": 0,
+        "size_only": 0,
+        "target_shift": 0,
+        "flow_kind": 0,
+        "missing": abs(len(candidate_cfg) - len(retail_cfg)),
+    }
+    for index in range(min(len(candidate_cfg), len(retail_cfg))):
+        candidate_body, candidate_term = candidate_cfg[index][1:]
+        retail_body, retail_term = retail_cfg[index][1:]
+        candidate_kind = _branch_kind(candidate_term, index)
+        retail_kind = _branch_kind(retail_term, index)
+        if candidate_term == retail_term:
+            if len(candidate_body) == len(retail_body):
+                counts["exact"] += 1
+            else:
+                counts["size_only"] += 1
+        elif candidate_kind == retail_kind:
+            counts["target_shift"] += 1
+        else:
+            counts["flow_kind"] += 1
+    return {
+        "candidate_blocks": len(candidate_cfg),
+        "retail_blocks": len(retail_cfg),
+        "block_count_delta": abs(len(candidate_cfg) - len(retail_cfg)),
+        "graph_exact": candidate_signature == retail_signature,
+        "labeled_edge_delta": signature_edge_delta(
+            candidate_signature, retail_signature
+        ),
+        "predecessor_delta": signature_predecessor_delta(
+            candidate_signature, retail_signature
+        ),
+        "candidate_graph_sha": sha256_bytes(
+            repr(candidate_signature).encode("utf-8")
+        )[:16],
+        "retail_graph_sha": sha256_bytes(
+            repr(retail_signature).encode("utf-8")
+        )[:16],
+        **structural_frontier(candidate_cfg, retail_cfg),
+        **counts,
+        "flow_exact": (
+            len(candidate_cfg) == len(retail_cfg)
+            and counts["target_shift"] == 0
+            and counts["flow_kind"] == 0
+        ),
+    }
+
+
+def topology_rank(metrics: dict[str, int | bool | str], score: float) -> tuple:
+    """Lower is better; fuzzy score breaks otherwise identical CFG ties."""
+    return (
+        metrics["block_count_delta"],
+        metrics["labeled_edge_delta"],
+        metrics["predecessor_delta"],
+        metrics["flow_kind"],
+        metrics["target_shift"],
+        metrics["size_only"],
+        -metrics["exact"],
+        -score,
+    )
+
+
+def structural_frontier_rank(
+    metrics: dict[str, int | bool | str | None], score: float
+) -> tuple:
+    """Lower is better; rank the farthest exact structural prefix first."""
+    return (
+        -int(metrics["leading_exact_blocks"]),
+        -int(metrics["leading_exact_instructions"]),
+        metrics["block_count_delta"],
+        metrics["labeled_edge_delta"],
+        metrics["predecessor_delta"],
+        metrics["flow_kind"],
+        metrics["target_shift"],
+        metrics["size_only"],
+        -metrics["exact"],
+        -score,
+    )
+
+
+def object_topology_metrics(
+    candidate_obj: Path, retail_obj: Path, symbol: str
+) -> dict[str, int | bool | str]:
+    return cfg_topology_metrics(
+        disassemble_symbol(candidate_obj, symbol),
+        disassemble_symbol(retail_obj, symbol),
+    )
 
 
 def _terminate_process_group(process: subprocess.Popen) -> tuple[str, str]:
@@ -1680,10 +1930,19 @@ def main(argv: list[str] | None = None) -> int:
     retail_target = retail_metrics.get(target.symbol, {})
     retail_target["codeview_size"] = target.retail_size
     baseline_score = baseline_scores[target.symbol]
+    with measure_stage(timings, "baseline_topology"):
+        retail_assembly = disassemble_symbol(
+            baseline_target_normalized, target.symbol
+        )
+        baseline_topology = cfg_topology_metrics(
+            disassemble_symbol(baseline_normalized, target.symbol),
+            retail_assembly,
+        )
     manifest["baseline"] = {
         "score": baseline_score,
         "candidate": baseline_target,
         "retail": retail_target,
+        "topology": baseline_topology,
     }
     print(
         f"target {target.unit} {target.symbol} RVA 0x{target.rva:x}: "
@@ -1692,16 +1951,37 @@ def main(argv: list[str] | None = None) -> int:
         flush=True,
     )
     if args.retain_best:
-        preserve_best_objects(
+        preserve_comparison_objects(
             output,
             baseline_obj,
             baseline_normalized,
             baseline_target_normalized,
+            "best",
+        )
+        preserve_comparison_objects(
+            output,
+            baseline_obj,
+            baseline_normalized,
+            baseline_target_normalized,
+            "best-topology",
+        )
+        preserve_comparison_objects(
+            output,
+            baseline_obj,
+            baseline_normalized,
+            baseline_target_normalized,
+            "best-structural-frontier",
         )
 
     observed_states = {}
 
-    def observe_state(label: str, score: float, metrics: dict, variant: Variant | None = None):
+    def observe_state(
+        label: str,
+        score: float,
+        metrics: dict,
+        topology: dict,
+        variant: Variant | None = None,
+    ):
         state_id = target_state_identity(metrics)
         state = observed_states.setdefault(
             state_id,
@@ -1717,6 +1997,7 @@ def main(argv: list[str] | None = None) -> int:
                 "objdiff_size": metrics.get("objdiff_size"),
                 "relocs": metrics["relocs"],
                 "scores": [],
+                "topology": topology,
                 "occurrences": 0,
                 "trials": [],
                 "baseline": False,
@@ -1746,7 +2027,9 @@ def main(argv: list[str] | None = None) -> int:
                 }
         return state_id
 
-    observe_state("baseline", baseline_score, baseline_target)
+    baseline_state_id = observe_state(
+        "baseline", baseline_score, baseline_target, baseline_topology
+    )
 
     best_score = baseline_score
     best_observed = None
@@ -1755,7 +2038,33 @@ def main(argv: list[str] | None = None) -> int:
         "trial": None,
         "score": baseline_score,
         "score_delta": 0.0,
+        "state": baseline_state_id,
         "candidate": baseline_target,
+        "topology": baseline_topology,
+        "body": "",
+        "permutation": (),
+    }
+    best_topology_key = topology_rank(baseline_topology, baseline_score)
+    best_topology_origin = {
+        "origin": "baseline",
+        "trial": None,
+        "score": baseline_score,
+        "score_delta": 0.0,
+        "state": baseline_state_id,
+        "candidate": baseline_target,
+        "topology": baseline_topology,
+        "body": "",
+        "permutation": (),
+    }
+    best_frontier_key = structural_frontier_rank(baseline_topology, baseline_score)
+    best_frontier_origin = {
+        "origin": "baseline",
+        "trial": None,
+        "score": baseline_score,
+        "score_delta": 0.0,
+        "state": baseline_state_id,
+        "candidate": baseline_target,
+        "topology": baseline_topology,
         "body": "",
         "permutation": (),
     }
@@ -1813,6 +2122,7 @@ def main(argv: list[str] | None = None) -> int:
                 "score": None,
                 "score_delta": None,
                 "candidate": None,
+                "topology": None,
                 "canonical_target_source_hash": candidate_target_hash,
                 "include_macro_guard": include_guard,
                 "observed": False,
@@ -1858,10 +2168,18 @@ def main(argv: list[str] | None = None) -> int:
                     trial["rejections"].append("target absent from candidate object/diff")
                 else:
                     target_metrics["objdiff_size"] = sizes.get(target.symbol)
+                    with measure_stage(timings, "trial_topology"):
+                        topology = cfg_topology_metrics(
+                            disassemble_symbol(trial_normalized, target.symbol),
+                            retail_assembly,
+                        )
                     trial["score"] = score
                     trial["score_delta"] = score - baseline_score
                     trial["candidate"] = target_metrics
-                    trial["state"] = observe_state("trial", score, target_metrics, variant)
+                    trial["topology"] = topology
+                    trial["state"] = observe_state(
+                        "trial", score, target_metrics, topology, variant
+                    )
                     with measure_stage(timings, "target_gates"):
                         candidate_size = target_metrics.get("objdiff_size")
                         if candidate_size is None:
@@ -1889,16 +2207,67 @@ def main(argv: list[str] | None = None) -> int:
                             "tag": trial["tag"],
                             "score": score,
                             "score_delta": trial["score_delta"],
+                            "state": trial["state"],
                             "candidate": target_metrics,
+                            "topology": topology,
                             "body": trial["body"],
                             "permutation": trial["permutation"],
                         }
                         if args.retain_best:
-                            preserve_best_objects(
+                            preserve_comparison_objects(
                                 output,
                                 trial_obj,
                                 trial_normalized,
                                 trial_target_normalized,
+                                "best",
+                            )
+                    trial_topology_key = topology_rank(topology, score)
+                    if trial["observed"] and trial_topology_key < best_topology_key:
+                        best_topology_key = trial_topology_key
+                        best_topology_origin = {
+                            "origin": "trial",
+                            "trial": trial["trial"],
+                            "family": trial["family"],
+                            "tag": trial["tag"],
+                            "score": score,
+                            "score_delta": trial["score_delta"],
+                            "state": trial["state"],
+                            "candidate": target_metrics,
+                            "topology": topology,
+                            "body": trial["body"],
+                            "permutation": trial["permutation"],
+                        }
+                        if args.retain_best:
+                            preserve_comparison_objects(
+                                output,
+                                trial_obj,
+                                trial_normalized,
+                                trial_target_normalized,
+                                "best-topology",
+                            )
+                    trial_frontier_key = structural_frontier_rank(topology, score)
+                    if trial["observed"] and trial_frontier_key < best_frontier_key:
+                        best_frontier_key = trial_frontier_key
+                        best_frontier_origin = {
+                            "origin": "trial",
+                            "trial": trial["trial"],
+                            "family": trial["family"],
+                            "tag": trial["tag"],
+                            "score": score,
+                            "score_delta": trial["score_delta"],
+                            "state": trial["state"],
+                            "candidate": target_metrics,
+                            "topology": topology,
+                            "body": trial["body"],
+                            "permutation": trial["permutation"],
+                        }
+                        if args.retain_best:
+                            preserve_comparison_objects(
+                                output,
+                                trial_obj,
+                                trial_normalized,
+                                trial_target_normalized,
+                                "best-structural-frontier",
                             )
                 trial_obj.unlink(missing_ok=True)
                 Path(str(trial_obj) + ".d").unlink(missing_ok=True)
@@ -1967,6 +2336,12 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"  state {index:02d} {state['state']}: {source}; occurrences={state['occurrences']} "
             f"scores={scores}% size={state['objdiff_size']} "
+            f"blocks={state['topology']['candidate_blocks']}/"
+            f"{state['topology']['retail_blocks']} "
+            f"edges={state['topology']['labeled_edge_delta']} "
+            f"pred={state['topology']['predecessor_delta']} "
+            f"flow={state['topology']['flow_kind']} "
+            f"shift={state['topology']['target_shift']} "
             f"retail-byte-delta={len(state['retail_byte_differences'])} "
             f"text={state['text_sha']} relocs={state['normalized_reloc_sha']} "
             f"raw-label-spellings={len(state['raw_reloc_detail_shas'])}{permutation}",
@@ -1985,7 +2360,7 @@ def main(argv: list[str] | None = None) -> int:
         state_summary_output.write_text(
             json.dumps(
                 {
-                    "schema": 2,
+                    "schema": 3,
                     "source": str(source_rel),
                     "target": manifest["target"],
                     "seed": args.seed,
@@ -1998,6 +2373,18 @@ def main(argv: list[str] | None = None) -> int:
                     "insertion": args.insertion,
                     "layer": layer,
                     "retail": retail_target,
+                    "best_fuzzy": {
+                        key: best_origin.get(key)
+                        for key in ("origin", "trial", "state", "score", "topology")
+                    },
+                    "best_topology": {
+                        key: best_topology_origin.get(key)
+                        for key in ("origin", "trial", "state", "score", "topology")
+                    },
+                    "best_structural_frontier": {
+                        key: best_frontier_origin.get(key)
+                        for key in ("origin", "trial", "state", "score", "topology")
+                    },
                     "states": state_rows,
                     "state_byte_delta_matrix": state_byte_delta_matrix,
                 },
@@ -2012,17 +2399,37 @@ def main(argv: list[str] | None = None) -> int:
             "score": best_observed["score"],
             "score_delta": best_observed["score_delta"],
             "candidate": best_observed["candidate"],
+            "topology": best_observed["topology"],
             "permutation": best_observed["permutation"],
             "source_hash_unchanged": True,
             "generated_noise_retained": False,
         }
     if args.retain_best:
-        best_paths = write_best_disassembly(output, target.symbol)
+        best_paths = write_comparison_disassembly(output, target.symbol, "best")
         manifest["best_retained"] = {
             **best_origin,
             "source_hash_unchanged": True,
             "generated_noise_retained_in_source": False,
             "artifacts": best_paths,
+        }
+        best_topology_paths = write_comparison_disassembly(
+            output, target.symbol, "best-topology"
+        )
+        manifest["best_topology_retained"] = {
+            **best_topology_origin,
+            "source_hash_unchanged": True,
+            "generated_noise_retained_in_source": False,
+            "artifacts": best_topology_paths,
+        }
+        best_frontier_paths = write_comparison_disassembly(
+            output, target.symbol, "best-structural-frontier"
+        )
+        manifest["best_structural_frontier_retained"] = {
+            **best_frontier_origin,
+            "source_hash_unchanged": True,
+            "generated_noise_retained_in_source": False,
+            "experimental_metric": True,
+            "artifacts": best_frontier_paths,
         }
     if exact_closure is not None:
         manifest["exact_closure"] = {
@@ -2094,8 +2501,41 @@ def main(argv: list[str] | None = None) -> int:
                 f"{best_observed['score']:.6f}% (trial {best_observed['trial']}); "
                 "no audited exact closure; source restored",
             )
+        topology_trial = best_topology_origin["trial"]
+        topology_source = (
+            "baseline" if topology_trial is None else f"trial {topology_trial}"
+        )
+        topology = best_topology_origin["topology"]
+        print(
+            f"best topology {topology_source}: "
+            f"{topology['candidate_blocks']}/{topology['retail_blocks']} blocks, "
+            f"labeled-edge-delta={topology['labeled_edge_delta']}, "
+            f"predecessor-delta={topology['predecessor_delta']}, "
+            f"flow-kind={topology['flow_kind']}, "
+            f"target-shift={topology['target_shift']}, "
+            f"size-only={topology['size_only']}; "
+            f"fuzzy={best_topology_origin['score']:.6f}%"
+        )
+        frontier_trial = best_frontier_origin["trial"]
+        frontier_source = (
+            "baseline" if frontier_trial is None else f"trial {frontier_trial}"
+        )
+        frontier = best_frontier_origin["topology"]
+        divergence = frontier["first_structural_divergence"]
+        divergence_text = (
+            "none"
+            if divergence is None
+            else f"B{divergence}:{frontier['first_structural_divergence_kind']}"
+        )
+        print(
+            f"best structural frontier (experimental) {frontier_source}: "
+            f"{frontier['leading_exact_blocks']} blocks/"
+            f"{frontier['leading_exact_instructions']} instructions, "
+            f"first-divergence={divergence_text}; "
+            f"fuzzy={best_frontier_origin['score']:.6f}%"
+        )
         if retained_output is not None:
-            print(f"best objects and assembly retained: {retained_output}")
+            print(f"best fuzzy and topology objects retained: {retained_output}")
         if args.record_max:
             state = manifest["record_max"]
             if state["updated"]:

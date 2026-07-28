@@ -80,12 +80,18 @@ only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not
 because several distinct objects may share one percentage. Public target identities, relocation
 sites/types/addends, and all other spellings remain part of the state. The report also counts the
 raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
-JSON census with one complete reproducible probe body and atom permutation per state. With
-`--retain-best`, only the best sub-100 COFF pair and assembly are kept. Each state also records the ordered list of
-every trial that reached it, so occurrence populations and representative selection can be
-reproduced after the temporary objects are removed. This summary is diagnostic evidence only: it
-does not update a retained maximum. If one normalized state ever receives multiple fuzzy scores,
-the census reports the complete score set instead of silently choosing one.
+JSON census with one complete reproducible probe body and atom permutation per state. Each state
+also records its block count and aligned flow/size classification. With `--retain-best`, two
+independent sub-100 COFF/assembly pairs are kept: `best.*` for fuzzy score and
+`best-topology.*` for CFG proximity. Topology canonicalizes block labels by entry-rooted traversal
+of labeled `jcc`, `fall`, and `jmp` edges, records both successor and predecessor structure, and
+ranks block-count delta, labeled-edge and predecessor deltas, flow-kind mismatches, shifted block
+targets, and size-only blocks before using fuzzy score as a tie-breaker.
+Each state also records the ordered list of every trial that reached it, so occurrence populations
+and representative selection can be reproduced after the temporary objects are removed. This
+summary is diagnostic evidence only: it does not update a retained maximum. If one normalized
+state ever receives multiple fuzzy scores, the census reports the complete score set instead of
+silently choosing one.
 
 The historical recovery driver also retires target-local `OD_STEER` in this loop. It scopes the
 edit to the exact target's `VA(...)` block, searches the clean source again, rebuilds the canonical
@@ -133,9 +139,10 @@ summary and successful manifest separately report compile, target-integrity, obj
 COFF-metric, and regression-gate costs.
 
 The default is diagnostic-only. Add `--record-max` to raise the unchanged target's
-hash-scoped maximum to its best observed score. Add `--retain-best` to preserve paired
-candidate/retail objects, disassemblies, an assembly diff, and the reproducible best probe
-manifest under `build/`. Generated probe text is never retained in reconstructed source.
+hash-scoped maximum to its best observed score. Add `--retain-best` to preserve independent
+best-fuzzy and best-topology candidate/retail objects, disassemblies, assembly diffs, and the
+reproducible probe manifest under `build/`. Generated probe text is never retained in
+reconstructed source.
 
 An accepted closure contributes to the hash-scoped `functions exact-max` and `fuzzy-max`
 metrics. It does not contribute to live `functions exact` or `fuzzy`: those continue to
@@ -226,10 +233,11 @@ under the matcher guide.
 
 An exact-100 run, or a clean run requested with `--retain-best`, preserves `manifest.json`. It records the commit, source
 hash, compiler flags, each seed-derived tag and complete generated probe body, every score, target
-text/relocation metrics, rejection reasons, and the best observed disposable trial from that
-successful run. `trials.tsv` is its compact score/family/rejection log. No generated `.cpp` or patch
-is emitted. The preserved artifact retains the seed, tag, complete winning snippet, paired objects,
-disassemblies, and diff for audit and later structural work, but never a source patch.
+text/relocation/topology metrics, rejection reasons, and both the best-fuzzy and best-topology
+disposable trials from that successful run. `trials.tsv` is its compact score/family/rejection
+log. No generated `.cpp` or patch is emitted. The preserved artifact retains the seed, tag,
+complete winning snippets, paired objects, disassemblies, and diffs for audit and later structural
+work, but never a source patch.
 
 `--record-max` is the only optional repository mutation. It runs after byte-for-byte source
 restoration and uses the project's normalized `source_hashes()` API. The mode requires exactly
