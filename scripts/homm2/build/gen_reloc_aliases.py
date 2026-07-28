@@ -64,7 +64,8 @@ def load_manifest_symbols(path):
 
 
 def collect_proofs(base_dir, target_dir, report_path, symbols_path, data_manifest_path):
-    public_data, function_rvas = load_retail_symbols(symbols_path)
+    public_data, function_rvas, _function_sizes = load_retail_symbols(
+        symbols_path)
     symbols, data, _duplicates = load_symbols()
     manifest_symbols, unique_manifest_symbols = load_manifest_symbols(
         data_manifest_path)

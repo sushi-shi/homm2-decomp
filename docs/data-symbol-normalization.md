@@ -36,6 +36,20 @@ Thus neither a compiler-private counter nor an alternate external alias is
 itself matching evidence: resolved identity, addend, payload, occurrence, and
 topology are the evidence.
 
+The paired target also receives a local `$fnpad@<offset>` boundary symbol after
+each function whose delinked `.text` span runs past the reviewed retail size in
+`build/gen/symbol_names.csv` and whose remainder is one to fifteen bytes of
+pure `0x90`/`0xCC` linker alignment fill. The delinked blob attributes that
+fill to the preceding provisional span even though padding is not part of any
+function. Objdiff strips such fill by itself only when the tail is code; a
+function that ends in embedded switch-table data would otherwise keep foreign
+fill inside its compared extent and could never observe an exact score. The
+boundary symbol restores the reviewed size as the comparison extent without
+deleting, masking, or reordering any byte, so a candidate that is genuinely
+longer than retail stops pairing its overflow against linker fill. A span
+remainder containing any other byte value, sixteen or more fill bytes, or a
+function without a reviewed size claim is left untouched.
+
 Anonymous definitions use these forms:
 
 ```text

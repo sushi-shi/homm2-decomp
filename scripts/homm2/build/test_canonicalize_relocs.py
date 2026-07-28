@@ -153,5 +153,83 @@ class CoffOwnerRewriteTest(unittest.TestCase):
             self.assertEqual(relocation_names, ["__open", "_open"])
 
 
+class AlignmentBoundaryTest(unittest.TestCase):
+    FUNCTION_TYPE = 0x20
+
+    def _coff(self, text, extra_symbols=()):
+        obj = make_coff(
+            [SectionSpec(".text", bytes(text), TEXT)],
+            [("function", 0, 1, self.FUNCTION_TYPE, 2)] + list(extra_symbols))
+        directory = TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        path = Path(directory.name) / "test.obj"
+        path.write_bytes(obj)
+        return path
+
+    def _boundaries(self, path):
+        parsed = CoffFile(path)
+        return [(symbol.name, symbol.value, symbol.section)
+                for symbol in parsed.symbols.values()
+                if symbol.name.startswith("$fnpad@")]
+
+    def test_pure_nop_fill_before_next_symbol_is_bounded(self):
+        path = self._coff(
+            b"\xc3\x90\x90\x90" + bytes(4),
+            [("next_function", 4, 1, self.FUNCTION_TYPE, 2)])
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertTrue(coff.add_alignment_boundary(function, 1))
+        coff.finish()
+
+        self.assertEqual(self._boundaries(path), [("$fnpad@1", 1, 1)])
+
+    def test_int3_fill_before_section_end_is_bounded(self):
+        path = self._coff(b"\xc3\xcc\xcc\xcc")
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertTrue(coff.add_alignment_boundary(function, 1))
+        coff.finish()
+
+        self.assertEqual(self._boundaries(path), [("$fnpad@1", 1, 1)])
+
+    def test_non_fill_byte_keeps_the_span_unbounded(self):
+        path = self._coff(b"\xc3\x90\x04\x90")
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertFalse(coff.add_alignment_boundary(function, 1))
+        coff.finish()
+
+        self.assertEqual(self._boundaries(path), [])
+
+    def test_fill_of_sixteen_or_more_bytes_is_not_alignment(self):
+        path = self._coff(b"\xc3" + b"\x90" * 16)
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertFalse(coff.add_alignment_boundary(function, 1))
+
+    def test_exact_span_needs_no_boundary(self):
+        path = self._coff(
+            b"\xc3\x90\x90\x90" + bytes(4),
+            [("next_function", 4, 1, self.FUNCTION_TYPE, 2)])
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertFalse(coff.add_alignment_boundary(function, 4))
+
+    def test_claim_beyond_span_is_rejected(self):
+        path = self._coff(
+            b"\xc3\x90\x90\x90" + bytes(4),
+            [("next_function", 4, 1, self.FUNCTION_TYPE, 2)])
+        coff = CoffFile(path)
+        function = coff.unique_text_functions()["function"]
+
+        self.assertFalse(coff.add_alignment_boundary(function, 5))
+        self.assertFalse(coff.add_alignment_boundary(function, 0))
+
+
 if __name__ == "__main__":
     unittest.main()

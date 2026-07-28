@@ -21,6 +21,18 @@ sites when both names resolve to the same unique public RVA and carry the same
 COFF addend. The disposable target receives a separate undefined COFF symbol
 for each proven identity, so a synthetic symbol shared by unrelated relocations
 is never renamed globally. Input and output paths must differ.
+
+The pass also appends a local ``$fnpad@<offset>`` boundary symbol after each
+function whose delinked ``.text`` span runs past its reviewed retail size and
+whose remainder is one to fifteen bytes of pure ``0x90``/``0xCC`` alignment
+fill. The delinked blob attributes that linker fill to the preceding function
+span; padding is not part of any function, and objdiff only strips it by
+itself when the tail is code. A function that ends in embedded switch-table
+data otherwise keeps the fill inside its compared extent and can never reach
+an exact score. The boundary symbol restores the reviewed size as the
+comparison extent without deleting, masking, or reordering any byte. A span
+whose remainder contains any other byte value, exceeds fifteen bytes, or has
+no reviewed size claim is left untouched.
 """
 
 import argparse
@@ -41,6 +53,9 @@ DIR32 = 0x0006
 REL32 = 0x0014
 SYMBOL_SIZE = 18
 OUTPUT_MARKER = ".homm2-reloc-canonical"
+SYM_CLASS_STATIC = 3
+ALIGNMENT_FILL = {0x90, 0xCC}
+ALIGNMENT_FILL_LIMIT = 16
 
 
 class Section(NamedTuple):
@@ -106,6 +121,7 @@ class CoffFile:
         self.relocations = self._read_relocations()
         self._string_offsets = self._read_string_offsets()
         self._new_symbols = {}
+        self._new_boundaries = []
 
     def _read_sections(self, first):
         sections = []
@@ -173,6 +189,36 @@ class CoffFile:
         return {name: symbols[0] for name, symbols in found.items()
                 if len(symbols) == 1}
 
+    def add_alignment_boundary(self, function, claimed_size):
+        """Bound one function span at its reviewed size across proven fill.
+
+        Returns True only when the span between the claimed end and the next
+        symbol (or section end) is one to fifteen bytes of pure 0x90/0xCC
+        linker alignment fill. Anything else leaves the object unchanged.
+        """
+        if claimed_size <= 0:
+            return False
+        section = self.sections[function.section - 1]
+        if section.raw_offset == 0:
+            return False
+        claim_end = function.value + claimed_size
+        span_end = min(
+            (symbol.value for symbol in self.symbols.values()
+             if symbol.section == function.section
+             and symbol.value > function.value),
+            default=section.raw_size)
+        if not claim_end < span_end <= section.raw_size:
+            return False
+        if span_end - claim_end >= ALIGNMENT_FILL_LIMIT:
+            return False
+        fill = self.data[section.raw_offset + claim_end:
+                         section.raw_offset + span_end]
+        if any(byte not in ALIGNMENT_FILL for byte in fill):
+            return False
+        self._new_boundaries.append(
+            ("$fnpad@%x" % claim_end, claim_end, function.section))
+        return True
+
     def patch_dir32(self, function, site, expected_symbol, new_symbol, addend):
         absolute_site = function.value + site
         reloc = self.relocations.get((function.section, absolute_site))
@@ -205,44 +251,54 @@ class CoffFile:
         return True
 
     def finish(self):
-        if not self._new_symbols:
+        if not self._new_symbols and not self._new_boundaries:
             self.path.write_bytes(self.data)
             return
         string_table = bytearray(
             self.data[self.string_offset:self.string_offset + self.string_size])
         records = bytearray()
-        for name, _symbol_index in sorted(
-                self._new_symbols.items(), key=lambda item: item[1]):
+
+        def name_field(name):
             encoded = name.encode("latin-1")
             if len(encoded) <= 8:
-                name_field = encoded.ljust(8, b"\0")
-            else:
-                string_offset = self._string_offsets.get(encoded)
-                if string_offset is None:
-                    string_offset = len(string_table)
-                    self._string_offsets[encoded] = string_offset
-                    string_table.extend(encoded + b"\0")
-                name_field = struct.pack("<II", 0, string_offset)
-            records.extend(name_field)
+                return encoded.ljust(8, b"\0")
+            string_offset = self._string_offsets.get(encoded)
+            if string_offset is None:
+                string_offset = len(string_table)
+                self._string_offsets[encoded] = string_offset
+                string_table.extend(encoded + b"\0")
+            return struct.pack("<II", 0, string_offset)
+
+        for name, _symbol_index in sorted(
+                self._new_symbols.items(), key=lambda item: item[1]):
+            records.extend(name_field(name))
             records.extend(struct.pack("<IhHBB", 0, 0, 0, 2, 0))
+        for name, value, section in sorted(
+                self._new_boundaries, key=lambda item: (item[2], item[1])):
+            records.extend(name_field(name))
+            records.extend(struct.pack(
+                "<IhHBB", value, section, 0, SYM_CLASS_STATIC, 0))
         struct.pack_into("<I", string_table, 0, len(string_table))
         self.data = (self.data[:self.string_offset] + records + string_table)
         struct.pack_into("<I", self.data, 12,
-                         self.symbol_count + len(self._new_symbols))
+                         self.symbol_count + len(self._new_symbols) +
+                         len(self._new_boundaries))
         self.path.write_bytes(self.data)
 
 
 def load_retail_symbols(path):
     public_data = {}
     function_rvas = {}
+    function_sizes = {}
     with open(path, encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
             if row.get("kind") == "func":
                 function_rvas[(row["unit"], row["name"])] = int(row["rva"], 0)
+                function_sizes[(row["unit"], row["name"])] = int(row["size"], 0)
             elif (row.get("kind") == "data" and
                   row.get("provenance") == "cv-public-data"):
                 public_data[row["name"]] = int(row["rva"], 0)
-    return public_data, function_rvas
+    return public_data, function_rvas, function_sizes
 
 
 def authorize_owner_alias(public_data, base_type, base_symbol, base_addend,
@@ -311,8 +367,8 @@ def record_site_coverage(coverage, base, target, symbols, data, duplicates):
     return True
 
 
-def canonicalize_unit(unit, names, public_data, function_rvas, symbols, data,
-                      duplicates, base_path, target_path):
+def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
+                      symbols, data, duplicates, base_path, target_path):
     base_sites = parse_obj(str(base_path), with_sites=True)
     target_sites = parse_obj(str(target_path), with_sites=True)
     target = CoffFile(target_path)
@@ -368,8 +424,17 @@ def canonicalize_unit(unit, names, public_data, function_rvas, symbols, data,
             patched_functions.add(name)
             patched_aliases.add((target_symbol, base_symbol, base_addend))
             patched_sites += 1
+    boundaries = 0
+    for name in sorted(names):
+        function = target_functions.get(name)
+        claimed_size = function_sizes.get((unit, name))
+        if function is None or claimed_size is None:
+            continue
+        if target.add_alignment_boundary(function, claimed_size):
+            boundaries += 1
     target.finish()
-    return len(patched_functions), len(patched_aliases), patched_sites, coverage
+    return (len(patched_functions), len(patched_aliases), patched_sites,
+            boundaries, coverage)
 
 
 def main(argv=None):
@@ -392,14 +457,16 @@ def main(argv=None):
             parser.error("--target and --output must differ")
         output.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(args.target, output)
-        public_data, function_rvas = load_retail_symbols(args.symbols)
+        public_data, function_rvas, function_sizes = load_retail_symbols(
+            args.symbols)
         symbols, data, duplicates = load_symbols()
         names = function_inventory(function_rvas).get(args.unit, set())
-        functions, aliases, sites, coverage = canonicalize_unit(
-            args.unit, names, public_data, function_rvas, symbols, data,
-            duplicates, Path(args.base), output)
-        print("canonicalized %d relocation sites (%d aliases, %d functions)" %
-              (sites, aliases, functions))
+        functions, aliases, sites, boundaries, coverage = canonicalize_unit(
+            args.unit, names, public_data, function_rvas, function_sizes,
+            symbols, data, duplicates, Path(args.base), output)
+        print("canonicalized %d relocation sites (%d aliases, %d functions, "
+              "%d alignment boundaries)" % (sites, aliases, functions,
+                                            boundaries))
         print("coverage: functions=%d paired_functions=%d base_sites=%d "
               "same_site_same_type=%d missing_target_site=%d type_mismatch=%d "
               "unresolved_base=%d unresolved_target=%d "
@@ -425,10 +492,11 @@ def main(argv=None):
     (output_dir / OUTPUT_MARKER).write_text(
         "generated by homm2.build.canonicalize_relocs\n")
 
-    public_data, function_rvas = load_retail_symbols(args.symbols)
+    public_data, function_rvas, function_sizes = load_retail_symbols(
+        args.symbols)
     symbols, data, duplicates = load_symbols()
     inventory = function_inventory(function_rvas)
-    function_count = alias_count = site_count = 0
+    function_count = alias_count = site_count = boundary_count = 0
     unit_count = 0
     coverage = Coverage()
     for unit, names in sorted(inventory.items()):
@@ -436,17 +504,20 @@ def main(argv=None):
         target_path = output_dir / (unit + ".c.obj")
         if not names or not base_path.exists() or not target_path.exists():
             continue
-        functions, aliases, sites, unit_coverage = canonicalize_unit(
-            unit, names, public_data, function_rvas, symbols, data,
-            duplicates, base_path, target_path)
+        functions, aliases, sites, boundaries, unit_coverage = canonicalize_unit(
+            unit, names, public_data, function_rvas, function_sizes, symbols,
+            data, duplicates, base_path, target_path)
         coverage.merge(unit_coverage)
+        boundary_count += boundaries
         if sites:
             unit_count += 1
             function_count += functions
             alias_count += aliases
             site_count += sites
-    print("canonicalized %d relocation sites (%d aliases, %d functions, %d units)" %
-          (site_count, alias_count, function_count, unit_count))
+    print("canonicalized %d relocation sites (%d aliases, %d functions, "
+          "%d units, %d alignment boundaries)" %
+          (site_count, alias_count, function_count, unit_count,
+           boundary_count))
     print("coverage: functions=%d paired_functions=%d base_sites=%d "
           "same_site_same_type=%d missing_target_site=%d type_mismatch=%d "
           "unresolved_base=%d unresolved_target=%d duplicate_string_ambiguity=%d "
