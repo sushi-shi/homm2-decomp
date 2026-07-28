@@ -55,14 +55,20 @@ from tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
     byte_differences,
+    canonical_cfg_signature,
     compile_object,
     exact_closure_rejections,
     normalized_relocation_stream,
     object_metrics,
     objdiff_scores,
     resolve_target,
+    signature_edge_delta,
+    signature_predecessor_delta,
+    structural_frontier,
+    structural_frontier_rank,
     target_state_identity,
     temporary_source,
+    topology_rank,
 )
 
 
@@ -109,8 +115,18 @@ def result_rank(row: dict, retail_size: int, retail_relocs: int):
     )
 
 
+def topology_result_rank(row: dict):
+    return (*topology_rank(row["blocks"], row["score"]), row["trial"])
+
+
+def structural_frontier_result_rank(row: dict):
+    return (*structural_frontier_rank(row["blocks"], row["score"]), row["trial"])
+
+
 def cfg_metrics(candidate_cfg, retail_cfg) -> dict:
     """Return the index-aligned structural signals shown by ``disasm --blocks``."""
+    candidate_signature = canonical_cfg_signature(candidate_cfg)
+    retail_signature = canonical_cfg_signature(retail_cfg)
     counts = {
         "exact": 0,
         "size_only": 0,
@@ -134,7 +150,27 @@ def cfg_metrics(candidate_cfg, retail_cfg) -> dict:
     return {
         "candidate_blocks": len(candidate_cfg),
         "retail_blocks": len(retail_cfg),
+        "block_count_delta": abs(len(candidate_cfg) - len(retail_cfg)),
+        "graph_exact": candidate_signature == retail_signature,
+        "labeled_edge_delta": signature_edge_delta(
+            candidate_signature, retail_signature
+        ),
+        "predecessor_delta": signature_predecessor_delta(
+            candidate_signature, retail_signature
+        ),
+        "candidate_graph_sha": sha256(
+            repr(candidate_signature).encode("utf-8")
+        )[:16],
+        "retail_graph_sha": sha256(
+            repr(retail_signature).encode("utf-8")
+        )[:16],
+        **structural_frontier(candidate_cfg, retail_cfg),
         **counts,
+        "flow_exact": (
+            len(candidate_cfg) == len(retail_cfg)
+            and counts["target_shift"] == 0
+            and counts["flow_kind"] == 0
+        ),
     }
 
 
@@ -491,7 +527,11 @@ def main(argv=None) -> int:
     exact_source = None
     baseline_summary = None
     best_object_rank = None
+    best_topology_object_rank = None
+    best_frontier_object_rank = None
     best_disasm = None
+    best_topology_disasm = None
+    best_frontier_disasm = None
     original_handler = signal.getsignal(signal.SIGTERM)
     restoration_conflict = False
     wall_time_reached = False
@@ -653,6 +693,7 @@ def main(argv=None) -> int:
                     "text_hex": candidate_target["text_hex"],
                     "normalized_reloc_sha": normalized_reloc_sha,
                     "normalized_reloc_stream": normalized_relocations,
+                    "blocks": row["blocks"],
                     "retail_byte_differences": byte_differences(
                         candidate_target["text_hex"], retail_target["text_hex"]
                     ),
@@ -671,6 +712,20 @@ def main(argv=None) -> int:
                 ):
                     shutil.copyfile(candidate_obj, scratch / "best.obj")
                     best_object_rank = rank
+                candidate_topology_rank = topology_result_rank(row)
+                if args.show_best_disasm and (
+                    best_topology_object_rank is None
+                    or candidate_topology_rank < best_topology_object_rank
+                ):
+                    shutil.copyfile(candidate_obj, scratch / "best-topology.obj")
+                    best_topology_object_rank = candidate_topology_rank
+                candidate_frontier_rank = structural_frontier_result_rank(row)
+                if args.show_best_disasm and (
+                    best_frontier_object_rank is None
+                    or candidate_frontier_rank < best_frontier_object_rank
+                ):
+                    shutil.copyfile(candidate_obj, scratch / "best-frontier.obj")
+                    best_frontier_object_rank = candidate_frontier_rank
                 if score > best_score:
                     best_score = score
                     print(
@@ -690,6 +745,20 @@ def main(argv=None) -> int:
                 ]
                 disassembly = subprocess.run(command, capture_output=True, text=True)
                 best_disasm = disassembly.stdout + disassembly.stderr
+            if args.show_best_disasm and best_topology_object_rank is not None:
+                command = [
+                    "llvm-objdump", "-dr", f"--disassemble-symbols={target.symbol}",
+                    str(scratch / "best-topology.obj"),
+                ]
+                disassembly = subprocess.run(command, capture_output=True, text=True)
+                best_topology_disasm = disassembly.stdout + disassembly.stderr
+            if args.show_best_disasm and best_frontier_object_rank is not None:
+                command = [
+                    "llvm-objdump", "-dr", f"--disassemble-symbols={target.symbol}",
+                    str(scratch / "best-frontier.obj"),
+                ]
+                disassembly = subprocess.run(command, capture_output=True, text=True)
+                best_frontier_disasm = disassembly.stdout + disassembly.stderr
     except KeyboardInterrupt:
         print("interrupted; source restored", file=sys.stderr)
         source_lock.close()
@@ -712,6 +781,14 @@ def main(argv=None) -> int:
         (row for row in results if row.get("score") is not None),
         key=lambda row: result_rank(row, target.retail_size, retail_target["relocs"]),
     )
+    topology_ranked = sorted(
+        (row for row in results if row.get("score") is not None),
+        key=topology_result_rank,
+    )
+    frontier_ranked = sorted(
+        (row for row in results if row.get("score") is not None),
+        key=structural_frontier_result_rank,
+    )
     summary = {
         "schema": 1,
         "source": str(source.relative_to(root)),
@@ -728,6 +805,8 @@ def main(argv=None) -> int:
         "source_restored": source.read_bytes() == original,
         "baseline": baseline_summary,
         "best": ranked[0] if ranked else None,
+        "best_topology": topology_ranked[0] if topology_ranked else None,
+        "best_structural_frontier": frontier_ranked[0] if frontier_ranked else None,
         "state_count": len(states),
         "states": sorted(
             states.values(),
@@ -741,14 +820,31 @@ def main(argv=None) -> int:
         label_names = [axis.name for axis in axes]
         if candidates:
             label_names.append("candidate")
-        writer.writerow(["trial", "score", "size", "relocs", "exact", *label_names])
+        writer.writerow([
+            "trial",
+            "score",
+            "size",
+            "relocs",
+            "exact",
+            "leading_exact_blocks",
+            "first_structural_divergence",
+            *label_names,
+        ])
         for row in ranked:
             writer.writerow([
                 row["trial"], row["score"], row["candidate_size"], row["candidate_relocs"],
-                row["exact"], *[row["choices"][name] for name in label_names],
+                row["exact"], row["blocks"]["leading_exact_blocks"],
+                row["blocks"]["first_structural_divergence"],
+                *[row["choices"][name] for name in label_names],
             ])
     if exact_source is not None:
         (output / "exact.cpp").write_bytes(exact_source)
+    if best_disasm is not None:
+        (output / "best.asm").write_text(best_disasm)
+    if best_topology_disasm is not None:
+        (output / "best-topology.asm").write_text(best_topology_disasm)
+    if best_frontier_disasm is not None:
+        (output / "best-structural-frontier.asm").write_text(best_frontier_disasm)
 
     disposition = (
         f"stopped after {len(results)}/{combinations} variants at the wall-time limit"
@@ -761,9 +857,50 @@ def main(argv=None) -> int:
             f"{row['score']:.6f}% size {row['candidate_size']} "
             f"relocs {row['candidate_relocs']}/{row['retail_relocs']} trial {row['trial']} {labels}"
         )
+    if topology_ranked:
+        row = topology_ranked[0]
+        blocks = row["blocks"]
+        labels = " ".join(f"{name}={value}" for name, value in row["choices"].items())
+        print(
+            "best topology "
+            f"{blocks['candidate_blocks']}/{blocks['retail_blocks']} blocks "
+            f"edges={blocks['labeled_edge_delta']} pred={blocks['predecessor_delta']} "
+            f"flow={blocks['flow_kind']} shift={blocks['target_shift']} "
+            f"fuzzy={row['score']:.6f}% trial {row['trial']} {labels}"
+        )
+    if frontier_ranked:
+        row = frontier_ranked[0]
+        blocks = row["blocks"]
+        labels = " ".join(f"{name}={value}" for name, value in row["choices"].items())
+        divergence = blocks["first_structural_divergence"]
+        divergence_text = (
+            "none"
+            if divergence is None
+            else f"B{divergence}:{blocks['first_structural_divergence_kind']}"
+        )
+        print(
+            "best structural frontier (experimental) "
+            f"{blocks['leading_exact_blocks']} blocks/"
+            f"{blocks['leading_exact_instructions']} instructions, "
+            f"first-divergence={divergence_text}; "
+            f"fuzzy={row['score']:.6f}% trial {row['trial']} {labels}"
+        )
     if best_disasm is not None:
-        print("--- best disposable candidate disassembly (object deleted after inspection) ---")
+        print("--- best-fuzzy disposable candidate disassembly (object deleted after inspection) ---")
         print(best_disasm.rstrip())
+    if best_topology_disasm is not None and best_topology_disasm != best_disasm:
+        print("--- best-topology disposable candidate disassembly (object deleted after inspection) ---")
+        print(best_topology_disasm.rstrip())
+    if (
+        best_frontier_disasm is not None
+        and best_frontier_disasm != best_disasm
+        and best_frontier_disasm != best_topology_disasm
+    ):
+        print(
+            "--- best-structural-frontier disposable candidate disassembly "
+            "(object deleted after inspection) ---"
+        )
+        print(best_frontier_disasm.rstrip())
     print(output)
     source_lock.close()
     return 0

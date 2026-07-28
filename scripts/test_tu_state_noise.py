@@ -253,6 +253,99 @@ class TuStateNoiseTests(unittest.TestCase):
             ],
         )
 
+    def test_cfg_topology_metrics_match_blocks_and_flow(self):
+        assembly = (
+            "0000: 74 01\tje\t0x3\n"
+            "0002: c3\tret\n"
+            "0003: c3\tret\n"
+        )
+        metrics = noise.cfg_topology_metrics(assembly, assembly)
+        self.assertEqual(metrics["candidate_blocks"], 3)
+        self.assertEqual(metrics["retail_blocks"], 3)
+        self.assertEqual(metrics["exact"], 3)
+        self.assertEqual(metrics["flow_kind"], 0)
+        self.assertEqual(metrics["target_shift"], 0)
+        self.assertTrue(metrics["flow_exact"])
+        self.assertTrue(metrics["graph_exact"])
+        self.assertEqual(metrics["labeled_edge_delta"], 0)
+        self.assertEqual(metrics["predecessor_delta"], 0)
+        self.assertEqual(metrics["leading_exact_blocks"], 3)
+        self.assertEqual(metrics["leading_exact_instructions"], 3)
+        self.assertIsNone(metrics["first_structural_divergence"])
+        self.assertIsNone(metrics["first_structural_divergence_kind"])
+
+    def test_canonical_cfg_signature_preserves_labeled_from_to_graph(self):
+        left = [
+            (0, [], "jcc B2 | fall B1"),
+            (1, [], "jmp B3"),
+            (2, [], "jmp B3"),
+            (3, [], "ret"),
+        ]
+        right = [
+            (0, [], "jcc B1 | fall B2"),
+            (1, [], "jmp B3"),
+            (2, [], "jmp B3"),
+            (3, [], "ret"),
+        ]
+        self.assertEqual(
+            noise.canonical_cfg_signature(left),
+            noise.canonical_cfg_signature(right),
+        )
+        changed = list(right)
+        changed[2] = (2, [], "ret")
+        self.assertNotEqual(
+            noise.canonical_cfg_signature(left),
+            noise.canonical_cfg_signature(changed),
+        )
+
+    def test_topology_rank_precedes_fuzzy_score(self):
+        exact_shape = {
+            "block_count_delta": 0,
+            "labeled_edge_delta": 0,
+            "predecessor_delta": 0,
+            "flow_kind": 0,
+            "target_shift": 0,
+            "size_only": 3,
+            "exact": 7,
+        }
+        extra_block = {
+            "block_count_delta": 1,
+            "labeled_edge_delta": 0,
+            "predecessor_delta": 0,
+            "flow_kind": 0,
+            "target_shift": 0,
+            "size_only": 0,
+            "exact": 20,
+        }
+        self.assertLess(
+            noise.topology_rank(exact_shape, 50.0),
+            noise.topology_rank(extra_block, 99.0),
+        )
+        self.assertLess(
+            noise.topology_rank(exact_shape, 90.0),
+            noise.topology_rank(exact_shape, 80.0),
+        )
+
+    def test_structural_frontier_rank_prefers_later_first_divergence(self):
+        earlier = {
+            "leading_exact_blocks": 3,
+            "leading_exact_instructions": 10,
+            "block_count_delta": 0,
+            "labeled_edge_delta": 0,
+            "predecessor_delta": 0,
+            "flow_kind": 0,
+            "target_shift": 0,
+            "size_only": 1,
+            "exact": 9,
+        }
+        later = dict(earlier)
+        later["leading_exact_blocks"] = 4
+        later["leading_exact_instructions"] = 12
+        self.assertLess(
+            noise.structural_frontier_rank(later, 70.0),
+            noise.structural_frontier_rank(earlier, 99.0),
+        )
+
     def test_trial_status_reports_only_target_observation_and_closure(self):
         self.assertEqual(
             noise.trial_status({
