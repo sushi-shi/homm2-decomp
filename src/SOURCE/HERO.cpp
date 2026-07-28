@@ -1187,7 +1187,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 
     if (message.type == HERO_UI_HOVER) {
         gpWindowManager->ConvertToHover(message);
-        if (gpWindowManager->m_lastHoverId == message.payload.hover.id)
+        if (message.payload.hover.id == gpWindowManager->m_lastHoverId)
             return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = message.payload.hover.id;
         UpdateHeroScreenStatusBar(message);
@@ -1302,7 +1302,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 0
                             );
                         } else {
-                            gpHVHero->m_eventFlags &= ~HERO_EVENT_GROUPED_FORMATION;
+                            gpHVHero->m_eventFlags = HeroEventFlag(
+                                static_cast<i32>(gpHVHero->m_eventFlags)
+                                & ~IDX(HERO_EVENT_GROUPED_FORMATION)
+                            );
                             SetupHeroView();
                             RedrawHeroScreen();
                         }
@@ -1324,7 +1327,10 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                 0
                             );
                         } else {
-                            gpHVHero->m_eventFlags |= HERO_EVENT_GROUPED_FORMATION;
+                            gpHVHero->m_eventFlags = HeroEventFlag(
+                                static_cast<i32>(gpHVHero->m_eventFlags)
+                                | IDX(HERO_EVENT_GROUPED_FORMATION)
+                            );
                             SetupHeroView();
                             RedrawHeroScreen();
                         }
@@ -1402,7 +1408,9 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         } else if ((quickView0 != 0
                                     && gpHVHero->m_army.m_creatureTypes[armySlot7]
                                            != CREATURE_NONE)
-                                   || (quickView0 == 0 && armySlot7 == giHeroScreenSrcIndex)) {
+                                   || (quickView0 == 0
+                                       && message.payload.widget.id - UI_ARMY_SELECTOR_FIRST
+                                              == giHeroScreenSrcIndex)) {
                             i32 canDismiss;
 
                             if (quickView0 == 0
