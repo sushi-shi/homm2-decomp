@@ -26,6 +26,7 @@ or a bounded source-variant search.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import csv
 import difflib
 import fcntl
@@ -1204,21 +1205,21 @@ def compile_object(
     flags: list[str],
     timeout_seconds: float,
 ) -> tuple[bool, str, bool]:
-    command = [
-        sys.executable,
-        "-m",
-        "homm2.build.cc_wrap",
-        "--out",
-        str(output),
-        "--src",
-        str(source),
-        "--",
-        *flags,
-    ]
-    returncode, stdout, stderr, timed_out = _run_command_with_timeout(
-        command, root, timeout_seconds
-    )
-    log = stdout + stderr
+    """Compile one disposable probe object through the in-process cc_wrap.
+
+    The shared toolchain/INCLUDE resolution and pure winepath spelling are
+    prepared once per process, so a trial pays only the wine cl child itself.
+    Probe objects never emit ninja depfiles. cc_wrap kills the compiler
+    process group itself when the per-call timeout expires.
+    """
+    from homm2.build.cc_wrap import run_compile
+
+    try:
+        returncode, log, timed_out = run_compile(
+            source, output, flags, depfile=False, cl_timeout=timeout_seconds
+        )
+    except RuntimeError as exc:
+        return False, f"{exc}\n", False
     if timed_out:
         output.unlink(missing_ok=True)
         Path(str(output) + ".d").unlink(missing_ok=True)
@@ -1700,6 +1701,15 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--seed", type=parse_int, default=0x484F4D32)
     parser.add_argument(
+        "--jobs", type=positive_count, default=1,
+        help=(
+            "compile this many trials concurrently from disposable source "
+            "copies beside the target; the reconstructed source is never "
+            "edited in parallel mode and every score is produced by the same "
+            "serial pipeline (default: 1, the in-place serial behavior)"
+        ),
+    )
+    parser.add_argument(
         "--insertion", choices=("target", "top"), default="target",
         help="insert immediately before the target or after the TU's leading include block",
     )
@@ -1843,6 +1853,7 @@ def main(argv: list[str] | None = None) -> int:
         "seed": args.seed,
         "generated_trial_horizon": args.trials,
         "selected_trials": sorted(args.only_trial) if args.only_trial else None,
+        "jobs": args.jobs,
         "layer": layer,
         "policy": {
             "parser_visible_temporary_probes": True,
@@ -2080,6 +2091,55 @@ def main(argv: list[str] | None = None) -> int:
         raise KeyboardInterrupt
 
     signal.signal(signal.SIGTERM, stop_for_signal)
+
+    def candidate_admissible(candidate: str, variant) -> tuple[str | None, dict]:
+        """Pure per-trial gates shared by the serial and parallel paths."""
+        candidate_target_hash = (
+            canonical_target_hash
+            if target_suffix_digest(candidate, target.va) == canonical_target_suffix_digest
+            else None
+        )
+        include_guard = include_macro_guard(
+            root, layer_body + variant.body, canonical_target_tokens
+        )
+        return candidate_target_hash, include_guard
+
+    precompiled: dict[int, tuple[bool, str, bool]] = {}
+    if args.jobs > 1 and variants:
+
+        def parallel_compile(variant):
+            candidate = insert_variant(
+                original, target, variant, args.insertion, layer_body
+            )
+            candidate_target_hash, include_guard = candidate_admissible(candidate, variant)
+            if candidate_target_hash != canonical_target_hash or not include_guard.get(
+                "passed", True
+            ):
+                return variant.trial, None
+            probe_source = target.source.with_name(
+                f".{target.source.stem}.trial{variant.trial:04d}{target.source.suffix}"
+            )
+            trial_obj = output / f"trial-{variant.trial:04d}.obj"
+            probe_source.write_bytes(candidate.encode("utf-8"))
+            try:
+                return variant.trial, compile_object(
+                    root,
+                    probe_source,
+                    trial_obj,
+                    flags,
+                    args.compile_timeout_seconds,
+                )
+            finally:
+                probe_source.unlink(missing_ok=True)
+
+        with measure_stage(timings, "trial_compile"):
+            with concurrent.futures.ThreadPoolExecutor(
+                max_workers=args.jobs
+            ) as pool:
+                for trial_index, result in pool.map(parallel_compile, variants):
+                    if result is not None:
+                        precompiled[trial_index] = result
+
     try:
         for variant in variants:
             candidate = insert_variant(
@@ -2088,27 +2148,24 @@ def main(argv: list[str] | None = None) -> int:
             candidate_bytes = candidate.encode("utf-8")
             trial_obj = output / f"trial-{variant.trial:04d}.obj"
             trial_generated = []
-            include_guard = include_macro_guard(
-                root, layer_body + variant.body, canonical_target_tokens
-            )
             compile_timed_out = False
-            with temporary_source(target.source, original_bytes, candidate_bytes):
-                with measure_stage(timings, "target_hash_check"):
-                    candidate_target_hash = (
-                        canonical_target_hash
-                        if target_suffix_digest(candidate, target.va) == canonical_target_suffix_digest
-                        else None
-                    )
-                if candidate_target_hash != canonical_target_hash:
-                    ok = False
-                    compile_log = (
-                        "canonical target normalized source hash changed: "
-                        f"{canonical_target_hash} -> {candidate_target_hash}\n"
-                    )
-                elif not include_guard.get("passed", True):
-                    ok = False
-                    compile_log = "include macro guard rejected candidate: " + json.dumps(include_guard) + "\n"
-                else:
+            with measure_stage(timings, "target_hash_check"):
+                candidate_target_hash, include_guard = candidate_admissible(
+                    candidate, variant
+                )
+            if candidate_target_hash != canonical_target_hash:
+                ok = False
+                compile_log = (
+                    "canonical target normalized source hash changed: "
+                    f"{canonical_target_hash} -> {candidate_target_hash}\n"
+                )
+            elif not include_guard.get("passed", True):
+                ok = False
+                compile_log = "include macro guard rejected candidate: " + json.dumps(include_guard) + "\n"
+            elif variant.trial in precompiled:
+                ok, compile_log, compile_timed_out = precompiled.pop(variant.trial)
+            else:
+                with temporary_source(target.source, original_bytes, candidate_bytes):
                     with measure_stage(timings, "trial_compile"):
                         ok, compile_log, compile_timed_out = compile_object(
                             root,

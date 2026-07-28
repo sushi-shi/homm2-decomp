@@ -669,10 +669,11 @@ class TuStateNoiseTests(unittest.TestCase):
             output = root / "candidate.obj"
             output.write_bytes(b"partial")
             Path(str(output) + ".d").write_bytes(b"partial dependency")
+            from homm2.build import cc_wrap
             with mock.patch.object(
-                noise,
-                "_run_command_with_timeout",
-                return_value=(-9, "compiler stdout\n", "compiler stderr\n", True),
+                cc_wrap,
+                "run_compile",
+                return_value=(-9, "compiler stdout\ncompiler stderr\n", True),
             ):
                 ok, log, timed_out = noise.compile_object(
                     root, root / "unit.cpp", output, ["/c"], 0.125
