@@ -30,7 +30,4 @@
 
 #endif
 
-#define OD_STEER(x) 0 [&(x)]
-#define OR_STEER(x) (x | 0)
-
 #endif
