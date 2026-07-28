@@ -445,17 +445,17 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     leftFlag = 0;
     isMovingRight = 0;
 
-    if (OR_STEER(sourceColumnCheck) < targetColumn)
+    if (sourceColumnCheck < targetColumn)
         isMovingRight = 1;
-    else if (OR_STEER(sourceColumnCheck) != targetColumn)
+    else if (sourceColumnCheck != targetColumn)
         leftFlag = 1;
 
-    if (OR_STEER(sourceRow) < targetRowValue)
+    if (sourceRow < targetRowValue)
         isMovingDown = 1;
-    else if (OR_STEER(sourceRow) != targetRowValue)
+    else if (sourceRow != targetRowValue)
         isMovingUp = 1;
 
-    if (OR_STEER(leftFlag) == isMovingRight) {
+    if (leftFlag == isMovingRight) {
         if (isMovingUp == 1) {
             if (sourceRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
