@@ -2373,7 +2373,7 @@ void army::PowEffect(
         }
     }
     frame = 0;
-    for (frame = 0; OD_STEER(effectFrames_1) > frame; frame++) {
+    for (frame = 0; effectFrames_1 > frame; frame++) {
         for (side_4 = COMBAT_ATTACKER_SIDE; IDX(side_4) < COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[IDX(side_4)]; index_10++) {
                 current = &gpCombatManager->m_armies[IDX(side_4)][index_10];
