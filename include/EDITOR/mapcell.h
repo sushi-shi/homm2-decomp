@@ -120,10 +120,13 @@ public:
             u16 m_objectLayerBit0 : 1;
             u16 m_objectLayerBit1 : 1;
             u16 m_objectDrawnAsOverlay : 1;
+            // Object-specific payload interpreted according to m_triggerType. It can
+            // encode an object id, quantity, flags, or packed event/site data.
             u16 m_objectMetadata : 13;
         };
         struct {
             u16 m_tentFlags : 3;
+            // Tent-specific view of the same object metadata payload.
             u16 m_tentColor : 13;
         };
     };

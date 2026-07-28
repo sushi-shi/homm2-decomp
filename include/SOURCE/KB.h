@@ -62,7 +62,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CampaignSide, u8)
 H2_ENUM_CLASS_END_SPLIT(CampaignSide, u8)
 
 inline CampaignSide OppositeCampaignSide(CampaignSide side) {
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
     return side == CAMPAIGN_ROLAND ? CAMPAIGN_ARCHIBALD : CAMPAIGN_ROLAND;
 #else
     return 1 - side;

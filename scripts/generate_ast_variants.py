@@ -38,6 +38,7 @@ from pathlib import Path
 
 import clang.cindex as ci
 
+from homm2.clang_options import ClangMode
 from tu_state_noise import (
     DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,
     _top_level_insertion_offset,
@@ -133,7 +134,8 @@ def clang_args(root: Path, source: Path) -> list[str]:
             raw = entry.get("arguments", [])
             break
     out = [
-        "-x", "c++", "-std=c++14", "-fms-compatibility", "-ferror-limit=0",
+        "-x", "c++", ClangMode.RETAIL_ANALYSIS.driver_flag,
+        "-fms-compatibility", "-ferror-limit=0",
         "-Wno-writable-strings", "-fwritable-strings",
         "-I", str(root / "include"),
     ]

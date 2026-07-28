@@ -45,6 +45,7 @@ class AstVariantGenerationTests(unittest.TestCase):
             args = clang_args(root, source)
         self.assertIn(str(root / "include"), args)
         self.assertIn(str(root / "vendor/sdk"), args)
+        self.assertIn("-std=c++98", args)
 
     def test_disjoint_mutations_are_combined(self):
         blob = b"abcdefghij"

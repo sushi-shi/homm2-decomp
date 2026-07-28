@@ -61,6 +61,12 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.runtime_fid", "--check"): return 1
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
+        # Relocation field validation consumes the objdiff report. Generate it
+        # after Ninja has rebuilt every input so a clean build is self-contained.
+        from homm2.match.status import load_report, main as st
+        report = load_report()
+        if report is None:
+            return 1
         # Fast and warning-only: half-built TUs may intentionally need a later redelink.
         sh("python3", "-m", "homm2.build.symbol_model_drift")
         if sh("python3", "-m", "homm2.build.annotated_functions", "--check",
@@ -75,10 +81,6 @@ def main(argv=None):
         if sh("python3", "-m", "homm2.build.assert_vtables"): return 1
         if sh("python3", "-m", "homm2.build.assert_relocs", "--fields"): return 1
         if sh("python3", "-m", "homm2.build.assert_fixed_width_ints"): return 1
-        from homm2.match.status import load_report, main as st
-        report = load_report()
-        if report is None:
-            return 1
         st(["--write-readme"], report)
         return st([], report)   # refresh README % block + print summary
     if cmd == "link":

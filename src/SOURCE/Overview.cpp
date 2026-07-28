@@ -340,7 +340,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             ROW_BACKGROUND_WIDTH,
             ROW_BACKGROUND_HEIGHT,
             const_cast<char*>(DATA_COMPGEN(0x004edbd4, setupDynamicStuffOverviewIcn, "overview.icn")),
-            static_cast<i16>(giOverviewType + ROW_BACKGROUND_FRAME_BASE),
+            static_cast<i16>(IDX(giOverviewType) + ROW_BACKGROUND_FRAME_BASE),
             ICON_DRAW_NORMAL,
             static_cast<i16>(rowWidgetId6 + ROW_BACKGROUND_CONTROL),
             WIDGET_KIND_ICON_DIRECT,
@@ -464,7 +464,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     TOWN_HERO_PORTRAIT_HEIGHT,
                     const_cast<char*>(hasCaptain0 ? DATA_COMPGEN(0x004eda84, setupDynamicStuffMinicaptIcn, "minicapt.icn") : DATA_COMPGEN(0x004eda94, setupDynamicStuffMiniportIcn, "miniport.icn")),
                     hasCaptain0 ? static_cast<u8>(IDX(record->m_type))
-                                : heroData13->m_portrait,
+                                : IDX(heroData13->m_portrait),
                     ICON_DRAW_NORMAL,
                     static_cast<i16>(rowWidgetId6 + TOWN_HERO_PORTRAIT_CONTROL),
                     WIDGET_KIND_ICON_DIRECT,
@@ -1523,18 +1523,41 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
                 }
             }
             if (widgetId >= HERO_SKILL_FIRST && widgetId <= HERO_SKILL_LAST) {
+#if H2_STRICT_ENUMS
+                HeroSecondarySkill secondarySkill12 =
+                    selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
+                selectedHero13->DoSSLevelDialog(secondarySkill12, quickView);
+#else
                 selectionIndex2 = selectedHero13->GetNthSS(widgetId - HERO_SKILL_FIRST);
                 selectedHero13->DoSSLevelDialog(selectionIndex2, quickView);
+#endif
             }
             if (widgetId >= HERO_ARTIFACT_FIRST
                 && widgetId <= HERO_ARTIFACT_LAST) {
+#if H2_STRICT_ENUMS
+                ArtifactType selectedArtifact =
+                    selectedHero13->m_artifacts[widgetId - HERO_ARTIFACT_FIRST];
+#else
                 selectionIndex2 =
                     selectedHero13->m_artifacts[widgetId - HERO_ARTIFACT_FIRST];
-                if (selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)) {
+#endif
+                if (
+#if H2_STRICT_ENUMS
+                    selectedArtifact == ARTIFACT_MAGIC_BOOK
+#else
+                    selectionIndex2 == IDX(ARTIFACT_MAGIC_BOOK)
+#endif
+                ) {
                     gpGame->ViewSpells(selectedHero13, SPELL_TYPE_ALL, ViewSpecialHandler, 1);
                 } else {
                     NormalDialog(
-                        gArtifactDesc[selectionIndex2],
+                        gArtifactDesc[
+#if H2_STRICT_ENUMS
+                            IDX(selectedArtifact)
+#else
+                            selectionIndex2
+#endif
+                        ],
                         quickView == 0 ? NORMAL_DIALOG_INFO : NORMAL_DIALOG_QUICK_VIEW,
                         NORMAL_DIALOG_NO_VALUE,
                         NORMAL_DIALOG_MAX_TOP,
