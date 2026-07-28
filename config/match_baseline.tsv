@@ -527,7 +527,7 @@ SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.4983	4b40aa2602ea
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a648267683
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	98c41dde6a5b
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	59fc1a2bd34f
-SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	3af62d592f5b
+SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	99.4414	a1d5b20d5a2f
 SOURCE/AI	?GetFlyerMask@combatManager@@QAEHH@Z	100.0000	061a0b1aa1a0
 SOURCE/AI	?GetMirrorImageMask@combatManager@@QAEHH@Z	100.0000	0ddc985b4e29
 SOURCE/AI	?GetModLichDamage@combatManager@@QAEMPAVarmy@@M@Z	100.0000	a6d8e3c39de7
@@ -538,7 +538,7 @@ SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	f4bc452ff45c
 SOURCE/AI	?GetWalkerMask@combatManager@@QAEHH@Z	100.0000	5d80474ee13a
 SOURCE/AI	?GetWorstArmy@combatManager@@QAEHHH@Z	100.0000	1f995e6ce676
 SOURCE/AI	?WalkTowardArmy@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	869b34dbc719
-SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	76c933ef404b
+SOURCE/AI	?WalkTowardArmyFront@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	06099b98312d
 SOURCE/ARMY	??0army@@QAE@XZ	100.0000	e94f637d29ec
 SOURCE/ARMY	?AttackTo@army@@QAEHH@Z	100.0000	638bb6372bfb
 SOURCE/ARMY	?AttackTo@army@@QAEHXZ	100.0000	3e78f3f1d751

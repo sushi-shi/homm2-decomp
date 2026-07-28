@@ -816,8 +816,8 @@ i32 combatManager::GetClosestArmy(
     army* target26;
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        if ((OD_STEER(bit1) & mask) != 0) {
-            target26 = &OD_STEER(armyIndex2)[m_armies[IDX(side)]];
+        if ((bit1 & mask) != 0) {
+            target26 = &armyIndex2[m_armies[IDX(side)]];
             value19 = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
@@ -826,7 +826,7 @@ i32 combatManager::GetClosestArmy(
             );
             value19 = value19 * COMBAT_AI_DISTANCE_WEIGHT
                       - target26->m_monster.hitPoints * target26->m_quantity;
-            if (OD_STEER(closestValue29) > value19) {
+            if (closestValue29 > value19) {
                 closestArmy7 = armyIndex2;
                 closestValue29 = value19;
             }
@@ -963,8 +963,8 @@ i32 combatManager::WalkTowardArmyFront(
         return 0;
 
     frontOffset13 = SINGLE_HEX_FRONT_OFFSET;
-    targetHex7 = OD_STEER(targetArmy6)[m_armies[IDX(side)]].m_hex;
-    if (HAS(OD_STEER(targetArmy6)[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
+    targetHex7 = targetArmy6[m_armies[IDX(side)]].m_hex;
+    if (HAS(targetArmy6[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
             MONSTER_ABILITY_FLAG_WIDE)
         != 0)
         frontOffset13 = WIDE_CREATURE_FRONT_OFFSET;
