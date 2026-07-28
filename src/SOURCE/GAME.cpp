@@ -4387,8 +4387,9 @@ void game::PerDay(void) {
     }
 
     for (player = 0; player < GAME_HERO_COUNT; player++)
-        m_heroRecs[player].m_eventFlags =
-            m_heroRecs[player].m_eventFlags & ~WEEKLY_HERO_RESERVED_FLAG;
+        m_heroRecs[player].m_eventFlags = HeroEventFlag(
+            static_cast<i32>(m_heroRecs[player].m_eventFlags) & ~IDX(WEEKLY_HERO_RESERVED_FLAG)
+        );
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_GOLD; resource8++) {

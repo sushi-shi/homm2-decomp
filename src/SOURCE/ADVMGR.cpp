@@ -7076,7 +7076,9 @@ void advManager::DemobilizeCurrHero(void) {
     currentHero->m_occupiedTown = currentCell->m_objectMetadata;
     currentHero->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
-        currentHero->m_eventFlags = HERO_EVENT_EMBARKED | currentHero->m_eventFlags;
+        currentHero->m_eventFlags = HeroEventFlag(
+            static_cast<i32>(currentHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+        );
     }
     currentCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
     currentCell->m_objectMetadata = currentHero->m_id;
@@ -8408,7 +8410,9 @@ void advManager::TeleportTo(
             destinationCell29->m_objectMetadata = mapHero->m_id;
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
-            mapHero->m_eventFlags = HERO_EVENT_EMBARKED | mapHero->m_eventFlags;
+            mapHero->m_eventFlags = HeroEventFlag(
+                static_cast<i32>(mapHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+            );
         }
         m_cursorActive = 0;
     }
