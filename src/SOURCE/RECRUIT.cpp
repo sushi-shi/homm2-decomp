@@ -269,6 +269,8 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             0
                         );
                         break;
+                    default:
+                        break;
                 }
                 Update();
                 m_window->DrawWindow(1, 0, DRAW_DEPTH);
@@ -311,14 +313,14 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                             break;
                         if (m_quantity == 0) {
                             close = 1;
-                            break;
+                            goto checkClose;
                         }
                         if (m_army->CanJoin(m_creatureType) != 0) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
                             close = 1;
                             m_noRoom = 1;
-                            break;
+                            goto checkClose;
                         }
                         gpCurPlayer->m_resources[GOLD_RESOURCE] -= m_quantity * m_goldCost;
                         if (m_resourceType != RECRUIT_NO_RESOURCE) {
@@ -331,8 +333,11 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         break;
                 }
                 break;
+            default:
+                break;
         }
 
+    checkClose:
         if (close == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
