@@ -5395,7 +5395,7 @@ void NormalDialog(
         }
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+            labelY_o = sizingIconHeight_l + resourceY_l
                 - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
             textPanel_h = new textWidget(
                 resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
@@ -5417,7 +5417,7 @@ void NormalDialog(
                 NORMAL_DIALOG_TEXT_LENGTH, DATA_COMPGEN(0x00516e9c, normalDialogSourceFile2, RETAIL_FILE),
                 normalDialogSourceLineBase + 431
             ));
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+            labelY_o = sizingIconHeight_l + resourceY_l
                 - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             sprintf(
                 resourceText_e[resourceSlot_n],
@@ -5426,10 +5426,10 @@ void NormalDialog(
                     [resourceValue_l[resourceSlot_n] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+            labelY_o = sizingIconHeight_l + resourceY_l
                 - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
         } else {
-            labelY_o = OD_STEER(sizingIconHeight_l) + resourceY_l
+            labelY_o = sizingIconHeight_l + resourceY_l
                 - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
         }
 
@@ -5459,7 +5459,7 @@ void NormalDialog(
             strcpy(bonusText, DATA_COMPGEN(0x00516f00, normalDialog1, "+1 "));
             textPanel_h = new textWidget(
                 resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                OD_STEER(sizingIconHeight_l) + resourceY_l
+                sizingIconHeight_l + resourceY_l
                     - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
                 NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT,
