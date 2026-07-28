@@ -2707,109 +2707,110 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     modifierStart = strlen(gText);
     if (h->m_army.HasAllUndead()) {
         strcat(gText, cMoraleInfo[IDX(INFO_ALL_UNDEAD)]);
-    } else {
-        if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_SOME_UNDEAD)]);
-            mixedUndead4 = 1;
-        }
-
-        homogeneous3 = h->m_army.IsHomogeneous(-1);
-        if (mixedUndead4 && homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
-            homogeneous3 = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
-        }
-        if (homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
-            alignment_e = 0;
-            for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
-                if (h->m_army.m_creatureTypes[slot8] != CREATURE_NONE) {
-                    alignment_e =
-                        IDX(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[slot8])].race);
-                }
-            }
-            sprintf(
-                description,
-                cMoraleInfo[IDX(INFO_SAME_ALIGNMENT)],
-                gAlignmentNames[alignment_e]
-            );
-            strcat(gText, description);
-        }
-        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_THREE) {
-            sprintf(description, cMoraleInfo[IDX(INFO_THREE_ALIGNMENTS)]);
-            strcat(gText, description);
-        }
-        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FOUR) {
-            sprintf(description, cMoraleInfo[IDX(INFO_FOUR_ALIGNMENTS)]);
-            strcat(gText, description);
-        }
-        if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
-            sprintf(description, cMoraleInfo[IDX(INFO_FIVE_ALIGNMENTS)]);
-            strcat(gText, description);
-        }
-
-        if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
-            && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
-            strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
-        }
-        if (h->GetOccupiedTown() != NULL
-            && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
-            strcat(gText, cMoraleInfo[IDX(INFO_TAVERN)]);
-        }
-
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_VALOR)]);
-        }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_COURAGE)]);
-        }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_HONOR)]);
-        }
-        if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_DISTINCTION)]);
-        }
-        if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_FIZBIN)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_BUOY)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_OASIS)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_OASIS)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_TEMPLE)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_TEMPLE)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_GRAVEYARD)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_SHIPWRECK)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_SHIPWRECK)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_WATERING_HOLE)]);
-        }
-        if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
-            strcat(gText, cMoraleInfo[IDX(INFO_DERELICT_SHIP)]);
-        }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
-            strcat(gText, cMoraleInfo[IDX(INFO_BASIC_LEADERSHIP)]);
-        }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
-            strcat(gText, cMoraleInfo[IDX(INFO_ADVANCED_LEADERSHIP)]);
-        }
-        if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
-            strcat(gText, cMoraleInfo[IDX(INFO_EXPERT_LEADERSHIP)]);
-        }
-        if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
-        }
-        if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
-        }
-        if (static_cast<i32>(strlen(gText)) == modifierStart) {
-            strcat(gText, cMoraleInfo[IDX(MORALE_INFO_NONE)]);
-        }
+        goto showDialog;
+    }
+    if (h->m_army.HasSomeUndead() || h->HasArtifact(ARTIFACT_ARM_OF_MARTYR)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_SOME_UNDEAD)]);
+        mixedUndead4 = 1;
     }
 
+    homogeneous3 = h->m_army.IsHomogeneous(-1);
+    if (mixedUndead4 && homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
+        homogeneous3 = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
+    }
+    if (homogeneous3 > ARMY_GROUP_ALIGNMENT_NO_MODIFIER) {
+        alignment_e = 0;
+        for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
+            if (h->m_army.m_creatureTypes[slot8] != CREATURE_NONE) {
+                alignment_e =
+                    IDX(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[slot8])].race);
+            }
+        }
+        sprintf(
+            description,
+            cMoraleInfo[IDX(INFO_SAME_ALIGNMENT)],
+            gAlignmentNames[alignment_e]
+        );
+        strcat(gText, description);
+    }
+    if (homogeneous3 == ARMY_GROUP_ALIGNMENT_THREE) {
+        sprintf(description, cMoraleInfo[IDX(INFO_THREE_ALIGNMENTS)]);
+        strcat(gText, description);
+    }
+    if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FOUR) {
+        sprintf(description, cMoraleInfo[IDX(INFO_FOUR_ALIGNMENTS)]);
+        strcat(gText, description);
+    }
+    if (homogeneous3 == ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE) {
+        sprintf(description, cMoraleInfo[IDX(INFO_FIVE_ALIGNMENTS)]);
+        strcat(gText, description);
+    }
+
+    if (h->GetOccupiedTown() != NULL && h->GetOccupiedTown()->m_type == FACTION_BARBARIAN
+        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_COLISEUM))) {
+        strcat(gText, cMoraleInfo[IDX(INFO_COLISEUM)]);
+    }
+    if (h->GetOccupiedTown() != NULL
+        && (h->GetOccupiedTown()->m_buildings & IDX(TOWN_BUILDING_TAVERN))) {
+        strcat(gText, cMoraleInfo[IDX(INFO_TAVERN)]);
+    }
+
+    if (h->HasArtifact(ARTIFACT_MEDAL_OF_VALOR)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_VALOR)]);
+    }
+    if (h->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_COURAGE)]);
+    }
+    if (h->HasArtifact(ARTIFACT_MEDAL_OF_HONOR)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_HONOR)]);
+    }
+    if (h->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_MEDAL_OF_DISTINCTION)]);
+    }
+    if (h->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_FIZBIN)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_BUOY)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_BUOY)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_OASIS)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_OASIS)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_TEMPLE)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_TEMPLE)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_GRAVEYARD)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_GRAVEYARD)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_SHIPWRECK)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_SHIPWRECK)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_WATERING_HOLE)]);
+    }
+    if (HAS(h->m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
+        strcat(gText, cMoraleInfo[IDX(INFO_DERELICT_SHIP)]);
+    }
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_BASIC) {
+        strcat(gText, cMoraleInfo[IDX(INFO_BASIC_LEADERSHIP)]);
+    }
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_ADVANCED) {
+        strcat(gText, cMoraleInfo[IDX(INFO_ADVANCED_LEADERSHIP)]);
+    }
+    if (h->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)] == HERO_SKILL_LEVEL_EXPERT) {
+        strcat(gText, cMoraleInfo[IDX(INFO_EXPERT_LEADERSHIP)]);
+    }
+    if (h->HasArtifact(ARTIFACT_MASTHEAD) && HAS(h->m_eventFlags, HERO_EVENT_EMBARKED)) {
+        strcat(gText, cMoraleInfo[IDX(MORALE_INFO_MASTHEAD)]);
+    }
+    if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
+        strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
+    }
+    if (static_cast<i32>(strlen(gText)) == modifierStart) {
+        strcat(gText, cMoraleInfo[IDX(MORALE_INFO_NONE)]);
+    }
+
+showDialog:
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
 
