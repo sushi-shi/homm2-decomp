@@ -6710,107 +6710,100 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
             HeroInteractionAtHero(gpCurAIHero, gpGame->GetHero(heroId), 1, &result5);
         }
         gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
-        return result5;
-    }
-
-    if (OnMySide(gpGame->m_availableHeroes[heroId])) {
+    } else if (OnMySide(gpGame->m_availableHeroes[heroId])) {
         if (mode == EVENT_MODE_IGNORE)
             result5 = 0;
         else if (mode == EVENT_MODE_AVOID)
             result5 = EVENT_SEVERE_PENALTY;
         else
             result5 = EVENT_ALLIED_PENALTY;
-        return result5;
-    }
-
-    if (gbIAmGreatest && !gbHumanPlayer[gpGame->m_availableHeroes[heroId]]) {
+    } else if (gbIAmGreatest && !gbHumanPlayer[gpGame->m_availableHeroes[heroId]]) {
         result5 = 0;
         *liveChance = POSITION_FULL_CHANCE;
-        return result5;
-    }
-
-    result5 = 0;
-    townValue8 = 0;
-    townPtr29 = NULL;
-    townArmy26 = NULL;
-    enemyHero6 = gpGame->GetHero(heroId);
-    if (enemyHero6->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-        townPtr29 = gpGame->GetTown(enemyHero6->m_occupiedTown);
-        townArmy26 = &townPtr29->m_army;
-        townValue8 = ValueOfTown(townPtr29);
-        townId8 = townPtr29->m_id;
-        if (townPtr29->m_owner >= 0) {
-            if (gbHumanPlayer[townPtr29->m_owner])
-                attackBonus6 = gfAttackHumanBonus;
-            else
-                attackBonus6 = gfAttackComputerBonus;
-            townValue8 = static_cast<i32>(
-                ((EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
-                     * AI_EVENT_TOWN_PLAYER_FACTOR * attackBonus6
-                 + AI_EVENT_VALUE_BASE_FACTOR)
-                * townValue8
-            );
-        }
     } else {
-        townId8 = TOWN_ID_NONE;
-    }
-
-    ProbableOutcomeOfBattle(
-        &gpCurAIHero->m_army,
-        gpCurAIHero,
-        &enemyHero6->m_army,
-        enemyHero6,
-        townArmy26,
-        townArmy26 != NULL,
-        townId8,
-        enemyHero6->m_owner,
-        winChance9,
-        attackerLoss6,
-        defenderLoss4,
-        attackerRemaining3,
-        defenderRemaining6,
-        result5
-    );
-    *liveChance = static_cast<i32>(winChance9 * AI_EVENT_CERTAIN_CHANCE);
-    if (townValue8 > 0)
-        result5 = static_cast<i32>(townValue8 * winChance9 + result5);
-
-    if (gbHumanPlayer[enemyHero6->m_owner] && result5 > EVENT_HUMAN_VALUE_THRESHOLD) {
-        if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
-            result5 *= 2;
-        else
-            result5 = static_cast<i32>(result5 * AI_EVENT_HUMAN_VALUE_FACTOR);
-    }
-
-    if (winChance9 > AI_EVENT_CERTAIN_ODDS)
-        gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
-    else if (winChance9 > AI_EVENT_HIGH_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c4, evaluateHeroEventConstant2, AI_EVENT_HIGH_CHANCE_SCALE));
-    else if (winChance9 > AI_EVENT_GOOD_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c8, evaluateHeroEventConstant3, AI_EVENT_GOOD_CHANCE_SCALE));
-    else if (winChance9 > DATA_COMPGEN(0x004eb3d8, evaluateHeroEventConstant, AI_EVENT_POOR_ODDS))
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5cc, evaluateHeroEventConstant4, AI_EVENT_POOR_CHANCE_SCALE));
-    else if (winChance9 > AI_EVENT_BAD_ODDS)
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5d0, evaluateHeroEventConstant5, AI_EVENT_BAD_CHANCE_SCALE));
-    else
-        gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_CERTAIN_CHANCE);
-    if (gaiHeroLiveChance[heroId] > POSITION_FULL_CHANCE)
-        gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
-
-    if (mode == EVENT_MODE_IGNORE && winChance9 < AI_EVENT_GOOD_ODDS)
-        result5 = static_cast<i32>((3.0f - winChance9 * 2.0f) * result5);
-    if (mode == EVENT_MODE_IGNORE && winChance9 < AI_EVENT_BAD_ODDS)
-        result5 = static_cast<i32>((2.0f - winChance9 * 2.0f) * result5);
-
-    if (result5 < 0)
-        gbReduceByReload = false;
-    gbReduceByBerserk = false;
-    if (result5 > 0
-        && EVENT_EARLY_TURN_BASE
-                   - IDX(gpGame->m_difficulty) * EVENT_EARLY_TURN_DIFFICULTY_STEP
-               > giCurTurn
-        && !(mapExtra[x + MAP_WIDTH * y] & giCurPlayerBit)) {
         result5 = 0;
+        townValue8 = 0;
+        townPtr29 = NULL;
+        townArmy26 = NULL;
+        enemyHero6 = gpGame->GetHero(heroId);
+        if (enemyHero6->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+            townPtr29 = gpGame->GetTown(enemyHero6->m_occupiedTown);
+            townArmy26 = &townPtr29->m_army;
+            townValue8 = ValueOfTown(townPtr29);
+            townId8 = townPtr29->m_id;
+            if (townPtr29->m_owner >= 0) {
+                if (gbHumanPlayer[townPtr29->m_owner])
+                    attackBonus6 = gfAttackHumanBonus;
+                else
+                    attackBonus6 = gfAttackComputerBonus;
+                townValue8 = static_cast<i32>(
+                    ((EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
+                         * AI_EVENT_TOWN_PLAYER_FACTOR * attackBonus6
+                     + AI_EVENT_VALUE_BASE_FACTOR)
+                    * townValue8
+                );
+            }
+        } else {
+            townId8 = TOWN_ID_NONE;
+        }
+
+        ProbableOutcomeOfBattle(
+            &gpCurAIHero->m_army,
+            gpCurAIHero,
+            &enemyHero6->m_army,
+            enemyHero6,
+            townArmy26,
+            townArmy26 != NULL,
+            townId8,
+            enemyHero6->m_owner,
+            winChance9,
+            attackerLoss6,
+            defenderLoss4,
+            attackerRemaining3,
+            defenderRemaining6,
+            result5
+        );
+        *liveChance = static_cast<i32>(winChance9 * AI_EVENT_CERTAIN_CHANCE);
+        if (townValue8 > 0)
+            result5 = static_cast<i32>(townValue8 * winChance9 + result5);
+
+        if (gbHumanPlayer[enemyHero6->m_owner] && result5 > EVENT_HUMAN_VALUE_THRESHOLD) {
+            if (gpCurPlayer->m_aiDifficulty == PLAYER_PERSONALITY_WARRIOR)
+                result5 *= 2;
+            else
+                result5 = static_cast<i32>(result5 * AI_EVENT_HUMAN_VALUE_FACTOR);
+        }
+
+        if (winChance9 > AI_EVENT_CERTAIN_ODDS)
+            gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
+        else if (winChance9 > AI_EVENT_HIGH_ODDS)
+            gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c4, evaluateHeroEventConstant2, AI_EVENT_HIGH_CHANCE_SCALE));
+        else if (winChance9 > AI_EVENT_GOOD_ODDS)
+            gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5c8, evaluateHeroEventConstant3, AI_EVENT_GOOD_CHANCE_SCALE));
+        else if (winChance9 > DATA_COMPGEN(0x004eb3d8, evaluateHeroEventConstant, AI_EVENT_POOR_ODDS))
+            gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5cc, evaluateHeroEventConstant4, AI_EVENT_POOR_CHANCE_SCALE));
+        else if (winChance9 > AI_EVENT_BAD_ODDS)
+            gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * DATA_COMPGEN(0x004eb5d0, evaluateHeroEventConstant5, AI_EVENT_BAD_CHANCE_SCALE));
+        else
+            gaiHeroLiveChance[heroId] = static_cast<i16>(winChance9 * AI_EVENT_CERTAIN_CHANCE);
+        if (gaiHeroLiveChance[heroId] > POSITION_FULL_CHANCE)
+            gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
+
+        if (mode == EVENT_MODE_IGNORE && winChance9 < AI_EVENT_GOOD_ODDS)
+            result5 = static_cast<i32>((3.0f - winChance9 * 2.0f) * result5);
+        if (mode == EVENT_MODE_IGNORE && winChance9 < AI_EVENT_BAD_ODDS)
+            result5 = static_cast<i32>((2.0f - winChance9 * 2.0f) * result5);
+
+        if (result5 < 0)
+            gbReduceByReload = false;
+        gbReduceByBerserk = false;
+        if (result5 > 0
+            && EVENT_EARLY_TURN_BASE
+                       - IDX(gpGame->m_difficulty) * EVENT_EARLY_TURN_DIFFICULTY_STEP
+                   > giCurTurn
+            && !(mapExtra[x + MAP_WIDTH * y] & giCurPlayerBit)) {
+            result5 = 0;
+        }
     }
     return result5;
 }
