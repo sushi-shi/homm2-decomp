@@ -6,23 +6,24 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <string.h>
-DATA(0x00538190) static u32 gFMRun;
-DATA(0x00538194) static u8* gFMSrc;
-DATA(0x00538198) static IconEntry* gFMEntry;
-DATA(0x0053819c) static i32 gFMX;
-DATA(0x005381a0) static i32 gFMX0;
-DATA(0x005381a4) static i32 gFMClipB;
-DATA(0x005381a8) static u8* gFMRow;
-DATA(0x005381ac) static i32 gFMY;
-DATA(0x005381b0) static i32 gFMClipR;
-DATA(0x005381b4) static i32 gFMXEnd;
 
-static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch) {
-    return dest->m_pixels + gFMY * pitch;
+DATA(0x005381a4) static i32 s_clipB;
+DATA(0x005381ac) static i32 s_y;
+DATA(0x0053819c) static i32 s_x;
+DATA(0x005381a0) static i32 s_left;
+DATA(0x005381b4) static i32 s_right;
+DATA(0x00538190) static u32 s_run;
+DATA(0x005381a8) static u8* s_row;
+DATA(0x00538194) static u8* s_src;
+DATA(0x00538198) static IconEntry* s_entry;
+DATA(0x005381b0) static i32 s_clipR;
+
+static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch, i32 currentY) {
+    return dest->m_pixels + currentY * pitch;
 }
 
-static inline i32 FlipMonoRowVisible(i32 clipTop) {
-    return clipTop <= gFMY && gFMY <= gFMClipB;
+static inline i32 FlipMonoRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
+    return clipTop <= currentY && currentY <= clipBottom;
 }
 
 VA(0x004da800, 0x212)
@@ -40,67 +41,64 @@ void FlipMonoIconToBitmap(
     i32 clipH
 ) {
     IconEntry* entries = srcIcon->Entries();
-    IconEntry* entry = &entries[frame];
-    u8* srcData = reinterpret_cast<u8*>(entries) + entry->srcOffset;
+    s_entry = &entries[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
     i32 x0 = x;
-    gFMEntry = entry;
-    gFMSrc = srcData;
-    i32 w = entry->w;
-    i32 entryY = entry->y;
-    x0 = x0 - entry->x;
+    i32 w = s_entry->w;
+    x0 = x0 - s_entry->x;
     x0 = x0 - w;
     i32 right = w + x0 + 1;
     x0++;
-    gFMX0 = x0;
+    s_left = x0;
     i32 X = right - 1;
-    gFMXEnd = X;
-    gFMY = y + entryY;
+    s_right = X;
+    s_y = y + s_entry->y;
     if (clip != ICON_DRAW_NO_CLIP) {
         i32 clipRight = clipX + clipW;
-        i32 entryHeight = entry->h;
-        if (x0 < clipX || clipRight < right || gFMY < clipY
-            || entryHeight + gFMY > clipY + clipH) {
+        i32 entryHeight = s_entry->h;
+        if (x0 < clipX || clipRight < right || s_y < clipY
+            || entryHeight + s_y > clipY + clipH) {
             clip = ICON_DRAW_CLIP;
-            gFMClipR = clipX + clipW - 1;
-            gFMClipB = clipY + clipH - 1;
+            s_clipR = clipX + clipW - 1;
+            s_clipB = clipY + clipH - 1;
         } else {
             clip = ICON_DRAW_NO_CLIP;
         }
     }
     i16 pitch = dest->m_width;
-    gFMRow = FlipMonoInitialRow(dest, pitch);
+    s_row = FlipMonoInitialRow(dest, pitch, s_y);
     for (;;) {
-        gFMX = X;
-        i32 cmd = ReadIconRleByte(gFMSrc);
+        s_x = X;
+        i32 cmd = ReadIconRleByte(s_src);
         if (static_cast<i8>(cmd) < 0) {
-            gFMRun = cmd;
+            s_run = cmd;
             i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
             if (n == 0)
                 return;
             X = X - n;
             continue;
         }
-        gFMRun = cmd;
+        s_run = cmd;
         if (cmd != 0) {
             if (clip == ICON_DRAW_NO_CLIP) {
-                memset((gFMRow - cmd) + 1 + X, color, cmd);
+                memset((s_row - cmd) + 1 + X, color, cmd);
             } else {
                 i32 left;
-                if (FlipMonoRowVisible(clipY)
-                    && (left = (X - cmd) + 1, clipX <= left) && gFMClipR >= X) {
+                if (FlipMonoRowVisible(clipY, s_y, s_clipB)
+                    && (left = (X - cmd) + 1, clipX <= left) && s_clipR >= X) {
                     if (clipX <= left) {
-                        memset((gFMRow - cmd) + 1 + X, color, cmd);
+                        memset((s_row - cmd) + 1 + X, color, cmd);
                     } else {
-                        memset(gFMRow + clipX, color, (X - clipX) + 1);
+                        memset(s_row + clipX, color, (X - clipX) + 1);
                     }
                 }
             }
-            gFMRun = cmd;
+            s_run = cmd;
             X = X - cmd;
             continue;
         }
-        X = gFMXEnd;
-        gFMY = gFMY + 1;
-        gFMRow = gFMRow + pitch;
+        X = s_right;
+        s_y = s_y + 1;
+        s_row = s_row + pitch;
     }
 }

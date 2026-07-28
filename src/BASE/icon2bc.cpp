@@ -3,26 +3,27 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconMacro.h>
+#include <BASE/IconRle.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-DATA(0x00534ca8) static i32 gCTPitch;
-DATA(0x00534cac) static u32 gCTCnt;
-DATA(0x00534cb0) static i32 gCTX;
-DATA(0x00534cb4) static i32 gCTY;
-DATA(0x00534cb8) static IconEntry* gCTEntry;
-DATA(0x00534cbc) static u8* gCTRow;
-DATA(0x00534cc0) static u8* gCTDimPal;
-DATA(0x00534cc4) static i32 gCTClipB;
-DATA(0x00534cc8) static i32 gCTClipR;
-DATA(0x00534ccc) static u8* gCTSrcCopy;
-DATA(0x00534cd0) static u32 gCTDimLen;
-DATA(0x00534cd4) static u8* gCTDst;
-DATA(0x00534cd8) static u8* gCTSrc;
-DATA(0x00534cdc) static u32 gCTCnt2;
-DATA(0x00534ce0) static i32 gCTX0;
-DATA(0x00534ce4) static u8 gCTColor;
-DATA(0x00534ce8) static u32 gCTRun;
+
+DATA(0x00534cc4) static i32 s_clipB;
+DATA(0x00534cd0) static u32 s_loopCount;
+DATA(0x00534ca8) static i32 s_pitch;
+DATA(0x00534cb4) static i32 s_y;
+DATA(0x00534cb0) static i32 s_x;
+DATA(0x00534ce0) static i32 s_left;
+DATA(0x00534ce8) static u32 s_run;
+DATA(0x00534cc0) static u8* s_dimPal;
+DATA(0x00534cbc) static u8* s_row;
+DATA(0x00534cd4) static u8* s_dst;
+DATA(0x00534ccc) static u8* s_literalSource;
+DATA(0x00534cd8) static u8* s_src;
+DATA(0x00534cb8) static IconEntry* s_entry;
+DATA(0x00534cac) static u32 s_spanCount;
+DATA(0x00534ce4) static u8 s_color;
+DATA(0x00534cdc) static u32 s_dimLen;
+DATA(0x00534cc8) static i32 s_clipR;
 
 static inline u8* ColorTableDimPixel(u8* dst, u8* palette, i32 dimGate) {
     if (dimGate != 0)
@@ -50,167 +51,174 @@ void IconToBitmapColorTable(
     u8* colorTable,
     i32 dimGate
 ) {
-    u8* data = srcIcon->m_data;
-    i32 entryOffset = frame * sizeof(IconEntry);
-    IconEntry* entry = reinterpret_cast<IconEntry*>(data + entryOffset);
-    i32 entryX = entry->x;
-    i32 sourceOffset = entry->srcOffset;
-    u8* savedDst = gCTDst;
-    gCTEntry = entry;
-    gCTSrc = data + sourceOffset;
-    i32 X = x + entryX;
-    gCTX0 = X;
-    gCTPitch = dest->m_width;
-    gCTY = entry->y + y;
+    IconEntry* entries = srcIcon->Entries();
+    u8* savedDst = s_dst;
+    s_entry = &entries[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = x + s_entry->x;
+    s_pitch = dest->m_width;
+    s_y = y + s_entry->y;
+    i32 X = s_left;
     if (clip != ICON_DRAW_NO_CLIP) {
-        i32 currentY = gCTY;
-        if (X < clipX || clipW + clipX < entry->w + gCTX0 || currentY < clipY
-            || clipY + clipH < entry->h + currentY) {
+        i32 currentY = s_y;
+        if (X < clipX || clipW + clipX < s_entry->w + s_left || currentY < clipY
+            || clipY + clipH < s_entry->h + currentY) {
             clip = ICON_DRAW_CLIP;
-            gCTClipR = clipX + clipW - 1;
-            gCTClipB = clipY + clipH - 1;
+            s_clipR = clipX + clipW - 1;
+            s_clipB = clipY + clipH - 1;
         } else {
             clip = ICON_DRAW_NO_CLIP;
         }
     }
-    u8* row = dest->m_pixels + gCTPitch * gCTY;
+    u8* row = dest->m_pixels + s_pitch * s_y;
     i32 cmd;
     for (;;) {
-        gCTSrc = gCTSrc + 1;
-        cmd = gCTSrc[-1];
+        s_src = s_src + 1;
+        cmd = s_src[-1];
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
-                gCTX = X;
-                gCTRow = row;
-                gCTDst = savedDst;
-                gCTRun = cmd;
+                s_x = X;
+                s_row = row;
+                s_dst = savedDst;
+                s_run = cmd;
                 if ((cmd & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
                 X = X + (cmd & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
-            gCTRun = cmd;
+            s_run = cmd;
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
                 // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
-                    count = *gCTSrc++;
+                    count = *s_src++;
                 }
-                gCTColor = colorTable[*gCTSrc++];
-                goto fill_run;
+                s_color = colorTable[*s_src++];
+                goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            flags = *gCTSrc++;
+            flags = *s_src++;
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {
-                count = *gCTSrc++;
+                count = *s_src++;
             }
-            gCTCnt2 = count;
+            s_dimLen = count;
             if (color != 0) {
-                gCTRun = flags;
+                s_run = flags;
                 if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
-                    gCTCnt = count;
-                    gCTColor = static_cast<u8>(color);
-                    goto fill_run;
+                    s_spanCount = count;
+                    s_color = static_cast<u8>(color);
+                    goto do_fill;
                 }
             }
             goto do_dim;
-        fill_run:
-            H2_ICON_RLE_FILL_RUN(
-                clip,
-                clipY <= gCTY && gCTY <= gCTClipB
-                    && static_cast<i32>(X + count) > clipX && gCTClipR >= X,
-                row,
-                X,
-                gCTColor,
-                count,
-                clipX,
-                clipW,
-                gCTClipR,
-                gCTRun
-            );
+        do_fill:
+            if (clip == ICON_DRAW_NO_CLIP) {
+                memset(row + X, s_color, count);
+            } else if (clipY <= s_y && s_y <= s_clipB
+                       && static_cast<i32>(X + count) > clipX && s_clipR >= X) {
+                i32 fillRight = X + count;
+                if (clipX <= X) {
+                    if (s_clipR >= fillRight) {
+                        memset(row + X, s_color, count);
+                    } else {
+                        memset(row + X, s_color, (s_clipR - X) + 1);
+                    }
+                } else {
+                    if (s_clipR >= fillRight) {
+                        memset(row + clipX, s_color, (count - clipX) + X);
+                    } else {
+                        memset(row + clipX, s_color, clipW);
+                    }
+                }
+            }
+            X = X + count;
+            s_run = count;
+            continue;
         do_dim:
-            gCTCnt = count;
-            gCTRun = flags;
+            s_spanCount = count;
+            s_run = flags;
             if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                u8* palette = H2_ICON_RLE_DIM_PALETTE(flags);
-                gCTDst = savedDst;
-                gCTDimPal = palette;
+                u8* palette =
+                    reinterpret_cast<u8*>(uDimPal)
+                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                s_dst = savedDst;
+                s_dimPal = palette;
                 if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
-                    gCTDimLen = 0;
+                    s_loopCount = 0;
                     i32 dimCount = count;
                     if (dimCount > 0) {
-                        gCTDimLen = dimCount;
+                        s_loopCount = dimCount;
                         do {
                             savedDst = ColorTableDimPixel(savedDst, palette, dimGate);
-                            gCTDimPal = palette;
+                            s_dimPal = palette;
                             count--;
                         } while (count != 0);
                     }
                 } else {
-                    gCTCnt = count;
-                    if (clipY <= gCTY && gCTClipB >= gCTY && static_cast<i32>(X + count) > clipX
-                        && (gCTDst = savedDst, gCTClipR >= X)) {
+                    s_spanCount = count;
+                    if (clipY <= s_y && s_clipB >= s_y && static_cast<i32>(X + count) > clipX
+                        && (s_dst = savedDst, s_clipR >= X)) {
                         i32 right = X + count;
                         u32 cn;
                         if (X >= clipX) {
-                            i32 clipRight = gCTClipR;
+                            i32 clipRight = s_clipR;
                             cn = count;
                             if (clipRight < right)
                                 cn = (clipRight - X) + 1;
                             savedDst = row + X;
                         } else {
-                            i32 clipRight = gCTClipR;
-                            gCTCnt = count;
+                            i32 clipRight = s_clipR;
+                            s_spanCount = count;
                             if (right <= clipRight)
-                                count = (gCTCnt - clipX) + X;
+                                count = (count - clipX) + X;
                             else
                                 count = clipW;
                             cn = count;
                             savedDst = row + clipX;
                         }
-                        gCTDimPal = palette;
-                        gCTCnt = cn;
-                        gCTDimLen = 0;
+                        s_dimPal = palette;
+                        s_spanCount = cn;
+                        s_loopCount = 0;
                         i32 dimCount = cn;
                         if (dimCount > 0) {
-                            gCTDimLen = dimCount;
+                            s_loopCount = dimCount;
                             do {
                                 savedDst = ColorTableDimPixel(savedDst, palette, dimGate);
-                                gCTDimPal = palette;
+                                s_dimPal = palette;
                                 cn--;
                             } while (cn != 0);
                         }
                     }
                 }
             }
-            X = X + gCTCnt2;
+            X = X + s_dimLen;
             continue;
         }
-        gCTX = X;
-        gCTRun = cmd;
+        s_x = X;
+        s_run = cmd;
         if (cmd != 0) {
             u32 cnt;
             do {
-                gCTDst = savedDst;
-                gCTSrcCopy = gCTSrc;
+                s_dst = savedDst;
+                s_literalSource = s_src;
                 if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
                     cnt = cmd;
                 } else {
-                    if (gCTY < clipY || gCTClipB < gCTY) {
+                    if (s_y < clipY || s_clipB < s_y) {
                         cnt = 0;
                         break;
                     }
                     i32 right = X + cmd;
-                    if (right <= clipX || (gCTDst = savedDst, gCTClipR < X)) {
+                    if (right <= clipX || (s_dst = savedDst, s_clipR < X)) {
                         cnt = 0;
                         break;
                     }
-                    i32 clipRight = gCTClipR;
+                    i32 clipRight = s_clipR;
                     if (clipX <= X) {
                         savedDst = row + X;
                         if (clipRight >= right)
@@ -225,30 +233,30 @@ void IconToBitmapColorTable(
                             savedDst = row + clipX;
                             cnt = clipW;
                         }
-                        gCTSrcCopy = ColorTableOutsideSource(gCTSrc, X, clipX);
+                        s_literalSource = ColorTableOutsideSource(s_src, X, clipX);
                     }
                 }
             } while (0);
-            gCTCnt = cnt;
+            s_spanCount = cnt;
             if (cnt != 0) {
-                gCTDimLen = 0;
+                s_loopCount = 0;
                 if (static_cast<i32>(cnt) > 0) {
-                    gCTDimLen = cnt;
+                    s_loopCount = cnt;
                     do {
-                        i32 b = *gCTSrcCopy;
+                        i32 b = *s_literalSource;
                         savedDst = savedDst + 1;
                         savedDst[-1] = colorTable[b];
-                        gCTSrcCopy = gCTSrcCopy + 1;
+                        s_literalSource = s_literalSource + 1;
                     } while (--cnt != 0);
                 }
             }
             X = X + cmd;
-            gCTSrc = gCTSrc + cmd;
-            gCTRun = cmd;
+            s_src = s_src + cmd;
+            s_run = cmd;
             continue;
         }
-        X = gCTX0;
-        gCTY = gCTY + 1;
-        row = row + gCTPitch;
+        X = s_left;
+        s_y = s_y + 1;
+        row = row + s_pitch;
     }
 }

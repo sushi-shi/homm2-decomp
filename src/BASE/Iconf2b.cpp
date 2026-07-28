@@ -7,6 +7,25 @@
 #include <BASE/IconEntry.h>
 #include <string.h>
 
+DATA(0x00534c8c) static i32 s_clipB;
+DATA(0x00534c6c) static u32 s_loopCount;
+DATA(0x00534c74) static i32 s_y;
+DATA(0x00534c7c) static i32 s_x;
+DATA(0x00534c88) static u8* s_dimDst;
+DATA(0x00534c68) static i32 s_left;
+DATA(0x00534ca4) static i32 s_right;
+DATA(0x00534c64) static u32 s_run;
+DATA(0x00534c84) static u8* s_dimPal;
+DATA(0x00534c90) static u8* s_row;
+DATA(0x00534ca0) static u8* s_dst;
+DATA(0x00534c60) static i32 s_srcSkip;
+DATA(0x00534c80) static u8* s_src;
+DATA(0x00534c78) static IconEntry* s_entry;
+DATA(0x00534c94) static u32 s_spanCount;
+DATA(0x00534c98) static u8 s_color;
+DATA(0x00534c70) static u32 s_dimLen;
+DATA(0x00534c9c) static i32 s_clipR;
+
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(
     class icon* srcIcon,
@@ -21,25 +40,6 @@ void FlipIconToBitmap(
     i32 clipH,
     i32 color
 ) {
-    DATA(0x00534c78) static IconEntry* s_entry;
-    DATA(0x00534c68) static i32 s_left;
-    DATA(0x00534ca4) static i32 s_right;
-    DATA(0x00534c74) static i32 s_y;
-    DATA(0x00534c7c) static i32 s_x;
-    DATA(0x00534c80) static u8* s_src;
-    DATA(0x00534c9c) static i32 s_clipR;
-    DATA(0x00534c8c) static i32 s_clipB;
-    DATA(0x00534c90) static u8* s_row;
-    DATA(0x00534c64) static u32 s_run;
-    DATA(0x00534c98) static u8 s_color;
-    DATA(0x00534c94) static u32 s_spanCount;
-    DATA(0x00534c70) static u32 s_dimLen;
-    DATA(0x00534c84) static u8* s_dimPal;
-    DATA(0x00534c6c) static u32 s_loopCount;
-    DATA(0x00534c88) static u8* s_dimDst;
-    DATA(0x00534ca0) static u8* s_dst;
-    DATA(0x00534c60) static i32 s_srcSkip;
-
     IconEntry* entry = &srcIcon->Entries()[frame];
     s_entry = entry;
     u8* src = srcIcon->m_data;

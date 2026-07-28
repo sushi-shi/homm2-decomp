@@ -3,26 +3,29 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconMacro.h>
+#include <BASE/IconRle.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
+DATA(0x00534c44) static i32 s_clipB;
+DATA(0x00534c34) static u32 s_loopCount;
+DATA(0x00534c24) static i32 s_pitch;
+DATA(0x00534c50) static i32 s_y;
+DATA(0x00534c54) static i32 s_x;
+DATA(0x00534c48) static i32 s_left;
+DATA(0x00534c30) static u32 s_run;
+DATA(0x00534c2c) static u8* s_dimPal;
+DATA(0x00534c20) static u8* s_row;
+DATA(0x00534c3c) static u8* s_dst;
+DATA(0x00534c38) static u8* s_src;
+DATA(0x00534c58) static IconEntry* s_entry;
+DATA(0x00534c5c) static u32 s_spanCount;
+DATA(0x00534c28) static u8 s_color;
+DATA(0x00534c4c) static u32 s_dimLen;
+DATA(0x00534c40) static i32 s_clipR;
+
 static inline i32 IconRowVisible(i32 currentY, i32 clipBottom, i32 clipTop) {
     return clipTop <= currentY && currentY <= clipBottom;
-}
-
-static inline i32 IconRunVisible(
-    i32 currentY,
-    i32 clipBottom,
-    i32 clipTop,
-    i32 currentX,
-    u32 runLength,
-    i32 clipLeft,
-    i32 clipRight
-) {
-    i32 runRight = currentX + runLength;
-    return IconRowVisible(currentY, clipBottom, clipTop)
-           && clipLeft < runRight && clipRight >= currentX;
 }
 
 VA(0x004d0570, 0x4ed)
@@ -39,147 +42,137 @@ void IconToBitmap(
     i32 clipH,
     i32 color
 ) {
-    DATA(0x00534c20) static u8* gIcRow;
-    DATA(0x00534c24) static i32 gIcPitch;
-    DATA(0x00534c28) static u8 gIcColor;
-    DATA(0x00534c2c) static u8* gIcDimPal;
-    DATA(0x00534c30) static u32 gIcRun;
-    DATA(0x00534c34) static u32 gIcCnt;
-    DATA(0x00534c38) static u8* gIcSrc;
-    DATA(0x00534c3c) static u8* gIcDimDst;
-    DATA(0x00534c40) static i32 gIcClipR;
-    DATA(0x00534c44) static i32 gIcClipB;
-    DATA(0x00534c48) static i32 gIcX0;
-    DATA(0x00534c4c) static u32 gIcDimLen;
-    DATA(0x00534c50) static i32 gIcY;
-    DATA(0x00534c54) static i32 gIcX;
-    DATA(0x00534c58) static IconEntry* gIcEntry;
-    DATA(0x00534c5c) static u32 gIcCnt2;
-
-    u8* data = srcIcon->m_data;
-    i32 entryOffset = frame * sizeof(IconEntry);
-    u8* entryData = data + entryOffset;
-    i32 entryX = reinterpret_cast<IconEntry*>(entryData)->x;
-    i32 sourceOffset = reinterpret_cast<IconEntry*>(entryData)->srcOffset;
-    IconEntry* entry = reinterpret_cast<IconEntry*>(entryData);
+    IconEntry* entries = srcIcon->Entries();
     u8* savedDst;
-    gIcEntry = entry;
-    gIcSrc = data + sourceOffset;
-    x += entryX;
-    y += entry->y;
-    i32 pitch = dest->m_width;
-    gIcX0 = x;
-    gIcPitch = pitch;
-    gIcY = y;
-    i32 X = x;
-    i32 currentY = y;
+    s_entry = &entries[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = x + s_entry->x;
+    s_pitch = dest->m_width;
+    s_y = y + s_entry->y;
+    i32 X = s_left;
 
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (gIcX0 < clipX || clipW + clipX < entry->w + gIcX0 || gIcY < clipY
-            || clipY + clipH < entry->h + gIcY) {
+        if (s_left < clipX || clipW + clipX < s_entry->w + s_left || s_y < clipY
+            || clipY + clipH < s_entry->h + s_y) {
             clip = ICON_DRAW_CLIP;
-            gIcClipR = clipX + clipW - 1;
-            gIcClipB = clipY + clipH - 1;
+            s_clipR = clipX + clipW - 1;
+            s_clipB = clipY + clipH - 1;
         } else {
             clip = ICON_DRAW_NO_CLIP;
         }
     }
 
-    i32 rowPitch = gIcPitch;
-    i32 rowY = gIcY;
-    u8* row = dest->m_pixels + rowPitch * rowY;
+    u8* row = dest->m_pixels + s_pitch * s_y;
     i32 command;
 
     for (;;) {
-        command = ReadIconRleByte(gIcSrc);
+        command = ReadIconRleByte(s_src);
         if (static_cast<i8>(command) < 0) {
             if ((command & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                gIcX = X;
-                gIcRow = row;
-                gIcRun = command;
+                s_x = X;
+                s_row = row;
+                s_run = command;
                 if ((command & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
                 X = X + (command & ICON_RLE_COMMAND_RUN_MASK);
                 continue;
             }
 
-            gIcRun = command;
+            s_run = command;
             u32 count = command & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
                 if (command == ICON_RLE_LONG_SOLID_COMMAND)
-                    count = ReadIconRleByte(gIcSrc);
-                gIcColor = ReadIconRleByte(gIcSrc);
+                    count = ReadIconRleByte(s_src);
+                s_color = ReadIconRleByte(s_src);
                 goto fill_run;
             }
 
-            flags = ReadIconRleByte(gIcSrc);
+            flags = ReadIconRleByte(s_src);
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)
-                count = ReadIconRleByte(gIcSrc);
-            gIcDimLen = count;
+                count = ReadIconRleByte(s_src);
+            s_dimLen = count;
 
             if (color != 0) {
-                gIcRun = flags;
+                s_run = flags;
                 if ((flags & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
-                    gIcCnt2 = count;
-                    gIcColor = static_cast<u8>(color);
+                    s_spanCount = count;
+                    s_color = static_cast<u8>(color);
                     goto fill_run;
                 }
             }
             goto dim_run;
 
         fill_run:
-            H2_ICON_RLE_FILL_RUN(
-                clip,
-                IconRunVisible(gIcY, gIcClipB, clipY, X, count, clipX, gIcClipR),
-                row,
-                X,
-                gIcColor,
-                count,
-                clipX,
-                clipW,
-                gIcClipR,
-                gIcRun
-            );
+            if (clip == ICON_DRAW_NO_CLIP) {
+                memset(row + X, s_color, count);
+            } else {
+                i32 right;
+                i32 fillLen;
+                if (IconRowVisible(s_y, s_clipB, clipY)
+                    && (right = X + count, clipX < right)
+                    && s_clipR >= X) {
+                    if (X >= clipX) {
+                        if (s_clipR >= right) {
+                            fillLen = count;
+                            memset(row + X, s_color, fillLen);
+                        } else {
+                            fillLen = (s_clipR - X) + 1;
+                            memset(row + X, s_color, fillLen);
+                        }
+                    } else {
+                        if (s_clipR >= right)
+                            fillLen = (count - clipX) + X;
+                        else
+                            fillLen = clipW;
+                        memset(row + clipX, s_color, fillLen);
+                    }
+                }
+            }
+            X = X + count;
+            s_run = count;
+            continue;
 
         dim_run:
-            gIcCnt2 = count;
-            gIcRun = flags;
+            s_spanCount = count;
+            s_run = flags;
             if ((flags & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                u8* palette = H2_ICON_RLE_DIM_PALETTE(flags);
+                u8* palette =
+                    reinterpret_cast<u8*>(uDimPal)
+                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
                 if (clip == ICON_DRAW_NO_CLIP) {
                     savedDst = row + X;
-                    gIcDimPal = palette;
-                    gIcDimDst = savedDst;
-                    gIcCnt = 0;
+                    s_dimPal = palette;
+                    s_dst = savedDst;
+                    s_loopCount = 0;
                     i32 dimCount = count;
                     if (dimCount > 0) {
-                        gIcCnt = dimCount;
+                        s_loopCount = dimCount;
                         do {
                             i32 b = *savedDst;
                             savedDst = savedDst + 1;
-                            gIcDimDst = savedDst;
+                            s_dst = savedDst;
                             count--;
-                            gIcDimPal = palette;
+                            s_dimPal = palette;
                             savedDst[-1] = palette[b];
                         } while (count != 0);
                     }
                 } else {
-                    gIcCnt2 = count;
-                    gIcDimPal = palette;
-                    if (clipY <= gIcY && gIcClipB >= gIcY && static_cast<i32>(X + count) > clipX
-                        && gIcClipR >= X) {
+                    s_spanCount = count;
+                    s_dimPal = palette;
+                    if (clipY <= s_y && s_clipB >= s_y && static_cast<i32>(X + count) > clipX
+                        && s_clipR >= X) {
                         i32 right = X + count;
                         u32 cn;
                         if (X >= clipX) {
                             cn = count;
-                            if (gIcClipR < right)
-                                cn = (gIcClipR - X) + 1;
+                            if (s_clipR < right)
+                                cn = (s_clipR - X) + 1;
                             savedDst = row + X;
                         } else {
-                            i32 clipRight = gIcClipR;
-                            gIcCnt2 = count;
+                            i32 clipRight = s_clipR;
+                            s_spanCount = count;
                             if (right <= clipRight)
                                 count = (count - clipX) + X;
                             else
@@ -187,61 +180,61 @@ void IconToBitmap(
                             cn = count;
                             savedDst = row + clipX;
                         }
-                        gIcCnt2 = cn;
-                        gIcDimDst = savedDst;
-                        gIcDimPal = palette;
-                        gIcCnt = 0;
+                        s_spanCount = cn;
+                        s_dst = savedDst;
+                        s_dimPal = palette;
+                        s_loopCount = 0;
                         i32 dimCount = cn;
                         if (dimCount > 0) {
-                            gIcCnt = dimCount;
+                            s_loopCount = dimCount;
                             do {
                                 i32 b = *savedDst;
                                 savedDst = savedDst + 1;
-                                gIcDimDst = savedDst;
+                                s_dst = savedDst;
                                 cn--;
-                                gIcDimPal = palette;
+                                s_dimPal = palette;
                                 savedDst[-1] = palette[b];
                             } while (cn != 0);
                         }
                     }
                 }
             }
-            X = X + gIcDimLen;
+            X = X + s_dimLen;
             continue;
         }
 
-        gIcX = X;
-        gIcRun = command;
+        s_x = X;
+        s_run = command;
         if (command != 0) {
             u32 count = command;
             if (clip == ICON_DRAW_NO_CLIP) {
-                memcpy(row + X, gIcSrc, count);
-            } else if (!(clipY > gIcY || gIcClipB < gIcY
-                         || clipX >= X + static_cast<i32>(count) || gIcClipR < X)) {
+                memcpy(row + X, s_src, count);
+            } else if (!(clipY > s_y || s_clipB < s_y
+                         || clipX >= X + static_cast<i32>(count) || s_clipR < X)) {
                 if (clipX <= X) {
-                    if (gIcClipR >= X + static_cast<i32>(count)) {
-                        memcpy(row + X, gIcSrc, count);
+                    if (s_clipR >= X + static_cast<i32>(count)) {
+                        memcpy(row + X, s_src, count);
                     } else {
-                        count = gIcClipR - X + 1;
-                        memcpy(row + X, gIcSrc, count);
+                        count = s_clipR - X + 1;
+                        memcpy(row + X, s_src, count);
                     }
                 } else {
-                    if (gIcClipR >= X + static_cast<i32>(count)) {
+                    if (s_clipR >= X + static_cast<i32>(count)) {
                         count -= clipX - X;
                     } else {
                         count = clipW;
                     }
-                    memcpy(row + clipX, gIcSrc + clipX - X, count);
+                    memcpy(row + clipX, s_src + clipX - X, count);
                 }
             }
 
             X += command;
-            gIcRun = command;
-            gIcSrc += command;
+            s_run = command;
+            s_src += command;
         } else {
-            X = gIcX0;
-            gIcY++;
-            row += gIcPitch;
+            X = s_left;
+            s_y++;
+            row += s_pitch;
         }
     }
 }

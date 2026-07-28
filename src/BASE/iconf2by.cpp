@@ -7,27 +7,28 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>
-DATA(0x00538118) static IconEntry* gFYEntry;
-DATA(0x00538128) static u8* gFYSrc;
-DATA(0x00538110) static i32 gFYX0;
-DATA(0x00538108) static i32 gFYXEnd;
-DATA(0x00538148) static i32 gFYY;
-DATA(0x00538120) static i32 gFYX;
-DATA(0x00538134) static i32 gFYClipB;
-DATA(0x00538140) static u8* gFYRow;
-DATA(0x00538144) static i32 gFYRun;
-DATA(0x0053812c) static u8 gFYColor;
-DATA(0x00538130) static i32 gFYDimLen;
-DATA(0x00538114) static u32 gFYDimLen2;
-DATA(0x0053810c) static u8* gFYDimPal;
-DATA(0x00538138) static i32 gFYDimIdx;
-DATA(0x0053814c) static u8* gFYDimDst;
-DATA(0x0053811c) static u8* gFYDst;
-DATA(0x00538124) static i32 gFYSkip;
-DATA(0x0053813c) static i32 gFYClipR;
 
-static inline i32 IconRowVisible(i8* shear, i32 clipTop) {
-    return shear[gFYY] != ICON_SHEAR_SKIP_ROW && clipTop <= gFYY && gFYY <= gFYClipB;
+DATA(0x00538134) static i32 s_clipB;
+DATA(0x00538138) static i32 s_loopIndex;
+DATA(0x00538148) static i32 s_y;
+DATA(0x00538120) static i32 s_x;
+DATA(0x0053814c) static u8* s_dimDst;
+DATA(0x00538110) static i32 s_left;
+DATA(0x00538108) static i32 s_right;
+DATA(0x00538144) static i32 s_run;
+DATA(0x0053810c) static u8* s_dimPal;
+DATA(0x00538140) static u8* s_row;
+DATA(0x0053811c) static u8* s_dst;
+DATA(0x00538128) static u8* s_src;
+DATA(0x00538124) static i32 s_srcSkip;
+DATA(0x00538118) static IconEntry* s_entry;
+DATA(0x00538130) static i32 s_spanCount;
+DATA(0x0053812c) static u8 s_color;
+DATA(0x00538114) static u32 s_dimLen;
+DATA(0x0053813c) static i32 s_clipR;
+
+static inline i32 IconRowVisible(i8* shear, i32 clipTop, i32 currentY, i32 clipBottom) {
+    return shear[currentY] != ICON_SHEAR_SKIP_ROW && clipTop <= currentY && currentY <= clipBottom;
 }
 
 VA(0x004d9ce0, 0x58d)
@@ -45,142 +46,134 @@ void FlipIconToBitmapYModify(
     i32 color,
     i8* shear
 ) {
-    i32 clipWidth = clipW;
-    IconEntry* entries = srcIcon->Entries();
-    gFYEntry = &entries[frame];
-    gFYSrc = srcIcon->m_data + gFYEntry->srcOffset;
-    gFYX0 = ((x - gFYEntry->w) - gFYEntry->x) + 1;
-    gFYXEnd = gFYEntry->w + gFYX0 - 1;
-    gFYY = gFYEntry->y + y;
-    gFYX = gFYXEnd - shear[gFYY];
-    gFYClipB = clipY + clipH - 1;
-    gFYClipR = clipX + clipWidth - 1;
-    gFYRow = dest->m_pixels + dest->m_width * gFYY;
+    s_entry = &srcIcon->Entries()[frame];
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = ((x - s_entry->w) - s_entry->x) + 1;
+    s_right = s_entry->w + s_left - 1;
+    s_y = s_entry->y + y;
+    s_x = s_right - shear[s_y];
+    s_clipB = clipY + clipH - 1;
+    s_clipR = clipX + clipW - 1;
+    s_row = dest->m_pixels + dest->m_width * s_y;
     for (;;) {
-        gFYRun = *gFYSrc++;
-        if (static_cast<i8>(gFYRun) < 0) {
-            if ((gFYRun & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) == 0)
+        s_run = *s_src++;
+        if (static_cast<i8>(s_run) < 0) {
+            if ((s_run & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
+                if ((s_run & ICON_RLE_COMMAND_RUN_MASK) == 0)
                     return;
-                gFYX = gFYX - (gFYRun & ICON_RLE_COMMAND_RUN_MASK);
+                s_x -= s_run & ICON_RLE_COMMAND_RUN_MASK;
                 continue;
             }
-            if ((gFYRun & ICON_RLE_COMMAND_RUN_MASK) != 0) {
-                if (gFYRun == ICON_RLE_LONG_SOLID_COMMAND) {
-                    gFYRun = *gFYSrc++;
+            if ((s_run & ICON_RLE_COMMAND_RUN_MASK) != 0) {
+                if (s_run == ICON_RLE_LONG_SOLID_COMMAND) {
+                    s_run = *s_src++;
                 } else {
-                    gFYRun = gFYRun & ICON_RLE_COMMAND_RUN_MASK;
+                    s_run &= ICON_RLE_COMMAND_RUN_MASK;
                 }
-                gFYColor = *gFYSrc++;
+                s_color = *s_src++;
             } else {
-                gFYRun = *gFYSrc++;
-                if ((gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
-                    gFYDimLen = gFYRun & ICON_RLE_DIM_SHORT_COUNT_MASK;
+                s_run = *s_src++;
+                if ((s_run & ICON_RLE_DIM_SHORT_COUNT_MASK) != 0) {
+                    s_spanCount = s_run & ICON_RLE_DIM_SHORT_COUNT_MASK;
                 } else {
-                    gFYDimLen = *gFYSrc++;
+                    s_spanCount = *s_src++;
                 }
-                gFYDimLen2 = gFYDimLen;
-                if (color != 0 && (gFYRun & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
-                    gFYRun = gFYDimLen;
-                    gFYColor = static_cast<u8>(color);
+                s_dimLen = s_spanCount;
+                if (color != 0 && (s_run & ICON_RLE_DIM_RECOLOR_FLAG) != 0) {
+                    s_run = s_spanCount;
+                    s_color = static_cast<u8>(color);
                 } else {
-                    if ((gFYRun & ICON_RLE_DIM_APPLY_FLAG) != 0) {
-                        gFYDimPal = reinterpret_cast<u8*>(uDimPal)
-                                    + (gFYRun & ICON_RLE_DIM_LEVEL_MASK)
+                    if ((s_run & ICON_RLE_DIM_APPLY_FLAG) != 0) {
+                        s_dimPal = reinterpret_cast<u8*>(uDimPal)
+                                    + (s_run & ICON_RLE_DIM_LEVEL_MASK)
                                           * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                        if (IconRowVisible(shear, clipY)) {
-                            if (clipX <= (gFYX - gFYDimLen) + 1 && gFYX <= gFYClipR) {
-                                u8* dimDst;
-                                if (clipX <= (gFYX - gFYDimLen) + 1) {
-                                    dimDst = (gFYRow - gFYDimLen) + gFYX + 1;
+                        if (IconRowVisible(shear, clipY, s_y, s_clipB)) {
+                            if (clipX <= (s_x - s_spanCount) + 1 && s_x <= s_clipR) {
+                                if (clipX <= (s_x - s_spanCount) + 1) {
+                                    s_dimDst = (s_row - s_spanCount) + s_x + 1;
                                 } else {
-                                    gFYDimLen = (gFYX - clipX) + 1;
-                                    dimDst = gFYRow + clipX;
+                                    s_spanCount = (s_x - clipX) + 1;
+                                    s_dimDst = s_row + clipX;
                                 }
-                                gFYDimIdx = 0;
-                                gFYDimDst = dimDst;
-                                if (0 < gFYDimLen) {
+                                s_loopIndex = 0;
+                                if (0 < s_spanCount) {
                                     do {
-                                        *gFYDimDst = gFYDimPal[*gFYDimDst];
-                                        gFYDimDst = gFYDimDst + 1;
-                                        gFYDimIdx = gFYDimIdx + 1;
-                                    } while (gFYDimIdx < gFYDimLen);
+                                        *s_dimDst = s_dimPal[*s_dimDst];
+                                        s_dimDst += 1;
+                                        s_loopIndex += 1;
+                                    } while (s_loopIndex < s_spanCount);
                                 }
                             }
                         }
                     }
-                    gFYX = gFYX - gFYDimLen2;
+                    s_x -= s_dimLen;
                     continue;
                 }
             }
-            if (IconRowVisible(shear, clipY)) {
-                u32 fillCount = gFYRun;
-                if (clipX <= static_cast<i32>((gFYX - fillCount) + 1) && gFYX <= gFYClipR) {
-                    if (clipX <= static_cast<i32>((gFYX - fillCount) + 1)) {
-                        memset((gFYRow - fillCount) + 1 + gFYX, gFYColor, fillCount);
+            if (IconRowVisible(shear, clipY, s_y, s_clipB)) {
+                u32 fillCount = s_run;
+                if (clipX <= static_cast<i32>((s_x - fillCount) + 1) && s_x <= s_clipR) {
+                    if (clipX <= static_cast<i32>((s_x - fillCount) + 1)) {
+                        memset((s_row - fillCount) + 1 + s_x, s_color, fillCount);
                     } else {
-                        memset(gFYRow + clipX, gFYColor, (gFYX - clipX) + 1);
+                        memset(s_row + clipX, s_color, (s_x - clipX) + 1);
                     }
                 }
             }
-            gFYX = gFYX - gFYRun;
+            s_x -= s_run;
             continue;
         }
-        if (gFYRun != 0) {
-            if (IconRowVisible(shear, clipY)) {
-                i32 left = (gFYX - gFYRun) + 1;
+        if (s_run != 0) {
+            if (IconRowVisible(shear, clipY, s_y, s_clipB)) {
+                i32 left = (s_x - s_run) + 1;
                 i32 pendingSkip;
-                if (left <= gFYClipR && clipX <= gFYX) {
-                    if (gFYX <= gFYClipR) {
-                        gFYDst = gFYRow + gFYX;
-                        if (clipX <= left) {
-                            gFYSkip = 0;
-                            gFYDimLen = gFYRun;
-                            goto copy_literal;
+                if (left <= s_clipR && clipX <= s_x) {
+                    do {
+                        if (s_x <= s_clipR) {
+                            s_dst = s_row + s_x;
+                            if (clipX <= left) {
+                                s_srcSkip = 0;
+                                s_spanCount = s_run;
+                                break;
+                            }
+                            s_spanCount = (s_x - clipX) + 1;
+                            pendingSkip = s_run - s_spanCount;
+                        } else {
+                            s_src += s_x - s_clipR;
+                            s_dst = s_row + s_clipR;
+                            if (clipX <= (s_x - s_run)) {
+                                s_srcSkip = 0;
+                                s_spanCount = (s_run - s_x) + s_clipR;
+                                break;
+                            }
+                            pendingSkip = s_run;
+                            pendingSkip -= s_x;
+                            pendingSkip -= clipW;
+                            pendingSkip += s_clipR;
+                            s_spanCount = clipW;
                         }
-                        gFYDimLen = (gFYX - clipX) + 1;
-                        pendingSkip = gFYRun - gFYDimLen;
-                        goto publish_literal_skip;
-                    } else {
-                        gFYSrc = gFYSrc + (gFYX - gFYClipR);
-                        u8* rightDst = gFYRow + gFYClipR;
-                        if (clipX <= (gFYX - gFYRun)) {
-                            gFYDst = rightDst;
-                            gFYSkip = 0;
-                            gFYDimLen = (gFYRun - gFYX) + gFYClipR;
-                            goto copy_literal;
-                        }
-                        gFYDst = rightDst;
-                        pendingSkip = gFYRun;
-                        pendingSkip = pendingSkip - gFYX;
-                        pendingSkip = pendingSkip - clipWidth;
-                        pendingSkip = pendingSkip + gFYClipR;
-                        gFYDimLen = clipWidth;
-                        goto publish_literal_skip;
-                    }
-                publish_literal_skip:
-                    gFYSkip = pendingSkip;
-                copy_literal:
-                    gFYDimIdx = 0;
-                    if (0 < gFYDimLen) {
+                        s_srcSkip = pendingSkip;
+                    } while (0);
+                    s_loopIndex = 0;
+                    if (0 < s_spanCount) {
                         do {
-                            *gFYDst = *gFYSrc;
-                            gFYSrc = gFYSrc + 1;
-                            gFYDst = gFYDst - 1;
-                            gFYDimIdx = gFYDimIdx + 1;
-                        } while (gFYDimIdx < gFYDimLen);
+                            *s_dst = *s_src++;
+                            s_dst -= 1;
+                            s_loopIndex += 1;
+                        } while (s_loopIndex < s_spanCount);
                     }
-                    gFYSrc = gFYSrc + gFYSkip;
-                    goto literal_advance_done;
+                    s_src += s_srcSkip;
+                } else {
+                    s_src += s_run;
                 }
+            } else {
+                s_src += s_run;
             }
-            gFYSrc = gFYSrc + gFYRun;
-        literal_advance_done:
-            gFYX = gFYX - gFYRun;
+            s_x -= s_run;
             continue;
         }
-        gFYX = gFYXEnd - shear[gFYY];
-        gFYY = gFYY + 1;
-        gFYRow = gFYRow + dest->m_width;
+        s_x = s_right - shear[s_y];
+        s_y += 1;
+        s_row += dest->m_width;
     }
 }
