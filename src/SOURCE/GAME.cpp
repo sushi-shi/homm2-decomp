@@ -7165,27 +7165,28 @@ i32 CalcBaseScore(i32 days) {
 
     if (days <= SCORE_FIRST_TIER) {
         score -= -(-days);
-    } else {
+        goto clampScore;
+    } else
         score -= SCORE_FIRST_TIER;
-        if (days <= SCORE_SECOND_TIER) {
-            score = static_cast<i32>(
-                score - (days - SCORE_FIRST_TIER) * SCORE_SECOND_TIER_FACTOR
-            );
-        } else {
-            score = static_cast<i32>(score - SCORE_SECOND_TIER_BASE_DEDUCTION);
-            if (days <= SCORE_THIRD_TIER) {
-                score = static_cast<i32>(
-                    score - (days - SCORE_SECOND_TIER) * DATA_COMPGEN(0x004eb770, calcBaseScoreConstant, SCORE_THIRD_TIER_FACTOR)
-                );
-            } else {
-                score = static_cast<i32>(score - SCORE_THIRD_TIER_BASE_DEDUCTION);
-                score = static_cast<i32>(
-                    score - (days - SCORE_THIRD_TIER) * SCORE_FINAL_TIER_FACTOR
-                );
-            }
-        }
-    }
+    if (days <= SCORE_SECOND_TIER) {
+        score = static_cast<i32>(
+            score - (days - SCORE_FIRST_TIER) * SCORE_SECOND_TIER_FACTOR
+        );
+        goto clampScore;
+    } else
+        score = static_cast<i32>(score - SCORE_SECOND_TIER_BASE_DEDUCTION);
+    if (days <= SCORE_THIRD_TIER) {
+        score = static_cast<i32>(
+            score - (days - SCORE_SECOND_TIER) * DATA_COMPGEN(0x004eb770, calcBaseScoreConstant, SCORE_THIRD_TIER_FACTOR)
+        );
+        goto clampScore;
+    } else
+        score = static_cast<i32>(score - SCORE_THIRD_TIER_BASE_DEDUCTION);
+    score = static_cast<i32>(
+        score - (days - SCORE_THIRD_TIER) * SCORE_FINAL_TIER_FACTOR
+    );
 
+clampScore:
     if (score < SCORE_MINIMUM)
         score = SCORE_MINIMUM;
     return score;
