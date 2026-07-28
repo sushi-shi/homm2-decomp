@@ -2904,7 +2904,9 @@ MessageDispatchResult TavernHandler(tag_message& message) {
                     case TOWN_DIALOG_CONFIRM:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        // Retail reads the id back rather than restating the constant.
+                        message.payload.widget.command =
+                            static_cast<BaseWidgetCommand>(message.payload.widget.id);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;

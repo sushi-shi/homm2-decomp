@@ -8500,7 +8500,10 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
-                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        // Retail reads the id back rather than restating the
+                        // constant; both spell 10.
+                        message.payload.widget.command =
+                            static_cast<BaseWidgetCommand>(message.payload.widget.id);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
