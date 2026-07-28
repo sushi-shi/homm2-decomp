@@ -66,48 +66,47 @@ DATA(0x00517148) static i16 gPollRemoteLineBase = 757; // NOLINT(readability-mag
 VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {
     LogStr(DATA_COMPGEN(0x00516fd4, remoteCleanupRC1, "RC1"));
-    if (gbRemoteOn == 0) {
-    } else {
-        LogStr(DATA_COMPGEN(0x00516fd8, remoteCleanupRC2, "RC2"));
-        if (gbInRemoteMain != 0) {
-        } else {
-            if (gbInRemoteCleanup != 0) {
-            } else {
-                gbInRemoteCleanup = true;
-                LogStr(DATA_COMPGEN(0x00516fdc, remoteCleanupRC3, "RC3"));
-                switch (GameMode) {
+    if (gbRemoteOn == 0)
+        return;
+    LogStr(DATA_COMPGEN(0x00516fd8, remoteCleanupRC2, "RC2"));
+    if (gbInRemoteMain != 0)
+        return;
+    if (gbInRemoteCleanup != 0)
+        return;
+    gbInRemoteCleanup = true;
+    LogStr(DATA_COMPGEN(0x00516fdc, remoteCleanupRC3, "RC3"));
+    switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
-                        UnloadRemoteDriver(1);
-                        break;
+            UnloadRemoteDriver(1);
+            break;
         case REMOTE_GAME_MODEM_HOST:
         case REMOTE_GAME_MODEM_GUEST:
-                        UnloadRemoteDriver(0);
-                        break;
-                }
-                gbRemoteOn = false;
-                xNetHasOldPlayers = 0;
-                iInOrderCtr = 0;
-                iCurLastID = 0;
-                giLastConfirm = -1;
-                GameMode = REMOTE_GAME_NONE;
-                lLastHeartbeatSend = 0;
-                gbInRemoteMain = false;
-                iIDCtr = 0;
-                iTimesDropped = 0;
-                bUseDirectPlay = 0;
-                bUseWinsock = 0;
-                bInTimeoutFail = 0;
-                bUseDirectPlay = 0;
-                bUseWinsock = 0;
-                bInTimeoutFail = 0;
-                iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
-                iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
-                gbGotFirstHeartbeat = false;
-                gbInRemoteCleanup = false;
-            }
-        }
+            UnloadRemoteDriver(0);
+            break;
+        default:
+            break;
     }
+    gbRemoteOn = false;
+    xNetHasOldPlayers = 0;
+    iInOrderCtr = 0;
+    iCurLastID = 0;
+    giLastConfirm = -1;
+    GameMode = REMOTE_GAME_NONE;
+    lLastHeartbeatSend = 0;
+    gbInRemoteMain = false;
+    iIDCtr = 0;
+    iTimesDropped = 0;
+    bUseDirectPlay = 0;
+    bUseWinsock = 0;
+    bInTimeoutFail = 0;
+    bUseDirectPlay = 0;
+    bUseWinsock = 0;
+    bInTimeoutFail = 0;
+    iMPNetProtocol = REMOTE_PROTOCOL_NETBIOS;
+    iLastDiffSendTo = DIFF_SEND_FORCE_WHOLE;
+    gbGotFirstHeartbeat = false;
+    gbInRemoteCleanup = false;
 }
 
 VA(0x004a3208, 0x6da)
@@ -827,10 +826,10 @@ i32 TransmitAndWait(
     i8 responseCommand,
     char** response
 ) {
-    char* receivedData;
     i32 result;
-    i32 waitStart;
+    i32 ticks;
     i8 complete;
+    char* receivedData;
     i32 unusedResponseState;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
@@ -845,43 +844,42 @@ i32 TransmitAndWait(
         1,
         REMOTE_MESSAGE_DEFAULT
     );
-    if (result == 0) {
-    } else {
-        waitStart = KBTickCount();
-        complete = 0;
-        while (complete == 0) {
-            if (waitStart + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
-                NormalDialog(
-                    DATA_COMPGEN(0x00517318, transmitAndWaitErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                    waitStart = KBTickCount();
-                } else {
-                    result = 0;
-                    goto transmitComplete;
-                }
-            }
-            ForcePollSound();
-            receivedData = GetRemoteData(1);
-            if (receivedData != NULL)
-                unusedResponseState = 0;
-            if (receivedData != NULL
-                && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
-                complete = 1;
+    if (result == 0)
+        goto transmitComplete;
+    ticks = KBTickCount();
+    complete = 0;
+    while (complete == 0) {
+        if (ticks + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
+            NormalDialog(
+                DATA_COMPGEN(0x00517318, transmitAndWaitErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
+                NORMAL_DIALOG_CONFIRM,
+                -1,
+                -1,
+                -1,
+                0,
+                -1,
+                0,
+                -1,
+                0
+            );
+            if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
+                ticks = KBTickCount();
+            } else {
+                result = 0;
+                goto transmitComplete;
             }
         }
-        *response = receivedData;
+        ForcePollSound();
+        receivedData = GetRemoteData(1);
+        if (receivedData != NULL)
+            unusedResponseState = 0;
+        if (receivedData != NULL
+            && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
+            && REMOTE_MESSAGE(receivedData)->command == responseCommand) {
+            complete = 1;
+        }
     }
+    *response = receivedData;
 transmitComplete:
     return result;
 }
