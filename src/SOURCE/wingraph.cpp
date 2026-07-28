@@ -653,7 +653,7 @@ void WGInitGraphics(void) {
     screenImage.header.biHeight = -WINGRAPH_HEIGHT;
     bitmap =
         WinGCreateBitmap(hdcImage, reinterpret_cast<BITMAPINFO*>(&screenImage), &screenImage.bits);
-    screenImage.header.biSizeImage = OR_STEER(screenImage.header.biWidth) * screenImage.header.biHeight;
+    screenImage.header.biSizeImage = screenImage.header.biWidth * screenImage.header.biHeight;
     screenImage.header.biSizeImage *= Orientation;
     gbmOldMonoBitmap = static_cast<HBITMAP>(SelectObject(hdcImage, bitmap));
     lpInitWin = screenImage.bits;

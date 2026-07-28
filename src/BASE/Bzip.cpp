@@ -752,7 +752,7 @@ Int32 NORMALISEHI(Int32 p) {
 
 VA(0x004d5810, 0x31)
 Int32 NORMALISELO(Int32 p) {
-    return IF_THEN_ELSE(((p) < 0), (OR_STEER((p)) + lastPP), (p));
+    return IF_THEN_ELSE(((p) < 0), ((p) + lastPP), (p));
 }
 
 VA(0x004d5850, 0x39)

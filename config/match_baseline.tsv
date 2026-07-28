@@ -41,7 +41,7 @@ BASE/Bzip	?FreeDecompressStructures@@YIXXZ	100.0000	febf408b7c85
 BASE/Bzip	?GETALL@@YIIH@Z	100.0000	0086d3fb49e5
 BASE/Bzip	?NORMALISE@@YIHH@Z	100.0000	b3a35e1c6224
 BASE/Bzip	?NORMALISEHI@@YIHH@Z	100.0000	16c66d4f859d
-BASE/Bzip	?NORMALISELO@@YIHH@Z	100.0000	4f5a8b4fbce0
+BASE/Bzip	?NORMALISELO@@YIHH@Z	100.0000	c68595a63256
 BASE/Bzip	?SETFIRST16@@YIXHI@Z	100.0000	5a6d28e335b0
 BASE/Bzip	?SETFIRST@@YIXHE@Z	100.0000	33a3ae355ced
 BASE/Bzip	?SETFOURTH@@YIXHE@Z	100.0000	bec7abb47b47
@@ -389,7 +389,7 @@ BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	100.0000	1717d9feb43f
 BASE/soundmgr	?AllocateSampleHandles@soundManager@@QAEXXZ	100.0000	d1623e77e613
 BASE/soundmgr	?CDIsPlaying@soundManager@@QAEHXZ	100.0000	c2b0e27ac69a
 BASE/soundmgr	?CDPlay@soundManager@@QAEXHHHH@Z	100.0000	e0ffad1b368d
-BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	100.0000	6e18157a4ec1
+BASE/soundmgr	?CDPoll@soundManager@@QAEXXZ	100.0000	2ad972bb8174
 BASE/soundmgr	?CDSetVolume@soundManager@@QAEXHH@Z	100.0000	b59e5965d570
 BASE/soundmgr	?CDShutdown@soundManager@@QAEXXZ	100.0000	848c51e3064c
 BASE/soundmgr	?CDStartup@soundManager@@QAEXXZ	100.0000	08e5e410ec57
@@ -727,7 +727,7 @@ SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	100.0000	1b48ec4a0f67
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	100.0000	52d3e5726afd
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	100.0000	dbbb0adea44e
 SOURCE/EVENTS	?GenericSiteAIEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	92.5136	25e56edc0c3f
-SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	97.1120	f182847f0279
+SOURCE/EVENTS	?GenericSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	97.1120	7e224f2e3086
 SOURCE/EVENTS	?GhostEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	d48193191da0
 SOURCE/EVENTS	?GiveArtifact@@YIHPAVhero@@HHC@Z	100.0000	450575d0ccdb
 SOURCE/EVENTS	?GiveExperience@advManager@@QAEHPAVhero@@HH@Z	100.0000	70189f16034c
@@ -1202,7 +1202,7 @@ SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	100.0000	eb97ff78f36c
 SOURCE/SMACKMGR	?PointInRect@@YICHHPAUtag_rect@@@Z	100.0000	e4ec390bc280
 SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	03be6c576e52
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	4f7ce9e0410d
-SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	100.0000	81bd56364a50
+SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	99.8963	f013c4b464e1
 SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	a4d6ebd8f1a4
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	98.6532	65e7b1ad3056
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	100.0000	5b33d8bad638
@@ -1464,7 +1464,7 @@ SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	f0f9ec94ffc4
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	100.0000	d2c96363c18e
 SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	100.0000	de1b147fdef8
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	7fe4b2109860
-SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	48ad9ec7afeb
+SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	a06fed66ceea
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	100.0000	e29ceb9ba22f
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	0ff7295e73c3
 SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	100.0000	a7e0b4851dbe
