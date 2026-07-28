@@ -854,6 +854,8 @@ mapCell* advManager::MoveHero(
             case MAP_OBJECT_DUNE:
             case MAP_OBJECT_LAVA_POOL:
             case MAP_OBJECT_SHRUB:
+            case MAP_OBJECT_ARENA:
+            case MAP_OBJECT_BARROW_MOUNDS:
                 eventCell_g = NULL;
         }
     }
