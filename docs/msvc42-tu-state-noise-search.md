@@ -79,7 +79,11 @@ target's raw text digest, objdiff function boundary, and ordered relocation stre
 only numeric `$SG`/`$T` compiler-private counters with stable placeholders—not by fuzzy score,
 because several distinct objects may share one percentage. Public target identities, relocation
 sites/types/addends, and all other spellings remain part of the state. The report also counts the
-raw private-label spellings folded into each state. Pass `--state-summary` to preserve a compact
+raw private-label spellings folded into each state. Pass `--jobs N` to compile that many trials
+concurrently: each candidate is written to a disposable dotted source copy beside the target (so
+include resolution is unchanged), the reconstructed source is never edited in parallel mode, and
+every score comes from the same serial pipeline; the parallel and serial paths are
+score-identical by construction and by A/B. Pass `--state-summary` to preserve a compact
 JSON census with one complete reproducible probe body and atom permutation per state. Each state
 also records its block count and aligned flow/size classification. With `--retain-best`, two
 independent sub-100 COFF/assembly pairs are kept: `best.*` for fuzzy score and
