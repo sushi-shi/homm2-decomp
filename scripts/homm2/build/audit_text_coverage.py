@@ -12,6 +12,38 @@ from pathlib import Path
 
 PADDING = {0x00, 0x90, 0xcc}
 
+# LINK also aligns the next function with the multi-byte NOP encodings, which no
+# single-byte set can express. A gap made only of these is alignment fill, not
+# unattributed code.
+ALIGNMENT_NOPS = (
+    bytes.fromhex("8da42400000000"),  # lea esp, [esp]
+    bytes.fromhex("8d642400"),        # lea esp, [esp]
+    bytes.fromhex("8d4900"),          # lea ecx, [ecx]
+    bytes.fromhex("8d7f00"),          # lea edi, [edi]
+    bytes.fromhex("6690"),            # xchg ax, ax
+    bytes.fromhex("8bff"),            # mov edi, edi
+)
+
+
+def is_alignment_fill(body):
+    """True when *body* is nothing but linker alignment fill."""
+    if not body:
+        return False
+    if set(body) <= PADDING:
+        return True
+    pos = 0
+    while pos < len(body):
+        if body[pos] in PADDING:
+            pos += 1
+            continue
+        for nop in ALIGNMENT_NOPS:
+            if body[pos:pos + len(nop)] == nop:
+                pos += len(nop)
+                break
+        else:
+            return False
+    return True
+
 
 def rows_without_comments(path):
     return csv.DictReader(line for line in open(path, newline="")
@@ -373,7 +405,7 @@ def main(argv=None):
     for start, end in gaps:
         for piece_start, piece_end in subtract_ranges(start, end, exclusions):
             body = text[piece_start - text_rva:piece_end - text_rva]
-            if set(body) <= PADDING:
+            if is_alignment_fill(body):
                 padding_count += 1
             else:
                 unexplained.append((piece_start, piece_end, len(body)))
@@ -389,7 +421,7 @@ def main(argv=None):
         if any(start <= rva < end for rva, _owner_start, _owner_end in candidates):
             exclusion_failures.append((start, "contains an executable-entry candidate"))
         body = text[start - text_rva:end - text_rva]
-        if not body or set(body) <= PADDING:
+        if not body or is_alignment_fill(body):
             exclusion_failures.append((start, "contains padding only"))
         contained_tables = sum(start <= left and right <= end for left, right in jump_tables)
         if jump_tables and kind == "embedded-data" and not contained_tables:
