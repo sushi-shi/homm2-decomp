@@ -11,6 +11,7 @@
 #include <BASE/icon2bc.h>
 #include <BASE/Iconf2b.h>
 #include <BASE/Misc.h>
+#include <BASE/DebugCheck.h>
 #include <BASE/widgetKind.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -5309,6 +5310,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 
     if (locatorSlot == -1) {
         selectedHero9 = gpCurPlayer->m_currentHero;
+        DebugCheck();
         if (selectedHero9 == INVALID_HERO) {
             return;
         }
@@ -5349,7 +5351,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
             m_adventureWindow->BroadcastMessage(locatorMessage15);
         }
     } else {
-        locatorHero8 = &gpGame->m_heroRecs[heroId9];
+        locatorHero8 = gpGame->GetHero(heroId9);
         locatorMessage15.payload.widget.id = widgetBase7 + LOCATOR_HERO_IMAGE_OFFSET;
         locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
         locatorMessage15.payload.widget.data.value = LOCATOR_HERO_DEFAULT_FRAME;
@@ -5540,7 +5542,7 @@ void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen
     if (!gbThisNetHumanPlayer[giCurPlayer] || gbAllBlack
         || gpGame->m_players[giCurPlayer].m_color != gpCurPlayer->m_color) {
         updated = UpdBottomViewEnemyTurn();
-    } else if (gpCurPlayer->m_currentHero == INVALID_HERO) {
+    } else if (gpCurPlayer->CurrentHero() == INVALID_HERO) {
         updated = UpdBottomViewKingdom();
     } else {
         updated = UpdBottomViewHero();
