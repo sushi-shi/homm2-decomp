@@ -40,18 +40,21 @@ void FlipIconToBitmap(
     i32 clipH,
     i32 color
 ) {
-    IconEntry* entry = &srcIcon->Entries()[frame];
+    IconEntry* entries = srcIcon->Entries();
     u8* src = srcIcon->m_data;
-    s_entry = entry;
+    i32 width = entries[frame].w;
+    IconEntry* entry = &entries[frame];
     i32 entryX = entry->x;
     i32 x0 = x - entryX;
     src += entry->srcOffset;
-    i32 width = entry->w;
-    x0 = (x0 - width) + 1;
+    i32 entryY = entry->y;
+    x0 = x0 - width;
+    s_entry = entry;
+    x0++;
     s_left = x0;
     i32 currentX = (width - 1) + x0;
+    s_y = y + entryY;
     s_right = currentX;
-    s_y = y + entry->y;
     if (clip != ICON_DRAW_NO_CLIP) {
         if (s_left < clipX || clipW + clipX < s_left + width || s_y < clipY
             || clipY + clipH < entry->h + s_y) {
