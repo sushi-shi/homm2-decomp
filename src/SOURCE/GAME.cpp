@@ -2936,7 +2936,7 @@ VA(0x00478fea, 0x3aa)
 void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     i32 i;
     town* townRec;
-    mapCell* cell;
+    mapCell* cellPtr;
 
     if (!gbInNewGameSetup)
         SendMapChange(
@@ -2965,23 +2965,23 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     m_players[player].m_townIds[m_players[player].m_townCount] = static_cast<i8>(townId);
     m_players[player].m_townCount++;
 
-    cell = m_worldMap.GetCell(m_castleRecs[townId].m_x - 1, m_castleRecs[townId].m_y);
+    cellPtr = m_worldMap.GetCell(m_castleRecs[townId].m_x - 1, m_castleRecs[townId].m_y);
     m_worldMap.ChangeTilesetIndex(
-        cell,
+        cellPtr,
         m_castleRecs[townId].m_x - 1,
         m_castleRecs[townId].m_y,
         TILESET_FLAG32,
-        m_players[static_cast<i8>(player)].m_color * TOWN_FLAG_FRAME_STRIDE,
+        GetPlayerColor(static_cast<i8>(player)) * TOWN_FLAG_FRAME_STRIDE,
         1,
         -1
     );
-    cell = m_worldMap.GetCell(m_castleRecs[townId].m_x + 1, m_castleRecs[townId].m_y);
+    cellPtr = m_worldMap.GetCell(m_castleRecs[townId].m_x + 1, m_castleRecs[townId].m_y);
     m_worldMap.ChangeTilesetIndex(
-        cell,
+        cellPtr,
         m_castleRecs[townId].m_x + 1,
         m_castleRecs[townId].m_y,
         TILESET_FLAG32,
-        m_players[static_cast<i8>(player)].m_color * TOWN_FLAG_FRAME_STRIDE
+        GetPlayerColor(static_cast<i8>(player)) * TOWN_FLAG_FRAME_STRIDE
             + TOWN_FLAG_RIGHT_FRAME,
         1,
         -1
@@ -3060,7 +3060,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
             x,
             y,
             TILESET_FLAG32,
-            m_players[static_cast<i8>(player)].m_color + flag,
+            GetPlayerColor(static_cast<i8>(player)) + flag,
             1,
             -1
         );
