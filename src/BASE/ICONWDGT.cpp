@@ -209,8 +209,8 @@ void iconWidget::Draw(void) {
             i16 iconWidth;
             iconWidth = entry->w;
             y -= entry->y;
-            widgetWidth = m_width;
             x -= entry->x;
+            widgetWidth = m_width;
             if (iconWidth < widgetWidth)
                 x += (widgetWidth - iconWidth) >> CENTER_SHIFT;
             if (entry->h + BOTTOM_PADDING < m_height)
