@@ -301,7 +301,7 @@ void dpProcessMessages(void) {
             DPSD(receiveResult, DATA_COMPGEN(0x004efb18, dpProcessMessagesIProjectsHeroesProgSOURCEDpnetwin, RETAIL_FILE), processSourceLineBase + 23);
         if (senderId == 0) {
         } else {
-            if (destinationIds[0] == 0 || destinationIds[0] == OD_STEER(dcoID))
+            if (destinationIds[0] == 0 || destinationIds[0] == dcoID)
                 dpEvaluateMessage(packetSize[0], senderId);
         }
     }
@@ -416,7 +416,7 @@ i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
-    if (iLastMsgNumHumanPlayers != OD_STEER(giNumHumanPlayers)) {
+    if (iLastMsgNumHumanPlayers != giNumHumanPlayers) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,

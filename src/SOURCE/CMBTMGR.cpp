@@ -1010,7 +1010,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
         xResidual = gridX % COMBAT_HEX_HORIZONTAL_STEP;
         diagonalDistance =
             abs(xResidual - COMBAT_HEX_ROW_STAGGER) / COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
-        if (OR_STEER(yOffset) < diagonalDistance) {
+        if (yOffset < diagonalDistance) {
             rowIndex--;
             if (xResidual < COMBAT_HEX_ROW_STAGGER) {
                 if (!(rowIndex & 1))
@@ -1731,7 +1731,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         shotCount28 /= COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR;
 
     i32 damage8 = 0;
-    for (armyIndex3 = 0; OR_STEER(shotCount28) > armyIndex3; armyIndex3++)
+    for (armyIndex3 = 0; shotCount28 > armyIndex3; armyIndex3++)
         damage8 += SRandom(COMBAT_KEEP_RANDOM_DAMAGE_MIN, COMBAT_KEEP_RANDOM_DAMAGE_MAX);
     damage8 = static_cast<i32l>(
         damage8 * gfBattleStat[attackBonus4 + COMBAT_KEEP_ATTACK_STAT_INDEX_OFFSET]

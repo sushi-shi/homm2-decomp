@@ -632,7 +632,7 @@ mapCell* advManager::MoveHero(
         boat->direction = m_cursorDirection;
         boat->heroId = static_cast<i8>(boat->heroId | BOAT_OCCUPIED_FLAG);
         boatCell_a->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
-        boatCell_a->m_objectMetadata = static_cast<u16>(OD_STEER(step_a));
+        boatCell_a->m_objectMetadata = static_cast<u16>(step_a);
         boat->x = static_cast<i8>(movingHero_f->m_x);
         boat->y = static_cast<i8>(movingHero_f->m_y);
         StopCursor(1);
@@ -781,7 +781,7 @@ mapCell* advManager::MoveHero(
                 m_updateMinY = startVals[directionY_b + 1];
             }
             i32l tick = KBTickCount();
-            if (OD_STEER(step_a) + 1 == halfSteps_o * MOVE_TILE_HALF_COUNT) {
+            if (step_a + 1 == halfSteps_o * MOVE_TILE_HALF_COUNT) {
                 m_updateMinX = 0;
                 m_updateMinY = 0;
             } else {

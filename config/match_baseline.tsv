@@ -611,12 +611,12 @@ SOURCE/CMBTMGR	?FreeArmies@combatManager@@QAEXXZ	100.0000	484834dd090b
 SOURCE/CMBTMGR	?FreeIcons@combatManager@@QAEXXZ	100.0000	461c482d9584
 SOURCE/CMBTMGR	?GenerateMap@combatManager@@QAEXXZ	100.0000	53217f573d89
 SOURCE/CMBTMGR	?GetBackgroundName@combatManager@@QAEPADXZ	100.0000	630d96d071b0
-SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	bca1ba5ff99b
+SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	100.0000	5f292ab885bd
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	100.0000	77ea9f6e918c
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	9958022caed6
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	cf7a75230ca8
 SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	9c177c0261ad
-SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	100.0000	76a4e6e60008
+SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	100.0000	d604bec5af19
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	100.0000	5ba667017fb8
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.0950	52eda7315333
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	100.0000	f13fafc4223c
@@ -676,7 +676,7 @@ SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	100.0000	73090b5d579c
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	100.0000	47fa1e66459e
 SOURCE/CURSOR	?GetCursorBaseFrame@advManager@@QAEHH@Z	100.0000	2f1e1c7d5503
 SOURCE/CURSOR	?GetMoveShowIt@advManager@@QAEHPAVhero@@H@Z	100.0000	6a74e5fe567f
-SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	97.3994	a334e729811a
+SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	97.1973	a789f9e253de
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	95.0494	805556da534a
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	8fae25eb5921
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	c1ff9e8eeab8
@@ -1384,9 +1384,9 @@ SOURCE/dpnetwin	?DPSD@@YIXHPADH@Z	100.0000	032fd8fca8b4
 SOURCE/dpnetwin	?dpEnumServiceProvider@@YGHPAU_GUID@@PADKKPAX@Z	100.0000	e28889dca67e
 SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	100.0000	86abfb62be5f
 SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8b7cbda874d4
-SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	100.0000	642ee837031e
+SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	97.7358	8c02e47fe579
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	100.0000	ed9c8b7ec742
-SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	c83cd47ceeee
+SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	99.7222	11ae2705655d
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	100.0000	ee547f2be814
 SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	100.0000	42421cf83f8a
 SOURCE/dpnetwin	?dpnet_init@@YIFXZ	100.0000	e2b525c1d694
