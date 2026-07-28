@@ -506,7 +506,7 @@ SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	98.7456	5e4ebd2056bb
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	100.0000	b0b5b175db8c
 SOURCE/ADVMGR	?TownPortalHandler@@YIHAAUtag_message@@@Z	95.6164	5c00fe0cc843
 SOURCE/ADVMGR	?TownQuickView@advManager@@QAEXHHHH@Z	99.9973	4a6d1ac77184
-SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	97.8829	44697e428ed6
+SOURCE/ADVMGR	?TrimLoopingSounds@advManager@@QAEXH@Z	100.0000	a95cf689695e
 SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	100.0000	73494a125d75
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.2903	fca61ae310fd
 SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	100.0000	620cdd5cc4e3
@@ -517,7 +517,7 @@ SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	100.0000	13e0b2af391a
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	42645560e031
 SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	99.5579	e2eb6798dee1
 SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	100.0000	f1f0c8f558a0
-SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	94.0829	cedc223f1acf
+SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	100.0000	aa270c0a0ec6
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	100.0000	a7574c6bfc69
 SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.3333	184a6006a045
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.4904	78849a4f08be
@@ -642,7 +642,7 @@ SOURCE/COMMAND	?CheckGetAIMove@combatManager@@QAEXXZ	100.0000	49657b4d70ae
 SOURCE/COMMAND	?CheckSetMouseDirection@combatManager@@QAEXHHH@Z	100.0000	81ed1069226f
 SOURCE/COMMAND	?CheckWin@combatManager@@QAEHPAUtag_message@@@Z	100.0000	df34b08d7a5c
 SOURCE/COMMAND	?ClearWinLoseBottom@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	398a4d26ec25
-SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	97.7901	26c4b5e2962c
+SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	96.9010	af1276450598
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
@@ -653,7 +653,7 @@ SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
 SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	100.0000	1b0cb7be1ca7
 SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	23c1d15c2606
 SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	7538522a763c
-SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.2062	048284a2459a
+SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.9003	a7307a1557b7
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	100.0000	620387977505
 SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	6898d4037c16
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	100.0000	bcc2bb1d844a
@@ -768,7 +768,7 @@ SOURCE/FINDPATH	?TestPossibleDirections@searchArray@@QAEXHHQAC0HH@Z	94.9253	8cea
 SOURCE/FLY	?CanFit@army@@QAEHHHPAH@Z	100.0000	81c7cf3d9b5c
 SOURCE/FLY	?FlyTo@army@@QAEHH@Z	98.7267	b7ebefb940f1
 SOURCE/FLY	?FlyTo@army@@QAEHXZ	100.0000	214d2ea93c6c
-SOURCE/FLY	?ValidFlight@army@@QAEHHH@Z	97.3925	3ca9df2c9123
+SOURCE/FLY	?ValidFlight@army@@QAEHHH@Z	97.8020	1f5122008258
 SOURCE/GAME	?BuildingsOwned@playerData@@QAEHHHH@Z	100.0000	345649ce05f8
 SOURCE/GAME	?CalcBaseScore@@YIHH@Z	100.0000	c8dbd972e2b9
 SOURCE/GAME	?CalcDifficultyRating@game@@QAEHXZ	100.0000	848cde3b3403
