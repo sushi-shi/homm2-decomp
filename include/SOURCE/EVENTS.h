@@ -291,6 +291,7 @@ H2_ENUM_CLASS_END(FlotsamReward)
 
 H2_ENUM_BEGIN(MonsterInteractionConstant)
     MONSTER_JOIN_FORCED                     = 0x1000,
+    MONSTER_FLAGS_MASK                      = 0xf000,
     MONSTER_COUNT_MASK                      = 0xfff,
     MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR = 2,
     MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR    = 4,
