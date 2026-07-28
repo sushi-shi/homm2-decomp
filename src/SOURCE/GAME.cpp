@@ -7256,13 +7256,15 @@ void game::RestoreCell(
 VA(0x004848bf, 0xe3)
 void game::SetMapSize(i32 w, i32 h) {
     DATA(0x004f7a0c) static i16 setMapSizeSourceLineBase = 0x1d0d;
-    if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized) {
-    } else {
+    if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized)
+        goto mapSized;
+    {
         bMapInitialized = 1;
         MAP_WIDTH = w;
         MAP_HEIGHT = h;
         gpSearchArray->Init();
     }
+mapSized:
     if (mapExtra)
         H2_FREE_AT(mapExtra, DATA_COMPGEN(0x004f7a10, setMapSizeSourceFile, RETAIL_FILE), setMapSizeSourceLineBase + 12);
     mapExtra = static_cast<u8*>(H2_ALLOC_AT(MAP_WIDTH * MAP_HEIGHT, DATA_COMPGEN(0x004f7a38, setMapSizeSourceFile2, RETAIL_FILE), setMapSizeSourceLineBase + 13));
