@@ -6,28 +6,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/IconEntry.h>
 #include <string.h>
-DATA(0x00534c78) static IconEntry* gFlipEntry;
-DATA(0x00534c68) static i32 gFlipX0;
-DATA(0x00534ca4) static i32 gFlipXEnd;
-DATA(0x00534c74) static i32 gFlipY;
-DATA(0x00534c7c) static i32 gFlipX;
-DATA(0x00534c80) static u8* gFlipSrc;
-DATA(0x00534c9c) static i32 gFlipClipR;
-DATA(0x00534c8c) static i32 gFlipClipB;
-DATA(0x00534c90) static u8* gFlipRow;
-DATA(0x00534c64) static u32 gFlipRun;
-DATA(0x00534c98) static u8 gFlipColor;
-DATA(0x00534c94) static u32 gFlipCnt2;
-DATA(0x00534c70) static u32 gFlipDimLen;
-DATA(0x00534c84) static u8* gFlipDimPal;
-DATA(0x00534c6c) static u32 gFlipCnt;
-DATA(0x00534c88) static u8* gFlipDimDst;
-DATA(0x00534ca0) static u8* gFlipDst;
-DATA(0x00534c60) static i32 gFlipSkip;
-
-static inline i32 FlipRowVisible(i32 clipTop) {
-    return clipTop <= gFlipY && gFlipY <= gFlipClipB;
-}
 
 VA(0x004d1ba0, 0x4f1)
 void FlipIconToBitmap(
@@ -43,232 +21,235 @@ void FlipIconToBitmap(
     i32 clipH,
     i32 color
 ) {
-    u8* src = srcIcon->m_data;
-    i32 x0 = x;
-    i32 w;
+    DATA(0x00534c78) static IconEntry* s_entry;
+    DATA(0x00534c68) static i32 s_left;
+    DATA(0x00534ca4) static i32 s_right;
+    DATA(0x00534c74) static i32 s_y;
+    DATA(0x00534c7c) static i32 s_x;
+    DATA(0x00534c80) static u8* s_src;
+    DATA(0x00534c9c) static i32 s_clipR;
+    DATA(0x00534c8c) static i32 s_clipB;
+    DATA(0x00534c90) static u8* s_row;
+    DATA(0x00534c64) static u32 s_run;
+    DATA(0x00534c98) static u8 s_color;
+    DATA(0x00534c94) static u32 s_spanCount;
+    DATA(0x00534c70) static u32 s_dimLen;
+    DATA(0x00534c84) static u8* s_dimPal;
+    DATA(0x00534c6c) static u32 s_loopCount;
+    DATA(0x00534c88) static u8* s_dimDst;
+    DATA(0x00534ca0) static u8* s_dst;
+    DATA(0x00534c60) static i32 s_srcSkip;
+
     IconEntry* entry = &srcIcon->Entries()[frame];
-    w = entry->w;
+    s_entry = entry;
+    u8* src = srcIcon->m_data;
     i32 entryX = entry->x;
-    i32 entryY = entry->y;
-    i32 sourceOffset = entry->srcOffset;
-    x0 = x0 - entryX;
-    src += sourceOffset;
-    x0 = x0 - w;
-    gFlipEntry = entry;
-    x0++;
-    gFlipX0 = x0;
-    i32 X = w + x0 - 1;
-    gFlipXEnd = X;
-    y += entryY;
-    gFlipY = y;
+    i32 x0 = x - entryX;
+    src += entry->srcOffset;
+    i32 width = entry->w;
+    x0 = (x0 - width) + 1;
+    s_left = x0;
+    i32 currentX = (width - 1) + x0;
+    s_right = currentX;
+    s_y = y + entry->y;
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (gFlipX0 < clipX || clipW + clipX < gFlipX0 + w || gFlipY < clipY
-            || clipY + clipH < entry->h + gFlipY) {
+        if (s_left < clipX || clipW + clipX < s_left + width || s_y < clipY
+            || clipY + clipH < entry->h + s_y) {
             clip = ICON_DRAW_CLIP;
-            gFlipClipR = clipX + clipW - 1;
-            gFlipClipB = clipY + clipH - 1;
+            s_clipR = clipX + clipW - 1;
+            s_clipB = clipY + clipH - 1;
         } else {
             clip = ICON_DRAW_NO_CLIP;
         }
     }
     i16 pitch = dest->m_width;
-    gFlipRow = dest->m_pixels + gFlipY * pitch;
+    s_row = dest->m_pixels + s_y * pitch;
     for (;;) {
-        i32 cmd = *src++;
-        if (static_cast<i8>(cmd) < 0) {
-            if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
+        i32 command = *src++;
+        if (static_cast<i8>(command) < 0) {
+            if ((command & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
                 // skip run / end-of-sprite
-                gFlipRun = cmd;
-                i32 n = cmd & ICON_RLE_COMMAND_RUN_MASK;
-                gFlipX = X;
-                gFlipSrc = src;
-                if (n == 0)
+                s_run = command;
+                command &= ICON_RLE_COMMAND_RUN_MASK;
+                s_x = currentX;
+                s_src = src;
+                if (command == 0)
                     return;
-                X = X - n;
+                currentX -= command;
                 continue;
             }
-            gFlipRun = cmd;
-            u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
-            i32 flags = 0;
+            s_run = command;
+            u32 count = command & ICON_RLE_COMMAND_RUN_MASK;
             if (count != 0) {
                 // 0xc1 - 0xFF : solid colour run
-                if (cmd == ICON_RLE_LONG_SOLID_COMMAND)
+                if (command == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
-                gFlipColor = *src++;
+                s_color = *src++;
                 goto do_fill;
             }
             // 0xc0 : shadow / dim run
-            flags = *src++;
-            count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
+            command = *src++;
+            count = command & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)
                 count = *src++;
-            gFlipCnt2 = count;
+            s_spanCount = count;
             if (color != 0) {
-                gFlipRun = flags;
-                if (flags & ICON_RLE_DIM_RECOLOR_FLAG) {
-                    gFlipDimLen = count;
-                    gFlipColor = static_cast<u8>(color);
+                s_run = command;
+                if (command & ICON_RLE_DIM_RECOLOR_FLAG) {
+                    s_dimLen = count;
+                    s_color = static_cast<u8>(color);
                     goto do_fill;
                 }
             }
             goto do_dim;
         do_fill:
             if (clip == ICON_DRAW_NO_CLIP) {
-                memset((gFlipRow - count) + 1 + X, gFlipColor, count);
+                memset((s_row - count) + 1 + currentX, s_color, count);
             } else {
-                i32 left;
-                if (FlipRowVisible(clipY)
-                    && (left = (X - count) + 1, clipX <= left) && X <= gFlipClipR) {
-                    if (clipX <= left) {
+                if (clipY <= s_y && s_y <= s_clipB
+                    && clipX <= static_cast<i32>((currentX - count) + 1)
+                    && currentX <= s_clipR) {
+                    if (clipX <= static_cast<i32>((currentX - count) + 1)) {
                         memset(
-                            (gFlipRow - count) + 1 + X,
-                            gFlipColor,
+                            (s_row - count) + 1 + currentX,
+                            s_color,
                             count
                         );
                     } else {
                         memset(
-                            gFlipRow + clipX,
-                            gFlipColor,
-                            (X - clipX) + 1
+                            s_row + clipX,
+                            s_color,
+                            (currentX - clipX) + 1
                         );
                     }
                 }
             }
-            X = X - count;
-            gFlipRun = count;
+            currentX -= count;
+            s_run = count;
             continue;
         do_dim:
-            gFlipRun = flags;
-            gFlipDimLen = count;
-            if (flags & ICON_RLE_DIM_APPLY_FLAG) {
-                u8* palette =
-                    reinterpret_cast<u8*>(uDimPal)
-                    + (flags & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
-                gFlipDimPal = palette;
+            s_run = command;
+            s_dimLen = count;
+            if (command & ICON_RLE_DIM_APPLY_FLAG) {
+                u8* palette = reinterpret_cast<u8*>(uDimPal)
+                    + (command & ICON_RLE_DIM_LEVEL_MASK) * ICON_RLE_DIM_PALETTE_LEVEL_STRIDE;
+                s_dimPal = palette;
+                u8* dimDestination;
                 if (clip == ICON_DRAW_NO_CLIP) {
-                    u8* dp = (gFlipRow - count) + 1 + X;
-                    gFlipCnt = 0;
+                    dimDestination = (s_row - count) + 1 + currentX;
+                    s_loopCount = 0;
                     i32 dimCount = count;
-                    gFlipDimDst = dp;
-                    if (dimCount > 0) {
-                        gFlipCnt = dimCount;
+                    s_dimDst = dimDestination;
+                    if (static_cast<i32>(count) > 0) {
+                        s_loopCount = count;
                         do {
-                            u8* dimPalette = gFlipDimPal;
-                            i32 px = *dp++;
-                            gFlipDimDst = dp;
-                            dp[-1] = dimPalette[px];
-                        } while (--count != 0);
+                            *dimDestination = s_dimPal[*dimDestination];
+                            dimDestination++;
+                            s_dimDst = dimDestination;
+                        } while (--dimCount != 0);
                     }
                 } else {
-                    gFlipDimLen = count;
-                    if (FlipRowVisible(clipY)
-                        && clipX <= static_cast<i32>((X - count) + 1) && X <= gFlipClipR) {
-                        i32 left = (X - count) + 1;
-                        u8* dp;
-                        if (clipX <= left) {
-                            dp = (gFlipRow - count) + 1 + X;
+                    s_dimLen = count;
+                    if (clipY <= s_y && s_y <= s_clipB
+                        && clipX <= static_cast<i32>((currentX - count) + 1)
+                        && currentX <= s_clipR) {
+                        if (clipX <= static_cast<i32>((currentX - count) + 1)) {
+                            dimDestination = (s_row - count) + 1 + currentX;
                         } else {
-                            count = (X - clipX) + 1;
-                            dp = gFlipRow + clipX;
+                            count = (currentX - clipX) + 1;
+                            dimDestination = s_row + clipX;
                         }
                         i32 dimCount = count;
-                        gFlipDimLen = count;
-                        gFlipDimDst = dp;
-                        gFlipCnt = 0;
-                        if (dimCount > 0) {
-                            gFlipCnt = dimCount;
+                        s_dimLen = count;
+                        s_dimDst = dimDestination;
+                        s_loopCount = 0;
+                        if (static_cast<i32>(count) > 0) {
+                            s_loopCount = count;
                             do {
-                                u8* dimPalette = gFlipDimPal;
-                                i32 px = *dp++;
-                                count--;
-                                gFlipDimDst = dp;
-                                dp[-1] = dimPalette[px];
-                            } while (count != 0);
+                                *dimDestination = s_dimPal[*dimDestination];
+                                dimDestination++;
+                                s_dimDst = dimDestination;
+                            } while (--dimCount != 0);
                         }
                     }
                 }
             }
-            X = X - gFlipCnt2;
+            currentX -= s_spanCount;
             continue;
         }
-        gFlipRun = cmd;
-        gFlipX = X;
-        if (cmd != 0) {
+        s_run = command;
+        s_x = currentX;
+        if (command != 0) {
+            u32 literalCount;
             if (clip == ICON_DRAW_NO_CLIP) {
-                gFlipCnt = 0;
-                u8* dst = gFlipRow + X;
-                gFlipDst = dst;
-                if (cmd > 0) {
-                    gFlipCnt = cmd;
-                    i32 k = cmd;
+                s_loopCount = 0;
+                u8* destination = s_row + currentX;
+                s_dst = destination;
+                if (command > 0) {
+                    u32 copyCount = command;
+                    s_loopCount = copyCount;
                     do {
-                        u8 c = *src++;
-                        *dst-- = c;
-                        gFlipDst = dst;
-                        k--;
-                    } while (k != 0);
+                        *destination-- = *src++;
+                        s_dst = destination;
+                    } while (--copyCount != 0);
                 }
             } else {
-                if (FlipRowVisible(clipY)) {
-                    i32 left = (X - cmd) + 1;
-                    if (left <= gFlipClipR && clipX <= X) {
-                        u32 cn;
-                        i32 skip;
-                        if (X <= gFlipClipR) {
-                            gFlipDst = gFlipRow + X;
-                            if (clipX <= left) {
-                                gFlipSkip = 0;
-                                cn = cmd;
+                if (clipY <= s_y && s_y <= s_clipB) {
+                    if ((currentX - command) + 1 <= s_clipR && clipX <= currentX) {
+                        u32 pendingSkip;
+                        do {
+                            if (currentX <= s_clipR) {
+                                s_dst = s_row + currentX;
+                                if (clipX <= (currentX - command) + 1) {
+                                    literalCount = command;
+                                    s_srcSkip = 0;
+                                    break;
+                                }
+                                literalCount = (currentX - clipX) + 1;
+                                pendingSkip = command - literalCount;
+                                s_srcSkip = pendingSkip;
                             } else {
-                                cn = (X - clipX) + 1;
-                                skip = cmd - cn;
-                                goto set_skip;
+                                literalCount = s_clipR;
+                                src += currentX - literalCount;
+                                s_dst = s_row + literalCount;
+                                if (clipX <= currentX - command) {
+                                    s_srcSkip = 0;
+                                    literalCount += command - currentX;
+                                    break;
+                                }
+                                pendingSkip = command;
+                                pendingSkip -= currentX;
+                                pendingSkip -= clipW;
+                                pendingSkip += s_clipR;
+                                literalCount = clipW;
+                                s_srcSkip = pendingSkip;
                             }
-                        } else {
-                            cn = gFlipClipR;
-                            src = src + (X - cn);
-                            gFlipDst = gFlipRow + cn;
-                            if (clipX <= (X - cmd)) {
-                                gFlipSkip = 0;
-                                cn = (cmd - X) + cn;
-                            } else {
-                                cn = clipW;
-                                skip = cmd;
-                                skip = skip - X;
-                                skip = skip - clipW;
-                                skip = gFlipClipR + skip;
-                                goto set_skip;
-                            }
-                        }
-                        goto skip_set;
-                    set_skip:
-                        gFlipSkip = skip;
-                    skip_set:
-                        i32 copyCount = cn;
-                        gFlipDimLen = cn;
-                        gFlipCnt = 0;
-                        if (copyCount > 0) {
-                            gFlipCnt = copyCount;
+                        } while (0);
+                        i32 copyCount = literalCount;
+                        s_dimLen = literalCount;
+                        s_loopCount = 0;
+                        if (static_cast<i32>(literalCount) > 0) {
+                            s_loopCount = literalCount;
                             do {
-                                u8 c = *src++;
-                                (gFlipDst = gFlipDst - 1)[1] = c;
-                                cn--;
-                            } while (cn != 0);
+                                u8 literalPixel = *src++;
+                                s_dst--;
+                                s_dst[1] = literalPixel;
+                            } while (--copyCount != 0);
                         }
-                        src = src + gFlipSkip;
+                        src += s_srcSkip;
                     } else {
-                        src = src + cmd;
+                        src += command;
                     }
                 } else {
-                    src = src + cmd;
+                    src += command;
                 }
             }
-            X = X - cmd;
-            gFlipRun = cmd;
+            currentX -= command;
+            s_run = command;
             continue;
         }
-        X = gFlipXEnd;
-        gFlipY = gFlipY + 1;
-        gFlipRow = gFlipRow + pitch;
+        currentX = s_right;
+        s_y++;
+        s_row += pitch;
     }
 }

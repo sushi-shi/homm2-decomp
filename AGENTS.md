@@ -82,8 +82,12 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    50 only when a near-closing state or unusually sparse state census justifies the extra
    time. Stop at the first audited target-local exact closure. TU-state probes
    may perturb siblings; report those changes as diagnostics, but never reject or withhold the
-   target's exact MAX because of them. If no exact state appears, retain only the best paired
-   object, disassembly, and diff under `build/` as clue evidence.
+   target's exact MAX because of them. If no exact state appears, retain both independently
+   selected clue pairs under `build/`: best fuzzy score and best block topology. The topology
+   rank compares block-count delta, canonical labeled-edge and predecessor deltas, flow-kind
+   mismatches, shifted targets, and size-only blocks before using fuzzy score as a tie-breaker.
+   Inspect every state's recorded topology rather than assuming the fuzzy winner represents the
+   structural orbit.
 9. Treat every retained `OD_STEER` expression as migration debt: it manually selects a compiler
    state while contributing no program semantics. Remove it incrementally, search islands for
    the clean unchanged source, and retain no generated probe declarations or functions. The
@@ -106,6 +110,97 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    `git diff --check`. Normal one-unit builds take roughly 4-5 seconds; investigate build
    performance only when it exceeds 10 seconds consistently.
 
+## Tooling Reference
+
+- Enter the build environment from the assigned worktree with `nix develop .#build`.
+  Before trusting any result, verify `pwd`, `git branch --show-current`, and
+  `readlink -f "$HOMM2_DIR"` all identify that worktree. Keep one persistent shell when
+  running many matrices so every compile uses the same environment.
+- Locate files and source anchors with `rg`/`rg --files`. Use exact, unique source spans
+  for generated axes; `match_variants.py` deliberately rejects ambiguous or overlapping
+  edits. Generate JSON manifests with a small reviewed script when quoting a source
+  product by hand would be error-prone.
+- Start a function dossier with:
+  `homm2 sema rva 0x<RVA>`,
+  `homm2 sema xref --callees 0x<RVA>`,
+  and `homm2 sema strings 0x<RVA>`.
+  Use `homm2 sema strings --find <text>` for reverse literal lookup. These are read-only;
+  use cached `homm2 ghidra` output only when the retail structure is still ambiguous.
+- Use `homm2 sema disasm 0x<RVA> --diff --lite` for the compact instruction diff and
+  remove `--lite` when bytes, offsets, stack slots, or relocation sites matter.
+  `--base` and `--target` inspect one side. `--rich` interleaves candidate source lines.
+  Add `--blocks` for the canonical basic-block view:
+  `--blocks --diff --lite` is the compact skeleton,
+  `--blocks --diff` shows per-block instruction changes,
+  `--blocks --base/--target` shows one complete skeleton, and
+  `--blocks --dot` emits Graphviz CFG input.
+- Interpret the block report as a multi-objective diagnostic. Track exact graph/edge
+  topology, block count, size-only blocks, shifted targets, flow-kind mismatches, and the
+  leading structural frontier separately from fuzzy score. A lower-fuzzy island with
+  fewer structural mismatches remains a valid descendant. Compiler state can change block
+  partition and register allocation nonlocally, so rerun the block census after every
+  retained source shape and across state probes.
+- Audit relocations with `homm2 relocs 0x<RVA>`. It reports missing/extra owners and
+  count differences. Use
+  `llvm-objdump -r build/objdiff/base/<unit>.obj` and
+  `llvm-objdump -r build/delink/<unit>.c.obj`
+  to compare exact source offsets, types, identities, and addends when one repeated owner
+  is ambiguous. Equal relocation counts alone are not closure.
+- For `/Od` work use `homm2 od-frames` for frame/slot drift and
+  `scripts/od_slots.py` for an individual name-sensitive layout. Keep stack
+  displacements visible in the non-lite disassembly. Do not apply `/Od` slot steering to
+  optimized functions.
+- Build through `homm2 build` after retained edits. It configures the affected units,
+  compiles raw objects, and refreshes the normalized objdiff copies. If source line
+  movement makes function spans stale, first run
+  `python3 -m homm2.build.annotated_functions`. A raw `ninja` compile without normalized
+  refresh can leave `homm2 sema`/objdiff reading stale objects. Run `homm2 status` before
+  quoting live repository totals.
+- Describe reviewed source products in a schema-1 exact-span axes file and run them with
+  the public permuter, for example:
+
+  ```
+  python3 scripts/match_variants.py src/OWNER/File.cpp 0x<RVA> \
+    --axes-from build/function-axes.json \
+    --min-depth 0 --max-depth 0 --limit <complete-product> \
+    --state-trials 50 --state-families forest --state-insertion top \
+    -o build/function-manifest.json --run \
+    --batch-output build/source-variant-batch/function
+  ```
+
+  `--limit` must fit the full exact-axis product times every emitted source/state shape;
+  a reported truncation is not coverage. Use `--compile-timeout` and
+  `--wall-time-seconds` to bound the complete matrix, not to accept a partial one. The
+  results JSON retains separate `best`, `best_topology`, and structural-frontier
+  selections. Do not choose only the printed fuzzy winner.
+- For an unchanged-source compiler-state census use:
+
+  ```
+  python3 scripts/tu_state_noise.py \
+    --source src/OWNER/File.cpp --rva 0x<RVA> \
+    --trials 50 --families forest --insertion top \
+    --state-summary build/function-state-summary.json \
+    --output build/tu-state-noise/function --retain-best
+  ```
+
+  The tool restores source on success/failure and retains paired best-fuzzy,
+  best-topology, and best-frontier objects/assembly/diffs. Use `--seed` for reproducible
+  state sets, `--only-trial` for a reviewed replay, and `--layer-state-summary` plus
+  `--layer-trial` for a second state layer. Probe declarations are disposable and never
+  become source. Use `--record-max` only for an audited exact closure; never edit
+  generated MAX/status configuration by hand.
+- Read matrix results from `results.json`/`results.csv`, not terminal snippets alone.
+  Preserve each source matrix under `docs/matching/<function>/<attempt>.cpp` with code,
+  artifact paths, completeness, topology, relocation result, and disposition. Mark
+  planned ideas explicitly `UNTRIED`; do not mix them with measured rejections. General
+  optimized-code lessons and multi-objective island selection are recorded in
+  `docs/msvc42-optimized-nonlocal-islands.md`.
+- Before a focused commit run `homm2 build`, `homm2 relocs 0x<RVA>`,
+  the appropriate disassembly/block diff, and `git diff --check`. Inspect
+  `git status --short`, stage only the declared source/header/docs plus intentional
+  root-generated status files, and leave build probes, worktrees, queues, and unrelated
+  dirty files unstaged.
+
 ## Evidence Rules
 
 - Retail bytes, relocations, and public RVAs are authoritative. Embedded CodeView does
@@ -123,6 +218,16 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   change. MAX is the durable campaign memory: when a disposable island has exact target
   bytes, retail size, and complete ordered-relocation identity, record 100 for that target
   even if the same TU state perturbs siblings. Recover each sibling through its own search.
+- Interpret negative optimized-code experiments narrowly. Byte-identical arms prove only
+  that the compiler erased that distinction for the tested parent source and TU state;
+  they do not prove which spelling was original. Likewise, a complete flat matrix rejects
+  those axes only in that parent orbit. A distant ownership, helper-boundary, declaration-
+  order, or compiler-state change can make the same axis observable, so retry it only when
+  an evidence-backed structural parent changes.
+- An exact CFG, exact block sizes, exact total size, or equal relocation count is still
+  partial evidence. A relocation appearing in the wrong block often identifies the wrong
+  semantic owner even when the target and total count agree. Compare ordered sites,
+  identities, addends, block contents, and bytes before calling an island closed.
 - Keep an ordinary source comment only when it records an enduring semantic or codegen fact.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
 - Never retain generated labels, globals, aliases, padding, or fake code in reconstructed
@@ -132,6 +237,11 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 
 ## Source Conventions
 
+- For a family of closely related functions, recover and preserve a consistent
+  semantic phase structure, control-flow ownership, and narrow inline-helper
+  boundaries. Keep real dialect differences explicit. Do not replace copied
+  retail-family implementations with shared macros merely to remove source
+  duplication, especially when doing so loses established byte or CFG islands.
 - Class data members start with `m_`; plain struct fields need not.
 - Replace `fieldN` placeholders once their meaning is known. Use real tagged layouts when
   one serialized record has multiple forms.
@@ -152,6 +262,15 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   keeps `SIZE` byte-neutral; do not turn it into emitted declarations.
 - Use inline accessors where retail `/Ob1` traces prove them. Do not replace modeled fields
   with `reinterpret_cast<unsigned char *>(this)[offset]` merely for a local score gain.
+- In the optimized icon-decoder family, begin from the
+  `FlipIconToBitmapYModify` structural idiom: semantic file-static decoder
+  state and comparable declaration order, direct compact cursor operations,
+  few incidental state-copying locals, shallow early-exit/continue flow, and a
+  scoped `do { ... } while (0)` candidate for small two-join goto clusters that
+  plausibly came from a multiline macro. Preserve normal semantic gotos and
+  treat every family resemblance as a hypothesis requiring byte, relocation,
+  and CFG evidence. Enumerate uncertain declaration orders rather than editing
+  them manually one by one.
 - Do not search for unavailable original source. Secondary references are for
   naming/semantic guidance only; adapt useful names to this repository.
 
@@ -160,7 +279,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Candidate objects supply reconstructed COFF symbol spelling and topology; retail PE,
   NB09 contributions, bytes, and relocations supply placement evidence. Vostok emits the
   reviewed model; it does not discover private identities automatically.
-- The canonical data manifest is generated entirely from source `DATA(...)`,
+- The canonical data manifest is generated from source `DATA(...)`,
   `DATA_COMPGEN(...)`, `VTBL(...)`, and `VTBL2(...)` annotations. Candidate COFF
   supplies physical topology; source supplies semantic identity. Missing or ambiguous
   private placement warns normally and fails strict assembly instead of falling back to
