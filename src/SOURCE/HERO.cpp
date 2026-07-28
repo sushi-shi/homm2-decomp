@@ -854,13 +854,13 @@ void hero::CheckLevel(void) {
                                 iGetSSByAlignment[IDX(skillIndexValue)][IDX(m_cursorType)];
                             if (skillWeightIndex <= 0) {
                                 skillChoicesResult[indexValue] = skillIndexValue;
-                                break;
+                                goto nextAttempt;
                             }
                         }
-                        ++skillIndexValue;
-                        if (skillIndexValue == HERO_SKILL_COUNT)
-                            skillIndexValue = HERO_SKILL_PATHFINDING;
+                        skillIndexValue =
+                            HeroSecondarySkill((IDX(skillIndexValue) + 1) % HERO_SKILL_COUNT);
                     }
+                nextAttempt:
                     attempts--;
                 }
             }
