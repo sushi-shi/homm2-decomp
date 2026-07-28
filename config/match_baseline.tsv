@@ -687,7 +687,7 @@ SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	c28caa0e307f
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	100.0000	7245d8dba01f
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	100.0000	fe9be41b7595
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	82f219fa1091
-SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.9942	ab5e7fe02b27
+SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	100.0000	ab5e7fe02b27
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	100.0000	9ca9e9ded8fc
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	97.0881	126e83005de4
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	98.6043	1ab552cbd038
@@ -1226,7 +1226,7 @@ SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	a2360f525f06
 SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	99.9912	368b5b94227f
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	99.2693	73ed71e645cc
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	100.0000	5454e637526f
-SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	99.9920	97403325a850
+SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	100.0000	2583c222df0a
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	222058889a73
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	96a95cd26e60
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	91.5133	f259c474d379

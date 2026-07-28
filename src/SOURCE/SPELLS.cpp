@@ -2146,7 +2146,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                 }
             }
 
-            distance = abs(bolt->endX - bolt->pixelX) + abs(bolt->endY - bolt->pixelY);
+            distance = abs(bolt->endY - bolt->pixelY) + abs(bolt->endX - bolt->pixelX);
             if (bolt->nearTarget != 0) {
                 if (bolt->nearestDistance + 1 < distance
                     || distance <= BOLT_FINISHED_DISTANCE_MAX) {
