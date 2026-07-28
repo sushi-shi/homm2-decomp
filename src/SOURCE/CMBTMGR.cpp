@@ -875,7 +875,7 @@ void combatManager::LoadIcons(void) {
             if (m_playerId[index] == -1)
                 heroColor = COMBAT_NEUTRAL_HERO_COLOR;
             else
-                heroColor = gpGame->GetPlayerColor(static_cast<i8>(m_playerId[index]));
+                heroColor = gpGame->m_players[static_cast<i8>(m_playerId[index])].m_color;
             DebugCheck();
             sprintf(gText, DATA_COMPGEN(0x004f8a38, loadIconsHerofl02dIcn, "herofl%02d.icn"), heroColor);
             m_heroOverlayIcons[index] = gpResourceManager->GetIcon(gText);
