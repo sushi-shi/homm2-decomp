@@ -2751,7 +2751,7 @@ void philAI::ValueOfBuyingCreature(
     );
 
     if (townPtr->m_occupyingHeroId != AI_TROOP_EMPTY_SLOT) {
-        visitingHeroCandidate = &gpGame->m_heroRecs[townPtr->m_occupyingHeroId];
+        visitingHeroCandidate = gpGame->GetHero(townPtr->m_occupyingHeroId);
         creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_VISITING_HERO_FACTOR);
         if (gMonsterDatabase[IDX(creature)].race == visitingHeroCandidate->m_cursorType)
             creatureValue = static_cast<i32>(creatureValue * AI_CREATURE_SAME_RACE_FACTOR);
@@ -2809,7 +2809,7 @@ void philAI::ValueOfBuyingCreature(
         danger
     );
     riskFactor = static_cast<float>(danger + AI_CREATURE_DANGER_BASE);
-    creatureValue = static_cast<i32>(riskFactor * riskFactor * riskFactor * creatureValue);
+    creatureValue = static_cast<i32>((riskFactor * riskFactor * riskFactor) * creatureValue);
     creatureValue = static_cast<i32>(FutureDeflator(creatureCosts) * creatureValue);
     resourceValue = creatureValue;
     benefitCost = static_cast<float>(resourceValue) / purchaseCost;
