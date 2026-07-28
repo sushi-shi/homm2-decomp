@@ -6864,12 +6864,12 @@ i32 philAI::EvaluateTownEvent(i32 townId, i32 x, i32 y, i32 mode, i32* liveChanc
         node = 0;
     } else {
         py = ValueOfTown(p);
-        if (gpGame->m_castleRecs[townId].m_occupyingHeroId != TOWN_ID_NONE) {
+        if (gpGame->m_castleRecs[townId].OccupyingHero() != TOWN_ID_NONE) {
             ProbableOutcomeOfBattle(
                 &gpCurAIHero->m_army,
                 gpCurAIHero,
-                &gpGame->m_heroRecs[p->m_occupyingHeroId].m_army,
-                &gpGame->m_heroRecs[p->m_occupyingHeroId],
+                &gpGame->m_heroRecs[p->OccupyingHero()].m_army,
+                &gpGame->m_heroRecs[p->OccupyingHero()],
                 &p->m_army,
                 1,
                 townId,
