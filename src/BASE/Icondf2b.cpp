@@ -40,16 +40,17 @@ void FlipDimIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    IconEntry* entry = &srcIcon->Entries()[frame];
+    IconEntry* entries = srcIcon->Entries();
     u8* data = srcIcon->m_data;
+    IconEntry* entry = &entries[frame];
     s_entry = entry;
-    i32 entryX = entry->x;
-    i32 x0 = x - entryX;
-    s_src = data + entry->srcOffset;
+    s_src = data + entries[frame].srcOffset;
     i32 width = entry->w;
-    x0 = (x0 - width) + 1;
-    s_left = x0;
+    i32 x0 = x - entry->x;
     s_y = y + entry->y;
+    x0 = x0 - width;
+    x0++;
+    s_left = x0;
     i32 X = (width - 1) + x0;
     s_right = X;
     if (clip != ICON_DRAW_NO_CLIP) {
