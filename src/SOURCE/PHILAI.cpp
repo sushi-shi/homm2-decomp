@@ -634,102 +634,101 @@ void philAI::CheckBuyStuff(void) {
     town* idx;
 
     gpGame->CheckHeroConsistency();
-    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= PURCHASE_MINIMUM_GOLD) {
-        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < AI_HERO_PURCHASE_GOLD_FLOOR
-            && gpCurPlayer->m_heroCount == 0)
-            return;
-        LogInt(
-            DATA_COMPGEN(0x004f2120, checkBuyStuffCheckBuyStart, "CheckBuy Start"),
-            gpCurPlayer->m_resources[IDX(RES_GOLD)],
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
+    if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < PURCHASE_MINIMUM_GOLD
+        || (gpCurPlayer->m_resources[IDX(RES_GOLD)] < AI_HERO_PURCHASE_GOLD_FLOOR
+            && gpCurPlayer->m_heroCount == 0))
+        return;
+    LogInt(
+        DATA_COMPGEN(0x004f2120, checkBuyStuffCheckBuyStart, "CheckBuy Start"),
+        gpCurPlayer->m_resources[IDX(RES_GOLD)],
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
+    idx = NULL;
+    if (giBuildShipyard[giCurPlayer] >= 0) {
+        idx = &gpGame->m_castleRecs[giBuildShipyard[giCurPlayer]];
+    } else if (giBuildBoat[giCurPlayer] >= 0) {
+        idx = &gpGame->m_castleRecs[giBuildBoat[giCurPlayer]];
+    }
+    if (giBuildShipyard[giCurPlayer] >= 0) {
+        idx = GetCastleSlot(giBuildShipyard[giCurPlayer]);
+    } else if (giBuildBoat[giCurPlayer] >= 0) {
+        idx = GetCastleSlot(giBuildBoat[giCurPlayer]);
+    }
+    if (idx != NULL && idx->m_owner != giCurPlayer) {
+        giBuildShipyard[giCurPlayer] = -1;
+        giBuildBoat[giCurPlayer] = giBuildShipyard[giCurPlayer];
         idx = NULL;
-        if (giBuildShipyard[giCurPlayer] >= 0) {
-            idx = gpGame->GetTown(giBuildShipyard[giCurPlayer]);
-        } else if (giBuildBoat[giCurPlayer] >= 0) {
-            idx = gpGame->GetTown(giBuildBoat[giCurPlayer]);
-        }
-        if (giBuildShipyard[giCurPlayer] >= 0) {
-            idx = GetCastleSlot(giBuildShipyard[giCurPlayer]);
-        } else if (giBuildBoat[giCurPlayer] >= 0) {
-            idx = GetCastleSlot(giBuildBoat[giCurPlayer]);
-        }
-        if (idx != NULL && idx->m_owner != giCurPlayer) {
+    }
+    if (giBuildShipyard[giCurPlayer] >= 0) {
+        if (CanBuy(idx, BUILDING_SLOT_DOCK) && CanBuild(idx, BUILDING_SLOT_DOCK)) {
+            BuildBuilding(idx, BUILDING_SLOT_DOCK);
             giBuildShipyard[giCurPlayer] = -1;
-            giBuildBoat[giCurPlayer] = giBuildShipyard[giCurPlayer];
-            idx = NULL;
+        } else {
+            gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SHIPYARD_GOLD_COST;
+            gpCurPlayer->m_resources[IDX(RES_WOOD)] -= SHIPYARD_WOOD_COST;
         }
-        if (giBuildShipyard[giCurPlayer] >= 0) {
-            if (CanBuy(idx, BUILDING_SLOT_DOCK) && CanBuild(idx, BUILDING_SLOT_DOCK)) {
-                BuildBuilding(idx, BUILDING_SLOT_DOCK);
-                giBuildShipyard[giCurPlayer] = -1;
-            } else {
-                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= SHIPYARD_GOLD_COST;
-                gpCurPlayer->m_resources[IDX(RES_WOOD)] -= SHIPYARD_WOOD_COST;
-            }
-        }
-        if (giBuildBoat[giCurPlayer] >= 0) {
-            if ((idx->m_buildings & AI_BUILDING_SHIPYARD_MASK)
-                && gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TOWN_BOAT_GOLD_COST
-                && gpCurPlayer->m_resources[IDX(RES_WOOD)] >= TOWN_BOAT_WOOD_COST) {
-                if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
-                    && gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType
-                           == MAP_OBJECT_NONE
-                    && gpGame->CreateBoat(idx->m_boatX, idx->m_boatY, 0) != -1) {
-                    gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
-                    gpCurPlayer->m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
-                }
-                giBuildBoat[giCurPlayer] = -1;
-            } else {
+    }
+    if (giBuildBoat[giCurPlayer] >= 0) {
+        if ((idx->m_buildings & AI_BUILDING_SHIPYARD_MASK)
+            && gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TOWN_BOAT_GOLD_COST
+            && gpCurPlayer->m_resources[IDX(RES_WOOD)] >= TOWN_BOAT_WOOD_COST) {
+            if (gpGame->GetBoatsBuilt() < GAME_BOAT_COUNT
+                && gpAdvManager->GetCell(idx->m_boatX, idx->m_boatY)->m_triggerType
+                       == MAP_OBJECT_NONE
+                && gpGame->CreateBoat(idx->m_boatX, idx->m_boatY, 0) != -1) {
                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
                 gpCurPlayer->m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
             }
+            giBuildBoat[giCurPlayer] = -1;
+        } else {
+            gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TOWN_BOAT_GOLD_COST;
+            gpCurPlayer->m_resources[IDX(RES_WOOD)] -= TOWN_BOAT_WOOD_COST;
         }
-        CheckForCreatureUpgrades();
-        DoAllHeroInteractions();
-        while (!done) {
-            GetBestBHC(giCurPlayer, best);
-            if (best.type >= 0 && CanBuyBHC(best)) {
-                switch (best.type) {
-                    case PURCHASE_BUILDING:
-                        BuildBuilding(best.pTown, best.building);
-                        break;
-                    case PURCHASE_HERO:
-                        BuildHero(best.pTown, best.what);
-                        break;
-                    case PURCHASE_CREATURE:
-                        BuildCreature(best.pTown, best.what, best.num);
-                        break;
-                }
-                jb = 1;
-            } else
-                done = 1;
-        }
-        if (giBuildShipyard[giCurPlayer] >= 0) {
-            gpCurPlayer->m_resources[IDX(RES_GOLD)] += SHIPYARD_GOLD_COST;
-            gpCurPlayer->m_resources[IDX(RES_WOOD)] += SHIPYARD_WOOD_COST;
-        }
-        if (giBuildBoat[giCurPlayer] >= 0) {
-            gpCurPlayer->m_resources[IDX(RES_GOLD)] += TOWN_BOAT_GOLD_COST;
-            gpCurPlayer->m_resources[IDX(RES_WOOD)] += TOWN_BOAT_WOOD_COST;
-        }
-        DoAllHeroInteractions();
-        LogInt(
-            DATA_COMPGEN(0x004f2130, checkBuyStuffCheckBuyEnd, "CheckBuy End  "),
-            gpCurPlayer->m_resources[IDX(RES_GOLD)],
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
     }
+    CheckForCreatureUpgrades();
+    DoAllHeroInteractions();
+    while (!done) {
+        GetBestBHC(giCurPlayer, best);
+        if (best.type >= 0 && CanBuyBHC(best)) {
+            switch (best.type) {
+                case PURCHASE_BUILDING:
+                    BuildBuilding(best.pTown, best.building);
+                    break;
+                case PURCHASE_HERO:
+                    BuildHero(best.pTown, best.what);
+                    break;
+                case PURCHASE_CREATURE:
+                    BuildCreature(best.pTown, best.what, best.num);
+                    break;
+            }
+            jb = 1;
+        } else
+            done = 1;
+    }
+    if (giBuildShipyard[giCurPlayer] >= 0) {
+        gpCurPlayer->m_resources[IDX(RES_GOLD)] += SHIPYARD_GOLD_COST;
+        gpCurPlayer->m_resources[IDX(RES_WOOD)] += SHIPYARD_WOOD_COST;
+    }
+    if (giBuildBoat[giCurPlayer] >= 0) {
+        gpCurPlayer->m_resources[IDX(RES_GOLD)] += TOWN_BOAT_GOLD_COST;
+        gpCurPlayer->m_resources[IDX(RES_WOOD)] += TOWN_BOAT_WOOD_COST;
+    }
+    DoAllHeroInteractions();
+    LogInt(
+        DATA_COMPGEN(0x004f2130, checkBuyStuffCheckBuyEnd, "CheckBuy End  "),
+        gpCurPlayer->m_resources[IDX(RES_GOLD)],
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
 }
 
 inline hero* GetHeroSlot(i32 id) {
