@@ -4121,7 +4121,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 EventSound(
                     cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
                 );
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_ARENA)
+                );
                 primaryStat15 = DoArenaDialog();
                 eventHero->m_primaryStats[primaryStat15]++;
             }
@@ -4146,7 +4148,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 EventSound(
                     cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, IDX(siteType2), &eventSample5
                 );
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_MERMAID;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MERMAID)
+                );
                 eventHero->m_luck = eventHero->m_luck + 1;
                 EventWindow(
                     -1,
@@ -4273,7 +4277,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                         0
                     );
                 }
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_SIRENS;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_SIRENS)
+                );
             }
             break;
 
@@ -4282,7 +4288,9 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
             unusedTwo6 = STABLE_VISIT_UPGRADE;
             stableResult26 = STABLE_VISIT_NONE;
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_STABLES) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_STABLES;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_STABLES)
+                );
                 eventHero->m_mobility += SITE_STABLE_MOBILITY;
                 eventHero->m_remainingMobility += SITE_STABLE_MOBILITY;
                 stableResult26 |= STABLE_VISIT_MOBILITY;
@@ -7184,7 +7192,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             break;
         case GENERIC_SITE_ARENA:
             if (!(eventHero->m_eventFlags & HERO_EVENT_ARENA)) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_ARENA;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_ARENA)
+                );
                 switch (eventHero->m_cursorType) {
                     case FACTION_SORCERESS:
                     case FACTION_WARLOCK:
@@ -7206,8 +7216,9 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
             break;
         case GENERIC_SITE_MERMAID:
             if (!(eventHero->m_eventFlags & HERO_EVENT_MERMAID)) {
-                eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | HERO_EVENT_MERMAID;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MERMAID)
+                );
                 eventHero->m_luck = eventHero->m_luck + 1;
             }
             break;
@@ -7232,13 +7243,16 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
                 }
                 if (armyValue7 != 0)
                     GiveExperience(eventHero, armyValue7, 1);
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_SIRENS;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_SIRENS)
+                );
             }
             break;
         case GENERIC_SITE_STABLES:
             if (!(eventHero->m_eventFlags & HERO_EVENT_STABLES)) {
-                eventHero->m_eventFlags =
-                    eventHero->m_eventFlags | HERO_EVENT_STABLES;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_STABLES)
+                );
                 eventHero->m_mobility += EVENT_CREATURE_UPGRADE_MOBILITY;
                 eventHero->m_remainingMobility += EVENT_CREATURE_UPGRADE_MOBILITY;
             }
