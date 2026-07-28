@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <BASE/DebugCheck.h>
 #include <BASE/message.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -572,6 +573,7 @@ void hero::Deallocate(i32 updateMap) {
     }
 
     if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+        DebugCheck();
         occupiedTownValue = &gpGame->m_castleRecs[m_occupiedTown];
         occupiedTownValue->m_occupyingHeroId = -1;
     }
@@ -599,7 +601,9 @@ void hero::Deallocate(i32 updateMap) {
         player->m_currentHero = -1;
         if (m_owner == giCurPlayer) {
             gpAdvManager->m_cursorActive = 0;
-            mapCellRecord = gpGame->m_worldMap.GetCell(m_x, m_y);
+            mapCellRecord =
+                gpGame->m_worldMap.cells + gpGame->m_worldMap.width * m_y + m_x;
+            DebugCheck();
             mapCellRecord->m_flags &= ~HERO_MAP_CELL_PRESENT;
         }
         if (giCurPlayer == heroOwner)
