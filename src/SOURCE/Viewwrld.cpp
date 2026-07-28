@@ -228,7 +228,7 @@ void advManager::VWCompleteDraw(void) {
     i32 pixelY2;
     i32 pixelX6;
     u8* pixel4;
-    i8 drawTilesets0[WORLD_TILESET_COUNT];
+    u8 drawTilesets0[WORLD_TILESET_COUNT];
     u8* rowEnd37;
     i32 unusedRowState14;
     i32 mapY3;
@@ -323,7 +323,7 @@ void advManager::VWCompleteDraw(void) {
                 if (cell0->m_flags & GROUND_ALTERNATE_SET)
                     groundFrame29 += GROUND_ALTERNATE_OFFSET;
                 if (groundFrame29 == 0)
-                    groundFrame29 =
+                    groundFrame29 +=
                         (mapY3 * GROUND_RANDOM_X_MULTIPLIER + mapX7) & GROUND_RANDOM_FRAME_MASK;
                 else
                     groundFrame29 += GROUND_FRAME_OFFSET;
