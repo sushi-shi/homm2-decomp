@@ -574,7 +574,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                 case WIDGET_COMMAND_ALTERNATE_SELECT:
                     if (HAS(
                             message.payload.widget.modifiers,
-                            MESSAGE_MODIFIER_LEFT_SHIFT
+                            MESSAGE_MODIFIER_RIGHT_BUTTON
                         )) {
                         helpIndexMouse = REQUESTER_HELP_NONE;
                         switch (message.payload.widget.id) {

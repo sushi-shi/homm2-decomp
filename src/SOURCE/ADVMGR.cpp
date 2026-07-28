@@ -7526,7 +7526,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
-                            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
+                            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             } else {
                                 if (gpWindowManager->m_dialogResult
                                     == TRAVEL_DIALOG_ACCEPT) {
@@ -10062,7 +10062,7 @@ VA(0x0046ad7e, 0x304)
 MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) {
+        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
