@@ -1304,7 +1304,7 @@ smallView:
 
 VA(0x0042ce19, 0x2a6)
 i32 combatManager::RightClick(i32 hexIndex) {
-    i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
+    i32 col = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
     if (hexIndex == INVALID_HEX)
         return 0;
