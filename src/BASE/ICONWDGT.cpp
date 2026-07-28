@@ -99,7 +99,7 @@ inline iconWidget::~iconWidget() {
 
 VA(0x004d0cd0, 0x291)
 MessageDispatchResult iconWidget::Main(tag_message& msg) {
-    WidgetFlag flags = m_flags;
+    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)
         && (msg.type != MESSAGE_WIDGET
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
