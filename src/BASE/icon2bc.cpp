@@ -52,7 +52,6 @@ void IconToBitmapColorTable(
     i32 dimGate
 ) {
     IconEntry* entries = srcIcon->Entries();
-    u8* savedDst = s_dst;
     s_entry = &entries[frame];
     s_src = srcIcon->m_data + s_entry->srcOffset;
     s_left = x + s_entry->x;
@@ -71,6 +70,7 @@ void IconToBitmapColorTable(
         }
     }
     u8* row = dest->m_pixels + s_pitch * s_y;
+    u8* savedDst = s_dst;
     i32 cmd;
     for (;;) {
         s_src = s_src + 1;
