@@ -1073,7 +1073,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_MAGIC_WELL;
+                    eventHero2->m_eventFlags = HeroEventFlag(
+                        static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
+                    );
                     eventHero2->m_spellPoints = wellSpellPoints5;
                 } else {
                     NormalDialog(
@@ -1108,7 +1110,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_COAST:
             if (HAS(eventHero2->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags & ~HERO_EVENT_EMBARKED;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
+                );
                 eventHero2->m_remainingMobility = 0;
                 eventHero2->m_direction = m_cursorDirection;
                 m_cursorType = eventHero2->m_cursorType;
@@ -1146,7 +1150,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 cell,
                 BOAT_RESTORE_MODE
             );
-            eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_EMBARKED;
+            eventHero2->m_eventFlags = HeroEventFlag(
+                static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+            );
             eventHero2->m_remainingMobility = 0;
             boat_j->heroId = eventHero2->m_id;
             boat_j->owner = eventHero2->m_owner;
@@ -1322,7 +1328,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_BUOY:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_BUOY)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_BUOY;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_BUOY)
+                );
                 eventHero2->m_morale++;
                 EventWindow(
                     EVENT_TEXT_BUOY_REWARD,
@@ -1342,7 +1350,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FAERIE_RING:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_FAERIE_RING)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FAERIE_RING;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FAERIE_RING)
+                );
                 eventHero2->m_luck++;
                 EventWindow(
                     EVENT_TEXT_FAERIE_RING_REWARD,
@@ -1371,7 +1381,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_IDOL:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_IDOL)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_IDOL;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_IDOL)
+                );
                 eventHero2->m_luck++;
                 EventWindow(
                     -1,
@@ -1403,7 +1415,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_FOUNTAIN:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_FOUNTAIN)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_FOUNTAIN;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FOUNTAIN)
+                );
                 eventHero2->m_luck++;
                 EventWindow(
                     EVENT_TEXT_FOUNTAIN_REWARD,
@@ -1423,7 +1437,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WATERING_HOLE:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_WATERING_HOLE;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_WATERING_HOLE)
+                );
                 eventHero2->m_morale++;
                 eventHero2->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
                 eventHero2->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
@@ -1457,7 +1473,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OASIS:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_OASIS)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_OASIS;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_OASIS)
+                );
                 eventHero2->m_morale++;
                 eventHero2->m_mobility += OASIS_MOBILITY_BONUS;
                 eventHero2->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -1490,7 +1508,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_TEMPLE:
             if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_TEMPLE)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_TEMPLE;
+                eventHero2->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_TEMPLE)
+                );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
                     DATA_COMPGEN(0x00518dc0, doEventTempleAVisitAndAPrayer, "{Temple}\n\nA visit and a prayer at the temple raises the morale of your "
@@ -3472,7 +3492,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0
                     );
                     if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_PYRAMID)) {
-                        eventHero2->m_eventFlags = eventHero2->m_eventFlags | HERO_EVENT_PYRAMID;
+                        eventHero2->m_eventFlags = HeroEventFlag(
+                            static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_PYRAMID)
+                        );
                         eventHero2->m_luck -= PYRAMID_LUCK_PENALTY;
                     }
                 } else {
@@ -6072,7 +6094,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     switch (eventType_g) {
         case MAP_OBJECT_COAST:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags & ~HERO_EVENT_EMBARKED;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) & ~IDX(HERO_EVENT_EMBARKED)
+                );
                 eventHero->m_remainingMobility = 0;
                 eventHero->m_direction = m_cursorDirection;
                 m_cursorType = eventHero->m_cursorType;
@@ -6092,7 +6116,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 cell,
                 EVENT_BOAT_RESTORE_MODE
             );
-            eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_EMBARKED;
+            eventHero->m_eventFlags = HeroEventFlag(
+                static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+            );
             eventHero->m_remainingMobility = 0;
             boat_k->heroId = eventHero->m_id;
             boat_k->owner = eventHero->m_owner;
@@ -6193,42 +6219,54 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_WATERING_HOLE) == 0) {
                 eventHero->m_mobility += WATERING_HOLE_MOBILITY_BONUS;
                 eventHero->m_remainingMobility += WATERING_HOLE_MOBILITY_BONUS;
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_WATERING_HOLE;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_WATERING_HOLE)
+                );
                 ++eventHero->m_morale;
             }
             break;
 
         case MAP_OBJECT_BUOY:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_BUOY) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_BUOY;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_BUOY)
+                );
                 ++eventHero->m_morale;
             }
             break;
 
         case MAP_OBJECT_FAERIE_RING:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_FAERIE_RING) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_FAERIE_RING;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_FAERIE_RING)
+                );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_IDOL:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_IDOL) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_IDOL;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_IDOL)
+                );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_FOUNTAIN:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_FOUNTAIN) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_FOUNTAIN;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_FOUNTAIN)
+                );
                 ++eventHero->m_luck;
             }
             break;
 
         case MAP_OBJECT_OASIS:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_OASIS) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_OASIS;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_OASIS)
+                );
                 ++eventHero->m_morale;
                 eventHero->m_mobility += OASIS_MOBILITY_BONUS;
                 eventHero->m_remainingMobility += OASIS_MOBILITY_BONUS;
@@ -6237,7 +6275,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_TEMPLE:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_TEMPLE) == 0) {
-                eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_TEMPLE;
+                eventHero->m_eventFlags = HeroEventFlag(
+                    static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_TEMPLE)
+                );
                 eventHero->m_morale += TEMPLE_MORALE_BONUS;
             }
             break;
@@ -7057,7 +7097,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 spellPower_j = eventHero->Stats(HERO_PRIMARY_KNOWLEDGE);
                 if (eventHero->m_spellPoints < spellPower_j * HERO_SPELL_POINTS_PER_KNOWLEDGE) {
-                    eventHero->m_eventFlags = eventHero->m_eventFlags | HERO_EVENT_MAGIC_WELL;
+                    eventHero->m_eventFlags = HeroEventFlag(
+                        static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
+                    );
                     eventHero->m_spellPoints =
                         static_cast<i16>(spellPower_j * HERO_SPELL_POINTS_PER_KNOWLEDGE);
                 }

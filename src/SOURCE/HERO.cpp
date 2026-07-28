@@ -628,10 +628,14 @@ void hero::Deallocate(i32 updateMap) {
         }
         gpGame->m_players[m_owner].m_availableHeroIds[availableHeroSlotCurrent] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
-        m_eventFlags = m_eventFlags | HERO_EVENT_WEEKLY_VISIT;
+        m_eventFlags = HeroEventFlag(
+            static_cast<i32>(m_eventFlags) | IDX(HERO_EVENT_WEEKLY_VISIT)
+        );
     }
 
-    m_eventFlags = m_eventFlags & ~HERO_EVENT_GROUPED_FORMATION;
+    m_eventFlags = HeroEventFlag(
+        static_cast<i32>(m_eventFlags) & ~IDX(HERO_EVENT_GROUPED_FORMATION)
+    );
     m_owner = HERO_OWNER_NONE;
     m_destinationY = HERO_DESTINATION_NONE;
     m_destinationX = m_destinationY;
