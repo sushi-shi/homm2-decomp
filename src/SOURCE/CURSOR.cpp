@@ -1368,8 +1368,10 @@ void advManager::ProcessMapChange(SMapChange change) {
                 gpGame->m_worldMap.GetCell(change.x, change.y)->m_objectMetadata;
             mapHero_n->m_owner = change.player;
             recruitCell_i = gpGame->m_worldMap.GetCell(change.x, change.y);
+            DebugCheck();
             recruitCell_i->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
             heroCell_i = gpGame->m_worldMap.GetCell(change.x, change.y);
+            DebugCheck();
             heroCell_i->m_objectMetadata = change.id;
             gpAdvManager->SetHeroContext(change.id, 0);
             CompleteDraw(0);
