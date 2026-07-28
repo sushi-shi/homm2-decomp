@@ -52,9 +52,11 @@ void IconToBitmapColorTable(
     i32 dimGate
 ) {
     IconEntry* entries = srcIcon->Entries();
+    u8* data = srcIcon->m_data;
+    i32 entryX = entries[frame].x;
     s_entry = &entries[frame];
-    s_src = srcIcon->m_data + s_entry->srcOffset;
-    s_left = x + s_entry->x;
+    s_src = data + entries[frame].srcOffset;
+    s_left = x + entryX;
     s_pitch = dest->m_width;
     s_y = y + s_entry->y;
     i32 X = s_left;
