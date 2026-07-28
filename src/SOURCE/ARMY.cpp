@@ -1408,7 +1408,7 @@ void army::DoHydraAttack(i32) {
             if (ValidHex(targetHex_2)) {
                 targetSide_8 = gpCombatManager->m_hexCells[targetHex_2].m_occupantSide;
                 targetIndex_9 = gpCombatManager->m_hexCells[targetHex_2].m_occupantIndex;
-                if (targetSide_8 != COMBAT_SIDE_NONE && targetIndex_9 >= 0) {
+                if (targetSide_8 >= 0 && targetIndex_9 >= 0) {
                     gpCombatManager->m_limitCreatureCount[IDX(targetSide_8)][targetIndex_9]++;
                     target_2 = &gpCombatManager->m_armies[IDX(targetSide_8)][targetIndex_9];
                     if (!target_2->m_hitByCreature) {
@@ -1512,7 +1512,7 @@ void army::DoAttack(i32 retaliation) {
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_BREATH_ATTACK)) {
             breathHex_1 = GetAdjacentCellIndex(targetHex_3, m_attackDirection);
             if (ValidHex(breathHex_1)
-                && gpCombatManager->m_hexCells[breathHex_1].m_occupantSide != COMBAT_SIDE_NONE
+                && gpCombatManager->m_hexCells[breathHex_1].m_occupantSide >= 0
                 && gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex >= 0
                 && (gpCombatManager->m_hexCells[breathHex_1].m_occupantSide != target_1->m_side
                     || gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex
