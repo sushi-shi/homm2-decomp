@@ -157,10 +157,12 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
 
 VA(0x0041c15f, 0x31)
 i32 AppIdle(void) {
+    // Retail returns 1 from both arms; the else arm is not dead code that
+    // folded away, it emits its own mov eax,1 at 0x0041c181.
     if (gbForegroundApp != 0)
         return 1;
     else
-        return 0;
+        return 1;
 }
 
 VA(0x0041c190, 0x57e)
