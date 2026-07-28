@@ -9435,13 +9435,13 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
             if (retainedSamples[soundIndex] == 0 && m_loopingSamples[soundIndex] != NULL) {
                 ++retainedSamples[soundIndex];
                 ++loadedSampleCount;
-                if (loadedSampleCount >= maxSamples) {
-                    break;
-                }
+                if (loadedSampleCount >= maxSamples)
+                    goto disposeSamples;
             }
         }
     }
 
+disposeSamples:
     for (soundIndex = 0; soundIndex < LOOPING_SAMPLE_COUNT; ++soundIndex) {
         if (m_loopingSamples[soundIndex] != NULL && retainedSamples[soundIndex] == 0) {
             gpResourceManager->Dispose(m_loopingSamples[soundIndex]);
