@@ -10217,10 +10217,10 @@ void UpdateSystemOptions(i32 initialDraw) {
     message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
-    if (gConfig.soundVolume == CONFIG_VOLUME_MUTED) {
-        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
-    } else {
+    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
+    } else {
+        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
@@ -10243,11 +10243,11 @@ void UpdateSystemOptions(i32 initialDraw) {
         (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
-    if (gConfig.blackoutComputer == 0) {
+    if (gConfig.blackoutComputer != 0) {
+        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
+    } else {
         message.payload.widget.data.value =
             IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
-    } else {
-        message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
@@ -10287,10 +10287,10 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    if (gConfig.blackoutComputer == 0) {
-        message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
-    } else {
+    if (gConfig.blackoutComputer != 0) {
         message.payload.widget.data.text = DATA_COMPGEN(0x004f69dc, updateSystemOptionsDonTShow, "Don't Show");
+    } else {
+        message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =

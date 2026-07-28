@@ -106,7 +106,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     if (!ValidHex(destination)) {
         return 0;
     }
-    if ((m_targetSide != COMBAT_ATTACKER_SIDE && m_targetSide != COMBAT_DEFENDER_SIDE)
+    if (m_targetSide < COMBAT_ATTACKER_SIDE || m_targetSide > COMBAT_DEFENDER_SIDE
         || m_targetIndex < 0
         || m_targetIndex > COMBAT_ARMY_SLOT_COUNT - 1) {
         if (CanFit(destination, 0, NULL)) {
