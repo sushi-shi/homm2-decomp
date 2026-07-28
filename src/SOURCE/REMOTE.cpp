@@ -111,7 +111,7 @@ void RemoteCleanup(void) {
 
 VA(0x004a3208, 0x6da)
 void RemoteMain(RemoteGameMode gameMode) {
-    u8 receivedPlayers[REMOTE_PLAYER_COUNT];
+    i8 receivedPlayers[REMOTE_PLAYER_COUNT];
     i32 playerState;
     char* incomingData;
     i32 waitingForPlayers;
