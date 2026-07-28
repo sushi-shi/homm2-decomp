@@ -4851,67 +4851,67 @@ void game::ConvertObject(
 
     for (x = left; right >= x; x++) {
         for (y = top; bottom >= y; y++) {
-            if (x >= 0 && x < MAP_WIDTH && y >= 0 && MAP_HEIGHT >= y + 1) {
-                cell = WORLDMAP->GetCell(x, y);
-                if (cell->m_objectIndex != static_cast<u8>(-1)
-                    && cell->m_objectTileset == oldTileset
-                    && cell->m_objectIndex >= oldFirstIndex
-                    && cell->m_objectIndex <= oldLastIndex) {
-                    cell->m_objectTileset = newTileset;
-                    cell->m_objectIndex =
-                        static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
-                }
-                if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
-                    cell->m_triggerType =
-                        (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger;
+            if (x < 0 || x >= MAP_WIDTH || y < 0 || MAP_HEIGHT <= y)
+                continue;
+            cell = WORLDMAP->GetCell(x, y);
+            if (cell->m_objectIndex != static_cast<u8>(-1)
+                && cell->m_objectTileset == oldTileset
+                && cell->m_objectIndex >= oldFirstIndex
+                && cell->m_objectIndex <= oldLastIndex) {
+                cell->m_objectTileset = newTileset;
+                cell->m_objectIndex =
+                    static_cast<u8>(cell->m_objectIndex - oldFirstIndex + newFirstIndex);
+            }
+            if ((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == oldTrigger)
+                cell->m_triggerType =
+                    (cell->m_triggerType & MAP_TRIGGER_ACTION_FLAG) | newTrigger;
 
-                if (cell->m_extraIndex != 0
-                    && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
-                    extra = WORLDMAP->Extra(cell->m_extraIndex);
+            if (cell->m_extraIndex != 0
+                && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
+                extra = WORLDMAP->Extra(cell->m_extraIndex);
+            else
+                extra = NULL;
+            while (extra != NULL) {
+                if (extra->objectTileset == oldTileset
+                    && extra->objectIndex >= oldFirstIndex
+                    && extra->objectIndex <= oldLastIndex) {
+                    extra->objectTileset = newTileset;
+                    extra->objectIndex =
+                        static_cast<u8>(extra->objectIndex - oldFirstIndex + newFirstIndex);
+                }
+                if (extra->nextIndex != 0
+                    && WORLDMAP->Extra(extra->nextIndex)->objectIndex != static_cast<u8>(-1))
+                    extra = WORLDMAP->Extra(extra->nextIndex);
                 else
                     extra = NULL;
-                while (extra != NULL) {
-                    if (extra->objectTileset == oldTileset
-                        && extra->objectIndex >= oldFirstIndex
-                        && extra->objectIndex <= oldLastIndex) {
-                        extra->objectTileset = newTileset;
-                        extra->objectIndex =
-                            static_cast<u8>(extra->objectIndex - oldFirstIndex + newFirstIndex);
-                    }
-                    if (extra->nextIndex != 0
-                        && WORLDMAP->Extra(extra->nextIndex)->objectIndex != static_cast<u8>(-1))
-                        extra = WORLDMAP->Extra(extra->nextIndex);
-                    else
-                        extra = NULL;
-                }
+            }
 
-                if (cell->m_overlayIndex != static_cast<u8>(-1)
-                    && cell->m_overlayTileset == oldTileset
-                    && cell->m_overlayIndex >= oldFirstIndex
-                    && cell->m_overlayIndex <= oldLastIndex) {
-                    cell->m_overlayTileset = newTileset;
-                    cell->m_overlayIndex =
-                        static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
+            if (cell->m_overlayIndex != static_cast<u8>(-1)
+                && cell->m_overlayTileset == oldTileset
+                && cell->m_overlayIndex >= oldFirstIndex
+                && cell->m_overlayIndex <= oldLastIndex) {
+                cell->m_overlayTileset = newTileset;
+                cell->m_overlayIndex =
+                    static_cast<u8>(cell->m_overlayIndex - oldFirstIndex + newFirstIndex);
+            }
+            if (cell->m_extraIndex != 0
+                && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != static_cast<u8>(-1))
+                extra = WORLDMAP->Extra(cell->m_extraIndex);
+            else
+                extra = NULL;
+            while (extra != NULL) {
+                if (extra->overlayTileset == oldTileset
+                    && extra->overlayIndex >= oldFirstIndex
+                    && extra->overlayIndex <= oldLastIndex) {
+                    extra->overlayTileset = newTileset;
+                    extra->overlayIndex =
+                        static_cast<u8>(extra->overlayIndex - oldFirstIndex + newFirstIndex);
                 }
-                if (cell->m_extraIndex != 0
-                    && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != static_cast<u8>(-1))
-                    extra = WORLDMAP->Extra(cell->m_extraIndex);
+                if (extra->nextIndex != 0
+                    && WORLDMAP->Extra(extra->nextIndex)->overlayIndex != static_cast<u8>(-1))
+                    extra = WORLDMAP->Extra(extra->nextIndex);
                 else
                     extra = NULL;
-                while (extra != NULL) {
-                    if (extra->overlayTileset == oldTileset
-                        && extra->overlayIndex >= oldFirstIndex
-                        && extra->overlayIndex <= oldLastIndex) {
-                        extra->overlayTileset = newTileset;
-                        extra->overlayIndex =
-                            static_cast<u8>(extra->overlayIndex - oldFirstIndex + newFirstIndex);
-                    }
-                    if (extra->nextIndex != 0
-                        && WORLDMAP->Extra(extra->nextIndex)->overlayIndex != static_cast<u8>(-1))
-                        extra = WORLDMAP->Extra(extra->nextIndex);
-                    else
-                        extra = NULL;
-                }
             }
         }
     }
