@@ -92,11 +92,32 @@ or branch-cleaned a dozen more functions on these:
   wrap where we had a continue). The trailing-jmp count at the previous block
   end distinguishes them before you compile.
 
-None of the at-state mirrors move for any spelling: relational operand order,
+One exception is now probe-proven: an INLINE ACCESSOR on one side of a
+relational PINS the canonical cmp direction across TU states, and which side is
+inlined selects the jcc (right-side accessor -> jge form, left-side -> jle
+form; 8-state probe, 2026-07-29). The expansion usually costs the statement's
+continuation `jmp $+0`, so it closes a mirror site only when retail also shows
+that jmp - but the jmp is context-dependent (ClaimTown's GetCell emitted none),
+so a wall site with a natural accessor is worth one compile either way.
+
+Otherwise, none of the at-state mirrors move for any spelling: relational operand order,
 global-vs-local cmp direction, int add/or term order, and imul factorization
 all canonicalize per TU state (A/B: tradpost byte-identical under operand
 swap). Read the cmp reloc/slot ORDER first — if both sides load different
 operands first it can still be the canonicalizer, not the source.
+
+## 7. Multi-dimensional subscript term order is TU state, not spelling
+
+`&m_armies[side][index]` can emit the SIDE term first or the INDEX term first.
+A clean-TU probe gives side-first for every natural spelling — plain 2D
+subscript, row pointer + index, explicit row local, and with or without the
+`IDX()` conversion (which is a constexpr call the compiler folds away, proven by
+an unchanged score when it is replaced by direct casts). Only hoisting the side
+INDEX into a local flips the probe to index-first. In a large TU the order
+follows cumulative state instead (GetCommand, HandleAppSpecificMenuCommands, and
+CycleCombatScreen all show index-first against retail's side-first with correct
+source). Treat it as at-state (tu-cumulative-eval-order.md), not as a bug to
+respell.
 
 ## Diagnosis workflow
 
