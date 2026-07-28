@@ -774,8 +774,8 @@ void townManager::ChangeTown(void) {
 VA(0x0041436f, 0x95a)
 void townManager::SetupTown(void) {
     tag_message message;
-    i32 objectOrder;
-    H2_ENUM_STORAGE(BuildingSlotType, i32) objectId;
+    i32 index;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) buildId;
     i32 crestFrame;
 
     sprintf(gText, GetTownName(m_town->m_id));
@@ -814,20 +814,20 @@ void townManager::SetupTown(void) {
         sprintf(gText, DATA_COMPGEN(0x004eee4c, setupTownTownbkgDIcn, "townbkg%d.icn"), IDX(m_town->m_type));
         m_backgroundIcon = gpResourceManager->GetIcon(gText);
         m_townObjectCount = 0;
-        for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
-            objectId = gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
-            if (objectId != TOWN_OBJECT_NONE) {
+        for (index = 0; index < TOWN_BUILDING_COUNT; ++index) {
+            buildId = gTownObjectOrder[IDX(m_town->m_type)][index];
+            if (buildId != TOWN_OBJECT_NONE) {
                 sprintf(
                     gText,
                     DATA_COMPGEN(0x004eee5c, setupTownSS, "%s%s"),
                     gTownPrefixNames[IDX(m_town->m_type)],
-                    gTownObjNames[IDX(objectId)]
+                    gTownObjNames[IDX(buildId)]
                 );
-                m_townObjects[m_townObjectCount] = new townObject(m_town->m_type, objectId, gText);
+                m_townObjects[m_townObjectCount] = new townObject(m_town->m_type, buildId, gText);
                 if (m_townObjects[m_townObjectCount] == NULL)
                     MemError();
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
-                    if (!(m_town->m_buildings & BIT(objectId))) {
+                    if (!(m_town->m_buildings & BIT(buildId))) {
                         m_townObjects[m_townObjectCount]->m_border->m_flags &=
                             ~WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
@@ -843,9 +843,9 @@ void townManager::SetupTown(void) {
         gpWindowManager->AddWindow(m_townWindow, 0, 1);
     } else {
         m_townObjectCount = 0;
-        for (objectOrder = 0; objectOrder < TOWN_BUILDING_COUNT; ++objectOrder) {
+        for (index = 0; index < TOWN_BUILDING_COUNT; ++index) {
             H2_ENUM_STORAGE(BuildingSlotType, i32) existingObjectId =
-                gTownObjectOrder[IDX(m_town->m_type)][objectOrder];
+                gTownObjectOrder[IDX(m_town->m_type)][index];
             if (existingObjectId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & BIT(existingObjectId))) {
@@ -870,9 +870,9 @@ void townManager::SetupTown(void) {
     }
 
     crestFrame = gpCurPlayer->m_color;
-    if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
+    if (m_town->OccupyingHero() != TOWN_OCCUPYING_HERO_NONE) {
         crestFrame *= CREST_PORTRAITS_PER_COLOR;
-        crestFrame += IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait);
+        crestFrame += IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_cursorType);
     } else {
         crestFrame += TOWN_EMPTY_HERO_PORTRAIT_OFFSET;
     }
@@ -884,7 +884,7 @@ void townManager::SetupTown(void) {
                                                                   : TOWN_CREST_FRAME_WITH_HERO
         ),
         gpResourceManager->MakeId(DATA_COMPGEN(0x004eee64, setupTownCrestIcn, "crest.icn"), TOWN_ICON_RESOURCE_TYPE),
-        gpCurPlayer->m_color,
+        gpCurPlayer->Color(),
         &m_town->m_army,
         TOWN_GARRISON_FIRST_CONTROL,
         0,
