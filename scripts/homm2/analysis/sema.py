@@ -125,6 +125,8 @@ def cmd_disasm(args) -> None:
         argv.append("--lite")
     if args.blocks:
         argv.append("--blocks")
+    if args.branches:
+        argv.append("--branches")
     if args.dot:
         argv.append("--dot")
     sys.exit(_sema_tool("homm2.analysis.disasm", argv))
@@ -263,6 +265,9 @@ def _build_parser() -> argparse.ArgumentParser:
                     help="unified diff of base-vs-target asm (addresses masked; rc=1 if differs)")
     sd.add_argument("--blocks", action="store_true",
                     help="basic-block CFG view (combines with --base/--target/--diff/--lite)")
+    sd.add_argument("--branches", action="store_true",
+                    help="ordered conditional-branch sequence with symbolic targets; "
+                         "with --diff, the flip/topology comparison --diff cannot show")
     sd.add_argument("--dot", action="store_true",
                     help="Graphviz CFG output (requires --blocks)")
     sd.set_defaults(func=cmd_disasm)

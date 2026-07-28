@@ -15,6 +15,9 @@ Modes:
   --diff     unified diff of BASE vs TARGET (addresses/byte-columns masked; rc=1 if differ)
   --lite     asm only - no offset column, no byte columns, no reloc lines
   --blocks   basic-block/CFG view; combines with --base, --target, --diff, and --lite
+  --branches ordered conditional-branch sequence with SYMBOLIC targets; with --diff,
+             the comparison --diff structurally cannot show (rc=1 if the sequences
+             differ). Single side follows the house default: TARGET, or --base.
   --dot      Graphviz CFG output (requires --blocks)
   --rich     BASE disasm interleaved with the CodeView source line each instr came from
              (implies --base; needs build/lines/<unit>.json from `gen_lines.py`, build shell)
@@ -511,6 +514,293 @@ def _blocks_diff(base_text: str, target_text: str) -> tuple[str, bool]:
     return "\n".join(out) + "\n", differences == 0 and base_flow == target_flow
 
 
+# --- --branches: the ordered conditional-branch sequence, symbolically -------------
+#
+# `--diff` masks address operands so reloc-bound targets do not show up as spurious
+# diffs. That masking also hides intra-function branch DISPLACEMENTS: a `je` to a
+# different basic block prints `je <addr>` on both sides and compares EQUAL, so a real
+# control-flow divergence can render as "identical asm" while the function sits below
+# 100%. Do NOT "fix" that by unmasking - every function whose instruction sizes differ
+# anywhere upstream would grow a +/- on every single branch, which is exactly the noise
+# the masking exists to remove. The answer is to name branch targets SYMBOLICALLY - by
+# the index of the first branch at or after them - so a uniform displacement shift
+# compares equal and a genuine retarget does not.
+#
+# What a hit is NOT: differing branch COUNTS are a structural difference (reconstruct,
+# don't re-spell); more than ~4 flips means the positional pairing is meaningless; a
+# POLARITY row can be pure /Od block-layout preference; a truncated stream (jump-table
+# data in .text) yields a reliable PREFIX that says so, not a clean result.
+
+_JCC_COND = frozenset(
+    "je jne jz jnz jl jle jg jge ja jae jb jbe js jns jo jno jp jnp".split())
+_JCC_UNCOND = frozenset(("jmp", "jmpl", "jmpw"))
+
+# The signed/unsigned twins: two condition families over the same flags; picking the
+# wrong one is a source-level type bug, not a codegen choice.
+_SIGNED_TWIN = {"jl": "jb", "jb": "jl", "jle": "jbe", "jbe": "jle",
+                "jg": "ja", "ja": "jg", "jge": "jae", "jae": "jge"}
+
+# The inverse of each condition: same test, opposite sense.
+_INVERSE = {"je": "jne", "jne": "je", "jz": "jnz", "jnz": "jz",
+            "jl": "jge", "jge": "jl", "jle": "jg", "jg": "jle",
+            "jb": "jae", "jae": "jb", "jbe": "ja", "ja": "jbe",
+            "js": "jns", "jns": "js", "jo": "jno", "jno": "jo",
+            "jp": "jnp", "jnp": "jp"}
+
+_JALL = re.compile(r"^j[a-z]+$")
+_JTGT = re.compile(r"^(-?0x[0-9a-f]+)\b")
+
+
+def _branch_insns(text: str) -> list:
+    """``[(offset, mnemonic, operand)]`` rebased so offset 0 is the function's first
+    instruction. Branch TARGETS are rebased into the SAME space - normalizing offsets
+    while leaving targets absolute would compare two address spaces and silently turn
+    every function into a topology hit."""
+    insns = []
+    for ln in text.splitlines():
+        p = _parse_ins(ln)
+        if p is None:
+            continue
+        off, body = p
+        fields = body.split(None, 1)
+        insns.append((off, fields[0].lower(), fields[1] if len(fields) > 1 else ""))
+    while insns and insns[-1][1] == "nop":
+        insns.pop()  # trailing COMDAT alignment padding (base only)
+    if not insns:
+        return []
+    base = insns[0][0]
+    out = []
+    for off, mn, op in insns:
+        if _JALL.match(mn):
+            t = _JTGT.match(op)
+            if t:
+                op = hex(int(t.group(1), 16) - base) + op[t.end():]
+        out.append((off - base, mn, op))
+    return out
+
+
+# MSVC 4.2 never emits these, so one "decoding" out of embedded jump-table bytes marks
+# exactly where linear decode left real code (table entries are small offsets whose low
+# bytes often decode as e2/e3 loop/jecxz forms - CombatMessage's table does).
+_NEVER_EMITTED = frozenset(("jecxz", "jcxz", "loop", "loope", "loopne",
+                            "loopz", "loopnz"))
+
+
+def _first_bad(insns) -> int | None:
+    """Offset where linear decode stopped being real instructions, or None. Jump-table
+    data in `.text` after an indirect `jmp` is the usual cause; everything after it is
+    unreliable, and callers must SAY the branch list is a partial prefix."""
+    for off, mn, _ in insns:
+        if mn == "(bad)" or mn.startswith("<") or mn in _NEVER_EMITTED:
+            return off
+    return None
+
+
+def _branch_seq(insns, stop=None) -> list:
+    """The ordered conditional-branch list ``[(offset, mnemonic, target|None)]``.
+
+    `stop` (see `_first_bad`) truncates the walk so the result is a reliable prefix. A
+    target that is not a plain address stays None so the sequence length stays honest.
+    An unclassified jump mnemonic dies rather than falling through - a jmp alias inside
+    the conditional sequence fabricates flips."""
+    out = []
+    for off, mn, op in insns:
+        if stop is not None and off >= stop:
+            break
+        if mn in _JCC_COND:
+            m = _JTGT.match(op)
+            out.append((off, mn, int(m.group(1), 16) if m else None))
+        elif _JALL.match(mn) and mn not in _JCC_UNCOND:
+            die(f"unclassified jump mnemonic {mn!r} - add it to _JCC_COND or "
+                "_JCC_UNCOND, do not let it fall through")
+    return out
+
+
+def _ret_count(insns, stop=None) -> int:
+    return sum(1 for off, mn, _ in insns
+               if mn.startswith("ret") and (stop is None or off < stop))
+
+
+def _sym_branch_target(brs, tgt):
+    """Name a branch target symbolically: the index of the first branch at or after it
+    (``len(brs)`` = past the last branch). This is what makes a uniform displacement
+    shift compare EQUAL. The residue it cannot see: two blocks that both sit past the
+    last branch, so TOPOLOGY under-reports at the epilogue."""
+    if tgt is None:
+        return None
+    for i, (off, _, _) in enumerate(brs):
+        if off >= tgt:
+            return i
+    return len(brs)
+
+
+def _classify_flip(a: str, b: str) -> str:
+    """SIGNEDNESS / POLARITY / OTHER for one mnemonic pair (base, target)."""
+    if _SIGNED_TWIN.get(a) == b:
+        return "SIGNEDNESS"
+    if _INVERSE.get(a) == b:
+        return "POLARITY"
+    return "OTHER"
+
+
+def _branches_compare(bi, ti, max_flips: int = 4) -> dict:
+    """Compare two instruction streams' branch sequences.
+
+    Returns a dict the renderer consumes:
+      status  'flips' | 'topology' | 'clean' | 'struct' | 'many-flips' | 'no-branches'
+      kind    SIGNEDNESS / POLARITY / OTHER / TOPOLOGY (only for flips/topology)
+      rows    [(index, base_mn, target_mn)] for flips, [(index, base_blk, target_blk)]
+              for topology
+      nbr/nbr_t  branch counts; rets (base, target); trunc (base|None, target|None)
+    """
+    bstop, tstop = _first_bad(bi), _first_bad(ti)
+    bb, tb = _branch_seq(bi, bstop), _branch_seq(ti, tstop)
+    res = {"kind": None, "rows": [], "nbr": len(bb), "nbr_t": len(tb),
+           "rets": (_ret_count(bi, bstop), _ret_count(ti, tstop)),
+           "trunc": (bstop, tstop)}
+    if len(bb) != len(tb):
+        res["status"] = "struct"
+        return res
+    if not bb:
+        res["status"] = "no-branches"
+        return res
+    flips = [(i, x[1], y[1]) for i, (x, y) in enumerate(zip(bb, tb)) if x[1] != y[1]]
+    if len(flips) > max_flips:
+        res["status"] = "many-flips"
+        return res
+    if flips:
+        kinds = {_classify_flip(a, b) for _, a, b in flips}
+        res["status"] = "flips"
+        res["kind"] = ("SIGNEDNESS" if "SIGNEDNESS" in kinds else
+                       "OTHER" if "OTHER" in kinds else "POLARITY")
+        res["rows"] = flips
+        return res
+    # Same mnemonics everywhere: the only thing left that a masked diff can hide is a
+    # branch landing on a different block.
+    bt = [_sym_branch_target(bb, t) for _, _, t in bb]
+    tt = [_sym_branch_target(tb, t) for _, _, t in tb]
+    moved = [(i, x, y) for i, (x, y) in enumerate(zip(bt, tt)) if x != y]
+    if not moved:
+        res["status"] = "clean"
+    elif len(moved) > max_flips:
+        res["status"] = "many-flips"
+    else:
+        res["status"] = "topology"
+        res["kind"] = "TOPOLOGY"
+        res["rows"] = moved
+    return res
+
+
+def _hint_branches(rva: int, name: str, unit: str) -> None:
+    """Print the `--branches` pointer when a diff view has nothing to show but the
+    function is NOT matched - `--diff` and the block views mask exactly the signal
+    `--branches` names. Fires only on the already-clean path, reads report.json
+    lazily, and swallows every failure so the normal path is unchanged."""
+    try:
+        rep = json.loads((REPO / "build/objdiff/report.json").read_text())
+        pct = None
+        for u in rep.get("units", []):
+            if u.get("name") == unit:
+                for fn in u.get("functions") or []:
+                    if fn.get("name") == name:
+                        pct = fn.get("fuzzy_match_percent")
+                break
+    except Exception:
+        return
+    if pct is None or pct >= 100.0:
+        return
+    print(f"[but this function is {pct:.2f}%, not 100 - and this view MASKS address "
+          "operands, which also hides intra-function branch displacements. Try "
+          f"`homm2 sema disasm 0x{rva:08x} --branches --diff`, which names each "
+          "branch target by branch index.]")
+
+
+def _branch_view(rva: int, name: str, unit: str, size: int, ordinal: int,
+                 want_diff: bool, want_base: bool) -> int:
+    """Render `--branches`: one side's ordered sequence, or the two sides diffed."""
+    def trunc_note(side: str, insns) -> int | None:
+        # SAY the list is partial - a silently short branch list on exactly the
+        # functions people most need one for is what makes a view untrustworthy.
+        at = _first_bad(insns)
+        if at is not None:
+            print(f"[{side} stream truncated at +0x{at:x} - jump-table data in "
+                  ".text; branch list is partial]")
+        return at
+
+    if not want_diff:
+        side = "BASE (compiled)" if want_base else "TARGET (retail)"
+        obj = BASE / f"{unit}.obj" if want_base else DELINK / f"{unit}.c.obj"
+        insns = _branch_insns(_objdump(obj, name, size, ordinal))
+        print(f"[branch sequence: {side} @ 0x{rva:08x} {name} [{unit}]]")
+        stop = trunc_note(side.split()[0].lower(), insns)
+        brs = _branch_seq(insns, stop)
+        for i, (off, mn, tgt) in enumerate(brs):
+            if tgt is None:
+                print(f"  #{i:<3} +{off:03x}  {mn:<4} -> ?")
+                continue
+            blk = _sym_branch_target(brs, tgt)
+            past = "  (past the last branch)" if blk == len(brs) else ""
+            print(f"  #{i:<3} +{off:03x}  {mn:<4} -> blk{blk} (+{tgt:03x}){past}")
+        print(f"  {len(brs)} branch(es), {_ret_count(insns, stop)} ret(s)")
+        return 0
+
+    bi = _branch_insns(_objdump(NORMAL_BASE / f"{unit}.obj", name, size, ordinal))
+    ti = _branch_insns(_objdump(NORMAL_TARGET / f"{unit}.c.obj", name, size, ordinal))
+    print(f"[branch diff: BASE (compiled) vs TARGET (retail) @ 0x{rva:08x} {name}]")
+    print("[targets are named by BRANCH INDEX, so a uniform displacement shift "
+          "compares EQUAL and a genuine retarget does not]")
+    bstop, tstop = trunc_note("base", bi), trunc_note("target", ti)
+    res = _branches_compare(bi, ti)
+    br, tr = res["rets"]
+    dup = ("  DUP-EXIT (we duplicate an exit retail merges - respell the gate: "
+           "docs/patterns/od-early-return-guard-clauses.md)" if br > tr else
+           "  (retail has MORE exits than we do - the tail-merge direction, a wall "
+           "on o2 units)" if br < tr else "")
+    print(f"  base {res['nbr']} branch(es), {br} ret(s)   |   "
+          f"target {res['nbr_t']} branch(es), {tr} ret(s){dup}")
+    status = res["status"]
+    if status == "struct":
+        print("  BRANCH COUNTS DIFFER - a structural difference (a block we did not "
+              "reconstruct, a folded `if`, an inlining decision), NOT the one-line "
+              "condition signal. Reconstruct rather than re-spell.")
+        return 1
+    if status == "many-flips":
+        print("  more than 4 rows differ - the two functions are differently shaped "
+              "and the positional pairing is meaningless. Not this signal.")
+        return 1
+    if status == "no-branches":
+        print("  no conditional branches on either side.")
+        return 0
+    if status == "clean":
+        print("  branch sequences AGREE (mnemonics and symbolic targets). Whatever "
+              "is left is instruction selection / slot layout, not control flow.")
+        return 0
+    print(f"  {res['kind']}:")
+    bb = _branch_seq(bi, bstop)
+    for row in res["rows"]:
+        i = row[0]
+        if res["kind"] == "TOPOLOGY":
+            _, x, y = row
+            print(f"    #{i:<3} +{bb[i][0]:03x} {bb[i][1]:<4}  target lands on "
+                  f"blk{y}, we land on blk{x}")
+        else:
+            _, a, b = row
+            print(f"    #{i:<3} +{bb[i][0]:03x}  base {a:<4} -> target {b}")
+    hint = {
+        "SIGNEDNESS": "a signed/unsigned twin is nearly always a REAL source bug - "
+                      "an operand that wants the other signedness (member, global, or "
+                      "literal type)",
+        "POLARITY": "same test, opposite sense - read where each side's branch GOES; "
+                    "the guard-clause house shape is the usual lever "
+                    "(docs/patterns/od-early-return-guard-clauses.md)",
+        "TOPOLOGY": "identical instruction for instruction - a branch just lands on "
+                    "a different block; the shape --diff hides hardest",
+        "OTHER": "neither a signed twin nor an inversion - read it by hand",
+    }[res["kind"]]
+    print(f"  [{hint}]")
+    return 1
+
+
 def _dot(cfg, differing: set[int] | None = None, title: str = "") -> str:
     """Render a CFG as Graphviz DOT."""
     def quote(value: str) -> str:
@@ -605,6 +895,14 @@ def main():
     if "--dot" in flags and "--blocks" not in flags:
         die("--dot requires --blocks")
 
+    if "--branches" in flags:
+        unknown = flags - {"--branches", "--diff", "--base", "--target"}
+        if unknown:
+            die(f"--branches does not combine with {' '.join(sorted(unknown))}")
+        sys.exit(_branch_view(rva, name, unit, size, ordinal,
+                              want_diff="--diff" in flags,
+                              want_base="--base" in flags))
+
     if "--blocks" in flags:
         if "--diff" in flags:
             base_text = _objdump(
@@ -635,6 +933,8 @@ def main():
             else:
                 output, exact = _blocks_diff(base_text, target_text)
             print(output, end="")
+            if exact:
+                _hint_branches(rva, name, unit)
             sys.exit(0 if exact else 1)
 
         use_base = "--base" in flags
@@ -655,6 +955,7 @@ def main():
         tgt = _norm(_objdump(NORMAL_TARGET / f"{unit}.c.obj", name, size, ordinal))
         if base == tgt:
             print(f"identical asm ({len(tgt)} instruction(s); addresses/relocs masked)")
+            _hint_branches(rva, name, unit)
             sys.exit(0)
         print(f"[diff: BASE (compiled) vs TARGET (retail) @ 0x{rva:08x} {name}; "
               "addresses masked as <addr>]")
