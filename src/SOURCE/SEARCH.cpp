@@ -42,7 +42,7 @@ DATA(0x0052a254) static i32 s_hasTarget;
 DATA(0x0052a258) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
 DATA(0x0052a260) static hero* s_currentHero;
 
-VA(0x004a25e0, 0xc0)
+VA(0x004a25e0, 0xbc)
 i32 searchArray::BuildPath(
     i32 startX,
     i32 startY,

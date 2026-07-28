@@ -59,13 +59,13 @@ DATA(0x0051736c) static SFindPathSourceLocation gSearchDestructionSource = {
     FINDPATH_SOURCE_FILE
 };
 
-VA(0x004a4a50, 0x10)
+VA(0x004a4a50, 0xe)
 searchArray::searchArray(void) {
     m_storage.cells = NULL;
     m_maxQueueCount = 0;
 }
 
-VA(0x004a4a60, 0x30)
+VA(0x004a4a60, 0x2c)
 searchArray::~searchArray() {
     if (m_storage.cells != NULL)
         H2_FREE_AT(
@@ -76,7 +76,7 @@ searchArray::~searchArray() {
     m_storage.cells = NULL;
 }
 
-VA(0x004a4a90, 0x60)
+VA(0x004a4a90, 0x56)
 void searchArray::Init(void) {
     if (m_storage.cells != NULL)
         H2_FREE_AT(
@@ -92,7 +92,7 @@ void searchArray::Init(void) {
     ));
 }
 
-VA(0x004a4af0, 0x30)
+VA(0x004a4af0, 0x2c)
 void searchArray::Close(void) {
     if (m_storage.cells != NULL)
         H2_FREE_AT(
@@ -103,7 +103,7 @@ void searchArray::Close(void) {
     m_storage.cells = NULL;
 }
 
-VA(0x004a4b20, 0x40)
+VA(0x004a4b20, 0x3c)
 void searchArray::Clear(void) {
     memset(m_queue, 0, sizeof(m_queue));
     memset(m_storage.cells, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell));
@@ -111,7 +111,7 @@ void searchArray::Clear(void) {
     m_queueCount = 0;
 }
 
-VA(0x004a4b60, 0x40)
+VA(0x004a4b60, 0x3d)
 i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
     i32 yDistance = abs(y1 - y2);
@@ -119,7 +119,7 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     return ApproximateGridDistance(xDistance, yDistance);
 }
 
-VA(0x004a4ba0, 0x80)
+VA(0x004a4ba0, 0x75)
 i32 CalcTerrainCost(
     H2_ENUM_PARAM(TerrainType, i32) terrain,
     i32 diagonal,
@@ -153,7 +153,7 @@ terrainCost:
     return giTerrainCost[IDX(terrain)][pathfindingLevel][diagonal & SEARCH_DIAGONAL_COST_MASK];
 }
 
-VA(0x004a4c20, 0x270)
+VA(0x004a4c20, 0x267)
 void searchArray::PushPoint(
     i32 x,
     i32 y,
@@ -341,7 +341,7 @@ void searchArray::TestPossibleDirections(
     } while (gSearchDirection < SEARCH_DIRECTION_COUNT);
 }
 
-VA(0x004a5200, 0x1f0)
+VA(0x004a5200, 0x1ed)
 void searchArray::SeedCombatPosition(class army* unit) {
     i32 hex;
 
@@ -398,7 +398,7 @@ void searchArray::SeedCombatPosition(class army* unit) {
     unit->m_targetSide = COMBAT_SIDE_NONE;
 }
 
-VA(0x004a53f0, 0x410)
+VA(0x004a53f0, 0x402)
 i32 searchArray::FindCombatPath(
     i32 sourceHex,
     i32 targetHex,
