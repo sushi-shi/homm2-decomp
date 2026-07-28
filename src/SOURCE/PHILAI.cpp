@@ -6707,8 +6707,8 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
             result5 = EVENT_FRIENDLY_PENALTY;
 
         if (giCurTurn - gpCurAIHero->m_lastHeroInteractionTurn >= EVENT_INTERACTION_AGE
-            || gpGame->m_heroRecs[heroId].m_id != gpCurAIHero->m_lastInteractionHeroId) {
-            HeroInteractionAtHero(gpCurAIHero, &gpGame->m_heroRecs[heroId], 1, &result5);
+            || gpGame->GetHero(heroId)->m_id != gpCurAIHero->m_lastInteractionHeroId) {
+            HeroInteractionAtHero(gpCurAIHero, gpGame->GetHero(heroId), 1, &result5);
         }
         gaiHeroLiveChance[heroId] = POSITION_FULL_CHANCE;
         return result5;
@@ -6734,7 +6734,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     townValue8 = 0;
     townPtr29 = NULL;
     townArmy26 = NULL;
-    enemyHero6 = &gpGame->m_heroRecs[heroId];
+    enemyHero6 = gpGame->GetHero(heroId);
     if (enemyHero6->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
         townPtr29 = &gpGame->m_castleRecs[enemyHero6->m_occupiedTown];
         townArmy26 = &townPtr29->m_army;
