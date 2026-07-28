@@ -1,5 +1,16 @@
 # TODO
 
+## `tu_state_noise --state-summary` perturbs the seeded trial sequence
+
+A full sweep with `--seed N` is reproducible verbatim (Iconf2b 128-trial
+target-insertion sweeps reproduce 87.8223% at trial 127 across runs), and
+`--only-trial K --retain-best` replays a single trial faithfully. Adding
+`--state-summary` to the same full sweep drifts the sequence after some
+trial index (the same invocation peaked at a different trial/score). Find
+where the summary bookkeeping consumes or reorders generation state, fix it,
+and add a regression test comparing full-sweep trial tags and scores with
+and without `--state-summary`.
+
 ## Segment-aware `DATA` topology ratchet
 
 Verify that the hard build checks require compiler-emitted and linked `DATA(...)`
