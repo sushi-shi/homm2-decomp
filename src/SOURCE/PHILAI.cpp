@@ -3535,10 +3535,10 @@ i32 philAI::StrategicValueOfPosition(
                              gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex2]].m_y
                          )
                          ->m_terrainImageIndex];
-                if (targetTerrain29 != TERRAIN_WATER || heroTerrain7 == TERRAIN_WATER) {
-                    if (targetTerrain29 == TERRAIN_WATER || heroTerrain7 != TERRAIN_WATER) {
-                        score4 -= (9 - distance15) * 600 / 9;
-                    }
+                if (!((targetTerrain29 == TERRAIN_WATER && heroTerrain7 > TERRAIN_WATER)
+                      || (targetTerrain29 > TERRAIN_WATER
+                          && heroTerrain7 == TERRAIN_WATER))) {
+                    score4 -= (9 - distance15) * 600 / 9;
                 }
             }
         }
