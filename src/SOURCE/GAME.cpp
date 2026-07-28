@@ -5814,11 +5814,19 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_drawOverlayOnTop)
         return 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
+    mapCellExtra* extra;
+
+    if (cell->m_extraIndex)
+        extra = WORLDMAP->Extra(cell->m_extraIndex);
+    else
+        extra = NULL;
     while (extra) {
         if (extra->drawOverlayOnTop)
             return 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
+        if (extra->nextIndex)
+            extra = WORLDMAP->Extra(extra->nextIndex);
+        else
+            extra = NULL;
     }
     return 0;
 }
@@ -5829,11 +5837,19 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayTileset == TILESET_FLAG32)
         cell->m_drawOverlayOnTop = 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
+    mapCellExtra* extra;
+
+    if (cell->m_extraIndex)
+        extra = WORLDMAP->Extra(cell->m_extraIndex);
+    else
+        extra = NULL;
     while (extra) {
         if (extra->overlayTileset == TILESET_FLAG32)
             extra->drawOverlayOnTop = 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
+        if (extra->nextIndex)
+            extra = WORLDMAP->Extra(extra->nextIndex);
+        else
+            extra = NULL;
     }
 }
 
@@ -5848,11 +5864,19 @@ i32 game::HasObjectTilesetIndex(
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
         return 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
+    mapCellExtra* extra;
+
+    if (cell->m_extraIndex)
+        extra = WORLDMAP->Extra(cell->m_extraIndex);
+    else
+        extra = NULL;
     while (extra) {
         if (extra->objectTileset == tileset && extra->objectIndex == index)
             return 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
+        if (extra->nextIndex)
+            extra = WORLDMAP->Extra(extra->nextIndex);
+        else
+            extra = NULL;
     }
     return 0;
 }
@@ -5863,11 +5887,19 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
         cell->m_drawOverlayOnTop = 1;
-    mapCellExtra* extra = cell->m_extraIndex ? WORLDMAP->Extra(cell->m_extraIndex) : NULL;
+    mapCellExtra* extra;
+
+    if (cell->m_extraIndex)
+        extra = WORLDMAP->Extra(cell->m_extraIndex);
+    else
+        extra = NULL;
     while (extra) {
         if (extra->overlayIndex != MAPCELL_SPRITE_NONE)
             extra->drawOverlayOnTop = 1;
-        extra = extra->nextIndex ? WORLDMAP->Extra(extra->nextIndex) : NULL;
+        if (extra->nextIndex)
+            extra = WORLDMAP->Extra(extra->nextIndex);
+        else
+            extra = NULL;
     }
 }
 
