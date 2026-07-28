@@ -2996,8 +2996,8 @@ VA(0x00479394, 0x4c2)
 void game::ClaimMine(i32 mineId, i32 player) {
     mapCell* acc;
     i32 flag;
-    u32 x;
-    u32 y;
+    i32 x;
+    i32 y;
 
     SendMapChange(
         MAP_CHANGE_CLAIM_MINE,
