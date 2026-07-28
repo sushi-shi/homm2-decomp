@@ -4428,7 +4428,9 @@ void game::PerDay(void) {
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
         if (HAS(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL))
-            currentHero6->m_eventFlags = currentHero6->m_eventFlags - HERO_EVENT_MAGIC_WELL;
+            currentHero6->m_eventFlags = HeroEventFlag(
+                static_cast<i32>(currentHero6->m_eventFlags) - IDX(HERO_EVENT_MAGIC_WELL)
+            );
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
