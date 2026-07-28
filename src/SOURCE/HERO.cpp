@@ -709,51 +709,51 @@ void hero::ApplyBattleWinTemps(void) {
 
     if (HAS(m_eventFlags, HERO_EVENT_GRAVEYARD)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_GRAVEYARD;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_GRAVEYARD);
     }
     if (HAS(m_eventFlags, HERO_EVENT_SHIPWRECK)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_SHIPWRECK;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_SHIPWRECK);
     }
     if (HAS(m_eventFlags, HERO_EVENT_BUOY)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_BUOY;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_BUOY);
     }
     if (HAS(m_eventFlags, HERO_EVENT_OASIS)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_OASIS;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_OASIS);
     }
     if (HAS(m_eventFlags, HERO_EVENT_TEMPLE)) {
         m_morale -= TEMPLE_MORALE_BONUS;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_TEMPLE;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_TEMPLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FAERIE_RING)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_FAERIE_RING;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FAERIE_RING);
     }
     if (HAS(m_eventFlags, HERO_EVENT_IDOL)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_IDOL;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_IDOL);
     }
     if (HAS(m_eventFlags, HERO_EVENT_FOUNTAIN)) {
         m_luck--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_FOUNTAIN;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_FOUNTAIN);
     }
     if (HAS(m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
         m_morale--;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_WATERING_HOLE;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_WATERING_HOLE);
     }
     if (HAS(m_eventFlags, HERO_EVENT_DERELICT_SHIP)) {
         m_morale++;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_DERELICT_SHIP;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_DERELICT_SHIP);
     }
     if (HAS(m_eventFlags, HERO_EVENT_PYRAMID)) {
         m_luck += PYRAMID_LUCK_PENALTY;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_PYRAMID;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_PYRAMID);
     }
     if (HAS(m_eventFlags, HERO_EVENT_MERMAID)) {
         m_luck = m_luck - 1;
-        m_eventFlags = static_cast<i32>(m_eventFlags) - HERO_EVENT_MERMAID;
+        H2_ENUM_CLEAR_FLAG(m_eventFlags, HERO_EVENT_MERMAID);
     }
 }
 
@@ -954,7 +954,7 @@ i32 hero::NumArtifacts(void) {
     i32 i;
 
     for (i = 0; i < HERO_ARTIFACT_SLOT_COUNT; i++) {
-        if (m_artifacts[i] >= 0)
+        if (m_artifacts[i] >= ARTIFACT_VALID_BEGIN)
             cnt++;
     }
     return cnt;
@@ -2026,12 +2026,13 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 VA(0x004705c2, 0xc3)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
-    H2_ENUM_STORAGE(HeroSkillLevel, i8) baseLevel;
+    // Necromancy bonuses turn the stored 0..3 tier into a 10%-per-point effect score.
+    i8 baseLevel;
 
-    baseLevel = m_secondarySkills[IDX(skill)];
+    baseLevel = static_cast<i8>(m_secondarySkills[IDX(skill)]);
     if (skill != HERO_SKILL_NECROMANCY)
         return IDX(baseLevel);
-    if (baseLevel == HERO_SKILL_LEVEL_NONE)
+    if (baseLevel == IDX(HERO_SKILL_LEVEL_NONE))
         return IDX(baseLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
         shrineAndArtifactBonus++;

@@ -4,8 +4,9 @@
 #include <va.h>
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CombatSide, i8)
-    COMBAT_SIDE_NONE     = -1,
-    COMBAT_ATTACKER_SIDE = 0,
+    COMBAT_SIDE_NONE        = -1,
+    COMBAT_SIDE_VALID_BEGIN = 0,
+    COMBAT_ATTACKER_SIDE    = COMBAT_SIDE_VALID_BEGIN,
     COMBAT_DEFENDER_SIDE = 1
 H2_ENUM_CLASS_END_SPLIT(CombatSide, i8)
 H2_ENUM_STEPPED(CombatSide)
@@ -14,7 +15,7 @@ H2_ENUM_BEGIN(CombatSideConstant)
     COMBAT_SIDE_COUNT = 2
 H2_ENUM_END(CombatSideConstant)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline CombatSide& operator^=(CombatSide& side, i32 mask) {
     side = static_cast<CombatSide>(static_cast<i32>(side) ^ mask);
     return side;
@@ -23,7 +24,7 @@ inline CombatSide& operator^=(CombatSide& side, i32 mask) {
 
 // VC4.2 must see these arithmetic forms at the call site; an inline wrapper emits /Ob1
 // continuation jumps that are absent from retail.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline CombatSide OppositeCombatSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;
 }
@@ -38,7 +39,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CombatResult, i8)
     COMBAT_RESULT_PENDING  = 3
 H2_ENUM_CLASS_END_SPLIT(CombatResult, i8)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline CombatResult CombatResultForSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_RESULT_ATTACKER : COMBAT_RESULT_DEFENDER;
 }
@@ -58,7 +59,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArmyFacing, i8)
     ARMY_FACING_COUNT = 2
 H2_ENUM_CLASS_END_SPLIT(ArmyFacing, i8)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline ArmyFacing OppositeArmyFacing(ArmyFacing facing) {
     return facing == ARMY_FACING_RIGHT ? ARMY_FACING_LEFT : ARMY_FACING_RIGHT;
 }

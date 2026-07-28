@@ -258,6 +258,13 @@ H2_ENUM_BEGIN(AdventureFrameConstant)
     FRAME_MID               = 23
 H2_ENUM_END(AdventureFrameConstant)
 
+#if H2_STRICT_ENUMS
+H2_ENUM_CLASS_BEGIN(CursorSampleSet)
+    CURSOR_SAMPLE_SLOW_SET = 0,
+    CURSOR_SAMPLE_FAST_SET = 2
+H2_ENUM_CLASS_END(CursorSampleSet)
+#endif
+
 H2_ENUM_BEGIN(AdventureStateConstant)
     INVALID_HERO               = -1,
     LOOPING_SOUND_LIMIT        = 4,
@@ -269,7 +276,9 @@ H2_ENUM_BEGIN(AdventureStateConstant)
     HIGH_MEMORY_BUFFER_DIVISOR = 100,
     CURSOR_SAMPLE_VOLUME       = 64,
     CURSOR_SAMPLE_CHANNEL      = 2,
+#if !H2_STRICT_ENUMS
     CURSOR_SAMPLE_FAST_SET     = 2,
+#endif
     HERO_ICON_FROTH            = IDX(HERO_TYPE_BOAT) + 1,
     ADVENTURE_FADE_STEPS       = 8,
     FORCED_MUSIC_DELAY         = 6000,
@@ -1266,7 +1275,7 @@ void advManager::Close(void) {
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gConfig.useOpera
+    if (!bEnteringTown || gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         gpSoundManager->SwitchAmbientMusic(-1);
         gpSoundManager->StopAllSamples(1);
@@ -1335,15 +1344,31 @@ void advManager::Close(void) {
 }
 
 VA(0x00457432, 0xe9)
-void advManager::GetCursorSampleSet(i32 sampleSet) {
+void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
+#if H2_STRICT_ENUMS
+    CursorSampleSet cursorSampleSet =
+        sampleSet >= CONFIG_WALK_SPEED_SLOW ? CURSOR_SAMPLE_FAST_SET : CURSOR_SAMPLE_SLOW_SET;
+#else
     if (sampleSet >= 1)
         sampleSet = CURSOR_SAMPLE_FAST_SET;
+#endif
     // Ordered filename suffixes select the retail walking-sound variants.
     // NOLINTBEGIN(readability-magic-numbers)
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
     // NOLINTEND(readability-magic-numbers)
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
-        sprintf(gText, DATA_COMPGEN(0x004f59d8, getCursorSampleSetWsnd1d1d82M, "wsnd%1d%1d.82M"), sampleSet, sampleSuffix[index]);
+        sprintf(
+            gText,
+            DATA_COMPGEN(
+                0x004f59d8, getCursorSampleSetWsnd1d1d82M, "wsnd%1d%1d.82M"
+            ),
+#if H2_STRICT_ENUMS
+            IDX(cursorSampleSet),
+#else
+            sampleSet,
+#endif
+            sampleSuffix[index]
+        );
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
         m_cursorSamples[index]->m_playbackData.volume = CURSOR_SAMPLE_VOLUME;
         m_cursorSamples[index]->m_playbackData.channelType = CURSOR_SAMPLE_CHANNEL;
@@ -5870,7 +5895,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
     textY19 = 0;
-    if (giBottomViewResource < 0) {
+    if (giBottomViewResource < RES_VALID_BEGIN) {
         textY19 = RESOURCE_VIEW_MULTILINE_HEIGHT;
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
@@ -5897,7 +5922,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    if (giBottomViewResource >= 0) {
+    if (giBottomViewResource >= RES_VALID_BEGIN) {
         if (giBottomViewResource == RES_GOLD) {
             iconWidth6 = RESOURCE_VIEW_GOLD_WIDTH;
             iconHeight11 = RESOURCE_VIEW_GOLD_HEIGHT;
@@ -10524,7 +10549,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                             );
                             break;
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
                         case SYSTEM_OPTION_COUNT:
                             break;
 #endif

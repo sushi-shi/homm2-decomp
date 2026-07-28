@@ -40,7 +40,8 @@ H2_ENUM_CLASS_END_SPLIT(HeroPortrait, u8)
 H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_NONE            = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,
-    RES_WOOD            = 0,
+    RES_VALID_BEGIN     = 0,
+    RES_WOOD            = RES_VALID_BEGIN,
     RES_MERCURY         = 1,
     RES_ORE             = 2,
     RES_SULFUR          = 3,
@@ -95,7 +96,8 @@ H2_ENUM_CLASS_END_SPLIT(MineType, i8)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_NONE                = -1,
-    CREATURE_PEASANT             = 0,
+    CREATURE_VALID_BEGIN         = 0,
+    CREATURE_PEASANT             = CREATURE_VALID_BEGIN,
     CREATURE_SUMMONED_NONE       = CREATURE_PEASANT,
     CREATURE_ARCHER              = 1,
     CREATURE_RANGER              = 2,
@@ -168,7 +170,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
 H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
 H2_ENUM_STEPPED(CreatureType)
 
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 inline CreatureType NextCreatureType(CreatureType creatureType) {
     ++creatureType;
     return creatureType;
@@ -188,7 +190,8 @@ H2_ENUM_FLAGS(ArtifactLevelMask)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_NONE                  = -1,
-    ARTIFACT_ULTIMATE_BOOK         = 0,
+    ARTIFACT_VALID_BEGIN           = 0,
+    ARTIFACT_ULTIMATE_BOOK         = ARTIFACT_VALID_BEGIN,
     ARTIFACT_ULTIMATE_SWORD        = 1,
     ARTIFACT_ULTIMATE_CLOAK        = 2,
     ARTIFACT_ULTIMATE_WAND         = 3,

@@ -1,6 +1,14 @@
 #ifndef HOMM2_INTS_H
 #define HOMM2_INTS_H
 
+// Modern compilers use real enum domains; retail MSVC 4.2 retains its integer ABI.
+// Derive this from the required language support rather than a compiler name or build flag.
+#if defined(__cplusplus) && __cplusplus >= 202002L
+#define H2_STRICT_ENUMS 1
+#else
+#define H2_STRICT_ENUMS 0
+#endif
+
 typedef signed char i8;
 typedef unsigned char u8;
 typedef short i16;
@@ -19,13 +27,13 @@ typedef unsigned __int64 u64;
 // Boolean-int aliases for the pre-bool compiler.
 typedef i32 b32;
 typedef i8 b8;
-#ifndef __clang__
+#if !H2_STRICT_ENUMS
 #define true 1
 #define false 0
 #endif
 
-// Strict Clang builds type-check domains; production keeps the integer ABI.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+// Modern builds type-check domains; the retail MSVC build keeps the integer ABI.
+#if H2_STRICT_ENUMS
 #define H2_ENUM_BEGIN(name) typedef enum name {
 #define H2_ENUM_END(name)                                                                          \
     }                                                                                              \
@@ -137,6 +145,16 @@ constexpr bool operator!=(
     H2EnumStorage<Enum, LeftStorage> lhs, H2EnumStorage<Enum, RightStorage> rhs
 ) {
     return !(lhs == rhs);
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator<(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return static_cast<Enum>(lhs) < rhs;
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator>=(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return static_cast<Enum>(lhs) >= rhs;
 }
 
 template <typename Enum, typename Storage>
@@ -285,7 +303,7 @@ constexpr i32 H2EnumIndex(Value value) {
 // Preserve a retail integer assignment chain while allowing strict enum views
 // of individual fields to receive the same value without cross-domain casts at
 // the reconstructed call site.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value)                                               \
     do {                                                                                           \
         (e) = static_cast<decltype(e)>(value);                                                     \
@@ -298,9 +316,24 @@ constexpr i32 H2EnumIndex(Value value) {
 #define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value) ((a) = (b) = (c) = (d) = (e) = (value))
 #endif
 
+// Decode a semantic enum from a masked packed-storage field. Retail retains
+// the original two-step /Od assignment shape.
+#if H2_STRICT_ENUMS
+#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
+    do {                                                                                           \
+        (target) = static_cast<type>((raw) & (mask));                                              \
+    } while (0)
+#else
+#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
+    do {                                                                                           \
+        (target) = (raw);                                                                          \
+        (target) &= (mask);                                                                        \
+    } while (0)
+#endif
+
 // Table lookup by semantic domain: IDX spells the value-as-index conversion at
 // the site. Production expands to the bare value, so bytes cannot change.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #define IDX(x) H2EnumIndex(x)
 #else
 #define IDX(x) (x)
@@ -309,15 +342,24 @@ constexpr i32 H2EnumIndex(Value value) {
 // Flag-domain membership test usable in integer/boolean context. The flags
 // argument and bit share one H2_ENUM_FLAGS domain; production expands to
 // the plain bitwise AND.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #define HAS(flags, bit) (IDX((flags) & (bit)))
 #else
 #define HAS(flags, bit) ((flags) & (bit))
 #endif
 
+// Clear a known-set flag from its domain. Strict builds express the operation
+// as bit removal; production retains the guarded subtraction shape used by
+// reconstructed retail code.
+#if H2_STRICT_ENUMS
+#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) &= ~(bit))
+#else
+#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) = static_cast<i32>(flags) - (bit))
+#endif
+
 // Bit-index to mask: the domain value is a shift count. Production expands to
 // the plain shift.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #define BIT(x) (1 << IDX(x))
 #else
 #define BIT(x) (1 << (x))
@@ -325,7 +367,7 @@ constexpr i32 H2EnumIndex(Value value) {
 
 // Sequence domains step to adjacent ids (animation followthroughs). The audit
 // defines the increment; production sees plain integer arithmetic.
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 #define H2_ENUM_STEPPED(name)                                                                      \
     inline constexpr name operator+(name a, i32 amount) {                                          \
         return static_cast<name>(static_cast<i64>(a) + amount);                                    \

@@ -4010,7 +4010,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 index3;
     i32 siteLevel6;
     i32 primaryStat15;
-    H2_ENUM_STORAGE(GenericSiteType, i32) siteType2;
+    GenericSiteType siteType2;
     i32 mapY9;
     i32 mapX37;
     i32 unusedSite;
@@ -4025,8 +4025,12 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
     cursedArtifactCount9 = 0;
     eventSample5 = NULL_SAMPLE2;
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= GENERIC_SITE_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        GenericSiteType,
+        siteType2,
+        cell->m_objectMetadata,
+        GENERIC_SITE_TYPE_MASK
+    );
     siteLevel6 = cell->m_objectMetadata;
     siteLevel6 >>= GENERIC_SITE_LEVEL_SHIFT;
 
@@ -4320,8 +4324,12 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     u32 siteIndex;
     u32 packedSite1;
 
-    siteType2 = cell->m_objectMetadata;
-    siteType2 &= EVENT_RECRUIT_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        RecruitSiteType,
+        siteType2,
+        cell->m_objectMetadata,
+        EVENT_RECRUIT_TYPE_MASK
+    );
     availableCount = static_cast<i16>(cell->m_objectMetadata);
     availableCount >>= EVENT_RECRUIT_COUNT_SHIFT;
 
@@ -7140,7 +7148,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 artifactIndex1;
     i32 siteLevel5;
     HeroPrimaryStat primaryStat16;
-    H2_ENUM_STORAGE(GenericSiteType, i32) siteType3;
+    GenericSiteType siteType3;
     i32 unusedTriple26[3]; // NOLINT(readability-magic-numbers)
     i32 cursedArtifactCount5;
     CreatureType creatureType3;
@@ -7148,8 +7156,12 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 armyValue7;
 
     cursedArtifactCount5 = 0;
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= GENERIC_SITE_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        GenericSiteType,
+        siteType3,
+        cell->m_objectMetadata,
+        GENERIC_SITE_TYPE_MASK
+    );
     siteLevel5 = cell->m_objectMetadata;
     siteLevel5 >>= GENERIC_SITE_LEVEL_SHIFT;
 
@@ -7248,8 +7260,12 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 purchaseValue5;
     i32 replacementSlot26;
 
-    siteType3 = cell->m_objectMetadata;
-    siteType3 &= EVENT_RECRUIT_TYPE_MASK;
+    H2_ENUM_DECODE_MASKED(
+        RecruitSiteType,
+        siteType3,
+        cell->m_objectMetadata,
+        EVENT_RECRUIT_TYPE_MASK
+    );
     availableCount1 = static_cast<i16>(cell->m_objectMetadata);
     availableCount1 >>= EVENT_RECRUIT_COUNT_SHIFT;
 

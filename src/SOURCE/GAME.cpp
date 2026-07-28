@@ -5629,7 +5629,7 @@ void game::GiveArmy(
         }
         if (i >= ARMY_GROUP_SLOT_COUNT) {
             for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
-                if (group->m_creatureTypes[i] < 0) {
+                if (group->m_creatureTypes[i] < CREATURE_VALID_BEGIN) {
                     group->m_creatureCounts[i] = 0;
                     break;
                 }
@@ -6204,7 +6204,7 @@ void game::ProcessOnMapHeroes(void) {
                             heroClass6 = static_cast<FactionType>(
                                 cell5->m_objectIndex % MAP_HERO_FRAME_STRIDE
                             );
-                            if (heroClass6 == MAP_HERO_RANDOM_FACTION_FRAME) {
+                            if (heroClass6 == FACTION_NEUTRAL) {
                                 heroClass6 = m_setupPlayerRace
                                     [gcColorToSetupPos[gpGame->m_players[extra0->owner].m_color]];
                             }

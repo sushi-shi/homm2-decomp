@@ -106,7 +106,7 @@ void BlitBitmapToScreen(class bitmap*, i32, i32, i32, i32, i32, i32);
 void LogTruncate(void);
 void LogStr(char*);
 void LogInt(char*, i32, i32, i32, i32, i32, i32, i32);
-#ifdef HOMM2_STRICT_ENUM_TYPES
+#if H2_STRICT_ENUMS
 template <typename Enum>
     requires __is_enum(Enum)
 inline void LogInt(char* text, Enum value, i32 b, i32 c, i32 d, i32 e, i32 f, i32 g) {
