@@ -1889,44 +1889,44 @@ void combatManager::SetupAndLoadObstacles(void) {
             anchorHex9 = SRandom(0, COMBAT_OBSTACLE_CELL_ROLL_MAX);
             obstacleType4 = SRandom(0, COMBAT_OBSTACLE_INCLUSIVE_ROLL_HIGH);
             if (terrainMask9 & sCmbtObstacles[obstacleType4].terrainMask) {
-                if (obstacleUsed[obstacleType4] == 0) {
-                    anchorRow2 = anchorHex9 / COMBAT_GRID_ROW_LENGTH;
-                    if (sCmbtObstacles[obstacleType4].minimumColumn
-                        <= anchorRow2 + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET) {
-                        blocked6 = 0;
-                        for (cellIndex1 = 0; cellIndex1 < sCmbtObstacles[obstacleType4].cellCount;
-                             cellIndex1++) {
-                            obstacleHex2 =
-                                anchorHex9 + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1];
-                            if (obstacleHex2 % COMBAT_GRID_ROW_LENGTH
-                                    <= COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1
-                                || obstacleHex2 % COMBAT_GRID_ROW_LENGTH
-                                       >= COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
-                                blocked6 = 1;
-                            }
-                            if (m_hexCells[obstacleHex2].m_blocked != 0)
-                                blocked6 = 1;
-                        }
-                        if (blocked6 == 0) {
-                            tryCount28 = 0;
-                            obstacleCells18 += sCmbtObstacles[obstacleType4].cellCount;
-                            obstacleUsed[obstacleType4] = 1;
-                            for (cellIndex1 = 0;
-                                 cellIndex1 < sCmbtObstacles[obstacleType4].cellCount;
-                                 cellIndex1++) {
-                                m_hexCells
-                                    [anchorHex9
-                                     + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1]]
-                                        .m_blocked = 1;
-                            }
-                            sprintf(gText, DATA_COMPGEN(0x004f8c20, setupAndLoadObstaclesCobj04dIcn, "cobj%04d.icn"), obstacleType4);
-                            m_obstacleIcons[m_obstacleCount] = gpResourceManager->GetIcon(gText);
-                            m_hexCells[anchorHex9].m_obstacleIndex =
-                                static_cast<i8>(m_obstacleCount);
-                            m_obstacleCount++;
-                        }
+                if (obstacleUsed[obstacleType4] != 0)
+                    continue;
+                anchorRow2 = anchorHex9 / COMBAT_GRID_ROW_LENGTH;
+                if (sCmbtObstacles[obstacleType4].minimumColumn
+                    > anchorRow2 + COMBAT_OBSTACLE_MIN_COLUMN_OFFSET)
+                    continue;
+                blocked6 = 0;
+                for (cellIndex1 = 0; cellIndex1 < sCmbtObstacles[obstacleType4].cellCount;
+                     cellIndex1++) {
+                    obstacleHex2 =
+                        anchorHex9 + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1];
+                    if (obstacleHex2 % COMBAT_GRID_ROW_LENGTH
+                            <= COMBAT_OBSTACLE_LEFT_COLUMN_LIMIT - 1
+                        || obstacleHex2 % COMBAT_GRID_ROW_LENGTH
+                               >= COMBAT_OBSTACLE_RIGHT_COLUMN_FIRST) {
+                        blocked6 = 1;
                     }
+                    if (m_hexCells[obstacleHex2].m_blocked != 0)
+                        blocked6 = 1;
                 }
+                if (blocked6 != 0)
+                    continue;
+                tryCount28 = 0;
+                obstacleCells18 += sCmbtObstacles[obstacleType4].cellCount;
+                obstacleUsed[obstacleType4] = 1;
+                for (cellIndex1 = 0;
+                     cellIndex1 < sCmbtObstacles[obstacleType4].cellCount;
+                     cellIndex1++) {
+                    m_hexCells
+                        [anchorHex9
+                         + sCmbtObstacles[obstacleType4].cellOffsets[cellIndex1]]
+                            .m_blocked = 1;
+                }
+                sprintf(gText, DATA_COMPGEN(0x004f8c20, setupAndLoadObstaclesCobj04dIcn, "cobj%04d.icn"), obstacleType4);
+                m_obstacleIcons[m_obstacleCount] = gpResourceManager->GetIcon(gText);
+                m_hexCells[anchorHex9].m_obstacleIndex =
+                    static_cast<i8>(m_obstacleCount);
+                m_obstacleCount++;
             }
         }
     }
