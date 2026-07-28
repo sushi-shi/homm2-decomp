@@ -27,3 +27,19 @@ reproduces its recorded ceiling (iconf2by hits 94.4102 again at a different
 seed); only FlipDimIconToBitmap ratcheted, 78.69 -> 79.11. Fuzzy ceilings are
 seed-robust; progress comes from steered source axes, not deeper blind state
 search.
+
+- **Iconf2b late-y branch** (dropping the entryY local so the y read lands at
+  the add, matching retail's late movsx): 512 seed-606060 states peak at
+  88.58 with the SAME +1 size and relocation-order residual as the retained
+  entryY-local branch (89.10); neither branch dominates, the higher island
+  is kept. The island's remaining cluster is one pressure knot: the hoisted
+  y read blocks the srcOffset fold-add and forces the w spill reload.
+  `build/tu-state-noise/iconf2b-latey-wide512-20260729/`.
+- **Icond2b hoist combos** under the flat-x parent: both lose to the current
+  spelling; the m_data hoist stays rejected for the dim dialect.
+  `build/icond2b-hoist-combo-{axes,manifest}-20260729.json`.
+
+Island size-delta census (best islands vs retail): Iconf2b +1; iconf2bc +7;
+Iconm2b +8; icon2bc -24; Icond2b -15; Iconmf2b -12; icon2bs/Icondf2b -11.
+The negative-delta class is missing whole retail instructions (extra
+reloads/moves from memory-heavy allocation) — the next structural frontier.
