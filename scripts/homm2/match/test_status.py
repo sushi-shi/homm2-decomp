@@ -86,6 +86,45 @@ class ReportCacheTest(unittest.TestCase):
         self.report.write_text(json.dumps({"units": [], "measures": {}}))
         self.assertIsNone(self.cached(identity))
 
+    def test_unstamped_normalized_object_is_rejected(self):
+        normalized = self.objdiff / "normalized/base/SOURCE/UNIT.obj"
+        normalized.parent.mkdir(parents=True)
+        normalized.write_bytes(b"derived")
+        self.config.write_text(json.dumps({
+            "units": [{
+                "name": "SOURCE/UNIT",
+                "base_path": "./normalized/base/SOURCE/UNIT.obj",
+                "target_path": "../delink/SOURCE/UNIT.c.obj",
+            }]
+        }))
+
+        with self.assertRaises(RuntimeError) as raised:
+            self.identity()
+        self.assertIn("no provenance stamp", str(raised.exception))
+
+    def test_stale_normalized_object_is_rejected(self):
+        from homm2.build.normalized_freshness import write_stamp
+        raw = self.objdiff / "base/SOURCE/UNIT.obj"
+        normalized = self.objdiff / "normalized/base/SOURCE/UNIT.obj"
+        normalized.parent.mkdir(parents=True)
+        normalized.write_bytes(b"derived")
+        write_stamp(normalized, {"input": raw})
+        self.config.write_text(json.dumps({
+            "units": [{
+                "name": "SOURCE/UNIT",
+                "base_path": "./normalized/base/SOURCE/UNIT.obj",
+                "target_path": "../delink/SOURCE/UNIT.c.obj",
+            }]
+        }))
+        self.assertEqual(
+            self.identity()["objects"][0]["reference"],
+            "./normalized/base/SOURCE/UNIT.obj")
+
+        raw.write_bytes(b"rebuilt raw object")
+        with self.assertRaises(RuntimeError) as raised:
+            self.identity()
+        self.assertIn("is stale", str(raised.exception))
+
 
 class LiveStatusTest(unittest.TestCase):
     def setUp(self):
