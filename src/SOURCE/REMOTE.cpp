@@ -159,10 +159,10 @@ void RemoteMain(RemoteGameMode gameMode) {
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
     LogStr(DATA_COMPGEN(0x0051702c, remoteMainRM7, "RM 7"));
     if (giTCPHostStatus != -1) {
-        if (strlen(gcTCPName) == 0)
-            strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
-        else
+        if (strlen(gcTCPName) != 0)
             strcpy(gsThisNetPlayerInfo.name, gcTCPName);
+        else
+            strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
     } else {
         GetDataEntry(
             DATA_COMPGEN(0x00517034, remoteMainPleaseEnterAHandleByWhich, "Please enter a 'handle' by which you will be known."),
@@ -190,17 +190,15 @@ void RemoteMain(RemoteGameMode gameMode) {
                     case REMOTE_GAME_NETWORK_GUEST:
             giThisNetPos = 1;
         initializeNetwork:
-            if (bUseDirectPlay == 0) {
-                if (bUseWinsock == 0) {
-                    nbnet_init();
-                    gbRemoteOn = true;
-                } else {
-                    wsnet_init();
-                    gbRemoteOn = true;
-                }
-            } else {
+            if (bUseDirectPlay != 0) {
                 gbRemoteOn = true;
                 dpnet_init();
+            } else if (bUseWinsock != 0) {
+                wsnet_init();
+                gbRemoteOn = true;
+            } else {
+                nbnet_init();
+                gbRemoteOn = true;
             }
             break;
                     case REMOTE_GAME_MODEM_HOST:
