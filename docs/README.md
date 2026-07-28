@@ -11,6 +11,10 @@ one-run progress summaries belong under `build/`, not here.
   catalogs retain reconstruction evidence that is expensive to rediscover.
 - `resource-link-reconstruction.md` documents the active resource link; the explicitly
   deferred `resource-source-reconstruction-plan.md` records the later editable-resource work.
+- `icon-format.md` and `icon-decoders.md` record the retail-verified icon (ICN) container,
+  frame table, and both run-length pixel dialects, plus the per-function catalog for the
+  `Icon*ToBitmap*` family. They also retain the confirmed retail clipping defect in the
+  flipped decoders, whose dead branch must not be "simplified" away.
 
 ## Data and final linking
 
