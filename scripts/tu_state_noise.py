@@ -2534,7 +2534,10 @@ def main(argv: list[str] | None = None) -> int:
                 target.unit,
                 target.symbol,
                 restored_target_hash,
-                best_observed["score"] if best_observed is not None else None,
+                # The baseline is itself an observation of the current source
+                # hash; without this a source fix that raises the clean score
+                # above the ledger is never recorded unless an island beats it.
+                best_observed["score"] if best_observed is not None else baseline_score,
             )
         except (OSError, BaselineUpdateError) as exc:
             record_error = True
