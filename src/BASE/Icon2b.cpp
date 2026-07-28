@@ -43,9 +43,10 @@ void IconToBitmap(
     i32 color
 ) {
     IconEntry* entries = srcIcon->Entries();
+    u8* data = srcIcon->m_data;
     u8* savedDst;
     s_entry = &entries[frame];
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_src = data + s_entry->srcOffset;
     s_left = x + s_entry->x;
     s_pitch = dest->m_width;
     s_y = y + s_entry->y;

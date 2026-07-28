@@ -50,8 +50,9 @@ void FlipIconToBitmapColorTable(
     u8* colorTable
 ) {
     IconEntry* entries = srcIcon->Entries();
+    u8* data = srcIcon->m_data;
     s_entry = &entries[frame];
-    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_src = data + s_entry->srcOffset;
     u8* src = s_src;
     i32 w = s_entry->w;
     i32 x0 = x - s_entry->x;

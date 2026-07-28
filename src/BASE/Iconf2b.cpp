@@ -41,8 +41,8 @@ void FlipIconToBitmap(
     i32 color
 ) {
     IconEntry* entry = &srcIcon->Entries()[frame];
-    s_entry = entry;
     u8* src = srcIcon->m_data;
+    s_entry = entry;
     i32 entryX = entry->x;
     i32 x0 = x - entryX;
     src += entry->srcOffset;
