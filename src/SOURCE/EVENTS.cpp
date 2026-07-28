@@ -7678,18 +7678,19 @@ fightMonsters:
 
 VA(0x004b5800, 0x440)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
-    i32 joiningCount;
-    i32 purchaseCount;
-    i32 monsterCount[MONSTER_COMBAT_VALUE_COUNT];
-    float strengthRatio;
-    i32 purchaseValue;
     i32 replacementSlot;
-    u32 forcedJoin;
     CreatureType monsterType;
+    i32 purchaseValue;
+    i32 joiningCost;
+    i32 numBought;
+    i32 monsterCount[MONSTER_COMBAT_VALUE_COUNT];
+    u32 forceMask;
+    float strengthRatio;
+    i32 joiningCount;
 
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
     monsterCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    forcedJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
+    forceMask = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
     strengthRatio =
         static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
         / static_cast<float>(
@@ -7702,16 +7703,16 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
         && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
         && monsterType != CREATURE_WATER_ELEMENTAL) {
-        if (forcedJoin) {
+        if (forceMask) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
                 monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
                 1,
-                purchaseCount,
+                numBought,
                 purchaseValue,
                 replacementSlot
             );
-            if (purchaseCount > 0) {
+            if (numBought > 0) {
                 gpGame->GiveArmy(
                     &eventHero->m_army,
                     monsterType,
@@ -7738,25 +7739,27 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 if (!joiningCount)
                     joiningCount = 1;
 
-                i32 joiningCost = static_cast<i32>(
-                    gMonsterDatabase[IDX(monsterType)].cost * joiningCount
+                joiningCost = static_cast<i32>(
+                    gMonsterDatabase[IDX(monsterType)].cost
+                    * monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
                     * DATA_COMPGEN(0x004eb940, computerMonsterInteractConstant, MONSTER_AI_JOIN_COST_FRACTION)
                 );
                 if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
                     < joiningCost) {
                     if (strengthRatio > MONSTER_STRENGTH_FLEE)
                         goto computerMonstersFlee;
-                    goto fightComputerMonsters;
+                    else
+                        goto fightComputerMonsters;
                 }
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
                     monsterType,
                     monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
                     1,
-                    purchaseCount,
+                    numBought,
                     purchaseValue,
                     replacementSlot
                 );
-                if (purchaseCount > 0) {
+                if (numBought > 0) {
                     gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
                     gpGame->GiveArmy(
                         &eventHero->m_army,
@@ -7765,7 +7768,8 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                         replacementSlot
                     );
                     *handled = 1;
-                }
+                } else
+                    goto fightComputerMonsters;
             }
         }
     }
@@ -7801,10 +7805,9 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
             *handled = 1;
             return;
         }
-        cell->m_objectMetadata = ((cell->m_objectMetadata & MONSTER_JOIN_FORCED)
-                                  + (static_cast<u16>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
-                                     & MONSTER_COUNT_MASK))
-                                 | 0;
+        cell->m_objectMetadata = (cell->m_objectMetadata & MONSTER_FLAGS_MASK)
+                                 + (static_cast<u16>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
+                                    & MONSTER_COUNT_MASK);
     }
 }
 
