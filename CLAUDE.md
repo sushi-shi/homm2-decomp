@@ -115,11 +115,14 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 ## Matching Method
 
 - Do not test matching hypotheses as one-off manual edit-compile cycles. Localize the
-  divergence with `homm2 sema disasm --blocks --diff` first, then express every
-  candidate spelling or structure as a reviewed exact-span axis for
-  `scripts/match_variants.py` and run the bounded complete matrix with TU-state
-  probes (`--state-trials 50 --state-families forest`). Judge survivors by block
-  topology and ordered relocations as well as fuzzy score.
+  divergence with `homm2 sema disasm --blocks --diff` first, then run
+  `scripts/match_variants.py` as one bounded complete matrix whose independent
+  dimensions are: generated conservative AST transformations (`--min-depth 1
+  --max-depth 2` with the relevant `--families`), reviewed exact-span axes for
+  hypotheses the generator cannot express (`--axes-from`, with the full candidate
+  family per site in one file — never laddered across runs), and TU-state probes
+  (`--state-trials ... --state-families forest`). Judge survivors by block topology
+  and ordered relocations as well as fuzzy score.
 - For a structurally aligned residual with unchanged source, run
   `scripts/tu_state_noise.py` island censuses (forest family). Record MAX only on an
   audited exact closure.
