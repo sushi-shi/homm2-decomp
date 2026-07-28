@@ -886,55 +886,55 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             break;
 
         case MESSAGE_MOUSE_MOVE:
-            if (m_gridSelectionDisabled == 0) {
-                pendingMessage = gpInputManager->PeekEvent();
-                if (pendingMessage.type != MESSAGE_MOUSE_MOVE) {
-                    if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
-                        != 0)
-                        selectedHex_36 = GetGridIndex(mouseX, mouseY);
-                    else
-                        selectedHex_36 = INVALID_HEX;
+            if (m_gridSelectionDisabled != 0)
+                break;
+            pendingMessage = gpInputManager->PeekEvent();
+            if (pendingMessage.type == MESSAGE_MOUSE_MOVE)
+                break;
+            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
+                != 0)
+                selectedHex_36 = GetGridIndex(mouseX, mouseY);
+            else
+                selectedHex_36 = INVALID_HEX;
 
-                    UpdateMouseGrid(selectedHex_36, 0);
-                    if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
-                        != 0) {
-                        if (m_selectedHex != selectedHex_36
-                            || selectedHex_36 == INVALID_HEX) {
-                            m_selectedHex = selectedHex_36;
-                            m_previousCommand = COMBAT_INVALID_COMMAND;
-                            m_currentCommand = GetCommand(m_selectedHex);
-                            m_mouseDirection = INVALID_HEX;
-                            if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
-                                SetCombatDirections(selectedHex_36);
-                                CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
-                            } else {
-                                gpMouseManager->SetPointer(
-                                    GetPointer(m_currentCommand, selectedHex_36)
-                                );
-                            }
-                        } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
-                            CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
-                        }
-                        if (m_previousCommand != m_currentCommand) {
-                            m_previousCommand = m_currentCommand;
-                            CombatMessage(m_currentCommand);
-                        }
+            UpdateMouseGrid(selectedHex_36, 0);
+            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
+                != 0) {
+                if (m_selectedHex != selectedHex_36
+                    || selectedHex_36 == INVALID_HEX) {
+                    m_selectedHex = selectedHex_36;
+                    m_previousCommand = COMBAT_INVALID_COMMAND;
+                    m_currentCommand = GetCommand(m_selectedHex);
+                    m_mouseDirection = INVALID_HEX;
+                    if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
+                        SetCombatDirections(selectedHex_36);
+                        CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                     } else {
-                        if (mouseX >= CONTROL_RIGHT_MIN_X) {
-                            CombatMessage(cCombatHelp[IDX(HELP_SKIP_UNIT)], 1, 0, 0);
-                        } else if (mouseX <= CONTROL_LEFT_MAX_X
-                                   && mouseY < CONTROL_SYSTEM_OPTIONS_MIN_Y) {
-                            CombatMessage(cCombatHelp[IDX(HELP_AUTO_COMBAT)], 1, 0, 0);
-                        } else if (mouseX <= CONTROL_LEFT_MAX_X) {
-                            CombatMessage(cCombatHelp[IDX(HELP_SYSTEM_OPTIONS)], 1, 0, 0);
-                        } else {
-                            CombatMessage(cCombatHelp[IDX(HELP_OTHER_CONTROL)], 1, 0, 0);
-                        }
-                        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-                        m_selectedHex = INVALID_HEX;
-                        m_previousCommand = COMBAT_INVALID_COMMAND;
+                        gpMouseManager->SetPointer(
+                            GetPointer(m_currentCommand, selectedHex_36)
+                        );
                     }
+                } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
+                    CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                 }
+                if (m_previousCommand != m_currentCommand) {
+                    m_previousCommand = m_currentCommand;
+                    CombatMessage(m_currentCommand);
+                }
+            } else {
+                if (mouseX >= CONTROL_RIGHT_MIN_X) {
+                    CombatMessage(cCombatHelp[IDX(HELP_SKIP_UNIT)], 1, 0, 0);
+                } else if (mouseX <= CONTROL_LEFT_MAX_X
+                           && mouseY < CONTROL_SYSTEM_OPTIONS_MIN_Y) {
+                    CombatMessage(cCombatHelp[IDX(HELP_AUTO_COMBAT)], 1, 0, 0);
+                } else if (mouseX <= CONTROL_LEFT_MAX_X) {
+                    CombatMessage(cCombatHelp[IDX(HELP_SYSTEM_OPTIONS)], 1, 0, 0);
+                } else {
+                    CombatMessage(cCombatHelp[IDX(HELP_OTHER_CONTROL)], 1, 0, 0);
+                }
+                gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                m_selectedHex = INVALID_HEX;
+                m_previousCommand = COMBAT_INVALID_COMMAND;
             }
             return MESSAGE_DISPATCH_CONSUME;
 
@@ -2896,85 +2896,87 @@ void combatManager::CycleCombatScreen(void) {
     if (m_heroIcons[IDX(COMBAT_DEFENDER_SIDE)] != NULL)
         m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] = 1;
 
-    if (nextHeroAnimation[COMBAT_SIDE_COUNT] != 0 || m_drawHero[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] != 0 || m_drawHeroOverlay[IDX(COMBAT_ATTACKER_SIDE)] != 0
-        || m_drawHeroOverlay[IDX(COMBAT_DEFENDER_SIDE)] != 0) {
-        gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-            for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-                currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
-                if (cycleArmy[IDX(side)][index] != 0) {
-                    if (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND) {
-                        roll =
-                            static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
-                            / COMBAT_IDLE_ROLL_DIVISOR;
-                        accumulatedChance = DATA_COMPGEN(
-                            0x004eb25c, standingAnimationInitialChance, 0.0f
-                        );
-                        currentArmy->m_standingAnimation =
-                            currentArmy->m_frameInfo.standingAnimationCount - 1;
-                        for (animationIndex = 0;
-                             animationIndex < currentArmy->m_frameInfo.standingAnimationCount - 1;
-                             ++animationIndex) {
-                            accumulatedChance +=
-                                currentArmy->m_frameInfo.standingAnimationChances[animationIndex];
-                            if (accumulatedChance > roll) {
-                                currentArmy->m_standingAnimation = animationIndex;
-                                animationIndex = STANDING_ANIMATION_SEARCH_DONE;
-                            }
-                        }
-                        currentArmy->m_animationSequence = ArmyAnimationSequence(
-                            currentArmy->m_standingAnimation
-                            + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
-                        );
-                        currentArmy->m_animationFrame = 0;
-                    } else {
-                        ++currentArmy->m_animationFrame;
-                        if (currentArmy->m_frameInfo.standStillDelay == 0
-                            && currentArmy->m_frameInfo.standingAnimationCount == 1
-                            && Random(0, IDLE_ROLL_MAX) < IDLE_REPEAT_CHANCE) {
-                            --currentArmy->m_animationFrame;
-                        }
-                        if (currentArmy->m_animationFrame
-                            >= currentArmy->m_frameInfo.animationFrameCount
-                                   [currentArmy->m_standingAnimation
-                                    + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)]) {
-                            currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
-                            currentArmy->m_animationFrame = 0;
-                            currentArmy->m_lastAnimationTime = KBTickCount();
-                            if (currentArmy->m_frameInfo.standStillDelay > 0) {
-                                currentArmy->m_lastAnimationTime = static_cast<i32>(
-                                    (currentArmy->m_frameInfo.standStillDelay
-                                         * COMBAT_STAND_DELAY_BASE_FACTOR
-                                     - Random(0, currentArmy->m_frameInfo.standStillDelay)
-                                           * COMBAT_STAND_DELAY_RANDOM_FACTOR)
-                                    + currentArmy->m_lastAnimationTime
-                                );
-                            }
+    if (nextHeroAnimation[COMBAT_SIDE_COUNT] == 0 && m_drawHero[IDX(COMBAT_ATTACKER_SIDE)] == 0
+        && m_drawHero[IDX(COMBAT_DEFENDER_SIDE)] == 0
+        && m_drawHeroOverlay[IDX(COMBAT_ATTACKER_SIDE)] == 0
+        && m_drawHeroOverlay[IDX(COMBAT_DEFENDER_SIDE)] == 0)
+        goto setCycleTimer;
+    gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
+            currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
+            if (cycleArmy[IDX(side)][index] != 0) {
+                if (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND) {
+                    roll =
+                        static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
+                        / COMBAT_IDLE_ROLL_DIVISOR;
+                    accumulatedChance = DATA_COMPGEN(
+                        0x004eb25c, standingAnimationInitialChance, 0.0f
+                    );
+                    currentArmy->m_standingAnimation =
+                        currentArmy->m_frameInfo.standingAnimationCount - 1;
+                    for (animationIndex = 0;
+                         animationIndex < currentArmy->m_frameInfo.standingAnimationCount - 1;
+                         ++animationIndex) {
+                        accumulatedChance +=
+                            currentArmy->m_frameInfo.standingAnimationChances[animationIndex];
+                        if (accumulatedChance > roll) {
+                            currentArmy->m_standingAnimation = animationIndex;
+                            animationIndex = STANDING_ANIMATION_SEARCH_DONE;
                         }
                     }
-                }
-            }
-        }
-        for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-            if (m_drawHero[IDX(side)] != 0) {
-                if (nextHeroAnimation[IDX(side)] != -1) {
-                    m_heroAnimationState[IDX(side)] = nextHeroAnimation[IDX(side)];
-                    m_heroAnimationFrame[IDX(side)] = 0;
+                    currentArmy->m_animationSequence = ArmyAnimationSequence(
+                        currentArmy->m_standingAnimation
+                        + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
+                    );
+                    currentArmy->m_animationFrame = 0;
                 } else {
-                    ++m_heroAnimationFrame[IDX(side)];
-                    if (m_heroAnimationFrame[IDX(side)]
-                        >= sCmbtHero[m_heroSpriteIndex[IDX(side)]]
-                               .animationFrameCount[m_heroAnimationState[IDX(side)]]) {
-                        m_heroAnimationState[IDX(side)] = HERO_ANIMATION_STAND;
-                        m_heroAnimationFrame[IDX(side)] = 0;
-                        m_heroCycleTimer[IDX(side)] = KBTickCount();
+                    ++currentArmy->m_animationFrame;
+                    if (currentArmy->m_frameInfo.standStillDelay == 0
+                        && currentArmy->m_frameInfo.standingAnimationCount == 1
+                        && Random(0, IDLE_ROLL_MAX) < IDLE_REPEAT_CHANCE) {
+                        --currentArmy->m_animationFrame;
+                    }
+                    if (currentArmy->m_animationFrame
+                        >= currentArmy->m_frameInfo.animationFrameCount
+                               [currentArmy->m_standingAnimation
+                                + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)]) {
+                        currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
+                        currentArmy->m_animationFrame = 0;
+                        currentArmy->m_lastAnimationTime = KBTickCount();
+                        if (currentArmy->m_frameInfo.standStillDelay > 0) {
+                            currentArmy->m_lastAnimationTime = static_cast<i32>(
+                                (currentArmy->m_frameInfo.standStillDelay
+                                     * COMBAT_STAND_DELAY_BASE_FACTOR
+                                 - Random(0, currentArmy->m_frameInfo.standStillDelay)
+                                       * COMBAT_STAND_DELAY_RANDOM_FACTOR)
+                                + currentArmy->m_lastAnimationTime
+                            );
+                        }
                     }
                 }
             }
         }
-        DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     }
+    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
+        if (m_drawHero[IDX(side)] != 0) {
+            if (nextHeroAnimation[IDX(side)] != -1) {
+                m_heroAnimationState[IDX(side)] = nextHeroAnimation[IDX(side)];
+                m_heroAnimationFrame[IDX(side)] = 0;
+            } else {
+                ++m_heroAnimationFrame[IDX(side)];
+                if (m_heroAnimationFrame[IDX(side)]
+                    >= sCmbtHero[m_heroSpriteIndex[IDX(side)]]
+                           .animationFrameCount[m_heroAnimationState[IDX(side)]]) {
+                    m_heroAnimationState[IDX(side)] = HERO_ANIMATION_STAND;
+                    m_heroAnimationFrame[IDX(side)] = 0;
+                    m_heroCycleTimer[IDX(side)] = KBTickCount();
+                }
+            }
+        }
+    }
+    DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
+setCycleTimer:
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = static_cast<i32>(
         KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR
     );
