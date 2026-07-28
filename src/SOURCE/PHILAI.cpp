@@ -6736,7 +6736,7 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
     townArmy26 = NULL;
     enemyHero6 = gpGame->GetHero(heroId);
     if (enemyHero6->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-        townPtr29 = &gpGame->m_castleRecs[enemyHero6->m_occupiedTown];
+        townPtr29 = gpGame->GetTown(enemyHero6->m_occupiedTown);
         townArmy26 = &townPtr29->m_army;
         townValue8 = ValueOfTown(townPtr29);
         townId8 = townPtr29->m_id;
