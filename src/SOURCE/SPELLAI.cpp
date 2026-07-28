@@ -1100,55 +1100,55 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                 for (influence = ARMY_SPELL_INFLUENCE_HASTE;
                      influence < ARMY_SPELL_INFLUENCE_COUNT;
                      influence++) {
-                    if (!combatTarget->m_spellInfluence[IDX(influence)])
-                        continue;
-                    switch (influence) {
-                        case ARMY_SPELL_INFLUENCE_HASTE:
-                        case ARMY_SPELL_INFLUENCE_BLESS:
-                        case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
-                        case ARMY_SPELL_INFLUENCE_BLOODLUST:
-                        case ARMY_SPELL_INFLUENCE_SHIELD:
-                        case ARMY_SPELL_INFLUENCE_STONESKIN:
-                        case ARMY_SPELL_INFLUENCE_STEELSKIN:
-                            positiveEffectResult = static_cast<i32>(
-                                positiveEffectResult
-                                + RawEffectSpellInfluence(
-                                      combatTarget,
-                                      influence
-                                  )
-                                      * gfCancelDurationMods
-                                          [combatTarget->m_spellInfluence[IDX(influence)]
-                                                       + fullQuantityWork
-                                                   >= SPELL_AI_MAX_DURATION
-                                               ? SPELL_AI_MAX_DURATION
-                                               : combatTarget->m_spellInfluence[IDX(influence)]
-                                                     + fullQuantityWork]
-                            );
-                            break;
-                        case ARMY_SPELL_INFLUENCE_SLOW:
-                        case ARMY_SPELL_INFLUENCE_CURSE:
-                        case ARMY_SPELL_INFLUENCE_BLIND:
-                        case ARMY_SPELL_INFLUENCE_BERSERK:
-                        case ARMY_SPELL_INFLUENCE_PARALYZE:
-                        case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
-                        case ARMY_SPELL_INFLUENCE_PETRIFIED:
-                            negativeEffectResult = static_cast<i32>(
-                                negativeEffectResult
-                                + RawEffectSpellInfluence(
-                                      combatTarget,
-                                      influence
-                                  )
-                                      * gfCancelDurationMods
-                                          [combatTarget->m_spellInfluence[IDX(influence)]
-                                                       + fullQuantityWork
-                                                   >= SPELL_AI_MAX_DURATION
-                                               ? SPELL_AI_MAX_DURATION
-                                               : combatTarget->m_spellInfluence[IDX(influence)]
-                                                     + fullQuantityWork]
-                            );
-                            break;
-                        case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
-                            break;
+                    if (combatTarget->m_spellInfluence[IDX(influence)]) {
+                        switch (influence) {
+                            case ARMY_SPELL_INFLUENCE_HASTE:
+                            case ARMY_SPELL_INFLUENCE_BLESS:
+                            case ARMY_SPELL_INFLUENCE_DRAGON_SLAYER:
+                            case ARMY_SPELL_INFLUENCE_BLOODLUST:
+                            case ARMY_SPELL_INFLUENCE_SHIELD:
+                            case ARMY_SPELL_INFLUENCE_STONESKIN:
+                            case ARMY_SPELL_INFLUENCE_STEELSKIN:
+                                positiveEffectResult = static_cast<i32>(
+                                    positiveEffectResult
+                                    + RawEffectSpellInfluence(
+                                          combatTarget,
+                                          influence
+                                      )
+                                          * gfCancelDurationMods
+                                              [combatTarget->m_spellInfluence[IDX(influence)]
+                                                           + fullQuantityWork
+                                                       >= SPELL_AI_MAX_DURATION
+                                                   ? SPELL_AI_MAX_DURATION
+                                                   : combatTarget->m_spellInfluence[IDX(influence)]
+                                                         + fullQuantityWork]
+                                );
+                                break;
+                            case ARMY_SPELL_INFLUENCE_SLOW:
+                            case ARMY_SPELL_INFLUENCE_CURSE:
+                            case ARMY_SPELL_INFLUENCE_BLIND:
+                            case ARMY_SPELL_INFLUENCE_BERSERK:
+                            case ARMY_SPELL_INFLUENCE_PARALYZE:
+                            case ARMY_SPELL_INFLUENCE_HYPNOTIZE:
+                            case ARMY_SPELL_INFLUENCE_PETRIFIED:
+                                negativeEffectResult = static_cast<i32>(
+                                    negativeEffectResult
+                                    + RawEffectSpellInfluence(
+                                          combatTarget,
+                                          influence
+                                      )
+                                          * gfCancelDurationMods
+                                              [combatTarget->m_spellInfluence[IDX(influence)]
+                                                           + fullQuantityWork
+                                                       >= SPELL_AI_MAX_DURATION
+                                                   ? SPELL_AI_MAX_DURATION
+                                                   : combatTarget->m_spellInfluence[IDX(influence)]
+                                                         + fullQuantityWork]
+                                );
+                                break;
+                            case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+                                break;
+                        }
                     }
                 }
             }
