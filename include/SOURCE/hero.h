@@ -131,7 +131,7 @@ public:
     u8 m_id;
     char m_owner;
     i16 m_lastHeroInteractionTurn;
-    i8 m_lastInteractionHeroId;
+    u8 m_lastInteractionHeroId;
     i16 m_lastTownInteractionTurn;
     u8 m_visitedTownId;
     char m_name[HERO_NAME_SIZE];

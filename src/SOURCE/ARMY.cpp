@@ -411,8 +411,8 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     unused = 0;
     color = 0;
     standing7 = m_animationSequence == ARMY_ANIMATION_STAND
-                || (m_animationSequence >= ARMY_ANIMATION_STANDING_FIRST
-                    && m_animationSequence < ARMY_ANIMATION_STANDING_END);
+                || (m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                    && m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST);
     y += m_yOffset;
     x += m_xOffset;
     if (m_animationSequence == ARMY_ANIMATION_WALK
