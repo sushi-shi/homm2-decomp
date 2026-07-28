@@ -752,7 +752,7 @@ void PollRemote(void) {
                 receiveResult =
                     ReceiveRemoteData(NULL, reinterpret_cast<u8*>(rcvBufIn), REMOTE_BROADCAST_PLAYER);
                 if (receiveResult == 0 || REMOTE_MESSAGE(rcvBufIn)->sender == giThisNetPos)
-                    continue;
+                    goto nextIncoming;
                 if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_CONFIRM) {
                     giLastConfirm = REMOTE_MESSAGE(rcvBufIn)->id;
                     return;
@@ -783,17 +783,13 @@ void PollRemote(void) {
                 for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
                     if (rcvBuf[queueIndex] != NULL
                         && REMOTE_MESSAGE(rcvBuf[queueIndex])->id == REMOTE_MESSAGE(rcvBufIn)->id) {
-                        break;
+                        goto nextIncoming;
                     }
                 }
-                if (queueIndex < REMOTE_QUEUE_CAPACITY)
-                    continue;
                 for (queueIndex = 0; queueIndex < REMOTE_RECENT_ID_COUNT; queueIndex++) {
                     if (iLastIds[queueIndex] == REMOTE_MESSAGE(rcvBufIn)->id)
-                        break;
+                        goto nextIncoming;
                 }
-                if (queueIndex < REMOTE_RECENT_ID_COUNT)
-                    continue;
                 for (queueIndex = 0; queueIndex < REMOTE_QUEUE_CAPACITY; queueIndex++) {
                     if (rcvBuf[queueIndex] == NULL)
                         break;
@@ -810,6 +806,7 @@ void PollRemote(void) {
                 iCurLastID = (iCurLastID + 1) % REMOTE_RECENT_ID_COUNT;
                 if (queueCount == REMOTE_QUEUE_CAPACITY)
                     return;
+            nextIncoming:;
             }
         }
     }
