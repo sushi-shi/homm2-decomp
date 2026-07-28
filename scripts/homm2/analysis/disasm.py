@@ -148,6 +148,11 @@ def _objdump(obj: Path, name: str, size_hint: int, ordinal: int) -> str:
     if not obj.is_file():
         die(f"{obj.relative_to(REPO)} missing - "
             + ("run `homm2 build` first" if BASE in obj.parents else "run `homm2 init` first"))
+    if NORMAL_BASE in obj.parents or NORMAL_TARGET in obj.parents:
+        from homm2.build.normalized_freshness import freshness_problems
+        problems = freshness_problems(obj)
+        if problems:
+            die("stale normalized comparison object:\n  " + "\n  ".join(problems[:5]))
     public_names = _public_text_symbols(obj)
     res = subprocess.run(
         ["llvm-objdump", "-dr", "--x86-asm-syntax=intel", str(obj)],

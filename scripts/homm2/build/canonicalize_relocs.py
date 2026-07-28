@@ -47,6 +47,7 @@ from typing import NamedTuple
 from homm2.build.assert_relocs import (
     IMAGE_BASE, _pe_read, load_symbols, parse_obj, resolve,
 )
+from homm2.build.normalized_freshness import write_stamp
 
 
 DIR32 = 0x0006
@@ -464,6 +465,11 @@ def main(argv=None):
         functions, aliases, sites, boundaries, coverage = canonicalize_unit(
             args.unit, names, public_data, function_rvas, function_sizes,
             symbols, data, duplicates, Path(args.base), output)
+        write_stamp(output, {
+            "target": Path(args.target),
+            "base": Path(args.base),
+            "symbols": Path(args.symbols),
+        })
         print("canonicalized %d relocation sites (%d aliases, %d functions, "
               "%d alignment boundaries)" % (sites, aliases, functions,
                                             boundaries))
