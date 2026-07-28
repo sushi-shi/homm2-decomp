@@ -134,23 +134,23 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         while (moreFilesHandle) {
             if (m_mode == FILE_REQUESTER_MAP_GAME) {
                 GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if (mapHeader.minHumanPlayers <= giNumHumanPlayers
-                    && giNumHumanPlayers <= mapHeader.maxHumanPlayers
-                    && (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                        || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
-                    && ShowThisMapGame(findDataPath.cFileName)) {
-                } else {
+                if (mapHeader.minHumanPlayers > giNumHumanPlayers)
                     goto CountNextFile;
-                }
+                if (giNumHumanPlayers > mapHeader.maxHumanPlayers)
+                    goto CountNextFile;
+                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
+                    && giMapSizes[IDX(giMapSizeFilter)] != mapHeader.width)
+                    goto CountNextFile;
+                if (!ShowThisMapGame(findDataPath.cFileName))
+                    goto CountNextFile;
             }
             if (m_mode == FILE_REQUESTER_MAP) {
                 GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if ((giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                     || giMapSizes[IDX(giMapSizeFilter)] == mapHeader.width)
-                    && ShowThisMap(findDataPath.cFileName)) {
-                } else {
+                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
+                    && giMapSizes[IDX(giMapSizeFilter)] != mapHeader.width)
                     goto CountNextFile;
-                }
+                if (!ShowThisMap(findDataPath.cFileName))
+                    goto CountNextFile;
             }
             ++m_fileCount;
         CountNextFile:
