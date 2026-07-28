@@ -3,10 +3,14 @@ import unittest
 from homm2.analysis.disasm import (
     _blocks,
     _blocks_diff,
+    _branch_insns,
+    _branch_seq,
+    _branches_compare,
     _cfg,
     _parse_ins,
     _skeleton_diff,
     _slice_public_symbol,
+    _sym_branch_target,
 )
 
 
@@ -126,6 +130,84 @@ Disassembly of section .text:
         self.assertFalse(exact)
         self.assertIn("!!", output)
         self.assertIn("first branch-kind divergence", output)
+
+    def test_branch_insns_rebases_offsets_and_targets_into_one_space(self):
+        # A function sliced from mid-object starts at a nonzero offset. Offsets AND
+        # branch targets must land in the same rebased space, or every symbolic
+        # target comparison spans two address spaces.
+        text = """\
+00000100 <?Late@@YAXXZ>:
+     100: 83 f8 00\tcmp eax, 0x0
+     103: 74 05\tje 0x10a
+     105: 48\tdec eax
+     106: eb f8\tjmp 0x100
+     10a: c3\tret
+"""
+        insns = _branch_insns(text)
+
+        self.assertEqual(insns[0][0], 0)
+        self.assertEqual(insns[1], (0x3, "je", "0xa"))
+        self.assertEqual(insns[3], (0x6, "jmp", "0x0"))
+
+    def test_branch_seq_takes_conditionals_only(self):
+        insns = _branch_insns(self.CFG_TEXT)
+
+        brs = _branch_seq(insns)
+
+        self.assertEqual(brs, [(0x3, "je", 0xa)])
+
+    def test_branch_seq_dies_on_unclassified_jump(self):
+        with self.assertRaises(SystemExit):
+            _branch_seq([(0, "jecxz", "0x4"), (2, "ret", "")])
+
+    def test_branches_compare_truncates_at_table_decode_garbage(self):
+        # Jump-table bytes decode as valid-looking loop/jecxz forms MSVC 4.2 never
+        # emits; the comparison must stop there (reliable prefix), not die mid-render.
+        base = [(0x0, "je", "0x8"), (0x4, "jmp", "dword ptr [eax*4 + 0x10]"),
+                (0x8, "jecxz", "0x2"), (0xa, "loop", "0x4")]
+        res = _branches_compare(base, base)
+
+        self.assertEqual(res["status"], "clean")
+        self.assertEqual(res["trunc"], (0x8, 0x8))
+        self.assertEqual(res["nbr"], 1)
+
+    def test_sym_branch_target_makes_uniform_shift_equal(self):
+        base = [(0x3, "je", 0x20), (0x10, "jne", 0x30)]
+        shifted = [(0x3, "je", 0x24), (0x12, "jne", 0x34)]
+
+        self.assertEqual([_sym_branch_target(base, t) for _, _, t in base],
+                         [_sym_branch_target(shifted, t) for _, _, t in shifted])
+
+    def test_branches_compare_classifies_flip_kinds(self):
+        base = [(0x0, "cmp", "eax, 0x0"), (0x3, "jl", "0x10"), (0x10, "ret", "")]
+        signed = [(0x0, "cmp", "eax, 0x0"), (0x3, "jb", "0x10"), (0x10, "ret", "")]
+        inverted = [(0x0, "cmp", "eax, 0x0"), (0x3, "jge", "0x10"), (0x10, "ret", "")]
+
+        self.assertEqual(_branches_compare(base, signed)["kind"], "SIGNEDNESS")
+        self.assertEqual(_branches_compare(base, inverted)["kind"], "POLARITY")
+        self.assertEqual(_branches_compare(base, base)["status"], "clean")
+
+    def test_branches_compare_sees_retarget_as_topology(self):
+        # Identical mnemonics; the second branch lands before vs after the first
+        # branch's landing site - the exact shape --diff masks.
+        base = [(0x0, "je", "0x8"), (0x4, "jne", "0x8"),
+                (0x8, "inc", "eax"), (0x9, "ret", "")]
+        moved = [(0x0, "je", "0x8"), (0x4, "jne", "0x2"),
+                 (0x8, "inc", "eax"), (0x9, "ret", "")]
+
+        res = _branches_compare(base, moved)
+
+        self.assertEqual(res["status"], "topology")
+        self.assertEqual(res["rows"], [(1, 2, 1)])
+
+    def test_branches_compare_count_mismatch_is_struct(self):
+        base = [(0x0, "je", "0x4"), (0x4, "ret", "")]
+        extra = [(0x0, "je", "0x4"), (0x4, "jne", "0x8"), (0x8, "ret", "")]
+
+        res = _branches_compare(base, extra)
+
+        self.assertEqual(res["status"], "struct")
+        self.assertEqual((res["nbr"], res["nbr_t"]), (1, 2))
 
     def test_skeleton_diff_separates_size_only_change(self):
         base = _cfg(self.CFG_TEXT)
