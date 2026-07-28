@@ -177,8 +177,8 @@ BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	100.0000	d6158d77293b
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	79.5989	78418a9d23b8.02e5f0cc8453
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	79.2471	7823696ef898
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	73.4578	9a3c066ede3c.8980c23345e5
-BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	86.3767	b3fb33b13f5d
-BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.0663	7ec770f1510c.651319fc93db
+BASE/Iconf2b	?FlipIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	87.8223	b3fb33b13f5d
+BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.3149	7ec770f1510c.651319fc93db
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.2515	1f7da1d30d51.0bcb0c3934d6
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	af335173b95f
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	88e22e24424c
@@ -371,7 +371,7 @@ BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	33440694b7af
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	81.6338	19e479e76dff.0e13db56b47b
 BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.8298	95a045323ecc
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	100.0000	05f27a372010.30f5cab9fe5a
-BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	84.2519	d0f64f8f58c5.2e149f56ae53
+BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	84.5919	d0f64f8f58c5.2e149f56ae53
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	94.4102	f38d4d50b121.4dabe2f544ff
 BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	40e385482543
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	09f021777edb
