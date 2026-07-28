@@ -7591,7 +7591,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
 
     if (handled) {
         message.payload.widget.id = DIMENSION_DOOR_FIRST_BUTTON;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -10050,8 +10050,9 @@ i32 advManager::ControlPanel(void) {
     }
     if (selectedCommand != PANEL_NO_HELP) {
         gGameCommand = selectedCommand;
+        return 1;
     }
-    return selectedCommand != PANEL_NO_HELP;
+    return 0;
 }
 
 VA(0x0046ad7e, 0x304)
