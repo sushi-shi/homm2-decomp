@@ -761,9 +761,9 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         iVWMapOriginY = 0;
                     // Retail's initial-click path clamps X overflow into Y; the drag path below
                     // stores the equivalent clamp into X.
-                    if (MAP_WIDTH <= OD_STEER(iVWMapOriginX) + iVWViewableCells)
+                    if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
                         iVWMapOriginY = MAP_WIDTH - iVWViewableCells;
-                    if (MAP_HEIGHT <= OD_STEER(iVWMapOriginY) + iVWViewableCells)
+                    if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
                         iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                     gpAdvManager->UpdateRadar(1, 0);
                     gpAdvManager->VWCompleteDraw();
@@ -804,9 +804,9 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                                 iVWMapOriginX = 0;
                             if (iVWMapOriginY < 0)
                                 iVWMapOriginY = 0;
-                            if (MAP_WIDTH <= OD_STEER(iVWMapOriginX) + iVWViewableCells)
+                            if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
                                 iVWMapOriginX = MAP_WIDTH - iVWViewableCells;
-                            if (MAP_HEIGHT <= OD_STEER(iVWMapOriginY) + iVWViewableCells)
+                            if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
                                 iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                             gpAdvManager->UpdateRadar(1, 0);
                             gpAdvManager->VWCompleteDraw();
@@ -826,8 +826,8 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         else
                             giViewWorldScale = VIEW_WORLD_SCALE_NEAR;
                         gpAdvManager->VWInit(
-                            OD_STEER(iVWMapOriginX) + iVWCenterOffset,
-                            OD_STEER(iVWMapOriginY) + iVWCenterOffset
+                            iVWMapOriginX + iVWCenterOffset,
+                            iVWMapOriginY + iVWCenterOffset
                         );
                         gpAdvManager->VWCompleteDraw();
                         break;
