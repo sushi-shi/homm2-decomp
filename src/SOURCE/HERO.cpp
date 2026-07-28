@@ -1655,11 +1655,11 @@ void SetupHeroView(void) {
         heroWin->BroadcastMessage(message);
     }
 
-    if (cannotDismiss == 0 && gpTownManager->m_castleDialogActive == 0
-        && (gpCurPlayer->m_townCount != 0 || gpCurPlayer->m_heroCount != UI_SINGLE_HERO_COUNT))
-        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
-    else
+    if (cannotDismiss != 0 || gpTownManager->m_castleDialogActive != 0
+        || (gpCurPlayer->m_townCount == 0 && gpCurPlayer->m_heroCount == UI_SINGLE_HERO_COUNT))
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    else
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
     message.payload.widget.id = UI_DISMISS;
     message.payload.widget.data.value = UI_CONTROL_VALUE_DEFAULT;
     heroWin->BroadcastMessage(message);
@@ -1753,10 +1753,10 @@ void SetupHeroView(void) {
     message.payload.widget.id = UI_FORMATION_SPREAD_ICON;
     message.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(message);
-    if (HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
-        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
-    else
+    if (!HAS(gpHVHero->m_eventFlags, HERO_EVENT_GROUPED_FORMATION))
         message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
+    else
+        message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
     message.payload.widget.id = UI_FORMATION_GROUPED_ICON;
     message.payload.widget.data.value = UI_CONTROL_FRAME_DEFAULT;
     heroWin->BroadcastMessage(message);
