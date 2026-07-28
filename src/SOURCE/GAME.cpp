@@ -5146,7 +5146,7 @@ void game::InitRandomArtifacts(void) {
     i32 ignoredIndex;
     i32 y;
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
-    for (i32 x = 0; x < MAP_WIDTH; x++) {
+    for (i32 x = 0; MAP_WIDTH > x; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->Row(y) + x;
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT))
