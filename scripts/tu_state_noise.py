@@ -374,12 +374,19 @@ def _leading_metadata_offset(text: str, marker_offset: int) -> int:
 
 
 def _top_level_insertion_offset(text: str) -> int:
-    """Return the first authored token after the leading preprocessor/include block."""
+    """Return the first authored token after the leading preprocessor/include block.
+
+    A directive line ending in a backslash continues on the next physical
+    line; the continuation belongs to the directive even though it does not
+    start with ``#``. Splitting such a macro with a probe corrupts the TU.
+    """
     offset = 0
+    continuation = False
     for line in text.splitlines(keepends=True):
         stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
+        if continuation or not stripped or stripped.startswith("#"):
             offset += len(line)
+            continuation = stripped.endswith("\\")
             continue
         break
     return offset

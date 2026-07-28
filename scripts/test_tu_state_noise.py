@@ -858,5 +858,31 @@ class TuStateNoiseTests(unittest.TestCase):
         )
 
 
+
+class TopLevelInsertionOffsetTests(unittest.TestCase):
+    def test_backslash_continued_define_is_not_split(self):
+        text = (
+            "#include <va.h>\n"
+            "#define PLAIN 1\n"
+            "#define CONTINUED value \\\n"
+            "    (1 + 2)\n"
+            "#define TRAILING 3\n"
+            "\n"
+            "int gValue;\n"
+        )
+        offset = noise._top_level_insertion_offset(text)
+        self.assertEqual(text[offset:], "int gValue;\n")
+
+    def test_chained_continuations_are_consumed(self):
+        text = (
+            "#define A first \\\n"
+            "    second \\\n"
+            "    third\n"
+            "int gValue;\n"
+        )
+        offset = noise._top_level_insertion_offset(text)
+        self.assertEqual(text[offset:], "int gValue;\n")
+
+
 if __name__ == "__main__":
     unittest.main()
