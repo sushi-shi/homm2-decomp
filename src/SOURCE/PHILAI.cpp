@@ -1903,7 +1903,8 @@ hero* philAI::DetermineHeroToMove(i32 player) {
     idx = -1;
     if (gpCurPlayer->HasMobileHero()) {
         for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
-            val = gpGame->GetPlayerHero(player, i)->m_remainingMobility;
+            val = gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[i]]
+                          .m_remainingMobility;
             if (val > jb) {
                 jb = val;
                 idx = i;
@@ -1911,7 +1912,7 @@ hero* philAI::DetermineHeroToMove(i32 player) {
         }
     }
     if (idx >= 0)
-        return gpGame->GetPlayerHero(player, idx);
+        return &gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[idx]];
     gpGame->m_players[player].m_currentHero = -1;
     return NULL;
 }
