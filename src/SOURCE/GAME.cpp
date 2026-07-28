@@ -2189,7 +2189,7 @@ void game::RandomizeEvents(void) {
     memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; OR_STEER(xPos2) < MAP_WIDTH; xPos2++) {
+        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             switch (cell2->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
@@ -2684,7 +2684,7 @@ void game::RandomizeEvents(void) {
     }
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; OR_STEER(xPos2) < MAP_WIDTH; xPos2++) {
+        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && cell2->m_objectLayerBit1) {
                 valid27 = 1;
@@ -2703,7 +2703,7 @@ void game::RandomizeEvents(void) {
     }
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; OR_STEER(xPos2) < MAP_WIDTH; xPos2++) {
+        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
             cell2 = m_worldMap.Row(yPos19) + xPos2;
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
                 && cell2->m_objectTileset == TILESET_X_LOC2)
@@ -4817,7 +4817,7 @@ void game::PerMonth(void) {
                         secondCount4 = GetRandomNumTroops(
                             static_cast<CreatureType>(giMonthTypeExtra)
                         );
-                        cell0->m_objectMetadata = (OR_STEER(firstCount5) + secondCount4) | 0;
+                        cell0->m_objectMetadata = (firstCount5 + secondCount4) | 0;
                         if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
                             < MONSTER_GUARD_CUTOFF)
                             cell0->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
@@ -5275,7 +5275,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
                 minimum5 =
-                    (OR_STEER(minimum5) + maximum5) / RANDOM_HERO_AVERAGE_DIVISOR;
+                    (minimum5 + maximum5) / RANDOM_HERO_AVERAGE_DIVISOR;
             army2->m_creatureCounts[armySlot7] =
                 static_cast<i16>(Random(minimum5, maximum5) / RANDOM_HERO_COUNT_SCALE);
             armySlot7++;
@@ -5579,7 +5579,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
                     sqrt(static_cast<double>((x - col) * (x - col) + (y - row) * (y - row)))
                 );
                 if (distance < radius) {
-                    mapExtra[OR_STEER(MAP_WIDTH) * row + col] |= mask;
+                    mapExtra[MAP_WIDTH * row + col] |= mask;
                 }
             }
         }
@@ -5589,7 +5589,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
                 visibility = radius - abs(y - row) + radius - abs(x - col);
                 if (visibility >= cutoff && col >= 0 && row >= 0 && col < MAP_WIDTH
                     && row < MAP_HEIGHT) {
-                    mapExtra[OR_STEER(MAP_WIDTH) * row + col] |= mask;
+                    mapExtra[MAP_WIDTH * row + col] |= mask;
                 }
             }
         }

@@ -158,7 +158,7 @@ inline BoltColorMode LuckBoltColor(i32 targetX, i32 startX) {
 #else
 #define LuckBoltColor(targetX, startX)                                                        \
     (BOLT_COLOR_RAINBOW_REVERSE                                                              \
-     + (((OR_STEER((targetX)) >= (startX)) - 1)                                                  \
+     + ((((targetX) >= (startX)) - 1)                                                  \
         & (BOLT_COLOR_RAINBOW_FORWARD - BOLT_COLOR_RAINBOW_REVERSE)))
 #endif
 
@@ -1585,7 +1585,7 @@ void combatManager::ElementalStorm(void) {
                         stormIcon_i->CombatClipDrawToBuffer(
                             column_e * SPELL_STORM_TILE_SIZE,
                             row_b * SPELL_STORM_TILE_SIZE,
-                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + OR_STEER(frame_i) + row_b)
+                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + frame_i + row_b)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits_n,
                             ICON_DRAW_NORMAL,
@@ -2226,7 +2226,7 @@ void combatManager::AddBolt(
             bolt->drawVertically = 1;
         else
             bolt->drawVertically = 0;
-    } else if (OR_STEER(abs(endX - startX)) > abs(endY - startY))
+    } else if (abs(endX - startX) > abs(endY - startY))
         bolt->drawVertically = 1;
     else
         bolt->drawVertically = 0;
@@ -2234,7 +2234,7 @@ void combatManager::AddBolt(
     i32 deltaX = abs(endX - startX);
     i32 deltaY = abs(endY - startY);
     bolt->totalDistance =
-        static_cast<i32>(sqrt(static_cast<double>(OR_STEER(deltaX * deltaX) + deltaY * deltaY)));
+        static_cast<i32>(sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY)));
     ResetBoltAngle(bolt);
 }
 
@@ -3286,12 +3286,12 @@ void combatManager::SummonElemental(
     i32 offset;
     for (offset = 0; offset < SUMMON_HEXES_PER_SIDE; ++offset) {
         if (m_hexCells[summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                     + (OR_STEER(randomOffset_a) + offset)
+                                     + (randomOffset_a + offset)
                                            % SUMMON_HEXES_PER_SIDE]]
                 .m_occupantSide
             == COMBAT_SIDE_NONE)
             summonHex = summonHexes_l[IDX(m_currentSide) * SUMMON_HEXES_PER_SIDE
-                                      + (OR_STEER(randomOffset_a) + offset)
+                                      + (randomOffset_a + offset)
                                             % SUMMON_HEXES_PER_SIDE];
     }
     m_summonedCreatureType[IDX(m_currentSide)] = monsterType;

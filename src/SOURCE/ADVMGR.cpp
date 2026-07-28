@@ -8913,18 +8913,18 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
             }
 
             if (pathIndex == 0) {
-                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] = 1;
+                m_visibilityMap[routeY1 * MAP_WIDTH + routeX1] = 1;
             } else {
                 previousDirection0 =
                     static_cast<u8>(gpSearchArray->m_storage.path.directions[pathIndex]);
-                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] = static_cast<u16>(
+                m_visibilityMap[routeY1 * MAP_WIDTH + routeX1] = static_cast<u16>(
                     gbArrow[previousDirection0][direction | 0]
                     + routeFrame * ROUTE_ARROW_FRAME_STRIDE + ROUTE_ARROW_FRAME_OFFSET
                 );
             }
 
             if (remainingMobility2 < 0) {
-                m_visibilityMap[routeY1 * OR_STEER(MAP_WIDTH) + routeX1] += ROUTE_DAY_MASK;
+                m_visibilityMap[routeY1 * MAP_WIDTH + routeX1] += ROUTE_DAY_MASK;
             } else {
                 routeReachable8 = 1;
             }
@@ -9693,9 +9693,9 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
         }
         for (i32 checkY = y - 1; checkY <= y + 1; ++checkY) {
             if (checkY >= 0) {
-                if (MAP_HEIGHT <= OD_STEER(checkY)) {
+                if (MAP_HEIGHT <= checkY) {
                 } else {
-                    if (mapExtra[OD_STEER(checkY) * MAP_WIDTH + checkX] & mask) {
+                    if (mapExtra[checkY * MAP_WIDTH + checkX] & mask) {
                         return 1;
                     }
                 }
@@ -9793,7 +9793,7 @@ void advManager::ViewPuzzle(void) {
         pixelIterator = gpWindowManager->m_screen->m_pixels + rowCounterNumber * SCREEN_WIDTH
                         + PUZZLE_VIEW_ORIGIN;
         rowLimitAddress = pixelIterator + PUZZLE_VIEW_SIZE;
-        for (; OD_STEER(pixelIterator) < rowLimitAddress; ++pixelIterator) {
+        for (; pixelIterator < rowLimitAddress; ++pixelIterator) {
             *pixelIterator = gColorTableTan[*pixelIterator];
         }
     }
