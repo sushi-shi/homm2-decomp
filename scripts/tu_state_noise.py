@@ -1281,7 +1281,8 @@ def object_metrics(path: Path) -> dict[str, dict]:
 
 
 def load_pairing_context(root: Path, unit: str) -> dict:
-    public_data, function_rvas = load_retail_symbols(root / "build/gen/symbol_names.csv")
+    public_data, function_rvas, function_sizes = load_retail_symbols(
+        root / "build/gen/symbol_names.csv")
     previous_directory = Path.cwd()
     try:
         os.chdir(root)
@@ -1293,6 +1294,7 @@ def load_pairing_context(root: Path, unit: str) -> dict:
         "names": function_inventory(function_rvas).get(unit, set()),
         "public_data": public_data,
         "function_rvas": function_rvas,
+        "function_sizes": function_sizes,
         "symbols": symbols,
         "data": data,
         "duplicates": duplicates,
@@ -1322,6 +1324,7 @@ def normalize_comparison_pair(
         pairing["names"],
         pairing["public_data"],
         pairing["function_rvas"],
+        pairing["function_sizes"],
         pairing["symbols"],
         pairing["data"],
         pairing["duplicates"],
