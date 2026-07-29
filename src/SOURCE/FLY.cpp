@@ -217,48 +217,51 @@ i32 army::FlyTo(void) {
 
 VA(0x004a5fbf, 0xc1f)
 i32 army::FlyTo(i32 destination) {
-    i32 sourceColumn;
-    i32 destinationColumn;
-    i32 columnDifference;
-    i32 destinationX;
-    i32 destinationY;
-    i32 sourceX;
-    i32 sourceY;
-    float x;
-    float y;
-    i32 xDistance;
-    i32 yDistance;
-    i32 distance;
-    i32 flightSegmentCount;
-    float xStep;
-    float yStep;
-    i32 sourceRearHex;
-    i32 destinationRearHex;
-    i32 flightSegment;
-    i32 flightFrameCount;
-    i32 middleFrameCount;
-    i32 frameStart;
-    i32 oldMinX;
-    i32 oldMinY;
-    i32 oldMaxX;
+    i32 endRearHex;
+    i32 oldMinExtentY;
+    i32 middleFrames2;
+    i32 prevMinX5;
+    i32 frameBegin3;
     i32 oldMaxY;
+    i32 oldRight;
+    i32 flightFrameCount3;
+    i32 sourceRearHex;
+    i32 segmentIndex;
+    i32 flightSteps;
+    i32 pad2;
+    i32 destinationColumn;
+    i32 goalY;
+    i32 destinationX;
+    i32 sourceY;
+    i32 dist;
+    i32 sourceX;
+    i32 unusedB;
+    float yRate3;
+    i32 ySpan;
+    float xIncrement3;
+    i32 dead2;
+    float flyY1;
+    i32 xDistance;
+    i32 hexColumn;
+    i32 columnDiff5;
+    float xPos;
 
     if (!ValidHex(destination)) {
         return 0;
     }
 
-    sourceColumn = m_hex % ARMY_HEX_COLUMNS;
+    hexColumn = m_hex % ARMY_HEX_COLUMNS;
     destinationColumn = destination % ARMY_HEX_COLUMNS;
-    columnDifference = destinationColumn - sourceColumn;
+    columnDiff5 = destinationColumn - hexColumn;
     m_facingChanged = 0;
-    if (columnDifference > 0 && m_facing == ARMY_FACING_LEFT) {
+    if (columnDiff5 > 0 && m_facing == ARMY_FACING_LEFT) {
         m_facingChanged = 1;
         m_facing = OppositeArmyFacing(m_facing);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
             m_hex--;
             destination--;
         }
-    } else if (columnDifference < 0 && m_facing == ARMY_FACING_RIGHT) {
+    } else if (columnDiff5 < 0 && m_facing == ARMY_FACING_RIGHT) {
         m_facingChanged = 1;
         m_facing = OppositeArmyFacing(m_facing);
         if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
@@ -271,39 +274,39 @@ i32 army::FlyTo(i32 destination) {
     }
 
     destinationX = gpCombatManager->m_hexCells[destination].m_x;
-    destinationY = gpCombatManager->m_hexCells[destination].m_y;
+    goalY = gpCombatManager->m_hexCells[destination].m_y;
     sourceX = gpCombatManager->m_hexCells[m_hex].m_x;
     sourceY = gpCombatManager->m_hexCells[m_hex].m_y;
-    x = static_cast<float>(sourceX);
-    y = static_cast<float>(sourceY);
+    xPos = static_cast<float>(sourceX);
+    flyY1 = static_cast<float>(sourceY);
     xDistance = destinationX - sourceX;
-    yDistance = destinationY - sourceY;
-    distance =
-        static_cast<i32>(sqrt(static_cast<double>(xDistance * xDistance + yDistance * yDistance)));
-    flightSegmentCount = 0;
+    ySpan = goalY - sourceY;
+    dist =
+        static_cast<i32>(sqrt(static_cast<double>(xDistance * xDistance + ySpan * ySpan)));
+    flightSteps = 0;
     if (m_frameInfo.flightSpeed > 0) {
-        flightSegmentCount = ((m_frameInfo.flightSpeed >> 1) + distance) / m_frameInfo.flightSpeed;
+        flightSteps = ((m_frameInfo.flightSpeed >> 1) + dist) / m_frameInfo.flightSpeed;
     }
-    if (flightSegmentCount <= 0) {
-        flightSegmentCount = 1;
+    if (flightSteps <= 0) {
+        flightSteps = 1;
     }
-    xStep = static_cast<float>(xDistance) / flightSegmentCount;
-    yStep = static_cast<float>(yDistance) / flightSegmentCount;
+    xIncrement3 = static_cast<float>(xDistance) / flightSteps;
+    yRate3 = static_cast<float>(ySpan) / flightSteps;
 
     gpCombatManager->m_hexCells[m_hex].m_occupantIndex = -1;
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        sourceRearHex = ArmyFacingRearHexOffset(m_facing) + m_hex;
+        sourceRearHex = (static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? -1 : 1) + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
     }
 
     if (!gbNoShowCombat) {
-        flightFrameCount = 0;
-        frameStart = 0;
-        middleFrameCount = 0;
+        flightFrameCount3 = 0;
+        frameBegin3 = 0;
+        middleFrames2 = 0;
         gpCombatManager->DrawFrame(0, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
         gpWindowManager->m_screen->CopyTo(
             gpCombatManager->m_backgroundBuffer,
@@ -312,59 +315,59 @@ i32 army::FlyTo(i32 destination) {
             0,
             0,
             ARMY_COMBAT_WIDTH,
-            ARMY_COMBAT_HEIGHT
+            ARMY_COMBAT_MAX_Y
         );
         gpCombatManager->m_backgroundDrawn = 0;
         m_animationSequence = ARMY_ANIMATION_WALK;
-        for (flightSegment = 0; flightSegmentCount > flightSegment; flightSegment++) {
+        for (segmentIndex = 0; !(flightSteps <= segmentIndex); segmentIndex++) {
             BuildTempWalkSeq(
                 &m_frameInfo,
-                flightSegment + 1 == flightSegmentCount,
-                flightSegment > 0
+                segmentIndex + 1 == flightSteps,
+                segmentIndex > 0
             );
-            if (flightSegmentCount == 0) {
-                flightFrameCount = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
-                frameStart = 0;
+            if (flightSteps == 0) {
+                flightFrameCount3 = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
+                frameBegin3 = 0;
             } else {
-                if (flightSegment > 0) {
-                    flightFrameCount +=
+                if (segmentIndex > 0) {
+                    flightFrameCount3 +=
                         m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_BEGIN_STANDING)];
-                    frameStart = 0;
+                    frameBegin3 = 0;
                 } else {
-                    frameStart = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_BEGIN)];
+                    frameBegin3 = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_BEGIN)];
                 }
-                flightFrameCount = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_MIDDLE)];
-                middleFrameCount = flightFrameCount;
-                if (flightSegment + 1 < flightSegmentCount) {
-                    flightFrameCount += m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_END)];
+                flightFrameCount3 = m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_MIDDLE)];
+                middleFrames2 = flightFrameCount3;
+                if (segmentIndex + 1 < flightSteps) {
+                    flightFrameCount3 += m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK_END)];
                 }
             }
 
             for (m_animationFrame = 0;
                  m_animationFrame < m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)];
                  m_animationFrame++) {
-                if (m_animationFrame >= frameStart
-                    && m_animationFrame < flightFrameCount + frameStart) {
-                    x += xStep / flightFrameCount;
-                    y += yStep / flightFrameCount;
+                if (m_animationFrame >= frameBegin3
+                    && m_animationFrame < flightFrameCount3 + frameBegin3) {
+                    xPos += xIncrement3 / flightFrameCount3;
+                    flyY1 += yRate3 / flightFrameCount3;
                 }
                 if (m_animationFrame % m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)]
                     == FLIGHT_SOUND_FRAME) {
                     if ((m_monsterType == CREATURE_VAMPIRE
                          || m_monsterType == CREATURE_VAMPIRE_LORD)
-                        && flightSegment == 0) {
+                        && segmentIndex == 0) {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_ONE)]);
                         DelayMilli(VAMPIRE_FLIGHT_SOUND_DELAY);
                     } else if ((m_monsterType == CREATURE_VAMPIRE
                                 || m_monsterType == CREATURE_VAMPIRE_LORD)
-                               && flightSegmentCount - 1 == flightSegment) {
+                               && flightSteps - 1 == segmentIndex) {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_EXTRA_TWO)]);
                     } else {
                         gpSoundManager->MemorySample(m_samples[IDX(ARMY_SAMPLE_MOVE)]);
                     }
                 }
 
-                if (flightSegment != 0 || m_animationFrame != 0) {
+                if (segmentIndex != 0 || m_animationFrame != 0) {
                     gpCombatManager->m_backgroundBuffer->CopyTo(
                         gpWindowManager->m_screen,
                         giMinExtentX,
@@ -374,14 +377,14 @@ i32 army::FlyTo(i32 destination) {
                         giMaxExtentX - giMinExtentX + 1,
                         giMaxExtentY - giMinExtentY + 1
                     );
-                    oldMinX = giMinExtentX;
-                    oldMinY = giMinExtentY;
-                    oldMaxX = giMaxExtentX;
+                    prevMinX5 = giMinExtentX;
+                    oldMinExtentY = giMinExtentY;
+                    oldRight = giMaxExtentX;
                     oldMaxY = giMaxExtentY;
                 } else {
-                    oldMinX = 0;
-                    oldMinY = 0;
-                    oldMaxX = ARMY_COMBAT_MAX_X;
+                    prevMinX5 = 0;
+                    oldMinExtentY = 0;
+                    oldRight = ARMY_COMBAT_MAX_X;
                     oldMaxY = ARMY_COMBAT_MAX_Y;
                 }
                 giMinExtentY = ARMY_COMBAT_WIDTH;
@@ -390,7 +393,7 @@ i32 army::FlyTo(i32 destination) {
                 giMaxExtentX = giMaxExtentY;
                 gbComputeExtent = true;
                 gbSaveBiggestExtent = true;
-                DrawToBuffer(static_cast<i32>(x), static_cast<i32>(y), 0);
+                DrawToBuffer(static_cast<i32>(xPos), static_cast<i32>(flyY1), 0);
                 gbComputeExtent = false;
                 gbSaveBiggestExtent = false;
                 if (giMinExtentX < 0)
@@ -401,42 +404,42 @@ i32 army::FlyTo(i32 destination) {
                     giMaxExtentX = ARMY_COMBAT_MAX_X;
                 if (giMaxExtentY > ARMY_COMBAT_MAX_Y)
                     giMaxExtentY = ARMY_COMBAT_MAX_Y;
-                if (oldMinX > giMinExtentX)
-                    oldMinX = giMinExtentX;
-                if (oldMinY > giMinExtentY)
-                    oldMinY = giMinExtentY;
-                if (oldMaxX < giMaxExtentX)
-                    oldMaxX = giMaxExtentX;
+                if (!(prevMinX5 <= giMinExtentX))
+                    prevMinX5 = giMinExtentX;
+                if (!(oldMinExtentY <= giMinExtentY))
+                    oldMinExtentY = giMinExtentY;
+                if (oldRight < giMaxExtentX)
+                    oldRight = giMaxExtentX;
                 if (oldMaxY < giMaxExtentY)
                     oldMaxY = giMaxExtentY;
 
                 DelayTil(glTimers);
-                if (m_animationFrame < frameStart
-                    || (m_animationFrame + 1 >= middleFrameCount
+                if (m_animationFrame < frameBegin3
+                    || (m_animationFrame + 1 >= middleFrames2
                         && (m_monsterType == CREATURE_VAMPIRE
                             || m_monsterType == CREATURE_VAMPIRE_LORD))) {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount()
                         + m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed]
-                              * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE / flightFrameCount
+                              * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE / flightFrameCount3
                     );
                 } else {
                     glTimers[0] = static_cast<i32>(
                         KBTickCount()
                         + m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed]
-                              / flightFrameCount
+                              / flightFrameCount3
                     );
                 }
                 gpWindowManager->UpdateScreenRegion(
-                    oldMinX,
-                    oldMinY,
-                    oldMaxX - oldMinX + 1,
-                    oldMaxY - oldMinY + 1
+                    prevMinX5,
+                    oldMinExtentY,
+                    oldRight - prevMinX5 + 1,
+                    oldMaxY - oldMinExtentY + 1
                 );
                 if (m_animationFrame
                     == m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WALK)] - 1) {
-                    x = sourceX + (flightSegment + 1) * xStep;
-                    y = sourceY + (flightSegment + 1) * yStep;
+                    xPos = sourceX + (segmentIndex + 1) * xIncrement3;
+                    flyY1 = sourceY + (segmentIndex + 1) * yRate3;
                 }
             }
         }
@@ -449,17 +452,18 @@ i32 army::FlyTo(i32 destination) {
         static_cast<i8>(gpCombatManager->m_currentArmyIndex);
     gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        destinationRearHex = ArmyFacingRearHexOffset(m_facing) + destination;
-        gpCombatManager->m_hexCells[destinationRearHex].m_occupantSide =
+        endRearHex =
+            (static_cast<u32>(m_facing) < ARMY_FACING_RIGHT ? -1 : 1) + destination;
+        gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
             static_cast<i8>(gpCombatManager->m_currentArmySide);
-        gpCombatManager->m_hexCells[destinationRearHex].m_occupantIndex =
+        gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
             static_cast<i8>(gpCombatManager->m_currentArmyIndex);
-        if (destinationRearHex >= destination) {
-            gpCombatManager->m_hexCells[destinationRearHex].m_occupantFrame = ARMY_FACING_RIGHT;
+        if (endRearHex >= destination) {
+            gpCombatManager->m_hexCells[endRearHex].m_occupantFrame = ARMY_FACING_RIGHT;
         } else {
-            gpCombatManager->m_hexCells[destinationRearHex].m_occupantFrame = ARMY_FACING_LEFT;
+            gpCombatManager->m_hexCells[endRearHex].m_occupantFrame = ARMY_FACING_LEFT;
         }
-        if (destinationRearHex <= destination) {
+        if (endRearHex <= destination) {
             gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_RIGHT;
         } else {
             gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_LEFT;
