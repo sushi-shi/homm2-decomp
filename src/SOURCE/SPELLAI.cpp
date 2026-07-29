@@ -1098,9 +1098,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                   * combatTarget->m_quantity;
                 if (HAS(combatTarget->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
                     negativeEffectResult = armyValueResult;
-                    continue;
-                }
-
+                } else {
                 for (influence = ARMY_SPELL_INFLUENCE_HASTE;
                      influence < ARMY_SPELL_INFLUENCE_COUNT;
                      influence++) {
@@ -1128,6 +1126,8 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                                          + fullQuantityWork]
                                 );
                                 break;
+                            case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
+                                break;
                             case ARMY_SPELL_INFLUENCE_SLOW:
                             case ARMY_SPELL_INFLUENCE_CURSE:
                             case ARMY_SPELL_INFLUENCE_BLIND:
@@ -1150,10 +1150,9 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                                          + fullQuantityWork]
                                 );
                                 break;
-                            case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
-                                break;
                         }
                     }
+                }
                 }
             }
         }
