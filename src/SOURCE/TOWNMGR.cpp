@@ -3011,7 +3011,7 @@ MessageDispatchResult SplitArmyHandler(tag_message& message) {
 
     if (handled == 1) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
