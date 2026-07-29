@@ -32,7 +32,7 @@
   54:	85 c0                	test   eax,eax
   56:	75 0c                	jne    0x64
   58:	c7 05 00 00 00 00 01 	mov    DWORD PTR ds:0x0,0x1
-  5f:	00 00 00 
+  5f:	00 00 00
   62:	eb 12                	jmp    0x76
   64:	b8 01 00 00 00       	mov    eax,0x1
   69:	8b 0d 00 00 00 00    	mov    ecx,DWORD PTR ds:0x0

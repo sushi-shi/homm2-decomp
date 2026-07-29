@@ -56,13 +56,13 @@
   a7:	3b c1                	cmp    eax,ecx
   a9:	7f 0e                	jg     0xb9
   ab:	c7 44 24 20 00 00 00 	mov    DWORD PTR [esp+0x20],0x0
-  b2:	00 
+  b2:	00
   b3:	eb 28                	jmp    0xdd
   b5:	8b 74 24 30          	mov    esi,DWORD PTR [esp+0x30]
   b9:	8b 44 24 2c          	mov    eax,DWORD PTR [esp+0x2c]
   bd:	8b 4c 24 24          	mov    ecx,DWORD PTR [esp+0x24]
   c1:	c7 44 24 20 01 00 00 	mov    DWORD PTR [esp+0x20],0x1
-  c8:	00 
+  c8:	00
   c9:	03 c1                	add    eax,ecx
   cb:	48                   	dec    eax
   cc:	a3 00 00 00 00       	mov    ds:0x0,eax
@@ -231,7 +231,7 @@
  2e9:	89 35 00 00 00 00    	mov    DWORD PTR ds:0x0,esi
  2ef:	85 d2                	test   edx,edx
  2f1:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 2f8:	00 00 00 
+ 2f8:	00 00 00
  2fb:	0f 8e d4 00 00 00    	jle    0x3d5
  301:	89 15 00 00 00 00    	mov    DWORD PTR ds:0x0,edx
  307:	33 c9                	xor    ecx,ecx
@@ -283,7 +283,7 @@
  3a2:	a3 00 00 00 00       	mov    ds:0x0,eax
  3a7:	85 d2                	test   edx,edx
  3a9:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 3b0:	00 00 00 
+ 3b0:	00 00 00
  3b3:	7e 20                	jle    0x3d5
  3b5:	89 15 00 00 00 00    	mov    DWORD PTR ds:0x0,edx
  3bb:	33 c9                	xor    ecx,ecx

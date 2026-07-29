@@ -20,7 +20,7 @@
   28:	83 7d f0 05          	cmp    DWORD PTR [ebp-0x10],0x5
   2c:	0f 8f 20 00 00 00    	jg     0x52
   32:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
-  39:	00 00 00 
+  39:	00 00 00
   3c:	ba 09 00 00 00       	mov    edx,0x9
   41:	33 c9                	xor    ecx,ecx
   43:	e8 00 00 00 00       	call   0x48
@@ -29,7 +29,7 @@
   52:	83 7d f0 09          	cmp    DWORD PTR [ebp-0x10],0x9
   56:	0f 8f 27 00 00 00    	jg     0x83
   5c:	c7 05 00 00 00 00 01 	mov    DWORD PTR ds:0x0,0x1
-  63:	00 00 00 
+  63:	00 00 00
   66:	ba 0b 00 00 00       	mov    edx,0xb
   6b:	33 c9                	xor    ecx,ecx
   6d:	e8 00 00 00 00       	call   0x72
@@ -37,7 +37,7 @@
   79:	a3 00 00 00 00       	mov    ds:0x0,eax
   7e:	e9 0a 00 00 00       	jmp    0x8d
   83:	c7 05 00 00 00 00 02 	mov    DWORD PTR ds:0x0,0x2
-  8a:	00 00 00 
+  8a:	00 00 00
   8d:	c7 45 f0 00 00 00 00 	mov    DWORD PTR [ebp-0x10],0x0
   94:	e9 03 00 00 00       	jmp    0x9c
   99:	ff 45 f0             	inc    DWORD PTR [ebp-0x10]
@@ -67,12 +67,12 @@
   f8:	8d 04 40             	lea    eax,[eax+eax*2]
   fb:	8b 4d ec             	mov    ecx,DWORD PTR [ebp-0x14]
   fe:	0f be 84 81 ed ff ff 	movsx  eax,BYTE PTR [ecx+eax*4-0x13]
- 105:	ff 
+ 105:	ff
  106:	8b c8                	mov    ecx,eax
  108:	8d 04 80             	lea    eax,[eax+eax*4]
  10b:	8d 04 80             	lea    eax,[eax+eax*4]
  10e:	0f be 84 08 07 00 00 	movsx  eax,BYTE PTR [eax+ecx*1+0x7]
- 115:	00 
+ 115:	00
  116:	89 45 e8             	mov    DWORD PTR [ebp-0x18],eax
  119:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
  11c:	f6 40 18 10          	test   BYTE PTR [eax+0x18],0x10
@@ -91,7 +91,7 @@
  159:	8d 04 40             	lea    eax,[eax+eax*2]
  15c:	8b 4d ec             	mov    ecx,DWORD PTR [ebp-0x14]
  15f:	0f be 84 81 ed ff ff 	movsx  eax,BYTE PTR [ecx+eax*4-0x13]
- 166:	ff 
+ 166:	ff
  167:	3b 05 00 00 00 00    	cmp    eax,DWORD PTR ds:0x0
  16d:	0f 85 18 00 00 00    	jne    0x18b
  173:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]

@@ -229,7 +229,7 @@
  323:	a1 00 00 00 00       	mov    eax,ds:0x0
  328:	03 c3                	add    eax,ebx
  32a:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 331:	00 00 00 
+ 331:	00 00 00
  334:	a3 00 00 00 00       	mov    ds:0x0,eax
  339:	a1 00 00 00 00       	mov    eax,ds:0x0
  33e:	85 c0                	test   eax,eax
@@ -288,7 +288,7 @@
  414:	a3 00 00 00 00       	mov    ds:0x0,eax
  419:	7f 19                	jg     0x434
  41b:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 422:	00 00 00 
+ 422:	00 00 00
  425:	a1 00 00 00 00       	mov    eax,ds:0x0
  42a:	a3 00 00 00 00       	mov    ds:0x0,eax
  42f:	e9 94 00 00 00       	jmp    0x4c8
@@ -316,7 +316,7 @@
  487:	2b c1                	sub    eax,ecx
  489:	8b 35 00 00 00 00    	mov    esi,DWORD PTR ds:0x0
  48f:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 496:	00 00 00 
+ 496:	00 00 00
  499:	03 c6                	add    eax,esi
  49b:	a3 00 00 00 00       	mov    ds:0x0,eax
  4a0:	eb 26                	jmp    0x4c8
@@ -330,7 +330,7 @@
  4bd:	89 35 00 00 00 00    	mov    DWORD PTR ds:0x0,esi
  4c3:	a3 00 00 00 00       	mov    ds:0x0,eax
  4c8:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 4cf:	00 00 00 
+ 4cf:	00 00 00
  4d2:	a1 00 00 00 00       	mov    eax,ds:0x0
  4d7:	85 c0                	test   eax,eax
  4d9:	7e 3f                	jle    0x51a

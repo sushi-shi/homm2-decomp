@@ -13,11 +13,11 @@
    9:	89 4d c4             	mov    DWORD PTR [ebp-0x3c],ecx
    c:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
    f:	0f be 04 85 00 00 00 	movsx  eax,BYTE PTR [eax*4+0x0]
-  16:	00 
+  16:	00
   17:	89 45 f8             	mov    DWORD PTR [ebp-0x8],eax
   1a:	8b 45 08             	mov    eax,DWORD PTR [ebp+0x8]
   1d:	0f be 04 85 01 00 00 	movsx  eax,BYTE PTR [eax*4+0x1]
-  24:	00 
+  24:	00
   25:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
   28:	8b 45 c4             	mov    eax,DWORD PTR [ebp-0x3c]
   2b:	8b 80 d6 01 00 00    	mov    eax,DWORD PTR [eax+0x1d6]

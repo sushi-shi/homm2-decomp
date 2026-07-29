@@ -268,7 +268,7 @@
  396:	66 8b 54 08 02       	mov    dx,WORD PTR [eax+ecx*1+0x2]
  39b:	89 95 44 ff ff ff    	mov    DWORD PTR [ebp-0xbc],edx
  3a1:	c7 85 48 ff ff ff 00 	mov    DWORD PTR [ebp-0xb8],0x0
- 3a8:	00 00 00 
+ 3a8:	00 00 00
  3ab:	df ad 44 ff ff ff    	fild   QWORD PTR [ebp-0xbc]
  3b1:	a1 00 00 00 00       	mov    eax,ds:0x0
  3b6:	8b 40 31             	mov    eax,DWORD PTR [eax+0x31]
@@ -399,7 +399,7 @@
  5be:	89 85 50 ff ff ff    	mov    DWORD PTR [ebp-0xb0],eax
  5c4:	e9 0a 00 00 00       	jmp    0x5d3
  5c9:	c7 85 50 ff ff ff 00 	mov    DWORD PTR [ebp-0xb0],0x0
- 5d0:	00 00 00 
+ 5d0:	00 00 00
  5d3:	8b 85 50 ff ff ff    	mov    eax,DWORD PTR [ebp-0xb0]
  5d9:	50                   	push   eax
  5da:	68 00 00 00 00       	push   0x0

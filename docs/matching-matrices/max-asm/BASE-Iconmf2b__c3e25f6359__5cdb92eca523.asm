@@ -55,11 +55,11 @@
   91:	3b c3                	cmp    eax,ebx
   93:	7f 0e                	jg     0xa3
   95:	c7 44 24 28 00 00 00 	mov    DWORD PTR [esp+0x28],0x0
-  9c:	00 
+  9c:	00
   9d:	eb 24                	jmp    0xc3
   9f:	8b 4c 24 38          	mov    ecx,DWORD PTR [esp+0x38]
   a3:	c7 44 24 28 01 00 00 	mov    DWORD PTR [esp+0x28],0x1
-  aa:	00 
+  aa:	00
   ab:	8b 44 24 2c          	mov    eax,DWORD PTR [esp+0x2c]
   af:	03 c7                	add    eax,edi
   b1:	48                   	dec    eax

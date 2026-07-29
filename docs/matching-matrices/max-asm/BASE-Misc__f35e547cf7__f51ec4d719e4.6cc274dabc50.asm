@@ -20,9 +20,9 @@
   2c:	83 f8 01             	cmp    eax,0x1
   2f:	7d 0b                	jge    0x3c
   31:	c7 84 24 24 03 00 00 	mov    DWORD PTR [esp+0x324],0x1
-  38:	01 00 00 00 
+  38:	01 00 00 00
   3c:	c7 44 24 10 30 00 00 	mov    DWORD PTR [esp+0x10],0x30
-  43:	00 
+  43:	00
   44:	e8 00 00 00 00       	call   0x49
   49:	83 c0 32             	add    eax,0x32
   4c:	89 44 24 1c          	mov    DWORD PTR [esp+0x1c],eax
