@@ -343,7 +343,7 @@ extern i32 iOverviewItems;
 extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
 extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
 extern H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-extern H2_ENUM_STORAGE(CampaignTrackType, i32) iCampaignTrackType;
+extern CampaignTrackType iCampaignTrackType;
 extern i32 bCampaignViewOnly;
 extern i32 iCurViewMap;
 extern char* cNGKPDisplay;

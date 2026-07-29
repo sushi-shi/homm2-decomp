@@ -2861,7 +2861,9 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
             CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
             m_monster.speed = static_cast<i8>((m_monster.speed + 1) / SLOW_SPEED_DIVISOR);
             if HAS (m_monster.attributes, MONSTER_ATTRIBUTE_FLYING) {
-                m_monster.attributes -= MONSTER_ATTRIBUTE_FLYING;
+                H2_ENUM_CLEAR_FLAG(
+                    m_monster.attributes, MONSTER_ATTRIBUTE_FLYING
+                );
             }
             m_frameInfo.walkDuration =
                 static_cast<i32>(m_frameInfo.walkDuration * ARMY_SLOW_WALK_DURATION_SCALE);

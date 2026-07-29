@@ -56,7 +56,7 @@ public:
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
     i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
     i8 m_minimumHeroCount;
-    H2_ENUM_STORAGE(PlayerPersonality, i32) m_aiDifficulty;
+    PlayerPersonality m_aiDifficulty;
     i8 m_cheatValue;
     char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];
     i8 m_ultimateArtifactHintChance;

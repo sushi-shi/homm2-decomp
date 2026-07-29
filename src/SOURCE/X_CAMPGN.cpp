@@ -851,7 +851,7 @@ i32 ExpCampaign::HandleVictory(void) {
         if (m_mapChoices[mapIndex]) {
             m_mapDays[mapIndex] = days;
             if (m_currentMap == MAP_NONE)
-                m_currentMap = mapIndex;
+                m_currentMap = static_cast<ExpansionCampaignMap>(mapIndex);
         }
     }
     ShowInfo(0, 0);
@@ -1184,7 +1184,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
                         if (giDebugLevel >= 1 || xCampaign.m_mapChoices[map]
                             || xCampaign.m_mapsPlayed[map]) {
-                            xCampaign.m_viewMap = map;
+                            xCampaign.m_viewMap = static_cast<ExpansionCampaignMap>(map);
                             xCampaign.UpdateInfo(1);
                         }
                         break;

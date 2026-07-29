@@ -94,7 +94,7 @@ extern i32 bInDPSD;
 extern i32 iGUIDCount;
 extern i32 iLastMsgNumHumanPlayers;
 extern i32 iMaxSession;
-extern H2_ENUM_STORAGE(DirectPlayHostAcceptStatus, i32) giHostAcceptStatus;
+extern DirectPlayHostAcceptStatus giHostAcceptStatus;
 extern struct _GUID* g_lpGuid;
 extern i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 extern i32 iSessionToTry;

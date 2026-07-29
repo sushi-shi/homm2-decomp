@@ -1903,7 +1903,7 @@ void combatManager::BloodLustEffect(
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    target->m_monster.flags.abilityFlags -= effect;
+    H2_ENUM_CLEAR_FLAG(target->m_monster.flags.abilityFlags, effect);
     gpCombatManager->DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gpWindowManager->FizzleForward(
         giMinExtentX,

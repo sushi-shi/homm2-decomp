@@ -6235,14 +6235,15 @@ i32 philAI::EvaluatePassword(mapCell* cell) {
 VA(0x00445dde, 0xf5)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;  // result
-    H2_ENUM_STORAGE(RecruitSiteType, i32) recruitmentSiteType;
+    RecruitSiteType recruitmentSiteType;
     i32 nb;   // monster type
     i32 kn;
     i32 jb;
     i32 idx;
     i16 lvl;  // monster level
-    recruitmentSiteType = cell->m_tentColor;
-    recruitmentSiteType = IDX(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK;
+    recruitmentSiteType = static_cast<RecruitSiteType>(cell->m_tentColor);
+    recruitmentSiteType =
+        static_cast<RecruitSiteType>(IDX(recruitmentSiteType) & EVENT_RECRUIT_TYPE_MASK);
     lvl = cell->m_tentColor;
     lvl >>= EVENT_RECRUIT_COUNT_SHIFT;
     nb = 0;
