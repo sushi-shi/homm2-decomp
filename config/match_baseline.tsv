@@ -647,7 +647,7 @@ SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
 SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	97.5520	acb89fcb99c3
-SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	93.8187	e47a7070833d
+SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	99.6875	e47a7070833d
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	a1ba6769f25b
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
 SOURCE/COMMAND	?InCombatArea@@YIHHH@Z	100.0000	1b0cb7be1ca7
@@ -664,7 +664,7 @@ SOURCE/COMMAND	?SetCombatDirections@combatManager@@QAEXH@Z	99.6679	a333698de38c
 SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	c959d36505cb
 SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	ff78d34345c0
 SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	ee3bfad7a352
-SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	99.0052	1ff4f81c6ac6
+SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	99.9793	de33fc8d48f7
 SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	5a17cb885bf5
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	5f2d1c7e6d85
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	100.0000	9083c9bbbca3
