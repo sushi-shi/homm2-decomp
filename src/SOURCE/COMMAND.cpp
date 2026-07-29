@@ -250,8 +250,7 @@ H2_ENUM_BEGIN(CombatCasualtyPanelConstant)
     CASUALTY_CENTER_DIVISOR       = 2,
     CASUALTY_CENTER_X_OFFSET      = 3,
     CASUALTY_ICON_CELL_WIDTH      = 32,
-    CASUALTY_ICON_CENTER_X_OFFSET = 17,
-    CASUALTY_ICON_BASE_Y_OFFSET   = 51,
+    CASUALTY_ICON_TOP_OFFSET      = 19,
     CASUALTY_ICON_WIDTH           = 32,
     CASUALTY_ICON_HEIGHT          = 28,
     CASUALTY_QUANTITY_X_OFFSET    = 16,
@@ -1977,25 +1976,23 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         for (armyIndex_8 = 0; displayedCount_11 > armyIndex_8; ++armyIndex_8) {
             m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] =
                 new iconWidget(
-                    armyIndex_8 * spacing_9 + startX_0
+                    armyIndex_8 * spacing_9 + startX_0 + CASUALTY_ICON_CELL_WIDTH / 2
                         - GetIconEntry(
                               monsterIcons_2,
                               *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
                                 + armyIndex_8)
                         )
                               ->x
-                        + static_cast<i16>(
-                            (CASUALTY_ICON_CELL_WIDTH
-                             - GetIconEntry(
-                                   monsterIcons_2,
-                                   *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
-                                     + armyIndex_8)
-                             )
-                                   ->w)
+                        + (CASUALTY_ICON_CELL_WIDTH
+                           - GetIconEntry(
+                                 monsterIcons_2,
+                                 *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT
+                                   + armyIndex_8)
+                           )
+                                 ->w)
                             / CASUALTY_CENTER_DIVISOR
-                        )
-                        + CASUALTY_ICON_CENTER_X_OFFSET,
-                    (y_29
+                        + 1,
+                    (y_29 + CASUALTY_ICON_TOP_OFFSET
                      - GetIconEntry(
                            monsterIcons_2,
                            *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8)
@@ -2006,7 +2003,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                            *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8)
                      )
                            ->h)
-                        + CASUALTY_ICON_BASE_Y_OFFSET,
+                        + CASUALTY_ICON_CELL_WIDTH,
                     CASUALTY_ICON_WIDTH,
                     CASUALTY_ICON_HEIGHT,
                     DATA_COMPGEN(0x004f0d9c, showDeadArmiesMons32Icn2, "mons32.icn"),
