@@ -94,9 +94,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     u32 directionMask;
     army* target0;
     i32 spare;
-    i32 adjacentHex1;
-    i32 attackMask29;
     CombatHexDirection direction4;
+    i32 attackMask29;
+    i32 adjacentHex1;
     i32 cost;
     CombatHexDirection i5;
     i32 fittingHex3;
@@ -112,8 +112,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         if (CanFit(destination, 0, NULL)) {
             m_moveTargetHex = destination;
             return 1;
+        } else {
+            return 0;
         }
-        return 0;
     }
 
     target0 = &gpCombatManager->m_armies[IDX(m_targetSide)][m_targetIndex];
@@ -139,8 +140,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
             m_attackDirection = initialDirection4;
             m_moveTargetHex = m_hex;
             return 1;
+        } else {
+            attackMask29 |= 1 << IDX(initialDirection4);
         }
-        attackMask29 |= 1 << IDX(initialDirection4);
     }
 
     directionMask = 0;
@@ -161,7 +163,7 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
         direction4 = GetBestDirection(targetHex, m_hex, directionMask);
         adjacentHex1 = GetAdjacentCellIndex(targetHex, direction4);
         if (ValidHex(adjacentHex1)
-            && CanFit(adjacentHex1, pathMode == ARMY_PATH_ANY_TARGET_HEX, &fittingHex3)) {
+            && CanFit(adjacentHex1, 1 - IDX(pathMode), &fittingHex3)) {
             m_moveTargetHex = fittingHex3;
             if (!HAS(m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
                 m_attackDirection = OppositeDirection(direction4);
@@ -176,8 +178,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
                 }
             }
             return 1;
+        } else {
+            directionMask |= 1 << IDX(direction4);
         }
-        directionMask |= 1 << IDX(direction4);
     }
 
     if (HAS(target0->m_monster.flags.all, MONSTER_FLAGS_WIDE)
@@ -199,8 +202,9 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
                 m_moveTargetHex = adjacentHex1;
                 m_attackDirection = GetBestDirection(m_moveTargetHex, targetHex, 0);
                 return 1;
+            } else {
+                directionMask |= 1 << IDX(direction4);
             }
-            directionMask |= 1 << IDX(direction4);
         }
     }
     return 0;

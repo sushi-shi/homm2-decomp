@@ -5011,21 +5011,21 @@ void game::RandomizeMine(i32 x, i32 y) {
         switch (terrain3) {
             case TERRAIN_GRASS:
             case TERRAIN_DIRT:
-                mineType29 = RandomMineType(MINE_TYPE_MERCURY, MINE_TYPE_GOLD);
+                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
                 if (mineType29 == MINE_TYPE_MERCURY)
                     mineType29 = MINE_TYPE_WOOD;
                 break;
             case TERRAIN_SNOW:
-                mineType29 = RandomMineType(MINE_TYPE_ORE, MINE_TYPE_GOLD);
+                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_ORE), IDX(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_SWAMP:
-                mineType29 = RandomMineType(MINE_TYPE_WOOD, MINE_TYPE_GOLD);
+                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_WOOD), IDX(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_LAVA:
                 mineType29 = MINE_TYPE_MERCURY;
                 break;
             default:
-                mineType29 = RandomMineType(MINE_TYPE_MERCURY, MINE_TYPE_GOLD);
+                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
                 break;
         }
         if (RandMineQty[IDX(mineType29)] == 0)
