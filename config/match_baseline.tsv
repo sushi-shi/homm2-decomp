@@ -659,7 +659,7 @@ SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	6898d4037c16
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	100.0000	bcc2bb1d844a
 SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	100.0000	14c539520e75
 SOURCE/COMMAND	?ResetRound@combatManager@@QAEXXZ	100.0000	6accf29bee34
-SOURCE/COMMAND	?RightClick@combatManager@@QAEHH@Z	97.1978	606b2400613e
+SOURCE/COMMAND	?RightClick@combatManager@@QAEHH@Z	100.0000	704b995f8670
 SOURCE/COMMAND	?SetCombatDirections@combatManager@@QAEXH@Z	99.6679	a333698de38c
 SOURCE/COMMAND	?SetCombatGrid@combatManager@@QAEXHHH@Z	100.0000	c959d36505cb
 SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	ff78d34345c0

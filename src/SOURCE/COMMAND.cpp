@@ -1343,19 +1343,25 @@ i32 combatManager::RightClick(i32 hexIndex) {
                                    != COMBAT_SIDE_NONE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
                                        .m_deadOccupantCount
-                                   != 0))))
+                                   != 0)))) {
                 return 0;
-
-            if (side != COMBAT_SIDE_NONE) {
-                switch (side) {
-                    case COMBAT_ATTACKER_SIDE:
-                    case COMBAT_DEFENDER_SIDE:
-                        gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-                        ViewArmy(&m_armies[IDX(side)][m_hexCells[m_selectedHex].m_occupantIndex], 1);
-                        ResetMouse();
-                        return 0;
+            } else {
+                if (side != COMBAT_SIDE_NONE) {
+                    switch (side) {
+                        case COMBAT_ATTACKER_SIDE:
+                        case COMBAT_DEFENDER_SIDE:
+                            gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
+                            ViewArmy(
+                                &m_armies[IDX(side)][m_hexCells[m_selectedHex].m_occupantIndex], 1
+                            );
+                            ResetMouse();
+                            return 0;
+                    }
+                } else {
+                    return 0;
                 }
             }
+            break;
     }
     return 0;
 }
