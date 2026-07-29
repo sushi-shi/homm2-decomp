@@ -737,7 +737,7 @@ def load_layer_body(
     matches = [
         state
         for state in summary.get("states", [])
-        if state.get("representative", {}).get("trial") == trial
+        if (state.get("representative") or {}).get("trial") == trial
     ]
     if len(matches) != 1:
         raise ValueError(

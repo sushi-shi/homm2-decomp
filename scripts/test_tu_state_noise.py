@@ -84,16 +84,23 @@ class TuStateNoiseTests(unittest.TestCase):
                 "rva": f"0x{target.rva:x}",
                 "symbol": target.symbol,
             },
-            "states": [{
-                "state": "state-id",
-                "scores": [96.5],
-                "representative": {
-                    "trial": 17,
-                    "family": "typedef",
-                    "tag": "tag",
-                    "body": "typedef int LAYER;",
+            "states": [
+                {
+                    "state": "baseline-state",
+                    "scores": [95.0],
+                    "representative": None,
                 },
-            }],
+                {
+                    "state": "state-id",
+                    "scores": [96.5],
+                    "representative": {
+                        "trial": 17,
+                        "family": "typedef",
+                        "tag": "tag",
+                        "body": "typedef int LAYER;",
+                    },
+                },
+            ],
         }
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "states.json"
