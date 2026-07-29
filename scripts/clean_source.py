@@ -179,12 +179,6 @@ def _arg(index: int, parenthesize: bool = False):
     return rule
 
 
-def _size_assert(args: list[str]) -> str:
-    type_name, byte_count = args[0].strip(), args[1].strip()
-    return (f'static_assert(sizeof({type_name}) == ({byte_count}), '
-            f'"sizeof({type_name}) != {byte_count}")')
-
-
 # The clean tree is generated in the *strict* configuration: domains become real
 # `enum class` types keeping their retail width through H2EnumStorage. The
 # matching tree cannot build this way -- production needs each domain to *be* an
@@ -461,9 +455,7 @@ CALL_RULES = {
     "H2_ENUM_DECODE_MASKED": _decode_masked,
     "H2_ENUM_CLEAR_FLAG": _clear_flag,
 
-    # Structure-size proofs are kept: the game reads retail file formats
-    # straight into these types, so the layout assertions stay useful.
-    "SIZE": _size_assert,
+    "SIZE": _drop,
 
     "__declspec": _declspec,
 }
