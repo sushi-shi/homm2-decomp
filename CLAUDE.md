@@ -129,6 +129,11 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 - Manual edits are reserved for integrating the winning arm of a measured matrix and
   for mechanical fixes pinned directly by byte/relocation evidence (a wrong constant,
   field, or call target).
+- Every banked maximum keeps its evidence, not just its score: after banking runs,
+  run `scripts/harvest_max_observations.py` to append replay coordinates (seed,
+  trial, probe tag) to `docs/matching-matrices/max-observations.tsv` and preserve
+  the winning bytes as disassembly under `docs/matching-matrices/max-asm/`. That
+  disassembly is the structural reference for later source-shape recovery.
 
 ## Proof Vocabulary
 
