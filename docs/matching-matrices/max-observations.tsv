@@ -110,3 +110,4 @@ recorded_utc	unit	symbol	src_hash	score	seed	trial	family	insertion	tag	run_dir
 2026-07-26T06:55:11+00:00	BASE/TEXTWDGT	?Main@textWidget@@UAEHAAUtag_message@@@Z	5a9dd52fe9f9	100.0000	1213156658	2	forest	target	484f4d32-0002-e2d06adb	text-widget-main-storage-states-20260726
 2026-07-23T21:32:20+00:00	SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	ffa791e5b029	100.0000	1447119945	36	forest	target	56414c49-0036-b9bf93c5	validmove-current-forest
 2026-07-29T05:58:25+00:00	SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	464938d22dd4	99.6867	8888	1	forest	top	000022b8-0001-939b359a	command-dovic2
+2026-07-29T06:03:06+00:00	SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	b6c4dd4b86a1	99.8963	777	13	forest	top	00000309-0013-11ba60df	smack-deep

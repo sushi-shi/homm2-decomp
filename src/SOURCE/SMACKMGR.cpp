@@ -406,7 +406,7 @@ void SmackManagerMain(void) {
 
                     gpMouseManager->MouseCoords(expansionMouseX6, expansionMouseY4);
                     expansionChoice1 = ExpansionCampaignRect(expansionMouseX6, expansionMouseY4);
-                    if (xLastChoice != expansionChoice1) {
+                    if (expansionChoice1 != xLastChoice) {
                         backImage->DrawToBuffer(0, 0, 0, ICON_DRAW_NORMAL);
                         BlitBitmapToScreen(
                             gpWindowManager->m_screen,
