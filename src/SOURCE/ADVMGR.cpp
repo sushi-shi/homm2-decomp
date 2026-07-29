@@ -6392,7 +6392,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
                         H2_ALLOC_AT(
                             HERO_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f63b4, heroQuickViewSourceFile, RETAIL_FILE),
-                            QUICK_VIEW_LINE_BASE + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
+                            s_quickViewLineBase + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
                         )
                     );
                     sprintf(
@@ -6482,7 +6482,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsStrings[armyIndex] =
-                static_cast<char*>(H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6400, heroQuickViewSourceFile2, RETAIL_FILE), 4982 + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
+                static_cast<char*>(H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6400, heroQuickViewSourceFile2, RETAIL_FILE), s_quickViewLineBase + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(
@@ -6549,7 +6549,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsStrings[armyIndex] = static_cast<char*>(
-                    H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6448, heroQuickViewSourceFile3, RETAIL_FILE), 4982 + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6448, heroQuickViewSourceFile3, RETAIL_FILE), s_quickViewLineBase + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
