@@ -12,8 +12,7 @@ the generated tree omits comments entirely.
 
 ```sh
 python3 scripts/clean_source.py --out build/clean            # generate
-python3 scripts/clean_source.py --out build/clean --verify \
-  --compat-include path/to/win32-compat/include              # syntax check
+python3 scripts/clean_source.py --out build/clean --verify   # build
 python3 scripts/clean_source.py --out build/clean \
   --publish source-pol-2.0                                  # publish source branch
 ```
@@ -27,11 +26,11 @@ becomes an ordinary `static_assert`. Keep the rule table and its regression test
 in step with `include/va.h` and `include/Ints.h`.
 
 Selecting the typed branch is the one choice the generator makes. Generated
-conversions in `STRICT_ENUM_PATCHES` bridge the few integer-only expressions
+conversions in `GENERATED_PATCHES` bridge the few integer-only expressions
 that remain in the matching source.
 
 Every patch declares how many sites it expects to hit, and any other number ends
-the run naming the file. Six audited groups cover 58 sites.
+the run naming the file. Nine audited groups cover 67 sites.
 
 Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to
@@ -65,30 +64,30 @@ valid output target.
 | `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
 | `RETAIL_FILE`, `#line N` | deleted; `__FILE__` where a file operand remains |
 | `OD_STEER(x)`, `OR_STEER(x)` | `x` |
-| `__fastcall`, `__cdecl`, `__declspec(dllexport)`, `OVERRIDE`, `register` | deleted, or `override` |
+| `__declspec(dllexport)`, `register` | deleted |
+| `OVERRIDE` | `override` |
+| `__cdecl`, `__stdcall`, `__fastcall` | preserved |
 | `// ...`, `/* ... */` | deleted |
 
 Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
 the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
-Only `include/` and `src/` are carried. The matching toolchain — `configure.py`,
-`scripts/homm2/`, `config/units.toml`, the delinker and objdiff plumbing — is
-deliberately absent, because none of it means anything to a consumer of the
-source. Anything a downstream branch needs to build with, it adds itself.
+The branch carries `include/`, `src/`, vendor SDK headers, import definitions,
+and a generated `build.ninja`. The Ninja graph builds `build/HEROES2W.EXE` for
+32-bit Windows with Clang and LLD. The compiler runtime is linked statically.
+The matching toolchain, delinker, objdiff plumbing, MSVC, and Wine are absent.
+It requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW toolchain.
 
 `--publish` accepts only a generated source checkout and either creates a new
 generated branch or advances a branch whose tip already carries the generator
-provenance marker. It refuses dirty generated worktrees, stages only `include/`
-and `src/`, and records unchanged output with an empty descendant commit instead
-of rewriting published history.
+provenance marker. It refuses dirty generated worktrees, stages only generated
+project files, and records unchanged output with an empty descendant commit
+instead of rewriting published history.
 
-Given a set of Win32 compatibility headers, the verifier compiles 93 of the 95
-translation units. The only accepted failures are `BITS.cpp` and `TILE.cpp`,
-hand-written `__declspec(naked)` blitters made of `__asm` blocks. Nothing is
-wrong with them and the generator does not touch them — they are excluded
-because `--verify` runs GCC, which has no such syntax. An MSVC build has all 95.
-Any other failure makes verification fail.
+The verifier invokes the generated Ninja graph. All 95 translation units,
+including portable replacements for the two old inline-assembly units, must
+compile and link into the Windows executable.
 
 ## Type information is preserved, not discarded
 
