@@ -746,7 +746,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     float node;
     i32 nb;
     i32 kn;
-    MapDirection directionIndex;
+    MapDirection dirIdx;
     MapDirection bestDirection;
     i32 heroId;
 
@@ -758,19 +758,19 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
     bestValue = 100;
     if ((gpAdvManager->GetCell(gpCurAIHero->m_x, gpCurAIHero->m_y)->m_triggerType
          & MAP_TRIGGER_TYPE_MASK)
-        == MAP_OBJECT_MONSTER)
+        == MAP_OBJECT_STONE_LITHS)
         return 0;
-    for (directionIndex = MAP_DIRECTION_NORTH; IDX(directionIndex) < NORMAL_DIRECTION_COUNT;
-         directionIndex++) {
-        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, directionIndex)) {
-            kn = normalDirTable[IDX(directionIndex)].x + gpCurAIHero->m_x;
-            nb = normalDirTable[IDX(directionIndex)].y + gpCurAIHero->m_y;
+    for (dirIdx = MAP_DIRECTION_NORTH; IDX(dirIdx) < NORMAL_DIRECTION_COUNT;
+         dirIdx++) {
+        if (gpAdvManager->ValidMoveWithEvent(gpCurAIHero, dirIdx)) {
+            kn = normalDirTable[IDX(dirIdx)].x + gpCurAIHero->m_x;
+            nb = normalDirTable[IDX(dirIdx)].y + gpCurAIHero->m_y;
             if (HAS(gpAdvManager->GetCell(kn, nb)->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
                 && !(mapExtra[kn + MAP_WIDTH * nb] & IDX(MAP_EXTRA_ADJACENT_MONSTER))
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
-                    != MAP_OBJECT_MONSTER)
+                    != MAP_OBJECT_STONE_LITHS)
                 && ((gpAdvManager->GetCell(kn, nb)->m_triggerType & MAP_TRIGGER_TYPE_MASK)
-                    != MAP_OBJECT_ARTIFACT)) {
+                    != MAP_OBJECT_WHIRLPOOL)) {
                 if (gpAdvManager->GetCell(kn, nb)->m_triggerType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     ra = gpAdvManager->GetCell(kn, nb)->m_objectMetadata;
@@ -789,7 +789,7 @@ i32 philAI::GoodAdjacent(H2_ENUM_PARAM(MapDirection, i32)* direction) {
                 if (p > 80)
                     if (bestValue < val) {
                         bestValue = val;
-                        bestDirection = directionIndex;
+                        bestDirection = dirIdx;
                     }
             }
         }
