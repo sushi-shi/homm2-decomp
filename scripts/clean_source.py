@@ -272,86 +272,11 @@ def _assign_chain(args: list[str]) -> str:
     return "(%s = %s)" % (" = ".join(targets), value)
 
 
-# Operator sets for enum domains the game does arithmetic on. In the matching
-# tree these expand to nothing, because the domains are integers there and the
-# built-in operators already apply. With named enums they have to be real, and
-# these are the same operators the repository's strict audit build defines.
-STEPPED_OPERATORS = """\
-inline constexpr {name} operator+({name} a, i32 amount) {{
-    return static_cast<{name}>(static_cast<i32>(a) + amount);
-}}
-inline constexpr {name} operator-({name} a, i32 amount) {{
-    return static_cast<{name}>(static_cast<i32>(a) - amount);
-}}
-inline constexpr i32 operator-({name} a, {name} b) {{
-    return static_cast<i32>(a) - static_cast<i32>(b);
-}}
-inline constexpr {name} operator%({name} a, i32 modulus) {{
-    return static_cast<{name}>(static_cast<i32>(a) % modulus);
-}}
-inline constexpr {name} operator%({name} a, {name} modulus) {{
-    return static_cast<{name}>(static_cast<i32>(a) % static_cast<i32>(modulus));
-}}
-inline constexpr {name} operator&({name} a, i32 mask) {{
-    return static_cast<{name}>(static_cast<i32>(a) & mask);
-}}
-inline {name}& operator+=({name}& a, i32 amount) {{ return a = a + amount; }}
-inline {name}& operator-=({name}& a, i32 amount) {{ return a = a - amount; }}
-inline {name}& operator+=({name}& a, {name} b) {{ return a = a + static_cast<i32>(b); }}
-inline {name}& operator-=({name}& a, {name} b) {{ return a = a - static_cast<i32>(b); }}
-inline {name}& operator%=({name}& a, i32 modulus) {{ return a = a % modulus; }}
-inline {name}& operator%=({name}& a, {name} modulus) {{ return a = a % modulus; }}
-inline {name}& operator++({name}& a) {{ return a = a + 1; }}
-inline {name} operator++({name}& a, int) {{ {name} old = a; a = a + 1; return old; }}
-inline {name}& operator--({name}& a) {{ return a = a - 1; }}
-inline {name} operator--({name}& a, int) {{ {name} old = a; a = a - 1; return old; }}"""
-
-FLAG_OPERATORS = """\
-inline constexpr {name} operator|({name} a, {name} b) {{
-    return static_cast<{name}>(static_cast<i32>(a) | static_cast<i32>(b));
-}}
-inline constexpr {name} operator&({name} a, {name} b) {{
-    return static_cast<{name}>(static_cast<i32>(a) & static_cast<i32>(b));
-}}
-inline constexpr {name} operator^({name} a, {name} b) {{
-    return static_cast<{name}>(static_cast<i32>(a) ^ static_cast<i32>(b));
-}}
-inline constexpr {name} operator~({name} a) {{
-    return static_cast<{name}>(~static_cast<i32>(a));
-}}
-inline constexpr bool operator!({name} a) {{ return !static_cast<i32>(a); }}
-inline {name}& operator|=({name}& a, {name} b) {{ return a = a | b; }}
-inline {name}& operator&=({name}& a, {name} b) {{ return a = a & b; }}
-inline {name}& operator^=({name}& a, {name} b) {{ return a = a ^ b; }}
-// Flag sets are also accumulated and cleared arithmetically.
-inline constexpr {name} operator+({name} a, {name} b) {{
-    return static_cast<{name}>(static_cast<i32>(a) + static_cast<i32>(b));
-}}
-inline constexpr {name} operator-({name} a, {name} b) {{
-    return static_cast<{name}>(static_cast<i32>(a) - static_cast<i32>(b));
-}}
-inline {name}& operator+=({name}& a, {name} b) {{ return a = a + b; }}
-inline {name}& operator-=({name}& a, {name} b) {{ return a = a - b; }}
-// Flag domains are also combined with plain masks held in integer fields.
-inline constexpr {name} operator&({name} a, i32 mask) {{
-    return static_cast<{name}>(static_cast<i32>(a) & mask);
-}}
-inline constexpr {name} operator&(i32 mask, {name} a) {{ return a & mask; }}
-inline constexpr {name} operator|({name} a, i32 mask) {{
-    return static_cast<{name}>(static_cast<i32>(a) | mask);
-}}
-inline constexpr {name} operator|(i32 mask, {name} a) {{ return a | mask; }}
-inline {name}& operator&=({name}& a, i32 mask) {{ return a = a & mask; }}
-inline {name}& operator|=({name}& a, i32 mask) {{ return a = a | mask; }}"""
-
-
-def _operators(template: str):
+def _operator_macro(clean_name: str):
     def rule(args: list[str]) -> str:
-        # An integer domain already has every built-in operator; defining more
-        # for it would be redefinition, or illegal on a builtin type.
         if args[0].strip() in INTEGER_DOMAINS:
             return DROPPED
-        return template.format(name=args[0].strip())
+        return "%s(%s)" % (clean_name, args[0].strip())
     return rule
 
 
@@ -449,8 +374,8 @@ CALL_RULES = {
     "H2_ENUM_STORAGE_STEPPED": _enum_storage("H2SteppedEnumStorage"),
 
     # Operator sets for domains used as counters or bit flags.
-    "H2_ENUM_STEPPED": _operators(STEPPED_OPERATORS),
-    "H2_ENUM_FLAGS": _operators(FLAG_OPERATORS),
+    "H2_ENUM_STEPPED": _operator_macro("ENABLE_ENUM_STEPS"),
+    "H2_ENUM_FLAGS": _operator_macro("ENABLE_ENUM_FLAGS"),
     "H2_ENUM_ASSIGN_CHAIN_5": _assign_chain_typed,
     "H2_ENUM_DECODE_MASKED": _decode_masked,
     "H2_ENUM_CLEAR_FLAG": _clear_flag,

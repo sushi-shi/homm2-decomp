@@ -276,4 +276,70 @@ constexpr i32 H2EnumIndex(Value value) {
     return static_cast<i32>(value);
 }
 
+#define ENABLE_ENUM_FLAGS(name)                                                                    \
+    inline constexpr name operator|(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) | static_cast<i32>(b));                        \
+    }                                                                                              \
+    inline constexpr name operator&(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) & static_cast<i32>(b));                        \
+    }                                                                                              \
+    inline constexpr name operator^(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) ^ static_cast<i32>(b));                        \
+    }                                                                                              \
+    inline constexpr name operator~(name a) {                                                      \
+        return static_cast<name>(~static_cast<i32>(a));                                            \
+    }                                                                                              \
+    inline constexpr bool operator!(name a) { return !static_cast<i32>(a); }                       \
+    inline name& operator|=(name& a, name b) { return a = a | b; }                                 \
+    inline name& operator&=(name& a, name b) { return a = a & b; }                                 \
+    inline name& operator^=(name& a, name b) { return a = a ^ b; }                                 \
+    inline constexpr name operator+(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) + static_cast<i32>(b));                        \
+    }                                                                                              \
+    inline constexpr name operator-(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) - static_cast<i32>(b));                        \
+    }                                                                                              \
+    inline name& operator+=(name& a, name b) { return a = a + b; }                                 \
+    inline name& operator-=(name& a, name b) { return a = a - b; }                                 \
+    inline constexpr name operator&(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i32>(a) & mask);                                      \
+    }                                                                                              \
+    inline constexpr name operator&(i32 mask, name a) { return a & mask; }                         \
+    inline constexpr name operator|(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i32>(a) | mask);                                      \
+    }                                                                                              \
+    inline constexpr name operator|(i32 mask, name a) { return a | mask; }                         \
+    inline name& operator&=(name& a, i32 mask) { return a = a & mask; }                            \
+    inline name& operator|=(name& a, i32 mask) { return a = a | mask; }
+
+#define ENABLE_ENUM_STEPS(name)                                                                    \
+    inline constexpr name operator+(name a, i32 amount) {                                         \
+        return static_cast<name>(static_cast<i32>(a) + amount);                                    \
+    }                                                                                              \
+    inline constexpr name operator-(name a, i32 amount) {                                         \
+        return static_cast<name>(static_cast<i32>(a) - amount);                                    \
+    }                                                                                              \
+    inline constexpr i32 operator-(name a, name b) {                                               \
+        return static_cast<i32>(a) - static_cast<i32>(b);                                          \
+    }                                                                                              \
+    inline constexpr name operator%(name a, i32 modulus) {                                        \
+        return static_cast<name>(static_cast<i32>(a) % modulus);                                   \
+    }                                                                                              \
+    inline constexpr name operator%(name a, name modulus) {                                       \
+        return static_cast<name>(static_cast<i32>(a) % static_cast<i32>(modulus));                  \
+    }                                                                                              \
+    inline constexpr name operator&(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i32>(a) & mask);                                      \
+    }                                                                                              \
+    inline name& operator+=(name& a, i32 amount) { return a = a + amount; }                        \
+    inline name& operator-=(name& a, i32 amount) { return a = a - amount; }                        \
+    inline name& operator+=(name& a, name b) { return a = a + static_cast<i32>(b); }               \
+    inline name& operator-=(name& a, name b) { return a = a - static_cast<i32>(b); }               \
+    inline name& operator%=(name& a, i32 modulus) { return a = a % modulus; }                      \
+    inline name& operator%=(name& a, name modulus) { return a = a % modulus; }                     \
+    inline name& operator++(name& a) { return a = a + 1; }                                        \
+    inline name operator++(name& a, int) { name old = a; a = a + 1; return old; }                 \
+    inline name& operator--(name& a) { return a = a - 1; }                                        \
+    inline name operator--(name& a, int) { name old = a; a = a - 1; return old; }
+
 #endif
