@@ -4206,7 +4206,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
                 -1,
                 0
             );
-            for (mapX37 = 0; mapX37 < MAP_WIDTH; mapX37++) {
+            for (mapX37 = 0; MAP_WIDTH > mapX37; mapX37++) {
                 for (mapY9 = 0; mapY9 < MAP_HEIGHT; mapY9++) {
                     currentCell5 = gpGame->m_worldMap.Row(mapY9) + mapX37;
                     currentSiteType = currentCell5->m_objectMetadata;

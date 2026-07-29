@@ -3085,38 +3085,37 @@ void army::MoveAttack(i32 destination, i32 moveOnly) {
     CombatHexDirection direction;
     hexcell* adjacentCell;
 
-    while (1) {
-        gpCombatManager->m_limitCreature = 0;
-        m_targetSide = COMBAT_SIDE_NONE;
-        m_targetIndex = -1;
-        if (!ValidHex(destination)) {
-            return;
-        }
-        if (gpCombatManager->m_hexCells[destination].m_occupantSide == COMBAT_SIDE_NONE
-            || (gpCombatManager->m_hexCells[destination].m_occupantSide
-                    == gpCombatManager->m_currentArmySide
-                && gpCombatManager->m_hexCells[destination].m_occupantIndex
-                       == gpCombatManager->m_currentArmyIndex)) {
-            goto move;
-        }
-        if (moveOnly) {
-            return;
-        }
-        m_targetSide = gpCombatManager->m_hexCells[destination].m_occupantSide;
-        m_targetIndex = gpCombatManager->m_hexCells[destination].m_occupantIndex;
-        m_moveTargetHex = destination;
-        baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
-        if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)
-            && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
-            if (m_hex != m_moveTargetHex
-                && !ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
-                return;
-            }
-            FlyTo(m_moveTargetHex);
-            continue;
-        }
-        break;
+again:
+    gpCombatManager->m_limitCreature = 0;
+    m_targetSide = COMBAT_SIDE_NONE;
+    m_targetIndex = -1;
+    if (!ValidHex(destination)) {
+        return;
     }
+    if (gpCombatManager->m_hexCells[destination].m_occupantSide == COMBAT_SIDE_NONE
+        || (gpCombatManager->m_hexCells[destination].m_occupantSide
+                == gpCombatManager->m_currentArmySide
+            && gpCombatManager->m_hexCells[destination].m_occupantIndex
+                   == gpCombatManager->m_currentArmyIndex)) {
+        goto move;
+    }
+    if (moveOnly) {
+        return;
+    }
+    m_targetSide = gpCombatManager->m_hexCells[destination].m_occupantSide;
+    m_targetIndex = gpCombatManager->m_hexCells[destination].m_occupantIndex;
+    m_moveTargetHex = destination;
+    baseAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID);
+    if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)
+        && baseAttackMask == ARMY_ALL_ATTACK_DIRECTIONS) {
+        if (m_hex != m_moveTargetHex
+            && !ValidFlight(m_moveTargetHex, ARMY_PATH_ANY_TARGET_HEX)) {
+            return;
+        }
+        FlyTo(m_moveTargetHex);
+        goto again;
+    }
+
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]) {
         targetAttackMask = GetAttackMask(m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     } else {
