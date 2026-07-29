@@ -7487,7 +7487,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
 
     sprintf(gText, DATA_COMPGEN(0x004f7bd0, createJoinFileSS, "%s%s"), DATA_COMPGEN(0x004f7bc8, createJoinFileDATA, ".\\DATA\\"), diffName);
     diffSize1 = FileSize(gText);
-    diffData5 = static_cast<u8*>(H2_ALLOC_AT(diffSize1, DATA_COMPGEN(0x004f7bd8, createJoinFileSourceFile, RETAIL_FILE), 7708));
+    diffData5 = static_cast<u8*>(H2_ALLOC_AT(diffSize1, DATA_COMPGEN(0x004f7bd8, createJoinFileSourceFile, RETAIL_FILE), createJoinFileSourceLineBase + 0xd));
     sprintf(gText, DATA_COMPGEN(0x004f7c08, createJoinFileSS2, "%s%s"), DATA_COMPGEN(0x004f7c00, createJoinFileDATA2, ".\\DATA\\"), diffName);
     diffFile2 = open(gText, _O_BINARY);
     if (diffFile2 == -1)
@@ -7495,14 +7495,14 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     read(diffFile2, diffData5, diffSize1);
     close(diffFile2);
 
-    joinData9 = static_cast<u8*>(H2_ALLOC_AT(JOIN_BUFFER_SIZE, DATA_COMPGEN(0x004f7c10, createJoinFileSourceFile2, RETAIL_FILE), 7717));
+    joinData9 = static_cast<u8*>(H2_ALLOC_AT(JOIN_BUFFER_SIZE, DATA_COMPGEN(0x004f7c10, createJoinFileSourceFile2, RETAIL_FILE), createJoinFileSourceLineBase + 0x16));
     if (diffData5[0] == 0) {
         memcpy(joinData9, diffData5 + JOIN_HEADER_SIZE, diffSize1 - JOIN_HEADER_SIZE);
         joinSize37 = diffSize1 - JOIN_HEADER_SIZE;
     } else {
         sprintf(gText, DATA_COMPGEN(0x004f7c40, createJoinFileSS3, "%s%s"), DATA_COMPGEN(0x004f7c38, createJoinFileDATA3, ".\\DATA\\"), oldName);
         oldSize10 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC_AT(oldSize10, DATA_COMPGEN(0x004f7c48, createJoinFileSourceFile3, RETAIL_FILE), 7728));
+        oldData13 = static_cast<u8*>(H2_ALLOC_AT(oldSize10, DATA_COMPGEN(0x004f7c48, createJoinFileSourceFile3, RETAIL_FILE), createJoinFileSourceLineBase + 0x21));
         sprintf(gText, DATA_COMPGEN(0x004f7c78, createJoinFileSS4, "%s%s"), DATA_COMPGEN(0x004f7c70, createJoinFileDATA4, ".\\DATA\\"), oldName);
         diffFile2 = open(gText, _O_BINARY);
         if (diffFile2 == -1)
@@ -7550,11 +7550,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     close(joinFile0);
 
     if (oldData13)
-        H2_FREE_AT(oldData13, DATA_COMPGEN(0x004f7cb0, createJoinFileSourceFile4, RETAIL_FILE), 7778);
+        H2_FREE_AT(oldData13, DATA_COMPGEN(0x004f7cb0, createJoinFileSourceFile4, RETAIL_FILE), createJoinFileSourceLineBase + 0x53);
     if (diffData5)
-        H2_FREE_AT(diffData5, DATA_COMPGEN(0x004f7cd8, createJoinFileSourceFile5, RETAIL_FILE), 7780);
+        H2_FREE_AT(diffData5, DATA_COMPGEN(0x004f7cd8, createJoinFileSourceFile5, RETAIL_FILE), createJoinFileSourceLineBase + 0x55);
     if (joinData9)
-        H2_FREE_AT(joinData9, DATA_COMPGEN(0x004f7d00, createJoinFileSourceFile6, RETAIL_FILE), 7782);
+        H2_FREE_AT(joinData9, DATA_COMPGEN(0x004f7d00, createJoinFileSourceFile6, RETAIL_FILE), createJoinFileSourceLineBase + 0x57);
 }
 
 VA(0x004854d5, 0x5d)
