@@ -5761,8 +5761,8 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
     i32 frameIndex;
     i32 month;
-    char* weekText;
-    char* dayText;
+    char* week;
+    char* day;
 
     frameIndex = 0;
     if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_NEW_TURN) {
@@ -5812,19 +5812,19 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-    weekText = static_cast<char*>(
+    week = static_cast<char*>(
         H2_ALLOC_AT(
             BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f6154, updBottomViewNewTurnSourceFile, RETAIL_FILE),
-            NEW_TURN_LINE_BASE + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
+            s_newTurnLineBase + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
         )
     );
-    sprintf(weekText, DATA_COMPGEN(0x004f6190, updBottomViewNewTurnSDSD, "%s: %d  %s: %d"), DATA_COMPGEN(0x004f6188, updBottomViewNewTurnMonth, "Month"), gpGame->m_month, DATA_COMPGEN(0x004f6180, updBottomViewNewTurnWeek, "Week"), gpGame->m_week);
+    sprintf(week, DATA_COMPGEN(0x004f6190, updBottomViewNewTurnSDSD, "%s: %d  %s: %d"), DATA_COMPGEN(0x004f6188, updBottomViewNewTurnMonth, "Month"), gpGame->m_month, DATA_COMPGEN(0x004f6180, updBottomViewNewTurnWeek, "Week"), gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_WEEK_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_WEEK_TEXT_HEIGHT,
-        weekText,
+        week,
         DATA_COMPGEN(0x004f61a0, updBottomViewNewTurnSmalfontFnt, "smalfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
@@ -5836,19 +5836,19 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
-    dayText = static_cast<char*>(
+    day = static_cast<char*>(
         H2_ALLOC_AT(
             BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f61b0, updBottomViewNewTurnSourceFile2, RETAIL_FILE),
-            NEW_TURN_LINE_BASE + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
+            s_newTurnLineBase + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
         )
     );
-    sprintf(dayText, DATA_COMPGEN(0x004f61e0, updBottomViewNewTurnSD, "%s: %d"), DATA_COMPGEN(0x004f61dc, updBottomViewNewTurnDay, "Day"), gpGame->m_day);
+    sprintf(day, DATA_COMPGEN(0x004f61e0, updBottomViewNewTurnSD, "%s: %d"), DATA_COMPGEN(0x004f61dc, updBottomViewNewTurnDay, "Day"), gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_DAY_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_DAY_TEXT_HEIGHT,
-        dayText,
+        day,
         DATA_COMPGEN(0x004f61e8, updBottomViewNewTurnBigfontFnt, "bigfont.fnt"),
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,

@@ -511,7 +511,7 @@ SOURCE/ADVMGR	?UpdBottomView@advManager@@QAEXHHH@Z	100.0000	73494a125d75
 SOURCE/ADVMGR	?UpdBottomViewEnemyTurn@advManager@@QAEHXZ	99.2903	fca61ae310fd
 SOURCE/ADVMGR	?UpdBottomViewHero@advManager@@QAEHXZ	100.0000	620cdd5cc4e3
 SOURCE/ADVMGR	?UpdBottomViewKingdom@advManager@@QAEHXZ	100.0000	81c75c644bf5
-SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	98.1593	96e172165c39
+SOURCE/ADVMGR	?UpdBottomViewNewTurn@advManager@@QAEHXZ	100.0000	303e48f12328
 SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	100.0000	bd658abf59f5
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	100.0000	13e0b2af391a
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	42645560e031
