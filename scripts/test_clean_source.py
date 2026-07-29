@@ -66,6 +66,19 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
     def test_output_has_one_final_newline(self):
         self.assertEqual(clean_source.clean("int value;\n\n"), "int value;\n")
 
+    def test_comments_are_removed_without_joining_tokens(self):
+        text = 'int/* note */value; // tail\nconst char* text = "//";\n'
+        self.assertEqual(
+            clean_source.clean(text),
+            'int value;\nconst char* text = "//";\n',
+        )
+
+    def test_multiline_comment_preserves_line_breaks(self):
+        self.assertEqual(
+            clean_source.strip_comments("left/* one\ntwo */right"),
+            "left \nright",
+        )
+
     def test_current_strict_condition_selects_typed_arm(self):
         text = (
             "#if H2_STRICT_ENUMS\n"
@@ -102,6 +115,12 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
                 clean_source.residue(output),
                 {"H2_ENUM_FUTURE": 1},
             )
+
+    def test_residue_rejects_comments(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "comment.h").write_text("int value; // note\n")
+            self.assertEqual(clean_source.residue(output), {"comment": 1})
 
 
 class CleanSourceOutputSafetyTests(unittest.TestCase):
@@ -182,6 +201,25 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             self.assertFalse(stale.exists())
             self.assertTrue((output / "include/example.h").is_file())
             self.assertTrue((output / "src/example.cpp").is_file())
+
+    def test_override_comments_are_removed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            repo = self.fixture_repo(root)
+            overrides = repo / "overrides/include"
+            overrides.mkdir(parents=True)
+            (overrides / "example.h").write_text("int value; // note\n")
+            output = repo / "build/clean"
+            with (
+                mock.patch.object(clean_source, "REPO", repo),
+                mock.patch.object(clean_source, "OVERRIDE_DIR", repo / "overrides"),
+                mock.patch.object(clean_source, "STRICT_ENUM_PATCHES", {}),
+            ):
+                clean_source.generate(output)
+            self.assertEqual(
+                (output / "include/example.h").read_text(),
+                "int value;\n",
+            )
 
 
 class CleanSourcePublishSafetyTests(unittest.TestCase):

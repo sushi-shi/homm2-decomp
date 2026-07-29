@@ -580,6 +580,31 @@ def rewrite(text: str) -> str:
     return "".join(out)
 
 
+def strip_comments(text: str) -> str:
+    """Remove comments without joining adjacent tokens."""
+    out, i, n = [], 0, len(text)
+    while i < n:
+        two = text[i:i + 2]
+        if two == "//":
+            end = text.find("\n", i + 2)
+            i = n if end < 0 else end
+            continue
+        if two == "/*":
+            end = text.find("*/", i + 2)
+            end = n if end < 0 else end + 2
+            out.append(" " + "\n" * text[i:end].count("\n"))
+            i = end
+            continue
+        end = _literal_end(text, i)
+        if end is not None:
+            out.append(text[i:end])
+            i = end
+            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
 def tidy(text: str) -> str:
     """Remove the holes left by dropped annotations."""
     lines = []
@@ -847,7 +872,7 @@ def clean(text: str, relative: str = "") -> str:
     name = relative.rsplit("/", 1)[-1] if relative else "unknown.cpp"
     text = _replace_word(text, "RETAIL_FILE", '"%s"' % name)
 
-    text = drop_integer_domain_operators(tidy(rewrite(text)))
+    text = drop_integer_domain_operators(tidy(strip_comments(rewrite(text))))
     return text.rstrip("\n") + "\n"
 
 
@@ -931,7 +956,8 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
             if path.is_file():
                 target = out_root / path.relative_to(OVERRIDE_DIR)
                 target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(path, target)
+                text = tidy(strip_comments(path.read_text())).rstrip("\n") + "\n"
+                target.write_text(text)
                 overrides += 1
 
     # A patch key that no file matched means the source moved and the patch is
@@ -964,6 +990,11 @@ def residue(out_root: Path) -> dict[str, int]:
         text = path.read_text()
         i, n = 0, len(text)
         while i < n:
+            if text[i:i + 2] in ("//", "/*"):
+                found["comment"] = found.get("comment", 0) + 1
+                end = _literal_end(text, i)
+                i = n if end is None else end
+                continue
             end = _literal_end(text, i)
             if end is not None:
                 i = end
@@ -1136,7 +1167,10 @@ def stranded(source: str, cleaned: str) -> list[tuple[int, str]]:
     legitimate empty statement: the game really does write `if (easy) ;` to
     leave a branch of an if/else chain empty.
     """
-    introduced = len(_punctuation_only(cleaned)) - len(_punctuation_only(source))
+    introduced = (
+        len(_punctuation_only(cleaned))
+        - len(_punctuation_only(strip_comments(source)))
+    )
     return _punctuation_only(cleaned)[-introduced:] if introduced > 0 else []
 
 
@@ -1196,7 +1230,7 @@ def main(argv: list[str] | None = None) -> int:
     out_root = validate_out_root(requested)
     sources, overrides, debris = generate(out_root)
     print(f"[clean] wrote {sources} transformed files "
-          f"({overrides} supplied verbatim) to {out_root}")
+          f"({overrides} supplied overrides) to {out_root}")
 
     left = residue(out_root)
     if left:
@@ -1214,7 +1248,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"          ... and {len(debris) - MAX_REPORTED} more", file=sys.stderr)
         return 1
 
-    print("[clean] no scaffolding macros or stranded punctuation remain")
+    print("[clean] no comments, scaffolding macros, or stranded punctuation remain")
 
     status = 0
     if args.verify:

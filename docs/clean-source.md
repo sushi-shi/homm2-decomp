@@ -7,7 +7,8 @@ frozen retail file/line operands threaded through every allocation, and the
 dual-build enum machinery (`H2_ENUM_*`).
 
 All of it is load-bearing for matching and none of it belongs in anything else
-built from this source. `scripts/clean_source.py` derives a tree without it.
+built from this source. Most comments also describe reconstruction evidence, so
+the generated tree omits comments entirely.
 
 ```sh
 python3 scripts/clean_source.py --out build/clean            # generate
@@ -36,15 +37,13 @@ Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to
 resolve away.
 
-The implementation is a lexer, not a set of regexes. It tracks comments and
-string and character literals, and matches balanced parentheses, so it never
-rewrites inside `".\\DATA\\HEROES2.AGG"` or a format string full of commas.
-Macro arguments are transformed recursively, innermost first, so nested
-invocations resolve in one pass.
+The lexer distinguishes comments from string and character literals, matches
+balanced parentheses, and removes comments without joining adjacent tokens.
+Macro arguments are transformed recursively, innermost first.
 
 Two self-checks run after generation and fail the run:
 
-- no scaffolding macro survives anywhere in the output;
+- no comment or scaffolding macro survives anywhere in the output;
 - no construct expanded to nothing while stranding its punctuation. A `VTBL(...)`
   used to leave a bare `;` behind. This is measured as a delta against the input,
   because a lone `;` is also legitimate — the game writes `if (easy) ;` to leave
@@ -67,6 +66,7 @@ valid output target.
 | `RETAIL_FILE`, `#line N` | deleted; `__FILE__` where a file operand remains |
 | `OD_STEER(x)`, `OR_STEER(x)` | `x` |
 | `__fastcall`, `__cdecl`, `__declspec(dllexport)`, `OVERRIDE`, `register` | deleted, or `override` |
+| `// ...`, `/* ... */` | deleted |
 
 Retail threaded a frozen source path and line number through every allocation so
 its leak tracker could name the site. The clean tree keeps the tracking and lets
