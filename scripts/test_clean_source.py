@@ -63,6 +63,9 @@ class CleanSourcePatchTests(unittest.TestCase):
 
 
 class CleanSourceCurrentEnumTests(unittest.TestCase):
+    def test_output_has_one_final_newline(self):
+        self.assertEqual(clean_source.clean("int value;\n\n"), "int value;\n")
+
     def test_current_strict_condition_selects_typed_arm(self):
         text = (
             "#if H2_STRICT_ENUMS\n"

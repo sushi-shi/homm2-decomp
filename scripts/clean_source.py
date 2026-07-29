@@ -847,7 +847,8 @@ def clean(text: str, relative: str = "") -> str:
     name = relative.rsplit("/", 1)[-1] if relative else "unknown.cpp"
     text = _replace_word(text, "RETAIL_FILE", '"%s"' % name)
 
-    return drop_integer_domain_operators(tidy(rewrite(text)))
+    text = drop_integer_domain_operators(tidy(rewrite(text)))
+    return text.rstrip("\n") + "\n"
 
 
 # --------------------------------------------------------------------------
