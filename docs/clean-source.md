@@ -21,9 +21,9 @@ python3 scripts/clean_source.py --out build/clean \
 
 Metadata and codegen-steering rules reproduce the *production* expansion of
 their macros — the expansion MSVC 4.2 already performs when building matching
-objects. The enum rules deliberately select the strict typed branch and `SIZE`
-becomes an ordinary `static_assert`. Keep the rule table and its regression tests
-in step with `include/va.h` and `include/Ints.h`.
+objects. The enum rules deliberately select the strict typed branch. Keep the
+rule table and its regression tests in step with `include/va.h` and
+`include/Ints.h`.
 
 Selecting the typed branch is the one choice the generator makes. Generated
 conversions in `GENERATED_PATCHES` bridge the few integer-only expressions
@@ -60,6 +60,7 @@ valid output target.
 | `DATA_COMPGEN(addr, name, value)` | `value` |
 | `IDX(x)`, `HAS(f,b)`, `BIT(x)` | the typed expression |
 | `VA(...)`, `DATA(...)`, `VTBL(...)` | deleted |
+| `SIZE(type, bytes)` | deleted |
 | `H2_ENUM_*` declarations and helpers | typed declarations and expressions |
 | `H2_ALLOC_AT` / `H2_FREE_AT` / `H2_ASSERT` | `H2_ALLOC(n)` / `H2_FREE(p)` / `H2_ASSERT(c)` |
 | `RETAIL_FILE`, `#line N` | deleted; `__FILE__` where a file operand remains |
