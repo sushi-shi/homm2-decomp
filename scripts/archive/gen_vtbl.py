@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""gen_vtbl.py — emit a VTBL(Class, 0xVA); census marker at the tail of each TU that owns a
+"""Archived one-time migration: emit the initial source-owned vtable census.
+
+Emit a VTBL(Class, 0xVA); census marker at the tail of each TU that owns a
 vtable (CodeView ??_7Class@@6B@ data symbols, attributed to a compiland). Vtables are
 compiler-emitted from the class's virtual methods; VTBL just records the claim so the vtable
 gate can cross-check CodeView <-> source <-> emitted objects. Idempotent. Run from repo root."""

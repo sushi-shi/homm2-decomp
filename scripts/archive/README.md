@@ -12,6 +12,10 @@ The archived `carcass_fill.py`, `gen_queue.py`, and `verify_carcass.py` belong t
 the completed placeholder/bootstrap phase. The live exhaustive residual queue is
 implemented separately and remains supported.
 
+`gen_global_decls.py`, `gen_global_defs.py`, and `gen_vtbl.py` are completed
+one-time source migration generators. Their generated marker blocks no longer
+exist.
+
 The `enum_types/` package and archived constant-taxonomy document preserve the
 completed integer-domain census. They predate `H2_ENUM_*`, private TU domains,
 and the live file-by-file `homm2 constants` audit, so they are not supported CLI

@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""gen_global_defs.py — give every CodeView-owned global a DEFINITION in its owner .cpp, so the
+"""Archived one-time migration: give every CodeView-owned global a definition in its owner .cpp.
+
+The completed source tree now carries reviewed declarations and DATA-annotated definitions. This
+script is retained only to reproduce the historical bootstrap:
+
+Every CodeView-owned global gets a DEFINITION in its owner .cpp, so the
 project links (headers only DECLARE them: plain `extern T g;`). The definition carries the address:
 `DATA(0x<VA>) T g;`, emitted in retail-RVA order in a data section at the owner .cpp's tail.
 Scalars/pointers/sized-arrays are the header decl minus `extern`; unsized `T g[]` gets its outer dim
