@@ -1160,21 +1160,20 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
         m_cursorMapY += directionY;
         cellX5 = m_cursorMapX + m_mapOriginX;
         cellY1 = m_cursorMapY + m_mapOriginY;
-        newCursorCell5 = m_mapData->GetCell(cellX5, cellY1);
+        newCursorCell5 = m_mapData->cells + m_mapData->width * cellY1 + cellX5;
         DebugCheck();
         newCursorCell5->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         if (m_previousCursorMapX != CURSOR_INVALID_POSITION) {
-            oldPreviousCell2 = m_mapData->GetCell(
-                m_previousCursorMapX + oldOriginX0,
-                m_previousCursorMapY + oldOriginY9
-            );
+            oldPreviousCell2 = m_mapData->cells
+                + m_mapData->width * (m_previousCursorMapY + oldOriginY9)
+                + (m_previousCursorMapX + oldOriginX0);
             DebugCheck();
             oldPreviousCell2->m_flags &= ~CURSOR_MAP_VISIBLE_FLAG;
             m_previousCursorMapX += directionX;
             m_previousCursorMapY += directionY;
             cellX5 = m_previousCursorMapX + m_mapOriginX;
             cellY1 = m_previousCursorMapY + m_mapOriginY;
-            newPreviousCell4 = m_mapData->GetCell(cellX5, cellY1);
+            newPreviousCell4 = m_mapData->cells + m_mapData->width * cellY1 + cellX5;
             DebugCheck();
             newPreviousCell4->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
         }
