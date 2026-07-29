@@ -534,85 +534,84 @@ void philAI::DoAllHeroInteractions(void) {
 
 VA(0x00437c61, 0x37e)
 void philAI::CheckForCreatureUpgrades(void) {
-    CreatureType upgradeType = CREATURE_NONE;
     i32 node;
-    i32 armyIndex;
-    i32 creatureIndex;
+    armyGroup* army;
+    i32 slot;
+    i32 armyNo;
     BuildingSlotType dwelling;
-    i32 canUpgrade;
-    town* townPtr;
-    armyGroup* armyPtr;
-    i32 goldCost;
-    ResourceType resourceType;
-    i32 resourceCost;
     i32 mergeIndex;
+    CreatureType newType = CREATURE_NONE;
+    i32 upgradable;
+    town* townRef;
+    ResourceType material;
+    i32 goldAmount;
+    i32 resourceAmount;
 
     for (node = 0; node < gpCurPlayer->m_townCount; node++) {
-        townPtr = gpGame->GetTown(gpCurPlayer->TownId(node));
-        for (armyIndex = 0; armyIndex < CREATURE_UPGRADE_ARMY_COUNT; armyIndex++) {
-            if (armyIndex == 0)
-                armyPtr = &townPtr->m_army;
+        townRef = gpGame->GetTown(gpCurPlayer->TownId(node));
+        for (armyNo = 0; armyNo < CREATURE_UPGRADE_ARMY_COUNT; armyNo++) {
+            if (armyNo == 0)
+                army = &townRef->m_army;
             else {
-                if (townPtr->m_occupyingHeroId == -1)
+                if (townRef->m_occupyingHeroId == -1)
                     continue;
-                else
-                    armyPtr = &gpGame->GetHero(townPtr->m_occupyingHeroId)->m_army;
+                army = &gpGame->GetHero(townRef->m_occupyingHeroId)->m_army;
             }
-            for (creatureIndex = 0; creatureIndex < ARMY_GROUP_SLOT_COUNT; creatureIndex++) {
-                if (armyPtr->m_creatureTypes[creatureIndex] == CREATURE_NONE)
+            for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
+                if (army->m_creatureTypes[slot] == CREATURE_NONE)
                     continue;
-                canUpgrade = 0;
+                upgradable = 0;
                 for (dwelling = BUILDING_SLOT_DWELLING_SECOND;
                      dwelling <= BUILDING_SLOT_DWELLING_SIXTH;
                      dwelling++) {
-                    if (gDwellingType[IDX(townPtr->m_type)]
+                    if (gDwellingType[IDX(townRef->m_type)]
                                      [IDX(dwelling) - IDX(BUILDING_SLOT_DWELLING_FIRST)]
-                            == armyPtr->m_creatureTypes[creatureIndex]
-                        && (townPtr->m_buildings
+                            == army->m_creatureTypes[slot]
+                        && (townRef->m_buildings
                             & (1 << (IDX(dwelling) + CREATURE_UPGRADE_BUILDING_OFFSET)))) {
-                        canUpgrade = 1;
-                        upgradeType = NextCreatureType(armyPtr->m_creatureTypes[creatureIndex]);
+                        upgradable = 1;
+                        newType = NextCreatureType(army->m_creatureTypes[slot]);
                     }
                 }
-                if ((armyPtr->m_creatureTypes[creatureIndex] == CREATURE_GREEN_DRAGON
-                     || armyPtr->m_creatureTypes[creatureIndex] == CREATURE_RED_DRAGON)
-                    && (townPtr->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
-                    canUpgrade = 1;
-                    upgradeType = CREATURE_BLACK_DRAGON;
+                if ((army->m_creatureTypes[slot] == CREATURE_GREEN_DRAGON
+                     || army->m_creatureTypes[slot] == CREATURE_RED_DRAGON)
+                    && (townRef->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))) {
+                    upgradable = 1;
+                    newType = CREATURE_BLACK_DRAGON;
                 }
-                if (canUpgrade) {
-                    goldCost = (gMonsterDatabase[IDX(upgradeType)].cost
-                                - gMonsterDatabase[IDX(armyPtr->m_creatureTypes[creatureIndex])].cost)
-                               * armyPtr->m_quantities[creatureIndex]
+                if (upgradable) {
+                    goldAmount = (gMonsterDatabase[IDX(newType)].cost
+                                - gMonsterDatabase[IDX(army->m_creatureTypes[slot])].cost)
+                               * army->m_quantities[slot]
                                * CREATURE_UPGRADE_RESOURCE_COST_MULTIPLIER;
-                    if (upgradeType == CREATURE_BLACK_DRAGON) {
-                        resourceType = RES_SULFUR;
-                        resourceCost = armyPtr->m_quantities[creatureIndex]
+                    if (newType == CREATURE_BLACK_DRAGON) {
+                        material = RES_SULFUR;
+                        resourceAmount = army->m_quantities[slot]
                                        * CREATURE_UPGRADE_RESOURCE_COST_MULTIPLIER;
-                    } else if (upgradeType == CREATURE_TITAN) {
-                        resourceType = RES_GEMS;
-                        resourceCost = armyPtr->m_quantities[creatureIndex]
+                    } else if (newType == CREATURE_TITAN) {
+                        material = RES_GEMS;
+                        resourceAmount = army->m_quantities[slot]
                                        * CREATURE_UPGRADE_RESOURCE_COST_MULTIPLIER;
                     } else {
-                        resourceType = RES_NONE;
-                        resourceCost = 0;
+                        material = RES_NONE;
+                        resourceAmount = 0;
                     }
-                    if (goldCost <= gpCurPlayer->m_resources[IDX(RES_GOLD)]
-                        && (resourceType == RES_NONE
-                            || resourceCost <= gpCurPlayer->m_resources[IDX(resourceType)])) {
-                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost;
-                        if (resourceType != RES_NONE)
-                            gpCurPlayer->m_resources[IDX(resourceType)] -= resourceCost;
-                        armyPtr->m_creatureTypes[creatureIndex] = upgradeType;
+                    if (goldAmount <= gpCurPlayer->m_resources[IDX(RES_GOLD)]
+                        && (material == RES_NONE
+                            || resourceAmount <= gpCurPlayer->m_resources[IDX(material)])) {
+                        gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldAmount;
+                        if (material != RES_NONE)
+                            gpCurPlayer->m_resources[IDX(material)] -= resourceAmount;
+                        army->m_creatureTypes[slot] = newType;
                         for (mergeIndex = 0; mergeIndex < ARMY_GROUP_SLOT_COUNT; mergeIndex++) {
-                            if (mergeIndex != creatureIndex
-                                && armyPtr->m_creatureTypes[mergeIndex]
-                                       == armyPtr->m_creatureTypes[creatureIndex]
-                                && armyPtr->m_quantities[mergeIndex] > 0) {
-                                armyPtr->m_quantities[mergeIndex] +=
-                                    armyPtr->m_quantities[creatureIndex];
-                                armyPtr->m_quantities[creatureIndex] = 0;
-                                armyPtr->m_creatureTypes[creatureIndex] = CREATURE_NONE;
+                            if (mergeIndex != slot
+                                && army->m_creatureTypes[mergeIndex]
+                                       == army->m_creatureTypes[slot]
+                                && army->m_quantities[mergeIndex] > 0) {
+                                army->m_quantities[mergeIndex] +=
+                                    army->m_quantities[slot];
+                                army->m_quantities[slot] = 0;
+                                army->m_creatureTypes[slot] = CREATURE_NONE;
                             }
                         }
                     }

@@ -111,3 +111,5 @@ recorded_utc	unit	symbol	src_hash	score	seed	trial	family	insertion	tag	run_dir
 2026-07-23T21:32:20+00:00	SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	ffa791e5b029	100.0000	1447119945	36	forest	target	56414c49-0036-b9bf93c5	validmove-current-forest
 2026-07-29T05:58:25+00:00	SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	464938d22dd4	99.6867	8888	1	forest	top	000022b8-0001-939b359a	command-dovic2
 2026-07-29T06:03:06+00:00	SOURCE/SMACKMGR	?SmackManagerMain@@YIXXZ	b6c4dd4b86a1	99.8963	777	13	forest	top	00000309-0013-11ba60df	smack-deep
+2026-07-29T06:34:26+00:00	SOURCE/FLY	?FlyTo@army@@QAEHH@Z	cc184d02d673	99.7503	1414	57	forest	top	00000586-0057-8ef52c14	fly-flyto
+2026-07-29T06:35:17+00:00	SOURCE/PHILAI	?CheckForCreatureUpgrades@philAI@@QAEXXZ	3cc449312877	99.5516	1414	2	forest	top	00000586-0002-8d6e71e4	philai-cfcu

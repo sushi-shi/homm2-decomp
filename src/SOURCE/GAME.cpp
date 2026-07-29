@@ -4120,8 +4120,9 @@ void game::TurnOffAIMusic(void) {
 VA(0x0047bd99, 0x596)
 void game::NextPlayer(void) {
     char scratch[NEXT_PLAYER_SCRATCH_SIZE];
-    i32 humanCount;
+    i32 remotePlayer;
     i32 index;
+    i32 humansLeft;
 
     m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags = HeroEventFlag(
         static_cast<i32>(m_heroRecs[gpCurPlayer->m_availableHeroIds[0]].m_eventFlags)
@@ -4134,10 +4135,10 @@ void game::NextPlayer(void) {
     iCurHourGlassPhase = 0;
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gConfig.autosave) {
-        humanCount = 0;
+        humansLeft = 0;
         for (index = 0; index < GAME_PLAYER_COUNT; index++) {
             if (m_playerDead[index] == 0 && gbHumanPlayer[index])
-                humanCount++;
+                humansLeft++;
         }
         SaveGame(const_cast<char*>(DATA_COMPGEN(0x004f7538, nextPlayerAUTOSAVE, "AUTOSAVE")), 1, 0);
     }
@@ -4176,7 +4177,7 @@ void game::NextPlayer(void) {
         bShowIt = 0;
         if (gbRemoteOn && gbHumanPlayer[giCurPlayer]) {
             gbThisNetGotAdventureControl = false;
-            i32 remotePlayer = gbGamePosToNetPos[giCurPlayer];
+            remotePlayer = gbGamePosToNetPos[giCurPlayer];
             if (!gpGame->TransmitSaveGame(remotePlayer, 0, 0))
                 ShutDown(NULL);
         }
