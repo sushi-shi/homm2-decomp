@@ -16,7 +16,7 @@
   14:	b9 20 00 00 00       	mov    ecx,0x20
   19:	f3 ab                	rep stos DWORD PTR es:[edi],eax
   1b:	66 8b 9c 24 a0 00 00 	mov    bx,WORD PTR [esp+0xa0]
-  22:	00 
+  22:	00
   23:	b8 01 00 00 00       	mov    eax,0x1
   28:	c6 44 24 1c 0a       	mov    BYTE PTR [esp+0x1c],0xa
   2d:	8d 4b ff             	lea    ecx,[ebx-0x1]

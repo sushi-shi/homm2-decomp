@@ -268,7 +268,7 @@
  39f:	a1 00 00 00 00       	mov    eax,ds:0x0
  3a4:	03 c3                	add    eax,ebx
  3a6:	c7 05 00 00 00 00 00 	mov    DWORD PTR ds:0x0,0x0
- 3ad:	00 00 00 
+ 3ad:	00 00 00
  3b0:	a3 00 00 00 00       	mov    ds:0x0,eax
  3b5:	a1 00 00 00 00       	mov    eax,ds:0x0
  3ba:	85 c0                	test   eax,eax

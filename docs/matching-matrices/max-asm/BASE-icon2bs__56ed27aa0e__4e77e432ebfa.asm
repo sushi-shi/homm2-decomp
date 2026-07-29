@@ -67,7 +67,7 @@
   9c:	89 44 24 10          	mov    DWORD PTR [esp+0x10],eax
   a0:	eb 08                	jmp    0xaa
   a2:	c7 44 24 10 00 00 00 	mov    DWORD PTR [esp+0x10],0x0
-  a9:	00 
+  a9:	00
   aa:	33 d2                	xor    edx,edx
   ac:	8b 44 24 10          	mov    eax,DWORD PTR [esp+0x10]
   b0:	8b 68 16             	mov    ebp,DWORD PTR [eax+0x16]

@@ -54,13 +54,13 @@
   99:	3b c1                	cmp    eax,ecx
   9b:	7f 0e                	jg     0xab
   9d:	c7 44 24 28 00 00 00 	mov    DWORD PTR [esp+0x28],0x0
-  a4:	00 
+  a4:	00
   a5:	eb 28                	jmp    0xcf
   a7:	8b 74 24 38          	mov    esi,DWORD PTR [esp+0x38]
   ab:	8b 44 24 34          	mov    eax,DWORD PTR [esp+0x34]
   af:	8b 4c 24 2c          	mov    ecx,DWORD PTR [esp+0x2c]
   b3:	c7 44 24 28 01 00 00 	mov    DWORD PTR [esp+0x28],0x1
-  ba:	00 
+  ba:	00
   bb:	03 c1                	add    eax,ecx
   bd:	48                   	dec    eax
   be:	a3 00 00 00 00       	mov    ds:0x0,eax

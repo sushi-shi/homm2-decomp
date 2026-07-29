@@ -63,7 +63,7 @@
   97:	0f bf c0             	movsx  eax,ax
   9a:	7d 0c                	jge    0xa8
   9c:	c7 44 24 10 00 00 00 	mov    DWORD PTR [esp+0x10],0x0
-  a3:	00 
+  a3:	00
   a4:	03 f8                	add    edi,eax
   a6:	eb 04                	jmp    0xac
   a8:	89 44 24 10          	mov    DWORD PTR [esp+0x10],eax

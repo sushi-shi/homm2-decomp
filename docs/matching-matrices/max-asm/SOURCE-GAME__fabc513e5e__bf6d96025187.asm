@@ -53,7 +53,7 @@
   a5:	d1 f9                	sar    ecx,1
   a7:	8b 45 ec             	mov    eax,DWORD PTR [ebp-0x14]
   aa:	c6 84 01 36 61 00 00 	mov    BYTE PTR [ecx+eax*1+0x6136],0x1
-  b1:	01 
+  b1:	01
   b2:	e9 94 ff ff ff       	jmp    0x4b
   b7:	e9 71 ff ff ff       	jmp    0x2d
   bc:	e9 00 00 00 00       	jmp    0xc1

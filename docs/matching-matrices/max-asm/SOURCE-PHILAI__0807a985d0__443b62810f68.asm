@@ -56,7 +56,7 @@
   b7:	89 45 c8             	mov    DWORD PTR [ebp-0x38],eax
   ba:	8b 45 e8             	mov    eax,DWORD PTR [ebp-0x18]
   bd:	c7 44 85 e0 00 00 00 	mov    DWORD PTR [ebp+eax*4-0x20],0x0
-  c4:	00 
+  c4:	00
   c5:	c7 45 d8 00 00 00 00 	mov    DWORD PTR [ebp-0x28],0x0
   cc:	e9 03 00 00 00       	jmp    0xd4
   d1:	ff 45 d8             	inc    DWORD PTR [ebp-0x28]
@@ -230,7 +230,7 @@
  322:	8b 45 d8             	mov    eax,DWORD PTR [ebp-0x28]
  325:	8b 4d dc             	mov    ecx,DWORD PTR [ebp-0x24]
  328:	0f be 84 08 d5 00 00 	movsx  eax,BYTE PTR [eax+ecx*1+0xd5]
- 32f:	00 
+ 32f:	00
  330:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
  333:	83 7d f0 ff          	cmp    DWORD PTR [ebp-0x10],0xffffffff
  337:	0f 84 17 00 00 00    	je     0x354

@@ -26,7 +26,7 @@
   3d:	8b 80 af f2 00 00    	mov    eax,DWORD PTR [eax+0xf2af]
   43:	8b 4d e4             	mov    ecx,DWORD PTR [ebp-0x1c]
   46:	83 bc 81 87 32 00 00 	cmp    DWORD PTR [ecx+eax*4+0x3287],0x0
-  4d:	00 
+  4d:	00
   4e:	0f 84 25 00 00 00    	je     0x79
   54:	6a 35                	push   0x35
   56:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
@@ -60,7 +60,7 @@
   bf:	2b c8                	sub    ecx,eax
   c1:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
   c4:	0f be 84 01 24 05 00 	movsx  eax,BYTE PTR [ecx+eax*1+0x524]
-  cb:	00 
+  cb:	00
   cc:	83 f8 ff             	cmp    eax,0xffffffff
   cf:	0f 85 25 00 00 00    	jne    0xfa
   d5:	8b 45 e8             	mov    eax,DWORD PTR [ebp-0x18]
@@ -103,7 +103,7 @@
  148:	2b c1                	sub    eax,ecx
  14a:	8b 4d e4             	mov    ecx,DWORD PTR [ebp-0x1c]
  14d:	0f be 84 08 25 05 00 	movsx  eax,BYTE PTR [eax+ecx*1+0x525]
- 154:	00 
+ 154:	00
  155:	8b c8                	mov    ecx,eax
  157:	c1 e0 03             	shl    eax,0x3
  15a:	8d 04 c0             	lea    eax,[eax+eax*8]
@@ -116,7 +116,7 @@
  16e:	2b ca                	sub    ecx,edx
  170:	8b 55 e4             	mov    edx,DWORD PTR [ebp-0x1c]
  173:	0f be 8c 11 24 05 00 	movsx  ecx,BYTE PTR [ecx+edx*1+0x524]
- 17a:	00 
+ 17a:	00
  17b:	8b d1                	mov    edx,ecx
  17d:	c1 e1 06             	shl    ecx,0x6
  180:	2b ca                	sub    ecx,edx
@@ -131,7 +131,7 @@
  19a:	89 45 f0             	mov    DWORD PTR [ebp-0x10],eax
  19d:	8b 45 f0             	mov    eax,DWORD PTR [ebp-0x10]
  1a0:	81 88 d0 00 00 00 00 	or     DWORD PTR [eax+0xd0],0x800
- 1a7:	08 00 00 
+ 1a7:	08 00 00
  1aa:	8b 45 e4             	mov    eax,DWORD PTR [ebp-0x1c]
  1ad:	8b 80 af f2 00 00    	mov    eax,DWORD PTR [eax+0xf2af]
  1b3:	8b 4d e4             	mov    ecx,DWORD PTR [ebp-0x1c]

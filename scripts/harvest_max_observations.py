@@ -46,7 +46,7 @@ def disassemble(text_hex: str) -> str:
         cut = text.find("<.data>:")
         if cut != -1:
             text = text[text.index("\n", cut) + 1:]
-        return text
+        return "\n".join(ln.rstrip() for ln in text.splitlines()) + "\n"
     finally:
         tmp.unlink(missing_ok=True)
 

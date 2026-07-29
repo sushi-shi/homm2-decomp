@@ -167,7 +167,7 @@
  248:	8b 45 dc             	mov    eax,DWORD PTR [ebp-0x24]
  24b:	8b 4d c0             	mov    ecx,DWORD PTR [ebp-0x40]
  24e:	83 bc 81 87 32 00 00 	cmp    DWORD PTR [ecx+eax*4+0x3287],0x0
- 255:	00 
+ 255:	00
  256:	0f 84 33 00 00 00    	je     0x28f
  25c:	6a 59                	push   0x59
  25e:	8b 45 dc             	mov    eax,DWORD PTR [ebp-0x24]
