@@ -61,6 +61,15 @@ class CleanSourcePatchTests(unittest.TestCase):
                     expected,
                 )
 
+    def test_menu_handles_use_the_windows_type(self):
+        source = "#include <Ints.h>\n" + "\n".join(
+            f"extern void* {name};"
+            for name in ("hmnuAdv", "hmnuCmbt", "hmnuDflt", "hmnuTown")
+        )
+        result = clean_source.apply_patches("include/SOURCE/KB.h", source)
+        self.assertNotIn("void*", result)
+        self.assertEqual(result.count("extern HMENU"), 4)
+
 
 class CleanSourceCurrentEnumTests(unittest.TestCase):
     def test_output_has_one_final_newline(self):
@@ -71,6 +80,18 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
         self.assertEqual(
             clean_source.clean(text),
             'int value;\nconst char* text = "//";\n',
+        )
+
+    def test_windows_intrinsic_collisions_are_renamed(self):
+        self.assertEqual(
+            clean_source.clean("BitTest(bits, index);\n"),
+            "H2BitTest(bits, index);\n",
+        )
+
+    def test_windows_calling_conventions_are_preserved(self):
+        self.assertEqual(
+            clean_source.clean("void __stdcall callback();\n"),
+            "void __stdcall callback();\n",
         )
 
     def test_multiline_comment_preserves_line_breaks(self):
@@ -194,13 +215,23 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             with (
                 mock.patch.object(clean_source, "REPO", repo),
                 mock.patch.object(clean_source, "OVERRIDE_DIR", repo / "overrides"),
-                mock.patch.object(clean_source, "STRICT_ENUM_PATCHES", {}),
+                mock.patch.object(clean_source, "GENERATED_PATCHES", {}),
             ):
                 sources, overrides, debris = clean_source.generate(output)
             self.assertEqual((sources, overrides, debris), (2, 0, []))
             self.assertFalse(stale.exists())
             self.assertTrue((output / "include/example.h").is_file())
             self.assertTrue((output / "src/example.cpp").is_file())
+            ninja = (output / "build.ninja").read_text()
+            self.assertIn("cxx = clang++", ninja)
+            self.assertIn("--target=i686-w64-windows-gnu", ninja)
+            self.assertIn(
+                "build $builddir/obj/example.o: cxx src/example.cpp",
+                ninja,
+            )
+            self.assertIn("build $builddir/HEROES2W.EXE: link", ninja)
+            self.assertIn("default game", ninja)
+            self.assertTrue((output / "imports/MSS32.def").is_file())
 
     def test_override_comments_are_removed(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -213,7 +244,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             with (
                 mock.patch.object(clean_source, "REPO", repo),
                 mock.patch.object(clean_source, "OVERRIDE_DIR", repo / "overrides"),
-                mock.patch.object(clean_source, "STRICT_ENUM_PATCHES", {}),
+                mock.patch.object(clean_source, "GENERATED_PATCHES", {}),
             ):
                 clean_source.generate(output)
             self.assertEqual(
@@ -243,8 +274,11 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
         )
         (output / "include").mkdir()
         (output / "src").mkdir()
+        (output / "imports").mkdir()
         (output / "include/example.h").write_text("#pragma once\n")
         (output / "src/example.cpp").write_text("int generated_value;\n")
+        (output / "imports/example.def").write_text("EXPORTS\n")
+        (output / "build.ninja").write_text("build objects: phony\n")
         return repo, output
 
     def test_publish_refuses_a_non_generated_branch(self):
@@ -294,7 +328,8 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
             git(repo, "branch", "clean")
             git(repo, "switch", "clean")
             (repo / "src/example.cpp").write_text("int generated_value;\n")
-            git(repo, "add", "src/example.cpp")
+            (repo / "build.ninja").write_text("build objects: phony\n")
+            git(repo, "add", "build.ninja", "src/example.cpp")
             git(
                 repo,
                 "commit",
@@ -314,9 +349,18 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
 
 
 class CleanSourceVerifyTests(unittest.TestCase):
-    def test_verify_requires_compatibility_headers(self):
-        with self.assertRaises(SystemExit):
-            clean_source.main(["--verify"])
+    def test_verify_runs_generated_ninja_build(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            with mock.patch(
+                "subprocess.run",
+                return_value=subprocess.CompletedProcess([], 0),
+            ) as run:
+                self.assertEqual(clean_source.verify(output), 0)
+            run.assert_called_once_with(
+                ("ninja", "-C", str(output), "game"),
+                check=False,
+            )
 
 
 if __name__ == "__main__":
