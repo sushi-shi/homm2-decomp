@@ -646,7 +646,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	98.4215	af1276450598
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	58fbedc1ff1c
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	100.0000	40cb0bfcfaf0
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	100.0000	a91a8b1e062d
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.3295	e30e9e191719
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.6867	464938d22dd4
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	100.0000	d32f8fa0b779
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	a1ba6769f25b
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	100.0000	888595803e2c
@@ -680,7 +680,7 @@ SOURCE/CURSOR	?MoveHero@advManager@@QAEPAVmapCell@@HHPAH00H0H@Z	97.3010	65035bd2
 SOURCE/CURSOR	?MoveOrigin@advManager@@QAEXHH@Z	99.3704	b55f4d382b6d
 SOURCE/CURSOR	?ProcessIncomingGroupMapChange@advManager@@QAEXPAD@Z	100.0000	8fae25eb5921
 SOURCE/CURSOR	?ProcessIncomingSingleMapChange@advManager@@QAEXPAUSMapChange@@@Z	100.0000	c1ff9e8eeab8
-SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	99.5936	5904b904a7b0
+SOURCE/CURSOR	?ProcessMapChange@advManager@@QAEXUSMapChange@@@Z	100.0000	880c89c023c1
 SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	100.0000	3c3e0517398e
 SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	e27ea2ea0baa
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	100.0000	c28caa0e307f

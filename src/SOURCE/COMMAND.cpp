@@ -2163,10 +2163,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     m_heroes[IDX(winningSide)]->m_spells[IDX(m_eagleEyeSpell[IDX(winningSide)])] = 1;
                 }
                 m_experienceValue[IDX(OppositeCombatResult(winningSide))] =
-                    ExperienceValueOfStack(
-                        winningSide == COMBAT_RESULT_ATTACKER ? COMBAT_DEFENDER_SIDE
-                                                             : COMBAT_ATTACKER_SIDE
-                    );
+                    ExperienceValueOfStack(IDX(OppositeCombatResult(winningSide)));
                 if (gbRetreatWin != 0)
                     m_experienceValue[IDX(OppositeCombatResult(winningSide))] -=
                         COMBAT_HERO_EXPERIENCE_VALUE;
