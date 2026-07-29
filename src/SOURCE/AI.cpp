@@ -817,7 +817,7 @@ i32 combatManager::GetClosestArmy(
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
         if ((bit1 & mask) != 0) {
-            target26 = &armyIndex2[m_armies[IDX(side)]];
+            target26 = &m_armies[IDX(side)][armyIndex2];
             value19 = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
