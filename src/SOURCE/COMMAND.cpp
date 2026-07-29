@@ -1274,6 +1274,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                                 command = COMBAT_MESSAGE_COMMAND_DEFAULT;
                             }
                         }
+                        break;
                 }
             } else {
                 if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].ValidPath(
@@ -2055,21 +2056,21 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
 
 VA(0x0042ec8b, 0xba9)
 void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
-    CombatSide side;
-    i32 lastLivingArmy0;
-    i32 experienceLevels = 0;
+    char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
+    i32 emptySlots;
+    i32 living;
+    i32 fadeCount;
+    i32 timer;
+    i32 i;
+    i32 necroEligible;
     i32 cost;
     i32 fadeIndex26;
     army* currentArmy26;
     tag_message message;
+    i32 victoryLevels = 0;
+    CombatSide combatSide;
     i32 deadCreatureCount3;
-    i32 emptyArtifactSlots;
-    i32 armyIndex9;
-    char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
-    i32 livingCreatureCount7;
-    i32 fadeTimer18;
-    i32 fadeCount17;
-    i32 eligibleWinnerStacks;
+    i32 lastLivingArmy0;
 
     if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
         m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = NULL;
@@ -2081,42 +2082,39 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     iCurTransferArtifact = -1;
     bSkeletonsShown = 0;
     deadCreatureCount3 = 0;
-    eligibleWinnerStacks = 0;
+    necroEligible = 0;
 
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        livingCreatureCount7 = 0;
+    for (combatSide = COMBAT_ATTACKER_SIDE; IDX(combatSide) < COMBAT_SIDE_COUNT; ++combatSide) {
+        living = 0;
         lastLivingArmy0 = -1;
-        for (armyIndex9 = 0; armyIndex9 < gpCombatManager->m_armyCount[IDX(side)]; ++armyIndex9) {
-            currentArmy26 = IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT
-                           + &m_armies[IDX(COMBAT_ATTACKER_SIDE)][armyIndex9];
+        for (i = 0; i < gpCombatManager->m_armyCount[IDX(combatSide)]; ++i) {
+            currentArmy26 = &m_armies[IDX(combatSide)][i];
             if (currentArmy26->m_quantity > 0) {
-                lastLivingArmy0 = armyIndex9;
+                lastLivingArmy0 = i;
                 if (currentArmy26->m_temporaryResurrectionQuantity > 0)
                     currentArmy26->m_quantity -= currentArmy26->m_temporaryResurrectionQuantity;
                 if (currentArmy26->m_quantity < 0)
                     currentArmy26->m_quantity = 0;
-                livingCreatureCount7 += currentArmy26->m_quantity;
+                living += currentArmy26->m_quantity;
             }
-            if (CombatResultForSide(side) == winningSide && currentArmy26->m_quantity > 0
+            if (CombatResultForSide(combatSide) == winningSide && currentArmy26->m_quantity > 0
                 && HAS(currentArmy26->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
                 && currentArmy26->m_monsterType != CREATURE_EARTH_ELEMENTAL
                 && currentArmy26->m_monsterType != CREATURE_AIR_ELEMENTAL
                 && currentArmy26->m_monsterType != CREATURE_FIRE_ELEMENTAL
                 && currentArmy26->m_monsterType != CREATURE_WATER_ELEMENTAL
                 && currentArmy26->m_monsterType != CREATURE_GHOST) {
-                ++eligibleWinnerStacks;
+                ++necroEligible;
             }
-            if (winningSide == OppositeCombatResult(CombatResultForSide(side))) {
+            if (winningSide == OppositeCombatResult(CombatResultForSide(combatSide))) {
                 deadCreatureCount3 += currentArmy26->m_initialQuantity - currentArmy26->m_quantity;
             }
         }
-        if (livingCreatureCount7 == 0 && lastLivingArmy0 != -1)
-            (IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT
-             + &m_armies[IDX(COMBAT_ATTACKER_SIDE)][lastLivingArmy0])
-                ->m_quantity = 1;
+        if (living == 0 && lastLivingArmy0 != -1)
+            m_armies[IDX(combatSide)][lastLivingArmy0].m_quantity = 1;
     }
 
-    if (winningSide != COMBAT_RESULT_DRAW && eligibleWinnerStacks < VICTORY_NECROMANCY_STACK_LIMIT
+    if (winningSide != COMBAT_RESULT_DRAW && necroEligible < VICTORY_NECROMANCY_STACK_LIMIT
         && m_heroes[IDX(winningSide)] != NULL
         && m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         giSkeletonsCreated = static_cast<i32>(
@@ -2132,14 +2130,14 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     FreeArmies();
     CombatMessage(DATA_COMPGEN(0x004f0de8, doVictoryEmptyString, ""), 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
-    fadeCount17 = VICTORY_FADE_STEPS;
+    fadeCount = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
-        fadeCount17 = VICTORY_WASTELAND_FADE_STEPS;
-    fadeTimer18 = KBTickCount();
-    for (fadeIndex26 = 0; fadeCount17 > fadeIndex26; ++fadeIndex26) {
+        fadeCount = VICTORY_WASTELAND_FADE_STEPS;
+    timer = KBTickCount();
+    for (fadeIndex26 = 0; fadeCount > fadeIndex26; ++fadeIndex26) {
         PollSound();
-        DelayTil(&fadeTimer18);
-        fadeTimer18 = KBTickCount() + VICTORY_FADE_DELAY;
+        DelayTil(&timer);
+        timer = KBTickCount() + VICTORY_FADE_DELAY;
         DimBitmapArea(
             gpWindowManager->m_screen,
             0,
@@ -2176,20 +2174,20 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     && winningSide == COMBAT_RESULT_ATTACKER)
                     m_experienceValue[IDX(OppositeCombatResult(winningSide))] +=
                         COMBAT_HERO_EXPERIENCE_VALUE;
-                experienceLevels = gpAdvManager->GiveExperience(
+                victoryLevels = gpAdvManager->GiveExperience(
                     m_heroes[IDX(winningSide)],
                     m_experienceValue[IDX(OppositeCombatResult(winningSide))],
                     gbThisNetHumanPlayer[m_heroes[IDX(winningSide)]->m_owner] == 0
                 );
 
                 if (gbRetreatWin == 0) {
-                    emptyArtifactSlots = 0;
+                    emptySlots = 0;
                     if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
                         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
                         for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex26) {
                             if (m_heroes[IDX(winningSide)]->m_artifacts[fadeIndex26]
                                 == ARTIFACT_NONE) {
-                                ++emptyArtifactSlots;
+                                ++emptySlots;
                             }
                         }
                         for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex26) {
@@ -2198,7 +2196,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                                 && m_heroes[IDX(OppositeCombatResult(winningSide))]
                                            ->m_artifacts[fadeIndex26]
                                        != ARTIFACT_MAGIC_BOOK
-                                && emptyArtifactSlots > iMaxTransferArtifacts) {
+                                && emptySlots > iMaxTransferArtifacts) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
                                     m_heroes[IDX(OppositeCombatResult(winningSide))]
                                         ->m_artifacts[fadeIndex26];
@@ -2236,14 +2234,14 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     } else {
                         sprintf(gText, cBattleResults[IDX(RESULT_TEXT_VICTORY)]);
                     }
-                    if (experienceLevels > 0 && winningSide == COMBAT_RESULT_DEFENDER
+                    if (victoryLevels > 0 && winningSide == COMBAT_RESULT_DEFENDER
                         && giNumHumanPlayers > 1) {
                         sprintf(
                             experienceText,
                             cBattleResults[IDX(RESULT_TEXT_NETWORK_EXPERIENCE)],
                             m_heroes[IDX(winningSide)]->m_name,
                             m_experienceValue[IDX(OppositeCombatResult(winningSide))],
-                            experienceLevels
+                            victoryLevels
                         );
                     } else {
                         sprintf(
