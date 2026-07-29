@@ -1099,6 +1099,6 @@ DATA(0x004f4f28) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUN
 // NOLINTEND(readability-magic-numbers)
 DATA(0x004f4f90) class heroWindow* campWin = NULL;
 DATA(0x00527ea4) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-DATA(0x00527ea8) H2_ENUM_STORAGE(CampaignTrackType, i32) iCampaignTrackType;
+DATA(0x00527ea8) CampaignTrackType iCampaignTrackType;
 DATA(0x00527eac) i32 bCampaignViewOnly;
 DATA(0x00527eb0) i32 iCurViewMap;

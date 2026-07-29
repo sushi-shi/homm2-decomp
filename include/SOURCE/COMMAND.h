@@ -30,7 +30,7 @@ struct CombatRemotePacket {
     H2_ENUM_STORAGE(RemoteMessageType, i8) type;
     i8 command;
     char reserved7[COMBAT_REMOTE_PACKET_BODY_RESERVED_SIZE];
-    H2_ENUM_STORAGE(CombatAction, i32) nextAction;
+    CombatAction nextAction;
     i32 nextActionExtra;
     i32 nextActionGridIndex;
     i32 nextActionGridIndex2;

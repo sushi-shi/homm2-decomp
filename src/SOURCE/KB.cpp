@@ -6619,7 +6619,7 @@ DATA(0x004fbb30) i32 giScrollX = 0;
 DATA(0x004fbb34) i32 giScrollY = 0;
 DATA(0x004fbb38) b32 gbNoBorder = false;
 DATA(0x004fbb3c) b32 gbEnlargeScreenBlit = true;
-DATA(0x004fbb40) H2_ENUM_STORAGE(ConfigExecutable, i32) giCurExe = CONFIG_EXECUTABLE_GAME;
+DATA(0x004fbb40) ConfigExecutable giCurExe = CONFIG_EXECUTABLE_GAME;
 DATA(0x004fbb44) b32 gbInDialog = false;
 DATA(0x004fbb48) struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
@@ -7142,7 +7142,7 @@ DATA(0x004fc538) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10,
                                                              10, 10, 10, 10, 10, 16, 16, 14,
                                                              19, 22, 10, 17, 10, 12, 11, 16};
 DATA(0x004fc558)
-H2_ENUM_STORAGE(SpellEffectDisplayType, i32)
+SpellEffectDisplayType
 giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 DATA(0x004fc560) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
 DATA(0x004fc568) char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
@@ -10057,11 +10057,11 @@ DATA(0x00500138) b32 gbComputeExtent = false;
 DATA(0x0050013c) b32 gbSaveBiggestExtent = false;
 DATA(0x00500140) b32 gbLimitToExtent = false;
 DATA(0x00500144) b32 gbCurrArmyDrawn = true;
-DATA(0x00500148) H2_ENUM_STORAGE(AdventureDisposeLevel, i32) gAdvDisposeLevel = ADV_DISPOSE_NONE;
+DATA(0x00500148) AdventureDisposeLevel gAdvDisposeLevel = ADV_DISPOSE_NONE;
 DATA(0x0050014c) b32 gbRemoteOn = false;
 DATA(0x00500150) b32 gbGameInitialized = false;
 DATA(0x00500154) i32 giHighScoreRank = -1;
-DATA(0x00500158) H2_ENUM_STORAGE(HighScoreType, i32) giHighScoreType = HIGH_SCORE_STANDARD;
+DATA(0x00500158) HighScoreType giHighScoreType = HIGH_SCORE_STANDARD;
 DATA(0x0050015c) b32 gbShowHighScore = false;
 DATA(0x00500160) b32 gbLowMemory = false;
 DATA(0x00500164) i32 giHighMemBuffer = CHECK_MEMORY_INITIAL_AVAILABLE_KB;
@@ -10137,7 +10137,7 @@ DATA(0x00528980) MultiplayerBaseType iMPBaseType;
 DATA(0x00528984) b32 gbTCPFirstTime;
 DATA(0x00528988) i16* pwSizeOfMapExtra;
 DATA(0x0052898c) i32 giHeroScreenSrcIndex;
-DATA(0x00528990) H2_ENUM_STORAGE(CalendarPeriodType, i32) giWeekType;
+DATA(0x00528990) CalendarPeriodType giWeekType;
 DATA(0x00528998) char gText[GLOBAL_TEXT_BUFFER_SIZE];
 DATA(0x00528c98) b32 gbInNewGameSetup;
 DATA(0x00528c9c) class palette* gpBufferPalette;
@@ -10190,7 +10190,7 @@ DATA(0x005295e4) executive* gpExec;
 DATA(0x005295e8) void* hMainWindow;
 DATA(0x005295ec) i32 giCurWindowsStyleFlags;
 DATA(0x005295f0) i32 gGameCommand;
-DATA(0x005295f4) H2_ENUM_STORAGE(CalendarPeriodType, i32) giMonthType;
+DATA(0x005295f4) CalendarPeriodType giMonthType;
 DATA(0x005295f8) char* DEFAULT_AGGREGATE_NAME;
 DATA(0x005295fc) i32 gCurSpellEffectFrame;
 DATA(0x00529600) b8 gbThisNetHumanPlayer[RADAR_OWNER_COLOR_COUNT];

@@ -17,7 +17,7 @@ public:
     icon* m_icon;
     i16 m_normalFrame;
     i16 m_pressedFrame;
-    H2_ENUM_STORAGE(ButtonSelectMode, i16) m_selectMode;
+    ButtonSelectMode m_selectMode;
     i16 m_hotkey;
     u32l m_iconId;
     button(void);

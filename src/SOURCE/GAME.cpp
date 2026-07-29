@@ -4429,9 +4429,7 @@ void game::PerDay(void) {
         if (currentHero6->m_spellPoints < restoredSpellPoints13)
             currentHero6->m_spellPoints = static_cast<i16>(restoredSpellPoints13);
         if (HAS(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL))
-            currentHero6->m_eventFlags = HeroEventFlag(
-                static_cast<i32>(currentHero6->m_eventFlags) - IDX(HERO_EVENT_MAGIC_WELL)
-            );
+            H2_ENUM_CLEAR_FLAG(currentHero6->m_eventFlags, HERO_EVENT_MAGIC_WELL);
     }
 
     for (player = 0; player < GAME_TOWN_COUNT; player++) {
@@ -4694,7 +4692,7 @@ void game::PerWeek(void) {
     for (outerIndex5 = 0; outerIndex5 < GAME_HERO_COUNT; outerIndex5++) {
         weeklyHero4 = &m_heroRecs[outerIndex5];
         if (HAS(weeklyHero4->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
-            weeklyHero4->m_eventFlags = weeklyHero4->m_eventFlags - WEEKLY_HERO_VISIT_FLAG;
+            H2_ENUM_CLEAR_FLAG(weeklyHero4->m_eventFlags, WEEKLY_HERO_VISIT_FLAG);
     }
 
     m_week++;

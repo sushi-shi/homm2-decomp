@@ -662,7 +662,7 @@ DATA(0x004ef808) i32 bInDPSD = 0;
 DATA(0x004ef80c) i32 iGUIDCount = 0;
 DATA(0x004ef810) i32 iLastMsgNumHumanPlayers = 1;
 DATA(0x00525060) i32 iMaxSession;
-DATA(0x00525064) H2_ENUM_STORAGE(DirectPlayHostAcceptStatus, i32) giHostAcceptStatus;
+DATA(0x00525064) DirectPlayHostAcceptStatus giHostAcceptStatus;
 DATA(0x00525068) struct _GUID* g_lpGuid;
 DATA(0x00525070) i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 DATA(0x00525088) i32 iSessionToTry;
