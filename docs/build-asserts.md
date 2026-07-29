@@ -56,11 +56,12 @@ functions follow the separate source-private `VA` inventory described above.
 - every `DATA()` VA is **unique** (one VA == one definition).
 
 Rationale for def-not-extern: the VA describes *storage*, which the definition owns; a caller that
-`#include`s the header sees the plain `extern` and never a duplicated address. The one-time
-migration is complete; `gen_global_defs.py` emits `DATA(VA) T g;`. Anonymous or synthetic
-storage without a retained public symbol is a `DATA(VA) static T g;` definition in the sole owning
-module. A real cross-TU external necessarily has a retained public symbol and uses its owner header;
-def-less synthetic externs are rejected.
+`#include`s the header sees the plain `extern` and never a duplicated address. The completed
+migration emitted `DATA(VA) T g;`; its generator is archived as
+`scripts/archive/gen_global_defs.py`. Anonymous or synthetic storage without a retained public
+symbol is a `DATA(VA) static T g;` definition in the sole owning module. A real cross-TU external
+necessarily has a retained public symbol and uses its owner header; def-less synthetic externs are
+rejected.
 
 ### 5. `assert_defs_declared` — every definition has a header declaration
 Every free function **defined** in a `.cpp` is **declared** in that TU's owner header
@@ -72,8 +73,8 @@ bootstrapped by `gen_module_header.py`.
 ### 6. `assert_globals_defined` — link-completeness
 Every global **declared** `extern` in a header has a **definition** in its owner TU's object
 (symbol defined, section > 0, in `build/objdiff/base/<owner>.obj`) — so the project has no
-unresolved externals and can link. Only the `_const` pseudo-unit is exempt. Definitions are generated
-by `gen_global_defs.py` (`DATA(VA) T g;` in retail-RVA order; the header keeps a plain `extern`).
+unresolved externals and can link. Only the `_const` pseudo-unit is exempt. The completed migration
+generated definitions in retail-RVA order; current definitions are maintained in source.
 
 ### 7. `assert_vtables` — source-owned vtable census
 Primary vtables use `VTBL(Class, 0xVA)`, which reconstructs the MSVC identity

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""gen_global_decls.py — EAGER global declarations.
+"""Archived one-time migration: eager global declarations.
 
 Every CodeView-owned data symbol gets a plain `extern <type> <name>;` in its owner header UP FRONT
 (the DATA(<VA>) lives on the .cpp DEFINITION — see gen_global_defs.py), so matching a TU never
