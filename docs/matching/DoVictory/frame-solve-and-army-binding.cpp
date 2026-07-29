@@ -21,3 +21,14 @@
 // `break;` — retail emits jmp;jmp (case break + switch fallout). Adding the
 // break closed the function EXACT at the clean state (93.82 -> 100), the
 // od-goto-stub `default:break`-family lever.
+//
+// 2026-07-29 later pass (build/dovic4-axes.json): the 1-byte deficit was the
+// loser-side argument to ExperienceValueOfStack — retail computes it as
+// OppositeCombatResult(winningSide), which under the retail build is the
+// macro (COMBAT_RESULT_DEFENDER - result) = `mov eax,1; sub eax,[esp+8]`;
+// the literal ternary compiled to the cmp/sbb/neg bool. Integrated
+// IDX(OppositeCombatResult(winningSide)); first-divergence is now NONE with
+// 121/121 blocks at 99.687. dovic3/dovic5 measured rejections: reversed
+// subscript, flat index-first, row+index pointer sums — the m_armies term
+// order canonicalizes in every spelling; the one remaining cluster is the
+// at-state index/side evaluation-order mirror (island only).
