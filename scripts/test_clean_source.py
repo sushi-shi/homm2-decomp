@@ -119,6 +119,18 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
             "((flags) &= ~(FLAG_A))",
         )
 
+    def test_flag_operators_stay_compact(self):
+        self.assertEqual(
+            clean_source.rewrite("H2_ENUM_FLAGS(MessageType)"),
+            "ENABLE_ENUM_FLAGS(MessageType)",
+        )
+
+    def test_step_operators_stay_compact(self):
+        self.assertEqual(
+            clean_source.rewrite("H2_ENUM_STEPPED(CreatureType)"),
+            "ENABLE_ENUM_STEPS(CreatureType)",
+        )
+
     def test_size_annotations_are_removed(self):
         self.assertEqual(
             clean_source.clean(
