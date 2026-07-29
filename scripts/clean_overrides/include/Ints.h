@@ -1,0 +1,279 @@
+// Fixed-width integers and enum-field storage.
+#ifndef HOMM2_INTS_H
+#define HOMM2_INTS_H
+
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
+
+typedef std::int8_t i8;
+typedef std::uint8_t u8;
+typedef std::int16_t i16;
+typedef std::uint16_t u16;
+typedef std::int32_t i32;
+typedef std::uint32_t u32;
+typedef std::int64_t i64;
+typedef std::uint64_t u64;
+
+// Keep `long` distinct where its type identity matters.
+typedef long i32l;
+typedef unsigned long u32l;
+
+// Integer-valued booleans with fixed storage.
+typedef i32 b32;
+typedef i8 b8;
+
+// Values accepted beside a stored enum domain.
+template <typename T>
+inline constexpr bool H2IsMaskLike = std::is_integral_v<T> || std::is_enum_v<T>;
+
+template <typename T>
+constexpr long long H2MaskValue(T value) {
+    return static_cast<long long>(value);
+}
+
+// An enum value with explicit field storage.
+template <typename Enum, typename Storage>
+class H2EnumStorage {
+public:
+    H2EnumStorage() = default;
+    constexpr H2EnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
+    constexpr H2EnumStorage(Storage value) : m_value(value) {}
+
+    template <typename OtherStorage>
+    constexpr H2EnumStorage(H2EnumStorage<Enum, OtherStorage> value)
+        : m_value(static_cast<Storage>(static_cast<Enum>(value))) {}
+
+    constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+
+    // Integer conversion stays explicit.
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    explicit constexpr operator Integer() const {
+        return static_cast<Integer>(static_cast<Enum>(m_value));
+    }
+
+    H2EnumStorage& operator=(Enum value) {
+        m_value = static_cast<Storage>(value);
+        return *this;
+    }
+
+    H2EnumStorage& operator=(Storage value) {
+        m_value = value;
+        return *this;
+    }
+
+    template <typename OtherStorage>
+    H2EnumStorage& operator=(H2EnumStorage<Enum, OtherStorage> value) {
+        m_value = static_cast<Storage>(static_cast<Enum>(value));
+        return *this;
+    }
+
+    H2EnumStorage& operator|=(Enum value) {
+        m_value = static_cast<Storage>(m_value | static_cast<Storage>(value));
+        return *this;
+    }
+
+    H2EnumStorage& operator&=(Enum value) {
+        m_value = static_cast<Storage>(m_value & static_cast<Storage>(value));
+        return *this;
+    }
+
+    H2EnumStorage& operator^=(Enum value) {
+        m_value = static_cast<Storage>(m_value ^ static_cast<Storage>(value));
+        return *this;
+    }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator|=(Integer mask) {
+        m_value = static_cast<Storage>(m_value | mask);
+        return *this;
+    }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator&=(Integer mask) {
+        m_value = static_cast<Storage>(m_value & mask);
+        return *this;
+    }
+
+    // Some domains are stepped in place.
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator+=(Integer amount) {
+        m_value = static_cast<Storage>(m_value + H2MaskValue(amount));
+        return *this;
+    }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator-=(Integer amount) {
+        m_value = static_cast<Storage>(m_value - H2MaskValue(amount));
+        return *this;
+    }
+
+    H2EnumStorage& operator++() {
+        ++m_value;
+        return *this;
+    }
+
+    H2EnumStorage operator++(int) {
+        H2EnumStorage previous = *this;
+        ++m_value;
+        return previous;
+    }
+
+    // Numeric view for mixed operations.
+    constexpr i64 value() const { return static_cast<i64>(m_value); }
+
+private:
+    Storage m_value;
+};
+
+template <typename Enum, typename Storage>
+constexpr bool operator==(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return static_cast<Enum>(lhs) == rhs;
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator==(Enum lhs, H2EnumStorage<Enum, Storage> rhs) {
+    return lhs == static_cast<Enum>(rhs);
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator!=(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Enum, typename Storage>
+constexpr bool operator!=(Enum lhs, H2EnumStorage<Enum, Storage> rhs) {
+    return !(lhs == rhs);
+}
+
+template <typename Enum, typename LeftStorage, typename RightStorage>
+constexpr bool operator==(
+    H2EnumStorage<Enum, LeftStorage> lhs, H2EnumStorage<Enum, RightStorage> rhs
+) {
+    return static_cast<Enum>(lhs) == static_cast<Enum>(rhs);
+}
+
+template <typename Enum, typename LeftStorage, typename RightStorage>
+constexpr bool operator!=(
+    H2EnumStorage<Enum, LeftStorage> lhs, H2EnumStorage<Enum, RightStorage> rhs
+) {
+    return !(lhs == rhs);
+}
+
+// Mixed arithmetic and ordering.
+#define DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(op)                                                   \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr auto operator op(H2EnumStorage<Enum, Storage> lhs, Other rhs) {                      \
+        return lhs.value() op H2MaskValue(rhs);                                                    \
+    }                                                                                              \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr auto operator op(Other lhs, H2EnumStorage<Enum, Storage> rhs) {                      \
+        return H2MaskValue(lhs) op rhs.value();                                                    \
+    }
+
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(+)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(-)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(*)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(/)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(%)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(<)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(>)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(<=)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(>=)
+
+#undef DEFINE_ENUM_STORAGE_INTEGER_OPERATOR
+
+// Mixed bitwise operations.
+#define DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(op)                                                   \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr Enum operator op(H2EnumStorage<Enum, Storage> lhs, Other rhs) {                      \
+        return static_cast<Enum>(lhs.value() op H2MaskValue(rhs));                                 \
+    }                                                                                              \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr Enum operator op(Other lhs, H2EnumStorage<Enum, Storage> rhs) {                      \
+        return static_cast<Enum>(H2MaskValue(lhs) op rhs.value());                                 \
+    }                                                                                              \
+    template <typename Enum, typename Storage>                                                     \
+    constexpr Storage operator op(H2EnumStorage<Enum, Storage> lhs, Storage rhs) {                 \
+        return static_cast<Storage>(lhs.value() op static_cast<long long>(rhs));                   \
+    }
+
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(&)
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(|)
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(^)
+
+#undef DEFINE_ENUM_STORAGE_BITWISE_OPERATOR
+
+// Stored domains with increment and decrement.
+template <typename Enum, typename Storage>
+class H2SteppedEnumStorage {
+public:
+    H2SteppedEnumStorage() = default;
+    constexpr H2SteppedEnumStorage(Enum value) : m_value(static_cast<Storage>(value)) {}
+
+    constexpr operator Enum() const { return static_cast<Enum>(m_value); }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    explicit constexpr operator Integer() const {
+        return static_cast<Integer>(static_cast<Enum>(m_value));
+    }
+
+    H2SteppedEnumStorage& operator=(Enum value) {
+        m_value = static_cast<Storage>(value);
+        return *this;
+    }
+
+    H2SteppedEnumStorage& operator=(Storage value) {
+        m_value = value;
+        return *this;
+    }
+
+    H2SteppedEnumStorage& operator++() { ++m_value; return *this; }
+    H2SteppedEnumStorage operator++(int) {
+        H2SteppedEnumStorage previous = *this;
+        ++m_value;
+        return previous;
+    }
+
+    H2SteppedEnumStorage& operator--() { --m_value; return *this; }
+    H2SteppedEnumStorage operator--(int) {
+        H2SteppedEnumStorage previous = *this;
+        --m_value;
+        return previous;
+    }
+
+    H2SteppedEnumStorage& operator+=(i32 amount) {
+        m_value = static_cast<Storage>(m_value + amount);
+        return *this;
+    }
+
+    H2SteppedEnumStorage& operator-=(i32 amount) {
+        m_value = static_cast<Storage>(m_value - amount);
+        return *this;
+    }
+
+private:
+    Storage m_value;
+};
+
+// Convert a domain to an index.
+template <typename Enum, typename Storage>
+constexpr i32 H2EnumIndex(H2EnumStorage<Enum, Storage> value) {
+    return static_cast<i32>(static_cast<Enum>(value));
+}
+
+template <typename Enum, typename Storage>
+constexpr i32 H2EnumIndex(H2SteppedEnumStorage<Enum, Storage> value) {
+    return static_cast<i32>(static_cast<Enum>(value));
+}
+
+template <typename Value>
+constexpr i32 H2EnumIndex(Value value) {
+    return static_cast<i32>(value);
+}
+
+#endif
