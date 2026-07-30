@@ -1288,6 +1288,7 @@ def publish(out_root: Path, branch: str) -> int:
     temporary = existing is None
     worktree = existing
     new_branch = not exists
+    merged_source = False
 
     if temporary:
         # Best effort: clears stale entries if any, and is fine if there are none.
@@ -1309,6 +1310,21 @@ def publish(out_root: Path, branch: str) -> int:
             raise SystemExit(
                 "refusing to replace dirty generated worktree at %s" % worktree
             )
+
+        if exists and subprocess.run(
+            ("git", "merge-base", "--is-ancestor", source_commit, "HEAD"),
+            cwd=worktree,
+            capture_output=True,
+            check=False,
+        ).returncode:
+            subprocess.run(
+                ("git", "merge", "--no-commit", "--no-ff", "-s", "ours",
+                 source_commit),
+                cwd=worktree,
+                check=True,
+                capture_output=True,
+            )
+            merged_source = True
 
         if new_branch:
             subprocess.run(
@@ -1372,6 +1388,18 @@ def publish(out_root: Path, branch: str) -> int:
             print(f"[clean] committed to {branch} from "
                   f"{source_branch} {source_commit[:9]}")
     finally:
+        if merged_source and subprocess.run(
+            ("git", "rev-parse", "--quiet", "--verify", "MERGE_HEAD"),
+            cwd=worktree,
+            capture_output=True,
+            check=False,
+        ).returncode == 0:
+            subprocess.run(
+                ("git", "merge", "--abort"),
+                cwd=worktree,
+                capture_output=True,
+                check=False,
+            )
         if temporary:
             # Cleanup on the way out of a failure must not mask the failure.
             subprocess.run(

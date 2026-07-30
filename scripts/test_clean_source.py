@@ -429,6 +429,26 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
                 "int generated_value;",
             )
 
+    def test_existing_generated_branch_merges_new_source_history(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo, output = self.fixture_repo(Path(directory))
+
+            with mock.patch.object(clean_source, "REPO", repo):
+                clean_source.publish(output, "clean")
+            old_clean = git(repo, "rev-parse", "clean")
+
+            (repo / "decomp-only.txt").write_text("new matching state\n")
+            git(repo, "add", "decomp-only.txt")
+            git(repo, "commit", "-m", "advance source")
+            source = git(repo, "rev-parse", "main")
+
+            with mock.patch.object(clean_source, "REPO", repo):
+                clean_source.publish(output, "clean")
+
+            parents = git(repo, "rev-list", "--parents", "-n", "1", "clean").split()
+            self.assertEqual(parents[1:], [old_clean, source])
+            git(repo, "merge-base", "--is-ancestor", "main", "clean")
+
     def test_publish_refuses_and_preserves_a_dirty_generated_worktree(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
