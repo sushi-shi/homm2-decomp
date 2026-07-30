@@ -775,10 +775,10 @@ void SetGameDefaults(void) {
         }
         fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
     } while (fullScreen < &gConfig.showCombatGrid);
-    gConfig.showCombatGrid = 0;
-    gConfig.showCombatMouseHex = 0;
-    gConfig.combatShadeLevel = 0;
-    gConfig.combatArmyInfoLevel = 0;
+    gConfig.showCombatGrid = 1;
+    gConfig.showCombatMouseHex = 1;
+    gConfig.combatShadeLevel = 1;
+    gConfig.combatArmyInfoLevel = 2;
     gConfig.evilInterfaceUsage = 0;
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
