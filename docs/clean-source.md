@@ -75,11 +75,24 @@ its leak tracker could name the site. The clean tree keeps the tracking and lets
 the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
 The branch carries `include/`, `src/`, vendor SDK headers, import definitions,
-and a generated `build.ninja`. The Ninja graph builds `build/HEROES2W.EXE` for
-32-bit Windows with Clang at `-O0`, x87 floating point, and LLD. The compiler runtime
-is linked statically.
-The matching toolchain, delinker, objdiff plumbing, MSVC, and Wine are absent.
-It requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW toolchain.
+`build.ninja`, and a standalone Nix flake. The Ninja graph builds
+`build/HEROES2W.EXE` for 32-bit Windows with Clang at `-O0`, x87 floating point,
+and LLD. The compiler runtime is linked statically.
+
+The matching toolchain, delinker, objdiff plumbing, and MSVC are absent. A direct
+Ninja build requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW
+toolchain. Nix supplies all of them:
+
+```sh
+nix build
+cp result/HEROES2W.EXE result/run-game.sh /path/to/installed/game/
+cd /path/to/installed/game
+./run-game.sh
+```
+
+The runner creates `.wineprefix` beside the game on first use. Set
+`HOMM2_WINEPREFIX` to use another prefix. On Niri it also opens the game as a
+640×480 floating window.
 
 `--publish` accepts only a generated source checkout and either creates a new
 generated branch or advances a branch whose tip already carries the generator

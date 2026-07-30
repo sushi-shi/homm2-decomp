@@ -1,4 +1,5 @@
 /build/
+/result
 *.pyc
 __pycache__/
 .ninja_deps

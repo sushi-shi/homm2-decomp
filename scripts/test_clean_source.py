@@ -220,8 +220,17 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
         repo = root / "repo"
         (repo / "include").mkdir(parents=True)
         (repo / "src").mkdir()
+        (repo / "scripts/clean_project").mkdir(parents=True)
         (repo / "include/example.h").write_text("#pragma once\n")
         (repo / "src/example.cpp").write_text("int example;\n")
+        (repo / "scripts/clean_project/flake.lock").write_text("{}\n")
+        (repo / "scripts/clean_project/flake.nix").write_text(
+            "{ outputs = _: {}; }\n"
+        )
+        (repo / "scripts/clean_project/.gitignore").write_text(
+            "/build/\n/result\n"
+        )
+        (repo / "scripts/run-game.sh").write_text("#!/bin/sh\n")
         return repo
 
     def test_generate_refuses_source_owned_output_without_deleting_it(self):
@@ -293,6 +302,10 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             self.assertFalse(stale.exists())
             self.assertTrue((output / "include/example.h").is_file())
             self.assertTrue((output / "src/example.cpp").is_file())
+            self.assertEqual((output / "flake.lock").read_text(), "{}\n")
+            self.assertIn("outputs", (output / "flake.nix").read_text())
+            self.assertIn("/result", (output / ".gitignore").read_text())
+            self.assertTrue((output / "run-game.sh").stat().st_mode & 0o111)
             ninja = (output / "build.ninja").read_text()
             self.assertIn("cxx = clang++", ninja)
             self.assertIn("--target=i686-w64-windows-gnu", ninja)
