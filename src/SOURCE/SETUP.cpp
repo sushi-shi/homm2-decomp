@@ -15,7 +15,6 @@
 #include <SOURCE/SETUP.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 
 typedef enum SetupConstant {
     WINDOW_X = 405,
@@ -237,47 +236,19 @@ i32 game::SetupNetworkGame(void) {
 }
 
 i32 game::SetupNetworkGame2(void) {
-    OSVERSIONINFO osInfo;
-    HINSTANCE hLib;
-    i32 gotVersion;
     tag_message msg;
 
     heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
     if (dialogWindow == NULL)
         MemError();
 
-    memset(&osInfo, 0, sizeof(osInfo));
-    osInfo.dwOSVersionInfoSize = sizeof(osInfo);
-    gotVersion = GetVersionEx(&osInfo);
-    LogInt(
-        "Version",
-        gotVersion,
-        osInfo.dwPlatformId,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE,
-        LOG_UNUSED_VALUE
-    );
-    if (gotVersion != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-        msg.type = MESSAGE_WIDGET;
-        msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        msg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        msg.payload.widget.id = CHOICE_THREE;
-        dialogWindow->BroadcastMessage(msg);
-    }
-
-    hLib = NULL;
-    hLib = LoadLibraryA("DPLAYX.DLL");
-    if (hLib == NULL) {
-        tag_message dimMsg;
-
-        dimMsg.type = MESSAGE_WIDGET;
-        dimMsg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        dimMsg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        dimMsg.payload.widget.id = CHOICE_ONE;
-        dialogWindow->BroadcastMessage(dimMsg);
-    }
+    msg.type = MESSAGE_WIDGET;
+    msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+    msg.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
+    msg.payload.widget.id = CHOICE_ONE;
+    dialogWindow->BroadcastMessage(msg);
+    msg.payload.widget.id = CHOICE_THREE;
+    dialogWindow->BroadcastMessage(msg);
 
     gpWindowManager->DoDialog(dialogWindow, SetupNetworkGame2Handler, 0);
     delete dialogWindow;

@@ -76,9 +76,9 @@ struct SMapHeader {
 };
 #pragma pack(pop)
 
-i32 GetMapHeader(char*, struct SMapHeader*);
+i32 GetMapHeader(const char*, struct SMapHeader*);
 i32 CheckSumIsDemoOK(char*);
-i32 ShowThisMapGame(char*);
-i32 ShowThisMap(char*);
+i32 ShowThisMapGame(const char*);
+i32 ShowThisMap(const char*);
 
 #endif

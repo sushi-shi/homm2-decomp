@@ -1,5 +1,5 @@
-#ifndef HOMM2_KBWIN_H
-#define HOMM2_KBWIN_H
+#ifndef HOMM2_PLATFORM_WIN32_APPLICATION_H
+#define HOMM2_PLATFORM_WIN32_APPLICATION_H
 
 #include <SOURCE/KB_TYPES.h>
 #include <Ints.h>
@@ -52,9 +52,9 @@ void Process1WindowsMessage(void);
 void ResizeWindow(i32, i32, i32, i32);
 LRESULT AppCommand(HWND, UINT, WPARAM, LPARAM);
 void UpdateDfltMenu(HMENU);
-void KBChangeMenu(HMENU);
+void platform::ChangeMenu(HMENU);
 void SetMenuStatus(i32);
-void SetNoDialogMenus(i32);
+void platform::SetDialogMenusEnabled(i32);
 void SetMenus(HMENU, i32);
 i32l KBTickCount(void);
 void InitVideo(void);

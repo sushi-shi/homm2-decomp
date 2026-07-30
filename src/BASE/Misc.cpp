@@ -1,6 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <Ints.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
@@ -157,7 +157,7 @@ typedef enum FileIdHashConstant {
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Graphics.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
 #include <windows.h>
@@ -377,7 +377,7 @@ void FadeIn(i32 increment) {
     memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
     fadeStep:
-        delayTime = KBTickCount() + FADE_FRAME_DELAY;
+        delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (i == MISC_PALETTE_MAX_LEVEL) {
             done = 1;
@@ -410,7 +410,7 @@ void FadeOut(i32 increment) {
     memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
     fadeStep:
-        delayTime = KBTickCount() + FADE_FRAME_DELAY;
+        delayTime = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (i == FADE_LEVEL_LAST)
             done = 1;
@@ -448,8 +448,7 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
-        if (MessageBoxA(hwndApp, gText, "Assert Failure", MB_YESNO | MB_ICONHAND) == IDNO)
-            return;
+        platform::ShowMessage("Assert Failure", gText);
         unusedAssertWord = 0;
         ShutDown(NULL);
     }
@@ -542,13 +541,13 @@ void SetGameDefaults(void) {
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
     seed = 0;
-    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + platform::Ticks();
     gConfig.uniqueSystemID[UNIQUE_ID_TRAILING_INDEX] =
         alpha[seed % UNIQUE_ID_ALPHANUMERIC_COUNT];
-    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + platform::Ticks();
     gConfig.uniqueSystemID[UNIQUE_ID_MIDDLE_INDEX] =
         alpha[seed % UNIQUE_ID_ALPHANUMERIC_COUNT];
-    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + platform::Ticks();
     gConfig.uniqueSystemID[UNIQUE_ID_LEADING_INDEX] =
         static_cast<char>(seed % UNIQUE_ID_ALPHA_COUNT + 'A');
     gConfig.needsDefaultInitialization = 0;
@@ -1639,7 +1638,7 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
         delay *= WINDOWED_FADE_INCREMENT_SCALE;
     }
     for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
-        nextTime = KBTickCount() + FADE_TO_FRAME_DELAY;
+        nextTime = platform::Ticks() + FADE_TO_FRAME_DELAY;
         PollSound();
         idx = MISC_PALETTE_LEVEL_COUNT - iLevel - increment;
         if (idx < 0)

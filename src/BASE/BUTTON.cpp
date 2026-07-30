@@ -5,7 +5,7 @@
 #include <BASE/icon.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/mouseManager.h>
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
@@ -102,7 +102,7 @@ inline button::~button() {
 
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && (H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))
-        && glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] < KBTickCount()) {
+        && glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] < platform::Ticks()) {
         return Deselect(msg);
     }
 
@@ -180,7 +180,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                             Deselect(msg);
                         }
                     }
-                    Process1WindowsMessage();
+                    platform::PumpEvents();
                     msg = gpInputManager->GetEvent();
                 }
                 if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
@@ -217,7 +217,7 @@ MessageDispatchResult button::Select(struct tag_message& msg) {
     } else {
         msg.payload.widget.command = WIDGET_COMMAND_SELECT;
     }
-    glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = KBTickCount() + REPEAT_DELAY_TICKS;
+    glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT] = platform::Ticks() + REPEAT_DELAY_TICKS;
     iLeftRightSave = msg.payload.widget.modifiers
         & MESSAGE_MODIFIER_BUTTON_MASK;
     return MESSAGE_DISPATCH_FORWARD;

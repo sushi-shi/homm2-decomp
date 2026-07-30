@@ -4,7 +4,7 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <mss.h>
 #include <string.h>
 
@@ -99,7 +99,7 @@ void SetMilesSampleHandleVolume(struct _SAMPLE* sampleHandle, i32 volume) {
     );
     if (foundIndex >= 0)
         gMilesSampleVolumes[foundIndex] = static_cast<i16>(volume);
-    Process1WindowsMessage();
+    platform::PumpEvents();
 }
 
 void StopAllMilesSamples(void) {

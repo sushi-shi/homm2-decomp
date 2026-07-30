@@ -2,7 +2,7 @@
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <BASE/Misc.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/PATH.h>
@@ -520,11 +520,11 @@ void ResetHeroRVs(i32 resetAll, i32 x, i32 y) {
 }
 
 void CheckDoMain(i32 a1, i32 doMain) {
-    if (iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS < KBTickCount()
-        || glTimers[0] < KBTickCount()) {
-        Process1WindowsMessage();
+    if (iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS < platform::Ticks()
+        || glTimers[0] < platform::Ticks()) {
+        platform::PumpEvents();
         PollSound();
-        if (glTimers[0] < KBTickCount()) {
+        if (glTimers[0] < platform::Ticks()) {
             if (doMain == 0) {
                 i32 oldShowIt = bShowIt;
                 i32 oldX = gpAdvManager->m_previousOriginX;
@@ -550,9 +550,9 @@ void CheckDoMain(i32 a1, i32 doMain) {
                 gpAdvManager->m_previousOriginX = oldX;
                 gpAdvManager->m_previousOriginY = oldY;
             }
-            glTimers[0] = KBTickCount() + FRAME_TIMER_TICKS;
+            glTimers[0] = platform::Ticks() + FRAME_TIMER_TICKS;
         }
-        iLastFrameRateTimer = KBTickCount();
+        iLastFrameRateTimer = platform::Ticks();
     }
 }
 

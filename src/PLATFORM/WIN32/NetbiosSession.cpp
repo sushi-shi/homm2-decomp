@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/Netbios.h>
+#include <PLATFORM/WIN32/NetbiosSession.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/netwin.h>
+#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/WIN32/NetbiosTransport.h>
 
 typedef enum NetbiosSetupConstant {
     INIT_UNAVAILABLE         = 1,
@@ -160,8 +160,8 @@ i8 WaitForGuest(void) {
         case WAIT_POLL:
             status = !(H2EnumIndex((static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(GUEST_SESSION)))) & (NETBIOS_SESSION_ACTIVE)));
             if (status) {
-                if (KBTickCount() > iLastBroadcastTime + BROADCAST_INTERVAL) {
-                    iLastBroadcastTime = KBTickCount();
+                if (platform::Ticks() > iLastBroadcastTime + BROADCAST_INTERVAL) {
+                    iLastBroadcastTime = platform::Ticks();
                     nb_snd(HOST_SESSION, 0, NULL);
                 }
             } else {

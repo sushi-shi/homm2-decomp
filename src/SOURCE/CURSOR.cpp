@@ -17,7 +17,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/playerData.h>
@@ -473,7 +473,7 @@ void advManager::TurnTo(MapDirection direction) {
         m_cursorFrame = m_cursorType < HERO_TYPE_BOAT ? horseFrameFlip[frameIndex]
                                                       : boatFrameFlip[frameIndex];
         m_cursorFrameCount = 0;
-        glTimers[1] = KBTickCount() + delayTime;
+        glTimers[1] = platform::Ticks() + delayTime;
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
             != CONFIG_WALK_SPEED_INSTANT) {
             if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
@@ -543,7 +543,7 @@ mapCell* advManager::MoveHero(
     i32 pixelsPerStep;
 
     if (gbThisNetHumanPlayer[giCurPlayer])
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
     gbHitEvent = false;
     *adjacentMonster = 0;
     *outOfMobility = 0;
@@ -764,7 +764,7 @@ mapCell* advManager::MoveHero(
                 m_updateMinX = startVals[directionX_a + 1];
                 m_updateMinY = startVals[directionY + 1];
             }
-            tick = KBTickCount();
+            tick = platform::Ticks();
             if (step_a + 1 == halfSteps_g * MOVE_TILE_HALF_COUNT) {
                 m_updateMinX = 0;
                 m_updateMinY = 0;
@@ -866,7 +866,7 @@ movementDone:
     }
 adjacentDone:
     if (gbThisNetHumanPlayer[giCurPlayer])
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
 
     if (mapEvent) {
         if (processEvent) {

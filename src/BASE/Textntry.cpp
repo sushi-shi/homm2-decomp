@@ -9,7 +9,7 @@
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/Misc.h>
 #include <BASE/icon.h>
 #include <string.h>
@@ -231,15 +231,15 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                 Draw();
                 gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
                 done = 0;
-                glTimers[0] = KBTickCount() + CURSOR_BLINK_TICKS;
+                glTimers[0] = platform::Ticks() + CURSOR_BLINK_TICKS;
                 gpMouseManager->ReallyHidePointer();
                 while (done == 0) {
-                    if (KBTickCount() > glTimers[0]) {
+                    if (platform::Ticks() > glTimers[0]) {
                         SetupDisplayString(edit, m_cursorPosition);
                         Draw();
                         gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
                     }
-                    Process1WindowsMessage();
+                    platform::PumpEvents();
                     event = gpInputManager->GetEvent();
                     if (event.type == MESSAGE_KEY_DOWN) {
                         switch (event.payload.keyboard.keyCode) {
@@ -416,9 +416,9 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     i32 changed;
     char display[TEXT_BUFFER_CAPACITY];
 
-    if (KBTickCount() > glTimers[0]) {
+    if (platform::Ticks() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;
-        glTimers[0] = KBTickCount() + CURSOR_BLINK_TICKS;
+        glTimers[0] = platform::Ticks() + CURSOR_BLINK_TICKS;
     }
     if (cursor > 0)
         strncpy(m_text, source, cursor);

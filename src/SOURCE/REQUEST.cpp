@@ -3,7 +3,6 @@
 #include <io.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -15,7 +14,8 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/REQUEST.h>
 
 enum class FileRequesterHelpIndex : i32 {
@@ -77,7 +77,7 @@ typedef enum FileRequesterPrivateConstant {
     CP1251_YO_LOWER             = 0xb8
 } FileRequesterPrivateConstant;
 
-i32 GetMapHeader(char* filename, struct SMapHeader* header) {
+i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = open(gText, _O_BINARY);
     if (file == -1) {
@@ -92,7 +92,7 @@ i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
-i32 ShowThisMapGame(char* filename) {
+i32 ShowThisMapGame(const char* filename) {
     return 1;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
@@ -110,52 +110,42 @@ i32 ShowThisMapGame(char* filename) {
     return 0;
 }
 
-i32 ShowThisMap(char*) {
+i32 ShowThisMap(const char*) {
     return 1;
 }
 
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
-    HANDLE findHandleWork;
     SMapHeader header;
-    i32 haveMore;
     char nameBuffer[FILE_REQUESTER_LOCAL_NAME_SIZE];
     i32 insertCount;
     char* dotPtr;
     char extension[FILE_REQUESTER_EXTENSION_SIZE];
-    WIN32_FIND_DATA findFileData;
     i32 indexData5;
     i32 moveValue;
     char fullPath[FILE_REQUESTER_PATH_SIZE];
 
     sprintf(gText, "%s%s", directory, pattern);
+    const std::vector<std::string> files = platform::Files().List(gText);
+    const auto accepts = [&](const std::string& foundFile) {
+        if (m_mode != FILE_REQUESTER_MAP && m_mode != FILE_REQUESTER_MAP_GAME)
+            return true;
+
+        GetMapHeader(foundFile.c_str(), &header);
+        if (m_mode == FILE_REQUESTER_MAP_GAME
+            && (header.minHumanPlayers > giNumHumanPlayers
+                || header.maxHumanPlayers < giNumHumanPlayers))
+            return false;
+        if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
+            && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)])
+            return false;
+        return m_mode == FILE_REQUESTER_MAP_GAME ? ShowThisMapGame(foundFile.c_str()) != 0
+                                                : ShowThisMap(foundFile.c_str()) != 0;
+    };
+
     m_fileCount = 0;
-    haveMore = 1;
-    findHandleWork = FindFirstFile(gText, &findFileData);
-    if (findHandleWork != INVALID_HANDLE_VALUE) {
-        while (haveMore) {
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
-                GetMapHeader(findFileData.cFileName, &header);
-                if (header.minHumanPlayers > giNumHumanPlayers
-                    || header.maxHumanPlayers < giNumHumanPlayers
-                    || (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                        && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)]))
-                    goto CountNextFile;
-                if (!ShowThisMapGame(findFileData.cFileName))
-                    goto CountNextFile;
-            }
-            if (m_mode == FILE_REQUESTER_MAP) {
-                GetMapHeader(findFileData.cFileName, &header);
-                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)])
-                    goto CountNextFile;
-                if (!ShowThisMap(findFileData.cFileName))
-                    goto CountNextFile;
-            }
+    for (const std::string& foundFile : files) {
+        if (accepts(foundFile))
             ++m_fileCount;
-        CountNextFile:
-            haveMore = FindNextFile(findHandleWork, &findFileData);
-        }
-        FindClose(findHandleWork);
     }
 
     if (countOnly) {
@@ -189,54 +179,30 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     insertCount = 0;
-    sprintf(gText, "%s%s", directory, pattern);
-    findHandleWork = FindFirstFile(gText, &findFileData);
-    if (findHandleWork != INVALID_HANDLE_VALUE) {
-        haveMore = 1;
-        while (haveMore) {
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
-                GetMapHeader(findFileData.cFileName, &header);
-                if (header.minHumanPlayers > giNumHumanPlayers
-                    || header.maxHumanPlayers < giNumHumanPlayers
-                    || (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                        && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)]))
-                    goto InsertNextFile;
-                if (!ShowThisMapGame(findFileData.cFileName))
-                    goto InsertNextFile;
-            }
-            if (m_mode == FILE_REQUESTER_MAP) {
-                GetMapHeader(findFileData.cFileName, &header);
-                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && header.width != giMapSizes[H2EnumIndex(giMapSizeFilter)])
-                    goto InsertNextFile;
-                if (!ShowThisMap(findFileData.cFileName))
-                    goto InsertNextFile;
-            }
+    for (const std::string& foundFile : files) {
+        if (!accepts(foundFile))
+            continue;
 
-            strcpy(nameBuffer, findFileData.cFileName);
-            dotPtr = FindLastToken(nameBuffer, '.');
-            if (dotPtr != NULL) {
-                strcpy(extension, dotPtr);
-                *dotPtr = 0;
-            }
-
-            for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-                if (strcmpi(nameBuffer, m_fileNames[indexData5].text) < 0) {
-                    for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
-                        strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
-                        strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
-                    }
-                    goto InsertName;
-                }
-            }
-        InsertName:
-            strcpy(m_fileNames[indexData5].text, nameBuffer);
-            strcpy(m_extensions[indexData5].text, extension);
-            ++insertCount;
-        InsertNextFile:
-            haveMore = FindNextFile(findHandleWork, &findFileData);
+        strcpy(nameBuffer, foundFile.c_str());
+        extension[0] = 0;
+        dotPtr = FindLastToken(nameBuffer, '.');
+        if (dotPtr != NULL) {
+            strcpy(extension, dotPtr);
+            *dotPtr = 0;
         }
-        FindClose(findHandleWork);
+
+        for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
+            if (strcmpi(nameBuffer, m_fileNames[indexData5].text) < 0) {
+                for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
+                    strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
+                    strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
+                }
+                break;
+            }
+        }
+        strcpy(m_fileNames[indexData5].text, nameBuffer);
+        strcpy(m_extensions[indexData5].text, extension);
+        ++insertCount;
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
@@ -320,7 +286,7 @@ void fileRequester::Close(void) {
     if (!m_active) {
         return;
     }
-    KBChangeMenu(m_previousMenu);
+    platform::ChangeMenu(m_previousMenu);
     strcpy(gLastFilename, GetFilename());
     CleanUpData();
     gpWindowManager->RemoveWindow(m_window);
@@ -333,8 +299,8 @@ i32 fileRequester::Open(i32 id) {
         gLastFilename,
         ""
     );
-    m_previousMenu = hmnuCurrent;
-    KBChangeMenu(hmnuDflt);
+    m_previousMenu = platform::CurrentMenu();
+    platform::ChangeMenu(hmnuDflt);
 
     m_window = new heroWindow(
         m_x,
@@ -999,7 +965,7 @@ void fileRequester::DoKnob(void) {
                 m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
-        Process1WindowsMessage();
+        platform::PumpEvents();
         knobMessage = gpInputManager->GetEvent();
     }
     m_scrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;

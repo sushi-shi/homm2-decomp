@@ -1,9 +1,9 @@
-#ifndef HOMM2_NETWIN_PRIVATE_H
-#define HOMM2_NETWIN_PRIVATE_H
+#ifndef HOMM2_PLATFORM_WIN32_NETBIOSTRANSPORTPRIVATE_H
+#define HOMM2_PLATFORM_WIN32_NETBIOSTRANSPORTPRIVATE_H
 
 #include <Ints.h>
 
-#include <SOURCE/netwin.h>
+#include <PLATFORM/WIN32/NetbiosTransport.h>
 
 static void nb_add_name(void);
 static void __stdcall nb_add_name_done(NetbiosControlBlock* controlBlock);

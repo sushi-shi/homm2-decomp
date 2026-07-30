@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <sstream>
@@ -862,7 +863,53 @@ public:
         return m_dataRoot + "/" + (retailPath != nullptr ? retailPath : "");
     }
 
+    std::vector<std::string> List(const char* pattern) const override {
+        std::string retail = pattern != nullptr ? pattern : "";
+        std::replace(retail.begin(), retail.end(), '\\', '/');
+        const std::size_t slash = retail.find_last_of('/');
+        const std::string directory = slash == std::string::npos ? "" : retail.substr(0, slash);
+        const std::string wildcard = slash == std::string::npos ? retail : retail.substr(slash + 1);
+        const std::filesystem::path root = directory.empty()
+            ? std::filesystem::path(m_dataRoot)
+            : std::filesystem::path(m_dataRoot) / directory;
+
+        std::vector<std::string> names;
+        std::error_code error;
+        for (const auto& entry : std::filesystem::directory_iterator(root, error)) {
+            const std::string name = entry.path().filename().string();
+            if (Matches(wildcard.c_str(), name.c_str())) {
+                names.push_back(name);
+            }
+        }
+        return names;
+    }
+
 private:
+    static bool Matches(const char* pattern, const char* name) {
+        if (*pattern == '\0') {
+            return *name == '\0';
+        }
+        if (*pattern == '*') {
+            for (const char* at = name;; ++at) {
+                if (Matches(pattern + 1, at)) {
+                    return true;
+                }
+                if (*at == '\0') {
+                    return false;
+                }
+            }
+        }
+        if (*name == '\0') {
+            return false;
+        }
+        if (*pattern != '?'
+            && std::tolower(static_cast<unsigned char>(*pattern))
+                != std::tolower(static_cast<unsigned char>(*name))) {
+            return false;
+        }
+        return Matches(pattern + 1, name + 1);
+    }
+
     std::string m_dataRoot;
     std::string m_userRoot;
 };

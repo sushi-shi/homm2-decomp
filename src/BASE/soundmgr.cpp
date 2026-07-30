@@ -6,7 +6,7 @@
 #include <BASE/MusicFlags.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <mss.h>
 #include <stdio.h>
@@ -77,15 +77,11 @@ bool soundManager::StartupMilesBackend(void) {
         return false;
     }
     if (waveOutGetDevCapsA(0, &gWaveOutCaps, sizeof(gWaveOutCaps)) != 0) {
-        MessageBoxA(
-            hwndApp,
-
+        platform::ShowMessage(
+            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
             "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
                 "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
-                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee.",
-
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
-            0
+                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee."
         );
         m_digitalDriver = NULL;
         return false;
@@ -104,13 +100,10 @@ bool soundManager::StartupMilesBackend(void) {
     gWaveFormat.wf.nBlockAlign = (bits / DEFAULT_SAMPLE_BITS) * channels;
     gWaveFormat.wBitsPerSample = bits;
     if (AIL_waveOutOpen(&m_digitalDriver, NULL, 0, &gWaveFormat.wf) != 0) {
-        MessageBoxA(
-            hwndApp,
-            AIL_last_error(),
-
+        platform::ShowMessage(
             "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
                 "\xe7\xe2\xf3\xea\xe0!",
-            0
+            AIL_last_error()
         );
         m_digitalDriver = NULL;
         AIL_shutdown();
@@ -403,11 +396,11 @@ void soundManager::PollSound(void) {
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
     if (m_musicFadeSteps > 0) {
-        Process1WindowsMessage();
+        platform::PumpEvents();
         if (m_musicTrack < CD_MUSIC_TRACK_FIRST
             || m_musicTrack > CD_MUSIC_TRACK_LAST)
-            glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
-        delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+            glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = platform::Ticks();
+        delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - platform::Ticks();
         m_musicFadeSteps = delta / FADE_STEP_TICKS;
         if (m_musicFadeSteps < 1)
             m_musicFadeSteps = 0;
@@ -415,9 +408,9 @@ void soundManager::PollSound(void) {
         if (m_musicFadeSteps <= FADE_HOLD_STEPS
             && m_musicTrack != m_musicFadeTargetTrack) {
             if (bSaveMusicPosition[m_musicTrack] == 0)
-                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = platform::Ticks();
             PlayAmbientMusic(m_musicFadeTargetTrack);
-            switchDelta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+            switchDelta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - platform::Ticks();
             m_musicFadeSteps = switchDelta / FADE_STEP_TICKS;
             if (m_musicFadeSteps < 1)
                 m_musicFadeSteps = 0;
@@ -463,7 +456,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     }
     if (m_musicTrack == track)
         return;
-    Process1WindowsMessage();
+    platform::PumpEvents();
     if ((m_musicFadeSteps != 0
          && track != m_musicFadeTargetTrack)
         || (m_musicFadeSteps == 0
@@ -471,7 +464,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
         if (m_musicFadeSteps <= FADE_HOLD_STEPS) {
             m_musicFadeSteps = FADE_TOTAL_STEPS;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] =
-                KBTickCount() + AMBIENT_FADE_DELAY_TICKS;
+                platform::Ticks() + AMBIENT_FADE_DELAY_TICKS;
         }
         m_musicFadeTargetTrack = track;
         PollSound();

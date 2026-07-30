@@ -7,12 +7,12 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/WIN32/Application.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/heroWindow.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
-#include <SOURCE/dpnetwin.h>
+#include <PLATFORM/WIN32/DirectPlayTransport.h>
 
 
 enum class DirectPlaySessionOpenFlag : i32 {
@@ -481,7 +481,7 @@ i32 dpWaitForHost(void) {
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
-            iLastHereIAmTickCount = KBTickCount();
+            iLastHereIAmTickCount = platform::Ticks();
             giHostAcceptStatus = HOST_ACCEPT_PENDING;
             dpSendMessage(
                 0,
@@ -505,7 +505,7 @@ i32 dpWaitForHost(void) {
                 rv = lpIDC->Close();
                 if (rv != RESULT_OK)
                     DPSD(rv, "dpnetwin.cpp", 603);
-            } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
+            } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < platform::Ticks()) {
                 iDPWaitForHostStatus--;
             }
             break;
@@ -649,5 +649,11 @@ i32 iMaxSession;
 DirectPlayHostAcceptStatus giHostAcceptStatus;
 struct _GUID* g_lpGuid;
 i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
+
+void network_remove_player(i32 position) {
+    for (i32 player = position; player < DP_TRANSPORT_STARTUP_MAPPING_COUNT - 1; ++player) {
+        giNetPosToDCOPos[player] = giNetPosToDCOPos[player + 1];
+    }
+}
 i32 iSessionToTry;
 i32l lSessions[DP_TRANSPORT_SESSION_COUNT];

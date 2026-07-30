@@ -5,7 +5,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/comwin.h>
+#include <PLATFORM/WIN32/SerialTransport.h>
 
 typedef enum ComConstant {
     PORT_COUNT           = 2,

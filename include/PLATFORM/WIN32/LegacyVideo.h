@@ -1,10 +1,11 @@
-#ifndef HOMM2_WINGRAPH_H
-#define HOMM2_WINGRAPH_H
+#ifndef HOMM2_PLATFORM_WIN32_LEGACYVIDEO_H
+#define HOMM2_PLATFORM_WIN32_LEGACYVIDEO_H
 
 #include <windows.h>
 #include <ddraw.h>
 #include <wing.h>
 #include <Ints.h>
+#include <PLATFORM/Graphics.h>
 
 typedef enum WingraphConstant {
     WINGRAPH_WIDTH                 = 640,
@@ -21,12 +22,6 @@ typedef enum WingraphConstant {
     WINGRAPH_PAINT_TIMEOUT         = 10000,
     WINGRAPH_ERROR_TEXT_SIZE       = 200
 } WingraphConstant;
-
-enum class WingraphGraphicsType : i32 {
-    WINGRAPH_GRAPHICS_WING        = 1,
-    WINGRAPH_GRAPHICS_DIRECT_DRAW = 2
-};
-using enum WingraphGraphicsType;
 
 #pragma pack(push, 1)
 struct _PALETTE {

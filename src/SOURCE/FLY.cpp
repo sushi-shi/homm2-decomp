@@ -8,7 +8,7 @@
 #include <SOURCE/CMBTMGR.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -406,13 +406,13 @@ i32 army::FlyTo(i32 destination) {
                         && (m_monsterType == CREATURE_VAMPIRE
                             || m_monsterType == CREATURE_VAMPIRE_LORD))) {
                     glTimers[0] = static_cast<i32>(
-                        KBTickCount()
+                        platform::Ticks()
                         + m_frameInfo.walkDuration * ARMY_VAMPIRE_FLIGHT_DURATION_SCALE
                               * gfCombatSpeedMod[gConfig.combatSpeed] / frameCount0
                     );
                 } else {
                     glTimers[0] = static_cast<i32>(
-                        KBTickCount()
+                        platform::Ticks()
                         + m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed]
                               / frameCount0
                     );

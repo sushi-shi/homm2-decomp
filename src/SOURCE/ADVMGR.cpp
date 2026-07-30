@@ -43,7 +43,7 @@
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/ADVMGR_TYPES.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
@@ -1321,12 +1321,12 @@ i32 advManager::Open(i32 id) {
     GetCursorSampleSet(gConfig.walkSpeed);
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->TurnOnAIMusic();
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
     } else {
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
     }
 
-    glTimers[0] = KBTickCount() + TIMER_DELAY;
+    glTimers[0] = platform::Ticks() + TIMER_DELAY;
     ConfigVolumeLevel savedVolume = gConfig.soundVolume;
     if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
         gConfig.soundVolume = CONFIG_VOLUME_MAX;
@@ -1346,7 +1346,7 @@ i32 advManager::Open(i32 id) {
     if (!gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
     }
-    KBChangeMenu(hmnuAdv);
+    platform::ChangeMenu(hmnuAdv);
     ForceNewHover();
     gpWindowManager->FadeScreen(FADE_IN, ADVENTURE_FADE_STEPS, gPalette);
     giBottomViewOverride = BOTTOM_VIEW_NONE;
@@ -1533,7 +1533,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                             StopCursor(1);
                             goto movement_done;
                         }
-                        Process1WindowsMessage();
+                        platform::PumpEvents();
                         messageValue = gpInputManager->GetEvent();
                     }
                 }
@@ -1680,7 +1680,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     i32 bEnded;
     i32 curMusic;
 
-    if (glTimers[0] < KBTickCount() && ComboDraw(1)) {
+    if (glTimers[0] < platform::Ticks() && ComboDraw(1)) {
         UpdateScreen(1, 0);
     }
     if (gbGameOver) {
@@ -1702,7 +1702,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         CheckScreenScroll();
     }
     if (gConfig.musicVolume != CONFIG_VOLUME_MUTED && giForceSwitchMusic > 0
-        && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
+        && platform::Ticks() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
         curMusic = gpSoundManager->m_musicTrack;
         if (curMusic == WAIT_AMBIENT_MUSIC) {
@@ -2448,7 +2448,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
 
             msg.type = MESSAGE_NONE;
             while (msg.type != MESSAGE_LEFT_BUTTON_UP) {
-                Process1WindowsMessage();
+                platform::PumpEvents();
                 msg = gpInputManager->GetEvent();
                 radMsg = msg;
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP
@@ -2456,7 +2456,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     if (msg.type == MESSAGE_MOUSE_MOVE) {
                         radMsg = msg;
                     }
-                    Process1WindowsMessage();
+                    platform::PumpEvents();
                     msg = gpInputManager->GetEvent();
                 }
                 if (radMsg.type == MESSAGE_MOUSE_MOVE) {
@@ -2627,7 +2627,7 @@ advManager::ProcessDeSelect(struct tag_message* message, i32* result, class mapC
         } else {
             giBottomViewOverride = BOTTOM_VIEW_KINGDOM;
         }
-        giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_DURATION;
+        giBottomViewOverrideEndTime = platform::Ticks() + BOTTOM_VIEW_DURATION;
         UpdBottomView(1, 1, 1);
     }
     return MESSAGE_DISPATCH_CONSUME;
@@ -3080,8 +3080,8 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 
 void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (forceUpdate == 0 && bShowIt == 0) {
-        if (glTimers[0] < KBTickCount()) {
-            glTimers[0] = KBTickCount() + TIMER_DELAY;
+        if (glTimers[0] < platform::Ticks()) {
+            glTimers[0] = platform::Ticks() + TIMER_DELAY;
         }
         return;
     }
@@ -3113,13 +3113,13 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     giScrollX = giScrollY;
     PollSound();
 
-    if (glTimers[0] < KBTickCount()) {
+    if (glTimers[0] < platform::Ticks()) {
         ++m_updateMaxY;
         ++m_updateMaxX;
         if (m_updateMaxX >= UPDATE_ANIMATION_PHASES) {
             m_updateMaxX = 0;
         }
-        glTimers[0] = KBTickCount() + TIMER_DELAY;
+        glTimers[0] = platform::Ticks() + TIMER_DELAY;
 
         if (m_updateMaxX == 1 || m_updateMaxX == 3 || m_updateMaxX == 5) {
             ++m_animationPhases[ANIMATION_PHASE_COLUMN_1];
@@ -3134,7 +3134,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
         }
     }
     giLimitUpdMinX = UPDATE_NONE;
-    Process1WindowsMessage();
+    platform::PumpEvents();
 }
 
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
@@ -5534,7 +5534,7 @@ void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen
     }
 
     if (giBottomViewOverride > BOTTOM_VIEW_NONE) {
-        if (KBTickCount() > giBottomViewOverrideEndTime) {
+        if (platform::Ticks() > giBottomViewOverrideEndTime) {
             giBottomViewOverride = BOTTOM_VIEW_NONE;
         } else {
             switch (giBottomViewOverride) {
@@ -5648,11 +5648,11 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, ENEMY_TURN_HOURGLASS_Z);
     }
 
-    if (gbForceUpdate || KBTickCount() - iLastSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
-        iLastSandAnimTime = KBTickCount();
+    if (gbForceUpdate || platform::Ticks() - iLastSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
+        iLastSandAnimTime = platform::Ticks();
         iLastAnimFrame = m_updateMaxX;
-        if (KBTickCount() - iLastNewSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
-            iLastNewSandAnimTime = KBTickCount();
+        if (platform::Ticks() - iLastNewSandAnimTime > ENEMY_TURN_ANIMATION_DELAY) {
+            iLastNewSandAnimTime = platform::Ticks();
             ++iSandAnim;
             if (iSandAnim >= ENEMY_TURN_SAND_FRAME_LIMIT) {
                 iSandAnim = ENEMY_TURN_SAND_RESTART_FRAME;
@@ -5725,10 +5725,10 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 
     if (gbForceUpdate || iCurHourGlassPhase < iLastHourGlassPhase || iLastHourGlassPhase < 0
         || (iCurHourGlassPhase > iLastHourGlassPhase
-            && KBTickCount() - giLastHourGlassUpdateTime >= ENEMY_TURN_PHASE_DELAY)) {
+            && platform::Ticks() - giLastHourGlassUpdateTime >= ENEMY_TURN_PHASE_DELAY)) {
         updated = 1;
         iLastHourGlassPhase = iCurHourGlassPhase;
-        giLastHourGlassUpdateTime = KBTickCount();
+        giLastHourGlassUpdateTime = platform::Ticks();
         if (m_bottomViewIcons[ENEMY_TURN_PHASE_SLOT] != NULL) {
             msg.payload.widget.command = ADVMGR_ENEMY_TURN_MESSAGE_SET_FRAME;
             msg.payload.widget.id = ENEMY_TURN_PHASE_ID;
@@ -7228,7 +7228,7 @@ void advManager::DoHeroKnob(void) {
                 }
             }
         }
-        Process1WindowsMessage();
+        platform::PumpEvents();
         message = gpInputManager->GetEvent();
     }
     m_scrollLeftButton->m_flags &= ~WIDGET_FLAG_SELECTED;
@@ -7275,7 +7275,7 @@ void advManager::DoTownKnob(void) {
                 }
             }
         }
-        Process1WindowsMessage();
+        platform::PumpEvents();
         message = gpInputManager->GetEvent();
     }
     m_scrollRightButton->m_flags &= ~WIDGET_FLAG_SELECTED;
@@ -7498,7 +7498,7 @@ void advManager::CheckCastSpell(void) {
 }
 
 MessageDispatchResult DimensionDoorHandler(tag_message& message) {
-    if (glTimers[0] < KBTickCount()) {
+    if (glTimers[0] < platform::Ticks()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
         gpAdvManager->UpdateScreen(0, 0);
     }
@@ -7605,9 +7605,9 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     if (animate != 0) {
         giFrameCount += giFrameStep;
         if (giFrameCount < COMBO_FRAME_LIMIT) {
-            Process1WindowsMessage();
-            if (glTimers[0] < KBTickCount()) {
-                glTimers[0] = KBTickCount() + TIMER_DELAY;
+            platform::PumpEvents();
+            if (glTimers[0] < platform::Ticks()) {
+                glTimers[0] = platform::Ticks() + TIMER_DELAY;
             }
             PollSound();
             return 0;
@@ -9023,7 +9023,7 @@ void advManager::ScreenScroll(MapDirection direction, i32 updatePointer) {
 
     xOrigin = m_mapOriginX;
     yOrigin = m_mapOriginY;
-    iLastScrollTime = KBTickCount();
+    iLastScrollTime = platform::Ticks();
 
     switch (direction) {
         case MAP_DIRECTION_NORTH:
@@ -9089,8 +9089,8 @@ void advManager::CheckScreenScroll(void) {
     i32 oldMapX;
     i32 oldMapY;
 
-    if (KBTickCount() - iLastScrollTime > SCROLL_TICK_INTERVAL) {
-        iLastScrollTime = KBTickCount();
+    if (platform::Ticks() - iLastScrollTime > SCROLL_TICK_INTERVAL) {
+        iLastScrollTime = platform::Ticks();
         oldMapX = m_mapOriginX;
         oldMapY = m_mapOriginY;
         gpMouseManager->MouseCoords(mouseX, mouseY);
@@ -9210,7 +9210,7 @@ void advManager::LoadRemote(void) {
         gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
         gSoundBackendsReady = 0;
-        giForceSwitchMusic = KBTickCount();
+        giForceSwitchMusic = platform::Ticks();
     }
 
     if (gpGame->m_playerDead[giCurPlayer]) {

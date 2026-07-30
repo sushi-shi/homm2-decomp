@@ -18,7 +18,7 @@
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 
 typedef enum ExpansionCampaignSmacker {
     SMACKER_POL_INTRO             = 0x27,
@@ -1171,7 +1171,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
-    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+    if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;

@@ -15,8 +15,8 @@
 #include <SOURCE/ExpCampaign.h>
 #include <SOURCE/SMACKMGR.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Runtime.h>
+#include <PLATFORM/Graphics.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -45,7 +45,7 @@ typedef enum SmackManagerConstant {
     POINTER_ID                     = 40,
     POINTER_DEFAULT                = 0,
     EXPANSION_RECT_COUNT           = 4,
-    CAMPAIGN_DIVIDER_X             = WINGRAPH_WIDTH / 2,
+    CAMPAIGN_DIVIDER_X             = GRAPHICS_WIDTH / 2,
     CAMPAIGN_LEFT_FRAME            = 0,
     CAMPAIGN_RIGHT_FRAME           = 1,
     CAMPAIGN_RIGHT_SELECTED_FRAME  = 2,
@@ -55,8 +55,8 @@ typedef enum SmackManagerConstant {
     CONGRATS_TEXT_Y                = 98,
     CONGRATS_TEXT_WIDTH            = 134,
     CONGRATS_TEXT_HEIGHT           = 217,
-    CONGRATS_BLIT_WIDTH            = WINGRAPH_WIDTH - 1,
-    CONGRATS_BLIT_HEIGHT           = WINGRAPH_HEIGHT - 1,
+    CONGRATS_BLIT_WIDTH            = GRAPHICS_WIDTH - 1,
+    CONGRATS_BLIT_HEIGHT           = GRAPHICS_HEIGHT - 1,
     MOVIE_PATH_SIZE                = 352,
     MILES_SOUND_SYSTEM_PREFERENCE  = 15,
     CAMPAIGN_BLIT_X                = 49,
@@ -173,7 +173,7 @@ void SmackManagerMain(void) {
             gbCampaignSideChoice = CAMPAIGN_ROLAND;
     }
 
-    KBChangeMenu(hmnuDflt);
+    platform::ChangeMenu(hmnuDflt);
     gpMouseManager->HideColorPointer();
     bMainDone = 1;
     memcpy(savedPalette4, gPalette->m_data, PALETTE_DATA_SIZE);
@@ -247,8 +247,8 @@ void SmackManagerMain(void) {
             smk1,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            GRAPHICS_WIDTH,
+            GRAPHICS_HEIGHT,
             gpWindowManager->m_screen->m_pixels,
             0
         );
@@ -276,21 +276,21 @@ void SmackManagerMain(void) {
                 smk2,
                 SmackOptions[bSmackNum].companionX,
                 SmackOptions[bSmackNum].companionY,
-                WINGRAPH_WIDTH,
-                WINGRAPH_HEIGHT,
+                GRAPHICS_WIDTH,
+                GRAPHICS_HEIGHT,
                 gpWindowManager->m_screen->m_pixels,
                 0
             );
         }
     }
 
-    FillBitmapArea(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0);
+    FillBitmapArea(gpWindowManager->m_screen, 0, 0, GRAPHICS_WIDTH, GRAPHICS_HEIGHT, 0);
     BlitBitmapToScreen(
         gpWindowManager->m_screen,
         0,
         0,
-        WINGRAPH_WIDTH,
-        WINGRAPH_HEIGHT,
+        GRAPHICS_WIDTH,
+        GRAPHICS_HEIGHT,
         0,
         0
     );
@@ -302,7 +302,7 @@ void SmackManagerMain(void) {
     companionStarted26 = 0;
 
     if (bSmackNum == CHOOSE_CAMPAIGN) {
-        Process1WindowsMessage();
+        platform::PumpEvents();
         while (gpInputManager->GetEvent().type != MESSAGE_NONE)
             ;
     }
@@ -377,7 +377,7 @@ void SmackManagerMain(void) {
                 DoAdvance(smk2, drawLastFrame, advanceLastFrame2, 0, 1);
                 gbLastFramePlayed = true;
                 while (SmackWait(smk2))
-                    Process1WindowsMessage();
+                    platform::PumpEvents();
             } else {
                 if (bSmackNum == EXPANSION_CAMPAIGN)
                     DoAdvance(smk2, 1, 1, 0, 1);
@@ -388,7 +388,7 @@ void SmackManagerMain(void) {
                 companionStarted26 = 1;
         }
 
-        Process1WindowsMessage();
+        platform::PumpEvents();
         tag_message message;
         message = gpInputManager->GetEvent();
         switch (message.type) {
@@ -435,8 +435,8 @@ void SmackManagerMain(void) {
                             gpWindowManager->m_screen,
                             0,
                             0,
-                            WINGRAPH_WIDTH,
-                            WINGRAPH_HEIGHT,
+                            GRAPHICS_WIDTH,
+                            GRAPHICS_HEIGHT,
                             0,
                             0
                         );
@@ -463,8 +463,8 @@ void SmackManagerMain(void) {
                                 smk2,
                                 SmackOptions[bExpansionSmackNum].companionX,
                                 SmackOptions[bExpansionSmackNum].companionY,
-                                WINGRAPH_WIDTH,
-                                WINGRAPH_HEIGHT,
+                                GRAPHICS_WIDTH,
+                                GRAPHICS_HEIGHT,
                                 gpWindowManager->m_screen->m_pixels,
                                 0
                             );
@@ -528,16 +528,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            GRAPHICS_WIDTH,
+            GRAPHICS_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            GRAPHICS_WIDTH,
+            GRAPHICS_HEIGHT,
             0,
             0
         );
@@ -548,16 +548,16 @@ playbackDone:
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            GRAPHICS_WIDTH,
+            GRAPHICS_HEIGHT,
             BACKGROUND_COLOR
         );
         BlitBitmapToScreen(
             gpWindowManager->m_screen,
             0,
             0,
-            WINGRAPH_WIDTH,
-            WINGRAPH_HEIGHT,
+            GRAPHICS_WIDTH,
+            GRAPHICS_HEIGHT,
             0,
             0
         );

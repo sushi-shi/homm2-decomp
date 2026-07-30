@@ -2,7 +2,7 @@
 #define HOMM2_KB_H
 
 #include <Ints.h>
-#include <windows.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/REMOTE_TYPES.h>
@@ -667,10 +667,10 @@ extern icon* gSystemIcons;
 extern char gText[];
 extern char* gWellExtraNames[];
 extern SWinSetup gWinSetup[];
-extern HMENU hmnuAdv;
-extern HMENU hmnuCmbt;
-extern HMENU hmnuDflt;
-extern HMENU hmnuTown;
+extern platform::MenuHandle hmnuAdv;
+extern platform::MenuHandle hmnuCmbt;
+extern platform::MenuHandle hmnuDflt;
+extern platform::MenuHandle hmnuTown;
 extern H2EnumStorage<CDRomSetupResult, i32> iCDRomErr;
 extern i32 iMaxMapExtra;
 extern i32 iNextShingleAnim;

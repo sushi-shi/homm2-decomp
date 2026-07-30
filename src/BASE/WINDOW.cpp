@@ -4,7 +4,7 @@
 #include <BASE/widget.h>
 #include <BASE/message.h>
 #include <BASE/mouseManager.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/listBoxWidget.h>
 #include <BASE/dropListWidget.h>
 #include <BASE/textEntryWidget.h>

@@ -22,7 +22,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/Newgame.h>
 
 typedef enum NewGameConstant {
@@ -1112,7 +1112,7 @@ cleanup:
                         break;
                 }
             }
-            if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
+            if (static_cast<i32>(platform::Ticks()) > glTimers[0]) {
                 gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
                 gpGame->DrawNGKPDisplayString(1);
             }
@@ -1673,9 +1673,9 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
+    if (static_cast<i32>(platform::Ticks()) > glTimers[0]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
-        glTimers[0] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
+        glTimers[0] = platform::Ticks() + GAME_CURSOR_FLASH_TICKS;
     }
 
     if (cursor > 0)

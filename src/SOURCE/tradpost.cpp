@@ -11,7 +11,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/tradpost.h>
 #include <BASE/message.h>
@@ -327,7 +327,7 @@ void DoTradeKnob(struct tag_message message) {
             gpMouseManager->Main(message);
             UpdateTradingPost(1);
         }
-        Process1WindowsMessage();
+        platform::PumpEvents();
         message = gpInputManager->GetEvent();
         if (message.type == MESSAGE_MOUSE_MOVE) {
             nextMessage = gpInputManager->PeekEvent();

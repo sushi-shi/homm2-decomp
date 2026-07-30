@@ -3,7 +3,7 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <stdio.h>
 
 typedef enum AudiereMusicConstant {
@@ -138,7 +138,7 @@ void PlayAudiereMusic(
     }
     if (fadeSteps > 0) {
         fadeSteps = AUDIERE_FADE_STEP_COUNT;
-        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + AUDIERE_FADE_DELAY;
+        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = platform::Ticks() + AUDIERE_FADE_DELAY;
         SetAudiereMusicVolume(AUDIERE_FADE_START_LEVEL, false);
     } else {
         SetAudiereMusicVolume(-1, false);

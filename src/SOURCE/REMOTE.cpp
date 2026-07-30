@@ -6,19 +6,15 @@
 #include <BASE/Misc.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/comwin.h>
+#include <PLATFORM/Network.h>
 #include <SOURCE/CURSOR.h>
-#include <SOURCE/dpnetwin.h>
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/Modem.h>
-#include <SOURCE/Netbios.h>
-#include <SOURCE/netwin.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
 typedef enum RemoteImplementationConstant {
@@ -618,7 +614,7 @@ void PollRemote(void) {
     cnt = 0;
     oldInPoll = gbInPollSound;
     qFull = 0;
-    if (KBTickCount() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
+    if (platform::Ticks() - lLastHeartbeatSend > REMOTE_HEARTBEAT_INTERVAL) {
         REMOTE_MESSAGE(sndBuf)->sender = static_cast<i8>(giThisNetPos);
         REMOTE_MESSAGE(sndBuf)->type = REMOTE_MESSAGE_HEARTBEAT;
         REMOTE_MESSAGE(sndBuf)->payloadSize = 0;
@@ -638,13 +634,13 @@ void PollRemote(void) {
                 : REMOTE_BROADCAST_PLAYER,
             REMOTE_HEARTBEAT_MESSAGE_SIZE
         );
-        lLastHeartbeatSend = KBTickCount();
+        lLastHeartbeatSend = platform::Ticks();
     }
 
     if (giThisNetPos == 0) {
         for (queueIndex = 0; queueIndex < giNumHumanPlayers; queueIndex++) {
             if (queueIndex != giThisNetPos
-                && KBTickCount() > lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT
+                && platform::Ticks() > lLastHeartbeatReceive[queueIndex] + REMOTE_HOST_TIMEOUT
                 && bInTimeoutFail == 0) {
                 bInTimeoutFail = 1;
                 gbInPollSound = false;
@@ -658,7 +654,7 @@ void PollRemote(void) {
                     gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
                 );
                 if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                    lLastHeartbeatReceive[queueIndex] = KBTickCount();
+                    lLastHeartbeatReceive[queueIndex] = platform::Ticks();
                 } else {
                     hostExit.netPosition = static_cast<i8>(queueIndex);
                     hostExit.gamePosition = static_cast<i8>(NetPosToGamePos(queueIndex));
@@ -675,7 +671,7 @@ void PollRemote(void) {
         timeout = REMOTE_GUEST_TIMEOUT;
         if (giThisNetPos != 1)
             timeout += REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT;
-        if (KBTickCount() > lLastHeartbeatReceive[0] + timeout && bInTimeoutFail == 0) {
+        if (platform::Ticks() > lLastHeartbeatReceive[0] + timeout && bInTimeoutFail == 0) {
             bInTimeoutFail = 1;
             gbInPollSound = false;
             if (giThisNetPos == 1) {
@@ -696,7 +692,7 @@ void PollRemote(void) {
                 gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                lLastHeartbeatReceive[0] = KBTickCount();
+                lLastHeartbeatReceive[0] = platform::Ticks();
             } else if (giThisNetPos == 1) {
                 guestExit.netPosition = 0;
                 guestExit.gamePosition = static_cast<i8>(NetPosToGamePos(0));
@@ -744,7 +740,7 @@ void PollRemote(void) {
                 giLastConfirm = REMOTE_MESSAGE(rcvBufIn)->id;
                 goto done;
             } else if (REMOTE_MESSAGE(rcvBufIn)->type == REMOTE_MESSAGE_HEARTBEAT) {
-                lLastHeartbeatReceive[REMOTE_MESSAGE(rcvBufIn)->sender] = KBTickCount();
+                lLastHeartbeatReceive[REMOTE_MESSAGE(rcvBufIn)->sender] = platform::Ticks();
                 cmdByte = REMOTE_MESSAGE(rcvBufIn)->command;
                 if ((cmdByte & REMOTE_HEARTBEAT_CONTROL_FLAG) != 0
                     && gbThisNetGotAdventureControl == 0)
@@ -823,10 +819,10 @@ i32 TransmitAndWait(
     );
     if (result == 0)
         goto transmitComplete;
-    clock = KBTickCount();
+    clock = platform::Ticks();
     complete = 0;
     while (complete == 0) {
-        if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
+        if (clock + REMOTE_CHAIN_TIMEOUT < platform::Ticks()) {
             NormalDialog(
                   "\xce\xf8\xe8\xe1\xea\xe0\x20\xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8\x20\xe4\xe0\xed\xed\xfb\xf5\x2e\x20\xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc\x3f",
                 NORMAL_DIALOG_CONFIRM,
@@ -840,7 +836,7 @@ i32 TransmitAndWait(
                 0
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                clock = KBTickCount();
+                clock = platform::Ticks();
             } else {
                 result = 0;
                 goto transmitComplete;

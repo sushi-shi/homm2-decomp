@@ -6,7 +6,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
 
@@ -44,7 +44,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     for (sweepPosition = -PROFILE_RADIUS; sweepPosition < SWEEP_END; sweepPosition += step7) {
         PollSound();
         deadline7 =
-            KBTickCount() + static_cast<i32>(9.0f * gfCombatSpeedMod[gConfig.combatSpeed]);
+            platform::Ticks() + static_cast<i32>(9.0f * gfCombatSpeedMod[gConfig.combatSpeed]);
 
         for (idx = 0; idx <= PROFILE_SIZE - 1; idx++) {
             column7 = sweepPosition + idx - PROFILE_RADIUS;

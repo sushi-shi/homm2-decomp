@@ -16,7 +16,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/Campaign.h>
 typedef enum CampaignScenarioArmyCount {
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
@@ -701,7 +701,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
-    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+    if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;

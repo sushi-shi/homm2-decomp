@@ -4,10 +4,10 @@
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Graphics.h>
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/message.h>
@@ -132,7 +132,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
             if (event->type == MESSAGE_KEY_DOWN
                 && event->payload.keyboard.keyCode == INPUT_SCAN_F1) {
                 SetFullScreenStatus(0);
-                AppCommand(hwndApp, 0, H2EnumIndex(KBWIN_MENU_HELP), 0);
+                platform::ShowHelp();
             }
             if (event->type == MESSAGE_KEY_DOWN && event->payload.keyboard.keyCode == INPUT_SCAN_F4)
                 SetFullScreenStatus(1 - gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen);
@@ -150,7 +150,6 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
         return 1;
     gpInputManager->m_mouseMessageActive = 1;
 
-    i32 captureReleased;
     tag_message* event = &gpInputManager->m_eventRing[gpInputManager->m_writeIndex];
     event->payload.mouse.modifiers = MESSAGE_MODIFIER_NONE;
     event->payload.mouse.screenY = 0;
@@ -168,47 +167,34 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             goto mouseCoordinates;
         case WM_LBUTTONDOWN:
             event->type = MESSAGE_LEFT_BUTTON_DOWN;
-            SetCapture(hwndApp);
             goto mouseCoordinates;
         case WM_RBUTTONDOWN:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
-            SetCapture(hwndApp);
             goto mouseCoordinates;
         case WM_RBUTTONDBLCLK:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
             goto mouseCoordinates;
         case WM_LBUTTONUP:
             event->type = MESSAGE_LEFT_BUTTON_UP;
-            captureReleased = ReleaseCapture();
-            if (captureReleased == 0)
-                LogStr(
-                    "ReleaseCapture Failed"
-                );
             goto mouseCoordinates;
         case WM_RBUTTONUP:
             event->type = MESSAGE_RIGHT_BUTTON_UP;
-            captureReleased = ReleaseCapture();
-            if (captureReleased == 0)
-                LogStr(
-                    "ReleaseCapture Failed"
-                );
         mouseCoordinates:
-            event->payload.mouse.x =
-                (static_cast<i16>(messageData) * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-            event->payload.mouse.y =
-                (static_cast<i16>(HIWORD(messageData)) * MOUSE_SCREEN_HEIGHT)
-                / iMainWinScreenHeight;
+            event->payload.mouse.x = static_cast<i16>(messageData);
+            event->payload.mouse.y = static_cast<i16>(
+                static_cast<u32l>(messageData) >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
+            );
             event->payload.mouse.screenX = event->payload.mouse.x;
             event->payload.mouse.screenY = event->payload.mouse.y;
 
             if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0
                 && gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor == 0
-                && iLastBWOnScreenCheck < KBTickCount()
+                && iLastBWOnScreenCheck < platform::Ticks()
                 && event->payload.mouse.x > CURSOR_INTERIOR_MIN_EXCLUSIVE
                 && event->payload.mouse.x < CURSOR_INTERIOR_MAX_X_EXCLUSIVE
                 && event->payload.mouse.y > CURSOR_INTERIOR_MIN_EXCLUSIVE
                 && event->payload.mouse.y < CURSOR_INTERIOR_MAX_Y_EXCLUSIVE) {
-                iLastBWOnScreenCheck = KBTickCount() + CURSOR_CHECK_DELAY;
+                iLastBWOnScreenCheck = platform::Ticks() + CURSOR_CHECK_DELAY;
                 gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
             }
             break;

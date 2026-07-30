@@ -8,8 +8,8 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/WIN32/LegacyVideo.h>
 
 typedef enum KbWinPrivateConstant {
     TIMER_UPDATE_MIN_INTERVAL = 5
@@ -182,7 +182,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
 
     switch (message) {
         case WM_CREATE:
-            srand(KBTickCount());
+            srand(platform::Ticks());
             SetTimer(window, KBWIN_TIMER_ID, KBWIN_TIMER_INTERVAL, NULL);
             GdiSetBatchLimit(1);
             return 0;
@@ -202,7 +202,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 return 0;
             break;
         case WM_TIMER:
-            lTemp = KBTickCount();
+            lTemp = platform::Ticks();
             if (lTemp > lLastGTimerTickCount + TIMER_UPDATE_MIN_INTERVAL) {
                 lLastGTimerTickCount = lTemp;
             }
@@ -327,7 +327,7 @@ void Process1WindowsMessage(void) {
         TranslateMessage(&message);
         DispatchMessageA(&message);
     }
-    currentTick = KBTickCount();
+    currentTick = platform::Ticks();
     if (currentTick - lLastAilServe > KBWIN_SOUND_SERVICE_INTERVAL) {
         lLastAilServe = currentTick;
         gpSoundManager->ServiceSound();
@@ -434,7 +434,7 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, H2EnumIndex(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
-void KBChangeMenu(HMENU menu) {
+void platform::ChangeMenu(HMENU menu) {
     if (menu == NULL)
         menu = hmnuCurrent;
     else
@@ -465,7 +465,7 @@ void SetMenuStatus(i32 showMenu) {
         winWidth = gConfig.gfx[H2EnumIndex(giCurExe)].width;
         height = gConfig.gfx[H2EnumIndex(giCurExe)].height;
         gConfig.gfx[H2EnumIndex(giCurExe)].showMenu = showMenu;
-        KBChangeMenu(NULL);
+        platform::ChangeMenu(NULL);
         gConfig.gfx[H2EnumIndex(giCurExe)].width = winWidth;
         gConfig.gfx[H2EnumIndex(giCurExe)].height = height;
         WritePrefs();
@@ -480,7 +480,7 @@ void SetMenuStatus(i32 showMenu) {
     }
 }
 
-void SetNoDialogMenus(i32 menusEnabled) {
+void platform::SetDialogMenusEnabled(i32 menusEnabled) {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
     if (!gbNoDialogMenusOn && menusEnabled)

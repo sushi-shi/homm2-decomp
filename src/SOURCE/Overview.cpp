@@ -17,7 +17,7 @@
 #include <SOURCE/RECRUIT.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/Overview.h>
 #include <BASE/widgetKind.h>
 #include <SOURCE/playerData.h>
@@ -1212,7 +1212,7 @@ void game::DoKnob(void) {
                     overWin->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             }
-            Process1WindowsMessage();
+            platform::PumpEvents();
             widgetMessage = gpInputManager->GetEvent();
             if (widgetMessage.type == MESSAGE_MOUSE_MOVE) {
                 i32 discardMouseMoves = 1;

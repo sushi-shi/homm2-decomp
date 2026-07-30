@@ -8,8 +8,9 @@
 #include <BASE/INPUTMGR.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Runtime.h>
+#include <PLATFORM/WIN32/LegacyVideo.h>
+#include <PLATFORM/WIN32/Application.h>
 
 
 typedef enum WingraphPaletteConstant {
@@ -107,7 +108,7 @@ void DDInitGraphics(void) {
             118
         );
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
-        SetMenuStatus(0);
+        platform::SetMenuVisible(0);
         result = lpDD->SetCooperativeLevel(
             hwndApp,
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
@@ -206,7 +207,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDSourceRect.bottom > WINGRAPH_HEIGHT)
             gDDSourceRect.bottom = WINGRAPH_HEIGHT;
 
-        lPaintStart = KBTickCount();
+        lPaintStart = platform::Ticks();
         while (1) {
             gDDResult =
                 lpDDSPrimary->Blt(&gDDDestinationRect, lpDDSOne, &gDDSourceRect, DDBLT_WAIT, NULL);
@@ -238,7 +239,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
                         260
                     );
             } else if (gDDResult == DDERR_SURFACEBUSY
-                       && KBTickCount() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
+                       && platform::Ticks() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
                 iBusyRetry++;
             } else if (gDDResult != DD_OK) {
                 DDSD(
@@ -600,7 +601,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         gbWinGraphBusy = true;
         gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = fullScreen;
         if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0)
-            SetMenuStatus(0);
+            platform::SetMenuVisible(0);
 
         hres = lpDD->SetCooperativeLevel(
             hwndApp,
@@ -651,7 +652,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         WritePrefs();
         gbWinGraphBusy = false;
         if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
-            SetMenuStatus(1);
+            platform::SetMenuVisible(1);
             ResizeWindow(x, y, width, windowHeight);
         } else {
             gConfig.gfx[H2EnumIndex(giCurExe)].x = x;
@@ -924,7 +925,7 @@ void ConnectToDLLs(void) {
         gbDDrawAttached = true;
     } else {
         gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = 0;
-        SetMenuStatus(1);
+        platform::SetMenuVisible(1);
     }
 }
 
@@ -1090,7 +1091,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     memcpy(gpWindowManager->m_screen->m_pixels, buffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     H2_FREE(buffer);
     if (fullState != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
-        SetMenuStatus(1);
+        platform::SetMenuVisible(1);
         ResizeWindow(x, y, width, hgt);
     }
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0, 0);

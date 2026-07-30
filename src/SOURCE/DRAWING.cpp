@@ -18,7 +18,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 enum class CombatDrawLayer : i32 {
@@ -120,7 +120,7 @@ void combatManager::ClearCombatMessages(i32 force) {
     m_combatMessagePending = 0;
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
         return;
-    if (force != 0 || m_combatMessageExpiration < KBTickCount()) {
+    if (force != 0 || m_combatMessageExpiration < platform::Ticks()) {
         strcpy(
             m_previousCombatMessage,
             ""
@@ -142,7 +142,7 @@ void combatManager::ClearCombatMessages(i32 force) {
 
 void combatManager::CheckUpdateCombatMessages(void) {
     if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0
-        && m_combatMessageExpiration < KBTickCount())
+        && m_combatMessageExpiration < platform::Ticks())
         CombatMessage(
             "",
             1,
@@ -183,7 +183,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
         m_combatMessagePending = 0;
     } else {
         if (retainPrevious == 0) {
-            if (m_combatMessageExpiration > KBTickCount()) {
+            if (m_combatMessageExpiration > platform::Ticks()) {
                 return;
             } else {
                 strcpy(
@@ -202,7 +202,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
                     ""
                 );
             m_previousCombatMessageExpiration = m_combatMessageExpiration;
-            m_combatMessageExpiration = KBTickCount() + COMBAT_MESSAGE_TIMEOUT;
+            m_combatMessageExpiration = platform::Ticks() + COMBAT_MESSAGE_TIMEOUT;
         }
 
         newlinePtr = FindToken(gCombatMessageText, '\n');
@@ -1365,7 +1365,7 @@ void combatManager::DrawFrame(
         if (waitForTimer != 0)
             DelayTil(glTimers);
         glTimers[0] =
-            static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
+            static_cast<i32>(platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
         gbFullCombatScreenDrawn = false;
         if (updateScreen == 1) {
             if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
@@ -1384,7 +1384,7 @@ void combatManager::DrawFrame(
             DelayTil(glTimers);
         gbFullCombatScreenDrawn = true;
         glTimers[0] =
-            static_cast<i32>(KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
+            static_cast<i32>(platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * delay);
         UpdateCombatArea();
     }
 

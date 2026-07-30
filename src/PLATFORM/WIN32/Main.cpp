@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/WIN32/Application.h>
 
 #include <PLATFORM/Platform.h>
 

@@ -2,7 +2,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/highScoreManager.h>
 #include <BASE/Misc.h>
 #include <BASE/executive.h>
@@ -39,9 +39,9 @@ i32 highScoreManager::Open(i32 id) {
     m_priority = id;
     m_active = true;
     strcpy(m_name, "highScoreManager");
-    KBChangeMenu(hmnuDflt);
+    platform::ChangeMenu(hmnuDflt);
     gpWindowManager->FadeScreen(FADE_IN, HIGH_SCORE_FADE_STEPS, NULL);
-    glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
+    glTimers[HIGH_SCORE_TIMER_SLOT] = platform::Ticks() + HIGH_SCORE_ANIMATION_DELAY;
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
@@ -61,8 +61,8 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     if (gbShowHighScore != 0)
         gbShowHighScore = false;
 
-    if (glTimers[HIGH_SCORE_TIMER_SLOT] < KBTickCount()) {
-        glTimers[HIGH_SCORE_TIMER_SLOT] = KBTickCount() + HIGH_SCORE_ANIMATION_DELAY;
+    if (glTimers[HIGH_SCORE_TIMER_SLOT] < platform::Ticks()) {
+        glTimers[HIGH_SCORE_TIMER_SLOT] = platform::Ticks() + HIGH_SCORE_ANIMATION_DELAY;
         for (entry = 0; entry < HIGH_SCORE_DISPLAY_ENTRY_COUNT; entry++) {
             m_animationFrames[entry] =
                 (m_animationFrames[entry] + 1) % HIGH_SCORE_ANIMATION_FRAME_COUNT;
