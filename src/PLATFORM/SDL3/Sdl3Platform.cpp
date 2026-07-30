@@ -115,6 +115,7 @@ public:
                             | (static_cast<std::uint32_t>(color.g) << 8)
                             | static_cast<std::uint32_t>(color.b);
         }
+        Present();
     }
 
     void Present() override {
