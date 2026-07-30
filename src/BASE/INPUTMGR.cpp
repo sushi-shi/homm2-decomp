@@ -25,6 +25,14 @@ static inline u32 EncodeScanCode(u32 scanCode) {
     return scanCode << H2EnumIndex(ENCODED_SCAN_CODE_SHIFT);
 }
 
+static inline i32l PackInputPoint(platform::Point point) {
+    return static_cast<i32l>(
+        static_cast<u16>(point.x)
+        | (static_cast<u32l>(static_cast<u16>(point.y))
+           << H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT))
+    );
+}
+
 typedef enum InputManagerCursorBounds {
     CURSOR_INTERIOR_MIN_EXCLUSIVE   = 3,
     CURSOR_INTERIOR_MAX_X_EXCLUSIVE = 636,
@@ -228,6 +236,51 @@ afterMouseCoordinates:
     return event->type == MESSAGE_NONE;
 }
 
+static void PlatformEventHandler(const platform::Event& event) {
+    using Type = platform::Event::Type;
+
+    switch (event.type) {
+        case Type::KeyDown:
+        case Type::KeyUp:
+            KeyboardMessageHandler(
+                nullptr,
+                event.type == Type::KeyDown
+                    ? platform::INPUT_MESSAGE_KEY_DOWN
+                    : platform::INPUT_MESSAGE_KEY_UP,
+                0,
+                static_cast<i32l>(
+                    event.scanCode << H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
+                )
+            );
+            break;
+        case Type::MouseMove:
+            MouseMessageHandler(
+                nullptr,
+                platform::INPUT_MESSAGE_MOUSE_MOVE,
+                0,
+                PackInputPoint(event.position)
+            );
+            break;
+        case Type::MouseDown:
+        case Type::MouseUp: {
+            u32 message;
+            if (event.button == platform::MouseButton::Right) {
+                message = event.type == Type::MouseDown
+                    ? platform::INPUT_MESSAGE_RIGHT_DOWN
+                    : platform::INPUT_MESSAGE_RIGHT_UP;
+            } else {
+                message = event.type == Type::MouseDown
+                    ? platform::INPUT_MESSAGE_LEFT_DOWN
+                    : platform::INPUT_MESSAGE_LEFT_UP;
+            }
+            MouseMessageHandler(nullptr, message, 0, PackInputPoint(event.position));
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 inputManager::inputManager(void) : baseManager() {
     m_active = false;
     m_mouseMessageActive = 0;
@@ -255,12 +308,14 @@ i32 inputManager::Open(i32 priority) {
     m_messageMask = BASE_MANAGER_ACCEPT_MOUSE_MOVE;
     m_priority = INPUT_MANAGER_PRIORITY;
     m_active = true;
+    platform::SetEventHandler(PlatformEventHandler);
     strcpy(m_name, gInputManagerText.managerName);
     return 0;
 }
 
 void inputManager::Close(void) {
     if (m_active == true) {
+        platform::SetEventHandler(nullptr);
         ResetEventQueue(this);
         m_requestedPriority = 0;
         m_active = false;

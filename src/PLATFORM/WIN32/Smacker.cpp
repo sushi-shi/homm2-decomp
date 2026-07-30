@@ -7,13 +7,17 @@
 #include <cstring>
 #include <new>
 #include <string>
+#include <vector>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
+#include <libavutil/channel_layout.h>
 #include <libavutil/error.h>
 #include <libavutil/pixfmt.h>
 #include <libavutil/rational.h>
+#include <libavutil/samplefmt.h>
+#include <libswresample/swresample.h>
 }
 
 #include <PLATFORM/Platform.h>
@@ -21,6 +25,30 @@ extern "C" {
 #include "State.h"
 
 namespace {
+
+constexpr u32 kAudioTrackFlags = 0xfe000;
+
+struct AudioDecoder {
+    AVFormatContext* format = nullptr;
+    AVCodecContext* codec = nullptr;
+    AVFrame* frame = nullptr;
+    AVPacket* packet = nullptr;
+    SwrContext* resampler = nullptr;
+
+    ~AudioDecoder() {
+        swr_free(&resampler);
+        av_packet_free(&packet);
+        av_frame_free(&frame);
+        avcodec_free_context(&codec);
+        avformat_close_input(&format);
+    }
+};
+
+struct DecodedAudio {
+    std::vector<u8> samples;
+    std::int32_t sampleRate = 0;
+    std::int32_t channels = 0;
+};
 
 struct SmackerState {
     AVFormatContext* format = nullptr;
@@ -37,6 +65,7 @@ struct SmackerState {
     bool draining = false;
     bool rectPending = false;
     bool paletteReady = false;
+    platform::VoiceId audioVoice = 0;
     std::array<u8, 768> palette{};
 };
 
@@ -48,11 +77,127 @@ void CloseState(SmackerState* state) {
     if (state == nullptr) {
         return;
     }
+    platform::Audio().StopVoice(state->audioVoice);
     av_packet_free(&state->packet);
     av_frame_free(&state->frame);
     avcodec_free_context(&state->codec);
     avformat_close_input(&state->format);
     delete state;
+}
+
+bool AppendAudioFrame(AudioDecoder& decoder, DecodedAudio& audio) {
+    const std::int32_t capacity =
+        swr_get_out_samples(decoder.resampler, decoder.frame->nb_samples);
+    if (capacity < 0) {
+        return false;
+    }
+
+    const std::size_t first = audio.samples.size();
+    audio.samples.resize(
+        first + static_cast<std::size_t>(capacity) * audio.channels * sizeof(std::int16_t)
+    );
+    u8* output = audio.samples.data() + first;
+    const u8* const* input =
+        const_cast<const u8* const*>(decoder.frame->extended_data);
+    const std::int32_t converted = swr_convert(
+        decoder.resampler,
+        &output,
+        capacity,
+        input,
+        decoder.frame->nb_samples
+    );
+    if (converted < 0) {
+        return false;
+    }
+    audio.samples.resize(
+        first + static_cast<std::size_t>(converted) * audio.channels * sizeof(std::int16_t)
+    );
+    return true;
+}
+
+bool ReceiveAudio(AudioDecoder& decoder, DecodedAudio& audio) {
+    for (;;) {
+        const std::int32_t received =
+            avcodec_receive_frame(decoder.codec, decoder.frame);
+        if (received == AVERROR(EAGAIN) || received == AVERROR_EOF) {
+            return true;
+        }
+        if (received < 0 || !AppendAudioFrame(decoder, audio)) {
+            return false;
+        }
+        av_frame_unref(decoder.frame);
+    }
+}
+
+bool DecodeAudio(const std::string& path, DecodedAudio& audio) {
+    AudioDecoder decoder;
+    if (avformat_open_input(&decoder.format, path.c_str(), nullptr, nullptr) < 0
+        || avformat_find_stream_info(decoder.format, nullptr) < 0) {
+        return false;
+    }
+
+    const AVCodec* codec = nullptr;
+    const std::int32_t stream =
+        av_find_best_stream(decoder.format, AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
+    if (stream < 0 || codec == nullptr) {
+        return false;
+    }
+
+    decoder.codec = avcodec_alloc_context3(codec);
+    decoder.frame = av_frame_alloc();
+    decoder.packet = av_packet_alloc();
+    if (decoder.codec == nullptr || decoder.frame == nullptr || decoder.packet == nullptr
+        || avcodec_parameters_to_context(
+               decoder.codec,
+               decoder.format->streams[stream]->codecpar
+           ) < 0
+        || avcodec_open2(decoder.codec, codec, nullptr) < 0) {
+        return false;
+    }
+
+    AVChannelLayout inputLayout{};
+    if (decoder.codec->ch_layout.nb_channels > 0) {
+        if (av_channel_layout_copy(&inputLayout, &decoder.codec->ch_layout) < 0) {
+            return false;
+        }
+    } else {
+        av_channel_layout_default(&inputLayout, 1);
+    }
+    audio.channels = std::clamp(inputLayout.nb_channels, 1, 2);
+    audio.sampleRate = decoder.codec->sample_rate;
+    AVChannelLayout outputLayout{};
+    av_channel_layout_default(&outputLayout, audio.channels);
+    const std::int32_t configured = swr_alloc_set_opts2(
+        &decoder.resampler,
+        &outputLayout,
+        AV_SAMPLE_FMT_S16,
+        audio.sampleRate,
+        &inputLayout,
+        decoder.codec->sample_fmt,
+        audio.sampleRate,
+        0,
+        nullptr
+    );
+    av_channel_layout_uninit(&outputLayout);
+    av_channel_layout_uninit(&inputLayout);
+    if (configured < 0 || swr_init(decoder.resampler) < 0) {
+        return false;
+    }
+
+    while (av_read_frame(decoder.format, decoder.packet) >= 0) {
+        if (decoder.packet->stream_index == stream
+            && avcodec_send_packet(decoder.codec, decoder.packet) >= 0
+            && !ReceiveAudio(decoder, audio)) {
+            av_packet_unref(decoder.packet);
+            return false;
+        }
+        av_packet_unref(decoder.packet);
+    }
+    if (avcodec_send_packet(decoder.codec, nullptr) < 0
+        || !ReceiveAudio(decoder, audio)) {
+        return false;
+    }
+    return !audio.samples.empty();
 }
 
 bool ReceiveFrame(SmackerState& state) {
@@ -161,6 +306,19 @@ Smack* SmackOpen(const char* name, u32 flags, u32) {
     smack->OpenFlags = flags;
     smack->Reserved = state;
     state->nextFrameTime = platform::Host().Ticks();
+
+    if ((flags & kAudioTrackFlags) != 0) {
+        DecodedAudio audio;
+        if (DecodeAudio(path, audio)) {
+            platform::SoundData sound;
+            sound.samples = audio.samples.data();
+            sound.byteCount = audio.samples.size();
+            sound.sampleRate = audio.sampleRate;
+            sound.channels = audio.channels;
+            sound.bitsPerSample = 16;
+            state->audioVoice = platform::Audio().PlaySound(sound, 127, 0);
+        }
+    }
 
     if (!LoadFrame(*smack, *state)) {
         SmackClose(smack);

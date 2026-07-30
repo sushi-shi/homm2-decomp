@@ -9,6 +9,7 @@ namespace platform {
 namespace {
 
 MenuHandle gCurrentMenu;
+EventHandler gEventHandler;
 
 }
 
@@ -16,8 +17,18 @@ i32l Ticks() {
     return static_cast<i32l>(Host().Ticks());
 }
 
+void SetEventHandler(EventHandler handler) {
+    gEventHandler = handler;
+}
+
 void PumpEvents() {
     Host().Yield();
+    Event event;
+    while (Input().Poll(event)) {
+        if (gEventHandler != nullptr) {
+            gEventHandler(event);
+        }
+    }
 }
 
 MenuHandle LoadMenu(const char* name) {
