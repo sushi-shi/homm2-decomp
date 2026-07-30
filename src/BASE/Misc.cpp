@@ -553,9 +553,6 @@ void SetGameDefaults(void) {
 }
 
 void ReadPrefsFromFile(void) {
-    i32 result;
-    FILE* file;
-
     snprintf(
         gText,
         GLOBAL_TEXT_BUFFER_SIZE,
@@ -563,16 +560,14 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         "HEROES2.CFG"
     );
-    if (access(gText, 0) == -1) {
+    FILE* file = access(gText, 0) == -1 ? NULL : fopen(gText, "rb");
+    if (file == NULL) {
         SetInstallDefaults();
         SetGameDefaults();
         WritePrefs();
     } else {
-        file = fopen(gText, "rb");
-        if (file == NULL)
-            FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, file);
-        result = fclose(file);
+        fclose(file);
         if (gConfig.needsDefaultInitialization != 0) {
             SetGameDefaults();
             WritePrefs();
