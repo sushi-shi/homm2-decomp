@@ -13,10 +13,10 @@ VA(0x004dac60, 0x8f)
 tileset::tileset(u32l id)
     : resource(RESOURCE_CATEGORY_TILESET, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
+    m_tileCount = gpResourceManager->ReadWord();
     m_tileWidth = gpResourceManager->ReadWord();
     m_tileHeight = gpResourceManager->ReadWord();
-    m_tileCount = gpResourceManager->ReadWord();
-    u32 size = m_tileCount * m_tileWidth * m_tileHeight;
+    u32 size = m_tileHeight * m_tileCount * m_tileWidth;
     m_data = static_cast<char*>(H2_ALLOC_AT(size, gTilesetSourceFiles.allocation, 18));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
