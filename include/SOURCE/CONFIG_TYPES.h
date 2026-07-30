@@ -14,19 +14,6 @@ struct exeGfxConfig {
     i32 colorMouseCursor;
 };
 
-enum class ConfigMusicSource : i32 {
-    CONFIG_MUSIC_SOURCE_MIDI    = 0,
-    CONFIG_MUSIC_SOURCE_CD      = 1,
-    CONFIG_MUSIC_SOURCE_DEFAULT = 3
-};
-using enum ConfigMusicSource;
-
-enum class ConfigOperaMode : i32 {
-    CONFIG_OPERA_DISABLED = 0,
-    CONFIG_OPERA_ENABLED  = 1
-};
-using enum ConfigOperaMode;
-
 enum class ConfigWalkSpeed : i32 {
     CONFIG_WALK_SPEED_SLOWEST = 0,
     CONFIG_WALK_SPEED_SLOW    = 1,
@@ -110,15 +97,15 @@ struct configStruct {
     i32 evilInterfaceUsage;
     char autoLoadName[CONFIG_SAVE_NAME_SIZE];
     char autoSaveName[CONFIG_SAVE_NAME_SIZE];
-    char mciError;
+    char reservedConfigByte;
     char needsDefaultInitialization;
     char reservedAfterAutoSave[CONFIG_AUTOSAVE_RESERVED_SIZE];
-    ConfigMusicSource musicSource;
+    i32 reservedConfigWord1;
     char modemInitString[CONFIG_MODEM_INIT_STRING_SIZE];
     H2EnumStorage<ConfigComPort, i32> comPort[H2EnumIndex(CONFIG_CONNECTION_COUNT)];
     H2EnumStorage<ConfigBaudRate, i32> baudRate[H2EnumIndex(CONFIG_CONNECTION_COUNT)];
     char uniqueSystemID[CONFIG_UNIQUE_SYSTEM_ID_SIZE];
-    ConfigOperaMode useOpera;
+    i32 reservedConfigWord2;
     i32 quickCombatLevel;
     i32 combatSpeed;
     i32 autoCombatUseSpells;

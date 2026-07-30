@@ -11,10 +11,6 @@ EXPORTS
   _AIL_set_preference@8
   _AIL_waveOutOpen@16
   _AIL_last_error@0
-  _AIL_redbook_tracks@4
-  _AIL_redbook_track_info@16
-  _AIL_redbook_close@4
-  _AIL_redbook_open@4
   _AIL_init_sample@4
   _AIL_serve@0
   _AIL_stop_sequence@4

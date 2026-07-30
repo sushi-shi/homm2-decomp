@@ -436,7 +436,6 @@ extern i32 giLimitUpdMaxX;
 extern i32 giLimitUpdMaxY;
 extern i32 bPrefsChanged;
 extern i32 giLimitUpdMinY;
-extern struct tag_message CDMsg;
 extern i8 bComboDraw[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE]
                     [ADVMGR_MONSTER_ANIMATION_TABLE_SIZE];
 extern i32 iLastAnimFrame;

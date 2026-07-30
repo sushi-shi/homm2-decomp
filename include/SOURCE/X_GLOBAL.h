@@ -260,7 +260,6 @@ typedef enum KbGameTableConstant {
     KB_WIN_TEXT_COUNT                   = 6,
     KB_HUMAN_DIFFICULTY_TEXT_COUNT      = 6,
     KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT = 6,
-    KB_MUSIC_QUALITY_TEXT_COUNT         = 4,
     KB_SPELL_TEXT_COUNT                 = H2EnumIndex(SPELL_COUNT) + 1,
     KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT = H2EnumIndex(HERO_SKILL_LEVEL_COUNT),
     KB_SECONDARY_SKILL_TEXT_COUNT       = H2EnumIndex(HERO_SKILL_COUNT),
@@ -275,7 +274,7 @@ typedef enum KbGameTableConstant {
     KB_BW_MOUSE_TEXT_COUNT              = 2,
     KB_COMBAT_SPEED_TEXT_COUNT          = KB_COMBAT_SPEED_COUNT + 1,
     KB_COMBAT_MINI_INFO_TEXT_COUNT      = 4,
-    KB_COMMAND_LINE_HELP_COUNT          = 14,
+    KB_COMMAND_LINE_HELP_COUNT          = 10,
     KB_OVERVIEW_TEXT_COUNT              = 6,
     KB_WIN_COM_ERROR_TEXT_COUNT         = 6,
     KB_MINI_VIEW_TEXT_COUNT             = 10,
@@ -333,7 +332,6 @@ extern char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT]
 extern char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern char gcGamePath[GLOBAL_GAME_PATH_SIZE];
 extern char gcMapPath[GLOBAL_MAP_PATH_SIZE];
-extern b32 gbDontTryRedbook;
 extern b32 gbDontTryMIDI;
 extern b32 gbDontTryDigital;
 extern float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT];
@@ -497,7 +495,6 @@ extern char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT];
 extern char* cWinText[KB_WIN_TEXT_COUNT];
 extern char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT];
 extern char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT];
-extern char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT];
 extern char* gSpellDesc[KB_SPELL_TEXT_COUNT];
 extern char* gSpellNames[KB_SPELL_TEXT_COUNT];
 extern char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT];
@@ -548,7 +545,6 @@ extern void* gLowPage;
 extern b32 gbLowPageGrabbed;
 extern i8 xSmackFromNetwork;
 extern i32 bKBDone;
-extern struct _REDBOOK* hRedbookz;
 extern i32 bForceCheckTimeEvent;
 extern u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][H2EnumIndex(INIT_MENU_HOTSPOT_FIELD_COUNT)];
 extern i32 lastIMHoverID;
@@ -609,7 +605,6 @@ extern i32 iCombatControlNetPos[COMBAT_SIDE_COUNT];
 extern char cExpAggPathName[GLOBAL_AGGREGATE_PATH_SIZE];
 extern b32 gbMoveShown;
 extern b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
-extern char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 extern class heroWindow* heroWin;
 extern i32 giOverviewReturnActionExtra;
 extern H2EnumStorage<CombatSide, i32> giCurGeneral;

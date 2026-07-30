@@ -19,7 +19,6 @@ typedef enum KbWinConstant {
     KBWIN_WINDOWED_STYLE          = 0x14cf0000,
     KBWIN_FULLSCREEN_STYLE        = 0x14000000,
     KBWIN_CLASS_STYLE             = 0x100b,
-    KBWIN_CUSTOM_CD_MESSAGE       = 0x3b9,
     KBWIN_MENU_ENTRY_COUNT        = MENU_ENABLE_STATUS_COUNT,
     KBWIN_APP_NAME_SIZE           = 16,
     KBWIN_WINDOW_TITLE_SIZE       = 32,

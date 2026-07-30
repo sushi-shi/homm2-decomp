@@ -206,26 +206,9 @@ void SmackManagerMain(void) {
 
     smk1 = NULL;
     if (bSmackNum != EXPANSION_CAMPAIGN) {
-        while (!smk1) {
-            smk1 = SmackOpen(gText, preloadFlags26 + soundFlags4, SMACKAUTOEXTRA);
-            if (!smk1) {
-                gpWindowManager->FadeScreen(FADE_IN, NORMAL_FADE, NULL);
-                NormalDialog(
-                    "Error reading the Heroes 2 Expansion CD.  Retry?",
-                    NORMAL_DIALOG_CONFIRM,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_SIX)
-                    ShutDown("CDROM drive error.  Exiting.");
-            }
-        }
+        smk1 = SmackOpen(gText, preloadFlags26 + soundFlags4, SMACKAUTOEXTRA);
+        if (!smk1)
+            ShutDown("Unable to open animation file.");
         SmackToBuffer(
             smk1,
             0,
@@ -567,9 +550,6 @@ i32 PlaySmacker(i32 smackNumber) {
     i32 oldUpdateFlags;
 
     xLastChoice = EXPANSION_CAMPAIGN_NONE;
-    if (gbNoCDRom)
-        return 0;
-
     gbInSmackMgr = true;
     gbPlayedThrough = false;
     memcpy(savedPalette, gpBufferPalette->m_data, PALETTE_DATA_SIZE);

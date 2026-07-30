@@ -7,7 +7,7 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-enum class CDRomSetupResult : i32;
+enum class GameDataStatus : i32;
 
 struct SAMPLE2;
 struct SSpellInfo;
@@ -465,7 +465,7 @@ void ForcePollSound(void);
 void InitMainClasses(void);
 void DeleteMainClasses(void);
 void EarlyShutdown(char* caption, char* text);
-void SetupCDRom(void);
+void RequireGameData(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
@@ -582,7 +582,6 @@ extern u8 gColorTableDarkGray[];
 extern b32 gbInMemError;
 extern b32 gbInNewGameSetup;
 extern b32 gbInPollSound;
-extern b32 gbNoCDRom;
 extern b32 gbNoSound;
 extern b32 gbPutzingWithMouseCtr;
 extern b32 gbRemoteOn;
@@ -657,7 +656,7 @@ extern HMENU hmnuAdv;
 extern HMENU hmnuCmbt;
 extern HMENU hmnuDflt;
 extern HMENU hmnuTown;
-extern H2EnumStorage<CDRomSetupResult, i32> iCDRomErr;
+extern H2EnumStorage<GameDataStatus, i32> gGameDataStatus;
 extern i32 iMaxMapExtra;
 extern i32 iNextShingleAnim;
 extern i32 iShingleAnimFrame;

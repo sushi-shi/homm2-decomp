@@ -41,7 +41,6 @@ struct SMiscReadFileText {
     SMiscTextSlot<sizeof("HEROES2.CFG")> configFilename;
     SMiscTextSlot<sizeof("%s")> stringFormat;
     SMiscTextSlot<sizeof("rb")> binaryMode;
-    SMiscTextSlot<sizeof("")> cdRomPathDefault;
     SMiscTextSlot<sizeof("")> appPathDefault;
 };
 
@@ -55,8 +54,6 @@ struct SMiscReadRegistryText {
     SMiscTextSlot<sizeof("Computer Walk Speed")> computerWalkSpeed;
     SMiscTextSlot<sizeof("Show Route")> showRoute;
     SMiscTextSlot<sizeof("Blackout Computer")> blackoutComputer;
-    SMiscTextSlot<sizeof("Sound Quality")> soundQuality;
-    SMiscTextSlot<sizeof("Use Opera")> useOpera;
     SMiscTextSlot<sizeof("Direct Connect Com Port")> directComPort;
     SMiscTextSlot<sizeof("Direct Connect Baud Rate")> directBaudRate;
     SMiscTextSlot<sizeof("Modem Com Port")> modemComPort;
@@ -95,8 +92,6 @@ struct SMiscReadRegistryText {
     SMiscTextSlot<sizeof("Editor Color Mouse Cursor")> editorColorMouseCursor;
     SMiscTextSlot<sizeof("AppPath")> appPath;
     SMiscTextSlot<sizeof("")> appPathDefault;
-    SMiscTextSlot<sizeof("CDDrive")> cdDrive;
-    SMiscTextSlot<sizeof("")> cdDriveDefault;
 };
 
 struct SMiscRemoteNameText {
@@ -122,8 +117,6 @@ struct SMiscWriteRegistryText {
     SMiscTextSlot<sizeof("Computer Walk Speed")> computerWalkSpeed;
     SMiscTextSlot<sizeof("Show Route")> showRoute;
     SMiscTextSlot<sizeof("Blackout Computer")> blackoutComputer;
-    SMiscTextSlot<sizeof("Sound Quality")> soundQuality;
-    SMiscTextSlot<sizeof("Use Opera")> useOpera;
     SMiscTextSlot<sizeof("Direct Connect Com Port")> directComPort;
     SMiscTextSlot<sizeof("Direct Connect Baud Rate")> directBaudRate;
     SMiscTextSlot<sizeof("Modem Com Port")> modemComPort;
@@ -162,19 +155,9 @@ struct SMiscWriteRegistryText {
     SMiscTextSlot<sizeof("Editor Color Mouse Cursor")> editorColorMouseCursor;
 };
 
-struct SMiscCdText {
-    SMiscTextSlot<sizeof("A:\\")> rootDrive;
+struct SMiscMediaText {
     SMiscTextSlot<sizeof(".\\DATA\\HEROES2.AGG")> dataArchive;
-    SMiscTextSlot<sizeof("%s\\heroes2\\anim\\voy24.smk")> configuredAnimationPath;
-    SMiscTextSlot<sizeof("%s")> stringFormat;
-    SMiscTextSlot<sizeof("open %c: type cdaudio alias CD")> openAudioCommand;
-    SMiscTextSlot<sizeof("info CD UPC wait")> audioInfoCommand;
-    SMiscTextSlot<sizeof("close CD")> closeAudioCommand;
-    SMiscTextSlot<sizeof("%c:\\heroes2\\anim\\voy24.smk")> driveAnimationPath;
-    SMiscTextSlot<sizeof(MISC_REGISTRY_KEY)> registryKey;
-    SMiscTextSlot<sizeof("%c:")> driveFormat;
-    SMiscTextSlot<sizeof("CDDrive")> cdDrive;
-    SMiscTextSlot<sizeof("%c:%s")> driveAndPathFormat;
+    SMiscTextSlot<sizeof(".\\HEROES2\\ANIM\\VOY24.SMK")> animationFile;
 };
 
 struct SMiscLogText {
@@ -223,7 +206,7 @@ struct SMiscText {
     SMiscRemoteNameText remoteNames;
     SMiscWriteFileText writeFile;
     SMiscWriteRegistryText writeRegistry;
-    SMiscCdText cd;
+    SMiscMediaText media;
     SMiscLogText log;
     SMiscPcxText pcx;
     SMiscFileText file;

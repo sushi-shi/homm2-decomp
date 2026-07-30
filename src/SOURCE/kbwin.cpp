@@ -90,7 +90,6 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     bProcessMessage[WM_DESTROY] = 1;
     bProcessMessage[WM_QUIT] = 1;
     bProcessMessage[WM_CLOSE] = 1;
-    bProcessMessage[KBWIN_CUSTOM_CD_MESSAGE] = 1;
 
     if (previousInstance == NULL) {
         appClass.hCursor = NULL;
@@ -195,12 +194,6 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 UpdateTimers(0);
             }
             return 0;
-        case KBWIN_CUSTOM_CD_MESSAGE:
-            if (messageParam == 1) {
-                gpSoundManager
-                    ->CDPlay(gpSoundManager->m_cdTrack, 0, gpSoundManager->m_cdPlayFrame, 1);
-            }
-            break;
         case WM_ACTIVATEAPP:
             gbForegroundApp = messageParam;
             return 0;

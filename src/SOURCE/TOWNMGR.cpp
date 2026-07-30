@@ -719,9 +719,7 @@ void townManager::SetupExtraStuff(void) {
 
 i32 townManager::Open(i32 id) {
     gpGame->CheckHeroConsistency();
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
-        || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
+    gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     PollSound();
     m_townWindow = new heroWindow(0, 0, "townwind.bin");
     if (m_townWindow == NULL)
@@ -756,9 +754,7 @@ i32 townManager::Open(i32 id) {
 void townManager::ChangeTown(void) {
     tag_message message;
 
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
-        || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
+    gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     SetupExtraStuff();
     SetupTown();
     message.type = MESSAGE_WIDGET;
@@ -981,9 +977,7 @@ void townManager::Close(void) {
         delete m_townWindow;
     }
     m_townWindow = NULL;
-    if (gConfig.useOpera != CONFIG_OPERA_DISABLED
-        || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
+    gpSoundManager->SwitchAmbientMusic(TOWN_MUSIC_STOP);
     gpWindowManager->FadeScreen(FADE_OUT, TOWN_FADE_STEPS, NULL);
     gpMouseManager->SetPointer(TOWN_POINTER_DEFAULT);
     m_active = false;
