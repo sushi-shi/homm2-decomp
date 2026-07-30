@@ -1287,6 +1287,7 @@ def publish(out_root: Path, branch: str) -> int:
 
     temporary = existing is None
     worktree = existing
+    new_branch = not exists
 
     if temporary:
         # Best effort: clears stale entries if any, and is fine if there are none.
@@ -1300,19 +1301,21 @@ def publish(out_root: Path, branch: str) -> int:
         if exists:
             git("worktree", "add", str(worktree), branch)
         else:
-            git("worktree", "add", "--detach", str(worktree))
-            subprocess.run(("git", "checkout", "--orphan", branch),
-                           cwd=worktree, check=True, capture_output=True)
-            # Empties the index the orphan inherited. Fails harmlessly when the
-            # checkout it was branched from was itself empty.
-            subprocess.run(("git", "rm", "-rf", "--quiet", "."),
-                           cwd=worktree, capture_output=True, check=False)
+            git("worktree", "add", "-b", branch, str(worktree), source_commit)
 
     try:
         assert worktree is not None
         if git("status", "--porcelain", cwd=worktree):
             raise SystemExit(
                 "refusing to replace dirty generated worktree at %s" % worktree
+            )
+
+        if new_branch:
+            subprocess.run(
+                ("git", "rm", "-rf", "--quiet", "."),
+                cwd=worktree,
+                check=True,
+                capture_output=True,
             )
 
         for stale in PUBLISHED_PATHS:
