@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <map>
 #include <set>
 #include <sstream>
 #include <string>
@@ -614,18 +615,225 @@ private:
     std::uint32_t m_replayStart = 0;
 };
 
-class SilentAudio final : public IAudio {
+class Sdl3Audio final : public IAudio {
 public:
-    bool Open() override { return true; }
-    void Close() override {}
-    VoiceId PlaySound(const SoundData&, int, int) override { return 0; }
-    void StopVoice(VoiceId) override {}
-    bool IsVoicePlaying(VoiceId) const override { return false; }
-    void SetVoiceVolume(VoiceId, int) override {}
-    bool PlayMusic(const void*, std::size_t, int) override { return false; }
-    void StopMusic() override {}
-    bool IsMusicPlaying() const override { return false; }
-    void SetMusicVolume(int) override {}
+    bool Open() override {
+        if (m_device != 0) {
+            return true;
+        }
+        if (!SDL_InitSubSystem(SDL_INIT_AUDIO)) {
+            std::fprintf(stderr, "[homm2] SDL_InitSubSystem(audio): %s\n", SDL_GetError());
+            return false;
+        }
+        m_device = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+        if (m_device == 0) {
+            std::fprintf(stderr, "[homm2] SDL_OpenAudioDevice: %s\n", SDL_GetError());
+            return false;
+        }
+        return true;
+    }
+
+    void Close() override {
+        StopMusic();
+        for (auto& [id, voice] : m_voices) {
+            SDL_DestroyAudioStream(voice.stream);
+        }
+        m_voices.clear();
+        if (m_device != 0) {
+            SDL_CloseAudioDevice(m_device);
+            m_device = 0;
+        }
+    }
+
+    VoiceId PlaySound(const SoundData& sound, int volume, int loops) override {
+        if (!Open() || sound.samples == nullptr || sound.byteCount == 0) {
+            return 0;
+        }
+
+        SDL_AudioSpec source {};
+        source.format = sound.bitsPerSample == 16 ? SDL_AUDIO_S16 : SDL_AUDIO_U8;
+        source.channels = std::clamp(sound.channels, 1, 2);
+        source.freq = sound.sampleRate;
+
+        SDL_AudioSpec destination {};
+        if (!SDL_GetAudioDeviceFormat(m_device, &destination, nullptr)) {
+            return 0;
+        }
+
+        Voice voice;
+        voice.stream = SDL_CreateAudioStream(&source, &destination);
+        if (voice.stream == nullptr || !SDL_BindAudioStream(m_device, voice.stream)) {
+            SDL_DestroyAudioStream(voice.stream);
+            return 0;
+        }
+
+        const auto* first = static_cast<const std::uint8_t*>(sound.samples);
+        voice.samples.assign(first, first + sound.byteCount);
+        voice.infinite = loops < 0;
+        SDL_SetAudioStreamGain(
+            voice.stream,
+            static_cast<float>(std::clamp(volume, 0, 127)) / 127.0f
+        );
+
+        const int copies = voice.infinite ? 2 : loops + 1;
+        for (int copy = 0; copy < copies; ++copy) {
+            if (!Queue(voice)) {
+                SDL_DestroyAudioStream(voice.stream);
+                return 0;
+            }
+        }
+        if (!voice.infinite) {
+            SDL_FlushAudioStream(voice.stream);
+        }
+
+        VoiceId id = m_nextVoice++;
+        if (id == 0) {
+            id = m_nextVoice++;
+        }
+        m_voices.emplace(id, std::move(voice));
+        return id;
+    }
+
+    void StopVoice(VoiceId id) override {
+        const auto found = m_voices.find(id);
+        if (found == m_voices.end()) {
+            return;
+        }
+        SDL_DestroyAudioStream(found->second.stream);
+        m_voices.erase(found);
+    }
+
+    bool IsVoicePlaying(VoiceId id) const override {
+        const auto found = m_voices.find(id);
+        if (found == m_voices.end()) {
+            return false;
+        }
+        const Voice& voice = found->second;
+        return voice.infinite || SDL_GetAudioStreamQueued(voice.stream) > 0
+            || SDL_GetAudioStreamAvailable(voice.stream) > 0;
+    }
+
+    void SetVoiceVolume(VoiceId id, int volume) override {
+        const auto found = m_voices.find(id);
+        if (found != m_voices.end()) {
+            SDL_SetAudioStreamGain(
+                found->second.stream,
+                static_cast<float>(std::clamp(volume, 0, 127)) / 127.0f
+            );
+        }
+    }
+
+    bool PlayMusic(const SoundData& sound, int loops) override {
+        StopMusic();
+        if (!Open() || sound.samples == nullptr || sound.byteCount == 0) {
+            return false;
+        }
+
+        SDL_AudioSpec source {};
+        source.format = sound.bitsPerSample == 16 ? SDL_AUDIO_S16 : SDL_AUDIO_U8;
+        source.channels = std::clamp(sound.channels, 1, 2);
+        source.freq = sound.sampleRate;
+
+        SDL_AudioSpec destination {};
+        if (!SDL_GetAudioDeviceFormat(m_device, &destination, nullptr)) {
+            return false;
+        }
+
+        m_music.stream = SDL_CreateAudioStream(&source, &destination);
+        if (m_music.stream == nullptr || !SDL_BindAudioStream(m_device, m_music.stream)) {
+            SDL_DestroyAudioStream(m_music.stream);
+            m_music.stream = nullptr;
+            return false;
+        }
+
+        const auto* first = static_cast<const std::uint8_t*>(sound.samples);
+        m_music.samples.assign(first, first + sound.byteCount);
+        m_music.infinite = loops < 0;
+        SDL_SetAudioStreamGain(
+            m_music.stream,
+            static_cast<float>(std::clamp(m_musicVolume, 0, 127)) / 127.0f
+        );
+
+        const int copies = m_music.infinite ? 2 : loops + 1;
+        for (int copy = 0; copy < copies; ++copy) {
+            if (!Queue(m_music)) {
+                StopMusic();
+                return false;
+            }
+        }
+        if (!m_music.infinite) {
+            SDL_FlushAudioStream(m_music.stream);
+        }
+        return true;
+    }
+
+    void StopMusic() override {
+        if (m_music.stream != nullptr) {
+            SDL_DestroyAudioStream(m_music.stream);
+            m_music = Voice();
+        }
+    }
+
+    bool IsMusicPlaying() const override {
+        return m_music.stream != nullptr
+            && (m_music.infinite || SDL_GetAudioStreamQueued(m_music.stream) > 0
+                || SDL_GetAudioStreamAvailable(m_music.stream) > 0);
+    }
+
+    void SetMusicVolume(int volume) override {
+        m_musicVolume = std::clamp(volume, 0, 127);
+        if (m_music.stream != nullptr) {
+            SDL_SetAudioStreamGain(
+                m_music.stream,
+                static_cast<float>(m_musicVolume) / 127.0f
+            );
+        }
+    }
+
+    void Service() override {
+        for (auto iterator = m_voices.begin(); iterator != m_voices.end();) {
+            Voice& voice = iterator->second;
+            if (voice.infinite) {
+                if (SDL_GetAudioStreamQueued(voice.stream)
+                    < static_cast<int>(voice.samples.size() * 2)) {
+                    Queue(voice);
+                }
+                ++iterator;
+            } else if (SDL_GetAudioStreamQueued(voice.stream) == 0
+                       && SDL_GetAudioStreamAvailable(voice.stream) == 0) {
+                SDL_DestroyAudioStream(voice.stream);
+                iterator = m_voices.erase(iterator);
+            } else {
+                ++iterator;
+            }
+        }
+        if (m_music.stream != nullptr && m_music.infinite
+            && SDL_GetAudioStreamQueued(m_music.stream)
+                   < static_cast<int>(m_music.samples.size() * 2)) {
+            Queue(m_music);
+        }
+    }
+
+private:
+    struct Voice {
+        SDL_AudioStream* stream = nullptr;
+        std::vector<std::uint8_t> samples;
+        bool infinite = false;
+    };
+
+    static bool Queue(Voice& voice) {
+        return SDL_PutAudioStreamData(
+            voice.stream,
+            voice.samples.data(),
+            static_cast<int>(voice.samples.size())
+        );
+    }
+
+    SDL_AudioDeviceID m_device = 0;
+    VoiceId m_nextVoice = 1;
+    std::map<VoiceId, Voice> m_voices;
+    Voice m_music;
+    int m_musicVolume = 127;
 };
 
 class Sdl3FileSystem final : public IFileSystem {
@@ -663,7 +871,7 @@ struct Sdl3Backend {
     Sdl3Video video;
     Sdl3Input input{video};
     Sdl3Host host{video, input};
-    SilentAudio audio;
+    Sdl3Audio audio;
     Sdl3FileSystem files;
     Backend facade;
 };
