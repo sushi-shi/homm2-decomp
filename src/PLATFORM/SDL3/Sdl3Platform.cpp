@@ -353,6 +353,19 @@ public:
         }
         event = m_queue.front();
         m_queue.erase(m_queue.begin());
+        if (event.type == Event::Type::MouseMove) {
+            SetMouse(event.position);
+        } else if (event.type == Event::Type::MouseDown) {
+            SetMouse(event.position);
+            SetButton(event.button, true);
+        } else if (event.type == Event::Type::MouseUp) {
+            SetMouse(event.position);
+            SetButton(event.button, false);
+        } else if (event.type == Event::Type::KeyDown) {
+            SetKey(event.key, true);
+        } else if (event.type == Event::Type::KeyUp) {
+            SetKey(event.key, false);
+        }
         return true;
     }
 
@@ -445,8 +458,7 @@ private:
             std::istringstream fields(line);
             ReplayEvent replay;
             std::string action;
-            fields >> replay.milliseconds >> action >> replay.event.position.x
-                >> replay.event.position.y;
+            fields >> replay.milliseconds >> action;
             if (!fields) {
                 continue;
             }
@@ -464,7 +476,25 @@ private:
             } else if (action == "right-up") {
                 replay.event.type = Event::Type::MouseUp;
                 replay.event.button = MouseButton::Right;
+            } else if (action == "key-down" || action == "key-up") {
+                std::string name;
+                fields >> name;
+                const SDL_Scancode code = SDL_GetScancodeFromName(name.c_str());
+                replay.event.type =
+                    action == "key-down" ? Event::Type::KeyDown : Event::Type::KeyUp;
+                replay.event.key = TranslateKey(code);
+                replay.event.scanCode = ToSetOneScanCode(code);
+                replay.event.character =
+                    name.size() == 1 ? static_cast<unsigned char>(name[0]) : 0;
             } else {
+                continue;
+            }
+            if (replay.event.type == Event::Type::MouseMove
+                || replay.event.type == Event::Type::MouseDown
+                || replay.event.type == Event::Type::MouseUp) {
+                fields >> replay.event.position.x >> replay.event.position.y;
+            }
+            if (!fields) {
                 continue;
             }
             m_replay.push_back(replay);
@@ -477,12 +507,6 @@ private:
         while (m_replayIndex < m_replay.size()
                && m_replay[m_replayIndex].milliseconds <= elapsed) {
             const Event& event = m_replay[m_replayIndex].event;
-            m_input.SetMouse(event.position);
-            if (event.type == Event::Type::MouseDown) {
-                m_input.SetButton(event.button, true);
-            } else if (event.type == Event::Type::MouseUp) {
-                m_input.SetButton(event.button, false);
-            }
             m_input.Push(event);
             ++m_replayIndex;
         }
