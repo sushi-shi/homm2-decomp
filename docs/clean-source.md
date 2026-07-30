@@ -30,7 +30,7 @@ conversions in `GENERATED_PATCHES` bridge the few integer-only expressions
 that remain in the matching source.
 
 Every patch declares how many sites it expects to hit, and any other number ends
-the run naming the file. Nine audited groups cover 67 sites.
+the run naming the file. Twelve audited groups cover 72 sites.
 
 Nothing the generator does changes what the game *does*. The clean tree targets
 Win32 exactly as retail did, so there is nothing to adapt — only scaffolding to
@@ -76,7 +76,8 @@ the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
 The branch carries `include/`, `src/`, vendor SDK headers, import definitions,
 and a generated `build.ninja`. The Ninja graph builds `build/HEROES2W.EXE` for
-32-bit Windows with Clang and LLD. The compiler runtime is linked statically.
+32-bit Windows with Clang at `-O0`, x87 floating point, and LLD. The compiler runtime
+is linked statically.
 The matching toolchain, delinker, objdiff plumbing, MSVC, and Wine are absent.
 It requires Ninja, Clang, LLD, LLVM dlltool, and a 32-bit MinGW toolchain.
 

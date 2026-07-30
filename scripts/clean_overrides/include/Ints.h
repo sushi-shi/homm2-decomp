@@ -260,21 +260,7 @@ private:
     Storage m_value;
 };
 
-// Convert a domain to an index.
-template <typename Enum, typename Storage>
-constexpr i32 H2EnumIndex(H2EnumStorage<Enum, Storage> value) {
-    return static_cast<i32>(static_cast<Enum>(value));
-}
-
-template <typename Enum, typename Storage>
-constexpr i32 H2EnumIndex(H2SteppedEnumStorage<Enum, Storage> value) {
-    return static_cast<i32>(static_cast<Enum>(value));
-}
-
-template <typename Value>
-constexpr i32 H2EnumIndex(Value value) {
-    return static_cast<i32>(value);
-}
+#define H2EnumIndex(value) static_cast<i32>(value)
 
 #define ENABLE_ENUM_FLAGS(name)                                                                    \
     inline constexpr name operator|(name a, name b) {                                              \

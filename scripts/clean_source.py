@@ -68,6 +68,13 @@ class Pattern(enum.Enum):
 # /Od codegen parity in unrelated functions, which already cost
 # advManager::DoVisions its byte-exact match once.
 GENERATED_PATCHES = {
+    "include/BASE/Misc.h": [
+        (
+            Pattern.LITERAL, 1,
+            "u32l MAKEFILEID(char* text);",
+            "u32l MAKEFILEID(const char* text);",
+        ),
+    ],
     "include/SOURCE/KB.h": [
         (
             Pattern.LITERAL, 1,
@@ -140,6 +147,42 @@ GENERATED_PATCHES = {
             Pattern.REGEX, 4,
             r"void\* (hmnu(?:Adv|Cmbt|Dflt|Town)) = NULL;",
             r"HMENU \1 = NULL;",
+        ),
+    ],
+    "src/BASE/Misc.cpp": [
+        (
+            Pattern.LITERAL, 1,
+            """u32l MAKEFILEID(char* text) {
+    u32 hash = 0;
+    i32 sum = 0;
+    for (i32 i = strlen(text) - 1; i >= 0; --i) {
+        if (text[i] >= 'a' && text[i] <= 'z') {
+            text[i] &= ~('a' - 'A');
+        }
+        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
+        hash >>= HASH_RIGHT_SHIFT;
+        hash += shiftedHash;
+        sum += text[i];
+        hash += text[i] + sum;
+    }
+    return hash;
+}""",
+            """u32l MAKEFILEID(const char* text) {
+    u32 hash = 0;
+    i32 sum = 0;
+    for (i32 i = strlen(text) - 1; i >= 0; --i) {
+        char value = text[i];
+        if (value >= 'a' && value <= 'z') {
+            value &= ~('a' - 'A');
+        }
+        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
+        hash >>= HASH_RIGHT_SHIFT;
+        hash += shiftedHash;
+        sum += value;
+        hash += value + sum;
+    }
+    return hash;
+}""",
         ),
     ],
     "src/SOURCE/X_CAMPGN.cpp": [
@@ -887,6 +930,10 @@ def write_ninja(out_root: Path) -> None:
     flags = [
         "--target=i686-w64-windows-gnu",
         "-std=gnu++20",
+        "-O0",
+        "-mno-sse",
+        "-mno-sse2",
+        "-mfpmath=387",
         "-fms-extensions",
         "-fsjlj-exceptions",
         "-w",
@@ -926,7 +973,7 @@ def write_ninja(out_root: Path) -> None:
         "  description = CXX $in",
         "",
         "rule implib",
-        "  command = $dlltool -m i386 -d $in -l $out",
+        "  command = $dlltool -m i386 $dlltool_flags -d $in -l $out",
         "  description = IMPLIB $in",
         "",
         "rule link",
@@ -944,17 +991,27 @@ def write_ninja(out_root: Path) -> None:
         lines.append(f"build {obj}: cxx {relative} || $builddir/obj")
         objects.append(obj)
     import_libraries = []
-    for dll in ("MSS32", "SMACKW32", "WING32"):
+    for dll, dlltool_flags in (
+        ("MSS32", ""),
+        ("SMACKW32", ""),
+        ("WING32", "-k"),
+    ):
         library = f"$builddir/imports/{dll}.a"
         lines.append(
             f"build {library}: implib imports/{dll}.def || $builddir/imports"
         )
+        if dlltool_flags:
+            lines.append(f"  dlltool_flags = {dlltool_flags}")
         import_libraries.append(library)
+    mss_aliases = "$builddir/imports/MSS32_aliases.o"
+    lines.append(
+        f"build {mss_aliases}: cxx imports/MSS32_aliases.S || $builddir/imports"
+    )
     lines += [
         "",
         "build objects: phony " + " ".join(objects),
         "build $builddir/HEROES2W.EXE: link "
-        + " ".join(objects + import_libraries),
+        + " ".join(objects + [mss_aliases] + import_libraries),
         "build game: phony $builddir/HEROES2W.EXE",
         "default game",
         "",
@@ -1026,8 +1083,17 @@ def write_import_defs(out_root: Path) -> None:
     imports.mkdir()
 
     mss = ["LIBRARY mss32.dll", "EXPORTS"]
-    mss += [f"  {symbol[1:]} = {symbol}" for symbol in MSS_IMPORTS]
+    mss += [f"  {symbol}" for symbol in MSS_IMPORTS]
     (imports / "MSS32.def").write_text("\n".join(mss) + "\n")
+    mss_aliases = []
+    for symbol in MSS_IMPORTS:
+        mss_aliases += [
+            f'    .weak "{symbol}"',
+            f'    .set "{symbol}", "_{symbol}"',
+            f'    .weak "__imp_{symbol}"',
+            f'    .set "__imp_{symbol}", "__imp__{symbol}"',
+        ]
+    (imports / "MSS32_aliases.S").write_text("\n".join(mss_aliases) + "\n")
 
     smack = ["LIBRARY smackw32.DLL", "EXPORTS"]
     smack += [
@@ -1037,10 +1103,7 @@ def write_import_defs(out_root: Path) -> None:
     (imports / "SMACKW32.def").write_text("\n".join(smack) + "\n")
 
     wing = ["LIBRARY WING32.dll", "EXPORTS"]
-    wing += [
-        f"  {symbol[1:]} = {lookup}"
-        for symbol, lookup in WING_IMPORTS
-    ]
+    wing += [f"  {symbol[1:]}" for symbol, _ in WING_IMPORTS]
     (imports / "WING32.def").write_text("\n".join(wing) + "\n")
 
 
@@ -1334,9 +1397,22 @@ def verify(out_root: Path) -> int:
         ("ninja", "-C", str(out_root), "game"),
         check=False,
     )
-    if result.returncode == 0:
-        print("[clean] verify: built build/HEROES2W.EXE")
-    return result.returncode
+    if result.returncode != 0:
+        return result.returncode
+
+    executable = out_root / "build/HEROES2W.EXE"
+    symbols = subprocess.run(
+        ("llvm-nm", "-C", str(executable)),
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if symbols.returncode != 0 or "H2EnumIndex" in symbols.stdout:
+        print("[clean] verify: H2EnumIndex survived linking", file=sys.stderr)
+        return 1
+
+    print("[clean] verify: built build/HEROES2W.EXE")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

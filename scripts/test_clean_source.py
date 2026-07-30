@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import subprocess
 import sys
 import tempfile
@@ -70,8 +72,56 @@ class CleanSourcePatchTests(unittest.TestCase):
         self.assertNotIn("void*", result)
         self.assertEqual(result.count("extern HMENU"), 4)
 
+    def test_makefileid_does_not_modify_literals(self):
+        declaration = clean_source.apply_patches(
+            "include/BASE/Misc.h",
+            "u32l MAKEFILEID(char* text);",
+        )
+        self.assertEqual(declaration, "u32l MAKEFILEID(const char* text);")
+
+        source = """u32l MAKEFILEID(char* text) {
+    u32 hash = 0;
+    i32 sum = 0;
+    for (i32 i = strlen(text) - 1; i >= 0; --i) {
+        if (text[i] >= 'a' && text[i] <= 'z') {
+            text[i] &= ~('a' - 'A');
+        }
+        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
+        hash >>= HASH_RIGHT_SHIFT;
+        hash += shiftedHash;
+        sum += text[i];
+        hash += text[i] + sum;
+    }
+    return hash;
+}"""
+        result = clean_source.apply_patches("src/BASE/Misc.cpp", source)
+        self.assertIn("u32l MAKEFILEID(const char* text)", result)
+        self.assertIn("char value = text[i];", result)
+        self.assertNotIn("text[i] &=", result)
+
 
 class CleanSourceCurrentEnumTests(unittest.TestCase):
+    def test_clean_override_expands_enum_index_at_the_call_site(self):
+        text = (
+            clean_source.OVERRIDE_DIR / "include/Ints.h"
+        ).read_text()
+        self.assertIn(
+            "#define H2EnumIndex(value) static_cast<i32>(value)",
+            text,
+        )
+        self.assertNotIn("constexpr i32 H2EnumIndex(", text)
+
+    def test_verify_rejects_enum_index_symbol(self):
+        built = subprocess.CompletedProcess((), 0)
+        symbols = subprocess.CompletedProcess(
+            (), 0, stdout="00000000 T H2EnumIndex<int>(int)\n"
+        )
+        with (
+            mock.patch("subprocess.run", side_effect=(built, symbols)),
+            contextlib.redirect_stderr(io.StringIO()),
+        ):
+            self.assertEqual(clean_source.verify(Path("generated")), 1)
+
     def test_output_has_one_final_newline(self):
         self.assertEqual(clean_source.clean("int value;\n\n"), "int value;\n")
 
@@ -246,13 +296,46 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
             ninja = (output / "build.ninja").read_text()
             self.assertIn("cxx = clang++", ninja)
             self.assertIn("--target=i686-w64-windows-gnu", ninja)
+            self.assertIn("-O0", ninja)
+            self.assertIn("-mno-sse -mno-sse2 -mfpmath=387", ninja)
             self.assertIn(
                 "build $builddir/obj/example.o: cxx src/example.cpp",
                 ninja,
             )
             self.assertIn("build $builddir/HEROES2W.EXE: link", ninja)
             self.assertIn("default game", ninja)
-            self.assertTrue((output / "imports/MSS32.def").is_file())
+            self.assertIn(
+                "build $builddir/imports/MSS32.a: implib imports/MSS32.def",
+                ninja,
+            )
+            self.assertIn(
+                "build $builddir/imports/MSS32_aliases.o: cxx "
+                "imports/MSS32_aliases.S",
+                ninja,
+            )
+            self.assertIn(
+                "build $builddir/imports/WING32.a: implib imports/WING32.def",
+                ninja,
+            )
+            self.assertIn("  dlltool_flags = -k", ninja)
+
+            mss = (output / "imports/MSS32.def").read_text()
+            self.assertIn("  _AIL_startup@0\n", mss)
+            self.assertNotIn("AIL_startup@0 =", mss)
+
+            mss_aliases = (output / "imports/MSS32_aliases.S").read_text()
+            self.assertIn(
+                '    .set "_AIL_startup@0", "__AIL_startup@0"\n',
+                mss_aliases,
+            )
+            self.assertIn(
+                '    .set "__imp__AIL_startup@0", "__imp___AIL_startup@0"\n',
+                mss_aliases,
+            )
+
+            wing = (output / "imports/WING32.def").read_text()
+            self.assertIn("  WinGCreateDC@0\n", wing)
+            self.assertNotIn("WinGCreateDC@0 =", wing)
 
     def test_override_comments_are_removed(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -373,14 +456,27 @@ class CleanSourceVerifyTests(unittest.TestCase):
     def test_verify_runs_generated_ninja_build(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory)
+            built = subprocess.CompletedProcess([], 0)
+            symbols = subprocess.CompletedProcess([], 0, stdout="")
             with mock.patch(
                 "subprocess.run",
-                return_value=subprocess.CompletedProcess([], 0),
+                side_effect=(built, symbols),
             ) as run:
                 self.assertEqual(clean_source.verify(output), 0)
-            run.assert_called_once_with(
-                ("ninja", "-C", str(output), "game"),
-                check=False,
+            self.assertEqual(
+                run.call_args_list,
+                [
+                    mock.call(
+                        ("ninja", "-C", str(output), "game"),
+                        check=False,
+                    ),
+                    mock.call(
+                        ("llvm-nm", "-C", str(output / "build/HEROES2W.EXE")),
+                        check=False,
+                        capture_output=True,
+                        text=True,
+                    ),
+                ],
             )
 
 
