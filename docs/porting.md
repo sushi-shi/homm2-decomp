@@ -34,16 +34,30 @@ Other targets:
 ```sh
 nix build .#homm2-unwrapped
 nix build .#homm2-unwrapped-debug
+nix build .#homm2-linux
 nix build .#homm2-windows
+nix build .#homm2-web
 ```
 
-The Windows package remains byte-identical to the build from
-`master-pol-2.0`.
+The Windows package cross-compiles the SDL3 platform and minimal FFmpeg. It
+includes the required DLLs and a Wine launcher.
+
+## Web
+
+The WebAssembly build cross-compiles SDL3 and a minimal FFmpeg. Game data is
+kept outside the Nix store:
+
+```sh
+HOMM2_DATA=/path/to/heroes2 nix run .#web
+```
+
+The launcher packages the installed data, opens a local server, and stores the
+web bundle under `~/.cache/homm2-web`. Set `HOMM2_WEB_OUTPUT` to change it.
 
 ## Current platform
 
 Linux uses a 32-bit SDL3 build. The 32-bit target preserves retail pointer
 width and packed layouts. Additional systems belong under `PLATFORM`.
 
-Video and input run natively. Audio is silent, cinematics are skipped, and
-network transports fail cleanly.
+Video, input, audio, and cinematics use the platform layer. Network transports
+are not supported yet.

@@ -3,6 +3,17 @@
 
 #include_next <string.h>
 
+#ifdef _WIN32
+
+#define strrev _strrev
+#define strupr _strupr
+#define strlwr _strlwr
+#define stricmp _stricmp
+#define strcmpi _strcmpi
+#define strnicmp _strnicmp
+
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,6 +34,8 @@ int _strnicmp(const char* left, const char* right, unsigned count);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

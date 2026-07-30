@@ -1,5 +1,7 @@
 #include <winsock.h>
 
+#ifndef _WIN32
+
 #include <cerrno>
 #include <cstring>
 
@@ -50,3 +52,5 @@ int ioctlsocket(SOCKET socket, long command, unsigned long* argument) {
     }
     return ::ioctl(socket, static_cast<unsigned long>(command), argument);
 }
+
+#endif

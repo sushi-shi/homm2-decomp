@@ -43,7 +43,7 @@ bitmap::bitmap(u32l id)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
 }
-inline bitmap::~bitmap() {
+bitmap::~bitmap() {
     static char destructionSourceFile[] = "BITMAP.cpp";
     if (m_pixels != NULL)
         H2_FREE(m_pixels);
@@ -85,7 +85,7 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     }
 }
 
-inline void bitmap::DrawToBuffer(i16 x, i16 y) {
+void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
@@ -101,7 +101,7 @@ void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
-inline void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
+void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 

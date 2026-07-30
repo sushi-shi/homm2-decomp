@@ -13,6 +13,8 @@
 
 #include "State.h"
 
+#ifndef _WIN32
+
 #undef open
 #undef access
 #undef tell
@@ -149,3 +151,5 @@ int _strnicmp(const char* left, const char* right, unsigned count) {
 }
 
 }
+
+#endif

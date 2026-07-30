@@ -1,5 +1,9 @@
 #include <SDL3/SDL.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -463,15 +467,24 @@ public:
     std::uint32_t Ticks() const override { return static_cast<std::uint32_t>(SDL_GetTicks()); }
 
     void Sleep(std::uint32_t milliseconds) override {
-
+#ifdef __EMSCRIPTEN__
+        Pump();
+        emscripten_sleep(milliseconds);
+#else
         const std::uint32_t deadline = Ticks() + milliseconds;
         do {
             Yield();
             SDL_Delay(1);
         } while (Ticks() < deadline);
+#endif
     }
 
-    void Yield() override { Pump(); }
+    void Yield() override {
+        Pump();
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(0);
+#endif
+    }
 
     bool ShouldQuit() const override { return m_quit; }
     void RequestQuit() override { m_quit = true; }
@@ -883,6 +896,9 @@ private:
 class Sdl3FileSystem final : public IFileSystem {
 public:
     Sdl3FileSystem() {
+#ifdef __EMSCRIPTEN__
+        m_dataRoot = "/game";
+#else
         if (const char* fromEnvironment = SDL_getenv("HOMM2_DATA")) {
             m_dataRoot = fromEnvironment;
         } else if (const char* base = SDL_GetBasePath()) {
@@ -890,6 +906,7 @@ public:
         } else {
             m_dataRoot = ".";
         }
+#endif
 
         if (char* preferences = SDL_GetPrefPath("homm2", "homm2")) {
             m_userRoot = preferences;

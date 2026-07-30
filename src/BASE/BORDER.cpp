@@ -40,7 +40,7 @@ border::border(
     m_fillColor = fillColor;
 }
 
-inline border::~border() {
+border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
     if (m_backgroundIcon != NULL)

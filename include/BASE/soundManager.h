@@ -107,9 +107,9 @@ public:
     void MIDIStartup(void);
     void MIDIShutdown(void);
     void MIDIPlay(i32);
-    inline void MIDIStop(void);
-    inline i32 MIDIIsPlaying(void);
-    inline void MIDISetVolume(void);
+    void MIDIStop(void);
+    i32 MIDIIsPlaying(void);
+    void MIDISetVolume(void);
     void MIDIPoll(void);
 };
 #pragma pack(pop)

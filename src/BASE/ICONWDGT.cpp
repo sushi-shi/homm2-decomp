@@ -83,7 +83,7 @@ void iconWidget::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-inline iconWidget::~iconWidget() {
+iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 

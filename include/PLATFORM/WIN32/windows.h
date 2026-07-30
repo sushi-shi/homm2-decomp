@@ -4,27 +4,38 @@
 #include <cstddef>
 #include <cstdint>
 
+#ifdef _WIN32
 #ifndef __cdecl
-#define __cdecl
+#define __cdecl __attribute__((cdecl))
 #endif
 #ifndef __stdcall
-#define __stdcall
+#define __stdcall __attribute__((stdcall))
 #endif
 #ifndef __fastcall
-#define __fastcall
+#define __fastcall __attribute__((fastcall))
 #endif
+#define WINAPI __stdcall
+#define APIENTRY __stdcall
+#define CALLBACK __stdcall
+#define PASCAL __stdcall
+#else
+#define __cdecl
+#define __stdcall
+#define __fastcall
 #define WINAPI
 #define APIENTRY
 #define CALLBACK
 #define PASCAL
+#endif
 #define FAR
 #define NEAR
-#define WINGAPI
+#define WINGAPI WINAPI
 
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned int DWORD;
 typedef int BOOL;
+typedef BOOL WINBOOL;
 typedef unsigned int UINT;
 typedef int INT;
 typedef long LONG;
@@ -33,10 +44,12 @@ typedef short SHORT;
 typedef unsigned short USHORT;
 typedef char CHAR;
 typedef float FLOAT;
+typedef void VOID;
 
 typedef char* LPSTR;
 typedef const char* LPCSTR;
 typedef void* LPVOID;
+typedef void* PVOID;
 typedef const void* LPCVOID;
 typedef BYTE* LPBYTE;
 typedef WORD* LPWORD;
@@ -54,6 +67,7 @@ typedef long HRESULT;
 
 #define TRUE 1
 #define FALSE 0
+#define MAKEWORD(low, high) ((WORD)(((BYTE)(low)) | (((WORD)((BYTE)(high))) << 8)))
 
 typedef void* HANDLE;
 typedef void* HWND;

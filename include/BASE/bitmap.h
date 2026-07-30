@@ -22,12 +22,12 @@ public:
     bitmap(void);
     bitmap(BitmapType type, i16 width, i16 height);
     bitmap(u32l id);
-    virtual inline ~bitmap();
+    virtual ~bitmap();
     void DrawToBufferCareful(i16 x, i16 y);
-    inline void DrawToBuffer(i16 x, i16 y);
+    void DrawToBuffer(i16 x, i16 y);
     void DrawToScreen(i16 x, i16 y);
     void GrabScreen(i16 x, i16 y);
-    inline void GrabBitmap(class bitmap* source, i16 x, i16 y);
+    void GrabBitmap(class bitmap* source, i16 x, i16 y);
     void GrabBitmapCareful(class bitmap* source, i16 x, i16 y);
     void CopyTo(
         class bitmap* destination,

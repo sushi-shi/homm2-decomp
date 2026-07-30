@@ -83,7 +83,7 @@ i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     return 1;
 }
 
-i32 CheckSumIsDemoOK(char*) {
+i32 CheckSumIsDemoOK(const char*) {
     return 1;
 }
 
