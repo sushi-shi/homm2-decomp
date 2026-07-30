@@ -533,14 +533,6 @@ typedef WIN32_FIND_DATAA* LPWIN32_FIND_DATAA;
 #define ERROR_ACCESS_DENIED 5L
 #define ERROR_ALREADY_EXISTS 183L
 
-#define DRIVE_UNKNOWN 0
-#define DRIVE_NO_ROOT_DIR 1
-#define DRIVE_REMOVABLE 2
-#define DRIVE_FIXED 3
-#define DRIVE_REMOTE 4
-#define DRIVE_CDROM 5
-#define DRIVE_RAMDISK 6
-
 HMODULE LoadLibraryA(LPCSTR name);
 BOOL FreeLibrary(HMODULE module);
 FARPROC GetProcAddress(HMODULE module, LPCSTR name);
@@ -563,9 +555,6 @@ DWORD GetFileAttributesA(LPCSTR name);
 HANDLE FindFirstFileA(LPCSTR pattern, LPWIN32_FIND_DATAA data);
 BOOL FindNextFileA(HANDLE find, LPWIN32_FIND_DATAA data);
 BOOL FindClose(HANDLE find);
-DWORD GetLogicalDrives();
-UINT GetDriveTypeA(LPCSTR root);
-
 void InitializeCriticalSection(LPCRITICAL_SECTION section);
 void DeleteCriticalSection(LPCRITICAL_SECTION section);
 void EnterCriticalSection(LPCRITICAL_SECTION section);
@@ -738,17 +727,11 @@ DWORD GetVersion();
 
 UINT waveOutGetNumDevs();
 MMRESULT waveOutGetDevCapsA(UINT_PTR device, LPWAVEOUTCAPSA caps, UINT size);
-MMRESULT auxSetVolume(UINT device, DWORD volume);
-DWORD mciSendStringA(LPCSTR command, LPSTR returnString, UINT returnLength,
-                     HWND callback);
-BOOL mciGetErrorStringA(DWORD error, LPSTR buffer, UINT length);
-
 #define FindFirstFile FindFirstFileA
 #define FindNextFile FindNextFileA
 #define CreateFile CreateFileA
 #define GetFileAttributes GetFileAttributesA
 #define GetVersionEx GetVersionExA
-#define GetDriveType GetDriveTypeA
 #define LoadLibrary LoadLibraryA
 #define MessageBox MessageBoxA
 #define OutputDebugString OutputDebugStringA

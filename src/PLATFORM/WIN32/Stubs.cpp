@@ -69,23 +69,6 @@ MMRESULT waveOutGetDevCapsA(UINT_PTR, LPWAVEOUTCAPSA caps, UINT) {
     return 0;
 }
 
-MMRESULT auxSetVolume(UINT, DWORD) { return 0; }
-
-DWORD mciSendStringA(LPCSTR, LPSTR returnString, UINT returnLength, HWND) {
-    if (returnString != nullptr && returnLength > 0) {
-        returnString[0] = '\0';
-    }
-    return 1;
-}
-
-BOOL mciGetErrorStringA(DWORD, LPSTR buffer, UINT length) {
-    if (buffer != nullptr && length > 0) {
-        std::strncpy(buffer, "no CD audio device", length - 1);
-        buffer[length - 1] = '\0';
-    }
-    return TRUE;
-}
-
 extern "C" u8 Netbios(void*) { return 0x23; }
 
 namespace {
@@ -244,14 +227,6 @@ void AIL_stop_sequence(HSEQUENCE) {}
 void AIL_resume_sequence(HSEQUENCE) {}
 U32 AIL_sequence_status(HSEQUENCE) { return SEQ_DONE; }
 void AIL_set_sequence_loop_count(HSEQUENCE, S32) {}
-
-HREDBOOK AIL_redbook_open(U32) { return nullptr; }
-void AIL_redbook_close(HREDBOOK) {}
-U32 AIL_redbook_tracks(HREDBOOK) { return 0; }
-void AIL_redbook_track_info(HREDBOOK, U32, U32* start, U32* end) {
-    if (start != nullptr) *start = 0;
-    if (end != nullptr) *end = 0;
-}
 
 u8 SmackSoundUseMSS(void*) { return 1; }
 u8 SmackSoundUseDirectSound(void*) { return 0; }

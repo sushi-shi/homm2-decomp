@@ -12,7 +12,6 @@ typedef struct _DIG_DRIVER* HDIGDRIVER;
 typedef struct _MDI_DRIVER* HMDIDRIVER;
 typedef struct _SAMPLE* HSAMPLE;
 typedef struct _SEQUENCE* HSEQUENCE;
-typedef struct _REDBOOK* HREDBOOK;
 
 #define SMP_FREE 1
 #define SMP_DONE 2
@@ -70,10 +69,5 @@ U32 AIL_sequence_status(HSEQUENCE sequence);
 void AIL_set_sequence_loop_count(HSEQUENCE sequence, S32 loopCount);
 void AIL_set_XMIDI_master_volume(HMDIDRIVER driver, S32 volume);
 S32 AIL_XMIDI_master_volume(HMDIDRIVER driver);
-
-HREDBOOK AIL_redbook_open(U32 which);
-void AIL_redbook_close(HREDBOOK handle);
-U32 AIL_redbook_tracks(HREDBOOK handle);
-void AIL_redbook_track_info(HREDBOOK handle, U32 track, U32* start, U32* end);
 
 #endif
