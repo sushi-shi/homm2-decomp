@@ -41,14 +41,14 @@ public:
     virtual ~font();
 
 protected:
-    void DrawStringExecute(char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void DrawStringExecute(const char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
 
 public:
-    void DrawString(char*, i32, i32, FontDrawMode);
+    void DrawString(const char*, i32, i32, FontDrawMode);
     i32 GetCharacterWidth(u8);
-    void DrawBoundedString(char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
-    i32 LineLength(char*, i32);
-    i32 LineWidth(char*);
+    void DrawBoundedString(const char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
+    i32 LineLength(const char*, i32);
+    i32 LineWidth(const char*);
 };
 #pragma pack(pop)
 #endif

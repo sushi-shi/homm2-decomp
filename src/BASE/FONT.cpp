@@ -9,6 +9,8 @@
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
 
+#include <string>
+
 typedef enum FontConstant {
     LARGE_FONT_HEIGHT_THRESHOLD = 14,
     FONT_DRAW_SCREEN_WIDTH      = 640,
@@ -37,7 +39,7 @@ font::~font() {
 }
 
 void font::DrawStringExecute(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -137,7 +139,7 @@ void font::DrawStringExecute(
     }
 }
 
-void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
@@ -158,7 +160,7 @@ i32 font::GetCharacterWidth(u8 c) {
 }
 
 void font::DrawBoundedString(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     i32 w,
@@ -178,7 +180,8 @@ void font::DrawBoundedString(
     i32 idx = 0;
     i32 lineWidth3 = 0;
     i32 wordBreak0 = 0;
-    char* text2 = str;
+    std::string text(str);
+    char* text2 = text.data();
     FontDrawMode drawMode2 = mode;
     if ((H2EnumIndex((align) & (FONT_ALIGN_VERTICAL_CENTER)))) {
         align -= FONT_ALIGN_VERTICAL_CENTER;
@@ -238,11 +241,11 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-i32 font::LineLength(char* str, i32 maxW) {
+i32 font::LineLength(const char* str, i32 maxW) {
     i32 s = strlen(str);
     char aa = ' ';
     i32 z = 0, t = 0, r = 0, y = 0, p = 0, u = 0, x = 0, gap = 0;
-    char* w = str;
+    const char* w = str;
     i32 q, v;
     while (p < s && w[p] != 0) {
         while (w[p] != 0 && w[p] != '\n' && x <= maxW) {
@@ -272,12 +275,12 @@ i32 font::LineLength(char* str, i32 maxW) {
     return z;
 }
 
-i32 font::LineWidth(char* str) {
+i32 font::LineWidth(const char* str) {
     i32 s = strlen(str);
     i32 q, u;
     i32 y = 0, t = 0, r = 0, x = 0, p = 0,
         w = 0;
-    char* v = str;
+    const char* v = str;
     while (p < s && v[p] != 0) {
         while (v[p] != 0 && v[p] != '\n') {
             w += GetCharacterWidth(v[p]);
