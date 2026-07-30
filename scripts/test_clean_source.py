@@ -381,7 +381,8 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
         (repo / "src").mkdir()
         (repo / "include/example.h").write_text("#pragma once\n")
         (repo / "src/example.cpp").write_text("int source_value;\n")
-        git(repo, "add", "include", "src")
+        (repo / "decomp-only.txt").write_text("matching tools\n")
+        git(repo, "add", "include", "src", "decomp-only.txt")
         git(repo, "commit", "-m", "source")
 
         output = root / "generated"
@@ -409,6 +410,24 @@ class CleanSourcePublishSafetyTests(unittest.TestCase):
                 clean_source.publish(output, "main")
             self.assertEqual(git(repo, "rev-parse", "main"), before)
             self.assertEqual(git(repo, "status", "--porcelain"), "")
+
+    def test_new_generated_branch_descends_from_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo, output = self.fixture_repo(Path(directory))
+            source = git(repo, "rev-parse", "main")
+
+            with mock.patch.object(clean_source, "REPO", repo):
+                clean_source.publish(output, "clean")
+
+            self.assertEqual(git(repo, "rev-parse", "clean^"), source)
+            self.assertNotIn(
+                "decomp-only.txt",
+                git(repo, "ls-tree", "--name-only", "clean"),
+            )
+            self.assertEqual(
+                git(repo, "show", "clean:src/example.cpp"),
+                "int generated_value;",
+            )
 
     def test_publish_refuses_and_preserves_a_dirty_generated_worktree(self):
         with tempfile.TemporaryDirectory() as directory:

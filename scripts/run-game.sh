@@ -17,8 +17,10 @@ if [ ! -d "$WINEPREFIX/drive_c" ]; then
 fi
 
 if [ -n "${NIRI_SOCKET:-}" ] && command -v niri >/dev/null 2>&1 \
-    && command -v jq >/dev/null 2>&1; then
-    before_ids=" $(niri msg -j windows 2>/dev/null | jq -r '.[].id' | tr '\n' ' ') "
+    && command -v jq >/dev/null 2>&1 \
+    && niri_windows=$(niri msg -j windows 2>/dev/null) \
+    && before_ids=$(printf '%s\n' "$niri_windows" | jq -r '.[].id' | tr '\n' ' '); then
+    before_ids=" $before_ids "
 else
     before_ids=
 fi
@@ -30,14 +32,23 @@ game_pid=$!
 if [ -n "$before_ids" ]; then
     attempts=0
     while [ "$attempts" -lt 200 ]; do
-        for window_id in $(niri msg -j windows 2>/dev/null | jq -r '.[].id'); do
+        niri_windows=$(niri msg -j windows 2>/dev/null) || break
+        window_ids=$(printf '%s\n' "$niri_windows" | jq -r '.[].id') || break
+        for window_id in $window_ids; do
             case "$before_ids" in
                 *" $window_id "*) ;;
                 *)
-                    niri msg action move-window-to-floating --id "$window_id" >/dev/null 2>&1
-                    niri msg action set-window-width --id "$window_id" 640 >/dev/null 2>&1
-                    niri msg action set-window-height --id "$window_id" 480 >/dev/null 2>&1
-                    niri msg action center-window --id "$window_id" >/dev/null 2>&1
+                    if ! niri msg action move-window-to-floating \
+                            --id "$window_id" >/dev/null 2>&1 \
+                        || ! niri msg action set-window-width \
+                            --id "$window_id" 640 >/dev/null 2>&1 \
+                        || ! niri msg action set-window-height \
+                            --id "$window_id" 480 >/dev/null 2>&1 \
+                        || ! niri msg action center-window \
+                            --id "$window_id" >/dev/null 2>&1; then
+                        attempts=200
+                        break
+                    fi
                     attempts=200
                     break
                     ;;
