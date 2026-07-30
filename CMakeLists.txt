@@ -39,7 +39,8 @@ target_include_directories(homm2_platform PRIVATE
 if(HOMM2_PLATFORM STREQUAL "SDL3")
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(SDL3 REQUIRED IMPORTED_TARGET sdl3)
-  pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec libavformat libavutil)
+  pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
+    libavcodec libavformat libavutil libswresample)
   target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3)
 endif()
 
