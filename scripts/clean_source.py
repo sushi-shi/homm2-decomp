@@ -8,13 +8,15 @@ the dual-build enum machinery (`H2_ENUM_*`). None of it survives into the
 compiler's view of a production build, so this performs those expansions ahead
 of time and emits ordinary C++.
 
-A translation, not a fork: the same program for the same target. The one choice
-made is selecting the strict typed enum branch, which is why GENERATED_PATCHES
-also carries the conversions that choice requires. See docs/clean-source.md.
+A translation, not a fork: the same program for the same target. The default
+selects the strict typed enum branch. `--classic-from` derives an integer-enum
+view from an existing clean tree. See docs/clean-source.md.
 
 Usage:
     python3 scripts/clean_source.py --out build/clean
     python3 scripts/clean_source.py --out build/clean --verify
+    python3 scripts/clean_source.py --classic-from ../homm2-decomp-master \
+        --out build/classic
 """
 
 from __future__ import annotations
@@ -23,6 +25,7 @@ import argparse
 import enum
 import re
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -890,6 +893,309 @@ def clean(text: str, relative: str = "") -> str:
 
 
 # --------------------------------------------------------------------------
+# Classic source generation
+# --------------------------------------------------------------------------
+
+CLASSIC_DOMAIN_MACROS = {
+    "H2_ENUM_CLASS_BEGIN": lambda args: "i32",
+    "H2_ENUM_CLASS_BEGIN_T": lambda args: args[1].strip(),
+    "H2_ENUM_CLASS_BEGIN_SPLIT": lambda args: "i32",
+    "H2_ENUM_CLASS_FORWARD": lambda args: "i32",
+    "H2_ENUM_CLASS_FORWARD_SPLIT": lambda args: "i32",
+}
+
+
+def _macro_calls(text: str, names: set[str]):
+    i = 0
+    while i < len(text):
+        end = _literal_end(text, i)
+        if end is not None:
+            i = end
+            continue
+        if not _is_ident_start(text[i]):
+            i += 1
+            continue
+        j = i + 1
+        while j < len(text) and _is_ident_char(text[j]):
+            j += 1
+        word = text[i:j]
+        k = j
+        while k < len(text) and text[k] in " \t\n\r":
+            k += 1
+        if word in names and k < len(text) and text[k] == "(":
+            matched = _match_call(text, k)
+            if matched is not None:
+                close, args = matched
+                yield word, args
+                i = close
+                continue
+        i = j
+
+
+def classic_domains(schema_root: Path = REPO) -> dict[str, str]:
+    domains: dict[str, str] = {}
+    for tier in ("include", "src"):
+        for path in sorted((schema_root / tier).rglob("*")):
+            if not path.is_file() or path.suffix not in (".h", ".cpp"):
+                continue
+            if path == schema_root / "include/Ints.h":
+                continue
+            for macro, args in _macro_calls(path.read_text(), set(CLASSIC_DOMAIN_MACROS)):
+                name = args[0].strip()
+                storage = CLASSIC_DOMAIN_MACROS[macro](args)
+                previous = domains.setdefault(name, storage)
+                if previous != storage:
+                    raise SystemExit(
+                        f"classic domain {name} has conflicting storage: "
+                        f"{previous} and {storage}"
+                    )
+    return domains
+
+
+def expanded_domains(source_root: Path) -> dict[str, str]:
+    domains: dict[str, str] = {}
+    opening = re.compile(
+        r"^enum class ([A-Za-z_][A-Za-z0-9_]*)"
+        r"(?:\s*:\s*([A-Za-z_][A-Za-z0-9_]*))?\s*\{",
+        re.MULTILINE,
+    )
+    for tier in ("include", "src"):
+        for path in sorted((source_root / tier).rglob("*")):
+            if not path.is_file() or path.suffix not in (".h", ".cpp"):
+                continue
+            text = path.read_text()
+            for match in opening.finditer(text):
+                name, storage = match.group(1), match.group(2) or "i32"
+                if re.search(rf"^using enum {re.escape(name)};\s*$", text, re.MULTILINE):
+                    domains.setdefault(name, storage)
+    return domains
+
+
+def _scoped_enums_in_text(
+    text: str,
+    excluded: set[str],
+) -> dict[str, tuple[str, tuple[str, ...]]]:
+    found: dict[str, tuple[str, tuple[str, ...]]] = {}
+    opening = re.compile(
+        r"\benum class ([A-Za-z_][A-Za-z0-9_]*)"
+        r"(?:\s*:\s*([A-Za-z_][A-Za-z0-9_]*))?\s*\{"
+    )
+    for match in opening.finditer(text):
+        name = match.group(1)
+        if name in excluded:
+            continue
+        close = text.find("}", match.end())
+        if close < 0:
+            raise SystemExit("unterminated scoped enum %s" % name)
+        body = text[match.end():close]
+        enumerators = []
+        for entry in _split_args(body):
+            identifier = re.match(r"\s*([A-Za-z_][A-Za-z0-9_]*)", entry)
+            if identifier is not None:
+                enumerators.append(identifier.group(1))
+        found[name] = (match.group(2) or "int", tuple(enumerators))
+    return found
+
+
+def scoped_enums(
+    source_root: Path,
+    excluded: set[str],
+) -> dict[str, tuple[str, tuple[str, ...]]]:
+    found: dict[str, tuple[str, tuple[str, ...]]] = {}
+    for tier in ("include", "src"):
+        for path in sorted((source_root / tier).rglob("*")):
+            if not path.is_file() or path.suffix not in (".h", ".cpp"):
+                continue
+            for name, details in _scoped_enums_in_text(
+                path.read_text(), excluded
+            ).items():
+                previous = found.setdefault(name, details)
+                if previous != details:
+                    raise SystemExit("scoped enum %s has conflicting definitions" % name)
+    return found
+
+
+def _replace_template_storage(text: str) -> str:
+    pattern = re.compile(
+        r"\bH2(?:Stepped)?EnumStorage\s*<\s*"
+        r"[A-Za-z_][A-Za-z0-9_]*\s*,\s*"
+        r"([A-Za-z_][A-Za-z0-9_]*)\s*>"
+    )
+    return pattern.sub(r"\1", text)
+
+
+def _replace_enum_index(text: str) -> str:
+    out, i = [], 0
+    name = "H2EnumIndex"
+    while i < len(text):
+        end = _literal_end(text, i)
+        if end is not None:
+            out.append(text[i:end])
+            i = end
+            continue
+        if text.startswith(name, i):
+            before = text[i - 1] if i else ""
+            after = text[i + len(name)] if i + len(name) < len(text) else ""
+            if not _is_ident_char(before) and not _is_ident_char(after):
+                k = i + len(name)
+                while k < len(text) and text[k] in " \t\n\r":
+                    k += 1
+                if k < len(text) and text[k] == "(":
+                    matched = _match_call(text, k)
+                    if matched is not None:
+                        close, args = matched
+                        if len(args) == 1:
+                            argument = _replace_enum_index(args[0].strip())
+                            out.append("(%s)" % argument)
+                            i = close
+                            continue
+        out.append(text[i])
+        i += 1
+    return "".join(out)
+
+
+def _classic_ints(text: str) -> str:
+    start = text.find("template <typename T>\ninline constexpr bool H2IsMaskLike")
+    end = text.rfind("#endif")
+    if start < 0 or end < start:
+        raise SystemExit("include/Ints.h no longer has the expected strict type block")
+    text = text[:start] + text[end:]
+    text = text.replace("#include <type_traits>\n", "")
+    return tidy(text).rstrip("\n") + "\n"
+
+
+def _drop_classic_domain_operators(text: str, domains: set[str]) -> str:
+    lines = text.split("\n")
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not (
+            line.startswith("inline")
+            and "operator" in line
+            and any(domain in line for domain in domains)
+        ):
+            out.append(line)
+            i += 1
+            continue
+        depth = 0
+        seen_brace = False
+        while i < len(lines):
+            depth += lines[i].count("{") - lines[i].count("}")
+            seen_brace = seen_brace or "{" in lines[i]
+            i += 1
+            if seen_brace and depth <= 0:
+                break
+    return "\n".join(out)
+
+
+def _demote_scoped_enums(
+    text: str,
+    enums: dict[str, tuple[str, tuple[str, ...]]],
+) -> str:
+    for name, (storage, enumerators) in enums.items():
+        aliases = re.findall(
+            rf"\busing\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*"
+            rf"((?:[A-Za-z_][A-Za-z0-9_]*::)+){re.escape(name)}\s*;",
+            text,
+        )
+        imports = re.findall(
+            rf"\busing\s+((?:[A-Za-z_][A-Za-z0-9_]*::)+)"
+            rf"{re.escape(name)}\s*;",
+            text,
+        )
+        for enumerator in enumerators:
+            for alias, owner in aliases:
+                text = re.sub(
+                    rf"\b{re.escape(alias)}::{re.escape(enumerator)}\b",
+                    f"{owner}{name}_{enumerator}",
+                    text,
+                )
+            for owner in imports:
+                text = re.sub(
+                    rf"\b{re.escape(name)}::{re.escape(enumerator)}\b",
+                    f"{owner}{name}_{enumerator}",
+                    text,
+                )
+            text = re.sub(
+                rf"\b{re.escape(name)}::{re.escape(enumerator)}\b",
+                f"{name}_{enumerator}",
+                text,
+            )
+
+        pattern = re.compile(
+            rf"^([ \t]*)enum class {re.escape(name)}"
+            rf"(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*\{{(.*?)\}}\s*;",
+            re.MULTILINE | re.DOTALL,
+        )
+
+        def replacement(match: re.Match[str]) -> str:
+            body = match.group(2).rstrip(" \t")
+            for enumerator in enumerators:
+                body = _replace_word(body, enumerator, f"{name}_{enumerator}")
+            indent = match.group(1)
+            closing = indent if body.endswith("\n") else " "
+            return f"{indent}enum {{{body}{closing}}};\n{indent}typedef {storage} {name};"
+
+        text = pattern.sub(replacement, text)
+        text = re.sub(
+            rf"\benum class {re.escape(name)}"
+            rf"(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*;",
+            f"typedef {storage} {name};",
+            text,
+        )
+    return text
+
+
+def classicize(
+    text: str,
+    domains: dict[str, str],
+    relative: str = "",
+    modern_enums: dict[str, tuple[str, tuple[str, ...]]] | None = None,
+) -> str:
+    if relative == "include/Ints.h":
+        return _classic_ints(text)
+
+    for name, storage in sorted(domains.items(), key=lambda item: -len(item[0])):
+        opening = re.compile(
+            rf"^([ \t]*)enum class {re.escape(name)}"
+            rf"(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*\{{",
+            re.MULTILINE,
+        )
+        text = opening.sub(r"\1enum {", text)
+        text = re.sub(
+            rf"^([ \t]*)using enum {re.escape(name)};\s*$",
+            rf"\1typedef {storage} {name};",
+            text,
+            flags=re.MULTILINE,
+        )
+        text = re.sub(
+            rf"\benum class {re.escape(name)}"
+            rf"(?:\s*:\s*[A-Za-z_][A-Za-z0-9_]*)?\s*;",
+            f"typedef {storage} {name};",
+            text,
+        )
+        text = re.sub(
+            rf"^[ \t]*ENABLE_ENUM_(?:FLAGS|STEPS)"
+            rf"\(\s*{re.escape(name)}\s*\)\s*$",
+            "",
+            text,
+            flags=re.MULTILINE,
+        )
+
+    text = _replace_template_storage(text)
+    text = _replace_enum_index(text)
+    text = _drop_classic_domain_operators(text, set(domains))
+    text = _demote_scoped_enums(
+        text,
+        modern_enums
+        if modern_enums is not None
+        else _scoped_enums_in_text(text, set(domains)),
+    )
+    return tidy(text).rstrip("\n") + "\n"
+
+
+# --------------------------------------------------------------------------
 # Tree generation
 # --------------------------------------------------------------------------
 
@@ -1183,6 +1489,61 @@ def generate(out_root: Path) -> tuple[int, int, list[str]]:
     return sources, overrides, debris
 
 
+def generate_classic(source_root: Path, out_root: Path) -> tuple[int, int, list[str]]:
+    source_root = source_root.resolve()
+    if not (source_root / ".git").exists():
+        raise SystemExit("classic source is not a Git worktree: %s" % source_root)
+
+    out_root = validate_out_root(out_root)
+    if out_root.exists():
+        shutil.rmtree(out_root)
+    out_root.mkdir(parents=True)
+    (out_root / GENERATED_MARKER).write_text(GENERATED_MARKER_CONTENT)
+
+    result = subprocess.run(
+        ("git", "ls-files", "-z"),
+        cwd=source_root,
+        check=True,
+        capture_output=True,
+    )
+    tracked = [
+        Path(raw.decode())
+        for raw in result.stdout.split(b"\0")
+        if raw
+    ]
+    domains = classic_domains()
+    for name, storage in expanded_domains(source_root).items():
+        domains.setdefault(name, storage)
+    modern_enums = scoped_enums(source_root, set(domains))
+    transformed = 0
+    for relative in tracked:
+        source = source_root / relative
+        if not source.is_file():
+            continue
+        target = out_root / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        relative_text = relative.as_posix()
+        if (
+            relative.parts
+            and relative.parts[0] in ("include", "src")
+            and relative.suffix in (".h", ".cpp")
+        ):
+            target.write_text(
+                classicize(
+                    source.read_text(),
+                    domains,
+                    relative_text,
+                    modern_enums,
+                )
+            )
+            transformed += 1
+        else:
+            shutil.copyfile(source, target)
+            target.chmod(source.stat().st_mode)
+
+    return transformed, 0, []
+
+
 # Macros the clean tree keeps on purpose: the allocation wrappers survive in
 # their argument-free form, and `__declspec` still carries `naked`.
 INTENTIONALLY_KEPT = {
@@ -1234,17 +1595,23 @@ def residue(out_root: Path) -> dict[str, int]:
     return found
 
 
-def publish(out_root: Path, branch: str) -> int:
+def publish(
+    out_root: Path,
+    branch: str,
+    source_root: Path | None = None,
+    full_tree: bool = False,
+) -> int:
     """Publish the generated tree onto a branch, one commit per source commit.
 
     The clean tree is a pure function of the matching tree, so it is never
     edited by hand: as matching advances toward byte-exactness, this is re-run
     and the improvements flow through to the branch consumers build against.
     """
-    import subprocess
     import tempfile
 
-    def git(*argv: str, cwd: Path = REPO, **kwargs) -> str:
+    source_root = (source_root or REPO).resolve()
+
+    def git(*argv: str, cwd: Path = source_root, **kwargs) -> str:
         return subprocess.run(("git", *argv), cwd=cwd, text=True,
                               capture_output=True, check=True, **kwargs).stdout.strip()
 
@@ -1256,7 +1623,7 @@ def publish(out_root: Path, branch: str) -> int:
 
     subprocess.run(
         ("git", "check-ref-format", "--branch", branch),
-        cwd=REPO,
+        cwd=source_root,
         check=True,
         capture_output=True,
     )
@@ -1264,7 +1631,7 @@ def publish(out_root: Path, branch: str) -> int:
     # The exit status is the answer here, so it is read rather than raised on.
     exists = subprocess.run(
         ("git", "show-ref", "--verify", "--quiet", branch_ref),
-        cwd=REPO,
+        cwd=source_root,
         capture_output=True,
         check=False,
     ).returncode == 0
@@ -1292,7 +1659,7 @@ def publish(out_root: Path, branch: str) -> int:
 
     if temporary:
         # Best effort: clears stale entries if any, and is fine if there are none.
-        subprocess.run(("git", "worktree", "prune"), cwd=REPO, capture_output=True,
+        subprocess.run(("git", "worktree", "prune"), cwd=source_root, capture_output=True,
                        check=False)
         worktree = Path(tempfile.mkdtemp(
             prefix=".clean-worktree-",
@@ -1326,7 +1693,7 @@ def publish(out_root: Path, branch: str) -> int:
             )
             merged_source = True
 
-        if new_branch:
+        if new_branch or full_tree:
             subprocess.run(
                 ("git", "rm", "-rf", "--quiet", "."),
                 cwd=worktree,
@@ -1334,22 +1701,31 @@ def publish(out_root: Path, branch: str) -> int:
                 capture_output=True,
             )
 
-        for stale in PUBLISHED_PATHS:
+        publish_paths = (
+            tuple(
+                path.name
+                for path in sorted(out_root.iterdir())
+                if path.name != GENERATED_MARKER
+            )
+            if full_tree
+            else PUBLISHED_PATHS
+        )
+        for stale in publish_paths:
             path = worktree / stale
             if path.is_dir():
                 shutil.rmtree(path)
             else:
                 path.unlink(missing_ok=True)
-        for relative in PUBLISHED_PATHS:
+        for relative in publish_paths:
             source = out_root / relative
             target = worktree / relative
             if source.is_dir():
                 shutil.copytree(source, target)
             elif source.is_file():
-                shutil.copyfile(source, target)
+                shutil.copy2(source, target)
 
         stage_paths = [
-            relative for relative in PUBLISHED_PATHS
+            relative for relative in publish_paths
             if (worktree / relative).exists()
             or git("ls-files", "--", relative, cwd=worktree)
         ]
@@ -1473,10 +1849,26 @@ def main(argv: list[str] | None = None) -> int:
                         help="build the generated Windows executable with Ninja")
     parser.add_argument("--publish", metavar="BRANCH", nargs="?", const="clean",
                         help="commit the generated tree onto BRANCH (default: clean)")
+    parser.add_argument(
+        "--classic-from",
+        metavar="TREE",
+        help="derive a classic integer-enum tree from an existing clean worktree",
+    )
     args = parser.parse_args(argv)
     requested = (REPO / args.out) if not Path(args.out).is_absolute() else Path(args.out)
     out_root = validate_out_root(requested)
-    sources, overrides, debris = generate(out_root)
+    source_root = (
+        (REPO / args.classic_from).resolve()
+        if args.classic_from and not Path(args.classic_from).is_absolute()
+        else Path(args.classic_from).resolve()
+        if args.classic_from
+        else REPO
+    )
+    classic = args.classic_from is not None
+    if classic:
+        sources, overrides, debris = generate_classic(source_root, out_root)
+    else:
+        sources, overrides, debris = generate(out_root)
     print(f"[clean] wrote {sources} transformed files "
           f"({overrides} supplied overrides) to {out_root}")
 
@@ -1503,7 +1895,12 @@ def main(argv: list[str] | None = None) -> int:
         status = verify(out_root)
 
     if args.publish:
-        return publish(out_root, args.publish) or status
+        return publish(
+            out_root,
+            args.publish,
+            source_root=source_root,
+            full_tree=classic,
+        ) or status
     return status
 
 
