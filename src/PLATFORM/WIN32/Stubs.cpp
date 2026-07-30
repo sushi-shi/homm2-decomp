@@ -253,27 +253,5 @@ void AIL_redbook_track_info(HREDBOOK, U32, U32* start, U32* end) {
     if (end != nullptr) *end = 0;
 }
 
-Smack* SmackOpen(const char*, u32, u32) {
-    Smack* smack = new Smack{};
-    smack->Width = 640;
-    smack->Height = 480;
-    smack->Frames = 1;
-    return smack;
-}
-void SmackClose(Smack* smack) { delete smack; }
-u32 SmackDoFrame(Smack*) { return 0; }
-void SmackNextFrame(Smack* smack) {
-    if (smack != nullptr && smack->FrameNum < smack->Frames) {
-        ++smack->FrameNum;
-    }
-}
-u32 SmackWait(Smack*) { return 0; }
-void SmackSummary(Smack*, SmackSum* summary) {
-    if (summary != nullptr) {
-        *summary = {};
-    }
-}
-void SmackToBuffer(Smack*, u32, u32, u32, u32, void*, u32) {}
-u32 SmackToBufferRect(Smack*, u32) { return 0; }
 u8 SmackSoundUseMSS(void*) { return 1; }
 u8 SmackSoundUseDirectSound(void*) { return 0; }
