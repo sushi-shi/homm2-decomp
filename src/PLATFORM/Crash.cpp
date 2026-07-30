@@ -6,6 +6,7 @@
 
 #include <execinfo.h>
 #include <fcntl.h>
+#include <ucontext.h>
 #include <unistd.h>
 
 #include <PLATFORM/Platform.h>
@@ -26,12 +27,33 @@ const char* SignalName(int number) {
     }
 }
 
-void WriteBacktrace(int fileDescriptor, int number) {
+void WriteBacktrace(int fileDescriptor, int number, void* address, void* rawContext) {
 
     const char* name = SignalName(number);
     ::write(fileDescriptor, "\nhomm2 crashed: ", 16);
     ::write(fileDescriptor, name, std::strlen(name));
     ::write(fileDescriptor, "\n\n", 2);
+    char fault[64];
+    const int faultLength = std::snprintf(fault, sizeof(fault), "fault address: %p\n\n", address);
+    ::write(fileDescriptor, fault, static_cast<std::size_t>(faultLength > 0 ? faultLength : 0));
+#if defined(__i386__)
+    ucontext_t* context = static_cast<ucontext_t*>(rawContext);
+    char registers[160];
+    const int registerLength = std::snprintf(
+        registers,
+        sizeof(registers),
+        "EIP=%08lx EAX=%08lx EDX=%08lx EDI=%08lx\n\n",
+        static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EIP]),
+        static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EAX]),
+        static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EDX]),
+        static_cast<unsigned long>(context->uc_mcontext.gregs[REG_EDI])
+    );
+    ::write(
+        fileDescriptor,
+        registers,
+        static_cast<std::size_t>(registerLength > 0 ? registerLength : 0)
+    );
+#endif
 
     void* frames[64];
     const int count = ::backtrace(frames, 64);
@@ -48,13 +70,14 @@ void WriteBacktrace(int fileDescriptor, int number) {
     }
 }
 
-void Handle(int number) {
-    WriteBacktrace(STDERR_FILENO, number);
+void Handle(int number, siginfo_t* info, void* context) {
+    void* address = info != nullptr ? info->si_addr : nullptr;
+    WriteBacktrace(STDERR_FILENO, number, address, context);
 
     if (gReportPath[0] != '\0') {
         const int file = ::open(gReportPath, O_WRONLY | O_CREAT | O_APPEND, 0644);
         if (file >= 0) {
-            WriteBacktrace(file, number);
+            WriteBacktrace(file, number, address, context);
             ::close(file);
             ::write(STDERR_FILENO, "\nreport written to ", 19);
             ::write(STDERR_FILENO, gReportPath, std::strlen(gReportPath));
@@ -73,7 +96,11 @@ void InstallCrashHandler(const char* reportPath) {
         std::strncpy(gReportPath, reportPath, sizeof(gReportPath) - 1);
     }
     for (const int number : {SIGSEGV, SIGBUS, SIGFPE, SIGILL, SIGABRT}) {
-        std::signal(number, Handle);
+        struct sigaction action {};
+        action.sa_sigaction = Handle;
+        sigemptyset(&action.sa_mask);
+        action.sa_flags = SA_SIGINFO;
+        sigaction(number, &action, nullptr);
     }
 }
 
