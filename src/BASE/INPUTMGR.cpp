@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <string.h>
-#include <windows.h>
+#include <PLATFORM/Input.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
@@ -57,7 +57,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     event->type = MESSAGE_NONE;
 
     switch (message) {
-        case WM_KEYDOWN:
+        case platform::INPUT_MESSAGE_KEY_DOWN:
             event->type = MESSAGE_KEY_DOWN;
             event->payload.keyboard.keyCode =
                 static_cast<u16>(static_cast<u32l>(messageData) >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT))
@@ -79,7 +79,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
                     break;
             }
             break;
-        case WM_KEYUP:
+        case platform::INPUT_MESSAGE_KEY_UP:
             event->type = MESSAGE_KEY_UP;
             event->payload.keyboard.keyCode =
                 static_cast<u16>(static_cast<u32l>(messageData) >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT))
@@ -148,26 +148,26 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     event->payload.mouse.x = 0;
     event->type = MESSAGE_NONE;
 
-    switch (message - WM_MOUSEMOVE) {
-        case WM_MOUSEMOVE - WM_MOUSEMOVE:
+    switch (message - platform::INPUT_MESSAGE_MOUSE_MOVE) {
+        case platform::INPUT_MESSAGE_MOUSE_MOVE - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_MOUSE_MOVE;
             break;
-        case WM_LBUTTONDOWN - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_LEFT_DOWN - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_LEFT_BUTTON_DOWN;
             break;
-        case WM_LBUTTONUP - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_LEFT_UP - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_LEFT_BUTTON_UP;
             break;
-        case WM_LBUTTONDBLCLK - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_LEFT_DOUBLE - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_LEFT_BUTTON_DOWN;
             break;
-        case WM_RBUTTONDOWN - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_RIGHT_DOWN - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
             break;
-        case WM_RBUTTONUP - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_RIGHT_UP - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_RIGHT_BUTTON_UP;
             break;
-        case WM_RBUTTONDBLCLK - WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_RIGHT_DOUBLE - platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
             break;
         default:
@@ -191,7 +191,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     }
 
 afterMouseCoordinates:
-    if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
+    if (message == platform::INPUT_MESSAGE_MOUSE_MOVE && gpMouseManager != NULL) {
         i32 y = event->payload.mouse.y;
         i32 x = event->payload.mouse.x;
         if (bInCheckChangeCursor == 0 && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0

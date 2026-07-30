@@ -6,11 +6,10 @@
 #include <SOURCE/KB.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
-#include <mss.h>
+#include <PLATFORM/Miles.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <windows.h>
 #include <BASE/Misc.h>
 
 typedef enum SoundConstant {
@@ -20,7 +19,6 @@ typedef enum SoundConstant {
     AMBIENT_FADE_DELAY_TICKS     = 900,
     SOUND_TIMER_INTERVAL         = 16,
     AIL_WAVEOUT_PREFERENCE       = 15,
-    PCM_BITS_PER_BYTE_SHIFT      = 3,
     DEFAULT_SAMPLE_RATE          = 22050,
     DEFAULT_SAMPLE_BITS          = 8,
     DEFAULT_SAMPLE_CHANNELS      = 1,
@@ -35,8 +33,6 @@ typedef enum SoundSampleStatus {
     SAMPLE_STATUS_PLAYING = 4
 } SoundSampleStatus;
 
-
-static PCMWAVEFORMAT gWaveFormat;
 
 enum class SoundStateSpan : i32 {
     SOUND_STATE_RESET_SPAN = 0xae
@@ -97,30 +93,11 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
 
 struct _DIG_DRIVER*
 WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showErrors) {
-    u32 numDevs;
     struct _DIG_DRIVER* drvr;
-    WAVEOUTCAPSA caps;
     i32 rc;
-    numDevs = waveOutGetNumDevs();
-    if (numDevs == 0) {
-        drvr = NULL;
-        return NULL;
-    }
-    if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
-        platform::ShowMessage("Startup Error", "Sound initialization error!  No wave devices found.");
-        drvr = NULL;
-        return NULL;
-    }
     if (gbUseWaveout != 0)
         AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
-    gWaveFormat.wf.wFormatTag = 1;
-    gWaveFormat.wf.nChannels = channels;
-    gWaveFormat.wf.nSamplesPerSec = sampleRate;
-    gWaveFormat.wf.nAvgBytesPerSec =
-        (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels * sampleRate;
-    gWaveFormat.wf.nBlockAlign = (bitsPerSample >> PCM_BITS_PER_BYTE_SHIFT) * channels;
-    gWaveFormat.wBitsPerSample = bitsPerSample;
-    rc = AIL_waveOutOpen(&drvr, NULL, 0, &gWaveFormat.wf);
+    rc = AIL_waveOutOpen(&drvr, NULL, 0, NULL);
     if (rc != 0) {
         if (showErrors != 0)
             platform::ShowMessage("Sound initialization error!", AIL_last_error());

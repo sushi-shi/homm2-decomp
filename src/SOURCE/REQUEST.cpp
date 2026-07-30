@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <fcntl.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/Misc.h>

@@ -2,7 +2,7 @@
 #include "EDITOR/fullMap.h"
 #include "EDITOR/mapcell.h"
 #include <string.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 
 typedef enum MapCellExtraConstant {
     EXTRA_ALLOCATION_STEP = 100

@@ -2,8 +2,8 @@
 #define HOMM2_SMACKMGR_H
 
 #include <Ints.h>
-#include <smack.h>
-#include <mss.h>
+#include <PLATFORM/Smacker.h>
+#include <PLATFORM/Miles.h>
 
 void ConvertSmackerPalette(u8*);
 class icon;

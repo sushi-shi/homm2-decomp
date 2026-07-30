@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <BASE/soundManager.h>
-#include <mss.h>
+#include <PLATFORM/Miles.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/resourceManager.h>

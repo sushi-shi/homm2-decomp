@@ -1,5 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <Ints.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
@@ -172,11 +173,10 @@ typedef enum FileIdHashConstant {
 #include <PLATFORM/Graphics.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
-#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <io.h>
-#include <direct.h>
+#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/LegacyFile.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -397,7 +397,7 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
+                    platform::Host().Log(platform::LogLevel::Debug, logText);
             }
         }
     }
@@ -436,7 +436,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
+                    platform::Host().Log(platform::LogLevel::Debug, logText);
             }
         }
         return;
@@ -475,7 +475,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                         fputs(logText, logFile);
                         fclose(logFile);
                         if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                            OutputDebugStringA(logText);
+                            platform::Host().Log(platform::LogLevel::Debug, logText);
                     }
                 }
             }
@@ -495,7 +495,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                 fputs(logText, logFile);
                 fclose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
+                    platform::Host().Log(platform::LogLevel::Debug, logText);
             }
         }
     } else {
@@ -537,7 +537,7 @@ void PrintMemoryLeaks(void) {
                         fputs(logText, logFile);
                         fclose(logFile);
                         if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                            OutputDebugStringA(logText);
+                            platform::Host().Log(platform::LogLevel::Debug, logText);
                     }
                 }
             }
@@ -811,7 +811,13 @@ void SetGameDefaults(void) {
 }
 
 void ReadPrefsFromFile(void) {
-    sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
+    snprintf(
+        gText,
+        GLOBAL_TEXT_BUFFER_SIZE,
+        "%s/%s",
+        platform::Files().UserRoot().c_str(),
+        gMiscText.readFile.configFilename.text
+    );
     if (access(gText, 0) == -1) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
@@ -832,413 +838,8 @@ skipDefaults:
     strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
-typedef enum RegistryValueSize {
-    REGISTRY_TEXT_BUFFER_SIZE = 100,
-    REGISTRY_DWORD_BYTES      = 4,
-    CONFIG_ZERO_BUFFER_WORDS  = 25,
-    MODEM_INIT_STRING_SIZE    = 0x62,
-    UNIQUE_SYSTEM_ID_SIZE     = 4,
-    NETWORK_DEFAULT_NAME_SIZE = 0x1e
-} RegistryValueSize;
-
 void ReadPrefsFromRegistry(void) {
-    HKEY hKey;
-    DWORD dwType;
-    DWORD dwSize;
-    char szKey[REGISTRY_TEXT_BUFFER_SIZE];
-    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
-
-    strcpy(szScratch, gMiscText.readRegistry.scratchDefault.text);
-    strcpy(szKey, gMiscText.readRegistry.key.text);
-    hKey = NULL;
-    if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
-        return;
-    dwSize = REGISTRY_DWORD_BYTES;
-    if (RegQueryValueExA(
-            hKey,
-            gMiscText.readRegistry.musicVolumeProbe.text,
-            NULL,
-            &dwType,
-            reinterpret_cast<u8*>(&gConfig.musicVolume),
-            &dwSize
-        )
-        != 0) {
-        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
-        strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
-        SetGameDefaults();
-        RegCloseKey(hKey);
-        UpdateSystemOptionsMenu();
-        WritePrefsToRegistry();
-        return;
-    }
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.musicVolume.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.musicVolume),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.soundVolume.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.soundVolume),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.walkSpeed.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.walkSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.computerWalkSpeed.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.showRoute.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showRoute),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.blackoutComputer.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.directComPort.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.directBaudRate.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.modemComPort.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.modemBaudRate.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
-        &dwSize
-    );
-    dwSize = MODEM_INIT_STRING_SIZE + 1;
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.modemInitString.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.modemInitString),
-        &dwSize
-    );
-    dwSize = REGISTRY_DWORD_BYTES;
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.uniqueSystemId.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.uniqueSystemID),
-        &dwSize
-    );
-    gConfig.uniqueSystemID[UNIQUE_ID_TERMINATOR_INDEX] = 0;
-    dwSize = NETWORK_DEFAULT_NAME_SIZE + 1;
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.networkDefaultName.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.networkDefaultName),
-        &dwSize
-    );
-    dwSize = REGISTRY_DWORD_BYTES;
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.autosave.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.autosave),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.slowVideo.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.slowVideo),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.showCombatGrid.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showCombatGrid),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.showCombatMouseHex.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.combatShadeLevel.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.combatArmyInfoLevel.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.evilInterfaceUsage.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.quickCombatLevel.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.combatSpeed.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.autoCombatUseSpells.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.firstMapOffset.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.firstMapOffset),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.currentMapOffset.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.currentMapOffset),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.showObjectBoxes.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorScreenAnimation.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorPaletteCycling.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameShowMenu.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].showMenu),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameX.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].x),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameY.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].y),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameWidth.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].width),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameHeight.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].height),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameFullScreen.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].fullScreen),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.mainGameColorMouseCursor.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorShowMenu.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].showMenu),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorX.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].x),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorY.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].y),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorWidth.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].width),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorHeight.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].height),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorFullScreen.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.editorColorMouseCursor.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
-        &dwSize
-    );
-    dwSize = MODEM_INIT_STRING_SIZE + 1;
-    if (RegQueryValueExA(
-            hKey,
-            gMiscText.readRegistry.appPath.text,
-            NULL,
-            &dwType,
-            reinterpret_cast<u8*>(gcRegAppPath),
-            &dwSize
-        )
-        != 0)
-        strcpy(gcRegAppPath, gMiscText.readRegistry.appPathDefault.text);
-    RegCloseKey(hKey);
-
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].width <= 0)
-        gConfig.gfx[H2EnumIndex(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].height <= 0)
-        gConfig.gfx[H2EnumIndex(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].x < 0)
-        gConfig.gfx[H2EnumIndex(giCurExe)].x = 0;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[H2EnumIndex(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].y < 0)
-        gConfig.gfx[H2EnumIndex(giCurExe)].y = 0;
-    if (gConfig.gfx[H2EnumIndex(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[H2EnumIndex(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
+    ReadPrefsFromFile();
 }
 
 void ReadPrefs(void) {
@@ -1253,14 +854,13 @@ void ReadPrefs(void) {
 }
 
 void WritePrefsToFile(void) {
-    i32 zeroBuffer[CONFIG_ZERO_BUFFER_WORDS];
-    i32 i;
-    i32* p = zeroBuffer;
-    for (i = CONFIG_ZERO_BUFFER_WORDS; i != 0; i--) {
-        *p = 0;
-        p++;
-    }
-    sprintf(gText, gMiscText.writeFile.stringFormat.text, gMiscText.writeFile.configFilename.text);
+    snprintf(
+        gText,
+        GLOBAL_TEXT_BUFFER_SIZE,
+        "%s/%s",
+        platform::Files().UserRoot().c_str(),
+        gMiscText.writeFile.configFilename.text
+    );
     i32 fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (fd != -1) {
         write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
@@ -1269,352 +869,7 @@ void WritePrefsToFile(void) {
 }
 
 void WritePrefsToRegistry(void) {
-    HKEY hKey;
-    char szKey[REGISTRY_TEXT_BUFFER_SIZE];
-    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
-
-    strcpy(szScratch, gMiscText.writeRegistry.scratchDefault.text);
-    strcpy(szKey, gMiscText.writeRegistry.key.text);
-    hKey = NULL;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
-        return;
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.musicVolume.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.musicVolume),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.soundVolume.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.soundVolume),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.walkSpeed.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.walkSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.computerWalkSpeed.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.showRoute.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showRoute),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.blackoutComputer.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.directComPort.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.directBaudRate.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_DIRECT)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.modemComPort.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.modemBaudRate.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[H2EnumIndex(CONFIG_CONNECTION_MODEM)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.modemInitString.text,
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.modemInitString),
-        MODEM_INIT_STRING_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.uniqueSystemId.text,
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.uniqueSystemID),
-        UNIQUE_SYSTEM_ID_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.networkDefaultName.text,
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.networkDefaultName),
-        NETWORK_DEFAULT_NAME_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.autosave.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.autosave),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.slowVideo.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.slowVideo),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.showCombatGrid.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showCombatGrid),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.showCombatMouseHex.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.combatShadeLevel.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.combatArmyInfoLevel.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.evilInterfaceUsage.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.quickCombatLevel.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.combatSpeed.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.autoCombatUseSpells.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.firstMapOffset.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.firstMapOffset),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.currentMapOffset.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.currentMapOffset),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.showObjectBoxes.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorScreenAnimation.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorPaletteCycling.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameShowMenu.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].showMenu),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameX.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].x),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameY.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].y),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameWidth.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].width),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameHeight.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].height),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameFullScreen.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].fullScreen),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.mainGameColorMouseCursor.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorShowMenu.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].showMenu),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorX.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].x),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorY.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].y),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorWidth.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].width),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorHeight.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].height),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorFullScreen.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.editorColorMouseCursor.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
-        REGISTRY_DWORD_BYTES
-    );
-    RegCloseKey(hKey);
+    WritePrefsToFile();
 }
 
 void WritePrefs(void) {
@@ -1760,7 +1015,7 @@ void LogStr(char* text) {
             fputs(logText, logFile);
             fclose(logFile);
             if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                OutputDebugStringA(logText);
+                platform::Host().Log(platform::LogLevel::Debug, logText);
         }
     }
 }
@@ -1830,7 +1085,7 @@ void LogInt(
             fputs(logText, file);
             fclose(file);
             if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                OutputDebugStringA(logText);
+                platform::Host().Log(platform::LogLevel::Debug, logText);
         }
     }
 }

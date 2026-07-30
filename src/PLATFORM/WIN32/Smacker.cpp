@@ -1,4 +1,4 @@
-#include <smack.h>
+#include <PLATFORM/Smacker.h>
 
 #include <algorithm>
 #include <array>

@@ -1,5 +1,5 @@
-#ifndef HOMM2_PLATFORM_WIN32_RAD_H
-#define HOMM2_PLATFORM_WIN32_RAD_H
+#ifndef HOMM2_PLATFORM_RADTYPES_H
+#define HOMM2_PLATFORM_RADTYPES_H
 
 typedef signed char s8;
 typedef unsigned char u8;

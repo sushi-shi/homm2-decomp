@@ -1,5 +1,5 @@
 #include <Ints.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
