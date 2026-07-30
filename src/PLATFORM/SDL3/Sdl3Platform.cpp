@@ -344,6 +344,11 @@ unsigned TranslateModifiers(SDL_Keymod mod) {
     return modifiers;
 }
 
+SDL_Scancode LogicalScanCode(const SDL_KeyboardEvent& event) {
+    const SDL_Scancode code = SDL_GetScancodeFromKey(event.key, nullptr);
+    return code != SDL_SCANCODE_UNKNOWN ? code : event.scancode;
+}
+
 class Sdl3Host;
 
 class Sdl3Input final : public IInput {
@@ -535,9 +540,10 @@ private:
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP: {
             const bool down = sdlEvent.type == SDL_EVENT_KEY_DOWN;
+            const SDL_Scancode code = LogicalScanCode(sdlEvent.key);
             event.type = down ? Event::Type::KeyDown : Event::Type::KeyUp;
-            event.key = TranslateKey(sdlEvent.key.scancode);
-            event.scanCode = ToSetOneScanCode(sdlEvent.key.scancode);
+            event.key = TranslateKey(code);
+            event.scanCode = ToSetOneScanCode(code);
             event.modifiers = TranslateModifiers(sdlEvent.key.mod);
             const SDL_Keycode key = sdlEvent.key.key;
             event.character = (key > 0 && key < 128) ? static_cast<unsigned>(key) : 0;
