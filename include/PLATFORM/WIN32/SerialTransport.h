@@ -1,8 +1,9 @@
-#ifndef HOMM2_COMWIN_H
-#define HOMM2_COMWIN_H
+#ifndef HOMM2_PLATFORM_WIN32_SERIALTRANSPORT_H
+#define HOMM2_PLATFORM_WIN32_SERIALTRANSPORT_H
 
 #include <windows.h>
 #include <Ints.h>
+#include <PLATFORM/Network.h>
 
 typedef enum ComPortConstant {
     COM_PORT_FLEXIBLE_DATA_SIZE = 1,
@@ -10,16 +11,6 @@ typedef enum ComPortConstant {
     COM_PORT_RUNTIME_GAP_SIZE   = 0x18,
     COM_SERIAL_BYTE_SIZE        = 8
 } ComPortConstant;
-
-enum class ComBaudRate : i32 {
-    COM_BAUD_2400  = 1,
-    COM_BAUD_4800  = 2,
-    COM_BAUD_9600  = 3,
-    COM_BAUD_19200 = 4,
-    COM_BAUD_38400 = 5
-};
-using enum ComBaudRate;
-
 
 struct tag_Node {
     struct tag_Node* prev;

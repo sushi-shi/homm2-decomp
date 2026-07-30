@@ -12,7 +12,8 @@
 #include <BASE/resourceManager.h>
 #include <BASE/heroWindowManager.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/INPUTMGR.h>
 
 #define MOUSE_CURSOR_MASK_SHIFT 3
@@ -28,9 +29,6 @@ typedef enum MouseManagerLocalConstant {
 
 static i32 gOldMouseRight;
 BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-static POINT gMouseScreenPt;
-static POINT
-    gMouseCheckPt;
 static i32 gOldMouseTop;
 HICON hMouseCursor[MOUSE_CURSOR_COUNT];
 void* cAndBits[MOUSE_CURSOR_COUNT];
@@ -327,10 +325,9 @@ void mouseManager::NewUpdate(i32 force) {
     if (force == 0) {
         if (gbColorMice == 0)
             goto updateDone;
-        GetCursorPos(&gMouseCheckPt);
-        ScreenToClient(hwndApp, &gMouseCheckPt);
-        m_mouseX = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-        m_mouseY = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+        const platform::Point position = platform::Input().MousePosition();
+        m_mouseX = position.x;
+        m_mouseY = position.y;
         CheckChangeCursor(m_mouseX, m_mouseY, 0);
     }
     if (gbColorMice == 0)
@@ -470,10 +467,9 @@ updateDone:
 }
 
 void mouseManager::MouseCoords(i32& x, i32& y) {
-    GetCursorPos(&gMouseScreenPt);
-    ScreenToClient(hwndApp, &gMouseScreenPt);
-    x = (gMouseScreenPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-    y = (gMouseScreenPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+    const platform::Point position = platform::Input().MousePosition();
+    x = position.x;
+    y = position.y;
 }
 
 void mouseManager::SaveAndDraw(void) {
@@ -536,11 +532,10 @@ void mouseManager::ReallyShowPointer(void) {
         if (m_hideCount > 0 && --m_hideCount == 0) {
             gbPutzingWithMouseCtr++;
             if (gbColorMice != 0) {
-                GetCursorPos(&gMouseCheckPt);
-                ScreenToClient(hwndApp, &gMouseCheckPt);
-                i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+                const platform::Point position = platform::Input().MousePosition();
+                i32 x = position.x;
                 m_mouseX = x;
-                i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+                i32 y = position.y;
                 m_mouseY = y;
                 CheckChangeCursor(x, y, 0);
             }
@@ -562,11 +557,10 @@ void mouseManager::ShowColorPointer(void) {
     if (m_hideCount > 0 && --m_hideCount == 0) {
         gbPutzingWithMouseCtr++;
         if (gbColorMice != 0) {
-            GetCursorPos(&gMouseCheckPt);
-            ScreenToClient(hwndApp, &gMouseCheckPt);
-            i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+            const platform::Point position = platform::Input().MousePosition();
+            i32 x = position.x;
             m_mouseX = x;
-            i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+            i32 y = position.y;
             m_mouseY = y;
             CheckChangeCursor(x, y, 0);
         }
@@ -581,11 +575,10 @@ i32 mouseManager::IsVis(void) {
 
 void mouseManager::CheckUpdateMousePos(void) {
     if (gbColorMice != 0) {
-        GetCursorPos(&gMouseCheckPt);
-        ScreenToClient(hwndApp, &gMouseCheckPt);
-        i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+        const platform::Point position = platform::Input().MousePosition();
+        i32 x = position.x;
         m_mouseX = x;
-        i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+        i32 y = position.y;
         m_mouseY = y;
         CheckChangeCursor(x, y, 0);
     }
@@ -620,11 +613,10 @@ void mouseManager::SetColorMice(i32 enabled) {
             if (m_hideCount > 0 && --m_hideCount == 0) {
                 gbPutzingWithMouseCtr++;
                 if (gbColorMice != 0) {
-                    GetCursorPos(&gMouseCheckPt);
-                    ScreenToClient(hwndApp, &gMouseCheckPt);
-                    i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+                    const platform::Point position = platform::Input().MousePosition();
+                    i32 x = position.x;
                     m_mouseX = x;
-                    i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+                    i32 y = position.y;
                     m_mouseY = y;
                     CheckChangeCursor(x, y, 0);
                 }

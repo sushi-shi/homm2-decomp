@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/Netbios.h>
+#include <PLATFORM/WIN32/NetbiosSession.h>
 #include <SOURCE/REMOTE.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/netwin.h>
+#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/WIN32/NetbiosTransport.h>
 
 typedef enum NetbiosSetupConstant {
     INIT_UNAVAILABLE         = 1,

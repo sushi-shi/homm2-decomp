@@ -18,20 +18,17 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/Modem.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/Netbios.h>
+#include <PLATFORM/Network.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/SMACKMGR.h>
-#include <SOURCE/Wsnetwin.h>
-#include <SOURCE/dpnetwin.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Runtime.h>
+#include <PLATFORM/Graphics.h>
 #include <BASE/BITS.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>
 #include <BASE/sample.h>
 #include <SOURCE/KB.h>
-#include <windows.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -297,18 +294,18 @@ extern "C" void PollSound(void) {
     if (gbInPollSound)
         return;
     gbInPollSound = true;
-    if (KBTickCount() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
-        glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + MOUSE_UPDATE_INTERVAL;
+    if (platform::Ticks() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
+        glTimers[GLOBAL_MOUSE_TIMER_SLOT] = platform::Ticks() + MOUSE_UPDATE_INTERVAL;
         gpMouseManager->NewUpdate(0);
     }
-    if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
+    if (platform::Ticks() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
         if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT
             || giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
-                KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
+                platform::Ticks() + COMBAT_COLOR_CYCLE_INTERVAL;
         else
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
-                KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
+                platform::Ticks() + DEFAULT_COLOR_CYCLE_INTERVAL;
         bDoColorCycle = 1;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
@@ -319,8 +316,8 @@ extern "C" void PollSound(void) {
         if (bDoColorCycle)
             CycleColors(0);
     }
-    if (KBTickCount() > glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]) {
-        glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() + SOUND_POLL_INTERVAL;
+    if (platform::Ticks() > glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]) {
+        glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = platform::Ticks() + SOUND_POLL_INTERVAL;
         if (gbForegroundApp)
             gpSoundManager->PollSound();
         PollRemote();
@@ -329,7 +326,7 @@ extern "C" void PollSound(void) {
 }
 
 void ForcePollSound(void) {
-    glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() - 1;
+    glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = platform::Ticks() - 1;
     PollSound();
 }
 
@@ -400,7 +397,7 @@ void DeleteMainClasses(void) {
 }
 
 void EarlyShutdown(char* caption, char* text) {
-    MessageBoxA(hwndApp, text, caption, MB_ICONHAND);
+    platform::ShowMessage(caption, text);
     exit(0);
 }
 
@@ -457,7 +454,7 @@ i32 oldmain(void) {
     if (gpExec->InitSystem())
         ShutDown("Initialization failed!");
     LogStr("OM3");
-    KBChangeMenu(hmnuDflt);
+    platform::ChangeMenu(hmnuDflt);
     gPalette = gpResourceManager->GetPalette("kb.pal");
     gpWindowManager->m_updateFlags = 1;
     smallFont = gpResourceManager->GetFont("smalfont.fnt");
@@ -1680,7 +1677,7 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
-    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+    if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         msg.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = msg.payload.widget.id;
         msg.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
@@ -2554,7 +2551,7 @@ void QuickViewWait(void) {
     done = 0;
     while (!done) {
         PollSound();
-        Process1WindowsMessage();
+        platform::PumpEvents();
         ev = gpInputManager->GetEvent();
         if (ev.type == MESSAGE_RIGHT_BUTTON_UP || ev.type == MESSAGE_LEFT_BUTTON_DOWN
             || ev.type == MESSAGE_LEFT_BUTTON_UP)
@@ -2591,15 +2588,15 @@ void InitVars(void) {
     for (i = 0; i < GLOBAL_TIMER_COUNT; i++)
         glTimers[i] = 0;
     if (gbCheatMenus) {
-        hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
-        hmnuCmbt = LoadMenuA(hInstApp, "mnuCmbt");
-        hmnuAdv = LoadMenuA(hInstApp, "mnuAdvD");
-        hmnuTown = LoadMenuA(hInstApp, "mnuTownD");
+        hmnuDflt = platform::LoadMenu("mnuDflt");
+        hmnuCmbt = platform::LoadMenu("mnuCmbt");
+        hmnuAdv = platform::LoadMenu("mnuAdvD");
+        hmnuTown = platform::LoadMenu("mnuTownD");
     } else {
-        hmnuDflt = LoadMenuA(hInstApp, "mnuDflt");
-        hmnuCmbt = LoadMenuA(hInstApp, "mnuCmbt");
-        hmnuAdv = LoadMenuA(hInstApp, "mnuAdv");
-        hmnuTown = LoadMenuA(hInstApp, "mnuTown");
+        hmnuDflt = platform::LoadMenu("mnuDflt");
+        hmnuCmbt = platform::LoadMenu("mnuCmbt");
+        hmnuAdv = platform::LoadMenu("mnuAdv");
+        hmnuTown = platform::LoadMenu("mnuTown");
     }
 }
 
@@ -2901,7 +2898,7 @@ i32 AddScoreToHighScore(
 
 void BVResMsg(char* s, ResourceType res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
-    giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
+    giBottomViewOverrideEndTime = platform::Ticks() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
     giBottomViewResource = res;
     giBottomViewResourceQty = qty;
     strcpy(gcBottomViewText, s);
@@ -2999,7 +2996,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             gText[BOX_LINE_TEXT_LIMIT] = 0;
             AddNetBoxLine(gText, BOX_DEFAULT_COLOR);
         }
-        messageTime_b = KBTickCount();
+        messageTime_b = platform::Ticks();
     }
 
     inputLength_a = 0;
@@ -3090,7 +3087,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                         );
                         redrawLines_f = 1;
                         if (messageTime_b != 0)
-                            messageTime_b = KBTickCount();
+                            messageTime_b = platform::Ticks();
                         break;
                     default:
                         AddNetBoxLine("[ Incoming data, must exit... ]", BOX_DEFAULT_COLOR);
@@ -3101,7 +3098,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             }
         }
 
-        Process1WindowsMessage();
+        platform::PumpEvents();
         event_a = gpInputManager->GetEvent();
         switch (event_a.type) {
             case MESSAGE_KEY_DOWN:
@@ -3142,7 +3139,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 }
         }
 
-        if (!updateInput_a && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < KBTickCount()) {
+        if (!updateInput_a && glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] < platform::Ticks()) {
             cursorState = 1 - cursorState;
             updateInput_a = 1;
         }
@@ -3206,7 +3203,7 @@ void PopNetBox(char* text, i32 netPlayer) {
 
         if (updateInput_a) {
             updateInput_a = 0;
-            glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = KBTickCount() + BOX_CURSOR_DELAY;
+            glTimers[GLOBAL_NET_BOX_CURSOR_TIMER_SLOT] = platform::Ticks() + BOX_CURSOR_DELAY;
             if (cursorState)
                 inputText_c[inputLength_a] = '_';
             else
@@ -3222,7 +3219,7 @@ void PopNetBox(char* text, i32 netPlayer) {
                 ->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
         }
 
-        if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < KBTickCount())
+        if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < platform::Ticks())
             done_i = 1;
         if (exitForIncomingData_i) {
             for (delay_h = 0; delay_h < BOX_EXIT_DELAY_STEPS; delay_h++) {
@@ -3277,7 +3274,7 @@ void ShutDown(char* msg) {
         strcpy(buf, msg);
         SetFullScreenStatus(0);
         LogStr(buf);
-        MessageBoxA(hwndApp, buf, "Unexpected Program Termination", MB_ICONHAND);
+        platform::ShowMessage("Unexpected Program Termination", buf);
     } else {
         sprintf(buf, "Bye!");
     }
@@ -3301,16 +3298,13 @@ void ShutDown(char* msg) {
     }
     RemoteCleanup();
     gpExec->ShutDownSystem();
-    if (gEventHandle) {
-        CloseHandle(gEventHandle);
-        gEventHandle = NULL;
-    }
     if (mapExtra)
         H2_FREE(mapExtra);
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
-    AppExit();
+    CleanUpWinGraphics();
+    CleanUpMenus();
     PrintMemoryLeaks();
     if (gpMemEntry)
         free(gpMemEntry);
@@ -3343,8 +3337,8 @@ void FileError(char* filename) {
 }
 
 typedef enum SmackFadeConstant {
-    SMACK_FADE_FIRST_COLOR       = WINGRAPH_SYSTEM_PALETTE_SIZE,
-    SMACK_FADE_COLOR_LIMIT       = WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_FIRST_COLOR       = GRAPHICS_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_COLOR_LIMIT       = GRAPHICS_PALETTE_SIZE - GRAPHICS_SYSTEM_PALETTE_SIZE,
     SMACK_FADE_MATCH_COLOR_LIMIT = 36,
     SMACK_FADE_DISTANCE_SENTINEL = 999,
     SMACK_FADE_SCREEN_WIDTH      = 640,
@@ -3370,9 +3364,9 @@ void SmackFade(u8* src, u8* dst) {
     f = NULL;
     k = -1;
     a = static_cast<u8*>(H2_ALLOC(MISC_PALETTE_BYTE_COUNT));
-    f = static_cast<u8*>(H2_ALLOC(WINGRAPH_PALETTE_SIZE));
+    f = static_cast<u8*>(H2_ALLOC(GRAPHICS_PALETTE_SIZE));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
-    memset(f, 0, WINGRAPH_PALETTE_SIZE);
+    memset(f, 0, GRAPHICS_PALETTE_SIZE);
     for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_COLOR_LIMIT; h++) {
         e = (src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_BLUE_COMPONENT]
              + src[h * MISC_PALETTE_COMPONENT_BYTES + SMACK_FADE_RED_COMPONENT]
@@ -3490,7 +3484,7 @@ void CongratsWait(void) {
     gpInputManager->Flush();
     while (!done) {
         PollSound();
-        Process1WindowsMessage();
+        platform::PumpEvents();
         msg = gpInputManager->GetEvent();
         if (msg.type == MESSAGE_KEY_DOWN || msg.type == MESSAGE_LEFT_BUTTON_DOWN
             || msg.type == MESSAGE_LEFT_BUTTON_UP || msg.type == MESSAGE_RIGHT_BUTTON_DOWN
@@ -3518,11 +3512,11 @@ void WaitEndSample(SAMPLE2 s, i32 waitTime) {
     i32l endTime;
     if (waitTime < 0)
         waitTime = SAMPLE_DEFAULT_WAIT_TIME;
-    endTime = KBTickCount() + waitTime;
+    endTime = platform::Ticks() + waitTime;
     if (s.pMem)
         while (gpSoundManager->DigitalReport(s.pMem, SOUND_DIGITAL_REPORT_PLAYING)
-               && KBTickCount() < endTime) {
-            Process1WindowsMessage();
+               && platform::Ticks() < endTime) {
+            platform::PumpEvents();
             PollSound();
         }
     if (s.pSample)
@@ -3627,7 +3621,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             SaveGame();
             break;
         case APP_MENU_EXIT:
-            PostMessageA(hwndApp, APP_MENU_CLOSE_MESSAGE, 0, 0);
+            platform::RequestQuit();
             break;
 
         case APP_MENU_MUSIC_FIRST:
@@ -3848,13 +3842,12 @@ void UpdateSystemOptionsMenu(void) {
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].showMenu == 0)
         return;
-    if (hmnuApp == NULL)
-        return;
-    if (hmnuAdv != hmnuApp)
+    const platform::MenuHandle currentMenu = platform::CurrentMenu();
+    if (hmnuAdv != currentMenu)
         return;
 
     for (menuCommand = APP_MENU_MUSIC_FIRST; menuCommand <= APP_MENU_MUSIC_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+        platform::SetMenuItemChecked(currentMenu, menuCommand, false);
     switch (gConfig.musicVolume) {
         case CONFIG_VOLUME_MIN:
             checkedCommand = APP_MENU_MUSIC_FIRST + 1;
@@ -3890,10 +3883,10 @@ void UpdateSystemOptionsMenu(void) {
             checkedCommand = APP_MENU_MUSIC_FIRST;
             break;
     }
-    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+    platform::SetMenuItemChecked(currentMenu, checkedCommand, true);
 
     for (menuCommand = APP_MENU_SOUND_FIRST; menuCommand <= APP_MENU_SOUND_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
+        platform::SetMenuItemChecked(currentMenu, menuCommand, false);
     switch (gConfig.soundVolume) {
         case CONFIG_VOLUME_MIN:
             checkedCommand = APP_MENU_SOUND_FIRST + 1;
@@ -3929,35 +3922,23 @@ void UpdateSystemOptionsMenu(void) {
             checkedCommand = APP_MENU_SOUND_FIRST;
             break;
     }
-    CheckMenuItem(hmnuApp, checkedCommand, APP_MENU_CHECKED);
+    platform::SetMenuItemChecked(currentMenu, checkedCommand, true);
 
     for (menuCommand = APP_MENU_SPEED_FIRST; menuCommand <= APP_MENU_SPEED_LAST; menuCommand++)
-        CheckMenuItem(hmnuApp, menuCommand, APP_MENU_UNCHECKED);
-    CheckMenuItem(
-        hmnuApp,
-        APP_MENU_TOGGLE_ROUTE,
-        gConfig.showRoute ? APP_MENU_CHECKED : APP_MENU_UNCHECKED
-    );
-    CheckMenuItem(
-        hmnuApp,
+        platform::SetMenuItemChecked(currentMenu, menuCommand, false);
+    platform::SetMenuItemChecked(currentMenu, APP_MENU_TOGGLE_ROUTE, gConfig.showRoute != 0);
+    platform::SetMenuItemChecked(
+        currentMenu,
         APP_MENU_TOGGLE_BLACKOUT,
-        1 - gConfig.blackoutComputer ? APP_MENU_CHECKED : APP_MENU_UNCHECKED
+        gConfig.blackoutComputer == 0
     );
 }
 
 void CleanUpMenus(void) {
-    if (hmnuApp) {
-        SetMenu(hwndApp, NULL);
-        if (hmnuAdv)
-            DestroyMenu(hmnuAdv);
-        if (hmnuDflt)
-            DestroyMenu(hmnuDflt);
-        if (hmnuCmbt)
-            DestroyMenu(hmnuCmbt);
-        if (hmnuTown)
-            DestroyMenu(hmnuTown);
-    }
-    hmnuApp = NULL;
+    platform::DestroyMenu(hmnuAdv);
+    platform::DestroyMenu(hmnuDflt);
+    platform::DestroyMenu(hmnuCmbt);
+    platform::DestroyMenu(hmnuTown);
 }
 
 void UpdateAppSpecificMenus(void* hMenu) {
@@ -4250,8 +4231,8 @@ void TestDynamicWindow(i32 p1, i32 p2) {
         0,
         0,
         1,
-        WINGRAPH_WIDTH,
-        WINGRAPH_HEIGHT,
+        GRAPHICS_WIDTH,
+        GRAPHICS_HEIGHT,
         p1 * TILE_SIZE,
         p2 * TILE_SIZE,
         &s,
@@ -4267,7 +4248,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
     t = 0;
     gpInputManager->Flush();
     while (!t) {
-        Process1WindowsMessage();
+        platform::PumpEvents();
         switch (gpInputManager->GetEvent().type) {
             case MESSAGE_KEY_DOWN:
             case MESSAGE_LEFT_BUTTON_DOWN:
@@ -4421,10 +4402,10 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
     if (exitInfo.netPosition < giThisNetPos)
         giThisNetPos--;
     gbHumanPlayer[exitInfo.gamePosition] = 0;
+    network_remove_player(exitInfo.netPosition);
 
     for (netPosition = exitInfo.netPosition; netPosition < REMOTE_PLAYER_COUNT - 1; netPosition++) {
         lLastHeartbeatReceive[netPosition] = lLastHeartbeatReceive[netPosition + 1];
-        giNetPosToDCOPos[netPosition] = giNetPosToDCOPos[netPosition + 1];
         strcpy(gsNetPlayerInfo[netPosition].name, gsNetPlayerInfo[netPosition + 1].name);
     }
 
@@ -4627,8 +4608,8 @@ typedef enum ShingleAnimationConstant {
 void CheckShingleUpdate(void) {
     if (!gShingleAnim)
         return;
-    if (KBTickCount() > iNextShingleAnim) {
-        iNextShingleAnim = KBTickCount() + SHINGLE_ANIMATION_INTERVAL;
+    if (platform::Ticks() > iNextShingleAnim) {
+        iNextShingleAnim = platform::Ticks() + SHINGLE_ANIMATION_INTERVAL;
         iShingleAnimFrame =
             (iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET)
             % SHINGLE_ANIMATION_FRAME_COUNT;
@@ -4776,7 +4757,7 @@ void NormalDialog(
     if (!gbRemoteOn)
         timeout = 0;
     if (timeout > NORMAL_DIALOG_TIMEOUT_MIN && timeout < NORMAL_DIALOG_TIMEOUT_MAX) {
-        giDialogTimeout = KBTickCount() + timeout;
+        giDialogTimeout = platform::Ticks() + timeout;
     } else {
         giDialogTimeout = timeout;
     }
@@ -5629,9 +5610,9 @@ i32 MAP_HEIGHT = MAP_DIMENSION_MEDIUM;
 u8* mapExtra = NULL;
 b32 gbClosingApp = false;
 b32 gbForegroundApp = false;
-i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
-i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
-i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
+i32 giMainVideoModeColorDepth = GRAPHICS_COLOR_DEPTH;
+i32 giMainVideoModeWidth = GRAPHICS_WIDTH;
+i32 giMainVideoModeHeight = GRAPHICS_HEIGHT;
 u32l glMilliCounter = 0;
 u8 gMapColors[RADAR_MAP_COLOR_COUNT] =
     {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
@@ -6464,11 +6445,11 @@ ConfigExecutable giCurExe = CONFIG_EXECUTABLE_GAME;
 b32 gbInDialog = false;
 struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_NONE, 0, 0, 0},
-    {H2EnumIndex(KBWIN_MENU_SIZE_640_480), 1, 1, 0},
-    {H2EnumIndex(KBWIN_MENU_SIZE_800_600), 1, 1, 0},
-    {H2EnumIndex(KBWIN_MENU_SIZE_1024_768), 1, 1, 0},
-    {H2EnumIndex(KBWIN_MENU_SIZE_1280_1024), 1, 1, 0},
-    {H2EnumIndex(KBWIN_MENU_FULLSCREEN), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Size640x480), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Size800x600), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Size1024x768), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Size1280x1024), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Fullscreen), 1, 1, 0},
     {APP_MENU_VIEW_WORLD, 0, 0, 0},
     {APP_MENU_VIEW_PUZZLE, 0, 0, 0},
     {APP_MENU_CAST_SPELL, 0, 0, 0},
@@ -6503,8 +6484,8 @@ struct SMenuEnableStatus gsMenuEnableStatus[MENU_ENABLE_STATUS_COUNT] = {
     {APP_MENU_UNKNOWN_9C6D, 0, 0, 0},
     {APP_MENU_TOGGLE_ROUTE, 0, 0, 0},
     {APP_MENU_TOGGLE_BLACKOUT, 0, 0, 0},
-    {H2EnumIndex(KBWIN_MENU_HELP), 1, 1, 0},
-    {H2EnumIndex(KBWIN_MENU_ABOUT), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::Help), 1, 1, 0},
+    {H2EnumIndex(platform::SystemMenuCommand::About), 1, 1, 0},
     {APP_MENU_RESTART_0, 0, 1, 0},
     {APP_MENU_RESTART_1, 0, 1, 0},
     {APP_MENU_RESTART_2, 0, 1, 0},
@@ -6541,10 +6522,10 @@ b32 gbInSmackMgr = false;
 i32 glBottomRefresh = 0;
 b32 gbBothMachinesWin95 = false;
 b32 gbGotFirstHeartbeat = false;
-HMENU hmnuDflt = NULL;
-HMENU hmnuCmbt = NULL;
-HMENU hmnuAdv = NULL;
-HMENU hmnuTown = NULL;
+platform::MenuHandle hmnuDflt = nullptr;
+platform::MenuHandle hmnuCmbt = nullptr;
+platform::MenuHandle hmnuAdv = nullptr;
+platform::MenuHandle hmnuTown = nullptr;
 char* cMonFilename[H2EnumIndex(CREATURE_COUNT)] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",

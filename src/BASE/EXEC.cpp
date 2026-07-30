@@ -10,7 +10,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/X_GLOBAL.h>
 
 typedef enum ExecutiveManagerConstant {
@@ -234,7 +234,7 @@ void executive::MainLoop(void) {
     if (m_managerListHead != NULL) {
         gpInputManager->Flush();
         do {
-            Process1WindowsMessage();
+            platform::PumpEvents();
             message = gpInputManager->GetEvent();
             keepDispatching = 1;
             m_activeManager = m_managerListHead;

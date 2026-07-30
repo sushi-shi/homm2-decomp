@@ -4,7 +4,7 @@
 #include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <mss.h>
 #include <stdio.h>
@@ -107,12 +107,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
         return NULL;
     }
     if (waveOutGetDevCapsA(0, &caps, sizeof(caps)) != 0) {
-        MessageBoxA(
-            hwndApp,
-            "Sound initialization error!  No wave devices found.",
-            "Startup Error",
-            0
-        );
+        platform::ShowMessage("Startup Error", "Sound initialization error!  No wave devices found.");
         drvr = NULL;
         return NULL;
     }
@@ -128,12 +123,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     rc = AIL_waveOutOpen(&drvr, NULL, 0, &gWaveFormat.wf);
     if (rc != 0) {
         if (showErrors != 0)
-            MessageBoxA(
-                hwndApp,
-                AIL_last_error(),
-                "Sound initialization error!",
-                0
-            );
+            platform::ShowMessage("Sound initialization error!", AIL_last_error());
         drvr = NULL;
         return NULL;
     }
@@ -351,7 +341,7 @@ void soundManager::ModifySample(
             break;
     }
 
-    Process1WindowsMessage();
+    platform::PumpEvents();
     LogStr("Modify Sample 2");
 }
 
@@ -448,9 +438,9 @@ void soundManager::PollSound(void) {
     LogStr("Poll Sound 1");
     if (m_fadeSteps > 0) {
         LogStr("Poll Sound 1a");
-        Process1WindowsMessage();
-        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
-        delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+        platform::PumpEvents();
+        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = platform::Ticks();
+        delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - platform::Ticks();
         m_fadeSteps = delta / FADE_STEP_TICKS;
         if (m_fadeSteps < 1)
             m_fadeSteps = 0;
@@ -460,14 +450,14 @@ void soundManager::PollSound(void) {
                 H2_ASSERT(reinterpret_cast<i32>(m_midiFile));
                 m_savedTrackPositions[m_currentTrack] = ftell(m_midiFile);
             } else {
-                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = platform::Ticks();
             }
             m_fading = 1;
             if (bSaveMusicPosition[m_fadeTargetTrack] != 0)
                 PlayAmbientMusic(m_fadeTargetTrack, m_savedTrackPositions[m_fadeTargetTrack], -1);
             else
                 PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
-            now = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+            now = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - platform::Ticks();
             m_fadeSteps = now / FADE_STEP_TICKS;
             if (m_fadeSteps < 1)
                 m_fadeSteps = 0;
@@ -497,13 +487,13 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     if (m_currentTrack == track)
         return;
     LogStr("Switch Ambient Music 1");
-    Process1WindowsMessage();
+    platform::PumpEvents();
     if ((m_fadeSteps != 0 && m_fadeTargetTrack != track)
         || (m_fadeSteps == 0 && m_currentTrack != track)) {
         if (m_fadeSteps <= FADE_HOLD_STEPS) {
             m_fadeSteps = FADE_TOTAL_STEPS;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] =
-                KBTickCount() + AMBIENT_FADE_DELAY_TICKS;
+                platform::Ticks() + AMBIENT_FADE_DELAY_TICKS;
         }
         m_fadeTargetTrack = track;
         PollSound();

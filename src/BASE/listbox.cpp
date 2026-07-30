@@ -9,7 +9,7 @@
 #include <BASE/widget.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <string.h>
 #include <SOURCE/X_GLOBAL.h>
 
@@ -522,12 +522,12 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 message.payload.widget.data.value = selectedIndex;
                 if (m_lastSelectedIndex == m_selectedIndex) {
                     i32 lastTick = m_lastClickTime;
-                    i32 currentTick = KBTickCount();
+                    i32 currentTick = platform::Ticks();
                     if (lastTick + DOUBLE_CLICK_TICKS > currentTick)
                         message.payload.widget.parameter = SELECTION_DOUBLE_CLICK;
                 }
                 m_lastSelectedIndex = m_selectedIndex;
-                m_lastClickTime = KBTickCount();
+                m_lastClickTime = platform::Ticks();
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;

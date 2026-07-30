@@ -18,7 +18,7 @@
 #include <SOURCE/advManager.h>
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/swapManager.h>
 #include <SOURCE/townManager.h>
 typedef enum SwapManagerControl {
@@ -194,7 +194,7 @@ i32 swapManager::Open(i32 id) {
 
     Update();
     gpWindowManager->AddWindow(m_window, -1, 1);
-    KBChangeMenu(hmnuAdv);
+    platform::ChangeMenu(hmnuAdv);
     giMonoIconSkip = MONO_ICON_SKIP;
     m_selectorIcon = gpResourceManager->GetIcon("swapbtn.icn");
     giMonoIconSkip = MONO_ICON_DEFAULT;

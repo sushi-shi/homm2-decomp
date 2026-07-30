@@ -96,7 +96,7 @@ static SWindowManagerText gWindowManagerText = {
 #include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Graphics.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 
@@ -287,7 +287,8 @@ updatePalette:
 #include <BASE/inputManager.h>
 #include <BASE/resourceManager.h>
 #include <stdio.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 
 heroWindowManager::heroWindowManager(void) : baseManager() {
@@ -307,7 +308,7 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
 
 i32 heroWindowManager::Open(i32 managerOrder) {
     i32 i;
-    InitVideo();
+    platform::InitializeVideo();
     i32* pal = reinterpret_cast<i32*>(gpBufferPalette->m_data);
     for (i = PALETTE_DWORD_COUNT; i != 0; i--) {
         *pal = 0;
@@ -320,7 +321,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_screen->m_bitmapType = BITMAP_TYPE_MEMORY;
     m_screen->m_width = SCREEN_WIDTH;
     m_screen->m_height = SCREEN_HEIGHT;
-    m_screen->m_pixels = reinterpret_cast<u8*>(lpInitWin);
+    m_screen->m_pixels = platform::Video().Pixels();
     memset(
         m_screen->m_pixels,
         FRAMEBUFFER_FILL_COLOR,
@@ -463,7 +464,7 @@ i32 heroWindowManager::DoDialog(
 
     gbInDialog = true;
     if (iDialogNestCount == 0)
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
     iDialogNestCount++;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
@@ -499,7 +500,7 @@ i32 heroWindowManager::DoDialog(
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
     do {
         PollSound();
-        Process1WindowsMessage();
+        platform::PumpEvents();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
         if (window != NULL && (message.type != MESSAGE_MOUSE_MOVE || gbSendMouseMoveMessages != 0)) {
@@ -521,7 +522,7 @@ i32 heroWindowManager::DoDialog(
     gbInDialog = false;
     iDialogNestCount--;
     if (iDialogNestCount == 0)
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
     return 0;
 }
 
@@ -680,7 +681,7 @@ void heroWindowManager::FizzleForward(
                 }
                 PollSound();
                 DelayTilMilli(delay + tick);
-                tick = KBTickCount();
+                tick = platform::Ticks();
                 BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
                 if (startPalette != NULL) {
                     memcpy(fadePalette, startPalette, PALETTE_BYTE_COUNT);

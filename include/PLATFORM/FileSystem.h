@@ -2,6 +2,7 @@
 #define HOMM2_PLATFORM_FILESYSTEM_H
 
 #include <string>
+#include <vector>
 
 namespace platform {
 
@@ -14,6 +15,8 @@ public:
     virtual std::string UserRoot() const = 0;
 
     virtual std::string Resolve(const char* retailPath) const = 0;
+
+    virtual std::vector<std::string> List(const char* pattern) const = 0;
 };
 
 }

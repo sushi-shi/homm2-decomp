@@ -7,8 +7,8 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/comwin.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Network.h>
+#include <PLATFORM/Runtime.h>
 
 typedef enum ModemPrivateConstant {
     SETUP_TEXT_CAPACITY       = 104,
@@ -137,10 +137,10 @@ void GUIModemCommand(char* message, char* command) {
 
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
-    if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
+    if (platform::Ticks() < iLastActionTime + MODEM_COMMAND_INTERVAL)
         return 0;
 
-    iLastActionTime = KBTickCount();
+    iLastActionTime = platform::Ticks();
     commandLength = strlen(cModemCommand);
     if (iModemCommandPos < commandLength) {
         write_buffer(cModemCommand + iModemCommandPos, 1);
@@ -222,7 +222,7 @@ void write_byte(i32 value) {
 
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
-    u32 idSeed = KBTickCount();
+    u32 idSeed = platform::Ticks();
     i32 packetResult;
     idSeed %= MODEM_ID_MODULUS;
     sprintf(idstr, "%06d", idSeed);
@@ -247,7 +247,7 @@ void Connect(void) {
             oldsec = -1;
         }
 
-        stime = KBTickCount();
+        stime = platform::Ticks();
         if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
             oldsec = stime;
             sprintf(idMessage, "ID%s_%i", idstr, localstage);
@@ -263,7 +263,7 @@ i32 WaitForDirectConnect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     switch (WFDCStage) {
         case MODEM_CONNECTION_INIT_STAGE: {
-            u32 idSeed = KBTickCount();
+            u32 idSeed = platform::Ticks();
             idSeed %= MODEM_ID_MODULUS;
             sprintf(idstr, "%06d", idSeed);
             oldsec = -1;
@@ -289,7 +289,7 @@ i32 WaitForDirectConnect(void) {
                 localstage = remotestage + 1;
                 oldsec = -1;
             }
-            stime = KBTickCount();
+            stime = platform::Ticks();
             if (oldsec / MILLISECONDS_PER_SECOND
                 != stime / MILLISECONDS_PER_SECOND) {
                 oldsec = stime;
@@ -379,7 +379,7 @@ void WriteModemPacket(char* buffer, i32 length) {
         ForcePollSound();
 }
 
-i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
+i32 iBaudBits = SERIAL_BYTE_SIZE;
 i32 inescape = 0;
 i32 newpacket = 0;
 i32 packetlen = 0;

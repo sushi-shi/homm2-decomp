@@ -10,7 +10,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/x_arena.h>
 
 typedef enum ArenaConstant {
@@ -149,7 +149,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
-    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+    if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         message_1.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message_1.payload.widget.id;
         message_1.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;

@@ -29,7 +29,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/hero.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/recruitUnit.h>
@@ -724,7 +724,7 @@ i32 townManager::Open(i32 id) {
     m_townWindow = new heroWindow(0, 0, "townwind.bin");
     if (m_townWindow == NULL)
         MemError();
-    glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
+    glTimers[0] = platform::Ticks() + TOWN_REDRAW_INTERVAL;
     m_lastTownType = FACTION_UNINITIALIZED;
     m_castleDialogActive = 0;
     m_recruitResult = 0;
@@ -741,7 +741,7 @@ i32 townManager::Open(i32 id) {
     m_backgroundIcon = NULL;
     SetupExtraStuff();
     SetupTown();
-    KBChangeMenu(hmnuTown);
+    platform::ChangeMenu(hmnuTown);
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     m_messageMask = BASE_MANAGER_ACCEPT_TOWN_EVENT;
     m_priority = id;
@@ -1256,9 +1256,9 @@ MessageDispatchResult townManager::Main(tag_message& message) {
         }
     }
 
-    if (KBTickCount() > glTimers[0]) {
+    if (platform::Ticks() > glTimers[0]) {
         DrawTown(1, 1);
-        glTimers[0] = KBTickCount() + TOWN_REDRAW_INTERVAL;
+        glTimers[0] = platform::Ticks() + TOWN_REDRAW_INTERVAL;
     }
 
     switch (message.type) {
@@ -2871,7 +2871,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
                 break;
         }
     }
-    if (KBTickCount() > glTimers[0]) {
+    if (platform::Ticks() > glTimers[0]) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         message.payload.widget.id = TAVERN_ANIMATION_CONTROL;
@@ -2881,7 +2881,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
             + TOWN_TAVERN_FIRST_ANIMATION_FRAME;
         gpTownManager->m_heroWindow0->BroadcastMessage(message);
         gpTownManager->m_heroWindow0->MoveWindow(0, 0);
-        glTimers[0] = static_cast<i32>(KBTickCount() + TOWN_TAVERN_ANIMATION_DELAY);
+        glTimers[0] = static_cast<i32>(platform::Ticks() + TOWN_TAVERN_ANIMATION_DELAY);
     }
     return MESSAGE_DISPATCH_CONSUME;
 }

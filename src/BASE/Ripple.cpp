@@ -6,7 +6,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <string.h>
 
@@ -36,7 +36,7 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     do {
         PollSound();
 
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
+        i32 deadline = platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
         for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
             i32 column = profileIndex + position - PROFILE_RADIUS;

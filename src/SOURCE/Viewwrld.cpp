@@ -21,7 +21,7 @@
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/advManager.h>
@@ -765,14 +765,14 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 
                     currentMessage7.type = MESSAGE_NONE;
                     while (currentMessage7.type != VIEW_WORLD_MOUSE_UP) {
-                        Process1WindowsMessage();
+                        platform::PumpEvents();
                         currentMessage7 = gpInputManager->GetEvent();
                         savedMessage = currentMessage7;
                         while (currentMessage7.type != VIEW_WORLD_MOUSE_UP
                                && currentMessage7.type != MESSAGE_NONE) {
                             if (currentMessage7.type == VIEW_WORLD_MOUSE_MOVE)
                                 savedMessage = currentMessage7;
-                            Process1WindowsMessage();
+                            platform::PumpEvents();
                             currentMessage7 = gpInputManager->GetEvent();
                         }
                         if (savedMessage.type == VIEW_WORLD_MOUSE_MOVE) {

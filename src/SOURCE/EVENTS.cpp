@@ -28,7 +28,7 @@
 #include <SOURCE/philAI.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/combatManager.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
 #include <SOURCE/swapManager.h>
@@ -8030,7 +8030,7 @@ CombatResult advManager::DoCombat(
                                 goto combatFinished;
                         }
                     }
-                    Process1WindowsMessage();
+                    platform::PumpEvents();
                     message9 = gpInputManager->GetEvent();
                     CheckHandleNetPlayerWait(message9, 1);
                 }
@@ -8099,9 +8099,9 @@ combatFinished:
     if (!gbHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
         gpGame->TurnOnAIMusic();
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
     } else {
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
     }
     MobilizeCurrHero(0);
     if (processLosses)
@@ -8332,7 +8332,7 @@ void advManager::ReceiveHeroTownData(
     if (!result7)
         ShutDown(NULL);
 
-    lastPacketTime36 = KBTickCount();
+    lastPacketTime36 = platform::Ticks();
     gotFirstHeroFirst3 = 1;
     gotFirstHeroSecond9 = 1;
     gotSecondHeroFirst13 = 1;
@@ -8351,7 +8351,7 @@ void advManager::ReceiveHeroTownData(
     while (!gotFirstHeroFirst3 || !gotFirstHeroSecond9 || !gotSecondHeroFirst13
            || !gotSecondHeroSecond6) {
         PollSound();
-        if (lastPacketTime36 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
+        if (lastPacketTime36 + COMBAT_REMOTE_TIMEOUT < platform::Ticks()) {
             NormalDialog(
                 const_cast<char*>("Error receiving data.  Keep trying?"),
                 NORMAL_DIALOG_CONFIRM,
@@ -8365,14 +8365,14 @@ void advManager::ReceiveHeroTownData(
                 0
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                lastPacketTime36 = KBTickCount();
+                lastPacketTime36 = platform::Ticks();
             else
                 ShutDown(const_cast<char*>("Game canceled."));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
             && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND) {
-            lastPacketTime36 = KBTickCount();
+            lastPacketTime36 = platform::Ticks();
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {
                 memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);
                 gotFirstHeroFirst3 = 1;
@@ -8473,9 +8473,9 @@ CombatResult advManager::AutoResolveCombat(
     if (!gbHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
         gpGame->TurnOnAIMusic();
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
     } else {
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
     }
     MobilizeCurrHero(0);
     if (processLosses)

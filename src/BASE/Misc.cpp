@@ -1,6 +1,6 @@
 #define HOMM2_MISC_INLINE_ICONENTRY
 #include <Ints.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <BASE/heroWindow.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
@@ -169,7 +169,7 @@ typedef enum FileIdHashConstant {
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Graphics.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
 #include <windows.h>
@@ -632,7 +632,7 @@ void FadeIn(i32 increment) {
             }
             level = MISC_PALETTE_MAX_LEVEL;
         }
-        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
+        i32 delayUntil = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         i8* colors;
         if (level == MISC_PALETTE_MAX_LEVEL) {
@@ -670,7 +670,7 @@ void FadeOut(i32 increment) {
             }
             level = FADE_LEVEL_LAST;
         }
-        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
+        i32 delayUntil = platform::Ticks() + FADE_FRAME_DELAY;
         PollSound();
         if (level == FADE_LEVEL_LAST)
             done = 1;
@@ -703,10 +703,8 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, gMiscText.memory.assertMessage.text, file, line);
-        if (MessageBoxA(hwndApp, gText, gMiscText.memory.assertTitle.text, MB_YESNO | MB_ICONHAND)
-            != IDNO) {
-            ShutDown(NULL);
-        }
+        platform::ShowMessage(gMiscText.memory.assertTitle.text, gText);
+        ShutDown(NULL);
     }
 }
 
@@ -796,16 +794,16 @@ void SetGameDefaults(void) {
     strcpy(gConfig.networkDefaultName, gMiscText.gameDefaults.unknownHeroName.text);
     *reinterpret_cast<i32*>(gConfig.uniqueSystemID) = 0;
     i32 idSeed = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idSeed += KBTickCount();
+    idSeed += platform::Ticks();
     gConfig.uniqueSystemID[UNIQUE_ID_TRAILING_INDEX] =
         gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
     i32 idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idAdd += KBTickCount();
+    idAdd += platform::Ticks();
     idSeed += idAdd;
     gConfig.uniqueSystemID[UNIQUE_ID_MIDDLE_INDEX] =
         gMiscText.gameDefaults.uniqueIdAlphabet.text[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
     idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idAdd += KBTickCount();
+    idAdd += platform::Ticks();
     idSeed += idAdd;
     gConfig.uniqueSystemID[UNIQUE_ID_LEADING_INDEX] =
         static_cast<char>(idSeed % UNIQUE_ID_ALPHA_COUNT + 'A');
@@ -1905,7 +1903,7 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
         increment = 1;
     i32 level = FADE_TO_START_LEVEL;
     do {
-        i32 delayUntil = KBTickCount() + FADE_TO_FRAME_DELAY;
+        i32 delayUntil = platform::Ticks() + FADE_TO_FRAME_DELAY;
         PollSound();
         i32 threshold = FadeThreshold(level, increment);
         u8* current = colors;

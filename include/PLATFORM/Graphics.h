@@ -1,0 +1,32 @@
+#ifndef HOMM2_PLATFORM_GRAPHICS_H
+#define HOMM2_PLATFORM_GRAPHICS_H
+
+#include <Ints.h>
+
+enum GraphicsConstant : i32 {
+    GRAPHICS_WIDTH = 640,
+    GRAPHICS_HEIGHT = 480,
+    GRAPHICS_COLOR_DEPTH = 8,
+    GRAPHICS_PALETTE_SIZE = 256,
+    GRAPHICS_SYSTEM_PALETTE_SIZE = 10,
+};
+
+enum class WingraphGraphicsType : i32 {
+    WINGRAPH_GRAPHICS_WING = 1,
+    WINGRAPH_GRAPHICS_DIRECT_DRAW = 2,
+};
+using enum WingraphGraphicsType;
+
+void GetGraphicsInfo();
+void InitGraphics();
+i32 AppPaint(void* window, void* paint);
+void InitializePalette();
+void UpdatePalette(i8* palette);
+void CleanUpWinGraphics();
+void SetFullScreenStatus(i32 fullscreen);
+i32 QueryNewPalette();
+i32 SetGraphicsType(WingraphGraphicsType type);
+
+extern WingraphGraphicsType giGraphicsType;
+
+#endif

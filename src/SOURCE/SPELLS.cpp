@@ -21,7 +21,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/SPELLS.h>
@@ -1311,7 +1311,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
 
         for (frame_i = 0; frame_i < frameCount_i; ++frame_i) {
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+                platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
             );
             IconToBitmap(
                 spellIcon_n,
@@ -1487,7 +1487,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         for (direction = 0; direction < SPELL_METEOR_PASS_COUNT; ++direction) {
             for (frame = 0; frame < SPELL_METEOR_FRAME_COUNT; ++frame) {
                 glTimers[0] = static_cast<i32>(
-                    KBTickCount()
+                    platform::Ticks()
                     + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_METEOR_ANIMATION_DELAY
                 );
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
@@ -1564,7 +1564,7 @@ void combatManager::ElementalStorm(void) {
         for (pass_c = 0; pass_c < SPELL_STORM_PASS_COUNT; ++pass_c) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
                 glTimers[0] = static_cast<i32>(
-                    KBTickCount()
+                    platform::Ticks()
                     + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
                 );
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
@@ -1658,7 +1658,7 @@ void combatManager::Armageddon(void) {
         memcpy(effectPalette4->Data(), originalPalette5->Data(), SPELL_ARMAGEDDON_PALETTE_SIZE);
 
         glTimers[0] = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+            platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
         );
         i8* effectData = effectPalette4->Data();
         i32 pass;
@@ -1684,7 +1684,7 @@ void combatManager::Armageddon(void) {
             DelayTil(&glTimers[0]);
             SetPalette(effectData, 1);
             glTimers[0] = static_cast<i32>(
-                KBTickCount()
+                platform::Ticks()
                 + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_PALETTE_DELAY
             );
         }
@@ -1745,7 +1745,7 @@ void combatManager::Armageddon(void) {
                     shakeOffsets[frame][H2EnumIndex(COORDINATE_AXIS_Y)] * scale
                 );
                 i32 timer = static_cast<i32>(
-                    KBTickCount()
+                    platform::Ticks()
                     + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
                 );
                 PollSound();
@@ -2235,7 +2235,7 @@ void combatManager::DoBolt(
     i32 allFinished = 0;
     i32 drawPassCount = (angleDistance - 1) / drawDistance + 1;
     i32 branchChance = branchDistance * BOLT_ANGLE_PERCENT_SCALE / angleDistance;
-    i32 deadline = KBTickCount();
+    i32 deadline = platform::Ticks();
     gpWindowManager->m_updateFlags = 0;
 
     palette* originalPalette = NULL;
@@ -2331,7 +2331,7 @@ void combatManager::DoBolt(
 
             DelayTil(&deadline);
             deadline = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay
+                platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay
             );
             BlitBitmapToScreen(
                 gpWindowManager->m_screen,
@@ -2504,7 +2504,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
 
     firstBolt = 1;
     damage_l = spellPower * CHAIN_LIGHTNING_INITIAL_DAMAGE_PER_POWER;
-    deadline_o = KBTickCount();
+    deadline_o = platform::Ticks();
     startX_l = castX;
     startY_l = castY;
     ClearEffects();
@@ -2575,7 +2575,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
         DrawFrame(1, 0, 0, 0, 0, 1, 1);
         DelayTil(&deadline_o);
         deadline_o = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY
+            platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * CHAIN_LIGHTNING_FRAME_DELAY
         );
     }
     ShowMassSpell(gArmyEffected, gsSpellInfo[H2EnumIndex(SPELL_CHAIN_LIGHTNING)].combatEffect, 1);
@@ -3189,7 +3189,7 @@ mirror_found:
                           [m_hexCells[targetHex].m_occupantIndex];
     gpCombatManager->DrawFrame(0, 1, 0, 1, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     deadline0 = static_cast<i32>(
-        KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
+        platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
     );
     for (frame = 0; frame < MIRROR_SLIDE_FRAME_COUNT; ++frame) {
         image3->m_xOffset = (MIRROR_SLIDE_FRAME_COUNT - frame) * xOffset8 / MIRROR_SLIDE_FRAME_COUNT;
@@ -3205,7 +3205,7 @@ mirror_found:
         gbLimitToExtent = false;
         DelayTil(&deadline0);
         deadline0 = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
+            platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * MIRROR_SLIDE_FRAME_DELAY
         );
     }
     image3->m_xOffset = 0;
@@ -3386,7 +3386,7 @@ void combatManager::DoBlast(i32 targetHex, SpellType spell) {
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_j);
         deadline_j = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * BLAST_FRAME_DELAY
+            platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * BLAST_FRAME_DELAY
         );
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,
@@ -3507,7 +3507,7 @@ void combatManager::Resurrect(
         resurrectIcon = gpResourceManager->GetIcon("yinyang.icn");
         for (index_o = 0; index_o < RESURRECT_ANIMATION_FRAME_COUNT; ++index_o) {
             glTimers[0] = static_cast<i32>(
-                KBTickCount()
+                platform::Ticks()
                 + gfCombatSpeedMod[gConfig.combatSpeed] * H2EnumIndex(SPELL_FIZZLE_FRAME_DELAY)
             );
             IconToBitmap(
@@ -3651,7 +3651,7 @@ void combatManager::Earthquake(void) {
         i32 frame;
         for (frame = 0; frame < EARTHQUAKE_SHAKE_FRAME_COUNT; ++frame) {
             i32 deadline = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
+                platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_ARMAGEDDON_SHAKE_DELAY
             );
             PollSound();
             i32 width =
@@ -3774,7 +3774,7 @@ void combatManager::Earthquake(void) {
         i32 frame;
         for (frame = 0; frame < EARTHQUAKE_CLOUD_FRAME_COUNT; ++frame) {
             glTimers[1] = static_cast<i32>(
-                KBTickCount()
+                platform::Ticks()
                 + gfCombatSpeedMod[gConfig.combatSpeed] * H2EnumIndex(SPELL_FIZZLE_FRAME_DELAY)
             );
             DrawFrame(0, 0, 1, 0, 0, 1, 0);

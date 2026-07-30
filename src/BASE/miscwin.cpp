@@ -4,9 +4,9 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <windows.h>
 #include <string.h>
 
 typedef enum VesaBlitConstant {
@@ -43,8 +43,8 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
     }
 
     if (gbEnlargeScreenBlit != 0 && gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
-        if (iMainWinScreenWidth == VESA_SCREEN_WIDTH
-            && iMainWinScreenHeight == VESA_SCREEN_HEIGHT) {
+        const platform::Size screen = platform::Video().Resolution();
+        if (screen.width == VESA_SCREEN_WIDTH && screen.height == VESA_SCREEN_HEIGHT) {
             if (width < VESA_SCREEN_WIDTH)
                 ++width;
             if (height < VESA_SCREEN_WIDTH)
@@ -68,22 +68,11 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
             height = NET_BOX_TOP - destinationY;
     }
 
-    RECT invalidRect;
-    invalidRect.left = destinationX * iMainWinScreenWidth / VESA_SCREEN_WIDTH;
-    invalidRect.top = destinationY * iMainWinScreenHeight / VESA_SCREEN_HEIGHT;
-    invalidRect.right =
-        (destinationX + width) * iMainWinScreenWidth / VESA_SCREEN_WIDTH - 1;
-    invalidRect.bottom =
-        (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
-
-    if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
-        LogStr("InvalidateRect Failed");
-    if (UpdateWindow(hwndApp) == 0)
-        LogStr("UpdateWindow Failed");
+    platform::Video().Blit({destinationX, destinationY, width, height},
+                           {destinationX, destinationY});
+    platform::Video().Present();
 }
 
 i16 AutoInitSVGA(void) {
     return 0;
 }
-
-struct tagPAINTSTRUCT ps;

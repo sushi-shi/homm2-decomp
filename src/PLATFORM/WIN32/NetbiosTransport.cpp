@@ -3,9 +3,9 @@
 #include <windows.h>
 #include <stdarg.h>
 #include <string.h>
-#include <SOURCE/comwin.h>
-#include <SOURCE/netwin.h>
-#include <SOURCE/netwin_private.h>
+#include <PLATFORM/WIN32/SerialTransport.h>
+#include <PLATFORM/WIN32/NetbiosTransport.h>
+#include <PLATFORM/WIN32/NetbiosTransportPrivate.h>
 #include <SOURCE/KB.h>
 #include <BASE/Misc.h>
 #include <stdio.h>

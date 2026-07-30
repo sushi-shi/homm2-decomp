@@ -2,8 +2,8 @@
 #define HOMM2_SOURCE_RECRUITUNIT_H
 
 #include <Ints.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/KB_TYPES.h>
-#include <windows.h>
 #include <BASE/baseManager.h>
 
 class armyGroup;
@@ -46,6 +46,6 @@ public:
     void Update(void);
 };
 #pragma pack(pop)
-extern HMENU hmnuRecruitSave;
+extern platform::MenuHandle hmnuRecruitSave;
 
 #endif

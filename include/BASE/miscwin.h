@@ -9,6 +9,5 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(class bitmap*, i32, i32, i32, 
 i16 AutoInitSVGA(void);
 
 struct tagPAINTSTRUCT;
-extern struct tagPAINTSTRUCT ps;
 
 #endif

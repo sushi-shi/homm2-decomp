@@ -18,7 +18,7 @@
 #include <SOURCE/GAME.h>
 #include <SOURCE/game.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/PHILAI.h>
@@ -337,13 +337,13 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
 
     if (gbNoShowCombat == 0) {
-        if (KBTickCount() > glTimers[0]) {
+        if (platform::Ticks() > glTimers[0]) {
             PollSound();
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SOUND_POLL_DELAY
+                platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SOUND_POLL_DELAY
             );
         }
-        if (KBTickCount() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT]
+        if (platform::Ticks() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT]
             && gbProcessingCombatAction == 0) {
             gbProcessingCombatAction = true;
             CycleCombatScreen();
@@ -1470,7 +1470,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     i32 frame;
     i32 iDelay;
 
-    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
+    if (giDialogTimeout != 0 && platform::Ticks() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = WIN_LOSE_CLOSE_COMMAND;
@@ -1527,7 +1527,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
         }
     }
 
-    if (KBTickCount() > glTimers[0]) {
+    if (platform::Ticks() > glTimers[0]) {
         animationMessage.type = MESSAGE_WIDGET;
         animationMessage.payload.widget.command = COMBAT_WIN_LOSE_RESOURCE_COMMAND;
         animationMessage.payload.widget.data.text = iconFile;
@@ -1606,7 +1606,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
         message.payload.widget.data.value = frame;
         gpCombatManager->m_winLoseWindow->BroadcastMessage(message);
         gpCombatManager->m_winLoseWindow->DrawWindow(1, 0, WIN_LOSE_DRAW_DEPTH);
-        glTimers[0] = KBTickCount() + iDelay;
+        glTimers[0] = platform::Ticks() + iDelay;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
@@ -2117,11 +2117,11 @@ void combatManager::DoVictory(CombatResult winningSide) {
     fadeCount = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
         fadeCount = VICTORY_WASTELAND_FADE_STEPS;
-    timer = KBTickCount();
+    timer = platform::Ticks();
     for (fadeIndex26 = 0; fadeCount > fadeIndex26; ++fadeIndex26) {
         PollSound();
         DelayTil(&timer);
-        timer = KBTickCount() + VICTORY_FADE_DELAY;
+        timer = platform::Ticks() + VICTORY_FADE_DELAY;
         DimBitmapArea(
             gpWindowManager->m_screen,
             0,
@@ -2252,7 +2252,7 @@ void combatManager::DoVictory(CombatResult winningSide) {
                 m_winLoseWindow->BroadcastMessage(message);
                 ShowDeadArmies(m_winLoseWindow);
                 if (gbRemoteOn != 0 && gbThisNetGotAdventureControl == 0)
-                    giDialogTimeout = KBTickCount() + WIN_LOSE_DIALOG_TIMEOUT;
+                    giDialogTimeout = platform::Ticks() + WIN_LOSE_DIALOG_TIMEOUT;
                 gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
                 giDialogTimeout = 0;
                 delete m_winLoseWindow;
@@ -2352,7 +2352,7 @@ void combatManager::DoLoseWindow(void) {
     m_winLoseWindow->BroadcastMessage(message);
     ShowDeadArmies(m_winLoseWindow);
     if (gbRemoteOn != 0 && gbThisNetGotAdventureControl == 0)
-        giDialogTimeout = KBTickCount() + WIN_LOSE_DIALOG_TIMEOUT;
+        giDialogTimeout = platform::Ticks() + WIN_LOSE_DIALOG_TIMEOUT;
     gpWindowManager->DoDialog(m_winLoseWindow, WinCombatHandler, 0);
     giDialogTimeout = 0;
     delete m_winLoseWindow;
@@ -2719,23 +2719,23 @@ void combatManager::ResetCyclingCreatures(void) {
                 currentArmy_p = &gpCombatManager->m_armies[H2EnumIndex(side)][index];
                 currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
                 currentArmy_p->m_animationFrame = 0;
-                currentArmy_p->m_lastAnimationTime = KBTickCount();
+                currentArmy_p->m_lastAnimationTime = platform::Ticks();
             }
         }
     }
-    m_heroCycleTimer[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = KBTickCount();
-    m_heroCycleTimer[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = KBTickCount();
+    m_heroCycleTimer[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = platform::Ticks();
+    m_heroCycleTimer[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = platform::Ticks();
     gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 }
 
 void combatManager::ResetCycleTimers(void) {
-    i32l currentTime_r = KBTickCount();
+    i32l currentTime_r = platform::Ticks();
     CombatSide side;
     i32 index;
     army* currentArmy_p;
 
-    m_heroCycleTimer[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = KBTickCount();
-    m_heroCycleTimer[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = KBTickCount();
+    m_heroCycleTimer[H2EnumIndex(COMBAT_ATTACKER_SIDE)] = platform::Ticks();
+    m_heroCycleTimer[H2EnumIndex(COMBAT_DEFENDER_SIDE)] = platform::Ticks();
     for (side = COMBAT_ATTACKER_SIDE; H2EnumIndex(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[H2EnumIndex(side)]; ++index) {
             currentArmy_p = &gpCombatManager->m_armies[H2EnumIndex(side)][index];
@@ -2791,7 +2791,7 @@ void combatManager::CycleCombatScreen(void) {
                     || (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND
                         && currentArmy->m_frameInfo.standStillDelay
                                    + currentArmy->m_lastAnimationTime
-                               < KBTickCount()))) {
+                               < platform::Ticks()))) {
                 ++nextHeroAnimation[COMBAT_SIDE_COUNT];
                 ++cycleArmy[H2EnumIndex(side)][index];
                 ++m_limitCreatureCount[H2EnumIndex(side)][index];
@@ -2845,7 +2845,7 @@ void combatManager::CycleCombatScreen(void) {
                     }
                 }
             } else if (m_heroAnimationState[H2EnumIndex(side)] == HERO_ANIMATION_STAND
-                       && m_heroCycleTimer[H2EnumIndex(side)] + HERO_IDLE_DELAY < KBTickCount()) {
+                       && m_heroCycleTimer[H2EnumIndex(side)] + HERO_IDLE_DELAY < platform::Ticks()) {
                 if (sCmbtHero[m_heroSpriteIndex[H2EnumIndex(side)]].idleAnimationCount > 1) {
                     nextHeroAnimation[H2EnumIndex(side)] =
                         Random(
@@ -2911,7 +2911,7 @@ void combatManager::CycleCombatScreen(void) {
                                 + H2EnumIndex(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)]) {
                         currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
                         currentArmy->m_animationFrame = 0;
-                        currentArmy->m_lastAnimationTime = KBTickCount();
+                        currentArmy->m_lastAnimationTime = platform::Ticks();
                         if (currentArmy->m_frameInfo.standStillDelay > 0) {
                             currentArmy->m_lastAnimationTime = static_cast<i32>(
                                 (currentArmy->m_frameInfo.standStillDelay
@@ -2938,7 +2938,7 @@ void combatManager::CycleCombatScreen(void) {
                            .animationFrameCount[m_heroAnimationState[H2EnumIndex(side)]]) {
                     m_heroAnimationState[H2EnumIndex(side)] = HERO_ANIMATION_STAND;
                     m_heroAnimationFrame[H2EnumIndex(side)] = 0;
-                    m_heroCycleTimer[H2EnumIndex(side)] = KBTickCount();
+                    m_heroCycleTimer[H2EnumIndex(side)] = platform::Ticks();
                 }
             }
         }
@@ -2946,7 +2946,7 @@ void combatManager::CycleCombatScreen(void) {
     DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 setCycleTimer:
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = static_cast<i32>(
-        KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR
+        platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_CYCLE_TIMER_FACTOR
     );
 }
 

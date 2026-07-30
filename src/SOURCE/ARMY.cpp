@@ -19,7 +19,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/hero.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/searchArray.h>
@@ -186,7 +186,7 @@ void army::InitClean(void) {
     m_roundCounter = -1;
     m_spellCount = 0;
     memset(m_spellInfluence, 0, sizeof(m_spellInfluence));
-    m_lastAnimationTime = KBTickCount();
+    m_lastAnimationTime = platform::Ticks();
     m_drawEnabled = 1;
     m_creatureIcon = NULL;
     m_drawSpellEffect = 0;
@@ -815,7 +815,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
             }
             DelayTil(glTimers);
             glTimers[0] = static_cast<i32>(
-                KBTickCount()
+                platform::Ticks()
                 + m_frameInfo.walkDuration * gfCombatSpeedMod[gConfig.combatSpeed]
                       / m_frameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
             );
@@ -1034,7 +1034,7 @@ void army::SpecialAttack(void) {
             gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
         glTimers[0] = static_cast<i32>(
-            KBTickCount()
+            platform::Ticks()
             + m_frameInfo.attackDuration * gfCombatSpeedMod[gConfig.combatSpeed]
                   / m_frameInfo.animationFrameCount[H2EnumIndex(m_animationSequence)]
         );
@@ -1201,7 +1201,7 @@ void army::SpecialAttack(void) {
                     ->UpdateScreenRegion(minX_1, minY_1, maxX_3 - minX_1 + 1, maxY_3 - minY_1 + 1);
             }
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + missileDelay_2 * gfCombatSpeedMod[gConfig.combatSpeed]
+                platform::Ticks() + missileDelay_2 * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             oldX_16 = currentMissileX_7;
             oldY_9 = currentMissileY_7;
@@ -2416,7 +2416,7 @@ void army::PowEffect(
             }
         }
         glTimers[0] =
-            static_cast<i32>(KBTickCount() + frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
+            static_cast<i32>(platform::Ticks() + frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]);
         if (drawEffect_1 && frame < giNumPowFrames[H2EnumIndex(gCurLoadedSpellEffect)]) {
             gCurSpellEffectFrame = frame;
         }
@@ -2504,7 +2504,7 @@ void army::PowEffect(
         }
         if (keepAnimating_1) {
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]
+                platform::Ticks() + frameDelay_6 * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             gpCombatManager->DrawFrame(1, 1, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
         }
@@ -2695,7 +2695,7 @@ void army::SpellEffect(
                     gCurSpellEffectFrame = giNumPowFrames[H2EnumIndex(effect)];
                 }
                 glTimers[1] = static_cast<i32>(
-                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
+                    platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
                 );
                 gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);
@@ -2703,7 +2703,7 @@ void army::SpellEffect(
         }
         for (; frame_4 < giNumPowFrames[H2EnumIndex(effect)]; frame_4++) {
             glTimers[1] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay
+                platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay
             );
             gCurSpellEffectFrame = frame_4;
             gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
@@ -2720,7 +2720,7 @@ void army::SpellEffect(
                  frame_4++) {
                 m_animationFrame = frame_4;
                 glTimers[1] = static_cast<i32>(
-                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
+                    platform::Ticks() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
                 );
                 gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);

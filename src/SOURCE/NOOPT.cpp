@@ -1,22 +1,22 @@
 #include <Ints.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/NOOPT.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 
 void DelayTil(i32* endTime) {
-    while (KBTickCount() < *endTime) {
-        Process1WindowsMessage();
+    while (platform::Ticks() < *endTime) {
+        platform::PumpEvents();
         PollSound();
     }
 }
 
 void DelayMilli(i32l delay) {
-    DelayTilMilli(KBTickCount() + delay);
+    DelayTilMilli(platform::Ticks() + delay);
 }
 
 void DelayTilMilli(i32l endTime) {
-    while (KBTickCount() < endTime) {
-        Process1WindowsMessage();
+    while (platform::Ticks() < endTime) {
+        platform::PumpEvents();
         PollSound();
     }
 }

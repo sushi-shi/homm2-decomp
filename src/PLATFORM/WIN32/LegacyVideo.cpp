@@ -8,8 +8,9 @@
 #include <BASE/INPUTMGR.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/Runtime.h>
+#include <PLATFORM/WIN32/LegacyVideo.h>
+#include <PLATFORM/WIN32/Application.h>
 
 typedef enum WingraphPaletteConstant {
     PALETTE_COMPONENT_COUNT     = 3,
@@ -97,7 +98,7 @@ void DDInitGraphics(void) {
     if (result != DD_OK)
         DDSD(result, "wingraph.cpp", gDDInitLineBase + 8);
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
-        SetMenuStatus(0);
+        platform::SetMenuVisible(0);
         result = lpDD->SetCooperativeLevel(
             hwndApp,
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
@@ -180,7 +181,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         if (gDDSourceRect.bottom > WINGRAPH_HEIGHT)
             gDDSourceRect.bottom = WINGRAPH_HEIGHT;
 
-        lPaintStart = KBTickCount();
+        lPaintStart = platform::Ticks();
         for (;;) {
             gDDResult =
                 lpDDSPrimary->Blt(&gDDDestinationRect, lpDDSOne, &gDDSourceRect, DDBLT_WAIT, NULL);
@@ -200,7 +201,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
                 if (gDDResult != DD_OK)
                     DDSD(gDDResult, "wingraph.cpp", gDDPaintLineBase + 103);
             } else if (gDDResult == DDERR_SURFACEBUSY
-                       && KBTickCount() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
+                       && platform::Ticks() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
                 iBusyRetry++;
             } else if (gDDResult != DD_OK) {
                 DDSD(gDDResult, "wingraph.cpp", gDDPaintLineBase + 108);
@@ -531,7 +532,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         gbWinGraphBusy = true;
         gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = fullScreen;
         if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0)
-            SetMenuStatus(0);
+            platform::SetMenuVisible(0);
 
         result0 = lpDD->SetCooperativeLevel(
             hwndApp,
@@ -582,7 +583,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         WritePrefs();
         gbWinGraphBusy = false;
         if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen == 0) {
-            SetMenuStatus(1);
+            platform::SetMenuVisible(1);
             ResizeWindow(x, y, width, windowHeight0);
         } else {
             gConfig.gfx[H2EnumIndex(giCurExe)].x = x;
@@ -854,7 +855,7 @@ void ConnectToDLLs(void) {
         gbDDrawAttached = true;
     } else {
         gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen = 0;
-        SetMenuStatus(1);
+        platform::SetMenuVisible(1);
     }
 }
 
@@ -1011,7 +1012,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     H2_FREE(screenBuffer);
     if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
-        SetMenuStatus(1);
+        platform::SetMenuVisible(1);
         ResizeWindow(x, y, width, height7);
     }
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0, 0);

@@ -2,7 +2,7 @@
 #include <SOURCE/ADVMGR.h>
 #include <SOURCE/PHILAI.h>
 #include <BASE/Misc.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
 #include <stdlib.h>
@@ -464,11 +464,11 @@ inline i16& HeroRVAt(i16* values, i32 x, i32 y) {
 }
 
 void CheckDoMain(i32 a1, i32 doMain) {
-    if (KBTickCount() > iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS
-        || KBTickCount() > glTimers[0]) {
-        Process1WindowsMessage();
+    if (platform::Ticks() > iLastFrameRateTimer + AI_FRAME_THROTTLE_TICKS
+        || platform::Ticks() > glTimers[0]) {
+        platform::PumpEvents();
         PollSound();
-        if (KBTickCount() > glTimers[0]) {
+        if (platform::Ticks() > glTimers[0]) {
             if (doMain == 0) {
                 i32 idx = bShowIt;
                 i32 savedX = gpAdvManager->m_previousOriginX;
@@ -494,9 +494,9 @@ void CheckDoMain(i32 a1, i32 doMain) {
                 gpAdvManager->m_previousOriginX = savedX;
                 gpAdvManager->m_previousOriginY = savedY;
             }
-            glTimers[0] = KBTickCount() + FRAME_TIMER_TICKS;
+            glTimers[0] = platform::Ticks() + FRAME_TIMER_TICKS;
         }
-        iLastFrameRateTimer = KBTickCount();
+        iLastFrameRateTimer = platform::Ticks();
     }
 }
 

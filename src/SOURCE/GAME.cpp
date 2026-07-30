@@ -44,7 +44,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/ARMY.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 
 #define GAME_SCORE_EXTRA_LARGE_DAY_SCALE 0.6
 #define GAME_SCORE_LARGE_DAY_SCALE 0.8
@@ -3754,7 +3754,7 @@ void game::ViewArmy(
         }
     }
 
-    glTimers[0] = KBTickCount() + VIEW_ARMY_ANIMATION_INITIAL_DELAY;
+    glTimers[0] = platform::Ticks() + VIEW_ARMY_ANIMATION_INITIAL_DELAY;
     m_viewArmyResult = 0;
     if (quickView) {
         gpWindowManager->AddWindow(m_viewArmyWindow, -1, 1);
@@ -3881,7 +3881,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
         }
     }
 
-    if (!gbLowMemory && KBTickCount() > glTimers[0]) {
+    if (!gbLowMemory && platform::Ticks() > glTimers[0]) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id = VIEW_ARMY_MONSTER_WIDGET_ID;
@@ -3897,7 +3897,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
         gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
-            KBTickCount()
+            platform::Ticks()
             + sViewArmyMonFrameInfo.walkDuration * GAME_VIEW_ARMY_FRAME_DELAY_SCALE
                   / sViewArmyMonFrameInfo.animationFrameCount[H2EnumIndex(ARMY_ANIMATION_WALK)]
         );
@@ -4110,7 +4110,7 @@ void game::NextPlayer(void) {
         gpAdvManager->HideRoute(1, 0, 1);
         gpAdvManager->CheckDimNextHeroBut();
         TurnOnAIMusic();
-        SetNoDialogMenus(0);
+        platform::SetDialogMenusEnabled(0);
         giBottomViewOverride = BOTTOM_VIEW_OVERRIDE_DISABLED;
         ShowComputerScreen();
         bShowIt = 0;
@@ -4123,7 +4123,7 @@ void game::NextPlayer(void) {
         if (giBottomViewOverride == BOTTOM_VIEW_OVERRIDE_DISABLED)
             giBottomViewOverride = BOTTOM_VIEW_NONE;
     } else {
-        SetNoDialogMenus(1);
+        platform::SetDialogMenusEnabled(1);
         gpInputManager->Flush();
         gbAllBlack = true;
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
@@ -4140,7 +4140,7 @@ void game::NextPlayer(void) {
 
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
-        giForceSwitchMusic = KBTickCount();
+        giForceSwitchMusic = platform::Ticks();
         gpSoundManager->m_samplesReady = 0;
     }
     if (m_day == 1 && giCurTurn != 1)
@@ -5691,7 +5691,7 @@ void game::WaitForPlayer(char* text, i32 player) {
     if (gbBlackoutPlayer && giNumHumanPlayers > 1 && !gbRemoteOn) {
         gpMouseManager->SetPointer(0);
         gbAllBlack = true;
-        giBottomViewOverrideEndTime = KBTickCount() + WAIT_BOTTOM_VIEW_TIMEOUT;
+        giBottomViewOverrideEndTime = platform::Ticks() + WAIT_BOTTOM_VIEW_TIMEOUT;
         giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] ? BOTTOM_VIEW_NEW_TURN
                                                                  : BOTTOM_VIEW_NONE;
         gpSoundManager->m_samplesReady = 1;
@@ -6748,7 +6748,7 @@ i32 game::ReceiveSaveGame(
     ackBuffer = static_cast<u8*>(H2_ALLOC(REMOTE_HEADER_CAPACITY));
     incomingData = static_cast<u8*>(H2_ALLOC(dataSize + REMOTE_BUFFER_EXTRA));
 
-    lastPacketTime = KBTickCount();
+    lastPacketTime = platform::Ticks();
     LogInt(
         const_cast<char*>("FW2"),
         remotePlayer,
@@ -6762,7 +6762,7 @@ i32 game::ReceiveSaveGame(
     while (!finished) {
         PollSound();
         CheckDoMain(0, 1);
-        if (KBTickCount() > lastPacketTime + REMOTE_RECEIVE_TIMEOUT) {
+        if (platform::Ticks() > lastPacketTime + REMOTE_RECEIVE_TIMEOUT) {
             NormalDialog(
                 const_cast<char*>("Error receiving data.  Keep trying?"),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
@@ -6776,7 +6776,7 @@ i32 game::ReceiveSaveGame(
                 0
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
-                lastPacketTime = KBTickCount();
+                lastPacketTime = platform::Ticks();
             else
                 ShutDown(NULL);
         }
@@ -6785,7 +6785,7 @@ i32 game::ReceiveSaveGame(
         if (packet
             && (packet->type == REMOTE_MESSAGE_RELIABLE
                 || packet->type == REMOTE_MESSAGE_UNRELIABLE)) {
-            lastPacketTime = KBTickCount();
+            lastPacketTime = platform::Ticks();
             switch (packet->command) {
                 case REMOTE_SAVE_DATA_COMMAND:
                     packetStart = *reinterpret_cast<i16*>(packet->payload);
@@ -6924,7 +6924,7 @@ void game::DoNewTurn(void) {
         CheckEndGame(END_GAME_FORCE_NONE, false);
         return;
     }
-    giBottomViewOverrideEndTime = KBTickCount() + NEW_TURN_BOTTOM_VIEW_DURATION;
+    giBottomViewOverrideEndTime = platform::Ticks() + NEW_TURN_BOTTOM_VIEW_DURATION;
     giBottomViewOverride = BOTTOM_VIEW_NEW_TURN;
     gpAdvManager->UpdBottomView(1, 1, 1);
     gpAdvManager->SetInitialMapOrigin();
@@ -7211,7 +7211,7 @@ void CreateDiffFile(
     i32 sendWhole4;
     i32 oldFile17;
 
-    startTime11 = KBTickCount();
+    startTime11 = platform::Ticks();
     oldData13 = NULL;
     joinData29 = NULL;
     diffData6 = NULL;

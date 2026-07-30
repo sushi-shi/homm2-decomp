@@ -3,7 +3,6 @@
 #include <io.h>
 #include <stdio.h>
 #include <string.h>
-#include <windows.h>
 #include <BASE/Misc.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
@@ -15,7 +14,8 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/fileRequester.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Platform.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/REQUEST.h>
 
 enum class FileRequesterHelpIndex : i32 {
@@ -72,7 +72,7 @@ typedef enum FileRequesterPrivateConstant {
     SCROLL_CENTER_DIVISOR       = 2
 } FileRequesterPrivateConstant;
 
-i32 GetMapHeader(char* filename, struct SMapHeader* header) {
+i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = _open(gText, _O_BINARY);
     if (file == -1) {
@@ -87,7 +87,7 @@ i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
-i32 ShowThisMapGame(char* filename) {
+i32 ShowThisMapGame(const char* filename) {
     return 1;
 
     char mapName[FILE_REQUESTER_PATH_SIZE];
@@ -105,54 +105,46 @@ i32 ShowThisMapGame(char* filename) {
     return 0;
 }
 
-i32 ShowThisMap(char*) {
+i32 ShowThisMap(const char*) {
     return 1;
 }
 
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     char fullPath[FILE_REQUESTER_PATH_SIZE];
     SMapHeader mapHeader;
-    WIN32_FIND_DATA findDataPath;
     char extensionEntry[FILE_REQUESTER_LOCAL_EXTENSION_SIZE];
     char fileName[FILE_REQUESTER_LOCAL_NAME_SIZE];
-    HANDLE findHandleWork;
-    i32 moreFilesHandle;
     i32 insertedCountResult;
     char* dotSource;
     i32 moveValue;
     i32 indexData;
 
     sprintf(gText, "%s%s", directory, pattern);
-    m_fileCount = 0;
-    moreFilesHandle = 1;
-    findHandleWork = FindFirstFile(gText, &findDataPath);
-    if (findHandleWork != INVALID_HANDLE_VALUE) {
-        while (moreFilesHandle) {
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
-                GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if (mapHeader.minHumanPlayers > giNumHumanPlayers)
-                    goto CountNextFile;
-                if (giNumHumanPlayers > mapHeader.maxHumanPlayers)
-                    goto CountNextFile;
-                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && giMapSizes[H2EnumIndex(giMapSizeFilter)] != mapHeader.width)
-                    goto CountNextFile;
-                if (!ShowThisMapGame(findDataPath.cFileName))
-                    goto CountNextFile;
-            }
-            if (m_mode == FILE_REQUESTER_MAP) {
-                GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
-                    && giMapSizes[H2EnumIndex(giMapSizeFilter)] != mapHeader.width)
-                    goto CountNextFile;
-                if (!ShowThisMap(findDataPath.cFileName))
-                    goto CountNextFile;
-            }
-            ++m_fileCount;
-        CountNextFile:
-            moreFilesHandle = FindNextFile(findHandleWork, &findDataPath);
+    const std::vector<std::string> files = platform::Files().List(gText);
+    const auto accepts = [&](const std::string& foundFile) {
+        if (m_mode != FILE_REQUESTER_MAP && m_mode != FILE_REQUESTER_MAP_GAME) {
+            return true;
         }
-        FindClose(findHandleWork);
+        GetMapHeader(foundFile.c_str(), &mapHeader);
+        if (m_mode == FILE_REQUESTER_MAP_GAME
+            && (mapHeader.minHumanPlayers > giNumHumanPlayers
+                || giNumHumanPlayers > mapHeader.maxHumanPlayers)) {
+            return false;
+        }
+        if (giMapSizeFilter != FILE_REQUESTER_MAP_SIZE_ALL
+            && giMapSizes[H2EnumIndex(giMapSizeFilter)] != mapHeader.width) {
+            return false;
+        }
+        return m_mode == FILE_REQUESTER_MAP_GAME
+            ? ShowThisMapGame(foundFile.c_str()) != 0
+            : ShowThisMap(foundFile.c_str()) != 0;
+    };
+
+    m_fileCount = 0;
+    for (const std::string& foundFile : files) {
+        if (accepts(foundFile)) {
+            ++m_fileCount;
+        }
     }
 
     if (countOnly) {
@@ -180,55 +172,31 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     }
 
     insertedCountResult = 0;
-    sprintf(gText, "%s%s", directory, pattern);
-    findHandleWork = FindFirstFile(gText, &findDataPath);
-    if (findHandleWork != INVALID_HANDLE_VALUE) {
-        moreFilesHandle = 1;
-        while (moreFilesHandle) {
-            if (m_mode == FILE_REQUESTER_MAP_GAME) {
-                GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if (mapHeader.minHumanPlayers <= giNumHumanPlayers
-                    && giNumHumanPlayers <= mapHeader.maxHumanPlayers
-                    && (giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                        || giMapSizes[H2EnumIndex(giMapSizeFilter)] == mapHeader.width)
-                    && ShowThisMapGame(findDataPath.cFileName)) {
-                } else {
-                    goto InsertNextFile;
-                }
-            }
-            if (m_mode == FILE_REQUESTER_MAP) {
-                GetMapHeader(findDataPath.cFileName, &mapHeader);
-                if ((giMapSizeFilter == FILE_REQUESTER_MAP_SIZE_ALL
-                     || giMapSizes[H2EnumIndex(giMapSizeFilter)] == mapHeader.width)
-                    && ShowThisMap(findDataPath.cFileName)) {
-                } else {
-                    goto InsertNextFile;
-                }
-            }
-
-            strcpy(fileName, findDataPath.cFileName);
-            dotSource = FindLastToken(fileName, '.');
-            if (dotSource != NULL) {
-                strcpy(extensionEntry, dotSource);
-                *dotSource = 0;
-            }
-
-            for (indexData = 0; insertedCountResult > indexData; ++indexData) {
-                if (strcmpi(fileName, m_fileNames[indexData].text) < 0) {
-                    for (moveValue = insertedCountResult; moveValue > indexData; --moveValue) {
-                        strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
-                        strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
-                    }
-                    break;
-                }
-            }
-            strcpy(m_fileNames[indexData].text, fileName);
-            strcpy(m_extensions[indexData].text, extensionEntry);
-            ++insertedCountResult;
-        InsertNextFile:
-            moreFilesHandle = FindNextFile(findHandleWork, &findDataPath);
+    for (const std::string& foundFile : files) {
+        if (!accepts(foundFile)) {
+            continue;
         }
-        FindClose(findHandleWork);
+
+        strcpy(fileName, foundFile.c_str());
+        extensionEntry[0] = 0;
+        dotSource = FindLastToken(fileName, '.');
+        if (dotSource != NULL) {
+            strcpy(extensionEntry, dotSource);
+            *dotSource = 0;
+        }
+
+        for (indexData = 0; insertedCountResult > indexData; ++indexData) {
+            if (strcmpi(fileName, m_fileNames[indexData].text) < 0) {
+                for (moveValue = insertedCountResult; moveValue > indexData; --moveValue) {
+                    strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
+                    strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
+                }
+                break;
+            }
+        }
+        strcpy(m_fileNames[indexData].text, fileName);
+        strcpy(m_extensions[indexData].text, extensionEntry);
+        ++insertedCountResult;
     }
 
     if (m_mode == FILE_REQUESTER_MAP_GAME || m_mode == FILE_REQUESTER_MAP) {
@@ -312,7 +280,7 @@ void fileRequester::Close(void) {
     if (!m_active) {
         return;
     }
-    KBChangeMenu(m_previousMenu);
+    platform::ChangeMenu(m_previousMenu);
     strcpy(gLastFilename, GetFilename());
     CleanUpData();
     gpWindowManager->RemoveWindow(m_window);
@@ -322,8 +290,8 @@ void fileRequester::Close(void) {
 
 i32 fileRequester::Open(i32 id) {
     strcpy(gLastFilename, "");
-    m_previousMenu = hmnuCurrent;
-    KBChangeMenu(hmnuDflt);
+    m_previousMenu = platform::CurrentMenu();
+    platform::ChangeMenu(hmnuDflt);
 
     m_window = new heroWindow(
         m_x,
@@ -939,7 +907,7 @@ void fileRequester::DoKnob(void) {
                 m_window->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
             }
         }
-        Process1WindowsMessage();
+        platform::PumpEvents();
         dragMessage = gpInputManager->GetEvent();
     }
     m_scrollKnob->m_flags &= ~WIDGET_FLAG_SELECTED;

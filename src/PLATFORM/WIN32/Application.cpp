@@ -9,8 +9,8 @@
 #include <BASE/soundmgr.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <SOURCE/kbwin.h>
-#include <SOURCE/wingraph.h>
+#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/WIN32/LegacyVideo.h>
 
 typedef enum KbWinPrivateConstant {
     TIMER_UPDATE_MIN_INTERVAL = 5

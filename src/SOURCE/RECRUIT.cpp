@@ -11,7 +11,7 @@
 #include <SOURCE/armyGroup.h>
 #include <SOURCE/bankBox.h>
 #include <SOURCE/game.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/recruitUnit.h>
 #include <SOURCE/RECRUIT.h>
@@ -162,8 +162,8 @@ i32 recruitUnit::Open(i32 priority) {
             BROADCAST_FLAGS
         );
     }
-    hmnuRecruitSave = hmnuCurrent;
-    KBChangeMenu(hmnuDflt);
+    hmnuRecruitSave = platform::CurrentMenu();
+    platform::ChangeMenu(hmnuDflt);
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = priority;
     m_active = true;
@@ -199,7 +199,7 @@ void recruitUnit::Close(void) {
         gpTownManager->m_bankBox->Update(1);
     }
     m_active = false;
-    KBChangeMenu(hmnuRecruitSave);
+    platform::ChangeMenu(hmnuRecruitSave);
 }
 
 void recruitUnit::Update(void) {
@@ -430,4 +430,4 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
 }
 
 
-HMENU hmnuRecruitSave;
+platform::MenuHandle hmnuRecruitSave;

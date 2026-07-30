@@ -24,7 +24,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/PATH.h>
 #include <SOURCE/town.h>
@@ -524,9 +524,9 @@ i32 combatManager::Open(i32 openFlags) {
     gpWindowManager->AddWindow(m_combatWindow, -1, 1);
     m_combatWindowOpen = 1;
     DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
-    glTimers[0] = KBTickCount();
+    glTimers[0] = platform::Ticks();
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
-    KBChangeMenu(hmnuCmbt);
+    platform::ChangeMenu(hmnuCmbt);
     CombatMessage("", 1, 1, 0);
     gConfig.showCombatMouseHex = savedShowMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
@@ -537,7 +537,7 @@ i32 combatManager::Open(i32 openFlags) {
 
     LogStr("Op3");
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
-    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
+    glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = platform::Ticks();
     ResetCycleTimers();
     LogStr("Op4");
     gpInputManager->Flush();
@@ -1513,7 +1513,7 @@ void combatManager::CatAttack(CombatSide side) {
             && (gateIndex2 != -1 || missShot19 != 0))
             continue;
         glTimers[COMBAT_CATAPULT_TIMER_SLOT] = static_cast<i32l>(
-            KBTickCount()
+            platform::Ticks()
             + gfCombatSpeedMod[gConfig.combatSpeed]
                 * H2EnumIndex(COMBAT_CATAPULT_ANIMATION_DELAY)
         );
@@ -2199,7 +2199,7 @@ void combatManager::ShootMissile(
             gpWindowManager->UpdateScreenRegion(minX8, minY5, maxX9 - minX8 + 1, maxY6 - minY5 + 1);
         }
         glTimers[0] = static_cast<i32>(
-            KBTickCount()
+            platform::Ticks()
             + gfCombatSpeedMod[gConfig.combatSpeed]
                 * H2EnumIndex(COMBAT_MISSILE_TIMER_DELAY)
         );

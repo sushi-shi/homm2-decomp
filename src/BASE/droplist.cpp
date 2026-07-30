@@ -11,7 +11,7 @@
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
 #include <SOURCE/KB.h>
-#include <SOURCE/kbwin.h>
+#include <PLATFORM/Runtime.h>
 #include <string.h>
 
 enum class DropListFrame : i32 {
@@ -500,7 +500,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     DrawDropStuff();
     for (;;) {
         PollSound();
-        Process1WindowsMessage();
+        platform::PumpEvents();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
         ownerX = m_owner->m_posX;

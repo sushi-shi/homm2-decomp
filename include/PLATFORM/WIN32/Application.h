@@ -1,5 +1,5 @@
-#ifndef HOMM2_KBWIN_H
-#define HOMM2_KBWIN_H
+#ifndef HOMM2_PLATFORM_WIN32_APPLICATION_H
+#define HOMM2_PLATFORM_WIN32_APPLICATION_H
 
 #include <SOURCE/KB_TYPES.h>
 #include <Ints.h>
