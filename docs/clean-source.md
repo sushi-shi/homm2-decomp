@@ -15,6 +15,9 @@ python3 scripts/clean_source.py --out build/clean            # generate
 python3 scripts/clean_source.py --out build/clean --verify   # build
 python3 scripts/clean_source.py --out build/clean \
   --publish source-pol-2.0                                  # publish source branch
+python3 scripts/clean_source.py \
+  --classic-from ../homm2-decomp-master \
+  --out build/classic --publish classic-pol-2.0             # publish classic branch
 ```
 
 ## Why it is safe
@@ -127,3 +130,15 @@ inline CampaignSide OppositeCampaignSide(CampaignSide side) {
 
 Struct fields keep their retail width through `H2EnumStorage<Enum, Storage>`,
 which presents the enum type while retaining each audited field width.
+
+## Classic view
+
+`--classic-from` keeps the supplied clean project and changes only its legacy
+type presentation. Domains reconstructed through `H2_ENUM_CLASS_*` become
+anonymous enums with integer typedefs, packed fields become their proven
+storage type, and strict-only index, storage, and operator helpers disappear.
+
+The domain widths come from the matching tree, including split domains whose
+public type is `i32` but whose serialized fields are narrower. Remaining scoped
+enums become integer typedefs with prefixed constants, avoiding name collisions
+without requiring `enum class`. Inline assembly is copied unchanged.

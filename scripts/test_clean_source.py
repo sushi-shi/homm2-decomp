@@ -215,6 +215,133 @@ class CleanSourceCurrentEnumTests(unittest.TestCase):
             self.assertEqual(clean_source.residue(output), {"comment": 1})
 
 
+class ClassicSourceTests(unittest.TestCase):
+    DOMAINS = {
+        "CombatSide": "i32",
+        "PackedKind": "u8",
+    }
+
+    def test_classic_domains_follow_retail_macro_storage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "include").mkdir()
+            (root / "src").mkdir()
+            (root / "include/types.h").write_text(
+                "H2_ENUM_CLASS_BEGIN(CombatSide)\n"
+                "H2_ENUM_CLASS_END(CombatSide)\n"
+                "H2_ENUM_CLASS_BEGIN_T(PackedKind, u8)\n"
+                "H2_ENUM_CLASS_END_T(PackedKind, u8)\n"
+                "H2_ENUM_CLASS_BEGIN_SPLIT(SplitKind, i8)\n"
+                "H2_ENUM_CLASS_END_SPLIT(SplitKind, i8)\n"
+            )
+            self.assertEqual(
+                clean_source.classic_domains(root),
+                {
+                    "CombatSide": "i32",
+                    "PackedKind": "u8",
+                    "SplitKind": "i32",
+                },
+            )
+
+    def test_classicize_demotes_generated_enum_domains(self):
+        source = (
+            "enum class CombatSide : i32 {\n"
+            "    COMBAT_ATTACKER,\n"
+            "    COMBAT_DEFENDER\n"
+            "};\n"
+            "using enum CombatSide;\n"
+            "ENABLE_ENUM_STEPS(CombatSide)\n"
+            "inline CombatSide& operator^=(CombatSide& side, i32 mask) {\n"
+            "    return side;\n"
+            "}\n"
+        )
+        self.assertEqual(
+            clean_source.classicize(source, self.DOMAINS),
+            "enum {\n"
+            "    COMBAT_ATTACKER,\n"
+            "    COMBAT_DEFENDER\n"
+            "};\n"
+            "typedef i32 CombatSide;\n",
+        )
+
+    def test_classicize_demotes_new_platform_enum_classes(self):
+        source = (
+            "enum class HostKey { Escape, Enter };\n"
+            "HostKey key = HostKey::Escape;\n"
+        )
+        self.assertEqual(
+            clean_source.classicize(source, self.DOMAINS),
+            "enum { HostKey_Escape, HostKey_Enter };\n"
+            "typedef int HostKey;\n"
+            "HostKey key = HostKey_Escape;\n",
+        )
+
+    def test_classicize_qualifies_nested_enum_alias_constants(self):
+        enums = {"Type": ("int", ("None", "KeyDown"))}
+        source = (
+            "using Type = platform::Event::Type;\n"
+            "return Type::KeyDown;\n"
+        )
+        self.assertEqual(
+            clean_source.classicize(
+                source,
+                self.DOMAINS,
+                modern_enums=enums,
+            ),
+            "using Type = platform::Event::Type;\n"
+            "return platform::Event::Type_KeyDown;\n",
+        )
+
+    def test_classicize_qualifies_imported_enum_constants(self):
+        enums = {"Key": ("int", ("Escape",))}
+        source = "using platform::Key;\nreturn Key::Escape;\n"
+        self.assertEqual(
+            clean_source.classicize(
+                source,
+                self.DOMAINS,
+                modern_enums=enums,
+            ),
+            "using platform::Key;\nreturn platform::Key_Escape;\n",
+        )
+
+    def test_classicize_replaces_forward_storage_and_index_helpers(self):
+        source = (
+            "enum class CombatSide : i32;\n"
+            "H2EnumStorage<CombatSide, i16> side;\n"
+            "H2SteppedEnumStorage<CombatSide, i8> phase;\n"
+            "i32 value = H2EnumIndex(side) + H2EnumIndex(COMBAT_ATTACKER);\n"
+            "i32 menu = H2EnumIndex(platform::SystemMenuCommand::Help);\n"
+        )
+        self.assertEqual(
+            clean_source.classicize(source, self.DOMAINS),
+            "typedef i32 CombatSide;\n"
+            "i16 side;\n"
+            "i8 phase;\n"
+            "i32 value = (side) + (COMBAT_ATTACKER);\n"
+            "i32 menu = (platform::SystemMenuCommand::Help);\n",
+        )
+
+    def test_classic_ints_drops_strict_support(self):
+        source = (
+            "#ifndef HOMM2_INTS_H\n"
+            "#define HOMM2_INTS_H\n"
+            "#include <type_traits>\n"
+            "typedef int i32;\n"
+            "template <typename T>\n"
+            "inline constexpr bool H2IsMaskLike = true;\n"
+            "#define H2EnumIndex(value) value\n"
+            "#endif\n"
+        )
+        result = clean_source.classicize(source, self.DOMAINS, "include/Ints.h")
+        self.assertEqual(
+            result,
+            "#ifndef HOMM2_INTS_H\n"
+            "#define HOMM2_INTS_H\n"
+            "typedef int i32;\n"
+            "#endif\n",
+        )
+
+
 class CleanSourceOutputSafetyTests(unittest.TestCase):
     def fixture_repo(self, root: Path) -> Path:
         repo = root / "repo"
