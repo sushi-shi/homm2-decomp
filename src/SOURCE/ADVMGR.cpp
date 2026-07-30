@@ -950,13 +950,6 @@ typedef enum AdventureSystemOptionsPrivateConstant {
     SYSTEM_OPTIONS_TEXT_CAPACITY       = 120
 } AdventureSystemOptionsPrivateConstant;
 
-enum class AdventureMusicQuality : i32 {
-    MUSIC_QUALITY_MIDI      = 0,
-    MUSIC_QUALITY_CD_STEREO = 1,
-    MUSIC_QUALITY_CD_OPERA  = 2
-};
-using enum AdventureMusicQuality;
-
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 
@@ -1270,13 +1263,8 @@ void advManager::Close(void) {
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
-    if (!bEnteringTown || gConfig.useOpera != CONFIG_OPERA_DISABLED
-        || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-        gpSoundManager->SwitchAmbientMusic(-1);
-        gpSoundManager->StopAllSamples(1);
-    } else {
-        gpSoundManager->StopAllSamples(0);
-    }
+    gpSoundManager->SwitchAmbientMusic(-1);
+    gpSoundManager->StopAllSamples(1);
     if (m_adventureBorder != NULL) {
         H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
@@ -10038,6 +10026,11 @@ void advManager::SystemOptions(void) {
         MemError();
     }
     SetWinText(cPanel, ADVMGR_SYSTEM_OPTIONS_TITLE);
+    message6.type = MESSAGE_WIDGET;
+    message6.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE);
+    message6.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+    message6.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
+    cPanel->BroadcastMessage(message6);
     UpdateSystemOptions(1);
     gpWindowManager->DoDialog(cPanel, SystemOptionsHandler, 0);
     delete cPanel;
@@ -10061,7 +10054,6 @@ void advManager::SystemOptions(void) {
 
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
-    AdventureMusicQuality musicQuality;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
@@ -10080,15 +10072,7 @@ void UpdateSystemOptions(i32 initialDraw) {
         H2EnumIndex(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE);
-    if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-        musicQuality = MUSIC_QUALITY_MIDI;
-    } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
-        musicQuality = MUSIC_QUALITY_CD_STEREO;
-    } else {
-        musicQuality = MUSIC_QUALITY_CD_OPERA;
-    }
-    message.payload.widget.data.value =
-        H2EnumIndex(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
+    message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
     message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE);
     message.payload.widget.data.value =
@@ -10131,7 +10115,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = musicQualityText[H2EnumIndex(musicQuality)];
+    message.payload.widget.data.text = "MIDI";
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
         H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
@@ -10242,11 +10226,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         message.payload.widget.id
                     )) {
                         case SYSTEM_OPTION_MUSIC_VOLUME:
-                            if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
+                            if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
                                 && gpSoundManager->m_midiReady == 0) {
                                 NormalDialog(
-                                    "Neither MIDI nor Redbook music is currently available on this "
-                                    "system.",
+                                    "MIDI music is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10311,45 +10294,6 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_MUSIC_SOURCE:
-                            if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                                if (gpSoundManager->m_cdStarted == 0) {
-                                    gpSoundManager->CDStartup();
-                                }
-                                if (gpSoundManager->m_cdReady == 0) {
-                                    NormalDialog(
-                                        "Unable to set up CD stereo music.  Your CD player might "
-                                        "be in use by another program, or your sound driver might "
-                                        "not support CD stereo.",
-                                        OPTION_DIALOG_MESSAGE,
-                                        OPTION_DIALOG_NONE,
-                                        OPTION_DIALOG_NONE,
-                                        OPTION_DIALOG_NONE,
-                                        0,
-                                        OPTION_DIALOG_NONE,
-                                        0,
-                                        OPTION_DIALOG_NONE,
-                                        0
-                                    );
-                                    break;
-                                }
-                                gpSoundManager->SetMusicQuality(H2EnumIndex(CONFIG_MUSIC_SOURCE_CD));
-                                gConfig.useOpera = CONFIG_OPERA_DISABLED;
-                            } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
-                                gConfig.useOpera = CONFIG_OPERA_ENABLED;
-                            } else {
-                                if (gpSoundManager->m_midiStarted == 0) {
-                                    gpSoundManager->MIDIStartup();
-                                }
-                                if (gpSoundManager->m_midiReady == 0) {
-                                    gConfig.useOpera = static_cast<ConfigOperaMode>(
-                                        1 - H2EnumIndex(gConfig.useOpera)
-                                    );
-                                } else {
-                                    gpSoundManager->SetMusicQuality(H2EnumIndex(CONFIG_MUSIC_SOURCE_MIDI));
-                                }
-                            }
-                            preferencesChanged = 1;
-                            bPrefsChanged = 1;
                             break;
 
                         case SYSTEM_OPTION_SHOW_ROUTE:
@@ -10657,5 +10601,4 @@ i32 giLimitUpdMaxY;
 i32 bPrefsChanged;
 i32 giLimitUpdMinY;
 i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
-struct tag_message CDMsg;
 i32 iLastAnimFrame;

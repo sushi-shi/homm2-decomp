@@ -209,7 +209,7 @@ typedef enum CongratsConstant {
 
 typedef enum CommandLineConstant {
     LINE_TCP_TEXT_LENGTH    = 20,
-    LINE_HELP_LINE_COUNT    = 14,
+    LINE_HELP_LINE_COUNT    = 10,
     LINE_HUMAN_PLAYER_SLOTS = 4,
     LINE_TCP_MIN_PLAYERS    = 2,
     LINE_TCP_MAX_PLAYERS    = 6,
@@ -404,63 +404,14 @@ void EarlyShutdown(char* caption, char* text) {
     exit(0);
 }
 
-void SetupCDRom(void) {
-    i32 savedNoSound = gbNoSound;
-    if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        gbNoSound = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion "
-                "CD-ROM you will only be able to play as the guest in a multi-player game.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
-        SetPalette(gPalette->m_data, 1);
-        gpMouseManager->ShowColorPointer();
-        gbNoSound = true;
-        if (giTCPHostStatus)
-            NormalDialog(
-                "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion "
-                "CD-ROM you will only be able to play as the guest in a multi-player game.  If you "
-                "have the CD, then exit the program, put the CD in, and try again.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                -1,
-                0,
-                -1,
-                0,
-                -1,
-                0
-            );
-        gbNoCDRom = true;
-    }
-    if (iCDRomErr == CD_ROM_GAME_DIRECTORY_MISSING) {
+void RequireGameData(void) {
+    if (gGameDataStatus == GAME_DATA_MISSING) {
         EarlyShutdown(
             "Startup Error",
-            "Unable to change to the Heroes II directory.  Please run the installation program."
+            "Unable to find the Heroes II data files. Run the game from its installation folder."
         );
         exit(0);
     }
-    if (iCDRomErr == CD_ROM_DATA_FILES_MISSING) {
-        EarlyShutdown(
-            "Startup Error",
-            "Unable to find the Heroes II data files.  Please run the installation program."
-        );
-        exit(0);
-    }
-    gbNoSound = savedNoSound;
 }
 
 i32 EarlySetup(void) {
@@ -473,7 +424,7 @@ i32 EarlySetup(void) {
         return 1;
     LogTruncate();
     LogStr("ES1");
-    iCDRomErr = SetupCDDrive();
+    gGameDataStatus = VerifyGameData();
     InitVars();
     LogStr("ES2");
     return 1;
@@ -514,7 +465,7 @@ i32 oldmain(void) {
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->SetColorMice(gConfig.gfx[H2EnumIndex(giCurExe)].colorMouseCursor);
     LogStr("OM4");
-    SetupCDRom();
+    RequireGameData();
     LogStr("OM5");
     if (gpSoundManager->Open(-1))
         ShutDown("Unable to initialize sound.");
@@ -1079,10 +1030,6 @@ i32 InterpretCommandLine(void) {
                 case 'M':
                     if (i + 2 < len)
                         gbDontTryMIDI = 1 - (gcCommandLine[i + 2] - '0');
-                    break;
-                case 'R':
-                    if (i + 2 < len)
-                        gbDontTryRedbook = 1 - (gcCommandLine[i + 2] - '0');
                     break;
                 case 'D':
                     if (i + 2 < len)
@@ -3335,7 +3282,7 @@ void ShutDown(char* msg) {
         sprintf(buf, "Bye!");
     }
     ShutDownSmacker();
-    gpSoundManager->CDStop();
+    gpSoundManager->MIDIStop();
     ClearMapExtra();
     UnloadSystemwideIcons();
     if (gbRemoteOn)
@@ -6067,7 +6014,6 @@ char gcAnimPath[GLOBAL_AGGREGATE_PATH_SIZE] = "\\HEROES2\\ANIM\\";
 char gcGamePath[GLOBAL_GAME_PATH_SIZE] = ".\\GAMES\\";
 char gcMapPath[GLOBAL_MAP_PATH_SIZE] = ".\\MAPS\\";
 b32 gbPutzingWithMouseCtr = false;
-b32 gbDontTryRedbook = false;
 b32 gbDontTryMIDI = false;
 b32 gbDontTryDigital = false;
 float gfCombatSpeedMod[KB_COMBAT_SPEED_COUNT] = {1.0f, 0.7f, 0.35f};
@@ -6075,7 +6021,6 @@ icon* gShingleAnim = NULL;
 i32 iNextShingleAnim = 0;
 i32 giDialogTimeout = 0;
 i32 giNewMonsterCycleFrame = 0;
-b32 gbNoCDRom = false;
 b32 gbLeaveNetBoxAlone = false;
 b32 gbDrawWindowBackground = true;
 b32 gbCheatMenus = false;
@@ -9182,8 +9127,6 @@ char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
     {"Human\n", "Human\nEasy", "Human\nNormal", "Human\nHard", "Human\nExpert", NULL};
 char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert", NULL};
-char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
-    {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera", NULL};
 char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
@@ -9615,16 +9558,12 @@ char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n",
     "/D0 - disable digital sound\n",
     "/M0 - disable MIDI music\n",
-    "/R0 - disable Redbook music\n",
     "/I0 - skip the intro\n",
-    "\n",
     "\n",
     "Example:\n",
     "\n",
-    "HEROES2D /R0 /I0\n",
-    "\n",
-    "Starts the DOS version of Heroes2 with redbook\n",
-    "sound disabled and the intro skipped.\n"
+    "HEROES2W /I0\n",
+    "Starts Heroes II with the intro skipped.\n"
 };
 char* cOverviewText[KB_OVERVIEW_TEXT_COUNT] =
     {"Hero/Stats", "Skills", "Artifacts", "Town/Castle", "Garrison", "Available"};
@@ -9818,15 +9757,10 @@ char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {
 };
 char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
-    "{Music}\n\nToggle ambient music level.\n\n(Note: When using CD Stereo music in DOS, the music "
-    "may only be turned on or off - the level has no effect.)",
+    "{Music}\n\nToggle ambient music level.",
     "{Effects}\n\nToggle foreground sounds level.",
     "{Speed}\n\nChange the speed at which your heroes move on the main screen.",
-    "{Music Type}\n\nChange the type of music.  MIDI music does not usually sound as good, but "
-    "hurts performance less than CD Stereo.  If you use CD Stereo, you can select whether or not "
-    "to have the operatic town themes play or not.\n\n(Note: Some older computers do not handle CD "
-    "Stereo music well.  If you have a computer that leaves the music playing when you quit or "
-    "crashes when you switch music tracks, try MIDI music.)",
+    "{Music Type}\n\nHeroes II uses MIDI music.",
     "{Show Path}\n\nToggle 'Show Path' on/off.  If 'Show Path' is on, your first click on a map "
     "location will show the path to get there, your second will start you moving. If this option "
     "is off, one click starts you moving immediately.",
@@ -9835,8 +9769,8 @@ char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{Interface}\n\nSets what type of interface you want to use.  The default selection is a "
     "dynamic interface, which uses Evil graphics for the 3 evil heroes (Barbarian, Warlock, and "
     "Necromancer).",
-    "{Video}\n\nDetermines if the video sequences play normally or in interlaced mode.  Interlaced "
-    "mode runs better on slower machines, or machines with double-speed CD drives.",
+    "{Video}\n\nDetermines if the video sequences play normally or in interlaced mode. Interlaced "
+    "mode runs better on slower machines.",
     "{Mouse Cursor}\n\nToggle color cursors on/off.  Color cursors look nicer, but sometimes don't "
     "move as smoothly as black and white ones."
 };
@@ -9961,10 +9895,9 @@ void* gLowPage = NULL;
 b32 gbLowPageGrabbed = false;
 i8 xSmackFromNetwork = 0;
 b32 gbInPollSound = false;
-H2EnumStorage<CDRomSetupResult, i32> iCDRomErr = CD_ROM_READY;
+H2EnumStorage<GameDataStatus, i32> gGameDataStatus = GAME_DATA_READY;
 i32 bEarlySetupDone = 0;
 i32 bKBDone = 0;
-struct _REDBOOK* hRedbookz = NULL;
 i32 bForceCheckTimeEvent = 0;
 u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][H2EnumIndex(INIT_MENU_HOTSPOT_FIELD_COUNT)] = {
     {481, 185, 83, 96},
@@ -10068,7 +10001,6 @@ void** ppMapExtra;
 char gcBottomViewText[GLOBAL_BOTTOM_VIEW_MESSAGE_SIZE];
 i32 giThisNetPos;
 b8 gbSetupGamePosToRealGamePos[RADAR_OWNER_COLOR_COUNT];
-char gcRegCDRomPath[GLOBAL_AGGREGATE_PATH_SIZE];
 class heroWindow* heroWin;
 i32 giOverviewReturnActionExtra;
 H2EnumStorage<CombatSide, i32> giCurGeneral;

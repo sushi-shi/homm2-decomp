@@ -189,18 +189,9 @@ i32 game::SetupHotSeatGame(void) {
 }
 
 i32 game::SetupNetworkGame(void) {
-    tag_message message;
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet.bin");
     if (window == NULL)
         MemError();
-
-    if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
-        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        window->BroadcastMessage(message);
-    }
 
     gpWindowManager->DoDialog(window, SetupNetworkGameHandler, 0);
     delete window;
@@ -276,7 +267,6 @@ i32 game::SetupNetworkGame2(void) {
 }
 
 i32 game::SetupModemGame(void) {
-    tag_message message;
     heroWindow* window;
 
     LogStr("SMC 1");
@@ -295,13 +285,6 @@ i32 game::SetupModemGame(void) {
         MemError();
 
     LogStr("SMC 2");
-    if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
-        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        window->BroadcastMessage(message);
-    }
     LogStr("SMC 3");
     gpWindowManager->DoDialog(window, SetupModemGameHandler, 0);
     LogStr("SMC 4");
@@ -347,20 +330,12 @@ i32 game::SetupModemGame(void) {
 }
 
 i32 game::SetupMultiPlayerGame(void) {
-    tag_message message;
     i32 continueFlag;
 
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpmp.bin");
     if (window == NULL)
         MemError();
 
-    if (gbNoCDRom != 0) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.id = DISABLED_WIDGET_ID;
-        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        window->BroadcastMessage(message);
-    }
     gpWindowManager->DoDialog(window, SetupMultiPlayerGameHandler, 0);
     delete window;
 
@@ -499,17 +474,6 @@ i32 game::SetupGame(void) {
     window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnewgm.bin");
     if (window == NULL)
         MemError();
-
-    if (gbNoCDRom != 0) {
-        tag_message message;
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
-        message.payload.widget.id = CHOICE_ONE;
-        window->BroadcastMessage(message);
-        message.payload.widget.id = CHOICE_TWO;
-        window->BroadcastMessage(message);
-    }
 
     gpWindowManager->DoDialog(window, SetupGameHandler, 0);
     delete window;

@@ -3,13 +3,10 @@
 
 #include <Ints.h>
 
-enum class CDRomSetupResult : i32 {
-    CD_ROM_READY                  = 0,
-    CD_ROM_DRIVE_UNAVAILABLE      = 1,
-    CD_ROM_EXPANSION_DISC_MISSING = 2,
-    CD_ROM_GAME_DIRECTORY_MISSING = 3,
-    CD_ROM_DATA_FILES_MISSING     = 4
+enum class GameDataStatus : i32 {
+    GAME_DATA_READY   = 0,
+    GAME_DATA_MISSING = 1
 };
-using enum CDRomSetupResult;
+using enum GameDataStatus;
 
 #endif

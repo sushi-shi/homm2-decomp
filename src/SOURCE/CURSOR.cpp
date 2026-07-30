@@ -813,8 +813,7 @@ mapCell* advManager::MoveHero(
                  ->m_terrainImageIndex;
     if (giGroundToTerrain[step_a] != m_currentTerrain) {
         m_currentTerrain = giGroundToTerrain[step_a];
-        if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
     m_updateMinY = 0;
     m_updateMinX = m_updateMinY;

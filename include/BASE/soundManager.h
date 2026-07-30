@@ -15,10 +15,7 @@ typedef enum SoundStorageConstant {
     SOUND_CHANNEL_VOLUME_CAPACITY = 0x14,
     DIGITAL_DRIVER_NAME_COUNT     = 14,
     SOUND_CHANNEL_TYPE_COUNT      = 4,
-    CD_POSITION_CAPACITY          = 15,
-    MCI_RESULT_CAPACITY           = 0x100,
-    SAVED_SAMPLE_VOLUME_CAPACITY  = 0x20,
-    MCI_COMMAND_CAPACITY          = 0x100
+    SAVED_SAMPLE_VOLUME_CAPACITY  = 0x20
 } SoundStorageConstant;
 
 enum class SoundVolumeConversionMode : i32 {
@@ -84,26 +81,13 @@ public:
     i32 m_samplesReady;
     i32 m_fadeSteps;
     i32 m_fadeTargetTrack;
-    i32 m_cdTrack;
-    i32 m_cdPlayFrame;
-    i16 m_auxDevice;
-    i32 m_cdReady;
     i32 m_midiReady;
-    i32 m_cdStarted;
     i32 m_midiStarted;
     i32 m_pollTimer;
     soundManager(void);
     virtual i32 Open(i32) override;
     virtual void Close(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
-    void ValidatePreviousPosition(i32);
-    void CDStop(void);
-    i32 CDIsPlaying(void);
-    void CDStartup(void);
-    void CDShutdown(void);
-    void CDSetVolume(i32, i32);
-    void CDPlay(i32, i32, i32, i32);
-    void CDPoll(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
     void AllocateSampleHandles(void);
     struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
@@ -114,12 +98,10 @@ public:
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);
-    void SetMusicQuality(i32);
     void PlayAmbientMusic(i32, i32l, i32);
     void PollSound(void);
     void SwitchAmbientMusic(i32);
     struct _SAMPLE* MemorySample(class sample*);
-    void GetNumberCDDrives(void);
     void ServiceSound(void);
     i32 MusicPlaying(void);
     void MIDIStartup(void);
@@ -133,18 +115,12 @@ public:
 #pragma pack(pop)
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
-extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];
-extern i32 CDWaiting;
-extern i32 CDPlaying;
 extern i32 iCalibrateLoop;
 extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
 extern i32l lLastMIDIPollTickCount;
-extern char lpszReturnString[MCI_RESULT_CAPACITY];
-extern u32l nMCIError;
 extern i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
-extern char CommandString[MCI_COMMAND_CAPACITY];
 extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 

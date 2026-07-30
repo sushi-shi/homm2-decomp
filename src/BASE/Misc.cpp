@@ -211,7 +211,7 @@ static SMiscText gMiscText = {
      {"Assert Failure"}},
     {{"AUTO"}, {"AUTO"}},
     {{"The Unknown Hero"}, {"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"}},
-    {{"HEROES2.CFG"}, {"%s"}, {"rb"}, {""}, {""}},
+    {{"HEROES2.CFG"}, {"%s"}, {"rb"}, {""}},
     {{""},
      {MISC_REGISTRY_KEY},
      {"Music Volume"},
@@ -221,8 +221,6 @@ static SMiscText gMiscText = {
      {"Computer Walk Speed"},
      {"Show Route"},
      {"Blackout Computer"},
-     {"Sound Quality"},
-     {"Use Opera"},
      {"Direct Connect Com Port"},
      {"Direct Connect Baud Rate"},
      {"Modem Com Port"},
@@ -260,8 +258,6 @@ static SMiscText gMiscText = {
      {"Editor Full Screen"},
      {"Editor Color Mouse Cursor"},
      {"AppPath"},
-     {""},
-     {"CDDrive"},
      {""}},
     {{"RMT%sRL.BIN"},
      {"RMT%sRC.BIN"},
@@ -278,8 +274,6 @@ static SMiscText gMiscText = {
      {"Computer Walk Speed"},
      {"Show Route"},
      {"Blackout Computer"},
-     {"Sound Quality"},
-     {"Use Opera"},
      {"Direct Connect Com Port"},
      {"Direct Connect Baud Rate"},
      {"Modem Com Port"},
@@ -316,18 +310,7 @@ static SMiscText gMiscText = {
      {"Editor Height"},
      {"Editor Full Screen"},
      {"Editor Color Mouse Cursor"}},
-    {{"A:\\"},
-     {".\\DATA\\HEROES2.AGG"},
-     {"%s\\heroes2\\anim\\voy24.smk"},
-     {"%s"},
-     {"open %c: type cdaudio alias CD"},
-     {"info CD UPC wait"},
-     {"close CD"},
-     {"%c:\\heroes2\\anim\\voy24.smk"},
-     {MISC_REGISTRY_KEY},
-     {"%c:"},
-     {"CDDrive"},
-     {"%c:%s"}},
+    {{".\\DATA\\HEROES2.AGG"}, {".\\HEROES2\\ANIM\\VOY24.SMK"}},
     {{"KB.LOG"},
      {"===========New Log=========="},
      {"\n"},
@@ -768,7 +751,6 @@ void SetInstallDefaults(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
     strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
-    gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 
 void SetGameDefaults(void) {
@@ -798,7 +780,6 @@ void SetGameDefaults(void) {
     gConfig.combatShadeLevel = 0;
     gConfig.combatArmyInfoLevel = 0;
     gConfig.evilInterfaceUsage = 0;
-    gConfig.useOpera = CONFIG_OPERA_ENABLED;
     gConfig.quickCombatLevel = 0;
     gConfig.combatSpeed = 0;
     gConfig.autoCombatUseSpells = 0;
@@ -837,7 +818,6 @@ void ReadPrefsFromFile(void) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
         strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
-        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
     } else {
         FILE* f = fopen(gText, gMiscText.readFile.binaryMode.text);
         if (f == NULL)
@@ -851,7 +831,6 @@ void ReadPrefsFromFile(void) {
     UpdateSystemOptionsMenu();
     WritePrefsToRegistry();
 skipDefaults:
-    strcpy(gcRegCDRomPath, gMiscText.readFile.cdRomPathDefault.text);
     strcpy(gcRegAppPath, gMiscText.readFile.appPathDefault.text);
 }
 
@@ -890,7 +869,6 @@ void ReadPrefsFromRegistry(void) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
         strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
-        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         SetGameDefaults();
         RegCloseKey(hKey);
         UpdateSystemOptionsMenu();
@@ -943,22 +921,6 @@ void ReadPrefsFromRegistry(void) {
         NULL,
         &dwType,
         reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.soundQuality.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.musicSource),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        gMiscText.readRegistry.useOpera.text,
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.useOpera),
         &dwSize
     );
     RegQueryValueExA(
@@ -1265,16 +1227,6 @@ void ReadPrefsFromRegistry(void) {
         )
         != 0)
         strcpy(gcRegAppPath, gMiscText.readRegistry.appPathDefault.text);
-    if (RegQueryValueExA(
-            hKey,
-            gMiscText.readRegistry.cdDrive.text,
-            NULL,
-            &dwType,
-            reinterpret_cast<u8*>(gcRegCDRomPath),
-            &dwSize
-        )
-        != 0)
-        strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].width <= 0)
@@ -1374,22 +1326,6 @@ void WritePrefsToRegistry(void) {
         0,
         REG_DWORD,
         reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.soundQuality.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.musicSource),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        gMiscText.writeRegistry.useOpera.text,
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.useOpera),
         REGISTRY_DWORD_BYTES
     );
     RegSetValueExA(
@@ -1688,21 +1624,21 @@ void WritePrefs(void) {
     WritePrefsToRegistry();
 }
 
-CDRomSetupResult SetupCDDrive(void) {
-    sprintf(gText, gMiscText.cd.dataArchive.text);
+GameDataStatus VerifyGameData(void) {
+    sprintf(gText, gMiscText.media.dataArchive.text);
     i32 file = open(gText, _O_BINARY);
     if (file == -1)
-        return CD_ROM_DATA_FILES_MISSING;
+        return GAME_DATA_MISSING;
     close(file);
 
-    sprintf(gText, gMiscText.cd.configuredAnimationPath.text, ".");
+    sprintf(gText, gMiscText.media.animationFile.text);
     file = open(gText, _O_BINARY);
     if (file == -1)
-        return CD_ROM_DATA_FILES_MISSING;
+        return GAME_DATA_MISSING;
     close(file);
 
     strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
-    return CD_ROM_READY;
+    return GAME_DATA_READY;
 }
 
 void BitmapToScreen(class bitmap* bmp) {
