@@ -1,5 +1,5 @@
-#ifndef HOMM2_PLATFORM_WIN32_IO_H
-#define HOMM2_PLATFORM_WIN32_IO_H
+#ifndef HOMM2_PLATFORM_LEGACYFILE_H
+#define HOMM2_PLATFORM_LEGACYFILE_H
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -35,6 +35,9 @@ int _chdir(const char* path);
 int _mkdir(const char* path);
 char* _getcwd(char* buffer, int length);
 int _unlink(const char* path);
+int _rmdir(const char* path);
+int _chdrive(int drive);
+int _getdrive();
 
 char* _itoa(int value, char* buffer, int radix);
 

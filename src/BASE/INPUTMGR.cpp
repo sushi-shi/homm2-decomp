@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <string.h>
-#include <windows.h>
+#include <PLATFORM/Input.h>
 #include <BASE/mouseManager.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/Misc.h>
@@ -16,7 +16,8 @@ enum class InputManagerScanCodeEncoding : i32 {
     SCAN_CODE_MASK          = 0xff,
     WINDOWS_HIGH_WORD_SHIFT = 16,
     ENCODED_SCAN_CODE_SHIFT = 8,
-    ASCII_DELETE_CODE       = 0x7f
+    ASCII_DELETE_CODE       = 0x7f,
+    VIRTUAL_KEY_ENTER       = 0x0d
 };
 using enum InputManagerScanCodeEncoding;
 
@@ -65,12 +66,17 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
     event->type = MESSAGE_NONE;
 
     switch (message) {
-        case WM_KEYDOWN:
+        case platform::INPUT_MESSAGE_KEY_DOWN:
             event->type = MESSAGE_KEY_DOWN;
-            if (virtualKey == VK_RETURN)
+            if (virtualKey == H2EnumIndex(VIRTUAL_KEY_ENTER))
                 event->payload.keyboard.keyCode = INPUT_SCAN_ENTER;
             else
-                event->payload.keyboard.keyCode = HIWORD(messageData) & H2EnumIndex(SCAN_CODE_MASK);
+                event->payload.keyboard.keyCode =
+                    static_cast<u16>(
+                        static_cast<u32l>(messageData)
+                        >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
+                    )
+                    & H2EnumIndex(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
@@ -88,12 +94,17 @@ i32 KeyboardMessageHandler(void*, u32 message, u32 virtualKey, i32l messageData)
                     break;
             }
             break;
-        case WM_KEYUP:
+        case platform::INPUT_MESSAGE_KEY_UP:
             event->type = MESSAGE_KEY_UP;
-            if (virtualKey == VK_RETURN)
+            if (virtualKey == H2EnumIndex(VIRTUAL_KEY_ENTER))
                 event->payload.keyboard.keyCode = INPUT_SCAN_ENTER;
             else
-                event->payload.keyboard.keyCode = HIWORD(messageData) & H2EnumIndex(SCAN_CODE_MASK);
+                event->payload.keyboard.keyCode =
+                    static_cast<u16>(
+                        static_cast<u32l>(messageData)
+                        >> H2EnumIndex(WINDOWS_HIGH_WORD_SHIFT)
+                    )
+                    & H2EnumIndex(SCAN_CODE_MASK);
             event->payload.keyboard.unknown0x08 = 0;
             event->payload.keyboard.modifiers = MESSAGE_MODIFIER_NONE;
             switch (event->payload.keyboard.keyCode) {
@@ -159,25 +170,25 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     event->type = MESSAGE_NONE;
 
     switch (message) {
-        case WM_MOUSEMOVE:
+        case platform::INPUT_MESSAGE_MOUSE_MOVE:
             event->type = MESSAGE_MOUSE_MOVE;
             goto mouseCoordinates;
-        case WM_LBUTTONDBLCLK:
+        case platform::INPUT_MESSAGE_LEFT_DOUBLE:
             event->type = MESSAGE_LEFT_BUTTON_DOWN;
             goto mouseCoordinates;
-        case WM_LBUTTONDOWN:
+        case platform::INPUT_MESSAGE_LEFT_DOWN:
             event->type = MESSAGE_LEFT_BUTTON_DOWN;
             goto mouseCoordinates;
-        case WM_RBUTTONDOWN:
+        case platform::INPUT_MESSAGE_RIGHT_DOWN:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
             goto mouseCoordinates;
-        case WM_RBUTTONDBLCLK:
+        case platform::INPUT_MESSAGE_RIGHT_DOUBLE:
             event->type = MESSAGE_RIGHT_BUTTON_DOWN;
             goto mouseCoordinates;
-        case WM_LBUTTONUP:
+        case platform::INPUT_MESSAGE_LEFT_UP:
             event->type = MESSAGE_LEFT_BUTTON_UP;
             goto mouseCoordinates;
-        case WM_RBUTTONUP:
+        case platform::INPUT_MESSAGE_RIGHT_UP:
             event->type = MESSAGE_RIGHT_BUTTON_UP;
         mouseCoordinates:
             event->payload.mouse.x = static_cast<i16>(messageData);
@@ -202,7 +213,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
             break;
     }
 
-    if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
+    if (message == platform::INPUT_MESSAGE_MOUSE_MOVE && gpMouseManager != NULL) {
         CheckChangeCursor(event->payload.mouse.x, event->payload.mouse.y, 0);
     }
 

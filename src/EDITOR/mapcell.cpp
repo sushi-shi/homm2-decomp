@@ -4,7 +4,7 @@
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 
 typedef enum MapCellExtraConstant {
     EXTRA_ALLOCATION_STEP = 100

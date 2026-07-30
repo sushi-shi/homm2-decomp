@@ -5,6 +5,18 @@
 
 namespace platform {
 
+enum InputMessageCode : unsigned {
+    INPUT_MESSAGE_KEY_DOWN = 0x100,
+    INPUT_MESSAGE_KEY_UP = 0x101,
+    INPUT_MESSAGE_MOUSE_MOVE = 0x200,
+    INPUT_MESSAGE_LEFT_DOWN = 0x201,
+    INPUT_MESSAGE_LEFT_UP = 0x202,
+    INPUT_MESSAGE_LEFT_DOUBLE = 0x203,
+    INPUT_MESSAGE_RIGHT_DOWN = 0x204,
+    INPUT_MESSAGE_RIGHT_UP = 0x205,
+    INPUT_MESSAGE_RIGHT_DOUBLE = 0x206,
+};
+
 struct Event {
     enum class Type {
         None,

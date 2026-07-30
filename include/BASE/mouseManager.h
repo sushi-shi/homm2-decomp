@@ -2,7 +2,6 @@
 #define HOMM2_BASE_MOUSEMANAGER_H
 
 #include <Ints.h>
-#include <windows.h>
 #include "baseManager.h"
 
 struct tag_message;
@@ -96,11 +95,4 @@ extern i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT];
 extern b32 gbInSetPointer;
 extern i32 bInNewMouseUpdate;
-extern BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-extern HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-extern void* cAndBits[MOUSE_CURSOR_COUNT];
-extern void* cColorBits[MOUSE_CURSOR_COUNT];
-extern ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
-extern HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
-
 #endif

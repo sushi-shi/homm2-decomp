@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 
 highScoreManager::highScoreManager(void) {
     i32 entry;

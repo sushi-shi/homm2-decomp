@@ -2,7 +2,6 @@
 #include <BASE/mouseManager.h>
 #include <string.h>
 #include <stdio.h>
-#include <windows.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/bitmap.h>
 #include <BASE/icon.h>
@@ -32,14 +31,8 @@ typedef enum MouseManagerLocalConstant {
 
 static i32 gOldMouseLeft = 0;
 static i32 gOldMouseTop = 0;
-BITMAP bmpAndMask[MOUSE_CURSOR_COUNT] = {0};
 static i32 gOldMouseRight = 0;
-HICON hMouseCursor[MOUSE_CURSOR_COUNT] = {NULL};
-HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT] = {NULL};
-void* cColorBits[MOUSE_CURSOR_COUNT] = {NULL};
 static i32 gOldMouseBottom = 0;
-ICONINFO IconInfo[MOUSE_CURSOR_COUNT] = {0};
-void* cAndBits[MOUSE_CURSOR_COUNT] = {NULL};
 b32 gbInSetPointer = false;
 i32 bInNewMouseUpdate = 0;
 
@@ -84,10 +77,6 @@ mouseManager::mouseManager(void) : baseManager() {
     m_cursorIcon = NULL;
     m_cursorReady = 1;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
-        cAndBits[i] = NULL;
-        cColorBits[i] = NULL;
-        hMouseCursor[i] = NULL;
-        hbmpAndMask[i] = NULL;
         if (iHotSpot[i][MOUSE_CURSOR_HORIZONTAL] == MOUSE_DEFAULT_HOTSPOT)
             iHotSpot[i][MOUSE_CURSOR_HORIZONTAL] =
                 iMouseSize[i][MOUSE_CURSOR_VERTICAL] / HOTSPOT_CENTER_DIVISOR;
@@ -113,7 +102,7 @@ i32 mouseManager::Open(i32 priority) {
     m_cursorSizeIndex = 0;
     m_drawnCursorSizeIndex = 0;
     if (gbColorMice != 0)
-        ShowCursor(0);
+        platform::Video().ShowCursor(false);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
     m_priority = priority;
     m_active = true;
@@ -121,28 +110,13 @@ i32 mouseManager::Open(i32 priority) {
 }
 
 void mouseManager::Close(void) {
-    i32 cursorIndex;
     if (m_active != 1)
         return;
     m_active = false;
     if (m_savedUnderlying != NULL)
         delete m_savedUnderlying;
     m_savedUnderlying = NULL;
-    SetCursor(LoadCursorA(NULL, IDC_ARROW));
-    for (cursorIndex = 0; cursorIndex < MOUSE_CURSOR_COUNT; cursorIndex++) {
-        if (hMouseCursor[cursorIndex] != NULL)
-            DestroyIcon(hMouseCursor[cursorIndex]);
-        hMouseCursor[cursorIndex] = NULL;
-        if (cAndBits[cursorIndex] != NULL)
-            H2_FREE(cAndBits[cursorIndex]);
-        cAndBits[cursorIndex] = NULL;
-        if (cColorBits[cursorIndex] != NULL)
-            H2_FREE(cColorBits[cursorIndex]);
-        cColorBits[cursorIndex] = NULL;
-        if (hbmpAndMask[cursorIndex] != NULL)
-            DeleteObject(hbmpAndMask[cursorIndex]);
-        hbmpAndMask[cursorIndex] = NULL;
-    }
+    platform::Video().ShowCursor(true);
     if (m_cursorIcon != NULL)
         gpResourceManager->Dispose(m_cursorIcon);
     m_cursorIcon = NULL;
@@ -227,97 +201,9 @@ void mouseManager::SetPointer(i32 frame) {
 
     if (gbColorMice != 0) {
         NewUpdate(1);
-        goto done;
+    } else {
+        platform::Video().ShowCursor(true);
     }
-    if (hMouseCursor[m_cursorSizeIndex] == NULL) {
-        cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES);
-        cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES);
-
-        char filename[RESOURCE_NAME_CAPACITY];
-        if (m_cursorType == MOUSE_CURSOR_ADVENTURE)
-            sprintf(
-                filename,
-                MOUSE_MANAGER_ADVENTURE_BITMAP,
-                frame + 1
-            );
-        else if (m_cursorType == MOUSE_CURSOR_SPELL)
-            sprintf(
-                filename,
-                MOUSE_MANAGER_SPELL_BITMAP,
-                frame
-            );
-        else
-            sprintf(
-                filename,
-                MOUSE_MANAGER_COMBAT_BITMAP,
-                frame + 1
-            );
-
-        gpResourceManager->PointToFile(gpResourceManager->MakeId(filename, 1));
-        gpResourceManager->ReadBlock(
-            reinterpret_cast<i8*>(cColorBits[m_cursorSizeIndex]),
-            MOUSE_CURSOR_BITMAP_HEADER_BYTES
-        );
-        gpResourceManager->ReadBlock(
-            reinterpret_cast<i8*>(cColorBits[m_cursorSizeIndex]),
-            MOUSE_CURSOR_COLOR_BYTES
-        );
-        memset(cAndBits[m_cursorSizeIndex], 0, MOUSE_CURSOR_AND_BYTES);
-        {
-            i32 x;
-            i32 y;
-            for (y = 0; y < MOUSE_CURSOR_BITMAP_WIDTH; y++) {
-                for (x = 0; x < MOUSE_CURSOR_BITMAP_WIDTH; x++) {
-                    if (*(static_cast<u8*>(cColorBits[m_cursorSizeIndex]) + x
-                          + y * MOUSE_CURSOR_BITMAP_WIDTH)
-                        == 0)
-                        *(static_cast<u8*>(cAndBits[m_cursorSizeIndex])
-                          + y * MOUSE_CURSOR_MASK_ROW_BYTES
-                          + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
-                            1
-                            << (MOUSE_CURSOR_MASK_HIGH_BIT
-                                - (x & MOUSE_CURSOR_MASK_HIGH_BIT));
-                    else if (*(static_cast<u8*>(cColorBits[m_cursorSizeIndex]) + x
-                               + y * MOUSE_CURSOR_BITMAP_WIDTH)
-                             == 1)
-                        *(static_cast<u8*>(cAndBits[m_cursorSizeIndex])
-                          + MOUSE_CURSOR_MASK_PLANE_BYTES + y * MOUSE_CURSOR_MASK_ROW_BYTES
-                          + (x >> MOUSE_CURSOR_MASK_SHIFT)) |=
-                            1
-                            << (MOUSE_CURSOR_MASK_HIGH_BIT
-                                - (x & MOUSE_CURSOR_MASK_HIGH_BIT));
-                }
-            }
-        }
-
-        bmpAndMask[m_cursorSizeIndex].bmType = 0;
-        bmpAndMask[m_cursorSizeIndex].bmWidth = MOUSE_CURSOR_BITMAP_WIDTH;
-        bmpAndMask[m_cursorSizeIndex].bmHeight = MOUSE_CURSOR_MASK_HEIGHT;
-        bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
-        bmpAndMask[m_cursorSizeIndex].bmPlanes = MOUSE_CURSOR_BITMAP_PLANES;
-        bmpAndMask[m_cursorSizeIndex].bmBitsPixel = MOUSE_CURSOR_BITMAP_BITS_PER_PIXEL;
-        bmpAndMask[m_cursorSizeIndex].bmWidthBytes = MOUSE_CURSOR_MASK_ROW_BYTES;
-        bmpAndMask[m_cursorSizeIndex].bmBits = cAndBits[m_cursorSizeIndex];
-        hbmpAndMask[m_cursorSizeIndex] = CreateBitmapIndirect(&bmpAndMask[m_cursorSizeIndex]);
-        H2_ASSERT(reinterpret_cast<i32>(hbmpAndMask[m_cursorSizeIndex]));
-
-        IconInfo[m_cursorSizeIndex].fIcon = 0;
-        if (m_cursorType == MOUSE_CURSOR_SPELL) {
-            IconInfo[m_cursorSizeIndex].xHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
-            IconInfo[m_cursorSizeIndex].yHotspot = MOUSE_SPELL_CURSOR_HOTSPOT;
-        } else {
-            IconInfo[m_cursorSizeIndex].xHotspot =
-                iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-            IconInfo[m_cursorSizeIndex].yHotspot =
-                iHotSpot[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
-        }
-        IconInfo[m_cursorSizeIndex].hbmMask = hbmpAndMask[m_cursorSizeIndex];
-        IconInfo[m_cursorSizeIndex].hbmColor = NULL;
-        hMouseCursor[m_cursorSizeIndex] = CreateIconIndirect(&IconInfo[m_cursorSizeIndex]);
-        H2_ASSERT(reinterpret_cast<i32>(hMouseCursor[m_cursorSizeIndex]));
-    }
-    SetCursor(hMouseCursor[m_cursorSizeIndex]);
-done:
     gpResourceManager->RestorePosition();
     gbPutzingWithMouseCtr--;
     gbInSetPointer = false;
@@ -531,7 +417,7 @@ void mouseManager::ReallyHidePointer(void) {
     if (gbColorMice != 0) {
         HideColorPointer();
     } else {
-        ShowCursor(0);
+        platform::Video().ShowCursor(false);
     }
 }
 
@@ -539,7 +425,7 @@ void mouseManager::ReallyShowPointer(void) {
     if (gbColorMice != 0) {
         ShowColorPointer();
     } else {
-        ShowCursor(1);
+        platform::Video().ShowCursor(true);
     }
 }
 

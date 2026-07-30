@@ -2,7 +2,7 @@
 #include <BASE/Bzip.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdio.h>

@@ -10,7 +10,7 @@
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <math.h>

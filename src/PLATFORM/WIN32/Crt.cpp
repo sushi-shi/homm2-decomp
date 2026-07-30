@@ -1,4 +1,4 @@
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 
 #include <cctype>
 #include <cstdarg>

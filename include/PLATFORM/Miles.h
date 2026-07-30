@@ -1,5 +1,5 @@
-#ifndef HOMM2_PLATFORM_WIN32_MSS_H
-#define HOMM2_PLATFORM_WIN32_MSS_H
+#ifndef HOMM2_PLATFORM_MILES_H
+#define HOMM2_PLATFORM_MILES_H
 
 typedef int S32;
 typedef unsigned int U32;

@@ -1,5 +1,5 @@
-#include <mss.h>
-#include <smack.h>
+#include <PLATFORM/Miles.h>
+#include <PLATFORM/Smacker.h>
 #include <windows.h>
 
 #include <Ints.h>

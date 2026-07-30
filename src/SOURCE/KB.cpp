@@ -33,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <io.h>
+#include <PLATFORM/LegacyFile.h>
 
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>

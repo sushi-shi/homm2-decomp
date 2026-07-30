@@ -6,13 +6,13 @@
 #include <BASE/MusicFlags.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
-#include <mss.h>
+#include <PLATFORM/Miles.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <windows.h>
 #include <BASE/Misc.h>
 #include <audiere.h>
 
@@ -42,8 +42,6 @@ typedef enum SoundSampleStatus {
 } SoundSampleStatus;
 
 
-static WAVEOUTCAPSA gWaveOutCaps = {0};
-static PCMWAVEFORMAT gWaveFormat = {0};
 #define NORMALIZED_VOLUME_MAX 127.0f
 
 bool gSoundDisabled = false;
@@ -72,34 +70,10 @@ bool soundManager::StartupMilesBackend(void) {
         return false;
 
     m_backend = SOUND_BACKEND_MILES;
-    if (waveOutGetNumDevs() == 0) {
-        m_digitalDriver = NULL;
-        return false;
-    }
-    if (waveOutGetDevCapsA(0, &gWaveOutCaps, sizeof(gWaveOutCaps)) != 0) {
-        platform::ShowMessage(
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
-            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
-                "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
-                "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee."
-        );
-        m_digitalDriver = NULL;
-        return false;
-    }
     AIL_startup();
     AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
 
-    u32l sampleRate = DEFAULT_SAMPLE_RATE;
-    u16 bits = DEFAULT_SAMPLE_BITS;
-    u16 channels = DEFAULT_SAMPLE_CHANNELS;
-    gWaveFormat.wf.wFormatTag = 1;
-    gWaveFormat.wf.nChannels = channels;
-    gWaveFormat.wf.nSamplesPerSec = sampleRate;
-    gWaveFormat.wf.nAvgBytesPerSec =
-        sampleRate * (bits / DEFAULT_SAMPLE_BITS) * channels;
-    gWaveFormat.wf.nBlockAlign = (bits / DEFAULT_SAMPLE_BITS) * channels;
-    gWaveFormat.wBitsPerSample = bits;
-    if (AIL_waveOutOpen(&m_digitalDriver, NULL, 0, &gWaveFormat.wf) != 0) {
+    if (AIL_waveOutOpen(&m_digitalDriver, NULL, 0, NULL) != 0) {
         platform::ShowMessage(
             "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
                 "\xe7\xe2\xf3\xea\xe0!",
@@ -124,9 +98,7 @@ bool soundManager::CDStartup(void) {
         return false;
 
     m_backend = SOUND_BACKEND_AUDIERE;
-    m_audiereDevice = audiere::OpenDevice(
-        "winmm"
-    );
+    m_audiereDevice = audiere::OpenDevice();
     if (m_audiereDevice != NULL)
         return StartupAudiereMusic(m_audiereDevice);
     return false;
@@ -175,7 +147,6 @@ soundManager::soundManager(void) : baseManager() {
 }
 
 i32 soundManager::Open(i32) {
-    i32 asyncState;
     i32 musicTrack;
 
     memset(bSaveMusicPosition, 0, MIDI_TRACK_COUNT);
@@ -214,13 +185,11 @@ i32 soundManager::Open(i32) {
     for (musicTrack = 2; musicTrack <= 4; musicTrack++)
         bMusicIsLooping[musicTrack] = 1;
 
-    asyncState = GetAsyncKeyState(VK_F6);
-    if (HIBYTE(asyncState)) {
+    if (platform::Input().IsKeyDown(platform::Key::F6)) {
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
         WritePrefs();
     }
-    asyncState = GetAsyncKeyState(VK_F7);
-    if (HIBYTE(asyncState)) {
+    if (platform::Input().IsKeyDown(platform::Key::F7)) {
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         WritePrefs();
     }
