@@ -32,7 +32,11 @@ int _open(const char* path, int flags, ...) {
     }
 
     const std::string resolved = platform::win32::ResolvePath(path);
-    return ::open(resolved.c_str(), flags, mode);
+    const int file = ::open(resolved.c_str(), flags, mode);
+    if (file >= 0 && (flags & O_CREAT) != 0) {
+        ::fchmod(file, mode);
+    }
+    return file;
 }
 
 int _close(int file) { return ::close(file); }

@@ -818,14 +818,12 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         gMiscText.readFile.configFilename.text
     );
-    if (access(gText, 0) == -1) {
+    FILE* f = access(gText, 0) == -1 ? NULL : fopen(gText, gMiscText.readFile.binaryMode.text);
+    if (f == NULL) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
         strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     } else {
-        FILE* f = fopen(gText, gMiscText.readFile.binaryMode.text);
-        if (f == NULL)
-            FileError(gText);
         fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
         fclose(f);
         if (gConfig.needsDefaultInitialization == 0)
