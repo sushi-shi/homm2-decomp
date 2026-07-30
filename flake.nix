@@ -54,7 +54,7 @@
             !(base == "build" || base == ".git" || base == "result");
         };
         nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
-        buildInputs = [ p32.sdl3 ];
+        buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
         cmakeFlags = [
           "-DHOMM2_PLATFORM=SDL3"
           "-DCMAKE_BUILD_TYPE=${if debug then "Debug" else "RelWithDebInfo"}"
@@ -123,7 +123,7 @@
 
       devShells.${system}.default = p32.mkShell {
         nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
-        buildInputs = [ p32.sdl3 ];
+        buildInputs = [ p32.ffmpeg-headless p32.sdl3 ];
       };
     };
 }

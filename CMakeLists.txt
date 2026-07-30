@@ -39,6 +39,7 @@ target_include_directories(homm2_platform PRIVATE
 if(HOMM2_PLATFORM STREQUAL "SDL3")
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(SDL3 REQUIRED IMPORTED_TARGET sdl3)
+  pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET libavcodec libavformat libavutil)
   target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3)
 endif()
 
@@ -76,7 +77,7 @@ target_compile_options(homm2 PRIVATE
   -fpermissive)
 
 target_link_options(homm2 PRIVATE -rdynamic)
-target_link_libraries(homm2 PRIVATE homm2_platform)
+target_link_libraries(homm2 PRIVATE homm2_platform PkgConfig::FFMPEG)
 
 list(LENGTH HOMM2_GAME_SOURCES HOMM2_GAME_SOURCE_COUNT)
 message(STATUS "homm2: ${HOMM2_GAME_SOURCE_COUNT} game units, ${HOMM2_PLATFORM}")
