@@ -491,7 +491,8 @@ void game::CampaignInfoUpdate(i32 redraw) {
 
     message.type = MESSAGE_WIDGET;
     for (mapIndex = 0; mapIndex < CAMPAIGN_TRACK_POINT_COUNT; ++mapIndex) {
-        if (m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][mapIndex]) {
+        if (mapIndex < CAMPAIGN_MAP_COUNT
+            && m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][mapIndex]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_COMPLETE;
         } else if (mapIndex < CAMPAIGN_REGULAR_MAP_COUNT
                    && m_campaignScenarioCompleted
