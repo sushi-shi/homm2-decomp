@@ -261,9 +261,6 @@ BOOL FindClose(HANDLE find) {
     return TRUE;
 }
 
-DWORD GetLogicalDrives() { return 1u << 2; }
-UINT GetDriveTypeA(LPCSTR) { return DRIVE_FIXED; }
-
 void InitializeCriticalSection(LPCRITICAL_SECTION section) {
     if (section != nullptr) {
         section->opaque = new std::recursive_mutex();
