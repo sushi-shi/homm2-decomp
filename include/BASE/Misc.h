@@ -101,8 +101,6 @@ void ReadPrefs(void);
 void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
-i32 IsCDDrive(i32);
-bool DriveSupportsFreeSpaceQuery(char);
 CDRomSetupResult SetupCDDrive(void);
 void BitmapToScreen(class bitmap*);
 void SetPalette(i8*, i32);

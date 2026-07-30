@@ -147,7 +147,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     for (player = 0; player < REMOTE_QUEUE_CAPACITY; player++)
         rcvBuf[player] = NULL;
     LogStr("RM 5");
-    memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
+    memset(iLastIds, 0, sizeof(iLastIds));
     GameMode = gameMode;
     LogStr("RM 6");
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));

@@ -80,17 +80,6 @@ typedef enum MiscGameDefaultConstant {
     UNIQUE_ID_TERMINATOR_INDEX   = 3
 } MiscGameDefaultConstant;
 
-typedef enum MiscCDDriveConstant {
-    CD_FIRST_DRIVE_INDEX        = 2,
-    CD_DRIVE_SLOT_COUNT         = 26,
-    CD_PATH_BUFFER_SIZE         = 100,
-    CD_DRIVE_QUERY_PATH_SIZE    = 256,
-    CD_READ_BUFFER_SIZE         = 256,
-    CD_PROBE_TRAILER_SIZE       = 100,
-    CD_RETRY_DELAY_MILLISECONDS = 3000,
-    CD_RETRY_LIMIT              = 2
-} MiscCDDriveConstant;
-
 typedef enum PCXConstant {
     MANUFACTURER_ZSOFT    = 10,
     VERSION_3_0           = 5,
@@ -1424,114 +1413,21 @@ void WritePrefs(void) {
     WritePrefsToRegistry();
 }
 
-i32 IsCDDrive(i32 driveIndex) {
-    sprintf(gText, "A:\\");
-    gText[0] += driveIndex;
-    return GetDriveTypeA(gText) == DRIVE_CDROM;
-}
-
-bool DriveSupportsFreeSpaceQuery(char driveLetter) {
-    UINT oldMode;
-    char szPath[CD_DRIVE_QUERY_PATH_SIZE];
-    ULARGE_INTEGER availToCaller;
-    ULARGE_INTEGER total;
-    ULARGE_INTEGER freeBytes;
-
-    wsprintfA(szPath, "%c:", driveLetter);
-    oldMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    if (GetDiskFreeSpaceExA(szPath, &availToCaller, &total, &freeBytes) != 0) {
-        SetErrorMode(oldMode);
-        return true;
-    } else {
-        SetErrorMode(oldMode);
-        return false;
-    }
-}
-
 CDRomSetupResult SetupCDDrive(void) {
-    u32l dwErr;
-    u32l drives;
-    i32 i;
-    i32 handle;
-    i32 j;
-    i32 cdrom[CD_DRIVE_SLOT_COUNT];
-    char buffer[CD_READ_BUFFER_SIZE];
-    i32 status;
-    i32 num;
-    HKEY hKey;
-    char szKey[CD_PATH_BUFFER_SIZE];
-
     sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
-    handle = open(gText, _O_BINARY);
-    if (handle == -1) {
-        if (_chdir(gcRegAppPath) == -1)
-            return CD_ROM_GAME_DIRECTORY_MISSING;
-        handle = open(gText, _O_BINARY);
-        if (handle == -1)
-            return CD_ROM_DATA_FILES_MISSING;
-    }
-    close(handle);
+    i32 file = open(gText, _O_BINARY);
+    if (file == -1)
+        return CD_ROM_DATA_FILES_MISSING;
+    close(file);
 
-    drives = GetLogicalDrives();
-    memset(cdrom, 0, CD_DRIVE_SLOT_COUNT);
-    for (i = CD_FIRST_DRIVE_INDEX, j = 0; i < CD_DRIVE_SLOT_COUNT; ++i) {
-        if (drives & (1 << i)) {
-            if (IsCDDrive(i)) {
-                cdrom[j] = i;
-                ++j;
-            }
-        }
-    }
-    num = j;
+    sprintf(gText, "%s%s", ".", gcCDTrackName);
+    file = open(gText, _O_BINARY);
+    if (file == -1)
+        return CD_ROM_DATA_FILES_MISSING;
+    close(file);
 
-    if (strlen(gcRegCDRomPath) > 0 && gcRegCDRomPath[0] >= 'A' && gcRegCDRomPath[0] <= 'Z'
-        && DriveSupportsFreeSpaceQuery(gcRegCDRomPath[0])) {
-        sprintf(gText, "%s%s", gcRegCDRomPath, gcCDTrackName);
-        handle = open(gText, _O_BINARY);
-        if (handle != -1) {
-            close(handle);
-            return CD_ROM_READY;
-        }
-    }
-    if (num <= 0)
-        return CD_ROM_DRIVE_UNAVAILABLE;
-
-    for (i = 0; i < CD_RETRY_LIMIT; ++i) {
-        for (j = 0; j < num; ++j) {
-            if (DriveSupportsFreeSpaceQuery(cdrom[j] + 'A')) {
-                sprintf(gText, "%c:%s", cdrom[j] + 'A', gcCDTrackName);
-                handle = open(gText, _O_BINARY);
-                if (handle == -1)
-                    continue;
-                status = _lseek(handle, 0, SEEK_END);
-                if (status != -1) {
-                    status = _lseek(handle, -CD_PROBE_TRAILER_SIZE, SEEK_CUR);
-                    if (status != -1)
-                        status = read(handle, buffer, CD_PROBE_TRAILER_SIZE);
-                }
-                close(handle);
-                if (status != -1) {
-                    sprintf(gcRegCDRomPath, "%c:", cdrom[j] + 'A');
-                    strcpy(szKey, MISC_REGISTRY_KEY);
-                    hKey = NULL;
-                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_WRITE, &hKey) == 0) {
-                        RegSetValueExA(
-                            hKey,
-                            "HMM2POL CDDrive",
-                            0,
-                            REG_SZ,
-                            reinterpret_cast<u8*>(gcRegCDRomPath),
-                            strlen(gcRegCDRomPath) + 1
-                        );
-                        RegCloseKey(hKey);
-                    }
-                    return CD_ROM_READY;
-                }
-            }
-        }
-        Sleep(CD_RETRY_DELAY_MILLISECONDS);
-    }
-    return CD_ROM_EXPANSION_DISC_MISSING;
+    strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
+    return CD_ROM_READY;
 }
 
 void BitmapToScreen(class bitmap* bmp) {
