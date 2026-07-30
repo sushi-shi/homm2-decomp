@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/textEntryWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -14,18 +14,18 @@
 #include <BASE/icon.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(TextEntryKeyConstant)
+typedef enum TextEntryKeyConstant {
     ACCEPT_KEY         = 10,
     DELETE_KEY         = 0x7f,
     EXTENDED_KEY_SHIFT = 8,
     EXTENDED_KEY_MASK  = 0xff
-H2_ENUM_END(TextEntryKeyConstant)
+} TextEntryKeyConstant;
 
-H2_ENUM_BEGIN(TextEntrySourceFileConstant)
+typedef enum TextEntrySourceFileConstant {
     ENTRY_SOURCE_FILE_SLOT_SIZE = 0x2c
-H2_ENUM_END(TextEntrySourceFileConstant)
+} TextEntrySourceFileConstant;
 
-H2_ENUM_BEGIN(TextEntryConstant)
+typedef enum TextEntryConstant {
     RESOURCE_NAME_CAPACITY      = RESOURCE_MANAGER_READ13_BYTES,
     COLOR_MASK                  = 0xff,
     HORIZONTAL_INSET_SIDE_COUNT = 2,
@@ -38,18 +38,16 @@ H2_ENUM_BEGIN(TextEntryConstant)
     TEXT_ALLOCATION_PADDING     = 5,
     EDIT_ALLOCATION_PADDING     = 6,
     PRESERVE_TEXT_FLAG          = 1
-H2_ENUM_END(TextEntryConstant)
+} TextEntryConstant;
 
-H2_ENUM_BEGIN(InputManagerExtendedKey)
+typedef enum InputManagerExtendedKey {
     EXTENDED_KEY_BASE = 0x100
-// extended keys arrive as scan code << 8
-H2_ENUM_END(InputManagerExtendedKey)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
+} InputManagerExtendedKey;
+
 #define TEXT_ENTRY_MAIN_SOURCE_FILES                                                    \
-    DATA_COMPGEN(0x00520d44, textEntryWidgetMainSourceFiles, RETAIL_FILE "\0\0\0" RETAIL_FILE)
+    "Textntry.cpp" "\0\0\0" "Textntry.cpp"
 
-VA(0x004d8740, 0x2d)
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
     m_icon = NULL;
@@ -59,7 +57,6 @@ textEntryWidget::textEntryWidget(void) : textWidget() {
     m_displayOffset = 0;
 }
 
-VA(0x004d87b0, 0x134)
 textEntryWidget::textEntryWidget(
     i16 x,
     i16 y,
@@ -68,12 +65,12 @@ textEntryWidget::textEntryWidget(
     i16 maxLength,
     char* text,
     char* fontName,
-    H2_ENUM_PARAM(FontDrawMode, i16) color,
+    FontDrawMode color,
     char* iconName,
     i16 iconFrame,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
-    H2_ENUM_PARAM(TextEntryLayout, i16) layout,
+    WidgetKind kind,
+    TextEntryLayout layout,
     i32 horizontalInset,
     i32 verticalInset
 )
@@ -94,13 +91,8 @@ textEntryWidget::textEntryWidget(
     m_preserveTextOnFocus = 0;
     m_color = FONT_DRAW_DEFAULT;
     m_rectH = m_height;
-#line 61 RETAIL_FILE
     m_text = static_cast<char*>(
-        H2_ALLOC_AT(
-            static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING,
-            DATA_COMPGEN(0x00520cec, textEntryWidgetConstructorSourceFile, RETAIL_FILE),
-            62
-        )
+        H2_ALLOC(static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING)
     );
     strcpy(m_text, text);
     if (layout == TEXT_ENTRY_LAYOUT_INSET) {
@@ -112,26 +104,19 @@ textEntryWidget::textEntryWidget(
     }
 }
 
-VA(0x004d88f0, 0x21)
 inline textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-VA(0x004d8920, 0x26c)
-void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
+void textEntryWidget::Read(TextEntryReadMode type) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     m_maxLength = gpResourceManager->ReadWord();
-#line 99
     m_text = static_cast<char*>(
-        H2_ALLOC_AT(
-            m_maxLength + TEXT_ALLOCATION_PADDING,
-            DATA_COMPGEN(0x00520d18, textEntryWidgetReadSourceFile, RETAIL_FILE "\0"),
-            99
-        )
+        H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING)
     );
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
@@ -189,9 +174,8 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
-VA(0x004d8b90, 0x874)
 MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -333,15 +317,8 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                     }
                                     if (typed != 0) {
                                         strcpy(scratch, m_text);
-#line 388
-                                        H2_FREE_AT(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
-#line 389
-                                        m_text = static_cast<char*>(H2_ALLOC_AT(
-                                            strlen(edit) + EDIT_ALLOCATION_PADDING,
-                                            TEXT_ENTRY_MAIN_SOURCE_FILES
-                                                + ENTRY_SOURCE_FILE_SLOT_SIZE,
-                                            389
-                                        ));
+                                        H2_FREE(m_text);
+                                        m_text = static_cast<char*>(H2_ALLOC(strlen(edit) + EDIT_ALLOCATION_PADDING));
                                         strcpy(scratch, edit);
                                         scratch[m_cursorPosition] = typed;
                                         scratch[m_cursorPosition + 1] = 0;
@@ -404,7 +381,6 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     return widget::Main(message);
 }
 
-VA(0x004d9410, 0x160)
 void textEntryWidget::Draw(void) {
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         char display[EDIT_BUFFER_CAPACITY];
@@ -429,7 +405,7 @@ void textEntryWidget::Draw(void) {
     } else {
         m_icon->DrawToBuffer(m_rectX + m_owner->m_posX, m_rectY + m_owner->m_posY, m_iconFrame, ICON_DRAW_NORMAL);
         FontDrawMode color = FONT_DRAW_DIMMED;
-        if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
+        if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))))
             color = m_color;
         m_font->DrawBoundedString(
             m_text,
@@ -443,7 +419,6 @@ void textEntryWidget::Draw(void) {
     }
 }
 
-VA(0x004d9570, 0x1be)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     if (KBTickCount() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;
@@ -488,8 +463,3 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
         }
     }
 }
-
-
-VTBL(textEntryWidget, 0x004ebaa0);
-
-#undef RETAIL_FILE

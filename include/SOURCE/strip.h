@@ -1,7 +1,7 @@
 #ifndef HOMM2_SOURCE_STRIP_H
 #define HOMM2_SOURCE_STRIP_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
 class armyGroup;
@@ -9,7 +9,7 @@ class border;
 class heroWindow;
 class icon;
 
-H2_ENUM_BEGIN(StripConstant)
+typedef enum StripConstant {
     STRIP_ARMY_SLOT_COUNT       = 5,
     STRIP_BORDER_COUNT          = 6,
     STRIP_RUNTIME_GAP_SIZE      = 0x18,
@@ -29,7 +29,7 @@ H2_ENUM_BEGIN(StripConstant)
     STRIP_QUANTITY_Y            = 0x56,
     STRIP_QUANTITY_WIDTH        = 0x4d,
     STRIP_QUANTITY_HEIGHT       = 0xd
-H2_ENUM_END(StripConstant)
+} StripConstant;
 
 #pragma pack(push, 1)
 class strip {
@@ -43,7 +43,7 @@ public:
     border* m_borders[STRIP_BORDER_COUNT];
     icon* m_stripIcon;
     icon* m_creatureIcons[STRIP_ARMY_SLOT_COUNT];
-    H2_ENUM_STORAGE(CreatureType, i32) m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
+    H2EnumStorage<CreatureType, i32> m_cachedCreatureTypes[STRIP_ARMY_SLOT_COUNT];
     icon* m_portraitIcon;
     icon* m_flagIcon;
     i32 m_portraitFrame;
@@ -66,5 +66,4 @@ public:
     void DrawFrame(void);
 };
 #pragma pack(pop)
-SIZE(strip, 0x84);
 #endif

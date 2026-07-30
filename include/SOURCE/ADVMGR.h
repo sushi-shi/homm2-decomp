@@ -1,7 +1,7 @@
 #ifndef HOMM2_ADVMGR_H
 #define HOMM2_ADVMGR_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
@@ -9,7 +9,7 @@
 class mapCell;
 struct tag_message;
 
-H2_ENUM_BEGIN(AdventureRemoteConstant)
+typedef enum AdventureRemoteConstant {
     ADVMGR_REMOTE_DATA_REQUEST             = 1,
     ADVMGR_REMOTE_COMMAND_SAVE_GAME        = 1,
     ADVMGR_REMOTE_COMMAND_POP_NET_BOX      = 11,
@@ -18,13 +18,13 @@ H2_ENUM_BEGIN(AdventureRemoteConstant)
     ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT = 33,
     ADVMGR_REMOTE_COMMAND_GROUP_MAP_CHANGE = 41,
     ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE        = 16
-H2_ENUM_END(AdventureRemoteConstant)
+} AdventureRemoteConstant;
 
-H2_ENUM_BEGIN(AdventureBottomViewSharedConstant)
+typedef enum AdventureBottomViewSharedConstant {
     BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION = 5000
-H2_ENUM_END(AdventureBottomViewSharedConstant)
+} AdventureBottomViewSharedConstant;
 
-H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
+enum class AdventureEnvironmentSoundId : i32 {
     ADVMGR_ENVIRONMENT_SOUND_NONE     = -1,
     ADVMGR_SOUND_BUOY                 = 0,
     ADVMGR_SOUND_SHIPWRECK            = 1,
@@ -55,9 +55,10 @@ H2_ENUM_CLASS_BEGIN(AdventureEnvironmentSoundId)
     ADVMGR_SOUND_ABANDONED_MINE       = 26,
     ADVMGR_SOUND_LARGE_VOLCANO        = 27,
     ADVMGR_ENVIRONMENT_SOUND_COUNT    = 28
-H2_ENUM_CLASS_END(AdventureEnvironmentSoundId)
+};
+using enum AdventureEnvironmentSoundId;
 
-H2_ENUM_CLASS_BEGIN(AdventureCommand)
+enum class AdventureCommand : i32 {
     ADVMGR_COMMAND_NONE               = -1,
     ADVMGR_COMMAND_MOVE_TO            = 1,
     ADVMGR_COMMAND_HERO_VIEW          = 2,
@@ -66,9 +67,10 @@ H2_ENUM_CLASS_BEGIN(AdventureCommand)
     ADVMGR_COMMAND_SELECT_TOWN        = 5,
     ADVMGR_COMMAND_OCCUPIED_TOWN_VIEW = 6,
     ADVMGR_COMMAND_CONTINUE_ROUTE     = 7
-H2_ENUM_CLASS_END(AdventureCommand)
+};
+using enum AdventureCommand;
 
-H2_ENUM_CLASS_BEGIN(AdventureDrawMask)
+enum class AdventureDrawMask : i32 {
     ADVMGR_DRAW_GROUND      = 0x01,
     ADVMGR_DRAW_OBJECT      = 0x02,
     ADVMGR_DRAW_OVERLAY     = 0x04,
@@ -76,10 +78,11 @@ H2_ENUM_CLASS_BEGIN(AdventureDrawMask)
     ADVMGR_DRAW_CLOUD       = 0x20,
     ADVMGR_DRAW_OVERLAY_TOP = 0x40,
     ADVMGR_DRAW_HERO_SHADOW = 0x80
-H2_ENUM_CLASS_END(AdventureDrawMask)
-H2_ENUM_FLAGS(AdventureDrawMask)
+};
+using enum AdventureDrawMask;
+ENABLE_ENUM_FLAGS(AdventureDrawMask)
 
-H2_ENUM_BEGIN(AdventureSystemOptionsConstant)
+typedef enum AdventureSystemOptionsConstant {
     ADVMGR_SYSTEM_OPTIONS_WINDOW_X                = 160,
     ADVMGR_SYSTEM_OPTIONS_WINDOW_Y                = 33,
     ADVMGR_SYSTEM_OPTIONS_TITLE                   = 2,
@@ -93,12 +96,12 @@ H2_ENUM_BEGIN(AdventureSystemOptionsConstant)
     ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE       = 20,
     ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET          = 10,
     ADVMGR_SYSTEM_OPTIONS_DRAW_MASK               = 0x7fff
-H2_ENUM_END(AdventureSystemOptionsConstant)
+} AdventureSystemOptionsConstant;
 
-H2_ENUM_BEGIN(AdventureAIStorageConstant)
+typedef enum AdventureAIStorageConstant {
     ADVMGR_PLACE_VISIT_COUNT      = 30,
     ADVMGR_PLACE_COORDINATE_COUNT = 2
-H2_ENUM_END(AdventureAIStorageConstant)
+} AdventureAIStorageConstant;
 
 i32 SaveGame(void);
 MessageDispatchResult DimensionDoorHandler(struct tag_message&);
@@ -132,7 +135,7 @@ extern u8 giCurPlayerBit;
 extern i32 giBestShipyardDist;
 extern i16 gaiHeroLiveChance[GAME_HERO_COUNT];
 extern i32 giHumanTownConquered;
-extern i32 costTemp[IDX(RES_COUNT)];
+extern i32 costTemp[H2EnumIndex(RES_COUNT)];
 extern b32 gbPossibleShipyardFound;
 extern i32 iCurPlaceToVisit;
 extern i32 giBestShipyardId;

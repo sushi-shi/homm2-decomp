@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Ripple.h>
 #include <BASE/bitmap.h>
 #include <BASE/mouseManager.h>
@@ -10,7 +10,7 @@
 #include <SOURCE/NOOPT.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(RippleConstant)
+typedef enum RippleConstant {
     SCREEN_WIDTH   = 640,
     PROFILE_RADIUS = 25,
     PROFILE_SIZE   = PROFILE_RADIUS * 2 + 1,
@@ -18,27 +18,25 @@ H2_ENUM_BEGIN(RippleConstant)
     REDRAW_WIDTH   = 41,
     SWEEP_STEP     = 4,
     SWEEP_END      = SCREEN_WIDTH + PROFILE_RADIUS
-H2_ENUM_END(RippleConstant)
+} RippleConstant;
 
-VA(0x004d26a0, 0x23f)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;
 
     gpMouseManager->HideColorPointer();
 
-    // Retail stack-local displacement samples are data, not symbolic domains.
-    // NOLINTBEGIN(readability-magic-numbers)
+
     u8 profile[PROFILE_SIZE] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
                                 7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
-    // NOLINTEND(readability-magic-numbers)
+
     u8 previous[SCREEN_WIDTH];
     memset(previous, 0, sizeof(previous));
     i32 position = -PROFILE_RADIUS;
 
     do {
         PollSound();
-        // Keep the retail anonymous constant-pool relocation.
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * DATA_COMPGEN(0x004eba80, deadlineConstant, 9.0f); // NOLINT(readability-magic-numbers)
+
+        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
         for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
             i32 column = profileIndex + position - PROFILE_RADIUS;

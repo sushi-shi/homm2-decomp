@@ -8,7 +8,7 @@
 
 struct tag_message;
 
-H2_ENUM_BEGIN(NewGameControlConstant)
+typedef enum NewGameControlConstant {
     NEW_GAME_DIFFICULTY_HELP_FIRST = 1,
     NEW_GAME_DIFFICULTY_FIRST      = 0x43,
     NEW_GAME_RACE_FIRST            = 6,
@@ -25,19 +25,19 @@ H2_ENUM_BEGIN(NewGameControlConstant)
     NEW_GAME_SHADOW                = 0x49,
     NEW_GAME_CHAT_FIRST            = 0x4a,
     NEW_GAME_RACE_NAME_FIRST       = 0x4e
-H2_ENUM_END(NewGameControlConstant)
+} NewGameControlConstant;
 
-H2_ENUM_BEGIN(NewGameRemotePacketConstant)
+typedef enum NewGameRemotePacketConstant {
     NEW_GAME_REMOTE_RESERVED_SIZE     = 4,
     NEW_GAME_REMOTE_SEQUENCE_SIZE     = 2,
     NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE = 1
-H2_ENUM_END(NewGameRemotePacketConstant)
+} NewGameRemotePacketConstant;
 
 #pragma pack(push, 1)
 struct NewGameRemotePacket {
     i8 sender;
     u8 reserved[NEW_GAME_REMOTE_RESERVED_SIZE];
-    H2_ENUM_STORAGE(RemoteMessageType, i8) type;
+    H2EnumStorage<RemoteMessageType, i8> type;
     i8 command;
     u8 sequence[NEW_GAME_REMOTE_SEQUENCE_SIZE];
     char payload[NEW_GAME_REMOTE_PAYLOAD_HEAD_SIZE];

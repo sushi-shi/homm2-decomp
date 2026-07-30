@@ -1,15 +1,16 @@
 #ifndef HOMM2_BASE_BUTTON_H
 #define HOMM2_BASE_BUTTON_H
 
-#include <va.h>
+#include <Ints.h>
 #include "message.h"
 #include "widget.h"
 
 class icon;
-H2_ENUM_CLASS_BEGIN_T(ButtonSelectMode, i16)
+enum class ButtonSelectMode : i16 {
     BUTTON_SELECT_STANDARD      = 0,
     BUTTON_SELECT_DIALOG_RESULT = 1
-H2_ENUM_CLASS_END_T(ButtonSelectMode, i16)
+};
+using enum ButtonSelectMode;
 
 #pragma pack(push, 1)
 class button : public widget {
@@ -29,10 +30,10 @@ public:
         u32l iconId,
         i16 normalFrame,
         i16 pressedFrame,
-        H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
+        ButtonSelectMode selectMode,
         i16 hotkey,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind
+        WidgetKind kind
     );
     button(
         i16 x,
@@ -42,24 +43,23 @@ public:
         char* iconName,
         i16 normalFrame,
         i16 pressedFrame,
-        H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
+        ButtonSelectMode selectMode,
         i16 hotkey,
         i16 id,
-        H2_ENUM_PARAM(WidgetKind, i16) kind
+        WidgetKind kind
     );
-    __declspec(dllexport) virtual inline ~button() OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message& message) OVERRIDE;
+    virtual inline ~button() override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message& message) override;
     void Read(void);
-    H2_ENUM_RETURN(MessageDispatchResult, i16) Select(struct tag_message& message);
-    H2_ENUM_RETURN(MessageDispatchResult, i16) Deselect(struct tag_message& message);
+    MessageDispatchResult Select(struct tag_message& message);
+    MessageDispatchResult Deselect(struct tag_message& message);
 
 private:
-    inline H2_ENUM_RETURN(MessageDispatchResult, i16)
+    inline MessageDispatchResult
         DeselectSelected(struct tag_message& message);
 };
 #pragma pack(pop)
-SIZE(button, 0x30);
 extern MessageModifier iLeftRightSave;
 
 #endif

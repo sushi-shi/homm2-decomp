@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/textWidget.h>
 #include <BASE/TEXTWDGT_TYPES.h>
 #include <BASE/widgetKind.h>
@@ -9,18 +9,16 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
 
-DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles =
-    {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
+static STextWidgetSourceFiles gTextWidgetSourceFiles =
+    {"TEXTWDGT.cpp", "TEXTWDGT.cpp", "TEXTWDGT.cpp", "TEXTWDGT.cpp"};
 
-H2_ENUM_BEGIN(TextWidgetConstant)
+typedef enum TextWidgetConstant {
     RESOURCE_NAME_CAPACITY = 16,
     DRAW_MODE_MASK         = 0xff,
     TEXT_BUFFER_GROWTH     = 5
-H2_ENUM_END(TextWidgetConstant)
+} TextWidgetConstant;
 
-VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_color = FONT_DRAW_DEFAULT;
     m_alignment = FONT_ALIGN_CENTER;
@@ -29,7 +27,6 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d10f0, 0x64)
 textWidget::textWidget(
     i16 x,
     i16 y,
@@ -37,10 +34,10 @@ textWidget::textWidget(
     i16 height,
     char* text,
     char* fontName,
-    H2_ENUM_PARAM(FontDrawMode, i16) color,
+    FontDrawMode color,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
-    H2_ENUM_PARAM(FontAlignment, i16) alignment
+    WidgetKind kind,
+    FontAlignment alignment
 )
     : widget(x, y, width, height, id, kind) {
     font* loadedFont = gpResourceManager->GetFont(fontName);
@@ -51,7 +48,6 @@ textWidget::textWidget(
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d1160, 0xef)
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -59,7 +55,7 @@ void textWidget::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
-    m_text = static_cast<char*>(H2_ALLOC_AT(len, gTextWidgetSourceFiles.read, 57));
+    m_text = static_cast<char*>(H2_ALLOC(len));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -72,22 +68,20 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d1250, 0x30)
 inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
-    H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
+    H2_FREE(m_text);
 }
 
-// Preserve the original statement stream while consolidating repeated message setup.
+
 #define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.payload.widget.id = idValue
 
-VA(0x004d1280, 0x210)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
+    H2EnumStorage<WidgetFlag, i16> flags = m_flags;
+    if (!(H2EnumIndex((flags) & (WIDGET_FLAG_ENABLED)))) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -105,17 +99,17 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             m_flags = flags | WIDGET_FLAG_SELECTED;
             if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                msg.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
             SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
             return MESSAGE_DISPATCH_FORWARD;
         }
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(flags, WIDGET_FLAG_SELECTED)) {
+            if ((H2EnumIndex((flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
-                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                    msg.payload.widget.parameter = H2EnumIndex(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
@@ -133,13 +127,9 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
                     }
                     u16 newLen = strlen(newText);
                     if (strlen(m_text) < newLen) {
-                        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
+                        H2_FREE(m_text);
                         m_text = static_cast<char*>(
-                            H2_ALLOC_AT(
-                                newLen + TEXT_BUFFER_GROWTH,
-                                gTextWidgetSourceFiles.resizeAlloc,
-                                212
-                            )
+                            H2_ALLOC(newLen + TEXT_BUFFER_GROWTH)
                         );
                     }
                     strcpy(m_text, newText);
@@ -166,10 +156,9 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE
 
-VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {
     FontDrawMode color = FONT_DRAW_DIMMED;
-    if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
+    if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))))
         color = m_color;
     m_font->DrawBoundedString(
         m_text,
@@ -182,12 +171,10 @@ void textWidget::Draw(void) {
     );
 }
 
-VA(0x004d14e0, 0xc)
-void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
+void textWidget::SetColorIndex(FontDrawMode color) {
     m_color = color;
 }
 
-VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char* text) {
     if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
         m_text = text;
@@ -195,17 +182,8 @@ void textWidget::SetText(char* text) {
     }
     u16 newLen = strlen(text);
     if (strlen(m_text) < newLen) {
-        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
-        m_text = static_cast<char*>(H2_ALLOC_AT(
-            newLen + TEXT_BUFFER_GROWTH,
-            gTextWidgetSourceFiles.resizeAlloc,
-            212
-        ));
+        H2_FREE(m_text);
+        m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
     }
     strcpy(m_text, text);
 }
-
-
-VTBL(textWidget, 0x004eba50);
-
-#undef RETAIL_FILE

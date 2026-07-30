@@ -1,64 +1,38 @@
+
 #ifndef HOMM2_INTS_H
 #define HOMM2_INTS_H
 
-// Modern compilers use real enum domains; retail MSVC 4.2 retains its integer ABI.
-// Derive this from the required language support rather than a compiler name or build flag.
-#if defined(__cplusplus) && __cplusplus >= 202002L
-#define H2_STRICT_ENUMS 1
-#else
-#define H2_STRICT_ENUMS 0
-#endif
+#include <cstddef>
+#include <cstdint>
+#include <type_traits>
 
-typedef signed char i8;
-typedef unsigned char u8;
-typedef short i16;
-typedef unsigned short u16;
-typedef int i32;
-typedef unsigned int u32;
+typedef std::int8_t i8;
+typedef std::uint8_t u8;
+typedef std::int16_t i16;
+typedef std::uint16_t u16;
+typedef std::int32_t i32;
+typedef std::uint32_t u32;
+typedef std::int64_t i64;
+typedef std::uint64_t u64;
+
+
 typedef long i32l;
 typedef unsigned long u32l;
-typedef __int64 i64;
-typedef unsigned __int64 u64;
 
-#ifndef NULL
-#define NULL 0
-#endif
 
-// Boolean-int aliases for the pre-bool compiler.
 typedef i32 b32;
 typedef i8 b8;
-#if !H2_STRICT_ENUMS
-#define true 1
-#define false 0
-#endif
 
-// Modern builds type-check domains; the retail MSVC build keeps the integer ABI.
-#if H2_STRICT_ENUMS
-#define H2_ENUM_BEGIN(name) typedef enum name {
-#define H2_ENUM_END(name)                                                                          \
-    }                                                                                              \
-    name;
-#define H2_ENUM_CLASS_BEGIN(name) enum class name : i32 {
-#define H2_ENUM_CLASS_FORWARD(name) enum class name : i32
-#define H2_ENUM_CLASS_FORWARD_SPLIT(name, storage) enum class name : storage
-#define H2_ENUM_CLASS_END(name)                                                                    \
-    }                                                                                              \
-    ;                                                                                              \
-    using enum name;
-#define H2_ENUM_CLASS_BEGIN_T(name, storage) enum class name : storage {
-#define H2_ENUM_CLASS_END_T(name, storage)                                                         \
-    }                                                                                              \
-    ;                                                                                              \
-    using enum name;
-// Keep strict builds type-safe without changing the retail domain or field storage.
-#define H2_ENUM_CLASS_BEGIN_SPLIT(name, storage) enum class name : storage {
-#define H2_ENUM_CLASS_END_SPLIT(name, storage)                                                     \
-    }                                                                                              \
-    ;                                                                                              \
-    using enum name;
 
-// A retail domain can appear in fields of several widths. Keep the exact field
-// representation while presenting the domain type to strict-build expressions.
+template <typename T>
+inline constexpr bool H2IsMaskLike = std::is_integral_v<T> || std::is_enum_v<T>;
+
+template <typename T>
+constexpr long long H2MaskValue(T value) {
+    return static_cast<long long>(value);
+}
+
+
 template <typename Enum, typename Storage>
 class H2EnumStorage {
 public:
@@ -72,8 +46,8 @@ public:
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
 
-    template <typename Integer>
-        requires(__is_integral(Integer))
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
     explicit constexpr operator Integer() const {
         return static_cast<Integer>(static_cast<Enum>(m_value));
     }
@@ -108,6 +82,45 @@ public:
         m_value = static_cast<Storage>(m_value ^ static_cast<Storage>(value));
         return *this;
     }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator|=(Integer mask) {
+        m_value = static_cast<Storage>(m_value | mask);
+        return *this;
+    }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator&=(Integer mask) {
+        m_value = static_cast<Storage>(m_value & mask);
+        return *this;
+    }
+
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator+=(Integer amount) {
+        m_value = static_cast<Storage>(m_value + H2MaskValue(amount));
+        return *this;
+    }
+
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
+    H2EnumStorage& operator-=(Integer amount) {
+        m_value = static_cast<Storage>(m_value - H2MaskValue(amount));
+        return *this;
+    }
+
+    H2EnumStorage& operator++() {
+        ++m_value;
+        return *this;
+    }
+
+    H2EnumStorage operator++(int) {
+        H2EnumStorage previous = *this;
+        ++m_value;
+        return previous;
+    }
+
+
+    constexpr i64 value() const { return static_cast<i64>(m_value); }
 
 private:
     Storage m_value;
@@ -147,15 +160,54 @@ constexpr bool operator!=(
     return !(lhs == rhs);
 }
 
-template <typename Enum, typename Storage>
-constexpr bool operator<(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
-    return static_cast<Enum>(lhs) < rhs;
-}
 
-template <typename Enum, typename Storage>
-constexpr bool operator>=(H2EnumStorage<Enum, Storage> lhs, Enum rhs) {
-    return static_cast<Enum>(lhs) >= rhs;
-}
+#define DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(op)                                                   \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr auto operator op(H2EnumStorage<Enum, Storage> lhs, Other rhs) {                      \
+        return lhs.value() op H2MaskValue(rhs);                                                    \
+    }                                                                                              \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr auto operator op(Other lhs, H2EnumStorage<Enum, Storage> rhs) {                      \
+        return H2MaskValue(lhs) op rhs.value();                                                    \
+    }
+
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(+)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(-)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(*)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(/)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(%)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(<)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(>)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(<=)
+DEFINE_ENUM_STORAGE_INTEGER_OPERATOR(>=)
+
+#undef DEFINE_ENUM_STORAGE_INTEGER_OPERATOR
+
+
+#define DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(op)                                                   \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr Enum operator op(H2EnumStorage<Enum, Storage> lhs, Other rhs) {                      \
+        return static_cast<Enum>(lhs.value() op H2MaskValue(rhs));                                 \
+    }                                                                                              \
+    template <typename Enum, typename Storage, typename Other,                                     \
+              typename = std::enable_if_t<H2IsMaskLike<Other>>>                                    \
+    constexpr Enum operator op(Other lhs, H2EnumStorage<Enum, Storage> rhs) {                      \
+        return static_cast<Enum>(H2MaskValue(lhs) op rhs.value());                                 \
+    }                                                                                              \
+    template <typename Enum, typename Storage>                                                     \
+    constexpr Storage operator op(H2EnumStorage<Enum, Storage> lhs, Storage rhs) {                 \
+        return static_cast<Storage>(lhs.value() op static_cast<long long>(rhs));                   \
+    }
+
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(&)
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(|)
+DEFINE_ENUM_STORAGE_BITWISE_OPERATOR(^)
+
+#undef DEFINE_ENUM_STORAGE_BITWISE_OPERATOR
+
 
 template <typename Enum, typename Storage>
 class H2SteppedEnumStorage {
@@ -165,8 +217,7 @@ public:
 
     constexpr operator Enum() const { return static_cast<Enum>(m_value); }
 
-    template <typename Integer>
-        requires(__is_integral(Integer))
+    template <typename Integer, typename = std::enable_if_t<H2IsMaskLike<Integer>>>
     explicit constexpr operator Integer() const {
         return static_cast<Integer>(static_cast<Enum>(m_value));
     }
@@ -181,23 +232,15 @@ public:
         return *this;
     }
 
-    H2SteppedEnumStorage& operator++() {
-        ++m_value;
-        return *this;
-    }
-
-    H2SteppedEnumStorage operator++(i32) {
+    H2SteppedEnumStorage& operator++() { ++m_value; return *this; }
+    H2SteppedEnumStorage operator++(int) {
         H2SteppedEnumStorage previous = *this;
         ++m_value;
         return previous;
     }
 
-    H2SteppedEnumStorage& operator--() {
-        --m_value;
-        return *this;
-    }
-
-    H2SteppedEnumStorage operator--(i32) {
+    H2SteppedEnumStorage& operator--() { --m_value; return *this; }
+    H2SteppedEnumStorage operator--(int) {
         H2SteppedEnumStorage previous = *this;
         --m_value;
         return previous;
@@ -217,203 +260,72 @@ private:
     Storage m_value;
 };
 
-template <typename Enum, typename Storage>
-constexpr i32 H2EnumIndex(H2EnumStorage<Enum, Storage> value) {
-    return static_cast<i32>(static_cast<Enum>(value));
-}
+#define H2EnumIndex(value) static_cast<i32>(value)
 
-template <typename Enum, typename Storage>
-constexpr i32 H2EnumIndex(H2SteppedEnumStorage<Enum, Storage> value) {
-    return static_cast<i32>(static_cast<Enum>(value));
-}
-
-template <typename Value>
-constexpr i32 H2EnumIndex(Value value) {
-    return static_cast<i32>(value);
-}
-
-#define H2_ENUM_STORAGE(name, storage) H2EnumStorage<name, storage>
-#define H2_ENUM_STORAGE_STEPPED(name, storage) H2SteppedEnumStorage<name, storage>
-#define H2_ENUM_BITFIELD(name, storage) name
-#define H2_ENUM_PARAM(name, storage) name
-#define H2_ENUM_RETURN(name, storage) name
-#define H2_ENUM_FLAGS(name)                                                                        \
+#define ENABLE_ENUM_FLAGS(name)                                                                    \
     inline constexpr name operator|(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i64>(a) | static_cast<i64>(b));                       \
+        return static_cast<name>(static_cast<i32>(a) | static_cast<i32>(b));                        \
     }                                                                                              \
     inline constexpr name operator&(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i64>(a) & static_cast<i64>(b));                       \
+        return static_cast<name>(static_cast<i32>(a) & static_cast<i32>(b));                        \
     }                                                                                              \
     inline constexpr name operator^(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i64>(a) ^ static_cast<i64>(b));                       \
+        return static_cast<name>(static_cast<i32>(a) ^ static_cast<i32>(b));                        \
     }                                                                                              \
     inline constexpr name operator~(name a) {                                                      \
-        return static_cast<name>(~static_cast<i64>(a));                                            \
+        return static_cast<name>(~static_cast<i32>(a));                                            \
     }                                                                                              \
-    inline constexpr name& operator|=(name& a, name b) {                                           \
-        return a = a | b;                                                                          \
-    }                                                                                              \
-    inline constexpr name& operator&=(name& a, name b) {                                           \
-        return a = a & b;                                                                          \
-    }                                                                                              \
-    inline constexpr name& operator^=(name& a, name b) {                                           \
-        return a = a ^ b;                                                                          \
+    inline constexpr bool operator!(name a) { return !static_cast<i32>(a); }                       \
+    inline name& operator|=(name& a, name b) { return a = a | b; }                                 \
+    inline name& operator&=(name& a, name b) { return a = a & b; }                                 \
+    inline name& operator^=(name& a, name b) { return a = a ^ b; }                                 \
+    inline constexpr name operator+(name a, name b) {                                              \
+        return static_cast<name>(static_cast<i32>(a) + static_cast<i32>(b));                        \
     }                                                                                              \
     inline constexpr name operator-(name a, name b) {                                              \
-        return static_cast<name>(static_cast<i64>(a) - static_cast<i64>(b));                       \
+        return static_cast<name>(static_cast<i32>(a) - static_cast<i32>(b));                        \
     }                                                                                              \
-    inline constexpr name& operator-=(name& a, name b) {                                           \
-        return a = a - b;                                                                          \
+    inline name& operator+=(name& a, name b) { return a = a + b; }                                 \
+    inline name& operator-=(name& a, name b) { return a = a - b; }                                 \
+    inline constexpr name operator&(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i32>(a) & mask);                                      \
     }                                                                                              \
-    inline constexpr bool operator!(name a) {                                                      \
-        return !static_cast<i64>(a);                                                               \
-    }
-#else
-#define H2_ENUM_BEGIN(name) enum {
-#define H2_ENUM_END(name)                                                                          \
+    inline constexpr name operator&(i32 mask, name a) { return a & mask; }                         \
+    inline constexpr name operator|(name a, i32 mask) {                                            \
+        return static_cast<name>(static_cast<i32>(a) | mask);                                      \
     }                                                                                              \
-    ;                                                                                              \
-    typedef i32 name;
-#define H2_ENUM_CLASS_BEGIN(name) enum {
-#define H2_ENUM_CLASS_FORWARD(name) typedef i32 name
-#define H2_ENUM_CLASS_FORWARD_SPLIT(name, storage) typedef i32 name
-#define H2_ENUM_CLASS_END(name)                                                                    \
-    }                                                                                              \
-    ;                                                                                              \
-    typedef i32 name;
-#define H2_ENUM_CLASS_BEGIN_T(name, storage) enum {
-#define H2_ENUM_CLASS_END_T(name, storage)                                                         \
-    }                                                                                              \
-    ;                                                                                              \
-    typedef storage name;
-// The enum domain remains i32 in retail builds; each field retains its proven storage.
-#define H2_ENUM_CLASS_BEGIN_SPLIT(name, storage) enum {
-#define H2_ENUM_CLASS_END_SPLIT(name, storage)                                                     \
-    }                                                                                              \
-    ;                                                                                              \
-    typedef i32 name;
-#define H2_ENUM_STORAGE(name, storage) storage
-#define H2_ENUM_STORAGE_STEPPED(name, storage) storage
-#define H2_ENUM_BITFIELD(name, storage) storage
-#define H2_ENUM_PARAM(name, storage) storage
-#define H2_ENUM_RETURN(name, storage) storage
-#define H2_ENUM_FLAGS(name)
-#endif
+    inline constexpr name operator|(i32 mask, name a) { return a | mask; }                         \
+    inline name& operator&=(name& a, i32 mask) { return a = a & mask; }                            \
+    inline name& operator|=(name& a, i32 mask) { return a = a | mask; }
 
-// Preserve a retail integer assignment chain while allowing strict enum views
-// of individual fields to receive the same value without cross-domain casts at
-// the reconstructed call site.
-#if H2_STRICT_ENUMS
-#define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value)                                               \
-    do {                                                                                           \
-        (e) = static_cast<decltype(e)>(value);                                                     \
-        (d) = static_cast<decltype(d)>(value);                                                     \
-        (c) = static_cast<decltype(c)>(value);                                                     \
-        (b) = static_cast<decltype(b)>(value);                                                     \
-        (a) = static_cast<decltype(a)>(value);                                                     \
-    } while (0)
-#else
-#define H2_ENUM_ASSIGN_CHAIN_5(a, b, c, d, e, value) ((a) = (b) = (c) = (d) = (e) = (value))
-#endif
-
-// Decode a semantic enum from a masked packed-storage field. Retail retains
-// the original two-step /Od assignment shape.
-#if H2_STRICT_ENUMS
-#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
-    do {                                                                                           \
-        (target) = static_cast<type>((raw) & (mask));                                              \
-    } while (0)
-#else
-#define H2_ENUM_DECODE_MASKED(type, target, raw, mask)                                             \
-    do {                                                                                           \
-        (target) = (raw);                                                                          \
-        (target) &= (mask);                                                                        \
-    } while (0)
-#endif
-
-// Table lookup by semantic domain: IDX spells the value-as-index conversion at
-// the site. Production expands to the bare value, so bytes cannot change.
-#if H2_STRICT_ENUMS
-#define IDX(x) H2EnumIndex(x)
-#else
-#define IDX(x) (x)
-#endif
-
-// Flag-domain membership test usable in integer/boolean context. The flags
-// argument and bit share one H2_ENUM_FLAGS domain; production expands to
-// the plain bitwise AND.
-#if H2_STRICT_ENUMS
-#define HAS(flags, bit) (IDX((flags) & (bit)))
-#else
-#define HAS(flags, bit) ((flags) & (bit))
-#endif
-
-// Clear a known-set flag from its domain. Strict builds express the operation
-// as bit removal; production retains the guarded subtraction shape used by
-// reconstructed retail code.
-#if H2_STRICT_ENUMS
-#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) &= ~(bit))
-#else
-#define H2_ENUM_CLEAR_FLAG(flags, bit) ((flags) = static_cast<i32>(flags) - (bit))
-#endif
-
-// Bit-index to mask: the domain value is a shift count. Production expands to
-// the plain shift.
-#if H2_STRICT_ENUMS
-#define BIT(x) (1 << IDX(x))
-#else
-#define BIT(x) (1 << (x))
-#endif
-
-// Sequence domains step to adjacent ids (animation followthroughs). The audit
-// defines the increment; production sees plain integer arithmetic.
-#if H2_STRICT_ENUMS
-#define H2_ENUM_STEPPED(name)                                                                      \
-    inline constexpr name operator+(name a, i32 amount) {                                          \
-        return static_cast<name>(static_cast<i64>(a) + amount);                                    \
+#define ENABLE_ENUM_STEPS(name)                                                                    \
+    inline constexpr name operator+(name a, i32 amount) {                                         \
+        return static_cast<name>(static_cast<i32>(a) + amount);                                    \
     }                                                                                              \
-    inline constexpr name operator-(name a, i32 amount) {                                          \
-        return static_cast<name>(static_cast<i64>(a) - amount);                                    \
+    inline constexpr name operator-(name a, i32 amount) {                                         \
+        return static_cast<name>(static_cast<i32>(a) - amount);                                    \
     }                                                                                              \
-    inline constexpr name operator%(name a, i32 modulus) {                                         \
-        return static_cast<name>(static_cast<i64>(a) % modulus);                                   \
+    inline constexpr i32 operator-(name a, name b) {                                               \
+        return static_cast<i32>(a) - static_cast<i32>(b);                                          \
     }                                                                                              \
-    inline constexpr name operator%(name a, name modulus) {                                        \
-        return static_cast<name>(static_cast<i64>(a) % static_cast<i64>(modulus));                  \
+    inline constexpr name operator%(name a, i32 modulus) {                                        \
+        return static_cast<name>(static_cast<i32>(a) % modulus);                                   \
+    }                                                                                              \
+    inline constexpr name operator%(name a, name modulus) {                                       \
+        return static_cast<name>(static_cast<i32>(a) % static_cast<i32>(modulus));                  \
     }                                                                                              \
     inline constexpr name operator&(name a, i32 mask) {                                            \
-        return static_cast<name>(static_cast<i64>(a) & mask);                                      \
+        return static_cast<name>(static_cast<i32>(a) & mask);                                      \
     }                                                                                              \
-    inline name& operator+=(name& a, i32 amount) {                                                 \
-        return a = a + amount;                                                                     \
-    }                                                                                              \
-    inline name& operator-=(name& a, i32 amount) {                                                 \
-        return a = a - amount;                                                                     \
-    }                                                                                              \
-    inline name& operator++(name& a) {                                                             \
-        return a = static_cast<name>(static_cast<i64>(a) + 1);                                     \
-    }                                                                                              \
-    inline name operator++(name& a, int) {                                                         \
-        name old = a;                                                                              \
-        ++a;                                                                                       \
-        return old;                                                                                \
-    }                                                                                              \
-    inline name& operator--(name& a) {                                                             \
-        return a = static_cast<name>(static_cast<i64>(a) - 1);                                     \
-    }                                                                                              \
-    inline name operator--(name& a, int) {                                                         \
-        name old = a;                                                                              \
-        --a;                                                                                       \
-        return old;                                                                                \
-    }                                                                                              \
-    inline name& operator%=(name& a, i32 modulus) {                                                \
-        return a = a % modulus;                                                                    \
-    }                                                                                              \
-    inline name& operator%=(name& a, name modulus) {                                               \
-        return a = a % modulus;                                                                    \
-    }
-#else
-#define H2_ENUM_STEPPED(name)
-#endif
+    inline name& operator+=(name& a, i32 amount) { return a = a + amount; }                        \
+    inline name& operator-=(name& a, i32 amount) { return a = a - amount; }                        \
+    inline name& operator+=(name& a, name b) { return a = a + static_cast<i32>(b); }               \
+    inline name& operator-=(name& a, name b) { return a = a - static_cast<i32>(b); }               \
+    inline name& operator%=(name& a, i32 modulus) { return a = a % modulus; }                      \
+    inline name& operator%=(name& a, name modulus) { return a = a % modulus; }                     \
+    inline name& operator++(name& a) { return a = a + 1; }                                        \
+    inline name operator++(name& a, int) { name old = a; a = a + 1; return old; }                 \
+    inline name& operator--(name& a) { return a = a - 1; }                                        \
+    inline name operator--(name& a, int) { name old = a; a = a - 1; return old; }
 
 #endif

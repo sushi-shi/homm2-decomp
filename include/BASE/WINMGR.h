@@ -3,16 +3,17 @@
 
 #include <Ints.h>
 
-H2_ENUM_CLASS_BEGIN(WindowColorCycleMode)
+enum class WindowColorCycleMode : i32 {
     WINDOW_COLOR_CYCLE_DEFAULT          = 0,
     WINDOW_COLOR_CYCLE_COMBAT           = 1,
     WINDOW_COLOR_CYCLE_WORLD_VIEW       = 2,
     WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE = 3
-H2_ENUM_CLASS_END(WindowColorCycleMode)
+};
+using enum WindowColorCycleMode;
 
-H2_ENUM_BEGIN(WindowManagerConstant)
+typedef enum WindowManagerConstant {
     WINDOW_CYCLE_PALETTE_BYTES = 0x60
-H2_ENUM_END(WindowManagerConstant)
+} WindowManagerConstant;
 
 void CycleColors(i32);
 void CreateFizzleTables(void);

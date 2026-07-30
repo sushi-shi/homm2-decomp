@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/button.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
@@ -10,16 +10,15 @@
 #include <BASE/inputManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(ButtonHotkeyConstant)
+typedef enum ButtonHotkeyConstant {
     NO_HOTKEY = -1
-H2_ENUM_END(ButtonHotkeyConstant)
+} ButtonHotkeyConstant;
 
-H2_ENUM_BEGIN(ButtonConstant)
+typedef enum ButtonConstant {
     RESOURCE_NAME_CAPACITY = 16,
     REPEAT_DELAY_TICKS     = 60
-H2_ENUM_END(ButtonConstant)
+} ButtonConstant;
 
-VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
@@ -29,7 +28,6 @@ button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_icon = NULL;
 }
 
-VA(0x004dd4c0, 0x6e)
 button::button(
     i16 x,
     i16 y,
@@ -38,10 +36,10 @@ button::button(
     u32l iconId,
     i16 normalFrame,
     i16 pressedFrame,
-    H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
+    ButtonSelectMode selectMode,
     i16 hotkey,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind
+    WidgetKind kind
 )
     : widget(x, y, width, height, id, kind) {
     m_iconId = iconId;
@@ -52,7 +50,6 @@ button::button(
     m_hotkey = hotkey;
 }
 
-VA(0x004dd530, 0x7c)
 button::button(
     i16 x,
     i16 y,
@@ -61,10 +58,10 @@ button::button(
     char* iconName,
     i16 normalFrame,
     i16 pressedFrame,
-    H2_ENUM_PARAM(ButtonSelectMode, i16) selectMode,
+    ButtonSelectMode selectMode,
     i16 hotkey,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind
+    WidgetKind kind
 )
     : widget(x, y, width, height, id, kind) {
     u32l iconId = gpResourceManager->MakeId(iconName, 1);
@@ -76,7 +73,6 @@ button::button(
     m_hotkey = hotkey;
 }
 
-VA(0x004dd5b0, 0xeb)
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -96,20 +92,19 @@ void button::Read(void) {
     m_kind = gpResourceManager->ReadWord();
 }
 
-VA(0x004dd6a0, 0x21)
 inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// Preserve the original statement stream; an inline function perturbs VC4.2 CSE in Main.
+
 #define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
-inline H2_ENUM_RETURN(MessageDispatchResult, i16)
+inline MessageDispatchResult
     button::DeselectSelected(tag_message& msg) {
-    if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
+    if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED))))
         return MESSAGE_DISPATCH_CONTINUE;
     m_flags &= ~WIDGET_FLAG_SELECTED;
     Draw();
@@ -121,14 +116,13 @@ inline H2_ENUM_RETURN(MessageDispatchResult, i16)
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-VA(0x004dd6d0, 0x595)
 MessageDispatchResult button::Main(tag_message& msg) {
-    if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
+    if (m_kind == WIDGET_KIND_AUTO_REPEAT && (H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
         return DeselectSelected(msg);
     }
 
-    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
+    if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED)))) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
@@ -137,8 +131,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
     MessageType eventType = msg.type;
     switch (eventType) {
         case MESSAGE_KEY_DOWN:
-            if (HAS(m_flags, WIDGET_FLAG_ENABLED) && HAS(m_flags, WIDGET_FLAG_DRAW)
-                && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
+            if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED))) && (H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW)))
+                && !(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED)))) {
                 if (m_hotkey != NO_HOTKEY && m_hotkey == msg.payload.keyboard.keyCode)
                     return Select(msg);
                 return MESSAGE_DISPATCH_CONTINUE;
@@ -146,8 +140,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
             break;
 
         case MESSAGE_KEY_UP:
-            if (HAS(m_flags, WIDGET_FLAG_ENABLED) && HAS(m_flags, WIDGET_FLAG_DRAW)
-                && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
+            if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_ENABLED))) && (H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW)))
+                && !(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED)))) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return MESSAGE_DISPATCH_CONTINUE;
                 return DeselectSelected(msg);
@@ -156,7 +150,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW))))
                 goto normalEvent;
 
             i16 relativeX =
@@ -173,7 +167,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 return MESSAGE_DISPATCH_CONTINUE;
             }
 
-            if (!HAS(m_flags, WIDGET_FLAG_DIMMED) && relativeX >= m_x && relativeY >= m_y
+            if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_DIMMED))) && relativeX >= m_x && relativeY >= m_y
                 && relativeX < m_x + m_width && relativeY < m_y + m_height) {
                 Select(msg);
                 while (msg.type != MESSAGE_LEFT_BUTTON_UP && msg.type != MESSAGE_RIGHT_BUTTON_UP) {
@@ -186,17 +180,17 @@ MessageDispatchResult button::Main(tag_message& msg) {
                                     - static_cast<i16>(m_owner->m_posY);
                         if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                             || relativeY >= m_y + m_height) {
-                            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                            if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                                 DeselectSelected(msg);
                             }
-                        } else if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                        } else if (!(H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                             Select(msg);
                         }
                     }
                     Process1WindowsMessage();
                     msg = gpInputManager->GetEvent();
                 }
-                if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                     return DeselectSelected(msg);
                 }
                 return MESSAGE_DISPATCH_CONSUME;
@@ -205,8 +199,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
         }
 
         case MESSAGE_LEFT_BUTTON_UP: {
-            if (HAS(m_flags, WIDGET_FLAG_DRAW)
-                && HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+            if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_DRAW)))
+                && (H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
                 return DeselectSelected(msg);
             }
             goto normalEvent;
@@ -231,8 +225,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
-VA(0x004ddc70, 0x96)
-H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
+MessageDispatchResult button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = window->m_posX + m_x;
     i16 y = m_y + static_cast<i16>(window->m_posY);
@@ -252,17 +245,15 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-VA(0x004ddd10, 0x83)
-H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
+MessageDispatchResult button::Deselect(struct tag_message& msg) {
     return DeselectSelected(msg);
 }
 
 #undef SET_WIDGET_MESSAGE
 
-VA(0x004ddda0, 0x55)
 void button::Draw(void) {
     heroWindow* win = m_owner;
-    if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+    if ((H2EnumIndex((m_flags) & (WIDGET_FLAG_SELECTED)))) {
         m_icon->DrawToBuffer(m_x + win->m_posX, m_y + win->m_posY, m_pressedFrame, ICON_DRAW_NORMAL);
         return;
     }
@@ -270,6 +261,4 @@ void button::Draw(void) {
 }
 
 
-VTBL(button, 0x004ebaf0);
-
-DATA(0x0052125c) MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;
+MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;

@@ -1,12 +1,12 @@
 #ifndef HOMM2_SOURCE_KB_TYPES_H
 #define HOMM2_SOURCE_KB_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/combatTypes.h>
 
 class sample;
 
-H2_ENUM_CLASS_BEGIN(BottomViewMode)
+enum class BottomViewMode : i32 {
     BOTTOM_VIEW_NONE              = 0,
     BOTTOM_VIEW_NEW_TURN          = 1,
     BOTTOM_VIEW_KINGDOM           = 2,
@@ -14,15 +14,17 @@ H2_ENUM_CLASS_BEGIN(BottomViewMode)
     BOTTOM_VIEW_ENEMY_TURN        = 4,
     BOTTOM_VIEW_RESOURCE          = 5,
     BOTTOM_VIEW_OVERRIDE_DISABLED = 6
-H2_ENUM_CLASS_END(BottomViewMode)
+};
+using enum BottomViewMode;
 
-H2_ENUM_CLASS_BEGIN(HighScoreType)
+enum class HighScoreType : i32 {
     HIGH_SCORE_CAMPAIGN           = 0,
     HIGH_SCORE_STANDARD           = 1,
     HIGH_SCORE_EXPANSION_CAMPAIGN = 2
-H2_ENUM_CLASS_END(HighScoreType)
+};
+using enum HighScoreType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(HeroPortrait, u8)
+enum class HeroPortrait : u8 {
     CAMPAIGN_HERO_ROLAND           = 54,
     CAMPAIGN_HERO_CORLAGON         = 55,
     CAMPAIGN_HERO_ELIZA            = 56,
@@ -35,9 +37,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(HeroPortrait, u8)
     HERO_GALLAVANT                 = 65,
     HERO_CEALLACH                  = 67,
     HERO_CAPTAIN_PORTRAIT_FIRST    = 90
-H2_ENUM_CLASS_END_SPLIT(HeroPortrait, u8)
+};
+using enum HeroPortrait;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
+enum class ResourceType : i16 {
     RES_NONE            = -1,
     RECRUIT_NO_RESOURCE = RES_NONE,
     RES_VALID_BEGIN     = 0,
@@ -49,9 +52,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ResourceType, i16)
     RES_GEMS            = 5,
     RES_GOLD            = 6,
     RES_COUNT           = 7
-H2_ENUM_CLASS_END_SPLIT(ResourceType, i16)
+};
+using enum ResourceType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(MapDirection, i8)
+enum class MapDirection : i8 {
     MAP_DIRECTION_NONE       = -1,
     MAP_DIRECTION_NORTH      = 0,
     MAP_DIRECTION_NORTH_EAST = 1,
@@ -62,27 +66,28 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapDirection, i8)
     MAP_DIRECTION_WEST       = 6,
     MAP_DIRECTION_NORTH_WEST = 7,
     MAP_DIRECTION_COUNT      = 8
-H2_ENUM_CLASS_END_SPLIT(MapDirection, i8)
-H2_ENUM_STEPPED(MapDirection)
+};
+using enum MapDirection;
+ENABLE_ENUM_STEPS(MapDirection)
 
-H2_ENUM_BEGIN(MapDirectionConstant)
+typedef enum MapDirectionConstant {
     MAP_DIRECTION_OPPOSITE_OFFSET = 4,
     MAP_DIRECTION_INDEX_MASK      = 7
-H2_ENUM_END(MapDirectionConstant)
+} MapDirectionConstant;
 
 inline MapDirection OppositeMapDirection(MapDirection direction) {
     return (direction + MAP_DIRECTION_OPPOSITE_OFFSET) & MAP_DIRECTION_INDEX_MASK;
 }
 
-H2_ENUM_CLASS_BEGIN(CoordinateAxis)
+enum class CoordinateAxis : i32 {
     COORDINATE_AXIS_X     = 0,
     COORDINATE_AXIS_Y     = 1,
     COORDINATE_AXIS_COUNT = 2
-H2_ENUM_CLASS_END(CoordinateAxis)
+};
+using enum CoordinateAxis;
 
-// Mine records use the resource ids for ordinary mines and reserve two
-// additional ids for map facilities tracked through the same table.
-H2_ENUM_CLASS_BEGIN_SPLIT(MineType, i8)
+
+enum class MineType : i8 {
     MINE_TYPE_WOOD          = 0,
     MINE_TYPE_MERCURY       = 1,
     MINE_TYPE_ORE           = 2,
@@ -92,9 +97,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MineType, i8)
     MINE_TYPE_GOLD          = 6,
     MINE_TYPE_LIGHTHOUSE    = 100,
     MINE_TYPE_ALCHEMIST_LAB = 101
-H2_ENUM_CLASS_END_SPLIT(MineType, i8)
+};
+using enum MineType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
+enum class CreatureType : i8 {
     CREATURE_NONE                = -1,
     CREATURE_VALID_BEGIN         = 0,
     CREATURE_PEASANT             = CREATURE_VALID_BEGIN,
@@ -167,28 +173,26 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CreatureType, i8)
     CREATURE_FIRE_ELEMENTAL      = 64,
     CREATURE_WATER_ELEMENTAL     = 65,
     CREATURE_COUNT               = 66
-H2_ENUM_CLASS_END_SPLIT(CreatureType, i8)
-H2_ENUM_STEPPED(CreatureType)
+};
+using enum CreatureType;
+ENABLE_ENUM_STEPS(CreatureType)
 
-#if H2_STRICT_ENUMS
 inline CreatureType NextCreatureType(CreatureType creatureType) {
     ++creatureType;
     return creatureType;
 }
-#else
-#define NextCreatureType(creatureType) (static_cast<CreatureType>((creatureType) + 1))
-#endif
 
-H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactLevelMask, u8)
+enum class ArtifactLevelMask : u8 {
     ARTIFACT_LEVEL_ULTIMATE = 0x01,
     ARTIFACT_LEVEL_MAJOR    = 0x02,
     ARTIFACT_LEVEL_MINOR    = 0x04,
     ARTIFACT_LEVEL_TREASURE = 0x08,
     ARTIFACT_LEVEL_RANDOM   = 0x0e
-H2_ENUM_CLASS_END_SPLIT(ArtifactLevelMask, u8)
-H2_ENUM_FLAGS(ArtifactLevelMask)
+};
+using enum ArtifactLevelMask;
+ENABLE_ENUM_FLAGS(ArtifactLevelMask)
 
-H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
+enum class ArtifactType : i8 {
     ARTIFACT_NONE                  = -1,
     ARTIFACT_VALID_BEGIN           = 0,
     ARTIFACT_ULTIMATE_BOOK         = ARTIFACT_VALID_BEGIN,
@@ -296,9 +300,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(ArtifactType, i8)
     ARTIFACT_SWORD_ANDURAN         = 101,
     ARTIFACT_SPADE_NECROMANCY      = 102,
     ARTIFACT_COUNT                 = 103
-H2_ENUM_CLASS_END_SPLIT(ArtifactType, i8)
+};
+using enum ArtifactType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(SpellType, i8)
+enum class SpellType : i8 {
     SPELL_NONE                   = -1,
     SPELL_FIREBALL               = 0,
     SPELL_FIREBLAST              = 1,
@@ -368,10 +373,11 @@ H2_ENUM_CLASS_BEGIN_SPLIT(SpellType, i8)
     SPELL_COUNT                  = 65,
     CREATURE_SPELL_PETRIFY       = 101,
     CREATURE_SPELL_DISPEL        = 102
-H2_ENUM_CLASS_END_SPLIT(SpellType, i8)
-H2_ENUM_STEPPED(SpellType)
+};
+using enum SpellType;
+ENABLE_ENUM_STEPS(SpellType)
 
-H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
+enum class MapObjectType : i16 {
     MAP_OBJECT_NO_CONVERSION              = -1,
     MAP_TRIGGER_ACTION_FLAG               = 0x80,
     MAP_TRIGGER_TYPE_MASK                 = 0x7f,
@@ -418,7 +424,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_WINDMILL                   = 40,
     MAP_OBJECT_ARTIFACT                   = 41,
     MAP_OBJECT_MERMAID                    = 42,
-    MAP_OBJECT_HERO_INTERACTION           = IDX(MAP_OBJECT_MERMAID),
+    MAP_OBJECT_HERO_INTERACTION           = H2EnumIndex(MAP_OBJECT_MERMAID),
     MAP_OBJECT_BOAT                       = 43,
     MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT   = 44,
     MAP_OBJECT_RANDOM_ARTIFACT            = 45,
@@ -500,10 +506,11 @@ H2_ENUM_CLASS_BEGIN_SPLIT(MapObjectType, i16)
     MAP_OBJECT_EXPANSION_DWELLING         = 121,
     MAP_OBJECT_EXPANSION_OBJECT           = 122,
     MAP_OBJECT_JAIL                       = 123
-H2_ENUM_CLASS_END_SPLIT(MapObjectType, i16)
-H2_ENUM_FLAGS(MapObjectType)
+};
+using enum MapObjectType;
+ENABLE_ENUM_FLAGS(MapObjectType)
 
-H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
+enum class FactionType : i8 {
     FACTION_UNINITIALIZED = -2,
     FACTION_ANY           = -1,
     FACTION_NONE          = -1,
@@ -514,16 +521,17 @@ H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
     FACTION_WIZARD        = 4,
     FACTION_NECROMANCER   = 5,
     FACTION_NEUTRAL       = 6,
-    HERO_TYPE_BOAT        = 6,  // Hero cursor sprites use the neutral slot for boats.
+    HERO_TYPE_BOAT        = 6,
     FACTION_RANDOM        = 7,
     FACTION_COUNT         = 6
-H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
-H2_ENUM_STEPPED(FactionType)
+};
+using enum FactionType;
+ENABLE_ENUM_STEPS(FactionType)
 
-// Hero cursor slots 0-5 reuse faction ids; slot 6 selects the boat sprites.
+
 typedef FactionType HeroCursorType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(TerrainType, i8)
+enum class TerrainType : i8 {
     TERRAIN_INVALID   = -1,
     TERRAIN_WATER     = 0,
     TERRAIN_GRASS     = 1,
@@ -536,9 +544,10 @@ H2_ENUM_CLASS_BEGIN_SPLIT(TerrainType, i8)
     TERRAIN_BEACH     = 8,
     TERRAIN_COUNT     = 9,
     TERRAIN_ROAD      = TERRAIN_COUNT
-H2_ENUM_CLASS_END_SPLIT(TerrainType, i8)
+};
+using enum TerrainType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
+enum class BuildingSlotType : i8 {
     BUILDING_SLOT_NONE                          = -1,
     TOWN_OBJECT_NONE                            = BUILDING_SLOT_NONE,
     BUILDING_SLOT_MAGE_GUILD                    = 0,
@@ -581,7 +590,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_DISABLED_FIRST                = 14,
     TOWN_OBJECT_BOAT                            = BUILDING_SLOT_DISABLED_FIRST,
     BUILDING_SLOT_NEUTRAL_LAST                  = 15,
-    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST, // captain's quarters slot
+    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST,
     TOWN_OBJECT_CAPTAIN_QUARTERS                = BUILDING_SLOT_NEUTRAL_LAST,
     BUILDING_SLOT_DISABLED_SECOND               = 16,
     TOWN_OBJECT_RACE_OVERLAY                    = BUILDING_SLOT_DISABLED_SECOND,
@@ -618,10 +627,11 @@ H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_DISABLED_LAST                 = 31,
     TOWN_OBJECT_BARBARIAN_OVERLAY               = BUILDING_SLOT_DISABLED_LAST,
     BUILDING_SLOT_COUNT                         = 32
-H2_ENUM_CLASS_END_SPLIT(BuildingSlotType, i8)
-H2_ENUM_STEPPED(BuildingSlotType)
+};
+using enum BuildingSlotType;
+ENABLE_ENUM_STEPS(BuildingSlotType)
 
-H2_ENUM_CLASS_BEGIN(MonsterFlags)
+enum class MonsterFlags : i32 {
     MONSTER_FLAGS_NONE                    = 0,
     MONSTER_FLAGS_WIDE                    = 0x00000001,
     MONSTER_ATTRIBUTE_WIDE                = MONSTER_FLAGS_WIDE,
@@ -642,7 +652,7 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_ABILITY_FLAG_AI_EXCLUDED      = MONSTER_FLAGS_DEAD,
     MONSTER_FLAGS_AI_EXCLUDED             = MONSTER_FLAGS_DEAD,
     COMBAT_ARMY_FLAG_MIRROR_IMAGE         =
-        MONSTER_FLAGS_DEAD, // shared bit: combat mirror images ride the dead bit
+        MONSTER_FLAGS_DEAD,
     MONSTER_ABILITY_FLAG_HIGH_MORALE      = 0x00000020,
     MONSTER_FLAGS_RETALIATED              = 0x00000040,
     MONSTER_ATTRIBUTE_RETALIATED          = MONSTER_FLAGS_RETALIATED,
@@ -666,16 +676,17 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_FLAGS_GRAY_PALETTE            = 0x00004000,
     MONSTER_FLAGS_ROUND_PERSISTENT_MASK   = 0x0000ff1f,
     MONSTER_FLAGS_RESURRECTED_MASK        = 0x0000ffef
-H2_ENUM_CLASS_END(MonsterFlags)
-H2_ENUM_FLAGS(MonsterFlags)
+};
+using enum MonsterFlags;
+ENABLE_ENUM_FLAGS(MonsterFlags)
 
 typedef u32 UInt32;
 struct MemEntry;
 struct _SAMPLE;
 
-H2_ENUM_BEGIN(KbLayoutConstant)
+typedef enum KbLayoutConstant {
     MENU_ENABLE_STATUS_COUNT = 70
-H2_ENUM_END(KbLayoutConstant)
+} KbLayoutConstant;
 #pragma pack(push, 1)
 struct SMenuEnableStatus {
     u32 command;
@@ -684,7 +695,6 @@ struct SMenuEnableStatus {
     u8 reserved;
 };
 #pragma pack(pop)
-SIZE(SMenuEnableStatus, 7);
 
 #include <SOURCE/CONFIG_TYPES.h>
 struct tag_tilePoint {
@@ -692,10 +702,9 @@ struct tag_tilePoint {
     i8 y;
     i16 frameOffset;
 };
-SIZE(tag_tilePoint, 4);
-H2_ENUM_BEGIN(MonsterDatabaseConstant)
+typedef enum MonsterDatabaseConstant {
     MONSTER_SPRITE_NAME_SIZE = 5
-H2_ENUM_END(MonsterDatabaseConstant)
+} MonsterDatabaseConstant;
 #pragma pack(push, 1)
 struct tag_monsterInfo {
     union {
@@ -710,7 +719,7 @@ struct tag_monsterInfo {
     i8 iconIndex;
     i8 growth;
     u16 hitPoints;
-    H2_ENUM_STORAGE(FactionType, i8) race;
+    H2EnumStorage<FactionType, i8> race;
     i8 speed;
     i8 attack;
     i8 defense;
@@ -731,11 +740,10 @@ struct tag_monsterInfo {
     };
 };
 #pragma pack(pop)
-SIZE(tag_monsterInfo, 0x1a);
-H2_ENUM_BEGIN(CombatHeroAnimationConstant)
+typedef enum CombatHeroAnimationConstant {
     COMBAT_HERO_ANIMATION_COUNT       = 12,
     COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
-H2_ENUM_END(CombatHeroAnimationConstant)
+} CombatHeroAnimationConstant;
 
 #pragma pack(push, 1)
 struct SCmbtHero {
@@ -745,10 +753,9 @@ struct SCmbtHero {
     i8 animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
     i8 animationFrames[COMBAT_HERO_ANIMATION_COUNT][COMBAT_HERO_ANIMATION_FRAME_COUNT];
 };
-SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
 
-H2_ENUM_CLASS_BEGIN_SPLIT(CombatEffectType, i8)
+enum class CombatEffectType : i8 {
     COMBAT_EFFECT_INVALID       = -1,
     COMBAT_EFFECT_EMPTY         = 0,
     COMBAT_EFFECT_MAGIC_01      = 1,
@@ -783,40 +790,42 @@ H2_ENUM_CLASS_BEGIN_SPLIT(CombatEffectType, i8)
     COMBAT_EFFECT_STONE_SKIN    = 30,
     COMBAT_EFFECT_STEEL_SKIN    = 31,
     COMBAT_EFFECT_COUNT         = 32
-H2_ENUM_CLASS_END_SPLIT(CombatEffectType, i8)
+};
+using enum CombatEffectType;
 
-H2_ENUM_CLASS_BEGIN_T(SpellInfoAttribute, u8)
+enum class SpellInfoAttribute : u8 {
     SPELL_INFO_ATTRIBUTE_POWER     = 0x01,
     SPELL_INFO_ATTRIBUTE_COMBAT    = 0x02,
     SPELL_INFO_ATTRIBUTE_ADVENTURE = 0x04,
     SPELL_INFO_ATTRIBUTE_DURATION  = 0x08
-H2_ENUM_CLASS_END_T(SpellInfoAttribute, u8)
-H2_ENUM_FLAGS(SpellInfoAttribute)
+};
+using enum SpellInfoAttribute;
+ENABLE_ENUM_FLAGS(SpellInfoAttribute)
 
-H2_ENUM_BEGIN(SpellInfoConstant)
+typedef enum SpellInfoConstant {
     SPELL_INFO_SOUND_NAME_SIZE = 9,
-    SPELL_INFO_RACE_COUNT      = IDX(FACTION_COUNT)
-H2_ENUM_END(SpellInfoConstant)
+    SPELL_INFO_RACE_COUNT      = H2EnumIndex(FACTION_COUNT)
+} SpellInfoConstant;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(SpellLevel, u8)
+enum class SpellLevel : u8 {
     SPELL_LEVEL_FIRST  = 1,
     SPELL_LEVEL_SECOND = 2,
     SPELL_LEVEL_THIRD  = 3,
     SPELL_LEVEL_FOURTH = 4,
     SPELL_LEVEL_FIFTH  = 5
-H2_ENUM_CLASS_END_SPLIT(SpellLevel, u8)
+};
+using enum SpellLevel;
 
 struct SSpellInfo {
     char soundName[SPELL_INFO_SOUND_NAME_SIZE];
-    H2_ENUM_STORAGE(SpellLevel, u8) level;
+    H2EnumStorage<SpellLevel, u8> level;
     u8 iconIndex;
-    H2_ENUM_STORAGE(CombatEffectType, u8) combatEffect;
+    H2EnumStorage<CombatEffectType, u8> combatEffect;
     i16 aiValue;
     u8 cost;
     u8 raceChance[SPELL_INFO_RACE_COUNT];
     SpellInfoAttribute attributes;
 };
-SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 {
     class sample* pSample;
     struct _SAMPLE* pMem;
@@ -828,7 +837,6 @@ struct SWinSetup {
     u16 widgetId;
     char* text;
 };
-SIZE(SWinSetup, 7);
 #pragma pack(pop)
 
 #endif

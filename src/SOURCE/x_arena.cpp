@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/font.h>
@@ -13,7 +13,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/x_arena.h>
 
-H2_ENUM_BEGIN(ArenaConstant)
+typedef enum ArenaConstant {
     CHOICE_COUNT            = 3,
     WINDOW_RESOURCE         = 5,
     WINDOW_WIDTH            = 306,
@@ -44,9 +44,8 @@ H2_ENUM_BEGIN(ArenaConstant)
     BROADCAST_TEXT_ID       = 1,
     BROADCAST_CONTROL_VALUE = 6,
     DRAW_MODE               = 1
-H2_ENUM_END(ArenaConstant)
+} ArenaConstant;
 
-VA(0x004c0080, 0x35c)
 i32 DoArenaDialog(void) {
     i32 statValues_2[CHOICE_COUNT];
     i32 statValue_28;
@@ -66,17 +65,17 @@ i32 DoArenaDialog(void) {
     if (windowY_12 > WINDOW_MAX_Y)
         windowY_12 = WINDOW_MAX_Y;
     choice = 0;
-    sprintf(windowName_3, DATA_COMPGEN(0x0051dbcc, doArenaDialogEvntwinDBin, "evntwin%d.bin"), windowLines_7);
+    sprintf(windowName_3, "evntwin%d.bin", windowLines_7);
     arenaWinPtr = new heroWindow(windowX_9, windowY_12, windowName_3);
     if (arenaWinPtr == NULL)
         MemError();
 
     strcpy(
         gText,
-        DATA_COMPGEN(0x0051dbdc, doArenaDialogYouEnterTheArenaAndFace, "You enter the arena and face a pack of vicious lions.  You handily "
+        "You enter the arena and face a pack of vicious lions.  You handily "
         "defeat them, to the wild cheers of the crowd.  Impressed by your "
         "skill, the aged trainer of gladiators agrees to train you in a "
-        "skill of your choice.")
+        "skill of your choice."
     );
     lineCount_3 = bigFont->LineLength(gText, TEXT_WIDTH);
     textHeight_11 = lineCount_3 << TEXT_LINE_SHIFT;
@@ -92,7 +91,7 @@ i32 DoArenaDialog(void) {
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
-            DATA_COMPGEN(0x0051dcb8, doArenaDialogXprimaryIcn, "xprimary.icn"),
+            "xprimary.icn",
             widgetIndex_12 == choice ? widgetIndex_12 + SELECTED_FRAME_OFFSET
                                      : widgetIndex_12,
             ICON_DRAW_NORMAL,
@@ -109,7 +108,7 @@ i32 DoArenaDialog(void) {
             TEXT_WIDTH_PIXELS,
             TEXT_HEIGHT,
             gStatNames[widgetIndex_12],
-            DATA_COMPGEN(0x0051dcc8, doArenaDialogSmalfontFnt, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             TEXT_BACKGROUND,
             WIDGET_KIND_TEXT,
@@ -140,7 +139,6 @@ i32 DoArenaDialog(void) {
     return choice;
 }
 
-VA(0x004c03dc, 0x25f)
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     tag_message dialogMessage_12;
     i32 widgetIndex_5;
@@ -149,7 +147,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message_1.type = MESSAGE_WIDGET;
@@ -222,7 +220,6 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004c063b, 0x150)
 void UpdateArenaIcons(void) {
     i32 widgetIndex;
 
@@ -235,7 +232,7 @@ void UpdateArenaIcons(void) {
             ICON_Y,
             ICON_WIDTH,
             ICON_HEIGHT,
-            DATA_COMPGEN(0x0051dcd8, updateArenaIconsXprimaryIcn, "xprimary.icn"),
+            "xprimary.icn",
             widgetIndex == choice ? widgetIndex + SELECTED_FRAME_OFFSET : widgetIndex,
             ICON_DRAW_NORMAL,
             widgetIndex + WIDGET_FIRST_ID,
@@ -249,6 +246,6 @@ void UpdateArenaIcons(void) {
     arenaWinPtr->DrawWindow(DRAW_MODE, WIDGET_FIRST_ID, WIDGET_LAST_ID);
 }
 
-DATA(0x005331a8) i32 choice;
-DATA(0x005331b0) class iconWidget* skillWidget[CHOICE_COUNT];
-DATA(0x005331bc) class heroWindow* arenaWinPtr;
+i32 choice;
+class iconWidget* skillWidget[CHOICE_COUNT];
+class heroWindow* arenaWinPtr;

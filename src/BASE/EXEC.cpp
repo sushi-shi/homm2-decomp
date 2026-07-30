@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/executive.h>
 #include <BASE/EXEC_TYPES.h>
 #include <BASE/baseManager.h>
@@ -13,14 +13,14 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
-H2_ENUM_BEGIN(ExecutiveManagerConstant)
+typedef enum ExecutiveManagerConstant {
     MANAGER_DEFAULT_PRIORITY = -1,
     MANAGER_SUCCESS          = 0,
     MANAGER_ERROR            = 3,
     DIALOG_MANAGER_CAPACITY  = 20
-H2_ENUM_END(ExecutiveManagerConstant)
+} ExecutiveManagerConstant;
 
-DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
+static SExecutiveText gExecutiveText = {
     "Unable to initialize resources - possible disk problem.",
     "Unable to initialize input devices - possible problem with mouse or keyboard.",
     "Unable to initialize sound.",
@@ -41,7 +41,6 @@ DATA(0x0051fb20) static SExecutiveText gExecutiveText = {
     "Terminated"
 };
 
-VA(0x004d1610, 0x10)
 executive::executive(void) {
     m_managerListHead = NULL;
     m_managerListTail = NULL;
@@ -49,7 +48,6 @@ executive::executive(void) {
     m_result = 0;
 }
 
-VA(0x004d1620, 0x9e)
 i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
@@ -66,7 +64,6 @@ i32 executive::InitSystem(void) {
     return 0;
 }
 
-VA(0x004d16c0, 0x86)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
@@ -85,7 +82,6 @@ void executive::ShutDownSystem(void) {
     gpResourceManager->Close();
 }
 
-VA(0x004d1750, 0xfb)
 i32 executive::DoDialog(class baseManager* manager) {
     baseManager* managerList[DIALOG_MANAGER_CAPACITY];
     baseManager* previousList[DIALOG_MANAGER_CAPACITY];
@@ -135,7 +131,6 @@ i32 executive::DoDialog(class baseManager* manager) {
     return dialog->m_result;
 }
 
-VA(0x004d1850, 0x86)
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
@@ -149,7 +144,6 @@ void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStop);
 }
 
-VA(0x004d18e0, 0xce)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == NULL)
         return MANAGER_ERROR;
@@ -189,7 +183,6 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     return MANAGER_SUCCESS;
 }
 
-VA(0x004d19b0, 0x76)
 void executive::RemoveManager(class baseManager* mgr) {
     if (mgr != NULL) {
         mgr->Close();
@@ -220,7 +213,6 @@ void executive::RemoveManager(class baseManager* mgr) {
     }
 }
 
-VA(0x004d1a30, 0x5a)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(saved);
@@ -233,7 +225,6 @@ void executive::CallManager(class baseManager* mgr) {
     m_activeManager = saved;
 }
 
-VA(0x004d1a90, 0xfa)
 void executive::MainLoop(void) {
     tag_message message;
     i32 keepDispatching;
@@ -288,7 +279,6 @@ void executive::MainLoop(void) {
     }
 }
 
-VA(0x004d1b90, 0xa)
 void executive::Terminate(void) {
     ShutDown(gExecutiveText.terminationMessage);
 }

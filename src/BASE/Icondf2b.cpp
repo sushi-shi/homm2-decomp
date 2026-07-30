@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/Icondf2b.h>
 #include <BASE/IconDraw.h>
 #include <BASE/IconEntry.h>
@@ -8,25 +8,24 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 
-DATA(0x005381d4) static i32 s_clipB;
-DATA(0x005381c0) static u32 s_loopCount;
-DATA(0x005381e0) static i32 s_y;
-DATA(0x005381c4) static i32 s_x;
-DATA(0x005381b8) static i32 s_left;
-DATA(0x005381bc) static i32 s_right;
-DATA(0x005381e8) static u32 s_run;
-DATA(0x005381d0) static u8* s_row;
-DATA(0x005381dc) static u8* s_dst;
-DATA(0x005381d8) static u8* s_src;
-DATA(0x005381e4) static IconEntry* s_entry;
-DATA(0x005381cc) static u32 s_spanCount;
-DATA(0x005381c8) static i32 s_clipR;
+static i32 s_clipB;
+static u32 s_loopCount;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static i32 s_right;
+static u32 s_run;
+static u8* s_row;
+static u8* s_dst;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static i32 s_clipR;
 
 static inline i32 FlipDimRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
-VA(0x004daa20, 0x23b)
 void FlipDimIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,
@@ -34,7 +33,7 @@ void FlipDimIconToBitmap(
     i32 y,
     i32 frame,
     i32 color,
-    H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
+    IconDrawClipMode clip,
     i32 clipX,
     i32 clipY,
     i32 clipW,

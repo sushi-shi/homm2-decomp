@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/message.h>
@@ -18,7 +18,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/kbwin.h>
 #include <SOURCE/Campaign.h>
-H2_ENUM_BEGIN(CampaignScenarioArmyCount)
+typedef enum CampaignScenarioArmyCount {
     BARBARIAN_ORC_CHIEF_COUNT  = 12,
     BARBARIAN_OGRE_COUNT       = 18,
     BARBARIAN_GOBLIN_COUNT     = 40,
@@ -28,9 +28,9 @@ H2_ENUM_BEGIN(CampaignScenarioArmyCount)
     NECROMANCER_SKELETON_COUNT = 50,
     NECROMANCER_MUMMY_COUNT    = 18,
     NECROMANCER_VAMPIRE_COUNT  = 8
-H2_ENUM_END(CampaignScenarioArmyCount)
+} CampaignScenarioArmyCount;
 
-H2_ENUM_BEGIN(CampaignSmacker)
+typedef enum CampaignSmacker {
     SMACKER_ROLAND_INTRO    = 5,
     SMACKER_ROLAND_1        = 6,
     SMACKER_ROLAND_2        = 7,
@@ -60,9 +60,9 @@ H2_ENUM_BEGIN(CampaignSmacker)
     SMACKER_ARCHIBALD_9     = 32,
     SMACKER_ARCHIBALD_10    = 33,
     SMACKER_ARCHIBALD_END   = 34
-H2_ENUM_END(CampaignSmacker)
+} CampaignSmacker;
 
-H2_ENUM_BEGIN(CampaignMapIndex)
+typedef enum CampaignMapIndex {
     MAP_ONE      = 0,
     MAP_TWO      = 1,
     MAP_THREE    = 2,
@@ -76,9 +76,9 @@ H2_ENUM_BEGIN(CampaignMapIndex)
     MAP_ELEVEN   = 10,
     MAP_TWELVE   = 11,
     MAP_THIRTEEN = 12
-H2_ENUM_END(CampaignMapIndex)
+} CampaignMapIndex;
 
-H2_ENUM_BEGIN(CampaignScenarioNumber)
+typedef enum CampaignScenarioNumber {
     SCENARIO_INTRO    = 0,
     SCENARIO_ONE      = 1,
     SCENARIO_TWO      = 2,
@@ -93,9 +93,9 @@ H2_ENUM_BEGIN(CampaignScenarioNumber)
     SCENARIO_ELEVEN   = 11,
     SCENARIO_TWELVE   = 12,
     SCENARIO_THIRTEEN = 13
-H2_ENUM_END(CampaignScenarioNumber)
+} CampaignScenarioNumber;
 
-H2_ENUM_CLASS_BEGIN(CampaignTrackType)
+enum class CampaignTrackType : i32 {
     ROLAND_TO_ROLAND             = 0,
     ROLAND_TO_ARCHIBALD          = 1,
     ARCHIBALD_TO_ROLAND          = 2,
@@ -103,9 +103,10 @@ H2_ENUM_CLASS_BEGIN(CampaignTrackType)
     SWITCH_TO_ROLAND             = 4,
     SWITCH_TO_ARCHIBALD_COMPLETE = 5,
     SWITCH_TO_ARCHIBALD_OPEN     = 6
-H2_ENUM_CLASS_END(CampaignTrackType)
+};
+using enum CampaignTrackType;
 
-H2_ENUM_BEGIN(CampaignTrackConstant)
+typedef enum CampaignTrackConstant {
     TRACK_X                          = 0,
     TRACK_Y                          = 1,
     TRACK_ICON_FILL_COLOR            = 1,
@@ -113,11 +114,10 @@ H2_ENUM_BEGIN(CampaignTrackConstant)
     TRACK_SELECTED_FRAME_TWO_STEPS   = 6,
     TRACK_SELECTED_FRAME_THREE_STEPS = 9,
     TRACK_SELECTED_FRAME_FOUR_STEPS  = 12
-H2_ENUM_END(CampaignTrackConstant)
+} CampaignTrackConstant;
 
-VA(0x00447710, 0x563)
 i32 game::HandleCampaignWin(void) {
-    H2_ENUM_STORAGE_STEPPED(CampaignSide, i32) sideIndex;
+    H2SteppedEnumStorage<CampaignSide, i32> sideIndex;
     i32 mapIndex;
 
     memset(m_campaignMapEnabled, 0, sizeof(m_campaignMapEnabled));
@@ -125,53 +125,53 @@ i32 game::HandleCampaignWin(void) {
         switch (m_campaignScenario + 1) {
             case SCENARIO_INTRO:
                 PlaySmacker(SMACKER_ROLAND_INTRO);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_ONE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_ONE] = 1;
                 break;
             case SCENARIO_ONE:
                 PlaySmacker(SMACKER_ROLAND_1);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_TWO] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_TWO] = 1;
                 break;
             case SCENARIO_TWO:
                 PlaySmacker(SMACKER_ROLAND_2);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_THREE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_FOUR] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_THREE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_FOUR] = 1;
                 break;
             case SCENARIO_THREE:
                 PlaySmacker(SMACKER_ROLAND_3B);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_FOUR] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_FOUR] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)] = 1;
                 break;
             case SCENARIO_FOUR:
                 PlaySmacker(SMACKER_ROLAND_4);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_FIVE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_TWELVE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_FIVE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_TWELVE] = 1;
                 break;
             case SCENARIO_FIVE:
                 if (m_campaignStartingSide == CAMPAIGN_ROLAND)
                     PlaySmacker(SMACKER_ROLAND_5A);
                 else
                     PlaySmacker(SMACKER_ROLAND_5B);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_SIX] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_SIX] = 1;
                 break;
             case SCENARIO_SIX:
                 PlaySmacker(SMACKER_ROLAND_6);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_SEVEN] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_EIGHT] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_SEVEN] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_EIGHT] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_SORCERESS_GUILD)] = 1;
                 break;
             case SCENARIO_SEVEN:
                 PlaySmacker(SMACKER_ROLAND_8);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_NINE] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_NINE] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)] = 1;
                 break;
             case SCENARIO_EIGHT:
                 PlaySmacker(SMACKER_ROLAND_8);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_NINE] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_NINE] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)] = 1;
                 break;
             case SCENARIO_NINE:
                 PlaySmacker(SMACKER_ROLAND_9);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ROLAND)][MAP_TEN] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ROLAND)][MAP_TEN] = 1;
                 break;
             case SCENARIO_TEN:
                 PlaySmacker(SMACKER_ROLAND_END);
@@ -181,68 +181,68 @@ i32 game::HandleCampaignWin(void) {
         switch (m_campaignScenario + 1) {
             case SCENARIO_INTRO:
                 PlaySmacker(SMACKER_ARCHIBALD_INTRO);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_ONE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_ONE] = 1;
                 break;
             case SCENARIO_ONE:
                 PlaySmacker(SMACKER_ARCHIBALD_1);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_TWO] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_TWO] = 1;
                 break;
             case SCENARIO_TWO:
                 PlaySmacker(SMACKER_ARCHIBALD_2);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_THREE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_FOUR] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_THREE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_FOUR] = 1;
                 break;
             case SCENARIO_THREE:
                 PlaySmacker(SMACKER_ARCHIBALD_4A);
                 PlaySmacker(SMACKER_ARCHIBALD_4_END);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_FIVE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_TWELVE] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_NECROMANCER_GUILD)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_FIVE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_TWELVE] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_NECROMANCER_GUILD)] = 1;
                 break;
             case SCENARIO_FOUR:
                 PlaySmacker(SMACKER_ARCHIBALD_4B);
                 PlaySmacker(SMACKER_ARCHIBALD_4_END);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_FIVE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_TWELVE] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_OGRE_ALLIANCE)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_FIVE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_TWELVE] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DWARFBANE)] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_OGRE_ALLIANCE)] = 1;
                 break;
             case SCENARIO_FIVE:
                 if (m_campaignStartingSide == CAMPAIGN_ARCHIBALD)
                     PlaySmacker(SMACKER_ARCHIBALD_5A);
                 else
                     PlaySmacker(SMACKER_ARCHIBALD_5B);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_SIX] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_SIX] = 1;
                 break;
             case SCENARIO_SIX:
                 PlaySmacker(SMACKER_ARCHIBALD_6);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_SEVEN] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_EIGHT] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_SEVEN] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_EIGHT] = 1;
                 break;
             case SCENARIO_SEVEN:
                 PlaySmacker(SMACKER_ARCHIBALD_7B);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_EIGHT] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_DRAGON_ALLIANCE)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_EIGHT] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_DRAGON_ALLIANCE)] = 1;
                 break;
             case SCENARIO_EIGHT:
                 PlaySmacker(SMACKER_ARCHIBALD_8);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_NINE] = 1;
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_TEN] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_NINE] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_TEN] = 1;
                 break;
             case SCENARIO_NINE:
                 PlaySmacker(SMACKER_ARCHIBALD_10);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_ELEVEN] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_ELEVEN] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 1;
                 break;
             case SCENARIO_TEN:
                 PlaySmacker(SMACKER_ARCHIBALD_10);
-                m_campaignMapEnabled[IDX(CAMPAIGN_ARCHIBALD)][MAP_ELEVEN] = 1;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 1;
+                m_campaignMapEnabled[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_ELEVEN] = 1;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 1;
                 break;
             case SCENARIO_ELEVEN:
                 PlaySmacker(SMACKER_ARCHIBALD_END);
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 0;
-                m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 0;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)] = 0;
+                m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)] = 0;
                 break;
         }
     }
@@ -253,8 +253,8 @@ i32 game::HandleCampaignWin(void) {
         m_campaignScenario = CAMPAIGN_NO_SCENARIO;
         for (sideIndex = CAMPAIGN_ROLAND; sideIndex < CAMPAIGN_SIDE_COUNT; ++sideIndex) {
             for (mapIndex = 0; mapIndex < CAMPAIGN_REGULAR_MAP_COUNT; ++mapIndex) {
-                if (m_campaignMapEnabled[IDX(sideIndex)][mapIndex]) {
-                    gpGame->m_campaignScenarioBonus[IDX(sideIndex)][mapIndex] =
+                if (m_campaignMapEnabled[H2EnumIndex(sideIndex)][mapIndex]) {
+                    gpGame->m_campaignScenarioBonus[H2EnumIndex(sideIndex)][mapIndex] =
                         m_campaignScore;
                     if (m_campaignScenario == CAMPAIGN_NO_SCENARIO) {
                         m_campaignType = sideIndex;
@@ -274,8 +274,7 @@ i32 game::HandleCampaignWin(void) {
     return 0;
 }
 
-VA(0x00447c73, 0x343)
-void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map) {
+void game::PlayPreScenarioSmacker(CampaignSide side, i32 map) {
     if (side == CAMPAIGN_ROLAND) {
         switch (map + 1) {
             case SCENARIO_ONE:
@@ -288,7 +287,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
                 PlaySmacker(SMACKER_ROLAND_2);
                 break;
             case SCENARIO_FOUR:
-                if (m_campaignScenarioCompleted[IDX(m_campaignStartingSide)][MAP_THREE])
+                if (m_campaignScenarioCompleted[H2EnumIndex(m_campaignStartingSide)][MAP_THREE])
                     PlaySmacker(SMACKER_ROLAND_3B);
                 else
                     PlaySmacker(SMACKER_ROLAND_3A);
@@ -334,7 +333,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
                 PlaySmacker(SMACKER_ARCHIBALD_3);
                 break;
             case SCENARIO_FIVE:
-                if (m_campaignScenarioCompleted[IDX(m_campaignStartingSide)][MAP_FOUR])
+                if (m_campaignScenarioCompleted[H2EnumIndex(m_campaignStartingSide)][MAP_FOUR])
                     PlaySmacker(SMACKER_ARCHIBALD_4B);
                 else
                     PlaySmacker(SMACKER_ARCHIBALD_4A);
@@ -350,7 +349,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
                 PlaySmacker(SMACKER_ARCHIBALD_6);
                 break;
             case SCENARIO_EIGHT:
-                if (m_campaignScenarioCompleted[IDX(m_campaignType)][MAP_SEVEN])
+                if (m_campaignScenarioCompleted[H2EnumIndex(m_campaignType)][MAP_SEVEN])
                     PlaySmacker(SMACKER_ARCHIBALD_7B);
                 else
                     PlaySmacker(SMACKER_ARCHIBALD_7A);
@@ -366,7 +365,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
                 break;
             case SCENARIO_TWELVE:
             case SCENARIO_THIRTEEN:
-                if (m_campaignScenarioCompleted[IDX(m_campaignStartingSide)][MAP_FOUR])
+                if (m_campaignScenarioCompleted[H2EnumIndex(m_campaignStartingSide)][MAP_FOUR])
                     PlaySmacker(SMACKER_ARCHIBALD_4B);
                 else
                     PlaySmacker(SMACKER_ARCHIBALD_4A);
@@ -377,7 +376,6 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
     gpWindowManager->m_updateFlags = 1;
 }
 
-VA(0x00447fb6, 0x48d)
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     i32 savedInterface;
     i32 map;
@@ -385,7 +383,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     widget* trackWidget;
     tag_message message;
 
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f4f94, showCampaignInfoAdvmiceMse, "advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     gpMouseManager->ReallyShowPointer();
     savedInterface = gbUseEvilInterface;
     gbUseEvilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
@@ -395,22 +393,22 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (m_campaignScenario == CAMPAIGN_SWITCHING_SCENARIO && !viewOnly) {
         if (m_campaignType == CAMPAIGN_ROLAND)
             iCampaignTrackType = SWITCH_TO_ROLAND;
-        else if (m_campaignScenarioCompleted[IDX(CAMPAIGN_ARCHIBALD)][MAP_THREE])
+        else if (m_campaignScenarioCompleted[H2EnumIndex(CAMPAIGN_ARCHIBALD)][MAP_THREE])
             iCampaignTrackType = SWITCH_TO_ARCHIBALD_COMPLETE;
         else
             iCampaignTrackType = SWITCH_TO_ARCHIBALD_OPEN;
     } else {
         iCampaignTrackType = static_cast<CampaignTrackType>(
-            IDX(m_campaignType) + IDX(m_campaignStartingSide) * IDX(CAMPAIGN_SIDE_COUNT)
+            H2EnumIndex(m_campaignType) + H2EnumIndex(m_campaignStartingSide) * H2EnumIndex(CAMPAIGN_SIDE_COUNT)
         );
     }
 
-    campWin = new heroWindow(0, 0, DATA_COMPGEN(0x004f4fa0, showCampaignInfoCampaignBin, "campaign.bin"));
+    campWin = new heroWindow(0, 0, "campaign.bin");
     if (campWin == NULL)
         MemError();
     trackWidget = NULL;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
-        if (IDX(iCampaignTrackType) < IDX(SWITCH_TO_ROLAND)
+        if (H2EnumIndex(iCampaignTrackType) < H2EnumIndex(SWITCH_TO_ROLAND)
             && map >= CAMPAIGN_REGULAR_MAP_COUNT)
             continue;
         if (iCampaignTrackType == SWITCH_TO_ROLAND && map == MAP_THIRTEEN)
@@ -419,20 +417,20 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
             continue;
         if (iCampaignTrackType == SWITCH_TO_ARCHIBALD_OPEN && map == MAP_TWELVE)
             continue;
-        if (trackXY[IDX(iCurViewSide)][map][TRACK_X] != -1) {
+        if (trackXY[H2EnumIndex(iCurViewSide)][map][TRACK_X] != -1) {
             trackMapIndex = map;
             if (trackMapIndex > CAMPAIGN_REGULAR_MAP_COUNT)
                 trackMapIndex = CAMPAIGN_REGULAR_MAP_COUNT;
             trackWidget = new iconWidget(
-                trackXY[IDX(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
+                trackXY[H2EnumIndex(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
                                                                : m_campaignType)][map][TRACK_X]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
-                trackXY[IDX(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
+                trackXY[H2EnumIndex(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
                                                                : m_campaignType)][map][TRACK_Y]
                     - CAMPAIGN_TRACK_ICON_OFFSET,
                 CAMPAIGN_TRACK_ICON_SIZE,
                 CAMPAIGN_TRACK_ICON_SIZE,
-                DATA_COMPGEN(0x004f4fb0, showCampaignInfoCampxtrgIcn, "campxtrg.icn"),
+                "campxtrg.icn",
                 CAMPAIGN_TRACK_ICON_FRAME,
                 ICON_DRAW_NORMAL,
                 trackMapIndex + CAMPAIGN_TRACK_WIDGET_FIRST,
@@ -449,13 +447,13 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     if (!viewOnly) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         campWin->BroadcastMessage(message);
     }
     if (gbLowMemory) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         campWin->BroadcastMessage(message);
     }
     gpSoundManager->SwitchAmbientMusic(
@@ -468,7 +466,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
-            DATA_COMPGEN(0x004f4fc0, showCampaignInfoAreYouSureYouWantTo, "Are you sure you want to restart this scenario?"),
+            "Are you sure you want to restart this scenario?",
             CAMPAIGN_RESTART_CONFIRM,
             CAMPAIGN_DIALOG_NO_RESOURCE,
             CAMPAIGN_DIALOG_NO_RESOURCE,
@@ -491,7 +489,6 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     }
 }
 
-VA(0x00448443, 0xa0f)
 void game::CampaignInfoUpdate(i32 redraw) {
     i32 map;
     tag_message message;
@@ -500,11 +497,11 @@ void game::CampaignInfoUpdate(i32 redraw) {
 
     message.type = MESSAGE_WIDGET;
     for (map = 0; map < CAMPAIGN_TRACK_POINT_COUNT; ++map) {
-        if (m_campaignMapEnabled[IDX(iCurViewSide)][map]) {
+        if (m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][map]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_COMPLETE;
         } else if (map < CAMPAIGN_REGULAR_MAP_COUNT
                    && m_campaignScenarioCompleted
-                          [IDX(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
+                          [H2EnumIndex(map < CAMPAIGN_SWITCHING_SCENARIO ? m_campaignStartingSide
                                                                  : m_campaignType)][map]) {
             message.payload.widget.data.value = CAMPAIGN_TRACK_FRAME_AVAILABLE;
         } else {
@@ -540,53 +537,53 @@ void game::CampaignInfoUpdate(i32 redraw) {
     message.payload.widget.command = CAMPAIGN_MESSAGE_SET_ICON;
     message.payload.widget.id = CAMPAIGN_TRACK_ICON_WIDGET;
     message.payload.widget.data.text = gText;
-    sprintf(gText, DATA_COMPGEN(0x004f4ff0, campaignInfoUpdateCtrack02dIcn, "ctrack%02d.icn"), IDX(iCampaignTrackType));
+    sprintf(gText, "ctrack%02d.icn", H2EnumIndex(iCampaignTrackType));
     campWin->BroadcastMessage(message);
 
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.data.text = gText;
     message.payload.widget.id = CAMPAIGN_SCENARIO_NUMBER_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP)
-        sprintf(gText, DATA_COMPGEN(0x004f5000, campaignInfoUpdate5, "5"));
+        sprintf(gText, "5");
     else
-        sprintf(gText, DATA_COMPGEN(0x004f5004, campaignInfoUpdateD, "%d"), iCurViewMap + 1);
+        sprintf(gText, "%d", iCurViewMap + 1);
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_NAME_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, DATA_COMPGEN(0x004f5008, campaignInfoUpdateS, "%s"), cCampaignName[1 - IDX(iCurViewSide)][iCurViewMap]);
+        sprintf(gText, "%s", cCampaignName[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
     } else if (m_campaignType != m_campaignStartingSide
                && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-        sprintf(gText, DATA_COMPGEN(0x004f500c, campaignInfoUpdateS2, "%s"), cCampaignName[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]);
+        sprintf(gText, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]);
     } else {
-        sprintf(gText, DATA_COMPGEN(0x004f5010, campaignInfoUpdateS3, "%s"), cCampaignName[IDX(iCurViewSide)][iCurViewMap]);
+        sprintf(gText, "%s", cCampaignName[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     }
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_DESCRIPTION_WIDGET;
     if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-        sprintf(gText, DATA_COMPGEN(0x004f5014, campaignInfoUpdateS4, "%s"), cCampaignDescription[1 - IDX(iCurViewSide)][iCurViewMap]);
+        sprintf(gText, "%s", cCampaignDescription[1 - H2EnumIndex(iCurViewSide)][iCurViewMap]);
     } else if (m_campaignType != m_campaignStartingSide
                && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f5018, campaignInfoUpdateS5, "%s"),
-            cCampaignDescription[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]
+            "%s",
+            cCampaignDescription[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP]
         );
     } else {
-        sprintf(gText, DATA_COMPGEN(0x004f501c, campaignInfoUpdateS6, "%s"), cCampaignDescription[IDX(iCurViewSide)][iCurViewMap]);
+        sprintf(gText, "%s", cCampaignDescription[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     }
     campWin->BroadcastMessage(message);
 
     message.payload.widget.id = CAMPAIGN_SCENARIO_BONUS_WIDGET;
-    sprintf(gText, DATA_COMPGEN(0x004f5020, campaignInfoUpdateD2, "%d"), m_campaignScenarioBonus[IDX(iCurViewSide)][iCurViewMap]);
+    sprintf(gText, "%d", m_campaignScenarioBonus[H2EnumIndex(iCurViewSide)][iCurViewMap]);
     campWin->BroadcastMessage(message);
 
-    strcpy(gText, DATA_COMPGEN(0x004f5024, campaignInfoUpdateEmptyString, ""));
+    strcpy(gText, "");
     for (map = 0; map < CAMPAIGN_AWARD_COUNT; ++map) {
         if (m_campaignAwards[map]) {
             strcat(gText, cCampaignAwards[map]);
-            strcat(gText, DATA_COMPGEN(0x004f5028, campaignInfoUpdateEmptyString2, "\n"));
+            strcat(gText, "\n");
         }
     }
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
@@ -594,84 +591,84 @@ void game::CampaignInfoUpdate(i32 redraw) {
 
     for (map = 0; map < CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
         if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
-            choice = &campaignChoices[1 - IDX(iCurViewSide)][iCurViewMap][map];
+            choice = &campaignChoices[1 - H2EnumIndex(iCurViewSide)][iCurViewMap][map];
         } else if (m_campaignType != m_campaignStartingSide
                    && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
-            choice = &campaignChoices[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][map];
+            choice = &campaignChoices[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][map];
         } else {
-            choice = &campaignChoices[IDX(iCurViewSide)][iCurViewMap][map];
+            choice = &campaignChoices[H2EnumIndex(iCurViewSide)][iCurViewMap][map];
         }
 
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(gText, DATA_COMPGEN(0x004f50d4, campaignInfoUpdateDS, "%d %s"), choice->amount, gResourceNames[IDX(choice->resource)]);
+                sprintf(gText, "%d %s", choice->amount, gResourceNames[H2EnumIndex(choice->resource)]);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->artifact) {
                     case ARTIFACT_MAGE_RING:
-                        strcpy(gText, DATA_COMPGEN(0x004f5044, campaignInfoUpdateMageSRing, "Mage's Ring"));
+                        strcpy(gText, "Mage's Ring");
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
-                        strcpy(gText, DATA_COMPGEN(0x004f5088, campaignInfoUpdateFizbinMedal, "Fizbin Medal"));
+                        strcpy(gText, "Fizbin Medal");
                         break;
                     case ARTIFACT_THUNDER_MACE:
-                        strcpy(gText, DATA_COMPGEN(0x004f5098, campaignInfoUpdateThunderMace, "Thunder Mace"));
+                        strcpy(gText, "Thunder Mace");
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, DATA_COMPGEN(0x004f50a8, campaignInfoUpdateGauntlets, "Gauntlets"));
+                        strcpy(gText, "Gauntlets");
                         break;
                     case ARTIFACT_DEFENDER_HELM:
-                        strcpy(gText, DATA_COMPGEN(0x004f5050, campaignInfoUpdateDefenderHelm, "Defender Helm"));
+                        strcpy(gText, "Defender Helm");
                         break;
                     case ARTIFACT_DRAGON_SWORD:
-                        strcpy(gText, DATA_COMPGEN(0x004f506c, campaignInfoUpdateDragonSword, "Dragon Sword"));
+                        strcpy(gText, "Dragon Sword");
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, DATA_COMPGEN(0x004f5060, campaignInfoUpdatePowerAxe, "Power Axe"));
+                        strcpy(gText, "Power Axe");
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, DATA_COMPGEN(0x004f507c, campaignInfoUpdateBreastplate, "Breastplate"));
+                        strcpy(gText, "Breastplate");
                         break;
                     case ARTIFACT_MINOR_SCROLL:
-                        strcpy(gText, DATA_COMPGEN(0x004f5034, campaignInfoUpdateMinorScroll, "Minor Scroll"));
+                        strcpy(gText, "Minor Scroll");
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
                     default:
-                        sprintf(gText, DATA_COMPGEN(0x004f50c8, campaignInfoUpdateS7, "%s"), gArtifactNames[IDX(choice->artifact)]);
+                        sprintf(gText, "%s", gArtifactNames[H2EnumIndex(choice->artifact)]);
                         break;
                 }
                 break;
             case CAMPAIGN_CHOICE_SPELL:
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
-                    sprintf(gText, DATA_COMPGEN(0x004f50b8, campaignInfoUpdateSummonEarth, "Summon Earth"));
+                    sprintf(gText, "Summon Earth");
                 else
-                    sprintf(gText, DATA_COMPGEN(0x004f50b4, campaignInfoUpdateSpellNameFormat, "%s"), gSpellNames[IDX(choice->spell)]);
+                    sprintf(gText, "%s", gSpellNames[H2EnumIndex(choice->spell)]);
                 break;
             case CAMPAIGN_CHOICE_SECONDARY_SKILL:
                 sprintf(
                     gText,
-                    DATA_COMPGEN(0x004f50cc, campaignInfoUpdateSS, "%s %s"),
+                    "%s %s",
                     gSecondarySkillLevels[choice->amount - 1],
                     gSecondarySkills[choice->value]
                 );
                 break;
             case CAMPAIGN_CHOICE_CREATURES:
-                strcpy(armyName, gArmyNamesPlural[IDX(choice->creature)]);
+                strcpy(armyName, gArmyNamesPlural[H2EnumIndex(choice->creature)]);
                 armyName[0] -= 'a' - 'A';
-                sprintf(gText, DATA_COMPGEN(0x004f50ec, campaignInfoUpdateDS2, "%d %s"), choice->amount, armyName);
+                sprintf(gText, "%d %s", choice->amount, armyName);
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-                sprintf(gText, DATA_COMPGEN(0x004f5100, campaignInfoUpdateDS3, "%d %s"), choice->value, DATA_COMPGEN(0x004f50dc, campaignInfoUpdatePuzzlePieces, "Puzzle Pieces"));
+                sprintf(gText, "%d %s", choice->value, "Puzzle Pieces");
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, DATA_COMPGEN(0x004f502c, campaignInfoUpdateExperienceFormat, "%d %s"), choice->value, DATA_COMPGEN(0x004f50f4, campaignInfoUpdateExperience, "Experience"));
+                sprintf(gText, "%d %s", choice->value, "Experience");
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, DATA_COMPGEN(0x004f5108, campaignInfoUpdateNA, "n/a"));
+                sprintf(gText, "n/a");
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
-                sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
+                sprintf(gText, gAlignmentNames[H2EnumIndex(choice->faction)]);
                 break;
         }
         message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
@@ -682,13 +679,13 @@ void game::CampaignInfoUpdate(i32 redraw) {
         message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         if (!bCampaignViewOnly
-            && gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap])
+            && gpGame->m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][iCurViewMap])
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
         else
             message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
         campWin->BroadcastMessage(message);
 
-        if (m_campaignChoice[IDX(iCurViewSide)][iCurViewMap] == map)
+        if (m_campaignChoice[H2EnumIndex(iCurViewSide)][iCurViewMap] == map)
             message.payload.widget.command = CAMPAIGN_MESSAGE_SELECT;
         else
             message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
@@ -699,13 +696,12 @@ void game::CampaignInfoUpdate(i32 redraw) {
         campWin->DrawWindow();
 }
 
-VA(0x00448e52, 0x521)
 MessageDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1)
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
     if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
         message.type = MESSAGE_WIDGET;
@@ -734,10 +730,10 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                     case CAMPAIGN_TRACK_WIDGET_LAST:
                         map = message.payload.widget.id - CAMPAIGN_TRACK_WIDGET_FIRST;
                         if (giDebugLevel < 1
-                            && !gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][map]) {
+                            && !gpGame->m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][map]) {
                             if (map >= CAMPAIGN_REGULAR_MAP_COUNT
                                 || !gpGame->m_campaignScenarioCompleted
-                                        [IDX(map < CAMPAIGN_SWITCHING_SCENARIO
+                                        [H2EnumIndex(map < CAMPAIGN_SWITCHING_SCENARIO
                                                  ? gpGame->m_campaignStartingSide
                                                  : gpGame->m_campaignType)][map])
                                 break;
@@ -752,8 +748,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                     case CAMPAIGN_BONUS_WIDGET_FIRST + 1:
                     case CAMPAIGN_BONUS_WIDGET_LAST:
                         if (!bCampaignViewOnly
-                            && gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
-                            gpGame->m_campaignChoice[IDX(iCurViewSide)][iCurViewMap] =
+                            && gpGame->m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][iCurViewMap]) {
+                            gpGame->m_campaignChoice[H2EnumIndex(iCurViewSide)][iCurViewMap] =
                                 static_cast<u8>(
                                     message.payload.widget.id - CAMPAIGN_BONUS_WIDGET_FIRST
                                 );
@@ -771,19 +767,19 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                         break;
                     case CAMPAIGN_DIALOG_ACCEPT:
                         if (!bCampaignViewOnly) {
-                            if (gpGame->m_campaignMapEnabled[IDX(iCurViewSide)][iCurViewMap]) {
+                            if (gpGame->m_campaignMapEnabled[H2EnumIndex(iCurViewSide)][iCurViewMap]) {
                                 if (iCurViewMap == CAMPAIGN_SWITCHING_MAP) {
                                     gpGame->m_campaignScenario = CAMPAIGN_SWITCHING_SCENARIO;
                                     gpGame->m_campaignType =
                                         OppositeCampaignSide(gpGame->m_campaignType);
-                                    gpGame->m_campaignMapEnabled[IDX(gpGame->m_campaignType)]
+                                    gpGame->m_campaignMapEnabled[H2EnumIndex(gpGame->m_campaignType)]
                                                                 [gpGame->m_campaignScenario] = 1;
-                                    gpGame->m_campaignScenarioBonus[IDX(gpGame->m_campaignType)]
+                                    gpGame->m_campaignScenarioBonus[H2EnumIndex(gpGame->m_campaignType)]
                                                                    [gpGame->m_campaignScenario] =
                                         gpGame->m_campaignScore;
-                                    gpGame->m_campaignChoice[IDX(gpGame->m_campaignType)]
+                                    gpGame->m_campaignChoice[H2EnumIndex(gpGame->m_campaignType)]
                                                             [gpGame->m_campaignScenario] =
-                                        gpGame->m_campaignChoice[1 - IDX(gpGame->m_campaignType)]
+                                        gpGame->m_campaignChoice[1 - H2EnumIndex(gpGame->m_campaignType)]
                                                                 [CAMPAIGN_SWITCHING_MAP];
                                     for (map = 0; map < CAMPAIGN_AWARD_COUNT; ++map)
                                         gpGame->m_campaignAwards[map] = 0;
@@ -793,8 +789,8 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
                                 }
                             } else {
                                 NormalDialog(
-                                    DATA_COMPGEN(0x004f510c, campaignHandlerTheCurrentlySelectedMapIsNot, "The currently selected map is not a valid choice for your "
-                                    "next scenario."),
+                                    "The currently selected map is not a valid choice for your "
+                                    "next scenario.",
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_RESOURCE,
                                     NORMAL_DIALOG_NO_RESOURCE,
@@ -823,15 +819,13 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x00449373, 0x47)
-void game::InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32) side) {
+void game::InitEntireCampaign(CampaignSide side) {
     memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
     m_campaignType = side;
     m_campaignStartingSide = side;
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
-VA(0x004493ba, 0xbb7)
 void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;
     SCampaignChoice* choiceBest;
@@ -846,13 +840,13 @@ void game::InitCampaignMap(void) {
     i32 swappedHero;
     i32 bonusHeroIndexPosition;
 
-    selectedChoicePosition = m_campaignChoice[IDX(iCurViewSide)][iCurViewMap];
+    selectedChoicePosition = m_campaignChoice[H2EnumIndex(iCurViewSide)][iCurViewMap];
     if (m_campaignType != m_campaignStartingSide && iCurViewMap == CAMPAIGN_SWITCHING_SCENARIO) {
         choiceBest =
-            &campaignChoices[IDX(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][selectedChoicePosition];
+            &campaignChoices[H2EnumIndex(iCurViewSide)][CAMPAIGN_SWITCHING_MAP][selectedChoicePosition];
     } else {
         choiceBest =
-            &campaignChoices[IDX(m_campaignType)][m_campaignScenario][selectedChoicePosition];
+            &campaignChoices[H2EnumIndex(m_campaignType)][m_campaignScenario][selectedChoicePosition];
     }
 
     gpGame->m_campaignScenarioWon = 0;
@@ -861,14 +855,14 @@ void game::InitCampaignMap(void) {
         && m_campaignStartingSide != m_campaignType) {
         sprintf(
             m_mapFilename,
-            DATA_COMPGEN(0x004f5158, initCampaignMapCAMPC02dBH2C, "CAMP%c%02dB.H2C"),
+            "CAMP%c%02dB.H2C",
             m_campaignType == CAMPAIGN_ROLAND ? 'E' : 'G',
             m_campaignScenario + 1
         );
     } else {
         sprintf(
             m_mapFilename,
-            DATA_COMPGEN(0x004f5168, initCampaignMapCAMPC02dH2C, "CAMP%c%02d.H2C"),
+            "CAMP%c%02d.H2C",
             m_campaignType == CAMPAIGN_ROLAND ? 'G' : 'E',
             m_campaignScenario + 1
         );
@@ -878,7 +872,7 @@ void game::InitCampaignMap(void) {
         m_campaignScore = 0;
     strcpy(gMapName, m_mapFilename);
     mapHeaderResultCampaign = GetMapHeader(m_mapFilename, &m_mapHeader);
-    LoadGame(DATA_COMPGEN(0x004f5178, initCampaignMapOrigdataBin, "origdata.bin"), 1, 0);
+    LoadGame("origdata.bin", 1, 0);
     InitNewGame(NULL);
 
     if (choiceBest->type == CAMPAIGN_CHOICE_ALIGNMENT) {
@@ -942,7 +936,7 @@ void game::InitCampaignMap(void) {
 
     switch (choiceBest->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            m_players[0].m_resources[IDX(choiceBest->resource)] += choiceBest->amount;
+            m_players[0].m_resources[H2EnumIndex(choiceBest->resource)] += choiceBest->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
             if (m_players[0].m_heroCount > 0)
@@ -961,7 +955,7 @@ void game::InitCampaignMap(void) {
                     && m_players[0].m_heroCount > 1)
                     bonusHeroIndexPosition = 1;
                 gpGame->GetHero(m_players[0].m_heroIds[bonusHeroIndexPosition])
-                    ->m_spells[IDX(choiceBest->spell)] = 1;
+                    ->m_spells[H2EnumIndex(choiceBest->spell)] = 1;
             }
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
@@ -994,22 +988,22 @@ void game::InitCampaignMap(void) {
             break;
     }
 
-    if ((m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)]
-         || (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)]
+    if ((m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_ULTIMATE_CROWN)]
+         || (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_ULTIMATE_CROWN)]
              && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1))
         && m_players[0].m_heroCount > 0) {
         GiveArtifact(gpGame->GetHero(m_players[0].m_heroIds[0]), ARTIFACT_ULTIMATE_CROWN, 0, -1);
     }
     gbRetreatWin = true;
 
-    if (m_campaignAwards[IDX(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
+    if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_CORLAGON_DEFEATED)]) {
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_HERO_COUNT; ++heroPositionValue) {
             if (gpGame->m_heroRecs[heroPositionValue].m_portrait == CAMPAIGN_HERO_CORLAGON)
                 gpGame->m_heroRecs[heroPositionValue].Deallocate(0);
         }
     }
 
-    if (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]) {
+    if (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]) {
         hero* armyHero = gpGame->GetHero(m_players[CAMPAIGN_CARRYOVER_PLAYER].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
@@ -1056,16 +1050,16 @@ void game::InitCampaignMap(void) {
         gbInNewGameSetup = savedNewGameSetup;
     }
 
-    if ((m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)]
+    if ((m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_CARRYOVER_FORCES)]
          && m_campaignScenario + 1 == CAMPAIGN_ROLAND_FINAL_SCENARIO + 1)
-        || m_campaignAwards[IDX(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)]) {
+        || m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ARCHIBALD_CARRYOVER_FORCES)]) {
         hero* armyHero = gpGame->GetHero(m_players[0].m_heroIds[0]);
         for (heroPositionValue = 0; heroPositionValue < CAMPAIGN_ARMY_SLOT_COUNT;
              ++heroPositionValue) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] =
                 m_campaignCarryoverCreatureTypes[heroPositionValue];
             armyHero->m_army.m_creatureCounts[heroPositionValue] =
-                (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
+                (m_campaignAwards[H2EnumIndex(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
                      ? CAMPAIGN_TRIPLE_ARMY_MULTIPLIER
                      : 1)
                 * m_campaignCarryoverCreatureCounts[heroPositionValue];
@@ -1088,17 +1082,16 @@ void game::InitCampaignMap(void) {
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 
-// Retail campaign-track coordinate payload.
-// NOLINTBEGIN(readability-magic-numbers)
-DATA(0x004f4f28) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
+
+i16 trackXY[H2EnumIndex(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
     39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
     557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
     335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
 };
-// NOLINTEND(readability-magic-numbers)
-DATA(0x004f4f90) class heroWindow* campWin = NULL;
-DATA(0x00527ea4) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-DATA(0x00527ea8) CampaignTrackType iCampaignTrackType;
-DATA(0x00527eac) i32 bCampaignViewOnly;
-DATA(0x00527eb0) i32 iCurViewMap;
+
+class heroWindow* campWin = NULL;
+H2EnumStorage<CampaignSide, i32> iCurViewSide;
+CampaignTrackType iCampaignTrackType;
+i32 bCampaignViewOnly;
+i32 iCurViewMap;

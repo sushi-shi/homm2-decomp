@@ -1,46 +1,50 @@
 #ifndef HOMM2_REMOTE_TYPES_H
 #define HOMM2_REMOTE_TYPES_H
 
-#include <va.h>
+#include <Ints.h>
 
-H2_ENUM_BEGIN(NetPlayerInfoConstant)
+typedef enum NetPlayerInfoConstant {
     NET_PLAYER_INFO_SYSTEM_ID_SIZE = 4,
     NET_PLAYER_INFO_NAME_SIZE      = 21,
     NET_PLAYER_INFO_RESERVED_SIZE  = 6,
     NET_PLAYER_CONNECTION_CURRENT  = 2
-H2_ENUM_END(NetPlayerInfoConstant)
+} NetPlayerInfoConstant;
 
-H2_ENUM_CLASS_BEGIN(NetworkPacketType)
+enum class NetworkPacketType : i32 {
     NETWORK_PACKET_DATA           = 1,
     NETWORK_PACKET_GUEST_ARRIVED  = 2,
     NETWORK_PACKET_STARTUP        = 3,
     NETWORK_PACKET_GUEST_ACCEPTED = 4,
     NETWORK_PACKET_GUEST_REJECTED = 5
-H2_ENUM_CLASS_END(NetworkPacketType)
+};
+using enum NetworkPacketType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(RemoteMessageType, i8)
+enum class RemoteMessageType : i8 {
     REMOTE_MESSAGE_DEFAULT    = -1,
     REMOTE_MESSAGE_CONFIRM    = 1,
     REMOTE_MESSAGE_RELIABLE   = 2,
     REMOTE_MESSAGE_UNRELIABLE = 3,
     REMOTE_MESSAGE_HEARTBEAT  = 4
-H2_ENUM_CLASS_END_SPLIT(RemoteMessageType, i8)
+};
+using enum RemoteMessageType;
 
-H2_ENUM_CLASS_BEGIN(MultiplayerBaseType)
+enum class MultiplayerBaseType : i32 {
     MULTIPLAYER_BASE_MODEM         = 0,
     MULTIPLAYER_BASE_NETWORK       = 1,
     MULTIPLAYER_BASE_HOT_SEAT      = 2,
     MULTIPLAYER_BASE_UNINITIALIZED = 10
-H2_ENUM_CLASS_END(MultiplayerBaseType)
+};
+using enum MultiplayerBaseType;
 
-H2_ENUM_CLASS_BEGIN_SPLIT(RemoteGameMode, u8)
+enum class RemoteGameMode : u8 {
     REMOTE_GAME_NONE          = 0,
     REMOTE_GAME_NETWORK_HOST  = 1,
     REMOTE_GAME_NETWORK_GUEST = 2,
     REMOTE_GAME_MODEM_HOST    = 3,
     REMOTE_GAME_MODEM_GUEST   = 4,
     REMOTE_GAME_UNINITIALIZED = 10
-H2_ENUM_CLASS_END_SPLIT(RemoteGameMode, u8)
+};
+using enum RemoteGameMode;
 
 #pragma pack(push, 1)
 struct SNetPlayerInfo {
@@ -52,11 +56,9 @@ struct SNetPlayerInfo {
     char reserved[NET_PLAYER_INFO_RESERVED_SIZE];
 };
 #pragma pack(pop)
-SIZE(SNetPlayerInfo, 34);
 
-// stpnet2.bin protocol picker: 1=IPX (rides DirectPlay), 2=TCP (rides Winsock),
-// 3=modem, 4=direct connect; NT dims options 1 and 3.
-H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
+
+enum class RemoteNetworkProtocol : i32 {
     REMOTE_PROTOCOL_NETBIOS        = 0,
     REMOTE_PROTOCOL_DIRECT_PLAY    = 1,
     DP_PROTOCOL_IPX                = REMOTE_PROTOCOL_DIRECT_PLAY,
@@ -65,6 +67,7 @@ H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     OLD_MAIN_NETWORK_PROTOCOL      = REMOTE_PROTOCOL_WINSOCK,
     REMOTE_PROTOCOL_MODEM          = 3,
     REMOTE_PROTOCOL_DIRECT_CONNECT = 4
-H2_ENUM_CLASS_END(RemoteNetworkProtocol)
+};
+using enum RemoteNetworkProtocol;
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef HOMM2_TOWNMGR_H
 #define HOMM2_TOWNMGR_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <SOURCE/GAME.h>
 #include <SOURCE/KB_TYPES.h>
@@ -17,9 +17,8 @@ struct SBuildingInfo {
     i16 height;
 };
 #pragma pack(pop)
-SIZE(SBuildingInfo, 9);
 
-H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
+enum class TownExtraBuildingMask : u32 {
     TOWN_EXTRA_DOCK_GRAPHIC_MASK  = 0x4000,
     TOWN_EXTRA_RACE_FIRST_MASK    = 0x10000,
     TOWN_EXTRA_RACE_SECOND_MASK   = 0x20000,
@@ -27,10 +26,11 @@ H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
     TOWN_EXTRA_RACE_LAST_MASK     = 0x80000000,
     TOWN_EXTRA_DYNAMIC_CLEAR_MASK = 0x7ff8bfff,
     TOWN_CLOSE_DYNAMIC_CLEAR_MASK = 0xfff8bfff
-H2_ENUM_CLASS_END_T(TownExtraBuildingMask, u32)
-H2_ENUM_FLAGS(TownExtraBuildingMask)
+};
+using enum TownExtraBuildingMask;
+ENABLE_ENUM_FLAGS(TownExtraBuildingMask)
 
-H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
+enum class TownThievesGuildCategory : i32 {
     THIEVES_CATEGORY_TOWNS          = 0,
     THIEVES_CATEGORY_CASTLES        = 1,
     THIEVES_CATEGORY_HEROES         = 2,
@@ -41,10 +41,11 @@ H2_ENUM_CLASS_BEGIN(TownThievesGuildCategory)
     THIEVES_CATEGORY_ARTIFACTS      = 7,
     THIEVES_CATEGORY_ARMY_STRENGTH  = 8,
     THIEVES_CATEGORY_INCOME         = 9
-H2_ENUM_CLASS_END(TownThievesGuildCategory)
-H2_ENUM_STEPPED(TownThievesGuildCategory)
+};
+using enum TownThievesGuildCategory;
+ENABLE_ENUM_STEPS(TownThievesGuildCategory)
 
-H2_ENUM_BEGIN(TownManagerConstant)
+typedef enum TownManagerConstant {
     TOWN_DEBUG_BUILD_ALL                     = 100,
     TOWN_BUILDING_COUNT                      = 32,
     TOWN_OBJECT_FILENAME_SIZE                = 16,
@@ -133,7 +134,7 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_WELL_FIRST_DWELLING_GROWTH_BUILDING = 11,
     TOWN_WELL_BASE_GROWTH_BONUS              = 2,
     TOWN_WELL_FIRST_DWELLING_GROWTH_BONUS    = 8,
-    TOWN_THIEVES_PLAYER_COUNT                = IDX(GAME_PLAYER_COUNT),
+    TOWN_THIEVES_PLAYER_COUNT                = H2EnumIndex(GAME_PLAYER_COUNT),
     TOWN_THIEVES_ORDER_BUFFER_SIZE           = 8,
     TOWN_THIEVES_FIRST_RANK_CONTROL          = 800,
     TOWN_THIEVES_FIRST_PLAYER_CONTROL        = 900,
@@ -150,7 +151,7 @@ H2_ENUM_BEGIN(TownManagerConstant)
     TOWN_THIEVES_PRIMARY_STAT_COUNT          = 4,
     TOWN_THIEVES_DEAD_PLAYER_STAT            = -1,
     TOWN_THIEVES_RANK_ICON_FRAME_BASE        = 22
-H2_ENUM_END(TownManagerConstant)
+} TownManagerConstant;
 
 extern SBuildingInfo sBuildingInfo[][TOWN_BUILDING_COUNT];
 
@@ -158,7 +159,7 @@ MessageDispatchResult MageGuildHandler(struct tag_message&);
 MessageDispatchResult TavernHandler(struct tag_message&);
 MessageDispatchResult SplitArmyHandler(struct tag_message&);
 void GetCategoryStats(
-    H2_ENUM_PARAM(TownThievesGuildCategory, i32),
+    TownThievesGuildCategory,
     i32l* const,
     i8* const
 );

@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/SAMPLE_TYPES.h>
@@ -7,15 +7,14 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-H2_ENUM_BEGIN(SampleConstant)
+typedef enum SampleConstant {
     FILENAME_CAPACITY    = 32,
     FORMAT_SUFFIX_LENGTH = 3
-H2_ENUM_END(SampleConstant)
+} SampleConstant;
 
-DATA(0x00520df4) static SSampleSourceFiles gSampleSourceFiles =
+static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
-VA(0x004dad60, 0x181)
 sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -56,31 +55,23 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
                 break;
         }
     }
-#if H2_STRICT_ENUMS
     m_playbackData.format |= formatFlags;
-#else
-    m_playbackData.format += formatFlags;
-#endif
 
     u32l size = gpResourceManager->GetFileSize(m_id);
-#line 57
     m_playbackData.data =
-        static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.sampleAllocation, 57));
+        static_cast<char*>(H2_ALLOC(size));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
-VA(0x004daf40, 0x2c)
 inline sample::~sample() {
-#line 97
-    H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
+    H2_FREE(m_playbackData.data);
     m_playbackData.data = NULL;
     m_playbackData.size = 0;
     m_playbackData.volume = 0;
 }
 
-VA(0x004daf70, 0x72)
 MIDIWrap::MIDIWrap(char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -89,20 +80,12 @@ MIDIWrap::MIDIWrap(char* name)
         NULL
     ) {
     u32l size = gpResourceManager->GetFileSize(m_id);
-#line 110
-    m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 110));
+    m_data = static_cast<char*>(H2_ALLOC(size));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
-VA(0x004db030, 0x28)
 inline MIDIWrap::~MIDIWrap() {
-#line 118
-    H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);
+    H2_FREE(m_data);
     m_data = NULL;
 }
-
-
-
-VTBL(sample, 0x004ebab4);
-VTBL(MIDIWrap, 0x004ebab8);

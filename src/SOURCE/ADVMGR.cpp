@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/message.h>
 #include <BASE/icon.h>
 #include <BASE/font.h>
@@ -52,7 +52,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
+enum class AdventureSystemOptionsWidgetId : i32 {
     SYSTEM_OPTION_MUSIC_VOLUME   = 10,
     SYSTEM_OPTION_SOUND_VOLUME   = 11,
     SYSTEM_OPTION_HERO_SPEED     = 12,
@@ -66,9 +66,10 @@ H2_ENUM_CLASS_BEGIN(AdventureSystemOptionsWidgetId)
     SYSTEM_OPTION_LAST           = SYSTEM_OPTION_COLOR_CURSOR,
     SYSTEM_OPTION_COUNT          = SYSTEM_OPTION_LAST - SYSTEM_OPTION_FIRST + 1,
     SYSTEM_OPTIONS_DIALOG_ACCEPT = 0x7800
-H2_ENUM_CLASS_END(AdventureSystemOptionsWidgetId)
+};
+using enum AdventureSystemOptionsWidgetId;
 
-H2_ENUM_BEGIN(AdventureScreenConstant)
+typedef enum AdventureScreenConstant {
     SCREEN_WIDTH     = 640,
     SCREEN_HEIGHT    = 480,
     VIEWPORT_SIZE    = SCREEN_HEIGHT,
@@ -83,9 +84,9 @@ H2_ENUM_BEGIN(AdventureScreenConstant)
     RADAR_BOTTOM     = 160,
     PUZZLE_TILE_SIZE = 32,
     PUZZLE_X_TRIM    = 12
-H2_ENUM_END(AdventureScreenConstant)
+} AdventureScreenConstant;
 
-H2_ENUM_BEGIN(AdventureDrawConstant)
+typedef enum AdventureDrawConstant {
     CELL_PIXELS                    = 32,
     CELL_CENTER_PIXEL              = CELL_PIXELS / 2,
     CELL_LAST_PIXEL                = CELL_PIXELS - 1,
@@ -138,17 +139,17 @@ H2_ENUM_BEGIN(AdventureDrawConstant)
     PLAYER_FLAG_FRAME_BASE         = 56,
     TILESET_MONSTER                = 20,
     TILESET_BOAT                   = 39
-H2_ENUM_END(AdventureDrawConstant)
+} AdventureDrawConstant;
 
-H2_ENUM_BEGIN(AdventureUpdateScreenConstant)
+typedef enum AdventureUpdateScreenConstant {
     UPDATE_NONE             = -1,
     UPDATE_VIEWPORT_ORIGIN  = 16,
     UPDATE_VIEWPORT_SIZE    = 448,
     UPDATE_ANIMATION_PHASES = 6,
     UPDATE_FRAME_CYCLE      = 18
-H2_ENUM_END(AdventureUpdateScreenConstant)
+} AdventureUpdateScreenConstant;
 
-H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
+typedef enum AdventureAnimationPhaseIndex {
     ANIMATION_PHASE_COLUMN_0         = 0,
     ANIMATION_PHASE_COLUMN_1         = 1,
     ANIMATION_PHASE_COLUMN_2         = 2,
@@ -158,9 +159,9 @@ H2_ENUM_BEGIN(AdventureAnimationPhaseIndex)
     ANIMATION_PHASE_COLUMN_1_INITIAL = 4,
     ANIMATION_PHASE_COLUMN_2_INITIAL = 11,
     ANIMATION_PHASE_COLUMN_3_INITIAL = 13
-H2_ENUM_END(AdventureAnimationPhaseIndex)
+} AdventureAnimationPhaseIndex;
 
-H2_ENUM_BEGIN(AdventureSourceLineConstant)
+typedef enum AdventureSourceLineConstant {
     CLOSE_BORDER_FREE_LINE_BASE         = 0x0124,
     BORDER_INITIAL_FREE_LINE_OFFSET     = 22,
     BORDER_SECONDARY_FREE_LINE_OFFSET   = 9,
@@ -180,9 +181,9 @@ H2_ENUM_BEGIN(AdventureSourceLineConstant)
     TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET   = 0x108,
     REDRAW_BORDER_FREE_LINE_BASE        = 0x1628,
     SAVE_BORDER_ALLOC_LINE_BASE         = 0x2025
-H2_ENUM_END(AdventureSourceLineConstant)
+} AdventureSourceLineConstant;
 
-H2_ENUM_BEGIN(AdventureBorderConstant)
+typedef enum AdventureBorderConstant {
     BORDER_BUFFER_SIZE      = 0x7400,
     BORDER_EDGE_SIZE        = 16,
     BORDER_VIEW_SIZE        = VIEWPORT_SIZE,
@@ -191,15 +192,15 @@ H2_ENUM_BEGIN(AdventureBorderConstant)
     BORDER_SCREEN_PITCH     = SCREEN_WIDTH,
     BORDER_SIDE_BYTES       = BORDER_EDGE_SIZE,
     BORDER_SAVED_SIDE_BYTES = BORDER_SIDE_BYTES * 2
-H2_ENUM_END(AdventureBorderConstant)
+} AdventureBorderConstant;
 
-H2_ENUM_BEGIN(AdventureScrollConstant)
+typedef enum AdventureScrollConstant {
     SCROLL_MIN_ORIGIN    = 1 - VIEW_EDGE_MARGIN,
     VIEW_CENTER_OFFSET   = VIEW_CENTER_CELL,
     SCROLL_TICK_INTERVAL = 70
-H2_ENUM_END(AdventureScrollConstant)
+} AdventureScrollConstant;
 
-H2_ENUM_BEGIN(AdventureButtonConstant)
+typedef enum AdventureButtonConstant {
     BUTTON_FIRST           = 1,
     BUTTON_LAST            = 6,
     BUTTON_TARGET          = 2,
@@ -211,15 +212,15 @@ H2_ENUM_BEGIN(AdventureButtonConstant)
     BUTTON_SLOT_6          = 6,
     BUTTON_BROADCAST_ARG   = 1,
     BUTTON_BROADCAST_FLAGS = 0x4008
-H2_ENUM_END(AdventureButtonConstant)
+} AdventureButtonConstant;
 
-H2_ENUM_BEGIN(AdventureTriggerConstant)
+typedef enum AdventureTriggerConstant {
     SPECIAL_TRIGGER_MASK = 0x3f,
     TRIGGER_EVENT_5      = 5,
     TRIGGER_EVENT_6      = 6
-H2_ENUM_END(AdventureTriggerConstant)
+} AdventureTriggerConstant;
 
-H2_ENUM_BEGIN(AdventureHoverConstant)
+typedef enum AdventureHoverConstant {
     HOVER_VIEW_CELLS           = VIEW_CELL_COUNT,
     HOVER_MAX_CELL             = VIEW_LAST_CELL,
     HOVER_OBJECT_BLOCKED       = 0x08,
@@ -228,9 +229,9 @@ H2_ENUM_BEGIN(AdventureHoverConstant)
     HOVER_ROUTE_FRAMES_PER_DAY = 6,
     HOVER_SCROLL_FRAME_FIRST   = 32,
     HOVER_SCROLL_FRAME_END     = 40
-H2_ENUM_END(AdventureHoverConstant)
+} AdventureHoverConstant;
 
-H2_ENUM_BEGIN(AdventurePointerFrame)
+typedef enum AdventurePointerFrame {
     POINTER_DEFAULT      = 0,
     POINTER_HERO         = 2,
     POINTER_TOWN         = 3,
@@ -241,9 +242,9 @@ H2_ENUM_BEGIN(AdventurePointerFrame)
     POINTER_SELECT_HERO  = 8,
     POINTER_ACTION       = 9,
     POINTER_WATER_ACTION = 28
-H2_ENUM_END(AdventurePointerFrame)
+} AdventurePointerFrame;
 
-H2_ENUM_BEGIN(AdventureFrameConstant)
+typedef enum AdventureFrameConstant {
     MOBILITY_SCALE          = 22,
     MOBILITY_DIVISOR        = 1500,
     MANA_DIVISOR            = 5,
@@ -257,42 +258,38 @@ H2_ENUM_BEGIN(AdventureFrameConstant)
     FRAME_TOP               = 25,
     FRAME_HIGH              = 24,
     FRAME_MID               = 23
-H2_ENUM_END(AdventureFrameConstant)
+} AdventureFrameConstant;
 
-#if H2_STRICT_ENUMS
-H2_ENUM_CLASS_BEGIN(CursorSampleSet)
+enum class CursorSampleSet : i32 {
     CURSOR_SAMPLE_SLOW_SET = 0,
     CURSOR_SAMPLE_FAST_SET = 2
-H2_ENUM_CLASS_END(CursorSampleSet)
-#endif
+};
+using enum CursorSampleSet;
 
-H2_ENUM_BEGIN(AdventureStateConstant)
+typedef enum AdventureStateConstant {
     INVALID_HERO               = -1,
     LOOPING_SOUND_LIMIT        = 4,
     OBJECT_ICON_COUNT          = ADVMGR_OBJECT_ICON_COUNT,
     HERO_ICON_COUNT            = ADVMGR_HERO_ICON_COUNT,
-    LOOPING_SAMPLE_COUNT       = IDX(ADVMGR_ENVIRONMENT_SOUND_COUNT),
+    LOOPING_SAMPLE_COUNT       = H2EnumIndex(ADVMGR_ENVIRONMENT_SOUND_COUNT),
     CURSOR_SAMPLE_COUNT        = ADVMGR_CURSOR_SAMPLE_COUNT,
     SOUND_CELL_COUNT           = ADVMGR_ACTIVE_SOUND_COUNT,
     HIGH_MEMORY_BUFFER_DIVISOR = 100,
     CURSOR_SAMPLE_VOLUME       = 64,
     CURSOR_SAMPLE_CHANNEL      = 2,
-#if !H2_STRICT_ENUMS
-    CURSOR_SAMPLE_FAST_SET     = 2,
-#endif
-    HERO_ICON_FROTH            = IDX(HERO_TYPE_BOAT) + 1,
+    HERO_ICON_FROTH            = H2EnumIndex(HERO_TYPE_BOAT) + 1,
     ADVENTURE_FADE_STEPS       = 8,
     FORCED_MUSIC_DELAY         = 6000,
     QUICK_VIEW_NONE            = -99,
     UNUSED_OBJECT_ICON_1       = 21,
     UNUSED_OBJECT_ICON_2       = 38
-H2_ENUM_END(AdventureStateConstant)
+} AdventureStateConstant;
 
-H2_ENUM_BEGIN(AdventureMainConstant)
+typedef enum AdventureMainConstant {
     ADVENTURE_EVENT_CELL_RESULT_COUNT = 3
-H2_ENUM_END(AdventureMainConstant)
+} AdventureMainConstant;
 
-H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
+typedef enum AdventureEnvironmentSoundConstant {
     ENVIRONMENT_ORIGIN_NONE          = -1,
     ENVIRONMENT_SOUND_LOG_UNUSED     = -999,
     ENVIRONMENT_SOUND_DEFAULT_VOLUME = 127,
@@ -302,9 +299,9 @@ H2_ENUM_BEGIN(AdventureEnvironmentSoundConstant)
     ENVIRONMENT_SOUND_LAYER_COUNT    = 2,
     ENVIRONMENT_SOUND_CHANNEL_TYPE   = 3,
     ENVIRONMENT_SOUND_EDGE_SPAN      = 2
-H2_ENUM_END(AdventureEnvironmentSoundConstant)
+} AdventureEnvironmentSoundConstant;
 
-H2_ENUM_BEGIN(AdventureTeleportConstant)
+typedef enum AdventureTeleportConstant {
     TELEPORT_MAP_CHANGE_VALUE         = -999,
     TELEPORT_CELL_OBJECT_FLAG         = 0x40,
     TELEPORT_RESTORE_MODE             = 99,
@@ -312,9 +309,9 @@ H2_ENUM_BEGIN(AdventureTeleportConstant)
     TELEPORT_DELAY                    = 90,
     TELEPORT_FIZZLE_TIME              = 128,
     TELEPORT_REMOTE_FIZZLE_ADJUSTMENT = 64
-H2_ENUM_END(AdventureTeleportConstant)
+} AdventureTeleportConstant;
 
-H2_ENUM_BEGIN(AdventureTravelSpellConstant)
+typedef enum AdventureTravelSpellConstant {
     TRAVEL_DIALOG_ACCEPT        = 1,
     TRAVEL_MUSIC                = 1,
     DIMENSION_DOOR_FIRST_BUTTON = 10,
@@ -323,25 +320,25 @@ H2_ENUM_BEGIN(AdventureTravelSpellConstant)
     TOWN_PORTAL_WINDOW_X        = 159,
     TOWN_PORTAL_WINDOW_Y        = 65,
     TOWN_PORTAL_DISTANCE_LIMIT  = 1000
-H2_ENUM_END(AdventureTravelSpellConstant)
+} AdventureTravelSpellConstant;
 
-H2_ENUM_BEGIN(AdventureTownPortalMessage)
+typedef enum AdventureTownPortalMessage {
     TOWN_PORTAL_TITLE_WIDGET  = 1,
     TOWN_PORTAL_CHOICE_WIDGET = 100,
     TOWN_PORTAL_CLOSE_WIDGET  = 10,
     TOWN_PORTAL_FIRST_CHOICE  = 0x7801,
     TOWN_PORTAL_LAST_CHOICE   = 0x7802,
-H2_ENUM_END(AdventureTownPortalMessage)
+} AdventureTownPortalMessage;
 
-H2_ENUM_BEGIN(AdventureSoundTilesetConstant)
+typedef enum AdventureSoundTilesetConstant {
     SOUND_GROUND_SHAPE_MASK     = 0x0f,
     SOUND_SEAGULL_FRAME_FIRST   = 0xb6,
     SOUND_SEAGULL_FRAME_LAST    = 0xb7,
     SOUND_ALCHEMIST_FRAME_FIRST = 0x27,
     SOUND_ALCHEMIST_FRAME_LAST  = 0x2c
-H2_ENUM_END(AdventureSoundTilesetConstant)
+} AdventureSoundTilesetConstant;
 
-H2_ENUM_BEGIN(AdventureOpenConstant)
+typedef enum AdventureOpenConstant {
     SCROLL_Y          = 195,
     SCROLL_LEFT_X     = 540,
     SCROLL_RIGHT_X    = 612,
@@ -352,23 +349,23 @@ H2_ENUM_BEGIN(AdventureOpenConstant)
     SCROLL_RIGHT_ID   = 27,
     TIMER_DELAY       = 120,
     MANAGER_MESSAGE   = 0x400
-H2_ENUM_END(AdventureOpenConstant)
+} AdventureOpenConstant;
 
-H2_ENUM_BEGIN(AdventureInterfaceConstant)
+typedef enum AdventureInterfaceConstant {
     INTERFACE_AUTO              = 0,
     INTERFACE_GOOD              = 1,
     INTERFACE_EVIL              = 2,
     INTERFACE_TRANSLATION_COUNT = 37
-H2_ENUM_END(AdventureInterfaceConstant)
+} AdventureInterfaceConstant;
 
-H2_ENUM_BEGIN(AdventureSystemOptionConstant)
+typedef enum AdventureSystemOptionConstant {
     OPTION_INTERFACE_COUNT = 3,
     OPTION_DIALOG_MESSAGE  = 1,
     OPTION_DIALOG_HELP     = 4,
     OPTION_DIALOG_NONE     = -1
-H2_ENUM_END(AdventureSystemOptionConstant)
+} AdventureSystemOptionConstant;
 
-H2_ENUM_BEGIN(AdventureSummonBoatConstant)
+typedef enum AdventureSummonBoatConstant {
     SUMMON_CENTER_OFFSET   = VIEW_CENTER_CELL,
     SUMMON_DIRECTION_COUNT = 8,
     SUMMON_BOAT_COUNT      = 48,
@@ -385,9 +382,9 @@ H2_ENUM_BEGIN(AdventureSummonBoatConstant)
     SUMMON_TARGET_WIDTH    = 150,
     SUMMON_TARGET_HEIGHT   = 136,
     SUMMON_BOAT_TRIGGER    = 0xab
-H2_ENUM_END(AdventureSummonBoatConstant)
+} AdventureSummonBoatConstant;
 
-H2_ENUM_BEGIN(AdventureRouteConstant)
+typedef enum AdventureRouteConstant {
     ROUTE_PATH_COST_LIMIT       = 59999,
     ROUTE_TERRAIN_COST_INFINITY = 999999999,
     ROUTE_DAY_MASK              = 0x100,
@@ -405,24 +402,24 @@ H2_ENUM_BEGIN(AdventureRouteConstant)
     ROUTE_DIAGONAL_COST_3       = 225,
     ROUTE_DIAGONAL_COST_4       = 262,
     ROUTE_DIAGONAL_COST_5       = 300
-H2_ENUM_END(AdventureRouteConstant)
+} AdventureRouteConstant;
 
-H2_ENUM_BEGIN(AdventureRouteFrame)
+typedef enum AdventureRouteFrame {
     ROUTE_FRAME_COST_0 = 0,
     ROUTE_FRAME_COST_1 = 1,
     ROUTE_FRAME_COST_2 = 2,
     ROUTE_FRAME_COST_3 = 3,
     ROUTE_FRAME_COST_4 = 4,
     ROUTE_FRAME_COST_5 = 5
-H2_ENUM_END(AdventureRouteFrame)
+} AdventureRouteFrame;
 
-H2_ENUM_BEGIN(AdventureSearchConstant)
+typedef enum AdventureSearchConstant {
     ARTIFACT_CAPACITY       = HERO_ARTIFACT_SLOT_COUNT,
     DIG_HOLE_FRAME          = 140,
     ULTIMATE_ARTIFACT_MUSIC = 41
-H2_ENUM_END(AdventureSearchConstant)
+} AdventureSearchConstant;
 
-H2_ENUM_BEGIN(AdventureComboDrawConstant)
+typedef enum AdventureComboDrawConstant {
     COMBO_VIEW_CELLS          = VIEW_CELL_COUNT,
     COMBO_GRID_CELLS          = 18,
     COMBO_CLEAR_BYTES         = 256,
@@ -435,9 +432,9 @@ H2_ENUM_BEGIN(AdventureComboDrawConstant)
     COMBO_UPDATE_MIN          = 16,
     COMBO_UPDATE_MAX          = 463,
     COMBO_FAR_NEIGHBOR_OFFSET = 2,
-H2_ENUM_END(AdventureComboDrawConstant)
+} AdventureComboDrawConstant;
 
-H2_ENUM_BEGIN(AdventureRadarConstant)
+typedef enum AdventureRadarConstant {
     RADAR_SIZE                    = MAP_DIMENSION_XLARGE,
     RADAR_SCREEN_PITCH            = SCREEN_WIDTH,
     RADAR_ROW_GROUPS              = 5,
@@ -464,9 +461,9 @@ H2_ENUM_BEGIN(AdventureRadarConstant)
     RADAR_FRAME_VIEW_FAR_XLARGE   = 7,
     RADAR_FRAME_VIEW_NEAR_LARGE   = 8,
     RADAR_FRAME_VIEW_MIDDLE_LARGE = 9,
-H2_ENUM_END(AdventureRadarConstant)
+} AdventureRadarConstant;
 
-H2_ENUM_BEGIN(AdventureArmySizeThreshold)
+typedef enum AdventureArmySizeThreshold {
     ARMY_FEW_LIMIT     = 5,
     ARMY_SEVERAL_LIMIT = 10,
     ARMY_PACK_LIMIT    = 20,
@@ -475,9 +472,9 @@ H2_ENUM_BEGIN(AdventureArmySizeThreshold)
     ARMY_THRONG_LIMIT  = 250,
     ARMY_SWARM_LIMIT   = 500,
     ARMY_ZOUNDS_LIMIT  = 1000
-H2_ENUM_END(AdventureArmySizeThreshold)
+} AdventureArmySizeThreshold;
 
-H2_ENUM_BEGIN(AdventureArmySizeBand)
+typedef enum AdventureArmySizeBand {
     ARMY_SIZE_FEW     = 0,
     ARMY_SIZE_SEVERAL = 1,
     ARMY_SIZE_PACK    = 2,
@@ -487,9 +484,9 @@ H2_ENUM_BEGIN(AdventureArmySizeBand)
     ARMY_SIZE_SWARM   = 6,
     ARMY_SIZE_ZOUNDS  = 7,
     ARMY_SIZE_LEGION  = 8
-H2_ENUM_END(AdventureArmySizeBand)
+} AdventureArmySizeBand;
 
-H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
+typedef enum AdventureArmyQuickViewConstant {
     ARMY_QUICK_SLOT_COUNT            = ARMY_GROUP_SLOT_COUNT,
     ARMY_QUICK_ICON_SIZE             = 32,
     ARMY_QUICK_ICON_BASELINE         = 30,
@@ -507,9 +504,9 @@ H2_ENUM_BEGIN(AdventureArmyQuickViewConstant)
     ARMY_QUICK_EMPTY_SLOT            = -1,
     ARMY_QUICK_TEXT_WIDTH            = 60,
     ARMY_QUICK_TEXT_X_ADJUSTMENT     = 14
-H2_ENUM_END(AdventureArmyQuickViewConstant)
+} AdventureArmyQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
+typedef enum AdventureHeroQuickViewConstant {
     HERO_QUICK_ARMY_AREA_WIDTH       = 160,
     HERO_QUICK_DETAILED_CREATURE_Y   = 124,
     HERO_QUICK_VAGUE_FIRST_ROW_Y     = 73,
@@ -526,9 +523,9 @@ H2_ENUM_BEGIN(AdventureHeroQuickViewConstant)
     HERO_QUICK_ARMY_LABEL_CAPACITY   = 5,
     HERO_QUICK_SECOND_ROW_FIRST_SLOT = 2,
     HERO_QUICK_SECOND_ROW_TEXT_SHIFT = 38
-H2_ENUM_END(AdventureHeroQuickViewConstant)
+} AdventureHeroQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
+typedef enum AdventureTownQuickViewConstant {
     TOWN_QUICK_ARMY_AREA_WIDTH       = 192,
     TOWN_QUICK_FIRST_ROW_Y           = 76,
     TOWN_QUICK_DEFAULT_WINDOW_X      = 328,
@@ -550,9 +547,9 @@ H2_ENUM_BEGIN(AdventureTownQuickViewConstant)
     TOWN_QUICK_INFORMATION_ESTIMATES = 2,
     TOWN_QUICK_INFORMATION_EXACT     = 3,
     TOWN_QUICK_DEBUG_INFORMATION     = 2
-H2_ENUM_END(AdventureTownQuickViewConstant)
+} AdventureTownQuickViewConstant;
 
-H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
+typedef enum AdventureBottomHeroViewConstant {
     BOTTOM_HERO_ARMY_SLOTS                = ARMY_GROUP_SLOT_COUNT,
     BOTTOM_HERO_EMPTY_SLOT                = -1,
     BOTTOM_HERO_LABEL_BYTES               = 6,
@@ -579,9 +576,9 @@ H2_ENUM_BEGIN(AdventureBottomHeroViewConstant)
     BOTTOM_HERO_CREATURE_BOUND_COUNT      = 2,
     BOTTOM_HERO_FIRST_ICON_ID             = 2002,
     BOTTOM_HERO_FIRST_TEXT_ID             = 2101,
-H2_ENUM_END(AdventureBottomHeroViewConstant)
+} AdventureBottomHeroViewConstant;
 
-H2_ENUM_BEGIN(AdventureLocatorConstant)
+typedef enum AdventureLocatorConstant {
     LOCATOR_VISIBLE_COUNT             = 4,
     LOCATOR_PAGE_THRESHOLD            = 5,
     LOCATOR_PAGE_DENOMINATOR_OFFSET   = 4,
@@ -630,9 +627,9 @@ H2_ENUM_BEGIN(AdventureLocatorConstant)
     LOCATOR_SCREEN_ROW_HEIGHT         = 32,
     LOCATOR_SCREEN_WIDTH              = 54,
     LOCATOR_SCREEN_HEIGHT             = 30
-H2_ENUM_END(AdventureLocatorConstant)
+} AdventureLocatorConstant;
 
-H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
+typedef enum AdventureQuickViewPlacementConstant {
     QUICK_VIEW_MIN_X         = 30,
     QUICK_VIEW_MIN_Y         = 16,
     QUICK_VIEW_RIGHT         = 448,
@@ -649,26 +646,26 @@ H2_ENUM_BEGIN(AdventureQuickViewPlacementConstant)
     TOWN_QUICK_VIEW_HEIGHT   = 186,
     TOWN_QUICK_VIEW_RIGHT_X  = 224,
     TOWN_QUICK_VIEW_BOTTOM_Y = 278
-H2_ENUM_END(AdventureQuickViewPlacementConstant)
+} AdventureQuickViewPlacementConstant;
 
-H2_ENUM_BEGIN(AdventureSpellConstant)
+typedef enum AdventureSpellConstant {
     TRAVEL_SPELL_MOBILITY_COST = 225,
     MINE_GUARDIAN_MAX_POWER    = 51,
     MINE_GUARDIANS_PER_POWER   = 4,
     MINE_GUARDIAN_VALUE_COUNT  = 2,
     MINE_GUARDIAN_TYPE_INDEX   = 0
-H2_ENUM_END(AdventureSpellConstant)
+} AdventureSpellConstant;
 
-H2_ENUM_BEGIN(AdventureSaveConstant)
+typedef enum AdventureSaveConstant {
     SAVE_PLAYER_COUNT   = GAME_PLAYER_COUNT,
     SAVE_EXTENSION_SIZE = 8,
     SAVE_PATTERN_SIZE   = 16,
     SAVE_REQUESTER_X    = 131,
     SAVE_REQUESTER_Y    = 58,
     SAVE_POINTER_FRAME  = 0
-H2_ENUM_END(AdventureSaveConstant)
+} AdventureSaveConstant;
 
-H2_ENUM_BEGIN(AdventureBottomViewConstant)
+typedef enum AdventureBottomViewConstant {
     BOTTOM_VIEW_PANEL_X           = 480,
     BOTTOM_VIEW_PANEL_Y           = 392,
     BOTTOM_VIEW_PANEL_WIDTH       = 143,
@@ -687,9 +684,9 @@ H2_ENUM_BEGIN(AdventureBottomViewConstant)
     BOTTOM_VIEW_CENTER_DIVISOR    = 2,
     BOTTOM_VIEW_NO_ENEMY          = -1,
     BOTTOM_VIEW_NO_ANIMATION      = -1
-H2_ENUM_END(AdventureBottomViewConstant)
+} AdventureBottomViewConstant;
 
-H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
+typedef enum AdventureNewTurnViewConstant {
     NEW_TURN_DATE_ICON_X            = 480,
     NEW_TURN_DATE_ICON_Y            = 392,
     NEW_TURN_DATE_ICON_WIDTH        = 143,
@@ -703,9 +700,9 @@ H2_ENUM_BEGIN(AdventureNewTurnViewConstant)
     NEW_TURN_FIRST_DAY              = 1,
     NEW_TURN_WEEK_ALLOC_LINE_OFFSET = 0x29,
     NEW_TURN_DAY_ALLOC_LINE_OFFSET  = 0x43
-H2_ENUM_END(AdventureNewTurnViewConstant)
+} AdventureNewTurnViewConstant;
 
-H2_ENUM_BEGIN(AdventureResourceViewConstant)
+typedef enum AdventureResourceViewConstant {
     RESOURCE_VIEW_TEXT_BASE_Y               = 398,
     RESOURCE_VIEW_MULTILINE_HEIGHT          = 32,
     RESOURCE_VIEW_LINE_HEIGHT               = 6,
@@ -722,10 +719,10 @@ H2_ENUM_BEGIN(AdventureResourceViewConstant)
     RESOURCE_VIEW_COUNT_HEIGHT              = 12,
     RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET = 0x26,
     RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET   = 0x50
-H2_ENUM_END(AdventureResourceViewConstant)
+} AdventureResourceViewConstant;
 
-H2_ENUM_BEGIN(AdventureKingdomViewConstant)
-    KINGDOM_VIEW_RESOURCE_COUNT          = IDX(RES_COUNT),
+typedef enum AdventureKingdomViewConstant {
+    KINGDOM_VIEW_RESOURCE_COUNT          = H2EnumIndex(RES_COUNT),
     KINGDOM_VIEW_ENTRY_COUNT             = 9,
     KINGDOM_VIEW_CASTLE_ENTRY            = 7,
     KINGDOM_VIEW_TOWN_ENTRY              = 8,
@@ -747,16 +744,16 @@ H2_ENUM_BEGIN(AdventureKingdomViewConstant)
     KINGDOM_VIEW_CASTLE_TEXT_X           = 27,
     KINGDOM_VIEW_VILLAGE_TEXT_X          = 80,
     KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET = 0x32
-H2_ENUM_END(AdventureKingdomViewConstant)
+} AdventureKingdomViewConstant;
 
-H2_ENUM_BEGIN(AdventureVisionsConstant)
+typedef enum AdventureVisionsConstant {
     VISIONS_RADIUS               = 3,
     VISIONS_NO_MONSTER_DISTANCE  = 100,
     VISIONS_MESSAGE_BUFFER_SIZE  = 200,
     VISIONS_JOIN_COST_MULTIPLIER = 2
-H2_ENUM_END(AdventureVisionsConstant)
+} AdventureVisionsConstant;
 
-H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
+typedef enum AdventureEnemyTurnViewConstant {
     ENEMY_TURN_BACKGROUND_X       = 480,
     ENEMY_TURN_BACKGROUND_Y       = 392,
     ENEMY_TURN_BACKGROUND_WIDTH   = 143,
@@ -789,9 +786,9 @@ H2_ENUM_BEGIN(AdventureEnemyTurnViewConstant)
     ENEMY_TURN_PHASE_SLOT         = 2,
     ENEMY_TURN_ANIMATION_DELAY    = 300,
     ENEMY_TURN_PHASE_DELAY        = 700
-H2_ENUM_END(AdventureEnemyTurnViewConstant)
+} AdventureEnemyTurnViewConstant;
 
-H2_ENUM_BEGIN(AdventureCloudNeighbor)
+typedef enum AdventureCloudNeighbor {
     CLOUD_NORTH       = 0x01,
     CLOUD_EAST        = 0x02,
     CLOUD_SOUTH       = 0x04,
@@ -804,9 +801,9 @@ H2_ENUM_BEGIN(AdventureCloudNeighbor)
     CLOUD_RIGHT_EDGE  = 0x32,
     CLOUD_TOP_EDGE    = 0x91,
     CLOUD_BOTTOM_EDGE = 0x64
-H2_ENUM_END(AdventureCloudNeighbor)
+} AdventureCloudNeighbor;
 
-H2_ENUM_BEGIN(AdventureQuickInfoObject)
+typedef enum AdventureQuickInfoObject {
     OBELISK_INDEX_BASE          = 1,
     RESOURCE_FRAME_PAIR_MASK    = ~1,
     RESOURCE_FRAME_PAIR_STRIDE  = 2,
@@ -827,9 +824,9 @@ H2_ENUM_BEGIN(AdventureQuickInfoObject)
     QUICK_INFO_HEIGHT           = 96,
     QUICK_INFO_BOTTOM           = QUICK_VIEW_RIGHT,
     QUICK_INFO_BOTTOM_Y         = QUICK_INFO_BOTTOM - QUICK_INFO_HEIGHT
-H2_ENUM_END(AdventureQuickInfoObject)
+} AdventureQuickInfoObject;
 
-H2_ENUM_BEGIN(AdventureCheatConstant)
+typedef enum AdventureCheatConstant {
     CHEAT_SEQUENCE_RADIX     = 10,
     CHEAT_SEQUENCE_MODULUS   = 10000000,
     CHEAT_CREATURES_MODULUS  = 100000,
@@ -846,9 +843,9 @@ H2_ENUM_BEGIN(AdventureCheatConstant)
     CHEAT_BLACK_DRAGON_COUNT = 5,
     CHEAT_REVEAL_CENTER      = 30,
     CHEAT_REVEAL_RADIUS      = 180
-H2_ENUM_END(AdventureCheatConstant)
+} AdventureCheatConstant;
 
-H2_ENUM_BEGIN(AdventureSiteConstant)
+typedef enum AdventureSiteConstant {
     GENERIC_SITE_1_END   = 4,
     GENERIC_SITE_2_END   = 0x48,
     GENERIC_ALTAR_END    = 5,
@@ -863,9 +860,9 @@ H2_ENUM_BEGIN(AdventureSiteConstant)
     RECRUITMENT_3_END    = 0x78,
     RECRUITMENT_4_END    = 0x81,
     RECRUITMENT_5_END    = 0x89
-H2_ENUM_END(AdventureSiteConstant)
+} AdventureSiteConstant;
 
-H2_ENUM_BEGIN(AdventurePanelCommand)
+typedef enum AdventurePanelCommand {
     PANEL_NEXT_HERO           = 1,
     PANEL_CONTINUE_ROUTE      = 2,
     PANEL_OVERVIEW            = 3,
@@ -886,15 +883,15 @@ H2_ENUM_BEGIN(AdventurePanelCommand)
     BOTTOM_VIEW_DURATION      = 3000,
     LOCATORS_PER_PAGE         = 5,
     LOCATOR_PAGE_STEP         = 4
-H2_ENUM_END(AdventurePanelCommand)
+} AdventurePanelCommand;
 
-H2_ENUM_BEGIN(AdventureAdjacentMonsterConstant)
+typedef enum AdventureAdjacentMonsterConstant {
     ADJACENT_MONSTER_RADIUS     = 1,
     ADJACENT_MONSTER_END_OFFSET = 2,
     ADJACENT_OBJECT_INDEX_NONE  = 0xFF
-H2_ENUM_END(AdventureAdjacentMonsterConstant)
+} AdventureAdjacentMonsterConstant;
 
-H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
+typedef enum AdventurePuzzleViewConstant {
     PUZZLE_MUSIC             = 23,
     PUZZLE_WINDOW_X          = DRAW_CLIP_WIDTH,
     PUZZLE_WINDOW_Y          = SCROLL_BORDER,
@@ -907,9 +904,9 @@ H2_ENUM_BEGIN(AdventurePuzzleViewConstant)
     PUZZLE_Y_ADJUST_Y_FACTOR = 5,
     PUZZLE_PARITY_DIVISOR    = 2,
     PUZZLE_FIZZLE_TIME       = 220
-H2_ENUM_END(AdventurePuzzleViewConstant)
+} AdventurePuzzleViewConstant;
 
-H2_ENUM_BEGIN(AdventurePanelDialogConstant)
+typedef enum AdventurePanelDialogConstant {
     PANEL_NO_HELP             = -1,
     PANEL_WINDOW_X            = 144,
     PANEL_WINDOW_Y            = 40,
@@ -936,9 +933,9 @@ H2_ENUM_BEGIN(AdventurePanelDialogConstant)
     CONTROL_MAIN_MENU_HELP    = 3,
     CONTROL_CLOSE_HELP        = 4,
     CONTROL_CONFIRMATION_SIZE = 200
-H2_ENUM_END(AdventurePanelDialogConstant)
+} AdventurePanelDialogConstant;
 
-H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
+typedef enum AdventureSystemOptionsPrivateConstant {
     SYSTEM_OPTIONS_HELP_ACCEPT         = 0,
     SYSTEM_OPTIONS_HELP_MUSIC_VOLUME   = 1,
     SYSTEM_OPTIONS_HELP_SOUND_VOLUME   = 2,
@@ -951,50 +948,49 @@ H2_ENUM_BEGIN(AdventureSystemOptionsPrivateConstant)
     SYSTEM_OPTIONS_HELP_COLOR_CURSOR   = 9,
     SYSTEM_OPTIONS_HELP_FIRST_OPTION   = SYSTEM_OPTIONS_HELP_MUSIC_VOLUME,
     SYSTEM_OPTIONS_TEXT_CAPACITY       = 120
-H2_ENUM_END(AdventureSystemOptionsPrivateConstant)
+} AdventureSystemOptionsPrivateConstant;
 
-H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
+enum class AdventureMusicQuality : i32 {
     MUSIC_QUALITY_MIDI      = 0,
     MUSIC_QUALITY_CD_STEREO = 1,
     MUSIC_QUALITY_CD_OPERA  = 2
-H2_ENUM_CLASS_END(AdventureMusicQuality)
+};
+using enum AdventureMusicQuality;
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 
-DATA(0x004eb660) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
+static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
-DATA(0x00527eb8) static u16 s_drawGroundTile;
-DATA(0x00527ebc) static i32 s_adjacentMonsterX;
-DATA(0x00527ec0) static i32 s_drawPixelY;
-DATA(0x00527ec4) static mapCellExtra* s_drawExtra;
-DATA(0x00527ecc) static i32 s_adjacentMonsterY;
-DATA(0x00527ed4) static i32 s_adjacentMonsterMinX;
-DATA(0x00527ed8) static i32 s_adjacentMonsterMinY;
-DATA(0x00527ee4) static i32 s_drawMonsterFrame;
-DATA(0x00527f0c) static i32 s_drawCloudFrame;
-DATA(0x00527f10) static i32 s_drawStoneTile;
-DATA(0x00527f18) static mapCell* s_drawCell;
-DATA(0x00527f1c) static mineRecord* s_drawMine;
-DATA(0x00527f20) static hero* s_drawHero;
-DATA(0x00527f3c) static H2_ENUM_STORAGE(HeroCursorType, i32) s_drawHeroType;
-DATA(0x00527f44) static i32 s_drawCovered;
-DATA(0x00527f48) static mapCell* s_drawAdjacentCell;
-DATA(0x00528094) static i32 s_drawHasHero;
-DATA(0x00528098) static i32 s_adjacentMonsterEndY;
-DATA(0x0052809c) static i32 s_drawFlipCloud;
-DATA(0x005280a0) static i32 s_drawHeroFrame;
-DATA(0x005280a4) static i32 s_drawPixelX;
-DATA(0x005280a8) static i32 s_drawPlayerColor;
-DATA(0x005280cc) static i32 s_adjacentMonsterEndX;
-DATA(0x005280d0) static i32 s_drawAnimationLength;
-DATA(0x005280d8) static i32 s_drawHeroYOffset;
-H2_ENUM_BEGIN(AdvVisitMetadata)
+static u16 s_drawGroundTile;
+static i32 s_adjacentMonsterX;
+static i32 s_drawPixelY;
+static mapCellExtra* s_drawExtra;
+static i32 s_adjacentMonsterY;
+static i32 s_adjacentMonsterMinX;
+static i32 s_adjacentMonsterMinY;
+static i32 s_drawMonsterFrame;
+static i32 s_drawCloudFrame;
+static i32 s_drawStoneTile;
+static mapCell* s_drawCell;
+static mineRecord* s_drawMine;
+static hero* s_drawHero;
+static H2EnumStorage<HeroCursorType, i32> s_drawHeroType;
+static i32 s_drawCovered;
+static mapCell* s_drawAdjacentCell;
+static i32 s_drawHasHero;
+static i32 s_adjacentMonsterEndY;
+static i32 s_drawFlipCloud;
+static i32 s_drawHeroFrame;
+static i32 s_drawPixelX;
+static i32 s_drawPlayerColor;
+static i32 s_adjacentMonsterEndX;
+static i32 s_drawAnimationLength;
+static i32 s_drawHeroYOffset;
+typedef enum AdvVisitMetadata {
     VISIT_BIT_INDEX_MASK = 0x1f
-H2_ENUM_END(AdvVisitMetadata)
+} AdvVisitMetadata;
 
-VA(0x00456350, 0x30f)
 advManager::advManager(void) {
     m_groundTiles = NULL;
     m_puzzleIcon = NULL;
@@ -1055,7 +1051,6 @@ advManager::advManager(void) {
     m_cursorTurning = 0;
 }
 
-VA(0x0045665f, 0x9c9)
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
     m_openState = 0;
@@ -1069,7 +1064,7 @@ i32 advManager::Open(i32 id) {
     }
 
     if (m_adventureWindow == NULL) {
-        m_adventureWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f57dc, openAdvWindBin, "adv_wind.bin"));
+        m_adventureWindow = new heroWindow(0, 0, "adv_wind.bin");
         if (m_adventureWindow == NULL) {
             MemError();
         }
@@ -1078,7 +1073,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            DATA_COMPGEN(0x004f57ec, openScrollIcn, "scroll.icn"),
+            "scroll.icn",
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_LEFT_ID,
@@ -1094,7 +1089,7 @@ i32 advManager::Open(i32 id) {
             SCROLL_Y,
             SCROLL_WIDTH,
             SCROLL_HEIGHT,
-            DATA_COMPGEN(0x004f57f8, openScrollIcn2, "scroll.icn"),
+            "scroll.icn",
             SCROLL_ICON_FRAME,
             ICON_DRAW_NORMAL,
             SCROLL_RIGHT_ID,
@@ -1108,9 +1103,9 @@ i32 advManager::Open(i32 id) {
     }
 
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f5804, openAdvmiceMse, "advmice.mse"), 0, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
     } else {
-        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f5810, openAdvmiceMse2, "advmice.mse"), 1, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", 1, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     if (m_visibilityMap == NULL) {
@@ -1123,16 +1118,16 @@ i32 advManager::Open(i32 id) {
     gpWindowManager->AddWindow(m_adventureWindow, 0, 1);
 
     if (m_groundTiles == NULL) {
-        m_groundTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f581c, openGround32Til, "ground32.til"));
+        m_groundTiles = gpResourceManager->GetTileset("ground32.til");
     }
     if (m_cloudTiles == NULL) {
-        m_cloudTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f582c, openClof32Til, "clof32.til"));
+        m_cloudTiles = gpResourceManager->GetTileset("clof32.til");
     }
     if (m_stoneTiles == NULL) {
-        m_stoneTiles = gpResourceManager->GetTileset(DATA_COMPGEN(0x004f5838, openStonTil, "ston.til"));
+        m_stoneTiles = gpResourceManager->GetTileset("ston.til");
     }
     if (m_cloudOverlayIcon == NULL) {
-        m_cloudOverlayIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5844, openClop32Icn, "clop32.icn"));
+        m_cloudOverlayIcon = gpResourceManager->GetIcon("clop32.icn");
     }
 
     for (resourceIndex = 0; resourceIndex < OBJECT_ICON_COUNT; ++resourceIndex) {
@@ -1143,80 +1138,80 @@ i32 advManager::Open(i32 id) {
         }
     }
 
-    if (m_heroIcons[IDX(FACTION_KNIGHT)] == NULL) {
-        m_heroIcons[IDX(FACTION_KNIGHT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5850, openKngt32Icn, "kngt32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_KNIGHT)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_KNIGHT)] = gpResourceManager->GetIcon("kngt32.icn");
     }
-    if (m_heroIcons[IDX(FACTION_BARBARIAN)] == NULL) {
-        m_heroIcons[IDX(FACTION_BARBARIAN)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f585c, openBarb32Icn, "barb32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_BARBARIAN)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_BARBARIAN)] = gpResourceManager->GetIcon("barb32.icn");
     }
-    if (m_heroIcons[IDX(FACTION_SORCERESS)] == NULL) {
-        m_heroIcons[IDX(FACTION_SORCERESS)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5868, openSorc32Icn, "sorc32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_SORCERESS)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_SORCERESS)] = gpResourceManager->GetIcon("sorc32.icn");
     }
-    if (m_heroIcons[IDX(FACTION_WARLOCK)] == NULL) {
-        m_heroIcons[IDX(FACTION_WARLOCK)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5874, openWrlk32Icn, "wrlk32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_WARLOCK)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_WARLOCK)] = gpResourceManager->GetIcon("wrlk32.icn");
     }
-    if (m_heroIcons[IDX(FACTION_WIZARD)] == NULL) {
-        m_heroIcons[IDX(FACTION_WIZARD)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5880, openWzrd32Icn, "wzrd32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_WIZARD)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_WIZARD)] = gpResourceManager->GetIcon("wzrd32.icn");
     }
-    if (m_heroIcons[IDX(FACTION_NECROMANCER)] == NULL) {
-        m_heroIcons[IDX(FACTION_NECROMANCER)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f588c, openNecr32Icn, "necr32.icn"));
+    if (m_heroIcons[H2EnumIndex(FACTION_NECROMANCER)] == NULL) {
+        m_heroIcons[H2EnumIndex(FACTION_NECROMANCER)] = gpResourceManager->GetIcon("necr32.icn");
     }
-    if (m_heroIcons[IDX(HERO_TYPE_BOAT)] == NULL) {
-        m_heroIcons[IDX(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5898, openBoat32Icn, "boat32.icn"));
+    if (m_heroIcons[H2EnumIndex(HERO_TYPE_BOAT)] == NULL) {
+        m_heroIcons[H2EnumIndex(HERO_TYPE_BOAT)] = gpResourceManager->GetIcon("boat32.icn");
     }
     if (m_heroIcons[HERO_ICON_FROTH] == NULL) {
-        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58a4, openFrothIcn, "froth.icn"));
+        m_heroIcons[HERO_ICON_FROTH] = gpResourceManager->GetIcon("froth.icn");
     }
 
     gbLoadingMonoIcon = true;
     if (m_shadowIcon == NULL) {
-        m_shadowIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58b0, openShadow32Icn, "shadow32.icn"));
+        m_shadowIcon = gpResourceManager->GetIcon("shadow32.icn");
     }
     if (m_boatShadowIcon == NULL) {
-        m_boatShadowIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58c0, openBoatshadIcn, "boatshad.icn"));
+        m_boatShadowIcon = gpResourceManager->GetIcon("boatshad.icn");
     }
     gbLoadingMonoIcon = false;
 
     if (m_flagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58d0, openBFlag32Icn, "b-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-flag32.icn");
     }
     if (m_flagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58e0, openGFlag32Icn, "g-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-flag32.icn");
     }
     if (m_flagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f58f0, openRFlag32Icn, "r-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-flag32.icn");
     }
     if (m_flagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5900, openYFlag32Icn, "y-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-flag32.icn");
     }
     if (m_flagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5910, openOFlag32Icn, "o-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-flag32.icn");
     }
     if (m_flagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5920, openPFlag32Icn, "p-flag32.icn"));
+        m_flagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-flag32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_BLUE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5930, openBBflg32Icn, "b-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_BLUE] = gpResourceManager->GetIcon("b-bflg32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_GREEN] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5940, openGBflg32Icn, "g-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_GREEN] = gpResourceManager->GetIcon("g-bflg32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_RED] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5950, openRBflg32Icn, "r-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_RED] = gpResourceManager->GetIcon("r-bflg32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_YELLOW] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5960, openYBflg32Icn, "y-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_YELLOW] = gpResourceManager->GetIcon("y-bflg32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_ORANGE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5970, openOBflg32Icn, "o-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_ORANGE] = gpResourceManager->GetIcon("o-bflg32.icn");
     }
     if (m_boatFlagIcons[PLAYER_COLOR_PURPLE] == NULL) {
-        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5980, openPBflg32Icn, "p-bflg32.icn"));
+        m_boatFlagIcons[PLAYER_COLOR_PURPLE] = gpResourceManager->GetIcon("p-bflg32.icn");
     }
 
     gbLoadingMonoIcon = true;
     if (m_puzzleIcon == NULL) {
-        m_puzzleIcon = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f5990, openRadarIcn, "radar.icn"));
+        m_puzzleIcon = gpResourceManager->GetIcon("radar.icn");
     }
     gbLoadingMonoIcon = false;
 
@@ -1266,13 +1261,12 @@ i32 advManager::Open(i32 id) {
     m_messageMask = BASE_MANAGER_ACCEPT_ADVENTURE;
     m_priority = id;
     m_active = true;
-    strcpy(m_name, DATA_COMPGEN(0x004f599c, openAdvManager, "advManager"));
+    strcpy(m_name, "advManager");
     return 0;
 }
 
-VA(0x00457028, 0x40a)
 void advManager::Close(void) {
-    DATA(0x004f59a8) static i16 s_closeBorderFreeLineBase = CLOSE_BORDER_FREE_LINE_BASE;
+    static i16 s_closeBorderFreeLineBase = CLOSE_BORDER_FREE_LINE_BASE;
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
@@ -1284,7 +1278,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != NULL) {
-        H2_FREE_AT(m_adventureBorder, DATA_COMPGEN(0x004f59ac, closeSourceFile, RETAIL_FILE), s_closeBorderFreeLineBase + BORDER_INITIAL_FREE_LINE_OFFSET);
+        H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
     }
 
@@ -1344,30 +1338,18 @@ void advManager::Close(void) {
     m_active = false;
 }
 
-VA(0x00457432, 0xe9)
 void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
-#if H2_STRICT_ENUMS
     CursorSampleSet cursorSampleSet =
         sampleSet >= CONFIG_WALK_SPEED_SLOW ? CURSOR_SAMPLE_FAST_SET : CURSOR_SAMPLE_SLOW_SET;
-#else
-    if (sampleSet >= 1)
-        sampleSet = CURSOR_SAMPLE_FAST_SET;
-#endif
-    // Ordered filename suffixes select the retail walking-sound variants.
-    // NOLINTBEGIN(readability-magic-numbers)
+
+
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
-    // NOLINTEND(readability-magic-numbers)
+
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
-            DATA_COMPGEN(
-                0x004f59d8, getCursorSampleSetWsnd1d1d82M, "wsnd%1d%1d.82M"
-            ),
-#if H2_STRICT_ENUMS
-            IDX(cursorSampleSet),
-#else
-            sampleSet,
-#endif
+            "wsnd%1d%1d.82M",
+            H2EnumIndex(cursorSampleSet),
             sampleSuffix[index]
         );
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
@@ -1376,7 +1358,6 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     }
 }
 
-VA(0x0045751b, 0x6c0)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
     town* viewTownValue;
@@ -1479,7 +1460,7 @@ class mapCell* advManager::DoAdvCommand(void) {
                 while (gpMouseManager->m_hideCount != 0) {
                     gpMouseManager->ShowColorPointer();
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
                 UpdBottomView(1, 1, 1);
                 if (eventCellState != NULL) {
                     StopCursor(1);
@@ -1558,7 +1539,6 @@ class mapCell* advManager::DoAdvCommand(void) {
     return eventCellState;
 }
 
-VA(0x00457bdb, 0x191)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     i32 shouldChange;
     i32 translationIndex;
@@ -1604,7 +1584,6 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
-VA(0x00457d6c, 0xfda)
 MessageDispatchResult advManager::Main(struct tag_message& message) {
     if (KBTickCount() > glTimers[0] && ComboDraw(1)) {
         UpdateScreen(1, 0);
@@ -1631,7 +1610,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
         && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
         if (gpSoundManager->m_currentTrack == WAIT_AMBIENT_MUSIC) {
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
         }
         SetEnvironmentOrigin(
             m_mapOriginX + VIEW_CENTER_OFFSET,
@@ -1642,7 +1621,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
 
     MessageDispatchResult processResult = MESSAGE_DISPATCH_CONSUME;
     i32 exitRequestedFlag = 0;
-    // Retail reserves three result slots; only the first is used.
+
     mapCell* eventCellsResult[ADVENTURE_EVENT_CELL_RESULT_COUNT];
     eventCellsResult[0] = NULL;
     MapDirection moveDirectionState;
@@ -1654,7 +1633,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
             case MESSAGE_WIDGET:
                 switch (message.payload.widget.command) {
                     case WIDGET_COMMAND_DESELECT:
-                        if (!(HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))) {
+                        if (!((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))) {
                             processResult =
                                 ProcessDeSelect(&message, &exitRequestedFlag, eventCellsResult);
                         }
@@ -1662,7 +1641,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case WIDGET_COMMAND_SELECT:
                     case WIDGET_COMMAND_ALTERNATE_SELECT: {
                         i32 helpIndexState;
-                        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                        if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                             helpIndexState = -1;
                             switch (message.payload.widget.id) {
                                 case PANEL_NEXT_HERO:
@@ -1746,8 +1725,8 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
-                        // Retail's debug command advances an opaque cheat-state payload.
-                        // NOLINTNEXTLINE(readability-magic-numbers)
+
+
                         gpCurPlayer->m_cheatValue += 12;
                         if (currentHero != NULL) {
                             GiveExperience(currentHero, CHEAT_EXPERIENCE_AMOUNT, 1);
@@ -1756,17 +1735,17 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_F8:
                         break;
                     case INPUT_SCAN_F9:
-                        for (cheatDigitLocal = 0; cheatDigitLocal < IDX(RES_COUNT);
+                        for (cheatDigitLocal = 0; cheatDigitLocal < H2EnumIndex(RES_COUNT);
                              ++cheatDigitLocal) {
-                            if (cheatDigitLocal == IDX(RES_GOLD)) {
+                            if (cheatDigitLocal == H2EnumIndex(RES_GOLD)) {
                                 gpCurPlayer->m_resources[cheatDigitLocal] += CHEAT_GOLD_AMOUNT;
                             } else {
                                 gpCurPlayer->m_resources[cheatDigitLocal] += CHEAT_RESOURCE_AMOUNT;
                             }
                         }
                         break;
-                    // Scan-code cases intentionally decode to their literal decimal digits.
-                    // NOLINTBEGIN(readability-magic-numbers)
+
+
                     case INPUT_SCAN_0:
                         cheatDigitLocal = 0;
                         goto process_cheat_digit;
@@ -1797,7 +1776,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_9:
                         cheatDigitLocal = 9;
                         goto process_cheat_digit;
-                    // NOLINTEND(readability-magic-numbers)
+
                     process_cheat_digit: {
                         hero* cheatHero = NULL;
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -1882,7 +1861,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         if (giCheatSeq % CHEAT_SHORT_MODULUS == CHEAT_INFO) {
                             sprintf(
                                 gText,
-                                DATA_COMPGEN(0x004f59f0, mainCoordinatesAtTopLeftCornerOf, "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d"),
+                                "Coordinates at top left corner of view:\n\n  X: %d\n  Y: %d",
                                 m_mapOriginX,
                                 m_mapOriginY
                             );
@@ -1892,60 +1871,60 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         }
                         break;
                     }
-                    // Retail places this case after the cheat-digit block in source order.
+
                     case INPUT_SCAN_ESCAPE:
                         break;
                     case INPUT_SCAN_NUMPAD_8:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_9:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_6:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_3:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH_EAST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_2:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_1:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_SOUTH_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_4:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_WEST;
                         }
                         break;
                     case INPUT_SCAN_NUMPAD_7:
-                        if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_CONTROL_KEYS)) {
+                        if ((H2EnumIndex((message.payload.keyboard.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                             ScreenScroll(MAP_DIRECTION_NORTH_WEST, 0);
                         } else {
                             moveDirectionState = MAP_DIRECTION_NORTH_WEST;
@@ -1967,20 +1946,20 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         cheatDigitLocal = 'e';
                         strcpy(
                             gText,
-                            DATA_COMPGEN(0x004f5a2c, mainAreYouSureYouWantTo, "Are you sure you want to restart?  (Your current game will be lost)")
+                            "Are you sure you want to restart?  (Your current game will be lost)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_L:
                         cheatDigitLocal = 'f';
                         strcpy(
                             gText,
-                            DATA_COMPGEN(0x004f5a70, mainAreYouSureYouWantTo2, "Are you sure you want to load a new game?  (Your current game will be "
-                            "lost)")
+                            "Are you sure you want to load a new game?  (Your current game will be "
+                            "lost)"
                         );
                         goto confirm_game_command;
                     case INPUT_SCAN_Q:
                         cheatDigitLocal = 'i';
-                        strcpy(gText, DATA_COMPGEN(0x004f5abc, mainAreYouSureYouWantTo3, "Are you sure you want to quit?"));
+                        strcpy(gText, "Are you sure you want to quit?");
                         goto confirm_game_command;
                     confirm_game_command:
                         exitRequestedFlag = 1;
@@ -2009,7 +1988,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                                giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]
                             );
                         } else if (xIsPlayingExpansionCampaign) {
                             SetEnvironmentOrigin(
@@ -2023,7 +2002,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             );
                             RedrawAdvScreen(1, 0);
                             gpSoundManager->SwitchAmbientMusic(
-                                giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                                giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]
                             );
                         } else {
                             gpGame->ShowScenInfo();
@@ -2089,7 +2068,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpMouseManager->ShowColorPointer();
                     }
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]
                     );
                     if (eventCellsResult[0] != NULL) {
                         StopCursor(1);
@@ -2117,12 +2096,10 @@ finish_message:
     return processResult;
 }
 
-VA(0x00458d46, 0x22)
 void advManager::Reseed(i32, i32) {
     giSeedingValid = 0;
 }
 
-VA(0x00458d68, 0xeb1)
 MessageDispatchResult
 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 mouseX;
@@ -2153,7 +2130,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 break;
             }
             objectTypeState = gpCurPlayer->m_heroIds[gpCurPlayer->m_heroLocatorPage + pageState];
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 HeroQuickView(objectTypeState, pageState, -1, -1);
             } else {
                 if (gpCurPlayer->CurrentHero() == objectTypeState) {
@@ -2174,7 +2151,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 gpCurPlayer
                     ->m_townIds[gpCurPlayer->m_townLocatorPage + message->payload.widget.id
                                - LOCATOR_TOWN_IMAGE_BASE];
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 TownQuickView(
                     objectTypeState,
                     message->payload.widget.id - LOCATOR_TOWN_IMAGE_BASE,
@@ -2240,17 +2217,17 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 visible = 0;
             }
             currentCell = GetCell(m_lastHoverCell + m_mapOriginX, m_hoverCellY + m_mapOriginY);
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 if (!visible) {
                     QuickInfo(m_lastHoverCell, m_hoverCellY);
                 } else {
                     if (m_lastHoverCell == VIEW_CENTER_CELL && m_hoverCellY == VIEW_CENTER_CELL
                         && gpCurPlayer->CurrentHero() != INVALID_HERO
                         && m_heroContextLocked) {
-                        objectTypeState = IDX(MAP_OBJECT_HERO_INTERACTION);
+                        objectTypeState = H2EnumIndex(MAP_OBJECT_HERO_INTERACTION);
                         objectIdIndex = gpCurPlayer->CurrentHero();
                     } else {
-                        objectTypeState = IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
+                        objectTypeState = H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                         objectIdIndex = currentCell->m_objectMetadata;
                     }
                     switch (static_cast<MapObjectType>(objectTypeState)) {
@@ -2312,10 +2289,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                         DoAdvCommand();
                     } else if ((!mobileResult
-                                || HAS(
-                                    message->payload.widget.modifiers,
-                                    MESSAGE_MODIFIER_CONTROL_KEYS
-                                )
+                                || (H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))
                                 || (gConfig.showRoute
                                     && (m_commandTargetX != currentHero->m_destinationX
                                         || m_commandTargetY != currentHero->m_destinationY)))
@@ -2328,9 +2302,9 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                         *eventCell = DoAdvCommand();
                     }
                 } else {
-                    objectTypeState = IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
+                    objectTypeState = H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK);
                     objectIdIndex = currentCell->m_objectMetadata;
-                    if (objectTypeState == IDX(MAP_OBJECT_HERO_INTERACTION)) {
+                    if (objectTypeState == H2EnumIndex(MAP_OBJECT_HERO_INTERACTION)) {
                         if (gpCurPlayer->CurrentHero() == objectIdIndex) {
                             m_selectedCell = ADVMGR_COMMAND_HERO_VIEW;
                             DoAdvCommand();
@@ -2338,7 +2312,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                             SetHeroContext(objectIdIndex, 0);
                         }
                     }
-                    if (objectTypeState == IDX(MAP_OBJECT_CASTLE)) {
+                    if (objectTypeState == H2EnumIndex(MAP_OBJECT_CASTLE)) {
                         if (gpCurPlayer->CurrentTown() == objectIdIndex) {
                             m_selectedCell = ADVMGR_COMMAND_TOWN_VIEW;
                             *eventCell = DoAdvCommand();
@@ -2351,10 +2325,10 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
         }
         case PANEL_RADAR:
-            if (HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+            if ((H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f5adc, processSelectWorldMapAMiniatureViewOf, "{World Map}\n\nA miniature view of the known world.  "
-                    "Left click to move viewing area."),
+                    "{World Map}\n\nA miniature view of the known world.  "
+                    "Left click to move viewing area.",
                     NORMAL_DIALOG_QUICK_VIEW,
                     -1,
                     -1,
@@ -2368,23 +2342,23 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 break;
             }
             DemobilizeCurrHero();
-            // These are retail's scale payloads for the four supported map dimensions.
-            // NOLINTBEGIN(readability-magic-numbers)
+
+
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
-                    radarScale = DATA_COMPGEN(0x004eb680, processSelectConstant3, 4.0f);
+                    radarScale = 4.0f;
                     break;
                 case MAP_DIMENSION_MEDIUM:
-                    radarScale = DATA_COMPGEN(0x004eb684, processSelectConstant, 2.0f);
+                    radarScale = 2.0f;
                     break;
                 case MAP_DIMENSION_LARGE:
-                    radarScale = DATA_COMPGEN(0x004eb688, processSelectConstant4, 1.3333f);
+                    radarScale = 1.3333f;
                     break;
                 default:
-                    radarScale = DATA_COMPGEN(0x004eb68c, processSelectConstant2, 1.0f);
+                    radarScale = 1.0f;
                     break;
             }
-            // NOLINTEND(readability-magic-numbers)
+
             mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / radarScale);
             mouseY = static_cast<i32>((mouseY - RADAR_TOP) / radarScale);
             m_mapOriginX = mouseX - VIEW_CENTER_CELL;
@@ -2461,13 +2435,13 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
             break;
     }
 
-    if ((HAS(message->payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+    if (((H2EnumIndex((message->payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON))))
         && message->payload.widget.id >= BOTTOM_VIEW_FIRST_MESSAGE
         && message->payload.widget.id <= BOTTOM_VIEW_LAST_MESSAGE) {
         NormalDialog(
-            DATA_COMPGEN(0x004f5b30, processSelectStatusWindowThisWindowProvidesInformation, "{Status Window}\n\nThis window provides information on the status "
+            "{Status Window}\n\nThis window provides information on the status "
             "of your hero or kingdom, and shows the date.  Left click here to "
-            "cycle through these windows."),
+            "cycle through these windows.",
             NORMAL_DIALOG_QUICK_VIEW,
             -1,
             -1,
@@ -2482,7 +2456,6 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x00459c19, 0x463)
 MessageDispatchResult advManager::ProcessDeSelect(
     struct tag_message* message,
     i32* result,
@@ -2528,7 +2501,7 @@ MessageDispatchResult advManager::ProcessDeSelect(
         case PANEL_END_TURN:
             if (gpCurPlayer->HasMobileHero()) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f5bd0, processDeSelectOneOrMoreHeroesMayStill, "One or more heroes may still move, are you sure you want to end your turn?"),
+                    "One or more heroes may still move, are you sure you want to end your turn?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -2562,12 +2535,12 @@ MessageDispatchResult advManager::ProcessDeSelect(
                     SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                 }
                 TrimLoopingSounds(0);
-                // Retail uses the action discriminator for this occupied-town lookup;
-                // HeroView receives the selected hero ID separately.
+
+
                 HeroView(
                     giOverviewReturnActionExtra,
                     reinterpret_cast<i32>(
-                        gpGame->GetHero(IDX(giOverviewReturnAction))->GetOccupiedTown()
+                        gpGame->GetHero(H2EnumIndex(giOverviewReturnAction))->GetOccupiedTown()
                     ),
                     1
                 );
@@ -2625,7 +2598,6 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
-VA(0x0045a07c, 0x5c8)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
     i32 playerState;
@@ -2643,7 +2615,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(0x004f5c1c, processSearchDiggingForArtifactsRequiresAWhole, "Digging for artifacts requires a whole day, try again tomorrow."),
+            "Digging for artifacts requires a whole day, try again tomorrow.",
             1,
             -1,
             -1,
@@ -2661,8 +2633,8 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             goto search_end;
         }
         NormalDialog(
-            DATA_COMPGEN(0x004f5c5c, processSearchSearchingForTheUltimateArtifactIs, "Searching for the Ultimate Artifact is fruitless.  Your hero could not carry it even "
-            "if he found it - all his artifact slots are full."),
+            "Searching for the Ultimate Artifact is fruitless.  Your hero could not carry it even "
+            "if he found it - all his artifact slots are full.",
             1,
             -1,
             -1,
@@ -2690,19 +2662,19 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
-        NormalDialog(DATA_COMPGEN(0x004f5ce4, processSearchTrySearchingOnClearGround, "Try searching on clear ground."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog("Try searching on clear ground.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
     if (giGroundToTerrain[currentCell->m_terrainImageIndex] == TERRAIN_WATER) {
         if (!gbHumanPlayer[giCurPlayer]) {
             goto search_end;
         }
-        NormalDialog(DATA_COMPGEN(0x004f5d04, processSearchTryLookingOnLand, "Try looking on land!!!"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog("Try looking on land!!!", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         return 1;
     }
 
     if (gbHumanPlayer[giCurPlayer]) {
-        digSampleState = LoadPlaySample(DATA_COMPGEN(0x004f5d1c, processSearchDIGSOUND82M, "DIGSOUND.82M"));
+        digSampleState = LoadPlaySample("DIGSOUND.82M");
     }
     if (currentCell->m_objectIndex == MAPCELL_SPRITE_NONE
         || currentCell->m_objectTileset == TILESET_DUMMY) {
@@ -2710,7 +2682,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         currentCell->m_objectIndex = DIG_HOLE_FRAME;
         currentCell->m_objectLayerBit0 = 1;
         currentCell->m_objectLayerBit1 = 1;
-        currentCell->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
+        currentCell->m_flags |= H2EnumIndex(MAP_CELL_OBJECT_SHADOW_ONLY);
     }
     CompleteDraw(0);
     UpdateScreen(0, 0);
@@ -2720,7 +2692,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         if (searchingHeroState->NumArtifacts() >= ARTIFACT_CAPACITY) {
             if (gbHumanPlayer[giCurPlayer]) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f5d2c, processSearchYouHaveNoRoomToCarry, "You have no room to carry another artifact!"),
+                    "You have no room to carry another artifact!",
                     1,
                     -1,
                     -1,
@@ -2742,18 +2714,18 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 if (specialArtifactValue) {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004f5dac, processSearchSS, "%s%s"),
-                        DATA_COMPGEN(0x004f5d58, processSearchCongratulationsAfterSpendingManyHoursDigging, "Congratulations! After spending many hours digging here, you have "
-                        "uncovered the "),
-                        gArtifactNames[IDX(ARTIFACT_SPHERE_NEGATION)]
+                        "%s%s",
+                        "Congratulations! After spending many hours digging here, you have "
+                        "uncovered the ",
+                        gArtifactNames[H2EnumIndex(ARTIFACT_SPHERE_NEGATION)]
                     );
                 } else {
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004f5e08, processSearchSS2, "%s%s"),
-                        DATA_COMPGEN(0x004f5db4, processSearchCongratulationsAfterSpendingManyHoursDigging2, "Congratulations! After spending many hours digging here, you have "
-                        "uncovered the "),
-                        gArtifactNames[IDX(gpGame->m_ultimateArtifactId)]
+                        "%s%s",
+                        "Congratulations! After spending many hours digging here, you have "
+                        "uncovered the ",
+                        gArtifactNames[H2EnumIndex(gpGame->m_ultimateArtifactId)]
                     );
                 }
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -2762,7 +2734,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
                 } else {
                     searchingHeroState->ViewArtifact(gpGame->m_ultimateArtifactId, 0, -1);
                 }
-                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+                gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
             }
             if (specialArtifactValue) {
                 GiveArtifact(searchingHeroState, ARTIFACT_SPHERE_NEGATION, 1, -1);
@@ -2777,7 +2749,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
             gpGame->m_ultimateArtifactId = ARTIFACT_NONE;
         }
     } else if (gbHumanPlayer[giCurPlayer]) {
-        NormalDialog(DATA_COMPGEN(0x004f5e10, processSearchNothingHereWhereCouldItBe, "Nothing here.\nWhere could it be?"), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog("Nothing here.\nWhere could it be?", 1, -1, -1, -1, 0, -1, 0, -1, 0);
     }
     if (gbHumanPlayer[giCurPlayer]) {
         WaitEndSample(digSampleState, -1);
@@ -2796,7 +2768,6 @@ search_end:
     return 1;
 }
 
-VA(0x0045a644, 0xa50)
 MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroXHero;
     i32 heroYCoordinate;
@@ -2966,7 +2937,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                             break;
                         case MAP_OBJECT_CASTLE:
                             hoverTownCell = gpGame->GetTown(hoverCellLocal->m_objectMetadata);
-                            if (HAS(hoverCellLocal->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+                            if ((H2EnumIndex((hoverCellLocal->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
                                 && hoverTownCell->m_owner != giCurPlayer
                                 && hoverTownCell->HasGarrison()) {
                                 gpMouseManager->SetPointer(
@@ -2987,7 +2958,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
                                           pointerBaseCursor + POINTER_ATTACK
                                       ),
                                       1))) {
-                                if (HAS(hoverCellLocal->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                                if ((H2EnumIndex((hoverCellLocal->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                                     if (m_cursorType != HERO_TYPE_BOAT) {
                                         if (giGroundToTerrain[hoverCellLocal
                                                                   ->m_terrainImageIndex]
@@ -3052,7 +3023,6 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     }
 }
 
-VA(0x0045b094, 0x21a)
 void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (forceUpdate == 0 && bShowIt == 0) {
         if (KBTickCount() > glTimers[0]) {
@@ -3112,7 +3082,6 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     Process1WindowsMessage();
 }
 
-VA(0x0045b2ae, 0x4eb)
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
     i32 drawY;
     i32 drawX;
@@ -3260,12 +3229,10 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
     }
 }
 
-VA(0x0045b799, 0x3a)
 void advManager::CompleteDraw(i32 update) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
-VA(0x0045b7d3, 0x3a9)
 i32 advManager::GetCloudLookup(i32 x, i32 y) {
     u32 cloudMask = 0;
 
@@ -3343,7 +3310,6 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     return giCloudType[cloudMask];
 }
 
-VA(0x0045bb7c, 0x24cb)
 void advManager::DrawCell(
     i32 mapX,
     i32 mapY,
@@ -3416,7 +3382,7 @@ void advManager::DrawCell(
                 s_drawCloudFrame = GetCloudLookup(mapX, mapY);
             }
             if (s_drawCloudFrame == 0) {
-                if (HAS(drawMask, ADVMGR_DRAW_CLOUD)) {
+                if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_CLOUD)))) {
                     TileToBitmap(
                         m_cloudTiles,
                         (mapY + mapX) & CLOUD_VARIANT_MASK,
@@ -3445,7 +3411,7 @@ void advManager::DrawCell(
             s_drawCovered = 0;
         }
 
-        if (HAS(drawMask, ADVMGR_DRAW_CLOUD) && !gbDrawingPuzzle) {
+        if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_CLOUD))) && !gbDrawingPuzzle) {
             if (s_drawCovered != 0) {
                 if (s_drawFlipCloud != 0) {
                     FlipIconToBitmap(
@@ -3480,7 +3446,7 @@ void advManager::DrawCell(
                 if ((m_visibilityMap[mapY * MAP_WIDTH + mapX] & ROUTE_BEYOND_MOBILITY_FLAG)
                     != 0) {
                     IconToBitmapColorTable(
-                        m_objectIcons[IDX(TILESET_ROUTE)],
+                        m_objectIcons[H2EnumIndex(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
@@ -3496,7 +3462,7 @@ void advManager::DrawCell(
                     );
                 } else {
                     IconToBitmap(
-                        m_objectIcons[IDX(TILESET_ROUTE)],
+                        m_objectIcons[H2EnumIndex(TILESET_ROUTE)],
                         gpWindowManager->m_screen,
                         s_drawPixelX - ROUTE_DRAW_X_OFFSET,
                         s_drawPixelY + ROUTE_DRAW_Y_OFFSET,
@@ -3511,7 +3477,7 @@ void advManager::DrawCell(
                 }
             }
         } else {
-            if (HAS(drawMask, ADVMGR_DRAW_GROUND)) {
+            if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_GROUND)))) {
                 s_drawGroundTile = s_drawCell->m_flags;
                 s_drawGroundTile <<= TERRAIN_FLAGS_SHIFT;
                 s_drawGroundTile |= s_drawCell->m_terrainImageIndex;
@@ -3526,9 +3492,9 @@ void advManager::DrawCell(
                 if (s_drawCell->m_objectLayerBit0
                     && (gbDrawingPuzzle == 0 || s_drawCell->m_objectTileset != TILESET_OBJNDIRT
                         || s_drawCell->m_objectIndex != DIG_HOLE_FRAME)
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3542,12 +3508,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3571,9 +3537,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3587,12 +3553,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                                        m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3616,9 +3582,9 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_objectLayerBit1 && !s_drawCell->m_objectLayerBit0
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3632,12 +3598,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3661,9 +3627,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectLayerBit1 && !s_drawExtra->objectLayerBit0
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3677,12 +3643,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                                        m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3706,14 +3672,14 @@ void advManager::DrawCell(
                 }
             }
 
-            if (HAS(drawMask, ADVMGR_DRAW_OBJECT)) {
+            if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OBJECT)))) {
                 if (s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !s_drawCell->m_objectLayerBit0 && !s_drawCell->m_objectLayerBit1
                     && !s_drawCell->m_objectDrawnAsOverlay
                     && s_drawCell->m_objectTileset != TILESET_MONS32
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -3727,7 +3693,7 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
@@ -3741,7 +3707,7 @@ void advManager::DrawCell(
                             }
                         }
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3767,9 +3733,9 @@ void advManager::DrawCell(
                     if (!s_drawExtra->objectLayerBit0 && !s_drawExtra->objectLayerBit1
                         && !s_drawExtra->objectDrawnAsOverlay
                         && s_drawExtra->objectTileset != TILESET_MONS32
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -3783,12 +3749,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                                        m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -3812,11 +3778,11 @@ void advManager::DrawCell(
                 }
             }
 
-            if ((HAS(drawMask, ADVMGR_DRAW_HERO) || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
+            if (((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO))) || (H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW))))
                 && gbDrawingPuzzle == 0) {
                 s_drawHasHero = 0;
                 s_drawHero = NULL;
-                if (HAS(drawMask, ADVMGR_DRAW_HERO)) {
+                if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO)))) {
                     if (mapX > 0) {
                         s_drawAdjacentCell = GetCell(mapX - 1, mapY);
                         if (s_drawAdjacentCell->m_triggerType
@@ -3842,7 +3808,7 @@ void advManager::DrawCell(
                                     gpWindowManager->m_screen,
                                     s_drawPixelX - CELL_PIXELS,
                                     s_drawPixelY,
-                                    IDX(s_drawMine->guardianType) - IDX(CREATURE_EARTH_ELEMENTAL),
+                                    H2EnumIndex(s_drawMine->guardianType) - H2EnumIndex(CREATURE_EARTH_ELEMENTAL),
                                     ICON_DRAW_CLIP,
                                     0,
                                     0,
@@ -3924,14 +3890,14 @@ void advManager::DrawCell(
                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
                         s_drawHero = gpGame->GetHero(s_drawCell->m_objectMetadata);
                         s_drawPlayerColor = gpGame->m_players[s_drawHero->m_owner].m_color;
-                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+                        if ((H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
                             s_drawHeroType = HERO_TYPE_BOAT;
                         } else {
                             s_drawHeroType = s_drawHero->m_cursorType;
                         }
                         s_drawHeroFrame = GetCursorBaseFrame(s_drawHero->m_direction);
                         s_drawHasHero = 1;
-                        if (HAS(s_drawHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+                        if ((H2EnumIndex((s_drawHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
                             s_drawHeroYOffset = HERO_BOAT_Y_OFFSET;
                         }
                     }
@@ -3939,7 +3905,7 @@ void advManager::DrawCell(
 
                 if (s_drawHasHero) {
                     if (s_drawHeroFrame & HERO_FRAME_MIRROR_FLAG) {
-                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                        if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT) {
                                 cursorFrame = s_drawHeroFrame & HERO_FRAME_INDEX_MASK;
                                 if (cursorFrame == HERO_SHADOW_SOURCE_FRAME_51) {
@@ -4017,7 +3983,7 @@ void advManager::DrawCell(
                                 );
                             }
                             FlipIconToBitmap(
-                                m_heroIcons[IDX(s_drawHeroType)],
+                                m_heroIcons[H2EnumIndex(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX + CELL_PIXELS,
                                 s_drawHeroYOffset + s_drawPixelY + CELL_LAST_PIXEL,
@@ -4064,9 +4030,9 @@ void advManager::DrawCell(
                             }
                         }
                     } else {
-                        if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                        if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                             if (m_drawHeroShadows != 0 && s_drawHeroType != HERO_TYPE_BOAT
-                                && HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                                && (H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                                 IconToBitmap(
                                     m_shadowIcon,
                                     gpWindowManager->m_screen,
@@ -4114,7 +4080,7 @@ void advManager::DrawCell(
                                 );
                             }
                             IconToBitmap(
-                                m_heroIcons[IDX(s_drawHeroType)],
+                                m_heroIcons[H2EnumIndex(s_drawHeroType)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawHeroYOffset + s_drawPixelY + CELL_LAST_PIXEL,
@@ -4164,10 +4130,10 @@ void advManager::DrawCell(
                 }
 
                 if (m_cursorActive != 0 && (s_drawCell->m_flags & CURSOR_MAP_VISIBLE_FLAG) != 0
-                    && (m_comboHeroDrawn == 0 || HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW))
+                    && (m_comboHeroDrawn == 0 || (H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW))))
                     && m_mapOriginX + VIEW_CENTER_CELL == mapX
                     && m_mapOriginY + VIEW_CENTER_CELL == mapY) {
-                    if (HAS(drawMask, ADVMGR_DRAW_HERO_SHADOW)) {
+                    if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_HERO_SHADOW)))) {
                         cursorSuppressed = 1;
                     } else {
                         DrawCursorShadow();
@@ -4177,13 +4143,13 @@ void advManager::DrawCell(
                 }
             }
 
-            if (HAS(drawMask, ADVMGR_DRAW_OVERLAY) || HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)) {
-                if (HAS(drawMask, ADVMGR_DRAW_OVERLAY)
+            if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY))) || (H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))) {
+                if ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY)))
                     && s_drawCell->m_objectIndex != MAPCELL_SPRITE_NONE
                     && s_drawCell->m_objectDrawnAsOverlay
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_objectTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawCell->m_objectTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                        m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -4197,12 +4163,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedObject) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                                                    m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                                                     s_drawCell->m_objectIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawCell->m_objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -4226,9 +4192,9 @@ void advManager::DrawCell(
                 }
                 while (s_drawExtra != NULL) {
                     if (s_drawExtra->objectDrawnAsOverlay
-                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->objectTileset)])) {
+                        && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawExtra->objectTileset)])) {
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -4242,12 +4208,12 @@ void advManager::DrawCell(
                         );
                         if (s_drawExtra->animatedObject) {
                             s_drawAnimationLength = GetIconEntry(
-                                                        m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                                        m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                                         s_drawExtra->objectIndex
                             )
                                                         ->flags;
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->objectTileset)],
+                                m_objectIcons[H2EnumIndex(s_drawExtra->objectTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -4271,12 +4237,12 @@ void advManager::DrawCell(
                 }
 
                 if (s_drawCell->m_overlayIndex != MAPCELL_SPRITE_NONE
-                    && ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawCell->m_drawOverlayOnTop)
-                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
+                    && (((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY))) && !s_drawCell->m_drawOverlayOnTop)
+                        || ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))
                             && s_drawCell->m_drawOverlayOnTop))
-                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawCell->m_overlayTileset)])) {
+                    && (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawCell->m_overlayTileset)])) {
                     IconToBitmap(
-                        m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                        m_objectIcons[H2EnumIndex(s_drawCell->m_overlayTileset)],
                         gpWindowManager->m_screen,
                         s_drawPixelX,
                         s_drawPixelY,
@@ -4291,12 +4257,12 @@ void advManager::DrawCell(
                     );
                     if (s_drawCell->m_animatedOverlay) {
                         s_drawAnimationLength = GetIconEntry(
-                                                    m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                                                    m_objectIcons[H2EnumIndex(s_drawCell->m_overlayTileset)],
                                                     s_drawCell->m_overlayIndex
                         )
                                                     ->flags;
                         IconToBitmap(
-                            m_objectIcons[IDX(s_drawCell->m_overlayTileset)],
+                            m_objectIcons[H2EnumIndex(s_drawCell->m_overlayTileset)],
                             gpWindowManager->m_screen,
                             s_drawPixelX,
                             s_drawPixelY,
@@ -4319,12 +4285,12 @@ void advManager::DrawCell(
                     s_drawExtra = NULL;
                 }
                 while (s_drawExtra != NULL) {
-                    if ((HAS(drawMask, ADVMGR_DRAW_OVERLAY) && !s_drawExtra->drawOverlayOnTop)
-                        || (HAS(drawMask, ADVMGR_DRAW_OVERLAY_TOP)
+                    if (((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY))) && !s_drawExtra->drawOverlayOnTop)
+                        || ((H2EnumIndex((drawMask) & (ADVMGR_DRAW_OVERLAY_TOP)))
                             && s_drawExtra->drawOverlayOnTop)) {
-                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[IDX(s_drawExtra->overlayTileset)]) {
+                        if (gbDrawingPuzzle == 0 || bPuzzleDraw[H2EnumIndex(s_drawExtra->overlayTileset)]) {
                             IconToBitmap(
-                                m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                m_objectIcons[H2EnumIndex(s_drawExtra->overlayTileset)],
                                 gpWindowManager->m_screen,
                                 s_drawPixelX,
                                 s_drawPixelY,
@@ -4340,12 +4306,12 @@ void advManager::DrawCell(
                             if (s_drawExtra->animatedOverlay) {
                                 s_drawAnimationLength =
                                     GetIconEntry(
-                                        m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                        m_objectIcons[H2EnumIndex(s_drawExtra->overlayTileset)],
                                         s_drawExtra->overlayIndex
                                     )
                                         ->flags;
                                 IconToBitmap(
-                                    m_objectIcons[IDX(s_drawExtra->overlayTileset)],
+                                    m_objectIcons[H2EnumIndex(s_drawExtra->overlayTileset)],
                                     gpWindowManager->m_screen,
                                     s_drawPixelX,
                                     s_drawPixelY,
@@ -4374,7 +4340,6 @@ void advManager::DrawCell(
     }
 }
 
-VA(0x0045e047, 0x93)
 class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y) {
         return m_mapData->Cells();
@@ -4383,7 +4348,6 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     }
 }
 
-VA(0x0045e0da, 0x104d)
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 maxXLocal;
     i32 unusedRadarRowLocal;
@@ -4408,7 +4372,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 minYOffset;
     i32 minXSlot;
     i32 skipFrameIndex;
-    H2_ENUM_STORAGE(TilesetId, i32) objectTilesetLocal;
+    H2EnumStorage<TilesetId, i32> objectTilesetLocal;
 
 
     if (partial == 0) {
@@ -4549,7 +4513,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                         if (objectTilesetLocal == TILESET_X_LOC2
                             && cellValue->m_triggerType == MAP_OBJECT_ROCK) {
                             radarColorValue =
-                                gMapColors[IDX(giGroundToTerrain
+                                gMapColors[H2EnumIndex(giGroundToTerrain
                                                    [cellValue->m_terrainImageIndex])]
                                 + RADAR_TERRAIN_SHADE;
                         } else {
@@ -4611,7 +4575,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                         }
                                         default:
                                             radarColorValue =
-                                                gMapColors[IDX(giGroundToTerrain
+                                                gMapColors[H2EnumIndex(giGroundToTerrain
                                                                    [cellValue
                                                                         ->m_terrainImageIndex])]
                                                 + RADAR_TERRAIN_SHADE;
@@ -4641,7 +4605,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                                         }
                                         default:
                                             radarColorValue = gMapColors
-                                                [IDX(giGroundToTerrain
+                                                [H2EnumIndex(giGroundToTerrain
                                                          [cellValue->m_terrainImageIndex])];
                                             break;
                                     }
@@ -4732,9 +4696,9 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 }
                 break;
             case MAP_DIMENSION_LARGE:
-                // Retail approximates the large-map radar ratio rather than using 4/3.
-                // NOLINTNEXTLINE(readability-magic-numbers)
-                radarScaleState = DATA_COMPGEN(0x004eb690, updateRadarConstant, 1.33f);
+
+
+                radarScaleState = 1.33f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
                 } else if (giViewWorldScale == VIEW_WORLD_SCALE_MIDDLE) {
@@ -4766,8 +4730,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
             case MAP_DIMENSION_LARGE:
                 radarFrameLocal = RADAR_FRAME_NORMAL_LARGE;
-                // Retail approximates the large-map radar ratio rather than using 4/3.
-                // NOLINTNEXTLINE(readability-magic-numbers)
+
+
                 radarScaleState = 1.33f;
                 break;
             default:
@@ -4782,11 +4746,11 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             m_puzzleIcon->ClipFillToBuffer(
                 static_cast<i32>(
                     iVWMapOriginX * radarScaleState
-                    + DATA_COMPGEN(0x004eb698, radarLeftFloat, IDX(RADAR_LEFT))
+                    + H2EnumIndex(RADAR_LEFT)
                 ),
                 static_cast<i32>(
                     iVWMapOriginY * radarScaleState
-                    + DATA_COMPGEN(0x004eb694, radarTopFloat, IDX(RADAR_TOP))
+                    + H2EnumIndex(RADAR_TOP)
                 ),
                 radarFrameLocal,
                 RADAR_VIEWPORT_COLOR,
@@ -4798,8 +4762,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
             );
         } else {
             m_puzzleIcon->ClipFillToBuffer(
-                static_cast<i32>(m_mapOriginX * radarScaleState + IDX(RADAR_LEFT)),
-                static_cast<i32>(m_mapOriginY * radarScaleState + IDX(RADAR_TOP)),
+                static_cast<i32>(m_mapOriginX * radarScaleState + H2EnumIndex(RADAR_LEFT)),
+                static_cast<i32>(m_mapOriginY * radarScaleState + H2EnumIndex(RADAR_TOP)),
                 radarFrameLocal,
                 RADAR_VIEWPORT_COLOR,
                 ICON_DRAW_NORMAL,
@@ -4814,8 +4778,8 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     if (updateScreen != 0) {
         if (partial != 0) {
             gpWindowManager->UpdateScreenRegion(
-                static_cast<i32>(minXSlot * radarScaleState + IDX(RADAR_LEFT)),
-                static_cast<i32>(minYOffset * radarScaleState + IDX(RADAR_TOP)),
+                static_cast<i32>(minXSlot * radarScaleState + H2EnumIndex(RADAR_LEFT)),
+                static_cast<i32>(minYOffset * radarScaleState + H2EnumIndex(RADAR_TOP)),
                 static_cast<i32>((maxXLocal - minXSlot + 1) * radarScaleState),
                 static_cast<i32>((maxYLocal - minYOffset + 1) * radarScaleState)
             );
@@ -4830,7 +4794,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 }
 
-VA(0x0045f127, 0x133e)
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 quickInfoShowFlag = 1;
     mapCell* currentCell = NULL;
@@ -4870,7 +4833,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
         dialogTopPosition = QUICK_INFO_BOTTOM_Y;
     }
 
-    windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, DATA_COMPGEN(0x004f5e4c, quickInfoQwikinfoBin, "qwikinfo.bin"));
+    windowLocal = new heroWindow(quickInfoScreenX, dialogTopPosition, "qwikinfo.bin");
     if (windowLocal == NULL) {
         MemError();
     }
@@ -4878,134 +4841,134 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
 
     if (m_mapOriginX + cellX < 0 || m_mapOriginX + cellX >= MAP_WIDTH || m_mapOriginY + cellY < 0
         || m_mapOriginY + cellY >= MAP_HEIGHT) {
-        sprintf(gText, DATA_COMPGEN(0x004f5e64, quickInfoS, "%s"), DATA_COMPGEN(0x004f5e5c, quickInfoBorder, "Border"));
+        sprintf(gText, "%s", "Border");
     } else {
         currentCell = GetCell(m_mapOriginX + cellX, m_mapOriginY + cellY);
         if ((giCurPlayerBit & (mapExtra + (m_mapOriginY + cellY) * MAP_WIDTH)[m_mapOriginX + cellX])
             == 0) {
-            sprintf(gText, DATA_COMPGEN(0x004f5e7c, quickInfoS2, "%s"), DATA_COMPGEN(0x004f5e68, quickInfoUnchartedTerritory, "Uncharted Territory"));
+            sprintf(gText, "%s", "Uncharted Territory");
         } else {
 
             switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
                 case MAP_OBJECT_ARTIFACT:
-                    sprintf(gText, DATA_COMPGEN(0x004f5e8c, quickInfoS3, "%s"), DATA_COMPGEN(0x004f5e80, quickInfoArtifact, "Artifact"));
+                    sprintf(gText, "%s", "Artifact");
                     break;
                 case MAP_OBJECT_OBELISK:
-                    if HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG) {
+                    if (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5eb4, quickInfoSS, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (gpGame->m_obeliskVisitors
                                  [currentCell->m_objectMetadata - OBELISK_INDEX_BASE]
                              & (1u << giCurPlayer))
-                                ? DATA_COMPGEN(0x004f5e90, quickInfoAlreadyVisited, "(already visited)")
-                                : DATA_COMPGEN(0x004f5ea4, quickInfoNotVisited, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_GAZEBO:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5ee0, quickInfoSS2, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_gazeboVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5ebc, quickInfoAlreadyVisited2, "(already visited)")
-                                : DATA_COMPGEN(0x004f5ed0, quickInfoNotVisited2, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_FORT:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5f0c, quickInfoSS3, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_fortVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5ee8, quickInfoAlreadyVisited3, "(already visited)")
-                                : DATA_COMPGEN(0x004f5efc, quickInfoNotVisited3, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_WITCH_DOCTOR_HUT:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5f38, quickInfoSS4, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_witchDoctorVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5f14, quickInfoAlreadyVisited4, "(already visited)")
-                                : DATA_COMPGEN(0x004f5f28, quickInfoNotVisited4, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_MERCENARY_CAMP:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5f64, quickInfoSS5, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_mercenaryCampVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5f40, quickInfoAlreadyVisited5, "(already visited)")
-                                : DATA_COMPGEN(0x004f5f54, quickInfoNotVisited5, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_STANDING_STONES:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5f90, quickInfoSS6, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_standingStoneVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5f6c, quickInfoAlreadyVisited6, "(already visited)")
-                                : DATA_COMPGEN(0x004f5f80, quickInfoNotVisited6, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_TREE_OF_KNOWLEDGE:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5fbc, quickInfoSS7, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_treeKnowledgeVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5f98, quickInfoAlreadyVisited7, "(already visited)")
-                                : DATA_COMPGEN(0x004f5fac, quickInfoNotVisited7, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
                     }
                     break;
                 case MAP_OBJECT_XANADU:
-                    if (heroLocal != NULL && HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                    if (heroLocal != NULL && (H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f5fe8, quickInfoSS8, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                             (heroLocal->m_xanaduVisits
                              & (1u << (currentCell->m_objectMetadata & VISIT_BIT_INDEX_MASK)))
-                                ? DATA_COMPGEN(0x004f5fc4, quickInfoAlreadyVisited8, "(already visited)")
-                                : DATA_COMPGEN(0x004f5fd8, quickInfoNotVisited8, "(not visited)")
+                                ? "(already visited)"
+                                : "(not visited)"
                         );
                     } else {
                         goto quick_info_default;
@@ -5042,16 +5005,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_MOSSY_ROCK:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004f5ff0, quickInfoS4, "%s"),
-                        gTerrainNames[IDX(giGroundToTerrain
+                        "%s",
+                        gTerrainNames[H2EnumIndex(giGroundToTerrain
                                               [currentCell->m_terrainImageIndex])]
                     );
                     break;
                 case MAP_OBJECT_ABANDONED_MINE:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004f5ff4, quickInfoS5, "%s"),
-                        gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
+                        "%s",
+                        gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                     );
                     goto quick_info_guarded;
                 case MAP_OBJECT_MINE:
@@ -5059,40 +5022,34 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         != CREATURE_NONE) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6000, quickInfoSS9, "%s %s"),
-                            gResourceNames[IDX(
-                                gpGame->m_mines[currentCell->m_objectMetadata].resourceType
-                            )],
-                            DATA_COMPGEN(0x004f5ff8, quickInfoMine, "Mine")
+                            "%s %s",
+                            gResourceNames[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata].resourceType)],
+                            "Mine"
                         );
                     quick_info_guarded:
                         sprintf(
                             guardCaption,
-                            DATA_COMPGEN(0x004f6008, quickInfoGuardedBySS, "\n\nguarded by %s %s"),
+                            "\n\nguarded by %s %s",
                             GetArmySizeName(
                                 gpGame->m_mines[currentCell->m_objectMetadata].guardianCount,
                                 ARMY_SIZE_NAME_INLINE
                             ),
-                            gArmyNamesPlural[IDX(
-                                gpGame->m_mines[currentCell->m_objectMetadata].guardianType
-                            )]
+                            gArmyNamesPlural[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata].guardianType)]
                         );
                         strcat(gText, guardCaption);
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6024, quickInfoSS10, "%s %s"),
-                            gResourceNames[IDX(
-                                gpGame->m_mines[currentCell->m_objectMetadata].resourceType
-                            )],
-                            DATA_COMPGEN(0x004f601c, quickInfoMine2, "Mine")
+                            "%s %s",
+                            gResourceNames[H2EnumIndex(gpGame->m_mines[currentCell->m_objectMetadata].resourceType)],
+                            "Mine"
                         );
                     }
                     break;
                 case MAP_OBJECT_RESOURCE:
                     sprintf(
                         gText,
-                        DATA_COMPGEN(0x004f602c, quickInfoS6, "%s"),
+                        "%s",
                         gResourceNames
                             [(currentCell->m_objectIndex & RESOURCE_FRAME_PAIR_MASK)
                              / RESOURCE_FRAME_PAIR_STRIDE]
@@ -5106,16 +5063,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         )) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6030, quickInfoDS, "%d %s"),
-                            currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
+                            "%d %s",
+                            currentCell->m_objectMetadata & H2EnumIndex(MAP_MONSTER_COUNT_MASK),
                             gArmyNamesPlural[currentCell->m_objectIndex]
                         );
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f6038, quickInfoSS11, "%s %s"),
+                            "%s %s",
                             GetArmySizeName(
-                                currentCell->m_objectMetadata & IDX(MAP_MONSTER_COUNT_MASK),
+                                currentCell->m_objectMetadata & H2EnumIndex(MAP_MONSTER_COUNT_MASK),
                                 ARMY_SIZE_NAME_SENTENCE
                             ),
                             gArmyNamesPlural[currentCell->m_objectIndex]
@@ -5126,7 +5083,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 case MAP_OBJECT_TRAVELER_TENT:
                     sprintf(
                         gText,
-                        gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                        gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
                         xBarrierColor[currentCell->m_objectMetadata & BARRIER_COLOR_MASK]
                     );
                     uppercaseResult =
@@ -5142,16 +5099,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
+                    expansionSite = H2EnumIndex(GENERIC_SITE_UNKNOWN);
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < 0) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_1_END) {
-                                    expansionSite = IDX(GENERIC_SITE_ALCHEMIST_TOWER);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_ALCHEMIST_TOWER);
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_2_END) {
-                                    expansionSite = IDX(GENERIC_SITE_ARENA);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_ARENA);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_HUT;
                                 }
                             }
@@ -5161,15 +5118,15 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_ALTAR_END) {
-                                    expansionSite = IDX(GENERIC_SITE_STABLES);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_STABLES);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_ALTAR;
                                 } else if (siteFrameLocal[0] < GENERIC_UNUSED_END) {
-                                    expansionSite = IDX(GENERIC_SITE_UNKNOWN);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_UNKNOWN);
                                 } else if (siteFrameLocal[0] < GENERIC_TOWER_END) {
-                                    expansionSite = IDX(GENERIC_SITE_MERMAID);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_MERMAID);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_TOWER;
                                 } else if (siteFrameLocal[0] < GENERIC_SPRING_END) {
-                                    expansionSite = IDX(GENERIC_SITE_SIRENS);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_SIRENS);
                                     visitedMaskValue = ADVMGR_VISIT_GENERIC_SPRING;
                                 }
                             }
@@ -5179,24 +5136,24 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < GENERIC_SITE_3_SPLIT) {
-                                    expansionSite = IDX(GENERIC_SITE_HUT_OF_MAGI);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_HUT_OF_MAGI);
                                 } else if (siteFrameLocal[0] < GENERIC_SITE_3_END) {
-                                    expansionSite = IDX(GENERIC_SITE_EYE_OF_MAGI);
+                                    expansionSite = H2EnumIndex(GENERIC_SITE_EYE_OF_MAGI);
                                 }
                             }
                             break;
                     }
-                    if (expansionSite == IDX(GENERIC_SITE_UNKNOWN)) {
-                        sprintf(gText, DATA_COMPGEN(0x004f6040, quickInfoUnknown, "Unknown"));
+                    if (expansionSite == H2EnumIndex(GENERIC_SITE_UNKNOWN)) {
+                        sprintf(gText, "Unknown");
                     } else {
                         sprintf(gText, xGenericSiteNames[expansionSite]);
                     }
                     if (heroLocal != NULL && visitedMaskValue != HERO_EVENT_NONE) {
-                        strcat(gText, DATA_COMPGEN(0x004f6048, quickInfoEmptyString, "\n\n"));
+                        strcat(gText, "\n\n");
                         strcat(
                             gText,
-                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? DATA_COMPGEN(0x004f604c, quickInfoAlreadyVisited9, "(already visited)")
-                                                                           : DATA_COMPGEN(0x004f6060, quickInfoNotVisited9, "(not visited)")
+                            (H2EnumIndex((heroLocal->m_eventFlags) & (visitedMaskValue))) ? "(already visited)"
+                                                                           : "(not visited)"
                         );
                     }
                     break;
@@ -5209,28 +5166,28 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                         siteFrameLocal[0] = currentCell->m_overlayIndex;
                         objectTilesetLocal = currentCell->m_overlayTileset;
                     }
-                    expansionSite = IDX(RECRUITMENT_SITE_UNKNOWN);
+                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_UNKNOWN);
                     switch (objectTilesetLocal) {
                         case TILESET_X_LOC1:
                             if (siteFrameLocal[0] < RECRUITMENT_START) {
                                 break;
                             } else {
                                 if (siteFrameLocal[0] < RECRUITMENT_1_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_BARROW_MOUNDS);
+                                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_BARROW_MOUNDS);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_2_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_EARTH_ALTAR);
+                                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_EARTH_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_3_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_AIR_ALTAR);
+                                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_AIR_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_4_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_FIRE_ALTAR);
+                                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_FIRE_ALTAR);
                                 } else if (siteFrameLocal[0] < RECRUITMENT_5_END) {
-                                    expansionSite = IDX(RECRUITMENT_SITE_WATER_ALTAR);
+                                    expansionSite = H2EnumIndex(RECRUITMENT_SITE_WATER_ALTAR);
                                 }
                             }
                             break;
                     }
-                    if (expansionSite == IDX(RECRUITMENT_SITE_UNKNOWN)) {
-                        sprintf(gText, DATA_COMPGEN(0x004f6070, quickInfoUnknown2, "Unknown"));
+                    if (expansionSite == H2EnumIndex(RECRUITMENT_SITE_UNKNOWN)) {
+                        sprintf(gText, "Unknown");
                     } else {
                         sprintf(gText, xRecruitmentSiteNames[expansionSite]);
                     }
@@ -5238,7 +5195,7 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                 }
                 case MAP_OBJECT_ROCK:
                     if (currentCell->m_objectTileset == TILESET_X_LOC2) {
-                        sprintf(gText, DATA_COMPGEN(0x004f6078, quickInfoReefs, "Reefs"));
+                        sprintf(gText, "Reefs");
                     } else {
                         goto quick_info_default;
                     }
@@ -5248,16 +5205,16 @@ void advManager::QuickInfo(i32 cellX, i32 cellY) {
                     if (visitedMaskValue != HERO_EVENT_NONE && heroLocal != NULL) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f60a4, quickInfoSS12, "%s\n\n%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
-                            HAS(heroLocal->m_eventFlags, visitedMaskValue) ? DATA_COMPGEN(0x004f6080, quickInfoAlreadyVisited10, "(already visited)")
-                                                                           : DATA_COMPGEN(0x004f6094, quickInfoNotVisited10, "(not visited)")
+                            "%s\n\n%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)],
+                            (H2EnumIndex((heroLocal->m_eventFlags) & (visitedMaskValue))) ? "(already visited)"
+                                                                           : "(not visited)"
                         );
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x004f60ac, quickInfoS7, "%s"),
-                            gQuickViewText[IDX(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
+                            "%s",
+                            gQuickViewText[H2EnumIndex(currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK)]
                         );
                     }
                     break;
@@ -5270,13 +5227,13 @@ quick_info_ready:
     if (giDebugLevel > 0 && currentCell != NULL) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f60b0, quickInfoGiDObtileDObiD, "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d"),
+            "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
             currentCell->m_terrainImageIndex,
             currentCell->m_objectTileset,
             currentCell->m_objectIndex,
-            IDX(currentCell->m_triggerType),
+            H2EnumIndex(currentCell->m_triggerType),
             currentCell->m_objectMetadata,
-            currentCell->m_flags & IDX(MAP_CELL_OCCUPIED),
+            currentCell->m_flags & H2EnumIndex(MAP_CELL_OCCUPIED),
             savedTextLocal,
             m_mapOriginX + cellX,
             m_mapOriginY + cellY
@@ -5293,7 +5250,6 @@ quick_info_ready:
     delete windowLocal;
 }
 
-VA(0x00460465, 0x348)
 void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen) {
     hero* locatorHero8;
     i32 mobilityFrame18;
@@ -5378,7 +5334,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
 
         locatorMessage15.payload.widget.id = widgetBase7 + LOCATOR_HERO_PORTRAIT_OFFSET;
         locatorMessage15.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
-        locatorMessage15.payload.widget.data.value = IDX(locatorHero8->m_portrait);
+        locatorMessage15.payload.widget.data.value = H2EnumIndex(locatorHero8->m_portrait);
         m_adventureWindow->BroadcastMessage(locatorMessage15);
     }
 
@@ -5399,7 +5355,6 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
     }
 }
 
-VA(0x004607ad, 0x102)
 void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
     double scrollStep;
@@ -5415,15 +5370,11 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_heroCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollLeftButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        scrollStep = DATA_COMPGEN(
-                         0x004eb6a0,
-                         heroLocatorScrollSpan,
-                         static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
-                     )
+        scrollStep = static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
                      / (gpCurPlayer->m_heroCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollLeftButton->m_y = static_cast<i16>(
             gpCurPlayer->m_heroLocatorPage * scrollStep
-            + DATA_COMPGEN(0x004eb6a8, locatorScrollBaseY, IDX(LOCATOR_SCROLL_BASE_Y))
+            + H2EnumIndex(LOCATOR_SCROLL_BASE_Y)
         );
     }
     if (drawWindow) {
@@ -5431,7 +5382,6 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-VA(0x004608af, 0x2e8)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
     tag_message locatorMessage14;
@@ -5474,14 +5424,14 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
             m_adventureWindow->BroadcastMessage(locatorMessage14);
             locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FRAME;
             locatorMessage14.payload.widget.data.value =
-                IDX(gpGame->GetTown(townId37)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
-            if (!(gpGame->GetTown(townId37)->m_buildings & IDX(TOWN_BUILDING_CASTLE))) {
+                H2EnumIndex(gpGame->GetTown(townId37)->m_type) + LOCATOR_TOWN_TYPE_FRAME_BASE;
+            if (!(gpGame->GetTown(townId37)->m_buildings & H2EnumIndex(TOWN_BUILDING_CASTLE))) {
                 locatorMessage14.payload.widget.data.value +=
                     LOCATOR_TOWN_VILLAGE_FRAME_OFFSET;
             }
             m_adventureWindow->BroadcastMessage(locatorMessage14);
 
-            if (BitTest(gpGame->m_knownTowns, townId37)) {
+            if (H2BitTest(gpGame->m_knownTowns, townId37)) {
                 locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_SET_FLAGS;
             } else {
                 locatorMessage14.payload.widget.command = ADVMGR_LOCATOR_COMMAND_CLEAR_FLAGS;
@@ -5495,14 +5445,10 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     if (gpCurPlayer->m_townCount < LOCATOR_PAGE_THRESHOLD) {
         m_scrollRightButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
-        scrollStep = DATA_COMPGEN(
-                         0x004eb6b0,
-                         townLocatorScrollSpan,
-                         static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
-                     )
+        scrollStep = static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
                      / (gpCurPlayer->m_townCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollRightButton->m_y = static_cast<i16>(
-            gpCurPlayer->m_townLocatorPage * scrollStep + IDX(LOCATOR_SCROLL_BASE_Y)
+            gpCurPlayer->m_townLocatorPage * scrollStep + H2EnumIndex(LOCATOR_SCROLL_BASE_Y)
         );
     }
     if (drawWindow) {
@@ -5510,7 +5456,6 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
-VA(0x00460b97, 0x1cc)
 void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
     i32 updated;
 
@@ -5567,7 +5512,6 @@ update_bottom_view:
     forceUpdate = gbForceUpdate;
 }
 
-VA(0x00460d63, 0x132)
 void advManager::ClearBottomView(void) {
     i32 widgetIndex;
 
@@ -5592,7 +5536,6 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
-VA(0x00460e95, 0x51b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     i32 updated;
     tag_message message;
@@ -5610,7 +5553,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_BACKGROUND_Y,
             ENEMY_TURN_BACKGROUND_WIDTH,
             ENEMY_TURN_BACKGROUND_HEIGHT,
-            DATA_COMPGEN(0x004f60e8, updBottomViewEnemyTurnStonbackIcn, "stonback.icn"),
+            "stonback.icn",
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_BACKGROUND_ID,
@@ -5627,7 +5570,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
             ENEMY_TURN_HOURGLASS_Y,
             ENEMY_TURN_HOURGLASS_WIDTH,
             ENEMY_TURN_HOURGLASS_HEIGHT,
-            DATA_COMPGEN(0x004f60f8, updBottomViewEnemyTurnHourglasIcn, "hourglas.icn"),
+            "hourglas.icn",
             0,
             ICON_DRAW_NORMAL,
             ENEMY_TURN_HOURGLASS_ID,
@@ -5665,7 +5608,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                     ENEMY_TURN_ANIMATION_Y,
                     ENEMY_TURN_ANIMATION_WIDTH,
                     ENEMY_TURN_ANIMATION_HEIGHT,
-                    DATA_COMPGEN(0x004f6108, updBottomViewEnemyTurnHourglasIcn2, "hourglas.icn"),
+                    "hourglas.icn",
                     iSandAnim + ENEMY_TURN_SAND_FRAME_OFFSET,
                     ICON_DRAW_NORMAL,
                     ENEMY_TURN_SAND_ID,
@@ -5701,7 +5644,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                DATA_COMPGEN(0x004f6118, updBottomViewEnemyTurnBrcrestIcn, "brcrest.icn"),
+                "brcrest.icn",
                 gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_CREST_ID,
@@ -5736,7 +5679,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
                 ENEMY_TURN_ANIMATION_Y,
                 ENEMY_TURN_ANIMATION_WIDTH,
                 ENEMY_TURN_ANIMATION_HEIGHT,
-                DATA_COMPGEN(0x004f6124, updBottomViewEnemyTurnHourglasIcn3, "hourglas.icn"),
+                "hourglas.icn",
                 iCurHourGlassPhase + ENEMY_TURN_PHASE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 ENEMY_TURN_PHASE_ID,
@@ -5755,9 +5698,8 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     return updated;
 }
 
-VA(0x004613b0, 0x366)
 i32 advManager::UpdBottomViewNewTurn(void) {
-    DATA(0x004f6134) static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
+    static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
 
     i32 frameIndex;
     i32 month;
@@ -5783,7 +5725,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004f6138, updBottomViewNewTurnStonbackIcn, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -5800,7 +5742,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
         NEW_TURN_DATE_ICON_Y,
         NEW_TURN_DATE_ICON_WIDTH,
         NEW_TURN_DATE_ICON_HEIGHT,
-        DATA_COMPGEN(0x004f6148, updBottomViewNewTurnSunmoonIcn, "sunmoon.icn"),
+        "sunmoon.icn",
         frameIndex,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -5813,19 +5755,16 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     week = static_cast<char*>(
-        H2_ALLOC_AT(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f6154, updBottomViewNewTurnSourceFile, RETAIL_FILE),
-            s_newTurnLineBase + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
-        )
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE)
     );
-    sprintf(week, DATA_COMPGEN(0x004f6190, updBottomViewNewTurnSDSD, "%s: %d  %s: %d"), DATA_COMPGEN(0x004f6188, updBottomViewNewTurnMonth, "Month"), gpGame->m_month, DATA_COMPGEN(0x004f6180, updBottomViewNewTurnWeek, "Week"), gpGame->m_week);
+    sprintf(week, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_WEEK_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_WEEK_TEXT_HEIGHT,
         week,
-        DATA_COMPGEN(0x004f61a0, updBottomViewNewTurnSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5837,19 +5776,16 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     day = static_cast<char*>(
-        H2_ALLOC_AT(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE, DATA_COMPGEN(0x004f61b0, updBottomViewNewTurnSourceFile2, RETAIL_FILE),
-            s_newTurnLineBase + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
-        )
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE)
     );
-    sprintf(day, DATA_COMPGEN(0x004f61e0, updBottomViewNewTurnSD, "%s: %d"), DATA_COMPGEN(0x004f61dc, updBottomViewNewTurnDay, "Day"), gpGame->m_day);
+    sprintf(day, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
         NEW_TURN_DATE_TEXT_X,
         NEW_TURN_DAY_TEXT_Y,
         NEW_TURN_DATE_TEXT_WIDTH,
         NEW_TURN_DAY_TEXT_HEIGHT,
         day,
-        DATA_COMPGEN(0x004f61e8, updBottomViewNewTurnBigfontFnt, "bigfont.fnt"),
+        "bigfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5862,9 +5798,8 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     return 1;
 }
 
-VA(0x00461716, 0x35f)
 i32 advManager::UpdBottomViewResMsg(void) {
-    DATA(0x004f61f4) static i16 s_resourceViewLineBase = RESOURCE_VIEW_LINE_BASE;
+    static i16 s_resourceViewLineBase = RESOURCE_VIEW_LINE_BASE;
 
     i32 iconWidth6;
     i32 iconHeight11;
@@ -5884,7 +5819,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004f61f8, updBottomViewResMsgStonbackIcn, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -5902,10 +5837,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
     }
-    messageText2 = static_cast<char*>(H2_ALLOC_AT(
-        strlen(gcBottomViewText) + 1, DATA_COMPGEN(0x004f6208, updBottomViewResMsgSourceFile, RETAIL_FILE),
-        s_resourceViewLineBase + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
-    ));
+    messageText2 = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
         BOTTOM_VIEW_PANEL_X,
@@ -5913,7 +5845,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         BOTTOM_VIEW_PANEL_WIDTH,
         RESOURCE_VIEW_TEXT_HEIGHT,
         messageText2,
-        DATA_COMPGEN(0x004f6234, updBottomViewResMsgSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -5939,8 +5871,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
                 - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
             iconWidth6,
             iconHeight11,
-            DATA_COMPGEN(0x004f6244, updBottomViewResMsgResourceIcn, "resource.icn"),
-            IDX(giBottomViewResource),
+            "resource.icn",
+            H2EnumIndex(giBottomViewResource),
             ICON_DRAW_NORMAL,
             BOTTOM_VIEW_FOREGROUND_ID,
             WIDGET_KIND_ICON_DIRECT,
@@ -5951,18 +5883,15 @@ i32 advManager::UpdBottomViewResMsg(void) {
         }
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-        resourceCountText6 = static_cast<char*>(H2_ALLOC_AT(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f6254, updBottomViewResMsgSourceFile2, RETAIL_FILE),
-            s_resourceViewLineBase + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
-        ));
-        sprintf(resourceCountText6, DATA_COMPGEN(0x004f6280, updBottomViewResMsgD, "%d"), giBottomViewResourceQty);
+        resourceCountText6 = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
+        sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
             RESOURCE_VIEW_COUNT_X,
             RESOURCE_VIEW_COUNT_Y,
             RESOURCE_VIEW_COUNT_WIDTH,
             RESOURCE_VIEW_COUNT_HEIGHT,
             resourceCountText6,
-            DATA_COMPGEN(0x004f6284, updBottomViewResMsgSecondarySmalfontFnt, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
             WIDGET_KIND_TEXT,
@@ -5976,9 +5905,8 @@ i32 advManager::UpdBottomViewResMsg(void) {
     return 1;
 }
 
-VA(0x00461a75, 0x363)
 i32 advManager::UpdBottomViewKingdom(void) {
-    DATA(0x004f6294) static i16 s_kingdomViewLineBase = KINGDOM_VIEW_LINE_BASE;
+    static i16 s_kingdomViewLineBase = KINGDOM_VIEW_LINE_BASE;
 
     i32 villageCount37;
     i32 index11;
@@ -5993,22 +5921,22 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
     ClearBottomView();
     iCurBottomView = BOTTOM_VIEW_KINGDOM;
-    textY5[IDX(RES_WOOD)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_MERCURY)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_ORE)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_SULFUR)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_GEMS)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
-    textY5[IDX(RES_GOLD)] = KINGDOM_VIEW_TOWN_TEXT_Y;
+    textY5[H2EnumIndex(RES_WOOD)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_MERCURY)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_ORE)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_SULFUR)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_CRYSTAL)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_GEMS)] = KINGDOM_VIEW_RESOURCE_TEXT_Y;
+    textY5[H2EnumIndex(RES_GOLD)] = KINGDOM_VIEW_TOWN_TEXT_Y;
     textY5[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
     textY5[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_TOWN_TEXT_Y;
-    textX[IDX(RES_WOOD)] = KINGDOM_VIEW_WOOD_TEXT_X;
-    textX[IDX(RES_MERCURY)] = KINGDOM_VIEW_MERCURY_TEXT_X;
-    textX[IDX(RES_ORE)] = KINGDOM_VIEW_ORE_TEXT_X;
-    textX[IDX(RES_SULFUR)] = KINGDOM_VIEW_SULFUR_TEXT_X;
-    textX[IDX(RES_CRYSTAL)] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
-    textX[IDX(RES_GEMS)] = KINGDOM_VIEW_GEMS_TEXT_X;
-    textX[IDX(RES_GOLD)] = KINGDOM_VIEW_GOLD_TEXT_X;
+    textX[H2EnumIndex(RES_WOOD)] = KINGDOM_VIEW_WOOD_TEXT_X;
+    textX[H2EnumIndex(RES_MERCURY)] = KINGDOM_VIEW_MERCURY_TEXT_X;
+    textX[H2EnumIndex(RES_ORE)] = KINGDOM_VIEW_ORE_TEXT_X;
+    textX[H2EnumIndex(RES_SULFUR)] = KINGDOM_VIEW_SULFUR_TEXT_X;
+    textX[H2EnumIndex(RES_CRYSTAL)] = KINGDOM_VIEW_CRYSTAL_TEXT_X;
+    textX[H2EnumIndex(RES_GEMS)] = KINGDOM_VIEW_GEMS_TEXT_X;
+    textX[H2EnumIndex(RES_GOLD)] = KINGDOM_VIEW_GOLD_TEXT_X;
     textX[KINGDOM_VIEW_CASTLE_ENTRY] = KINGDOM_VIEW_CASTLE_TEXT_X;
     textX[KINGDOM_VIEW_TOWN_ENTRY] = KINGDOM_VIEW_VILLAGE_TEXT_X;
     villageCount37 = 0;
@@ -6019,7 +5947,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         BOTTOM_VIEW_PANEL_Y,
         BOTTOM_VIEW_BACKGROUND_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004f6298, updBottomViewKingdomStonbackIcn, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_BACKGROUND_ID,
@@ -6036,7 +5964,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
         KINGDOM_VIEW_ICON_Y,
         BOTTOM_VIEW_PANEL_WIDTH,
         BOTTOM_VIEW_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004f62a8, updBottomViewKingdomRessmallIcn, "ressmall.icn"),
+        "ressmall.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FOREGROUND_ID,
@@ -6050,7 +5978,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
     for (index11 = 0; index11 < gpCurPlayer->m_townCount; ++index11) {
         if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[index11]].m_buildings
-            & IDX(TOWN_BUILDING_CASTLE)) {
+            & H2EnumIndex(TOWN_BUILDING_CASTLE)) {
             ++castleCount12;
         } else {
             ++villageCount37;
@@ -6058,16 +5986,13 @@ i32 advManager::UpdBottomViewKingdom(void) {
     }
 
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
-        countText14[index11] = static_cast<char*>(H2_ALLOC_AT(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE, DATA_COMPGEN(0x004f62b8, updBottomViewKingdomSourceFile, RETAIL_FILE),
-            s_kingdomViewLineBase + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
-        ));
+        countText14[index11] = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
-            sprintf(countText14[index11], DATA_COMPGEN(0x004f62e4, updBottomViewKingdomD, "%d"), gpCurPlayer->m_resources[index11]);
+            sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
         } else if (index11 == KINGDOM_VIEW_CASTLE_ENTRY) {
-            sprintf(countText14[index11], DATA_COMPGEN(0x004f62e8, updBottomViewKingdomD2, "%d"), castleCount12);
+            sprintf(countText14[index11], "%d", castleCount12);
         } else {
-            sprintf(countText14[index11], DATA_COMPGEN(0x004f62ec, updBottomViewKingdomD3, "%d"), villageCount37);
+            sprintf(countText14[index11], "%d", villageCount37);
         }
 
         m_bottomViewAllTexts[index11] = new textWidget(
@@ -6076,7 +6001,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
             KINGDOM_VIEW_TEXT_WIDTH,
             KINGDOM_VIEW_TEXT_HEIGHT,
             countText14[index11],
-            DATA_COMPGEN(0x004f62f0, updBottomViewKingdomSmalfontFnt, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             index11 + BOTTOM_VIEW_TEXT_ID,
             WIDGET_KIND_TEXT,
@@ -6090,9 +6015,8 @@ i32 advManager::UpdBottomViewKingdom(void) {
     return 1;
 }
 
-VA(0x00461dd8, 0x583)
 i32 advManager::UpdBottomViewHero(void) {
-    DATA(0x004f6300) static i16 s_bottomHeroLineBase = BOTTOM_HERO_LINE_BASE;
+    static i16 s_bottomHeroLineBase = BOTTOM_HERO_LINE_BASE;
 
     char* armyCountLabelsResult[BOTTOM_HERO_ARMY_SLOTS];
     icon* monsterIconsLocal;
@@ -6125,7 +6049,7 @@ i32 advManager::UpdBottomViewHero(void) {
         BOTTOM_HERO_PANEL_Y,
         BOTTOM_HERO_PANEL_WIDTH,
         BOTTOM_HERO_PANEL_HEIGHT,
-        DATA_COMPGEN(0x004f6304, updBottomViewHeroStonbackIcn, "stonback.icn"),
+        "stonback.icn",
         0,
         ICON_DRAW_NORMAL,
         BOTTOM_VIEW_FIRST_MESSAGE,
@@ -6145,13 +6069,12 @@ i32 advManager::UpdBottomViewHero(void) {
 
     if (occupiedSlotsLocal != 0) {
         displayIndexData = 0;
-        monsterIconsLocal = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f6314, updBottomViewHeroMons32Icn, "mons32.icn"));
+        monsterIconsLocal = gpResourceManager->GetIcon("mons32.icn");
         for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
-            creature = IDX(targetHero->m_army.m_creatureTypes[armySlot]);
+            creature = H2EnumIndex(targetHero->m_army.m_creatureTypes[armySlot]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
-                // Retail stores eight compact (x, y) layout anchors and indexes them through
-                // the occupied-slot table below; the coordinate payload has no separate domain.
-                // NOLINTBEGIN(readability-magic-numbers)
+
+
                 u8 iconPositions[BOTTOM_HERO_ICON_POSITION_BYTES] =
                     {50, 3, 96, 3, 50, 17, 73, 17, 96, 17, 27, 32, 73, 32, 119, 32};
                 i8 armyLayouts[BOTTOM_HERO_ARMY_SLOTS][BOTTOM_HERO_ARMY_SLOTS] = {
@@ -6161,24 +6084,21 @@ i32 advManager::UpdBottomViewHero(void) {
                     {0, 1, 5, 6, -1},
                     {0, 1, 5, 6, 7}
                 };
-                // NOLINTEND(readability-magic-numbers)
 
-                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC_AT(
-                    BOTTOM_HERO_LABEL_BYTES, DATA_COMPGEN(0x004f6320, updBottomViewHeroSourceFile, RETAIL_FILE),
-                    s_bottomHeroLineBase + BOTTOM_HERO_ALLOC_LINE_OFFSET
-                ));
+
+                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(BOTTOM_HERO_LABEL_BYTES));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
                         armyCountLabelsResult[displayIndexData],
-                        DATA_COMPGEN(0x004f634c, updBottomViewHeroDk, "%dk"),
+                        "%dk",
                         targetHero->m_army.m_creatureCounts[armySlot]
                             / BOTTOM_HERO_COUNT_DIVISOR
                     );
                 } else {
                     sprintf(
                         armyCountLabelsResult[displayIndexData],
-                        DATA_COMPGEN(0x004f6350, updBottomViewHeroD, "%d"),
+                        "%d",
                         targetHero->m_army.m_creatureCounts[armySlot]
                     );
                 }
@@ -6214,7 +6134,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     iconY + BOTTOM_HERO_PANEL_Y,
                     BOTTOM_HERO_ICON_WIDTH,
                     BOTTOM_HERO_ICON_HEIGHT,
-                    DATA_COMPGEN(0x004f6354, updBottomViewHeroSecondaryMons32Icn, "mons32.icn"),
+                    "mons32.icn",
                     creature,
                     ICON_DRAW_NORMAL,
                     displayIndexData + BOTTOM_HERO_FIRST_ICON_ID,
@@ -6236,7 +6156,7 @@ i32 advManager::UpdBottomViewHero(void) {
                               * BOTTOM_HERO_CHARACTER_WIDTH,
                     BOTTOM_HERO_LABEL_HEIGHT,
                     armyCountLabelsResult[displayIndexData],
-                    DATA_COMPGEN(0x004f6360, updBottomViewHeroSmalfontFnt, "smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     displayIndexData + BOTTOM_HERO_FIRST_TEXT_ID,
                     WIDGET_KIND_TEXT,
@@ -6256,9 +6176,8 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
-VA(0x0046235b, 0xd32)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6370) static i16 s_quickViewLineBase = QUICK_VIEW_LINE_BASE;
+    static i16 s_quickViewLineBase = QUICK_VIEW_LINE_BASE;
 
     i16 armyAreaWidthLocal = HERO_QUICK_ARMY_AREA_WIDTH;
     i16 armyAreaLeftLocal = ARMY_QUICK_AREA_LEFT;
@@ -6286,7 +6205,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    monsterIconRef = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f6374, heroQuickViewMons32Icn, "mons32.icn"));
+    monsterIconRef = gpResourceManager->GetIcon("mons32.icn");
     targetHero = gpGame->GetHero(heroId);
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
@@ -6294,13 +6213,13 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
             windowX = HERO_QUICK_DEFAULT_WINDOW_X;
             windowY = locatorSlot * HERO_QUICK_LOCATOR_ROW_HEIGHT + HERO_QUICK_LOCATOR_BASE_Y;
         }
-        quickWindowSlot = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f6380, heroQuickViewQhero0Bin, "qhero0.bin"));
+        quickWindowSlot = new heroWindow(windowX, windowY, "qhero0.bin");
         if (quickWindowSlot == NULL) {
             MemError();
         }
         SetWinText(quickWindowSlot, HERO_QUICK_WINDOW_TEXT);
     } else {
-        quickWindowSlot = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f638c, heroQuickViewQhero1Bin, "qhero1.bin"));
+        quickWindowSlot = new heroWindow(windowX, windowY, "qhero1.bin");
         if (quickWindowSlot == NULL) {
             MemError();
         }
@@ -6308,7 +6227,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
 
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = HERO_QUICK_PORTRAIT_WIDGET;
-    quickViewMessageState.payload.widget.data.value = IDX(targetHero->m_portrait);
+    quickViewMessageState.payload.widget.data.value = H2EnumIndex(targetHero->m_portrait);
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     quickViewMessageState.payload.widget.id = HERO_QUICK_PLAYER_COLOR_WIDGET;
@@ -6318,7 +6237,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     ++quickViewMessageState.payload.widget.id;
     ++quickViewMessageState.payload.widget.data.value;
     quickWindowSlot->BroadcastMessage(quickViewMessageState);
-    sprintf(gText, DATA_COMPGEN(0x004f6398, heroQuickViewS, "%s"), targetHero->m_name);
+    sprintf(gText, "%s", targetHero->m_name);
     quickViewMessageState.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     quickViewMessageState.payload.widget.id = HERO_QUICK_NAME_WIDGET;
     quickViewMessageState.payload.widget.data.text = gText;
@@ -6334,14 +6253,14 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     if (targetHero->m_owner == giCurPlayer || m_identifyHeroActive == 1
         || IsCrystalBallInEffect(targetHero->m_x, targetHero->m_y, CRYSTAL_BALL_RADIUS)) {
         for (armyIndex = 0; armyIndex < HERO_PRIMARY_STAT_COUNT; ++armyIndex) {
-            sprintf(gText, DATA_COMPGEN(0x004f639c, heroQuickViewD, "%d"), targetHero->Stats(HeroPrimaryStat(armyIndex)));
+            sprintf(gText, "%d", targetHero->Stats(HeroPrimaryStat(armyIndex)));
             quickViewMessageState.payload.widget.id = armyIndex + HERO_QUICK_PRIMARY_STAT_WIDGET;
             quickViewMessageState.payload.widget.data.text = gText;
             quickWindowSlot->BroadcastMessage(quickViewMessageState);
         }
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f63a0, heroQuickViewDD, "%d/%d"),
+            "%d/%d",
             targetHero->m_spellPoints,
             targetHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE
         );
@@ -6361,7 +6280,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                        == CREATURE_NONE) {
                     ++displayIndexStateOffset;
                 }
-                creature = IDX(targetHero->m_army.m_creatureTypes[displayIndexStateOffset]);
+                creature = H2EnumIndex(targetHero->m_army.m_creatureTypes[displayIndexStateOffset]);
                 if (creature != ARMY_QUICK_EMPTY_SLOT) {
                     stackIconsWidgets[armyIndex] = new iconWidget(
                         static_cast<i16>(
@@ -6379,7 +6298,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_ICON_SIZE,
-                        DATA_COMPGEN(0x004f63a8, heroQuickViewMons32Icn2, "mons32.icn"),
+                        "mons32.icn",
                         static_cast<i16>(creature),
                         ICON_DRAW_NORMAL,
                         -1,
@@ -6390,25 +6309,22 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         MemError();
                     }
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
-                        H2_ALLOC_AT(
-                            HERO_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f63b4, heroQuickViewSourceFile, RETAIL_FILE),
-                            s_quickViewLineBase + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
-                        )
+                        H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY)
                     );
                     sprintf(
                         armyLabelsStrings[armyIndex],
-                        DATA_COMPGEN(0x004f63e0, heroQuickViewD2, "%d"),
+                        "%d",
                         targetHero->m_army.m_creatureCounts[displayIndexStateOffset]
                     );
                     creatureTextWidgetsLocal[armyIndex] = new textWidget(
                         static_cast<i16>(armyIndex * ARMY_QUICK_ICON_SIZE + armyStartPosition),
                         static_cast<i16>(
-                            HERO_QUICK_DETAILED_CREATURE_Y + IDX(ARMY_QUICK_ICON_SIZE)
+                            HERO_QUICK_DETAILED_CREATURE_Y + H2EnumIndex(ARMY_QUICK_ICON_SIZE)
                         ),
                         ARMY_QUICK_ICON_SIZE,
                         ARMY_QUICK_LABEL_HEIGHT,
                         armyLabelsStrings[armyIndex],
-                        DATA_COMPGEN(0x004f63e4, heroQuickViewSmalfontFnt, "smalfont.fnt"),
+                        "smalfont.fnt",
                         FONT_DRAW_DEFAULT,
                         -1,
                         WIDGET_KIND_TEXT,
@@ -6456,7 +6372,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                    == CREATURE_NONE) {
                 ++displayIndexValue;
             }
-            creatureTypeId = IDX(targetHero->m_army.m_creatureTypes[displayIndexValue]);
+            creatureTypeId = H2EnumIndex(targetHero->m_army.m_creatureTypes[displayIndexValue]);
             stackIconsWidgets[armyIndex] = new iconWidget(
                 static_cast<i16>(
                     armyIndex * armySpacing + slotStartPosition
@@ -6471,7 +6387,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                DATA_COMPGEN(0x004f63f4, heroQuickViewMons32Icn3, "mons32.icn"),
+                "mons32.icn",
                 static_cast<i16>(creatureTypeId),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6482,7 +6398,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsStrings[armyIndex] =
-                static_cast<char*>(H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6400, heroQuickViewSourceFile2, RETAIL_FILE), s_quickViewLineBase + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
+                static_cast<char*>(H2_ALLOC(15));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(
@@ -6496,7 +6412,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 armySpacing,
                 ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsStrings[armyIndex],
-                DATA_COMPGEN(0x004f642c, heroQuickViewSmalfontFnt2, "smalfont.fnt"),
+                "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6521,7 +6437,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 while (targetHero->m_army.m_creatureTypes[displayIndexValue] == CREATURE_NONE) {
                     ++displayIndexValue;
                 }
-                creatureTypeId = IDX(targetHero->m_army.m_creatureTypes[displayIndexValue]);
+                creatureTypeId = H2EnumIndex(targetHero->m_army.m_creatureTypes[displayIndexValue]);
                 stackIconsWidgets[armyIndex] = new iconWidget(
                     static_cast<i16>(
                         (armyIndex - HERO_QUICK_SECOND_ROW_FIRST_SLOT) * armySpacing
@@ -6538,7 +6454,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    DATA_COMPGEN(0x004f643c, heroQuickViewMons32Icn4, "mons32.icn"),
+                    "mons32.icn",
                     static_cast<i16>(creatureTypeId),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6549,7 +6465,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsStrings[armyIndex] = static_cast<char*>(
-                    H2_ALLOC_AT(15, DATA_COMPGEN(0x004f6448, heroQuickViewSourceFile3, RETAIL_FILE), s_quickViewLineBase + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC(15)
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
@@ -6567,7 +6483,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     armySpacing,
                     ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsStrings[armyIndex],
-                    DATA_COMPGEN(0x004f6474, heroQuickViewSmalfontFnt3, "smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -6604,45 +6520,43 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(monsterIconRef);
 }
 
-VA(0x0046308d, 0x120)
 char* advManager::GetArmySizeName(
     i32 armySize,
-    H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar
+    ArmySizeNameVariant grammar
 ) {
     if (giDebugLevel > 0) {
-        sprintf(cArmySizeName, DATA_COMPGEN(0x004f6484, getArmySizeNameD, "%d"), armySize);
+        sprintf(cArmySizeName, "%d", armySize);
         return cArmySizeName;
     }
     if (armySize < ARMY_FEW_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_FEW][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_FEW][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_SEVERAL_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_SEVERAL][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_SEVERAL][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_PACK_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_PACK][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_PACK][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_LOTS_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_LOTS][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_LOTS][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_HORDE_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_HORDE][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_HORDE][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_THRONG_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_THRONG][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_THRONG][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_SWARM_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_SWARM][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_SWARM][H2EnumIndex(grammar)];
     }
     if (armySize < ARMY_ZOUNDS_LIMIT) {
-        return gArmySizeNames[ARMY_SIZE_ZOUNDS][IDX(grammar)];
+        return gArmySizeNames[ARMY_SIZE_ZOUNDS][H2EnumIndex(grammar)];
     }
-    return gArmySizeNames[ARMY_SIZE_LEGION][IDX(grammar)];
+    return gArmySizeNames[ARMY_SIZE_LEGION][H2EnumIndex(grammar)];
 }
 
-VA(0x004631ad, 0xc29)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    DATA(0x004f6488) static i16 s_townViewLineBase = TOWN_VIEW_LINE_BASE;
+    static i16 s_townViewLineBase = TOWN_VIEW_LINE_BASE;
 
     icon* monsterIconLocal;
     i16 portraitWidgetLocal;
@@ -6675,13 +6589,13 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
         return;
     }
 
-    monsterIconLocal = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f648c, townQuickViewMons32Icn, "mons32.icn"));
+    monsterIconLocal = gpResourceManager->GetIcon("mons32.icn");
     quickTownLocal = gpGame->GetTown(townId);
     if (windowX == -1) {
         windowX = TOWN_QUICK_DEFAULT_WINDOW_X;
         windowY = TOWN_QUICK_DEFAULT_WINDOW_Y;
     }
-    townQuickWindow = new heroWindow(windowX, windowY, DATA_COMPGEN(0x004f6498, townQuickViewQtown1Bin, "qtown1.bin"));
+    townQuickWindow = new heroWindow(windowX, windowY, "qtown1.bin");
     if (townQuickWindow == NULL) {
         MemError();
     }
@@ -6709,24 +6623,24 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     messageLocal.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
     messageLocal.payload.widget.id = TOWN_QUICK_PORTRAIT_WIDGET;
     messageLocal.payload.widget.data.value =
-        IDX(quickTownLocal->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
-    if ((gpGame->GetTown(townId)->m_buildings & BIT(BUILDING_SLOT_CASTLE)) == 0) {
+        H2EnumIndex(quickTownLocal->m_type) + TOWN_QUICK_TYPE_FRAME_BASE;
+    if ((gpGame->GetTown(townId)->m_buildings & (1 << H2EnumIndex(BUILDING_SLOT_CASTLE))) == 0) {
         messageLocal.payload.widget.data.value += TOWN_QUICK_VILLAGE_FRAME_OFFSET;
     }
     townQuickWindow->BroadcastMessage(messageLocal);
 
     if (informationLevel != TOWN_QUICK_INFORMATION_EXACT
-        || BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
+        || H2BitTest(gpGame->m_knownTowns, static_cast<i8>(quickTownLocal->m_id)) == 0) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = TOWN_QUICK_KNOWN_MARKER_WIDGET;
-        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        messageLocal.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
         townQuickWindow->BroadcastMessage(messageLocal);
     }
 
     if (quickTownLocal->m_owner == -1) {
         messageLocal.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         messageLocal.payload.widget.id = TOWN_QUICK_PLAYER_COLOR_WIDGET;
-        messageLocal.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        messageLocal.payload.widget.data.value = H2EnumIndex(WIDGET_FLAG_DRAW);
         townQuickWindow->BroadcastMessage(messageLocal);
         ++messageLocal.payload.widget.id;
         townQuickWindow->BroadcastMessage(messageLocal);
@@ -6755,14 +6669,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN || armyCountLocal == 0) {
-        emptyArmyLabel = static_cast<char*>(H2_ALLOC_AT(
-            TOWN_QUICK_EMPTY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64a4, townQuickViewSourceFile, RETAIL_FILE),
-            s_townViewLineBase + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
-        ));
+        emptyArmyLabel = static_cast<char*>(H2_ALLOC(TOWN_QUICK_EMPTY_LABEL_CAPACITY));
         if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN) {
-            sprintf(emptyArmyLabel, DATA_COMPGEN(0x004f64d0, townQuickViewUnknown, "Unknown"));
+            sprintf(emptyArmyLabel, "Unknown");
         } else {
-            sprintf(emptyArmyLabel, DATA_COMPGEN(0x004f64d8, townQuickViewNone, "None"));
+            sprintf(emptyArmyLabel, "None");
         }
         emptyArmyTextState = new textWidget(
             TOWN_QUICK_EMPTY_LABEL_X,
@@ -6770,7 +6681,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             TOWN_QUICK_EMPTY_LABEL_WIDTH,
             ARMY_QUICK_LABEL_HEIGHT,
             emptyArmyLabel,
-            DATA_COMPGEN(0x004f64e0, townQuickViewSmalfontFnt, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             -1,
             WIDGET_KIND_TEXT,
@@ -6831,7 +6742,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                    == CREATURE_NONE) {
                 ++creatureSlotLocal;
             }
-            creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
+            creatureLocal = H2EnumIndex(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
             armyIcons[widgetIndexWidget] = new iconWidget(
                 static_cast<i16>(
                     slotWidthSlot * widgetIndexWidget + slotStartState + fiveArmyShiftValue
@@ -6846,7 +6757,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ),
                 ARMY_QUICK_ICON_SIZE,
                 ARMY_QUICK_ICON_SIZE,
-                DATA_COMPGEN(0x004f64f0, townQuickViewSecondaryMons32Icn, "mons32.icn"),
+                "mons32.icn",
                 static_cast<i16>(creatureLocal),
                 ICON_DRAW_NORMAL,
                 -1,
@@ -6856,14 +6767,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (armyIcons[widgetIndexWidget] == NULL) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
-                TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f64fc, townQuickViewSourceFile2, RETAIL_FILE),
-                s_townViewLineBase + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
-            ));
+            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
             if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
-                    DATA_COMPGEN(0x004f6528, townQuickViewD, "%d"),
+                    "%d",
                     quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                 );
             } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -6875,7 +6783,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     )
                 );
             } else {
-                strcpy(armyLabelsResult[widgetIndexWidget], DATA_COMPGEN(0x004f652c, townQuickViewEmptyString, "???"));
+                strcpy(armyLabelsResult[widgetIndexWidget], "???");
             }
             armyTexts[widgetIndexWidget] = new textWidget(
                 static_cast<i16>(
@@ -6886,7 +6794,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 ARMY_QUICK_TEXT_WIDTH,
                 ARMY_QUICK_LABEL_HEIGHT,
                 armyLabelsResult[widgetIndexWidget],
-                DATA_COMPGEN(0x004f6530, townQuickViewSmalfontFnt2, "smalfont.fnt"),
+                "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 -1,
                 WIDGET_KIND_TEXT,
@@ -6914,7 +6822,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                        == CREATURE_NONE) {
                     ++creatureSlotLocal;
                 }
-                creatureLocal = IDX(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
+                creatureLocal = H2EnumIndex(quickTownLocal->m_army.m_creatureTypes[creatureSlotLocal]);
                 armyIcons[widgetIndexWidget] = new iconWidget(
                     static_cast<i16>(
                         (widgetIndexWidget - firstRowCountState) * slotWidthSlot + slotStartState
@@ -6930,7 +6838,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ),
                     ARMY_QUICK_ICON_SIZE,
                     ARMY_QUICK_ICON_SIZE,
-                    DATA_COMPGEN(0x004f6540, townQuickViewMons32Icn2, "mons32.icn"),
+                    "mons32.icn",
                     static_cast<i16>(creatureLocal),
                     ICON_DRAW_NORMAL,
                     -1,
@@ -6940,14 +6848,11 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (armyIcons[widgetIndexWidget] == NULL) {
                     MemError();
                 }
-                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
-                    TOWN_QUICK_ARMY_LABEL_CAPACITY, DATA_COMPGEN(0x004f654c, townQuickViewSourceFile3, RETAIL_FILE),
-                    s_townViewLineBase + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
-                ));
+                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
                 if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         armyLabelsResult[widgetIndexWidget],
-                        DATA_COMPGEN(0x004f6578, townQuickViewD2, "%d"),
+                        "%d",
                         quickTownLocal->m_army.m_creatureCounts[creatureSlotLocal]
                     );
                 } else if (informationLevel == TOWN_QUICK_INFORMATION_ESTIMATES) {
@@ -6959,7 +6864,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                         )
                     );
                 } else {
-                    strcpy(armyLabelsResult[widgetIndexWidget], DATA_COMPGEN(0x004f657c, townQuickViewEmptyString2, "???"));
+                    strcpy(armyLabelsResult[widgetIndexWidget], "???");
                 }
                 armyTexts[widgetIndexWidget] = new textWidget(
                     static_cast<i16>(
@@ -6970,7 +6875,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                     ARMY_QUICK_TEXT_WIDTH,
                     ARMY_QUICK_LABEL_HEIGHT,
                     armyLabelsResult[widgetIndexWidget],
-                    DATA_COMPGEN(0x004f6580, townQuickViewSmalfontFnt3, "smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     -1,
                     WIDGET_KIND_TEXT,
@@ -7007,19 +6912,15 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(monsterIconLocal);
 }
 
-VA(0x00463dd6, 0x11f)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
-    DATA(0x004f6590) static i16 s_redrawBorderFreeLineBase = REDRAW_BORDER_FREE_LINE_BASE;
+    static i16 s_redrawBorderFreeLineBase = REDRAW_BORDER_FREE_LINE_BASE;
 
     if (!bShowIt) {
         return;
     }
-    gpResourceManager->GetBackdrop(DATA_COMPGEN(0x004f6594, redrawAdvScreenAdvbordIcn, "advbord.icn"), gpWindowManager->m_screen, 1);
+    gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        H2_FREE_AT(
-            m_adventureBorder, DATA_COMPGEN(0x004f65a0, redrawAdvScreenSourceFile, RETAIL_FILE),
-            s_redrawBorderFreeLineBase + BORDER_SECONDARY_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
     }
     SaveAdventureBorder();
@@ -7037,18 +6938,15 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
 }
 
-VA(0x00463ef5, 0x1f)
 void advManager::DeactivateCurrTown(void) {
     gpCurPlayer->m_currentTown = -1;
 }
 
-VA(0x00463f14, 0x27)
 void advManager::DeactivateCurrHero(void) {
     DemobilizeCurrHero();
     gpCurPlayer->m_currentHero = -1;
 }
 
-VA(0x00463f3b, 0x5a)
 void advManager::MobilizeCurrHero(i32 update) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7059,7 +6957,6 @@ void advManager::MobilizeCurrHero(i32 update) {
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
-VA(0x00463f95, 0x16c)
 void advManager::DemobilizeCurrHero(void) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7077,7 +6974,7 @@ void advManager::DemobilizeCurrHero(void) {
     currentHero->m_direction = m_cursorDirection;
     if (m_cursorType == HERO_TYPE_BOAT) {
         currentHero->m_eventFlags = HeroEventFlag(
-            static_cast<i32>(currentHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+            static_cast<i32>(currentHero->m_eventFlags) | H2EnumIndex(HERO_EVENT_EMBARKED)
         );
     }
     currentCell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
@@ -7088,7 +6985,6 @@ void advManager::DemobilizeCurrHero(void) {
     UpdateScreen(0, 0);
 }
 
-VA(0x00464101, 0x217)
 void advManager::SetTownContext(i32 townId) {
     DeactivateCurrHero();
     gpCurPlayer->m_currentTown = static_cast<i8>(townId);
@@ -7123,19 +7019,16 @@ void advManager::SetTownContext(i32 townId) {
         1
     );
 
-    contextValue7 = IDX(
-        giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
-                              ->m_terrainImageIndex]
-    );
+    contextValue7 = H2EnumIndex(giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
+                              ->m_terrainImageIndex]);
     if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
         m_currentTerrain = contextValue7;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
     gpInputManager->ForceMouseMove();
     m_lastHoverCell = 0;
 }
 
-VA(0x00464318, 0x392)
 void advManager::SetHeroContext(i32 heroId, i32 update) {
     if (heroId == INVALID_HERO) {
         return;
@@ -7153,7 +7046,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     m_cursorMapX = m_cursorMapY;
     m_previousCursorMapY = CURSOR_INVALID_POSITION;
     m_previousCursorMapX = m_previousCursorMapY;
-    if (HAS(currentHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if ((H2EnumIndex((currentHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         m_cursorType = HERO_TYPE_BOAT;
     } else {
         m_cursorType = currentHero->m_cursorType;
@@ -7169,12 +7062,12 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         currentHero->m_locationType,
         currentHero->m_occupiedTown,
         NULL,
-        // Retail's final RestoreCell argument is unused.
-        // NOLINTNEXTLINE(readability-magic-numbers)
+
+
         4
     );
 
-    // Retail reuses this locator index slot for the terrain value below.
+
     i32 contextValue7 = 0;
     i32 index;
     for (index = 0; index < gpCurPlayer->m_heroCount; ++index) {
@@ -7211,7 +7104,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         static_cast<i32>(giGroundToTerrain[currentCell->m_terrainImageIndex]);
     if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
         m_currentTerrain = contextValue7;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
     if (!gbHeroMoving) {
         gpInputManager->ForceMouseMove();
@@ -7219,7 +7112,6 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     }
 }
 
-VA(0x004646aa, 0x22f)
 void advManager::DoHeroKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_heroLocatorPage;
     i32 locatorCount29 = gpCurPlayer->m_heroCount;
@@ -7267,7 +7159,6 @@ void advManager::DoHeroKnob(void) {
     UpdateHeroLocators(1, 1);
 }
 
-VA(0x004648d9, 0x22f)
 void advManager::DoTownKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_townLocatorPage;
     i32 locatorCount29 = gpCurPlayer->m_townCount;
@@ -7315,7 +7206,6 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
-VA(0x00464b08, 0x397)
 void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
     if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -7347,8 +7237,8 @@ void advManager::CastSpell(SpellType spell) {
             currentCell = gpAdvManager->GetCell(currentHeroSlot->m_x, currentHeroSlot->m_y);
             if (currentCell->m_triggerType != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f65cc, castSpellYouMustBeStandingOnThe, "You must be standing on the entrance to a mine (sawmills and alchemists don't "
-                    "count) to cast this spell."),
+                    "You must be standing on the entrance to a mine (sawmills and alchemists don't "
+                    "count) to cast this spell.",
                     1,
                     -1,
                     -1,
@@ -7384,7 +7274,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_IDENTIFY_HERO:
             m_identifyHeroActive = 1;
             NormalDialog(
-                DATA_COMPGEN(0x004f6638, castSpellEnemyHeroesAreNowFullyIdentifiable, "Enemy heroes are now fully identifiable."),
+                "Enemy heroes are now fully identifiable.",
                 1,
                 -1,
                 -1,
@@ -7404,7 +7294,7 @@ void advManager::CastSpell(SpellType spell) {
         case SPELL_TOWN_PORTAL:
             if (currentHeroSlot->m_remainingMobility == 0) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f6664, castSpellYourHeroIsTooTiredTo, "Your hero is too tired to cast this spell today.  Try again tomorrow."),
+                    "Your hero is too tired to cast this spell today.  Try again tomorrow.",
                     1,
                     -1,
                     -1,
@@ -7443,12 +7333,11 @@ void advManager::CastSpell(SpellType spell) {
     }
 }
 
-VA(0x00464e9f, 0x24c)
 i32 SaveGame(void) {
     i32 result11 = 0;
     i32 humanPlayerCount1 = 0;
     gpAdvManager->DisableButtons();
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f66ac, saveGameAdvmiceMse, "advmice.mse"), SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
     i32 playerLocal;
     for (playerLocal = 0; playerLocal < SAVE_PLAYER_COUNT; ++playerLocal) {
         if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal]) {
@@ -7459,17 +7348,17 @@ i32 SaveGame(void) {
     char extension7[SAVE_EXTENSION_SIZE];
     char patternState[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(extension7, DATA_COMPGEN(0x004f66b8, saveGameGMC, ".GMC"));
-        sprintf(patternState, DATA_COMPGEN(0x004f66c0, saveGameGMC2, "*.GMC"));
+        sprintf(extension7, ".GMC");
+        sprintf(patternState, "*.GMC");
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(extension7, DATA_COMPGEN(0x004f66c8, saveGameGXC, ".GXC"));
-        sprintf(patternState, DATA_COMPGEN(0x004f66d0, saveGameGXC2, "*.GXC"));
+        sprintf(extension7, ".GXC");
+        sprintf(patternState, "*.GXC");
     } else if (xIsExpansionMap) {
-        sprintf(extension7, DATA_COMPGEN(0x004f66d8, saveGameGXD, ".GX%d"), humanPlayerCount1);
-        sprintf(patternState, DATA_COMPGEN(0x004f66e0, saveGameGXD2, "*.GX%d"), humanPlayerCount1);
+        sprintf(extension7, ".GX%d", humanPlayerCount1);
+        sprintf(patternState, "*.GX%d", humanPlayerCount1);
     } else {
-        sprintf(extension7, DATA_COMPGEN(0x004f66e8, saveGameGMD, ".GM%d"), humanPlayerCount1);
-        sprintf(patternState, DATA_COMPGEN(0x004f66f0, saveGameGMD2, "*.GM%d"), humanPlayerCount1);
+        sprintf(extension7, ".GM%d", humanPlayerCount1);
+        sprintf(patternState, "*.GM%d", humanPlayerCount1);
     }
 
     fileRequester* requester2 = new fileRequester(
@@ -7489,7 +7378,7 @@ i32 SaveGame(void) {
         bFreshSave = 1;
         result11 = gpGame->SaveGame(gLastFilename, 0, 0);
         if (result11) {
-            NormalDialog(DATA_COMPGEN(0x004f66f8, saveGameGameSavedSuccessfully, "Game saved successfully."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+            NormalDialog("Game saved successfully.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     delete requester2;
@@ -7497,20 +7386,18 @@ i32 SaveGame(void) {
     return result11;
 }
 
-VA(0x004650eb, 0xa6)
 void advManager::CheckCastSpell(void) {
     if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
         MobilizeCurrHero(0);
         CompleteDraw(0);
         UpdateScreen(0, 0);
-        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f6714, checkCastSpellAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         CastSpell(gpGame->ViewSpells(
             gpGame->GetHero(gpCurPlayer->m_currentHero), SPELL_TYPE_ADVENTURE, NullHandler, 0
         ));
     }
 }
 
-VA(0x00465191, 0x31c)
 MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
@@ -7528,7 +7415,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_FIRST_BUTTON:
                         case DIMENSION_DOOR_LAST_BUTTON:
-                            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                            if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
                             } else {
                                 if (gpWindowManager->m_dialogResult
                                     == TRAVEL_DIALOG_ACCEPT) {
@@ -7574,7 +7461,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                         gpAdvManager->m_mapOriginX + mouseX,
                         gpAdvManager->m_mapOriginY + mouseY
                     );
-                    if (HAS(cell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)
+                    if ((H2EnumIndex((cell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))
                         || (cell->m_flags & HOVER_OBJECT_BLOCKED)) {
                         gpWindowManager->m_dialogResult = 0;
                         gpMouseManager->SetPointer(POINTER_DEFAULT);
@@ -7599,7 +7486,6 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004654ad, 0x11a9)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     i32 updateCount;
     i32 mapCellX;
@@ -7988,12 +7874,10 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     return 1;
 }
 
-VA(0x00466656, 0x38)
 i32 advManager::ComboDraw(i32 update) {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
-VA(0x0046668e, 0x338)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundLayer;
     i32 maxSounds = SOUND_CELL_COUNT;
@@ -8007,7 +7891,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     for (edgeOffset = 0; edgeOffset < SOUND_CELL_COUNT; ++edgeOffset) {
         if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             LogInt(
-                DATA_COMPGEN(0x004f6724, setEnvironmentOriginSEOA, "SEO a"),
+                "SEO a",
                 edgeOffset,
                 ENVIRONMENT_SOUND_LOG_UNUSED,
                 ENVIRONMENT_SOUND_LOG_UNUSED,
@@ -8018,7 +7902,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
             );
             if (stopSounds != 0) {
                 LogInt(
-                    DATA_COMPGEN(0x004f672c, setEnvironmentOriginSEOB, "SEO b"),
+                    "SEO b",
                     edgeOffset,
                     ENVIRONMENT_SOUND_LOG_UNUSED,
                     ENVIRONMENT_SOUND_LOG_UNUSED,
@@ -8028,7 +7912,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                     ENVIRONMENT_SOUND_LOG_UNUSED
                 );
                 gpSoundManager->StopSample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
+                    m_loopingSamples[H2EnumIndex(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
@@ -8085,15 +7969,15 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
                 && m_activeSounds[edgeOffset].volume > ENVIRONMENT_SOUND_MAX_DISTANCE) {
                 gpSoundManager->StopSample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
+                    m_loopingSamples[H2EnumIndex(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
             }
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
-                && (m_activeSoundMask & BIT(m_activeSounds[edgeOffset].soundId)) != 0) {
+                && (m_activeSoundMask & (1 << H2EnumIndex(m_activeSounds[edgeOffset].soundId))) != 0) {
                 gpSoundManager->ModifySample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
+                    m_loopingSamples[H2EnumIndex(m_activeSounds[edgeOffset].soundId)]
                         ->m_playbackData.activeSample,
                     SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
@@ -8103,16 +7987,14 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     }
 }
 
-VA(0x004669c6, 0x69)
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        sprintf(gText, DATA_COMPGEN(0x004f6734, checkLoadSampleLoop04d82M, "loop%04d.82M"), index);
+        sprintf(gText, "loop%04d.82M", index);
         m_loopingSamples[index] = gpResourceManager->GetSample(gText);
     }
 }
 
-VA(0x00466a2f, 0x4c1)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
     AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
@@ -8122,7 +8004,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
         return ADVMGR_SOUND_COASTLINE;
     }
 
-    if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+    if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
         switch (currentCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
             case MAP_OBJECT_ARCHER_HOUSE:
                 return ADVMGR_SOUND_DWELLING;
@@ -8169,27 +8051,27 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
             case MAP_OBJECT_WATER_WHEEL:
                 return ADVMGR_SOUND_WATER_WHEEL;
             case MAP_OBJECT_ALCHEMIST_LAB:
-                if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_ALCHEMIST_LAB_ACTION;
                 }
                 break;
             case MAP_OBJECT_MINE:
-                if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_MINE;
                 }
                 break;
             case MAP_OBJECT_ABANDONED_MINE:
-                if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_ABANDONED_MINE;
                 }
                 break;
             case MAP_OBJECT_SAWMILL:
-                if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_SAWMILL;
                 }
                 break;
             case MAP_OBJECT_DAEMON_CAVE:
-                if (HAS(currentCell->m_triggerType, MAP_TRIGGER_ACTION_FLAG)) {
+                if ((H2EnumIndex((currentCell->m_triggerType) & (MAP_TRIGGER_ACTION_FLAG)))) {
                     return ADVMGR_SOUND_DAEMON_CAVE;
                 }
                 break;
@@ -8234,7 +8116,6 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
-VA(0x00466ef0, 0x23a)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
     i32 distanceLimit;
@@ -8254,7 +8135,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         if (m_activeSounds[activeIndex].soundId == soundId) {
             if (m_activeSounds[activeIndex].volume > distance) {
                 m_activeSounds[activeIndex].volume = distance;
-                m_activeSoundMask |= BIT(m_activeSounds[activeIndex].soundId);
+                m_activeSoundMask |= (1 << H2EnumIndex(m_activeSounds[activeIndex].soundId));
             }
             return;
         }
@@ -8276,23 +8157,22 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     if (soundSlot != -1) {
         if (m_activeSounds[soundSlot].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             gpSoundManager->StopSample(
-                m_loopingSamples[IDX(m_activeSounds[soundSlot].soundId)]
+                m_loopingSamples[H2EnumIndex(m_activeSounds[soundSlot].soundId)]
                     ->m_playbackData.activeSample
             );
         }
         m_activeSounds[soundSlot].soundId = soundId;
         m_activeSounds[soundSlot].volume = distance;
-        CheckLoadSample(IDX(soundId));
-        m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 0;
-        m_loopingSamples[IDX(soundId)]->m_playbackData.channelType =
+        CheckLoadSample(H2EnumIndex(soundId));
+        m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
+        m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.loopCount = 0;
+        m_loopingSamples[H2EnumIndex(soundId)]->m_playbackData.channelType =
             ENVIRONMENT_SOUND_CHANNEL_TYPE;
-        gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
-        m_activeSoundMask ^= 1 << IDX(m_activeSounds[soundSlot].soundId);
+        gpSoundManager->MemorySample(m_loopingSamples[H2EnumIndex(soundId)]);
+        m_activeSoundMask ^= 1 << H2EnumIndex(m_activeSounds[soundSlot].soundId);
     }
 }
 
-VA(0x0046712a, 0x40f)
 void advManager::TeleportTo(
     hero* mapHero,
     i32 destinationX,
@@ -8301,7 +8181,7 @@ void advManager::TeleportTo(
     i32 skipMapChange
 ) {
     i32 savedShow11;
-    H2_ENUM_STORAGE(TerrainType, i32) terrain5;
+    H2EnumStorage<TerrainType, i32> terrain5;
     mapCell* oldCell2;
     i32 oldCellFlag26;
     i32 unused47;
@@ -8371,7 +8251,7 @@ void advManager::TeleportTo(
         m_mapOriginX + TELEPORT_VIEW_CENTER,
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         giCurPlayer,
-        giVisRange[IDX(mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
+        giVisRange[H2EnumIndex(mapHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_SCOUTING)])]
             + (static_cast<u32>(mapHero->HasArtifact(ARTIFACT_TELESCOPE)) >= 1)
     );
 
@@ -8411,7 +8291,7 @@ void advManager::TeleportTo(
         }
         if (m_cursorType == HERO_TYPE_BOAT) {
             mapHero->m_eventFlags = HeroEventFlag(
-                static_cast<i32>(mapHero->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
+                static_cast<i32>(mapHero->m_eventFlags) | H2EnumIndex(HERO_EVENT_EMBARKED)
             );
         }
         m_cursorActive = 0;
@@ -8425,7 +8305,7 @@ void advManager::TeleportTo(
     terrain5 = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
     if (m_currentTerrain != terrain5) {
         m_currentTerrain = terrain5;
-        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+        gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     }
     Reseed(0, 0);
     UpdateRadar(1, 0);
@@ -8433,7 +8313,6 @@ void advManager::TeleportTo(
     ForceNewHover();
 }
 
-VA(0x00467539, 0x1fb)
 void advManager::DimensionDoor(void) {
     hero* targetHero;
     heroWindow* dimensionDoorWindow;
@@ -8441,7 +8320,7 @@ void advManager::DimensionDoor(void) {
     i32 y;
     mapCell* targetCell;
 
-    dimensionDoorWindow = new heroWindow(0, 0, DATA_COMPGEN(0x004f6744, dimensionDoorDimdoorBin, "dimdoor.bin"));
+    dimensionDoorWindow = new heroWindow(0, 0, "dimdoor.bin");
     if (dimensionDoorWindow == NULL) {
         MemError();
     }
@@ -8453,12 +8332,12 @@ void advManager::DimensionDoor(void) {
         x = m_lastHoverCell + m_mapOriginX;
         y = m_hoverCellY + m_mapOriginY;
         targetCell = GetCell(x, y);
-        if ((HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+        if (((H2EnumIndex((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
              && giGroundToTerrain[targetCell->m_terrainImageIndex] != TERRAIN_WATER)
-            || (!HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)
+            || (!(H2EnumIndex((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))
                 && giGroundToTerrain[targetCell->m_terrainImageIndex] == TERRAIN_WATER)) {
             NormalDialog(
-                DATA_COMPGEN(0x004f6750, dimensionDoorDimensionDoorFailed, "Dimension Door failed!!!"),
+                "Dimension Door failed!!!",
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8473,7 +8352,7 @@ void advManager::DimensionDoor(void) {
         } else {
             gpSoundManager->SwitchAmbientMusic(TRAVEL_MUSIC);
             TeleportTo(targetHero, x, y, 0, 0);
-            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+            gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
         }
         gpGame->GetHero(gpCurPlayer->m_currentHero)->UseSpell(SPELL_DIMENSION_DOOR);
     } else {
@@ -8481,13 +8360,12 @@ void advManager::DimensionDoor(void) {
     }
 }
 
-VA(0x00467734, 0x129)
 MessageDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
     if (!gpSoundManager->MusicPlaying() && gpAdvManager->m_active == 1) {
         gpSoundManager->SwitchAmbientMusic(
-            giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
+            giTerrainToMusicTrack[H2EnumIndex(gpAdvManager->m_currentTerrain)]
         );
     }
 
@@ -8504,8 +8382,8 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
-                        // Retail reads the id back rather than restating the
-                        // constant; both spell 10.
+
+
                         message.payload.widget.command =
                             static_cast<BaseWidgetCommand>(message.payload.widget.id);
                         return MESSAGE_DISPATCH_FORWARD;
@@ -8521,7 +8399,6 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0046785d, 0x43e)
 void advManager::TownGate(SpellType spellId) {
     i32 distance0;
     hero* targetHero;
@@ -8536,7 +8413,7 @@ void advManager::TownGate(SpellType spellId) {
 
     if (gpCurPlayer->m_townCount == 0) {
         NormalDialog(
-            DATA_COMPGEN(0x004f676c, townGateNoAvailableTownSpellFailed, "No available town.  Spell Failed!!!"),
+            "No available town.  Spell Failed!!!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8549,9 +8426,9 @@ void advManager::TownGate(SpellType spellId) {
         );
         return;
     }
-    if (HAS(targetHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
+    if ((H2EnumIndex((targetHero->m_eventFlags) & (HERO_EVENT_EMBARKED)))) {
         NormalDialog(
-            DATA_COMPGEN(0x004f6790, townGateSpellFailedYouMustBeOn, "Spell Failed!!!  You must be on land for this spell to work."),
+            "Spell Failed!!!  You must be on land for this spell to work.",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8569,9 +8446,9 @@ void advManager::TownGate(SpellType spellId) {
         townPortalWin = new heroWindow(
             TOWN_PORTAL_WINDOW_X,
             TOWN_PORTAL_WINDOW_Y,
-            DATA_COMPGEN(0x004f67d0, townGateTownportBin, "townport.bin")
+            "townport.bin"
         );
-        sprintf(gText, DATA_COMPGEN(0x004f67e0, townGateTownPortalSelectTownToPort, "{Town Portal}\n\nSelect town to port to."));
+        sprintf(gText, "{Town Portal}\n\nSelect town to port to.");
         message.type = ADVMGR_TOWN_PORTAL_MESSAGE;
         message.payload.widget.command = ADVMGR_TOWN_PORTAL_COMMAND_TEXT;
         message.payload.widget.id = TOWN_PORTAL_TITLE_WIDGET;
@@ -8598,7 +8475,7 @@ void advManager::TownGate(SpellType spellId) {
     } else {
         for (townListIndex = 0; townListIndex < gpCurPlayer->m_townCount; ++townListIndex) {
             distance0 = abs(
-                            
+
                                 gpGame->m_castleRecs[gpCurPlayer->m_townIds[townListIndex]].m_y
                              - targetHero->m_y
                         )
@@ -8616,7 +8493,7 @@ void advManager::TownGate(SpellType spellId) {
     if (gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].m_occupyingHeroId
         != INVALID_HERO) {
         NormalDialog(
-            DATA_COMPGEN(0x004f6808, townGateNearestTownOccupiedSpellFailed, "Nearest town occupied.  Spell Failed!!!"),
+            "Nearest town occupied.  Spell Failed!!!",
             OPTION_DIALOG_MESSAGE,
             OPTION_DIALOG_NONE,
             OPTION_DIALOG_NONE,
@@ -8644,10 +8521,9 @@ void advManager::TownGate(SpellType spellId) {
     gpGame->m_castleRecs[gpCurPlayer->m_townIds[selectedTownIndex]].GiveSpells(NULL);
     targetHero->m_locationType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE;
     targetHero->m_occupiedTown = gpCurPlayer->m_townIds[selectedTownIndex];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
 }
 
-VA(0x00467c9b, 0x5ac)
 void advManager::SummonBoat(void) {
     i32 boatIndex9;
     mapCell* destinationCell;
@@ -8795,7 +8671,7 @@ void advManager::SummonBoat(void) {
         Reseed(0, 0);
         if (!foundBoat) {
             NormalDialog(
-                DATA_COMPGEN(0x004f6830, summonBoatSummonBoatFailed, "Summon Boat failed!!!"),
+                "Summon Boat failed!!!",
                 OPTION_DIALOG_MESSAGE,
                 OPTION_DIALOG_NONE,
                 OPTION_DIALOG_NONE,
@@ -8811,7 +8687,6 @@ void advManager::SummonBoat(void) {
     }
 }
 
-VA(0x00468247, 0x4d9)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 routeReachable8;
     i32 pathFound5;
@@ -8824,7 +8699,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 terrainCost;
     i32 remainingMobility2;
     i32 pathIndex;
-    H2_ENUM_STORAGE(TerrainType, i32) currentTerrain0;
+    H2EnumStorage<TerrainType, i32> currentTerrain0;
     mapCell* currentCell2;
     i32 routeFrame;
     BaseWidgetCommand buttonFrame;
@@ -8874,7 +8749,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 giGroundToTerrain[nextCell7->m_terrainImageIndex],
                 direction & 1,
                 ROUTE_TERRAIN_COST_INFINITY,
-                IDX(currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+                H2EnumIndex(currentHero0->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -8882,7 +8757,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
                 currentTerrain0,
                 direction & 1,
                 remainingMobility2,
-                IDX(currentHero0->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+                H2EnumIndex(currentHero0->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
                 currentCell2->m_isRoad,
                 nextCell7->m_isRoad
             );
@@ -8958,7 +8833,6 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     }
 }
 
-VA(0x00468720, 0x107)
 void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     hero* currentHero;
 
@@ -8992,7 +8866,6 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     }
 }
 
-VA(0x00468827, 0x8d)
 void advManager::CheckDimHero(void) {
     if (!gbThisNetHumanPlayer[giCurPlayer] || gpCurPlayer->CurrentHero() == INVALID_HERO) {
         return;
@@ -9004,7 +8877,6 @@ void advManager::CheckDimHero(void) {
     }
 }
 
-VA(0x004688b4, 0x6b)
 void advManager::CheckDimNextHeroBut(void) {
     BaseWidgetCommand frame;
     if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero()) {
@@ -9020,7 +8892,6 @@ void advManager::CheckDimNextHeroBut(void) {
     );
 }
 
-VA(0x0046891f, 0x138)
 void advManager::SeedTo(i32 targetX, i32 targetY) {
     hero* currentHero;
 
@@ -9041,7 +8912,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+            H2EnumIndex(currentHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             0,
@@ -9056,7 +8927,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
             m_cursorType == HERO_TYPE_BOAT,
             0,
             currentHero->m_remainingMobility,
-            IDX(currentHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
+            H2EnumIndex(currentHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_PATHFINDING)]),
             targetX,
             targetY,
             1,
@@ -9065,7 +8936,6 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
     }
 }
 
-VA(0x00468a57, 0x5f)
 void advManager::ForceNewHover(void) {
     i32 x;
     i32 y;
@@ -9078,8 +8948,7 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
-VA(0x00468ab6, 0x1a6)
-void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
+void advManager::ScreenScroll(MapDirection direction, i32 updatePointer) {
     i32 originX;
     i32 originY;
 
@@ -9119,7 +8988,7 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 
     if (updatePointer) {
-        gpMouseManager->SetPointer(IDX(direction) + IDX(HOVER_SCROLL_FRAME_FIRST));
+        gpMouseManager->SetPointer(H2EnumIndex(direction) + H2EnumIndex(HOVER_SCROLL_FRAME_FIRST));
     }
 
     if (originX < SCROLL_MIN_ORIGIN) {
@@ -9145,7 +9014,6 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 }
 
-VA(0x00468c5c, 0x1bb)
 void advManager::CheckScreenScroll(void) {
     i32 mouseX6;
     i32 mouseY1;
@@ -9191,7 +9059,6 @@ void advManager::CheckScreenScroll(void) {
     }
 }
 
-VA(0x00468e17, 0x91)
 i32 advManager::MouseInScrollZone(void) {
     i32 x;
     i32 y;
@@ -9206,7 +9073,6 @@ i32 advManager::MouseInScrollZone(void) {
     return 0;
 }
 
-VA(0x00468ea8, 0x2b8)
 void advManager::SetInitialMapOrigin(void) {
     game* gameState;
     town* currentTown9;
@@ -9257,7 +9123,7 @@ void advManager::SetInitialMapOrigin(void) {
     m_currentTerrain = giGroundToTerrain
         [GetCell(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET)
              ->m_terrainImageIndex];
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
     SetEnvironmentOrigin(
         m_mapOriginX + VIEW_CENTER_OFFSET,
         m_mapOriginY + VIEW_CENTER_OFFSET,
@@ -9267,10 +9133,9 @@ void advManager::SetInitialMapOrigin(void) {
     CheckDimNextHeroBut();
 }
 
-VA(0x00469160, 0x1be)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
-        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f6848, loadRemoteAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     }
 
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
@@ -9302,7 +9167,6 @@ void advManager::LoadRemote(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-VA(0x0046931e, 0x20c)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
     i32 playerExited5;
@@ -9348,12 +9212,12 @@ char* advManager::CheckHandleNet(void) {
                 break;
 
             case ADVMGR_REMOTE_COMMAND_PLAYER_EXIT:
-                LogStr(DATA_COMPGEN(0x004f6854, checkHandleNetReceiveRemotePlayerExit, "Receive Remote Player Exit"));
+                LogStr("Receive Remote Player Exit");
                 ReceiveRemotePlayerExit(ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit);
                 break;
 
             case ADVMGR_REMOTE_COMMAND_HOST_PLAYER_EXIT:
-                LogStr(DATA_COMPGEN(0x004f6870, checkHandleNetHostReportsPlayerExit, "Host Reports Player Exit"));
+                LogStr("Host Reports Player Exit");
                 ReceiveHostReportsPlayerExit(
                     packet9->sender,
                     ADVMGR_REMOTE_PAYLOAD(packet9)->playerExit,
@@ -9372,7 +9236,6 @@ char* advManager::CheckHandleNet(void) {
     return NULL;
 }
 
-VA(0x0046952a, 0xcd)
 MessageDispatchResult
 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE) {
@@ -9387,10 +9250,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
                 break;
 
             case ADVMGR_REMOTE_WAIT_EXIT_COMMAND:
-                if (HAS(
-                        message.payload.widget.modifiers,
-                        MESSAGE_MODIFIER_CONTROL_KEYS
-                    )) {
+                if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_CONTROL_KEYS)))) {
                     message.type = ADVMGR_REMOTE_WAIT_EXIT_MESSAGE;
                     message.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
                     return MESSAGE_DISPATCH_FORWARD;
@@ -9405,7 +9265,6 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004695f7, 0x1d5)
 void advManager::TrimLoopingSounds(i32 maxSamples) {
     if (giHighMemBuffer > 0) {
         maxSamples += giHighMemBuffer / HIGH_MEMORY_BUFFER_DIVISOR;
@@ -9427,7 +9286,7 @@ void advManager::TrimLoopingSounds(i32 maxSamples) {
     for (soundIndex = 0; soundIndex < SOUND_CELL_COUNT; ++soundIndex) {
         if (m_activeSounds[soundIndex].soundId >= ADVMGR_SOUND_BUOY
             && m_activeSounds[soundIndex].soundId < ADVMGR_ENVIRONMENT_SOUND_COUNT) {
-            ++retainedSamples[IDX(m_activeSounds[soundIndex].soundId)];
+            ++retainedSamples[H2EnumIndex(m_activeSounds[soundIndex].soundId)];
         }
     }
 
@@ -9457,7 +9316,6 @@ disposeSamples:
     }
 }
 
-VA(0x004697cc, 0xd5)
 void advManager::DisableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9480,7 +9338,6 @@ void advManager::DisableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
-VA(0x004698a1, 0xd5)
 void advManager::EnableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9503,16 +9360,15 @@ void advManager::EnableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
-VA(0x00469976, 0x145)
 void advManager::SaveAdventureBorder(void) {
-    DATA(0x004f688c) static i16 s_saveBorderAllocLineBase = SAVE_BORDER_ALLOC_LINE_BASE;
+    static i16 s_saveBorderAllocLineBase = SAVE_BORDER_ALLOC_LINE_BASE;
 
     if (m_adventureBorder != NULL) {
         return;
     }
 
     m_adventureBorder = static_cast<u8*>(
-        H2_ALLOC_AT(BORDER_BUFFER_SIZE, DATA_COMPGEN(0x004f6890, saveAdventureBorderSourceFile, RETAIL_FILE), s_saveBorderAllocLineBase + BORDER_ALLOC_LINE_OFFSET)
+        H2_ALLOC(BORDER_BUFFER_SIZE)
     );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
@@ -9539,7 +9395,6 @@ void advManager::SaveAdventureBorder(void) {
     }
 }
 
-VA(0x00469abb, 0x134)
 void advManager::DrawAdventureBorder(void) {
     if (m_adventureBorder == NULL) {
         return;
@@ -9573,7 +9428,6 @@ void advManager::DrawAdventureBorder(void) {
     }
 }
 
-VA(0x00469bef, 0x3d3)
 i32 advManager::FindAdjacentMonster(
     i32 originX,
     i32 originY,
@@ -9660,7 +9514,6 @@ foundAdjacentMonster:
     return 1;
 }
 
-VA(0x00469fc2, 0x125)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
         gbThisNetGotAdventureControl = true;
@@ -9691,7 +9544,6 @@ void ComputeAdvNetControl(void) {
     }
 }
 
-VA(0x0046a0e7, 0xf6)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     if (mapExtra[MAP_WIDTH * y + x] & mask) {
         return 1;
@@ -9714,22 +9566,21 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     return 0;
 }
 
-VA(0x0046a1dd, 0x4c6)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
-    // Retail's fixed reveal permutation is payload, not a numeric domain.
-    // NOLINTBEGIN(readability-magic-numbers)
+
+
     u8 puzzleOrderLocal[PUZZLE_PIECE_COUNT] = {23, 7,  44, 5,  24, 47, 1,  39, 16, 36,
                                                       11, 45, 31, 2,  30, 38, 43, 4,  3,  14,
                                                       40, 37, 34, 0,  12, 17, 35, 42, 15, 8,
                                                       26, 41, 28, 46, 10, 22, 21, 6,  32, 18,
                                                       19, 29, 13, 27, 9,  20, 33, 25};
-    // NOLINTEND(readability-magic-numbers)
+
     i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68bc, viewPuzzleAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
-    icon* puzzleIconObjectPointer = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f68c8, puzzleIconObjectPointerPuzzleIcn, "puzzle.icn"));
+    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    icon* puzzleIconObjectPointer = gpResourceManager->GetIcon("puzzle.icn");
     i32 pieceIndexPosition;
     for (pieceIndexPosition = 0; pieceIndexPosition < PUZZLE_PIECE_COUNT;
          ++pieceIndexPosition) {
@@ -9749,7 +9600,7 @@ void advManager::ViewPuzzle(void) {
         PUZZLE_VIEW_SIZE
     );
     heroWindow* puzzleWindowObject =
-        new heroWindow(PUZZLE_WINDOW_X, PUZZLE_WINDOW_Y, DATA_COMPGEN(0x004f68d4, puzzleWindowObjectViewpuzlBin, "viewpuzl.bin"));
+        new heroWindow(PUZZLE_WINDOW_X, PUZZLE_WINDOW_Y, "viewpuzl.bin");
     if (puzzleWindowObject == NULL) {
         MemError();
     }
@@ -9809,7 +9660,7 @@ void advManager::ViewPuzzle(void) {
 
     for (pieceIndexPosition = 0; pieceIndexPosition < PUZZLE_PIECE_COUNT;
          ++pieceIndexPosition) {
-        if (!BitTest(puzzlePiecesRemoved, pieceIndexPosition)) {
+        if (!H2BitTest(puzzlePiecesRemoved, pieceIndexPosition)) {
             puzzleIconObjectPointer->DrawToBuffer(0, 0, puzzleOrderLocal[pieceIndexPosition], ICON_DRAW_NORMAL);
             ++puzzlePiecesVisible;
         }
@@ -9833,12 +9684,11 @@ void advManager::ViewPuzzle(void) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
     UpdateScreen(0, 0);
     UpdateRadar(1, 0);
-    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
+    gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]);
 }
 
-VA(0x0046a6a3, 0x81)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    // Retail reserves six unreferenced four-byte locals before the implicit `this` slot.
+
     i32 unusedPuzzle0;
     i32 unused1;
     i32 unused2;
@@ -9850,7 +9700,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     CompleteDraw(left, top, 0, 0);
     gbDrawingPuzzle = false;
     IconToBitmap(
-        m_objectIcons[IDX(TILESET_ROUTE)],
+        m_objectIcons[H2EnumIndex(TILESET_ROUTE)],
         gpWindowManager->m_screen,
         (right - left) * PUZZLE_TILE_SIZE - PUZZLE_X_TRIM,
         (bottom - top) * PUZZLE_TILE_SIZE,
@@ -9864,17 +9714,16 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
-VA(0x0046a724, 0x2ac)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-        gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68e4, advPanelAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+        gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
         i32 heroWasMobilized = m_heroContextLocked;
         tag_message message;
         DemobilizeCurrHero();
 
-        adventurePanel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, DATA_COMPGEN(0x004f68f0, advPanelApanelBin, "apanel.bin"));
+        adventurePanel = new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "apanel.bin");
         if (adventurePanel == NULL) {
             MemError();
         }
@@ -9886,7 +9735,7 @@ void advManager::AdvPanel(void) {
             adventurePanel->BroadcastMessage(message);
             message.payload.widget.id = PANEL_DISABLED_WIDGET;
             message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+            message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
             adventurePanel->BroadcastMessage(message);
         }
 
@@ -9904,7 +9753,7 @@ void advManager::AdvPanel(void) {
                     );
                     RedrawAdvScreen(1, 0);
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]
                     );
                 } else if (xIsPlayingExpansionCampaign) {
                     SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
@@ -9916,7 +9765,7 @@ void advManager::AdvPanel(void) {
                     );
                     RedrawAdvScreen(1, 0);
                     gpSoundManager->SwitchAmbientMusic(
-                        giTerrainToMusicTrack[IDX(m_currentTerrain)]
+                        giTerrainToMusicTrack[H2EnumIndex(m_currentTerrain)]
                     );
                 } else {
                     gpGame->ShowScenInfo();
@@ -9939,11 +9788,10 @@ void advManager::AdvPanel(void) {
     }
 }
 
-VA(0x0046a9d0, 0x1ca)
 MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+        if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -10000,7 +9848,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command =
             static_cast<BaseWidgetCommand>(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
@@ -10008,16 +9856,15 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0046ab9a, 0x1e4)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f68fc, controlPanelAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     i32 heroWasMobilized = m_heroContextLocked;
     DemobilizeCurrHero();
 
     heroWindow* controlPanel =
-        new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, DATA_COMPGEN(0x004f6908, controlPanelCpanelBin, "cpanel.bin"));
+        new heroWindow(PANEL_WINDOW_X, PANEL_WINDOW_Y, "cpanel.bin");
     if (controlPanel == NULL) {
         MemError();
     }
@@ -10026,14 +9873,14 @@ i32 advManager::ControlPanel(void) {
         message.type = MESSAGE_WIDGET;
         message.payload.widget.id = CONTROL_RESTART;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
         controlPanel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
         controlPanel->BroadcastMessage(message);
         message.payload.widget.id = CONTROL_NEW_GAME;
         message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        message.payload.widget.data.value = H2EnumIndex(WIDGET_COMMAND_DIMMED);
         controlPanel->BroadcastMessage(message);
         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
         message.payload.widget.data.value = BUTTON_TARGET;
@@ -10062,11 +9909,10 @@ i32 advManager::ControlPanel(void) {
     return 0;
 }
 
-VA(0x0046ad7e, 0x304)
 MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
-        if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+        if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                 || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                 i32 helpIndex = PANEL_NO_HELP;
@@ -10110,19 +9956,19 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
                         case CONTROL_RESTART:
                             strcpy(
                                 confirmation,
-                                DATA_COMPGEN(0x004f6914, cPanelHandlerAreYouSureYouWantTo, "Are you sure you want to restart?  (Your current game will be "
-                                "lost)")
+                                "Are you sure you want to restart?  (Your current game will be "
+                                "lost)"
                             );
                             break;
                         case CONTROL_NEW_GAME:
                             strcpy(
                                 confirmation,
-                                DATA_COMPGEN(0x004f6958, cPanelHandlerAreYouSureYouWantTo2, "Are you sure you want to load a new game?  (Your current game "
-                                "will be lost)")
+                                "Are you sure you want to load a new game?  (Your current game "
+                                "will be lost)"
                             );
                             break;
                         case CONTROL_MAIN_MENU:
-                            strcpy(confirmation, DATA_COMPGEN(0x004f69a4, cPanelHandlerAreYouSureYouWantTo3, "Are you sure you want to quit?"));
+                            strcpy(confirmation, "Are you sure you want to quit?");
                             break;
                         case CONTROL_SAVE_GAME:
                         case PANEL_CLOSE_WIDGET:
@@ -10161,14 +10007,13 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
     if (handled) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
+        message.payload.widget.id = H2EnumIndex(WIDGET_COMMAND_DIALOG_SELECT);
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0046b082, 0x197)
 void advManager::SystemOptions(void) {
     tag_message message6;
     i32 oldInterfaceMode;
@@ -10177,7 +10022,7 @@ void advManager::SystemOptions(void) {
     i32 sampleIndex;
 
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f69c4, systemOptionsAdvmiceMse, "advmice.mse"), POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
+    gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
     prevWalkSpeed = gConfig.walkSpeed;
     oldInterfaceMode = gConfig.evilInterfaceUsage;
     heroContextLocked = m_heroContextLocked;
@@ -10187,7 +10032,7 @@ void advManager::SystemOptions(void) {
     cPanel = new heroWindow(
         ADVMGR_SYSTEM_OPTIONS_WINDOW_X,
         ADVMGR_SYSTEM_OPTIONS_WINDOW_Y,
-        DATA_COMPGEN(0x004f69d0, systemOptionsSpanelBin, "spanel.bin")
+        "spanel.bin"
     );
     if (cPanel == NULL) {
         MemError();
@@ -10214,28 +10059,27 @@ void advManager::SystemOptions(void) {
     }
 }
 
-VA(0x0046b219, 0x35f)
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
     AdventureMusicQuality musicQuality;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_FRAME;
 
-    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_VOLUME);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_VOLUME);
     message.payload.widget.data.value = gConfig.musicVolume != CONFIG_VOLUME_MUTED;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_SOUND_VOLUME);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME);
     if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE + 1;
     } else {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_SOUND_FRAME_BASE;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_HERO_SPEED);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_HERO_SPEED);
     message.payload.widget.data.value =
-        IDX(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+        H2EnumIndex(gConfig.walkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_MUSIC_SOURCE);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE);
     if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         musicQuality = MUSIC_QUALITY_MIDI;
     } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
@@ -10244,75 +10088,75 @@ void UpdateSystemOptions(i32 initialDraw) {
         musicQuality = MUSIC_QUALITY_CD_OPERA;
     }
     message.payload.widget.data.value =
-        IDX(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
+        H2EnumIndex(musicQuality) + ADVMGR_SYSTEM_OPTIONS_MUSIC_SOURCE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_SHOW_ROUTE);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE);
     message.payload.widget.data.value =
         (gConfig.showRoute == 0) + ADVMGR_SYSTEM_OPTIONS_ROUTE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_COMPUTER_SPEED);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED);
     if (gConfig.blackoutComputer != 0) {
         message.payload.widget.data.value = ADVMGR_SYSTEM_OPTIONS_COMPUTER_HIDDEN_FRAME;
     } else {
         message.payload.widget.data.value =
-            IDX(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
+            H2EnumIndex(gConfig.computerWalkSpeed) + ADVMGR_SYSTEM_OPTIONS_SPEED_FRAME_BASE;
     }
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_INTERFACE);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_INTERFACE);
     message.payload.widget.data.value =
         gConfig.evilInterfaceUsage + ADVMGR_SYSTEM_OPTIONS_INTERFACE_FRAME_BASE;
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_VIDEO);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_VIDEO);
     message.payload.widget.data.value =
         ADVMGR_SYSTEM_OPTIONS_VIDEO_FRAME_BASE + (gConfig.slowVideo != 0);
     cPanel->BroadcastMessage(message);
-    message.payload.widget.id = IDX(SYSTEM_OPTION_COLOR_CURSOR);
+    message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR);
     message.payload.widget.data.value =
-        gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+        gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
         + ADVMGR_SYSTEM_OPTIONS_CURSOR_FRAME_BASE;
     cPanel->BroadcastMessage(message);
 
     message.payload.widget.command = ADVMGR_SYSTEM_OPTIONS_SET_TEXT;
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = onOffText[IDX(gConfig.musicVolume)];
+        H2EnumIndex(SYSTEM_OPTION_MUSIC_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.musicVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = onOffText[IDX(gConfig.soundVolume)];
+        H2EnumIndex(SYSTEM_OPTION_SOUND_VOLUME) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = onOffText[H2EnumIndex(gConfig.soundVolume)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = walkSpeedText[IDX(gConfig.walkSpeed)];
+        H2EnumIndex(SYSTEM_OPTION_HERO_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.walkSpeed)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
-    message.payload.widget.data.text = musicQualityText[IDX(musicQuality)];
+        H2EnumIndex(SYSTEM_OPTION_MUSIC_SOURCE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+    message.payload.widget.data.text = musicQualityText[H2EnumIndex(musicQuality)];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        H2EnumIndex(SYSTEM_OPTION_SHOW_ROUTE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = onOffText[gConfig.showRoute];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        H2EnumIndex(SYSTEM_OPTION_COMPUTER_SPEED) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     if (gConfig.blackoutComputer != 0) {
-        message.payload.widget.data.text = DATA_COMPGEN(0x004f69dc, updateSystemOptionsDonTShow, "Don't Show");
+        message.payload.widget.data.text = "Don't Show";
     } else {
-        message.payload.widget.data.text = walkSpeedText[IDX(gConfig.computerWalkSpeed)];
+        message.payload.widget.data.text = walkSpeedText[H2EnumIndex(gConfig.computerWalkSpeed)];
     }
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        H2EnumIndex(SYSTEM_OPTION_INTERFACE) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = gInterfaceTypeText[gConfig.evilInterfaceUsage];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        H2EnumIndex(SYSTEM_OPTION_VIDEO) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text = cSlowVideoLevelText[gConfig.slowVideo != 0];
     cPanel->BroadcastMessage(message);
     message.payload.widget.id =
-        IDX(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
+        H2EnumIndex(SYSTEM_OPTION_COLOR_CURSOR) + ADVMGR_SYSTEM_OPTIONS_TEXT_ID_OFFSET;
     message.payload.widget.data.text =
-        cBWMouseText[gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
+        cBWMouseText[gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor];
     cPanel->BroadcastMessage(message);
 
     if (initialDraw == 0) {
@@ -10320,17 +10164,13 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
-VA(0x0046b578, 0x672)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];
     i32 accepted = 0;
 
     if (message.type == ADVMGR_SYSTEM_OPTIONS_MESSAGE) {
-        if (HAS(
-                message.payload.widget.modifiers,
-                MESSAGE_MODIFIER_RIGHT_BUTTON
-            )) {
+        if ((H2EnumIndex((message.payload.widget.modifiers) & (MESSAGE_MODIFIER_RIGHT_BUTTON)))) {
             if (message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_ACTIVATE
                 || message.payload.widget.command == ADVMGR_SYSTEM_OPTIONS_HOVER) {
                 i32 helpIndex = OPTION_DIALOG_NONE;
@@ -10405,8 +10245,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_cdReady == 0
                                 && gpSoundManager->m_midiReady == 0) {
                                 NormalDialog(
-                                    DATA_COMPGEN(0x004f69e8, systemOptionsHandlerNeitherMIDINorRedbookMusicIs, "Neither MIDI nor Redbook music is currently available on this "
-                                    "system."),
+                                    "Neither MIDI nor Redbook music is currently available on this "
+                                    "system.",
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10429,7 +10269,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
                                 NormalDialog(
-                                    DATA_COMPGEN(0x004f6a30, systemOptionsHandlerDigitalSoundIsNotCurrentlyAvailable, "Digital sound is not currently available on this system."),
+                                    "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10477,9 +10317,9 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 if (gpSoundManager->m_cdReady == 0) {
                                     NormalDialog(
-                                        DATA_COMPGEN(0x004f6a6c, systemOptionsHandlerUnableToSetUpCDStereo, "Unable to set up CD stereo music.  Your CD player might "
+                                        "Unable to set up CD stereo music.  Your CD player might "
                                         "be in use by another program, or your sound driver might "
-                                        "not support CD stereo."),
+                                        "not support CD stereo.",
                                         OPTION_DIALOG_MESSAGE,
                                         OPTION_DIALOG_NONE,
                                         OPTION_DIALOG_NONE,
@@ -10492,7 +10332,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                     );
                                     break;
                                 }
-                                gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_CD));
+                                gpSoundManager->SetMusicQuality(H2EnumIndex(CONFIG_MUSIC_SOURCE_CD));
                                 gConfig.useOpera = CONFIG_OPERA_DISABLED;
                             } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
@@ -10502,10 +10342,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                                 }
                                 if (gpSoundManager->m_midiReady == 0) {
                                     gConfig.useOpera = static_cast<ConfigOperaMode>(
-                                        1 - IDX(gConfig.useOpera)
+                                        1 - H2EnumIndex(gConfig.useOpera)
                                     );
                                 } else {
-                                    gpSoundManager->SetMusicQuality(IDX(CONFIG_MUSIC_SOURCE_MIDI));
+                                    gpSoundManager->SetMusicQuality(H2EnumIndex(CONFIG_MUSIC_SOURCE_MIDI));
                                 }
                             }
                             preferencesChanged = 1;
@@ -10528,7 +10368,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                         case SYSTEM_OPTION_VIDEO:
                             if (gbLowMemory) {
                                 NormalDialog(
-                                    DATA_COMPGEN(0x004f6af4, systemOptionsHandlerYouDonTHaveEnoughMemory, "You don't have enough memory for non-interlaced video."),
+                                    "You don't have enough memory for non-interlaced video.",
                                     OPTION_DIALOG_MESSAGE,
                                     OPTION_DIALOG_NONE,
                                     OPTION_DIALOG_NONE,
@@ -10551,18 +10391,16 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_COLOR_CURSOR:
-                            gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
-                                1 - gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
+                            gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor =
+                                1 - gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor;
                             preferencesChanged = 1;
                             bPrefsChanged = 1;
                             gpMouseManager->SetColorMice(
-                                gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
+                                gConfig.gfx[H2EnumIndex(CONFIG_EXECUTABLE_GAME)].colorMouseCursor
                             );
                             break;
-#if H2_STRICT_ENUMS
                         case SYSTEM_OPTION_COUNT:
                             break;
-#endif
                     }
                     break;
                 }
@@ -10575,7 +10413,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     }
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
-        message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
+        message.payload.widget.id = H2EnumIndex(SYSTEM_OPTION_FIRST);
         message.payload.widget.command =
             static_cast<BaseWidgetCommand>(message.payload.widget.id);
         return MESSAGE_DISPATCH_FORWARD;
@@ -10583,7 +10421,6 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0046bbea, 0x7f)
 i32 GetMobilityFrame(i32 mobility) {
     i32 frame = mobility * MOBILITY_SCALE / MOBILITY_DIVISOR;
     if (frame < 0) {
@@ -10599,7 +10436,6 @@ i32 GetMobilityFrame(i32 mobility) {
     return frame;
 }
 
-VA(0x0046bc69, 0x7f)
 i32 GetManaFrame(i32 mana) {
     i32 frame = mana / MANA_DIVISOR;
     if (frame == 0 && mana >= MANA_MIN_VISIBLE) {
@@ -10615,7 +10451,6 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
-VA(0x0046bce8, 0x559)
 i32 advManager::DoVisions(hero* visionHero) {
     char visionMessageResult[VISIONS_MESSAGE_BUFFER_SIZE];
     CreatureType creatureData;
@@ -10656,7 +10491,7 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (nearestDistanceState == VISIONS_NO_MONSTER_DISTANCE) {
         NormalDialog(
-            DATA_COMPGEN(0x004f6b2c, doVisionsYouMustBeWithin3Spaces, "You must be within 3 spaces of a monster for the Visions spell to work."),
+            "You must be within 3 spaces of a monster for the Visions spell to work.",
             1,
             -1,
             -1,
@@ -10674,27 +10509,27 @@ i32 advManager::DoVisions(hero* visionHero) {
     creatureData = static_cast<CreatureType>(cellData->m_objectIndex);
     forcedJoinState = cellData->m_objectMetadata & MONSTER_JOIN_FORCED;
     monsterCountIndex = cellData->m_objectMetadata & MONSTER_COUNT_MASK;
-    sprintf(gText, DATA_COMPGEN(0x004f6b74, doVisionsDS, "{%d %s}\n\n"), monsterCountIndex, gArmyNamesPlural[IDX(creatureData)]);
+    sprintf(gText, "{%d %s}\n\n", monsterCountIndex, gArmyNamesPlural[H2EnumIndex(creatureData)]);
     strengthRatioCurrent =
         static_cast<float>(gpPhilAI->FightValueOfStack(&visionHero->m_army, visionHero, 0, 0, 0, 0))
-        / static_cast<float>(gMonsterDatabase[IDX(creatureData)].fightValue * monsterCountIndex);
+        / static_cast<float>(gMonsterDatabase[H2EnumIndex(creatureData)].fightValue * monsterCountIndex);
 
     if (visionHero->m_army.CanJoin(creatureData)
         && strengthRatioCurrent
-            > DATA_COMPGEN(0x004eb6b8, monsterStrengthJoinThreshold, MONSTER_STRENGTH_JOIN)
+            > MONSTER_STRENGTH_JOIN
         && !visionHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && creatureData != CREATURE_GHOST
         && creatureData != CREATURE_EARTH_ELEMENTAL && creatureData != CREATURE_AIR_ELEMENTAL
         && creatureData != CREATURE_FIRE_ELEMENTAL && creatureData != CREATURE_WATER_ELEMENTAL) {
         if (forcedJoinState) {
-            sprintf(visionMessageResult, DATA_COMPGEN(0x004f6b80, doVisionsTheCreaturesAreWillingToJoin, "The creatures are willing to join us!"));
+            sprintf(visionMessageResult, "The creatures are willing to join us!");
             strcat(gText, visionMessageResult);
             goto showVision;
-        } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+        } else if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
                    != HERO_SKILL_LEVEL_NONE) {
-            if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
                 == HERO_SKILL_LEVEL_EXPERT) {
                 joiningCount = monsterCountIndex;
-            } else if (visionHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
+            } else if (visionHero->m_secondarySkills[H2EnumIndex(HERO_SKILL_DIPLOMACY)]
                        == HERO_SKILL_LEVEL_ADVANCED) {
                 joiningCount = monsterCountIndex / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             } else {
@@ -10704,14 +10539,12 @@ i32 advManager::DoVisions(hero* visionHero) {
                 joiningCount = 1;
             }
 
-            joiningCostIndex = gMonsterDatabase[IDX(creatureData)].cost * monsterCountIndex
+            joiningCostIndex = gMonsterDatabase[H2EnumIndex(creatureData)].cost * monsterCountIndex
                 * VISIONS_JOIN_COST_MULTIPLIER;
             if (joiningCostIndex
-                > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                > gpGame->m_players[visionHero->m_owner].m_resources[H2EnumIndex(RES_GOLD)]) {
                 if (strengthRatioCurrent
-                    > DATA_COMPGEN(
-                        0x004eb6c0, monsterStrengthFleeThreshold, MONSTER_STRENGTH_FLEE
-                    )) {
+                    > MONSTER_STRENGTH_FLEE) {
                     goto creaturesFlee;
                 } else {
                     goto creaturesFight;
@@ -10721,13 +10554,13 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joiningCount == monsterCountIndex) {
                 sprintf(
                     visionMessageResult,
-                    DATA_COMPGEN(0x004f6ba8, doVisionsAllTheCreaturesWillJoinUs, "All the creatures will join us...\n\nfor a fee of %d gold."),
+                    "All the creatures will join us...\n\nfor a fee of %d gold.",
                     joiningCostIndex
                 );
             } else {
                 sprintf(
                     visionMessageResult,
-                    DATA_COMPGEN(0x004f6be4, doVisionsDOfTheCreaturesWillJoin, "%d of the creatures will join us...\n\nfor a fee of %d gold."),
+                    "%d of the creatures will join us...\n\nfor a fee of %d gold.",
                     monsterCountIndex,
                     joiningCostIndex
                 );
@@ -10739,12 +10572,12 @@ i32 advManager::DoVisions(hero* visionHero) {
 
     if (strengthRatioCurrent > MONSTER_STRENGTH_FLEE) {
     creaturesFlee:
-        sprintf(visionMessageResult, DATA_COMPGEN(0x004f6c20, doVisionsTheseWeakCreaturesWillSurelyFlee, "These weak creatures will surely flee before us."));
+        sprintf(visionMessageResult, "These weak creatures will surely flee before us.");
         strcat(gText, visionMessageResult);
         goto showVision;
     }
 creaturesFight:
-    sprintf(visionMessageResult, DATA_COMPGEN(0x004f6c54, doVisionsIFearTheseCreaturesAreIn, "I fear these creatures are in the mood for a fight."));
+    sprintf(visionMessageResult, "I fear these creatures are in the mood for a fight.");
     strcat(gText, visionMessageResult);
     goto showVision;
 
@@ -10753,7 +10586,6 @@ showVision:
     return 1;
 }
 
-VA(0x0046c241, 0xd7)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 heroIndex;
     hero* crystalHero;
@@ -10775,11 +10607,10 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     return 0;
 }
 
-VA(0x0046c318, 0x85)
 u8 StopOnTrigger(class mapCell* cell) {
     MapObjectType type = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     if (type != MAP_OBJECT_EXPANSION_OBJECT) {
-        return bStopOnTrigger[IDX(type)];
+        return bStopOnTrigger[H2EnumIndex(type)];
     }
 
     i32 trigger = cell->m_objectMetadata;
@@ -10793,42 +10624,38 @@ u8 StopOnTrigger(class mapCell* cell) {
 }
 
 
-VTBL(advManager, 0x004eb6c8);
+i32 giLimitUpdMinX = -1;
+i32 iLastScrollTime = 0;
+i32 iSandAnim = 0;
+i32 giLastHourGlassUpdateTime = 0;
+i32 TrigX = 0;
+i32 TrigY = 0;
+BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
+i32 iCurBottomViewEnemy = -1;
+i32 iCurHourGlassPhase = 0;
+i32 iLastHourGlassPhase = 1;
+b32 gbForceUpdate = false;
+i32 giCheatSeq = 0;
+i32 iQWE = 0;
 
-DATA(0x004f57b0) i32 giLimitUpdMinX = -1;
-DATA(0x004f57b4) i32 iLastScrollTime = 0;
-DATA(0x004f57b8) i32 iSandAnim = 0;
-DATA(0x004f57bc) i32 giLastHourGlassUpdateTime = 0;
-DATA(0x004f57c0) i32 TrigX = 0;
-DATA(0x004f57c4) i32 TrigY = 0;
-DATA(0x004f57c8) BottomViewMode iCurBottomView = BOTTOM_VIEW_NONE;
-DATA(0x004f57cc) i32 iCurBottomViewEnemy = -1;
-DATA(0x004f57d0) i32 iCurHourGlassPhase = 0;
-DATA(0x004f57d4) i32 iLastHourGlassPhase = 1;
-DATA(0x004f57d8) b32 gbForceUpdate = false;
-DATA(0x004f59e8) i32 giCheatSeq = 0;
-DATA(0x004f59ec) i32 iQWE = 0;
-// Retail animation-phase payload for the adventure monster overlay.
-// NOLINTNEXTLINE(readability-magic-numbers)
-DATA(0x004f5e38) u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
+
+u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
-DATA(0x004f60e0) i32 iLastSandAnimTime = 0;
-DATA(0x004f60e4) i32 iLastNewSandAnimTime = 0;
-DATA(0x004f6720) i32 giFrameCount = 0;
-DATA(0x00527ec8) class heroWindow* cPanel;
-DATA(0x00527ed0) i32 iThisMaxY;
-DATA(0x00527edc) i32 giTownPortalChoice;
-DATA(0x00527ee0) i32 iThisMinY;
-DATA(0x00527ee8) class heroWindow* townPortalWin;
-DATA(0x00527ef0) struct tag_message USMsg;
-DATA(0x00527f14) i32 giFrameStep;
-DATA(0x00527f28) char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
-DATA(0x00527f34) i32 giLimitUpdMaxX;
-DATA(0x00527f38) i32 giLimitUpdMaxY;
-DATA(0x00527f40) i32 bPrefsChanged;
-DATA(0x00527f4c) i32 giLimitUpdMinY;
-DATA(0x00527f50) i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
-DATA(0x005280b0) struct tag_message CDMsg;
-DATA(0x005280d4) i32 iLastAnimFrame;
-
-#undef RETAIL_FILE
+i32 iLastSandAnimTime = 0;
+i32 iLastNewSandAnimTime = 0;
+i32 giFrameCount = 0;
+class heroWindow* cPanel;
+i32 iThisMaxY;
+i32 giTownPortalChoice;
+i32 iThisMinY;
+class heroWindow* townPortalWin;
+struct tag_message USMsg;
+i32 giFrameStep;
+char cArmySizeName[ADVMGR_ARMY_SIZE_NAME_SIZE];
+i32 giLimitUpdMaxX;
+i32 giLimitUpdMaxY;
+i32 bPrefsChanged;
+i32 giLimitUpdMinY;
+i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
+struct tag_message CDMsg;
+i32 iLastAnimFrame;

@@ -3,9 +3,8 @@
 
 #include <Ints.h>
 
-// Known serialized values only. The domain remains open-ended, and widget stores
-// the value in its proven packed short field rather than as this enum type.
-H2_ENUM_CLASS_BEGIN_SPLIT(WidgetKind, i16)
+
+enum class WidgetKind : i16 {
     WIDGET_KIND_NONE          = 0,
     WIDGET_KIND_TRANSPARENT   = 1,
     WIDGET_KIND_DEFAULT       = 2,
@@ -19,6 +18,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(WidgetKind, i16)
     WIDGET_KIND_ICON          = 0x801,
     WIDGET_KIND_AUTO_REPEAT   = 0x1000,
     WIDGET_KIND_TEXT_ENTRY    = 0x4000
-H2_ENUM_CLASS_END_SPLIT(WidgetKind, i16)
+};
+using enum WidgetKind;
 
 #endif

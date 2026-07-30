@@ -5,7 +5,7 @@
 #include <SOURCE/KB_TYPES.h>
 
 i32 CalcTerrainCost(
-    H2_ENUM_PARAM(TerrainType, i32),
+    TerrainType,
     i32,
     i32,
     i32,

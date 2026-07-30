@@ -1,18 +1,19 @@
 #ifndef HOMM2_BASE_INPUTMANAGER_H
 #define HOMM2_BASE_INPUTMANAGER_H
 
-#include <va.h>
+#include <Ints.h>
 #include "baseManager.h"
 #include <BASE/message.h>
 
 struct tag_message;
 
-H2_ENUM_CLASS_BEGIN(InputManagerKeyCodeType)
+enum class InputManagerKeyCodeType : i32 {
     INPUT_KEY_CODE_ASCII = 0,
     INPUT_KEY_CODE_SCAN  = 1
-H2_ENUM_CLASS_END(InputManagerKeyCodeType)
+};
+using enum InputManagerKeyCodeType;
 
-H2_ENUM_BEGIN(InputManagerScanCode)
+typedef enum InputManagerScanCode {
     INPUT_SCAN_NONE            = 0x00,
     INPUT_SCAN_ESCAPE          = 0x01,
     INPUT_SCAN_1               = 0x02,
@@ -102,24 +103,24 @@ H2_ENUM_BEGIN(InputManagerScanCode)
     INPUT_SCAN_ISO_BACKSLASH   = 0x56,
     INPUT_SCAN_F11             = 0x57,
     INPUT_SCAN_F12             = 0x58
-H2_ENUM_END(InputManagerScanCode)
+} InputManagerScanCode;
 
-H2_ENUM_BEGIN(InputManagerCapacity)
+typedef enum InputManagerCapacity {
     INPUT_EVENT_RING_CAPACITY = 64,
     INPUT_SCAN_CODE_CAPACITY  = 128
-H2_ENUM_END(InputManagerCapacity)
+} InputManagerCapacity;
 
 #pragma pack(push, 1)
 class inputManager : public baseManager {
 public:
-    tag_message m_eventRing[IDX(INPUT_EVENT_RING_CAPACITY)];
+    tag_message m_eventRing[H2EnumIndex(INPUT_EVENT_RING_CAPACITY)];
     i32 m_readIndex;
     i32 m_writeIndex;
     i32 m_mouseMessageActive;
     i32 field_0x742;
     i32 field_0x746;
     i32 field_0x74a;
-    i16 m_keyState[IDX(INPUT_SCAN_CODE_CAPACITY)];
+    i16 m_keyState[H2EnumIndex(INPUT_SCAN_CODE_CAPACITY)];
     i32 field_0x84e;
     i32 m_requestedPriority;
     InputManagerKeyCodeType m_keyCodeType;
@@ -128,20 +129,19 @@ public:
     i32 field_0x862;
     i32 field_0x866;
     inputManager(void);
-    virtual i32 Open(i32) OVERRIDE;
-    virtual void Close(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual i32 Open(i32) override;
+    virtual void Close(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Flush(void);
     struct tag_message GetEvent(void);
     struct tag_message PeekEvent(void);
     void SetMouseCoords(i32, i32);
-    void SetKeyCodeType(H2_ENUM_PARAM(InputManagerKeyCodeType, i32));
+    void SetKeyCodeType(InputManagerKeyCodeType);
     void AsciiConvert(struct tag_message&);
     void MakeScanCodeTable(void);
     void ForceMouseMove(void);
 };
 #pragma pack(pop)
-SIZE(inputManager, 0x86a);
 extern i32 iCurSwapPalette;
 extern i32 bLastMouseOffscreen;
 extern i32 bLastOnscreenMouseColor;

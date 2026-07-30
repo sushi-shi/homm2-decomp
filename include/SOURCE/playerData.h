@@ -1,18 +1,18 @@
 #ifndef HOMM2_SOURCE_PLAYERDATA_H
 #define HOMM2_SOURCE_PLAYERDATA_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/GAME.h>
 
-H2_ENUM_BEGIN(PlayerDataStorageConstant)
+typedef enum PlayerDataStorageConstant {
     PLAYER_HERO_CAPACITY         = 8,
     PLAYER_AVAILABLE_HERO_COUNT  = 2,
     PLAYER_UNUSED_SAVE_DATA_SIZE = 0x2c,
     PLAYER_BARRIER_STATE_SIZE    = 6,
     PLAYER_RUNTIME_TAIL_GAP_SIZE = 0x1c
-H2_ENUM_END(PlayerDataStorageConstant)
+} PlayerDataStorageConstant;
 
-H2_ENUM_CLASS_BEGIN(PlayerPersonality)
+enum class PlayerPersonality : i32 {
     PLAYER_PERSONALITY_WARRIOR        = 0,
     PLAYER_PERSONALITY_BUILDER        = 1,
     PLAYER_PERSONALITY_EXPLORER       = 2,
@@ -20,7 +20,8 @@ H2_ENUM_CLASS_BEGIN(PlayerPersonality)
     PLAYER_PERSONALITY_COMPUTER_FIRST = PLAYER_PERSONALITY_WARRIOR,
     PLAYER_PERSONALITY_COMPUTER_LAST  = PLAYER_PERSONALITY_EXPLORER,
     PLAYER_PERSONALITY_COUNT          = PLAYER_PERSONALITY_HUMAN + 1
-H2_ENUM_CLASS_END(PlayerPersonality)
+};
+using enum PlayerPersonality;
 
 #pragma pack(push, 1)
 struct playerAttentionWeights {
@@ -31,13 +32,12 @@ struct playerAttentionWeights {
     float upgradeBase;
     float heroValue;
 };
-SIZE(playerAttentionWeights, 0x18);
 
 class playerAIData {
 public:
     playerAttentionWeights m_attentionWeights;
     char m_unknown18[PLAYER_RUNTIME_TAIL_GAP_SIZE];
-    i32 m_income[IDX(RES_COUNT)];
+    i32 m_income[H2EnumIndex(RES_COUNT)];
     i32 m_obeliskValue;
     i32 m_totalObeliskValue;
     i32 m_unexploredValue;
@@ -45,7 +45,6 @@ public:
     float m_artifactValue;
     float m_artifactPoolShare;
 };
-SIZE(playerAIData, 0x68);
 
 class playerData {
 public:
@@ -66,8 +65,8 @@ public:
     i8 m_townCount;
     i8 m_currentTown;
     i8 m_townLocatorPage;
-    i8 m_townIds[IDX(GAME_TOWN_COUNT)];
-    i32 m_resources[IDX(RES_COUNT)];
+    i8 m_townIds[H2EnumIndex(GAME_TOWN_COUNT)];
+    i32 m_resources[H2EnumIndex(RES_COUNT)];
     i8 m_evilInterface;
     i8 m_barrierTents;
     char m_unknownad[PLAYER_BARRIER_STATE_SIZE];
@@ -104,6 +103,5 @@ public:
     }
 };
 #pragma pack(pop)
-SIZE(playerData, 0x11b);
 extern playerData* gpCurPlayer;
 #endif

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <va.h>
+#include <Ints.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/Misc.h>
@@ -21,7 +21,7 @@
 #include <SOURCE/Wsnetwin.h>
 #include <SOURCE/X_GLOBAL.h>
 
-H2_ENUM_BEGIN(RemoteImplementationConstant)
+typedef enum RemoteImplementationConstant {
     CRC_FEEDBACK_BIT                 = 0x08000000,
     LOCAL_NET_NAME_BUFFER_SIZE       = 64,
     NET_NAME_INPUT_LIMIT             = NET_PLAYER_INFO_NAME_SIZE - 1,
@@ -31,50 +31,49 @@ H2_ENUM_BEGIN(RemoteImplementationConstant)
     CRC_STORAGE_WORD_COUNT           = 2,
     GET_REMOTE_DATA_FREE_LINE_OFFSET = 25,
     POLL_REMOTE_ALLOC_LINE_OFFSET    = 235
-H2_ENUM_END(RemoteImplementationConstant)
+} RemoteImplementationConstant;
 
-H2_ENUM_CLASS_BEGIN(RemoteSetupCommand)
+enum class RemoteSetupCommand : i32 {
     SETUP_PLAYER_INFO   = 0x22,
     SETUP_STANDARD_GAME = 0x3d,
     SETUP_CAMPAIGN_GAME = 0x3e
-H2_ENUM_CLASS_END(RemoteSetupCommand)
+};
+using enum RemoteSetupCommand;
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
 
-DATA(0x00516f60) i32 iInOrderCtr = 0;
-DATA(0x00516f64) i32 iCurLastID = 0;
-DATA(0x00516f68) i32 giLastConfirm = -1;
-DATA(0x00516f6c) H2_ENUM_STORAGE(RemoteGameMode, u8) GameMode = REMOTE_GAME_NONE;
-DATA(0x00516f70) i32l lLastHeartbeatSend = 0;
-DATA(0x00516f74) b32 gbInRemoteMain = false;
-DATA(0x00516f78) b32 gbInRemoteCleanup = false;
-DATA(0x00516f7c) i32 iIDCtr = 0;
-DATA(0x00516f80) i32 iTimesDropped = 0;
-DATA(0x00516f84) b8 gbInNetSetup = false;
-DATA(0x00516f88) i32 bUseDirectPlay = 0;
-DATA(0x00516f8c) i32 bUseWinsock = 0;
-DATA(0x00516f90) i8 bInTimeoutFail = 0;
-DATA(0x00516f98) i32
+i32 iInOrderCtr = 0;
+i32 iCurLastID = 0;
+i32 giLastConfirm = -1;
+H2EnumStorage<RemoteGameMode, u8> GameMode = REMOTE_GAME_NONE;
+i32l lLastHeartbeatSend = 0;
+b32 gbInRemoteMain = false;
+b32 gbInRemoteCleanup = false;
+i32 iIDCtr = 0;
+i32 iTimesDropped = 0;
+b8 gbInNetSetup = false;
+i32 bUseDirectPlay = 0;
+i32 bUseWinsock = 0;
+i8 bInTimeoutFail = 0;
+i32
     iBaud[REMOTE_BAUD_RATE_COUNT] = {300, 1200, 2400, 9600, 19200, 38400, 57600, 0};
-DATA(0x00516fb8) i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
-DATA(0x00517118) static i16 gGetRemoteDataLineBase = 716; // NOLINT(readability-magic-numbers)
-DATA(0x00517148) static i16 gPollRemoteLineBase = 757; // NOLINT(readability-magic-numbers)
+i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
+static i16 gGetRemoteDataLineBase = 716;
+static i16 gPollRemoteLineBase = 757;
 
-VA(0x004a3080, 0x188)
 void RemoteCleanup(void) {
-    LogStr(DATA_COMPGEN(0x00516fd4, remoteCleanupRC1, "RC1"));
+    LogStr("RC1");
     if (gbRemoteOn == 0)
         return;
-    LogStr(DATA_COMPGEN(0x00516fd8, remoteCleanupRC2, "RC2"));
+    LogStr("RC2");
     if (gbInRemoteMain != 0)
         return;
     if (gbInRemoteCleanup != 0)
         return;
     gbInRemoteCleanup = true;
-    LogStr(DATA_COMPGEN(0x00516fdc, remoteCleanupRC3, "RC3"));
+    LogStr("RC3");
     switch (GameMode) {
         case REMOTE_GAME_NETWORK_HOST:
         case REMOTE_GAME_NETWORK_GUEST:
@@ -109,7 +108,6 @@ void RemoteCleanup(void) {
     gbInRemoteCleanup = false;
 }
 
-VA(0x004a3208, 0x6da)
 void RemoteMain(RemoteGameMode gameMode) {
     i8 receivedPlayers[REMOTE_PLAYER_COUNT];
     i32 playerState;
@@ -124,20 +122,20 @@ void RemoteMain(RemoteGameMode gameMode) {
 
     gbInRemoteMain = true;
     bGotGameType = 0;
-    LogStr(DATA_COMPGEN(0x00516fe0, remoteMainInRemoteMain, "In Remote Main"));
-    LogStr(DATA_COMPGEN(0x00516ff0, remoteMainRM1, "RM 1"));
+    LogStr("In Remote Main");
+    LogStr("RM 1");
     for (player = 0; player < REMOTE_PLAYER_COUNT; player++) {
         lLastHeartbeatReceive[player] = REMOTE_INITIAL_HEARTBEAT;
-        sprintf(gsNetPlayerInfo[player].name, DATA_COMPGEN(0x00516ff8, remoteMainPlayerD, "Player %d"), player + 1);
+        sprintf(gsNetPlayerInfo[player].name, "Player %d", player + 1);
     }
-    LogStr(DATA_COMPGEN(0x00517004, remoteMainRM2, "RM 2"));
+    LogStr("RM 2");
     gbRemoteGameOpen = true;
     if (bLastMouseOffscreen != 0)
         savedColorMice = bLastOnscreenMouseColor;
     else
         savedColorMice = gbColorMice;
     gpMouseManager->SetColorMice(0);
-    LogStr(DATA_COMPGEN(0x0051700c, remoteMainRM3, "RM 3"));
+    LogStr("RM 3");
     gbInNetSetup = true;
     if (iMPNetProtocol == REMOTE_PROTOCOL_DIRECT_PLAY)
         bUseDirectPlay = 1;
@@ -147,17 +145,17 @@ void RemoteMain(RemoteGameMode gameMode) {
         bUseWinsock = 0;
         bUseDirectPlay = bUseWinsock;
     }
-    LogStr(DATA_COMPGEN(0x00517014, remoteMainRM4, "RM 4"));
+    LogStr("RM 4");
     memset(sMapChangeQueue, 0, sizeof(sMapChangeQueue));
     for (player = 0; player < REMOTE_QUEUE_CAPACITY; player++)
         rcvBuf[player] = NULL;
-    LogStr(DATA_COMPGEN(0x0051701c, remoteMainRM5, "RM 5"));
+    LogStr("RM 5");
     memset(iLastIds, 0, REMOTE_RECENT_ID_COUNT);
     GameMode = gameMode;
-    LogStr(DATA_COMPGEN(0x00517024, remoteMainRM6, "RM 6"));
+    LogStr("RM 6");
     memset(gsNetPlayerInfo, 0, sizeof(gsNetPlayerInfo));
     memset(&gsThisNetPlayerInfo, 0, sizeof(gsThisNetPlayerInfo));
-    LogStr(DATA_COMPGEN(0x0051702c, remoteMainRM7, "RM 7"));
+    LogStr("RM 7");
     if (giTCPHostStatus != -1) {
         if (strlen(gcTCPName) != 0)
             strcpy(gsThisNetPlayerInfo.name, gcTCPName);
@@ -165,7 +163,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
     } else {
         GetDataEntry(
-            DATA_COMPGEN(0x00517034, remoteMainPleaseEnterAHandleByWhich, "Please enter a 'handle' by which you will be known."),
+            "Please enter a 'handle' by which you will be known.",
             gsThisNetPlayerInfo.name,
             NET_NAME_INPUT_LIMIT,
             gConfig.networkDefaultName,
@@ -202,17 +200,17 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
             break;
                     case REMOTE_GAME_MODEM_HOST:
-            LogStr(DATA_COMPGEN(0x00517068, remoteMainMH1, "MH1"));
+            LogStr("MH1");
             gbRemoteOn = true;
             gsNetPlayerInfo[0] = gsThisNetPlayerInfo;
             giThisNetPos = 0;
-            ModemSetup(IDX(gameMode));
-            LogStr(DATA_COMPGEN(0x0051706c, remoteMainMH2, "MH2"));
+            ModemSetup(H2EnumIndex(gameMode));
+            LogStr("MH2");
             break;
                     case REMOTE_GAME_MODEM_GUEST:
             gbRemoteOn = true;
             giThisNetPos = 1;
-            ModemSetup(IDX(gameMode));
+            ModemSetup(H2EnumIndex(gameMode));
             break;
     }
     if (bUseDirectPlay == 0 && bUseWinsock == 0)
@@ -222,15 +220,15 @@ void RemoteMain(RemoteGameMode gameMode) {
     gpMouseManager->SetColorMice(savedColorMice);
 
     if (bUseDirectPlay == 0 && bUseWinsock == 0) {
-        LogStr(DATA_COMPGEN(0x00517070, remoteMainRM22, "RM 2"));
+        LogStr("RM 2");
         if (giThisNetPos == 0) {
             waitingForPlayers = 1;
             memset(receivedPlayers, 0, REMOTE_PLAYER_COUNT);
             while (waitingForPlayers != 0) {
                 PollSound();
-                LogStr(DATA_COMPGEN(0x00517078, remoteMainRM32, "RM 3"));
+                LogStr("RM 3");
                 incomingData = GetRemoteData(1);
-                LogStr(DATA_COMPGEN(0x00517080, remoteMainRM42, "RM 4"));
+                LogStr("RM 4");
                 if (incomingData != NULL
                     && REMOTE_MESSAGE(incomingData)->type == REMOTE_MESSAGE_RELIABLE) {
                     switch (static_cast<RemoteSetupCommand>(REMOTE_MESSAGE(incomingData)->command)) {
@@ -251,17 +249,17 @@ void RemoteMain(RemoteGameMode gameMode) {
                 }
             }
         } else {
-            LogStr(DATA_COMPGEN(0x00517088, remoteMainRM52, "RM 5"));
+            LogStr("RM 5");
             TransmitRemoteData(
                 reinterpret_cast<char*>(&gsThisNetPlayerInfo),
                 0,
                 sizeof(SNetPlayerInfo),
-                IDX(SETUP_PLAYER_INFO),
+                H2EnumIndex(SETUP_PLAYER_INFO),
                 1,
                 1,
                 REMOTE_MESSAGE_DEFAULT
             );
-            LogStr(DATA_COMPGEN(0x00517090, remoteMainRM62, "RM 6"));
+            LogStr("RM 6");
         }
     }
     remoteGameType = NULL;
@@ -290,23 +288,22 @@ void RemoteMain(RemoteGameMode gameMode) {
             }
             if (remoteGameType != NULL
                 && REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_CAMPAIGN_GAME)) {
+                && REMOTE_MESSAGE(remoteGameType)->command == H2EnumIndex(SETUP_CAMPAIGN_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 1;
             }
             if (remoteGameType != NULL
                 && REMOTE_MESSAGE(remoteGameType)->type == REMOTE_MESSAGE_RELIABLE
-                && REMOTE_MESSAGE(remoteGameType)->command == IDX(SETUP_STANDARD_GAME)) {
+                && REMOTE_MESSAGE(remoteGameType)->command == H2EnumIndex(SETUP_STANDARD_GAME)) {
                 bGotGameType = 1;
                 giSetupGameType = 0;
             }
         }
     }
-    LogStr(DATA_COMPGEN(0x00517098, remoteMainOutRemoteMain, "Out Remote Main"));
+    LogStr("Out Remote Main");
     gbInRemoteMain = false;
 }
 
-VA(0x004a38e2, 0x85)
 void UnloadRemoteDriver(i16 networkDriver) {
     switch (networkDriver) {
         case 0:
@@ -323,7 +320,6 @@ void UnloadRemoteDriver(i16 networkDriver) {
     }
 }
 
-VA(0x004a3967, 0x8d)
 i32 calc_crc_long(u8* data, i32 length) {
     u32 shifted;
     u32 crc;
@@ -347,12 +343,10 @@ i32 calc_crc_long(u8* data, i32 length) {
     return crc;
 }
 
-VA(0x004a39f4, 0x2c)
 void calc_crc(u16* crc, u8* data, i32 length) {
     *crc = static_cast<u16>(calc_crc_long(data, length));
 }
 
-VA(0x004a3a20, 0x87)
 i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     u16 crc[CRC_STORAGE_WORD_COUNT];
 
@@ -368,7 +362,6 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
-VA(0x004a3aa7, 0x13a)
 i32 DecodePacket(u8* data, i32) {
     u16 receivedCRC4;
     i32 ignored;
@@ -379,7 +372,7 @@ i32 DecodePacket(u8* data, i32) {
     calculatedCRC0[0] = 0;
     if (REMOTE_PACKET(packet)->destination != giThisNetPos
         && REMOTE_PACKET(packet)->destination != REMOTE_BROADCAST_PLAYER) {
-        sprintf(errorText5, DATA_COMPGEN(0x005170a8, decodePacketNotMineD, "not mine %d\n"), REMOTE_PACKET(packet)->destination);
+        sprintf(errorText5, "not mine %d\n", REMOTE_PACKET(packet)->destination);
         LogStr(errorText5);
         return 0;
     }
@@ -390,7 +383,7 @@ i32 DecodePacket(u8* data, i32) {
     if (receivedCRC4 != calculatedCRC0[0]) {
         sprintf(
             errorText5,
-            DATA_COMPGEN(0x005170b8, decodePacketCRCCheckFailedCRC1D, "CRC Check Failed CRC 1 %d CRC 2 %d\n"),
+            "CRC Check Failed CRC 1 %d CRC 2 %d\n",
             receivedCRC4,
             calculatedCRC0[0]
         );
@@ -401,7 +394,6 @@ i32 DecodePacket(u8* data, i32) {
     return 1;
 }
 
-VA(0x004a3be1, 0x18e)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 sendStatus;
     i32 out;
@@ -432,7 +424,7 @@ i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
                     );
                     if (sendStatus != 0) {
                         LogInt(
-                            DATA_COMPGEN(0x005170dc, sendRemoteDataBadReturnOnSendData, "Bad return on Send Data"),
+                            "Bad return on Send Data",
                             destination,
                             sendStatus,
                             size,
@@ -457,7 +449,6 @@ finished:
     return out;
 }
 
-VA(0x004a3d6f, 0x158)
 i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 result;
     i32 receiveResult;
@@ -494,7 +485,6 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
-VA(0x004a3ec7, 0x21a)
 i32 TransmitRemoteData(
     char* data,
     i32 destination,
@@ -502,7 +492,7 @@ i32 TransmitRemoteData(
     i8 command,
     i8 reliable,
     i8 allowRetryDialog,
-    H2_ENUM_PARAM(RemoteMessageType, i8) messageType
+    RemoteMessageType messageType
 ) {
     i32 poll;
     i32 attempt0;
@@ -553,7 +543,7 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && attempt0 == REMOTE_RETRY_COUNT && result == 0) {
             NormalDialog(
-                DATA_COMPGEN(0x005170f4, transmitRemoteDataErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
+                "Error sending data.  Keep trying??",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -572,7 +562,6 @@ i32 TransmitRemoteData(
     return result;
 }
 
-VA(0x004a40e1, 0x10b)
 char* GetRemoteData(i8 remove) {
     i32 oldestOrder;
     i32 queueIndex;
@@ -591,9 +580,7 @@ char* GetRemoteData(i8 remove) {
     if (selected >= 0) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
-            H2_FREE_AT(
-                rcvBuf[selected], DATA_COMPGEN(0x0051711c, getRemoteDataSourceFile, RETAIL_FILE), gGetRemoteDataLineBase + GET_REMOTE_DATA_FREE_LINE_OFFSET
-            );
+            H2_FREE(rcvBuf[selected]);
             rcvBuf[selected] = NULL;
         }
         return rcvBufOut;
@@ -601,7 +588,6 @@ char* GetRemoteData(i8 remove) {
     return NULL;
 }
 
-VA(0x004a41ec, 0x6f4)
 void PollRemote(void) {
     i32 savedInPollSound;
     i32 queueCount;
@@ -667,8 +653,8 @@ void PollRemote(void) {
                         gbInPollSound = false;
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x0051714c, pollRemoteSSComputerIsNotResponding, "%s's computer is not responding.  Do you wish to keep waiting for a "
-                            "response?"),
+                            "%s's computer is not responding.  Do you wish to keep waiting for a "
+                            "response?",
                             gsNetPlayerInfo[queueIndex].name
                         );
                         NormalDialog(
@@ -698,15 +684,15 @@ void PollRemote(void) {
                     if (giThisNetPos == 1) {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x0051719c, pollRemoteSSComputerIsNotResponding2, "%s's computer is not responding.  Do you wish to keep waiting for a "
-                            "response?"),
+                            "%s's computer is not responding.  Do you wish to keep waiting for a "
+                            "response?",
                             gsNetPlayerInfo[0].name
                         );
                     } else {
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x005171ec, pollRemoteYourRemoteConnectionToTheOther, "Your remote connection to the other players appears to be broken.  Do "
-                            "you wish to keep waiting for a response?")
+                            "Your remote connection to the other players appears to be broken.  Do "
+                            "you wish to keep waiting for a response?"
                         );
                     }
                     NormalDialog(
@@ -722,11 +708,11 @@ void PollRemote(void) {
                         guestExit.eliminated = 0;
                         ReceiveRemotePlayerExit(guestExit);
                     } else {
-                        gpGame->SaveGame(DATA_COMPGEN(0x0051725c, pollRemotePLYREXIT, "PLYREXIT"), 1, 0);
+                        gpGame->SaveGame("PLYREXIT", 1, 0);
                         sprintf(
                             gText,
-                            DATA_COMPGEN(0x00517268, pollRemoteTheCurrentGameHasBeenSaved, "The current game has been saved as 'PLYREXIT'. Do you wish to keep "
-                            "playing with the computer filling in for the other humans?")
+                            "The current game has been saved as 'PLYREXIT'. Do you wish to keep "
+                            "playing with the computer filling in for the other humans?"
                         );
                         NormalDialog(
                             gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0
@@ -734,7 +720,7 @@ void PollRemote(void) {
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE)
                             DropDownToOnePlayer();
                         else
-                            ShutDown(DATA_COMPGEN(0x005172e8, pollRemoteEmptyString, ""));
+                            ShutDown("");
                     }
                     gbInPollSound = savedInPollSound;
                     bInTimeoutFail = 1;
@@ -796,9 +782,7 @@ void PollRemote(void) {
                 }
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
-                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC_AT(
-                    REMOTE_MESSAGE_SIZE, DATA_COMPGEN(0x005172ec, pollRemoteSourceFile, RETAIL_FILE), gPollRemoteLineBase + POLL_REMOTE_ALLOC_LINE_OFFSET
-                ));
+                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC(REMOTE_MESSAGE_SIZE));
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
                 queueCount++;
@@ -812,7 +796,6 @@ void PollRemote(void) {
     }
 }
 
-VA(0x004a48e0, 0x163)
 i32 TransmitAndWait(
     char* data,
     i32 destination,
@@ -846,7 +829,7 @@ i32 TransmitAndWait(
     while (complete == 0) {
         if (ticks + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                DATA_COMPGEN(0x00517318, transmitAndWaitErrorSendingDataKeepTrying, "Error sending data.  Keep trying??"),
+                "Error sending data.  Keep trying??",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -879,20 +862,18 @@ transmitComplete:
     return result;
 }
 
-DATA(0x0052a268) char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x0052a378) i32 iLastIds[REMOTE_RECENT_ID_COUNT];
-DATA(0x0052a3f0) char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
-DATA(0x0052a4fc) char gbUseDiffCompression;
-DATA(0x0052a500) char gbUseRegularCompression;
-DATA(0x0052a508) i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
-DATA(0x0052a730) char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x0052a840) char gcThisNetName[REMOTE_NET_NAME_SIZE];
-DATA(0x0052a860) i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
-DATA(0x0052a878) char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x0052a988) SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
-DATA(0x0052aa58) char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
-DATA(0x0052ab68) char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
-DATA(0x0052ad90) i32 bGotGameType;
-DATA(0x0052ad98) SNetPlayerInfo gsThisNetPlayerInfo;
-
-#undef RETAIL_FILE
+char rcvBufOut[REMOTE_TRANSPORT_BUFFER_SIZE];
+i32 iLastIds[REMOTE_RECENT_ID_COUNT];
+char PacketSend[REMOTE_ENCODED_BUFFER_SIZE];
+char gbUseDiffCompression;
+char gbUseRegularCompression;
+i32 iInOrder[REMOTE_QUEUE_STORAGE_COUNT];
+char sndBuf[REMOTE_TRANSPORT_BUFFER_SIZE];
+char gcThisNetName[REMOTE_NET_NAME_SIZE];
+i32l lLastHeartbeatReceive[REMOTE_PLAYER_COUNT];
+char packet[REMOTE_TRANSPORT_BUFFER_SIZE];
+SNetPlayerInfo gsNetPlayerInfo[REMOTE_PLAYER_COUNT];
+char rcvBufIn[REMOTE_TRANSPORT_BUFFER_SIZE];
+char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
+i32 bGotGameType;
+SNetPlayerInfo gsThisNetPlayerInfo;

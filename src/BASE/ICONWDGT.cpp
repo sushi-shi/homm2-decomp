@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/iconWidget.h>
 #include <BASE/widgetKind.h>
 #include <BASE/icon.h>
@@ -7,14 +7,13 @@
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
 
-H2_ENUM_BEGIN(IconWidgetConstant)
+typedef enum IconWidgetConstant {
     RESOURCE_NAME_CAPACITY = 16,
     COLOR_INDEX_MASK       = 0xff,
     CENTER_SHIFT           = 1,
     BOTTOM_PADDING         = 2
-H2_ENUM_END(IconWidgetConstant)
+} IconWidgetConstant;
 
-VA(0x004d0a60, 0x2d)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_frame = 0;
     m_fillColor = 0;
@@ -23,8 +22,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_iconId = 0;
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
-VA(0x004d0ad0, 0x6a)
+
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -32,9 +30,9 @@ iconWidget::iconWidget(
     i16 height,
     u32l iconId,
     i16 frame,
-    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+    IconDrawOrientation orientation,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -46,7 +44,6 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
-VA(0x004d0b40, 0x78)
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -54,9 +51,9 @@ iconWidget::iconWidget(
     i16 height,
     char* iconName,
     i16 frame,
-    H2_ENUM_PARAM(IconDrawOrientation, i8) orientation,
+    IconDrawOrientation orientation,
     i16 id,
-    H2_ENUM_PARAM(WidgetKind, i16) kind,
+    WidgetKind kind,
     i16 fillColor
 )
     : widget(x, y, width, height, id, kind) {
@@ -68,7 +65,6 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
-VA(0x004d0bc0, 0xdf)
 void iconWidget::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -87,20 +83,18 @@ void iconWidget::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
-VA(0x004d0ca0, 0x21)
 inline iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// Preserve the original statement stream while consolidating forwarded widget identity.
+
 #define SET_WIDGET_MESSAGE_TYPE_AND_ID(messageValue, idValue)                                    \
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
-VA(0x004d0cd0, 0x291)
 MessageDispatchResult iconWidget::Main(tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_ENABLED)
+    H2EnumStorage<WidgetFlag, i16> flags = m_flags;
+    if (!(H2EnumIndex((flags) & (WIDGET_FLAG_ENABLED)))
         && (msg.type != MESSAGE_WIDGET
             || msg.payload.widget.command != WIDGET_COMMAND_REPLACE_ICON)) {
         if (msg.type == MESSAGE_WIDGET)
@@ -134,7 +128,7 @@ MessageDispatchResult iconWidget::Main(tag_message& msg) {
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(flags, WIDGET_FLAG_SELECTED)) {
+            if ((H2EnumIndex((flags) & (WIDGET_FLAG_SELECTED)))) {
                 m_flags = flags & ~WIDGET_FLAG_SELECTED;
                 msg.payload.widget.command = WIDGET_COMMAND_DESELECT;
                 SET_WIDGET_MESSAGE_TYPE_AND_ID(msg, m_id);
@@ -189,7 +183,6 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE_TYPE_AND_ID
 
-VA(0x004d0f70, 0xe5)
 void iconWidget::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = static_cast<i16>(window->m_posY);
@@ -224,6 +217,3 @@ void iconWidget::Draw(void) {
             return;
     }
 }
-
-
-VTBL(iconWidget, 0x004eba40);

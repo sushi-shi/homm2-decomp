@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_SAMPLE_H
 #define HOMM2_BASE_SAMPLE_H
 
-#include <va.h>
+#include <Ints.h>
 #include <BASE/resource.h>
 #include <BASE/sampleData.h>
 
@@ -10,8 +10,7 @@ class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
     sample(char*, i32l, i32l, i32l);
-    __declspec(dllexport) virtual inline ~sample() OVERRIDE;
+    virtual inline ~sample() override;
 };
 #pragma pack(pop)
-SIZE(sample, 0x30);
 #endif

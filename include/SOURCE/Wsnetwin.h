@@ -1,22 +1,22 @@
 #ifndef HOMM2_WSNETWIN_H
 #define HOMM2_WSNETWIN_H
 
-#include <va.h>
+#include <Ints.h>
 #include <SOURCE/GAME.h>
 #include <winsock.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
-H2_ENUM_BEGIN(WinsockTransportConstant)
+typedef enum WinsockTransportConstant {
     WS_TRANSPORT_BUFFER_COUNT       = 200,
     WS_TRANSPORT_BUFFER_SIZE        = 0x100,
     WS_TRANSPORT_BROADCAST_POSITION = 0x7f,
-    WS_TRANSPORT_PLAYER_COUNT       = IDX(GAME_PLAYER_COUNT),
+    WS_TRANSPORT_PLAYER_COUNT       = H2EnumIndex(GAME_PLAYER_COUNT),
     WS_TRANSPORT_PORT               = 2000,
     WS_TRANSPORT_SEND_RETRY_DELAY   = 300,
     WS_TRANSPORT_HOST_RETRY_DELAY   = 3000,
     WS_TRANSPORT_HOST_RETRY_LIMIT   = 15,
     WS_TRANSPORT_ADDRESS_SIZE       = 16
-H2_ENUM_END(WinsockTransportConstant)
+} WinsockTransportConstant;
 
 #pragma pack(push, 1)
 struct WinsockStartupMessage {
@@ -25,11 +25,10 @@ struct WinsockStartupMessage {
     i32 playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
 };
 #pragma pack(pop)
-SIZE(WinsockStartupMessage, 0x1a);
 
 i16 wsnet_init(void);
 void wsnet_term(void);
-void wsSendMessage(i32, H2_ENUM_PARAM(NetworkPacketType, u8), u16, void*);
+void wsSendMessage(i32, NetworkPacketType, u16, void*);
 i32 wsnet_snd(i32, i32, void*);
 i16 wsnet_rcv(i16, u16, void*);
 void wsProcessMessages(void);

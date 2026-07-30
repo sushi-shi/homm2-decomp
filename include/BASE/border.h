@@ -1,7 +1,7 @@
 #ifndef HOMM2_BASE_BORDER_H
 #define HOMM2_BASE_BORDER_H
 
-#include <va.h>
+#include <Ints.h>
 #include "widget.h"
 
 class bitmap;
@@ -21,15 +21,14 @@ public:
         i16,
         i16,
         i16,
-        H2_ENUM_PARAM(WidgetKind, i16),
+        WidgetKind,
         i16,
         char*
     );
-    __declspec(dllexport) virtual inline ~border() OVERRIDE;
-    virtual void Draw(void) OVERRIDE;
-    virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
+    virtual inline ~border() override;
+    virtual void Draw(void) override;
+    virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);
 };
 #pragma pack(pop)
-SIZE(border, 0x2a);
 #endif

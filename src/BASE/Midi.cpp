@@ -1,4 +1,4 @@
-#include <va.h>
+#include <Ints.h>
 #include <BASE/soundManager.h>
 #include <mss.h>
 #include <SOURCE/KB.h>
@@ -9,32 +9,31 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
-H2_ENUM_BEGIN(MidiSequenceStatus)
+typedef enum MidiSequenceStatus {
     SEQUENCE_PLAYING = 4
-H2_ENUM_END(MidiSequenceStatus)
+} MidiSequenceStatus;
 
-H2_ENUM_BEGIN(MidiVolumeConstant)
+typedef enum MidiVolumeConstant {
     VOLUME_HIGH_RANGE = 6,
     VOLUME_FADE_SPLIT = 10,
     VOLUME_LOW_RANGE  = 11,
     MAX_VOLUME        = 127
-H2_ENUM_END(MidiVolumeConstant)
+} MidiVolumeConstant;
 
-H2_ENUM_BEGIN(MidiConstant)
+typedef enum MidiConstant {
     MIDI_FILENAME_CAPACITY = 16
-H2_ENUM_END(MidiConstant)
+} MidiConstant;
 
-DATA(0x0051fec8) struct _MDI_DRIVER* hMDI = NULL;
-DATA(0x0051fecc) i32 CurrentMidiFile = MIDI_NO_TRACK;
-DATA(0x0051fed0) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
+struct _MDI_DRIVER* hMDI = NULL;
+i32 CurrentMidiFile = MIDI_NO_TRACK;
+u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                                   1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-DATA(0x0051ff0c) i32l lLastMIDIPollTickCount = 0;
-DATA(0x0051ff10) static SMidiText gMidiText =
+i32l lLastMIDIPollTickCount = 0;
+static SMidiText gMidiText =
     {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
 
-VA(0x004d3850, 0xb8)
 void soundManager::MIDIStartup(void) {
     i32 i;
     LogStr(gMidiText.startupBegin);
@@ -54,7 +53,6 @@ void soundManager::MIDIStartup(void) {
     }
 }
 
-VA(0x004d3910, 0x1a9)
 void soundManager::MIDIShutdown(void) {
     i32 i;
     if (gbNoSound == 0 && m_midiReady != 0) {
@@ -78,7 +76,6 @@ void soundManager::MIDIShutdown(void) {
     }
 }
 
-VA(0x004d3ac0, 0x3ab)
 void soundManager::MIDIPlay(i32 midiTrack) {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED) {
         LogStr(gMidiText.playBegin);
@@ -115,7 +112,6 @@ void soundManager::MIDIPlay(i32 midiTrack) {
     }
 }
 
-VA(0x004d3e70, 0x108)
 inline void soundManager::MIDIStop(void) {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
         if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
@@ -133,7 +129,6 @@ inline void soundManager::MIDIStop(void) {
     }
 }
 
-VA(0x004d3f80, 0x46)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
@@ -142,7 +137,6 @@ inline i32 soundManager::MIDIIsPlaying(void) {
     return 0;
 }
 
-VA(0x004d3fd0, 0x68)
 inline void soundManager::MIDISetVolume(void) {
     if (gbNoSound == 0 && m_midiReady != 0) {
         i32 volume = MAX_VOLUME;
@@ -158,8 +152,7 @@ inline void soundManager::MIDISetVolume(void) {
     }
 }
 
-VA(0x004d4040, 0x1)
 void soundManager::MIDIPoll(void) {}
 
-DATA(0x00534cf0) class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
-DATA(0x00534de0) struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
+class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
+struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
