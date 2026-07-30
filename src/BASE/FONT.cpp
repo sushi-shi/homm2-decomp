@@ -51,7 +51,7 @@ i32 RemapCyrillicCharacter(i32 character) {
 }
 
 void font::DrawStringExecute(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     FontDrawMode mode,
@@ -156,7 +156,7 @@ void font::DrawStringExecute(
     }
 }
 
-void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
+void font::DrawString(const char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
@@ -199,7 +199,7 @@ static inline bool IsHyphen(u8 c) {
 }
 
 void font::ExtractLine(
-    char* text,
+    const char* text,
     char* line,
     i32* position,
     i32 maxWidth,
@@ -313,7 +313,7 @@ void font::ExtractLine(
 }
 
 void font::DrawBoundedString(
-    char* str,
+    const char* str,
     i32 x,
     i32 y,
     i32 w,
@@ -370,7 +370,7 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
-i32 font::LineLength(char* str, i32 maxW) {
+i32 font::LineLength(const char* str, i32 maxW) {
 
 
     i32 len = strlen(str);
@@ -391,10 +391,10 @@ i32 font::LineLength(char* str, i32 maxW) {
     return count;
 }
 
-i32 font::LineWidth(char* str) {
+i32 font::LineWidth(const char* str) {
     i32 s = strlen(str);
     i32 idx = 0, w = 0;
-    char* p = str;
+    const char* p = str;
     while (idx < s && p[idx] != 0) {
         while (p[idx] != 0 && p[idx] != '\n') {
             w += GetCharacterWidth(p[idx]);
