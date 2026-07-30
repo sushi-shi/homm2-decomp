@@ -514,10 +514,10 @@ void SetGameDefaults(void) {
             gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
         }
     }
-    gConfig.showCombatGrid = 0;
-    gConfig.showCombatMouseHex = 0;
-    gConfig.combatShadeLevel = 0;
-    gConfig.combatArmyInfoLevel = 0;
+    gConfig.showCombatGrid = 1;
+    gConfig.showCombatMouseHex = 1;
+    gConfig.combatShadeLevel = 1;
+    gConfig.combatArmyInfoLevel = 2;
     gConfig.evilInterfaceUsage = 0;
     gConfig.useOpera = CONFIG_OPERA_ENABLED;
     gConfig.quickCombatLevel = 0;
