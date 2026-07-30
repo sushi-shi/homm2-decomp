@@ -345,8 +345,45 @@ unsigned TranslateModifiers(SDL_Keymod mod) {
 }
 
 SDL_Scancode LogicalScanCode(const SDL_KeyboardEvent& event) {
-    const SDL_Scancode code = SDL_GetScancodeFromKey(event.key, nullptr);
-    return code != SDL_SCANCODE_UNKNOWN ? code : event.scancode;
+    switch (event.key) {
+    case SDLK_ESCAPE: return SDL_SCANCODE_ESCAPE;
+    case SDLK_RETURN: return SDL_SCANCODE_RETURN;
+    case SDLK_SPACE: return SDL_SCANCODE_SPACE;
+    case SDLK_TAB: return SDL_SCANCODE_TAB;
+    case SDLK_BACKSPACE: return SDL_SCANCODE_BACKSPACE;
+    case SDLK_DELETE: return SDL_SCANCODE_DELETE;
+    case SDLK_MINUS: return SDL_SCANCODE_MINUS;
+    case SDLK_EQUALS: return SDL_SCANCODE_EQUALS;
+    case SDLK_LEFTBRACKET: return SDL_SCANCODE_LEFTBRACKET;
+    case SDLK_RIGHTBRACKET: return SDL_SCANCODE_RIGHTBRACKET;
+    case SDLK_SEMICOLON: return SDL_SCANCODE_SEMICOLON;
+    case SDLK_APOSTROPHE: return SDL_SCANCODE_APOSTROPHE;
+    case SDLK_GRAVE: return SDL_SCANCODE_GRAVE;
+    case SDLK_BACKSLASH: return SDL_SCANCODE_BACKSLASH;
+    case SDLK_COMMA: return SDL_SCANCODE_COMMA;
+    case SDLK_PERIOD: return SDL_SCANCODE_PERIOD;
+    case SDLK_SLASH: return SDL_SCANCODE_SLASH;
+    default: break;
+    }
+    if (event.key >= SDLK_A && event.key <= SDLK_Z) {
+        return static_cast<SDL_Scancode>(
+            SDL_SCANCODE_A + (event.key - SDLK_A)
+        );
+    }
+    if (event.key >= SDLK_1 && event.key <= SDLK_9) {
+        return static_cast<SDL_Scancode>(
+            SDL_SCANCODE_1 + (event.key - SDLK_1)
+        );
+    }
+    if (event.key == SDLK_0) {
+        return SDL_SCANCODE_0;
+    }
+    if ((event.key & SDLK_SCANCODE_MASK) != 0) {
+        return static_cast<SDL_Scancode>(
+            event.key & ~(SDLK_SCANCODE_MASK | SDLK_EXTENDED_MASK)
+        );
+    }
+    return event.scancode;
 }
 
 class Sdl3Host;
