@@ -2,10 +2,12 @@
 #define HOMM2_PLATFORM_RUNTIME_H
 
 #include <Ints.h>
+#include <PLATFORM/Input.h>
 
 namespace platform {
 
 using MenuHandle = void*;
+using EventHandler = void (*)(const Event&);
 
 enum class SystemMenuCommand : i32 {
     Size640x480 = 0x9c45,
@@ -18,6 +20,7 @@ enum class SystemMenuCommand : i32 {
 };
 
 i32l Ticks();
+void SetEventHandler(EventHandler handler);
 void PumpEvents();
 MenuHandle LoadMenu(const char* name);
 void DestroyMenu(MenuHandle menu);
