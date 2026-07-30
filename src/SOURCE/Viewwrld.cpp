@@ -200,13 +200,13 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     iVWXPixelOffset = (WORLD_WINDOW_X - H2EnumIndex(giViewWorldScale) * H2EnumIndex(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
     gpMouseManager->SetPointer("advmice.mse", WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
-    sprintf(gText, "ground%d.icn", giViewWorldScale);
+    sprintf(gText, "ground%d.icn", H2EnumIndex(giViewWorldScale));
     pVWGround = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "vwflag%d.icn", giViewWorldScale);
+    sprintf(gText, "vwflag%d.icn", H2EnumIndex(giViewWorldScale));
     pVWFlags = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "misc%d.icn", giViewWorldScale);
+    sprintf(gText, "misc%d.icn", H2EnumIndex(giViewWorldScale));
     pVWMisc = gpResourceManager->GetIcon(gText);
-    sprintf(gText, "letter%d.icn", giViewWorldScale);
+    sprintf(gText, "letter%d.icn", H2EnumIndex(giViewWorldScale));
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
 }

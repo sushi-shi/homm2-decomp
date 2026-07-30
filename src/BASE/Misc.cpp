@@ -89,18 +89,6 @@ enum class MiscGraphicsFieldIndex : i32 {
 };
 using enum MiscGraphicsFieldIndex;
 
-typedef enum MiscCDDriveConstant {
-    CD_FIRST_DRIVE_INDEX        = 2,
-    CD_DRIVE_SLOT_COUNT         = 26,
-    CD_PATH_PREFIX_BYTES        = 2,
-    CD_PATH_BUFFER_SIZE         = 100,
-    CD_MCI_BUFFER_SIZE          = 256,
-    CD_MCI_RESULT_LENGTH        = 0xFF,
-    CD_PROBE_TRAILER_SIZE       = 100,
-    CD_RETRY_DELAY_MILLISECONDS = 3000,
-    CD_RETRY_LIMIT              = 2
-} MiscCDDriveConstant;
-
 typedef enum PCXConstant {
     MANUFACTURER_ZSOFT    = 10,
     VERSION_3_0           = 5,
@@ -1700,114 +1688,21 @@ void WritePrefs(void) {
     WritePrefsToRegistry();
 }
 
-i32 IsCDDrive(i32 driveIndex) {
-    sprintf(gText, gMiscText.cd.rootDrive.text);
-    gText[0] = gText[0] + driveIndex;
-    return GetDriveTypeA(gText) == DRIVE_CDROM;
-}
-
 CDRomSetupResult SetupCDDrive(void) {
-    char registryPath[CD_PATH_BUFFER_SIZE];
-    char registryKey[CD_PATH_BUFFER_SIZE];
-    char cdDrives[CD_DRIVE_SLOT_COUNT];
-    char count;
-    i32 attempts;
-    HKEY key;
-
     sprintf(gText, gMiscText.cd.dataArchive.text);
     i32 file = open(gText, _O_BINARY);
-    if (file == -1) {
-        if (_chdir(gcRegAppPath) == -1)
-            return CD_ROM_GAME_DIRECTORY_MISSING;
-        file = open(gText, _O_BINARY);
-        if (file == -1)
-            return CD_ROM_DATA_FILES_MISSING;
-    }
+    if (file == -1)
+        return CD_ROM_DATA_FILES_MISSING;
     close(file);
 
-    u32l logicalDrives = GetLogicalDrives();
-    i32 cdDriveCount = 0;
-    memset(cdDrives, 0, sizeof(cdDrives));
-    for (i32 drive = CD_FIRST_DRIVE_INDEX; drive < CD_DRIVE_SLOT_COUNT; ++drive) {
-        if (logicalDrives & (1 << drive)) {
-            sprintf(gText, gMiscText.cd.rootDrive.text);
-            gText[0] += static_cast<char>(drive);
-            if (GetDriveTypeA(gText) == DRIVE_CDROM) {
-                ++cdDriveCount;
-                cdDrives[cdDriveCount - 1] = static_cast<char>(drive);
-            }
-        }
-    }
-    count = static_cast<char>(cdDriveCount);
+    sprintf(gText, gMiscText.cd.configuredAnimationPath.text, ".");
+    file = open(gText, _O_BINARY);
+    if (file == -1)
+        return CD_ROM_DATA_FILES_MISSING;
+    close(file);
 
-    if (strlen(gcRegCDRomPath) != 0) {
-        sprintf(gText, gMiscText.cd.configuredAnimationPath.text, gcRegCDRomPath);
-        file = open(gText, _O_BINARY);
-        if (file != -1) {
-            close(file);
-            sprintf(gText + CD_PATH_PREFIX_BYTES, gMiscText.cd.stringFormat.text, gcAnimPath);
-            strcpy(gcAnimPath, gText);
-            return CD_ROM_READY;
-        }
-    }
-
-    typedef i32 (__cdecl *CDFormatCommand)(char*, const char*, ...);
-    CDFormatCommand formatCommand = wsprintfA;
-    attempts = 0;
-    {
-        char resultBuffer[CD_MCI_BUFFER_SIZE];
-        char command[CD_MCI_BUFFER_SIZE];
-        for (;;) {
-            for (i32 index = 0; index < count; ++index) {
-                formatCommand(command, gMiscText.cd.openAudioCommand.text, cdDrives[index] + 'A');
-                if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL) == 0) {
-                    formatCommand(command, gMiscText.cd.audioInfoCommand.text);
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
-                    formatCommand(command, gMiscText.cd.closeAudioCommand.text);
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
-                }
-                sprintf(gText, gMiscText.cd.driveAnimationPath.text, cdDrives[index] + 'A');
-                file = open(gText, _O_BINARY);
-                if (file != -1) {
-                    if (lseek(file, 0, SEEK_END) != -1
-                        && lseek(file, -CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
-                        read(file, resultBuffer, CD_PROBE_TRAILER_SIZE);
-                    close(file);
-
-                    strcpy(registryKey, gMiscText.cd.registryKey.text);
-                    key = NULL;
-                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
-                        wsprintfA(
-                            registryPath,
-                            gMiscText.cd.driveFormat.text,
-                            cdDrives[index] + 'A'
-                        );
-                        RegSetValueExA(
-                            key,
-                            gMiscText.cd.cdDrive.text,
-                            0,
-                            REG_SZ,
-                            reinterpret_cast<u8*>(registryPath),
-                            lstrlenA(registryPath) + 1
-                        );
-                        RegCloseKey(key);
-                    }
-                    sprintf(
-                        gText,
-                        gMiscText.cd.driveAndPathFormat.text,
-                        cdDrives[index] + 'A',
-                        gcAnimPath
-                    );
-                    strcpy(gcAnimPath, gText);
-                    return CD_ROM_READY;
-                }
-            }
-            Sleep(CD_RETRY_DELAY_MILLISECONDS);
-            ++attempts;
-            if (attempts >= CD_RETRY_LIMIT)
-                return CD_ROM_EXPANSION_DISC_MISSING;
-        }
-    }
+    strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
+    return CD_ROM_READY;
 }
 
 void BitmapToScreen(class bitmap* bmp) {

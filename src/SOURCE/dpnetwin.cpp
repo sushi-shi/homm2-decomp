@@ -417,7 +417,7 @@ i32 dpWaitForHost(void) {
     i32 playResult;
     char statusString[STATUS_TEXT_SIZE];
 
-    sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
+    sprintf(statusString, "WFHS %d", H2EnumIndex(iDPWaitForHostStatus));
     AiPrint(statusString);
     switch (iDPWaitForHostStatus) {
         case HOST_ENUMERATE_SESSIONS:

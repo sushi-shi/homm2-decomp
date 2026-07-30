@@ -5229,7 +5229,7 @@ quick_info_ready:
             gText,
             "gi%d obtile%d obi%d ot%d ei%d bl%d %s X%d Y%d",
             currentCell->m_terrainImageIndex,
-            currentCell->m_objectTileset,
+            static_cast<i32>(currentCell->m_objectTileset),
             currentCell->m_objectIndex,
             H2EnumIndex(currentCell->m_triggerType),
             currentCell->m_objectMetadata,

@@ -940,7 +940,7 @@ void combatManager::CastSpell(
             sprintf(
                 gText,
                 "The cold ray does %d\n damage to the %s.",
-                damage_m,
+                static_cast<i32>(damage_m),
                 coldRayArmyName_f
             );
             CombatMessage(gText, 1, 1, 0);
@@ -971,7 +971,7 @@ void combatManager::CastSpell(
             sprintf(
                 gText,
                 "The magic arrow does %d\n damage to the %s.",
-                damage_m,
+                static_cast<i32>(damage_m),
                 magicArrowArmyName_n
             );
             CombatMessage(gText, 1, 1, 0);
@@ -1019,7 +1019,7 @@ void combatManager::CastSpell(
             sprintf(
                 gText,
                 "The lightning bolt does %d\n damage to the %s.",
-                damage_m,
+                static_cast<i32>(damage_m),
                 lightningArmyName_d
             );
             CombatMessage(gText, 1, 1, 0);
@@ -1447,9 +1447,17 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[H2EnumIndex(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "The cold ring does %d damage.", baseDamage_w);
+            sprintf(
+                gText,
+                "The cold ring does %d damage.",
+                static_cast<i32>(baseDamage_w)
+            );
         else
-            sprintf(gText, "The fireball does %d damage.", baseDamage_w);
+            sprintf(
+                gText,
+                "The fireball does %d damage.",
+                static_cast<i32>(baseDamage_w)
+            );
         CombatMessage(gText, 1, 1, 0);
         target_n->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }

@@ -1535,7 +1535,7 @@ void philAI::GetTurnAIVars(i32 player) {
             townPtr9 = GetCastleSlot(gpCurPlayer->m_townIds[firstWeekIndex0]);
             for (innerIndex27 = 0; innerIndex27 < GAME_HERO_COUNT; innerIndex27++) {
                 heroPtr5 = &gpGame->m_heroRecs[innerIndex27];
-                if (heroPtr5->m_owner >= 0 && heroPtr5->m_owner <= 6)
+                if (heroPtr5->m_owner >= 0 && heroPtr5->m_owner <= 6) {
                     if (heroPtr5->m_owner == giCurPlayer) {
                     } else if (abs(heroPtr5->m_y - townPtr9->m_y)
                                    + abs(heroPtr5->m_x - townPtr9->m_x)
@@ -1543,6 +1543,7 @@ void philAI::GetTurnAIVars(i32 player) {
                         fFirstWeekTownFV = 0.3f;
                         goto firstWeekDone;
                     }
+                }
             }
         }
     }
@@ -2647,7 +2648,7 @@ void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
                 if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                     sprintf(
                         gText,
-                        "Town:%2d  Building: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
+                        "Town:%2d  Building: %18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                         t->m_id,
                         GetBuildingName(t->m_type, node),
                         idx,
@@ -2836,7 +2837,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                     if (giDebugLevel >= AI_PURCHASE_VALUE_DEBUG_LEVEL) {
                         sprintf(
                             gText,
-                            "Town:%2d  Creature: % 18s   Raw BC = %8.2f,  RandBC = %8.2f.",
+                            "Town:%2d  Creature: %18s   Raw BC = %8.2f,  RandBC = %8.2f.",
                             townPtr->m_id,
                             GetMonsterName(candidateMonster),
                             unrandomizedValue,
@@ -3252,7 +3253,7 @@ i32 philAI::RVOfPosition(
             objectName5 = gQuickViewText[H2EnumIndex(debugObjectType)];
         else
             objectName5 = " ";
-        sprintf(debugText1, "FUN U :% 15s", objectName5);
+        sprintf(debugText1, "FUN U :%15s", objectName5);
         LogInt(
             debugText1,
             x,
@@ -5958,7 +5959,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
                     gText,
                     "AI encountered object type %d and doesn't know how to deal with it.   Tell "
                     "Phil",
-                    cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK
+                    H2EnumIndex(cell_k->m_triggerType & MAP_TRIGGER_TYPE_MASK)
                 );
                 NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
                 value_h = 0;

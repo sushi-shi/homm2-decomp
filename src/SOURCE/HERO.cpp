@@ -843,7 +843,9 @@ void hero::CheckLevel(void) {
                             }
                         }
                         skillIndexValue =
-                            HeroSecondarySkill((H2EnumIndex(skillIndexValue) + 1) % H2EnumIndex(HERO_SKILL_COUNT));
+                            HeroSecondarySkill(
+                                (H2EnumIndex(skillIndexValue) + 1) % H2EnumIndex(HERO_SKILL_COUNT)
+                            );
                     }
                 nextAttempt:
                     attempts--;

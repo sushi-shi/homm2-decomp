@@ -107,7 +107,12 @@ i32 CDTest_GenerateTable(char* file) {
 
     for (trackNumber = 1; trackNumber <= count; ++trackNumber) {
         AIL_redbook_track_info(cdTestRedbook, trackNumber, &first, &finish);
-        sprintf(line, "  {%d, %d}", first, finish);
+        sprintf(
+            line,
+            "  {%d, %d}",
+            static_cast<i32>(first),
+            static_cast<i32>(finish)
+        );
         write(fileHandle, line, strlen(line));
         if (trackNumber != count) {
             sprintf(line, ",");

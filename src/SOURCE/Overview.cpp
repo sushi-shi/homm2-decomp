@@ -615,7 +615,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     }
 
                     if ((record->m_buildings
-                         & (1 << (detailIndex6 + TOWN_DWELLING_BUILDING_BIT_BASE)))
+                         & (1 << (H2EnumIndex(detailIndex6) + TOWN_DWELLING_BUILDING_BIT_BASE)))
                         != 0) {
                         OVERVIEW_ICON_WIDGET_ROWS[row][iconCount] = new iconWidget(
                             static_cast<i16>(

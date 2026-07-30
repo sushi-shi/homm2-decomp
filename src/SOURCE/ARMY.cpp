@@ -1497,7 +1497,7 @@ void army::DoAttack(i32 retaliation) {
         if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_BREATH_ATTACK)))) {
             breathHex_1 = GetAdjacentCellIndex(targetHex_3, m_attackDirection);
             if (ValidHex(breathHex_1)
-                && gpCombatManager->m_hexCells[breathHex_1].m_occupantSide >= 0
+                && H2EnumIndex(gpCombatManager->m_hexCells[breathHex_1].m_occupantSide) >= 0
                 && gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex >= 0
                 && (gpCombatManager->m_hexCells[breathHex_1].m_occupantSide != target_1->m_side
                     || gpCombatManager->m_hexCells[breathHex_1].m_occupantIndex

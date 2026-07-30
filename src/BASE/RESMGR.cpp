@@ -336,8 +336,8 @@ void resourceManager::PointToFile(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
-            m_lastFileId,
+            static_cast<i32>(fileId),
+            static_cast<i32>(m_lastFileId),
             m_lastFileName
         );
         ShutDown(gText);
@@ -370,8 +370,8 @@ u32l resourceManager::GetFileSize(u32l fileId) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
-            fileId,
-            m_lastFileId,
+            static_cast<i32>(fileId),
+            static_cast<i32>(m_lastFileId),
             m_lastFileName
         );
         ShutDown(gText);
@@ -458,7 +458,7 @@ void resourceManager::ReadBlock(i8* destination, u32l size) {
             gText,
             "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
             bytesRead,
-            size,
+            static_cast<i32>(size),
             errno,
             m_lastFileName
         );

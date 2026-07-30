@@ -293,7 +293,9 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[m_hex].m_occupantSide = COMBAT_SIDE_NONE;
     gpCombatManager->m_hexCells[m_hex].m_occupantFrame = ARMY_FACING_NONE;
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
-        sourceRearHex = (static_cast<u32>(m_facing) < static_cast<u32>(ARMY_FACING_RIGHT) ? -1 : 1) + m_hex;
+        sourceRearHex =
+            (static_cast<u32>(m_facing) < H2EnumIndex(ARMY_FACING_RIGHT) ? -1 : 1)
+            + m_hex;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantIndex = -1;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantSide = COMBAT_SIDE_NONE;
         gpCombatManager->m_hexCells[sourceRearHex].m_occupantFrame = ARMY_FACING_NONE;
@@ -449,7 +451,8 @@ i32 army::FlyTo(i32 destination) {
     gpCombatManager->m_hexCells[destination].m_occupantFrame = ARMY_FACING_NONE;
     if ((H2EnumIndex((m_monster.flags.all) & (MONSTER_FLAGS_WIDE)))) {
         endRearHex =
-            (static_cast<u32>(m_facing) < static_cast<u32>(ARMY_FACING_RIGHT) ? -1 : 1) + destination;
+            (static_cast<u32>(m_facing) < H2EnumIndex(ARMY_FACING_RIGHT) ? -1 : 1)
+            + destination;
         gpCombatManager->m_hexCells[endRearHex].m_occupantSide =
             static_cast<i8>(gpCombatManager->m_currentArmySide);
         gpCombatManager->m_hexCells[endRearHex].m_occupantIndex =
