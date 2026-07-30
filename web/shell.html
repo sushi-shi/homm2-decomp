@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Heroes of Might and Magic II</title>
+  <style>
+    html, body { height: 100%; }
+    body {
+      align-items: center;
+      background: #111;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      font: 16px sans-serif;
+      justify-content: center;
+      margin: 0;
+    }
+    canvas {
+      background: #000;
+      image-rendering: pixelated;
+      max-height: calc(100vh - 5rem);
+      max-width: 100vw;
+    }
+    button { font: inherit; margin: 1rem; padding: .6rem 1.2rem; }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="640" height="480" tabindex="0"></canvas>
+  <button id="start" disabled>Loading…</button>
+  <div id="status"></div>
+  <script>
+    const canvas = document.getElementById("canvas");
+    const start = document.getElementById("start");
+    const status = document.getElementById("status");
+    var Module = {
+      canvas,
+      noInitialRun: true,
+      print: console.log,
+      printErr: console.error,
+      setStatus(text) { status.textContent = text; },
+      preRun: [module => {
+        module.FS.mkdirTree("/storage");
+        module.FS.mount(module.IDBFS, { autoPersist: true }, "/storage");
+        module.addRunDependency("storage");
+        module.FS.syncfs(true, error => {
+          if (error) console.error(error);
+          module.removeRunDependency("storage");
+        });
+      }],
+      onRuntimeInitialized() {
+        start.disabled = false;
+        start.textContent = "Start Heroes II";
+      }
+    };
+    start.addEventListener("click", () => {
+      start.remove();
+      status.remove();
+      canvas.focus();
+      Module.callMain([]);
+    });
+  </script>
+  <script src="homm2.data.js"></script>
+  {{{ SCRIPT }}}
+</body>
+</html>

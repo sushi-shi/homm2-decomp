@@ -41,7 +41,7 @@ public:
         WidgetKind kind,
         i16 fillColor
     );
-    virtual inline ~iconWidget() override;
+    virtual ~iconWidget() override;
     virtual void Draw(void) override;
     virtual MessageDispatchResult Main(struct tag_message&) override;
     void Read(void);

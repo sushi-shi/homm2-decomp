@@ -69,6 +69,8 @@ struct DPNAME {
 };
 typedef DPNAME* LPDPNAME;
 
+typedef BOOL (*LPDPENUMSESSIONSCALLBACK)(LPDPSESSIONDESC, void*, LPDWORD, DWORD);
+
 struct IDirectPlay {
     virtual ULONG Release() = 0;
     virtual HRESULT Close() = 0;
@@ -77,7 +79,8 @@ struct IDirectPlay {
                                  HANDLE event) = 0;
     virtual HRESULT DestroyPlayer(DPID player) = 0;
     virtual HRESULT EnumSessions(LPDPSESSIONDESC session, DWORD timeout,
-                                 void* callback, void* context, DWORD flags) = 0;
+                                 LPDPENUMSESSIONSCALLBACK callback, void* context,
+                                 DWORD flags) = 0;
     virtual HRESULT Send(DPID from, DPID to, DWORD flags, void* message,
                          DWORD size) = 0;
     virtual HRESULT Receive(LPDPID from, LPDPID to, DWORD flags, void* message,

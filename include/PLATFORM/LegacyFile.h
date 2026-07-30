@@ -5,6 +5,22 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#ifdef _WIN32
+
+#include <direct.h>
+#include <io.h>
+
+#define open(...) _open(__VA_ARGS__)
+#define close _close
+#define read _read
+#define write _write
+#define lseek _lseek
+#define access(path, mode) _access(path, mode)
+#define tell(file) _tell(file)
+#define filelength(file) _filelength(file)
+
+#else
+
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
@@ -48,5 +64,7 @@ char* _itoa(int value, char* buffer, int radix);
 #define _S_IREAD S_IRUSR
 #define _S_IWRITE (S_IRUSR | S_IWUSR)
 #define _S_IEXEC S_IXUSR
+
+#endif
 
 #endif

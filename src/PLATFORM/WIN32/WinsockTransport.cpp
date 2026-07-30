@@ -323,7 +323,11 @@ i16 wsnet_rcv(i16, u16, void* data) {
 
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
+#ifdef __EMSCRIPTEN__
+    socklen_t addressLength = sizeof(remote);
+#else
     i32 addressLength = sizeof(remote);
+#endif
     i32 bufLen;
 
     for (;;) {

@@ -4,14 +4,21 @@
 #include <cstring>
 #include <ctime>
 
+#if !defined(__EMSCRIPTEN__) && !defined(_WIN32)
 #include <execinfo.h>
 #include <fcntl.h>
 #include <ucontext.h>
 #include <unistd.h>
+#endif
 
 #include <PLATFORM/Platform.h>
 
 namespace platform {
+#if defined(__EMSCRIPTEN__) || defined(_WIN32)
+
+void InstallCrashHandler(const char*) {}
+
+#else
 namespace {
 
 char gReportPath[512] = {};
@@ -104,4 +111,5 @@ void InstallCrashHandler(const char* reportPath) {
     }
 }
 
+#endif
 }

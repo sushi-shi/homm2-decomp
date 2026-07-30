@@ -40,10 +40,9 @@ bitmap::bitmap(u32l id)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
 }
-
-bitmap::~bitmap() {
+bitmap::~bitmap(void) {
     if (m_pixels != NULL)
-        delete m_pixels;
+        delete[] m_pixels;
     m_pixels = NULL;
 }
 

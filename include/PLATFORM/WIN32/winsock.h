@@ -1,6 +1,12 @@
 #ifndef HOMM2_PLATFORM_WIN32_WINSOCK_H
 #define HOMM2_PLATFORM_WIN32_WINSOCK_H
 
+#ifdef _WIN32
+
+#include_next <winsock.h>
+
+#else
+
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -50,5 +56,7 @@ int ioctlsocket(SOCKET socket, long command, unsigned long* argument);
 #define WSAEINPROGRESS 10036
 #define WSAECONNRESET 10054
 #define FIONBIO 0x8004667E
+
+#endif
 
 #endif
