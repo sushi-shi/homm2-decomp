@@ -7,8 +7,9 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+      p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
-      game = mingw.clangStdenv.mkDerivation {
+      windows = mingw.clangStdenv.mkDerivation {
         pname = "homm2-gold-buka";
         version = "2.1";
         src = ./.;
@@ -41,10 +42,88 @@
           runHook postInstall
         '';
       };
+
+      mkNative = debug: p32.stdenv.mkDerivation {
+        pname = "homm2-native${if debug then "-debug" else ""}";
+        version = "2.0";
+        src = builtins.path {
+          path = ./.;
+          name = "homm2-port-source";
+          filter = path: type:
+            let base = baseNameOf path; in
+            !(base == "build" || base == ".git" || base == "result");
+        };
+        nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
+        buildInputs = [ p32.sdl3 ];
+        cmakeFlags = [
+          "-DHOMM2_PLATFORM=SDL3"
+          "-DCMAKE_BUILD_TYPE=${if debug then "Debug" else "RelWithDebInfo"}"
+        ];
+        dontStrip = true;
+        separateDebugInfo = false;
+        hardeningDisable = pkgs.lib.optionals debug [ "fortify" ];
+        installPhase = ''
+          runHook preInstall
+          install -Dm755 homm2 "$out/bin/homm2-unwrapped"
+          runHook postInstall
+        '';
+      };
+
+      homm2-unwrapped = mkNative false;
+      homm2-unwrapped-debug = mkNative true;
+
+      wrap = native: pkgs.writeShellApplication {
+        name = "homm2";
+        runtimeInputs = [ native ];
+        text = ''
+          if [ -n "''${HOMM2_DATA:-}" ]; then
+            data="$HOMM2_DATA"
+          else
+            data=""
+            for candidate in \
+              "$PWD" \
+              "''${XDG_DATA_HOME:-$HOME/.local/share}/homm2" \
+              "$HOME/.local/share/homm2/data" \
+              "$HOME/games/homm2"; do
+              if [ -e "$candidate/DATA/HEROES2.AGG" ] || [ -e "$candidate/data/heroes2.agg" ]; then
+                data="$candidate"
+                break
+              fi
+            done
+          fi
+
+          if [ -z "$data" ]; then
+            echo "homm2: set HOMM2_DATA to the directory containing DATA/HEROES2.AGG" >&2
+            exit 1
+          fi
+
+          export HOMM2_DATA="$data"
+          exec homm2-unwrapped "$@"
+        '';
+      };
+
+      homm2 = wrap homm2-unwrapped;
+      homm2-debug = wrap homm2-unwrapped-debug;
     in {
       packages.${system} = {
-        inherit game;
-        default = game;
+        inherit
+          homm2
+          homm2-debug
+          homm2-unwrapped
+          homm2-unwrapped-debug;
+        homm2-windows = windows;
+        game = windows;
+        default = homm2;
+      };
+
+      apps.${system}.default = {
+        type = "app";
+        program = "${homm2}/bin/homm2";
+      };
+
+      devShells.${system}.default = p32.mkShell {
+        nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
+        buildInputs = [ p32.sdl3 ];
       };
     };
 }
