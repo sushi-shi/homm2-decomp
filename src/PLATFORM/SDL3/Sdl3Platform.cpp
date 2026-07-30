@@ -5,7 +5,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -396,7 +398,9 @@ private:
 
 class Sdl3Host final : public IHost {
 public:
-    Sdl3Host(Sdl3Video& video, Sdl3Input& input) : m_video(video), m_input(input) {}
+    Sdl3Host(Sdl3Video& video, Sdl3Input& input) : m_video(video), m_input(input) {
+        LoadReplay();
+    }
 
     std::uint32_t Ticks() const override { return static_cast<std::uint32_t>(SDL_GetTicks()); }
 
@@ -424,11 +428,72 @@ public:
     }
 
 private:
+    struct ReplayEvent {
+        std::uint32_t milliseconds;
+        Event event;
+    };
+
+    void LoadReplay() {
+        const char* path = SDL_getenv("HOMM2_INPUT_REPLAY");
+        if (path == nullptr) {
+            return;
+        }
+
+        std::ifstream stream(path);
+        std::string line;
+        while (std::getline(stream, line)) {
+            std::istringstream fields(line);
+            ReplayEvent replay;
+            std::string action;
+            fields >> replay.milliseconds >> action >> replay.event.position.x
+                >> replay.event.position.y;
+            if (!fields) {
+                continue;
+            }
+            if (action == "move") {
+                replay.event.type = Event::Type::MouseMove;
+            } else if (action == "left-down") {
+                replay.event.type = Event::Type::MouseDown;
+                replay.event.button = MouseButton::Left;
+            } else if (action == "left-up") {
+                replay.event.type = Event::Type::MouseUp;
+                replay.event.button = MouseButton::Left;
+            } else if (action == "right-down") {
+                replay.event.type = Event::Type::MouseDown;
+                replay.event.button = MouseButton::Right;
+            } else if (action == "right-up") {
+                replay.event.type = Event::Type::MouseUp;
+                replay.event.button = MouseButton::Right;
+            } else {
+                continue;
+            }
+            m_replay.push_back(replay);
+        }
+        m_replayStart = Ticks();
+    }
+
+    void PumpReplay() {
+        const std::uint32_t elapsed = Ticks() - m_replayStart;
+        while (m_replayIndex < m_replay.size()
+               && m_replay[m_replayIndex].milliseconds <= elapsed) {
+            const Event& event = m_replay[m_replayIndex].event;
+            m_input.SetMouse(event.position);
+            if (event.type == Event::Type::MouseDown) {
+                m_input.SetButton(event.button, true);
+            } else if (event.type == Event::Type::MouseUp) {
+                m_input.SetButton(event.button, false);
+            }
+            m_input.Push(event);
+            ++m_replayIndex;
+        }
+    }
+
     void Pump() {
         SDL_Event sdlEvent;
         while (SDL_PollEvent(&sdlEvent)) {
             Translate(sdlEvent);
         }
+        PumpReplay();
     }
 
     void Translate(const SDL_Event& sdlEvent) {
@@ -519,6 +584,9 @@ private:
     Sdl3Video& m_video;
     Sdl3Input& m_input;
     bool m_quit = false;
+    std::vector<ReplayEvent> m_replay;
+    std::size_t m_replayIndex = 0;
+    std::uint32_t m_replayStart = 0;
 };
 
 class SilentAudio final : public IAudio {
