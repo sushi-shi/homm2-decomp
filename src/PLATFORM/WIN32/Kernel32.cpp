@@ -83,7 +83,9 @@ HANDLE CreateFileA(LPCSTR name, DWORD access, DWORD, LPSECURITY_ATTRIBUTES, DWOR
         flags |= O_CREAT;
     }
 
-    const std::string resolved = platform::win32::ResolvePath(name);
+    const bool writing = (flags & (O_CREAT | O_WRONLY | O_RDWR)) != 0;
+    const std::string resolved = platform::win32::ResolvePath(
+        name, writing ? platform::win32::PathUse::Write : platform::win32::PathUse::Read);
     const int descriptor = ::open(resolved.c_str(), flags, 0644);
     if (descriptor < 0) {
         gLastError = ERROR_FILE_NOT_FOUND;

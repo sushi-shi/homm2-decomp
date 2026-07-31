@@ -46,6 +46,24 @@ std::string MatchIgnoringCase(const std::string& directory, const std::string& w
     return found;
 }
 
+std::string Walk(const std::string& base, const std::vector<std::string>& components) {
+    std::string resolved = base;
+    for (const std::string& component : components) {
+        if (component == ".") {
+            continue;
+        }
+        const std::string separator = (resolved.empty() || resolved.back() == '/') ? "" : "/";
+        std::string candidate = resolved + separator + component;
+        if (Exists(candidate)) {
+            resolved = candidate;
+            continue;
+        }
+        const std::string matched = MatchIgnoringCase(resolved, component);
+        resolved += separator + (matched.empty() ? component : matched);
+    }
+    return resolved;
+}
+
 std::vector<std::string> SplitPath(const std::string& path) {
     std::vector<std::string> components;
     std::string current;
@@ -71,7 +89,7 @@ void TrackGdiObject(void* object) { gGdiObjects.insert(object); }
 
 bool ForgetGdiObject(void* object) { return gGdiObjects.erase(object) != 0; }
 
-std::string ResolvePath(const char* retailPath) {
+std::string ResolvePath(const char* retailPath, PathUse use) {
     if (retailPath == nullptr || *retailPath == '\0') {
         return std::string();
     }
@@ -87,22 +105,22 @@ std::string ResolvePath(const char* retailPath) {
     }
 
     const bool absolute = !relative.empty() && (relative[0] == '\\' || relative[0] == '/');
-    const std::string base = absolute ? std::string("/") : platform::Files().DataRoot();
+    const std::vector<std::string> components = SplitPath(relative);
 
-    std::string resolved = base;
-    for (const std::string& component : SplitPath(relative)) {
-        if (component == ".") {
-            continue;
+    // Writes go to the user directory, reads fall back to the installation so
+    // that shipped saves and score tables stay in reach. Not cached: the
+    // answer changes as files appear.
+    if (!absolute && platform::IsUserState(original.c_str())) {
+        const std::string user = Walk(platform::Files().UserRoot(), components);
+        if (use == PathUse::Write || Exists(user)) {
+            return user;
         }
-        const std::string separator = (resolved.empty() || resolved.back() == '/') ? "" : "/";
-        std::string candidate = resolved + separator + component;
-        if (Exists(candidate)) {
-            resolved = candidate;
-            continue;
-        }
-        const std::string matched = MatchIgnoringCase(resolved, component);
-        resolved += separator + (matched.empty() ? component : matched);
+        const std::string data = Walk(platform::Files().DataRoot(), components);
+        return Exists(data) ? data : user;
     }
+
+    const std::string base = absolute ? std::string("/") : platform::Files().DataRoot();
+    const std::string resolved = Walk(base, components);
 
     gCache.emplace(original, resolved);
     return resolved;
