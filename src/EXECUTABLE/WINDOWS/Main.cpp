@@ -11,9 +11,14 @@
 
 // Retail's entry, kept where it belongs: only this executable is allowed to
 // know what a HINSTANCE is.
+namespace {
+
+HANDLE gEventHandle = NULL;
+
+}
+
 extern "C" i32 __stdcall
 WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
-    hInstApp = instance;
     gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
     if (gEventHandle == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
         sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");

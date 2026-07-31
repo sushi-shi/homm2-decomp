@@ -22,7 +22,6 @@ extern "C" {
 
 #include <PLATFORM/Platform.h>
 
-#include "State.h"
 
 namespace {
 
@@ -269,7 +268,7 @@ Smack* SmackOpen(const char* name, u32 flags, u32) {
         return nullptr;
     }
 
-    const std::string path = platform::win32::ResolvePath(name);
+    const std::string path = platform::Files().Resolve(name, platform::FileMode::Read);
     if (avformat_open_input(&state->format, path.c_str(), nullptr, nullptr) < 0
         || avformat_find_stream_info(state->format, nullptr) < 0) {
         CloseState(state);

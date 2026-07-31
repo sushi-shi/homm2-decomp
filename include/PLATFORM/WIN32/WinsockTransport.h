@@ -3,7 +3,7 @@
 
 #include <Ints.h>
 #include <SOURCE/GAME.h>
-#include <winsock.h>
+#include <PLATFORM/Sockets.h>
 #include <SOURCE/REMOTE_TYPES.h>
 
 typedef enum WinsockTransportConstant {
@@ -38,18 +38,23 @@ i32 wsWaitForExtraGuests(void);
 i32 wsWaitForHost(void);
 
 extern i32 bHostFound;
-extern u32 sd_dg;
+inline constexpr i32 WS_TRANSPORT_PLAYER_LIMIT = 6;
+
+extern i32 giNetPosToDCOPos[WS_TRANSPORT_PLAYER_LIMIT];
+extern platform::Socket sd_dg;
+extern i32 iDPRcvBufferHead;
+extern i32 iDPRcvBufferTail;
+extern u8** ppDPRcvBuffer;
+extern i32* piDPRcvBufferSize;
+extern i32 bStartUpInfoReceived;
+void CleanupDPVars(void);
 extern i32 iWSLastMsgNumHumanPlayers;
 extern i32 iWSAttempts;
 extern i32 iWSNextTickCount;
 extern i32 iWSWaitForHostStatus;
 extern i32 iRc;
 extern char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
-extern struct sockaddr_in saddr_loc;
-extern u16 wVer;
-extern struct WSAData wsadata;
-extern struct in_addr gIn_addrIP;
-extern struct sockaddr_in saddr_remote;
+extern u32l gIn_addrIP;
 extern i32 iAddrLen;
 
 #endif

@@ -3,25 +3,15 @@
 
 #include <SOURCE/KB_TYPES.h>
 #include <Ints.h>
-#include <windows.h>
 
 typedef enum KbWinConstant {
-    KBWIN_PROCESS_MESSAGE_MAX     = 0x3ff,
-    KBWIN_PROCESS_MESSAGE_COUNT   = KBWIN_PROCESS_MESSAGE_MAX + 1,
     KBWIN_COMMAND_LINE_LIMIT      = 0x3c,
     KBWIN_COMMAND_LINE_CLEAR_SIZE = KBWIN_COMMAND_LINE_LIMIT + 1,
-    KBWIN_SOUND_SERVICE_INTERVAL  = 20,
-    KBWIN_GET_MESSAGE_INTERVAL    = 150,
-    KBWIN_TIMER_ID                = 1,
-    KBWIN_TIMER_INTERVAL          = 10,
     KBWIN_MIN_WIDTH               = 240,
     KBWIN_MIN_HEIGHT              = 160,
     KBWIN_WINDOWED_STYLE          = 0x14cf0000,
     KBWIN_FULLSCREEN_STYLE        = 0x14000000,
-    KBWIN_CLASS_STYLE             = 0x100b,
     KBWIN_MENU_ENTRY_COUNT        = MENU_ENABLE_STATUS_COUNT,
-    KBWIN_APP_NAME_SIZE           = 16,
-    KBWIN_WINDOW_TITLE_SIZE       = 32,
     KBWIN_WIDTH_640               = 640,
     KBWIN_HEIGHT_480              = 480,
     KBWIN_WIDTH_800               = 800,
@@ -45,10 +35,6 @@ using enum KbWinMenuCommand;
 
 void ResizeWindow(i32, i32, i32, i32);
 i32l KBTickCount(void);
-
-extern HANDLE gEventHandle;
-extern HINSTANCE hInstApp;
-extern HWND hwndApp;
 
 extern i32 giTotalMemAllocated;
 extern u8 giChangeThreshold[];

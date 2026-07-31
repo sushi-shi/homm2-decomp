@@ -1,6 +1,5 @@
 #include <PLATFORM/Miles.h>
 #include <PLATFORM/Smacker.h>
-#include <windows.h>
 
 #include <Ints.h>
 
@@ -23,7 +22,6 @@ extern "C" {
 
 #include <PLATFORM/Platform.h>
 
-#include "State.h"
 
 struct _SEQUENCE {
     int track = -1;
@@ -32,60 +30,6 @@ struct _SEQUENCE {
 };
 
 extern HSEQUENCE hSequence[60];
-
-namespace {
-
-int gRegistryKey = 0;
-
-}
-
-LONG RegOpenKeyExA(HKEY, LPCSTR, DWORD, DWORD, PHKEY result) {
-    if (result != nullptr) {
-        *result = &gRegistryKey;
-    }
-    return ERROR_SUCCESS;
-}
-
-LONG RegCreateKeyA(HKEY, LPCSTR, PHKEY result) {
-    if (result != nullptr) {
-        *result = &gRegistryKey;
-    }
-    return ERROR_SUCCESS;
-}
-
-LONG RegQueryValueExA(HKEY, LPCSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD) {
-    return ERROR_FILE_NOT_FOUND;
-}
-
-LONG RegSetValueExA(HKEY, LPCSTR, DWORD, DWORD, const BYTE*, DWORD) { return ERROR_SUCCESS; }
-LONG RegCloseKey(HKEY) { return ERROR_SUCCESS; }
-
-BOOL GetVersionExA(LPOSVERSIONINFOA info) {
-    if (info == nullptr) {
-        return FALSE;
-    }
-    info->dwMajorVersion = 10;
-    info->dwMinorVersion = 0;
-    info->dwBuildNumber = 19045;
-    info->dwPlatformId = VER_PLATFORM_WIN32_NT;
-    info->szCSDVersion[0] = '\0';
-    return TRUE;
-}
-
-DWORD GetVersion() { return 0x0A00; }
-
-UINT waveOutGetNumDevs() { return 1; }
-
-MMRESULT waveOutGetDevCapsA(UINT_PTR, LPWAVEOUTCAPSA caps, UINT) {
-    if (caps != nullptr) {
-        std::memset(caps, 0, sizeof(*caps));
-        std::strcpy(caps->szPname, "Platform audio");
-        caps->wChannels = 2;
-    }
-    return 0;
-}
-
-extern "C" u8 Netbios(void*) { return 0x23; }
 
 namespace {
 
