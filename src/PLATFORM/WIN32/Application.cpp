@@ -58,8 +58,5 @@ i32l KBTickCount(void) {
     return platform::Ticks();
 }
 
-HWND hwndApp = NULL;
-HANDLE gEventHandle = NULL;
-HINSTANCE hInstApp;
 i32 iMainWinScreenHeight;
 i32 iMainWinScreenWidth;

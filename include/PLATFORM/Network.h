@@ -30,9 +30,9 @@ i32 dpWaitForExtraGuests();
 i32 dpWaitForHost();
 
 i32 nbnet_init();
-extern "C" void __fastcall nb_term();
-extern "C" u16 __fastcall nb_rcv(i16 size, void* data);
-extern "C" u16 __fastcall nb_snd(i16 destination, i16 size, void* data);
+void nb_term();
+u16 nb_rcv(i16 size, void* data);
+u16 nb_snd(i16 destination, i16 size, void* data);
 void nb_thr_ctl();
 i8 InitNetHost();
 i8 InitNetGuest();

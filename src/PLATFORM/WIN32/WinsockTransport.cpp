@@ -1,6 +1,5 @@
 #include <Ints.h>
-#include <windows.h>
-#include <winsock.h>
+#include <PLATFORM/Sockets.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,7 +10,6 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <PLATFORM/WIN32/DirectPlayTransport.h>
 #include <PLATFORM/WIN32/Application.h>
 #include <PLATFORM/Graphics.h>
 #include <BASE/message.h>
@@ -33,9 +31,6 @@ static i16 s_wsEvaluateSourceLineBase = 413;
 
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
-    struct hostent* pHost;
-    u_long socketMode;
-    char localHostName[WS_TRANSPORT_BUFFER_SIZE];
     i32 player;
 
     if (gConfig.gfx[H2EnumIndex(giCurExe)].fullScreen != 0) {
@@ -55,41 +50,26 @@ i16 wsnet_init(void) {
     memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
-    wVer = MAKEWORD(1, 1);
-    iRc = WSAStartup(wVer, &wsadata);
-    if (iRc != 0) {
-        sprintf(cWSTextBuffer, "Error During WSAStartup(): %d", WSAGetLastError());
+    if (!platform::SocketsStartup()) {
+        sprintf(cWSTextBuffer, "Error starting sockets: %d", platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
-    sd_dg = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sd_dg == INVALID_SOCKET) {
-        sprintf(cWSTextBuffer, "Error During socket(): %d", WSAGetLastError());
+    sd_dg = platform::OpenDatagramSocket();
+    if (sd_dg == platform::kInvalidSocket) {
+        sprintf(cWSTextBuffer, "Error opening socket: %d", platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
     gbRemoteOn = true;
-    saddr_loc.sin_family = AF_INET;
-    saddr_loc.sin_port = htons(WS_TRANSPORT_PORT);
-    saddr_loc.sin_addr.s_addr = htonl(INADDR_ANY);
-    iRc = bind(sd_dg, reinterpret_cast<struct sockaddr*>(&saddr_loc), sizeof(saddr_loc));
-    if (iRc == SOCKET_ERROR) {
-        sprintf(cWSTextBuffer, "Error During bind(): %d", WSAGetLastError());
+    if (!platform::BindSocket(sd_dg, WS_TRANSPORT_PORT)) {
+        sprintf(cWSTextBuffer, "Error binding socket: %d", platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
-    socketMode = 1;
-    iRc = ioctlsocket(sd_dg, FIONBIO, &socketMode);
-    if (iRc == SOCKET_ERROR) {
-        sprintf(cWSTextBuffer, "Error During ioctlsocket(): %d", WSAGetLastError());
+    if (!platform::SetSocketNonBlocking(sd_dg, true)) {
+        sprintf(cWSTextBuffer, "Error setting socket mode: %d", platform::LastSocketError());
         ShutDown(cWSTextBuffer);
     }
-    iRc = gethostname(localHostName, sizeof(localHostName) - 1);
-    if (iRc == SOCKET_ERROR) {
-        sprintf(cWSTextBuffer, "Error During gethostname(): %d", WSAGetLastError());
-        ShutDown(cWSTextBuffer);
-    }
-    pHost = gethostbyname(localHostName);
-    gIn_addrIP = *reinterpret_cast<struct in_addr*>(pHost->h_addr);
-    sprintf(cWSTextBuffer, "%s", inet_ntoa(gIn_addrIP));
-    giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(inet_addr(cWSTextBuffer));
+    gIn_addrIP = platform::LocalHost();
+    giNetPosToDCOPos[giThisNetPos] = static_cast<i32>(gIn_addrIP);
 
     if (GameMode == REMOTE_GAME_NETWORK_HOST) {
         giWaitType = DIALOG_WAIT_WINSOCK_FIRST_GUEST;
@@ -99,7 +79,7 @@ i16 wsnet_init(void) {
                 "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
                 "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for additional "
                 "guests.",
-                inet_ntoa(gIn_addrIP),
+                platform::HostText(gIn_addrIP),
                 0,
                 giTCPNumPlayers - 1
             );
@@ -108,7 +88,7 @@ i16 wsnet_init(void) {
             sprintf(
                 cWSTextBuffer,
                 "Hosting game at %s\n\nWaiting On Guest(s).\n\n  Press 'CANCEL' to abort.",
-                inet_ntoa(gIn_addrIP)
+                platform::HostText(gIn_addrIP)
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         }
@@ -123,7 +103,7 @@ i16 wsnet_init(void) {
                     "Hosting game at %s.\n\nYou have %d guest(s) out of an expected total of %d "
                     "guest(s) now logged in.  Click 'CANCEL' to move on without waiting for "
                     "additional guests.",
-                    inet_ntoa(gIn_addrIP),
+                    platform::HostText(gIn_addrIP),
                     giNumHumanPlayers - 1,
                     giTCPNumPlayers - 1
                 );
@@ -134,7 +114,7 @@ i16 wsnet_init(void) {
                 cWSTextBuffer,
                 "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move "
                 "on, or wait for additional guests.",
-                inet_ntoa(gIn_addrIP),
+                platform::HostText(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -166,8 +146,8 @@ i16 wsnet_init(void) {
                 1
             );
         }
-        giNetPosToDCOPos[0] = static_cast<i32>(inet_addr(cWSTextBuffer));
-        if (giNetPosToDCOPos[0] == static_cast<i32>(INADDR_NONE)) {
+        giNetPosToDCOPos[0] = static_cast<i32>(platform::HostFromText(cWSTextBuffer));
+        if (giNetPosToDCOPos[0] == -1) {
             NormalDialog(
                 "Error in IP Address, please try again.",
                 NORMAL_DIALOG_WAIT_FIRST,
@@ -185,17 +165,17 @@ i16 wsnet_init(void) {
 }
 
 void wsnet_term(void) {
-    if (sd_dg != INVALID_SOCKET)
-        closesocket(sd_dg);
+    if (sd_dg != platform::kInvalidSocket)
+        platform::CloseSocket(sd_dg);
     if (ppDPRcvBuffer != NULL)
         H2_FREE(ppDPRcvBuffer);
     ppDPRcvBuffer = NULL;
     if (piDPRcvBufferSize != NULL)
         H2_FREE(piDPRcvBufferSize);
     piDPRcvBufferSize = NULL;
-    WSACleanup();
+    platform::SocketsShutdown();
     bHostFound = 0;
-    sd_dg = INVALID_SOCKET;
+    sd_dg = platform::kInvalidSocket;
     iWSLastMsgNumHumanPlayers = 1;
     iWSAttempts = 0;
     iWSNextTickCount = 0;
@@ -210,7 +190,7 @@ void wsSendMessage(
     void* data
 ) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1));
-    struct sockaddr_in peerAddress;
+    platform::Address peerAddress;
     i32 attemptCount;
     i32 error;
     i32 netPlayer;
@@ -218,25 +198,17 @@ void wsSendMessage(
     packetBuffer[0] = static_cast<u8>(type);
     if (size != 0)
         memcpy(packetBuffer + 1, data, size);
-    peerAddress.sin_family = AF_INET;
-    peerAddress.sin_port = htons(WS_TRANSPORT_PORT);
+    peerAddress.port = WS_TRANSPORT_PORT;
     if (destination == 0) {
         for (netPlayer = 0; giNumHumanPlayers > netPlayer; netPlayer++) {
             if (giThisNetPos == netPlayer)
                 continue;
             attemptCount = 0;
         sendPacket:
-            peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
-            iRc = sendto(
-                sd_dg,
-                reinterpret_cast<char*>(packetBuffer),
-                size + 1,
-                0,
-                reinterpret_cast<struct sockaddr*>(&peerAddress),
-                sizeof(peerAddress)
-            );
-            if (iRc == SOCKET_ERROR) {
-                error = WSAGetLastError();
+            peerAddress.host = static_cast<u32l>(giNetPosToDCOPos[netPlayer]);
+            iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
+            if (iRc < 0) {
+                error = platform::LastSocketError();
                 if (attemptCount < SEND_ATTEMPT_LIMIT) {
                     DelayMilli(WS_TRANSPORT_SEND_RETRY_DELAY);
                     goto sendPacket;
@@ -247,17 +219,10 @@ void wsSendMessage(
             }
         }
     } else {
-        peerAddress.sin_addr.s_addr = destination;
-        iRc = sendto(
-            sd_dg,
-            reinterpret_cast<char*>(packetBuffer),
-            size + 1,
-            0,
-            reinterpret_cast<struct sockaddr*>(&peerAddress),
-            sizeof(peerAddress)
-        );
-        if (iRc == SOCKET_ERROR) {
-            sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
+        peerAddress.host = static_cast<u32l>(destination);
+        iRc = platform::SendTo(sd_dg, packetBuffer, size + 1, peerAddress);
+        if (iRc < 0) {
+            sprintf(cWSTextBuffer, "Error sending: %d", platform::LastSocketError());
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
             return;
         }
@@ -295,34 +260,18 @@ i16 wsnet_rcv(i16, u16, void* data) {
 }
 
 void wsProcessMessages(void) {
-    struct sockaddr_in remote;
-#ifdef __EMSCRIPTEN__
-    socklen_t addressLength = sizeof(remote);
-#else
-    i32 addressLength = sizeof(remote);
-#endif
+    platform::Address remote;
     i32 receiveSize;
 
     while (1) {
         receiveSize = WS_TRANSPORT_BUFFER_SIZE;
-        iRc = recvfrom(
-            sd_dg,
-            rcvBufIn,
-            receiveSize,
-            0,
-            reinterpret_cast<struct sockaddr*>(&remote),
-            &addressLength
-        );
-        if (iRc == SOCKET_ERROR) {
-            iRc = WSAGetLastError();
-            if (iRc == WSAEWOULDBLOCK)
-                return;
-        }
+        iRc = platform::ReceiveFrom(sd_dg, rcvBufIn, receiveSize, &remote);
+        if (iRc < 0)
+            return;
         if (iRc == 0)
             return;
-        if (giNetPosToDCOPos[giThisNetPos] == static_cast<i32>(remote.sin_addr.s_addr)) {
-        } else {
-            wsEvaluateMessage(iRc, static_cast<i32>(remote.sin_addr.s_addr));
+        if (giNetPosToDCOPos[giThisNetPos] != static_cast<i32>(remote.host)) {
+            wsEvaluateMessage(iRc, static_cast<i32>(remote.host));
         }
     }
 }
@@ -451,7 +400,7 @@ i32 wsWaitForExtraGuests(void) {
             cWSTextBuffer,
             "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or "
             "wait for additional guests.",
-            inet_ntoa(gIn_addrIP),
+            platform::HostText(gIn_addrIP),
             giNumHumanPlayers - 1
         );
         message.type = MESSAGE_WIDGET;
@@ -500,16 +449,25 @@ i32 wsWaitForHost(void) {
 }
 
 i32 bHostFound = 0;
-u32 sd_dg = INVALID_SOCKET;
+platform::Socket sd_dg = platform::kInvalidSocket;
 i32 iWSLastMsgNumHumanPlayers = 1;
 i32 iWSAttempts = 0;
 i32 iWSNextTickCount = 0;
 i32 iWSWaitForHostStatus = 0;
 i32 iRc;
 char cWSTextBuffer[WS_TRANSPORT_BUFFER_SIZE];
-struct sockaddr_in saddr_loc;
-u16 wVer;
-struct WSAData wsadata;
-struct in_addr gIn_addrIP;
-struct sockaddr_in saddr_remote;
+u32l gIn_addrIP;
 i32 iAddrLen;
+
+i32 iDPRcvBufferHead = 0;
+i32 iDPRcvBufferTail = 0;
+u8** ppDPRcvBuffer = NULL;
+i32* piDPRcvBufferSize = NULL;
+i32 bStartUpInfoReceived = 0;
+
+void CleanupDPVars(void) {
+    iDPRcvBufferHead = 0;
+    iDPRcvBufferTail = 0;
+}
+
+i32 giNetPosToDCOPos[WS_TRANSPORT_PLAYER_LIMIT];
