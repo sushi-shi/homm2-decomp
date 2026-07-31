@@ -8,6 +8,7 @@
 #include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <PLATFORM/Entry.h>
 #include <PLATFORM/WIN32/Application.h>
 #include <PLATFORM/WIN32/LegacyVideo.h>
 
@@ -15,39 +16,14 @@ typedef enum KbWinPrivateConstant {
     TIMER_UPDATE_MIN_INTERVAL = 5
 } KbWinPrivateConstant;
 
-extern "C" i32 __stdcall
-WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
-    DWORD errorLast;
+i32 platform::RunApplication(const char* commandLine) {
     MSG message;
-
-    hInstApp = instance;
-    gEventHandle = CreateEventA(
-        NULL,
-        0,
-        0,
-        "\xc3\xe5\xf0\xee\xe8\x20\x49\x49"
-    );
-    errorLast = GetLastError();
-    if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
-        sprintf(
-            gText,
-            "\xd2\xee\xeb\xfc\xea\xee\x20\xee\xe4\xed\xe0\x20\xea\xee\xef\xe8\xff\x20\x25\x73\x20\xec\xee\xe6\xe5\xf2\x20\xe1\xfb\xf2\xfc\x20\xe7\xe0\xef\xf3\xf9\xe5\xed\xe0\x20\xee\xe4\xed\xee\xe2\xf0\xe5\xec\xe5\xed\xed\xee",
-            "\xc3\xe5\xf0\xee\xe8\x20\xcc\xe5\xf7\xe0\x20\xe8\x20\xcc\xe0\xe3\xe8\xe8\x20\x49\x49"
-        );
-        MessageBoxA(
-            NULL,
-            gText,
-            "\xce\xf8\xe8\xe1\xea\xe0\x20\xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
-            MB_ICONHAND
-        );
-        return 0;
-    }
 
     memset(gcCommandLine, 0, KBWIN_COMMAND_LINE_CLEAR_SIZE);
     strncpy(gcCommandLine, commandLine, KBWIN_COMMAND_LINE_LIMIT);
     if (EarlySetup() == 0)
         return 0;
-    if (AppInit(instance, previousInstance, showCommand, commandLine) == 0)
+    if (AppInit(hInstApp, NULL, SW_SHOWNORMAL, gcCommandLine) == 0)
         return 0;
 
     for (;;) {
