@@ -19,13 +19,9 @@ using enum WingraphGraphicsType;
 
 void GetGraphicsInfo();
 void InitGraphics();
-i32 AppPaint(void* window, void* paint);
-void InitializePalette();
 void UpdatePalette(i8* palette);
 void CleanUpWinGraphics();
 void SetFullScreenStatus(i32 fullscreen);
-i32 QueryNewPalette();
-i32 SetGraphicsType(WingraphGraphicsType type);
 
 extern WingraphGraphicsType giGraphicsType;
 
