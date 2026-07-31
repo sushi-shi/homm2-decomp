@@ -18,10 +18,8 @@
             || base == ".git"
             || base == "result"
             || base == "docs"
-            || base == "imports"
             || base == "flake.nix"
             || base == "flake.lock"
-            || base == "build.ninja"
             || base == "run-game.sh");
       };
 
