@@ -1801,6 +1801,10 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
         FileError(fname);
     platform::FileWrite(fd, src, srcLen);
     platform::FileClose(fd);
+
+    // The compressor works the file with the C runtime, so hand it the real
+    // path rather than the retail one.
+    platform::FileResolve(fname, platform::FileMode::Write, fname, sizeof(fname));
     compress(fname);
 
     strcat(fname, ".nw");
@@ -1842,6 +1846,9 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
         FileError(fname);
     platform::FileWrite(fd, src, srcLen);
     platform::FileClose(fd);
+
+    // As in EncodeData: the decompressor uses the C runtime directly.
+    platform::FileResolve(fname, platform::FileMode::Write, fname, sizeof(fname));
     uncompress(fname);
 
     fname[strlen(fname) - 3] = '\0';

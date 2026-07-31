@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <filesystem>
 #include <string>
 #include <system_error>
@@ -87,6 +88,17 @@ bool Under(const std::string& path, const std::string& directory) {
         && (path.size() == directory.size() || path[directory.size()] == '/');
 }
 
+// The save compressor works through scratch files named H2C plus four random
+// letters, and the same again with .nw while compressed. H2CAMP.TXT ships with
+// the game and is none of ours.
+bool IsScratch(const std::string& name) {
+    if (!name.starts_with("H2C")) {
+        return false;
+    }
+    return name.size() == sizeof("H2CABCD") - 1
+        || (name.size() == sizeof("H2CABCD.NW") - 1 && name.ends_with(".NW"));
+}
+
 #endif
 
 }
@@ -105,7 +117,19 @@ i32 FileSeek(i32 file, i32 offset) { return Files().Seek(file, offset); }
 
 i32 FileTell(i32 file) { return Files().Tell(file); }
 
+i32 FileLength(i32 file) { return Files().Length(file); }
+
 bool FileExists(const char* retailPath) { return Files().Exists(retailPath); }
+
+void FileResolve(const char* retailPath, FileMode mode, char* buffer, i32 size) {
+    if (buffer == nullptr || size <= 0) {
+        return;
+    }
+
+    const std::string path = Files().Resolve(retailPath, mode);
+    std::strncpy(buffer, path.c_str(), static_cast<std::size_t>(size) - 1);
+    buffer[size - 1] = '\0';
+}
 
 bool IsUserState(const char* retailPath) {
 #ifdef _WIN32
@@ -119,12 +143,19 @@ bool IsUserState(const char* retailPath) {
     }
 
     const std::size_t slash = path.find('/');
-    if (!Under(path, "DATA") || slash == std::string::npos) {
+    if (slash == std::string::npos) {
+        // Screenshots and the debug log are things the game produces, not
+        // things the installation came with.
+        return path.ends_with(".PCX") || path.ends_with(".LOG");
+    }
+
+    if (!Under(path, "DATA")) {
         return false;
     }
 
     const std::string name = path.substr(slash + 1);
-    return name.ends_with(".HS") || (name.starts_with("RMT") && name.ends_with(".BIN"));
+    return name.ends_with(".HS") || IsScratch(name)
+        || (name.starts_with("RMT") && name.ends_with(".BIN"));
 #endif
 }
 

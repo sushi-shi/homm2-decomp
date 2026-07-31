@@ -388,13 +388,13 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
             originalLine
         );
         if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != NULL) {
+            i32 logFile = platform::FileOpen(gMiscText.log.appendFilename.text, platform::FileMode::Append);
+            if (logFile != -1) {
                 strcpy(logText, text);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-                fputs(logText, logFile);
-                fclose(logFile);
+                platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+                platform::FileClose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     platform::Host().Log(platform::LogLevel::Debug, logText);
             }
@@ -427,13 +427,13 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
         );
     if (ptr == NULL) {
         if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != NULL) {
+            i32 logFile = platform::FileOpen(gMiscText.log.appendFilename.text, platform::FileMode::Append);
+            if (logFile != -1) {
                 strcpy(logText, gMiscText.memory.nullPointer.text);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-                fputs(logText, logFile);
-                fclose(logFile);
+                platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+                platform::FileClose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     platform::Host().Log(platform::LogLevel::Debug, logText);
             }
@@ -465,14 +465,16 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
                     gpMemEntry[entryIndex].line
                 );
                 if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-                    FILE* logFile =
-                        fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-                    if (logFile != NULL) {
+                    i32 logFile = platform::FileOpen(
+                        gMiscText.log.appendFilename.text,
+                        platform::FileMode::Append
+                    );
+                    if (logFile != -1) {
                         strcpy(logText, text);
                         *reinterpret_cast<u16*>(logText + strlen(logText)) =
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-                        fputs(logText, logFile);
-                        fclose(logFile);
+                        platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+                        platform::FileClose(logFile);
                         if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                             platform::Host().Log(platform::LogLevel::Debug, logText);
                     }
@@ -486,13 +488,13 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     if (entryIndex < ENTRY_SEARCH_COMPLETE) {
         sprintf(gText, gMiscText.memory.badDeleteFormat.text, originalFile, originalLine, ptr);
         if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-            if (logFile != NULL) {
+            i32 logFile = platform::FileOpen(gMiscText.log.appendFilename.text, platform::FileMode::Append);
+            if (logFile != -1) {
                 strcpy(logText, gText);
                 *reinterpret_cast<u16*>(logText + strlen(logText)) =
                     *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-                fputs(logText, logFile);
-                fclose(logFile);
+                platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+                platform::FileClose(logFile);
                 if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                     platform::Host().Log(platform::LogLevel::Debug, logText);
             }
@@ -527,14 +529,16 @@ void PrintMemoryLeaks(void) {
                     gpMemEntry[entryIndex].size
                 );
                 if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-                    FILE* logFile =
-                        fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-                    if (logFile != NULL) {
+                    i32 logFile = platform::FileOpen(
+                        gMiscText.log.appendFilename.text,
+                        platform::FileMode::Append
+                    );
+                    if (logFile != -1) {
                         strcpy(logText, gText);
                         *reinterpret_cast<u16*>(logText + strlen(logText)) =
                             *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-                        fputs(logText, logFile);
-                        fclose(logFile);
+                        platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+                        platform::FileClose(logFile);
                         if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                             platform::Host().Log(platform::LogLevel::Debug, logText);
                     }
@@ -817,14 +821,14 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         gMiscText.readFile.configFilename.text
     );
-    FILE* f = platform::FileExists(gText) ? fopen(gText, gMiscText.readFile.binaryMode.text) : NULL;
-    if (f == NULL) {
+    i32 f = platform::FileOpen(gText, platform::FileMode::Read);
+    if (f == -1) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
         strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     } else {
-        fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
-        fclose(f);
+        platform::FileRead(f, &gConfig, CONFIG_PERSISTED_SIZE);
+        platform::FileClose(f);
         if (gConfig.needsDefaultInitialization == 0)
             goto skipDefaults;
     }
@@ -1003,13 +1007,13 @@ void LogTruncate(void) {
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        FILE* logFile = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-        if (logFile != NULL) {
+        i32 logFile = platform::FileOpen(gMiscText.log.appendFilename.text, platform::FileMode::Append);
+        if (logFile != -1) {
             strcpy(logText, text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-            fputs(logText, logFile);
-            fclose(logFile);
+            platform::FileWrite(logFile, logText, static_cast<i32>(strlen(logText)));
+            platform::FileClose(logFile);
             if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                 platform::Host().Log(platform::LogLevel::Debug, logText);
         }
@@ -1073,13 +1077,13 @@ void LogInt(
     else
         sprintf(text, gMiscText.log.oneValueFormat.text, label, value1);
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        FILE* file = fopen(gMiscText.log.appendFilename.text, gMiscText.log.appendMode.text);
-        if (file != NULL) {
+        i32 file = platform::FileOpen(gMiscText.log.appendFilename.text, platform::FileMode::Append);
+        if (file != -1) {
             strcpy(logText, text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.appendNewline.text);
-            fputs(logText, file);
-            fclose(file);
+            platform::FileWrite(file, logText, static_cast<i32>(strlen(logText)));
+            platform::FileClose(file);
             if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
                 platform::Host().Log(platform::LogLevel::Debug, logText);
         }
@@ -1282,14 +1286,12 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
 }
 
 i32l FileSize(char* filename) {
-    FILE* file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
-    if (file == NULL) {
+    i32 file = platform::FileOpen(filename, platform::FileMode::Read);
+    if (file == -1) {
         FileError(filename);
     }
-    fseek(file, 0, SEEK_END);
-    i32l size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    fclose(file);
+    i32l size = platform::FileLength(file);
+    platform::FileClose(file);
     return size;
 }
 

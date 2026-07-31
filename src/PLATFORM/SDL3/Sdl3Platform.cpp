@@ -927,7 +927,7 @@ public:
         // Writes go to the user directory, reads fall back to the installation
         // so that shipped saves and score tables stay in reach.
         const std::string user = ResolveIn(m_userRoot, retailPath);
-        if (mode == FileMode::Write || Present(user)) {
+        if (mode != FileMode::Read || Present(user)) {
             return user;
         }
         const std::string data = ResolveIn(m_dataRoot, retailPath);
@@ -939,8 +939,15 @@ public:
     }
 
     i32 Open(const char* retailPath, FileMode mode) override {
+        const char* how = "wb";
+        if (mode == FileMode::Read) {
+            how = "rb";
+        } else if (mode == FileMode::Append) {
+            how = "ab";
+        }
+
         const std::string path = Resolve(retailPath, mode);
-        SDL_IOStream* stream = SDL_IOFromFile(path.c_str(), mode == FileMode::Read ? "rb" : "wb");
+        SDL_IOStream* stream = SDL_IOFromFile(path.c_str(), how);
         if (stream == nullptr) {
             return -1;
         }
@@ -981,6 +988,14 @@ public:
             return -1;
         }
         return static_cast<i32>(SDL_SeekIO(stream, offset, SDL_IO_SEEK_SET));
+    }
+
+    i32 Length(i32 file) override {
+        SDL_IOStream* stream = Stream(file);
+        if (stream == nullptr) {
+            return -1;
+        }
+        return static_cast<i32>(SDL_GetIOSize(stream));
     }
 
     i32 Tell(i32 file) override {
