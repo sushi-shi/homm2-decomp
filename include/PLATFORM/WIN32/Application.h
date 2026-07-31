@@ -43,7 +43,6 @@ enum class KbWinMenuCommand : i32 {
 };
 using enum KbWinMenuCommand;
 
-extern "C" i32 __stdcall WinMain(HINSTANCE, HINSTANCE, char*, i32);
 i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);
 i32 AppIdle(void);
 LRESULT CALLBACK AppWndProc(HWND, UINT, WPARAM, LPARAM);

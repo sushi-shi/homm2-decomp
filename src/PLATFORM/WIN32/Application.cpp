@@ -9,6 +9,7 @@
 #include <BASE/soundmgr.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
+#include <PLATFORM/Entry.h>
 #include <PLATFORM/WIN32/Application.h>
 #include <PLATFORM/WIN32/LegacyVideo.h>
 
@@ -16,25 +17,14 @@ typedef enum KbWinPrivateConstant {
     TIMER_UPDATE_MIN_INTERVAL = 5
 } KbWinPrivateConstant;
 
-extern "C" i32 __stdcall
-WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
-    DWORD lastError;
+i32 platform::RunApplication(const char* commandLine) {
     MSG message;
-
-    hInstApp = instance;
-    gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
-    lastError = GetLastError();
-    if (gEventHandle == NULL || lastError == ERROR_ALREADY_EXISTS) {
-        sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
-        MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
-        return 0;
-    }
 
     memset(gcCommandLine, 0, KBWIN_COMMAND_LINE_CLEAR_SIZE);
     strncpy(gcCommandLine, commandLine, KBWIN_COMMAND_LINE_LIMIT);
     if (EarlySetup() == 0)
         return 0;
-    if (AppInit(instance, previousInstance, showCommand, commandLine) == 0)
+    if (AppInit(hInstApp, NULL, SW_SHOWNORMAL, gcCommandLine) == 0)
         return 0;
 
     for (;;) {
