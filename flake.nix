@@ -87,6 +87,14 @@
         ];
       };
 
+      # Statically, so that the Windows build is the one file it was in 1996.
+      sdl3-windows = mingw.sdl3.overrideAttrs (previous: {
+        cmakeFlags = previous.cmakeFlags ++ [
+          "-DSDL_SHARED:BOOL=OFF"
+          "-DSDL_STATIC:BOOL=ON"
+        ];
+      });
+
       windows = mingw.stdenv.mkDerivation {
         pname = "homm2-gold-buka";
         version = "2.1";
@@ -98,22 +106,19 @@
         ];
         buildInputs = [
           ffmpeg-windows
-          mingw.sdl3
+          sdl3-windows
           mingw.windows.mcfgthreads
         ];
         cmakeFlags = [
           "-DHOMM2_32BIT=OFF"
           "-DHOMM2_PLATFORM=SDL3"
           "-DCMAKE_BUILD_TYPE=Release"
+          "-DCMAKE_EXE_LINKER_FLAGS=-static"
         ];
         installPhase = ''
           runHook preInstall
           mkdir -p "$out/bin"
           cp homm2.exe "$out/bin/HMM2PL.exe"
-          cp ${mingw.sdl3.out}/bin/SDL3.dll "$out/bin/"
-          cp ${mingw.stdenv.cc.cc.lib}/i686-w64-mingw32/lib/libgcc_s_sjlj-1.dll "$out/bin/"
-          cp ${mingw.stdenv.cc.cc.lib}/i686-w64-mingw32/lib/libstdc++-6.dll "$out/bin/"
-          cp ${mingw.windows.mcfgthreads.out}/bin/libmcfgthread-2.dll "$out/bin/"
           ln -s bin/HMM2PL.exe "$out/HMM2PL.exe"
           cp ${./run-game.sh} "$out/run-game.sh"
           chmod +x "$out/run-game.sh"
