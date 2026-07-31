@@ -1,8 +1,0 @@
-LIBRARY WING32.dll
-EXPORTS
-  WinGCreateDC@0
-  WinGCreateBitmap@12
-  WinGRecommendDIBFormat@4
-  WinGSetDIBColorTable@16
-  WinGStretchBlt@40
-  WinGBitBlt@32
