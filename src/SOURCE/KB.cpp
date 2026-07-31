@@ -5609,7 +5609,8 @@ i32 MAP_WIDTH = MAP_DIMENSION_MEDIUM;
 i32 MAP_HEIGHT = MAP_DIMENSION_MEDIUM;
 u8* mapExtra = NULL;
 b32 gbClosingApp = false;
-b32 gbForegroundApp = false;
+// The window comes up focused, and the first focus change corrects this.
+b32 gbForegroundApp = true;
 i32 giMainVideoModeColorDepth = GRAPHICS_COLOR_DEPTH;
 i32 giMainVideoModeWidth = GRAPHICS_WIDTH;
 i32 giMainVideoModeHeight = GRAPHICS_HEIGHT;

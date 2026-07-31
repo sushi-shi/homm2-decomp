@@ -276,6 +276,13 @@ static void PlatformEventHandler(const platform::Event& event) {
             MouseMessageHandler(nullptr, message, 0, PackInputPoint(event.position));
             break;
         }
+        case Type::Quit:
+            // Closing the window leaves through the game's own door.
+            ShutDown(NULL);
+            break;
+        case Type::FocusChanged:
+            gbForegroundApp = event.focused;
+            break;
         default:
             break;
     }
