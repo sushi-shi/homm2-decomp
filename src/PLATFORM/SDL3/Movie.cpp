@@ -1,11 +1,10 @@
-#include <PLATFORM/Smacker.h>
+#include <PLATFORM/Movie.h>
 
 #include <algorithm>
 #include <array>
-#include <cerrno>
 #include <cstdint>
 #include <cstring>
-#include <new>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -22,10 +21,8 @@ extern "C" {
 
 #include <PLATFORM/Platform.h>
 
-
+namespace platform {
 namespace {
-
-constexpr u32 kAudioTrackFlags = 0xfe000;
 
 struct AudioDecoder {
     AVFormatContext* format = nullptr;
@@ -48,41 +45,6 @@ struct DecodedAudio {
     std::int32_t sampleRate = 0;
     std::int32_t channels = 0;
 };
-
-struct SmackerState {
-    AVFormatContext* format = nullptr;
-    AVCodecContext* codec = nullptr;
-    AVFrame* frame = nullptr;
-    AVPacket* packet = nullptr;
-    std::int32_t stream = -1;
-    u8* destination = nullptr;
-    u32 left = 0;
-    u32 top = 0;
-    u32 pitch = 0;
-    u32 destinationHeight = 0;
-    u32 nextFrameTime = 0;
-    bool draining = false;
-    bool rectPending = false;
-    bool paletteReady = false;
-    platform::VoiceId audioVoice = 0;
-    std::array<u8, 768> palette{};
-};
-
-SmackerState* State(Smack* smack) {
-    return smack != nullptr ? static_cast<SmackerState*>(smack->Reserved) : nullptr;
-}
-
-void CloseState(SmackerState* state) {
-    if (state == nullptr) {
-        return;
-    }
-    platform::Audio().StopVoice(state->audioVoice);
-    av_packet_free(&state->packet);
-    av_frame_free(&state->frame);
-    avcodec_free_context(&state->codec);
-    avformat_close_input(&state->format);
-    delete state;
-}
 
 bool AppendAudioFrame(AudioDecoder& decoder, DecodedAudio& audio) {
     const std::int32_t capacity =
@@ -199,7 +161,55 @@ bool DecodeAudio(const std::string& path, DecodedAudio& audio) {
     return !audio.samples.empty();
 }
 
-bool ReceiveFrame(SmackerState& state) {
+struct Movie {
+    AVFormatContext* format = nullptr;
+    AVCodecContext* codec = nullptr;
+    AVFrame* frame = nullptr;
+    AVPacket* packet = nullptr;
+    std::int32_t stream = -1;
+
+    u8* destination = nullptr;
+    i32 left = 0;
+    i32 top = 0;
+    i32 pitch = 0;
+    i32 destinationHeight = 0;
+
+    i32 width = 0;
+    i32 height = 0;
+    i32 index = 0;
+    i32 count = 1;
+    u32 msPerFrame = 1;
+    u32 nextFrameTime = 0;
+
+    bool draining = false;
+    bool framePending = false;
+    bool paletteReady = false;
+    bool paletteChanged = false;
+    std::array<u8, 768> palette{};
+    VoiceId audioVoice = 0;
+};
+
+std::map<MovieId, Movie*> gMovies;
+MovieId gNextMovie = 1;
+
+Movie* Find(MovieId movie) {
+    const auto found = gMovies.find(movie);
+    return found != gMovies.end() ? found->second : nullptr;
+}
+
+void Release(Movie* movie) {
+    if (movie == nullptr) {
+        return;
+    }
+    Audio().StopVoice(movie->audioVoice);
+    av_packet_free(&movie->packet);
+    av_frame_free(&movie->frame);
+    avcodec_free_context(&movie->codec);
+    avformat_close_input(&movie->format);
+    delete movie;
+}
+
+bool ReceiveFrame(Movie& state) {
     for (;;) {
         const std::int32_t received = avcodec_receive_frame(state.codec, state.frame);
         if (received == 0) {
@@ -231,7 +241,7 @@ bool ReceiveFrame(SmackerState& state) {
     }
 }
 
-bool LoadFrame(Smack& smack, SmackerState& state) {
+bool LoadFrame(Movie& state) {
     av_frame_unref(state.frame);
     if (!ReceiveFrame(state) || state.frame->format != AV_PIX_FMT_PAL8
         || state.frame->data[0] == nullptr || state.frame->data[1] == nullptr) {
@@ -247,42 +257,32 @@ bool LoadFrame(Smack& smack, SmackerState& state) {
         palette[index * 3 + 2] = static_cast<u8>(color);
     }
 
-    smack.NewPalette = !state.paletteReady || palette != state.palette;
-    if (smack.NewPalette) {
+    state.paletteChanged = !state.paletteReady || palette != state.palette;
+    if (state.paletteChanged) {
         state.palette = palette;
-        std::copy(palette.begin(), palette.end(), smack.Palette);
         state.paletteReady = true;
     }
-    state.rectPending = true;
+    state.framePending = true;
     return true;
 }
 
 }
 
-Smack* SmackOpen(const char* name, u32 flags, u32) {
-    Smack* smack = new (std::nothrow) Smack{};
-    SmackerState* state = new (std::nothrow) SmackerState{};
-    if (smack == nullptr || state == nullptr) {
-        delete smack;
-        delete state;
-        return nullptr;
-    }
+MovieId MovieOpen(const char* retailPath, bool withSound) {
+    Movie* state = new Movie();
 
-    const std::string path = platform::Files().Resolve(name, platform::FileMode::Read);
+    const std::string path = Files().Resolve(retailPath, FileMode::Read);
     if (avformat_open_input(&state->format, path.c_str(), nullptr, nullptr) < 0
         || avformat_find_stream_info(state->format, nullptr) < 0) {
-        CloseState(state);
-        delete smack;
-        return nullptr;
+        Release(state);
+        return kInvalidMovie;
     }
 
     const AVCodec* decoder = nullptr;
-    state->stream =
-        av_find_best_stream(state->format, AVMEDIA_TYPE_VIDEO, -1, -1, &decoder, 0);
+    state->stream = av_find_best_stream(state->format, AVMEDIA_TYPE_VIDEO, -1, -1, &decoder, 0);
     if (state->stream < 0 || decoder == nullptr) {
-        CloseState(state);
-        delete smack;
-        return nullptr;
+        Release(state);
+        return kInvalidMovie;
     }
 
     AVStream* stream = state->format->streams[state->stream];
@@ -292,123 +292,144 @@ Smack* SmackOpen(const char* name, u32 flags, u32) {
     if (state->codec == nullptr || state->frame == nullptr || state->packet == nullptr
         || avcodec_parameters_to_context(state->codec, stream->codecpar) < 0
         || avcodec_open2(state->codec, decoder, nullptr) < 0) {
-        CloseState(state);
-        delete smack;
-        return nullptr;
+        Release(state);
+        return kInvalidMovie;
     }
 
-    smack->Width = static_cast<u32>(state->codec->width);
-    smack->Height = static_cast<u32>(state->codec->height);
-    smack->Frames = stream->duration > 0 ? static_cast<u32>(stream->duration) : 1;
-    smack->MSPerFrame =
-        std::max(1u, static_cast<u32>(av_q2d(stream->time_base) * 1000.0 + 0.5));
-    smack->OpenFlags = flags;
-    smack->Reserved = state;
-    state->nextFrameTime = platform::Host().Ticks();
+    state->width = state->codec->width;
+    state->height = state->codec->height;
+    state->count = stream->duration > 0 ? static_cast<i32>(stream->duration) : 1;
+    state->msPerFrame = std::max(1u, static_cast<u32>(av_q2d(stream->time_base) * 1000.0 + 0.5));
 
-    if ((flags & kAudioTrackFlags) != 0) {
+    if (withSound) {
         DecodedAudio audio;
         if (DecodeAudio(path, audio)) {
-            platform::SoundData sound;
+            SoundData sound;
             sound.samples = audio.samples.data();
             sound.byteCount = audio.samples.size();
             sound.sampleRate = audio.sampleRate;
             sound.channels = audio.channels;
             sound.bitsPerSample = 16;
-            state->audioVoice = platform::Audio().PlaySound(sound, 127, 0);
+            state->audioVoice = Audio().PlaySound(sound, 127, 0);
         }
     }
 
-    if (!LoadFrame(*smack, *state)) {
-        SmackClose(smack);
-        return nullptr;
+    if (!LoadFrame(*state)) {
+        Release(state);
+        return kInvalidMovie;
     }
-    return smack;
+
+    // Opening decodes the whole sound track, which takes real time. Start the
+    // clock once that is done, or the first frames are already overdue and the
+    // movie races to catch up.
+    state->nextFrameTime = Host().Ticks();
+
+    const MovieId movie = gNextMovie++;
+    gMovies.emplace(movie, state);
+    return movie;
 }
 
-void SmackClose(Smack* smack) {
-    if (smack == nullptr) {
+void MovieClose(MovieId movie) {
+    const auto found = gMovies.find(movie);
+    if (found == gMovies.end()) {
         return;
     }
-    CloseState(State(smack));
-    delete smack;
+    Release(found->second);
+    gMovies.erase(found);
 }
 
-u32 SmackDoFrame(Smack* smack) {
-    if (smack != nullptr) {
-        smack->NewPalette = 0;
-    }
-    return 0;
-}
-
-void SmackNextFrame(Smack* smack) {
-    SmackerState* state = State(smack);
-    if (smack == nullptr || state == nullptr || smack->FrameNum >= smack->Frames) {
-        return;
-    }
-
-    ++smack->FrameNum;
-    state->nextFrameTime += smack->MSPerFrame;
-    if (smack->FrameNum < smack->Frames && !LoadFrame(*smack, *state)) {
-        smack->Frames = smack->FrameNum;
-    }
-}
-
-u32 SmackWait(Smack* smack) {
-    SmackerState* state = State(smack);
-    if (state == nullptr) {
-        return 0;
-    }
-    return static_cast<std::int32_t>(platform::Host().Ticks() - state->nextFrameTime) < 0;
-}
-
-void SmackSummary(Smack*, SmackSum* summary) {
-    if (summary != nullptr) {
-        *summary = {};
-    }
-}
-
-void SmackToBuffer(
-    Smack* smack,
-    u32 left,
-    u32 top,
-    u32 pitch,
-    u32 destinationHeight,
-    void* buffer,
-    u32
-) {
-    SmackerState* state = State(smack);
+void MovieTarget(MovieId movie, void* buffer, i32 pitch, i32 height, i32 left, i32 top) {
+    Movie* state = Find(movie);
     if (state == nullptr) {
         return;
     }
     state->destination = static_cast<u8*>(buffer);
+    state->pitch = pitch;
+    state->destinationHeight = height;
     state->left = left;
     state->top = top;
-    state->pitch = pitch;
-    state->destinationHeight = destinationHeight;
 }
 
-u32 SmackToBufferRect(Smack* smack, u32) {
-    SmackerState* state = State(smack);
-    if (smack == nullptr || state == nullptr || !state->rectPending || state->destination == nullptr) {
-        return 0;
+bool MovieDraw(MovieId movie, MovieFrame& frame) {
+    Movie* state = Find(movie);
+    if (state == nullptr || !state->framePending || state->destination == nullptr) {
+        return false;
     }
 
-    const u32 width = std::min(smack->Width, state->pitch - std::min(state->left, state->pitch));
-    const u32 height =
-        std::min(smack->Height, state->destinationHeight - std::min(state->top, state->destinationHeight));
-    for (u32 row = 0; row < height; ++row) {
+    const i32 width = std::min(state->width, state->pitch - std::min(state->left, state->pitch));
+    const i32 height =
+        std::min(state->height, state->destinationHeight - std::min(state->top, state->destinationHeight));
+    for (i32 row = 0; row < height; ++row) {
         std::memcpy(
             state->destination + (state->top + row) * state->pitch + state->left,
             state->frame->data[0] + row * state->frame->linesize[0],
-            width
+            static_cast<std::size_t>(width)
         );
     }
 
-    smack->LastRectx = state->left;
-    smack->LastRecty = state->top;
-    smack->LastRectw = width;
-    smack->LastRecth = height;
-    state->rectPending = false;
-    return 1;
+    frame.index = state->index;
+    frame.count = state->count;
+    frame.dirty = Rect{state->left, state->top, width, height};
+    frame.palette = state->paletteChanged ? state->palette.data() : nullptr;
+
+    state->framePending = false;
+    state->paletteChanged = false;
+    return true;
+}
+
+void MovieAdvance(MovieId movie) {
+    Movie* state = Find(movie);
+    if (state == nullptr || state->index >= state->count) {
+        return;
+    }
+
+    ++state->index;
+    state->nextFrameTime += state->msPerFrame;
+
+    // A stall - a slow load, a window drag - must not turn into a fast-forward
+    // through the rest of the movie. Give up on the lost time instead.
+    constexpr u32 kResyncAfter = 250;
+    const u32 now = Host().Ticks();
+    if (static_cast<std::int32_t>(now - state->nextFrameTime) > static_cast<std::int32_t>(kResyncAfter)) {
+        state->nextFrameTime = now;
+    }
+
+    if (state->index < state->count && !LoadFrame(*state)) {
+        state->count = state->index;
+    }
+}
+
+bool MovieWaiting(MovieId movie) {
+    Movie* state = Find(movie);
+    if (state == nullptr) {
+        return false;
+    }
+    return static_cast<std::int32_t>(Host().Ticks() - state->nextFrameTime) < 0;
+}
+
+bool MovieAtEnd(MovieId movie) {
+    Movie* state = Find(movie);
+    return state == nullptr || state->index >= state->count;
+}
+
+i32 MovieFrameIndex(MovieId movie) {
+    Movie* state = Find(movie);
+    return state != nullptr ? state->index : 0;
+}
+
+i32 MovieFrameCount(MovieId movie) {
+    Movie* state = Find(movie);
+    return state != nullptr ? state->count : 0;
+}
+
+const u8* MoviePalette(MovieId movie) {
+    Movie* state = Find(movie);
+    return state != nullptr && state->paletteReady ? state->palette.data() : nullptr;
+}
+
+Size MovieSize(MovieId movie) {
+    Movie* state = Find(movie);
+    return state != nullptr ? Size{state->width, state->height} : Size{0, 0};
+}
+
 }
