@@ -13,7 +13,7 @@
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <PLATFORM/Graphics.h>
-#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/RETAIL/Application.h>
 
 i32 platform::RunApplication(const char* commandLine) {
     memset(gcCommandLine, 0, KBWIN_COMMAND_LINE_CLEAR_SIZE);

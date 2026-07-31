@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/SAMPLE_TYPES.h>
@@ -30,7 +31,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
 
     char filename[FILENAME_CAPACITY];
     strcpy(filename, name);
-    _strrev(filename);
+    platform::Reverse(filename);
 
     for (i32 i = 0; i < FORMAT_SUFFIX_LENGTH; i++) {
         switch (filename[i]) {

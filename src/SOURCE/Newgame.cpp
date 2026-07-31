@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/message.h>
@@ -272,7 +273,7 @@ void game::GetMap(void) {
     if (resultCode == FILE_REQUESTER_OK) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
-        if (strcmpi(savedName, gMapName) != 0) {
+        if (platform::CompareIgnoringCase(savedName, gMapName) != 0) {
             strcpy(m_mapFilename, gMapName);
             ProcessNewMap(NULL);
         }
@@ -531,9 +532,9 @@ i32 game::NewGame(void) {
                 m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
             }
             if (giNumHumanPlayers > BROKENA_MAX_HUMAN_PLAYERS
-                && _strcmpi(gpGame->m_mapFilename, "brokena.mp2") == 0)
+                && platform::CompareIgnoringCase(gpGame->m_mapFilename, "brokena.mp2") == 0)
                 strcpy(gpGame->m_mapFilename, "slugfest.mp2");
-            if (giNumHumanPlayers > 1 && _strcmpi(gpGame->m_mapFilename, "arrax.mx2") == 0)
+            if (giNumHumanPlayers > 1 && platform::CompareIgnoringCase(gpGame->m_mapFilename, "arrax.mx2") == 0)
                 strcpy(gpGame->m_mapFilename, "fullhse.mx2");
 
             strcpy(gMapName, m_mapFilename);

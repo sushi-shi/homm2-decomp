@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <SOURCE/PHILAI.h>
 #include <SOURCE/philAI.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -1141,12 +1142,12 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         sprintf(generatedNameStorage, filename);
     }
 
-    if (strnicmp(generatedNameStorage, "RMT", sizeof("RMT") - 1) == 0) {
+    if (platform::CompareIgnoringCase(generatedNameStorage, "RMT", sizeof("RMT") - 1) == 0) {
         sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
     } else {
         sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
-        if (strnicmp(generatedNameStorage, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
-            && strnicmp(generatedNameStorage, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
+        if (platform::CompareIgnoringCase(generatedNameStorage, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
+            && platform::CompareIgnoringCase(generatedNameStorage, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
@@ -1415,7 +1416,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     m_gameLoaded = 1;
 
     char path28[SAVE_PATH_CAPACITY];
-    if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
+    if (loadFromFile || platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) == 0)
         sprintf(path28, "%s%s", ".\\DATA\\", filename);
     else
         sprintf(path28, "%s%s", gcGamePath, filename);
@@ -1461,7 +1462,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gpAdvManager->PurgeMapChangeQueue();
     platform::FileRead(file0, &giMapChangeCtr, sizeof(giMapChangeCtr));
     platform::FileRead(file0, oldData3, SAVE_STANDARD_FILENAME_SIZE);
-    if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
+    if (platform::CompareIgnoringCase(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
     platform::FileRead(file0, &m_playerCount, sizeof(m_playerCount));
 

@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8500,7 +8501,7 @@ i32 RiddleStringsEqual(char* answer, char* expected) {
     }
     strncpy(answerPrefix, answer, RIDDLE_PREFIX_LENGTH);
     answerPrefix[strlen(expectedPrefix)] = 0;
-    return strcmpi(expectedPrefix, answerPrefix) == 0;
+    return platform::CompareIgnoringCase(expectedPrefix, answerPrefix) == 0;
 }
 
 b32 gbNoShowCombat = false;
