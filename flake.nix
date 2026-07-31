@@ -9,69 +9,82 @@
       pkgs = import nixpkgs { inherit system; };
       p32 = pkgs.pkgsi686Linux;
       mingw = pkgs.pkgsCross.mingw32;
+      # Only what the build reads. Everything else - docs, the README, the
+      # flake itself - would otherwise rebuild all three targets when touched.
       source = builtins.path {
         path = ./.;
         name = "homm2-port-source";
         filter = path: type:
-          let base = baseNameOf path; in
-          !(base == "build"
-            || base == ".git"
-            || base == "result"
-            || base == "docs"
-            || base == "flake.nix"
-            || base == "flake.lock"
-            || base == "run-game.sh");
+          let relative = pkgs.lib.removePrefix (toString ./. + "/") (toString path); in
+          relative == "CMakeLists.txt"
+          || pkgs.lib.any (kept: pkgs.lib.hasPrefix kept relative) [ "src" "include" "web" ];
       };
 
-      ffmpeg-windows = mingw.stdenv.mkDerivation {
+      # Emscripten writes its cache next to $HOME, which a build does not have.
+      emscriptenHome = ''
+        export HOME="$TMPDIR"
+        export EM_CACHE="$TMPDIR/emscripten-cache"
+      '';
+
+      # The game needs Smacker video and Ogg music out of FFmpeg and nothing
+      # else. Both cross builds have to decode the same things, so they share
+      # one flag set.
+      mkFfmpeg = { pname, stdenv, tools, targetOs, arch, nativeBuildInputs, preConfigure ? "" }:
+        stdenv.mkDerivation {
+          inherit pname nativeBuildInputs;
+          inherit (pkgs.ffmpeg-headless) version src;
+          configurePhase = ''
+            runHook preConfigure
+            ${preConfigure}./configure \
+              --prefix="$out" \
+              ${pkgs.lib.concatStringsSep " \\\n              " tools} \
+              --target-os=${targetOs} \
+              --arch=${arch} \
+              --enable-cross-compile \
+              --disable-everything \
+              --disable-programs \
+              --disable-doc \
+              --disable-debug \
+              --disable-network \
+              --disable-autodetect \
+              --disable-asm \
+              --disable-avdevice \
+              --disable-avfilter \
+              --disable-swscale \
+              --disable-pthreads \
+              --disable-w32threads \
+              --disable-os2threads \
+              --disable-iconv \
+              --disable-runtime-cpudetect \
+              --enable-static \
+              --disable-shared \
+              --enable-avcodec \
+              --enable-avformat \
+              --enable-avutil \
+              --enable-swresample \
+              --enable-demuxer=smacker,ogg \
+              --enable-decoder=smacker,smackaud,vorbis \
+              --enable-protocol=file \
+              --extra-cflags=-O2
+            runHook postConfigure
+          '';
+          enableParallelBuilding = true;
+        };
+
+      ffmpeg-windows = mkFfmpeg {
         pname = "ffmpeg-windows";
-        inherit (pkgs.ffmpeg-headless) version src;
-        nativeBuildInputs = [
-          pkgs.gnumake
-          pkgs.perl
-          pkgs.pkg-config
+        stdenv = mingw.stdenv;
+        nativeBuildInputs = [ pkgs.gnumake pkgs.perl pkgs.pkg-config ];
+        targetOs = "mingw32";
+        arch = "x86_32";
+        tools = [
+          ''--cc="$CC"''
+          ''--cxx="$CXX"''
+          ''--ar="$AR"''
+          ''--ranlib="$RANLIB"''
+          ''--nm="$NM"''
+          "--host-cc=${pkgs.stdenv.cc}/bin/cc"
         ];
-        configurePhase = ''
-          runHook preConfigure
-          ./configure \
-            --prefix="$out" \
-            --cc="$CC" \
-            --cxx="$CXX" \
-            --ar="$AR" \
-            --ranlib="$RANLIB" \
-            --nm="$NM" \
-            --host-cc=${pkgs.stdenv.cc}/bin/cc \
-            --target-os=mingw32 \
-            --arch=x86_32 \
-            --enable-cross-compile \
-            --disable-everything \
-            --disable-programs \
-            --disable-doc \
-            --disable-debug \
-            --disable-network \
-            --disable-autodetect \
-            --disable-asm \
-            --disable-avdevice \
-            --disable-avfilter \
-            --disable-swscale \
-            --disable-pthreads \
-            --disable-w32threads \
-            --disable-os2threads \
-            --disable-iconv \
-            --disable-runtime-cpudetect \
-            --enable-static \
-            --disable-shared \
-            --enable-avcodec \
-            --enable-avformat \
-            --enable-avutil \
-            --enable-swresample \
-            --enable-demuxer=smacker,ogg \
-            --enable-decoder=smacker,smackaud,vorbis \
-            --enable-protocol=file \
-            --extra-cflags=-O2
-          runHook postConfigure
-        '';
-        enableParallelBuilding = true;
       };
 
       windows = mingw.stdenv.mkDerivation {
@@ -138,9 +151,7 @@
         nativeBuildInputs = [ pkgs.cmake pkgs.emscripten pkgs.ninja ];
         configurePhase = ''
           runHook preConfigure
-          export HOME="$TMPDIR"
-          export EM_CACHE="$TMPDIR/emscripten-cache"
-          emcmake cmake -S . -B build -G Ninja \
+          ${emscriptenHome}emcmake cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$out" \
             -DSDL_SHARED=OFF \
@@ -164,60 +175,22 @@
         '';
       };
 
-      ffmpeg-web = pkgs.stdenv.mkDerivation {
+      ffmpeg-web = (mkFfmpeg {
         pname = "ffmpeg-web";
-        inherit (pkgs.ffmpeg-headless) version src;
-        nativeBuildInputs = [
-          pkgs.emscripten
-          pkgs.gnumake
-          pkgs.perl
-          pkgs.pkg-config
+        stdenv = pkgs.stdenv;
+        nativeBuildInputs = [ pkgs.emscripten pkgs.gnumake pkgs.perl pkgs.pkg-config ];
+        targetOs = "none";
+        arch = "wasm32";
+        preConfigure = emscriptenHome;
+        tools = [
+          "--cc=emcc"
+          "--cxx=em++"
+          "--ar=emar"
+          "--ranlib=emranlib"
+          "--nm=${pkgs.emscripten.llvmEnv}/bin/llvm-nm"
+          ''--host-cc="$CC"''
         ];
-        configurePhase = ''
-          runHook preConfigure
-          export HOME="$TMPDIR"
-          export EM_CACHE="$TMPDIR/emscripten-cache"
-          ./configure \
-            --prefix="$out" \
-            --cc=emcc \
-            --cxx=em++ \
-            --ar=emar \
-            --ranlib=emranlib \
-            --nm=${pkgs.emscripten.llvmEnv}/bin/llvm-nm \
-            --host-cc="$CC" \
-            --target-os=none \
-            --arch=wasm32 \
-            --enable-cross-compile \
-            --disable-everything \
-            --disable-programs \
-            --disable-doc \
-            --disable-debug \
-            --disable-network \
-            --disable-autodetect \
-            --disable-asm \
-            --disable-avdevice \
-            --disable-avfilter \
-            --disable-swscale \
-            --disable-pthreads \
-            --disable-w32threads \
-            --disable-os2threads \
-            --disable-iconv \
-            --disable-runtime-cpudetect \
-            --enable-static \
-            --disable-shared \
-            --enable-avcodec \
-            --enable-avformat \
-            --enable-avutil \
-            --enable-swresample \
-            --enable-demuxer=smacker,ogg \
-            --enable-decoder=smacker,smackaud,vorbis \
-            --enable-protocol=file \
-            --extra-cflags=-O2
-          runHook postConfigure
-        '';
-        enableParallelBuilding = true;
-        dontStrip = true;
-      };
+      }).overrideAttrs { dontStrip = true; };
 
       homm2-web = pkgs.stdenvNoCC.mkDerivation {
         pname = "homm2-web";
@@ -226,9 +199,7 @@
         nativeBuildInputs = [ pkgs.cmake pkgs.emscripten pkgs.ninja ];
         configurePhase = ''
           runHook preConfigure
-          export HOME="$TMPDIR"
-          export EM_CACHE="$TMPDIR/emscripten-cache"
-          emcmake cmake -S . -B build -G Ninja \
+          ${emscriptenHome}emcmake cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DSDL3_DIR=${sdl3-web}/lib/cmake/SDL3 \
             -DHOMM2_FFMPEG_ROOT=${ffmpeg-web} \
@@ -307,7 +278,6 @@
           homm2-web-run;
         homm2-linux = homm2;
         homm2-windows = windows;
-        game = windows;
         default = homm2;
       };
 
