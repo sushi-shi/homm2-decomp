@@ -70,47 +70,56 @@ target_include_directories(homm2_platform PRIVATE
   ${CMAKE_SOURCE_DIR}/include)
 
 if(HOMM2_PLATFORM STREQUAL "SDL3")
-  if(EMSCRIPTEN)
+  # A statically linked SDL3 drags in system libraries of its own. That list
+  # lives in its package config, which pkg-config does not carry.
+  if(EMSCRIPTEN OR MINGW)
     find_package(SDL3 CONFIG REQUIRED)
-    set(FFMPEG_INCLUDE_DIR ${HOMM2_FFMPEG_ROOT}/include)
-    foreach(library avformat avcodec swresample avutil)
-      set(FFMPEG_${library}_LIBRARY
-        ${HOMM2_FFMPEG_ROOT}/lib/lib${library}.a)
-      list(APPEND HOMM2_FFMPEG_LIBRARIES ${FFMPEG_${library}_LIBRARY})
-    endforeach()
-    target_include_directories(homm2_platform PUBLIC ${FFMPEG_INCLUDE_DIR})
-    target_link_libraries(homm2_platform PUBLIC SDL3::SDL3)
+    set(HOMM2_SDL3_LIBRARY SDL3::SDL3)
   else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SDL3 REQUIRED IMPORTED_TARGET sdl3)
+    set(HOMM2_SDL3_LIBRARY PkgConfig::SDL3)
+  endif()
+
+  if(HOMM2_FFMPEG_ROOT)
+    target_include_directories(homm2_platform PUBLIC ${HOMM2_FFMPEG_ROOT}/include)
+    foreach(library avformat avcodec swresample avutil)
+      list(APPEND HOMM2_FFMPEG_LIBRARIES
+        ${HOMM2_FFMPEG_ROOT}/lib/lib${library}.a)
+    endforeach()
+  else()
+    find_package(PkgConfig REQUIRED)
     pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
       libavcodec libavformat libavutil libswresample)
     set(HOMM2_FFMPEG_LIBRARIES PkgConfig::FFMPEG)
-    target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3 PkgConfig::FFMPEG)
+  endif()
 
-    # pkg-config answers about the libraries it can see, which on a 64-bit
-    # host are the 64-bit ones. Link something before believing it.
-    if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
-      cmake_push_check_state(RESET)
-      set(CMAKE_REQUIRED_FLAGS -m32)
-      set(CMAKE_REQUIRED_LIBRARIES PkgConfig::SDL3 PkgConfig::FFMPEG)
-      check_cxx_source_compiles([[
-        #include <SDL3/SDL.h>
-        extern "C" {
-        #include <libavcodec/avcodec.h>
-        }
-        int main() { return SDL_WasInit(0) + avcodec_version(); }
-      ]] HOMM2_HAVE_32BIT_LIBRARIES)
-      cmake_pop_check_state()
+  target_link_libraries(homm2_platform PUBLIC
+    ${HOMM2_SDL3_LIBRARY}
+    ${HOMM2_FFMPEG_LIBRARIES})
 
-      if(NOT HOMM2_HAVE_32BIT_LIBRARIES)
-        message(FATAL_ERROR
-          "SDL3 and FFmpeg were found, but not as 32-bit libraries.\n"
-          "Install the 32-bit development packages: libsdl3-dev:i386 and the "
-          "libav*-dev:i386 set on Debian/Ubuntu, SDL3-devel.i686 and "
-          "ffmpeg-devel.i686 on Fedora.\n"
-          "Nix users get all of it from `nix develop`.")
-      endif()
+  # pkg-config answers about the libraries it can see, which on a 64-bit
+  # host are the 64-bit ones. Link something before believing it.
+  if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
+    cmake_push_check_state(RESET)
+    set(CMAKE_REQUIRED_FLAGS -m32)
+    set(CMAKE_REQUIRED_LIBRARIES ${HOMM2_SDL3_LIBRARY} ${HOMM2_FFMPEG_LIBRARIES})
+    check_cxx_source_compiles([[
+      #include <SDL3/SDL.h>
+      extern "C" {
+      #include <libavcodec/avcodec.h>
+      }
+      int main() { return SDL_WasInit(0) + avcodec_version(); }
+    ]] HOMM2_HAVE_32BIT_LIBRARIES)
+    cmake_pop_check_state()
+
+    if(NOT HOMM2_HAVE_32BIT_LIBRARIES)
+      message(FATAL_ERROR
+        "SDL3 and FFmpeg were found, but not as 32-bit libraries.\n"
+        "Install the 32-bit development packages: libsdl3-dev:i386 and the "
+        "libav*-dev:i386 set on Debian/Ubuntu, SDL3-devel.i686 and "
+        "ffmpeg-devel.i686 on Fedora.\n"
+        "Nix users get all of it from `nix develop`.")
     endif()
   endif()
 endif()
