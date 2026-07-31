@@ -16,6 +16,7 @@
 #include <SOURCE/game.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
+#include <PLATFORM/Strings.h>
 #include <SOURCE/REQUEST.h>
 
 enum class FileRequesterHelpIndex : i32 {
@@ -104,7 +105,7 @@ i32 ShowThisMapGame(const char* filename) {
             mapName[ix] = 0;
         }
     }
-    if (strcmpi(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
+    if (platform::CompareIgnoringCase(mapName, "BROKENA") == 0 && CheckSumIsDemoOK(filename)) {
         return 1;
     }
     return 0;
@@ -192,7 +193,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
         }
 
         for (indexData5 = 0; indexData5 < insertCount; ++indexData5) {
-            if (strcmpi(nameBuffer, m_fileNames[indexData5].text) < 0) {
+            if (platform::CompareIgnoringCase(nameBuffer, m_fileNames[indexData5].text) < 0) {
                 for (moveValue = insertCount; moveValue > indexData5; --moveValue) {
                     strcpy(m_fileNames[moveValue].text, m_fileNames[moveValue - 1].text);
                     strcpy(m_extensions[moveValue].text, m_extensions[moveValue - 1].text);
@@ -355,7 +356,7 @@ i32 fileRequester::Open(i32 id) {
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
         for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
-            if (strcmpi(m_fileNames[fileSlot].text, m_filename) == 0) {
+            if (platform::CompareIgnoringCase(m_fileNames[fileSlot].text, m_filename) == 0) {
                 m_selectedIndex = fileSlot;
             }
         }
@@ -371,7 +372,7 @@ i32 fileRequester::Open(i32 id) {
                 ++fileSlot;
             }
             for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
-                if (strcmpi(m_fileNames[fileSlot].text, mapName) == 0) {
+                if (platform::CompareIgnoringCase(m_fileNames[fileSlot].text, mapName) == 0) {
                     m_selectedIndex = fileSlot;
                     enabled = 1;
                 }
@@ -400,7 +401,7 @@ i32 fileRequester::Open(i32 id) {
         enabled = 0;
     }
     if (m_mode == FILE_REQUESTER_SAVE_GAME
-        && strcmpi(
+        && platform::CompareIgnoringCase(
                m_filename,
                  "\xcd\xce\xc2\xc0\xdf\x20\xc8\xc3\xd0\xc0"
            )
@@ -461,7 +462,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                     SetupFiles();
                     if (strlen(cycleNameBuffer) != 0) {
                         for (iResult = 0; iResult < m_fileCount; ++iResult) {
-                            if (strcmpi(m_fileNames[iResult].text, cycleNameBuffer) == 0) {
+                            if (platform::CompareIgnoringCase(m_fileNames[iResult].text, cycleNameBuffer) == 0) {
                                 m_selectedIndex = iResult;
                             }
                         }
@@ -690,7 +691,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
                                 SetupFiles();
                                 if (strlen(filteredNameMap) != 0) {
                                     for (iResult = 0; iResult < m_fileCount; ++iResult) {
-                                        if (strcmpi(m_fileNames[iResult].text, filteredNameMap)
+                                        if (platform::CompareIgnoringCase(m_fileNames[iResult].text, filteredNameMap)
                                             == 0) {
                                             m_selectedIndex = iResult;
                                         }
@@ -842,8 +843,8 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     if (acceptStep == 1) {
         if (m_mode == FILE_REQUESTER_LOAD_GAME && m_selectedIndex >= 0
             && message.payload.widget.data.value != FILE_REQUESTER_CANCEL
-            && strcmpi(m_extensions[m_selectedIndex].text, ".GMC") != 0
-            && strcmpi(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
+            && platform::CompareIgnoringCase(m_extensions[m_selectedIndex].text, ".GMC") != 0
+            && platform::CompareIgnoringCase(m_extensions[m_selectedIndex].text, ".GXC") != 0) {
             iResult =
                 m_extensions[m_selectedIndex].text[FILE_REQUESTER_EXTENSION_PLAYER_DIGIT] - '0';
             if (iResult < giNumHumanPlayers

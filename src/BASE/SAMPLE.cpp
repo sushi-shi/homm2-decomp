@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>
@@ -29,7 +30,7 @@ sample::sample(char* name)
 
     char fileName[FILENAME_CAPACITY];
     strcpy(fileName, name);
-    strrev(fileName);
+    platform::Reverse(fileName);
 
     for (i32 i = 0; i < FORMAT_SUFFIX_LENGTH; i++) {
         switch (fileName[i]) {

@@ -10,11 +10,11 @@
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/RETAIL/Application.h>
 #include <PLATFORM/Graphics.h>
 #include <BASE/message.h>
 #include <BASE/widget.h>
-#include <PLATFORM/WIN32/WinsockTransport.h>
+#include <PLATFORM/RETAIL/WinsockTransport.h>
 
 typedef enum WinsockPrivateConstant {
     IP_ADDRESS_ENTRY_LIMIT = 20,

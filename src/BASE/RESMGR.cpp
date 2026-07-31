@@ -1,4 +1,5 @@
 #include <Ints.h>
+#include <PLATFORM/Strings.h>
 #include <PLATFORM/File.h>
 #include <string.h>
 #include <SOURCE/KB.h>
@@ -425,7 +426,7 @@ u32l resourceManager::MakeId(char* name, i32 translate) {
     if (gbUseEvilInterface != 0 && translate != 0) {
         for (i32 translatedIndex = 0; translatedIndex < EVIL_TRANSLATION_COUNT;
              translatedIndex++) {
-            if (strcmpi(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
+            if (platform::CompareIgnoringCase(m_lastFileName, cEvilTranslate[translatedIndex][0]) == 0)
                 strcpy(m_lastFileName, cEvilTranslate[translatedIndex][1]);
         }
     }

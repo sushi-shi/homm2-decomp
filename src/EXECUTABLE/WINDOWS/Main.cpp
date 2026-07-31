@@ -5,7 +5,7 @@
 
 #include <Ints.h>
 #include <PLATFORM/Entry.h>
-#include <PLATFORM/WIN32/Application.h>
+#include <PLATFORM/RETAIL/Application.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 
