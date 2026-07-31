@@ -1,5 +1,5 @@
 #include <Ints.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <string.h>
 #include <SOURCE/KB.h>
 #include <stdio.h>
@@ -24,7 +24,6 @@ typedef enum ResourceConstant {
     ENTRY_BYTES             = 0xc,
     EVIL_TRANSLATION_COUNT  = 37,
     BACKDROP_ROW_BYTES      = 640,
-    BINARY_OPEN_MODE        = 0x8000,
     FILE_COUNT_BUFFER_WORDS = 2,
     POSITION_STACK_DEPTH    = 10
 } ResourceConstant;
@@ -279,7 +278,7 @@ void resourceManager::Close(void) {
         if (m_aggregateDir[aggregateIndex] != NULL)
             H2_FREE(m_aggregateDir[aggregateIndex]);
         if (m_aggregateFd[aggregateIndex] != INVALID_FILE) {
-            close(m_aggregateFd[aggregateIndex]);
+            platform::FileClose(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = INVALID_FILE;
         }
     }
@@ -300,7 +299,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
         ShutDown(gText);
         return LOAD_ERROR;
     }
-    aggregateFp = open(aggregateName, BINARY_OPEN_MODE);
+    aggregateFp = platform::FileOpen(aggregateName, platform::FileMode::Read);
     if (aggregateFp == INVALID_FILE) {
         sprintf(
             gText,
@@ -314,11 +313,11 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
     m_aggregateFd[m_curAggregate] = aggregateFp;
-    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
+    platform::FileRead(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
-    read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
+    platform::FileRead(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return LOAD_SUCCESS;
 }
 
@@ -352,7 +351,7 @@ void resourceManager::PointToFile(u32l fileId) {
         ShutDown(gText);
     }
     i32l position =
-        lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset, 0);
+        platform::FileSeek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset);
 }
 
 u32l resourceManager::GetFileSize(u32l fileId) {
@@ -389,7 +388,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
 }
 
 void resourceManager::SavePosition(void) {
-    lastPositionZ[iSaveCtr] = tell(m_aggregateFd[m_curAggregate]);
+    lastPositionZ[iSaveCtr] = platform::FileTell(m_aggregateFd[m_curAggregate]);
     lastAggZ[iSaveCtr] = m_curAggregate;
     iSaveCtr = iSaveCtr + 1;
 }
@@ -397,27 +396,27 @@ void resourceManager::SavePosition(void) {
 void resourceManager::RestorePosition(void) {
     iSaveCtr = iSaveCtr - 1;
     m_curAggregate = lastAggZ[iSaveCtr];
-    lseek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr], 0);
+    platform::FileSeek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr]);
 }
 
 i8 resourceManager::ReadByte(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i8 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result = platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 i16 resourceManager::ReadWord(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i16 value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result = platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 i32l resourceManager::ReadLong(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     i32l value = 0;
-    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
+    i32 result = platform::FileRead(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
@@ -442,7 +441,7 @@ void resourceManager::Read13(i8* destination) {
 void resourceManager::ReadBlock(i8* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE);
     PollSound();
-    i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
+    i32 bytesRead = platform::FileRead(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
         sprintf(
             gText,

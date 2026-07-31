@@ -2,7 +2,7 @@
 #include <BASE/Bzip.h>
 #include <BASE/Misc.h>
 #include <SOURCE/KB.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -1904,11 +1904,11 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
 
-    fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    fd = platform::FileOpen(fname, platform::FileMode::Write);
     if (fd == -1)
         FileError(fname);
-    _write(fd, src, srcLen);
-    _close(fd);
+    platform::FileWrite(fd, src, srcLen);
+    platform::FileClose(fd);
     compress(fname);
 
     strcat(fname, ".nw");
@@ -1945,11 +1945,11 @@ i32l DecodeData(char* dst, char* src, u32l srcLen) {
     fname[strlen(fname)] = (char)Random(0x41, 0x5a);
     strcat(fname, ".nw");
 
-    fd = _open(fname, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    fd = platform::FileOpen(fname, platform::FileMode::Write);
     if (fd == -1)
         FileError(fname);
-    _write(fd, src, srcLen);
-    _close(fd);
+    platform::FileWrite(fd, src, srcLen);
+    platform::FileClose(fd);
     uncompress(fname);
 
     fname[strlen(fname) - 3] = '\0';

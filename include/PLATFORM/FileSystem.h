@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <PLATFORM/File.h>
+
 namespace platform {
 
 class IFileSystem {
@@ -14,9 +16,23 @@ public:
 
     virtual std::string UserRoot() const = 0;
 
-    virtual std::string Resolve(const char* retailPath) const = 0;
+    virtual std::string Resolve(const char* retailPath, FileMode mode) const = 0;
 
     virtual std::vector<std::string> List(const char* pattern) const = 0;
+
+    virtual bool Exists(const char* retailPath) const = 0;
+
+    virtual i32 Open(const char* retailPath, FileMode mode) = 0;
+
+    virtual void Close(i32 file) = 0;
+
+    virtual i32 Read(i32 file, void* buffer, i32 count) = 0;
+
+    virtual i32 Write(i32 file, const void* buffer, i32 count) = 0;
+
+    virtual i32 Seek(i32 file, i32 offset) = 0;
+
+    virtual i32 Tell(i32 file) = 0;
 };
 
 // Saved games, high scores and the network exchange files. Retail kept them
@@ -25,6 +41,10 @@ bool IsUserState(const char* retailPath);
 
 // Creates the user directories that state resolves into.
 void PrepareUserState(const std::string& userRoot);
+
+// Names a retail path inside a real directory, taking the spelling that is
+// already there over the one asked for.
+std::string ResolveIn(const std::string& root, const char* retailPath);
 
 }
 

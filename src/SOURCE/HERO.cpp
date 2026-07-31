@@ -1,5 +1,5 @@
 #include <Ints.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -204,16 +204,16 @@ hero::hero(void) {
 
 void hero::Read(i32 file, i8 expansion) {
     if (expansion)
-        read(file, this, sizeof(hero));
+        platform::FileRead(file, this, sizeof(hero));
     else
-        read(file, this, BASE_RECORD_SIZE);
+        platform::FileRead(file, this, BASE_RECORD_SIZE);
 }
 
 void hero::Write(i32 file, i8 expansion) {
     if (expansion)
-        write(file, this, sizeof(hero));
+        platform::FileWrite(file, this, sizeof(hero));
     else
-        write(file, this, BASE_RECORD_SIZE);
+        platform::FileWrite(file, this, BASE_RECORD_SIZE);
 }
 
 void hero::GetArmyStrengths(u32l* const) {}

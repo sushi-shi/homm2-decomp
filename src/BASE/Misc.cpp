@@ -163,7 +163,7 @@ typedef enum FileIdHashConstant {
 #include <BASE/message.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -560,7 +560,7 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         "HEROES2.CFG"
     );
-    FILE* file = access(gText, 0) == -1 ? NULL : fopen(gText, "rb");
+    FILE* file = platform::FileExists(gText) ? fopen(gText, "rb") : NULL;
     if (file == NULL) {
         SetInstallDefaults();
         SetGameDefaults();
@@ -608,11 +608,11 @@ void WritePrefsToFile(void) {
         platform::Files().UserRoot().c_str(),
         "HEROES2.CFG"
     );
-    fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    fd = platform::FileOpen(gText, platform::FileMode::Write);
     if (fd == -1)
         return;
-    write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
-    close(fd);
+    platform::FileWrite(fd, &gConfig, CONFIG_PERSISTED_SIZE);
+    platform::FileClose(fd);
 }
 
 void WritePrefsToRegistry(void) {
@@ -626,16 +626,16 @@ void WritePrefs(void) {
 
 CDRomSetupResult SetupCDDrive(void) {
     sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
-    i32 file = open(gText, _O_BINARY);
+    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return CD_ROM_DATA_FILES_MISSING;
-    close(file);
+    platform::FileClose(file);
 
     sprintf(gText, "%s%s", ".", gcCDTrackName);
-    file = open(gText, _O_BINARY);
+    file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return CD_ROM_DATA_FILES_MISSING;
-    close(file);
+    platform::FileClose(file);
 
     strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
     return CD_ROM_READY;
@@ -719,13 +719,13 @@ void LogTruncate(void) {
     i32 fileHandle;
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
-    fileHandle = open("KB.LOG", _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
+    fileHandle = platform::FileOpen("KB.LOG", platform::FileMode::Write);
     if (fileHandle == -1)
         return;
     strcpy(logText, "===========New Log==========");
     strcat(logText, "\n");
-    write(fileHandle, logText, strlen(logText));
-    close(fileHandle);
+    platform::FileWrite(fileHandle, logText, strlen(logText));
+    platform::FileClose(fileHandle);
 }
 
 
@@ -939,10 +939,10 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     pcxHdr.planes = PLANE_COUNT;
     pcxHdr.bytesPerLine = static_cast<u16>(width);
     pcxHdr.paletteType = PALETTE_TYPE_COLOR;
-    fd = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    fd = platform::FileOpen(filename, platform::FileMode::Write);
     if (fd == -1)
         return;
-    write(fd, &pcxHdr, sizeof(pcxHdr));
+    platform::FileWrite(fd, &pcxHdr, sizeof(pcxHdr));
     encodedRow = static_cast<u8*>(H2_ALLOC(width * 2));
     for (y = 0; y < height; ++y) {
         sourceIndex = 0;
@@ -966,17 +966,17 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
                 sourceIndex += 1;
             }
         }
-        write(fd, encodedRow, iLen);
+        platform::FileWrite(fd, encodedRow, iLen);
     }
     H2_FREE(encodedRow);
     bMark = VGA_PALETTE_MARKER;
-    write(fd, &bMark, 1);
+    platform::FileWrite(fd, &bMark, 1);
     palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
     for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
         *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
-    write(fd, palOut, PALETTE_BYTE_COUNT);
+    platform::FileWrite(fd, palOut, PALETTE_BYTE_COUNT);
     H2_FREE(palOut);
-    close(fd);
+    platform::FileClose(fd);
 }
 
 i32l FileSize(char* filename) {

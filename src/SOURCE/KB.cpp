@@ -33,7 +33,7 @@
 #include <string.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 
 #include <SOURCE/advManager.h>
 #include <SOURCE/combatManager.h>
@@ -2986,7 +2986,7 @@ i32 AddScoreToHighScore(
             ".\\DATA\\"
         );
 
-    file_c = open(filename_h, HIGH_SCORE_FILE_READ_FLAGS);
+    file_c = platform::FileOpen(filename_h, platform::FileMode::Read);
     if (file_c == -1)
         missingFile_e = 1;
     if (missingFile_e) {
@@ -2996,8 +2996,8 @@ i32 AddScoreToHighScore(
         }
     } else {
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            read(file_c, &entries_a[entry_a], sizeof(entries_a));
-        close(file_c);
+            platform::FileRead(file_c, &entries_a[entry_a], sizeof(entries_a));
+        platform::FileClose(file_c);
     }
 
     gbShowHighScore = true;
@@ -3036,12 +3036,12 @@ i32 AddScoreToHighScore(
         if (highScoreType == HIGH_SCORE_CAMPAIGN && gpGame->m_campaignCheated)
             entries_a[entry_a].cheated = 1;
 
-        file_c = open(filename_h, HIGH_SCORE_FILE_WRITE_FLAGS, HIGH_SCORE_FILE_PERMISSIONS);
+        file_c = platform::FileOpen(filename_h, platform::FileMode::Write);
         if (file_c == -1)
             FileError(filename_h);
         for (entry_a = 0; entry_a < HIGH_SCORE_ENTRY_COUNT; entry_a++)
-            write(file_c, &entries_a[entry_a], sizeof(HighScoreEntry));
-        close(file_c);
+            platform::FileWrite(file_c, &entries_a[entry_a], sizeof(HighScoreEntry));
+        platform::FileClose(file_c);
     } else {
         gbShowHighScore = false;
     }

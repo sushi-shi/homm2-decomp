@@ -270,10 +270,7 @@ typedef enum HighScoreConstant {
     HIGH_SCORE_PLAYER_NAME_SIZE   = HIGH_SCORE_NAME_LENGTH + 1,
     HIGH_SCORE_SCENARIO_NAME_SIZE = 41,
     HIGH_SCORE_RESERVED_SIZE      = 29,
-    HIGH_SCORE_EMPTY              = -1,
-    HIGH_SCORE_FILE_READ_FLAGS    = 0x8000,
-    HIGH_SCORE_FILE_WRITE_FLAGS   = 0x8301,
-    HIGH_SCORE_FILE_PERMISSIONS   = 0x80
+    HIGH_SCORE_EMPTY              = -1
 } HighScoreConstant;
 
 #pragma pack(push, 1)
