@@ -560,14 +560,14 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         "HEROES2.CFG"
     );
-    FILE* file = platform::FileExists(gText) ? fopen(gText, "rb") : NULL;
-    if (file == NULL) {
+    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
+    if (file == -1) {
         SetInstallDefaults();
         SetGameDefaults();
         WritePrefs();
     } else {
-        fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, file);
-        fclose(file);
+        platform::FileRead(file, &gConfig, CONFIG_PERSISTED_SIZE);
+        platform::FileClose(file);
         if (gConfig.needsDefaultInitialization != 0) {
             SetGameDefaults();
             WritePrefs();
@@ -731,16 +731,16 @@ void LogTruncate(void) {
 
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
-    FILE* out;
+    i32 out;
     if (giDebugLevel < FILE_DEBUG_LEVEL)
         return;
-    out = fopen("KB.LOG", "at+");
-    if (out == NULL)
+    out = platform::FileOpen("KB.LOG", platform::FileMode::Append);
+    if (out == -1)
         return;
     strcpy(logText, text);
     strcat(logText, "\n");
-    fputs(logText, out);
-    fclose(out);
+    platform::FileWrite(out, logText, static_cast<i32>(strlen(logText)));
+    platform::FileClose(out);
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
         platform::Host().Log(platform::LogLevel::Debug, logText);
 }
@@ -980,19 +980,12 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
 }
 
 i32l FileSize(char* filename) {
-    FILE* f;
-    i32l lLen;
-
-    f = fopen(filename, "r+b");
-    if (f == NULL) {
-        if (f == NULL)
-            FileError(filename);
-    }
-    fseek(f, 0, SEEK_END);
-    lLen = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    fclose(f);
-    return lLen;
+    i32 file = platform::FileOpen(filename, platform::FileMode::Read);
+    if (file == -1)
+        FileError(filename);
+    i32l size = platform::FileLength(file);
+    platform::FileClose(file);
+    return size;
 }
 
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {

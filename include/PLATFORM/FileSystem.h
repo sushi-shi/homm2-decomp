@@ -33,6 +33,8 @@ public:
     virtual i32 Seek(i32 file, i32 offset) = 0;
 
     virtual i32 Tell(i32 file) = 0;
+
+    virtual i32 Length(i32 file) = 0;
 };
 
 // Saved games, high scores and the network exchange files. Retail kept them
