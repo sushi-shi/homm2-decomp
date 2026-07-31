@@ -10,9 +10,29 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Retail pointer width and packed layouts are load-bearing, so the game is
+# built 32-bit. On a 64-bit host that means -m32, and a toolchain that cannot
+# do it should say so here rather than on the first source file.
 if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
   add_compile_options(-m32)
   add_link_options(-m32)
+
+  include(CMakePushCheckState)
+  include(CheckCXXSourceCompiles)
+
+  cmake_push_check_state(RESET)
+  set(CMAKE_REQUIRED_FLAGS -m32)
+  check_cxx_source_compiles("int main() { return 0; }" HOMM2_HAVE_32BIT_TOOLCHAIN)
+  cmake_pop_check_state()
+
+  if(NOT HOMM2_HAVE_32BIT_TOOLCHAIN)
+    message(FATAL_ERROR
+      "This is a 32-bit build and ${CMAKE_CXX_COMPILER_ID} cannot produce a "
+      "32-bit binary here.\n"
+      "Install the multilib toolchain: gcc-multilib and g++-multilib on "
+      "Debian/Ubuntu, glibc-devel.i686 and libstdc++-devel.i686 on Fedora.\n"
+      "Nix users get all of it from `nix develop`.")
+  endif()
 endif()
 
 file(GLOB_RECURSE HOMM2_GAME_SOURCES CONFIGURE_DEPENDS
@@ -67,6 +87,31 @@ if(HOMM2_PLATFORM STREQUAL "SDL3")
       libavcodec libavformat libavutil libswresample)
     set(HOMM2_FFMPEG_LIBRARIES PkgConfig::FFMPEG)
     target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3)
+
+    # pkg-config answers about the libraries it can see, which on a 64-bit
+    # host are the 64-bit ones. Link something before believing it.
+    if(HOMM2_32BIT AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
+      cmake_push_check_state(RESET)
+      set(CMAKE_REQUIRED_FLAGS -m32)
+      set(CMAKE_REQUIRED_LIBRARIES PkgConfig::SDL3 PkgConfig::FFMPEG)
+      check_cxx_source_compiles([[
+        #include <SDL3/SDL.h>
+        extern "C" {
+        #include <libavcodec/avcodec.h>
+        }
+        int main() { return SDL_WasInit(0) + avcodec_version(); }
+      ]] HOMM2_HAVE_32BIT_LIBRARIES)
+      cmake_pop_check_state()
+
+      if(NOT HOMM2_HAVE_32BIT_LIBRARIES)
+        message(FATAL_ERROR
+          "SDL3 and FFmpeg were found, but not as 32-bit libraries.\n"
+          "Install the 32-bit development packages: libsdl3-dev:i386 and the "
+          "libav*-dev:i386 set on Debian/Ubuntu, SDL3-devel.i686 and "
+          "ffmpeg-devel.i686 on Fedora.\n"
+          "Nix users get all of it from `nix develop`.")
+      endif()
+    endif()
   endif()
 endif()
 
