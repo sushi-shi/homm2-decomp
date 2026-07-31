@@ -43,45 +43,16 @@ enum class KbWinMenuCommand : i32 {
 };
 using enum KbWinMenuCommand;
 
-i32 AppInit(HINSTANCE, HINSTANCE, i32, char*);
-i32 AppIdle(void);
-LRESULT CALLBACK AppWndProc(HWND, UINT, WPARAM, LPARAM);
-BOOL CALLBACK AppAbout(HWND, UINT, WPARAM, LPARAM);
-void AppExit(void);
-void Process1WindowsMessage(void);
 void ResizeWindow(i32, i32, i32, i32);
-LRESULT AppCommand(HWND, UINT, WPARAM, LPARAM);
-void UpdateDfltMenu(HMENU);
-void KBChangeMenu(HMENU);
-void SetMenuStatus(i32);
-void SetNoDialogMenus(i32);
-void SetMenus(HMENU, i32);
 i32l KBTickCount(void);
-void InitVideo(void);
 
 extern HANDLE gEventHandle;
 extern HINSTANCE hInstApp;
-extern HMENU hmnuApp;
 extern HWND hwndApp;
 
-extern char szAppName[KBWIN_APP_NAME_SIZE];
-extern char szTitle[KBWIN_WINDOW_TITLE_SIZE];
-extern i32l lLastGTimerTickCount;
-extern i32l lLastCycleColorsTickCount;
-extern i32 bRestartMusic;
-extern i32 iLastMusic;
-extern i32l lLastGetMessage;
-extern i32l lLastAilServe;
-extern b32 gbNoDialogMenusOn;
 extern i32 giTotalMemAllocated;
 extern u8 giChangeThreshold[];
-extern RECT rcTemp;
 extern i32 iMainWinScreenHeight;
-extern HMENU hmnuCurrent;
-extern i32 iTempX;
-extern i32 iTempY;
-extern i32l lTemp;
-extern u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
 extern i32 iMainWinScreenWidth;
 
 #endif
