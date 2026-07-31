@@ -2,6 +2,7 @@
 #define HOMM2_BASE_SOUNDMANAGER_H
 
 #include <Ints.h>
+#include <PLATFORM/Audio.h>
 #include <stdio.h>
 #include "baseManager.h"
 
@@ -37,10 +38,7 @@ enum class SoundDigitalReportQuery : i16 {
 using enum SoundDigitalReportQuery;
 
 class sample;
-struct _SAMPLE;
-struct _DIG_DRIVER;
 struct tag_message;
-#include <audiere.h>
 
 #pragma pack(push, 1)
 struct SampleChannelStruct {
@@ -50,17 +48,15 @@ struct SampleChannelStruct {
 };
 
 typedef enum SoundBackendKind {
-    SOUND_BACKEND_AUDIERE = 0,
-    SOUND_BACKEND_MILES   = 1,
-    SOUND_BACKEND_NONE    = 2
+    SOUND_BACKEND_AUDIO_CD   = 0,
+    SOUND_BACKEND_AUDIO_MIDI = 1,
+    SOUND_BACKEND_NONE       = 2
 } SoundBackendKind;
 
 class soundManager : public baseManager {
 public:
     SoundBackendKind m_backend;
     SoundBackendKind m_savedBackend;
-    struct _DIG_DRIVER* m_digitalDriver;
-    audiere::AudioDevicePtr m_audiereDevice;
     i32 m_musicFadeTargetTrack;
     i32 m_musicFadeSteps;
     i32 m_musicTrack;
@@ -74,7 +70,6 @@ public:
     void SaveBackend(void);
     void RestoreBackend(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
-    float ConvertVolumeFloat(i32, SoundVolumeConversionMode);
     void StopAllSamples(i32);
     void StopSample(class sample*);
     void ModifySample(class sample*, i32);
@@ -98,11 +93,11 @@ extern bool gSoundDisabled;
 extern bool gSoundBackendsReady;
 
 inline bool IsAudiereBackend(const soundManager* manager) {
-    return manager->m_backend == SOUND_BACKEND_AUDIERE && manager->m_audiereDevice != NULL;
+    return manager->m_backend == SOUND_BACKEND_AUDIO_CD;
 }
 
 inline bool IsMilesBackend(const soundManager* manager) {
-    return manager->m_backend == SOUND_BACKEND_MILES && manager->m_digitalDriver != NULL;
+    return manager->m_backend == SOUND_BACKEND_AUDIO_MIDI;
 }
 
 inline bool IsSoundBackendActive(const soundManager* manager) {
@@ -119,17 +114,14 @@ inline void soundManager::RestoreBackend(void) {
         return;
     if (m_backend != SOUND_BACKEND_NONE)
         ShutdownSoundBackends();
-    if (m_savedBackend == SOUND_BACKEND_MILES)
+    if (m_savedBackend == SOUND_BACKEND_AUDIO_MIDI)
         StartupMilesBackend();
-    else if (m_savedBackend == SOUND_BACKEND_AUDIERE)
+    else if (m_savedBackend == SOUND_BACKEND_AUDIO_CD)
         CDStartup();
 }
 
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
-extern struct _MDI_DRIVER* hMDI;
 extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
-extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
-extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 
 #endif

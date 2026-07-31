@@ -30,6 +30,10 @@ public:
     virtual void SetVoiceVolume(VoiceId voice, int volume) = 0;
 
     virtual bool PlayMusic(const SoundData& sound, int loops) = 0;
+
+    // The numbered music the game ships with. Where it lives and how it is
+    // encoded is the backend's business.
+    virtual bool PlayMusicTrack(int track, int loops) = 0;
     virtual void StopMusic() = 0;
     virtual bool IsMusicPlaying() const = 0;
     virtual void SetMusicVolume(int volume) = 0;

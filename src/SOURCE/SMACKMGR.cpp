@@ -147,8 +147,6 @@ void SmackManagerMain(void) {
     i32 companionStarted26;
     i32 primaryStarted7;
     i32 unusedOne8;
-    HDIGDRIVER digitalDriver5;
-    i32 savedVolume8;
     i32 unusedPlaybackState0;
     char path7[MOVIE_PATH_SIZE];
     i8 savedPalette4[PALETTE_DATA_SIZE];
@@ -178,38 +176,10 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette4, gPalette->m_data, PALETTE_DATA_SIZE);
 
-    if (!IsSoundBackendActive(gpSoundManager) || gConfig.soundVolume == CONFIG_VOLUME_MUTED
-        || bSmackNum == SMACK_CREDITS || bSmackNum == BUKA_CREDITS) {
-        bSmackSound = 0;
-    } else {
-        if (IsMilesBackend(gpSoundManager))
-            digitalDriver5 = gpSoundManager->m_digitalDriver;
-        else
-            digitalDriver5 = NULL;
-        if (!digitalDriver5) {
-            gpSoundManager->StartupMilesBackend();
-            if (IsMilesBackend(gpSoundManager))
-                digitalDriver5 = gpSoundManager->m_digitalDriver;
-            else
-                digitalDriver5 = NULL;
-            if (!digitalDriver5) {
-                bSmackSound = 0;
-            } else {
-                SmackSoundUseMSS(digitalDriver5);
-                bSmackSound = 1;
-            }
-        } else {
-            SmackSoundUseMSS(digitalDriver5);
-            bSmackSound = 1;
-        }
-        if (bSmackSound) {
-            savedVolume8 = AIL_digital_master_volume(digitalDriver5);
-            AIL_set_digital_master_volume(
-                digitalDriver5,
-                smackMasterVolumes[H2EnumIndex(gConfig.soundVolume)]
-            );
-        }
-    }
+    bSmackSound = IsSoundBackendActive(gpSoundManager)
+               && gConfig.soundVolume != CONFIG_VOLUME_MUTED
+               && bSmackNum != SMACK_CREDITS
+               && bSmackNum != BUKA_CREDITS;
 
     if (bSmackNum == EXPANSION_CAMPAIGN)
         strcpy(path7, ".\\DATA\\");
@@ -582,8 +552,6 @@ playbackDone:
     if (backImage)
         gpResourceManager->Dispose(static_cast<resource*>(backImage));
     backImage = NULL;
-    if (bSmackSound)
-        AIL_set_digital_master_volume(digitalDriver5, savedVolume8);
     gpSoundManager->RestoreBackend();
 }
 

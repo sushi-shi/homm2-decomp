@@ -29,6 +29,7 @@
 #include <SOURCE/game.h>
 #include <SOURCE/HERO.h>
 #include <SOURCE/hero.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/playerData.h>
 #include <SOURCE/philAI.h>
@@ -771,7 +772,7 @@ void townManager::ChangeTown(void) {
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
         || gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
         if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-            Sleep(100);
+            platform::Host().Sleep(100);
         gpSoundManager->SwitchAmbientMusic(townTheme[H2EnumIndex(m_town->m_type)]);
     }
 }

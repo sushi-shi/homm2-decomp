@@ -25,7 +25,7 @@ sample::sample(char* name)
     m_playbackData.stereo = 1;
     m_playbackData.sampleFormat = FORMAT_16_BIT;
     m_playbackData.sampleRate = RATE_44100;
-    m_playbackData.activeSample = NULL;
+    m_playbackData.activeSample = 0;
     m_playbackData.channelType = 0;
 
     char fileName[FILENAME_CAPACITY];
