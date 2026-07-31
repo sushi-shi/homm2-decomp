@@ -914,13 +914,16 @@ public:
         } else {
             m_userRoot = m_dataRoot;
         }
+
+        PrepareUserState(m_userRoot);
     }
 
     std::string DataRoot() const override { return m_dataRoot; }
     std::string UserRoot() const override { return m_userRoot; }
 
     std::string Resolve(const char* retailPath) const override {
-        return m_dataRoot + "/" + (retailPath != nullptr ? retailPath : "");
+        const std::string& root = IsUserState(retailPath) ? m_userRoot : m_dataRoot;
+        return root + "/" + (retailPath != nullptr ? retailPath : "");
     }
 
     std::vector<std::string> List(const char* pattern) const override {
@@ -929,22 +932,42 @@ public:
         const std::size_t slash = retail.find_last_of('/');
         const std::string directory = slash == std::string::npos ? "" : retail.substr(0, slash);
         const std::string wildcard = slash == std::string::npos ? retail : retail.substr(slash + 1);
-        const std::filesystem::path root = directory.empty()
-            ? std::filesystem::path(m_dataRoot)
-            : std::filesystem::path(m_dataRoot) / directory;
 
+        // A browser wants both what the game wrote and what shipped.
         std::vector<std::string> names;
-        std::error_code error;
-        for (const auto& entry : std::filesystem::directory_iterator(root, error)) {
-            const std::string name = entry.path().filename().string();
-            if (Matches(wildcard.c_str(), name.c_str())) {
-                names.push_back(name);
-            }
+        if (IsUserState(pattern)) {
+            Collect(Directory(m_userRoot, directory), wildcard, names);
         }
+        Collect(Directory(m_dataRoot, directory), wildcard, names);
         return names;
     }
 
 private:
+    static std::filesystem::path Directory(const std::string& root, const std::string& directory) {
+        return directory.empty() ? std::filesystem::path(root)
+                                 : std::filesystem::path(root) / directory;
+    }
+
+    static void Collect(
+        const std::filesystem::path& root,
+        const std::string& wildcard,
+        std::vector<std::string>& names
+    ) {
+        std::error_code error;
+        for (const auto& entry : std::filesystem::directory_iterator(root, error)) {
+            const std::string name = entry.path().filename().string();
+            if (!Matches(wildcard.c_str(), name.c_str())) {
+                continue;
+            }
+            const auto known = [&name](const std::string& seen) {
+                return SDL_strcasecmp(seen.c_str(), name.c_str()) == 0;
+            };
+            if (std::none_of(names.begin(), names.end(), known)) {
+                names.push_back(name);
+            }
+        }
+    }
+
     static bool Matches(const char* pattern, const char* name) {
         if (*pattern == '\0') {
             return *name == '\0';

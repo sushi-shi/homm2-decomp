@@ -15,7 +15,12 @@ HWND MainWindow();
 
 bool PumpOne(MSG* message);
 
-std::string ResolvePath(const char* retailPath);
+enum class PathUse {
+    Read,
+    Write,
+};
+
+std::string ResolvePath(const char* retailPath, PathUse use = PathUse::Read);
 
 void TrackGdiObject(void* object);
 bool ForgetGdiObject(void* object);

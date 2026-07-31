@@ -20,6 +20,14 @@
 #undef tell
 #undef filelength
 
+namespace {
+
+std::string ResolveForWrite(const char* path) {
+    return platform::win32::ResolvePath(path, platform::win32::PathUse::Write);
+}
+
+}
+
 int _open(const char* path, int flags, ...) {
     if (path == nullptr) {
         return -1;
@@ -33,7 +41,9 @@ int _open(const char* path, int flags, ...) {
         va_end(arguments);
     }
 
-    const std::string resolved = platform::win32::ResolvePath(path);
+    const bool writing = (flags & (O_CREAT | O_WRONLY | O_RDWR)) != 0;
+    const std::string resolved =
+        writing ? ResolveForWrite(path) : platform::win32::ResolvePath(path);
     const int file = ::open(resolved.c_str(), flags, mode);
     if (file >= 0 && (flags & O_CREAT) != 0) {
         ::fchmod(file, mode);
@@ -72,9 +82,9 @@ int _eof(int file) {
 }
 
 int _chdir(const char* path) { return ::chdir(platform::win32::ResolvePath(path).c_str()); }
-int _mkdir(const char* path) { return ::mkdir(platform::win32::ResolvePath(path).c_str(), 0755); }
-int _rmdir(const char* path) { return ::rmdir(platform::win32::ResolvePath(path).c_str()); }
-int _unlink(const char* path) { return ::unlink(platform::win32::ResolvePath(path).c_str()); }
+int _mkdir(const char* path) { return ::mkdir(ResolveForWrite(path).c_str(), 0755); }
+int _rmdir(const char* path) { return ::rmdir(ResolveForWrite(path).c_str()); }
+int _unlink(const char* path) { return ::unlink(ResolveForWrite(path).c_str()); }
 char* _getcwd(char* buffer, int length) { return ::getcwd(buffer, static_cast<size_t>(length)); }
 
 int _chdrive(int) { return 0; }
