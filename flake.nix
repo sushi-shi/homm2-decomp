@@ -111,7 +111,7 @@
       };
 
       mkNative = debug: p32.stdenv.mkDerivation {
-        pname = "homm2-native${if debug then "-debug" else ""}";
+        pname = "homm2${if debug then "-debug" else ""}";
         version = "2.0";
         src = source;
         nativeBuildInputs = [ pkgs.cmake pkgs.ninja pkgs.pkg-config ];
@@ -125,13 +125,14 @@
         hardeningDisable = pkgs.lib.optionals debug [ "fortify" ];
         installPhase = ''
           runHook preInstall
-          install -Dm755 homm2 "$out/bin/homm2-unwrapped"
+          install -Dm755 homm2 "$out/bin/homm2"
           runHook postInstall
         '';
+        meta.mainProgram = "homm2";
       };
 
-      homm2-unwrapped = mkNative false;
-      homm2-unwrapped-debug = mkNative true;
+      homm2 = mkNative false;
+      homm2-debug = mkNative true;
 
       sdl3-web = pkgs.stdenvNoCC.mkDerivation {
         pname = "sdl3-web";
@@ -255,39 +256,6 @@
         '';
       };
 
-      wrap = native: pkgs.writeShellApplication {
-        name = "homm2";
-        runtimeInputs = [ native ];
-        text = ''
-          if [ -n "''${HOMM2_DATA:-}" ]; then
-            data="$HOMM2_DATA"
-          else
-            data=""
-            for candidate in \
-              "$PWD" \
-              "''${XDG_DATA_HOME:-$HOME/.local/share}/homm2" \
-              "$HOME/.local/share/homm2/data" \
-              "$HOME/games/homm2"; do
-              if [ -e "$candidate/DATA/HEROES2.AGG" ] || [ -e "$candidate/data/heroes2.agg" ]; then
-                data="$candidate"
-                break
-              fi
-            done
-          fi
-
-          if [ -z "$data" ]; then
-            echo "homm2: set HOMM2_DATA to the directory containing DATA/HEROES2.AGG" >&2
-            exit 1
-          fi
-
-          export HOMM2_DATA="$data"
-          exec homm2-unwrapped "$@"
-        '';
-      };
-
-      homm2 = wrap homm2-unwrapped;
-      homm2-debug = wrap homm2-unwrapped-debug;
-
       homm2-web-run = pkgs.writeShellApplication {
         name = "homm2-web";
         runtimeInputs = [ pkgs.coreutils pkgs.emscripten ];
@@ -337,8 +305,6 @@
         inherit
           homm2
           homm2-debug
-          homm2-unwrapped
-          homm2-unwrapped-debug
           homm2-web
           homm2-web-run;
         homm2-linux = homm2;
