@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 
 highScoreManager::highScoreManager(void) {
     i32 entry;
@@ -133,7 +133,7 @@ void highScoreManager::Update(void) {
         sprintf(filename, "%sCAMPAIGN.HS", ".\\DATA\\");
     else
         sprintf(filename, "%sSTANDARD.HS", ".\\DATA\\");
-    inputFile = open(filename, HIGH_SCORE_FILE_READ_FLAGS);
+    inputFile = platform::FileOpen(filename, platform::FileMode::Read);
     if (inputFile == -1)
         missingFile = 1;
 
@@ -169,7 +169,7 @@ void highScoreManager::Update(void) {
         if (missingFile != 0)
             scoreEntry.score = HIGH_SCORE_EMPTY;
         else
-            read(inputFile, &scoreEntry, sizeof(scoreEntry));
+            platform::FileRead(inputFile, &scoreEntry, sizeof(scoreEntry));
 
         if (scoreEntry.score == HIGH_SCORE_EMPTY) {
             m_monsterTypes[entry] = 0;
@@ -294,5 +294,5 @@ void highScoreManager::Update(void) {
         }
     }
     if (missingFile == 0)
-        close(inputFile);
+        platform::FileClose(inputFile);
 }

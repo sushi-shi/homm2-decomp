@@ -1,6 +1,6 @@
 #include <Ints.h>
 #include <fcntl.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <stdio.h>
 #include <string.h>
 #include <BASE/Misc.h>
@@ -74,12 +74,12 @@ typedef enum FileRequesterPrivateConstant {
 
 i32 GetMapHeader(const char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
-    i32 file = _open(gText, _O_BINARY);
+    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1) {
         return 0;
     }
-    _read(file, header, sizeof(*header));
-    _close(file);
+    platform::FileRead(file, header, sizeof(*header));
+    platform::FileClose(file);
     return 1;
 }
 

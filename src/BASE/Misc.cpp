@@ -175,8 +175,7 @@ typedef enum FileIdHashConstant {
 #include <BASE/message.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <PLATFORM/LegacyFile.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <string.h>
@@ -818,7 +817,7 @@ void ReadPrefsFromFile(void) {
         platform::Files().UserRoot().c_str(),
         gMiscText.readFile.configFilename.text
     );
-    FILE* f = access(gText, 0) == -1 ? NULL : fopen(gText, gMiscText.readFile.binaryMode.text);
+    FILE* f = platform::FileExists(gText) ? fopen(gText, gMiscText.readFile.binaryMode.text) : NULL;
     if (f == NULL) {
         memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
         strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
@@ -859,10 +858,10 @@ void WritePrefsToFile(void) {
         platform::Files().UserRoot().c_str(),
         gMiscText.writeFile.configFilename.text
     );
-    i32 fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    i32 fd = platform::FileOpen(gText, platform::FileMode::Write);
     if (fd != -1) {
-        write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
-        close(fd);
+        platform::FileWrite(fd, &gConfig, CONFIG_PERSISTED_SIZE);
+        platform::FileClose(fd);
     }
 }
 
@@ -877,16 +876,16 @@ void WritePrefs(void) {
 
 GameDataStatus VerifyGameData(void) {
     sprintf(gText, gMiscText.media.dataArchive.text);
-    i32 file = open(gText, _O_BINARY);
+    i32 file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return GAME_DATA_MISSING;
-    close(file);
+    platform::FileClose(file);
 
     sprintf(gText, gMiscText.media.animationFile.text);
-    file = open(gText, _O_BINARY);
+    file = platform::FileOpen(gText, platform::FileMode::Read);
     if (file == -1)
         return GAME_DATA_MISSING;
-    close(file);
+    platform::FileClose(file);
 
     strcpy(gcAnimPath, ".\\HEROES2\\ANIM\\");
     return GAME_DATA_READY;
@@ -986,17 +985,16 @@ void BlitBitmapToScreen(
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        i32 fileHandle = open(
+        i32 fileHandle = platform::FileOpen(
             gMiscText.log.truncateFilename.text,
-            _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT,
-            _S_IWRITE
+            platform::FileMode::Write
         );
         if (fileHandle != -1) {
             strcpy(logText, gMiscText.log.newLogLabel.text);
             *reinterpret_cast<u16*>(logText + strlen(logText)) =
                 *reinterpret_cast<const u16*>(gMiscText.log.truncateNewline.text);
-            write(fileHandle, logText, strlen(logText));
-            close(fileHandle);
+            platform::FileWrite(fileHandle, logText, strlen(logText));
+            platform::FileClose(fileHandle);
         }
     }
 }
@@ -1242,10 +1240,10 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     header.planes = PLANE_COUNT;
     header.bytesPerLine = static_cast<u16>(width);
     header.paletteType = PALETTE_TYPE_COLOR;
-    i32 fileHandle = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    i32 fileHandle = platform::FileOpen(filename, platform::FileMode::Write);
     if (fileHandle == -1)
         return;
-    write(fileHandle, &header, sizeof(header));
+    platform::FileWrite(fileHandle, &header, sizeof(header));
     u8* encodedRow =
         static_cast<u8*>(H2_ALLOC(width * 2));
     for (i32 row = 0; row < height; ++row) {
@@ -1267,20 +1265,20 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
                 sourceIndex += runLength;
             }
         }
-        write(fileHandle, encodedRow, encodedSize);
+        platform::FileWrite(fileHandle, encodedRow, encodedSize);
         pixels += width;
     }
     H2_FREE(encodedRow);
     u8 paletteMarker = VGA_PALETTE_MARKER;
-    write(fileHandle, &paletteMarker, 1);
+    platform::FileWrite(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
         H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
-    write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
+    platform::FileWrite(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
     H2_FREE(outputPalette);
-    close(fileHandle);
+    platform::FileClose(fileHandle);
 }
 
 i32l FileSize(char* filename) {

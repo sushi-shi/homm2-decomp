@@ -919,9 +919,76 @@ public:
     std::string DataRoot() const override { return m_dataRoot; }
     std::string UserRoot() const override { return m_userRoot; }
 
-    std::string Resolve(const char* retailPath) const override {
-        const std::string& root = IsUserState(retailPath) ? m_userRoot : m_dataRoot;
-        return root + "/" + (retailPath != nullptr ? retailPath : "");
+    std::string Resolve(const char* retailPath, FileMode mode) const override {
+        if (!IsUserState(retailPath)) {
+            return ResolveIn(m_dataRoot, retailPath);
+        }
+
+        // Writes go to the user directory, reads fall back to the installation
+        // so that shipped saves and score tables stay in reach.
+        const std::string user = ResolveIn(m_userRoot, retailPath);
+        if (mode == FileMode::Write || Present(user)) {
+            return user;
+        }
+        const std::string data = ResolveIn(m_dataRoot, retailPath);
+        return Present(data) ? data : user;
+    }
+
+    bool Exists(const char* retailPath) const override {
+        return Present(Resolve(retailPath, FileMode::Read));
+    }
+
+    i32 Open(const char* retailPath, FileMode mode) override {
+        const std::string path = Resolve(retailPath, mode);
+        SDL_IOStream* stream = SDL_IOFromFile(path.c_str(), mode == FileMode::Read ? "rb" : "wb");
+        if (stream == nullptr) {
+            return -1;
+        }
+
+        const i32 file = m_nextFile++;
+        m_streams.emplace(file, stream);
+        return file;
+    }
+
+    void Close(i32 file) override {
+        const auto found = m_streams.find(file);
+        if (found == m_streams.end()) {
+            return;
+        }
+        SDL_CloseIO(found->second);
+        m_streams.erase(found);
+    }
+
+    i32 Read(i32 file, void* buffer, i32 count) override {
+        SDL_IOStream* stream = Stream(file);
+        if (stream == nullptr) {
+            return -1;
+        }
+        return static_cast<i32>(SDL_ReadIO(stream, buffer, static_cast<std::size_t>(count)));
+    }
+
+    i32 Write(i32 file, const void* buffer, i32 count) override {
+        SDL_IOStream* stream = Stream(file);
+        if (stream == nullptr) {
+            return -1;
+        }
+        return static_cast<i32>(SDL_WriteIO(stream, buffer, static_cast<std::size_t>(count)));
+    }
+
+    i32 Seek(i32 file, i32 offset) override {
+        SDL_IOStream* stream = Stream(file);
+        if (stream == nullptr) {
+            return -1;
+        }
+        return static_cast<i32>(SDL_SeekIO(stream, offset, SDL_IO_SEEK_SET));
+    }
+
+    i32 Tell(i32 file) override {
+        SDL_IOStream* stream = Stream(file);
+        if (stream == nullptr) {
+            return -1;
+        }
+        return static_cast<i32>(SDL_TellIO(stream));
     }
 
     std::vector<std::string> List(const char* pattern) const override {
@@ -941,6 +1008,16 @@ public:
     }
 
 private:
+    SDL_IOStream* Stream(i32 file) const {
+        const auto found = m_streams.find(file);
+        return found != m_streams.end() ? found->second : nullptr;
+    }
+
+    static bool Present(const std::string& path) {
+        std::error_code error;
+        return std::filesystem::exists(path, error);
+    }
+
     // Where an installed copy of the game tends to sit.
     static std::string FindDataRoot() {
         std::vector<std::string> candidates;
@@ -1042,6 +1119,8 @@ private:
 
     std::string m_dataRoot;
     std::string m_userRoot;
+    std::map<i32, SDL_IOStream*> m_streams;
+    i32 m_nextFile = 1;
 };
 
 struct Sdl3Backend {

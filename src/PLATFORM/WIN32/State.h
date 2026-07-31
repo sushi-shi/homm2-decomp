@@ -5,6 +5,8 @@
 
 #include <windows.h>
 
+#include <PLATFORM/FileSystem.h>
+
 namespace platform::win32 {
 
 bool EnsureDisplay();
@@ -15,12 +17,7 @@ HWND MainWindow();
 
 bool PumpOne(MSG* message);
 
-enum class PathUse {
-    Read,
-    Write,
-};
-
-std::string ResolvePath(const char* retailPath, PathUse use = PathUse::Read);
+std::string ResolvePath(const char* retailPath, FileMode mode = FileMode::Read);
 
 void TrackGdiObject(void* object);
 bool ForgetGdiObject(void* object);

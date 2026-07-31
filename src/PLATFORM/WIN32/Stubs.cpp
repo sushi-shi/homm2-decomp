@@ -237,7 +237,7 @@ bool StartSequence(_SEQUENCE& sequence) {
     );
     std::vector<std::int16_t> samples;
     int sampleRate = 0;
-    const std::string path = platform::Files().Resolve(relativePath);
+    const std::string path = platform::Files().Resolve(relativePath, platform::FileMode::Read);
     if (!DecodeMusic(path, samples, sampleRate)) {
         std::fprintf(stderr, "[homm2] unable to decode music: %s\n", path.c_str());
         return false;

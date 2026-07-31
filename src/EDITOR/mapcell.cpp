@@ -2,7 +2,7 @@
 #include "EDITOR/fullMap.h"
 #include "EDITOR/mapcell.h"
 #include <string.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 
 typedef enum MapCellExtraConstant {
     EXTRA_ALLOCATION_STEP = 100
@@ -75,11 +75,11 @@ i32 fullMap::GetNewCellExtraIndex(void) {
 }
 
 void fullMap::Write(i32 handle) {
-    write(handle, &width, sizeof(width));
-    write(handle, &height, sizeof(height));
-    write(handle, cells, width * height * sizeof(mapCell));
-    write(handle, &extraCount, sizeof(extraCount));
-    write(handle, extras, extraCount * sizeof(mapCellExtra));
+    platform::FileWrite(handle, &width, sizeof(width));
+    platform::FileWrite(handle, &height, sizeof(height));
+    platform::FileWrite(handle, cells, width * height * sizeof(mapCell));
+    platform::FileWrite(handle, &extraCount, sizeof(extraCount));
+    platform::FileWrite(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
 void fullMap::Read(i32 handle, i32 convert) {
@@ -88,31 +88,31 @@ void fullMap::Read(i32 handle, i32 convert) {
     i32 x, y;
     oldMapCellExtra* tmp2;
 
-    read(handle, &width, sizeof(width));
-    read(handle, &height, sizeof(height));
+    platform::FileRead(handle, &width, sizeof(width));
+    platform::FileRead(handle, &height, sizeof(height));
     Init(width, height);
     if (convert) {
         tmp = static_cast<oldMapCell*>(operator new(width * height * sizeof(oldMapCell)));
-        read(handle, tmp, width * height * sizeof(oldMapCell));
+        platform::FileRead(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
                 memcpy(cells + width * y + x, tmp + width * y + x, sizeof(mapCell));
         delete tmp;
     } else {
-        read(handle, cells, width * height * sizeof(mapCell));
+        platform::FileRead(handle, cells, width * height * sizeof(mapCell));
     }
-    read(handle, &extraCount, sizeof(extraCount));
+    platform::FileRead(handle, &extraCount, sizeof(extraCount));
     if (extras)
         delete extras;
     extras = static_cast<mapCellExtra*>(operator new(extraCount * sizeof(mapCellExtra)));
     if (convert) {
         tmp2 = static_cast<oldMapCellExtra*>(operator new(extraCount * sizeof(oldMapCellExtra)));
-        read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
+        platform::FileRead(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
         delete tmp2;
     } else {
-        read(handle, extras, extraCount * sizeof(mapCellExtra));
+        platform::FileRead(handle, extras, extraCount * sizeof(mapCellExtra));
     }
 }
 

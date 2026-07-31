@@ -10,7 +10,7 @@
 #include <SOURCE/HERO.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/REMOTE.h>
-#include <PLATFORM/LegacyFile.h>
+#include <PLATFORM/File.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <math.h>
@@ -689,63 +689,63 @@ typedef enum PlayerDataSerializationConstant {
 void playerData::Write(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    write(file, &m_color, sizeof(m_color));
-    write(file, &m_heroCount, sizeof(m_heroCount));
-    write(file, &m_currentHero, sizeof(m_currentHero));
-    write(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    write(file, m_heroIds, sizeof(m_heroIds));
-    write(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    platform::FileWrite(file, &m_color, sizeof(m_color));
+    platform::FileWrite(file, &m_heroCount, sizeof(m_heroCount));
+    platform::FileWrite(file, &m_currentHero, sizeof(m_currentHero));
+    platform::FileWrite(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    platform::FileWrite(file, m_heroIds, sizeof(m_heroIds));
+    platform::FileWrite(file, m_availableHeroIds, sizeof(m_availableHeroIds));
 
     memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
-    write(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    write(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    write(file, &m_cheatValue, sizeof(m_cheatValue));
-    write(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    write(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    write(file, &m_evilInterface, sizeof(m_evilInterface));
-    write(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    write(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    write(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    write(file, &m_daysLeft, sizeof(m_daysLeft));
-    write(file, &m_townCount, sizeof(m_townCount));
-    write(file, &m_currentTown, sizeof(m_currentTown));
-    write(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    write(file, m_townIds, sizeof(m_townIds));
-    write(file, m_resources, sizeof(m_resources));
-    write(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    write(file, &m_barrierTents, sizeof(m_barrierTents));
-    write(file, &m_barrierTents, sizeof(m_barrierTents));
-    write(file, m_unknownad, sizeof(m_unknownad));
+    platform::FileWrite(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    platform::FileWrite(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    platform::FileWrite(file, &m_cheatValue, sizeof(m_cheatValue));
+    platform::FileWrite(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    platform::FileWrite(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    platform::FileWrite(file, &m_evilInterface, sizeof(m_evilInterface));
+    platform::FileWrite(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    platform::FileWrite(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    platform::FileWrite(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    platform::FileWrite(file, &m_daysLeft, sizeof(m_daysLeft));
+    platform::FileWrite(file, &m_townCount, sizeof(m_townCount));
+    platform::FileWrite(file, &m_currentTown, sizeof(m_currentTown));
+    platform::FileWrite(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    platform::FileWrite(file, m_townIds, sizeof(m_townIds));
+    platform::FileWrite(file, m_resources, sizeof(m_resources));
+    platform::FileWrite(file, m_aiData.m_income, sizeof(m_aiData.m_income));
+    platform::FileWrite(file, &m_barrierTents, sizeof(m_barrierTents));
+    platform::FileWrite(file, &m_barrierTents, sizeof(m_barrierTents));
+    platform::FileWrite(file, m_unknownad, sizeof(m_unknownad));
 }
 
 void playerData::Read(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
-    read(file, &m_color, sizeof(m_color));
-    read(file, &m_heroCount, sizeof(m_heroCount));
-    read(file, &m_currentHero, sizeof(m_currentHero));
-    read(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
-    read(file, m_heroIds, sizeof(m_heroIds));
-    read(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    read(file, unused, PLAYER_SAVE_RESERVED_SIZE);
-    read(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
-    read(file, &m_cheatValue, sizeof(m_cheatValue));
-    read(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
-    read(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
-    read(file, &m_evilInterface, sizeof(m_evilInterface));
-    read(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
-    read(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
-    read(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
-    read(file, &m_daysLeft, sizeof(m_daysLeft));
-    read(file, &m_townCount, sizeof(m_townCount));
-    read(file, &m_currentTown, sizeof(m_currentTown));
-    read(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
-    read(file, m_townIds, sizeof(m_townIds));
-    read(file, m_resources, sizeof(m_resources));
-    read(file, m_aiData.m_income, sizeof(m_aiData.m_income));
-    read(file, &m_barrierTents, sizeof(m_barrierTents));
-    read(file, &m_barrierTents, sizeof(m_barrierTents));
-    read(file, m_unknownad, sizeof(m_unknownad));
+    platform::FileRead(file, &m_color, sizeof(m_color));
+    platform::FileRead(file, &m_heroCount, sizeof(m_heroCount));
+    platform::FileRead(file, &m_currentHero, sizeof(m_currentHero));
+    platform::FileRead(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
+    platform::FileRead(file, m_heroIds, sizeof(m_heroIds));
+    platform::FileRead(file, m_availableHeroIds, sizeof(m_availableHeroIds));
+    platform::FileRead(file, unused, PLAYER_SAVE_RESERVED_SIZE);
+    platform::FileRead(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
+    platform::FileRead(file, &m_cheatValue, sizeof(m_cheatValue));
+    platform::FileRead(file, &m_aiDifficulty, sizeof(m_aiDifficulty));
+    platform::FileRead(file, &m_minimumHeroCount, sizeof(m_minimumHeroCount));
+    platform::FileRead(file, &m_evilInterface, sizeof(m_evilInterface));
+    platform::FileRead(file, &m_ultimateArtifactHintChance, sizeof(m_ultimateArtifactHintChance));
+    platform::FileRead(file, &m_ultimateArtifactHintX, sizeof(m_ultimateArtifactHintX));
+    platform::FileRead(file, &m_ultimateArtifactHintY, sizeof(m_ultimateArtifactHintY));
+    platform::FileRead(file, &m_daysLeft, sizeof(m_daysLeft));
+    platform::FileRead(file, &m_townCount, sizeof(m_townCount));
+    platform::FileRead(file, &m_currentTown, sizeof(m_currentTown));
+    platform::FileRead(file, &m_townLocatorPage, sizeof(m_townLocatorPage));
+    platform::FileRead(file, m_townIds, sizeof(m_townIds));
+    platform::FileRead(file, m_resources, sizeof(m_resources));
+    platform::FileRead(file, m_aiData.m_income, sizeof(m_aiData.m_income));
+    platform::FileRead(file, &m_barrierTents, sizeof(m_barrierTents));
+    platform::FileRead(file, &m_barrierTents, sizeof(m_barrierTents));
+    platform::FileRead(file, m_unknownad, sizeof(m_unknownad));
 }
 
 i32 playerData::NextHero(i32) {
@@ -1150,50 +1150,50 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
             strcpy(gpGame->m_saveName, filename);
     }
 
-    i32 handle = open(savePathValue, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    i32 handle = platform::FileOpen(savePathValue, platform::FileMode::Write);
     if (handle == -1)
         FileError(savePathValue);
 
     i32 legacyMarkerTemp = -1;
     if (!expansionFormat)
-        write(handle, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
-    write(handle, &m_worldMap.width, sizeof(m_worldMap.width));
-    write(handle, &m_worldMap.height, sizeof(m_worldMap.height));
-    write(handle, &m_mapHeader, sizeof(m_mapHeader));
-    write(handle, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    write(handle, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, this, sizeof(m_difficultyRating));
-    write(handle, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, cPlayerNames, sizeof(cPlayerNames));
+        platform::FileWrite(handle, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
+    platform::FileWrite(handle, &m_worldMap.width, sizeof(m_worldMap.width));
+    platform::FileWrite(handle, &m_worldMap.height, sizeof(m_worldMap.height));
+    platform::FileWrite(handle, &m_mapHeader, sizeof(m_mapHeader));
+    platform::FileWrite(handle, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    platform::FileWrite(handle, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileWrite(handle, this, sizeof(m_difficultyRating));
+    platform::FileWrite(handle, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileWrite(handle, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileWrite(handle, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileWrite(handle, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileWrite(handle, cPlayerNames, sizeof(cPlayerNames));
 
     char legacyData[SAVE_LEGACY_SCRATCH_SIZE];
     memset(legacyData, 0, SAVE_LEGACY_CLEAR_SIZE);
-    write(handle, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
+    platform::FileWrite(handle, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
-        write(handle, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        write(handle, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        platform::FileWrite(handle, &campaignTypeInfo, sizeof(campaignTypeInfo));
+        platform::FileWrite(handle, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
-        write(handle, &gbInCampaign, sizeof(gbInCampaign));
+        platform::FileWrite(handle, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
-            write(handle, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+            platform::FileWrite(handle, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
-        write(handle, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        platform::FileWrite(handle, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    write(handle, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    platform::FileWrite(handle, &giMapChangeCtr, sizeof(giMapChangeCtr));
     GenerateStandardFileName(m_saveName, legacyData);
-    write(handle, legacyData, SAVE_STANDARD_FILENAME_SIZE);
-    write(handle, &m_playerCount, sizeof(m_playerCount));
+    platform::FileWrite(handle, legacyData, SAVE_STANDARD_FILENAME_SIZE);
+    platform::FileWrite(handle, &m_playerCount, sizeof(m_playerCount));
     char currentPlayerInfo[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
     currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
-    write(handle, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
-    write(handle, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    write(handle, m_playerDead, sizeof(m_playerDead));
+    platform::FileWrite(handle, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
+    platform::FileWrite(handle, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    platform::FileWrite(handle, m_playerDead, sizeof(m_playerDead));
 
     char humanFlagsLocal[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
@@ -1201,66 +1201,66 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
         if (m_playerDead[indexFile] != 0)
             humanFlagsLocal[indexFile] = 0;
     }
-    write(handle, humanFlagsLocal, GAME_PLAYER_COUNT);
-    write(handle, &m_day, sizeof(m_day));
-    write(handle, &m_week, sizeof(m_week));
-    write(handle, &m_month, sizeof(m_month));
+    platform::FileWrite(handle, humanFlagsLocal, GAME_PLAYER_COUNT);
+    platform::FileWrite(handle, &m_day, sizeof(m_day));
+    platform::FileWrite(handle, &m_week, sizeof(m_week));
+    platform::FileWrite(handle, &m_month, sizeof(m_month));
     for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
         m_players[indexFile].Write(handle);
 
-    write(handle, &m_obeliskCount, sizeof(m_obeliskCount));
+    platform::FileWrite(handle, &m_obeliskCount, sizeof(m_obeliskCount));
     for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
         m_heroRecs[indexFile].Write(handle, !expansionFormat);
-    write(handle, m_availableHeroes, sizeof(m_availableHeroes));
-    write(handle, m_castleRecs, sizeof(m_castleRecs));
-    write(handle, m_castleOwners, sizeof(m_castleOwners));
-    write(handle, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    write(handle, m_mines, sizeof(m_mines));
-    write(handle, m_mineOwners, sizeof(m_mineOwners));
+    platform::FileWrite(handle, m_availableHeroes, sizeof(m_availableHeroes));
+    platform::FileWrite(handle, m_castleRecs, sizeof(m_castleRecs));
+    platform::FileWrite(handle, m_castleOwners, sizeof(m_castleOwners));
+    platform::FileWrite(handle, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    platform::FileWrite(handle, m_mines, sizeof(m_mines));
+    platform::FileWrite(handle, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
-        write(handle, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
+        platform::FileWrite(handle, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
-        write(handle, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    write(handle, m_boats, sizeof(m_boats));
-    write(handle, m_boatSlots, sizeof(m_boatSlots));
-    write(handle, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    write(handle, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    write(handle, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    write(handle, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    write(handle, m_rumour, sizeof(m_rumour));
-    write(handle, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+        platform::FileWrite(handle, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    platform::FileWrite(handle, m_boats, sizeof(m_boats));
+    platform::FileWrite(handle, m_boatSlots, sizeof(m_boatSlots));
+    platform::FileWrite(handle, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    platform::FileWrite(handle, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    platform::FileWrite(handle, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    platform::FileWrite(handle, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    platform::FileWrite(handle, m_rumour, sizeof(m_rumour));
+    platform::FileWrite(handle, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
 
-    write(handle, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(
+    platform::FileWrite(handle, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileWrite(
         handle,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    write(handle, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(handle, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    write(handle, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(handle, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    platform::FileWrite(handle, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileWrite(handle, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    platform::FileWrite(handle, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileWrite(handle, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
     i32 markerBuffer[SAVE_MARKER_SCRATCH_COUNT];
     markerBuffer[0] = GAME_FILE_MARKER;
     i32 unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    write(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
+    platform::FileWrite(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
     for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
-        write(handle, markerBuffer, sizeof(markerBuffer[0]));
-        write(handle, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
+        platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
+        platform::FileWrite(handle, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
         if (ppMapExtra[indexFile] != NULL)
-            write(handle, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
+            platform::FileWrite(handle, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
         else
-            write(handle, emptyPayload, pwSizeOfMapExtra[indexFile]);
+            platform::FileWrite(handle, emptyPayload, pwSizeOfMapExtra[indexFile]);
     }
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    write(handle, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
+    platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
+    platform::FileWrite(handle, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
     m_worldMap.Write(handle);
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    close(handle);
+    platform::FileWrite(handle, markerBuffer, sizeof(markerBuffer[0]));
+    platform::FileClose(handle);
     H2_FREE(emptyPayload);
     return 1;
 }
@@ -1420,7 +1420,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     else
         sprintf(path28, "%s%s", gcGamePath, filename);
 
-    i32 file0 = open(path28, _O_BINARY);
+    i32 file0 = platform::FileOpen(path28, platform::FileMode::Read);
     if (file0 == -1)
         FileError(path28);
     ClearMapExtra();
@@ -1428,51 +1428,51 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     i8 expansionMarker0 = 0;
     i32 width8;
     i32 height9[LOAD_DIMENSION_SCRATCH_COUNT];
-    read(file0, &width8, sizeof(width8));
+    platform::FileRead(file0, &width8, sizeof(width8));
     if (width8 == -1) {
         expansionMarker0 = 1;
-        read(file0, &width8, sizeof(width8));
+        platform::FileRead(file0, &width8, sizeof(width8));
     }
-    read(file0, height9, sizeof(height9[0]));
+    platform::FileRead(file0, height9, sizeof(height9[0]));
     SetMapSize(width8, height9[0]);
-    read(file0, &m_mapHeader, sizeof(m_mapHeader));
-    read(file0, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    read(file0, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, this, sizeof(m_difficultyRating));
-    read(file0, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, cPlayerNames, sizeof(cPlayerNames));
+    platform::FileRead(file0, &m_mapHeader, sizeof(m_mapHeader));
+    platform::FileRead(file0, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    platform::FileRead(file0, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileRead(file0, this, sizeof(m_difficultyRating));
+    platform::FileRead(file0, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileRead(file0, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileRead(file0, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileRead(file0, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    platform::FileRead(file0, cPlayerNames, sizeof(cPlayerNames));
 
     char oldData3[SAVE_LEGACY_CLEAR_SIZE];
-    read(file0, oldData3, SAVE_LEGACY_SERIALIZED_SIZE);
-    read(file0, &gbInCampaign, sizeof(gbInCampaign));
+    platform::FileRead(file0, oldData3, SAVE_LEGACY_SERIALIZED_SIZE);
+    platform::FileRead(file0, &gbInCampaign, sizeof(gbInCampaign));
     if (gbInCampaign == 1) {
-        read(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+        platform::FileRead(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        read(file0, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        platform::FileRead(file0, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     }
     if (expansionMarker0)
-        read(file0, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        platform::FileRead(file0, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    read(file0, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    read(file0, oldData3, SAVE_STANDARD_FILENAME_SIZE);
+    platform::FileRead(file0, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    platform::FileRead(file0, oldData3, SAVE_STANDARD_FILENAME_SIZE);
     if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
-    read(file0, &m_playerCount, sizeof(m_playerCount));
+    platform::FileRead(file0, &m_playerCount, sizeof(m_playerCount));
 
     char currentPlayer6[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
-    read(file0, currentPlayer6, sizeof(currentPlayer6[0]));
+    platform::FileRead(file0, currentPlayer6, sizeof(currentPlayer6[0]));
     giCurPlayer = currentPlayer6[0];
-    read(file0, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    read(file0, m_playerDead, sizeof(m_playerDead));
+    platform::FileRead(file0, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    platform::FileRead(file0, m_playerDead, sizeof(m_playerDead));
 
     char humanFlags1[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    read(file0, humanFlags1, GAME_PLAYER_COUNT);
+    platform::FileRead(file0, humanFlags1, GAME_PLAYER_COUNT);
     i32 i29;
     for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
         if (humanFlags1[i29] && humansLoaded3 < (&giNumHumanPlayers)[0]) {
@@ -1493,50 +1493,50 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
         }
     }
 
-    read(file0, &m_day, sizeof(m_day));
-    read(file0, &m_week, sizeof(m_week));
-    read(file0, &m_month, sizeof(m_month));
+    platform::FileRead(file0, &m_day, sizeof(m_day));
+    platform::FileRead(file0, &m_week, sizeof(m_week));
+    platform::FileRead(file0, &m_month, sizeof(m_month));
     giCurTurn = (m_week - 1) * EVENT_DAYS_PER_WEEK
                 + (m_month - 1) * EVENT_DAYS_PER_MONTH + m_day;
     for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++)
         m_players[i29].Read(file0);
 
-    read(file0, &m_obeliskCount, sizeof(m_obeliskCount));
+    platform::FileRead(file0, &m_obeliskCount, sizeof(m_obeliskCount));
     for (i29 = 0; i29 < GAME_HERO_COUNT; i29++)
         m_heroRecs[i29].Read(file0, expansionMarker0);
-    read(file0, m_availableHeroes, sizeof(m_availableHeroes));
-    read(file0, m_castleRecs, sizeof(m_castleRecs));
-    read(file0, m_castleOwners, sizeof(m_castleOwners));
-    read(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    read(file0, m_mines, sizeof(m_mines));
-    read(file0, m_mineOwners, sizeof(m_mineOwners));
+    platform::FileRead(file0, m_availableHeroes, sizeof(m_availableHeroes));
+    platform::FileRead(file0, m_castleRecs, sizeof(m_castleRecs));
+    platform::FileRead(file0, m_castleOwners, sizeof(m_castleOwners));
+    platform::FileRead(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    platform::FileRead(file0, m_mines, sizeof(m_mines));
+    platform::FileRead(file0, m_mineOwners, sizeof(m_mineOwners));
     if (expansionMarker0)
-        read(file0, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
+        platform::FileRead(file0, m_randomArtifacts, H2EnumIndex(ARTIFACT_COUNT));
     else
-        read(file0, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    read(file0, m_boats, sizeof(m_boats));
-    read(file0, m_boatSlots, sizeof(m_boatSlots));
-    read(file0, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    read(file0, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    read(file0, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    read(file0, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    read(file0, m_rumour, sizeof(m_rumour));
-    read(file0, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    read(file0, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(
+        platform::FileRead(file0, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    platform::FileRead(file0, m_boats, sizeof(m_boats));
+    platform::FileRead(file0, m_boatSlots, sizeof(m_boatSlots));
+    platform::FileRead(file0, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    platform::FileRead(file0, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    platform::FileRead(file0, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    platform::FileRead(file0, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    platform::FileRead(file0, m_rumour, sizeof(m_rumour));
+    platform::FileRead(file0, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    platform::FileRead(file0, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileRead(
         file0,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    read(file0, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(file0, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    read(file0, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(file0, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    platform::FileRead(file0, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileRead(file0, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    platform::FileRead(file0, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    platform::FileRead(file0, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
     char marker0[LOAD_MARKER_SCRATCH_SIZE];
-    read(file0, marker0, sizeof(i32));
-    read(file0, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    read(file0, marker0, sizeof(i32));
+    platform::FileRead(file0, marker0, sizeof(i32));
+    platform::FileRead(file0, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    platform::FileRead(file0, marker0, sizeof(i32));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
     );
@@ -1546,17 +1546,17 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
     for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
-        read(file0, marker0, sizeof(i32));
-        read(file0, pwSizeOfMapExtra + i29, sizeof(pwSizeOfMapExtra[i29]));
+        platform::FileRead(file0, marker0, sizeof(i32));
+        platform::FileRead(file0, pwSizeOfMapExtra + i29, sizeof(pwSizeOfMapExtra[i29]));
         ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29]);
-        read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
+        platform::FileRead(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
     }
-    read(file0, marker0, sizeof(i32));
-    read(file0, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    read(file0, marker0, sizeof(i32));
+    platform::FileRead(file0, marker0, sizeof(i32));
+    platform::FileRead(file0, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    platform::FileRead(file0, marker0, sizeof(i32));
     m_worldMap.Read(file0, 0);
-    read(file0, marker0, sizeof(i32));
-    close(file0);
+    platform::FileRead(file0, marker0, sizeof(i32));
+    platform::FileClose(file0);
 
     gpAdvManager->m_heroContextLocked = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
@@ -2809,17 +2809,17 @@ i32 game::LoadMap(char* filename) {
     char trailer15[LOAD_MAP_RECORD_SCRATCH_SIZE];
 
     sprintf(gText, "%s%s", gcMapPath, filename);
-    file2 = open(gText, _O_BINARY);
+    file2 = platform::FileOpen(gText, platform::FileMode::Read);
     if (file2 == -1)
         FileError(gText);
-    read(file2, &m_mapHeader, sizeof(m_mapHeader));
+    platform::FileRead(file2, &m_mapHeader, sizeof(m_mapHeader));
     m_worldMap.Read(file2, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
     for (i37 = 0; i37 < GAME_TOWN_COUNT; i37++) {
-        read(file2, column5, sizeof(column5[0]));
-        read(file2, row9, sizeof(row9[0]));
-        read(file2, type5, sizeof(type5[0]));
+        platform::FileRead(file2, column5, sizeof(column5[0]));
+        platform::FileRead(file2, row9, sizeof(row9[0]));
+        platform::FileRead(file2, type5, sizeof(type5[0]));
         if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
             m_castleRecs[i37].m_onMap = 1;
             m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
@@ -2839,9 +2839,9 @@ i32 game::LoadMap(char* filename) {
             row9[0] = -1;
             type5[0] = -1;
         } else {
-            read(file2, column5, sizeof(column5[0]));
-            read(file2, row9, sizeof(row9[0]));
-            read(file2, type5, sizeof(type5[0]));
+            platform::FileRead(file2, column5, sizeof(column5[0]));
+            platform::FileRead(file2, row9, sizeof(row9[0]));
+            platform::FileRead(file2, type5, sizeof(type5[0]));
         }
         if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
             m_mines[i37].guardianType = CREATURE_NONE;
@@ -2852,20 +2852,20 @@ i32 game::LoadMap(char* filename) {
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    read(file2, &m_obeliskCount, sizeof(m_obeliskCount));
-    read(
+    platform::FileRead(file2, &m_obeliskCount, sizeof(m_obeliskCount));
+    platform::FileRead(
         file2,
         m_rumourEventIndices,
         m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
     );
     m_rumourEventCount = m_mapHeader.rumourCount;
-    read(
+    platform::FileRead(
         file2,
         m_timeEventIndices,
         m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    read(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    platform::FileRead(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
     );
@@ -2875,12 +2875,12 @@ i32 game::LoadMap(char* filename) {
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
-        read(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
+        platform::FileRead(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
         ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37]);
-        read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
+        platform::FileRead(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
-    read(file2, trailer15, sizeof(u16));
-    close(file2);
+    platform::FileRead(file2, trailer15, sizeof(u16));
+    platform::FileClose(file2);
     return 0;
 }
 
@@ -6473,15 +6473,15 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
         transmitData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
     fileData = static_cast<u8*>(H2_ALLOC(fileSize + REMOTE_BUFFER_EXTRA));
 
-    file = open(filename, _O_BINARY);
+    file = platform::FileOpen(filename, platform::FileMode::Read);
     if (file == -1)
         FileError(filename);
     if (file == -1) {
         goto transmitCleanup;
     }
     {
-        read(file, fileData, fileSize);
-        close(file);
+        platform::FileRead(file, fileData, fileSize);
+        platform::FileClose(file);
         fileCrc = calc_crc_long(fileData, fileSize);
         if (gbUseRegularCompression)
             fileSize = EncodeData(
@@ -6865,11 +6865,11 @@ i32 game::ReceiveSaveGame(
     );
 
     sprintf(filename, "%s%s", ".\\DATA\\", gConfig.rmtRDName);
-    file = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    file = platform::FileOpen(filename, platform::FileMode::Write);
     if (file == -1)
         FileError(filename);
-    write(file, decodedData, dataSize);
-    close(file);
+    platform::FileWrite(file, decodedData, dataSize);
+    platform::FileClose(file);
     success = 1;
 
     if (received)
@@ -7228,11 +7228,11 @@ void CreateDiffFile(
     joinSize36 = FileSize(gText);
     joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36));
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile1 = open(gText, _O_BINARY);
+    joinFile1 = platform::FileOpen(gText, platform::FileMode::Read);
     if (joinFile1 == -1)
         FileError(gText);
-    read(joinFile1, joinData29, joinSize36);
-    close(joinFile1);
+    platform::FileRead(joinFile1, joinData29, joinSize36);
+    platform::FileClose(joinFile1);
     LogInt(
         const_cast<char*>("Orig Join CRC"),
         calc_crc_long(joinData29, joinSize36),
@@ -7249,11 +7249,11 @@ void CreateDiffFile(
         oldSize37 = FileSize(gText);
         oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        oldFile17 = open(gText, _O_BINARY);
+        oldFile17 = platform::FileOpen(gText, platform::FileMode::Read);
         if (oldFile17 == -1)
             FileError(gText);
-        read(oldFile17, oldData13, oldSize37);
-        close(oldFile17);
+        platform::FileRead(oldFile17, oldData13, oldSize37);
+        platform::FileClose(oldFile17);
     }
 
     diffData6 = static_cast<u8*>(H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + DIFF_BUFFER_EXTRA));
@@ -7312,18 +7312,18 @@ void CreateDiffFile(
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    joinFile1 = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile1 == -1)
         FileError(gText);
-    write(joinFile1, diffData6, diffSize29);
-    close(joinFile1);
+    platform::FileWrite(joinFile1, diffData6, diffSize29);
+    platform::FileClose(joinFile1);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    joinFile1 = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile1 == -1)
         FileError(gText);
-    write(joinFile1, joinData29, joinSize36);
-    close(joinFile1);
+    platform::FileWrite(joinFile1, joinData29, joinSize36);
+    platform::FileClose(joinFile1);
 
     if (oldData13 != NULL)
         H2_FREE(oldData13);
@@ -7352,11 +7352,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     diffSize1 = FileSize(gText);
     diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    diffFile2 = open(gText, _O_BINARY);
+    diffFile2 = platform::FileOpen(gText, platform::FileMode::Read);
     if (diffFile2 == -1)
         FileError(gText);
-    read(diffFile2, diffData5, diffSize1);
-    close(diffFile2);
+    platform::FileRead(diffFile2, diffData5, diffSize1);
+    platform::FileClose(diffFile2);
 
     joinData9 = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
     if (diffData5[0] == 0) {
@@ -7367,11 +7367,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         oldSize10 = FileSize(gText);
         oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        diffFile2 = open(gText, _O_BINARY);
+        diffFile2 = platform::FileOpen(gText, platform::FileMode::Read);
         if (diffFile2 == -1)
             FileError(gText);
-        read(diffFile2, oldData13, oldSize10);
-        close(diffFile2);
+        platform::FileRead(diffFile2, oldData13, oldSize10);
+        platform::FileClose(diffFile2);
         memcpy(joinData9, oldData13, oldSize10);
 
         position1 = JOIN_HEADER_SIZE;
@@ -7389,11 +7389,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    joinFile0 = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile0 == -1)
         FileError(gText);
-    write(joinFile0, joinData9, joinSize37);
-    close(joinFile0);
+    platform::FileWrite(joinFile0, joinData9, joinSize37);
+    platform::FileClose(joinFile0);
     LogInt(
         const_cast<char*>("New Join CRC"),
         calc_crc_long(joinData9, joinSize37),
@@ -7406,11 +7406,11 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     );
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    joinFile0 = platform::FileOpen(gText, platform::FileMode::Write);
     if (joinFile0 == -1)
         FileError(gText);
-    write(joinFile0, joinData9, joinSize37);
-    close(joinFile0);
+    platform::FileWrite(joinFile0, joinData9, joinSize37);
+    platform::FileClose(joinFile0);
 
     if (oldData13)
         H2_FREE(oldData13);
@@ -7676,12 +7676,12 @@ i32 CalcFileCRC(char* filename) {
     static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
     char* block = static_cast<char*>(H2_ALLOC(size));
-    i32 hand = open(filename, _O_BINARY);
+    i32 hand = platform::FileOpen(filename, platform::FileMode::Read);
     if (hand == -1)
         FileError(filename);
-    read(hand, block, size);
+    platform::FileRead(hand, block, size);
     i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
-    close(hand);
+    platform::FileClose(hand);
     H2_FREE(block);
     return crc;
 }
@@ -7750,14 +7750,14 @@ void CompressTest(void) {
         H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA)
     );
     LogStr(const_cast<char*>("C2"));
-    fileHandle4 = open(filename3, _O_BINARY);
+    fileHandle4 = platform::FileOpen(filename3, platform::FileMode::Read);
     if (fileHandle4 == -1)
         FileError(filename3);
-    read(fileHandle4, sourceData6, fileSize7);
+    platform::FileRead(fileHandle4, sourceData6, fileSize7);
     LogStr(const_cast<char*>("C3"));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
     LogStr(const_cast<char*>("C4"));
-    close(fileHandle4);
+    platform::FileClose(fileHandle4);
     LogStr(const_cast<char*>("C5"));
     encodedSize14 = EncodeData(encodedData6, sourceData6, fileSize7);
     LogStr(const_cast<char*>("C6"));
