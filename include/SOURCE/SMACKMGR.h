@@ -2,7 +2,7 @@
 #define HOMM2_SMACKMGR_H
 
 #include <Ints.h>
-#include <PLATFORM/Smacker.h>
+#include <PLATFORM/Movie.h>
 
 void ConvertSmackerPalette(u8*);
 class icon;
@@ -37,24 +37,21 @@ struct SSmackOptions {
 
 #pragma pack(pop)
 
-void DoAdvance(Smack*, i32, i32, i32, i32);
+void DoAdvance(platform::MovieId, i32, i32, i32, i32);
 void SmackManagerMain(void);
 void ShutDownSmacker(void);
 i32 PlaySmacker(i32);
 ExpansionCampaignId ExpansionCampaignRect(i32, i32);
 i8 PointInRect(i32, i32, struct tag_rect*);
-void PrintSummaryInfo(SmackSum*);
 
 extern i32 bSmackSound;
 extern class icon* brotherIcon;
 extern class icon* backImage;
 extern struct SSmackOptions SmackOptions[];
-extern i32 bTesting;
-extern Smack* smk1;
-extern Smack* smk2;
+extern platform::MovieId smk1;
+extern platform::MovieId smk2;
 extern i8 bSmackNum;
 extern b32 gbLastFramePlayed;
-extern SmackSum smksum;
 extern b32 gbPlayedThrough;
 extern i8 bMainDone;
 
