@@ -5,6 +5,6 @@
 
 void __stdcall SetReady2Poll(u32l);
 void __stdcall UpdateTimers(u32l);
-struct _DIG_DRIVER* WAVE_init_driver(u32l, u16, u16, u16);
+i32 WAVE_init_driver(u32l, u16, u16, u16);
 
 #endif

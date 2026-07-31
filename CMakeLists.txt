@@ -86,7 +86,7 @@ if(HOMM2_PLATFORM STREQUAL "SDL3")
     pkg_check_modules(FFMPEG REQUIRED IMPORTED_TARGET
       libavcodec libavformat libavutil libswresample)
     set(HOMM2_FFMPEG_LIBRARIES PkgConfig::FFMPEG)
-    target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3)
+    target_link_libraries(homm2_platform PUBLIC PkgConfig::SDL3 PkgConfig::FFMPEG)
 
     # pkg-config answers about the libraries it can see, which on a 64-bit
     # host are the 64-bit ones. Link something before believing it.

@@ -1575,8 +1575,8 @@ void SendMapChange(
 i32 bMoveSoundMade = 1;
 i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
 i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
-struct _SAMPLE* hOldWalkSample = NULL;
-struct _SAMPLE* hNewWalkSample = NULL;
+platform::VoiceId hOldWalkSample = 0;
+platform::VoiceId hNewWalkSample = 0;
 i32 EveryOther = 0;
 i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
 i32 S1cursorCycle;

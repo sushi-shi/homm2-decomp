@@ -18,6 +18,12 @@
 #include <vector>
 
 #include <PLATFORM/Platform.h>
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libswresample/swresample.h>
+}
+
 
 namespace platform {
 namespace {
@@ -672,6 +678,127 @@ private:
     std::uint32_t m_replayStart = 0;
 };
 
+bool AppendAudioFrame(
+    AVFrame* frame,
+    SwrContext* converter,
+    std::vector<std::int16_t>& samples
+) {
+    const int channels = 2;
+    const int capacity = swr_get_out_samples(converter, frame->nb_samples);
+    if (capacity < 0) {
+        return false;
+    }
+    const std::size_t first = samples.size();
+    samples.resize(first + static_cast<std::size_t>(capacity) * channels);
+    std::uint8_t* output =
+        reinterpret_cast<std::uint8_t*>(samples.data() + first);
+    const int converted = swr_convert(
+        converter,
+        &output,
+        capacity,
+        const_cast<const std::uint8_t**>(frame->extended_data),
+        frame->nb_samples
+    );
+    if (converted < 0) {
+        return false;
+    }
+    samples.resize(first + static_cast<std::size_t>(converted) * channels);
+    return true;
+}
+
+bool ReceiveAudio(
+    AVCodecContext* codec,
+    AVFrame* frame,
+    SwrContext* converter,
+    std::vector<std::int16_t>& samples
+) {
+    for (;;) {
+        const int result = avcodec_receive_frame(codec, frame);
+        if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
+            return true;
+        }
+        if (result < 0 || !AppendAudioFrame(frame, converter, samples)) {
+            return false;
+        }
+        av_frame_unref(frame);
+    }
+}
+
+bool DecodeMusic(
+    const std::string& path,
+    std::vector<std::int16_t>& samples,
+    int& sampleRate
+) {
+    AVFormatContext* format = nullptr;
+    AVCodecContext* codec = nullptr;
+    AVFrame* frame = nullptr;
+    AVPacket* packet = nullptr;
+    SwrContext* converter = nullptr;
+    const AVCodec* decoder = nullptr;
+    int stream = -1;
+    AVChannelLayout stereo = AV_CHANNEL_LAYOUT_STEREO;
+    bool success = false;
+
+    if (avformat_open_input(&format, path.c_str(), nullptr, nullptr) < 0
+        || avformat_find_stream_info(format, nullptr) < 0) {
+        goto done;
+    }
+
+    stream = av_find_best_stream(format, AVMEDIA_TYPE_AUDIO, -1, -1, &decoder, 0);
+    if (stream < 0 || decoder == nullptr) {
+        goto done;
+    }
+
+    codec = avcodec_alloc_context3(decoder);
+    frame = av_frame_alloc();
+    packet = av_packet_alloc();
+    if (codec == nullptr || frame == nullptr || packet == nullptr
+        || avcodec_parameters_to_context(codec, format->streams[stream]->codecpar) < 0
+        || avcodec_open2(codec, decoder, nullptr) < 0) {
+        goto done;
+    }
+
+    sampleRate = codec->sample_rate;
+    if (swr_alloc_set_opts2(
+            &converter,
+            &stereo,
+            AV_SAMPLE_FMT_S16,
+            sampleRate,
+            &codec->ch_layout,
+            codec->sample_fmt,
+            sampleRate,
+            0,
+            nullptr
+        )
+            < 0
+        || swr_init(converter) < 0) {
+        goto done;
+    }
+
+    while (av_read_frame(format, packet) >= 0) {
+        if (packet->stream_index == stream
+            && (avcodec_send_packet(codec, packet) < 0
+                || !ReceiveAudio(codec, frame, converter, samples))) {
+            av_packet_unref(packet);
+            goto done;
+        }
+        av_packet_unref(packet);
+    }
+    if (avcodec_send_packet(codec, nullptr) < 0
+        || !ReceiveAudio(codec, frame, converter, samples)) {
+        goto done;
+    }
+    success = !samples.empty();
+
+done:
+    swr_free(&converter);
+    av_packet_free(&packet);
+    av_frame_free(&frame);
+    avcodec_free_context(&codec);
+    avformat_close_input(&format);
+    return success;
+}
+
 class Sdl3Audio final : public IAudio {
 public:
     bool Open() override {
@@ -778,6 +905,32 @@ public:
                 static_cast<float>(std::clamp(volume, 0, 127)) / 127.0f
             );
         }
+    }
+
+    // Retail shipped MIDI; this port ships the Ogg recordings next to it.
+    bool PlayMusicTrack(int track, int loops) override {
+        if (track < 0) {
+            return false;
+        }
+
+        char relativePath[32];
+        SDL_snprintf(relativePath, sizeof(relativePath), "MUSIC/Track%02d.ogg", track);
+        const std::string path = Files().Resolve(relativePath, FileMode::Read);
+
+        std::vector<std::int16_t> samples;
+        int sampleRate = 0;
+        if (!DecodeMusic(path, samples, sampleRate)) {
+            std::fprintf(stderr, "[homm2] unable to decode music: %s\n", path.c_str());
+            return false;
+        }
+
+        SoundData sound;
+        sound.samples = samples.data();
+        sound.byteCount = samples.size() * sizeof(samples[0]);
+        sound.sampleRate = sampleRate;
+        sound.channels = 2;
+        sound.bitsPerSample = 16;
+        return PlayMusic(sound, loops);
     }
 
     bool PlayMusic(const SoundData& sound, int loops) override {

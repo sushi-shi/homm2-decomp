@@ -4,9 +4,9 @@
 #include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
+#include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/NOOPT.h>
-#include <PLATFORM/Miles.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -87,24 +87,16 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
         iLastVolume[local_8] = 0;
     memset(&m_ready, 0, H2EnumIndex(SOUND_STATE_RESET_SPAN));
     m_samplesReady = 0;
-    m_digitalDriver = NULL;
+    m_digitalReady = 0;
     field_0x3a = 0;
 }
 
-struct _DIG_DRIVER*
-WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showErrors) {
-    struct _DIG_DRIVER* drvr;
-    i32 rc;
-    if (gbUseWaveout != 0)
-        AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
-    rc = AIL_waveOutOpen(&drvr, NULL, 0, NULL);
-    if (rc != 0) {
-        if (showErrors != 0)
-            platform::ShowMessage("Sound initialization error!", AIL_last_error());
-        drvr = NULL;
-        return NULL;
-    }
-    return drvr;
+i32 WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showErrors) {
+    if (platform::Audio().Open())
+        return 1;
+    if (showErrors != 0)
+        platform::ShowMessage("Sound initialization error!", "no audio device");
+    return 0;
 }
 
 i32 soundManager::Open(i32) {
@@ -156,7 +148,6 @@ i32 soundManager::Open(i32) {
         goto managerReady;
     }
     m_pollToggle = m_pollDue = m_pollRequested = 0;
-    AIL_startup();
 
     MIDIStartup();
     if (m_midiReady == 0) {
@@ -166,14 +157,14 @@ i32 soundManager::Open(i32) {
 
     m_samplesReady = 1;
     memset(&m_ready, 0, H2EnumIndex(SOUND_STATE_RESET_SPAN));
-    if (gbDontTryDigital == 0 && m_digitalDriver == NULL)
-        m_digitalDriver = WAVE_init_driver(
+    if (gbDontTryDigital == 0 && m_digitalReady == 0)
+        m_digitalReady = WAVE_init_driver(
             DEFAULT_SAMPLE_RATE,
             DEFAULT_SAMPLE_BITS,
             DEFAULT_SAMPLE_CHANNELS,
             0
         );
-    if (m_digitalDriver == NULL) {
+    if (m_digitalReady == 0) {
         gConfig.soundVolume = CONFIG_VOLUME_MUTED;
         WritePrefs();
     }
@@ -191,18 +182,16 @@ managerReady:
     return 0;
 }
 
+// Voices come into being when a sound starts, so the channels only need
+// clearing. The count is what the mixer will hand out at once.
 void soundManager::AllocateSampleHandles(void) {
-    i32 local_8;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return;
-    for (local_8 = 0; local_8 < SOUND_SAMPLE_HANDLE_CAPACITY; local_8++) {
-        m_sampleHandles[local_8] = AIL_allocate_sample_handle(m_digitalDriver);
-        if (m_sampleHandles[local_8] == NULL)
-            break;
-    }
-    m_numSampleHandles = local_8;
+    for (i32 channel = 0; channel < SOUND_SAMPLE_HANDLE_CAPACITY; channel++)
+        m_sampleHandles[channel] = 0;
+    m_numSampleHandles = SOUND_SAMPLE_HANDLE_CAPACITY;
 }
 
 void soundManager::Close(void) {
@@ -213,7 +202,7 @@ void soundManager::Close(void) {
     LogStr("SD1");
     MIDIShutdown();
     LogStr("SD2");
-    AIL_shutdown();
+    platform::Audio().Close();
     LogStr("SD3");
 soundClosed:
     m_active = false;
@@ -224,8 +213,8 @@ MessageDispatchResult soundManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-struct _SAMPLE* soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32l) {
-    return NULL;
+platform::VoiceId soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32l) {
+    return 0;
 }
 
 void soundManager::StopAllSamples(i32 stopMusic) {
@@ -234,15 +223,14 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     i32 sampleStatus;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return;
     if (m_samplesReady == 0)
         return;
     LogStr("SAS 1");
     for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
-        sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
-        if (sampleStatus == SAMPLE_STATUS_PLAYING)
-            AIL_end_sample(m_sampleHandles[sampleIdx]);
+        if (platform::Audio().IsVoicePlaying(m_sampleHandles[sampleIdx]))
+            platform::Audio().StopVoice(m_sampleHandles[sampleIdx]);
     }
     m_fadeSteps = 0;
     if (stopMusic != 0) {
@@ -255,18 +243,18 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     LogStr("SAS 2");
 }
 
-void soundManager::StopSample(struct _SAMPLE* sample) {
+void soundManager::StopSample(platform::VoiceId sample) {
     i32 local_c;
     i32 local_10;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return;
     local_10 = 0;
     LogStr("Stop Sample 1");
     if (m_sampleHandles[0] == sample)
         local_10 = 1;
-    AIL_end_sample(sample);
+    platform::Audio().StopVoice(sample);
     if (local_10 != 0) {
         for (local_c = 0; local_c < SAMPLE_STOP_MUSIC_WAIT_COUNT; local_c++) {
             ServiceSound();
@@ -277,7 +265,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
 }
 
 void soundManager::ModifySample(
-    struct _SAMPLE* sampleHandle,
+    platform::VoiceId sampleHandle,
     SoundSampleOperation operation,
     i32l value
 ) {
@@ -287,7 +275,7 @@ void soundManager::ModifySample(
 
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return;
     if (m_samplesReady == 0)
         return;
@@ -304,17 +292,14 @@ void soundManager::ModifySample(
     switch (operation) {
         case SOUND_SAMPLE_OPERATION_VOLUME:
         case SOUND_SAMPLE_OPERATION_EFFECT_VOLUME:
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
+            platform::Audio().SetVoiceVolume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
             break;
         case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
+            platform::Audio().SetVoiceVolume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
             if (foundChannel >= 0)
                 iLastVolume[foundChannel] = static_cast<i16>(value);
-            break;
-        case SOUND_SAMPLE_OPERATION_START:
-            AIL_start_sample(sampleHandle);
             break;
     }
 
@@ -322,30 +307,27 @@ void soundManager::ModifySample(
     LogStr("Modify Sample 2");
 }
 
-i32l soundManager::DigitalReport(struct _SAMPLE* sample, SoundDigitalReportQuery reportType) {
+i32l soundManager::DigitalReport(platform::VoiceId sample, SoundDigitalReportQuery reportType) {
     i32 sampleStatus;
 
     if (gbNoSound != 0)
         return 0;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return 0;
     switch (reportType) {
-        case SOUND_DIGITAL_REPORT_VOLUME:
-            return AIL_sample_volume(sample);
         case SOUND_DIGITAL_REPORT_PLAYING:
-            sampleStatus = AIL_sample_status(sample);
-            return sampleStatus == SAMPLE_STATUS_PLAYING;
+            return platform::Audio().IsVoicePlaying(sample);
     }
     return 0;
 }
 
 void soundManager::AdjustSoundVolumes(void) {
     i32 sampleIndex;
-    struct _SAMPLE* sampleHandle;
+    platform::VoiceId sampleHandle;
 
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_digitalReady == 0)
         return;
     if (m_samplesReady == 0)
         return;
@@ -478,33 +460,33 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     LogStr("Switch Ambient Music 2");
 }
 
-struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
-    struct _SAMPLE* smp;
+platform::VoiceId soundManager::MemorySample(class sample* sampleResource) {
+    platform::VoiceId smp;
     i16 ch;
     SampleChannelStruct* scs;
     SamplePlaybackData* playbackData;
     if (gbNoSound != 0)
-        return NULL;
-    if (m_digitalDriver == NULL)
-        return NULL;
+        return 0;
+    if (m_digitalReady == 0)
+        return 0;
     if (m_samplesReady == 0)
-        return NULL;
+        return 0;
     if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
-        return NULL;
+        return 0;
     playbackData = &sampleResource->m_playbackData;
     if (m_ready == 0 || playbackData->volume == 0)
-        return NULL;
+        return 0;
     LogStr("Memory Sample 1");
 
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (AIL_sample_status(m_sampleHandles[ch]) == SAMPLE_STATUS_DONE)
+        if (!platform::Audio().IsVoicePlaying(m_sampleHandles[ch]))
             break;
     }
     if (scs->endChannel == ch) {
         if (playbackData->channelType == NO_SAMPLE_CHANNEL_TYPE) {
             LogStr("Memory Sample 2a");
-            return NULL;
+            return 0;
         }
         ch = static_cast<i16>(scs->currentChannel);
         scs->currentChannel++;
@@ -514,19 +496,22 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
         }
         StopSample(m_sampleHandles[ch]);
     }
-    smp = m_sampleHandles[ch];
     m_channelVolumes[ch] = static_cast<char>(playbackData->volume);
     iLastVolume[ch] = static_cast<i16>(playbackData->volume);
-    AIL_init_sample(smp);
-    AIL_set_sample_type(smp, H2EnumIndex(playbackData->format), 0);
-    AIL_set_sample_playback_rate(smp, H2EnumIndex(playbackData->sampleRate));
-    AIL_set_sample_loop_count(smp, playbackData->loopCount);
-    AIL_set_sample_address(smp, playbackData->data, playbackData->size);
-    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
-        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
-    else
-        AIL_set_sample_volume(smp, 0);
-    AIL_start_sample(smp);
+
+    platform::SoundData sound;
+    sound.samples = playbackData->data;
+    sound.byteCount = playbackData->size;
+    sound.sampleRate = H2EnumIndex(playbackData->sampleRate);
+    sound.channels = 1;
+    sound.bitsPerSample = 8;
+
+    const i32 volume = gConfig.soundVolume != CONFIG_VOLUME_MUTED
+        ? ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT)
+        : 0;
+    smp = platform::Audio().PlaySound(sound, volume, playbackData->loopCount);
+
+    m_sampleHandles[ch] = smp;
     playbackData->activeSample = smp;
     m_channelSamples[ch] = smp;
     m_channelSampleData[ch] = playbackData->data;
@@ -538,7 +523,7 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
 void soundManager::ServiceSound(void) {
     if (gbNoSound != 0)
         return;
-    AIL_serve();
+    platform::Audio().Service();
 }
 
 i32 soundManager::MusicPlaying(void) {

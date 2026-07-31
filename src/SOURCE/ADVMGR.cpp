@@ -10250,7 +10250,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
-                            if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
+                            if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalReady == 0) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,

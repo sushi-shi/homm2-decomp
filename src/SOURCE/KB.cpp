@@ -2566,7 +2566,7 @@ void InitVars(void) {
     i32 i;
     i32 j;
     NULL_SAMPLE2.pSample = NULL;
-    NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE*>(NULL_SAMPLE2.pSample);
+    NULL_SAMPLE2.pMem = 0;
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;

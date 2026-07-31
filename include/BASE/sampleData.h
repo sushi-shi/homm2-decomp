@@ -2,6 +2,7 @@
 #define HOMM2_BASE_SAMPLEDATA_H
 
 #include <Ints.h>
+#include <PLATFORM/Audio.h>
 
 enum class SampleAudioFormat : i32 {
     FORMAT_MONO   = 0,
@@ -21,7 +22,7 @@ using enum SamplePlaybackRate;
 
 #pragma pack(push, 1)
 struct SamplePlaybackData {
-    struct _SAMPLE* activeSample;
+    platform::VoiceId activeSample;
     char* data;
     i32 size;
     i32 channelType;

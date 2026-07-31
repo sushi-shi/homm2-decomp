@@ -4,6 +4,7 @@
 #include <Ints.h>
 #include <stdio.h>
 #include "baseManager.h"
+#include <PLATFORM/Audio.h>
 
 typedef enum MidiTrackConstant {
     MIDI_NO_TRACK    = -1,
@@ -39,8 +40,6 @@ enum class SoundDigitalReportQuery : i16 {
 using enum SoundDigitalReportQuery;
 
 class sample;
-struct _SAMPLE;
-struct _DIG_DRIVER;
 struct tag_message;
 
 #pragma pack(push, 1)
@@ -52,17 +51,17 @@ struct SampleChannelStruct {
 
 class soundManager : public baseManager {
 public:
-    struct _DIG_DRIVER* m_digitalDriver;
+    i32 m_digitalReady;
     i32 field_0x3a;
     i32 m_ready;
     char _pad_0x42[0xe];
     FILE* m_midiFile;
-    struct _SAMPLE* m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
+    platform::VoiceId m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x8c[0x8];
     i32 m_numSampleHandles;
     char _pad_0x98[0x40];
     char m_channelVolumes[SOUND_CHANNEL_VOLUME_CAPACITY];
-    struct _SAMPLE* m_channelSamples[SOUND_SAMPLE_HANDLE_CAPACITY];
+    platform::VoiceId m_channelSamples[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x124[0x8];
     void* m_channelSampleData[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x164[0x8];
@@ -90,18 +89,18 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) override;
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
     void AllocateSampleHandles(void);
-    struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
+    platform::VoiceId StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
-    void StopSample(struct _SAMPLE*);
-    void ModifySample(struct _SAMPLE*, SoundSampleOperation, i32l);
-    i32l DigitalReport(struct _SAMPLE*, SoundDigitalReportQuery);
+    void StopSample(platform::VoiceId);
+    void ModifySample(platform::VoiceId, SoundSampleOperation, i32l);
+    i32l DigitalReport(platform::VoiceId, SoundDigitalReportQuery);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);
     void PlayAmbientMusic(i32, i32l, i32);
     void PollSound(void);
     void SwitchAmbientMusic(i32);
-    struct _SAMPLE* MemorySample(class sample*);
+    platform::VoiceId MemorySample(class sample*);
     void ServiceSound(void);
     i32 MusicPlaying(void);
     void MIDIStartup(void);

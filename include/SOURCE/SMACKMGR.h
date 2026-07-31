@@ -3,7 +3,6 @@
 
 #include <Ints.h>
 #include <PLATFORM/Smacker.h>
-#include <PLATFORM/Miles.h>
 
 void ConvertSmackerPalette(u8*);
 class icon;
@@ -36,10 +35,6 @@ struct SSmackOptions {
     i16 companionY;
 };
 
-struct SmackMilesDigitalDriver {
-    char reserved[SMACK_MILES_RESERVED_SIZE];
-    void* directSound;
-};
 #pragma pack(pop)
 
 void DoAdvance(Smack*, i32, i32, i32, i32);

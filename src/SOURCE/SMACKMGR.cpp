@@ -171,22 +171,10 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette9, gPalette->m_data, PALETTE_DATA_SIZE);
 
-    if (gbNoSound || !gpSoundManager->m_digitalDriver || gConfig.soundVolume == CONFIG_VOLUME_MUTED
-        || bSmackNum == SMACK_CREDITS) {
-        bSmackSound = 0;
-    } else {
-        bSmackSound = 1;
-        if (AIL_get_preference(MILES_SOUND_SYSTEM_PREFERENCE)) {
-            SmackSoundUseMSS(reinterpret_cast<void*>(gpSoundManager->m_digitalDriver));
-            LogStr("SSSS 1");
-        } else {
-            SmackSoundUseDirectSound(
-                reinterpret_cast<SmackMilesDigitalDriver*>(gpSoundManager->m_digitalDriver)
-                    ->directSound
-            );
-            LogStr("SSSS 2");
-        }
-    }
+    // Retail picked a sound driver for the movie player here. There is one.
+    bSmackSound = !(gbNoSound || !gpSoundManager->m_digitalReady
+                    || gConfig.soundVolume == CONFIG_VOLUME_MUTED
+                    || bSmackNum == SMACK_CREDITS);
 
     if (xSmackFromNetwork && bSmackNum > FIRST_NETWORK - 1)
         strcpy(path7, "i:\\projects\\heroes\\art\\fin3d\\");

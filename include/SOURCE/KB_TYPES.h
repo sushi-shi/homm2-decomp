@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_KB_TYPES_H
 
 #include <Ints.h>
+#include <PLATFORM/Audio.h>
 #include <SOURCE/combatTypes.h>
 
 class sample;
@@ -682,7 +683,6 @@ ENABLE_ENUM_FLAGS(MonsterFlags)
 
 typedef u32 UInt32;
 struct MemEntry;
-struct _SAMPLE;
 
 typedef enum KbLayoutConstant {
     MENU_ENABLE_STATUS_COUNT = 70
@@ -828,7 +828,7 @@ struct SSpellInfo {
 };
 struct SAMPLE2 {
     class sample* pSample;
-    struct _SAMPLE* pMem;
+    platform::VoiceId pMem;
 };
 
 #pragma pack(push, 1)
