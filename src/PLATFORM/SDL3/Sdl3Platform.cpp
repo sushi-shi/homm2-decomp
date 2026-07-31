@@ -1195,13 +1195,19 @@ private:
         std::error_code error;
         const std::filesystem::path working = std::filesystem::current_path(error);
         candidates.emplace_back(error ? std::string(".") : working.string());
-        if (const char* data = SDL_getenv("XDG_DATA_HOME")) {
-            candidates.emplace_back(std::string(data) + "/homm2");
+        // XDG_DATA_HOME falls back to ~/.local/share, so the two spellings are
+        // one place and everything below it follows whichever is in effect.
+        std::string dataHome;
+        if (const char* data = SDL_getenv("XDG_DATA_HOME"); data != nullptr && *data != '\0') {
+            dataHome = data;
         } else if (const char* home = SDL_getenv("HOME")) {
-            candidates.emplace_back(std::string(home) + "/.local/share/homm2");
+            dataHome = std::string(home) + "/.local/share";
+        }
+        if (!dataHome.empty()) {
+            candidates.emplace_back(dataHome + "/homm2");
+            candidates.emplace_back(dataHome + "/homm2/data");
         }
         if (const char* home = SDL_getenv("HOME")) {
-            candidates.emplace_back(std::string(home) + "/.local/share/homm2/data");
             candidates.emplace_back(std::string(home) + "/games/homm2");
         }
 
