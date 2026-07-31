@@ -29,11 +29,15 @@ The native build needs an installed copy of the game data:
 HOMM2_DATA=/path/to/heroes2 nix run .
 ```
 
+`HOMM2_DATA` wins when it is set. Otherwise the engine looks for a directory
+holding `DATA/HEROES2.AGG`, in order: next to the executable, the current
+directory, `$XDG_DATA_HOME/homm2`, `~/.local/share/homm2/data`, `~/games/homm2`.
+
 Other targets:
 
 ```sh
-nix build .#homm2-unwrapped
-nix build .#homm2-unwrapped-debug
+nix build .#homm2
+nix build .#homm2-debug
 nix build .#homm2-linux
 nix build .#homm2-windows
 nix build .#homm2-web

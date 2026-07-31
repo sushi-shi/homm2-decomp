@@ -901,10 +901,8 @@ public:
 #else
         if (const char* fromEnvironment = SDL_getenv("HOMM2_DATA")) {
             m_dataRoot = fromEnvironment;
-        } else if (const char* base = SDL_GetBasePath()) {
-            m_dataRoot = base;
         } else {
-            m_dataRoot = ".";
+            m_dataRoot = FindDataRoot();
         }
 #endif
 
@@ -943,6 +941,55 @@ public:
     }
 
 private:
+    // Where an installed copy of the game tends to sit.
+    static std::string FindDataRoot() {
+        std::vector<std::string> candidates;
+        if (const char* base = SDL_GetBasePath()) {
+            candidates.emplace_back(base);
+        }
+        std::error_code error;
+        const std::filesystem::path working = std::filesystem::current_path(error);
+        candidates.emplace_back(error ? std::string(".") : working.string());
+        if (const char* data = SDL_getenv("XDG_DATA_HOME")) {
+            candidates.emplace_back(std::string(data) + "/homm2");
+        } else if (const char* home = SDL_getenv("HOME")) {
+            candidates.emplace_back(std::string(home) + "/.local/share/homm2");
+        }
+        if (const char* home = SDL_getenv("HOME")) {
+            candidates.emplace_back(std::string(home) + "/.local/share/homm2/data");
+            candidates.emplace_back(std::string(home) + "/games/homm2");
+        }
+
+        for (const std::string& candidate : candidates) {
+            if (HoldsGameData(candidate)) {
+                return candidate;
+            }
+        }
+
+        std::fprintf(
+            stderr,
+            "[homm2] no game data found, set HOMM2_DATA to the directory holding "
+            "DATA/HEROES2.AGG\n"
+        );
+        return candidates.front();
+    }
+
+    static bool HoldsGameData(const std::filesystem::path& directory) {
+        const std::filesystem::path data = Entry(directory, "DATA");
+        return !data.empty() && !Entry(data, "HEROES2.AGG").empty();
+    }
+
+    // An installation carries the retail spelling, a copied one anything.
+    static std::filesystem::path Entry(const std::filesystem::path& directory, const char* wanted) {
+        std::error_code error;
+        for (const auto& entry : std::filesystem::directory_iterator(directory, error)) {
+            if (SDL_strcasecmp(entry.path().filename().string().c_str(), wanted) == 0) {
+                return entry.path();
+            }
+        }
+        return std::filesystem::path();
+    }
+
     static std::filesystem::path Directory(const std::string& root, const std::string& directory) {
         return directory.empty() ? std::filesystem::path(root)
                                  : std::filesystem::path(root) / directory;
