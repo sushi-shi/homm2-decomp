@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """Provision the pinned Visual C++ 4.2 matching toolchain.
 
-The original repository scaffold referenced make-toolchain.sh without ever
-committing it. This implementation accepts either an installed/extracted MSDEV
-tree or one or more VC 4.2 disc/archive images. Archive extraction is deliberately
+The original repository scaffold referenced a make-toolchain.sh that was never
+committed; when provisioning was finally implemented it was written here, in
+Python, and a shell shim was added purely to make that documented name resolve.
+The shim is gone - this file is executable and self-contained.
+
+Most people no longer need this: `homm2 init` fetches the pinned release. Reach
+for this when you are provisioning from your OWN media, which the release cannot
+do because it pins two exact archive.org artifacts by hash. It accepts either an
+installed/extracted MSDEV tree or one or more VC 4.2 disc/archive images. Archive extraction is deliberately
 best effort because some editions use an installer database that 7z cannot lay
 out as an installed tree; in that case install/extract the media separately and
 pass the resulting MSDEV directory.
@@ -258,9 +264,9 @@ def parse_args() -> argparse.Namespace:
         description="Provision build/toolchain/msvc from VC 4.2 media or an installed MSDEV tree.",
         epilog=(
             "Examples:\n"
-            "  scripts/toolchain/make-toolchain.sh /mnt/vc42/MSDEV\n"
-            "  scripts/toolchain/make-toolchain.sh /images/en_vc42ent_disc1.iso /images/en_vc42ent_disc2.iso\n"
-            "  scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc"
+            "  scripts/toolchain/make_toolchain.py /mnt/vc42/MSDEV\n"
+            "  scripts/toolchain/make_toolchain.py /images/en_vc42ent_disc1.iso /images/en_vc42ent_disc2.iso\n"
+            "  scripts/toolchain/make_toolchain.py --check build/toolchain/msvc"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
