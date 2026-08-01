@@ -1,6 +1,6 @@
 import unittest
 
-from format_enums import format_text
+from homm2.format.enums import format_text
 
 
 class FormatEnumsTests(unittest.TestCase):

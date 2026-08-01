@@ -26,9 +26,9 @@ def main(argv=None):
         headers = sorted(REPO.glob("include/**/*.h"))
         sources = sorted(REPO.glob("src/**/*.cpp"))
         header_status = sh(
-            "python3", "scripts/format_headers.py", *rest, *headers)
+            "python3", "-m", "homm2.format.headers", *rest, *headers)
         enum_status = sh(
-            "python3", "scripts/format_enums.py", *rest, *headers, *sources)
+            "python3", "-m", "homm2.format.enums", *rest, *headers, *sources)
         return int(bool(header_status or enum_status))
     if cmd == "constants":
         from homm2.constants_audit import main as m; return m(rest)
@@ -96,6 +96,9 @@ def main(argv=None):
         from homm2.match.status import main as st; return st(rest)
     if cmd == "sema":
         from homm2.analysis.sema import main as m; return m(rest)
+    if cmd == "clean":
+        # Derive the shipped tree from the matching tree; see homm2/clean/__init__.py.
+        from homm2.clean.clean_source import main as m; return m(rest)
     if cmd == "audit":
         # On-demand campaign diagnostics. NOT build gates - those are the assert_*
         # modules run inside `homm2 build`. No argument lists the tools.
@@ -106,6 +109,6 @@ def main(argv=None):
         from homm2.permute.match_variants import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|audit|ghidra}",
+    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|audit|clean|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

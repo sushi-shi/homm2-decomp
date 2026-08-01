@@ -13,9 +13,9 @@ selects the strict typed enum branch. `--classic-from` derives an integer-enum
 view from an existing clean tree. See docs/clean-source.md.
 
 Usage:
-    python3 scripts/clean_source.py --out build/clean
-    python3 scripts/clean_source.py --out build/clean --verify
-    python3 scripts/clean_source.py --classic-from ../homm2-decomp-master \
+    homm2 clean --out build/clean
+    homm2 clean --out build/clean --verify
+    homm2 clean --classic-from ../homm2-decomp-master \
         --out build/classic
 """
 
@@ -49,10 +49,10 @@ PUBLISHED_PATHS = (
     "vendor",
 )
 PROJECT_FILES = (
-    ("scripts/clean_project/.gitignore", ".gitignore"),
-    ("scripts/clean_project/flake.lock", "flake.lock"),
-    ("scripts/clean_project/flake.nix", "flake.nix"),
-    ("scripts/run-game.sh", "run-game.sh"),
+    ("scripts/homm2/clean/project/.gitignore", ".gitignore"),
+    ("scripts/homm2/clean/project/flake.lock", "flake.lock"),
+    ("scripts/homm2/clean/project/flake.nix", "flake.nix"),
+    ("scripts/homm2/clean/project/run-game.sh", "run-game.sh"),
 )
 
 # Sentinel marking a construct that expanded to nothing. Line cleanup uses it to
@@ -70,7 +70,7 @@ DROPPED = "\x01"
 # --------------------------------------------------------------------------
 
 # Supplied verbatim rather than derived; va.h is pure annotation machinery.
-OVERRIDE_DIR = REPO / "scripts/clean_overrides"
+OVERRIDE_DIR = REPO / "scripts/homm2/clean/overrides"
 DROP_FILES = {"include/va.h"}
 
 # The frozen 1996 source path, and the `#line` markers that pinned MSVC 4.2's
