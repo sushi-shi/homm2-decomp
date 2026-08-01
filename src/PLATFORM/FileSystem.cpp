@@ -180,8 +180,9 @@ std::string ResolveIn(const std::string& root, const char* retailPath) {
         relative.erase(0, 2);
     }
 
-    const bool absolute = !relative.empty() && (relative[0] == '\\' || relative[0] == '/');
-    std::string resolved = absolute ? std::string("/") : root;
+    // Retail wrote paths from the installation, so a leading separator means
+    // the top of the game directory rather than the top of the host.
+    std::string resolved = root;
     for (const std::string& component : SplitPath(relative)) {
         if (component == ".") {
             continue;
