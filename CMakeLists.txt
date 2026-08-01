@@ -177,6 +177,8 @@ target_link_libraries(homm2 PRIVATE homm2_platform ${HOMM2_FFMPEG_LIBRARIES})
 
 if(WIN32)
   target_link_libraries(homm2 PRIVATE ws2_32)
+  # A game, not a console program: retail came up without one behind it.
+  set_target_properties(homm2 PROPERTIES WIN32_EXECUTABLE ON)
 endif()
 
 list(LENGTH HOMM2_GAME_SOURCES HOMM2_GAME_SOURCE_COUNT)
