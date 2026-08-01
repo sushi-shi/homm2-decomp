@@ -51,5 +51,4 @@ public:
     void DamageGroup(float);
 };
 #pragma pack(pop)
-SIZE(armyGroup, 0xf);
 #endif

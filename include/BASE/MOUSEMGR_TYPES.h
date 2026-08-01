@@ -12,25 +12,21 @@ union SMouseManagerName {
     char text[sizeof(MOUSE_MANAGER_NAME)];
     u32l alignmentValue;
 };
-SIZE(SMouseManagerName, 0x10);
 
 union SMouseManagerSourceFile {
     char text[sizeof(MOUSE_MANAGER_SOURCE_FILE)];
     u32l alignmentValue;
 };
-SIZE(SMouseManagerSourceFile, 0x2c);
 
 union SMouseManagerIconName {
     char text[sizeof(MOUSE_MANAGER_ADVENTURE_ICON)];
     u32l alignmentValue;
 };
-SIZE(SMouseManagerIconName, 0xc);
 
 union SMouseManagerBitmapName {
     char text[sizeof(MOUSE_MANAGER_ADVENTURE_BITMAP)];
     u32l alignmentValue;
 };
-SIZE(SMouseManagerBitmapName, 0x10);
 
 struct SMouseManagerStrings {
     SMouseManagerName managerName;
@@ -50,6 +46,5 @@ struct SMouseManagerStrings {
     SMouseManagerSourceFile cursorAssertion;
     char defaultCursorName[sizeof("")];
 };
-SIZE(SMouseManagerStrings, 0x1c8);
 
 #endif

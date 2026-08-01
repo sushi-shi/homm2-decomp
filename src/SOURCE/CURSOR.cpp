@@ -51,11 +51,10 @@ H2_ENUM_BEGIN(CursorPrivateConstant)
     GROUP_FREE_LINE_OFFSET   = 25
 H2_ENUM_END(CursorPrivateConstant)
 
-#define SLOW_TURN_DELAY_SCALE DATA_COMPGEN(0x004eb078, dELAYSCALEConstant, 1.5)
+#define SLOW_TURN_DELAY_SCALE 1.5
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
-VA(0x0040d5e0, 0x138)
 void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 directionX_a;
     i32 directionY_a1;
@@ -81,7 +80,6 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
-VA(0x0040d718, 0x11c)
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
         bMoveSoundMade = 1;
@@ -104,7 +102,6 @@ void advManager::StopCursor(i32 stopSound) {
     m_cursorTurning = 0;
 }
 
-VA(0x0040d834, 0x5f8)
 void advManager::DrawCursor(void) {
     i32 drawY;
     i32 drawFrame_f;
@@ -325,7 +322,6 @@ void advManager::DrawCursor(void) {
     }
 }
 
-VA(0x0040de2c, 0x36c)
 void advManager::DrawCursorShadow(void) {
     i32 shadowOffset;
     i32 boatShadowOffset;
@@ -444,7 +440,6 @@ void advManager::DrawCursorShadow(void) {
     }
 }
 
-VA(0x0040e198, 0x85)
 i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
     if (direction > MAP_DIRECTION_SOUTH) {
         switch (direction) {
@@ -462,7 +457,6 @@ i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
     }
 }
 
-VA(0x0040e21d, 0x256)
 void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 turnStep_c = 1;
     i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
@@ -511,7 +505,6 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         UpdateScreen(0, 0);
 }
 
-VA(0x0040e473, 0xac)
 i32 advManager::GetMoveShowIt(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
@@ -530,7 +523,6 @@ i32 advManager::GetMoveShowIt(
         return 0;
 }
 
-VA(0x0040e51f, 0x1234)
 mapCell* advManager::MoveHero(
     H2_ENUM_PARAM(MapDirection, i32) direction,
     i32 stopAfterMove,
@@ -650,7 +642,7 @@ mapCell* advManager::MoveHero(
                     goto movementDone;
                 StopCursor(1);
                 m_cursorActive = 0;
-                fizzleSample_h = LoadPlaySample(DATA_COMPGEN(0x004ee06c, moveHeroKillfade82m, "killfade.82m"));
+                fizzleSample_h = LoadPlaySample("killfade.82m");
                 gpWindowManager->SaveFizzleSource(
                     CURSOR_FIZZLE_X,
                     CURSOR_FIZZLE_Y,
@@ -958,7 +950,6 @@ movementDone:
     return eventCell_g;
 }
 
-VA(0x0040f753, 0x174)
 void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     hero* currentHero_f;
     i32 killed_e;
@@ -1005,7 +996,6 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     }
 }
 
-VA(0x0040f8c7, 0x14e)
 i32 advManager::ValidMoveWithEvent(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
@@ -1040,7 +1030,6 @@ i32 advManager::ValidMoveWithEvent(
     }
 }
 
-VA(0x0040fa15, 0x4f2)
 i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventMode) {
     i32 directionX_j;
     i32 directionY_h;
@@ -1135,7 +1124,6 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     return 1;
 }
 
-VA(0x0040ff07, 0x24b)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     i32 oldOriginX0;
     i32 cellY1;
@@ -1181,7 +1169,6 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     m_forceCompleteDraw = 1;
 }
 
-VA(0x00410152, 0x74f)
 void advManager::ProcessMapChange(SMapChange change) {
     hero* mapHero_n;
     mapCell* eventCell_n;
@@ -1206,7 +1193,7 @@ void advManager::ProcessMapChange(SMapChange change) {
     switch (change.type) {
         case MAP_CHANGE_MOVE_HERO:
             LogInt(
-                DATA_COMPGEN(0x004ee07c, processMapChangeMCMoveHero, "MC Move Hero"),
+                "MC Move Hero",
                 change.id,
                 change.x,
                 change.y,
@@ -1219,9 +1206,9 @@ void advManager::ProcessMapChange(SMapChange change) {
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y) {
                 sprintf(
                     gText,
-                    DATA_COMPGEN(0x004ee08c, processMapChangeDataMiscommunicationInHeroPositionFirst, "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
+                    "Data miscommunication in hero position, first %d, %d, second %d, %d.  Please "
                     "give Phil a copy of  your Autosave and, if possible, instructions to recreate "
-                    "this error"),
+                    "this error",
                     mapHero_n->m_x,
                     mapHero_n->m_y,
                     change.x,
@@ -1253,7 +1240,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_MY_TURN:
             LogInt(
-                DATA_COMPGEN(0x004ee134, processMapChangeMCMyTurn, "MC My Turn"),
+                "MC My Turn",
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1266,7 +1253,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_TELEPORT_HERO:
             LogInt(
-                DATA_COMPGEN(0x004ee140, processMapChangeMCTeleportHero, "MC Teleport Hero"),
+                "MC Teleport Hero",
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1281,7 +1268,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_CLAIM_MINE:
             LogInt(
-                DATA_COMPGEN(0x004ee154, processMapChangeMCClaimMine, "MC ClaimMine"),
+                "MC ClaimMine",
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1297,7 +1284,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_CLAIM_TOWN:
             LogInt(
-                DATA_COMPGEN(0x004ee164, processMapChangeMCClaimTown, "MC ClaimTown"),
+                "MC ClaimTown",
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1313,7 +1300,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_BUILD_BOAT:
             LogInt(
-                DATA_COMPGEN(0x004ee174, processMapChangeMCBuildBoat, "MC BuildBoat"),
+                "MC BuildBoat",
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
                 LOG_UNUSED_VALUE,
@@ -1329,7 +1316,7 @@ void advManager::ProcessMapChange(SMapChange change) {
 
         case MAP_CHANGE_ERASE_OBJECT:
             LogInt(
-                DATA_COMPGEN(0x004ee184, processMapChangeMCEraseObject, "MC Erase Object"),
+                "MC Erase Object",
                 change.x,
                 change.y,
                 LOG_UNUSED_VALUE,
@@ -1345,7 +1332,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_DEAD_HERO:
-            LogStr(DATA_COMPGEN(0x004ee194, processMapChangeMCDeadHero, "MC DeadHero"));
+            LogStr("MC DeadHero");
             mapHero_n = gpGame->GetHero(change.id);
             if (change.x != mapHero_n->m_x || change.y != mapHero_n->m_y)
                 break;
@@ -1355,7 +1342,7 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_RECRUIT_HERO:
-            LogStr(DATA_COMPGEN(0x004ee1a0, processMapChangeMCRecruitHero, "MC RecruitHero"));
+            LogStr("MC RecruitHero");
             mapHero_n = gpGame->GetHero(change.id);
             mapHero_n->m_x = change.x;
             mapHero_n->m_y = change.y;
@@ -1380,8 +1367,8 @@ void advManager::ProcessMapChange(SMapChange change) {
             break;
 
         case MAP_CHANGE_DEAD_PLAYER:
-            LogStr(DATA_COMPGEN(0x004ee1b0, processMapChangeDeadPlayer, "Dead Player"));
-            sprintf(gText, DATA_COMPGEN(0x004ee1bc, processMapChangeSHasBeenVanquished, "%s has been vanquished!"), cPlayerNames[change.id]);
+            LogStr("Dead Player");
+            sprintf(gText, "%s has been vanquished!", cPlayerNames[change.id]);
             NormalDialog(
                 gText,
                 NORMAL_DIALOG_INFO,
@@ -1402,7 +1389,6 @@ void advManager::ProcessMapChange(SMapChange change) {
     }
 }
 
-VA(0x004108a1, 0x1ba)
 void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     i32 slot;
 
@@ -1417,7 +1403,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
             if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
                 && sMapChangeQueue[slot].sequence == incoming->sequence) {
                 LogInt(
-                    DATA_COMPGEN(0x004ee1d4, processIncomingSingleMapChangeOQ, "OQ"),
+                    "OQ",
                     incoming->sequence,
                     giMapChangeCtr,
                     LOG_UNUSED_VALUE,
@@ -1433,7 +1419,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
         for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
             if (sMapChangeQueue[slot].type == MAP_CHANGE_NONE) {
                 LogInt(
-                    DATA_COMPGEN(0x004ee1d8, processIncomingSingleMapChangeSQ, "SQ"),
+                    "SQ",
                     incoming->sequence,
                     giMapChangeCtr,
                     LOG_UNUSED_VALUE,
@@ -1456,9 +1442,8 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     UnwindMapChangeQueue(0, 1);
 }
 
-VA(0x00410a5b, 0xce)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
-    DATA(0x004ee1dc) static i16 s_groupLineBase = 1505; // NOLINT(readability-magic-numbers)
+    static i16 s_groupLineBase = 1505; // NOLINT(readability-magic-numbers)
     SMapChange* ptr;
     i32 size;
     SMapChange* buf;
@@ -1466,7 +1451,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(H2_ALLOC_AT(size, DATA_COMPGEN(0x004ee1e0, processIncomingGroupMapChangeSourceFile, RETAIL_FILE), s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
+    buf = static_cast<SMapChange*>(H2_ALLOC_AT(size, RETAIL_FILE, s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];
@@ -1476,10 +1461,9 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
             processed = 0;
         }
     }
-    H2_FREE_AT(buf, DATA_COMPGEN(0x004ee20c, processIncomingGroupMapChangeSourceFile2, RETAIL_FILE), s_groupLineBase + GROUP_FREE_LINE_OFFSET);
+    H2_FREE_AT(buf, RETAIL_FILE, s_groupLineBase + GROUP_FREE_LINE_OFFSET);
 }
 
-VA(0x00410b29, 0x75)
 void advManager::PurgeMapChangeQueue(void) {
     i32 slot;
 
@@ -1489,7 +1473,6 @@ void advManager::PurgeMapChangeQueue(void) {
         sMapChangeLastFew[slot].type = MAP_CHANGE_NONE;
 }
 
-VA(0x00410b9e, 0x1d4)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queueCount;
     i32 unwoundChanges;
@@ -1537,7 +1520,6 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     }
 }
 
-VA(0x00410d72, 0x11a)
 void SendMapChange(
     MapChangeType type,
     i8 id,
@@ -1556,7 +1538,7 @@ void SendMapChange(
     if (player == MAP_CHANGE_CURRENT_PLAYER)
         player = giCurPlayer;
     LogInt(
-        DATA_COMPGEN(0x004ee238, sendMapChangeSendMapChange, "Send Map Change"),
+        "Send Map Change",
         type,
         id,
         x,
@@ -1594,19 +1576,19 @@ void SendMapChange(
     );
 }
 
-DATA(0x004ee020) i32 bMoveSoundMade = 1;
-DATA(0x004ee028) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
-DATA(0x004ee040) i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
-DATA(0x004ee054) struct _SAMPLE* hOldWalkSample = NULL;
-DATA(0x004ee058) struct _SAMPLE* hNewWalkSample = NULL;
-DATA(0x004ee05c) i32 EveryOther = 0;
-DATA(0x004ee060) i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
-DATA(0x00524bc0) i32 S1cursorCycle;
-DATA(0x00524bc4) i32 S1cursorFrameCount;
-DATA(0x00524bc8) i32 S1cursorTurning;
-DATA(0x00524bcc) i32 S1cursorBaseFrame;
-DATA(0x00524bd0) H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
-DATA(0x00524bd8) SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
+i32 bMoveSoundMade = 1;
+i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
+i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
+struct _SAMPLE* hOldWalkSample = NULL;
+struct _SAMPLE* hNewWalkSample = NULL;
+i32 EveryOther = 0;
+i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT] = {16, 0, -16};
+i32 S1cursorCycle;
+i32 S1cursorFrameCount;
+i32 S1cursorTurning;
+i32 S1cursorBaseFrame;
+H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
+SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 #undef SLOW_TURN_DELAY_SCALE
 #undef RETAIL_FILE

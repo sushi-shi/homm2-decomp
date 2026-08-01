@@ -194,21 +194,21 @@ H2_ENUM_END(FileIdHashConstant)
 #include <BASE/palette.h>
 #include <SOURCE/X_GLOBAL.h>
 
-DATA(0x005331c0) static i32 giFindMid;
+static i32 giFindMid;
 
-DATA(0x005331cc) static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rect right edge
-DATA(0x005331d0) static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
+static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rect right edge
+static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
 
-DATA(0x0051dce8) i32 iMemEntries = 0;
-DATA(0x0051dcec) MemEntry* gpMemEntry = NULL;
-DATA(0x0051dcf0) i32 giTotalMemAllocated = 0;
-DATA(0x0051dcf8) u8
+i32 iMemEntries = 0;
+MemEntry* gpMemEntry = NULL;
+i32 giTotalMemAllocated = 0;
+u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
-DATA(0x0051dd08) i32 iLastSeed = INITIAL_SEED;
-DATA(0x0051dd0c) static char gMemEntryTag[sizeof("IME")] = "IME";
+i32 iLastSeed = INITIAL_SEED;
+static char gMemEntryTag[sizeof("IME")] = "IME";
 
-DATA(0x0051dd10) static SMiscText gMiscText = {
+static SMiscText gMiscText = {
     {{"KBAlloc    Size %d   Ptr %d   File %s  Line %d"},
      {"Free "},
      {"NULL POINTER"},
@@ -368,7 +368,6 @@ H2_ENUM_BEGIN(StatusBarLayout)
     STATUS_TEXT_HEIGHT = 16
 H2_ENUM_END(StatusBarLayout)
 
-VA(0x004c3d10, 0x58)
 void InitMemEntry(void) {
     LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
            LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
@@ -377,7 +376,6 @@ void InitMemEntry(void) {
         gpMemEntry[i].used = 0;
 }
 
-VA(0x004c3d70, 0x20f)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     char text[FORMAT_BUFFER_SIZE];
     char logText[TEXT_BUFFER_SIZE];
@@ -434,7 +432,6 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
     return ptr;
 }
 
-VA(0x004c3f80, 0x386)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     char logText[TEXT_BUFFER_SIZE];
     char text[FORMAT_BUFFER_SIZE];
@@ -534,7 +531,6 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     }
 }
 
-VA(0x004c4310, 0x134)
 void PrintMemoryLeaks(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= MEMORY_LEAK_DEBUG_LEVEL && gpMemEntry != NULL) {
@@ -578,7 +574,6 @@ void PrintMemoryLeaks(void) {
     }
 }
 
-VA(0x004c4450, 0x91)
 void ShowMemoryStatus(void) {
     sprintf(gText, gMiscText.memory.memoryStatusFormat.text, REPORTED_MEMORY_KILOBYTES);
     i32 savedDebugLevel = giDebugLevel;
@@ -607,7 +602,6 @@ void ShowMemoryStatus(void) {
     giDebugLevel = savedDebugLevel;
 }
 
-VA(0x004c44f0, 0x48)
 u32l MAKEFILEID(char* text) {
     u32 hash = 0;
     i32 sum = 0;
@@ -624,7 +618,6 @@ u32l MAKEFILEID(char* text) {
     return hash;
 }
 
-VA(0x004c4540, 0x95)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
     while (high - low > 1) {
@@ -649,7 +642,6 @@ i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
 
 #include <BASE/MiscGraphicsConstants.h>
 
-VA(0x004c45e0, 0xea)
 void FadeIn(i32 increment) {
     palette* fadePalette = new palette;
     if (fadePalette == NULL)
@@ -688,7 +680,6 @@ void FadeIn(i32 increment) {
     }
 }
 
-VA(0x004c46d0, 0xe6)
 void FadeOut(i32 increment) {
     palette* fadePalette = new palette;
     if (fadePalette == NULL)
@@ -724,7 +715,6 @@ void FadeOut(i32 increment) {
     }
 }
 
-VA(0x004c47c0, 0x28)
 i32 Random(i32 low, i32 high) {
     if (low == high) {
         return high;
@@ -735,7 +725,6 @@ i32 Random(i32 low, i32 high) {
     return low + rand() % (high - low + 1);
 }
 
-VA(0x004c47f0, 0x5d)
 void ProcessAssert(i32 condition, char* file, i32 line) {
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
@@ -748,7 +737,6 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
     }
 }
 
-VA(0x004c4850, 0x66)
 char* FindStringInString(char* text, char* pattern) {
     i32 text_len = strlen(text);
     i32 pattern_len = strlen(pattern);
@@ -764,7 +752,6 @@ char* FindStringInString(char* text, char* pattern) {
     return NULL;
 }
 
-VA(0x004c48c0, 0x31)
 char* FindToken(char* text, char token) {
     i32 len = strlen(text);
     i32 i = 0;
@@ -778,7 +765,6 @@ char* FindToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004c4900, 0x2b)
 char* FindLastToken(char* text, char token) {
     for (i32 i = strlen(text) - 1; i >= 0; --i) {
         if (text[i] == token) {
@@ -788,7 +774,6 @@ char* FindLastToken(char* text, char token) {
     return NULL;
 }
 
-VA(0x004c4930, 0x6c)
 void SetInstallDefaults(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     strcpy(gConfig.autoLoadName, gMiscText.installDefaults.autoLoadName.text);
@@ -796,7 +781,6 @@ void SetInstallDefaults(void) {
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
 // Retail saves ESI/EDI before materializing the main-game graphics slot.
-VA(0x004c49a0, 0x1b5)
 void SetGameDefaults(void) {
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
@@ -857,7 +841,6 @@ void SetGameDefaults(void) {
     gConfig.needsDefaultInitialization = 0;
 }
 
-VA(0x004c4b60, 0x13f)
 void ReadPrefsFromFile(void) {
     sprintf(gText, gMiscText.readFile.stringFormat.text, gMiscText.readFile.configFilename.text);
     if (access(gText, 0) == -1) {
@@ -891,7 +874,6 @@ H2_ENUM_BEGIN(RegistryValueSize)
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
 H2_ENUM_END(RegistryValueSize)
 
-VA(0x004c4ca0, 0x7ab)
 void ReadPrefsFromRegistry(void) {
     HKEY hKey;
     DWORD dwType;
@@ -1319,7 +1301,6 @@ void ReadPrefsFromRegistry(void) {
         gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
 }
 
-VA(0x004c5450, 0xa1)
 void ReadPrefs(void) {
     memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
     ReadPrefsFromRegistry();
@@ -1331,7 +1312,6 @@ void ReadPrefs(void) {
     sprintf(gConfig.rmtSDName, gMiscText.remoteNames.serverRight.text, gConfig.uniqueSystemID);
 }
 
-VA(0x004c5500, 0x6a)
 void WritePrefsToFile(void) {
     i32 zeroBuffer[CONFIG_ZERO_BUFFER_WORDS];
     i32 i;
@@ -1348,7 +1328,6 @@ void WritePrefsToFile(void) {
     }
 }
 
-VA(0x004c5570, 0x491)
 void WritePrefsToRegistry(void) {
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
@@ -1714,20 +1693,17 @@ void WritePrefsToRegistry(void) {
     RegCloseKey(hKey);
 }
 
-VA(0x004c5a10, 0xa)
 void WritePrefs(void) {
     UpdateSystemOptionsMenu();
     WritePrefsToRegistry();
 }
 
-VA(0x004c5a20, 0x3c)
 i32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, gMiscText.cd.rootDrive.text);
     gText[0] = gText[0] + driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
-VA(0x004c5a60, 0x3ed)
 H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     char registryPath[CD_PATH_BUFFER_SIZE];
     char registryKey[CD_PATH_BUFFER_SIZE];
@@ -1832,12 +1808,10 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
     }
 }
 
-VA(0x004c5e50, 0x18)
 void BitmapToScreen(class bitmap* bmp) {
     BlitBitmapToScreen(bmp, 0, 0, bmp->m_width, bmp->m_height, 0, 0);
 }
 
-VA(0x004c5e70, 0x3d)
 void SetPalette(i8* paletteData, i32 updateDisplay) {
     memcpy(gpBufferPalette->m_data, paletteData, MISC_PALETTE_BYTE_COUNT);
     memcpy(
@@ -1849,7 +1823,6 @@ void SetPalette(i8* paletteData, i32 updateDisplay) {
         UpdatePalette(gpBufferPalette->m_data);
 }
 
-VA(0x004c5eb0, 0x25)
 void BlitBitmapToScreenNoMouseCheck(
     class bitmap* bmp,
     i32 sourceX,
@@ -1862,7 +1835,6 @@ void BlitBitmapToScreenNoMouseCheck(
     BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
 }
 
-VA(0x004c5ee0, 0x18b)
 void BlitBitmapToScreen(
     class bitmap* bmp,
     i32 sourceX,
@@ -1927,7 +1899,6 @@ void BlitBitmapToScreen(
     }
     BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height, destinationX, destinationY);
 }
-VA(0x004c6070, 0xa6)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
@@ -1947,7 +1918,6 @@ void LogTruncate(void) {
 }
 
 
-VA(0x004c6120, 0x9e)
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
@@ -1964,7 +1934,6 @@ void LogStr(char* text) {
     }
 }
 
-VA(0x004c61c0, 0x224)
 void LogInt(
     char* label,
     i32 value1,
@@ -2035,7 +2004,6 @@ void LogInt(
     }
 }
 
-VA(0x004c63f0, 0x6c)
 void AiPrint(char* text) {
     if (giDebugLevel >= FILE_DEBUG_LEVEL) {
         FillBitmapArea(
@@ -2062,7 +2030,6 @@ void AiPrint(char* text) {
     }
 }
 
-VA(0x004c6460, 0x7a)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
@@ -2097,7 +2064,6 @@ static inline i32 FadeThreshold(i32 level, i32 increment) {
     return giChangeThreshold[index];
 }
 
-VA(0x004c64e0, 0xf8)
 void FadeTo(u8* source, u8* destination, i32 increment) {
     u8 colors[MISC_PALETTE_BYTE_COUNT];
     memcpy(colors, source, sizeof(colors));
@@ -2133,7 +2099,6 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
-VA(0x004c65e0, 0xb8)
 void FadeToColorTable(u8* colorTable, i32 increment) {
     u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
     i32 savedUpdateFlags = gpWindowManager->m_updateFlags;
@@ -2169,7 +2134,6 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
     gpWindowManager->m_updateFlags = savedUpdateFlags;
 }
 
-VA(0x004c66a0, 0x29)
 i32 IsCycleColor(i32 color) {
     if ((color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
         || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST)) {
@@ -2182,7 +2146,6 @@ static inline i32 PCXValueIsLiteral(u8 value) {
     return (value & RLE_RUN_MARKER) != RLE_RUN_MARKER;
 }
 
-VA(0x004c66d0, 0x1ee)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
     PCXHeader header;
     memset(&header, 0, sizeof(header));
@@ -2236,7 +2199,6 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
     close(fileHandle);
 }
 
-VA(0x004c68c0, 0x52)
 i32l FileSize(char* filename) {
     FILE* file = fopen(filename, gMiscText.file.readWriteBinaryMode.text);
     if (file == NULL) {
@@ -2249,11 +2211,9 @@ i32l FileSize(char* filename) {
     return size;
 }
 
-VA(0x004c6920, 0xc)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
     return &iconPtr->Entries()[index];
 }
-VA(0x004c6930, 0xb8)
 i32 SRandom(i32 low, i32 high) {
     if (high == low) {
         return high;
@@ -2286,7 +2246,6 @@ i32 SRandom(i32 low, i32 high) {
     return rangedResult;
 }
 
-VA(0x004c69f0, 0x5c)
 void SIncRandomize(i32 x, i32 y) {
     x *= RANDOM_TERM_MULTIPLIER;
     x &= RANDOM_TERM_MASK;
@@ -2298,13 +2257,11 @@ void SIncRandomize(i32 x, i32 y) {
     iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
 }
 
-VA(0x004c6a50, 0x10)
 void SRand(i32 seed) {
     iLastSeed = seed;
     srand(seed);
 }
 
-VA(0x004c6a60, 0x48)
 i32 SGenRand(void) {
     i32 result = 0;
     iLastSeed &= RANDOM_SEED_MASK;
@@ -2319,11 +2276,9 @@ i32 SGenRand(void) {
     return result;
 }
 
-VA(0x004c6ab0, 0x6)
 i32 MemSize(i32) {
     return REPORTED_MEMORY_KILOBYTES;
 }
-VA(0x004c6ac0, 0x386)
 void GetDataEntry(
     char* prompt,
     char* destination,
@@ -2428,7 +2383,6 @@ void GetDataEntry(
     gbAllowTextEntryEscape = true;
 }
 
-VA(0x004c6e50, 0x173)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
@@ -2488,9 +2442,9 @@ normalEvent:
     return EventWindowHandler(message);
 }
 
-DATA(0x005331c4) class heroWindow* DataEntryWin;
-DATA(0x005331c8) char* cDEDest;
-DATA(0x005331d4) i32 iDEMaxLen;
-DATA(0x005331d8) H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
-DATA(0x005331dc) i32 inBoxX;
-DATA(0x005331e0) i32 inBoxY;
+class heroWindow* DataEntryWin;
+char* cDEDest;
+i32 iDEMaxLen;
+H2_ENUM_STORAGE_STEPPED(DataEntryPhase, i32) bDataEntryTime;
+i32 inBoxX;
+i32 inBoxY;

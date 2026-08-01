@@ -10,7 +10,6 @@ H2_ENUM_BEGIN(IconScaleConstant)
     SCALE_WORK_BITMAP_SIZE = 0x40
 H2_ENUM_END(IconScaleConstant)
 
-VA(0x004d2f90, 0x179)
 void IconToBitmapScale(
     class icon* srcIcon,
     class bitmap* dest,

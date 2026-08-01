@@ -29,6 +29,5 @@ struct SamplePlaybackData {
     i32 loopCount;
 };
 #pragma pack(pop)
-SIZE(SamplePlaybackData, 0x20);
 
 #endif

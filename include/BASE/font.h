@@ -49,5 +49,4 @@ public:
     i32 LineWidth(char*);
 };
 #pragma pack(pop)
-SIZE(font, 0x20);
 #endif

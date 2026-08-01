@@ -51,7 +51,7 @@ H2_ENUM_BEGIN(DropListLayoutConstant)
     SCROLL_DRAG_Y_ADJUSTMENT    = 4
 H2_ENUM_END(DropListLayoutConstant)
 
-DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
+static SDropListSourceFiles gDropListSourceFiles = {
     {DROPLIST_SOURCE_FILE},
     {DROPLIST_SOURCE_FILE},
     {DROPLIST_SOURCE_FILE},
@@ -65,7 +65,6 @@ DATA(0x00521078) static SDropListSourceFiles gDropListSourceFiles = {
     {DROPLIST_SOURCE_FILE}
 };
 
-VA(0x004dbf00, 0x3b)
 dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_items = NULL;
     m_savedBackground = NULL;
@@ -73,7 +72,6 @@ dropListWidget::dropListWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_selectedIndex = -1;
 }
 
-VA(0x004dbf60, 0x7c)
 dropListWidget::~dropListWidget() {
     gpResourceManager->Dispose(m_font);
     gpResourceManager->Dispose(m_icon);
@@ -84,7 +82,6 @@ dropListWidget::~dropListWidget() {
     H2_FREE_AT(m_items, gDropListSourceFiles.listDestruction.text, 27);
 }
 
-VA(0x004dbfe0, 0x21d)
 void dropListWidget::Read(void) {
     i8 name[RESOURCE_NAME_CAPACITY];
     u8** entries;
@@ -145,7 +142,6 @@ void dropListWidget::Read(void) {
     m_scrollThumbHeight = bottomEntry->h;
 }
 
-VA(0x004dc200, 0xd5)
 void dropListWidget::DeleteItem(i32 index) {
     if (index < m_itemCount) {
         if (m_selectedIndex == index)
@@ -175,7 +171,6 @@ void dropListWidget::DeleteItem(i32 index) {
     }
 }
 
-VA(0x004dc2e0, 0x350)
 MessageDispatchResult dropListWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
@@ -289,7 +284,6 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
     return widget::Main(message);
 }
 
-VA(0x004dc630, 0xaf)
 void dropListWidget::Draw(void) {
     m_icon->DrawToBuffer(
         m_iconX + m_owner->m_posX,
@@ -319,7 +313,6 @@ void dropListWidget::Draw(void) {
     }
 }
 
-VA(0x004dc6e0, 0x378)
 void dropListWidget::DrawDropStuff(void) {
     i32 y = m_owner->m_posY + m_listY;
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, ICON_DRAW_NORMAL);
@@ -415,14 +408,12 @@ void dropListWidget::DrawDropStuff(void) {
     gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_savedBackgroundHeight + m_height);
 }
 
-VA(0x004dca60, 0x50)
 void dropListWidget::SaveDropBackground(void) {
     m_savedBackground =
         new bitmap(BITMAP_TYPE_NONE, m_savedBackgroundWidth, m_savedBackgroundHeight);
     m_savedBackground->GrabScreen(m_savedBackgroundX, m_savedBackgroundY);
 }
 
-VA(0x004dcab0, 0x56)
 void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground->DrawToBuffer(m_savedBackgroundX, m_savedBackgroundY);
     gpWindowManager->UpdateScreenRegion(
@@ -436,7 +427,6 @@ void dropListWidget::RestoreDropBackground(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004dcb10, 0x81f)
 void dropListWidget::ProcessSelectDialog(void) {
     i16 scrollWidth[SCROLL_METRIC_SLOT_COUNT];
     i16 scrollTopHeight[SCROLL_METRIC_SLOT_COUNT];
@@ -722,4 +712,3 @@ done:
 }
 
 
-VTBL(dropListWidget, 0x004ebad0);

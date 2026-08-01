@@ -24,13 +24,12 @@ H2_ENUM_BEGIN(ModemPrivateConstant)
     INPUT_QUEUE_GUARD         = 4
 H2_ENUM_END(ModemPrivateConstant)
 
-VA(0x0040c8f0, 0x24e)
 void ModemSetup(i32 mode) {
     char directConnectMessage3[SETUP_TEXT_CAPACITY];
     i32 resetAttempt9;
     char command[SETUP_TEXT_CAPACITY];
 
-    LogStr(DATA_COMPGEN(0x004ede60, modemSetupMS1, "MS1"));
+    LogStr("MS1");
     gbRemoteOn = true;
     inque.writePosition = 0;
     inque.readPosition = 0;
@@ -42,24 +41,24 @@ void ModemSetup(i32 mode) {
         COM_BAUD_19200,
         0
     );
-    LogStr(DATA_COMPGEN(0x004ede64, modemSetupMS2, "MS2"));
+    LogStr("MS2");
 
     if (gbDirectConnect == 0) {
         for (resetAttempt9 = 0; resetAttempt9 < RESET_ATTEMPT_COUNT; ++resetAttempt9) {
             if (gConfig.comPort[gbDirectConnect] >= CONFIG_COM_PORT_1)
                 sprintf(command, gConfig.modemInitString);
             else
-                sprintf(command, DATA_COMPGEN(0x004ede68, modemSetupATZ, "ATZ"));
+                sprintf(command, "ATZ");
             PollSound();
             ModemCommand(command);
             DelayMilli(MODEM_RESET_DELAY);
-            ModemCommand(DATA_COMPGEN(0x004ede6c, modemSetupEmptyString, "\r"));
+            ModemCommand("\r");
             DelayMilli(MODEM_COMMAND_DELAY);
             PollSound();
         }
     }
 
-    LogStr(DATA_COMPGEN(0x004ede70, modemSetupMS3, "MS3"));
+    LogStr("MS3");
     switch (mode) {
         case MODEM_MODE_DIAL:
             if (gbDirectConnect == 0 && Dial() != 0) {
@@ -78,13 +77,13 @@ void ModemSetup(i32 mode) {
     }
 
     if (gbDirectConnect != 0) {
-        LogStr(DATA_COMPGEN(0x004ede74, modemSetupMS4, "MS4"));
+        LogStr("MS4");
         WFDCStage = MODEM_CONNECTION_INIT_STAGE;
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
-            DATA_COMPGEN(0x004ede78, modemSetupWaitingForOtherComputerToLog, "Waiting for other computer to log in to direct connection.\n\n"
-            "Press 'CANCEL' to abort.")
+            "Waiting for other computer to log in to direct connection.\n\n"
+            "Press 'CANCEL' to abort."
         );
         NormalDialog(
             directConnectMessage3,
@@ -100,35 +99,32 @@ void ModemSetup(i32 mode) {
         );
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
-        LogStr(DATA_COMPGEN(0x004eded0, modemSetupMS5, "MS5"));
+        LogStr("MS5");
     } else {
         Connect();
     }
 }
 
-VA(0x0040cb3e, 0x9e)
 i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
-    sprintf(dialCommand, DATA_COMPGEN(0x004eded4, dialATDTS, "ATDT%s"), numbuf);
-    sprintf(gText, DATA_COMPGEN(0x004edee8, dialSS, "%s %s"), DATA_COMPGEN(0x004ededc, dialDialing, "Dialing..."), numbuf);
+    sprintf(dialCommand, "ATDT%s", numbuf);
+    sprintf(gText, "%s %s", "Dialing...", numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, DATA_COMPGEN(0x004edefc, dialSS2, "%s %s"), DATA_COMPGEN(0x004edef0, dialDialing2, "Dialing..."), numbuf);
-    if (GUIModemResponse(gText, DATA_COMPGEN(0x004edf04, dialCONNECT, "CONNECT")) != 0)
+    sprintf(gText, "%s %s", "Dialing...", numbuf);
+    if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
 }
 
-VA(0x0040cbdc, 0x54)
 i32l Wait(void) {
-    GUIModemResponse(DATA_COMPGEN(0x004edf14, waitWaitingForRing, "Waiting for ring..."), DATA_COMPGEN(0x004edf0c, waitRING, "RING"));
-    GUIModemCommand(DATA_COMPGEN(0x004edf2c, waitInitializingModem, "Initializing modem..."), DATA_COMPGEN(0x004edf28, waitATA, "ATA"));
-    if (GUIModemResponse(DATA_COMPGEN(0x004edf4c, waitEstablishingConnection, "Establishing connection..."), DATA_COMPGEN(0x004edf44, waitCONNECT, "CONNECT")) != 0)
+    GUIModemResponse("Waiting for ring...", "RING");
+    GUIModemCommand("Initializing modem...", "ATA");
+    if (GUIModemResponse("Establishing connection...", "CONNECT") != 0)
         return 1;
     return 0;
 }
 
-VA(0x0040cc30, 0x79)
 void GUIModemCommand(char* message, char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
@@ -139,7 +135,6 @@ void GUIModemCommand(char* message, char* command) {
         ShutDown(NULL);
 }
 
-VA(0x0040cca9, 0x95)
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
@@ -152,12 +147,11 @@ i8 GUIModemCommandExec(void) {
         ++iModemCommandPos;
         return 0;
     } else {
-        write_buffer(DATA_COMPGEN(0x004edf68, gUIModemCommandExecEmptyString, "\r"), 1);
+        write_buffer("\r", 1);
         return 1;
     }
 }
 
-VA(0x0040cd3e, 0x8e)
 void ModemCommand(char* command) {
     char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
@@ -166,10 +160,9 @@ void ModemCommand(char* command) {
         write_buffer(command + commandPosition0, 1);
         DelayMilli(MODEM_COMMAND_DELAY);
     }
-    write_buffer(DATA_COMPGEN(0x004edf6c, modemCommandEmptyString, "\r"), 1);
+    write_buffer("\r", 1);
 }
 
-VA(0x0040cdcc, 0x82)
 i8 GUIModemResponse(char* message, char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
@@ -181,7 +174,6 @@ i8 GUIModemResponse(char* message, char* response) {
     return 0;
 }
 
-VA(0x0040ce4e, 0xe2)
 i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
@@ -208,7 +200,6 @@ i8 GUIModemResponseExec(void) {
     }
 }
 
-VA(0x0040cf30, 0x4e)
 i32 write_buffer(char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
@@ -216,7 +207,6 @@ i32 write_buffer(char* buffer, i32 length) {
     return 1;
 }
 
-VA(0x0040cf7e, 0x47)
 i32 read_byte(void) {
     u8 value[READ_STORAGE_SIZE];
     i32 received = com_rcv(0, 1, value);
@@ -226,18 +216,16 @@ i32 read_byte(void) {
         return -1;
 }
 
-VA(0x0040cfc5, 0x27)
 void write_byte(i32 value) {
     com_snd(0, 0, 1, &value, 0);
 }
 
-VA(0x0040cfec, 0x1bb)
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 idSeed = KBTickCount();
     i32 packetResult;
     idSeed %= MODEM_ID_MODULUS;
-    sprintf(idstr, DATA_COMPGEN(0x004edf70, connect06d, "%06d"), idSeed);
+    sprintf(idstr, "%06d", idSeed);
     oldsec = -1;
     remotestage = 0;
     localstage = remotestage;
@@ -246,10 +234,10 @@ void Connect(void) {
             packet[packetlen] = 0;
             if (packetlen != HANDSHAKE_PACKET_SIZE)
                 continue;
-            if (strncmp(packet, DATA_COMPGEN(0x004edf78, connectID, "ID"), HANDSHAKE_PREFIX_SIZE) != 0)
+            if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                 continue;
             if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
-                sprintf(gText, DATA_COMPGEN(0x004edf7c, connectDuplicateIDStringsSorryPleaseTry, "Duplicate ID Strings!\nSorry Please Try Again\n"));
+                sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
                 GOut(gText);
                 RemoteCleanup();
             }
@@ -262,7 +250,7 @@ void Connect(void) {
         stime = KBTickCount();
         if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
             oldsec = stime;
-            sprintf(idMessage, DATA_COMPGEN(0x004edfac, connectIDSI, "ID%s_%i"), idstr, localstage);
+            sprintf(idMessage, "ID%s_%i", idstr, localstage);
             WriteModemPacket(idMessage, strlen(idMessage));
         }
         PollSound();
@@ -271,14 +259,13 @@ void Connect(void) {
     }
 }
 
-VA(0x0040d1a7, 0x211)
 i32 WaitForDirectConnect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     switch (WFDCStage) {
         case MODEM_CONNECTION_INIT_STAGE: {
             u32 idSeed = KBTickCount();
             idSeed %= MODEM_ID_MODULUS;
-            sprintf(idstr, DATA_COMPGEN(0x004edfb4, waitForDirectConnect06d, "%06d"), idSeed);
+            sprintf(idstr, "%06d", idSeed);
             oldsec = -1;
             remotestage = 0;
             localstage = remotestage;
@@ -290,10 +277,10 @@ i32 WaitForDirectConnect(void) {
                 packet[packetlen] = 0;
                 if (packetlen != HANDSHAKE_PACKET_SIZE)
                     return 0;
-                if (strncmp(packet, DATA_COMPGEN(0x004edfbc, waitForDirectConnectID, "ID"), HANDSHAKE_PREFIX_SIZE) != 0)
+                if (strncmp(packet, "ID", HANDSHAKE_PREFIX_SIZE) != 0)
                     return 0;
                 if (strncmp(packet + HANDSHAKE_PREFIX_SIZE, idstr, HANDSHAKE_ID_SIZE) == 0) {
-                    sprintf(gText, DATA_COMPGEN(0x004edfc0, waitForDirectConnectDuplicateIDStringsSorryPleaseTry, "Duplicate ID Strings!\nSorry Please Try Again\n"));
+                    sprintf(gText, "Duplicate ID Strings!\nSorry Please Try Again\n");
                     GOut(gText);
                     RemoteCleanup();
                 }
@@ -306,7 +293,7 @@ i32 WaitForDirectConnect(void) {
             if (oldsec / MILLISECONDS_PER_SECOND
                 != stime / MILLISECONDS_PER_SECOND) {
                 oldsec = stime;
-                sprintf(idMessage, DATA_COMPGEN(0x004edff0, waitForDirectConnectIDSI, "ID%s_%i"), idstr, localstage);
+                sprintf(idMessage, "ID%s_%i", idstr, localstage);
                 WriteModemPacket(idMessage, strlen(idMessage));
             }
             if (localstage >= MODEM_CONNECTION_READY_STAGE)
@@ -320,11 +307,10 @@ i32 WaitForDirectConnect(void) {
     return 0;
 }
 
-VA(0x0040d3b8, 0x127)
 char ReadPacket(void) {
     i32 input;
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - IDX(INPUT_QUEUE_GUARD)) {
-        LogStr(DATA_COMPGEN(0x004edff8, readPacketOverFlow1, "OverFlow1"));
+        LogStr("OverFlow1");
         inque.writePosition = 0;
         newpacket = 1;
     }
@@ -354,7 +340,7 @@ readPacketStart:
         }
         if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
             newpacket = 1;
-            LogStr(DATA_COMPGEN(0x004ee004, readPacketOverFlow2, "OverFlow2"));
+            LogStr("OverFlow2");
             goto readPacketStart;
         }
         packet[packetlen] = static_cast<char>(input);
@@ -362,11 +348,10 @@ readPacketStart:
     }
 }
 
-VA(0x0040d4df, 0xFF)
 void WriteModemPacket(char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {
-        LogStr(DATA_COMPGEN(0x004ee010, writeModemPacketTOOLONG, "TOO LONG"));
+        LogStr("TOO LONG");
         return;
     }
 
@@ -394,25 +379,25 @@ void WriteModemPacket(char* buffer, i32 length) {
         ForcePollSound();
 }
 
-DATA(0x004ede50) i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
-DATA(0x004ede54) i32 inescape = 0;
-DATA(0x004ede58) i32 newpacket = 0;
-DATA(0x004ede5c) i32 packetlen = 0;
-DATA(0x00523280) char idstr[MODEM_ID_SIZE];
-DATA(0x00523288) i32 GUIMRc;
-DATA(0x0052328c) i32 iModemCommandPos;
-DATA(0x00523290) i32 GUIMRrespptr;
-DATA(0x00523294) i32 localstage;
-DATA(0x00523298) char numbuf[MODEM_NUMBER_BUFFER_SIZE];
-DATA(0x005232bc) i32 WFDCStage;
-DATA(0x005232c0) char remoteidstr[MODEM_ID_SIZE];
-DATA(0x005232c8) i32 stime;
-DATA(0x005232d0) char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
-DATA(0x005232f8) i32 iLastDialPos;
-DATA(0x005232fc) i32 remotestage;
-DATA(0x00523300) char GUIMRresp[MODEM_RESPONSE_SIZE];
-DATA(0x00523350) i32 oldsec;
-DATA(0x00523358) inque_t inque;
-DATA(0x00524360) i32 iLastActionTime;
-DATA(0x00524368) char GUIMRresponse[MODEM_RESPONSE_SIZE];
-DATA(0x005243b8) outque_t outque;
+i32 iBaudBits = COM_SERIAL_BYTE_SIZE;
+i32 inescape = 0;
+i32 newpacket = 0;
+i32 packetlen = 0;
+char idstr[MODEM_ID_SIZE];
+i32 GUIMRc;
+i32 iModemCommandPos;
+i32 GUIMRrespptr;
+i32 localstage;
+char numbuf[MODEM_NUMBER_BUFFER_SIZE];
+i32 WFDCStage;
+char remoteidstr[MODEM_ID_SIZE];
+i32 stime;
+char cModemCommand[MODEM_COMMAND_BUFFER_SIZE];
+i32 iLastDialPos;
+i32 remotestage;
+char GUIMRresp[MODEM_RESPONSE_SIZE];
+i32 oldsec;
+inque_t inque;
+i32 iLastActionTime;
+char GUIMRresponse[MODEM_RESPONSE_SIZE];
+outque_t outque;

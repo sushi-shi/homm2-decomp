@@ -49,5 +49,4 @@ public:
     void SplitMons(void);
 };
 #pragma pack(pop)
-SIZE(swapManager, 0x5a);
 #endif

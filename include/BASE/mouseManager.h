@@ -60,7 +60,6 @@ public:
     void SetColorMice(i32);
 };
 #pragma pack(pop)
-SIZE(mouseManager, 0x8a);
 H2_ENUM_BEGIN(MouseManagerConstant)
     MOUSE_CURSOR_COUNT                 = 96,
     MOUSE_CURSOR_TYPE_SLOT_COUNT       = 4,

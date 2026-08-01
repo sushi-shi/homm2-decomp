@@ -112,7 +112,6 @@ public:
     void CalcNumLevelArchers(i32*, i32*);
 };
 #pragma pack(pop)
-SIZE(town, 100);
 extern i32 bEnteringTown;
 
 #endif

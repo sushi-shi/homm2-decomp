@@ -13,7 +13,7 @@
 #include <SOURCE/PATH.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE DATA_COMPGEN(0x004eb910, dURATIONSCALEConstant, 1.3)
+#define ARMY_VAMPIRE_FLIGHT_DURATION_SCALE 1.3
 
 namespace {
 
@@ -25,7 +25,6 @@ H2_ENUM_END(ArmyFlightConstant)
 
 }
 
-VA(0x004a5900, 0x295)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell_9;
     i32 candidateHex;
@@ -88,7 +87,6 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     }
 }
 
-VA(0x004a5b95, 0x405)
 i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 attackHex7[ARMY_ATTACK_HEX_COUNT];
     u32 directionMask;
@@ -210,12 +208,10 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     return 0;
 }
 
-VA(0x004a5f9a, 0x25)
 i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
-VA(0x004a5fbf, 0xc1f)
 i32 army::FlyTo(i32 destination) {
     i32 endRearHex;
     i32 oldMinExtentY;

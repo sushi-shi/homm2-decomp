@@ -16,18 +16,17 @@ H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
 H2_ENUM_END(KbWinPrivateConstant)
 
-VA(0x0041bce0, 0x146)
 extern "C" i32 __stdcall
 WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
     DWORD lastError;
     MSG message;
 
     hInstApp = instance;
-    gEventHandle = CreateEventA(NULL, 0, 0, DATA_COMPGEN(0x004ef504, winMainHeroesII, "Heroes II"));
+    gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
     lastError = GetLastError();
     if (gEventHandle == NULL || lastError == ERROR_ALREADY_EXISTS) {
-        sprintf(gText, DATA_COMPGEN(0x004ef530, winMainOnlyOneCopyOfSMay, "Only one copy of %s may run at a time"), DATA_COMPGEN(0x004ef510, winMainHeroesOfMightAndMagicII, "Heroes of Might and Magic II"));
-        MessageBoxA(NULL, gText, DATA_COMPGEN(0x004ef558, winMainStartupError, "Startup Error"), MB_ICONHAND);
+        sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
+        MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
         return 0;
     }
 
@@ -53,14 +52,13 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     return message.wParam;
 }
 
-VA(0x0041be26, 0x339)
 i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine) {
     HMENU windowMenu;
     RECT windowRect;
     WNDCLASSA appClass;
 
     LogInt(
-        DATA_COMPGEN(0x004ef568, appInitHInstApp, "hInstApp"),
+        "hInstApp",
         reinterpret_cast<i32>(hInstApp),
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -96,7 +94,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
 
     if (previousInstance == NULL) {
         appClass.hCursor = NULL;
-        appClass.hIcon = LoadIconA(instance, DATA_COMPGEN(0x004ef574, appInitHeroesII, "Heroes II"));
+        appClass.hIcon = LoadIconA(instance, "Heroes II");
         appClass.lpszMenuName = NULL;
         appClass.lpszClassName = szAppName;
         appClass.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
@@ -140,7 +138,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
             hwndApp,
             WM_SETICON,
             ICON_SMALL,
-            reinterpret_cast<LPARAM>(LoadIconA(instance, DATA_COMPGEN(0x004ef580, appInitHeroes, "Heroes")))
+            reinterpret_cast<LPARAM>(LoadIconA(instance, "Heroes"))
         );
         ShowWindow(hwndApp, showCommand);
         SetWindowLongA(hwndApp, GWL_STYLE, giCurWindowsStyleFlags);
@@ -155,7 +153,6 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     }
 }
 
-VA(0x0041c15f, 0x31)
 i32 AppIdle(void) {
     // Retail returns 1 from both arms; the else arm is not dead code that
     // folded away, it emits its own mov eax,1 at 0x0041c181.
@@ -165,7 +162,6 @@ i32 AppIdle(void) {
         return 1;
 }
 
-VA(0x0041c190, 0x57e)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
         return DefWindowProcA(window, message, messageParam, messageData);
@@ -266,7 +262,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (hwndApp == window) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        DATA_COMPGEN(0x004ef598, appWndProcAreYouSureYouWantTo, "Are you sure you want to quit?"),
+                        "Are you sure you want to quit?",
                         NORMAL_DIALOG_CONFIRM,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -292,7 +288,6 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
-VA(0x0041c70e, 0x90)
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     HWND commandWindow;
@@ -313,13 +308,11 @@ BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM me
     return 0;
 }
 
-VA(0x0041c79e, 0x1a)
 void AppExit(void) {
     CleanUpWinGraphics();
     CleanUpMenus();
 }
 
-VA(0x0041c7b8, 0xc8)
 void Process1WindowsMessage(void) {
     MSG message;
     i32l currentTick;
@@ -343,7 +336,6 @@ void Process1WindowsMessage(void) {
     }
 }
 
-VA(0x0041c880, 0x147)
 void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     i32 windowX;
     RECT windowRect;
@@ -380,7 +372,6 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
-VA(0x0041c9c7, 0x197)
 LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     DLGPROC appDialogProc;
@@ -389,10 +380,10 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     switch (static_cast<KbWinMenuCommand>(command)) {
         case KBWIN_MENU_ABOUT:
             appDialogProc = reinterpret_cast<DLGPROC>(AppAbout);
-            DialogBoxParamA(hInstApp, DATA_COMPGEN(0x004ef5c0, appCommandHEROES, "HEROES"), window, appDialogProc, 0);
+            DialogBoxParamA(hInstApp, "HEROES", window, appDialogProc, 0);
             break;
         case KBWIN_MENU_HELP:
-            WinHelpA(hwndApp, DATA_COMPGEN(0x004ef5c8, appCommandHELPHEROES2HLP, ".\\HELP\\HEROES2.HLP"), HELP_FINDER, 0);
+            WinHelpA(hwndApp, ".\\HELP\\HEROES2.HLP", HELP_FINDER, 0);
             break;
         case KBWIN_MENU_SIZE_640_480:
             ResizeWindow(-1, -1, KBWIN_WIDTH_640, KBWIN_HEIGHT_480);
@@ -415,7 +406,6 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     return 0;
 }
 
-VA(0x0041cb5e, 0xd7)
 void UpdateDfltMenu(HMENU menu) {
     i32 result;
     i32 value;
@@ -434,7 +424,6 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
-VA(0x0041cc35, 0xac)
 void KBChangeMenu(HMENU menu) {
     if (menu == NULL)
         menu = hmnuCurrent;
@@ -454,7 +443,6 @@ void KBChangeMenu(HMENU menu) {
     }
 }
 
-VA(0x0041cce1, 0x15c)
 void SetMenuStatus(i32 showMenu) {
     i32 width;
     i32 height;
@@ -482,7 +470,6 @@ void SetMenuStatus(i32 showMenu) {
     }
 }
 
-VA(0x0041ce3d, 0x7b)
 void SetNoDialogMenus(i32 menusEnabled) {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
@@ -494,7 +481,6 @@ void SetNoDialogMenus(i32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
-VA(0x0041ceb8, 0x159)
 void SetMenus(HMENU menu, i32 enabled) {
     i32 count;
     u32 commandId;
@@ -534,34 +520,32 @@ void SetMenus(HMENU menu, i32 enabled) {
     UpdateDfltMenu(menu);
 }
 
-VA(0x0041d011, 0x16)
 i32l KBTickCount(void) {
     return GetTickCount();
 }
 
-VA(0x0041d027, 0x10)
 void InitVideo(void) {
     return;
 }
 
-DATA(0x004ef4c8) char szAppName[KBWIN_APP_NAME_SIZE] = "Heroes II";
-DATA(0x004ef4d8) char szTitle[KBWIN_WINDOW_TITLE_SIZE] = "Heroes of Might and Magic II";
-DATA(0x004ef4f8) HWND hwndApp = NULL;
-DATA(0x004ef4fc) HMENU hmnuApp = NULL;
-DATA(0x004ef500) HANDLE gEventHandle = NULL;
-DATA(0x004ef588) i32l lLastGTimerTickCount = 0;
-DATA(0x004ef58c) i32l lLastCycleColorsTickCount = 0;
-DATA(0x004ef590) i32 bRestartMusic = 0;
-DATA(0x004ef594) i32 iLastMusic = -1;
-DATA(0x004ef5b8) i32l lLastGetMessage = 0;
-DATA(0x004ef5bc) i32l lLastAilServe = 0;
-DATA(0x004ef5dc) b32 gbNoDialogMenusOn = false;
-DATA(0x00524c08) HINSTANCE hInstApp;
-DATA(0x00524c10) RECT rcTemp;
-DATA(0x00524c20) i32 iMainWinScreenHeight;
-DATA(0x00524c24) HMENU hmnuCurrent;
-DATA(0x00524c28) i32 iTempX;
-DATA(0x00524c2c) i32 iTempY;
-DATA(0x00524c30) i32l lTemp;
-DATA(0x00524c38) u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
-DATA(0x00525038) i32 iMainWinScreenWidth;
+char szAppName[KBWIN_APP_NAME_SIZE] = "Heroes II";
+char szTitle[KBWIN_WINDOW_TITLE_SIZE] = "Heroes of Might and Magic II";
+HWND hwndApp = NULL;
+HMENU hmnuApp = NULL;
+HANDLE gEventHandle = NULL;
+i32l lLastGTimerTickCount = 0;
+i32l lLastCycleColorsTickCount = 0;
+i32 bRestartMusic = 0;
+i32 iLastMusic = -1;
+i32l lLastGetMessage = 0;
+i32l lLastAilServe = 0;
+b32 gbNoDialogMenusOn = false;
+HINSTANCE hInstApp;
+RECT rcTemp;
+i32 iMainWinScreenHeight;
+HMENU hmnuCurrent;
+i32 iTempX;
+i32 iTempY;
+i32l lTemp;
+u8 bProcessMessage[KBWIN_PROCESS_MESSAGE_COUNT];
+i32 iMainWinScreenWidth;

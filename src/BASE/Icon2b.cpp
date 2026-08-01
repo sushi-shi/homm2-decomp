@@ -7,28 +7,27 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-DATA(0x00534c44) static i32 s_clipB;
-DATA(0x00534c34) static u32 s_loopCount;
-DATA(0x00534c24) static i32 s_pitch;
-DATA(0x00534c50) static i32 s_y;
-DATA(0x00534c54) static i32 s_x;
-DATA(0x00534c48) static i32 s_left;
-DATA(0x00534c30) static u32 s_run;
-DATA(0x00534c2c) static u8* s_dimPal;
-DATA(0x00534c20) static u8* s_row;
-DATA(0x00534c3c) static u8* s_dst;
-DATA(0x00534c38) static u8* s_src;
-DATA(0x00534c58) static IconEntry* s_entry;
-DATA(0x00534c5c) static u32 s_spanCount;
-DATA(0x00534c28) static u8 s_color;
-DATA(0x00534c4c) static u32 s_dimLen;
-DATA(0x00534c40) static i32 s_clipR;
+static i32 s_clipB;
+static u32 s_loopCount;
+static i32 s_pitch;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static u32 s_run;
+static u8* s_dimPal;
+static u8* s_row;
+static u8* s_dst;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static u8 s_color;
+static u32 s_dimLen;
+static i32 s_clipR;
 
 static inline i32 IconRowVisible(i32 currentY, i32 clipBottom, i32 clipTop) {
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
-VA(0x004d0570, 0x4ed)
 void IconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

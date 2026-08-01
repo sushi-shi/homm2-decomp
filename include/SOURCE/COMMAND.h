@@ -36,7 +36,6 @@ struct CombatRemotePacket {
     i32 nextActionGridIndex2;
 };
 #pragma pack(pop)
-SIZE(CombatRemotePacket, 0x19);
 
 MessageDispatchResult WinCombatHandler(struct tag_message&);
 i32 InCombatArea(i32, i32);

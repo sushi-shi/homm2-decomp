@@ -14,10 +14,9 @@ H2_ENUM_BEGIN(TileBlitConstant)
     PIXELS_PER_COPY_GROUP_SHIFT = 3
 H2_ENUM_END(TileBlitConstant)
 
-DATA(0x0051fec0) static u32 gTileMode;
-DATA(0x0051fec4) static i32 gTileRowCtr;
+static u32 gTileMode;
+static i32 gTileRowCtr;
 
-VA(0x004d310c, 0x18f)
 extern "C" __declspec(naked) void __cdecl
 TileToBitmap(tileset* src, u32 flags, bitmap* dst, i32 x, i32 y) {
     __asm {

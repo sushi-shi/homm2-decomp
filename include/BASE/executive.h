@@ -24,5 +24,4 @@ public:
     void Terminate(void);
 };
 #pragma pack(pop)
-SIZE(executive, 0x10);
 #endif

@@ -40,9 +40,8 @@ H2_ENUM_BEGIN(WindowConstant)
     OPEN_FAILURE  = 3
 H2_ENUM_END(WindowConstant)
 
-VA(0x004ceb70, 0xaa)
 heroWindow::heroWindow(void) {
-    strcpy(name, DATA_COMPGEN(0x0051f9d0, heroWindowDefaultConstruct, "Default Construct"));
+    strcpy(name, "Default Construct");
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;
@@ -57,11 +56,10 @@ heroWindow::heroWindow(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004cec20, 0xa5)
 heroWindow::heroWindow(
     i32 x, i32 y, i32 w, i32 h, H2_ENUM_PARAM(WindowFlag, i32) flags
 ) {
-    strcpy(name, DATA_COMPGEN(0x0051f9e4, heroWindowDynamicConstruct, "Dynamic Construct"));
+    strcpy(name, "Dynamic Construct");
     m_prevWindow = NULL;
     m_nextWindow = m_prevWindow;
     m_zOrder = -1;
@@ -76,7 +74,6 @@ heroWindow::heroWindow(
     m_savedBackground = NULL;
 }
 
-VA(0x004cecd0, 0x521)
 heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     u32l jb;
     i32 idx;
@@ -181,7 +178,6 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     }
 }
 
-VA(0x004cf200, 0x73)
 i32 heroWindow::Open(i32 x, i32 flags) {
     if (HAS(m_winState, WINDOW_STATE_OPEN) != 0)
         return OPEN_FAILURE;
@@ -193,7 +189,6 @@ i32 heroWindow::Open(i32 x, i32 flags) {
     return 0;
 }
 
-VA(0x004cf280, 0x90)
 void heroWindow::RemoveAndDeleteWidget(i32 id) {
     widget *w, *next;
     w = m_widgetListHead;
@@ -208,7 +203,6 @@ void heroWindow::RemoveAndDeleteWidget(i32 id) {
     }
 }
 
-VA(0x004cf310, 0xaa)
 void heroWindow::Close(void) {
     widget *w, *next;
     if (HAS(m_winFlags, WINDOW_FLAG_SAVE_BACKGROUND) != 0
@@ -226,7 +220,6 @@ void heroWindow::Close(void) {
     m_winState = WINDOW_STATE_CLOSED;
 }
 
-VA(0x004cf3c0, 0x13c)
 void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     widget* local_8 = m_widgetListHead;
     if (zOrder == -1) {
@@ -259,7 +252,6 @@ void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     }
 }
 
-VA(0x004cf500, 0x116)
 void heroWindow::RemoveWidget(class widget* w) {
     if (w == NULL)
         return;
@@ -288,7 +280,6 @@ void heroWindow::RemoveWidget(class widget* w) {
     }
 }
 
-VA(0x004cf620, 0x95)
 MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) {
     MessageDispatchResult local_8 = MESSAGE_DISPATCH_CONTINUE;
     widget* local_c = m_widgetListHead;
@@ -305,17 +296,14 @@ MessageDispatchResult heroWindow::BroadcastMessage(struct tag_message& message) 
     return local_8;
 }
 
-VA(0x004cf6c0, 0x20)
 void heroWindow::DrawWindow(void) {
     DrawWindow(1);
 }
 
-VA(0x004cf6e0, 0x2e)
 void heroWindow::DrawWindow(i32 flags) {
     DrawWindow(flags, WINDOW_ALL_WIDGETS_LOW, WINDOW_ALL_WIDGETS_HIGH);
 }
 
-VA(0x004cf710, 0x116)
 void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     tag_message local_24;
     widget* local_8;
@@ -341,7 +329,6 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     gpMouseManager->m_cursorReady = 1;
 }
 
-VA(0x004cf830, 0x7f)
 i32 heroWindow::SaveBackground(void) {
     m_savedBackground = new bitmap(BITMAP_TYPE_MEMORY, m_winWidth, m_winHeight);
     PollSound();
@@ -350,7 +337,6 @@ i32 heroWindow::SaveBackground(void) {
     return 0;
 }
 
-VA(0x004cf8b0, 0x97)
 void heroWindow::RestoreBackground(void) {
     if (gbDrawWindowBackground) {
         m_savedBackground->DrawToBuffer(m_posX, m_posY);
@@ -360,7 +346,6 @@ void heroWindow::RestoreBackground(void) {
     m_savedBackground = NULL;
 }
 
-VA(0x004cf950, 0x186)
 void heroWindow::MoveWindow(i32 dx, i32 dy) {
     i32 oldX = m_posX;
     i32 oldY = m_posY;

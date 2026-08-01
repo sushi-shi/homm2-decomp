@@ -111,7 +111,6 @@ public:
     char* GetFilename(void);
 };
 #pragma pack(pop)
-SIZE(fileRequester, 0x42f);
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char* cFRDummy;
 extern float fGutterMinY;

@@ -41,5 +41,4 @@ public:
     void DrawObstacle(void);
 };
 #pragma pack(pop)
-SIZE(hexcell, 0x62);
 #endif

@@ -7,20 +7,19 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 
-DATA(0x00534c08) static i32 s_clipB;
-DATA(0x00534bf4) static u32 s_loopCount;
-DATA(0x00534bfc) static i32 s_y;
-DATA(0x00534c14) static i32 s_x;
-DATA(0x00534c1c) static i32 s_left;
-DATA(0x00534bf8) static u32 s_run;
-DATA(0x00534bf0) static u8* s_row;
-DATA(0x00534c10) static u8* s_dst;
-DATA(0x00534c0c) static u8* s_src;
-DATA(0x00534c04) static IconEntry* s_entry;
-DATA(0x00534c00) static u32 s_spanCount;
-DATA(0x00534c18) static i32 s_clipR;
+static i32 s_clipB;
+static u32 s_loopCount;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static u32 s_run;
+static u8* s_row;
+static u8* s_dst;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static i32 s_clipR;
 
-VA(0x004cfd50, 0x26e)
 void DimIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

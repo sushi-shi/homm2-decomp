@@ -15,35 +15,34 @@
 #include <SOURCE/searchArray.h>
 #include <SOURCE/town.h>
 
-#define COMBAT_AI_QUANTITY_ESTIMATE DATA_COMPGEN(0x004eb960, qUANTITYESTIMATEConstant, 1.2)
+#define COMBAT_AI_QUANTITY_ESTIMATE 1.2
 #define COMBAT_AI_TOWN_STRENGTH_MODIFIER 1.1
-#define COMBAT_AI_BASE_RETREAT_CHANCE DATA_COMPGEN(0x004eb970, rETREATCHANCEConstant, 0.16f)
-#define COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE DATA_COMPGEN(0x004eb9b8, cHANCECOMPAREConstant, 0.16)
+#define COMBAT_AI_BASE_RETREAT_CHANCE 0.16f
+#define COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE 0.16
 #define COMBAT_AI_MAX_RETREAT_CHANCE 0.16f
-#define COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS DATA_COMPGEN(0x004eb978, rETREATBONUSConstant3, 0.06)
-#define COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS DATA_COMPGEN(0x004eb980, rETREATBONUSConstant2, 0.05)
-#define COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS DATA_COMPGEN(0x004eb988, rETREATBONUSConstant, 0.04)
-#define COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY DATA_COMPGEN(0x004eb990, rETREATPENALTYConstant2, 0.08)
+#define COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS 0.06
+#define COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS 0.05
+#define COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS 0.04
+#define COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY 0.08
 #define COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY 0.06
 #define COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY 0.04
-#define COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY DATA_COMPGEN(0x004eb998, rETREATPENALTYConstant, 0.02)
-#define COMBAT_AI_DIFFICULTY_RETREAT_STEP DATA_COMPGEN(0x004eb9a0, rETREATSTEPConstant, 0.015)
-#define COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE DATA_COMPGEN(0x004eb9a8, bONUSCOMPAREConstant, 0.03)
-#define COMBAT_AI_MAX_EXPERIENCE_BONUS DATA_COMPGEN(0x004eb9b0, eXPERIENCEBONUSConstant, 0.03f)
+#define COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY 0.02
+#define COMBAT_AI_DIFFICULTY_RETREAT_STEP 0.015
+#define COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE 0.03
+#define COMBAT_AI_MAX_EXPERIENCE_BONUS 0.03f
 #define COMBAT_AI_ATTACKER_RETREAT_PENALTY 0.06
 #define COMBAT_AI_TOWER_LEVEL_SCALE 0.1
 #define COMBAT_AI_TOWER_BASE_SCALE 1.0
 #define COMBAT_AI_LICH_PRIORITY_MULTIPLIER 1.3
 #define COMBAT_AI_LICH_HIT_POINT_SCALE 100.0f
 #define COMBAT_AI_MIN_LICH_DAMAGE_SCORE                                                      \
-    (DATA_COMPGEN(0x004eb9dc, minimumLichDamageScore, -99999.0f))
+    (-99999.0f)
 
 H2_ENUM_BEGIN(ArmyFrontOffset)
     SINGLE_HEX_FRONT_OFFSET    = 1,
     WIDE_CREATURE_FRONT_OFFSET = 2
 H2_ENUM_END(ArmyFrontOffset)
 
-VA(0x004c0790, 0x8d7)
 i32 combatManager::AICheckRetreat(void) {
     if (m_combatTowns[IDX(m_currentSide)] != NULL)
         return 0;
@@ -123,7 +122,7 @@ i32 combatManager::AICheckRetreat(void) {
                 ->FightValueOfStack(armyGroupPtr1, heroPtr9, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
         if (m_combatTowns[side9] != NULL)
             strengths1[side9] =
-                static_cast<i32>(strengths1[side9] * DATA_COMPGEN(0x004eb968, aICheckRetreatConstant, COMBAT_AI_TOWN_STRENGTH_MODIFIER));
+                static_cast<i32>(strengths1[side9] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);
 
         artifactValues[side9] = 0;
         if (heroPtr9 != NULL) {
@@ -193,7 +192,6 @@ i32 combatManager::AICheckRetreat(void) {
     return 0;
 }
 
-VA(0x004c1067, 0x129c)
 void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     u32l shooterStrengths37[COMBAT_SIDE_COUNT];
     i32 enemyStronger3;
@@ -282,7 +280,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
                 extraArchers29 += numArchers6 / COMBAT_SIDE_COUNT;
             numArchers6 += extraArchers29;
             towerStrength4 = static_cast<i32>(
-                (archerLevel18 * DATA_COMPGEN(0x004eb9c0, doCompAIConstant, COMBAT_AI_TOWER_LEVEL_SCALE) + DATA_COMPGEN(0x004eb9c8, doCompAIConstant2, COMBAT_AI_TOWER_BASE_SCALE))
+                (archerLevel18 * COMBAT_AI_TOWER_LEVEL_SCALE + COMBAT_AI_TOWER_BASE_SCALE)
                 * (numArchers6 * COMBAT_AI_TOWER_STRENGTH)
             );
             if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
@@ -511,7 +509,6 @@ finish:
     }
 }
 
-VA(0x004c2303, 0xc9)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
     float remainingHitPoints = static_cast<float>(
@@ -521,15 +518,14 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
     if (remainingHitPoints < modifiedDamage)
         modifiedDamage = remainingHitPoints;
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0)
-        modifiedDamage = static_cast<float>(modifiedDamage * DATA_COMPGEN(0x004eb9d0, getModLichDamageConstant, COMBAT_AI_LICH_PRIORITY_MULTIPLIER));
+        modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0)
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
     modifiedDamage = ((target->m_monster.hitPoints + COMBAT_AI_LICH_HIT_POINT_BONUS) * modifiedDamage
-        / DATA_COMPGEN(0x004eb9d8, getModLichDamageConstant2, COMBAT_AI_LICH_HIT_POINT_SCALE));
+        / COMBAT_AI_LICH_HIT_POINT_SCALE);
     return modifiedDamage;
 }
 
-VA(0x004c23cc, 0x32e)
 void combatManager::DoLichShot(class army* lich) {
     i32 bestArmy12 = COMBAT_AI_NO_ARMY;
     float bestDamage15 = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
@@ -546,7 +542,7 @@ void combatManager::DoLichShot(class army* lich) {
     for (armyIndex37 = 0; armyIndex37 < m_armyCount[IDX(OppositeCombatSide(m_currentSide))];
          armyIndex37++) {
         memset(damaged19, 0, sizeof(damaged19));
-        damageValue10 = DATA_COMPGEN(0x004eb9e0, initialLichDamageValue, 0);
+        damageValue10 = 0;
         target17 = &m_armies[IDX(OppositeCombatSide(m_currentSide))][armyIndex37];
         if (target17 == NULL
             || HAS(target17->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
@@ -589,7 +585,6 @@ void combatManager::DoLichShot(class army* lich) {
     }
 }
 
-VA(0x004c26fa, 0x131)
 i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -614,7 +609,6 @@ i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c282b, 0xc0)
 i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -633,7 +627,6 @@ i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c28eb, 0x11f)
 i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -657,7 +650,6 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c2a0a, 0xc0)
 i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex11 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -676,7 +668,6 @@ i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c2aca, 0x141)
 i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -702,7 +693,6 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c2c0b, 0xe9)
 i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -724,7 +714,6 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c2cf4, 0xd6)
 i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -744,7 +733,6 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
-VA(0x004c2dca, 0x1f1)
 i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -783,7 +771,6 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return bestArmy1;
 }
 
-VA(0x004c2fbb, 0xc2)
 i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -804,7 +791,6 @@ i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return worstArmy6;
 }
 
-VA(0x004c307d, 0x16f)
 i32 combatManager::GetClosestArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -836,7 +822,6 @@ i32 combatManager::GetClosestArmy(
     return closestArmy7;
 }
 
-VA(0x004c31ec, 0xc1)
 u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex4 = 0;
     u32 bit36 = COMBAT_AI_MASK_FIRST_BIT;
@@ -856,7 +841,6 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return strength7;
 }
 
-VA(0x004c32ad, 0x1bb)
 i32 combatManager::AttemptAttack(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -899,7 +883,6 @@ i32 combatManager::AttemptAttack(
     return 0;
 }
 
-VA(0x004c3468, 0x182)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 =
         ~currentArmy->GetAttackMask(
@@ -944,7 +927,6 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     }
 }
 
-VA(0x004c35ea, 0x240)
 i32 combatManager::WalkTowardArmyFront(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -1007,7 +989,6 @@ i32 combatManager::WalkTowardArmyFront(
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
-VA(0x004c382a, 0x244)
 i32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {

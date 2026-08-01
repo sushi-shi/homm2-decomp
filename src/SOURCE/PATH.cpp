@@ -12,7 +12,6 @@ H2_ENUM_BEGIN(CombatPathConstant)
     WIDE_HEX_OFFSET        = 1
 H2_ENUM_END(CombatPathConstant)
 
-VA(0x004bdbf0, 0x14a)
 i32 army::FindPath(
     i32 sourceHex,
     i32 targetHex,
@@ -52,7 +51,6 @@ i32 army::FindPath(
     return pathResult;
 }
 
-VA(0x004bdd3a, 0x9a)
 i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     i32 pathResult;
     i32 reserved;
@@ -71,7 +69,6 @@ i32 army::ValidPath(i32 targetHex, ArmyPathTarget pathMode) {
     return 0;
 }
 
-VA(0x004bddd4, 0x6d)
 i32 army::GetMoveMask(i32 sourceHex) {
     CombatHexDirection directionResult;
     i32 blockedMaskValue = 0;
@@ -87,7 +84,6 @@ i32 army::GetMoveMask(i32 sourceHex) {
     return blockedMaskValue | SPECIAL_DIRECTION_MASK;
 }
 
-VA(0x004bde41, 0xb5)
 i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHex) {
     CombatHexDirection directionResult;
     i32 directionCountNext;
@@ -117,12 +113,10 @@ i32 army::GetAttackMask(i32 sourceHex, ArmyAttackTarget targetMode, i32 targetHe
     return blockedMaskValue;
 }
 
-VA(0x004bdef6, 0x2b)
 i32 army::ValidMove(CombatHexDirection direction) {
     return ValidMove(m_hex, direction);
 }
 
-VA(0x004bdf21, 0x2f6)
 i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     i32 destinationHexNext;
     i32 rearHex;
@@ -199,7 +193,6 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
         return frontValid;
 }
 
-VA(0x004be217, 0x273)
 i32 army::ValidAttack(
     i32 sourceHex,
     CombatHexDirection direction,
@@ -275,7 +268,6 @@ i32 army::ValidAttack(
     return 0;
 }
 
-VA(0x004be48a, 0xa5)
 i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
@@ -295,7 +287,6 @@ i32 army::GetAdjacentCellIndex(i32 sourceHex, CombatHexDirection direction) {
     return gpCombatManager->m_adjacency[sourceHex][IDX(direction)];
 }
 
-VA(0x004be52f, 0x6e)
 i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
     if (sourceHex == ARMY_HEX_INVALID)
         return ARMY_HEX_INVALID;
@@ -307,7 +298,6 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
     return gpCombatManager->m_adjacency[sourceHex][IDX(direction)];
 }
 
-VA(0x004be59d, 0x44a)
 i32 army::ValidRange(i32 targetHex) {
     i32 adjacentHex;
     CombatHexDirection directionResult;
@@ -410,7 +400,6 @@ i32 army::ValidRange(i32 targetHex) {
     return 0;
 }
 
-VA(0x004be9e7, 0x58)
 CombatHexDirection OppositeDirection(CombatHexDirection direction) {
     if (IDX(direction) < COMBAT_DIRECTION_ADJACENT_COUNT) {
         return (direction + COMBAT_DIRECTION_OPPOSITE_OFFSET)
@@ -423,7 +412,6 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
     }
 }
 
-VA(0x004bea3f, 0x8ff)
 CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
     i32 sourceRow;
     i32 sourceColumnCheck;
