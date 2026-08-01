@@ -26,7 +26,8 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+from homm2.core.paths import REPO as ROOT
+
 NOISE = ROOT / "build" / "tu-state-noise"
 OUT_TSV = ROOT / "docs" / "matching-matrices" / "max-observations.tsv"
 OUT_ASM = ROOT / "docs" / "matching-matrices" / "max-asm"

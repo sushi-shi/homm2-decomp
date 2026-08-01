@@ -19,7 +19,7 @@ so the Lua overlay matches a statement to the asm line whose address equals it.
 import json, os, re, struct, subprocess, sys, tomllib
 from pathlib import Path
 
-REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[1]))
+from homm2.core.paths import REPO
 
 
 def find_def_line(src_lines, mangled):

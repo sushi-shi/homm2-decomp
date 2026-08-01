@@ -29,7 +29,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
+from homm2.core.paths import REPO
+
 # How many offending sites a diagnostic lists before summarising the rest. A
 # failing run usually fails the same way in many files; the first few identify
 # the cause and the rest is scrollback.

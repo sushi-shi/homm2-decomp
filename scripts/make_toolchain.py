@@ -22,7 +22,25 @@ import tempfile
 from pathlib import Path
 
 
-REPO = Path(__file__).resolve().parent.parent
+def _find_repo() -> Path:
+    """Repository root, resolved without counting this file's nesting.
+
+    Deliberately NOT ``homm2.core.paths``: the release builder runs these modules
+    from the Nix store with only their own directory on ``PYTHONPATH``, where the
+    package is not importable and no ancestor belongs to the repository. The two
+    sibling provisioning modules import this one, so the trio still shares a single
+    definition. ``HOMM2_DIR`` is what the sandbox sets.
+    """
+    override = os.environ.get("HOMM2_DIR")
+    if override:
+        return Path(override).resolve()
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "flake.nix").exists():
+            return parent
+    return Path.cwd().resolve()
+
+
+REPO = _find_repo()
 DEFAULT_OUTPUT = REPO / "build" / "toolchain" / "msvc"
 
 REQUIRED_BIN = (

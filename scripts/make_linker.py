@@ -15,7 +15,7 @@ from pathlib import Path
 import make_toolchain
 
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = make_toolchain.REPO
 DEFAULT_OUTPUT = REPO / "build" / "toolchain" / "link300"
 REQUIRED_FILES = (
     "LINK.EXE",
