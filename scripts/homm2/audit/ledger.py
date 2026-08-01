@@ -36,9 +36,15 @@ LEDGER = REPO / "config/match_baseline.tsv"
 
 
 def read_ledger(path=None):
-    """Parse the ledger into {(unit, symbol): (score, banked_hash)}."""
+    """Parse the ledger into {(unit, symbol): (score, banked_hash)}.
+
+    No ledger is a real state, not an error: a campaign that has banked nothing
+    has nothing to be stale. `homm2 status` treats it the same way.
+    """
     path = path or LEDGER
     rows = {}
+    if not path.exists():
+        return rows
     for line in path.read_text().splitlines():
         if not line.strip() or line.startswith("#"):
             continue
