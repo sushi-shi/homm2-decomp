@@ -6,6 +6,26 @@
 > queueing, but never reject regressions or establish correctness. References below describe
 > the recorded campaign state and are not current workflow instructions.
 
+## Tool paths recorded here are historical
+
+The commands in these matrices, and in `docs/matching/**`, name the script paths that
+existed **when the run happened**. They are replay coordinates, so they were left alone
+when `scripts/` was restructured on 2026-08-01. To reproduce a run, map the path:
+
+| recorded as | now |
+|---|---|
+| `scripts/match_variants.py` | `homm2 permute` |
+| `scripts/tu_state_noise.py` | `python3 -m homm2.permute.tu_state_noise` |
+| `scripts/generate_ast_variants.py` | `python3 -m homm2.permute.generate_ast_variants` |
+| `scripts/batch_source_variants.py` | `python3 -m homm2.permute.batch_source_variants` |
+| `scripts/od_slots.py` | `scripts/homm2/core/od_slots.py` |
+| `scripts/harvest_max_observations.py` | `homm2 audit harvest-max` |
+| `scripts/historical_exact_losses.py` | `homm2 audit historical-losses` |
+
+A tool's *content* has also moved on since these runs, which matters for one of them:
+`recover_historical_exact` keys its profile identity on the tool's SHA-256, so a replay
+does not reproduce the old profile id even when the coordinates match.
+
 These TSV files are durable no-repeat sets for large exact-preserving searches. The original
 matrices contain:
 

@@ -72,8 +72,11 @@ src/      {BASE,SOURCE,EDITOR}   reconstructed C++ (carcass: RVA-annotated stubs
 include/  {BASE,SOURCE,EDITOR}   recovered class headers (vtables, OVERRIDE) + va.h / Ints.h
 build/orig/   your HEROES2W.EXE (gitignored; copy it here before `homm2 init`)
 config/   units.toml             per-TU build manifest
-scripts/archive/  one-time CodeView carcass builders (materialize_src, codeview_*, make_compilable)
-scripts/   homm2 CLI pkg (homm2.*) + gen_manifest / name_strings / od_slots / od_oracle
+scripts/homm2/    the CLI package - one role per subpackage, mirroring the commands:
+          core/ analysis/ permute/ audit/ match/ build/ clean/ format/ init/ ghidra/
+          tests live beside what they test; `homm2 selftest` runs them
+scripts/toolchain/  VC 4.2 + LINK 3.00 provisioning from preserved media (run once)
+scripts/archive/    retired tooling, kept only to reproduce old audit-ledger commands
 build/    (gitignored)           toolchain, synth PDB, delinked targets, base objs, objdiff report
 flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
 ```
@@ -108,10 +111,10 @@ The provisioners validate the pinned compiler, linker, headers, import libraries
 and both CRT archives before publishing either tree atomically:
 
 ```sh
-scripts/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
-scripts/make-linker.sh /path/to/MSVC40.iso
-scripts/make-toolchain.sh --check build/toolchain/msvc
-scripts/make-linker.sh --check build/toolchain/link300
+scripts/toolchain/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
+scripts/toolchain/make-linker.sh /path/to/MSVC40.iso
+scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc
+scripts/toolchain/make-linker.sh --check build/toolchain/link300
 ```
 
 Object compilation always uses VC 4.2. When the separately pinned `link300`
@@ -119,7 +122,7 @@ component is present, `homm2 link` uses VC 4.0 LINK 3.00.5270 and its sibling
 CVPACK/CVTRES tools and `LIBCMT.LIB`. The VC 4.0 runtime archive supplies the
 retail CRT members; in particular, its `testfdiv.obj` carries private literal
 identities absent from the VC 4.2 archive. The deterministic Gruntz-style release
-builder is `scripts/create-toolchain-release.nix`; provenance, the release hash,
+builder is `scripts/toolchain/create-toolchain-release.nix`; provenance, the release hash,
 and recovery history are in
 [`docs/toolchain-vc42.md`](docs/toolchain-vc42.md). `clang`/`clangd` is editor tooling only;
 the Wine MSVC 4.2 build is the sole verdict on a match.

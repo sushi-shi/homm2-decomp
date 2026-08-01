@@ -33,7 +33,7 @@ See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
 - The retail build has no `/GX` exception state and no RTTI.
 - `/G5` commonly lowers unsigned zero-extension with `and` rather than `movzx`;
   preserve that distinction when reading retail intent.
-- `/Od` stack positions depend on identifier hashes. Use `scripts/od_slots.py` and
+- `/Od` stack positions depend on identifier hashes. Use `homm2/core/od_slots.py` and
   `docs/od-stack-layout.md`; do not brute-force local names.
 - Compile with the pinned VC 4.2 compiler. Final-link with the pinned VC 4.0
   component under `build/toolchain/link300`: LINK 3.00.5270 and its sibling
@@ -52,6 +52,7 @@ homm2 build                # configure, compile, compare, and run hard gates
 homm2 status               # current metrics plus observation-only retained maxima
 homm2 status update        # explicitly record maxima for current function hashes
 homm2 status --force-refresh
+homm2 selftest             # the tool test suite (run after changing anything in scripts/)
 ```
 
 Use `ninja` for rapid TU iteration, then refresh status before trusting objdiff
@@ -77,6 +78,19 @@ homm2 relocs --addends SOURCE
 `python3 -m homm2.analysis.decomp 0x<RVA>` provides cached Ghidra-assisted structure
 when ordinary disassembly is unclear. `homm2 ghidra` creates the optional project;
 `homm2 ghidra --no-analyze` reapplies names without reanalysis.
+
+## Tooling Layout
+
+`scripts/` holds three directories and no loose files. Every package under
+`scripts/homm2/` is one role, and the folder structure mirrors the command structure:
+`core/` (shared library — `paths`, `od_slots`), `analysis/` (`homm2 sema`), `permute/`
+(`homm2 permute`), `audit/` (`homm2 audit <tool>`), `match/`, `build/` (the always-on
+gates), `clean/` (`homm2 clean`), `format/`, `init/`, `ghidra/`. Provisioning lives in
+`scripts/toolchain/`, retired tooling in `scripts/archive/`.
+
+Tests live beside what they test; `homm2 selftest` runs them and asserts a case-count
+floor, because a package missing `__init__.py` is skipped by discovery silently rather
+than failing. Add a tool to its role package, not to a new top-level file.
 
 ## Repository Model
 
@@ -105,7 +119,7 @@ when ordinary disassembly is unclear. `homm2 ghidra` creates the optional projec
 - `config/match_baseline.tsv` retains each function's best observed fuzzy score for its
   current normalized source hash. A changed hash starts a new current-score epoch. It is
   queue evidence only: no build or command rejects a regression against an older maximum.
-  A controlled run from `scripts/tu_state_noise.py` may raise the unchanged function's maximum
+  A controlled run from `homm2.permute.tu_state_noise` may raise the unchanged function's maximum
   after generated predecessor input is removed. Best paired objects, disassemblies, and diffs
   may remain under `build/`; generated source input is never retained.
 
@@ -116,7 +130,7 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 
 - Do not test matching hypotheses as one-off manual edit-compile cycles. Localize the
   divergence with `homm2 sema disasm --blocks --diff` first, then run
-  `scripts/match_variants.py` as one bounded complete matrix whose independent
+  `homm2 permute` as one bounded complete matrix whose independent
   dimensions are: generated conservative AST transformations (`--min-depth 1
   --max-depth 2` with the relevant `--families`), reviewed exact-span axes for
   hypotheses the generator cannot express (`--axes-from`, with the full candidate
@@ -124,13 +138,13 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
   (`--state-trials ... --state-families forest`). Judge survivors by block topology
   and ordered relocations as well as fuzzy score.
 - For a structurally aligned residual with unchanged source, run
-  `scripts/tu_state_noise.py` island censuses (forest family). Record MAX only on an
+  `homm2.permute.tu_state_noise` island censuses (forest family). Record MAX only on an
   audited exact closure.
 - Manual edits are reserved for integrating the winning arm of a measured matrix and
   for mechanical fixes pinned directly by byte/relocation evidence (a wrong constant,
   field, or call target).
 - Every banked maximum keeps its evidence, not just its score: after banking runs,
-  run `scripts/harvest_max_observations.py` to append replay coordinates (seed,
+  run `homm2 audit harvest-max` to append replay coordinates (seed,
   trial, probe tag) to `docs/matching-matrices/max-observations.tsv` and preserve
   the winning bytes as disassembly under `docs/matching-matrices/max-asm/`. That
   disassembly is the structural reference for later source-shape recovery.

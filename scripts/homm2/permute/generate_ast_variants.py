@@ -20,9 +20,9 @@ rejected rather than left for the compiler to filter.
 
 Run inside ``nix develop .#build``::
 
-    python3 scripts/generate_ast_variants.py src/BASE/icon2by.cpp 0xda270 \
+    python3 -m homm2.permute.generate_ast_variants src/BASE/icon2by.cpp 0xda270 \
         --max-depth 3 --limit 4096 -o /tmp/icon2by-ast.json
-    python3 scripts/batch_source_variants.py /tmp/icon2by-ast.json
+    python3 -m homm2.permute.batch_source_variants /tmp/icon2by-ast.json
 """
 
 from __future__ import annotations

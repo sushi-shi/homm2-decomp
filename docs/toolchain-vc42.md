@@ -24,18 +24,18 @@ The initial provisioning session downloaded `en_vc42ent_disc1.exe`, extracted
 those three directories with `unrar`, and moved them directly into the gitignored
 `build/toolchain/msvc` directory. Commit `33fe2e4` recorded that provisioning in
 its message, but committed only unrelated generated-manifest path changes. The
-`scripts/make-toolchain.sh` reference existed from the initial scaffold and no
+`scripts/toolchain/make-toolchain.sh` reference existed from the initial scaffold and no
 provisioning or release-builder script was ever added to Git. Release `v0.1.0`
 therefore contains neither script, and its GitHub release has no binary assets.
 
 The recovered workflow has two explicit entry points:
 
-- `scripts/make-toolchain.sh` provisions or verifies a local tree. It supports
+- `scripts/toolchain/make-toolchain.sh` provisions or verifies a local tree. It supports
   the original RAR SFX, other archive/disc inputs, and installed `MSDEV` trees.
-- `scripts/make-linker.sh` provisions the separate pinned LINK 3.00 component
+- `scripts/toolchain/make-linker.sh` provisions the separate pinned LINK 3.00 component
   and its pinned `LIBCMT.LIB` from VC 4.0 media without replacing the VC 4.2
   compiler, headers, or non-CRT libraries.
-- `scripts/create-toolchain-release.nix` reproduces a normalized `.tar.xz` from
+- `scripts/toolchain/create-toolchain-release.nix` reproduces a normalized `.tar.xz` from
   the preserved disc1 media, following the Gruntz release-builder pattern.
 
 Both paths require the pinned SHA-256 identities of the code-generating compiler
@@ -53,10 +53,10 @@ official-source proof are documented in
 ## Local provisioning
 
 ```sh
-scripts/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
-scripts/make-linker.sh /path/to/MSVC40.iso
-scripts/make-toolchain.sh --check build/toolchain/msvc
-scripts/make-linker.sh --check build/toolchain/link300
+scripts/toolchain/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
+scripts/toolchain/make-linker.sh /path/to/MSVC40.iso
+scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc
+scripts/toolchain/make-linker.sh --check build/toolchain/link300
 ```
 
 The RAR SFX path requires `unrar` on `PATH`; an already installed `MSDEV` tree
@@ -72,7 +72,7 @@ rejected by itself; the complete tree and pinned artifact hashes are the gate.
 ## Release reproduction
 
 ```sh
-nix-shell scripts/create-toolchain-release.nix
+nix-shell scripts/toolchain/create-toolchain-release.nix
 ```
 
 The Nix entrypoint pins both archive.org originals by their published SHA-1.

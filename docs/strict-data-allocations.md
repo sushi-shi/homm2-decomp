@@ -3,7 +3,7 @@
 ## Standalone project-neutral workflow
 
 The patched `objdiff-cli diff` JSON exposes the section index and data relocation
-rows for every symbol. `scripts/strict_allocation_diff.py` uses those raw side
+rows for every symbol. `homm2 audit allocations` uses those raw side
 records to audit reviewed allocations without relying on objdiff's fuzzy score.
 The format and checker are project-neutral and work with any objdiff project.
 Vostok, Gruntz, or another consumer supplies its own reviewed manifest and
@@ -15,7 +15,7 @@ Generate a one-shot diff for a unit, then audit it:
 ```sh
 objdiff-cli diff -p build/objdiff -u MODULE/UNIT \
   -o build/objdiff/UNIT.allocations.json --format json
-python3 scripts/strict_allocation_diff.py \
+python3 homm2 audit allocations \
   build/objdiff/UNIT.allocations.json config/UNIT.allocations.json
 ```
 
@@ -128,7 +128,7 @@ mapping.
 No mapping is inferred from literal order alone. A table that cannot satisfy the
 proof is omitted from its generated strict manifest and listed by name with the
 exact reason in `report.json` and command output. The remaining subset stays a
-hard audit; exclusions never relax `scripts/strict_allocation_diff.py`.
+hard audit; exclusions never relax `homm2 audit allocations`.
 
 The command requires a current Ninja build and refuses to audit stale candidate
 objects. It is intentionally opt-in rather than part of `homm2 build`: every

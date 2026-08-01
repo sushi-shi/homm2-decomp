@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Archived compatibility wrapper for the former ``permute_ast.py`` CLI.
 
-Current matching work uses ``scripts/match_variants.py`` directly. This wrapper
+Current matching work uses ``homm2 permute`` directly. This wrapper
 is retained only to reproduce historical commands recorded in audit ledgers.
 """
 

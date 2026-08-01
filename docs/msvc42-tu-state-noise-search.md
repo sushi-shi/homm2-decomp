@@ -5,19 +5,19 @@ otherwise irrelevant earlier source surface. This makes a bounded TU-state probe
 after a function is semantically and structurally complete but remains at a compiler-shape
 wall. It does **not** make arbitrary dummy C++ declarations acceptable reconstructed source.
 
-The unchanged-source implementation is `scripts/tu_state_noise.py`. Use it only after the target's
+The unchanged-source implementation is `homm2.permute.tu_state_noise`. Use it only after the target's
 semantics, types/layout, frame/slots, CFG, inline boundaries, and external relocations have
 been audited. Prefer this disposable search to adding a persistent `OD_STEER` solely to
 select one unstable compiler state. Before starting, check the external residual queue and
 target-specific matrix so an unchanged state tuple is not searched twice.
 
 ```sh
-python3 scripts/tu_state_noise.py \
+python3 -m homm2.permute.tu_state_noise \
   --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40 --seed 0x484f4d32
 ```
 
 When the audit leaves several legitimate source spellings to test, use the unified
-`scripts/match_variants.py` frontend. Its search is a true product:
+`homm2 permute` frontend. Its search is a true product:
 
 ```text
 reviewed hand choices × (clean + conservative AST shapes) × (clean + TU-state probes)
@@ -103,7 +103,7 @@ object, advances the source-hash epoch, and replays the exact trial before retai
 Failure restores the authored source and baseline. Steering in predecessors and siblings is not
 part of the target and remains untouched.
 
-The exhaustive frontend is `scripts/recover_residual_functions.py`. It refreshes a persistent
+The exhaustive frontend is `homm2.permute.recover_residual_functions`. It refreshes a persistent
 `/tmp` queue and completion ledger keyed by search profile plus effective source hash. Its first
 tier is the historical-exact/current-MAX-below-100 set, followed by all other live 93%-or-higher
 functions and then every lower residual. Compiler-generated functions without a source `VA(...)`

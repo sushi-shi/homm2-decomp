@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (scripts/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (homm2/core/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -105,7 +105,7 @@ early-exit versus single-exit shape. Use:
 
 Select a retail-compatible semantic CFG family first. Only then enumerate small
 evaluation-order, relational, parenthesization, identifier-spelling, and equivalent
-internal choices with `scripts/match_variants.py`; never compile those changes
+internal choices with `homm2 permute`; never compile those changes
 manually one by one. Use 50 TU-state trials per structural version by default;
 expand beyond 50 only for a near-closing state or an unusually sparse state census.
 Do not use fuzzy score as a greedy pruning rule. A lower-scoring version that keeps
@@ -140,10 +140,10 @@ closure.
 correct function mismatches: every `mov ...,-0xN(%ebp)` references the wrong slot.
 
 **This hash is fully reverse-engineered.** Do NOT brute-force names with a compile
-loop. Use **`scripts/od_slots.py`** (pure, no compiler):
+loop. Use **`homm2/core/od_slots.py`** (pure, no compiler):
 
 - Read the retail frame from the disasm: which `-0xN(%ebp)` slot holds which role.
-- `python3 scripts/od_slots.py order n1 n2 ...` predicts a layout; `solve_layout(...)`
+- `python3 homm2/core/od_slots.py order n1 n2 ...` predicts a layout; `solve_layout(...)`
   picks names for a target slot order; `bucket(name)` gives a name's bucket.
 - Pick local names whose buckets sort into the retail slot order. Cross-scope order
   you control with `{}` blocks (it's name-independent). Full model + algorithm:

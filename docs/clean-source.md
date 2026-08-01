@@ -11,11 +11,11 @@ built from this source. Most comments also describe reconstruction evidence, so
 the generated tree omits comments entirely.
 
 ```sh
-python3 scripts/clean_source.py --out build/clean            # generate
-python3 scripts/clean_source.py --out build/clean --verify   # build
-python3 scripts/clean_source.py --out build/clean \
+homm2 clean --out build/clean            # generate
+homm2 clean --out build/clean --verify   # build
+homm2 clean --out build/clean \
   --publish source-pol-2.0                                  # publish source branch
-python3 scripts/clean_source.py \
+homm2 clean \
   --classic-from ../homm2-decomp-master \
   --out build/classic --publish classic-pol-2.0             # publish classic branch
 ```

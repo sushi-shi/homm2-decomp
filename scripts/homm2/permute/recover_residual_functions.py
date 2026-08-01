@@ -9,7 +9,7 @@ under ``build/``; generated probe source never does.
 
 Run inside ``nix develop .#build``::
 
-    python3 scripts/recover_residual_functions.py --trials 128
+    python3 -m homm2.permute.recover_residual_functions --trials 128
 """
 
 from __future__ import annotations

@@ -31,7 +31,7 @@ In short (full rules in the two agent docs):
    **NOT** `isolation: worktree`). Each prompt: absolute worktree path + `cd` there first,
    absolute paths, a **whole-TU 20+ function batch** (RVA/name/size each, in retail-RVA
    order) for **one TU**, the 8-digit **absolute-VA** convention, the
-   **`scripts/od_slots.py` stack-naming workflow**, account for every residual byte and external
+   **`homm2/core/od_slots.py` stack-naming workflow**, account for every residual byte and external
    relocation, and push to exactness where retail evidence permits; otherwise keep the residual
    live and report its byte/relocation evidence outside source comments. Report per-function results
    plus a one-line summary and full `git diff`. **Lane discipline:** each lane

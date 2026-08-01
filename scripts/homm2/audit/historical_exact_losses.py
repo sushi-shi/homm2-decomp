@@ -9,7 +9,7 @@ evidence, while the latter usually requires inspecting a source or helper change
 
 Run after ``homm2 build``::
 
-    python3 scripts/historical_exact_losses.py \
+    homm2 audit historical-losses \
         --output /tmp/homm2-historical-exact-losses.tsv
 """
 

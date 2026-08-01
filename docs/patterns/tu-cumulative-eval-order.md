@@ -124,7 +124,7 @@ retained. The historical assembly remains useful evidence for the compiler choic
    mutation; never use the regex permuter.
 6. Try exact-preserving AST variants in predecessors. Reject any variant that changes a
    predecessor byte or relocation, and retest every candidate on the combined root.
-7. Run `scripts/tu_state_noise.py` on the clean source. Its generated predecessor declarations
+7. Run `homm2.permute.tu_state_noise` on the clean source. Its generated predecessor declarations
    are disposable; only an exact size/byte/ordered-relocation closure may update the hash-scoped
    retained maximum.
 8. If no exact island exists, make one evidence-based source change at the first divergence,

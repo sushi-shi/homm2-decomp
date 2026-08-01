@@ -26,7 +26,7 @@ Example manifest::
 
 Run inside ``nix develop .#build``::
 
-    python3 scripts/batch_source_variants.py /tmp/icon2b-variants.json
+    python3 -m homm2.permute.batch_source_variants /tmp/icon2b-variants.json
 
 The real source is restored after every compile and on interruption.  Results contain
 scores, sizes, and ordered relocation metrics.  Candidate source is retained only for
