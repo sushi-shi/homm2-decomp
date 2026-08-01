@@ -19,7 +19,7 @@ Run inside ``nix develop .#build`` after entering the worktree first::
       --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40
 
 This is appropriate only after semantics, frame/slots, CFG, and external relocations
-have already been audited. It is not a substitute for reconstruction, od_slots.py,
+have already been audited. It is not a substitute for reconstruction, homm2.core.od_slots,
 or a bounded source-variant search.
 """
 

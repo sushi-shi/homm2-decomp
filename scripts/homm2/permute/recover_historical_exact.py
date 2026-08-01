@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Recover current-hash MAX evidence for every historically exact live residual.
 
-The driver builds a persistent queue from ``historical_exact_losses.py`` and runs
+The driver builds a persistent queue from ``homm2.audit.historical_exact_losses`` and runs
 ``tu_state_noise.py`` independently for each function whose current hash does not
 already retain MAX 100%.  Each target gets N deterministic parser-state
 transformations.  The child search stops at its first audited exact closure,
@@ -29,7 +29,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from historical_exact_losses import parse_baseline
+from homm2.audit.historical_exact_losses import parse_baseline
 from homm2.permute.tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
@@ -633,7 +633,8 @@ def refresh_queue(root: Path, queue: Path) -> None:
     subprocess.run(
         [
             sys.executable,
-            str(root / "scripts/historical_exact_losses.py"),
+            "-m",
+            "homm2.audit.historical_exact_losses",
             "--output",
             str(queue),
         ],

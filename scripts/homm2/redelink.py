@@ -18,12 +18,12 @@ def main(argv=None):
         print("usage: homm2 redelink")
         return 1
     # Refresh public, source-private, and compiler-generated function identities.
-    if run("python3", "scripts/gen_manifest.py",
+    if run("python3", "-m", "homm2.build.gen_manifest",
            "build/orig/HEROES2W.EXE", "."):
         return 1
     if run("python3", "-m", "homm2.build.audit_text_coverage"):
         return 1
-    if run("python3", "scripts/name_strings.py"):
+    if run("python3", "-m", "homm2.build.name_strings"):
         return 1
     if run("python3", "-m", "homm2.build.synth_pdb"):
         return 1
