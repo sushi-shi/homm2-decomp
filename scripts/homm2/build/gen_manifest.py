@@ -385,7 +385,7 @@ for im,name in modname.items():
     if src: units.append((f"{tier}/{st}", src))
 units.sort()
 with open(os.path.join(REPO,"config","units.toml"),"w") as f:
-    f.write("# units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).\n")
+    f.write("# units.toml - per-TU build manifest (generated from CodeView by homm2.build.gen_manifest).\n")
     f.write("# unit MUST match the unit column in build/gen/symbol_names.csv.\n\n")
     f.write('[build]\ncompiler = "msvc4.2"\nplatform = "win32"\n\n')
     f.write("[flags]\n")

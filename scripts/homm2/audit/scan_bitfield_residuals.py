@@ -14,8 +14,8 @@ without writing a second generated diff corpus.
 
 Run inside ``nix develop .#build`` so ``objdiff-cli`` is available::
 
-    python3 scripts/scan_bitfield_residuals.py
-    python3 scripts/scan_bitfield_residuals.py build/tu-state-noise/run-a --format json
+    homm2 audit bitfield-residuals
+    homm2 audit bitfield-residuals build/tu-state-noise/run-a --format json
 
 The signature currently recognized is the MSVC 4.2 /G5 lowering seen in
 ``advManager::DrawCell``:

@@ -18,7 +18,7 @@ the source. The raw evidence is in
 [msvc42-tu-declaration-state.tsv](msvc42-tu-declaration-state.tsv). Reproduce the metrics with:
 
 ```sh
-python3 scripts/tu_state_metrics.py \
+python3 homm2.permute.tu_state_metrics \
   build/objdiff/base/BASE/FONT.obj --unit BASE/FONT
 ```
 

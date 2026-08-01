@@ -10,8 +10,8 @@ those offsets are a function of the **identifier spelling**, not declaration ord
 or type.
 
 Tools: **`homm2 od-frames`** (audit every paired `/Od` function for frame and slot
-drift), **`scripts/od_slots.py`** (predict a layout / solve names for a target layout,
-no compiler in the loop), and **`scripts/od_oracle.py`** (ground-truth: compile a
+drift), **`homm2/core/od_slots.py`** (predict a layout / solve names for a target layout,
+no compiler in the loop), and **`homm2 audit od-oracle`** (ground-truth: compile a
 probe and read the real offsets).
 
 ---
@@ -148,7 +148,7 @@ So `bucket` only ever orders locals **within a single scope**; everything else i
 fixed by scope structure, which you control directly with `{}` placement
 (name-independent).
 
-## 5. Worked examples (all measured with `scripts/od_oracle.py`)
+## 5. Worked examples (all measured with `homm2 audit od-oracle`)
 
 ```c
 // reused counter (one local, one slot)
@@ -203,7 +203,7 @@ so only the opt-in `--check` form returns nonzero for findings. Disassembly stil
 decides whether a frame-size delta is truly an absent local, a different temporary,
 or downstream control-flow drift.
 
-`scripts/od_slots.py` (pure functions, no compiler):
+`homm2/core/od_slots.py` (pure functions, no compiler):
 * `bucket(name)`, `key16(name)`, `ident_hash(name)` — the hash.
 * `slot_order(decl_names)` / `predict_offsets(decl_names, sizes=None)` — predict a
   single scope's layout.
@@ -218,7 +218,7 @@ or downstream control-flow drift.
 awkward to express and easy to get wrong. Instead, apply `slot_order` per scope and
 concatenate shallow→deep per §4.5; cross-scope order you control with braces.
 
-`scripts/od_oracle.py` — ground truth. Compiles a one-function probe with
+`homm2 audit od-oracle` — ground truth. Compiles a one-function probe with
 `/Od /MT /Gr /Z7` and reads each local's real offset from the `S_BPREL32` CodeView
 records in the `.obj` (`/Z7` adds debug records but does **not** change `/Od`
 codegen, so the offsets are identical to the real build). Use it to verify any

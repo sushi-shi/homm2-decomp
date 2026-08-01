@@ -258,9 +258,9 @@ def parse_args() -> argparse.Namespace:
         description="Provision build/toolchain/msvc from VC 4.2 media or an installed MSDEV tree.",
         epilog=(
             "Examples:\n"
-            "  scripts/make-toolchain.sh /mnt/vc42/MSDEV\n"
-            "  scripts/make-toolchain.sh /images/en_vc42ent_disc1.iso /images/en_vc42ent_disc2.iso\n"
-            "  scripts/make-toolchain.sh --check build/toolchain/msvc"
+            "  scripts/toolchain/make-toolchain.sh /mnt/vc42/MSDEV\n"
+            "  scripts/toolchain/make-toolchain.sh /images/en_vc42ent_disc1.iso /images/en_vc42ent_disc2.iso\n"
+            "  scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

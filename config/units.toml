@@ -1,4 +1,4 @@
-# units.toml - per-TU build manifest (generated from CodeView by scripts/gen_manifest.py).
+# units.toml - per-TU build manifest (generated from CodeView by homm2.build.gen_manifest).
 # unit MUST match the unit column in build/gen/symbol_names.csv.
 
 [build]

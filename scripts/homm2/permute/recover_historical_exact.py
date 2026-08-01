@@ -10,7 +10,7 @@ on.  A TSV under /tmp makes the campaign resumable.
 
 Run inside ``nix develop .#build``::
 
-    python3 scripts/recover_historical_exact.py --trials 128
+    python3 -m homm2.permute.recover_historical_exact --trials 128
 """
 
 from __future__ import annotations
@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from homm2.audit.historical_exact_losses import parse_baseline
+from homm2.permute import tu_state_noise
 from homm2.permute.tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
@@ -210,8 +211,11 @@ def pending_losses(
 
 def profile_id(root: Path, args: argparse.Namespace) -> str:
     payload = {
+        # Keyed off the module's own location so the profile identity survives
+        # the file being moved between packages; a CONTENT change still
+        # invalidates completion records, which is the point.
         "tool_sha256": hashlib.sha256(
-            (root / "scripts/tu_state_noise.py").read_bytes()
+            Path(tu_state_noise.__file__).read_bytes()
         ).hexdigest(),
         "trials": args.trials,
         "families": args.families,
@@ -325,7 +329,8 @@ def noise_command(
 ) -> list[str]:
     command = [
         sys.executable,
-        str(root / "scripts/tu_state_noise.py"),
+        "-m",
+        "homm2.permute.tu_state_noise",
         "--source",
         str(source),
         "--rva",

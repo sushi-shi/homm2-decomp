@@ -15,7 +15,7 @@ input only and is never written back to reconstructed source.
 
 Run inside ``nix develop .#build`` after entering the worktree first::
 
-    python3 scripts/tu_state_noise.py \
+    python3 -m homm2.permute.tu_state_noise \
       --source src/BASE/WINMGR.cpp --rva 0xca6d0 --trials 40
 
 This is appropriate only after semantics, frame/slots, CFG, and external relocations

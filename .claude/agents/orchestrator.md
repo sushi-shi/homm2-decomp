@@ -84,7 +84,7 @@ Spawn a **matcher** (`subagent_type: matcher`), **`run_in_background: true`**, *
    everywhere (relative paths can leak into master).
 3. Carry a **whole-TU batch — each as RVA / mangled+demangled name / size** — plus the
    TU name, the 8-digit ABSOLUTE-VA convention (`VA(RVA+0x400000, size)`; placeholders in
-   the scaffold already show it), the **`scripts/od_slots.py` stack-naming workflow**, and
+   the scaffold already show it), the **`homm2/core/od_slots.py` stack-naming workflow**, and
    a requirement to account for every residual ordinary byte and every external relocation,
    pushing to exactness where retail evidence permits and otherwise keeping the residual live.
    Do not put scores, retained maxima, or queue/completion state in source comments.

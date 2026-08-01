@@ -45,7 +45,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    `--blocks --base/--target --lite` for either skeleton; and `--blocks --dot` when
    graph topology is clearer than a listing.
 4. Run `homm2 od-frames` to expose `/Od` frame and slot drift, then use
-   `scripts/od_slots.py` for individual name-sensitive layouts. For large switches,
+   `homm2/core/od_slots.py` for individual name-sensitive layouts. For large switches,
    recover body order separately from case values and compare ordered jump-table
    destinations.
 5. Audit external targets and owner-relative addends with `homm2 relocs 0x<RVA>`.
@@ -54,7 +54,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    correctness; ordered relocation identity/addend/destination checks still apply.
 7. Do not test small evaluation-order, commutative/relational, parenthesization, identifier-
    spelling, or similar compiler-state-sensitive source changes by editing and compiling them
-   one at a time. Enumerate them with `scripts/match_variants.py` and run a bounded complete
+   one at a time. Enumerate them with `homm2 permute` and run a bounded complete
    permutation matrix. Manual source edits are reserved for evidence-backed structural recovery
    such as types, fields, scopes, locals, inline accessors, CFG, and switch body order. When a
    targeted source shape is justified at the first real divergence, add it as a reviewed
@@ -72,8 +72,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
    matrices before pruning it. Prune a branch for contradictory topology or semantics, not
    merely because its parent or first compiler-state census scores below the current MAX.
 8. For a structurally aligned compiler-state residual, island search is the current
-   last-mile policy. Run `scripts/tu_state_noise.py` for an unchanged-source census. When
-   several legitimate source shapes must also be tested, use `scripts/match_variants.py` so
+   last-mile policy. Run `homm2.permute.tu_state_noise` for an unchanged-source census. When
+   several legitimate source shapes must also be tested, use `homm2 permute` so
    reviewed exact-span choices, conservative AST variants, and TU-state probes are independent
    Cartesian dimensions. A selected source shape must be compiled against the clean state and
    every requested probe state; never rely on a truncated mixed mutation list. Use the expansive
@@ -147,7 +147,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   to compare exact source offsets, types, identities, and addends when one repeated owner
   is ambiguous. Equal relocation counts alone are not closure.
 - For `/Od` work use `homm2 od-frames` for frame/slot drift and
-  `scripts/od_slots.py` for an individual name-sensitive layout. Keep stack
+  `homm2/core/od_slots.py` for an individual name-sensitive layout. Keep stack
   displacements visible in the non-lite disassembly. Do not apply `/Od` slot steering to
   optimized functions.
 - Build through `homm2 build` after retained edits. It configures the affected units,
@@ -160,7 +160,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   the public permuter, for example:
 
   ```
-  python3 scripts/match_variants.py src/OWNER/File.cpp 0x<RVA> \
+  homm2 permute src/OWNER/File.cpp 0x<RVA> \
     --axes-from build/function-axes.json \
     --min-depth 0 --max-depth 0 --limit <complete-product> \
     --state-trials 50 --state-families forest --state-insertion top \
@@ -176,7 +176,7 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - For an unchanged-source compiler-state census use:
 
   ```
-  python3 scripts/tu_state_noise.py \
+  python3 -m homm2.permute.tu_state_noise \
     --source src/OWNER/File.cpp --rva 0x<RVA> \
     --trials 50 --families forest --insertion top \
     --state-summary build/function-state-summary.json \
