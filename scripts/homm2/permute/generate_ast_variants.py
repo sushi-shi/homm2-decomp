@@ -39,7 +39,7 @@ from pathlib import Path
 import clang.cindex as ci
 
 from homm2.clang_options import ClangMode
-from tu_state_noise import (
+from homm2.permute.tu_state_noise import (
     DEFAULT_FAMILIES as DEFAULT_STATE_FAMILIES,
     _top_level_insertion_offset,
     include_macro_guard,
@@ -1725,7 +1725,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
         "source": source_name,
         "rva": f"0x{args.rva:x}",
         "generator": {
-            "tool": "scripts/generate_ast_variants.py",
+            "tool": "scripts/homm2/permute/generate_ast_variants.py",
             "families": sorted(families),
             "atomic_mutation_count": len(mutations),
             "composition": "hand_axes_x_source_shapes_x_tu_states",
@@ -1778,7 +1778,7 @@ def main(argv=None, *, prog=None, description=None) -> int:
             "recorded in the manifest"
         )
     if args.run:
-        from batch_source_variants import main as run_batch
+        from homm2.permute.batch_source_variants import main as run_batch
 
         batch_args = [
             str(args.output), "--limit", str(len(candidates) * max(1, _axis_product(payload))),

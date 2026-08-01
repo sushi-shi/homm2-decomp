@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from batch_source_variants import (
+from homm2.permute.batch_source_variants import (
     cfg_metrics,
     iter_variants,
     load_manifest,

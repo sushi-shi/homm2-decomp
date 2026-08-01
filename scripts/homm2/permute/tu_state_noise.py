@@ -48,7 +48,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
 
-from tu_state_metrics import read_coff
+from homm2.permute.tu_state_metrics import read_coff
 from homm2.build.assert_relocs import load_symbols
 from homm2.build.canonicalize_data_symbols import (
     CoffObject,
