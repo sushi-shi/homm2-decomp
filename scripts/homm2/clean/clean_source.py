@@ -1333,9 +1333,9 @@ def write_ninja(out_root: Path) -> None:
     lines += [
         "",
         "build objects: phony " + " ".join(objects),
-        "build $builddir/HEROES2W.EXE: link "
+        "build $builddir/HMM2PL.exe: link "
         + " ".join(objects + [mss_aliases] + import_libraries),
-        "build game: phony $builddir/HEROES2W.EXE",
+        "build game: phony $builddir/HMM2PL.exe",
         "default game",
         "",
     ]
@@ -1828,7 +1828,7 @@ def verify(out_root: Path) -> int:
     if result.returncode != 0:
         return result.returncode
 
-    executable = out_root / "build/HEROES2W.EXE"
+    executable = out_root / "build/HMM2PL.exe"
     symbols = subprocess.run(
         ("llvm-nm", "-C", str(executable)),
         check=False,
@@ -1839,7 +1839,7 @@ def verify(out_root: Path) -> int:
         print("[clean] verify: H2EnumIndex survived linking", file=sys.stderr)
         return 1
 
-    print("[clean] verify: built build/HEROES2W.EXE")
+    print("[clean] verify: built build/HMM2PL.exe")
     return 0
 
 

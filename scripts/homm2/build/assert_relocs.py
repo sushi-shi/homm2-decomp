@@ -448,7 +448,7 @@ def _pe_sections():
     if _PE_SECTIONS is not None:
         return _PE_SECTIONS
 
-    data = open("build/orig/HEROES2W.EXE", "rb").read()
+    data = open("build/orig/HMM2PL.exe", "rb").read()
     pe = struct.unpack_from("<L", data, 0x3c)[0]
     section_count = struct.unpack_from("<H", data, pe + 6)[0]
     optional_header_size = struct.unpack_from("<H", data, pe + 20)[0]
@@ -1092,12 +1092,12 @@ def review_pe_data_targets():
     """
     from homm2.build.link_exe import parse_map_symbol_records
 
-    retail_image = _load_pe_image("build/orig/HEROES2W.EXE")
-    candidate_image = _load_pe_image("build/link/HEROES2W.EXE")
+    retail_image = _load_pe_image("build/orig/HMM2PL.exe")
+    candidate_image = _load_pe_image("build/link/HMM2PL.exe")
     sym, data, dups = load_symbols()
     local_rvas = load_candidate_local_rvas()
     section_ranges = _pe_named_section_ranges()
-    map_records = parse_map_symbol_records("build/link/HEROES2W.map")
+    map_records = parse_map_symbol_records("build/link/HMM2PL.map")
     candidate_functions = {}
     for record in map_records:
         candidate_functions.setdefault(record["name"], []).append(record)

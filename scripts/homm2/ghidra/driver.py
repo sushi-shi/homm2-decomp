@@ -7,7 +7,7 @@ so Ghidra never *discovers* names. It exists only to:
      CodeView omits), and
   2. back `python3 -m homm2.analysis.decomp` with our names applied so the C reads well.
 
-`homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HEROES2W.EXE into a
+`homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HMM2PL.exe into a
 cached project (build/ghidra/homm2.{gpr,rep}), auto-analyzes it once (SEVERAL MINUTES;
 skipped on re-runs), then runs two GhidraScripts:
   - apply_names.py      : create a function at every symbol_names.csv RVA Ghidra missed and
@@ -27,7 +27,7 @@ from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
-EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HEROES2W.EXE")
+EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HMM2PL.exe")
 PROJ_DIR = REPO / "build/ghidra"
 PROJ_NAME = "homm2"
 SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
@@ -47,7 +47,7 @@ def _preflight() -> None:
     if not os.environ.get("GHIDRA_INSTALL_DIR"):
         sys.exit("[homm2 ghidra] GHIDRA_INSTALL_DIR unset - enter the dev shell (`nix develop`)")
     if not EXE.is_file():
-        sys.exit(f"[homm2 ghidra] target EXE not found: {EXE} (copy HEROES2W.EXE into build/orig/)")
+        sys.exit(f"[homm2 ghidra] target EXE not found: {EXE} (copy HMM2PL.exe into build/orig/)")
     try:
         import pyghidra  # noqa: F401
     except Exception as e:
@@ -112,7 +112,7 @@ def cli_main(argv) -> int:
     if "--structs" in argv:
         analyze = ("--analyze" in argv) or not _project_exists()
         if analyze:
-            print("[homm2 ghidra] importing + auto-analyzing HEROES2W.EXE (SEVERAL MINUTES, "
+            print("[homm2 ghidra] importing + auto-analyzing HMM2PL.exe (SEVERAL MINUTES, "
                   "one-time) ...", flush=True)
         else:
             print("[homm2 ghidra --structs] reusing analyzed project; recovering class "
@@ -131,7 +131,7 @@ def cli_main(argv) -> int:
     else:
         analyze = not _project_exists()  # analyze once on first build
     if analyze:
-        print("[homm2 ghidra] importing + auto-analyzing HEROES2W.EXE (SEVERAL MINUTES, "
+        print("[homm2 ghidra] importing + auto-analyzing HMM2PL.exe (SEVERAL MINUTES, "
               "one-time) ...", flush=True)
     else:
         print("[homm2 ghidra] reusing analyzed project (--no-analyze) ...", flush=True)

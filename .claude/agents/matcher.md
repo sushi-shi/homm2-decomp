@@ -1,7 +1,7 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (homm2/core/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against retail HMM2PL.exe — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (homm2/core/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
 # matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
@@ -23,7 +23,7 @@ description: Byte-matches one function / TU of HoMM2 against retail HEROES2W.EXE
 You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, base flags `/nologo /c
 /Od /MT /Gr /G5 /Ob1 /QIfdiv`; 39 of the 95 TUs use an optimized profile instead —
 `config/units.toml` is authoritative per TU) under wine, produces COFF
-**byte-identical** to retail `HEROES2W.EXE`,
+**byte-identical** to retail `HMM2PL.exe`,
 verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers under
 `include/<TIER>/`), define the TU's functions in **retail-RVA order**, put
 `VA(0x........, 0x..)` / `DATA(0x........)` above each, and **leave the working
@@ -33,7 +33,7 @@ zero-padded to 8 hex digits**; leave the size arg unpadded. You do NOT
 
 ## What's authoritative
 
-HEROES2W.EXE (Price of Loyalty) ships a linker-produced minimal/publics-only
+HMM2PL.exe (Price of Loyalty) ships a linker-produced minimal/publics-only
 **CodeView NB09** stream. All 3,541 retained names are `S_PUB32` records with type
 index zero. Game compilands contain no `S_GPROC32`, `S_LPROC32`, locals, types, or
 line records.

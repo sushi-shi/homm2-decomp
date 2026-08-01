@@ -1,7 +1,7 @@
 # Resource source reconstruction plan
 
 Status: **DEFERRED**. This plan does not activate source-level resource compilation.
-The extracted canonical `build/link/HEROES2W.res` remains the linker input and byte
+The extracted canonical `build/link/HMM2PL.res` remains the linker input and byte
 oracle until every phase below has been completed and audited.
 
 ## Principles

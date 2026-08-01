@@ -43,7 +43,7 @@ local ROOT_MARKER = "config/units.toml" -- tracked: present even in a fresh chec
 -- The VA(...) macros in src/ hold a VA (image-base-included, e.g. 0x0040b070),
 -- but symbol_names.csv's rva column is image-base-RELATIVE (0x000b070). Bridge
 -- the two so the cursor->function join works regardless of which a lookup uses.
--- HEROES2W.EXE image base = 0x400000 (relative and VA key-spaces don't overlap).
+-- HMM2PL.exe image base = 0x400000 (relative and VA key-spaces don't overlap).
 local IMGBASE = 0x400000
 
 -- ------------------------------------------------------------------ logging --

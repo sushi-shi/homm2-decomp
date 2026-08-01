@@ -24,7 +24,7 @@ from homm2.build.link_exe import PINNED_VC40_LIBCMT_SHA256
 
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_ARCHIVE = REPO / "build/toolchain/link300/lib/LIBCMT.LIB"
-DEFAULT_EXE = REPO / "build/orig/HEROES2W.EXE"
+DEFAULT_EXE = REPO / "build/orig/HMM2PL.exe"
 DEFAULT_LABELS = REPO / "config/library_labels.csv"
 
 IMAGE_SCN_CNT_CODE = 0x00000020

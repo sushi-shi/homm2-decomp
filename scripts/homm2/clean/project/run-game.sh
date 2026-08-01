@@ -26,7 +26,7 @@ else
 fi
 
 cd "$game_dir"
-wine HEROES2W.EXE "$@" &
+wine HMM2PL.exe "$@" &
 game_pid=$!
 
 if [ -n "$before_ids" ]; then

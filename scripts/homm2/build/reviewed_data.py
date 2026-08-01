@@ -58,8 +58,8 @@ from homm2.build.data_topology_census import _fallback_kind
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 LEDGER = REPO / "config/required_initialized_storage.tsv"
-EXE = REPO / "build/orig/HEROES2W.EXE"
-PDB = REPO / "build/pdb/HEROES2W.pdb"
+EXE = REPO / "build/orig/HMM2PL.exe"
+PDB = REPO / "build/pdb/HMM2PL.pdb"
 RELOC_ALIASES = REPO / "config/delink_reloc_aliases.tsv"
 MANIFEST = REPO / "build/gen/reviewed_delink_data.tsv"
 TARGET = REPO / "build/delink"

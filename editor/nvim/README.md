@@ -1,7 +1,7 @@
 # homm2.nvim
 
 In-editor [objdiff](https://github.com/encounter/objdiff) for the **homm2**
-binary-matching project (HEROES2W.EXE). For the function under your cursor: its
+binary-matching project (HMM2PL.exe). For the function under your cursor: its
 **target** (retail) asm, its **base** (recompiled) asm, a **side-by-side diff**,
 and its **match %** — without leaving Neovim to start the objdiff TUI. Plus a
 one-key **build** that recompiles and tells you what moved.

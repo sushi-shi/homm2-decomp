@@ -3,7 +3,7 @@
 
 The delink/objdiff pipeline has no cross-reference DB, but for SEMANTIC navigation a
 matcher wants the *callers* of a function (which method `new`s a ctor, which caller
-attributes a leaf to its owning class/TU). This scans HEROES2W.EXE's .text for direct
+attributes a leaf to its owning class/TU). This scans HMM2PL.exe's .text for direct
 `call`/`jmp rel32` (E8/E9) sites whose target is the queried RVA and reports each caller
 resolved to its containing function + unit. It is the caller-side complement of
 `sema disasm` (which shows a function's own body/callees).
@@ -18,7 +18,7 @@ library/runtime function (not in CodeView) is reported as `(unrecovered fn @ ~0x
 because we don't know that function's boundary. With it, every caller site lands inside
 a known boundary. Generate it once with `homm2 ghidra`.
 
-Unlike gruntz's GRUNTZ.EXE, HEROES2W.EXE is NOT incrementally linked - there is no ILT
+Unlike gruntz's GRUNTZ.EXE, HMM2PL.exe is NOT incrementally linked - there is no ILT
 jump-thunk table in front of .text (it starts at RVA 0x1000 with real code), so the
 thunk-chasing machinery gruntz needs is absent here.
 
@@ -39,7 +39,7 @@ from pathlib import Path
 
 REPO = next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
             Path(__file__).resolve().parents[3])
-EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HEROES2W.EXE")
+EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HMM2PL.exe")
 SYMCSV = REPO / "build/gen/symbol_names.csv"
 FUNCS = REPO / "build/ghidra/exports/functions.csv"
 IMAGEBASE = 0x400000
@@ -152,7 +152,7 @@ def _resolve(arg, byname):
 def data_refs(target, d, secs, names):
     """Data words (in non-.text sections) whose value is the VA of `target`: the fn-ptr
     tables / vtable slots / command tables that hold it indirectly - references a rel32
-    .text scan can't see. Returns [(data_rva, section)]. (No ILT thunks in HEROES2W, so
+    .text scan can't see. Returns [(data_rva, section)]. (No ILT thunks in HMM2PL, so
     the referenced value is always the direct body VA.)"""
     want = target + IMAGEBASE
     hits = []

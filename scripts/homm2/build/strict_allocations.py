@@ -23,7 +23,7 @@ from homm2.build.reviewed_data import ensure_reviewed_targets
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 LEDGER = REPO / "config/required_initialized_storage.tsv"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
-RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
+RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
 OBJDIFF_PROJECT = REPO / "build/objdiff"
 OUTPUT = REPO / "build/gen/strict-allocations"
 GENERIC_CHECKER = "homm2.audit.strict_allocation_diff"

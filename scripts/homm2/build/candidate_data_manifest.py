@@ -737,7 +737,7 @@ def _literal_rvas(row, coff, intervals, highlow, read_bytes, cache):
 
 
 def derive_allocations(base_dir=REPO / "build/objdiff/base",
-                       exe=REPO / "build/orig/HEROES2W.EXE",
+                       exe=REPO / "build/orig/HMM2PL.exe",
                        symbols_path=REPO / "build/gen/symbol_names.csv",
                        units_path=REPO / "config/units.toml",
                        reviewed_rows=()):
@@ -1046,7 +1046,7 @@ def diagnostics_bytes(stats, diagnostics):
 def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-dir", type=Path, default=REPO / "build/objdiff/base")
-    parser.add_argument("--exe", type=Path, default=REPO / "build/orig/HEROES2W.EXE")
+    parser.add_argument("--exe", type=Path, default=REPO / "build/orig/HMM2PL.exe")
     parser.add_argument("--symbols", type=Path, default=REPO / "build/gen/symbol_names.csv")
     parser.add_argument("--units", type=Path, default=REPO / "config/units.toml")
     parser.add_argument("--output", type=Path, default=OUTPUT)

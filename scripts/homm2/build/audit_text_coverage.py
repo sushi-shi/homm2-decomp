@@ -232,7 +232,7 @@ def write_coverage_partition(path, text_rva, text_end, spans, gaps, exclusions,
 
 def main(argv=None):
     argv = list(argv or sys.argv[1:])
-    exe = argv[0] if argv else "build/orig/HEROES2W.EXE"
+    exe = argv[0] if argv else "build/orig/HMM2PL.exe"
     manifest = argv[1] if len(argv) > 1 else "build/gen/symbol_names.csv"
     library_labels = "config/library_labels.csv"
     ghidra_path = Path("build/ghidra/exports/functions.csv")

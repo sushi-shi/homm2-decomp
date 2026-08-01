@@ -21,7 +21,7 @@ from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR")) if os.environ.get("HOMM2_DIR") else \
     next((p for p in Path(__file__).resolve().parents if (p / "flake.nix").exists()),
          Path(__file__).resolve().parents[3])
-EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HEROES2W.EXE")
+EXE = Path(os.environ.get("HOMM2_EXE") or REPO / "build/orig/HMM2PL.exe")
 SYMCSV = REPO / "build/gen/symbol_names.csv"
 FUNCS = REPO / "build/ghidra/exports/functions.csv"
 IMAGE_BASE = 0x400000

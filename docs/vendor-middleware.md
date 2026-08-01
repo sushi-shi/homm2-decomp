@@ -1,14 +1,14 @@
-# Vendored middleware SDKs — PoL HEROES2W.EXE
+# Vendored middleware SDKs — PoL HMM2PL.exe
 
-HEROES2W.EXE dynamically imports three closed third-party middleware DLLs. Their **code**
+HMM2PL.exe dynamically imports three closed third-party middleware DLLs. Their **code**
 is not in the EXE (only PE import thunks), so we do not reconstruct it — we only need the
 **API headers** so the NWC translation units that CALL them compile and byte-match. Those
 headers are vendored under `vendor/<sdk>-<version>/` and put on the compiler's `INCLUDE`
 path by `scripts/homm2/build/cc_wrap.py` (see *Build wiring* at the end).
 
-The retail EXE analysed here is `build/orig/HEROES2W.EXE`
+The retail EXE analysed here is `build/orig/HMM2PL.exe`
 (md5 `900aa22c4e88221e7ebac524cd4172c9`), byte-identical to the English "Price of Loyalty"
-CD image `img-pol/HEROES2W.EXE` (dated 1997-05-05). The GOG re-release EXE
+CD image `img-pol/HMM2PL.exe` (dated 1997-05-05). The GOG re-release EXE
 (`ea70bf65…`) is a *different* binary and must not be used to pin versions.
 
 | Middleware | DLL | Version | Import style | Confidence |
@@ -43,7 +43,7 @@ checked, function-by-function, against the period headers and found accurate:
   1991-97 — **exactly** the version pinned here (the sibling image's `mss32.dll` build
   string is `MSS V3.6B`). That `AIL.H` is the DOS variant (`cdecl`, `__pascal` callbacks)
   and declares 22 of our 33 imports; the Win32 stdcall superset (with `AIL_waveOutOpen`,
-  `AIL_midiOutOpen`, `AIL_redbook_*`) is `MSSW.H`. HEROES2W.EXE links the **Win32** `stdcall
+  `AIL_midiOutOpen`, `AIL_redbook_*`) is `MSSW.H`. HMM2PL.exe links the **Win32** `stdcall
   @N` API, which `mss.h` here targets; the AIL 2D core signatures/handle types it shares
   with `AIL.H` match.
 - *Smacker*: `Blood-RE` `SMACK.H` (v3.0c) confirms every imported signature —
