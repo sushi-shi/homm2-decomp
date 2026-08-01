@@ -33,7 +33,7 @@ PACKAGE = SCRIPTS / "homm2"
 # Raised deliberately when cases are ADDED - the number is a floor against silent
 # loss, not a target. If a package legitimately shrinks, lower it in the same
 # commit that removes the tests, so the drop is reviewed rather than absorbed.
-MINIMUM_CASES = 529
+MINIMUM_CASES = 536
 
 
 def _packages():

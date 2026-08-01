@@ -17,9 +17,10 @@ def main(argv=None):
     if argv:
         print("usage: homm2 redelink")
         return 1
-    # Refresh public, source-private, and compiler-generated function identities.
-    if run("python3", "-m", "homm2.build.gen_manifest",
-           "build/orig/HEROES2W.EXE", "."):
+    # Refresh the symbol inventory. This target is stripped, so it comes from the
+    # source's own VA/DATA markers rather than from a CodeView stream: there is no
+    # gen_manifest step here because there is nothing for it to read.
+    if run("python3", "-m", "homm2.build.source_symbols"):
         return 1
     if run("python3", "-m", "homm2.build.audit_text_coverage"):
         return 1
