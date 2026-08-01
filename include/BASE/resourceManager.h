@@ -4,7 +4,6 @@
 #include <Ints.h>
 #include "baseManager.h"
 
-class MIDIWrap;
 class bitmap;
 class font;
 class icon;
@@ -54,7 +53,6 @@ public:
     class mouse* GetMouse(char*);
     class font* GetFont(char*);
     class sample* GetSample(char*);
-    class MIDIWrap* GetMIDIWrap(char*);
     void Dispose(class resource*);
     void AddResource(class resource*);
     void Expunge(void);

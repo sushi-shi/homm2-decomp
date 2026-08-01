@@ -634,17 +634,6 @@ private:
             return;
         }
 
-        case SDL_EVENT_MOUSE_WHEEL:
-            event.type = Event::Type::MouseWheel;
-            event.wheel = static_cast<int>(sdlEvent.wheel.y);
-            m_input.Push(event);
-            return;
-
-        case SDL_EVENT_WINDOW_RESIZED:
-            event.type = Event::Type::Resized;
-            m_input.Push(event);
-            return;
-
         case SDL_EVENT_WINDOW_FOCUS_GAINED:
         case SDL_EVENT_WINDOW_FOCUS_LOST:
             event.type = Event::Type::FocusChanged;
@@ -1225,20 +1214,11 @@ private:
         return candidates.front();
     }
 
-    static bool HoldsGameData(const std::filesystem::path& directory) {
-        const std::filesystem::path data = Entry(directory, "DATA");
-        return !data.empty() && !Entry(data, "HEROES2.AGG").empty();
-    }
-
-    // An installation carries the retail spelling, a copied one anything.
-    static std::filesystem::path Entry(const std::filesystem::path& directory, const char* wanted) {
+    // An installation carries the retail spelling, a copied one anything, which
+    // is what resolving a retail path already knows how to handle.
+    static bool HoldsGameData(const std::string& directory) {
         std::error_code error;
-        for (const auto& entry : std::filesystem::directory_iterator(directory, error)) {
-            if (SDL_strcasecmp(entry.path().filename().string().c_str(), wanted) == 0) {
-                return entry.path();
-            }
-        }
-        return std::filesystem::path();
+        return std::filesystem::exists(ResolveIn(directory, "DATA\\HEROES2.AGG"), error);
     }
 
     static std::filesystem::path Directory(const std::string& root, const std::string& directory) {

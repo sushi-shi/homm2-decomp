@@ -25,11 +25,8 @@ struct Event {
         MouseMove,
         MouseDown,
         MouseUp,
-        MouseWheel,
 
         Quit,
-
-        Resized,
 
         FocusChanged,
     };
@@ -45,7 +42,6 @@ struct Event {
 
     Point position;
     MouseButton button = MouseButton::Left;
-    int wheel = 0;
 
     bool focused = false;
 };

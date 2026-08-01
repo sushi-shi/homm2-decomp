@@ -19,8 +19,7 @@ u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 i32l lLastMIDIPollTickCount = 0;
-static SMidiText gMidiText =
-    {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
+static SMidiText gMidiText = {"MS1", "MS6b", "MS1", "MS4", "MP1a"};
 
 void soundManager::MIDIStartup(void) {
     LogStr(gMidiText.startupBegin);

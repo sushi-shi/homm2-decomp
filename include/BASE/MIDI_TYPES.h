@@ -11,14 +11,10 @@ typedef enum MidiTextSlotSize {
 
 typedef struct SMidiText {
     char startupBegin[MIDI_TEXT_SHORT_SLOT_SIZE];
-    char startupDriver[MIDI_TEXT_SHORT_SLOT_SIZE];
     char startupOpen[MIDI_TEXT_LOG_SLOT_SIZE];
-    char startupOpenResult[MIDI_TEXT_LOG_SLOT_SIZE];
     char shutdownBegin[MIDI_TEXT_SHORT_SLOT_SIZE];
-    char shutdownDriver[MIDI_TEXT_SHORT_SLOT_SIZE];
     char shutdownComplete[MIDI_TEXT_SHORT_SLOT_SIZE];
     char playBegin[MIDI_TEXT_LOG_SLOT_SIZE];
-    char filenameFormat[MIDI_TEXT_FILENAME_FORMAT_SLOT_SIZE];
 } SMidiText;
 
 

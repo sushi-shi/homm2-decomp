@@ -120,7 +120,6 @@ extern i32 CurrentMidiFile;
 extern u8 bGotMidi[MIDI_TRACK_COUNT];
 extern i32l lLastMIDIPollTickCount;
 extern i16 iLastVolume[SAVED_SAMPLE_VOLUME_CAPACITY];
-extern class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 extern struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];
 
 #endif
