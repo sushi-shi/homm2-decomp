@@ -8,10 +8,45 @@ toolchain. Retail executable bytes, relocations, and public RVAs are authoritati
 [objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
 not proof of correctness.
 
+This repository does **not** contain the original game's executable or resources. Supply a
+legally obtained `HEROES2W.EXE` locally to initialize the matching workspace; the playable port
+branches also require an installed copy of the game data.
+
 The embedded minimal CodeView stream proves retained public names and start RVAs only. Function
 sizes, private helpers, types, classes, and vtables are reconstructed from executable bytes,
 relocations, candidate objects, and reviewed manifests. The synthesized PDB used by the delinker
 contains those reconstruction results; it is not shipping debug information.
+
+## Trust and provenance
+
+Most reconstruction work was produced with GPT-5.6 Sol and Claude Fable 5.0. An exact function is
+still independently checkable against retail bytes and ordered relocations, so accepting it does
+not require trusting the model's prose or intent. The cross-platform port is a semantic rewrite,
+not a byte-matching result, and therefore still requires ordinary code review and play-testing.
+
+## Repository branches
+
+```text
+decomp-pol-2.0 (you are here)
+    |
+    +------------------+
+    |                  |
+source-pol-2.0     classic-pol-2.0
+    |
+master-pol-2.0
+    |
+ironfist-pol-2.0
+
+decomp-gold-2.1-buka
+```
+
+- `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
+  branches.
+- `source-pol-2.0` is generated from decomp with matching-only machinery removed.
+- `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
+- `master-pol-2.0` is the cross-platform Linux, Windows, and Web port.
+- `ironfist-pol-2.0` applies the Project Ironfist changes to the reconstructed source.
+- `decomp-gold-2.1-buka` is the separate Gold 2.1/Buka reconstruction used for cross-reference.
 
 <!-- match-score:start -->
 ## Match status
