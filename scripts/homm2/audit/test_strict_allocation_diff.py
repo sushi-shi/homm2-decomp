@@ -2,7 +2,7 @@ import base64
 import copy
 import unittest
 
-from strict_allocation_diff import audit
+from homm2.audit.strict_allocation_diff import audit
 
 
 def encoded(data: bytes) -> str:

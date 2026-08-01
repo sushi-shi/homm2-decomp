@@ -26,7 +26,7 @@ SYMBOLS = REPO / "build/gen/symbol_names.csv"
 RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
 OBJDIFF_PROJECT = REPO / "build/objdiff"
 OUTPUT = REPO / "build/gen/strict-allocations"
-GENERIC_CHECKER = REPO / "scripts/strict_allocation_diff.py"
+GENERIC_CHECKER = "homm2.audit.strict_allocation_diff"
 
 
 def _number(value):
@@ -368,7 +368,7 @@ def audit_units(units=None, output=OUTPUT, runner=_run, keep_diffs=False):
         manifest, excluded = derive_manifest(
             unit, by_unit[unit], diff, literal_inventory)
         manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")
-        check = runner([sys.executable, str(GENERIC_CHECKER),
+        check = runner([sys.executable, "-m", GENERIC_CHECKER,
                         str(diff_path), str(manifest_path)])
         report["units"].append({
             "unit": unit,

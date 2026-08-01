@@ -1,6 +1,6 @@
 import unittest
 
-from historical_exact_losses import (
+from homm2.audit.historical_exact_losses import (
     Commit,
     ExactEpoch,
     hash_relation,

@@ -65,7 +65,7 @@ def run_checked(root: Path, command: list[str]) -> None:
 
 def refresh_live_report_and_queue(root: Path) -> Path:
     run_checked(root, ["homm2", "status", "--force-refresh"])
-    run_checked(root, [sys.executable, str(root / "scripts/homm2/match/residual_queue.py")])
+    run_checked(root, [sys.executable, "-m", "homm2.match.residual_queue"])
     return root / "build/gen/residual_function_queue.tsv"
 
 
@@ -138,7 +138,8 @@ def historical_priority_keys(root: Path) -> set[tuple[str, str]]:
         root,
         [
             sys.executable,
-            str(root / "scripts/historical_exact_losses.py"),
+            "-m",
+            "homm2.audit.historical_exact_losses",
             "--output",
             str(output),
         ],
