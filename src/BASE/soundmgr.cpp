@@ -503,13 +503,14 @@ platform::VoiceId soundManager::MemorySample(class sample* sampleResource) {
     sound.samples = playbackData->data;
     sound.byteCount = playbackData->size;
     sound.sampleRate = H2EnumIndex(playbackData->sampleRate);
-    sound.channels = 1;
-    sound.bitsPerSample = 8;
+    sound.channels = (playbackData->format & FORMAT_STEREO) == FORMAT_STEREO ? 2 : 1;
+    sound.bitsPerSample = (playbackData->format & FORMAT_16_BIT) == FORMAT_16_BIT ? 16 : 8;
 
     const i32 volume = gConfig.soundVolume != CONFIG_VOLUME_MUTED
         ? ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT)
         : 0;
-    smp = platform::Audio().PlaySound(sound, volume, playbackData->loopCount);
+    // The sample counts how many times to play, and none means forever.
+    smp = platform::Audio().PlaySound(sound, volume, playbackData->loopCount - 1);
 
     m_sampleHandles[ch] = smp;
     playbackData->activeSample = smp;
