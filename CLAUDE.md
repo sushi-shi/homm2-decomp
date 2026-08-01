@@ -122,6 +122,9 @@ than failing. Add a tool to its role package, not to a new top-level file.
   A controlled run from `homm2.permute.tu_state_noise` may raise the unchanged function's maximum
   after generated predecessor input is removed. Best paired objects, disassemblies, and diffs
   may remain under `build/`; generated source input is never retained.
+  The ledger is only rewritten by a build, so a source edit committed without one leaves rows
+  banked against a hash that no longer exists. `homm2 audit ledger` reports that drift without
+  needing a build.
 
 See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md`,
 `docs/reviewed-data-objdiff.md`, and `docs/static-storage-link-audit.md`.

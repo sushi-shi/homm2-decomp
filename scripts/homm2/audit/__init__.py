@@ -4,7 +4,10 @@ Nothing here is a build gate. The always-on gates live in homm2/build/ (assert_*
 and run inside `homm2 build`; these are the read-only diagnostics you reach for
 when a residual will not explain itself, grouped by the question they answer:
 
-  regression  historical_exact_losses - functions that were exact historically and
+  regression  ledger - match_baseline.tsv rows banked against source that no longer
+              exists. The ledger is only rewritten by a build, so drift is otherwise
+              invisible; this answers "is it current?" without a build.
+              historical_exact_losses - functions that were exact historically and
               are not now, split by whether the effective-source hash also moved.
               An unchanged hash is TU/compiler-state evidence; a changed one usually
               means a source or helper edit. Feeds the permute sweep drivers.
@@ -28,6 +31,8 @@ import runpy
 import sys
 
 TOOLS = {
+    "ledger": ("ledger",
+               "match_baseline rows banked against source that changed"),
     "historical-losses": ("historical_exact_losses",
                           "functions exact historically but not now"),
     "bitfield-residuals": ("scan_bitfield_residuals",
