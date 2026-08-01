@@ -61,7 +61,11 @@ def main() -> int:
         formatted = format_text(original)
         if formatted != original:
             changed = True
-            if not args.check:
+            if args.check:
+                # Name the file. A --check that only sets an exit code tells you
+                # something is wrong out of 140 headers but not which one.
+                print(f"{path}: needs header spacing", file=sys.stderr)
+            else:
                 path.write_text(formatted)
 
     return int(args.check and changed)
