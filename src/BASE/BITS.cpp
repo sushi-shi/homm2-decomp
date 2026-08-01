@@ -8,7 +8,6 @@ H2_ENUM_BEGIN(BitIndexConstant)
 H2_ENUM_END(BitIndexConstant)
 
 // Pseudocode: return (wordAt(bits + bitIndex / 8) & (1U << (bitIndex % 8))) != 0;
-VA(0x004d1594, 0x2e)
 extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
     __asm {
         mov esi, bits
@@ -30,7 +29,6 @@ extern "C" i32 __cdecl BitTest(const void* bits, BitIndex bitIndex) {
 }
 
 // Pseudocode: wordAt(bits + bitIndex / 8) |= 1U << (bitIndex % 8);
-VA(0x004d15c2, 0x20)
 extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
     __asm {
         mov esi, bits
@@ -46,7 +44,6 @@ extern "C" void __cdecl BitSet(void* bits, BitIndex bitIndex) {
 }
 
 // Pseudocode: wordAt(bits + bitIndex / 8) &= ~(1U << (bitIndex % 8));
-VA(0x004d15e2, 0x22)
 extern "C" void __cdecl BitClear(void* bits, BitIndex bitIndex) {
     __asm {
         mov esi, bits

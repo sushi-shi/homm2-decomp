@@ -54,7 +54,6 @@ struct boatRecord {
     i8 owner;
 };
 #pragma pack(pop)
-SIZE(boatRecord, 8);
 
 H2_ENUM_BEGIN(GameStateStorageConstant)
     GAME_CAMPAIGN_STATE_PAD_SIZE         = 0x78,
@@ -323,7 +322,6 @@ public:
     i32 GetSideDesc(char*, i32, i32);
 };
 #pragma pack(pop)
-SIZE(game, 0x660f);
 extern class heroWindow* overWin;
 extern char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 extern class textWidget** textWidgetDynamic;

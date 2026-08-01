@@ -109,7 +109,6 @@ H2_ENUM_BEGIN(ViewWorldGroundFrame)
     GROUND_FRAME_EIGHT = 8
 H2_ENUM_END(ViewWorldGroundFrame)
 
-VA(0x004333c0, 0x267)
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[WORLD_PALETTE_SIZE];
     char* viewIconNames[LEGEND_COUNT];
@@ -127,21 +126,21 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     VWCompleteDraw();
     gpWindowManager->m_updateFlags = 1;
 
-    sprintf(gText, DATA_COMPGEN(0x004f11e8, viewWorldViewlgndBin, "viewlgnd.bin"));
+    sprintf(gText, "viewlgnd.bin");
     viewWorldWindow = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
     if (viewWorldWindow == NULL)
         MemError();
 
-    viewIconNames[LEGEND_MINES] = DATA_COMPGEN(0x004f11f8, viewWorldMINE, "MINE");
-    viewIconNames[LEGEND_RESOURCES] = DATA_COMPGEN(0x004f1200, viewWorldRSRC, "RSRC");
-    viewIconNames[LEGEND_ARTIFACTS] = DATA_COMPGEN(0x004f1208, viewWorldRTFX, "RTFX");
-    viewIconNames[LEGEND_TOWNS] = DATA_COMPGEN(0x004f1210, viewWorldTWNS, "TWNS");
-    viewIconNames[LEGEND_HEROES] = DATA_COMPGEN(0x004f1218, viewWorldHROS, "HROS");
-    viewIconNames[LEGEND_ALL] = DATA_COMPGEN(0x004f1220, viewWorldALL, "_ALL");
-    viewIconNames[LEGEND_WORLD] = DATA_COMPGEN(0x004f1228, viewWorldWRLD, "WRLD");
+    viewIconNames[LEGEND_MINES] = "MINE";
+    viewIconNames[LEGEND_RESOURCES] = "RSRC";
+    viewIconNames[LEGEND_ARTIFACTS] = "RTFX";
+    viewIconNames[LEGEND_TOWNS] = "TWNS";
+    viewIconNames[LEGEND_HEROES] = "HROS";
+    viewIconNames[LEGEND_ALL] = "_ALL";
+    viewIconNames[LEGEND_WORLD] = "WRLD";
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f1230, viewWorldViewSIcn, "view%s.icn"),
+        "view%s.icn",
         viewIconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
                           ? LEGEND_WORLD
                           : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
@@ -164,7 +163,6 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     SetPalette(paletteData, 1);
 }
 
-VA(0x00433627, 0x5a)
 void advManager::VWCleanup(void) {
     gpResourceManager->Dispose(pVWGround);
     gpResourceManager->Dispose(pVWFlags);
@@ -172,7 +170,6 @@ void advManager::VWCleanup(void) {
     gpResourceManager->Dispose(pVWLetters);
 }
 
-VA(0x00433681, 0x253)
 void advManager::VWInit(i32 centerX, i32 centerY) {
     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR)
         giViewWorldScaleLookup = SCALE_INDEX_FAR;
@@ -202,19 +199,18 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 
     iVWXPixelOffset = (WORLD_WINDOW_X - IDX(giViewWorldScale) * IDX(iVWViewableCells)) >> 1;
     iVWYPixelOffset = iVWXPixelOffset;
-    gpMouseManager->SetPointer(DATA_COMPGEN(0x004f123c, vWInitAdvmiceMse, "advmice.mse"), WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
-    sprintf(gText, DATA_COMPGEN(0x004f1248, vWInitGroundDIcn, "ground%d.icn"), giViewWorldScale);
+    gpMouseManager->SetPointer("advmice.mse", WORLD_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
+    sprintf(gText, "ground%d.icn", giViewWorldScale);
     pVWGround = gpResourceManager->GetIcon(gText);
-    sprintf(gText, DATA_COMPGEN(0x004f1258, vWInitVwflagDIcn, "vwflag%d.icn"), giViewWorldScale);
+    sprintf(gText, "vwflag%d.icn", giViewWorldScale);
     pVWFlags = gpResourceManager->GetIcon(gText);
-    sprintf(gText, DATA_COMPGEN(0x004f1268, vWInitMiscDIcn, "misc%d.icn"), giViewWorldScale);
+    sprintf(gText, "misc%d.icn", giViewWorldScale);
     pVWMisc = gpResourceManager->GetIcon(gText);
-    sprintf(gText, DATA_COMPGEN(0x004f1274, vWInitLetterDIcn, "letter%d.icn"), giViewWorldScale);
+    sprintf(gText, "letter%d.icn", giViewWorldScale);
     pVWLetters = gpResourceManager->GetIcon(gText);
     UpdateRadar(1, 0);
 }
 
-VA(0x004338d4, 0x1346)
 void advManager::VWCompleteDraw(void) {
     i32 mineHighlight18;
     i32 heroHighlight8;
@@ -707,7 +703,6 @@ void advManager::VWCompleteDraw(void) {
     );
 }
 
-VA(0x00434c1a, 0x5e2)
 MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale6;
     i32 radarY1;
@@ -735,16 +730,16 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                     // NOLINTBEGIN(readability-magic-numbers)
                     switch (MAP_HEIGHT) {
                         case MAP_DIMENSION_SMALL:
-                            radarScale6 = DATA_COMPGEN(0x004eb26c, viewWorldDialogHandlerConstant3, 4.0f);
+                            radarScale6 = 4.0f;
                             break;
                         case MAP_DIMENSION_MEDIUM:
-                            radarScale6 = DATA_COMPGEN(0x004eb270, viewWorldDialogHandlerConstant, 2.0f);
+                            radarScale6 = 2.0f;
                             break;
                         case MAP_DIMENSION_LARGE:
-                            radarScale6 = DATA_COMPGEN(0x004eb274, viewWorldDialogHandlerConstant4, 1.3333f);
+                            radarScale6 = 1.3333f;
                             break;
                         default:
-                            radarScale6 = DATA_COMPGEN(0x004eb278, viewWorldDialogHandlerConstant2, 1.0f);
+                            radarScale6 = 1.0f;
                             break;
                     }
                     // NOLINTEND(readability-magic-numbers)
@@ -855,25 +850,24 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
 
 // Retail scale/kind/axis pixel-offset payload.
 // NOLINTBEGIN(readability-magic-numbers)
-DATA(0x004f11b8)
 i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
             [IDX(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
                                               4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
                                               7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
 // NOLINTEND(readability-magic-numbers)
-DATA(0x004f11dc) ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
-DATA(0x004f11e0) i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
-DATA(0x004f11e4) b32 gbInViewWorld = false;
-DATA(0x00525110) class icon* pVWMisc;
-DATA(0x00525114) class icon* pVWLetters;
-DATA(0x00525118) i32 iVWYPixelOffset;
-DATA(0x0052511c) class icon* pVWGround;
-DATA(0x00525120) i32 iVWViewableCells;
-DATA(0x00525124) class icon* pVWFlags;
-DATA(0x00525128) i32 iVWDrawAllTerrains;
-DATA(0x0052512c) H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
-DATA(0x00525130) i32 iVWDrawAllObjs;
-DATA(0x00525134) i32 iVWMapOriginX;
-DATA(0x00525138) i32 iVWMapOriginY;
-DATA(0x0052513c) i32 iVWCenterOffset;
-DATA(0x00525140) i32 iVWXPixelOffset;
+ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
+i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
+b32 gbInViewWorld = false;
+class icon* pVWMisc;
+class icon* pVWLetters;
+i32 iVWYPixelOffset;
+class icon* pVWGround;
+i32 iVWViewableCells;
+class icon* pVWFlags;
+i32 iVWDrawAllTerrains;
+H2_ENUM_STORAGE(SpellType, i32) iVWWhatToDraw;
+i32 iVWDrawAllObjs;
+i32 iVWMapOriginX;
+i32 iVWMapOriginY;
+i32 iVWCenterOffset;
+i32 iVWXPixelOffset;

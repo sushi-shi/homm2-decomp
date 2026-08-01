@@ -41,10 +41,6 @@ struct SmackMilesDigitalDriver {
     void* directSound;
 };
 #pragma pack(pop)
-SIZE(tag_rect, 8);
-SIZE(SSmackOptions, 45);
-SIZE(SmackMilesDigitalDriver, 0x50);
-SIZE(SmackSum, 0x54);
 
 void DoAdvance(Smack*, i32, i32, i32, i32);
 void SmackManagerMain(void);

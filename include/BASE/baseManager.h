@@ -51,5 +51,4 @@ public:
     virtual MessageDispatchResult Main(struct tag_message&) = 0;
 };
 #pragma pack(pop)
-SIZE(baseManager, 0x36);
 #endif

@@ -70,7 +70,6 @@ H2_ENUM_BEGIN(ViewGeneralHoverHelp)
     GENERAL_HOVER_HELP_CAPTAIN   = 6
 H2_ENUM_END(ViewGeneralHoverHelp)
 
-VA(0x0040bd60, 0x6d3)
 i32 combatManager::ViewGeneral(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
 ) {
@@ -116,10 +115,10 @@ i32 combatManager::ViewGeneral(
     giCurGeneral = side;
 
     message15.type = MESSAGE_WIDGET;
-    generalWindow18 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, DATA_COMPGEN(0x004eddf8, viewGeneralVgenwinBin, "vgenwin.bin"));
+    generalWindow18 = new heroWindow(GENERAL_WINDOW_X, GENERAL_WINDOW_Y, "vgenwin.bin");
     if (generalWindow18 == NULL)
         MemError();
-    sprintf(gText, DATA_COMPGEN(0x004ede04, viewGeneralPort04dIcn, "port%04d.icn"), IDX(m_heroes[IDX(side)]->m_portrait));
+    sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(side)]->m_portrait));
     message15.payload.widget.command = VIEW_GENERAL_SET_ICON;
     message15.payload.widget.id = GENERAL_PORTRAIT_WIDGET;
     message15.payload.widget.data.text = gText;
@@ -146,11 +145,11 @@ i32 combatManager::ViewGeneral(
     generalWindow18->BroadcastMessage(message15);
 
     if (m_heroes[IDX(side)]->m_isCaptain != 0)
-        sprintf(gText, DATA_COMPGEN(0x004ede14, viewGeneralCaptain, "Captain"));
+        sprintf(gText, "Captain");
     else
         sprintf(
             gText,
-            DATA_COMPGEN(0x004ede1c, viewGeneralSTheS, "%s the %s"),
+            "%s the %s",
             m_heroes[IDX(side)]->m_name,
             gAlignmentNames[IDX(m_heroes[IDX(side)]->m_cursorType)]
         );
@@ -167,7 +166,7 @@ i32 combatManager::ViewGeneral(
     luck10 = gpGame->GetLuck(m_heroes[IDX(side)], NULL, m_combatTowns[IDX(side)]);
     sprintf(
         gText,
-        DATA_COMPGEN(0x004ede28, viewGeneralSDSDSD, "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d"),
+        "\n%s%d\n%s%d\n%s%d\n%s%d\n%s%s\n%s%s\n\n%s%d/%d",
         cViewGeneralLabels[IDX(HERO_PRIMARY_ATTACK)],
         m_heroes[IDX(side)]->Stats(HERO_PRIMARY_ATTACK),
         cViewGeneralLabels[IDX(HERO_PRIMARY_DEFENSE)],
@@ -239,7 +238,6 @@ i32 combatManager::ViewGeneral(
     return 0;
 }
 
-VA(0x0040c433, 0x351)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 msgConst;
     i16 msgConst27;
@@ -362,7 +360,6 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0040c784, 0x165)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     if (viewedArmy == NULL)
         return;
@@ -413,4 +410,4 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     }
 }
 
-DATA(0x004eddf4) H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;
+H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide = COMBAT_ATTACKER_SIDE;

@@ -67,8 +67,6 @@ struct SElevationOverlay {
     i8 cellOffsets[ELEVATION_OVERLAY_CELL_COUNT];
 };
 #pragma pack(pop)
-SIZE(SCmbtObstacle, 0xe);
-SIZE(SElevationOverlay, 0x11);
 
 H2_ENUM_BEGIN(GlobalConstant)
     HERO_TYPE_INITIAL_COUNT                 = IDX(FACTION_COUNT),

@@ -11,7 +11,6 @@ struct SLimitData {
     i32 top;
     i32 bottom;
 };
-SIZE(SLimitData, 0x10);
 
 #pragma pack(push, 1)
 class icon : public resource {
@@ -63,5 +62,4 @@ public:
     );
 };
 #pragma pack(pop)
-SIZE(icon, 0x16);
 #endif

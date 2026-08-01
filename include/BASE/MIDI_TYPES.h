@@ -21,6 +21,5 @@ typedef struct SMidiText {
     char filenameFormat[MIDI_TEXT_FILENAME_FORMAT_SLOT_SIZE];
 } SMidiText;
 
-SIZE(SMidiText, 0x40);
 
 #endif

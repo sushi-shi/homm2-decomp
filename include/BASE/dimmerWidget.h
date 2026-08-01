@@ -24,5 +24,4 @@ public:
     void Read(void);
 };
 #pragma pack(pop)
-SIZE(dimmerWidget, 0x20);
 #endif

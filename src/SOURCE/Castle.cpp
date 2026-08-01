@@ -99,7 +99,6 @@ H2_ENUM_BEGIN(CastleConstant)
     RACE_ICON_FRAMES             = 32
 H2_ENUM_END(CastleConstant)
 
-VA(0x0041d040, 0x10bb)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     widget* backgroundWidget19;
     i32 backgroundFrame6;
@@ -159,7 +158,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 
     message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    sprintf(iconName4, DATA_COMPGEN(0x004ef5f4, setupCastleCstlSIcn, "cstl%s.icn"), cHeroTypeShortName[IDX(m_town->m_type)]);
+    sprintf(iconName4, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
     message3.payload.widget.data.text = iconName4;
     for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
         message3.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slot7;
@@ -172,7 +171,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         if (castleSlotsUse[slot7] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
-                DATA_COMPGEN(0x004ef600, setupCastleMageGuildLevelD, "Mage Guild, Level %d"),
+                "Mage Guild, Level %d",
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
             );
@@ -241,7 +240,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
     message3.payload.widget.data.value = captainBuilt != 0;
     casWin->BroadcastMessage(message3);
-    sprintf(gText, DATA_COMPGEN(0x004ef618, setupCastleCSTLCAPCICN, "CSTLCAP%c.ICN"), cHeroTypeInitial[IDX(m_town->m_type)]);
+    sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[IDX(m_town->m_type)]);
     message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
     message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
     message3.payload.widget.data.text = gText;
@@ -262,16 +261,16 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     if (captainBuilt != 0) {
         message3.payload.widget.command = CASTLE_WIDGET_TEXT;
         message3.payload.widget.data.text = gText;
-        sprintf(gText, DATA_COMPGEN(0x004ef628, setupCastleEmptyString, ""));
+        sprintf(gText, "");
         for (slot7 = 0; slot7 < HERO_PRIMARY_STAT_COUNT; ++slot7) {
-            sprintf(statLine11, DATA_COMPGEN(0x004ef62c, setupCastleS, "%s\n"), gStatNames[slot7]);
+            sprintf(statLine11, "%s\n", gStatNames[slot7]);
             strcat(gText, statLine11);
         }
         message3.payload.widget.id = CONTROL_CAPTAIN_STATS;
         casWin->BroadcastMessage(message3);
-        sprintf(gText, DATA_COMPGEN(0x004ef630, setupCastleEmptyString2, ""));
+        sprintf(gText, "");
         for (slot7 = 0; slot7 < HERO_PRIMARY_STAT_COUNT; ++slot7) {
-            sprintf(statLine11, DATA_COMPGEN(0x004ef634, setupCastleD, "%d\n"), captainStats[IDX(m_town->m_type)][slot7]);
+            sprintf(statLine11, "%d\n", captainStats[IDX(m_town->m_type)][slot7]);
             strcat(gText, statLine11);
         }
         message3.payload.widget.id = CONTROL_CAPTAIN_VALUES;
@@ -335,7 +334,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
         message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
         sprintf(
             iconName4,
-            DATA_COMPGEN(0x004ef638, setupCastlePort04dIcn, "port%04d.icn"),
+            "port%04d.icn",
             IDX(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slot7)].m_portrait)
         );
         message3.payload.widget.data.text = iconName4;
@@ -362,7 +361,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     static_cast<i16>((row9 - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
-                    DATA_COMPGEN(0x004ef648, setupCastleObjntwbaIcn, "objntwba.icn"),
+                    "objntwba.icn",
                     static_cast<i16>(terrainIconFrame27 + backgroundFrame6),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
@@ -388,7 +387,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                     static_cast<i16>((row9 - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
-                    DATA_COMPGEN(0x004ef658, setupCastleObjntownIcn, "objntown.icn"),
+                    "objntown.icn",
                     static_cast<i16>(raceIconFrame + backgroundFrame6),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
@@ -407,7 +406,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 EXPANSION_OVERLAY_Y,
                 EXPANSION_OVERLAY_WIDTH,
                 EXPANSION_OVERLAY_HEIGHT,
-                DATA_COMPGEN(0x004ef668, setupCastleCaslxtraIcn, "caslxtra.icn"),
+                "caslxtra.icn",
                 0,
                 ICON_DRAW_NORMAL,
                 TOWN_WIDGET_ID_NONE,
@@ -421,7 +420,6 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 }
 
-VA(0x0041e0fb, 0xca3)
 MessageDispatchResult CastleHandler(tag_message& message) {
     i32 cannotRecruitHero;
     i32 hoverMessage;
@@ -537,7 +535,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
             case BUILDING_SLOT_SPECIAL_THIRTY:
                 if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
-                    sprintf(gText, DATA_COMPGEN(0x004ef678, castleHandlerCannotBuildAlreadyBuiltHereThis, "Cannot build.  Already built here this turn."));
+                    sprintf(gText, "Cannot build.  Already built here this turn.");
                 } else if (gpTownManager->m_town->m_buildings & BIT(buildSlot)) {
                     sprintf(
                         gText,
@@ -648,9 +646,9 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                         if (quickFlag) {
                             NormalDialog(
-                                DATA_COMPGEN(0x004ef6a8, castleHandlerSpreadFormationSpreadCombatFormationSpreads, "{Spread Formation}\n\n'Spread' combat formation spreads your "
+                                "{Spread Formation}\n\n'Spread' combat formation spreads your "
                                 "armies from the top to the bottom of the battlefield, with at "
-                                "least one empty space between each army."),
+                                "least one empty space between each army.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -671,8 +669,8 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                         if (quickFlag) {
                             NormalDialog(
-                                DATA_COMPGEN(0x004ef74c, castleHandlerGroupedFormationGroupedCombatFormationBunches, "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
-                                "army together in the center of your side of the battlefield."),
+                                "{Grouped Formation}\n\n'Grouped' combat formation bunches your "
+                                "army together in the center of your side of the battlefield.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -787,8 +785,8 @@ selection_done:
 
 // Retail castle building-slot order payload.
 // NOLINTBEGIN(readability-magic-numbers)
-DATA(0x004ef5e0) H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT] =
+H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT] =
     {19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12};
 // NOLINTEND(readability-magic-numbers)
-DATA(0x00525040) heroWindow* casWin;
-DATA(0x00525048) H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];
+heroWindow* casWin;
+H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];

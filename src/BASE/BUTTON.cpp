@@ -19,7 +19,6 @@ H2_ENUM_BEGIN(ButtonConstant)
     REPEAT_DELAY_TICKS     = 60
 H2_ENUM_END(ButtonConstant)
 
-VA(0x004dd440, 0x34)
 button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
@@ -29,7 +28,6 @@ button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_icon = NULL;
 }
 
-VA(0x004dd4c0, 0x6e)
 button::button(
     i16 x,
     i16 y,
@@ -52,7 +50,6 @@ button::button(
     m_hotkey = hotkey;
 }
 
-VA(0x004dd530, 0x7c)
 button::button(
     i16 x,
     i16 y,
@@ -76,7 +73,6 @@ button::button(
     m_hotkey = hotkey;
 }
 
-VA(0x004dd5b0, 0xeb)
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -96,7 +92,6 @@ void button::Read(void) {
     m_kind = gpResourceManager->ReadWord();
 }
 
-VA(0x004dd6a0, 0x21)
 inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
@@ -121,7 +116,6 @@ inline H2_ENUM_RETURN(MessageDispatchResult, i16)
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-VA(0x004dd6d0, 0x595)
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
@@ -231,7 +225,6 @@ normalEvent:
     return widget::Main(msg);
 }
 
-VA(0x004ddc70, 0x96)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = window->m_posX + m_x;
@@ -252,14 +245,12 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
     return MESSAGE_DISPATCH_FORWARD;
 }
 
-VA(0x004ddd10, 0x83)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
     return DeselectSelected(msg);
 }
 
 #undef SET_WIDGET_MESSAGE
 
-VA(0x004ddda0, 0x55)
 void button::Draw(void) {
     heroWindow* win = m_owner;
     if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
@@ -270,6 +261,5 @@ void button::Draw(void) {
 }
 
 
-VTBL(button, 0x004ebaf0);
 
-DATA(0x0052125c) MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;
+MessageModifier iLeftRightSave = MESSAGE_MODIFIER_NONE;

@@ -21,5 +21,4 @@ public:
     void Draw(i32);
 };
 #pragma pack(pop)
-SIZE(townObject, 0x18);
 #endif

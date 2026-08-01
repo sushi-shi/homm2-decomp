@@ -11,7 +11,7 @@
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
 
-DATA(0x0051fa70) static STextWidgetSourceFiles gTextWidgetSourceFiles =
+static STextWidgetSourceFiles gTextWidgetSourceFiles =
     {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
 H2_ENUM_BEGIN(TextWidgetConstant)
@@ -20,7 +20,6 @@ H2_ENUM_BEGIN(TextWidgetConstant)
     TEXT_BUFFER_GROWTH     = 5
 H2_ENUM_END(TextWidgetConstant)
 
-VA(0x004d1060, 0x3e)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_color = FONT_DRAW_DEFAULT;
     m_alignment = FONT_ALIGN_CENTER;
@@ -29,7 +28,6 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d10f0, 0x64)
 textWidget::textWidget(
     i16 x,
     i16 y,
@@ -51,7 +49,6 @@ textWidget::textWidget(
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d1160, 0xef)
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -72,7 +69,6 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
-VA(0x004d1250, 0x30)
 inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
@@ -84,7 +80,6 @@ inline textWidget::~textWidget() {
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.payload.widget.id = idValue
 
-VA(0x004d1280, 0x210)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
     H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
@@ -166,7 +161,6 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE
 
-VA(0x004d1490, 0x49)
 void textWidget::Draw(void) {
     FontDrawMode color = FONT_DRAW_DIMMED;
     if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
@@ -182,12 +176,10 @@ void textWidget::Draw(void) {
     );
 }
 
-VA(0x004d14e0, 0xc)
 void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
     m_color = color;
 }
 
-VA(0x004d14f0, 0xa2)
 void textWidget::SetText(char* text) {
     if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
         m_text = text;
@@ -206,6 +198,5 @@ void textWidget::SetText(char* text) {
 }
 
 
-VTBL(textWidget, 0x004eba50);
 
 #undef RETAIL_FILE

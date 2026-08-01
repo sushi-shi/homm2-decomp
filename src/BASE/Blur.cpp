@@ -101,12 +101,10 @@ typedef struct SBlurText {
     char newPaletteFreeSource[SOURCE_FILE_SLOT_SIZE];
 } SBlurText;
 
-SIZE(SBlurText, 0x100);
 
-DATA(0x0051fdc0) static SBlurText gBlurText =
+static SBlurText gBlurText =
     {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
-VA(0x004d28e0, 0x6a4)
 void DoBlur(
     bitmap* destination,
     bitmap* source,
@@ -385,9 +383,7 @@ void DoBlur(
     DelayMilli(
         static_cast<i32l>(
             gfCombatSpeedMod[gConfig.combatSpeed]
-            * DATA_COMPGEN(
-                0x004eba84, combatSpeedDelayMilliseconds, IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
-            )
+            * IDX(COMBAT_SPEED_DELAY_MILLISECONDS)
         )
     );
     gpWindowManager->SaveFizzleSource(0, 0, SCREEN_WIDTH, height);

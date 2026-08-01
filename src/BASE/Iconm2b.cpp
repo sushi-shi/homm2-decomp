@@ -8,15 +8,15 @@
 #include <BASE/IconMonoRle.h>
 #include <string.h>
 
-DATA(0x00534be8) static i32 s_clipB;
-DATA(0x00534be4) static i32 s_y;
-DATA(0x00534bec) static i32 s_x;
-DATA(0x00534bdc) static i32 s_left;
-DATA(0x00534be0) static u32 s_run;
-DATA(0x00534bd0) static u8* s_row;
-DATA(0x00534bd8) static u8* s_src;
-DATA(0x00534bd4) static IconEntry* s_entry;
-DATA(0x00534bcc) static i32 s_clipR;
+static i32 s_clipB;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static u32 s_run;
+static u8* s_row;
+static u8* s_src;
+static IconEntry* s_entry;
+static i32 s_clipR;
 
 static inline i32 MonoNeedsClipping(
     IconEntry* entry,
@@ -39,7 +39,6 @@ static inline u8* MonoInitialRow(bitmap* dest, i16 pitch, i32 currentY) {
     return dest->m_pixels + currentY * pitch;
 }
 
-VA(0x004cfae0, 0x266)
 void MonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

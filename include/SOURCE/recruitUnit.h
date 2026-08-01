@@ -45,7 +45,6 @@ public:
     void Update(void);
 };
 #pragma pack(pop)
-SIZE(recruitUnit, 0x7e);
 extern HMENU hmnuRecruitSave;
 
 #endif

@@ -11,6 +11,5 @@ struct SSampleSourceFiles {
     char midiAllocation[sizeof(SAMPLE_SOURCE_FILE)];
     char midiDestruction[sizeof(SAMPLE_SOURCE_FILE)];
 };
-SIZE(SSampleSourceFiles, 0xa0);
 
 #endif

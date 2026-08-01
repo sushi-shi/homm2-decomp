@@ -153,7 +153,6 @@ public:
     }
 };
 #pragma pack(pop)
-SIZE(army, 0x482);
 extern i32 bSecondAttack;
 extern b32 gbGenieHalf;
 

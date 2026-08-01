@@ -52,7 +52,6 @@ struct SNetPlayerInfo {
     char reserved[NET_PLAYER_INFO_RESERVED_SIZE];
 };
 #pragma pack(pop)
-SIZE(SNetPlayerInfo, 34);
 
 // stpnet2.bin protocol picker: 1=IPX (rides DirectPlay), 2=TCP (rides Winsock),
 // 3=modem, 4=direct connect; NT dims options 1 and 3.

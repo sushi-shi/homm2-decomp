@@ -50,7 +50,6 @@ struct SBolt {
     float distanceRatio;
     i32 forceAngle;
 };
-SIZE(SBolt, 0x78);
 struct tag_message;
 
 H2_ENUM_CLASS_BEGIN(CombatCastleHex)
@@ -822,7 +821,6 @@ public:
     i32 WalkTowardArmy(class army*, H2_ENUM_PARAM(CombatSide, i32), i32);
 };
 #pragma pack(pop)
-SIZE(combatManager, 0xf877);
 extern i32 bGridWasShowing;
 extern b32 gbInDrawSmallView;
 extern H2_ENUM_STORAGE(CombatSide, i32) iViewGeneralWhichSide;

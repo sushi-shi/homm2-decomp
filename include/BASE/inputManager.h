@@ -141,7 +141,6 @@ public:
     void ForceMouseMove(void);
 };
 #pragma pack(pop)
-SIZE(inputManager, 0x86a);
 extern i32 iCurSwapPalette;
 extern i32 bLastMouseOffscreen;
 extern i32 bLastOnscreenMouseColor;

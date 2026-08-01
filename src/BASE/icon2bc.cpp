@@ -7,23 +7,23 @@
 #include <SOURCE/dimPalette.h>
 #include <string.h>
 
-DATA(0x00534cc4) static i32 s_clipB;
-DATA(0x00534cd0) static u32 s_loopCount;
-DATA(0x00534ca8) static i32 s_pitch;
-DATA(0x00534cb4) static i32 s_y;
-DATA(0x00534cb0) static i32 s_x;
-DATA(0x00534ce0) static i32 s_left;
-DATA(0x00534ce8) static u32 s_run;
-DATA(0x00534cc0) static u8* s_dimPal;
-DATA(0x00534cbc) static u8* s_row;
-DATA(0x00534cd4) static u8* s_dst;
-DATA(0x00534ccc) static u8* s_literalSource;
-DATA(0x00534cd8) static u8* s_src;
-DATA(0x00534cb8) static IconEntry* s_entry;
-DATA(0x00534cac) static u32 s_spanCount;
-DATA(0x00534ce4) static u8 s_color;
-DATA(0x00534cdc) static u32 s_dimLen;
-DATA(0x00534cc8) static i32 s_clipR;
+static i32 s_clipB;
+static u32 s_loopCount;
+static i32 s_pitch;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static u32 s_run;
+static u8* s_dimPal;
+static u8* s_row;
+static u8* s_dst;
+static u8* s_literalSource;
+static u8* s_src;
+static IconEntry* s_entry;
+static u32 s_spanCount;
+static u8 s_color;
+static u32 s_dimLen;
+static i32 s_clipR;
 
 static inline u8* ColorTableDimPixel(u8* dst, u8* palette, i32 dimGate) {
     if (dimGate != 0)
@@ -35,7 +35,6 @@ static inline u8* ColorTableOutsideSource(u8* src, i32 currentX, i32 clipX) {
     return src + (clipX - currentX);
 }
 
-VA(0x004d32a0, 0x5af)
 void IconToBitmapColorTable(
     class icon* srcIcon,
     class bitmap* dest,

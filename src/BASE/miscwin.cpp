@@ -17,7 +17,6 @@ H2_ENUM_BEGIN(VesaBlitConstant)
     NET_BOX_TOP          = 411
 H2_ENUM_END(VesaBlitConstant)
 
-VA(0x004d8540, 0x1e2)
 extern "C" void __fastcall BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
     i32 sourceX,
@@ -78,14 +77,13 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
         (destinationY + height) * iMainWinScreenHeight / VESA_SCREEN_HEIGHT - 1;
 
     if (InvalidateRect(hwndApp, &invalidRect, 0) == 0)
-        LogStr(DATA_COMPGEN(0x00520cc0, blitBitmapToScreenVesaInvalidateRectFailed, "InvalidateRect Failed"));
+        LogStr("InvalidateRect Failed");
     if (UpdateWindow(hwndApp) == 0)
-        LogStr(DATA_COMPGEN(0x00520cd8, blitBitmapToScreenVesaUpdateWindowFailed, "UpdateWindow Failed"));
+        LogStr("UpdateWindow Failed");
 }
 
-VA(0x004d8730, 0x4)
 i16 AutoInitSVGA(void) {
     return 0;
 }
 
-DATA(0x00538080) struct tagPAINTSTRUCT ps;
+struct tagPAINTSTRUCT ps;

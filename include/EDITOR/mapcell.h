@@ -99,7 +99,6 @@ struct mapCellExtra {
     u8 overlayIndex;
 };
 #pragma pack(pop)
-SIZE(mapCellExtra, 7);
 
 class mapCell {
 public:
@@ -142,7 +141,6 @@ public:
         return (m_flags & IDX(flag)) != 0;
     }
 };
-SIZE(mapCell, 12);
 
 // Legacy on-disk record sizes used by fullMap::Read's conversion path.
 struct oldMapCell {

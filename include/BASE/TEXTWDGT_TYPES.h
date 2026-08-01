@@ -14,6 +14,5 @@ typedef struct STextWidgetSourceFiles {
     char resizeAlloc[TEXT_WIDGET_SOURCE_FILE_SLOT_SIZE];
 } STextWidgetSourceFiles;
 
-SIZE(STextWidgetSourceFiles, 0xb0);
 
 #endif

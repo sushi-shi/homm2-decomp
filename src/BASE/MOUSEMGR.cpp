@@ -26,24 +26,24 @@ H2_ENUM_BEGIN(MouseManagerLocalConstant)
     RESOURCE_NAME_CAPACITY = 16
 H2_ENUM_END(MouseManagerLocalConstant)
 
-DATA(0x00533238) static i32 gOldMouseRight;
-DATA(0x00533240) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-DATA(0x00533b40) static POINT gMouseScreenPt; // GetCursorPos scratch (mouseManager::MouseCoords)
-DATA(0x00533b48) static POINT
+static i32 gOldMouseRight;
+BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
+static POINT gMouseScreenPt; // GetCursorPos scratch (mouseManager::MouseCoords)
+static POINT
     gMouseCheckPt; // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
-DATA(0x00533b50) static i32 gOldMouseTop;
-DATA(0x00533b58) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-DATA(0x00533cd8) void* cAndBits[MOUSE_CURSOR_COUNT];
-DATA(0x00533e58) void* cColorBits[MOUSE_CURSOR_COUNT];
-DATA(0x00533fd8) static i32 gOldMouseBottom;
-DATA(0x00533fdc) static i32 gOldMouseLeft;
-DATA(0x00533fe0) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
-DATA(0x00534760) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
+static i32 gOldMouseTop;
+HICON hMouseCursor[MOUSE_CURSOR_COUNT];
+void* cAndBits[MOUSE_CURSOR_COUNT];
+void* cColorBits[MOUSE_CURSOR_COUNT];
+static i32 gOldMouseBottom;
+static i32 gOldMouseLeft;
+ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
+HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
 
-DATA(0x0051ebc8) i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57, 0};
+i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57, 0};
 // Per-cursor bitmap {width, height} pairs.
-DATA(0x0051ebd8) i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
+i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {15, 21}, {22, 21}, {24, 20}, {24, 24}, {30, 25}, {24, 24}, {24, 24}, {19, 23}, {15, 20},
     {30, 30}, {32, 26}, {31, 25}, {30, 25}, {24, 24}, {22, 21}, {31, 31}, {32, 26}, {31, 25},
     {30, 25}, {24, 24}, {22, 21}, {31, 31}, {32, 26}, {32, 25}, {32, 25}, {27, 24}, {25, 22},
@@ -59,7 +59,7 @@ DATA(0x0051ebd8) i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
 // Per-cursor {x, y} click-point offsets inside the bitmap; fed to ICONINFO
 // xHotspot/yHotspot and the software draw position. -1 = default to center
 // (patched to iMouseSize/2 in Open).
-DATA(0x0051ec98) i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
+i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {2, 3},   {2, 3},   {12, 11}, {12, 13}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},
     {15, 15}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},   {15, 15}, {15, 11}, {10, 10},
     {12, 13}, {9, 12},  {7, 9},   {15, 15}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},
@@ -72,10 +72,10 @@ DATA(0x0051ec98) i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1},
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}
 };
-DATA(0x0051ed58) b32 gbInSetPointer = false;
-DATA(0x0051ed5c) i32 bInNewMouseUpdate = 0;
+b32 gbInSetPointer = false;
+i32 bInNewMouseUpdate = 0;
 
-DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
+static SMouseManagerStrings gMouseManagerStrings = {
     {MOUSE_MANAGER_NAME},
     {MOUSE_MANAGER_SOURCE_FILE},
     {MOUSE_MANAGER_SOURCE_FILE},
@@ -95,7 +95,6 @@ DATA(0x0051ed60) static SMouseManagerStrings gMouseManagerStrings = {
 };
 
 
-VA(0x004c9270, 0xd9)
 mouseManager::mouseManager(void) : baseManager() {
     i32 i;
     m_savedUnderlying = NULL;
@@ -124,7 +123,6 @@ mouseManager::mouseManager(void) : baseManager() {
     m_hideCount = 1;
 }
 
-VA(0x004c9350, 0x94)
 i32 mouseManager::Open(i32 priority) {
     m_forcePointerUpdate = 0;
     m_savedUnderlying =
@@ -147,7 +145,6 @@ i32 mouseManager::Open(i32 priority) {
     return 0;
 }
 
-VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
     if (m_active == 1) {
@@ -184,12 +181,10 @@ void mouseManager::Close(void) {
     }
 }
 
-VA(0x004c94e0, 0x5)
 MessageDispatchResult mouseManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
-VA(0x004c94f0, 0x135)
 void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
     if (m_forcePointerUpdate == 0) {
         gbPutzingWithMouseCtr++;
@@ -229,7 +224,6 @@ void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType)
     }
 }
 
-VA(0x004c9630, 0x405)
 void mouseManager::SetPointer(i32 frame) {
     if (m_forcePointerUpdate != 0)
         return;
@@ -353,7 +347,6 @@ void mouseManager::SetPointer(i32 frame) {
     gbPutzingWithMouseCtr--;
 }
 
-VA(0x004c9a40, 0x47a)
 void mouseManager::NewUpdate(i32 force) {
     i32 width;
     i32 height;
@@ -509,7 +502,6 @@ updateDone:
     gbPutzingWithMouseCtr--;
 }
 
-VA(0x004c9ec0, 0x56)
 void mouseManager::MouseCoords(i32& x, i32& y) {
     GetCursorPos(&gMouseScreenPt);
     ScreenToClient(hwndApp, &gMouseScreenPt);
@@ -517,7 +509,6 @@ void mouseManager::MouseCoords(i32& x, i32& y) {
     y = (gMouseScreenPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
 }
 
-VA(0x004c9f20, 0xa2)
 void mouseManager::SaveAndDraw(void) {
     m_savedWidth =
         m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] > MOUSE_SCREEN_WIDTH
@@ -551,7 +542,6 @@ void mouseManager::SaveAndDraw(void) {
     );
 }
 
-VA(0x004c9fd0, 0x29)
 void mouseManager::RestoreUnderlying(void) {
     m_savedUnderlying->CopyToCareful(
         gpWindowManager->m_screen,
@@ -564,7 +554,6 @@ void mouseManager::RestoreUnderlying(void) {
     );
 }
 
-VA(0x004ca000, 0x2c)
 void mouseManager::ReallyHidePointer(void) {
     if (gbColorMice != 0) {
         m_hideCount++;
@@ -575,7 +564,6 @@ void mouseManager::ReallyHidePointer(void) {
     }
 }
 
-VA(0x004ca030, 0xb9)
 void mouseManager::ReallyShowPointer(void) {
     if (gbColorMice != 0) {
         if (m_hideCount > 0 && --m_hideCount == 0) {
@@ -597,14 +585,12 @@ void mouseManager::ReallyShowPointer(void) {
     }
 }
 
-VA(0x004ca0f0, 0x1a)
 void mouseManager::HideColorPointer(void) {
     m_hideCount++;
     if (m_hideCount == 1)
         NewUpdate(1);
 }
 
-VA(0x004ca110, 0x98)
 void mouseManager::ShowColorPointer(void) {
     if (m_hideCount > 0 && --m_hideCount == 0) {
         gbPutzingWithMouseCtr++;
@@ -622,12 +608,10 @@ void mouseManager::ShowColorPointer(void) {
     }
 }
 
-VA(0x004ca1b0, 0xc)
 i32 mouseManager::IsVis(void) {
     return m_hideCount == 0;
 }
 
-VA(0x004ca1c0, 0x66)
 void mouseManager::CheckUpdateMousePos(void) {
     if (gbColorMice != 0) {
         GetCursorPos(&gMouseCheckPt);
@@ -640,7 +624,6 @@ void mouseManager::CheckUpdateMousePos(void) {
     }
 }
 
-VA(0x004ca230, 0x191)
 void mouseManager::SetColorMice(i32 enabled) {
     if (enabled != gbColorMice) {
         i32 savedWM56 = gpWindowManager->m_updateFlags;
@@ -691,4 +674,3 @@ void mouseManager::SetColorMice(i32 enabled) {
 }
 
 
-VTBL(mouseManager, 0x004eba00);

@@ -7,17 +7,16 @@ H2_ENUM_BEGIN(BitmapDimConstant)
     DIM_PALETTE_LEVEL_STRIDE = 256
 H2_ENUM_END(BitmapDimConstant)
 
-DATA(0x005348f0) static i32 gFillRow;
-DATA(0x005348f8) static u8* gFillPtr;
-DATA(0x005348e8) static i32 gDimRow;
-DATA(0x005348e4) static i32 gDimCol;
-DATA(0x005348f4) static u8* gDimPtr;
-DATA(0x00534900) static u8* gDimNext;
-DATA(0x005348ec) static u8* gBlitSrc;
-DATA(0x005348e0) static u8* gBlitDst;
-DATA(0x005348fc) static i32 gBlitRow;
+static i32 gFillRow;
+static u8* gFillPtr;
+static i32 gDimRow;
+static i32 gDimCol;
+static u8* gDimPtr;
+static u8* gDimNext;
+static u8* gBlitSrc;
+static u8* gBlitDst;
+static i32 gBlitRow;
 
-VA(0x004ca3d0, 0x80)
 void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
     gFillRow = 0;
@@ -30,7 +29,6 @@ void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     }
 }
 
-VA(0x004ca450, 0x114)
 void FillBitmapAreaClip(
     class bitmap* bmp,
     i32 x,
@@ -70,7 +68,6 @@ void FillBitmapAreaClip(
     }
 }
 
-VA(0x004ca570, 0xa6)
 void BlitBitmap(
     class bitmap* src,
     i32 sx,
@@ -94,7 +91,6 @@ void BlitBitmap(
     }
 }
 
-VA(0x004ca620, 0xa8)
 void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     gDimPtr = bmp->m_pixels + bmp->m_width * y + x;
     for (gDimRow = 0; gDimRow < h; gDimRow++) {

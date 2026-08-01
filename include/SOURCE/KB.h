@@ -131,7 +131,6 @@ struct SCampaignChoice {
     i16 amount;
 };
 #pragma pack(pop)
-SIZE(SCampaignChoice, 5);
 
 extern SCampaignChoice campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT]
                                       [CAMPAIGN_BONUS_CHOICE_COUNT];
@@ -147,7 +146,6 @@ struct SPlayerExit {
     i8 hostReported;
     i8 continueGame;
 };
-SIZE(SPlayerExit, 7);
 
 H2_ENUM_BEGIN(EventWindowConstant)
     EVENT_WINDOW_RESOURCE_FLAG          = 0x200,
@@ -288,7 +286,6 @@ struct HighScoreEntry {
     char reserved[HIGH_SCORE_RESERVED_SIZE];
 };
 #pragma pack(pop)
-SIZE(HighScoreEntry, 100);
 
 H2_ENUM_BEGIN(AppMenuCommand)
     APP_MENU_NONE            = 0,
@@ -402,13 +399,11 @@ struct OldMainNetSetup {
     SNetPlayerInfo players[OLD_MAIN_PLAYER_COUNT];
 };
 #pragma pack(pop)
-SIZE(OldMainNetSetup, 0xd4);
 
 union OldMainNetBuffer {
     OldMainNetSetup setup;
     char bytes[OLD_MAIN_NET_BUFFER_SIZE];
 };
-SIZE(OldMainNetBuffer, OLD_MAIN_NET_BUFFER_SIZE);
 
 #pragma pack(push, 1)
 struct KbRemotePacket {
@@ -428,7 +423,6 @@ struct KbRemotePacket {
     } payload;
 };
 #pragma pack(pop)
-SIZE(KbRemotePacket, 0xdd);
 
 H2_ENUM_BEGIN(AppMenuConstant)
     APP_MENU_CHECKED             = 8,

@@ -7,16 +7,16 @@
 #include <BASE/bitmap.h>
 #include <string.h>
 
-DATA(0x005381a4) static i32 s_clipB;
-DATA(0x005381ac) static i32 s_y;
-DATA(0x0053819c) static i32 s_x;
-DATA(0x005381a0) static i32 s_left;
-DATA(0x005381b4) static i32 s_right;
-DATA(0x00538190) static u32 s_run;
-DATA(0x005381a8) static u8* s_row;
-DATA(0x00538194) static u8* s_src;
-DATA(0x00538198) static IconEntry* s_entry;
-DATA(0x005381b0) static i32 s_clipR;
+static i32 s_clipB;
+static i32 s_y;
+static i32 s_x;
+static i32 s_left;
+static i32 s_right;
+static u32 s_run;
+static u8* s_row;
+static u8* s_src;
+static IconEntry* s_entry;
+static i32 s_clipR;
 
 static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch, i32 currentY) {
     return dest->m_pixels + currentY * pitch;
@@ -26,7 +26,6 @@ static inline i32 FlipMonoRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) 
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
-VA(0x004da800, 0x212)
 void FlipMonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

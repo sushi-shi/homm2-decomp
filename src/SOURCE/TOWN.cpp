@@ -11,7 +11,6 @@
 #include <SOURCE/hero.h>
 #include <SOURCE/town.h>
 #include <SOURCE/townManager.h>
-VA(0x00432c00, 0x65)
 town::town(void) {
     m_type = FACTION_KNIGHT;
     m_id = 0;
@@ -24,7 +23,6 @@ town::town(void) {
     m_unknown1d = 0;
 }
 
-VA(0x00432c65, 0x54)
 i32 town::HasGarrison(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_army.m_creatureTypes[slot] != CREATURE_NONE)
@@ -33,7 +31,6 @@ i32 town::HasGarrison(void) {
     return 0;
 }
 
-VA(0x00432cb9, 0x111)
 void town::GiveSpells(hero* targetHero) {
     hero* activeHero;
     i32 level;
@@ -61,7 +58,6 @@ void town::GiveSpells(hero* targetHero) {
     }
 }
 
-VA(0x00432dca, 0xaa)
 void town::XformToCastle(void) {
     i32 objectType;
     gpGame->ConvertObject(
@@ -92,7 +88,6 @@ void town::XformToCastle(void) {
     );
 }
 
-VA(0x00432e74, 0xe0)
 void town::View(i32 noFade) {
     bEnteringTown = 1;
     if (giHighMemBuffer + TOWN_VIEW_MEMORY_REQUIREMENT > TOWN_VIEW_HIGH_MEMORY_LIMIT)
@@ -111,7 +106,6 @@ void town::View(i32 noFade) {
     bEnteringTown = 0;
 }
 
-VA(0x00432f54, 0x14d)
 void town::Deallocate(void) {
     playerData* playerRecord = &gpGame->m_players[m_owner];
     i32 position = TOWN_ID_NONE;
@@ -137,7 +131,6 @@ void town::Deallocate(void) {
     m_owner = TOWN_OWNER_NONE;
 }
 
-VA(0x004330a1, 0x23e)
 void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 level;
     if (building == BUILDING_SLOT_MAGE_GUILD) {
@@ -193,12 +186,10 @@ void town::BuildBuilding(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     BitSet(gpGame->m_knownTowns, m_id);
 }
 
-VA(0x004332df, 0x36)
 i32 town::CanBuildDock(void) {
     return m_boatX != TOWN_DOCK_COORDINATE_NONE;
 }
 
-VA(0x00433315, 0x9f)
 void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     *mageGuildLevel = m_buildState;
     *numArchers = 0;
@@ -215,4 +206,4 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     }
 }
 
-DATA(0x004f11b0) i32 bEnteringTown = 0;
+i32 bEnteringTown = 0;

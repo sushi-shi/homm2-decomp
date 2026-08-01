@@ -30,9 +30,8 @@ H2_ENUM_BEGIN(IconDrawExtentConstant)
 H2_ENUM_END(IconDrawExtentConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
-VA(0x004c7a20, 0x67)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
-    DATA(0x0051e94c) static char allocationSourceFile[] = RETAIL_FILE;
+    static char allocationSourceFile[] = RETAIL_FILE;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
@@ -41,13 +40,11 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
-VA(0x004c7ad0, 0x21)
 inline icon::~icon() {
-    DATA(0x0051e974) static char destructionSourceFile[] = RETAIL_FILE;
+    static char destructionSourceFile[] = RETAIL_FILE;
     H2_FREE_AT(m_data, destructionSourceFile, 0x1a);
 }
 
-VA(0x004c7b00, 0x44)
 void icon::DrawToBuffer(
     i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
 ) {
@@ -82,7 +79,6 @@ void icon::DrawToBuffer(
     );
 }
 
-VA(0x004c7b50, 0x2bb)
 IconDrawResult icon::CombatClipDrawToBuffer(
     i32 x,
     i32 y,
@@ -255,7 +251,6 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     return ICON_DRAW_COMPLETED;
 }
 
-VA(0x004c7e10, 0x3d)
 void icon::ClipFillToBuffer(
     i32 x,
     i32 y,
@@ -282,7 +277,6 @@ void icon::ClipFillToBuffer(
     );
 }
 
-VA(0x004c7e50, 0x103)
 void icon::FillToBuffer(
     i32 x,
     i32 y,
@@ -331,7 +325,6 @@ void icon::FillToBuffer(
     );
 }
 
-VA(0x004c7f60, 0x3e)
 void icon::DimToBuffer(
     i32 x, i32 y, i32 frame, H2_ENUM_PARAM(IconDrawOrientation, i32) orientation
 ) {
@@ -367,6 +360,5 @@ void icon::DimToBuffer(
 }
 
 
-VTBL(icon, 0x004eb9e8);
 
 #undef RETAIL_FILE

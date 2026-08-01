@@ -128,7 +128,6 @@ public:
     void MIDIPoll(void);
 };
 #pragma pack(pop)
-SIZE(soundManager, 0x6ae);
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];

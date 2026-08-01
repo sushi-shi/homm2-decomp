@@ -25,7 +25,6 @@ struct WinsockStartupMessage {
     i32 playerAddresses[WS_TRANSPORT_PLAYER_COUNT];
 };
 #pragma pack(pop)
-SIZE(WinsockStartupMessage, 0x1a);
 
 i16 wsnet_init(void);
 void wsnet_term(void);

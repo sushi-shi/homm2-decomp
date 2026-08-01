@@ -38,13 +38,12 @@ H2_ENUM_END(ComSerialConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
-DATA(0x004f843c) static i16 s_comTermSourceLineBase = 199;
-DATA(0x004f84d8) static i16 s_comSendSourceLineBase = 247;
-DATA(0x004f8540) static i16 s_comWriteSourceLineBase = 310;
-DATA(0x005284b8) static ComPortState s_comPorts[PORT_COUNT];
+static i16 s_comTermSourceLineBase = 199;
+static i16 s_comSendSourceLineBase = 247;
+static i16 s_comWriteSourceLineBase = 310;
+static ComPortState s_comPorts[PORT_COUNT];
 
 
-VA(0x0048a640, 0x74)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     node->next = NULL;
     node->prev = node->next;
@@ -58,7 +57,6 @@ void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     }
 }
 
-VA(0x0048a6b4, 0x4c)
 struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     tag_Node* node = anchor->head;
     if (node != NULL)
@@ -68,13 +66,11 @@ struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     return node;
 }
 
-VA(0x0048a700, 0x2e)
 void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->head = NULL;
     anchor->tail = NULL;
 }
 
-VA(0x0048a72e, 0x3e5)
 void ShutdownComError(char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
@@ -82,61 +78,61 @@ void ShutdownComError(char* function) {
 
     switch (error) {
         case ERROR_INVALID_FUNCTION:
-            strcpy(errorName, DATA_COMPGEN(0x004f81ac, shutdownComErrorERRORINVALIDFUNCTION, "ERROR_INVALID_FUNCTION    "));
+            strcpy(errorName, "ERROR_INVALID_FUNCTION    ");
             break;
         case ERROR_FILE_NOT_FOUND:
-            strcpy(errorName, DATA_COMPGEN(0x004f81c8, shutdownComErrorERRORFILENOTFOUND, "ERROR_FILE_NOT_FOUND      "));
+            strcpy(errorName, "ERROR_FILE_NOT_FOUND      ");
             break;
         case ERROR_PATH_NOT_FOUND:
-            strcpy(errorName, DATA_COMPGEN(0x004f81e4, shutdownComErrorERRORPATHNOTFOUND, "ERROR_PATH_NOT_FOUND      "));
+            strcpy(errorName, "ERROR_PATH_NOT_FOUND      ");
             break;
         case ERROR_TOO_MANY_OPEN_FILES:
-            strcpy(errorName, DATA_COMPGEN(0x004f8200, shutdownComErrorERRORTOOMANYOPENFILES, "ERROR_TOO_MANY_OPEN_FILES "));
+            strcpy(errorName, "ERROR_TOO_MANY_OPEN_FILES ");
             break;
         case ERROR_ACCESS_DENIED:
-            strcpy(errorName, DATA_COMPGEN(0x004f821c, shutdownComErrorERRORACCESSDENIED, "ERROR_ACCESS_DENIED       "));
+            strcpy(errorName, "ERROR_ACCESS_DENIED       ");
             break;
         case ERROR_INVALID_HANDLE:
-            strcpy(errorName, DATA_COMPGEN(0x004f8238, shutdownComErrorERRORINVALIDHANDLE, "ERROR_INVALID_HANDLE      "));
+            strcpy(errorName, "ERROR_INVALID_HANDLE      ");
             break;
         case ERROR_ARENA_TRASHED:
-            strcpy(errorName, DATA_COMPGEN(0x004f8254, shutdownComErrorERRORARENATRASHED, "ERROR_ARENA_TRASHED       "));
+            strcpy(errorName, "ERROR_ARENA_TRASHED       ");
             break;
         case ERROR_NOT_ENOUGH_MEMORY:
-            strcpy(errorName, DATA_COMPGEN(0x004f8270, shutdownComErrorERRORNOTENOUGHMEMORY, "ERROR_NOT_ENOUGH_MEMORY   "));
+            strcpy(errorName, "ERROR_NOT_ENOUGH_MEMORY   ");
             break;
         case ERROR_INVALID_BLOCK:
-            strcpy(errorName, DATA_COMPGEN(0x004f828c, shutdownComErrorERRORINVALIDBLOCK, "ERROR_INVALID_BLOCK       "));
+            strcpy(errorName, "ERROR_INVALID_BLOCK       ");
             break;
         case ERROR_BAD_ENVIRONMENT:
-            strcpy(errorName, DATA_COMPGEN(0x004f82a8, shutdownComErrorERRORBADENVIRONMENT, "ERROR_BAD_ENVIRONMENT     "));
+            strcpy(errorName, "ERROR_BAD_ENVIRONMENT     ");
             break;
         case ERROR_BAD_FORMAT:
-            strcpy(errorName, DATA_COMPGEN(0x004f82c4, shutdownComErrorERRORBADFORMAT, "ERROR_BAD_FORMAT          "));
+            strcpy(errorName, "ERROR_BAD_FORMAT          ");
             break;
         case ERROR_INVALID_ACCESS:
-            strcpy(errorName, DATA_COMPGEN(0x004f82e0, shutdownComErrorERRORINVALIDACCESS, "ERROR_INVALID_ACCESS      "));
+            strcpy(errorName, "ERROR_INVALID_ACCESS      ");
             break;
         case ERROR_INVALID_DATA:
-            strcpy(errorName, DATA_COMPGEN(0x004f82fc, shutdownComErrorERRORINVALIDDATA, "ERROR_INVALID_DATA        "));
+            strcpy(errorName, "ERROR_INVALID_DATA        ");
             break;
         case ERROR_INVALID_DRIVE:
-            strcpy(errorName, DATA_COMPGEN(0x004f8318, shutdownComErrorERRORINVALIDDRIVE, "ERROR_INVALID_DRIVE       "));
+            strcpy(errorName, "ERROR_INVALID_DRIVE       ");
             break;
         case ERROR_CURRENT_DIRECTORY:
-            strcpy(errorName, DATA_COMPGEN(0x004f8334, shutdownComErrorERRORCURRENTDIRECTORY, "ERROR_CURRENT_DIRECTORY   "));
+            strcpy(errorName, "ERROR_CURRENT_DIRECTORY   ");
             break;
         case ERROR_NOT_SAME_DEVICE:
-            strcpy(errorName, DATA_COMPGEN(0x004f8350, shutdownComErrorERRORNOTSAMEDEVICE, "ERROR_NOT_SAME_DEVICE     "));
+            strcpy(errorName, "ERROR_NOT_SAME_DEVICE     ");
             break;
         case ERROR_NO_MORE_FILES:
-            strcpy(errorName, DATA_COMPGEN(0x004f836c, shutdownComErrorERRORNOMOREFILES, "ERROR_NO_MORE_FILES       "));
+            strcpy(errorName, "ERROR_NO_MORE_FILES       ");
             break;
         case ERROR_ALREADY_EXISTS:
-            strcpy(errorName, DATA_COMPGEN(0x004f8388, shutdownComErrorERRORALREADYEXISTS, "ERROR_ALREADY_EXISTS      "));
+            strcpy(errorName, "ERROR_ALREADY_EXISTS      ");
             break;
         default:
-            strcpy(errorName, DATA_COMPGEN(0x004f83a4, shutdownComErrorUNKNOWNERROR, "UNKNOWN_ERROR             "));
+            strcpy(errorName, "UNKNOWN_ERROR             ");
             break;
     }
 
@@ -149,7 +145,6 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
-VA(0x0048ab13, 0x34a)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
     BOOL success;
@@ -166,11 +161,11 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     if (portIndex >= PORT_COUNT)
         return -1;
 
-    wsprintfA(portName, DATA_COMPGEN(0x004f83c0, comInitCOMD, "COM%d"), portNumber);
+    wsprintfA(portName, "COM%d", portNumber);
     s_comPorts[portIndex].handle =
         CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE) {
-        sprintf(gText, DATA_COMPGEN(0x004f83c8, comInitOpeningCOMD, "Opening COM%d"), portNumber);
+        sprintf(gText, "Opening COM%d", portNumber);
         ShutdownComError(gText);
         return -1;
     }
@@ -220,10 +215,10 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     success =
         SetupComm(s_comPorts[portIndex].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
     if (success == 0)
-        ShutdownComError(DATA_COMPGEN(0x004f83d8, comInitInitializeCommunicationsParamaters, "Initialize communications paramaters"));
+        ShutdownComError("Initialize communications paramaters");
     success = SetCommState(s_comPorts[portIndex].handle, &portState);
     if (success == 0)
-        ShutdownComError(DATA_COMPGEN(0x004f8400, comInitConfigureCommunicationsDevice, "Configure communications device"));
+        ShutdownComError("Configure communications device");
 
     commTimeouts.ReadIntervalTimeout = MAXDWORD;
     commTimeouts.ReadTotalTimeoutConstant = 0;
@@ -232,14 +227,13 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     commTimeouts.WriteTotalTimeoutMultiplier = 0;
     success = SetCommTimeouts(s_comPorts[portIndex].handle, &commTimeouts);
     if (success == 0)
-        ShutdownComError(DATA_COMPGEN(0x004f8420, comInitSetCommunicationsTimeouts, "Set communications timeouts"));
+        ShutdownComError("Set communications timeouts");
 
     init_anchor(&s_comPorts[portIndex].normalQueue, 1, 0);
     init_anchor(&s_comPorts[portIndex].priorityQueue, 1, 0);
     return static_cast<i16>(portIndex);
 }
 
-VA(0x0048ae5d, 0x11d)
 void com_term(i16 portIndex) {
     tag_Node* node;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
@@ -249,13 +243,12 @@ void com_term(i16 portIndex) {
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
         while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != NULL)
-            H2_FREE_AT(node, DATA_COMPGEN(0x004f8440, com_termSourceFile, RETAIL_FILE), s_comTermSourceLineBase + 13);
+            H2_FREE_AT(node, RETAIL_FILE, s_comTermSourceLineBase + 13);
         while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != NULL)
-            H2_FREE_AT(node, DATA_COMPGEN(0x004f846c, com_termSourceFile2, RETAIL_FILE), s_comTermSourceLineBase + 17);
+            H2_FREE_AT(node, RETAIL_FILE, s_comTermSourceLineBase + 17);
     }
 }
 
-VA(0x0048af7a, 0xdd)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     COMSTAT status;
     DWORD commErrors;
@@ -266,7 +259,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
         result = ClearCommError(s_comPorts[portIndex].handle, &commErrors, &status);
         if (result == 0)
-            ShutdownComError(DATA_COMPGEN(0x004f8498, comRcvClearCommunicationsErrorQueue, "Clear communications error queue"));
+            ShutdownComError("Clear communications error queue");
         if (status.cbInQue <= requested)
             count = status.cbInQue;
         else
@@ -280,14 +273,13 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
                 NULL
             );
             if (result == 0)
-                ShutdownComError(DATA_COMPGEN(0x004f84bc, comRcvReadCommunicationsData, "Read communications data"));
+                ShutdownComError("Read communications data");
             return bytesRead[0];
         }
     }
     return 0;
 }
 
-VA(0x0048b057, 0x145)
 i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     BOOL result;
     tag_Node* sendNode;
@@ -296,15 +288,15 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
         if (length == 0) {
             result = SetCommBreak(s_comPorts[portIndex].handle);
             if (result == 0)
-                ShutdownComError(DATA_COMPGEN(0x004f84dc, comSndSetCommunicationsBreak, "Set communications break"));
+                ShutdownComError("Set communications break");
             Sleep(BREAK_DELAY);
             result = ClearCommBreak(s_comPorts[portIndex].handle);
             if (result == 0)
-                ShutdownComError(DATA_COMPGEN(0x004f84f8, comSndClearCommunicationsBreak, "Clear communications break"));
+                ShutdownComError("Clear communications break");
             return 0;
         }
         sendNode = static_cast<tag_Node*>(
-            H2_ALLOC_AT(length + NODE_HEADER_SIZE, DATA_COMPGEN(0x004f8514, com_sndSourceFile, RETAIL_FILE), s_comSendSourceLineBase + 16)
+            H2_ALLOC_AT(length + NODE_HEADER_SIZE, RETAIL_FILE, s_comSendSourceLineBase + 16)
         );
         if (sendNode != NULL) {
             sendNode->len = length;
@@ -319,12 +311,10 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     return 1;
 }
 
-VA(0x0048b19c, 0x13)
 i16 __cdecl com_sess(i32, i32, ...) {
     return 0;
 }
 
-VA(0x0048b1af, 0x6e)
 u8 com_stat(i16 portIndex, u16) {
     DWORD modemStatus;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE
@@ -334,7 +324,6 @@ u8 com_stat(i16 portIndex, u16) {
     return 0;
 }
 
-VA(0x0048b21d, 0xe8)
 void comm_wrt_task(void) {
     DWORD bytesWritten;
     u32 writtenTotal;
@@ -360,10 +349,10 @@ void comm_wrt_task(void) {
                 NULL
             );
             if (callResult == 0)
-                ShutdownComError(DATA_COMPGEN(0x004f8544, wrtTaskWriteCommunicationsData, "Write communications data"));
+                ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        H2_FREE_AT(packetNode, DATA_COMPGEN(0x004f8560, comm_wrt_taskSourceFile, RETAIL_FILE), s_comWriteSourceLineBase + 28);
+        H2_FREE_AT(packetNode, RETAIL_FILE, s_comWriteSourceLineBase + 28);
     }
 }
 

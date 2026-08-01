@@ -81,12 +81,11 @@ H2_ENUM_END(ListBoxSelectionClickCount)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\listbox.cpp"
 #define LISTBOX_SOURCE_FILE_SEPARATOR "\0\0\0\0"
-#define LISTBOX_DESTRUCTOR_SOURCE_FILES DATA_COMPGEN(0x00520e94, listBoxWidgetDestructorSourceFiles, RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE)
-#define LISTBOX_DELETE_SOURCE_FILES DATA_COMPGEN(0x00520eec, listBoxWidgetDeleteItemSourceFiles, RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE)
-#define LISTBOX_MAIN_SOURCE_FILES DATA_COMPGEN(0x00520f9c, listBoxWidgetMainSourceFiles, RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE)
+#define LISTBOX_DESTRUCTOR_SOURCE_FILES RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
+#define LISTBOX_DELETE_SOURCE_FILES RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
+#define LISTBOX_MAIN_SOURCE_FILES RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 
 
-VA(0x004db060, 0x42)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_items = NULL;
     m_scrollbar = NULL;
@@ -95,7 +94,6 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_lastSelectedIndex = -1;
 }
 
-VA(0x004db0d0, 0x86)
 listBoxWidget::~listBoxWidget() {
     i32 i;
     gpResourceManager->Dispose(m_font);
@@ -114,7 +112,6 @@ listBoxWidget::~listBoxWidget() {
     gbSendMouseMoveMessages = false;
 }
 
-VA(0x004db160, 0x26e)
 void listBoxWidget::Read(void) {
     i16 frameHeight[FRAME_HEIGHT_SLOT_COUNT];
     i8 iconName[RESOURCE_NAME_CAPACITY];
@@ -201,7 +198,6 @@ void listBoxWidget::Read(void) {
     m_visibleItemCount = 0;
 }
 
-VA(0x004db3d0, 0x142)
 void listBoxWidget::DeleteItem(i32 index) {
     if (index >= m_itemCount)
         return;
@@ -254,7 +250,6 @@ void listBoxWidget::DeleteItem(i32 index) {
         m_visibleItemCount = m_itemCount;
 }
 
-VA(0x004db520, 0x368)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
@@ -378,12 +373,10 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     return widget::Main(message);
 }
 
-VA(0x004db890, 0x8)
 void listBoxWidget::Draw(void) {
     DrawLBStuff(0);
 }
 
-VA(0x004db8a0, 0x334)
 void listBoxWidget::DrawLBStuff(i32 doUpdate) {
     i32 y;
     i32 x;
@@ -487,7 +480,6 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
 }
 
-VA(0x004dbbe0, 0x312)
 MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX - m_owner->m_posX;
     i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;
@@ -598,6 +590,5 @@ done:
 }
 
 
-VTBL(listBoxWidget, 0x004ebac0);
 
 #undef RETAIL_FILE

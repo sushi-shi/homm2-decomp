@@ -26,21 +26,21 @@
 #include <SOURCE/town.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#define COMBAT_NECROMANCY_LEVEL_FACTOR DATA_COMPGEN(0x004eb238, lEVELFACTORConstant, 0.1)
+#define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
 #define COMBAT_SURRENDER_BASE_FACTOR                                                   \
-    DATA_COMPGEN(0x004eb240, combatSharedHalfFactor, 0.5)
-#define COMBAT_SURRENDER_DIPLOMACY_FACTOR DATA_COMPGEN(0x004eb248, dIPLOMACYFACTORConstant, 0.2)
-#define COMBAT_IDLE_ROLL_DIVISOR DATA_COMPGEN(0x004eb258, rOLLDIVISORConstant, 100.0f)
-#define COMBAT_STAND_DELAY_BASE_FACTOR DATA_COMPGEN(0x004eb260, bASEFACTORConstant, 0.25)
+    0.5
+#define COMBAT_SURRENDER_DIPLOMACY_FACTOR 0.2
+#define COMBAT_IDLE_ROLL_DIVISOR 100.0f
+#define COMBAT_STAND_DELAY_BASE_FACTOR 0.25
 #define COMBAT_STAND_DELAY_RANDOM_FACTOR 0.5
-#define COMBAT_CYCLE_TIMER_FACTOR DATA_COMPGEN(0x004eb268, tIMERFACTORConstant, 150.0f)
-#define COMBAT_SOUND_POLL_DELAY DATA_COMPGEN(0x004eb208, pOLLDELAYConstant, 75.0f)
-#define COMBAT_DIRECTION_SLOPE_STEEPEST DATA_COMPGEN(0x004eb210, sLOPESTEEPESTConstant, 3.73)
-#define COMBAT_DIRECTION_SLOPE_STEEP DATA_COMPGEN(0x004eb218, sLOPESTEEPConstant, 1.73)
-#define COMBAT_DIRECTION_SLOPE_DIAGONAL DATA_COMPGEN(0x004eb220, sLOPEDIAGONALConstant, 1.0f)
-#define COMBAT_DIRECTION_SLOPE_SHALLOW DATA_COMPGEN(0x004eb228, sLOPESHALLOWConstant, 0.58)
-#define COMBAT_DIRECTION_SLOPE_SHALLOWEST DATA_COMPGEN(0x004eb230, sLOPESHALLOWESTConstant, 0.27)
+#define COMBAT_CYCLE_TIMER_FACTOR 150.0f
+#define COMBAT_SOUND_POLL_DELAY 75.0f
+#define COMBAT_DIRECTION_SLOPE_STEEPEST 3.73
+#define COMBAT_DIRECTION_SLOPE_STEEP 1.73
+#define COMBAT_DIRECTION_SLOPE_DIAGONAL 1.0f
+#define COMBAT_DIRECTION_SLOPE_SHALLOW 0.58
+#define COMBAT_DIRECTION_SLOPE_SHALLOWEST 0.27
 
 namespace {
 
@@ -328,7 +328,6 @@ H2_ENUM_END(CombatStorageConstant)
 }
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
-VA(0x0042a6d0, 0x36d)
 MessageDispatchResult combatManager::Main(tag_message& message) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
 
@@ -415,7 +414,6 @@ ProcessAction:
     return result;
 }
 
-VA(0x0042aa3d, 0x181)
 i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
@@ -443,7 +441,6 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     }
 }
 
-VA(0x0042abbe, 0x8a1)
 void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
@@ -643,7 +640,6 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
-VA(0x0042b45f, 0x63c)
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
@@ -779,7 +775,6 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     gpMouseManager->SetPointer(m_mouseDirection + POINTER_ATTACK_OFFSET);
 }
 
-VA(0x0042ba9b, 0x8b)
 i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     i32 result;
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
@@ -800,7 +795,6 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     }
 }
 
-VA(0x0042bb26, 0x8e4)
 MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;
@@ -1017,7 +1011,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            DATA_COMPGEN(0x004f0860, processCombatMsgYouHaveNoHeroToCast, "You have no hero to cast a spell."),
+                            "You have no hero to cast a spell.",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1030,8 +1024,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (IsNegationSphereInEffect() != 0) {
                         NormalDialog(
-                            DATA_COMPGEN(0x004f0884, processCombatMsgTheSphereOfNegationArtifactIs, "The Sphere of Negation artifact is in effect for this battle, "
-                            "disabling all combat spells."),
+                            "The Sphere of Negation artifact is in effect for this battle, "
+                            "disabling all combat spells.",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1044,7 +1038,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (m_heroCastSpell[IDX(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
-                            DATA_COMPGEN(0x004f08e0, processCombatMsgYouHaveAlreadyCastASpell, "You have already cast a spell this round."),
+                            "You have already cast a spell this round.",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1069,7 +1063,6 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0042c40a, 0x70)
 i32 combatManager::IsNegationSphereInEffect(void) {
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
@@ -1079,7 +1072,6 @@ i32 combatManager::IsNegationSphereInEffect(void) {
     return 0;
 }
 
-VA(0x0042c47a, 0x205)
 void combatManager::ResetRound(void) {
     i32 unusedResetRoundWord6;
 
@@ -1119,7 +1111,6 @@ void combatManager::ResetRound(void) {
     m_currentSpeed = ROUND_INITIAL_SPEED;
 }
 
-VA(0x0042c67f, 0x280)
 i32 combatManager::CheckWin(struct tag_message* message) {
     i32 combatEnded = 0;
     if (IsWinner(m_currentSide) != 0) {
@@ -1167,7 +1158,6 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     return combatEnded;
 }
 
-VA(0x0042c8ff, 0x51a)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 rowPos = hexIndex / COMBAT_GRID_ROW_LENGTH;
@@ -1302,7 +1292,6 @@ smallView:
     return command;
 }
 
-VA(0x0042ce19, 0x2a6)
 i32 combatManager::RightClick(i32 hexIndex) {
     i32 col = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
@@ -1366,7 +1355,6 @@ i32 combatManager::RightClick(i32 hexIndex) {
     return 0;
 }
 
-VA(0x0042d0bf, 0x3b3)
 void combatManager::DoCommand(CombatMessageCommand command) {
     i32 unusedCommandWord2;
     i32 unusedCommandWord5;
@@ -1418,8 +1406,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
             if (IsNegationSphereInEffect() != 0) {
                 NormalDialog(
-                    DATA_COMPGEN(0x004f090c, doCommandTheSphereOfNegationArtifactIs, "The Sphere of Negation artifact is in effect for this battle, disabling all "
-                    "combat spells."),
+                    "The Sphere of Negation artifact is in effect for this battle, disabling all "
+                    "combat spells.",
                     NORMAL_DIALOG_INFO,
                     NORMAL_DIALOG_NO_RESOURCE,
                     NORMAL_DIALOG_NO_VALUE,
@@ -1437,7 +1425,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
-                DATA_COMPGEN(0x004f0968, doCommandAreYouSureYouWantTo, "Are you sure you want to retreat?"),
+                "Are you sure you want to retreat?",
                 NORMAL_DIALOG_CONFIRM,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
@@ -1457,7 +1445,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 if (gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
-                        DATA_COMPGEN(0x004f098c, doCommandYouDonTHaveEnoughGold, "You don't have enough gold!"),
+                        "You don't have enough gold!",
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -1478,7 +1466,6 @@ void combatManager::DoCommand(CombatMessageCommand command) {
     }
 }
 
-VA(0x0042d472, 0x57b)
 MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     char iconFile[WIN_LOSE_ICON_FILENAME_SIZE];
     tag_message animationMessage;
@@ -1562,14 +1549,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             case WIN_LOSE_ANIMATION_FLEE:
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile, DATA_COMPGEN(0x004f09a8, winCombatHandlerCmbtfle2Icn, "cmbtfle2.icn"));
+                    sprintf(iconFile, "cmbtfle2.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile, DATA_COMPGEN(0x004f09b8, winCombatHandlerCmbtfle3Icn, "cmbtfle3.icn"));
+                    sprintf(iconFile, "cmbtfle3.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1588,14 +1575,14 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                 break;
             default:
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME) {
-                    sprintf(iconFile, DATA_COMPGEN(0x004f09c8, winCombatHandlerCmbtlos2Icn, "cmbtlos2.icn"));
+                    sprintf(iconFile, "cmbtlos2.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                 }
                 if (giWinCmbtFrame == WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME) {
-                    sprintf(iconFile, DATA_COMPGEN(0x004f09d8, winCombatHandlerCmbtlos3Icn, "cmbtlos3.icn"));
+                    sprintf(iconFile, "cmbtlos3.icn");
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_LOAD_ID;
                     gpCombatManager->m_winLoseWindow->BroadcastMessage(animationMessage);
                     animationMessage.payload.widget.id = WIN_LOSE_RESOURCE_DRAW_ID;
@@ -1627,7 +1614,6 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0042d9ed, 0x110)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
     for (widgetIndex = 0; widgetIndex < WIN_LOSE_WIDGET_COUNT; widgetIndex++) {
@@ -1644,17 +1630,16 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     }
 }
 
-VA(0x0042dafd, 0x29a)
 void combatManager::ShowWinLoseArtifact(
     class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact
 ) {
-    DATA(0x004f09e8) static i16 artifactSourceLineBase = 0x680; // NOLINT(readability-magic-numbers)
+    static i16 artifactSourceLineBase = 0x680; // NOLINT(readability-magic-numbers)
     i16 w = CASUALTY_WINDOW_WIDTH;
     i16 winBottom = CASUALTY_WINDOW_BOTTOM;
     tag_message message;
     char* capturedArtifactName;
 
-    sprintf(gText, DATA_COMPGEN(0x004f09ec, showWinLoseArtifactYouHaveCapturedAnEnemyArtifact, "You have captured an enemy artifact!"));
+    sprintf(gText, "You have captured an enemy artifact!");
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = WIN_LOSE_TEXT_ID;
@@ -1666,7 +1651,7 @@ void combatManager::ShowWinLoseArtifact(
         ARTIFACT_BACKGROUND_Y,
         ARTIFACT_BACKGROUND_SIZE,
         ARTIFACT_BACKGROUND_SIZE,
-        DATA_COMPGEN(0x004f0a14, showWinLoseArtifactWinlosebIcn, "winloseb.icn"),
+        "winloseb.icn",
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_ICON_ID,
@@ -1682,7 +1667,7 @@ void combatManager::ShowWinLoseArtifact(
         ARTIFACT_ICON_Y,
         ARTIFACT_ICON_SIZE,
         ARTIFACT_ICON_SIZE,
-        DATA_COMPGEN(0x004f0a24, showWinLoseArtifactArtifactIcn, "artifact.icn"),
+        "artifact.icn",
         IDX(artifact) + 1,
         ICON_DRAW_NORMAL,
         WIN_LOSE_ARTIFACT_IMAGE_ID,
@@ -1693,7 +1678,7 @@ void combatManager::ShowWinLoseArtifact(
         MemError();
     window->AddWidget(m_winLoseBottomWidgets[1], -1);
 
-    capturedArtifactName = static_cast<char*>(H2_ALLOC_AT(ARTIFACT_NAME_CAPACITY, DATA_COMPGEN(0x004f0a34, showWinLoseArtifactSourceFile, RETAIL_FILE), artifactSourceLineBase + 0x2b));
+    capturedArtifactName = static_cast<char*>(H2_ALLOC_AT(ARTIFACT_NAME_CAPACITY, RETAIL_FILE, artifactSourceLineBase + 0x2b));
     sprintf(capturedArtifactName, gArtifactNames[IDX(artifact)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         ARTIFACT_TEXT_X,
@@ -1701,7 +1686,7 @@ void combatManager::ShowWinLoseArtifact(
         CASUALTY_WINDOW_WIDTH,
         ARTIFACT_TEXT_HEIGHT,
         capturedArtifactName,
-        DATA_COMPGEN(0x004f0a60, showWinLoseArtifactSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_ARTIFACT_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1713,14 +1698,13 @@ void combatManager::ShowWinLoseArtifact(
 
     gpCombatManager->m_winLoseWindow->DrawWindow();
     SAMPLE2 pickupSample = NULL_SAMPLE2;
-    sprintf(gText, DATA_COMPGEN(0x004f0a70, showWinLoseArtifactPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
     WaitEndSample(pickupSample, -1);
 }
 
-VA(0x0042dd97, 0x232)
 void combatManager::ShowSkeletons(class heroWindow* window) {
-    DATA(0x004f0a80) static i16 skeletonSourceLineBase = 0x6c8; // NOLINT(readability-magic-numbers)
+    static i16 skeletonSourceLineBase = 0x6c8; // NOLINT(readability-magic-numbers)
     tag_message message;
     char* skeletonCount;
 
@@ -1729,7 +1713,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
         SKELETON_ICON_Y,
         SKELETON_ICON_WIDTH,
         SKELETON_ICON_HEIGHT,
-        DATA_COMPGEN(0x004f0a84, showSkeletonsMons32Icn, "mons32.icn"),
+        "mons32.icn",
         IDX(CREATURE_SKELETON),
         ICON_DRAW_NORMAL,
         WIN_LOSE_SKELETON_ICON_ID,
@@ -1739,15 +1723,15 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (m_winLoseBottomWidgets[0] == NULL)
         MemError();
 
-    skeletonCount = static_cast<char*>(H2_ALLOC_AT(SKELETON_COUNT_CAPACITY, DATA_COMPGEN(0x004f0a90, showSkeletonsSourceFile, RETAIL_FILE), skeletonSourceLineBase + 0x13));
-    sprintf(skeletonCount, DATA_COMPGEN(0x004f0abc, showSkeletonsD, "%d"), giSkeletonsCreated);
+    skeletonCount = static_cast<char*>(H2_ALLOC_AT(SKELETON_COUNT_CAPACITY, RETAIL_FILE, skeletonSourceLineBase + 0x13));
+    sprintf(skeletonCount, "%d", giSkeletonsCreated);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         SKELETON_TEXT_X,
         SKELETON_TEXT_Y,
         SKELETON_TEXT_WIDTH,
         SKELETON_TEXT_HEIGHT,
         skeletonCount,
-        DATA_COMPGEN(0x004f0ac0, showSkeletonsSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_SKELETON_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1761,17 +1745,17 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     if (giSkeletonsCreated > 1) {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f0ad0, showSkeletonsPracticingTheDarkArtsOfNecromancy, "Practicing the dark arts of necromancy, you are able to "
+            "Practicing the dark arts of necromancy, you are able to "
             "raise %d of the enemy's dead to return under your service "
-            "as Skeletons."),
+            "as Skeletons.",
             giSkeletonsCreated
         );
     } else {
         sprintf(
             gText,
-            DATA_COMPGEN(0x004f0b50, showSkeletonsPracticingTheDarkArtsOfNecromancy2, "Practicing the dark arts of necromancy, you are able to "
+            "Practicing the dark arts of necromancy, you are able to "
             "raise one of the enemy's dead to return under your service "
-            "as a Skeleton.")
+            "as a Skeleton."
         );
     }
     message.type = MESSAGE_WIDGET;
@@ -1782,14 +1766,13 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 pickupSample = NULL_SAMPLE2;
-    sprintf(gText, DATA_COMPGEN(0x004f0bd4, showSkeletonsPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
     WaitEndSample(pickupSample, -1);
 }
 
-VA(0x0042dfc9, 0x2f6)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
-    DATA(0x004f0be4) static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
+    static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
     SpellType displayedSpell = m_eagleEyeSpell[IDX(m_combatResult)];
     i32 x = EAGLE_PANEL_X;
     i32 y = EAGLE_PANEL_Y;
@@ -1801,7 +1784,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         y,
         0,
         0,
-        DATA_COMPGEN(0x004f0be8, showEagleEyeSpellTownwindIcn, "townwind.icn"),
+        "townwind.icn",
         0,
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_BACKGROUND_ID,
@@ -1816,7 +1799,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
         y + EAGLE_ICON_Y_OFFSET,
         EAGLE_ICON_WIDTH,
         EAGLE_ICON_HEIGHT,
-        DATA_COMPGEN(0x004f0bf8, showEagleEyeSpellSpellsIcn, "spells.icn"),
+        "spells.icn",
         static_cast<i16>(gsSpellInfo[IDX(displayedSpell)].iconIndex),
         ICON_DRAW_NORMAL,
         WIN_LOSE_EAGLE_SPELL_ID,
@@ -1826,15 +1809,15 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     if (m_winLoseBottomWidgets[1] == NULL)
         MemError();
 
-    spellName = static_cast<char*>(H2_ALLOC_AT(EAGLE_SPELL_NAME_CAPACITY, DATA_COMPGEN(0x004f0c04, showEagleEyeSpellSourceFile, RETAIL_FILE), eagleEyeSourceLineBase + 0x22));
-    sprintf(spellName, DATA_COMPGEN(0x004f0c30, showEagleEyeSpellS, "%s"), gSpellNames[IDX(displayedSpell)]);
+    spellName = static_cast<char*>(H2_ALLOC_AT(EAGLE_SPELL_NAME_CAPACITY, RETAIL_FILE, eagleEyeSourceLineBase + 0x22));
+    sprintf(spellName, "%s", gSpellNames[IDX(displayedSpell)]);
     m_winLoseBottomTextWidgets[0] = new textWidget(
         x + EAGLE_TEXT_X_OFFSET,
         y + EAGLE_TEXT_Y_OFFSET,
         EAGLE_TEXT_WIDTH,
         EAGLE_TEXT_HEIGHT,
         spellName,
-        DATA_COMPGEN(0x004f0c34, showEagleEyeSpellSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         WIN_LOSE_EAGLE_TEXT_ID,
         WIDGET_KIND_TEXT,
@@ -1848,8 +1831,8 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f0c44, showEagleEyeSpellThroughEagleEyedObservationSIs, "Through eagle-eyed observation, %s is able to learn the magic "
-        "spell '%s'."),
+        "Through eagle-eyed observation, %s is able to learn the magic "
+        "spell '%s'.",
         m_heroes[IDX(m_combatResult)]->m_name,
         gSpellNames[IDX(displayedSpell)]
     );
@@ -1861,14 +1844,13 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
     SAMPLE2 playedSample = NULL_SAMPLE2;
-    sprintf(gText, DATA_COMPGEN(0x004f0c90, showEagleEyeSpellPickup02d82M, "pickup%02d.82M"), SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
+    sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playedSample = LoadPlaySample(gText);
     WaitEndSample(playedSample, -1);
 }
 
-VA(0x0042e2bf, 0x9cc)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
-    DATA(0x004f0ca0) static i16 casualtySourceLineBase = 0x74b; // NOLINT(readability-magic-numbers)
+    static i16 casualtySourceLineBase = 0x74b; // NOLINT(readability-magic-numbers)
     i32 casualtyQuantity_0[CASUALTY_QUANTITY_STORAGE_COUNT];
     i32 casualtyType_1[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 side_9;
@@ -1909,15 +1891,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         }
     }
 
-    text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0ca4, showDeadArmiesSourceFile, RETAIL_FILE), casualtySourceLineBase + 0x23));
-    sprintf(text_27, DATA_COMPGEN(0x004f0cd0, showDeadArmiesBattlefieldCasualties, "Battlefield Casualties"));
+    text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, RETAIL_FILE, casualtySourceLineBase + 0x23));
+    sprintf(text_27, "Battlefield Casualties");
     m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] = new textWidget(
         CASUALTY_TITLE_X,
         CASUALTY_TITLE_Y,
         CASUALTY_WINDOW_WIDTH,
         CASUALTY_TEXT_HEIGHT,
         text_27,
-        DATA_COMPGEN(0x004f0ce8, showDeadArmiesSmalfontFnt, "smalfont.fnt"),
+        "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         CASUALTY_TEXT_WIDGET_ID,
         WIDGET_KIND_TEXT,
@@ -1932,15 +1914,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             y_29 = CASUALTY_ATTACKER_Y;
         else
             y_29 = CASUALTY_DEFENDER_Y;
-        text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, DATA_COMPGEN(0x004f0cf8, showDeadArmiesSourceFile2, RETAIL_FILE), casualtySourceLineBase + 0x38));
-        sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? DATA_COMPGEN(0x004f0d24, showDeadArmiesAttacker, "Attacker") : DATA_COMPGEN(0x004f0d30, showDeadArmiesDefender, "Defender"));
+        text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_HEADING_CAPACITY, RETAIL_FILE, casualtySourceLineBase + 0x38));
+        sprintf(text_27, side_9 == IDX(COMBAT_ATTACKER_SIDE) ? "Attacker" : "Defender");
         m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9] = new textWidget(
             CASUALTY_TITLE_X,
             y_29 + CASUALTY_SIDE_LABEL_Y_OFFSET,
             CASUALTY_WINDOW_WIDTH,
             CASUALTY_TEXT_HEIGHT,
             text_27,
-            DATA_COMPGEN(0x004f0d3c, showDeadArmiesSmalfontFnt2, "smalfont.fnt"),
+            "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             CASUALTY_TEXT_WIDGET_ID,
             WIDGET_KIND_TEXT,
@@ -1951,15 +1933,15 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
         window->AddWidget(m_winLoseBottomTextWidgets[CASUALTY_SIDE_WIDGET_FIRST + side_9], -1);
 
         if (casualtyQuantity_0[side_9] <= 0) {
-            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_NONE_CAPACITY, DATA_COMPGEN(0x004f0d4c, showDeadArmiesSourceFile3, RETAIL_FILE), casualtySourceLineBase + 0x4b));
-            sprintf(text_27, DATA_COMPGEN(0x004f0d78, showDeadArmiesNone, "None"));
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_NONE_CAPACITY, RETAIL_FILE, casualtySourceLineBase + 0x4b));
+            sprintf(text_27, "None");
             m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] = new textWidget(
                 CASUALTY_TITLE_X,
                 y_29 + CASUALTY_NONE_Y_OFFSET,
                 CASUALTY_WINDOW_WIDTH,
                 CASUALTY_TEXT_HEIGHT,
                 text_27,
-                DATA_COMPGEN(0x004f0d80, showDeadArmiesSmalfontFnt3, "smalfont.fnt"),
+                "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
                 side_9 * CASUALTY_WIDGET_ID_STRIDE + CASUALTY_TEXT_WIDGET_ID_FIRST,
                 WIDGET_KIND_TEXT,
@@ -1973,7 +1955,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             );
         }
 
-        monsterIcons_2 = gpResourceManager->GetIcon(DATA_COMPGEN(0x004f0d90, showDeadArmiesMons32Icn, "mons32.icn"));
+        monsterIcons_2 = gpResourceManager->GetIcon("mons32.icn");
         displayedCount_11 = casualtyQuantity_0[side_9] < CASUALTY_DISPLAY_LIMIT
                                 ? casualtyQuantity_0[side_9]
                                 : CASUALTY_DISPLAY_LIMIT;
@@ -2013,7 +1995,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                         + CASUALTY_ICON_CELL_WIDTH,
                     CASUALTY_ICON_WIDTH,
                     CASUALTY_ICON_HEIGHT,
-                    DATA_COMPGEN(0x004f0d9c, showDeadArmiesMons32Icn2, "mons32.icn"),
+                    "mons32.icn",
                     *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
                     ICON_DRAW_NORMAL,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_ICON_WIDGET_ID_FIRST,
@@ -2024,10 +2006,10 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                 == NULL)
                 MemError();
 
-            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_QUANTITY_CAPACITY, DATA_COMPGEN(0x004f0da8, showDeadArmiesSourceFile4, RETAIL_FILE), casualtySourceLineBase + 0x77));
+            text_27 = static_cast<char*>(H2_ALLOC_AT(CASUALTY_QUANTITY_CAPACITY, RETAIL_FILE, casualtySourceLineBase + 0x77));
             sprintf(
                 text_27,
-                DATA_COMPGEN(0x004f0dd4, showDeadArmiesD, "%d"),
+                "%d",
                 *(&casualtyQuantity_0[COMBAT_SIDE_COUNT] + side_9 * COMBAT_ARMY_SLOT_COUNT
                   + armyIndex_8)
             );
@@ -2038,7 +2020,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     CASUALTY_QUANTITY_WIDTH,
                     CASUALTY_QUANTITY_HEIGHT,
                     text_27,
-                    DATA_COMPGEN(0x004f0dd8, showDeadArmiesSmalfontFnt4, "smalfont.fnt"),
+                    "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
                     side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_TEXT_WIDGET_ID_FIRST,
                     WIDGET_KIND_TEXT,
@@ -2060,7 +2042,6 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 }
 
-VA(0x0042ec8b, 0xba9)
 void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
     i32 emptySlots;
@@ -2134,7 +2115,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
 
     m_nonVisualCombat = 1;
     FreeArmies();
-    CombatMessage(DATA_COMPGEN(0x004f0de8, doVictoryEmptyString, ""), 1, 1, 0);
+    CombatMessage("", 1, 1, 0);
     gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
     fadeCount = VICTORY_FADE_STEPS;
     if (m_terrainType == TERRAIN_WASTELAND)
@@ -2225,7 +2206,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
-                m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, DATA_COMPGEN(0x004f0dec, doVictoryWincmbtBin, "wincmbt.bin"));
+                m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
                 if (m_winLoseWindow == NULL)
                     MemError();
 
@@ -2292,7 +2273,6 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     gMapY = gpAdvManager->m_mapOriginY;
 }
 
-VA(0x0042f834, 0x3bc)
 void combatManager::DoLoseWindow(void) {
     i32 unusedLoseWord_h = IDX(COMBAT_RESULT_ATTACKER);
     CombatResult losingSide_h;
@@ -2314,17 +2294,17 @@ void combatManager::DoLoseWindow(void) {
 
     gbShowingLoseWindow = true;
     if (gbCombatSurrender != 0) {
-        sprintf(animationFile_j, DATA_COMPGEN(0x004f0df8, doLoseWindowCmbtsurrIcn, "cmbtsurr.icn"));
+        sprintf(animationFile_j, "cmbtsurr.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_CYCLE_SECOND;
     } else if (gbRetreatWin != 0) {
-        sprintf(animationFile_j, DATA_COMPGEN(0x004f0e08, doLoseWindowCmbtfle1Icn, "cmbtfle1.icn"));
+        sprintf(animationFile_j, "cmbtfle1.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_FLEE;
     } else {
-        sprintf(animationFile_j, DATA_COMPGEN(0x004f0e18, doLoseWindowCmbtlos1Icn, "cmbtlos1.icn"));
+        sprintf(animationFile_j, "cmbtlos1.icn");
         gbWhichAnimationPlaying = WIN_LOSE_ANIMATION_LOSS;
     }
 
-    m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, DATA_COMPGEN(0x004f0e28, doLoseWindowWincmbtBin, "wincmbt.bin"));
+    m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
     if (m_winLoseWindow == NULL)
         MemError();
 
@@ -2380,7 +2360,6 @@ void combatManager::DoLoseWindow(void) {
     m_winLoseWindow = NULL;
 }
 
-VA(0x0042fbf0, 0x43d)
 i32 combatManager::DoSurrender(void) {
     i32 armyIndex_n;
     i16 dialogType;
@@ -2403,7 +2382,7 @@ i32 combatManager::DoSurrender(void) {
         giSurrenderCost = static_cast<i32>(giSurrenderCost * COMBAT_SURRENDER_BASE_FACTOR);
     giSurrenderCost = static_cast<i32>(
         giSurrenderCost
-        * (DATA_COMPGEN(0x004eb250, doSurrenderConstant, 1.0)
+        * (1.0
            - IDX(m_heroes[IDX(m_currentSide)]->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
@@ -2411,7 +2390,7 @@ i32 combatManager::DoSurrender(void) {
     dialogType = SURRENDER_DIALOG_TYPE;
     dialogResult = SURRENDER_DIALOG_ACCEPT_RESULT;
     textWidth_t = SURRENDER_TEXT_WIDTH;
-    window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, DATA_COMPGEN(0x004f0e34, doSurrenderSurrendrBin, "surrendr.bin"));
+    window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, "surrendr.bin");
     if (window == NULL)
         MemError();
     message.type = MESSAGE_WIDGET;
@@ -2419,7 +2398,7 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_PORTRAIT_RESOURCE_ID;
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f0e44, doSurrenderPort04dIcn, "port%04d.icn"),
+        "port%04d.icn",
         static_cast<i32>(m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_portrait)
     );
     message.payload.widget.data.text = gText;
@@ -2445,8 +2424,8 @@ i32 combatManager::DoSurrender(void) {
     message.payload.widget.id = SURRENDER_TEXT_ID;
     sprintf(
         gText,
-        DATA_COMPGEN(0x004f0e54, doSurrenderSStatesIWillAcceptYour, "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
-        "for the price of %d gold.\""),
+        "%s states:\n\n\"I will accept your surrender and grant you and your troops safe passage "
+        "for the price of %d gold.\"",
         m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_name,
         giSurrenderCost
     );
@@ -2456,7 +2435,6 @@ i32 combatManager::DoSurrender(void) {
     return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
 }
 
-VA(0x0043002d, 0xdc)
 void combatManager::CheckChangeSelector(void) {
     if (gbNoShowCombat != 0)
         return;
@@ -2471,7 +2449,6 @@ void combatManager::CheckChangeSelector(void) {
     SetupSmallView();
 }
 
-VA(0x00430109, 0xea)
 void combatManager::CheckCastleAttack(void) {
     if (m_inCastleCombat != 0 && m_currentSide == COMBAT_ATTACKER_SIDE) {
         while (m_catapultAttacksRemaining[IDX(m_currentSide)] > 0) {
@@ -2489,7 +2466,6 @@ void combatManager::CheckCastleAttack(void) {
     }
 }
 
-VA(0x004301f3, 0xdd)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
     if (m_heroCastSpell[IDX(m_currentSide)] == 0
@@ -2506,7 +2482,6 @@ void combatManager::CheckGetAIMove(void) {
     DoCompAI(m_currentSide);
 }
 
-VA(0x004302d0, 0x18f)
 void combatManager::GetControl(void) {
     m_selectedHex = INVALID_HEX;
     m_previousCommand = COMBAT_INVALID_COMMAND;
@@ -2535,7 +2510,6 @@ setup_view:
     ResetMouse();
 }
 
-VA(0x0043045f, 0xd7)
 void combatManager::ResetMouse(void) {
     i32 mouseY_g;
     i32 mouseX_f;
@@ -2557,7 +2531,6 @@ void combatManager::ResetMouse(void) {
     }
 }
 
-VA(0x00430536, 0x65b)
 MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;
@@ -2578,7 +2551,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
     }
     if (giNextAction != ACTION_NONE) {
         LogInt(
-            DATA_COMPGEN(0x004f0ec4, processNextActionProcessAct, "Process Act"),
+            "Process Act",
             IDX(giNextAction),
             giNextActionGridIndex,
             giNextActionGridIndex2,
@@ -2605,7 +2578,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
         actionData[IDX(ACTION_DATA_GRID)] = giNextActionGridIndex;
         actionData[IDX(ACTION_DATA_SECOND_GRID)] = giNextActionGridIndex2;
         LogInt(
-            DATA_COMPGEN(0x004f0ed0, processNextActionAboutToT, "About to T"),
+            "About to T",
             iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE) - IDX(m_currentSide)],
             LOG_UNUSED_VALUE,
             LOG_UNUSED_VALUE,
@@ -2623,7 +2596,7 @@ MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& messa
             1,
             REMOTE_MESSAGE_DEFAULT
         );
-        LogStr(DATA_COMPGEN(0x004f0edc, processNextActionPostT, "Post T"));
+        LogStr("Post T");
         if (transmitResult == 0)
             ShutDown(NULL);
     }
@@ -2716,7 +2689,6 @@ Finished:
     return dispatchResult;
 }
 
-VA(0x00430b91, 0x237)
 void combatManager::ResetCyclingCreatures(void) {
     army* currentArmy_p = NULL;
     i32 cyclingCount = 0;
@@ -2758,7 +2730,6 @@ void combatManager::ResetCyclingCreatures(void) {
     gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 }
 
-VA(0x00430dc8, 0xf9)
 void combatManager::ResetCycleTimers(void) {
     i32l currentTime_r = KBTickCount();
     CombatSide side;
@@ -2781,12 +2752,10 @@ void combatManager::ResetCycleTimers(void) {
     }
 }
 
-VA(0x00430ec1, 0x53)
 i32 InCombatArea(i32 x, i32 y) {
     return x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT;
 }
 
-VA(0x00430f14, 0x9d9)
 void combatManager::CycleCombatScreen(void) {
     army* currentArmy;
     u8 cycleArmy[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
@@ -2913,9 +2882,7 @@ void combatManager::CycleCombatScreen(void) {
                     roll =
                         static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
                         / COMBAT_IDLE_ROLL_DIVISOR;
-                    accumulatedChance = DATA_COMPGEN(
-                        0x004eb25c, standingAnimationInitialChance, 0.0f
-                    );
+                    accumulatedChance = 0.0f;
                     currentArmy->m_standingAnimation =
                         currentArmy->m_frameInfo.standingAnimationCount - 1;
                     for (animationIndex = 0;
@@ -2985,14 +2952,12 @@ setCycleTimer:
     );
 }
 
-VA(0x004318ed, 0x3b)
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {
     gConfig.combatArmyInfoLevel = level;
     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     WritePrefs();
 }
 
-VA(0x00431928, 0xe3)
 void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel) {
     if (gConfig.showCombatGrid == showGrid && gConfig.showCombatMouseHex == showMouseHex
         && gConfig.combatShadeLevel == shadeLevel)
@@ -3009,7 +2974,6 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     WritePrefs();
 }
 
-VA(0x00431a0b, 0x3ab)
 void combatManager::AddArmy(
     H2_ENUM_PARAM(CombatSide, i32) side,
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
@@ -3076,7 +3040,6 @@ void combatManager::AddArmy(
     );
 }
 
-VA(0x00431db6, 0x169)
 void combatManager::SetupSmallView(void) {
     i32 unusedSmallViewWord1;
     i32 unusedSmallViewWord2;
@@ -3107,56 +3070,55 @@ void combatManager::SetupSmallView(void) {
     }
 }
 
-VA(0x00431f1f, 0x304)
 void combatManager::ViewBallista(i32 quickView) {
     i32 archerCount;
     i32 attackBonus;
     char description[VIEW_DESCRIPTION_SIZE];
 
     m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&archerCount, &attackBonus);
-    sprintf(gText, DATA_COMPGEN(0x004f0ee4, viewBallistaBallista, "Ballista"));
-    strcpy(description, DATA_COMPGEN(0x004f0ef0, viewBallistaEmptyString, ""));
+    sprintf(gText, "Ballista");
+    strcpy(description, "");
     if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] != COMBAT_WALL_STATE_KEEP_STANDING) {
-        sprintf(description, DATA_COMPGEN(0x004f0f00, viewBallistaTheSIsDestroyed, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f0ef4, viewBallistaBallista2, "Ballista"));
+        sprintf(description, "\n\nThe %s is destroyed.", "Ballista");
     } else if (attackBonus > 0) {
         sprintf(
             description,
-            DATA_COMPGEN(0x004f0f24, viewBallistaTheSFiresWithTheStrength, "\n\nThe %s fires with the strength of %d Archers, each "
-            "with a +%d bonus to their attack skill."),
-            DATA_COMPGEN(0x004f0f18, viewBallistaBallista3, "Ballista"),
+            "\n\nThe %s fires with the strength of %d Archers, each "
+            "with a +%d bonus to their attack skill.",
+            "Ballista",
             archerCount,
             attackBonus
         );
     } else {
         sprintf(
             description,
-            DATA_COMPGEN(0x004f0f90, viewBallistaTheSFiresWithTheStrength2, "\n\nThe %s fires with the strength of %d Archers."),
-            DATA_COMPGEN(0x004f0f84, viewBallistaBallista4, "Ballista"),
+            "\n\nThe %s fires with the strength of %d Archers.",
+            "Ballista",
             archerCount
         );
     }
     strcat(gText, description);
 
-    strcpy(description, DATA_COMPGEN(0x004f0fc0, viewBallistaEmptyString2, ""));
+    strcpy(description, "");
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, DATA_COMPGEN(0x004f0fd0, viewBallistaTheSIsDestroyed2, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f0fc4, viewBallistaLeftTurret, "Left Turret"));
+            sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
-                    DATA_COMPGEN(0x004f0ff4, viewBallistaTheSFiresWithTheStrength3, "\n\nThe %s fires with the strength of %d Archers, "
-                    "each with a +%d bonus to their attack skill."),
-                    DATA_COMPGEN(0x004f0fe8, viewBallistaLeftTurret2, "Left Turret"),
+                    "\n\nThe %s fires with the strength of %d Archers, "
+                    "each with a +%d bonus to their attack skill.",
+                    "Left Turret",
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackBonus
                 );
             } else {
                 sprintf(
                     description,
-                    DATA_COMPGEN(0x004f1060, viewBallistaTheSFiresWithTheStrength4, "\n\nThe %s fires with the strength of %d Archers."),
-                    DATA_COMPGEN(0x004f1054, viewBallistaLeftTurret3, "Left Turret"),
+                    "\n\nThe %s fires with the strength of %d Archers.",
+                    "Left Turret",
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }
@@ -3165,25 +3127,25 @@ void combatManager::ViewBallista(i32 quickView) {
     }
 
     if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
-        strcpy(description, DATA_COMPGEN(0x004f1090, viewBallistaEmptyString3, ""));
+        strcpy(description, "");
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
-            sprintf(description, DATA_COMPGEN(0x004f10a4, viewBallistaTheSIsDestroyed3, "\n\nThe %s is destroyed."), DATA_COMPGEN(0x004f1094, viewBallistaRightTurret, "Right Turret"));
+            sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                    == COMBAT_WALL_STATE_TOWER_STANDING) {
             if (attackBonus > 0) {
                 sprintf(
                     description,
-                    DATA_COMPGEN(0x004f10cc, viewBallistaTheSFiresWithTheStrength5, "\n\nThe %s fires with the strength of %d Archers, "
-                    "each with a +%d bonus to their attack skill."),
-                    DATA_COMPGEN(0x004f10bc, viewBallistaRightTurret2, "Right Turret"),
+                    "\n\nThe %s fires with the strength of %d Archers, "
+                    "each with a +%d bonus to their attack skill.",
+                    "Right Turret",
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR,
                     attackBonus
                 );
             } else {
                 sprintf(
                     description,
-                    DATA_COMPGEN(0x004f113c, viewBallistaTheSFiresWithTheStrength6, "\n\nThe %s fires with the strength of %d Archers."),
-                    DATA_COMPGEN(0x004f112c, viewBallistaRightTurret3, "Right Turret"),
+                    "\n\nThe %s fires with the strength of %d Archers.",
+                    "Right Turret",
                     archerCount / COMBAT_KEEP_SIDE_TOWER_SHOT_DIVISOR
                 );
             }
@@ -3205,19 +3167,18 @@ void combatManager::ViewBallista(i32 quickView) {
     );
 }
 
-DATA(0x005250b8) b32 gbThisNetHasControl;
-DATA(0x005250bc) i32 iCurTransferArtifact;
-DATA(0x005250c0) i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-DATA(0x005250d0) b32 gbWhichAnimationPlaying;
-DATA(0x005250d4) i32 iMaxTransferArtifacts;
-DATA(0x005250d8) i32 giNextActionExtra;
-DATA(0x005250dc) i32 bSkeletonsShown;
-DATA(0x005250e0) b32 gbShowingLoseWindow;
-DATA(0x005250e4) i32 giWinCmbtFrame;
-DATA(0x005250e8) i32 giNextActionGridIndex;
-DATA(0x005250ec) i32 giSurrenderCost;
-DATA(0x005250f0) i32 giSkeletonsCreated;
-DATA(0x005250f8)
+b32 gbThisNetHasControl;
+i32 iCurTransferArtifact;
+i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
+b32 gbWhichAnimationPlaying;
+i32 iMaxTransferArtifacts;
+i32 giNextActionExtra;
+i32 bSkeletonsShown;
+b32 gbShowingLoseWindow;
+i32 giWinCmbtFrame;
+i32 giNextActionGridIndex;
+i32 giSurrenderCost;
+i32 giSkeletonsCreated;
 H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
-DATA(0x00525108) H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
-DATA(0x0052510c) i32 giNextActionGridIndex2;
+H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
+i32 giNextActionGridIndex2;

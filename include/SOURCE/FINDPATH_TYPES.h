@@ -9,12 +9,10 @@ struct SFindPathSourceLine {
     i16 value;
     i16 reserved;
 };
-SIZE(SFindPathSourceLine, 0x4);
 
 struct SFindPathSourceLocation {
     SFindPathSourceLine line;
     char sourceFile[sizeof(FINDPATH_SOURCE_FILE)];
 };
-SIZE(SFindPathSourceLocation, 0x30);
 
 #endif
