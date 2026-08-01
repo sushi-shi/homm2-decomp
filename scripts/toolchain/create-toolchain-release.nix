@@ -2,7 +2,7 @@
 # from preserved Microsoft media.
 #
 # Usage from the repository root:
-#   nix-shell scripts/create-toolchain-release.nix
+#   nix-shell scripts/toolchain/create-toolchain-release.nix
 
 { pkgs ? import <nixpkgs> { config.allowUnfree = true; } }:
 

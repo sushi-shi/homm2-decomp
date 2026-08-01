@@ -185,7 +185,7 @@
         };
 
         # Build - MSVC 4.2 under wine. Toolchain defaults to build/toolchain (populate
-        # from the en_vc42ent discs via scripts/make-toolchain.sh); override $HOMM2_TOOLCHAIN
+        # from the en_vc42ent discs via scripts/toolchain/make-toolchain.sh); override $HOMM2_TOOLCHAIN
         # to a hosted tarball once pinned.
         build = pkgs.mkShell {
           name = "homm2-build";
@@ -208,7 +208,7 @@
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
             echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
-              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/make-toolchain.sh on the en_vc42ent discs" >&2
+              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/toolchain/make-toolchain.sh on the en_vc42ent discs" >&2
             fi
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
