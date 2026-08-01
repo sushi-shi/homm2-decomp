@@ -158,7 +158,7 @@ typedef enum FileIdHashConstant {
 #undef HOMM2_MISC_INLINE_ICONENTRY
 #include <BASE/miscwin.h>
 #include <SOURCE/KB.h>
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <SOURCE/NOOPT.h>
 #include <BASE/message.h>
 #include <stdlib.h>
