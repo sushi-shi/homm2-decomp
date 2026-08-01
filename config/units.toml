@@ -1,15 +1,24 @@
-# units.toml - per-TU build manifest (generated from CodeView by homm2.build.gen_manifest).
+# units.toml - per-TU build manifest.
 # unit MUST match the unit column in build/gen/symbol_names.csv.
 
 [build]
 compiler = "msvc4.2"
 platform = "win32"
 
+# /DNO_STRICT looks like a workaround and is not. VC6's WINDEF.H opens with
+# `#ifndef NO_STRICT / #ifndef STRICT / #define STRICT 1`, which VC 4.2's does not
+# have at all, and DECLARE_HANDLE keys off it: without STRICT a handle is `typedef
+# HANDLE name` (void*), with it a distinct `struct name##__ *`.
+#
+# That is a MANGLING difference, not a codegen one - both are 32-bit pointers. The
+# PoL 2.0 CodeView shows which one retail used: ?hmnuDflt@@3PAXA and
+# ?KBChangeMenu@@YIXPAX@Z, where PAX is pointer-to-void. Compiling with STRICT would
+# emit PAUHMENU__@@ for every handle-taking function instead.
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv"]
-o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv"]
-o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv"]
-base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/DNO_STRICT"]
+o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
+o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
+base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi", "/DNO_STRICT"]
 
 [[unit]]
 unit = "BASE/BASEMGR"
