@@ -11,7 +11,6 @@
 #include <BASE/baseManager.h>
 #include <BASE/resource.h>
 #include <BASE/icon.h>
-#include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/tileset.h>
 #include <BASE/font.h>
@@ -175,19 +174,6 @@ class sample* resourceManager::GetSample(char* name) {
         r = new sample(name);
         AddResource(r);
         return static_cast<sample*>(r);
-    }
-}
-
-class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
-    u32l fileId = MakeId(name, 1);
-    resource* r = Query(fileId);
-    if (r != NULL) {
-        r->m_refCount++;
-        return static_cast<MIDIWrap*>(r);
-    } else {
-        r = new MIDIWrap(name);
-        AddResource(r);
-        return static_cast<MIDIWrap*>(r);
     }
 }
 

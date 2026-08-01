@@ -22,6 +22,11 @@ enum class SystemMenuCommand : i32 {
 i32l Ticks();
 void SetEventHandler(EventHandler handler);
 void PumpEvents();
+
+// Retail hung a Windows menu bar off the window, one per screen. The game half
+// of that survives whole - HandleAppSpecificMenuCommands still runs every
+// command - but no backend draws a menu, so these keep the bookkeeping and
+// nothing looks at it. A backend that grew menus would find the game ready.
 MenuHandle LoadMenu(const char* name);
 void DestroyMenu(MenuHandle menu);
 MenuHandle CurrentMenu();

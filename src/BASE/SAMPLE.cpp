@@ -1,6 +1,5 @@
 #include <Ints.h>
 #include <PLATFORM/Strings.h>
-#include <BASE/MIDIWrap.h>
 #include <BASE/sample.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
@@ -69,22 +68,4 @@ inline sample::~sample() {
         gpSoundManager->StopSample(this);
     H2_FREE(m_playbackData.data);
     memset(&m_playbackData, 0, sizeof(m_playbackData));
-}
-
-MIDIWrap::MIDIWrap(char* name)
-    : resource(
-        RESOURCE_CATEGORY_SAMPLE,
-        gpResourceManager->MakeId(name, 1),
-        RESOURCE_REFERENCE_INITIAL,
-        NULL
-    ) {
-    u32l size = gpResourceManager->GetFileSize(m_id);
-    m_data = static_cast<char*>(H2_ALLOC(size));
-    gpResourceManager->PointToFile(m_id);
-    gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
-}
-
-inline MIDIWrap::~MIDIWrap() {
-    H2_FREE(m_data);
-    m_data = NULL;
 }
