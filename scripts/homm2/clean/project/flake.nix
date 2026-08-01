@@ -36,7 +36,7 @@
         installPhase = ''
           runHook preInstall
           mkdir -p "$out"
-          cp build/HEROES2W.EXE run-game.sh "$out/"
+          cp build/HMM2PL.exe run-game.sh "$out/"
           chmod +x "$out/run-game.sh"
           runHook postInstall
         '';

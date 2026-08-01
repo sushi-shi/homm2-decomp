@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """synth_pdb.py - synthesize a PDB for vostok-delinker from build/gen/symbol_names.csv.
 
-vostok-delinker consumes a PDB (not CodeView) to slice HEROES2W.EXE into per-symbol
-COFF .obj files. HEROES2W ships a publics-only CodeView NB09 stream, but the delinker
+vostok-delinker consumes a PDB (not CodeView) to slice HMM2PL.exe into per-symbol
+COFF .obj files. HMM2PL ships a publics-only CodeView NB09 stream, but the delinker
 wants a PDB, so we build one from retail publics plus reviewed runtime/compiler and
 source-annotated private identities. This is a deterministic `homm2 redelink` input: every
 function is named and unit-attributed before delinking, so we always emit per-unit line
@@ -12,7 +12,7 @@ Pipeline:
   build/gen/symbol_names.csv (rva,name,unit,size,kind,provenance)
       -> PDB-YAML (one DBI module; per-function C13 line info -> c:\\proj\\<unit>.c;
          S_GPROC32 for funcs, S_LDATA32 for data)
-      -> `llvm-pdbutil yaml2pdb`  -> build/pdb/HEROES2W.pdb
+      -> `llvm-pdbutil yaml2pdb`  -> build/pdb/HMM2PL.pdb
       -> byte-patch DBIHeader.symbol_records_stream (0x14) to an empty stream so
          pdb2's global_symbols() returns empty (yaml2pdb writes 0xFFFF nil there).
 """
@@ -60,9 +60,9 @@ def read_csv(path):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HEROES2W.EXE")))
+    ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HMM2PL.exe")))
     ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
-    ap.add_argument("--out", default=str(REPO / "build/pdb/HEROES2W.pdb"))
+    ap.add_argument("--out", default=str(REPO / "build/pdb/HMM2PL.pdb"))
     a = ap.parse_args(argv)
     exe, out = Path(a.exe), Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -109,7 +109,7 @@ def main(argv=None):
           "  Signature:       0\n  Features:        [ VC140 ]\n  Version:         VC70\n")
         W("DbiStream:\n  VerHeader:       V70\n  Age:             1\n  BuildNumber:     0\n"
           "  PdbDllVersion:   0\n  PdbDllRbld:      0\n  Flags:           0\n  MachineType:     x86\n")
-        mod = r"c:\proj\HEROES2W"
+        mod = r"c:\proj\HMM2PL"
         W("  Modules:\n    - Module:          '%s'\n      ObjFile:         '%s'\n" % (mod, mod))
         W("      SourceFiles:\n")
         for sf in files:

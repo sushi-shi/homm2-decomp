@@ -6,7 +6,7 @@ working executable.
 
 ## Ground Truth
 
-- Retail `HEROES2W.EXE` is authoritative for code, data, relocations, resources, and
+- Retail `HMM2PL.exe` is authoritative for code, data, relocations, resources, and
   linked addresses.
 - The embedded NB09 CodeView stream is minimal/publics-only. Its 3,541 named symbols
   are `S_PUB32` records with type index zero. It proves public names and start RVAs,

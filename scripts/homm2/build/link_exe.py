@@ -37,7 +37,7 @@ PINNED_VC40_LIBCMT_SHA256 = (
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
-RETAIL_EXE = REPO / "build/orig/HEROES2W.EXE"
+RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
 REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
 DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 DATA_SECTIONS = REPO / "build/gen/delink_data_sections.tsv"
@@ -165,7 +165,7 @@ def write_module_definition(path):
     """Write the retail executable description and public export surface."""
     path = Path(path)
     path.write_text(
-        "NAME HEROES2W.EXE\n"
+        "NAME HMM2PL.exe\n"
         "DESCRIPTION 'Heroes of Might and Magic 2'\n"
         "EXPORTS\n"
         "    AppAbout=?AppAbout@@YGHPAXIIJ@Z\n"
@@ -1750,7 +1750,7 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
     link_objects, stripped_export_objects, rebuilt_writable_sections = final_link_objects(
         response_objects, [row["unit"] for row in order],
         output.parent / "objects-final", data_topology)
-    definition_path = write_module_definition(output.parent / "HEROES2W.def")
+    definition_path = write_module_definition(output.parent / "HMM2PL.def")
     command = build_link_command(
         link_exe,
         winepath_w(map_path),
@@ -2017,10 +2017,10 @@ def run_link(output, order_response, imports_libraries, resource_path, linker_ov
 
 def main(argv=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", default=str(REPO / "build/link/HEROES2W.EXE"))
+    parser.add_argument("--out", default=str(REPO / "build/link/HMM2PL.exe"))
     parser.add_argument("--order", default=str(REPO / "build/link/objects.rsp"))
     parser.add_argument("--imports", action="append")
-    parser.add_argument("--resource", default=str(REPO / "build/link/HEROES2W.res"))
+    parser.add_argument("--resource", default=str(REPO / "build/link/HMM2PL.res"))
     parser.add_argument("--linker", help="alternate LINK.EXE for an isolated A/B link")
     parser.add_argument(
         "--required-initialized", default=str(REQUIRED_INITIALIZED_STORAGE),

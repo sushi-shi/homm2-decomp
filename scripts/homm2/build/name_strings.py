@@ -15,7 +15,7 @@ import os, re, struct, subprocess, sys, tempfile
 from pathlib import Path
 
 from homm2.core.paths import REPO
-EXE = REPO/"build/orig/HEROES2W.EXE"; CSV = REPO/"build/gen/symbol_names.csv"
+EXE = REPO/"build/orig/HMM2PL.exe"; CSV = REPO/"build/gen/symbol_names.csv"
 MSVC = os.environ.get("MSVC_DIR", str(REPO/"build/toolchain/msvc"))
 
 def sections(d):

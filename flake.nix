@@ -1,5 +1,5 @@
 {
-  description = "HoMM2 'Price of Loyalty' HEROES2W.EXE (NWC, 1997, MSVC 4.2) - matching decompilation environment";
+  description = "HoMM2 Gold 2.1 / Buka HMM2PL.exe (NWC, 1997, VC6 SP5) - matching decompilation environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/64c08a7ca051951c8eae34e3e3cb1e202fe36786";
@@ -170,8 +170,8 @@
           packages = commonTools;
           shellHook = ''
             ${projectRootHook}
-            export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
-            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
+            export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
+            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             ${ghidraEnvHook}
@@ -197,8 +197,8 @@
           packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
           shellHook = ''
             ${projectRootHook}
-            export HOMM2_EXE="$HOMM2_DIR/build/orig/HEROES2W.EXE"
-            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HEROES2W.EXE into build/orig/ (gitignored, never committed)" >&2
+            export HOMM2_EXE="$HOMM2_DIR/build/orig/HMM2PL.exe"
+            [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"

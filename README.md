@@ -1,15 +1,16 @@
 # homm2-decomp
 
 Binary-matching decompilation of **Heroes of Might and Magic II — The Price of Loyalty**
-(`HEROES2W.EXE`, New World Computing, 1997), the only HoMM2 build that ships a **CodeView
-NB09** debug stream. The goal is to recover the C++ structure and behavior and, where retail
-evidence permits, reproduce the original code, data, and relocations with the **MSVC 4.2**
+(`HMM2PL.exe`, New World Computing, 1997). Unlike the Price of Loyalty line, this build is
+**stripped** - it ships no CodeView stream, so every symbol here comes from the source's own
+markers. The goal is to recover the C++ structure and behavior and, where retail evidence
+permits, reproduce the original code, data, and relocations with the **Visual C++ 6.0 SP5**
 toolchain. Retail executable bytes, relocations, and public RVAs are authoritative.
 [objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
 not proof of correctness.
 
 This repository does **not** contain the original game's executable or resources. Supply a
-legally obtained `HEROES2W.EXE` locally to initialize the matching workspace; the playable port
+legally obtained `HMM2PL.exe` locally to initialize the matching workspace; the playable port
 branches also require an installed copy of the game data.
 
 The embedded minimal CodeView stream proves retained public names and start RVAs only. Function
@@ -70,7 +71,7 @@ _**Functions exact** = byte-identical now. **Functions exact-max** = observed at
 ```
 src/      {BASE,SOURCE,EDITOR}   reconstructed C++ (carcass: RVA-annotated stubs -> real bodies)
 include/  {BASE,SOURCE,EDITOR}   recovered class headers (vtables, OVERRIDE) + va.h / Ints.h
-build/orig/   your HEROES2W.EXE (gitignored; copy it here before `homm2 init`)
+build/orig/   your HMM2PL.exe (gitignored; copy it here before `homm2 init`)
 config/   units.toml             per-TU build manifest
 scripts/homm2/    the CLI package - one role per subpackage, mirroring the commands:
           core/ analysis/ permute/ audit/ match/ build/ clean/ format/ init/ ghidra/

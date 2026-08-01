@@ -1,8 +1,8 @@
 # Missing public-data link audit
 
-The strict final link writes `build/link/HEROES2W.missing-data.tsv` and the equivalent
+The strict final link writes `build/link/HMM2PL.missing-data.tsv` and the equivalent
 JSON list at `static_storage.public_symbols.missing_symbols` in
-`HEROES2W.link.json`. Each row contains the retail `S_PUB32` name, owning compiland,
+`HMM2PL.link.json`. Each row contains the retail `S_PUB32` name, owning compiland,
 RVA, public-symbol span, retail PE storage class, root-cause classification, and
 supporting evidence.
 

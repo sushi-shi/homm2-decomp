@@ -79,7 +79,7 @@ the compiler supply `__FILE__`/`__LINE__`, which is both accurate and free.
 
 The branch carries `include/`, `src/`, vendor SDK headers, import definitions,
 `build.ninja`, and a standalone Nix flake. The Ninja graph builds
-`build/HEROES2W.EXE` for 32-bit Windows with Clang at `-O0`, x87 floating point,
+`build/HMM2PL.exe` for 32-bit Windows with Clang at `-O0`, x87 floating point,
 and LLD. The compiler runtime is linked statically.
 
 The matching toolchain, delinker, objdiff plumbing, and MSVC are absent. A direct
@@ -88,7 +88,7 @@ toolchain. Nix supplies all of them:
 
 ```sh
 nix build
-cp result/HEROES2W.EXE result/run-game.sh /path/to/installed/game/
+cp result/HMM2PL.exe result/run-game.sh /path/to/installed/game/
 cd /path/to/installed/game
 ./run-game.sh
 ```

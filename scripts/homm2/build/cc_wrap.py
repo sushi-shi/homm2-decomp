@@ -150,7 +150,7 @@ def main():
     # INCLUDE for <...> system headers). Each vendor/<sdk>/ dir (e.g. vendor/miles-3.6,
     # vendor/smacker-3.0g, vendor/wing-1.0) is added like the original toolchain's SDK
     # dirs so `#include <mss.h>` / `<smack.h>` / `<wing.h>` resolves; these are the
-    # closed middleware DLLs HEROES2W.EXE imports (mss32/smackw32/WING32) — headers only,
+    # closed middleware DLLs HMM2PL.exe imports (mss32/smackw32/WING32) — headers only,
     # never built as units. See docs/vendor-middleware.md. The depfile target must be
     # the obj path AS ninja passed it (a.out); `deps=gcc` in build.ninja consumes it.
     ap = argparse.ArgumentParser()

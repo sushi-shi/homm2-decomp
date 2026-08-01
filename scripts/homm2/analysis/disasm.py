@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""homm2.analysis.disasm - per-function disassembly of a HEROES2W function.
+"""homm2.analysis.disasm - per-function disassembly of a HMM2PL function.
 
 Two sides, both via `llvm-objdump` on the per-symbol COFF objects the pipeline already
 produces (so no raw-EXE byte carving, and both sides share ONE disassembler - the

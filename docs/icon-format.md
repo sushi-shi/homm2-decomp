@@ -5,7 +5,7 @@ dialects its frames use, and the decode actions every `Icon*ToBitmap*` routine p
 Per-function behaviour is in `icon-decoders.md`.
 
 Evidence class. Everything in the "Format" and "Parse actions" sections below was read back
-out of retail `HEROES2W.EXE` with `homm2 sema disasm` (RVAs cited inline) and agrees with the
+out of retail `HMM2PL.exe` with `homm2 sema disasm` (RVAs cited inline) and agrees with the
 current reconstruction in `src/BASE/Icon*.cpp` / `include/BASE/IconMacro.h`. The
 reconstruction itself is only partly byte-proven. The `icon` class methods and
 `GetIconEntry` are exact; the eleven RLE blitters are not (check

@@ -66,7 +66,7 @@ class LinkExeTest(unittest.TestCase):
 
     def test_module_definition_has_retail_description_and_exports(self):
         with tempfile.TemporaryDirectory() as directory:
-            path = write_module_definition(Path(directory) / "HEROES2W.def")
+            path = write_module_definition(Path(directory) / "HMM2PL.def")
             payload = path.read_text(encoding="ascii")
         self.assertIn("DESCRIPTION 'Heroes of Might and Magic 2'", payload)
         self.assertIn("AppAbout=?AppAbout@@YGHPAXIIJ@Z", payload)

@@ -1,6 +1,6 @@
 # MSVC 4.2 `/Od` local stack-slot allocation — complete model
 
-How the retail compiler (MSVC 4.2, `cl 10.20`, the build HEROES2W.EXE was made
+How the retail compiler (MSVC 4.2, `cl 10.20`, the build HMM2PL.exe was made
 with) decides the `ebp`-relative offset of every local in an unoptimized (`/Od`)
 function. Reverse-engineered from the toolchain itself — the C++ front end
 **C1XX.EXE** and back end **C2.EXE** — and verified byte-exact against the real

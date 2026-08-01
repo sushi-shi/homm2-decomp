@@ -88,7 +88,7 @@ The final isolated-worktree verification completed:
 - all delink manifests and source-private symbol checks;
 - 1,499 functions and 37,090 ordered relocation sites in the relocation-field
   audit, with zero structural review items;
-- the final `HEROES2W.EXE` link and link audit;
+- the final `HMM2PL.exe` link and link audit;
 - the strict hook: 94 units and zero failures.
 
 Focused current-master results:

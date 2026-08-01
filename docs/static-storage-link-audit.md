@@ -1,7 +1,7 @@
 # Static-storage link audit
 
 `ninja link` writes a per-symbol static-storage audit to
-`build/link/HEROES2W.link.json` under `static_storage.public_symbols`. This is a
+`build/link/HMM2PL.link.json` under `static_storage.public_symbols`. This is a
 final-link diagnostic, not an objdiff data-matching score and not a mechanism for
 forcing retail addresses.
 
@@ -125,7 +125,7 @@ The remaining writable drift starts in the loader-zero tail at `handler`'s
 their order still follows archive demand. Renaming `.bss` subsections matched only
 the aggregate size while displacing identities, so that experiment is deliberately
 not retained. Current section sizes and the first relative divergence are recorded
-in `build/link/HEROES2W.link.json` rather than copied into this durable document.
+in `build/link/HMM2PL.link.json` rather than copied into this durable document.
 
 The current exhaustive census covers all 1,499 unique functions and 21,664 retail
 data targets: 781 into `.rdata` and 20,883 into `.data`. Candidate code has 21,380

@@ -442,7 +442,7 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
                 "build $builddir/obj/example.o: cxx src/example.cpp",
                 ninja,
             )
-            self.assertIn("build $builddir/HEROES2W.EXE: link", ninja)
+            self.assertIn("build $builddir/HMM2PL.exe: link", ninja)
             self.assertIn("default game", ninja)
             self.assertIn(
                 "build $builddir/imports/MSS32.a: implib imports/MSS32.def",
@@ -650,7 +650,7 @@ class CleanSourceVerifyTests(unittest.TestCase):
                         check=False,
                     ),
                     mock.call(
-                        ("llvm-nm", "-C", str(output / "build/HEROES2W.EXE")),
+                        ("llvm-nm", "-C", str(output / "build/HMM2PL.exe")),
                         check=False,
                         capture_output=True,
                         text=True,

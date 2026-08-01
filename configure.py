@@ -70,12 +70,12 @@ def main():
         w.rule("link_exe",
                command=(f"{PY} -m homm2.build.link_exe --out $exe "
                         "--order build/link/objects.rsp "
-                        "--resource build/link/HEROES2W.res "
+                        "--resource build/link/HMM2PL.res "
                         "--imports build/link/vendor-imports-smack.lib "
                         "--imports build/link/vendor-imports-mss.lib "
                         "--imports build/link/vendor-imports-wing.lib "
                         "--imports build/link/system-imports-advapi.lib"),
-               description="link HEROES2W.EXE")
+               description="link HMM2PL.exe")
         w.rule("link_order",
                command=f"{PY} -m homm2.build.link_exe --write-order $out",
                description="link-order objects.rsp")
@@ -84,9 +84,9 @@ def main():
                description="link-imports middleware libraries")
         w.rule("link_resources",
                command=(f"{PY} -m homm2.build.extract_resources "
-                        "--exe build/orig/HEROES2W.EXE --out build/link/HEROES2W.res "
-                        "--report build/link/HEROES2W.resources.json"),
-               description="link-resources HEROES2W.res")
+                        "--exe build/orig/HMM2PL.exe --out build/link/HMM2PL.res "
+                        "--report build/link/HMM2PL.resources.json"),
+               description="link-resources HMM2PL.res")
         normalizer = ["scripts/homm2/build/canonicalize_data_symbols.py",
                       "build/gen/compiler_generated_functions.csv",
                       "build/gen/delink_data_manifest.tsv"]
@@ -122,7 +122,7 @@ def main():
                         implicit=[obj, reloc_normalizer,
                                   "scripts/homm2/build/assert_relocs.py",
                                   "build/gen/symbol_names.csv",
-                                  "build/orig/HEROES2W.EXE"],
+                                  "build/orig/HMM2PL.exe"],
                         variables={"base": obj, "unit": u["unit"]})
                 target_normalized = (
                     f"build/objdiff/normalized/target/{u['unit']}.c.obj")
@@ -145,7 +145,7 @@ def main():
         w.build("all", "phony", inputs=comparison_inputs)
         w.build("base", "phony", inputs=objs)
         order_inputs = ["config/units.toml", "build/gen/symbol_names.csv",
-                        "build/orig/HEROES2W.EXE", "scripts/homm2/build/link_exe.py"]
+                        "build/orig/HMM2PL.exe", "scripts/homm2/build/link_exe.py"]
         w.build("build/link/objects.rsp", "link_order", inputs=order_inputs)
         import_outputs = ["build/link/vendor-imports-mss.lib",
                           "build/link/vendor-imports-smack.lib",
@@ -153,27 +153,27 @@ def main():
                           "build/link/system-imports-advapi.lib"]
         w.build(import_outputs, "link_imports",
                 inputs="scripts/homm2/build/gen_vendor_imports.py")
-        resource_output = "build/link/HEROES2W.res"
-        w.build([resource_output, "build/link/HEROES2W.resources.json"], "link_resources",
-                inputs=["build/orig/HEROES2W.EXE",
+        resource_output = "build/link/HMM2PL.res"
+        w.build([resource_output, "build/link/HMM2PL.resources.json"], "link_resources",
+                inputs=["build/orig/HMM2PL.exe",
                         "scripts/homm2/build/extract_resources.py"])
-        link_outputs = ["build/link/HEROES2W.EXE", "build/link/HEROES2W.map",
-                        "build/link/HEROES2W.link.json",
-                        "build/link/HEROES2W.missing-data.tsv"]
+        link_outputs = ["build/link/HMM2PL.exe", "build/link/HMM2PL.map",
+                        "build/link/HMM2PL.link.json",
+                        "build/link/HMM2PL.missing-data.tsv"]
         w.build(link_outputs, "link_exe",
                 inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
-                implicit=objs + ["build/orig/HEROES2W.EXE",
+                implicit=objs + ["build/orig/HMM2PL.exe",
                                  "config/required_initialized_storage.tsv",
                                  "scripts/homm2/build/build_libcmt_gfy.py",
                                  "scripts/homm2/build/retopologize_data.py",
                                  "scripts/homm2/build/link_exe.py"],
-                variables={"exe": "build/link/HEROES2W.EXE"})
-        w.build("link", "phony", inputs="build/link/HEROES2W.EXE")
+                variables={"exe": "build/link/HMM2PL.exe"})
+        w.build("link", "phony", inputs="build/link/HMM2PL.exe")
         w.build("link-order", "phony", inputs="build/link/objects.rsp")
         w.build("link-imports", "phony", inputs=import_outputs)
         w.build("link-resources", "phony", inputs=resource_output)
         w.build("link-map", "phony",
-                inputs=["build/link/HEROES2W.map", "build/link/HEROES2W.link.json"])
+                inputs=["build/link/HMM2PL.map", "build/link/HMM2PL.link.json"])
         w.default("all")
 
     units_j = []

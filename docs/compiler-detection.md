@@ -1,4 +1,4 @@
-# Compiler detection — PoL HEROES2W.EXE
+# Compiler detection — PoL HMM2PL.exe
 
 **Conclusion: Microsoft Visual C++ 4.2 compiler** (cl 10.20), with the older
 Visual C++ 4.0 final-link component: LINK **3.00.5270**, its matching CVPACK/PDB
@@ -95,9 +95,9 @@ building the normal link inputs, run an isolated A/B output:
 ```sh
 python3 -m homm2.build.link_exe \
   --linker /provenance-known/VC40/BIN/LINK.EXE \
-  --out build/link-link300/HEROES2W.EXE \
+  --out build/link-link300/HMM2PL.exe \
   --order build/link/objects.rsp \
-  --resource build/link/HEROES2W.res \
+  --resource build/link/HMM2PL.res \
   --imports build/link/vendor-imports-smack.lib \
   --imports build/link/vendor-imports-mss.lib \
   --imports build/link/vendor-imports-wing.lib
