@@ -6,9 +6,9 @@ from types import SimpleNamespace
 from unittest import mock
 
 import clang.cindex as ci
-import generate_ast_variants as generator
+from homm2.permute import generate_ast_variants as generator
 
-from generate_ast_variants import (
+from homm2.permute.generate_ast_variants import (
     AstEdit,
     AstMutation,
     balance_mutations,

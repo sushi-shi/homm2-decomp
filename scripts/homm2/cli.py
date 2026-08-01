@@ -96,8 +96,12 @@ def main(argv=None):
         from homm2.match.status import main as st; return st(rest)
     if cmd == "sema":
         from homm2.analysis.sema import main as m; return m(rest)
+    if cmd == "permute":
+        # The measured source-variant search; see homm2/permute/__init__.py for the
+        # layering. This is the frontend, never a lower stage.
+        from homm2.permute.match_variants import main as m; return m(rest)
     if cmd == "ghidra":
         from homm2.ghidra.driver import cli_main as m; return m(rest)
-    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|ghidra}",
+    print("usage: homm2 {init|redelink|model-drift|configure|build|link|clangd|format|constants|strict-allocations|od-frames|data-relocs|data-topology|status|relocs|sema|permute|ghidra}",
           file=sys.stderr)
     return 0 if cmd in ("help", "-h", "--help") else 1

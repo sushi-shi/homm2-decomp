@@ -51,7 +51,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from homm2.analysis.disasm import _branch_kind, _cfg, _objdump
-from tu_state_noise import (
+from homm2.permute.tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
     byte_differences,

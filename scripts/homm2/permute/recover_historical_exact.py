@@ -30,7 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from historical_exact_losses import parse_baseline
-from tu_state_noise import (
+from homm2.permute.tu_state_noise import (
     SourceMutationError,
     acquire_source_mutation_lock,
     resolve_target,

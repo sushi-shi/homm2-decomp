@@ -26,7 +26,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from homm2.match.source_hashes import source_hashes
-from recover_historical_exact import (
+from homm2.permute.recover_historical_exact import (
     RESULT_FIELDS,
     append_result,
     artifact_name,
