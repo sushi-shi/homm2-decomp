@@ -15,6 +15,11 @@ def main(argv=None):
     if argv:
         print("usage: homm2 init")
         return 1
+    # Before redelink, not after: its name_strings step runs `cl` under wine, so a
+    # checkout without a toolchain cannot get past it.
+    from homm2.init.toolchain import main as toolchain
+    if toolchain([]):
+        return 1
     if redelink([]):
         return 1
     if run("python3", "-m", "homm2.init.clangd"):

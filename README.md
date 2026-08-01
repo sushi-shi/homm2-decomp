@@ -105,16 +105,27 @@ The final link is opt-in, so object matching stays fast. Its Ninja graph exposes
 The build performs only a fast warning-only model-drift census, so a half-built TU
 does not force an immediate redelink.
 
-The matching toolchain is provisioned into `build/toolchain/` from two preserved
-components: the VC 4.2 compiler/header tree and the older VC 4.0 final-link tree.
-The provisioners validate the pinned compiler, linker, headers, import libraries,
-and both CRT archives before publishing either tree atomically:
+The matching toolchain lives in `build/toolchain/` and has two components: the VC 4.2
+compiler/header tree and the older VC 4.0 final-link tree. **`homm2 init` fetches both**
+from the pinned `toolchain-vc42-link300` release, checks the archive against its
+recorded SHA-256, and validates the unpacked tree against the pinned per-artifact
+hashes. Nothing to do by hand:
 
 ```sh
-scripts/toolchain/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
-scripts/toolchain/make-linker.sh /path/to/MSVC40.iso
-scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc
-scripts/toolchain/make-linker.sh --check build/toolchain/link300
+homm2 init                                    # fetches the toolchain, then redelinks
+python3 -m homm2.init.toolchain --check       # re-validate an existing tree
+python3 -m homm2.init.toolchain --force       # refetch over it
+```
+
+Provisioning from your own media stays supported, and is the only option for an
+edition the release does not pin. Both provisioners validate the compiler, linker,
+headers, import libraries, and both CRT archives before publishing a tree atomically:
+
+```sh
+scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe
+scripts/toolchain/make_linker.py /path/to/MSVC40.iso
+scripts/toolchain/make_toolchain.py --check build/toolchain/msvc
+scripts/toolchain/make_linker.py --check build/toolchain/link300
 ```
 
 Object compilation always uses VC 4.2. When the separately pinned `link300`

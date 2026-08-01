@@ -24,15 +24,15 @@ The initial provisioning session downloaded `en_vc42ent_disc1.exe`, extracted
 those three directories with `unrar`, and moved them directly into the gitignored
 `build/toolchain/msvc` directory. Commit `33fe2e4` recorded that provisioning in
 its message, but committed only unrelated generated-manifest path changes. The
-`scripts/toolchain/make-toolchain.sh` reference existed from the initial scaffold and no
+`scripts/toolchain/make_toolchain.py` reference existed from the initial scaffold and no
 provisioning or release-builder script was ever added to Git. Release `v0.1.0`
 therefore contains neither script, and its GitHub release has no binary assets.
 
 The recovered workflow has two explicit entry points:
 
-- `scripts/toolchain/make-toolchain.sh` provisions or verifies a local tree. It supports
+- `scripts/toolchain/make_toolchain.py` provisions or verifies a local tree. It supports
   the original RAR SFX, other archive/disc inputs, and installed `MSDEV` trees.
-- `scripts/toolchain/make-linker.sh` provisions the separate pinned LINK 3.00 component
+- `scripts/toolchain/make_linker.py` provisions the separate pinned LINK 3.00 component
   and its pinned `LIBCMT.LIB` from VC 4.0 media without replacing the VC 4.2
   compiler, headers, or non-CRT libraries.
 - `scripts/toolchain/create-toolchain-release.nix` reproduces a normalized `.tar.xz` from
@@ -50,13 +50,33 @@ supersedes that derived archive. The byte-constrained VC 4.2 experiment and its
 official-source proof are documented in
 [`vc42-libcmt-gf.md`](vc42-libcmt-gf.md).
 
-## Local provisioning
+## Getting a toolchain
+
+`homm2 init` populates `build/toolchain/` from the pinned release below, so a fresh
+checkout needs no media. It gates the download on the recorded archive SHA-256 and
+then runs each component's own pinned-artifact check over the unpacked tree; a
+tarball that does not hash as expected is discarded rather than installed.
 
 ```sh
-scripts/toolchain/make-toolchain.sh /path/to/en_vc42ent_disc1.exe
-scripts/toolchain/make-linker.sh /path/to/MSVC40.iso
-scripts/toolchain/make-toolchain.sh --check build/toolchain/msvc
-scripts/toolchain/make-linker.sh --check build/toolchain/link300
+homm2 init                                  # fetch (skipped when already present)
+python3 -m homm2.init.toolchain --check     # validate what is there, fetch nothing
+python3 -m homm2.init.toolchain --force     # refetch over an existing tree
+```
+
+The fetch uses `gh`, which the dev shell provides. Making the toolchain a
+`pkgs.fetchurl` derivation instead - the sibling Gruntz layout, where `MSVC_DIR`
+points into the Nix store and cannot drift - is the better endgame and a small
+change once the release is anonymously fetchable.
+
+## Local provisioning
+
+Use this for media the release does not pin.
+
+```sh
+scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe
+scripts/toolchain/make_linker.py /path/to/MSVC40.iso
+scripts/toolchain/make_toolchain.py --check build/toolchain/msvc
+scripts/toolchain/make_linker.py --check build/toolchain/link300
 ```
 
 The RAR SFX path requires `unrar` on `PATH`; an already installed `MSDEV` tree
@@ -87,6 +107,6 @@ runs produced the same release SHA-256:
 ```
 
 The archive is published on GitHub under the dedicated
-[`toolchain-vc42-link300`](https://github.com/homm2-decomp/homm2-decomp/releases/tag/toolchain-vc42-link300)
+[`toolchain-vc42-link300`](https://github.com/sushi-shi/homm2-decomp/releases/tag/toolchain-vc42-link300)
 release. Its `link300/lib/LIBCMT.LIB` has SHA-256
 `d7bdb49c0a3bc77dee026b9aa9a994c5a78963c8aefc6512dbb298b4d41c4907`.

@@ -152,6 +152,7 @@
         llvm                              # llvm-pdbutil (synth_pdb yaml2pdb)
         llvmPackages.clang-unwrapped      # clangd + clang-format + clang driver (UNWRAPPED: no host gcc/glibc include shadowing)
         ripgrep file xxd jq binutils p7zip
+        gh                                # `homm2 init` fetches the pinned toolchain release
       ]);
 
       # PyGhidra env, shared by both shells: pyghidra.start() reads GHIDRA_INSTALL_DIR
@@ -184,9 +185,12 @@
           '';
         };
 
-        # Build - MSVC 4.2 under wine. Toolchain defaults to build/toolchain (populate
-        # from the en_vc42ent discs via scripts/toolchain/make-toolchain.sh); override $HOMM2_TOOLCHAIN
-        # to a hosted tarball once pinned.
+        # Build - MSVC 4.2 under wine. Toolchain defaults to build/toolchain, which
+        # `homm2 init` populates from the pinned toolchain-vc42-link300 release; set
+        # $HOMM2_TOOLCHAIN to point somewhere else. Making it a fetchurl derivation
+        # instead (the sibling Gruntz layout) is the better endgame - a store path
+        # cannot drift - and is a small change once the release is anonymously
+        # fetchable.
         build = pkgs.mkShell {
           name = "homm2-build";
           packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
@@ -208,7 +212,8 @@
             echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
             echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
-              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run scripts/toolchain/make-toolchain.sh on the en_vc42ent discs" >&2
+              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run \`homm2 init\` to fetch the pinned release" >&2
+              echo "[homm2]              (or provision from your own media: scripts/toolchain/make_toolchain.py --help)" >&2
             fi
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE" >&2
