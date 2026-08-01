@@ -10,21 +10,25 @@ from homm2.init import toolchain
 
 def _tree(root: Path, cl=True):
     (root / "msvc" / "bin").mkdir(parents=True)
-    (root / "link300" / "bin").mkdir(parents=True)
     if cl:
         (root / "msvc" / "bin" / "CL.EXE").write_bytes(b"MZ")
     return root
 
 
-def _archive(path: Path, prefix="homm2-toolchain-vc42-link300", components=("msvc", "link300")):
-    """A tarball shaped like the release: one top dir, stripped on extract."""
+def _archive(path: Path, components=("msvc",)):
+    """A tarball shaped like the VC6 release: components at the TOP level.
+
+    No wrapping directory, so nothing is stripped on extract. The VC 4.2 release
+    was the other shape; getting this wrong silently produces an empty tree.
+    """
     with TemporaryDirectory() as staging:
-        top = Path(staging) / prefix
+        top = Path(staging)
         for component in components:
             (top / component / "bin").mkdir(parents=True)
             (top / component / "bin" / "CL.EXE").write_bytes(b"MZ")
         with tarfile.open(path, "w") as archive:
-            archive.add(top, arcname=prefix)
+            for component in components:
+                archive.add(top / component, arcname=component)
     return path
 
 
@@ -73,18 +77,17 @@ class DownloadGateTests(unittest.TestCase):
         with mock.patch.object(toolchain.shutil, "which", return_value=None):
             with self.assertRaises(SystemExit) as raised:
                 toolchain.download(Path("/nonexistent"))
-        self.assertIn("make_toolchain.py", str(raised.exception))
+        self.assertIn("create-toolchain-release.nix", str(raised.exception))
 
 
 class InstallTests(unittest.TestCase):
-    def test_strips_the_top_level_directory(self):
+    def test_unpacks_components_from_the_archive_top_level(self):
         with TemporaryDirectory() as directory:
             base = Path(directory)
             archive = _archive(base / "tc.tar")
             root = base / "toolchain"
             toolchain.install(archive, root)
             self.assertTrue((root / "msvc" / "bin" / "CL.EXE").exists())
-            self.assertTrue((root / "link300").is_dir())
 
     def test_replaces_an_existing_tree(self):
         with TemporaryDirectory() as directory:
@@ -100,10 +103,10 @@ class InstallTests(unittest.TestCase):
             base = Path(directory)
             root = _tree(base / "toolchain")
             (root / "msvc" / "keep.txt").write_text("original")
-            partial = _archive(base / "partial.tar", components=("msvc",))
+            partial = _archive(base / "partial.tar", components=("bogus",))
             with self.assertRaises(SystemExit) as raised:
                 toolchain.install(partial, root)
-            self.assertIn("link300", str(raised.exception))
+            self.assertIn("msvc", str(raised.exception))
             # The swap must not have happened.
             self.assertEqual((root / "msvc" / "keep.txt").read_text(), "original")
 

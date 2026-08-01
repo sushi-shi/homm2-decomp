@@ -14,9 +14,9 @@ and it is a small change once the release is anonymously fetchable. Until then
 the fetch happens at init, where it runs in your shell with your credentials
 rather than inside a Nix sandbox without them.
 
-Provisioning from media stays supported and is still the only option for a
-different edition; see scripts/toolchain/make_toolchain.py. This just means you
-no longer need it to get started.
+Reproducing the tarball from the preserved VS6 Enterprise disc and SP5 media
+stays supported: scripts/toolchain/create-toolchain-release.nix. This just means
+you no longer need the media to get started.
 
     python3 -m homm2.init.toolchain           # fetch if absent
     python3 -m homm2.init.toolchain --force   # refetch over an existing tree
@@ -36,15 +36,19 @@ from pathlib import Path
 from homm2.core.paths import REPO
 
 REPOSITORY = "sushi-shi/homm2-decomp"
-RELEASE_TAG = "toolchain-vc42-link300"
-ASSET = "homm2-toolchain-vc42-link300.tar.xz"
-# docs/toolchain-vc42.md records this as the output of two independent packaging
-# runs. It is the gate: a tarball that does not hash to it is not the toolchain,
-# whatever the release page says.
-ASSET_SHA256 = "37f04afbb8cf8005878e010608620c51f16f1a945e7cb76145fd0f52d09617a3"
+RELEASE_TAG = "toolchain-vc6-sp5"
+ASSET = "homm2-toolchain-vc6-sp5.tar.xz"
+# The gate: a tarball that does not hash to this is not the toolchain, whatever
+# the release page says.
+ASSET_SHA256 = "b243b68a1df8c2c54f7830a14221fa0a73fd3bbca78343fd1dd81a815a32ecec"
 
-COMPONENTS = ("msvc", "link300")
-CHECKERS = {"msvc": "make_toolchain.py", "link300": "make_linker.py"}
+# One component, and the archive has no wrapping directory - its top level IS
+# msvc/, so it unpacks with no --strip-components. The VC 4.2 release shipped two
+# components under a wrapper; do not carry that shape over.
+COMPONENTS = ("msvc",)
+# The release builder owns the pinned per-artifact hashes; --check re-runs its
+# verify() over an unpacked tree, so they are not duplicated here.
+CHECKER = "create-toolchain-release.py"
 
 
 def toolchain_dir() -> Path:
@@ -74,7 +78,7 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def validate(root: Path, allow_unpinned: bool = False) -> bool:
+def validate(root: Path) -> bool:
     """Run each component's own pinned-hash checker over an existing tree."""
     ok = True
     for component in COMPONENTS:
@@ -83,10 +87,8 @@ def validate(root: Path, allow_unpinned: bool = False) -> bool:
             log(f"{component}: MISSING at {path}")
             ok = False
             continue
-        command = [sys.executable, str(REPO / "scripts/toolchain" / CHECKERS[component]),
+        command = [sys.executable, str(REPO / "scripts/toolchain" / CHECKER),
                    "--check", str(path)]
-        if allow_unpinned:
-            command.append("--allow-unpinned")
         if subprocess.run(command, cwd=REPO).returncode != 0:
             log(f"{component}: FAILED its pinned-artifact check")
             ok = False
@@ -101,7 +103,7 @@ def download(destination: Path) -> Path:
         raise SystemExit(
             "[toolchain] gh is not on PATH; it is what fetches the release asset.\n"
             "            Enter `nix develop .#build`, or provision from media:\n"
-            "              scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe")
+            "              nix-shell scripts/toolchain/create-toolchain-release.nix")
     log(f"fetching {ASSET} from {REPOSITORY} {RELEASE_TAG}")
     result = subprocess.run(
         ["gh", "release", "download", RELEASE_TAG, "--repo", REPOSITORY,
@@ -110,7 +112,7 @@ def download(destination: Path) -> Path:
         raise SystemExit(
             "[toolchain] download failed. If gh is not logged in, run `gh auth login`;\n"
             "            otherwise provision from media with\n"
-            "              scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe")
+            "              nix-shell scripts/toolchain/create-toolchain-release.nix")
     archive = destination / ASSET
     actual = sha256(archive)
     if actual != ASSET_SHA256:
@@ -129,8 +131,7 @@ def install(archive: Path, root: Path) -> None:
     root.parent.mkdir(parents=True, exist_ok=True)
     staging = Path(tempfile.mkdtemp(prefix=".toolchain-", dir=root.parent))
     try:
-        subprocess.run(["tar", "xf", str(archive), "-C", str(staging),
-                        "--strip-components=1"], check=True)
+        subprocess.run(["tar", "xf", str(archive), "-C", str(staging)], check=True)
         missing = [c for c in COMPONENTS if not (staging / c).is_dir()]
         if missing:
             raise SystemExit(f"[toolchain] archive lacks {', '.join(missing)}")
@@ -153,14 +154,12 @@ def main(argv=None) -> int:
                         help="refetch even when a toolchain is already present")
     parser.add_argument("--check", action="store_true",
                         help="validate the existing tree; never download")
-    parser.add_argument("--allow-unpinned", action="store_true",
-                        help="accept a tree whose artifacts are not the pinned ones")
     args = parser.parse_args(argv)
 
     root = toolchain_dir()
 
     if args.check:
-        return 0 if validate(root, args.allow_unpinned) else 1
+        return 0 if validate(root) else 1
 
     if is_provisioned(root) and not args.force:
         log(f"present at {root} (--force to refetch, --check to validate)")
@@ -169,7 +168,7 @@ def main(argv=None) -> int:
     with tempfile.TemporaryDirectory(prefix="homm2-toolchain-") as scratch:
         install(download(Path(scratch)), root)
 
-    if not validate(root, args.allow_unpinned):
+    if not validate(root):
         log("the installed tree did not pass its pinned-artifact checks")
         return 1
     return 0

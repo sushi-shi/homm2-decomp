@@ -185,12 +185,14 @@
           '';
         };
 
-        # Build - MSVC 4.2 under wine. Toolchain defaults to build/toolchain, which
-        # `homm2 init` populates from the pinned toolchain-vc42-link300 release; set
-        # $HOMM2_TOOLCHAIN to point somewhere else. Making it a fetchurl derivation
-        # instead (the sibling Gruntz layout) is the better endgame - a store path
-        # cannot drift - and is a small change once the release is anonymously
-        # fetchable.
+        # Build - VC6 SP5 under wine, the compiler this target was built with.
+        # Toolchain defaults to build/toolchain, which `homm2 init` populates from the
+        # pinned toolchain-vc6-sp5 release; set $HOMM2_TOOLCHAIN to point somewhere
+        # else. Unlike the VC 4.2 line there is no separate final-link component: VC6
+        # links with its own LINK.EXE out of the same tree. Making it a fetchurl
+        # derivation instead (the sibling Gruntz layout) is the better endgame - a
+        # store path cannot drift - and is a small change once the release is
+        # anonymously fetchable.
         build = pkgs.mkShell {
           name = "homm2-build";
           packages = commonTools ++ [ pkgs.wineWow64Packages.staging ];
@@ -202,18 +204,15 @@
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
             export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
-            if [ -f "$HOMM2_TOOLCHAIN/link300/bin/LINK.EXE" ]; then
-              export HOMM2_LINK_EXE="$HOMM2_TOOLCHAIN/link300/bin/LINK.EXE"
-            fi
             export WINEPREFIX="$HOMM2_DIR/build/wineprefix"
             export WINEDEBUG="fixme-all,err-kerberos"
             export WINEDLLOVERRIDES="mscoree,mshtml="
             case "$-" in *i*) trap 'wineserver -k >/dev/null 2>&1 || true' EXIT ;; esac
-            echo "[homm2] MSVC 4.2   : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
+            echo "[homm2] VC6 SP5    : $MSVC_DIR/bin/CL.EXE (under wine)" >&2
             echo "[homm2] final LINK : ''${HOMM2_LINK_EXE:-$MSVC_DIR/bin/LINK.EXE}" >&2
             if [ ! -f "$MSVC_DIR/bin/CL.EXE" ] && [ ! -f "$MSVC_DIR/bin/cl.exe" ]; then
-              echo "[homm2] MSVC 4.2   : NOT PROVISIONED - run \`homm2 init\` to fetch the pinned release" >&2
-              echo "[homm2]              (or provision from your own media: scripts/toolchain/make_toolchain.py --help)" >&2
+              echo "[homm2] VC6 SP5    : NOT PROVISIONED - run \`homm2 init\` to fetch the pinned release" >&2
+              echo "[homm2]              (or rebuild it from media: nix-shell scripts/toolchain/create-toolchain-release.nix)" >&2
             fi
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE" >&2

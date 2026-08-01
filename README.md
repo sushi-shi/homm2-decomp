@@ -105,11 +105,11 @@ The final link is opt-in, so object matching stays fast. Its Ninja graph exposes
 The build performs only a fast warning-only model-drift census, so a half-built TU
 does not force an immediate redelink.
 
-The matching toolchain lives in `build/toolchain/` and has two components: the VC 4.2
-compiler/header tree and the older VC 4.0 final-link tree. **`homm2 init` fetches both**
-from the pinned `toolchain-vc42-link300` release, checks the archive against its
-recorded SHA-256, and validates the unpacked tree against the pinned per-artifact
-hashes. Nothing to do by hand:
+This target was built with **Visual C++ 6.0 SP5**, not the VC 4.2 of the PoL 2.0 line,
+so the toolchain is a single component: `build/toolchain/msvc`, compiler and linker in
+one tree. **`homm2 init` fetches it** from the pinned `toolchain-vc6-sp5` release, gates
+the download on the archive's recorded SHA-256, then re-runs the release builder's own
+`verify()` over the unpacked tree. Nothing to do by hand:
 
 ```sh
 homm2 init                                    # fetches the toolchain, then redelinks
@@ -117,26 +117,22 @@ python3 -m homm2.init.toolchain --check       # re-validate an existing tree
 python3 -m homm2.init.toolchain --force       # refetch over it
 ```
 
-Provisioning from your own media stays supported, and is the only option for an
-edition the release does not pin. Both provisioners validate the compiler, linker,
-headers, import libraries, and both CRT archives before publishing a tree atomically:
+Rebuilding the tarball from the preserved media stays supported. Two things about SP5
+make it more than an unzip: its cabinets are a multi-volume set that must be followed
+through the chain, and it ships four back ends under edition-specific names, of which
+Enterprise's `msvcep.dll` is the one this target used. The base disc also spells every
+name in 8.3, so six C++ standard headers are restored to their long names:
 
 ```sh
-scripts/toolchain/make_toolchain.py /path/to/en_vc42ent_disc1.exe
-scripts/toolchain/make_linker.py /path/to/MSVC40.iso
-scripts/toolchain/make_toolchain.py --check build/toolchain/msvc
-scripts/toolchain/make_linker.py --check build/toolchain/link300
+nix-shell scripts/toolchain/create-toolchain-release.nix     # pins both media by SHA-1
+scripts/toolchain/create-toolchain-release.py --check build/toolchain/msvc
 ```
 
-Object compilation always uses VC 4.2. When the separately pinned `link300`
-component is present, `homm2 link` uses VC 4.0 LINK 3.00.5270 and its sibling
-CVPACK/CVTRES tools and `LIBCMT.LIB`. The VC 4.0 runtime archive supplies the
-retail CRT members; in particular, its `testfdiv.obj` carries private literal
-identities absent from the VC 4.2 archive. The deterministic Gruntz-style release
-builder is `scripts/toolchain/create-toolchain-release.nix`; provenance, the release hash,
-and recovery history are in
-[`docs/toolchain-vc42.md`](docs/toolchain-vc42.md). `clang`/`clangd` is editor tooling only;
-the Wine MSVC 4.2 build is the sole verdict on a match.
+Seven artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
+`LINK.EXE`, `CVTRES.EXE`, `LIBCMT.LIB` - and the assembled compiler must stamp the
+target's own `@comp.id` before a tarball is written. Provenance is in
+[`docs/buka-analysis.md`](docs/buka-analysis.md). `clang`/`clangd` is editor tooling only;
+the Wine VC6 build is the sole verdict on a match.
 
 ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
 so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
