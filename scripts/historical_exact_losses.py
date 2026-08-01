@@ -26,7 +26,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[1]))
+from homm2.core.paths import REPO
+
 DEFAULT_BASELINE = Path("config/match_baseline.tsv")
 DEFAULT_REPORT = Path("build/objdiff/report.json")
 DEFAULT_SYMBOLS = Path("build/gen/symbol_names.csv")

@@ -13,7 +13,8 @@
 # bytes are a printable null-terminated string get name = the real ??_C@ symbol.
 import os, re, struct, subprocess, sys, tempfile
 from pathlib import Path
-REPO = next((p for p in Path(__file__).resolve().parents if (p/"flake.nix").exists()), Path.cwd())
+
+from homm2.core.paths import REPO
 EXE = REPO/"build/orig/HEROES2W.EXE"; CSV = REPO/"build/gen/symbol_names.csv"
 MSVC = os.environ.get("MSVC_DIR", str(REPO/"build/toolchain/msvc"))
 

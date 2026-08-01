@@ -21,7 +21,7 @@ import make_toolchain
 import make_linker
 
 
-REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parent.parent)).resolve()
+REPO = make_toolchain.REPO
 RELEASE_EPOCH = 1782573438  # Fixed project release epoch, 2026-06-27 UTC.
 
 
