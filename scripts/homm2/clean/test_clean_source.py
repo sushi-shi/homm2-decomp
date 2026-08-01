@@ -347,17 +347,17 @@ class CleanSourceOutputSafetyTests(unittest.TestCase):
         repo = root / "repo"
         (repo / "include").mkdir(parents=True)
         (repo / "src").mkdir()
-        (repo / "scripts/clean_project").mkdir(parents=True)
+        (repo / "scripts/homm2/clean/project").mkdir(parents=True)
         (repo / "include/example.h").write_text("#pragma once\n")
         (repo / "src/example.cpp").write_text("int example;\n")
-        (repo / "scripts/clean_project/flake.lock").write_text("{}\n")
-        (repo / "scripts/clean_project/flake.nix").write_text(
+        (repo / "scripts/homm2/clean/project/flake.lock").write_text("{}\n")
+        (repo / "scripts/homm2/clean/project/flake.nix").write_text(
             "{ outputs = _: {}; }\n"
         )
-        (repo / "scripts/clean_project/.gitignore").write_text(
+        (repo / "scripts/homm2/clean/project/.gitignore").write_text(
             "/build/\n/result\n"
         )
-        (repo / "scripts/run-game.sh").write_text("#!/bin/sh\n")
+        (repo / "scripts/homm2/clean/project/run-game.sh").write_text("#!/bin/sh\n")
         return repo
 
     def test_generate_refuses_source_owned_output_without_deleting_it(self):

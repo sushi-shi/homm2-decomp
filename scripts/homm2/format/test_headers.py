@@ -1,6 +1,6 @@
 import unittest
 
-from format_headers import format_text
+from homm2.format.headers import format_text
 
 
 class FormatHeadersTests(unittest.TestCase):

@@ -16,7 +16,7 @@
 -- BASE side only (vb, and the base pane of vd): each source STATEMENT is floated as
 -- a virtual line above the asm it lowered to, and each `[ebp±off]` access is tagged
 -- end-of-line with its local/param NAME (`mov eax, [ebp-0x10] ; cell`). Data:
--- build/lines/<unit>.json from scripts/gen_lines.py (compiles the TU /Z7 -
+-- build/lines/<unit>.json from homm2.analysis.gen_lines (compiles the TU /Z7 -
 -- codegen-neutral - and reads its COFF line table + .debug$S S_BPREL32 locals; needs
 -- the `nix develop .#build` shell for wine cl). Retail has no debug info, so
 -- target/diff-target panes are never annotated.
@@ -325,7 +325,7 @@ local function pct(x) return string.format("%.2f%%", x or 0) end
 -- BASE-only (our /Z7 build carries line info; retail has none). For vb and the
 -- base pane of vd we float each source STATEMENT above the asm it lowered to, as
 -- transient virtual lines (the buffer text is unchanged). Data: build/lines/
--- <unit>.json from scripts/gen_lines.py (compiles the TU /Z7 - codegen-neutral, so
+-- <unit>.json from homm2.analysis.gen_lines (compiles the TU /Z7 - codegen-neutral, so
 -- the COFF line-table offsets equal objdiff's base-side instruction addresses).
 local SRC_NS = vim.api.nvim_create_namespace("homm2_source")
 local source_cache = {}    -- "root|unit" -> { mtime, map = {mangled -> {offset -> "Lnnn  text"}} }
@@ -370,7 +370,8 @@ local function source_map(root, unit, cb)
   end
   source_pending[key] = true
   log("gen_lines " .. unit .. "  [" .. root .. "]")
-  vim.system({ "python3", "scripts/gen_lines.py", unit }, { cwd = root, text = true },
+  vim.system({ "python3", "-m", "homm2.analysis.gen_lines", unit },
+    { cwd = root, text = true, env = { PYTHONPATH = root .. "/scripts" } },
     function(res)
       vim.schedule(function()
         source_pending[key] = nil
@@ -1162,6 +1163,19 @@ local function in_format_scope(root, file)
   return false
 end
 
+--- Run a homm2 tool module over stdin and return its stdout lines, or nil on
+--- failure. The formatters live in the `homm2` package under <root>/scripts and
+--- import from it themselves, so PYTHONPATH is set here rather than inherited:
+--- that keeps the overlay working when nvim was not launched from `nix develop`.
+local function pipe_through_module(root, module, input)
+  local res = vim.system(
+    { "python3", "-m", module, "-" },
+    { cwd = root, text = true, stdin = input,
+      env = { PYTHONPATH = root .. "/scripts" } }):wait()
+  if res.code ~= 0 then return nil end
+  return vim.split((res.stdout or ""):gsub("\n$", ""), "\n", { plain = true })
+end
+
 --- BufWritePre hook: when format-on-save is on, clang-format the buffer in place
 --- (synchronously, before the write hits disk) so the saved file is formatted in
 --- one save. The buffer is only rewritten when formatting actually changed
@@ -1191,18 +1205,14 @@ function M.format_on_save(buf)
   end
 
   if file:match("%.h%w*$") then
-    out = vim.fn.systemlist(
-      { "python3", root .. "/scripts/format_headers.py", "-" },
-      table.concat(out, "\n"))
-    if vim.v.shell_error ~= 0 then
+    out = pipe_through_module(root, "homm2.format.headers", table.concat(out, "\n"))
+    if not out then
       return notify("header formatting failed", vim.log.levels.ERROR)
     end
   end
 
-  out = vim.fn.systemlist(
-    { "python3", root .. "/scripts/format_enums.py", "-" },
-    table.concat(out, "\n"))
-  if vim.v.shell_error ~= 0 then
+  out = pipe_through_module(root, "homm2.format.enums", table.concat(out, "\n"))
+  if not out then
     return notify("enum formatting failed", vim.log.levels.ERROR)
   end
 
