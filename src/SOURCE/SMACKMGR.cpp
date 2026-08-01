@@ -16,7 +16,7 @@
 #include <SOURCE/SMACKMGR.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <PLATFORM/Runtime.h>
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <PLATFORM/Movie.h>
 #include <stdio.h>
 #include <string.h>

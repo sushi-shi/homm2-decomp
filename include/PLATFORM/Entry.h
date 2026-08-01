@@ -9,9 +9,6 @@ namespace platform {
 // backend up, run the game, take it down again.
 i32 Run(const char* commandLine);
 
-// The window, the game and the message loop. Implemented by the window layer.
-i32 RunApplication(const char* commandLine);
-
 }
 
 #endif

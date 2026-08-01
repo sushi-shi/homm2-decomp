@@ -23,7 +23,7 @@
 #include <SOURCE/REMOTE.h>
 #include <SOURCE/SMACKMGR.h>
 #include <PLATFORM/Runtime.h>
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <BASE/BITS.h>
 #include <BASE/bmap2.h>
 #include <BASE/bitmap.h>

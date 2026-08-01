@@ -5,7 +5,7 @@
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
 
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <PLATFORM/Platform.h>
 #include <PLATFORM/Runtime.h>
 

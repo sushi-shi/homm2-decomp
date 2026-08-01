@@ -96,7 +96,7 @@ static SWindowManagerText gWindowManagerText = {
 #include <BASE/widget.h>
 #include <BASE/palette.h>
 #include <string.h>
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 

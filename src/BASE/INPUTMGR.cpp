@@ -7,7 +7,7 @@
 #include <PLATFORM/Runtime.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
-#include <PLATFORM/Graphics.h>
+#include <SOURCE/wingraph.h>
 #include <BASE/inputManager.h>
 #include <BASE/INPUTMGR.h>
 #include <BASE/INPUTMGR_TYPES.h>
