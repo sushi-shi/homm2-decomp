@@ -7,9 +7,8 @@
       url = "github:oxalica/rust-overlay/6cddd512fa2bf7231f098d3a2f92f6e4cff71e0a";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Vostok branch with reviewed data topology and real folded-symbol identities.
     vostok-delinker-src = {
-      url = "github:srp-survarium/vostok-delinker/81d34b204a0384a92cf3b4c641a8430256b2922e";
+      url = "github:srp-survarium/vostok-delinker/a4cc119d80b4aff12607ac55e74d75c58542c3c8";
       flake = false;
     };
     objdiff-src = {
@@ -30,7 +29,7 @@
       vostok-delinker = nightly-rustPlatform.buildRustPackage {
         pname = "vostok-delinker"; version = "0.1.0";
         src = vostok-delinker-src;
-        cargoHash = "sha256-ry3TH1fz7Aj/JdbmlgQFFn29m8E7EQHyGaVXnZTEcXo=";
+        cargoHash = "sha256-ZwFdbqUyh4b0S+fUYKGMN1fWaxRu1zU2ozKpe7CbcYs=";
       };
 
       # Build the CLI from the pinned upstream source so its machine-readable diff
