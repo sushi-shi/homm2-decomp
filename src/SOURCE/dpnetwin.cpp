@@ -77,7 +77,16 @@ i16 dpnet_init(void) {
     static i16 initSourceLineBase = 95; // NOLINT(readability-magic-numbers)
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
-    typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACK, void*);
+    // LPDPENUMDPCALLBACK*A*, not the bare name. This target builds against VC6's
+    // DirectX 5+ DPLAY.H, where the unsuffixed typedef became the UNICODE callback
+    // (LPWSTR lpSPName) and the ANSI one moved to the A suffix. The code around it is
+    // ANSI throughout - dpEnumServiceProvider takes char*, and DirectPlayEnumerateA is
+    // what gets loaded below - so only the name to reach for changed.
+    //
+    // The PoL 2.0 line cannot spell it this way: its DirectX 1/2 header has a single
+    // ANSI callback under the bare name and defines no A variant. The divergence is a
+    // real difference between the two builds' SDKs, not a portability shim.
+    typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACKA, void*);
     DirectPlayEnumerateFunction enumerateFunction;
     DirectPlayCreateFunction createFunction;
     i32 guestIndex;
