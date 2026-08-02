@@ -15,13 +15,13 @@ platform = "win32"
 # ?KBChangeMenu@@YIXPAX@Z, where PAX is pointer-to-void. Compiling with STRICT would
 # emit PAUHMENU__@@ for every handle-taking function instead.
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/DNO_STRICT"]
-o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
-o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
-base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi", "/DNO_STRICT"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/DNO_STRICT"]
+o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
+o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
+base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Oi", "/DNO_STRICT"]
 # Buka's modern audio TUs carry C++ exception state (the image's SEH unwind
 # funclets come from them); /Gi- pins the incremental-compilation surface off.
-base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Gi-", "/GX", "/DNO_STRICT"]
+base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
 
 [[unit]]
 unit = "BASE/AudiereEffects"

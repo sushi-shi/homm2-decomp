@@ -210,6 +210,7 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xd1ca0,18,_$E18,BASE/droplist,BASE/AudiereEffects,masked-exact
 0xd1d20,46,??_GtextEntryWidget@@UAEPAXI@Z,BASE/Textntry,BASE/FONT,masked-exact
 0xd32c0,39,_$E19,BASE/Textntry,BASE/AudiereEffects,masked-exact
+0xd32f0,18,_$E18,BASE/Textntry,BASE/Textntry,reviewed-callgraph
 0xd3440,46,??_GdimmerWidget@@UAEPAXI@Z,BASE/DIMMER,BASE/FONT,masked-exact
 0xd3490,39,_$E19,BASE/DIMMER,BASE/AudiereEffects,masked-exact
 0xd34c0,18,_$E18,BASE/DIMMER,BASE/AudiereEffects,masked-exact

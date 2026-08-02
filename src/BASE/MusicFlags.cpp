@@ -22,3 +22,8 @@ u8 MusicFlagsActive(void) {
         active = 0;
     return active;
 }
+
+VA(0x004c57c0, 0xa)
+u8 GetMusicFlagB(void) {
+    return gMusicFlagB;
+}

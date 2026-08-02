@@ -198,7 +198,54 @@ def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
             key = (row.unit, row.name)
         named[key] = row.rva
         seen[row.rva] = row
+
+    # Every DIR32 site in the reviewed manifest names a target the delinker
+    # must be able to symbolize ("all constants must be named"). Targets not
+    # covered by a claim get synthetic const_<RVA> aliases; name_strings later
+    # upgrades the string-bearing ones to their real ??_C@ spellings.
+    for rva in _manifest_targets(repo):
+        if rva not in seen:
+            seen[rva] = SourceSymbol(
+                rva=rva, name="const_%08x" % rva, unit="_const",
+                size=0, kind="data", provenance="reloc-manifest-target")
     return sorted(seen.values())
+
+
+def _manifest_targets(repo: Path) -> list[int]:
+    """RVAs the reviewed DIR32 sites point at (read from the retail image)."""
+    import struct as _struct
+    manifest = repo / "config/delink_relocs.tsv"
+    exe = repo / "build/orig/HMM2PL.exe"
+    if not manifest.is_file() or not exe.is_file():
+        return []
+    data = exe.read_bytes()
+    pe = _struct.unpack_from("<I", data, 0x3C)[0]
+    section_count = _struct.unpack_from("<H", data, pe + 6)[0]
+    optional = _struct.unpack_from("<H", data, pe + 20)[0]
+    sections = []
+    for index in range(section_count):
+        header = pe + 24 + optional + index * 40
+        virtual, raw_size, raw_offset = (
+            _struct.unpack_from("<I", data, header + 12)[0],
+            _struct.unpack_from("<I", data, header + 16)[0],
+            _struct.unpack_from("<I", data, header + 20)[0])
+        sections.append((virtual, raw_size, raw_offset))
+
+    def read_u32(rva):
+        for virtual, raw_size, raw_offset in sections:
+            if virtual <= rva and rva + 4 <= virtual + raw_size:
+                return _struct.unpack_from(
+                    "<I", data, raw_offset + rva - virtual)[0]
+        return None
+
+    targets = set()
+    for line in manifest.read_text().splitlines():
+        if line.startswith("#") or line.startswith("site_rva") or not line.strip():
+            continue
+        value = read_u32(int(line.split("\t")[0], 16))
+        if value is not None and value >= IMAGE_BASE:
+            targets.add(value - IMAGE_BASE)
+    return sorted(targets)
 
 
 def render(rows) -> str:

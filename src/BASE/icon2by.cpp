@@ -32,7 +32,7 @@ static inline u8* IconOutsideCopySource(u8* src, i32 currentX, i32 clipX) {
     return src + (clipX - currentX);
 }
 
-// @remove
+VA(0x004d5a50, 0x683)
 void IconToBitmapYModify(
     class icon* srcIcon,
     class bitmap* dest,

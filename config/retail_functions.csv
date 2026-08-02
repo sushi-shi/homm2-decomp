@@ -1788,6 +1788,7 @@ entry_rva,byte_size,name,thunk,chunks,max_gap,total_gap,extent
 0xd6c60,114,FUN_004d6c60,0,2,3,3,117
 0xd6cd5,123,FUN_004d6cd5,0,1,0,0,123
 0xd6d50,32,__global_unwind2,0,1,0,0,32
+0xd6d70,34,__unwind_handler,0,1,0,0,34
 0xd6d92,104,__local_unwind2,0,1,0,0,104
 0xd6dfa,35,__abnormal_termination,0,1,0,0,35
 0xd6e1d,9,__NLG_Notify1,0,1,0,0,9
@@ -1976,6 +1977,7 @@ entry_rva,byte_size,name,thunk,chunks,max_gap,total_gap,extent
 0xddd6e,292,FUN_004ddd6e,0,1,0,0,292
 0xdde92,169,FUN_004dde92,0,1,0,0,169
 0xddf3b,350,FUN_004ddf3b,0,1,0,0,350
+0xde0a4,189,__except_handler3,0,1,0,0,189
 0xde161,27,FUN_004de161,0,1,0,0,27
 0xde387,304,FUN_004de387,0,1,0,0,304
 0xde4b7,101,FUN_004de4b7,0,1,0,0,101

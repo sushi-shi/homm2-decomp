@@ -28,13 +28,19 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   line)` is live in MOUSEMGR, RESMGR, netwin, dpnetwin, and wingraph with
   `e:\Users\igorl\...` path strings; every other TU's asserts were compiled
   out. (Our MOUSEMGR reconstruction is still missing its retail asserts.)
+- **[Buka] /QIfdiv off.** Retail game code carries raw `fdiv` instructions
+  (hundreds of sites; PHILAI alone has ~90) and links no `_adj_fdiv_*`
+  helpers; the PoL-era `/QIfdiv` flag made VC6 emit `__adj_fdiv_m64` calls
+  and was removed from every profile.
 - **[Buka] C++ exception state on the new audio/bitmap TUs.** AudiereEffects,
   AudiereMusic, and BITMAP compile /GX; their EH registration funclets are the
   bulk of the image's `(funclets)` region. PoL had no /GX anywhere.
-- **[Buka] VC6 STL exposure.** `soundManager.h` includes `<audiere.h>`, which
-  drags `<string>`/`<vector>` into ~55 game TUs; each emits the ctype-facet
-  guard stub trio ($E19/$E18 + `?id@?$ctype@G@std@@` dtor thunk, the dtor
-  COMDAT-folded to ADVMGR's copy at 0x415a50).
+- **[Buka] VC6 STL exposure.** `KB.h` includes `soundManager.h`, which
+  includes `<audiere.h>` — dragging `<string>`/`<vector>` into 90 of the 95
+  game TUs; each emits the ctype-facet guard stub trio ($E19/$E18 +
+  `?id@?$ctype@G@std@@` dtor thunk, the dtor COMDAT-folded to ADVMGR's copy
+  at 0x415a50). Only BITS, TILE, X_GLOBAL, MusicFlags, and the emptied TUs
+  stay clean.
 
 ## Removed (present in PoL 2.0, absent from this image)
 
@@ -50,9 +56,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   STL init tail.
 - **[Buka] `soundManager::MIDIPoll`** (`src/BASE/Midi.cpp`) — the empty MCI
   poll body.
-- **[unclassified] The Y-modify icon decoder pair** — `IconToBitmapYModify`
-  (`BASE/icon2by`) and `FlipIconToBitmapYModify` (`BASE/iconf2by`); both TUs
-  now contribute nothing but their init tails.
+- ~~The Y-modify icon decoder pair~~ — **not removed after all**: retail
+  relocated both decoders to the BASE tier tail (`FlipIconToBitmapYModify`
+  at 0x4d5270, `IconToBitmapYModify` at 0x4d5a50) with rewritten bodies;
+  reclaimed 2026-08-02.
 
 ## Added (no PoL counterpart)
 
@@ -61,8 +68,8 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `AudiereSampleNode` list), `BASE/AudiereMusic` (7 music functions over
   class-static stream/source RefPtrs with guarded atexit teardowns), and the
   refactored Miles wrapper `BASE/MilesSound` (11 functions).
-- **[Buka] `BASE/MusicFlags`** — a new two-function /Od TU between EXEC and
-  Midi (`GetMusicFlagA`, `MusicFlagsActive`).
+- **[Buka] `BASE/MusicFlags`** — a new three-function /Od TU between EXEC
+  and Midi (`GetMusicFlagA`, `MusicFlagsActive`, `GetMusicFlagB`).
 - **[Buka] The Cyrillic text engine** in `BASE/FONT`:
   `RemapCyrillicCharacter` (CP1251 → glyph range) and the 4KB
   `font::ExtractLine` — a line extractor that word-wraps and hyphenates
