@@ -3027,7 +3027,7 @@ void philAI::LikelihoodOfEnemyAttacking(
     nAttack = 3000;
     nValue = (i32)((float)nAttack * chanceA);
     nWeeks = 6;
-    fOut = chanceB * chanceA;
+    fOut = chanceA * chanceB;
 }
 
 VA(0x004842e2, 0xf)

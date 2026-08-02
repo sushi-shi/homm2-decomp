@@ -77,7 +77,7 @@ void searchArray::Init(void) {
     if (m_storage.cells != NULL)
         H2_FREE(m_storage.cells);
     m_storage.cells = NULL;
-    m_storage.cells = static_cast<searchCell*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell)));
+    m_storage.cells = static_cast<searchCell*>(H2_ALLOC(MAP_WIDTH * sizeof(searchCell) * MAP_HEIGHT));
 }
 
 VA(0x00449ca4, 0x3e)
@@ -90,7 +90,7 @@ void searchArray::Close(void) {
 VA(0x00449ce2, 0x59)
 void searchArray::Clear(void) {
     memset(m_queue, 0, sizeof(m_queue));
-    memset(m_storage.cells, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell));
+    memset(m_storage.cells, 0, MAP_WIDTH * sizeof(searchCell) * MAP_HEIGHT);
     m_pathLength = 0;
     m_queueCount = 0;
 }
@@ -420,7 +420,7 @@ i32 searchArray::FindCombatPath(
     i32 attackTargetHex =
         attackPath != ARMY_PATH_ANY_TARGET_HEX ? targetHex : ARMY_HEX_INVALID;
     memset(m_queue, 0, sizeof(m_queue));
-    memset(m_storage.cells, 0, MAP_WIDTH * MAP_HEIGHT * sizeof(searchCell));
+    memset(m_storage.cells, 0, MAP_WIDTH * sizeof(searchCell) * MAP_HEIGHT);
     m_pathLength = 0;
     m_queueCount = 0;
 
