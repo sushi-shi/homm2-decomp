@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| game::DoKnob knob clamp compare | `floatChain < cast(mouse.y)` | `cast(mouse.y) > floatChain` (fild-first) | OPEN - slot residual parked |
+| philAI::GetBestCreature random compare | `weakestArmyValue < table.randomValue` | `table.randomValue > weakestArmyValue` | OPEN - slot residual parked |
+| playerData::NextHero local + hero compare | `current`; `m_heroIds[i] == m_currentHero` | `curHero`; `m_currentHero == m_heroIds[i]` | OPEN |
 | textWidget::textWidget(void) store order | `color, alignment, font, text, kind` | `font, text, color, alignment, kind` | OPEN |
 | dropListWidget::dropListWidget(void) store order | `items, savedBackground, itemCount, selectedIndex` | `itemCount, items, selectedIndex, savedBackground` | OPEN |
 | combatManager::DoBlast FP factor | `gfCombatSpeedMod[speed] * BLAST_FRAME_DELAY` | `BLAST_FRAME_DELAY * gfCombatSpeedMod[speed]` | OPEN - same class as combatManager::Main |

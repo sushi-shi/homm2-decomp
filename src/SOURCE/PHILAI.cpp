@@ -2811,7 +2811,7 @@ void philAI::GetBestCreature(town* townPtr, BHC& best, float& bestValue) {
                         gMonsterDatabase[IDX(townPtr->m_army.m_creatureTypes[armyIndex])].randomValue;
                 }
             }
-            if (weakestArmyValue < gMonsterDatabase[IDX(candidateMonster)].randomValue
+            if (gMonsterDatabase[IDX(candidateMonster)].randomValue > weakestArmyValue
                 && gMonsterDatabase[IDX(candidateMonster)].randomValue
                        > CREATURE_PURCHASE_EXPENSIVE_VALUE) {
                 canAddUnit = 1;
