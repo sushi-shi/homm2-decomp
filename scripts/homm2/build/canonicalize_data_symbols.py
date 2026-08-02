@@ -44,6 +44,7 @@ UNINITIALIZED_DATA = 0x00000080
 MEM_EXECUTE = 0x20000000
 MEM_WRITE = 0x80000000
 LNK_NRELOC_OVFL = 0x01000000
+LNK_INFO = 0x00000200
 
 RELOCATION_WIDTHS = {
     0x0001: 2,  # IMAGE_REL_I386_DIR16
@@ -806,6 +807,46 @@ def _assert_only_canonical_changes(
                 "jump-table relocation resolved-target postcondition failed")
 
 
+def defer_data_comparison(payload: bytes) -> bytes:
+    """Remove data from a comparison copy until the data campaign models it.
+
+    Without reviewed DATA/DATA_COMPGEN identities, comparing data sections can
+    only mislead: anonymous payloads pair by content while placement stays
+    unproven. This pass empties every non-executable data section header and
+    turns its symbols into plain undefined externals, so objdiff sees the unit
+    as code only. Comparison-copy surgery exclusively - raw objects are
+    untouched.
+    """
+    coff = CoffObject(payload)
+    data = bytearray(payload)
+    deferred = set()
+    for section in coff.sections:
+        if not section.characteristics & (INITIALIZED_DATA | UNINITIALIZED_DATA):
+            continue
+        if section.characteristics & (MEM_EXECUTE | LNK_INFO):
+            continue
+        deferred.add(section.index)
+        header = section.header_offset
+        struct.pack_into("<I", data, header + 8, 0)    # VirtualSize
+        struct.pack_into("<I", data, header + 16, 0)   # SizeOfRawData
+        struct.pack_into("<I", data, header + 20, 0)   # PointerToRawData
+        struct.pack_into("<I", data, header + 24, 0)   # PointerToRelocations
+        struct.pack_into("<H", data, header + 32, 0)   # NumberOfRelocations
+        struct.pack_into("<I", data, header + 36,
+                         section.characteristics & ~LNK_NRELOC_OVFL)
+    if not deferred:
+        return payload
+    for symbol in coff.symbols.values():
+        if symbol.section not in deferred:
+            continue
+        struct.pack_into("<IhHBB", data, symbol.offset + 8,
+                         0, 0, symbol.typ, EXTERNAL_STORAGE, symbol.aux_count)
+        for aux in range(symbol.aux_count):
+            start = symbol.offset + (aux + 1) * SYMBOL_SIZE
+            data[start:start + SYMBOL_SIZE] = bytes(SYMBOL_SIZE)
+    return bytes(data)
+
+
 def canonicalize_coff(payload: bytes,
                       compgen: tuple[CompgenClaim, ...] = (),
                       compgen_data: tuple[CompgenDataClaim, ...] = (),
@@ -1133,6 +1174,9 @@ def main(argv=None):
     parser.add_argument("--unit")
     parser.add_argument("--compgen-manifest", type=Path)
     parser.add_argument("--data-manifest", type=Path)
+    parser.add_argument("--defer-data", action="store_true",
+                        help="drop data sections/symbols from the comparison "
+                             "copy until the data campaign models storage")
     parser.add_argument("--summary-root", type=Path, action="append")
     parser.add_argument("--summary-output", type=Path)
     args = parser.parse_args(argv)
@@ -1156,7 +1200,10 @@ def main(argv=None):
     claims = load_compgen_claims(args.compgen_manifest, args.unit)
     data_claims = load_compgen_data_claims(args.data_manifest, args.unit)
     result = canonicalize_coff(args.input.read_bytes(), claims, data_claims)
-    _atomic_write(args.output, result.data)
+    payload = result.data
+    if args.defer_data:
+        payload = defer_data_comparison(payload)
+    _atomic_write(args.output, payload)
     _atomic_write(args.sidecar, sidecar_bytes(result.rows))
     stamp_inputs = {"input": args.input}
     if args.compgen_manifest:
