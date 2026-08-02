@@ -80,7 +80,7 @@ def main():
     const_rows = []
     for i, ln in enumerate(body):
         f = ln.split(",")
-        if len(f) < 5 or f[2] != "_const":
+        if len(f) < 5 or f[2] != "_const" or not f[1].startswith("const_"):
             continue
         const_rows.append((int(f[0], 16), i))
     for rva, i in sorted(const_rows):

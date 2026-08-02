@@ -111,6 +111,17 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   the config musicSource/musicVolume paths in `GAME`/`ADVMGR`/`SMACKMGR`
   (fade timing via `glTimers` slots).
 
+## Reconstruction infrastructure notes (not version deltas)
+
+- The stripped image's DIR32 sites are recovered by donation
+  (`homm2.audit.reloc_donation`): masked-identical claimed functions
+  transfer their compiled relocation sites onto retail bytes; unanimous
+  (symbol, addend) votes name the data owners and alias interior fields as
+  owner+addend. Re-run with `--write` after each matching wave.
+- VC6 /Od slot-order model (`homm2/core/od_slots.py`, solved on cl 10.20)
+  re-validated on VC6 SP5 by probe: order rule identical; slot offsets
+  round each local to 4 bytes.
+
 ## Bookkeeping
 
 - The 36 no-PoL-counterpart functions harvested from the attempt-1 remap are
