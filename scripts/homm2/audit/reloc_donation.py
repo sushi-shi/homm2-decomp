@@ -29,6 +29,7 @@ EXE = REPO / "build/orig/HMM2PL.exe"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 BASE_OBJS = REPO / "build/objdiff/base"
 MANIFEST = REPO / "config/delink_relocs.tsv"
+ALIASES = REPO / "config/delink_reloc_aliases.tsv"
 
 IMAGE_BASE = 0x400000
 IMAGE_DIR32 = 6
@@ -53,7 +54,7 @@ def image_extent(exe: bytes) -> int:
 
 
 def function_bodies(obj_path: Path):
-    """name -> (bytes, [(offset, type)]) for every function in one obj."""
+    """name -> (bytes, [(offset, type, symbol, addend)]) per function."""
     coff = CoffFile(str(obj_path))
     first_header = 20 + struct.unpack_from("<H", coff.data, 16)[0]
     out = {}
@@ -71,12 +72,20 @@ def function_bodies(obj_path: Path):
             continue
         payload = bytes(
             coff.data[section.raw_offset:section.raw_offset + section.raw_size])
-        section_relocs = sorted(
-            (site, reloc.typ) for (index, site), reloc
-            in coff.relocations.items() if index == section.index)
+        section_relocs = []
+        for (index, site), reloc in coff.relocations.items():
+            if index != section.index:
+                continue
+            target = coff.symbols.get(reloc.symbol_index)
+            addend = struct.unpack_from("<I", payload, site)[0] \
+                if site + 4 <= len(payload) else 0
+            section_relocs.append(
+                (site, reloc.typ, target.name if target else None, addend))
+        section_relocs.sort()
         for symbol, start, end in function_spans(symbols, section.raw_size):
-            local = [(site - start, kind)
-                     for site, kind in section_relocs if start <= site < end]
+            local = [(site - start, kind, name, addend)
+                     for site, kind, name, addend in section_relocs
+                     if start <= site < end]
             out[symbol.name] = (payload[start:end], local)
     return out
 
@@ -86,7 +95,7 @@ def masked_equal(ours: bytes, retail: bytes, sites) -> bool:
         return False
     ours = bytearray(ours[:len(retail)])
     retail = bytearray(retail)
-    for offset, _kind in sites:
+    for offset, _kind, _symbol, _addend in sites:
         for k in range(offset, min(offset + 4, len(retail))):
             ours[k] = retail[k] = 0
     return bytes(ours) == bytes(retail)
@@ -103,6 +112,8 @@ def main(argv=None):
     claims = load_claims()
 
     donated = {}
+    named = {}
+    interior = []
     functions_used = 0
     rejected_target = 0
     for unit, rows in sorted(claims.items()):
@@ -120,26 +131,66 @@ def main(argv=None):
             retail = exe[rva:rva + size]
             if not masked_equal(ours, retail, sites):
                 continue
-            dir32 = [(off, kind) for off, kind in sites
-                     if kind == IMAGE_DIR32 and off + 4 <= size]
+            dir32 = [entry for entry in sites
+                     if entry[1] == IMAGE_DIR32 and entry[0] + 4 <= size]
             keep = True
             fn_sites = []
-            for off, _kind in dir32:
+            for off, _kind, symbol, addend in dir32:
                 target = struct.unpack_from("<I", retail, off)[0]
                 if not IMAGE_BASE <= target < end_va:
                     keep = False
                     rejected_target += 1
                     break
-                fn_sites.append((rva + off, target))
+                fn_sites.append((rva + off, target, symbol, addend))
             if not keep or not fn_sites:
                 continue
             functions_used += 1
-            for site, target in fn_sites:
+            for site, target, symbol, addend in fn_sites:
                 donated[site] = target
+                if symbol and not symbol.startswith("__real@"):
+                    # our object stores the addend in the field, so the
+                    # symbol's linked address is target - addend
+                    owner_rva = target - IMAGE_BASE - addend
+                    if not 0 <= owner_rva < end_va - IMAGE_BASE:
+                        continue  # biased-pointer idiom, not a plain owner
+                    named.setdefault(owner_rva, {}).setdefault(symbol, 0)
+                    named[owner_rva][symbol] += 1
+                    if addend:
+                        interior.append(
+                            (rva, target - IMAGE_BASE, site, owner_rva,
+                             symbol, addend))
 
     print(f"[reloc-donation] {functions_used} masked-identical functions "
           f"donated {len(donated)} DIR32 sites "
           f"({rejected_target} functions rejected on out-of-image targets)")
+
+    # target-name evidence: unanimous owners become real names for the
+    # synthetic manifest-target rows (const_<RVA> otherwise). Distinct owners
+    # sharing one spelling (per-TU statics with plain C names) get an @<rva>
+    # suffix so the PDB stays one-name-one-address.
+    names_path = REPO / "build/gen/reloc_target_names.tsv"
+    solo = {rva: entries for rva, votes in named.items()
+            if len(entries := sorted(votes.items(), key=lambda kv: -kv[1])) == 1}
+    by_name = {}
+    for rva, entries in solo.items():
+        by_name.setdefault(entries[0][0], []).append(rva)
+    owner_name = {}
+    for name, rvas in by_name.items():
+        for rva in rvas:
+            owner_name[rva] = name if len(rvas) == 1 else f"{name}@0x{rva:x}"
+    with names_path.open("w") as stream:
+        print("owner_rva\tsymbol\tvotes", file=stream)
+        for owner_rva in sorted(named):
+            if owner_rva in owner_name:
+                votes = solo[owner_rva][0][1]
+                print(f"0x{owner_rva:x}\t{owner_name[owner_rva]}\t{votes}",
+                      file=stream)
+            else:
+                entries = sorted(named[owner_rva].items(), key=lambda kv: -kv[1])
+                spellings = "|".join(f"{n}:{v}" for n, v in entries)
+                print(f"0x{owner_rva:x}\t(conflict)\t{spellings}", file=stream)
+    print(f"[reloc-donation] {len(owner_name)} unanimous data-owner names -> "
+          f"{names_path}")
 
     if not args.write:
         for site in sorted(donated)[:20]:
@@ -165,6 +216,27 @@ def main(argv=None):
             print(f"0x{site:x}\tdir32", file=stream)
     print(f"[reloc-donation] manifest now lists {len(merged)} sites "
           f"({len(merged) - len(existing)} new)")
+
+    # interior sites: represent the field as owner + addend so the delinked
+    # relocation reads exactly like our compiled one (symbol name and
+    # displacement both visible). Only unanimous owners qualify.
+    alias_rows = [(fn, tgt, site, owner_name[owner], addend)
+                  for fn, tgt, site, owner, sym, addend in interior
+                  if owner in owner_name]
+    header_lines = []
+    for line in ALIASES.read_text().splitlines():
+        if line.startswith("#"):
+            header_lines.append(line)
+    with ALIASES.open("w") as stream:
+        for line in header_lines:
+            print(line, file=stream)
+        print("function_rva\ttarget_rva\tsite_rva\towner\taddend\toccurrences",
+              file=stream)
+        for fn, tgt, site, sym, addend in sorted(alias_rows, key=lambda r: r[2]):
+            print(f"0x{fn:x}\t0x{tgt:x}\t0x{site:x}\t{sym}\t0x{addend:x}\t1",
+                  file=stream)
+    print(f"[reloc-donation] {len(alias_rows)} interior sites aliased to "
+          f"owner+addend -> {ALIASES}")
     return 0
 
 

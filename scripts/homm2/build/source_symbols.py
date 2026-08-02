@@ -199,16 +199,43 @@ def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
         named[key] = row.rva
         seen[row.rva] = row
 
+    # Donation evidence names data owners: every masked-identical function's
+    # relocations vote (symbol, addend) per target, and target - addend pins
+    # the owner's linked address. Unanimous owners become real data rows.
+    for rva, name in _donated_owner_names(repo):
+        if rva not in seen:
+            seen[rva] = SourceSymbol(
+                rva=rva, name=name, unit="_data",
+                size=0, kind="data", provenance="reloc-donation-owner")
+
     # Every DIR32 site in the reviewed manifest names a target the delinker
     # must be able to symbolize ("all constants must be named"). Targets not
     # covered by a claim get synthetic const_<RVA> aliases; name_strings later
-    # upgrades the string-bearing ones to their real ??_C@ spellings.
+    # upgrades the string-bearing ones to their canonical spellings.
     for rva in _manifest_targets(repo):
         if rva not in seen:
             seen[rva] = SourceSymbol(
                 rva=rva, name="const_%08x" % rva, unit="_const",
                 size=0, kind="data", provenance="reloc-manifest-target")
     return sorted(seen.values())
+
+
+def _donated_owner_names(repo: Path) -> list[tuple[int, str]]:
+    path = repo / "build/gen/reloc_target_names.tsv"
+    if not path.is_file():
+        return []
+    rows = []
+    for line in path.read_text().splitlines()[1:]:
+        fields = line.split("\t")
+        if len(fields) < 2 or fields[1] == "(conflict)":
+            continue
+        try:
+            rva = int(fields[0], 16)
+        except ValueError:
+            continue
+        if rva >= 0:
+            rows.append((rva, fields[1]))
+    return rows
 
 
 def _manifest_targets(repo: Path) -> list[int]:
