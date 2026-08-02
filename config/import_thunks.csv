@@ -20,7 +20,7 @@ entry_rva,size,dll,symbol,iat_rva,coff
 0xb55fa,6,WING32.dll,WinGCreateDC,0xea3e0,_WinGCreateDC@0
 0xb5600,6,WING32.dll,WinGRecommendDIBFormat,0xea3d0,_WinGRecommendDIBFormat@4
 0xb5606,6,WING32.dll,WinGSetDIBColorTable,0xea3d4,_WinGSetDIBColorTable@16
-0xb560c,6,WING32.dll,WinGStretchBlt,0xea3d8,_WinGStretchBlt@44
-0xb5612,6,WING32.dll,WinGBitBlt,0xea3dc,_WinGBitBlt@36
+0xb560c,6,WING32.dll,WinGStretchBlt,0xea3d8,_WinGStretchBlt@40
+0xb5612,6,WING32.dll,WinGBitBlt,0xea3dc,_WinGBitBlt@32
 0xb5618,6,NETAPI32.dll,Netbios,0xea1f8,_Netbios@4
 0xe7c1a,6,KERNEL32.dll,RtlUnwind,0xea1d8
