@@ -127,11 +127,8 @@ void CycleColors(i32 forceUpdate) {
                 frame = CYCLE_FRAME_COUNT - frame;
             else
                 frame = iCombatCycleFrame;
-            // Retail world-cycle palette indices are local data, not symbolic domains.
-            // NOLINTBEGIN(readability-magic-numbers)
             u8 cycleIndices[WORLD_CYCLE_COLOR_COUNT] =
                 {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
-            // NOLINTEND(readability-magic-numbers)
             for (i32 colorIndex = 0; colorIndex < WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
                 i8* src = gpBufferPalette->m_data
                           + (cycleIndices[colorIndex] + frame * WORLD_CYCLE_FRAME_COLOR_STEP)
@@ -632,7 +629,6 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     }
 }
 
-// Named one-byte retail stub.
 VA(0x004b79a0, 0x5)
 void CreateFizzleTables(void) {}
 
@@ -745,11 +741,9 @@ void heroWindowManager::ReleaseFizzleSource(void) {
     m_fizzleSource = NULL;
 }
 
-// Named one-byte retail stub.
 VA(0x004b7e70, 0x5)
 void CreateColorTables(void) {}
 
-// Named one-byte retail stub.
 VA(0x004b7e80, 0x5)
 void CreateColorLookupTables(void) {}
 

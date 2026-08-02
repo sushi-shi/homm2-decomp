@@ -12,4 +12,3 @@ baseManager::baseManager(void)
     strcpy(m_name, "Unknown");
 }
 
-

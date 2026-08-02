@@ -785,10 +785,7 @@ selection_done:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-// Retail castle building-slot order payload.
-// NOLINTBEGIN(readability-magic-numbers)
 H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsBase[CASTLE_SLOT_COUNT] =
     {19, 20, 21, 22, 23, 24, 0, 2, 1, 3, 7, 10, 4, 11, 13, 8, 9, 12};
-// NOLINTEND(readability-magic-numbers)
 heroWindow* casWin;
 H2_ENUM_STORAGE(BuildingSlotType, u8) castleSlotsUse[CASTLE_SLOT_COUNT];

@@ -244,7 +244,7 @@ void ComputeTradeRatios(
 
     if (tradeRatio >= 1.0f) {
         *leftDenominated = 0;
-        *ratio = static_cast<i32>(tradeRatio + 0.999); // NOLINT(readability-magic-numbers)
+        *ratio = static_cast<i32>(tradeRatio + 0.999);
         *maxTrade = gpCurPlayer->m_resources[sourceResource] / *ratio;
     } else {
         *leftDenominated = 1;

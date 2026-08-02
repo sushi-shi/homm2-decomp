@@ -80,8 +80,6 @@ H2_ENUM_CLASS_BEGIN(CoordinateAxis)
     COORDINATE_AXIS_COUNT = 2
 H2_ENUM_CLASS_END(CoordinateAxis)
 
-// Mine records use the resource ids for ordinary mines and reserve two
-// additional ids for map facilities tracked through the same table.
 H2_ENUM_CLASS_BEGIN_SPLIT(MineType, i8)
     MINE_TYPE_WOOD          = 0,
     MINE_TYPE_MERCURY       = 1,
@@ -514,13 +512,12 @@ H2_ENUM_CLASS_BEGIN_SPLIT(FactionType, i8)
     FACTION_WIZARD        = 4,
     FACTION_NECROMANCER   = 5,
     FACTION_NEUTRAL       = 6,
-    HERO_TYPE_BOAT        = 6,  // Hero cursor sprites use the neutral slot for boats.
+    HERO_TYPE_BOAT        = 6,
     FACTION_RANDOM        = 7,
     FACTION_COUNT         = 6
 H2_ENUM_CLASS_END_SPLIT(FactionType, i8)
 H2_ENUM_STEPPED(FactionType)
 
-// Hero cursor slots 0-5 reuse faction ids; slot 6 selects the boat sprites.
 typedef FactionType HeroCursorType;
 
 H2_ENUM_CLASS_BEGIN_SPLIT(TerrainType, i8)
@@ -581,7 +578,7 @@ H2_ENUM_CLASS_BEGIN_SPLIT(BuildingSlotType, i8)
     BUILDING_SLOT_DISABLED_FIRST                = 14,
     TOWN_OBJECT_BOAT                            = BUILDING_SLOT_DISABLED_FIRST,
     BUILDING_SLOT_NEUTRAL_LAST                  = 15,
-    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST, // captain's quarters slot
+    CASTLE_CAPTAIN                              = BUILDING_SLOT_NEUTRAL_LAST,
     TOWN_OBJECT_CAPTAIN_QUARTERS                = BUILDING_SLOT_NEUTRAL_LAST,
     BUILDING_SLOT_DISABLED_SECOND               = 16,
     TOWN_OBJECT_RACE_OVERLAY                    = BUILDING_SLOT_DISABLED_SECOND,
@@ -642,7 +639,7 @@ H2_ENUM_CLASS_BEGIN(MonsterFlags)
     MONSTER_ABILITY_FLAG_AI_EXCLUDED      = MONSTER_FLAGS_DEAD,
     MONSTER_FLAGS_AI_EXCLUDED             = MONSTER_FLAGS_DEAD,
     COMBAT_ARMY_FLAG_MIRROR_IMAGE         =
-        MONSTER_FLAGS_DEAD, // shared bit: combat mirror images ride the dead bit
+        MONSTER_FLAGS_DEAD,
     MONSTER_ABILITY_FLAG_HIGH_MORALE      = 0x00000020,
     MONSTER_FLAGS_RETALIATED              = 0x00000040,
     MONSTER_ATTRIBUTE_RETALIATED          = MONSTER_FLAGS_RETALIATED,

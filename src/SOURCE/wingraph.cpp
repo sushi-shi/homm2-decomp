@@ -27,18 +27,18 @@ static RECT gDDClientRect;
 static RECT gDDDestinationRect;
 static HRESULT gDDResult;
 static DDSURFACEDESC gDDSurfaceDesc;
-static i16 gDDRestoreLineBase = 45; // NOLINT(readability-magic-numbers)
-static i16 gCreatePrimaryLineBase = 67; // NOLINT(readability-magic-numbers)
-static i16 gSetupClipperLineBase = 87; // NOLINT(readability-magic-numbers)
-static i16 gDDInitLineBase = 110; // NOLINT(readability-magic-numbers)
-static i16 gDDPaintLineBase = 157; // NOLINT(readability-magic-numbers)
-static i16 gDDInitializePaletteLineBase = 296; // NOLINT(readability-magic-numbers)
-static i16 gDDSetPaletteLineBase = 368; // NOLINT(readability-magic-numbers)
-static i16 gDDCreateSurfaceLineBase = 393; // NOLINT(readability-magic-numbers)
-static i16 gDDUpdatePaletteLineBase = 500; // NOLINT(readability-magic-numbers)
-static i16 gDDCleanUpLineBase = 526; // NOLINT(readability-magic-numbers)
-static i16 gDDSetFullScreenLineBase = 572; // NOLINT(readability-magic-numbers)
-static i16 gSetGraphicsTypeLineBase = 1247; // NOLINT(readability-magic-numbers)
+static i16 gDDRestoreLineBase = 45;
+static i16 gCreatePrimaryLineBase = 67;
+static i16 gSetupClipperLineBase = 87;
+static i16 gDDInitLineBase = 110;
+static i16 gDDPaintLineBase = 157;
+static i16 gDDInitializePaletteLineBase = 296;
+static i16 gDDSetPaletteLineBase = 368;
+static i16 gDDCreateSurfaceLineBase = 393;
+static i16 gDDUpdatePaletteLineBase = 500;
+static i16 gDDCleanUpLineBase = 526;
+static i16 gDDSetFullScreenLineBase = 572;
+static i16 gSetGraphicsTypeLineBase = 1247;
 
 VA(0x004afbe0, 0x3a)
 void DDRestoreDisplayMode(void) {

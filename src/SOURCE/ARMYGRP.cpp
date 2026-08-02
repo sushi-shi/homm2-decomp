@@ -267,7 +267,7 @@ void armyGroup::DamageGroup(float damagePercent) {
                     ++numKilled;
             }
             if (isFirstTroop && m_creatureCounts[i] == numKilled
-                && damagePercent < 0.999) // NOLINT(readability-magic-numbers)
+                && damagePercent < 0.999)
                 --numKilled;
             m_creatureCounts[i] -= numKilled;
             if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {

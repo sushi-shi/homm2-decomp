@@ -26,19 +26,15 @@ void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
 
     gpMouseManager->HideColorPointer();
 
-    // Retail stack-local displacement samples are data, not symbolic domains.
-    // NOLINTBEGIN(readability-magic-numbers)
     u8 profile[PROFILE_SIZE] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
                                 7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
-    // NOLINTEND(readability-magic-numbers)
     u8 previous[SCREEN_WIDTH];
     memset(previous, 0, sizeof(previous));
     i32 position = -PROFILE_RADIUS;
 
     do {
         PollSound();
-        // Keep the retail anonymous constant-pool relocation.
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f; // NOLINT(readability-magic-numbers)
+        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
 
         for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
             i32 column = profileIndex + position - PROFILE_RADIUS;

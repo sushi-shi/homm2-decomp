@@ -22,8 +22,6 @@ inline CombatSide& operator^=(CombatSide& side, i32 mask) {
 }
 #endif
 
-// VC4.2 must see these arithmetic forms at the call site; an inline wrapper emits /Ob1
-// continuation jumps that are absent from retail.
 #if H2_STRICT_ENUMS
 inline CombatSide OppositeCombatSide(CombatSide side) {
     return side == COMBAT_ATTACKER_SIDE ? COMBAT_DEFENDER_SIDE : COMBAT_ATTACKER_SIDE;

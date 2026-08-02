@@ -311,7 +311,6 @@ extern u32l glMilliCounter;
 extern u8 gMapColors[RADAR_MAP_COLOR_COUNT];
 extern u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT];
 extern u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT];
-// One adventure-object image set per TilesetId.
 extern char* gTilesetFiles[IDX(TILESET_COUNT)];
 extern u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT];
 extern u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT];
@@ -568,7 +567,6 @@ extern i32 giResType2;
 extern i32 gIndex;
 extern i32 giWeekTypeExtra;
 extern i32 giTCPType;
-// Retail name retained; the payload indexes gCombatFxNames, not the spell table.
 extern H2_ENUM_STORAGE(CombatEffectType, i32) gCurLoadedSpellEffect;
 extern i32 giCurTempMobility;
 extern OverviewReturnAction giOverviewReturnAction;

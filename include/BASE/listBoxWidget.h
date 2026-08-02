@@ -7,8 +7,6 @@
 
 struct tag_message;
 
-// Frame layout of the list-box ICN resource; the m_*Frame members are
-// initialized from these in Read and the entry table is indexed with them.
 #pragma pack(push, 1)
 class font;
 class icon;

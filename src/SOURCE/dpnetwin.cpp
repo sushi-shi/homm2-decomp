@@ -77,18 +77,9 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
 
 VA(0x00436866, 0x2bf)
 i16 dpnet_init(void) {
-    static i16 initSourceLineBase = 95; // NOLINT(readability-magic-numbers)
+    static i16 initSourceLineBase = 95;
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
-    // LPDPENUMDPCALLBACK*A*, not the bare name. This target builds against VC6's
-    // DirectX 5+ DPLAY.H, where the unsuffixed typedef became the UNICODE callback
-    // (LPWSTR lpSPName) and the ANSI one moved to the A suffix. The code around it is
-    // ANSI throughout - dpEnumServiceProvider takes char*, and DirectPlayEnumerateA is
-    // what gets loaded below - so only the name to reach for changed.
-    //
-    // The PoL 2.0 line cannot spell it this way: its DirectX 1/2 header has a single
-    // ANSI callback under the bare name and defines no A variant. The divergence is a
-    // real difference between the two builds' SDKs, not a portability shim.
     typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACKA, void*);
     DirectPlayEnumerateFunction enumerateFunction;
     DirectPlayCreateFunction createFunction;
@@ -200,7 +191,7 @@ void CleanupDPVars(void) {
 
 VA(0x00436be8, 0xed)
 void dpnet_term(void) {
-    static i16 termSourceLineBase = 219; // NOLINT(readability-magic-numbers)
+    static i16 termSourceLineBase = 219;
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
     gbRemoteOn = false;
@@ -230,7 +221,7 @@ void dpSendMessage(
     u16 size,
     void* data
 ) {
-    static i16 sendSourceLineBase = 254; // NOLINT(readability-magic-numbers)
+    static i16 sendSourceLineBase = 254;
     u8* message = static_cast<u8*>(H2_ALLOC_AT(size + 1, RETAIL_FILE, sendSourceLineBase + 2));
     i32 result;
 
@@ -260,7 +251,7 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
 
 VA(0x00436dec, 0x93)
 i16 dpnet_rcv(i16, u16, void* data) {
-    static i16 receiveSourceLineBase = 284; // NOLINT(readability-magic-numbers)
+    static i16 receiveSourceLineBase = 284;
     u32 size;
 
     dpProcessMessages();
@@ -287,7 +278,7 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
-    static i16 processSourceLineBase = 312; // NOLINT(readability-magic-numbers)
+    static i16 processSourceLineBase = 312;
     DWORD packetSize[RECEIVE_ARGUMENT_STORAGE_COUNT];
     i32 destinationIds[RECEIVE_ARGUMENT_STORAGE_COUNT];
     i32 senderId;
@@ -316,10 +307,9 @@ void dpProcessMessages(void) {
     }
 }
 
-// Named one-byte retail stub.
 VA(0x00436f33, 0x230)
 void dpEvaluateMessage(u32l size, i32 sender) {
-    static i16 evaluateSourceLineBase = 355; // NOLINT(readability-magic-numbers)
+    static i16 evaluateSourceLineBase = 355;
     DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
     i32 i;
 
@@ -383,7 +373,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
 VA(0x00437177, 0x15a)
 i32 dpWaitForFirstGuest(void) {
-    static i16 firstGuestSourceLineBase = 426; // NOLINT(readability-magic-numbers)
+    static i16 firstGuestSourceLineBase = 426;
     DPSESSIONDESC session;
     i32 result;
 
@@ -445,7 +435,7 @@ i32 dpWaitForExtraGuests(void) {
 
 VA(0x0043735d, 0x37e)
 i32 dpWaitForHost(void) {
-    static i16 hostSourceLineBase = 510; // NOLINT(readability-magic-numbers)
+    static i16 hostSourceLineBase = 510;
     DWORD enumerationTimeout;
     DPSESSIONDESC sessionDescription;
     i32 playResult;

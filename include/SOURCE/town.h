@@ -41,7 +41,7 @@ H2_ENUM_CLASS_END(TownBuilding)
 H2_ENUM_FLAGS(TownBuilding)
 
 H2_ENUM_BEGIN(TownConstant)
-    TOWN_GARRISON_SLOT_COUNT           = 12, // slots 19..30: dwellings + upgrades (see BuildingSlotType)
+    TOWN_GARRISON_SLOT_COUNT           = 12,
     TOWN_OWNER_NONE                    = -1,
     TOWN_ID_NONE                       = -1,
     TOWN_OCCUPYING_HERO_NONE           = -1,

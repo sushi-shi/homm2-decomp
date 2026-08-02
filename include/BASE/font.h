@@ -7,8 +7,8 @@
 class icon;
 
 H2_ENUM_BEGIN(FontGlyphConstant)
-    FONT_SPACER_CHAR    = 0x1f, // Advances the pen without drawing a glyph.
-    FONT_GLYPH_FALLBACK = 0x5f  // Out-of-range characters render this glyph.
+    FONT_SPACER_CHAR    = 0x1f,
+    FONT_GLYPH_FALLBACK = 0x5f
 H2_ENUM_END(FontGlyphConstant)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(FontDrawMode, i16)

@@ -1,7 +1,6 @@
 #ifndef HOMM2_BASE_ICONMONORLE_H
 #define HOMM2_BASE_ICONMONORLE_H
 
-// Serialized run-length domain used by monochrome icon streams.
 H2_ENUM_BEGIN(IconMonoRleCommandConstant)
     ICON_RLE_MONO_NEWLINE_COMMAND = 0x00,
     ICON_RLE_MONO_END_COUNT       = 0x00,

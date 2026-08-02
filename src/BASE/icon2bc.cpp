@@ -79,7 +79,6 @@ void IconToBitmapColorTable(
         cmd = s_src[-1];
         if (static_cast<i8>(cmd) < 0) {
             if ((cmd & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                // skip run / end-of-sprite
                 s_x = X;
                 s_row = row;
                 s_dst = savedDst;
@@ -93,14 +92,12 @@ void IconToBitmapColorTable(
             u32 count = cmd & ICON_RLE_COMMAND_RUN_MASK;
             i32 flags = 0;
             if (count != 0) {
-                // 0xc1 - 0xFF : solid colour run
                 if (cmd == ICON_RLE_LONG_SOLID_COMMAND) {
                     count = *s_src++;
                 }
                 s_color = colorTable[*s_src++];
                 goto do_fill;
             }
-            // 0xc0 : shadow / dim run
             flags = *s_src++;
             count = flags & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0) {

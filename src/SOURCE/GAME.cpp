@@ -56,7 +56,7 @@ H2_ENUM_BEGIN(MapTilesetConstant)
 H2_ENUM_END(MapTilesetConstant)
 
 H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
-    CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f // persisted prefix, up to m_pad_0x4f
+    CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 H2_ENUM_END(ExpansionCampaignSaveConstant)
 
 H2_ENUM_BEGIN(GameSaveFormatConstant)
@@ -95,8 +95,6 @@ H2_ENUM_BEGIN(GameInitialStateConstant)
     INITIAL_PLAYER_COUNT        = 4,
     INITIAL_CALENDAR_VALUE      = 1,
     INITIAL_MAP_CHANGE_SEQUENCE = 1,
-    // Retail seeds both hero and town record types in nine-record groups
-    // before map data is applied.
     INITIAL_RECORD_TYPE_STRIDE  = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
     BOAT_HERO_NONE              = -1,
     BOAT_SLOT_EMPTY             = -1
@@ -494,28 +492,27 @@ H2_ENUM_BEGIN(GameRumourConstant)
 H2_ENUM_END(GameRumourConstant)
 
 b32 gbGameOver = false;
-// Fixed source-file and line anchors preserve allocation diagnostics.
-static i16 gSaveSourceLine = 0x294; // NOLINT(readability-magic-numbers)
-static i16 gLoadSourceLine = 0x44f; // NOLINT(readability-magic-numbers)
-static i16 gMapSourceLine = 0xaf4; // NOLINT(readability-magic-numbers)
-static i16 gTransmitSourceLine = 0x1a4e; // NOLINT(readability-magic-numbers)
-static i16 gReceiveSourceLine = 0x1b2d; // NOLINT(readability-magic-numbers)
-static i16 gDiffSourceLine = 0x1d66; // NOLINT(readability-magic-numbers)
-static i16 gCompressTest2SourceLine = 0x1f72; // NOLINT(readability-magic-numbers)
-static i16 gCompressTestSourceLine = 0x1f95; // NOLINT(readability-magic-numbers)
+static i16 gSaveSourceLine = 0x294;
+static i16 gLoadSourceLine = 0x44f;
+static i16 gMapSourceLine = 0xaf4;
+static i16 gTransmitSourceLine = 0x1a4e;
+static i16 gReceiveSourceLine = 0x1b2d;
+static i16 gDiffSourceLine = 0x1d66;
+static i16 gCompressTest2SourceLine = 0x1f72;
+static i16 gCompressTestSourceLine = 0x1f95;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\GAME.CPP")
 
 H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT          = 10000,
     EXPERIENCE_HERO_PRESENCE_BONUS   = 500,
-    MINE_FLAG_OVERWRITE_LIMIT        = 0x30,   // highest passive object id a mine flag may cover
-    RANDOM_MONSTER_SPRITE_FIRST      = 0x43, // MONS32 placeholder frames for random monsters 1-4
+    MINE_FLAG_OVERWRITE_LIMIT        = 0x30,
+    RANDOM_MONSTER_SPRITE_FIRST      = 0x43,
     RANDOM_MONSTER_SPRITE_LAST       = 0x46,
     RANDOM_MONSTER_SPRITE_TO_TRIGGER =
-        0x70,                     // sprite index + 0x70 == its MAP_TRIGGER_RANDOM_MONSTER_LEVEL_*
-    BANK_GUARDIAN_FLAG               = 0x100,   // creature-bank metadata: defenders present
-    TOWN_RECORD_TYPE_MASK            = 0x7f // saved town record: low bits carry the race
+        0x70,
+    BANK_GUARDIAN_FLAG               = 0x100,
+    TOWN_RECORD_TYPE_MASK            = 0x7f
 H2_ENUM_END(GameTuningConstant)
 
 H2_ENUM_BEGIN(GamePasswordConstant)
@@ -697,7 +694,6 @@ void playerData::Write(i32 file) {
     write(file, &m_heroLocatorPage, sizeof(m_heroLocatorPage));
     write(file, m_heroIds, sizeof(m_heroIds));
     write(file, m_availableHeroIds, sizeof(m_availableHeroIds));
-    // Retail clears six more scratch bytes than it persists.
     memset(unused, 0, PLAYER_SAVE_SCRATCH_CLEAR_SIZE);
     write(file, unused, PLAYER_SAVE_RESERVED_SIZE);
     write(file, &gpGame->m_cheated, PLAYER_SAVE_CHEATED_FLAG_SIZE);
@@ -1119,7 +1115,7 @@ void GenerateStandardFileName(char* source, char* destination) {
             indexOut++;
         }
         if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
-            i = 999; // NOLINT(readability-magic-numbers)
+            i = 999;
     }
     *extension = '.';
     strcpy(destination + indexOut, extension);
@@ -1250,7 +1246,6 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     write(handle, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
     write(handle, m_rumour, sizeof(m_rumour));
     write(handle, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    // Each legacy event header persists the count and the first index word.
     write(handle, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     write(
         handle,
@@ -2301,8 +2296,6 @@ void game::RandomizeEvents(void) {
                         + MAP_EVENT_RESOURCE_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DAEMON_CAVE:
-                    // Decimal buckets are balance payload; the stored values are event outcomes.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
@@ -2323,7 +2316,6 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata = DAEMON_REWARD_RANSOM;
                             break;
                     }
-                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
@@ -2374,8 +2366,6 @@ void game::RandomizeEvents(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GRAVEYARD:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DERELICT_SHIP:
-                    // Decimal buckets are balance payload; the stored value selects encounter size.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     switch (Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX) % EVENT_BUCKET_COUNT) {
                         case 0:
                         case 1:
@@ -2396,11 +2386,8 @@ void game::RandomizeEvents(void) {
                             cell2->m_objectMetadata = IDX(EVENT_LEVEL_HUGE);
                             break;
                     }
-                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
-                    // Retail weekly dwelling availability ranges are balance payload.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     cell2->m_objectMetadata = Random(10, 25);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
@@ -2414,7 +2401,6 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
                     cell2->m_objectMetadata = Random(20, 50);
-                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
                     cell2->m_objectMetadata = MAP_EVENT_DATA_AVAILABLE;
@@ -2482,8 +2468,6 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectMetadata = GetRandomEventSpell(SPELL_LEVEL_FIFTH);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
-                    // Retail recruit-site and guarded-bank quantities are balance payload.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     cell2->m_objectMetadata = Random(15, 25);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
@@ -2529,7 +2513,6 @@ void game::RandomizeEvents(void) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
                     else
                         cell2->m_objectMetadata = Random(30, 50);
-                    // NOLINTEND(readability-magic-numbers)
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
                     randomValue7 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
@@ -2558,8 +2541,6 @@ void game::RandomizeEvents(void) {
                                      << ARTIFACT_EVENT_RESOURCE_SHIFT)
                                     | ARTIFACT_EVENT_MODE_RESOURCE_5;
                         } else {
-                            // Retail artifact-tier guardian choice payload.
-                            // NOLINTBEGIN(readability-magic-numbers)
                             artifactGuardianChoices[6] = CREATURE_PALADIN;
                             artifactGuardianChoices[7] = CREATURE_CRUSADER;
                             artifactGuardianChoices[8] = CREATURE_CYCLOPS;
@@ -2570,7 +2551,6 @@ void game::RandomizeEvents(void) {
                             artifactGuardianChoices[3] = CREATURE_BONE_DRAGON;
                             artifactGuardianChoices[4] = CREATURE_GIANT;
                             artifactGuardianChoices[5] = CREATURE_TITAN;
-                            // NOLINTEND(readability-magic-numbers)
                             cell2->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
                             if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_TREASURE)
                                 cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
@@ -2790,9 +2770,6 @@ void game::RandomizeEvents(void) {
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
-                // Bit 2 is authored map data used by retail's occupancy pass. Its broader
-                // semantics remain unproven, so do not give it a speculative shared name.
-                // NOLINTNEXTLINE(readability-magic-numbers)
                 && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
         }
@@ -3526,7 +3503,6 @@ void game::ViewArmy(
     i32 groupIndex
 ) {
     static i16 viewArmySourceLineBase = 0x0dd1;
-    // Retail initializes these unused UI locals; retaining them preserves the /Od frame.
     i16 baseX7 = VIEW_ARMY_UNUSED_BASE_X;
     i16 quickBaseY3 = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
     i16 blankWidget3 = VIEW_ARMY_BLANK_WIDGET_ID;
@@ -3959,9 +3935,6 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
 
 VA(0x004565ae, 0x53e)
 i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
-    // Retail per-creature neutral-stack ranges. The paired bounds are balance payload,
-    // while the switch labels identify the domain that owns each pair.
-    // NOLINTBEGIN(readability-magic-numbers)
     switch (monsterType) {
         case CREATURE_PEASANT:
             return Random(40, 80);
@@ -4098,7 +4071,6 @@ i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
         default:
             return 3;
     }
-    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x00456bf4, 0x2c)
@@ -4556,9 +4528,6 @@ void game::PerWeek(void) {
 
     for (mapY5 = 0; MAP_HEIGHT > mapY5; mapY5++) {
         for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
-            // Retail's per-site refresh values and growth ranges are encoded map-object
-            // balance payload. The surrounding case labels provide their semantic owners.
-            // NOLINTBEGIN(readability-magic-numbers)
             switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
                     monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
@@ -4681,7 +4650,6 @@ void game::PerWeek(void) {
                 default:
                     break;
             }
-            // NOLINTEND(readability-magic-numbers)
         }
     }
 
@@ -4704,9 +4672,6 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     recruitCount >>= WEEKLY_RECRUIT_COUNT_SHIFT;
     i32 packed;
 
-    // The low metadata bits are serialized expansion-site subtype ids. Retail
-    // defines five subtypes here, all with the same weekly growth rule.
-    // NOLINTBEGIN(readability-magic-numbers)
     switch (type) {
         case 0:
             recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
@@ -4724,7 +4689,6 @@ void game::WeeklyRecruitSite(mapCell* cell) {
             recruitCount += Random(WEEKLY_RECRUIT_MIN_GROWTH, WEEKLY_RECRUIT_MAX_GROWTH);
             break;
     }
-    // NOLINTEND(readability-magic-numbers)
 
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
@@ -4736,14 +4700,11 @@ VA(0x00459ab8, 0x61)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
     type &= WEEKLY_SITE_TYPE_MASK;
-    // Expansion-object subtype 4 is the only generic site with weekly state.
-    // NOLINTBEGIN(readability-magic-numbers)
     switch (type) {
         case 4:
             cell->m_objectMetadata = type;
             break;
     }
-    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x00459b19, 0x383)
@@ -5028,9 +4989,6 @@ void game::RandomizeMine(i32 x, i32 y) {
     }
     RandMineQty[IDX(mineType29)]++;
 
-    // Mine overlays and object bodies use terrain-specific sprite-frame
-    // payload from the original map tilesets.
-    // NOLINTBEGIN(readability-magic-numbers)
     switch (mineType29) {
         case MINE_TYPE_WOOD:
             mineFrame36 = 5;
@@ -5090,7 +5048,6 @@ void game::RandomizeMine(i32 x, i32 y) {
             }
             break;
     }
-    // NOLINTEND(readability-magic-numbers)
 
     WORLDMAP->GetCell(x, y)->m_objectIndex = objectFrame1;
     WORLDMAP->GetCell(x + 1, y)->m_objectIndex = objectFrame1 + 1;
@@ -5137,7 +5094,6 @@ void game::RandomizeMine(i32 x, i32 y) {
 
 VA(0x0045a930, 0xb8)
 void game::InitRandomArtifacts(void) {
-    // Retail /Od retains this otherwise unused local between the loop-index slots.
     i32 ignoredIndex;
     i32 y;
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
@@ -5228,8 +5184,6 @@ VA(0x0045ad00, 0x342)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
-    // Starting-army count ranges are retail faction-balance payload.
-    // NOLINTBEGIN(readability-magic-numbers)
     RandomHeroArmyRange armyTable7[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
         {{IDX(CREATURE_PEASANT), 30, 50},
          {IDX(CREATURE_ARCHER), 3, 5},
@@ -5244,7 +5198,6 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
          {IDX(CREATURE_IRON_GOLEM), 1, 2}},
         {{IDX(CREATURE_SKELETON), 6, 10}, {IDX(CREATURE_ZOMBIE), 2, 4}, {IDX(CREATURE_MUMMY), 1, 2}}
     };
-    // NOLINTEND(readability-magic-numbers)
     i32 selected9[RANDOM_HERO_ARMY_OPTION_COUNT];
     i32 index9;
     i32 minimum5;
@@ -5321,9 +5274,6 @@ void game::ProcessRandomObjects(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
                     RandomizeTown(x10, y8, 1);
                     break;
-                // Random-object value bands, quantity ranges, and paired source
-                // frames are serialized map-editor balance and tileset payload.
-                // NOLINTBEGIN(readability-magic-numbers)
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER:
                     minValue7 = 80;
                     maxValue17 = 2000;
@@ -5539,9 +5489,6 @@ void game::ProcessRandomObjects(void) {
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
-                // NOLINTEND(readability-magic-numbers)
-                // The legacy random-mine trigger reuses the flagged value whose low
-                // seven bits later identify an Eye of the Magi map object.
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EYE_OF_MAGI:
                     RandomizeMine(x10, y8);
                     break;
@@ -5810,7 +5757,6 @@ void game::WaitForPlayer(char* text, i32 player) {
     }
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x0045c03e, 0xda)
 i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -5833,7 +5779,6 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
     return 0;
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x0045c118, 0xe9)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -5855,7 +5800,6 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     }
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x0045c201, 0xf7)
 i32 game::HasObjectTilesetIndex(
     i32 col,
@@ -5883,7 +5827,6 @@ i32 game::HasObjectTilesetIndex(
     return 0;
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x0045c2f8, 0xdc)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
@@ -6014,9 +5957,6 @@ void game::SetupTowns(void) {
                 | (castle->m_buildings & (IDX(TOWN_BUILDING_CASTLE) | IDX(TOWN_BUILDING_TENT)));
             castle->m_buildState = extra->mageGuildLevel;
         } else {
-            // The ten-entry table and AI adjustment are retail town-generation
-            // probability payload.
-            // NOLINTBEGIN(readability-magic-numbers)
             defaultDwellingRoll[0] = 1;
             defaultDwellingRoll[1] = 1;
             defaultDwellingRoll[2] = 1;
@@ -6032,7 +5972,6 @@ void game::SetupTowns(void) {
             castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_1);
             if (!gbHumanPlayer[castle->m_owner] && dwellingCount == 1 && Random(1, 10) < 4)
                 dwellingCount++;
-            // NOLINTEND(readability-magic-numbers)
             if (--dwellingCount != 0)
                 castle->m_buildings |= IDX(TOWN_BUILDING_DWELLING_2);
             dwellingCount--;
@@ -6084,9 +6023,6 @@ void game::SetupTowns(void) {
                     SPELL_NONE;
         }
 
-        // Fixed spell choices, selection weights, and retry limits are retail
-        // mage-guild balance payload.
-        // NOLINTBEGIN(readability-magic-numbers)
         if (castle->m_type == FACTION_NECROMANCER && castle->m_owner != -1
             && !gbHumanPlayer[castle->m_owner]) {
             if (Random(0, 100) < 50)
@@ -6171,7 +6107,6 @@ void game::SetupTowns(void) {
                 }
             }
         }
-        // NOLINTEND(readability-magic-numbers)
         H2_FREE_AT(ppMapExtra[extraIndex], RETAIL_FILE, 6375);
         ppMapExtra[extraIndex] = NULL;
     }
@@ -7578,9 +7513,6 @@ void game::SetupNewRumour(void) {
     i32 roll2;
     i32 selectionRoll;
     i32 direction9;
-    // Retail's event chances, category weights, and cDirections indices are
-    // tavern-rumour selection payload.
-    // NOLINTBEGIN(readability-magic-numbers)
     if (m_rumourEventCount != 0 && Random(0, 9) < static_cast<i32>(m_rumourEventCount)) {
         attempts13 = 0;
         while (attempts13++ < 200) {
@@ -7694,7 +7626,6 @@ void game::SetupNewRumour(void) {
             }
         }
     }
-    // NOLINTEND(readability-magic-numbers)
 }
 
 VA(0x00460424, 0xae)
@@ -7848,8 +7779,7 @@ void CompressTest2(void) {
             H2_ALLOC_AT(dataSize2 + TEST_RANDOM_BUFFER_EXTRA, RETAIL_FILE, gCompressTest2SourceLine + 9)
         );
     for (index7 = 0; index7 < dataSize2; index7++)
-        // Random() is inclusive, so this covers every byte payload value.
-        sourceData6[index7] = static_cast<char>(Random(0, 255)); // NOLINT(readability-magic-numbers)
+        sourceData6[index7] = static_cast<char>(Random(0, 255));
     sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
     encodedSize14 = EncodeData(encodedData6, sourceData6, dataSize2);
     decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);

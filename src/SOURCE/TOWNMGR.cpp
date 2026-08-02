@@ -476,7 +476,7 @@ static const H2_ENUM_STORAGE(BuildingSlotType, i8)
 };
 
 SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
-    {// Knight
+    {
      {0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
      {0, 188, 214, 39, 42},  {0, 69, 108, 67, 55},   {5, 0, 49, 286, 116},   {0, 478, 193, 46, 63},
      {5, 7, 33, 0, 0},       {5, 134, 37, 0, 0},     {0, 219, 138, 120, 30}, {0, 286, 102, 88, 22},
@@ -486,7 +486,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
      {0, 445, 50, 195, 157}, {0, 135, 149, 73, 32},  {5, 240, 166, 91, 66},  {0, 323, 174, 102, 69},
      {7, 48, 176, 104, 80},  {0, 445, 50, 195, 157}, {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
     },
-    {// Barbarian
+    {
      {8, 346, 22, 54, 120},  {0, 466, 94, 87, 47},  {0, 0, 161, 136, 85},   {5, 505, 199, 138, 56},
      {0, 268, 189, 50, 66},  {0, 44, 109, 87, 52},  {6, 0, 0, 214, 175},    {0, 463, 154, 38, 81},
      {0, 10, 58, 0, 0},      {0, 118, 45, 0, 0},    {0, 217, 166, 67, 43},  {0, 240, 106, 73, 34},
@@ -496,7 +496,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
      {5, 407, 0, 113, 106},  {0, 145, 195, 76, 52}, {0, 0, 0, 0, 0},        {5, 496, 136, 138, 64},
      {5, 318, 174, 131, 54}, {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
     },
-    {// Sorceress
+    {
      {0, 279, 0, 63, 168},  {5, 423, 167, 87, 50}, {5, 490, 141, 148, 91}, {5, 0, 208, 178, 48},
      {0, 335, 205, 45, 29}, {0, 104, 130, 59, 42}, {5, 0, 0, 201, 179},    {0, 152, 163, 28, 65},
      {0, 98, 99, 0, 0},     {0, 151, 98, 0, 0},    {0, 404, 122, 69, 45},  {5, 131, 185, 71, 53},
@@ -506,7 +506,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
      {0, 179, 0, 84, 119},  {5, 338, 146, 93, 61}, {0, 51, 164, 106, 40},  {0, 198, 178, 143, 71},
      {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
     },
-    {// Warlock
+    {
      {0, 586, 18, 54, 150},  {0, 520, 103, 64, 54}, {0, 476, 96, 82, 55},   {5, 517, 200, 123, 56},
      {0, 342, 205, 67, 51},  {0, 298, 135, 72, 31}, {5, 241, 18, 181, 150}, {0, 478, 161, 37, 63},
      {0, 311, 84, 0, 0},     {0, 359, 83, 0, 0},    {0, 386, 171, 71, 40},  {6, 60, 32, 63, 186},
@@ -516,7 +516,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
      {0, 92, 0, 64, 257},    {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 139, 163, 190, 83},
      {0, 0, 0, 0, 0},        {0, 92, 0, 64, 257},   {0, 92, 0, 64, 257},    {0, 0, 0, 0, 0}
     },
-    {// Wizard
+    {
      {0, 570, 0, 70, 126},  {5, 505, 50, 51, 49},  {6, 0, 149, 118, 76},   {5, 0, 206, 206, 50},
      {0, 249, 139, 28, 33}, {0, 58, 60, 49, 42},   {5, 0, 0, 200, 99},     {0, 464, 45, 24, 72},
      {0, 30, 17, 0, 0},     {0, 128, 17, 0, 0},    {0, 255, 163, 108, 53}, {0, 237, 208, 137, 49},
@@ -526,7 +526,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
      {0, 160, 0, 178, 67},  {0, 0, 0, 0, 0},       {5, 152, 130, 96, 60},  {0, 0, 0, 0, 0},
      {0, 411, 0, 49, 167},  {0, 160, 0, 178, 67},  {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
     },
-    {// Necromancer
+    {
      {5, 557, 17, 85, 191},  {0, 275, 124, 62, 77},  {0, 455, 39, 51, 103},  {5, 500, 220, 141, 36},
      {0, 215, 213, 29, 41},  {0, 333, 115, 47, 70},  {5, 289, 10, 134, 164}, {0, 365, 154, 41, 93},
      {0, 330, 47, 0, 0},     {0, 360, 46, 0, 0},     {0, 412, 193, 98, 61},  {6, 263, 181, 90, 65},
@@ -769,7 +769,6 @@ void townManager::ChangeTown(void) {
     SetCommandAndText(message);
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004a51da, 0x9df)
 void townManager::SetupTown(void) {
     tag_message message;
@@ -1091,12 +1090,8 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             break;
         case TOWN_WIDGET_GARRISON_FIRST:
         case TOWN_WIDGET_GARRISON_FIRST + 1:
-        // The strip exposes five contiguous army-slot controls; the interior offsets
-        // are topology, not distinct commands.
-        // NOLINTBEGIN(readability-magic-numbers)
         case TOWN_WIDGET_GARRISON_FIRST + 2:
         case TOWN_WIDGET_GARRISON_FIRST + 3:
-        // NOLINTEND(readability-magic-numbers)
         case TOWN_WIDGET_GARRISON_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_garrisonStrip;
@@ -1126,11 +1121,8 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             break;
         case TOWN_WIDGET_HERO_FIRST:
         case TOWN_WIDGET_HERO_FIRST + 1:
-        // The hero strip uses the same five-control topology as the garrison strip.
-        // NOLINTBEGIN(readability-magic-numbers)
         case TOWN_WIDGET_HERO_FIRST + 2:
         case TOWN_WIDGET_HERO_FIRST + 3:
-        // NOLINTEND(readability-magic-numbers)
         case TOWN_WIDGET_HERO_LAST:
             if (m_swapArmySlot != TOWN_ARMY_SLOT_NONE) {
                 m_pendingStrip = m_heroStrip;
@@ -1986,8 +1978,6 @@ void townManager::RedrawTownScreen(void) {
 VA(0x004a84b7, 0x376)
 void townManager::SplitArmy(void) {
     i16 unusedValue = 1;
-    // splitwin.bin's setup record retains this otherwise-unused control value.
-    // NOLINTNEXTLINE(readability-magic-numbers)
     i16 unusedControl = 4;
     i32 sameType;
     tag_message message;
@@ -2015,7 +2005,6 @@ void townManager::SplitArmy(void) {
     message.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message);
     sprintf(gText, "%d", m_splitAmount);
-    // The BIN uses control 4 during initial population; the runtime edit control is 0x44.
     message.payload.widget.id = SPLIT_SETUP_AMOUNT_CONTROL;
     message.payload.widget.data.text = gText;
     m_heroWindow1->BroadcastMessage(message);
@@ -2098,7 +2087,7 @@ i32 townManager::BuyBuild(
     i32 cannotBuy,
     i32 quickView
 ) {
-    static i16 sourceLineBase = 0x0948; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x0948;
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     i16 dialogLeft_a;
@@ -2214,9 +2203,6 @@ i32 townManager::BuyBuild(
         }
     }
 
-    // Retail keeps these dialog-builder defaults as stack locals although the
-    // reconstructed path no longer reads them.
-    // NOLINTBEGIN(readability-magic-numbers)
     dialogWidth_e = 80;
     dialogHeight_f = 40;
     dialogLeft_a = 32;
@@ -2224,7 +2210,6 @@ i32 townManager::BuyBuild(
     dialogResult_b = 0;
     dialogButtonWidth_l = 2;
     dialogButtonCount_m = 3;
-    // NOLINTEND(readability-magic-numbers)
     widgetIndex_f = 0;
     resourceCount_a = 0;
     topRowCount_c = 0;
@@ -2234,8 +2219,6 @@ i32 townManager::BuyBuild(
         if (resourceTypes_o[index_h] != -1)
             ++resourceCount_a;
     }
-    // Retail's two-row partition is 1-4, 2+3, 3+3, or 3+4 resources.
-    // NOLINTBEGIN(readability-magic-numbers)
     if (resourceCount_a <= 4) {
         topRowCount_c = resourceCount_a;
     } else if (resourceCount_a == 5) {
@@ -2248,7 +2231,6 @@ i32 townManager::BuyBuild(
         topRowCount_c = 3;
         bottomRowCount_o = 4;
     }
-    // NOLINTEND(readability-magic-numbers)
 
     sprintf(
         description_b,
@@ -2573,8 +2555,6 @@ void townManager::SetupMage(heroWindow* window) {
     i16 unusedZero_f = 0;
     i16 unusedAvailable_j = 1;
     i16 unusedInvalid_c = TOWN_MAGE_SPELL_UNAVAILABLE;
-    // magewind.bin retains this icon-state default as an otherwise-unused local.
-    // NOLINTNEXTLINE(readability-magic-numbers)
     i16 unusedIconState_h = 2;
     i16 unusedFirstSpell_p = TOWN_MAGE_FIRST_SPELL_CONTROL;
     i16 unusedFirstIcon_m = TOWN_MAGE_FIRST_ICON_CONTROL;
@@ -2588,7 +2568,6 @@ void townManager::SetupMage(heroWindow* window) {
     i32 hasLibrary_k;
     i32 lineCount_m;
     i32 unusedGuildFrame_n;
-    // Retail keeps one unreferenced four-byte local at EBP-0x48.
     i32 unusedLocal_n;
 
     message_b.type = MESSAGE_WIDGET;
@@ -2748,8 +2727,6 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
 VA(0x004aa0d8, 0x70b)
 i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i16 unusedTextStateTemp = 1;
-    // rcrthero.bin control defaults are preserved as stack locals for the retail frame.
-    // NOLINTBEGIN(readability-magic-numbers)
     i16 unusedPortraitStateSlot = 2;
     i16 unusedTextControlValue = 3;
     i16 unusedIconStatek = 4;
@@ -2757,7 +2734,6 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i16 unusedPortraitControlIndex = 7;
     i16 unusedButtonTextk = 8;
     i16 unusedButtonIconl = 9;
-    // NOLINTEND(readability-magic-numbers)
     tag_message messageLocal;
     i32 artifactCountb;
     i32 indexValue;
@@ -2903,7 +2879,6 @@ MessageDispatchResult TavernHandler(tag_message& message) {
                     case TOWN_DIALOG_CONFIRM:
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-                        // Retail reads the id back rather than restating the constant.
                         message.payload.widget.command =
                             static_cast<BaseWidgetCommand>(message.payload.widget.id);
                         return MESSAGE_DISPATCH_FORWARD;
@@ -3169,7 +3144,7 @@ void townManager::SetupWell(heroWindow* window) {
 
 VA(0x004ab344, 0xde3)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    static i16 sourceLineBase = 0x0e0e; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x0e0e;
     i16 unusedRankX_last = THIEVES_RANK_FIRST_X;
     i16 unusedRankWidth_category = THIEVES_PLAYER_COLUMN_WIDTH;
     i16 unusedRankY_j = THIEVES_FIRST_CATEGORY_Y;
@@ -3177,8 +3152,6 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     i16 unusedRankIconHeight_k = THIEVES_RANK_ICON_HEIGHT;
     i16 unusedIconWidth_index = THIEVES_RANK_ICON_WIDTH;
     i16 unusedIconHeight = THIEVES_RANK_ICON_HEIGHT;
-    // thiefwin.bin retains this otherwise-unused player-column extent.
-    // NOLINTNEXTLINE(readability-magic-numbers)
     i16 unusedPlayerWidth_value = 72;
     TownThievesGuildCategory category_stat;
     i8 categoryOrder_x[TOWN_THIEVES_ORDER_BUFFER_SIZE];

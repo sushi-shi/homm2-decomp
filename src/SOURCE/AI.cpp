@@ -464,7 +464,6 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (WalkTowardArmy(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
                 goto finish;
 
-            // NOLINTBEGIN(readability-magic-numbers)
             castleBoundary27[0] = COMBAT_AI_CASTLE_BOUNDARY_ROW_0;
             castleBoundary27[1] = COMBAT_AI_CASTLE_BOUNDARY_ROW_1;
             castleBoundary27[2] = COMBAT_AI_CASTLE_BOUNDARY_ROW_2;
@@ -474,7 +473,6 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             castleBoundary27[6] = COMBAT_AI_CASTLE_BOUNDARY_ROW_6;
             castleBoundary27[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
             castleBoundary27[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
-            // NOLINTEND(readability-magic-numbers)
             castleRow29 = currentArmy9->m_hex / ARMY_HEX_COLUMNS;
             if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0
                 && currentArmy9->m_hex < castleBoundary27[castleRow29]) {

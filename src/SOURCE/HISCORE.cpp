@@ -302,4 +302,3 @@ void highScoreManager::Update(void) {
         close(inputFile);
 }
 
-

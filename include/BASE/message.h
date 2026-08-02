@@ -13,10 +13,6 @@ H2_ENUM_CLASS_END(MessageDispatchResult)
 
 typedef MessageDispatchResult (*MessageDispatchHandler)(tag_message&);
 
-// Shared event ABI emitted by inputManager and consumed by BASE and SOURCE managers.
-// The complete definition is required anywhere a message is passed or returned by value.
-
-// Values emitted by INPUTMGR and consumed by manager/widget Main loops.
 H2_ENUM_CLASS_BEGIN(MessageType)
     MESSAGE_NONE                       = 0,
     MESSAGE_KEY_DOWN                   = 1,
@@ -58,7 +54,6 @@ H2_ENUM_CLASS_BEGIN(MessageType)
 H2_ENUM_CLASS_END(MessageType)
 H2_ENUM_FLAGS(MessageType)
 
-// One widget-dispatch command space; per-window names are value-verified aliases.
 H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     WIDGET_COMMAND_DRAW                       = 2,
     WIDGET_COMMAND_SET_TEXT                   = 3,
@@ -146,7 +141,6 @@ H2_ENUM_CLASS_BEGIN(BaseWidgetCommand)
     HERO_UI_INPUT_ALTERNATE_SELECT            = WIDGET_COMMAND_ALTERNATE_SELECT,
     INIT_MENU_HELP_COMMAND                    = WIDGET_COMMAND_ALTERNATE_SELECT,
     NEW_GAME_EVENT_ALTERNATE_PRESS            = WIDGET_COMMAND_ALTERNATE_SELECT,
-    // Remote-wait extension outside the canonical widget command sequence.
     WIDGET_COMMAND_REMOTE_WAIT_EXIT           = 16,
     ADVMGR_REMOTE_WAIT_EXIT_COMMAND           = WIDGET_COMMAND_REMOTE_WAIT_EXIT,
     HERO_UI_WIDGET_ICON_FILE                  = WIDGET_COMMAND_SET_ICON,
@@ -181,7 +175,7 @@ H2_ENUM_CLASS_BEGIN(MessageModifier)
     MESSAGE_MODIFIER_SHIFT_KEYS             = 0x3,
     MESSAGE_MODIFIER_CONTROL                = 4,
     MESSAGE_MODIFIER_ALT                    = 0x20,
-    MESSAGE_MODIFIER_CONTROL_KEYS           = 0xc, // either control-key modifier bit
+    MESSAGE_MODIFIER_CONTROL_KEYS           = 0xc,
     MESSAGE_MODIFIER_CLEAR_CONTROL_MASK     = 0xfffb,
     MESSAGE_MODIFIER_CLEAR_LEFT_SHIFT_MASK  = 0xfffd,
     MESSAGE_MODIFIER_CLEAR_RIGHT_SHIFT_MASK = 0xfffe,
@@ -239,7 +233,6 @@ struct tag_messageWidgetPayload {
     tag_messageWidgetData data;
 };
 
-// Executive-arm commands consumed by the manager loop (EXEC), not by widgets.
 H2_ENUM_CLASS_BEGIN(ExecutiveCommand)
     EXECUTIVE_COMMAND_TERMINATE_LOOP = 1,
     EXECUTIVE_COMMAND_REMOVE_MANAGER = 2,

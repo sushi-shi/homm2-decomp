@@ -36,4 +36,3 @@ void dimmerWidget::Draw(void) {
     Dim();
 }
 
-

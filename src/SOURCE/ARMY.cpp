@@ -3075,7 +3075,6 @@ berserkFinish:
     }
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x00420238, 0x35d)
 void army::MoveAttack(i32 destination, i32 moveOnly) {
     i32 baseAttackMask;

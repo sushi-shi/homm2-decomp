@@ -1088,15 +1088,12 @@ void game::InitCampaignMap(void) {
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 
-// Retail campaign-track coordinate payload.
-// NOLINTBEGIN(readability-magic-numbers)
 i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
     39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
     557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
     335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
 };
-// NOLINTEND(readability-magic-numbers)
 class heroWindow* campWin = NULL;
 H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
 CampaignTrackType iCampaignTrackType;

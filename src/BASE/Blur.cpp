@@ -3,10 +3,6 @@
 #include <BASE/Blur.h>
 #include <BASE/palette.h>
 
-// Fixed geometry of the 640-pixel framebuffer region processed by DoBlur.
-// The blur samples sixteen pixels from the horizontal and vertical axes around
-// each output pixel. Component-table indices are byte offsets into int tables.
-// The game palette stores 256 RGB triplets with six-bit component values.
 H2_ENUM_BEGIN(BlurPaletteConstant)
     PALETTE_RED_OFFSET         = -3,
     PALETTE_GREEN_OFFSET       = -2,
@@ -17,7 +13,6 @@ H2_ENUM_BEGIN(BlurPaletteConstant)
     COMPONENT_TABLE_BYTE_COUNT = sizeof(i32) * PALETTE_COLOR_COUNT
 H2_ENUM_END(BlurPaletteConstant)
 
-// RGBLOOKP.BIN is addressed as 1024 rows of 32 quantized blue entries.
 H2_ENUM_BEGIN(BlurLookupConstant)
     QUANTIZATION_SHIFT    = 5,
     QUANTIZATION_MASK     = (1 << QUANTIZATION_SHIFT) - 1,
@@ -157,9 +152,9 @@ void DoBlur(
                 PollSound();
             }
             i32 samples[SPILLED_ARRAY_SAMPLE_COUNT];
-            i32 sample15; // south four rows
-            i32 sample14; // north one row
-            i32 sample13; // north four rows
+            i32 sample15;
+            i32 sample14;
+            i32 sample13;
             u8* input = destination->m_pixels + rowOffset + BORDER_RADIUS;
             i32 remaining = INTERIOR_COLUMN_COUNT;
             u8* output = source->m_pixels + rowOffset + BORDER_RADIUS;

@@ -50,7 +50,7 @@ H2_ENUM_END(SoundSampleStatus)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp"
 
-static PCMWAVEFORMAT gWaveFormat; // digital-driver PCM format (WAVE_init_driver)
+static PCMWAVEFORMAT gWaveFormat;
 
 H2_ENUM_CLASS_BEGIN(SoundStateSpan)
     SOUND_STATE_RESET_SPAN = 0xae
@@ -448,8 +448,6 @@ i32 soundManager::Open(i32) {
     memset(bSaveMusicPosition, 0, MIDI_TRACK_COUNT);
     memset(bMusicIsLooping, 0, MIDI_TRACK_COUNT);
 
-    // Retail content policy keyed by resource track number.
-    // NOLINTBEGIN(readability-magic-numbers)
     bSaveMusicPosition[16] = 1;
     bSaveMusicPosition[18] = 1;
     bSaveMusicPosition[14] = 1;
@@ -482,7 +480,6 @@ i32 soundManager::Open(i32) {
     bMusicIsLooping[24] = 1;
     for (musicTrack = 2; musicTrack <= 4; musicTrack++)
         bMusicIsLooping[musicTrack] = 1;
-    // NOLINTEND(readability-magic-numbers)
 
     keyState = GetAsyncKeyState(VK_F6);
     if (HIBYTE(keyState)) {
@@ -959,7 +956,6 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     if (m_ready == 0 || playbackData->volume == 0)
         return NULL;
     LogStr("Memory Sample 1");
-    // The one-past channel type reads the zeroed record-shaped prefix of adjacent storage.
     scs = &SCS[playbackData->channelType];
     for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
         if (AIL_sample_status(m_sampleHandles[ch]) == SAMPLE_STATUS_DONE)

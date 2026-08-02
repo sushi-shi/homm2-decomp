@@ -61,7 +61,6 @@ void DimIconToBitmap(
         s_x = X;
         i32 cmd = ReadIconRleByte(s_src);
         if (static_cast<i8>(cmd) < 0) {
-            // skip run / end-of-sprite
             s_row = row;
             s_run = cmd;
             i32 n = cmd & ICON_RLE_MONO_RUN_MASK;

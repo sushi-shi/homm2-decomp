@@ -78,7 +78,6 @@ inline textWidget::~textWidget() {
     H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
 }
 
-// Preserve the original statement stream while consolidating repeated message setup.
 #define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.command = commandValue;                                          \

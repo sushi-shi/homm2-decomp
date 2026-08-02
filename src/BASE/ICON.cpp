@@ -40,7 +40,6 @@ icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_IN
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004c27e0, 0x33)
 inline icon::~icon() {
     static char destructionSourceFile[] = RETAIL_FILE;

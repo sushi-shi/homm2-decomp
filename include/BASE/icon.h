@@ -17,9 +17,6 @@ class icon : public resource {
 public:
     i16 m_frameCount;
     u8* m_data;
-    // m_data heads with the serialized IconEntry frame table (m_frameCount rows);
-    // pixel runs follow at each entry's srcOffset. The typed view of the table
-    // lives here so call sites do not re-cast the blob.
     struct IconEntry* Entries(void) {
         return reinterpret_cast<struct IconEntry*>(m_data);
     }

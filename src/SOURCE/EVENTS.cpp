@@ -315,7 +315,7 @@ namespace {
         MINE_CENTER_GOLD_FRAME = 4
     H2_ENUM_END(AbandonedMineConversionConstant)
 
-} // namespace
+}
 
 #define TRADING_POST_EFFICIENCY 0.2f
 
@@ -3604,7 +3604,6 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0,
                         -1
                     );
-                    // Retail conversion topology for the two terrain variants and center tile.
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
                         y + ABANDONED_MINE_Y_TOP,
@@ -3735,9 +3734,6 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     }
 
     erased_a = 1;
-    // Retail object-to-footprint frame topology. The frame ids are payloads from the
-    // corresponding ICN tilesets, not independent gameplay constants.
-    // NOLINTBEGIN(readability-magic-numbers)
     if (cell->m_objectTileset == TILESET_OBJNARTI)
         frame_k = cell->m_objectIndex - 1;
     if (cell->m_objectTileset == TILESET_X_LOC3)
@@ -3806,7 +3802,6 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
                 cellX_b[0] = x - 1;
                 cellY_e[0] = y;
             }
-            // NOLINTEND(readability-magic-numbers)
 
             if (cellX_b[0] >= 0) {
                 if (cellY_e[0] >= 0) {
@@ -5509,9 +5504,6 @@ CombatResult advManager::CombatMonsterEvent(
     for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++)
         placement4[stackIndex9] = stackIndex9;
 
-    // Retail permutations for centering the last creature group in the five army slots.
-    // The indices are topology payload, not independent gameplay constants.
-    // NOLINTBEGIN(readability-magic-numbers)
     if (lastStackCount == 1) {
         placement4[2] = 0;
         placement4[0] = 2;
@@ -5536,7 +5528,6 @@ CombatResult advManager::CombatMonsterEvent(
         placement4[1] = 4;
         placement4[4] = 1;
     }
-    // NOLINTEND(readability-magic-numbers)
 
     for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++) {
         temporaryTypes7[stackIndex9] = gpMonGroup->m_creatureTypes[stackIndex9];
@@ -5592,9 +5583,6 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     statChanges[IDX(HERO_PRIMARY_SPELL_POWER)] = 0;
     statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 0;
 
-    // Artifact primary-stat bonus table. Each value is the payload of its named artifact/stat
-    // row; giving every cell another constant name would only duplicate that context.
-    // NOLINTBEGIN(readability-magic-numbers)
     switch (artifact) {
         case ARTIFACT_ULTIMATE_BOOK:
             statChanges[IDX(HERO_PRIMARY_KNOWLEDGE)] = 12;
@@ -5849,7 +5837,6 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
         default:
             break;
     }
-    // NOLINTEND(readability-magic-numbers)
 
     for (statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] = 0;
          statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT] < EVENT_ARTIFACT_PRIMARY_STAT_COUNT;
@@ -6992,7 +6979,6 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 if (combatResult_d == 0) {
                 } else {
                     eventHero->CheckLevel();
-                    // Same retail conversion topology as the human abandoned-mine event.
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,
                         y + ABANDONED_MINE_Y_TOP,
@@ -7172,8 +7158,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
 VA(0x004478df, 0x56)
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
-    // Preserved retail /Od frame slot; this array has no semantic use.
-    i32 unusedBarrier15[5]; // NOLINT(readability-magic-numbers)
+    i32 unusedBarrier15[5];
     i32 color = cell->m_objectMetadata;
     color &= EVENT_BARRIER_COLOR_MASK;
     if (gpCurPlayer->m_barrierTents & (1 << color))
@@ -7193,13 +7178,12 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
 
 VA(0x00447989, 0x31d)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
-    // Preserved retail /Od frame slots; these arrays have no semantic use.
-    i32 unusedPair27[2]; // NOLINT(readability-magic-numbers)
+    i32 unusedPair27[2];
     i32 artifactIndex1;
     i32 siteLevel5;
     HeroPrimaryStat primaryStat16;
     GenericSiteType siteType3;
-    i32 unusedTriple26[3]; // NOLINT(readability-magic-numbers)
+    i32 unusedTriple26[3];
     i32 cursedArtifactCount5;
     CreatureType creatureType3;
     i32 quantity6;
@@ -7867,8 +7851,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
 VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
-    // Original-source anchor consumed by H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x1655;
     hero* secondHero9;
     i32 setupCombatY8;
     i32 combatX1;
@@ -7967,8 +7950,7 @@ CombatResult advManager::DoCombat(
     i32 randomSeed,
     i32 processLosses
 ) {
-    // Original-source anchor consumed by H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x16ba; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x16ba;
     armyGroup* receivedSecondArmy2;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
@@ -8023,7 +8005,7 @@ CombatResult advManager::DoCombat(
                 setupCombatY,
                 randomSeed,
                 gbGamePosToNetPos[secondPlayer7],
-                COMBAT_RESULT_ATTACKER, // Placeholder ignored until the remote combat finishes.
+                COMBAT_RESULT_ATTACKER,
                 0,
                 0
             );
@@ -8182,8 +8164,7 @@ void advManager::SendHeroTownData(
     i32 retreatWin,
     i32 combatSurrender
 ) {
-    // Original-source anchor consumed by H2_ALLOC/H2_FREE line reconstruction.
-    static i16 sourceLineBase = 0x17cc; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x17cc;
     char* reply;
     i32 result;
     combatRemoteData* buffer = NULL;
@@ -8323,8 +8304,7 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    // Original-source anchor consumed by H2_ALLOC line reconstruction.
-    static i16 sourceLineBase = 0x183d; // NOLINT(readability-magic-numbers)
+    static i16 sourceLineBase = 0x183d;
     i32 hasFirstHero7;
     i32 hasTown0;
     i32 hasSecondHero8;

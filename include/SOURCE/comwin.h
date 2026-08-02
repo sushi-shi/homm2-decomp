@@ -19,7 +19,6 @@ H2_ENUM_CLASS_BEGIN(ComBaudRate)
     COM_BAUD_38400 = 5
 H2_ENUM_CLASS_END(ComBaudRate)
 
-// Intrusive-list anchors store the tail before the head.
 struct tag_Node {
     struct tag_Node* prev;
     struct tag_Node* next;
@@ -27,8 +26,8 @@ struct tag_Node {
     union {
         u8 comData[COM_PORT_FLEXIBLE_DATA_SIZE];
         struct {
-            u8 sessionIndex; // NetBIOS session table index
-            u8 data[COM_PORT_FLEXIBLE_DATA_SIZE]; // NetBIOS payload (variable length)
+            u8 sessionIndex;
+            u8 data[COM_PORT_FLEXIBLE_DATA_SIZE];
         };
     };
 };

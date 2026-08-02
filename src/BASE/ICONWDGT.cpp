@@ -23,7 +23,6 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_iconId = 0;
 }
 
-// Retail /Ob1 includes an inline-accessor continuation in this function.
 VA(0x004bb700, 0xb4)
 iconWidget::iconWidget(
     i16 x,
@@ -92,7 +91,6 @@ inline iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// Preserve the original statement stream while consolidating forwarded widget identity.
 #define SET_WIDGET_MESSAGE_TYPE_AND_ID(messageValue, idValue)                                    \
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
@@ -224,5 +222,4 @@ void iconWidget::Draw(void) {
             return;
     }
 }
-
 
