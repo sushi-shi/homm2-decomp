@@ -86,6 +86,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[unclassified] `DriveSupportsFreeSpaceQuery`** (`BASE/Misc`, 0xbf2f0).
 - **[Buka] soundManager backend plumbing** — `ShutdownSoundBackends`,
   `StartupMilesBackend`, `ConvertVolumeFloat` (see the class rework below).
+- **[Buka] EDITOR/mapcell gained the STL init pair** — the only editor-tier
+  TU now carries the ctype-facet guard stub and atexit registration at its
+  tail (the "two new functions" vs 2.0), meaning Buka's mapcell.cpp include
+  chain reaches <audiere.h>; our TU does not emit them yet.
 - **[Buka] User-declared empty destructors** `game::~game` and
   `soundManager::~soundManager`, defined at the tail of `SOURCE/KB` — PoL
   relied on the implicit destructors.
