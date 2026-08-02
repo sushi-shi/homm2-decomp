@@ -682,24 +682,24 @@ VA(0x00461d60, 0xac)
 i32 hero::GetLevel(i32 experienceValue) {
     i32 experience;
     i32 levelCounter;
-    i32 increment;
+    i32 growth;
 
     for (levelCounter = 1; levelCounter <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT; levelCounter++) {
         if (experienceValue < gMinExpForLevel[levelCounter - 1])
             return levelCounter - 1;
     }
 
-    increment = static_cast<i32>(
+    growth = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
              [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
-    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
+    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + growth;
     levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
-    while (experience < experienceValue) {
-        increment = static_cast<i32>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
-        experience += increment;
+    while (experienceValue > experience) {
+        growth = static_cast<i32>(growth * HERO_EXPERIENCE_GROWTH_FACTOR);
+        experience += growth;
         levelCounter++;
     }
     return levelCounter - 1;

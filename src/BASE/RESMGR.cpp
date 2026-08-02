@@ -76,9 +76,9 @@ void resourceManager::GetBackdropAtLoc(
     i32 useIcon
 ) {
     icon* backdropIcon;
-    i32 dataWidth;
+    i32 width;
     i32 imageHeight;
-    i32 row;
+    i32 curRow;
     if (useIcon != 0) {
         backdropIcon = GetIcon(filename);
         backdropIcon->DrawToBuffer(destinationX, destinationY, 0, ICON_DRAW_NORMAL);
@@ -86,13 +86,13 @@ void resourceManager::GetBackdropAtLoc(
     } else {
         PointToFile(MakeId(filename, 1));
         ReadWord();
-        dataWidth = ReadWord();
+        width = ReadWord();
         imageHeight = ReadWord();
-        for (row = destinationY; row < imageHeight + destinationY; row++) {
+        for (curRow = destinationY; curRow < destinationY + imageHeight; curRow++) {
             ReadBlock(
-                (row * BACKDROP_ROW_BYTES)
+                (curRow * BACKDROP_ROW_BYTES)
                     + reinterpret_cast<i8*>(destination->m_pixels) + destinationX,
-                dataWidth
+                width
             );
         }
     }
