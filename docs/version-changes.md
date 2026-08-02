@@ -98,6 +98,14 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Changed
 
+- **[build] String pooling (`/Gf`) is on for most of the build but off for
+  seven TUs.** Retail KB/dpnetwin/COMMAND/ADVMGR blocks hold one cell per
+  literal content (duplicate literals in our reconstruction resolve to a
+  single retail cell), while Bzip, Misc, EVENTS, Modem, SETUP, SPELLS and
+  wingraph keep adjacent duplicate cells of the same content inside their
+  unit block - their compiles ran without pooling (`base_nogf`). Pooled
+  literals are `??_C@` COMDATs the linker folds image-wide, so cross-unit
+  references are expected.
 - **[Buka] In-code UI strings translated to Russian (CP1251).** 29 string
   literals compiled into code (not the resource text) carry Buka's Russian
   translation where PoL/Gold had English: the ADVMGR bottom-bar date words

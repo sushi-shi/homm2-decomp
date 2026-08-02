@@ -15,13 +15,16 @@ platform = "win32"
 # ?KBChangeMenu@@YIXPAX@Z, where PAX is pointer-to-void. Compiling with STRICT would
 # emit PAUHMENU__@@ for every handle-taking function instead.
 [flags]
-base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
+base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
+# Seven TUs keep duplicate string cells in retail (same content, two cells
+# inside the unit block): their compile ran without string pooling.
+base_nogf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
 o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
-base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Oi", "/Gi-", "/GX", "/DNO_STRICT"]
+base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Oi", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
 # Buka's modern audio TUs carry C++ exception state (the image's SEH unwind
 # funclets come from them); /Gi- pins the incremental-compilation surface off.
-base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
+base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
 
 [[unit]]
 unit = "BASE/AudiereEffects"
@@ -65,7 +68,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/Bzip"
 source = "src/BASE/Bzip.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/DIMMER"
@@ -144,7 +147,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "BASE/PALETTE"
@@ -319,7 +322,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/EVENTS"
 source = "src/SOURCE/EVENTS.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/FINDPATH"
@@ -359,7 +362,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/Modem"
 source = "src/SOURCE/Modem.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/NOOPT"
@@ -414,7 +417,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/SETUP"
 source = "src/SOURCE/SETUP.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/SMACKMGR"
@@ -429,7 +432,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/SPELLS"
 source = "src/SOURCE/SPELLS.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/STRIP"
@@ -504,7 +507,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/wingraph"
 source = "src/SOURCE/wingraph.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/x_arena"

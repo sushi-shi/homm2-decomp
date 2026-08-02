@@ -249,7 +249,7 @@ i16 dpnet_rcv(i16, u16, void* data) {
     u32 size;
 
     dpProcessMessages();
-    if (iDPRcvBufferTail == iDPRcvBufferHead)
+    if (iDPRcvBufferHead == iDPRcvBufferTail)
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
@@ -403,7 +403,7 @@ i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
     dpProcessMessages();
-    if (iLastMsgNumHumanPlayers != giNumHumanPlayers) {
+    if (giNumHumanPlayers != iLastMsgNumHumanPlayers) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
