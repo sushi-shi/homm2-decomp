@@ -294,4 +294,3 @@ i32 font::LineWidth(char* str) {
     }
     return w;
 }
-

@@ -7,9 +7,11 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd68e0,224,__mbscat,mbscat.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\mbscat.obj!__mbscat|libcmt.lib:build\intel\mt_obj\strcat.obj!_strcat
 0xd69c0,123,_strlen,strlen.obj,libcmt.lib,masked-exact,
 0xd6a3b,14,_iswupper,_wctype.obj,libcmt.lib,masked-exact,3 identical candidates: libcmt.lib:build\intel\mt_obj\_wctype.obj!_iswupper|libcmt.lib:build\intel\mt_obj\new.obj!??2@YAPAXI@Z|libcmt.lib:build\intel\mt_obj\mktime.obj!_mktime
+0xd6a49,45,?_JumpToContinuation@@YGXPAXPAUEHRegistrationNode@@@Z,trnsctrl.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=45
 0xd6a7d,7,?_CallMemberFunction0@@YGXPAX0@Z,trnsctrl.obj,libcmt.lib,masked-exact,3 identical candidates: libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction0@@YGXPAX0@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction1@@YGXPAX00@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction2@@YGXPAX00H@Z
 0xd6a84,7,?_CallMemberFunction0@@YGXPAX0@Z,trnsctrl.obj,libcmt.lib,masked-exact,3 identical candidates: libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction0@@YGXPAX0@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction1@@YGXPAX00@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction2@@YGXPAX00H@Z
 0xd6a8b,7,?_CallMemberFunction0@@YGXPAX0@Z,trnsctrl.obj,libcmt.lib,masked-exact,3 identical candidates: libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction0@@YGXPAX0@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction1@@YGXPAX00@Z|libcmt.lib:build\intel\mt_obj\trnsctrl.obj!?_CallMemberFunction2@@YGXPAX00H@Z
+0xd6a92,79,?_UnwindNestedFrames@@YGXPAUEHRegistrationNode@@PAUEHExceptionRecord@@@Z,trnsctrl.obj,libcmt.lib,order-aligned,between 0xd6a8b and 0xd6ae1; size ours=79 cand=79
 0xd6ae1,54,___CxxFrameHandler,trnsctrl.obj,libcmt.lib,masked-exact,
 0xd6b31,84,?_CallCatchBlock2@@YAPAXPAUEHRegistrationNode@@PBU_s_FuncInfo@@PAXHK@Z,trnsctrl.obj,libcmt.lib,masked-exact,
 0xd6b85,37,?CatchGuardHandler@@YA?AW4_EXCEPTION_DISPOSITION@@PAUEHExceptionRecord@@PAUCatchGuardRN@@PAX2@Z,trnsctrl.obj,libcmt.lib,masked-exact,
@@ -24,9 +26,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7aa0,254,_strncpy,strncpy.obj,libcmt.lib,masked-exact,
 0xd7bcb,17,_exit,crt0dat.obj,libcmt.lib,masked-exact,
 0xd7bdc,17,__exit,crt0dat.obj,libcmt.lib,masked-exact,
+0xd7c0b,163,_doexit,crt0dat.obj,libcmt.lib,order-aligned,between 0xd7bdc and 0xd7cb0; size ours=163 cand=165
 0xd7cb0,9,__lockexit,crt0dat.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\crt0dat.obj!__lockexit|libcmt.lib:build\intel\mt_obj\crt0dat.obj!__unlockexit
 0xd7cb9,9,__lockexit,crt0dat.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\crt0dat.obj!__lockexit|libcmt.lib:build\intel\mt_obj\crt0dat.obj!__unlockexit
 0xd7cc2,26,__initterm,crt0dat.obj,libcmt.lib,masked-exact,
+0xd7ce0,129,_strcmp,strcmp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=129
+0xd7e4d,80,_strerror,strerror.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=80
 0xd7f10,9,__errno,dosmap.obj,libcmt.lib,masked-exact,
 0xd7f19,9,___doserrno,dosmap.obj,libcmt.lib,masked-exact,
 0xd7f22,13,_srand,rand.obj,libcmt.lib,masked-exact,
@@ -34,7 +39,11 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7f60,56,_strncmp,strncmp.obj,libcmt.lib,masked-exact,
 0xd7fa0,172,_memcmp,memcmp.obj,libcmt.lib,masked-exact,
 0xd82f8,11,_atoi,atox.obj,libcmt.lib,masked-exact,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
+0xd87c5,395,__write_lk,write.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=395
+0xd89b5,473,__read_lk,read.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=473
+0xd8beb,131,__close_lk,close.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=131
 0xd8c6e,23,__open,open.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\open.obj!__open|libcmt.lib:build\intel\mt_obj\wopen.obj!__wopen
+0xd8f60,257,__strnicmp,strnicmp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=257
 0xd907c,44,__nh_malloc,malloc.obj,libcmt.lib,masked-exact,
 0xd91a4,49,_fclose,fclose.obj,libcmt.lib,masked-exact,
 0xd91d5,76,__fclose_lk,fclose.obj,libcmt.lib,masked-exact,
@@ -42,8 +51,10 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd9250,232,__fread_lk,fread.obj,libcmt.lib,masked-exact,
 0xd9338,49,__fsopen,fopen.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fopen.obj!__fsopen|libcmt.lib:build\intel\mt_obj\wfopen.obj!__wfsopen
 0xd9369,19,_fopen,fopen.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fopen.obj!_fopen|libcmt.lib:build\intel\mt_obj\wfopen.obj!__wfopen
+0xd93e1,115,__lseek_lk,lseek.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=115
 0xd94da,78,_fputs,fputs.obj,libcmt.lib,masked-exact,
 0xd9528,34,_ftell,ftell.obj,libcmt.lib,masked-exact,
+0xd954a,353,__ftell_lk,ftell.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=353
 0xd96ab,44,_fseek,fseek.obj,libcmt.lib,masked-exact,
 0xd96d7,141,__fseek_lk,fseek.obj,libcmt.lib,masked-exact,
 0xd9764,59,_fputc,fputc.obj,libcmt.lib,masked-exact,
@@ -55,6 +66,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd9848,92,__flush,fflush.obj,libcmt.lib,masked-exact,
 0xd9951,41,_ungetc,ungetc.obj,libcmt.lib,masked-exact,
 0xd997a,110,__ungetc_lk,ungetc.obj,libcmt.lib,masked-exact,
+0xd99e8,139,_perror,perror.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=139
 0xd9ab0,47,__chkstk,chkstk.obj,libcmt.lib,masked-exact,
 0xd9adf,155,___InternalCxxFrameHandler,frame.obj,libcmt.lib,masked-exact,
 0xd9b7a,435,?FindHandler@@YAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAU_CONTEXT@@PAXPBU_s_FuncInfo@@EH1@Z,frame.obj,libcmt.lib,masked-exact,
@@ -66,6 +78,9 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xda0a8,440,?BuildCatchObject@@YAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PBU_s_HandlerType@@PBU_s_CatchableType@@@Z,frame.obj,libcmt.lib,order-inferred,between 0xd9ee8 and 0xda2d3
 0xda26c,86,?_DestructExceptionObject@@YAXPAUEHExceptionRecord@@E@Z,frame.obj,libcmt.lib,order-inferred,between 0xd9ee8 and 0xda2d3
 0xda2d3,35,?AdjustPointer@@YAPAXPAXABUPMD@@@Z,frame.obj,libcmt.lib,masked-exact,
+0xda300,76,__CallSettingFrame@12,lowhelpr.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=76
+0xda5b3,280,__flsbuf,_flsbuf.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=280
+0xda6cb,1825,__output,output.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=1825
 0xdae0c,53,_write_char,output.obj,libcmt.lib,masked-exact,
 0xdae41,49,_write_multi_char,output.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\output.obj!_write_multi_char|libcmt.lib:build\intel\mt_obj\woutput.obj!_write_multi_char
 0xdae72,56,_write_string,output.obj,libcmt.lib,masked-exact,
@@ -81,7 +96,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xdb26b,147,__cftog,cvt.obj,libcmt.lib,masked-exact,
 0xdb2fe,81,__cfltcvt,cvt.obj,libcmt.lib,masked-exact,
 0xdb34f,37,__shift,cvt.obj,libcmt.lib,masked-exact,
+0xdb497,582,_setlocale,setlocal.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=582
+0xdb6dd,283,__setlocale_set_cat,setlocal.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=283
+0xdb8b1,280,__expandlocale,setlocal.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=280
 0xdb9cc,37,__strcats,setlocal.obj,libcmt.lib,masked-exact,
+0xdb9f1,204,___lc_strtolc,setlocal.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=204
+0xdbabd,83,___lc_lctostr,setlocal.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=83
 0xdbd34,43,_strncnt,a_cmp.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\a_cmp.obj!_strncnt|libcmt.lib:build\intel\mt_obj\a_map.obj!_strncnt
 0xdbee6,5,__rtzeronpop,87disp.obj,libcmt.lib,masked-exact,
 0xdbfa3,7,__rtchsifneg,87disp.obj,libcmt.lib,masked-exact,
@@ -92,16 +112,35 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xdc055,67,__fload_withFB,common.obj,libcmt.lib,masked-exact,
 0xdc098,22,__checkTOS_withFB,common.obj,libcmt.lib,masked-exact,
 0xdc0bb,42,__math_exit,common.obj,libcmt.lib,masked-exact,
+0xdc5e6,328,___heap_select,heapinit.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=328
+0xdc978,809,___sbh_free_block,sbheap.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=809
+0xdd05b,251,___sbh_alloc_new_group,sbheap.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=251
 0xdd156,758,___sbh_resize_block,sbheap.obj,libcmt.lib,masked-exact,
+0xdd51d,815,___sbh_heap_check,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=815 cand=815
+0xdd86e,324,___old_sbh_new_region,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=324 cand=324
+0xdd9b2,86,___old_sbh_release_region,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=86 cand=86
+0xdda08,194,___old_sbh_decommit_pages,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=194 cand=194
+0xddaca,87,___old_sbh_find_block,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=87 cand=87
+0xddb21,69,___old_sbh_free_block,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=69 cand=69
+0xddb66,520,___old_sbh_alloc_block,sbheap.obj,libcmt.lib,order-aligned,between 0xdd156 and 0xddd6e; size ours=520 cand=520
 0xddd6e,292,___old_sbh_alloc_block_from_page,sbheap.obj,libcmt.lib,masked-exact,
 0xdde92,169,___old_sbh_resize_block,sbheap.obj,libcmt.lib,masked-exact,
 0xde161,27,__seh_longjmp_unwind@4,exsup3.obj,libcmt.lib,masked-exact,
+0xde4b7,101,__d_inttype,powhlp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=101
 0xde520,52,__allmul,llmul.obj,libcmt.lib,masked-exact,
 0xde83e,60,__fload,87cdisp.obj,libcmt.lib,masked-exact,
+0xde87a,318,__XcptFilter,winxfltr.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=318
+0xdeb9c,436,_parse_cmdline,stdargv.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=436
+0xdee82,444,__ioinit,ioinit.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=444
+0xdf391,291,__alloc_osfhnd,osfinfo.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=291
+0xdf5f1,167,__open_osfhandle,osfinfo.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=167
+0xdf772,293,__chsize_lk,chsize.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=293
 0xdfa3c,43,__freebuf,_freebuf.obj,libcmt.lib,masked-exact,
+0xdfa67,220,__filbuf,_filbuf.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=220
 0xdfe83,42,__ftbuf,_sftbuf.obj,libcmt.lib,masked-exact,
 0xdfead,47,_fread,fread.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fread.obj!_fread|libcmt.lib:build\intel\mt_obj\fwrite.obj!_fwrite
 0xdfedc,266,__fwrite_lk,fwrite.obj,libcmt.lib,masked-exact,
+0xe00bd,70,?__CxxUnhandledExceptionFilter@@YGJPAU_EXCEPTION_POINTERS@@@Z,unhandld.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=70
 0xe02ae,23,_abort,abort.obj,libcmt.lib,masked-exact,
 0xe03b0,104,__aulldiv,ulldiv.obj,libcmt.lib,masked-exact,
 0xe0420,117,__aullrem,ullrem.obj,libcmt.lib,masked-exact,
@@ -150,31 +189,50 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe20c1,230,_crtGetLocaleInfoA@16,getqloc.obj,libcmt.lib,order-inferred,between 0xe1ad7 and 0xe21a7
 0xe21a7,57,_LcidFromHexString,getqloc.obj,libcmt.lib,masked-exact,
 0xe21e0,33,_GetPrimaryLen,getqloc.obj,libcmt.lib,masked-exact,
+0xe234a,208,__87except,87except.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=208
 0xe241a,23,_strtol,strtol.obj,libcmt.lib,masked-exact,6 identical candidates: libcmt.lib:build\intel\mt_obj\strtol.obj!_strtol|libcmt.lib:build\intel\mt_obj\wcstol.obj!_wcstol|libcmt.lib:build\intel\mt_obj\spawnv.obj!__spawnv|libcmt.lib:build\intel\mt_obj\spawnvp.obj!__spawnvp
+0xe2431,517,_strtoxl,strtol.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=517
+0xe2720,128,_strstr,strstr.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=128
 0xe352b,41,__set_exp,util.obj,libcmt.lib,masked-exact,
 0xe3594,36,__set_bexp,util.obj,libcmt.lib,masked-exact,
 0xe35b8,90,__sptype,util.obj,libcmt.lib,masked-exact,
 0xe36d3,18,__frnd,frnd.obj,libcmt.lib,masked-exact,
 0xe36e5,33,__copysign,ieeemisc.obj,libcmt.lib,masked-exact,
 0xe3706,37,__chgsign,ieeemisc.obj,libcmt.lib,masked-exact,
+0xe3741,231,__logb,ieeemisc.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=231
+0xe3828,661,__nextafter,ieeemisc.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=661
+0xe3aff,146,__fpclass,ieeemisc.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=146
 0xe3c25,17,__ismbblead,ismbbyte.obj,libcmt.lib,masked-exact,
+0xe3c9f,429,__setmbcp,mbctype.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=429
 0xe3e96,51,_CPtoLCID,mbctype.obj,libcmt.lib,masked-exact,
+0xe4185,97,__setmode_lk,setmode.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=97
+0xe4267,386,_signal,winsig.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=386
+0xe444b,386,_raise,winsig.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=386
 0xe4613,9,___pxcptinfoptrs,winsig.obj,libcmt.lib,masked-exact,
 0xe461c,33,___addl,mantold.obj,libcmt.lib,masked-exact,
 0xe463d,94,___add_12,mantold.obj,libcmt.lib,masked-exact,
 0xe469b,46,___shl_12,mantold.obj,libcmt.lib,masked-exact,
 0xe46c9,45,___shr_12,mantold.obj,libcmt.lib,masked-exact,
 0xe46f6,199,___mtold12,mantold.obj,libcmt.lib,masked-exact,
+0xe47bd,1185,___strgtold12,strgtold.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=1185
 0xe4c8e,60,___STRINGTOLD,strgtold.obj,libcmt.lib,masked-exact,
+0xe4cca,659,_$I10_OUTPUT,x10fout.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=659
+0xe53c8,1007,__expandtime,strftime.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=1007
 0xe57b7,39,__store_str,strftime.obj,libcmt.lib,masked-exact,
 0xe57de,111,__store_num,strftime.obj,libcmt.lib,order-inferred,between 0xe57b7 and 0xe584d
 0xe584d,73,__store_number,strftime.obj,libcmt.lib,masked-exact,
+0xe5896,719,__store_winword,strftime.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=719
+0xe5b65,312,___getlocaleinfo,inithelp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=312
 0xe5e68,45,__itoa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5e95,92,_xtoa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5ef1,42,__ltoa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5f36,49,__i64toa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5f67,134,_x64toa@20,xtoa.obj,libcmt.lib,masked-exact,
 0xe5fed,27,__ui64toa,xtoa.obj,libcmt.lib,masked-exact,
+0xe60bc,152,__except1,fpexcept.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=152
+0xe6154,165,__except2,fpexcept.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=165
+0xe61f9,691,__raise_exc,fpexcept.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=691
+0xe64ac,535,__handle_exc,fpexcept.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=535
 0xe66c3,136,__umatherr,fpexcept.obj,libcmt.lib,masked-exact,
 0xe674b,40,__set_errno,fpexcept.obj,libcmt.lib,masked-exact,
 0xe6773,37,__get_fname,fpexcept.obj,libcmt.lib,order-inferred,between 0xe674b and 0xe6798
@@ -183,8 +241,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe67c8,14,__statfp,fpctrl.obj,libcmt.lib,masked-exact,
 0xe67d6,15,__clrfp,fpctrl.obj,libcmt.lib,masked-exact,
 0xe67e5,35,__ctrlfp,fpctrl.obj,libcmt.lib,masked-exact,
+0xe685e,486,_ldexp,ldexp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=486
 0xe6a44,544,___ld12mul,tenpow.obj,libcmt.lib,masked-exact,
+0xe6d24,647,__tzset_lk,tzset.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=647
+0xe7178,320,_cvtdate,tzset.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=320
 0xe78b1,43,_strncnt,a_cmp.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\a_cmp.obj!_strncnt|libcmt.lib:build\intel\mt_obj\a_map.obj!_strncnt
+0xe78dc,391,___crtsetenv,setenv.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=391
 0xe7abb,103,_copy_environ,setenv.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\setenv.obj!_copy_environ|libcmt.lib:build\intel\mt_obj\wsetenv.obj!_copy_environ
 0xe7bb9,43,__mbsdup,mbsdup.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\mbsdup.obj!__mbsdup|libcmt.lib:build\intel\mt_obj\strdup.obj!__strdup
 0xe7eba,17,__tell,tell.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\tell.obj!__tell|libcmt.lib:build\intel\mt_obj\ismbbyte.obj!__ismbbkalnum

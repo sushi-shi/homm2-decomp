@@ -47,4 +47,5 @@ public:
     );
 };
 #pragma pack(pop)
+SIZE(bitmap, 0x1a);
 #endif

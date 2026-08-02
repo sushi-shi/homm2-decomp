@@ -19,6 +19,23 @@ base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/DNO_ST
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
 o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/QIfdiv", "/DNO_STRICT"]
 base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Oi", "/DNO_STRICT"]
+# Buka's modern audio TUs carry C++ exception state (the image's SEH unwind
+# funclets come from them); /Gi- pins the incremental-compilation surface off.
+base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/QIfdiv", "/Gi-", "/GX", "/DNO_STRICT"]
+
+[[unit]]
+unit = "BASE/AudiereEffects"
+source = "src/BASE/AudiereEffects.cpp"
+flags = "base_gx"
+
+[[unit]]
+unit = "BASE/AudiereMusic"
+source = "src/BASE/AudiereMusic.cpp"
+flags = "base_gx"
+
+[[unit]]
+unit = "BASE/MilesSound"
+source = "src/BASE/MilesSound.cpp"
 
 [[unit]]
 unit = "BASE/BASEMGR"

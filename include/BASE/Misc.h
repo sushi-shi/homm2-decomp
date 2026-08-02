@@ -35,6 +35,7 @@ struct MemEntry {
     i32 line;
 };
 #pragma pack(pop)
+SIZE(MemEntry, 0x4a);
 #ifdef HOMM2_MISC_INLINE_ICONENTRY
 #pragma pack(push, 1)
 struct IconEntry {
@@ -62,6 +63,7 @@ struct PCXHeader {
     u8 filler[PCX_HEADER_FILLER_BYTES];
 };
 #pragma pack(pop)
+SIZE(PCXHeader, 0x80);
 
 void InitMemEntry(void);
 void* BaseAlloc(u32, char*, i32);
@@ -94,6 +96,7 @@ void WritePrefsToFile(void);
 void WritePrefsToRegistry(void);
 void WritePrefs(void);
 i32 IsCDDrive(i32);
+bool DriveSupportsFreeSpaceQuery(char);
 H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void);
 void BitmapToScreen(class bitmap*);
 void SetPalette(i8*, i32);

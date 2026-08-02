@@ -118,6 +118,11 @@ struct NetbiosSessionBuffer {
 struct NetbiosThreadEvents {
     void* handles[NETBIOS_THREAD_EVENT_STORAGE_COUNT];
 };
+SIZE(NetbiosControlBlock, NETBIOS_CONTROL_BLOCK_SIZE);
+SIZE(NetbiosName, NETBIOS_NAME_SIZE);
+SIZE(NetbiosPayload, NETBIOS_PAYLOAD_SIZE);
+SIZE(NetbiosSessionBuffer, NETBIOS_PAYLOAD_SIZE);
+SIZE(NetbiosThreadEvents, NETBIOS_THREAD_EVENT_STORAGE_COUNT * sizeof(void*));
 
 i32 is_netbios_avail(void);
 extern "C" u16 __fastcall nb_init(u16, u16);

@@ -35,4 +35,3 @@ VA(0x004d3420, 0x13)
 void dimmerWidget::Draw(void) {
     Dim();
 }
-

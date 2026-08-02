@@ -19,15 +19,17 @@ H2_ENUM_CLASS_END(SamplePlaybackRate)
 
 #pragma pack(push, 1)
 struct SamplePlaybackData {
-    struct _SAMPLE* activeSample;
     char* data;
     i32 size;
-    i32 channelType;
     SamplePlaybackRate sampleRate;
-    SampleAudioFormat format;
     i32 volume;
+    SampleAudioFormat sampleFormat;
+    i32 stereo;
     i32 loopCount;
+    struct _SAMPLE* activeSample;
+    i32 channelType;
 };
 #pragma pack(pop)
+SIZE(SamplePlaybackData, 0x24);
 
 #endif

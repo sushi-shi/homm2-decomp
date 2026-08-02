@@ -334,15 +334,24 @@ def _reference_graph():
     return callers, callees
 
 
+PREFIX = 24
+
+
 def _candidate_index():
     index = defaultdict(list)
     definition_orders = defaultdict(list)
+    candidate_sizes = {}
+    prefix_index = defaultdict(set)
 
     def register(rows):
         for source, symbol, order, masked in rows:
             index[(len(masked), hashlib.sha256(masked).hexdigest())].append(
                 (source, symbol, order))
             definition_orders[source].append((order, symbol))
+            candidate_sizes[(source, order)] = len(masked)
+            if len(masked) >= PREFIX:
+                prefix_index[hashlib.sha256(masked[:PREFIX]).hexdigest()].add(
+                    (source, symbol))
 
     for path in sorted(BASE_ROOT.rglob("*.obj")):
         source = "base:%s" % path.relative_to(BASE_ROOT).with_suffix("")
@@ -355,14 +364,38 @@ def _candidate_index():
         for member, payload in _archive_members(path):
             register(_coff_candidates(
                 payload, "%s:%s" % (library.lower(), member)))
-    return index, definition_orders
+    return index, definition_orders, candidate_sizes, prefix_index
+
+
+def align_sizes(source_sizes, image_sizes, tolerance=0.15, floor=16):
+    """Monotone greedy alignment of two in-order size sequences.
+
+    Returns index pairs (i, j) where source function i plausibly occupies
+    image slot j: sizes agree within max(floor, tolerance * larger). Both
+    sequences advance monotonically; a mismatch advances whichever side has
+    the smaller current size (it cannot pair with anything later either).
+    """
+    pairs = []
+    i = j = 0
+    while i < len(source_sizes) and j < len(image_sizes):
+        a, b = source_sizes[i], image_sizes[j]
+        if abs(a - b) <= max(floor, tolerance * max(a, b)):
+            pairs.append((i, j))
+            i += 1
+            j += 1
+        elif a < b:
+            i += 1
+        else:
+            j += 1
+    return pairs
 
 
 def run_census():
     unmatched = _unmatched_functions()
-    index, definition_orders = _candidate_index()
+    index, definition_orders, candidate_sizes, prefix_index = _candidate_index()
     slots, image, raw_offset = _import_table()
     callers, callees = _reference_graph()
+    masked_by_rva = {rva: masked for rva, _size, _name, masked in unmatched}
 
     rows = []
     matches_by_source = defaultdict(list)
@@ -397,7 +430,10 @@ def run_census():
             row["class"] = "eh-funclet"
             row["detail"] = "SEH unwind funclet (EH-compiled TU)"
 
-    # DNA pass: definition order against image order.
+    # DNA pass: definition order against image order. A gap bracketed by two
+    # consecutive matches from one source object is filled directly when the
+    # counts agree ("order-inferred"), otherwise by monotone size alignment
+    # ("order-aligned" - weaker evidence, size deltas recorded).
     inferred = 0
     by_rva = {row["rva"]: row for row in rows}
     ordered_rvas = [row["rva"] for row in rows]
@@ -414,16 +450,54 @@ def run_census():
                                 and by_rva[rva]["class"] == "unknown"]
                 if not between_orders or not between_rvas:
                     continue
-                if len(between_orders) != len(between_rvas):
+                if len(between_orders) == len(between_rvas):
+                    for order, rva in zip(between_orders, between_rvas):
+                        row = by_rva[rva]
+                        row["class"] = "order-inferred"
+                        row["source"] = source
+                        row["symbol"] = names.get(order, "?")
+                        row["detail"] = ("between 0x%x and 0x%x" %
+                                         (left_rva, right_rva))
+                        inferred += 1
                     continue
-                for order, rva in zip(between_orders, between_rvas):
-                    row = by_rva[rva]
-                    row["class"] = "order-inferred"
+                source_sizes = [candidate_sizes.get((source, order), 0)
+                                for order in between_orders]
+                image_sizes = [by_rva[rva]["size"] for rva in between_rvas]
+                for i, j in align_sizes(source_sizes, image_sizes):
+                    row = by_rva[between_rvas[j]]
+                    row["class"] = "order-aligned"
                     row["source"] = source
-                    row["symbol"] = names.get(order, "?")
-                    row["detail"] = ("between 0x%x and 0x%x" %
-                                     (left_rva, right_rva))
+                    row["symbol"] = names.get(between_orders[i], "?")
+                    row["detail"] = (
+                        "between 0x%x and 0x%x; size ours=%d cand=%d" % (
+                            left_rva, right_rva, image_sizes[j],
+                            source_sizes[i]))
                     inferred += 1
+
+    # Prefix pass: a shared first-24-byte masked prefix is weak evidence, but
+    # it names a concrete candidate for review where nothing else does.
+    for row in rows:
+        if row["class"] != "unknown":
+            continue
+        masked = masked_by_rva[row["rva"]]
+        if len(masked) < PREFIX:
+            continue
+        prefix_candidates = prefix_index.get(
+            hashlib.sha256(masked[:PREFIX]).hexdigest(), ())
+        symbols = {symbol for _source, symbol in prefix_candidates}
+        if not symbols:
+            continue
+        if len(symbols) == 1:
+            source, symbol = sorted(prefix_candidates)[0]
+            row["class"] = ("crt-prefix"
+                            if source.split(":")[0].endswith(".lib")
+                            else "game-prefix")
+            row["source"], row["symbol"] = source, symbol
+            row["detail"] = "prefix-%d only; size ours=%d" % (
+                PREFIX, row["size"])
+        else:
+            row["detail"] = "prefix-%d candidates: %s" % (
+                PREFIX, "|".join(sorted(symbols)[:4]))
 
     # Reference heuristics: contact with the CRT leans CRT, contact with only
     # claimed game units leans game. Evidence columns always; class refinement
@@ -464,13 +538,72 @@ def run_census():
             row["class"] = "unknown-crt-linked"
         elif "game" in contact and "crt" not in contact and contact:
             row["class"] = "unknown-game-linked"
-    return rows, inferred
+    return rows, inferred, callers, callees
+
+
+CARVING_OUTPUT = REPO / "docs/buka-new-tu-carving.tsv"
+
+
+def write_carving(rows, callers):
+    """Cluster the game-side residue into new-TU proposals.
+
+    Eligible rows are game-linked or unclassified functions; clusters split at
+    0x200-byte address gaps (functions link in definition order, so a cluster
+    is plausibly one TU's contribution). The dominant claimed caller unit is
+    the suggested home; wide or absent caller sets suggest a fresh TU.
+    """
+    eligible = [row for row in rows if row["class"] in
+                ("unknown-game-linked", "game-prefix", "unknown")]
+    clusters = []
+    current = []
+    for row in sorted(eligible, key=lambda value: value["rva"]):
+        if current and row["rva"] - (current[-1]["rva"] + current[-1]["size"]) > 0x200:
+            clusters.append(current)
+            current = []
+        current.append(row)
+    if current:
+        clusters.append(current)
+
+    with CARVING_OUTPUT.open("w", newline="") as stream:
+        stream.write(
+            "# Game-side residue carved into address clusters for new-TU\n"
+            "# planning. Functions link in definition order, so one cluster\n"
+            "# is plausibly one TU's contribution. Generated by\n"
+            "# `homm2 audit unmatched-census --write-carving`.\n"
+            "cluster\tstart_rva\tend_rva\tfunctions\tbytes\tcaller_units\t"
+            "suggested_home\tnamed_functions\n")
+        for number, cluster in enumerate(
+                sorted(clusters,
+                       key=lambda value: -sum(r["size"] for r in value)), 1):
+            units = defaultdict(int)
+            for row in cluster:
+                for caller in callers.get(row["name"], ()):
+                    if "/" in caller:
+                        units[caller] += 1
+            ranked = sorted(units.items(), key=lambda item: -item[1])
+            total = sum(count for _unit, count in ranked)
+            if ranked and ranked[0][1] >= max(2, 0.6 * total):
+                home = "join %s" % ranked[0][0]
+            elif ranked:
+                home = "new TU (callers span %d units)" % len(ranked)
+            else:
+                home = "new TU (no claimed callers)"
+            named = [row["name"] for row in cluster
+                     if not row["name"].startswith(("FUN_", "Unwind@"))]
+            stream.write("%d\t0x%x\t0x%x\t%d\t%d\t%s\t%s\t%s\n" % (
+                number, cluster[0]["rva"],
+                cluster[-1]["rva"] + cluster[-1]["size"], len(cluster),
+                sum(row["size"] for row in cluster),
+                ",".join("%s:%d" % item for item in ranked[:4]),
+                home, ",".join(named[:6])))
+    return len(clusters)
 
 
 def write_config_rows(rows):
     """Persist reviewed identification CSVs for CRT bodies and import thunks."""
     crt = [row for row in rows
-           if row["class"] in ("crt-exact", "order-inferred")
+           if row["class"] in ("crt-exact", "order-inferred", "order-aligned",
+                               "crt-prefix")
            and row["source"].split(":")[0].endswith(".lib")]
     with CRT_OUTPUT.open("w", newline="") as stream:
         stream.write(
@@ -484,8 +617,10 @@ def write_config_rows(rows):
             stream.write("0x%x,%d,%s,%s,%s,%s,%s\n" % (
                 row["rva"], row["size"], row["symbol"],
                 member.replace("\\", "/").rsplit("/", 1)[-1], library,
-                "masked-exact" if row["class"] == "crt-exact"
-                else "order-inferred",
+                {"crt-exact": "masked-exact",
+                 "order-inferred": "order-inferred",
+                 "order-aligned": "order-aligned",
+                 "crt-prefix": "prefix-%d" % PREFIX}[row["class"]],
                 row["detail"].replace(",", ";")))
     thunks = [row for row in rows if row["class"] == "import-thunk"]
     with THUNK_OUTPUT.open("w", newline="") as stream:
@@ -507,8 +642,11 @@ def main(argv=None):
     parser.add_argument("--write-config", action="store_true",
                         help="persist config/crt_functions.csv and "
                              "config/import_thunks.csv from this census")
+    parser.add_argument("--write-carving", action="store_true",
+                        help="persist docs/buka-new-tu-carving.tsv cluster "
+                             "proposals for the game-side residue")
     args = parser.parse_args(argv)
-    rows, inferred = run_census()
+    rows, inferred, callers, _callees = run_census()
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT.open("w", newline="") as stream:
         stream.write(
@@ -530,7 +668,8 @@ def main(argv=None):
         totals[row["class"]][0] += 1
         totals[row["class"]][1] += row["size"]
     print("[unmatched-census] %d functions -> %s" % (len(rows), OUTPUT))
-    for kind in ("game-exact", "crt-exact", "order-inferred", "import-thunk",
+    for kind in ("game-exact", "crt-exact", "order-inferred",
+                 "order-aligned", "crt-prefix", "game-prefix", "import-thunk",
                  "eh-funclet", "unknown-crt-linked", "unknown-game-linked",
                  "unknown"):
         count, size = totals.get(kind, (0, 0))
@@ -560,6 +699,10 @@ def main(argv=None):
               (crt_count, CRT_OUTPUT))
         print("[unmatched-census] wrote %d thunk rows -> %s" %
               (thunk_count, THUNK_OUTPUT))
+    if args.write_carving:
+        cluster_count = write_carving(rows, callers)
+        print("[unmatched-census] wrote %d clusters -> %s" %
+              (cluster_count, CARVING_OUTPUT))
     return 0
 
 

@@ -31,4 +31,5 @@ public:
     void Read(void);
 };
 #pragma pack(pop)
+SIZE(border, 0x2a);
 #endif

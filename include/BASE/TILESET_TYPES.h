@@ -13,5 +13,6 @@ typedef struct STilesetSourceFiles {
     char destruction[TILESET_SOURCE_FILE_SIZE];
 } STilesetSourceFiles;
 
+SIZE(STilesetSourceFiles, 0x55);
 
 #endif

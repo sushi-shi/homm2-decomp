@@ -101,6 +101,7 @@ struct SMapChange {
     i32 sequence;
 };
 #pragma pack(pop)
+SIZE(SMapChange, 11);
 
 extern SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 

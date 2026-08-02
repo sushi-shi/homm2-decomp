@@ -60,4 +60,5 @@ public:
     void Update(void);
 };
 #pragma pack(pop)
+SIZE(highScoreManager, 0x63);
 #endif

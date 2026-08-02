@@ -18,5 +18,6 @@ union AdventureRemotePayload {
 };
 #pragma pack(pop)
 
+SIZE(AdventureRemotePayload, ADVMGR_REMOTE_PAYLOAD_VIEW_SIZE);
 
 #endif

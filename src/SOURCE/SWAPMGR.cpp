@@ -1005,4 +1005,3 @@ void swapManager::SplitMons(void) {
             selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
     }
 }
-

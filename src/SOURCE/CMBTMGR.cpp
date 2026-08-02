@@ -490,7 +490,7 @@ i32 combatManager::Open(i32 openFlags) {
     m_combatMessageExpiration = 0;
     m_combatMessagePending = 0;
     m_combatWindowOpen = 0;
-    gpSoundManager->PlayAmbientMusic(-1, 0, -1);
+    gpSoundManager->PlayAmbientMusic(-1);
     m_combatBuffer =
         new bitmap(BITMAP_TYPE_NONE, COMBAT_BACKGROUND_COPY_WIDTH, COMBAT_BACKGROUND_COPY_HEIGHT);
     m_backgroundBuffer = new bitmap(BITMAP_TYPE_NONE, COMBAT_SCREEN_WIDTH, COMBAT_AREA_HEIGHT);
@@ -1445,6 +1445,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
                 static_cast<i32l>(
                     projectileX11
                     + IDX(COMBAT_CATAPULT_PROJECTILE_EXTENT_RADIUS)
+                    
                 );
             giMinExtentY =
                 static_cast<i32l>(
@@ -1531,6 +1532,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
             KBTickCount()
             + gfCombatSpeedMod[gConfig.combatSpeed]
                 * IDX(COMBAT_CATAPULT_ANIMATION_DELAY)
+                
         );
         DrawFrame(0, 0, 1, 0, 0, 1, 0);
         if (gateIndex2 != -1 && frame18 >= COMBAT_CATAPULT_GATE_CLOUD_FIRST_FRAME && !missShot19) {
@@ -2059,7 +2061,8 @@ i32 combatManager::ShotIsThroughWall(
         rowStep2 = rowDistance17 > 0 ? 1 : -1;
         columnStep5 = static_cast<float>(columnDistance4) / static_cast<float>(abs(rowDistance17));
     }
-    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
+    ;
     rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
     float traceColumn6 = static_cast<float>(sourceColumn1);
     float traceRow1 = static_cast<float>(sourceRow9);
@@ -2226,6 +2229,7 @@ void combatManager::ShootMissile(
             KBTickCount()
             + gfCombatSpeedMod[gConfig.combatSpeed]
                 * IDX(COMBAT_MISSILE_TIMER_DELAY)
+                
         );
         oldX8 = missileX16;
         oldY5 = missileY7;

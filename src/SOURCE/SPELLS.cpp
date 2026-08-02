@@ -2043,7 +2043,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_SCREEN_WIDTH - 1 < bolt->pixelX) {
             bolt->pixelX = COMBAT_SCREEN_WIDTH - 1;
-            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1);
+            bolt->currentX = static_cast<float>(COMBAT_SCREEN_WIDTH - 1)
+            ;
         }
         if (bolt->pixelY < 0) {
             bolt->pixelY = 0;
@@ -2051,7 +2052,8 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
         }
         if (COMBAT_AREA_HEIGHT - 1 < bolt->pixelY) {
             bolt->pixelY = COMBAT_AREA_HEIGHT - 1;
-            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1);
+            bolt->currentY = static_cast<float>(COMBAT_AREA_HEIGHT - 1)
+            ;
         }
 
         drawX = bolt->pixelX;

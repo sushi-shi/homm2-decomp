@@ -54,6 +54,7 @@ public:
     void ReleaseFizzleSource(void);
 };
 #pragma pack(pop)
+SIZE(heroWindowManager, 0x62);
 extern i32 iCombatCycleFrame;
 extern b32 gbEveryOtherCycle;
 extern i32 iCycle1Count;

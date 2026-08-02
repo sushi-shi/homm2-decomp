@@ -15,4 +15,5 @@ public:
     __declspec(dllexport) virtual inline ~tileset();
 };
 #pragma pack(pop)
+SIZE(tileset, 0x1a);
 #endif

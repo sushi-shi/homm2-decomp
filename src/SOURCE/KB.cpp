@@ -935,7 +935,7 @@ i32 oldmain(void) {
             gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
             gpWindowManager->m_updateFlags = 1;
             mainScreenLoaded_b = 1;
-            gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
+            gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
         } else if (gbInCampaign) {
             result_i = gpGame->HandleCampaignWin();
             if ((gpGame->m_campaignScenario == OLD_MAIN_ARCHIBALD_FINAL_SCENARIO
@@ -996,9 +996,9 @@ i32 oldmain(void) {
                 gpWindowManager->FadeScreen(FADE_IN, OLD_MAIN_FADE_SPEED, gPalette);
                 gpWindowManager->m_updateFlags = 1;
                 mainScreenLoaded_b = 1;
-                gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(OLD_MAIN_MAIN_MUSIC);
             } else {
-                gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(OLD_MAIN_HIGH_SCORE_MUSIC);
             }
         }
 
@@ -1313,7 +1313,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                             MENU_SCREEN_WIDTH,
                             MENU_SCREEN_HEIGHT
                         );
-                        gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC, 0, -1);
+                        gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
                         break;
                     } else {
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
@@ -1540,6 +1540,11 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
 VA(0x00468cdb, 0x15)
 char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster) {
     return gArmyNames[IDX(monster)];
+}
+
+VA(0x00468cf0, 0x15)
+char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster) {
+    return gArmyNamesPlural[IDX(monster)];
 }
 
 VA(0x00468d05, 0xc3)
@@ -2646,7 +2651,6 @@ void InitVars(void) {
     i32 i;
     i32 j;
     NULL_SAMPLE2.pSample = NULL;
-    NULL_SAMPLE2.pMem = reinterpret_cast<struct _SAMPLE*>(NULL_SAMPLE2.pSample);
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
@@ -3530,7 +3534,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     ));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
-    gpSoundManager->PlayAmbientMusic(MIDI_NO_TRACK, 0, MIDI_NO_TRACK);
+    gpSoundManager->PlayAmbientMusic(MIDI_NO_TRACK);
 
     if (highScoreType == HIGH_SCORE_STANDARD) {
         sprintf(rating, gArmyNames[GetMonType(score_e, highScoreType)]);
@@ -3617,7 +3621,7 @@ SAMPLE2 LoadPlaySample(char* name) {
     ss.pSample = gpResourceManager->GetSample(name);
     if (ss.pSample) {
         ss.pSample->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
-        ss.pMem = gpSoundManager->MemorySample(ss.pSample);
+        gpSoundManager->MemorySample(ss.pSample);
     }
     return ss;
 }
@@ -3628,14 +3632,15 @@ void WaitEndSample(SAMPLE2 s, i32 waitTime) {
     if (waitTime < 0)
         waitTime = SAMPLE_DEFAULT_WAIT_TIME;
     endTime = KBTickCount() + waitTime;
-    if (s.pMem)
-        while (gpSoundManager->DigitalReport(s.pMem, SOUND_DIGITAL_REPORT_PLAYING)
+    if (s.pSample)
+        while (gpSoundManager->DigitalReport(s.pSample)
                && KBTickCount() < endTime) {
             Process1WindowsMessage();
             PollSound();
         }
     if (s.pSample)
         gpResourceManager->Dispose((resource*)s.pSample);
+    s.pSample = NULL;
 }
 
 H2_ENUM_BEGIN(MemoryErrorConstant)
@@ -6686,10 +6691,10 @@ b32 gbInSmackMgr = false;
 i32 glBottomRefresh = 0;
 b32 gbBothMachinesWin95 = false;
 b32 gbGotFirstHeartbeat = false;
-void* hmnuDflt = NULL;
-void* hmnuCmbt = NULL;
-void* hmnuAdv = NULL;
-void* hmnuTown = NULL;
+HMENU hmnuDflt = NULL;
+HMENU hmnuCmbt = NULL;
+HMENU hmnuAdv = NULL;
+HMENU hmnuTown = NULL;
 char* cMonFilename[IDX(CREATURE_COUNT)] = {
     "peasant.icn",  "archer.icn",   "archer2.icn",  "pikeman.icn",  "pikeman2.icn", "swordsmn.icn",
     "swordsm2.icn", "cavalryr.icn", "cavalryb.icn", "paladin.icn",  "paladin2.icn", "goblin.icn",

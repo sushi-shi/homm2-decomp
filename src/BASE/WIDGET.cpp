@@ -195,4 +195,3 @@ void widget::Dim(void) {
         DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
     }
 }
-

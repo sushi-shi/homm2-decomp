@@ -146,6 +146,7 @@ public:
     i8 IsSpecialLossCondition(i32);
 };
 #pragma pack(pop)
+SIZE(ExpCampaign, 0x50);
 
 extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]

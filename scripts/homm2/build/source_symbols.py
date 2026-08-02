@@ -70,10 +70,20 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSy
     configure_libclang()
     translation = ci.Index.create().parse(
         str(path), args=_clang_args(repo, path, mode=ClangMode.RETAIL_ANALYSIS))
+    # An error in one of OUR files can silently drop a marker, so it is fatal.
+    # Errors confined to system or vendor headers (VC6's pre-standard STL does
+    # not parse as C++98 - clang recovers and the game cursors survive) only
+    # warn; the annotation walk below still hard-fails on unusable markers.
     errors = [d for d in translation.diagnostics if d.severity >= ci.Diagnostic.Error]
-    if errors:
-        detail = "; ".join(str(d) for d in errors[:5])
+    own = [d for d in errors if d.location.file is not None and (
+        Path(str(d.location.file)).resolve().is_relative_to(repo / "src")
+        or Path(str(d.location.file)).resolve().is_relative_to(repo / "include"))]
+    if own:
+        detail = "; ".join(str(d) for d in own[:5])
         raise ValueError(f"{path}: Clang could not read the annotations: {detail}")
+    if errors:
+        print(f"[source-symbols] {path.name}: tolerating {len(errors)} "
+              "system/vendor header errors")
 
     unit = path.relative_to(source_root).with_suffix("").as_posix()
     rows = []

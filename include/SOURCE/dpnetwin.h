@@ -55,6 +55,7 @@ H2_ENUM_CLASS_BEGIN(DirectPlayHostState)
 H2_ENUM_CLASS_END(DirectPlayHostState)
 H2_ENUM_STEPPED(DirectPlayHostState)
 #pragma pack(pop)
+SIZE(DirectPlayStartupMessage, 0x1a);
 
 BOOL WINAPI dpEnumServiceProvider(struct _GUID*, char*, DWORD, DWORD, void*);
 BOOL WINAPI dpEnumSession(DPSESSIONDESC*, void*, LPDWORD, DWORD);

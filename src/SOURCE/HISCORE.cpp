@@ -301,4 +301,3 @@ void highScoreManager::Update(void) {
     if (missingFile == 0)
         close(inputFile);
 }
-

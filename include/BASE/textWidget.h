@@ -38,4 +38,5 @@ public:
     void SetText(char* text);
 };
 #pragma pack(pop)
+SIZE(textWidget, 0x2b);
 #endif

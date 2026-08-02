@@ -40,6 +40,7 @@ public:
 
 protected:
     void DrawStringExecute(char*, i32, i32, FontDrawMode, i32, i32, i32, i32);
+    void PolishBoundedTextLayout(char*, char*, u32*, i32, i32*, char);
 
 public:
     void DrawString(char*, i32, i32, FontDrawMode);
@@ -49,4 +50,5 @@ public:
     i32 LineWidth(char*);
 };
 #pragma pack(pop)
+SIZE(font, 0x20);
 #endif

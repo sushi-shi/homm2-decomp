@@ -94,4 +94,5 @@ public:
     void SetupCastle(class heroWindow*, i32);
 };
 #pragma pack(pop)
+SIZE(townManager, 0x17a);
 #endif

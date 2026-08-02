@@ -9,6 +9,7 @@ union SDropListSourceFile {
     char text[sizeof(DROPLIST_SOURCE_FILE)];
     u32l alignmentValue;
 };
+SIZE(SDropListSourceFile, 0x2c);
 
 struct SDropListSourceFiles {
     SDropListSourceFile itemDestruction;
@@ -23,5 +24,6 @@ struct SDropListSourceFiles {
     SDropListSourceFile appendedTextAllocation;
     SDropListSourceFile appendedOldListDestruction;
 };
+SIZE(SDropListSourceFiles, 0x1e4);
 
 #endif

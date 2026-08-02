@@ -45,6 +45,7 @@ struct ComPortState {
     tag_Anchor normalQueue;
     tag_Anchor priorityQueue;
 };
+SIZE(ComPortState, 0x60);
 
 void add_node(struct tag_Anchor*, struct tag_Node*);
 struct tag_Node* pop_node(struct tag_Anchor*);

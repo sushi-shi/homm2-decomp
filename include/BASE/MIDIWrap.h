@@ -12,4 +12,5 @@ public:
     __declspec(dllexport) virtual inline ~MIDIWrap() OVERRIDE;
 };
 #pragma pack(pop)
+SIZE(MIDIWrap, 0x14);
 #endif
