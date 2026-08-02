@@ -316,7 +316,7 @@ void arithCodeDoneDecoding(BitStream* bs) {
 VA(0x004c73a0, 0xa5)
 void arithCodeRenormalise_Encode(BitStream* bs) {
     while (bigR <= TWO_TO_THE(smallB - 2)) {
-        if ((bigR + bigL) <= TWO_TO_THE(smallB - 1)) {
+        if ((bigL + bigR) <= TWO_TO_THE(smallB - 1)) {
             arithCodeBitPlusFollow(bs, 0);
         } else if (TWO_TO_THE(smallB - 1) <= bigL) {
             arithCodeBitPlusFollow(bs, 1);
