@@ -44,6 +44,11 @@ happens, entries stay OPEN.
 | Bzip spotBlock locals | upstream `pos, delta, newdelta` | `index, delta, updatedDelta2` | OPEN - upstream names cannot give VC6's slots; either Buka renamed (dev-change) or the 4.2/VC6 hash split resolves it; test upstream names in 2.0 tree |
 | PATH FindPath / ValidRange, HERO GetNumSpells / GetExperience, KB CanBuild, TOWN GiveSpells, CURSOR pair, REMOTE calc_crc_long, Newgame GetLossConditionText, wingraph DDInitializePalette locals | PoL names | bucket-pinned renames (see f5d5b4c3) | OPEN as a class - slot names are per-compiler hash pins; resolving needs the 4.2-vs-VC6 hash comparison per name |
 
+| TeleportTo telescope bonus | `>= 1` u32 cast (PoL-era spelling) | `HasArtifact(...) != 0` | OPEN |
+| TeleportTo terrain compare | `m_currentTerrain != terrain` | `terrain != m_currentTerrain` | OPEN |
+| TeleportTo locals | savedShow11/terrain5/oldCell2/unused47 | savedShow/terrain/cellOld2/unused (bucket pins) | OPEN as slot-name class |
+| InsertSound bounds guard spelling | `MAP_WIDTH <= x \|\| MAP_HEIGHT <= mapY` | param-first, axes swapped (see Resolved) | - |
+
 ## Resolved
 
 | Site | Resolution | Evidence |
