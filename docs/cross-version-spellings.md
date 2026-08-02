@@ -27,6 +27,10 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| game::ExperienceValueOfStack factors | `hitPoints * m_quantities[i]` | `m_quantities[i] * hitPoints` | OPEN |
+| town::Deallocate locals + owner compare | `playerRecord/position`; `m_id == ->m_currentTown` | `pp/pos`; `pp->m_currentTown == m_id` | OPEN |
+| armyGroup::DamageGroup locals + kill compare | `percentChance/numKilled`; `m_creatureCounts[i] == killed` | `killChance/killed`; `killed == m_creatureCounts[i]` | OPEN |
+| combatManager::EffectSpellResurrect locals | `quantityResult[COMBAT_SIDE_COUNT]` array + `targetStack/resurrectPowerWork/armyIndexWork` | scalar `count` + dead `float workChance` (slot -16 unreferenced, bucket 15) + `target/resurrectPower/armyIndex`; two operand mirrors | OPEN - VALUE-SHAPE: 2.1 frame cannot host the [0]-at-fc array; check what 2.0 bytes hold |
 | widget::widget(void) store order | `m_id` first | `m_id` after `m_prev` | OPEN |
 | widget::widget(x,y,w,h,id,kind) store order | `m_id` after `m_zOrder` | `m_id` before `m_flags` | OPEN |
 | army::LeftX else-branch addends | `->w + ->x` | `->x + ->w` | OPEN |

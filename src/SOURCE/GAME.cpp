@@ -5584,8 +5584,8 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; i++) {
         if (group->m_quantities[i] > 0) {
-            exp += gMonsterDatabase[IDX(group->m_creatureTypes[i])].hitPoints
-                * group->m_quantities[i];
+            exp += group->m_quantities[i]
+                * gMonsterDatabase[IDX(group->m_creatureTypes[i])].hitPoints;
         }
     }
     if (h != NULL)
