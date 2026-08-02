@@ -3568,12 +3568,12 @@ i32 army::LeftX(void) {
                       m_creatureIcon,
                       m_frameInfo.animationFrames[IDX(ARMY_ANIMATION_STAND)][0]
                   )
-                      ->w
+                      ->x
                   + GetIconEntry(
                         m_creatureIcon,
                         m_frameInfo.animationFrames[IDX(ARMY_ANIMATION_STAND)][0]
                   )
-                        ->x);
+                        ->w);
     }
 }
 
