@@ -161,7 +161,7 @@ Disassembly of section .text:
             _branch_seq([(0, "jecxz", "0x4"), (2, "ret", "")])
 
     def test_branches_compare_truncates_at_table_decode_garbage(self):
-        # Jump-table bytes decode as valid-looking loop/jecxz forms MSVC 4.2 never
+        # Jump-table bytes decode as valid-looking loop/jecxz forms the retail compiler never
         # emits; the comparison must stop there (reliable prefix), not die mid-render.
         base = [(0x0, "je", "0x8"), (0x4, "jmp", "dword ptr [eax*4 + 0x10]"),
                 (0x8, "jecxz", "0x2"), (0xa, "loop", "0x4")]

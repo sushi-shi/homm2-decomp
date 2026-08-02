@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Build build/gen/symbol_names.csv from the VA/DATA annotations in the source.
 
-The PoL 2.0 line reads this inventory out of the CodeView NB09 stream: 3,541
-publics, present whether or not anything has been reconstructed. This image is
-stripped, so there is no such stream and no such gift. The only thing that knows
+This image is stripped: no debug stream names anything, so there is no gift
+inventory that exists before reconstruction starts. The only thing that knows
 an address here is the source itself, and only where somebody has written the
 address down.
 
@@ -18,9 +17,9 @@ opinion, the other is a reviewed claim.
 The set is empty until the campaign starts marking, and an empty inventory is the
 correct answer to "what has been proven so far", not a failure.
 
-Unlike homm2.build.annotated_functions - which recovers only STATIC functions,
-because CodeView already supplied the public names - this names every annotated
-definition, free function and method alike, since nothing else will.
+Unlike homm2.build.annotated_functions - a library for the static-helper case -
+this names every annotated definition, free function and method alike, since
+nothing else will.
 
     python3 -m homm2.build.source_symbols            # -> build/gen/symbol_names.csv
     python3 -m homm2.build.source_symbols --check    # report, write nothing

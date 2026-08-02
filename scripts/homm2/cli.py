@@ -4,11 +4,10 @@ from pathlib import Path
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[2]))
 
 # Every audit is off while the reconstruction is unmarked. They were written for a
-# tree whose inventory is COMPLETE - CodeView hands PoL 2.0 all 3,541 publics before
-# a line is reconstructed, so a gap there means a defect. Here the inventory starts
-# empty and grows one proven address at a time, so the same checks report the whole
-# image as broken and say nothing: audit_text_coverage calls all 951,827 bytes of
-# .text unexplained, and every assert_* keyed on a symbol model has no model to read.
+# COMPLETE inventory, and here the inventory starts empty and grows one proven
+# address at a time, so the same checks report the whole image as broken and say
+# nothing: audit_text_coverage calls all 951,827 bytes of .text unexplained, and
+# every assert_* keyed on a symbol model has no model to read.
 #
 # They come back on as the campaign earns them, and several could return early: the
 # source-only ones (assert_decls, assert_defs_declared, assert_globals_defined,

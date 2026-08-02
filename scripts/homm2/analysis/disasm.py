@@ -19,7 +19,7 @@ Modes:
              the comparison --diff structurally cannot show (rc=1 if the sequences
              differ). Single side follows the house default: TARGET, or --base.
   --dot      Graphviz CFG output (requires --blocks)
-  --rich     BASE disasm interleaved with the CodeView source line each instr came from
+  --rich     BASE disasm interleaved with the /Z7 debug source line each instr came from
              (implies --base; needs build/lines/<unit>.json from `gen_lines.py`, build shell)
 
 Usage:
@@ -579,7 +579,7 @@ def _branch_insns(text: str) -> list:
     return out
 
 
-# MSVC 4.2 never emits these, so one "decoding" out of embedded jump-table bytes marks
+# the retail compiler never emits these, so one "decoding" out of embedded jump-table bytes marks
 # exactly where linear decode left real code (table entries are small offsets whose low
 # bytes often decode as e2/e3 loop/jecxz forms - CombatMessage's table does).
 _NEVER_EMITTED = frozenset(("jecxz", "jcxz", "loop", "loope", "loopne",
@@ -854,7 +854,7 @@ def _dot(cfg, differing: set[int] | None = None, title: str = "") -> str:
 
 
 def _rich(name: str, unit: str, size: int, ordinal: int) -> str:
-    """BASE disasm interleaved with the CodeView source line each code offset came from
+    """BASE disasm interleaved with the /Z7 debug source line each code offset came from
     (build/lines/<unit>.json: {mangled: [[code_off, src_line, text], ...]}). Degrades to
     plain base asm if the line map is absent."""
     obj = BASE / f"{unit}.obj"

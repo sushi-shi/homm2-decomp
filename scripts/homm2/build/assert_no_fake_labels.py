@@ -3,10 +3,10 @@
 defines must exist in the retained-public/recovered inventory (build/gen/symbol_names.csv).
 Catches invented labels and wrong signatures that mangle to a name the retail binary
 never had. Run from repo root after a build; exits 1 if any object defines a function
-symbol absent from CodeView.
+symbol absent from the inventory.
 
 A defined, external, function-typed COFF symbol (llvm-objdump: sec>0, ty 20, scl 2) is a
-"label". FAKE = not in CodeView at all. MISATTRIBUTED = in CodeView but under a different
+"label". FAKE = not in the inventory at all. MISATTRIBUTED = present but under a different
 unit (usually a wrong-TU definition)."""
 import csv, subprocess, os, sys, glob, re
 
@@ -17,7 +17,7 @@ for r in rows:
     if r["kind"] == "func":
         unit_funcs.setdefault(r["unit"], set()).add(r["name"])
 
-# symbols the compiler may synthesize that CodeView legitimately lists as funcs anyway are
+# symbols the compiler may synthesize that the inventory legitimately lists as funcs anyway are
 # already in global_funcs (??_E/??_G/??_H...). Nothing extra to whitelist.
 
 SYM_RE = re.compile(r'\(sec\s+(\d+)\).*\(ty\s+([0-9a-fA-F]+)\).*\(scl\s+(\d+)\).*?\s(\S+)$')
@@ -53,6 +53,6 @@ nf = sum(len(v) for v in fake.values())
 nm = sum(len(v) for v in misattr.values())
 print("\n%d fake label(s), %d misattributed, across %d objects" % (nf, nm, len(objs)))
 if nf:
-    print("FAIL: objects define function symbols that do not exist in CodeView.")
+    print("FAIL: objects define function symbols that do not exist in the inventory.")
     sys.exit(1)
 print("no-fake-labels OK: every emitted external function is in the reviewed inventory.")

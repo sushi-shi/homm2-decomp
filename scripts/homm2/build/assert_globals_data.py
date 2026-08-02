@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """assert_globals_data.py — hard build gate for global DATA(VA) placement. DATA(0x<VA>) lives on
 the global's DEFINITION in its owner .cpp (not on the header `extern`). Enforces:
-  * every file-scope DEFINITION of a CodeView data symbol carries DATA(0x<its exact VA>);
+  * every file-scope DEFINITION of an inventory data symbol carries DATA(0x<its exact VA>);
   * NO DATA() on a header `extern`;
-  * every header global extern has a CodeView public symbol and an owner TU;
+  * every header global extern has an inventory symbol and an owner TU;
   * every DATA() VA is UNIQUE (one VA == one definition).
 Run from repo root; exits 1 on any violation."""
 import csv, re, sys, glob
@@ -36,7 +36,7 @@ def note(va, loc):
     else:
         seen[va] = loc
 
-# (1) .cpp DEFINITIONS: every CodeView-global def carries DATA(exact VA). Non-CodeView defs may carry
+# (1) .cpp DEFINITIONS: every inventory-global def carries DATA(exact VA). Unclaimed defs may carry
 #     DATA too (Phase-B module-private synthetic globals) — those just claim their VA for uniqueness.
 for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
     for i, line in enumerate(open(c), 1):
@@ -46,7 +46,7 @@ for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
         name = def_name(rest.split('//')[0])
         if not name:
             continue
-        if name not in rva_of:                        # non-CodeView file-scope def (helper/static)
+        if name not in rva_of:                        # unclaimed file-scope def (helper/static)
             if dm:
                 note(dm.group(1), loc)
             continue
@@ -59,7 +59,7 @@ for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
             note(dm.group(1), loc)
 
 # (2) HEADERS: declarations never claim storage, and every cross-TU global must have a retained
-#     CodeView public symbol. Anonymous/synthetic storage is module-private in its owning .cpp.
+#     inventory symbol. Anonymous/synthetic storage is module-private in its owning .cpp.
 for h in sorted(glob.glob("include/**/*.h", recursive=True)):
     for i, line in enumerate(open(h), 1):
         loc = "%s:%d" % (h, i)
@@ -77,7 +77,7 @@ for h in sorted(glob.glob("include/**/*.h", recursive=True)):
             bad.append((loc, name, "DATA() on header extern — move it to the .cpp definition", "—"))
         elif name not in rva_of:
             bad.append((loc, name,
-                        "no CodeView public symbol -> make storage module-private or recover owner",
+                        "no inventory symbol -> make storage module-private or recover owner",
                         "—"))
 
 for loc, name, got, want in bad:
@@ -87,5 +87,5 @@ for loc, va, first in dup:
 if bad or dup:
     print("\nGLOBALS-DATA FAIL: %d placement issue(s), %d duplicate VA(s)." % (len(bad), len(dup)))
     sys.exit(1)
-print("globals-data OK: every CodeView global's DEFINITION carries DATA(its VA); no DATA on header "
+print("globals-data OK: every inventory global's DEFINITION carries DATA(its VA); no DATA on header "
       "externs; definition VAs unique.")

@@ -8,13 +8,13 @@ attributes a leaf to its owning class/TU). This scans HMM2PL.exe's .text for dir
 resolved to its containing function + unit. It is the caller-side complement of
 `sema disasm` (which shows a function's own body/callees).
 
-Names are resolved best-first: build/gen/symbol_names.csv (the CodeView-authoritative
+Names are resolved best-first: build/gen/symbol_names.csv (the claimed-inventory
 game functions + their units) -> build/ghidra/exports/functions.csv (Ghidra's whole-
 .text boundary map, which NAMES nothing new but bounds the library/runtime functions
-CodeView omits) -> a FUN_<rva> fallback.
+the inventory omits) -> a FUN_<rva> fallback.
 
 Ghidra's functions.csv is OPTIONAL but recommended: without it, a caller sitting in a
-library/runtime function (not in CodeView) is reported as `(unrecovered fn @ ~0x..)`
+library/runtime function (not in the inventory) is reported as `(unrecovered fn @ ~0x..)`
 because we don't know that function's boundary. With it, every caller site lands inside
 a known boundary. Generate it once with `homm2 ghidra`.
 
@@ -76,7 +76,7 @@ def _psize(x):
         return None
 
 
-# name maps: rva -> (name, unit). symbol_names first (CodeView game funcs), then Ghidra.
+# name maps: rva -> (name, unit). symbol_names first (claimed game funcs), then Ghidra.
 # fstarts/fsize: recovered function starts + their byte sizes. symbol_names sizes are
 # authoritative; functions.csv fills the library/runtime remainder. _owner() bounds
 # attribution by size so a call in an unrecovered GAP is reported, not misattributed.
@@ -104,7 +104,7 @@ def _names():
                 except Exception:
                     continue
                 starts.add(rva)
-                if rva not in fsize:  # symbol_names size wins (CodeView authority)
+                if rva not in fsize:  # symbol_names size wins (claimed authority)
                     sz = _psize(r.get("byte_size", ""))
                     if sz:
                         fsize[rva] = sz
@@ -228,7 +228,7 @@ def callers_of(targets, d, secs, names, fstarts, fsize, raw=False):
 
 
 def _is_known(rva, names):
-    """A CodeView-named game function (a real symbol_names unit), vs a Ghidra-only /
+    """A claimed game function (a real symbol_names unit), vs a Ghidra-only /
     FUN_ library body. The tree expands THROUGH known game functions and STOPS on
     library functions - the attribution frontier."""
     nm, unit = names.get(rva, (f"FUN_{rva:x}", "?"))
@@ -237,7 +237,7 @@ def _is_known(rva, names):
 
 def caller_tree(targets, d, secs, names, fstarts, fsize, depth_cap=0):
     """Recursive caller ancestry. Expansion continues through KNOWN game functions
-    (CodeView-named) and stops at each library function (Ghidra-only FUN_ - the frontier),
+    (claimed) and stops at each library function (Ghidra-only FUN_ - the frontier),
     as well as at roots and unrecovered gaps. Dedup: an already-expanded function prints
     as (*seen). depth_cap=0 means unlimited; the default is 4."""
     tname, tva, tvsz, trp, trsz = _text(secs)

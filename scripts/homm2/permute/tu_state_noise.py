@@ -4,7 +4,7 @@
 This standalone diagnostic does not rewrite the target. Each trial temporarily inserts
 deterministic parser-visible declarations, definitions, or
 curated includes before the target's ``VA`` metadata block, compiles the real translation
-unit with VC 4.2, scores the requested symbol with objdiff, and restores the source
+unit with the pinned MSVC, scores the requested symbol with objdiff, and restores the source
 immediately.  Probe-emitted symbols/storage exist only in the disposable candidate object.
 
 The source is unchanged on normal exit, compiler failure, timeout, or Ctrl-C. Each
@@ -509,7 +509,7 @@ def resolve_target(root: Path, source_arg: Path, requested_rva: int) -> tuple[Ta
             if row["kind"] == "func" and row["unit"] == unit and int(row["rva"], 0) == rva
         ]
     if len(rows) != 1:
-        raise ValueError(f"RVA 0x{rva:x} is not a unique CodeView function in {unit}")
+        raise ValueError(f"RVA 0x{rva:x} is not a unique inventory function in {unit}")
     row = rows[0]
     text = source.read_text()
     va = rva + IMAGE_BASE
@@ -1686,7 +1686,7 @@ def main(argv: list[str] | None = None) -> int:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("--source", required=True, type=Path, help="configured TU source path")
-    parser.add_argument("--rva", required=True, type=parse_int, help="exact CodeView RVA or image VA")
+    parser.add_argument("--rva", required=True, type=parse_int, help="exact inventory RVA or image VA")
     parser.add_argument("--trials", type=int, default=30, help="number of deterministic trials")
     parser.add_argument(
         "--only-trial",

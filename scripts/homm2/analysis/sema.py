@@ -253,13 +253,13 @@ def _build_parser() -> argparse.ArgumentParser:
 
     sd = ss.add_parser("disasm",
                        help="disasm: TARGET (retail delink, default) / --base (compiled) / "
-                            "--rich (base + CodeView source lines) / --diff / --lite")
+                            "--rich (base + /Z7 source lines) / --diff / --lite")
     sd.add_argument("rva", help="RVA (0x..) or (mangled) symbol name")
     sdside = sd.add_mutually_exclusive_group()
     sdside.add_argument("--target", action="store_true", help="retail delink side (default)")
     sdside.add_argument("--base", action="store_true", help="your compiled obj instead")
     sd.add_argument("--rich", action="store_true",
-                    help="BASE disasm interleaved with the CodeView source lines (implies --base)")
+                    help="BASE disasm interleaved with the /Z7 source lines (implies --base)")
     sd.add_argument("--lite", action="store_true", help="asm only - no addresses/bytes")
     sd.add_argument("--diff", action="store_true",
                     help="unified diff of base-vs-target asm (addresses masked; rc=1 if differs)")

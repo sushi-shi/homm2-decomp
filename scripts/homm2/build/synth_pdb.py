@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """synth_pdb.py - synthesize a PDB for vostok-delinker from build/gen/symbol_names.csv.
 
-vostok-delinker consumes a PDB (not CodeView) to slice HMM2PL.exe into per-symbol
-COFF .obj files. This target is stripped, so the claimed inventory comes from source
+vostok-delinker consumes a PDB to slice HMM2PL.exe into per-symbol COFF .obj
+files. This target is stripped, so the claimed inventory comes from source
 VA/DATA markers (build/gen/symbol_names.csv) alone. Every function listed in
 config/retail_functions.csv whose entry RVA no source marker has claimed is placed
 in one extra "(unmatched)" module, so the whole retail .text delinks from the first

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-# apply_names.py - seed the Ghidra DB with OUR CodeView names ("set the symbols we know").
+# apply_names.py - seed the Ghidra DB with OUR claimed names ("set the symbols we know").
 #
-# CodeView is authoritative for each retained public name and start RVA. Recovered boundaries
-# and ownership are carried in build/gen/symbol_names.csv. This creates a function at each RVA
+# Source VA() markers are the name authority; the claims are carried in
+# build/gen/symbol_names.csv. This creates a function at each claimed RVA
 # Ghidra missed and applies the demangled name, so:
 #   - functions.csv carries real names for game funcs (Ghidra fills the library remainder), and
 #   - decompiler output reads with real names instead of FUN_xxxx.
@@ -64,5 +64,5 @@ except Exception as e:
 finally:
     prog.endTransaction(tx, ok)
 
-print("[apply_names] created %d functions, named %d (%d RVAs uncreatable) from CodeView"
+print("[apply_names] created %d functions, named %d (%d RVAs uncreatable) from the source inventory"
       % (created, named, missing))

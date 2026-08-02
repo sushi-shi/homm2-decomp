@@ -12,7 +12,7 @@ equivalent spelling. A relocation is rewritten when:
 
 * both sides name the same function and have a DIR32 relocation at the same
   function-relative site;
-* the candidate names a CodeView public data symbol; and
+* the candidate names a source-claimed data symbol; and
 * ``public owner RVA + candidate addend == retail PE target RVA`` exactly.
 
 A wrong candidate offset cannot authorize a rewrite and remains visible to

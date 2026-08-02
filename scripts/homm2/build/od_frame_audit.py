@@ -256,7 +256,7 @@ def main(argv=None) -> int:
         description="Audit stack-frame evidence in all paired /Od functions.")
     parser.add_argument("--unit", help="restrict to one configured unit")
     parser.add_argument("--rva", type=lambda value: int(value, 0),
-                        help="restrict to one CodeView RVA")
+                        help="restrict to one inventory RVA")
     parser.add_argument("--output", type=Path,
                         help="write the complete mismatch TSV")
     parser.add_argument(

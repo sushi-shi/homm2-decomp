@@ -2,8 +2,10 @@
 # export_functions.py - dump build/ghidra/exports/functions.csv from the analyzed DB.
 #
 # functions.csv (entry_rva hex, byte_size decimal, name) is the WHOLE-.text function
-# boundary map homm2.analysis.xref reads to attribute caller sites that land in the
-# library/runtime functions CodeView omits. Read-only over the FunctionManager.
+# boundary map homm2.analysis.xref reads, and the refresh path for the candidate
+# inventory config/retail_functions.csv when analysis improves (boundaries stay
+# analysis opinion until a VA() marker claims them). Read-only over the
+# FunctionManager.
 #
 # Runs as a GhidraScript under PyGhidra (currentProgram bound by the driver).
 #@category Homm2

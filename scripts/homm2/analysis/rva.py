@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """homm2.analysis.rva - one-shot address dossier.
 
-Joins the pure lookups a matcher wants when they land on an address: the CodeView src
+Joins the pure lookups a matcher wants when they land on an address: the inventory
 claim (name/unit/kind), where it is bodied in src/ (the VA(...) macro line), the Ghidra
 boundary (if `homm2 ghidra` has run), and its objdiff fuzzy %. No analysis - just joins.
 

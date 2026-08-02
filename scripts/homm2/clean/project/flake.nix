@@ -1,5 +1,5 @@
 {
-  description = "Heroes of Might and Magic II: The Price of Loyalty";
+  description = "Heroes of Might and Magic II - Gold 2.1 (Buka) reconstruction";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/64c08a7ca051951c8eae34e3e3cb1e202fe36786";
 

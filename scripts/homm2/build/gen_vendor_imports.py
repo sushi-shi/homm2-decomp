@@ -124,7 +124,7 @@ FORCED_VENDOR_IMPORTS = (
     + FORCE_MSS_IMPORTS
 )
 
-# With the bundled VC 4.2 SDK ADVAPI32.LIB, final LINK resolves the object's
+# With the bundled SDK ADVAPI32.LIB, final LINK resolves the object's
 # __imp__RegCreateKeyA@12 reference as RegOpenKeyA. Build the small retail
 # import set explicitly so startup retains RegCreateKeyA semantics as well as
 # retail's IAT order and hint values.
@@ -219,7 +219,7 @@ def _coff_names(data: bytearray) -> tuple[list[tuple[int, int, str]], int, int]:
 def _rewrite_symbols(data: bytearray, replacements: dict[str, str]) -> bytearray:
     """Rebuild the COFF string table after renaming symbols.
 
-    VC 4.2 shares string suffixes: ``__AIL_startup@0`` can point inside the
+    LIB shares string suffixes: ``__AIL_startup@0`` can point inside the
     storage for ``__imp___AIL_startup@0``.  In-place shortening would therefore
     corrupt the other symbol, so every long name gets a fresh stable offset.
     """
@@ -429,7 +429,7 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, ...]:
         raise RuntimeError("wine/winepath not found; run inside `nix develop .#build`")
     lib_exe = find_ci(msvc_dir() / "bin", "lib.exe")
     if lib_exe is None:
-        raise RuntimeError("VC 4.2 LIB.EXE not found; run inside `nix develop .#build`")
+        raise RuntimeError("LIB.EXE not found; run inside `nix develop .#build`")
     if not Path(os.environ.get("WINEPREFIX", "")).is_dir():
         os.environ["WINEPREFIX"] = str(HOMM2_DIR / "build/wineprefix")
     os.environ.setdefault("WINEDEBUG", "fixme-all,err-kerberos")

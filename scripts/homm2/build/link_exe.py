@@ -89,7 +89,7 @@ def build_link_command(link_exe, map_path, output, object_paths, import_librarie
 def strip_coff_export_directives(source, destination):
     """Copy a candidate COFF while removing source-only ``dllexport`` directives.
 
-    Several reconstructed inline bodies need ``dllexport`` to make VC4.2 retain
+    Several reconstructed inline bodies need ``dllexport`` to make the pinned MSVC retain
     the same out-of-line COMDAT as retail.  Those compiler directives are not
     retail final-link inputs, however: the executable exports only AppAbout and
     AppWndProc.  Keep the object used for byte comparison untouched and sanitize

@@ -18,7 +18,7 @@ def _tree(root: Path, cl=True):
 def _archive(path: Path, components=("msvc",)):
     """A tarball shaped like the VC6 release: components at the TOP level.
 
-    No wrapping directory, so nothing is stripped on extract. The VC 4.2 release
+    No wrapping directory, so nothing is stripped on extract. An older release
     was the other shape; getting this wrong silently produces an empty tree.
     """
     with TemporaryDirectory() as staging:

@@ -3,10 +3,10 @@
 
 Invoke via `homm2 clangd`. ADDITIVE editor tooling (go-to-def / completion /
 hover / diagnostics in nvim) that runs ALONGSIDE the real matching build; it does
-not touch it. The matching build compiles with MSVC 4.2's CL.EXE under wine
+not touch it. The matching build compiles with the pinned VC6 CL.EXE under wine
 (scripts/homm2/build/cc_wrap.py), which clangd cannot invoke. So we emit our OWN
 compilation database, in clang-cl form, that points clang at the toolchain's MSVC
-headers and asks it to *emulate* MSVC 4.2 (cl 10.20 == _MSC_VER 1020). clang reads
+headers and asks it to *emulate* VC6 (cl 12.00 == _MSC_VER 1200). clang reads
 those headers as plain files - no wine, parse-only, never a real compile.
 
 Output: build/clangd/compile_commands.json   (git-ignored). The committed .clangd
@@ -29,7 +29,7 @@ OUT_DIR = REPO / "build" / "clangd"
 OUT_FILE = OUT_DIR / "compile_commands.json"
 MIRROR_DIR = OUT_DIR / "inc-lower"          # lowercase mirror of UPPERCASE MSVC headers
 
-MSC_COMPAT = "10.20"                          # MSVC 4.2 == cl 10.20 == _MSC_VER 1020
+MSC_COMPAT = "12.00"                          # VC6 == cl 12.00 == _MSC_VER 1200
 TARGET = "i386-pc-windows-msvc"
 DEFINES = ["/D_X86_", "/DWIN32", "/D_WINDOWS", "/D_MT"]   # 32-bit Win32 app, static CRT (/MT)
 
