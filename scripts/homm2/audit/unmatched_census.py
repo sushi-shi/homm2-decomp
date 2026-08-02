@@ -85,6 +85,28 @@ def function_spans(symbols, section_size):
     return spans
 
 
+def union_mask_matches(masked, size_buckets):
+    """Candidates equal to the image bytes under the union of both masks.
+
+    The delinker recovers instruction-operand relocations but misses moffs
+    forms (a0/a1/a2/a3 absolute loads), leaving linked addresses in the image
+    copy. Zeroing the candidate's own relocation sites on BOTH copies makes
+    those bytes compare equal; everything outside either mask must match.
+    """
+    matches = []
+    for source, symbol, _order, cand, sites in size_buckets.get(
+            len(masked), ()):
+        if cand == masked:
+            continue  # exact hash already handled
+        image_side = bytearray(masked)
+        for site in sites:
+            end = min(site + 4, len(image_side))
+            image_side[site:end] = bytes(end - site)
+        if bytes(image_side) == cand:
+            matches.append((source, symbol))
+    return matches
+
+
 def prefer_candidate(candidates, ghidra_name):
     """Prefer the collision candidate that agrees with Ghidra's own name."""
     if ghidra_name and not ghidra_name.startswith(("FUN_", "Unwind@")):
@@ -200,7 +222,8 @@ def _coff_candidates(payload: bytes, source: str):
         for symbol, start, end in function_spans(symbols, section.raw_size):
             local = [site - start for site in sites if start <= site < end]
             rows.append((source, symbol.name, order, trim_padding(
-                mask_bytes(section_payload[start:end], local))))
+                mask_bytes(section_payload[start:end], local)),
+                tuple(local)))
             order += 1
     return rows
 
@@ -360,12 +383,16 @@ def _candidate_index():
     candidate_sizes = {}
     prefix_index = defaultdict(set)
 
+    size_buckets = defaultdict(list)
+
     def register(rows):
-        for source, symbol, order, masked in rows:
+        for source, symbol, order, masked, sites in rows:
             index[(len(masked), hashlib.sha256(masked).hexdigest())].append(
                 (source, symbol, order))
             definition_orders[source].append((order, symbol))
             candidate_sizes[(source, order)] = len(masked)
+            size_buckets[len(masked)].append((source, symbol, order, masked,
+                                              sites))
             if len(masked) >= PREFIX:
                 prefix_index[hashlib.sha256(masked[:PREFIX]).hexdigest()].add(
                     (source, symbol))
@@ -381,7 +408,8 @@ def _candidate_index():
         for member, payload in _archive_members(path):
             register(_coff_candidates(
                 payload, "%s:%s" % (library.lower(), member)))
-    return index, definition_orders, candidate_sizes, prefix_index
+    return (index, definition_orders, candidate_sizes, prefix_index,
+            size_buckets)
 
 
 def align_sizes(source_sizes, image_sizes, tolerance=0.15, floor=16):
@@ -409,7 +437,8 @@ def align_sizes(source_sizes, image_sizes, tolerance=0.15, floor=16):
 
 def run_census():
     unmatched = _unmatched_functions()
-    index, definition_orders, candidate_sizes, prefix_index = _candidate_index()
+    (index, definition_orders, candidate_sizes, prefix_index,
+     size_buckets) = _candidate_index()
     slots, image, raw_offset = _import_table()
     callers, callees = _reference_graph()
     masked_by_rva = {rva: masked for rva, _size, _name, masked in unmatched}
@@ -430,6 +459,7 @@ def run_census():
                 s.split(":")[0].endswith(".lib") for s in sources)
                 else "game-exact")
             row["source"], row["symbol"] = primary[0], primary[1]
+            row["_candidates"] = candidates
             if len(candidates) > 1:
                 row["detail"] = "%d identical candidates: %s" % (
                     len(candidates), "|".join(
@@ -446,6 +476,23 @@ def run_census():
         if name.startswith("Unwind@"):
             row["class"] = "eh-funclet"
             row["detail"] = "SEH unwind funclet (EH-compiled TU)"
+            continue
+        union = union_mask_matches(masked, size_buckets)
+        if union:
+            sources = {source for source, _symbol in union}
+            primary = prefer_candidate(
+                [(source, symbol, None) for source, symbol in union], name)
+            row["class"] = ("crt-exact" if all(
+                s.split(":")[0].endswith(".lib") for s in sources)
+                else "game-exact")
+            row["source"], row["symbol"] = primary[0], primary[1]
+            row["_candidates"] = [(s, y, None) for s, y in union]
+            detail = "union-mask (delinker missed image sites)"
+            if len(union) > 1:
+                detail += "; %d candidates: %s" % (len(union), "|".join(
+                    "%s!%s" % (s, y) for s, y in union[:4]))
+            row["detail"] = detail
+            continue
 
     # DNA pass: definition order against image order. A gap bracketed by two
     # consecutive matches from one source object is filled directly when the
@@ -520,6 +567,14 @@ def run_census():
     # claimed game units leans game. Evidence columns always; class refinement
     # only when the signal is one-sided.
     class_by_name = {row["name"]: row["class"] for row in rows}
+    MODULE_KINDS = {"(libcmt)": "crt", "(imports)": "crt",
+                    "(funclets)": "eh", "(compgen)": "game",
+                    "(unmatched)": "un"}
+    unit_by_claimed_name = {}
+    with SYMBOLS.open(newline="", encoding="latin-1") as stream:
+        for claimed_row in csv.DictReader(stream):
+            if claimed_row.get("kind") == "func":
+                unit_by_claimed_name[claimed_row["name"]] = claimed_row["unit"]
 
     def kind_of(entity):
         if entity in class_by_name:
@@ -531,8 +586,11 @@ def run_census():
             if kind == "eh-funclet":
                 return "eh"
             return "un"
-        if entity == "(unmatched)":
-            return "un"
+        if entity in MODULE_KINDS:
+            return MODULE_KINDS[entity]
+        unit = unit_by_claimed_name.get(entity)
+        if unit in MODULE_KINDS:
+            return MODULE_KINDS[unit]
         return "game"   # claimed unit source or claimed symbol name
 
     def summarize(entities):
@@ -616,55 +674,107 @@ def write_carving(rows, callers):
     return len(clusters)
 
 
+def _merge_rows(path, new_rows):
+    """Union new identification rows with a CSV's existing data rows.
+
+    Keyed by the leading entry_rva column; a fresh identification overrides
+    the old row, and rows the current census context cannot see (because the
+    functions are already claimed and drained) survive untouched. This is
+    what makes --write-config safe to run from any pipeline state.
+    """
+    merged = {}
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            if not line or line.startswith("#") or line.startswith("entry_rva"):
+                continue
+            merged[int(line.split(",", 1)[0], 16)] = line
+    for rva, line in new_rows.items():
+        merged[rva] = line
+    return [merged[rva] for rva in sorted(merged)]
+
+
+def _positional_owner():
+    """rva -> unit of the nearest claimed real-unit function below it.
+
+    Compiler-generated tails (STL init stubs, atexit thunks) sit after their
+    TU's last function and are referenced by no caller; position is the
+    ownership evidence.
+    """
+    import bisect
+    claimed = []
+    with SYMBOLS.open(newline="", encoding="latin-1") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("kind") == "func" and "/" in row.get("unit", ""):
+                claimed.append((int(row["rva"], 0), row["unit"]))
+    claimed.sort()
+    rvas = [rva for rva, _unit in claimed]
+
+    def owner(rva):
+        slot = bisect.bisect_right(rvas, rva) - 1
+        return claimed[slot][1] if slot >= 0 else None
+    return owner
+
+
 def write_compgen_rows(rows, callers):
     """Interim VA_COMPGEN store: game-side identified bodies with owner units.
 
     The owner is the dominant claimed caller unit when one exists, else the
-    base object the bytes matched (a TU that also instantiates the body),
-    else the catch-all "(compgen)" module. Rows return to source markers when
-    the campaign reaches them.
+    position (compiler-generated tails follow their TU's last function), else
+    the matched base object. Rows return to source markers when the campaign
+    reaches them.
     """
     eligible = [row for row in rows
                 if row["class"] in ("game-exact", "order-inferred",
                                     "order-aligned", "game-prefix")
                 and row["source"].startswith("base:")]
-    with COMPGEN_OUTPUT.open("w", newline="") as stream:
-        stream.write(
-            "# Compiler-generated / unclaimed game bodies identified against\n"
-            "# our own base objects; interim store until VA_COMPGEN markers\n"
-            "# land in source. Generated by `homm2 audit unmatched-census\n"
-            "# --write-config`.\n"
-            "entry_rva,size,symbol,unit,source_object,evidence\n")
-        for row in sorted(eligible, key=lambda value: value["rva"]):
-            units = defaultdict(int)
-            for caller in callers.get(row["name"], ()):
-                if "/" in caller:
-                    units[caller] += 1
-            ranked = sorted(units.items(), key=lambda item: -item[1])
-            if ranked and (len(ranked) == 1
-                           or ranked[0][1] > ranked[1][1]):
-                owner = ranked[0][0]
-            else:
-                owner = row["source"].removeprefix("base:") or "(compgen)"
-            evidence = {"game-exact": "masked-exact",
-                        "order-inferred": "order-inferred",
-                        "order-aligned": "order-aligned",
-                        "game-prefix": "prefix-%d" % PREFIX}[row["class"]]
-            stream.write("0x%x,%d,%s,%s,%s,%s\n" % (
-                row["rva"], row["size"], row["symbol"], owner,
-                row["source"].removeprefix("base:"), evidence))
-    with FUNCLET_OUTPUT.open("w", newline="") as stream:
-        stream.write(
-            "# SEH unwind funclets (destructor-call handlers of EH-compiled\n"
-            "# TUs). Names are the analysis placeholders until each funclet\n"
-            "# is attributed to its parent function. Generated by\n"
-            "# `homm2 audit unmatched-census --write-config`.\n"
-            "entry_rva,size,name\n")
-        funclets = [row for row in rows if row["class"] == "eh-funclet"]
-        for row in sorted(funclets, key=lambda value: value["rva"]):
-            stream.write("0x%x,%d,%s\n" % (row["rva"], row["size"],
-                                            row["name"]))
-    return len(eligible), len(funclets)
+    positional = _positional_owner()
+    new_rows = {}
+    for row in sorted(eligible, key=lambda value: value["rva"]):
+        units = defaultdict(int)
+        for caller in callers.get(row["name"], ()):
+            if "/" in caller:
+                units[caller] += 1
+        ranked = sorted(units.items(), key=lambda item: -item[1])
+        if ranked and (len(ranked) == 1 or ranked[0][1] > ranked[1][1]):
+            owner = ranked[0][0]
+        else:
+            owner = (positional(row["rva"])
+                     or row["source"].removeprefix("base:") or "(compgen)")
+        # The owner's own emission of the body is the pairing truth: prefer
+        # the collision candidate compiled from the owner unit (volatile $E
+        # numbering differs across TUs).
+        for source, symbol, _order in row.get("_candidates", ()):
+            if source == "base:%s" % owner:
+                row = dict(row, source=source, symbol=symbol)
+                break
+        evidence = {"game-exact": "masked-exact",
+                    "order-inferred": "order-inferred",
+                    "order-aligned": "order-aligned",
+                    "game-prefix": "prefix-%d" % PREFIX}[row["class"]]
+        new_rows[row["rva"]] = "0x%x,%d,%s,%s,%s,%s" % (
+            row["rva"], row["size"], row["symbol"], owner,
+            row["source"].removeprefix("base:"), evidence)
+    merged = _merge_rows(COMPGEN_OUTPUT, new_rows)
+    COMPGEN_OUTPUT.write_text(
+        "# Compiler-generated / unclaimed game bodies identified against\n"
+        "# our own base objects; interim store until VA_COMPGEN markers\n"
+        "# land in source. Cumulative: rows survive any census context.\n"
+        "# Generated by `homm2 audit unmatched-census --write-config`.\n"
+        "entry_rva,size,symbol,unit,source_object,evidence\n"
+        + "".join(line + "\n" for line in merged))
+
+    funclets = [row for row in rows if row["class"] == "eh-funclet"]
+    funclet_rows = {row["rva"]: "0x%x,%d,%s" % (
+        row["rva"], row["size"], row["name"]) for row in funclets}
+    merged = _merge_rows(FUNCLET_OUTPUT, funclet_rows)
+    FUNCLET_OUTPUT.write_text(
+        "# SEH unwind funclets (destructor-call handlers of EH-compiled\n"
+        "# TUs). Names are the analysis placeholders until each funclet is\n"
+        "# attributed to its parent function. Cumulative. Generated by\n"
+        "# `homm2 audit unmatched-census --write-config`.\n"
+        "entry_rva,size,name\n"
+        + "".join(line + "\n" for line in merged))
+    return len(new_rows), len(funclet_rows)
 
 
 def write_config_rows(rows):
@@ -673,35 +783,39 @@ def write_config_rows(rows):
            if row["class"] in ("crt-exact", "order-inferred", "order-aligned",
                                "crt-prefix")
            and row["source"].split(":")[0].endswith(".lib")]
-    with CRT_OUTPUT.open("w", newline="") as stream:
-        stream.write(
-            "# CRT bodies identified in the retail image by masked-byte and\n"
-            "# definition-order evidence against the VC6 toolchain archives.\n"
-            "# Generated by `homm2 audit unmatched-census --write-config`;\n"
-            "# review before trusting rows whose alternates list collisions.\n"
-            "entry_rva,size,symbol,member,library,evidence,alternates\n")
-        for row in sorted(crt, key=lambda value: value["rva"]):
-            library, _colon, member = row["source"].partition(":")
-            stream.write("0x%x,%d,%s,%s,%s,%s,%s\n" % (
-                row["rva"], row["size"], row["symbol"],
-                member.replace("\\", "/").rsplit("/", 1)[-1], library,
-                {"crt-exact": "masked-exact",
-                 "order-inferred": "order-inferred",
-                 "order-aligned": "order-aligned",
-                 "crt-prefix": "prefix-%d" % PREFIX}[row["class"]],
-                row["detail"].replace(",", ";")))
+    crt_rows = {}
+    for row in sorted(crt, key=lambda value: value["rva"]):
+        library, _colon, member = row["source"].partition(":")
+        crt_rows[row["rva"]] = "0x%x,%d,%s,%s,%s,%s,%s" % (
+            row["rva"], row["size"], row["symbol"],
+            member.replace("\\", "/").rsplit("/", 1)[-1], library,
+            {"crt-exact": "masked-exact",
+             "order-inferred": "order-inferred",
+             "order-aligned": "order-aligned",
+             "crt-prefix": "prefix-%d" % PREFIX}[row["class"]],
+            row["detail"].replace(",", ";"))
+    merged = _merge_rows(CRT_OUTPUT, crt_rows)
+    CRT_OUTPUT.write_text(
+        "# CRT bodies identified in the retail image by masked-byte and\n"
+        "# definition-order evidence against the VC6 toolchain archives.\n"
+        "# Cumulative: rows survive any census context. Generated by\n"
+        "# `homm2 audit unmatched-census --write-config`; review rows whose\n"
+        "# alternates list collisions.\n"
+        "entry_rva,size,symbol,member,library,evidence,alternates\n"
+        + "".join(line + "\n" for line in merged))
+
     thunks = [row for row in rows if row["class"] == "import-thunk"]
-    with THUNK_OUTPUT.open("w", newline="") as stream:
-        stream.write(
-            "# Import thunks (jmp [IAT]) resolved through the retail import\n"
-            "# directory. Generated by `homm2 audit unmatched-census"
-            " --write-config`.\n"
-            "entry_rva,size,dll,symbol,iat_rva\n")
-        for row in sorted(thunks, key=lambda value: value["rva"]):
-            stream.write("0x%x,%d,%s,%s,%s\n" % (
-                row["rva"], row["size"], row["source"], row["symbol"],
-                row["detail"].replace("IAT ", "")))
-    return len(crt), len(thunks)
+    thunk_rows = {row["rva"]: "0x%x,%d,%s,%s,%s" % (
+        row["rva"], row["size"], row["source"], row["symbol"],
+        row["detail"].replace("IAT ", "")) for row in thunks}
+    merged = _merge_rows(THUNK_OUTPUT, thunk_rows)
+    THUNK_OUTPUT.write_text(
+        "# Import thunks (jmp [IAT]) resolved through the retail import\n"
+        "# directory. Cumulative. Generated by `homm2 audit unmatched-census"
+        " --write-config`.\n"
+        "entry_rva,size,dll,symbol,iat_rva\n"
+        + "".join(line + "\n" for line in merged))
+    return len(crt_rows), len(thunk_rows)
 
 
 def main(argv=None):
@@ -726,7 +840,8 @@ def main(argv=None):
                                 lineterminator="\n")
         writer.writeheader()
         for row in rows:
-            row = dict(row)
+            row = {key: value for key, value in row.items()
+                   if not key.startswith("_")}
             row["rva"] = "0x%x" % row["rva"]
             row["size"] = "0x%x" % row["size"]
             writer.writerow(row)
