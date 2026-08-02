@@ -250,8 +250,8 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 
 VA(0x00421d87, 0x133)
 void armyGroup::DamageGroup(float damagePercent) {
-    i32 numKilled;
-    i32 percentChance = static_cast<i32>(
+    i32 killed;
+    i32 killChance = static_cast<i32>(
         damagePercent
         * IDX(ARMY_GROUP_RANDOM_PERCENT_MAX)
     );
@@ -261,15 +261,15 @@ void armyGroup::DamageGroup(float damagePercent) {
 
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
-            numKilled = 0;
+            killed = 0;
             for (j = 0; j < m_creatureCounts[i]; ++j) {
-                if (SRandom(0, ARMY_GROUP_RANDOM_PERCENT_MAX) < percentChance)
-                    ++numKilled;
+                if (SRandom(0, ARMY_GROUP_RANDOM_PERCENT_MAX) < killChance)
+                    ++killed;
             }
-            if (isFirstTroop && m_creatureCounts[i] == numKilled
+            if (isFirstTroop && killed == m_creatureCounts[i]
                 && damagePercent < 0.999)
-                --numKilled;
-            m_creatureCounts[i] -= numKilled;
+                --killed;
+            m_creatureCounts[i] -= killed;
             if (m_creatureCounts[i] <= 0 || damagePercent >= 1.0) {
                 m_creatureCounts[i] = 0;
                 m_creatureTypes[i] = CREATURE_NONE;
