@@ -289,9 +289,9 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
     m_windowListTail = NULL;
     m_windowListHead = NULL;
     m_screen = NULL;
+    m_screenshotIndex = 1;
     m_updateFlags = 0;
     m_fizzleSource = NULL;
-    m_screenshotIndex = 1;
     m_fizzleWork = NULL;
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
