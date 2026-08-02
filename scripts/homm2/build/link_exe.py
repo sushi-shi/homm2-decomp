@@ -21,6 +21,7 @@ from pathlib import Path
 
 from homm2.build.annotated_data import source_definitions as annotated_source_definitions
 from homm2.build.extract_resources import read_pe_resources
+from homm2.build.reloc_owners import load_reviewed_highlow_sites
 from homm2.build.build_libcmt_gfy import (
     archive_entries, build_library as build_gfy_libcmt, expected_retail_literals,
 )
@@ -38,6 +39,7 @@ PINNED_VC40_LIBCMT_SHA256 = (
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), SCRIPT_DIR)
 RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
+RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
 REQUIRED_INITIALIZED_STORAGE = REPO / "config/required_initialized_storage.tsv"
 DATA_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 DATA_SECTIONS = REPO / "build/gen/delink_data_sections.tsv"
@@ -759,23 +761,10 @@ def read_pe_payload_evidence(path, rva, size, audit_kind="bytes"):
                 return section["raw_offset"] + delta
         raise ValueError("RVA 0x%x is outside PE sections in %s" % (rva, path))
 
-    relocation_rvas = []
-    directory = optional + 96 + IMAGE_DIRECTORY_ENTRY_BASERELOC * 8
-    relocation_rva, relocation_size = struct.unpack_from("<II", data, directory)
-    if relocation_rva and relocation_size:
-        cursor = raw_offset(relocation_rva)
-        if cursor is None:
-            raise ValueError("PE base-relocation directory has no raw bytes in %s" % path)
-        end = cursor + relocation_size
-        while cursor + 8 <= end:
-            page_rva, block_size = struct.unpack_from("<II", data, cursor)
-            if block_size < 8 or cursor + block_size > end:
-                raise ValueError("invalid PE base-relocation block in %s" % path)
-            for entry_offset in range(cursor + 8, cursor + block_size, 2):
-                entry = struct.unpack_from("<H", data, entry_offset)[0]
-                if entry >> 12 == IMAGE_REL_BASED_HIGHLOW:
-                    relocation_rvas.append(page_rva + (entry & 0x0FFF))
-            cursor += block_size
+    # The image ships no base-relocation directory; the reviewed site manifest
+    # is the only absolute-relocation inventory, so ledger highlow evidence is
+    # counted against it (zero sites until sites are reviewed in).
+    relocation_rvas = load_reviewed_highlow_sites(RELOC_MANIFEST)
 
     def read_span(span_rva, span_size):
         payload = bytearray(span_size)

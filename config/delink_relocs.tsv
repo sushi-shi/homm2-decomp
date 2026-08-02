@@ -1,0 +1,6 @@
+# Reviewed absolute-relocation sites for the stripped Gold 2.1 target.
+# HMM2PL.exe carries no base-relocation directory (data directory 5 is 0/0), so
+# the delinker cannot read DIR32 sites from the image. Every row here names the
+# RVA of a 4-byte field that holds a linked target address; the delinker reads
+# and classifies the target itself. Empty until sites are reviewed in.
+site_rva	kind

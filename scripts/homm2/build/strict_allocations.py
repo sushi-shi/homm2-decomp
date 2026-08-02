@@ -306,7 +306,7 @@ def load_rows(ledger=LEDGER, symbols=SYMBOLS):
     retail_rvas = {}
     with Path(symbols).open(newline="", encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
-            if row.get("kind") == "data" and row.get("provenance") == "cv-public-data":
+            if row.get("kind") == "data":
                 retail_rvas.setdefault(row["name"], []).append(int(row["rva"], 0))
     rows = load_required_initialized_storage(ledger)
     for row in rows:

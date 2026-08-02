@@ -1,22 +1,29 @@
-"""Public-data owner ranges used to normalize interior COFF relocations.
+"""Reviewed data-owner ranges and relocation sites for the stripped target.
 
-The generated symbol inventory contains synthetic ``const_<RVA>`` aliases for PE
-base-relocation targets.  Some aliases point into a real reconstructed global.  A
-relocation to such an alias is better represented as the public owner plus an
-implicit COFF addend, for example ``gConfig + 0x30``.
+The generated symbol inventory contains synthetic ``const_<RVA>`` aliases for
+reviewed relocation targets.  Some aliases point into a real reconstructed
+global.  A relocation to such an alias is better represented as the owner plus
+an implicit COFF addend, for example ``gConfig + 0x30``.
 
-Only CodeView public data symbols with a matching source ``DATA()`` definition and
-an explicit recovered extent are accepted as owners.  The inventory's data sizes are
-often provisional next-public gaps, so they are not ownership proof by themselves.
+Ownership is a reviewed claim: a data symbol is accepted as an owner only when
+its source ``DATA()`` definition names the same RVA and an explicit extent is
+recorded in config/reloc_data_owners.tsv.  The inventory's own sizes are not
+ownership proof by themselves.
+
+This module also owns the reader for config/delink_relocs.tsv - the reviewed
+absolute-relocation site list that substitutes for the image's missing
+base-relocation directory.
 """
 import csv
 import glob
 import re
+from pathlib import Path
 from typing import NamedTuple
 
 
 IMAGE_BASE = 0x400000
 OWNER_EXTENTS = "config/reloc_data_owners.tsv"
+RELOC_MANIFEST = "config/delink_relocs.tsv"
 
 
 class DataOwner(NamedTuple):
@@ -24,6 +31,18 @@ class DataOwner(NamedTuple):
     size: int
     symbol: str
     source_name: str
+
+
+def load_reviewed_highlow_sites(path=None):
+    """Reviewed absolute-relocation site RVAs (the image has no .reloc)."""
+    path = Path(path or RELOC_MANIFEST)
+    sites = []
+    with path.open(newline="") as stream:
+        for row in csv.DictReader(
+                (line for line in stream if not line.lstrip().startswith("#")),
+                delimiter="\t"):
+            sites.append(int(row["site_rva"], 16))
+    return sorted(sites)
 
 
 def load_definition_rvas(source_glob="src/**/*.cpp"):
@@ -54,24 +73,40 @@ def load_explicit_extents(path=OWNER_EXTENTS):
     return extents
 
 
+def _source_name(symbol):
+    """The source identifier behind an inventory symbol name.
+
+    The inventory carries linkage names: clang's MS mangling for C++
+    (``?gConfig@@3...``) or a plain identifier for extern "C" objects
+    (with or without the cdecl underscore).
+    """
+    match = re.match(r"\?([A-Za-z_]\w*)@@", symbol)
+    if match:
+        return match.group(1)
+    match = re.fullmatch(r"_?([A-Za-z_]\w*)", symbol)
+    return match.group(1) if match else None
+
+
 def owners_from_rows(rows, definitions, extents):
     owners = []
     for row in rows:
-        if (row.get("kind") != "data" or
-                row.get("provenance") != "cv-public-data"):
+        if row.get("kind") != "data":
             continue
         try:
             rva = int(row["rva"], 16)
             size = int(row.get("size") or "0", 16)
         except (KeyError, ValueError):
             continue
-        match = re.match(r"\?([A-Za-z_]\w*)@@", row.get("name", ""))
-        if size <= 0 or match is None:
+        source_name = _source_name(row.get("name", ""))
+        if source_name is None:
             continue
-        source_name = match.group(1)
         extent = extents.get(source_name)
         if (definitions.get(source_name) != rva or extent is None or
-                extent[0] != rva or extent[1] <= 0 or size < extent[1]):
+                extent[0] != rva or extent[1] <= 0):
+            continue
+        # A zero inventory size is "no claim"; a positive size smaller than the
+        # reviewed extent contradicts it and disqualifies the owner.
+        if 0 < size < extent[1]:
             continue
         owners.append(DataOwner(rva, extent[1], row["name"], source_name))
     return sorted(owners, key=lambda owner: (owner.rva, owner.size, owner.symbol))
@@ -86,7 +121,7 @@ def load_owner_ranges(symbols_path="build/gen/symbol_names.csv",
 
 
 def owner_for_rva(owners, rva):
-    """Return the most specific recovered public-data owner containing ``rva``."""
+    """Return the most specific reviewed data owner containing ``rva``."""
     matches = [owner for owner in owners
                if owner.rva <= rva < owner.rva + owner.size]
     if not matches:

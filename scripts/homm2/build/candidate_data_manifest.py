@@ -1,10 +1,12 @@
-"""Derive closed-world data allocations from candidate COFF topology and retail relocs.
+"""Derive closed-world data allocations from candidate COFF topology and retail bytes.
 
 Candidate objects prove symbol topology only: which symbols are definitions, their
-section-relative offsets, sizes, alignment, and relocation spelling.  Retail PE bytes,
-NB09 contribution ranges, and aligned code relocations remain the address authority.
-An object/storage group is emitted only when every candidate definition maps through a
-unique, consistent relocation proof (or an exact NB09 public-data address).
+section-relative offsets, sizes, alignment, and relocation spelling.  Retail PE
+bytes, reviewed relocation sites (config/delink_relocs.tsv - the image has no
+base-relocation directory), and reviewed owner intervals remain the address
+authority.  An object/storage group is emitted only when every candidate
+definition maps through a unique, consistent relocation proof (or a reviewed
+data address from the source inventory).
 """
 
 import argparse
@@ -18,16 +20,16 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from homm2.build.canonicalize_relocs import CoffFile
-from homm2.build.contribution_manifest import contribution_rows
+from homm2.build.reloc_owners import load_reviewed_highlow_sites
 
 
 REPO = Path(os.environ.get("HOMM2_DIR", Path(__file__).resolve().parents[3]))
 IMAGE_BASE = 0x400000
 DIR32 = 0x0006
-IMAGE_REL_BASED_HIGHLOW = 3
 DATA_SECTIONS = {".rdata": "rdata", ".data": "data", ".bss": "bss"}
 OUTPUT = REPO / "build/gen/candidate_delink_data.tsv"
 DIAGNOSTICS_OUTPUT = REPO / "build/gen/candidate_data_diagnostics.json"
+RELOC_MANIFEST = REPO / "config/delink_relocs.tsv"
 
 
 @dataclass(frozen=True)
@@ -353,22 +355,10 @@ def _pe_layout(path):
                 return None if delta >= raw_size else raw + delta
         return None
 
-    directory = optional + 96 + 5 * 8
-    reloc_rva, reloc_size = struct.unpack_from("<II", data, directory)
-    cursor = raw_offset(reloc_rva)
-    if cursor is None:
-        raise ValueError("PE has no readable base-relocation directory")
-    end = cursor + reloc_size
-    highlow = []
-    while cursor + 8 <= end:
-        page, block_size = struct.unpack_from("<II", data, cursor)
-        if block_size < 8 or cursor + block_size > end:
-            raise ValueError("invalid PE base-relocation block")
-        for offset in range(cursor + 8, cursor + block_size, 2):
-            entry = struct.unpack_from("<H", data, offset)[0]
-            if entry >> 12 == IMAGE_REL_BASED_HIGHLOW:
-                highlow.append(page + (entry & 0xFFF))
-        cursor += block_size
+    # The image ships no base-relocation directory. The reviewed site manifest
+    # (the same file the delinker consumes as --reloc-manifest) is the only
+    # highlow inventory; empty means zero reviewed sites, not an error.
+    highlow = load_reviewed_highlow_sites(RELOC_MANIFEST)
 
     def read_u32(rva):
         offset = raw_offset(rva)
@@ -388,7 +378,7 @@ def _symbol_inventory(path):
     functions = defaultdict(list)
     with Path(path).open(newline="", encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
-            if row.get("kind") == "data" and row.get("provenance") == "cv-public-data":
+            if row.get("kind") == "data":
                 rva = int(row["rva"], 0)
                 public_data[row["name"]] = rva
                 public[row["name"]] = rva
@@ -472,15 +462,6 @@ def _function_sequence_relocation_proofs(candidate, retail_sites, read_u32,
             if (public[symbol.name] + addend) & 0xFFFFFFFF != target_rva:
                 return [], known_anchors, False
     return proposed, known_anchors, True
-
-
-def _contribution_index(exe, units):
-    result = defaultdict(list)
-    for row in contribution_rows(exe, units):
-        if row["storage"] != "text":
-            unit = row["object"].replace("\\", "/").removesuffix(".c")
-            result[(unit, row["storage"])].append((row["rva"], row["rva"] + row["size"]))
-    return result
 
 
 def _contains(intervals, rva, size=1):
@@ -740,7 +721,7 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
                        exe=REPO / "build/orig/HMM2PL.exe",
                        symbols_path=REPO / "build/gen/symbol_names.csv",
                        units_path=REPO / "config/units.toml",
-                       reviewed_rows=()):
+                       reviewed_rows=(), contributions=None):
     """Return allocations only for object/storage groups proved complete."""
     reviewed = {}
     reviewed_by_position = {}
@@ -762,7 +743,10 @@ def derive_allocations(base_dir=REPO / "build/objdiff/base",
     referenced_targets = {
         (read_u32(site) - image_base) & 0xFFFFFFFF for site in highlow
     }
-    contributions = _contribution_index(exe, units_path)
+    # Reviewed owner intervals per (unit, storage). There is no image-side
+    # owner-interval oracle on this target, so the default is empty and every
+    # group without reviewed intervals simply stays open.
+    contributions = dict(contributions or {})
     storage_intervals = defaultdict(list)
     for (_unit, storage), intervals in contributions.items():
         storage_intervals[storage].extend(intervals)

@@ -8,7 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     vostok-delinker-src = {
-      url = "github:srp-survarium/vostok-delinker/a4cc119d80b4aff12607ac55e74d75c58542c3c8";
+      url = "github:srp-survarium/vostok-delinker/1393e24b4804cb357fdac147c68013f0aa5a9d95";
       flake = false;
     };
     objdiff-src = {

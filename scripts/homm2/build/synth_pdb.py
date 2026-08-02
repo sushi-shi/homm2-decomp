@@ -2,11 +2,13 @@
 """synth_pdb.py - synthesize a PDB for vostok-delinker from build/gen/symbol_names.csv.
 
 vostok-delinker consumes a PDB (not CodeView) to slice HMM2PL.exe into per-symbol
-COFF .obj files. HMM2PL ships a publics-only CodeView NB09 stream, but the delinker
-wants a PDB, so we build one from retail publics plus reviewed runtime/compiler and
-source-annotated private identities. This is a deterministic `homm2 redelink` input: every
-function is named and unit-attributed before delinking, so we always emit per-unit line
-info (no Ghidra functions.csv or address-bucketed remainder).
+COFF .obj files. This target is stripped, so the claimed inventory comes from source
+VA/DATA markers (build/gen/symbol_names.csv) alone. Every function listed in
+config/retail_functions.csv whose entry RVA no source marker has claimed is placed
+in one extra "(unmatched)" module, so the whole retail .text delinks from the first
+run and matching has a browsable baseline. Rows move out of "(unmatched)" exactly
+when a VA marker claims their RVA; the boundaries of what remains stay analysis
+opinion, not retail evidence.
 
 Pipeline:
   build/gen/symbol_names.csv (rva,name,unit,size,kind,provenance)
@@ -58,10 +60,30 @@ def read_csv(path):
     return rows
 
 
+def merge_unmatched(funcs, retail_rows, text_seg_of):
+    """Append every retail-inventory function no source marker has claimed.
+
+    They form the "(unmatched)" module. Sizes are the inventory's own
+    byte_size column: analysis claims, kept verbatim (never inferred here).
+    Returns the number of merged functions.
+    """
+    claimed = {rva for rva, _size, _name, _unit in funcs}
+    merged = 0
+    for row in retail_rows:
+        rva = int(row["entry_rva"], 16)
+        size = int(row["byte_size"])
+        if not text_seg_of(rva) or size <= 0 or rva in claimed:
+            continue
+        funcs.append((rva, size, row["name"].strip(), "(unmatched)"))
+        merged += 1
+    return merged
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--exe", default=os.environ.get("HOMM2_EXE", str(REPO / "build/orig/HMM2PL.exe")))
     ap.add_argument("--csv", default=str(REPO / "build/gen/symbol_names.csv"))
+    ap.add_argument("--retail-functions", default=str(REPO / "config/retail_functions.csv"))
     ap.add_argument("--out", default=str(REPO / "build/pdb/HMM2PL.pdb"))
     a = ap.parse_args(argv)
     exe, out = Path(a.exe), Path(a.out)
@@ -88,6 +110,12 @@ def main(argv=None):
                 canonicalized_aliases += 1
                 continue
             data.append((rva, name, seg, rva - base))
+
+    retail_rows = csv.DictReader(
+        ln for ln in open(a.retail_functions)
+        if not ln.lstrip().startswith("#"))
+    unmatched = merge_unmatched(
+        funcs, retail_rows, lambda rva: seg_of(secs, rva)[0] == text_seg)
     funcs.sort(); data.sort()
 
     # per-unit source files (the delinker emits one <unit>.c.obj per file)
@@ -151,9 +179,9 @@ def main(argv=None):
                   if (m := re.search(r"Stream\s+(\d+)\s+\(\s*0 bytes\)", line))), None)
     if empty is not None:
         _patch_dbi(out, empty)
-    print("[synth_pdb] %d funcs + %d data -> %s (%d units); "
+    print("[synth_pdb] %d funcs (%d unmatched) + %d data -> %s (%d units); "
           "%d explicit-owner aliases omitted" %
-          (len(funcs), len(data), out, len(files), canonicalized_aliases))
+          (len(funcs), unmatched, len(data), out, len(files), canonicalized_aliases))
 
 
 def _patch_dbi(pdb, empty_stream):

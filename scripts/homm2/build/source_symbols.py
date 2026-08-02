@@ -10,7 +10,7 @@ address down.
 That makes the rule strict and deliberate: a symbol exists for the delinker if and
 only if a `VA(...)` or `DATA(...)` marker names it. Nothing is inferred from
 Ghidra's function inventory, from signature matching, or from a neighbouring
-symbol's extent. config/ghidra_functions.csv is a work list of 2,472 candidate
+symbol's extent. config/retail_functions.csv is a work list of 2,472 candidate
 boundaries; this is the far smaller set that has been claimed and can be delinked
 against. The two are not the same and must not be conflated - one is analysis
 opinion, the other is a reviewed claim.

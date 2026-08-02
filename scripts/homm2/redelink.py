@@ -1,4 +1,12 @@
-"""Explicitly rebuild every delinker input and replace the fixed target."""
+"""Rebuild every delinker input from the source tree and replace the target.
+
+The target image is stripped, so the whole inventory is project evidence:
+source VA/DATA markers name what has been claimed, config/retail_functions.csv
+carries the analysis candidates that fill the "(unmatched)" module, and the
+reviewed manifests under config/ supply relocation sites and aliases. The
+pipeline is deterministic; `homm2.build.reviewed_data --regenerate` is a no-op
+when nothing changed (pass --force to re-delink anyway).
+"""
 
 import os
 import subprocess
@@ -14,32 +22,24 @@ def run(*command):
 
 
 def main(argv=None):
-    if argv:
-        print("usage: homm2 redelink")
+    argv = list(argv or ())
+    force = "--force" in argv
+    if [argument for argument in argv if argument != "--force"]:
+        print("usage: homm2 redelink [--force]")
         return 1
-    # Refresh the symbol inventory. This target is stripped, so it comes from the
-    # source's own VA/DATA markers rather than from a CodeView stream: there is no
-    # gen_manifest step here because there is nothing for it to read.
     if run("python3", "-m", "homm2.build.source_symbols"):
         return 1
-    # audit_text_coverage is off with the rest of the audits (see homm2.cli.AUDITS).
-    # It requires every non-padding .text byte to be covered by a named function or
-    # an explicit exclusion, which is a question worth asking only once the inventory
-    # is meant to be complete. Here it reports all 951,827 bytes as unexplained.
     if run("python3", "-m", "homm2.build.name_strings"):
         return 1
     if run("python3", "-m", "homm2.build.synth_pdb"):
         return 1
-
-    # DATA/DATA_COMPGEN binding needs current candidate COFF topology.
-    if run("python3", "configure.py"):
+    regenerate = ["python3", "-m", "homm2.build.reviewed_data", "--regenerate"]
+    if force:
+        regenerate.append("--force")
+    if run(*regenerate):
         return 1
-    if run("ninja", "base"):
-        return 1
-
-    # Strict assembly precedes Vostok; target replacement is atomic.
-    if run("python3", "-m", "homm2.build.reviewed_data", "--regenerate"):
-        return 1
+    # Reconfigure last so the ninja graph and objdiff pairing see the fresh
+    # target set (a newly claimed unit's <unit>.c.obj, or "(unmatched)").
     if run("python3", "configure.py"):
         return 1
     print("[redelink] done. Next: `homm2 build`")

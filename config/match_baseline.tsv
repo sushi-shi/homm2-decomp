@@ -1,0 +1,4 @@
+# homm2 retained match maxima by normalized effective-source hash.
+# Observational only; never an enforcement baseline.
+# Updated by `homm2 status update` and `homm2 build`; do not hand-edit.
+# unit<TAB>fn<TAB>max_fuzzy<TAB>src_hash

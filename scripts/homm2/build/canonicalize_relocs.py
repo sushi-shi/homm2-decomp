@@ -296,8 +296,7 @@ def load_retail_symbols(path):
             if row.get("kind") == "func":
                 function_rvas[(row["unit"], row["name"])] = int(row["rva"], 0)
                 function_sizes[(row["unit"], row["name"])] = int(row["size"], 0)
-            elif (row.get("kind") == "data" and
-                  row.get("provenance") == "cv-public-data"):
+            elif row.get("kind") == "data":
                 public_data[row["name"]] = int(row["rva"], 0)
     return public_data, function_rvas, function_sizes
 
