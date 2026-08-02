@@ -45,6 +45,7 @@ protected:
 public:
     void DrawString(char*, i32, i32, FontDrawMode);
     i32 GetCharacterWidth(u8);
+    void ExtractLine(char*, char*, i32*, i32, i32*, u8);
     void DrawBoundedString(char*, i32, i32, i32, i32, FontDrawMode, FontAlignment);
     i32 LineLength(char*, i32);
     i32 LineWidth(char*);
