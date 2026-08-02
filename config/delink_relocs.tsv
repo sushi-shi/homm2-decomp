@@ -3847,6 +3847,7 @@ site_rva	kind
 0xc2ea3	dir32
 0xc2eac	dir32
 0xc2ec4	dir32
+0xc2f70	dir32
 0xc31c6	dir32
 0xc31e3	dir32
 0xc31f7	dir32
@@ -4576,6 +4577,7 @@ site_rva	kind
 0xcfd73	dir32
 0xcfd7c	dir32
 0xcfd94	dir32
+0xcfdd0	dir32
 0xcfe46	dir32
 0xcfe63	dir32
 0xcfe77	dir32
