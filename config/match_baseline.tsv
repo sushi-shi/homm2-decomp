@@ -657,7 +657,7 @@ SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	96.1563	53997336650f
 SOURCE/CMBTMGR	?ShotIsThroughWall@combatManager@@QAEHHHH@Z	99.5654	758e95d69852
 SOURCE/CMBTMGR	?TestRaiseDoor@combatManager@@QAEXXZ	100.0000	888e7a6e17f9
-SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	99.9157	0ad4bdedcfc3
+SOURCE/CMBTMGR	?UpdateArmyGroup@combatManager@@QAEXH@Z	100.0000	ff1f30babf5e
 SOURCE/CMBTMGR	?UpdateCombatSystemOptions@@YIXH@Z	100.0000	f93bafa9f6c1
 SOURCE/CMBTMGR	?ValidHex@@YIHH@Z	100.0000	71e59bd81da2
 SOURCE/COMMAND	?AddArmy@combatManager@@QAEXHHHHHH@Z	99.7990	caae86538235
@@ -671,7 +671,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	93.5798	284d7e0bc07d
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	6044b0b8106f
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	98.7027	274e540bbbb9
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	91.2870	4623dc79702f
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.4035	70a29751590b
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.4099	70a29751590b
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	98.2700	2217dc6eb987
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	dcac6e7285e6
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	99.9394	ef958481421a
@@ -691,11 +691,11 @@ SOURCE/COMMAND	?SetCombatViewArmySmallLevel@combatManager@@QAEXH@Z	100.0000	7ba9
 SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	a32512ad9ea5
 SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	95.7297	2290164ca8ef
 SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	96.6453	c4c4d4eeae5e
-SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	95.4126	1c99022469c1
+SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	95.4336	1c99022469c1
 SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	96.2273	5136b7d1af8c
 SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	86.6234	7bf41efa4eac
 SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	99.7398	795b20976cca
-SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	96.0276	ed2b7335d8a7
+SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	96.0310	ed2b7335d8a7
 SOURCE/CURSOR	?CheckAdjacentMon@advManager@@QAEXPAH@Z	100.0000	e6a7b3727aa5
 SOURCE/CURSOR	?DrawCursor@advManager@@QAEXXZ	92.3441	1181bfc01cdc
 SOURCE/CURSOR	?DrawCursorShadow@advManager@@QAEXXZ	99.6967	98fc0ad6f390
@@ -967,7 +967,7 @@ SOURCE/KB	?EarlySetup@@YIHXZ	100.0000	4626575ac61f
 SOURCE/KB	?EarlyShutDownSystem@@YIXXZ	100.0000	4c4f4771d291
 SOURCE/KB	?EarlyShutdown@@YIXPAD0@Z	100.0000	60fe5e8f0a9d
 SOURCE/KB	?EventWindowHandler@@YIHAAUtag_message@@@Z	78.7435	160d2ce5f320
-SOURCE/KB	?FileError@@YIXPAD@Z	99.8421	d6bd318f8b63
+SOURCE/KB	?FileError@@YIXPAD@Z	99.9474	9d3933effa42
 SOURCE/KB	?ForcePollSound@@YIXXZ	100.0000	dfc495ce96a0
 SOURCE/KB	?GOut@@YIXPAD@Z	100.0000	dde63b4957ad
 SOURCE/KB	?GameUnsaved@@YIHXZ	100.0000	b9a0af52e322
