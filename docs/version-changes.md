@@ -98,6 +98,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Changed
 
+- **[Buka] `resourceManager::m_lastFileName` grew from 60 to 1000 bytes**
+  (`RESOURCE_MANAGER_FILENAME_CAPACITY` 0x3c -> 0x3e8, sizeof 0xa2 ->
+  0x44e). Byte-pinned three ways: `m_lastFileId` reads at `this+0x44a`
+  (PointToFile, GetFileSize sprintf args) while `m_lastFileName` stays at
+  `this+0x62`, and the single retail `push 0x44e` at the KB
+  `new resourceManager` site. Longer localized path/name headroom.
 - **[build] String pooling (`/Gf`) is on for most of the build but off for
   seven TUs.** Retail KB/dpnetwin/COMMAND/ADVMGR blocks hold one cell per
   literal content (duplicate literals in our reconstruction resolve to a
