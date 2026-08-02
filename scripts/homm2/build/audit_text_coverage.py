@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from homm2.build.reloc_owners import load_reviewed_highlow_sites
+
 
 PADDING = {0x00, 0x90, 0xcc}
 
@@ -86,27 +88,15 @@ def highlow_pointer_targets(path, image_base):
                 return raw + rva - start
         return None
 
-    reloc_rva, reloc_size = struct.unpack_from("<II", data, optional + 96 + 5 * 8)
-    cursor = raw_offset(reloc_rva)
-    if cursor is None:
-        return {}
-    limit = cursor + reloc_size
+    # The image ships no base-relocation directory; the reviewed site manifest
+    # is the only absolute-relocation inventory.
     targets = {}
-    while cursor + 8 <= limit:
-        page, block_size = struct.unpack_from("<II", data, cursor)
-        if block_size < 8 or cursor + block_size > limit:
-            raise ValueError("invalid PE base-relocation block")
-        for offset in range(cursor + 8, cursor + block_size, 2):
-            entry = struct.unpack_from("<H", data, offset)[0]
-            if entry >> 12 != 3:
-                continue
-            site = page + (entry & 0xFFF)
-            raw = raw_offset(site)
-            if raw is None or raw + 4 > len(data):
-                continue
-            target = (struct.unpack_from("<I", data, raw)[0] - image_base) & 0xFFFFFFFF
-            targets.setdefault(target, []).append(site)
-        cursor += block_size
+    for site in load_reviewed_highlow_sites():
+        raw = raw_offset(site)
+        if raw is None or raw + 4 > len(data):
+            continue
+        target = (struct.unpack_from("<I", data, raw)[0] - image_base) & 0xFFFFFFFF
+        targets.setdefault(target, []).append(site)
     return targets
 
 
@@ -250,7 +240,7 @@ def main(argv=None):
     intervals = []
     unit_by_name = {}
     public_by_rva = {}
-    nb09_starts = set()
+    claimed_starts = set()
     source_configured = {}
     for row in manifest_rows:
         if row.get("kind") != "func":
@@ -261,11 +251,9 @@ def main(argv=None):
         if size and text_rva <= start < text_end:
             intervals.append((start, start + size, row["name"], provenance))
             unit_by_name[row["name"]] = row["unit"]
-        if provenance.startswith("cv-public"):
+        if provenance.startswith("source-annotation"):
             public_by_rva.setdefault(start, (row["name"], row["unit"]))
-            nb09_starts.add(start)
-        elif provenance.startswith("cv-thunk"):
-            nb09_starts.add(start)
+            claimed_starts.add(start)
         elif (provenance.startswith("source-compgen") or
               provenance.startswith("source-private")):
             source_configured[start] = (size, row["name"], row["unit"], provenance)
@@ -299,7 +287,7 @@ def main(argv=None):
     raw_candidates.update(ghidra)
     candidates = []
     for rva in sorted(raw_candidates):
-        if rva in nb09_starts or not text_rva <= rva < text_end:
+        if rva in claimed_starts or not text_rva <= rva < text_end:
             continue
         index = bisect.bisect_right(public_starts, rva) - 1
         if index < 0:
@@ -351,7 +339,7 @@ def main(argv=None):
 
     for rva, (size, name, _unit, provenance) in configured.items():
         end = rva + size
-        if (rva not in nb09_starts and rva not in pointer_targets and
+        if (rva not in claimed_starts and rva not in pointer_targets and
                 rva not in {candidate[0] for candidate in candidates}):
             candidate_failures.append((
                 rva, "%s has no direct-call, stored-pointer, or Ghidra entry evidence" % name))

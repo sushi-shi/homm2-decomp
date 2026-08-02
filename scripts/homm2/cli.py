@@ -52,15 +52,12 @@ def main(argv=None):
     if cmd == "data-relocs":
         from homm2.build.coff_reloc_topology import main as m; return m(rest)
     if cmd == "data-topology":
-        # Target regeneration lives in `homm2 redelink`; these are the
-        # candidate-COFF inspection tools that stay meaningful without it.
+        # Target regeneration lives in `homm2 redelink`; the census is the
+        # candidate-COFF inspection tool that stays meaningful without it.
         if rest and rest[0] == "census":
             from homm2.build.data_topology_census import main as m
             return m(rest[1:])
-        if rest and rest[0] == "assemble":
-            from homm2.build.data_manifest_adapter import main as m
-            return m(rest[1:])
-        print("usage: homm2 data-topology {census|assemble}", file=sys.stderr)
+        print("usage: homm2 data-topology census", file=sys.stderr)
         return 1
     if cmd == "build":
         if AUDITS:
