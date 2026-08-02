@@ -3436,7 +3436,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
 VA(0x004553d1, 0x158)
 MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
-        if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
+        if (msg.payload.hover.id == gpWindowManager->m_lastHoverId)
             return MESSAGE_DISPATCH_CONSUME;
         gpWindowManager->m_lastHoverId = msg.payload.hover.id;
         switch (msg.payload.hover.id) {

@@ -188,7 +188,6 @@ i8 WaitForGuest(void) {
 
 VA(0x00473bd6, 0x18c)
 i32 nbnet_init(void) {
-    char scratch[SCRATCH_BUFFER_SIZE];
     i32 unused;
 
     LogStr("GUON1");
