@@ -27,18 +27,18 @@ widget::widget(
     m_y = y;
     m_width = width;
     m_height = height;
+    m_id = id;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
-    m_id = id;
     m_kind = kind;
 }
 
 VA(0x004d40a0, 0x7d)
 widget::widget(void) {
-    m_id = 0;
     m_owner = NULL;
     m_next = NULL;
     m_prev = NULL;
+    m_id = 0;
     m_flags = WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW;
     m_zOrder = -1;
     m_kind = WIDGET_KIND_DEFAULT;

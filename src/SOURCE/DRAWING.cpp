@@ -356,9 +356,9 @@ void combatManager::UpdateCombatArea(void) {
 VA(0x00438696, 0x1a9)
 void combatManager::SetupGridForArmy(army* armyPtr) {
     i32 attackMask;
-    CombatSide savedTargetSide;
-    i32 targetIndexSave;
-    i32 hexIndex;
+    CombatSide oldSide;
+    i32 oldIndex;
+    i32 j;
 
     if (gbNoShowCombat != 0)
         return;
@@ -368,28 +368,28 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     attackMask =
         armyPtr->GetAttackMask(armyPtr->m_hex, ARMY_ATTACK_TARGET_OCCUPIED, ARMY_HEX_INVALID);
     memset(m_gridState, IDX(GRID_SHADE_NONE), sizeof(m_gridState));
-    savedTargetSide = armyPtr->m_targetSide;
-    targetIndexSave = armyPtr->m_targetIndex;
+    oldSide = armyPtr->m_targetSide;
+    oldIndex = armyPtr->m_targetIndex;
     armyPtr->m_targetSide = COMBAT_SIDE_NONE;
     armyPtr->m_targetIndex = -1;
     gpSearchArray->SeedCombatPosition(armyPtr);
-    armyPtr->m_targetSide = savedTargetSide;
-    armyPtr->m_targetIndex = targetIndexSave;
+    armyPtr->m_targetSide = oldSide;
+    armyPtr->m_targetIndex = oldIndex;
 
-    for (hexIndex = 0; hexIndex < COMBAT_HEX_COUNT; hexIndex++) {
-        if (armyPtr->m_hex == hexIndex) {
-            m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
-        } else if (m_hexCells[hexIndex].m_pathReachable != 0) {
-            if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE) {
-                if (m_hexCells[hexIndex].m_occupantSide != armyPtr->m_side)
-                    m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
+    for (j = 0; j < COMBAT_HEX_COUNT; j++) {
+        if (j == armyPtr->m_hex) {
+            m_gridState[j] = GRID_SHADE_REACHABLE;
+        } else if (m_hexCells[j].m_pathReachable != 0) {
+            if (m_hexCells[j].m_occupantSide != COMBAT_SIDE_NONE) {
+                if (m_hexCells[j].m_occupantSide != armyPtr->m_side)
+                    m_gridState[j] = GRID_SHADE_REACHABLE;
             } else {
-                m_gridState[hexIndex] = GRID_SHADE_EMPTY_BLOCKED;
+                m_gridState[j] = GRID_SHADE_EMPTY_BLOCKED;
             }
-        } else if (m_hexCells[hexIndex].m_occupantSide != COMBAT_SIDE_NONE
-                   && m_hexCells[hexIndex].m_occupantSide != OppositeCombatSide(m_currentSide)
-                   && (attackMask & (1 << m_hexCells[hexIndex].m_occupantIndex)) != 0) {
-            m_gridState[hexIndex] = GRID_SHADE_REACHABLE;
+        } else if (m_hexCells[j].m_occupantSide != COMBAT_SIDE_NONE
+                   && m_hexCells[j].m_occupantSide != OppositeCombatSide(m_currentSide)
+                   && (attackMask & (1 << m_hexCells[j].m_occupantIndex)) != 0) {
+            m_gridState[j] = GRID_SHADE_REACHABLE;
         }
     }
 }

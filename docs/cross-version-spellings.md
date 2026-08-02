@@ -27,6 +27,10 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| widget::widget(void) store order | `m_id` first | `m_id` after `m_prev` | OPEN |
+| widget::widget(x,y,w,h,id,kind) store order | `m_id` after `m_zOrder` | `m_id` before `m_flags` | OPEN |
+| army::LeftX else-branch addends | `->w + ->x` | `->x + ->w` | OPEN |
+| combatManager::SetupGridForArmy locals + hex compare | `savedTargetSide/targetIndexSave/hexIndex`; `m_hex == hexIndex` | `oldSide/oldIndex/j`; `j == armyPtr->m_hex` | OPEN |
 | hero::DoSSLevelDialog local + icon-frame expr | `skillLevelText`; `skills[...] + skill * STRIDE - BASE` | `skillText`; `skill * STRIDE + skills[...] - BASE` | OPEN |
 | combatManager::EffectSpellCreateCreature locals + imul | `spellPowerValue/creatureType`; `fightValue * IDX(type)` | `spellPower/monType`; `IDX(monType) * fightValue` | OPEN |
 | combatManager::Main timers + FP factor + army decl | `KBTickCount() > glTimers[...]` (x2); `mod[speed] * DELAY`; `army* currentArmy` in bare block | `glTimers[...] < KBTickCount()`; `DELAY * mod[speed]`; `army* currentArmy;` hoisted to fn top (goto forbids initialized decl; hoist also moves it into the outer frame group - inner-block locals slot AFTER outer ones) | OPEN |
