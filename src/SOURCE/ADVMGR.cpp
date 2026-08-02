@@ -7371,9 +7371,9 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
         gpAdvManager->UpdateScreen(0, 0);
     }
 
-    i32 mouseX = message.payload.mouse.x;
-    i32 mouseY = message.payload.mouse.y;
-    i32 handled = 0;
+    i32 mouseX = message.payload.mouse.screenX;
+    i32 mouseY = message.payload.mouse.screenY;
+    i32 result = 0;
 
     switch (message.type) {
         case MESSAGE_WIDGET:
@@ -7386,7 +7386,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                                     MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                             } else {
                                 if (gpWindowManager->m_dialogResult == TRAVEL_DIALOG_ACCEPT) {
-                                    handled = 1;
+                                    result = 1;
                                 }
                             }
                             break;
@@ -7396,7 +7396,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
                     switch (message.payload.widget.id) {
                         case DIMENSION_DOOR_CLOSE_BUTTON:
                             gpWindowManager->m_dialogResult = 0;
-                            handled = 1;
+                            result = 1;
                             break;
                     }
                     break;
@@ -7404,7 +7404,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
             break;
 
         case MESSAGE_MOUSE_MOVE:
-            if (InMapArea(message.payload.mouse.x, message.payload.mouse.y)) {
+            if (InMapArea(message.payload.mouse.screenX, message.payload.mouse.screenY)) {
                 mouseX /= CELL_PIXELS;
                 mouseY /= CELL_PIXELS;
                 if (mouseX < 0) {
@@ -7445,7 +7445,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
             break;
     }
 
-    if (handled) {
+    if (result) {
         message.payload.widget.id = DIMENSION_DOOR_FIRST_BUTTON;
         message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
@@ -8981,44 +8981,44 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
 
 VA(0x0041283f, 0x16e)
 void advManager::CheckScreenScroll(void) {
-    i32 mouseX6;
-    i32 mouseY1;
-    i32 oldOriginX9;
-    i32 oldOriginY3;
+    i32 mouseX;
+    i32 mouseY;
+    i32 oldMapX;
+    i32 oldMapY;
 
     if (KBTickCount() - iLastScrollTime > SCROLL_TICK_INTERVAL) {
         iLastScrollTime = KBTickCount();
-        oldOriginX9 = m_mapOriginX;
-        oldOriginY3 = m_mapOriginY;
-        gpMouseManager->MouseCoords(mouseX6, mouseY1);
+        oldMapX = m_mapOriginX;
+        oldMapY = m_mapOriginY;
+        gpMouseManager->MouseCoords(mouseX, mouseY);
 
-        if (mouseX6 >= 0 && mouseX6 < SCREEN_WIDTH && mouseY1 >= 0 && mouseY1 < SCREEN_HEIGHT) {
-            if (mouseX6 < SCROLL_BORDER) {
-                if (mouseY1 < SCROLL_BORDER) {
+        if (mouseX >= 0 && mouseX < SCREEN_WIDTH && mouseY >= 0 && mouseY < SCREEN_HEIGHT) {
+            if (mouseX < SCROLL_BORDER) {
+                if (mouseY < SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_NORTH_WEST, 1);
-                } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
+                } else if (mouseY > SCREEN_HEIGHT - SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_SOUTH_WEST, 1);
                 } else {
                     ScreenScroll(MAP_DIRECTION_WEST, 1);
                 }
-            } else if (mouseX6 > SCREEN_WIDTH - SCROLL_BORDER - 1) {
-                if (mouseY1 < SCROLL_BORDER) {
+            } else if (mouseX > SCREEN_WIDTH - SCROLL_BORDER - 1) {
+                if (mouseY < SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_NORTH_EAST, 1);
-                } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
+                } else if (mouseY > SCREEN_HEIGHT - SCROLL_BORDER) {
                     ScreenScroll(MAP_DIRECTION_SOUTH_EAST, 1);
                 } else {
                     ScreenScroll(MAP_DIRECTION_EAST, 1);
                 }
-            } else if (mouseY1 < SCROLL_BORDER) {
+            } else if (mouseY < SCROLL_BORDER) {
                 ScreenScroll(MAP_DIRECTION_NORTH, 1);
-            } else if (mouseY1 > SCREEN_HEIGHT - SCROLL_BORDER) {
+            } else if (mouseY > SCREEN_HEIGHT - SCROLL_BORDER) {
                 ScreenScroll(MAP_DIRECTION_SOUTH, 1);
             }
         }
 
         if (gpMouseManager->m_cursorFrame >= HOVER_SCROLL_FRAME_FIRST
-            && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END && m_mapOriginX == oldOriginX9
-            && m_mapOriginY == oldOriginY3) {
+            && gpMouseManager->m_cursorFrame < HOVER_SCROLL_FRAME_END && oldMapX == m_mapOriginX
+            && oldMapY == m_mapOriginY) {
             gpMouseManager->SetPointer(POINTER_DEFAULT);
         }
     }

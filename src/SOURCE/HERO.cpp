@@ -393,17 +393,17 @@ void HeroMessageUpdate(char* text) {
 VA(0x0046148c, 0x94)
 void hero::HeroScreenUpdate(void) {
     tag_message message;
-    i32 index;
+    i32 i;
 
     message.type = HERO_UI_MESSAGE;
     UpdateArmies();
-    for (index = 0; index < UI_ARMY_SLOT_COUNT; index++) {
-        if (index == giHeroScreenSrcIndex)
+    for (i = 0; i < UI_ARMY_SLOT_COUNT; i++) {
+        if (giHeroScreenSrcIndex == i)
             message.payload.widget.command = HERO_UI_WIDGET_ENABLE;
         else
             message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
         message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
-        message.payload.widget.id = index + UI_ARMY_SELECTOR_FIRST;
+        message.payload.widget.id = i + UI_ARMY_SELECTOR_FIRST;
         heroWin->BroadcastMessage(message);
     }
     heroWin->DrawWindow();
