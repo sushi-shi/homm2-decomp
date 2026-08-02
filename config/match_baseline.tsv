@@ -205,7 +205,7 @@ BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	57.6406	3a298
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	42.1706	e5d2e9ad5bfc.0bcb0c3934d6
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	47.3000	da6459d822f9
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	81.0000	6526d7380ee7
-BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	98.2143	ade0db454008
+BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	99.8469	fe17b28dd7fb
 BASE/MOUSEMGR	?HideColorPointer@mouseManager@@QAEXXZ	100.0000	2e70d2ea078a
 BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	c81273b66a87
 BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	3158a37d4d26
@@ -573,7 +573,7 @@ SOURCE/ARMY	?CancelSpellType@army@@QAEXH@Z	100.0000	606c72a29312
 SOURCE/ARMY	?CheckLuck@army@@QAEXXZ	92.6691	553163d51407
 SOURCE/ARMY	?Cure@army@@QAEXH@Z	100.0000	9c50d5c0f889
 SOURCE/ARMY	?Damage@army@@QAEHJH@Z	99.2030	1602165622e2
-SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	95.6282	4fe59bec3063
+SOURCE/ARMY	?DamageEnemy@army@@QAEXPAV1@PAH1HH@Z	96.1090	4fe59bec3063
 SOURCE/ARMY	?DecrementSpellRounds@army@@QAEXXZ	100.0000	0fbe32264bbb
 SOURCE/ARMY	?DirDoAttack@army@@QAEXH@Z	100.0000	a3ece3634504
 SOURCE/ARMY	?DispelGood@army@@QAEXXZ	100.0000	3a031f40e8e1
@@ -645,7 +645,7 @@ SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	94.6000	d42f9ecde611
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	96.0251	e044f8ae0ec9
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.7419	84c639eab96a
 SOURCE/CMBTMGR	?LowerDoor@combatManager@@QAEXXZ	81.1081	b72bb8277b43
-SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	96.0565	9b66ae2af5f4
+SOURCE/CMBTMGR	?MakeCreaturesVanish@combatManager@@QAEXXZ	96.2203	9b66ae2af5f4
 SOURCE/CMBTMGR	?MoreTreesNear@combatManager@@QAEHXZ	70.4545	b3888d01463e
 SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	93.2403	cf01b59ea429
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	85.9400	df0db247faba
@@ -1351,12 +1351,12 @@ SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	98.0000	ffe74a903e6f
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.7226	03dd826b92ea
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	97.5073	5b0db971cfd1
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4c07c527f13e
-SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	84.4615	69c1c67161ac
-SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	97.5390	a1d0980b895f
+SOURCE/Wsnetwin	?wsProcessMessages@@YIXXZ	84.7180	69c1c67161ac
+SOURCE/Wsnetwin	?wsSendMessage@@YIXHEGPAX@Z	97.7163	a1d0980b895f
 SOURCE/Wsnetwin	?wsWaitForExtraGuests@@YIHXZ	100.0000	b7535f7d92a1
 SOURCE/Wsnetwin	?wsWaitForFirstGuest@@YIHXZ	100.0000	9f1ce7ca9d9f
 SOURCE/Wsnetwin	?wsWaitForHost@@YIHXZ	98.9254	bc450ac02d0d
-SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	99.5014	19726c485cba
+SOURCE/Wsnetwin	?wsnet_init@@YIFXZ	99.7103	19726c485cba
 SOURCE/Wsnetwin	?wsnet_rcv@@YIFFGPAX@Z	100.0000	1d78cd27ce67
 SOURCE/Wsnetwin	?wsnet_snd@@YIHHHPAX@Z	100.0000	87e6cf249d61
 SOURCE/Wsnetwin	?wsnet_term@@YIXXZ	100.0000	3186af533c03
