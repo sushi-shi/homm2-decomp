@@ -151,7 +151,7 @@ BASE/EXEC	?MainLoop@executive@@QAEXXZ	22.6018	e69c460d8f2a
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	65.3585	bb6925048c62
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	31.7000	7a5a0a411c47
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	53.5818	0f3a8231b9d2
-BASE/EXEC	?Terminate@executive@@QAEXXZ	8.8889	ff92b5edaa80
+BASE/EXEC	?Terminate@executive@@QAEXXZ	8.8889	954f5a9ba0c3
 BASE/FONT	??0font@@QAE@K@Z	80.8644	a335f165fa1c
 BASE/FONT	??_Dfont@@QAEXXZ	0.0000	065137566962
 BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	25.1235	fa3e3b393065
@@ -160,6 +160,7 @@ BASE/FONT	?DrawStringExecute@font@@IAEXPADHHHHHHH@Z	83.1390	65cec13e9d9e
 BASE/FONT	?GetCharacterWidth@font@@QAEHE@Z	36.9000	1cd069044cf8
 BASE/FONT	?LineLength@font@@QAEHPADH@Z	0.0000	e890b048e2e2
 BASE/FONT	?LineWidth@font@@QAEHPAD@Z	73.8571	01207ce3c74c
+BASE/FONT	?RemapCyrillicCharacter@@YIHH@Z	0.0000	0ac695a260ea
 BASE/ICON	??0icon@@QAE@K@Z	43.3269	19a20ad34ee9
 BASE/ICON	??_Dicon@@QAEXXZ	0.0000	4490aecd7f1f
 BASE/ICON	?ClipFillToBuffer@icon@@QAEXHHHHHHHHH@Z	61.3214	28e05171c91b
@@ -175,7 +176,7 @@ BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	36.2727	90952e73e03b
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	0.0000	29263972126d
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	58.6957	34143d361c89
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	40.7812	6fa049274693
-BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	0.0000	be4781ce79c1
+BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	0.0000	3778fb95dda6
 BASE/INPUTMGR	?CheckChangeCursor@@YIXHHH@Z	23.9828	4974dc6c89a9
 BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	27.5263	5014d577da07.5e877b076c9a
 BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	24.4545	c3ac6ef06625.5e877b076c9a
@@ -189,6 +190,7 @@ BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	15.8947	18dd0830ebaa.5e877b076c9a
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	31.1034	68dc42638fb3
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	28.8333	0e64864541d3.5e877b076c9a
 BASE/INPUTMGR	?SetMouseCoords@inputManager@@QAEXHH@Z	14.2857	0ab6f4fa2618
+BASE/INPUTMGR	?TranslatePolishInputCharacter@@YIXAAUtag_message@@@Z	32.6667	88c50c2f8fa3
 BASE/Icon2b	?IconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	28.1611	40bc2a7446cc.02e5f0cc8453
 BASE/Icond2b	?DimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	32.8725	21648188e49e
 BASE/Icondf2b	?FlipDimIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	29.0522	6846fbd6a838.8980c23345e5
@@ -238,6 +240,7 @@ BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	25.3716	81efe106ce06
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	47.0833	8e1bd50148cc
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	25.8827	7da6faaa30d0.076d7b63a6f7
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	17.5338	4d12edf05295
+BASE/Misc	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	38.6757	63336774890a
 BASE/Misc	?FadeIn@@YIXH@Z	30.1488	401b36815bd1
 BASE/Misc	?FadeOut@@YIXH@Z	26.0080	ca57aedf183b
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	27.9369	b633015bd26c.6cc274dabc50
@@ -275,6 +278,8 @@ BASE/Misc	?ShowMemoryStatus@@YIXXZ	0.0000	783abdf1886e
 BASE/Misc	?WritePrefs@@YIXXZ	23.3333	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	64.6333	52e0c0a59c33
 BASE/Misc	?WritePrefsToRegistry@@YIXXZ	0.0000	0a80596aa4f2
+BASE/MusicFlags	?GetMusicFlagA@@YIEXZ	99.8000	555c0a51d82f
+BASE/MusicFlags	?MusicFlagsActive@@YIEXZ	99.8889	e6a90b40e0dd
 BASE/PALETTE	??0palette@@QAE@K@Z	40.6744	56d2c4d962db
 BASE/PALETTE	??0palette@@QAE@XZ	39.3750	9e788aff2273
 BASE/PALETTE	??_Dpalette@@QAEXXZ	0.0000	b41c22c6b12c

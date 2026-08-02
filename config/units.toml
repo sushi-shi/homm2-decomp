@@ -138,6 +138,10 @@ source = "src/BASE/MOUSEMGR.cpp"
 flags = "o2"
 
 [[unit]]
+unit = "BASE/MusicFlags"
+source = "src/BASE/MusicFlags.cpp"
+
+[[unit]]
 unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
 flags = "o2"
