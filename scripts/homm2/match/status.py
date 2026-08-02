@@ -409,10 +409,31 @@ def _md_table(headers, aligns, rows):
     return [row(headers), "| " + " | ".join(sep) + " |", *(row(r) for r in rows)]
 
 
+# Identification modules: functions carved out of the reconstruction-target
+# universe because they are generated or library code, not independent
+# matching targets. "(unmatched)" is NOT here - unclaimed reconstruction
+# targets stay in the denominator.
+CARVE_OUTS = {
+    "(libcmt)": "FID-identified static runtime (config/crt_functions.csv)",
+    "(imports)": "import thunks (config/import_thunks.csv)",
+    "(funclets)": "compiler /GX EH; match with their parent function",
+    "(compgen)": "compiler-generated bodies awaiting an owner unit",
+}
+
+
+def split_carve_outs(data):
+    """(target_units, carved_units) - identification modules leave the score."""
+    targets, carved = [], []
+    for unit in data.get("units", []):
+        (carved if unit.get("name") in CARVE_OUTS else targets).append(unit)
+    return targets, carved
+
+
 def readme_block(data, maxima):
     """Render live and current-source-hash-best per-tier comparison metrics."""
+    target_units, carved_units = split_carve_outs(data)
     tiers = {}
-    for u in data.get("units", []):
+    for u in target_units:
         tier = u.get("name", "?").split("/")[0]
         m = u.get("measures", {}) or {}
         unit_name = u.get("name", "?")
@@ -471,8 +492,23 @@ def readme_block(data, maxima):
            "effective-source hash. "
            "Maxima are historical navigation data, not correctness proof or enforcement._", "",
            *_md_table(["Module", "Units", "Functions exact", "Functions exact-max", "Fuzzy",
-                       "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows),
-           "", RM_END]
+                       "Fuzzy-max", "Data exact", "Data bytes"], "lrrrrrrr", rows)]
+    if carved_units:
+        carved_rows = []
+        for unit in sorted(carved_units, key=lambda u: u.get("name", "")):
+            measures = unit.get("measures", {}) or {}
+            carved_rows.append([
+                f"`{unit.get('name')}`",
+                str(_i(measures.get("total_functions"))),
+                f"{_i(measures.get('total_code')):,}",
+                CARVE_OUTS[unit.get("name")],
+            ])
+        out += ["",
+                "_Excluded from the % above — identified generated/library "
+                "code, not independent reconstruction targets:_", "",
+                *_md_table(["Module", "Functions", "Code (B)", "Why excluded"],
+                           "lrrl", carved_rows)]
+    out += ["", RM_END]
     return "\n".join(out)
 
 
@@ -504,43 +540,57 @@ def main(argv=None, data=None):
         print("[status] refreshed README.md match block")
         return 0
     maxima = current_maxima()
-    started = sorted((u for u in data["units"] if unit_pct(u) > 0 and
+    target_units, carved_units = split_carve_outs(data)
+    started = sorted((u for u in target_units if unit_pct(u) > 0 and
                       _i((u.get("measures", {}) or {}).get("total_functions"))), key=unit_pct, reverse=True)
     if started:
         print("[status] highest objdiff matched-code byte percentages by unit:")
     for u in started[:25]:
         print(f"  {unit_pct(u):6.2f}%  {u.get('name')}")
-    measures = data.get("measures", {}) or {}
-    matched_code_percent = float(measures.get("matched_code_percent", 0) or 0)
-    fuzzy_match_percent = float(measures.get("fuzzy_match_percent", 0) or 0)
-    matched_data = _i(measures.get("matched_data"))
-    total_data = _i(measures.get("total_data"))
-    data_percent = float(measures.get("matched_data_percent", 0) or 0)
-    matched_functions = _i(measures.get("matched_functions"))
-    total_functions = _i(measures.get("total_functions"))
+
+    def _sum(units, key):
+        return sum(_i((u.get("measures", {}) or {}).get(key)) for u in units)
+
+    matched_code = _sum(target_units, "matched_code")
+    total_code = _sum(target_units, "total_code")
+    matched_code_percent = 100 * matched_code / total_code if total_code else 0
+    fuzzy_match_percent = (sum(
+        float((u.get("measures", {}) or {}).get("fuzzy_match_percent") or 0)
+        * _i((u.get("measures", {}) or {}).get("total_code"))
+        for u in target_units) / total_code if total_code else 0)
+    matched_data = _sum(target_units, "matched_data")
+    total_data = _sum(target_units, "total_data")
+    data_percent = 100 * matched_data / total_data if total_data else 100.0
+    matched_functions = _sum(target_units, "matched_functions")
+    total_functions = _sum(target_units, "total_functions")
     exact_max = sum(
         maxima.get((unit.get("name", "?"), function.get("name", "?")),
                    (float(function.get("fuzzy_match_percent") or 0.0), None))[0]
         >= EXACT_MATCH_PERCENT
-        for unit in data.get("units", [])
+        for unit in target_units
         for function in (unit.get("functions", []) or []))
     fuzzy_max_numerator = sum(
         _i(function.get("size")) * maxima.get(
             (unit.get("name", "?"), function.get("name", "?")),
             (float(function.get("fuzzy_match_percent") or 0.0), None))[0]
-        for unit in data.get("units", [])
+        for unit in target_units
         for function in (unit.get("functions", []) or []))
     fuzzy_max_denominator = sum(
         _i(function.get("size"))
-        for unit in data.get("units", [])
+        for unit in target_units
         for function in (unit.get("functions", []) or []))
     fuzzy_max = (fuzzy_max_numerator / fuzzy_max_denominator
                  if fuzzy_max_denominator else 0.0)
-    print(f"[status] units: {len(data['units'])}  with-progress: {len(started)}  "
+    carved_functions = _sum(carved_units, "total_functions")
+    print(f"[status] units: {len(target_units)}  with-progress: {len(started)}  "
           f"matched-code-bytes: {matched_code_percent:.2f}%  "
           f"fuzzy: {fuzzy_match_percent:.2f}%  "
           f"functions-exact: {matched_functions}/{total_functions}  "
           f"functions-exact-max: {exact_max}/{total_functions}  "
           f"fuzzy-max: {fuzzy_max:.2f}%  "
           f"data: {matched_data}/{total_data} ({data_percent:.3f}%)")
+    if carved_units:
+        print(f"[status] identified carve-outs: {carved_functions} functions in "
+              f"{len(carved_units)} modules "
+              f"({', '.join(sorted(u.get('name', '?') for u in carved_units))})")
     return 0
