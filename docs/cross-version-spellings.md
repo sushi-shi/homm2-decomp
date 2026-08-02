@@ -61,13 +61,14 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | Random head compare | `low == high` | `high == low` | OPEN |
 | netwin done-callbacks compare | `&gNbSessNcb[i] == ncb` | `ncb == &gNbSessNcb[i]` | OPEN |
 | townObject::Draw frame sum | `m_animationFrame + baseFrame + 1` | `baseFrame + m_animationFrame + 1` | OPEN |
-| TransferArtifacts non-transferable bound | `<= ARTIFACT_ULTIMATE_WAND` (recheck 2.0 bytes) | `<= ARTIFACT_GOLDEN_GOOSE` | OPEN - may be a 2.0 reconstruction slip rather than a dev change |
 | Relational/commutative mirror class (AddWidget, DeleteItem, SetSpellInfluence, DrawWindow, GetNthSpell, recruitUnit::Open, wsWaitForHost, game::Scan, Random, netwin callbacks, townObject::Draw) | PoL-order spellings | mirrored operand order, byte-pinned per fn | OPEN as a class |
 
 ## Resolved
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| ValidHex bound (125 vs <117) | **dev-change** | PoL ledger banks ValidHex 100.0000 with `<= 125`; this image compares `< 117` |
+| TransferArtifacts bound (WAND vs GOOSE) | **dev-change** | PoL ledger banks TransferArtifacts 100.0000 with `<= WAND(3)`; this image compares `<= 7` |
 | InsertSound loopCount 0 vs 1 | **dev-change** | both values byte-pinned (PoL 2.0 = 0, Buka = 1); ledgered |
 | InsertSound bounds guard | **dev-change (or 2.0 recheck)** | retail 2.1 swaps the axes (x vs HEIGHT); verify what 2.0's bytes compare before classifying further |
 | In-code UI strings (29 literals) + SExecutiveText | **dev-change (Buka)** | retail CP1251 content differs from 2.0's English; ledgered in version-changes.md |
