@@ -1231,9 +1231,8 @@ void game::DoKnob(void) {
                 if (static_cast<float>(message9.payload.mouse.y) < scrollTop11) {
                     message9.payload.mouse.y = static_cast<i32>(scrollTop11);
                 }
-                if (scrollRange13 + scrollTop11
-                        - IDX(SCROLL_LAST_PIXEL_ADJUST)
-                    < static_cast<float>(message9.payload.mouse.y)) {
+                if (static_cast<float>(message9.payload.mouse.y)
+                    > scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)) {
                     message9.payload.mouse.y = static_cast<i32>(
                         scrollRange13 + scrollTop11 - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     );

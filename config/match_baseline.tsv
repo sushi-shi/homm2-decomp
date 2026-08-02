@@ -847,7 +847,7 @@ SOURCE/GAME	?LoadMap@game@@QAEHPAD@Z	99.8408	668c13d571f1
 SOURCE/GAME	?MakeAllWaterVisible@game@@QAEXH@Z	81.8448	82c8b5727d5e
 SOURCE/GAME	?MineTypesOwned@game@@QAEHHH@Z	100.0000	8295dae196bd
 SOURCE/GAME	?NewMap@game@@QAEXPAD@Z	92.7615	7091923e1c83
-SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	97.1410	be4b3b4a74df
+SOURCE/GAME	?NextHero@playerData@@QAEHH@Z	100.0000	7aa5ceb9f4f5
 SOURCE/GAME	?NextPlayer@game@@QAEXXZ	96.4464	7bdae7a9d6c7
 SOURCE/GAME	?NumOfGivenArtifact@playerData@@QAEHH@Z	99.7500	85d5ea94aa74
 SOURCE/GAME	?PerDay@game@@QAEXXZ	95.6381	dcd059b3d5b2
@@ -1060,7 +1060,7 @@ SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	100.0000	292209677ba8
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	9ec3ce96d04f
 SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	93.8276	7b6e64804977
 SOURCE/Newgame	?UpdateNewGameWindow@game@@QAEXXZ	87.7647	d846bc8e6dd8
-SOURCE/Overview	?DoKnob@game@@QAEXXZ	98.2056	2898273f808a
+SOURCE/Overview	?DoKnob@game@@QAEXXZ	99.6778	6c280b769dc8
 SOURCE/Overview	?Overview@game@@QAEXXZ	97.1612	ba198771c0c7
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	73.4231	c2afaaaebb48
 SOURCE/Overview	?ProcessIconSelect@game@@QAEHHH@Z	93.3935	a7e90793648b
@@ -1124,7 +1124,7 @@ SOURCE/PHILAI	?FightValueOfStack@philAI@@QAEHPAVarmyGroup@@PAVhero@@HHHH@Z	93.80
 SOURCE/PHILAI	?FutureDeflator@philAI@@QAEMQAH@Z	100.0000	6cd6cede4987
 SOURCE/PHILAI	?GetBestBHC@philAI@@QAEXHAAUBHC@@@Z	94.3253	8a104df6c779
 SOURCE/PHILAI	?GetBestBuilding@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z	99.7944	b0a9b39e3ffa
-SOURCE/PHILAI	?GetBestCreature@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z	99.3529	60640c21f1cf
+SOURCE/PHILAI	?GetBestCreature@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z	99.7195	3afcc3630b92
 SOURCE/PHILAI	?GetBestHero@philAI@@QAEXPAVtown@@AAUBHC@@AAM@Z	93.5000	7fc7ba7e9e6b
 SOURCE/PHILAI	?GetGameAIVars@philAI@@QAEXXZ	100.0000	957280be97b2
 SOURCE/PHILAI	?GetGameAttentionValue@philAI@@QAEXH@Z	85.2874	4a644dd02e8e

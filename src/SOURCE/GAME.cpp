@@ -748,21 +748,21 @@ void playerData::Read(i32 file) {
 
 VA(0x0044c457, 0xff)
 i32 playerData::NextHero(i32) {
-    i32 current = -1;
+    i32 curHero = -1;
     i32 i;
 
     if (gpCurPlayer->m_currentHero != -1) {
         for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
-            if (gpCurPlayer->m_heroIds[i] == gpCurPlayer->m_currentHero)
-                current = i;
+            if (gpCurPlayer->m_currentHero == gpCurPlayer->m_heroIds[i])
+                curHero = i;
         }
     }
 
-    for (i = current + 1; i < gpCurPlayer->m_heroCount; i++) {
+    for (i = curHero + 1; i < gpCurPlayer->m_heroCount; i++) {
         if (gpGame->IsMobile(gpCurPlayer->m_heroIds[i]))
             return m_heroIds[i];
     }
-    for (i = 0; i < current + 1; i++) {
+    for (i = 0; i < curHero + 1; i++) {
         if (gpGame->IsMobile(gpCurPlayer->m_heroIds[i]))
             return m_heroIds[i];
     }
