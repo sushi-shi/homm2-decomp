@@ -103,7 +103,7 @@ BASE/Bzip	?getAndMoveToFrontDecode@@YIHPAUBitStream@@@Z	100.0000	16288adf5859
 BASE/Bzip	?getFinalCRC@@YIIXZ	100.0000	f78f583164ab
 BASE/Bzip	?getGlobalCRC@@YIIXZ	100.0000	21ab45a10076
 BASE/Bzip	?getInt32@@YIHPAUBitStream@@@Z	100.0000	dc192389c57a
-BASE/Bzip	?getMTFVal@@YIHPAUBitStream@@@Z	99.9367	d13c3b28bcdd
+BASE/Bzip	?getMTFVal@@YIHPAUBitStream@@@Z	100.0000	d13c3b28bcdd
 BASE/Bzip	?getRLEpair@@YIHPAU_iobuf@@@Z	99.8876	ed9ee6e5c13f
 BASE/Bzip	?getSymbol@@YIHPAUModel@@PAUBitStream@@@Z	100.0000	21453c2e1752
 BASE/Bzip	?getUChar@@YIEPAUBitStream@@@Z	100.0000	1cd47cd85fdd
@@ -130,7 +130,7 @@ BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	f0c48d771bb2
 BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	6e97a740e2f6
 BASE/Bzip	?shellTrivial@@YIXXZ	100.0000	78273e158f0b
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	c178c8ce00b9
-BASE/Bzip	?sortIt@@YIXXZ	99.9742	4f22ec5d910e
+BASE/Bzip	?sortIt@@YIXXZ	100.0000	4f22ec5d910e
 BASE/Bzip	?spotBlock@@YIXH@Z	99.7732	f078a8eaee2c
 BASE/Bzip	?stripe@@YIXXZ	100.0000	9e1b328c6673
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000	a5528a24065d
@@ -668,7 +668,7 @@ SOURCE/COMMAND	?CheckSetMouseDirection@combatManager@@QAEXHHH@Z	96.1122	ea5f34da
 SOURCE/COMMAND	?CheckWin@combatManager@@QAEHPAUtag_message@@@Z	95.2845	31224d1daf0b
 SOURCE/COMMAND	?ClearWinLoseBottom@combatManager@@QAEXPAVheroWindow@@@Z	100.0000	17300f01036d
 SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	93.5901	7420cc84dc8f
-SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9005	20326dd3c3c6
+SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	99.9254	20326dd3c3c6
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	98.6937	274e540bbbb9
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	91.2783	4623dc79702f
 SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.3907	d00799f5fb50
@@ -716,10 +716,10 @@ SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	87.4047	c123ae70ee3e
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	92.6191	6788270a16ae
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	71.0000	d77a6b184852
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	89.4427	b7d533df0775
-SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	99.9672	32df4ef318ee
+SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	32df4ef318ee
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	98.5422	e9641788703e
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
-SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	99.9482	7b252f8765d3
+SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	7b252f8765d3
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	95.9928	e51cbcdc6a03
 SOURCE/Castle	?CastleHandler@@YIHAAUtag_message@@@Z	22.3413	8f45dd97f0b7
 SOURCE/Castle	?SetupCastle@townManager@@QAEXPAVheroWindow@@H@Z	97.1687	3dc06eacb7a1
