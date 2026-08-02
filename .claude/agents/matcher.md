@@ -200,6 +200,12 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 
 ## Source-writing doctrine (same spirit as a /O2 decomp)
 
+- **Version-delta ledger is part of the close.** If the function you match
+  differs semantically from the PoL 2.0 body (logic, fields, signature,
+  removed/added behavior), add or update its entry in
+  `docs/version-changes.md` in the same change. Classify [2.1] vs [Buka] by
+  diffing against the Gold 2.1 GOG binary where it matters; otherwise mark
+  [unclassified].
 - Treat a proven sibling as a structural reference for its function family.
   Align semantic phases, joins, cursor/counter ownership, and narrow inline
   helper boundaries before pursuing local byte steering. Preserve explicit
