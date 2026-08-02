@@ -9476,12 +9476,12 @@ void ComputeAdvNetControl(void) {
         return;
     }
     {
-        i32 selectedPlayer = -1;
+        i32 selected = -1;
         i32 player;
-        i32 currentPlayer;
+        i32 myPlayer;
         if (gpGame->m_playerDead[giCurPlayer]) {
             player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
-            while (giCurPlayer != player) {
+            while (player != giCurPlayer) {
                 if (!gpGame->m_playerDead[player] && gbHumanPlayer[player]) {
                     gbThisNetGotAdventureControl = gbThisNetHumanPlayer[player];
                     return;
@@ -9490,13 +9490,13 @@ void ComputeAdvNetControl(void) {
         }
 
         player = (giCurPlayer + 1) % GAME_PLAYER_COUNT;
-        while (giCurPlayer != player) {
+        while (player != giCurPlayer) {
             player = (player + 1) % GAME_PLAYER_COUNT;
             if (!gpGame->m_playerDead[player] && gbHumanPlayer[player]) {
-                selectedPlayer = player;
+                selected = player;
             }
         }
-        gbThisNetGotAdventureControl = gbThisNetHumanPlayer[selectedPlayer];
+        gbThisNetGotAdventureControl = gbThisNetHumanPlayer[selected];
     }
 }
 
@@ -10538,19 +10538,19 @@ showVision:
 
 VA(0x004158e9, 0xc2)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
-    i32 heroIndex;
+    i32 i;
     hero* crystalHero;
-    i32 range;
-    for (heroIndex = 0; heroIndex < gpCurPlayer->m_heroCount; ++heroIndex) {
-        crystalHero = &gpGame->m_heroRecs[gpCurPlayer->m_heroIds[heroIndex]];
+    i32 distance;
+    for (i = 0; i < gpCurPlayer->m_heroCount; ++i) {
+        crystalHero = &gpGame->m_heroRecs[gpCurPlayer->m_heroIds[i]];
         if (crystalHero->HasArtifact(ARTIFACT_CRYSTAL_BALL)) {
-            range = static_cast<i32>(sqrt(
+            distance = static_cast<i32>(sqrt(
                 static_cast<double>(
-                    (crystalHero->m_y - y) * (crystalHero->m_y - y)
-                    + (crystalHero->m_x - x) * (crystalHero->m_x - x)
+                    (crystalHero->m_x - x) * (crystalHero->m_x - x)
+                    + (crystalHero->m_y - y) * (crystalHero->m_y - y)
                 )
             ));
-            if (range <= radius) {
+            if (distance <= radius) {
                 return 1;
             }
         }

@@ -31,6 +31,10 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | iconWidget::iconWidget(void) store order | `frame, fillColor, icon, orientation, iconId` | `icon, frame, fillColor, orientation, iconId` | OPEN |
 | resourceManager::PointToFile locals | `isFound/entryIndex/aggregateIndex/ignoredPosition` | `found/entry/i/position` | OPEN - 2.0 names read PoL-invented |
 | resourceManager::GetFileSize locals | `isFound/entryIndex/matchedAggregate/fileIndex` | `found/entry/matched/i` | OPEN |
+| ComputeAdvNetControl locals + while compares | `selectedPlayer/player/currentPlayer(dead)`; `giCurPlayer != player` | `selected/player/myPlayer(dead)`; `player != giCurPlayer` (x2) | OPEN |
+| resourceManager::GetBackdropAtLoc locals + loop bound | `backdropIcon/dataWidth/imageHeight/row`; `row < imageHeight + destinationY` | `width`/`curRow` renames; `curRow < destinationY + imageHeight` | OPEN |
+| hero::GetLevel local + while compare | `increment`; `experience < experienceValue` | `growth`; `experienceValue > experience` | OPEN |
+| advManager::IsCrystalBallInEffect locals + distance terms | `heroIndex/range`; `(m_y-y)^2 + (m_x-x)^2` | `i/distance`; `(m_x-x)^2 + (m_y-y)^2` | OPEN |
 | GetMonType threshold compares | `table[...] >= score`; `table[...] <= score` | `score <= table[...]`; `score >= table[...]` | OPEN |
 | philAI::NetValueOfArtifact addend order | `a4 * cost[a3] + a2 * cost[GOLD]` | `a2 * cost[GOLD] + a4 * cost[a3]` | OPEN |
 | hero::HeroScreenUpdate | `index`; `index == giHeroScreenSrcIndex` | `i`; `giHeroScreenSrcIndex == i` | OPEN |
