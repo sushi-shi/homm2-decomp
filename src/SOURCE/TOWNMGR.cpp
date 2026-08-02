@@ -45,241 +45,242 @@
 
 namespace {
 
-H2_ENUM_BEGIN(TownManagerInputCode)
-    CONTROL_PREVIOUS_TOWN = 0x387,
-    CONTROL_NEXT_TOWN     = 0x388,
-    CONTROL_CLOSE         = 0x7800,
-    DIALOG_BUILD_BOAT     = 0x7802,
-    DIALOG_BUY_SPELL_BOOK = 0x7805
-H2_ENUM_END(TownManagerInputCode)
+    H2_ENUM_BEGIN(TownManagerInputCode)
+        CONTROL_PREVIOUS_TOWN = 0x387,
+        CONTROL_NEXT_TOWN = 0x388,
+        CONTROL_CLOSE = 0x7800,
+        DIALOG_BUILD_BOAT = 0x7802,
+        DIALOG_BUY_SPELL_BOOK = 0x7805
+    H2_ENUM_END(TownManagerInputCode)
 
-H2_ENUM_CLASS_BEGIN(TownManagerWidgetId)
-    TOWN_WIDGET_NONE                          = TOWN_WIDGET_ID_NONE,
-    TOWN_WIDGET_BUILDING_MAGE_GUILD           = IDX(TOWN_OBJECT_MAGE_GUILD),
-    TOWN_WIDGET_BUILDING_THIEVES_GUILD        = IDX(TOWN_OBJECT_THIEVES_GUILD),
-    TOWN_WIDGET_BUILDING_TAVERN               = IDX(TOWN_OBJECT_TAVERN),
-    TOWN_WIDGET_BUILDING_DOCK                 = IDX(TOWN_OBJECT_DOCK),
-    TOWN_WIDGET_BUILDING_WELL                 = IDX(TOWN_OBJECT_WELL),
-    TOWN_WIDGET_BUILDING_TENT                 = IDX(TOWN_OBJECT_TENT),
-    TOWN_WIDGET_BUILDING_CASTLE_UPGRADE       = IDX(TOWN_OBJECT_CASTLE_UPGRADE),
-    TOWN_WIDGET_BUILDING_CASTLE               = IDX(TOWN_OBJECT_CASTLE),
-    TOWN_WIDGET_BUILDING_STATUE               = IDX(TOWN_OBJECT_STATUE),
-    TOWN_WIDGET_BUILDING_LEFT_TURRET          = IDX(TOWN_OBJECT_LEFT_TURRET),
-    TOWN_WIDGET_BUILDING_RIGHT_TURRET         = IDX(TOWN_OBJECT_RIGHT_TURRET),
-    TOWN_WIDGET_BUILDING_MARKETPLACE          = IDX(TOWN_OBJECT_MARKETPLACE),
-    TOWN_WIDGET_BUILDING_SECOND_WELL          = IDX(TOWN_OBJECT_SECOND_WELL),
-    TOWN_WIDGET_BUILDING_MOAT                 = IDX(TOWN_OBJECT_MOAT),
-    TOWN_WIDGET_BUILDING_SPECIAL              = IDX(TOWN_OBJECT_SPECIAL_BUILDING),
-    TOWN_WIDGET_BUILDING_BOAT                 = IDX(TOWN_OBJECT_BOAT),
-    TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS     = IDX(TOWN_OBJECT_CAPTAIN_QUARTERS),
-    TOWN_WIDGET_BUILDING_DWELLING_1           = IDX(TOWN_OBJECT_DWELLING_1),
-    TOWN_WIDGET_BUILDING_DWELLING_2           = IDX(TOWN_OBJECT_DWELLING_2),
-    TOWN_WIDGET_BUILDING_DWELLING_3           = IDX(TOWN_OBJECT_DWELLING_3),
-    TOWN_WIDGET_BUILDING_DWELLING_4           = IDX(TOWN_OBJECT_DWELLING_4),
-    TOWN_WIDGET_BUILDING_DWELLING_5           = IDX(TOWN_OBJECT_DWELLING_5),
-    TOWN_WIDGET_BUILDING_DWELLING_6           = IDX(TOWN_OBJECT_DWELLING_6),
-    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_2  = IDX(TOWN_OBJECT_UPGRADED_DWELLING_2),
-    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_3  = IDX(TOWN_OBJECT_UPGRADED_DWELLING_3),
-    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_4  = IDX(TOWN_OBJECT_UPGRADED_DWELLING_4),
-    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5  = IDX(TOWN_OBJECT_UPGRADED_DWELLING_5),
-    TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6  = IDX(TOWN_OBJECT_UPGRADED_DWELLING_6),
-    TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6 = IDX(TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6),
-    TOWN_WIDGET_GARRISON_FIRST                = TOWN_GARRISON_SLOT_FIRST,
-    TOWN_WIDGET_GARRISON_LAST                 = TOWN_GARRISON_SLOT_LAST,
-    TOWN_WIDGET_HERO_CONTROL                  = TOWN_HERO_FIRST_CONTROL,
-    TOWN_WIDGET_HERO_FIRST                    = TOWN_HERO_SLOT_FIRST,
-    TOWN_WIDGET_HERO_LAST                     = TOWN_HERO_SLOT_LAST,
-    TOWN_WIDGET_EMPTY_FIRST                   = TOWN_EMPTY_STATUS_CONTROL_FIRST,
-    TOWN_WIDGET_EMPTY_LAST                    = TOWN_EMPTY_STATUS_CONTROL_LAST,
-    TOWN_WIDGET_CLOSE                         = CONTROL_CLOSE
-H2_ENUM_CLASS_END(TownManagerWidgetId)
-H2_ENUM_STEPPED(TownManagerWidgetId)
+    H2_ENUM_CLASS_BEGIN(TownManagerWidgetId)
+        TOWN_WIDGET_NONE = TOWN_WIDGET_ID_NONE,
+        TOWN_WIDGET_BUILDING_MAGE_GUILD = IDX(TOWN_OBJECT_MAGE_GUILD),
+        TOWN_WIDGET_BUILDING_THIEVES_GUILD = IDX(TOWN_OBJECT_THIEVES_GUILD),
+        TOWN_WIDGET_BUILDING_TAVERN = IDX(TOWN_OBJECT_TAVERN),
+        TOWN_WIDGET_BUILDING_DOCK = IDX(TOWN_OBJECT_DOCK),
+        TOWN_WIDGET_BUILDING_WELL = IDX(TOWN_OBJECT_WELL),
+        TOWN_WIDGET_BUILDING_TENT = IDX(TOWN_OBJECT_TENT),
+        TOWN_WIDGET_BUILDING_CASTLE_UPGRADE = IDX(TOWN_OBJECT_CASTLE_UPGRADE),
+        TOWN_WIDGET_BUILDING_CASTLE = IDX(TOWN_OBJECT_CASTLE),
+        TOWN_WIDGET_BUILDING_STATUE = IDX(TOWN_OBJECT_STATUE),
+        TOWN_WIDGET_BUILDING_LEFT_TURRET = IDX(TOWN_OBJECT_LEFT_TURRET),
+        TOWN_WIDGET_BUILDING_RIGHT_TURRET = IDX(TOWN_OBJECT_RIGHT_TURRET),
+        TOWN_WIDGET_BUILDING_MARKETPLACE = IDX(TOWN_OBJECT_MARKETPLACE),
+        TOWN_WIDGET_BUILDING_SECOND_WELL = IDX(TOWN_OBJECT_SECOND_WELL),
+        TOWN_WIDGET_BUILDING_MOAT = IDX(TOWN_OBJECT_MOAT),
+        TOWN_WIDGET_BUILDING_SPECIAL = IDX(TOWN_OBJECT_SPECIAL_BUILDING),
+        TOWN_WIDGET_BUILDING_BOAT = IDX(TOWN_OBJECT_BOAT),
+        TOWN_WIDGET_BUILDING_CAPTAIN_QUARTERS = IDX(TOWN_OBJECT_CAPTAIN_QUARTERS),
+        TOWN_WIDGET_BUILDING_DWELLING_1 = IDX(TOWN_OBJECT_DWELLING_1),
+        TOWN_WIDGET_BUILDING_DWELLING_2 = IDX(TOWN_OBJECT_DWELLING_2),
+        TOWN_WIDGET_BUILDING_DWELLING_3 = IDX(TOWN_OBJECT_DWELLING_3),
+        TOWN_WIDGET_BUILDING_DWELLING_4 = IDX(TOWN_OBJECT_DWELLING_4),
+        TOWN_WIDGET_BUILDING_DWELLING_5 = IDX(TOWN_OBJECT_DWELLING_5),
+        TOWN_WIDGET_BUILDING_DWELLING_6 = IDX(TOWN_OBJECT_DWELLING_6),
+        TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_2 = IDX(TOWN_OBJECT_UPGRADED_DWELLING_2),
+        TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_3 = IDX(TOWN_OBJECT_UPGRADED_DWELLING_3),
+        TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_4 = IDX(TOWN_OBJECT_UPGRADED_DWELLING_4),
+        TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_5 = IDX(TOWN_OBJECT_UPGRADED_DWELLING_5),
+        TOWN_WIDGET_BUILDING_UPGRADED_DWELLING_6 = IDX(TOWN_OBJECT_UPGRADED_DWELLING_6),
+        TOWN_WIDGET_BUILDING_ALTERNATE_DWELLING_6 = IDX(TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6),
+        TOWN_WIDGET_GARRISON_FIRST = TOWN_GARRISON_SLOT_FIRST,
+        TOWN_WIDGET_GARRISON_LAST = TOWN_GARRISON_SLOT_LAST,
+        TOWN_WIDGET_HERO_CONTROL = TOWN_HERO_FIRST_CONTROL,
+        TOWN_WIDGET_HERO_FIRST = TOWN_HERO_SLOT_FIRST,
+        TOWN_WIDGET_HERO_LAST = TOWN_HERO_SLOT_LAST,
+        TOWN_WIDGET_EMPTY_FIRST = TOWN_EMPTY_STATUS_CONTROL_FIRST,
+        TOWN_WIDGET_EMPTY_LAST = TOWN_EMPTY_STATUS_CONTROL_LAST,
+        TOWN_WIDGET_CLOSE = CONTROL_CLOSE
+    H2_ENUM_CLASS_END(TownManagerWidgetId)
+    H2_ENUM_STEPPED(TownManagerWidgetId)
 
-H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
-    RENDER_KNIGHT_LEFT_GATE           = 0x4,
-    RENDER_KNIGHT_LEFT_FIRST_OPTION   = 0x1,
-    RENDER_KNIGHT_LEFT_SECOND_OPTION  = 0x1000000,
-    RENDER_KNIGHT_LEFT_THIRD_OPTION   = 0x20000000,
-    RENDER_KNIGHT_RIGHT_GATE          = 0x1,
-    RENDER_KNIGHT_RIGHT_FIRST_OPTION  = 0x1000000,
-    RENDER_KNIGHT_RIGHT_SECOND_OPTION = 0x20000000,
-    RENDER_BARBARIAN_RIGHT_GATE       = 0x1,
-    RENDER_BARBARIAN_RIGHT_OPTION     = 0x2000,
-    RENDER_BARBARIAN_OVERLAY_GATE     = 0x2,
-    RENDER_BARBARIAN_OVERLAY_OPTION   = 0x200000,
-    RENDER_SORCERESS_LEFT_GATE        = 0x80,
-    RENDER_SORCERESS_LEFT_OPTION      = 0x800,
-    RENDER_RACE_OVERLAY_FIRST_OPTION  = 0x4000,
-    RENDER_RACE_OVERLAY_SECOND_OPTION = 0x8,
-    RENDER_DOCK_GATE                  = 0x4000
-H2_ENUM_CLASS_END(TownObjectRenderMask)
+    H2_ENUM_CLASS_BEGIN(TownObjectRenderMask)
+        RENDER_KNIGHT_LEFT_GATE = 0x4,
+        RENDER_KNIGHT_LEFT_FIRST_OPTION = 0x1,
+        RENDER_KNIGHT_LEFT_SECOND_OPTION = 0x1000000,
+        RENDER_KNIGHT_LEFT_THIRD_OPTION = 0x20000000,
+        RENDER_KNIGHT_RIGHT_GATE = 0x1,
+        RENDER_KNIGHT_RIGHT_FIRST_OPTION = 0x1000000,
+        RENDER_KNIGHT_RIGHT_SECOND_OPTION = 0x20000000,
+        RENDER_BARBARIAN_RIGHT_GATE = 0x1,
+        RENDER_BARBARIAN_RIGHT_OPTION = 0x2000,
+        RENDER_BARBARIAN_OVERLAY_GATE = 0x2,
+        RENDER_BARBARIAN_OVERLAY_OPTION = 0x200000,
+        RENDER_SORCERESS_LEFT_GATE = 0x80,
+        RENDER_SORCERESS_LEFT_OPTION = 0x800,
+        RENDER_RACE_OVERLAY_FIRST_OPTION = 0x4000,
+        RENDER_RACE_OVERLAY_SECOND_OPTION = 0x8,
+        RENDER_DOCK_GATE = 0x4000
+    H2_ENUM_CLASS_END(TownObjectRenderMask)
 
-H2_ENUM_CLASS_BEGIN(TownCommandTextId)
-    TEXT_REDISTRIBUTE_ARMY          = 0,
-    TEXT_CANNOT_COMBINE_LAST_ARMY   = 1,
-    TEXT_COMBINE_ARMIES             = 2,
-    TEXT_REDISTRIBUTE_TO_EMPTY_SLOT = 3,
-    TEXT_VIEW_ARMY                  = 4,
-    TEXT_CANNOT_MOVE_LAST_ARMY      = 5,
-    TEXT_MOVE_ARMY                  = 6,
-    TEXT_EXCHANGE_ARMIES            = 7,
-    TEXT_EXIT                       = 8,
-    TEXT_EMPTY_STATUS               = 9,
-    TEXT_KINGDOM_OVERVIEW           = 10,
-    TEXT_EMPTY_SLOT                 = 11,
-    TEXT_SELECT_ARMY                = 12,
-    TEXT_VIEW_HERO                  = 13,
-    TEXT_MAGE_GUILD                 = 14,
-    TEXT_THIEVES_GUILD              = 15,
-    TEXT_TAVERN                     = 16,
-    TEXT_DOCK                       = 17,
-    TEXT_WELL                       = 18,
-    TEXT_TENT                       = 19,
-    TEXT_CASTLE                     = 20,
-    TEXT_RECRUIT                    = 21,
-    TEXT_STATUE                     = 22,
-    TEXT_LEFT_TURRET                = 23,
-    TEXT_RIGHT_TURRET               = 24,
-    TEXT_MOAT                       = 25,
-    TEXT_MARKETPLACE                = 26,
-    TEXT_CAPTAIN_QUARTERS           = 27
-H2_ENUM_CLASS_END(TownCommandTextId)
+    H2_ENUM_CLASS_BEGIN(TownCommandTextId)
+        TEXT_REDISTRIBUTE_ARMY = 0,
+        TEXT_CANNOT_COMBINE_LAST_ARMY = 1,
+        TEXT_COMBINE_ARMIES = 2,
+        TEXT_REDISTRIBUTE_TO_EMPTY_SLOT = 3,
+        TEXT_VIEW_ARMY = 4,
+        TEXT_CANNOT_MOVE_LAST_ARMY = 5,
+        TEXT_MOVE_ARMY = 6,
+        TEXT_EXCHANGE_ARMIES = 7,
+        TEXT_EXIT = 8,
+        TEXT_EMPTY_STATUS = 9,
+        TEXT_KINGDOM_OVERVIEW = 10,
+        TEXT_EMPTY_SLOT = 11,
+        TEXT_SELECT_ARMY = 12,
+        TEXT_VIEW_HERO = 13,
+        TEXT_MAGE_GUILD = 14,
+        TEXT_THIEVES_GUILD = 15,
+        TEXT_TAVERN = 16,
+        TEXT_DOCK = 17,
+        TEXT_WELL = 18,
+        TEXT_TENT = 19,
+        TEXT_CASTLE = 20,
+        TEXT_RECRUIT = 21,
+        TEXT_STATUE = 22,
+        TEXT_LEFT_TURRET = 23,
+        TEXT_RIGHT_TURRET = 24,
+        TEXT_MOAT = 25,
+        TEXT_MARKETPLACE = 26,
+        TEXT_CAPTAIN_QUARTERS = 27
+    H2_ENUM_CLASS_END(TownCommandTextId)
 
-H2_ENUM_CLASS_BEGIN(TownDialogResult)
-    DIALOG_CANCEL_ID = 0x7801
-H2_ENUM_CLASS_END(TownDialogResult)
+    H2_ENUM_CLASS_BEGIN(TownDialogResult)
+        DIALOG_CANCEL_ID = 0x7801
+    H2_ENUM_CLASS_END(TownDialogResult)
 
-H2_ENUM_CLASS_BEGIN(TownPortraitIcon)
-    TOWN_PORTRAIT_ICON_BASE = 90
-H2_ENUM_CLASS_END(TownPortraitIcon)
+    H2_ENUM_CLASS_BEGIN(TownPortraitIcon)
+        TOWN_PORTRAIT_ICON_BASE = 90
+    H2_ENUM_CLASS_END(TownPortraitIcon)
 
-H2_ENUM_BEGIN(TownAnimationConstant)
-    NECROMANCER_BUILD_STATE_FRAME_STRIDE = 6,
-    CREST_PORTRAITS_PER_COLOR            = 4
-H2_ENUM_END(TownAnimationConstant)
+    H2_ENUM_BEGIN(TownAnimationConstant)
+        NECROMANCER_BUILD_STATE_FRAME_STRIDE = 6,
+        CREST_PORTRAITS_PER_COLOR = 4
+    H2_ENUM_END(TownAnimationConstant)
 
-H2_ENUM_BEGIN(TownMainConstant)
-    BUILDING_DESCRIPTION_CAPACITY    = 400,
-    TOWN_VIEW_FIZZLE_WIDTH           = 552,
-    TOWN_VIEW_FIZZLE_HEIGHT          = 204,
-    BUILDING_DIALOG_ICON_FRAME_BASE  = 19,
-    MAGE_GUILD_WINDOW_TEXT_ID        = 17,
-    THIEVES_GUILD_WINDOW_TEXT_ID     = 14,
-    SMALL_DIALOG_WINDOW_X            = 177,
-    SMALL_DIALOG_WINDOW_Y            = 20,
-    SHIP_WINDOW_TEXT_ID              = 12,
-    BOAT_LIMIT_DIALOG_X              = 208,
-    BOAT_LIMIT_DIALOG_Y              = 40,
-    MARKETPLACE_EFFICIENCY_MAX_INDEX = KB_TRADING_POST_EFFICIENCY_COUNT - 1,
-    TOWN_REDRAW_FIRST_CONTROL        = 136,
-    TOWN_REDRAW_LAST_CONTROL         = 137,
-    TOWN_VIEWPORT_HEIGHT             = TOWN_GARRISON_STRIP_Y
-H2_ENUM_END(TownMainConstant)
+    H2_ENUM_BEGIN(TownMainConstant)
+        BUILDING_DESCRIPTION_CAPACITY = 400,
+        TOWN_VIEW_FIZZLE_WIDTH = 552,
+        TOWN_VIEW_FIZZLE_HEIGHT = 204,
+        BUILDING_DIALOG_ICON_FRAME_BASE = 19,
+        MAGE_GUILD_WINDOW_TEXT_ID = 17,
+        THIEVES_GUILD_WINDOW_TEXT_ID = 14,
+        SMALL_DIALOG_WINDOW_X = 177,
+        SMALL_DIALOG_WINDOW_Y = 20,
+        SHIP_WINDOW_TEXT_ID = 12,
+        BOAT_LIMIT_DIALOG_X = 208,
+        BOAT_LIMIT_DIALOG_Y = 40,
+        MARKETPLACE_EFFICIENCY_MAX_INDEX = KB_TRADING_POST_EFFICIENCY_COUNT - 1,
+        TOWN_REDRAW_FIRST_CONTROL = 136,
+        TOWN_REDRAW_LAST_CONTROL = 137,
+        TOWN_VIEWPORT_HEIGHT = TOWN_GARRISON_STRIP_Y
+    H2_ENUM_END(TownMainConstant)
 
-H2_ENUM_BEGIN(TownSplitConstant)
-    SPLIT_SETUP_AMOUNT_CONTROL = 4
-H2_ENUM_END(TownSplitConstant)
+    H2_ENUM_BEGIN(TownSplitConstant)
+        SPLIT_SETUP_AMOUNT_CONTROL = 4
+    H2_ENUM_END(TownSplitConstant)
 
-H2_ENUM_BEGIN(BuildDialogConstant)
-    BUILD_RESOURCE_STORAGE_COUNT            = TOWN_RESOURCE_COUNT + 1,
-    BUILD_ROW_RESOURCE_CAPACITY             = 4,
-    BUILD_DESCRIPTION_WIDTH                 = 240,
-    BUILD_WINDOW_BASE_Y                     = 151,
-    BUILD_TEXT_LINE_SHIFT                   = 4,
-    BUILD_SINGLE_RESOURCE_ROW_HEIGHT        = 44,
-    BUILD_DOUBLE_RESOURCE_ROW_HEIGHT        = 88,
-    BUILD_BUTTON_AREA_HEIGHT                = 39,
-    BUILD_WINDOW_ROW_BASE_HEIGHT            = 69,
-    BUILD_WINDOW_ROW_HEIGHT                 = 45,
-    BUILD_WINDOW_MIN_ROWS                   = 3,
-    BUILD_WINDOW_MAX_ROWS                   = 6,
-    BUILD_WINDOW_X                          = 158,
-    BUILD_WINDOW_Y                          = 16,
-    BUILD_ICON_CONTROL                      = 2,
-    BUILD_NAME_CONTROL                      = 3,
-    BUILD_DESCRIPTION_X                     = 43,
-    BUILD_DESCRIPTION_Y_OFFSET              = 24,
-    BUILD_RESOURCE_ROW_COUNT                = 2,
-    BUILD_RESOURCE_ROW_HEIGHT               = 44,
-    BUILD_TEXT_LINE_HEIGHT                  = 16,
-    BUILD_RESOURCE_FIRST_Y_OFFSET           = 12,
-    BUILD_RESOURCE_AREA_WIDTH               = 256,
-    BUILD_RESOURCE_AREA_LEFT                = 32,
-    BUILD_AMOUNT_Y_OFFSET                   = 35,
-    BUILD_RESOURCE_WIDGET_HEIGHT            = 12,
-    BUILD_AMOUNT_TEXT_CAPACITY              = 10,
-    NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL = 2
-H2_ENUM_END(BuildDialogConstant)
+    H2_ENUM_BEGIN(BuildDialogConstant)
+        BUILD_RESOURCE_STORAGE_COUNT = TOWN_RESOURCE_COUNT + 1,
+        BUILD_ROW_RESOURCE_CAPACITY = 4,
+        BUILD_DESCRIPTION_WIDTH = 240,
+        BUILD_WINDOW_BASE_Y = 151,
+        BUILD_TEXT_LINE_SHIFT = 4,
+        BUILD_SINGLE_RESOURCE_ROW_HEIGHT = 44,
+        BUILD_DOUBLE_RESOURCE_ROW_HEIGHT = 88,
+        BUILD_BUTTON_AREA_HEIGHT = 39,
+        BUILD_WINDOW_ROW_BASE_HEIGHT = 69,
+        BUILD_WINDOW_ROW_HEIGHT = 45,
+        BUILD_WINDOW_MIN_ROWS = 3,
+        BUILD_WINDOW_MAX_ROWS = 6,
+        BUILD_WINDOW_X = 158,
+        BUILD_WINDOW_Y = 16,
+        BUILD_ICON_CONTROL = 2,
+        BUILD_NAME_CONTROL = 3,
+        BUILD_DESCRIPTION_X = 43,
+        BUILD_DESCRIPTION_Y_OFFSET = 24,
+        BUILD_RESOURCE_ROW_COUNT = 2,
+        BUILD_RESOURCE_ROW_HEIGHT = 44,
+        BUILD_TEXT_LINE_HEIGHT = 16,
+        BUILD_RESOURCE_FIRST_Y_OFFSET = 12,
+        BUILD_RESOURCE_AREA_WIDTH = 256,
+        BUILD_RESOURCE_AREA_LEFT = 32,
+        BUILD_AMOUNT_Y_OFFSET = 35,
+        BUILD_RESOURCE_WIDGET_HEIGHT = 12,
+        BUILD_AMOUNT_TEXT_CAPACITY = 10,
+        NECROMANCER_PREREQUISITE_MAX_MAGE_LEVEL = 2
+    H2_ENUM_END(BuildDialogConstant)
 
-H2_ENUM_BEGIN(MageGuildConstant)
-    MAGE_SPELL_NAME_WIDTH = 74
-H2_ENUM_END(MageGuildConstant)
+    H2_ENUM_BEGIN(MageGuildConstant)
+        MAGE_SPELL_NAME_WIDTH = 74
+    H2_ENUM_END(MageGuildConstant)
 
-H2_ENUM_BEGIN(RecruitDialogConstant)
-    RECRUIT_WINDOW_X            = 177,
-    RECRUIT_WINDOW_Y            = 16,
-    RECRUIT_WINDOW_TEXT_ID      = 20,
-    RECRUIT_DESCRIPTION_CONTROL = 1,
-    RECRUIT_PORTRAIT_CONTROL    = 2,
-    RECRUIT_BUTTON_TEXT_CONTROL = 8,
-    RECRUIT_BUTTON_ICON_CONTROL = 9,
-    HEROES_PER_FACTION          = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
-    TAVERN_WINDOW_X             = 162,
-    TAVERN_WINDOW_Y             = 10,
-    TAVERN_WINDOW_TEXT_ID       = 22,
-    TAVERN_ANIMATION_CONTROL    = 2
-H2_ENUM_END(RecruitDialogConstant)
+    H2_ENUM_BEGIN(RecruitDialogConstant)
+        RECRUIT_WINDOW_X = 177,
+        RECRUIT_WINDOW_Y = 16,
+        RECRUIT_WINDOW_TEXT_ID = 20,
+        RECRUIT_DESCRIPTION_CONTROL = 1,
+        RECRUIT_PORTRAIT_CONTROL = 2,
+        RECRUIT_BUTTON_TEXT_CONTROL = 8,
+        RECRUIT_BUTTON_ICON_CONTROL = 9,
+        HEROES_PER_FACTION = IDX(GAME_HERO_COUNT) / IDX(FACTION_COUNT),
+        TAVERN_WINDOW_X = 162,
+        TAVERN_WINDOW_Y = 10,
+        TAVERN_WINDOW_TEXT_ID = 22,
+        TAVERN_ANIMATION_CONTROL = 2
+    H2_ENUM_END(RecruitDialogConstant)
 
-H2_ENUM_BEGIN(WellConstant)
-    WELL_DWELLING_TYPE_STORAGE_COUNT = 8,
-    WELL_DETAIL_TEXT_CAPACITY        = 40,
-    WELL_ALTERNATE_UPGRADE_INDEX     = TOWN_WELL_DWELLING_COUNT * 2 - 1
-H2_ENUM_END(WellConstant)
+    H2_ENUM_BEGIN(WellConstant)
+        WELL_DWELLING_TYPE_STORAGE_COUNT = 8,
+        WELL_DETAIL_TEXT_CAPACITY = 40,
+        WELL_ALTERNATE_UPGRADE_INDEX = TOWN_WELL_DWELLING_COUNT * 2 - 1
+    H2_ENUM_END(WellConstant)
 
-H2_ENUM_BEGIN(WellDetailText)
-    WELL_DETAIL_ATTACK     = 0,
-    WELL_DETAIL_DEFENSE    = 1,
-    WELL_DETAIL_DAMAGE     = 3,
-    WELL_DETAIL_HIT_POINTS = 4,
-    WELL_DETAIL_SPEED      = 7,
-    WELL_DETAIL_GROWTH     = 8
-H2_ENUM_END(WellDetailText)
+    H2_ENUM_BEGIN(WellDetailText)
+        WELL_DETAIL_ATTACK = 0,
+        WELL_DETAIL_DEFENSE = 1,
+        WELL_DETAIL_DAMAGE = 3,
+        WELL_DETAIL_HIT_POINTS = 4,
+        WELL_DETAIL_SPEED = 7,
+        WELL_DETAIL_GROWTH = 8
+    H2_ENUM_END(WellDetailText)
 
-H2_ENUM_BEGIN(ThievesGuildConstant)
-    THIEVES_STAT_TEXT_CAPACITY    = 200,
-    THIEVES_PLAYER_COLUMN_WIDTH   = 68,
-    THIEVES_RANK_FIRST_X          = 258,
-    THIEVES_TIE_CENTERING_STEP    = 9,
-    THIEVES_RANK_ICON_WIDTH       = 18,
-    THIEVES_CATEGORY_ROW_HEIGHT   = 24,
-    THIEVES_FIRST_CATEGORY_Y      = 27,
-    THIEVES_RANK_ICON_HEIGHT      = 22,
-    THIEVES_HERO_Y                = 300,
-    THIEVES_PRIMARY_STATS_Y       = 339,
-    THIEVES_PERSONALITY_Y         = 397,
-    THIEVES_CREATURE_Y            = 418,
-    THIEVES_HERO_LOCATOR_X        = 246,
-    THIEVES_HERO_LOCATOR_Y        = 301,
-    THIEVES_HERO_LOCATOR_FRAME    = 22,
-    THIEVES_HERO_PORTRAIT_X       = 237,
-    THIEVES_PRIMARY_LABEL_X       = 239,
-    THIEVES_PRIMARY_LABEL_WIDTH   = 40,
-    THIEVES_PRIMARY_VALUE_X       = 284,
-    THIEVES_PRIMARY_VALUE_WIDTH   = 15,
-    THIEVES_PRIMARY_WIDGET_HEIGHT = 48,
-    THIEVES_PERSONALITY_X         = 227,
-    THIEVES_PERSONALITY_WIDTH     = 74,
-    THIEVES_PERSONALITY_HEIGHT    = 16,
-    THIEVES_CREATURE_X            = 244,
-    THIEVES_CREATURE_WIDTH        = 40,
-    THIEVES_CREATURE_HEIGHT       = 34
-H2_ENUM_END(ThievesGuildConstant)
+    H2_ENUM_BEGIN(ThievesGuildConstant)
+        THIEVES_STAT_TEXT_CAPACITY = 200,
+        THIEVES_PLAYER_COLUMN_WIDTH = 68,
+        THIEVES_RANK_FIRST_X = 258,
+        THIEVES_TIE_CENTERING_STEP = 9,
+        THIEVES_RANK_ICON_WIDTH = 18,
+        THIEVES_CATEGORY_ROW_HEIGHT = 24,
+        THIEVES_FIRST_CATEGORY_Y = 27,
+        THIEVES_RANK_ICON_HEIGHT = 22,
+        THIEVES_HERO_Y = 300,
+        THIEVES_PRIMARY_STATS_Y = 339,
+        THIEVES_PERSONALITY_Y = 397,
+        THIEVES_CREATURE_Y = 418,
+        THIEVES_HERO_LOCATOR_X = 246,
+        THIEVES_HERO_LOCATOR_Y = 301,
+        THIEVES_HERO_LOCATOR_FRAME = 22,
+        THIEVES_HERO_PORTRAIT_X = 237,
+        THIEVES_PRIMARY_LABEL_X = 239,
+        THIEVES_PRIMARY_LABEL_WIDTH = 40,
+        THIEVES_PRIMARY_VALUE_X = 284,
+        THIEVES_PRIMARY_VALUE_WIDTH = 15,
+        THIEVES_PRIMARY_WIDGET_HEIGHT = 48,
+        THIEVES_PERSONALITY_X = 227,
+        THIEVES_PERSONALITY_WIDTH = 74,
+        THIEVES_PERSONALITY_HEIGHT = 16,
+        THIEVES_CREATURE_X = 244,
+        THIEVES_CREATURE_WIDTH = 40,
+        THIEVES_CREATURE_HEIGHT = 34
+    H2_ENUM_END(ThievesGuildConstant)
 
-}
+} // namespace
 
-
-static const H2_ENUM_STORAGE(BuildingSlotType, i8)
-    gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
+static const H2_ENUM_STORAGE(
+    BuildingSlotType,
+    i8
+) gTownObjectOrder[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     {TOWN_OBJECT_SECOND_WELL,
      TOWN_OBJECT_CASTLE_UPGRADE,
      TOWN_OBJECT_CASTLE,
@@ -475,71 +476,61 @@ static const H2_ENUM_STORAGE(BuildingSlotType, i8)
 };
 
 SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
-    {
-     {0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
+    {{0, 397, 46, 84, 138},  {5, 0, 130, 53, 63},    {5, 345, 114, 83, 62},  {5, 531, 214, 113, 42},
      {0, 188, 214, 39, 42},  {0, 69, 108, 67, 55},   {5, 0, 49, 286, 116},   {0, 478, 193, 46, 63},
      {5, 7, 33, 0, 0},       {5, 134, 37, 0, 0},     {0, 219, 138, 120, 30}, {0, 286, 102, 88, 22},
      {0, 0, 146, 311, 30},   {0, 0, 78, 251, 22},    {9, 531, 211, 113, 45}, {0, 293, 107, 59, 35},
      {5, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {5, 192, 163, 69, 52},
      {0, 135, 149, 73, 32},  {5, 240, 166, 91, 66},  {0, 323, 174, 102, 69}, {7, 48, 176, 104, 80},
      {0, 445, 50, 195, 157}, {0, 135, 149, 73, 32},  {5, 240, 166, 91, 66},  {0, 323, 174, 102, 69},
-     {7, 48, 176, 104, 80},  {0, 445, 50, 195, 157}, {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
-    },
-    {
-     {8, 346, 22, 54, 120},  {0, 466, 94, 87, 47},  {0, 0, 161, 136, 85},   {5, 505, 199, 138, 56},
+     {7, 48, 176, 104, 80},  {0, 445, 50, 195, 157}, {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}},
+    {{8, 346, 22, 54, 120},  {0, 466, 94, 87, 47},  {0, 0, 161, 136, 85},   {5, 505, 199, 138, 56},
      {0, 268, 189, 50, 66},  {0, 44, 109, 87, 52},  {6, 0, 0, 214, 175},    {0, 463, 154, 38, 81},
      {0, 10, 58, 0, 0},      {0, 118, 45, 0, 0},    {0, 217, 166, 67, 43},  {0, 240, 106, 73, 34},
      {5, 115, 138, 182, 42}, {0, 210, 80, 197, 61}, {9, 505, 199, 138, 56}, {5, 206, 99, 46, 42},
      {5, 0, 0, 0, 0},        {5, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 290, 138, 58, 45},
      {0, 145, 195, 76, 52},  {0, 557, 48, 83, 83},  {5, 496, 136, 138, 64}, {5, 318, 174, 131, 54},
      {5, 407, 0, 113, 106},  {0, 145, 195, 76, 52}, {0, 0, 0, 0, 0},        {5, 496, 136, 138, 64},
-     {5, 318, 174, 131, 54}, {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
-    },
-    {
-     {0, 279, 0, 63, 168},  {5, 423, 167, 87, 50}, {5, 490, 141, 148, 91}, {5, 0, 208, 178, 48},
+     {5, 318, 174, 131, 54}, {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}},
+    {{0, 279, 0, 63, 168},  {5, 423, 167, 87, 50}, {5, 490, 141, 148, 91}, {5, 0, 208, 178, 48},
      {0, 335, 205, 45, 29}, {0, 104, 130, 59, 42}, {5, 0, 0, 201, 179},    {0, 152, 163, 28, 65},
      {0, 98, 99, 0, 0},     {0, 151, 98, 0, 0},    {0, 404, 122, 69, 45},  {5, 131, 185, 71, 53},
      {0, 0, 171, 272, 23},  {0, 152, 0, 236, 84},  {9, 0, 208, 178, 48},   {5, 223, 122, 37, 52},
      {5, 0, 0, 0, 0},       {5, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {5, 472, 59, 111, 92},
      {5, 338, 146, 93, 61}, {0, 51, 164, 106, 40}, {0, 198, 178, 143, 71}, {0, 263, 226, 296, 30},
      {0, 179, 0, 84, 119},  {5, 338, 146, 93, 61}, {0, 51, 164, 106, 40},  {0, 198, 178, 143, 71},
-     {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
-    },
-    {
-     {0, 586, 18, 54, 150},  {0, 520, 103, 64, 54}, {0, 476, 96, 82, 55},   {5, 517, 200, 123, 56},
+     {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}},
+    {{0, 586, 18, 54, 150},  {0, 520, 103, 64, 54}, {0, 476, 96, 82, 55},   {5, 517, 200, 123, 56},
      {0, 342, 205, 67, 51},  {0, 298, 135, 72, 31}, {5, 241, 18, 181, 150}, {0, 478, 161, 37, 63},
      {0, 311, 84, 0, 0},     {0, 359, 83, 0, 0},    {0, 386, 171, 71, 40},  {6, 60, 32, 63, 186},
      {5, 211, 166, 301, 21}, {0, 0, 160, 59, 96},   {9, 517, 200, 123, 56}, {5, 418, 83, 53, 84},
      {5, 0, 0, 0, 0},        {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {6, 0, 64, 48, 50},
      {0, 237, 168, 78, 87},  {0, 492, 50, 53, 39},  {0, 139, 163, 190, 83}, {0, 82, 92, 178, 68},
      {0, 92, 0, 64, 257},    {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {0, 139, 163, 190, 83},
-     {0, 0, 0, 0, 0},        {0, 92, 0, 64, 257},   {0, 92, 0, 64, 257},    {0, 0, 0, 0, 0}
-    },
-    {
-     {0, 570, 0, 70, 126},  {5, 505, 50, 51, 49},  {6, 0, 149, 118, 76},   {5, 0, 206, 206, 50},
+     {0, 0, 0, 0, 0},        {0, 92, 0, 64, 257},   {0, 92, 0, 64, 257},    {0, 0, 0, 0, 0}},
+    {{0, 570, 0, 70, 126},  {5, 505, 50, 51, 49},  {6, 0, 149, 118, 76},   {5, 0, 206, 206, 50},
      {0, 249, 139, 28, 33}, {0, 58, 60, 49, 42},   {5, 0, 0, 200, 99},     {0, 464, 45, 24, 72},
      {0, 30, 17, 0, 0},     {0, 128, 17, 0, 0},    {0, 255, 163, 108, 53}, {0, 237, 208, 137, 49},
      {0, 0, 90, 223, 14},   {0, 297, 95, 109, 78}, {9, 0, 206, 206, 50},   {0, 210, 52, 28, 35},
      {5, 0, 0, 0, 0},       {0, 0, 0, 0, 0},       {0, 0, 0, 0, 0},        {5, 467, 181, 38, 30},
      {0, 231, 68, 192, 36}, {5, 152, 130, 96, 60}, {0, 593, 184, 51, 31},  {0, 411, 0, 49, 167},
      {0, 160, 0, 178, 67},  {0, 0, 0, 0, 0},       {5, 152, 130, 96, 60},  {0, 0, 0, 0, 0},
-     {0, 411, 0, 49, 167},  {0, 160, 0, 178, 67},  {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
-    },
-    {
-     {5, 557, 17, 85, 191},  {0, 275, 124, 62, 77},  {0, 455, 39, 51, 103},  {5, 500, 220, 141, 36},
+     {0, 411, 0, 49, 167},  {0, 160, 0, 178, 67},  {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}},
+    {{5, 557, 17, 85, 191},  {0, 275, 124, 62, 77},  {0, 455, 39, 51, 103},  {5, 500, 220, 141, 36},
      {0, 215, 213, 29, 41},  {0, 333, 115, 47, 70},  {5, 289, 10, 134, 164}, {0, 365, 154, 41, 93},
      {0, 330, 47, 0, 0},     {0, 360, 46, 0, 0},     {0, 412, 193, 98, 61},  {6, 263, 181, 90, 65},
      {0, 258, 171, 193, 19}, {0, 0, 0, 640, 63},     {9, 500, 220, 141, 36}, {0, 441, 77, 22, 99},
      {5, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {0, 396, 177, 71, 35},
      {0, 110, 174, 141, 45}, {5, 0, 28, 241, 142},   {0, 20, 107, 124, 129}, {0, 221, 127, 66, 84},
      {6, 464, 72, 105, 124}, {0, 110, 174, 141, 45}, {5, 0, 28, 241, 142},   {0, 0, 107, 144, 129},
-     {0, 223, 45, 65, 166},  {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}
-    }
+     {0, 223, 45, 65, 166},  {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0},        {0, 0, 0, 0, 0}}
 };
 
 VA(0x004a4740, 0x18d)
 townObject::townObject(
-    FactionType townType, H2_ENUM_PARAM(BuildingSlotType, i32) buildingId, char* iconBaseName
+    FactionType townType,
+    H2_ENUM_PARAM(BuildingSlotType, i32) buildingId,
+    char* iconBaseName
 ) {
     char fileName[TOWN_OBJECT_FILENAME_SIZE];
     i32 x;
@@ -597,20 +588,14 @@ void townObject::Draw(i32 advanceAnimation) {
         && gpTownManager->m_town->m_type == FACTION_KNIGHT
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_GATE))
             || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_FIRST_OPTION))
-                && !(
-                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_SECOND_OPTION)
-                )
-                && !(
-                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_THIRD_OPTION)
-                ))))
+                && !(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_SECOND_OPTION))
+                && !(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_LEFT_THIRD_OPTION)))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_KNIGHT
         && (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_GATE))
             || (!(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_FIRST_OPTION))
-                && !(
-                    gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_SECOND_OPTION)
-                ))))
+                && !(gpTownManager->m_town->m_buildings & IDX(RENDER_KNIGHT_RIGHT_SECOND_OPTION)))))
         return;
     if (m_buildingId == TOWN_OBJECT_KNIGHT_RIGHT_OVERLAY
         && gpTownManager->m_town->m_type == FACTION_BARBARIAN
@@ -647,8 +632,8 @@ void townObject::Draw(i32 advanceAnimation) {
 
     if (m_buildingId == TOWN_OBJECT_PRIMARY_ANIMATION) {
         if (gpTownManager->m_town->m_type == FACTION_NECROMANCER) {
-            baseFrame = NECROMANCER_BUILD_STATE_FRAME_STRIDE
-                        * (gpTownManager->m_town->m_buildState - 1);
+            baseFrame =
+                NECROMANCER_BUILD_STATE_FRAME_STRIDE * (gpTownManager->m_town->m_buildState - 1);
         } else {
             baseFrame = gpTownManager->m_town->m_buildState - 1;
         }
@@ -825,8 +810,7 @@ void townManager::SetupTown(void) {
                     MemError();
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & BIT(buildId))) {
-                        m_townObjects[m_townObjectCount]->m_border->m_flags &=
-                            ~WIDGET_FLAG_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_border->m_flags &= ~WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
                     }
                     m_townWindow->AddWidget(
@@ -841,17 +825,15 @@ void townManager::SetupTown(void) {
     } else {
         m_townObjectCount = 0;
         for (index = 0; index < TOWN_BUILDING_COUNT; ++index) {
-            H2_ENUM_STORAGE(BuildingSlotType, i32) existingObjectId =
-                gTownObjectOrder[IDX(m_town->m_type)][index];
+            H2_ENUM_STORAGE(BuildingSlotType, i32)
+            existingObjectId = gTownObjectOrder[IDX(m_town->m_type)][index];
             if (existingObjectId != TOWN_OBJECT_NONE) {
                 if (m_townObjects[m_townObjectCount]->m_border != NULL) {
                     if (!(m_town->m_buildings & BIT(existingObjectId))) {
-                        m_townObjects[m_townObjectCount]->m_border->m_flags &=
-                            ~WIDGET_FLAG_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_border->m_flags &= ~WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 0;
                     } else {
-                        m_townObjects[m_townObjectCount]->m_border->m_flags |=
-                            WIDGET_FLAG_ENABLED;
+                        m_townObjects[m_townObjectCount]->m_border->m_flags |= WIDGET_FLAG_ENABLED;
                         m_townObjects[m_townObjectCount]->m_visible = 1;
                     }
                 }
@@ -891,11 +873,7 @@ void townManager::SetupTown(void) {
         MemError();
 
     if (m_town->m_occupyingHeroId != TOWN_OCCUPYING_HERO_NONE) {
-        sprintf(
-            gText,
-            "port%04d.icn",
-            IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait)
-        );
+        sprintf(gText, "port%04d.icn", IDX(gpGame->GetHero(m_town->m_occupyingHeroId)->m_portrait));
         m_heroStrip = new strip(
             0,
             TOWN_HERO_STRIP_Y,
@@ -1037,8 +1015,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
                 m_command = ARMY_COMMAND_MERGE;
             }
         } else if (qualifier != 0
-                   && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot]
-                          == CREATURE_NONE) {
+                   && m_pendingStrip->m_army->m_creatureTypes[m_pendingArmySlot] == CREATURE_NONE) {
             sprintf(
                 m_statusText,
                 cTownCommand[IDX(TEXT_REDISTRIBUTE_TO_EMPTY_SLOT)],
@@ -1099,16 +1076,14 @@ void townManager::SetCommandAndText(struct tag_message& message) {
             } else {
                 m_selectedStrip = m_garrisonStrip;
                 m_selectedArmySlot = objectId - TOWN_GARRISON_SLOT_FIRST;
-                if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                    == CREATURE_NONE) {
+                if (m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot] == CREATURE_NONE) {
                     strcpy(m_statusText, cTownCommand[IDX(TEXT_EMPTY_SLOT)]);
                 } else {
                     sprintf(
                         m_statusText,
                         cTownCommand[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[IDX(
-                            m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                        )]
+                        gArmyNames[IDX(m_selectedStrip->m_army
+                                           ->m_creatureTypes[m_selectedArmySlot])]
                     );
                     m_command = ARMY_COMMAND_SELECT;
                 }
@@ -1139,9 +1114,8 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                     sprintf(
                         m_statusText,
                         cTownCommand[IDX(TEXT_SELECT_ARMY)],
-                        gArmyNames[IDX(
-                            m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
-                        )]
+                        gArmyNames[IDX(m_selectedStrip->m_army
+                                           ->m_creatureTypes[m_selectedArmySlot])]
                     );
                     m_command = ARMY_COMMAND_SELECT;
                 }
@@ -1212,8 +1186,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
                 m_statusText,
                 cTownCommand[IDX(TEXT_RECRUIT)],
                 gArmyNames[IDX(
-                    gDwellingType[IDX(m_town->m_type)][objectId
-                                                       - IDX(TOWN_OBJECT_DWELLING_1)]
+                    gDwellingType[IDX(m_town->m_type)][objectId - IDX(TOWN_OBJECT_DWELLING_1)]
                 )]
             );
             break;
@@ -1357,16 +1330,15 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     m_townWindow->DrawWindow(0);
                                     m_garrisonStrip->DrawIcons(0);
                                     m_heroStrip->DrawIcons(0);
-                                    gpWindowManager
-                                        ->FizzleForward(
-                                            0,
-                                            TOWN_VIEWPORT_HEIGHT,
-                                            fizzleWidth,
-                                            TOWN_VIEW_FIZZLE_HEIGHT,
-                                            -1,
-                                            NULL,
-                                            NULL
-                                        );
+                                    gpWindowManager->FizzleForward(
+                                        0,
+                                        TOWN_VIEWPORT_HEIGHT,
+                                        fizzleWidth,
+                                        TOWN_VIEW_FIZZLE_HEIGHT,
+                                        -1,
+                                        NULL,
+                                        NULL
+                                    );
                                     WaitEndSample(buildSample_m, -1);
                                     m_recruitResult = 0;
                                     gpWindowManager->ReleaseFizzleSource();
@@ -1385,9 +1357,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                             0,
                                             TOWN_HERO_STRIP_Y,
                                             TOWN_HERO_STRIP_FRAME_COUNT,
-                                            gpResourceManager->MakeId(
-                                                gText, TOWN_ICON_RESOURCE_TYPE
-                                            ),
+                                            gpResourceManager
+                                                ->MakeId(gText, TOWN_ICON_RESOURCE_TYPE),
                                             0,
                                             NULL,
                                             -1,
@@ -1614,14 +1585,14 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         message.payload.widget.data.value = IDX(WIDGET_FLAG_GRAYED);
                                         m_heroWindow0->BroadcastMessage(message);
                                         message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                                        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+                                        message.payload.widget.data.value =
+                                            IDX(WIDGET_FLAG_ENABLED);
                                         m_heroWindow0->BroadcastMessage(message);
                                     }
                                     gpWindowManager
                                         ->DoDialog(m_heroWindow0, TrueFalseDialogHandler, 0);
                                     delete m_heroWindow0;
-                                    if (gpWindowManager->m_dialogResult
-                                        == DIALOG_BUILD_BOAT) {
+                                    if (gpWindowManager->m_dialogResult == DIALOG_BUILD_BOAT) {
                                         if (gpGame->CreateBoat(m_town->m_boatX, m_town->m_boatY, 0)
                                             != -1) {
                                             BuildObj(BUILDING_SLOT_DISABLED_FIRST);
@@ -1689,9 +1660,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        static_cast<BuildingSlotType>(
-                                            message.payload.widget.id
-                                        ),
+                                        static_cast<BuildingSlotType>(message.payload.widget.id),
                                         1
                                     )
                                 );
@@ -1712,9 +1681,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     description_b,
                                     GetBuildingInfo(
                                         m_town->m_type,
-                                        static_cast<BuildingSlotType>(
-                                            message.payload.widget.id
-                                        ),
+                                        static_cast<BuildingSlotType>(message.payload.widget.id),
                                         1
                                     )
                                 );
@@ -1760,8 +1727,8 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     && m_selectedStrip->m_army->m_creatureTypes[m_selectedArmySlot]
                                            != CREATURE_NONE) {
                                     viewedHero = m_selectedStrip == m_heroStrip
-                                        ? gpGame->GetHero(m_town->m_occupyingHeroId)
-                                        : NULL;
+                                                     ? gpGame->GetHero(m_town->m_occupyingHeroId)
+                                                     : NULL;
                                     gpGame->ViewArmy(
                                         TOWN_ARMY_VIEW_X,
                                         TOWN_ARMY_VIEW_Y,
@@ -1808,9 +1775,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     gpGame->TownIDToTownPos(gpCurPlayer, m_town->m_id);
                                 townPosition =
                                     (townPosition
-                                     + (message.payload.widget.id == CONTROL_PREVIOUS_TOWN
-                                            ? -1
-                                            : 1)
+                                     + (message.payload.widget.id == CONTROL_PREVIOUS_TOWN ? -1 : 1)
                                      + gpCurPlayer->m_townCount)
                                     % gpCurPlayer->m_townCount;
                                 m_town = gpGame->GetTown(gpCurPlayer->TownId(townPosition));
@@ -1981,8 +1946,7 @@ void townManager::SplitArmy(void) {
     i32 sameType;
     tag_message message;
 
-    m_heroWindow1 =
-        new heroWindow(SMALL_DIALOG_WINDOW_X, SMALL_DIALOG_WINDOW_Y, "splitwin.bin");
+    m_heroWindow1 = new heroWindow(SMALL_DIALOG_WINDOW_X, SMALL_DIALOG_WINDOW_Y, "splitwin.bin");
     if (m_heroWindow1 == NULL)
         MemError();
     m_splitAmount = 0;
@@ -2139,8 +2103,7 @@ i32 townManager::BuyBuild(
     }
 
     dwelling_k = -1;
-    if (building >= TOWN_OBJECT_DWELLING_1
-        && building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
+    if (building >= TOWN_OBJECT_DWELLING_1 && building <= TOWN_OBJECT_ALTERNATE_UPGRADED_DWELLING_6)
         dwelling_k = IDX(building) - IDX(TOWN_OBJECT_DWELLING_1);
 
     if (building == BUILDING_SLOT_TAVERN && m_town->m_type == FACTION_NECROMANCER) {
@@ -2172,8 +2135,9 @@ i32 townManager::BuyBuild(
         for (index_h = 0; index_h < TOWN_RESOURCE_COUNT; ++index_h) {
             if (gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h] > 0) {
                 resourceTypes_o[costCount_o] = static_cast<i8>(index_h);
-                costs_e[costCount_o] =
-                    static_cast<i16>(gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h]);
+                costs_e[costCount_o] = static_cast<i16>(
+                    gSpecialBuildingCosts[IDX(gpTownManager->m_town->m_type)][index_h]
+                );
                 ++costCount_o;
             }
         }
@@ -2227,10 +2191,7 @@ i32 townManager::BuyBuild(
         bottomRowCount_o = 4;
     }
 
-    sprintf(
-        description_b,
-        GetBuildingInfo(m_town->m_type, building, 0)
-    );
+    sprintf(description_b, GetBuildingInfo(m_town->m_type, building, 0));
     if (dwelling_k >= 0) {
         prerequisiteCount_p = 0;
         prerequisiteMask_c = gHierarchyMask[IDX(m_town->m_type)][dwelling_k];
@@ -2240,10 +2201,7 @@ i32 townManager::BuyBuild(
                     strcat(description_b, "\n\nRequires:");
                 ++prerequisiteCount_p;
                 strcat(description_b, "\n");
-                strcat(
-                    description_b,
-                    GetBuildingName(m_town->m_type, BuildingSlotType(index_h))
-                );
+                strcat(description_b, GetBuildingName(m_town->m_type, BuildingSlotType(index_h)));
             }
         }
         if (m_town->m_type == FACTION_NECROMANCER
@@ -2263,8 +2221,7 @@ i32 townManager::BuyBuild(
         windowHeight_a += BUILD_DOUBLE_RESOURCE_ROW_HEIGHT;
     if (quickView == 0)
         windowHeight_a += BUILD_BUTTON_AREA_HEIGHT;
-    windowRows_b =
-        (windowHeight_a - BUILD_WINDOW_ROW_BASE_HEIGHT) / BUILD_WINDOW_ROW_HEIGHT;
+    windowRows_b = (windowHeight_a - BUILD_WINDOW_ROW_BASE_HEIGHT) / BUILD_WINDOW_ROW_HEIGHT;
     if (windowRows_b < BUILD_WINDOW_MIN_ROWS)
         windowRows_b = BUILD_WINDOW_MIN_ROWS;
     if (windowRows_b > BUILD_WINDOW_MAX_ROWS)
@@ -2347,7 +2304,8 @@ i32 townManager::BuyBuild(
             x_d = xStart_b;
             for (index_h = 0; index_h < resourcesInRow_l; ++index_h) {
                 entryWidth_o = GetIconEntry(resourceIcon_c, rowResourceTypes_a[index_h])->w;
-                amountText_n[widgetIndex_f] = static_cast<char*>(H2_ALLOC(BUILD_AMOUNT_TEXT_CAPACITY));
+                amountText_n[widgetIndex_f] =
+                    static_cast<char*>(H2_ALLOC(BUILD_AMOUNT_TEXT_CAPACITY));
                 sprintf(amountText_n[widgetIndex_f], "%d", costs_e[widgetIndex_f]);
                 i32 widgetXOffset = 0;
                 amountWidgets_b[widgetIndex_f] = new textWidget(
@@ -2496,16 +2454,27 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             else
                 frame_g = gpTownManager->m_town->m_buildState - 1;
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                ->m_icon
+                ->CombatClipDrawToBuffer(0, 0, frame_g, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
-                m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, frame_g + 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                m_townObjects[objectIndex_k]->m_icon->CombatClipDrawToBuffer(
+                    0,
+                    0,
+                    frame_g + 1,
+                    &limits_h,
+                    ICON_DRAW_NORMAL,
+                    0,
+                    NULL,
+                    NULL
+                );
         } else {
             m_townObjects[objectIndex_k]
-                ->m_icon->CombatClipDrawToBuffer(0, 0, 0, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                ->m_icon
+                ->CombatClipDrawToBuffer(0, 0, 0, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
             if (m_townObjects[objectIndex_k]->m_animationFrameCount != 0)
                 m_townObjects[objectIndex_k]
-                    ->m_icon->CombatClipDrawToBuffer(0, 0, 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
+                    ->m_icon
+                    ->CombatClipDrawToBuffer(0, 0, 1, &limits_h, ICON_DRAW_NORMAL, 0, NULL, NULL);
         }
         gbComputeExtent = false;
         gbSaveBiggestExtent = false;
@@ -2620,10 +2589,10 @@ void townManager::SetupMage(heroWindow* window) {
                 message_b.payload.widget.data.value =
                     gsSpellInfo[IDX(m_town->m_spells[level][slot_m])].iconIndex;
                 window->BroadcastMessage(message_b);
-                lineCount_m =
-                    smallFont->LineLength(
-                        gSpellNames[IDX(m_town->m_spells[level][slot_m])], MAGE_SPELL_NAME_WIDTH
-                    );
+                lineCount_m = smallFont->LineLength(
+                    gSpellNames[IDX(m_town->m_spells[level][slot_m])],
+                    MAGE_SPELL_NAME_WIDTH
+                );
                 if (lineCount_m == 1)
                     sprintf(
                         gText,
@@ -2831,8 +2800,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
         newHeroClass = static_cast<FactionType>(
             gpCurPlayer->m_availableHeroIds[1 - m_recruitState] / HEROES_PER_FACTION
         );
-        newHeroClass =
-            (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
+        newHeroClass = (newHeroClass + Random(1, IDX(FACTION_COUNT) - 1)) % TOWN_FACTION_COUNT;
         gpCurPlayer->m_availableHeroIds[m_recruitState] =
             static_cast<i8>(gpGame->GetNewHeroId(giCurPlayer, newHeroClass, 0));
         gpGame->m_availableHeroes[gpCurPlayer->m_availableHeroIds[m_recruitState]] =
@@ -2908,7 +2876,12 @@ void townManager::DoTavern(void) {
     SetWinText(m_heroWindow0, TAVERN_WINDOW_TEXT_ID);
     sprintf(
         gText,
-        "A generous tip for the barkeep yields the following rumor:\n\n%s",
+        "\xd9\xe5\xe4\xf0\xfb\xe5 \xf7\xe0\xe5\xe2\xfb\xe5 \xe2\xfb\xf2\xff\xed\xf3\xeb\xe8 "
+        "\xe8\xe7 \xf3\xf1\xf2 \xf2\xf0\xe0\xea\xf2\xe8\xf0\xf9\xe8\xea\xe0 "
+        "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe8\xe9 \xf1\xeb\xf3\xf5:\n\n%s" /* "Щедрые чаевые вытянули из уст трактирщика следующий слух:
+
+%s" */
+        ,
         gpGame->m_rumour
     );
     message.type = MESSAGE_WIDGET;
@@ -3084,9 +3057,8 @@ void townManager::SetupWell(heroWindow* window) {
         messaged.payload.widget.id = dwellingResult + TOWN_WELL_FIRST_CREATURE_CONTROL;
         strcpy(
             gText,
-            gArmyNamesPlural[IDX(
-                gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
-            )]
+            gArmyNamesPlural
+                [IDX(gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]])]
         );
         gText[0] -= ' ';
         messaged.payload.widget.data.text = gText;
@@ -3108,17 +3080,14 @@ void townManager::SetupWell(heroWindow* window) {
             sprintf(detailTextf, "-%d", monsterInfoi.damageMax);
             strcat(gText, detailTextf);
         }
-        sprintf(
-            detailTextf, "\n%s%d", cWellDetail[WELL_DETAIL_HIT_POINTS], monsterInfoi.hitPoints
-        );
+        sprintf(detailTextf, "\n%s%d", cWellDetail[WELL_DETAIL_HIT_POINTS], monsterInfoi.hitPoints);
         strcat(gText, detailTextf);
         sprintf(detailTextf, cWellDetail[WELL_DETAIL_SPEED], speedText[monsterInfoi.speed]);
         strcat(gText, detailTextf);
         if (m_town->m_buildings
             & (1L << (dwellingTypesValue[dwellingResult] + IDX(BUILDING_SLOT_DWELLING_FIRST)))) {
-            growthd = gMonsterDatabase[IDX(
-                gDwellingType[IDX(m_town->m_type)][dwellingTypesValue[dwellingResult]]
-            )]
+            growthd = gMonsterDatabase[IDX(gDwellingType[IDX(m_town->m_type)]
+                                                        [dwellingTypesValue[dwellingResult]])]
                           .growth;
             growthd += TOWN_WELL_BASE_GROWTH_BONUS;
             if (dwellingResult == 0
@@ -3213,8 +3182,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         window->BroadcastMessage(message_n);
     }
 
-    for (category_stat = THIEVES_CATEGORY_TOWNS;
-         !(IDX(category_stat) >= maxCategories_hero);
+    for (category_stat = THIEVES_CATEGORY_TOWNS; !(IDX(category_stat) >= maxCategories_hero);
          ++category_stat) {
         GetCategoryStats(category_stat, categoryStats_m, categoryOrder_x);
         SortStats(categoryStats_m, categoryOrder_x);
@@ -3238,8 +3206,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         (position_current - firstAtRank_rank) * THIEVES_RANK_ICON_WIDTH + rankX_m
                     ),
                     static_cast<i16>(
-                        IDX(category_stat) * THIEVES_CATEGORY_ROW_HEIGHT
-                        + THIEVES_FIRST_CATEGORY_Y
+                        IDX(category_stat) * THIEVES_CATEGORY_ROW_HEIGHT + THIEVES_FIRST_CATEGORY_Y
                     ),
                     THIEVES_RANK_ICON_WIDTH,
                     THIEVES_RANK_ICON_HEIGHT,
@@ -3295,8 +3262,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
             if (strongestHeroPosition_first != -1) {
                 iconControl_last = new iconWidget(
                     static_cast<i16>(
-                        position_current * THIEVES_PLAYER_COLUMN_WIDTH
-                        + THIEVES_HERO_LOCATOR_X
+                        position_current * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_HERO_LOCATOR_X
                     ),
                     THIEVES_HERO_LOCATOR_Y,
                     0,
@@ -3313,8 +3279,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 window->AddWidget(iconControl_last, -1);
                 iconControl_last = new iconWidget(
                     static_cast<i16>(
-                        position_current * THIEVES_PLAYER_COLUMN_WIDTH
-                        + THIEVES_HERO_PORTRAIT_X
+                        position_current * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_HERO_PORTRAIT_X
                     ),
                     THIEVES_HERO_Y,
                     0,
@@ -3339,14 +3304,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 if (strongestHeroPosition_first != -1) {
                     strongestHero_x = gpGame->GetPlayerHero(rank, strongestHeroPosition_first);
                     sprintf(gText, "Att.\nDef.\nPower\nKnowl.");
-                    widgetText_control = static_cast<char*>(
-                        H2_ALLOC(strlen(gText) + 1)
-                    );
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(
-                            position_current * THIEVES_PLAYER_COLUMN_WIDTH
-                            + THIEVES_PRIMARY_LABEL_X
+                            position_current * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PRIMARY_LABEL_X
                         ),
                         THIEVES_PRIMARY_STATS_Y,
                         THIEVES_PRIMARY_LABEL_WIDTH,
@@ -3371,14 +3333,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         );
                         strcat(gText, statText_k);
                     }
-                    widgetText_control = static_cast<char*>(
-                        H2_ALLOC(strlen(gText) + 1)
-                    );
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(
-                            position_current * THIEVES_PLAYER_COLUMN_WIDTH
-                            + THIEVES_PRIMARY_VALUE_X
+                            position_current * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PRIMARY_VALUE_X
                         ),
                         THIEVES_PRIMARY_STATS_Y,
                         THIEVES_PRIMARY_VALUE_WIDTH,
@@ -3397,14 +3356,11 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                     goto nextRank;
                 {
                     strcpy(gText, cPersonality[IDX(gpGame->m_players[rank].m_aiDifficulty)]);
-                    widgetText_control = static_cast<char*>(
-                        H2_ALLOC(strlen(gText) + 1)
-                    );
+                    widgetText_control = static_cast<char*>(H2_ALLOC(strlen(gText) + 1));
                     strcpy(widgetText_control, gText);
                     textControl_icon = new textWidget(
                         static_cast<i16>(
-                            position_current * THIEVES_PLAYER_COLUMN_WIDTH
-                            + THIEVES_PERSONALITY_X
+                            position_current * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PERSONALITY_X
                         ),
                         THIEVES_PERSONALITY_Y,
                         THIEVES_PERSONALITY_WIDTH,
@@ -3433,9 +3389,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                                         != CREATURE_NONE
                                     && playerTown_k->m_army.m_creatureCounts[armySlot_index] > 0
                                     && strongestCreatureValue
-                                           < gMonsterDatabase[IDX(playerTown_k->m_army
-                                                                      .m_creatureTypes[armySlot_index])]
-                                                 .fightValue) {
+                                           < gMonsterDatabase
+                                                 [IDX(playerTown_k->m_army
+                                                          .m_creatureTypes[armySlot_index])]
+                                                     .fightValue) {
                                     strongestCreature_m =
                                         playerTown_k->m_army.m_creatureTypes[armySlot_index];
                                     strongestCreatureValue =
@@ -3455,9 +3412,10 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                                         != CREATURE_NONE
                                     && strongestHero_x->m_army.m_creatureCounts[armySlot_index] > 0
                                     && strongestCreatureValue
-                                           < gMonsterDatabase[IDX(strongestHero_x->m_army
-                                                                      .m_creatureTypes[armySlot_index])]
-                                                 .fightValue) {
+                                           < gMonsterDatabase
+                                                 [IDX(strongestHero_x->m_army
+                                                          .m_creatureTypes[armySlot_index])]
+                                                     .fightValue) {
                                     strongestCreature_m =
                                         strongestHero_x->m_army.m_creatureTypes[armySlot_index];
                                     strongestCreatureValue =
@@ -3491,7 +3449,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                 }
             }
         }
-nextRank:
+    nextRank:
         ++rank;
     }
 }
@@ -3566,8 +3524,7 @@ void GetCategoryStats(
                             gpGame->GetHero(gpGame->m_players[player].m_heroIds[townIndex_c]);
                         for (heroIndex_n = 0; heroIndex_n < TOWN_MAX_ARTIFACTS; ++heroIndex_n) {
                             if (playerHero_h->m_artifacts[heroIndex_n] != ARTIFACT_NONE
-                                && playerHero_h->m_artifacts[heroIndex_n]
-                                       != ARTIFACT_MAGIC_BOOK) {
+                                && playerHero_h->m_artifacts[heroIndex_n] != ARTIFACT_MAGIC_BOOK) {
                                 ++stats[player];
                             }
                         }
@@ -3625,6 +3582,3 @@ void SortStats(i32l* const stats, i8* const order) {
         }
     }
 }
-
-
-

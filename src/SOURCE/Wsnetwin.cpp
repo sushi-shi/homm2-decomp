@@ -19,12 +19,10 @@
 #include <SOURCE/Wsnetwin.h>
 
 H2_ENUM_BEGIN(WinsockPrivateConstant)
-    IP_ADDRESS_ENTRY_LIMIT       = 20,
-    SEND_ATTEMPT_LIMIT           = 20,
+    IP_ADDRESS_ENTRY_LIMIT = 20,
+    SEND_ATTEMPT_LIMIT = 20,
     EXTRA_GUEST_PLAYER_THRESHOLD = 2
 H2_ENUM_END(WinsockPrivateConstant)
-
-
 
 VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
@@ -128,8 +126,14 @@ i16 wsnet_init(void) {
         } else {
             sprintf(
                 cWSTextBuffer,
-                "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move "
-                "on, or wait for additional guests.",
+                "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n\xd3 "
+                "\xe2\xe0\xf1 %d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 "
+                "'\xce\xca', \xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc "
+                "\xe8\xeb\xe8 \xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
+                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Создание игры на %s.
+
+У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков." */
+                ,
                 inet_ntoa(gIn_addrIP),
                 giNumHumanPlayers - 1
             );
@@ -167,7 +171,14 @@ i16 wsnet_init(void) {
             NormalDialog(
                 "Error in IP Address, please try again.",
                 NORMAL_DIALOG_WAIT_FIRST,
-                -1, -1, -1, 0, -1, 0, -1, 0
+                -1,
+                -1,
+                -1,
+                0,
+                -1,
+                0,
+                -1,
+                0
             );
             goto retryAddress;
         }
@@ -403,13 +414,19 @@ void wsEvaluateMessage(u32l size, i32 sender) {
         case NETWORK_PACKET_GUEST_REJECTED:
             sprintf(
                 cWSTextBuffer,
-                "The Host already has a game in progress and is not accepting new players."
+                "\xd1\xe5\xf0\xe2\xe5\xf0 \xf3\xe6\xe5 \xf1\xee\xe7\xe4\xe0\xeb \xe8\xe3\xf0\xf3 "
+                "\xe8 \xed\xe5 \xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xed\xee\xe2\xfb\xf5 "
+                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Сервер уже создал игру и не принимает новых игроков." */
             );
             NormalDialog(cWSTextBuffer, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
             ShutDown(NULL);
             break;
         case NETWORK_PACKET_GUEST_ACCEPTED:
-            sprintf(cWSTextBuffer, "Waiting for other remote player to set up game.");
+            sprintf(
+                cWSTextBuffer,
+                "\xce\xe6\xe8\xe4\xe0\xfe \xe8\xe3\xf0\xee\xea\xe0 \xe4\xeb\xff "
+                "\xed\xe0\xf7\xe0\xeb\xe0 \xe8\xe3\xf0\xfb." /* "Ожидаю игрока для начала игры." */
+            );
             windowMessage.type = MESSAGE_WIDGET;
             windowMessage.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
             windowMessage.payload.widget.id = 1;
@@ -448,8 +465,14 @@ i32 wsWaitForExtraGuests(void) {
         iWSLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             cWSTextBuffer,
-            "Hosting game at %s.\n\nYou have %d guest(s) now logged in.  Click 'OK' to move on, or "
-            "wait for additional guests.",
+            "\xd1\xee\xe7\xe4\xe0\xed\xe8\xe5 \xe8\xe3\xf0\xfb \xed\xe0 %s.\n\n\xd3 \xe2\xe0\xf1 "
+            "%d \xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca', "
+            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
+            "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
+            "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "Создание игры на %s.
+
+У вас %d гостей. Нажмите 'ОК', чтобы продолжить или подождите других игроков." */
+            ,
             inet_ntoa(gIn_addrIP),
             giNumHumanPlayers - 1
         );
@@ -513,4 +536,3 @@ struct WSAData wsadata;
 struct in_addr gIn_addrIP;
 struct sockaddr_in saddr_remote;
 i32 iAddrLen;
-

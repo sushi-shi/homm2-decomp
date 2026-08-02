@@ -63,85 +63,85 @@ H2_ENUM_BEGIN(CampaignChoiceValue)
 H2_ENUM_END(CampaignChoiceValue)
 
 H2_ENUM_BEGIN(CampaignChoiceAmount)
-    CHOICE_NO_AMOUNT      = -1,
-    CHOICE_BASIC_SKILL    = 1,
+    CHOICE_NO_AMOUNT = -1,
+    CHOICE_BASIC_SKILL = 1,
     CHOICE_RESOURCE_BONUS = 20,
-    CHOICE_GOLD_BONUS     = 2000
+    CHOICE_GOLD_BONUS = 2000
 H2_ENUM_END(CampaignChoiceAmount)
 
 H2_ENUM_BEGIN(CheckEndGameConstants)
-    END_GAME_NO_PLAYER               = -1,
-    END_GAME_GRACE_DAYS              = 7,
-    END_GAME_TEXT_BUFFER_SIZE        = 100,
-    END_GAME_GOLD_SCALE              = 1000,
-    END_GAME_ULTIMATE_ARTIFACT       = 0,
-    END_GAME_PLAYER_DIALOG_ICON      = 9,
-    END_GAME_REMOTE_DIALOG_TIME      = 5000,
+    END_GAME_NO_PLAYER = -1,
+    END_GAME_GRACE_DAYS = 7,
+    END_GAME_TEXT_BUFFER_SIZE = 100,
+    END_GAME_GOLD_SCALE = 1000,
+    END_GAME_ULTIMATE_ARTIFACT = 0,
+    END_GAME_PLAYER_DIALOG_ICON = 9,
+    END_GAME_REMOTE_DIALOG_TIME = 5000,
     END_GAME_CAMPAIGN_SAVE_NAME_SIZE = 20,
-    END_GAME_SCENARIO_OFFSET         = 1
+    END_GAME_SCENARIO_OFFSET = 1
 H2_ENUM_END(CheckEndGameConstants)
 
 H2_ENUM_BEGIN(CheckEndGameCampaignScenario)
-    END_GAME_DWARF_SCENARIO          = 3,
-    END_GAME_SIDE_SCENARIO           = 7,
+    END_GAME_DWARF_SCENARIO = 3,
+    END_GAME_SIDE_SCENARIO = 7,
     END_GAME_ROLAND_CAPTURE_SCENARIO = 9,
-    END_GAME_FIRST_NO_SAVE_SCENARIO  = 10,
-    END_GAME_LAST_SCENARIO           = 11
+    END_GAME_FIRST_NO_SAVE_SCENARIO = 10,
+    END_GAME_LAST_SCENARIO = 11
 H2_ENUM_END(CheckEndGameCampaignScenario)
 
 H2_ENUM_CLASS_BEGIN(MoraleInfoTextIndex)
-    MORALE_INFO_GOOD          = 0,
-    MORALE_INFO_NEUTRAL       = 1,
-    MORALE_INFO_BAD           = 2,
-    MORALE_INFO_HEADER        = 3,
-    INFO_SAME_ALIGNMENT       = 5,
-    INFO_THREE_ALIGNMENTS     = 6,
-    INFO_FOUR_ALIGNMENTS      = 7,
-    INFO_MEDAL_OF_VALOR       = 8,
-    INFO_MEDAL_OF_COURAGE     = 9,
-    INFO_MEDAL_OF_HONOR       = 10,
+    MORALE_INFO_GOOD = 0,
+    MORALE_INFO_NEUTRAL = 1,
+    MORALE_INFO_BAD = 2,
+    MORALE_INFO_HEADER = 3,
+    INFO_SAME_ALIGNMENT = 5,
+    INFO_THREE_ALIGNMENTS = 6,
+    INFO_FOUR_ALIGNMENTS = 7,
+    INFO_MEDAL_OF_VALOR = 8,
+    INFO_MEDAL_OF_COURAGE = 9,
+    INFO_MEDAL_OF_HONOR = 10,
     INFO_MEDAL_OF_DISTINCTION = 11,
-    INFO_FIZBIN               = 12,
-    INFO_BUOY                 = 13,
-    INFO_OASIS                = 14,
-    INFO_TEMPLE               = 15,
-    INFO_GRAVEYARD            = 16,
-    INFO_SHIPWRECK            = 17,
-    MORALE_INFO_NONE          = 19,
-    INFO_FIVE_ALIGNMENTS      = 20,
-    INFO_ALL_UNDEAD           = 21,
-    INFO_SOME_UNDEAD          = 22,
-    INFO_WATERING_HOLE        = 23,
-    INFO_DERELICT_SHIP        = 24,
-    INFO_COLISEUM             = 25,
-    INFO_TAVERN               = 26,
-    INFO_BASIC_LEADERSHIP     = 27,
-    INFO_ADVANCED_LEADERSHIP  = 28,
-    INFO_EXPERT_LEADERSHIP    = 29,
-    MORALE_INFO_MASTHEAD      = 30,
-    MORALE_INFO_BATTLE_GARB   = 31
+    INFO_FIZBIN = 12,
+    INFO_BUOY = 13,
+    INFO_OASIS = 14,
+    INFO_TEMPLE = 15,
+    INFO_GRAVEYARD = 16,
+    INFO_SHIPWRECK = 17,
+    MORALE_INFO_NONE = 19,
+    INFO_FIVE_ALIGNMENTS = 20,
+    INFO_ALL_UNDEAD = 21,
+    INFO_SOME_UNDEAD = 22,
+    INFO_WATERING_HOLE = 23,
+    INFO_DERELICT_SHIP = 24,
+    INFO_COLISEUM = 25,
+    INFO_TAVERN = 26,
+    INFO_BASIC_LEADERSHIP = 27,
+    INFO_ADVANCED_LEADERSHIP = 28,
+    INFO_EXPERT_LEADERSHIP = 29,
+    MORALE_INFO_MASTHEAD = 30,
+    MORALE_INFO_BATTLE_GARB = 31
 H2_ENUM_CLASS_END(MoraleInfoTextIndex)
 
 H2_ENUM_CLASS_BEGIN(LuckInfoTextIndex)
-    LUCK_INFO_GOOD        = 0,
-    LUCK_INFO_NEUTRAL     = 1,
-    LUCK_INFO_BAD         = 2,
-    LUCK_INFO_HEADER      = 3,
-    INFO_RABBIT_FOOT      = 4,
-    INFO_HORSESHOE        = 5,
-    INFO_LUCKY_COIN       = 6,
-    INFO_CLOVER           = 7,
-    INFO_FAERIE_RING      = 8,
-    INFO_FOUNTAIN         = 9,
-    LUCK_INFO_NONE        = 10,
-    INFO_RAINBOW          = 12,
-    INFO_IDOL             = 13,
-    INFO_PYRAMID          = 14,
-    INFO_BASIC_SKILL      = 15,
-    INFO_ADVANCED_SKILL   = 16,
-    INFO_EXPERT_SKILL     = 17,
-    LUCK_INFO_MASTHEAD    = 18,
-    INFO_MERMAID          = 19,
+    LUCK_INFO_GOOD = 0,
+    LUCK_INFO_NEUTRAL = 1,
+    LUCK_INFO_BAD = 2,
+    LUCK_INFO_HEADER = 3,
+    INFO_RABBIT_FOOT = 4,
+    INFO_HORSESHOE = 5,
+    INFO_LUCKY_COIN = 6,
+    INFO_CLOVER = 7,
+    INFO_FAERIE_RING = 8,
+    INFO_FOUNTAIN = 9,
+    LUCK_INFO_NONE = 10,
+    INFO_RAINBOW = 12,
+    INFO_IDOL = 13,
+    INFO_PYRAMID = 14,
+    INFO_BASIC_SKILL = 15,
+    INFO_ADVANCED_SKILL = 16,
+    INFO_EXPERT_SKILL = 17,
+    LUCK_INFO_MASTHEAD = 18,
+    INFO_MERMAID = 19,
     LUCK_INFO_BATTLE_GARB = 20
 H2_ENUM_CLASS_END(LuckInfoTextIndex)
 
@@ -150,133 +150,132 @@ H2_ENUM_BEGIN(MoraleLuckInfoConstant)
 H2_ENUM_END(MoraleLuckInfoConstant)
 
 H2_ENUM_BEGIN(NetBoxLocalConstant)
-    BOX_WINDOW_Y             = 0x19b,
-    BOX_HEIGHT               = 0x44,
-    BOX_WIDTH                = 0x27f,
-    BOX_INPUT_Y              = 0x1d1,
-    BOX_INPUT_HEIGHT         = 0xc,
-    BOX_TEXT_LENGTH          = 150,
-    BOX_LINE_COUNT           = 4,
-    BOX_LINE_TEXT_LIMIT      = 120,
-    BOX_TEXT_X               = 20,
-    BOX_TEXT_Y               = 54,
-    BOX_MAX_INPUT            = 0x5d,
-    BOX_MAX_COLOR            = 6,
-    BOX_DEFAULT_COLOR        = BOX_MAX_COLOR,
-    BOX_COLOR_FRAME_OFFSET   = 1,
-    BOX_CURSOR_DELAY         = 0x168,
+    BOX_WINDOW_Y = 0x19b,
+    BOX_HEIGHT = 0x44,
+    BOX_WIDTH = 0x27f,
+    BOX_INPUT_Y = 0x1d1,
+    BOX_INPUT_HEIGHT = 0xc,
+    BOX_TEXT_LENGTH = 150,
+    BOX_LINE_COUNT = 4,
+    BOX_LINE_TEXT_LIMIT = 120,
+    BOX_TEXT_X = 20,
+    BOX_TEXT_Y = 54,
+    BOX_MAX_INPUT = 0x5d,
+    BOX_MAX_COLOR = 6,
+    BOX_DEFAULT_COLOR = BOX_MAX_COLOR,
+    BOX_COLOR_FRAME_OFFSET = 1,
+    BOX_CURSOR_DELAY = 0x168,
     BOX_CURSOR_WIDTH_PADDING = 0x32,
-    BOX_CURSOR_WIDTH_LIMIT   = 0x25a,
-    BOX_MESSAGE_TIMEOUT      = 6000,
-    BOX_EXIT_DELAY_STEPS     = 20,
-    BOX_EXIT_DELAY           = 75,
-    BOX_FIRST_LINE_ID        = 1,
-    BOX_FIRST_COLOR_ID       = 0x14,
-    BOX_INPUT_ID             = 5,
+    BOX_CURSOR_WIDTH_LIMIT = 0x25a,
+    BOX_MESSAGE_TIMEOUT = 6000,
+    BOX_EXIT_DELAY_STEPS = 20,
+    BOX_EXIT_DELAY = 75,
+    BOX_FIRST_LINE_ID = 1,
+    BOX_FIRST_COLOR_ID = 0x14,
+    BOX_INPUT_ID = 5,
     BOX_THIS_PLAYER_COLOR_ID = 0x18,
-    BOX_KEY_ESCAPE           = 0x1b,
-    BOX_KEY_ENTER            = 10,
-    BOX_KEY_BACKSPACE        = 0x7f,
-    BOX_KEY_F1               = 0x3b00,
-    BOX_CURSOR_GLYPH         = 0x1f,
-    BOX_PACKET_BUFFER_SIZE   = 0x7f,
-    BOX_FIRST_PRINTABLE      = 0x20,
-    BOX_LAST_PRINTABLE       = 0x7f,
-    BOX_REMOTE_MAP_CHANGE    = 0x29,
-    BOX_REMOTE_SETUP         = 0x20,
-    BOX_REMOTE_SAVE          = 1,
-    BOX_REMOTE_CHAT          = 0xb
+    BOX_KEY_ESCAPE = 0x1b,
+    BOX_KEY_ENTER = 10,
+    BOX_KEY_BACKSPACE = 0x7f,
+    BOX_KEY_F1 = 0x3b00,
+    BOX_CURSOR_GLYPH = 0x1f,
+    BOX_PACKET_BUFFER_SIZE = 0x7f,
+    BOX_FIRST_PRINTABLE = 0x20,
+    BOX_LAST_PRINTABLE = 0x7f,
+    BOX_REMOTE_MAP_CHANGE = 0x29,
+    BOX_REMOTE_SETUP = 0x20,
+    BOX_REMOTE_SAVE = 1,
+    BOX_REMOTE_CHAT = 0xb
 H2_ENUM_END(NetBoxLocalConstant)
 
 H2_ENUM_BEGIN(PollSoundConstant)
-    MOUSE_UPDATE_INTERVAL           = 13,
-    COMBAT_COLOR_CYCLE_INTERVAL     = 110,
-    DEFAULT_COLOR_CYCLE_INTERVAL    = 200,
-    NON_PALETTED_COLOR_CYCLE_DELAY  = 300,
-    SOUND_POLL_INTERVAL             = 30,
+    MOUSE_UPDATE_INTERVAL = 13,
+    COMBAT_COLOR_CYCLE_INTERVAL = 110,
+    DEFAULT_COLOR_CYCLE_INTERVAL = 200,
+    NON_PALETTED_COLOR_CYCLE_DELAY = 300,
+    SOUND_POLL_INTERVAL = 30,
     PALETTED_VIDEO_MODE_COLOR_DEPTH = 8
 H2_ENUM_END(PollSoundConstant)
 
 H2_ENUM_BEGIN(CongratsConstant)
     CONGRATS_PALETTE_BUFFER_SIZE = 0x304,
-    CONGRATS_TEXT_SIZE           = 500,
-    CONGRATS_RATING_LENGTH       = 32,
-    CONGRATS_SMACKER             = 2,
-    CONGRATS_DIFFICULTY_SCALE    = 100
+    CONGRATS_TEXT_SIZE = 500,
+    CONGRATS_RATING_LENGTH = 32,
+    CONGRATS_SMACKER = 2,
+    CONGRATS_DIFFICULTY_SCALE = 100
 H2_ENUM_END(CongratsConstant)
 
 H2_ENUM_BEGIN(CommandLineConstant)
-    LINE_TCP_TEXT_LENGTH    = 20,
-    LINE_HELP_LINE_COUNT    = 14,
+    LINE_TCP_TEXT_LENGTH = 20,
+    LINE_HELP_LINE_COUNT = 14,
     LINE_HUMAN_PLAYER_SLOTS = 4,
-    LINE_TCP_MIN_PLAYERS    = 2,
-    LINE_TCP_MAX_PLAYERS    = 6,
-    LINE_FRAME_STEP         = 6,
-    LINE_TCP_TYPE_DEFAULT   = 0,
-    LINE_TCP_TYPE_L         = 1,
-    LINE_TCP_CLIENT         = 0,
-    LINE_TCP_HOST           = 1,
-    LINE_SINGLE_PLAYER      = 1
+    LINE_TCP_MIN_PLAYERS = 2,
+    LINE_TCP_MAX_PLAYERS = 6,
+    LINE_FRAME_STEP = 6,
+    LINE_TCP_TYPE_DEFAULT = 0,
+    LINE_TCP_TYPE_L = 1,
+    LINE_TCP_CLIENT = 0,
+    LINE_TCP_HOST = 1,
+    LINE_SINGLE_PLAYER = 1
 H2_ENUM_END(CommandLineConstant)
 
 H2_ENUM_BEGIN(InitMenuConstant)
-    MENU_HOTSPOT_COUNT     = 5,
-    MENU_FIRST_COMMAND     = 0x65,
-    MENU_NEW_GAME          = 0x65,
-    MENU_LOAD_GAME         = 0x66,
-    MENU_HIGH_SCORES       = 0x67,
-    MENU_CREDITS           = 0x68,
-    MENU_EXIT              = 0x69,
-    MENU_LAST_ACTION       = 0x6b,
-    MENU_MOVIE             = 0x6b,
-    MENU_FIRST_WIDGET      = 11,
-    MENU_LAST_WIDGET       = 15,
-    MENU_WIDGET_OFFSET     = 11,
-    MENU_KEY_EXIT          = 0x10,
-    MENU_KEY_HIGH_SCORES   = 0x23,
-    MENU_KEY_LOAD          = 0x26,
-    MENU_KEY_CREDITS       = 0x2e,
-    MENU_KEY_NEW           = 0x31,
-    MENU_DISABLE_MASK      = 0x200,
-    MENU_CLOSE_COMMAND     = 10,
-    MENU_HELP_DIALOG       = 4,
-    MENU_MOVIE_SMACKER     = 0x26,
-    MENU_MAIN_MUSIC        = 0x2a,
-    MENU_SCREEN_WIDTH      = 640,
-    MENU_SCREEN_HEIGHT     = 480,
-    MENU_FRAME_STRIDE      = 4,
-    MENU_HOVER_FRAME       = 3,
-    MENU_IDLE_FRAME        = 1,
-    MENU_ACTIVE_FRAME      = 2,
+    MENU_HOTSPOT_COUNT = 5,
+    MENU_FIRST_COMMAND = 0x65,
+    MENU_NEW_GAME = 0x65,
+    MENU_LOAD_GAME = 0x66,
+    MENU_HIGH_SCORES = 0x67,
+    MENU_CREDITS = 0x68,
+    MENU_EXIT = 0x69,
+    MENU_LAST_ACTION = 0x6b,
+    MENU_MOVIE = 0x6b,
+    MENU_FIRST_WIDGET = 11,
+    MENU_LAST_WIDGET = 15,
+    MENU_WIDGET_OFFSET = 11,
+    MENU_KEY_EXIT = 0x10,
+    MENU_KEY_HIGH_SCORES = 0x23,
+    MENU_KEY_LOAD = 0x26,
+    MENU_KEY_CREDITS = 0x2e,
+    MENU_KEY_NEW = 0x31,
+    MENU_DISABLE_MASK = 0x200,
+    MENU_CLOSE_COMMAND = 10,
+    MENU_HELP_DIALOG = 4,
+    MENU_MOVIE_SMACKER = 0x26,
+    MENU_MAIN_MUSIC = 0x2a,
+    MENU_SCREEN_WIDTH = 640,
+    MENU_SCREEN_HEIGHT = 480,
+    MENU_FRAME_STRIDE = 4,
+    MENU_HOVER_FRAME = 3,
+    MENU_IDLE_FRAME = 1,
+    MENU_ACTIVE_FRAME = 2,
     MENU_WIDGET_FRAME_BASE = 44,
-    MENU_REDRAW_LEFT       = 0,
-    MENU_REDRAW_TOP        = 105,
-    MENU_REDRAW_WIDTH      = 565,
-    MENU_REDRAW_HEIGHT     = 375,
-    MENU_HELP_NEW_GAME     = 0,
-    MENU_HELP_LOAD_GAME    = 1,
-    MENU_HELP_HIGH_SCORES  = 2,
-    MENU_HELP_CREDITS      = 3,
-    MENU_HELP_EXIT         = 4
+    MENU_REDRAW_LEFT = 0,
+    MENU_REDRAW_TOP = 105,
+    MENU_REDRAW_WIDTH = 565,
+    MENU_REDRAW_HEIGHT = 375,
+    MENU_HELP_NEW_GAME = 0,
+    MENU_HELP_LOAD_GAME = 1,
+    MENU_HELP_HIGH_SCORES = 2,
+    MENU_HELP_CREDITS = 3,
+    MENU_HELP_EXIT = 4
 H2_ENUM_END(InitMenuConstant)
 
 H2_ENUM_BEGIN(RecruitHeroConstant)
     RECRUIT_HERO_VIEW_BUTTON = 2,
-    RECRUIT_HERO_FADE_STEPS  = 8
+    RECRUIT_HERO_FADE_STEPS = 8
 H2_ENUM_END(RecruitHeroConstant)
 
 H2_ENUM_BEGIN(BuildingRuleConstant)
-    BUILDING_INFO_BUFFER_SIZE                      = 400,
-    MONSTER_RARE_RESOURCE_COST                     = 1,
-    MONSTER_UPGRADED_RARE_RESOURCE_COST            = 2,
+    BUILDING_INFO_BUFFER_SIZE = 400,
+    MONSTER_RARE_RESOURCE_COST = 1,
+    MONSTER_UPGRADED_RARE_RESOURCE_COST = 2,
     NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE = 1000
 H2_ENUM_END(BuildingRuleConstant)
 
 H2_ENUM_BEGIN(HighScoreInputConstant)
-    HIGH_SCORE_INPUT_NAME_SIZE   = 20,
+    HIGH_SCORE_INPUT_NAME_SIZE = 20,
     HIGH_SCORE_LAST_SHIFT_SOURCE = HIGH_SCORE_ENTRY_COUNT - 2
 H2_ENUM_END(HighScoreInputConstant)
-
 
 inline town* GetCastleRec(i32 i) {
     return &gpGame->m_castleRecs[i];
@@ -287,7 +286,7 @@ inline hero* GetHeroSlot(i32 i) {
 }
 
 H2_ENUM_BEGIN(NormalDialogDrawRange)
-    NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT   = 0x9000,
+    NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT = 0x9000,
     NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID = -256
 H2_ENUM_END(NormalDialogDrawRange)
 
@@ -303,11 +302,9 @@ extern "C" void PollSound(void) {
     if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
         if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT
             || giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
-            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
-                KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
         else
-            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] =
-                KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
+            glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + DEFAULT_COLOR_CYCLE_INTERVAL;
         bDoColorCycle = 1;
         if (giGraphicsType == WINGRAPH_GRAPHICS_WING
             && giMainVideoModeColorDepth != PALETTED_VIDEO_MODE_COLOR_DEPTH) {
@@ -688,7 +685,8 @@ i32 oldmain(void) {
                                 gpGame->InitCampaignMap();
                                 goto initialize_game;
                             } else {
-                                gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                gpWindowManager
+                                    ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                                 mainScreenLoaded_b = 0;
                                 goto main_menu;
                             }
@@ -698,7 +696,8 @@ i32 oldmain(void) {
                                     xCampaign.InitMap();
                                     goto initialize_game;
                                 } else {
-                                    gpWindowManager->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
+                                    gpWindowManager
+                                        ->FadeScreen(FADE_OUT, OLD_MAIN_FADE_SPEED, gPalette);
                                     mainScreenLoaded_b = 0;
                                     goto main_menu;
                                 }
@@ -1115,16 +1114,14 @@ i32 InterpretCommandLine(void) {
                     if (i + 2 < len) {
                         switch (toupper(gcCommandLine[i + 2])) {
                             case 'T':
-                                if (i + 3 < len
-                                    && toupper(gcCommandLine[i + 3]) == 'L') {
+                                if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'L') {
                                     giTCPType = LINE_TCP_TYPE_L;
                                 } else {
                                     giTCPType = LINE_TCP_TYPE_DEFAULT;
                                 }
                                 break;
                             case 'S':
-                                if (i + 3 < len
-                                    && toupper(gcCommandLine[i + 3]) == 'H') {
+                                if (i + 3 < len && toupper(gcCommandLine[i + 3]) == 'H') {
                                     giTCPHostStatus = LINE_TCP_HOST;
                                 } else {
                                     giTCPHostStatus = LINE_TCP_CLIENT;
@@ -1290,8 +1287,7 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                     msg.type = INIT_MENU_MESSAGE;
                     msg.payload.widget.id = idx;
                     msg.payload.widget.command = INIT_MENU_SET_WIDGET_COMMAND;
-                    msg.payload.widget.data.value =
-                        menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
+                    msg.payload.widget.data.value = menu * MENU_FRAME_STRIDE + MENU_HOVER_FRAME;
                     gpInitWin->BroadcastMessage(msg);
                     gpInitWin->DrawWindow(0, idx, idx);
                     gpWindowManager->UpdateScreenRegion(
@@ -1306,12 +1302,8 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
                         PlaySmacker(MENU_MOVIE_SMACKER);
                         gpResourceManager->GetBackdrop("heroes.icn", gpWindowManager->m_screen, 1);
                         gpInitWin->DrawWindow(0);
-                        gpWindowManager->UpdateScreenRegion(
-                            0,
-                            0,
-                            MENU_SCREEN_WIDTH,
-                            MENU_SCREEN_HEIGHT
-                        );
+                        gpWindowManager
+                            ->UpdateScreenRegion(0, 0, MENU_SCREEN_WIDTH, MENU_SCREEN_HEIGHT);
                         gpSoundManager->PlayAmbientMusic(MENU_MAIN_MUSIC);
                         break;
                     } else {
@@ -1418,11 +1410,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
             case WIDGET_COMMAND_SELECT:
                 switch (msg.payload.widget.id) {
                     case RECRUIT_HERO_VIEW_BUTTON:
-                        HeroView(
-                            static_cast<u8>(gpTownManager->m_recruitHero->m_id),
-                            true,
-                            false
-                        );
+                        HeroView(static_cast<u8>(gpTownManager->m_recruitHero->m_id), true, false);
                         gpTownManager->RedrawTownScreen();
                         gpTownManager->m_heroWindow0->DrawWindow();
                         gpTownManager->m_heroWindow1->DrawWindow();
@@ -1465,7 +1453,9 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     } else if (building == BUILDING_SLOT_WELL_EXTRA) {
         sprintf(
             buf,
-            "The %s increases production of %s by 8 per week.",
+            "%s \xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xe5\xf2 \xef\xf0\xe8\xf0\xee\xf1\xf2 %s "
+            "\xed\xe0 8 \xe2 \xed\xe5\xe4\xe5\xeb\xfe." /* "%s увеличивает прирост %s на 8 в неделю." */
+            ,
             GetBuildingName(race, building),
             gArmyNamesPlural[IDX(gDwellingType[IDX(race)][0])]
         );
@@ -1476,11 +1466,11 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     } else {
         sprintf(
             gText,
-            "The %s produces %s.",
+            "\xc2 \xef\xee\xf1\xf2\xf0\xee\xe9\xea\xe5 '%s' \xec\xee\xe6\xed\xee "
+            "\xea\xf3\xef\xe8\xf2\xfc %s." /* "В постройке '%s' можно купить %s." */,
             GetBuildingName(race, building),
-            gArmyNamesPlural[IDX(gDwellingType[IDX(race)]
-                                               [IDX(building)
-                                                - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
+            gArmyNamesPlural
+                [IDX(gDwellingType[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)])]
         );
         return gText;
     }
@@ -2185,16 +2175,14 @@ void CheckEndGame(
     if ((gpGame->m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL
          && !gpGame->m_mapHeader.allowNormalVictory)
         || (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
-                   == END_GAME_SIDE_SCENARIO)) {
+            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO)) {
         allowNormalVictory = 0;
     }
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
         && gpGame->m_mapHeader.victoryConditionValue != CAMPAIGN_SWITCH_VICTORY_VALUE
         && (!gbInCampaign || gpGame->m_campaignType != CAMPAIGN_ARCHIBALD
-            || gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
-                   != END_GAME_SIDE_SCENARIO)) {
+            || gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET != END_GAME_SIDE_SCENARIO)) {
         sideBelow_i = 0;
         sideAbove = 0;
         for (player = 0; player < gpGame->m_playerCount; player++) {
@@ -2271,8 +2259,7 @@ void CheckEndGame(
         lossTown = gpGame->GetTown(
             gpGame->GetTownId(gpGame->m_mapHeader.lossConditionValue, gpGame->m_mapHeader.lossTownY)
         );
-        if (lossTown->m_owner == TOWN_OWNER_NONE
-            || !gbHumanPlayer[lossTown->m_owner]) {
+        if (lossTown->m_owner == TOWN_OWNER_NONE || !gbHumanPlayer[lossTown->m_owner]) {
             defeated = 1;
             if (!showedDialog) {
                 showedDialog = 1;
@@ -2289,8 +2276,7 @@ void CheckEndGame(
             if ((gbHumanPlayer[player] || gpGame->m_mapHeader.computerAlsoWins)
                 && gpGame->m_players[player].m_resources[IDX(RES_GOLD)]
                        >= gpGame->m_mapHeader.victoryConditionValue * END_GAME_GOLD_SCALE
-                && gpGame->m_players[player].m_resources[IDX(RES_GOLD)]
-                       >= bestGold) {
+                && gpGame->m_players[player].m_resources[IDX(RES_GOLD)] >= bestGold) {
                 bestGold = gpGame->m_players[player].m_resources[IDX(RES_GOLD)];
                 winnerPlayer = player;
             }
@@ -2325,8 +2311,7 @@ void CheckEndGame(
 
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
         winningHeroEntry = GetHeroSlot(gpGame->m_mapHeader.victoryConditionValue);
-        if (winningHeroEntry->m_owner < 0
-            || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
+        if (winningHeroEntry->m_owner < 0 || winningHeroEntry->m_owner >= GAME_PLAYER_COUNT
             || gbHumanPlayer[winningHeroEntry->m_owner]) {
             winFlag = 1;
             if (!showedDialog) {
@@ -2374,8 +2359,7 @@ void CheckEndGame(
                 for (heroIndex = 0; heroIndex < gpGame->m_players[player].m_heroCount;
                      heroIndex++) {
                     artifactHeroPtr = gpGame->GetPlayerHero(player, heroIndex);
-                    if (gpGame->m_mapHeader.victoryConditionValue
-                        > END_GAME_ULTIMATE_ARTIFACT) {
+                    if (gpGame->m_mapHeader.victoryConditionValue > END_GAME_ULTIMATE_ARTIFACT) {
                         if (artifactHeroPtr->HasArtifact(
                                 ArtifactType(gpGame->m_mapHeader.victoryConditionValue - 1)
                             )) {
@@ -2404,8 +2388,7 @@ void CheckEndGame(
             }
             if (!showedDialog) {
                 showedDialog = 1;
-                if (gpGame->m_mapHeader.victoryConditionValue
-                    == END_GAME_ULTIMATE_ARTIFACT) {
+                if (gpGame->m_mapHeader.victoryConditionValue == END_GAME_ULTIMATE_ARTIFACT) {
                     sprintf(artifactName, "Ultimate Artifact");
                 } else {
                     sprintf(
@@ -2428,8 +2411,7 @@ void CheckEndGame(
     }
 
     if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ROLAND
-        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
-               == END_GAME_DWARF_SCENARIO) {
+        && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_DWARF_SCENARIO) {
         hasDwarfTown = 0;
         for (player = 0; player < gpGame->m_players[0].m_townCount; player++) {
             if (gpGame->GetTown(gpGame->m_players[0].m_townIds[player])->m_type
@@ -2550,24 +2532,21 @@ void CheckEndGame(
 
     if (gbInCampaign && winFlag) {
         currentDayIndex = (gpGame->m_week - 1) * CALENDAR_DAYS_PER_WEEK
-                          + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH
-                          + gpGame->m_day;
+                          + (gpGame->m_month - 1) * CALENDAR_DAYS_PER_MONTH + gpGame->m_day;
         gpGame->m_campaignScenarioWon = 1;
-        gpGame->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)]
-                                                   [gpGame->m_campaignScenario] = 1;
-        gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)]
-                                      [gpGame->m_campaignScenario] =
+        gpGame
+            ->m_campaignScenarioCompleted[IDX(gpGame->m_campaignType)][gpGame->m_campaignScenario] =
+            1;
+        gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)][gpGame->m_campaignScenario] =
             currentDayIndex;
         gpGame->m_campaignScore =
-            gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)]
-                                          [gpGame->m_campaignScenario]
+            gpGame->m_campaignScenarioDays[IDX(gpGame->m_campaignType)][gpGame->m_campaignScenario]
             + gpGame->m_campaignScenarioBonus[IDX(gpGame->m_campaignType)]
                                              [gpGame->m_campaignScenario];
 
         carryoverHeroId = END_GAME_NO_PLAYER;
         if (gpGame->m_campaignType == CAMPAIGN_ROLAND
-            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET
-                   == END_GAME_SIDE_SCENARIO) {
+            && gpGame->m_campaignScenario + END_GAME_SCENARIO_OFFSET == END_GAME_SIDE_SCENARIO) {
             carryoverHeroId = CAMPAIGN_SWITCH_VICTORY_VALUE;
         }
         if (gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
@@ -2584,9 +2563,8 @@ void CheckEndGame(
             for (campaignHeroIndex = 0; campaignHeroIndex < gpGame->m_players[0].m_heroCount;
                  campaignHeroIndex++) {
                 if (carryoverHeroId == CAMPAIGN_SWITCH_VICTORY_VALUE
-                    || IDX(gpGame->m_heroRecs
-                               [gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
-                                   .m_portrait)
+                    || IDX(gpGame->m_heroRecs[gpGame->m_players[0].m_heroIds[campaignHeroIndex]]
+                               .m_portrait)
                            == carryoverHeroId) {
                     break;
                 }
@@ -2721,15 +2699,10 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
         alignment_e = 0;
         for (slot8 = 0; slot8 < ARMY_GROUP_SLOT_COUNT; slot8++) {
             if (h->m_army.m_creatureTypes[slot8] != CREATURE_NONE) {
-                alignment_e =
-                    IDX(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[slot8])].race);
+                alignment_e = IDX(gMonsterDatabase[IDX(h->m_army.m_creatureTypes[slot8])].race);
             }
         }
-        sprintf(
-            description,
-            cMoraleInfo[IDX(INFO_SAME_ALIGNMENT)],
-            gAlignmentNames[alignment_e]
-        );
+        sprintf(description, cMoraleInfo[IDX(INFO_SAME_ALIGNMENT)], gAlignmentNames[alignment_e]);
         strcat(gText, description);
     }
     if (homogeneous3 == ARMY_GROUP_ALIGNMENT_THREE) {
@@ -2949,8 +2922,7 @@ i32 AddScoreToHighScore(
     }
 
     if (entry < HIGH_SCORE_ENTRY_COUNT) {
-        for (destination = HIGH_SCORE_LAST_SHIFT_SOURCE; destination >= entry;
-             destination--)
+        for (destination = HIGH_SCORE_LAST_SHIFT_SOURCE; destination >= entry; destination--)
             entries_a[destination + 1] = entries_a[destination];
 
         GetDataEntry(
@@ -3209,17 +3181,15 @@ void PopNetBox(char* text, i32 netPlayer) {
                         sendText_e = 1;
                         break;
                     default:
-                        if (event_a.payload.keyboard.keyByte
-                                < static_cast<u32>(BOX_FIRST_PRINTABLE)
+                        if (event_a.payload.keyboard.keyByte < static_cast<u32>(BOX_FIRST_PRINTABLE)
                             || event_a.payload.keyboard.keyByte
-                                > static_cast<u32>(BOX_LAST_PRINTABLE))
+                                   > static_cast<u32>(BOX_LAST_PRINTABLE))
                             break;
                         if (inputLength_a < BOX_MAX_INPUT
                             && event_a.payload.keyboard.keyCode != 0) {
                             inputText_c[inputLength_a] = 0;
                             textWidth_b = smallFont->LineWidth(inputText_c);
-                            if (textWidth_b + BOX_CURSOR_WIDTH_PADDING
-                                < BOX_CURSOR_WIDTH_LIMIT) {
+                            if (textWidth_b + BOX_CURSOR_WIDTH_PADDING < BOX_CURSOR_WIDTH_LIMIT) {
                                 inputText_c[inputLength_a] =
                                     static_cast<char>(event_a.payload.keyboard.keyCode);
                                 inputLength_a++;
@@ -3273,20 +3243,16 @@ void PopNetBox(char* text, i32 netPlayer) {
             netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.command = NET_BOX_COLOR_COMMAND;
             updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID;
-            updateMessage_f.payload.widget.data.value =
-                cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[0] + BOX_COLOR_FRAME_OFFSET;
             netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 1;
-            updateMessage_f.payload.widget.data.value =
-                cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[1] + BOX_COLOR_FRAME_OFFSET;
             netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 2;
-            updateMessage_f.payload.widget.data.value =
-                cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[2] + BOX_COLOR_FRAME_OFFSET;
             netWindow_j->BroadcastMessage(updateMessage_f);
             updateMessage_f.payload.widget.id = BOX_FIRST_COLOR_ID + 3;
-            updateMessage_f.payload.widget.data.value =
-                cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
+            updateMessage_f.payload.widget.data.value = cNetBoxColor[3] + BOX_COLOR_FRAME_OFFSET;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
             gpWindowManager->UpdateScreenRegion(0, BOX_WINDOW_Y, BOX_WIDTH, BOX_HEIGHT);
@@ -3306,8 +3272,7 @@ void PopNetBox(char* text, i32 netPlayer) {
             updateMessage_f.payload.widget.data.text = inputText_c;
             netWindow_j->BroadcastMessage(updateMessage_f);
             netWindow_j->DrawWindow();
-            gpWindowManager
-                ->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
+            gpWindowManager->UpdateScreenRegion(0, BOX_INPUT_Y, BOX_WIDTH, BOX_INPUT_HEIGHT);
         }
 
         if (messageTime_b != 0 && messageTime_b + BOX_MESSAGE_TIMEOUT < KBTickCount())
@@ -3433,15 +3398,15 @@ void FileError(char* filename) {
 }
 
 H2_ENUM_BEGIN(SmackFadeConstant)
-    SMACK_FADE_FIRST_COLOR       = WINGRAPH_SYSTEM_PALETTE_SIZE,
-    SMACK_FADE_COLOR_LIMIT       = WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_FIRST_COLOR = WINGRAPH_SYSTEM_PALETTE_SIZE,
+    SMACK_FADE_COLOR_LIMIT = WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
     SMACK_FADE_MATCH_COLOR_LIMIT = 36,
     SMACK_FADE_DISTANCE_SENTINEL = 999,
-    SMACK_FADE_SCREEN_WIDTH      = 640,
-    SMACK_FADE_SCREEN_HEIGHT     = 480,
-    SMACK_FADE_BLUE_COMPONENT    = 2,
-    SMACK_FADE_GREEN_COMPONENT   = 1,
-    SMACK_FADE_RED_COMPONENT     = 0
+    SMACK_FADE_SCREEN_WIDTH = 640,
+    SMACK_FADE_SCREEN_HEIGHT = 480,
+    SMACK_FADE_BLUE_COMPONENT = 2,
+    SMACK_FADE_GREEN_COMPONENT = 1,
+    SMACK_FADE_RED_COMPONENT = 0
 H2_ENUM_END(SmackFadeConstant)
 
 VA(0x0046ced3, 0x236)
@@ -3592,7 +3557,7 @@ void CongratsWait(void) {
 
 H2_ENUM_BEGIN(SamplePlaybackConstant)
     SAMPLE_PLAYBACK_CHANNEL_GROUP = 2,
-    SAMPLE_DEFAULT_WAIT_TIME      = 4000
+    SAMPLE_DEFAULT_WAIT_TIME = 4000
 H2_ENUM_END(SamplePlaybackConstant)
 
 VA(0x0046d534, 0x41)
@@ -3613,8 +3578,7 @@ void WaitEndSample(SAMPLE2 s, i32 waitTime) {
         waitTime = SAMPLE_DEFAULT_WAIT_TIME;
     endTime = KBTickCount() + waitTime;
     if (s.pSample)
-        while (gpSoundManager->DigitalReport(s.pSample)
-               && KBTickCount() < endTime) {
+        while (gpSoundManager->DigitalReport(s.pSample) && KBTickCount() < endTime) {
             Process1WindowsMessage();
             PollSound();
         }
@@ -3633,7 +3597,13 @@ void MemError(void) {
         return;
     gbInMemError = true;
     LogStr("Out of Memory");
-    sprintf(gText, cOutOfMemory, "Out of memory.", MEMORY_ERROR_REQUEST_SIZE);
+    sprintf(
+        gText,
+        cOutOfMemory,
+        "\xcd\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee \xef\xe0\xec\xff\xf2\xe8." /* "Недостаточно памяти." */
+        ,
+        MEMORY_ERROR_REQUEST_SIZE
+    );
     ShutDown(gText);
 }
 
@@ -3861,7 +3831,8 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
             if (currentHeroRec != NULL) {
                 for (loopIndex = IDX(SPELL_FIREBALL); loopIndex < APP_MENU_MAX_SPELLS; loopIndex++)
                     currentHeroRec->AddSpell(
-                        static_cast<SpellType>(loopIndex), APP_MENU_SPELL_COUNT
+                        static_cast<SpellType>(loopIndex),
+                        APP_MENU_SPELL_COUNT
                     );
                 currentHeroRec->m_spellPoints = APP_MENU_CHEAT_SPELL_POINTS;
             }
@@ -4077,38 +4048,37 @@ void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
 
 H2_ENUM_BEGIN(MapAreaConstant)
     MAP_AREA_ORIGIN = 16,
-    MAP_AREA_LIMIT  = 448
+    MAP_AREA_LIMIT = 448
 H2_ENUM_END(MapAreaConstant)
 
 VA(0x0046e31d, 0x41)
 i32 InMapArea(i32 x, i32 y) {
-    return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN
-        && y < MAP_AREA_LIMIT;
+    return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN && y < MAP_AREA_LIMIT;
 }
 
 H2_ENUM_BEGIN(DynamicWindowConstant)
-    DYNAMIC_WINDOW_STONE      = 0,
-    TILE_SIZE                 = 48,
-    WINDOW_PADDING            = 48,
-    CONTENT_LEFT              = 32,
-    CONTENT_TOP               = 16,
-    CORNER_SIZE               = 72,
-    CORNER_LEFT               = 40,
-    CORNER_RIGHT              = 23,
-    EDGE_OFFSET               = 24,
-    CORNER_FRAME_TOP_LEFT     = 0,
-    CORNER_FRAME_TOP_RIGHT    = 1,
+    DYNAMIC_WINDOW_STONE = 0,
+    TILE_SIZE = 48,
+    WINDOW_PADDING = 48,
+    CONTENT_LEFT = 32,
+    CONTENT_TOP = 16,
+    CORNER_SIZE = 72,
+    CORNER_LEFT = 40,
+    CORNER_RIGHT = 23,
+    EDGE_OFFSET = 24,
+    CORNER_FRAME_TOP_LEFT = 0,
+    CORNER_FRAME_TOP_RIGHT = 1,
     CORNER_FRAME_BOTTOM_RIGHT = 2,
-    CORNER_FRAME_BOTTOM_LEFT  = 3,
-    BACKGROUND_FRAME          = 12,
-    TOP_FRAME_FIRST           = 4,
-    TOP_FRAME_LAST            = 5,
-    RIGHT_FRAME_FIRST         = 6,
-    RIGHT_FRAME_LAST          = 7,
-    BOTTOM_FRAME_FIRST        = 8,
-    BOTTOM_FRAME_LAST         = 9,
-    LEFT_FRAME_FIRST          = 10,
-    LEFT_FRAME_LAST           = 11,
+    CORNER_FRAME_BOTTOM_LEFT = 3,
+    BACKGROUND_FRAME = 12,
+    TOP_FRAME_FIRST = 4,
+    TOP_FRAME_LAST = 5,
+    RIGHT_FRAME_FIRST = 6,
+    RIGHT_FRAME_LAST = 7,
+    BOTTOM_FRAME_FIRST = 8,
+    BOTTOM_FRAME_LAST = 9,
+    LEFT_FRAME_FIRST = 10,
+    LEFT_FRAME_LAST = 11,
 H2_ENUM_END(DynamicWindowConstant)
 
 VA(0x0046e35e, 0x829)
@@ -4406,13 +4376,13 @@ void HandleRemoteDeadPlayerExit(i32 pos) {
 }
 
 H2_ENUM_BEGIN(PlayerExitLocalConstant)
-    PLAYER_EXIT_HOST_NET_POSITION        = 0,
+    PLAYER_EXIT_HOST_NET_POSITION = 0,
     PLAYER_EXIT_FIRST_GUEST_NET_POSITION = 1,
-    PLAYER_EXIT_DIRECT_PLAYER_COUNT      = 2,
-    PLAYER_EXIT_MESSAGE_LENGTH           = 500,
-    PLAYER_EXIT_TRANSMIT_DELAY           = 500,
-    PLAYER_EXIT_MESSAGE_TIME             = 5000,
-    PLAYER_EXIT_HEARTBEAT_DISABLED       = 0x0bebc1ff
+    PLAYER_EXIT_DIRECT_PLAYER_COUNT = 2,
+    PLAYER_EXIT_MESSAGE_LENGTH = 500,
+    PLAYER_EXIT_TRANSMIT_DELAY = 500,
+    PLAYER_EXIT_MESSAGE_TIME = 5000,
+    PLAYER_EXIT_HEARTBEAT_DISABLED = 0x0bebc1ff
 H2_ENUM_END(PlayerExitLocalConstant)
 
 VA(0x0046ece2, 0x8e)
@@ -4678,8 +4648,8 @@ playerExitHandled:
 
 H2_ENUM_BEGIN(CheckMemoryConstant)
     CHECK_MEMORY_INITIAL_AVAILABLE_KB = 5,
-    CHECK_MEMORY_TOTAL_KB             = 16000,
-    CHECK_MEMORY_AVAILABLE_KB         = 8000
+    CHECK_MEMORY_TOTAL_KB = 16000,
+    CHECK_MEMORY_AVAILABLE_KB = 8000
 H2_ENUM_END(CheckMemoryConstant)
 
 VA(0x0046f3de, 0x1e)
@@ -4729,13 +4699,13 @@ void SetWinText(heroWindow* j, i32 id) {
 }
 
 H2_ENUM_BEGIN(ShingleAnimationConstant)
-    SHINGLE_ANIMATION_INTERVAL     = 250,
-    SHINGLE_ANIMATION_FRAME_COUNT  = 39,
+    SHINGLE_ANIMATION_INTERVAL = 250,
+    SHINGLE_ANIMATION_FRAME_COUNT = 39,
     SHINGLE_ANIMATION_FRAME_OFFSET = 1,
-    SHINGLE_UPDATE_X               = 46,
-    SHINGLE_UPDATE_Y               = 176,
-    SHINGLE_UPDATE_WIDTH           = 139,
-    SHINGLE_UPDATE_HEIGHT          = 187
+    SHINGLE_UPDATE_X = 46,
+    SHINGLE_UPDATE_Y = 176,
+    SHINGLE_UPDATE_WIDTH = 139,
+    SHINGLE_UPDATE_HEIGHT = 187
 H2_ENUM_END(ShingleAnimationConstant)
 
 VA(0x0046f552, 0x79)
@@ -4745,10 +4715,12 @@ void CheckShingleUpdate(void) {
     if (KBTickCount() > iNextShingleAnim) {
         iNextShingleAnim = KBTickCount() + SHINGLE_ANIMATION_INTERVAL;
         iShingleAnimFrame =
-            (iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET)
-            % SHINGLE_ANIMATION_FRAME_COUNT;
+            (iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET) % SHINGLE_ANIMATION_FRAME_COUNT;
         gShingleAnim->DrawToBuffer(
-            0, 0, iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET, ICON_DRAW_NORMAL
+            0,
+            0,
+            iShingleAnimFrame + SHINGLE_ANIMATION_FRAME_OFFSET,
+            ICON_DRAW_NORMAL
         );
         gpWindowManager->UpdateScreenRegion(
             SHINGLE_UPDATE_X,
@@ -4760,79 +4732,79 @@ void CheckShingleUpdate(void) {
 }
 
 H2_ENUM_BEGIN(NormalDialogLayoutConstant)
-    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH        = 5,
-    NORMAL_DIALOG_OR_TEXT_LENGTH                   = 3,
-    NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT            = 12,
-    NORMAL_DIALOG_SPELL_LABEL_HEIGHT               = 24,
-    NORMAL_DIALOG_RESOURCE_LABEL_WIDTH             = 100,
-    NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH        = NORMAL_DIALOG_RESOURCE_LABEL_WIDTH / 2,
-    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT        = 16,
-    NORMAL_DIALOG_OR_TEXT_WIDTH                    = 40,
-    NORMAL_DIALOG_OR_TEXT_HEIGHT                   = 12,
-    NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT           = 44,
-    NORMAL_DIALOG_RESOURCE_ICON_WIDTH              = 38,
-    NORMAL_DIALOG_RESOURCE_ICON_HEIGHT             = 32,
-    NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT               = 26,
-    NORMAL_DIALOG_LARGE_ICON_WIDTH                 = 76,
-    NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT             = 76,
-    NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT              = 79,
-    NORMAL_DIALOG_SPELL_ICON_WIDTH                 = 70,
-    NORMAL_DIALOG_SPELL_ICON_HEIGHT                = 55,
-    NORMAL_DIALOG_CREST_ICON_WIDTH                 = 50,
-    NORMAL_DIALOG_CREST_ICON_HEIGHT                = 55,
-    NORMAL_DIALOG_EXPMRL_ICON_WIDTH                = 64,
-    NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT           = 28,
-    NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT         = 57,
-    NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT         = 62,
-    NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT       = 59,
-    NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT           = 64,
-    NORMAL_DIALOG_HERO_LAYOUT_HEIGHT               = 111,
-    NORMAL_DIALOG_HERO_BACKGROUND_WIDTH            = 111,
-    NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT           = 105,
-    NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT    = 81,
+    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH = 5,
+    NORMAL_DIALOG_OR_TEXT_LENGTH = 3,
+    NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT = 12,
+    NORMAL_DIALOG_SPELL_LABEL_HEIGHT = 24,
+    NORMAL_DIALOG_RESOURCE_LABEL_WIDTH = 100,
+    NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH = NORMAL_DIALOG_RESOURCE_LABEL_WIDTH / 2,
+    NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT = 16,
+    NORMAL_DIALOG_OR_TEXT_WIDTH = 40,
+    NORMAL_DIALOG_OR_TEXT_HEIGHT = 12,
+    NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT = 44,
+    NORMAL_DIALOG_RESOURCE_ICON_WIDTH = 38,
+    NORMAL_DIALOG_RESOURCE_ICON_HEIGHT = 32,
+    NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT = 26,
+    NORMAL_DIALOG_LARGE_ICON_WIDTH = 76,
+    NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT = 76,
+    NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT = 79,
+    NORMAL_DIALOG_SPELL_ICON_WIDTH = 70,
+    NORMAL_DIALOG_SPELL_ICON_HEIGHT = 55,
+    NORMAL_DIALOG_CREST_ICON_WIDTH = 50,
+    NORMAL_DIALOG_CREST_ICON_HEIGHT = 55,
+    NORMAL_DIALOG_EXPMRL_ICON_WIDTH = 64,
+    NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT = 28,
+    NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT = 57,
+    NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT = 62,
+    NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT = 59,
+    NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT = 64,
+    NORMAL_DIALOG_HERO_LAYOUT_HEIGHT = 111,
+    NORMAL_DIALOG_HERO_BACKGROUND_WIDTH = 111,
+    NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT = 105,
+    NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT = 81,
     NORMAL_DIALOG_SECONDARY_SKILL_BACKGROUND_WIDTH = 75,
-    NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT      = 65,
-    NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT    = 105,
+    NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT = 65,
+    NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT = 105,
     NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH = 94,
-    NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT      = 105,
-    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH    = 82,
-    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT   = 93,
-    NORMAL_DIALOG_CREST_OVERLAY_WIDTH              = 58,
-    NORMAL_DIALOG_CREST_OVERLAY_HEIGHT             = 55,
-    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH    = 71,
-    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT   = 81,
-    NORMAL_DIALOG_HERO_OVERLAY_WIDTH               = 101,
-    NORMAL_DIALOG_HERO_OVERLAY_HEIGHT              = 95,
-    NORMAL_DIALOG_BUTTON_AREA_HEIGHT               = 39,
-    NORMAL_DIALOG_RESOURCE_VERTICAL_GAP            = 14,
-    NORMAL_DIALOG_ROW_CALCULATION_OFFSET           = 25,
-    NORMAL_DIALOG_DEFAULT_X                        = 159,
-    NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET     = 17,
-    NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X          = 104,
-    NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET      = 87,
-    NORMAL_DIALOG_RESOURCE_BOTTOM_INSET            = 48,
-    NORMAL_DIALOG_SECONDARY_PAIR_SPACING           = 4,
-    NORMAL_DIALOG_ICON_OVERLAY_INSET               = 6,
-    NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET        = 2,
-    NORMAL_DIALOG_CREST_OVERLAY_OUTSET             = 4,
-    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET   = 3,
-    NORMAL_DIALOG_HERO_OVERLAY_INSET               = 5,
-    NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET          = 72,
-    NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET         = 24,
-    NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET           = 93,
-    NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET           = 10,
-    NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET     = 22,
-    NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET          = 10,
-    NORMAL_DIALOG_OR_TEXT_Y_OFFSET                 = 43,
-    NORMAL_DIALOG_CENTER_PART_COUNT                = 2,
-    NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME         = 4,
-    NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME         = 12,
-    NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE  = 1,
-    NORMAL_DIALOG_HERO_BACKGROUND_FRAME            = 4,
-    NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET            = 1,
-    NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET        = 4,
-    NORMAL_DIALOG_CREST_OVERLAY_FRAME              = 6,
-    NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME          = 15
+    NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT = 105,
+    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH = 82,
+    NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT = 93,
+    NORMAL_DIALOG_CREST_OVERLAY_WIDTH = 58,
+    NORMAL_DIALOG_CREST_OVERLAY_HEIGHT = 55,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH = 71,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT = 81,
+    NORMAL_DIALOG_HERO_OVERLAY_WIDTH = 101,
+    NORMAL_DIALOG_HERO_OVERLAY_HEIGHT = 95,
+    NORMAL_DIALOG_BUTTON_AREA_HEIGHT = 39,
+    NORMAL_DIALOG_RESOURCE_VERTICAL_GAP = 14,
+    NORMAL_DIALOG_ROW_CALCULATION_OFFSET = 25,
+    NORMAL_DIALOG_DEFAULT_X = 159,
+    NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET = 17,
+    NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X = 104,
+    NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET = 87,
+    NORMAL_DIALOG_RESOURCE_BOTTOM_INSET = 48,
+    NORMAL_DIALOG_SECONDARY_PAIR_SPACING = 4,
+    NORMAL_DIALOG_ICON_OVERLAY_INSET = 6,
+    NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET = 2,
+    NORMAL_DIALOG_CREST_OVERLAY_OUTSET = 4,
+    NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET = 3,
+    NORMAL_DIALOG_HERO_OVERLAY_INSET = 5,
+    NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET = 72,
+    NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET = 24,
+    NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET = 93,
+    NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET = 10,
+    NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET = 22,
+    NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET = 10,
+    NORMAL_DIALOG_OR_TEXT_Y_OFFSET = 43,
+    NORMAL_DIALOG_CENTER_PART_COUNT = 2,
+    NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME = 4,
+    NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME = 12,
+    NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE = 1,
+    NORMAL_DIALOG_HERO_BACKGROUND_FRAME = 4,
+    NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET = 1,
+    NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET = 4,
+    NORMAL_DIALOG_CREST_OVERLAY_FRAME = 6,
+    NORMAL_DIALOG_SECONDARY_OVERLAY_FRAME = 15
 H2_ENUM_END(NormalDialogLayoutConstant)
 
 inline i32 NormalDialogCenterOffset(i32 extent) {
@@ -4957,8 +4929,8 @@ void NormalDialog(
                 if (resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE)
                     sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
                 else
-                    sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
-                                         + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
+                    sizingIconHeight_l =
+                        NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
                 break;
             case NORMAL_DIALOG_CREST:
                 sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
@@ -4997,9 +4969,8 @@ void NormalDialog(
 
     if (maxIconHeight_a)
         dialogContentHeight_h += maxIconHeight_a + NORMAL_DIALOG_RESOURCE_VERTICAL_GAP;
-    windowRows_j =
-        (dialogContentHeight_h - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
-        / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
+    windowRows_j = (dialogContentHeight_h - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
+                   / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
     if (windowRows_j > NORMAL_DIALOG_MAX_ROWS)
         windowRows_j = NORMAL_DIALOG_MAX_ROWS;
     windowWidth_a = NORMAL_DIALOG_WINDOW_WIDTH;
@@ -5104,9 +5075,8 @@ void NormalDialog(
                     [resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
             strcpy(iconFile_h, "secskill.icn");
-            resourceFrame_g =
-                resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
-                + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
+            resourceFrame_g = resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+                              + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
             sprintf(resourceText_e[resourceSlot_n], "%s", "");
             sprintf(iconFile_h, "surrendr.icn");
@@ -5194,8 +5164,7 @@ void NormalDialog(
         if (resourceSlot_n == 0) {
             if (resourceType_l[1] == NORMAL_DIALOG_NO_RESOURCE)
                 resourceCenterX_a = NormalDialogCenterOffset(
-                                        windowWidth_a
-                                        - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
+                                        windowWidth_a - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
                                     )
                                     + NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET;
             else
@@ -5203,8 +5172,7 @@ void NormalDialog(
         } else {
             resourceCenterX_a = windowWidth_a - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
         }
-        resourceY_l =
-            windowHeight_k - sizingIconHeight_l - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
+        resourceY_l = windowHeight_k - sizingIconHeight_l - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
             resourceY_l -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
         if (resourceType_l[0] == NORMAL_DIALOG_SECONDARY_SKILL
@@ -5218,7 +5186,7 @@ void NormalDialog(
         iconPanel_j = new iconWidget(
             resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
                 + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL)
-                    * NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET,
+                      * NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET,
             resourceY_l,
             resourceImageWidth_g,
             imageHeight_b,
@@ -5226,9 +5194,8 @@ void NormalDialog(
             resourceFrame_g,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL
-                ? WIDGET_KIND_ICON_CENTERED
-                : WIDGET_KIND_ICON_DIRECT,
+            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+                                                                  : WIDGET_KIND_ICON_DIRECT,
             1
         );
         if (!iconPanel_j)
@@ -5366,8 +5333,7 @@ void NormalDialog(
         }
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_o = sizingIconHeight_l + resourceY_l
-                - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
+            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
             textPanel_h = new textWidget(
                 resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
                 labelY_o,
@@ -5384,9 +5350,9 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
-            labelY_o = sizingIconHeight_l + resourceY_l
-                - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
+            resourceText_e[resourceSlot_n] =
+                static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
+            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             sprintf(
                 resourceText_e[resourceSlot_n],
                 "%s",
@@ -5394,11 +5360,9 @@ void NormalDialog(
                     [resourceValue_l[resourceSlot_n] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
         } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = sizingIconHeight_l + resourceY_l
-                - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
+            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
         } else {
-            labelY_o = sizingIconHeight_l + resourceY_l
-                - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
+            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
         }
 
         textPanel_h = new textWidget(
@@ -5424,8 +5388,7 @@ void NormalDialog(
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                sizingIconHeight_l + resourceY_l
-                    - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
+                sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
                 NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT,
                 bonusText,
@@ -5514,11 +5477,8 @@ void UpdateNormalDialog(char* text) {
     evt.payload.widget.data.text = text;
     pNormalDialogWindow->BroadcastMessage(evt);
     pNormalDialogWindow->DrawWindow(0, 0, NORMAL_DIALOG_FOREGROUND_WIDGET_LIMIT);
-    pNormalDialogWindow->DrawWindow(
-        1,
-        WINDOW_ALL_WIDGETS_LOW,
-        NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
-    );
+    pNormalDialogWindow
+        ->DrawWindow(1, WINDOW_ALL_WIDGETS_LOW, NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID);
 }
 
 VA(0x00470dd0, 0x19)
@@ -5538,7 +5498,7 @@ soundManager::~soundManager() {}
         12, 13, 14, 15, GROUND_REPEAT_8(0)
 
 H2_ENUM_STORAGE(TerrainType, u8)
-    giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
+giGroundToTerrain[GROUND_TILE_IMAGE_COUNT] = {
     GROUND_REPEAT_16(TERRAIN_WATER),
     GROUND_REPEAT_8(TERRAIN_WATER),
     GROUND_REPEAT_4(TERRAIN_WATER),
@@ -5754,8 +5714,7 @@ i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
 i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
 i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
 u32l glMilliCounter = 0;
-u8 gMapColors[RADAR_MAP_COLOR_COUNT] =
-    {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
+u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
@@ -5831,224 +5790,223 @@ u8 bPuzzleDraw[PUZZLE_DRAW_TABLE_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x00,
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
 };
-u8
-    uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
-        {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
-          0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
-          0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
-          0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3e, 0x3e, 0x3e,
-          0x3e, 0x3e, 0x3e, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
-          0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x54, 0x54, 0x54, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
-          0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6b, 0x6b, 0x6b,
-          0x6b, 0x6b, 0x6b, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d,
-          0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x88, 0x89, 0x8a, 0x8b,
-          0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x97, 0x97, 0x97,
-          0x97, 0x97, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa,
-          0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xae, 0xae, 0xae, 0xae, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8,
-          0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc5, 0xc5,
-          0xc5, 0xc5, 0xc5, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5,
-          0xd5, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xe1, 0xe2, 0xe3,
-          0xe4, 0xe5, 0xe6, 0xe6, 0xe6, 0xe6, 0x49, 0x4b, 0x4d, 0x4f, 0x51, 0x4c, 0x4e, 0x4a, 0x4c,
-          0x4e, 0x50, 0xf4, 0xf5, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x0f, 0x10, 0x11, 0x12,
-          0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21,
-          0x22, 0x23, 0x24, 0x24, 0x24, 0x24, 0x24, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30,
-          0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3e,
-          0x3e, 0x3e, 0x3e, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d,
-          0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x54, 0x59, 0x5a, 0x5b, 0x5c, 0x5d,
-          0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6b,
-          0x6b, 0x6b, 0x6b, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b,
-          0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x82, 0x82, 0x86, 0x87, 0x88, 0x89,
-          0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x97,
-          0x97, 0x97, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8,
-          0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xae, 0xae, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6,
-          0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5,
-          0xc5, 0xc5, 0xc5, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4,
-          0xd5, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xe0, 0xe1, 0xe2,
-          0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0xe6, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c,
-          0x4c, 0x4e, 0xf4, 0xf5, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
-          0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
-          0x20, 0x21, 0x22, 0x23, 0x24, 0x24, 0x24, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
-          0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d,
-          0x3e, 0x3e, 0x3e, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c,
-          0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x57, 0x58, 0x59, 0x5a, 0x5b,
-          0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a,
-          0x6b, 0x6b, 0x6b, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
-          0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x85, 0x86, 0x87, 0x88,
-          0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
-          0x97, 0x97, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6,
-          0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5,
-          0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4,
-          0xc5, 0xc5, 0xc5, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
-          0xd4, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xdf, 0xe0, 0xe1,
-          0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c,
-          0x4c, 0x4c, 0xf3, 0xf4, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-          0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
-          0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x24, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
-          0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c,
-          0x3d, 0x3e, 0x3e, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
-          0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x56, 0x57, 0x58, 0x59, 0x5a,
-          0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69,
-          0x6a, 0x6b, 0x6b, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
-          0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x84, 0x85, 0x86, 0x87,
-          0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,
-          0x97, 0x97, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5,
-          0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4,
-          0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3,
-          0xc4, 0xc5, 0xc5, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
-          0xd3, 0xd4, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xdf, 0xe0, 0xe1,
-          0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b,
-          0x4b, 0x4b, 0xf3, 0xf4, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00}},
-        {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0a, 0x0b, 0x0b, 0x0b,
-          0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e, 0x0f, 0x0f, 0x0f, 0x10, 0x11, 0x11, 0x11, 0x12, 0x12,
-          0x13, 0x13, 0x14, 0x14, 0x14, 0x15, 0x15, 0x0b, 0x25, 0x25, 0x25, 0x26, 0x26, 0x27, 0x27,
-          0x27, 0x28, 0x28, 0x29, 0x29, 0x29, 0x29, 0x2a, 0x2a, 0x13, 0x2a, 0x14, 0x14, 0x14, 0x14,
-          0x14, 0x14, 0x15, 0x0c, 0x83, 0x3f, 0x3f, 0x3f, 0x40, 0x40, 0x40, 0x41, 0x41, 0x41, 0x41,
-          0x41, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0x0d, 0x0e, 0x0f, 0x0f, 0x10,
-          0x55, 0x11, 0x55, 0x55, 0x55, 0x55, 0x13, 0x56, 0x14, 0x14, 0x14, 0x15, 0x15, 0x15, 0x15,
-          0x15, 0x15, 0x15, 0x0a, 0x6c, 0x6c, 0x6d, 0x6d, 0x6d, 0x6e, 0x6e, 0x6e, 0x6e, 0xc7, 0x28,
-          0x29, 0x29, 0x29, 0x29, 0x29, 0x2a, 0x2a, 0x2a, 0x2a, 0x14, 0x14, 0x0b, 0x0b, 0x83, 0x83,
-          0x84, 0x84, 0x84, 0x85, 0x85, 0x86, 0x86, 0x86, 0x87, 0x87, 0x12, 0x88, 0x13, 0x13, 0x14,
-          0x14, 0x14, 0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0f, 0x0f, 0x0f,
-          0x10, 0x11, 0x11, 0x11, 0x12, 0x12, 0x13, 0x13, 0x14, 0x14, 0x0b, 0xaf, 0xaf, 0xb0, 0xb0,
-          0x26, 0xb1, 0xb1, 0xb2, 0xb2, 0xb2, 0xb3, 0xb3, 0xb3, 0xb3, 0xb4, 0xb4, 0xb4, 0xb4, 0xb4,
-          0xb4, 0x15, 0x15, 0x6c, 0x6c, 0x26, 0x6d, 0x26, 0x6d, 0x27, 0x28, 0x28, 0x29, 0x29, 0x29,
-          0x2a, 0x2a, 0x2a, 0x14, 0xc7, 0xb3, 0xb4, 0xb4, 0x6e, 0x6e, 0x28, 0x2a, 0x6e, 0x6e, 0x56,
-          0x56, 0x56, 0x56, 0x12, 0x12, 0x13, 0x41, 0x41, 0x41, 0x42, 0x41, 0x42, 0x41, 0x98, 0x9b,
-          0x41, 0xf2, 0x0f, 0x10, 0x11, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0c,
-          0x0d, 0x0d, 0x0e, 0x0f, 0x0f, 0x10, 0x10, 0x11, 0x11, 0x12, 0x13, 0x14, 0x14, 0x15, 0x15,
-          0x16, 0x16, 0x17, 0x18, 0x18, 0x19, 0x19, 0x25, 0x25, 0x26, 0x26, 0x27, 0x27, 0x28, 0x29,
-          0x29, 0x29, 0x2a, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x17, 0x18, 0x18,
-          0x18, 0x18, 0x18, 0x83, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x41, 0x42, 0x42, 0xf2, 0x43, 0x43,
-          0x44, 0x44, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0x0f, 0x0f, 0x55, 0x55, 0x55,
-          0x55, 0x56, 0x56, 0x57, 0x57, 0x58, 0x58, 0x58, 0x58, 0x59, 0x18, 0x5a, 0x19, 0x19, 0x19,
-          0x19, 0x19, 0x19, 0x25, 0x6c, 0x6d, 0x6d, 0x6e, 0x6e, 0x6f, 0x6f, 0xc8, 0xc8, 0xc9, 0xc9,
-          0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x2e, 0x0b, 0x83, 0x84, 0x84,
-          0x84, 0x85, 0x85, 0x86, 0x87, 0x87, 0x88, 0xf2, 0x89, 0x89, 0x8a, 0xf3, 0xf3, 0xf3, 0xf3,
-          0xf3, 0x18, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9a, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f,
-          0x12, 0x13, 0x13, 0x14, 0x14, 0x15, 0x16, 0x16, 0x17, 0x18, 0x25, 0xaf, 0xb0, 0xb0, 0xb1,
-          0xb1, 0xb2, 0xb3, 0xb3, 0xb4, 0xb4, 0xb4, 0xb5, 0xb5, 0xb5, 0xb6, 0xb6, 0xb6, 0x2e, 0x2f,
-          0x2f, 0x30, 0x19, 0x6c, 0x6d, 0x6d, 0x6d, 0xc6, 0xc7, 0xc7, 0xc9, 0xc9, 0x2a, 0x2b, 0x2b,
-          0x2c, 0x2d, 0x2e, 0x2e, 0xc9, 0xb5, 0xb6, 0xb7, 0x6f, 0x6f, 0xca, 0x2d, 0x6f, 0x6f, 0x57,
-          0x58, 0x58, 0x58, 0x58, 0x15, 0x16, 0x42, 0x42, 0x44, 0x44, 0x43, 0x44, 0x44, 0x98, 0x9d,
-          0x42, 0x45, 0x10, 0x12, 0x14, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0d,
-          0x0e, 0x0e, 0x0f, 0x10, 0x11, 0x11, 0x12, 0x13, 0x14, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18,
-          0x19, 0x1a, 0x1a, 0x1b, 0x1c, 0x1d, 0x1d, 0x25, 0x25, 0x26, 0x27, 0x28, 0x28, 0x29, 0x2a,
-          0x2a, 0x2b, 0x2c, 0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x30, 0x31, 0x32, 0x32, 0x1b,
-          0x1c, 0x1c, 0x1c, 0x3f, 0x3f, 0x40, 0x41, 0x41, 0x42, 0x43, 0x43, 0x44, 0x45, 0x45, 0x45,
-          0x46, 0x46, 0x46, 0xf4, 0x47, 0xf4, 0xf4, 0xf4, 0xf4, 0xf5, 0x10, 0x55, 0x55, 0x56, 0x57,
-          0x57, 0x58, 0x58, 0x59, 0x5a, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0x5d, 0x1d, 0x1d,
-          0x1d, 0x1d, 0x1d, 0x25, 0x6d, 0x6d, 0x6e, 0x6f, 0x6f, 0x70, 0x71, 0x70, 0x70, 0xcb, 0xcb,
-          0xcb, 0x2c, 0x2d, 0x2e, 0x2f, 0x2f, 0x2f, 0x30, 0x30, 0x31, 0x32, 0x83, 0x83, 0x84, 0x85,
-          0x85, 0x86, 0x87, 0x88, 0x88, 0x89, 0x89, 0x8b, 0x8b, 0x8b, 0x8d, 0x8d, 0x8d, 0x8f, 0x8f,
-          0xf5, 0xf5, 0x98, 0x98, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f, 0xa0, 0xa1,
-          0xa2, 0xa3, 0xa3, 0xa4, 0xa5, 0xa5, 0xa6, 0x1a, 0x1a, 0x1b, 0xaf, 0x0d, 0xb0, 0xb1, 0xb2,
-          0xb2, 0xb3, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb7, 0xb7, 0xb7, 0xb8, 0xb8, 0xb9, 0xb9, 0x32,
-          0x32, 0x34, 0x34, 0x6d, 0x6d, 0xc6, 0xc7, 0xc8, 0xc9, 0xc9, 0xca, 0xca, 0x2c, 0x2d, 0x2e,
-          0x2f, 0x30, 0x30, 0x31, 0xcc, 0xcd, 0xb9, 0xb9, 0x70, 0x70, 0xcc, 0x2f, 0x70, 0x71, 0x58,
-          0x59, 0x5b, 0x5c, 0x5d, 0x5d, 0x19, 0x42, 0x44, 0x45, 0x45, 0x44, 0x45, 0x45, 0x99, 0x9f,
-          0x44, 0x47, 0x12, 0xf2, 0xf3, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0d,
-          0x0e, 0x0f, 0x10, 0x11, 0x11, 0x13, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18, 0x1a, 0x1a,
-          0x1b, 0x1c, 0x1c, 0x1e, 0x1e, 0x1f, 0x20, 0x25, 0x26, 0x27, 0x27, 0x28, 0x29, 0x2a, 0x2b,
-          0x2b, 0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36,
-          0x36, 0x1e, 0x1f, 0x3f, 0x40, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x45, 0x46, 0x47, 0x47,
-          0x47, 0x48, 0x48, 0x48, 0x49, 0x49, 0x49, 0xa8, 0xa8, 0xa8, 0x55, 0x55, 0x56, 0x57, 0x58,
-          0x58, 0x59, 0x5a, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0x5e, 0x5f, 0x5f, 0x60, 0x60, 0x60, 0x1f,
-          0x20, 0x20, 0x20, 0x6c, 0x6d, 0xc6, 0x6e, 0x6f, 0x70, 0x71, 0x71, 0x71, 0x74, 0x75, 0x76,
-          0x77, 0x78, 0x79, 0x2f, 0x30, 0x32, 0x32, 0x33, 0x33, 0x34, 0x34, 0x83, 0x84, 0x84, 0x85,
-          0x86, 0x87, 0x88, 0x89, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8d, 0x8f, 0x8f, 0x90, 0x91, 0x92,
-          0x93, 0x1e, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2,
-          0xa3, 0xa4, 0xa5, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0x1c, 0x1d, 0xaf, 0xb0, 0xb1, 0xb1, 0xb2,
-          0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb9, 0xb9, 0xb9, 0xba, 0xba, 0xbb, 0x32, 0x34,
-          0x34, 0x36, 0x37, 0x6d, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xca, 0xcc, 0xcc, 0xcd, 0xcf, 0x2f,
-          0x31, 0x32, 0x33, 0x34, 0xce, 0xce, 0xbb, 0xbc, 0x71, 0x71, 0x76, 0x31, 0xde, 0xde, 0xdf,
-          0xe0, 0xe1, 0xe2, 0x5f, 0xe3, 0xe4, 0x43, 0x44, 0x46, 0x47, 0x45, 0x47, 0x46, 0x99, 0x41,
-          0x45, 0x49, 0xf2, 0x16, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x00}},
-        {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0c,
-          0x0d, 0x0e, 0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x12, 0x13, 0x14, 0xf2, 0xf2, 0x16, 0x16,
-          0x17, 0xf3, 0xf3, 0x19, 0xf4, 0xf4, 0xf4, 0x0b, 0x25, 0x26, 0x26, 0x27, 0x28, 0x28, 0x29,
-          0xb2, 0x12, 0x13, 0x14, 0x14, 0x15, 0x15, 0x16, 0x16, 0x16, 0x16, 0x16, 0x17, 0x17, 0x17,
-          0x17, 0x18, 0xf4, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x41, 0x42, 0x42, 0x43, 0x43, 0x44, 0x44,
-          0x44, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x46, 0x46, 0x46, 0x0f, 0x0f, 0x10, 0x55, 0x56,
-          0x12, 0x13, 0x13, 0x14, 0x9f, 0x15, 0x15, 0xa1, 0x16, 0xa3, 0xa3, 0xa3, 0x17, 0x17, 0xa5,
-          0xa5, 0xf4, 0xf4, 0x25, 0x6c, 0x26, 0x6d, 0x6d, 0x6e, 0xc7, 0xc8, 0xc7, 0x28, 0x29, 0x2a,
-          0x2a, 0x2a, 0x2b, 0x2b, 0x2c, 0x16, 0x16, 0x17, 0x17, 0x17, 0x17, 0x83, 0x83, 0x84, 0x84,
-          0x85, 0x85, 0x86, 0x86, 0x87, 0x87, 0x88, 0x88, 0x89, 0x89, 0x8a, 0x8a, 0x8b, 0x8b, 0x8c,
-          0x8d, 0xf4, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e,
-          0x9f, 0xf2, 0x9f, 0xa1, 0xa1, 0xf3, 0xf3, 0xf3, 0xf3, 0xa4, 0x0b, 0xaf, 0xb0, 0xb0, 0xb1,
-          0xb1, 0xb2, 0xb3, 0xb3, 0xb4, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb6, 0xb6, 0xb7, 0x16, 0x17,
-          0x17, 0x17, 0x17, 0x6c, 0x26, 0x26, 0x27, 0x27, 0x28, 0x28, 0x29, 0xb2, 0xb4, 0x2a, 0x2c,
-          0x2d, 0x17, 0x17, 0x17, 0xb4, 0xb5, 0xb5, 0xb7, 0x6e, 0xc8, 0x2a, 0x2d, 0x55, 0x56, 0x57,
-          0x57, 0x57, 0x15, 0x16, 0x16, 0x17, 0x42, 0x42, 0x43, 0x44, 0x43, 0x44, 0x44, 0x99, 0x9e,
-          0x43, 0x46, 0x40, 0x41, 0xf2, 0xf3, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f,
-          0x0a},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0d,
-          0x0e, 0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x13, 0x13, 0x14, 0xf2, 0x16, 0x16, 0xf3, 0xf3,
-          0xf3, 0xf4, 0xf4, 0xf4, 0xf4, 0xf5, 0xf5, 0x25, 0x25, 0x26, 0xb0, 0x27, 0xb1, 0x29, 0x29,
-          0x2a, 0xb3, 0x14, 0xb4, 0x2d, 0x16, 0x17, 0x17, 0x18, 0x18, 0x18, 0x18, 0x19, 0x19, 0x19,
-          0x19, 0x1a, 0x1a, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x42, 0x43, 0x43, 0x44, 0x44, 0x45, 0x45,
-          0x46, 0x46, 0x46, 0x46, 0x46, 0x47, 0x47, 0x47, 0x47, 0x47, 0x0f, 0x55, 0x55, 0x56, 0x56,
-          0x57, 0x14, 0x58, 0x59, 0x16, 0xa1, 0xa2, 0xa3, 0xa3, 0xa4, 0xa4, 0xa5, 0xa5, 0xa6, 0xa6,
-          0xa7, 0xa7, 0xa7, 0x25, 0x6c, 0x6d, 0x6d, 0x6e, 0xc7, 0x6f, 0x6f, 0xc8, 0xc9, 0x29, 0x2b,
-          0x2b, 0x2b, 0x2c, 0x2c, 0x2e, 0x2e, 0x18, 0x18, 0x19, 0x19, 0x19, 0x83, 0x83, 0x84, 0x84,
-          0x85, 0x86, 0x87, 0x87, 0x88, 0x88, 0x89, 0x8a, 0x8a, 0x8b, 0x8b, 0x8c, 0x8c, 0x8d, 0x8d,
-          0x8e, 0x8f, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f,
-          0x9f, 0xa1, 0xa1, 0xa2, 0xa2, 0xa3, 0xa4, 0xf4, 0xf4, 0xf4, 0xaf, 0xaf, 0xb0, 0xb1, 0xb1,
-          0xb2, 0xb3, 0xb3, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb7, 0xb7, 0xb7, 0xb8, 0xb8, 0xb8, 0x19,
-          0x19, 0x19, 0x19, 0x6c, 0x6d, 0x6d, 0x27, 0x28, 0x29, 0x29, 0x2a, 0x2a, 0x2b, 0x2b, 0x2d,
-          0x2e, 0x2f, 0x19, 0x19, 0xb5, 0xb6, 0xb7, 0xb9, 0x6f, 0x6f, 0x2a, 0x2e, 0x6f, 0x57, 0x58,
-          0x58, 0x58, 0x16, 0x17, 0x18, 0x19, 0x42, 0x43, 0x44, 0x45, 0x44, 0x45, 0x45, 0x99, 0x00,
-          0x44, 0x47, 0x41, 0xf2, 0xf2, 0xf3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x0a},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0d, 0x0d,
-          0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x15, 0x16, 0x17, 0xf3, 0x19, 0xf4,
-          0xf4, 0xf4, 0x1c, 0xf5, 0xf5, 0xf5, 0x1f, 0x25, 0x26, 0x26, 0x27, 0x28, 0x29, 0x29, 0x2a,
-          0x2a, 0xb4, 0x2d, 0x2e, 0x2e, 0x2f, 0x2f, 0x19, 0x1a, 0x1a, 0x1a, 0x1a, 0x1b, 0x1b, 0x1b,
-          0x1b, 0x1b, 0xf5, 0x3f, 0x3f, 0x40, 0x41, 0x42, 0x42, 0x43, 0x44, 0x45, 0x45, 0x46, 0x46,
-          0x47, 0x47, 0x48, 0x48, 0x48, 0x48, 0x48, 0x49, 0x49, 0x49, 0x10, 0x55, 0x55, 0x56, 0x57,
-          0x58, 0x58, 0x5a, 0x5a, 0x5b, 0x5b, 0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa6, 0xa7, 0xa7, 0xa8,
-          0xa9, 0xa9, 0xaa, 0x25, 0x6c, 0x6d, 0xc6, 0xc7, 0x6f, 0x70, 0x70, 0xc9, 0xca, 0xca, 0x2b,
-          0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x1a, 0x1b, 0x1b, 0x1b, 0x83, 0x83, 0x84, 0x85,
-          0x86, 0x87, 0x87, 0x88, 0x89, 0x89, 0x8a, 0x8b, 0x8b, 0x8c, 0x8d, 0x8d, 0x8e, 0x8f, 0x8f,
-          0x90, 0x91, 0x98, 0x98, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9e, 0x9e, 0x9f, 0xa0, 0xa0,
-          0xa1, 0xa2, 0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa6, 0xa7, 0xa7, 0xaf, 0xb0, 0xb0, 0xb1, 0xb2,
-          0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb8, 0xb8, 0xb9, 0xba, 0xba, 0x32, 0x33,
-          0x1b, 0x1b, 0x1b, 0x6d, 0x6d, 0x6d, 0x28, 0x28, 0x29, 0x2a, 0x2b, 0x2b, 0x2c, 0x2d, 0x2e,
-          0x2f, 0x31, 0x1b, 0x1b, 0xb6, 0xb7, 0xb8, 0xbb, 0x70, 0x70, 0x2b, 0x2f, 0x70, 0x57, 0x59,
-          0x5a, 0x5b, 0x5b, 0x18, 0x1a, 0x1a, 0x43, 0x44, 0x45, 0x46, 0x45, 0x46, 0x46, 0x99, 0x00,
-          0x00, 0x49, 0x41, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x0a},
-         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0d,
-          0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x15, 0x17, 0xf3, 0x18, 0x19, 0xf4, 0xf4,
-          0x1b, 0xf5, 0xf5, 0x1f, 0xaa, 0x95, 0x95, 0x25, 0x26, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2a,
-          0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x1c, 0x1c, 0x1c, 0x1d, 0x1d, 0x1d,
-          0x1d, 0x1d, 0x1e, 0x3f, 0x40, 0x41, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x46, 0x47, 0x48,
-          0x48, 0x49, 0x49, 0x4a, 0x4a, 0x4b, 0x4b, 0x4c, 0x4c, 0x4c, 0x55, 0x55, 0x56, 0x57, 0x58,
-          0x59, 0x5a, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0xa6, 0xa6, 0x60, 0xa8, 0xa8, 0xa9, 0xaa, 0xaa,
-          0xab, 0xab, 0xab, 0x25, 0x6d, 0x6d, 0x6e, 0xc8, 0x6f, 0x70, 0x71, 0xca, 0xca, 0xcb, 0x2c,
-          0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x1d, 0x1d, 0x83, 0x84, 0x85, 0x85,
-          0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8b, 0x8c, 0x8d, 0x8e, 0x8e, 0x90, 0x90, 0x91, 0x91,
-          0x92, 0x93, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0x9f, 0xa0, 0xa1, 0xa2,
-          0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa8, 0xa8, 0xa9, 0xaf, 0xb0, 0xb1, 0xb1, 0xb2,
-          0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xba, 0xbb, 0xbb, 0xbd, 0xbd, 0xc1,
-          0xc1, 0x92, 0x92, 0x6d, 0x6d, 0xc6, 0xc7, 0xc9, 0xc9, 0xc9, 0x2c, 0xcd, 0x2d, 0x2e, 0x2f,
-          0x30, 0x32, 0x34, 0x1d, 0xb7, 0xb9, 0xba, 0xbd, 0x70, 0x70, 0xcd, 0x31, 0xde, 0x58, 0x59,
-          0x5b, 0x5c, 0x5d, 0x1a, 0x1b, 0x1c, 0x43, 0x44, 0x46, 0x47, 0x45, 0x47, 0x47, 0x9a, 0x00,
-          0x00, 0x4b, 0xf2, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-          0x0a}}
+u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT] = {
+    {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x11, 0x12, 0x13, 0x14,
+      0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
+      0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x24, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30, 0x31, 0x32,
+      0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3e, 0x3e, 0x3e,
+      0x3e, 0x3e, 0x3e, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
+      0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x54, 0x54, 0x54, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f,
+      0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6b, 0x6b, 0x6b,
+      0x6b, 0x6b, 0x6b, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d,
+      0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x82, 0x88, 0x89, 0x8a, 0x8b,
+      0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x97, 0x97, 0x97,
+      0x97, 0x97, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0xaa,
+      0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xae, 0xae, 0xae, 0xae, 0xb4, 0xb5, 0xb6, 0xb7, 0xb8,
+      0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc5, 0xc5,
+      0xc5, 0xc5, 0xc5, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4, 0xd5,
+      0xd5, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xe1, 0xe2, 0xe3,
+      0xe4, 0xe5, 0xe6, 0xe6, 0xe6, 0xe6, 0x49, 0x4b, 0x4d, 0x4f, 0x51, 0x4c, 0x4e, 0x4a, 0x4c,
+      0x4e, 0x50, 0xf4, 0xf5, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0e, 0x0f, 0x10, 0x11, 0x12,
+      0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21,
+      0x22, 0x23, 0x24, 0x24, 0x24, 0x24, 0x24, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30,
+      0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3e,
+      0x3e, 0x3e, 0x3e, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d,
+      0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x54, 0x59, 0x5a, 0x5b, 0x5c, 0x5d,
+      0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 0x6b,
+      0x6b, 0x6b, 0x6b, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b,
+      0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x82, 0x82, 0x86, 0x87, 0x88, 0x89,
+      0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97, 0x97,
+      0x97, 0x97, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8,
+      0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xae, 0xae, 0xb2, 0xb3, 0xb4, 0xb5, 0xb6,
+      0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5,
+      0xc5, 0xc5, 0xc5, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3, 0xd4,
+      0xd5, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xe0, 0xe1, 0xe2,
+      0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0xe6, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c,
+      0x4c, 0x4e, 0xf4, 0xf5, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x0d, 0x0e, 0x0f, 0x10,
+      0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
+      0x20, 0x21, 0x22, 0x23, 0x24, 0x24, 0x24, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
+      0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d,
+      0x3e, 0x3e, 0x3e, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c,
+      0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x54, 0x57, 0x58, 0x59, 0x5a, 0x5b,
+      0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a,
+      0x6b, 0x6b, 0x6b, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78, 0x79,
+      0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x82, 0x85, 0x86, 0x87, 0x88,
+      0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
+      0x97, 0x97, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6,
+      0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xae, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5,
+      0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4,
+      0xc5, 0xc5, 0xc5, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2, 0xd3,
+      0xd4, 0xd5, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xdf, 0xe0, 0xe1,
+      0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c, 0x4c,
+      0x4c, 0x4c, 0xf3, 0xf4, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+      0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e,
+      0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x24, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d,
+      0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c,
+      0x3d, 0x3e, 0x3e, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b,
+      0x4c, 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53, 0x54, 0x54, 0x56, 0x57, 0x58, 0x59, 0x5a,
+      0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68, 0x69,
+      0x6a, 0x6b, 0x6b, 0x6d, 0x6e, 0x6f, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
+      0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x82, 0x84, 0x85, 0x86, 0x87,
+      0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96,
+      0x97, 0x97, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5,
+      0xa6, 0xa7, 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae, 0xae, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4,
+      0xb5, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc, 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3,
+      0xc4, 0xc5, 0xc5, 0xc7, 0xc8, 0xc9, 0xca, 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
+      0xd3, 0xd4, 0xd5, 0xd5, 0xd6, 0xd7, 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xdf, 0xe0, 0xe1,
+      0xe2, 0xe3, 0xe4, 0xe5, 0xe6, 0xe6, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b, 0x4b,
+      0x4b, 0x4b, 0xf3, 0xf4, 0xf5, 0xf5, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00}},
+    {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0a, 0x0b, 0x0b, 0x0b,
+      0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e, 0x0f, 0x0f, 0x0f, 0x10, 0x11, 0x11, 0x11, 0x12, 0x12,
+      0x13, 0x13, 0x14, 0x14, 0x14, 0x15, 0x15, 0x0b, 0x25, 0x25, 0x25, 0x26, 0x26, 0x27, 0x27,
+      0x27, 0x28, 0x28, 0x29, 0x29, 0x29, 0x29, 0x2a, 0x2a, 0x13, 0x2a, 0x14, 0x14, 0x14, 0x14,
+      0x14, 0x14, 0x15, 0x0c, 0x83, 0x3f, 0x3f, 0x3f, 0x40, 0x40, 0x40, 0x41, 0x41, 0x41, 0x41,
+      0x41, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0xf2, 0x0d, 0x0e, 0x0f, 0x0f, 0x10,
+      0x55, 0x11, 0x55, 0x55, 0x55, 0x55, 0x13, 0x56, 0x14, 0x14, 0x14, 0x15, 0x15, 0x15, 0x15,
+      0x15, 0x15, 0x15, 0x0a, 0x6c, 0x6c, 0x6d, 0x6d, 0x6d, 0x6e, 0x6e, 0x6e, 0x6e, 0xc7, 0x28,
+      0x29, 0x29, 0x29, 0x29, 0x29, 0x2a, 0x2a, 0x2a, 0x2a, 0x14, 0x14, 0x0b, 0x0b, 0x83, 0x83,
+      0x84, 0x84, 0x84, 0x85, 0x85, 0x86, 0x86, 0x86, 0x87, 0x87, 0x12, 0x88, 0x13, 0x13, 0x14,
+      0x14, 0x14, 0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0f, 0x0f, 0x0f,
+      0x10, 0x11, 0x11, 0x11, 0x12, 0x12, 0x13, 0x13, 0x14, 0x14, 0x0b, 0xaf, 0xaf, 0xb0, 0xb0,
+      0x26, 0xb1, 0xb1, 0xb2, 0xb2, 0xb2, 0xb3, 0xb3, 0xb3, 0xb3, 0xb4, 0xb4, 0xb4, 0xb4, 0xb4,
+      0xb4, 0x15, 0x15, 0x6c, 0x6c, 0x26, 0x6d, 0x26, 0x6d, 0x27, 0x28, 0x28, 0x29, 0x29, 0x29,
+      0x2a, 0x2a, 0x2a, 0x14, 0xc7, 0xb3, 0xb4, 0xb4, 0x6e, 0x6e, 0x28, 0x2a, 0x6e, 0x6e, 0x56,
+      0x56, 0x56, 0x56, 0x12, 0x12, 0x13, 0x41, 0x41, 0x41, 0x42, 0x41, 0x42, 0x41, 0x98, 0x9b,
+      0x41, 0xf2, 0x0f, 0x10, 0x11, 0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0c,
+      0x0d, 0x0d, 0x0e, 0x0f, 0x0f, 0x10, 0x10, 0x11, 0x11, 0x12, 0x13, 0x14, 0x14, 0x15, 0x15,
+      0x16, 0x16, 0x17, 0x18, 0x18, 0x19, 0x19, 0x25, 0x25, 0x26, 0x26, 0x27, 0x27, 0x28, 0x29,
+      0x29, 0x29, 0x2a, 0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x17, 0x18, 0x18,
+      0x18, 0x18, 0x18, 0x83, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x41, 0x42, 0x42, 0xf2, 0x43, 0x43,
+      0x44, 0x44, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0xf3, 0x0f, 0x0f, 0x55, 0x55, 0x55,
+      0x55, 0x56, 0x56, 0x57, 0x57, 0x58, 0x58, 0x58, 0x58, 0x59, 0x18, 0x5a, 0x19, 0x19, 0x19,
+      0x19, 0x19, 0x19, 0x25, 0x6c, 0x6d, 0x6d, 0x6e, 0x6e, 0x6f, 0x6f, 0xc8, 0xc8, 0xc9, 0xc9,
+      0x2a, 0x2b, 0x2b, 0x2c, 0x2c, 0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x2e, 0x0b, 0x83, 0x84, 0x84,
+      0x84, 0x85, 0x85, 0x86, 0x87, 0x87, 0x88, 0xf2, 0x89, 0x89, 0x8a, 0xf3, 0xf3, 0xf3, 0xf3,
+      0xf3, 0x18, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9a, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f,
+      0x12, 0x13, 0x13, 0x14, 0x14, 0x15, 0x16, 0x16, 0x17, 0x18, 0x25, 0xaf, 0xb0, 0xb0, 0xb1,
+      0xb1, 0xb2, 0xb3, 0xb3, 0xb4, 0xb4, 0xb4, 0xb5, 0xb5, 0xb5, 0xb6, 0xb6, 0xb6, 0x2e, 0x2f,
+      0x2f, 0x30, 0x19, 0x6c, 0x6d, 0x6d, 0x6d, 0xc6, 0xc7, 0xc7, 0xc9, 0xc9, 0x2a, 0x2b, 0x2b,
+      0x2c, 0x2d, 0x2e, 0x2e, 0xc9, 0xb5, 0xb6, 0xb7, 0x6f, 0x6f, 0xca, 0x2d, 0x6f, 0x6f, 0x57,
+      0x58, 0x58, 0x58, 0x58, 0x15, 0x16, 0x42, 0x42, 0x44, 0x44, 0x43, 0x44, 0x44, 0x98, 0x9d,
+      0x42, 0x45, 0x10, 0x12, 0x14, 0x15, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0d,
+      0x0e, 0x0e, 0x0f, 0x10, 0x11, 0x11, 0x12, 0x13, 0x14, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18,
+      0x19, 0x1a, 0x1a, 0x1b, 0x1c, 0x1d, 0x1d, 0x25, 0x25, 0x26, 0x27, 0x28, 0x28, 0x29, 0x2a,
+      0x2a, 0x2b, 0x2c, 0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x2f, 0x30, 0x30, 0x31, 0x32, 0x32, 0x1b,
+      0x1c, 0x1c, 0x1c, 0x3f, 0x3f, 0x40, 0x41, 0x41, 0x42, 0x43, 0x43, 0x44, 0x45, 0x45, 0x45,
+      0x46, 0x46, 0x46, 0xf4, 0x47, 0xf4, 0xf4, 0xf4, 0xf4, 0xf5, 0x10, 0x55, 0x55, 0x56, 0x57,
+      0x57, 0x58, 0x58, 0x59, 0x5a, 0x5a, 0x5b, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0x5d, 0x1d, 0x1d,
+      0x1d, 0x1d, 0x1d, 0x25, 0x6d, 0x6d, 0x6e, 0x6f, 0x6f, 0x70, 0x71, 0x70, 0x70, 0xcb, 0xcb,
+      0xcb, 0x2c, 0x2d, 0x2e, 0x2f, 0x2f, 0x2f, 0x30, 0x30, 0x31, 0x32, 0x83, 0x83, 0x84, 0x85,
+      0x85, 0x86, 0x87, 0x88, 0x88, 0x89, 0x89, 0x8b, 0x8b, 0x8b, 0x8d, 0x8d, 0x8d, 0x8f, 0x8f,
+      0xf5, 0xf5, 0x98, 0x98, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f, 0xa0, 0xa1,
+      0xa2, 0xa3, 0xa3, 0xa4, 0xa5, 0xa5, 0xa6, 0x1a, 0x1a, 0x1b, 0xaf, 0x0d, 0xb0, 0xb1, 0xb2,
+      0xb2, 0xb3, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb7, 0xb7, 0xb7, 0xb8, 0xb8, 0xb9, 0xb9, 0x32,
+      0x32, 0x34, 0x34, 0x6d, 0x6d, 0xc6, 0xc7, 0xc8, 0xc9, 0xc9, 0xca, 0xca, 0x2c, 0x2d, 0x2e,
+      0x2f, 0x30, 0x30, 0x31, 0xcc, 0xcd, 0xb9, 0xb9, 0x70, 0x70, 0xcc, 0x2f, 0x70, 0x71, 0x58,
+      0x59, 0x5b, 0x5c, 0x5d, 0x5d, 0x19, 0x42, 0x44, 0x45, 0x45, 0x44, 0x45, 0x45, 0x99, 0x9f,
+      0x44, 0x47, 0x12, 0xf2, 0xf3, 0x18, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0d,
+      0x0e, 0x0f, 0x10, 0x11, 0x11, 0x13, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x18, 0x1a, 0x1a,
+      0x1b, 0x1c, 0x1c, 0x1e, 0x1e, 0x1f, 0x20, 0x25, 0x26, 0x27, 0x27, 0x28, 0x29, 0x2a, 0x2b,
+      0x2b, 0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x32, 0x33, 0x34, 0x34, 0x35, 0x36,
+      0x36, 0x1e, 0x1f, 0x3f, 0x40, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x45, 0x46, 0x47, 0x47,
+      0x47, 0x48, 0x48, 0x48, 0x49, 0x49, 0x49, 0xa8, 0xa8, 0xa8, 0x55, 0x55, 0x56, 0x57, 0x58,
+      0x58, 0x59, 0x5a, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0x5e, 0x5f, 0x5f, 0x60, 0x60, 0x60, 0x1f,
+      0x20, 0x20, 0x20, 0x6c, 0x6d, 0xc6, 0x6e, 0x6f, 0x70, 0x71, 0x71, 0x71, 0x74, 0x75, 0x76,
+      0x77, 0x78, 0x79, 0x2f, 0x30, 0x32, 0x32, 0x33, 0x33, 0x34, 0x34, 0x83, 0x84, 0x84, 0x85,
+      0x86, 0x87, 0x88, 0x89, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8d, 0x8f, 0x8f, 0x90, 0x91, 0x92,
+      0x93, 0x1e, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f, 0xa0, 0xa1, 0xa2,
+      0xa3, 0xa4, 0xa5, 0xa5, 0xa6, 0xa7, 0xa8, 0xa9, 0x1c, 0x1d, 0xaf, 0xb0, 0xb1, 0xb1, 0xb2,
+      0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb9, 0xb9, 0xb9, 0xba, 0xba, 0xbb, 0x32, 0x34,
+      0x34, 0x36, 0x37, 0x6d, 0xc6, 0xc7, 0xc8, 0xc9, 0xca, 0xca, 0xcc, 0xcc, 0xcd, 0xcf, 0x2f,
+      0x31, 0x32, 0x33, 0x34, 0xce, 0xce, 0xbb, 0xbc, 0x71, 0x71, 0x76, 0x31, 0xde, 0xde, 0xdf,
+      0xe0, 0xe1, 0xe2, 0x5f, 0xe3, 0xe4, 0x43, 0x44, 0x46, 0x47, 0x45, 0x47, 0x46, 0x99, 0x41,
+      0x45, 0x49, 0xf2, 0x16, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x00}},
+    {{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0c,
+      0x0d, 0x0e, 0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x12, 0x13, 0x14, 0xf2, 0xf2, 0x16, 0x16,
+      0x17, 0xf3, 0xf3, 0x19, 0xf4, 0xf4, 0xf4, 0x0b, 0x25, 0x26, 0x26, 0x27, 0x28, 0x28, 0x29,
+      0xb2, 0x12, 0x13, 0x14, 0x14, 0x15, 0x15, 0x16, 0x16, 0x16, 0x16, 0x16, 0x17, 0x17, 0x17,
+      0x17, 0x18, 0xf4, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x41, 0x42, 0x42, 0x43, 0x43, 0x44, 0x44,
+      0x44, 0x45, 0x45, 0x45, 0x45, 0x45, 0x45, 0x46, 0x46, 0x46, 0x0f, 0x0f, 0x10, 0x55, 0x56,
+      0x12, 0x13, 0x13, 0x14, 0x9f, 0x15, 0x15, 0xa1, 0x16, 0xa3, 0xa3, 0xa3, 0x17, 0x17, 0xa5,
+      0xa5, 0xf4, 0xf4, 0x25, 0x6c, 0x26, 0x6d, 0x6d, 0x6e, 0xc7, 0xc8, 0xc7, 0x28, 0x29, 0x2a,
+      0x2a, 0x2a, 0x2b, 0x2b, 0x2c, 0x16, 0x16, 0x17, 0x17, 0x17, 0x17, 0x83, 0x83, 0x84, 0x84,
+      0x85, 0x85, 0x86, 0x86, 0x87, 0x87, 0x88, 0x88, 0x89, 0x89, 0x8a, 0x8a, 0x8b, 0x8b, 0x8c,
+      0x8d, 0xf4, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e,
+      0x9f, 0xf2, 0x9f, 0xa1, 0xa1, 0xf3, 0xf3, 0xf3, 0xf3, 0xa4, 0x0b, 0xaf, 0xb0, 0xb0, 0xb1,
+      0xb1, 0xb2, 0xb3, 0xb3, 0xb4, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb6, 0xb6, 0xb7, 0x16, 0x17,
+      0x17, 0x17, 0x17, 0x6c, 0x26, 0x26, 0x27, 0x27, 0x28, 0x28, 0x29, 0xb2, 0xb4, 0x2a, 0x2c,
+      0x2d, 0x17, 0x17, 0x17, 0xb4, 0xb5, 0xb5, 0xb7, 0x6e, 0xc8, 0x2a, 0x2d, 0x55, 0x56, 0x57,
+      0x57, 0x57, 0x15, 0x16, 0x16, 0x17, 0x42, 0x42, 0x43, 0x44, 0x43, 0x44, 0x44, 0x99, 0x9e,
+      0x43, 0x46, 0x40, 0x41, 0xf2, 0xf3, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f, 0x9f,
+      0x0a},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0c, 0x0d,
+      0x0e, 0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x13, 0x13, 0x14, 0xf2, 0x16, 0x16, 0xf3, 0xf3,
+      0xf3, 0xf4, 0xf4, 0xf4, 0xf4, 0xf5, 0xf5, 0x25, 0x25, 0x26, 0xb0, 0x27, 0xb1, 0x29, 0x29,
+      0x2a, 0xb3, 0x14, 0xb4, 0x2d, 0x16, 0x17, 0x17, 0x18, 0x18, 0x18, 0x18, 0x19, 0x19, 0x19,
+      0x19, 0x1a, 0x1a, 0x3f, 0x3f, 0x40, 0x40, 0x41, 0x42, 0x43, 0x43, 0x44, 0x44, 0x45, 0x45,
+      0x46, 0x46, 0x46, 0x46, 0x46, 0x47, 0x47, 0x47, 0x47, 0x47, 0x0f, 0x55, 0x55, 0x56, 0x56,
+      0x57, 0x14, 0x58, 0x59, 0x16, 0xa1, 0xa2, 0xa3, 0xa3, 0xa4, 0xa4, 0xa5, 0xa5, 0xa6, 0xa6,
+      0xa7, 0xa7, 0xa7, 0x25, 0x6c, 0x6d, 0x6d, 0x6e, 0xc7, 0x6f, 0x6f, 0xc8, 0xc9, 0x29, 0x2b,
+      0x2b, 0x2b, 0x2c, 0x2c, 0x2e, 0x2e, 0x18, 0x18, 0x19, 0x19, 0x19, 0x83, 0x83, 0x84, 0x84,
+      0x85, 0x86, 0x87, 0x87, 0x88, 0x88, 0x89, 0x8a, 0x8a, 0x8b, 0x8b, 0x8c, 0x8c, 0x8d, 0x8d,
+      0x8e, 0x8f, 0x98, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9d, 0x9e, 0x9e, 0x9f,
+      0x9f, 0xa1, 0xa1, 0xa2, 0xa2, 0xa3, 0xa4, 0xf4, 0xf4, 0xf4, 0xaf, 0xaf, 0xb0, 0xb1, 0xb1,
+      0xb2, 0xb3, 0xb3, 0xb4, 0xb5, 0xb5, 0xb6, 0xb6, 0xb7, 0xb7, 0xb7, 0xb8, 0xb8, 0xb8, 0x19,
+      0x19, 0x19, 0x19, 0x6c, 0x6d, 0x6d, 0x27, 0x28, 0x29, 0x29, 0x2a, 0x2a, 0x2b, 0x2b, 0x2d,
+      0x2e, 0x2f, 0x19, 0x19, 0xb5, 0xb6, 0xb7, 0xb9, 0x6f, 0x6f, 0x2a, 0x2e, 0x6f, 0x57, 0x58,
+      0x58, 0x58, 0x16, 0x17, 0x18, 0x19, 0x42, 0x43, 0x44, 0x45, 0x44, 0x45, 0x45, 0x99, 0x00,
+      0x44, 0x47, 0x41, 0xf2, 0xf2, 0xf3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x0a},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0b, 0x0d, 0x0d,
+      0x0e, 0x0f, 0x10, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x15, 0x16, 0x17, 0xf3, 0x19, 0xf4,
+      0xf4, 0xf4, 0x1c, 0xf5, 0xf5, 0xf5, 0x1f, 0x25, 0x26, 0x26, 0x27, 0x28, 0x29, 0x29, 0x2a,
+      0x2a, 0xb4, 0x2d, 0x2e, 0x2e, 0x2f, 0x2f, 0x19, 0x1a, 0x1a, 0x1a, 0x1a, 0x1b, 0x1b, 0x1b,
+      0x1b, 0x1b, 0xf5, 0x3f, 0x3f, 0x40, 0x41, 0x42, 0x42, 0x43, 0x44, 0x45, 0x45, 0x46, 0x46,
+      0x47, 0x47, 0x48, 0x48, 0x48, 0x48, 0x48, 0x49, 0x49, 0x49, 0x10, 0x55, 0x55, 0x56, 0x57,
+      0x58, 0x58, 0x5a, 0x5a, 0x5b, 0x5b, 0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa6, 0xa7, 0xa7, 0xa8,
+      0xa9, 0xa9, 0xaa, 0x25, 0x6c, 0x6d, 0xc6, 0xc7, 0x6f, 0x70, 0x70, 0xc9, 0xca, 0xca, 0x2b,
+      0x2c, 0x2d, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x1a, 0x1b, 0x1b, 0x1b, 0x83, 0x83, 0x84, 0x85,
+      0x86, 0x87, 0x87, 0x88, 0x89, 0x89, 0x8a, 0x8b, 0x8b, 0x8c, 0x8d, 0x8d, 0x8e, 0x8f, 0x8f,
+      0x90, 0x91, 0x98, 0x98, 0x99, 0x9a, 0x9b, 0x9b, 0x9c, 0x9c, 0x9e, 0x9e, 0x9f, 0xa0, 0xa0,
+      0xa1, 0xa2, 0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa6, 0xa7, 0xa7, 0xaf, 0xb0, 0xb0, 0xb1, 0xb2,
+      0xb2, 0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb8, 0xb8, 0xb9, 0xba, 0xba, 0x32, 0x33,
+      0x1b, 0x1b, 0x1b, 0x6d, 0x6d, 0x6d, 0x28, 0x28, 0x29, 0x2a, 0x2b, 0x2b, 0x2c, 0x2d, 0x2e,
+      0x2f, 0x31, 0x1b, 0x1b, 0xb6, 0xb7, 0xb8, 0xbb, 0x70, 0x70, 0x2b, 0x2f, 0x70, 0x57, 0x59,
+      0x5a, 0x5b, 0x5b, 0x18, 0x1a, 0x1a, 0x43, 0x44, 0x45, 0x46, 0x45, 0x46, 0x46, 0x99, 0x00,
+      0x00, 0x49, 0x41, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x0a},
+     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0d,
+      0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x15, 0x17, 0xf3, 0x18, 0x19, 0xf4, 0xf4,
+      0x1b, 0xf5, 0xf5, 0x1f, 0xaa, 0x95, 0x95, 0x25, 0x26, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2a,
+      0x2c, 0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x1c, 0x1c, 0x1c, 0x1d, 0x1d, 0x1d,
+      0x1d, 0x1d, 0x1e, 0x3f, 0x40, 0x41, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x46, 0x47, 0x48,
+      0x48, 0x49, 0x49, 0x4a, 0x4a, 0x4b, 0x4b, 0x4c, 0x4c, 0x4c, 0x55, 0x55, 0x56, 0x57, 0x58,
+      0x59, 0x5a, 0x5b, 0x5b, 0x5c, 0x5d, 0x5d, 0xa6, 0xa6, 0x60, 0xa8, 0xa8, 0xa9, 0xaa, 0xaa,
+      0xab, 0xab, 0xab, 0x25, 0x6d, 0x6d, 0x6e, 0xc8, 0x6f, 0x70, 0x71, 0xca, 0xca, 0xcb, 0x2c,
+      0x2d, 0x2e, 0x2e, 0x2f, 0x30, 0x31, 0x32, 0x33, 0x34, 0x1d, 0x1d, 0x83, 0x84, 0x85, 0x85,
+      0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8b, 0x8c, 0x8d, 0x8e, 0x8e, 0x90, 0x90, 0x91, 0x91,
+      0x92, 0x93, 0x98, 0x99, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0x9f, 0xa0, 0xa1, 0xa2,
+      0xa3, 0xa4, 0xa4, 0xa5, 0xa6, 0xa7, 0xa8, 0xa8, 0xa8, 0xa9, 0xaf, 0xb0, 0xb1, 0xb1, 0xb2,
+      0xb3, 0xb4, 0xb5, 0xb6, 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xba, 0xbb, 0xbb, 0xbd, 0xbd, 0xc1,
+      0xc1, 0x92, 0x92, 0x6d, 0x6d, 0xc6, 0xc7, 0xc9, 0xc9, 0xc9, 0x2c, 0xcd, 0x2d, 0x2e, 0x2f,
+      0x30, 0x32, 0x34, 0x1d, 0xb7, 0xb9, 0xba, 0xbd, 0x70, 0x70, 0xcd, 0x31, 0xde, 0x58, 0x59,
+      0x5b, 0x5c, 0x5d, 0x1a, 0x1b, 0x1c, 0x43, 0x44, 0x46, 0x47, 0x45, 0x47, 0x47, 0x9a, 0x00,
+      0x00, 0x4b, 0xf2, 0xf2, 0xf3, 0xf4, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+      0x0a}}
 };
 u8 gColorTableLighten[DIM_PALETTE_COLOR_COUNT] = {
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0a, 0x0a, 0x0a, 0x0a, 0x0b,
@@ -6103,12 +6061,8 @@ u32l gTownEligibleBuildMask[TOWN_ELIGIBLE_BUILD_MASK_COUNT] = {
     TOWN_ELIGIBLE_BUILD_WIZARD_MASK,
     TOWN_ELIGIBLE_BUILD_NECROMANCER_MASK
 };
-u8 giMapSizes[KB_MAP_SIZE_COUNT] = {
-    MAP_DIMENSION_SMALL,
-    MAP_DIMENSION_MEDIUM,
-    MAP_DIMENSION_LARGE,
-    MAP_DIMENSION_XLARGE
-};
+u8 giMapSizes[KB_MAP_SIZE_COUNT] =
+    {MAP_DIMENSION_SMALL, MAP_DIMENSION_MEDIUM, MAP_DIMENSION_LARGE, MAP_DIMENSION_XLARGE};
 b32 gbUseEvilInterface = false;
 char* cEvilTranslate[KB_INTERFACE_TYPE_COUNT][KB_INTERFACE_VARIANT_COUNT] = {
     {"advbord.icn", "advborde.icn"},  {"heroextg.icn", "heroexte.icn"},
@@ -6187,8 +6141,7 @@ i16 horseFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {45, 46, 47, 48, 49, 50, 51, 52, 53, 179, 178, 177, 54, 175, 174, 55};
 i16 boatFrameFlip[MOVEMENT_FRAME_FLIP_COUNT] =
     {0, 0, 9, 9, 18, 18, 27, 27, 36, 36, 155, 155, 146, 146, 137, 137};
-i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] =
-    {IDX(RES_WOOD), IDX(RES_ORE), -1, -1, 0, 0, 0, 0};
+i8 gCastleResources[CASTLE_RESOURCE_SLOT_COUNT] = {IDX(RES_WOOD), IDX(RES_ORE), -1, -1, 0, 0, 0, 0};
 i16 gCastleAmounts[CASTLE_AMOUNT_COUNT] = {20, 20, 0, 0};
 i32 gHeroGoldCost = HERO_RECRUITMENT_GOLD_COST;
 i16 gVesaMode[VESA_MODE_VALUE_COUNT] =
@@ -6203,23 +6156,20 @@ tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {-1, 0, 16},
     {-1, -1, 16}
 };
-i32
-    gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1, 0};
-i32
-    gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
-        {30, 10, 30, 10, 10, 10, 10000},
-        {20, 5, 20, 5, 5, 5, 7500},
-        {10, 2, 10, 2, 2, 2, 5000},
-        {5, 0, 5, 0, 0, 0, 2500},
-        {0, 0, 0, 0, 0, 0, 0}
+i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1, 0};
+i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+    {30, 10, 30, 10, 10, 10, 10000},
+    {20, 5, 20, 5, 5, 5, 7500},
+    {10, 2, 10, 2, 2, 2, 5000},
+    {5, 0, 5, 0, 0, 0, 2500},
+    {0, 0, 0, 0, 0, 0, 0}
 };
-i32
-    gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
-        {20, 5, 20, 5, 5, 5, 7500},
-        {20, 5, 20, 5, 5, 5, 7500},
-        {30, 10, 30, 10, 10, 10, 10000},
-        {30, 10, 30, 10, 10, 10, 10000},
-        {30, 10, 30, 10, 10, 10, 10000}
+i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
+    {20, 5, 20, 5, 5, 5, 7500},
+    {20, 5, 20, 5, 5, 5, 7500},
+    {30, 10, 30, 10, 10, 10, 10000},
+    {30, 10, 30, 10, 10, 10, 10000},
+    {30, 10, 30, 10, 10, 10, 10000}
 };
 i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000, 0};
 i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
@@ -6239,7 +6189,7 @@ i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {445, 950, 1500}
 };
 H2_ENUM_STORAGE(ArtifactLevelMask, u8)
-    gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
+gArtifactLevel[KB_ARTIFACT_LEVEL_COUNT] = {
     0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x04, 0x04, 0x02, 0x08, 0x08, 0x08,
     0x08, 0x08, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x02, 0x04, 0x02, 0x04, 0x02, 0x02, 0x02,
     0x02, 0x02, 0x04, 0x02, 0x02, 0x08, 0x08, 0x08, 0x08, 0x02, 0x04, 0x04, 0x08, 0x04, 0x04,
@@ -6279,16 +6229,64 @@ tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{200, 865}, 43, 5, 20, FACTION_BARBARIAN, 6, 6, 2, 3, 5, 0, "wolf", MONSTER_ATTRIBUTE_WIDE},
     {{300, 1065}, 36, 4, 40, FACTION_BARBARIAN, 2, 9, 5, 4, 6, 0, "ogre", MONSTER_FLAGS_NONE},
     {{500, 2070}, 41, 4, 60, FACTION_BARBARIAN, 4, 9, 5, 5, 7, 0, "ogre", MONSTER_FLAGS_NONE},
-    {{600, 1921}, 32, 3, 40, FACTION_BARBARIAN, 4, 10, 5, 5, 7, 8, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{700, 2337}, 33, 3, 40, FACTION_BARBARIAN, 5, 10, 5, 7, 9, 16, "trll", MONSTER_ATTRIBUTE_RANGED},
-    {{750, 6074}, 58, 2, 80, FACTION_BARBARIAN, 5, 12, 9, 12, 24, 0, "cycl", MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
+    {{600, 1921},
+     32,
+     3,
+     40,
+     FACTION_BARBARIAN,
+     4,
+     10,
+     5,
+     5,
+     7,
+     8,
+     "trll",
+     MONSTER_ATTRIBUTE_RANGED},
+    {{700, 2337},
+     33,
+     3,
+     40,
+     FACTION_BARBARIAN,
+     5,
+     10,
+     5,
+     7,
+     9,
+     16,
+     "trll",
+     MONSTER_ATTRIBUTE_RANGED},
+    {{750, 6074},
+     58,
+     2,
+     80,
+     FACTION_BARBARIAN,
+     5,
+     12,
+     9,
+     12,
+     24,
+     0,
+     "cycl",
+     MONSTER_ATTRIBUTE_TWO_HEX_ATTACKER},
     {{50, 129}, 26, 8, 2, FACTION_SORCERESS, 4, 4, 2, 1, 2, 0, "sprt", MONSTER_ATTRIBUTE_FLYING},
     {{200, 500}, 25, 6, 20, FACTION_SORCERESS, 2, 6, 5, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
     {{250, 716}, 29, 6, 20, FACTION_SORCERESS, 4, 6, 6, 2, 4, 0, "dwrf", MONSTER_FLAGS_NONE},
     {{250, 554}, 22, 4, 15, FACTION_SORCERESS, 4, 4, 3, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
     {{300, 658}, 22, 4, 15, FACTION_SORCERESS, 6, 5, 5, 2, 3, 24, "elf_", MONSTER_ATTRIBUTE_RANGED},
     {{350, 1290}, 37, 3, 25, FACTION_SORCERESS, 5, 7, 5, 5, 8, 8, "drui", MONSTER_ATTRIBUTE_RANGED},
-    {{400, 1428}, 36, 3, 25, FACTION_SORCERESS, 6, 7, 7, 5, 8, 16, "drui", MONSTER_ATTRIBUTE_RANGED},
+    {{400, 1428},
+     36,
+     3,
+     25,
+     FACTION_SORCERESS,
+     6,
+     7,
+     7,
+     5,
+     8,
+     16,
+     "drui",
+     MONSTER_ATTRIBUTE_RANGED},
     {{500, 2702}, 54, 2, 40, FACTION_SORCERESS, 5, 10, 9, 7, 14, 0, "unic", MONSTER_ATTRIBUTE_WIDE},
     {{1500, 10114},
      56,
@@ -6392,12 +6390,72 @@ tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
     {{600, 1935}, 32, 2, 30, FACTION_WIZARD, 5, 11, 7, 7, 9, 12, "mage", MONSTER_ATTRIBUTE_RANGED},
     {{700, 2469}, 35, 2, 35, FACTION_WIZARD, 6, 12, 8, 7, 9, 24, "mage", MONSTER_ATTRIBUTE_RANGED},
     {{2000, 9589}, 42, 1, 150, FACTION_WIZARD, 4, 13, 10, 20, 30, 0, "titn", MONSTER_FLAGS_NONE},
-    {{5000, 22933}, 79, 1, 300, FACTION_WIZARD, 6, 15, 15, 20, 30, 24, "titn", MONSTER_ATTRIBUTE_RANGED},
+    {{5000, 22933},
+     79,
+     1,
+     300,
+     FACTION_WIZARD,
+     6,
+     15,
+     15,
+     20,
+     30,
+     24,
+     "titn",
+     MONSTER_ATTRIBUTE_RANGED},
     {{75, 203}, 27, 8, 4, FACTION_NECROMANCER, 4, 4, 3, 2, 3, 0, "skel", MONSTER_ATTRIBUTE_UNDEAD},
-    {{150, 310}, 21, 6, 15, FACTION_NECROMANCER, 2, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{200, 506}, 25, 6, 20, FACTION_NECROMANCER, 4, 5, 2, 2, 3, 0, "zomb", MONSTER_ATTRIBUTE_UNDEAD},
-    {{250, 868}, 35, 4, 25, FACTION_NECROMANCER, 4, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
-    {{300, 1056}, 35, 4, 30, FACTION_NECROMANCER, 5, 6, 6, 3, 4, 0, "mumy", MONSTER_ATTRIBUTE_UNDEAD},
+    {{150, 310},
+     21,
+     6,
+     15,
+     FACTION_NECROMANCER,
+     2,
+     5,
+     2,
+     2,
+     3,
+     0,
+     "zomb",
+     MONSTER_ATTRIBUTE_UNDEAD},
+    {{200, 506},
+     25,
+     6,
+     20,
+     FACTION_NECROMANCER,
+     4,
+     5,
+     2,
+     2,
+     3,
+     0,
+     "zomb",
+     MONSTER_ATTRIBUTE_UNDEAD},
+    {{250, 868},
+     35,
+     4,
+     25,
+     FACTION_NECROMANCER,
+     4,
+     6,
+     6,
+     3,
+     4,
+     0,
+     "mumy",
+     MONSTER_ATTRIBUTE_UNDEAD},
+    {{300, 1056},
+     35,
+     4,
+     30,
+     FACTION_NECROMANCER,
+     5,
+     6,
+     6,
+     3,
+     4,
+     0,
+     "mumy",
+     MONSTER_ATTRIBUTE_UNDEAD},
     {{500, 1685},
      42,
      3,
@@ -6478,19 +6536,31 @@ tag_monsterInfo gMonsterDatabase[IDX(CREATURE_COUNT)] = {
      0,
      "ghst",
      MONSTER_ATTRIBUTE_FLYING | MONSTER_ATTRIBUTE_UNDEAD},
-    {{650, 5692}, 60, 2, 50, FACTION_NEUTRAL, 6, 10, 9, 20, 30, 0, "geni", MONSTER_ATTRIBUTE_FLYING},
+    {{650, 5692},
+     60,
+     2,
+     50,
+     FACTION_NEUTRAL,
+     6,
+     10,
+     9,
+     20,
+     30,
+     0,
+     "geni",
+     MONSTER_ATTRIBUTE_FLYING},
     {{500, 1979}, 40, 5, 35, FACTION_NEUTRAL, 4, 8, 9, 6, 10, 0, "meds", MONSTER_ATTRIBUTE_WIDE},
     {{500, 1732}, 35, 3, 50, FACTION_NEUTRAL, 3, 8, 8, 4, 5, 0, "eelm", MONSTER_FLAGS_NONE},
     {{500, 1412}, 28, 3, 35, FACTION_NEUTRAL, 6, 7, 7, 2, 8, 0, "aelm", MONSTER_FLAGS_NONE},
     {{500, 1501}, 30, 3, 40, FACTION_NEUTRAL, 5, 8, 6, 4, 6, 0, "felm", MONSTER_FLAGS_NONE},
     {{500, 1690}, 34, 3, 45, FACTION_NEUTRAL, 4, 6, 8, 3, 7, 0, "welm", MONSTER_FLAGS_NONE}
 };
-float gfStatPower[KB_STAT_POWER_COUNT] = {
-    0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f, 0.58f, 0.6f,  0.62f, 0.64f,
-    0.67f, 0.7f,  0.74f, 0.77f, 0.8f,  0.84f, 0.88f, 0.92f, 0.96f, 1.0f,  1.04f,
-    1.08f, 1.12f, 1.16f, 1.2f,  1.24f, 1.28f, 1.32f, 1.36f, 1.4f,  1.44f, 1.48f,
-    1.52f, 1.56f, 1.6f,  1.64f, 1.68f, 1.72f, 1.76f, 1.8f,  0.0f
-};
+float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  0.5f,  0.52f, 0.54f, 0.56f,
+                                          0.58f, 0.6f,  0.62f, 0.64f, 0.67f, 0.7f,  0.74f,
+                                          0.77f, 0.8f,  0.84f, 0.88f, 0.92f, 0.96f, 1.0f,
+                                          1.04f, 1.08f, 1.12f, 1.16f, 1.2f,  1.24f, 1.28f,
+                                          1.32f, 1.36f, 1.4f,  1.44f, 1.48f, 1.52f, 1.56f,
+                                          1.6f,  1.64f, 1.68f, 1.72f, 1.76f, 1.8f,  0.0f};
 float gfBattleStat[KB_STAT_POWER_COUNT] = {
     0.2f, 0.2f,  0.2f, 0.2f,  0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.55f, 0.6f, 0.65f,
     0.7f, 0.75f, 0.8f, 0.85f, 0.9f, 0.95f, 1.0f, 1.1f,  1.2f, 1.3f,  1.4f, 1.5f,  1.6f, 1.7f,
@@ -6568,14 +6638,13 @@ i8 townTheme[IDX(TOWN_MUSIC_TABLE_SIZE)] = {
     IDX(TOWN_MUSIC_NONE),
     IDX(TOWN_MUSIC_NONE)
 };
-i8
-    gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
-        {{35, 45, 10, 10}, {25, 25, 25, 25}},
-        {{55, 35, 5, 5}, {25, 25, 25, 25}},
-        {{10, 10, 30, 50}, {20, 20, 30, 30}},
-        {{10, 10, 50, 30}, {20, 20, 30, 30}},
-        {{10, 10, 40, 40}, {20, 20, 30, 30}},
-        {{15, 15, 35, 35}, {25, 25, 25, 25}}
+i8 gHeroSkillBonus[IDX(FACTION_COUNT)][KB_HERO_LEVEL_BAND_COUNT][HERO_PRIMARY_STAT_COUNT] = {
+    {{35, 45, 10, 10}, {25, 25, 25, 25}},
+    {{55, 35, 5, 5}, {25, 25, 25, 25}},
+    {{10, 10, 30, 50}, {20, 20, 30, 30}},
+    {{10, 10, 50, 30}, {20, 20, 30, 30}},
+    {{10, 10, 40, 40}, {20, 20, 30, 30}},
+    {{15, 15, 35, 35}, {25, 25, 25, 25}}
 };
 b32 gbLoadingMonoIcon = false;
 i32 giMonoIconSkip = -1;
@@ -7101,25 +7170,21 @@ u8 giSpellInfluenceToSpell[KB_SPELL_INFLUENCE_MAP_COUNT] = {
     0x11,
     0x00
 };
-u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10,
-                                                             10, 8,  8,  10, 10, 10, 10, 15,
-                                                             10, 10, 10, 10, 10, 16, 16, 14,
-                                                             19, 22, 10, 17, 10, 12, 11, 16};
-SpellEffectDisplayType
-giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
+u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10, 10, 10, 10, 10, 8,  8,
+                                            10, 10, 10, 10, 15, 10, 10, 10, 10, 10, 16,
+                                            16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
+SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
-char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {
-    "CBKGWATR.icn", "",
-    "CBKGGRTR.icn", "CBKGGRMT.icn",
-    "CBKGSNTR.icn", "CBKGSNMT.icn",
-    "CBKGSWMP.icn", "",
-    "CBKGLAVA.icn", "",
-    "CBKGDSRT.icn", "",
-    "CBKGDITR.icn", "CBKGDIMT.icn",
-    "CBKGCRCK.icn", "",
-    "CBKGBEAC.icn", "",
-    "CBKGGRAV.icn", NULL
-};
+char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
+                                                     "CBKGGRTR.icn", "CBKGGRMT.icn",
+                                                     "CBKGSNTR.icn", "CBKGSNMT.icn",
+                                                     "CBKGSWMP.icn", "",
+                                                     "CBKGLAVA.icn", "",
+                                                     "CBKGDSRT.icn", "",
+                                                     "CBKGDITR.icn", "CBKGDIMT.icn",
+                                                     "CBKGCRCK.icn", "",
+                                                     "CBKGBEAC.icn", "",
+                                                     "CBKGGRAV.icn", NULL};
 struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
     {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000042, 3, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000001, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
@@ -7152,26 +7217,24 @@ u8 gStartingHeroStats[IDX(FACTION_COUNT)][HERO_STARTING_STAT_COUNT] = {
     {0, 1, 2, 2, 1},
     {1, 0, 2, 2, 1}
 };
-i32
-    giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
-        {{{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-         {{150, 225}, {125, 187}, {100, 150}, {100, 150}},
-         {{175, 262}, {150, 225}, {125, 187}, {100, 150}},
-         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-         {{200, 300}, {175, 262}, {150, 225}, {100, 150}},
-         {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
-         {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
-         {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
-         {{75, 112}, {75, 112}, {75, 112}, {75, 112}}};
+i32 giTerrainCost[KB_TERRAIN_TYPE_COUNT][IDX(HERO_SKILL_LEVEL_COUNT)][KB_TERRAIN_STEP_TYPE_COUNT] =
+    {{{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+     {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+     {{150, 225}, {125, 187}, {100, 150}, {100, 150}},
+     {{175, 262}, {150, 225}, {125, 187}, {100, 150}},
+     {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+     {{200, 300}, {175, 262}, {150, 225}, {100, 150}},
+     {{100, 150}, {100, 150}, {100, 150}, {100, 150}},
+     {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
+     {{125, 187}, {100, 150}, {100, 150}, {100, 150}},
+     {{75, 112}, {75, 112}, {75, 112}, {75, 112}}};
 u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
     0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
 };
-char* gTownPrefixNames[IDX(FACTION_COUNT)] =
-    {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
+char* gTownPrefixNames[IDX(FACTION_COUNT)] = {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
 char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
     "mage", "thie", "tvrn", "dock", "well", "tent", "cstl", "stat", "ltur", "rtur", "mark",
     "wel2", "moat", "spec", "boat", "capt", "ext0", "ext1", "ext2", "dw_0", "dw_1", "dw_2",
@@ -7268,30 +7331,29 @@ i32 gSpecialBuildingCosts[IDX(FACTION_COUNT)][KB_BUILDING_RESOURCE_COUNT] = {
     {5, 5, 5, 5, 5, 5, 1500},
     {0, 10, 0, 10, 0, 0, 1000}
 };
-i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] =
-    {{5, 0, 5, 0, 0, 0, 2000},
-     {5, 0, 0, 0, 0, 0, 750},
-     {5, 0, 0, 0, 0, 0, 500},
-     {20, 0, 0, 0, 0, 0, 2000},
-     {0, 0, 0, 0, 0, 0, 500},
-     {0, 0, 0, 0, 0, 0, 0},
-     {20, 0, 20, 0, 0, 0, 5000},
-     {0, 0, 5, 0, 0, 0, 1250},
-     {0, 0, 5, 0, 0, 0, 1500},
-     {0, 0, 5, 0, 0, 0, 1500},
-     {5, 0, 0, 0, 0, 0, 500},
-     {0, 0, 0, 0, 0, 0, 1000},
-     {0, 0, 0, 0, 0, 0, 750},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 0},
-     {0, 0, 0, 0, 0, 0, 500}};
-i32
-    gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
+i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDING_RESOURCE_COUNT] = {
+    {5, 0, 5, 0, 0, 0, 2000},
+    {5, 0, 0, 0, 0, 0, 750},
+    {5, 0, 0, 0, 0, 0, 500},
+    {20, 0, 0, 0, 0, 0, 2000},
+    {0, 0, 0, 0, 0, 0, 500},
+    {0, 0, 0, 0, 0, 0, 0},
+    {20, 0, 20, 0, 0, 0, 5000},
+    {0, 0, 5, 0, 0, 0, 1250},
+    {0, 0, 5, 0, 0, 0, 1500},
+    {0, 0, 5, 0, 0, 0, 1500},
+    {5, 0, 0, 0, 0, 0, 500},
+    {0, 0, 0, 0, 0, 0, 1000},
+    {0, 0, 0, 0, 0, 0, 750},
+    {0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 500}
+};
+i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
 i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST) + 1] = {
     5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0, 0
 };
-i32
-    gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
+i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
 i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {858, 2225, 2816, 7385, 13754, 29785, 4000, 3200, 8000, 16000, 40000, 0},
     {1802, 2615, 3414, 6967, 13212, 38141, 3500, 0, 8000, 16000, 0, 0},
@@ -7300,80 +7362,79 @@ i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {1700, 3500, 2800, 9000, 11500, 85000, 0, 3500, 0, 15000, 155000, 0},
     {2200, 2100, 3800, 6000, 9500, 90000, 3000, 4900, 15000, 12000, 0, 0}
 };
-i32
-    gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
-        {{0, 0, 0, 0, 0, 0, 200},
-         {0, 0, 0, 0, 0, 0, 1000},
-         {0, 0, 5, 0, 0, 0, 1000},
-         {10, 0, 10, 0, 0, 0, 2000},
-         {20, 0, 0, 0, 0, 0, 3000},
-         {20, 0, 0, 0, 20, 0, 5000},
-         {5, 0, 0, 0, 0, 0, 1500},
-         {0, 0, 5, 0, 0, 0, 1500},
-         {5, 0, 5, 0, 0, 0, 2000},
-         {10, 0, 0, 0, 0, 0, 3000},
-         {10, 0, 0, 0, 10, 0, 5000},
-         {0, 0, 0, 0, 0, 0, 0}},
-        {{0, 0, 0, 0, 0, 0, 300},
-         {5, 0, 0, 0, 0, 0, 800},
-         {0, 0, 0, 0, 0, 0, 1000},
-         {10, 0, 10, 0, 0, 0, 2000},
-         {0, 0, 20, 0, 0, 0, 4000},
-         {0, 0, 20, 0, 20, 0, 6000},
-         {5, 0, 0, 0, 0, 0, 1200},
-         {0, 0, 0, 0, 0, 0, 0},
-         {5, 0, 5, 0, 0, 0, 3000},
-         {0, 0, 10, 0, 0, 0, 2000},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0}},
-        {{5, 0, 0, 0, 0, 0, 500},
-         {5, 0, 0, 0, 0, 0, 1000},
-         {0, 0, 0, 0, 0, 0, 1500},
-         {0, 0, 10, 0, 0, 0, 2500},
-         {10, 0, 0, 0, 0, 10, 3000},
-         {0, 20, 30, 0, 0, 0, 10000},
-         {5, 0, 0, 0, 0, 0, 1500},
-         {5, 0, 0, 0, 0, 0, 1500},
-         {0, 5, 0, 0, 0, 0, 1500},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0}},
-        {{0, 0, 0, 0, 0, 0, 500},
-         {0, 0, 10, 0, 0, 0, 1000},
-         {0, 0, 0, 0, 0, 0, 2000},
-         {0, 0, 0, 0, 0, 10, 3000},
-         {0, 0, 0, 10, 0, 0, 4000},
-         {0, 0, 30, 20, 0, 0, 15000},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 5, 2000},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 5, 10, 0, 0, 5000},
-         {0, 0, 5, 10, 0, 0, 5000}},
-        {{0, 0, 0, 0, 0, 0, 400},
-         {0, 0, 0, 0, 0, 0, 800},
-         {5, 0, 5, 0, 0, 0, 1500},
-         {5, 0, 0, 0, 0, 0, 3000},
-         {5, 5, 5, 5, 5, 5, 3500},
-         {5, 0, 5, 0, 0, 20, 12500},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 5, 0, 0, 0, 0, 1500},
-         {0, 0, 0, 0, 0, 0, 0},
-         {5, 0, 5, 0, 0, 0, 4000},
-         {5, 0, 5, 0, 0, 20, 12500},
-         {0, 0, 0, 0, 0, 0, 0}},
-        {{0, 0, 0, 0, 0, 0, 400},
-         {0, 0, 0, 0, 0, 0, 1000},
-         {0, 0, 10, 0, 0, 0, 1500},
-         {10, 0, 0, 0, 0, 0, 3000},
-         {10, 0, 0, 10, 0, 0, 4000},
-         {10, 5, 10, 5, 5, 5, 10000},
-         {0, 0, 0, 0, 0, 0, 1000},
-         {0, 0, 5, 0, 0, 0, 1500},
-         {5, 0, 0, 0, 10, 10, 4000},
-         {0, 0, 5, 0, 5, 0, 3000},
-         {0, 0, 0, 0, 0, 0, 0},
-         {0, 0, 0, 0, 0, 0, 0}}
+i32 gDwellingCosts[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT][KB_BUILDING_RESOURCE_COUNT] = {
+    {{0, 0, 0, 0, 0, 0, 200},
+     {0, 0, 0, 0, 0, 0, 1000},
+     {0, 0, 5, 0, 0, 0, 1000},
+     {10, 0, 10, 0, 0, 0, 2000},
+     {20, 0, 0, 0, 0, 0, 3000},
+     {20, 0, 0, 0, 20, 0, 5000},
+     {5, 0, 0, 0, 0, 0, 1500},
+     {0, 0, 5, 0, 0, 0, 1500},
+     {5, 0, 5, 0, 0, 0, 2000},
+     {10, 0, 0, 0, 0, 0, 3000},
+     {10, 0, 0, 0, 10, 0, 5000},
+     {0, 0, 0, 0, 0, 0, 0}},
+    {{0, 0, 0, 0, 0, 0, 300},
+     {5, 0, 0, 0, 0, 0, 800},
+     {0, 0, 0, 0, 0, 0, 1000},
+     {10, 0, 10, 0, 0, 0, 2000},
+     {0, 0, 20, 0, 0, 0, 4000},
+     {0, 0, 20, 0, 20, 0, 6000},
+     {5, 0, 0, 0, 0, 0, 1200},
+     {0, 0, 0, 0, 0, 0, 0},
+     {5, 0, 5, 0, 0, 0, 3000},
+     {0, 0, 10, 0, 0, 0, 2000},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0}},
+    {{5, 0, 0, 0, 0, 0, 500},
+     {5, 0, 0, 0, 0, 0, 1000},
+     {0, 0, 0, 0, 0, 0, 1500},
+     {0, 0, 10, 0, 0, 0, 2500},
+     {10, 0, 0, 0, 0, 10, 3000},
+     {0, 20, 30, 0, 0, 0, 10000},
+     {5, 0, 0, 0, 0, 0, 1500},
+     {5, 0, 0, 0, 0, 0, 1500},
+     {0, 5, 0, 0, 0, 0, 1500},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0}},
+    {{0, 0, 0, 0, 0, 0, 500},
+     {0, 0, 10, 0, 0, 0, 1000},
+     {0, 0, 0, 0, 0, 0, 2000},
+     {0, 0, 0, 0, 0, 10, 3000},
+     {0, 0, 0, 10, 0, 0, 4000},
+     {0, 0, 30, 20, 0, 0, 15000},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 5, 2000},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 5, 10, 0, 0, 5000},
+     {0, 0, 5, 10, 0, 0, 5000}},
+    {{0, 0, 0, 0, 0, 0, 400},
+     {0, 0, 0, 0, 0, 0, 800},
+     {5, 0, 5, 0, 0, 0, 1500},
+     {5, 0, 0, 0, 0, 0, 3000},
+     {5, 5, 5, 5, 5, 5, 3500},
+     {5, 0, 5, 0, 0, 20, 12500},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 5, 0, 0, 0, 0, 1500},
+     {0, 0, 0, 0, 0, 0, 0},
+     {5, 0, 5, 0, 0, 0, 4000},
+     {5, 0, 5, 0, 0, 20, 12500},
+     {0, 0, 0, 0, 0, 0, 0}},
+    {{0, 0, 0, 0, 0, 0, 400},
+     {0, 0, 0, 0, 0, 0, 1000},
+     {0, 0, 10, 0, 0, 0, 1500},
+     {10, 0, 0, 0, 0, 0, 3000},
+     {10, 0, 0, 10, 0, 0, 4000},
+     {10, 5, 10, 5, 5, 5, 10000},
+     {0, 0, 0, 0, 0, 0, 1000},
+     {0, 0, 5, 0, 0, 0, 1500},
+     {5, 0, 0, 0, 10, 10, 4000},
+     {0, 0, 5, 0, 5, 0, 3000},
+     {0, 0, 0, 0, 0, 0, 0},
+     {0, 0, 0, 0, 0, 0, 0}}
 };
 u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {0x00000000UL,
@@ -7450,10 +7511,8 @@ u32l gHierarchyMask[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
      0xffffffffUL}
 };
 i32 giDebugBuildingToBuild = -1;
-u8
-    giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
-char* cHeroTypeShortName[IDX(FACTION_COUNT)] =
-    {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr"};
+u8 giTerrainToMusicTrack[IDX(TERRAIN_COUNT)] = {16, 18, 14, 15, 11, 13, 17, 12, 16};
+char* cHeroTypeShortName[IDX(FACTION_COUNT)] = {"kngt", "barb", "sorc", "wrlk", "wzrd", "necr"};
 char cHeroTypeInitial[HERO_TYPE_INITIAL_COUNT] = {'k', 'b', 's', 'w', 'z', 'n'};
 i32 giDeferObjDrawX = -1;
 i32 giDeferObjDrawY = -1;
@@ -7674,10 +7733,7 @@ u16 wallPos[KB_CASTLE_WALL_SEGMENT_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
     {{468, 58}, {421, 128}, {417, 291}, {498, 402}};
 u16 towerPos[KB_CASTLE_TOWER_COUNT][IDX(COORDINATE_AXIS_COUNT)] =
     {{441, 61}, {398, 147}, {398, 233}, {441, 316}};
-u16
-    doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {
-        {393, 192}, {348, 262}
-    };
+u16 doorPos[KB_CASTLE_DOOR_POSITION_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {{393, 192}, {348, 262}};
 float fTradingPostEfficency[KB_TRADING_POST_EFFICIENCY_COUNT] =
     {0.0f, 0.1f, 0.15f, 0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.5f};
 struct SElevationOverlay sElevationOverlay[ELEVATION_OVERLAY_COUNT] = {
@@ -7716,81 +7772,80 @@ i32 giWalkingTo = -1;
 i32 giWalkingTo2 = -1;
 i32 giWalkingYMod = 0;
 u8 moatCell[KB_MOAT_CELL_COUNT] = {8, 21, 33, 46, 58, 72, 85, 99, 112};
-SCampaignChoice campaignChoices[IDX(
-    CAMPAIGN_SIDE_COUNT
-)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_ARMORED_GAUNTLETS), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MIRROR_IMAGE), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_SUMMON_EARTH_ELEMENTAL), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_RESURRECT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CHOICE_RESOURCE_BONUS},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GEMS), CHOICE_RESOURCE_BONUS},
-      {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CHOICE_RESOURCE_BONUS}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}}},
-    {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
-      {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_CURSE), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), CHOICE_BASIC_SKILL},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
-     {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
-      {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
+SCampaignChoice
+    campaignChoices[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT][CAMPAIGN_BONUS_CHOICE_COUNT] = {
+        {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_THUNDER_MACE), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_ARMORED_GAUNTLETS), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MIRROR_IMAGE), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_SUMMON_EARTH_ELEMENTAL), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_RESURRECT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_CRYSTAL), CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GEMS), CHOICE_RESOURCE_BONUS},
+          {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_MERCURY), CHOICE_RESOURCE_BONUS}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_NONE, CHOICE_VALUE_NONE, CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WIZARD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_SORCERESS), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_KNIGHT), CHOICE_NO_AMOUNT}}},
+        {{{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MAGE_RING), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MINOR_SCROLL), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_RESOURCE, IDX(RES_GOLD), CHOICE_GOLD_BONUS},
+          {CAMPAIGN_CHOICE_SPELL, IDX(SPELL_MASS_CURSE), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DEFENDER_HELM), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_SECONDARY_SKILL, IDX(HERO_SKILL_LOGISTICS), CHOICE_BASIC_SKILL},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_POWER_AXE), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_WHITE_PEARL), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_BLACK_PEARL), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DRAGON_SWORD), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_DIVINE_BREASTPLATE), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_TAX_LIEN), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_HIDEOUS_MASK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_FIZBIN_OF_MISFORTUNE), CHOICE_NO_AMOUNT}},
+         {{CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_NECROMANCER), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_WARLOCK), CHOICE_NO_AMOUNT},
+          {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
 char* congratsText = NULL;
 char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
@@ -8783,10 +8838,8 @@ char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "On\nVolume 1",
     NULL
 };
-char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] =
-    {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
-char* gColors[IDX(FACTION_COUNT)] =
-    {"blue", "green", "red", "yellow", "orange", "purple"};
+char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
+char* gColors[IDX(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
 char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Grasshopper",
     "Ant",
@@ -8890,8 +8943,7 @@ char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "\nBattle Garb of Anduran gives you maximum luck.",
     NULL
 };
-char* IQnames[KB_IQ_NAME_COUNT] =
-    {"None", "Dumb", "Average", "Smart", "Genius", NULL};
+char* IQnames[KB_IQ_NAME_COUNT] = {"None", "Dumb", "Average", "Smart", "Genius", NULL};
 char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View previous page",
     "View next page",
@@ -9242,8 +9294,7 @@ char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
 char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
 char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
     {"Easy", "Normal", "Hard", "Expert", "Impossible", NULL};
-char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] =
-    {"Easy", "Normal", "Hard", "Expert"};
+char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
 char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {"Lord Ironfist", "Lord Slayer", "Queen Lamanda", "Lord Alamar"};
 char* cWinText[KB_WIN_TEXT_COUNT] =
@@ -9673,13 +9724,10 @@ char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "buried on a beach.",
     NULL
 };
-char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] =
-    {"Dynamic", "Good", "Evil", NULL};
+char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil", NULL};
 char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
-char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] =
-    {"Normal", "Fast", "Very Fast", NULL};
-char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] =
-    {"None", "Spells Only", "Full", NULL};
+char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast", NULL};
+char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full", NULL};
 char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n\n\n***Command Line Help***\n",
     "\n",
@@ -9738,8 +9786,7 @@ char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "human player.",
     NULL
 };
-char* cPersonality[KB_PERSONALITY_TEXT_COUNT] =
-    {"Warrior", "Builder", "Explorer", "Human"};
+char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
 char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
     {"Few", "A few", "a few"},
     {"Several", "Several", "several"},
@@ -9882,10 +9929,7 @@ char* cCampaignDescription[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_MAP_COUNT] = {
 char* cOutOfMemory =
     "\n\n\n\n\n\n\n\n\n\n\n\n\n\n%s\nHeroes II requires a minimum of\n%dK of Extended Memory (XMS) "
     "and\n480K of Conventional Memory\n\n";
-char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {
-    "Normal",
-    "Interlaced"
-};
+char* cSlowVideoLevelText[KB_SLOW_VIDEO_LEVEL_TEXT_COUNT] = {"Normal", "Interlaced"};
 char* gSPanelHelp[KB_SETTINGS_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
     "{Music}\n\nToggle ambient music level.\n\n(Note: When using CD Stereo music in DOS, the music "
@@ -10180,4 +10224,3 @@ u8 bMusicIsLooping[KB_MUSIC_TRACK_COUNT];
 townManager* gpTownManager;
 advManager* gpAdvManager;
 b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
-

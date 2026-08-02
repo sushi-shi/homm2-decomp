@@ -17,23 +17,22 @@
 #define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\DPNETWIN.CPP"
 
 H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
-    SESSION_OPEN_JOIN   = 1,
+    SESSION_OPEN_JOIN = 1,
     SESSION_OPEN_CREATE = 2
 H2_ENUM_CLASS_END(DirectPlaySessionOpenFlag)
 
 H2_ENUM_BEGIN(DirectPlayResult)
-    RESULT_OK               = 0,
+    RESULT_OK = 0,
     RESULT_INVALID_ARGUMENT = static_cast<i32>(0x80070057),
-    RESULT_INVALID_PLAYER   = static_cast<i32>(0x88770096),
-    RESULT_NO_MESSAGES      = static_cast<i32>(0x887700be),
-    RESULT_NO_SESSIONS      = static_cast<i32>(0x887700dc)
+    RESULT_INVALID_PLAYER = static_cast<i32>(0x88770096),
+    RESULT_NO_MESSAGES = static_cast<i32>(0x887700be),
+    RESULT_NO_SESSIONS = static_cast<i32>(0x887700dc)
 H2_ENUM_END(DirectPlayResult)
 
 H2_ENUM_BEGIN(DirectPlayStorageConstant)
     RECEIVE_ARGUMENT_STORAGE_COUNT = 2,
-    STATUS_TEXT_SIZE               = 32
+    STATUS_TEXT_SIZE = 32
 H2_ENUM_END(DirectPlayStorageConstant)
-
 
 VA(0x00436770, 0x81)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
@@ -132,8 +131,12 @@ i16 dpnet_init(void) {
             giWaitType = DIALOG_WAIT_DIRECTPLAY_GUESTS;
             sprintf(
                 gText,
-                "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for "
-                "additional guests.",
+                "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
+                "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
+                "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
+                "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
+                "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+                ,
                 giNumHumanPlayers - 1
             );
             NormalDialog(gText, NORMAL_DIALOG_WAIT_FIRST, -1, -1, -1, 0, -1, 0, -1, 0);
@@ -317,7 +320,8 @@ void dpEvaluateMessage(u32l size, i32 sender) {
                 }
                 if (gbRemoteGameOpen != 0) {
                     giNetPosToDCOPos[giNumHumanPlayers] = sender;
-                    gsNetPlayerInfo[giNumHumanPlayers] = *reinterpret_cast<SNetPlayerInfo*>(startup);
+                    gsNetPlayerInfo[giNumHumanPlayers] =
+                        *reinterpret_cast<SNetPlayerInfo*>(startup);
                     if (gsNetPlayerInfo[giNumHumanPlayers].reserved[0] == 0)
                         xNetHasOldPlayers = 1;
                     dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
@@ -403,8 +407,12 @@ i32 dpWaitForExtraGuests(void) {
         iLastMsgNumHumanPlayers = giNumHumanPlayers;
         sprintf(
             gText,
-            "You have %d guest(s) now logged in.  Click 'OK' to move on, or wait for additional "
-            "guests.",
+            "\xca \xe2\xe0\xec \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc %d "
+            "\xe3\xee\xf1\xf2\xe5\xe9. \xcd\xe0\xe6\xec\xe8\xf2\xe5 '\xce\xca' "
+            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc \xe8\xeb\xe8 "
+            "\xef\xee\xe4\xee\xe6\xe4\xe8\xf2\xe5 \xe4\xf0\xf3\xe3\xe8\xf5 "
+            "\xe8\xe3\xf0\xee\xea\xee\xe2." /* "К вам присоединились %d гостей. Нажмите 'ОК' чтобы продолжить или подождите других игроков." */
+            ,
             giNumHumanPlayers - 1
         );
         message.type = MESSAGE_WIDGET;
@@ -443,7 +451,8 @@ i32 dpWaitForHost(void) {
             else
                 enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
             playResult =
-                lpIDC->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, NULL, 0);
+                lpIDC
+                    ->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, NULL, 0);
             iEnumCount++;
             if (playResult == RESULT_NO_SESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
@@ -647,4 +656,3 @@ struct _GUID* g_lpGuid;
 i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 i32 iSessionToTry;
 i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
-

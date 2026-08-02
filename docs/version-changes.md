@@ -98,6 +98,19 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Changed
 
+- **[Buka] In-code UI strings translated to Russian (CP1251).** 29 string
+  literals compiled into code (not the resource text) carry Buka's Russian
+  translation where PoL/Gold had English: the ADVMGR bottom-bar date words
+  (`Month`/`Week`/`Day` → `Месяц`/`Неделя`/`День`), combat confirmations and
+  the Sphere-of-Negation notice (COMMAND), hero dismissal (HERO), building
+  production and out-of-memory text (KB), the whole Modem/SETUP dial and
+  hosting dialog set, garrison-full (RECRUIT), five combat-spell rejection
+  messages (SPELLS), the tavern rumor lead-in (TOWNMGR), network
+  hosting/waiting texts (Wsnetwin/dpnetwin), and the 256-color requirement
+  (wingraph). Found mechanically: for every byte-proven function, the retail
+  dword at each donated string site names a cell whose retail content is
+  compared with the compiled literal. Source now carries the CP1251 bytes as
+  hex escapes with the Russian rendering in a trailing comment.
 - **[Buka] `soundManager` class rework.** The class gained a backend-state
   head at offset 0x36: backend/savedBackend kinds, the Miles `_DIG_DRIVER*`,
   an `audiere::AudioDevicePtr` (a real RefPtr — its inlined ref/unref
