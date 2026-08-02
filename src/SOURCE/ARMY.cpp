@@ -1919,7 +1919,7 @@ i32 army::AttackTo(i32 destination) {
         DoAttack(0);
         return 0;
     }
-    if (HAS(m_monster.flags.all, MONSTER_FLAGS_BREATH_ATTACK) && m_hex == m_moveTargetHex) {
+    if (HAS(m_monster.flags.all, MONSTER_FLAGS_BREATH_ATTACK) && m_moveTargetHex == m_hex) {
         DoAttack(0);
         return 0;
     }
@@ -1935,17 +1935,17 @@ i32 army::AttackTo(i32 destination) {
             numSteps = 0;
             for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
                 numSteps++;
-                if (pathIndex_4 == 1 || numSteps >= m_monster.speed) {
-                    finishStanding = 1;
-                } else {
+                if (pathIndex_4 != 1 && numSteps < m_monster.speed) {
                     finishStanding = 0;
+                } else {
+                    finishStanding = 1;
                 }
                 Walk(
                     static_cast<CombatHexDirection>(
                         gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]
                     ),
                     finishStanding,
-                    gpSearchArray->m_pathLength - 1 != pathIndex_4
+                    pathIndex_4 != gpSearchArray->m_pathLength - 1
                 );
                 if (numSteps >= m_monster.speed && pathIndex_4 != 1) {
                     return ARMY_PATH_BLOCKED;

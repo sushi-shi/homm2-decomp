@@ -209,7 +209,6 @@ void recruitUnit::Close(void) {
 
 VA(0x0048c855, 0x115)
 void recruitUnit::Update(void) {
-    char text[NAME_SIZE];
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
