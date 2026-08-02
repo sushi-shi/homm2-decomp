@@ -3014,7 +3014,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
 VA(0x004054df, 0x239)
 void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (forceUpdate == 0 && bShowIt == 0) {
-        if (KBTickCount() > glTimers[0]) {
+        if (glTimers[0] < KBTickCount()) {
             glTimers[0] = KBTickCount() + TIMER_DELAY;
         }
         return;
@@ -3047,7 +3047,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     giScrollX = giScrollY;
     PollSound();
 
-    if (KBTickCount() > glTimers[0]) {
+    if (glTimers[0] < KBTickCount()) {
         ++m_updateMaxY;
         ++m_updateMaxX;
         if (m_updateMaxX >= UPDATE_ANIMATION_PHASES) {

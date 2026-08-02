@@ -1149,7 +1149,7 @@ void fileRequester::Update(i32 drawWindow) {
 VA(0x00491554, 0x12b)
 char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
-        && (m_selectedIndex < 0 || m_fileCount <= m_selectedIndex)) {
+        && (m_selectedIndex < 0 || m_selectedIndex >= m_fileCount)) {
         return cFRDummy;
     }
 

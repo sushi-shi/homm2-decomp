@@ -11,7 +11,7 @@ tileset::tileset(u32l id)
     m_tileCount = gpResourceManager->ReadWord();
     m_tileWidth = gpResourceManager->ReadWord();
     m_tileHeight = gpResourceManager->ReadWord();
-    u32 size = m_tileHeight * m_tileCount * m_tileWidth;
+    u32 size = m_tileCount * m_tileWidth * m_tileHeight;
     m_data = static_cast<char*>(H2_ALLOC(size));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
