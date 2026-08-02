@@ -5291,7 +5291,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
     return 0;
 }
 
-VA(0x00443df6, 0x1ce)
+VA(0x00443df6, 0x245)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     HouseRecruitmentSite siteIndex = RECRUIT_ARCHER;
     CreatureType creatureTypes[IDX(RECRUIT_SITE_COUNT)];

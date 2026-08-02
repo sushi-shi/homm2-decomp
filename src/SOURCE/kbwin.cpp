@@ -378,7 +378,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
-VA(0x00471abf, 0x110)
+VA(0x00471abf, 0x161)
 LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     DLGPROC appDialogProc;

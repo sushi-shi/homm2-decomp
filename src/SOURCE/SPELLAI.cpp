@@ -1046,7 +1046,7 @@ i32 combatManager::FirstResurrectable(
     return 1;
 }
 
-VA(0x00497879, 0x350)
+VA(0x00497879, 0x36b)
 void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
     i32 sideWork;
     i32 fullQuantityWork;

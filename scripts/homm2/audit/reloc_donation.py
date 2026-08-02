@@ -79,6 +79,10 @@ def function_bodies(obj_path: Path):
             target = coff.symbols.get(reloc.symbol_index)
             addend = struct.unpack_from("<i", payload, site)[0] \
                 if site + 4 <= len(payload) else 0
+            # COFF DIR32 fields are symbol-relative addends for defined and
+            # external symbols alike (verified against EXEC.obj/globalCrc);
+            # the raw field is the addend. One symbol voting several owner
+            # RVAs therefore signals a layout divergence, not a read error.
             section_relocs.append(
                 (site, reloc.typ, target.name if target else None, addend))
         section_relocs.sort()

@@ -417,7 +417,7 @@ i32 game::SetupMultiPlayerGame(void) {
     return 1;
 }
 
-VA(0x0049333c, 0x554)
+VA(0x0049333c, 0x599)
 i32 game::SetupGame(void) {
     heroWindow* window;
     i32 result;

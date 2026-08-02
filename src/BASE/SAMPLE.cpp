@@ -16,7 +16,7 @@ H2_ENUM_END(SampleConstant)
 static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
-VA(0x004ce250, 0x1b7)
+VA(0x004ce250, 0x210)
 sample::sample(char* name, i32l, i32l, i32l)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,

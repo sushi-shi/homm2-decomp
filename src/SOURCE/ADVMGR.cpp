@@ -9220,7 +9220,7 @@ void advManager::LoadRemote(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
-VA(0x00412e8c, 0x1b0)
+VA(0x00412e8c, 0x1f5)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
     i32 playerExited5;

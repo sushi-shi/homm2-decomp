@@ -187,7 +187,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     return 0;
 }
 
-VA(0x004987f7, 0x380)
+VA(0x004987f7, 0x3ca)
 i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
 
@@ -505,7 +505,7 @@ i32 combatManager::FindResurrectArmyIndex(
     return NO_SELECTION;
 }
 
-VA(0x0049912f, 0x332)
+VA(0x0049912f, 0x379)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
     i32 unusedSpellWord5;
@@ -617,7 +617,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     return 1;
 }
 
-VA(0x004994a8, 0x173)
+VA(0x004994a8, 0x1ab)
 void combatManager::SpellMessage(SpellType spell, i32 hex) {
     army* target_i;
     char* armyName;
@@ -2923,7 +2923,7 @@ void combatManager::ShowMassSpell(
         MakeCreaturesVanish();
 }
 
-VA(0x0049f02b, 0x713)
+VA(0x0049f02b, 0x795)
 void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = NULL;
     CombatEffectType effect = gsSpellInfo[IDX(spell)].combatEffect;
