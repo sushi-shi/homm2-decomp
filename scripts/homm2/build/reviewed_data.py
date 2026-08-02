@@ -174,8 +174,10 @@ def _resolve_delinker(delinker=None):
     return delinker
 
 
-def _expected_delink_objects(symbols=SYMBOLS, retail_functions=RETAIL_FUNCTIONS):
+def _expected_delink_objects(symbols=None, retail_functions=None):
     """Object names the delinker must emit for the current inventories."""
+    symbols = Path(symbols or SYMBOLS)
+    retail_functions = Path(retail_functions or RETAIL_FUNCTIONS)
     claimed_units = set()
     claimed_rvas = set()
     with Path(symbols).open(newline="", encoding="latin-1") as stream:
