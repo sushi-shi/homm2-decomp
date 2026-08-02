@@ -737,15 +737,15 @@ void WGInitializePalette(void) {
 VA(0x004b15d6, 0x1bd)
 i32 WGAppPaint(void* window, void* paintDC) {
     i32 padding8;
-    RECT clientRect16;
     char unusedByte0;
-    i32 destY1;
-    i32 sourceX7;
+    RECT clientRect16;
+    i32 destY0;
+    i32 xSource;
     PAINTSTRUCT paint5;
     i32 destHeight3;
-    i32 destWidth0;
+    i32 destW;
     i32 destX7;
-    i32 sourceY7;
+    i32 fromY;
 
     unusedByte0 = 0;
     if (screenImage.bits != NULL) {
@@ -754,44 +754,44 @@ i32 WGAppPaint(void* window, void* paintDC) {
         RealizePalette(static_cast<HDC>(paintDC));
         GetClientRect(reinterpret_cast<HWND>(window), &clientRect16);
         destX7 = 0;
-        sourceX7 = destX7;
-        destY1 = 0;
-        sourceY7 = destY1;
-        destWidth0 = clientRect16.right - clientRect16.left;
+        xSource = destX7;
+        destY0 = 0;
+        fromY = destY0;
+        destW = clientRect16.right - clientRect16.left;
         destHeight3 = clientRect16.bottom - clientRect16.top;
-        sourceX7 = (destX7 * WINGRAPH_WIDTH) / iMainWinScreenWidth;
-        sourceY7 = (destY1 * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
+        xSource = (destX7 * WINGRAPH_WIDTH) / iMainWinScreenWidth;
+        fromY = (destY0 * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
         if (giScrollX != 0)
-            sourceX7 += giScrollX;
+            xSource += giScrollX;
         if (giScrollY != 0)
-            sourceY7 += giScrollY;
+            fromY += giScrollY;
         giTtlBlts++;
         if (iMainWinScreenWidth == WINGRAPH_WIDTH && iMainWinScreenHeight == WINGRAPH_HEIGHT) {
             destX7 = paint5.rcPaint.left & WINGRAPH_PAINT_ALIGN_MASK;
-            destWidth0 = paint5.rcPaint.right - destX7 + 1;
-            destY1 = paint5.rcPaint.top;
-            destHeight3 = paint5.rcPaint.bottom - destY1 + 1;
+            destW = paint5.rcPaint.right - destX7 + 1;
+            destY0 = paint5.rcPaint.top;
+            destHeight3 = paint5.rcPaint.bottom - destY0 + 1;
             WinGBitBlt(
                 static_cast<HDC>(paintDC),
                 destX7,
-                destY1,
-                destWidth0,
+                destY0,
+                destW,
                 destHeight3,
                 hdcImage,
-                giScrollX + destX7,
-                giScrollY + destY1
+                destX7 + giScrollX,
+                destY0 + giScrollY
             );
         } else {
             WinGStretchBlt(
                 static_cast<HDC>(paintDC),
                 destX7,
-                destY1,
-                destWidth0,
+                destY0,
+                destW,
                 destHeight3,
                 hdcImage,
-                sourceX7,
-                sourceY7,
-                (destWidth0 * WINGRAPH_WIDTH) / iMainWinScreenWidth,
+                xSource,
+                fromY,
+                (destW * WINGRAPH_WIDTH) / iMainWinScreenWidth,
                 (destHeight3 * WINGRAPH_HEIGHT) / iMainWinScreenHeight
             );
         }

@@ -242,7 +242,7 @@ BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	34d4d1d088c1
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	0.0000	f3a78b076682
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.0000	b39c95d6e883
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	50a43a40357c
-BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	60.3851	81efe106ce06
+BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	60.4122	81efe106ce06
 BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	87.2917	8e1bd50148cc
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	79.7704	3107f79bf6f0.076d7b63a6f7
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	72.2406	4d12edf05295
@@ -541,7 +541,7 @@ SOURCE/ADVMGR	?UpdBottomViewResMsg@advManager@@QAEHXZ	99.9231	f6a7e7af387b
 SOURCE/ADVMGR	?UpdateHeroLocator@advManager@@QAEXHHH@Z	96.2692	1dd9af5fd2a6
 SOURCE/ADVMGR	?UpdateHeroLocators@advManager@@QAEXHH@Z	100.0000	1120b06ed666
 SOURCE/ADVMGR	?UpdateRadar@advManager@@QAEXHH@Z	22.5541	93159e5a23f2
-SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	98.8986	0033e9150137
+SOURCE/ADVMGR	?UpdateScreen@advManager@@QAEXHH@Z	98.9130	0033e9150137
 SOURCE/ADVMGR	?UpdateSystemOptions@@YIXH@Z	93.5027	734b96ae7085
 SOURCE/ADVMGR	?UpdateTownLocators@advManager@@QAEXHH@Z	95.6707	b2a9aeeee2d2
 SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.6500	baf1a0856712
@@ -1468,7 +1468,7 @@ SOURCE/wingraph	?AppPaint@@YIHPAX0@Z	100.0000	bd232a97f75f
 SOURCE/wingraph	?CleanUpWinGraphics@@YIXXZ	100.0000	186b89cf6807
 SOURCE/wingraph	?ConnectToDLLs@@YIXXZ	100.0000	784a60926049
 SOURCE/wingraph	?CreatePrimary@@YIXXZ	100.0000	8265f94ff0a1
-SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	97.8951	443d68ed94b1
+SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	97.9196	443d68ed94b1
 SOURCE/wingraph	?DDCleanUpWinGraphics@@YIXXZ	99.8809	4763dd1aaa67
 SOURCE/wingraph	?DDCreateSurface@@YIPAUIDirectDrawSurface@@KKH@Z	99.6539	ff34749f6f9e
 SOURCE/wingraph	?DDInitGraphics@@YIXXZ	100.0000	f275c1dc169c
@@ -1490,7 +1490,7 @@ SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	98.1967	e2ce253d5362
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	6a31694c14c2
 SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	766bf5965d47
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	61.2000	d18ac4963343
-SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	97.8088	54209a849b43
+SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	99.9265	d376e9063804
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	8af52d636ced
 SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	0bf3ad9bbfd5
 SOURCE/wingraph	?WGInitializePalette@@YIXXZ	87.8210	4b35db37af15
