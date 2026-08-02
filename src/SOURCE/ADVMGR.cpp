@@ -1271,7 +1271,6 @@ i32 advManager::Open(i32 id) {
 
 VA(0x00401c47, 0x3b8)
 void advManager::Close(void) {
-    static i16 s_closeBorderFreeLineBase = CLOSE_BORDER_FREE_LINE_BASE;
 
     ClearBottomView();
     gpMouseManager->SetPointer(-1);
@@ -5730,7 +5729,6 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
 
 VA(0x0040b2ad, 0x387)
 i32 advManager::UpdBottomViewNewTurn(void) {
-    static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
 
     i32 frameIndex;
     i32 month;
@@ -5831,7 +5829,6 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 
 VA(0x0040b634, 0x384)
 i32 advManager::UpdBottomViewResMsg(void) {
-    static i16 s_resourceViewLineBase = RESOURCE_VIEW_LINE_BASE;
 
     i32 iconWidth6;
     i32 iconHeight11;
@@ -5939,7 +5936,6 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
 VA(0x0040b9b8, 0x37b)
 i32 advManager::UpdBottomViewKingdom(void) {
-    static i16 s_kingdomViewLineBase = KINGDOM_VIEW_LINE_BASE;
 
     i32 villageCount37;
     i32 index11;
@@ -6050,7 +6046,6 @@ i32 advManager::UpdBottomViewKingdom(void) {
 
 VA(0x0040bd33, 0x5ef)
 i32 advManager::UpdBottomViewHero(void) {
-    static i16 s_bottomHeroLineBase = BOTTOM_HERO_LINE_BASE;
 
     char* armyCountLabelsResult[BOTTOM_HERO_ARMY_SLOTS];
     icon* monsterIconsLocal;
@@ -6209,7 +6204,6 @@ i32 advManager::UpdBottomViewHero(void) {
 
 VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    static i16 s_quickViewLineBase = QUICK_VIEW_LINE_BASE;
 
     i16 armyAreaWidthLocal = HERO_QUICK_ARMY_AREA_WIDTH;
     i16 armyAreaLeftLocal = ARMY_QUICK_AREA_LEFT;
@@ -6590,7 +6584,6 @@ char* advManager::GetArmySizeName(
 
 VA(0x0040d1f9, 0xcd1)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
-    static i16 s_townViewLineBase = TOWN_VIEW_LINE_BASE;
 
     icon* monsterIconLocal;
     i16 portraitWidgetLocal;
@@ -6948,7 +6941,6 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
 
 VA(0x0040deca, 0x100)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
-    static i16 s_redrawBorderFreeLineBase = REDRAW_BORDER_FREE_LINE_BASE;
 
     if (!bShowIt) {
         return;
@@ -9431,7 +9423,6 @@ void advManager::EnableButtons(void) {
 
 VA(0x00413464, 0x142)
 void advManager::SaveAdventureBorder(void) {
-    static i16 s_saveBorderAllocLineBase = SAVE_BORDER_ALLOC_LINE_BASE;
 
     if (m_adventureBorder != NULL) {
         return;

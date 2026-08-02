@@ -2869,7 +2869,6 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
 
 VA(0x0046b9e9, 0xac)
 void ClearMapExtra(void) {
-    static i16 clearMapExtraSourceLineBase = 0x0cbe;
     i32 i;
     for (i = 0; i < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
@@ -3355,7 +3354,6 @@ void AddNetBoxLine(char* str, char color) {
 
 VA(0x0046cc61, 0x1d9)
 void ShutDown(char* msg) {
-    static i16 shutdownSourceLineBase = 0x0ef4;
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
     if (bInShutDown)
         return;
@@ -3448,7 +3446,6 @@ H2_ENUM_END(SmackFadeConstant)
 
 VA(0x0046ced3, 0x236)
 void SmackFade(u8* src, u8* dst) {
-    static i16 smackFadeSourceLineBase = 0x0f61;
     u8* a;
     u8* f;
     i32 k;
@@ -3506,7 +3503,6 @@ void SmackFade(u8* src, u8* dst) {
 
 VA(0x0046d109, 0x3b2)
 void ShowCongrats(HighScoreType highScoreType) {
-    static i16 congratsSourceLineBase = 0x0f97;
     u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
     i32 baseScore;
     i32 score_e;
@@ -4856,7 +4852,6 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    static i16 normalDialogSourceLineBase = 0x14a5;
     i32 panelHeight_p;
     i32 labelY_o;
     widget* borderWidget_o;

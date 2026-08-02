@@ -77,7 +77,6 @@ i32 is_netbios_avail(void) {
 
 VA(0x00473e34, 0x218)
 extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
-    static i16 gNbInitSourceLineBase = 105;
     NetbiosControlBlock localNcb;
     i32 i;
     u8* statusBuffer;
@@ -129,7 +128,6 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
 
 VA(0x0047404c, 0x1d0)
 extern "C" void __fastcall nb_term(void) {
-    static i16 gNbTermSourceLineBase = 169;
     tag_Node* node;
     NetbiosControlBlock localNcb;
     i32 i;
@@ -172,7 +170,6 @@ extern "C" void __fastcall nb_term(void) {
 
 VA(0x0047421c, 0x96)
 extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
-    static i16 gNbReceiveSourceLineBase = 226;
     tag_Node* node;
     i32 len;
 
@@ -193,7 +190,6 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
 
 VA(0x004742b2, 0xc0)
 extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
-    static i16 gNbSendSourceLineBase = 245;
     tag_Node* node;
 
     if (gNbMaxSess == session && len == 0) {
@@ -345,7 +341,6 @@ extern "C" char __fastcall nb_stat(i16 session) {
 
 VA(0x00474848, 0x215)
 void nb_thr_ctl(void) {
-    static i16 gNbThreadSourceLineBase = 412;
     i32 keepRunning;
     i32 i;
     tag_Node* node;
@@ -394,7 +389,7 @@ void nb_thr_ctl(void) {
                                 ProcessAssert(
                                     0,
                                     RETAIL_FILE,
-                                    gNbThreadSourceLineBase + 83
+                                    495
                                 );
                                 break;
                             case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
@@ -435,12 +430,11 @@ static void nb_add_name(void) {
 
 VA(0x00474b12, 0x152)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
-    static i16 gNbAddNameSourceLineBase = 534;
     i32 j;
     ProcessAssert(
         &gNbSessNcb[gNbMaxSess] == ncb,
         RETAIL_FILE,
-        gNbAddNameSourceLineBase + 3
+        537
     );
     switch (ncb->returnCode) {
         case NETBIOS_RESULT_SUCCESS:
@@ -570,13 +564,12 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
 
 VA(0x004750ee, 0x124)
 static void __fastcall nb_arm_recv(i32 session) {
-    static i16 gNbArmReceiveSourceLineBase = 710;
     H2_ENUM_STORAGE(NetbiosResult, u8) result;
     for (;;) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
             RETAIL_FILE,
-            gNbArmReceiveSourceLineBase + 5
+            715
         );
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
         gNbSessNcb[session].command = NETBIOS_COMMAND_RECEIVE | NETBIOS_COMMAND_ASYNC;
@@ -622,7 +615,6 @@ static void __fastcall nb_close_session(i32 session) {
 
 VA(0x004752c3, 0x112)
 static void __fastcall nb_recv_complete(i32 session) {
-    static i16 gNbReceiveCompleteSourceLineBase = 780;
     tag_Node* node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {
         case NETBIOS_COMMAND_RECEIVE:

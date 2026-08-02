@@ -25,11 +25,6 @@ H2_ENUM_BEGIN(WinsockPrivateConstant)
 H2_ENUM_END(WinsockPrivateConstant)
 
 
-static i16 s_wsInitSourceLineBase = 61;
-static i16 s_wsTermSourceLineBase = 248;
-static i16 s_wsSendSourceLineBase = 279;
-static i16 s_wsReceiveSourceLineBase = 359;
-static i16 s_wsEvaluateSourceLineBase = 413;
 
 VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {

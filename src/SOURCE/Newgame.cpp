@@ -398,7 +398,6 @@ void game::SetupNetPlayerNames(void) {
 
 VA(0x00475b4b, 0xa71)
 i32 game::NewGame(void) {
-    static i16 newGameSourceLineBase = 319;
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
     char mapInfoPacket[GAME_MAP_PACKET_SIZE];
     tag_message windowMessage;
@@ -632,7 +631,6 @@ void game::CleanUpNewGameWindow(void) {
 
 VA(0x004766a7, 0x794)
 void game::InitNewGameWindow(void) {
-    static i16 newGameWindowSourceLineBase = 635;
     i32 availableWidthResult;
     widget* textControlLocal;
     i32 firstPlayerXLocal;
@@ -1680,7 +1678,6 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
 
 VA(0x0047869f, 0xc36)
 void game::ShowScenInfo(void) {
-    static i16 scenarioInfoSourceLineBase = 1615;
     i32 availableWidthResult;
     i32 mapSizeIndex;
     widget* textControlLocal;

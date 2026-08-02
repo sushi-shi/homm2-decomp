@@ -78,7 +78,6 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
 
 VA(0x00436866, 0x2bf)
 i16 dpnet_init(void) {
-    static i16 initSourceLineBase = 95;
     DirectPlayStartupMessage startup;
     typedef HRESULT(WINAPI * DirectPlayCreateFunction)(GUID*, IDirectPlay**, IUnknown*);
     typedef HRESULT(WINAPI * DirectPlayEnumerateFunction)(LPDPENUMDPCALLBACKA, void*);
@@ -120,7 +119,7 @@ i16 dpnet_init(void) {
         }
         result = createFunction(g_lpGuid, &lpIDC, NULL);
         if (result != RESULT_OK)
-            DPSD(result, RETAIL_FILE, initSourceLineBase + 41);
+            DPSD(result, RETAIL_FILE, 136);
 
         if (GameMode == REMOTE_GAME_NETWORK_HOST) {
             gbRemoteGameOpen = true;
@@ -186,7 +185,6 @@ void CleanupDPVars(void) {
 
 VA(0x00436be8, 0xed)
 void dpnet_term(void) {
-    static i16 termSourceLineBase = 219;
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
 
     gbRemoteOn = false;
@@ -216,7 +214,6 @@ void dpSendMessage(
     u16 size,
     void* data
 ) {
-    static i16 sendSourceLineBase = 254;
     u8* message = static_cast<u8*>(H2_ALLOC(size + 1));
     i32 result;
 
@@ -226,7 +223,7 @@ void dpSendMessage(
     result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
     if (result != RESULT_OK && result != RESULT_INVALID_PLAYER
         && result != RESULT_INVALID_ARGUMENT) {
-        DPSD(result, RETAIL_FILE, sendSourceLineBase + 14);
+        DPSD(result, RETAIL_FILE, 268);
     }
     H2_FREE(message);
 }
@@ -246,7 +243,6 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
 
 VA(0x00436dec, 0x93)
 i16 dpnet_rcv(i16, u16, void* data) {
-    static i16 receiveSourceLineBase = 284;
     u32 size;
 
     dpProcessMessages();
@@ -271,7 +267,6 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
-    static i16 processSourceLineBase = 312;
     DWORD packetSize[RECEIVE_ARGUMENT_STORAGE_COUNT];
     i32 destinationIds[RECEIVE_ARGUMENT_STORAGE_COUNT];
     i32 senderId;
@@ -291,7 +286,7 @@ void dpProcessMessages(void) {
         if (receiveResult == RESULT_NO_MESSAGES)
             return;
         if (receiveResult != RESULT_OK)
-            DPSD(receiveResult, RETAIL_FILE, processSourceLineBase + 23);
+            DPSD(receiveResult, RETAIL_FILE, 335);
         if (senderId == 0) {
         } else {
             if (destinationIds[0] == 0 || destinationIds[0] == dcoID)
@@ -302,7 +297,6 @@ void dpProcessMessages(void) {
 
 VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
-    static i16 evaluateSourceLineBase = 355;
     DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
     i32 i;
 
@@ -364,7 +358,6 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
 VA(0x00437177, 0x16a)
 i32 dpWaitForFirstGuest(void) {
-    static i16 firstGuestSourceLineBase = 426;
     DPSESSIONDESC session;
     i32 result;
 
@@ -378,7 +371,7 @@ i32 dpWaitForFirstGuest(void) {
             strcpy(session.szSessionName, "Heroes 2");
             result = lpIDC->Open(&session);
             if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, firstGuestSourceLineBase + 16);
+                DPSD(result, RETAIL_FILE, 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -389,7 +382,7 @@ i32 dpWaitForFirstGuest(void) {
         case FIRST_GUEST_CREATE_PLAYER:
             result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, firstGuestSourceLineBase + 46);
+                DPSD(result, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -426,7 +419,6 @@ i32 dpWaitForExtraGuests(void) {
 
 VA(0x0043735d, 0x396)
 i32 dpWaitForHost(void) {
-    static i16 hostSourceLineBase = 510;
     DWORD enumerationTimeout;
     DPSESSIONDESC sessionDescription;
     i32 playResult;
@@ -458,7 +450,7 @@ i32 dpWaitForHost(void) {
                 return 0;
             }
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 38);
+                DPSD(playResult, RETAIL_FILE, 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
@@ -474,13 +466,13 @@ i32 dpWaitForHost(void) {
             strcpy(sessionDescription.szSessionName, "Heroes 2");
             playResult = lpIDC->Open(&sessionDescription);
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 57);
+                DPSD(playResult, RETAIL_FILE, 567);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
             playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
             if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 67);
+                DPSD(playResult, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -507,7 +499,7 @@ i32 dpWaitForHost(void) {
                 }
                 playResult = lpIDC->Close();
                 if (playResult != RESULT_OK)
-                    DPSD(playResult, RETAIL_FILE, hostSourceLineBase + 93);
+                    DPSD(playResult, RETAIL_FILE, 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }

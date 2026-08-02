@@ -3490,7 +3490,6 @@ void game::ViewArmy(
     armyGroup* theGroup,
     i32 groupIndex
 ) {
-    static i16 viewArmySourceLineBase = 0x0dd1;
     i16 baseX7 = VIEW_ARMY_UNUSED_BASE_X;
     i16 quickBaseY3 = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
     i16 blankWidget3 = VIEW_ARMY_BLANK_WIDGET_ID;
@@ -5886,7 +5885,6 @@ void game::ProcessMapExtra(void) {
 
 VA(0x0045c623, 0x871)
 void game::SetupTowns(void) {
-    static i16 setupTownsSourceLineBase = 0x17f9;
     char defaultDwellingRoll[DEFAULT_DWELLING_ROLL_CAPACITY];
     i8 usedSpells[IDX(SPELL_COUNT)];
     i32 spellsPerLevel[TOWN_MAGE_GUILD_LEVEL_COUNT];
@@ -6102,7 +6100,6 @@ void game::SetupTowns(void) {
 
 VA(0x0045ce94, 0x726)
 void game::ProcessOnMapHeroes(void) {
-    static i16 processOnMapHeroesSourceLineBase = 0x18ef;
     u32 extraIndex0;
     i32 pass19;
     i8 usedHeroes4[GAME_HERO_COUNT];
@@ -7167,7 +7164,6 @@ void game::RestoreCell(
 
 VA(0x0045f1e3, 0xb9)
 void game::SetMapSize(i32 w, i32 h) {
-    static i16 setMapSizeSourceLineBase = 0x1d0d;
     if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized)
         goto mapSized;
     {
@@ -7378,7 +7374,6 @@ void CreateDiffFile(
 
 VA(0x0045f9cd, 0x37e)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
-    static i16 createJoinFileSourceLineBase = 0x1e0f;
     u8* oldData13 = NULL;
     u8* diffData5 = NULL;
     u8* joinData9 = NULL;
@@ -7720,7 +7715,6 @@ void CheckValidAvailableHeroes(void) {
 
 VA(0x00460908, 0x92)
 i32 CalcFileCRC(char* filename) {
-    static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
     char* block = static_cast<char*>(H2_ALLOC(size));
     i32 hand = open(filename, _O_BINARY);

@@ -402,8 +402,6 @@ H2_ENUM_END(AITownEvaluationConstant)
 
 
 
-static i16 s_initAIMapLineBase = 0x1b86;
-static i16 s_closeAIMapLineBase = 0x1b96;
 
 searchArray SVSearchArray;
 

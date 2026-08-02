@@ -28,18 +28,6 @@ static RECT gDDClientRect;
 static RECT gDDDestinationRect;
 static HRESULT gDDResult;
 static DDSURFACEDESC gDDSurfaceDesc;
-static i16 gDDRestoreLineBase = 45;
-static i16 gCreatePrimaryLineBase = 67;
-static i16 gSetupClipperLineBase = 87;
-static i16 gDDInitLineBase = 110;
-static i16 gDDPaintLineBase = 157;
-static i16 gDDInitializePaletteLineBase = 296;
-static i16 gDDSetPaletteLineBase = 368;
-static i16 gDDCreateSurfaceLineBase = 393;
-static i16 gDDUpdatePaletteLineBase = 500;
-static i16 gDDCleanUpLineBase = 526;
-static i16 gDDSetFullScreenLineBase = 572;
-static i16 gSetGraphicsTypeLineBase = 1247;
 
 VA(0x004afbe0, 0x3a)
 void DDRestoreDisplayMode(void) {
@@ -48,7 +36,7 @@ void DDRestoreDisplayMode(void) {
     if (lpDD != NULL) {
         result = lpDD->RestoreDisplayMode();
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDRestoreLineBase + 7);
+            DDSD(result, RETAIL_FILE, 52);
     }
 }
 
@@ -71,7 +59,7 @@ void CreatePrimary(void) {
     if (lpClipper != NULL) {
         result = lpDDSPrimary->SetClipper(NULL);
         if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
-            DDSD(result, RETAIL_FILE, gCreatePrimaryLineBase + 10);
+            DDSD(result, RETAIL_FILE, 77);
         lpClipper->Release();
         lpClipper = NULL;
     }
@@ -84,13 +72,13 @@ void SetupClipper(void) {
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
         result = lpDD->CreateClipper(0, &lpClipper, NULL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 8);
+            DDSD(result, RETAIL_FILE, 95);
         result = lpClipper->SetHWnd(0, hwndApp);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 13);
+            DDSD(result, RETAIL_FILE, 100);
         result = lpDDSPrimary->SetClipper(lpClipper);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gSetupClipperLineBase + 18);
+            DDSD(result, RETAIL_FILE, 105);
     }
 }
 
@@ -102,7 +90,7 @@ void DDInitGraphics(void) {
         return;
     result = lpDirectDrawCreate(NULL, &lpDD, NULL);
     if (result != DD_OK)
-        DDSD(result, RETAIL_FILE, gDDInitLineBase + 8);
+        DDSD(result, RETAIL_FILE, 118);
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         SetMenuStatus(0);
         result = lpDD->SetCooperativeLevel(
@@ -110,14 +98,14 @@ void DDInitGraphics(void) {
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
         );
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 20);
+            DDSD(result, RETAIL_FILE, 130);
         result = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 24);
+            DDSD(result, RETAIL_FILE, 134);
     } else {
         result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDInitLineBase + 31);
+            DDSD(result, RETAIL_FILE, 141);
     }
     CreatePrimary();
     SetupClipper();
@@ -177,7 +165,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         OffsetRect(&gDDDestinationRect, point0.x, point0.y);
         gDDResult = lpDDSOne->Unlock(NULL);
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 71);
+            DDSD(gDDResult, RETAIL_FILE, 228);
 
         if (gDDSourceRect.left < 0)
             gDDSourceRect.left = 0;
@@ -199,19 +187,19 @@ i32 DDAppPaint(void* window, void* paintDC) {
                     gDDResult =
                         lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
                     if (gDDResult != DD_OK)
-                        DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 91);
+                        DDSD(gDDResult, RETAIL_FILE, 248);
                     gDDResult = lpDDSPrimary->Restore();
                     if (gDDResult != DD_OK)
-                        DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 95);
+                        DDSD(gDDResult, RETAIL_FILE, 252);
                     gDDDestinationRect = gDDSourceRect;
                 }
                 if (gDDResult != DD_OK)
-                    DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 103);
+                    DDSD(gDDResult, RETAIL_FILE, 260);
             } else if (gDDResult == DDERR_SURFACEBUSY
                        && KBTickCount() < lPaintStart + WINGRAPH_PAINT_TIMEOUT) {
                 iBusyRetry++;
             } else if (gDDResult != DD_OK) {
-                DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 108);
+                DDSD(gDDResult, RETAIL_FILE, 265);
             } else {
                 break;
             }
@@ -221,7 +209,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         gDDSurfaceDesc.dwSize = sizeof(gDDSurfaceDesc);
         gDDResult = lpDDSOne->Lock(NULL, &gDDSurfaceDesc, DDLOCK_WAIT, NULL);
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 118);
+            DDSD(gDDResult, RETAIL_FILE, 275);
         if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(gDDSurfaceDesc.lpSurface);
             lpInitWin = gDDSurfaceDesc.lpSurface;
@@ -229,7 +217,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
             lpInitWin = gDDSurfaceDesc.lpSurface;
         }
         if (gDDResult != DD_OK)
-            DDSD(gDDResult, RETAIL_FILE, gDDPaintLineBase + 129);
+            DDSD(gDDResult, RETAIL_FILE, 286);
         EndPaint(reinterpret_cast<HWND>(window), &paint3);
         gbWinGraphBusy = false;
     }
@@ -272,7 +260,7 @@ void DDInitializePalette(void) {
             DDSD(
                 result0,
                 RETAIL_FILE,
-                gDDInitializePaletteLineBase + 63
+                359
             );
         SetPalette();
     }
@@ -290,7 +278,7 @@ i32 DDSetPalette(void) {
         return 1;
     result = lpDDSPrimary->SetPalette(lpDDPal);
     if (result != DD_OK)
-        DDSD(result, RETAIL_FILE, gDDSetPaletteLineBase + 15);
+        DDSD(result, RETAIL_FILE, 383);
     return 0;
 }
 
@@ -316,11 +304,11 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     }
     rv = lpDD->CreateSurface(&description, &surface, NULL);
     if (rv != DD_OK)
-        DDSD(rv, RETAIL_FILE, gDDCreateSurfaceLineBase + 28);
+        DDSD(rv, RETAIL_FILE, 421);
     if (primary == 0) {
         rv = surface->Lock(NULL, &description, DDLOCK_WAIT, NULL);
         if (rv != DD_OK)
-            DDSD(rv, RETAIL_FILE, gDDCreateSurfaceLineBase + 36);
+            DDSD(rv, RETAIL_FILE, 429);
         if (gpWindowManager->m_screen != NULL) {
             gpWindowManager->m_screen->m_pixels = static_cast<u8*>(description.lpSurface);
             lpInitWin = description.lpSurface;
@@ -473,7 +461,7 @@ void DDUpdatePalette(i8* paletteData) {
     ProcessAssert(
         reinterpret_cast<i32>(lpDDPal),
         RETAIL_FILE,
-        gDDUpdatePaletteLineBase + 18
+        518
     );
     result0 = lpDDPal->SetEntries(
         0,
@@ -486,7 +474,7 @@ void DDUpdatePalette(i8* paletteData) {
         DDSD(
             result0,
             RETAIL_FILE,
-            gDDUpdatePaletteLineBase + 22
+            522
         );
 }
 
@@ -501,7 +489,7 @@ void DDCleanUpWinGraphics(void) {
             if (lpDDSPrimary != NULL) {
                 result = lpDDSPrimary->SetClipper(NULL);
                 if (result != DD_OK && result != DDERR_NOCLIPPERATTACHED)
-                    DDSD(result, RETAIL_FILE, gDDCleanUpLineBase + 14);
+                    DDSD(result, RETAIL_FILE, 540);
             }
             lpClipper->Release();
             lpClipper = NULL;
@@ -520,7 +508,7 @@ void DDCleanUpWinGraphics(void) {
         }
         result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
         if (result != DD_OK)
-            DDSD(result, RETAIL_FILE, gDDCleanUpLineBase + 38);
+            DDSD(result, RETAIL_FILE, 564);
         lpDD->Release();
         lpDD = NULL;
     }
@@ -556,7 +544,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             DDSD(
                 result0,
                 RETAIL_FILE,
-                gDDSetFullScreenLineBase + 21
+                593
             );
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
             result0 = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
@@ -564,7 +552,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
                 DDSD(
                     result0,
                     RETAIL_FILE,
-                    gDDSetFullScreenLineBase + 27
+                    599
                 );
         } else {
             result0 = lpDD->RestoreDisplayMode();
@@ -572,14 +560,14 @@ void DDSetFullScreenStatus(i32 fullScreen) {
                 DDSD(
                     result0,
                     RETAIL_FILE,
-                    gDDSetFullScreenLineBase + 34
+                    606
                 );
             result0 = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
             if (result0 != DD_OK)
                 DDSD(
                     result0,
                     RETAIL_FILE,
-                    gDDSetFullScreenLineBase + 39
+                    611
                 );
         }
         if (lpDDSPrimary != NULL) {
@@ -592,7 +580,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             DDSD(
                 result0,
                 RETAIL_FILE,
-                gDDSetFullScreenLineBase + 51
+                623
             );
         WritePrefs();
         gbWinGraphBusy = false;

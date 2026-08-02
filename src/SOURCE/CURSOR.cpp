@@ -1458,7 +1458,6 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
 
 VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
-    static i16 s_groupLineBase = 1505;
     SMapChange* ptr;
     i32 size;
     SMapChange* buf;
