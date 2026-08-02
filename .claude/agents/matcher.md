@@ -200,6 +200,16 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 
 ## Source-writing doctrine (same spirit as a /O2 decomp)
 
+- **Invariant TUs close by ISLANDS, not respells.** Third-party/adapted code
+  (Bzip = bzip 0.21) and any body the PoL line proved exact was never edited
+  by the developers: keep the source as-is and drive residuals to 100 with
+  TU-state island censuses (`homm2.permute.tu_state_noise`, forest family) -
+  a 100 under some island certifies the body and it is never touched again.
+  A body respell in such a TU is legitimate ONLY when it passes the
+  cross-compiler mirror test: old and new spellings are a proven VC4.2
+  byte-neutral mirror pair (the catalog), so the new arm would also have
+  matched PoL - that recovers the invariant source rather than inventing a
+  developer edit.
 - **Version-delta ledger is part of the close.** If the function you match
   differs semantically from the PoL 2.0 body (logic, fields, signature,
   removed/added behavior), add or update its entry in
