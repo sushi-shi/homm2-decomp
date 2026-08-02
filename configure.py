@@ -183,8 +183,6 @@ def main():
                 inputs=["build/link/objects.rsp"] + import_outputs + [resource_output],
                 implicit=objs + ["build/orig/HMM2PL.exe",
                                  "config/required_initialized_storage.tsv",
-                                 "scripts/homm2/build/build_libcmt_gfy.py",
-                                 "scripts/homm2/build/retopologize_data.py",
                                  "scripts/homm2/build/link_exe.py"],
                 variables={"exe": "build/link/HMM2PL.exe"})
         w.build("link", "phony", inputs="build/link/HMM2PL.exe")

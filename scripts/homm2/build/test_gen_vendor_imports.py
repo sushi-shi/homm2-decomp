@@ -3,10 +3,10 @@ import unittest
 
 from homm2.build.gen_vendor_imports import (
     ADVAPI_IMPORTS,
-    LINK300_FORCED_VENDOR_IMPORTS,
-    LINK300_FORCE_MSS_IMPORTS,
-    LINK300_FORCE_SMACK_IMPORTS,
-    LINK300_FORCE_WING_IMPORTS,
+    FORCED_VENDOR_IMPORTS,
+    FORCE_MSS_IMPORTS,
+    FORCE_SMACK_IMPORTS,
+    FORCE_WING_IMPORTS,
     MSS_IMPORTS,
     SMACK_IMPORTS,
     WING_IMPORTS,
@@ -32,14 +32,14 @@ class VendorImportTests(unittest.TestCase):
         expected = ({symbol for symbol, _ in MSS_IMPORTS}
                     | {symbol for symbol, _ in SMACK_IMPORTS}
                     | {symbol for symbol, _, _ in WING_IMPORTS})
-        self.assertEqual(set(LINK300_FORCED_VENDOR_IMPORTS), expected)
-        self.assertEqual(len(LINK300_FORCED_VENDOR_IMPORTS), len(expected))
-        self.assertEqual(LINK300_FORCE_MSS_IMPORTS,
+        self.assertEqual(set(FORCED_VENDOR_IMPORTS), expected)
+        self.assertEqual(len(FORCED_VENDOR_IMPORTS), len(expected))
+        self.assertEqual(FORCE_MSS_IMPORTS,
                          tuple(symbol for symbol, _ in reversed(MSS_IMPORTS)))
-        self.assertEqual(LINK300_FORCED_VENDOR_IMPORTS,
-                         LINK300_FORCE_WING_IMPORTS
-                         + LINK300_FORCE_SMACK_IMPORTS
-                         + LINK300_FORCE_MSS_IMPORTS)
+        self.assertEqual(FORCED_VENDOR_IMPORTS,
+                         FORCE_WING_IMPORTS
+                         + FORCE_SMACK_IMPORTS
+                         + FORCE_MSS_IMPORTS)
 
     def test_each_dll_uses_its_retail_import_form(self):
         specs = import_specs()

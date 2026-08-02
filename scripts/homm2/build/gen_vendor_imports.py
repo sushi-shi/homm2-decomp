@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Generate VC 4.2-compatible import libraries for the final link.
+"""Generate retail-ABI import libraries for the final link.
 
-VC 4.2 ``LIB /DEF`` emits old-style COFF import members, but it adds an extra
-leading underscore to already-decorated exports and cannot express WinG's
-decorated local thunk plus undecorated DLL lookup.  Generate those old-style
-members first, then rewrite their COFF symbol/string payloads to the exact
-retail ABI before combining them with VC 4.2 LIB.EXE.
+The retail image imports the vendor middleware with old-style import members
+whose names LIB ``/DEF`` alone cannot express (WinG's decorated local thunk
+plus undecorated DLL lookup, and already-decorated exports).  The generator
+runs LIB ``/DEF`` and rewrites the emitted members' COFF symbol/string
+payloads to the exact retail ABI.  The rewriting half predates the VC6
+toolchain and fails cleanly until it is recalibrated - see
+generate_import_libraries.
 """
 
 from __future__ import annotations
@@ -91,10 +93,11 @@ WING_IMPORTS = (
     ("_WinGBitBlt@32", 0, "WinGBitBlt"),
 )
 
-# LINK 3.00 pulls old-style import-library members in response to unresolved
+# LINK pulls old-style import-library members in response to unresolved
 # symbols.  These explicit roots reproduce the retail intra-DLL IAT order when
-# the vendor libraries precede game objects on the command line.
-LINK300_FORCE_WING_IMPORTS = (
+# the vendor libraries precede game objects on the command line; whether the
+# VC6 linker needs the forcing at all is link-campaign calibration.
+FORCE_WING_IMPORTS = (
     "_WinGStretchBlt@40",
     "_WinGBitBlt@32",
     "_WinGSetDIBColorTable@16",
@@ -102,7 +105,7 @@ LINK300_FORCE_WING_IMPORTS = (
     "_WinGCreateBitmap@12",
     "_WinGCreateDC@0",
 )
-LINK300_FORCE_SMACK_IMPORTS = (
+FORCE_SMACK_IMPORTS = (
     "_SmackSummary@8",
     "_SmackWait@4",
     "_SmackOpen@12",
@@ -114,11 +117,11 @@ LINK300_FORCE_SMACK_IMPORTS = (
     "_SmackSoundUseMSS@4",
     "_SmackSoundUseDirectSound@4",
 )
-LINK300_FORCE_MSS_IMPORTS = tuple(symbol for symbol, _ in reversed(MSS_IMPORTS))
-LINK300_FORCED_VENDOR_IMPORTS = (
-    LINK300_FORCE_WING_IMPORTS
-    + LINK300_FORCE_SMACK_IMPORTS
-    + LINK300_FORCE_MSS_IMPORTS
+FORCE_MSS_IMPORTS = tuple(symbol for symbol, _ in reversed(MSS_IMPORTS))
+FORCED_VENDOR_IMPORTS = (
+    FORCE_WING_IMPORTS
+    + FORCE_SMACK_IMPORTS
+    + FORCE_MSS_IMPORTS
 )
 
 # With the bundled VC 4.2 SDK ADVAPI32.LIB, final LINK resolves the object's
@@ -458,7 +461,16 @@ def generate_import_libraries(out_dir: Path) -> tuple[Path, ...]:
                 "system-imports-advapi.lib",
             )[dll_index]
             output = out_dir / output_name
-            output.write_bytes(patch_import_archive(lib_path.read_bytes(), dll_specs))
+            try:
+                patched = patch_import_archive(lib_path.read_bytes(), dll_specs)
+            except ValueError as error:
+                raise RuntimeError(
+                    "vendor import libraries are not yet calibrated for this "
+                    "toolchain: LIB.EXE emitted members the old-style import "
+                    "patcher cannot rewrite (%s). Reproducing the retail IAT "
+                    "with VC6 LIB is open link-campaign work." % error
+                ) from error
+            output.write_bytes(patched)
             outputs.append(output)
         return tuple(outputs)
 

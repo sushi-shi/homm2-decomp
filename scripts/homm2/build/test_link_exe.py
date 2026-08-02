@@ -6,72 +6,21 @@ from pathlib import Path
 from unittest import mock
 
 from homm2.build.link_exe import (
-    LINK300_FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
-    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command, build_retail_runtime_data_library,
+    FORCED_VENDOR_IMPORTS, RETAIL_LINK_FLAGS, SYSTEM_LIBS_AFTER_VENDOR,
+    SYSTEM_LIBS_BEFORE_VENDOR, build_link_command,
     classify_missing_public_data,
     classify_pe_storage, decode_map_symbol_name,
-    compare_pe_section_bytes, decode_s_compile_banner, load_required_initialized_storage,
-    load_retail_data_symbols, load_retail_order,
+    compare_pe_section_bytes, load_required_initialized_storage,
+    load_claimed_data_symbols, load_link_order,
     link_environment, normalized_dll_import, normalized_vendor_imports,
     parse_map_contributions, parse_map_symbol_records,
     parse_map_symbols, parse_unresolved, read_coff_section, read_imports, read_order_response,
     read_pe, required_initialized_storage_diagnostics, resolve_link_executable,
     sibling_tool_identities, static_symbol_diagnostics)
-from homm2.build.link_exe import strip_coff_export_directives, write_module_definition
+from homm2.build.link_exe import strip_coff_export_directives, write_order_response
 
 
 class LinkExeTest(unittest.TestCase):
-    def test_runtime_library_ranks_retained_data_sections_from_nb09(self):
-        raw_offset = 60
-        symbol_offset = raw_offset + 4
-        coff = bytearray(symbol_offset + 2 * 18 + 4)
-        struct.pack_into("<HHIIIHH", coff, 0, 0x14C, 1, 0, symbol_offset, 2, 0, 0)
-        struct.pack_into(
-            "<8sIIIIIIHHI", coff, 20, b".data\0\0\0", 0, 0, 4,
-            raw_offset, 0, 0, 0, 0, 0xC0300040)
-        coff[raw_offset:raw_offset + 4] = b"data"
-        struct.pack_into("<8sIhHBB", coff, symbol_offset,
-                         b".data\0\0\0", 0, 1, 0, 3, 1)
-        struct.pack_into("<I", coff, symbol_offset + 18, 4)
-        struct.pack_into("<I", coff, symbol_offset + 36, 4)
-        archive_header = (
-            b"unit.obj/       " + b"0           " + b"0     " + b"0     " +
-            b"100644  " + str(len(coff)).encode("ascii").ljust(10) + b"`\n")
-        archive = b"!<arch>\n" + archive_header + bytes(coff)
-        if len(coff) & 1:
-            archive += b"\n"
-        modules = {"unit": [{
-            "module": r"build\intel\mt_obj\unit.obj",
-            "contributions": [{
-                "section_name": ".data", "offset": 0x40, "size": 4,
-            }],
-        }]}
-        with tempfile.TemporaryDirectory() as directory, mock.patch(
-                "homm2.build.link_exe.PINNED_VC40_LIBCMT_SHA256",
-                hashlib.sha256(archive).hexdigest()), mock.patch(
-                "homm2.build.link_exe.read_nb09_module_contributions",
-                return_value=modules), mock.patch(
-                "homm2.build.link_exe.read_pe",
-                return_value={"sections": {".data": {"raw_size": 0x100}}}):
-            source = Path(directory) / "LIBCMT.LIB"
-            output = Path(directory) / "ordered" / "LIBCMT.LIB"
-            source.write_bytes(archive)
-            report = build_retail_runtime_data_library(source, output)
-            result = output.read_bytes()
-        member = 8 + 60
-        self.assertEqual(result[member + 20:member + 28], b".data$00")
-        self.assertEqual(result[member + symbol_offset:member + symbol_offset + 8],
-                         b".data$00")
-        self.assertEqual(report["initialized_ranked_sections"], 1)
-
-    def test_module_definition_has_retail_description_and_exports(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = write_module_definition(Path(directory) / "HMM2PL.def")
-            payload = path.read_text(encoding="ascii")
-        self.assertIn("DESCRIPTION 'Heroes of Might and Magic 2'", payload)
-        self.assertIn("AppAbout=?AppAbout@@YGHPAXIIJ@Z", payload)
-        self.assertIn("AppWndProc=?AppWndProc@@YGJPAXIIJ@Z", payload)
-
     def test_final_link_copy_strips_only_export_directives(self):
         payload = bytearray(20 + 40 + 64)
         struct.pack_into("<HHIIIHH", payload, 0, 0x14C, 1, 0, 0, 0, 0, 0)
@@ -87,13 +36,13 @@ class LinkExeTest(unittest.TestCase):
             copied = output.read_bytes()[60:124]
         self.assertIn(b"-defaultlib:LIBCMT", copied)
         self.assertNotIn(b"export:", copied.lower())
-    def test_link300_command_forces_vendor_members_before_game_objects(self):
+    def test_link_command_forces_vendor_members_before_game_objects(self):
         objects = [r"Z:\\obj\\one.obj", r"Z:\\obj\\two.obj"]
         vendors = [r"Z:\\lib\\smack.lib", r"Z:\\lib\\mss.lib", r"Z:\\lib\\wing.lib"]
         command = build_link_command(
             "LINK.EXE", r"Z:\\out\\game.map", r"Z:\\out\\game.exe",
             objects, vendors, r"Z:\\out\\game.res")
-        forced = ["/INCLUDE:" + symbol for symbol in LINK300_FORCED_VENDOR_IMPORTS]
+        forced = ["/INCLUDE:" + symbol for symbol in FORCED_VENDOR_IMPORTS]
         self.assertEqual(command[2 + len(RETAIL_LINK_FLAGS):
                                  2 + len(RETAIL_LINK_FLAGS) + len(forced)], forced)
         self.assertLess(command.index(SYSTEM_LIBS_BEFORE_VENDOR[0]), command.index(vendors[0]))
@@ -123,58 +72,6 @@ class LinkExeTest(unittest.TestCase):
             "LIB": r"Z:\vc42\lib",
         })
 
-    def test_order_uses_numeric_nb09_contribution_not_manifest_or_public_order(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            (root / "units.toml").write_text(
-                '[[unit]]\nunit="late"\nsource="late.cpp"\n'
-                '[[unit]]\nunit="early"\nsource="early.cpp"\n')
-            (root / "symbols.csv").write_text(
-                "rva,name,unit,size,kind,provenance\n"
-                "0x10000,late_fn,late,0x1,func,test\n"
-                "0x900,early_fn,early,0x1,func,test\n")
-            modules = {
-                "late": [{"module": "late.obj", "contributions": [
-                    {"section": 1, "offset": 0x1000, "size": 1, "rva": 0x2000}]}],
-                "early": [{"module": "early.obj", "contributions": [
-                    {"section": 1, "offset": 0x100, "size": 1, "rva": 0x1100}]}],
-            }
-            order = load_retail_order(root / "units.toml", root / "symbols.csv",
-                                      module_contributions=modules)
-            self.assertEqual([row["unit"] for row in order], ["early", "late"])
-
-    def test_missing_order_evidence_is_rejected(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            (root / "units.toml").write_text('[[unit]]\nunit="missing"\nsource="x.cpp"\n')
-            (root / "symbols.csv").write_text("rva,name,unit,size,kind,provenance\n")
-            with self.assertRaisesRegex(ValueError, "expected one NB09 module"):
-                load_retail_order(root / "units.toml", root / "symbols.csv",
-                                  module_contributions={})
-
-    def test_data_only_unit_uses_nb09_module_contribution_order(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            (root / "units.toml").write_text(
-                '[[unit]]\nunit="data_only"\nsource="data_only.cpp"\n')
-            (root / "symbols.csv").write_text(
-                "rva,name,unit,size,kind,provenance\n"
-                "0x3000,global,data_only,0x4,data,test\n")
-            modules = {
-                "data_only": [{"module": "data_only.obj", "contributions": [
-                    {"section": 1, "offset": 0x220, "size": 0x10, "rva": 0x1220}]}],
-            }
-            order = load_retail_order(root / "units.toml", root / "symbols.csv",
-                                      module_contributions=modules)
-            self.assertEqual(order[0]["function_anchors"], [])
-            self.assertEqual(order[0]["first_function_rva"], 0x1220)
-            self.assertIsNone(order[0]["first_function_symbol"])
-            self.assertEqual(order[0]["order_evidence"], "module-contribution")
-
-    def test_s_compile_banner_decodes_owned_tool_record(self):
-        body = b"\x03\x07\x00\x08\x04LINK"
-        self.assertEqual(decode_s_compile_banner(body), "LINK")
-
     def test_explicit_linker_override_is_validated_and_selected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -191,11 +88,11 @@ class LinkExeTest(unittest.TestCase):
             root = Path(temp)
             linker = root / "LINK.EXE"
             linker.write_bytes(b"link")
-            (root / "CVPACK.EXE").write_bytes(b"pack")
+            (root / "CVTRES.EXE").write_bytes(b"pack")
             identities = sibling_tool_identities(linker)
-        self.assertEqual(set(identities), {"CVPACK.EXE"})
+        self.assertEqual(set(identities), {"CVTRES.EXE"})
         self.assertEqual(
-            identities["CVPACK.EXE"]["sha256"],
+            identities["CVTRES.EXE"]["sha256"],
             "4862f447f2c7f272fa2f4aaf89dadb3b1ac09105bd5864f8d1a0c9452bb0a226",
         )
 
@@ -258,32 +155,61 @@ class LinkExeTest(unittest.TestCase):
         self.assertEqual([(row["name"], row["size"]) for row in rows],
                          [(".data", 0x100), (".bss", 0x200)])
 
-    def test_retail_public_data_loader_excludes_synthetic_relocation_constants(self):
+    def test_claimed_data_loader_excludes_synthetic_relocation_constants(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "symbols.csv"
             path.write_text(
                 "rva,name,unit,size,kind,provenance\n"
-                "0x3000,global,UNIT,0x4,data,cv-public-data\n"
+                "0x3000,global,UNIT,0x4,data,source-annotation\n"
                 "0x2000,const,_const,0x0,data,pe-reloc-constant\n"
-                "0x1000,fn,UNIT,0x10,func,cv-public-gap\n")
-            symbols = load_retail_data_symbols(path)
+                "0x1000,fn,UNIT,0x10,func,source-annotation\n")
+            symbols = load_claimed_data_symbols(path)
         self.assertEqual(symbols, [{
             "name": "global", "unit": "UNIT", "rva": 0x3000, "size": 4,
-            "provenance": "cv-public-data",
+            "provenance": "source-annotation",
         }])
 
-    def test_retail_public_data_loader_accepts_legacy_generated_schema(self):
+    def test_link_order_is_the_manifest_order_with_source_anchors(self):
         with tempfile.TemporaryDirectory() as temp:
-            path = Path(temp) / "symbols.csv"
-            path.write_text(
-                "rva,name,unit,size,kind\n"
-                "0x3000,global,UNIT,0x4,data\n"
-                "0x2000,const,_const,0x0,data\n")
-            symbols = load_retail_data_symbols(path)
-        self.assertEqual(symbols, [{
-            "name": "global", "unit": "UNIT", "rva": 0x3000, "size": 4,
-            "provenance": "cv-public-data",
-        }])
+            root = Path(temp)
+            units = root / "units.toml"
+            units.write_text(
+                '[[unit]]\nunit = "SOURCE/B"\nsource = "src/SOURCE/B.cpp"\n'
+                '[[unit]]\nunit = "SOURCE/A"\nsource = "src/SOURCE/A.cpp"\n')
+            symbols = root / "symbols.csv"
+            symbols.write_text(
+                "rva,name,unit,size,kind,provenance\n"
+                "0x2000,?B2@@YIXXZ,SOURCE/B,0x10,func,source-annotation\n"
+                "0x1000,?B1@@YIXXZ,SOURCE/B,0x10,func,source-annotation\n"
+                "0x3000,?gD@@3HA,SOURCE/A,0x4,data,source-annotation\n")
+            order = load_link_order(units, symbols)
+        self.assertEqual([row["unit"] for row in order],
+                         ["SOURCE/B", "SOURCE/A"])
+        self.assertEqual(order[0]["first_function_rva"], 0x1000)
+        self.assertEqual(order[0]["first_function_symbol"], "?B1@@YIXXZ")
+        self.assertEqual(order[0]["order_evidence"], "units-manifest")
+        self.assertIsNone(order[1]["first_function_rva"])
+
+    def test_write_order_response_reports_anchor_order_violations(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            order = [
+                {"unit": "SOURCE/B", "object": root / "obj/B.obj",
+                 "first_function_rva": 0x2000},
+                {"unit": "SOURCE/A", "object": root / "obj/A.obj",
+                 "first_function_rva": 0x1000},
+            ]
+            response = root / "link/objects.rsp"
+            with mock.patch("homm2.build.link_exe.load_link_order",
+                            return_value=order):
+                with mock.patch("builtins.print") as printer:
+                    self.assertEqual(write_order_response(response), 0)
+            self.assertEqual(read_order_response(response),
+                             [(root / "obj/B.obj").resolve(),
+                              (root / "obj/A.obj").resolve()])
+        message = printer.call_args[0][0]
+        self.assertIn("2 manifest units", message)
+        self.assertIn("1 order violations", message)
 
     def test_pe_storage_classifier_separates_initialized_and_loader_zero_data(self):
         pe = {"sections": {
