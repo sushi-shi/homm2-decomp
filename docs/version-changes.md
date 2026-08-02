@@ -36,9 +36,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (hundreds of sites; PHILAI alone has ~90) and links no `_adj_fdiv_*`
   helpers; the PoL-era `/QIfdiv` flag made VC6 emit `__adj_fdiv_m64` calls
   and was removed from every profile.
-- **[Buka] C++ exception state on the new audio/bitmap TUs.** AudiereEffects,
-  AudiereMusic, and BITMAP compile /GX; their EH registration funclets are the
-  bulk of the image's `(funclets)` region. PoL had no /GX anywhere.
+- **[Buka] C++ exception state EVERYWHERE.** The whole game build compiles
+  /GX: EH-registered prologues appear in every TU that constructs an object
+  with a throwing path (ADVMGR, SETUP, TOWNMGR, RESMGR, KB, the widget and
+  audio TUs...); the image's `(funclets)` region is their unwind bodies.
+  PoL had no /GX anywhere. Both base profiles carry /Gi- /GX.
 - **[Buka] VC6 STL exposure.** `KB.h` includes `soundManager.h`, which
   includes `<audiere.h>` — dragging `<string>`/`<vector>` into 90 of the 95
   game TUs; each emits the ctype-facet guard stub trio ($E19/$E18 +
