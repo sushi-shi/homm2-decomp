@@ -30,9 +30,9 @@ H2_ENUM_BEGIN(FindPathConstant)
 H2_ENUM_END(FindPathConstant)
 
 inline i32 ApproximateGridDistance(i32 xDistance, i32 yDistance) {
-    if (xDistance >= yDistance)
-        return xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
-    return yDistance + xDistance / DISTANCE_MINOR_DIVISOR;
+    if (xDistance < yDistance)
+        return yDistance + xDistance / DISTANCE_MINOR_DIVISOR;
+    return xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
 }
 
 }
