@@ -293,16 +293,16 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
 VA(0x00471883, 0x67)
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
-    HWND commandWindow;
-    u16 notificationType;
+    HWND commandWindow2;
+    u16 notificationType1;
 
     switch (message) {
         case WM_INITDIALOG:
             return 1;
         case WM_COMMAND:
             command = LOWORD(messageParam);
-            commandWindow = reinterpret_cast<HWND>(messageData);
-            notificationType = HIWORD(messageParam);
+            commandWindow2 = reinterpret_cast<HWND>(messageData);
+            notificationType1 = HIWORD(messageParam);
             if (command == IDOK)
                 EndDialog(dialog, 1);
             break;

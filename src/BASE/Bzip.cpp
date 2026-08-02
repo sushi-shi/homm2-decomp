@@ -1296,19 +1296,19 @@ void undoReversibleTransformation(void) {
 
 VA(0x004c99a0, 0x173)
 void spotBlock(Bool weAreCompressing) {
-    Int32 spotPos, delta, updatedDelta;
+    Int32 index, delta, updatedDelta2;
 
-    spotPos = SPOT_BASIS_STEP;
+    index = SPOT_BASIS_STEP;
     delta = 1;
 
-    while (spotPos < last) {
+    while (index < last) {
 
         Int32 n;
 
         if (weAreCompressing)
-            n = (Int32)GETFIRST(spotPos) + 1;
+            n = (Int32)GETFIRST(index) + 1;
         else
-            n = (Int32)block[spotPos] - 1;
+            n = (Int32)block[index] - 1;
 
         if (n == 256)
             n = 0;
@@ -1319,45 +1319,45 @@ void spotBlock(Bool weAreCompressing) {
             panic(const_cast<char*>("spotBlock"));
 
         if (weAreCompressing)
-            SETFIRST(spotPos, (UChar)n);
+            SETFIRST(index, (UChar)n);
         else
-            block[spotPos] = (UChar)n;
+            block[index] = (UChar)n;
 
         switch (delta) {
             case 3:
-                updatedDelta = 1;
+                updatedDelta2 = 1;
                 break;
             case 1:
-                updatedDelta = 4;
+                updatedDelta2 = 4;
                 break;
             case 4:
-                updatedDelta = 5;
+                updatedDelta2 = 5;
                 break;
             case 5:
-                updatedDelta = 9;
+                updatedDelta2 = 9;
                 break;
             case 9:
-                updatedDelta = 2;
+                updatedDelta2 = 2;
                 break;
             case 2:
-                updatedDelta = 6;
+                updatedDelta2 = 6;
                 break;
             case 6:
-                updatedDelta = 7;
+                updatedDelta2 = 7;
                 break;
             case 8:
-                updatedDelta = 8;
+                updatedDelta2 = 8;
                 break;
             case 7:
-                updatedDelta = 3;
+                updatedDelta2 = 3;
                 break;
             default:
-                updatedDelta = 1;
+                updatedDelta2 = 1;
                 break;
         }
-        delta = updatedDelta;
+        delta = updatedDelta2;
 
-        spotPos = spotPos + SPOT_BASIS_STEP + 17 * (updatedDelta - 5);
+        index = index + SPOT_BASIS_STEP + 17 * (updatedDelta2 - 5);
     }
 }
 

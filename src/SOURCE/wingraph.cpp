@@ -225,38 +225,38 @@ i32 DDAppPaint(void* window, void* paintDC) {
 
 VA(0x004b0369, 0x111)
 void DDInitializePalette(void) {
-    HDC dc0;
-    i32 entry;
-    HRESULT result0;
+    HDC winDC;
+    i32 entry0;
+    HRESULT rr;
 
     if (gbWinGraphBusy != 0)
         return;
     {
-        dc0 = GetDC(NULL);
-        GetSystemPaletteEntries(dc0, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
+        winDC = GetDC(NULL);
+        GetSystemPaletteEntries(winDC, 0, WINGRAPH_SYSTEM_PALETTE_SIZE, LogicalPalette.entries);
         GetSystemPaletteEntries(
-            dc0,
+            winDC,
             WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE,
             WINGRAPH_SYSTEM_PALETTE_SIZE,
             &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
         );
-        ReleaseDC(NULL, dc0);
-        for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
-            LogicalPalette.entries[entry].peFlags = 0;
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+        ReleaseDC(NULL, winDC);
+        for (entry0 = 0; entry0 < WINGRAPH_SYSTEM_PALETTE_SIZE; entry0++) {
+            LogicalPalette.entries[entry0].peFlags = 0;
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
                 .peFlags = 0;
         }
-        for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
-             entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
-             entry++) {
-            LogicalPalette.entries[entry].peRed = 0;
-            LogicalPalette.entries[entry].peGreen = 0;
-            LogicalPalette.entries[entry].peBlue = 0;
-            LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
+        for (entry0 = WINGRAPH_SYSTEM_PALETTE_SIZE;
+             entry0 < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
+             entry0++) {
+            LogicalPalette.entries[entry0].peRed = 0;
+            LogicalPalette.entries[entry0].peGreen = 0;
+            LogicalPalette.entries[entry0].peBlue = 0;
+            LogicalPalette.entries[entry0].peFlags = PC_NOCOLLAPSE;
         }
-        result0 = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
-        if (result0 != DD_OK)
-            DDSD(result0, RETAIL_FILE, 359);
+        rr = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
+        if (rr != DD_OK)
+            DDSD(rr, RETAIL_FILE, 359);
         SetPalette();
     }
 }

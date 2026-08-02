@@ -20,18 +20,18 @@ i32 army::FindPath(
     i32 ignoreSpeed,
     ArmyPathTarget pathMode
 ) {
-    i32 pathResult;
-    i32 savedSpeed;
+    i32 pathResult2;
+    i32 savedSpeed2;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return 0;
 
-    savedSpeed = m_monster.speed;
+    savedSpeed2 = m_monster.speed;
     if (ignoreSpeed)
         m_monster.speed = IGNORE_SPEED;
 
-    pathResult = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
-    if (!pathResult && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
+    pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 0);
+    if (!pathResult2 && HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE)
         && pathMode == ARMY_PATH_ANY_TARGET_HEX) {
         switch (m_facing) {
             case ARMY_FACING_LEFT:
@@ -43,13 +43,13 @@ i32 army::FindPath(
         }
 
         if (!ValidHex(targetHex))
-            pathResult = 0;
+            pathResult2 = 0;
         else
-            pathResult = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 1);
+            pathResult2 = gpSearchArray->FindCombatPath(sourceHex, targetHex, this, pathMode, 1);
     }
 
-    m_monster.speed = static_cast<i8>(savedSpeed);
-    return pathResult;
+    m_monster.speed = static_cast<i8>(savedSpeed2);
+    return pathResult2;
 }
 
 VA(0x0047cf9d, 0x80)
@@ -309,8 +309,8 @@ i32 GetAdjacentCellIndexNoArmy(i32 sourceHex, CombatHexDirection direction) {
 
 VA(0x0047d5f6, 0x3c1)
 i32 army::ValidRange(i32 targetHex) {
-    i32 adjacentHex;
-    CombatHexDirection directionResult;
+    i32 adj;
+    CombatHexDirection directionResult1;
 
     if (!ValidHex(targetHex))
         return 0;
@@ -318,91 +318,91 @@ i32 army::ValidRange(i32 targetHex) {
     m_moveTargetHex = m_hex;
     if (!(m_monster.attributes & MONSTER_ATTRIBUTE_WIDE)) {
         m_attackDirection = GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
-        adjacentHex = GetAdjacentCellIndex(m_hex, m_attackDirection);
-        if (adjacentHex == targetHex)
+        adj = GetAdjacentCellIndex(m_hex, m_attackDirection);
+        if (adj == targetHex)
             return 1;
-        adjacentHex = GetAdjacentCellIndex(adjacentHex, m_attackDirection);
-        if (adjacentHex == targetHex)
+        adj = GetAdjacentCellIndex(adj, m_attackDirection);
+        if (adj == targetHex)
             return 1;
     } else {
         switch (m_facing) {
             case ARMY_FACING_RIGHT:
-                directionResult =
+                directionResult1 =
                     GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
-                if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
-                    m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-                    if (adjacentHex == targetHex)
+                if (directionResult1 > COMBAT_DIRECTION_SOUTHEAST) {
+                    m_attackDirection = directionResult1;
+                    adj = GetAdjacentCellIndex(m_hex, directionResult1);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult1);
+                    if (adj == targetHex)
                         return 1;
                 }
 
-                directionResult =
+                directionResult1 =
                     GetBestDirection(m_hex + WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
-                if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
-                    m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
-                    if (adjacentHex == targetHex)
+                if (directionResult1 < COMBAT_DIRECTION_SOUTHWEST) {
+                    m_attackDirection = directionResult1;
+                    adj = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult1);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult1);
+                    if (adj == targetHex)
                         return 1;
                 }
-                if (directionResult == COMBAT_DIRECTION_WEST)
+                if (directionResult1 == COMBAT_DIRECTION_WEST)
                     return 0;
-                if (directionResult == COMBAT_DIRECTION_NORTHWEST)
+                if (directionResult1 == COMBAT_DIRECTION_NORTHWEST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_WEST;
-                else if (directionResult == COMBAT_DIRECTION_SOUTHWEST)
+                else if (directionResult1 == COMBAT_DIRECTION_SOUTHWEST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
 
-                adjacentHex = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(m_hex + WIDE_HEX_OFFSET, directionResult1);
+                if (adj == targetHex)
                     return 1;
-                adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(adj, directionResult1);
+                if (adj == targetHex)
                     return 1;
                 break;
 
             case ARMY_FACING_LEFT:
-                directionResult =
+                directionResult1 =
                     GetBestDirection(m_hex, targetHex, SPECIAL_DIRECTION_MASK);
-                if (directionResult < COMBAT_DIRECTION_SOUTHWEST) {
-                    m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-                    if (adjacentHex == targetHex)
+                if (directionResult1 < COMBAT_DIRECTION_SOUTHWEST) {
+                    m_attackDirection = directionResult1;
+                    adj = GetAdjacentCellIndex(m_hex, directionResult1);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult1);
+                    if (adj == targetHex)
                         return 1;
                     return 0;
                 }
 
-                directionResult =
+                directionResult1 =
                     GetBestDirection(m_hex - WIDE_HEX_OFFSET, targetHex, SPECIAL_DIRECTION_MASK);
-                if (directionResult > COMBAT_DIRECTION_SOUTHEAST) {
-                    m_attackDirection = directionResult;
-                    adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
-                    if (adjacentHex == targetHex)
+                if (directionResult1 > COMBAT_DIRECTION_SOUTHEAST) {
+                    m_attackDirection = directionResult1;
+                    adj = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult1);
+                    if (adj == targetHex)
                         return 1;
-                    adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                    if (adjacentHex == targetHex)
+                    adj = GetAdjacentCellIndex(adj, directionResult1);
+                    if (adj == targetHex)
                         return 1;
                     return 0;
                 }
-                if (directionResult == COMBAT_DIRECTION_EAST)
+                if (directionResult1 == COMBAT_DIRECTION_EAST)
                     return 0;
-                if (directionResult == COMBAT_DIRECTION_NORTHEAST)
+                if (directionResult1 == COMBAT_DIRECTION_NORTHEAST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_WEST;
-                else if (directionResult == COMBAT_DIRECTION_SOUTHEAST)
+                else if (directionResult1 == COMBAT_DIRECTION_SOUTHEAST)
                     m_attackDirection = COMBAT_DIRECTION_WIDE_EAST;
 
-                adjacentHex = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(m_hex - WIDE_HEX_OFFSET, directionResult1);
+                if (adj == targetHex)
                     return 1;
-                adjacentHex = GetAdjacentCellIndex(adjacentHex, directionResult);
-                if (adjacentHex == targetHex)
+                adj = GetAdjacentCellIndex(adj, directionResult1);
+                if (adj == targetHex)
                     return 1;
                 break;
         }

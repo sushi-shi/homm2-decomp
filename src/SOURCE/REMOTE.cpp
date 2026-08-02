@@ -322,26 +322,26 @@ void UnloadRemoteDriver(i16 networkDriver) {
 
 VA(0x0048d7fc, 0xa0)
 i32 calc_crc_long(u8* data, i32 length) {
-    u32 shifted;
-    u32 crc;
+    u32 q;
+    u32 cksum;
     u32 sum;
-    i32 unused;
+    i32 c;
 
-    crc = 0;
+    cksum = 0;
     sum = 0;
-    unused = 0;
+    c = 0;
     while (length-- != 0) {
-        shifted = crc & CRC_FEEDBACK_BIT;
-        crc <<= 1;
-        crc += *data;
+        q = cksum & CRC_FEEDBACK_BIT;
+        cksum <<= 1;
+        cksum += *data;
         sum += *data;
-        if (shifted != 0)
-            crc++;
+        if (q != 0)
+            cksum++;
         data++;
     }
-    crc += sum >> CRC_WORD_BIT_COUNT;
-    crc += sum << CRC_WORD_BIT_COUNT;
-    return crc;
+    cksum += sum >> CRC_WORD_BIT_COUNT;
+    cksum += sum << CRC_WORD_BIT_COUNT;
+    return cksum;
 }
 
 VA(0x0048d89c, 0x23)
