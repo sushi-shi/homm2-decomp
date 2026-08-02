@@ -37,6 +37,7 @@ no reviewed size claim is left untouched.
 
 import argparse
 import csv
+import re
 import shutil
 import struct
 from collections import defaultdict
@@ -57,6 +58,13 @@ OUTPUT_MARKER = ".homm2-reloc-canonical"
 SYM_CLASS_STATIC = 3
 ALIGNMENT_FILL = {0x90, 0xCC}
 ALIGNMENT_FILL_LIMIT = 16
+
+# Compiler-local EH machinery spellings: FuncInfo records and handler
+# funclets ($L..., __ehhandler$..., __unwindfunclet$...) live in .text$x,
+# which the linker groups at the end of .text - their linked addresses are
+# unknowable from the compiland, so identity is site-paired, never resolved.
+EH_LOCAL = re.compile(r"^\$L\d+$|^__ehhandler\$|^__unwindfunclet\$|^__catch\$")
+SYNTHETIC_TARGET = re.compile(r"^const_[0-9a-f]{8}$|^Unwind@[0-9a-f]{8}$")
 
 
 class Section(NamedTuple):
@@ -123,6 +131,7 @@ class CoffFile:
         self._string_offsets = self._read_string_offsets()
         self._new_symbols = {}
         self._new_boundaries = []
+        self._new_relocs = []
 
     def _read_sections(self, first):
         sections = []
@@ -238,6 +247,25 @@ class CoffFile:
                          section.raw_offset + absolute_site, addend & 0xFFFFFFFF)
         return True
 
+    def insert_dir32(self, function, site, symbol_name):
+        """Queue a DIR32 record at a site that has none (field bytes kept).
+
+        Used only for fs:[0] chain links (__except_list): the compiled
+        object carries a relocation against the absolute zero of the TIB
+        slot while the field itself stays zero, so adding the record to the
+        disposable comparison copy changes no byte of the section.
+        """
+        absolute_site = function.value + site
+        if (function.section, absolute_site) in self.relocations:
+            return False
+        section = self.sections[function.section - 1]
+        if absolute_site + 4 > section.raw_size:
+            return False
+        symbol_index = self._new_symbols.setdefault(
+            symbol_name, self.symbol_count + len(self._new_symbols))
+        self._new_relocs.append((function.section, absolute_site, symbol_index))
+        return True
+
     def patch_rel32(self, function, site, expected_symbol, new_symbol):
         absolute_site = function.value + site
         reloc = self.relocations.get((function.section, absolute_site))
@@ -252,7 +280,8 @@ class CoffFile:
         return True
 
     def finish(self):
-        if not self._new_symbols and not self._new_boundaries:
+        if (not self._new_symbols and not self._new_boundaries
+                and not self._new_relocs):
             self.path.write_bytes(self.data)
             return
         string_table = bytearray(
@@ -280,7 +309,33 @@ class CoffFile:
             records.extend(struct.pack(
                 "<IhHBB", value, section, 0, SYM_CLASS_STATIC, 0))
         struct.pack_into("<I", string_table, 0, len(string_table))
-        self.data = (self.data[:self.string_offset] + records + string_table)
+        prefix = bytearray(self.data[:self.symbol_offset])
+        tables = bytearray()
+        if self._new_relocs:
+            # Rebuild each touched section's relocation table between the
+            # raw data and the symbol table (COFF reads it through the
+            # header pointer) with the queued records merged in site order.
+            first_header = 20 + struct.unpack_from("<H", self.data, 16)[0]
+            by_section = defaultdict(list)
+            for section_index, site, symbol_index in self._new_relocs:
+                by_section[section_index].append((site, symbol_index))
+            for section_index, additions in sorted(by_section.items()):
+                section = self.sections[section_index - 1]
+                table = [bytes(self.data[section.reloc_offset + k * 10:
+                                         section.reloc_offset + k * 10 + 10])
+                         for k in range(section.reloc_count)]
+                table.extend(struct.pack("<IIH", site, symbol_index, DIR32)
+                             for site, symbol_index in additions)
+                table.sort(key=lambda record: struct.unpack_from("<I", record)[0])
+                header = first_header + (section_index - 1) * 40
+                struct.pack_into("<I", prefix, header + 24,
+                                 self.symbol_offset + len(tables))
+                struct.pack_into("<H", prefix, header + 32, len(table))
+                tables.extend(b"".join(table))
+            struct.pack_into("<I", prefix, 8, self.symbol_offset + len(tables))
+        self.data = (prefix + tables +
+                     self.data[self.symbol_offset:self.string_offset] +
+                     records + string_table)
         struct.pack_into("<I", self.data, 12,
                          self.symbol_count + len(self._new_symbols) +
                          len(self._new_boundaries))
@@ -389,6 +444,18 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
         for site, base_type, base_symbol, base_addend in base_sites[name]:
             target_reloc = target_by_site.get(site)
             base = (base_type, base_symbol, base_addend)
+            if (target_reloc is None and base_type == "DIR32"
+                    and base_symbol == "__except_list" and base_addend == 0):
+                # fs:[0] chain link: our object relocates the TIB-slot-zero
+                # operand while the linked field is 0. The retail operand
+                # must read 0; the record is then added to the disposable
+                # copy without touching any section byte.
+                retail_operand = _pe_read(function_rva + site, 4)
+                if retail_operand == b"\x00\x00\x00\x00" and target.insert_dir32(
+                        target_functions[name], site, "__except_list"):
+                    patched_functions.add(name)
+                    patched_sites += 1
+                    continue
             if not record_site_coverage(
                     coverage, base, target_reloc, symbols, data, duplicates):
                 continue
@@ -415,6 +482,15 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
             owner = authorize_owner_alias(
                 public_data, base_type, base_symbol, base_addend,
                 retail_target_rva)
+            if owner is None and EH_LOCAL.match(base_symbol or ""):
+                # Compiler-local EH machinery (.text$x FuncInfo records and
+                # handler funclets): the linked address is unknowable from
+                # the compiland, so identity is site-paired. Only synthetic
+                # delinker aliases are renamed; the delinker constructed
+                # owner + addend to equal the retail operand, so rewriting
+                # both to our spelling preserves the resolved address.
+                if SYNTHETIC_TARGET.match(target_symbol or ""):
+                    owner = base_symbol
             if owner is None or (target_symbol, target_addend) == base:
                 continue
             if not target.patch_dir32(

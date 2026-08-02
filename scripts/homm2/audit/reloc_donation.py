@@ -136,13 +136,21 @@ def main(argv=None):
             if not masked_equal(ours, retail, sites):
                 continue
             dir32 = [entry for entry in sites
-                     if entry[1] == IMAGE_DIR32 and entry[0] + 4 <= size
-                     and not (entry[2] or "").startswith(
-                         ("__ehhandler", "__unwindfunclet", "__catch"))]
+                     if entry[1] == IMAGE_DIR32 and entry[0] + 4 <= size]
             keep = True
             fn_sites = []
             for off, _kind, symbol, addend in dir32:
                 target = struct.unpack_from("<I", retail, off)[0]
+                if symbol == "__except_list":
+                    # fs:[0] chain link: the operand is the absolute address
+                    # of TIB slot zero, which is 0. Correct without a
+                    # relocation record; never a manifest row, never a
+                    # reason to reject the donor.
+                    if target == 0:
+                        continue
+                    keep = False
+                    rejected_target += 1
+                    break
                 if not IMAGE_BASE <= target < end_va:
                     keep = False
                     rejected_target += 1
