@@ -205,7 +205,7 @@ BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	57.6406	3a298
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	42.1706	e5d2e9ad5bfc.0bcb0c3934d6
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	47.3000	da6459d822f9
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	81.0000	6526d7380ee7
-BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	99.8469	fe17b28dd7fb
+BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	100.0000	fe17b28dd7fb
 BASE/MOUSEMGR	?HideColorPointer@mouseManager@@QAEXXZ	100.0000	2e70d2ea078a
 BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	c81273b66a87
 BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	3158a37d4d26
@@ -217,7 +217,7 @@ BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	0.0000	4d30a279ab40
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	90.0118	c2e3592fb488
 BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	0.0000	11e3df8e1c4c
-BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	89.2423	941a7a26fafd
+BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	89.2841	941a7a26fafd
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	92.9130	980ff174bc7f
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	3.1034	8d69724fe434
 BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	14.4800	e0e535c36b40
@@ -1427,7 +1427,7 @@ SOURCE/kbwin	?AppAbout@@YGHPAXIIJ@Z	100.0000	4b636c4f4658
 SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	73.7939	1f83b55e9937
 SOURCE/kbwin	?AppExit@@YIXXZ	100.0000	5d5226685dd1
 SOURCE/kbwin	?AppIdle@@YIHXZ	100.0000	3f553df292bd
-SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	91.0407	e71f86803f1e
+SOURCE/kbwin	?AppInit@@YIHPAX0HPAD@Z	91.0523	e71f86803f1e
 SOURCE/kbwin	?AppWndProc@@YGJPAXIIJ@Z	68.1350	e3903903b12a
 SOURCE/kbwin	?InitVideo@@YIXXZ	100.0000	8a6cdef92d87
 SOURCE/kbwin	?KBChangeMenu@@YIXPAX@Z	100.0000	bbb1cfc84ddc
