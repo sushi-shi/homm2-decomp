@@ -147,24 +147,25 @@ def main():
                     f"./normalized/base/{u['unit']}.obj",
                     "./normalized/dummy.obj",
                 )
-        # The "(unmatched)" module is target-only: every retail_functions.csv
-        # function no VA marker has claimed, delinked into one obj by synth_pdb.
-        # There is no base source to compile or reloc-pair against, so it takes
-        # data normalization only and lists opposite the empty dummy.
-        if (delink / "(unmatched).c.obj").exists():
-            unmatched_normalized = "build/objdiff/normalized/target/(unmatched).c.obj"
-            unmatched_sidecar = "build/objdiff/normalized/target/(unmatched).symbols.tsv"
-            # ninja shell-quotes $in/$out but not edge variables; the parens in
-            # "(unmatched)" are shell metacharacters, so quote these two here.
-            w.build(unmatched_normalized, "canonicalize_data_symbols",
-                    inputs="build/delink/(unmatched).c.obj", implicit=normalizer,
-                    implicit_outputs=unmatched_sidecar,
-                    variables={"sidecar": f"'{unmatched_sidecar}'",
-                               "unit": "'(unmatched)'"})
-            comparison_inputs.append(unmatched_normalized)
-            comparison_paths["(unmatched)"] = (
+        # Parenthesized root modules - "(unmatched)", "(libcmt)", "(imports)",
+        # "(funclets)", "(compgen)" - are target-only: reviewed or residual
+        # functions delinked without a base source to compile against. They
+        # take data normalization only and list opposite the empty dummy.
+        for target_obj in sorted(delink.glob("(*).c.obj")):
+            module = target_obj.name[:-len(".c.obj")]
+            normalized = f"build/objdiff/normalized/target/{module}.c.obj"
+            sidecar = f"build/objdiff/normalized/target/{module}.symbols.tsv"
+            # ninja shell-quotes $in/$out but not edge variables; the parens
+            # are shell metacharacters, so quote these two here.
+            w.build(normalized, "canonicalize_data_symbols",
+                    inputs=f"build/delink/{module}.c.obj", implicit=normalizer,
+                    implicit_outputs=sidecar,
+                    variables={"sidecar": f"'{sidecar}'",
+                               "unit": f"'{module}'"})
+            comparison_inputs.append(normalized)
+            comparison_paths[module] = (
                 "./normalized/dummy.obj",
-                "./normalized/target/(unmatched).c.obj",
+                f"./normalized/target/{module}.c.obj",
             )
         w.build("all", "phony", inputs=comparison_inputs)
         w.build("base", "phony", inputs=objs)
@@ -208,10 +209,12 @@ def main():
             "scratch": {"platform": build.get("platform", "win32"),
                         "compiler": build.get("compiler", "msvc4.2")},
         })
-    if "(unmatched)" in comparison_paths:
-        base_path, target_path = comparison_paths["(unmatched)"]
+    for module in sorted(comparison_paths):
+        if not module.startswith("("):
+            continue
+        base_path, target_path = comparison_paths[module]
         units_j.append({
-            "name": "(unmatched)",
+            "name": module,
             "base_path": base_path,
             "target_path": target_path,
             "scratch": {"platform": build.get("platform", "win32"),
