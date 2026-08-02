@@ -49,8 +49,8 @@ BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	8.0709	594dd911fb80
 BASE/BUTTON	?Read@button@@QAEXXZ	61.4203	df07d123bd65
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	35.5694	ca87d4011305
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	36.2804	7490a83851b0
-BASE/Bzip	?DecodeData@@YIJPAD0K@Z	74.0263	56951cf07fbb
-BASE/Bzip	?EncodeData@@YIJPAD0K@Z	76.3691	97db33efa39f
+BASE/Bzip	?DecodeData@@YIJPAD0K@Z	74.0592	56951cf07fbb
+BASE/Bzip	?EncodeData@@YIJPAD0K@Z	76.4027	97db33efa39f
 BASE/Bzip	?FreeCompressStructures@@YIXXZ	54.3636	ada8e735da3e
 BASE/Bzip	?FreeDecompressStructures@@YIXXZ	54.3636	fa62dee7b66a
 BASE/Bzip	?GETALL@@YIIH@Z	99.9000	e89e0523862b
@@ -270,7 +270,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	0.0000	73879661dceb
 BASE/Misc	?SetGameDefaults@@YIXXZ	0.0000	caf90a49fab4
 BASE/Misc	?SetInstallDefaults@@YIXXZ	0.0000	a30ea6c0d8f9
 BASE/Misc	?SetPalette@@YIXPACH@Z	23.4667	5e86bfda1e0c
-BASE/Misc	?SetupCDDrive@@YIHXZ	7.0388	a194e835ff20
+BASE/Misc	?SetupCDDrive@@YIHXZ	7.0603	a194e835ff20
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	0.0000	783abdf1886e
 BASE/Misc	?WritePrefs@@YIXXZ	23.3333	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	64.6333	52e0c0a59c33
@@ -497,7 +497,7 @@ SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	87.3783	63206b9c0bbe
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	95.7978	e4d6c30bec8b
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	74.0192	8baa6263b0bf
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	99.9210	69591000557a
-SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	73.1969	4e17afabdebc
+SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	73.2017	4e17afabdebc
 SOURCE/ADVMGR	?RedrawAdvScreen@advManager@@QAEXHH@Z	84.0395	288223522681
 SOURCE/ADVMGR	?Reseed@advManager@@QAEXHH@Z	99.8750	1ad5c3457ac6
 SOURCE/ADVMGR	?SaveAdventureBorder@advManager@@QAEXXZ	94.2887	7682269101eb
@@ -760,7 +760,7 @@ SOURCE/EVENTS	?RecruitSiteEvent@advManager@@QAEXPAVmapCell@@PAVhero@@@Z	87.5905	
 SOURCE/EVENTS	?RiddleStringsEqual@@YIHPAD0@Z	99.9039	7c37cfec3a60
 SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHHHHH@Z	87.1061	6913d389d65c
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	c747c89a433d
-SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	99.5000	61bf3bc60a7a
+SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	99.6852	61bf3bc60a7a
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	90.9040	f2f31753969e
 SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9397	dfe76e604f0d
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	5df14c8e4798
@@ -1172,7 +1172,7 @@ SOURCE/REQUEST	?CleanUpData@fileRequester@@QAEXXZ	99.6512	c3d4935b2dbf
 SOURCE/REQUEST	?Close@fileRequester@@UAEXXZ	99.6667	a5f0c4cf4140
 SOURCE/REQUEST	?DoKnob@fileRequester@@QAEXXZ	89.0000	5a04f91d62be
 SOURCE/REQUEST	?GetFilename@fileRequester@@QAEPADXZ	99.1071	488e0862b9ab
-SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	99.6111	6c18d85c9136
+SOURCE/REQUEST	?GetMapHeader@@YIHPADPAUSMapHeader@@@Z	99.7500	6c18d85c9136
 SOURCE/REQUEST	?InitializeFiles@fileRequester@@QAEHPAD0H@Z	91.4098	6e753af93b8d
 SOURCE/REQUEST	?Main@fileRequester@@UAEHAAUtag_message@@@Z	70.5998	dd482a80e4a2
 SOURCE/REQUEST	?MapExistsForFilter@fileRequester@@QAEHH@Z	99.8846	17edf3633bb6
@@ -1393,7 +1393,7 @@ SOURCE/comwin	?init_anchor@@YIXPAUtag_Anchor@@HH@Z	100.0000	793fdf35d18a
 SOURCE/comwin	?pop_node@@YIPAUtag_Node@@PAUtag_Anchor@@@Z	100.0000	7aa7cf8ad1ed
 SOURCE/dpnetwin	?CleanupDPVars@@YIXXZ	99.1739	cbe6cb299ac1
 SOURCE/dpnetwin	?DPSD@@YIXHPADH@Z	45.3553	7b5d7383a13f
-SOURCE/dpnetwin	?dpEnumServiceProvider@@YGHPAU_GUID@@PADKKPAX@Z	99.7143	f4df9ca48f36
+SOURCE/dpnetwin	?dpEnumServiceProvider@@YGHPAU_GUID@@PADKKPAX@Z	99.8571	f4df9ca48f36
 SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	99.8387	2d654e8762d6
 SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	88.3767	5c8089d051f8
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	92.7917	bb2f198050de

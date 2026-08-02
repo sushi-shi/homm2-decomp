@@ -42,9 +42,7 @@ class sample;
 struct _SAMPLE;
 struct _DIG_DRIVER;
 struct tag_message;
-namespace audiere {
-class AudioDevice;
-}
+#include <audiere.h>
 
 #pragma pack(push, 1)
 struct SampleChannelStruct {
