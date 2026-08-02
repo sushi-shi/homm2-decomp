@@ -922,7 +922,8 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     float ratio = static_cast<float>(GetNumObelisks(player)) / m_obeliskCount;
     float interpolation =
         (ratio * ratio + ratio)
-        / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT);
+        / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
+        ;
     pieceCountTotal = static_cast<i32>(pieceCountTotal + unvisitedObelisks * interpolation);
 
     if (GetNumObelisks(player) == m_obeliskCount)
@@ -6316,7 +6317,8 @@ void game::ProcessOnMapHeroes(void) {
                         }
                         H2_FREE_AT(
                             ppMapExtra[extraIndex0],
-                            RETAIL_FILE,
+                            RETAIL_FILE
+                            ,
                             processOnMapHeroesSourceLineBase + 0xdd
                         );
                         ppMapExtra[extraIndex0] = NULL;
@@ -6481,7 +6483,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     samplesReady = gpSoundManager->m_samplesReady;
     gpSoundManager->m_samplesReady = 1;
-    oldTrack = static_cast<i8>(gpSoundManager->m_currentTrack);
+    oldTrack = static_cast<i8>(gpSoundManager->m_backendState.buka.currentTrack);
     gpSoundManager->SwitchAmbientMusic(-1);
     gpSoundManager->m_samplesReady = samplesReady;
 
@@ -6770,7 +6772,7 @@ i32 game::ReceiveSaveGame(
         BVResMsg(const_cast<char*>("Receiving Data"), RES_NONE, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
-    oldTrack = static_cast<i8>(gpSoundManager->m_currentTrack);
+    oldTrack = static_cast<i8>(gpSoundManager->m_backendState.buka.currentTrack);
     gpSoundManager->m_samplesReady = 1;
     gpSoundManager->SwitchAmbientMusic(-1);
     gpSoundManager->m_samplesReady = samplesReady;
@@ -7050,7 +7052,7 @@ void game::DoNewTurn(void) {
                     );
                 }
             }
-            gpSoundManager->PlayAmbientMusic(musicTrack2, 0, -1);
+            gpSoundManager->PlayAmbientMusic(musicTrack2);
             gpMouseManager->SetPointer(0);
             NormalDialog(gText, 1, -1, -1, -1, 0, -1, 0, -1, 0);
             gpSoundManager->SwitchAmbientMusic(

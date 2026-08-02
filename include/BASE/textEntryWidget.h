@@ -67,4 +67,5 @@ public:
     void SetupDisplayString(char*, u16);
 };
 #pragma pack(pop)
+SIZE(textEntryWidget, 0x4e);
 #endif

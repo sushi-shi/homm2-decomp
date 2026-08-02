@@ -26,16 +26,19 @@ struct SMiscMemoryText {
         assertMessage;
     SMiscTextSlot<sizeof("Assert Failure")> assertTitle;
 };
+SIZE(SMiscMemoryText, 0x180);
 
 struct SMiscInstallDefaultsText {
     SMiscTextSlot<sizeof("AUTO")> autoLoadName;
     SMiscTextSlot<sizeof("AUTO")> autoSaveName;
 };
+SIZE(SMiscInstallDefaultsText, 0x10);
 
 struct SMiscGameDefaultsText {
     SMiscTextSlot<sizeof("The Unknown Hero")> unknownHeroName;
     SMiscTextSlot<sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")> uniqueIdAlphabet;
 };
+SIZE(SMiscGameDefaultsText, 0x3c);
 
 struct SMiscReadFileText {
     SMiscTextSlot<sizeof("HEROES2.CFG")> configFilename;
@@ -44,6 +47,7 @@ struct SMiscReadFileText {
     SMiscTextSlot<sizeof("")> cdRomPathDefault;
     SMiscTextSlot<sizeof("")> appPathDefault;
 };
+SIZE(SMiscReadFileText, 0x1c);
 
 struct SMiscReadRegistryText {
     SMiscTextSlot<sizeof("")> scratchDefault;
@@ -98,6 +102,7 @@ struct SMiscReadRegistryText {
     SMiscTextSlot<sizeof("CDDrive")> cdDrive;
     SMiscTextSlot<sizeof("")> cdDriveDefault;
 };
+SIZE(SMiscReadRegistryText, 0x3b0);
 
 struct SMiscRemoteNameText {
     SMiscTextSlot<sizeof("RMT%sRL.BIN")> remoteLocal;
@@ -107,11 +112,13 @@ struct SMiscRemoteNameText {
     SMiscTextSlot<sizeof("RMT%sSC.BIN")> serverCenter;
     SMiscTextSlot<sizeof("RMT%sSD.BIN")> serverRight;
 };
+SIZE(SMiscRemoteNameText, 0x48);
 
 struct SMiscWriteFileText {
     SMiscTextSlot<sizeof("HEROES2.CFG")> configFilename;
     SMiscTextSlot<sizeof("%s")> stringFormat;
 };
+SIZE(SMiscWriteFileText, 0x10);
 
 struct SMiscWriteRegistryText {
     SMiscTextSlot<sizeof("")> scratchDefault;
@@ -161,6 +168,7 @@ struct SMiscWriteRegistryText {
     SMiscTextSlot<sizeof("Editor Full Screen")> editorFullScreen;
     SMiscTextSlot<sizeof("Editor Color Mouse Cursor")> editorColorMouseCursor;
 };
+SIZE(SMiscWriteRegistryText, 0x388);
 
 struct SMiscCdText {
     SMiscTextSlot<sizeof("A:\\")> rootDrive;
@@ -176,6 +184,7 @@ struct SMiscCdText {
     SMiscTextSlot<sizeof("CDDrive")> cdDrive;
     SMiscTextSlot<sizeof("%c:%s")> driveAndPathFormat;
 };
+SIZE(SMiscCdText, 0xe8);
 
 struct SMiscLogText {
     SMiscTextSlot<sizeof("KB.LOG")> truncateFilename;
@@ -192,6 +201,7 @@ struct SMiscLogText {
     SMiscTextSlot<sizeof("%s : % 8d % 8d")> twoValueFormat;
     SMiscTextSlot<sizeof("%s : % 8d")> oneValueFormat;
 };
+SIZE(SMiscLogText, 0xf4);
 
 struct SMiscPcxText {
     SMiscTextSlot<sizeof(MISC_PCX_SOURCE_FILE)> encodedRowAllocation;
@@ -199,10 +209,12 @@ struct SMiscPcxText {
     SMiscTextSlot<sizeof(MISC_PCX_SOURCE_FILE)> outputPaletteAllocation;
     SMiscTextSlot<sizeof(MISC_PCX_SOURCE_FILE)> outputPaletteDestruction;
 };
+SIZE(SMiscPcxText, 0xa0);
 
 struct SMiscFileText {
     SMiscTextSlot<sizeof("r+b")> readWriteBinaryMode;
 };
+SIZE(SMiscFileText, 0x4);
 
 struct SMiscDataEntryText {
     SMiscTextSlot<sizeof("advmice.mse")> mouseFilename;
@@ -213,6 +225,7 @@ struct SMiscDataEntryText {
     SMiscTextSlot<sizeof("bigfont.fnt")> fontFilename;
     SMiscTextSlot<sizeof("")> restoredMouseFilename;
 };
+SIZE(SMiscDataEntryText, 0x44);
 
 struct SMiscText {
     SMiscMemoryText memory;
@@ -229,5 +242,6 @@ struct SMiscText {
     SMiscFileText file;
     SMiscDataEntryText dataEntry;
 };
+SIZE(SMiscText, 0xc3c);
 
 #endif

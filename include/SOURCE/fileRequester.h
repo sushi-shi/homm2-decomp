@@ -2,6 +2,7 @@
 #define HOMM2_SOURCE_FILEREQUESTER_H
 
 #include <va.h>
+#include <windows.h>
 #include <BASE/baseManager.h>
 
 struct tag_message;
@@ -88,7 +89,7 @@ public:
     FileRequesterName* m_fileNames;
     FileRequesterExtension* m_extensions;
     SMapHeader* m_mapHeaders;
-    void* m_previousMenu;
+    HMENU m_previousMenu;
     char m_defaultExtension[FILE_REQUESTER_EXTENSION_SIZE];
     char m_filename[FILE_REQUESTER_NAME_SIZE];
     i32 m_fileCount;
@@ -111,6 +112,7 @@ public:
     char* GetFilename(void);
 };
 #pragma pack(pop)
+SIZE(fileRequester, 0x42f);
 extern FileRequesterMapSizeFilter giMapSizeFilter;
 extern char* cFRDummy;
 extern float fGutterMinY;

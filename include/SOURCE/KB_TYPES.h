@@ -681,6 +681,7 @@ struct SMenuEnableStatus {
     u8 reserved;
 };
 #pragma pack(pop)
+SIZE(SMenuEnableStatus, 7);
 
 #include <SOURCE/CONFIG_TYPES.h>
 struct tag_tilePoint {
@@ -688,6 +689,7 @@ struct tag_tilePoint {
     i8 y;
     i16 frameOffset;
 };
+SIZE(tag_tilePoint, 4);
 H2_ENUM_BEGIN(MonsterDatabaseConstant)
     MONSTER_SPRITE_NAME_SIZE = 5
 H2_ENUM_END(MonsterDatabaseConstant)
@@ -726,6 +728,7 @@ struct tag_monsterInfo {
     };
 };
 #pragma pack(pop)
+SIZE(tag_monsterInfo, 0x1a);
 H2_ENUM_BEGIN(CombatHeroAnimationConstant)
     COMBAT_HERO_ANIMATION_COUNT       = 12,
     COMBAT_HERO_ANIMATION_FRAME_COUNT = 9
@@ -739,6 +742,7 @@ struct SCmbtHero {
     i8 animationFrameCount[COMBAT_HERO_ANIMATION_COUNT];
     i8 animationFrames[COMBAT_HERO_ANIMATION_COUNT][COMBAT_HERO_ANIMATION_FRAME_COUNT];
 };
+SIZE(SCmbtHero, 0x81);
 #pragma pack(pop)
 
 H2_ENUM_CLASS_BEGIN_SPLIT(CombatEffectType, i8)
@@ -809,9 +813,9 @@ struct SSpellInfo {
     u8 raceChance[SPELL_INFO_RACE_COUNT];
     SpellInfoAttribute attributes;
 };
+SIZE(SSpellInfo, 0x16);
 struct SAMPLE2 {
     class sample* pSample;
-    struct _SAMPLE* pMem;
 };
 
 #pragma pack(push, 1)
@@ -820,6 +824,7 @@ struct SWinSetup {
     u16 widgetId;
     char* text;
 };
+SIZE(SWinSetup, 7);
 #pragma pack(pop)
 
 #endif

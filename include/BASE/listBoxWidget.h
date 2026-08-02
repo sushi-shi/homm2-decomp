@@ -77,4 +77,5 @@ public:
     MessageDispatchResult ProcessMouseMessage(struct tag_message&);
 };
 #pragma pack(pop)
+SIZE(listBoxWidget, 0x92);
 #endif

@@ -31,6 +31,7 @@ struct playerAttentionWeights {
     float upgradeBase;
     float heroValue;
 };
+SIZE(playerAttentionWeights, 0x18);
 
 class playerAIData {
 public:
@@ -44,6 +45,7 @@ public:
     float m_artifactValue;
     float m_artifactPoolShare;
 };
+SIZE(playerAIData, 0x68);
 
 class playerData {
 public:
@@ -102,5 +104,6 @@ public:
     }
 };
 #pragma pack(pop)
+SIZE(playerData, 0x11b);
 extern playerData* gpCurPlayer;
 #endif

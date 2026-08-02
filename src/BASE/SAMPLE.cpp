@@ -4,6 +4,7 @@
 #include <BASE/SAMPLE_TYPES.h>
 #include <BASE/Misc.h>
 #include <BASE/resourceManager.h>
+#include <BASE/soundManager.h>
 #include <SOURCE/KB.h>
 #include <string.h>
 
@@ -16,18 +17,20 @@ static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
 VA(0x004ce250, 0x1b7)
-sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
+sample::sample(char* name, i32l, i32l, i32l)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
         RESOURCE_REFERENCE_INITIAL,
         NULL
     ) {
-    SampleAudioFormat formatFlags;
-    m_playbackData.channelType = channelType;
-    m_playbackData.volume = volume;
-    m_playbackData.loopCount = loopCount;
-    formatFlags = FORMAT_STEREO;
+    m_playbackData.volume = 0x7f;
+    m_playbackData.loopCount = 0;
+    m_playbackData.stereo = 1;
+    m_playbackData.sampleFormat = FORMAT_16_BIT;
+    m_playbackData.sampleRate = RATE_44100;
+    m_playbackData.activeSample = NULL;
+    m_playbackData.channelType = 0;
 
     char filename[FILENAME_CAPACITY];
     strcpy(filename, name);
@@ -45,22 +48,17 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
                 m_playbackData.sampleRate = RATE_44100;
                 break;
             case '6':
-                m_playbackData.format = FORMAT_16_BIT;
+                m_playbackData.sampleFormat = FORMAT_16_BIT;
                 break;
             case '8':
-                m_playbackData.format = FORMAT_8_BIT;
+                m_playbackData.sampleFormat = FORMAT_8_BIT;
                 break;
             case 'M':
             case 'm':
-                formatFlags = FORMAT_MONO;
+                m_playbackData.stereo = 0;
                 break;
         }
     }
-#if H2_STRICT_ENUMS
-    m_playbackData.format |= formatFlags;
-#else
-    m_playbackData.format += formatFlags;
-#endif
 
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
@@ -73,11 +71,11 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
 
 VA(0x004ce490, 0x8b)
 inline sample::~sample() {
+    if (gpSoundManager != NULL)
+        gpSoundManager->StopSample(this);
 #line 97
     H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
-    m_playbackData.data = NULL;
-    m_playbackData.size = 0;
-    m_playbackData.volume = 0;
+    memset(&m_playbackData, 0, sizeof(m_playbackData));
 }
 
 VA(0x004ce520, 0xbd)
@@ -101,5 +99,3 @@ inline MIDIWrap::~MIDIWrap() {
     H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);
     m_data = NULL;
 }
-
-

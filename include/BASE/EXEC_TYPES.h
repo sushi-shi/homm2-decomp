@@ -38,5 +38,6 @@ typedef struct SExecutiveText {
     char terminationMessage[EXEC_TEXT_TERMINATION_SLOT_SIZE];
 } SExecutiveText;
 
+SIZE(SExecutiveText, 0x214);
 
 #endif

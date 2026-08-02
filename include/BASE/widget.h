@@ -54,4 +54,5 @@ public:
     void Dim(void);
 };
 #pragma pack(pop)
+SIZE(widget, 0x20);
 #endif

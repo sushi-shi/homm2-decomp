@@ -42,6 +42,9 @@ class sample;
 struct _SAMPLE;
 struct _DIG_DRIVER;
 struct tag_message;
+namespace audiere {
+class AudioDevice;
+}
 
 #pragma pack(push, 1)
 struct SampleChannelStruct {
@@ -50,13 +53,41 @@ struct SampleChannelStruct {
     i32 currentChannel;
 };
 
+H2_ENUM_BEGIN(SoundBackendKind)
+    SOUND_BACKEND_AUDIERE = 0,
+    SOUND_BACKEND_MILES   = 1,
+    SOUND_BACKEND_NONE    = 2
+H2_ENUM_END(SoundBackendKind)
+
+struct LegacySoundManagerBackendState {
+    struct _DIG_DRIVER* digitalDriver;
+    i32 field_0x3a;
+    i32 ready;
+    char _pad_0x0c[0xe];
+    FILE* midiFile;
+};
+SIZE(LegacySoundManagerBackendState, 0x1e);
+
+struct BukaSoundManagerBackendState {
+    SoundBackendKind backend;
+    SoundBackendKind savedBackend;
+    struct _DIG_DRIVER* digitalDriver;
+    audiere::AudioDevice* audioDevice;
+    i32 fadeTargetTrack;
+    i32 fadeSteps;
+    i32 currentTrack;
+};
+SIZE(BukaSoundManagerBackendState, 0x1c);
+
+union SoundManagerBackendState {
+    LegacySoundManagerBackendState legacy;
+    BukaSoundManagerBackendState buka;
+};
+SIZE(SoundManagerBackendState, 0x1e);
+
 class soundManager : public baseManager {
 public:
-    struct _DIG_DRIVER* m_digitalDriver;
-    i32 field_0x3a;
-    i32 m_ready;
-    char _pad_0x42[0xe];
-    FILE* m_midiFile;
+    SoundManagerBackendState m_backendState;
     struct _SAMPLE* m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x8c[0x8];
     i32 m_numSampleHandles;
@@ -96,26 +127,29 @@ public:
     void ValidatePreviousPosition(i32);
     void CDStop(void);
     i32 CDIsPlaying(void);
-    void CDStartup(void);
+    bool CDStartup(void);
     void CDShutdown(void);
     void CDSetVolume(i32, i32);
     void CDPlay(i32, i32, i32, i32);
     void CDPoll(void);
+    void ShutdownSoundBackends(void);
+    bool StartupMilesBackend(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
+    float ConvertVolumeFloat(i32, SoundVolumeConversionMode);
     void AllocateSampleHandles(void);
     struct _SAMPLE* StartSample(char*, char**, i16, i16, i32, i32, i32l);
     void StopAllSamples(i32);
-    void StopSample(struct _SAMPLE*);
-    void ModifySample(struct _SAMPLE*, SoundSampleOperation, i32l);
-    i32l DigitalReport(struct _SAMPLE*, SoundDigitalReportQuery);
+    void StopSample(class sample*);
+    void ModifySample(class sample*, i32);
+    i32 DigitalReport(class sample*);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);
     void SetMusicQuality(i32);
-    void PlayAmbientMusic(i32, i32l, i32);
+    void PlayAmbientMusic(i32);
     void PollSound(void);
     void SwitchAmbientMusic(i32);
-    struct _SAMPLE* MemorySample(class sample*);
+    void MemorySample(class sample*);
     void GetNumberCDDrives(void);
     void ServiceSound(void);
     i32 MusicPlaying(void);
@@ -128,6 +162,7 @@ public:
     void MIDIPoll(void);
 };
 #pragma pack(pop)
+SIZE(soundManager, 0x6ae);
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];

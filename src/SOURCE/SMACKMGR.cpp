@@ -173,17 +173,22 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette9, gPalette->m_data, PALETTE_DATA_SIZE);
 
-    if (gbNoSound || !gpSoundManager->m_digitalDriver || gConfig.soundVolume == CONFIG_VOLUME_MUTED
+    if (gbNoSound || !gpSoundManager->m_backendState.buka.digitalDriver
+        || gConfig.soundVolume == CONFIG_VOLUME_MUTED
         || bSmackNum == SMACK_CREDITS) {
         bSmackSound = 0;
     } else {
         bSmackSound = 1;
         if (AIL_get_preference(MILES_SOUND_SYSTEM_PREFERENCE)) {
-            SmackSoundUseMSS(reinterpret_cast<void*>(gpSoundManager->m_digitalDriver));
+            SmackSoundUseMSS(
+                reinterpret_cast<void*>(gpSoundManager->m_backendState.buka.digitalDriver)
+            );
             LogStr("SSSS 1");
         } else {
             SmackSoundUseDirectSound(
-                reinterpret_cast<SmackMilesDigitalDriver*>(gpSoundManager->m_digitalDriver)
+                reinterpret_cast<SmackMilesDigitalDriver*>(
+                    gpSoundManager->m_backendState.buka.digitalDriver
+                )
                     ->directSound
             );
             LogStr("SSSS 2");
@@ -290,7 +295,7 @@ void SmackManagerMain(void) {
             if (!primaryStarted9) {
                 gpMouseManager->SetPointer("advmice.mse", POINTER_ID, MOUSE_AUTO_CURSOR_TYPE);
                 gpMouseManager->ReallyShowPointer();
-                gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 backImage = gpResourceManager->GetIcon("x_ivy.icn");
                 if (!backImage)
                     MemError();
@@ -310,7 +315,7 @@ void SmackManagerMain(void) {
         } else if (!SmackWait(smk1)) {
             if (bSmackNum == INTRO_MUSIC && !musicStarted36) {
                 musicStarted36 = 1;
-                gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC, 0, -1);
+                gpSoundManager->PlayAmbientMusic(INTRO_SECOND_MUSIC);
             }
             if ((!primaryStarted9 || smk1->Frames > 1)
                 && (bSmackNum != CONGRATS || smk1->Frames - 1 != smk1->FrameNum)) {
@@ -328,9 +333,9 @@ void SmackManagerMain(void) {
                         gpWindowManager->FadeScreen(FADE_IN, FAST_FADE, NULL);
                     }
                     if (bSmackNum == SMACK_CREDITS)
-                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
+                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                     if (bSmackNum == SPECIAL_MUSIC)
-                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC, 0, -1);
+                        gpSoundManager->PlayAmbientMusic(MAIN_MUSIC);
                 }
                 primaryStarted9 = 1;
             }
@@ -470,7 +475,7 @@ void SmackManagerMain(void) {
 
         if (bSmackNum == CONGRATS && smk1->FrameNum + 1 == smk1->Frames && !musicStarted36) {
             musicStarted36 = 1;
-            gpSoundManager->PlayAmbientMusic(LOSE_MUSIC, 0, -1);
+            gpSoundManager->PlayAmbientMusic(LOSE_MUSIC);
         }
 
         if (!SmackOptions[bSmackNum].waitForInput
@@ -581,7 +586,7 @@ i32 PlaySmacker(i32 smackNumber) {
     gpWindowManager->m_updateFlags = 0;
     if (smackNumber != EXPANSION_CAMPAIGN) {
         gpSoundManager->m_samplesReady = 1;
-        gpSoundManager->PlayAmbientMusic(-1, 0, -1);
+        gpSoundManager->PlayAmbientMusic(-1);
     }
     if (gConfig.slowVideo == VIDEO_SPEED_TEST) {
         gConfig.slowVideo = 0;
@@ -645,63 +650,78 @@ void PrintSummaryInfo(SmackSum* summary) {
     sprintf(gText, format, value);                                                                 \
     LogStr(gText)
     LOG_SUMMARY_VALUE(
-        "                                        total time - %8d",
+        "                                        total time - %8d"
+        ,
         summary->TotalTime
     );
     LOG_SUMMARY_VALUE(
-        "MS*100 per frame (100000/MS100PerFrame=Frames/Sec) - %8d",
+        "MS*100 per frame (100000/MS100PerFrame=Frames/Sec) - %8d"
+        ,
         summary->MS100PerFrame
     );
     LOG_SUMMARY_VALUE(
-        "        Time to open and prepare for decompression - %8d",
+        "        Time to open and prepare for decompression - %8d"
+        ,
         summary->TotalOpenTime
     );
     LOG_SUMMARY_VALUE(
-        "                            Total Frames displayed - %8d",
+        "                            Total Frames displayed - %8d"
+        ,
         summary->TotalFrames
     );
     LOG_SUMMARY_VALUE(
-        "                    Total number of skipped frames - %8d",
+        "                    Total number of skipped frames - %8d"
+        ,
         summary->SkippedFrames
     );
     LOG_SUMMARY_VALUE(
-        "                         Total time spent blitting - %8d",
+        "                         Total time spent blitting - %8d"
+        ,
         summary->TotalBlitTime
     );
     LOG_SUMMARY_VALUE(
-        "                          Total time spent reading - %8d",
+        "                          Total time spent reading - %8d"
+        ,
         summary->TotalReadTime
     );
     LOG_SUMMARY_VALUE(
-        "                    Total time spent decompressing - %8d",
+        "                    Total time spent decompressing - %8d"
+        ,
         summary->TotalDecompTime
     );
     LOG_SUMMARY_VALUE(
-        "                     Total io speed (sbytes/second) - %8d",
+        "                     Total io speed (sbytes/second) - %8d"
+        ,
         summary->TotalReadSpeed
     );
     LOG_SUMMARY_VALUE(
-        "                         Slowest single frame time - %8d",
+        "                         Slowest single frame time - %8d"
+        ,
         summary->SlowestFrameTime
     );
     LOG_SUMMARY_VALUE(
-        "                  Second slowest single frame time - %8d",
+        "                  Second slowest single frame time - %8d"
+        ,
         summary->Slowest2FrameTime
     );
     LOG_SUMMARY_VALUE(
-        "                       Slowest single frame number - %8d",
+        "                       Slowest single frame number - %8d"
+        ,
         summary->SlowestFrameNum
     );
     LOG_SUMMARY_VALUE(
-        "                Second slowest single frame number - %8d",
+        "                Second slowest single frame number - %8d"
+        ,
         summary->Slowest2FrameNum
     );
     LOG_SUMMARY_VALUE(
-        "                         Average size of the frame - %8d",
+        "                         Average size of the frame - %8d"
+        ,
         summary->AverageFrameSize
     );
     LOG_SUMMARY_VALUE(
-        "                Highest amount of memory allocated - %8d",
+        "                Highest amount of memory allocated - %8d"
+        ,
         summary->HighestExtraUsed
     );
 #undef LOG_SUMMARY_VALUE

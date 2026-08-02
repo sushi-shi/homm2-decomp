@@ -2,6 +2,7 @@ import unittest
 from types import SimpleNamespace
 
 from homm2.audit.unmatched_census import (
+    align_sizes,
     function_spans,
     mask_bytes,
     order_runs,
@@ -28,6 +29,12 @@ class UnmatchedCensusTest(unittest.TestCase):
             [(symbol.name, start, end)
              for symbol, start, end in function_spans(symbols, 20)],
             [("a", 0, 8), ("b", 8, 20)])
+
+    def test_size_alignment_is_monotone_and_tolerant(self):
+        # 100~104 pair, 400 skips the 30-byte slot, 500~someday pairs at end
+        pairs = align_sizes([100, 400, 500], [104, 30, 480])
+        self.assertEqual(pairs, [(0, 0), (2, 2)])
+        self.assertEqual(align_sizes([], [10]), [])
 
     def test_order_runs_split_on_address_regressions(self):
         runs = order_runs([(0, 0x100), (1, 0x180), (3, 0x80), (4, 0x200)])

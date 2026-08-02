@@ -20,5 +20,6 @@ typedef struct SWindowManagerText {
     char fadePaletteFreeSource[WINDOW_MANAGER_FINAL_SOURCE_FILE_SLOT_SIZE];
 } SWindowManagerText;
 
+SIZE(SWindowManagerText, 0xd8);
 
 #endif

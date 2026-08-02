@@ -25,4 +25,5 @@ public:
     i8* Data(void);
 };
 #pragma pack(pop)
+SIZE(palette, 0x14);
 #endif

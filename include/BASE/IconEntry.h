@@ -16,6 +16,7 @@ struct IconEntry {
 };
 #pragma pack(pop)
 #ifndef HOMM2_BASE_ICONENTRY_NO_SIZE
+SIZE(IconEntry, 0xd);
 #endif
 
 #endif

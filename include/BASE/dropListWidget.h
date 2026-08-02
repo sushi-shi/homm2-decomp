@@ -97,4 +97,5 @@ public:
     void ProcessSelectDialog(void);
 };
 #pragma pack(pop)
+SIZE(dropListWidget, 0xb4);
 #endif

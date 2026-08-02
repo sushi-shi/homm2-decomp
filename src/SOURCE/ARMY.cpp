@@ -1721,6 +1721,7 @@ void army::DoAttack(i32 retaliation) {
                 static_cast<i32l>(
                     gfCombatSpeedMod[gConfig.combatSpeed]
                     * IDX(ARMY_RETALIATION_DELAY)
+                    
                 )
             );
             target_1->m_attackDirection = OppositeDirection(m_attackDirection);

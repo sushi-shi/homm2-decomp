@@ -52,6 +52,7 @@ struct SNetPlayerInfo {
     char reserved[NET_PLAYER_INFO_RESERVED_SIZE];
 };
 #pragma pack(pop)
+SIZE(SNetPlayerInfo, 34);
 
 H2_ENUM_CLASS_BEGIN(RemoteNetworkProtocol)
     REMOTE_PROTOCOL_NETBIOS        = 0,

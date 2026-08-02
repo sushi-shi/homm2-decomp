@@ -59,6 +59,7 @@ private:
         DeselectSelected(struct tag_message& message);
 };
 #pragma pack(pop)
+SIZE(button, 0x30);
 extern MessageModifier iLeftRightSave;
 
 #endif

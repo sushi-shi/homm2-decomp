@@ -1357,7 +1357,8 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
-            "wsnd%1d%1d.82M",
+            "wsnd%1d%1d.82M"
+            ,
 #if H2_STRICT_ENUMS
             IDX(cursorSampleSet),
 #else
@@ -1625,7 +1626,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     if (!gbNoSound && gConfig.musicVolume != CONFIG_VOLUME_MUTED && giForceSwitchMusic > 0
         && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
-        if (gpSoundManager->m_currentTrack == WAIT_AMBIENT_MUSIC) {
+        if (gpSoundManager->m_backendState.buka.currentTrack == WAIT_AMBIENT_MUSIC) {
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
         }
         SetEnvironmentOrigin(
@@ -5395,6 +5396,7 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
         m_scrollLeftButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
         scrollStep = static_cast<double>(LOCATOR_HERO_SCROLL_SPAN)
+                     
                      / (gpCurPlayer->m_heroCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollLeftButton->m_y = static_cast<i16>(
             gpCurPlayer->m_heroLocatorPage * scrollStep
@@ -5471,6 +5473,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
         m_scrollRightButton->m_y = LOCATOR_SCROLL_NO_PAGES_Y;
     } else {
         scrollStep = static_cast<double>(LOCATOR_TOWN_SCROLL_SPAN)
+                     
                      / (gpCurPlayer->m_townCount - LOCATOR_PAGE_DENOMINATOR_OFFSET);
         m_scrollRightButton->m_y = static_cast<i16>(
             gpCurPlayer->m_townLocatorPage * scrollStep + IDX(LOCATOR_SCROLL_BASE_Y)
@@ -7993,7 +7996,6 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                 );
                 gpSoundManager->StopSample(
                     m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
-                        ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
                 m_activeSounds[edgeOffset].volume = ENVIRONMENT_SOUND_DEFAULT_VOLUME;
@@ -8050,16 +8052,13 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
                 && m_activeSounds[edgeOffset].volume > ENVIRONMENT_SOUND_MAX_DISTANCE) {
                 gpSoundManager->StopSample(
                     m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
-                        ->m_playbackData.activeSample
                 );
                 m_activeSounds[edgeOffset].soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
             }
             if (m_activeSounds[edgeOffset].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE
                 && (m_activeSoundMask & BIT(m_activeSounds[edgeOffset].soundId)) != 0) {
                 gpSoundManager->ModifySample(
-                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)]
-                        ->m_playbackData.activeSample,
-                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
+                    m_loopingSamples[IDX(m_activeSounds[edgeOffset].soundId)],
                     ADVMGR_ENVIRONMENT_VOLUME(m_activeSounds[edgeOffset].volume)
                 );
             }
@@ -8241,7 +8240,6 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         if (m_activeSounds[soundSlot].soundId != ADVMGR_ENVIRONMENT_SOUND_NONE) {
             gpSoundManager->StopSample(
                 m_loopingSamples[IDX(m_activeSounds[soundSlot].soundId)]
-                    ->m_playbackData.activeSample
             );
         }
         m_activeSounds[soundSlot].soundId = soundId;
@@ -10385,7 +10383,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             break;
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
-                            if (gConfig.soundVolume == CONFIG_VOLUME_MUTED && gpSoundManager->m_digitalDriver == NULL) {
+                            if (gConfig.soundVolume == CONFIG_VOLUME_MUTED
+                                && gpSoundManager->m_backendState.buka.digitalDriver == NULL) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
@@ -10667,7 +10666,8 @@ i32 advManager::DoVisions(hero* visionHero) {
             if (joiningCostIndex
                 > gpGame->m_players[visionHero->m_owner].m_resources[IDX(RES_GOLD)]) {
                 if (strengthRatioCurrent
-                    > MONSTER_STRENGTH_FLEE) {
+                    > MONSTER_STRENGTH_FLEE
+                    ) {
                     goto creaturesFlee;
                 } else {
                     goto creaturesFight;

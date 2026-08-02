@@ -18,4 +18,5 @@ public:
     void Update(i32);
 };
 #pragma pack(pop)
+SIZE(bankBox, 0xc);
 #endif

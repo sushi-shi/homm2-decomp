@@ -1,6 +1,7 @@
 #include <va.h>
 #include <BASE/soundManager.h>
 #include <BASE/sample.h>
+#include <BASE/soundBackends.h>
 #include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
@@ -12,6 +13,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <BASE/Misc.h>
+#include <audiere.h>
 
 H2_ENUM_BEGIN(SoundConstant)
     SAMPLE_VOLUME_MAX            = 0x40,
@@ -51,6 +53,19 @@ H2_ENUM_END(SoundSampleStatus)
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\soundmgr.cpp"
 
 static PCMWAVEFORMAT gWaveFormat;
+#define NORMALIZED_VOLUME_MAX 127.0f
+
+static bool gSoundBackendsReady = false;
+
+static inline bool IsAudiereBackend(const soundManager* manager) {
+    return manager->m_backendState.buka.backend == SOUND_BACKEND_AUDIERE
+        && manager->m_backendState.buka.audioDevice != NULL;
+}
+
+static inline bool IsMilesBackend(const soundManager* manager) {
+    return manager->m_backendState.buka.backend == SOUND_BACKEND_MILES
+        && manager->m_backendState.buka.digitalDriver != NULL;
+}
 
 H2_ENUM_CLASS_BEGIN(SoundStateSpan)
     SOUND_STATE_RESET_SPAN = 0xae
@@ -133,28 +148,25 @@ i32 soundManager::CDIsPlaying(void) {
 }
 
 VA(0x004b59b0, 0x123)
-void soundManager::CDStartup(void) {
+bool soundManager::CDStartup(void) {
+    if (m_backendState.buka.backend == SOUND_BACKEND_AUDIERE)
+        return true;
+
+    ShutdownSoundBackends();
     if (gbNoSound != 0)
-        return;
-    m_cdStarted = 1;
-    m_cdReady = 0;
-    if (gbNoCDRom != 0)
-        return;
-    if (gConfig.mciError != 0)
-        return;
-    if (gbDontTryRedbook != 0)
-        return;
-    wsprintfA(CommandString, "open %c: type cdaudio alias CD shareable", gcAnimPath[0]);
-    nMCIError =
-        mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
-    if (nMCIError != 0) {
-        m_cdReady = 0;
-        gConfig.mciError = 1;
-        gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
-        WritePrefs();
-        return;
+        return false;
+
+    m_backendState.buka.backend = SOUND_BACKEND_AUDIERE;
+    audiere::AudioDevice* device = audiere::OpenDevice();
+    if (device != m_backendState.buka.audioDevice) {
+        if (m_backendState.buka.audioDevice != NULL)
+            m_backendState.buka.audioDevice->unref();
+        m_backendState.buka.audioDevice = device;
+        if (m_backendState.buka.audioDevice != NULL)
+            m_backendState.buka.audioDevice->ref();
     }
-    m_cdReady = 1;
+    gSoundBackendsReady = StartupAudiereMusic(m_backendState.buka.audioDevice);
+    return gSoundBackendsReady;
 }
 
 // @remove
@@ -331,6 +343,53 @@ void soundManager::CDPoll(void) {
     }
 }
 
+VA(0x004b5710, 0x101)
+void soundManager::ShutdownSoundBackends(void) {
+    if (IsAudiereBackend(this)) {
+        StopAudiereMusic(m_backendState.buka.currentTrack);
+        StopAllAudiereSamples();
+        m_backendState.buka.audioDevice->unref();
+        m_backendState.buka.audioDevice = NULL;
+    } else if (IsMilesBackend(this)) {
+        MIDIShutdown();
+        StopAllMilesSamples();
+        AIL_shutdown();
+    }
+    m_backendState.buka.digitalDriver = NULL;
+    m_backendState.buka.audioDevice = NULL;
+    m_backendState.buka.backend = SOUND_BACKEND_NONE;
+    gSoundBackendsReady = false;
+}
+
+VA(0x004b5820, 0x18f)
+bool soundManager::StartupMilesBackend(void) {
+    if (IsMilesBackend(this))
+        return true;
+
+    ShutdownSoundBackends();
+    if (gbNoSound != 0)
+        return false;
+
+    m_backendState.buka.backend = SOUND_BACKEND_MILES;
+    AIL_startup();
+    m_backendState.buka.digitalDriver = WAVE_init_driver(
+        DEFAULT_SAMPLE_RATE,
+        DEFAULT_SAMPLE_BITS,
+        DEFAULT_SAMPLE_CHANNELS,
+        1
+    );
+    if (m_backendState.buka.digitalDriver == NULL) {
+        AIL_shutdown();
+        m_backendState.buka.backend = SOUND_BACKEND_NONE;
+        return false;
+    }
+
+    StartupMilesSamples(m_backendState.buka.digitalDriver);
+    MIDIStartup();
+    gSoundBackendsReady = true;
+    return true;
+}
+
 VA(0x004b5ae0, 0xb1)
 i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
     i32 local_8 = 0;
@@ -357,6 +416,13 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     return local_8;
 }
 
+VA(0x004b5ba0, 0x2b)
+float soundManager::ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode soundType) {
+    return static_cast<float>(ConvertVolume(volume, soundType)) / NORMALIZED_VOLUME_MAX;
+}
+
+#undef NORMALIZED_VOLUME_MAX
+
 // @remove
 void __stdcall SetReady2Poll(u32l) {
     if (gpSoundManager == NULL)
@@ -374,19 +440,20 @@ void __stdcall UpdateTimers(u32l) {
 }
 
 VA(0x004b5bd0, 0x146)
-soundManager::soundManager(void) : baseManager(), field_0x574(1) {
-    i32 local_8;
+soundManager::soundManager(void) : baseManager() {
+    m_backendState.buka.audioDevice = NULL;
+    m_backendState.buka.backend = SOUND_BACKEND_NONE;
+    m_backendState.buka.savedBackend = SOUND_BACKEND_NONE;
     m_active = false;
-    m_fadeSteps = 0;
-    field_0x56c = 0;
-    for (local_8 = 0; local_8 < SAVED_SAMPLE_VOLUME_CAPACITY; local_8++)
-        iLastVolume[local_8] = 0;
-    memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
-    m_samplesReady = 0;
-    m_digitalDriver = NULL;
-    field_0x3a = 0;
-    m_cdTrack = 0;
-    m_cdPlayFrame = 0;
+    gSoundBackendsReady = false;
+    m_backendState.buka.digitalDriver = NULL;
+    if (m_backendState.buka.audioDevice != NULL) {
+        m_backendState.buka.audioDevice->unref();
+        m_backendState.buka.audioDevice = NULL;
+    }
+    m_backendState.buka.fadeTargetTrack = MIDI_NO_TRACK;
+    m_backendState.buka.fadeSteps = 0;
+    m_backendState.buka.currentTrack = MIDI_NO_TRACK;
 }
 
 // @remove
@@ -440,11 +507,6 @@ i32 soundManager::Open(i32) {
     i32 keyState;
     i32 musicTrack;
 
-    m_cdStarted = 0;
-    m_midiStarted = 0;
-    m_cdReady = 0;
-    m_midiReady = 0;
-
     memset(bSaveMusicPosition, 0, MIDI_TRACK_COUNT);
     memset(bMusicIsLooping, 0, MIDI_TRACK_COUNT);
 
@@ -492,59 +554,34 @@ i32 soundManager::Open(i32) {
         WritePrefs();
     }
 
-    m_currentTrack = -1;
-    if (gbNoSound != 0) {
-        goto managerReady;
-    }
-    m_pollToggle = m_pollDue = m_pollRequested = 0;
-    AIL_startup();
-
-    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-        CDStartup();
-        if (m_cdReady == 0) {
-            MIDIStartup();
-            if (m_midiReady != 0) {
-                gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
-                WritePrefs();
-            } else {
+    m_backendState.buka.currentTrack = MIDI_NO_TRACK;
+    if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
+        StartupMilesBackend();
+        if (m_midiReady == 0) {
+            if (!CDStartup()) {
                 gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
-            }
-        }
-    } else {
-        MIDIStartup();
-        if (m_midiReady == 0) {
-            CDStartup();
-            if (m_cdReady != 0) {
+            } else {
                 gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
                 WritePrefs();
-            } else {
-                gConfig.musicVolume = CONFIG_VOLUME_MUTED;
-                WritePrefs();
             }
+        }
+    } else if (!CDStartup()) {
+        StartupMilesBackend();
+        if (m_midiReady != 0) {
+            gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
+            WritePrefs();
+        } else {
+            gConfig.musicVolume = CONFIG_VOLUME_MUTED;
+            WritePrefs();
         }
     }
 
-    m_samplesReady = 1;
-    memset(&m_ready, 0, IDX(SOUND_STATE_RESET_SPAN));
-    if (gbDontTryDigital == 0 && m_digitalDriver == NULL)
-        m_digitalDriver = WAVE_init_driver(
-            DEFAULT_SAMPLE_RATE,
-            DEFAULT_SAMPLE_BITS,
-            DEFAULT_SAMPLE_CHANNELS,
-            0
-        );
-    if (m_digitalDriver == NULL) {
+    if (!IsAudiereBackend(this) && !IsMilesBackend(this)) {
         gConfig.soundVolume = CONFIG_VOLUME_MUTED;
         WritePrefs();
     }
-    AllocateSampleHandles();
-    m_ready = 1;
-    m_midiFile = NULL;
-    memset(m_savedTrackPositions, 0, sizeof(m_savedTrackPositions));
-    m_fading = 1;
 
-managerReady:
     m_messageMask = BASE_MANAGER_ACCEPT_LEFT_BUTTON_UP;
     m_priority = SOUND_MANAGER_PRIORITY;
     m_active = true;
@@ -557,10 +594,11 @@ void soundManager::AllocateSampleHandles(void) {
     i32 local_8;
     if (gbNoSound != 0)
         return;
-    if (m_digitalDriver == NULL)
+    if (m_backendState.buka.digitalDriver == NULL)
         return;
     for (local_8 = 0; local_8 < SOUND_SAMPLE_HANDLE_CAPACITY; local_8++) {
-        m_sampleHandles[local_8] = AIL_allocate_sample_handle(m_digitalDriver);
+        m_sampleHandles[local_8] =
+            AIL_allocate_sample_handle(m_backendState.buka.digitalDriver);
         if (m_sampleHandles[local_8] == NULL)
             break;
     }
@@ -571,18 +609,8 @@ VA(0x004b6000, 0x28)
 void soundManager::Close(void) {
     if (m_active != 1)
         return;
-    if (gbNoSound != 0)
-        goto soundClosed;
-    LogStr("SD1");
-    CDShutdown();
-    LogStr("SD2");
-    MIDIShutdown();
-    LogStr("SD3");
-    AIL_shutdown();
-    LogStr("SD4");
-soundClosed:
+    ShutdownSoundBackends();
     m_active = false;
-    gbNoSound = true;
 }
 
 VA(0x004b6030, 0xf)
@@ -597,180 +625,71 @@ struct _SAMPLE* soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32
 
 VA(0x004b6040, 0xcb)
 void soundManager::StopAllSamples(i32 stopMusic) {
-    i16 sampleIdx;
-    i32 waitCounter;
-    i32 sampleStatus;
-    if (gbNoSound != 0)
+    if (!gSoundBackendsReady)
         return;
-    if (m_digitalDriver == NULL)
+
+    if (IsAudiereBackend(this)) {
+        m_backendState.buka.fadeSteps = 0;
+        if (stopMusic != 0)
+            StopAudiereMusic(m_backendState.buka.currentTrack);
+        StopAllAudiereSamples();
         return;
-    if (m_samplesReady == 0)
-        return;
-    LogStr("SAS 1");
-    for (sampleIdx = 0; sampleIdx < m_numSampleHandles; sampleIdx++) {
-        sampleStatus = AIL_sample_status(m_sampleHandles[sampleIdx]);
-        if (sampleStatus == SAMPLE_STATUS_PLAYING)
-            AIL_end_sample(m_sampleHandles[sampleIdx]);
     }
-    m_fadeSteps = 0;
-    if (stopMusic != 0) {
-        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
-            CDStop();
-        else
+    if (IsMilesBackend(this)) {
+        m_backendState.buka.fadeSteps = 0;
+        if (stopMusic != 0)
             MIDIStop();
+        StopAllMilesSamples();
     }
-    for (waitCounter = 0; waitCounter < SAMPLE_STOP_ALL_WAIT_COUNT; waitCounter++) {
-        ServiceSound();
-        DelayMilli(1);
-    }
-    LogStr("SAS 2");
 }
 
 VA(0x004b6110, 0x8a)
-void soundManager::StopSample(struct _SAMPLE* sample) {
-    i32 local_c;
-    i32 local_10;
-    if (gbNoSound != 0)
-        return;
-    if (m_digitalDriver == NULL)
-        return;
-    local_10 = 0;
-    LogStr("Stop Sample 1");
-    if (m_sampleHandles[0] == sample)
-        local_10 = 1;
-    AIL_end_sample(sample);
-    if (local_10 != 0) {
-        for (local_c = 0; local_c < SAMPLE_STOP_MUSIC_WAIT_COUNT; local_c++) {
-            ServiceSound();
-            DelayMilli(1);
-        }
+void soundManager::StopSample(class sample* sampleResource) {
+    if (IsAudiereBackend(this)) {
+        StopAudiereSample(sampleResource);
+    } else if (IsMilesBackend(this)) {
+        StopMilesSample(sampleResource);
     }
-    LogStr("Stop Sample 2");
 }
 
 VA(0x004b61a0, 0xa1)
 void soundManager::ModifySample(
-    struct _SAMPLE* sampleHandle,
-    SoundSampleOperation operation,
-    i32l value
+    class sample* sampleResource,
+    i32 volume
 ) {
-    i32 foundChannel;
-    i32 unused;
-    i32 sampleIndex;
-
-    if (gbNoSound != 0)
+    if (!gSoundBackendsReady)
         return;
-    if (m_digitalDriver == NULL)
-        return;
-    if (m_samplesReady == 0)
-        return;
-    if (m_ready == 0)
-        return;
-
-    LogStr("Modify Sample 1");
-    foundChannel = -1;
-    for (sampleIndex = 0; sampleIndex < m_numSampleHandles; sampleIndex++) {
-        if (m_sampleHandles[sampleIndex] == sampleHandle)
-            foundChannel = sampleIndex;
+    if (IsAudiereBackend(this)) {
+        SetAudiereSampleVolume(sampleResource, volume);
+    } else if (IsMilesBackend(this)) {
+        SetMilesSampleVolume(sampleResource, volume);
     }
-
-    switch (operation) {
-        case SOUND_SAMPLE_OPERATION_VOLUME:
-        case SOUND_SAMPLE_OPERATION_EFFECT_VOLUME:
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_EFFECT));
-            if (foundChannel >= 0)
-                iLastVolume[foundChannel] = static_cast<i16>(value);
-            break;
-        case SOUND_SAMPLE_OPERATION_MUSIC_VOLUME:
-            H2_ASSERT(
-                gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI,
-                RETAIL_FILE,
-                1327
-            );
-            AIL_set_sample_volume(sampleHandle, ConvertVolume(value, SOUND_VOLUME_MUSIC));
-            if (foundChannel >= 0)
-                iLastVolume[foundChannel] = static_cast<i16>(value);
-            break;
-        case SOUND_SAMPLE_OPERATION_START:
-            AIL_start_sample(sampleHandle);
-            break;
-    }
-
-    Process1WindowsMessage();
-    LogStr("Modify Sample 2");
 }
 
 VA(0x004b6250, 0x8e)
-i32l soundManager::DigitalReport(struct _SAMPLE* sample, SoundDigitalReportQuery reportType) {
-    i32 sampleStatus;
-
-    if (gbNoSound != 0)
-        return 0;
-    if (m_digitalDriver == NULL)
-        return 0;
-    switch (reportType) {
-        case SOUND_DIGITAL_REPORT_VOLUME:
-            return AIL_sample_volume(sample);
-        case SOUND_DIGITAL_REPORT_PLAYING:
-            sampleStatus = AIL_sample_status(sample);
-            return sampleStatus == SAMPLE_STATUS_PLAYING;
+i32 soundManager::DigitalReport(class sample* sampleResource) {
+    if (IsAudiereBackend(this)) {
+        return AudiereSamplePlaying(sampleResource);
     }
+    if (IsMilesBackend(this))
+        return MilesSamplePlaying(sampleResource);
     return 0;
 }
 
 VA(0x004b62e0, 0x4d)
 void soundManager::AdjustSoundVolumes(void) {
-    i32 sampleIndex;
-    struct _SAMPLE* sampleHandle;
-
-    if (gbNoSound != 0)
-        return;
-    if (m_digitalDriver == NULL)
-        return;
-    if (m_samplesReady == 0)
-        return;
-
-    LogStr("Adjust Sound Volumes 1");
-    for (sampleIndex = 1; sampleIndex < m_numSampleHandles; sampleIndex++) {
-        sampleHandle = m_sampleHandles[sampleIndex];
-        if (gConfig.soundVolume != CONFIG_VOLUME_MUTED) {
-            if (DigitalReport(sampleHandle, SOUND_DIGITAL_REPORT_PLAYING) != 0)
-                ModifySample(
-                    sampleHandle,
-                    SOUND_SAMPLE_OPERATION_EFFECT_VOLUME,
-                    iLastVolume[sampleIndex]
-                );
-        } else {
-            ModifySample(sampleHandle, SOUND_SAMPLE_OPERATION_VOLUME, 0);
-        }
-    }
-    LogStr("Adjust Sound Volumes 2");
+    if (gSoundBackendsReady && IsMilesBackend(this))
+        AdjustMilesSampleVolumes();
 }
 
 VA(0x004b6330, 0xad)
 void soundManager::AdjustMusicVolumes(void) {
-    if (gbNoSound != 0)
+    if (!gSoundBackendsReady || m_backendState.buka.currentTrack < 0)
         return;
-    if (m_samplesReady == 0)
-        return;
-    if (m_currentTrack < 0)
-        return;
-    LogStr("Adjust Music Volumes 1");
-    i32 local_4 = 0;
-    if (bSaveMusicPosition[m_currentTrack] != 0)
-        local_4 = 1;
-    if (gConfig.musicVolume != CONFIG_VOLUME_MUTED) {
-        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
-            CDSetVolume(-1, 0);
-        else
-            MIDISetVolume();
-    } else {
-        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
-            CDSetVolume(-1, 0);
-        else
-            MIDISetVolume();
-    }
-    LogStr("Adjust Music Volumes 2");
+    if (IsAudiereBackend(this))
+        SetAudiereMusicVolume(-1, false);
+    else if (IsMilesBackend(this))
+        MIDISetVolume();
 }
 
 // @remove
@@ -783,216 +702,145 @@ void soundManager::ForcePollSound(void) {
 
 VA(0x004b63e0, 0xef)
 void soundManager::SetMusicQuality(i32 musicSource) {
-    i32 local_8;
-    if (gbNoSound != 0)
-        return;
-    if (m_ready == 0)
-        return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    if (m_cdReady == 0)
-        return;
-    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-        local_8 = m_currentTrack;
-        CDStop();
-        m_currentTrack = MIDI_NO_TRACK;
-    } else {
-        local_8 = m_currentTrack;
+
+    i32 previousTrack = m_backendState.buka.currentTrack;
+    if (IsAudiereBackend(this)) {
+        StopAudiereMusic(m_backendState.buka.currentTrack);
+        m_backendState.buka.currentTrack = MIDI_NO_TRACK;
+    } else if (IsMilesBackend(this)) {
         MIDIStop();
     }
-    memset(m_savedTrackPositions, 0, sizeof(m_savedTrackPositions));
+
     gConfig.musicSource = ConfigMusicSource(musicSource);
-    if (local_8 >= 0)
-        PlayAmbientMusic(local_8, 0, -1);
+    if (musicSource == CONFIG_MUSIC_SOURCE_MIDI)
+        StartupMilesBackend();
+    else
+        CDStartup();
+    if (previousTrack >= 0)
+        PlayAmbientMusic(previousTrack);
 }
 
 VA(0x004b64d0, 0x106)
-void soundManager::PlayAmbientMusic(i32 track, i32l resume, i32 unused) {
-    if (gbNoSound != 0)
+void soundManager::PlayAmbientMusic(i32 track) {
+    if (!gSoundBackendsReady)
         return;
-    if (m_samplesReady == 0)
-        return;
-    if (m_ready == 0)
-        return;
-    if (m_currentTrack == track)
+    if (m_backendState.buka.currentTrack == track)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
-        m_currentTrack = static_cast<char>(track);
+        m_backendState.buka.currentTrack = track;
         return;
     }
-    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
-        CDPlay(track, resume, -1, 0);
-    else
+
+    if (IsAudiereBackend(this)) {
+        PlayAudiereMusic(
+            m_backendState.buka.currentTrack,
+            m_backendState.buka.fadeSteps,
+            m_backendState.buka.audioDevice,
+            track
+        );
+    } else if (IsMilesBackend(this)) {
         MIDIPlay(track);
-    m_currentTrack = static_cast<char>(track);
+    }
+    m_backendState.buka.currentTrack = track;
 }
 
 VA(0x004b65e0, 0x227)
 void soundManager::PollSound(void) {
     i32 volume;
-    struct _SAMPLE* smp;
     i32l delta;
-    i32 snap;
-    i32l now;
-    if (gbNoSound != 0)
-        return;
-    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
-        CDPoll();
-    if (m_pollRequested == 0 && m_fadeSteps == 0)
+    if (m_backendState.buka.fadeSteps == 0)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    LogStr("Poll Sound 1");
-    if (m_fadeSteps > 0) {
-        LogStr("Poll Sound 1a");
-        Process1WindowsMessage();
-        if (m_currentTrack < CD_MUSIC_TRACK_FIRST
-            || m_currentTrack > CD_MUSIC_TRACK_LAST)
+    if (m_backendState.buka.fadeSteps < 1)
+        return;
+
+    Process1WindowsMessage();
+    if (m_backendState.buka.currentTrack < CD_MUSIC_TRACK_FIRST
+        || m_backendState.buka.currentTrack > CD_MUSIC_TRACK_LAST)
+        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+    delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+    m_backendState.buka.fadeSteps = delta / FADE_STEP_TICKS;
+    if (m_backendState.buka.fadeSteps < 1)
+        m_backendState.buka.fadeSteps = 0;
+
+    if (m_backendState.buka.fadeSteps < FADE_TOTAL_STEPS
+        && m_backendState.buka.currentTrack != m_backendState.buka.fadeTargetTrack) {
+        if (bSaveMusicPosition[m_backendState.buka.currentTrack] == 0)
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+        PlayAmbientMusic(m_backendState.buka.fadeTargetTrack);
         delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
-        m_fadeSteps = delta / FADE_STEP_TICKS;
-        if (m_fadeSteps < 1)
-            m_fadeSteps = 0;
-        LogStr("Poll Sound 1b");
-        if (m_fadeSteps <= FADE_HOLD_STEPS && m_currentTrack != m_fadeTargetTrack) {
-            if (m_midiFile != NULL && bSaveMusicPosition[m_currentTrack] != 0) {
-                if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                    H2_ASSERT(
-                        reinterpret_cast<i32>(m_midiFile),
-                        RETAIL_FILE,
-                        0x61a
-                    );
-                    m_savedTrackPositions[m_currentTrack] = ftell(m_midiFile);
-                }
-            } else {
-                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
-            }
-            m_fading = 1;
-            if (bSaveMusicPosition[m_fadeTargetTrack] != 0)
-                PlayAmbientMusic(m_fadeTargetTrack, m_savedTrackPositions[m_fadeTargetTrack], -1);
-            else
-                PlayAmbientMusic(m_fadeTargetTrack, 0, -1);
-            now = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
-            m_fadeSteps = now / FADE_STEP_TICKS;
-            if (m_fadeSteps < 1)
-                m_fadeSteps = 0;
-            m_currentTrack = static_cast<char>(m_fadeTargetTrack);
-        }
-        snap = m_fadeSteps;
-        if (m_fadeSteps <= FADE_HOLD_STEPS)
-            volume = (FADE_TOTAL_STEPS - m_fadeSteps) * SAMPLE_VOLUME_MAX / FADE_TOTAL_STEPS;
-        else
-            volume = (m_fadeSteps - FADE_HOLD_STEPS) * SAMPLE_VOLUME_MAX
-                     / FADE_SAMPLE_RISE_STEPS;
-        if (volume > SAMPLE_VOLUME_MAX)
-            volume = SAMPLE_VOLUME_MAX;
+        m_backendState.buka.fadeSteps = delta / FADE_STEP_TICKS;
+        if (m_backendState.buka.fadeSteps < 1)
+            m_backendState.buka.fadeSteps = 0;
+        m_backendState.buka.currentTrack = m_backendState.buka.fadeTargetTrack;
+    }
+
+    if (m_backendState.buka.fadeSteps < FADE_TOTAL_STEPS)
+        volume = (FADE_TOTAL_STEPS - m_backendState.buka.fadeSteps)
+               * SAMPLE_VOLUME_MAX / FADE_TOTAL_STEPS;
+    else
+        volume = (m_backendState.buka.fadeSteps - FADE_HOLD_STEPS)
+               * SAMPLE_VOLUME_MAX / FADE_SAMPLE_RISE_STEPS;
+    if (volume > SAMPLE_VOLUME_MAX)
+        volume = SAMPLE_VOLUME_MAX;
+    if (volume < 0)
+        volume = 0;
+
+    if (IsAudiereBackend(this)) {
+        volume = (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume
+               * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
+        if (volume > MIDI_VOLUME_MAX)
+            volume = MIDI_VOLUME_MAX;
         if (volume < 0)
             volume = 0;
-        LogStr("Poll Sound 1c");
-        smp = m_sampleHandles[0];
-        if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-            volume = (IDX(CONFIG_VOLUME_MAX) + 1 - IDX(gConfig.musicVolume)) * volume
-                * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
-            if (volume > MIDI_VOLUME_MAX)
-                volume = MIDI_VOLUME_MAX;
-            if (volume < 0)
-                volume = 0;
-            CDSetVolume(volume, 1);
-        } else {
-            MIDISetVolume();
-        }
-        LogStr("Poll Sound 1d");
+        SetAudiereMusicVolume(volume, true);
+    } else if (IsMilesBackend(this)) {
+        MIDISetVolume();
     }
-    LogStr("Poll Sound 2");
-    m_pollRequested = 0;
 }
 
 VA(0x004b6810, 0xbb)
 void soundManager::SwitchAmbientMusic(i32 track) {
-    if (gbNoSound != 0)
-        return;
-    if (m_samplesReady == 0)
+    if (!gSoundBackendsReady)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED) {
-        m_currentTrack = static_cast<char>(track);
+        m_backendState.buka.currentTrack = track;
         return;
     }
     if (MusicPlaying() == 0) {
-        PlayAmbientMusic(track, 0, -1);
+        PlayAmbientMusic(track);
         return;
     }
-    if (m_currentTrack == track)
+    if (m_backendState.buka.currentTrack == track)
         return;
-    LogStr("Switch Ambient Music 1");
     Process1WindowsMessage();
-    if ((m_fadeSteps != 0 && m_fadeTargetTrack != track)
-        || (m_fadeSteps == 0 && m_currentTrack != track)) {
-        if (m_fadeSteps <= FADE_HOLD_STEPS) {
-            m_fadeSteps = FADE_TOTAL_STEPS;
+    if ((m_backendState.buka.fadeSteps != 0
+         && m_backendState.buka.fadeTargetTrack != track)
+        || (m_backendState.buka.fadeSteps == 0
+            && m_backendState.buka.currentTrack != track)) {
+        if (m_backendState.buka.fadeSteps < FADE_TOTAL_STEPS) {
+            m_backendState.buka.fadeSteps = FADE_TOTAL_STEPS;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] =
                 KBTickCount() + AMBIENT_FADE_DELAY_TICKS;
         }
-        m_fadeTargetTrack = track;
+        m_backendState.buka.fadeTargetTrack = track;
         PollSound();
     }
-    LogStr("Switch Ambient Music 2");
 }
 
 VA(0x004b68d0, 0x115)
-struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
-    struct _SAMPLE* smp;
-    i16 ch;
-    SampleChannelStruct* scs;
-    SamplePlaybackData* playbackData;
-    if (gbNoSound != 0)
-        return NULL;
-    if (m_digitalDriver == NULL)
-        return NULL;
-    if (m_samplesReady == 0)
-        return NULL;
-    if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
-        return NULL;
-    playbackData = &sampleResource->m_playbackData;
-    if (m_ready == 0 || playbackData->volume == 0)
-        return NULL;
-    LogStr("Memory Sample 1");
-    scs = &SCS[playbackData->channelType];
-    for (ch = static_cast<i16>(scs->startChannel); scs->endChannel > ch; ch++) {
-        if (AIL_sample_status(m_sampleHandles[ch]) == SAMPLE_STATUS_DONE)
-            break;
+void soundManager::MemorySample(class sample* sampleResource) {
+    if (sampleResource == NULL || !gSoundBackendsReady
+        || gConfig.soundVolume == CONFIG_VOLUME_MUTED)
+        return;
+    if (IsAudiereBackend(this)) {
+        PlayAudiereSample(sampleResource, m_backendState.buka.audioDevice);
+    } else if (IsMilesBackend(this)) {
+        PlayMilesSample(sampleResource);
     }
-    if (scs->endChannel == ch) {
-        if (playbackData->channelType == NO_SAMPLE_CHANNEL_TYPE) {
-            LogStr("Memory Sample 2a");
-            return NULL;
-        }
-        ch = static_cast<i16>(scs->currentChannel);
-        scs->currentChannel++;
-        if (scs->endChannel <= scs->currentChannel) {
-            scs->currentChannel = scs->startChannel;
-            ch = static_cast<i16>(scs->currentChannel);
-        }
-        StopSample(m_sampleHandles[ch]);
-    }
-    smp = m_sampleHandles[ch];
-    m_channelVolumes[ch] = static_cast<char>(playbackData->volume);
-    iLastVolume[ch] = static_cast<i16>(playbackData->volume);
-    AIL_init_sample(smp);
-    AIL_set_sample_type(smp, IDX(playbackData->format), 0);
-    AIL_set_sample_playback_rate(smp, IDX(playbackData->sampleRate));
-    AIL_set_sample_loop_count(smp, playbackData->loopCount);
-    AIL_set_sample_address(smp, playbackData->data, playbackData->size);
-    if (gConfig.soundVolume != CONFIG_VOLUME_MUTED)
-        AIL_set_sample_volume(smp, ConvertVolume(playbackData->volume, SOUND_VOLUME_EFFECT));
-    else
-        AIL_set_sample_volume(smp, 0);
-    AIL_start_sample(smp);
-    playbackData->activeSample = smp;
-    m_channelSamples[ch] = smp;
-    m_channelSampleData[ch] = playbackData->data;
-    m_channelSampleSizes[ch] = playbackData->size;
-    LogStr("Memory Sample 2b");
-    return smp;
 }
 
 // @remove
@@ -1000,24 +848,20 @@ void soundManager::GetNumberCDDrives(void) {}
 
 VA(0x004b69f0, 0x41)
 void soundManager::ServiceSound(void) {
-    if (gbNoSound != 0)
-        return;
-    AIL_serve();
+    if (IsMilesBackend(this))
+        ServiceMilesSamples();
 }
 
 VA(0x004b6a40, 0x49)
 i32 soundManager::MusicPlaying(void) {
-    if (gbNoSound != 0)
-        return 0;
-    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
-        if (m_cdReady == 0)
-            return 0;
-        return CDIsPlaying();
-    } else {
+    if (m_backendState.buka.backend == SOUND_BACKEND_AUDIERE)
+        return AudiereMusicPlaying();
+    if (m_backendState.buka.backend == SOUND_BACKEND_MILES) {
         if (m_midiReady == 0)
-            return 0;
+            return false;
         return MIDIIsPlaying();
     }
+    return false;
 }
 
 

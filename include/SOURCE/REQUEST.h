@@ -73,6 +73,7 @@ struct SMapHeader {
     u8 timeEventCount;
 };
 #pragma pack(pop)
+SIZE(SMapHeader, MAP_HEADER_SIZE);
 
 i32 GetMapHeader(char*, struct SMapHeader*);
 i32 CheckSumIsDemoOK(char*);

@@ -13,4 +13,5 @@ public:
     __declspec(dllexport) virtual inline ~sample() OVERRIDE;
 };
 #pragma pack(pop)
+SIZE(sample, 0x34);
 #endif

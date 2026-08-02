@@ -685,4 +685,3 @@ void mouseManager::SetColorMice(i32 enabled) {
         gpWindowManager->m_updateFlags = savedWM56;
     }
 }
-

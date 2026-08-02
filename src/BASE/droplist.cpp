@@ -720,4 +720,3 @@ done:
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
 }
-

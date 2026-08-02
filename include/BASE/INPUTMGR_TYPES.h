@@ -14,5 +14,6 @@ typedef struct SInputManagerText {
     char managerName[INPUT_MANAGER_NAME_SLOT_SIZE];
 } SInputManagerText;
 
+SIZE(SInputManagerText, 0x40);
 
 #endif

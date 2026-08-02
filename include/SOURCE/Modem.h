@@ -58,6 +58,8 @@ struct outque_t {
     i32 writePosition;
     char data[MODEM_QUEUE_OUTPUT_SIZE];
 };
+SIZE(inque_t, 0x1008);
+SIZE(outque_t, 0x808);
 
 extern i32 iBaudBits;
 extern i32 inescape;

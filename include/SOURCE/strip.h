@@ -66,4 +66,5 @@ public:
     void DrawFrame(void);
 };
 #pragma pack(pop)
+SIZE(strip, 0x84);
 #endif

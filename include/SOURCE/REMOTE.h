@@ -57,6 +57,8 @@ struct RemoteMessage {
     char payload[REMOTE_MESSAGE_PAYLOAD_SIZE];
 };
 #pragma pack(pop)
+SIZE(RemotePacketHeader, REMOTE_PACKET_HEADER_SIZE);
+SIZE(RemoteMessage, REMOTE_MESSAGE_SIZE);
 
 void RemoteCleanup(void);
 void RemoteMain(RemoteGameMode);

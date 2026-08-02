@@ -17,6 +17,7 @@ struct SBuildingInfo {
     i16 height;
 };
 #pragma pack(pop)
+SIZE(SBuildingInfo, 9);
 
 H2_ENUM_CLASS_BEGIN_T(TownExtraBuildingMask, u32)
     TOWN_EXTRA_DOCK_GRAPHIC_MASK  = 0x4000,

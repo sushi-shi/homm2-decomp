@@ -41,6 +41,7 @@ struct searchCell {
     char pad[SEARCH_CELL_PAD_SIZE];
 };
 #pragma pack(pop)
+SIZE(searchCell, 9);
 
 union searchStorage {
     struct searchCell* cells;
@@ -81,6 +82,7 @@ struct searchNode {
     };
 };
 #pragma pack(pop)
+SIZE(searchNode, 9);
 
 #pragma pack(push, 1)
 class searchArray {
@@ -165,6 +167,7 @@ public:
     }
 };
 #pragma pack(pop)
+SIZE(searchArray, 0x2518);
 extern u8 bIsMoatSlowed[SEARCH_COMBAT_HEX_COUNT];
 
 #endif
