@@ -142,6 +142,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[2.1] Gold 2.1 upstream content**: Archmagi/armageddon strings, cheat
   notices in `advManager::LoadRemote` (established when the branch was
   seeded; classify further entries against the GOG binary).
+- **[2.1?/unclassified] Environment sound loop count 0 → 1.**
+  `advManager::InsertSound` sets `m_playbackData.loopCount = 1` where the
+  2.0 body (PoL, byte-pinned) sets 0. Both sides proven by bytes; classify
+  against the Gold 2.1 GOG binary. The same function's bounds guard checks
+  `x` against `MAP_HEIGHT` and `mapY` against `MAP_WIDTH` - swapped axes,
+  harmless on square maps, present in retail.
 - **[Buka] Music configuration** routed through the new `MusicFlags` TU and
   the config musicSource/musicVolume paths in `GAME`/`ADVMGR`/`SMACKMGR`
   (fade timing via `glTimers` slots).
