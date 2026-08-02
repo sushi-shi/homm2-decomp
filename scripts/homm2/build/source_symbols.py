@@ -110,6 +110,43 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSy
     return rows
 
 
+# Reviewed identification CSVs: interim claims kept out of source until the
+# campaign converts them to markers (compgen rows become VA_COMPGEN, CRT and
+# thunk rows stay config-owned). Each maps to (unit, name-builder).
+REVIEWED_CLAIMS = (
+    ("config/compgen_functions.csv", None,
+     lambda row: (row["unit"], row["symbol"])),
+    ("config/crt_functions.csv", "reviewed-crt",
+     lambda row: ("(libcmt)", row["symbol"])),
+    ("config/import_thunks.csv", "reviewed-thunk",
+     lambda row: ("(imports)", "%s@%s" % (
+         row["symbol"], row["dll"].rsplit(".", 1)[0]))),
+    ("config/eh_funclets.csv", "reviewed-funclet",
+     lambda row: ("(funclets)", row["name"])),
+)
+
+
+def reviewed_claims(repo: Path) -> list[SourceSymbol]:
+    """Function claims carried by the reviewed identification CSVs."""
+    import csv as _csv
+    rows: list[SourceSymbol] = []
+    for name, provenance, build in REVIEWED_CLAIMS:
+        path = repo / name
+        if not path.is_file():
+            continue
+        provenance = provenance or "reviewed-compgen"
+        with path.open(newline="") as stream:
+            for row in _csv.DictReader(
+                    line for line in stream
+                    if not line.lstrip().startswith("#")):
+                unit, symbol = build(row)
+                rows.append(SourceSymbol(
+                    rva=int(row["entry_rva"], 16), name=symbol, unit=unit,
+                    size=int(row["size"], 0), kind="func",
+                    provenance=provenance))
+    return rows
+
+
 def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
     rows: list[SourceSymbol] = []
     for path in sorted(source_root.rglob("*.cpp")):
@@ -128,6 +165,25 @@ def collect(source_root: Path, repo: Path) -> list[SourceSymbol]:
             raise ValueError(
                 f"0x{row.rva:x} is claimed by both {clash.name} ({clash.unit}) "
                 f"and {row.name} ({row.unit})")
+        seen[row.rva] = row
+
+    # Reviewed CSV claims fill addresses source markers have not taken; a
+    # source marker always wins its address. Duplicate names within one unit
+    # get an @<rva> suffix so the delinked object stays one-symbol-one-name.
+    named: dict[tuple[str, str], int] = {}
+    for row in sorted(seen.values()):
+        named[(row.unit, row.name)] = row.rva
+    for row in sorted(reviewed_claims(repo)):
+        if row.rva in seen:
+            continue
+        key = (row.unit, row.name)
+        if key in named:
+            row = SourceSymbol(
+                rva=row.rva, name="%s@0x%x" % (row.name, row.rva),
+                unit=row.unit, size=row.size, kind=row.kind,
+                provenance=row.provenance)
+            key = (row.unit, row.name)
+        named[key] = row.rva
         seen[row.rva] = row
     return sorted(seen.values())
 
