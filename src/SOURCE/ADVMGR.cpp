@@ -6956,22 +6956,22 @@ VA(0x0040e186, 0x1ee)
 void advManager::SetTownContext(i32 townId) {
     DeactivateCurrHero();
     gpCurPlayer->m_currentTown = static_cast<i8>(townId);
-    town* currentTownValue = gpGame->GetTown(gpCurPlayer->m_currentTown);
-    m_mapOriginX = currentTownValue->m_x - VIEW_CENTER_OFFSET;
-    m_mapOriginY = currentTownValue->m_y - VIEW_CENTER_OFFSET;
+    town* tp = gpGame->GetTown(gpCurPlayer->m_currentTown);
+    m_mapOriginX = tp->m_x - VIEW_CENTER_OFFSET;
+    m_mapOriginY = tp->m_y - VIEW_CENTER_OFFSET;
 
-    i32 contextValue7 = 0;
+    i32 townNo = 0;
     i32 index;
     for (index = 0; index < gpCurPlayer->m_townCount; ++index) {
         if (gpCurPlayer->m_townIds[index] == townId) {
-            contextValue7 = index;
+            townNo = index;
         }
     }
-    if (contextValue7 < gpCurPlayer->m_townLocatorPage) {
-        gpCurPlayer->m_townLocatorPage = static_cast<i8>(contextValue7);
-    } else if (gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1 < contextValue7) {
+    if (townNo < gpCurPlayer->m_townLocatorPage) {
+        gpCurPlayer->m_townLocatorPage = static_cast<i8>(townNo);
+    } else if (townNo > gpCurPlayer->m_townLocatorPage + LOCATOR_VISIBLE_COUNT - 1) {
         gpCurPlayer->m_townLocatorPage =
-            static_cast<i8>(contextValue7 - (LOCATOR_VISIBLE_COUNT - 1));
+            static_cast<i8>(townNo - (LOCATOR_VISIBLE_COUNT - 1));
     }
 
     UpdateHeroLocators(1, 1);
@@ -6983,11 +6983,11 @@ void advManager::SetTownContext(i32 townId) {
     UpdateScreen(0, 0);
     SetEnvironmentOrigin(m_mapOriginX + VIEW_CENTER_OFFSET, m_mapOriginY + VIEW_CENTER_OFFSET, 1);
 
-    contextValue7 =
-        IDX(giGroundToTerrain[GetCell(currentTownValue->m_x, currentTownValue->m_y)
+    townNo =
+        IDX(giGroundToTerrain[GetCell(tp->m_x, tp->m_y)
                                   ->m_terrainImageIndex]);
-    if (m_currentTerrain != static_cast<TerrainType>(contextValue7)) {
-        m_currentTerrain = contextValue7;
+    if (static_cast<TerrainType>(townNo) != m_currentTerrain) {
+        m_currentTerrain = townNo;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     gpInputManager->ForceMouseMove();

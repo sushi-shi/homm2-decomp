@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| advManager::SetTownContext locals + two compares | `currentTownValue/contextValue7`; `m_currentTerrain != cast(ctx)`; `page + 3 - 1 < ctx` | `tp/townNo`; `cast(townNo) != m_currentTerrain`; `townNo > page + 3 - 1` | OPEN |
+| dpnet_init locals + guest loop | `enumerateFunction/result`; `giNumHumanPlayers > guestIndex` | `dpEnumerate/rc`; `guestIndex < giNumHumanPlayers` | OPEN |
+| army::GetBestDirection compares | source-first (`sCC < tC` etc.); `leftFlag == isMovingRight` | target-first (`tC > sCC`, `tC != sCC`, `tRV > sR`, `tRV != sR`); `isMovingRight == leftFlag` | OPEN - slot 8-perm residual parked: no natural rename satisfies b(down)<=b(tCol)<=b(sCol)<b(left)<=b(up)<=b(tRow)<=b(sRow)<b(right) |
 | border::border(void) store order | `bitmap, icon, fillColor` | `fillColor, bitmap, icon` | OPEN |
 | iconWidget::iconWidget(void) store order | `frame, fillColor, icon, orientation, iconId` | `icon, frame, fillColor, orientation, iconId` | OPEN |
 | resourceManager::PointToFile locals | `isFound/entryIndex/aggregateIndex/ignoredPosition` | `found/entry/i/position` | OPEN - 2.0 names read PoL-invented |

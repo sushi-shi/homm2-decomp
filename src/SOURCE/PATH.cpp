@@ -446,17 +446,17 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     leftFlag = 0;
     isMovingRight = 0;
 
-    if (sourceColumnCheck < targetColumn)
+    if (targetColumn > sourceColumnCheck)
         isMovingRight = 1;
-    else if (sourceColumnCheck != targetColumn)
+    else if (targetColumn != sourceColumnCheck)
         leftFlag = 1;
 
-    if (sourceRow < targetRowValue)
+    if (targetRowValue > sourceRow)
         isMovingDown = 1;
-    else if (sourceRow != targetRowValue)
+    else if (targetRowValue != sourceRow)
         isMovingUp = 1;
 
-    if (leftFlag == isMovingRight) {
+    if (isMovingRight == leftFlag) {
         if (isMovingUp == 1) {
             if (sourceRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
