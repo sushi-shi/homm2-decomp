@@ -25,7 +25,7 @@ struct aggEntry {
 H2_ENUM_BEGIN(ResourceManagerLayoutConstant)
     RESOURCE_MANAGER_AGGREGATE_LIMIT   = 2,
     RESOURCE_MANAGER_READ13_BYTES      = 0xd,
-    RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3c
+    RESOURCE_MANAGER_FILENAME_CAPACITY = 0x3e8
 H2_ENUM_END(ResourceManagerLayoutConstant)
 
 class resourceManager : public baseManager {
@@ -73,7 +73,7 @@ public:
     void ReadBlock(i8*, u32l);
 };
 #pragma pack(pop)
-SIZE(resourceManager, 0xa2);
+SIZE(resourceManager, 0x44e);
 extern i32 iSaveCtr;
 extern i32 lastAggZ[];
 extern i32l lastPositionZ[];

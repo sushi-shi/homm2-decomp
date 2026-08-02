@@ -338,25 +338,25 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
 
 VA(0x004b8af0, 0xf8)
 void resourceManager::PointToFile(u32l fileId) {
-    char isFound = 0;
-    i32 entryIndex;
-    i32 aggregateIndex;
-    for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
-        if (m_aggregateDir[aggregateIndex] != NULL) {
-            entryIndex = 0;
-            while (entryIndex < m_aggregateEntryCount[aggregateIndex]) {
-                if (m_aggregateDir[aggregateIndex][entryIndex].id == fileId) {
-                    isFound = 1;
-                    m_curAggregate = aggregateIndex;
+    char found = 0;
+    i32 entry;
+    i32 i;
+    for (i = 0; i < RESOURCE_MANAGER_AGGREGATE_LIMIT; i++) {
+        if (m_aggregateDir[i] != NULL) {
+            entry = 0;
+            while (entry < m_aggregateEntryCount[i]) {
+                if (m_aggregateDir[i][entry].id == fileId) {
+                    found = 1;
+                    m_curAggregate = i;
                     break;
                 }
-                entryIndex++;
+                entry++;
             }
         }
-        if (isFound)
+        if (found)
             break;
     }
-    if (!isFound) {
+    if (!found) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
@@ -366,32 +366,32 @@ void resourceManager::PointToFile(u32l fileId) {
         );
         ShutDown(gText);
     }
-    i32l ignoredPosition =
-        lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
+    i32l position =
+        lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entry].offset, 0);
 }
 
 VA(0x004b8bf0, 0xd6)
 u32l resourceManager::GetFileSize(u32l fileId) {
-    char isFound = 0;
-    i32 entryIndex;
-    i32 matchedAggregate;
-    i32 fileIndex;
-    for (fileIndex = 0; fileIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; fileIndex++) {
-        if (m_aggregateDir[fileIndex] != NULL) {
-            entryIndex = 0;
-            while (entryIndex < m_aggregateEntryCount[fileIndex]) {
-                if (m_aggregateDir[fileIndex][entryIndex].id == fileId) {
-                    isFound = 1;
-                    matchedAggregate = fileIndex;
+    char found = 0;
+    i32 entry;
+    i32 matched;
+    i32 i;
+    for (i = 0; i < RESOURCE_MANAGER_AGGREGATE_LIMIT; i++) {
+        if (m_aggregateDir[i] != NULL) {
+            entry = 0;
+            while (entry < m_aggregateEntryCount[i]) {
+                if (m_aggregateDir[i][entry].id == fileId) {
+                    found = 1;
+                    matched = i;
                     break;
                 }
-                entryIndex++;
+                entry++;
             }
         }
-        if (isFound)
+        if (found)
             break;
     }
-    if (!isFound) {
+    if (!found) {
         sprintf(
             gText,
             "ResMgr::PointToFile failure!  ThisFileId:%d  LastFileId:%d  LastFileName:%s",
@@ -401,7 +401,7 @@ u32l resourceManager::GetFileSize(u32l fileId) {
         );
         ShutDown(gText);
     }
-    return m_aggregateDir[matchedAggregate][entryIndex].size;
+    return m_aggregateDir[matched][entry].size;
 }
 
 VA(0x004b8cd0, 0x50)

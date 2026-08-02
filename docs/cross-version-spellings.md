@@ -27,6 +27,10 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| border::border(void) store order | `bitmap, icon, fillColor` | `fillColor, bitmap, icon` | OPEN |
+| iconWidget::iconWidget(void) store order | `frame, fillColor, icon, orientation, iconId` | `icon, frame, fillColor, orientation, iconId` | OPEN |
+| resourceManager::PointToFile locals | `isFound/entryIndex/aggregateIndex/ignoredPosition` | `found/entry/i/position` | OPEN - 2.0 names read PoL-invented |
+| resourceManager::GetFileSize locals | `isFound/entryIndex/matchedAggregate/fileIndex` | `found/entry/matched/i` | OPEN |
 | GetMonType threshold compares | `table[...] >= score`; `table[...] <= score` | `score <= table[...]`; `score >= table[...]` | OPEN |
 | philAI::NetValueOfArtifact addend order | `a4 * cost[a3] + a2 * cost[GOLD]` | `a2 * cost[GOLD] + a4 * cost[a3]` | OPEN |
 | hero::HeroScreenUpdate | `index`; `index == giHeroScreenSrcIndex` | `i`; `giHeroScreenSrcIndex == i` | OPEN |
