@@ -423,7 +423,7 @@ void combatManager::InitNonVisualVars(void) {
 
 VA(0x0042683f, 0x1bf)
 void combatManager::SetupAdjacencyArray(void) {
-    i32 destinationHex = 0;
+    i32 toHex = 0;
     i32 sourceHex;
     for (sourceHex = 0; sourceHex < COMBAT_HEX_COUNT; sourceHex++) {
         i32 rowIndex = sourceHex / COMBAT_GRID_ROW_LENGTH;
@@ -438,42 +438,42 @@ void combatManager::SetupAdjacencyArray(void) {
                 switch (direction) {
                     case COMBAT_DIRECTION_NORTHEAST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
+                            toHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
                         else
-                            destinationHex = sourceHex - (COMBAT_GRID_ROW_LENGTH - 1);
+                            toHex = sourceHex - (COMBAT_GRID_ROW_LENGTH - 1);
                         break;
                     case COMBAT_DIRECTION_SOUTHEAST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
+                            toHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
                         else
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH + 1;
+                            toHex = sourceHex + COMBAT_GRID_ROW_LENGTH + 1;
                         break;
                     case COMBAT_DIRECTION_SOUTHWEST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH - 1;
+                            toHex = sourceHex + COMBAT_GRID_ROW_LENGTH - 1;
                         else
-                            destinationHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
+                            toHex = sourceHex + COMBAT_GRID_ROW_LENGTH;
                         break;
                     case COMBAT_DIRECTION_NORTHWEST:
                         if (rowIndex & 1)
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH - 1;
+                            toHex = sourceHex - COMBAT_GRID_ROW_LENGTH - 1;
                         else
-                            destinationHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
+                            toHex = sourceHex - COMBAT_GRID_ROW_LENGTH;
                         break;
                     case COMBAT_DIRECTION_EAST:
-                        destinationHex = sourceHex + 1;
+                        toHex = sourceHex + 1;
                         break;
                     case COMBAT_DIRECTION_WEST:
-                        destinationHex = sourceHex - 1;
+                        toHex = sourceHex - 1;
                         break;
                 }
 
-                if (destinationHex % COMBAT_GRID_ROW_LENGTH == 0
-                    || destinationHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1
-                    || destinationHex < 0 || destinationHex >= COMBAT_HEX_COUNT)
+                if (toHex % COMBAT_GRID_ROW_LENGTH == 0
+                    || toHex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1
+                    || toHex < 0 || toHex >= COMBAT_HEX_COUNT)
                     m_adjacency[sourceHex][IDX(direction)] = -1;
                 else
-                    m_adjacency[sourceHex][IDX(direction)] = static_cast<i8>(destinationHex);
+                    m_adjacency[sourceHex][IDX(direction)] = static_cast<i8>(toHex);
             }
         }
     }
@@ -1224,7 +1224,7 @@ restart:
 
 VA(0x00428b04, 0xb4)
 i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
-    i32 winner;
+    i32 result;
     i32 index;
 
     if (m_sideDefeated[IDX(COMBAT_DEFENDER_SIDE) - IDX(side)])
@@ -1233,13 +1233,13 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
         return 1;
 
     side ^= 1;
-    winner = 1;
+    result = 1;
     for (index = 0; index < m_armyCount[IDX(side)]; index++) {
         if (!(m_armies[IDX(side)][index].m_monster.flags.abilityFlags
               & MONSTER_ABILITY_FLAG_AI_EXCLUDED))
-            winner = 0;
+            result = 0;
     }
-    return winner;
+    return result;
 }
 
 VA(0x00428bb8, 0xdd8)
