@@ -745,13 +745,13 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
 VA(0x00417b4a, 0x184)
 i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex2 = 0;
-    u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
+    u32 armyBit = COMBAT_AI_MASK_FIRST_BIT;
     u32l bestStrength8 = 0;
-    i32 bestArmy1 = COMBAT_AI_NO_ARMY;
+    i32 best = COMBAT_AI_NO_ARMY;
     u32l strength8;
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        if ((mask & bit1) != 0) {
+        if ((mask & armyBit) != 0) {
             strength8 =
                 (m_armies[IDX(side)] + armyIndex2)
                     ->Strength();
@@ -771,14 +771,14 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                        != 0)
                 strength8 >>= 1;
-            if (bestStrength8 < strength8) {
-                bestArmy1 = armyIndex2;
+            if (strength8 > bestStrength8) {
+                best = armyIndex2;
                 bestStrength8 = strength8;
             }
         }
-        bit1 <<= 1;
+        armyBit <<= 1;
     }
-    return bestArmy1;
+    return best;
 }
 
 VA(0x00417cce, 0xa0)
