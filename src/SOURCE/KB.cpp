@@ -3378,9 +3378,9 @@ H2_ENUM_END(FileErrorConstant)
 
 VA(0x0046ce3a, 0x99)
 void FileError(char* filename) {
-    char buf1[FILE_ERROR_BUFFER_SIZE];
-    i32 err;
     char buf[FILE_ERROR_BUFFER_SIZE];
+    i32 err;
+    char buf1[FILE_ERROR_BUFFER_SIZE];
     err = errno;
     sprintf(buf1, "File Error %s", strerror(err));
     LogInt(
