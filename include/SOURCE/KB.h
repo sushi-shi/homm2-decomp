@@ -29,7 +29,6 @@ class palette;
 class philAI;
 class resourceManager;
 class searchArray;
-class soundManager;
 struct tag_message;
 struct tag_monsterInfo;
 struct tag_tilePoint;
@@ -38,6 +37,7 @@ class town;
 class townManager;
 #include <SOURCE/KB_TYPES.h>
 #include <BASE/message.h>
+#include <BASE/soundManager.h>
 #include <BASE/WINMGR.h>
 
 H2_ENUM_BEGIN(GlobalTimerConstant)

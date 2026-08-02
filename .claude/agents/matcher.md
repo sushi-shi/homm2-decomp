@@ -21,7 +21,7 @@ description: Byte-matches one function / TU of HoMM2 against Buka's retail HMM2P
 > whole batch is done.
 
 You write C++ that, compiled with **VC6 SP5** (base flags `/nologo /c
-/Od /MT /Gr /G5 /Ob1 /QIfdiv /DNO_STRICT`; 43 of the 95 TUs use an optimized
+/Od /MT /Gr /G5 /Ob1 /QIfdiv /DNO_STRICT`; with the whole game build /Od-family, only a handful of the 99 TUs use a variant
 profile instead — `config/units.toml` is authoritative per TU) under wine,
 produces COFF **byte-identical** to retail `HMM2PL.exe`,
 verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers under
@@ -188,7 +188,7 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   the lever above), **`/QIfdiv`** (FDIV-bug guard around float divides).
   `/DNO_STRICT` keeps VC6's WINDEF.H handles as `void*` (the PoL evidence shows
   retail compiled without STRICT; see the units.toml comment). NO `/GX` → **no C++
-  exceptions / no EH state**. NO RTTI. The 43 optimized TUs (`config/units.toml`)
+  exceptions / no EH state**. NO RTTI. The non-base TUs (`config/units.toml`)
   have the regalloc/instruction-selection wall; base `/Od` TUs should not.
 - Lowering fingerprints measured on the PoL line's cl 10.20 (`/G5` AND-not-MOVZX
   zero-extension, `jmp $+0` inline brackets, FDIV wrapping shape) are strong

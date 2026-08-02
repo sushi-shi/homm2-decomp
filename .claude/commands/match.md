@@ -22,7 +22,7 @@ In short (full rules in the two agent docs):
    On startup, reuse any that exist (`git -C … reset --hard master`; their `build/`
    survives — no cold re-provision); only create + provision missing slots
    (`orchestrator.md` § Pool setup). A restart does NOT regenerate the pool.
-2. **Queue:** regenerate objdiff, then select **every live non-100% function** in ascending
+2. **Queue:** regenerate objdiff, then select **every live non-100% function**, harvest-first (99%+ band before deep residuals), then ascending
    fuzzy-percentage order (least matched first). Source comments never remove a function from
    this residual-audit queue. Note src `VA()` carries
    **absolute VAs (RVA + 0x400000)** while the queue lists RVAs — normalise before any

@@ -31,8 +31,10 @@ MSVC object code and can be linked into a working executable.
 
 - The target was built with VC6 SP5; the flake provisions that exact toolchain
   (compiler and linker in one tree) under wine. `config/units.toml` is the
-  authoritative per-TU flag assignment: 52 TUs on the `base` profile, 43 on
-  optimized profiles (`o2`, `base_oi`, `o1_frame`).
+  authoritative per-TU flag assignment. The whole game build is /Od-family
+  (frame census: every retail function keeps the full /Od frame): 91 TUs on
+  `base`, plus `base_oi` (FONT, RESMGR), `base_gx` (/GX: AudiereEffects,
+  AudiereMusic, BITMAP), and the single optimized unit `o1_frame` (BITS).
 - `/Gr` makes free functions `__fastcall` by default. The retail build has no
   `/GX` exception state and no RTTI.
 - The `/Od` stack-slot model and lowering catalogs in `homm2/core/od_slots.py`

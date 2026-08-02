@@ -20,8 +20,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd6baa,182,?_CallSETranslator@@YAHPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAX2PBU_s_FuncInfo@@H1@Z,trnsctrl.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd6c60,114,?TranslatorGuardHandler@@YA?AW4_EXCEPTION_DISPOSITION@@PAUEHExceptionRecord@@PAUTranslatorGuardRN@@PAX2@Z,trnsctrl.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=114
 0xd6cd5,123,?_GetRangeOfTrysToCheck@@YAPBU_s_TryBlockMapEntry@@PBU_s_FuncInfo@@HHPAI1@Z,trnsctrl.obj,libcmt.lib,masked-exact,
+0xd6d50,32,__global_unwind2,exsup.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
+0xd6d70,34,__unwind_handler,exsup.obj,libcmt.lib,reviewed-sandwich,gap body between global/local_unwind2; the handler local_unwind2 registers
+0xd6d92,104,__local_unwind2,exsup.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
 0xd6dfa,35,__abnormal_termination,exsup.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd6e1d,9,__NLG_Notify1,exsup.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xd6e26,24,__NLG_Notify,exsup.obj,libcmt.lib,reviewed-sandwich,writes __NLG_Destination at 0x5201f0; follows __NLG_Notify1
 0xd6e3e,82,_sprintf,sprintf.obj,libcmt.lib,masked-exact,
 0xd6e90,23,__fpmath,fpinit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd6ea8,56,__cfltcvt_init,fpinit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -30,8 +34,16 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd6f80,111,_toupper,toupper.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd6fef,204,__toupper_lk,toupper.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd70bb,11,_abs,abs.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\abs.obj!_abs|libcmt.lib:build\intel\mt_obj\labs.obj!_labs
+0xd70d0,664,_memcpy,memcpy.obj,libcmt.lib,reviewed-sandwich,prefix-24 twin pair; 28 game callers
+0xd7410,20,_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
+0xd7424,9,$alt_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd742d,157,$body_CIsqrt,87ctran.obj,libcmt.lib,reviewed-sandwich,sqrt body; negative-operand check
 0xd74ca,126,__onexit,onexit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7548,18,_atexit,onexit.obj,libcmt.lib,masked-exact,
+0xd7590,20,_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
+0xd75a4,9,$alt_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd75ad,125,$body_CIatan,87ctran.obj,libcmt.lib,reviewed-sandwich,fld1/fpatan body
+0xd7630,664,_memmove,memmove.obj,libcmt.lib,reviewed-sandwich,prefix-24 twin pair
 0xd7965,308,__strupr,strupr.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7aa0,254,_strncpy,strncpy.obj,libcmt.lib,masked-exact,
 0xd7b9e,45,__cinit,crt0dat.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -43,6 +55,8 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7cc2,26,__initterm,crt0dat.obj,libcmt.lib,masked-exact,
 0xd7ce0,129,_strcmp,strcmp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=129
 0xd7d64,215,_free,free.obj,libcmt.lib,reviewed-callgraph,forwarded to by operator delete 0xd68c2; callees are heap internals
+0xd7dce,9,$fin_unlock9@0xd7dce,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xd7e26,9,$fin_unlock9@0xd7e26,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
 0xd7e4d,80,_strerror,strerror.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7e9d,115,__dosmaperr,dosmap.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7f10,9,__errno,dosmap.obj,libcmt.lib,masked-exact,
@@ -51,9 +65,21 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7f2f,34,_rand,rand.obj,libcmt.lib,masked-exact,
 0xd7f60,56,_strncmp,strncmp.obj,libcmt.lib,masked-exact,
 0xd7fa0,172,_memcmp,memcmp.obj,libcmt.lib,masked-exact,
+0xd8050,25,_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,two-operand fp wrapper
+0xd8069,9,$alt_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd8072,78,$body_CIfmod,87ctran.obj,libcmt.lib,reviewed-sandwich,exponent-mask fmod body
 0xd826d,139,_atol,atox.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd82f8,11,_atoi,atox.obj,libcmt.lib,masked-exact,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
 0xd83c0,10,_exp,87ctran.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 8 candidates: libcmt.lib:..\build\intel\mt_obj\87ctran.obj!_exp|libcmt.lib:..\build\intel\mt_obj\87ctran.obj!__CIexp|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!_atan2|libcmt.lib:..\build\intel\mt_obj\87ctriga.obj!__CIatan2
+0xd83e0,20,_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
+0xd83f4,9,$alt_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd83fd,145,$body_CIcos,87ctrig.obj,libcmt.lib,reviewed-sandwich,fcos body
+0xd8490,20,_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,fp-intrinsic wrapper shape
+0xd84a4,9,$alt_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,lea edx dispatch alt-entry
+0xd84ad,158,$body_CIsin,87ctrig.obj,libcmt.lib,reviewed-sandwich,fsin body
+0xd853e,253,_WinMainCRTStartup,crt0.obj,libcmt.lib,reviewed-sandwich,ghidra-fid entry; EH frame; calls WinMain
+0xd8646,34,__amsg_exit,crt0msg.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
+0xd866b,35,_fast_error_exit,crt0.obj,libcmt.lib,reviewed-sandwich,rterr banner + __exit(255) twin of __amsg_exit
 0xd8690,208,__stricmp,stricmp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd8760,101,__lseek,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 3 candidates: libcmt.lib:build\intel\mt_obj\lseek.obj!__lseek|libcmt.lib:build\intel\mt_obj\read.obj!__read|libcmt.lib:build\intel\mt_obj\write.obj!__write
 0xd87c5,395,__write_lk,write.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -66,6 +92,9 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd8f60,257,__strnicmp,strnicmp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd906a,18,_malloc,malloc.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd907c,44,__nh_malloc,malloc.obj,libcmt.lib,masked-exact,
+0xd90a8,231,_realloc,realloc.obj,libcmt.lib,reviewed-sandwich,EH-framed heap body between __nh_malloc and stdio
+0xd910f,9,$fin_unlock9@0xd910f,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xd916e,9,$fin_unlock9@0xd916e,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
 0xd91a4,49,_fclose,fclose.obj,libcmt.lib,masked-exact,
 0xd91d5,76,__fclose_lk,fclose.obj,libcmt.lib,masked-exact,
 0xd9221,47,_fread,fread.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fread.obj!_fread|libcmt.lib:build\intel\mt_obj\fwrite.obj!_fwrite
@@ -97,6 +126,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd9b7a,435,?FindHandler@@YAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAU_CONTEXT@@PAXPBU_s_FuncInfo@@EH1@Z,frame.obj,libcmt.lib,masked-exact,
 0xd9d2d,170,?FindHandlerForForeignException@@YAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAU_CONTEXT@@PAXPBU_s_FuncInfo@@HH1@Z,frame.obj,libcmt.lib,masked-exact,
 0xd9dd7,93,?TypeMatch@@YAHPBU_s_HandlerType@@PBU_s_CatchableType@@PBU_s_ThrowInfo@@@Z,frame.obj,libcmt.lib,masked-exact,
+0xd9e34,132,?CallCatchBlock@@YAPAXPAUEHRegistrationNode@@@Z,frame.obj,libcmt.lib,reviewed-sandwich,EH-framed; between TypeMatch and CatchIt
 0xd9ee8,123,?CatchIt@@YAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAU_CONTEXT@@PAXPBU_s_FuncInfo@@PBU_s_HandlerType@@PBU_s_CatchableType@@PBU_s_TryBlockMapEntry@@H1E@Z,frame.obj,libcmt.lib,masked-exact,
 0xd9f63,165,?CallCatchBlock@@YAPAXPAUEHExceptionRecord@@PAUEHRegistrationNode@@PAU_CONTEXT@@PBU_s_FuncInfo@@PAXHK@Z,frame.obj,libcmt.lib,order-inferred,between 0xd9ee8 and 0xda2d3
 0xda030,78,?ExFilterRethrow@@YAHPAU_EXCEPTION_POINTERS@@@Z,frame.obj,libcmt.lib,order-inferred,between 0xd9ee8 and 0xda2d3
@@ -107,6 +137,8 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xda34c,84,__mtinit,tidtable.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xda3be,19,__initptd,tidtable.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xda3d1,103,__getptd,tidtable.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xda4e4,86,_getstream,stream.obj,libcmt.lib,reviewed-sandwich,EH-framed stream-table walk after __getptd
+0xda55d,79,$stdio_locked@0xda55d,(unresolved),libcmt.lib,reviewed-sandwich,EH-framed stdio helper before __flsbuf
 0xda5b3,280,__flsbuf,_flsbuf.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xda6cb,1825,__output,output.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=1825
 0xdae0c,53,_write_char,output.obj,libcmt.lib,masked-exact,
@@ -137,6 +169,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xdb9cc,37,__strcats,setlocal.obj,libcmt.lib,masked-exact,
 0xdb9f1,204,___lc_strtolc,setlocal.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xdbabd,83,___lc_lctostr,setlocal.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xdbb10,511,$locale_internal@0xdbb10,(unresolved),libcmt.lib,reviewed-sandwich,between ___lc_lctostr and _strncnt
 0xdbd34,43,_strncnt,a_cmp.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\a_cmp.obj!_strncnt|libcmt.lib:build\intel\mt_obj\a_map.obj!_strncnt
 0xdbd5f,117,__isctype,isctype.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xdbde0,103,__trandisp1,87disp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -150,6 +183,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xdc055,67,__fload_withFB,common.obj,libcmt.lib,masked-exact,
 0xdc098,22,__checkTOS_withFB,common.obj,libcmt.lib,masked-exact,
 0xdc0bb,42,__math_exit,common.obj,libcmt.lib,masked-exact,
+0xdc19c,781,_ioinit,crt0dat.obj,libcmt.lib,reviewed-sandwich,13 crt callees; startup io table build
+0xdc327,9,$fin_unlock9@0xdc327,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xdc475,11,$fin_unlock9@0xdc475,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xdc4cb,214,$ioinit_helper@0xdc4cb,(unresolved),libcmt.lib,reviewed-sandwich,same region as _ioinit
+0xdc535,9,$fin_unlock9@0xdc535,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xdc5b0,9,$fin_unlock9@0xdc5b0,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
 0xdc5b9,45,__GetLinkerVersion,heapinit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xdc5e6,328,___heap_select,heapinit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xdc72e,93,__heap_init,heapinit.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -171,11 +210,18 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xddd6e,292,___old_sbh_alloc_block_from_page,sbheap.obj,libcmt.lib,masked-exact,
 0xdde92,169,___old_sbh_resize_block,sbheap.obj,libcmt.lib,masked-exact,
 0xddf3b,350,___old_sbh_heap_check,sbheap.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xde0a4,189,__except_handler3,exsup3.obj,libcmt.lib,reviewed-sandwich,SEH3 dispatcher pushed by every CRT EH frame; size = gap to next row exactly 0xbd
 0xde161,27,__seh_longjmp_unwind@4,exsup3.obj,libcmt.lib,masked-exact,
 0xde387,304,__powhlp,powhlp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xde4b7,101,__d_inttype,powhlp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xde520,52,__allmul,llmul.obj,libcmt.lib,masked-exact,
 0xde5cc,9,__rtpiby2,87triga.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xde610,62,__cintrindisp2,87disp.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
+0xde64e,61,__cintrindisp1,87disp.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
+0xde68b,72,__ctrandisp2,87disp.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
+0xde6d3,7,$disp_frag@0xde6d3,87disp.obj,libcmt.lib,reviewed-sandwich,fragment between dispatchers
+0xde6da,305,$disp_body@0xde6da,87disp.obj,libcmt.lib,reviewed-sandwich,dispatch common body
+0xde80b,51,__ctrandisp1,87disp.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
 0xde83e,60,__fload,87cdisp.obj,libcmt.lib,masked-exact,
 0xde87a,318,__XcptFilter,winxfltr.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xde9b8,58,_xcptlookup,winxfltr.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -219,6 +265,9 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe0121,28,?_ValidateRead@@YAHPBXI@Z,validate.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 2 candidates: libcmt.lib:build\intel\mt_obj\validate.obj!?_ValidateRead@@YAHPBXI@Z|libcmt.lib:build\intel\mt_obj\validate.obj!?_ValidateWrite@@YAHPAXI@Z
 0xe013d,28,?_ValidateRead@@YAHPBXI@Z,validate.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 2 candidates: libcmt.lib:build\intel\mt_obj\validate.obj!?_ValidateRead@@YAHPBXI@Z|libcmt.lib:build\intel\mt_obj\validate.obj!?_ValidateWrite@@YAHPAXI@Z
 0xe0159,24,?_ValidateExecute@@YAHP6GHXZ@Z,validate.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xe0171,289,$libcmt_internal@0xe0171,(unresolved),libcmt.lib,reviewed-sandwich,between _ValidateExecute and _abort
+0xe020a,9,$fin_unlock9@0xe020a,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
+0xe0293,9,$fin_unlock9@0xe0293,(unresolved),libcmt.lib,reviewed-sandwich,__finally _unlock(9) funclet
 0xe02ae,23,_abort,abort.obj,libcmt.lib,masked-exact,
 0xe02c5,41,__isatty,isatty.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe02ee,89,_wctomb,wctomb.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -275,9 +324,11 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe20c1,230,_crtGetLocaleInfoA@16,getqloc.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe21a7,57,_LcidFromHexString,getqloc.obj,libcmt.lib,masked-exact,
 0xe21e0,33,_GetPrimaryLen,getqloc.obj,libcmt.lib,masked-exact,
+0xe2201,318,$locale_internal@0xe2201,(unresolved),libcmt.lib,reviewed-sandwich,between _GetPrimaryLen and __87except
 0xe234a,208,__87except,87except.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe241a,23,_strtol,strtol.obj,libcmt.lib,masked-exact,6 identical candidates: libcmt.lib:build\intel\mt_obj\strtol.obj!_strtol|libcmt.lib:build\intel\mt_obj\wcstol.obj!_wcstol|libcmt.lib:build\intel\mt_obj\spawnv.obj!__spawnv|libcmt.lib:build\intel\mt_obj\spawnvp.obj!__spawnvp
 0xe2431,517,_strtoxl,strtol.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xe2660,193,_strchr,strchr.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
 0xe2720,128,_strstr,strstr.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe352b,41,__set_exp,util.obj,libcmt.lib,masked-exact,
 0xe3594,36,__set_bexp,util.obj,libcmt.lib,masked-exact,
@@ -322,6 +373,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe584d,73,__store_number,strftime.obj,libcmt.lib,masked-exact,
 0xe5896,719,__store_winword,strftime.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe5b65,312,___getlocaleinfo,inithelp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xe5ca3,423,$locale_internal@0xe5ca3,(unresolved),libcmt.lib,reviewed-sandwich,after ___getlocaleinfo
 0xe5e68,45,__itoa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5e95,92,_xtoa,xtoa.obj,libcmt.lib,masked-exact,
 0xe5ef1,42,__ltoa,xtoa.obj,libcmt.lib,masked-exact,
@@ -350,9 +402,12 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xe6d24,647,__tzset_lk,tzset.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe6fcc,428,__isindst_lk,tzset.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe7178,320,_cvtdate,tzset.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xe72b8,264,$strftime_internal@0xe72b8,(unresolved),libcmt.lib,reviewed-sandwich,after _cvtdate
+0xe73cb,275,$strftime_internal@0xe73cb,(unresolved),libcmt.lib,reviewed-sandwich,after _cvtdate
 0xe750a,125,__getenv_lk,getenv.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe7587,63,__mbsnbicoll,mbsnbico.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe75c6,110,___wtomb_environ,wtombenv.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
+0xe7634,597,$env_internal@0xe7634,(unresolved),libcmt.lib,reviewed-sandwich,after ___wtomb_environ
 0xe78b1,43,_strncnt,a_cmp.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\a_cmp.obj!_strncnt|libcmt.lib:build\intel\mt_obj\a_map.obj!_strncnt
 0xe78dc,391,___crtsetenv,setenv.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xe7a63,88,_findenv,setenv.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)

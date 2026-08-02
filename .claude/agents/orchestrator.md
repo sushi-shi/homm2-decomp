@@ -58,8 +58,8 @@ Better: open ONE `nix develop .#build` shell per slot.
 ## Target selection — exhaustive residual audit, least-matched-first
 
 1. **Regenerate objdiff and build the residual queue** from every function whose live fuzzy
-   percentage is below exactly 100%. Sort globally by fuzzy percentage ascending, then retail
-   RVA for deterministic ties. This campaign intentionally starts with the least-matched functions.
+   percentage is below exactly 100%. Work harvest-first: the near-exact band (99%+) drains
+   before deep residuals; within a band sort by fuzzy ascending, then retail RVA for ties.
 2. **Skip only live exact functions.** Source `VA()` macros carry **absolute VAs**
    (`RVA + 0x400000`), so normalise before comparing to report RVAs. Source comments and old proof
    notes never remove a non-exact function from the queue; reproduce evidence from current objects.
