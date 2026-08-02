@@ -18,7 +18,7 @@ void DelayMilli(i32l delay) {
 
 VA(0x00479b3d, 0x21)
 void DelayTilMilli(i32l endTime) {
-    while (KBTickCount() < endTime) {
+    while (endTime > KBTickCount()) {
         Process1WindowsMessage();
         PollSound();
     }

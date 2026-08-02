@@ -389,7 +389,7 @@ void game::SetupNetPlayerNames(void) {
     i32 player;
 
     if (giNumHumanPlayers > 1) {
-        for (player = 0; giNumHumanPlayers > player; ++player) {
+        for (player = 0; player < giNumHumanPlayers; ++player) {
             if (iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
                 strcpy(cPlayerNames[player], gsNetPlayerInfo[player].name);
         }
