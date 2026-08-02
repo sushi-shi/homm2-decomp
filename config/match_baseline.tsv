@@ -671,7 +671,7 @@ SOURCE/COMMAND	?CycleCombatScreen@combatManager@@QAEXXZ	93.5798	284d7e0bc07d
 SOURCE/COMMAND	?DoCommand@combatManager@@QAEXH@Z	100.0000	6044b0b8106f
 SOURCE/COMMAND	?DoLoseWindow@combatManager@@QAEXXZ	98.7027	274e540bbbb9
 SOURCE/COMMAND	?DoSurrender@combatManager@@QAEHXZ	91.2870	4623dc79702f
-SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.4099	70a29751590b
+SOURCE/COMMAND	?DoVictory@combatManager@@QAEXH@Z	99.8182	27cabbe6d3db
 SOURCE/COMMAND	?GetCommand@combatManager@@QAEHH@Z	98.2776	2217dc6eb987
 SOURCE/COMMAND	?GetControl@combatManager@@QAEXXZ	100.0000	dcac6e7285e6
 SOURCE/COMMAND	?GetPointer@combatManager@@QAEHHH@Z	99.9394	ef958481421a
@@ -1258,7 +1258,7 @@ SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	79.8435	43bda8887fc9
 SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	89.5761	71dfa0ea94b7
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	99.9802	cdc66b758c60
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	97.2042	830fd1fa77c6
-SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	99.3978	184bf9017dc6
+SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	99.7248	765203ad70cf
 SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	99.5800	d6c4dc075647
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	72.1957	519a2664458b
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	350515d10b4b
