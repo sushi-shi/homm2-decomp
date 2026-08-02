@@ -62,6 +62,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | netwin done-callbacks compare | `&gNbSessNcb[i] == ncb` | `ncb == &gNbSessNcb[i]` | OPEN |
 | townObject::Draw frame sum | `m_animationFrame + baseFrame + 1` | `baseFrame + m_animationFrame + 1` | OPEN |
 | TransferArtifacts non-transferable bound | `<= ARTIFACT_ULTIMATE_WAND` (recheck 2.0 bytes) | `<= ARTIFACT_GOLDEN_GOOSE` | OPEN - may be a 2.0 reconstruction slip rather than a dev change |
+| Relational/commutative mirror class (AddWidget, DeleteItem, SetSpellInfluence, DrawWindow, GetNthSpell, recruitUnit::Open, wsWaitForHost, game::Scan, Random, netwin callbacks, townObject::Draw) | PoL-order spellings | mirrored operand order, byte-pinned per fn | OPEN as a class |
 
 ## Resolved
 
