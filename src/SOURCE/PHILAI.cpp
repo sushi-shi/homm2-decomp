@@ -3087,13 +3087,13 @@ void philAI::GetTurnAttentionValue(i32 player) {
 
 VA(0x00484504, 0x71)
 i32 philAI::RVConversion(i32* const p) {
-    return (i32)((((((((float)p[IDX(RES_ORE)] * gafAITurnCostResource[IDX(RES_ORE)])
-                      + (float)p[IDX(RES_GEMS)] * gafAITurnCostResource[IDX(RES_GEMS)])
-                     + (float)p[IDX(RES_MERCURY)] * gafAITurnCostResource[IDX(RES_MERCURY)])
-                    + (float)p[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)])
-                   + (float)p[IDX(RES_WOOD)] * gafAITurnCostResource[IDX(RES_WOOD)])
-                  + (float)p[IDX(RES_SULFUR)] * gafAITurnCostResource[IDX(RES_SULFUR)])
-                 + (float)p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)]);
+    return (i32)((((((((float)p[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)])
+                      + (float)p[IDX(RES_WOOD)] * gafAITurnCostResource[IDX(RES_WOOD)])
+                     + (float)p[IDX(RES_ORE)] * gafAITurnCostResource[IDX(RES_ORE)])
+                    + (float)p[IDX(RES_CRYSTAL)] * gafAITurnCostResource[IDX(RES_CRYSTAL)])
+                   + (float)p[IDX(RES_SULFUR)] * gafAITurnCostResource[IDX(RES_SULFUR)])
+                  + (float)p[IDX(RES_MERCURY)] * gafAITurnCostResource[IDX(RES_MERCURY)])
+                 + (float)p[IDX(RES_GEMS)] * gafAITurnCostResource[IDX(RES_GEMS)]);
 }
 
 VA(0x00484575, 0xcd)
