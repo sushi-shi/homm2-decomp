@@ -640,7 +640,7 @@ SOURCE/CMBTMGR	?GetGridIndex@combatManager@@QAEHHH@Z	99.7054	83356f172105
 SOURCE/CMBTMGR	?GetNextArmy@combatManager@@QAEHH@Z	99.7083	8d2f2c427d1c
 SOURCE/CMBTMGR	?InCastle@combatManager@@QAEHH@Z	100.0000	f2ed869297d4
 SOURCE/CMBTMGR	?InitNonVisualVars@combatManager@@QAEXXZ	100.0000	826f752afbca
-SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	99.8333	655d5ec5c843
+SOURCE/CMBTMGR	?IsWinner@combatManager@@QAEHH@Z	100.0000	a215bf154f53
 SOURCE/CMBTMGR	?KeepAttack@combatManager@@QAEXH@Z	94.6000	d42f9ecde611
 SOURCE/CMBTMGR	?LoadArmies@combatManager@@QAEXXZ	96.0251	e044f8ae0ec9
 SOURCE/CMBTMGR	?LoadIcons@combatManager@@QAEXXZ	99.7419	84c639eab96a
@@ -651,7 +651,7 @@ SOURCE/CMBTMGR	?Open@combatManager@@UAEHH@Z	83.5543	cf01b59ea429
 SOURCE/CMBTMGR	?RaiseDoor@combatManager@@QAEXXZ	85.9400	df0db247faba
 SOURCE/CMBTMGR	?ResetHitByCreature@combatManager@@QAEXXZ	100.0000	d9de47dae8d0
 SOURCE/CMBTMGR	?SaveCombatBorder@combatManager@@QAEXXZ	100.0000	dba6f232c7b1
-SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.8483	ac4f348ca7c3
+SOURCE/CMBTMGR	?SetupAdjacencyArray@combatManager@@QAEXXZ	99.7103	9cce0ab76e6d
 SOURCE/CMBTMGR	?SetupAndLoadObstacles@combatManager@@QAEXXZ	97.9700	bc0d48a58742
 SOURCE/CMBTMGR	?SetupCombat@combatManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHH@Z	89.1098	4ef3266da7eb
 SOURCE/CMBTMGR	?ShootMissile@combatManager@@QAEXHHHHPAMPAVicon@@@Z	91.2372	53997336650f
