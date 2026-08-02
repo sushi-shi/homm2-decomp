@@ -2461,7 +2461,7 @@ void combatManager::CheckChangeSelector(void) {
     if (gbNoShowCombat != 0)
         return;
     army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-    if (m_limitCreature == 0 || currentArmy->m_hex != m_limitCreatureHex) {
+    if (m_limitCreature == 0 || m_limitCreatureHex != currentArmy->m_hex) {
         UpdateGrid(0, 1);
         giNewMonsterCycleFrame = SELECTOR_INITIAL_FRAME;
         m_limitCreatureHex = currentArmy->m_hex;
