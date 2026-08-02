@@ -4883,8 +4883,8 @@ void philAI::BuildCreature(town* townPtr, i32 dwelling, i32 purchaseCount) {
 
 VA(0x00488284, 0x117)
 i32 philAI::CanBuyBHC(BHC& bhc) {
-    i32 jb;
-    i32 idx;
+    i32 j;
+    i32 index;
     i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     switch (bhc.type) {
         case PURCHASE_BUILDING:
@@ -4898,12 +4898,12 @@ i32 philAI::CanBuyBHC(BHC& bhc) {
                 return 1;
             break;
         case PURCHASE_CREATURE:
-            jb = IDX(gDwellingType[IDX(bhc.pTown->m_type)][bhc.what]);
-            if (bhc.pTown->m_garrison[bhc.what] < bhc.num)
+            j = IDX(gDwellingType[IDX(bhc.pTown->m_type)][bhc.what]);
+            if (bhc.num > bhc.pTown->m_garrison[bhc.what])
                 return 0;
-            GetMonsterCost(CreatureType(jb), cost);
-            for (idx = 0; idx < AI_PURCHASE_RESOURCE_COUNT; idx++)
-                if (cost[idx] * bhc.num > gpCurPlayer->m_resources[idx])
+            GetMonsterCost(CreatureType(j), cost);
+            for (index = 0; index < AI_PURCHASE_RESOURCE_COUNT; index++)
+                if (gpCurPlayer->m_resources[index] < cost[index] * bhc.num)
                     return 0;
             return 1;
     }
