@@ -3508,10 +3508,10 @@ void GetCategoryStats(
                                     + gpGame->m_players[player].m_resources[IDX(RES_ORE)];
                     break;
                 case THIEVES_CATEGORY_RARE_RESOURCES:
-                    stats[player] = gpGame->m_players[player].m_resources[IDX(RES_MERCURY)]
-                                    + gpGame->m_players[player].m_resources[IDX(RES_SULFUR)]
+                    stats[player] = gpGame->m_players[player].m_resources[IDX(RES_GEMS)]
                                     + gpGame->m_players[player].m_resources[IDX(RES_CRYSTAL)]
-                                    + gpGame->m_players[player].m_resources[IDX(RES_GEMS)];
+                                    + gpGame->m_players[player].m_resources[IDX(RES_SULFUR)]
+                                    + gpGame->m_players[player].m_resources[IDX(RES_MERCURY)];
                     break;
                 case THIEVES_CATEGORY_OBELISKS:
                     stats[player] = GetNumObelisks(player);
