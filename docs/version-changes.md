@@ -157,6 +157,13 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `army::LoadResources` writes `loopCount = 0` in this image where the
   PoL line wrote 1 (byte-pinned both sides, 2026-08-03) - the two sites
   moved in opposite directions between versions.
+- **[Buka] Necromancy eligibility excludes SKELETON, not GHOST.**
+  `combatManager::DoVictory`'s stack-count chain compares
+  `m_monsterType` against creature 47 (SKELETON) where the PoL 2.0
+  bytes compare 59 (GHOST) - the last term of the elemental-exclusion
+  chain (62/63/64/65 prefix identical). Byte-pinned both sides
+  (2026-08-03). Reads as a dev logic fix: skeletons killed in combat
+  no longer feed necromancy.
 - **[2.1?/unclassified] Combat hex validation tightened.** 2.0's
   `ValidHex` accepts hexes 0..125 (PoL byte-proven, `<= 125`); this image
   bounds the grid at `hex < COMBAT_HEX_COUNT` (117). Out-of-grid hexes
