@@ -39,13 +39,18 @@ INVENTORY = REPO / "config/retail_functions.csv"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNMATCHED_OBJ = REPO / "build/delink/(unmatched).c.obj"
 BASE_ROOT = REPO / "build/objdiff/base"
+DELINK_ROOT = REPO / "build/delink"
+RETAIL_EXE = REPO / "build/orig/HMM2PL.exe"
 RUNTIME_LIBS = ("LIBCMT.LIB", "LIBCPMT.LIB", "OLDNAMES.LIB")
 OUTPUT = REPO / "build/gen/unmatched_census.tsv"
+CRT_OUTPUT = REPO / "config/crt_functions.csv"
+THUNK_OUTPUT = REPO / "config/import_thunks.csv"
 
 IMAGE_BASE = 0x400000
 FUNCTION_TYPE = 0x0020
 MEM_EXECUTE = 0x20000000
-HEADER = ("rva", "size", "name", "class", "source", "symbol", "detail")
+HEADER = ("rva", "size", "name", "class", "source", "symbol", "callers",
+          "callees", "detail")
 
 
 def trim_padding(payload: bytes) -> bytes:
@@ -231,6 +236,104 @@ def _archive_members(path: Path):
         offset = start + size + (size & 1)
 
 
+def _import_table():
+    """IAT slot RVA -> (dll, symbol) from the retail import directory."""
+    data = RETAIL_EXE.read_bytes()
+    pe = struct.unpack_from("<I", data, 0x3C)[0]
+    section_count = struct.unpack_from("<H", data, pe + 6)[0]
+    optional_size = struct.unpack_from("<H", data, pe + 20)[0]
+    optional = pe + 24
+    sections = []
+    for index in range(section_count):
+        offset = optional + optional_size + index * 40
+        virtual_size, rva, raw_size, raw = struct.unpack_from(
+            "<IIII", data, offset + 8)
+        sections.append((rva, max(virtual_size, raw_size), raw_size, raw))
+
+    def raw_offset(rva):
+        for start, span, raw_size, raw in sections:
+            if start <= rva < start + span and rva - start < raw_size:
+                return raw + rva - start
+        return None
+
+    def read_string(rva):
+        offset = raw_offset(rva)
+        end = data.index(b"\0", offset)
+        return data[offset:end].decode("latin-1")
+
+    import_rva = struct.unpack_from("<I", data, optional + 96 + 1 * 8)[0]
+    slots = {}
+    descriptor = raw_offset(import_rva)
+    while descriptor is not None:
+        original, _stamp, _chain, name_rva, first = struct.unpack_from(
+            "<IIIII", data, descriptor)
+        if not (original or first or name_rva):
+            break
+        dll = read_string(name_rva)
+        lookup = raw_offset(original or first)
+        slot = first
+        while True:
+            entry = struct.unpack_from("<I", data, lookup)[0]
+            if not entry:
+                break
+            symbol = ("ordinal_%d" % (entry & 0xFFFF)
+                      if entry & 0x80000000 else read_string(entry + 2))
+            slots[slot] = (dll, symbol)
+            lookup += 4
+            slot += 4
+        descriptor += 20
+    return slots, data, raw_offset
+
+
+def _resolve_thunk(data, raw_offset, rva, slots):
+    """(dll, symbol, iat_rva) for a ff25 thunk, from the unmasked image."""
+    offset = raw_offset(rva)
+    if offset is None or data[offset:offset + 2] != b"\xff\x25":
+        return None
+    target_va = struct.unpack_from("<I", data, offset + 2)[0]
+    iat_rva = target_va - IMAGE_BASE
+    entry = slots.get(iat_rva)
+    if entry is None:
+        return None
+    return entry[0], entry[1], iat_rva
+
+
+def _reference_graph():
+    """callers[name] and callees[name] across every delinked object.
+
+    Names are the delinker's: claimed functions carry their claimed symbol,
+    unmatched ones their inventory name. Callers are recorded per source
+    object ("SOURCE/KB" or "(unmatched)"), callees per referenced symbol.
+    """
+    callers = defaultdict(set)
+    callees = defaultdict(set)
+    for path in sorted(DELINK_ROOT.rglob("*.c.obj")):
+        source = str(path.relative_to(DELINK_ROOT))[:-len(".c.obj")]
+        try:
+            coff = CoffFile(path)
+        except (ValueError, IndexError, struct.error):
+            continue
+        text_sections = {section.index for section in coff.sections
+                         if section.name == ".text"}
+        functions = sorted(
+            (symbol.value, symbol.name) for symbol in coff.symbols.values()
+            if symbol.section in text_sections)
+        starts = [value for value, _name in functions]
+        import bisect
+        for (section_index, site), reloc in sorted(coff.relocations.items()):
+            if section_index not in text_sections:
+                continue
+            target = coff.symbols.get(reloc.symbol_index)
+            if target is None:
+                continue
+            slot = bisect.bisect_right(starts, site) - 1
+            owner = functions[slot][1] if slot >= 0 else source
+            callees[owner].add(target.name)
+            callers[target.name].add(
+                owner if source == "(unmatched)" else source)
+    return callers, callees
+
+
 def _candidate_index():
     index = defaultdict(list)
     definition_orders = defaultdict(list)
@@ -258,36 +361,41 @@ def _candidate_index():
 def run_census():
     unmatched = _unmatched_functions()
     index, definition_orders = _candidate_index()
+    slots, image, raw_offset = _import_table()
+    callers, callees = _reference_graph()
 
     rows = []
     matches_by_source = defaultdict(list)
     for rva, size, name, masked in unmatched:
+        row = {"rva": rva, "size": size, "name": name, "class": "unknown",
+               "source": "", "symbol": "", "callers": "", "callees": "",
+               "detail": ""}
+        rows.append(row)
         key = (len(masked), hashlib.sha256(masked).hexdigest())
         candidates = index.get(key, [])
-        if not candidates:
-            kind = "unknown"
-            detail = ""
-            if masked[:2] == b"\xff\x25" and len(masked) <= 6:
-                kind = "import-thunk"
-                detail = "jmp [IAT]"
-            rows.append({"rva": rva, "size": size, "name": name,
-                         "class": kind, "source": "", "symbol": "",
-                         "detail": detail})
+        if candidates:
+            sources = {source for source, _symbol, _order in candidates}
+            primary = candidates[0]
+            row["class"] = ("crt-exact" if all(
+                s.split(":")[0].endswith(".lib") for s in sources)
+                else "game-exact")
+            row["source"], row["symbol"] = primary[0], primary[1]
+            if len(candidates) > 1:
+                row["detail"] = "%d identical candidates: %s" % (
+                    len(candidates), "|".join(
+                        "%s!%s" % (s, y) for s, y, _o in candidates[:4]))
+            if len(sources) == 1:
+                matches_by_source[primary[0]].append((primary[2], rva))
             continue
-        sources = {source for source, _symbol, _order in candidates}
-        primary = candidates[0]
-        kind = ("crt-exact" if all(s.split(":")[0].endswith(".lib")
-                                   for s in sources) else "game-exact")
-        detail = ("" if len(candidates) == 1 else
-                  "%d identical candidates: %s" % (
-                      len(candidates), "|".join(
-                          "%s!%s" % (s, y)
-                          for s, y, _o in candidates[:4])))
-        rows.append({"rva": rva, "size": size, "name": name, "class": kind,
-                     "source": primary[0], "symbol": primary[1],
-                     "detail": detail})
-        if len(sources) == 1:
-            matches_by_source[primary[0]].append((primary[2], rva))
+        thunk = _resolve_thunk(image, raw_offset, rva, slots)
+        if thunk is not None:
+            row["class"] = "import-thunk"
+            row["source"], row["symbol"] = thunk[0], thunk[1]
+            row["detail"] = "IAT 0x%x" % thunk[2]
+            continue
+        if name.startswith("Unwind@"):
+            row["class"] = "eh-funclet"
+            row["detail"] = "SEH unwind funclet (EH-compiled TU)"
 
     # DNA pass: definition order against image order.
     inferred = 0
@@ -316,10 +424,90 @@ def run_census():
                     row["detail"] = ("between 0x%x and 0x%x" %
                                      (left_rva, right_rva))
                     inferred += 1
+
+    # Reference heuristics: contact with the CRT leans CRT, contact with only
+    # claimed game units leans game. Evidence columns always; class refinement
+    # only when the signal is one-sided.
+    class_by_name = {row["name"]: row["class"] for row in rows}
+
+    def kind_of(entity):
+        if entity in class_by_name:
+            kind = class_by_name[entity]
+            if kind.startswith(("crt", "import")):
+                return "crt"
+            if kind.startswith("game"):
+                return "game"
+            if kind == "eh-funclet":
+                return "eh"
+            return "un"
+        if entity == "(unmatched)":
+            return "un"
+        return "game"   # claimed unit source or claimed symbol name
+
+    def summarize(entities):
+        counts = defaultdict(int)
+        for entity in entities:
+            counts[kind_of(entity)] += 1
+        return ",".join("%s:%d" % (kind, counts[kind])
+                        for kind in ("game", "crt", "eh", "un")
+                        if counts.get(kind))
+
+    for row in rows:
+        row["callers"] = summarize(callers.get(row["name"], ()))
+        row["callees"] = summarize(callees.get(row["name"], ()))
+        if row["class"] != "unknown":
+            continue
+        caller_kinds = {kind_of(e) for e in callers.get(row["name"], ())}
+        callee_kinds = {kind_of(e) for e in callees.get(row["name"], ())}
+        contact = caller_kinds | callee_kinds
+        if "crt" in contact and "game" not in contact:
+            row["class"] = "unknown-crt-linked"
+        elif "game" in contact and "crt" not in contact and contact:
+            row["class"] = "unknown-game-linked"
     return rows, inferred
 
 
+def write_config_rows(rows):
+    """Persist reviewed identification CSVs for CRT bodies and import thunks."""
+    crt = [row for row in rows
+           if row["class"] in ("crt-exact", "order-inferred")
+           and row["source"].split(":")[0].endswith(".lib")]
+    with CRT_OUTPUT.open("w", newline="") as stream:
+        stream.write(
+            "# CRT bodies identified in the retail image by masked-byte and\n"
+            "# definition-order evidence against the VC6 toolchain archives.\n"
+            "# Generated by `homm2 audit unmatched-census --write-config`;\n"
+            "# review before trusting rows whose alternates list collisions.\n"
+            "entry_rva,size,symbol,member,library,evidence,alternates\n")
+        for row in sorted(crt, key=lambda value: value["rva"]):
+            library, _colon, member = row["source"].partition(":")
+            stream.write("0x%x,%d,%s,%s,%s,%s,%s\n" % (
+                row["rva"], row["size"], row["symbol"],
+                member.replace("\\", "/").rsplit("/", 1)[-1], library,
+                "masked-exact" if row["class"] == "crt-exact"
+                else "order-inferred",
+                row["detail"].replace(",", ";")))
+    thunks = [row for row in rows if row["class"] == "import-thunk"]
+    with THUNK_OUTPUT.open("w", newline="") as stream:
+        stream.write(
+            "# Import thunks (jmp [IAT]) resolved through the retail import\n"
+            "# directory. Generated by `homm2 audit unmatched-census"
+            " --write-config`.\n"
+            "entry_rva,size,dll,symbol,iat_rva\n")
+        for row in sorted(thunks, key=lambda value: value["rva"]):
+            stream.write("0x%x,%d,%s,%s,%s\n" % (
+                row["rva"], row["size"], row["source"], row["symbol"],
+                row["detail"].replace("IAT ", "")))
+    return len(crt), len(thunks)
+
+
 def main(argv=None):
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--write-config", action="store_true",
+                        help="persist config/crt_functions.csv and "
+                             "config/import_thunks.csv from this census")
+    args = parser.parse_args(argv)
     rows, inferred = run_census()
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with OUTPUT.open("w", newline="") as stream:
@@ -340,16 +528,16 @@ def main(argv=None):
     totals = defaultdict(lambda: [0, 0])
     for row in rows:
         totals[row["class"]][0] += 1
-        totals[row["class"]][1] += int(row["size"], 0) if isinstance(
-            row["size"], str) else row["size"]
+        totals[row["class"]][1] += row["size"]
     print("[unmatched-census] %d functions -> %s" % (len(rows), OUTPUT))
     for kind in ("game-exact", "crt-exact", "order-inferred", "import-thunk",
+                 "eh-funclet", "unknown-crt-linked", "unknown-game-linked",
                  "unknown"):
         count, size = totals.get(kind, (0, 0))
-        print("[unmatched-census]   %-15s %5d functions  %7d bytes" %
+        print("[unmatched-census]   %-19s %5d functions  %7d bytes" %
               (kind, count, size))
 
-    unknown = [row for row in rows if row["class"] == "unknown"]
+    unknown = [row for row in rows if row["class"].startswith("unknown")]
     clusters = []
     current = []
     for row in unknown:
@@ -366,6 +554,12 @@ def main(argv=None):
                   cluster[0]["rva"],
                   cluster[-1]["rva"] + cluster[-1]["size"],
                   len(cluster), sum(row["size"] for row in cluster)))
+    if args.write_config:
+        crt_count, thunk_count = write_config_rows(rows)
+        print("[unmatched-census] wrote %d CRT rows -> %s" %
+              (crt_count, CRT_OUTPUT))
+        print("[unmatched-census] wrote %d thunk rows -> %s" %
+              (thunk_count, THUNK_OUTPUT))
     return 0
 
 
