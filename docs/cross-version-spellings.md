@@ -52,6 +52,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | InsertSound bounds guard spelling | `MAP_WIDTH <= x \|\| MAP_HEIGHT <= mapY` | param-first, axes swapped (see Resolved) | - |
 | WGAppPaint scroll adds | `giScrollX + x` (a1-form) | `destX7 + giScrollX` etc. (local first) | OPEN |
 | WGAppPaint locals | padding8/destY1/sourceX7/sourceY7/destWidth0 | decl swap + destW/fromY/xSource/destY0 (bucket pins) | OPEN as slot-name class |
+| InitCampaignMap priority compare | `bestLocal < best` | `best > bestLocal` (mirror) | OPEN |
+| InitCampaignMap faction switch | BARBARIAN, WARLOCK, NECROMANCER | WARLOCK, BARBARIAN, NECROMANCER (je-distance pinned) | OPEN |
+| InitCampaignMap carryover product | ternary * counts | counts * ternary (permuter trial 135) | OPEN |
 
 ## Resolved
 
