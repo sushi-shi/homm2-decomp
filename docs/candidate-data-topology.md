@@ -2,9 +2,11 @@
 
 Candidate objects and retail evidence have different jobs. Candidate COFF proves
 symbol spelling, local/external storage class, section ordinal and offset, alignment,
-allocation order, and relocation topology. The retail PE, NB09 contribution ranges,
-bytes, and relocations prove placement and contents. CodeView publics are anchors, but
-do not prove private identity, extent, TU ownership, or storage layout.
+allocation order, and relocation topology. Retail PE bytes, reviewed relocation sites
+(`config/delink_relocs.tsv` — the image has no base-relocation directory), and
+reviewed owner intervals prove placement and contents; a group without reviewed
+intervals stays open. Claimed inventory addresses are anchors, but do not prove
+private identity, extent, TU ownership, or storage layout.
 
 The primary mapper replays candidate sections into independent `.rdata`, `.data`, and
 `.bss` streams in COFF section-table order with their encoded alignment. Public RVAs,

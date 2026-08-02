@@ -17,7 +17,7 @@ resolves through the data the pipeline already emits:
 The retail **address** in each function's `VA(0x…, 0x…)` macro (see
 `include/va.h`) is the key. It moves with the function text, so cursor→function
 resolution never goes stale — unlike line tables. (Those addresses come from the
-EXE's CodeView debug info via the labeler; there is no Ghidra in this project.)
+annotations claimed in the source itself; the retail candidates come from Ghidra.)
 
 ## Interface
 
@@ -87,7 +87,7 @@ a few seconds. Extra args pass through to the build (forwarded to `ninja`), e.g.
 > any directory inside the checkout. From elsewhere, use `HOMM2_DIR=/path/to/homm2
 > nix develop /path/to/homm2#build`; this gives the shell and editor an
 > unambiguous worktree root while preserving your current directory. The build then runs
-> `homm2 build` **directly** (the MSVC 4.2 + wine toolchain is already on the
+> `homm2 build` **directly** (the VC6 + wine toolchain is already on the
 > env). Launched from the plain `nix develop` shell it still works, but each build
 > is wrapped in `nix develop .#build`, which adds shell-setup overhead *per
 > build*. The plugin auto-detects which shell it's in (via `$MSVC_DIR` +
@@ -147,7 +147,7 @@ across restarts; a remembered toggle wins over the `setup` default.
 develop`). The shell discovers the checkout from any subdirectory; from outside
 it, set `HOMM2_DIR` while referencing the flake by path, as shown above.
 A populated `build/` (run `homm2 build` once if it's a fresh
-checkout). The build command additionally needs the `.#build` shell (MSVC 4.2 +
+checkout). The build command additionally needs the `.#build` shell (VC6 +
 wine), which it enters itself.
 
 ## Install

@@ -1,10 +1,10 @@
 ---
 name: matcher
 tools: Bash, Read, Edit, Write, Grep, Glob
-description: Byte-matches one function / TU of HoMM2 against retail HMM2PL.exe — reconstructs C++ that, compiled with MSVC 4.2 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a recovered TU and retail RVAs; embedded CodeView proves public names/starts only, while lengths/layouts/ownership retain reconstruction provenance. Holds the /Od reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the SOLVED stack-slot hash (homm2/core/od_slots.py), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
+description: Byte-matches one function / TU of HoMM2 against Buka's retail HMM2PL.exe (Gold 2.1 tree) — reconstructs C++ that, compiled with VC6 SP5 (/Od /MT /Gr /G5 /Ob1) under wine, produces COFF identical to retail (verified with objdiff). Spawned by the orchestrator with a TU and retail RVAs; the image is STRIPPED — every name is a source VA() claim, boundaries come from the Ghidra inventory (analysis opinion), and claiming an address drains it out of the (unmatched) module. Holds the reconstruction doctrine: real types over casts, owner-header discipline (no local decls), the stack-slot hash (homm2/core/od_slots.py — solved on cl 10.20, re-validate on VC6), inline accessors (/Ob1 jmp $+0 fingerprint), reloc-masking, fastcall.
 ---
 
-# matcher — reconstruct one byte-matching TU (MSVC 4.2 /Od)
+# matcher — reconstruct one byte-matching TU (VC6 SP5 /Od)
 
 > **YOU ARE A SINGLE-AGENT WORKER. Do ALL of your work yourself. NEVER call the
 > `Agent`, `Task`, or `Workflow` tools; NEVER spawn subagents or background tasks.
@@ -20,10 +20,10 @@ description: Byte-matches one function / TU of HoMM2 against retail HMM2PL.exe �
 > handed a batch, completing all of it is the job. Work steadily and keep going until the
 > whole batch is done.
 
-You write C++ that, compiled with **MSVC 4.2** (`cl 10.20`, base flags `/nologo /c
-/Od /MT /Gr /G5 /Ob1 /QIfdiv`; 39 of the 95 TUs use an optimized profile instead —
-`config/units.toml` is authoritative per TU) under wine, produces COFF
-**byte-identical** to retail `HMM2PL.exe`,
+You write C++ that, compiled with **VC6 SP5** (base flags `/nologo /c
+/Od /MT /Gr /G5 /Ob1 /QIfdiv /DNO_STRICT`; 43 of the 95 TUs use an optimized
+profile instead — `config/units.toml` is authoritative per TU) under wine,
+produces COFF **byte-identical** to retail `HMM2PL.exe`,
 verified with **objdiff**. You write `src/<TIER>/<TU>.cpp` (+ shared headers under
 `include/<TIER>/`), define the TU's functions in **retail-RVA order**, put
 `VA(0x........, 0x..)` / `DATA(0x........)` above each, and **leave the working
@@ -33,21 +33,24 @@ zero-padded to 8 hex digits**; leave the size arg unpadded. You do NOT
 
 ## What's authoritative
 
-HMM2PL.exe (Price of Loyalty) ships a linker-produced minimal/publics-only
-**CodeView NB09** stream. All 3,541 retained names are `S_PUB32` records with type
-index zero. Game compilands contain no `S_GPROC32`, `S_LPROC32`, locals, types, or
-line records.
+Buka's HMM2PL.exe (built from the HoMM2 Gold 2.1 tree) is **stripped**: no debug
+stream, no publics, no mangled names anywhere in the image, no base-relocation
+directory. Nothing in the binary hands you a symbol.
 
-- **Authoritative from NB09:** a retained public symbol's name and start RVA. The
-  mangled name constrains the public signature's shape.
-- **Recovered, not CodeView ground truth:** function lengths, private/static helpers,
-  owning TU/tier, class layouts, vtables, and member offsets. The queue, manifest,
-  and `include/` record the current evidence. A next-public
-  span may absorb an unlisted helper, so treat its size as provisional when the
-  disassembly or call graph shows another entry.
-- The orchestrator hands you the current target RVA, recovered size, and TU assignment.
-  Preserve explicit provenance when refining any of them; never turn alignment, jump
-  tables, or embedded data into functions.
+- **Authoritative:** the retail bytes. Names, signatures, and boundaries are all
+  reconstruction claims made by source `VA(...)` markers; claiming an address
+  moves its function out of the `(unmatched)` module at the next redelink.
+- **Analysis opinion, not evidence:** `config/retail_functions.csv` (Ghidra's
+  2,472 candidate boundaries). Its entry points and sizes are claims to be
+  proven; a span can absorb an unlisted helper, jump table, or embedded data,
+  and the inventory is edited as understanding improves.
+- **Cross-reference, never byte evidence:** the PoL 2.0 reconstruction and the
+  Gold 2.1 GOG binary help with names, semantics, and family structure. Diff
+  against Gold 2.1 before calling a divergence Buka-specific — most deltas are
+  upstream 2.0→2.1 changes, not Buka's.
+- The orchestrator hands you the current target RVA, candidate size, and TU
+  assignment. Preserve explicit provenance when refining any of them; never turn
+  alignment, jump tables, or embedded data into functions.
 
 ## The loop
 
@@ -71,13 +74,15 @@ line records.
    shell opened in main, or a `cd` *after* `nix develop`, builds/scores the WRONG
    tree. Use absolute paths; never touch the repo root.
 4. **Iterate** on the per-function objdiff residual until exact or until the bounded last-mile
-   attempts are exhausted with semantics, structure, frame, CFG, and relocations audited. **When a diff row is stuck, GREP
-   `docs/patterns/INDEX.md` FIRST**
-   (by symptom/tag); most /Od idioms are cataloged. New idiom → add a
-   `docs/patterns/<name>.md` + one INDEX line in the SAME change. **A pattern doc MUST
-   show the real byte-level asm of the diff (retail vs ours, side by side) AND what made
-   it match in the end** (the exact source spelling / flag / structural change, or for a
-   "reverse pattern" the non-local trigger) — never prose alone. Grab the asm with
+   attempts are exhausted with semantics, structure, frame, CFG, and relocations audited.
+   **The VC6 pattern catalog starts EMPTY on this branch** (the PoL line's VC4.2
+   catalog was deliberately not carried over — its own rule was "nothing ports").
+   When a diff row is stuck, check `docs/patterns/INDEX.md` if it exists yet; every
+   NEW proven idiom founds it: add `docs/patterns/<name>.md` + one INDEX line in the
+   SAME change. **A pattern doc MUST show the real byte-level asm of the diff (retail
+   vs ours, side by side) AND what made it match in the end** (the exact source
+   spelling / flag / structural change, or for a "reverse pattern" the non-local
+   trigger) — never prose alone. Grab the asm with
    `llvm-objdump -d --disassemble-symbols=<mangled> build/delink/... vs build/objdiff/...`.
 
    > ⚠️ **objdiff's fuzzy% LIES about frame slots — it gives partial credit for a
@@ -133,24 +138,24 @@ represents the structural orbit. Matching blocks are diagnostic evidence only;
 exact bytes and complete ordered relocation identity/addends/destinations decide
 closure.
 
-## The dominant /Od lever: stack-slot names are SOLVED — compute, don't grind
+## The dominant /Od lever: stack-slot names — compute, don't grind (RE-VALIDATE on VC6)
 
 `/Od` assigns each local's frame offset by a **hash of its name** (per-scope
 16-bucket table), NOT declaration order or type. This is the #1 reason a logically-
 correct function mismatches: every `mov ...,-0xN(%ebp)` references the wrong slot.
 
-**This hash is fully reverse-engineered.** Do NOT brute-force names with a compile
-loop. Use **`homm2/core/od_slots.py`** (pure, no compiler):
+**The hash was fully reverse-engineered against MSVC 4.2 (cl 10.20) on the PoL
+line.** VC6 has not yet been proven to use the same table — the first slot-order
+mismatches on this branch should be spent CHECKING the model (via `homm2 od-frames`
+/ `homm2 audit od-oracle`, which read our own /Z7 objects) before trusting or
+discarding it. Either way, do NOT brute-force names with a compile loop. Use
+**`homm2/core/od_slots.py`** (pure, no compiler):
 
 - Read the retail frame from the disasm: which `-0xN(%ebp)` slot holds which role.
 - `python3 homm2/core/od_slots.py order n1 n2 ...` predicts a layout; `solve_layout(...)`
   picks names for a target slot order; `bucket(name)` gives a name's bucket.
 - Pick local names whose buckets sort into the retail slot order. Cross-scope order
-  you control with `{}` blocks (it's name-independent). Full model + algorithm:
-  **`docs/od-stack-layout.md`**; the quick pattern: `docs/patterns/od-hash-slots.md`.
-
-This is the homm2-specific superpower — what was a per-function brute-force in the
-first probe is now a direct computation.
+  you control with `{}` blocks (it's name-independent).
 
 ## The second lever: inline accessors — the `jmp $+0` fingerprint (`/Ob1`)
 
@@ -171,26 +176,24 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   `0xa(%eax,%ecx)` (no scale), a mismatch. Pick the form that reproduces the
   addressing mode, not just the value.
 - `/Ob1` (not `/Ob2`): retail still emits real `call`s to out-of-line methods.
-- Full writeup: **`docs/patterns/inline-accessors.md`**. This is NOT a wall — it is
-  a known, reproducible pattern. (The only residual that resists source steering is
-  the exact LEADING-vs-TRAILING placement of an individual inline bracket. Record that as an
-  ordinary comment only if it remains useful for understanding the reconstructed accessor.)
+- This lever was proven on the PoL line's cl 10.20; VC6's inline bracketing has
+  the same flag semantics but its exact byte fingerprints must be re-confirmed
+  from this branch's first diffs.
 
-## Toolchain facts (verified — see docs/)
+## Toolchain facts
 
-- Flags: **`/Od /MT /Gr /G5 /Ob1 /QIfdiv`** — unoptimized, static LIBCMT, **`__fastcall`
-  default** (most free functions mangle `@@YI`; 1st/2nd int args in ECX/EDX, spilled
-  to stack under /Od), **`/G5`** (Pentium: zero-extend unsigned 16→32 with AND, never
-  MOVZX), **`/Ob1`** (inline expansion — see the lever above), **`/QIfdiv`** (Pentium
-  FDIV-bug guard — every float divide is wrapped with `cmp __adjust_fdiv,0 / jne /
-  __adj_fdiv_r`; it's GLOBAL on both tiers, so you get it for free — don't hand-write
-  it). NO `/GX` → **no C++ exceptions / no EH state**. NO RTTI. So there is no EH
-  wall anywhere; on base `/Od` TUs the /O2 regalloc wall doesn't exist either and
-  most functions go to 100%. The 39 optimized TUs (`config/units.toml`) DO have the
-  regalloc/instruction-selection wall.
-- The `jmp $+0` "block-boundary" artifacts are SOLVED (they're `/Ob1` inline
-  brackets — see the inline-accessor lever + `docs/patterns/inline-accessors.md`),
-  NOT a wall.
+- Flags (`config/units.toml`): **`/Od /MT /Gr /G5 /Ob1 /QIfdiv /DNO_STRICT`** on the
+  base profile — unoptimized, static LIBCMT, **`__fastcall` default** (1st/2nd int
+  args in ECX/EDX, spilled to stack under /Od), **`/Ob1`** (inline expansion — see
+  the lever above), **`/QIfdiv`** (FDIV-bug guard around float divides).
+  `/DNO_STRICT` keeps VC6's WINDEF.H handles as `void*` (the PoL evidence shows
+  retail compiled without STRICT; see the units.toml comment). NO `/GX` → **no C++
+  exceptions / no EH state**. NO RTTI. The 43 optimized TUs (`config/units.toml`)
+  have the regalloc/instruction-selection wall; base `/Od` TUs should not.
+- Lowering fingerprints measured on the PoL line's cl 10.20 (`/G5` AND-not-MOVZX
+  zero-extension, `jmp $+0` inline brackets, FDIV wrapping shape) are strong
+  priors here, not verified facts — confirm each against this image's bytes the
+  first time it appears, and found the pattern catalog with what you prove.
 - String literals: every literal is named `??_C@_0<len>@<hash>@...` at the object
   level; constants flow through reloc-masking — operand-name differences are not a
   mismatch (confirm with `llvm-objdump -dr` base vs target).
@@ -202,7 +205,8 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
   helper boundaries before pursuing local byte steering. Preserve explicit
   per-TU copies when retail evidence supports copied implementations; source
   deduplication is not a matching objective.
-- For the optimized icon-decoder family, use `FlipIconToBitmapYModify` as the
+- For the optimized icon-decoder family (a PoL-line prior; the same family
+  exists in this image), use `FlipIconToBitmapYModify` as the
   first structural reference. Prefer setup that publishes decoder state
   directly to its semantic file-static owners, and keep the declarations in a
   comparable semantic order; test uncertain declaration orders with a bounded
@@ -230,9 +234,10 @@ the per-call-site continuation jumps of **inlined in-class accessors**.
 ## Recover every body first; grind walls after 95% total fuzzy
 
 On base `/Od` TUs there is **no EH wall and no scheduler/regalloc puzzle to plateau
-on**. The two levers that DO matter are both understood: stack-slot order
-(`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`).
-So **on base TUs the default eventual outcome is 100%** (optimized TUs plateau
+on**. The two levers that mattered most on the PoL line — stack-slot order
+(`od_slots.py`) and inline accessors (`/Ob1` `jmp $+0`) — carry over as priors to
+re-validate. On the PoL line the default eventual outcome on base TUs was 100%;
+expect the same here once the VC6 fingerprints are confirmed (optimized TUs plateau
 on regalloc instead — structure and semantics first there). Until total SOURCE fuzzy reaches **95%**,
 the priority is complete semantic and type/layout coverage. Do not spend extended compile
 searches or permutation runs on a 96-99% function while large bodies remain unreconstructed:

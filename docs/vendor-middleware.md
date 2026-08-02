@@ -6,9 +6,11 @@ is not in the EXE (only PE import thunks), so we do not reconstruct it — we on
 headers are vendored under `vendor/<sdk>-<version>/` and put on the compiler's `INCLUDE`
 path by `scripts/homm2/build/cc_wrap.py` (see *Build wiring* at the end).
 
-The retail EXE analysed here is `build/orig/HMM2PL.exe`
-(md5 `900aa22c4e88221e7ebac524cd4172c9`), byte-identical to the English "Price of Loyalty"
-CD image `img-pol/HMM2PL.exe` (dated 1997-05-05). The GOG re-release EXE
+The middleware identification below was established on the PoL line, whose retail EXE
+(md5 `900aa22c4e88221e7ebac524cd4172c9`) is byte-identical to the English "Price of
+Loyalty" CD image `img-pol/HMM2PL.exe` (dated 1997-05-05). This branch's target
+`build/orig/HMM2PL.exe` is a different binary; the identification carries over only if
+re-verified against its own import table. The GOG re-release EXE
 (`ea70bf65…`) is a *different* binary and must not be used to pin versions.
 
 | Middleware | DLL | Version | Import style | Confidence |
@@ -65,7 +67,7 @@ header this EXE links; Smacker `3.0c`/`3.2f` and Miles `6.x` are not `3.0g`/`3.6
 reconstruction authored from the observed ABI (import table, `@N` counts, mapped ordinals)
 plus verification against period references is the correct, license-clean practice for a
 decompilation — and it already yields the full, correct Win32 interface that compiles under
-MSVC 4.2 + clang. The reconstructions are the working, **verified** headers, not a fallback.
+the pinned MSVC + clang. The reconstructions are the working, **verified** headers, not a fallback.
 
 ---
 
@@ -214,7 +216,8 @@ original toolchain's SDK dirs. These are **headers only** — never build units,
 `config/units.toml`. `smack.h`'s `#include "rad.h"` resolves within the same vendor dir.
 
 **Verification.** A scratch TU including all three headers alongside `Ints.h` and
-`win/windows.h` compiles cleanly under MSVC 4.2 (no typedef clashes, all signatures parse)
-and parses cleanly under clang in the editor dialect (`--target=i386-pc-windows-msvc
--fms-compatibility-version=10.20 -fms-extensions`). A forced rebuild of an existing unit
+`win/windows.h` compiles cleanly under the pinned MSVC (no typedef clashes, all signatures parse)
+and parses cleanly under clang in the editor dialect (originally verified on the PoL line
+with `--target=i386-pc-windows-msvc -fms-compatibility-version=10.20 -fms-extensions`;
+the current clangd dialect pins `12.00`). A forced rebuild of an existing unit
 (`BASE/Misc.obj`) still succeeds with the new `INCLUDE`.

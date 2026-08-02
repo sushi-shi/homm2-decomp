@@ -1,11 +1,12 @@
 # homm2-decomp
 
-Binary-matching decompilation of **Heroes of Might and Magic II — The Price of Loyalty**
-(`HMM2PL.exe`, New World Computing, 1997). Unlike the Price of Loyalty line, this build is
-**stripped** - it ships no CodeView stream, so every symbol here comes from the source's own
-markers. The goal is to recover the C++ structure and behavior and, where retail evidence
-permits, reproduce the original code, data, and relocations with the **Visual C++ 6.0 SP5**
-toolchain. Retail executable bytes, relocations, and public RVAs are authoritative.
+Binary-matching decompilation of Buka's **Heroes of Might and Magic II** release
+(`HMM2PL.exe`, built from the HoMM2 Gold 2.1 tree, New World Computing, 1997). This build is
+**stripped** - it ships no debug stream and no base-relocation directory, so every symbol here
+comes from the source's own markers and every relocation site from a reviewed manifest. The
+goal is to recover the C++ structure and behavior and, where retail evidence permits,
+reproduce the original code, data, and relocations with the **Visual C++ 6.0 SP5** toolchain.
+Retail executable bytes are authoritative.
 [objdiff](https://github.com/encounter/objdiff) is a useful comparison and navigation surface,
 not proof of correctness.
 
@@ -13,10 +14,11 @@ This repository does **not** contain the original game's executable or resources
 legally obtained `HMM2PL.exe` locally to initialize the matching workspace; the playable port
 branches also require an installed copy of the game data.
 
-The embedded minimal CodeView stream proves retained public names and start RVAs only. Function
-sizes, private helpers, types, classes, and vtables are reconstructed from executable bytes,
-relocations, candidate objects, and reviewed manifests. The synthesized PDB used by the delinker
-contains those reconstruction results; it is not shipping debug information.
+`config/retail_functions.csv` carries Ghidra's candidate function boundaries (analysis
+output, not retail evidence); source `VA(...)` markers turn candidates into claims, and
+everything unclaimed delinks into one `(unmatched)` module so the whole `.text` stays
+comparable. The synthesized PDB used by the delinker contains those reconstruction
+results; it is not shipping debug information.
 
 ## Trust and provenance
 
@@ -28,7 +30,9 @@ not a byte-matching result, and therefore still requires ordinary code review an
 ## Repository branches
 
 ```text
-decomp-pol-2.0 (you are here)
+decomp-gold-2.1-buka (you are here)
+
+decomp-pol-2.0
     |
     +------------------+
     |                  |
@@ -37,17 +41,15 @@ source-pol-2.0     classic-pol-2.0
 master-pol-2.0
     |
 ironfist-pol-2.0
-
-decomp-gold-2.1-buka
 ```
 
-- `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
-  branches.
-- `source-pol-2.0` is generated from decomp with matching-only machinery removed.
+- `decomp-gold-2.1-buka` is this branch: the Gold 2.1/Buka reconstruction.
+- `decomp-pol-2.0` is the separate Price of Loyalty reconstruction; useful for
+  cross-reference on names and semantics, never for byte evidence here.
+- `source-pol-2.0` is generated from that decomp with matching-only machinery removed.
 - `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
 - `master-pol-2.0` is the cross-platform Linux, Windows, and Web port.
 - `ironfist-pol-2.0` applies the Project Ironfist changes to the reconstructed source.
-- `decomp-gold-2.1-buka` is the separate Gold 2.1/Buka reconstruction used for cross-reference.
 
 <!-- match-score:start -->
 ## Match status
@@ -74,10 +76,10 @@ config/   units.toml             per-TU build manifest
 scripts/homm2/    the CLI package - one role per subpackage, mirroring the commands:
           core/ analysis/ permute/ audit/ match/ build/ clean/ format/ init/ ghidra/
           tests live beside what they test; `homm2 selftest` runs them
-scripts/toolchain/  VC 4.2 + LINK 3.00 provisioning from preserved media (run once)
+scripts/toolchain/  VC6 SP5 toolchain-release builder from preserved media (run once)
 scripts/archive/    retired tooling, kept only to reproduce old audit-ledger commands
 build/    (gitignored)           toolchain, synth PDB, delinked targets, base objs, objdiff report
-flake.nix two dev shells: default (analysis+diff+clang), build (+wine+MSVC 4.2)
+flake.nix two dev shells: default (analysis+diff+clang), build (+wine+VC6 SP5)
 ```
 
 The documentation map and retention policy are in [`docs/README.md`](docs/README.md).
@@ -85,9 +87,9 @@ The documentation map and retention policy are in [`docs/README.md`](docs/README
 ## Quickstart
 
 ```sh
-nix develop .#build            # MSVC 4.2 under wine + the tools
-homm2 init                     # ONE-TIME: CodeView -> manifest -> ??_C@ names -> PDB -> delink -> configure
-homm2 redelink                 # EXPLICIT: refresh all symbol models and atomically rebuild delinked targets
+nix develop .#build            # VC6 SP5 under wine + the tools
+homm2 init                     # ONE-TIME: toolchain fetch -> source markers -> PDB -> delink -> configure
+homm2 redelink [--force]       # EXPLICIT: refresh all delinker inputs and atomically rebuild the target
 homm2 build                    # compile src (wine cl) -> comparisons + hard gates -> refresh status
 homm2 link                     # strict final link + section/RVA audit in build/link/
 homm2 status                   # per-unit + overall match %
@@ -95,7 +97,8 @@ homm2 format --check           # verify header and enum formatting
 ```
 
 The final link is opt-in, so object matching stays fast. Its Ninja graph exposes `link-order`
-(NB09 `sstModule` object order), `link-imports` (exact middleware import archive), `link`, and
+(`config/units.toml` manifest object order, audited against source anchors), `link-imports`
+(middleware import archives - recalibration for VC6 LIB is open work), `link`, and
 `link-map` (PE section, entry-point, unresolved-symbol, and per-unit RVA diagnostics).
 
 `homm2 build` never runs Vostok. After adding or changing a `VA`, `VA_COMPGEN`,
@@ -129,17 +132,18 @@ scripts/toolchain/create-toolchain-release.py --check build/toolchain/msvc
 
 Seven artifacts are pinned by SHA-256 - `CL.EXE`, `C1.DLL`, `C1XX.DLL`, `C2.DLL`,
 `LINK.EXE`, `CVTRES.EXE`, `LIBCMT.LIB` - and the assembled compiler must stamp the
-target's own `@comp.id` before a tarball is written. Provenance is in
-[`docs/buka-analysis.md`](docs/buka-analysis.md). `clang`/`clangd` is editor tooling only;
-the Wine VC6 build is the sole verdict on a match.
+target's own `@comp.id` before a tarball is written. `clang`/`clangd` is editor tooling
+only; the Wine VC6 build is the sole verdict on a match.
 
-ninja **tracks header dependencies** (via `cc_wrap.py`, since MSVC 4.2 has no `/showIncludes`),
-so editing a shared header recompiles exactly its includers — no stale objects. `homm2 build`
+ninja **tracks header dependencies** (via `cc_wrap.py`'s include scanner), so editing a
+shared header recompiles exactly its includers — no stale objects. `homm2 build`
 then runs **hard gates** (a red gate fails the build): no TU declares types/enums/externs/
 forward-decls locally (all come from headers), no object emits a function symbol absent from
-CodeView, every global carries a unique `DATA(<its VA>)`, every free function is declared in its
-owner header, and every extern global has a definition in its owner TU (link-completeness), and every class
-vtable is claimed by a `VTBL()` census marker in its owner TU. Full catalog: `docs/build-asserts.md`.
+the claimed inventory, every global carries a unique `DATA(<its VA>)`, every free function is
+declared in its owner header, and every extern global has a definition in its owner TU
+(link-completeness), and every class vtable is claimed by a `VTBL()` census marker in its
+owner TU. Full catalog: `docs/build-asserts.md`. (The symbol-model gates are switched off
+until the inventory has grown enough to audit; see `homm2/cli.py`.)
 
 ## Navigate (`homm2 sema`)
 
@@ -157,4 +161,4 @@ homm2 sema def|refs|hover src/… L C # clangd LSP at a point
 ```
 
 xref/disasm/strings/match/rva/clangd need no Ghidra; xref library boundaries need
-a one-time `homm2 ghidra` project (imports the EXE, applies our CodeView names).
+a one-time `homm2 ghidra` project (imports the EXE, applies our claimed names).

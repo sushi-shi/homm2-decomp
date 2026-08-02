@@ -23,7 +23,7 @@ homm2 clean \
 ## Why it is safe
 
 Metadata and codegen-steering rules reproduce the *production* expansion of
-their macros — the expansion MSVC 4.2 already performs when building matching
+their macros — the expansion the pinned MSVC already performs when building matching
 objects. The enum rules deliberately select the strict typed branch. Keep the
 rule table and its regression tests in step with `include/va.h` and
 `include/Ints.h`.
@@ -110,7 +110,7 @@ compile and link into the Windows executable.
 ## Type information is preserved, not discarded
 
 The matching tree must spell each enum domain as a plain integer, because that
-is what MSVC 4.2 lowers identically to retail. But it already carries the
+is what the pinned MSVC lowers identically to retail. But it already carries the
 properly typed variant behind `#if H2_STRICT_ENUMS` — for example
 `OppositeCampaignSide` is `1 - side` in production and a typed ternary in the
 strict build.

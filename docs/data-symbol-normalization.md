@@ -1,6 +1,6 @@
 # Anonymous data symbol normalization
 
-MSVC 4.2 gives compiler-private data symbols counter-based names such as
+MSVC gives compiler-private data symbols counter-based names such as
 `$SG30360`, `$T42489`, and `name$S31565`. The counters depend on compiler state
 and are not stable identities. Comparing those names directly makes equivalent
 data and code relocations look different.
@@ -22,7 +22,7 @@ spelling is not retail evidence and must not create a comparison residual.
 Before anonymous-data normalization,
 `scripts/homm2/build/canonicalize_relocs.py` makes a disposable paired target
 under `build/objdiff/paired/`. At the same function-relative relocation site it
-accepts the candidate spelling only when the CodeView public owner RVA plus the
+accepts the candidate spelling only when the claimed owner RVA plus the
 candidate addend equals the raw retail operand address exactly. It then adds a
 separate undefined COFF symbol and redirects only that relocation. It never
 renames a shared target symbol globally, and it does not require a prior match

@@ -46,7 +46,7 @@ relocations; a fuzzy score is navigation only and never an acceptance ratchet.
 
 ## Storage-split enum domains
 
-Use `H2_ENUM_CLASS_BEGIN_SPLIT(name, storage)` when one semantic domain has an `i32` CodeView/API
+Use `H2_ENUM_CLASS_BEGIN_SPLIT(name, storage)` when one semantic domain has an `i32` inventory/API
 type but is also stored in narrower fields. Strict Clang builds see a scoped enum with the declared
 underlying type; retail MSVC builds keep the domain typedef as `i32`. Declare each stored field as
 `H2_ENUM_STORAGE(name, proven_storage)`, which exposes the enum to strict checking while preserving

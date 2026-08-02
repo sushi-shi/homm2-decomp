@@ -1,43 +1,45 @@
 # HoMM2 Decomp Project Guide
 
-Binary-matching decompilation of Heroes of Might and Magic II: The Price of Loyalty.
-The goal is C++ that reproduces the retail MSVC object code and can be linked into a
-working executable.
+Binary-matching decompilation of Buka's Heroes of Might and Magic II release,
+built from the HoMM2 Gold 2.1 tree. The goal is C++ that reproduces the retail
+MSVC object code and can be linked into a working executable.
 
 ## Ground Truth
 
-- Retail `HMM2PL.exe` is authoritative for code, data, relocations, resources, and
-  linked addresses.
-- The embedded NB09 CodeView stream is minimal/publics-only. Its 3,541 named symbols
-  are `S_PUB32` records with type index zero. It proves public names and start RVAs,
-  not lengths, TU ownership, private helpers, types, locals, lines, or layouts.
-- A next-public span is a provisional function boundary. It can contain an unlisted
-  static helper, jump table, or embedded data.
+- Retail `HMM2PL.exe` is authoritative for code, data, resources, and linked
+  addresses.
+- The image is STRIPPED: no debug stream, no export directory, and no
+  base-relocation directory (data directory 5 is 0/0). Nothing in the binary
+  names a symbol or lists a DIR32 site.
+- `config/retail_functions.csv` is Ghidra's function inventory (2,472 candidate
+  boundaries): ANALYSIS OUTPUT, edited as understanding improves, never retail
+  evidence. A boundary becomes a claim only when a source `VA(...)` marker
+  names its address; `build/gen/symbol_names.csv` is that claimed inventory.
+- Every function the retail inventory lists that no marker claims delinks into
+  the `(unmatched)` module, so the whole `.text` is always comparable.
+- `config/delink_relocs.tsv` is the reviewed absolute-relocation site list —
+  the only DIR32 site channel (it substitutes for the missing `.reloc`
+  directory, for both the delinker and the Python tooling).
 - `build/delink/` contains Vostok-delinked retail target objects.
-  `build/objdiff/base/` contains objects compiled from this source tree. Do not call
-  either side "original source"; all source structure remains a reconstruction.
-- Secondary references may help with names and semantics, but retail evidence wins.
-
-See `docs/codeview-contents.md`, `docs/compiler-detection.md`, and
-`docs/candidate-data-topology.md` for the supporting evidence.
+  `build/objdiff/base/` contains objects compiled from this source tree. Do not
+  call either side "original source"; all source structure is a reconstruction.
+- Secondary references (the PoL 2.0 reconstruction, Gold 2.1 binaries) may help
+  with names and semantics, but this image's bytes win. Diff against Gold 2.1
+  before calling a divergence Buka-specific.
 
 ## Toolchain
 
-- Most game TUs use MSVC 4.2 `/Od /Ob1 /MT /Gr /G5 /QIfdiv`; 39 of the 95
-  configured TUs use an optimized profile instead. `config/units.toml` is the
-  authoritative per-TU assignment.
-  `/Ob1` remains active under `/Od`; inlined accessors commonly leave `jmp $+0`.
-- Optimized TUs use the `o2` profile. Their register allocation and instruction
-  selection cannot be solved with `/Od` stack-slot techniques.
-- `/Gr` makes free functions `__fastcall` by default.
-- The retail build has no `/GX` exception state and no RTTI.
-- `/G5` commonly lowers unsigned zero-extension with `and` rather than `movzx`;
-  preserve that distinction when reading retail intent.
-- `/Od` stack positions depend on identifier hashes. Use `homm2/core/od_slots.py` and
-  `docs/od-stack-layout.md`; do not brute-force local names.
-- Compile with the pinned VC 4.2 compiler. Final-link with the pinned VC 4.0
-  component under `build/toolchain/link300`: LINK 3.00.5270 and its sibling
-  `LIBCMT.LIB`, which supplies the retail runtime objects.
+- The target was built with VC6 SP5; the flake provisions that exact toolchain
+  (compiler and linker in one tree) under wine. `config/units.toml` is the
+  authoritative per-TU flag assignment: 52 TUs on the `base` profile, 43 on
+  optimized profiles (`o2`, `base_oi`, `o1_frame`).
+- `/Gr` makes free functions `__fastcall` by default. The retail build has no
+  `/GX` exception state and no RTTI.
+- The `/Od` stack-slot model and lowering catalogs in `homm2/core/od_slots.py`
+  were solved against MSVC 4.2 (cl 10.20) on the PoL line. Treat every such
+  prediction as a hypothesis until the `od-frames`/`od-oracle` harness
+  re-validates it against VC6 objects; do not brute-force local names either
+  way.
 
 ## Build
 
@@ -47,13 +49,18 @@ setting `HOMM2_DIR`, `MSVC_DIR`, and the Wine prefix:
 ```sh
 cd /path/to/worktree
 nix develop .#build
-homm2 init                 # one-time target/config generation
+homm2 init                 # one-time toolchain fetch + first delink + editor config
+homm2 redelink [--force]   # rebuild delinker inputs and the target (idempotent)
 homm2 build                # configure, compile, compare, and run hard gates
 homm2 status               # current metrics plus observation-only retained maxima
 homm2 status update        # explicitly record maxima for current function hashes
 homm2 status --force-refresh
 homm2 selftest             # the tool test suite (run after changing anything in scripts/)
 ```
+
+`homm2 build` validates the delink stamp against every input (exe, PDB,
+inventories, reviewed manifests, delinker binary) and refuses a stale target by
+naming the changed input; `homm2 redelink` is the one regeneration entry point.
 
 Use `ninja` for rapid TU iteration, then refresh status before trusting objdiff
 metrics. Run `homm2 build` before integration. The report cache is content-addressed;
@@ -126,8 +133,8 @@ than failing. Add a tool to its role package, not to a new top-level file.
   banked against a hash that no longer exists. `homm2 audit ledger` reports that drift without
   needing a build.
 
-See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md`,
-`docs/reviewed-data-objdiff.md`, and `docs/static-storage-link-audit.md`.
+See `docs/data-symbol-normalization.md`, `docs/reviewed-data-objdiff.md`, and
+`docs/static-storage-link-audit.md`.
 
 ## Matching Method
 
@@ -151,6 +158,7 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
   trial, probe tag) to `docs/matching-matrices/max-observations.tsv` and preserve
   the winning bytes as disassembly under `docs/matching-matrices/max-asm/`. That
   disassembly is the structural reference for later source-shape recovery.
+  (The directory starts empty on this branch; only VC6-measured evidence goes in.)
 
 ## Proof Vocabulary
 
@@ -166,7 +174,9 @@ See `docs/data-symbol-normalization.md`, `docs/delinker-contribution-manifest.md
 - `.claude/agents/matcher.md`: detailed worker procedure and byte-proof rules.
 - `.claude/agents/orchestrator.md`: parallel lane and serial integration protocol.
 - `AGENTS.md`: concise Codex campaign policy and source conventions.
-- `docs/patterns/INDEX.md`: known MSVC lowering patterns.
-- `docs/od-stack-layout.md`: solved `/Od` local-slot model.
 - `docs/build-asserts.md`: enforced repository invariants.
 - `scripts/archive/`: retired experiment/search tools retained for historical reproduction.
+
+The VC4.2 pattern catalog and matching matrices from the PoL 2.0 line were
+deliberately not carried over: that catalog's own rule is "nothing ports from
+other decomps". A fresh VC6 catalog grows here from measured evidence.

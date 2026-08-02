@@ -1,7 +1,7 @@
-# Class inheritance — recovered from the binary (NOT CodeView)
+# Class inheritance — recovered from the binary
 
-CodeView carries **no type stream** (`sstGlobalTypes` is empty — see `docs/codeview-contents.md`),
-so it has **no base-class records**. For **single** inheritance the MSVC mangling doesn't encode the
+The image carries **no type information at all** (it is fully stripped),
+so there are **no base-class records**. For **single** inheritance the MSVC mangling doesn't encode the
 base either (only *multiple* inheritance names bases, via `??_7C@@6B<Base>@@@`; all 30 of our vtables
 are single). So — like the class *fields* (recovered from disassembly via Ghidra) — the **inheritance
 hierarchy must be recovered from the binary**.

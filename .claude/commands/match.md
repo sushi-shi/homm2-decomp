@@ -7,7 +7,7 @@ allowed-tools: Agent, Bash, Read, Write, Edit, Grep, Glob
 You are the **parallel match orchestrator** in the top-level session (so you CAN
 dispatch subagents). Drive the campaign per **`.claude/agents/orchestrator.md`**
 (pool + serial integration + target selection) and **`.claude/agents/matcher.md`**
-(the /Od reconstruction doctrine). HMM2PL.exe is one binary — go straight to the queue.
+(the reconstruction doctrine). HMM2PL.exe is one binary — go straight to the queue.
 
 Pool size / concurrency: **N = $1** (default **4**). Always keep N matchers in flight
 until the queue is dry or the user winds down.

@@ -139,10 +139,10 @@
       '';
 
       # Analysis + diffing tools. Ghidra (headless, via PyGhidra) backs `homm2 sema`
-      # xref: it supplies the WHOLE-.text function-boundary map (incl. the
-      # library/runtime funcs CodeView omits). Our CodeView symbols
-      # stay authoritative for names; Ghidra never discovers - it's fed the EXE (+ our
-      # known names). Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
+      # xref and supplies the WHOLE-.text function-boundary map; on this stripped
+      # target its analysis is also the candidate function inventory
+      # (config/retail_functions.csv), while source VA() markers stay authoritative
+      # for names. Ghidra 12.0.4 + pyghidra + jdk21 pin-match gruntz (same nixpkgs
       # rev) so they're store cache hits, not a rebuild.
       commonTools = [ homm2-cli rust objdiff objdiff-cli vostok-delinker ] ++ (with pkgs; [
         (python3.withPackages (ps: [ ps.pyghidra ps.libclang ])) # Ghidra + source DATA parsing
@@ -175,10 +175,10 @@
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
             ${ghidraEnvHook}
-            echo "[homm2] target EXE : $HOMM2_EXE (minimal CodeView NB09 - public names/RVAs only)" >&2
+            echo "[homm2] target EXE : $HOMM2_EXE (stripped - no debug stream, no .reloc)" >&2
             echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
             echo "[homm2] cli        : 'homm2 <cmd>' (status/clangd/sema/ghidra/format/...)" >&2
-            echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC4.2 + wine)" >&2
+            echo "[homm2] build/MSVC : 'nix develop .#build' for 'homm2 build' (VC6 SP5 + wine)" >&2
             ${nvimShimHook}
             ${objdiffShimHook}
           '';

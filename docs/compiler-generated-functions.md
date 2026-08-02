@@ -1,37 +1,22 @@
-# Compiler-generated, runtime-library, and source-private functions
+# Compiler-generated and source-private functions
 
-These functions need synthetic PDB procedure records beyond the shipping linker-public
-inventory. Their identities come from different evidence and are kept separate.
-
-## Runtime-library functions
-
-The runtime FID database is `config/library_labels.csv`. `runtime_fid.py` compares each
-reviewed retail RVA against the same-named compiland in the pinned VC 4.0 `LIBCMT.LIB`.
-It masks only relocation operands and accepts exactly one signature identity. A reviewed
-procedure span can be a proved prefix when the library symbol extent continues into embedded
-data or a separately modeled alternate entry. An assembly entry without a standalone COFF
-symbol is named as
-`$entry_0x<owner-relative-offset>` after the containing library function is proved.
-
-Run `python3 -m homm2.build.runtime_fid --check` to verify the tracked database. A normal
-`homm2 build` runs the same check as a hard gate.
+These functions need synthetic PDB procedure records; the stripped retail image names
+none of them. Their identities come from different evidence and are kept separate.
 
 ## Source-private functions
 
 A file-local function is ordinary reconstructed source, not compiler-generated code. When
 its definition is `static` and carries `VA(address, size)`, `annotated_functions.py` reads
 the Clang AST, derives its Microsoft-decorated identity from the semantic signature, and
-writes `build/gen/source_private_functions.csv`. `gen_manifest.py` merges those rows into
-`symbol_names.csv`, so `synth_pdb.py` gives Vostok a procedure record even though the
-linker-public retail NB09 stream necessarily omits it.
+writes `build/gen/source_private_functions.csv`. `source_symbols.py` names the same
+definition in `symbol_names.csv`, so `synth_pdb.py` gives Vostok a procedure record even
+though no symbol in the stripped image names it.
 
 `homm2 build` checks this generated private-function inventory for freshness.
 
-Ordinary public definitions also carry reviewed `VA(address, size)` spans. CodeView remains
-authoritative for their decorated names and RVAs, but when a source span differs from the
-provisional next-public gap, `gen_manifest.py` uses the source size and records
-`cv-public-source-va`. The complete generated span inventory is
-`build/gen/source_function_spans.csv`.
+Ordinary public definitions also carry reviewed `VA(address, size)` spans; the claimed
+inventory takes its decorated names, RVAs, and sizes from those source annotations. The
+complete generated span inventory is `build/gen/source_function_spans.csv`.
 
 ## Source compiler-generated functions
 
@@ -45,8 +30,8 @@ VA_COMPGEN(0x004377e7, 0x1a, STATIC_DTOR, SVSearchArray)
 VA_COMPGEN(0x00437801, 0x1a, STATIC_CTOR, SVSearchArray)
 ```
 
-`gen_manifest.py` derives a stable comparison identity from the module, semantic role,
-and owner, such as
+`canonicalize_data_symbols.py` derives a stable comparison identity from the module,
+semantic role, and owner, such as
 `__h2cg$SOURCE$PHILAI$static_ctor$SVSearchArray`. The macro emits no code.
 
 The disposable COFF normalizer does not trust the `$E` number. It classifies constructor
