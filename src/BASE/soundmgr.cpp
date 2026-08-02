@@ -670,7 +670,9 @@ i32 soundManager::DigitalReport(class sample* sampleResource) {
 
 VA(0x004b62e0, 0x4d)
 void soundManager::AdjustSoundVolumes(void) {
-    if (gSoundBackendsReady && IsMilesBackend(this))
+    if (!gSoundBackendsReady)
+        return;
+    if (IsMilesBackend(this))
         AdjustMilesSampleVolumes();
 }
 

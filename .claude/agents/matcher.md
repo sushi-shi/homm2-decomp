@@ -285,3 +285,12 @@ were handed.
 Final per-function % + a one-line summary per function + the **complete `git diff`**
 of your worktree (so integration is a clean apply). List every file you touched.
 Never `git add`/commit.
+
+## Cross-version spelling discipline
+
+Matching Buka's bytes proves a spelling is *sufficient for 2.1*, never that
+it is what the devs wrote. If your close diverges from the PoL 2.0 spelling
+(expression shape, local names, guard-vs-wrap, operand order), add an OPEN
+row to docs/cross-version-spellings.md in the same change. Resolution
+(invariant / mixed / dev-change) comes from compiling the candidate under
+MSVC 4.2 in the 2.0 tree and byte-comparing - not from this branch alone.

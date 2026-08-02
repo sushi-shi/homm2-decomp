@@ -184,7 +184,7 @@ BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	96.8841	34143d361c89
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	99.8438	6fa049274693
 BASE/INPUTMGR	?AsciiConvert@inputManager@@QAEXAAUtag_message@@@Z	31.4773	3778fb95dda6
 BASE/INPUTMGR	?CheckChangeCursor@@YIXHHH@Z	99.6724	4974dc6c89a9
-BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	91.5790	5014d577da07.5e877b076c9a
+BASE/INPUTMGR	?Close@inputManager@@UAEXXZ	100.0000	3c8859525ff1.5e877b076c9a
 BASE/INPUTMGR	?Flush@inputManager@@QAEXXZ	100.0000	c3ac6ef06625.5e877b076c9a
 BASE/INPUTMGR	?ForceMouseMove@inputManager@@QAEXXZ	93.9500	544a513138f9
 BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	76.8254	c422f86b74b6
@@ -238,7 +238,7 @@ BASE/MilesSound	?StopAllMilesSamples@@YIXXZ	99.7222	f50fff40d548
 BASE/MilesSound	?StopMilesSample@@YIXPAVsample@@@Z	100.0000	44dc1fe77005
 BASE/MilesSound	?StopMilesSampleHandle@@YIXPAU_SAMPLE@@@Z	100.0000	d04fc5906f7a
 BASE/Misc	?AbsAiPrint@@YIXPAD@Z	0.0000	38eee7224651
-BASE/Misc	?AiPrint@@YIXPAD@Z	95.6757	c8d57e7d572d
+BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	34d4d1d088c1
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	0.0000	f3a78b076682
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.0000	b39c95d6e883
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	50a43a40357c
@@ -373,7 +373,7 @@ BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	f30559a466ff
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	99.8333	c9f85b1b51ab
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	81.4112	30caf024d5eb
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	100.0000	1183a5510de9
-BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	96.7347	bdd85b4e41dc
+BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	1058c1ccd6f9
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	d5d7a1b03ae8
 BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	50e4aa3b8315
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	eef2e34e81d2
@@ -422,7 +422,7 @@ BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	1da5ac3f7fee
 BASE/miscwin	@BlitBitmapToScreenVesa@28	80.2929	a073d070b1fe
 BASE/soundmgr	??0soundManager@@QAE@XZ	48.5000	35fb1625087c
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	93.9623	72a919172b8c.95b55bccad90
-BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	93.8461	b90bca22b20c.ed147910f694
+BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	100.0000	7ec25e4e0a49.ed147910f694
 BASE/soundmgr	?CDStartup@soundManager@@QAE_NXZ	85.1698	22d5d5ffaea3
 BASE/soundmgr	?Close@soundManager@@UAEXXZ	100.0000	4b8d232b82cc
 BASE/soundmgr	?ConvertVolume@soundManager@@QAEHHH@Z	93.0000	815f0523bcb2
