@@ -521,7 +521,7 @@ SOURCE/ADVMGR	?SeedTo@advManager@@QAEXHH@Z	93.7045	5c901b3caf3c
 SOURCE/ADVMGR	?SetEnvironmentOrigin@advManager@@QAEXHHH@Z	88.6667	c5c59356c4f6
 SOURCE/ADVMGR	?SetHeroContext@advManager@@QAEXHH@Z	92.2983	f6ab111c2549
 SOURCE/ADVMGR	?SetInitialMapOrigin@advManager@@QAEXXZ	88.4340	c312a624714f
-SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	99.2276	e7ba295f70e3
+SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	100.0000	aaa4a5109ee9
 SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	95.9097	4041d77aae7d
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	99.7778	68bd991a8fda
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	93.0875	77b2cf20f494
@@ -1071,7 +1071,7 @@ SOURCE/PATH	?FindPath@army@@QAEHHHHHH@Z	100.0000	382378ada9ac
 SOURCE/PATH	?GetAdjacentCellIndex@army@@QAEHHH@Z	59.3243	d37e16896454
 SOURCE/PATH	?GetAdjacentCellIndexNoArmy@@YIHHH@Z	100.0000	60e237eed612
 SOURCE/PATH	?GetAttackMask@army@@QAEHHHH@Z	87.5185	d77bd80ea4f2
-SOURCE/PATH	?GetBestDirection@army@@QAEHHHH@Z	99.7557	1f8b8774ad24
+SOURCE/PATH	?GetBestDirection@army@@QAEHHHH@Z	99.9599	2c22cd141a1f
 SOURCE/PATH	?GetMoveMask@army@@QAEHH@Z	96.6471	73b4a3c437a8
 SOURCE/PATH	?OppositeDirection@@YIHH@Z	100.0000	4f407926cd69
 SOURCE/PATH	?ValidAttack@army@@QAEHHHHHPAH@Z	96.3871	da3b95f14748
@@ -1415,9 +1415,9 @@ SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8d70d830d048
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	99.7917	619327303686
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	99.8358	7c7e114d1472
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	71b109f775c2
-SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	99.7253	f6b20aa5d424
-SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	99.7812	c9b7bab651df
-SOURCE/dpnetwin	?dpnet_init@@YIFXZ	98.8579	9347ddb014cf
+SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	99.7363	f6b20aa5d424
+SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	99.7902	c9b7bab651df
+SOURCE/dpnetwin	?dpnet_init@@YIFXZ	99.9290	e07adc451219
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	c7e2ae01e357
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	2a0579c07e7b
 SOURCE/dpnetwin	?dpnet_snd@@YIHHHPAX@Z	99.6667	0b1c3d2043b3
