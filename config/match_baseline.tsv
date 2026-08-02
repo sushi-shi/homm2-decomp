@@ -1226,7 +1226,7 @@ SOURCE/SETUP	?SetupNetworkGameHandler@@YIHAAUtag_message@@@Z	100.0000	299616f6c5
 SOURCE/SMACKMGR	?ConvertSmackerPalette@@YIXPAE@Z	100.0000	52bdce66d0c5
 SOURCE/SMACKMGR	?DoAdvance@@YIXPAUSmackTag@@HHHH@Z	97.9149	fdd1d421c85d
 SOURCE/SMACKMGR	?ExpansionCampaignRect@@YIHHH@Z	100.0000	1e4d315e4c73
-SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	86.3906	071b7920fe1f
+SOURCE/SMACKMGR	?PlaySmacker@@YIHH@Z	86.4219	071b7920fe1f
 SOURCE/SMACKMGR	?PointInRect@@YICHHPAUtag_rect@@@Z	100.0000	f415a2ca88d8
 SOURCE/SMACKMGR	?PrintSummaryInfo@@YIXPAUSmackSumTag@@@Z	100.0000	3e853aa40616
 SOURCE/SMACKMGR	?ShutDownSmacker@@YIXXZ	100.0000	ad88574cbded
@@ -1485,8 +1485,8 @@ SOURCE/wingraph	?InitGraphics@@YIXXZ	100.0000	57511c373894
 SOURCE/wingraph	?InitializePalette@@YIXXZ	100.0000	7d38d7ff876e
 SOURCE/wingraph	?QueryNewPalette@@YIHXZ	100.0000	e62ee1243ed4
 SOURCE/wingraph	?RestoreDisplayMode@@YIXXZ	100.0000	53f85989ef8b
-SOURCE/wingraph	?SetFullScreenStatus@@YIXH@Z	99.4565	a38f004533e5
-SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	98.1967	e2ce253d5362
+SOURCE/wingraph	?SetFullScreenStatus@@YIXH@Z	100.0000	9b1ef0aaeb21
+SOURCE/wingraph	?SetGraphicsType@@YIHH@Z	98.2049	e2ce253d5362
 SOURCE/wingraph	?SetPalette@@YIHXZ	100.0000	6a31694c14c2
 SOURCE/wingraph	?SetupClipper@@YIXXZ	100.0000	766bf5965d47
 SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	61.2000	d18ac4963343

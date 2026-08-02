@@ -942,7 +942,7 @@ VA(0x004b1a25, 0xa1)
 void SetFullScreenStatus(i32 fullScreen) {
     if (gbInSmackMgr != 0)
         return;
-    if (gConfig.gfx[IDX(giCurExe)].fullScreen == fullScreen)
+    if (fullScreen == gConfig.gfx[IDX(giCurExe)].fullScreen)
         return;
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
         if (gbDDrawAttached == 0)
