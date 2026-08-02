@@ -104,6 +104,7 @@ static SWindowManagerText gWindowManagerText = {
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
 
+VA(0x004b6b80, 0x3ff)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
     iCycle1Count++;
@@ -294,6 +295,7 @@ updatePalette:
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 
+VA(0x004b6f80, 0x97)
 heroWindowManager::heroWindowManager(void) : baseManager() {
     m_active = false;
     m_activeWindow = NULL;
@@ -309,6 +311,7 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
 }
 
+VA(0x004b7020, 0x12e)
 i32 heroWindowManager::Open(i32 managerOrder) {
     i32 i;
     InitVideo();
@@ -337,6 +340,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     return 0;
 }
 
+VA(0x004b7150, 0x91)
 void heroWindowManager::Close(void) {
     if (m_active == 1) {
         heroWindow* w = m_windowListTail;
@@ -352,6 +356,7 @@ void heroWindowManager::Close(void) {
     }
 }
 
+VA(0x004b71f0, 0x5b)
 MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
@@ -364,10 +369,12 @@ MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
     return result;
 }
 
+VA(0x004b7250, 0x1c)
 MessageDispatchResult heroWindowManager::ConvertToHover(struct tag_message& msg) {
     return Main(msg);
 }
 
+VA(0x004b7270, 0x36)
 MessageDispatchResult
 heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 p3, i32 p4) {
     tag_message msg;
@@ -378,6 +385,7 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 
     return Main(msg);
 }
 
+VA(0x004b72b0, 0x142)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
     i32 z;
@@ -423,6 +431,7 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
     m_focusWindow = w;
 }
 
+VA(0x004b7400, 0xe9)
 void heroWindowManager::RemoveWindow(class heroWindow* w) {
     if (w != NULL) {
         w->Close();
@@ -456,6 +465,7 @@ void heroWindowManager::RemoveWindow(class heroWindow* w) {
     }
 }
 
+VA(0x004b74f0, 0x199)
 i32 heroWindowManager::DoDialog(
     class heroWindow* window,
     MessageDispatchHandler handler,
@@ -533,12 +543,14 @@ i32 heroWindowManager::DoDialog(
 #undef MESSAGE_DISPATCH_CONSUME
 #undef MESSAGE_DISPATCH_FORWARD
 
+VA(0x004b7690, 0x20)
 void heroWindowManager::UpdateScreen(void) {
     PollSound();
     BitmapToScreen(m_screen);
     PollSound();
 }
 
+VA(0x004b76b0, 0x58)
 void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
     gpMouseManager->m_cursorReady = 0;
     PollSound();
@@ -547,11 +559,13 @@ void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
     PollSound();
 }
 
+VA(0x004b7710, 0x2f)
 void heroWindowManager::RedrawScreen(void) {
     for (heroWindow* w = m_windowListHead; w != NULL; w = w->m_nextWindow)
         w->DrawWindow();
 }
 
+VA(0x004b7740, 0x8f)
 void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class palette* pal) {
     if (pal != NULL)
         SetPalette(pal->m_data, 0);
@@ -578,6 +592,7 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
     }
 }
 
+VA(0x004b77d0, 0x63)
 void heroWindowManager::ScreenShot(void) {
     char local_10[SCREENSHOT_FILENAME_CAPACITY];
     sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
@@ -592,6 +607,7 @@ void heroWindowManager::ScreenShot(void) {
     gpInputManager->Flush();
 }
 
+VA(0x004b7840, 0x159)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
     if (bShowIt != 0) {
         if (x < 0) {
@@ -617,8 +633,10 @@ void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
 }
 
 // Named one-byte retail stub.
+VA(0x004b79a0, 0x5)
 void CreateFizzleTables(void) {}
 
+VA(0x004b79b0, 0x46d)
 void heroWindowManager::FizzleForward(
     i32 x,
     i32 y,
@@ -720,6 +738,7 @@ void heroWindowManager::FizzleForward(
     }
 }
 
+VA(0x004b7e20, 0x4d)
 void heroWindowManager::ReleaseFizzleSource(void) {
     if (m_fizzleSource != NULL)
         delete m_fizzleSource;
@@ -727,9 +746,11 @@ void heroWindowManager::ReleaseFizzleSource(void) {
 }
 
 // Named one-byte retail stub.
+VA(0x004b7e70, 0x5)
 void CreateColorTables(void) {}
 
 // Named one-byte retail stub.
+VA(0x004b7e80, 0x5)
 void CreateColorLookupTables(void) {}
 
 

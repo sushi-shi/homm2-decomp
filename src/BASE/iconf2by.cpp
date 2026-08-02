@@ -31,6 +31,7 @@ static inline i32 IconRowVisible(i8* shear, i32 clipTop, i32 currentY, i32 clipB
     return shear[currentY] != ICON_SHEAR_SKIP_ROW && clipTop <= currentY && currentY <= clipBottom;
 }
 
+// @remove
 void FlipIconToBitmapYModify(
     class icon* srcIcon,
     class bitmap* dest,

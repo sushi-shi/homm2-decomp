@@ -227,6 +227,7 @@ H2_ENUM_END(NewGameKeyEncoding)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp"
 
+VA(0x004754b0, 0x1d2)
 void game::GetMap(void) {
     fileRequester* requesterResult;
     i32 resultCode;
@@ -280,6 +281,7 @@ void game::GetMap(void) {
     }
 }
 
+VA(0x00475682, 0x66)
 void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameInitialized = 0;
     m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
@@ -292,6 +294,7 @@ void game::ProcessNewMap(struct SMapHeader* header) {
     m_newGameWindow->DrawWindow();
 }
 
+VA(0x004756e8, 0x404)
 void game::InitNewGame(struct SMapHeader* header) {
     i32 activePlayerCount;
     i32 unusedPlayerCount;
@@ -382,6 +385,7 @@ void game::InitNewGame(struct SMapHeader* header) {
     m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
 }
 
+VA(0x00475aec, 0x5f)
 void game::SetupNetPlayerNames(void) {
     i32 player;
 
@@ -393,6 +397,7 @@ void game::SetupNetPlayerNames(void) {
     }
 }
 
+VA(0x00475b4b, 0xa71)
 i32 game::NewGame(void) {
     static i16 newGameSourceLineBase = 319;
     char netPlayerPacket[GAME_PLAYER_INFO_BUFFER_SIZE];
@@ -609,6 +614,7 @@ i32 game::NewGame(void) {
     return result;
 }
 
+VA(0x004765bc, 0xeb)
 void game::CleanUpNewGameWindow(void) {
     i32 player;
 
@@ -625,6 +631,7 @@ void game::CleanUpNewGameWindow(void) {
     }
 }
 
+VA(0x004766a7, 0x794)
 void game::InitNewGameWindow(void) {
     static i16 newGameWindowSourceLineBase = 635;
     i32 availableWidthResult;
@@ -856,6 +863,7 @@ void game::InitNewGameWindow(void) {
     }
 }
 
+VA(0x00476e3b, 0x50f)
 void game::UpdateNewGameWindow(void) {
     i32 playerLockedValue;
     tag_message messageTemp;
@@ -999,6 +1007,7 @@ void game::UpdateNewGameWindow(void) {
     DrawNGKPDisplayString(0);
 }
 
+VA(0x0047734a, 0xd15)
 MessageDispatchResult NewGameHandler(struct tag_message& message) {
     i32 transmitResultTemp;
     i32 redrawWindow = 0;
@@ -1497,6 +1506,7 @@ finish:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0047811b, 0x35c)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
     char workText[GAME_KEY_BUFFER_SIZE];
     char keyChar;
@@ -1613,6 +1623,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
     return 0;
 }
 
+VA(0x0047850e, 0x104)
 void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
@@ -1636,6 +1647,7 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
         cNGKPDisplay[cursor + 1] = 0;
 }
 
+VA(0x00478612, 0x8d)
 void game::DrawNGKPDisplayString(i32 updateScreen) {
     if (gbNewGameDialogOver != 0)
         return;
@@ -1667,6 +1679,7 @@ void game::DrawNGKPDisplayString(i32 updateScreen) {
         );
 }
 
+VA(0x0047869f, 0xc36)
 void game::ShowScenInfo(void) {
     static i16 scenarioInfoSourceLineBase = 1615;
     i32 availableWidthResult;
@@ -2013,6 +2026,7 @@ void game::ShowScenInfo(void) {
     delete scenarioWindowValue;
 }
 
+VA(0x004792d5, 0x19c)
 void game::GetLossConditionText(char* text) {
     i32 week2;
     hero* lossHero11;
@@ -2061,6 +2075,7 @@ void game::GetLossConditionText(char* text) {
     }
 }
 
+VA(0x00479471, 0x2b7)
 void game::GetVictoryConditionText(char* text) {
     i32 unusedVictoryWord;
     hero* victoryHeroData;
@@ -2135,6 +2150,7 @@ void game::GetVictoryConditionText(char* text) {
     }
 }
 
+VA(0x0047973c, 0x386)
 i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     char colorName3[GAME_SIDE_TEXT_SIZE];
     i32 sideSize;

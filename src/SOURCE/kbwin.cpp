@@ -16,6 +16,7 @@ H2_ENUM_BEGIN(KbWinPrivateConstant)
     TIMER_UPDATE_MIN_INTERVAL = 5
 H2_ENUM_END(KbWinPrivateConstant)
 
+VA(0x00470e30, 0x112)
 extern "C" i32 __stdcall
 WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
     DWORD lastError;
@@ -52,6 +53,7 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
     return message.wParam;
 }
 
+VA(0x00470f42, 0x2ec)
 i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine) {
     HMENU windowMenu;
     RECT windowRect;
@@ -153,6 +155,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     }
 }
 
+VA(0x0047122e, 0x1a)
 i32 AppIdle(void) {
     // Retail returns 1 from both arms; the else arm is not dead code that
     // folded away, it emits its own mov eax,1 at 0x0041c181.
@@ -162,6 +165,7 @@ i32 AppIdle(void) {
         return 1;
 }
 
+VA(0x00471248, 0x503)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
         return DefWindowProcA(window, message, messageParam, messageData);
@@ -288,6 +292,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
     return DefWindowProcA(window, message, messageParam, messageData);
 }
 
+VA(0x00471883, 0x67)
 BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     HWND commandWindow;
@@ -308,11 +313,13 @@ BOOL CALLBACK AppAbout(HWND dialog, UINT message, WPARAM messageParam, LPARAM me
     return 0;
 }
 
+VA(0x004718ea, 0xf)
 void AppExit(void) {
     CleanUpWinGraphics();
     CleanUpMenus();
 }
 
+VA(0x004718f9, 0xa1)
 void Process1WindowsMessage(void) {
     MSG message;
     i32l currentTick;
@@ -336,6 +343,7 @@ void Process1WindowsMessage(void) {
     }
 }
 
+VA(0x0047199a, 0x125)
 void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     i32 windowX;
     RECT windowRect;
@@ -372,6 +380,7 @@ void ResizeWindow(i32 x, i32 y, i32 width, i32 height) {
     WritePrefs();
 }
 
+VA(0x00471abf, 0x110)
 LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     i32 command;
     DLGPROC appDialogProc;
@@ -406,6 +415,7 @@ LRESULT AppCommand(HWND window, UINT message, WPARAM messageParam, LPARAM messag
     return 0;
 }
 
+VA(0x00471c20, 0xb1)
 void UpdateDfltMenu(HMENU menu) {
     i32 result;
     i32 value;
@@ -424,6 +434,7 @@ void UpdateDfltMenu(HMENU menu) {
         EnableMenuItem(menu, IDX(KBWIN_MENU_FULLSCREEN), MF_GRAYED);
 }
 
+VA(0x00471cd1, 0x8f)
 void KBChangeMenu(HMENU menu) {
     if (menu == NULL)
         menu = hmnuCurrent;
@@ -443,6 +454,7 @@ void KBChangeMenu(HMENU menu) {
     }
 }
 
+VA(0x00471d60, 0x117)
 void SetMenuStatus(i32 showMenu) {
     i32 width;
     i32 height;
@@ -470,6 +482,7 @@ void SetMenuStatus(i32 showMenu) {
     }
 }
 
+VA(0x00471e77, 0x53)
 void SetNoDialogMenus(i32 menusEnabled) {
     if (gbNoDialogMenusOn && !menusEnabled)
         return;
@@ -481,6 +494,7 @@ void SetNoDialogMenus(i32 menusEnabled) {
     SetMenus(hmnuApp, menusEnabled);
 }
 
+VA(0x00471eca, 0x12e)
 void SetMenus(HMENU menu, i32 enabled) {
     i32 count;
     u32 commandId;
@@ -520,10 +534,12 @@ void SetMenus(HMENU menu, i32 enabled) {
     UpdateDfltMenu(menu);
 }
 
+VA(0x00471ff8, 0xb)
 i32l KBTickCount(void) {
     return GetTickCount();
 }
 
+VA(0x00472003, 0x5)
 void InitVideo(void) {
     return;
 }

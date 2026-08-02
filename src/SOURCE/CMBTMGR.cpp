@@ -182,6 +182,7 @@ H2_ENUM_END(CombatMoraleConstant)
 
 }
 
+VA(0x00425de0, 0x1af)
 combatManager::combatManager(void) {
     m_unknownF373 = -1;
     m_currentArmySide = COMBAT_DEFENDER_SIDE;
@@ -204,6 +205,7 @@ combatManager::combatManager(void) {
     strcpy(m_currentCombatMessage, "");
 }
 
+VA(0x00425f8f, 0xfa)
 void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup) {
     if (sourceGroup == NULL || targetGroup == NULL)
         return;
@@ -237,6 +239,7 @@ void combatManager::CombineGroups(armyGroup* sourceGroup, armyGroup* targetGroup
     }
 }
 
+VA(0x00426089, 0x55e)
 void combatManager::SetupCombat(
     i32 mapX,
     i32 mapY,
@@ -374,6 +377,7 @@ void combatManager::SetupCombat(
     m_combatTowns[IDX(COMBAT_ATTACKER_SIDE)] = NULL;
 }
 
+VA(0x004265e7, 0x258)
 void combatManager::InitNonVisualVars(void) {
     m_gridSelectionDisabled = 0;
     m_nonVisualCombat = 0;
@@ -418,6 +422,7 @@ void combatManager::InitNonVisualVars(void) {
     LoadArmies();
 }
 
+VA(0x0042683f, 0x1a7)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
     i32 sourceHex;
@@ -475,6 +480,7 @@ void combatManager::SetupAdjacencyArray(void) {
     }
 }
 
+VA(0x004269fe, 0x427)
 i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
@@ -545,6 +551,7 @@ i32 combatManager::Open(i32 openFlags) {
     return 0;
 }
 
+VA(0x00426e25, 0x388)
 void combatManager::Close(void) {
     gpSoundManager->SwitchAmbientMusic(-1);
     gbLimitedCombatUpdatePalette = false;
@@ -607,6 +614,7 @@ void combatManager::Close(void) {
     m_combatWindowOpen = 0;
 }
 
+VA(0x004271ad, 0x2c1)
 void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 index;
     i32 pos;
@@ -636,6 +644,7 @@ void combatManager::UpdateArmyGroup(H2_ENUM_PARAM(CombatSide, i32) side) {
         m_armyGroups[IDX(side)]->Add(CREATURE_SKELETON, giSkeletonsCreated, ARMY_GROUP_EMPTY_SLOT);
 }
 
+VA(0x0042746e, 0x244)
 void combatManager::GenerateMap(void) {
     i32 gridX;
     i32 randomOffset;
@@ -679,6 +688,7 @@ void combatManager::GenerateMap(void) {
     randomOffset = SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
 }
 
+VA(0x004276b2, 0x1ca)
 char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
@@ -746,6 +756,7 @@ char* combatManager::GetBackgroundName(void) {
     return cCombatBkgNames[IDX(backgroundIndex)];
 }
 
+VA(0x004278a0, 0x1c8)
 i32 combatManager::MoreTreesNear(void) {
     i32 treeCount;
     i32 x;
@@ -806,6 +817,7 @@ i32 combatManager::MoreTreesNear(void) {
     return mountainCounter < treeCount;
 }
 
+VA(0x00427a8b, 0x3ba)
 void combatManager::LoadIcons(void) {
     i32 index;
     i32 heroColor;
@@ -871,6 +883,7 @@ void combatManager::LoadIcons(void) {
     }
 }
 
+VA(0x00427e45, 0xff)
 void combatManager::FreeIcons(void) {
     i32 index;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++) {
@@ -891,6 +904,7 @@ void combatManager::FreeIcons(void) {
     }
 }
 
+VA(0x00427f44, 0x2fd)
 void combatManager::LoadArmies(void) {
     i32 groupSlot;
     CombatSide side;
@@ -955,6 +969,7 @@ void combatManager::LoadArmies(void) {
     }
 }
 
+VA(0x00428241, 0xbd)
 void combatManager::FreeArmies(void) {
     i32 index;
     gpSoundManager->StopAllSamples(1);
@@ -970,6 +985,7 @@ void combatManager::FreeArmies(void) {
     gCurLoadedSpellEffect = COMBAT_EFFECT_INVALID;
 }
 
+VA(0x004282fe, 0x191)
 i32 combatManager::GetGridIndex(i32 x, i32 y) {
     i32 gridX;
     i32 gridY;
@@ -1025,6 +1041,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
     return rowIndex * COMBAT_GRID_ROW_LENGTH + gridColumn;
 }
 
+VA(0x0042848f, 0x1ba)
 void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
     if (side < COMBAT_ATTACKER_SIDE || index < 0)
         return;
@@ -1074,6 +1091,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
         WaitEndSample(moraleSample, -1);
 }
 
+VA(0x00428649, 0x176)
 i32 combatManager::CheckApplyBadMorale(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 index
 ) {
@@ -1117,6 +1135,7 @@ i32 combatManager::CheckApplyBadMorale(
     return 1;
 }
 
+VA(0x004287bf, 0x345)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
     army* activeArmy;
     i32 speedLoop;
@@ -1205,6 +1224,7 @@ restart:
     return 0;
 }
 
+VA(0x00428b04, 0xb4)
 i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 winner;
     i32 index;
@@ -1224,6 +1244,7 @@ i32 combatManager::IsWinner(H2_ENUM_PARAM(CombatSide, i32) side) {
     return winner;
 }
 
+VA(0x00428bb8, 0xdd8)
 void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     if (!m_inCastleCombat)
         return;
@@ -1602,6 +1623,7 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     LogStr("CA2");
 }
 
+VA(0x00429990, 0x662)
 void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     if (!m_inCastleCombat)
         return;
@@ -1742,6 +1764,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     LogStr("KA2");
 }
 
+VA(0x00429ff2, 0x128)
 i32 combatManager::ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 experienceValue6 = 0;
     i32 index;
@@ -1759,6 +1782,7 @@ i32 combatManager::ExperienceValueOfStack(H2_ENUM_PARAM(CombatSide, i32) side) {
     return experienceValue6;
 }
 
+VA(0x0042a11a, 0x68)
 void combatManager::ResetHitByCreature(void) {
     CombatSide side;
     i32 index;
@@ -1769,18 +1793,22 @@ void combatManager::ResetHitByCreature(void) {
     }
 }
 
+VA(0x0042a182, 0x2c)
 i32 ValidHex(i32 hex) {
     return hex >= 0 && hex <= COMBAT_VALID_HEX_MAX ? 1 : 0;
 }
 
+VA(0x0042a1ae, 0xb)
 void combatManager::SaveCombatBorder(void) {
     return;
 }
 
+VA(0x0042a1b9, 0xb)
 void combatManager::DrawCombatBorder(void) {
     return;
 }
 
+VA(0x0042a1c4, 0x46a)
 void combatManager::SetupAndLoadObstacles(void) {
     u8 obstacleUsed[COMBAT_OBSTACLE_TYPE_COUNT];
     i32 overlayIndex14;
@@ -1900,6 +1928,7 @@ void combatManager::SetupAndLoadObstacles(void) {
     }
 }
 
+VA(0x0042a62e, 0x263)
 void combatManager::MakeCreaturesVanish(void) {
     ResetLimitCreature();
     i32 side3;
@@ -1946,6 +1975,7 @@ void combatManager::MakeCreaturesVanish(void) {
     );
 }
 
+VA(0x0042a891, 0x89)
 void combatManager::LowerDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
     drawbridgeSample = LoadPlaySample("drawbrg.82m");
@@ -1963,6 +1993,7 @@ void combatManager::LowerDoor(void) {
     WaitEndSample(drawbridgeSample, -1);
 }
 
+VA(0x0042a91a, 0xb6)
 void combatManager::RaiseDoor(void) {
     SAMPLE2 drawbridgeSample = NULL_SAMPLE2;
     drawbridgeSample = LoadPlaySample("drawbrg.82m");
@@ -1979,6 +2010,7 @@ void combatManager::RaiseDoor(void) {
     WaitEndSample(drawbridgeSample, -1);
 }
 
+VA(0x0042a9d0, 0x61)
 void combatManager::TestRaiseDoor(void) {
     if (m_inCastleCombat && m_drawbridgeState == COMBAT_DRAWBRIDGE_LOWERED
         && m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX].m_occupantSide == COMBAT_SIDE_NONE
@@ -1989,6 +2021,7 @@ void combatManager::TestRaiseDoor(void) {
     }
 }
 
+VA(0x0042aa31, 0x8e)
 i32 combatManager::InCastle(i32 hex) {
     return ((hex < CASTLE_INTERIOR_ROW_0_FIRST || hex > CASTLE_INTERIOR_ROW_0_LAST)
             && (hex < CASTLE_INTERIOR_ROW_1_FIRST || hex > CASTLE_INTERIOR_ROW_1_LAST)
@@ -2004,6 +2037,7 @@ i32 combatManager::InCastle(i32 hex) {
                : 0;
 }
 
+VA(0x0042aabf, 0x29b)
 i32 combatManager::ShotIsThroughWall(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 sourceHex, i32 targetHex
 ) {
@@ -2071,6 +2105,7 @@ i32 combatManager::ShotIsThroughWall(
     return 0;
 }
 
+VA(0x0042ad5a, 0x4e0)
 void combatManager::ShootMissile(
     i32 sourceX,
     i32 sourceY,
@@ -2225,6 +2260,7 @@ void combatManager::ShootMissile(
     delete missileBackground9;
 }
 
+VA(0x0042b23a, 0x10c)
 void combatManager::CombatSystemOptions(void) {
     tag_message message;
     bCPrefsChanged = 0;
@@ -2241,6 +2277,7 @@ void combatManager::CombatSystemOptions(void) {
     DrawFrame(1, 0, 0, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
 }
 
+VA(0x0042b346, 0x1e1)
 void UpdateCombatSystemOptions(i32 initialDraw) {
     tag_message message;
     message.type = COMBAT_SYSTEM_OPTION_EVENT;
@@ -2293,6 +2330,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
 }
 
+VA(0x0042b527, 0x283)
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;
     i32 bDone = 0;

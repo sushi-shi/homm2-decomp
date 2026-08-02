@@ -994,6 +994,7 @@ H2_ENUM_BEGIN(AdvVisitMetadata)
     VISIT_BIT_INDEX_MASK = 0x1f
 H2_ENUM_END(AdvVisitMetadata)
 
+VA(0x00401000, 0x2f2)
 advManager::advManager(void) {
     m_groundTiles = NULL;
     m_puzzleIcon = NULL;
@@ -1054,6 +1055,7 @@ advManager::advManager(void) {
     m_cursorTurning = 0;
 }
 
+VA(0x004012f2, 0x955)
 i32 advManager::Open(i32 id) {
     iCurBottomView = BOTTOM_VIEW_NONE;
     m_openState = 0;
@@ -1268,6 +1270,7 @@ i32 advManager::Open(i32 id) {
     return 0;
 }
 
+VA(0x00401c47, 0x3b8)
 void advManager::Close(void) {
     static i16 s_closeBorderFreeLineBase = CLOSE_BORDER_FREE_LINE_BASE;
 
@@ -1341,6 +1344,7 @@ void advManager::Close(void) {
     m_active = false;
 }
 
+VA(0x00401fff, 0xd8)
 void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
 #if H2_STRICT_ENUMS
     CursorSampleSet cursorSampleSet =
@@ -1370,6 +1374,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     }
 }
 
+VA(0x004020d7, 0x581)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
     town* viewTownValue;
@@ -1551,6 +1556,7 @@ class mapCell* advManager::DoAdvCommand(void) {
     return eventCellState;
 }
 
+VA(0x00402674, 0x15b)
 void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     i32 shouldChange;
     i32 translationIndex;
@@ -1596,6 +1602,7 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     }
 }
 
+VA(0x004027cf, 0xd07)
 MessageDispatchResult advManager::Main(struct tag_message& message) {
     if (KBTickCount() > glTimers[0] && ComboDraw(1)) {
         UpdateScreen(1, 0);
@@ -2108,10 +2115,12 @@ finish_message:
     return processResult;
 }
 
+VA(0x004035d2, 0x17)
 void advManager::Reseed(i32, i32) {
     giSeedingValid = 0;
 }
 
+VA(0x004035e9, 0xc85)
 MessageDispatchResult
 advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell) {
     i32 mouseX;
@@ -2471,6 +2480,7 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00404308, 0x33e)
 MessageDispatchResult advManager::ProcessDeSelect(
     struct tag_message* message,
     i32* result,
@@ -2613,6 +2623,7 @@ inline hero* GetHeroSlot(i32 i) {
     return &gpGame->m_heroRecs[i];
 }
 
+VA(0x00404692, 0x518)
 i32 advManager::ProcessSearch(i32 x, i32 y) {
     mapCell* currentCell;
     i32 playerState;
@@ -2783,6 +2794,7 @@ search_end:
     return 1;
 }
 
+VA(0x00404baa, 0x909)
 MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     i32 heroXHero;
     i32 heroYCoordinate;
@@ -3038,6 +3050,7 @@ MessageDispatchResult advManager::ProcessHover(i32 mouseX, i32 mouseY) {
     }
 }
 
+VA(0x004054df, 0x239)
 void advManager::UpdateScreen(i32, i32 forceUpdate) {
     if (forceUpdate == 0 && bShowIt == 0) {
         if (KBTickCount() > glTimers[0]) {
@@ -3097,6 +3110,7 @@ void advManager::UpdateScreen(i32, i32 forceUpdate) {
     Process1WindowsMessage();
 }
 
+VA(0x00405718, 0x4a2)
 void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updateBottomView) {
     i32 drawY;
     i32 drawX;
@@ -3244,10 +3258,12 @@ void advManager::CompleteDraw(i32 originX, i32 originY, i32 forceDraw, i32 updat
     }
 }
 
+VA(0x00405bba, 0x2f)
 void advManager::CompleteDraw(i32 update) {
     CompleteDraw(m_mapOriginX, m_mapOriginY, update, 1);
 }
 
+VA(0x00405be9, 0x3e0)
 i32 advManager::GetCloudLookup(i32 x, i32 y) {
     u32 cloudMask = 0;
 
@@ -3325,6 +3341,7 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     return giCloudType[cloudMask];
 }
 
+VA(0x00405fc9, 0x245e)
 void advManager::DrawCell(
     i32 mapX,
     i32 mapY,
@@ -4355,6 +4372,7 @@ void advManager::DrawCell(
     }
 }
 
+VA(0x00408427, 0x85)
 class mapCell* advManager::GetCell(i32 x, i32 y) {
     if (x < 0 || y < 0 || x >= MAP_WIDTH || MAP_HEIGHT <= y) {
         return m_mapData->Cells();
@@ -4363,6 +4381,7 @@ class mapCell* advManager::GetCell(i32 x, i32 y) {
     }
 }
 
+VA(0x004084ac, 0xc43)
 void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     i32 maxXLocal;
     i32 unusedRadarRowLocal;
@@ -4809,6 +4828,7 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
     }
 }
 
+VA(0x00409363, 0x1047)
 void advManager::QuickInfo(i32 cellX, i32 cellY) {
     i32 quickInfoShowFlag = 1;
     mapCell* currentCell = NULL;
@@ -5271,6 +5291,7 @@ quick_info_ready:
     delete windowLocal;
 }
 
+VA(0x0040a491, 0x2fe)
 void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateScreen) {
     hero* locatorHero8;
     i32 mobilityFrame18;
@@ -5376,6 +5397,7 @@ void advManager::UpdateHeroLocator(i32 locatorSlot, i32 drawWindow, i32 updateSc
     }
 }
 
+VA(0x0040a78f, 0xcd)
 void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
     double scrollStep;
@@ -5403,6 +5425,7 @@ void advManager::UpdateHeroLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
+VA(0x0040a85c, 0x292)
 void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     i32 locatorSlot;
     tag_message locatorMessage14;
@@ -5477,6 +5500,7 @@ void advManager::UpdateTownLocators(i32 drawWindow, i32 updateScreen) {
     }
 }
 
+VA(0x0040aaee, 0x15e)
 void advManager::UpdBottomView(i32 forceUpdate, i32 drawWindow, i32 updateScreen) {
     i32 updated;
 
@@ -5533,6 +5557,7 @@ update_bottom_view:
     forceUpdate = gbForceUpdate;
 }
 
+VA(0x0040ac4c, 0x126)
 void advManager::ClearBottomView(void) {
     i32 widgetIndex;
 
@@ -5557,6 +5582,7 @@ void advManager::ClearBottomView(void) {
     iLastAnimFrame = BOTTOM_VIEW_NO_ANIMATION;
 }
 
+VA(0x0040ad72, 0x53b)
 i32 advManager::UpdBottomViewEnemyTurn(void) {
     i32 updated;
     tag_message message;
@@ -5719,6 +5745,7 @@ i32 advManager::UpdBottomViewEnemyTurn(void) {
     return updated;
 }
 
+VA(0x0040b2ad, 0x387)
 i32 advManager::UpdBottomViewNewTurn(void) {
     static i16 s_newTurnLineBase = NEW_TURN_LINE_BASE;
 
@@ -5825,6 +5852,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     return 1;
 }
 
+VA(0x0040b634, 0x384)
 i32 advManager::UpdBottomViewResMsg(void) {
     static i16 s_resourceViewLineBase = RESOURCE_VIEW_LINE_BASE;
 
@@ -5938,6 +5966,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
     return 1;
 }
 
+VA(0x0040b9b8, 0x37b)
 i32 advManager::UpdBottomViewKingdom(void) {
     static i16 s_kingdomViewLineBase = KINGDOM_VIEW_LINE_BASE;
 
@@ -6051,6 +6080,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     return 1;
 }
 
+VA(0x0040bd33, 0x5ef)
 i32 advManager::UpdBottomViewHero(void) {
     static i16 s_bottomHeroLineBase = BOTTOM_HERO_LINE_BASE;
 
@@ -6216,6 +6246,7 @@ i32 advManager::UpdBottomViewHero(void) {
     return 1;
 }
 
+VA(0x0040c322, 0xdfb)
 void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 windowY) {
     static i16 s_quickViewLineBase = QUICK_VIEW_LINE_BASE;
 
@@ -6563,6 +6594,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(monsterIconRef);
 }
 
+VA(0x0040d11d, 0xdc)
 char* advManager::GetArmySizeName(
     i32 armySize,
     H2_ENUM_PARAM(ArmySizeNameVariant, i32) grammar
@@ -6598,6 +6630,7 @@ char* advManager::GetArmySizeName(
     return gArmySizeNames[ARMY_SIZE_LEGION][IDX(grammar)];
 }
 
+VA(0x0040d1f9, 0xcd1)
 void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 windowY) {
     static i16 s_townViewLineBase = TOWN_VIEW_LINE_BASE;
 
@@ -6964,6 +6997,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     gpResourceManager->Dispose(monsterIconLocal);
 }
 
+VA(0x0040deca, 0x100)
 void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     static i16 s_redrawBorderFreeLineBase = REDRAW_BORDER_FREE_LINE_BASE;
 
@@ -6993,15 +7027,18 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
 }
 
+VA(0x0040dfca, 0x14)
 void advManager::DeactivateCurrTown(void) {
     gpCurPlayer->m_currentTown = -1;
 }
 
+VA(0x0040dfde, 0x1c)
 void advManager::DeactivateCurrHero(void) {
     DemobilizeCurrHero();
     gpCurPlayer->m_currentHero = -1;
 }
 
+VA(0x0040dffa, 0x42)
 void advManager::MobilizeCurrHero(i32 update) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7012,6 +7049,7 @@ void advManager::MobilizeCurrHero(i32 update) {
     SetHeroContext(gpCurPlayer->m_currentHero, update);
 }
 
+VA(0x0040e03c, 0x14a)
 void advManager::DemobilizeCurrHero(void) {
     if (gpCurPlayer->m_currentHero == INVALID_HERO) {
         return;
@@ -7040,6 +7078,7 @@ void advManager::DemobilizeCurrHero(void) {
     UpdateScreen(0, 0);
 }
 
+VA(0x0040e186, 0x1ee)
 void advManager::SetTownContext(i32 townId) {
     DeactivateCurrHero();
     gpCurPlayer->m_currentTown = static_cast<i8>(townId);
@@ -7086,6 +7125,7 @@ void advManager::SetTownContext(i32 townId) {
     m_lastHoverCell = 0;
 }
 
+VA(0x0040e374, 0x34a)
 void advManager::SetHeroContext(i32 heroId, i32 update) {
     if (heroId == INVALID_HERO) {
         return;
@@ -7169,6 +7209,7 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
     }
 }
 
+VA(0x0040e6be, 0x1e7)
 void advManager::DoHeroKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_heroLocatorPage;
     i32 locatorCount29 = gpCurPlayer->m_heroCount;
@@ -7216,6 +7257,7 @@ void advManager::DoHeroKnob(void) {
     UpdateHeroLocators(1, 1);
 }
 
+VA(0x0040e8a5, 0x1e7)
 void advManager::DoTownKnob(void) {
     i32 previousPageSlot = gpCurPlayer->m_townLocatorPage;
     i32 locatorCount29 = gpCurPlayer->m_townCount;
@@ -7263,6 +7305,7 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
+VA(0x0040ea8c, 0x2df)
 void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
     if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -7390,6 +7433,7 @@ void advManager::CastSpell(SpellType spell) {
     }
 }
 
+VA(0x0040edaf, 0x24b)
 i32 SaveGame(void) {
     i32 result11 = 0;
     i32 humanPlayerCount1 = 0;
@@ -7443,6 +7487,7 @@ i32 SaveGame(void) {
     return result11;
 }
 
+VA(0x0040effa, 0x8b)
 void advManager::CheckCastSpell(void) {
     if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
         MobilizeCurrHero(0);
@@ -7455,6 +7500,7 @@ void advManager::CheckCastSpell(void) {
     }
 }
 
+VA(0x0040f085, 0x285)
 MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     if (glTimers[0] < KBTickCount()) {
         gpAdvManager->CompleteDraw(gpAdvManager->m_mapOriginX, gpAdvManager->m_mapOriginY, 0, 1);
@@ -7543,6 +7589,7 @@ MessageDispatchResult DimensionDoorHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0040f30a, 0x12b4)
 i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     i32 updateCount;
     i32 mapCellX;
@@ -7931,10 +7978,12 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
     return 1;
 }
 
+VA(0x004105be, 0x2d)
 i32 advManager::ComboDraw(i32 update) {
     return ComboDraw(m_mapOriginX, m_mapOriginY, update);
 }
 
+VA(0x004105eb, 0x2b6)
 void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) {
     i32 soundLayer;
     i32 maxSounds = SOUND_CELL_COUNT;
@@ -8044,6 +8093,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     }
 }
 
+VA(0x004108a1, 0x5a)
 void advManager::CheckLoadSample(i32 index) {
     if (m_loopingSamples[index] == NULL) {
         TrimLoopingSounds(LOOPING_SOUND_LIMIT);
@@ -8052,6 +8102,7 @@ void advManager::CheckLoadSample(i32 index) {
     }
 }
 
+VA(0x004108fb, 0x33f)
 AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     mapCell* currentCell = &m_mapData->Row(y)[x];
     AdventureEnvironmentSoundId soundId = ADVMGR_ENVIRONMENT_SOUND_NONE;
@@ -8173,6 +8224,7 @@ AdventureEnvironmentSoundId advManager::GetSoundId(i32 x, i32 y) {
     return ADVMGR_ENVIRONMENT_SOUND_NONE;
 }
 
+VA(0x00410d39, 0x217)
 void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 soundSlot;
     i32 distanceLimit;
@@ -8230,6 +8282,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     }
 }
 
+VA(0x00410f50, 0x3c3)
 void advManager::TeleportTo(
     hero* mapHero,
     i32 destinationX,
@@ -8370,6 +8423,7 @@ void advManager::TeleportTo(
     ForceNewHover();
 }
 
+VA(0x00411313, 0x202)
 void advManager::DimensionDoor(void) {
     hero* targetHero;
     heroWindow* dimensionDoorWindow;
@@ -8417,6 +8471,7 @@ void advManager::DimensionDoor(void) {
     }
 }
 
+VA(0x00411515, 0xe0)
 MessageDispatchResult TownPortalHandler(tag_message& message) {
     tag_message choiceMessage;
 
@@ -8456,6 +8511,7 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004115f5, 0x408)
 void advManager::TownGate(SpellType spellId) {
     i32 distance0;
     hero* targetHero;
@@ -8581,6 +8637,7 @@ void advManager::TownGate(SpellType spellId) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
 }
 
+VA(0x004119fd, 0x54c)
 void advManager::SummonBoat(void) {
     i32 boatIndex9;
     mapCell* destinationCell;
@@ -8744,6 +8801,7 @@ void advManager::SummonBoat(void) {
     }
 }
 
+VA(0x00411f49, 0x44e)
 void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     i32 routeReachable8;
     i32 pathFound5;
@@ -8890,6 +8948,7 @@ void advManager::ShowRoute(i32 redraw, i32, i32 updateButton) {
     }
 }
 
+VA(0x00412397, 0xd4)
 void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     hero* currentHero;
 
@@ -8923,6 +8982,7 @@ void advManager::HideRoute(i32 redraw, i32 clearDestination, i32 updateButton) {
     }
 }
 
+VA(0x0041246b, 0x6b)
 void advManager::CheckDimHero(void) {
     if (!gbThisNetHumanPlayer[giCurPlayer] || gpCurPlayer->CurrentHero() == INVALID_HERO) {
         return;
@@ -8934,6 +8994,7 @@ void advManager::CheckDimHero(void) {
     }
 }
 
+VA(0x004124d6, 0x5d)
 void advManager::CheckDimNextHeroBut(void) {
     BaseWidgetCommand frame;
     if (!gbThisNetHumanPlayer[giCurPlayer] || !gpCurPlayer->HasMobileHero()) {
@@ -8949,6 +9010,7 @@ void advManager::CheckDimNextHeroBut(void) {
     );
 }
 
+VA(0x00412533, 0x115)
 void advManager::SeedTo(i32 targetX, i32 targetY) {
     hero* currentHero;
 
@@ -8993,6 +9055,7 @@ void advManager::SeedTo(i32 targetX, i32 targetY) {
     }
 }
 
+VA(0x00412648, 0x4f)
 void advManager::ForceNewHover(void) {
     i32 x;
     i32 y;
@@ -9005,6 +9068,7 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
+VA(0x00412697, 0x188)
 void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
     i32 originX;
     i32 originY;
@@ -9071,6 +9135,7 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
     }
 }
 
+VA(0x0041283f, 0x16e)
 void advManager::CheckScreenScroll(void) {
     i32 mouseX6;
     i32 mouseY1;
@@ -9116,6 +9181,7 @@ void advManager::CheckScreenScroll(void) {
     }
 }
 
+VA(0x004129ad, 0x65)
 i32 advManager::MouseInScrollZone(void) {
     i32 x;
     i32 y;
@@ -9130,6 +9196,7 @@ i32 advManager::MouseInScrollZone(void) {
     return 0;
 }
 
+VA(0x00412a12, 0x268)
 void advManager::SetInitialMapOrigin(void) {
     game* gameState;
     town* currentTown9;
@@ -9190,6 +9257,7 @@ void advManager::SetInitialMapOrigin(void) {
     CheckDimNextHeroBut();
 }
 
+VA(0x00412c7a, 0x212)
 void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpMouseManager->SetPointer("advmice.mse", POINTER_DEFAULT, MOUSE_AUTO_CURSOR_TYPE);
@@ -9224,6 +9292,7 @@ void advManager::LoadRemote(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
+VA(0x00412e8c, 0x1b0)
 char* advManager::CheckHandleNet(void) {
     RemoteMessage* packet9;
     i32 playerExited5;
@@ -9293,6 +9362,7 @@ char* advManager::CheckHandleNet(void) {
     return NULL;
 }
 
+VA(0x00413081, 0x9b)
 MessageDispatchResult
 advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     if (message.type == ADVMGR_REMOTE_WAIT_MOUSE_MESSAGE) {
@@ -9325,6 +9395,7 @@ advManager::CheckHandleNetPlayerWait(struct tag_message& message, i32 doMain) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+VA(0x0041311c, 0x1b8)
 void advManager::TrimLoopingSounds(i32 maxSamples) {
     if (giHighMemBuffer > 0) {
         maxSamples += giHighMemBuffer / HIGH_MEMORY_BUFFER_DIVISOR;
@@ -9376,6 +9447,7 @@ disposeSamples:
     }
 }
 
+VA(0x004132d4, 0xc8)
 void advManager::DisableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9398,6 +9470,7 @@ void advManager::DisableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
+VA(0x0041339c, 0xc8)
 void advManager::EnableButtons(void) {
     if (gpAdvManager->m_active != 1) {
         return;
@@ -9420,6 +9493,7 @@ void advManager::EnableButtons(void) {
     m_adventureWindow->BroadcastMessage(msg);
 }
 
+VA(0x00413464, 0x142)
 void advManager::SaveAdventureBorder(void) {
     static i16 s_saveBorderAllocLineBase = SAVE_BORDER_ALLOC_LINE_BASE;
 
@@ -9455,6 +9529,7 @@ void advManager::SaveAdventureBorder(void) {
     }
 }
 
+VA(0x004135a6, 0x134)
 void advManager::DrawAdventureBorder(void) {
     if (m_adventureBorder == NULL) {
         return;
@@ -9488,6 +9563,7 @@ void advManager::DrawAdventureBorder(void) {
     }
 }
 
+VA(0x004136da, 0x37a)
 i32 advManager::FindAdjacentMonster(
     i32 originX,
     i32 originY,
@@ -9574,6 +9650,7 @@ foundAdjacentMonster:
     return 1;
 }
 
+VA(0x00413a54, 0xf9)
 void ComputeAdvNetControl(void) {
     if (!gbRemoteOn) {
         gbThisNetGotAdventureControl = true;
@@ -9604,6 +9681,7 @@ void ComputeAdvNetControl(void) {
     }
 }
 
+VA(0x00413b4d, 0xda)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     if (mapExtra[MAP_WIDTH * y + x] & mask) {
         return 1;
@@ -9626,6 +9704,7 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
     return 0;
 }
 
+VA(0x00413c27, 0x4d3)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
     // Retail's fixed reveal permutation is payload, not a numeric domain.
@@ -9747,6 +9826,7 @@ void advManager::ViewPuzzle(void) {
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
 }
 
+VA(0x004140fa, 0x79)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     // Retail reserves six unreferenced four-byte locals before the implicit `this` slot.
     i32 unusedPuzzle0;
@@ -9774,6 +9854,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
+VA(0x00414173, 0x294)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
@@ -9848,6 +9929,7 @@ void advManager::AdvPanel(void) {
     }
 }
 
+VA(0x00414417, 0x14b)
 MessageDispatchResult APanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
@@ -9916,6 +9998,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00414562, 0x1cd)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
@@ -9969,6 +10052,7 @@ i32 advManager::ControlPanel(void) {
     return 0;
 }
 
+VA(0x00414747, 0x279)
 MessageDispatchResult CPanelHandler(tag_message& message) {
     i32 handled = 0;
     if (message.type == MESSAGE_WIDGET) {
@@ -10074,6 +10158,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004149c0, 0x1a2)
 void advManager::SystemOptions(void) {
     tag_message message6;
     i32 oldInterfaceMode;
@@ -10119,6 +10204,7 @@ void advManager::SystemOptions(void) {
     }
 }
 
+VA(0x00414b62, 0x320)
 void UpdateSystemOptions(i32 initialDraw) {
     tag_message message;
     AdventureMusicQuality musicQuality;
@@ -10224,6 +10310,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
+VA(0x00414e82, 0x52d)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];
@@ -10486,6 +10573,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004153f7, 0x59)
 i32 GetMobilityFrame(i32 mobility) {
     i32 frame = mobility * MOBILITY_SCALE / MOBILITY_DIVISOR;
     if (frame < 0) {
@@ -10501,6 +10589,7 @@ i32 GetMobilityFrame(i32 mobility) {
     return frame;
 }
 
+VA(0x00415450, 0x5c)
 i32 GetManaFrame(i32 mana) {
     i32 frame = mana / MANA_DIVISOR;
     if (frame == 0 && mana >= MANA_MIN_VISIBLE) {
@@ -10516,6 +10605,7 @@ i32 GetManaFrame(i32 mana) {
     return frame;
 }
 
+VA(0x004154ac, 0x43d)
 i32 advManager::DoVisions(hero* visionHero) {
     char visionMessageResult[VISIONS_MESSAGE_BUFFER_SIZE];
     CreatureType creatureData;
@@ -10651,6 +10741,7 @@ showVision:
     return 1;
 }
 
+VA(0x004158e9, 0xc2)
 i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     i32 heroIndex;
     hero* crystalHero;
@@ -10672,6 +10763,7 @@ i32 advManager::IsCrystalBallInEffect(i32 x, i32 y, i32 radius) {
     return 0;
 }
 
+VA(0x004159ab, 0x68)
 u8 StopOnTrigger(class mapCell* cell) {
     MapObjectType type = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     if (type != MAP_OBJECT_EXPANSION_OBJECT) {

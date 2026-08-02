@@ -31,7 +31,9 @@ MIRROR_DIR = OUT_DIR / "inc-lower"          # lowercase mirror of UPPERCASE MSVC
 
 MSC_COMPAT = "12.00"                          # VC6 == cl 12.00 == _MSC_VER 1200
 TARGET = "i386-pc-windows-msvc"
-DEFINES = ["/D_X86_", "/DWIN32", "/D_WINDOWS", "/D_MT"]   # 32-bit Win32 app, static CRT (/MT)
+# 32-bit Win32 app, static CRT (/MT); NO_STRICT mirrors the retail compile
+# (see config/units.toml - handles stay void*).
+DEFINES = ["/D_X86_", "/DWIN32", "/D_WINDOWS", "/D_MT", "/DNO_STRICT"]
 
 
 def resolve_msvc_include():

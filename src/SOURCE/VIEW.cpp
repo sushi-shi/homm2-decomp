@@ -70,6 +70,7 @@ H2_ENUM_BEGIN(ViewGeneralHoverHelp)
     GENERAL_HOVER_HELP_CAPTAIN   = 6
 H2_ENUM_END(ViewGeneralHoverHelp)
 
+VA(0x004ad4b0, 0x6f9)
 i32 combatManager::ViewGeneral(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 allowActions, i32 quickView
 ) {
@@ -238,6 +239,7 @@ i32 combatManager::ViewGeneral(
     return 0;
 }
 
+VA(0x004adba9, 0x286)
 MessageDispatchResult HandleViewGeneral(tag_message& message) {
     i16 msgConst;
     i16 msgConst27;
@@ -360,6 +362,7 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004ade2f, 0x143)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     if (viewedArmy == NULL)
         return;

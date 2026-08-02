@@ -41,6 +41,7 @@ i32 bInCheckChangeCursor = 0;
 static SInputManagerText gInputManagerText =
     {"ReleaseCapture Failed", "ReleaseCapture Failed", "inputManager"};
 
+VA(0x004bbf40, 0x3ec)
 i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
@@ -130,6 +131,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     return event->type == MESSAGE_NONE;
 }
 
+VA(0x004bc390, 0x367)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;
@@ -236,6 +238,7 @@ afterMouseCoordinates:
     return event->type == MESSAGE_NONE;
 }
 
+VA(0x004bc720, 0x9e)
 inputManager::inputManager(void) : baseManager() {
     m_active = false;
     m_mouseMessageActive = 0;
@@ -254,6 +257,7 @@ static inline void ResetEventQueue(inputManager* manager) {
     manager->m_readIndex = 0;
 }
 
+VA(0x004bc7c0, 0x92)
 i32 inputManager::Open(i32 priority) {
     memset(m_eventRing, 0, sizeof(m_eventRing));
     ResetEventQueue(this);
@@ -267,6 +271,7 @@ i32 inputManager::Open(i32 priority) {
     return 0;
 }
 
+VA(0x004bc860, 0x47)
 void inputManager::Close(void) {
     if (m_active == true) {
         ResetEventQueue(this);
@@ -275,10 +280,12 @@ void inputManager::Close(void) {
     }
 }
 
+VA(0x004bc8b0, 0xf)
 MessageDispatchResult inputManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+VA(0x004bc8c0, 0x25)
 void inputManager::Flush(void) {
     ResetEventQueue(this);
 }
@@ -290,6 +297,7 @@ static inline void InitializeEmptyEvent(tag_message& event) {
     event.payload.unknown.unknown0x0c = 0;
 }
 
+VA(0x004bc8f0, 0xd2)
 tag_message inputManager::GetEvent(void) {
     tag_message event;
     PollSound();
@@ -308,6 +316,7 @@ tag_message inputManager::GetEvent(void) {
     return event;
 }
 
+VA(0x004bc9d0, 0xbd)
 tag_message inputManager::PeekEvent(void) {
     tag_message event;
     PollSound();
@@ -325,8 +334,10 @@ tag_message inputManager::PeekEvent(void) {
     return event;
 }
 
+VA(0x004bca90, 0xd)
 void inputManager::SetMouseCoords(i32, i32) {}
 
+VA(0x004bcaa0, 0x21)
 void inputManager::SetKeyCodeType(
     H2_ENUM_PARAM(InputManagerKeyCodeType, i32) keyCodeType
 ) {
@@ -334,6 +345,7 @@ void inputManager::SetKeyCodeType(
     ResetEventQueue(this);
 }
 
+VA(0x004bcb10, 0x1f3)
 void inputManager::AsciiConvert(tag_message& event) {
     if ((event.payload.keyboard.keyCode >= INPUT_SCAN_F1
          && event.payload.keyboard.keyCode <= INPUT_SCAN_F10)
@@ -418,6 +430,7 @@ void inputManager::AsciiConvert(tag_message& event) {
     }
 }
 
+VA(0x004bcd90, 0x46a)
 void inputManager::MakeScanCodeTable(void) {
     for (u32 scanCode = 0; scanCode < INPUT_SCAN_CODE_CAPACITY; scanCode++)
         m_keyState[scanCode] = EncodeScanCode(scanCode);
@@ -513,6 +526,7 @@ void inputManager::MakeScanCodeTable(void) {
     m_keyState[IDX(INPUT_SCAN_F12)] = EncodeScanCode(INPUT_SCAN_F12);
 }
 
+VA(0x004bd200, 0xfe)
 void CheckChangeCursor(i32 x, i32 y, i32 force) {
     if (bInCheckChangeCursor != 0)
         return;
@@ -537,6 +551,7 @@ void CheckChangeCursor(i32 x, i32 y, i32 force) {
     bInCheckChangeCursor = 0;
 }
 
+VA(0x004bd300, 0x151)
 void inputManager::ForceMouseMove(void) {
     i32 mouseMessageActive = gpInputManager->m_mouseMessageActive;
     if (mouseMessageActive != 0)

@@ -32,6 +32,7 @@ static i16 s_wsSendSourceLineBase = 279; // NOLINT(readability-magic-numbers)
 static i16 s_wsReceiveSourceLineBase = 359; // NOLINT(readability-magic-numbers)
 static i16 s_wsEvaluateSourceLineBase = 413; // NOLINT(readability-magic-numbers)
 
+VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     struct hostent* pHost;
@@ -191,6 +192,7 @@ i16 wsnet_init(void) {
     return 0;
 }
 
+VA(0x004b2262, 0xb3)
 void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
@@ -210,6 +212,7 @@ void wsnet_term(void) {
     CleanupDPVars();
 }
 
+VA(0x004b2315, 0x1d3)
 void wsSendMessage(
     i32 destination,
     H2_ENUM_PARAM(NetworkPacketType, u8) type,
@@ -272,6 +275,7 @@ void wsSendMessage(
     H2_FREE_AT(packetBuffer, RETAIL_FILE, s_wsSendSourceLineBase + 57);
 }
 
+VA(0x004b24e8, 0x4d)
 i32 wsnet_snd(i32 destination, i32 size, void* data) {
     i32 result;
 
@@ -288,6 +292,7 @@ i32 wsnet_snd(i32 destination, i32 size, void* data) {
     return 0;
 }
 
+VA(0x004b2535, 0x93)
 i16 wsnet_rcv(i16, u16, void* data) {
     u32 size;
 
@@ -304,6 +309,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
+VA(0x004b25c8, 0x8b)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
     i32 addressLength = sizeof(remote);
@@ -336,6 +342,7 @@ void wsProcessMessages(void) {
 // Byte-exact against retail: the startup fields are read through the raw
 // message bytes (sign-extended char loads, no struct-typed local) and the
 // three INFO/CONFIRM dialogs call NormalDialog directly. Keep these spellings.
+VA(0x004b2653, 0x330)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
     tag_message windowMessage;
@@ -443,6 +450,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
+VA(0x004b2997, 0x1c)
 i32 wsWaitForFirstGuest(void) {
     wsProcessMessages();
     if (giNumHumanPlayers > 1)
@@ -450,6 +458,7 @@ i32 wsWaitForFirstGuest(void) {
     return 0;
 }
 
+VA(0x004b29b3, 0xaa)
 i32 wsWaitForExtraGuests(void) {
     tag_message message;
 
@@ -475,6 +484,7 @@ i32 wsWaitForExtraGuests(void) {
     return 0;
 }
 
+VA(0x004b2a5d, 0xfd)
 i32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
         case 0:

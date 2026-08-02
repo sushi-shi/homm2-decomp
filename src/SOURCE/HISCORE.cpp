@@ -15,6 +15,7 @@
 #include <fcntl.h>
 #include <io.h>
 
+VA(0x00465110, 0x59)
 highScoreManager::highScoreManager(void) {
     i32 entry;
 
@@ -23,6 +24,7 @@ highScoreManager::highScoreManager(void) {
     m_showCampaignScores = 0;
 }
 
+VA(0x00465169, 0x16d)
 i32 highScoreManager::Open(i32 id) {
     if (giHighScoreType == HIGH_SCORE_CAMPAIGN || giHighScoreType == HIGH_SCORE_EXPANSION_CAMPAIGN)
         m_showCampaignScores = 1;
@@ -47,6 +49,7 @@ i32 highScoreManager::Open(i32 id) {
     return HIGH_SCORE_MANAGER_OPEN_OK;
 }
 
+VA(0x004652d6, 0x4f)
 void highScoreManager::Close(void) {
     gpWindowManager->FadeScreen(FADE_OUT, HIGH_SCORE_FADE_STEPS, NULL);
     gpWindowManager->RemoveWindow(m_window);
@@ -54,6 +57,7 @@ void highScoreManager::Close(void) {
     m_active = false;
 }
 
+VA(0x00465325, 0x1ca)
 MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     i32 result;
     i32 entry;
@@ -120,6 +124,7 @@ MessageDispatchResult highScoreManager::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004654ef, 0x6bc)
 void highScoreManager::Update(void) {
     i32 entry;
     HighScoreEntry scoreEntry;

@@ -71,6 +71,7 @@ H2_ENUM_BEGIN(FileRequesterPrivateConstant)
     SCROLL_CENTER_DIVISOR       = 2
 H2_ENUM_END(FileRequesterPrivateConstant)
 
+VA(0x0048e730, 0x70)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
     i32 file = _open(gText, _O_BINARY);
@@ -82,10 +83,12 @@ i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     return 1;
 }
 
+VA(0x0048e7a0, 0x10)
 i32 CheckSumIsDemoOK(char*) {
     return 1;
 }
 
+VA(0x0048e7b0, 0x1a)
 i32 ShowThisMapGame(char* filename) {
     return 1;
 
@@ -104,10 +107,12 @@ i32 ShowThisMapGame(char* filename) {
     return 0;
 }
 
+VA(0x0048e826, 0x10)
 i32 ShowThisMap(char*) {
     return 1;
 }
 
+VA(0x0048e836, 0x723)
 i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly) {
     char fullPath[FILE_REQUESTER_PATH_SIZE];
     SMapHeader mapHeader;
@@ -239,6 +244,7 @@ i32 fileRequester::InitializeFiles(char* directory, char* pattern, i32 countOnly
     return m_fileCount;
 }
 
+VA(0x0048ef59, 0x156)
 fileRequester::fileRequester(
     i32 x,
     i32 y,
@@ -275,6 +281,7 @@ fileRequester::fileRequester(
     m_result = RESULT_PENDING;
 }
 
+VA(0x0048f0af, 0x4f)
 i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
     FileRequesterMapSizeFilter oldFilter = giMapSizeFilter;
     giMapSizeFilter = filter;
@@ -283,6 +290,7 @@ i32 fileRequester::MapExistsForFilter(FileRequesterMapSizeFilter filter) {
     return result > 0;
 }
 
+VA(0x0048f0fe, 0x62)
 void fileRequester::SetupFiles(void) {
     CleanUpData();
     m_fileCount = 0;
@@ -292,6 +300,7 @@ void fileRequester::SetupFiles(void) {
     InitializeFiles(m_directory, m_filePattern, 0);
 }
 
+VA(0x0048f160, 0xa0)
 void fileRequester::CleanUpData(void) {
     if (m_fileNames != NULL) {
         delete[] m_fileNames;
@@ -307,6 +316,7 @@ void fileRequester::CleanUpData(void) {
     m_mapHeaders = NULL;
 }
 
+VA(0x0048f200, 0x75)
 void fileRequester::Close(void) {
     if (!m_active) {
         return;
@@ -319,6 +329,7 @@ void fileRequester::Close(void) {
     m_active = false;
 }
 
+VA(0x0048f275, 0x44b)
 i32 fileRequester::Open(i32 id) {
     strcpy(gLastFilename, "");
     m_previousMenu = hmnuCurrent;
@@ -426,6 +437,7 @@ i32 fileRequester::Open(i32 id) {
     return 0;
 }
 
+VA(0x0048f6c0, 0x77)
 void fileRequester::SetOK(i32 enabled) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
@@ -450,6 +462,7 @@ void fileRequester::SetOK(i32 enabled) {
     m_window->BroadcastMessage(message);
 }
 
+VA(0x0048f737, 0x102a)
 MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     i32 acceptStep = 0;
     i32 iResult;
@@ -896,6 +909,7 @@ MessageDispatchResult fileRequester::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0049085b, 0x25b)
 void fileRequester::DoKnob(void) {
     i32 oldTopIndex = m_topIndex;
     double gutterStep9 = fGutterTravelLength / (m_fileCount - (iMaxListSize - 1));
@@ -948,6 +962,7 @@ void fileRequester::DoKnob(void) {
     Update(1);
 }
 
+VA(0x00490ab6, 0xa9e)
 void fileRequester::Update(i32 drawWindow) {
     tag_message broadcastMessage;
     char localStorage[FILE_REQUESTER_UPDATE_STORAGE_SIZE];
@@ -1133,6 +1148,7 @@ void fileRequester::Update(i32 drawWindow) {
     }
 }
 
+VA(0x00491554, 0x12b)
 char* fileRequester::GetFilename(void) {
     if (m_mode != FILE_REQUESTER_SAVE_GAME
         && (m_selectedIndex < 0 || m_fileCount <= m_selectedIndex)) {

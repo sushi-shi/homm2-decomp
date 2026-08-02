@@ -28,6 +28,7 @@ static inline i32 IconRowVisible(i32 currentY, i32 clipBottom, i32 clipTop) {
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
+VA(0x004c14c0, 0x750)
 void IconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

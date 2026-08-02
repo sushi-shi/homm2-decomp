@@ -29,6 +29,7 @@ struct sCDTest_Track_Data cdTestTrackData[TRACK_COUNT] = {
 
 static HREDBOOK cdTestRedbook = NULL;
 
+// @remove
 i32 CDTest_Init(void) {
     cdTestRedbook = AIL_redbook_open(0);
     if (cdTestRedbook != NULL)
@@ -37,16 +38,19 @@ i32 CDTest_Init(void) {
         return 0;
 }
 
+// @remove
 void CDTest_Cleanup(void) {
     if (cdTestRedbook != NULL)
         AIL_redbook_close(cdTestRedbook);
     cdTestRedbook = NULL;
 }
 
+// @remove
 i32 CDTest_VerifyCDQuick(void) {
     return CDTest_VerifyTrack(Random(FIRST_TRACK, TRACK_COUNT));
 }
 
+// @remove
 i32 CDTest_VerifyCDThorough(void) {
     for (i32 i = FIRST_TRACK; i <= TRACK_COUNT; ++i) {
         if (!CDTest_VerifyTrack(i))
@@ -55,6 +59,7 @@ i32 CDTest_VerifyCDThorough(void) {
     return 1;
 }
 
+// @remove
 i32 CDTest_VerifyTrack(i32 track) {
     U32 first;
     U32 end;
@@ -71,6 +76,7 @@ i32 CDTest_VerifyTrack(i32 track) {
     return 1;
 }
 
+// @remove
 i32 CDTest_GenerateTable(char* file) {
     char line[OUTPUT_LINE_SIZE];
     U32 first;

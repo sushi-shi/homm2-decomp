@@ -277,6 +277,7 @@ H2_ENUM_END(OverviewDialogConstant)
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
 
+VA(0x00479ba0, 0x1e1a)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     static i16 overviewDynamicSourceLine = 116;
     i32 row;
@@ -1024,6 +1025,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     }
 }
 
+VA(0x0047b9e6, 0x344)
 void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     static i16 overviewSetupSourceLine = 698;
     i32 title;
@@ -1104,6 +1106,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
 }
 
+VA(0x0047bd2a, 0x77)
 void game::SetupResources(void) {
     H2_ENUM_STORAGE_STEPPED(ResourceType, i32) resourceIdx;
     tag_message message;
@@ -1118,6 +1121,7 @@ void game::SetupResources(void) {
     }
 }
 
+VA(0x0047bda1, 0x4b2)
 void game::Overview(void) {
     static i16 overviewDialogSourceLine = 778;
     char mineCounts4[OVERVIEW_MINE_COUNT_CAPACITY];
@@ -1233,6 +1237,7 @@ void game::Overview(void) {
     iconWidgetDynamic = NULL;
 }
 
+VA(0x0047c253, 0x2ae)
 void game::DoKnob(void) {
     tag_message pendingMessage4;
     float scrollRange13;
@@ -1320,6 +1325,7 @@ void game::DoKnob(void) {
     }
 }
 
+VA(0x0047c501, 0x441)
 MessageDispatchResult OverviewHandler(struct tag_message& message) {
     i32 closeDialog5;
     i32 quickView15;
@@ -1462,6 +1468,7 @@ MessageDispatchResult OverviewHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0047c9b3, 0x4a3)
 i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     i32 row0;
     i32 selectionIndex2;

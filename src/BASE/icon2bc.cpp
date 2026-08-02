@@ -35,6 +35,7 @@ static inline u8* ColorTableOutsideSource(u8* src, i32 currentX, i32 clipX) {
     return src + (clipX - currentX);
 }
 
+VA(0x004c0ca0, 0x7cf)
 void IconToBitmapColorTable(
     class icon* srcIcon,
     class bitmap* dest,

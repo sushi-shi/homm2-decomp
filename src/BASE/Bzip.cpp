@@ -143,22 +143,27 @@ FILE* outputHandleJustInCase;
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
 
+VA(0x004c6ea0, 0xf)
 void initialiseCRC(void) {
     globalCrc = 0xffffffff;
 }
 
+VA(0x004c6eb0, 0xc)
 u32 getFinalCRC(void) {
     return ~globalCrc;
 }
 
+VA(0x004c6ec0, 0xa)
 u32 getGlobalCRC(void) {
     return globalCrc;
 }
 
+VA(0x004c6ed0, 0x13)
 void setGlobalCRC(u32 newCrc) {
     globalCrc = newCrc;
 }
 
+VA(0x004c6ef0, 0x57)
 BitStream* bsOpenReadStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
@@ -172,6 +177,7 @@ BitStream* bsOpenReadStream(FILE* f) {
     return bs;
 }
 
+VA(0x004c6f50, 0x57)
 BitStream* bsOpenWriteStream(FILE* f) {
     BitStream* bs;
     if (bsInUse)
@@ -185,6 +191,7 @@ BitStream* bsOpenWriteStream(FILE* f) {
     return bs;
 }
 
+VA(0x004c6fb0, 0x8a)
 void bsPutBit(BitStream* bs, i32 bit) {
     i32 retVal;
     if (bs->buffLive == 8) {
@@ -200,6 +207,7 @@ void bsPutBit(BitStream* bs, i32 bit) {
     }
 }
 
+VA(0x004c7040, 0x81)
 i32 bsGetBit(BitStream* bs) {
     i32 retVal;
     if (bs->buffLive > 0) {
@@ -217,6 +225,7 @@ i32 bsGetBit(BitStream* bs) {
     }
 }
 
+VA(0x004c70d0, 0x45)
 u8 bsGetUChar(BitStream* bs) {
     Int32 i;
     UInt32 c;
@@ -228,12 +237,14 @@ u8 bsGetUChar(BitStream* bs) {
     return (UChar)c;
 }
 
+VA(0x004c7120, 0x43)
 void bsPutUChar(BitStream* bs, u8 c) {
     i32 i;
     for (i = 7; i >= 0; i--)
         bsPutBit(bs, ((u32)c >> i) & 1);
 }
 
+VA(0x004c7170, 0xde)
 void bsClose(BitStream* bs) {
     IntNative retVal;
     if (!bsInUse)
@@ -256,6 +267,7 @@ void bsClose(BitStream* bs) {
     ERROR_IF_EOF(retVal);
 }
 
+VA(0x004c7250, 0x20)
 u32 minUInt32(u32 a, u32 b) {
     if (a < b)
         return a;
@@ -263,6 +275,7 @@ u32 minUInt32(u32 a, u32 b) {
         return b;
 }
 
+VA(0x004c7270, 0x43)
 void arithCodeBitPlusFollow(BitStream* bs, UInt32 bit) {
     bsPutBit(bs, bit);
     while (bitsOutstanding > 0) {
@@ -271,12 +284,14 @@ void arithCodeBitPlusFollow(BitStream* bs, UInt32 bit) {
     }
 }
 
+VA(0x004c72c0, 0x29)
 void arithCodeStartEncoding(BitStream* bs) {
     bigL = 0;
     bigR = TWO_TO_THE(smallB - 1);
     bitsOutstanding = 0;
 }
 
+VA(0x004c72f0, 0x40)
 void arithCodeDoneEncoding(BitStream* bs) {
     Int32 i;
 
@@ -284,6 +299,7 @@ void arithCodeDoneEncoding(BitStream* bs) {
         arithCodeBitPlusFollow(bs, (bigL >> (i - 1)) & 0x1);
 }
 
+VA(0x004c7330, 0x5c)
 void arithCodeStartDecoding(BitStream* bs) {
     Int32 i;
 
@@ -294,10 +310,12 @@ void arithCodeStartDecoding(BitStream* bs) {
         bigD = (bigD << 1) + bsGetBit(bs);
 }
 
+VA(0x004c7390, 0xb)
 void arithCodeDoneDecoding(BitStream* bs) {
 
 }
 
+VA(0x004c73a0, 0xa5)
 void arithCodeRenormalise_Encode(BitStream* bs) {
     while (bigR <= TWO_TO_THE(smallB - 2)) {
         if ((bigR + bigL) <= TWO_TO_THE(smallB - 1)) {
@@ -314,6 +332,7 @@ void arithCodeRenormalise_Encode(BitStream* bs) {
     }
 }
 
+VA(0x004c7450, 0xcb)
 void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
     UInt32 cumulativeLow8, cumulativeHigh2, totalFrequency14, rangeWidth29, rangeProduct8;
     Int32 symbolIndex9;
@@ -340,6 +359,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
         panic(const_cast<char*>("arithCodeSymbol: too many bits outstanding"));
 }
 
+VA(0x004c7520, 0xf8)
 Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
     UInt32 cumulativeLow7, scaledTarget1, cumulativeHigh1, totalFrequency13, rangeWidth28,
         rangeProduct26, decodedSymbol5;
@@ -373,6 +393,7 @@ Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
     return (Int32)decodedSymbol5;
 }
 
+VA(0x004c7620, 0xc8)
 void initModel(
     Model* m,
     Char* initName,
@@ -401,11 +422,13 @@ void initModel(
     m->numScalings = 0;
 }
 
+VA(0x004c76f0, 0x34)
 void dumpModelStats(Model* m) {
     sprintf(gText, "model %s:\t scalings %d\n", m->name, m->numScalings);
     LogStr(gText);
 }
 
+VA(0x004c7730, 0xaf)
 void updateModel(Model* m, Int32 symbol) {
     UInt32 i;
 
@@ -421,11 +444,13 @@ void updateModel(Model* m, Int32 symbol) {
     }
 }
 
+VA(0x004c77e0, 0x2c)
 void putSymbol(Model* m, Int32 symbol, BitStream* bs) {
     arithCodeSymbol(bs, m, symbol);
     updateModel(m, symbol);
 }
 
+VA(0x004c7810, 0x2c)
 Int32 getSymbol(Model* m, BitStream* bs) {
     Int32 symbol;
 
@@ -435,14 +460,17 @@ Int32 getSymbol(Model* m, BitStream* bs) {
     return symbol;
 }
 
+VA(0x004c7840, 0x20)
 void initBogusModel(void) {
     initModel(&bogusModel, const_cast<char*>("bogus"), 256, 0, 256);
 }
 
+VA(0x004c7860, 0x2a)
 void putUChar(BitStream* bs, UChar c) {
     putSymbol(&bogusModel, 1 + (UInt32)c, bs);
 }
 
+VA(0x004c7890, 0x5d)
 void putInt32(BitStream* bs, Int32 i) {
     putUChar(bs, (UChar)(((UInt32)i >> 24) & 0xFF));
     putUChar(bs, (UChar)(((UInt32)i >> 16) & 0xFF));
@@ -450,6 +478,7 @@ void putInt32(BitStream* bs, Int32 i) {
     putUChar(bs, (UChar)((UInt32)i & 0xFF));
 }
 
+VA(0x004c78f0, 0x5d)
 void putUInt32(BitStream* bs, UInt32 i) {
     putUChar(bs, (UChar)((i >> 24) & 0xFF));
     putUChar(bs, (UChar)((i >> 16) & 0xFF));
@@ -457,10 +486,12 @@ void putUInt32(BitStream* bs, UInt32 i) {
     putUChar(bs, (UChar)(i & 0xFF));
 }
 
+VA(0x004c7950, 0x1b)
 UChar getUChar(BitStream* bs) {
     return (UChar)(getSymbol(&bogusModel, bs) - 1);
 }
 
+VA(0x004c7970, 0x74)
 Int32 getInt32(BitStream* bs) {
     UInt32 res = 0;
 
@@ -471,6 +502,7 @@ Int32 getInt32(BitStream* bs) {
     return (Int32)res;
 }
 
+VA(0x004c79f0, 0x74)
 UInt32 getUInt32(BitStream* bs) {
     UInt32 res = 0;
 
@@ -481,6 +513,7 @@ UInt32 getUInt32(BitStream* bs) {
     return res;
 }
 
+VA(0x004c7a70, 0xc8)
 void initModels(void) {
     initModel(&models[BASIS], const_cast<char*>("basis"), 11, 12, 1000);
     initModel(&models[MODEL_2_3], const_cast<char*>("2-3"), 2, 4, 1000);
@@ -492,6 +525,7 @@ void initModels(void) {
     initModel(&models[MODEL_128_255], const_cast<char*>("128-255"), 128, 1, 1000);
 }
 
+VA(0x004c7b40, 0x5f)
 void dumpAllModelStats(void) {
     dumpModelStats(&bogusModel);
     dumpModelStats(&models[BASIS]);
@@ -504,6 +538,7 @@ void dumpAllModelStats(void) {
     dumpModelStats(&models[MODEL_128_255]);
 }
 
+VA(0x004c7ba0, 0xfe)
 Int32 getMTFVal(BitStream* bs) {
     Int32 retVal;
 
@@ -545,6 +580,7 @@ Int32 getMTFVal(BitStream* bs) {
     return retVal;
 }
 
+VA(0x004c7cd0, 0x220)
 void sendMTFVal(BitStream* bs, Int32 n) {
     if (n == RUNA)
         putSymbol(&models[BASIS], VAL_RUNA, bs);
@@ -597,6 +633,7 @@ void sendMTFVal(BitStream* bs, Int32 n) {
     }
 }
 
+VA(0x004c7ef0, 0x81)
 void FreeCompressStructures(void) {
     if (words != NULL)
         H2_FREE_AT(words, RETAIL_FILE, 0x461);
@@ -609,6 +646,7 @@ void FreeCompressStructures(void) {
     zptr = NULL;
 }
 
+VA(0x004c7f80, 0xab)
 void allocateCompressStructures(void) {
     Int32 n = 100000 * blockSize100k;
     FreeCompressStructures();
@@ -624,6 +662,7 @@ void allocateCompressStructures(void) {
     }
 }
 
+VA(0x004c8030, 0x81)
 void FreeDecompressStructures(void) {
     if (block != NULL)
         H2_FREE_AT(block, RETAIL_FILE, 0x489);
@@ -636,6 +675,7 @@ void FreeDecompressStructures(void) {
     zptr = NULL;
 }
 
+VA(0x004c80c0, 0xc3)
 void setDecompressStructureSizes(Int32 newSize100k) {
     if (newSize100k == blockSize100k)
         return;
@@ -656,38 +696,47 @@ void setDecompressStructureSizes(Int32 newSize100k) {
     }
 }
 
+VA(0x004c8190, 0x17)
 UInt32 GETALL(Int32 a) {
     return words[a];
 }
 
+VA(0x004c81b0, 0x37)
 void SETREST16(Int32 a, UInt32 w) {
     words[a] = (words[a] & 0xffff0000) | (((UInt32)(w)) & 0x0000ffff);
 }
 
+VA(0x004c81f0, 0x35)
 void SETFIRST16(Int32 a, UInt32 w) {
     words[a] = (words[a] & 0x0000ffff) | (((UInt32)(w)) << 16);
 }
 
+VA(0x004c8230, 0x37)
 void SETREST(Int32 a, UInt32 w) {
     words[a] = (words[a] & 0xff000000) | (((UInt32)(w)) & 0x00ffffff);
 }
 
+VA(0x004c8270, 0x3a)
 void SETFIRST(Int32 a, UChar c) {
     words[a] = (words[a] & 0x00ffffff) | (((UInt32)(c)) << 24);
 }
 
+VA(0x004c82b0, 0x3a)
 void SETSECOND(Int32 a, UChar c) {
     words[a] = (words[a] & 0xff00ffff) | (((UInt32)(c)) << 16);
 }
 
+VA(0x004c82f0, 0x37)
 void SETTHIRD(Int32 a, UChar c) {
     words[a] = (words[a] & 0xffff00ff) | (((UInt32)(c)) << 8);
 }
 
+VA(0x004c8330, 0x34)
 void SETFOURTH(Int32 a, UChar c) {
     words[a] = (words[a] & 0xffffff00) | (((UInt32)(c)));
 }
 
+VA(0x004c8370, 0x49)
 Int32 NORMALISE(Int32 p) {
     return IF_THEN_ELSE(
         ((p) < 0),
@@ -696,14 +745,17 @@ Int32 NORMALISE(Int32 p) {
     );
 }
 
+VA(0x004c83c0, 0x2f)
 Int32 NORMALISEHI(Int32 p) {
     return IF_THEN_ELSE(((p) >= lastPP), ((p)-lastPP), (p));
 }
 
+VA(0x004c83f0, 0x2a)
 Int32 NORMALISELO(Int32 p) {
     return IF_THEN_ELSE(((p) < 0), ((p) + lastPP), (p));
 }
 
+VA(0x004c8420, 0x2b)
 Int32 STRONG_NORMALISE(Int32 p) {
     while (p < 0) {
         p += lastPP;
@@ -711,6 +763,7 @@ Int32 STRONG_NORMALISE(Int32 p) {
     return p % lastPP;
 }
 
+VA(0x004c8450, 0xa7)
 void sendZeroes(BitStream* outStream, Int32 zeroesPending) {
     UInt32 bitsToSend;
     Int32 numBits;
@@ -738,6 +791,7 @@ void sendZeroes(BitStream* outStream, Int32 zeroesPending) {
     }
 }
 
+VA(0x004c8500, 0x1c0)
 void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
     UChar yy0[256];
     Int32 i9, j6;
@@ -783,6 +837,7 @@ void moveToFrontCodeAndSend(BitStream* outStream, Bool thisIsTheLastBlock) {
     sendMTFVal(outStream, EOB);
 }
 
+VA(0x004c86c0, 0x331)
 Bool getAndMoveToFrontDecode(BitStream* inStream) {
     UChar symbols[256];
     Int32 i, j, encodedOrigin, nextSym, blockLimit;
@@ -855,6 +910,7 @@ LOOPSTART:
     return True;
 }
 
+VA(0x004c8a00, 0x81)
 void stripe(void) {
     Int32 i;
 
@@ -866,6 +922,7 @@ void stripe(void) {
     }
 }
 
+VA(0x004c8a90, 0x42)
 void copyOffsetWords(void) {
     Int32 i;
 
@@ -873,6 +930,7 @@ void copyOffsetWords(void) {
         words[lastPP + i] = words[i];
 }
 
+VA(0x004c8ae0, 0x13f)
 Bool fullGt(Int32 i1, Int32 i2) {
     Int32 i1orig = i1;
 
@@ -929,6 +987,7 @@ Bool fullGt(Int32 i1, Int32 i2) {
         zptr[RC(zr8)] = zt;                                                                        \
     }
 
+VA(0x004c8c20, 0x53c)
 void qsortFull(Int32 left, Int32 right) {
     Int32 pivot3, v3;
     Int32 i, j12;
@@ -1009,6 +1068,7 @@ void qsortFull(Int32 left, Int32 right) {
 #undef SWAP
 #undef ISORT_BELOW
 
+VA(0x004c9160, 0xb9)
 Bool trivialGt(Int32 i1, Int32 i2) {
     Int32 k;
 
@@ -1028,6 +1088,7 @@ Bool trivialGt(Int32 i1, Int32 i2) {
     return False;
 }
 
+VA(0x004c9220, 0xf4)
 void shellTrivial(void) {
     Int32 i, j, h, bigN2;
     Int32 v;
@@ -1056,6 +1117,7 @@ void shellTrivial(void) {
     } while (h != 1);
 }
 
+VA(0x004c9320, 0x40e)
 void sortIt(void) {
     lastPP = last + 1;
 
@@ -1182,6 +1244,7 @@ void sortIt(void) {
     }
 }
 
+VA(0x004c9750, 0x87)
 void doReversibleTransformation(void) {
     Int32 i;
 
@@ -1203,6 +1266,7 @@ void doReversibleTransformation(void) {
         panic(const_cast<char*>("doReversibleTransformation"));
 }
 
+VA(0x004c97e0, 0x1b2)
 void undoReversibleTransformation(void) {
     Int32 frequencyByChar[256];
     Int32 i, j, currentChar, total;
@@ -1232,6 +1296,7 @@ void undoReversibleTransformation(void) {
 
 #define SPOT_BASIS_STEP 8000
 
+VA(0x004c99a0, 0x14f)
 void spotBlock(Bool weAreCompressing) {
     Int32 spotPos, delta, updatedDelta;
 
@@ -1298,6 +1363,7 @@ void spotBlock(Bool weAreCompressing) {
     }
 }
 
+VA(0x004c9b20, 0x134)
 Int32 getRLEpair(FILE* src) {
     Int32 runLen;
     IntNative ch, latestCh;
@@ -1334,6 +1400,7 @@ Int32 getRLEpair(FILE* src) {
     }
 }
 
+VA(0x004c9c60, 0x20c)
 Bool loadAndRLEsource(FILE* src) {
     Int32 currentChar, allowableBlockSize;
 
@@ -1388,6 +1455,7 @@ Bool loadAndRLEsource(FILE* src) {
     return (currentChar == MY_EOF);
 }
 
+VA(0x004c9e70, 0x176)
 void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
     IntNative retVal6;
     Int32 lastCharToSpew0, i01, count19, chPrev, ch04;
@@ -1435,6 +1503,7 @@ void unRLEandDump(FILE* dst, Bool thisIsTheLastBlock) {
         unblockError();
 }
 
+VA(0x004c9ff0, 0x257)
 void compressStream(FILE* stream, FILE* zStream) {
     IntNative retVal;
     Bool thisIsTheLastBlock9;
@@ -1514,6 +1583,7 @@ void compressStream(FILE* stream, FILE* zStream) {
     }
 }
 
+VA(0x004ca250, 0x233)
 Bool uncompressStream(FILE* zStream, FILE* stream) {
     Bool thisIsTheLastBlock2;
     BitStream* zbs02;
@@ -1585,12 +1655,16 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     return True;
 }
 
+VA(0x004ca490, 0x5)
 void showFileNames(void) {}
 
+VA(0x004ca4a0, 0x5)
 void cleanUpAndFail(void) {}
 
+VA(0x004ca4b0, 0xb)
 void panic(char* s) {}
 
+VA(0x004ca4c0, 0x45)
 void crcError(UInt32 crcStored, UInt32 crcComputed) {
     sprintf(
         gText,
@@ -1607,6 +1681,7 @@ void crcError(UInt32 crcStored, UInt32 crcComputed) {
     cleanUpAndFail();
 }
 
+VA(0x004ca510, 0x40)
 void compressedStreamEOF(void) {
     sprintf(
         gText,
@@ -1620,6 +1695,7 @@ void compressedStreamEOF(void) {
     cleanUpAndFail();
 }
 
+VA(0x004ca550, 0x40)
 void ioError(void) {
     sprintf(gText, "\n%s: I/O or other error, bailing out.  Possible reason follows.\n", progName);
     LogStr(gText);
@@ -1628,6 +1704,7 @@ void ioError(void) {
     cleanUpAndFail();
 }
 
+VA(0x004ca590, 0x31)
 void blockOverrun(void) {
     sprintf(
         gText,
@@ -1641,6 +1718,7 @@ void blockOverrun(void) {
     cleanUpAndFail();
 }
 
+VA(0x004ca5d0, 0x31)
 void unblockError(void) {
     sprintf(
         gText,
@@ -1653,6 +1731,7 @@ void unblockError(void) {
     cleanUpAndFail();
 }
 
+VA(0x004ca610, 0x31)
 void bitStreamEOF(void) {
     sprintf(
         gText,
@@ -1665,12 +1744,14 @@ void bitStreamEOF(void) {
     cleanUpAndFail();
 }
 
+VA(0x004ca650, 0x2c)
 void __cdecl mySignalCatcher(IntNative* n) {
     sprintf(gText, "\n%s: Control-C (or similar) caught, quitting.\n", progName);
     LogStr(gText);
     cleanUpAndFail();
 }
 
+VA(0x004ca680, 0x65)
 void mySIGSEGVorSIGBUScatcher(IntNative* n) {
     if (compressing) {
         sprintf(
@@ -1696,6 +1777,7 @@ void mySIGSEGVorSIGBUScatcher(IntNative* n) {
     cleanUpAndFail();
 }
 
+VA(0x004ca6f0, 0x45)
 void uncompressOutOfMemory(Int32 draw, Int32 blockSize) {
     sprintf(
         gText,
@@ -1711,6 +1793,7 @@ void uncompressOutOfMemory(Int32 draw, Int32 blockSize) {
     cleanUpAndFail();
 }
 
+VA(0x004ca740, 0x45)
 void compressOutOfMemory(Int32 draw, Int32 blockSize) {
     sprintf(
         gText,
@@ -1726,6 +1809,7 @@ void compressOutOfMemory(Int32 draw, Int32 blockSize) {
     cleanUpAndFail();
 }
 
+VA(0x004ca790, 0x66)
 Bool endsInBz(Char* name) {
     Int32 n = strlen(name);
     if (n <= 3)
@@ -1733,6 +1817,7 @@ Bool endsInBz(Char* name) {
     return (name[n - 3] == '.' && name[n - 2] == 'n' && name[n - 1] == 'w');
 }
 
+VA(0x004ca800, 0xa4)
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
@@ -1753,6 +1838,7 @@ void compress(Char* name) {
     retVal3 = remove(inName);
 }
 
+VA(0x004ca8b0, 0xc2)
 void uncompress(Char* name) {
     FILE* inStr;
     FILE* outStr2;
@@ -1776,6 +1862,7 @@ void uncompress(Char* name) {
     ERROR_IF_NOT_ZERO(retVal3);
 }
 
+VA(0x004ca980, 0x259)
 i32l EncodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;
@@ -1817,6 +1904,7 @@ i32l EncodeData(char* dst, char* src, u32l srcLen) {
     return flen3;
 }
 
+VA(0x004cabe0, 0x266)
 i32l DecodeData(char* dst, char* src, u32l srcLen) {
     char fname[450] = {0};
     i32 fd;

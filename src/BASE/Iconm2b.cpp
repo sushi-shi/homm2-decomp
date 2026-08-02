@@ -39,6 +39,7 @@ static inline u8* MonoInitialRow(bitmap* dest, i16 pitch, i32 currentY) {
     return dest->m_pixels + currentY * pitch;
 }
 
+VA(0x004c67b0, 0x2e8)
 void MonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

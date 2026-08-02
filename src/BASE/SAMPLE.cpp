@@ -15,6 +15,7 @@ H2_ENUM_END(SampleConstant)
 static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
+VA(0x004ce250, 0x1b7)
 sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -70,6 +71,7 @@ sample::sample(char* name, i32l channelType, i32l volume, i32l loopCount)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
 }
 
+VA(0x004ce490, 0x8b)
 inline sample::~sample() {
 #line 97
     H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
@@ -78,6 +80,7 @@ inline sample::~sample() {
     m_playbackData.volume = 0;
 }
 
+VA(0x004ce520, 0xbd)
 MIDIWrap::MIDIWrap(char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
@@ -92,6 +95,7 @@ MIDIWrap::MIDIWrap(char* name)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
+VA(0x004ce610, 0x3d)
 inline MIDIWrap::~MIDIWrap() {
 #line 118
     H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);

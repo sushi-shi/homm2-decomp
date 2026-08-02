@@ -26,6 +26,7 @@ static u8 s_color;
 static u32 s_dimLen;
 static i32 s_clipR;
 
+VA(0x004c1c60, 0x8a2)
 void FlipIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

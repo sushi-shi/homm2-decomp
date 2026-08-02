@@ -9,6 +9,7 @@
 
 static STilesetSourceFiles gTilesetSourceFiles = {RETAIL_FILE, RETAIL_FILE};
 
+VA(0x004ce090, 0xf1)
 tileset::tileset(u32l id)
     : resource(RESOURCE_CATEGORY_TILESET, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
@@ -20,6 +21,7 @@ tileset::tileset(u32l id)
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
 
+VA(0x004ce1c0, 0x33)
 inline tileset::~tileset() {
     H2_FREE_AT(m_data, gTilesetSourceFiles.destruction, 0x1c);
 }

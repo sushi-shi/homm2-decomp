@@ -106,12 +106,14 @@ H2_ENUM_BEGIN(CombatSmallViewStatRow)
     STAT_ROW_LUCK       = 5
 H2_ENUM_END(CombatSmallViewStatRow)
 
+VA(0x00437d10, 0x38)
 void combatManager::NoShowCombatLog(char* message) {
     char logMessage[COMBAT_MESSAGE_LOG_BUFFER_SIZE];
     sprintf(logMessage, "NC: %s", message);
     LogStr(logMessage);
 }
 
+VA(0x00437d48, 0xba)
 void combatManager::ClearCombatMessages(i32 force) {
     m_combatMessagePending = 0;
     if (strlen(m_currentCombatMessage) <= 1 && strlen(m_previousCombatMessage) <= 1)
@@ -125,12 +127,14 @@ void combatManager::ClearCombatMessages(i32 force) {
     }
 }
 
+VA(0x00437e02, 0x46)
 void combatManager::CheckUpdateCombatMessages(void) {
     if (m_combatMessagePending != 0 && m_combatMessageExpiration != 0
         && m_combatMessageExpiration < KBTickCount())
         CombatMessage("", 1, 0, 1);
 }
 
+VA(0x00437e48, 0x3a7)
 void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPrevious, i32 clear) {
     char* newlinePtr;
     char wrappedMessage[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
@@ -219,6 +223,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
+VA(0x004381ef, 0x337)
 void combatManager::CombatMessage(CombatMessageCommand messageType) {
     army* currentArmyPtr;
     army* targetArmy;
@@ -311,6 +316,7 @@ void combatManager::CombatMessage(CombatMessageCommand messageType) {
     CombatMessage(gText, 1, 0, 0);
 }
 
+VA(0x00438566, 0xdf)
 void combatManager::ResetLimitCreature(void) {
     CombatSide side;
     i32 armySlotIndex;
@@ -335,6 +341,7 @@ void combatManager::ResetLimitCreature(void) {
     giMinExtentY = COMBAT_MAX_EXTENT_Y;
 }
 
+VA(0x00438645, 0x51)
 void combatManager::UpdateCombatArea(void) {
     if (gbNoShowCombat != 0)
         return;
@@ -346,6 +353,7 @@ void combatManager::UpdateCombatArea(void) {
     gbEnlargeScreenBlit = true;
 }
 
+VA(0x00438696, 0x1a9)
 void combatManager::SetupGridForArmy(army* armyPtr) {
     i32 attackMask;
     CombatSide savedTargetSide;
@@ -386,6 +394,7 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
     }
 }
 
+VA(0x0043883f, 0x4d8)
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     i32 retval;
     i32 minX;
@@ -527,6 +536,7 @@ CopyGridState:
     return retval;
 }
 
+VA(0x00438d17, 0x341)
 void combatManager::DrawBackground(void) {
     icon* backgroundIcon;
     i32 unusedBackgroundHeight;
@@ -692,6 +702,7 @@ void combatManager::DrawBackground(void) {
     m_backgroundDrawn = 1;
 }
 
+VA(0x00439058, 0x560)
 void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     i32 oldLimit;
     i32 copyHeight;
@@ -822,6 +833,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     m_mouseGridHex = hexIndex;
 }
 
+VA(0x004395b8, 0x148d)
 void combatManager::DrawFrame(
     i32 updateScreen,
     i32 computeExtent,
@@ -1368,6 +1380,7 @@ finish:
     PollSound();
 }
 
+VA(0x0043aad6, 0xb29)
 void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     i32 iconX;
     i32 iconY2;

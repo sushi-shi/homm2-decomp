@@ -34,6 +34,7 @@ static inline u8 FlipColorDimValue(u8* dst, u8* palette) {
     return palette[*dst];
 }
 
+VA(0x004d4960, 0x8bb)
 void FlipIconToBitmapColorTable(
     class icon* srcIcon,
     class bitmap* dest,

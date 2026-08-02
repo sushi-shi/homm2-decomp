@@ -17,6 +17,7 @@ typedef enum FontConstant {
     WRAP_HEIGHT_LINE_COUNT      = 2
 } FontConstant;
 
+VA(0x004c3620, 0xe5)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
@@ -32,10 +33,12 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
     gbLoadingMonoIcon = false;
 }
 
+VA(0x004c3740, 0x5b)
 font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
 
+VA(0x004c3800, 0x222)
 void font::DrawStringExecute(
     char* str,
     i32 x,
@@ -137,11 +140,13 @@ void font::DrawStringExecute(
     }
 }
 
+VA(0x004c3a30, 0x3d)
 void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
     m_suppressDraw = 0;
     DrawStringExecute(s, x, y, mode, 0, 0, FONT_DRAW_SCREEN_WIDTH, FONT_DRAW_SCREEN_HEIGHT);
 }
 
+VA(0x004c3a70, 0xa8)
 i32 font::GetCharacterWidth(u8 c) {
     if (c == '{' || c == '}') {
         return 0;
@@ -157,6 +162,7 @@ i32 font::GetCharacterWidth(u8 c) {
     }
 }
 
+VA(0x004c4b70, 0x1f8)
 void font::DrawBoundedString(
     char* str,
     i32 x,
@@ -238,6 +244,7 @@ void font::DrawBoundedString(
 #undef CENTER_DIVISOR
 #undef WRAP_HEIGHT_LINE_COUNT
 
+VA(0x004c4d70, 0xc7)
 i32 font::LineLength(char* str, i32 maxW) {
     i32 s = strlen(str);
     char aa = ' ';
@@ -272,6 +279,7 @@ i32 font::LineLength(char* str, i32 maxW) {
     return z;
 }
 
+VA(0x004c4e40, 0x8b)
 i32 font::LineWidth(char* str) {
     i32 s = strlen(str);
     i32 q, u;

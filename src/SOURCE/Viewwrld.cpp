@@ -109,6 +109,7 @@ H2_ENUM_BEGIN(ViewWorldGroundFrame)
     GROUND_FRAME_EIGHT = 8
 H2_ENUM_END(ViewWorldGroundFrame)
 
+VA(0x004adfb0, 0x2ba)
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
     i8 paletteData[WORLD_PALETTE_SIZE];
     char* viewIconNames[LEGEND_COUNT];
@@ -163,6 +164,7 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     SetPalette(paletteData, 1);
 }
 
+VA(0x004ae26a, 0x51)
 void advManager::VWCleanup(void) {
     gpResourceManager->Dispose(pVWGround);
     gpResourceManager->Dispose(pVWFlags);
@@ -170,6 +172,7 @@ void advManager::VWCleanup(void) {
     gpResourceManager->Dispose(pVWLetters);
 }
 
+VA(0x004ae2bb, 0x233)
 void advManager::VWInit(i32 centerX, i32 centerY) {
     if (giViewWorldScale == VIEW_WORLD_SCALE_FAR)
         giViewWorldScaleLookup = SCALE_INDEX_FAR;
@@ -211,6 +214,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     UpdateRadar(1, 0);
 }
 
+VA(0x004ae4ee, 0x118a)
 void advManager::VWCompleteDraw(void) {
     i32 mineHighlight18;
     i32 heroHighlight8;
@@ -703,6 +707,7 @@ void advManager::VWCompleteDraw(void) {
     );
 }
 
+VA(0x004af6d0, 0x4d4)
 MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     float radarScale6;
     i32 radarY1;

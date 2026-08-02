@@ -56,6 +56,7 @@ H2_ENUM_CLASS_BEGIN(SoundStateSpan)
     SOUND_STATE_RESET_SPAN = 0xae
 H2_ENUM_CLASS_END(SoundStateSpan)
 
+// @remove
 void HandleMCIError(i32 errorCode, char* commandString) {
     mciGetErrorStringA(errorCode, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT);
     sprintf(
@@ -75,6 +76,7 @@ void HandleMCIError(i32 errorCode, char* commandString) {
     ShutDown(gText);
 }
 
+// @remove
 void soundManager::ValidatePreviousPosition(i32 track) {
     char buf[CD_POSITION_BUFFER_CAPACITY];
     char* cur;
@@ -93,6 +95,7 @@ void soundManager::ValidatePreviousPosition(i32 track) {
         CDPreviousPosition[track][0] = 0;
 }
 
+// @remove
 void soundManager::CDStop(void) {
     char position[CD_POSITION_BUFFER_CAPACITY];
     if (gbNoSound != 0)
@@ -115,6 +118,7 @@ void soundManager::CDStop(void) {
     CDPlaying = 0;
 }
 
+// @remove
 i32 soundManager::CDIsPlaying(void) {
     if (gbNoSound != 0)
         return 0;
@@ -128,6 +132,7 @@ i32 soundManager::CDIsPlaying(void) {
     return strcmpi(lpszReturnString, "playing") == 0;
 }
 
+VA(0x004b59b0, 0x123)
 void soundManager::CDStartup(void) {
     if (gbNoSound != 0)
         return;
@@ -152,6 +157,7 @@ void soundManager::CDStartup(void) {
     m_cdReady = 1;
 }
 
+// @remove
 void soundManager::CDShutdown(void) {
     if (gbNoSound != 0)
         return;
@@ -169,6 +175,7 @@ void soundManager::CDShutdown(void) {
         HandleMCIError(nMCIError, CommandString);
 }
 
+// @remove
 void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     i32 local_c;
     u32l local_8;
@@ -197,6 +204,7 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     auxSetVolume(m_auxDevice, local_8);
 }
 
+// @remove
 void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     i32l t1;
     i32l t2;
@@ -302,6 +310,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     m_currentTrack = static_cast<char>(track);
 }
 
+// @remove
 void soundManager::CDPoll(void) {
     if (gbNoSound != 0)
         return;
@@ -322,6 +331,7 @@ void soundManager::CDPoll(void) {
     }
 }
 
+VA(0x004b5ae0, 0xb1)
 i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType) {
     i32 local_8 = 0;
     if (soundType == SOUND_VOLUME_MUSIC) {
@@ -347,6 +357,7 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     return local_8;
 }
 
+// @remove
 void __stdcall SetReady2Poll(u32l) {
     if (gpSoundManager == NULL)
         return;
@@ -355,12 +366,14 @@ void __stdcall SetReady2Poll(u32l) {
         gpSoundManager->m_pollDue = 1;
 }
 
+// @remove
 void __stdcall UpdateTimers(u32l) {
     iCalibrateLoop++;
     glMilliCounter += SOUND_TIMER_INTERVAL;
     SetReady2Poll(0);
 }
 
+VA(0x004b5bd0, 0x146)
 soundManager::soundManager(void) : baseManager(), field_0x574(1) {
     i32 local_8;
     m_active = false;
@@ -376,6 +389,7 @@ soundManager::soundManager(void) : baseManager(), field_0x574(1) {
     m_cdPlayFrame = 0;
 }
 
+// @remove
 struct _DIG_DRIVER*
 WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showErrors) {
     u32 numDevs;
@@ -421,6 +435,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
     return drvr;
 }
 
+VA(0x004b5d20, 0x2df)
 i32 soundManager::Open(i32) {
     i32 keyState;
     i32 musicTrack;
@@ -540,6 +555,7 @@ managerReady:
     return 0;
 }
 
+// @remove
 void soundManager::AllocateSampleHandles(void) {
     i32 local_8;
     if (gbNoSound != 0)
@@ -554,6 +570,7 @@ void soundManager::AllocateSampleHandles(void) {
     m_numSampleHandles = local_8;
 }
 
+VA(0x004b6000, 0x28)
 void soundManager::Close(void) {
     if (m_active != 1)
         return;
@@ -571,14 +588,17 @@ soundClosed:
     gbNoSound = true;
 }
 
+VA(0x004b6030, 0xf)
 MessageDispatchResult soundManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+// @remove
 struct _SAMPLE* soundManager::StartSample(char*, char**, i16, i16, i32, i32, i32l) {
     return NULL;
 }
 
+VA(0x004b6040, 0xcb)
 void soundManager::StopAllSamples(i32 stopMusic) {
     i16 sampleIdx;
     i32 waitCounter;
@@ -609,6 +629,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     LogStr("SAS 2");
 }
 
+VA(0x004b6110, 0x8a)
 void soundManager::StopSample(struct _SAMPLE* sample) {
     i32 local_c;
     i32 local_10;
@@ -630,6 +651,7 @@ void soundManager::StopSample(struct _SAMPLE* sample) {
     LogStr("Stop Sample 2");
 }
 
+VA(0x004b61a0, 0xa1)
 void soundManager::ModifySample(
     struct _SAMPLE* sampleHandle,
     SoundSampleOperation operation,
@@ -681,6 +703,7 @@ void soundManager::ModifySample(
     LogStr("Modify Sample 2");
 }
 
+VA(0x004b6250, 0x8e)
 i32l soundManager::DigitalReport(struct _SAMPLE* sample, SoundDigitalReportQuery reportType) {
     i32 sampleStatus;
 
@@ -698,6 +721,7 @@ i32l soundManager::DigitalReport(struct _SAMPLE* sample, SoundDigitalReportQuery
     return 0;
 }
 
+VA(0x004b62e0, 0x4d)
 void soundManager::AdjustSoundVolumes(void) {
     i32 sampleIndex;
     struct _SAMPLE* sampleHandle;
@@ -726,6 +750,7 @@ void soundManager::AdjustSoundVolumes(void) {
     LogStr("Adjust Sound Volumes 2");
 }
 
+VA(0x004b6330, 0xad)
 void soundManager::AdjustMusicVolumes(void) {
     if (gbNoSound != 0)
         return;
@@ -751,6 +776,7 @@ void soundManager::AdjustMusicVolumes(void) {
     LogStr("Adjust Music Volumes 2");
 }
 
+// @remove
 void soundManager::ForcePollSound(void) {
     if (gbNoSound != 0)
         return;
@@ -758,6 +784,7 @@ void soundManager::ForcePollSound(void) {
     PollSound();
 }
 
+VA(0x004b63e0, 0xef)
 void soundManager::SetMusicQuality(i32 musicSource) {
     i32 local_8;
     if (gbNoSound != 0)
@@ -782,6 +809,7 @@ void soundManager::SetMusicQuality(i32 musicSource) {
         PlayAmbientMusic(local_8, 0, -1);
 }
 
+VA(0x004b64d0, 0x106)
 void soundManager::PlayAmbientMusic(i32 track, i32l resume, i32 unused) {
     if (gbNoSound != 0)
         return;
@@ -802,6 +830,7 @@ void soundManager::PlayAmbientMusic(i32 track, i32l resume, i32 unused) {
     m_currentTrack = static_cast<char>(track);
 }
 
+VA(0x004b65e0, 0x227)
 void soundManager::PollSound(void) {
     i32 volume;
     struct _SAMPLE* smp;
@@ -881,6 +910,7 @@ void soundManager::PollSound(void) {
     m_pollRequested = 0;
 }
 
+VA(0x004b6810, 0xbb)
 void soundManager::SwitchAmbientMusic(i32 track) {
     if (gbNoSound != 0)
         return;
@@ -911,6 +941,7 @@ void soundManager::SwitchAmbientMusic(i32 track) {
     LogStr("Switch Ambient Music 2");
 }
 
+VA(0x004b68d0, 0x115)
 struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     struct _SAMPLE* smp;
     i16 ch;
@@ -968,14 +999,17 @@ struct _SAMPLE* soundManager::MemorySample(class sample* sampleResource) {
     return smp;
 }
 
+// @remove
 void soundManager::GetNumberCDDrives(void) {}
 
+VA(0x004b69f0, 0x41)
 void soundManager::ServiceSound(void) {
     if (gbNoSound != 0)
         return;
     AIL_serve();
 }
 
+VA(0x004b6a40, 0x49)
 i32 soundManager::MusicPlaying(void) {
     if (gbNoSound != 0)
         return 0;

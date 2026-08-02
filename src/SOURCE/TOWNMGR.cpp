@@ -538,6 +538,7 @@ SBuildingInfo sBuildingInfo[IDX(FACTION_COUNT)][TOWN_BUILDING_COUNT] = {
     }
 };
 
+VA(0x004a4740, 0x18d)
 townObject::townObject(
     FactionType townType, H2_ENUM_PARAM(BuildingSlotType, i32) buildingId, char* iconBaseName
 ) {
@@ -578,12 +579,14 @@ townObject::townObject(
     }
 }
 
+VA(0x004a48cd, 0x56)
 townObject::~townObject() {
     if (m_border != NULL)
         delete m_border;
     gpResourceManager->Dispose(m_icon);
 }
 
+VA(0x004a4923, 0x3f9)
 void townObject::Draw(i32 advanceAnimation) {
     i32 baseFrame;
 
@@ -676,6 +679,7 @@ void townObject::Draw(i32 advanceAnimation) {
     }
 }
 
+VA(0x004a4d1c, 0x5d)
 townManager::townManager(void) {
     m_town = NULL;
     m_heroWindow0 = NULL;
@@ -684,6 +688,7 @@ townManager::townManager(void) {
     m_castleDialogActive = 0;
 }
 
+VA(0x004a4d79, 0x1e4)
 void townManager::SetupExtraStuff(void) {
     m_town->m_buildings &= IDX(TOWN_EXTRA_DYNAMIC_CLEAR_MASK);
     if (m_town->m_type == FACTION_WIZARD)
@@ -713,6 +718,7 @@ void townManager::SetupExtraStuff(void) {
         m_town->m_buildings &= ~IDX(TOWN_EXTRA_DOCK_GRAPHIC_MASK);
 }
 
+VA(0x004a4f5d, 0x206)
 i32 townManager::Open(i32 id) {
     gpGame->CheckHeroConsistency();
     if (gConfig.useOpera != CONFIG_OPERA_DISABLED
@@ -749,6 +755,7 @@ i32 townManager::Open(i32 id) {
     return 0;
 }
 
+VA(0x004a5163, 0x77)
 void townManager::ChangeTown(void) {
     tag_message message;
 
@@ -763,6 +770,7 @@ void townManager::ChangeTown(void) {
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x004a51da, 0x9df)
 void townManager::SetupTown(void) {
     tag_message message;
     i32 index;
@@ -947,6 +955,7 @@ void townManager::SetupTown(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH, TOWN_SCREEN_HEIGHT);
 }
 
+VA(0x004a5bb9, 0x1e9)
 void townManager::UnloadTown(void) {
     i32 index_i;
 
@@ -970,6 +979,7 @@ void townManager::UnloadTown(void) {
     }
 }
 
+VA(0x004a5da2, 0xba)
 void townManager::Close(void) {
     UnloadTown();
     if (m_townWindow != NULL) {
@@ -986,6 +996,7 @@ void townManager::Close(void) {
     m_town->m_buildings &= IDX(TOWN_CLOSE_DYNAMIC_CLEAR_MASK);
 }
 
+VA(0x004a5e5c, 0x374)
 void townManager::SetArmyCommand(i32 qualifier) {
     i32 cantMoveLastArmy;
     i32 sameType;
@@ -1064,6 +1075,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     }
 }
 
+VA(0x004a61d0, 0x59e)
 void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
@@ -1218,6 +1230,7 @@ void townManager::SetCommandAndText(struct tag_message& message) {
     ShowText(m_statusText);
 }
 
+VA(0x004a67ce, 0x74)
 void townManager::ShowText(char*) {
     tag_message message;
 
@@ -1235,6 +1248,7 @@ void townManager::ShowText(char*) {
     );
 }
 
+VA(0x004a6842, 0x1701)
 MessageDispatchResult townManager::Main(tag_message& message) {
     char description_b[BUILDING_DESCRIPTION_CAPACITY];
     i32 exitTown_i = 0;
@@ -1858,6 +1872,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004a7f7b, 0x480)
 void townManager::DoCommand(TownManagerArmyCommand command) {
     hero* viewedHero;
     i32 dismissAllowed;
@@ -1951,6 +1966,7 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
     m_lastHoverId = -1;
 }
 
+VA(0x004a8413, 0xa4)
 void townManager::RedrawTownScreen(void) {
     tag_message message;
 
@@ -1967,6 +1983,7 @@ void townManager::RedrawTownScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, TOWN_SCREEN_WIDTH, TOWN_SCREEN_HEIGHT);
 }
 
+VA(0x004a84b7, 0x376)
 void townManager::SplitArmy(void) {
     i16 unusedValue = 1;
     // splitwin.bin's setup record retains this otherwise-unused control value.
@@ -2020,10 +2037,12 @@ void townManager::SplitArmy(void) {
     }
 }
 
+VA(0x004a882d, 0x16)
 void townManager::ShiftQualChange(void) {
     gpInputManager->ForceMouseMove();
 }
 
+VA(0x004a8843, 0x93)
 void townManager::ResetStrips(void) {
     if (m_swapStrip != NULL)
         m_swapStrip->m_selectedSlot = -1;
@@ -2035,6 +2054,7 @@ void townManager::ResetStrips(void) {
     m_swapArmySlot = m_pendingArmySlot = -1;
 }
 
+VA(0x004a88d6, 0x79)
 void townManager::Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 index;
 
@@ -2046,6 +2066,7 @@ void townManager::Toggle(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     }
 }
 
+VA(0x004a894f, 0xaf)
 void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
     i32 index;
 
@@ -2071,6 +2092,7 @@ void townManager::DrawTown(i32 updateScreen, i32 drawFlags) {
     PollSound();
 }
 
+VA(0x004a89fe, 0xe6c)
 i32 townManager::BuyBuild(
     H2_ENUM_PARAM(BuildingSlotType, i32) building,
     i32 cannotBuy,
@@ -2451,6 +2473,7 @@ i32 townManager::BuyBuild(
     }
 }
 
+VA(0x004a986a, 0x3a1)
 void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     i32 objectIndex_k;
     SLimitData limits_h;
@@ -2545,6 +2568,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
     }
 }
 
+VA(0x004a9c0b, 0x379)
 void townManager::SetupMage(heroWindow* window) {
     i16 unusedZero_f = 0;
     i16 unusedAvailable_j = 1;
@@ -2664,6 +2688,7 @@ void townManager::SetupMage(heroWindow* window) {
     window->BroadcastMessage(message_b);
 }
 
+VA(0x004a9f84, 0x154)
 MessageDispatchResult MageGuildHandler(tag_message& message) {
     i16 unusedFirstSpell = TOWN_MAGE_FIRST_SPELL_CONTROL;
     i16 unusedFirstIcon = TOWN_MAGE_FIRST_ICON_CONTROL;
@@ -2720,6 +2745,7 @@ MessageDispatchResult MageGuildHandler(tag_message& message) {
     return EventWindowHandler(message);
 }
 
+VA(0x004aa0d8, 0x70b)
 i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     i16 unusedTextStateTemp = 1;
     // rcrthero.bin control defaults are preserved as stack locals for the retail frame.
@@ -2863,6 +2889,7 @@ i32 townManager::RecruitHero(i32 availableHeroIndex, i32 cannotRecruit) {
     return m_recruitState != -1;
 }
 
+VA(0x004aa7e3, 0x120)
 MessageDispatchResult TavernHandler(tag_message& message) {
     i32 unusedDelay = TOWN_TAVERN_ANIMATION_DELAY;
     i16 unusedFirstFrame = TOWN_TAVERN_FIRST_ANIMATION_FRAME;
@@ -2903,6 +2930,7 @@ MessageDispatchResult TavernHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004aa903, 0x12b)
 void townManager::DoTavern(void) {
     i32 unusedValue = 0;
     tag_message message;
@@ -2925,6 +2953,7 @@ void townManager::DoTavern(void) {
     delete m_heroWindow0;
 }
 
+VA(0x004aaa2e, 0x2cf)
 MessageDispatchResult SplitArmyHandler(tag_message& message) {
     i16 plusButton = TOWN_SPLIT_INCREASE_CONTROL;
     i16 minusButton = TOWN_SPLIT_DECREASE_CONTROL;
@@ -2998,6 +3027,7 @@ update_amount:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004aacfd, 0x647)
 void townManager::SetupWell(heroWindow* window) {
     i16 unusedFirstIconj = 1;
     i16 unusedFirstNameh = TOWN_WELL_FIRST_NAME_CONTROL;
@@ -3137,6 +3167,7 @@ void townManager::SetupWell(heroWindow* window) {
     }
 }
 
+VA(0x004ab344, 0xde3)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
     static i16 sourceLineBase = 0x0e0e; // NOLINT(readability-magic-numbers)
     i16 unusedRankX_last = THIEVES_RANK_FIRST_X;
@@ -3510,6 +3541,7 @@ nextRank:
     }
 }
 
+VA(0x004ac127, 0x478)
 void GetCategoryStats(
     H2_ENUM_PARAM(TownThievesGuildCategory, i32) category,
     i32l* const stats,
@@ -3618,6 +3650,7 @@ void GetCategoryStats(
     }
 }
 
+VA(0x004ac5c7, 0xd2)
 void SortStats(i32l* const stats, i8* const order) {
     i32 temporaryOrder;
     i32 secondPlayer;

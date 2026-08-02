@@ -63,6 +63,7 @@ i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 static i16 gGetRemoteDataLineBase = 716; // NOLINT(readability-magic-numbers)
 static i16 gPollRemoteLineBase = 757; // NOLINT(readability-magic-numbers)
 
+VA(0x0048d050, 0x14c)
 void RemoteCleanup(void) {
     LogStr("RC1");
     if (gbRemoteOn == 0)
@@ -108,6 +109,7 @@ void RemoteCleanup(void) {
     gbInRemoteCleanup = false;
 }
 
+VA(0x0048d1ac, 0x5ef)
 void RemoteMain(RemoteGameMode gameMode) {
     i8 receivedPlayers[REMOTE_PLAYER_COUNT];
     i32 playerState;
@@ -304,6 +306,7 @@ void RemoteMain(RemoteGameMode gameMode) {
     gbInRemoteMain = false;
 }
 
+VA(0x0048d7ab, 0x51)
 void UnloadRemoteDriver(i16 networkDriver) {
     switch (networkDriver) {
         case 0:
@@ -320,6 +323,7 @@ void UnloadRemoteDriver(i16 networkDriver) {
     }
 }
 
+VA(0x0048d7fc, 0xa0)
 i32 calc_crc_long(u8* data, i32 length) {
     u32 shifted;
     u32 crc;
@@ -343,10 +347,12 @@ i32 calc_crc_long(u8* data, i32 length) {
     return crc;
 }
 
+VA(0x0048d89c, 0x23)
 void calc_crc(u16* crc, u8* data, i32 length) {
     *crc = static_cast<u16>(calc_crc_long(data, length));
 }
 
+VA(0x0048d8bf, 0x7d)
 i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     u16 crc[CRC_STORAGE_WORD_COUNT];
 
@@ -362,6 +368,7 @@ i32 EncodePacket(u8* data, char source, char destination, i32 length) {
     return length + REMOTE_PACKET_HEADER_SIZE;
 }
 
+VA(0x0048d93c, 0x10d)
 i32 DecodePacket(u8* data, i32) {
     u16 receivedCRC4;
     i32 ignored;
@@ -394,6 +401,7 @@ i32 DecodePacket(u8* data, i32) {
     return 1;
 }
 
+VA(0x0048da49, 0x148)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 sendStatus;
     i32 out;
@@ -449,6 +457,7 @@ finished:
     return out;
 }
 
+VA(0x0048dba1, 0x10f)
 i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 result;
     i32 receiveResult;
@@ -485,6 +494,7 @@ i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     return result;
 }
 
+VA(0x0048dcc0, 0x1d2)
 i32 TransmitRemoteData(
     char* data,
     i32 destination,
@@ -562,6 +572,7 @@ i32 TransmitRemoteData(
     return result;
 }
 
+VA(0x0048de92, 0xdd)
 char* GetRemoteData(i8 remove) {
     i32 oldestOrder;
     i32 queueIndex;
@@ -590,6 +601,7 @@ char* GetRemoteData(i8 remove) {
     return NULL;
 }
 
+VA(0x0048df6f, 0x664)
 void PollRemote(void) {
     i32 savedInPollSound;
     i32 queueCount;
@@ -800,6 +812,7 @@ void PollRemote(void) {
     }
 }
 
+VA(0x0048e5d3, 0x122)
 i32 TransmitAndWait(
     char* data,
     i32 destination,

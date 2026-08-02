@@ -14,6 +14,7 @@ H2_ENUM_BEGIN(IconWidgetConstant)
     BOTTOM_PADDING         = 2
 H2_ENUM_END(IconWidgetConstant)
 
+VA(0x004bb670, 0x58)
 iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_frame = 0;
     m_fillColor = 0;
@@ -23,6 +24,7 @@ iconWidget::iconWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x004bb700, 0xb4)
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -44,6 +46,7 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
+VA(0x004bb7c0, 0xc5)
 iconWidget::iconWidget(
     i16 x,
     i16 y,
@@ -65,6 +68,7 @@ iconWidget::iconWidget(
     m_kind = kind;
 }
 
+VA(0x004bb890, 0x113)
 void iconWidget::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -83,6 +87,7 @@ void iconWidget::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
+VA(0x004bb9b0, 0x5b)
 inline iconWidget::~iconWidget() {
     gpResourceManager->Dispose(m_icon);
 }
@@ -92,6 +97,7 @@ inline iconWidget::~iconWidget() {
     messageValue.type = MESSAGE_WIDGET;                                                          \
     messageValue.payload.widget.id = idValue
 
+VA(0x004bba10, 0x308)
 MessageDispatchResult iconWidget::Main(tag_message& msg) {
     H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)
@@ -183,6 +189,7 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE_TYPE_AND_ID
 
+VA(0x004bbd70, 0x175)
 void iconWidget::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = static_cast<i16>(window->m_posY);

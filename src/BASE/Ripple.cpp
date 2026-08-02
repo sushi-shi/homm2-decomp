@@ -20,6 +20,7 @@ H2_ENUM_BEGIN(RippleConstant)
     SWEEP_END      = SCREEN_WIDTH + PROFILE_RADIUS
 H2_ENUM_END(RippleConstant)
 
+VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
     i32 profileIndex;
 

@@ -55,6 +55,7 @@ H2_ENUM_END(CursorPrivateConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
+VA(0x004332d0, 0x124)
 void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 directionX_a;
     i32 directionY_a1;
@@ -80,6 +81,7 @@ void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
     m_mapData->GetCell(cellX, cellY)->m_flags |= CURSOR_MAP_VISIBLE_FLAG;
 }
 
+VA(0x004333f4, 0xe6)
 void advManager::StopCursor(i32 stopSound) {
     if (stopSound) {
         bMoveSoundMade = 1;
@@ -102,6 +104,7 @@ void advManager::StopCursor(i32 stopSound) {
     m_cursorTurning = 0;
 }
 
+VA(0x004334da, 0x5dd)
 void advManager::DrawCursor(void) {
     i32 drawY;
     i32 drawFrame_f;
@@ -322,6 +325,7 @@ void advManager::DrawCursor(void) {
     }
 }
 
+VA(0x00433ab7, 0x327)
 void advManager::DrawCursorShadow(void) {
     i32 shadowOffset;
     i32 boatShadowOffset;
@@ -440,6 +444,7 @@ void advManager::DrawCursorShadow(void) {
     }
 }
 
+VA(0x00433dde, 0x4e)
 i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
     if (direction > MAP_DIRECTION_SOUTH) {
         switch (direction) {
@@ -457,6 +462,7 @@ i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
     }
 }
 
+VA(0x00433e2c, 0x213)
 void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
     i32 turnStep_c = 1;
     i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
@@ -505,6 +511,7 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
         UpdateScreen(0, 0);
 }
 
+VA(0x0043403f, 0x8b)
 i32 advManager::GetMoveShowIt(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
@@ -523,6 +530,7 @@ i32 advManager::GetMoveShowIt(
         return 0;
 }
 
+VA(0x004340ca, 0x10b7)
 mapCell* advManager::MoveHero(
     H2_ENUM_PARAM(MapDirection, i32) direction,
     i32 stopAfterMove,
@@ -950,6 +958,7 @@ movementDone:
     return eventCell_g;
 }
 
+VA(0x004351c5, 0x156)
 void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     hero* currentHero_f;
     i32 killed_e;
@@ -996,6 +1005,7 @@ void advManager::CheckAdjacentMon(i32* adjacentMonster) {
     }
 }
 
+VA(0x0043531b, 0x116)
 i32 advManager::ValidMoveWithEvent(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
@@ -1030,6 +1040,7 @@ i32 advManager::ValidMoveWithEvent(
     }
 }
 
+VA(0x00435431, 0x457)
 i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventMode) {
     i32 directionX_j;
     i32 directionY_h;
@@ -1124,6 +1135,7 @@ i32 advManager::ValidMove(H2_ENUM_PARAM(MapDirection, i32) direction, i32 eventM
     return 1;
 }
 
+VA(0x00435888, 0x250)
 void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     i32 oldOriginX0;
     i32 cellY1;
@@ -1169,6 +1181,7 @@ void advManager::MoveOrigin(i32 directionX, i32 directionY) {
     m_forceCompleteDraw = 1;
 }
 
+VA(0x00435ad8, 0xb2)
 void advManager::ProcessMapChange(SMapChange change) {
     hero* mapHero_n;
     mapCell* eventCell_n;
@@ -1389,6 +1402,7 @@ void advManager::ProcessMapChange(SMapChange change) {
     }
 }
 
+VA(0x004361dd, 0x189)
 void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     i32 slot;
 
@@ -1442,6 +1456,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
     UnwindMapChangeQueue(0, 1);
 }
 
+VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     static i16 s_groupLineBase = 1505; // NOLINT(readability-magic-numbers)
     SMapChange* ptr;
@@ -1464,6 +1479,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     H2_FREE_AT(buf, RETAIL_FILE, s_groupLineBase + GROUP_FREE_LINE_OFFSET);
 }
 
+VA(0x0043640d, 0x5e)
 void advManager::PurgeMapChangeQueue(void) {
     i32 slot;
 
@@ -1473,6 +1489,7 @@ void advManager::PurgeMapChangeQueue(void) {
         sMapChangeLastFew[slot].type = MAP_CHANGE_NONE;
 }
 
+VA(0x0043646b, 0x1b5)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queueCount;
     i32 unwoundChanges;
@@ -1520,6 +1537,7 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     }
 }
 
+VA(0x00436620, 0x117)
 void SendMapChange(
     MapChangeType type,
     i8 id,

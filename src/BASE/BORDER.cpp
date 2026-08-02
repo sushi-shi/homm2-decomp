@@ -14,6 +14,7 @@ H2_ENUM_BEGIN(BorderConstant)
     COLOR_INDEX_MASK       = 0xff
 H2_ENUM_END(BorderConstant)
 
+VA(0x004cb0a0, 0x48)
 border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_backgroundBitmap = NULL;
     m_backgroundIcon = NULL;
@@ -21,6 +22,7 @@ border::border(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
 }
 
 
+VA(0x004cb120, 0xa8)
 border::border(
     i16 x,
     i16 y,
@@ -40,6 +42,7 @@ border::border(
     m_fillColor = fillColor;
 }
 
+VA(0x004cb1d0, 0x7f)
 inline border::~border() {
     if (m_backgroundBitmap != NULL)
         gpResourceManager->Dispose(m_backgroundBitmap);
@@ -47,6 +50,7 @@ inline border::~border() {
         gpResourceManager->Dispose(m_backgroundIcon);
 }
 
+VA(0x004cb250, 0x13c)
 void border::Read(void) {
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -75,6 +79,7 @@ void border::Read(void) {
     m_fillColor = gpResourceManager->ReadWord() & COLOR_INDEX_MASK;
 }
 
+VA(0x004cb390, 0x199)
 MessageDispatchResult border::Main(struct tag_message& msg) {
     H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
@@ -128,6 +133,7 @@ leaveEvent:
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+VA(0x004cb570, 0xec)
 void border::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = m_y + static_cast<i16>(window->m_posY);

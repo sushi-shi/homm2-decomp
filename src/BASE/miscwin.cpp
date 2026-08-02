@@ -17,6 +17,7 @@ H2_ENUM_BEGIN(VesaBlitConstant)
     NET_BOX_TOP          = 411
 H2_ENUM_END(VesaBlitConstant)
 
+VA(0x004d4610, 0x1e6)
 extern "C" void __fastcall BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
     i32 sourceX,
@@ -82,6 +83,7 @@ extern "C" void __fastcall BlitBitmapToScreenVesa(
         LogStr("UpdateWindow Failed");
 }
 
+VA(0x004d4800, 0x8)
 i16 AutoInitSVGA(void) {
     return 0;
 }

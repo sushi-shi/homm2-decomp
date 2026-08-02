@@ -56,6 +56,7 @@ static CRITICAL_SECTION gNbSendLockBacking;
 #define gNbEvents gNbThreadEventsContext
 #define gNbSndLock gNbSendLockBacking
 
+VA(0x00473da0, 0x94)
 i32 is_netbios_avail(void) {
     NetbiosControlBlock ncb;
     memset(&ncb, 0, sizeof(ncb));
@@ -73,6 +74,7 @@ i32 is_netbios_avail(void) {
     return 0;
 }
 
+VA(0x00473e34, 0x218)
 extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
     static i16 gNbInitSourceLineBase = 105;
     NetbiosControlBlock localNcb;
@@ -126,6 +128,7 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
     return 1;
 }
 
+VA(0x0047404c, 0x1d0)
 extern "C" void __fastcall nb_term(void) {
     static i16 gNbTermSourceLineBase = 169;
     tag_Node* node;
@@ -168,6 +171,7 @@ extern "C" void __fastcall nb_term(void) {
     DeleteCriticalSection(&gNbRcvLock);
 }
 
+VA(0x0047421c, 0x96)
 extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
     static i16 gNbReceiveSourceLineBase = 226;
     tag_Node* node;
@@ -188,6 +192,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
     return 0;
 }
 
+VA(0x004742b2, 0xc0)
 extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     static i16 gNbSendSourceLineBase = 245;
     tag_Node* node;
@@ -211,6 +216,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     return 0;
 }
 
+VA(0x00474372, 0x49f)
 extern "C" u16 __cdecl
 nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
     i32 oldSession;
@@ -335,10 +341,12 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
     return IDX(returnCode);
 }
 
+VA(0x00474839, 0xf)
 extern "C" char __fastcall nb_stat(i16 session) {
     return static_cast<char>(gNetStatus[session]);
 }
 
+VA(0x00474848, 0x215)
 void nb_thr_ctl(void) {
     static i16 gNbThreadSourceLineBase = 412;
     i32 keepRunning;
@@ -409,6 +417,7 @@ void nb_thr_ctl(void) {
 }
 
 
+VA(0x00474a5d, 0xb5)
 static void nb_add_name(void) {
     if (gNbCtlNcb.commandComplete != NETBIOS_RESULT_PENDING) {
         strcpy(gNbSessBuf.bytes, gNbGroupName);
@@ -427,6 +436,7 @@ static void nb_add_name(void) {
     }
 }
 
+VA(0x00474b12, 0x152)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     static i16 gNbAddNameSourceLineBase = 534;
     i32 j;
@@ -463,6 +473,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     }
 }
 
+VA(0x00474ca5, 0xb4)
 static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_recv_any(i32 session) {
     if (gNbSessNcb[session].commandComplete != NETBIOS_RESULT_PENDING) {
         memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
@@ -477,6 +488,7 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_recv_any(i32 session) {
     return gNbSessNcb[session].commandComplete;
 }
 
+VA(0x00474d59, 0x11d)
 static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
@@ -504,6 +516,7 @@ static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb) {
     }
 }
 
+VA(0x00474e76, 0xc2)
 static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_call(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
@@ -516,6 +529,7 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_call(i32 session, void* n
     return Netbios(&gNbSessNcb[session]);
 }
 
+VA(0x00474f38, 0xc2)
 static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_listen(i32 session, void* name) {
     memset(&gNbSessNcb[session], 0, sizeof(NetbiosControlBlock));
     memcpy(gNbSessNcb[session].callName, name, NETBIOS_NAME_SIZE);
@@ -528,6 +542,7 @@ static H2_ENUM_PARAM(NetbiosResult, u16) __fastcall nb_listen(i32 session, void*
     return Netbios(&gNbSessNcb[session]);
 }
 
+VA(0x00474ffa, 0xf4)
 static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
@@ -556,6 +571,7 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     }
 }
 
+VA(0x004750ee, 0x124)
 static void __fastcall nb_arm_recv(i32 session) {
     static i16 gNbArmReceiveSourceLineBase = 710;
     H2_ENUM_STORAGE(NetbiosResult, u8) result;
@@ -587,6 +603,7 @@ static void __fastcall nb_arm_recv(i32 session) {
     }
 }
 
+VA(0x00475212, 0xb1)
 static void __fastcall nb_close_session(i32 session) {
     NetbiosControlBlock controlBlock;
     if (gNbSessNcb[session].commandComplete == NETBIOS_RESULT_PENDING) {
@@ -606,6 +623,7 @@ static void __fastcall nb_close_session(i32 session) {
     }
 }
 
+VA(0x004752c3, 0x112)
 static void __fastcall nb_recv_complete(i32 session) {
     static i16 gNbReceiveCompleteSourceLineBase = 780;
     tag_Node* node;
@@ -641,6 +659,7 @@ static void __fastcall nb_recv_complete(i32 session) {
     }
 }
 
+VA(0x004753fa, 0x76)
 static void __fastcall nb_format_name(char* src, u8* dst) {
     u32 i;
     memset(dst, 0, NETBIOS_NAME_SIZE);

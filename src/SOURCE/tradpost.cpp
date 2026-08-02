@@ -42,6 +42,7 @@ H2_ENUM_BEGIN(TradingPostPrivateConstant)
     REDRAW_HEIGHT   = 418
 H2_ENUM_END(TradingPostPrivateConstant)
 
+VA(0x004ac6e0, 0x193)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
     tag_message messageTemp;
 
@@ -76,6 +77,7 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
     delete tpWindow;
 }
 
+VA(0x004ac873, 0x639)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
     i32 ratioLocal;
@@ -228,6 +230,7 @@ void UpdateTradingPost(i32 draw) {
     }
 }
 
+VA(0x004aceac, 0xc6)
 void ComputeTradeRatios(
     i32 sourceResource,
     i32 destinationResource,
@@ -250,6 +253,7 @@ void ComputeTradeRatios(
     }
 }
 
+VA(0x004acf72, 0x133)
 void DoTradeKnob(struct tag_message message) {
     tag_message nextMessage;
     i32 knobPosition;
@@ -278,6 +282,7 @@ void DoTradeKnob(struct tag_message message) {
     UpdateTradingPost(1);
 }
 
+VA(0x004ad0a5, 0x2f)
 void SetupNewTrade(void) {
     qtyToTrade = 0;
     ComputeTradeRatios(
@@ -289,6 +294,7 @@ void SetupNewTrade(void) {
     );
 }
 
+VA(0x004ad0d4, 0x326)
 MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
     i32 updateDisplay = 0;

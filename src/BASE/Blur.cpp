@@ -105,6 +105,7 @@ typedef struct SBlurText {
 static SBlurText gBlurText =
     {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
+VA(0x004cba60, 0xa22)
 void DoBlur(
     bitmap* destination,
     bitmap* source,

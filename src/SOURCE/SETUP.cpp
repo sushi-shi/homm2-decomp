@@ -58,12 +58,14 @@ H2_ENUM_BEGIN(HotSeatPlayerCount)
     SIX_PLAYERS   = 6
 H2_ENUM_END(HotSeatPlayerCount)
 
+VA(0x004924e0, 0x24)
 i32 game::SetupCampaignGame(void) {
     PlaySmacker(CAMPAIGN_INTRO);
     PlaySmacker(CAMPAIGN_SELECTION);
     return 1;
 }
 
+VA(0x00492504, 0x137)
 i32 game::SetupBaud(void) {
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpbaud.bin");
     if (window == NULL)
@@ -90,6 +92,7 @@ i32 game::SetupBaud(void) {
     return 1;
 }
 
+VA(0x0049263b, 0x1dc)
 i32 game::SetupComPort(void) {
     char initString[MODEM_INIT_ENTRY_LENGTH];
 
@@ -141,6 +144,7 @@ i32 game::SetupComPort(void) {
     return 1;
 }
 
+VA(0x00492817, 0x219)
 i32 game::SetupHotSeatGame(void) {
     char defaultName[DEFAULT_PLAYER_NAME_CAPACITY];
     i32 ix;
@@ -188,6 +192,7 @@ i32 game::SetupHotSeatGame(void) {
     return 1;
 }
 
+VA(0x00492a44, 0x120)
 i32 game::SetupNetworkGame(void) {
     tag_message message;
     heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet.bin");
@@ -218,6 +223,7 @@ i32 game::SetupNetworkGame(void) {
     return 1;
 }
 
+VA(0x00492b64, 0x281)
 i32 game::SetupNetworkGame2(void) {
     tag_message message;
     OSVERSIONINFO osInfo;
@@ -275,6 +281,7 @@ i32 game::SetupNetworkGame2(void) {
         return 1;
 }
 
+VA(0x00492de5, 0x330)
 i32 game::SetupModemGame(void) {
     tag_message message;
     heroWindow* window;
@@ -346,6 +353,7 @@ i32 game::SetupModemGame(void) {
     return 1;
 }
 
+VA(0x00493115, 0x227)
 i32 game::SetupMultiPlayerGame(void) {
     tag_message message;
     i32 continueFlag;
@@ -409,6 +417,7 @@ i32 game::SetupMultiPlayerGame(void) {
     return 1;
 }
 
+VA(0x0049333c, 0x554)
 i32 game::SetupGame(void) {
     heroWindow* window;
     i32 result;
@@ -592,6 +601,7 @@ done:
     return result;
 }
 
+VA(0x004938d5, 0x28b)
 i32 game::PickLoadGame(void) {
     char filePattern_4[FILE_PATTERN_CAPACITY];
     i32 dialogResult_18;
@@ -665,10 +675,12 @@ i32 game::PickLoadGame(void) {
     }
 }
 
+VA(0x00493b60, 0x13)
 MessageDispatchResult SetupCampaignGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00493b73, 0xfe)
 MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -725,6 +737,7 @@ MessageDispatchResult SetupComPortHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00493c71, 0xfe)
 MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -781,6 +794,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00493d6f, 0xda)
 MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -825,6 +839,7 @@ MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00493e5d, 0xef)
 MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -878,6 +893,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00493f4c, 0xcf)
 MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -919,6 +935,7 @@ MessageDispatchResult SetupMultiPlayerGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x0049401b, 0xa1)
 MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -954,6 +971,7 @@ MessageDispatchResult SetupNetworkGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x004940bc, 0xc0)
 MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -992,6 +1010,7 @@ MessageDispatchResult SetupNetworkGame2Handler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x0049417c, 0xe7)
 MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -1041,6 +1060,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00494263, 0xa1)
 MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -1076,6 +1096,7 @@ MessageDispatchResult ExpNewCampaignHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00494304, 0xa1)
 MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -1111,6 +1132,7 @@ MessageDispatchResult ExpLoadCampaignHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x004943a5, 0xa1)
 MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     i32 helpIndex;
 
@@ -1146,6 +1168,7 @@ MessageDispatchResult ExpStdGameHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
+VA(0x00494446, 0xb5)
 MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     i32 handled = 0;
 

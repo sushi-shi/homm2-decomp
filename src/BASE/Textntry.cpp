@@ -49,6 +49,7 @@ H2_ENUM_END(InputManagerExtendedKey)
 #define TEXT_ENTRY_MAIN_SOURCE_FILES                                                    \
     RETAIL_FILE "\0\0\0" RETAIL_FILE
 
+VA(0x004d1cc0, 0x56)
 textEntryWidget::textEntryWidget(void) : textWidget() {
     m_cursorPosition = 0;
     m_icon = NULL;
@@ -58,6 +59,7 @@ textEntryWidget::textEntryWidget(void) : textWidget() {
     m_displayOffset = 0;
 }
 
+VA(0x004d1d50, 0x1ac)
 textEntryWidget::textEntryWidget(
     i16 x,
     i16 y,
@@ -110,10 +112,12 @@ textEntryWidget::textEntryWidget(
     }
 }
 
+VA(0x004d1f00, 0x5b)
 inline textEntryWidget::~textEntryWidget() {
     gpResourceManager->Dispose(m_icon);
 }
 
+VA(0x004d1f60, 0x335)
 void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -185,6 +189,7 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_kind = WIDGET_KIND_TEXT_ENTRY;
 }
 
+VA(0x004d22a0, 0xa85)
 MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
@@ -399,6 +404,7 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
     return widget::Main(message);
 }
 
+VA(0x004d2dc0, 0x253)
 void textEntryWidget::Draw(void) {
     if (m_entryType == TEXT_ENTRY_READ_MULTILINE) {
         char display[EDIT_BUFFER_CAPACITY];
@@ -437,6 +443,7 @@ void textEntryWidget::Draw(void) {
     }
 }
 
+VA(0x004d3020, 0x29a)
 void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
     if (KBTickCount() > glTimers[0]) {
         m_cursorBlink = 1 - m_cursorBlink;

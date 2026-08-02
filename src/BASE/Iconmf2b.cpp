@@ -26,6 +26,7 @@ static inline i32 FlipMonoRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) 
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
+VA(0x004d6130, 0x32f)
 void FlipMonoIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

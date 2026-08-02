@@ -86,6 +86,7 @@ H2_ENUM_END(ListBoxSelectionClickCount)
 #define LISTBOX_MAIN_SOURCE_FILES RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE LISTBOX_SOURCE_FILE_SEPARATOR RETAIL_FILE
 
 
+VA(0x004ce6a0, 0x5d)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_items = NULL;
     m_scrollbar = NULL;
@@ -94,6 +95,7 @@ listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_lastSelectedIndex = -1;
 }
 
+VA(0x004ce730, 0x105)
 listBoxWidget::~listBoxWidget() {
     i32 i;
     gpResourceManager->Dispose(m_font);
@@ -112,6 +114,7 @@ listBoxWidget::~listBoxWidget() {
     gbSendMouseMoveMessages = false;
 }
 
+VA(0x004ce840, 0x41c)
 void listBoxWidget::Read(void) {
     i16 frameHeight[FRAME_HEIGHT_SLOT_COUNT];
     i8 iconName[RESOURCE_NAME_CAPACITY];
@@ -198,6 +201,7 @@ void listBoxWidget::Read(void) {
     m_visibleItemCount = 0;
 }
 
+VA(0x004cec60, 0x1f1)
 void listBoxWidget::DeleteItem(i32 index) {
     if (index >= m_itemCount)
         return;
@@ -250,6 +254,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         m_visibleItemCount = m_itemCount;
 }
 
+VA(0x004cee60, 0x474)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
@@ -373,10 +378,12 @@ MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     return widget::Main(message);
 }
 
+VA(0x004cf2f0, 0x15)
 void listBoxWidget::Draw(void) {
     DrawLBStuff(0);
 }
 
+VA(0x004cf310, 0x54e)
 void listBoxWidget::DrawLBStuff(i32 doUpdate) {
     i32 y;
     i32 x;
@@ -480,6 +487,7 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
 }
 
+VA(0x004cf860, 0x4f2)
 MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX - m_owner->m_posX;
     i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;

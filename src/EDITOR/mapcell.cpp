@@ -8,16 +8,19 @@ H2_ENUM_BEGIN(MapCellExtraConstant)
     EXTRA_ALLOCATION_STEP = 100
 H2_ENUM_END(MapCellExtraConstant)
 
+VA(0x00472050, 0x2b)
 fullMap::fullMap(void) {
     cells = NULL;
     extras = NULL;
     extraCount = 0;
 }
 
+VA(0x0047207b, 0x13)
 fullMap::~fullMap(void) {
     Close();
 }
 
+VA(0x0047208e, 0x64)
 void fullMap::Close(void) {
     if (cells)
         delete cells;
@@ -28,6 +31,7 @@ void fullMap::Close(void) {
     extraCount = 0;
 }
 
+VA(0x004720f2, 0x4d)
 void fullMap::Init(i32 w, i32 h) {
     i32 n;
     width = w;
@@ -36,6 +40,7 @@ void fullMap::Init(i32 w, i32 h) {
     cells = static_cast<mapCell*>(operator new(width * height * sizeof(mapCell)));
 }
 
+VA(0x0047213f, 0x151)
 void fullMap::ClearCellExtra(i32 index) {
     extras[index].objectTileset = TILESET_NONE;
     extras[index].objectIndex = MAPCELL_SPRITE_NONE;
@@ -50,6 +55,7 @@ void fullMap::ClearCellExtra(i32 index) {
     extras[index].nextIndex = 0;
 }
 
+VA(0x00472290, 0x113)
 i32 fullMap::GetNewCellExtraIndex(void) {
     i32 nb;
     mapCellExtra* i;
@@ -74,6 +80,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
     return extraCount - EXTRA_ALLOCATION_STEP;
 }
 
+VA(0x0047266d, 0x8c)
 void fullMap::Write(i32 handle) {
     write(handle, &width, sizeof(width));
     write(handle, &height, sizeof(height));
@@ -82,6 +89,7 @@ void fullMap::Write(i32 handle) {
     write(handle, extras, extraCount * sizeof(mapCellExtra));
 }
 
+VA(0x004726f9, 0x258)
 void fullMap::Read(i32 handle, i32 convert) {
     i32 nb;
     oldMapCell* tmp;
@@ -116,6 +124,7 @@ void fullMap::Read(i32 handle, i32 convert) {
     }
 }
 
+VA(0x004723a3, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
     mapCellExtra* node;
     i32 ix;
@@ -145,6 +154,7 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
     }
 }
 
+VA(0x00472508, 0x165)
 mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     mapCellExtra* node;
     i32 ix;
@@ -175,6 +185,7 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
 }
 
 // Updates a cell directly or appends to its extra-object chain.
+VA(0x00472951, 0x314)
 void fullMap::ChangeTilesetIndex(
     mapCell* cell,
     i32 x,

@@ -60,6 +60,7 @@ H2_ENUM_BEGIN(CombatLayoutConstant)
     SPELL_AI_MIRROR_VALUE_DIVISOR       = 2
 H2_ENUM_END(CombatLayoutConstant)
 
+VA(0x00495da0, 0x214)
 i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted) {
     SpellType bestSpellChoice;
     i32 effectScore;
@@ -120,6 +121,7 @@ i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted
     return 0;
 }
 
+VA(0x00495fb4, 0xe32)
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
     // Retail's frame reserves a 16th 4-byte local here that no surviving
     // instruction reads; without it esp drops to 0xd0 and every local plus
@@ -786,6 +788,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     }
 }
 
+VA(0x00496f02, 0x25d)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     i32 spellPowerValue = m_spellPower[IDX(m_currentSide)];
@@ -846,6 +849,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     return static_cast<i32>(creatureEffect * workChance);
 }
 
+VA(0x0049716f, 0x579)
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     army* otherArmy = NULL;
@@ -997,6 +1001,7 @@ i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence infl
     return effect;
 }
 
+VA(0x00497724, 0x52)
 void combatManager::ClearEffects(void) {
     CombatSide side;
     i32 idx;
@@ -1006,6 +1011,7 @@ void combatManager::ClearEffects(void) {
     }
 }
 
+VA(0x00497776, 0x3d)
 void combatManager::NextPos(i32* hex) {
     if ((*hex + SPELL_AI_HEX_ROW_END_OFFSET) % COMBAT_GRID_ROW_LENGTH == 0)
         *hex += SPELL_AI_HEX_ROW_SKIP;
@@ -1013,6 +1019,7 @@ void combatManager::NextPos(i32* hex) {
         (*hex)++;
 }
 
+VA(0x004977b3, 0x6c)
 i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
     while (startHex <= SPELL_AI_LAST_HEX) {
         if (IDX(m_hexCells[startHex].m_occupantSide) == side
@@ -1026,6 +1033,7 @@ i32 combatManager::FirstArmy(i32 startHex, i32 side, i32* hex) {
     return 1;
 }
 
+VA(0x0049781f, 0x5a)
 i32 combatManager::FirstResurrectable(
     i32 startHex,
     i32* hex,
@@ -1042,6 +1050,7 @@ i32 combatManager::FirstResurrectable(
     return 1;
 }
 
+VA(0x00497879, 0x350)
 void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex, i32 cure) {
     i32 sideWork;
     i32 fullQuantityWork;
@@ -1160,6 +1169,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
     }
 }
 
+VA(0x00497be4, 0x13f)
 void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) {
     army* targetStack;
     i32 resurrectPowerWork;
@@ -1181,6 +1191,7 @@ void combatManager::EffectSpellResurrect(i32* effect, i32 hex, SpellType spell) 
         *effect = static_cast<i32>(*effect * COMBAT_SPELL_AI_RESURRECT_VALUE_MODIFIER);
 }
 
+VA(0x00497d23, 0x959)
 void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHex) {
     i32 fightValueKilledAI[COMBAT_SIDE_COUNT];
     i32 creaturesKilledResult;

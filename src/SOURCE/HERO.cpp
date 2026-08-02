@@ -188,6 +188,7 @@ H2_ENUM_BEGIN(HeroImplementationConstant)
     PYRAMID_LUCK_PENALTY             = 2
 H2_ENUM_END(HeroImplementationConstant)
 
+VA(0x00460e50, 0x64)
 hero::hero(void) {
     m_id = 0;
     m_owner = 0;
@@ -200,6 +201,7 @@ hero::hero(void) {
     giHeroScreenSrcIndex = UI_ARMY_SELECTION_NONE;
 }
 
+VA(0x00460eb4, 0x41)
 void hero::Read(i32 file, i8 expansion) {
     if (expansion)
         read(file, this, sizeof(hero));
@@ -207,6 +209,7 @@ void hero::Read(i32 file, i8 expansion) {
         read(file, this, BASE_RECORD_SIZE);
 }
 
+VA(0x00460ef5, 0x41)
 void hero::Write(i32 file, i8 expansion) {
     if (expansion)
         write(file, this, sizeof(hero));
@@ -214,8 +217,10 @@ void hero::Write(i32 file, i8 expansion) {
         write(file, this, BASE_RECORD_SIZE);
 }
 
+VA(0x00460f36, 0xd)
 void hero::GetArmyStrengths(u32l* const) {}
 
+VA(0x00460f43, 0x44)
 i32 hero::HasArtifact(ArtifactType artifact) {
     i32 artifactIndex;
 
@@ -226,6 +231,7 @@ i32 hero::HasArtifact(ArtifactType artifact) {
     return 0;
 }
 
+VA(0x00460f87, 0x23c)
 i32 hero::CalcMobility(void) {
     i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500}; // NOLINT(readability-magic-numbers)
     const i16 seaBaseMobilityCurrent = SEA_BASE_MOBILITY;
@@ -284,6 +290,7 @@ i32 hero::CalcMobility(void) {
     return mobilityResult;
 }
 
+VA(0x004611c3, 0x9b)
 i32 hero::HasSpell(SpellType spell) {
     i32 artifactIndex;
 
@@ -302,6 +309,7 @@ i32 hero::HasSpell(SpellType spell) {
     return 0;
 }
 
+VA(0x0046125e, 0x95)
 SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     SpellType spell;
     i32 spellOrdinalCount = 0;
@@ -322,6 +330,7 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
     return SPELL_NONE;
 }
 
+VA(0x004612f3, 0x9e)
 i32 hero::GetNumSpells(HeroSpellType type) {
     i32 numAdventureSpells;
     i32 numCombatSpells;
@@ -349,6 +358,7 @@ i32 hero::GetNumSpells(HeroSpellType type) {
     return 0;
 }
 
+VA(0x00461391, 0x6f)
 void hero::UseSpell(SpellType spell) {
     if (spell == SPELL_NONE)
         return;
@@ -360,10 +370,12 @@ void hero::UseSpell(SpellType spell) {
         gpAdvManager->UpdateHeroLocator(-1, 1, 1);
 }
 
+VA(0x00461400, 0x1a)
 void hero::AddSpell(H2_ENUM_PARAM(SpellType, i32) spell, i32) {
     m_spells[IDX(spell)] = 1;
 }
 
+VA(0x0046141a, 0x72)
 void HeroMessageUpdate(char* text) {
     tag_message message;
 
@@ -381,6 +393,7 @@ void HeroMessageUpdate(char* text) {
     );
 }
 
+VA(0x0046148c, 0x94)
 void hero::HeroScreenUpdate(void) {
     tag_message message;
     i32 index;
@@ -400,6 +413,7 @@ void hero::HeroScreenUpdate(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
+VA(0x00461520, 0x1c3)
 void hero::UpdateArmies(void) {
     tag_message message;
     i32 index;
@@ -451,6 +465,7 @@ void hero::UpdateArmies(void) {
     }
 }
 
+VA(0x004616e3, 0x39)
 void hero::ViewStat(i32 stat, i32 quickView) {
     NormalDialog(
         gStatDesc[stat],
@@ -466,6 +481,7 @@ void hero::ViewStat(i32 stat, i32 quickView) {
     );
 }
 
+VA(0x0046171c, 0x8b)
 void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     if (artifact == ARTIFACT_SPELL_SCROLL) {
         sprintf(gText, gArtifactDesc[IDX(artifact)], gSpellNames[extra]);
@@ -497,6 +513,7 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
     }
 }
 
+VA(0x004617a7, 0x4b)
 i32 hero::Dismiss(void) {
     NormalDialog(
         "Are you sure you want to dismiss this Hero?",
@@ -517,6 +534,7 @@ i32 hero::Dismiss(void) {
     return 0;
 }
 
+VA(0x004617f2, 0x4e4)
 void hero::Deallocate(i32 updateMap) {
     i32 availableHeroSlotCurrent;
     playerData* player;
@@ -640,6 +658,7 @@ void hero::Deallocate(i32 updateMap) {
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+VA(0x00461cd6, 0x8a)
 i32 hero::GetExperience(i32 level) {
     i32 experience;
     i32 levelCounter;
@@ -664,6 +683,7 @@ i32 hero::GetExperience(i32 level) {
     return experience;
 }
 
+VA(0x00461d60, 0xac)
 i32 hero::GetLevel(i32 experienceValue) {
     i32 experience;
     i32 levelCounter;
@@ -690,6 +710,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     return levelCounter - 1;
 }
 
+VA(0x00461e0c, 0x2a9)
 void hero::ApplyBattleWinTemps(void) {
     m_lastTownInteractionTurn = HERO_INTERACTION_TURN_NONE;
     m_lastHeroInteractionTurn = HERO_INTERACTION_TURN_NONE;
@@ -744,10 +765,12 @@ void hero::ApplyBattleWinTemps(void) {
     }
 }
 
+VA(0x004620b5, 0x13)
 void hero::ApplyBattleLossTemps(void) {
     ApplyBattleWinTemps();
 }
 
+VA(0x004620c8, 0x6a3)
 void hero::CheckLevel(void) {
     i32 statBonuses[HERO_PRIMARY_STAT_COUNT];
     char line[HERO_LEVEL_TEXT_BUFFER_SIZE];
@@ -933,6 +956,7 @@ void hero::CheckLevel(void) {
     }
 }
 
+VA(0x0046276b, 0x4b)
 i32 hero::NumArtifacts(void) {
     i32 cnt = 0;
     i32 i;
@@ -944,6 +968,7 @@ i32 hero::NumArtifacts(void) {
     return cnt;
 }
 
+VA(0x004627b6, 0x66c)
 void UpdateHeroScreenStatusBar(struct tag_message& message) {
     i32 armySlot;
     i32 secondarySkillSlot;
@@ -1148,6 +1173,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     HeroMessageUpdate(gText);
 }
 
+VA(0x00462ef8, 0x8cd)
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
     i32 temp1;
@@ -1545,6 +1571,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004638b2, 0x44)
 void RedrawHeroScreen(void) {
     gpResourceManager
         ->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
@@ -1552,6 +1579,7 @@ void RedrawHeroScreen(void) {
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
 
+VA(0x004638f6, 0x219)
 i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     mapCell* heroCell;
 
@@ -1595,6 +1623,7 @@ i32 HeroView(i32 heroId, i32 noDismiss, i32 fadeAlreadyOut) {
     return UI_VIEW_CLOSED;
 }
 
+VA(0x00463b0f, 0x906)
 void SetupHeroView(void) {
     i32 cannotDismiss;
     tag_message message;
@@ -1850,6 +1879,7 @@ void SetupHeroView(void) {
     UpdateHeroScreenStatusBar(statusMessage);
 }
 
+VA(0x00464415, 0x2b6)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitTextSlot = UI_SPLIT_TEXT;
     i16 splitAmount = UI_SPLIT_AMOUNT;
@@ -1895,6 +1925,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     }
 }
 
+VA(0x004646cb, 0x4f)
 void hero::SetSS(
     H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
     H2_ENUM_PARAM(HeroSkillLevel, i32) level
@@ -1907,6 +1938,7 @@ void hero::SetSS(
         GiveSS(skill, level);
 }
 
+VA(0x0046471a, 0xee)
 i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
     H2_ENUM_STORAGE(HeroSkillLevel, i32) oldLevel;
     H2_ENUM_STORAGE_STEPPED(HeroSecondarySkill, i32) otherSkill;
@@ -1930,6 +1962,7 @@ i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
     return IDX(oldLevel) - IDX(m_secondarySkills[IDX(skill)]);
 }
 
+VA(0x00464808, 0xa9)
 i32 hero::GiveSS(
     H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
     H2_ENUM_PARAM(HeroSkillLevel, i32) levels
@@ -1951,6 +1984,7 @@ i32 hero::GiveSS(
     return IDX(m_secondarySkills[IDX(skill)]) - IDX(oldLevel);
 }
 
+VA(0x004648b1, 0x5a)
 i32 hero::CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     i32 creatureCount;
     i32 armySlot;
@@ -1965,6 +1999,7 @@ i32 hero::CreatureTypeCount(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     return creatureCount;
 }
 
+VA(0x0046490b, 0x4b)
 void hero::UpgradeCreatures(
     H2_ENUM_PARAM(CreatureType, i32) oldCreatureType,
     H2_ENUM_PARAM(CreatureType, i32) newCreatureType
@@ -1978,6 +2013,7 @@ void hero::UpgradeCreatures(
     }
 }
 
+VA(0x00464956, 0x49)
 HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
     HeroSecondarySkill skill;
 
@@ -1988,12 +2024,14 @@ HeroSecondarySkill hero::GetNthSS(i32 ordinal) {
     return HERO_SKILL_NONE;
 }
 
+VA(0x0046499f, 0x35)
 class town* hero::GetOccupiedTown(void) {
     if (m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
         return gpGame->GetTown(m_occupiedTown);
     return NULL;
 }
 
+VA(0x004649d4, 0x2f)
 i8 hero::Stats(HeroPrimaryStat stat) {
     if (stat == HERO_PRIMARY_SPELL_POWER && m_primaryStats[IDX(stat)] < HERO_MINIMUM_SPELL_POWER) {
         return HERO_MINIMUM_SPELL_POWER;
@@ -2001,6 +2039,7 @@ i8 hero::Stats(HeroPrimaryStat stat) {
     return m_primaryStats[IDX(stat)];
 }
 
+VA(0x00464a03, 0x9b)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
     // Necromancy bonuses turn the stored 0..3 tier into a 10%-per-point effect score.
@@ -2023,6 +2062,7 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     return IDX(baseLevel);
 }
 
+VA(0x00464a9e, 0xdd)
 void hero::DoSSLevelDialog(
     H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView
 ) {
@@ -2063,6 +2103,7 @@ void hero::DoSSLevelDialog(
     );
 }
 
+VA(0x00464b7b, 0x107)
 void hero::CheckAnduranPieces(i32 showDialog) {
     i32 artifactSlot;
 
