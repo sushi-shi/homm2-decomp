@@ -19,39 +19,39 @@
 #include <SOURCE/townManager.h>
 
 H2_ENUM_BEGIN(RecruitConstant)
-    RESOURCE_COUNT   = 6,
-    GOLD_RESOURCE    = 6,
-    WINDOW_X         = 0x8f,
-    WINDOW_Y         = 0x10,
-    QUICK_WINDOW_X   = 0xa0,
-    QUICK_WINDOW_Y   = 0x10,
-    NAME_SIZE        = 20,
-    LABEL_SIZE       = 40,
-    BROADCAST_FLAGS  = 0x4008,
-    DRAW_DEPTH       = 0x7fff,
-    VIEW_ARMY_X      = 0x77,
-    VIEW_ARMY_Y      = 0x20,
+    RESOURCE_COUNT = 6,
+    GOLD_RESOURCE = 6,
+    WINDOW_X = 0x8f,
+    WINDOW_Y = 0x10,
+    QUICK_WINDOW_X = 0xa0,
+    QUICK_WINDOW_Y = 0x10,
+    NAME_SIZE = 20,
+    LABEL_SIZE = 40,
+    BROADCAST_FLAGS = 0x4008,
+    DRAW_DEPTH = 0x7fff,
+    VIEW_ARMY_X = 0x77,
+    VIEW_ARMY_Y = 0x20,
     NO_ROOM_DIALOG_X = 177,
     NO_ROOM_DIALOG_Y = 100
 H2_ENUM_END(RecruitConstant)
 
 H2_ENUM_BEGIN(RecruitControl)
-    TITLE_CONTROL          = 0x40,
-    CREATURE_CONTROL       = 0x42,
-    AVAILABLE_CONTROL      = 0x43,
-    QUANTITY_CONTROL       = 0x44,
-    INCREASE_CONTROL       = 0x45,
-    DECREASE_CONTROL       = 0x46,
-    MAXIMUM_CONTROL        = 0x47,
-    GOLD_ICON_CONTROL      = 0x49,
-    RESOURCE_ICON_CONTROL  = 0x4a,
-    RESOURCE_COST_CONTROL  = 0x4b,
-    GOLD_TOTAL_CONTROL     = 0x4d,
+    TITLE_CONTROL = 0x40,
+    CREATURE_CONTROL = 0x42,
+    AVAILABLE_CONTROL = 0x43,
+    QUANTITY_CONTROL = 0x44,
+    INCREASE_CONTROL = 0x45,
+    DECREASE_CONTROL = 0x46,
+    MAXIMUM_CONTROL = 0x47,
+    GOLD_ICON_CONTROL = 0x49,
+    RESOURCE_ICON_CONTROL = 0x4a,
+    RESOURCE_COST_CONTROL = 0x4b,
+    GOLD_TOTAL_CONTROL = 0x4d,
     RESOURCE_IMAGE_CONTROL = 0x4e,
     RESOURCE_TOTAL_CONTROL = 0x4f,
-    CLOSE_CONTROL          = 0x7800,
-    CANCEL_CONTROL         = 0x7801,
-    CONFIRM_CONTROL        = 0x7802
+    CLOSE_CONTROL = 0x7800,
+    CANCEL_CONTROL = 0x7801,
+    CONFIRM_CONTROL = 0x7802
 H2_ENUM_END(RecruitControl)
 
 VA(0x0048c330, 0x1f2)
@@ -179,7 +179,9 @@ void recruitUnit::Close(void) {
     delete m_window;
     if (m_noRoom != 0) {
         NormalDialog(
-            "There is no room in the garrison for this army.",
+            "\xc4\xeb\xff \xfd\xf2\xee\xe9 \xe0\xf0\xec\xe8\xe8 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0 "
+            "\xe2 \xe3\xe0\xf0\xed\xe8\xe7\xee\xed\xe5." /* "Для этой армии нет места в гарнизоне." */
+            ,
             NORMAL_DIALOG_INFO,
             NO_ROOM_DIALOG_X,
             NO_ROOM_DIALOG_Y,
@@ -435,7 +437,5 @@ void QuickViewRecruit(class town* townData, i32 dwelling) {
     QuickViewWait();
     gpWindowManager->RemoveWindow(recruitWindow);
 }
-
-
 
 HMENU hmnuRecruitSave;

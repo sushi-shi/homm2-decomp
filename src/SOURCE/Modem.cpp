@@ -11,17 +11,17 @@
 #include <SOURCE/kbwin.h>
 
 H2_ENUM_BEGIN(ModemPrivateConstant)
-    SETUP_TEXT_CAPACITY       = 104,
-    RESET_ATTEMPT_COUNT       = 2,
+    SETUP_TEXT_CAPACITY = 104,
+    RESET_ATTEMPT_COUNT = 2,
     PRINTABLE_CHARACTER_FIRST = 32,
-    READ_STORAGE_SIZE         = 4,
-    HANDSHAKE_TEXT_CAPACITY   = 20,
-    HANDSHAKE_PACKET_SIZE     = 10,
-    HANDSHAKE_PREFIX_SIZE     = 2,
-    HANDSHAKE_ID_SIZE         = 6,
-    HANDSHAKE_STAGE_INDEX     = 9,
-    MILLISECONDS_PER_SECOND   = 1000,
-    INPUT_QUEUE_GUARD         = 4
+    READ_STORAGE_SIZE = 4,
+    HANDSHAKE_TEXT_CAPACITY = 20,
+    HANDSHAKE_PACKET_SIZE = 10,
+    HANDSHAKE_PREFIX_SIZE = 2,
+    HANDSHAKE_ID_SIZE = 6,
+    HANDSHAKE_STAGE_INDEX = 9,
+    MILLISECONDS_PER_SECOND = 1000,
+    INPUT_QUEUE_GUARD = 4
 H2_ENUM_END(ModemPrivateConstant)
 
 VA(0x00472ca0, 0x1f8)
@@ -37,11 +37,7 @@ void ModemSetup(i32 mode) {
     outque.writePosition = 0;
     outque.readPosition = 0;
     iBaudBits = MODEM_BAUD_CLOCK / IDX(gConfig.baudRate[gbDirectConnect]);
-    com_init(
-        static_cast<u8>(gConfig.comPort[gbDirectConnect]),
-        COM_BAUD_19200,
-        0
-    );
+    com_init(static_cast<u8>(gConfig.comPort[gbDirectConnect]), COM_BAUD_19200, 0);
     LogStr("MS2");
 
     if (gbDirectConnect == 0) {
@@ -83,21 +79,16 @@ void ModemSetup(i32 mode) {
         giWaitType = DIALOG_WAIT_DIRECT_CONNECT;
         strcpy(
             directConnectMessage3,
-            "Waiting for other computer to log in to direct connection.\n\n"
-            "Press 'CANCEL' to abort."
+            "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xef\xee\xe4\xea\xeb\xfe\xf7\xe5\xed\xe8\xff "
+            "\xe4\xf0\xf3\xe3\xee\xe3\xee \xea\xee\xec\xef\xfc\xfe\xf2\xe5\xf0\xe0 \xea "
+            "\xef\xf0\xff\xec\xee\xec\xf3 "
+            "\xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xfe.\n\n\xcd\xe0\xe6\xec\xe8\xf2\xe5 "
+            "'\xce\xd2\xcc\xc5\xcd\xc0', \xf7\xf2\xee\xe1\xfb \xef\xf0\xe5\xf0\xe2\xe0\xf2\xfc "
+            "\xee\xe6\xe8\xe4\xe0\xed\xe8\xe5." /* "Ожидание подключения другого компьютера к прямому соединению.
+
+Нажмите 'ОТМЕНА', чтобы прервать ожидание." */
         );
-        NormalDialog(
-            directConnectMessage3,
-            NORMAL_DIALOG_WAIT_LAST,
-            -1,
-            -1,
-            -1,
-            0,
-            -1,
-            0,
-            -1,
-            0
-        );
+        NormalDialog(directConnectMessage3, NORMAL_DIALOG_WAIT_LAST, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gbFunctionComplete == 0)
             ShutDown(NULL);
         LogStr("MS5");
@@ -111,9 +102,9 @@ i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
     sprintf(dialCommand, "ATDT%s", numbuf);
-    sprintf(gText, "%s %s", "Dialing...", numbuf);
+    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..." /* "Звоню..." */, numbuf);
     GUIModemCommand(gText, dialCommand);
-    sprintf(gText, "%s %s", "Dialing...", numbuf);
+    sprintf(gText, "%s %s", "\xc7\xe2\xee\xed\xfe..." /* "Звоню..." */, numbuf);
     if (GUIModemResponse(gText, "CONNECT") != 0)
         return 1;
     return 0;
@@ -121,9 +112,21 @@ i32l Dial(void) {
 
 VA(0x00472f26, 0x42)
 i32l Wait(void) {
-    GUIModemResponse("Waiting for ring...", "RING");
-    GUIModemCommand("Initializing modem...", "ATA");
-    if (GUIModemResponse("Establishing connection...", "CONNECT") != 0)
+    GUIModemResponse(
+        "\xce\xe6\xe8\xe4\xe0\xed\xe8\xe5 \xe7\xe2\xee\xed\xea\xe0..." /* "Ожидание звонка..." */,
+        "RING"
+    );
+    GUIModemCommand(
+        "\xc8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xff \xec\xee\xe4\xe5\xec\xe0..." /* "Инициализация модема..." */
+        ,
+        "ATA"
+    );
+    if (GUIModemResponse(
+            "\xd3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0 \xf1\xee\xe5\xe4\xe8\xed\xe5\xed\xe8\xff..." /* "Установка соединения..." */
+            ,
+            "CONNECT"
+        )
+        != 0)
         return 1;
     return 0;
 }
@@ -303,8 +306,7 @@ i32 WaitForDirectConnect(void) {
                 oldsec = -1;
             }
             stime = KBTickCount();
-            if (oldsec / MILLISECONDS_PER_SECOND
-                != stime / MILLISECONDS_PER_SECOND) {
+            if (oldsec / MILLISECONDS_PER_SECOND != stime / MILLISECONDS_PER_SECOND) {
                 oldsec = stime;
                 sprintf(idMessage, "ID%s_%i", idstr, localstage);
                 WriteModemPacket(idMessage, strlen(idMessage));

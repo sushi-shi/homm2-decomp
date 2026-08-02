@@ -14,14 +14,13 @@
 #define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\WINGRAPH.CPP"
 
 H2_ENUM_BEGIN(WingraphPaletteConstant)
-    PALETTE_COMPONENT_COUNT     = 3,
-    PALETTE_RED_COMPONENT       = 0,
-    PALETTE_GREEN_COMPONENT     = 1,
-    PALETTE_BLUE_COMPONENT      = 2,
-    PALETTE_VALUE_SHIFT         = 2,
+    PALETTE_COMPONENT_COUNT = 3,
+    PALETTE_RED_COMPONENT = 0,
+    PALETTE_GREEN_COMPONENT = 1,
+    PALETTE_BLUE_COMPONENT = 2,
+    PALETTE_VALUE_SHIFT = 2,
     SYSTEM_PALETTE_REGION_COUNT = 2
 H2_ENUM_END(WingraphPaletteConstant)
-
 
 static RECT gDDSourceRect;
 static RECT gDDClientRect;
@@ -257,11 +256,7 @@ void DDInitializePalette(void) {
         }
         result0 = lpDD->CreatePalette(DDPCAPS_8BIT, LogicalPalette.entries, &lpDDPal, NULL);
         if (result0 != DD_OK)
-            DDSD(
-                result0,
-                RETAIL_FILE,
-                359
-            );
+            DDSD(result0, RETAIL_FILE, 359);
         SetPalette();
     }
 }
@@ -458,24 +453,15 @@ void DDUpdatePalette(i8* paletteData) {
             << PALETTE_VALUE_SHIFT;
         LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
     }
-    ProcessAssert(
-        reinterpret_cast<i32>(lpDDPal),
-        RETAIL_FILE,
-        518
-    );
+    ProcessAssert(reinterpret_cast<i32>(lpDDPal), RETAIL_FILE, 518);
     result0 = lpDDPal->SetEntries(
         0,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
-        WINGRAPH_PALETTE_SIZE
-            - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
+        WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
         &LogicalPalette.entries[WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
     if (result0 != DD_OK)
-        DDSD(
-            result0,
-            RETAIL_FILE,
-            522
-        );
+        DDSD(result0, RETAIL_FILE, 522);
 }
 
 VA(0x004b0d03, 0x14a)
@@ -541,34 +527,18 @@ void DDSetFullScreenStatus(i32 fullScreen) {
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
         );
         if (result0 != DD_OK)
-            DDSD(
-                result0,
-                RETAIL_FILE,
-                593
-            );
+            DDSD(result0, RETAIL_FILE, 593);
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
             result0 = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
             if (result0 != DD_OK)
-                DDSD(
-                    result0,
-                    RETAIL_FILE,
-                    599
-                );
+                DDSD(result0, RETAIL_FILE, 599);
         } else {
             result0 = lpDD->RestoreDisplayMode();
             if (result0 != DD_OK)
-                DDSD(
-                    result0,
-                    RETAIL_FILE,
-                    606
-                );
+                DDSD(result0, RETAIL_FILE, 606);
             result0 = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
             if (result0 != DD_OK)
-                DDSD(
-                    result0,
-                    RETAIL_FILE,
-                    611
-                );
+                DDSD(result0, RETAIL_FILE, 611);
         }
         if (lpDDSPrimary != NULL) {
             lpDDSPrimary->Release();
@@ -577,11 +547,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         CreatePrimary();
         result0 = lpDDSPrimary->SetPalette(lpDDPal);
         if (result0 != DD_OK)
-            DDSD(
-                result0,
-                RETAIL_FILE,
-                623
-            );
+            DDSD(result0, RETAIL_FILE, 623);
         WritePrefs();
         gbWinGraphBusy = false;
         if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
@@ -674,15 +640,13 @@ void WGUpdatePalette(i8* paletteData) {
     AnimatePalette(
         hpalApp,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
-        WINGRAPH_PALETTE_SIZE
-            - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
+        WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
         &LogicalPalette.entries[WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
     WinGSetDIBColorTable(
         hdcImage,
         WINGRAPH_SYSTEM_PALETTE_SIZE,
-        WINGRAPH_PALETTE_SIZE
-            - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
+        WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE * IDX(SYSTEM_PALETTE_REGION_COUNT),
         &screenImage.colors[WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
     if (hpalApp != NULL)
@@ -904,10 +868,19 @@ void GetGraphicsInfo(void) {
         ReleaseDC(NULL, screenDC);
         if (giMainVideoModeColorDepth < WINGRAPH_COLOR_DEPTH)
             ShutDown(
-                "Heroes II requires 256 color mode or higher.\n\n"
-                "To change color mode, right click in an open area on the Windows 95 "
-                "background, choose 'Properties', then the 'Settings' tab, then change "
-                "the entry in the 'Color Palette Box'."
+                "\xc4\xeb\xff \xc3\xe5\xf0\xee\xe5\xe2 II \xf2\xf0\xe5\xe1\xf3\xe5\xf2\xf1\xff "
+                "\xf0\xe5\xe6\xe8\xec \xe2 256 \xf6\xe2\xe5\xf2\xee\xe2 \xe8\xeb\xe8 "
+                "\xe1\xee\xeb\xfc\xf8\xe5.\n\n\xd7\xf2\xee\xe1\xfb "
+                "\xe8\xe7\xec\xe5\xed\xe8\xf2\xfc \xf0\xe5\xe6\xe8\xec "
+                "\xf6\xe2\xe5\xf2\xed\xee\xf1\xf2\xe8, \xf9\xe5\xeb\xea\xed\xe8\xf2\xe5 "
+                "\xef\xf0\xe0\xe2\xee\xe9 \xea\xed\xee\xef\xea\xee\xe9 \xef\xee "
+                "\xf0\xe0\xe1\xee\xf7\xe5\xec\xf3 \xf1\xf2\xee\xeb\xf3 Windows \xe8 "
+                "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 'Properties'/\xd1\xe2\xee\xe9\xf1\xf2\xe2\xe0'. "
+                "\xc7\xe0\xf2\xe5\xec \xe2 \xf3\xf1\xf2\xe0\xed\xee\xe2\xea\xe0\xf5 "
+                "\xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5 \xe3\xeb\xf3\xe1\xe8\xed\xf3 "
+                "\xf6\xe2\xe5\xf2\xe0." /* "Для Героев II требуется режим в 256 цветов или больше.
+
+Чтобы изменить режим цветности, щелкните правой кнопкой по рабочему столу Windows и выберите 'Properties'/Свойства'. Затем в установках выберите глубину цвета." */
             );
     }
 }
@@ -1066,4 +1039,3 @@ HINSTANCE hDDrawLibrary = NULL;
 i32l lDelayRefresh = 0;
 i32l lPaintStart;
 struct _IMAGE screenImage;
-

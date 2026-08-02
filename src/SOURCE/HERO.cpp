@@ -31,161 +31,161 @@
 #define HERO_EXPERIENCE_GROWTH_FACTOR 1.2
 
 H2_ENUM_BEGIN(HeroUiConstant)
-    UI_STATUS_TEXT_WIDGET          = 0x12f,
-    UI_ARTIFACT_SLOT_0             = 0x14,
-    UI_ARTIFACT_SLOT_1             = 0x15,
-    UI_ARTIFACT_SLOT_2             = 0x16,
-    UI_ARTIFACT_SLOT_3             = 0x17,
-    UI_ARTIFACT_SLOT_4             = 0x18,
-    UI_ARTIFACT_SLOT_5             = 0x19,
-    UI_ARTIFACT_SLOT_6             = 0x1a,
-    UI_ARTIFACT_SLOT_7             = 0x1b,
-    UI_ARTIFACT_SLOT_8             = 0x1c,
-    UI_ARTIFACT_SLOT_9             = 0x1d,
-    UI_ARTIFACT_SLOT_10            = 0x1e,
-    UI_ARTIFACT_SLOT_11            = 0x1f,
-    UI_ARTIFACT_SLOT_12            = 0x20,
-    UI_ARTIFACT_SLOT_13            = 0x21,
-    UI_ARTIFACT_FIRST              = UI_ARTIFACT_SLOT_0,
-    UI_ARTIFACT_LAST               = UI_ARTIFACT_SLOT_13,
-    UI_PRIMARY_STAT_ATTACK         = 0x51,
-    UI_PRIMARY_STAT_DEFENSE        = 0x52,
-    UI_PRIMARY_STAT_SPELL_POWER    = 0x53,
-    UI_PRIMARY_STAT_KNOWLEDGE      = 0x54,
-    UI_PRIMARY_STAT_FIRST          = UI_PRIMARY_STAT_ATTACK,
-    UI_PRIMARY_STAT_LAST           = UI_PRIMARY_STAT_KNOWLEDGE,
-    UI_ADDITIONAL_STATS            = 0x55,
-    UI_ARMY_ICON_FIRST             = 0x57,
-    UI_ARMY_PORTRAIT_FIRST         = 0x5c,
-    UI_ARMY_COUNT_FIRST            = 0x61,
-    UI_ARMY_SELECTOR_SLOT_0        = 0x66,
-    UI_ARMY_SELECTOR_SLOT_1        = 0x67,
-    UI_ARMY_SELECTOR_SLOT_2        = 0x68,
-    UI_ARMY_SELECTOR_SLOT_3        = 0x69,
-    UI_ARMY_SELECTOR_SLOT_4        = 0x6a,
-    UI_ARMY_SELECTOR_FIRST         = UI_ARMY_SELECTOR_SLOT_0,
-    UI_ARMY_SELECTOR_LAST          = UI_ARMY_SELECTOR_SLOT_4,
-    UI_HERO_TITLE                  = 2,
-    UI_HERO_PORTRAIT               = 0x41,
-    UI_PRIMARY_STAT_VALUE_FIRST    = 0x4c,
-    UI_PLAYER_CREST                = 0x56,
-    UI_MORALE_FIRST                = 0xc8,
-    UI_MORALE_MIDDLE               = 0xc9,
-    UI_MORALE_LAST                 = 0xca,
-    UI_LUCK_FIRST                  = 0xcb,
-    UI_LUCK_MIDDLE                 = 0xcc,
-    UI_LUCK_LAST                   = 0xcd,
-    UI_EXPERIENCE_FIRST            = 0xce,
-    UI_EXPERIENCE_LAST             = 0xcf,
-    UI_SPELL_POINTS_FIRST          = 0xd3,
-    UI_SPELL_POINTS_LAST           = 0xd4,
-    UI_FORMATION_SPREAD            = 0xd6,
-    UI_FORMATION_GROUPED           = 0xd8,
-    UI_FORMATION_SPREAD_ICON       = 0xd5,
-    UI_FORMATION_GROUPED_ICON      = 0xd7,
-    UI_PREVIOUS_HERO               = 300,
-    UI_NEXT_HERO                   = 301,
-    UI_ARMY_SELECTION_NONE         = -1,
-    UI_HERO_CYCLE_MIN_COUNT        = 2,
-    UI_SINGLE_HERO_COUNT           = 1,
-    UI_MODIFIER_ICON_COUNT         = 3,
-    UI_MIN_MODIFIER_ICONS          = 1,
-    UI_PREVIOUS_HERO_MASK          = -2,
-    UI_SECONDARY_SKILL_ROW1_FIRST  = 0x190,
-    UI_SECONDARY_SKILL_ROW1_LAST   = 0x197,
-    UI_SECONDARY_SKILL_ROW2_FIRST  = 0x198,
-    UI_SECONDARY_SKILL_ROW2_LAST   = 0x19f,
-    UI_SECONDARY_SKILL_ROW3_FIRST  = 0x1a0,
-    UI_SECONDARY_SKILL_ROW3_LAST   = 0x1a7,
-    UI_CLOSE                       = 0x7800,
-    UI_DISMISS                     = 0x7803,
-    UI_DIALOG_CLOSE_COMMAND        = 10,
-    UI_VIEW_ARMY_X                 = 0x77,
-    UI_VIEW_ARMY_Y                 = 0x14,
-    UI_VIEW_SPELLS_SPECIAL         = 1,
-    UI_CASTLE_DIALOG_ACTIVE        = 1,
-    UI_ARMY_EMPTY_FRAME            = 2,
-    UI_WIDGET_FRAME_ACTIVE         = 4,
-    UI_ARTIFACT_DIALOG_ICON        = 0x1c,
-    UI_ARMY_SLOT_COUNT             = 5,
-    UI_SCREEN_WIDTH                = 640,
-    UI_SCREEN_HEIGHT               = 480,
-    UI_STATUS_REGION_Y             = 459,
-    UI_STATUS_REGION_HEIGHT        = 20,
-    UI_FADE_STEPS                  = 8,
-    UI_LOOPING_SOUND_KEEP_COUNT    = 4,
-    UI_VIEW_CLOSED                 = 0,
-    UI_VIEW_DISMISSED              = 1,
-    UI_WINDOW_TEXT_ID              = 6,
-    UI_BACKDROP_PALETTE            = 1,
-    UI_DIALOG_DISMISS              = 0x7803,
-    UI_DIALOG_SPLIT                = 0x7802,
-    UI_SPLIT_WINDOW_X              = 0xb1,
-    UI_SPLIT_WINDOW_Y              = 0x14,
-    UI_SPLIT_TEXT                  = 1,
-    UI_SPLIT_AMOUNT                = 68,
-    UI_CONTROL_VALUE_DEFAULT       = 6,
-    UI_CONTROL_FRAME_DEFAULT       = 4,
-    UI_CYCLE_BUTTON_FRAME          = 2,
+    UI_STATUS_TEXT_WIDGET = 0x12f,
+    UI_ARTIFACT_SLOT_0 = 0x14,
+    UI_ARTIFACT_SLOT_1 = 0x15,
+    UI_ARTIFACT_SLOT_2 = 0x16,
+    UI_ARTIFACT_SLOT_3 = 0x17,
+    UI_ARTIFACT_SLOT_4 = 0x18,
+    UI_ARTIFACT_SLOT_5 = 0x19,
+    UI_ARTIFACT_SLOT_6 = 0x1a,
+    UI_ARTIFACT_SLOT_7 = 0x1b,
+    UI_ARTIFACT_SLOT_8 = 0x1c,
+    UI_ARTIFACT_SLOT_9 = 0x1d,
+    UI_ARTIFACT_SLOT_10 = 0x1e,
+    UI_ARTIFACT_SLOT_11 = 0x1f,
+    UI_ARTIFACT_SLOT_12 = 0x20,
+    UI_ARTIFACT_SLOT_13 = 0x21,
+    UI_ARTIFACT_FIRST = UI_ARTIFACT_SLOT_0,
+    UI_ARTIFACT_LAST = UI_ARTIFACT_SLOT_13,
+    UI_PRIMARY_STAT_ATTACK = 0x51,
+    UI_PRIMARY_STAT_DEFENSE = 0x52,
+    UI_PRIMARY_STAT_SPELL_POWER = 0x53,
+    UI_PRIMARY_STAT_KNOWLEDGE = 0x54,
+    UI_PRIMARY_STAT_FIRST = UI_PRIMARY_STAT_ATTACK,
+    UI_PRIMARY_STAT_LAST = UI_PRIMARY_STAT_KNOWLEDGE,
+    UI_ADDITIONAL_STATS = 0x55,
+    UI_ARMY_ICON_FIRST = 0x57,
+    UI_ARMY_PORTRAIT_FIRST = 0x5c,
+    UI_ARMY_COUNT_FIRST = 0x61,
+    UI_ARMY_SELECTOR_SLOT_0 = 0x66,
+    UI_ARMY_SELECTOR_SLOT_1 = 0x67,
+    UI_ARMY_SELECTOR_SLOT_2 = 0x68,
+    UI_ARMY_SELECTOR_SLOT_3 = 0x69,
+    UI_ARMY_SELECTOR_SLOT_4 = 0x6a,
+    UI_ARMY_SELECTOR_FIRST = UI_ARMY_SELECTOR_SLOT_0,
+    UI_ARMY_SELECTOR_LAST = UI_ARMY_SELECTOR_SLOT_4,
+    UI_HERO_TITLE = 2,
+    UI_HERO_PORTRAIT = 0x41,
+    UI_PRIMARY_STAT_VALUE_FIRST = 0x4c,
+    UI_PLAYER_CREST = 0x56,
+    UI_MORALE_FIRST = 0xc8,
+    UI_MORALE_MIDDLE = 0xc9,
+    UI_MORALE_LAST = 0xca,
+    UI_LUCK_FIRST = 0xcb,
+    UI_LUCK_MIDDLE = 0xcc,
+    UI_LUCK_LAST = 0xcd,
+    UI_EXPERIENCE_FIRST = 0xce,
+    UI_EXPERIENCE_LAST = 0xcf,
+    UI_SPELL_POINTS_FIRST = 0xd3,
+    UI_SPELL_POINTS_LAST = 0xd4,
+    UI_FORMATION_SPREAD = 0xd6,
+    UI_FORMATION_GROUPED = 0xd8,
+    UI_FORMATION_SPREAD_ICON = 0xd5,
+    UI_FORMATION_GROUPED_ICON = 0xd7,
+    UI_PREVIOUS_HERO = 300,
+    UI_NEXT_HERO = 301,
+    UI_ARMY_SELECTION_NONE = -1,
+    UI_HERO_CYCLE_MIN_COUNT = 2,
+    UI_SINGLE_HERO_COUNT = 1,
+    UI_MODIFIER_ICON_COUNT = 3,
+    UI_MIN_MODIFIER_ICONS = 1,
+    UI_PREVIOUS_HERO_MASK = -2,
+    UI_SECONDARY_SKILL_ROW1_FIRST = 0x190,
+    UI_SECONDARY_SKILL_ROW1_LAST = 0x197,
+    UI_SECONDARY_SKILL_ROW2_FIRST = 0x198,
+    UI_SECONDARY_SKILL_ROW2_LAST = 0x19f,
+    UI_SECONDARY_SKILL_ROW3_FIRST = 0x1a0,
+    UI_SECONDARY_SKILL_ROW3_LAST = 0x1a7,
+    UI_CLOSE = 0x7800,
+    UI_DISMISS = 0x7803,
+    UI_DIALOG_CLOSE_COMMAND = 10,
+    UI_VIEW_ARMY_X = 0x77,
+    UI_VIEW_ARMY_Y = 0x14,
+    UI_VIEW_SPELLS_SPECIAL = 1,
+    UI_CASTLE_DIALOG_ACTIVE = 1,
+    UI_ARMY_EMPTY_FRAME = 2,
+    UI_WIDGET_FRAME_ACTIVE = 4,
+    UI_ARTIFACT_DIALOG_ICON = 0x1c,
+    UI_ARMY_SLOT_COUNT = 5,
+    UI_SCREEN_WIDTH = 640,
+    UI_SCREEN_HEIGHT = 480,
+    UI_STATUS_REGION_Y = 459,
+    UI_STATUS_REGION_HEIGHT = 20,
+    UI_FADE_STEPS = 8,
+    UI_LOOPING_SOUND_KEEP_COUNT = 4,
+    UI_VIEW_CLOSED = 0,
+    UI_VIEW_DISMISSED = 1,
+    UI_WINDOW_TEXT_ID = 6,
+    UI_BACKDROP_PALETTE = 1,
+    UI_DIALOG_DISMISS = 0x7803,
+    UI_DIALOG_SPLIT = 0x7802,
+    UI_SPLIT_WINDOW_X = 0xb1,
+    UI_SPLIT_WINDOW_Y = 0x14,
+    UI_SPLIT_TEXT = 1,
+    UI_SPLIT_AMOUNT = 68,
+    UI_CONTROL_VALUE_DEFAULT = 6,
+    UI_CONTROL_FRAME_DEFAULT = 4,
+    UI_CYCLE_BUTTON_FRAME = 2,
     UI_CYCLE_BUTTON_DISABLED_FRAME = 0x1000,
-    UI_LUCK_NEGATIVE_FRAME         = 3,
-    UI_LUCK_NEUTRAL_FRAME          = 6,
-    UI_LUCK_POSITIVE_FRAME         = 2,
-    UI_MORALE_NEGATIVE_FRAME       = 5,
-    UI_MORALE_NEUTRAL_FRAME        = 7,
-    UI_MORALE_POSITIVE_FRAME       = 4,
-    UI_EMPTY_SKILL_FRAME           = 0,
-    UI_EMPTY_ARTIFACT_FRAME        = 0,
-    UI_ARTIFACT_CONTROL_VALUE      = 2,
-    UI_ARMY_RACE_FRAME_OFFSET      = 4
+    UI_LUCK_NEGATIVE_FRAME = 3,
+    UI_LUCK_NEUTRAL_FRAME = 6,
+    UI_LUCK_POSITIVE_FRAME = 2,
+    UI_MORALE_NEGATIVE_FRAME = 5,
+    UI_MORALE_NEUTRAL_FRAME = 7,
+    UI_MORALE_POSITIVE_FRAME = 4,
+    UI_EMPTY_SKILL_FRAME = 0,
+    UI_EMPTY_ARTIFACT_FRAME = 0,
+    UI_ARTIFACT_CONTROL_VALUE = 2,
+    UI_ARMY_RACE_FRAME_OFFSET = 4
 H2_ENUM_END(HeroUiConstant)
 
 H2_ENUM_CLASS_BEGIN(HeroScreenText)
-    TEXT_PRIMARY_STAT      = 1,
-    TEXT_ADDITIONAL_STATS  = 2,
-    TEXT_GOOD_MORALE       = 3,
-    TEXT_NEUTRAL_MORALE    = 4,
-    TEXT_BAD_MORALE        = 5,
-    TEXT_GOOD_LUCK         = 6,
-    TEXT_NEUTRAL_LUCK      = 7,
-    TEXT_BAD_LUCK          = 8,
-    TEXT_EXPERIENCE        = 9,
-    TEXT_SELECT_ARMY       = 10,
-    TEXT_EMPTY             = 11,
-    TEXT_MOVE_ARMY         = 12,
-    TEXT_EXCHANGE_ARMIES   = 13,
-    TEXT_VIEW_SPELLS       = 14,
-    TEXT_ARTIFACT          = 15,
-    TEXT_DISMISS           = 16,
-    TEXT_EXIT              = 17,
-    TEXT_SCREEN            = 18,
-    TEXT_COMBINE_ARMIES    = 19,
-    TEXT_SPLIT_ARMY        = 20,
-    TEXT_SECONDARY_SKILL   = 21,
-    TEXT_SPELL_POINTS      = 22,
-    TEXT_SPREAD_FORMATION  = 23,
+    TEXT_PRIMARY_STAT = 1,
+    TEXT_ADDITIONAL_STATS = 2,
+    TEXT_GOOD_MORALE = 3,
+    TEXT_NEUTRAL_MORALE = 4,
+    TEXT_BAD_MORALE = 5,
+    TEXT_GOOD_LUCK = 6,
+    TEXT_NEUTRAL_LUCK = 7,
+    TEXT_BAD_LUCK = 8,
+    TEXT_EXPERIENCE = 9,
+    TEXT_SELECT_ARMY = 10,
+    TEXT_EMPTY = 11,
+    TEXT_MOVE_ARMY = 12,
+    TEXT_EXCHANGE_ARMIES = 13,
+    TEXT_VIEW_SPELLS = 14,
+    TEXT_ARTIFACT = 15,
+    TEXT_DISMISS = 16,
+    TEXT_EXIT = 17,
+    TEXT_SCREEN = 18,
+    TEXT_COMBINE_ARMIES = 19,
+    TEXT_SPLIT_ARMY = 20,
+    TEXT_SECONDARY_SKILL = 21,
+    TEXT_SPELL_POINTS = 22,
+    TEXT_SPREAD_FORMATION = 23,
     TEXT_GROUPED_FORMATION = 24
 H2_ENUM_CLASS_END(HeroScreenText)
 
 H2_ENUM_BEGIN(HeroMobilityConstant)
-    BASE_RECORD_SIZE              = 0xec,
-    LAND_SPEED_COUNT              = 8,
-    SLOWEST_LAND_SPEED            = LAND_SPEED_COUNT - 1,
-    SEA_BASE_MOBILITY             = 1500,
-    LIGHTHOUSE_MOBILITY_BONUS     = 500,
-    ASTROLABE_MOBILITY_BONUS      = 1000,
-    COMPASS_MOBILITY_BONUS        = 500,
-    NOMAD_BOOTS_MOBILITY_BONUS    = 600,
+    BASE_RECORD_SIZE = 0xec,
+    LAND_SPEED_COUNT = 8,
+    SLOWEST_LAND_SPEED = LAND_SPEED_COUNT - 1,
+    SEA_BASE_MOBILITY = 1500,
+    LIGHTHOUSE_MOBILITY_BONUS = 500,
+    ASTROLABE_MOBILITY_BONUS = 1000,
+    COMPASS_MOBILITY_BONUS = 500,
+    NOMAD_BOOTS_MOBILITY_BONUS = 600,
     TRAVELER_BOOTS_MOBILITY_BONUS = 300,
-    STABLES_MOBILITY_BONUS        = 400,
-    AI_DIFFICULTY_MOBILITY_BONUS  = 75,
-    AI_STATE_MOBILITY_BONUS       = 50
+    STABLES_MOBILITY_BONUS = 400,
+    AI_DIFFICULTY_MOBILITY_BONUS = 75,
+    AI_STATE_MOBILITY_BONUS = 50
 H2_ENUM_END(HeroMobilityConstant)
 
 H2_ENUM_BEGIN(HeroImplementationConstant)
     EXPERIENCE_PREVIOUS_ENTRY_OFFSET = 2,
-    TEMPLE_MORALE_BONUS              = 2,
-    PYRAMID_LUCK_PENALTY             = 2
+    TEMPLE_MORALE_BONUS = 2,
+    PYRAMID_LUCK_PENALTY = 2
 H2_ENUM_END(HeroImplementationConstant)
 
 VA(0x00460e50, 0x64)
@@ -247,12 +247,11 @@ i32 hero::CalcMobility(void) {
     if (HAS(m_eventFlags, HERO_EVENT_EMBARKED)) {
         mobilityResult = seaBaseMobilityCurrent;
         mobilityResult = static_cast<i32>(
-            mobilityResult
-            * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
+            mobilityResult * gfSSNavigationMod[IDX(m_secondarySkills[IDX(HERO_SKILL_NAVIGATION)])]
         );
         if (m_owner != -1)
-            mobilityResult += gpGame->MineTypesOwned(m_owner, MINE_TYPE_LIGHTHOUSE)
-                              * lighthouseBonusIncrement;
+            mobilityResult +=
+                gpGame->MineTypesOwned(m_owner, MINE_TYPE_LIGHTHOUSE) * lighthouseBonusIncrement;
         if (HasArtifact(ARTIFACT_SAILORS_ASTROLABE))
             mobilityResult += astrolabeBonus;
     } else {
@@ -267,8 +266,7 @@ i32 hero::CalcMobility(void) {
         }
         mobilityResult = landMobility[slowestSpeedValue];
         mobilityResult = static_cast<i32>(
-            mobilityResult
-            * gfSSLogisticsMod[IDX(m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)])]
+            mobilityResult * gfSSLogisticsMod[IDX(m_secondarySkills[IDX(HERO_SKILL_LOGISTICS)])]
         );
         if (HasArtifact(ARTIFACT_NOMAD_BOOTS))
             mobilityResult += nomadBootsMobilityBonus;
@@ -388,9 +386,8 @@ void HeroMessageUpdate(char* text) {
     message.payload.widget.data.text = text;
     gheroWin->BroadcastMessage(message);
     gheroWin->DrawWindow(0, UI_PREVIOUS_HERO, UI_STATUS_TEXT_WIDGET);
-    gpWindowManager->UpdateScreenRegion(
-        0, UI_STATUS_REGION_Y, UI_SCREEN_WIDTH, UI_STATUS_REGION_HEIGHT
-    );
+    gpWindowManager
+        ->UpdateScreenRegion(0, UI_STATUS_REGION_Y, UI_SCREEN_WIDTH, UI_STATUS_REGION_HEIGHT);
 }
 
 VA(0x0046148c, 0x94)
@@ -516,7 +513,9 @@ void hero::ViewArtifact(ArtifactType artifact, b32 quickView, i32 extra) {
 VA(0x004617a7, 0x4b)
 i32 hero::Dismiss(void) {
     NormalDialog(
-        "Are you sure you want to dismiss this Hero?",
+        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 "
+        "\xf3\xe2\xee\xeb\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff?" /* "Вы действительно хотите уволить героя?" */
+        ,
         NORMAL_DIALOG_CONFIRM,
         -1,
         -1,
@@ -601,8 +600,7 @@ void hero::Deallocate(i32 updateMap) {
         player->m_currentHero = -1;
         if (m_owner == giCurPlayer) {
             gpAdvManager->m_cursorActive = 0;
-            mapCellRecord =
-                gpGame->m_worldMap.cells + gpGame->m_worldMap.width * m_y + m_x;
+            mapCellRecord = gpGame->m_worldMap.cells + gpGame->m_worldMap.width * m_y + m_x;
             DebugCheck();
             mapCellRecord->m_flags &= ~HERO_MAP_CELL_PRESENT;
         }
@@ -632,14 +630,11 @@ void hero::Deallocate(i32 updateMap) {
         }
         gpGame->m_players[m_owner].m_availableHeroIds[availableHeroSlotCurrent] = m_id;
         gpGame->m_availableHeroes[m_id] = HERO_AVAILABILITY_RETREATED;
-        m_eventFlags = HeroEventFlag(
-            static_cast<i32>(m_eventFlags) | IDX(HERO_EVENT_WEEKLY_VISIT)
-        );
+        m_eventFlags = HeroEventFlag(static_cast<i32>(m_eventFlags) | IDX(HERO_EVENT_WEEKLY_VISIT));
     }
 
-    m_eventFlags = HeroEventFlag(
-        static_cast<i32>(m_eventFlags) & ~IDX(HERO_EVENT_GROUPED_FORMATION)
-    );
+    m_eventFlags =
+        HeroEventFlag(static_cast<i32>(m_eventFlags) & ~IDX(HERO_EVENT_GROUPED_FORMATION));
     m_owner = HERO_OWNER_NONE;
     m_destinationY = HERO_DESTINATION_NONE;
     m_destinationX = m_destinationY;
@@ -671,7 +666,7 @@ i32 hero::GetExperience(i32 level) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
+             [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -697,7 +692,7 @@ i32 hero::GetLevel(i32 experienceValue) {
     increment = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
-               [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
+             [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
     experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
@@ -813,12 +808,12 @@ void hero::CheckLevel(void) {
             } else {
                 randomValue -=
                     gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_ATTACK)];
-                if (randomValue
-                    < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)]) {
+                if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex]
+                                                 [IDX(HERO_PRIMARY_DEFENSE)]) {
                     statBonuses[IDX(HERO_PRIMARY_DEFENSE)]++;
                 } else {
-                    randomValue -=
-                        gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex][IDX(HERO_PRIMARY_DEFENSE)];
+                    randomValue -= gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex]
+                                                  [IDX(HERO_PRIMARY_DEFENSE)];
                     if (randomValue < gHeroSkillBonus[IDX(m_cursorType)][highLevelIndex]
                                                      [IDX(HERO_PRIMARY_SPELL_POWER)]) {
                         statBonuses[IDX(HERO_PRIMARY_SPELL_POWER)]++;
@@ -851,12 +846,10 @@ void hero::CheckLevel(void) {
                     while (attempts < HERO_SECONDARY_SKILL_SEARCH_LIMIT) {
                         attempts++;
                         if ((indexValue == 0 || skillChoicesResult[0] != skillIndexValue)
-                            && ((m_secondarySkills[IDX(skillIndexValue)]
-                                     != HERO_SKILL_LEVEL_NONE
+                            && ((m_secondarySkills[IDX(skillIndexValue)] != HERO_SKILL_LEVEL_NONE
                                  && m_secondarySkills[IDX(skillIndexValue)]
                                         < HERO_SKILL_LEVEL_EXPERT)
-                                || (m_secondarySkills[IDX(skillIndexValue)]
-                                            == HERO_SKILL_LEVEL_NONE
+                                || (m_secondarySkills[IDX(skillIndexValue)] == HERO_SKILL_LEVEL_NONE
                                     && m_secondarySkillCount < HERO_SECONDARY_SKILL_CAPACITY))) {
                             skillWeightIndex -=
                                 iGetSSByAlignment[IDX(skillIndexValue)][IDX(m_cursorType)];
@@ -886,8 +879,7 @@ void hero::CheckLevel(void) {
                     sprintf(
                         line,
                         "\n\nYou have learned %s %s.",
-                        gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
+                        gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
                         gSecondarySkills[IDX(skillChoicesResult[0])]
                     );
                     strcat(gText, line);
@@ -909,11 +901,9 @@ void hero::CheckLevel(void) {
                     sprintf(
                         line,
                         "\n\nYou may learn either %s %s or %s %s.",
-                        gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
+                        gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skillChoicesResult[0])])],
                         gSecondarySkills[IDX(skillChoicesResult[0])],
-                        gSecondarySkillLevels
-                            [IDX(m_secondarySkills[IDX(skillChoicesResult[1])])],
+                        gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skillChoicesResult[1])])],
                         gSecondarySkills[IDX(skillChoicesResult[1])]
                     );
                     strcat(gText, line);
@@ -1060,16 +1050,12 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                 else
                     strcpy(gText, cHeroScreen[IDX(TEXT_EMPTY)]);
             } else if (gpHVHero->m_army.m_creatureTypes[armySlot] == CREATURE_NONE) {
-                if (HAS(
-                        message.payload.widget.modifiers,
-                        MESSAGE_MODIFIER_SHIFT_KEYS
-                    ))
+                if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS))
                     sprintf(
                         gText,
                         cHeroScreen[IDX(TEXT_SPLIT_ARMY)],
-                        gArmyNamesPlural[IDX(
-                            gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
-                        )]
+                        gArmyNamesPlural[IDX(gpHVHero->m_army
+                                                 .m_creatureTypes[giHeroScreenSrcIndex])]
                     );
                 else
                     sprintf(
@@ -1119,8 +1105,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     gText,
                     cHeroScreen[IDX(TEXT_ARTIFACT)],
                     gArtifactNames
-                        [IDX(gpHVHero->m_artifacts
-                                 [message.payload.widget.id - UI_ARTIFACT_FIRST])]
+                        [IDX(gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST])]
                 );
             break;
 
@@ -1159,8 +1144,8 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
                     gText,
                     cHeroScreen[IDX(TEXT_SECONDARY_SKILL)],
                     gSecondarySkillLevels
-                        [IDX(gpHVHero->m_secondarySkills
-                                 [IDX(gpHVHero->GetNthSS(secondarySkillSlot))])
+                        [IDX(gpHVHero
+                                 ->m_secondarySkills[IDX(gpHVHero->GetNthSS(secondarySkillSlot))])
                          - 1],
                     gSecondarySkills[IDX(gpHVHero->GetNthSS(secondarySkillSlot))]
                 );
@@ -1185,10 +1170,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 nextExperience12;
     i32 level14;
 
-    if (HAS(
-            message.payload.widget.modifiers,
-            MESSAGE_MODIFIER_RIGHT_BUTTON
-        ))
+    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
         quickView0 = 1;
     else
         quickView0 = 0;
@@ -1406,24 +1388,20 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                         i32 armyValue;
 
                         armySlot7 = message.payload.widget.id - UI_ARMY_SELECTOR_FIRST;
-                        if (quickView0 == 0
-                            && giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
-                            if (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                != CREATURE_NONE) {
+                        if (quickView0 == 0 && giHeroScreenSrcIndex == UI_ARMY_SELECTION_NONE) {
+                            if (gpHVHero->m_army.m_creatureTypes[armySlot7] != CREATURE_NONE) {
                                 giHeroScreenSrcIndex = armySlot7;
                                 gpHVHero->HeroScreenUpdate();
                             }
                         } else if ((quickView0 != 0
-                                    && gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                           != CREATURE_NONE)
+                                    && gpHVHero->m_army.m_creatureTypes[armySlot7] != CREATURE_NONE)
                                    || (quickView0 == 0
                                        && message.payload.widget.id - UI_ARMY_SELECTOR_FIRST
                                               == giHeroScreenSrcIndex)) {
                             i32 canDismiss;
 
                             if (quickView0 == 0
-                                && gpTownManager->m_castleDialogActive
-                                       != UI_CASTLE_DIALOG_ACTIVE
+                                && gpTownManager->m_castleDialogActive != UI_CASTLE_DIALOG_ACTIVE
                                 && gpHVHero->m_army.GetNumArmies() != 1)
                                 canDismiss = 0;
                             else
@@ -1448,8 +1426,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                             RedrawHeroScreen();
                         } else {
                             if (quickView0 == 0 && gpTownManager->m_castleDialogActive != 0) {
-                                if (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                    != CREATURE_NONE) {
+                                if (gpHVHero->m_army.m_creatureTypes[armySlot7] != CREATURE_NONE) {
                                     giHeroScreenSrcIndex = armySlot7;
                                     gpHVHero->HeroScreenUpdate();
                                 }
@@ -1459,8 +1436,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                                         message.payload.widget.modifiers,
                                         MESSAGE_MODIFIER_SHIFT_KEYS
                                     )
-                                    || (gpHVHero->m_army.m_creatureTypes[armySlot7]
-                                            != CREATURE_NONE
+                                    || (gpHVHero->m_army.m_creatureTypes[armySlot7] != CREATURE_NONE
                                         && gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
                                                != gpHVHero->m_army.m_creatureTypes[armySlot7])) {
                                     if (gpHVHero->m_army.m_creatureTypes[giHeroScreenSrcIndex]
@@ -1509,12 +1485,11 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
                     case UI_ARTIFACT_SLOT_11:
                     case UI_ARTIFACT_SLOT_12:
                     case UI_ARTIFACT_SLOT_13:
-                        if (gpHVHero
-                                ->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
+                        if (gpHVHero->m_artifacts[message.payload.widget.id - UI_ARTIFACT_FIRST]
                             != ARTIFACT_NONE) {
                             if (quickView0 == 0
                                 && gpHVHero->m_artifacts
-                                       [message.payload.widget.id - UI_ARTIFACT_FIRST]
+                                           [message.payload.widget.id - UI_ARTIFACT_FIRST]
                                        == ARTIFACT_MAGIC_BOOK) {
                                 gpGame->ViewSpells(
                                     gpHVHero,
@@ -1573,8 +1548,7 @@ MessageDispatchResult HeroHandler(struct tag_message& message) {
 
 VA(0x004638b2, 0x44)
 void RedrawHeroScreen(void) {
-    gpResourceManager
-        ->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
+    gpResourceManager->GetBackdrop("herobkg.icn", gpWindowManager->m_screen, UI_BACKDROP_PALETTE);
     heroWin->DrawWindow();
     gpWindowManager->UpdateScreenRegion(0, 0, UI_SCREEN_WIDTH, UI_SCREEN_HEIGHT);
 }
@@ -1833,8 +1807,7 @@ void SetupHeroView(void) {
                 sprintf(
                     gText,
                     "%s",
-                    gSecondarySkillLevels
-                        [IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1]
+                    gSecondarySkillLevels[IDX(gpHVHero->m_secondarySkills[IDX(secondarySkill)]) - 1]
                 );
             }
             message.payload.widget.data.text = gText;
@@ -1905,8 +1878,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpWindowManager->DoDialog(gpTownManager->m_heroWindow1, SplitArmyHandler, 0);
     delete gpTownManager->m_heroWindow1;
 
-    if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT
-        && gpTownManager->m_splitAmount != 0) {
+    if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
         if (gpHVHero->m_army.m_creatureTypes[sourceSlot]
             == gpHVHero->m_army.m_creatureTypes[destinationSlot]) {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -= gpTownManager->m_splitAmount;
@@ -1950,8 +1922,7 @@ i32 hero::TakeSS(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 levels) {
             m_secondarySkills[IDX(skill)] = HERO_SKILL_LEVEL_NONE;
         if (m_secondarySkills[IDX(skill)] == HERO_SKILL_LEVEL_NONE) {
             for (otherSkill = HERO_SKILL_PATHFINDING; otherSkill < HERO_SKILL_COUNT; otherSkill++) {
-                if (m_secondarySkillOrder[IDX(otherSkill)]
-                    > m_secondarySkillOrder[IDX(skill)]) {
+                if (m_secondarySkillOrder[IDX(otherSkill)] > m_secondarySkillOrder[IDX(skill)]) {
                     m_secondarySkillOrder[IDX(otherSkill)]--;
                 }
             }
@@ -2062,9 +2033,7 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
 }
 
 VA(0x00464a9e, 0xdd)
-void hero::DoSSLevelDialog(
-    H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView
-) {
+void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView) {
     i32 skillBonusValue;
     char* skillLevelText;
 
@@ -2082,10 +2051,7 @@ void hero::DoSSLevelDialog(
             GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL
         );
     } else {
-        sprintf(
-            gText,
-            cSecSkillDesc[IDX(skill)][IDX(m_secondarySkills[IDX(skill)]) - 1]
-        );
+        sprintf(gText, cSecSkillDesc[IDX(skill)][IDX(m_secondarySkills[IDX(skill)]) - 1]);
     }
     NormalDialog(
         gText,
@@ -2112,11 +2078,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
             if (m_artifacts[artifactSlot] == ARTIFACT_BREASTPLATE_ANDURAN
                 || m_artifacts[artifactSlot] == ARTIFACT_HELMET_ANDURAN
                 || m_artifacts[artifactSlot] == ARTIFACT_SWORD_ANDURAN) {
-                GiveTakeArtifactStat(
-                    this,
-                    m_artifacts[artifactSlot],
-                    EVENT_ARTIFACT_TAKE
-                );
+                GiveTakeArtifactStat(this, m_artifacts[artifactSlot], EVENT_ARTIFACT_TAKE);
                 m_artifacts[artifactSlot] = ARTIFACT_NONE;
             }
         }

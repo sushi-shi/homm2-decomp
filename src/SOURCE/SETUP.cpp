@@ -18,44 +18,44 @@
 #include <windows.h>
 
 H2_ENUM_BEGIN(SetupConstant)
-    WINDOW_X                     = 405,
-    WINDOW_Y                     = 8,
-    DIALOG_CANCEL                = NORMAL_DIALOG_BUTTON_ONE,
-    DIALOG_YES                   = NORMAL_DIALOG_BUTTON_FIVE,
-    PLAYER_COUNT                 = IDX(GAME_PLAYER_COUNT),
-    PLAYER_NAME_LENGTH           = GLOBAL_PLAYER_NAME_SIZE - 1,
+    WINDOW_X = 405,
+    WINDOW_Y = 8,
+    DIALOG_CANCEL = NORMAL_DIALOG_BUTTON_ONE,
+    DIALOG_YES = NORMAL_DIALOG_BUTTON_FIVE,
+    PLAYER_COUNT = IDX(GAME_PLAYER_COUNT),
+    PLAYER_NAME_LENGTH = GLOBAL_PLAYER_NAME_SIZE - 1,
     DEFAULT_PLAYER_NAME_CAPACITY = 24,
-    MODEM_INIT_ENTRY_LENGTH      = 40,
-    TELEPHONE_ENTRY_LENGTH       = MODEM_NUMBER_BUFFER_SIZE - 1,
-    FILE_PATTERN_CAPACITY        = 12,
-    FILE_REQUESTER_X             = 200,
-    FILE_REQUESTER_Y             = 58,
-    DISABLED_WIDGET_ID           = 1,
-    CAMPAIGN_INTRO               = 4,
-    CAMPAIGN_SELECTION           = 35,
-    HELP_DIALOG                  = NORMAL_DIALOG_QUICK_VIEW,
-    DIALOG_RESULT_MAX            = 1000,
+    MODEM_INIT_ENTRY_LENGTH = 40,
+    TELEPHONE_ENTRY_LENGTH = MODEM_NUMBER_BUFFER_SIZE - 1,
+    FILE_PATTERN_CAPACITY = 12,
+    FILE_REQUESTER_X = 200,
+    FILE_REQUESTER_Y = 58,
+    DISABLED_WIDGET_ID = 1,
+    CAMPAIGN_INTRO = 4,
+    CAMPAIGN_SELECTION = 35,
+    HELP_DIALOG = NORMAL_DIALOG_QUICK_VIEW,
+    DIALOG_RESULT_MAX = 1000,
 H2_ENUM_END(SetupConstant)
 
 H2_ENUM_BEGIN(SetupDialogChoice)
-    CHOICE_ONE   = 1,
-    CHOICE_TWO   = 2,
+    CHOICE_ONE = 1,
+    CHOICE_TWO = 2,
     CHOICE_THREE = 3,
-    CHOICE_FOUR  = 4,
-    CHOICE_FIVE  = 5
+    CHOICE_FOUR = 4,
+    CHOICE_FIVE = 5
 H2_ENUM_END(SetupDialogChoice)
 
 H2_ENUM_BEGIN(SetupHelpIndex)
-    NO_HELP    = -1,
+    NO_HELP = -1,
     FIRST_HELP = 0
 H2_ENUM_END(SetupHelpIndex)
 
 H2_ENUM_BEGIN(HotSeatPlayerCount)
-    TWO_PLAYERS   = 2,
+    TWO_PLAYERS = 2,
     THREE_PLAYERS = 3,
-    FOUR_PLAYERS  = 4,
-    FIVE_PLAYERS  = 5,
-    SIX_PLAYERS   = 6
+    FOUR_PLAYERS = 4,
+    FIVE_PLAYERS = 5,
+    SIX_PLAYERS = 6
 H2_ENUM_END(HotSeatPlayerCount)
 
 VA(0x004924e0, 0x24)
@@ -130,8 +130,13 @@ i32 game::SetupComPort(void) {
         strcpy(gConfig.modemInitString, "ATZ");
         sprintf(gText, "%s", gConfig.modemInitString);
         GetDataEntry(
-            "Please enter any special initialization string required by your modem, or hit 'ENTER' "
-            "to accept the default.",
+            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xf3\xea\xe0\xe6\xe8\xf2\xe5 "
+            "\xe7\xed\xe0\xf7\xe5\xed\xe8\xe5 \xf1\xf2\xf0\xee\xea\xe8 "
+            "\xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xe2\xe0\xf8\xe5\xe3\xee "
+            "\xec\xee\xe4\xe5\xec\xe0 \xe8\xeb\xe8 \xed\xe0\xe6\xec\xe8\xf2\xe5 'ENTER', "
+            "\xf7\xf2\xee\xe1\xfb \xef\xf0\xe8\xf1\xe2\xee\xe8\xf2\xfc "
+            "\xe7\xed\xe0\xf7\xe5\xed\xe8\xff \xef\xee \xf3\xec\xee\xeb\xf7\xe0\xed\xe8\xfe." /* "Пожалуйста, укажите значение строки инициализации вашего модема или нажмите 'ENTER', чтобы присвоить значения по умолчанию." */
+            ,
             initString,
             MODEM_INIT_ENTRY_LENGTH,
             gText,
@@ -328,7 +333,9 @@ i32 game::SetupModemGame(void) {
             LogStr("SMC 9");
             if (gbDirectConnect == 0) {
                 GetDataEntry(
-                    "Please enter the telephone number.",
+                    "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 "
+                    "\xf2\xe5\xeb\xe5\xf4\xee\xed\xed\xfb\xe9 \xed\xee\xec\xe5\xf0." /* "Пожалуйста, введите телефонный номер." */
+                    ,
                     numbuf,
                     TELEPHONE_ENTRY_LENGTH,
                     NULL,
@@ -340,8 +347,7 @@ i32 game::SetupModemGame(void) {
             break;
         case CHOICE_TWO:
             iMPExtendedType = REMOTE_GAME_MODEM_GUEST;
-            if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED
-                && !SetupComPort())
+            if (gConfig.comPort[gbDirectConnect] == CONFIG_COM_PORT_UNCONFIGURED && !SetupComPort())
                 return 0;
             break;
         case CHOICE_THREE:
@@ -764,31 +770,9 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(
-                    gSetupDCBaudHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupDCBaudHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
             else
-                NormalDialog(
-                    gSetupBaudHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupBaudHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     return BaseSetupHandler(message);
@@ -863,18 +847,7 @@ MessageDispatchResult SetupModemGameHandler(struct tag_message& message) {
         }
         if (helpIndex >= FIRST_HELP) {
             if (gbDirectConnect != 0)
-                NormalDialog(
-                    gSetupDCGameHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupDCGameHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
             else
                 NormalDialog(
                     gSetupModemGameHelp[helpIndex],
@@ -1033,18 +1006,7 @@ MessageDispatchResult SetupGameHandler(struct tag_message& message) {
                     break;
             }
             if (helpIndex >= FIRST_HELP)
-                NormalDialog(
-                    gSetupGameHelp[helpIndex],
-                    HELP_DIALOG,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
+                NormalDialog(gSetupGameHelp[helpIndex], HELP_DIALOG, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     } else if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {

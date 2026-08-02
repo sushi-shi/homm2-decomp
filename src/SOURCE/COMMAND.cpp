@@ -28,8 +28,7 @@
 
 #define COMBAT_NECROMANCY_LEVEL_FACTOR 0.1
 #define COMBAT_SURRENDER_QUILL_FACTOR 0.1
-#define COMBAT_SURRENDER_BASE_FACTOR                                                   \
-    0.5
+#define COMBAT_SURRENDER_BASE_FACTOR 0.5
 #define COMBAT_SURRENDER_DIPLOMACY_FACTOR 0.2
 #define COMBAT_IDLE_ROLL_DIVISOR 100.0f
 #define COMBAT_STAND_DELAY_BASE_FACTOR 0.25
@@ -44,288 +43,288 @@
 
 namespace {
 
-H2_ENUM_CLASS_BEGIN(CombatKeyCommand)
-    KEY_MOUSE_COORDS          = 2,
-    KEY_VIEW_ARMY             = 0x14,
-    KEY_VIEW_GENERAL          = 0x23,
-    KEY_CAST_SPELL            = 0x2e,
-    KEY_WAIT                  = 0x39,
-    KEY_CLOSE_NETWORK_BOX     = 0x3c,
-    KEY_REDRAW_SCREEN         = 0x3d,
-    KEY_CYCLE_ARMY_VIEW       = 0x3f,
-    KEY_TOGGLE_GRID           = 0x40,
-    KEY_TOGGLE_MOUSE_HEX      = 0x41,
-    KEY_CYCLE_SHADE           = 0x42,
-    KEY_CYCLE_SPELL_EFFECT    = 0x43,
-    KEY_DEBUG_CREATURE_EFFECT = 0x57
-H2_ENUM_CLASS_END(CombatKeyCommand)
+    H2_ENUM_CLASS_BEGIN(CombatKeyCommand)
+        KEY_MOUSE_COORDS = 2,
+        KEY_VIEW_ARMY = 0x14,
+        KEY_VIEW_GENERAL = 0x23,
+        KEY_CAST_SPELL = 0x2e,
+        KEY_WAIT = 0x39,
+        KEY_CLOSE_NETWORK_BOX = 0x3c,
+        KEY_REDRAW_SCREEN = 0x3d,
+        KEY_CYCLE_ARMY_VIEW = 0x3f,
+        KEY_TOGGLE_GRID = 0x40,
+        KEY_TOGGLE_MOUSE_HEX = 0x41,
+        KEY_CYCLE_SHADE = 0x42,
+        KEY_CYCLE_SPELL_EFFECT = 0x43,
+        KEY_DEBUG_CREATURE_EFFECT = 0x57
+    H2_ENUM_CLASS_END(CombatKeyCommand)
 
-H2_ENUM_BEGIN(CombatWinLoseConstant)
-    WIN_LOSE_WIDGET_COUNT               = 25,
-    WIN_LOSE_NEXT_CONTROL               = 0x7800,
-    WIN_LOSE_CLOSE_COMMAND              = 10,
-    WIN_LOSE_TEXT_ID                    = 101,
-    WIN_LOSE_RESOURCE_LOAD_ID           = 200,
-    WIN_LOSE_RESOURCE_DRAW_ID           = 201,
-    WIN_LOSE_DRAW_DEPTH                 = 0x7fff,
-    WIN_LOSE_ANIMATION_CYCLE_FIRST      = 1,
-    WIN_LOSE_ANIMATION_LOSS             = 2,
-    WIN_LOSE_ANIMATION_FLEE             = 3,
-    WIN_LOSE_ANIMATION_CYCLE_SECOND     = 4,
-    WIN_LOSE_FIRST_ANIMATION_FRAME      = 1,
-    WIN_LOSE_LOOP_FRAME_COUNT           = 20,
-    WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME = 43,
-    WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME  = 69,
-    WIN_LOSE_FLEE_LAST_FRAME            = 25,
-    WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME = 30,
-    WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME  = 59,
-    WIN_LOSE_LOSS_RESET_FRAME           = 80,
-    WIN_LOSE_INITIAL_DELAY              = 90,
-    WIN_LOSE_LOOP_DELAY                 = 99,
-    WIN_LOSE_FLEE_DELAY                 = 40,
-    WIN_LOSE_LOSS_DELAY                 = 50,
-    WIN_LOSE_LOSS_FINAL_DELAY           = 100,
-    WIN_LOSE_ARTIFACT_ICON_ID           = 2001,
-    WIN_LOSE_ARTIFACT_IMAGE_ID          = 2002,
-    WIN_LOSE_ARTIFACT_TEXT_ID           = 2101,
-    WIN_LOSE_SKELETON_ICON_ID           = 900,
-    WIN_LOSE_SKELETON_TEXT_ID           = 901,
-    WIN_LOSE_EAGLE_BACKGROUND_ID        = 902,
-    WIN_LOSE_EAGLE_SPELL_ID             = 903,
-    WIN_LOSE_EAGLE_TEXT_ID              = 904,
-    WIN_LOSE_ICON_FILENAME_SIZE         = 40,
-    PICKUP_SAMPLE_FIRST                 = 1,
-    PICKUP_SAMPLE_LAST                  = 5
-H2_ENUM_END(CombatWinLoseConstant)
+    H2_ENUM_BEGIN(CombatWinLoseConstant)
+        WIN_LOSE_WIDGET_COUNT = 25,
+        WIN_LOSE_NEXT_CONTROL = 0x7800,
+        WIN_LOSE_CLOSE_COMMAND = 10,
+        WIN_LOSE_TEXT_ID = 101,
+        WIN_LOSE_RESOURCE_LOAD_ID = 200,
+        WIN_LOSE_RESOURCE_DRAW_ID = 201,
+        WIN_LOSE_DRAW_DEPTH = 0x7fff,
+        WIN_LOSE_ANIMATION_CYCLE_FIRST = 1,
+        WIN_LOSE_ANIMATION_LOSS = 2,
+        WIN_LOSE_ANIMATION_FLEE = 3,
+        WIN_LOSE_ANIMATION_CYCLE_SECOND = 4,
+        WIN_LOSE_FIRST_ANIMATION_FRAME = 1,
+        WIN_LOSE_LOOP_FRAME_COUNT = 20,
+        WIN_LOSE_FLEE_SECOND_RESOURCE_FRAME = 43,
+        WIN_LOSE_FLEE_THIRD_RESOURCE_FRAME = 69,
+        WIN_LOSE_FLEE_LAST_FRAME = 25,
+        WIN_LOSE_LOSS_SECOND_RESOURCE_FRAME = 30,
+        WIN_LOSE_LOSS_THIRD_RESOURCE_FRAME = 59,
+        WIN_LOSE_LOSS_RESET_FRAME = 80,
+        WIN_LOSE_INITIAL_DELAY = 90,
+        WIN_LOSE_LOOP_DELAY = 99,
+        WIN_LOSE_FLEE_DELAY = 40,
+        WIN_LOSE_LOSS_DELAY = 50,
+        WIN_LOSE_LOSS_FINAL_DELAY = 100,
+        WIN_LOSE_ARTIFACT_ICON_ID = 2001,
+        WIN_LOSE_ARTIFACT_IMAGE_ID = 2002,
+        WIN_LOSE_ARTIFACT_TEXT_ID = 2101,
+        WIN_LOSE_SKELETON_ICON_ID = 900,
+        WIN_LOSE_SKELETON_TEXT_ID = 901,
+        WIN_LOSE_EAGLE_BACKGROUND_ID = 902,
+        WIN_LOSE_EAGLE_SPELL_ID = 903,
+        WIN_LOSE_EAGLE_TEXT_ID = 904,
+        WIN_LOSE_ICON_FILENAME_SIZE = 40,
+        PICKUP_SAMPLE_FIRST = 1,
+        PICKUP_SAMPLE_LAST = 5
+    H2_ENUM_END(CombatWinLoseConstant)
 
-H2_ENUM_CLASS_BEGIN(CombatBattleResultText)
-    RESULT_TEXT_ENEMY_SURRENDERED  = 0,
-    RESULT_TEXT_ENEMY_FLED         = 1,
-    RESULT_TEXT_VICTORY            = 2,
-    RESULT_TEXT_EXPERIENCE         = 3,
-    RESULT_TEXT_HERO_SURRENDER     = 4,
-    RESULT_TEXT_HERO_FLEE          = 5,
-    RESULT_TEXT_HERO_DEFEAT        = 6,
-    RESULT_TEXT_FORCES_SURRENDER   = 7,
-    RESULT_TEXT_FORCES_FLEE        = 8,
-    RESULT_TEXT_FORCES_DEFEAT      = 9,
-    RESULT_TEXT_NETWORK_EXPERIENCE = 10
-H2_ENUM_CLASS_END(CombatBattleResultText)
+    H2_ENUM_CLASS_BEGIN(CombatBattleResultText)
+        RESULT_TEXT_ENEMY_SURRENDERED = 0,
+        RESULT_TEXT_ENEMY_FLED = 1,
+        RESULT_TEXT_VICTORY = 2,
+        RESULT_TEXT_EXPERIENCE = 3,
+        RESULT_TEXT_HERO_SURRENDER = 4,
+        RESULT_TEXT_HERO_FLEE = 5,
+        RESULT_TEXT_HERO_DEFEAT = 6,
+        RESULT_TEXT_FORCES_SURRENDER = 7,
+        RESULT_TEXT_FORCES_FLEE = 8,
+        RESULT_TEXT_FORCES_DEFEAT = 9,
+        RESULT_TEXT_NETWORK_EXPERIENCE = 10
+    H2_ENUM_CLASS_END(CombatBattleResultText)
 
-H2_ENUM_CLASS_BEGIN(CombatControlId)
-    CONTROL_ATTACK            = 1,
-    CONTROL_WAIT              = 2,
-    CONTROL_DISABLE_SELECTION = 3,
-    CONTROL_SYSTEM_OPTIONS    = 4,
-    CONTROL_HELP_FIRST        = 10,
-    CONTROL_HELP_SECOND       = 11,
-    CONTROL_HELP_THIRD        = 12,
-    CONTROL_HELP_FOURTH       = 13,
-    CONTROL_MAIN_BUTTON       = 0x40
-H2_ENUM_CLASS_END(CombatControlId)
+    H2_ENUM_CLASS_BEGIN(CombatControlId)
+        CONTROL_ATTACK = 1,
+        CONTROL_WAIT = 2,
+        CONTROL_DISABLE_SELECTION = 3,
+        CONTROL_SYSTEM_OPTIONS = 4,
+        CONTROL_HELP_FIRST = 10,
+        CONTROL_HELP_SECOND = 11,
+        CONTROL_HELP_THIRD = 12,
+        CONTROL_HELP_FOURTH = 13,
+        CONTROL_MAIN_BUTTON = 0x40
+    H2_ENUM_CLASS_END(CombatControlId)
 
-H2_ENUM_BEGIN(CombatRemoteConstant)
-    REMOTE_PACKET_TYPE     = 1,
-    REMOTE_COMMAND_MESSAGE = 11,
-    REMOTE_COMMAND_ACTION  = 23
-H2_ENUM_END(CombatRemoteConstant)
+    H2_ENUM_BEGIN(CombatRemoteConstant)
+        REMOTE_PACKET_TYPE = 1,
+        REMOTE_COMMAND_MESSAGE = 11,
+        REMOTE_COMMAND_ACTION = 23
+    H2_ENUM_END(CombatRemoteConstant)
 
-H2_ENUM_CLASS_BEGIN(CombatActionDataIndex)
-    ACTION_DATA_ACTION      = 0,
-    ACTION_DATA_EXTRA       = 1,
-    ACTION_DATA_GRID        = 2,
-    ACTION_DATA_SECOND_GRID = 3,
-    ACTION_DATA_COUNT       = 4
-H2_ENUM_CLASS_END(CombatActionDataIndex)
+    H2_ENUM_CLASS_BEGIN(CombatActionDataIndex)
+        ACTION_DATA_ACTION = 0,
+        ACTION_DATA_EXTRA = 1,
+        ACTION_DATA_GRID = 2,
+        ACTION_DATA_SECOND_GRID = 3,
+        ACTION_DATA_COUNT = 4
+    H2_ENUM_CLASS_END(CombatActionDataIndex)
 
-H2_ENUM_BEGIN(CombatDirectionConstant)
-    DIRECTION_SECTOR_COUNT                   = 24,
-    DIRECTION_SECTOR_QUARTER                 = 6,
-    DIRECTION_SECTOR_HALF                    = 12,
-    DIRECTION_SECTOR_THREE_QUARTERS          = 18,
-    DIRECTION_PENDING_OFFSET                 = 10,
-    DIRECTION_SECTORS_PER_ADJACENT           = 4,
-    DIRECTION_MOUSE_TOP_OFFSET               = 5,
-    DIRECTION_MOUSE_CENTER_OFFSET            = 21,
-    DIRECTION_SECTOR_OFFSET_SHALLOW          = 2,
-    DIRECTION_SECTOR_OFFSET_DIAGONAL         = 3,
-    DIRECTION_SECTOR_OFFSET_STEEP            = 4,
-    DIRECTION_SECTOR_OFFSET_STEEPEST         = 5,
-    DIRECTION_SPECIAL_FIRST_SECTOR_START     = 11,
-    DIRECTION_SPECIAL_FIRST_SECTOR_CENTER    = 12,
-    DIRECTION_SPECIAL_FIRST_SECTOR_END       = 13,
-    DIRECTION_SPECIAL_SECOND_SECTOR_PREVIOUS = 23,
-    DIRECTION_SPECIAL_SECOND_SECTOR_CENTER   = 0,
-    DIRECTION_SPECIAL_SECOND_SECTOR_NEXT     = 1
-H2_ENUM_END(CombatDirectionConstant)
+    H2_ENUM_BEGIN(CombatDirectionConstant)
+        DIRECTION_SECTOR_COUNT = 24,
+        DIRECTION_SECTOR_QUARTER = 6,
+        DIRECTION_SECTOR_HALF = 12,
+        DIRECTION_SECTOR_THREE_QUARTERS = 18,
+        DIRECTION_PENDING_OFFSET = 10,
+        DIRECTION_SECTORS_PER_ADJACENT = 4,
+        DIRECTION_MOUSE_TOP_OFFSET = 5,
+        DIRECTION_MOUSE_CENTER_OFFSET = 21,
+        DIRECTION_SECTOR_OFFSET_SHALLOW = 2,
+        DIRECTION_SECTOR_OFFSET_DIAGONAL = 3,
+        DIRECTION_SECTOR_OFFSET_STEEP = 4,
+        DIRECTION_SECTOR_OFFSET_STEEPEST = 5,
+        DIRECTION_SPECIAL_FIRST_SECTOR_START = 11,
+        DIRECTION_SPECIAL_FIRST_SECTOR_CENTER = 12,
+        DIRECTION_SPECIAL_FIRST_SECTOR_END = 13,
+        DIRECTION_SPECIAL_SECOND_SECTOR_PREVIOUS = 23,
+        DIRECTION_SPECIAL_SECOND_SECTOR_CENTER = 0,
+        DIRECTION_SPECIAL_SECOND_SECTOR_NEXT = 1
+    H2_ENUM_END(CombatDirectionConstant)
 
-H2_ENUM_BEGIN(CombatCommandConstant)
-    POINTER_VIEW             = 5,
-    POINTER_ATTACK_OFFSET    = 7,
-    INVALID_ARMY_INDEX       = -1,
-    INVALID_HEX              = -1,
-    PLAYER_NONE              = -1,
-    SMALL_VIEW_POSITION_NONE = -1,
-    IGNORED_HEX              = -2,
-    CASTLE_GATE_HEX          = 59
-H2_ENUM_END(CombatCommandConstant)
+    H2_ENUM_BEGIN(CombatCommandConstant)
+        POINTER_VIEW = 5,
+        POINTER_ATTACK_OFFSET = 7,
+        INVALID_ARMY_INDEX = -1,
+        INVALID_HEX = -1,
+        PLAYER_NONE = -1,
+        SMALL_VIEW_POSITION_NONE = -1,
+        IGNORED_HEX = -2,
+        CASTLE_GATE_HEX = 59
+    H2_ENUM_END(CombatCommandConstant)
 
-H2_ENUM_BEGIN(CombatRoundConstant)
-    ROUND_INITIAL_SPEED = 15
-H2_ENUM_END(CombatRoundConstant)
+    H2_ENUM_BEGIN(CombatRoundConstant)
+        ROUND_INITIAL_SPEED = 15
+    H2_ENUM_END(CombatRoundConstant)
 
-H2_ENUM_BEGIN(CombatCommandGeometry)
-    CONTROL_RIGHT_MIN_X          = 590,
-    CONTROL_LEFT_MAX_X           = 50,
-    CONTROL_SYSTEM_OPTIONS_MIN_Y = 460,
-    SCREEN_MAX_X                 = 639,
-    SCREEN_MAX_Y                 = 479,
-    ARMY_VIEW_LEVEL_COUNT        = 3,
-    COMMAND_FRAME_DELAY          = 75
-H2_ENUM_END(CombatCommandGeometry)
+    H2_ENUM_BEGIN(CombatCommandGeometry)
+        CONTROL_RIGHT_MIN_X = 590,
+        CONTROL_LEFT_MAX_X = 50,
+        CONTROL_SYSTEM_OPTIONS_MIN_Y = 460,
+        SCREEN_MAX_X = 639,
+        SCREEN_MAX_Y = 479,
+        ARMY_VIEW_LEVEL_COUNT = 3,
+        COMMAND_FRAME_DELAY = 75
+    H2_ENUM_END(CombatCommandGeometry)
 
-H2_ENUM_BEGIN(CombatCasualtyConstant)
-    CASUALTY_QUANTITY_STORAGE_COUNT = 42,
-    CASUALTY_DISPLAY_LIMIT          = 7,
-    CASUALTY_WIDGETS_PER_SIDE       = 7,
-    CASUALTY_WINDOW_WIDTH           = 320,
-    CASUALTY_WINDOW_BOTTOM          = 458
-H2_ENUM_END(CombatCasualtyConstant)
+    H2_ENUM_BEGIN(CombatCasualtyConstant)
+        CASUALTY_QUANTITY_STORAGE_COUNT = 42,
+        CASUALTY_DISPLAY_LIMIT = 7,
+        CASUALTY_WIDGETS_PER_SIDE = 7,
+        CASUALTY_WINDOW_WIDTH = 320,
+        CASUALTY_WINDOW_BOTTOM = 458
+    H2_ENUM_END(CombatCasualtyConstant)
 
-H2_ENUM_BEGIN(CombatArtifactPanelConstant)
-    ARTIFACT_BACKGROUND_X    = 136,
-    ARTIFACT_BACKGROUND_Y    = 310,
-    ARTIFACT_BACKGROUND_SIZE = 80,
-    ARTIFACT_ICON_X          = 144,
-    ARTIFACT_ICON_Y          = 318,
-    ARTIFACT_ICON_SIZE       = 64,
-    ARTIFACT_TEXT_X          = 16,
-    ARTIFACT_TEXT_Y          = 397,
-    ARTIFACT_TEXT_HEIGHT     = 12,
-    ARTIFACT_NAME_CAPACITY   = 60
-H2_ENUM_END(CombatArtifactPanelConstant)
+    H2_ENUM_BEGIN(CombatArtifactPanelConstant)
+        ARTIFACT_BACKGROUND_X = 136,
+        ARTIFACT_BACKGROUND_Y = 310,
+        ARTIFACT_BACKGROUND_SIZE = 80,
+        ARTIFACT_ICON_X = 144,
+        ARTIFACT_ICON_Y = 318,
+        ARTIFACT_ICON_SIZE = 64,
+        ARTIFACT_TEXT_X = 16,
+        ARTIFACT_TEXT_Y = 397,
+        ARTIFACT_TEXT_HEIGHT = 12,
+        ARTIFACT_NAME_CAPACITY = 60
+    H2_ENUM_END(CombatArtifactPanelConstant)
 
-H2_ENUM_BEGIN(CombatSkeletonPanelConstant)
-    SKELETON_ICON_X         = 173,
-    SKELETON_ICON_Y         = 270,
-    SKELETON_ICON_WIDTH     = 32,
-    SKELETON_ICON_HEIGHT    = 30,
-    SKELETON_TEXT_X         = 165,
-    SKELETON_TEXT_Y         = 300,
-    SKELETON_TEXT_WIDTH     = 32,
-    SKELETON_TEXT_HEIGHT    = 12,
-    SKELETON_COUNT_CAPACITY = 9
-H2_ENUM_END(CombatSkeletonPanelConstant)
+    H2_ENUM_BEGIN(CombatSkeletonPanelConstant)
+        SKELETON_ICON_X = 173,
+        SKELETON_ICON_Y = 270,
+        SKELETON_ICON_WIDTH = 32,
+        SKELETON_ICON_HEIGHT = 30,
+        SKELETON_TEXT_X = 165,
+        SKELETON_TEXT_Y = 300,
+        SKELETON_TEXT_WIDTH = 32,
+        SKELETON_TEXT_HEIGHT = 12,
+        SKELETON_COUNT_CAPACITY = 9
+    H2_ENUM_END(CombatSkeletonPanelConstant)
 
-H2_ENUM_BEGIN(CombatEagleEyePanelConstant)
-    EAGLE_PANEL_X             = 105,
-    EAGLE_PANEL_Y             = 275,
-    EAGLE_BACKGROUND_X_OFFSET = 16,
-    EAGLE_ICON_X_OFFSET       = 36,
-    EAGLE_ICON_Y_OFFSET       = 5,
-    EAGLE_ICON_WIDTH          = 72,
-    EAGLE_ICON_HEIGHT         = 51,
-    EAGLE_TEXT_X_OFFSET       = 34,
-    EAGLE_TEXT_Y_OFFSET       = 57,
-    EAGLE_TEXT_WIDTH          = 80,
-    EAGLE_TEXT_HEIGHT         = 24,
-    EAGLE_SPELL_NAME_CAPACITY = 200
-H2_ENUM_END(CombatEagleEyePanelConstant)
+    H2_ENUM_BEGIN(CombatEagleEyePanelConstant)
+        EAGLE_PANEL_X = 105,
+        EAGLE_PANEL_Y = 275,
+        EAGLE_BACKGROUND_X_OFFSET = 16,
+        EAGLE_ICON_X_OFFSET = 36,
+        EAGLE_ICON_Y_OFFSET = 5,
+        EAGLE_ICON_WIDTH = 72,
+        EAGLE_ICON_HEIGHT = 51,
+        EAGLE_TEXT_X_OFFSET = 34,
+        EAGLE_TEXT_Y_OFFSET = 57,
+        EAGLE_TEXT_WIDTH = 80,
+        EAGLE_TEXT_HEIGHT = 24,
+        EAGLE_SPELL_NAME_CAPACITY = 200
+    H2_ENUM_END(CombatEagleEyePanelConstant)
 
-H2_ENUM_BEGIN(CombatCasualtyPanelConstant)
-    CASUALTY_TITLE_WIDGET         = 17,
-    CASUALTY_TITLE_X              = 16,
-    CASUALTY_TITLE_Y              = 263,
-    CASUALTY_TEXT_HEIGHT          = 20,
-    CASUALTY_TEXT_WIDGET_ID       = 2110,
-    CASUALTY_SIDE_WIDGET_FIRST    = 15,
-    CASUALTY_ATTACKER_Y           = 279,
-    CASUALTY_DEFENDER_Y           = 346,
-    CASUALTY_SIDE_LABEL_Y_OFFSET  = 3,
-    CASUALTY_NONE_Y_OFFSET        = 21,
-    CASUALTY_WIDGET_ID_STRIDE     = 5,
-    CASUALTY_TEXT_WIDGET_ID_FIRST = 2100,
-    CASUALTY_ICON_WIDGET_ID_FIRST = 2000,
-    CASUALTY_ICON_SPACING         = 40,
-    CASUALTY_CENTER_DIVISOR       = 2,
-    CASUALTY_CENTER_X_OFFSET      = 3,
-    CASUALTY_ICON_CELL_WIDTH      = 32,
-    CASUALTY_ICON_TOP_OFFSET      = 19,
-    CASUALTY_ICON_WIDTH           = 32,
-    CASUALTY_ICON_HEIGHT          = 28,
-    CASUALTY_QUANTITY_X_OFFSET    = 16,
-    CASUALTY_QUANTITY_Y_OFFSET    = 53,
-    CASUALTY_QUANTITY_WIDTH       = 32,
-    CASUALTY_QUANTITY_HEIGHT      = 12,
-    CASUALTY_HEADING_CAPACITY     = 30,
-    CASUALTY_NONE_CAPACITY        = 10,
-    CASUALTY_QUANTITY_CAPACITY    = 9
-H2_ENUM_END(CombatCasualtyPanelConstant)
+    H2_ENUM_BEGIN(CombatCasualtyPanelConstant)
+        CASUALTY_TITLE_WIDGET = 17,
+        CASUALTY_TITLE_X = 16,
+        CASUALTY_TITLE_Y = 263,
+        CASUALTY_TEXT_HEIGHT = 20,
+        CASUALTY_TEXT_WIDGET_ID = 2110,
+        CASUALTY_SIDE_WIDGET_FIRST = 15,
+        CASUALTY_ATTACKER_Y = 279,
+        CASUALTY_DEFENDER_Y = 346,
+        CASUALTY_SIDE_LABEL_Y_OFFSET = 3,
+        CASUALTY_NONE_Y_OFFSET = 21,
+        CASUALTY_WIDGET_ID_STRIDE = 5,
+        CASUALTY_TEXT_WIDGET_ID_FIRST = 2100,
+        CASUALTY_ICON_WIDGET_ID_FIRST = 2000,
+        CASUALTY_ICON_SPACING = 40,
+        CASUALTY_CENTER_DIVISOR = 2,
+        CASUALTY_CENTER_X_OFFSET = 3,
+        CASUALTY_ICON_CELL_WIDTH = 32,
+        CASUALTY_ICON_TOP_OFFSET = 19,
+        CASUALTY_ICON_WIDTH = 32,
+        CASUALTY_ICON_HEIGHT = 28,
+        CASUALTY_QUANTITY_X_OFFSET = 16,
+        CASUALTY_QUANTITY_Y_OFFSET = 53,
+        CASUALTY_QUANTITY_WIDTH = 32,
+        CASUALTY_QUANTITY_HEIGHT = 12,
+        CASUALTY_HEADING_CAPACITY = 30,
+        CASUALTY_NONE_CAPACITY = 10,
+        CASUALTY_QUANTITY_CAPACITY = 9
+    H2_ENUM_END(CombatCasualtyPanelConstant)
 
-H2_ENUM_BEGIN(CombatCycleConstant)
-    HERO_ANIMATION_STAND           = 0,
-    HERO_ANIMATION_DEATH_FIRST     = 1,
-    HERO_ANIMATION_DEATH_SECOND    = 2,
-    HERO_ANIMATION_IDLE_FIRST      = 9,
-    HERO_ANIMATION_IDLE_SECOND     = 10,
-    HERO_ANIMATION_IDLE_LAST       = 11,
-    HERO_IDLE_DELAY                = 4500,
-    STAND_DELAY_RANDOM_THRESHOLD   = 51,
-    STAND_DELAY_RANDOM_MIN         = 50,
-    IDLE_ROLL_MIN                  = 1,
-    IDLE_ROLL_MAX                  = 100,
-    IDLE_REPEAT_CHANCE             = 8,
-    STANDING_ANIMATION_SEARCH_DONE = 99
-H2_ENUM_END(CombatCycleConstant)
+    H2_ENUM_BEGIN(CombatCycleConstant)
+        HERO_ANIMATION_STAND = 0,
+        HERO_ANIMATION_DEATH_FIRST = 1,
+        HERO_ANIMATION_DEATH_SECOND = 2,
+        HERO_ANIMATION_IDLE_FIRST = 9,
+        HERO_ANIMATION_IDLE_SECOND = 10,
+        HERO_ANIMATION_IDLE_LAST = 11,
+        HERO_IDLE_DELAY = 4500,
+        STAND_DELAY_RANDOM_THRESHOLD = 51,
+        STAND_DELAY_RANDOM_MIN = 50,
+        IDLE_ROLL_MIN = 1,
+        IDLE_ROLL_MAX = 100,
+        IDLE_REPEAT_CHANCE = 8,
+        STANDING_ANIMATION_SEARCH_DONE = 99
+    H2_ENUM_END(CombatCycleConstant)
 
-H2_ENUM_BEGIN(CombatVictoryConstant)
-    VICTORY_NECROMANCY_STACK_LIMIT   = 5,
-    VICTORY_FADE_STEPS               = 8,
-    VICTORY_WASTELAND_FADE_STEPS     = 5,
-    VICTORY_FADE_DELAY               = 60,
-    VICTORY_MUSIC                    = 29,
-    LOSS_MUSIC                       = 30,
-    VICTORY_EXPERIENCE_TEXT_SIZE     = 152,
-    WIN_LOSE_WINDOW_X                = 143,
-    WIN_LOSE_WINDOW_Y                = 10,
-    WIN_LOSE_DIALOG_TIMEOUT          = 15000,
-    WIN_LOSE_ANIMATION_FILENAME_SIZE = 52,
-    VICTORY_DIM_STEP                 = 3
-H2_ENUM_END(CombatVictoryConstant)
+    H2_ENUM_BEGIN(CombatVictoryConstant)
+        VICTORY_NECROMANCY_STACK_LIMIT = 5,
+        VICTORY_FADE_STEPS = 8,
+        VICTORY_WASTELAND_FADE_STEPS = 5,
+        VICTORY_FADE_DELAY = 60,
+        VICTORY_MUSIC = 29,
+        LOSS_MUSIC = 30,
+        VICTORY_EXPERIENCE_TEXT_SIZE = 152,
+        WIN_LOSE_WINDOW_X = 143,
+        WIN_LOSE_WINDOW_Y = 10,
+        WIN_LOSE_DIALOG_TIMEOUT = 15000,
+        WIN_LOSE_ANIMATION_FILENAME_SIZE = 52,
+        VICTORY_DIM_STEP = 3
+    H2_ENUM_END(CombatVictoryConstant)
 
-H2_ENUM_BEGIN(CombatSurrenderDialogConstant)
-    SURRENDER_DIALOG_TYPE            = 1,
-    SURRENDER_DIALOG_ACCEPT_RESULT   = 2,
-    SURRENDER_TEXT_WIDTH             = 30,
-    SURRENDER_PORTRAIT_RESOURCE_ID   = 1,
-    SURRENDER_PORTRAIT_WIDGET_ID     = 30,
-    SURRENDER_PORTRAIT_DEFAULT_COLOR = 4,
-    SURRENDER_TEXT_ID                = 2,
-    SURRENDER_WINDOW_X               = 74,
-    SURRENDER_WINDOW_Y               = 80
-H2_ENUM_END(CombatSurrenderDialogConstant)
+    H2_ENUM_BEGIN(CombatSurrenderDialogConstant)
+        SURRENDER_DIALOG_TYPE = 1,
+        SURRENDER_DIALOG_ACCEPT_RESULT = 2,
+        SURRENDER_TEXT_WIDTH = 30,
+        SURRENDER_PORTRAIT_RESOURCE_ID = 1,
+        SURRENDER_PORTRAIT_WIDGET_ID = 30,
+        SURRENDER_PORTRAIT_DEFAULT_COLOR = 4,
+        SURRENDER_TEXT_ID = 2,
+        SURRENDER_WINDOW_X = 74,
+        SURRENDER_WINDOW_Y = 80
+    H2_ENUM_END(CombatSurrenderDialogConstant)
 
-H2_ENUM_CLASS_BEGIN(CombatHelpTextIndex)
-    HELP_SKIP_UNIT      = 1,
-    HELP_AUTO_COMBAT    = 2,
-    HELP_SYSTEM_OPTIONS = 3,
-    HELP_OTHER_CONTROL  = 4
-H2_ENUM_CLASS_END(CombatHelpTextIndex)
+    H2_ENUM_CLASS_BEGIN(CombatHelpTextIndex)
+        HELP_SKIP_UNIT = 1,
+        HELP_AUTO_COMBAT = 2,
+        HELP_SYSTEM_OPTIONS = 3,
+        HELP_OTHER_CONTROL = 4
+    H2_ENUM_CLASS_END(CombatHelpTextIndex)
 
-H2_ENUM_CLASS_BEGIN(CombatLongHelpIndex)
-    LONG_HELP_ATTACK            = 0,
-    LONG_HELP_WAIT              = 1,
-    LONG_HELP_DISABLE_SELECTION = 2,
-    LONG_HELP_SYSTEM_OPTIONS    = 3,
-    LONG_HELP_CONTROLS          = 4
-H2_ENUM_CLASS_END(CombatLongHelpIndex)
+    H2_ENUM_CLASS_BEGIN(CombatLongHelpIndex)
+        LONG_HELP_ATTACK = 0,
+        LONG_HELP_WAIT = 1,
+        LONG_HELP_DISABLE_SELECTION = 2,
+        LONG_HELP_SYSTEM_OPTIONS = 3,
+        LONG_HELP_CONTROLS = 4
+    H2_ENUM_CLASS_END(CombatLongHelpIndex)
 
-H2_ENUM_BEGIN(CombatStorageConstant)
-    SELECTOR_INITIAL_FRAME = 7,
-    VIEW_DESCRIPTION_SIZE  = 300
-H2_ENUM_END(CombatStorageConstant)
+    H2_ENUM_BEGIN(CombatStorageConstant)
+        SELECTOR_INITIAL_FRAME = 7,
+        VIEW_DESCRIPTION_SIZE = 300
+    H2_ENUM_END(CombatStorageConstant)
 
-}
+} // namespace
 
 VA(0x0042b850, 0x2be)
 MessageDispatchResult combatManager::Main(tag_message& message) {
@@ -402,7 +401,8 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
 
 ProcessAction:
     if (giNextAction == ACTION_NONE) {
-        if (m_playerId[IDX(m_currentSide)] == -1 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
+        if (m_playerId[IDX(m_currentSide)] == -1
+            || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || m_gridSelectionDisabled != 0) {
             CheckGetAIMove();
         } else {
@@ -423,8 +423,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
           || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
           || (m_hexCells[hexIndex].m_blocked != 0
               && (gpCombatManager->m_inCastleCombat == 0
-                  || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
-                      && hexIndex != CASTLE_GATE_HEX)
+                  || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
                   || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                       && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                           || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
@@ -465,14 +464,18 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             if (HAS(currentArmy_3->m_monster.flags.all, MONSTER_FLAGS_WIDE) != 0) {
                 if (currentArmy_3->m_facing == ARMY_FACING_RIGHT) {
                     if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHWEST)];
+                        directionHexes_4[direction_27] =
+                            m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHWEST)];
                     if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_EAST))
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHWEST)];
+                        directionHexes_4[direction_27] =
+                            m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHWEST)];
                 } else {
                     if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHEAST)];
+                        directionHexes_4[direction_27] =
+                            m_adjacency[targetHex][IDX(COMBAT_DIRECTION_NORTHEAST)];
                     if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_EAST))
-                        directionHexes_4[direction_27] = m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHEAST)];
+                        directionHexes_4[direction_27] =
+                            m_adjacency[targetHex][IDX(COMBAT_DIRECTION_SOUTHEAST)];
                 }
             } else {
                 directionHexes_4[direction_27] = INVALID_HEX;
@@ -534,9 +537,9 @@ void combatManager::SetCombatDirections(i32 targetHex) {
             if (standable_3[direction_27] != 0) {
                 if (directionHexes_4[direction_27] == currentArmy_3->m_hex
                     || currentArmy_3->ValidPath(
-                           directionHexes_4[direction_27], ARMY_PATH_EXACT_TARGET_HEX
-                       )
-                        != 0)
+                           directionHexes_4[direction_27],
+                           ARMY_PATH_EXACT_TARGET_HEX
+                       ) != 0)
                     pathValid_1[direction_27] = 1;
                 else
                     pathValid_1[direction_27] = 0;
@@ -559,7 +562,8 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         i32 outputDirection_11 = direction_27;
         i32 mappedDirection_7;
         if (direction_27 < COMBAT_DIRECTION_ADJACENT_COUNT)
-            mappedDirection_7 = (direction_27 + COMBAT_DIRECTION_OPPOSITE_OFFSET) % COMBAT_DIRECTION_ADJACENT_COUNT;
+            mappedDirection_7 =
+                (direction_27 + COMBAT_DIRECTION_OPPOSITE_OFFSET) % COMBAT_DIRECTION_ADJACENT_COUNT;
         else if (direction_27 == IDX(COMBAT_DIRECTION_WIDE_WEST))
             mappedDirection_7 = IDX(COMBAT_DIRECTION_WIDE_EAST);
         else
@@ -615,8 +619,8 @@ void combatManager::SetCombatDirections(i32 targetHex) {
         for (direction_27 = 0; direction_27 < DIRECTION_SECTOR_COUNT; direction_27++) {
             if (m_directionMap[direction_27] == -1) {
                 i32 next_3 = (direction_27 + 1) % DIRECTION_SECTOR_COUNT;
-                i32 previous_1 = (direction_27 + DIRECTION_SECTOR_COUNT - 1)
-                                 % DIRECTION_SECTOR_COUNT;
+                i32 previous_1 =
+                    (direction_27 + DIRECTION_SECTOR_COUNT - 1) % DIRECTION_SECTOR_COUNT;
                 if (m_directionMap[next_3] >= 0
                     && m_directionMap[next_3] <= IDX(COMBAT_DIRECTION_WIDE_EAST)) {
                     m_directionMap[direction_27] =
@@ -809,10 +813,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
 
     switch (message.type) {
         case MESSAGE_WIDGET:
-            if (HAS(
-                    message.payload.widget.modifiers,
-                    MESSAGE_MODIFIER_RIGHT_BUTTON
-                )) {
+            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
                 if (message.payload.widget.command == WIDGET_COMMAND_SELECT
                     || message.payload.widget.command == WIDGET_COMMAND_ALTERNATE_SELECT) {
                     i32 helpIndex = -1;
@@ -889,17 +890,14 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             pendingMessage = gpInputManager->PeekEvent();
             if (pendingMessage.type == MESSAGE_MOUSE_MOVE)
                 break;
-            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
-                != 0)
+            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0)
                 selectedHex_36 = GetGridIndex(mouseX, mouseY);
             else
                 selectedHex_36 = INVALID_HEX;
 
             UpdateMouseGrid(selectedHex_36, 0);
-            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY)
-                != 0) {
-                if (m_selectedHex != selectedHex_36
-                    || selectedHex_36 == INVALID_HEX) {
+            if (InCombatArea(message.payload.mouse.screenX, message.payload.mouse.screenY) != 0) {
+                if (m_selectedHex != selectedHex_36 || selectedHex_36 == INVALID_HEX) {
                     m_selectedHex = selectedHex_36;
                     m_previousCommand = COMBAT_INVALID_COMMAND;
                     m_currentCommand = GetCommand(m_selectedHex);
@@ -908,9 +906,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         SetCombatDirections(selectedHex_36);
                         CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
                     } else {
-                        gpMouseManager->SetPointer(
-                            GetPointer(m_currentCommand, selectedHex_36)
-                        );
+                        gpMouseManager->SetPointer(GetPointer(m_currentCommand, selectedHex_36));
                     }
                 } else if (m_currentCommand == COMBAT_MESSAGE_COMMAND_ATTACK) {
                     CheckSetMouseDirection(mouseX, mouseY, selectedHex_36);
@@ -922,8 +918,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
             } else {
                 if (mouseX >= CONTROL_RIGHT_MIN_X) {
                     CombatMessage(cCombatHelp[IDX(HELP_SKIP_UNIT)], 1, 0, 0);
-                } else if (mouseX <= CONTROL_LEFT_MAX_X
-                           && mouseY < CONTROL_SYSTEM_OPTIONS_MIN_Y) {
+                } else if (mouseX <= CONTROL_LEFT_MAX_X && mouseY < CONTROL_SYSTEM_OPTIONS_MIN_Y) {
                     CombatMessage(cCombatHelp[IDX(HELP_AUTO_COMBAT)], 1, 0, 0);
                 } else if (mouseX <= CONTROL_LEFT_MAX_X) {
                     CombatMessage(cCombatHelp[IDX(HELP_SYSTEM_OPTIONS)], 1, 0, 0);
@@ -982,10 +977,8 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_DEBUG_CREATURE_EFFECT:
                     if (HAS(message.payload.keyboard.modifiers, MESSAGE_MODIFIER_SHIFT_KEYS)) {
                         VaporizeCreature(COMBAT_DEFENDER_SIDE, 1);
-                    } else if (HAS(
-                                   message.payload.keyboard.modifiers,
-                                   MESSAGE_MODIFIER_CONTROL_KEYS
-                               )) {
+                    } else if (HAS(message.payload.keyboard.modifiers,
+                                   MESSAGE_MODIFIER_CONTROL_KEYS)) {
                         RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_DEATH_RIPPLE);
                         RippleCreature(COMBAT_DEFENDER_SIDE, 1, COMBAT_RIPPLE_DEATH_WAVE);
                     } else {
@@ -1029,8 +1022,12 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (IsNegationSphereInEffect() != 0) {
                         NormalDialog(
-                            "The Sphere of Negation artifact is in effect for this battle, "
-                            "disabling all combat spells.",
+                            "\xd1\xf4\xe5\xf0\xe0 \xe0\xed\xf2\xe8\xec\xe0\xe3\xe8\xe8 \xe2 "
+                            "\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe8. \xcd\xe5 \xec\xee\xe6\xe5\xf2 "
+                            "\xe1\xfb\xf2\xfc \xed\xe0\xef\xf0\xe0\xe2\xeb\xe5\xed\xee \xed\xe8 "
+                            "\xee\xe4\xed\xee \xe1\xee\xe5\xe2\xee\xe5 "
+                            "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5." /* "Сфера антимагии в действии. Не может быть направлено ни одно боевое заклинание." */
+                            ,
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1072,7 +1069,8 @@ VA(0x0042d14d, 0x58)
 i32 combatManager::IsNegationSphereInEffect(void) {
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
-        if (m_heroes[IDX(side)] != NULL && m_heroes[IDX(side)]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
+        if (m_heroes[IDX(side)] != NULL
+            && m_heroes[IDX(side)]->HasArtifact(ARTIFACT_SPHERE_NEGATION) != 0)
             return 1;
     }
     return 0;
@@ -1101,8 +1099,7 @@ void combatManager::ResetRound(void) {
         for (armyIndex = 0; armyIndex < COMBAT_ARMY_SLOT_COUNT; armyIndex++) {
             army* currentArmy = m_armies[IDX(side)] + armyIndex;
             if (currentArmy->m_quantity > 0) {
-                currentArmy->m_monster.flags.abilityFlags &=
-                    MONSTER_FLAGS_ROUND_PERSISTENT_MASK;
+                currentArmy->m_monster.flags.abilityFlags &= MONSTER_FLAGS_ROUND_PERSISTENT_MASK;
                 if (currentArmy->m_monsterType == CREATURE_TROLL
                     || currentArmy->m_monsterType == CREATURE_WAR_TROLL)
                     currentArmy->m_hitPointsLost = 0;
@@ -1218,8 +1215,7 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
 
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
-                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
-                        && hexIndex != CASTLE_GATE_HEX)
+                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
                     || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                         && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
@@ -1250,16 +1246,11 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                             ourArmy->m_targetIndex = targetIndex;
                             if (ourArmy->m_monster.shots > 0
                                 && ourArmy->GetAttackMask(
-                                    ourArmy->m_hex,
-                                    ARMY_ATTACK_TARGET_ENEMY,
-                                    ARMY_HEX_INVALID
-                                )
-                                       == ARMY_ALL_ATTACK_DIRECTIONS) {
-                                if (ShotIsThroughWall(
-                                        ourArmy->m_side,
-                                        ourArmy->m_hex,
-                                        hexIndex
-                                    )
+                                       ourArmy->m_hex,
+                                       ARMY_ATTACK_TARGET_ENEMY,
+                                       ARMY_HEX_INVALID
+                                   ) == ARMY_ALL_ATTACK_DIRECTIONS) {
+                                if (ShotIsThroughWall(ourArmy->m_side, ourArmy->m_hex, hexIndex)
                                     != 0)
                                     return COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL;
                                 else
@@ -1276,17 +1267,18 @@ CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
                         break;
                 }
             } else {
-                if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex].ValidPath(
-                        hexIndex, ARMY_PATH_ANY_TARGET_HEX
-                    )
+                if (m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
+                        .ValidPath(hexIndex, ARMY_PATH_ANY_TARGET_HEX)
                     == 1) {
-                    command = CombatMessageCommand(static_cast<i8>(
-                        HAS(m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
-                                .m_monster.flags.all,
-                            MONSTER_FLAGS_FLYING)
-                            ? IDX(COMBAT_MESSAGE_COMMAND_FLY)
-                            : IDX(COMBAT_MESSAGE_COMMAND_MOVE)
-                    ));
+                    command = CombatMessageCommand(
+                        static_cast<i8>(
+                            HAS(m_armies[IDX(m_currentArmySide)][m_currentArmyIndex]
+                                    .m_monster.flags.all,
+                                MONSTER_FLAGS_FLYING)
+                                ? IDX(COMBAT_MESSAGE_COMMAND_FLY)
+                                : IDX(COMBAT_MESSAGE_COMMAND_MOVE)
+                        )
+                    );
                 }
             }
             break;
@@ -1333,8 +1325,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
             i32 armyIndex = m_hexCells[hexIndex].m_occupantIndex;
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
-                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX
-                        && hexIndex != CASTLE_GATE_HEX)
+                    || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
                     || (gpCombatManager->m_drawbridgeState == COMBAT_CASTLE_GATE_OPEN
                         && (gpCombatManager->m_currentSide != COMBAT_DEFENDER_SIDE
                             || gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
@@ -1351,7 +1342,8 @@ i32 combatManager::RightClick(i32 hexIndex) {
                         case COMBAT_DEFENDER_SIDE:
                             gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
                             ViewArmy(
-                                &m_armies[IDX(side)][m_hexCells[m_selectedHex].m_occupantIndex], 1
+                                &m_armies[IDX(side)][m_hexCells[m_selectedHex].m_occupantIndex],
+                                1
                             );
                             ResetMouse();
                             return 0;
@@ -1383,7 +1375,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_ATTACK:
             giNextActionGridIndex = m_selectedHex;
-            if (m_playerId[IDX(m_currentSide)] == -1 || gbHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
+            if (m_playerId[IDX(m_currentSide)] == -1
+                || gbHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
                 || m_gridSelectionDisabled != 0) {
                 giNextAction = ACTION_MOVE;
                 giNextActionExtra = -1;
@@ -1417,8 +1410,12 @@ void combatManager::DoCommand(CombatMessageCommand command) {
         case COMBAT_MESSAGE_COMMAND_CAST_SPELL:
             if (IsNegationSphereInEffect() != 0) {
                 NormalDialog(
-                    "The Sphere of Negation artifact is in effect for this battle, disabling all "
-                    "combat spells.",
+                    "\xd1\xf4\xe5\xf0\xe0 \xe0\xed\xf2\xe8\xec\xe0\xe3\xe8\xe8 \xe2 "
+                    "\xe4\xe5\xe9\xf1\xf2\xe2\xe8\xe8. \xcd\xe5 \xec\xee\xe6\xe5\xf2 "
+                    "\xe1\xfb\xf2\xfc \xed\xe0\xef\xf0\xe0\xe2\xeb\xe5\xed\xee \xed\xe8 "
+                    "\xee\xe4\xed\xee \xe1\xee\xe5\xe2\xee\xe5 "
+                    "\xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5." /* "Сфера антимагии в действии. Не может быть направлено ни одно боевое заклинание." */
+                    ,
                     NORMAL_DIALOG_INFO,
                     NORMAL_DIALOG_NO_RESOURCE,
                     NORMAL_DIALOG_NO_VALUE,
@@ -1436,7 +1433,9 @@ void combatManager::DoCommand(CombatMessageCommand command) {
             break;
         case COMBAT_MESSAGE_COMMAND_RETREAT:
             NormalDialog(
-                "Are you sure you want to retreat?",
+                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+                "\xf5\xee\xf2\xe8\xf2\xe5 \xee\xf2\xf1\xf2\xf3\xef\xe8\xf2\xfc?" /* "Вы действительно хотите отступить?" */
+                ,
                 NORMAL_DIALOG_CONFIRM,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,
@@ -1456,7 +1455,8 @@ void combatManager::DoCommand(CombatMessageCommand command) {
                 if (gpGame->m_players[m_playerId[IDX(m_currentSide)]].m_resources[IDX(RES_GOLD)]
                     < giSurrenderCost) {
                     NormalDialog(
-                        "You don't have enough gold!",
+                        "\xd3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
+                        "\xe7\xee\xeb\xee\xf2\xe0!" /* "У вас недостаточно золота!" */,
                         NORMAL_DIALOG_INFO,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,
@@ -1513,7 +1513,8 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                             gpCombatManager->ClearWinLoseBottom(gpCombatManager->m_winLoseWindow);
                             gpCombatManager->ShowSkeletons(gpCombatManager->m_winLoseWindow);
                         } else {
-                            if (gpCombatManager->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)]
+                            if (gpCombatManager
+                                    ->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)]
                                 != SPELL_NONE) {
                                 gpCombatManager->ClearWinLoseBottom(
                                     gpCombatManager->m_winLoseWindow
@@ -1521,7 +1522,8 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
                                 gpCombatManager->ShowEagleEyeSpell(
                                     gpCombatManager->m_winLoseWindow
                                 );
-                                gpCombatManager->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)] =
+                                gpCombatManager
+                                    ->m_eagleEyeSpell[IDX(gpCombatManager->m_combatResult)] =
                                     SPELL_NONE;
                             } else {
                             ExitDialog:
@@ -1550,13 +1552,11 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
 
         switch (gbWhichAnimationPlaying) {
             case WIN_LOSE_ANIMATION_CYCLE_FIRST:
-                frame = giWinCmbtFrame % WIN_LOSE_LOOP_FRAME_COUNT
-                        + WIN_LOSE_FIRST_ANIMATION_FRAME;
+                frame = giWinCmbtFrame % WIN_LOSE_LOOP_FRAME_COUNT + WIN_LOSE_FIRST_ANIMATION_FRAME;
                 iDelay = WIN_LOSE_LOOP_DELAY;
                 break;
             case WIN_LOSE_ANIMATION_CYCLE_SECOND:
-                frame = giWinCmbtFrame % WIN_LOSE_LOOP_FRAME_COUNT
-                        + WIN_LOSE_FIRST_ANIMATION_FRAME;
+                frame = giWinCmbtFrame % WIN_LOSE_LOOP_FRAME_COUNT + WIN_LOSE_FIRST_ANIMATION_FRAME;
                 iDelay = WIN_LOSE_LOOP_DELAY;
                 break;
             case WIN_LOSE_ANIMATION_FLEE:
@@ -1645,7 +1645,8 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
 
 VA(0x0042e478, 0x29d)
 void combatManager::ShowWinLoseArtifact(
-    class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact
+    class heroWindow* window,
+    H2_ENUM_PARAM(ArtifactType, i32) artifact
 ) {
     i16 w = CASUALTY_WINDOW_WIDTH;
     i16 winBottom = CASUALTY_WINDOW_BOTTOM;
@@ -1962,10 +1963,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
             );
             if (m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE] == NULL)
                 MemError();
-            window->AddWidget(
-                m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE],
-                -1
-            );
+            window->AddWidget(m_winLoseBottomTextWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE], -1);
         }
 
         monsterIcons_2 = gpResourceManager->GetIcon("mons32.icn");
@@ -1992,7 +1990,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                                    + armyIndex_8)
                            )
                                  ->w)
-                            / CASUALTY_CENTER_DIVISOR
+                              / CASUALTY_CENTER_DIVISOR
                         + 1,
                     (y_29 + CASUALTY_ICON_TOP_OFFSET
                      - GetIconEntry(
@@ -2011,12 +2009,12 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     "mons32.icn",
                     *(&casualtyType_1[0][0] + side_9 * COMBAT_ARMY_SLOT_COUNT + armyIndex_8),
                     ICON_DRAW_NORMAL,
-                    side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_ICON_WIDGET_ID_FIRST,
+                    side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8
+                        + CASUALTY_ICON_WIDGET_ID_FIRST,
                     WIDGET_KIND_ICON_DIRECT,
                     1
                 );
-            if (m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8]
-                == NULL)
+            if (m_winLoseBottomWidgets[side_9 * CASUALTY_WIDGETS_PER_SIDE + armyIndex_8] == NULL)
                 MemError();
 
             text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_QUANTITY_CAPACITY));
@@ -2035,7 +2033,8 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
                     text_27,
                     "smalfont.fnt",
                     FONT_DRAW_DEFAULT,
-                    side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8 + CASUALTY_TEXT_WIDGET_ID_FIRST,
+                    side_9 * CASUALTY_WIDGET_ID_STRIDE + armyIndex_8
+                        + CASUALTY_TEXT_WIDGET_ID_FIRST,
                     WIDGET_KIND_TEXT,
                     FONT_ALIGN_CENTER
                 );
@@ -2073,7 +2072,8 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     i32 deadCreatureCount3;
     i32 lastLivingArmy0;
 
-    if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
+    if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL
+        && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
         m_heroes[IDX(COMBAT_DEFENDER_SIDE)] = NULL;
     gbShowingLoseWindow = false;
     gbWhichAnimationPlaying = true;
@@ -2161,7 +2161,8 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
         case COMBAT_RESULT_DEFENDER:
             if (m_heroes[IDX(winningSide)] != NULL) {
                 if (m_eagleEyeSpell[IDX(winningSide)] != SPELL_NONE) {
-                    m_heroes[IDX(winningSide)]->m_spells[IDX(m_eagleEyeSpell[IDX(winningSide)])] = 1;
+                    m_heroes[IDX(winningSide)]->m_spells[IDX(m_eagleEyeSpell[IDX(winningSide)])] =
+                        1;
                 }
                 m_experienceValue[IDX(OppositeCombatResult(winningSide))] =
                     ExperienceValueOfStack(IDX(OppositeCombatResult(winningSide)));
@@ -2182,14 +2183,17 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     emptySlots = 0;
                     if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
                         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
-                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex26) {
+                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT;
+                             ++fadeIndex26) {
                             if (m_heroes[IDX(winningSide)]->m_artifacts[fadeIndex26]
                                 == ARTIFACT_NONE) {
                                 ++emptySlots;
                             }
                         }
-                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT; ++fadeIndex26) {
-                            if (m_heroes[IDX(OppositeCombatResult(winningSide))]->m_artifacts[fadeIndex26]
+                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT;
+                             ++fadeIndex26) {
+                            if (m_heroes[IDX(OppositeCombatResult(winningSide))]
+                                        ->m_artifacts[fadeIndex26]
                                     >= ARTIFACT_ARCANE_NECKLACE
                                 && m_heroes[IDX(OppositeCombatResult(winningSide))]
                                            ->m_artifacts[fadeIndex26]
@@ -2220,7 +2224,8 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     || gbThisNetHumanPlayer[m_playerId[IDX(winningSide)]] == 0
                 )) {
                 gpSoundManager->SwitchAmbientMusic(VICTORY_MUSIC);
-                m_winLoseWindow = new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
+                m_winLoseWindow =
+                    new heroWindow(WIN_LOSE_WINDOW_X, WIN_LOSE_WINDOW_Y, "wincmbt.bin");
                 if (m_winLoseWindow == NULL)
                     MemError();
 
@@ -2488,7 +2493,8 @@ VA(0x004309fa, 0xb6)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
     if (m_heroCastSpell[IDX(m_currentSide)] == 0
-        && (m_playerId[IDX(m_currentSide)] == -1 || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
+        && (m_playerId[IDX(m_currentSide)] == -1
+            || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0
             || gConfig.autoCombatUseSpells != 0)) {
         if (DoSpellAI(m_currentSide, retreat) != 0)
             return;
@@ -2738,8 +2744,7 @@ void combatManager::ResetCyclingCreatures(void) {
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
             currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
-            if (HAS(currentArmy_p->m_monster.flags.abilityFlags,
-                    MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                 == 0) {
                 currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
                 currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
@@ -2767,10 +2772,8 @@ void combatManager::ResetCycleTimers(void) {
             currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
             currentArmy_p->m_lastAnimationTime = currentTime_r;
             if (currentArmy_p->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
-                currentArmy_p->m_lastAnimationTime -= Random(
-                    STAND_DELAY_RANDOM_MIN,
-                    currentArmy_p->m_frameInfo.standStillDelay
-                );
+                currentArmy_p->m_lastAnimationTime -=
+                    Random(STAND_DELAY_RANDOM_MIN, currentArmy_p->m_frameInfo.standStillDelay);
             }
         }
     }
@@ -2800,7 +2803,8 @@ void combatManager::CycleCombatScreen(void) {
         if (m_heroOverlayIcons[IDX(side)] == NULL) {
         } else {
             if (m_heroes[IDX(side)] != NULL)
-                m_heroOverlayFrame[IDX(side)] = (m_heroOverlayFrame[IDX(side)] + 1) % COMBAT_HERO_OVERLAY_FRAME_COUNT;
+                m_heroOverlayFrame[IDX(side)] =
+                    (m_heroOverlayFrame[IDX(side)] + 1) % COMBAT_HERO_OVERLAY_FRAME_COUNT;
             ++m_drawHeroOverlay[IDX(side)];
         }
     }
@@ -2838,7 +2842,8 @@ void combatManager::CycleCombatScreen(void) {
                 || m_heroAnimationState[IDX(side)] == HERO_ANIMATION_IDLE_LAST) {
                 m_drawHero[IDX(side)] = 1;
             } else if (m_heroAnimationState[IDX(side)] == HERO_ANIMATION_STAND
-                       && m_heroDeathAnimationPlayed[IDX(side)] == 0 && m_heroDeathPending[IDX(side)] != 0) {
+                       && m_heroDeathAnimationPlayed[IDX(side)] == 0
+                       && m_heroDeathPending[IDX(side)] != 0) {
                 if (m_playerId[IDX(m_currentSide)] == -1
                     || gbThisNetHumanPlayer[m_playerId[IDX(m_currentSide)]] == 0) {
                     m_heroAlternateDeathPending[IDX(side)] = 0;
@@ -2876,11 +2881,7 @@ void combatManager::CycleCombatScreen(void) {
                        && m_heroCycleTimer[IDX(side)] + HERO_IDLE_DELAY < KBTickCount()) {
                 if (sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount > 1) {
                     nextHeroAnimation[IDX(side)] =
-                        Random(
-                            0,
-                            sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount
-                                - 1
-                        )
+                        Random(0, sCmbtHero[m_heroSpriteIndex[IDX(side)]].idleAnimationCount - 1)
                         + HERO_ANIMATION_IDLE_FIRST;
                 } else {
                     nextHeroAnimation[IDX(side)] = HERO_ANIMATION_IDLE_FIRST;
@@ -2905,9 +2906,8 @@ void combatManager::CycleCombatScreen(void) {
             currentArmy = gpCombatManager->m_armies[IDX(side)] + index;
             if (cycleArmy[IDX(side)][index] != 0) {
                 if (currentArmy->m_animationSequence == ARMY_ANIMATION_STAND) {
-                    roll =
-                        static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
-                        / COMBAT_IDLE_ROLL_DIVISOR;
+                    roll = static_cast<float>(Random(IDLE_ROLL_MIN, IDLE_ROLL_MAX))
+                           / COMBAT_IDLE_ROLL_DIVISOR;
                     accumulatedChance = 0.0f;
                     currentArmy->m_standingAnimation =
                         currentArmy->m_frameInfo.standingAnimationCount - 1;
@@ -2922,8 +2922,7 @@ void combatManager::CycleCombatScreen(void) {
                         }
                     }
                     currentArmy->m_animationSequence = ArmyAnimationSequence(
-                        currentArmy->m_standingAnimation
-                        + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
+                        currentArmy->m_standingAnimation + IDX(COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST)
                     );
                     currentArmy->m_animationFrame = 0;
                 } else {
@@ -3022,7 +3021,8 @@ void combatManager::AddArmy(
         }
         if (m_armies[IDX(side)][index_g].m_quantity == 0
             && HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE) != 0
+            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)
+                    != 0
                 || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
                 || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
                 || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
@@ -3033,8 +3033,7 @@ void combatManager::AddArmy(
         }
     }
 
-    if (armyIndex_r == INVALID_ARMY_INDEX
-        || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+    if (armyIndex_r == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
     newArmy = &m_armies[IDX(side)][armyIndex_r];
@@ -3131,7 +3130,8 @@ void combatManager::ViewBallista(i32 quickView) {
     strcat(gText, description);
 
     strcpy(description, "");
-    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET)) != 0) {
+    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_LEFT_TURRET))
+        != 0) {
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Left Turret");
         } else if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
@@ -3157,7 +3157,8 @@ void combatManager::ViewBallista(i32 quickView) {
         strcat(gText, description);
     }
 
-    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET)) != 0) {
+    if ((m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_buildings & IDX(TOWN_BUILDING_RIGHT_TURRET))
+        != 0) {
         strcpy(description, "");
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)] == COMBAT_WALL_STATE_DESTROYED) {
             sprintf(description, "\n\nThe %s is destroyed.", "Right Turret");
