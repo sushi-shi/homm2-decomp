@@ -322,7 +322,7 @@ void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     ResetBonusChoices();
 }
 
-VA(0x004b3427, 0x63f)
+VA(0x004b3427, 0x693)
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* campaignChoice =
         &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
@@ -818,7 +818,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->DrawWindow();
 }
 
-VA(0x004b4642, 0x121)
+VA(0x004b4642, 0x131)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
     i32 mapIndex;
@@ -859,7 +859,7 @@ i32 ExpCampaign::HandleVictory(void) {
     return 0;
 }
 
-VA(0x004b4773, 0x121)
+VA(0x004b4773, 0x145)
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -910,7 +910,7 @@ void ExpCampaign::HandleVictory1(void) {
     }
 }
 
-VA(0x004b48b8, 0x102)
+VA(0x004b48b8, 0x126)
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -957,7 +957,7 @@ void ExpCampaign::HandleVictory2(void) {
     }
 }
 
-VA(0x004b49de, 0x94)
+VA(0x004b49de, 0xa8)
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -985,7 +985,7 @@ void ExpCampaign::HandleVictory3(void) {
     }
 }
 
-VA(0x004b4a86, 0x7f)
+VA(0x004b4a86, 0x93)
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -1010,7 +1010,7 @@ void ExpCampaign::HandleVictory4(void) {
     }
 }
 
-VA(0x004b4b19, 0x57)
+VA(0x004b4b19, 0x67)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
         case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
@@ -1029,7 +1029,7 @@ void ExpCampaign::ReplaySmacker(void) {
     gpWindowManager->m_updateFlags = 1;
 }
 
-VA(0x004b4b80, 0xac)
+VA(0x004b4b80, 0xcc)
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
         case MAP_POL_UPRISING + 1:
@@ -1062,7 +1062,7 @@ void ExpCampaign::ReplaySmacker1(void) {
     }
 }
 
-VA(0x004b4c4c, 0x90)
+VA(0x004b4c4c, 0xb0)
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
         case MAP_DES_CONQUER_AND_UNIFY + 1:
@@ -1092,7 +1092,7 @@ void ExpCampaign::ReplaySmacker2(void) {
     }
 }
 
-VA(0x004b4cfc, 0x78)
+VA(0x004b4cfc, 0x88)
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
         case MAP_WIZ_SHROUDED_ISLES + 1:
@@ -1113,7 +1113,7 @@ void ExpCampaign::ReplaySmacker3(void) {
     }
 }
 
-VA(0x004b4d84, 0x60)
+VA(0x004b4d84, 0x70)
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
         case MAP_VOY_STRANDED + 1:

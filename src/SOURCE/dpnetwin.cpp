@@ -300,7 +300,7 @@ void dpProcessMessages(void) {
     }
 }
 
-VA(0x00436f33, 0x230)
+VA(0x00436f33, 0x244)
 void dpEvaluateMessage(u32l size, i32 sender) {
     static i16 evaluateSourceLineBase = 355;
     DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
@@ -362,7 +362,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
-VA(0x00437177, 0x15a)
+VA(0x00437177, 0x16a)
 i32 dpWaitForFirstGuest(void) {
     static i16 firstGuestSourceLineBase = 426;
     DPSESSIONDESC session;
@@ -424,7 +424,7 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
-VA(0x0043735d, 0x37e)
+VA(0x0043735d, 0x396)
 i32 dpWaitForHost(void) {
     static i16 hostSourceLineBase = 510;
     DWORD enumerationTimeout;

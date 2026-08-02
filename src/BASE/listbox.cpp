@@ -233,7 +233,7 @@ void listBoxWidget::DeleteItem(i32 index) {
         m_visibleItemCount = m_itemCount;
 }
 
-VA(0x004cee60, 0x474)
+VA(0x004cee60, 0x48c)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)

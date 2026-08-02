@@ -1365,7 +1365,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
     return 0;
 }
 
-VA(0x0042db4f, 0x2f2)
+VA(0x0042db4f, 0x32e)
 void combatManager::DoCommand(CombatMessageCommand command) {
     i32 unusedCommandWord2;
     i32 unusedCommandWord5;
@@ -2556,7 +2556,7 @@ void combatManager::ResetMouse(void) {
     }
 }
 
-VA(0x00430cbe, 0x5ef)
+VA(0x00430cbe, 0x60b)
 MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;

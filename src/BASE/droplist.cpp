@@ -171,7 +171,7 @@ void dropListWidget::DeleteItem(i32 index) {
     }
 }
 
-VA(0x004d0380, 0x417)
+VA(0x004d0380, 0x42f)
 MessageDispatchResult dropListWidget::Main(tag_message& message) {
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)

@@ -144,7 +144,7 @@ i32 KeyboardMessageHandler(void*, u32 message, u32, i32l messageData) {
     return event->type == MESSAGE_NONE;
 }
 
-VA(0x004bc390, 0x367)
+VA(0x004bc390, 0x383)
 i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
     if (gpInputManager == NULL)
         return 1;

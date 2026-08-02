@@ -22,7 +22,7 @@ H2_ENUM_BEGIN(NetbiosSetupConstant)
     DETACH_SOURCE_SESSION    = 1
 H2_ENUM_END(NetbiosSetupConstant)
 
-VA(0x00473830, 0x10c)
+VA(0x00473830, 0x11c)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 reserved;
@@ -70,7 +70,7 @@ i8 InitNetHost(void) {
     return 0;
 }
 
-VA(0x0047394c, 0x188)
+VA(0x0047394c, 0x19c)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
 

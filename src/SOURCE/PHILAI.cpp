@@ -4943,7 +4943,7 @@ i32 philAI::CombatMonsterEvent(
     return 0;
 }
 
-VA(0x004884f1, 0x5c3)
+VA(0x004884f1, 0x623)
 i32 philAI::FightEvent(hero* h, mapCell* cell, i32 evaluateOnly) {
     MapObjectType eventType16;
     CreatureType monsterType6;
@@ -5274,7 +5274,7 @@ i32 philAI::ComputeUpgradeValue(CreatureType a1, CreatureType a2) {
     return result;
 }
 
-VA(0x00488eb5, 0x19b)
+VA(0x00488eb5, 0x1bb)
 i32 philAI::ComputeValueOfSS(
     hero* h,
     H2_ENUM_PARAM(HeroSecondarySkill, i32) skill,
@@ -6038,7 +6038,7 @@ i32 philAI::ValueOfEventAtPosition(i32 x, i32 y, i32 immediate, i32* liveChance)
 
 #undef HERO_RV_AT
 
-VA(0x0048aacf, 0x258)
+VA(0x0048aacf, 0x274)
 i32 philAI::EvaluateGenericSite(mapCell* cell) {
     i32 unusedValue29;
     i32 artifactIndex1;
@@ -6138,7 +6138,7 @@ i32 philAI::EvaluatePassword(mapCell* cell) {
         return 0;
 }
 
-VA(0x0048adef, 0xcc)
+VA(0x0048adef, 0xe0)
 i32 philAI::EvaluateRecruitSite(mapCell* cell) {
     i32 val;
     RecruitSiteType recruitmentSiteType;
@@ -6248,7 +6248,7 @@ i32 OnMySide(i32 player) {
         return 0;
 }
 
-VA(0x0048b270, 0x237)
+VA(0x0048b270, 0x253)
 i32 philAI::EvaluateArtifactEvent(ArtifactType artifact, i32 eventData) {
     i32 battleScratch46;
     i32 guardedValue2;

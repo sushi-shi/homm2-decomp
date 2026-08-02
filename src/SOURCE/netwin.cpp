@@ -213,7 +213,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     return 0;
 }
 
-VA(0x00474372, 0x49f)
+VA(0x00474372, 0x4c7)
 extern "C" u16 __cdecl
 nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
     i32 oldSession;

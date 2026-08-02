@@ -62,7 +62,7 @@ i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
 static i16 gGetRemoteDataLineBase = 716;
 static i16 gPollRemoteLineBase = 757;
 
-VA(0x0048d050, 0x14c)
+VA(0x0048d050, 0x15c)
 void RemoteCleanup(void) {
     LogStr("RC1");
     if (gbRemoteOn == 0)
@@ -108,7 +108,7 @@ void RemoteCleanup(void) {
     gbInRemoteCleanup = false;
 }
 
-VA(0x0048d1ac, 0x5ef)
+VA(0x0048d1ac, 0x5ff)
 void RemoteMain(RemoteGameMode gameMode) {
     i8 receivedPlayers[REMOTE_PLAYER_COUNT];
     i32 playerState;
@@ -400,7 +400,7 @@ i32 DecodePacket(u8* data, i32) {
     return 1;
 }
 
-VA(0x0048da49, 0x148)
+VA(0x0048da49, 0x158)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
     i32 sendStatus;
     i32 out;
@@ -456,7 +456,7 @@ finished:
     return out;
 }
 
-VA(0x0048dba1, 0x10f)
+VA(0x0048dba1, 0x11f)
 i32 ReceiveRemoteData(u8*, u8* data, i32 decodeType) {
     i32 result;
     i32 receiveResult;

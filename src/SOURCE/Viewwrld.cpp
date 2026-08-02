@@ -214,7 +214,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
     UpdateRadar(1, 0);
 }
 
-VA(0x004ae4ee, 0x118a)
+VA(0x004ae4ee, 0x11e2)
 void advManager::VWCompleteDraw(void) {
     i32 mineHighlight18;
     i32 heroHighlight8;

@@ -4019,7 +4019,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
-VA(0x00442256, 0x6e0)
+VA(0x00442256, 0x6fc)
 void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 currentSiteType;
     mapCell* currentCell5;
@@ -4339,7 +4339,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-VA(0x00442952, 0x15c)
+VA(0x00442952, 0x170)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
     H2_ENUM_STORAGE(RecruitSiteType, u32) siteType2;
@@ -7175,7 +7175,7 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
-VA(0x00447989, 0x31d)
+VA(0x00447989, 0x351)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 unusedPair27[2];
     i32 artifactIndex1;
@@ -7287,7 +7287,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
-VA(0x00447cda, 0x175)
+VA(0x00447cda, 0x189)
 void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 cost16[IDX(RES_COUNT)];
     i32 purchaseCount17;

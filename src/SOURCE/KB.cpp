@@ -1672,7 +1672,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
     }
 }
 
-VA(0x00469180, 0x177)
+VA(0x00469180, 0x1af)
 MessageDispatchResult WaitHandler(tag_message& msg) {
     i32 result = 0;
     gbFunctionComplete = true;
@@ -3947,7 +3947,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     return 0;
 }
 
-VA(0x0046dfe5, 0x23e)
+VA(0x0046dfe5, 0x28e)
 void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;

@@ -223,7 +223,7 @@ void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPre
     gbLimitToExtent = savedLimitToExtent;
 }
 
-VA(0x004381ef, 0x337)
+VA(0x004381ef, 0x377)
 void combatManager::CombatMessage(CombatMessageCommand messageType) {
     army* currentArmyPtr;
     army* targetArmy;

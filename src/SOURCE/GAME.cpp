@@ -3433,7 +3433,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004553d1, 0x138)
+VA(0x004553d1, 0x158)
 MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
@@ -4652,7 +4652,7 @@ void game::PerWeek(void) {
     GiveTroopsToNeutralTowns();
 }
 
-VA(0x0045997e, 0x126)
+VA(0x0045997e, 0x13a)
 void game::WeeklyRecruitSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
     type &= WEEKLY_RECRUIT_TYPE_MASK;
@@ -4938,7 +4938,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     m_castleRecs[townId0].m_type = race0;
 }
 
-VA(0x0045a40e, 0x4f6)
+VA(0x0045a40e, 0x522)
 void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
     i32 mineId;

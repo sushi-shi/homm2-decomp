@@ -148,7 +148,7 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
-VA(0x00432ba2, 0x2e8)
+VA(0x00432ba2, 0x2fc)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
     BOOL success;

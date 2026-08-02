@@ -2839,7 +2839,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     }
 }
 
-VA(0x0041fa5f, 0x1fd)
+VA(0x0041fa5f, 0x239)
 i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) i;
 
