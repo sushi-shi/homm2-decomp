@@ -261,8 +261,8 @@ inputManager::inputManager(void) : baseManager() {
     field_0x746 = 0;
     field_0x74a = 1;
     m_keyCodeType = INPUT_KEY_CODE_SCAN;
-    field_0x866 = 0;
     field_0x862 = -1;
+    field_0x866 = 0;
 }
 
 static inline void ResetEventQueue(inputManager* manager) {
