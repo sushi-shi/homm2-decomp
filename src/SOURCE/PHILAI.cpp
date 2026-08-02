@@ -2883,7 +2883,7 @@ i32 philAI::CreaturesToBuy(H2_ENUM_PARAM(CreatureType, i32) a, i32 b) {
     i32 n = MaxBuyableCreatures(a);
     if (n > 1)
         n >>= 1;
-    if (b < n)
+    if (n > b)
         n = b;
     if (n > 1)
         return n;
