@@ -3330,7 +3330,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
             giMaxExtentY = COMBAT_AREA_HEIGHT - 1;
         DelayTil(&deadline_j);
         deadline_j = static_cast<i32>(
-            KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * BLAST_FRAME_DELAY
+            KBTickCount() + BLAST_FRAME_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
         );
         gpWindowManager->UpdateScreenRegion(
             giMinExtentX,

@@ -364,7 +364,7 @@ BASE/WINDOW	?Close@heroWindow@@QAEXXZ	100.0000	bdfb8142999f
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXH@Z	100.0000	0e54dd7b9f4c
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXHHH@Z	100.0000	b0dc98c57e29
 BASE/WINDOW	?DrawWindow@heroWindow@@QAEXXZ	100.0000	fb20755c4fbe
-BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	99.4146	daade507092d
+BASE/WINDOW	?MoveWindow@heroWindow@@QAEXHH@Z	99.7561	0ab35eaa1d9e
 BASE/WINDOW	?Open@heroWindow@@QAEHHH@Z	100.0000	1d6432adbcf5
 BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	7d0af76b0109
 BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	95.1507	58bf4111366e
@@ -1251,7 +1251,7 @@ SOURCE/SPELLS	?CastSpell@combatManager@@QAEXHHHH@Z	86.6969	64bf9f9e60ab
 SOURCE/SPELLS	?ChainLightning@combatManager@@QAEXHH@Z	91.9957	9c2a57e17e3d
 SOURCE/SPELLS	?CombatSpecialHandler@@YIHAAUtag_message@@@Z	92.4744	d5d7b28ecf12
 SOURCE/SPELLS	?DefaultSpell@combatManager@@QAEXH@Z	100.0000	39c5df9891b9
-SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	98.5278	bfdd87e02b0a
+SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	99.1889	035c9dc1310b
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	94.9956	ac3cf2732932
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	98.7016	e3b9d99fc55f
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	79.8435	43bda8887fc9
