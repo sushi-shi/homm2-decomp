@@ -29,15 +29,13 @@ not a byte-matching result, and therefore still requires ordinary code review an
 ```text
 decomp-pol-2.0 (you are here)
     |
-    +------------------+
-    |                  |
-source-pol-2.0     classic-pol-2.0
+    +------------------+-------------------+
+    |                  |                   |
+source-pol-2.0     classic-pol-2.0     decomp-gold-2.1-buka
     |
 master-pol-2.0
     |
 ironfist-pol-2.0
-
-decomp-gold-2.1-buka
 ```
 
 - `decomp-pol-2.0` is the main Price of Loyalty reconstruction; its changes feed the derived
@@ -46,7 +44,7 @@ decomp-gold-2.1-buka
 - `classic-pol-2.0` is likewise generated, while preserving the original game's mangling.
 - `master-pol-2.0` is the cross-platform Linux, Windows, and Web port.
 - `ironfist-pol-2.0` applies the Project Ironfist changes to the reconstructed source.
-- `decomp-gold-2.1-buka` is the separate Gold 2.1/Buka reconstruction used for cross-reference.
+- `decomp-gold-2.1-buka` is the Gold 2.1/Buka reconstruction used for cross-reference.
 
 <!-- match-score:start -->
 ## Match status
