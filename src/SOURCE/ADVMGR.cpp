@@ -8145,16 +8145,16 @@ void advManager::TeleportTo(
     i32,
     i32 skipMapChange
 ) {
-    i32 savedShow11;
-    H2_ENUM_STORAGE(TerrainType, i32) terrain5;
-    mapCell* oldCell2;
+    i32 savedShow;
+    H2_ENUM_STORAGE(TerrainType, i32) terrain;
+    mapCell* cellOld2;
     i32 oldCellFlag26;
-    i32 unused47;
+    i32 unused;
     mapCell* destinationCell29;
     i32 fizzleTime36;
     town* occupiedTown47;
 
-    savedShow11 = bShowIt;
+    savedShow = bShowIt;
     if (skipMapChange == 0) {
         SendMapChange(
             MAP_CHANGE_TELEPORT_HERO,
@@ -8168,15 +8168,15 @@ void advManager::TeleportTo(
     }
 
     destinationCell29 = GetCell(destinationX, destinationY);
-    oldCell2 = GetCell(mapHero->m_x, mapHero->m_y);
+    cellOld2 = GetCell(mapHero->m_x, mapHero->m_y);
     if (mapHero->m_locationType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
         occupiedTown47 = gpGame->GetTown(mapHero->m_occupiedTown);
         occupiedTown47->m_occupyingHeroId = INVALID_HERO;
     }
 
     oldCellFlag26 = 0;
-    if (oldCell2->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
-        oldCell2->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
+    if (cellOld2->m_flags & TELEPORT_CELL_OBJECT_FLAG) {
+        cellOld2->m_flags -= TELEPORT_CELL_OBJECT_FLAG;
         oldCellFlag26 = 1;
     } else {
         gpGame->RestoreCell(
@@ -8200,7 +8200,7 @@ void advManager::TeleportTo(
         }
     }
 
-    if (savedShow11 != 0) {
+    if (savedShow != 0) {
         HideRoute(1, 1, 1);
     }
 
@@ -8217,7 +8217,7 @@ void advManager::TeleportTo(
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         giCurPlayer,
         giVisRange[IDX(mapHero->m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
-            + (static_cast<u32>(mapHero->HasArtifact(ARTIFACT_TELESCOPE)) >= 1)
+            + (mapHero->HasArtifact(ARTIFACT_TELESCOPE) != 0)
     );
 
     if (bShowIt != 0) {
@@ -8266,9 +8266,9 @@ void advManager::TeleportTo(
         m_mapOriginY + TELEPORT_VIEW_CENTER,
         1
     );
-    terrain5 = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
-    if (m_currentTerrain != terrain5) {
-        m_currentTerrain = terrain5;
+    terrain = giGroundToTerrain[destinationCell29->m_terrainImageIndex];
+    if (terrain != m_currentTerrain) {
+        m_currentTerrain = terrain;
         gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
     }
     Reseed(0, 0);
