@@ -39,13 +39,13 @@ public:
         return cells;
     }
     mapCell* Row(i32 y) {
-        return &cells[width * y];
+        return &cells[y * width];
     }
     void Cell(mapCell*& cell, i32 x, i32 y) {
-        cell = cells + width * y + x;
+        cell = cells + y * width + x;
     }
     mapCell* GetCell(i32 x, i32 y) {
-        return cells + width * y + x;
+        return cells + y * width + x;
     }
     mapCellExtra* Extra(i32 i) {
         return &extras[i];

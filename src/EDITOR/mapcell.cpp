@@ -1,6 +1,7 @@
 #include <va.h>
 #include "EDITOR/fullMap.h"
 #include "EDITOR/mapcell.h"
+#include <BASE/Misc.h>
 #include <string.h>
 #include <io.h>
 
@@ -37,7 +38,7 @@ void fullMap::Init(i32 w, i32 h) {
     width = w;
     height = h;
     Close();
-    cells = static_cast<mapCell*>(operator new(width * height * sizeof(mapCell)));
+    cells = static_cast<mapCell*>(H2_ALLOC(width * height * sizeof(mapCell)));
 }
 
 VA(0x0047213f, 0x151)
@@ -68,7 +69,7 @@ i32 fullMap::GetNewCellExtraIndex(void) {
         }
     }
     i = static_cast<mapCellExtra*>(
-        operator new((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
+        H2_ALLOC((extraCount + EXTRA_ALLOCATION_STEP) * sizeof(mapCellExtra))
     );
     memcpy(i, extras, extraCount * sizeof(mapCellExtra));
     delete extras;
@@ -100,7 +101,7 @@ void fullMap::Read(i32 handle, i32 convert) {
     read(handle, &height, sizeof(height));
     Init(width, height);
     if (convert) {
-        tmp = static_cast<oldMapCell*>(operator new(width * height * sizeof(oldMapCell)));
+        tmp = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
         read(handle, tmp, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
@@ -112,9 +113,9 @@ void fullMap::Read(i32 handle, i32 convert) {
     read(handle, &extraCount, sizeof(extraCount));
     if (extras)
         delete extras;
-    extras = static_cast<mapCellExtra*>(operator new(extraCount * sizeof(mapCellExtra)));
+    extras = static_cast<mapCellExtra*>(H2_ALLOC(extraCount * sizeof(mapCellExtra)));
     if (convert) {
-        tmp2 = static_cast<oldMapCellExtra*>(operator new(extraCount * sizeof(oldMapCellExtra)));
+        tmp2 = static_cast<oldMapCellExtra*>(H2_ALLOC(extraCount * sizeof(oldMapCellExtra)));
         read(handle, tmp2, extraCount * sizeof(oldMapCellExtra));
         for (nb = 0; nb < extraCount; nb++)
             memcpy(extras + nb, tmp2 + nb, sizeof(mapCellExtra));
