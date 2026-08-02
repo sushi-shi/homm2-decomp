@@ -174,6 +174,9 @@
             [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
+            # The delinker's own scripts/ ships in its source tree, not its
+            # binary; `homm2 audit reloc-sweep` reads find_relocs.py from here.
+            export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
             ${ghidraEnvHook}
             echo "[homm2] target EXE : $HOMM2_EXE (stripped - no debug stream, no .reloc)" >&2
             echo "[homm2] tools      : vostok-delinker, objdiff(-cli), llvm-pdbutil, clang(d), ghidra" >&2
@@ -201,6 +204,9 @@
             [ -f "$HOMM2_EXE" ] || echo "[homm2] target EXE : MISSING - copy your HMM2PL.exe into build/orig/ (gitignored, never committed)" >&2
             export HOMM2_CLANG="${pkgs.llvmPackages.clang-unwrapped}/bin/clang"
             export PYTHONPATH="$HOMM2_DIR/scripts''${PYTHONPATH:+:$PYTHONPATH}"
+            # The delinker's own scripts/ ships in its source tree, not its
+            # binary; `homm2 audit reloc-sweep` reads find_relocs.py from here.
+            export VOSTOK_DELINKER="''${VOSTOK_DELINKER:-${vostok-delinker-src}}"
             export HOMM2_TOOLCHAIN="''${HOMM2_TOOLCHAIN:-$HOMM2_DIR/build/toolchain}"
             export MSVC_DIR="$HOMM2_TOOLCHAIN/msvc"
             export WINEPREFIX="$HOMM2_DIR/build/wineprefix"
