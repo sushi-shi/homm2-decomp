@@ -3101,17 +3101,17 @@ i32 philAI::RVConversion(i32* const p) {
 VA(0x00484575, 0xcd)
 float philAI::TurnsToBuy(i32* const p) {
     float maxT = 0;
-    i32 i;
-    float turns;
-    for (i = 0; i < AI_PURCHASE_RESOURCE_COUNT; i++) {
-        if (gpCurPlayer->m_resources[i] < p[i]) {
-            if (gpCurPlayer->m_aiData.m_income[i] > 0)
-                turns = static_cast<float>(
-                    (p[i] - gpCurPlayer->m_resources[i]) / gpCurPlayer->m_aiData.m_income[i] + 1
+    i32 res;
+    float turnCount;
+    for (res = 0; res < AI_PURCHASE_RESOURCE_COUNT; res++) {
+        if (gpCurPlayer->m_resources[res] < p[res]) {
+            if (gpCurPlayer->m_aiData.m_income[res] > 0)
+                turnCount = static_cast<float>(
+                    (p[res] - gpCurPlayer->m_resources[res]) / gpCurPlayer->m_aiData.m_income[res] + 1
                 );
             else
-                turns = 99.0f;
-            maxT = turns > maxT ? turns : maxT;
+                turnCount = 99.0f;
+            maxT = turnCount > maxT ? turnCount : maxT;
         }
     }
     return maxT;
@@ -3581,10 +3581,10 @@ float philAI::TurnValueOfObelisk(i32 player) {
 VA(0x00485981, 0x47)
 float philAI::FutureDeflator(i32* const p) {
     float t = TurnsToBuy(p);
-    float v = 1.0f - t * AI_FUTURE_DEFLATION_RATE;
-    if (v < 0.0)
-        v = 0;
-    return v;
+    float value = 1.0f - t * AI_FUTURE_DEFLATION_RATE;
+    if (value < 0.0)
+        value = 0;
+    return value;
 }
 
 VA(0x004859c8, 0x9a1)
