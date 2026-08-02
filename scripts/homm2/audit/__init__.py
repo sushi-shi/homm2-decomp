@@ -21,7 +21,7 @@ when a residual will not explain itself, grouped by the question they answer:
               winning disassembly out of build/ into tracked docs, so a maximum keeps
               its evidence and not just its score.
   oracle      od_oracle - ground truth for homm2.core.od_slots, read straight from the
-              CodeView S_BPREL32 records MSVC 4.2 emits. Needs wine.
+              S_BPREL32 debug records our compiler emits under /Z7. Needs wine.
 
 `homm2 audit` with no argument lists them. Dispatch is in-process via runpy, which
 is why these five keep their own differing entry points instead of being reshaped

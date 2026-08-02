@@ -15,7 +15,7 @@ BASE = REPO / "build/objdiff/base"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 
 
-def codeview_vtables():
+def inventory_vtables():
     rows = {}
     with SYMBOLS.open(newline="", encoding="latin-1") as stream:
         for row in csv.DictReader(stream):
@@ -24,7 +24,7 @@ def codeview_vtables():
                 continue
             value = (row["unit"], int(row["rva"], 0))
             if name in rows:
-                raise ValueError(f"duplicate CodeView vtable identity {name}")
+                raise ValueError(f"duplicate inventory vtable identity {name}")
             rows[name] = value
     return rows
 
@@ -43,24 +43,24 @@ def emitted_vtables():
 def main() -> int:
     claims = source_vtables(REPO / "src", REPO)
     source = {claim.mangled_name: claim for claim in claims}
-    codeview = codeview_vtables()
+    inventory = inventory_vtables()
     emitted = emitted_vtables()
     bad = []
 
-    # Retail CodeView is authoritative for every public vtable it records.
-    for name, (unit, rva) in sorted(codeview.items()):
+    # The inventory is authoritative for every vtable identity it records.
+    for name, (unit, rva) in sorted(inventory.items()):
         claim = source.get(name)
         if claim is None:
-            bad.append(f"A: CodeView vtable {name} ({unit}) has no source marker")
+            bad.append(f"A: inventory vtable {name} ({unit}) has no source marker")
         elif (claim.unit, claim.rva) != (unit, rva):
             bad.append(
                 f"A: {claim.location} places {name} at {claim.unit}+0x{claim.rva:x}; "
-                f"CodeView says {unit}+0x{rva:x}")
+                f"the inventory says {unit}+0x{rva:x}")
 
-    # Primary markers require CodeView. Secondary VTBL2 identities may be private.
+    # Primary markers require an inventory row. Secondary VTBL2 identities may be private.
     for name, claim in sorted(source.items()):
-        if claim.base is None and name not in codeview:
-            bad.append(f"B: {claim.location} primary {name} has no CodeView public")
+        if claim.base is None and name not in inventory:
+            bad.append(f"B: {claim.location} primary {name} has no inventory row")
         definitions = emitted.get(name, [])
         if len(definitions) != 1:
             bad.append(

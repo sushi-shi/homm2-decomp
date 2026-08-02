@@ -17,7 +17,7 @@ Run inside ``nix develop .#build`` so ``objdiff-cli`` is available::
     homm2 audit bitfield-residuals
     homm2 audit bitfield-residuals build/tu-state-noise/run-a --format json
 
-The signature currently recognized is the MSVC 4.2 /G5 lowering seen in
+The signature currently recognized is the MSVC /G5 lowering (catalogued on cl 10.20; re-validate on VC6) seen in
 ``advManager::DrawCell``:
 
     mov al, [source]        xor ecx, ecx

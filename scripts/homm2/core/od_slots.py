@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""MSVC 4.2 /Od local stack-slot predictor, name catalog & layout solver.
+"""MSVC /Od local stack-slot predictor, name catalog & layout solver.
+
+Solved against MSVC 4.2 (cl 10.20); this branch compiles with VC6, so every
+prediction here is a hypothesis until the od-frames/od-oracle harness
+re-validates it against VC6 objects.
 
 Reverse-engineered from the toolchain (C1XX.EXE identifier lexer FUN_0041d1a2 and
 C2.EXE per-scope symbol table FUN_0044bb5e/FUN_0044c4df). Verified byte-exact

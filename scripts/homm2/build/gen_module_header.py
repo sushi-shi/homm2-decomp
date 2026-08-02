@@ -26,7 +26,7 @@ def free_decls(path):
         semantic_sig = re.sub(r'^H2_ENUM_RETURN\s*\([^)]*\)\s*', '', sig)
         namepart = semantic_sig[:semantic_sig.index('(')]
         # free functions only: members (Class::name) live in class headers; skip ctor/dtor; skip
-        # file-static helpers (file-local — no CodeView symbol, never declared in the owner header)
+        # file-static helpers (file-local — no inventory symbol, never declared in the owner header)
         if '::' in namepart or '~' in namepart or namepart.split()[:1] == ['static']:
             continue
         out.append(sig + ';')

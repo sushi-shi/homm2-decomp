@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """detect_jump_tables.py — find MSVC switch jump-tables in the retail binary that the delinker
-folds into their owning function (CodeView has no `$L` label for the compiler-internal table).
+folds into their owning function (the inventory has no `$L` label for the compiler-internal table).
 Each is an indirect `jmp dword ptr [reg*4 + disp32]` (`ff 24 <SIB base=101> <disp32>`); the delinker
 relocates both the jmp and every table entry as `<func>+<off>` (DIR32), so a jump-table is a run of
 4-byte-spaced DIR32 self-relocs starting at the jmp's disp32 (= addend K, the table's offset in the

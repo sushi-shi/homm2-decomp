@@ -4,7 +4,7 @@ from enum import Enum
 
 
 class ClangMode(Enum):
-    # Closest Clang language mode to the pre-standard MSVC 4.2 retail compiler.
+    # Closest Clang language mode to the pre-standard retail MSVC compiler.
     RETAIL_ANALYSIS = "c++98"
 
     # Exercise the modern strongly typed enum model.

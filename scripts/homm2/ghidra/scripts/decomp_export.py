@@ -2,7 +2,7 @@
 # decomp_export.py - Ghidra decompiler C + caller/callee xrefs for a list of RVAs.
 #
 # Backs `python3 -m homm2.analysis.decomp`: for each target RVA, its decompiler C plus callers
-# and callees (names come from apply_names.py's CodeView seeding). READ-ONLY unless
+# and callees (names come from apply_names.py's inventory seeding). READ-ONLY unless
 # HOMM2_DECOMP_FORCE=1, which creates a function at an RVA Ghidra left unwrapped first.
 #
 # Reads/writes paths from HOMM2_DECOMP_TARGETS/HOMM2_DECOMP_OUT. The defaults

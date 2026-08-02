@@ -28,7 +28,7 @@ to settle first.
 Cross-TU answers (symbol, refs into other TUs) come from clangd's background
 index, built incrementally under build/clangd/.cache/ on first use - early runs may
 return partial results until it fills (the tool prints indexing progress).
-Definition/hover on an open file need no index. clang is a READER of this MSVC 4.2
+Definition/hover on an open file need no index. clang is a READER of this MSVC
 dialect (it parses our reconstructed src/ against the recovered headers via
 build/clangd/compile_commands.json): navigation is reliable, its diagnostics are
 NOT build truth - the wine `cl` build + objdiff are. Regenerate the compdb with

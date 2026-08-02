@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 """homm2.ghidra.driver - PyGhidra driver + the `homm2 ghidra` command.
 
-homm2's Ghidra use is MINIMAL, read-only, one-time and cached - CodeView is authoritative
-so Ghidra never *discovers* names. It exists only to:
-  1. give xref the WHOLE-.text function-boundary map (incl. the library/runtime funcs
-     CodeView omits), and
-  2. back `python3 -m homm2.analysis.decomp` with our names applied so the C reads well.
+This target is stripped, so Ghidra's analysis IS the candidate function inventory:
+config/retail_functions.csv started life as an export from this project, and
+export_functions.py is the refresh path when analysis improves. Boundaries stay
+analysis opinion - source VA() markers are what turn them into claims. The project
+also:
+  1. gives xref the WHOLE-.text function-boundary map, and
+  2. backs `python3 -m homm2.analysis.decomp` with our names applied so the C reads well.
 
 `homm2 ghidra` boots PyGhidra in-process (CPython3 + JPype), imports HMM2PL.exe into a
 cached project (build/ghidra/homm2.{gpr,rep}), auto-analyzes it once (SEVERAL MINUTES;
 skipped on re-runs), then runs two GhidraScripts:
   - apply_names.py      : create a function at every symbol_names.csv RVA Ghidra missed and
-                          apply our (demangled) CodeView name - "set the symbols we know".
+                          apply the source-claimed name - "set the symbols we know".
   - export_functions.py : dump build/ghidra/exports/functions.csv (entry_rva,byte_size,name).
 
 Re-run `homm2 ghidra --no-analyze` to re-apply/re-export instantly (no re-analysis).
@@ -34,9 +36,7 @@ SCRIPTS_DIR = Path(__file__).resolve().parent / "scripts"
 APPLY_NAMES = SCRIPTS_DIR / "apply_names.py"
 EXPORT_FUNCS = SCRIPTS_DIR / "export_functions.py"
 DECOMP_EXPORT = SCRIPTS_DIR / "decomp_export.py"
-RECOVER_STRUCTS = SCRIPTS_DIR / "recover_structs.py"
 FUNCTIONS_CSV = PROJ_DIR / "exports" / "functions.csv"
-STRUCT_SUMMARY_CSV = PROJ_DIR / "exports" / "struct_summary.csv"
 
 
 def _project_exists() -> bool:
@@ -77,8 +77,8 @@ def run_scripts(scripts, analyze: bool) -> int:
     try:
         if analyze:
             # Aggressive Instruction Finder (OFF by default) disassembles code in
-            # unreferenced gaps, recovering the extra .text function boundaries CodeView
-            # doesn't list. Costs ~3-4x the analysis phase, paid once on this path only.
+            # unreferenced gaps, recovering .text function boundaries plain
+            # reference-following misses. Costs ~3-4x the analysis phase, once.
             from ghidra.program.model.listing import Program
             opts = program.getOptions(Program.ANALYSIS_PROPERTIES)
             tx = program.startTransaction("enable-aggressive-instruction-finder")
@@ -102,27 +102,8 @@ def cli_main(argv) -> int:
     functions.csv. First run imports + auto-analyzes (minutes); afterwards it reuses the DB."""
     argv = list(argv)
     if "-h" in argv or "--help" in argv:
-        print("usage: homm2 ghidra [--analyze | --no-analyze] [--structs]\n" + __doc__)
+        print("usage: homm2 ghidra [--analyze | --no-analyze]\n" + __doc__)
         return 0
-
-    # --structs: decompiler-backed class LAYOUT recovery (FillOutStructureHelper). Reuses the
-    # analyzed DB (analyze only if never built), re-applies our CodeView names (idempotent) so
-    # `this`/__thiscall are set, then runs recover_structs.py -> struct_{layouts,summary}.csv.
-    # Read-only w.r.t. the DB (every probe transaction is rolled back).
-    if "--structs" in argv:
-        analyze = ("--analyze" in argv) or not _project_exists()
-        if analyze:
-            print("[homm2 ghidra] importing + auto-analyzing HMM2PL.exe (SEVERAL MINUTES, "
-                  "one-time) ...", flush=True)
-        else:
-            print("[homm2 ghidra --structs] reusing analyzed project; recovering class "
-                  "layouts ...", flush=True)
-        rc = run_scripts([APPLY_NAMES, RECOVER_STRUCTS], analyze)
-        if rc == 0 and STRUCT_SUMMARY_CSV.is_file():
-            n = sum(1 for _ in STRUCT_SUMMARY_CSV.open()) - 1
-            print("[homm2 ghidra --structs] done - %d classes -> %s (+ struct_layouts.csv)"
-                  % (n, STRUCT_SUMMARY_CSV.relative_to(REPO)))
-        return rc
 
     if "--no-analyze" in argv:
         analyze = False

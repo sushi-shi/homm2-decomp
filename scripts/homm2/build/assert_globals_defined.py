@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """assert_globals_defined.py — hard build gate: every global DECLARED `extern` in a header must
 have a DEFINITION in its owner TU's object, so the project links (no unresolved externals). For
-each CodeView-owned global declared in a header, checks its symbol is DEFINED (section > 0) in
+each inventory-owned global declared in a header, checks its symbol is DEFINED (section > 0) in
 build/objdiff/base/<owner-unit>.obj. Only the _const pseudo-unit is exempt. Runs after
 ninja (needs the built objs + llvm-objdump). Run from repo root; exits 1 on any violation."""
 import csv, re, sys, glob, os, subprocess
 
-# CodeView data symbol: demangled identifier -> (owner unit, mangled name)
+# inventory data symbol: demangled identifier -> (owner unit, mangled name)
 info = {}
 for r in csv.DictReader(open("build/gen/symbol_names.csv")):
     if r["kind"] != "data":
@@ -15,7 +15,7 @@ for r in csv.DictReader(open("build/gen/symbol_names.csv")):
     if m:
         info.setdefault(m.group(1), (r["unit"], r["name"]))
 
-# CodeView-owned globals declared `extern` in a header. The DATA-placement gate separately rejects
+# inventory-owned globals declared `extern` in a header. The DATA-placement gate separately rejects
 # owner-less header globals; anonymous/synthetic storage must be module-private.
 declared = {}
 for h in glob.glob("include/**/*.h", recursive=True):

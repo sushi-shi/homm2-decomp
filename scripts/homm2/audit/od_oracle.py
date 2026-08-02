@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Ground-truth oracle for the /Od local stack-slot model (see docs/od-stack-layout.md).
 
-Compiles a one-function probe with the real MSVC 4.2 toolchain and reads each
-local's ebp-relative frame offset straight from the CodeView S_BPREL32 records the
+Compiles a one-function probe with the real pinned MSVC toolchain and reads each
+local's ebp-relative frame offset straight from the S_BPREL32 debug records the
 compiler emits with /Z7. /Z7 adds debug records but does NOT change /Od code
 generation, so the slot assignment is byte-identical to the real `/Od /MT /Gr`
 build. Use this to verify any prediction from homm2.core.od_slots.

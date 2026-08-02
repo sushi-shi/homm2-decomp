@@ -15,11 +15,11 @@ global/const/field/function, or even call a FABRICATED function that is declared
 
 Order-INDEPENDENT: we resolve each side's relocs to a SET of final RVAs (symbol RVA + instruction
 addend; REL32 -> the symbol's own RVA) and flag any address the BASE references that retail never
-does. We also flag any base '?'-mangled symbol that resolves to NEITHER CodeView (symbol_names.csv)
+does. We also flag any base '?'-mangled symbol that resolves to NEITHER the inventory (symbol_names.csv)
 NOR a DATA()-pinned definition — i.e. fabricated.
 
-Data offsets come from symbol_names.csv (authoritative CodeView RVAs). Module-private synthetic
-storage has no CodeView symbol, so its VA is read from the owning .cpp DATA(0x..) definition.
+Data offsets come from symbol_names.csv (the claimed RVAs). Module-private synthetic
+storage has no inventory symbol, so its VA is read from the owning .cpp DATA(0x..) definition.
 
 It is OPT-IN (not in `homm2 build`'s hard gates) because incomplete functions can still carry
 legitimate relocation-shape differences. Canonical targets retain real folded-function identities;
@@ -176,7 +176,7 @@ def resolve(sym, data, typ, s, add):
 
 def is_fake(sym, data, s):
     if s.startswith('_') or s.startswith('??_C@') or s.startswith('$SG') or not s.startswith('?'):
-        return False                             # CRT/import/string/local -> outside CodeView, fine
+        return False                             # CRT/import/string/local -> outside the inventory, fine
     return resolve(sym, data, 'DIR32', s, 0) is None
 
 def _addend(insn):
@@ -860,7 +860,7 @@ def check_fn(sym, data, dups, unit, name, base_relocs, tgt_relocs):
     probs = []
     for r in base_relocs:                        # (1) fabricated function/data symbol
         if is_fake(sym, data, r[1]) and (unit, name, r[1]) not in ALLOWLIST:
-            probs.append("FAKE call/ref '%s' — exists in neither CodeView nor a DATA() global" % r[1])
+            probs.append("FAKE call/ref '%s' — exists in neither the inventory nor a DATA() global" % r[1])
     tvas = _tvas(sym, data, dups, tgt_relocs)
     bvas, va_sym = Counter(), {}
     for r in base_relocs:

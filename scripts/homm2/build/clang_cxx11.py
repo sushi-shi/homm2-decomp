@@ -3,7 +3,7 @@
 Every TU except BASE/TILE.cpp (a __declspec(naked) hand-asm blitter Clang cannot
 compile) is syntax-checked as C++20 with -Wall -Wextra (register mapped away; C++20 adds the
 deprecated cross-enum/enum-float arithmetic diagnostics). Accepted repo-wide
-classes are suppressed: writable-strings (retail's CodeView-pinned char*
+classes are suppressed: writable-strings (retail-pinned char*
 signatures), nonportable-include-path (retail-era include casing),
 unused-parameter and missing-field-initializers (reconstruction style).
 Run from the repo root inside `nix develop .#build`:
@@ -23,7 +23,7 @@ from homm2.clang_options import ClangMode
 EXCLUDED = ("BASE/TILE.cpp",)
 FLAGS = [
     "-fsyntax-only", ClangMode.STRICT.driver_flag, "--target=i386-pc-windows-msvc",
-    "-fms-extensions", "-fms-compatibility", "-fms-compatibility-version=10.20",
+    "-fms-extensions", "-fms-compatibility", "-fms-compatibility-version=12.00",
     "-ferror-limit=5",
     "-Wall", "-Wextra", "-Dregister=",
     "-Wno-writable-strings", "-Wno-nonportable-include-path",

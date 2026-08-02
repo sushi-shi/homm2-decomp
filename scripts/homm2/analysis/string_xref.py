@@ -8,7 +8,7 @@ Mechanically recovers, per function, the .rdata/.data string literals it directl
     --rva 0x0000126d      the string set of a function (its literal evidence)
     --find TEXT           reverse: every function referencing a string containing TEXT
 
-Function boundaries + names come from build/gen/symbol_names.csv (CodeView-authoritative);
+Function boundaries + names come from build/gen/symbol_names.csv (the claimed inventory);
 Ghidra's build/ghidra/exports/functions.csv, if present, adds the library/runtime funcs.
 
 Usage (reads $HOMM2_EXE + the CSVs only):

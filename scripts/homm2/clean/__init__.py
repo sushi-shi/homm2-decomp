@@ -12,14 +12,14 @@ generator performs those expansions ahead of time and emits ordinary C++.
 
 overrides/ is small and load-bearing. src/BASE/BITS.cpp and src/BASE/TILE.cpp are
 MSVC `__asm` in the matching tree - the bit primitives and the hand-asm tile
-blitter - and nothing but MSVC 4.2 can compile them, so the published tree gets
-portable C++ reimplementations. include/Ints.h is the dual-build switch itself,
-so it cannot select itself away; the override is single-branch C++20.
+blitter - and nothing but the pinned MSVC can compile them, so the published
+tree gets portable C++ reimplementations. include/Ints.h is the dual-build
+switch itself, so it cannot select itself away; the override is single-branch
+C++20.
 
 project/ is deliberately NOT this repository's flake: that one provisions wine,
-MSVC 4.2, Ghidra, objdiff and the delinker, and the published branch must need
-none of it. Its flake knows only clang and ninja.
+the pinned MSVC, Ghidra, objdiff and the delinker, and the published branch
+must need none of it. Its flake knows only clang and ninja.
 
-Output feeds source-pol-2.0 and classic-pol-2.0, and through the former,
-master-pol-2.0 and ironfist-pol-2.0.
+Output feeds this branch's published source trees.
 """

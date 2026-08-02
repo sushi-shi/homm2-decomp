@@ -1,9 +1,9 @@
 """Recover source-annotated function spans and file-local identities for delinking.
 
-Retail NB09 contains linker publics only, so a ``static`` function cannot appear
-there even though its candidate COFF carries a decorated local symbol. ``VA``
-already records the reviewed retail address and extent. Clang supplies the exact
-Microsoft-decorated identity from the definition's semantic signature.
+A ``static`` function has no external linkage name anywhere but its candidate
+COFF's decorated local symbol. ``VA`` already records the reviewed retail
+address and extent. Clang supplies the exact Microsoft-decorated identity from
+the definition's semantic signature.
 """
 
 from __future__ import annotations

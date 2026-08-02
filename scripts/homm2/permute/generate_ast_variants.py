@@ -660,13 +660,13 @@ def usable_type_spelling(spelling: str) -> bool:
     return bool(spelling) and not any(piece in spelling for piece in ("(anonymous", "{", "[", ")("))
 
 
-def msvc42_type_spelling(spelling: str) -> str:
+def msvc_type_spelling(spelling: str) -> str:
     # Retail's compiler predates built-in bool support; comparisons are represented as int.
     return "int" if spelling == "bool" else spelling
 
 
 def helper_parameter_spelling(type_):
-    spelling = msvc42_type_spelling(type_.spelling)
+    spelling = msvc_type_spelling(type_.spelling)
     if not usable_type_spelling(spelling) or type_is_volatile(type_):
         return None
     kind = canonical_kind(type_)
@@ -690,7 +690,7 @@ def helper_parameter_spelling(type_):
 def helper_return_spelling(type_):
     if not is_value_type(type_):
         return None
-    spelling = msvc42_type_spelling(type_.spelling)
+    spelling = msvc_type_spelling(type_.spelling)
     return spelling if usable_type_spelling(spelling) else None
 
 

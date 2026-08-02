@@ -64,12 +64,12 @@ class LinkExeTest(unittest.TestCase):
         })
         self.assertIsNone(normalized_dll_import(imports, "missing.dll"))
 
-    def test_link_environment_uses_historical_lib_search_path(self):
+    def test_link_environment_uses_toolchain_lib_search_path(self):
         environment = link_environment(
-            r"Z:\vc42\lib", "/vc40/bin", {"PATH": "tools", "LIB": "stale"})
+            r"Z:\msvc\lib", "/msvc/bin", {"PATH": "tools", "LIB": "stale"})
         self.assertEqual(environment, {
-            "PATH": "/vc40/bin" + __import__("os").pathsep + "tools",
-            "LIB": r"Z:\vc42\lib",
+            "PATH": "/msvc/bin" + __import__("os").pathsep + "tools",
+            "LIB": r"Z:\msvc\lib",
         })
 
     def test_explicit_linker_override_is_validated_and_selected(self):

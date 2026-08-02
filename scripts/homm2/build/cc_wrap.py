@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """cc_wrap.py - the `wine cl` compiler wrapper ninja's `cl` rule invokes.
 
-ninja drives the base/recompile side natively on Linux; the compiler is VC4.2
+ninja drives the base/recompile side natively on Linux; the compiler is the pinned VC6
 CL.EXE under wine. This wrapper translates paths (winepath -w), sets INCLUDE to
 the MSVC + repo headers, runs `wine cl <flags> /Fo<obj.w> <src.w>`, and exits
 non-zero if the .obj wasn't produced (wine noise can mask cl's real exit).
@@ -18,7 +18,9 @@ HOMM2_DIR = next((p for p in SCRIPT_DIR.parents if (p / "flake.nix").exists()), 
 _INC_RE = re.compile(r'^[ \t]*#[ \t]*include[ \t]*[<"]([^>"]+)[>"]', re.M)
 
 def scan_header_deps(src, inc_root):
-    """MSVC 4.2 has no /showIncludes, so recover header deps ourselves: recursively resolve
+    """Recover header deps by scanning rather than trusting cl output under wine
+    (VC6 does have /showIncludes; switching to it is a possible simplification):
+    recursively resolve
     every `#include` against the repo include root (+ each file's own dir for "quoted"
     includes) and return the repo headers reached. System headers (<string.h> etc.) don't
     resolve under inc_root and are skipped — they never change. Over-approximates (ignores

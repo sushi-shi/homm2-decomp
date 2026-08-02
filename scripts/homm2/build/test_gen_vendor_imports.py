@@ -28,7 +28,7 @@ class VendorImportTests(unittest.TestCase):
              "RegQueryValueExA", "RegCloseKey"],
         )
 
-    def test_link300_force_order_covers_every_vendor_import_once(self):
+    def test_forced_import_order_covers_every_vendor_import_once(self):
         expected = ({symbol for symbol, _ in MSS_IMPORTS}
                     | {symbol for symbol, _ in SMACK_IMPORTS}
                     | {symbol for symbol, _, _ in WING_IMPORTS})

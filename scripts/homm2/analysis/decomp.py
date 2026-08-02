@@ -3,7 +3,7 @@
 
 Reopens the cached Ghidra project (build/ghidra, built by `homm2 ghidra`) with NO
 re-analysis, runs decomp_export.py over the requested RVAs, and prints the decompiler C
-plus caller/callee xrefs. Names read from our CodeView seeding (apply_names.py).
+plus caller/callee xrefs. Names read from our inventory seeding (apply_names.py).
 
 Accepts RVAs or full VAs (a value >= the image base is reduced to its RVA).
 This command is currently exposed through the module entry point, not `homm2 sema`.

@@ -3,7 +3,7 @@
 
 `homm2 init` cannot get anywhere without the compiler - redelink's name_strings
 step runs `cl` under wine - so a missing toolchain used to stop a new checkout
-dead, with the dev shell pointing at the hard path: find the en_vc42ent media,
+dead, with the dev shell pointing at the hard path: find the VS6 Enterprise media,
 extract it, validate it. A published release has existed since 2026-07-18; nothing
 used it.
 
@@ -43,7 +43,7 @@ ASSET = "homm2-toolchain-vc6-sp5.tar.xz"
 ASSET_SHA256 = "b243b68a1df8c2c54f7830a14221fa0a73fd3bbca78343fd1dd81a815a32ecec"
 
 # One component, and the archive has no wrapping directory - its top level IS
-# msvc/, so it unpacks with no --strip-components. The VC 4.2 release shipped two
+# msvc/, so it unpacks with no --strip-components. An older toolchain release shipped two
 # components under a wrapper; do not carry that shape over.
 COMPONENTS = ("msvc",)
 # The release builder owns the pinned per-artifact hashes; --check re-runs its

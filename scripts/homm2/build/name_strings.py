@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # name_strings.py - give string-literal constants their real MSVC ??_C@ name.
 #
-# VC4.2 names every string literal ??_C@_0<len>@<hash>@<chars> AT THE OBJECT LEVEL
+# MSVC names every string literal ??_C@_0<len>@<hash>@<chars> AT THE OBJECT LEVEL
 # (verified: even with no /Gf|/GF). objdiff compares .objs, so if a delinked target
 # constant gets the SAME ??_C@ name our base obj will emit for that literal, objdiff
 # pairs them by name (no reloc-masking). The ??_C@ hash isn't a standard CRC, so we

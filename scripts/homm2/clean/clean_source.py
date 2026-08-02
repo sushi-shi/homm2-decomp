@@ -73,7 +73,7 @@ DROPPED = "\x01"
 OVERRIDE_DIR = REPO / "scripts/homm2/clean/overrides"
 DROP_FILES = {"include/va.h"}
 
-# The frozen 1996 source path, and the `#line` markers that pinned MSVC 4.2's
+# The frozen 1996 source path, and the `#line` markers that pinned the retail compiler's
 # /Gi __LINE__ variables to retail values.
 PROVENANCE_MACROS = ("RETAIL_FILE",)
 
@@ -245,7 +245,7 @@ def _arg(index: int, parenthesize: bool = False):
 # The clean tree is generated in the *strict* configuration: domains become real
 # `enum class` types keeping their retail width through H2EnumStorage. The
 # matching tree cannot build this way -- production needs each domain to *be* an
-# integer so MSVC 4.2 lowers it identically.
+# integer so the pinned MSVC lowers it identically.
 STRICT_MACRO = "H2_STRICT_ENUMS"
 
 
@@ -396,7 +396,7 @@ CALL_RULES = {
     "DATA_COMPGEN": _arg(2),
 
     # Codegen steering hacks. `0[&(x)]` and `(x | 0)` exist purely to nudge
-    # MSVC 4.2 register allocation; they mean `x`.
+    # MSVC register allocation; they mean `x`.
     "OD_STEER": _arg(0, parenthesize=True),
     "OR_STEER": _arg(0, parenthesize=True),
 
@@ -458,7 +458,7 @@ WORD_RULES = {
     "__pascal": "",
 
 
-    # MSVC 4.2 honoured `register`; C++17 removed the storage class.
+    # old MSVC honoured `register`; C++17 removed the storage class.
     "register": "",
 }
 
