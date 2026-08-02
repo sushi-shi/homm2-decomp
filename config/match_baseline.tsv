@@ -525,7 +525,7 @@ SOURCE/ADVMGR	?SetTownContext@advManager@@QAEXH@Z	99.2276	e7ba295f70e3
 SOURCE/ADVMGR	?ShowRoute@advManager@@QAEXHHH@Z	95.9097	4041d77aae7d
 SOURCE/ADVMGR	?StopOnTrigger@@YIEPAVmapCell@@@Z	99.7778	68bd991a8fda
 SOURCE/ADVMGR	?SummonBoat@advManager@@QAEXXZ	93.0875	77b2cf20f494
-SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	98.7037	1f48fed146df
+SOURCE/ADVMGR	?SystemOptions@advManager@@QAEXXZ	99.8056	8b987d4e00eb
 SOURCE/ADVMGR	?SystemOptionsHandler@@YIHAAUtag_message@@@Z	78.8916	e82090c2d6af
 SOURCE/ADVMGR	?TeleportTo@advManager@@QAEXPAVhero@@HHHH@Z	100.0000	7c383809a19c
 SOURCE/ADVMGR	?TownGate@advManager@@QAEXH@Z	96.3708	fb28bd85bb5f
