@@ -7,10 +7,10 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from homm2.build.candidate_data_manifest import IMAGE_REL_BASED_HIGHLOW
 from homm2.build.contribution_manifest import contribution_rows
 
 
+IMAGE_REL_BASED_HIGHLOW = 3
 CONTRIBUTION_HEADER = (
     "object", "storage", "rva", "size", "segment", "section", "provenance",
 )

@@ -52,23 +52,16 @@ def main(argv=None):
     if cmd == "data-relocs":
         from homm2.build.coff_reloc_topology import main as m; return m(rest)
     if cmd == "data-topology":
-        if rest and rest[0] == "audit":
-            from homm2.build.data_topology_audit import main as m
-            return m(rest[1:])
+        # Target regeneration lives in `homm2 redelink`; these are the
+        # candidate-COFF inspection tools that stay meaningful without it.
         if rest and rest[0] == "census":
             from homm2.build.data_topology_census import main as m
             return m(rest[1:])
         if rest and rest[0] == "assemble":
             from homm2.build.data_manifest_adapter import main as m
             return m(rest[1:])
-        from homm2.build.reviewed_data import main as m
-        if len(rest) != 1 or rest[0] not in (
-                "propose", "promote", "finalize", "regenerate"):
-            print("usage: homm2 data-topology "
-                  "{audit|assemble|census|propose|promote|finalize|regenerate}",
-                  file=sys.stderr)
-            return 1
-        return m(["--" + rest[0]])
+        print("usage: homm2 data-topology {census|assemble}", file=sys.stderr)
+        return 1
     if cmd == "build":
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1

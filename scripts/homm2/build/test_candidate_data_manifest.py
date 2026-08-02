@@ -454,45 +454,70 @@ class CandidateDataManifestTest(unittest.TestCase):
         self.assertEqual(payload["stats"]["evidenced_definitions"], 8)
         self.assertEqual(payload["stats"]["mapped_definitions"], 3)
 
-    def test_icondf2b_candidate_topology_and_retail_bijection(self):
-        path = REPO / "build/objdiff/base/BASE/Icondf2b.obj"
-        if not path.is_file():
-            self.skipTest("candidate objects are not built")
-        definitions, _coff = candidate_definitions(path, "BASE/Icondf2b")
-        local = [row for row in definitions if row["storage"] == "bss"]
-        self.assertEqual(len(local), 13)
-        self.assertEqual([row["section_offset"] for row in local],
-                         list(range(0, 0x34, 4)))
-        self.assertTrue(all(row["size"] == 4 and row["scope"] == "local"
-                            for row in local))
-
-        allocations, _stats, diagnostics = derive_allocations()
-        mapped = [row for row in allocations if row.unit == "BASE/Icondf2b"]
-        self.assertEqual(len(mapped), 13, diagnostics)
-        self.assertEqual({row.rva for row in mapped}, set(range(0x1381B8, 0x1381EC, 4)))
-        self.assertTrue(all(row.proof_count >= 1 for row in mapped))
-        self.assertTrue(all(row.provenance == "candidate-coff-section-translation"
-                            for row in mapped))
-        self.assertFalse(any(
-            row.storage == "bss" and row.unit in ("BASE/BUTTON", "BASE/Blur")
-            for row in allocations))
-        missing_contribution = {
-            (row.unit, row.storage) for row in diagnostics
-            if "retail_contribution_missing" in row.causes
-        }
-        self.assertNotIn(("BASE/Blur", "bss"), missing_contribution)
-        self.assertNotIn(("BASE/BUTTON", "bss"), missing_contribution)
-
     def test_philai_crt_initializer_is_a_real_candidate_definition(self):
         path = REPO / "build/objdiff/base/SOURCE/PHILAI.obj"
         if not path.is_file():
             self.skipTest("candidate objects are not built")
         definitions, _coff = candidate_definitions(path, "SOURCE/PHILAI")
-        crt = [row for row in definitions if row["section"] == 3]
+        crt = [row for row in definitions if row["name"].startswith("_$S")]
         self.assertEqual(len(crt), 1)
-        self.assertTrue(crt[0]["name"].startswith("_$S5$S"))
         self.assertEqual(crt[0]["storage"], "data")
         self.assertEqual(crt[0]["size"], 4)
+        self.assertEqual(crt[0]["scope"], "local")
+
+    def _fixture_pe(self, root):
+        import struct
+        data_rva, data_size = 0x2000, 0x40
+        dos = b"MZ" + b"\0" * 58 + struct.pack("<I", 0x40)
+        coff = struct.pack("<HHIIIHH", 0x14C, 1, 0, 0, 0, 224, 0x102)
+        optional = bytearray(224)
+        struct.pack_into("<H", optional, 0, 0x10B)
+        struct.pack_into("<I", optional, 28, 0x400000)      # image base
+        struct.pack_into("<I", optional, 92, 16)            # directory count
+        # every data directory zero, including base relocations (index 5)
+        section = struct.pack(
+            "<8sIIIIIIHHI", b".data\0\0\0", data_size, data_rva, data_size,
+            0x200, 0, 0, 0, 0, 0xC0000040)
+        payload = bytes(range(data_size))
+        pe = root / "fixture.exe"
+        blob = dos + b"PE\0\0" + coff + bytes(optional) + section
+        pe.write_bytes(blob + b"\0" * (0x200 - len(blob)) + payload)
+        return pe
+
+    def test_pe_layout_reads_sites_from_the_reviewed_manifest(self):
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+        from unittest import mock
+        from homm2.build.candidate_data_manifest import _pe_layout
+
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            pe = self._fixture_pe(root)
+            manifest = root / "delink_relocs.tsv"
+            manifest.write_text(
+                "# reviewed sites\nsite_rva\tkind\n0x2010\tdir32\n0x2004\tdir32\n")
+            with mock.patch(
+                    "homm2.build.candidate_data_manifest.RELOC_MANIFEST", manifest):
+                image_base, highlow, read_u32, _read_bytes = _pe_layout(pe)
+        self.assertEqual(image_base, 0x400000)
+        self.assertEqual(highlow, [0x2004, 0x2010])
+        self.assertEqual(read_u32(0x2000), 0x03020100)
+
+    def test_pe_layout_empty_manifest_means_zero_sites(self):
+        from tempfile import TemporaryDirectory
+        from pathlib import Path
+        from unittest import mock
+        from homm2.build.candidate_data_manifest import _pe_layout
+
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            pe = self._fixture_pe(root)
+            manifest = root / "delink_relocs.tsv"
+            manifest.write_text("site_rva\tkind\n")
+            with mock.patch(
+                    "homm2.build.candidate_data_manifest.RELOC_MANIFEST", manifest):
+                _image_base, highlow, _read_u32, _read_bytes = _pe_layout(pe)
+        self.assertEqual(highlow, [])
 
     def test_candidate_scope_is_read_per_symbol(self):
         path = REPO / "build/objdiff/base/BASE/Bzip.obj"

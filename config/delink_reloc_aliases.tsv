@@ -1,1 +1,4 @@
-function_rva	target_rva	site_rva	owner	addend	occurrences	provenance
+# Reviewed relocation-alias selections consumed by vostok-delinker
+# (--reloc-alias-manifest): sites whose data or function relocation must use a
+# specific existing owner symbol and addend. Empty until aliases are reviewed in.
+function_rva	target_rva	site_rva	owner	addend	occurrences
