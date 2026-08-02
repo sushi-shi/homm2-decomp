@@ -58,6 +58,10 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | ElementalStorm delay product + storm frame index | `speedMod * DELAY`, `col*STEP + frame + row` | `DELAY * speedMod`, `frame + col*STEP + row` (matrix winners) | OPEN |
 | m_armies indexing (SPELLS + AI, 19 sites) | flattened `m_armies[0] + side*21 + idx` | 2D `m_armies[side] + idx` (single-imul fold, byte-pinned) | OPEN |
 | ElementalStorm locals | *_suffixed epoch names | hit/whichSide/c/baseDam/dmg2/stack/iter/member (bucket pins) | OPEN as slot-name class |
+| Random head compare | `low == high` | `high == low` | OPEN |
+| netwin done-callbacks compare | `&gNbSessNcb[i] == ncb` | `ncb == &gNbSessNcb[i]` | OPEN |
+| townObject::Draw frame sum | `m_animationFrame + baseFrame + 1` | `baseFrame + m_animationFrame + 1` | OPEN |
+| TransferArtifacts non-transferable bound | `<= ARTIFACT_ULTIMATE_WAND` (recheck 2.0 bytes) | `<= ARTIFACT_GOLDEN_GOOSE` | OPEN - may be a 2.0 reconstruction slip rather than a dev change |
 
 ## Resolved
 

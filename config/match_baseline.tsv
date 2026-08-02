@@ -268,7 +268,7 @@ BASE/Misc	?MAKEFILEID@@YIKPAD@Z	59.6393	32aaafba2f07
 BASE/Misc	?MemSize@@YIHH@Z	100.0000	3eb7bdf6ee02
 BASE/Misc	?PrintMemoryLeaks@@YIXXZ	16.2419	f592602e0a96
 BASE/Misc	?ProcessAssert@@YIXHPADH@Z	92.3714	23882f27be2c
-BASE/Misc	?Random@@YIHHH@Z	99.9231	de4414d18ca7
+BASE/Misc	?Random@@YIHHH@Z	100.0000	e437de47de08
 BASE/Misc	?ReadPrefs@@YIXXZ	100.0000	e6fef53929fd
 BASE/Misc	?ReadPrefsFromFile@@YIXXZ	65.3273	683c747b5520
 BASE/Misc	?ReadPrefsFromRegistry@@YIXXZ	92.9359	80926d078fd7
@@ -508,7 +508,7 @@ SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	001c91f6647b
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	99.8373	be78a3a69fba
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	62.4112	7241900d0fe5
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	87.4441	8067d1551fa3
-SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	95.8934	6bf8e26e61d3
+SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	95.8962	6bf8e26e61d3
 SOURCE/ADVMGR	?ProcessSelect@advManager@@QAEHPAUtag_message@@PAPAVmapCell@@@Z	76.6346	868ec041efca
 SOURCE/ADVMGR	?PuzzleDraw@advManager@@QAEXHHHH@Z	100.0000	69591000557a
 SOURCE/ADVMGR	?QuickInfo@advManager@@QAEXHH@Z	75.8594	9abc10faafba
@@ -692,7 +692,7 @@ SOURCE/COMMAND	?SetupSmallView@combatManager@@QAEXXZ	100.0000	a32512ad9ea5
 SOURCE/COMMAND	?ShowDeadArmies@combatManager@@QAEXPAVheroWindow@@@Z	95.7297	2290164ca8ef
 SOURCE/COMMAND	?ShowEagleEyeSpell@combatManager@@QAEXPAVheroWindow@@@Z	96.6453	c4c4d4eeae5e
 SOURCE/COMMAND	?ShowSkeletons@combatManager@@QAEXPAVheroWindow@@@Z	95.4126	1c99022469c1
-SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	96.2216	5136b7d1af8c
+SOURCE/COMMAND	?ShowWinLoseArtifact@combatManager@@QAEXPAVheroWindow@@H@Z	96.2273	5136b7d1af8c
 SOURCE/COMMAND	?ValidHexToStandOn@combatManager@@QAEHH@Z	86.6234	7bf41efa4eac
 SOURCE/COMMAND	?ViewBallista@combatManager@@QAEXH@Z	99.7398	795b20976cca
 SOURCE/COMMAND	?WinCombatHandler@@YIHAAUtag_message@@@Z	96.0276	ed2b7335d8a7
@@ -715,7 +715,7 @@ SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	c06973c72312
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	87.4047	c123ae70ee3e
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	92.6191	6788270a16ae
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	71.0000	d77a6b184852
-SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	89.4427	b7d533df0775
+SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	89.4444	b7d533df0775
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	32df4ef318ee
 SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	99.8465	644e7c4a6642
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
@@ -776,7 +776,7 @@ SOURCE/EVENTS	?SendHeroTownData@advManager@@QAEXHHPAVhero@@PAVarmyGroup@@PAVtown
 SOURCE/EVENTS	?SkeletonEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	c747c89a433d
 SOURCE/EVENTS	?StrEqNoCase@@YICPAD0@Z	99.6852	61bf3bc60a7a
 SOURCE/EVENTS	?TownEvent@advManager@@QAEXPAVmapCell@@HH@Z	90.9920	f2f31753969e
-SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9569	dfe76e604f0d
+SOURCE/EVENTS	?TransferArtifacts@advManager@@QAEXPAVhero@@0@Z	99.9655	e380b7c0716b
 SOURCE/EVENTS	?ZombieEvent@advManager@@QAEHPAVhero@@PAVmapCell@@PADHH@Z	100.0000	5df14c8e4798
 SOURCE/FINDPATH	??0searchArray@@QAE@XZ	100.0000	448864c181fa
 SOURCE/FINDPATH	??1searchArray@@QAE@XZ	22.1111	16b02722d9f5
@@ -928,7 +928,7 @@ SOURCE/HERO	?SetupHeroView@@YIXXZ	94.8363	4bf116b9ca10
 SOURCE/HERO	?Stats@hero@@QAECH@Z	100.0000	476b3543c0b1
 SOURCE/HERO	?TakeSS@hero@@QAEHHH@Z	100.0000	dd77644311f3
 SOURCE/HERO	?UpdateArmies@hero@@QAEXXZ	99.5739	a8d02a416595
-SOURCE/HERO	?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z	52.3002	daaa6a77042e
+SOURCE/HERO	?UpdateHeroScreenStatusBar@@YIXAAUtag_message@@@Z	52.3027	daaa6a77042e
 SOURCE/HERO	?UpgradeCreatures@hero@@QAEXHH@Z	100.0000	e340c90940e8
 SOURCE/HERO	?UseSpell@hero@@QAEXH@Z	100.0000	e69a91d1d567
 SOURCE/HERO	?ViewArtifact@hero@@QAEXHHH@Z	100.0000	6f20b669534d
@@ -1318,7 +1318,7 @@ SOURCE/TOWNMGR	?ChangeTown@townManager@@QAEXXZ	18.4375	c88b97487f6c
 SOURCE/TOWNMGR	?Close@townManager@@UAEXXZ	100.0000	dad901dccb6f
 SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	92.6773	0e2eafdf9f44
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	feda98b3c589
-SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	99.9677	858f683b2177
+SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	100.0000	9ab3da5761ca
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	fc7dc5438a11
 SOURCE/TOWNMGR	?GetCategoryStats@@YIXHQAJQAC@Z	99.9834	1a8cd89cb0ec
 SOURCE/TOWNMGR	?MageGuildHandler@@YIHAAUtag_message@@@Z	97.5660	ac6fef108ae7
@@ -1395,7 +1395,7 @@ SOURCE/X_CAMPGN	?ResetMapChoices@ExpCampaign@@QAEXXZ	100.0000	1af0cdd79d9a
 SOURCE/X_CAMPGN	?ResetMapsPlayed@ExpCampaign@@QAEXXZ	100.0000	fcc4d178f503
 SOURCE/X_CAMPGN	?SetMapWasPlayed@ExpCampaign@@QAEXXZ	100.0000	974e0dadcc18
 SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	95.0219	28d3312aa59c
-SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	87.2419	c5fe6a7af76a
+SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	87.2438	c5fe6a7af76a
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	0.0000	5ada8f9524a3
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	84.1818	457d59b47f2e
 SOURCE/comwin	?com_init@@YIFEHH@Z	94.6743	b21d07111131
@@ -1444,12 +1444,12 @@ SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	5f81d890e2fa
 SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	36.8900	0634dc79fa95
 SOURCE/netwin	?nb_arm_recv@@YIXH@Z	94.2593	8da6f5b3e700
 SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	74fde161acde
-SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	99.7123	0e268725bb01
+SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	d8ec3c8b61e8
 SOURCE/netwin	?nb_close_session@@YIXH@Z	100.0000	ee26921cc43b
 SOURCE/netwin	?nb_format_name@@YIXPADPAE@Z	100.0000	7d29b3d4c0be
 SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	b805282b1b7c
 SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	7aae41686da9
-SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	99.7778	49eb1a55dd54
+SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	e7aaa4b61cb1
 SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	61354c20e32c
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	99.6738	39e934b9379c
 SOURCE/netwin	@nb_init@8	98.3775	855389dddac4

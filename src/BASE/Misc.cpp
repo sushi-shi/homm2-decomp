@@ -576,7 +576,7 @@ void FadeOut(i32 increment) {
 
 VA(0x004bde50, 0x40)
 i32 Random(i32 low, i32 high) {
-    if (low == high) {
+    if (high == low) {
         return high;
     }
     if (high < low) {

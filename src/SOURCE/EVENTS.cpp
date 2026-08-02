@@ -5867,7 +5867,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
                  sourceArtifactSlot++) {
                 if (sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_NONE
                     && sourceHero->m_artifacts[sourceArtifactSlot] != ARTIFACT_MAGIC_BOOK) {
-                    if (sourceHero->m_artifacts[sourceArtifactSlot] <= ARTIFACT_ULTIMATE_WAND) {
+                    if (sourceHero->m_artifacts[sourceArtifactSlot] <= ARTIFACT_GOLDEN_GOOSE) {
                         if (gbThisNetHumanPlayer[sourceHero->m_owner]
                             || gbThisNetHumanPlayer[destinationHero->m_owner]) {
                             sprintf(
