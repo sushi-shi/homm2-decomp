@@ -2792,7 +2792,7 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
     }
 }
 
-VA(0x0041f943, 0xf9)
+VA(0x0041f943, 0x11c)
 void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     if (!m_spellInfluence[IDX(influence)]) {
         return;

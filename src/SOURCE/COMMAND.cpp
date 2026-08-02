@@ -799,7 +799,7 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     }
 }
 
-VA(0x0042c958, 0x6fb)
+VA(0x0042c958, 0x7f5)
 MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;

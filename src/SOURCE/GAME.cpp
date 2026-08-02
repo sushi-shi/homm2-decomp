@@ -3920,7 +3920,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004565ae, 0x53e)
+VA(0x004565ae, 0x646)
 i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
     switch (monsterType) {
         case CREATURE_PEASANT:

@@ -1546,7 +1546,7 @@ char* GetMonsterPluralName(H2_ENUM_PARAM(CreatureType, i32) monster) {
     return gArmyNamesPlural[IDX(monster)];
 }
 
-VA(0x00468d05, 0xc3)
+VA(0x00468d05, 0x10d)
 void GetMonsterCost(CreatureType monster, i32* const cost) {
     i32 idx;
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)

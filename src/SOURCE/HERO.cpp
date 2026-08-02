@@ -1173,7 +1173,7 @@ void UpdateHeroScreenStatusBar(struct tag_message& message) {
     HeroMessageUpdate(gText);
 }
 
-VA(0x00462ef8, 0x8cd)
+VA(0x00462ef8, 0x9ba)
 MessageDispatchResult HeroHandler(struct tag_message& message) {
     i32 handlerValue16;
     i32 temp1;

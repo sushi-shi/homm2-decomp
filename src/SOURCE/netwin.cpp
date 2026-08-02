@@ -613,7 +613,7 @@ static void __fastcall nb_close_session(i32 session) {
     }
 }
 
-VA(0x004752c3, 0x112)
+VA(0x004752c3, 0x137)
 static void __fastcall nb_recv_complete(i32 session) {
     tag_Node* node;
     switch (gNbSessNcb[session].command & ~NETBIOS_COMMAND_ASYNC) {

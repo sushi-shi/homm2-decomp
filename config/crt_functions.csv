@@ -81,9 +81,9 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd8646,34,__amsg_exit,crt0msg.obj,libcmt.lib,reviewed-sandwich,ghidra-fid
 0xd866b,35,_fast_error_exit,crt0.obj,libcmt.lib,reviewed-sandwich,rterr banner + __exit(255) twin of __amsg_exit
 0xd8690,208,__stricmp,stricmp.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
-0xd8760,101,__lseek,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 3 candidates: libcmt.lib:build\intel\mt_obj\lseek.obj!__lseek|libcmt.lib:build\intel\mt_obj\read.obj!__read|libcmt.lib:build\intel\mt_obj\write.obj!__write
+0xd8760,101,__write,write.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); disambiguated: tail-calls __write_lk@0xd87c5
 0xd87c5,395,__write_lk,write.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
-0xd8950,101,__lseek,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 3 candidates: libcmt.lib:build\intel\mt_obj\lseek.obj!__lseek|libcmt.lib:build\intel\mt_obj\read.obj!__read|libcmt.lib:build\intel\mt_obj\write.obj!__write
+0xd8950,101,__read,read.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); disambiguated: tail-calls __read_lk@0xd89b5
 0xd89b5,473,__read_lk,read.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd8b8e,93,__close,close.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd8beb,131,__close_lk,close.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
@@ -101,7 +101,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd9250,232,__fread_lk,fread.obj,libcmt.lib,masked-exact,
 0xd9338,49,__fsopen,fopen.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fopen.obj!__fsopen|libcmt.lib:build\intel\mt_obj\wfopen.obj!__wfsopen
 0xd9369,19,_fopen,fopen.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\fopen.obj!_fopen|libcmt.lib:build\intel\mt_obj\wfopen.obj!__wfopen
-0xd937c,101,__lseek,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); 3 candidates: libcmt.lib:build\intel\mt_obj\lseek.obj!__lseek|libcmt.lib:build\intel\mt_obj\read.obj!__read|libcmt.lib:build\intel\mt_obj\write.obj!__write
+0xd937c,101,__lseek,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites); confirmed: tail-calls __lseek_lk@0xd93e1
 0xd93e1,115,__lseek_lk,lseek.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd9454,134,__chdir,chdir.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd94da,78,_fputs,fputs.obj,libcmt.lib,masked-exact,
