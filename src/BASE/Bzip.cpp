@@ -536,7 +536,7 @@ void dumpAllModelStats(void) {
     dumpModelStats(&models[MODEL_128_255]);
 }
 
-VA(0x004c7ba0, 0xfe)
+VA(0x004c7ba0, 0x12a)
 Int32 getMTFVal(BitStream* bs) {
     Int32 retVal;
 
@@ -1115,7 +1115,7 @@ void shellTrivial(void) {
     } while (h != 1);
 }
 
-VA(0x004c9320, 0x40e)
+VA(0x004c9320, 0x422)
 void sortIt(void) {
     lastPP = last + 1;
 

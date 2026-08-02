@@ -421,7 +421,7 @@ void combatManager::InitNonVisualVars(void) {
     LoadArmies();
 }
 
-VA(0x0042683f, 0x1a7)
+VA(0x0042683f, 0x1bf)
 void combatManager::SetupAdjacencyArray(void) {
     i32 destinationHex = 0;
     i32 sourceHex;
@@ -686,7 +686,7 @@ void combatManager::GenerateMap(void) {
     randomOffset = SRandom(MAP_RANDOM_OFFSET_MINIMUM, MAP_RANDOM_OFFSET_MAXIMUM);
 }
 
-VA(0x004276b2, 0x1ca)
+VA(0x004276b2, 0x1ee)
 char* combatManager::GetBackgroundName(void) {
     BattlefieldBackgroundIndex backgroundIndex;
     m_colorCycleType = WINDOW_COLOR_CYCLE_COMBAT;
@@ -2323,7 +2323,7 @@ void UpdateCombatSystemOptions(i32 initialDraw) {
         CSPanel->DrawWindow(1, 0, SYSTEM_OPTION_DRAW_MASK);
 }
 
-VA(0x0042b527, 0x283)
+VA(0x0042b527, 0x2b3)
 MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
     i32 bRedraw = 0;
     i32 bDone = 0;

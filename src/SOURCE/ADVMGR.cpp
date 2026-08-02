@@ -1371,7 +1371,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     }
 }
 
-VA(0x004020d7, 0x581)
+VA(0x004020d7, 0x59d)
 class mapCell* advManager::DoAdvCommand(void) {
     mapCell* eventCellState = NULL;
     town* viewTownValue;
@@ -7248,7 +7248,7 @@ void advManager::DoTownKnob(void) {
     UpdateTownLocators(1, 1);
 }
 
-VA(0x0040ea8c, 0x2df)
+VA(0x0040ea8c, 0x323)
 void advManager::CastSpell(SpellType spell) {
     hero* currentHeroSlot;
     if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -9004,7 +9004,7 @@ void advManager::ForceNewHover(void) {
     ProcessHover(x, y);
 }
 
-VA(0x00412697, 0x188)
+VA(0x00412697, 0x1a8)
 void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
     i32 originX;
     i32 originY;
@@ -9786,7 +9786,7 @@ void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
     );
 }
 
-VA(0x00414173, 0x294)
+VA(0x00414173, 0x2a4)
 void advManager::AdvPanel(void) {
     heroWindow* adventurePanel;
     {
@@ -9930,7 +9930,7 @@ MessageDispatchResult APanelHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x00414562, 0x1cd)
+VA(0x00414562, 0x1e5)
 i32 advManager::ControlPanel(void) {
     TrimLoopingSounds(LOOPING_SOUND_LIMIT);
     i32 selectedCommand = PANEL_NO_HELP;
@@ -10242,7 +10242,7 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
-VA(0x00414e82, 0x52d)
+VA(0x00414e82, 0x575)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
     char textData[SYSTEM_OPTIONS_TEXT_CAPACITY];

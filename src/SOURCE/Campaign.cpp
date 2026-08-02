@@ -115,7 +115,7 @@ H2_ENUM_BEGIN(CampaignTrackConstant)
     TRACK_SELECTED_FRAME_FOUR_STEPS  = 12
 H2_ENUM_END(CampaignTrackConstant)
 
-VA(0x00421f00, 0x494)
+VA(0x00421f00, 0x4f0)
 i32 game::HandleCampaignWin(void) {
     H2_ENUM_STORAGE_STEPPED(CampaignSide, i32) sideIndex;
     i32 mapIndex;
@@ -274,7 +274,7 @@ i32 game::HandleCampaignWin(void) {
     return 0;
 }
 
-VA(0x004223f0, 0x27a)
+VA(0x004223f0, 0x2e2)
 void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map) {
     if (side == CAMPAIGN_ROLAND) {
         switch (map + 1) {
@@ -831,7 +831,7 @@ void game::InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32) side) {
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
-VA(0x0042387e, 0xa41)
+VA(0x0042387e, 0xa5d)
 void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;
     SCampaignChoice* choiceBest;

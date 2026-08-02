@@ -1073,7 +1073,7 @@ void townManager::SetArmyCommand(i32 qualifier) {
     }
 }
 
-VA(0x004a61d0, 0x59e)
+VA(0x004a61d0, 0x5fe)
 void townManager::SetCommandAndText(struct tag_message& message) {
     i32 objectId = message.payload.widget.id;
 
@@ -1239,7 +1239,7 @@ void townManager::ShowText(char*) {
     );
 }
 
-VA(0x004a6842, 0x1701)
+VA(0x004a6842, 0x1739)
 MessageDispatchResult townManager::Main(tag_message& message) {
     char description_b[BUILDING_DESCRIPTION_CAPACITY];
     i32 exitTown_i = 0;
@@ -1863,7 +1863,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x004a7f7b, 0x480)
+VA(0x004a7f7b, 0x498)
 void townManager::DoCommand(TownManagerArmyCommand command) {
     hero* viewedHero;
     i32 dismissAllowed;
@@ -3498,7 +3498,7 @@ nextRank:
     }
 }
 
-VA(0x004ac127, 0x478)
+VA(0x004ac127, 0x4a0)
 void GetCategoryStats(
     H2_ENUM_PARAM(TownThievesGuildCategory, i32) category,
     i32l* const stats,

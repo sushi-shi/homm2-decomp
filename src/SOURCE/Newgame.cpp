@@ -2074,7 +2074,7 @@ void game::GetLossConditionText(char* text) {
     }
 }
 
-VA(0x00479471, 0x2b7)
+VA(0x00479471, 0x2cb)
 void game::GetVictoryConditionText(char* text) {
     i32 unusedVictoryWord;
     hero* victoryHeroData;

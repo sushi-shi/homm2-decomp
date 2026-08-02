@@ -276,7 +276,7 @@ H2_ENUM_END(OverviewDialogConstant)
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
 
-VA(0x00479ba0, 0x1e1a)
+VA(0x00479ba0, 0x1e46)
 void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
     static i16 overviewDynamicSourceLine = 116;
     i32 row;

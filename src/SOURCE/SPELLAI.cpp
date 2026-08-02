@@ -784,7 +784,7 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
     }
 }
 
-VA(0x00496f02, 0x25d)
+VA(0x00496f02, 0x26d)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
     i32 spellPowerValue = m_spellPower[IDX(m_currentSide)];
@@ -845,7 +845,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     return static_cast<i32>(creatureEffect * workChance);
 }
 
-VA(0x0049716f, 0x579)
+VA(0x0049716f, 0x5b5)
 i32 combatManager::RawEffectSpellInfluence(army* target, ArmySpellInfluence influence) {
     i32 effect = 0;
     army* otherArmy = NULL;

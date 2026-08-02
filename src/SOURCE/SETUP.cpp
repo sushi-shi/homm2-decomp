@@ -144,7 +144,7 @@ i32 game::SetupComPort(void) {
     return 1;
 }
 
-VA(0x00492817, 0x219)
+VA(0x00492817, 0x22d)
 i32 game::SetupHotSeatGame(void) {
     char defaultName[DEFAULT_PLAYER_NAME_CAPACITY];
     i32 ix;
@@ -794,7 +794,7 @@ MessageDispatchResult SetupBaudHandler(struct tag_message& message) {
     return BaseSetupHandler(message);
 }
 
-VA(0x00493d6f, 0xda)
+VA(0x00493d6f, 0xee)
 MessageDispatchResult SetupHotSeatGameHandler(struct tag_message& message) {
     i32 helpIndex;
 

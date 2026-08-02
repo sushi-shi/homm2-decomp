@@ -329,7 +329,7 @@ void wsProcessMessages(void) {
     }
 }
 
-VA(0x004b2653, 0x330)
+VA(0x004b2653, 0x344)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;
     tag_message windowMessage;
