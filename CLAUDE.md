@@ -17,9 +17,12 @@ MSVC object code and can be linked into a working executable.
   names its address; `build/gen/symbol_names.csv` is that claimed inventory.
 - Every function the retail inventory lists that no marker claims delinks into
   the `(unmatched)` module, so the whole `.text` is always comparable.
-- `config/delink_relocs.tsv` is the reviewed absolute-relocation site list —
-  the only DIR32 site channel (it substitutes for the missing `.reloc`
-  directory, for both the delinker and the Python tooling).
+- `config/delink_relocs.tsv` is the absolute-relocation site list — the only
+  DIR32 site channel (it substitutes for the missing `.reloc` directory, for
+  both the delinker and the Python tooling). It is generated, not hand-edited:
+  `homm2 audit reloc-sweep --write` regenerates it with the delinker's
+  `scripts/find_relocs.py`, whose rules are scored against PoL 2.0's surviving
+  `.reloc` directory. See `docs/reloc-manifest-sweep.md`.
 - `build/delink/` contains Vostok-delinked retail target objects.
   `build/objdiff/base/` contains objects compiled from this source tree. Do not
   call either side "original source"; all source structure is a reconstruction.

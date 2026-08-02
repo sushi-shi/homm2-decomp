@@ -142,7 +142,7 @@ void strip::DrawIcons(i32 drawWindow) {
     iconsCurrent_8 = 1;
     for (slot = 0; slot < STRIP_ARMY_SLOT_COUNT; slot++) {
         if (m_army->m_creatureTypes[slot] != CREATURE_NONE
-            && m_army->m_creatureTypes[slot] != m_cachedCreatureTypes[slot])
+            && m_cachedCreatureTypes[slot] != m_army->m_creatureTypes[slot])
             iconsCurrent_8 = 0;
     }
 
@@ -169,13 +169,13 @@ void strip::DrawIcons(i32 drawWindow) {
         creatureType = m_army->m_creatureTypes[slot];
         if (creatureType != CREATURE_NONE) {
             m_stripIcon->DrawToBuffer(
-                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
                 m_y + STRIP_CONTENT_Y,
                 IDX(gMonsterDatabase[IDX(creatureType)].race) + STRIP_RACE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL
             );
             m_creatureIcons[slot]->DrawToBuffer(
-                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
                 m_y + STRIP_CONTENT_Y,
                 0,
                 ICON_DRAW_NORMAL
@@ -183,7 +183,7 @@ void strip::DrawIcons(i32 drawWindow) {
             sprintf(gText, "%d", m_army->m_creatureCounts[slot]);
             smallFont->DrawBoundedString(
                 gText,
-                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
                 m_y + STRIP_QUANTITY_Y,
                 STRIP_QUANTITY_WIDTH,
                 STRIP_QUANTITY_HEIGHT,
@@ -192,7 +192,7 @@ void strip::DrawIcons(i32 drawWindow) {
             );
         } else {
             m_stripIcon->DrawToBuffer(
-                m_x + slot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+                m_x + STRIP_ARMY_FIRST_X + slot * STRIP_ARMY_X_STEP,
                 m_y + STRIP_CONTENT_Y,
                 STRIP_EMPTY_FRAME,
                 ICON_DRAW_NORMAL
@@ -202,7 +202,7 @@ void strip::DrawIcons(i32 drawWindow) {
     m_window->DrawWindow(drawWindow);
     if (m_selectedSlot != ARMY_GROUP_EMPTY_SLOT) {
         m_stripIcon->DrawToBuffer(
-            m_x + m_selectedSlot * STRIP_ARMY_X_STEP + STRIP_ARMY_FIRST_X,
+            m_x + STRIP_ARMY_FIRST_X + m_selectedSlot * STRIP_ARMY_X_STEP,
             m_y + STRIP_CONTENT_Y,
             STRIP_SELECTED_FRAME,
             ICON_DRAW_NORMAL

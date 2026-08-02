@@ -5615,16 +5615,16 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     }
     luck += h->m_luck;
     luck += IDX(h->m_secondarySkills[IDX(HERO_SKILL_LUCK)]);
+    if (castle != NULL && castle->m_type == FACTION_SORCERESS
+        && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
+        luck += RAINBOW_BONUS;
+    }
     if (luck < MINIMUM)
         luck = MINIMUM;
     if (luck > MAXIMUM)
         luck = MAXIMUM;
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         luck = MAXIMUM;
-    if (castle != NULL && castle->m_type == FACTION_SORCERESS
-        && (castle->m_buildings & IDX(TOWN_BUILDING_RAINBOW))) {
-        luck += RAINBOW_BONUS;
-    }
     return luck;
 }
 

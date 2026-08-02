@@ -164,6 +164,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   chain (62/63/64/65 prefix identical). Byte-pinned both sides
   (2026-08-03). Reads as a dev logic fix: skeletons killed in combat
   no longer feed necromancy.
+- **[Buka] Rainbow luck bonus applies before the clamps.**
+  `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
+  MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
+  applied it after, letting Rainbow push luck past MAXIMUM. Byte-pinned
+  (2026-08-03) - the reorder closed the whole function exact.
 - **[2.1?/unclassified] Combat hex validation tightened.** 2.0's
   `ValidHex` accepts hexes 0..125 (PoL byte-proven, `<= 125`); this image
   bounds the grid at `hex < COMBAT_HEX_COUNT` (117). Out-of-grid hexes
