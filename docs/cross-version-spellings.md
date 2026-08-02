@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| combatManager::SummonElemental hex index | `summonHexes_l[side*3 + (rand+off)%3]` | flat `*(summonHexes_l + side*3 + (rand+off)%3)` | OPEN - slot residual parked |
+| game::GetLuck block order | clamps, Battle Garb, then Rainbow | Rainbow BEFORE clamps (VALUE - see version-changes) | dev-change candidate |
+| strip::DrawIcons X exprs + type compare | `m_x + slot * STEP + FIRST_X` (5 sites); `m_army->types[slot] != cached[slot]` | `m_x + FIRST_X + slot * STEP` (NEW CLASS: const after member steers member-first eval); `cached[slot] != army types` | OPEN |
 | listBoxWidget::listBoxWidget(void) store order | `items, scrollbar, selectedIndex, itemCount, lastSelected` | `itemCount, items, selectedIndex, lastSelected, scrollbar` | OPEN |
 | button::button(void) store order | `normalFrame, pressedFrame, iconId, selectMode, hotkey, icon` | `iconId, icon, normalFrame, pressedFrame, selectMode, hotkey` | OPEN |
 | combatManager::ShowMassSpell frame clamps | `effectFrames < member` (x2); `returnFrames7 < member` | member-first `> effectFrames` / `> returnFrames7` | OPEN - slot residual parked |

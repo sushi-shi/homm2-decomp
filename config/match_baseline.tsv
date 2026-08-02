@@ -820,7 +820,7 @@ SOURCE/GAME	?DoNewTurn@game@@QAEXXZ	74.2538	8b1772fb2ede
 SOURCE/GAME	?ExperienceValueOfStack@game@@QAEHPAVarmyGroup@@PAVhero@@@Z	100.0000	6d8a7939fc7c
 SOURCE/GAME	?GenerateStandardFileName@@YIXPAD0@Z	62.0472	16c252daf004
 SOURCE/GAME	?GetBoatsBuilt@game@@QAEHXZ	100.0000	cb0d5d881c83
-SOURCE/GAME	?GetLuck@game@@QAEHPAVhero@@PAVarmy@@PAVtown@@@Z	70.1383	5a2c5f82bf3e
+SOURCE/GAME	?GetLuck@game@@QAEHPAVhero@@PAVarmy@@PAVtown@@@Z	100.0000	d4acea78c6f9
 SOURCE/GAME	?GetMapEvent@@YIPAUEventExtra@@HH@Z	93.9231	4fef72622562
 SOURCE/GAME	?GetMineId@game@@QAEHHH@Z	100.0000	9f461eb4d773
 SOURCE/GAME	?GetNewHeroId@game@@QAEHHHH@Z	100.0000	f745aaad9079
@@ -1274,7 +1274,7 @@ SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	58.8222	90da
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	88.8400	bbfdaf2d769b
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	25e693d9babc
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	99.7535	bf1c33bff8d2
-SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	96.6934	f3f5ce5aface
+SOURCE/SPELLS	?SummonElemental@combatManager@@QAEXHH@Z	99.8175	8929e58336af
 SOURCE/SPELLS	?TurnToStone@combatManager@@QAEXPAVarmy@@@Z	92.9333	b4353bc2cb31
 SOURCE/SPELLS	?ValidSpellTarget@combatManager@@QAEHHH@Z	99.9593	2c7cd6ddd933
 SOURCE/SPELLS	?VaporizeCreature@combatManager@@QAEXHH@Z	94.9353	cc7f24edfbbc
@@ -1285,7 +1285,7 @@ SOURCE/STRIP	??1bankBox@@QAE@XZ	100.0000	8217bdb1ca26
 SOURCE/STRIP	??1strip@@QAE@XZ	100.0000	69214841e3f9
 SOURCE/STRIP	?Draw@strip@@QAEXXZ	100.0000	f58020820223
 SOURCE/STRIP	?DrawFrame@strip@@QAEXXZ	100.0000	81283e06aa06
-SOURCE/STRIP	?DrawIcons@strip@@QAEXH@Z	95.6923	18c7b058810c
+SOURCE/STRIP	?DrawIcons@strip@@QAEXH@Z	100.0000	f05a612f3df5
 SOURCE/STRIP	?Update@bankBox@@QAEXH@Z	99.7288	5ca54d926aad
 SOURCE/SWAPMGR	??0swapManager@@QAE@PAVhero@@0@Z	100.0000	c9a57a677dca
 SOURCE/SWAPMGR	??0swapManager@@QAE@XZ	100.0000	a25e1c869324
