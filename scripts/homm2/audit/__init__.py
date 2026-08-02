@@ -43,6 +43,8 @@ TOOLS = {
                     "bank MAX replay coordinates + asm into docs"),
     "od-oracle": ("od_oracle",
                   "compiler ground truth for the /Od slot model (needs wine)"),
+    "unmatched-census": ("unmatched_census",
+                         "classify (unmatched) functions by masked bytes + order"),
 }
 
 
