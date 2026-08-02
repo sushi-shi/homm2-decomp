@@ -8088,7 +8088,9 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
     i32 activeIndex;
     AdventureEnvironmentSoundId soundId;
 
-    if (x < 0 || mapY < 0 || MAP_WIDTH <= x || MAP_HEIGHT <= mapY) {
+    // Retail checks x against MAP_HEIGHT and mapY against MAP_WIDTH - the
+    // axes are swapped (harmless on square maps, byte-pinned).
+    if (x < 0 || mapY < 0 || x >= MAP_HEIGHT || mapY >= MAP_WIDTH) {
         return;
     }
 
@@ -8128,7 +8130,7 @@ void advManager::InsertSound(i32 x, i32 mapY, i32 distance, i32 soundLayer) {
         m_activeSounds[soundSlot].volume = distance;
         CheckLoadSample(IDX(soundId));
         m_loopingSamples[IDX(soundId)]->m_playbackData.volume = ADVMGR_ENVIRONMENT_VOLUME(distance);
-        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 0;
+        m_loopingSamples[IDX(soundId)]->m_playbackData.loopCount = 1;
         m_loopingSamples[IDX(soundId)]->m_playbackData.channelType = ENVIRONMENT_SOUND_CHANNEL_TYPE;
         gpSoundManager->MemorySample(m_loopingSamples[IDX(soundId)]);
         m_activeSoundMask ^= 1 << IDX(m_activeSounds[soundSlot].soundId);

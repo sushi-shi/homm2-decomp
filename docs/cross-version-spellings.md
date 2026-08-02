@@ -48,5 +48,7 @@ happens, entries stay OPEN.
 
 | Site | Resolution | Evidence |
 |---|---|---|
+| InsertSound loopCount 0 vs 1 | **dev-change** | both values byte-pinned (PoL 2.0 = 0, Buka = 1); ledgered |
+| InsertSound bounds guard | **dev-change (or 2.0 recheck)** | retail 2.1 swaps the axes (x vs HEIGHT); verify what 2.0's bytes compare before classifying further |
 | In-code UI strings (29 literals) + SExecutiveText | **dev-change (Buka)** | retail CP1251 content differs from 2.0's English; ledgered in version-changes.md |
 | EDITOR/mapcell KB.h include (STL pair) | **dev-change (2.1)** | the two new functions exist only in the 2.1 image |
