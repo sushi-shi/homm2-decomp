@@ -292,3 +292,4 @@ VA(0x004c5700, 0x15)
 void executive::Terminate(void) {
     ShutDown(gExecutiveText.terminationMessage);
 }
+

@@ -38,6 +38,22 @@ font::~font() {
     gpResourceManager->Dispose(m_glyphIcon);
 }
 
+// Maps a CP1251 byte onto the font's glyph range. Retail compares the
+// zero-extended byte, so the codes stay numeric: a signed char literal
+// ('\xa8' == -88) would lower as cmp 0xffffffa8, not retail's cmp 0xa8.
+VA(0x004c37a0, 0x52)
+static i32 RemapCyrillicCharacter(i32 character) {
+    if (character == 0xa8)              // 'Ё'
+        return 0xa0;
+    if (character == 0xb8)              // 'ё'
+        return 0xc1;
+    if (character < 0xc0)               // below 'А': not a Cyrillic letter
+        return 0xa1;
+    if (character < 0xe0)               // 'А'..'Я'
+        return character - 0x40;
+    return character - 0x3f;            // 'а'..'я'
+}
+
 VA(0x004c3800, 0x222)
 void font::DrawStringExecute(
     char* str,

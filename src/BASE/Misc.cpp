@@ -93,6 +93,7 @@ H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_DRIVE_SLOT_COUNT         = 26,
     CD_PATH_PREFIX_BYTES        = 2,
     CD_PATH_BUFFER_SIZE         = 100,
+    CD_DRIVE_QUERY_PATH_SIZE    = 256,
     CD_MCI_BUFFER_SIZE          = 256,
     CD_MCI_RESULT_LENGTH        = 0xFF,
     CD_PROBE_TRAILER_SIZE       = 100,
@@ -1723,6 +1724,20 @@ i32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, gMiscText.cd.rootDrive.text);
     gText[0] = gText[0] + driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
+}
+
+VA(0x004bf2f0, 0x7b)
+bool DriveSupportsFreeSpaceQuery(char driveLetter) {
+    char rootPath[CD_DRIVE_QUERY_PATH_SIZE];
+    ULARGE_INTEGER availableBytes;
+    ULARGE_INTEGER totalBytes;
+    ULARGE_INTEGER freeBytes;
+
+    wsprintfA(rootPath, "%c:", driveLetter);
+    UINT previousErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
+    BOOL result = GetDiskFreeSpaceExA(rootPath, &availableBytes, &totalBytes, &freeBytes);
+    SetErrorMode(previousErrorMode);
+    return result != 0;
 }
 
 VA(0x004bf370, 0x35f)
