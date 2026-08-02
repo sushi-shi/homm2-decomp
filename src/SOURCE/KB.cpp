@@ -295,11 +295,11 @@ extern "C" void PollSound(void) {
     if (gbInPollSound)
         return;
     gbInPollSound = true;
-    if (KBTickCount() > glTimers[GLOBAL_MOUSE_TIMER_SLOT] && !gbPutzingWithMouseCtr) {
+    if (glTimers[GLOBAL_MOUSE_TIMER_SLOT] < KBTickCount() && !gbPutzingWithMouseCtr) {
         glTimers[GLOBAL_MOUSE_TIMER_SLOT] = KBTickCount() + MOUSE_UPDATE_INTERVAL;
         gpMouseManager->NewUpdate(0);
     }
-    if (KBTickCount() > glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT]) {
+    if (glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] < KBTickCount()) {
         if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT
             || giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
             glTimers[GLOBAL_COLOR_CYCLE_TIMER_SLOT] = KBTickCount() + COMBAT_COLOR_CYCLE_INTERVAL;
@@ -315,7 +315,7 @@ extern "C" void PollSound(void) {
         if (bDoColorCycle)
             CycleColors(0);
     }
-    if (KBTickCount() > glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT]) {
+    if (glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] < KBTickCount()) {
         glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() + SOUND_POLL_INTERVAL;
         if (gbForegroundApp)
             gpSoundManager->PollSound();
@@ -4421,7 +4421,7 @@ void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
     for (i32 i = 0; i < REMOTE_PLAYER_COUNT; i++)
-        if (giThisNetPos != i)
+        if (i != giThisNetPos)
             gbHumanPlayer[i] = 0;
     ComputeAdvNetControl();
 }
