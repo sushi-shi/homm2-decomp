@@ -155,7 +155,7 @@ BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	42e8597a1e5b
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	71.1593	e69c460d8f2a
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	85.4528	bb6925048c62
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	78.5500	7a5a0a411c47
-BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	91.8000	0f3a8231b9d2
+BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	181316dc8cc1
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	954f5a9ba0c3
 BASE/FONT	??0font@@QAE@K@Z	99.8983	a335f165fa1c
 BASE/FONT	??1font@@UAE@XZ	100.0000	065137566962
@@ -211,7 +211,7 @@ BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	c81273b66a87
 BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	3158a37d4d26
 BASE/MOUSEMGR	?MouseCoords@mouseManager@@QAEXAAH0@Z	100.0000	8464b641abb5
 BASE/MOUSEMGR	?NewUpdate@mouseManager@@QAEXH@Z	69.8773	97bf8dbbf9dc
-BASE/MOUSEMGR	?Open@mouseManager@@UAEHH@Z	97.6377	a2fe45855ccc
+BASE/MOUSEMGR	?Open@mouseManager@@UAEHH@Z	99.9275	d8a702714dd9
 BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	35.2143	431c87cecfdf
 BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	0.0000	4d30a279ab40
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854

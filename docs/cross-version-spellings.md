@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| mouseManager::Open store order | `cursorL/T, mouseX, sizeIdx x2, cursorBottom, mouseY`; `m_active` before `m_priority` | R/B then L/T then X/Y pairs, size indexes last; `m_priority` before `m_active` | OPEN |
+| executive::ShutDownSystem manager walk | `next = head; while ((cur = next) != NULL) { next = cur->m_next; ... }` | `baseManager* next; baseManager* cur = head; while (cur != NULL) { next = ...; ...; cur = next; }` (decl order flips the 14/14 tie) | OPEN |
 | game::SetVisibility mapExtra writes + distance terms + locals | `mapExtra[MAP_WIDTH * row + col] \|=`; x-term first; `col/row/visibility`, distance in-loop | `*(mapExtra + col + MAP_WIDTH * row) \|=` (RMW emits base-first load, index-first store); y-term first; `i/j/vis`, distance hoisted to fn scope | OPEN |
 | game::MakeAllWaterVisible map access | `WORLDMAP->Row(y)[x]`; `mapExtra[y * MAP_WIDTH + x]` | in-loop `fullMap* map = WORLDMAP;` + `map->Column(x)[y * map->width]`; `*(mapExtra + x + MAP_WIDTH * y)` | OPEN - third Column-class site (GetNewCellExtra pair, now this) |
 | philAI::RVConversion resource sum order | ORE, GEMS, MERCURY, GOLD, WOOD, SULFUR, CRYSTAL | GOLD, WOOD, ORE, CRYSTAL, SULFUR, MERCURY, GEMS | OPEN |
