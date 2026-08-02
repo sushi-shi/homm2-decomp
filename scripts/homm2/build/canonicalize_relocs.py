@@ -356,6 +356,31 @@ def load_retail_symbols(path):
     return public_data, function_rvas, function_sizes
 
 
+REAL_LITERAL = re.compile(r"^__real@(4|8)@([0-9a-f]{20})$")
+
+
+def real_literal_bytes(symbol):
+    """The IEEE bytes a VC6 __real@ symbol's cell must hold, or None.
+
+    The mangled digits are the constant in x87 80-bit extended form
+    (1 sign, 15 exponent biased 16383, 64 mantissa with explicit
+    integer bit); the cell holds it narrowed to float or double.
+    """
+    match = REAL_LITERAL.match(symbol)
+    if match is None:
+        return None
+    width = int(match.group(1))
+    bits = int(match.group(2), 16)
+    sign = -1.0 if bits >> 79 else 1.0
+    exponent = (bits >> 64) & 0x7FFF
+    mantissa = bits & 0xFFFFFFFFFFFFFFFF
+    if exponent == 0 and mantissa == 0:
+        value = 0.0 * sign
+    else:
+        value = sign * (mantissa / float(1 << 63)) * 2.0 ** (exponent - 16383)
+    return struct.pack("<f" if width == 4 else "<d", value)
+
+
 def authorize_owner_alias(public_data, base_type, base_symbol, base_addend,
                           retail_target_rva):
     """Return the public owner name only for an exact resolved-address proof."""
@@ -490,6 +515,15 @@ def canonicalize_unit(unit, names, public_data, function_rvas, function_sizes,
                 # owner + addend to equal the retail operand, so rewriting
                 # both to our spelling preserves the resolved address.
                 if SYNTHETIC_TARGET.match(target_symbol or ""):
+                    owner = base_symbol
+            if (owner is None and base_addend == 0
+                    and SYNTHETIC_TARGET.match(target_symbol or "")):
+                # Float literal pool: the retail cell must hold exactly the
+                # IEEE bytes the __real@ spelling encodes - content identity,
+                # the same proof the string channel uses.
+                expected = real_literal_bytes(base_symbol or "")
+                if expected is not None and expected == _pe_read(
+                        retail_target_rva, len(expected)):
                     owner = base_symbol
             if owner is None or (target_symbol, target_addend) == base:
                 continue
