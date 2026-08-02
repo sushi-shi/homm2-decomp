@@ -25,7 +25,7 @@ aliases take precedence over data-manifest ownership and nearest-symbol selectio
 The same manifest can resolve ambiguous code aliases for decoded `REL32` calls and
 jumps. For a code target, Vostok requires a zero addend and requires the selected name
 to be one of the public symbols at that exact target RVA. Do not use this to compensate
-for a wrong CRT source declaration: for example, VC4.2's `_write` and legacy `write`
+for a wrong CRT source declaration: for example, MSVC's `_write` and legacy `write`
 declarations naturally emit different C++ COFF spellings. Reconstruct the declaration
 that emits retail's spelling instead of forcing the target to match the candidate.
 

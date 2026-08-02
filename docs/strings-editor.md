@@ -1,5 +1,8 @@
 # Strings — EDITOR2W.EXE (HoMM2 map editor, PoL)
 
+Provenance: extracted from the PoL line's `EDITOR2W.EXE`, not from this branch's
+Gold 2.1 target `HMM2PL.exe`.
+
 Extracted by `scripts/archive/extract_strings.py` (printable runs >= 5 bytes, deduped).
 Source paths recover original file names; assert/expression strings can recover
 argument / local / member identifiers (MSVC `assert()` embeds the expression).

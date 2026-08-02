@@ -529,7 +529,7 @@ that shape has to be preserved, and the empirical retail bytes, not a codegen ru
 are the reason. Those macros carry no comment today, which makes them a live trap for the
 next hygiene pass.
 
-The fact that MSVC 4.2 `/O2` left the dead branch standing is itself a hint about the
+The fact that the retail-era compiler's `/O2` (observed on the PoL line's cl 10.20) left the dead branch standing is itself a hint about the
 original: a duplicated guard that survives optimization usually comes from a macro or a
 nested `if` the front end had already flattened, not from hand-written straight-line C.
 
@@ -542,7 +542,8 @@ and in the documented ICN layout the value 32 tags a monochrome frame - unrepres
 reads the field, so this is a modelling defect rather than a codegen one.
 
 Caveat before changing it: `IconEntry.h` is a shared header and this repo has repeatedly
-observed MSVC 4.2 re-rolling whole-TU codegen on any token change to a shared header. Any
+observed MSVC re-rolling whole-TU codegen on any token change to a shared header (measured
+on MSVC 4.2 cl 10.20 on the PoL line; re-validate on VC6). Any
 edit needs a same-session A/B objdump across every TU that includes it, not a cached
 `homm2 build` delta.
 

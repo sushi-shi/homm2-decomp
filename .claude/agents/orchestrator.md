@@ -69,7 +69,8 @@ Better: open ONE `nix develop .#build` shell per slot.
    Tiny TUs (1–8 funcs):
    bundle a few **adjacent, non-overlapping** TUs into one ≥20-func dispatch on a single
    lane. The least-matched-first ordering takes precedence over optimization profile. With `/Od` + the
-   solved stack hash, ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
+   stack hash (solved on the PoL line's cl 10.20; re-validate on VC6),
+   ctors/dtors/leaf functions go to 100% cheaply — no EH wall to plateau on.
    Do NOT interleave small functions across many TUs (the old size-band order) — a
    half-touched TU per lane multiplies the shared-header/top-of-file churn.
 

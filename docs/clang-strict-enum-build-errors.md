@@ -5,7 +5,7 @@
 The repository has two explicit Clang modes:
 
 - `ClangMode.RETAIL_ANALYSIS` uses C++98, the closest Clang language mode to the
-  pre-standard MSVC 4.2 compiler. `VA`, `DATA`, compiler-generated-data, and
+  pre-standard retail MSVC compiler. `VA`, `DATA`, compiler-generated-data, and
   matching AST tools use this view so their types and mangled names describe the
   retail candidate objects.
 - `ClangMode.STRICT` uses C++20. Clangd and the whole-tree Clang check use this

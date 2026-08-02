@@ -13,7 +13,7 @@ residual.
 
 ## Mechanism (raw objects — still true, still worth knowing)
 
-MSVC 4.2 lowers a dense `switch` to `jmp dword ptr [4*reg + disp32]` through a table of
+MSVC lowers a dense `switch` to `jmp dword ptr [4*reg + disp32]` through a table of
 case-label addresses. In MSVC's own object the table is a compiler-internal static label
 (`$Lnnnnn`, storage class 6, inside the owning function's `.text` range); the dispatch
 reads it at **disp 0** with a DIR32 relocation on the disp field naming the `$L` symbol,
@@ -24,8 +24,8 @@ and each 4-byte entry carries a DIR32 to a case label:
      00000890: IMAGE_REL_I386_DIR32  $L39184        <- table label, disp 0
 ```
 
-CodeView NB09 records no `$L` symbols, so the delinked retail object cannot know the
-table's identity. `vostok-delinker` folds the table into the function and spells every
+No `$L` label survives anywhere (the image is stripped), so the delinked retail object
+cannot know the table's identity. `vostok-delinker` folds the table into the function and spells every
 reference as `function + K` (dispatch disp = K = table offset, entry addends = case
 offsets):
 
@@ -60,7 +60,7 @@ Two synthetic-PDB attempts tried to teach the delinker the table identity:
    `.text`; they never surface.
 2. `S_GPROC32` at the table address — produced the desired disp-0 reloc but sliced the
    table into its own chunk and shrank the owning function's extent, which the
-   CodeView-size-based comparison punishes (scores got worse), and mid-function tables
+   inventory-size-based comparison punishes (scores got worse), and mid-function tables
    cannot be sliced at all.
 
 The comparison-side rewrite achieves the same equivalence with no delinker change and
@@ -78,7 +78,7 @@ destinations against the detector output.
 ## Open observations (not currently blocking)
 
 - **Tail tables** (table after the final `ret`, e.g. `?Main@listBoxWidget@@…`): the
-  CodeView size includes the table while our compiled function symbol ends at the code,
+  claimed size includes the table while our compiled function symbol ends at the code,
   so extents differ between the raw objects. Re-examine if such a function reaches
   instruction-exactness yet refuses the exact gate.
 - Delinked objects can carry a duplicate undefined symbol record for a function that is

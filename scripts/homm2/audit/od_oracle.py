@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ground-truth oracle for the /Od local stack-slot model (see docs/od-stack-layout.md).
+"""Ground-truth oracle for the /Od local stack-slot model (homm2/core/od_slots.py).
 
 Compiles a one-function probe with the real pinned MSVC toolchain and reads each
 local's ebp-relative frame offset straight from the S_BPREL32 debug records the

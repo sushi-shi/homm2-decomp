@@ -1,9 +1,9 @@
 # Reviewed public-data targets
 
 The native objdiff 3.7.1 report exposes data at section granularity. It does not
-produce one report row per COFF data symbol, and the synthetic PDB cannot fix that:
-CodeView `S_LDATA32`/`S_GDATA32` records carry a name, type index, and address, but
-no allocation length or initialized-versus-loader-zero storage classification.
+produce one report row per COFF data symbol, and no debug records carry allocation
+lengths on this target (the image is stripped); the reviewed ledgers below are the
+only extent authority.
 
 Two reviewed ledgers provide exact extents. `config/required_initialized_storage.tsv`
 records allocations whose initializer payload has been audited. The narrower
@@ -13,7 +13,8 @@ and type-derived size are independently proven, including loader-zero `.bss` sto
 address, compiland ownership, and PE storage, and writes
 `build/gen/reviewed_delink_data.tsv`. Initialized rows additionally validate the retail
 payload hash and relocation count. The generator never promotes a provisional
-next-public gap in `build/gen/symbol_names.csv` to CodeView truth.
+next-symbol gap in `build/gen/symbol_names.csv` to reviewed truth; inventory sizes
+are provisional.
 
 The patched delinker consumes the project-neutral columns `name`, `object`, `rva`,
 `size`, `storage`, `alignment`, `section_offset`, `scope`, and `provenance` through
@@ -76,12 +77,12 @@ canonical only by reconstructing a source `DATA()` definition or adding an expli
 `DATA_COMPGEN()` source claim followed by canonical assembly.
 
 The delinker manifest and parser are project-neutral. Only the HoMM2 adapter knows
-about NB09 and `required_initialized_storage.tsv`, so another reconstruction project
+about `required_initialized_storage.tsv`, so another reconstruction project
 can generate the same generic manifest from its own reviewed evidence. Per-symbol
 allocation scoring belongs in the generic objdiff consumer; this adapter does not
 rewrite objdiff's native section measures. The final-link initialized-storage audit
 remains authoritative for PE pointer-target content and final storage.
 
 IAT slots are not project data allocations. Vostok reads their exact decorated names from the
-synthetic PDB's retained CodeView-backed `.idata` symbols and reconstructs `__imp__...` COFF
+synthetic PDB's retained inventory-backed `.idata` symbols and reconstructs `__imp__...` COFF
 relocations directly; no separate IAT naming manifest is required.

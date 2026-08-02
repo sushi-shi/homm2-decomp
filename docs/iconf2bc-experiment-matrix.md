@@ -1,5 +1,10 @@
 # BASE/iconf2bc experiment matrix
 
+All results in this matrix were measured on MSVC 4.2 (cl 10.20) on the PoL line. Their
+validity is compiler-scoped: the negative results in particular (e.g. the `register`
+hint and reassociation rows) hold for that compiler and must be re-validated on VC6
+before reuse on this branch.
+
 Current source SHA-256 is
 `13d55c8c012990cc887118305dcad9b846570ea70234b8ec64c122559732fd7b`. The official
 generated status reports 87.0479%; the isolated 50-state branch-local-skip census measured

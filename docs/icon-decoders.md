@@ -228,8 +228,8 @@ The remap tables are the creature palette swaps (`gColorTableGray`, `gColorTable
 ### `FlipIconToBitmapColorTable(..., color, colorTable)` - RVA `0xd9790`, size `0x54d`
 
 Mirrored remapping blit. **No `dimGate` parameter** - the flipped variant always applies the
-dim palette. That asymmetry is real, not a reconstruction slip - the CodeView names prove the
-arity difference:
+dim palette. That asymmetry is real, not a reconstruction slip - the PoL line's debug names
+established the arity difference (this branch's image is stripped and has no such names):
 
 ```
     ?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z    13 params

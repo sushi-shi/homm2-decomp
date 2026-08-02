@@ -192,9 +192,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Read matrix results from `results.json`/`results.csv`, not terminal snippets alone.
   Preserve each source matrix under `docs/matching/<function>/<attempt>.cpp` with code,
   artifact paths, completeness, topology, relocation result, and disposition. Mark
-  planned ideas explicitly `UNTRIED`; do not mix them with measured rejections. General
-  optimized-code lessons and multi-objective island selection are recorded in
-  `docs/msvc42-optimized-nonlocal-islands.md`.
+  planned ideas explicitly `UNTRIED`; do not mix them with measured rejections.
+  (The directory starts empty on this branch; only VC6-measured attempts go in.)
 - Before a focused commit run `homm2 build`, `homm2 relocs 0x<RVA>`,
   the appropriate disassembly/block diff, and `git diff --check`. Inspect
   `git status --short`, stage only the declared source/header/docs plus intentional
@@ -203,8 +202,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 
 ## Evidence Rules
 
-- Retail bytes, relocations, and public RVAs are authoritative. Embedded CodeView does
-  not prove function lengths, private symbols, TU ownership, or layouts.
+- Retail bytes are authoritative. The image is stripped: names, lengths, TU
+  ownership, and layouts are all reconstruction claims carried by source markers
+  and reviewed manifests, and the Ghidra inventory is analysis opinion.
 - Objdiff fuzzy score is prioritization evidence, not correctness proof. In particular,
   wrong `(%ebp)` displacements and relocation operands can still score highly.
 - A `jmp $+0` under `/Od /Ob1` is often an inline-accessor continuation. Reconstruct the
@@ -232,8 +232,8 @@ do not add current assignments, queue snapshots, percentages, or next actions.
   Do not encode queue state, scores, retained maxima, or completion claims in source comments.
 - Never retain generated labels, globals, aliases, padding, or fake code in reconstructed
   source solely to improve a metric. The controlled TU-state probe is disposable compiler
-  input; its best object/assembly may remain under `build/` as clue evidence. Its contract is documented in
-  `docs/msvc42-tu-state-noise-search.md`.
+  input; its best object/assembly may remain under `build/` as clue evidence. Its contract
+  lives in `homm2/permute/tu_state_noise.py`'s own documentation.
 
 ## Source Conventions
 
@@ -276,9 +276,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 
 ## Data And Linking
 
-- Candidate objects supply reconstructed COFF symbol spelling and topology; retail PE,
-  NB09 contributions, bytes, and relocations supply placement evidence. Vostok emits the
-  reviewed model; it does not discover private identities automatically.
+- Candidate objects supply reconstructed COFF symbol spelling and topology; retail PE
+  bytes and the reviewed relocation-site manifest supply placement evidence. Vostok
+  emits the reviewed model; it does not discover private identities automatically.
 - The canonical data manifest is generated from source `DATA(...)`,
   `DATA_COMPGEN(...)`, `VTBL(...)`, and `VTBL2(...)` annotations. Candidate COFF
   supplies physical topology; source supplies semantic identity. Missing or ambiguous
@@ -292,10 +292,9 @@ do not add current assignments, queue snapshots, percentages, or next actions.
 - Anonymous `$SG`, `$T`, and compiler-counter names are normalized only in disposable
   comparison copies. Never link or derive layout from those normalized objects.
 
-Detailed contracts live in `docs/delinker-contribution-manifest.md`,
-`docs/data-symbol-normalization.md`, `docs/coff-data-relocations.md`, and
-`docs/static-storage-link-audit.md`. The compiler-generated data contract lives in
-`docs/candidate-data-topology.md`.
+Detailed contracts live in `docs/data-symbol-normalization.md`,
+`docs/coff-data-relocations.md`, and `docs/static-storage-link-audit.md`. The
+compiler-generated data contract lives in `docs/candidate-data-topology.md`.
 
 ## Orchestration
 

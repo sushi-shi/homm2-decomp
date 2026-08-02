@@ -2,7 +2,7 @@
 # unit MUST match the unit column in build/gen/symbol_names.csv.
 
 [build]
-compiler = "msvc4.2"
+compiler = "msvc6.0"
 platform = "win32"
 
 # /DNO_STRICT looks like a workaround and is not. VC6's WINDEF.H opens with

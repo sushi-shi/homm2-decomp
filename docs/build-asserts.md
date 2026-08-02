@@ -1,21 +1,14 @@
 # What `homm2 build` asserts
 
-`homm2 build` is `configure.py` → `ninja` (compile every TU with wine MSVC 4.2 via
+`homm2 build` is `configure.py` → `ninja` (compile every TU with wine VC6 SP5 via
 `cc_wrap.py`) → **hard gates** → objdiff/README refresh. A **red gate exits non-zero and fails
 the build** — they are not warnings. All gate scripts live in `scripts/homm2/build/` and run
 from the repo root; each is independently runnable (`python3 -m homm2.build.<name>`).
 
-Ordering in `cli.py`: the source-private and runtime FID inventories are verified first,
+Ordering in `cli.py`: the source-private inventory is verified first,
 then compilation must succeed (ninja), followed by the source/object gates below.
 
-## 0. Source-private and runtime FID identity
-
-`runtime_fid --check` re-identifies every row in `config/library_labels.csv` from the
-pinned VC 4.0 `LIBCMT.LIB`. It requires an exact function identity after masking only
-COFF relocation operands; reviewed code-only spans may be exact prefixes when the library
-symbol also owns embedded tables or alternate entries. Assembly entry points without their
-own COFF function symbol require an exact owner-relative match. A missing library, changed
-hash, ambiguous identity, stale name, or stale size fails the build.
+## 0. Source-private function identity
 
 The source-function gate requires every `VA(address, size)` definition to match
 `build/gen/source_function_spans.csv` and `symbol_names.csv`. For `static` definitions it also
@@ -28,8 +21,8 @@ function definition in the owning candidate COFF.
 ## 1. Compile + header-dependency tracking (ninja)
 
 Every `config/units.toml` unit must compile to `build/objdiff/base/<unit>.obj`; a compile
-error fails the build. MSVC 4.2 has no `/showIncludes`, so `cc_wrap.py` scans each TU's
-`#include` graph and writes a depfile (`deps=gcc` in `build.ninja`) — **editing a shared
+error fails the build. `cc_wrap.py` scans each TU's `#include` graph and writes a depfile
+(`deps=gcc` in `build.ninja`; VC6's `/showIncludes` is unused) — **editing a shared
 header recompiles exactly its includers**, so a header change can never leave a stale object
 (this previously masked drift). See `docs/patterns/` and the `cc_wrap.py` header.
 
@@ -50,9 +43,9 @@ functions follow the separate source-private `VA` inventory described above.
 
 ### 4. `assert_globals_data` — DATA(VA) discipline
 `DATA(0x<VA>)` rides the global's **definition** in its owner `.cpp`, not the header `extern`:
-- every file-scope **definition** of a CodeView data symbol carries `DATA(0x<its exact VA>)`;
+- every file-scope **definition** of an inventory data symbol carries `DATA(0x<its exact VA>)`;
 - **no `DATA()` on a header `extern`**;
-- every header global `extern` has a retained CodeView public symbol and owner TU;
+- every header global `extern` has an inventory symbol and owner TU;
 - every `DATA()` VA is **unique** (one VA == one definition).
 
 Rationale for def-not-extern: the VA describes *storage*, which the definition owns; a caller that
@@ -84,10 +77,10 @@ expand to nothing, but the data-manifest adapter combines their semantic identit
 retail RVAs with exact candidate COFF topology. Same-RVA aliases are accepted only when
 candidate COFF proves the same owner, section coordinate, storage, and extent.
 
-The gate requires every CodeView vtable to have a matching source marker, every primary
-marker to have a CodeView public, every marker to have exactly one definition in its owner
+The gate requires every inventory vtable to have a matching source marker, every primary
+marker to have an inventory row, every marker to have exactly one definition in its owner
 candidate object, and every emitted primary or secondary vtable to be modeled. A private
-secondary vtable need not have a CodeView public because its source marker and candidate
+secondary vtable need not have an inventory row because its source marker and candidate
 definition provide the missing identity evidence.
 
 ### 8. `assert_relocs --fields` — ordered DATA-owner field offsets
@@ -103,9 +96,9 @@ therefore cannot match retail's
 `gConfig+0x30`, even when every ordinary instruction byte agrees.
 
 Owner extents live in `config/reloc_data_owners.tsv`. An entry requires all three forms of evidence:
-a CodeView public data symbol, its source `DATA()` definition at the same RVA, and an independently
-recovered storage size. Do not use `symbol_names.csv`'s data size alone; many entries are provisional
-next-public gaps. The generated `reviewed_delink_data.tsv` passes these owner regions to the pinned
+an inventory data symbol, its source `DATA()` definition at the same RVA, and an independently
+recovered storage size. Do not use `symbol_names.csv`'s data size alone; sizes there are claims,
+not independently recovered extents. The generated `reviewed_delink_data.tsv` passes these owner regions to the pinned
 vostok-delinker. The delinker itself selects the containing region and emits the canonical public
 owner plus COFF implicit addend instead of guessing from the nearest preceding symbol.
 
@@ -125,7 +118,7 @@ intended widths when the game is ported away from the 32-bit MSVC data model. Pl
 the text character type. Win32, CRT, and vendored SDK headers retain their native ABI spellings and
 are outside this gate.
 
-VC4.2 gives `int` and `long` distinct C++ type identities even though both are 32 bits.
+The retail-era MSVC compilers give `int` and `long` distinct C++ type identities even though both are 32 bits.
 The compatibility aliases `i32l` and `u32l` preserve a retail long-backed declaration where that
 identity affects mangling or overload resolution; ordinary 32-bit game integers use `i32`/`u32`.
 
@@ -156,7 +149,7 @@ it is a floating-point type.
   can still hide or manufacture differences. This audit resolves every near-exact fn's reloc
   targets (from `symbol_names.csv` + definition `DATA()` VAs — REL32→symbol RVA, DIR32→symbol+addend,
   **signed** disp, `const_<rva>` and content-hash-collision names handled) and flags any address base
-  references that retail never does, plus any base `?`-symbol resolving to neither CodeView nor a
+  references that retail never does, plus any base `?`-symbol resolving to neither the inventory nor a
   `DATA()` global (fabricated). It is **deliberately NOT a hard gate** because incomplete
   functions may still have legitimate relocation-shape differences. Canonical targets retain
   real folded-function identities; synthetic relocation identities are errors.
