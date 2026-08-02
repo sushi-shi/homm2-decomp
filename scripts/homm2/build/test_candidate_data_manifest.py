@@ -460,10 +460,13 @@ class CandidateDataManifestTest(unittest.TestCase):
             self.skipTest("candidate objects are not built")
         definitions, _coff = candidate_definitions(path, "SOURCE/PHILAI")
         crt = [row for row in definitions if row["name"].startswith("_$S")]
-        self.assertEqual(len(crt), 1)
-        self.assertEqual(crt[0]["storage"], "data")
-        self.assertEqual(crt[0]["size"], 4)
-        self.assertEqual(crt[0]["scope"], "local")
+        # Two compiler-generated statics since KB.h began carrying the VC6
+        # STL exposure retail has: PHILAI's own initializer plus the
+        # ctype-facet guard byte.
+        self.assertEqual(len(crt), 2)
+        for row in crt:
+            self.assertEqual(row["storage"], "data")
+            self.assertEqual(row["scope"], "local")
 
     def _fixture_pe(self, root):
         import struct
