@@ -132,7 +132,7 @@ REVIEWED_CLAIMS = (
     ("config/crt_functions.csv", "reviewed-crt",
      lambda row: ("(libcmt)", row["symbol"])),
     ("config/import_thunks.csv", "reviewed-thunk",
-     lambda row: ("(imports)", "%s@%s" % (
+     lambda row: ("(imports)", (row.get("coff") or "").strip() or "%s@%s" % (
          row["symbol"], row["dll"].rsplit(".", 1)[0]))),
     ("config/eh_funclets.csv", "reviewed-funclet",
      lambda row: ("(funclets)", row["name"])),

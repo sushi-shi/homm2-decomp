@@ -72,12 +72,12 @@ H2_ENUM_END(FileRequesterPrivateConstant)
 VA(0x0048e730, 0x70)
 i32 GetMapHeader(char* filename, struct SMapHeader* header) {
     sprintf(gText, "%s%s", gcMapPath, filename);
-    i32 file = _open(gText, _O_BINARY);
+    i32 file = open(gText, _O_BINARY);
     if (file == -1) {
         return 0;
     }
-    _read(file, header, sizeof(*header));
-    _close(file);
+    read(file, header, sizeof(*header));
+    close(file);
     return 1;
 }
 
