@@ -4,8 +4,8 @@
 VA(0x004d4860, 0x3d)
 resource::resource(void) {
     m_resourceType = RESOURCE_CATEGORY_BITMAP;
-    m_id = 0;
     m_refCount = RESOURCE_REFERENCE_EMPTY;
+    m_id = 0;
     m_next = NULL;
 }
 

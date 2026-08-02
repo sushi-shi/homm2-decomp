@@ -27,6 +27,12 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| game::IsMobile locals + return compare | `cp`; `CalcTerrainCost(...) <= m_remainingMobility` | `cell`; `m_remainingMobility >= CalcTerrainCost(...)` | OPEN |
+| combatManager::GetStrength locals + and-mask | `armyIndex4/bit36/strength7/currentArmy8`; `(bit36 & mask)` | `idx/bitMask/totalStrength/currentArmy`; `(mask & bitMask)` | OPEN - 2.0 names are PoL auto-suffixed; dev names unknown on 4.2 side too |
+| advManager::CheckSetEvilInterface | `m_evilInterface != gbUseEvilInterface`; `interfaceMessage` | `gbUseEvilInterface != m_evilInterface`; `message` | OPEN |
+| resource::resource(void) store order | `m_id = 0;` before `m_refCount = ...` | `m_refCount` before `m_id` (header order) | OPEN |
+| wsnet_init locals + strlen guard | `socketMode`, `player`; `strlen(gcTCPAddress) != 0` | `blockMode`, `plr`; `strlen(gcTCPAddress) > 0` | OPEN |
+| philAI::CanBuyBHC locals + two compares | `jb/idx`; `garrison[what] < num`; `cost[idx] * num > m_resources[idx]` | `j/index`; `num > garrison[what]`; `m_resources[index] < cost[index] * num` | OPEN |
 | fullMap::GetNewCellExtra{Overlay,Object} reads | `Row(y)[x]` | `Column(x)[y * width]` (+ new `Column` accessor) | OPEN - test Column form under 4.2; only ~25 arms tried, uniqueness unproven |
 | fullMap::Cell body / cell assigns | `cells + width * y + x` | `cells + x + y * width` | OPEN |
 | fullMap::Read memcpy args | `cells + width * y + x` etc. | `cells + x + y * width` | OPEN |

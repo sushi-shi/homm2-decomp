@@ -28,9 +28,9 @@ VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
     WinsockStartupMessage startup;
     struct hostent* pHost;
-    u_long socketMode;
+    u_long blockMode;
     char localHostName[WS_TRANSPORT_BUFFER_SIZE];
-    i32 player;
+    i32 plr;
 
     if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
         sprintf(
@@ -69,8 +69,8 @@ i16 wsnet_init(void) {
         sprintf(cWSTextBuffer, "Error During bind(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
     }
-    socketMode = 1;
-    iRc = ioctlsocket(sd_dg, FIONBIO, &socketMode);
+    blockMode = 1;
+    iRc = ioctlsocket(sd_dg, FIONBIO, &blockMode);
     if (iRc == SOCKET_ERROR) {
         sprintf(cWSTextBuffer, "Error During ioctlsocket(): %d", WSAGetLastError());
         ShutDown(cWSTextBuffer);
@@ -142,10 +142,10 @@ i16 wsnet_init(void) {
         gbRemoteGameOpen = false;
         startup.playerCount = static_cast<u8>(giNumHumanPlayers);
         memcpy(startup.playerAddresses, giNetPosToDCOPos, sizeof(giNetPosToDCOPos));
-        for (player = 1; player < giNumHumanPlayers; player++) {
-            startup.netPosition = static_cast<u8>(player);
+        for (plr = 1; plr < giNumHumanPlayers; plr++) {
+            startup.netPosition = static_cast<u8>(plr);
             wsSendMessage(
-                giNetPosToDCOPos[player],
+                giNetPosToDCOPos[plr],
                 NETWORK_PACKET_STARTUP,
                 sizeof(startup),
                 &startup
@@ -153,7 +153,7 @@ i16 wsnet_init(void) {
         }
     } else {
     retryAddress:
-        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) != 0) {
+        if (giTCPHostStatus != -1 && strlen(gcTCPAddress) > 0) {
             strcpy(cWSTextBuffer, gcTCPAddress);
             strcpy(gcTCPAddress, "");
         } else {

@@ -976,16 +976,16 @@ i32 game::IsMobile(i32 heroId) {
     if (heroId == -1)
         return 0;
     hero* mobileHero = &m_heroRecs[heroId];
-    mapCell* cp = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
-    return CalcTerrainCost(
-               giGroundToTerrain[cp->m_terrainImageIndex],
+    mapCell* cell = gpAdvManager->GetCell(mobileHero->m_x, mobileHero->m_y);
+    return mobileHero->m_remainingMobility
+           >= CalcTerrainCost(
+               giGroundToTerrain[cell->m_terrainImageIndex],
                1,
                mobileHero->m_remainingMobility,
                IDX(mobileHero->m_secondarySkills[IDX(HERO_SKILL_PATHFINDING)]),
-               cp->m_isRoad,
+               cell->m_isRoad,
                0
-           )
-           <= mobileHero->m_remainingMobility;
+           );
 }
 
 VA(0x0044cdd0, 0x13)

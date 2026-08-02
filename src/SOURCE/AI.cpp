@@ -836,22 +836,22 @@ i32 combatManager::GetClosestArmy(
 
 VA(0x00417e9c, 0xa6)
 u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
-    i32 armyIndex4 = 0;
-    u32 bit36 = COMBAT_AI_MASK_FIRST_BIT;
-    u32l strength7 = 0;
-    army* currentArmy8;
+    i32 idx = 0;
+    u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
+    u32l totalStrength = 0;
+    army* currentArmy;
 
-    for (armyIndex4 = 0; armyIndex4 < m_armyCount[IDX(side)]; armyIndex4++) {
-        if ((bit36 & mask) != 0) {
-            currentArmy8 = &m_armies[IDX(side)][armyIndex4];
-            if (currentArmy8 != NULL
-                && HAS(currentArmy8->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+    for (idx = 0; idx < m_armyCount[IDX(side)]; idx++) {
+        if ((mask & bitMask) != 0) {
+            currentArmy = &m_armies[IDX(side)][idx];
+            if (currentArmy != NULL
+                && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                        == 0)
-                strength7 += currentArmy8->Strength();
+                totalStrength += currentArmy->Strength();
         }
-        bit36 <<= 1;
+        bitMask <<= 1;
     }
-    return strength7;
+    return totalStrength;
 }
 
 VA(0x00417f42, 0x178)

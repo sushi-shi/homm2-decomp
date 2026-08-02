@@ -1555,7 +1555,7 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     i32 shouldChange;
     i32 translationIndex;
     i32 savedShowIt;
-    tag_message interfaceMessage;
+    tag_message message;
 
     if (player == -1) {
         player = giCurWatchPlayer;
@@ -1567,26 +1567,26 @@ void advManager::CheckSetEvilInterface(i32 redraw, i32 player) {
     } else if (gConfig.evilInterfaceUsage == INTERFACE_GOOD && gbUseEvilInterface) {
         shouldChange = 1;
     } else if (gConfig.evilInterfaceUsage == INTERFACE_AUTO
-               && gpGame->m_players[player].m_evilInterface != gbUseEvilInterface) {
+               && gbUseEvilInterface != gpGame->m_players[player].m_evilInterface) {
         shouldChange = 1;
     }
 
     if (shouldChange) {
         gbUseEvilInterface = 1 - gbUseEvilInterface;
         if (redraw) {
-            interfaceMessage.type = ADVMGR_INTERFACE_MESSAGE;
-            interfaceMessage.payload.widget.command = ADVMGR_INTERFACE_REPLACE_RESOURCE;
+            message.type = ADVMGR_INTERFACE_MESSAGE;
+            message.payload.widget.command = ADVMGR_INTERFACE_REPLACE_RESOURCE;
             for (translationIndex = 0; translationIndex < INTERFACE_TRANSLATION_COUNT;
                  ++translationIndex) {
-                interfaceMessage.payload.widget.id = gpResourceManager->MakeId(
+                message.payload.widget.id = gpResourceManager->MakeId(
                     cEvilTranslate[translationIndex][1 - gbUseEvilInterface],
                     0
                 );
-                interfaceMessage.payload.widget.data.value = gpResourceManager->MakeId(
+                message.payload.widget.data.value = gpResourceManager->MakeId(
                     cEvilTranslate[translationIndex][gbUseEvilInterface],
                     0
                 );
-                m_adventureWindow->BroadcastMessage(interfaceMessage);
+                m_adventureWindow->BroadcastMessage(message);
             }
             savedShowIt = bShowIt;
             bShowIt = 1;
