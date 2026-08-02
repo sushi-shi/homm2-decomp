@@ -47,10 +47,11 @@ Three independent dimensions, crossed into one product:
   never ladder it across runs.
 - **TU-state islands** (`--state-trials`, `tu_state_noise` families, default
   `forest`): deterministic parser-visible declarations/includes inserted
-  before the target. Islands are THE mechanism to certify a finished body
-  without touching it - a 100 under some island means the body is done
-  (user doctrine). Islands alone cannot re-order anything intra-function
-  on /Od; they resolve TU-state parity residue.
+  before the target. /Od is TU-state-volatile, so islands are a STANDARD
+  dimension of every /Od matrix (user directive) - cross them with the
+  spelling axes rather than running spellings dry. They are also THE
+  mechanism to certify a finished body without touching it: a 100 under
+  some island means the body is done and never needs editing again.
 
 ## Exact axes-file schema (validation kills the run otherwise)
 

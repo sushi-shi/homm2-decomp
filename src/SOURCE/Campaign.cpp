@@ -924,7 +924,7 @@ void game::InitCampaignMap(void) {
             } else {
                 heroPriorityBest = 0;
             }
-            if (bestHeroPriorityLocal < heroPriorityBest) {
+            if (heroPriorityBest > bestHeroPriorityLocal) {
                 bestHeroPriorityLocal = heroPriorityBest;
                 bestHeroPositionCandidate = scanPositionId;
             }
@@ -1031,16 +1031,16 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureCounts[heroPositionValue] = 0;
         }
         switch (armyHero->m_cursorType) {
+            case FACTION_WARLOCK:
+                armyHero->m_army.Add(CREATURE_CENTAUR, WARLOCK_CENTAUR_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GARGOYLE, WARLOCK_GARGOYLE_COUNT, -1);
+                armyHero->m_army.Add(CREATURE_GRIFFIN, WARLOCK_GRIFFIN_COUNT, -1);
+                break;
             case FACTION_BARBARIAN:
                 armyHero->m_army
                     .Add(CREATURE_ORC_CHIEF, BARBARIAN_ORC_CHIEF_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_OGRE, BARBARIAN_OGRE_COUNT, -1);
                 armyHero->m_army.Add(CREATURE_GOBLIN, BARBARIAN_GOBLIN_COUNT, -1);
-                break;
-            case FACTION_WARLOCK:
-                armyHero->m_army.Add(CREATURE_CENTAUR, WARLOCK_CENTAUR_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_GARGOYLE, WARLOCK_GARGOYLE_COUNT, -1);
-                armyHero->m_army.Add(CREATURE_GRIFFIN, WARLOCK_GRIFFIN_COUNT, -1);
                 break;
             case FACTION_NECROMANCER:
                 armyHero->m_army
@@ -1065,10 +1065,10 @@ void game::InitCampaignMap(void) {
             armyHero->m_army.m_creatureTypes[heroPositionValue] =
                 m_campaignCarryoverCreatureTypes[heroPositionValue];
             armyHero->m_army.m_creatureCounts[heroPositionValue] =
-                (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
-                     ? CAMPAIGN_TRIPLE_ARMY_MULTIPLIER
-                     : 1)
-                * m_campaignCarryoverCreatureCounts[heroPositionValue];
+                m_campaignCarryoverCreatureCounts[heroPositionValue]
+                * (m_campaignAwards[IDX(CAMPAIGN_AWARD_ROLAND_STRENGTHENED)]
+                       ? CAMPAIGN_TRIPLE_ARMY_MULTIPLIER
+                       : 1);
         }
     }
 

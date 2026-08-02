@@ -717,7 +717,7 @@ SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	92.6191	6788270a1
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	71.0000	d77a6b184852
 SOURCE/Campaign	?CampaignInfoUpdate@game@@QAEXH@Z	89.4427	b7d533df0775
 SOURCE/Campaign	?HandleCampaignWin@game@@QAEHXZ	100.0000	32df4ef318ee
-SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	98.5422	e9641788703e
+SOURCE/Campaign	?InitCampaignMap@game@@QAEXXZ	99.8465	644e7c4a6642
 SOURCE/Campaign	?InitEntireCampaign@game@@QAEXH@Z	100.0000	8c98c4c70a08
 SOURCE/Campaign	?PlayPreScenarioSmacker@game@@QAEXHH@Z	100.0000	7b252f8765d3
 SOURCE/Campaign	?ShowCampaignInfo@game@@QAEXHH@Z	96.0000	e51cbcdc6a03

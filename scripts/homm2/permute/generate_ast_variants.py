@@ -206,8 +206,11 @@ def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn, allowed_exte
         )
         if (
             allowance is not None and diagnostic.severity < ci.Diagnostic.Fatal
-            and same_source and outside_target
+            and (outside_target if same_source else True)
         ):
+            # A diagnostic in another file (the VC6 vendor-header surface the
+            # whole game build tolerates) can never sit inside the target
+            # function; a reviewed allowance covers it like a trailing one.
             allowed.append(rendered)
             matched_allowances.add(allowance)
             continue
