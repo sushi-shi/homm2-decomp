@@ -113,6 +113,13 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Reconstruction infrastructure notes (not version deltas)
 
+- `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
+  (EncodeData/DecodeData/spotBlock/endsInBz/compress/uncompress wrappers and
+  the Free*Structures split are the adaptations; the codec bodies are
+  upstream text). Reference source: bzip-0.21/bzip.c (archived copy in
+  github.com/simenbkr/CTF, ncsc18/for170). The reconstruction restores the
+  original local names; the codec bodies are invariant across PoL and Buka.
+
 - The stripped image's DIR32 sites are recovered by donation
   (`homm2.audit.reloc_donation`): masked-identical claimed functions
   transfer their compiled relocation sites onto retail bytes; unanimous
