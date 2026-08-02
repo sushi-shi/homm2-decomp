@@ -141,7 +141,6 @@ FILE* outputHandleJustInCase;
 #define GETFIRST16(a) ((UInt32)(words[a] >> 16))
 #define GETREST16(a) (words[a] & 0x0000ffff)
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\BASE\\Bzip.cpp")
 
 VA(0x004c6ea0, 0xf)
 void initialiseCRC(void) {
@@ -636,11 +635,11 @@ void sendMTFVal(BitStream* bs, Int32 n) {
 VA(0x004c7ef0, 0x81)
 void FreeCompressStructures(void) {
     if (words != NULL)
-        H2_FREE_AT(words, RETAIL_FILE, 0x461);
+        H2_FREE(words);
     if (ftab != NULL)
-        H2_FREE_AT(ftab, RETAIL_FILE, 0x462);
+        H2_FREE(ftab);
     if (zptr != NULL)
-        H2_FREE_AT(zptr, RETAIL_FILE, 0x463);
+        H2_FREE(zptr);
     words = NULL;
     ftab = NULL;
     zptr = NULL;
@@ -650,9 +649,9 @@ VA(0x004c7f80, 0xab)
 void allocateCompressStructures(void) {
     Int32 n = 100000 * blockSize100k;
     FreeCompressStructures();
-    words = (UInt32*)H2_ALLOC_AT((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1, RETAIL_FILE, 0x475);
-    zptr = (Int32*)H2_ALLOC_AT(n * sizeof(Int32) + 1, RETAIL_FILE, 0x476);
-    ftab = (Int32*)H2_ALLOC_AT(65537 * sizeof(Int32) + 1, RETAIL_FILE, 0x477);
+    words = (UInt32*)H2_ALLOC((n + MAX_DENORM_OFFSET) * sizeof(Int32) + 1);
+    zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1);
+    ftab = (Int32*)H2_ALLOC(65537 * sizeof(Int32) + 1);
 
     if (words == NULL || zptr == NULL || ftab == NULL) {
         Int32 totalDraw =
@@ -665,11 +664,11 @@ void allocateCompressStructures(void) {
 VA(0x004c8030, 0x81)
 void FreeDecompressStructures(void) {
     if (block != NULL)
-        H2_FREE_AT(block, RETAIL_FILE, 0x489);
+        H2_FREE(block);
     if (ll != NULL)
-        H2_FREE_AT(ll, RETAIL_FILE, 0x48a);
+        H2_FREE(ll);
     if (zptr != NULL)
-        H2_FREE_AT(zptr, RETAIL_FILE, 0x48b);
+        H2_FREE(zptr);
     block = NULL;
     ll = NULL;
     zptr = NULL;
@@ -685,9 +684,9 @@ void setDecompressStructureSizes(Int32 newSize100k) {
 
     if (newSize100k != 0) {
         Int32 n = 100000 * newSize100k;
-        block = (UChar*)H2_ALLOC_AT(n * sizeof(UChar) + 1, RETAIL_FILE, 0x4a1);
-        ll = (UChar*)H2_ALLOC_AT(n * sizeof(UChar) + 1, RETAIL_FILE, 0x4a2);
-        zptr = (Int32*)H2_ALLOC_AT(n * sizeof(Int32) + 1, RETAIL_FILE, 0x4a3);
+        block = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1);
+        ll = (UChar*)H2_ALLOC(n * sizeof(UChar) + 1);
+        zptr = (Int32*)H2_ALLOC(n * sizeof(Int32) + 1);
 
         if (block == NULL || ll == NULL || zptr == NULL) {
             Int32 totalDraw = 6 * n * sizeof(UChar);
@@ -1953,4 +1952,3 @@ char outName[1024];
 char progNameReally[0x400];
 i32 keepInputFiles;
 
-#undef RETAIL_FILE

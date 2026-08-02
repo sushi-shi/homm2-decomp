@@ -7,13 +7,11 @@
 #include <SOURCE/KB.h>
 #include <string.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\BITMAP.CPP"
-
 H2_ENUM_BEGIN(BitmapConstant)
     COPY_STRIDE = 640
 H2_ENUM_END(BitmapConstant)
 
-// @remove
+VA(0x004c5cd0, 0x4c)
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     m_bitmapType = BITMAP_TYPE_NONE;
@@ -22,39 +20,34 @@ bitmap::bitmap(void)
     m_pixels = NULL;
 }
 
-#line 15
-// @remove
-bitmap::bitmap(BitmapType p1, i16 p2, i16 p3)
+VA(0x004c5d50, 0x99)
+bitmap::bitmap(BitmapType type, i16 width, i16 height)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
-    static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
-    m_bitmapType = p1;
-    m_width = p2;
-    m_height = p3;
-    m_pixels = static_cast<u8*>(H2_ALLOC_AT(p3 * p2, dimensionsAllocationSourceFile, 21));
+    m_bitmapType = type;
+    m_width = width;
+    m_height = height;
+    m_pixels = new u8[width * height];
 }
 
-#line 28
-// @remove
+VA(0x004c5df0, 0xeb)
 bitmap::bitmap(u32l id)
     : resource(RESOURCE_CATEGORY_BITMAP, id, RESOURCE_REFERENCE_INITIAL, NULL) {
-    static char resourceAllocationSourceFile[] = RETAIL_FILE;
     i32 size;
     gpResourceManager->PointToFile(id);
     m_bitmapType = BitmapType(gpResourceManager->ReadWord());
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    size = m_height * m_width;
-    m_pixels = static_cast<u8*>(H2_ALLOC_AT(size, resourceAllocationSourceFile, 37));
+    size = m_width * m_height;
+    m_pixels = new u8[size];
     PollSound();
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_pixels), size);
     PollSound();
 }
-#line 48
-// @remove
-inline bitmap::~bitmap() {
-    static char destructionSourceFile[] = RETAIL_FILE;
+
+VA(0x004c5ee0, 0x46)
+bitmap::~bitmap() {
     if (m_pixels != NULL)
-        H2_FREE_AT(m_pixels, destructionSourceFile, 51);
+        delete m_pixels;
     m_pixels = NULL;
 }
 
@@ -233,4 +226,3 @@ void bitmap::CopyToCareful(
 
 
 
-#undef RETAIL_FILE

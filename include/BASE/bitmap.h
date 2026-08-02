@@ -20,7 +20,7 @@ public:
     bitmap(void);
     bitmap(BitmapType type, i16 width, i16 height);
     bitmap(u32l id);
-    __declspec(dllexport) virtual inline ~bitmap();
+    virtual ~bitmap(void);
     void DrawToBufferCareful(i16 x, i16 y);
     __declspec(dllexport) inline void DrawToBuffer(i16 x, i16 y);
     void DrawToScreen(i16 x, i16 y);

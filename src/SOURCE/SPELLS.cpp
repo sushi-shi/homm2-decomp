@@ -173,7 +173,6 @@ H2_ENUM_END(EarthquakeConstant)
 
 }
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
 VA(0x00498790, 0x67)
 i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
@@ -2618,10 +2617,7 @@ void combatManager::VaporizeCreature(
     ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(1, 1, 1, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
     gyModify = static_cast<i8*>(
-        H2_ALLOC_AT(
-            SPELL_MODIFIER_ROW_COUNT, RETAIL_FILE,
-            vaporizeSourceLineBase + 0x09
-        )
+        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT)
     );
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     height0 = giMaxExtentY - giMinExtentY + 1;
@@ -2658,7 +2654,7 @@ void combatManager::VaporizeCreature(
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target->m_palette = NULL;
     target->m_showQuantity = 1;
-    H2_FREE_AT(gyModify, RETAIL_FILE, vaporizeSourceLineBase + 0x38);
+    H2_FREE(gyModify);
     gyModify = NULL;
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
@@ -2716,15 +2712,9 @@ void combatManager::RippleCreature(
 
     height0 = giMaxExtentY - giMinExtentY + 1;
     gyModify = static_cast<i8*>(
-        H2_ALLOC_AT(
-            SPELL_MODIFIER_ROW_COUNT, RETAIL_FILE,
-            rippleSourceLineBase + 0x2c
-        )
+        H2_ALLOC(SPELL_MODIFIER_ROW_COUNT)
     );
-    wave8 = static_cast<float*>(H2_ALLOC_AT(
-        sizeof(float) * SPELL_MODIFIER_ROW_COUNT, RETAIL_FILE,
-        rippleSourceLineBase + 0x2d
-    ));
+    wave8 = static_cast<float*>(H2_ALLOC(sizeof(float) * SPELL_MODIFIER_ROW_COUNT));
     memset(gyModify, 0, SPELL_MODIFIER_ROW_COUNT);
     for (row9 = 0; row9 < SPELL_MODIFIER_ROW_COUNT; ++row9) {
         wave8[row9] = static_cast<float>(
@@ -2798,8 +2788,8 @@ void combatManager::RippleCreature(
     DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
     target2->m_palette = NULL;
     target2->m_showQuantity = 1;
-    H2_FREE_AT(gyModify, RETAIL_FILE, rippleSourceLineBase + 0x8e);
-    H2_FREE_AT(wave8, RETAIL_FILE, rippleSourceLineBase + 0x8f);
+    H2_FREE(gyModify);
+    H2_FREE(wave8);
     gyModify = NULL;
     if (mode != COMBAT_RIPPLE_DEATH_RIPPLE)
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);

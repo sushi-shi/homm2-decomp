@@ -72,7 +72,6 @@ H2_ENUM_END(BlurTransitionConstant)
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Blur.cpp"
 
 #define BLUR_COMPONENT(table, offset)                                                              \
     BlurComponentAt((table), (offset))
@@ -80,25 +79,6 @@ H2_ENUM_END(BlurTransitionConstant)
 static inline i32& BlurComponentAt(BlurComponentTable& table, i32 offset) {
     return *reinterpret_cast<i32*>(reinterpret_cast<u8*>(table) + offset);
 }
-
-H2_ENUM_BEGIN(BlurTextSlotSize)
-    SOURCE_FILE_SLOT_SIZE     = 0x28,
-    LOOKUP_FILENAME_SLOT_SIZE = 0x10
-H2_ENUM_END(BlurTextSlotSize)
-
-typedef struct SBlurText {
-    char lookupAllocationSource[SOURCE_FILE_SLOT_SIZE];
-    char lookupFilename[LOOKUP_FILENAME_SLOT_SIZE];
-    char oldPaletteAllocationSource[SOURCE_FILE_SLOT_SIZE];
-    char newPaletteAllocationSource[SOURCE_FILE_SLOT_SIZE];
-    char lookupFreeSource[SOURCE_FILE_SLOT_SIZE];
-    char oldPaletteFreeSource[SOURCE_FILE_SLOT_SIZE];
-    char newPaletteFreeSource[SOURCE_FILE_SLOT_SIZE];
-} SBlurText;
-
-
-static SBlurText gBlurText =
-    {RETAIL_FILE, "RGBLOOKP.BIN", RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
 VA(0x004cba60, 0xa22)
 void DoBlur(
@@ -118,7 +98,7 @@ void DoBlur(
     memcpy(saved->m_pixels, source->m_pixels, imageSize);
 
     BlurLookupRow* lookup = static_cast<BlurLookupRow*>(
-        H2_ALLOC_AT(LOOKUP_BYTE_COUNT, gBlurText.lookupAllocationSource, 0x19)
+        H2_ALLOC(LOOKUP_BYTE_COUNT)
     );
     BlurComponentTable redComponents;
     BlurComponentTable blueComponents;
@@ -137,7 +117,7 @@ void DoBlur(
     } while (componentOffset < COMPONENT_TABLE_BYTE_COUNT);
 
     resourceManager* resourceMgr;
-    u32l lookupId = (resourceMgr = gpResourceManager)->MakeId(gBlurText.lookupFilename, 1);
+    u32l lookupId = (resourceMgr = gpResourceManager)->MakeId("RGBLOOKP.BIN", 1);
     resourceMgr->PointToFile(lookupId);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(lookup), LOOKUP_BYTE_COUNT);
     memcpy(destination->m_pixels, source->m_pixels, imageSize);
@@ -336,10 +316,10 @@ void DoBlur(
 
     PollSound();
     i8* oldPalette = static_cast<i8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gBlurText.oldPaletteAllocationSource, 0x8b)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     i8* newPalette = static_cast<i8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gBlurText.newPaletteAllocationSource, 0x8c)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     memcpy(oldPalette, gPalette->m_data, PALETTE_BYTE_COUNT);
     i8* oldColor = oldPalette;
@@ -386,16 +366,15 @@ void DoBlur(
     memcpy(source->m_pixels, saved->m_pixels, imageSize);
     gpWindowManager
         ->FizzleForward(0, 0, SCREEN_WIDTH, height, FIZZLE_DELAY, newPalette, oldPalette);
-    H2_FREE_AT(lookup, gBlurText.lookupFreeSource, 0xa8);
+    H2_FREE(lookup);
     if (saved != NULL) {
         delete saved;
     }
     gpMouseManager->ShowColorPointer();
-    H2_FREE_AT(oldPalette, gBlurText.oldPaletteFreeSource, 0xad);
-    H2_FREE_AT(newPalette, gBlurText.newPaletteFreeSource, 0xae);
+    H2_FREE(oldPalette);
+    H2_FREE(newPalette);
 }
 
 
 #undef BLUR_COMPONENT
 
-#undef RETAIL_FILE

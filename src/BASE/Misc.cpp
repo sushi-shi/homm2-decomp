@@ -2213,7 +2213,7 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         return;
     write(fileHandle, &header, sizeof(header));
     u8* encodedRow =
-        static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 1480));
+        static_cast<u8*>(H2_ALLOC(width * 2));
     for (i32 row = 0; row < height; ++row) {
         i32 sourceIndex = 0;
         u32 encodedSize = 0;
@@ -2236,16 +2236,16 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         write(fileHandle, encodedRow, encodedSize);
         pixels += width;
     }
-    H2_FREE_AT(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
+    H2_FREE(encodedRow);
     u8 paletteMarker = VGA_PALETTE_MARKER;
     write(fileHandle, &paletteMarker, 1);
     u8* outputPalette = static_cast<u8*>(
-        H2_ALLOC_AT(PALETTE_BYTE_COUNT, gMiscText.pcx.outputPaletteAllocation.text, 1526)
+        H2_ALLOC(PALETTE_BYTE_COUNT)
     );
     for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
         outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
     write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
-    H2_FREE_AT(outputPalette, gMiscText.pcx.outputPaletteDestruction.text, 0x5fb);
+    H2_FREE(outputPalette);
     close(fileHandle);
 }
 

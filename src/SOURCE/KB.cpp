@@ -277,7 +277,6 @@ H2_ENUM_BEGIN(HighScoreInputConstant)
     HIGH_SCORE_LAST_SHIFT_SOURCE = HIGH_SCORE_ENTRY_COUNT - 2
 H2_ENUM_END(HighScoreInputConstant)
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\KB.CPP")
 
 inline town* GetCastleRec(i32 i) {
     return &gpGame->m_castleRecs[i];
@@ -2874,19 +2873,13 @@ void ClearMapExtra(void) {
     i32 i;
     for (i = 0; i < iMaxMapExtra; i++) {
         if (ppMapExtra[i])
-            H2_FREE_AT(
-                ppMapExtra[i], RETAIL_FILE,
-                clearMapExtraSourceLineBase + 6
-            );
+            H2_FREE(ppMapExtra[i]);
     }
     if (ppMapExtra)
-        H2_FREE_AT(ppMapExtra, RETAIL_FILE, clearMapExtraSourceLineBase + 9);
+        H2_FREE(ppMapExtra);
     ppMapExtra = NULL;
     if (pwSizeOfMapExtra)
-        H2_FREE_AT(
-            pwSizeOfMapExtra, RETAIL_FILE,
-            clearMapExtraSourceLineBase + 13
-        );
+        H2_FREE(pwSizeOfMapExtra);
     pwSizeOfMapExtra = NULL;
     iMaxMapExtra = 0;
 }
@@ -3404,7 +3397,7 @@ void ShutDown(char* msg) {
         gEventHandle = NULL;
     }
     if (mapExtra)
-        H2_FREE_AT(mapExtra, RETAIL_FILE, shutdownSourceLineBase + 71);
+        H2_FREE(mapExtra);
     mapExtra = NULL;
     CloseAIMapVars();
     DeleteMainClasses();
@@ -3469,14 +3462,8 @@ void SmackFade(u8* src, u8* dst) {
     a = NULL;
     f = NULL;
     k = -1;
-    a = static_cast<u8*>(H2_ALLOC_AT(
-        MISC_PALETTE_BYTE_COUNT, RETAIL_FILE,
-        smackFadeSourceLineBase + 13
-    ));
-    f = static_cast<u8*>(H2_ALLOC_AT(
-        WINGRAPH_PALETTE_SIZE, RETAIL_FILE,
-        smackFadeSourceLineBase + 14
-    ));
+    a = static_cast<u8*>(H2_ALLOC(MISC_PALETTE_BYTE_COUNT));
+    f = static_cast<u8*>(H2_ALLOC(WINGRAPH_PALETTE_SIZE));
     memset(a, 0, MISC_PALETTE_BYTE_COUNT);
     memset(f, 0, WINGRAPH_PALETTE_SIZE);
     for (h = SMACK_FADE_FIRST_COLOR; h < SMACK_FADE_COLOR_LIMIT; h++) {
@@ -3513,8 +3500,8 @@ void SmackFade(u8* src, u8* dst) {
     }
     gpWindowManager->UpdateScreen();
     UpdatePalette(reinterpret_cast<i8*>(dst));
-    H2_FREE_AT(a, RETAIL_FILE, smackFadeSourceLineBase + 49);
-    H2_FREE_AT(f, RETAIL_FILE, smackFadeSourceLineBase + 50);
+    H2_FREE(a);
+    H2_FREE(f);
 }
 
 VA(0x0046d109, 0x3b2)
@@ -3528,10 +3515,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     gpMouseManager->HideColorPointer();
     memcpy(savedPalette, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
     gpWindowManager->m_updateFlags = 0;
-    congratsText = static_cast<char*>(H2_ALLOC_AT(
-        CONGRATS_TEXT_SIZE, RETAIL_FILE,
-        congratsSourceLineBase + 9
-    ));
+    congratsText = static_cast<char*>(H2_ALLOC(CONGRATS_TEXT_SIZE));
     baseScore = CalcBaseScore(giCurTurn);
     score_e = gpGame->m_difficultyRating * baseScore / CONGRATS_DIFFICULTY_SCALE;
     gpSoundManager->PlayAmbientMusic(MIDI_NO_TRACK);
@@ -3587,7 +3571,7 @@ void ShowCongrats(HighScoreType highScoreType) {
         HIGH_SCORE_STANDARD,
         gpGame->m_mapHeader.name
     );
-    H2_FREE_AT(congratsText, RETAIL_FILE, congratsSourceLineBase + 78);
+    H2_FREE(congratsText);
     congratsText = NULL;
     gpWindowManager->m_updateFlags = 1;
     memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
@@ -5073,10 +5057,7 @@ void NormalDialog(
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC_AT(
-            NORMAL_DIALOG_TEXT_LENGTH, RETAIL_FILE,
-            normalDialogSourceLineBase + 187
-        ));
+        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
         if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST
             && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
             if (resourceValue_l[resourceSlot_n] < 1) {
@@ -5408,10 +5389,7 @@ void NormalDialog(
                 MemError();
             pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
-            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC_AT(
-                NORMAL_DIALOG_TEXT_LENGTH, RETAIL_FILE,
-                normalDialogSourceLineBase + 431
-            ));
+            resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
             labelY_o = sizingIconHeight_l + resourceY_l
                 - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             sprintf(
@@ -5447,10 +5425,7 @@ void NormalDialog(
         pNormalDialogWindow->AddWidget(textPanel_h, -1);
 
         if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
-            char* bonusText = static_cast<char*>(H2_ALLOC_AT(
-                NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH, RETAIL_FILE,
-                normalDialogSourceLineBase + 457
-            ));
+            char* bonusText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH));
             strcpy(bonusText, "+1 ");
             textPanel_h = new textWidget(
                 resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
@@ -5490,10 +5465,7 @@ void NormalDialog(
     pNormalDialogWindow->BroadcastMessage(message_e);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(H2_ALLOC_AT(
-            NORMAL_DIALOG_OR_TEXT_LENGTH, RETAIL_FILE,
-            normalDialogSourceLineBase + 493
-        ));
+        orText_f = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_OR_TEXT_LENGTH));
         strcpy(orText_f, "or");
         textPanel_h = new textWidget(
             NormalDialogCenterOffset(windowWidth_a) - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
@@ -5553,6 +5525,12 @@ void UpdateNormalDialog(char* text) {
         NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID
     );
 }
+
+VA(0x00470dd0, 0x19)
+game::~game() {}
+
+VA(0x00470df0, 0x37)
+soundManager::~soundManager() {}
 
 #define GROUND_REPEAT_2(value) value, value
 #define GROUND_REPEAT_4(value) GROUND_REPEAT_2(value), GROUND_REPEAT_2(value)
@@ -10208,4 +10186,3 @@ townManager* gpTownManager;
 advManager* gpAdvManager;
 b8 gbGamePosToNetPos[OLD_MAIN_MATCH_BUFFER_SIZE];
 
-#undef RETAIL_FILE

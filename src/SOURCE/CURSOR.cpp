@@ -53,7 +53,6 @@ H2_ENUM_END(CursorPrivateConstant)
 
 #define SLOW_TURN_DELAY_SCALE 1.5
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\CURSOR.CPP")
 
 VA(0x004332d0, 0x124)
 void advManager::StartCursor(H2_ENUM_PARAM(MapDirection, i32) direction) {
@@ -1467,7 +1466,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
-    buf = static_cast<SMapChange*>(H2_ALLOC_AT(size, RETAIL_FILE, s_groupLineBase + GROUP_ALLOC_LINE_OFFSET));
+    buf = static_cast<SMapChange*>(H2_ALLOC(size));
     memcpy(buf, incomingData, size);
     for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
         ptr = &buf[i];
@@ -1477,7 +1476,7 @@ void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
             processed = 0;
         }
     }
-    H2_FREE_AT(buf, RETAIL_FILE, s_groupLineBase + GROUP_FREE_LINE_OFFSET);
+    H2_FREE(buf);
 }
 
 VA(0x0043640d, 0x5e)
@@ -1608,4 +1607,3 @@ H2_ENUM_STORAGE(MapDirection, i32) S1cursorDirection;
 SMapChange sMapChangeLastFew[CURSOR_MAP_CHANGE_RECENT_COUNT];
 
 #undef SLOW_TURN_DELAY_SCALE
-#undef RETAIL_FILE

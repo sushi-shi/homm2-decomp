@@ -11,6 +11,8 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/wingraph.h>
 
+#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\WINGRAPH.CPP"
+
 H2_ENUM_BEGIN(WingraphPaletteConstant)
     PALETTE_COMPONENT_COUNT     = 3,
     PALETTE_RED_COMPONENT       = 0,
@@ -20,7 +22,6 @@ H2_ENUM_BEGIN(WingraphPaletteConstant)
     SYSTEM_PALETTE_REGION_COUNT = 2
 H2_ENUM_END(WingraphPaletteConstant)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\wingraph.cpp"
 
 static RECT gDDSourceRect;
 static RECT gDDClientRect;
@@ -1027,7 +1028,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     y = gConfig.gfx[IDX(giCurExe)].y;
     width = gConfig.gfx[IDX(giCurExe)].width;
     height7 = gConfig.gfx[IDX(giCurExe)].height;
-    screenBuffer = H2_ALLOC_AT(WINGRAPH_WIDTH * WINGRAPH_HEIGHT, RETAIL_FILE, gSetGraphicsTypeLineBase + 18);
+    screenBuffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
         gConfig.gfx[IDX(giCurExe)].fullScreen = 0;
@@ -1042,7 +1043,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
         gpWindowManager->m_screen->m_pixels = static_cast<u8*>(lpInitWin);
     }
     memcpy(gpWindowManager->m_screen->m_pixels, screenBuffer, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
-    H2_FREE_AT(screenBuffer, RETAIL_FILE, gSetGraphicsTypeLineBase + 39);
+    H2_FREE(screenBuffer);
     if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
         SetMenuStatus(1);
         ResizeWindow(x, y, width, height7);
@@ -1078,4 +1079,3 @@ i32l lDelayRefresh = 0;
 i32l lPaintStart;
 struct _IMAGE screenImage;
 
-#undef RETAIL_FILE

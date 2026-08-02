@@ -225,7 +225,6 @@ H2_ENUM_BEGIN(NewGameKeyEncoding)
     KEY_SCAN_CODE_SHIFT = 8
 H2_ENUM_END(NewGameKeyEncoding)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\Newgame.cpp"
 
 VA(0x004754b0, 0x1d2)
 void game::GetMap(void) {
@@ -440,11 +439,11 @@ i32 game::NewGame(void) {
     glTimers[0] = 0;
     for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
         cTextReceivedBuffer[textBufferIndex] =
-            static_cast<char*>(H2_ALLOC_AT(GAME_TEXT_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 45));
+            static_cast<char*>(H2_ALLOC(GAME_TEXT_BUFFER_SIZE));
         strcpy(cTextReceivedBuffer[textBufferIndex], "");
     }
-    cNGKPCore = static_cast<char*>(H2_ALLOC_AT(GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 48));
-    cNGKPDisplay = static_cast<char*>(H2_ALLOC_AT(GAME_KEY_BUFFER_SIZE, RETAIL_FILE, newGameSourceLineBase + 49));
+    cNGKPCore = static_cast<char*>(H2_ALLOC(GAME_KEY_BUFFER_SIZE));
+    cNGKPDisplay = static_cast<char*>(H2_ALLOC(GAME_KEY_BUFFER_SIZE));
     strcpy(cNGKPCore, "");
     strcpy(cNGKPDisplay, "");
     NGKPcursorIndex = 0;
@@ -606,10 +605,10 @@ i32 game::NewGame(void) {
     }
 
     for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        H2_FREE_AT(cTextReceivedBuffer[textBufferIndex], RETAIL_FILE, newGameSourceLineBase + 286);
+        H2_FREE(cTextReceivedBuffer[textBufferIndex]);
     }
-    H2_FREE_AT(cNGKPCore, RETAIL_FILE, newGameSourceLineBase + 288);
-    H2_FREE_AT(cNGKPDisplay, RETAIL_FILE, newGameSourceLineBase + 289);
+    H2_FREE(cNGKPCore);
+    H2_FREE(cNGKPDisplay);
     gpResourceManager->Dispose(NGKPBkg);
     return result;
 }
@@ -769,7 +768,7 @@ void game::InitNewGameWindow(void) {
 
         if (giNumHumanPlayers > 1) {
             label = static_cast<char*>(
-                H2_ALLOC_AT(PLAYER_LABEL_CAPACITY, RETAIL_FILE, newGameWindowSourceLineBase + 80)
+                H2_ALLOC(PLAYER_LABEL_CAPACITY)
             );
             sprintf(label, " ");
             textControlLocal = new textWidget(
@@ -812,7 +811,7 @@ void game::InitNewGameWindow(void) {
         m_newGameWindow->AddWidget(iconControlLocal, -1);
 
         label = static_cast<char*>(
-            H2_ALLOC_AT(PLAYER_LABEL_CAPACITY, RETAIL_FILE, newGameWindowSourceLineBase + 112)
+            H2_ALLOC(PLAYER_LABEL_CAPACITY)
         );
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= PLAYER_RACE_NAME_NARROW_THRESHOLD) {
@@ -1843,7 +1842,7 @@ void game::ShowScenInfo(void) {
 
         if (giNumHumanPlayers > 1) {
             label = static_cast<char*>(
-                H2_ALLOC_AT(PLAYER_LABEL_CAPACITY, RETAIL_FILE, scenarioInfoSourceLineBase + 114)
+                H2_ALLOC(PLAYER_LABEL_CAPACITY)
             );
             sprintf(label, " ");
             textControlLocal = new textWidget(
@@ -1886,7 +1885,7 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         label = static_cast<char*>(
-            H2_ALLOC_AT(PLAYER_LABEL_CAPACITY, RETAIL_FILE, scenarioInfoSourceLineBase + 146)
+            H2_ALLOC(PLAYER_LABEL_CAPACITY)
         );
         sprintf(label, "A");
         if (m_mapHeader.playerCount >= PLAYER_RACE_NAME_NARROW_THRESHOLD) {
@@ -2229,4 +2228,3 @@ i32 NGKPcursorIndex;
 char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
 class icon* NGKPBkg;
 
-#undef RETAIL_FILE

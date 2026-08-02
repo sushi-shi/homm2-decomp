@@ -80,8 +80,8 @@ dropListWidget::~dropListWidget() {
     if (m_savedBackground != NULL)
         delete m_savedBackground;
     for (i32 itemIndex = 0; itemIndex < m_itemCount; itemIndex++)
-        H2_FREE_AT(m_items[itemIndex], gDropListSourceFiles.itemDestruction.text, 25);
-    H2_FREE_AT(m_items, gDropListSourceFiles.listDestruction.text, 27);
+        H2_FREE(m_items[itemIndex]);
+    H2_FREE(m_items);
 }
 
 VA(0x004cff40, 0x2f8)
@@ -151,15 +151,11 @@ void dropListWidget::DeleteItem(i32 index) {
         if (m_selectedIndex == index)
             m_selectedIndex = -1;
         if (m_itemCount == 1) {
-            H2_FREE_AT(m_items[0], gDropListSourceFiles.finalItemDestruction.text, 111);
-            H2_FREE_AT(m_items, gDropListSourceFiles.finalListDestruction.text, 112);
+            H2_FREE(m_items[0]);
+            H2_FREE(m_items);
             m_items = NULL;
         } else {
-            char** newItems = static_cast<char**>(H2_ALLOC_AT(
-                (m_itemCount - 1) * sizeof(*m_items),
-                gDropListSourceFiles.resizedListAllocation.text,
-                117
-            ));
+            char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
             memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
             if (m_itemCount - index - 1 > 0)
                 memcpy(
@@ -168,7 +164,7 @@ void dropListWidget::DeleteItem(i32 index) {
                     (m_itemCount - index - 1) * sizeof(*m_items)
                 );
             if (m_items != NULL)
-                H2_FREE_AT(m_items, gDropListSourceFiles.oldListDestruction.text, 123);
+                H2_FREE(m_items);
             m_items = newItems;
         }
         m_itemCount--;
@@ -231,26 +227,14 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                 case WIDGET_COMMAND_APPEND_ITEM:
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
-                        char** newItems = static_cast<char**>(H2_ALLOC_AT(
-                            (m_itemCount + 1) * sizeof(*m_items),
-                            gDropListSourceFiles.appendedListAllocation.text,
-                            184
-                        ));
+                        char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
                         if (m_itemCount != 0)
                             memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
-                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC_AT(
-                            strlen(text) + 1,
-                            gDropListSourceFiles.appendedTextAllocation.text,
-                            187
-                        ));
+                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
                         strcpy(newItems[m_itemCount], text);
                         m_itemCount++;
                         if (m_items != NULL)
-                            H2_FREE_AT(
-                                m_items,
-                                gDropListSourceFiles.appendedOldListDestruction.text,
-                                191
-                            );
+                            H2_FREE(m_items);
                         m_items = newItems;
                     }
                     break;
@@ -258,17 +242,9 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
                     if (m_id == message.payload.widget.id) {
                         char* text = message.payload.widget.data.text;
                         if (message.payload.widget.parameter < m_itemCount) {
-                            H2_FREE_AT(
-                                m_items[message.payload.widget.parameter],
-                                gDropListSourceFiles.replacedItemDestruction.text,
-                                173
-                            );
+                            H2_FREE(m_items[message.payload.widget.parameter]);
                             m_items[message.payload.widget.parameter] =
-                                static_cast<char*>(H2_ALLOC_AT(
-                                    strlen(text) + 1,
-                                    gDropListSourceFiles.replacementItemAllocation.text,
-                                    174
-                                ));
+                                static_cast<char*>(H2_ALLOC(strlen(text) + 1));
                             strcpy(m_items[message.payload.widget.parameter], text);
                         }
                     }

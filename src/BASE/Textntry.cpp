@@ -44,9 +44,6 @@ H2_ENUM_BEGIN(InputManagerExtendedKey)
     EXTENDED_KEY_BASE = 0x100
 H2_ENUM_END(InputManagerExtendedKey)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"
-#define TEXT_ENTRY_MAIN_SOURCE_FILES                                                    \
-    RETAIL_FILE "\0\0\0" RETAIL_FILE
 
 VA(0x004d1cc0, 0x56)
 textEntryWidget::textEntryWidget(void) : textWidget() {
@@ -93,13 +90,8 @@ textEntryWidget::textEntryWidget(
     m_preserveTextOnFocus = 0;
     m_color = FONT_DRAW_DEFAULT;
     m_rectH = m_height;
-#line 61 RETAIL_FILE
     m_text = static_cast<char*>(
-        H2_ALLOC_AT(
-            static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING,
-            RETAIL_FILE,
-            62
-        )
+        H2_ALLOC(static_cast<u16>(maxLength) + TEXT_ALLOCATION_PADDING)
     );
     strcpy(m_text, text);
     if (layout == TEXT_ENTRY_LAYOUT_INSET) {
@@ -126,11 +118,7 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
     m_maxLength = gpResourceManager->ReadWord();
 #line 99
     m_text = static_cast<char*>(
-        H2_ALLOC_AT(
-            m_maxLength + TEXT_ALLOCATION_PADDING,
-            RETAIL_FILE "\0",
-            99
-        )
+        H2_ALLOC(m_maxLength + TEXT_ALLOCATION_PADDING)
     );
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), m_maxLength);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
@@ -333,14 +321,9 @@ MessageDispatchResult textEntryWidget::Main(struct tag_message& message) {
                                     if (typed != 0) {
                                         strcpy(scratch, m_text);
 #line 388
-                                        H2_FREE_AT(m_text, TEXT_ENTRY_MAIN_SOURCE_FILES, 0x184);
+                                        H2_FREE(m_text);
 #line 389
-                                        m_text = static_cast<char*>(H2_ALLOC_AT(
-                                            strlen(edit) + EDIT_ALLOCATION_PADDING,
-                                            TEXT_ENTRY_MAIN_SOURCE_FILES
-                                                + ENTRY_SOURCE_FILE_SLOT_SIZE,
-                                            389
-                                        ));
+                                        m_text = static_cast<char*>(H2_ALLOC(strlen(edit) + EDIT_ALLOCATION_PADDING));
                                         strcpy(scratch, edit);
                                         scratch[m_cursorPosition] = typed;
                                         scratch[m_cursorPosition + 1] = 0;
@@ -490,4 +473,3 @@ void textEntryWidget::SetupDisplayString(char* source, u16 cursor) {
 
 
 
-#undef RETAIL_FILE

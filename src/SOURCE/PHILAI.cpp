@@ -400,7 +400,6 @@ H2_ENUM_BEGIN(AITownEvaluationConstant)
     TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
 H2_ENUM_END(AITownEvaluationConstant)
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\PHILAI.CPP")
 
 
 static i16 s_initAIMapLineBase = 0x1b86;
@@ -6186,67 +6185,27 @@ VA(0x0048aee1, 0xc5)
 void InitAIMapVars(void) {
     CloseAIMapVars();
     SVSearchArray.Init();
-    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC_AT(
-        MAP_WIDTH * MAP_HEIGHT * 2,
-        RETAIL_FILE,
-        s_initAIMapLineBase + 8
-    ));
+    gaiLiveChanceOfPos = static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
     gaiHeroStrategicRVOfPos =
-        static_cast<i16*>(H2_ALLOC_AT(
-            MAP_WIDTH * MAP_HEIGHT * 2,
-            RETAIL_FILE,
-            s_initAIMapLineBase + 9
-        ));
+        static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
     gaiHeroEventStratRVOfPos =
-        static_cast<i16*>(H2_ALLOC_AT(
-            MAP_WIDTH * MAP_HEIGHT * 2,
-            RETAIL_FILE,
-            s_initAIMapLineBase + 10
-        ));
-    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC_AT(
-        MAP_WIDTH * MAP_HEIGHT,
-        RETAIL_FILE,
-        s_initAIMapLineBase + 11
-    ));
-    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC_AT(
-        MAP_WIDTH * MAP_HEIGHT,
-        RETAIL_FILE,
-        s_initAIMapLineBase + 12
-    ));
+        static_cast<i16*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT * 2));
+    gaiTurnValueOfMine = static_cast<i8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT));
+    gaiEnemyHeroReachable = static_cast<i8*>(H2_ALLOC(MAP_WIDTH * MAP_HEIGHT));
 }
 
 VA(0x0048afa6, 0xda)
 void CloseAIMapVars(void) {
     if (gaiLiveChanceOfPos != NULL)
-        H2_FREE_AT(
-            gaiLiveChanceOfPos,
-            RETAIL_FILE,
-            s_closeAIMapLineBase + 1
-        );
+        H2_FREE(gaiLiveChanceOfPos);
     if (gaiHeroStrategicRVOfPos != NULL)
-        H2_FREE_AT(
-            gaiHeroStrategicRVOfPos,
-            RETAIL_FILE,
-            s_closeAIMapLineBase + 2
-        );
+        H2_FREE(gaiHeroStrategicRVOfPos);
     if (gaiHeroEventStratRVOfPos != NULL)
-        H2_FREE_AT(
-            gaiHeroEventStratRVOfPos,
-            RETAIL_FILE,
-            s_closeAIMapLineBase + 3
-        );
+        H2_FREE(gaiHeroEventStratRVOfPos);
     if (gaiTurnValueOfMine != NULL)
-        H2_FREE_AT(
-            gaiTurnValueOfMine,
-            RETAIL_FILE,
-            s_closeAIMapLineBase + 4
-        );
+        H2_FREE(gaiTurnValueOfMine);
     if (gaiEnemyHeroReachable != NULL)
-        H2_FREE_AT(
-            gaiEnemyHeroReachable,
-            RETAIL_FILE,
-            s_closeAIMapLineBase + 5
-        );
+        H2_FREE(gaiEnemyHeroReachable);
     gaiLiveChanceOfPos = NULL;
     gaiHeroStrategicRVOfPos = NULL;
     gaiHeroEventStratRVOfPos = NULL;
@@ -6876,4 +6835,3 @@ b32 gbTroopReload;
 i32 giCurAIHeroLuck;
 b32 gbActualShipyardFound;
 
-#undef RETAIL_FILE

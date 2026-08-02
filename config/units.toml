@@ -38,14 +38,9 @@ unit = "BASE/MilesSound"
 source = "src/BASE/MilesSound.cpp"
 
 [[unit]]
-unit = "BASE/BASEMGR"
-source = "src/BASE/BASEMGR.cpp"
-flags = "o2"
-
-[[unit]]
 unit = "BASE/BITMAP"
 source = "src/BASE/BITMAP.cpp"
-flags = "o2"
+flags = "base_gx"
 
 [[unit]]
 unit = "BASE/BITS"
@@ -55,17 +50,17 @@ flags = "o1_frame"
 [[unit]]
 unit = "BASE/BORDER"
 source = "src/BASE/BORDER.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/BUTTON"
 source = "src/BASE/BUTTON.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Blur"
 source = "src/BASE/Blur.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Bzip"
@@ -75,12 +70,12 @@ flags = "base"
 [[unit]]
 unit = "BASE/DIMMER"
 source = "src/BASE/DIMMER.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/EXEC"
 source = "src/BASE/EXEC.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/FONT"
@@ -90,52 +85,52 @@ flags = "base_oi"
 [[unit]]
 unit = "BASE/ICON"
 source = "src/BASE/ICON.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/ICONWDGT"
 source = "src/BASE/ICONWDGT.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/INPUTMGR"
 source = "src/BASE/INPUTMGR.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Icon2b"
 source = "src/BASE/Icon2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Icond2b"
 source = "src/BASE/Icond2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Icondf2b"
 source = "src/BASE/Icondf2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Iconf2b"
 source = "src/BASE/Iconf2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Iconm2b"
 source = "src/BASE/Iconm2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Iconmf2b"
 source = "src/BASE/Iconmf2b.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/MOUSEMGR"
 source = "src/BASE/MOUSEMGR.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/MusicFlags"
@@ -144,17 +139,17 @@ source = "src/BASE/MusicFlags.cpp"
 [[unit]]
 unit = "BASE/Midi"
 source = "src/BASE/Midi.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Misc"
 source = "src/BASE/Misc.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/PALETTE"
 source = "src/BASE/PALETTE.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/RESMGR"
@@ -164,42 +159,42 @@ flags = "base_oi"
 [[unit]]
 unit = "BASE/RESOURCE"
 source = "src/BASE/RESOURCE.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Ripple"
 source = "src/BASE/Ripple.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/SAMPLE"
 source = "src/BASE/SAMPLE.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/TEXTWDGT"
 source = "src/BASE/TEXTWDGT.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/TILE"
 source = "src/BASE/TILE.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/TILESET"
 source = "src/BASE/TILESET.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/Textntry"
 source = "src/BASE/Textntry.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/WIDGET"
 source = "src/BASE/WIDGET.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/WINDOW"
@@ -209,52 +204,57 @@ flags = "base"
 [[unit]]
 unit = "BASE/WINMGR"
 source = "src/BASE/WINMGR.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/bmap2"
 source = "src/BASE/bmap2.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/droplist"
 source = "src/BASE/droplist.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/icon2bc"
 source = "src/BASE/icon2bc.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/icon2bs"
 source = "src/BASE/icon2bs.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/icon2by"
 source = "src/BASE/icon2by.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/iconf2bc"
 source = "src/BASE/iconf2bc.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/iconf2by"
 source = "src/BASE/iconf2by.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/listbox"
 source = "src/BASE/listbox.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "BASE/miscwin"
 source = "src/BASE/miscwin.cpp"
-flags = "o2"
+flags = "base"
+
+[[unit]]
+unit = "BASE/BASEMGR"
+source = "src/BASE/BASEMGR.cpp"
+flags = "base"
 
 [[unit]]
 unit = "BASE/soundmgr"
@@ -324,7 +324,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/FINDPATH"
 source = "src/SOURCE/FINDPATH.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "SOURCE/FLY"
@@ -409,7 +409,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/SEARCH"
 source = "src/SOURCE/SEARCH.cpp"
-flags = "o2"
+flags = "base"
 
 [[unit]]
 unit = "SOURCE/SETUP"

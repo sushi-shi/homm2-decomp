@@ -19,6 +19,14 @@ struct AudiereSampleNode {
     }
 };
 
+// Retail keeps the music stream/source as static class members: their atexit
+// teardowns carry VC6's member-static destroy-once guard (one flag byte,
+// bit per member), which file-scope statics never get.
+struct AudiereMusicState {
+    static audiere::OutputStreamPtr stream;
+    static audiere::SampleSourcePtr source;
+};
+
 void StartupMilesSamples(struct _DIG_DRIVER* driver);
 void AllocateMilesSampleHandles(struct _DIG_DRIVER* driver);
 void StopMilesSample(class sample* sampleResource);

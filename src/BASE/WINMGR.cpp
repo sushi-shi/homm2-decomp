@@ -76,9 +76,7 @@ static inline u32& FadeSavedUpdate(void) {
 
 #undef DATA
 #include <va.h>
-#include <BASE/WINMGR_TYPES.h>
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\WINMGR.CPP"
 
 i32 iCombatCycleFrame = 0;
 b32 gbEveryOtherCycle = true;
@@ -86,15 +84,6 @@ i32 iCycle1Count = 0;
 i32 iCycle2Count = 0;
 i32 iCycle3Count = 0;
 i32 iDialogNestCount = 0;
-static SWindowManagerText gWindowManagerText = {
-    "heroWindowManager",
-    "SHOT%04d.PCX",
-    RETAIL_FILE,
-    RETAIL_FILE,
-    "CCYCLE%02d.BIN",
-    RETAIL_FILE,
-    RETAIL_FILE
-};
 
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>
@@ -333,7 +322,7 @@ i32 heroWindowManager::Open(i32 managerOrder) {
     m_priority = managerOrder;
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
     m_active = true;
-    strcpy(m_name, gWindowManagerText.managerName);
+    strcpy(m_name, "heroWindowManager");
     return 0;
 }
 
@@ -592,7 +581,7 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
 VA(0x004b77d0, 0x63)
 void heroWindowManager::ScreenShot(void) {
     char local_10[SCREENSHOT_FILENAME_CAPACITY];
-    sprintf(local_10, gWindowManagerText.screenshotFormat, m_screenshotIndex);
+    sprintf(local_10, "SHOT%04d.PCX", m_screenshotIndex);
     CreatePCXFile(
         local_10,
         m_screen->m_pixels,
@@ -662,22 +651,14 @@ void heroWindowManager::FizzleForward(
             m_updateFlags = 0;
             if (delay == -1)
                 delay = FIZZLE_DEFAULT_DELAY;
-            i8* fadePalette = static_cast<i8*>(H2_ALLOC_AT(
-                PALETTE_BYTE_COUNT,
-                gWindowManagerText.fadePaletteAllocSource,
-                808
-            ));
+            i8* fadePalette = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
             m_fizzleWork =
                 new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-            i8* cycleTable = static_cast<i8*>(H2_ALLOC_AT(
-                FIZZLE_CYCLE_TABLE_BYTES,
-                gWindowManagerText.cycleTableAllocSource,
-                810
-            ));
+            i8* cycleTable = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
             BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
 
             for (i32 frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
-                sprintf(gText, gWindowManagerText.cycleFilenameFormat, frame);
+                sprintf(gText, "CCYCLE%02d.BIN", frame);
                 u32l id = gpResourceManager->MakeId(gText, 1);
                 gpResourceManager->PointToFile(id);
                 gpResourceManager->ReadBlock(cycleTable, FIZZLE_CYCLE_TABLE_BYTES);
@@ -728,8 +709,8 @@ void heroWindowManager::FizzleForward(
             if (m_fizzleWork != NULL)
                 delete m_fizzleWork;
             m_fizzleWork = NULL;
-            H2_FREE_AT(cycleTable, gWindowManagerText.cycleTableFreeSource, 897);
-            H2_FREE_AT(fadePalette, gWindowManagerText.fadePaletteFreeSource, 898);
+            H2_FREE(cycleTable);
+            H2_FREE(fadePalette);
         }
     }
 }
@@ -749,4 +730,3 @@ void CreateColorLookupTables(void) {}
 
 
 
-#undef RETAIL_FILE

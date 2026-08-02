@@ -157,18 +157,10 @@ void mouseManager::Close(void) {
                 DestroyIcon(hMouseCursor[cursorIndex]);
             hMouseCursor[cursorIndex] = NULL;
             if (cAndBits[cursorIndex] != NULL)
-                H2_FREE_AT(
-                    cAndBits[cursorIndex],
-                    gMouseManagerStrings.andMaskDestruction.text,
-                    330
-                );
+                H2_FREE(cAndBits[cursorIndex]);
             cAndBits[cursorIndex] = NULL;
             if (cColorBits[cursorIndex] != NULL)
-                H2_FREE_AT(
-                    cColorBits[cursorIndex],
-                    gMouseManagerStrings.colorBitsDestruction.text,
-                    334
-                );
+                H2_FREE(cColorBits[cursorIndex]);
             cColorBits[cursorIndex] = NULL;
             if (hbmpAndMask[cursorIndex] != NULL)
                 DeleteObject(hbmpAndMask[cursorIndex]);
@@ -254,16 +246,8 @@ void mouseManager::SetPointer(i32 frame) {
         NewUpdate(1);
     } else {
         if (hMouseCursor[m_cursorSizeIndex] == NULL) {
-            cColorBits[m_cursorSizeIndex] = H2_ALLOC_AT(
-                MOUSE_CURSOR_COLOR_BYTES,
-                gMouseManagerStrings.colorBitsAllocation.text,
-                480
-            );
-            cAndBits[m_cursorSizeIndex] = H2_ALLOC_AT(
-                MOUSE_CURSOR_AND_BYTES,
-                gMouseManagerStrings.andBitsAllocation.text,
-                481
-            );
+            cColorBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_COLOR_BYTES);
+            cAndBits[m_cursorSizeIndex] = H2_ALLOC(MOUSE_CURSOR_AND_BYTES);
 
             char filename[RESOURCE_NAME_CAPACITY];
             if (m_cursorType == MOUSE_CURSOR_ADVENTURE)

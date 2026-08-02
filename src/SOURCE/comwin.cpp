@@ -36,7 +36,6 @@ H2_ENUM_BEGIN(ComSerialConstant)
     READ_RESULT_WORD_COUNT = 2
 H2_ENUM_END(ComSerialConstant)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\comwin.cpp"
 
 static i16 s_comTermSourceLineBase = 199;
 static i16 s_comSendSourceLineBase = 247;
@@ -249,9 +248,9 @@ void com_term(i16 portIndex) {
         s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
 
         while ((node = pop_node(&s_comPorts[portIndex].normalQueue)) != NULL)
-            H2_FREE_AT(node, RETAIL_FILE, s_comTermSourceLineBase + 13);
+            H2_FREE(node);
         while ((node = pop_node(&s_comPorts[portIndex].priorityQueue)) != NULL)
-            H2_FREE_AT(node, RETAIL_FILE, s_comTermSourceLineBase + 17);
+            H2_FREE(node);
     }
 }
 
@@ -304,7 +303,7 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
             return 0;
         }
         sendNode = static_cast<tag_Node*>(
-            H2_ALLOC_AT(length + NODE_HEADER_SIZE, RETAIL_FILE, s_comSendSourceLineBase + 16)
+            H2_ALLOC(length + NODE_HEADER_SIZE)
         );
         if (sendNode != NULL) {
             sendNode->len = length;
@@ -363,8 +362,7 @@ void comm_wrt_task(void) {
                 ShutdownComError("Write communications data");
             writtenTotal += bytesWritten;
         }
-        H2_FREE_AT(packetNode, RETAIL_FILE, s_comWriteSourceLineBase + 28);
+        H2_FREE(packetNode);
     }
 }
 
-#undef RETAIL_FILE

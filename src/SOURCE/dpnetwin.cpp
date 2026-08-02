@@ -14,6 +14,8 @@
 #include <BASE/widget.h>
 #include <SOURCE/dpnetwin.h>
 
+#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\DPNETWIN.CPP"
+
 H2_ENUM_CLASS_BEGIN(DirectPlaySessionOpenFlag)
     SESSION_OPEN_JOIN   = 1,
     SESSION_OPEN_CREATE = 2
@@ -32,7 +34,6 @@ H2_ENUM_BEGIN(DirectPlayStorageConstant)
     STATUS_TEXT_SIZE               = 32
 H2_ENUM_END(DirectPlayStorageConstant)
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
 VA(0x00436770, 0x81)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
@@ -89,14 +90,8 @@ i16 dpnet_init(void) {
     if (lpIDC != NULL)
         return 0;
     {
-        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC_AT(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*), RETAIL_FILE,
-            initSourceLineBase + 7
-        ));
-        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC_AT(
-            DP_TRANSPORT_BUFFER_COUNT * sizeof(i32), RETAIL_FILE,
-            initSourceLineBase + 8
-        ));
+        ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
+        piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(DP_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
         memset(ppDPRcvBuffer, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
         memset(piDPRcvBufferSize, 0, DP_TRANSPORT_BUFFER_COUNT * sizeof(i32));
         hinstDplayx = LoadLibraryA("DPLAYX.DLL");
@@ -203,10 +198,10 @@ void dpnet_term(void) {
     while (dpnet_rcv(0, DP_TRANSPORT_TERM_DRAIN_READ_SIZE, drainBuffer) != 0) {
     }
     if (ppDPRcvBuffer != NULL)
-        H2_FREE_AT(ppDPRcvBuffer, RETAIL_FILE, termSourceLineBase + 14);
+        H2_FREE(ppDPRcvBuffer);
     ppDPRcvBuffer = NULL;
     if (piDPRcvBufferSize != NULL)
-        H2_FREE_AT(piDPRcvBufferSize, RETAIL_FILE, termSourceLineBase + 18);
+        H2_FREE(piDPRcvBufferSize);
     piDPRcvBufferSize = NULL;
     if (hinstDplayx != NULL)
         FreeLibrary(hinstDplayx);
@@ -222,7 +217,7 @@ void dpSendMessage(
     void* data
 ) {
     static i16 sendSourceLineBase = 254;
-    u8* message = static_cast<u8*>(H2_ALLOC_AT(size + 1, RETAIL_FILE, sendSourceLineBase + 2));
+    u8* message = static_cast<u8*>(H2_ALLOC(size + 1));
     i32 result;
 
     message[0] = static_cast<u8>(type);
@@ -233,7 +228,7 @@ void dpSendMessage(
         && result != RESULT_INVALID_ARGUMENT) {
         DPSD(result, RETAIL_FILE, sendSourceLineBase + 14);
     }
-    H2_FREE_AT(message, RETAIL_FILE, sendSourceLineBase + 16);
+    H2_FREE(message);
 }
 
 VA(0x00436da4, 0x48)
@@ -259,9 +254,7 @@ i16 dpnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    H2_FREE_AT(
-        ppDPRcvBuffer[iDPRcvBufferTail], RETAIL_FILE, receiveSourceLineBase + 9
-    );
+    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail]);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % DP_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -315,9 +308,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC_AT(
-                size - 1, RETAIL_FILE, evaluateSourceLineBase + 8
-            ));
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % DP_TRANSPORT_BUFFER_COUNT;
@@ -665,4 +656,3 @@ i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
 i32 iSessionToTry;
 i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
 
-#undef RETAIL_FILE

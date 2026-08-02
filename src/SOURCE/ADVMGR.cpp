@@ -959,7 +959,6 @@ H2_ENUM_CLASS_BEGIN(AdventureMusicQuality)
     MUSIC_QUALITY_CD_OPERA  = 2
 H2_ENUM_CLASS_END(AdventureMusicQuality)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\ADVMGR.CPP"
 #define ADVMGR_ENVIRONMENT_VOLUME(distance) environmentVolumes[distance]
 #define ADVMGR_REMOTE_PAYLOAD(packet) (reinterpret_cast<AdventureRemotePayload*>((packet)->payload))
 
@@ -1284,7 +1283,7 @@ void advManager::Close(void) {
         gpSoundManager->StopAllSamples(0);
     }
     if (m_adventureBorder != NULL) {
-        H2_FREE_AT(m_adventureBorder, RETAIL_FILE, s_closeBorderFreeLineBase + BORDER_INITIAL_FREE_LINE_OFFSET);
+        H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
     }
 
@@ -1626,7 +1625,7 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
     if (!gbNoSound && gConfig.musicVolume != CONFIG_VOLUME_MUTED && giForceSwitchMusic > 0
         && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY) {
         giForceSwitchMusic = -1;
-        if (gpSoundManager->m_backendState.buka.currentTrack == WAIT_AMBIENT_MUSIC) {
+        if (gpSoundManager->m_musicTrack == WAIT_AMBIENT_MUSIC) {
             gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
         }
         SetEnvironmentOrigin(
@@ -5787,10 +5786,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
     week = static_cast<char*>(
-        H2_ALLOC_AT(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE, RETAIL_FILE,
-            s_newTurnLineBase + IDX(NEW_TURN_WEEK_ALLOC_LINE_OFFSET)
-        )
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE)
     );
     sprintf(week, "%s: %d  %s: %d", "Month", gpGame->m_month, "Week", gpGame->m_week);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5811,10 +5807,7 @@ i32 advManager::UpdBottomViewNewTurn(void) {
     m_adventureWindow->AddWidget(m_bottomViewAllTexts[0], -1);
 
     day = static_cast<char*>(
-        H2_ALLOC_AT(
-            BOTTOM_VIEW_TEXT_BUFFER_SIZE, RETAIL_FILE,
-            s_newTurnLineBase + IDX(NEW_TURN_DAY_ALLOC_LINE_OFFSET)
-        )
+        H2_ALLOC(BOTTOM_VIEW_TEXT_BUFFER_SIZE)
     );
     sprintf(day, "%s: %d", "Day", gpGame->m_day);
     m_bottomViewAllTexts[0] = new textWidget(
@@ -5876,10 +5869,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
         textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
     }
-    messageText2 = static_cast<char*>(H2_ALLOC_AT(
-        strlen(gcBottomViewText) + 1, RETAIL_FILE,
-        s_resourceViewLineBase + IDX(RESOURCE_VIEW_MESSAGE_ALLOC_LINE_OFFSET)
-    ));
+    messageText2 = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
     sprintf(messageText2, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
         BOTTOM_VIEW_PANEL_X,
@@ -5925,10 +5915,7 @@ i32 advManager::UpdBottomViewResMsg(void) {
         }
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-        resourceCountText6 = static_cast<char*>(H2_ALLOC_AT(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE, RETAIL_FILE,
-            s_resourceViewLineBase + IDX(RESOURCE_VIEW_COUNT_ALLOC_LINE_OFFSET)
-        ));
+        resourceCountText6 = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
             RESOURCE_VIEW_COUNT_X,
@@ -6032,10 +6019,7 @@ i32 advManager::UpdBottomViewKingdom(void) {
     }
 
     for (index11 = 0; index11 < KINGDOM_VIEW_ENTRY_COUNT; ++index11) {
-        countText14[index11] = static_cast<char*>(H2_ALLOC_AT(
-            BOTTOM_VIEW_COUNT_BUFFER_SIZE, RETAIL_FILE,
-            s_kingdomViewLineBase + IDX(KINGDOM_VIEW_COUNT_ALLOC_LINE_OFFSET)
-        ));
+        countText14[index11] = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
         if (index11 < KINGDOM_VIEW_RESOURCE_COUNT) {
             sprintf(countText14[index11], "%d", gpCurPlayer->m_resources[index11]);
         } else if (index11 == KINGDOM_VIEW_CASTLE_ENTRY) {
@@ -6133,10 +6117,7 @@ i32 advManager::UpdBottomViewHero(void) {
                     {0, 1, 5, 6, 7}
                 };
 
-                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC_AT(
-                    BOTTOM_HERO_LABEL_BYTES, RETAIL_FILE,
-                    s_bottomHeroLineBase + BOTTOM_HERO_ALLOC_LINE_OFFSET
-                ));
+                armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC(BOTTOM_HERO_LABEL_BYTES));
                 if (targetHero->m_army.m_creatureCounts[armySlot]
                     > BOTTOM_HERO_MAX_FULL_COUNT) {
                     sprintf(
@@ -6360,10 +6341,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                         MemError();
                     }
                     armyLabelsStrings[armyIndex] = static_cast<char*>(
-                        H2_ALLOC_AT(
-                            HERO_QUICK_ARMY_LABEL_CAPACITY, RETAIL_FILE,
-                            s_quickViewLineBase + QUICK_VIEW_FIRST_ALLOC_LINE_OFFSET
-                        )
+                        H2_ALLOC(HERO_QUICK_ARMY_LABEL_CAPACITY)
                     );
                     sprintf(
                         armyLabelsStrings[armyIndex],
@@ -6452,7 +6430,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                 MemError();
             }
             armyLabelsStrings[armyIndex] =
-                static_cast<char*>(H2_ALLOC_AT(15, RETAIL_FILE, s_quickViewLineBase + QUICK_VIEW_SECOND_ALLOC_LINE_OFFSET));
+                static_cast<char*>(H2_ALLOC(15));
             strcpy(
                 armyLabelsStrings[armyIndex],
                 GetArmySizeName(
@@ -6519,7 +6497,7 @@ void advManager::HeroQuickView(i32 heroId, i32 locatorSlot, i32 windowX, i32 win
                     MemError();
                 }
                 armyLabelsStrings[armyIndex] = static_cast<char*>(
-                    H2_ALLOC_AT(15, RETAIL_FILE, s_quickViewLineBase + QUICK_VIEW_THIRD_ALLOC_LINE_OFFSET)
+                    H2_ALLOC(15)
                 );
                 strcpy(
                     armyLabelsStrings[armyIndex],
@@ -6725,10 +6703,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
     }
 
     if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN || armyCountLocal == 0) {
-        emptyArmyLabel = static_cast<char*>(H2_ALLOC_AT(
-            TOWN_QUICK_EMPTY_LABEL_CAPACITY, RETAIL_FILE,
-            s_townViewLineBase + TOWN_VIEW_FIRST_ALLOC_LINE_OFFSET
-        ));
+        emptyArmyLabel = static_cast<char*>(H2_ALLOC(TOWN_QUICK_EMPTY_LABEL_CAPACITY));
         if (informationLevel == TOWN_QUICK_INFORMATION_UNKNOWN) {
             sprintf(emptyArmyLabel, "Unknown");
         } else {
@@ -6826,10 +6801,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
             if (armyIcons[widgetIndexWidget] == NULL) {
                 MemError();
             }
-            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
-                TOWN_QUICK_ARMY_LABEL_CAPACITY, RETAIL_FILE,
-                s_townViewLineBase + TOWN_VIEW_SECOND_ALLOC_LINE_OFFSET
-            ));
+            armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
             if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                 sprintf(
                     armyLabelsResult[widgetIndexWidget],
@@ -6910,10 +6882,7 @@ void advManager::TownQuickView(i32 townId, i32 locatorSlot, i32 windowX, i32 win
                 if (armyIcons[widgetIndexWidget] == NULL) {
                     MemError();
                 }
-                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC_AT(
-                    TOWN_QUICK_ARMY_LABEL_CAPACITY, RETAIL_FILE,
-                    s_townViewLineBase + TOWN_VIEW_THIRD_ALLOC_LINE_OFFSET
-                ));
+                armyLabelsResult[widgetIndexWidget] = static_cast<char*>(H2_ALLOC(TOWN_QUICK_ARMY_LABEL_CAPACITY));
                 if (informationLevel == TOWN_QUICK_INFORMATION_EXACT) {
                     sprintf(
                         armyLabelsResult[widgetIndexWidget],
@@ -6986,10 +6955,7 @@ void advManager::RedrawAdvScreen(i32 update, i32 freeBorder) {
     }
     gpResourceManager->GetBackdrop("advbord.icn", gpWindowManager->m_screen, 1);
     if (freeBorder) {
-        H2_FREE_AT(
-            m_adventureBorder, RETAIL_FILE,
-            s_redrawBorderFreeLineBase + BORDER_SECONDARY_FREE_LINE_OFFSET
-        );
+        H2_FREE(m_adventureBorder);
         m_adventureBorder = NULL;
     }
     SaveAdventureBorder();
@@ -9472,7 +9438,7 @@ void advManager::SaveAdventureBorder(void) {
     }
 
     m_adventureBorder = static_cast<u8*>(
-        H2_ALLOC_AT(BORDER_BUFFER_SIZE, RETAIL_FILE, s_saveBorderAllocLineBase + BORDER_ALLOC_LINE_OFFSET)
+        H2_ALLOC(BORDER_BUFFER_SIZE)
     );
     u8* savedPixels = m_adventureBorder;
     u8* screenPixel = gpWindowManager->m_screen->m_pixels;
@@ -10384,7 +10350,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED
-                                && gpSoundManager->m_backendState.buka.digitalDriver == NULL) {
+                                && gpSoundManager->m_digitalDriver == NULL) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
@@ -10784,4 +10750,3 @@ i8 bComboDraw[COMBO_GRID_CELLS][COMBO_GRID_CELLS];
 struct tag_message CDMsg;
 i32 iLastAnimFrame;
 
-#undef RETAIL_FILE
