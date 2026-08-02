@@ -77,7 +77,7 @@ def function_bodies(obj_path: Path):
             if index != section.index:
                 continue
             target = coff.symbols.get(reloc.symbol_index)
-            addend = struct.unpack_from("<I", payload, site)[0] \
+            addend = struct.unpack_from("<i", payload, site)[0] \
                 if site + 4 <= len(payload) else 0
             section_relocs.append(
                 (site, reloc.typ, target.name if target else None, addend))
@@ -233,7 +233,7 @@ def main(argv=None):
         print("function_rva\ttarget_rva\tsite_rva\towner\taddend\toccurrences",
               file=stream)
         for fn, tgt, site, sym, addend in sorted(alias_rows, key=lambda r: r[2]):
-            print(f"0x{fn:x}\t0x{tgt:x}\t0x{site:x}\t{sym}\t0x{addend:x}\t1",
+            print(f"0x{fn:x}\t0x{tgt:x}\t0x{site:x}\t{sym}\t0x{addend & 0xffffffff:x}\t1",
                   file=stream)
     print(f"[reloc-donation] {len(alias_rows)} interior sites aliased to "
           f"owner+addend -> {ALIASES}")
