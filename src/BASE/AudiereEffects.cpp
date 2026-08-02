@@ -139,11 +139,11 @@ VA(0x004ccd40, 0x63)
 void SetAudiereSampleVolume(class sample* sampleResource, i32 volume) {
     if (AudiereSampleIterationActive())
         return;
-    float convertedVolume =
+    float sampleVolume =
         gpSoundManager->ConvertVolumeFloat(volume, SOUND_VOLUME_EFFECT);
-    AudiereSampleNode* node = FindAudiereSample(sampleResource);
-    if (node != NULL)
-        node->stream->setVolume(convertedVolume);
+    AudiereSampleNode* sampleNode = FindAudiereSample(sampleResource);
+    if (sampleNode != NULL)
+        sampleNode->stream->setVolume(sampleVolume);
 }
 
 VA(0x004ccdb0, 0x62)
@@ -173,10 +173,11 @@ VA(0x004ccea0, 0x6b)
 void SetAllAudiereSampleVolumes(i32 volume) {
     if (AudiereSampleIterationActive())
         return;
-    float convertedVolume =
+    float sampleVolume =
         gpSoundManager->ConvertVolumeFloat(volume, SOUND_VOLUME_EFFECT);
-    for (AudiereSampleNode* node = gAudiereSampleList; node != NULL; node = node->next)
-        node->stream->setVolume(convertedVolume);
+    for (AudiereSampleNode* sampleNode = gAudiereSampleList; sampleNode != NULL;
+         sampleNode = sampleNode->next)
+        sampleNode->stream->setVolume(sampleVolume);
 }
 
 VA(0x004ccf10, 0x12)

@@ -9,8 +9,8 @@ BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	64f87f82c508
 BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	4.1304	9733ba51555a
 BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	99.5683	b59c2a03369f
 BASE/AudiereEffects	?PurgeFinishedAudiereSamples@@YIXXZ	100.0000	96434c35e788
-BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	99.8205	d49ffc2f938f
-BASE/AudiereEffects	?SetAudiereSampleVolume@@YIXPAVsample@@H@Z	99.8611	c082b320e8dd
+BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	100.0000	c5bce4cf8033
+BASE/AudiereEffects	?SetAudiereSampleVolume@@YIXPAVsample@@H@Z	100.0000	e38b19c6a90a
 BASE/AudiereEffects	?StopAllAudiereSamples@@YIXXZ	100.0000	ee7498c4b36a
 BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
