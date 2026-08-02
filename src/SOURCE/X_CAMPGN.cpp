@@ -1269,8 +1269,8 @@ ExpansionCampaignId ExpCampaign::Choose(void) {
 VA(0x004b517b, 0x58)
 i16 ExpCampaign::Days(void) {
     return (m_mapDays[IDX(m_currentMap)]
-            + (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK)
-           + (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH + gpGame->m_day;
+            + (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH)
+           + (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK + gpGame->m_day;
 }
 
 VA(0x004b51d3, 0x10)

@@ -5,7 +5,7 @@
 
 VA(0x00479b00, 0x23)
 void DelayTil(i32* endTime) {
-    while (KBTickCount() < *endTime) {
+    while (*endTime > KBTickCount()) {
         Process1WindowsMessage();
         PollSound();
     }
