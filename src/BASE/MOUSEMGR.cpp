@@ -128,18 +128,18 @@ i32 mouseManager::Open(i32 priority) {
     m_savedLeft = MOUSE_SCREEN_CENTER_X - 1;
     m_savedTop = MOUSE_SCREEN_CENTER_Y - 1;
     m_cursorRight = MOUSE_SCREEN_CENTER_X;
+    m_cursorBottom = MOUSE_SCREEN_CENTER_Y;
     m_cursorLeft = MOUSE_SCREEN_CENTER_X - 1;
     m_cursorTop = MOUSE_SCREEN_CENTER_Y - 1;
     m_mouseX = MOUSE_SCREEN_CENTER_X;
+    m_mouseY = MOUSE_SCREEN_CENTER_Y;
     m_cursorSizeIndex = 0;
     m_drawnCursorSizeIndex = 0;
-    m_cursorBottom = MOUSE_SCREEN_CENTER_Y;
-    m_mouseY = MOUSE_SCREEN_CENTER_Y;
     if (gbColorMice != 0)
         ShowCursor(0);
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_UP;
-    m_active = true;
     m_priority = priority;
+    m_active = true;
     return 0;
 }
 

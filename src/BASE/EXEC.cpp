@@ -70,12 +70,13 @@ VA(0x004c5010, 0xb8)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
-    baseManager* next = m_managerListHead;
-    baseManager* cur;
-    while ((cur = next) != NULL) {
+    baseManager* next;
+    baseManager* cur = m_managerListHead;
+    while (cur != NULL) {
         next = cur->m_next;
         if (cur != gpWindowManager && cur != gpMouseManager)
             RemoveManager(cur);
+        cur = next;
     }
     if (gpWindowManager->m_active == 1)
         RemoveManager(gpWindowManager);
