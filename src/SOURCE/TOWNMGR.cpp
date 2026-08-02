@@ -2086,7 +2086,6 @@ i32 townManager::BuyBuild(
     i32 cannotBuy,
     i32 quickView
 ) {
-    static i16 sourceLineBase = 0x0948;
     u32l prerequisiteMask_c;
     i32 prerequisiteCount_p;
     i16 dialogLeft_a;
@@ -3137,7 +3136,6 @@ void townManager::SetupWell(heroWindow* window) {
 
 VA(0x004ab344, 0xde3)
 void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
-    static i16 sourceLineBase = 0x0e0e;
     i16 unusedRankX_last = THIEVES_RANK_FIRST_X;
     i16 unusedRankWidth_category = THIEVES_PLAYER_COLUMN_WIDTH;
     i16 unusedRankY_j = THIEVES_FIRST_CATEGORY_Y;

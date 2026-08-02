@@ -59,8 +59,6 @@ i8 bInTimeoutFail = 0;
 i32
     iBaud[REMOTE_BAUD_RATE_COUNT] = {300, 1200, 2400, 9600, 19200, 38400, 57600, 0};
 i32 iIRQ[REMOTE_IRQ_COUNT] = {1, 2, 3, 4, 5, 7, 9};
-static i16 gGetRemoteDataLineBase = 716;
-static i16 gPollRemoteLineBase = 757;
 
 VA(0x0048d050, 0x15c)
 void RemoteCleanup(void) {

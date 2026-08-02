@@ -7850,7 +7850,6 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
 VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
-    static i16 sourceLineBase = 0x1655;
     hero* secondHero9;
     i32 setupCombatY8;
     i32 combatX1;
@@ -7949,7 +7948,6 @@ CombatResult advManager::DoCombat(
     i32 randomSeed,
     i32 processLosses
 ) {
-    static i16 sourceLineBase = 0x16ba;
     armyGroup* receivedSecondArmy2;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
@@ -8163,7 +8161,6 @@ void advManager::SendHeroTownData(
     i32 retreatWin,
     i32 combatSurrender
 ) {
-    static i16 sourceLineBase = 0x17cc;
     char* reply;
     i32 result;
     combatRemoteData* buffer = NULL;
@@ -8303,7 +8300,6 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    static i16 sourceLineBase = 0x183d;
     i32 hasFirstHero7;
     i32 hasTown0;
     i32 hasSecondHero8;

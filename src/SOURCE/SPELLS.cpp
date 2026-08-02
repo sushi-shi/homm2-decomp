@@ -2600,7 +2600,6 @@ VA(0x0049e2b3, 0x267)
 void combatManager::VaporizeCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex
 ) {
-    static i16 vaporizeSourceLineBase = 2524;
     i32 rowCount;
     i32 row9;
     i32 height0;
@@ -2663,7 +2662,6 @@ VA(0x0049e51a, 0x4ed)
 void combatManager::RippleCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex, CombatRippleMode mode
 ) {
-    static i16 rippleSourceLineBase = 2587;
     i32 end;
     float amplitudeStep1;
     i32 start0;

@@ -28,6 +28,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   line)` is live in MOUSEMGR, RESMGR, netwin, dpnetwin, and wingraph with
   `e:\Users\igorl\...` path strings; every other TU's asserts were compiled
   out. (Our MOUSEMGR reconstruction is still missing its retail asserts.)
+- **[Buka] No /Gi line machinery.** The PoL-era `*SourceLineBase` statics
+  (VC4.2 `/Gi` __LINE__Var lowering) have no VC6 counterpart; retail passes
+  literal line numbers where file/line machinery survives at all. All 76
+  statics folded to literals and removed.
 - **[Buka] /QIfdiv off.** Retail game code carries raw `fdiv` instructions
   (hundreds of sites; PHILAI alone has ~90) and links no `_adj_fdiv_*`
   helpers; the PoL-era `/QIfdiv` flag made VC6 emit `__adj_fdiv_m64` calls

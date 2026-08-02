@@ -37,9 +37,6 @@ H2_ENUM_BEGIN(ComSerialConstant)
 H2_ENUM_END(ComSerialConstant)
 
 
-static i16 s_comTermSourceLineBase = 199;
-static i16 s_comSendSourceLineBase = 247;
-static i16 s_comWriteSourceLineBase = 310;
 static ComPortState s_comPorts[PORT_COUNT];
 
 
