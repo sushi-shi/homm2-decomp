@@ -132,7 +132,9 @@ def main(argv=None):
             if not masked_equal(ours, retail, sites):
                 continue
             dir32 = [entry for entry in sites
-                     if entry[1] == IMAGE_DIR32 and entry[0] + 4 <= size]
+                     if entry[1] == IMAGE_DIR32 and entry[0] + 4 <= size
+                     and not (entry[2] or "").startswith(
+                         ("__ehhandler", "__unwindfunclet", "__catch"))]
             keep = True
             fn_sites = []
             for off, _kind, symbol, addend in dir32:
@@ -147,7 +149,13 @@ def main(argv=None):
             functions_used += 1
             for site, target, symbol, addend in fn_sites:
                 donated[site] = target
-                if symbol and not symbol.startswith(("__real@", "??_C@", "$SG")):
+                # TU-local artifacts never vote: $L jump-table/branch labels
+                # (their name is a compile accident and planting them as PDB
+                # data owners re-splits the delinked table relocs), string and
+                # float literals, and per-function EH funclet labels.
+                if symbol and not symbol.startswith(
+                        ("__real@", "??_C@", "$SG", "$L",
+                         "__ehhandler", "__unwindfunclet", "__catch")):
                     # our object stores the addend in the field, so the
                     # symbol's linked address is target - addend
                     owner_rva = target - IMAGE_BASE - addend
