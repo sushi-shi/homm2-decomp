@@ -2028,19 +2028,19 @@ void game::GetLossConditionText(char* text) {
     hero* lossHero11;
     i32 day26;
     i32 month19;
-    town* lossTown9;
+    town* city2;
     i32 townId12;
 
     if (m_mapHeader.lossCondition != MAP_LOSS_STANDARD) {
         switch (m_mapHeader.lossCondition) {
             case MAP_LOSS_TOWN:
                 townId12 = GetTownId(m_mapHeader.lossConditionValue, m_mapHeader.lossTownY);
-                lossTown9 = GetTown(townId12);
+                city2 = GetTown(townId12);
                 sprintf(
                     text,
                     "Lose the %s '%s'.",
-                    (lossTown9->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
-                    lossTown9->m_name
+                    (city2->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
+                    city2->m_name
                 );
                 break;
 

@@ -35,28 +35,28 @@ i32 town::HasGarrison(void) {
 
 VA(0x004a4089, 0xde)
 void town::GiveSpells(hero* targetHero) {
-    hero* activeHero;
-    i32 level;
-    i32 slot;
+    hero* pupil;
+    i32 stage;
+    i32 slotN;
 
     if (targetHero == NULL && m_occupyingHeroId == TOWN_OCCUPYING_HERO_NONE)
         return;
 
     if (targetHero != NULL)
-        activeHero = targetHero;
+        pupil = targetHero;
     else
-        activeHero = gpGame->GetHero(m_occupyingHeroId);
+        pupil = gpGame->GetHero(m_occupyingHeroId);
 
-    if (!activeHero->HasArtifact(ARTIFACT_MAGIC_BOOK))
+    if (!pupil->HasArtifact(ARTIFACT_MAGIC_BOOK))
         return;
     if (!(m_buildings & IDX(TOWN_BUILDING_MAGE_GUILD)))
         return;
 
-    for (level = 0; level < IDX(activeHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+    for (stage = 0; stage < IDX(pupil->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
                                 + TOWN_MAGE_GUILD_WISDOM_LEVEL_BONUS;
-         ++level) {
-        for (slot = 0; slot < m_spellCounts[level + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slot) {
-            activeHero->AddSpell(m_spells[level][slot], activeHero->Stats(HERO_PRIMARY_KNOWLEDGE));
+         ++stage) {
+        for (slotN = 0; slotN < m_spellCounts[stage + TOWN_MAGE_GUILD_FIRST_LEVEL]; ++slotN) {
+            pupil->AddSpell(m_spells[stage][slotN], pupil->Stats(HERO_PRIMARY_KNOWLEDGE));
         }
     }
 }

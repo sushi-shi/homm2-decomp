@@ -330,28 +330,28 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
 
 VA(0x004612f3, 0x9e)
 i32 hero::GetNumSpells(HeroSpellType type) {
-    i32 numAdventureSpells;
-    i32 numCombatSpells;
-    SpellType spell;
+    i32 numAdventureSpells2;
+    i32 numCombatSpells2;
+    SpellType spell2;
 
-    numCombatSpells = 0;
-    numAdventureSpells = 0;
-    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
-        if (HasSpell(spell)) {
-            if (HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
-                numCombatSpells++;
+    numCombatSpells2 = 0;
+    numAdventureSpells2 = 0;
+    for (spell2 = SPELL_FIREBALL; spell2 < SPELL_COUNT; spell2++) {
+        if (HasSpell(spell2)) {
+            if (HAS(gsSpellInfo[IDX(spell2)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))
+                numCombatSpells2++;
             else
-                numAdventureSpells++;
+                numAdventureSpells2++;
         }
     }
 
     switch (type) {
         case SPELL_TYPE_COMBAT:
-            return numCombatSpells;
+            return numCombatSpells2;
         case SPELL_TYPE_ADVENTURE:
-            return numAdventureSpells;
+            return numAdventureSpells2;
         case SPELL_TYPE_ALL:
-            return numCombatSpells + numAdventureSpells;
+            return numCombatSpells2 + numAdventureSpells2;
     }
     return 0;
 }
@@ -655,27 +655,27 @@ void hero::Deallocate(i32 updateMap) {
 
 VA(0x00461cd6, 0x8a)
 i32 hero::GetExperience(i32 level) {
-    i32 experience;
-    i32 levelCounter;
-    i32 increment;
+    i32 experience2;
+    i32 stage;
+    i32 incr;
 
     if (level <= HERO_EXPERIENCE_LEVEL_TABLE_COUNT)
         return gMinExpForLevel[level - 1];
 
-    levelCounter = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
-    increment = static_cast<i32>(
+    stage = HERO_EXPERIENCE_EXTRAPOLATION_FIRST_LEVEL;
+    incr = static_cast<i32>(
         (gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1]
          - gMinExpForLevel
              [HERO_EXPERIENCE_LEVEL_TABLE_COUNT - IDX(EXPERIENCE_PREVIOUS_ENTRY_OFFSET)])
         * HERO_EXPERIENCE_GROWTH_FACTOR
     );
-    experience = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + increment;
-    while (levelCounter < level) {
-        increment = static_cast<i32>(increment * HERO_EXPERIENCE_GROWTH_FACTOR);
-        experience += increment;
-        levelCounter++;
+    experience2 = gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT - 1] + incr;
+    while (stage < level) {
+        incr = static_cast<i32>(incr * HERO_EXPERIENCE_GROWTH_FACTOR);
+        experience2 += incr;
+        stage++;
     }
-    return experience;
+    return experience2;
 }
 
 VA(0x00461d60, 0xac)

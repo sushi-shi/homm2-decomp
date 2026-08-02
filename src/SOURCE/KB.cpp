@@ -1570,8 +1570,8 @@ void GetMonsterCost(CreatureType monster, i32* const cost) {
 
 VA(0x00468e12, 0x273)
 i32 CanBuild(town* t, BuildingSlotType building) {
-    i32 reqMask;
-    i32 haveMask;
+    i32 reqBits;
+    i32 curMask;
     if (BitTest(gpGame->m_knownTowns, t->m_id))
         return 0;
     if (building != BUILDING_SLOT_CASTLE && !(t->m_buildings & IDX(TOWN_BUILDING_CASTLE)))
@@ -1607,21 +1607,21 @@ i32 CanBuild(town* t, BuildingSlotType building) {
         || (building == BUILDING_SLOT_UPGRADE_LAST
             && (t->m_buildings & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))))
         return 0;
-    reqMask = gHierarchyMask[IDX(t->m_type)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
-    haveMask = t->m_buildings;
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
-        haveMask |= IDX(KB_DWELLING_FIRST_FLAG);
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG))
-        haveMask |= IDX(KB_DWELLING_SECOND_FLAG);
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG))
-        haveMask |= IDX(KB_DWELLING_THIRD_FLAG);
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG))
-        haveMask |= IDX(KB_DWELLING_FOURTH_FLAG);
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))
-        haveMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
-    if (haveMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
-        haveMask |= IDX(KB_DWELLING_FIFTH_FLAG);
-    if ((reqMask & haveMask) == reqMask) {
+    reqBits = gHierarchyMask[IDX(t->m_type)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
+    curMask = t->m_buildings;
+    if (curMask & IDX(KB_DWELLING_UPGRADE_FIRST_FLAG))
+        curMask |= IDX(KB_DWELLING_FIRST_FLAG);
+    if (curMask & IDX(KB_DWELLING_UPGRADE_SECOND_FLAG))
+        curMask |= IDX(KB_DWELLING_SECOND_FLAG);
+    if (curMask & IDX(KB_DWELLING_UPGRADE_THIRD_FLAG))
+        curMask |= IDX(KB_DWELLING_THIRD_FLAG);
+    if (curMask & IDX(KB_DWELLING_UPGRADE_FOURTH_FLAG))
+        curMask |= IDX(KB_DWELLING_FOURTH_FLAG);
+    if (curMask & IDX(KB_DWELLING_UPGRADE_SIXTH_FLAG))
+        curMask |= IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG);
+    if (curMask & IDX(KB_DWELLING_UPGRADE_FIFTH_FLAG))
+        curMask |= IDX(KB_DWELLING_FIFTH_FLAG);
+    if ((reqBits & curMask) == reqBits) {
         if (t->m_type == FACTION_NECROMANCER
             && building == BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE && t->m_buildState <= 1)
             return 0;

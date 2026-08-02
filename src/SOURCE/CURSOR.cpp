@@ -1458,19 +1458,19 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
 
 VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
-    SMapChange* ptr;
+    SMapChange* ptr0;
     i32 size;
     SMapChange* buf;
-    i32 i;
+    i32 ix;
     i32 processed;
 
     size = sizeof(sMapChangeLastFew);
     buf = static_cast<SMapChange*>(H2_ALLOC(size));
     memcpy(buf, incomingData, size);
-    for (i = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; i >= 0; --i) {
-        ptr = &buf[i];
-        if (ptr->type != MAP_CHANGE_NONE && ptr->sequence >= giMapChangeCtr) {
-            ProcessIncomingSingleMapChange(ptr);
+    for (ix = CURSOR_MAP_CHANGE_RECENT_COUNT - 1; ix >= 0; --ix) {
+        ptr0 = &buf[ix];
+        if (ptr0->type != MAP_CHANGE_NONE && ptr0->sequence >= giMapChangeCtr) {
+            ProcessIncomingSingleMapChange(ptr0);
         } else {
             processed = 0;
         }
@@ -1492,31 +1492,31 @@ VA(0x0043646b, 0x1b5)
 void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     i32 queueCount;
     i32 unwoundChanges;
-    i32 bestSlot;
+    i32 pos1;
     i32 lowestSequence;
     i32 continueUnwinding;
-    i32 slot;
+    i32 n;
 
     queueCount = CURSOR_MAP_CHANGE_PENDING_SENTINEL;
     unwoundChanges = 0;
     while (queueCount > 0 && unwoundChanges < maximumToUnwind) {
-        bestSlot = -1;
+        pos1 = -1;
         lowestSequence = CURSOR_MAP_CHANGE_SEQUENCE_SENTINEL;
         queueCount = 0;
-        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE) {
+        for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
+            if (sMapChangeQueue[n].type != MAP_CHANGE_NONE) {
                 ++queueCount;
-                if (sMapChangeQueue[slot].sequence < lowestSequence) {
-                    lowestSequence = sMapChangeQueue[slot].sequence;
-                    bestSlot = slot;
+                if (sMapChangeQueue[n].sequence < lowestSequence) {
+                    lowestSequence = sMapChangeQueue[n].sequence;
+                    pos1 = n;
                 }
             }
         }
-        if (bestSlot != -1) {
+        if (pos1 != -1) {
             --queueCount;
             if (processChanges)
-                ProcessMapChange(sMapChangeQueue[bestSlot]);
-            sMapChangeQueue[bestSlot].type = MAP_CHANGE_NONE;
+                ProcessMapChange(sMapChangeQueue[pos1]);
+            sMapChangeQueue[pos1].type = MAP_CHANGE_NONE;
             ++unwoundChanges;
         }
     }
@@ -1524,12 +1524,12 @@ void advManager::UnwindMapChangeQueue(i32 maximumToUnwind, i32 processChanges) {
     continueUnwinding = 1;
     while (continueUnwinding) {
         continueUnwinding = 0;
-        for (slot = 0; slot < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++slot) {
-            if (sMapChangeQueue[slot].type != MAP_CHANGE_NONE
-                && sMapChangeQueue[slot].sequence == giMapChangeCtr) {
+        for (n = 0; n < CURSOR_MAP_CHANGE_QUEUE_COUNT; ++n) {
+            if (sMapChangeQueue[n].type != MAP_CHANGE_NONE
+                && sMapChangeQueue[n].sequence == giMapChangeCtr) {
                 if (processChanges)
-                    ProcessMapChange(sMapChangeQueue[slot]);
-                sMapChangeQueue[slot].type = MAP_CHANGE_NONE;
+                    ProcessMapChange(sMapChangeQueue[n]);
+                sMapChangeQueue[n].type = MAP_CHANGE_NONE;
                 continueUnwinding = 1;
             }
         }
