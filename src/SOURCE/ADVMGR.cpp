@@ -10003,7 +10003,7 @@ void advManager::SystemOptions(void) {
     if (bPrefsChanged) {
         WritePrefs();
     }
-    if (gConfig.evilInterfaceUsage != oldInterfaceMode) {
+    if (oldInterfaceMode != gConfig.evilInterfaceUsage) {
         CheckSetEvilInterface(1, -1);
     }
     if (heroContextLocked) {
