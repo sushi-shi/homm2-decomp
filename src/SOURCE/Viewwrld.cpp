@@ -271,8 +271,6 @@ void advManager::VWCompleteDraw(void) {
                 pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + iVWYPixelOffset;
                 groundShape1 =
                     giGroundShape[cell0->m_terrainImageIndex] & WORLD_GROUND_SHAPE_MASK;
-                // Retail ground-shape groups select the overview terrain frame.
-                // NOLINTBEGIN(readability-magic-numbers)
                 switch (groundShape1) {
                     case 0:
                     case 9:
@@ -317,7 +315,6 @@ void advManager::VWCompleteDraw(void) {
                     default:
                         break;
                 }
-                // NOLINTEND(readability-magic-numbers)
                 if (cell0->m_flags & GROUND_HORIZONTAL_FLIP)
                     flipped5 = ICON_DRAW_FLIPPED;
                 if (cell0->m_flags & GROUND_ALTERNATE_SET)
@@ -533,15 +530,12 @@ void advManager::VWCompleteDraw(void) {
                     playerColor26 = WORLD_NO_OWNER_COLOR;
                 else
                     playerColor26 = gpGame->m_players[playerColor26].m_color;
-                // Retail scale-specific town marker offsets.
-                // NOLINTBEGIN(readability-magic-numbers)
                 townFlagX15[SCALE_INDEX_FAR] = -2;
                 townFlagX15[SCALE_INDEX_MIDDLE] = -3;
                 townFlagX15[SCALE_INDEX_NEAR] = -6;
                 townIconX2[SCALE_INDEX_FAR] = 5;
                 townIconX2[SCALE_INDEX_MIDDLE] = 7;
                 townIconX2[SCALE_INDEX_NEAR] = 10;
-                // NOLINTEND(readability-magic-numbers)
                 if (iVWWhatToDraw == SPELL_VIEW_TOWNS)
                     townFlagHighlight3 = playerColor26 + WORLD_HIGHLIGHT_BASE;
                 else
@@ -675,12 +669,9 @@ void advManager::VWCompleteDraw(void) {
                     WORLD_DRAW_SIZE,
                     mineHighlight18
                 );
-                // Retail scale-specific mine-letter offsets.
-                // NOLINTBEGIN(readability-magic-numbers)
                 mineLetterY0[SCALE_INDEX_FAR] = 0;
                 mineLetterY0[SCALE_INDEX_MIDDLE] = 0;
                 mineLetterY0[SCALE_INDEX_NEAR] = 2;
-                // NOLINTEND(readability-magic-numbers)
                 resourceType9 = gpGame->m_mines[cell0->m_objectMetadata].resourceType;
                 IconToBitmap(
                     pVWLetters,
@@ -731,8 +722,6 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         || (giViewWorldScale == VIEW_WORLD_SCALE_FAR
                             && MAP_WIDTH <= MAP_DIMENSION_LARGE))
                         break;
-                    // Retail radar scale ratios for the three supported map sizes.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     switch (MAP_HEIGHT) {
                         case MAP_DIMENSION_SMALL:
                             radarScale6 = 4.0f;
@@ -747,7 +736,6 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                             radarScale6 = 1.0f;
                             break;
                     }
-                    // NOLINTEND(readability-magic-numbers)
 
                     radarX0 = message.payload.mouse.screenX;
                     radarY1 = message.payload.mouse.screenY;
@@ -759,8 +747,6 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         iVWMapOriginX = 0;
                     if (iVWMapOriginY < 0)
                         iVWMapOriginY = 0;
-                    // Retail's initial-click path clamps X overflow into Y; the drag path below
-                    // stores the equivalent clamp into X.
                     if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
                         iVWMapOriginY = MAP_WIDTH - iVWViewableCells;
                     if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
@@ -853,13 +839,10 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-// Retail scale/kind/axis pixel-offset payload.
-// NOLINTBEGIN(readability-magic-numbers)
 i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
             [IDX(COORDINATE_AXIS_COUNT)] = {3,  3, 5, 5, 6, 6, 8, 5, 2, 3, 2,  2,
                                               4,  5, 6, 6, 8, 8, 11, 7, 3, 4, 3, 3,
                                               7,  7, 8, 8, 10, 10, 14, 8, 3, 6, 4, 4};
-// NOLINTEND(readability-magic-numbers)
 ViewWorldScale giViewWorldScale = VIEW_WORLD_SCALE_MIDDLE;
 i32 giViewWorldScaleLookup = SCALE_INDEX_MIDDLE;
 b32 gbInViewWorld = false;

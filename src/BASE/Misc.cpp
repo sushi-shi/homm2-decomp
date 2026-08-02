@@ -196,8 +196,8 @@ H2_ENUM_END(FileIdHashConstant)
 
 static i32 giFindMid;
 
-static i32 gBlitRight;  // BlitBitmapToScreen computed blit-rect right edge
-static i32 gBlitBottom; // BlitBitmapToScreen computed blit-rect bottom edge
+static i32 gBlitRight;
+static i32 gBlitBottom;
 
 i32 iMemEntries = 0;
 MemEntry* gpMemEntry = NULL;
@@ -795,7 +795,6 @@ void SetInstallDefaults(void) {
     strcpy(gConfig.autoSaveName, gMiscText.installDefaults.autoSaveName.text);
     gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
 }
-// Retail saves ESI/EDI before materializing the main-game graphics slot.
 VA(0x004be0a0, 0x29d)
 void SetGameDefaults(void) {
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
@@ -1304,7 +1303,6 @@ void ReadPrefsFromRegistry(void) {
         != 0)
         strcpy(gcRegCDRomPath, gMiscText.readRegistry.cdDriveDefault.text);
     RegCloseKey(hKey);
-    // Clamp the saved window geometry to sane defaults / on-screen bounds.
     if (gConfig.gfx[IDX(giCurExe)].width <= 0)
         gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
     if (gConfig.gfx[IDX(giCurExe)].height <= 0)

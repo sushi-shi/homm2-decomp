@@ -282,7 +282,6 @@ void combatManager::SetupCombat(
         m_playerId[IDX(COMBAT_DEFENDER_SIDE)] = -1;
     }
 
-    // Retail reuses this integer counter for the side and captain-array loops.
     i32 index;
     for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++) {
         if (m_playerId[index] >= 0)
@@ -570,7 +569,6 @@ void combatManager::Close(void) {
     i32 total;
     CombatSide groupSide;
     i32 index;
-    // Retail reuses this integer counter for the side and army-group loops.
     for (index = IDX(COMBAT_ATTACKER_SIDE); index < COMBAT_SIDE_COUNT; index++)
         UpdateArmyGroup(static_cast<CombatSide>(index));
 
@@ -1383,11 +1381,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     }
 
     if (missShot19) {
-        // Retail catapult miss-hex payload.
-        // NOLINTBEGIN(readability-magic-numbers)
         u8 validMissHexes[COMBAT_CATAPULT_MISS_HEX_COUNT] =
             {32, 46, 10, 23, 35, 48, 60, 74, 87, 101, 114};
-        // NOLINTEND(readability-magic-numbers)
         i32 startDirection =
             SRandom(COMBAT_CATAPULT_DIRECTION_ROLL_MIN, COMBAT_CATAPULT_DIRECTION_ROLL_MAX);
         for (frame18 = 0; frame18 < COMBAT_CATAPULT_DIRECTION_COUNT; frame18++) {
@@ -1682,8 +1677,6 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     SAMPLE2 keepSample19 = NULL_SAMPLE2;
     keepSample19 = LoadPlaySample(gText);
 
-    // Retail keep-missile origins by faction and tower.
-    // NOLINTBEGIN(readability-magic-numbers)
     CombatTowerOrigin towerOrigins4[COMBAT_KEEP_FACTION_COUNT][COMBAT_KEEP_TOWER_COUNT] = {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}},
@@ -1692,17 +1685,13 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
         {{586, 177}, {428, 60}, {428, 314}},
         {{586, 177}, {428, 60}, {428, 314}}
     };
-    // NOLINTEND(readability-magic-numbers)
     i32 unknownTowerData6[KEEP_TOWER_SCRATCH_COUNT];
     i32 sourceX9 = towerOrigins4[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].x;
     i32 sourceY6 = towerOrigins4[IDX(m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->m_type)][IDX(tower)].y;
     i32 targetX9 = target0->MidX();
     i32 targetY8 = target0->MidY();
-    // Retail keep-missile direction payload.
-    // NOLINTBEGIN(readability-magic-numbers)
     float missileAngles0[COMBAT_KEEP_MISSILE_ANGLE_COUNT] =
         {90.0f, 68.5f, 45.0f, 20.8f, 0.0f, -20.8f, -45.0f, -68.5f, -90.0f};
-    // NOLINTEND(readability-magic-numbers)
     ShootMissile(
         sourceX9,
         sourceY6,
@@ -2444,10 +2433,7 @@ MessageDispatchResult CombatSystemOptionsHandler(tag_message& message) {
 
 i32 bInHighMoraleBonus = 0;
 i32 giSeed = 1;
-// Retail castle wall-hex payload.
-// NOLINTBEGIN(readability-magic-numbers)
 u8 wallHex[COMBAT_WALL_SECTION_COUNT] = {9, 34, 86, 113};
-// NOLINTEND(readability-magic-numbers)
 i32 bMouseWasVis;
 class heroWindow* CSPanel;
 i32 bCPrefsChanged;

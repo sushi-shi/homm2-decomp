@@ -6,7 +6,6 @@
 
 struct tag_message;
 
-// Message classes a manager accepts: the bits are the tag_message type ids.
 H2_ENUM_CLASS_BEGIN_T(BaseManagerMessageMask, i32)
     BASE_MANAGER_MESSAGE_MASK_ALL         = -1,
     BASE_MANAGER_ACCEPT_MOUSE_MOVE        = 4,
@@ -22,7 +21,6 @@ H2_ENUM_CLASS_BEGIN_T(BaseManagerMessageMask, i32)
 H2_ENUM_CLASS_END_T(BaseManagerMessageMask, i32)
 H2_ENUM_FLAGS(BaseManagerMessageMask)
 
-// Executive ordering keys stay arithmetic; the catalog names each manager.
 H2_ENUM_BEGIN(BaseManagerPriorityConstant)
     BASE_MANAGER_PRIORITY_UNASSIGNED = -1,
     INPUT_MANAGER_PRIORITY           = BASE_MANAGER_PRIORITY_UNASSIGNED,

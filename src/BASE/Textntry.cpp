@@ -42,7 +42,6 @@ H2_ENUM_END(TextEntryConstant)
 
 H2_ENUM_BEGIN(InputManagerExtendedKey)
     EXTENDED_KEY_BASE = 0x100
-// extended keys arrive as scan code << 8
 H2_ENUM_END(InputManagerExtendedKey)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\Textntry.cpp"

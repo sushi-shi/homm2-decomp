@@ -110,7 +110,6 @@ i8 InitNetGuest(void) {
             if (namePending) {
                 if (HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_ERROR)) {
                     iNameRetryCount++;
-                    // SETUP_WAIT_FOR_LOCAL_NAME failed; return to SETUP_REGISTER_LOCAL_NAME.
                     iInitNetGuestStatus--;
                 }
             } else {

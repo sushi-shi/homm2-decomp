@@ -1,8 +1,6 @@
 #include <va.h>
 #include <BASE/TILE.h>
 
-// Hand-written tile blitter supporting normal, vertical, horizontal, and combined flips.
-
 H2_ENUM_BEGIN(TileBlitConstant)
     BITMAP_WIDTH_OFFSET         = 0x12,
     BITMAP_PIXELS_OFFSET        = 0x16,

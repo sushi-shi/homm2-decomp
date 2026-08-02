@@ -26,7 +26,6 @@ struct indexArray {
     u16 value;
 };
 
-// Leak-tracking allocation record (BaseAlloc/BaseFree). Packed: ptr sits at +1 (unaligned).
 #pragma pack(push, 1)
 struct MemEntry {
     char used;
@@ -75,7 +74,6 @@ void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, char* file, i32 line);
-// Allocation wrappers preserve explicit source-file and line operands.
 #define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
 #define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
 #define H2_ALLOC_AT(size, originalFile, originalLine)                                              \

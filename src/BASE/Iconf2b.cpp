@@ -71,7 +71,6 @@ void FlipIconToBitmap(
         i32 command = *src++;
         if (static_cast<i8>(command) < 0) {
             if ((command & ICON_RLE_COMMAND_SOLID_FLAG) == 0) {
-                // skip run / end-of-sprite
                 s_run = command;
                 command &= ICON_RLE_COMMAND_RUN_MASK;
                 s_x = currentX;
@@ -84,13 +83,11 @@ void FlipIconToBitmap(
             s_run = command;
             u32 count = command & ICON_RLE_COMMAND_RUN_MASK;
             if (count != 0) {
-                // 0xc1 - 0xFF : solid colour run
                 if (command == ICON_RLE_LONG_SOLID_COMMAND)
                     count = *src++;
                 s_color = *src++;
                 goto do_fill;
             }
-            // 0xc0 : shadow / dim run
             command = *src++;
             count = command & ICON_RLE_DIM_SHORT_COUNT_MASK;
             if (count == 0)

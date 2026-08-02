@@ -101,7 +101,6 @@ inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
 
-// Preserve the original statement stream; an inline function perturbs VC4.2 CSE in Main.
 #define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.type = MESSAGE_WIDGET;                                                          \

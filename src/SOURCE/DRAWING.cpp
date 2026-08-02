@@ -1140,8 +1140,6 @@ void combatManager::DrawFrame(
             }
 
             for (column1 = firstColumn; endColumn != column1; column1 += columnStep3) {
-                // Retail castle rendering lookup payloads.
-                // NOLINTBEGIN(readability-magic-numbers)
                 u16 wallCoordinates1[IDX(FACTION_COUNT)][WALL_COORDINATE_COUNT] = {
                     {443, 153, 399, 237, 399, 321, 443, 405},
                     {443, 153, 399, 237, 399, 321, 443, 405},
@@ -1151,7 +1149,6 @@ void combatManager::DrawFrame(
                     {443, 153, 399, 237, 399, 321, 443, 405}
                 };
                 u8 wallFrameOffsets1[WALL_FRAME_OFFSET_COUNT] = {0, 4, 8, 23, 27, 35, 31};
-                // NOLINTEND(readability-magic-numbers)
                 i32 wallX7;
                 i32 wallFrame1;
                 i32 wallY;

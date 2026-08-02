@@ -5,7 +5,6 @@
 #include <Ints.h>
 #include <SOURCE/KB_TYPES.h>
 
-// Occupancy is ignored when every object-stack entry is shadow-only or erased.
 H2_ENUM_CLASS_BEGIN(MapCellFlag)
     MAP_CELL_OBJECT_SHADOW_ONLY = 0x80,
     MAP_CELL_OCCUPIED           = 0x08
@@ -16,8 +15,6 @@ H2_ENUM_BEGIN(MapCellSentinel)
     MAPCELL_EXTRA_FREE  = 0xffff
 H2_ENUM_END(MapCellSentinel)
 
-// Adventure-map object image set. Retail expressions use i32, while map records
-// store the domain in packed 6/7-bit fields.
 H2_ENUM_CLASS_BEGIN_SPLIT(TilesetId, u8)
     TILESET_NONE                    = 0,
     TILESET_OBJNHAUN                = 10,
@@ -119,13 +116,10 @@ public:
             u16 m_objectLayerBit0 : 1;
             u16 m_objectLayerBit1 : 1;
             u16 m_objectDrawnAsOverlay : 1;
-            // Object-specific payload interpreted according to m_triggerType. It can
-            // encode an object id, quantity, flags, or packed event/site data.
             u16 m_objectMetadata : 13;
         };
         struct {
             u16 m_tentFlags : 3;
-            // Tent-specific view of the same object metadata payload.
             u16 m_tentColor : 13;
         };
     };
@@ -142,7 +136,6 @@ public:
     }
 };
 
-// Legacy on-disk record sizes used by fullMap::Read's conversion path.
 struct oldMapCell {
     u8 raw[20];
 };

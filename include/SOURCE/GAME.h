@@ -72,11 +72,6 @@ struct RandomHeroArmyRange {
     i16 maximum;
 };
 
-// Action trigger ids carried in mapCell::m_triggerType (non-action id | the
-// MAP_TRIGGER_ACTION_FLAG 0x80 bit). ProcessRandomObjects converts every
-// MAP_TRIGGER_RANDOM_* cell into its concrete counterpart at map load.
-// mapCell::m_objectMetadata layout for monster cells: low 12 bits carry the
-// troop count, bit 0x1000 marks a placed guardian.
 H2_ENUM_CLASS_BEGIN(GameMonsterMetadata)
     MAP_MONSTER_COUNT_MASK = 0xfff,
     MAP_MONSTER_GUARD_FLAG = 0x1000

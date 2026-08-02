@@ -1061,8 +1061,6 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
     }
     overWin->BroadcastMessage(message);
 
-    // Mode-indexed retail geometry for the three overview column titles.
-    // NOLINTBEGIN(readability-magic-numbers)
     i16 titleLefts[IDX(OVERVIEW_TYPE_COUNT)][OVERVIEW_TITLE_COUNT] = {
         {35, 232, 377},
         {35, 177, 379}
@@ -1071,7 +1069,6 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         {194, 142, 241},
         {140, 199, 239}
     };
-    // NOLINTEND(readability-magic-numbers)
 
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
         if (textWidgetTitle[title] != NULL) {

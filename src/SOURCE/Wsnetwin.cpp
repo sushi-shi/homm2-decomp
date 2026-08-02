@@ -26,11 +26,11 @@ H2_ENUM_END(WinsockPrivateConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
 
-static i16 s_wsInitSourceLineBase = 61; // NOLINT(readability-magic-numbers)
-static i16 s_wsTermSourceLineBase = 248; // NOLINT(readability-magic-numbers)
-static i16 s_wsSendSourceLineBase = 279; // NOLINT(readability-magic-numbers)
-static i16 s_wsReceiveSourceLineBase = 359; // NOLINT(readability-magic-numbers)
-static i16 s_wsEvaluateSourceLineBase = 413; // NOLINT(readability-magic-numbers)
+static i16 s_wsInitSourceLineBase = 61;
+static i16 s_wsTermSourceLineBase = 248;
+static i16 s_wsSendSourceLineBase = 279;
+static i16 s_wsReceiveSourceLineBase = 359;
+static i16 s_wsEvaluateSourceLineBase = 413;
 
 VA(0x004b1cf0, 0x572)
 i16 wsnet_init(void) {
@@ -339,9 +339,6 @@ void wsProcessMessages(void) {
     }
 }
 
-// Byte-exact against retail: the startup fields are read through the raw
-// message bytes (sign-extended char loads, no struct-typed local) and the
-// three INFO/CONFIRM dialogs call NormalDialog directly. Keep these spellings.
 VA(0x004b2653, 0x330)
 void wsEvaluateMessage(u32l size, i32 sender) {
     char* message = rcvBufIn + 1;

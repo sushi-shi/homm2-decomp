@@ -74,7 +74,6 @@ void MonoIconToBitmap(
     for (;;) {
         i32 cmd = ReadIconRleByte(s_src);
         if (static_cast<i8>(cmd) < 0) {
-            // skip run / end-of-sprite (negative command masks 7 bits)
             s_row = row;
             s_run = cmd;
             i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
@@ -85,7 +84,6 @@ void MonoIconToBitmap(
         }
         s_run = cmd;
         if (cmd != ICON_RLE_MONO_NEWLINE_COMMAND) {
-            // solid mono fill of `cmd` pixels
             if (clip == ICON_DRAW_NO_CLIP) {
                 memset(row + s_x, color, cmd);
             } else {

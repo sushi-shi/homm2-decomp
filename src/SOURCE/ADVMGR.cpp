@@ -1353,10 +1353,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     if (sampleSet >= 1)
         sampleSet = CURSOR_SAMPLE_FAST_SET;
 #endif
-    // Ordered filename suffixes select the retail walking-sound variants.
-    // NOLINTBEGIN(readability-magic-numbers)
     i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
-    // NOLINTEND(readability-magic-numbers)
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
@@ -1640,7 +1637,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
 
     MessageDispatchResult processResult = MESSAGE_DISPATCH_CONSUME;
     i32 exitRequestedFlag = 0;
-    // Retail reserves three result slots; only the first is used.
     mapCell* eventCellsResult[ADVENTURE_EVENT_CELL_RESULT_COUNT];
     eventCellsResult[0] = NULL;
     MapDirection moveDirectionState;
@@ -1744,8 +1740,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         gpGame->CheckHeroConsistency();
                         break;
                     case INPUT_SCAN_F7:
-                        // Retail's debug command advances an opaque cheat-state payload.
-                        // NOLINTNEXTLINE(readability-magic-numbers)
                         gpCurPlayer->m_cheatValue += 12;
                         if (currentHero != NULL) {
                             GiveExperience(currentHero, CHEAT_EXPERIENCE_AMOUNT, 1);
@@ -1763,8 +1757,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                             }
                         }
                         break;
-                    // Scan-code cases intentionally decode to their literal decimal digits.
-                    // NOLINTBEGIN(readability-magic-numbers)
                     case INPUT_SCAN_0:
                         cheatDigitLocal = 0;
                         goto process_cheat_digit;
@@ -1795,7 +1787,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                     case INPUT_SCAN_9:
                         cheatDigitLocal = 9;
                         goto process_cheat_digit;
-                    // NOLINTEND(readability-magic-numbers)
                     process_cheat_digit: {
                         hero* cheatHero = NULL;
                         if (gpCurPlayer->CurrentHero() != INVALID_HERO) {
@@ -1890,7 +1881,6 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                         }
                         break;
                     }
-                    // Retail places this case after the cheat-digit block in source order.
                     case INPUT_SCAN_ESCAPE:
                         break;
                     case INPUT_SCAN_NUMPAD_8:
@@ -2366,8 +2356,6 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                 break;
             }
             DemobilizeCurrHero();
-            // These are retail's scale payloads for the four supported map dimensions.
-            // NOLINTBEGIN(readability-magic-numbers)
             switch (MAP_HEIGHT) {
                 case MAP_DIMENSION_SMALL:
                     radarScale = 4.0f;
@@ -2382,7 +2370,6 @@ advManager::ProcessSelect(struct tag_message* message, class mapCell** eventCell
                     radarScale = 1.0f;
                     break;
             }
-            // NOLINTEND(readability-magic-numbers)
             mouseX = static_cast<i32>((mouseX - RADAR_LEFT) / radarScale);
             mouseY = static_cast<i32>((mouseY - RADAR_TOP) / radarScale);
             m_mapOriginX = mouseX - VIEW_CENTER_CELL;
@@ -2560,8 +2547,6 @@ MessageDispatchResult advManager::ProcessDeSelect(
                     SetEnvironmentOrigin(ENVIRONMENT_ORIGIN_NONE, ENVIRONMENT_ORIGIN_NONE, 1);
                 }
                 TrimLoopingSounds(0);
-                // Retail uses the action discriminator for this occupied-town lookup;
-                // HeroView receives the selected hero ID separately.
                 HeroView(
                     giOverviewReturnActionExtra,
                     reinterpret_cast<i32>(
@@ -4730,8 +4715,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 }
                 break;
             case MAP_DIMENSION_LARGE:
-                // Retail approximates the large-map radar ratio rather than using 4/3.
-                // NOLINTNEXTLINE(readability-magic-numbers)
                 radarScaleState = 1.33f;
                 if (giViewWorldScale <= VIEW_WORLD_SCALE_FAR) {
                     skipFrameIndex = 1;
@@ -4764,8 +4747,6 @@ void advManager::UpdateRadar(i32 updateScreen, i32 partial) {
                 break;
             case MAP_DIMENSION_LARGE:
                 radarFrameLocal = RADAR_FRAME_NORMAL_LARGE;
-                // Retail approximates the large-map radar ratio rather than using 4/3.
-                // NOLINTNEXTLINE(readability-magic-numbers)
                 radarScaleState = 1.33f;
                 break;
             default:
@@ -6139,9 +6120,6 @@ i32 advManager::UpdBottomViewHero(void) {
         for (armySlot = 0; armySlot < BOTTOM_HERO_ARMY_SLOTS; ++armySlot) {
             creature = IDX(targetHero->m_army.m_creatureTypes[armySlot]);
             if (creature != BOTTOM_HERO_EMPTY_SLOT) {
-                // Retail stores eight compact (x, y) layout anchors and indexes them through
-                // the occupied-slot table below; the coordinate payload has no separate domain.
-                // NOLINTBEGIN(readability-magic-numbers)
                 u8 iconPositions[BOTTOM_HERO_ICON_POSITION_BYTES] =
                     {50, 3, 96, 3, 50, 17, 73, 17, 96, 17, 27, 32, 73, 32, 119, 32};
                 i8 armyLayouts[BOTTOM_HERO_ARMY_SLOTS][BOTTOM_HERO_ARMY_SLOTS] = {
@@ -6151,7 +6129,6 @@ i32 advManager::UpdBottomViewHero(void) {
                     {0, 1, 5, 6, -1},
                     {0, 1, 5, 6, 7}
                 };
-                // NOLINTEND(readability-magic-numbers)
 
                 armyCountLabelsResult[displayIndexData] = static_cast<char*>(H2_ALLOC_AT(
                     BOTTOM_HERO_LABEL_BYTES, RETAIL_FILE,
@@ -7159,12 +7136,9 @@ void advManager::SetHeroContext(i32 heroId, i32 update) {
         currentHero->m_locationType,
         currentHero->m_occupiedTown,
         NULL,
-        // Retail's final RestoreCell argument is unused.
-        // NOLINTNEXTLINE(readability-magic-numbers)
         4
     );
 
-    // Retail reuses this locator index slot for the terrain value below.
     i32 contextValue7 = 0;
     i32 index;
     for (index = 0; index < gpCurPlayer->m_heroCount; ++index) {
@@ -8494,8 +8468,6 @@ MessageDispatchResult TownPortalHandler(tag_message& message) {
                         giTownPortalChoice = choiceMessage.payload.widget.data.value;
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = TOWN_PORTAL_CLOSE_WIDGET;
-                        // Retail reads the id back rather than restating the
-                        // constant; both spell 10.
                         message.payload.widget.command =
                             static_cast<BaseWidgetCommand>(message.payload.widget.id);
                         return MESSAGE_DISPATCH_FORWARD;
@@ -9707,14 +9679,11 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
 VA(0x00413c27, 0x4d3)
 void advManager::ViewPuzzle(void) {
     gpGame->SetupPuzzlePieces(giCurPlayer, 0);
-    // Retail's fixed reveal permutation is payload, not a numeric domain.
-    // NOLINTBEGIN(readability-magic-numbers)
     u8 puzzleOrderLocal[PUZZLE_PIECE_COUNT] = {23, 7,  44, 5,  24, 47, 1,  39, 16, 36,
                                                       11, 45, 31, 2,  30, 38, 43, 4,  3,  14,
                                                       40, 37, 34, 0,  12, 17, 35, 42, 15, 8,
                                                       26, 41, 28, 46, 10, 22, 21, 6,  32, 18,
                                                       19, 29, 13, 27, 9,  20, 33, 25};
-    // NOLINTEND(readability-magic-numbers)
     i32 puzzlePiecesVisible = 0;
 
     gpSoundManager->SwitchAmbientMusic(PUZZLE_MUSIC);
@@ -9828,7 +9797,6 @@ void advManager::ViewPuzzle(void) {
 
 VA(0x004140fa, 0x79)
 void advManager::PuzzleDraw(i32 left, i32 top, i32 right, i32 bottom) {
-    // Retail reserves six unreferenced four-byte locals before the implicit `this` slot.
     i32 unusedPuzzle0;
     i32 unused1;
     i32 unused2;
@@ -10795,8 +10763,6 @@ i32 iLastHourGlassPhase = 1;
 b32 gbForceUpdate = false;
 i32 giCheatSeq = 0;
 i32 iQWE = 0;
-// Retail animation-phase payload for the adventure monster overlay.
-// NOLINTNEXTLINE(readability-magic-numbers)
 u8 monAnimDrawFrame[ADVMGR_MONSTER_ANIMATION_TABLE_SIZE] =
     {0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 3, 4, 5, 5, 4, 3, 0, 0};
 i32 iLastSandAnimTime = 0;

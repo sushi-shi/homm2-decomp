@@ -19,12 +19,12 @@ H2_ENUM_END(NetbiosResetConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp"
 
-static u8 gNbCallRetries = 0; // nb_call_done retry counter
+static u8 gNbCallRetries = 0;
 static u8 gNetbiosAvail = 0;
 static u8 gNetbiosLana = 0;
-static u8 gNbShutdown = 0; // shutdown flag, cleared by nb_init
+static u8 gNbShutdown = 0;
 static u8 gNbMaxSess = NETBIOS_INVALID_ID;
-static u8 gNbLocalNum = 0; // local netbios name number
+static u8 gNbLocalNum = 0;
 static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
 static char* gNbGroupName = "Empire Too ";
 static char* gNbListenName = "*";

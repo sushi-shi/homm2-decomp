@@ -77,7 +77,6 @@ i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted
     if (m_heroes[IDX(side)] == NULL)
         return 0;
 
-    // Retail reuses the hero-side scan slot as the spell iterator below.
     for (spellIndex = IDX(COMBAT_ATTACKER_SIDE); IDX(spellIndex) < COMBAT_SIDE_COUNT; spellIndex++) {
         if (m_heroes[IDX(spellIndex)] != NULL
             && m_heroes[IDX(spellIndex)]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
@@ -123,9 +122,6 @@ i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted
 
 VA(0x00495fb4, 0xe32)
 void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32* bestHex) {
-    // Retail's frame reserves a 16th 4-byte local here that no surviving
-    // instruction reads; without it esp drops to 0xd0 and every local plus
-    // the this-slot shifts. Named for the duration clamp it sits beside.
     i32 durMax;
     i32 wallsDamagedTotal;
     i32 spellPowerWork;

@@ -338,7 +338,6 @@ i32 combatManager::ViewSpells(i32) {
                     );
                     return 0;
                 }
-                // fall through
             default:
                 if (!HasValidSpellTarget(m_selectedSpell)) {
                     NormalDialog(
@@ -460,7 +459,6 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
         case SPELL_MESSAGE_MOUSE_DOWN:
             if (message.payload.keyboard.keyCode != COMMAND_CANCEL)
                 break;
-            // fall through
 
         case SPELL_MESSAGE_CANCEL:
             gpCombatManager->m_selectedSpell = SPELL_NONE;
@@ -992,8 +990,6 @@ void combatManager::CastSpell(
             );
             CombatMessage(gText, 1, 1, 0);
             missileIcon_p = gpResourceManager->GetIcon("keep.icn");
-            // Retail projectile-angle lookup, ordered from vertical up to vertical down.
-            // NOLINTBEGIN(readability-magic-numbers)
             missileAngles[0] = 90.0f;
             missileAngles[1] = 68.5f;
             missileAngles[2] = 45.0f;
@@ -1003,7 +999,6 @@ void combatManager::CastSpell(
             missileAngles[6] = -45.0f;
             missileAngles[7] = -68.5f;
             missileAngles[8] = -90.0f;
-            // NOLINTEND(readability-magic-numbers)
             ShootMissile(
                 castX,
                 castY,
@@ -1481,7 +1476,6 @@ void combatManager::MeteorShower(i32 targetHex) {
     army* target_k = &m_armies[IDX(m_currentSide)][0] + m_currentArmyIndex;
     i32 affectedHexes_f[SPELL_METEOR_AFFECTED_HEX_COUNT];
     affectedHexes_f[0] = targetHex;
-    // Retail reuses this integer counter for adjacency, animation-pass, and affected-hex loops.
     i32 direction;
     for (direction = IDX(COMBAT_DIRECTION_NORTHEAST);
          direction < SPELL_ADJACENT_DIRECTION_COUNT;
@@ -1702,8 +1696,6 @@ void combatManager::Armageddon(void) {
             );
         }
 
-        // Retail screen-shake trajectory; each row is an ordered x/y displacement.
-        // NOLINTBEGIN(readability-magic-numbers)
         i32 shakeOffsets[SPELL_ARMAGEDDON_SHAKE_FRAME_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {
             {2, 2},
             {4, 1},
@@ -1721,7 +1713,6 @@ void combatManager::Armageddon(void) {
             {-2, -3},
             {0, 0}
         };
-        // NOLINTEND(readability-magic-numbers)
         gpMouseManager->HideColorPointer();
         memcpy(
             m_backgroundBuffer->m_pixels,
@@ -2110,8 +2101,6 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                                 uRainbow[BOLT_RAINBOW_LAST_INDEX - (beamOffset - widthFirst)];
                             break;
                         case BOLT_COLOR_LIGHTNING: {
-                            // Retail distance-to-edge lookup for the lightning palette ramp.
-                            // NOLINTBEGIN(readability-magic-numbers)
                             if (edgeShade == 0)
                                 color = BOLT_LIGHTNING_SHADE_0;
                             else if (edgeShade == 1)
@@ -2124,7 +2113,6 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
                                 color = BOLT_LIGHTNING_SHADE_4;
                             else
                                 color = BOLT_LIGHTNING_SHADE_5;
-                            // NOLINTEND(readability-magic-numbers)
                             (gpWindowManager->m_screen->m_pixels
                              + drawY * COMBAT_SCREEN_WIDTH)[drawX] = color;
                             break;
@@ -2642,8 +2630,6 @@ void combatManager::VaporizeCreature(
     lastY11 = (giMaxExtentY / VAPORIZE_STRIPE_WIDTH) * VAPORIZE_STRIPE_WIDTH;
     rowCount = (lastY11 - firstY8) / VAPORIZE_STRIPE_WIDTH + 1;
     for (phase11 = 0; phase11 < VAPORIZE_PHASE_COUNT; ++phase11) {
-        // The three phases erase paired stripes from the outside toward the center.
-        // NOLINTBEGIN(readability-magic-numbers)
         switch (phase11) {
             case 0:
                 topOffset8 = 0;
@@ -2658,7 +2644,6 @@ void combatManager::VaporizeCreature(
                 bottomOffset4 = 2;
                 break;
         }
-        // NOLINTEND(readability-magic-numbers)
         if (phase11 == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         for (row9 = 0; row9 < rowCount; ++row9) {
@@ -3671,8 +3656,6 @@ void combatManager::ModifyDamageForArtifacts(
 
 VA(0x004a0cb9, 0x975)
 void combatManager::Earthquake(void) {
-    // Retail screen-shake trajectory; each row is an ordered x/y displacement.
-    // NOLINTBEGIN(readability-magic-numbers)
     i32 shakeOffsets[EARTHQUAKE_SHAKE_FRAME_COUNT][IDX(COORDINATE_AXIS_COUNT)] = {
         {2, 2},
         {4, 1},
@@ -3690,7 +3673,6 @@ void combatManager::Earthquake(void) {
         {-2, -3},
         {0, 0}
     };
-    // NOLINTEND(readability-magic-numbers)
 
     gpMouseManager->HideColorPointer();
     memcpy(

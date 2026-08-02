@@ -1648,7 +1648,7 @@ VA(0x0042e478, 0x29d)
 void combatManager::ShowWinLoseArtifact(
     class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact
 ) {
-    static i16 artifactSourceLineBase = 0x680; // NOLINT(readability-magic-numbers)
+    static i16 artifactSourceLineBase = 0x680;
     i16 w = CASUALTY_WINDOW_WIDTH;
     i16 winBottom = CASUALTY_WINDOW_BOTTOM;
     tag_message message;
@@ -1720,7 +1720,7 @@ void combatManager::ShowWinLoseArtifact(
 
 VA(0x0042e715, 0x225)
 void combatManager::ShowSkeletons(class heroWindow* window) {
-    static i16 skeletonSourceLineBase = 0x6c8; // NOLINT(readability-magic-numbers)
+    static i16 skeletonSourceLineBase = 0x6c8;
     tag_message message;
     char* skeletonCount;
 
@@ -1789,7 +1789,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
 
 VA(0x0042e93a, 0x2f2)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
-    static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
+    static i16 eagleEyeSourceLineBase = 0x702;
     SpellType displayedSpell = m_eagleEyeSpell[IDX(m_combatResult)];
     i32 x = EAGLE_PANEL_X;
     i32 y = EAGLE_PANEL_Y;
@@ -1868,7 +1868,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
 
 VA(0x0042ec2c, 0x9d5)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
-    static i16 casualtySourceLineBase = 0x74b; // NOLINT(readability-magic-numbers)
+    static i16 casualtySourceLineBase = 0x74b;
     i32 casualtyQuantity_0[CASUALTY_QUANTITY_STORAGE_COUNT];
     i32 casualtyType_1[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
     i32 side_9;

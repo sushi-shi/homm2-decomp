@@ -139,7 +139,6 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         SmackNextFrame(smack);
 }
 
-// Named one-byte retail stub.
 VA(0x00494769, 0x1149)
 void SmackManagerMain(void) {
     i32 soundFlags4;

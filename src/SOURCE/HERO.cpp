@@ -233,7 +233,7 @@ i32 hero::HasArtifact(ArtifactType artifact) {
 
 VA(0x00460f87, 0x23c)
 i32 hero::CalcMobility(void) {
-    i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500}; // NOLINT(readability-magic-numbers)
+    i16 landMobility[LAND_SPEED_COUNT] = {1000, 1000, 1000, 1100, 1200, 1300, 1400, 1500};
     const i16 seaBaseMobilityCurrent = SEA_BASE_MOBILITY;
     const i16 lighthouseBonusIncrement = LIGHTHOUSE_MOBILITY_BONUS;
     const i16 astrolabeBonus = ASTROLABE_MOBILITY_BONUS;
@@ -2042,7 +2042,6 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 VA(0x00464a03, 0x9b)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
     i8 shrineAndArtifactBonus = 0;
-    // Necromancy bonuses turn the stored 0..3 tier into a 10%-per-point effect score.
     i8 baseLevel;
 
     baseLevel = static_cast<i8>(m_secondarySkills[IDX(skill)]);
@@ -2143,6 +2142,6 @@ void hero::CheckAnduranPieces(i32 showDialog) {
 class hero* gpHVHero = NULL;
 class heroWindow* gheroWin = NULL;
 i16 gMinExpForLevel[HERO_EXPERIENCE_LEVEL_TABLE_COUNT] =
-    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500}; // NOLINT(readability-magic-numbers)
+    {0, 1000, 2000, 3200, 4500, 6000, 7700, 9000, 11000, 13200, 15500, 18500};
 i32 iOrigHeroViewID;
 b32 gbNoDismiss;

@@ -28,9 +28,9 @@ H2_ENUM_END(MouseManagerLocalConstant)
 
 static i32 gOldMouseRight;
 BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-static POINT gMouseScreenPt; // GetCursorPos scratch (mouseManager::MouseCoords)
+static POINT gMouseScreenPt;
 static POINT
-    gMouseCheckPt; // GetCursorPos scratch (mouseManager::CheckUpdateMousePos/ShowColorPointer)
+    gMouseCheckPt;
 static i32 gOldMouseTop;
 HICON hMouseCursor[MOUSE_CURSOR_COUNT];
 void* cAndBits[MOUSE_CURSOR_COUNT];
@@ -42,7 +42,6 @@ HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
 
 i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57, 0};
-// Per-cursor bitmap {width, height} pairs.
 i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {15, 21}, {22, 21}, {24, 20}, {24, 24}, {30, 25}, {24, 24}, {24, 24}, {19, 23}, {15, 20},
     {30, 30}, {32, 26}, {31, 25}, {30, 25}, {24, 24}, {22, 21}, {31, 31}, {32, 26}, {31, 25},
@@ -56,9 +55,6 @@ i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {28, 34}, {36, 34}, {66, 41}, {38, 35}, {59, 41}, {54, 39}, {35, 42}, {30, 34}, {45, 41},
     {39, 34}, {29, 43}, {25, 35}, {39, 35}, {47, 37}, {51, 13}
 };
-// Per-cursor {x, y} click-point offsets inside the bitmap; fed to ICONINFO
-// xHotspot/yHotspot and the software draw position. -1 = default to center
-// (patched to iMouseSize/2 in Open).
 i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {2, 3},   {2, 3},   {12, 11}, {12, 13}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},
     {15, 15}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},   {15, 15}, {15, 11}, {10, 10},
@@ -689,5 +685,4 @@ void mouseManager::SetColorMice(i32 enabled) {
         gpWindowManager->m_updateFlags = savedWM56;
     }
 }
-
 

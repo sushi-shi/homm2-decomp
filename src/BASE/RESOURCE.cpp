@@ -20,4 +20,3 @@ resource::resource(ResourceCategory category, u32l id, i16 refCount, resource* n
 VA(0x004d48f0, 0x14)
 resource::~resource() {}
 
-

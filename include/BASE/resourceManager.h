@@ -16,7 +16,7 @@ class tileset;
 struct tag_message;
 
 #pragma pack(push, 1)
-struct aggEntry { // one .agg directory record (0xc bytes)
+struct aggEntry {
     u32l id;
     i32l offset;
     u32l size;

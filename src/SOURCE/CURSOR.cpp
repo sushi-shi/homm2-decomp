@@ -1458,7 +1458,7 @@ void advManager::ProcessIncomingSingleMapChange(SMapChange* incoming) {
 
 VA(0x00436366, 0xa7)
 void advManager::ProcessIncomingGroupMapChange(char* incomingData) {
-    static i16 s_groupLineBase = 1505; // NOLINT(readability-magic-numbers)
+    static i16 s_groupLineBase = 1505;
     SMapChange* ptr;
     i32 size;
     SMapChange* buf;
@@ -1571,8 +1571,6 @@ void SendMapChange(
     change.x = x;
     change.y = y;
     change.player = static_cast<i8>(player);
-    // The two bytes are a tagged payload; movement packets interpret them as
-    // direction and stop-after-move, while other packet types currently send zeroes.
     change.wire.stopAfterMove = static_cast<i8>(stopAfterMove);
     change.wire.direction = static_cast<i8>(direction);
     change.sequence = giMapChangeCtr;

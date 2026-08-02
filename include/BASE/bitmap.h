@@ -4,8 +4,6 @@
 #include <va.h>
 #include <BASE/resource.h>
 
-// Proven bitmap storage tags. The packed class member remains a short because
-// bitmap resources serialize this value as a 16-bit word.
 H2_ENUM_CLASS_BEGIN_T(BitmapType, i16)
     BITMAP_TYPE_NONE           = 0,
     BITMAP_TYPE_MEMORY         = 0x21,

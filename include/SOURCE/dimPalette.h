@@ -9,7 +9,6 @@ H2_ENUM_BEGIN(DimPaletteConstant)
     DIM_PALETTE_COLOR_COUNT = 256
 H2_ENUM_END(DimPaletteConstant)
 
-// Shared dimming lookup table owned and defined by SOURCE/KB.
 extern u8 uDimPal[DIM_PALETTE_SET_COUNT][DIM_PALETTE_LEVEL_COUNT][DIM_PALETTE_COLOR_COUNT];
 
 #endif

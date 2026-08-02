@@ -73,10 +73,10 @@ H2_ENUM_CLASS_BEGIN(CombatDrawbridgeState)
     COMBAT_DRAWBRIDGE_LOWERED            = 0,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_FIRST  = 1,
     COMBAT_DRAWBRIDGE_RAISE_FRAME_SECOND = 2,
-    COMBAT_CASTLE_GATE_HIDDEN            = 3, // gate sprite suppressed once the bridge clears this frame
+    COMBAT_CASTLE_GATE_HIDDEN            = 3,
     COMBAT_DRAWBRIDGE_RAISED             = 4,
     COMBAT_CASTLE_GATE_OPEN              =
-        COMBAT_DRAWBRIDGE_RAISED // alias: raised bridge reads as open gate in town view
+        COMBAT_DRAWBRIDGE_RAISED
 H2_ENUM_CLASS_END(CombatDrawbridgeState)
 H2_ENUM_STEPPED(CombatDrawbridgeState)
 

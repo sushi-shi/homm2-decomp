@@ -184,7 +184,6 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     }
 }
 
-// Updates a cell directly or appends to its extra-object chain.
 VA(0x00472951, 0x314)
 void fullMap::ChangeTilesetIndex(
     mapCell* cell,

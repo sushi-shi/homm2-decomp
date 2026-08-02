@@ -1411,11 +1411,7 @@ MessageDispatchResult NullHandler(struct tag_message& msg) {
 
 VA(0x004688c4, 0x145)
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
-    // Retail initializes these otherwise-unused /Od frame locals. Their suffixes preserve the
-    // observed identifier-bucket order; their original purpose remains unknown.
-    // NOLINTBEGIN(readability-magic-numbers)
     i16 unusedLocal0J = 2, unusedLocal1G = 3, unusedLocal2A = 8, unusedLocal3N = 9;
-    // NOLINTEND(readability-magic-numbers)
     i32 shouldClose = 0;
     i32 unusedResult;
     if (msg.type == MESSAGE_WIDGET) {
@@ -3051,11 +3047,6 @@ i32 WaitForOtherPlayer(void) {
     return result;
 }
 
-// @semantic
-// All 131 relocations and the control-flow topology agree. The first residual is
-// the printable-key range test: retail compares the stored byte directly, while
-// MSVC zero-extends the equivalent u8/u32 expression. Literal, narrowed,
-// inline-helper, and bit-field spellings did not reproduce that lowering.
 VA(0x0046c0a6, 0xb25)
 void PopNetBox(char* text, i32 netPlayer) {
     i32 textY_d;
@@ -4452,8 +4443,6 @@ void HandleRemoteSuddenExit(void) {
     exitInfo.updateNetworkControl = gbThisNetGotAdventureControl;
     exitInfo.timedOut = 0;
     exitInfo.eliminated = 0;
-    // Retail leaves the final two bytes unset. The receiver replaces continueGame and only
-    // consults hostReported for eliminated packets.
     if (giThisNetPos == PLAYER_EXIT_HOST_NET_POSITION)
         destination = PLAYER_EXIT_FIRST_GUEST_NET_POSITION;
     else
@@ -5652,9 +5641,6 @@ u8 giGroundShape[GROUND_TILE_IMAGE_COUNT] = {
 #undef GROUND_REPEAT_4
 #undef GROUND_REPEAT_2
 
-// These retail palette and lookup tables are byte-exact data payloads; their entries
-// are values rather than individually named constants.
-// NOLINTBEGIN(readability-magic-numbers)
 u8 gColorTableTan[DIM_PALETTE_COLOR_COUNT] = {
     0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xd5, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6,
     0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc6, 0xc8, 0xc9, 0xcb, 0xcc, 0xce, 0xcf, 0xd0, 0xd1, 0xd2,
@@ -10079,7 +10065,6 @@ u16 IMHotSpots[KB_INIT_MENU_HOTSPOT_COUNT][IDX(INIT_MENU_HOTSPOT_FIELD_COUNT)] =
     {303, 137, 75, 44},
     {0, 389, 86, 90}
 };
-// NOLINTEND(readability-magic-numbers)
 
 i32 lastIMHoverID = -1;
 i32 bInCheckEndGame = 0;
