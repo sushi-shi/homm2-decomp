@@ -1339,7 +1339,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
 
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
     target_n =
-        m_armies[0] + IDX(m_currentSide) * COMBAT_ARMY_STORAGE_SLOT_COUNT + m_currentArmyIndex;
+        m_armies[IDX(m_currentSide)] + m_currentArmyIndex;
     for (frame_i = 0; frame_i < SPELL_FIREBALL_AFFECTED_HEX_COUNT; ++frame_i)
         affectedHexes_e[frame_i] = COMBAT_HEX_EMPTY;
     if (spell != SPELL_COLD_RING)
@@ -1522,34 +1522,34 @@ void combatManager::MeteorShower(i32 targetHex) {
 
 VA(0x0049bb35, 0x2bd)
 void combatManager::ElementalStorm(void) {
-    i32 baseDamage_w;
-    i32 column_e;
-    army* target_m;
-    i32 armyIndex_e;
+    i32 baseDam;
+    i32 c;
+    army* stack;
+    i32 member;
     i32 frame_i;
     i32 row_b;
-    i32 pass_c;
-    i32 side_h;
-    i32 anyAffected_f;
-    i32l damage_e;
+    i32 iter;
+    i32 whichSide;
+    i32 hit;
+    i32l dmg2;
     icon* stormIcon_i;
     SLimitData limits_n;
 
     if (!gbNoShowCombat) {
         stormIcon_i = gpResourceManager->GetIcon("storm.icn");
-        for (pass_c = 0; pass_c < SPELL_STORM_PASS_COUNT; ++pass_c) {
+        for (iter = 0; iter < SPELL_STORM_PASS_COUNT; ++iter) {
             for (frame_i = 0; frame_i < SPELL_STORM_FRAME_COUNT; ++frame_i) {
                 glTimers[0] = static_cast<i32>(
                     KBTickCount()
-                    + gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_AREA_ANIMATION_DELAY
+                    + SPELL_AREA_ANIMATION_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
                 );
                 DrawFrame(0, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
                 for (row_b = 0; row_b < SPELL_STORM_ROW_COUNT; ++row_b) {
-                    for (column_e = 0; column_e < SPELL_STORM_COLUMN_COUNT; ++column_e) {
+                    for (c = 0; c < SPELL_STORM_COLUMN_COUNT; ++c) {
                         stormIcon_i->CombatClipDrawToBuffer(
-                            column_e * SPELL_STORM_TILE_SIZE,
+                            c * SPELL_STORM_TILE_SIZE,
                             row_b * SPELL_STORM_TILE_SIZE,
-                            (column_e * SPELL_STORM_FRAME_COLUMN_STEP + frame_i + row_b)
+                            (frame_i + c * SPELL_STORM_FRAME_COLUMN_STEP + row_b)
                                 % SPELL_STORM_FRAME_COUNT,
                             &limits_n,
                             ICON_DRAW_NORMAL,
@@ -1567,31 +1567,31 @@ void combatManager::ElementalStorm(void) {
     }
 
     DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
-    anyAffected_f = 0;
-    baseDamage_w = m_spellPower[IDX(m_currentSide)] * SPELL_ELEMENTAL_STORM_DAMAGE_PER_POWER;
-    for (side_h = 0; side_h < COMBAT_SIDE_COUNT; ++side_h) {
-        for (armyIndex_e = 0; armyIndex_e < m_armyCount[side_h]; ++armyIndex_e) {
-            target_m = m_armies[0] + side_h * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex_e;
-            if (target_m->SpellCastWorks(SPELL_ELEMENTAL_STORM)) {
-                damage_e = baseDamage_w;
-                if (target_m->m_monsterType == CREATURE_AIR_ELEMENTAL)
-                    damage_e <<= 1;
-                if (target_m->m_monsterType == CREATURE_IRON_GOLEM
-                    || target_m->m_monsterType == CREATURE_STEEL_GOLEM) {
-                    damage_e = static_cast<i32l>(damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+    hit = 0;
+    baseDam = m_spellPower[IDX(m_currentSide)] * SPELL_ELEMENTAL_STORM_DAMAGE_PER_POWER;
+    for (whichSide = 0; whichSide < COMBAT_SIDE_COUNT; ++whichSide) {
+        for (member = 0; member < m_armyCount[whichSide]; ++member) {
+            stack = m_armies[whichSide] + member;
+            if (stack->SpellCastWorks(SPELL_ELEMENTAL_STORM)) {
+                dmg2 = baseDam;
+                if (stack->m_monsterType == CREATURE_AIR_ELEMENTAL)
+                    dmg2 <<= 1;
+                if (stack->m_monsterType == CREATURE_IRON_GOLEM
+                    || stack->m_monsterType == CREATURE_STEEL_GOLEM) {
+                    dmg2 = static_cast<i32l>(dmg2 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                if (m_heroes[side_h] && m_heroes[side_h]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
-                    damage_e = static_cast<i32l>(damage_e * SPELL_GOLEM_DAMAGE_MULTIPLIER);
+                if (m_heroes[whichSide] && m_heroes[whichSide]->HasArtifact(ARTIFACT_BROACH_SHIELDING)) {
+                    dmg2 = static_cast<i32l>(dmg2 * SPELL_GOLEM_DAMAGE_MULTIPLIER);
                 }
-                target_m->Damage(damage_e, SPELL_ELEMENTAL_STORM);
-                anyAffected_f = 1;
+                stack->Damage(dmg2, SPELL_ELEMENTAL_STORM);
+                hit = 1;
             }
         }
     }
-    if (anyAffected_f) {
-        sprintf(gText, "The elemental storm does %d damage.", baseDamage_w);
+    if (hit) {
+        sprintf(gText, "The elemental storm does %d damage.", baseDam);
         CombatMessage(gText, 1, 1, 0);
-        target_m->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
+        stack->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
 }
 

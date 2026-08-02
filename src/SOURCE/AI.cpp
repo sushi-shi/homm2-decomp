@@ -91,23 +91,23 @@ i32 combatManager::AICheckRetreat(void) {
 
         groupCount8 = 0;
         for (armyIndex36 = 0; armyIndex36 < COMBAT_AI_ARMY_SLOT_COUNT; armyIndex36++) {
-            if ((m_armies[0] + side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex36)->IsAlive()) {
+            if ((m_armies[side9] + armyIndex36)->IsAlive()) {
                 armyGroupPtr1->m_creatureTypes[groupCount8] = static_cast<i8>(
-                    (m_armies[0] + side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex36)
+                    (m_armies[side9] + armyIndex36)
                         ->m_monsterType
                 );
-                if (HAS((m_armies[0] + side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex36)
+                if (HAS((m_armies[side9] + armyIndex36)
                             ->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY)
                     != 0) {
                     armyGroupPtr1->m_creatureCounts[groupCount8] = static_cast<i16>(
-                        (m_armies[0] + side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex36)
+                        (m_armies[side9] + armyIndex36)
                             ->m_quantity
                     );
                 } else {
                     armyGroupPtr1->m_creatureCounts[groupCount8] =
                         static_cast<i16>(static_cast<i32>(
-                            (m_armies[0] + side9 * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex36)
+                            (m_armies[side9] + armyIndex36)
                                 ->m_quantity
                             * COMBAT_AI_QUANTITY_ESTIMATE
                         ));
@@ -345,7 +345,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (targetArmy16 != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                    (m_armies[IDX(enemySide12)] + targetArmy16)
                         ->m_hex;
                 goto finish;
             }
@@ -353,7 +353,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (targetArmy16 != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                    (m_armies[IDX(enemySide12)] + targetArmy16)
                         ->m_hex;
                 goto finish;
             }
@@ -361,7 +361,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (targetArmy16 != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                    (m_armies[IDX(enemySide12)] + targetArmy16)
                         ->m_hex;
                 goto finish;
             }
@@ -371,7 +371,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
                 if (targetArmy16 != -1) {
                     giNextAction = ACTION_MOVE;
                     giNextActionGridIndex =
-                        (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                        (m_armies[IDX(enemySide12)] + targetArmy16)
                             ->m_hex;
                     goto finish;
                 }
@@ -380,7 +380,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (targetArmy16 != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                    (m_armies[IDX(enemySide12)] + targetArmy16)
                         ->m_hex;
                 goto finish;
             }
@@ -388,7 +388,7 @@ void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
             if (targetArmy16 != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[0] + targetArmy16 + IDX(enemySide12) * COMBAT_ARMY_STORAGE_SLOT_COUNT)
+                    (m_armies[IDX(enemySide12)] + targetArmy16)
                         ->m_hex;
                 goto finish;
             }
@@ -709,7 +709,7 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
 
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
         currentArmy10 =
-            m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2;
+            m_armies[IDX(side)] + armyIndex2;
         if (currentArmy10 != NULL
             && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
@@ -753,21 +753,21 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
         if ((mask & bit1) != 0) {
             strength8 =
-                (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                (m_armies[IDX(side)] + armyIndex2)
                     ->Strength();
-            if ((m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+            if ((m_armies[IDX(side)] + armyIndex2)
                         ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
                     != 0
-                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                || (m_armies[IDX(side)] + armyIndex2)
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)]
                        != 0
-                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                || (m_armies[IDX(side)] + armyIndex2)
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
                        != 0
-                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                || (m_armies[IDX(side)] + armyIndex2)
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)]
                        != 0
-                || (m_armies[0] + IDX(side) * COMBAT_ARMY_STORAGE_SLOT_COUNT + armyIndex2)
+                || (m_armies[IDX(side)] + armyIndex2)
                            ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)]
                        != 0)
                 strength8 >>= 1;
