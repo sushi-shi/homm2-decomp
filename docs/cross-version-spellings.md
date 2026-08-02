@@ -55,6 +55,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | InitCampaignMap priority compare | `bestLocal < best` | `best > bestLocal` (mirror) | OPEN |
 | InitCampaignMap faction switch | BARBARIAN, WARLOCK, NECROMANCER | WARLOCK, BARBARIAN, NECROMANCER (je-distance pinned) | OPEN |
 | InitCampaignMap carryover product | ternary * counts | counts * ternary (permuter trial 135) | OPEN |
+| ElementalStorm delay product + storm frame index | `speedMod * DELAY`, `col*STEP + frame + row` | `DELAY * speedMod`, `frame + col*STEP + row` (matrix winners) | OPEN |
+| m_armies indexing (SPELLS + AI, 19 sites) | flattened `m_armies[0] + side*21 + idx` | 2D `m_armies[side] + idx` (single-imul fold, byte-pinned) | OPEN |
+| ElementalStorm locals | *_suffixed epoch names | hit/whichSide/c/baseDam/dmg2/stack/iter/member (bucket pins) | OPEN as slot-name class |
 
 ## Resolved
 
