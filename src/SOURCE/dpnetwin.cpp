@@ -312,7 +312,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
             break;
         case NETWORK_PACKET_GUEST_ARRIVED:
             if (GameMode == REMOTE_GAME_NETWORK_HOST) {
-                for (i = 1; giNumHumanPlayers > i; i++) {
+                for (i = 1; i < giNumHumanPlayers; i++) {
                     if (giNetPosToDCOPos[i] == sender) {
                         dpSendMessage(sender, NETWORK_PACKET_GUEST_ACCEPTED, 0, NULL);
                         return;

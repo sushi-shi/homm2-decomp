@@ -737,7 +737,7 @@ SOURCE/DRAWING	?UpdateCombatArea@combatManager@@QAEXXZ	100.0000	198bbc2af938
 SOURCE/DRAWING	?UpdateGrid@combatManager@@QAEHHH@Z	99.7356	4ca7fef20422
 SOURCE/DRAWING	?UpdateMouseGrid@combatManager@@QAEXHH@Z	99.0146	79ad6018e21a
 SOURCE/EVENTS	?AutoResolveCombat@advManager@@QAEHHHPAVhero@@PAVarmyGroup@@PAVtown@@01HHHH@Z	99.9708	1a435f7a2017
-SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	99.7778	ec09c6c0b29c
+SOURCE/EVENTS	?BarrierAIEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	100.0000	9038ac811ece
 SOURCE/EVENTS	?BarrierEvent@advManager@@QAEHPAVmapCell@@PAVhero@@@Z	95.2198	c78240e85463
 SOURCE/EVENTS	?CombatMonsterEvent@advManager@@QAEHPAVhero@@HHPAVmapCell@@HHHHHHHHHHH@Z	93.7906	a267db64db30
 SOURCE/EVENTS	?ComputerMonsterInteract@advManager@@QAEXPAVmapCell@@PAVhero@@PAH@Z	96.1924	2ac3506a782c
@@ -1411,12 +1411,12 @@ SOURCE/dpnetwin	?CleanupDPVars@@YIXXZ	100.0000	cbe6cb299ac1
 SOURCE/dpnetwin	?DPSD@@YIXHPADH@Z	45.9048	7b5d7383a13f
 SOURCE/dpnetwin	?dpEnumServiceProvider@@YGHPAU_GUID@@PADKKPAX@Z	100.0000	f4df9ca48f36
 SOURCE/dpnetwin	?dpEnumSession@@YGHPAUDPSESSIONDESC@@PAXPAKK@Z	100.0000	2d654e8762d6
-SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	98.7682	48d30b035fba
+SOURCE/dpnetwin	?dpEvaluateMessage@@YIXKH@Z	100.0000	8d70d830d048
 SOURCE/dpnetwin	?dpProcessMessages@@YIXXZ	99.7917	619327303686
 SOURCE/dpnetwin	?dpSendMessage@@YIXHEGPAX@Z	99.8358	7c7e114d1472
 SOURCE/dpnetwin	?dpWaitForExtraGuests@@YIHXZ	100.0000	71b109f775c2
 SOURCE/dpnetwin	?dpWaitForFirstGuest@@YIHXZ	99.7253	f6b20aa5d424
-SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	99.7679	c9b7bab651df
+SOURCE/dpnetwin	?dpWaitForHost@@YIHXZ	99.7812	c9b7bab651df
 SOURCE/dpnetwin	?dpnet_init@@YIFXZ	98.8579	9347ddb014cf
 SOURCE/dpnetwin	?dpnet_rcv@@YIFFGPAX@Z	100.0000	c7e2ae01e357
 SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	2a0579c07e7b
