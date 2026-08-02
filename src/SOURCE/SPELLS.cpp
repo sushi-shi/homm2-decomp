@@ -2771,18 +2771,18 @@ void combatManager::ShowMassSpell(
                 && target0->m_animationSequence != ARMY_ANIMATION_WINCE
                 && target0->m_animationSequence != ARMY_ANIMATION_WINCE_RETURN) {
                 if (target0->m_quantity == 0) {
-                    if (effectFrames
-                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
+                        > effectFrames)
                         effectFrames =
                             target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)];
                     gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_KILL)]);
                 } else {
-                    if (effectFrames
-                        < target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)]
+                        > effectFrames)
                         effectFrames =
                             target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
-                    if (returnFrames7 < target0->m_frameInfo
-                                            .animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)])
+                    if (target0->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)]
+                        > returnFrames7)
                         returnFrames7 = target0->m_frameInfo
                                             .animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
                     gpSoundManager->MemorySample(target0->m_samples[IDX(ARMY_SAMPLE_WINCE)]);

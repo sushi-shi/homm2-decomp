@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| listBoxWidget::listBoxWidget(void) store order | `items, scrollbar, selectedIndex, itemCount, lastSelected` | `itemCount, items, selectedIndex, lastSelected, scrollbar` | OPEN |
+| button::button(void) store order | `normalFrame, pressedFrame, iconId, selectMode, hotkey, icon` | `iconId, icon, normalFrame, pressedFrame, selectMode, hotkey` | OPEN |
+| combatManager::ShowMassSpell frame clamps | `effectFrames < member` (x2); `returnFrames7 < member` | member-first `> effectFrames` / `> returnFrames7` | OPEN - slot residual parked |
 | combatManager::Fireball FP factor | `mod[speed] * SPELL_AREA_ANIMATION_DELAY` | `DELAY * mod[speed]` | OPEN - slot residual parked |
 | combatManager::DoVictory compares | `winningSide == Opposite(...)`; `fadeCount > fadeIndex26`; `emptySlots > iMaxTransferArtifacts`; `!= CREATURE_GHOST` | `Opposite(...) == winningSide`; `fadeIndex26 < fadeCount`; `iMaxTransferArtifacts < emptySlots`; `!= CREATURE_SKELETON` (VALUE - see version-changes) | OPEN - slot residual parked |
 | mouseManager::Open store order | `cursorL/T, mouseX, sizeIdx x2, cursorBottom, mouseY`; `m_active` before `m_priority` | R/B then L/T then X/Y pairs, size indexes last; `m_priority` before `m_active` | OPEN |

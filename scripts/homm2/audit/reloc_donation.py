@@ -1,14 +1,29 @@
-"""Recover DIR32 relocation sites for config/delink_relocs.tsv by donation.
+"""Recover DIR32 relocation sites and target identities by donation.
 
-The stripped target has no base-relocation directory, so the manifest is the
-only DIR32 channel. Every claimed function whose compiled bytes are
-masked-identical to the retail span at the same length donates its own
-relocation sites: the compiled object records where each DIR32 field sits,
-the offsets transfer one-to-one onto the retail body, and the retail dword at
-each site must be a linked VA inside the image. A row is emitted only when
-all three hold, so the output stays a reviewed list rather than a heuristic
-sweep (the Ghidra-reference and aligned-VA channels cover what donation
-cannot reach: unclaimed code and the data segment).
+SUPERSEDED as the site channel by `homm2 audit reloc-sweep`, which recovers
+every site this donates and ~26,000 more, from the image alone. Donation is
+site-anchored only in appearance: it fires on a function whose compiled bytes
+are already masked-identical to retail, so a site arrived *after* exactness
+rather than enabling it, and the data sections -- where nothing is compiled to
+compare against -- could never start at all.
+
+What donation still uniquely provides is target *identity*. The sweep sees a
+dword; this reads the symbol our own object relocated against, which is the
+only channel that yields build/gen/reloc_target_names.tsv (unanimous data-owner
+names), build/gen/string_cells.tsv (content-verified literal cells), and
+config/delink_reloc_aliases.tsv (interior sites as owner + addend). Keep running
+it as claims close: every newly exact function names targets the sweep has
+already placed. Source DATA()/VTBL() markers will retire even that.
+
+Every claimed function whose compiled bytes are masked-identical to the retail
+span at the same length donates its own relocation sites: the compiled object
+records where each DIR32 field sits, the offsets transfer one-to-one onto the
+retail body, and the retail dword at each site must be a linked VA inside the
+image. A row is emitted only when all three hold.
+
+`--write` still merges sites into the manifest, which is now a no-op against a
+freshly swept one; it stays because a non-empty merge means the sweep lost a
+site and a rule needs looking at.
 
 Usage:
     python3 -m homm2.audit.reloc_donation            # report only

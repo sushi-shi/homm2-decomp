@@ -22,6 +22,11 @@ when a residual will not explain itself, grouped by the question they answer:
               its evidence and not just its score.
   oracle      od_oracle - ground truth for homm2.core.od_slots, read straight from the
               S_BPREL32 debug records our compiler emits under /Z7. Needs wine.
+  relocs      reloc_sweep - regenerate config/delink_relocs.tsv from the image with
+              the delinker's find_relocs.py. The primary DIR32 channel.
+              reloc_donation - SUPERSEDED by the sweep; kept as a cross-check and
+              as the only channel that recovers target *identity* (owner names,
+              string cells, interior addends) rather than sites.
 
 `homm2 audit` with no argument lists them. Dispatch is in-process via runpy, which
 is why these five keep their own differing entry points instead of being reshaped
@@ -45,6 +50,10 @@ TOOLS = {
                   "compiler ground truth for the /Od slot model (needs wine)"),
     "unmatched-census": ("unmatched_census",
                          "classify (unmatched) functions by masked bytes + order"),
+    "reloc-sweep": ("reloc_sweep",
+                    "regenerate the DIR32 site manifest from the image"),
+    "reloc-donation": ("reloc_donation",
+                       "superseded by reloc-sweep; donates target identity"),
 }
 
 
