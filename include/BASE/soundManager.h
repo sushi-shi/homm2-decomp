@@ -57,35 +57,16 @@ H2_ENUM_BEGIN(SoundBackendKind)
     SOUND_BACKEND_NONE    = 2
 H2_ENUM_END(SoundBackendKind)
 
-struct LegacySoundManagerBackendState {
-    struct _DIG_DRIVER* digitalDriver;
-    i32 field_0x3a;
-    i32 ready;
-    char _pad_0x0c[0xe];
-    FILE* midiFile;
-};
-SIZE(LegacySoundManagerBackendState, 0x1e);
-
-struct BukaSoundManagerBackendState {
-    SoundBackendKind backend;
-    SoundBackendKind savedBackend;
-    struct _DIG_DRIVER* digitalDriver;
-    audiere::AudioDevice* audioDevice;
-    i32 fadeTargetTrack;
-    i32 fadeSteps;
-    i32 currentTrack;
-};
-SIZE(BukaSoundManagerBackendState, 0x1c);
-
-union SoundManagerBackendState {
-    LegacySoundManagerBackendState legacy;
-    BukaSoundManagerBackendState buka;
-};
-SIZE(SoundManagerBackendState, 0x1e);
-
 class soundManager : public baseManager {
 public:
-    SoundManagerBackendState m_backendState;
+    SoundBackendKind m_backend;
+    SoundBackendKind m_savedBackend;
+    struct _DIG_DRIVER* m_digitalDriver;
+    audiere::AudioDevicePtr m_audiereDevice;
+    i32 m_musicFadeTargetTrack;
+    i32 m_musicFadeSteps;
+    i32 m_musicTrack;
+    i16 field_0x52;
     struct _SAMPLE* m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
     char _pad_0x8c[0x8];
     i32 m_numSampleHandles;
@@ -119,6 +100,7 @@ public:
     i32 m_midiStarted;
     i32 m_pollTimer;
     soundManager(void);
+    ~soundManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;

@@ -17,6 +17,8 @@
 #include <BASE/bitmap.h>
 #include <BASE/palette.h>
 
+#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Base\\RESMGR.CPP"
+
 H2_ENUM_BEGIN(ResourceConstant)
     INVALID_FILE            = -1,
     LOAD_SUCCESS            = 0,
@@ -30,7 +32,6 @@ H2_ENUM_BEGIN(ResourceConstant)
     POSITION_STACK_DEPTH    = 10
 H2_ENUM_END(ResourceConstant)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP"
 VA(0x004b7ee0, 0xb8)
 resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
@@ -298,7 +299,7 @@ void resourceManager::Close(void) {
     m_resourceListHead = NULL;
     for (aggregateIndex = 0; aggregateIndex < RESOURCE_MANAGER_AGGREGATE_LIMIT; aggregateIndex++) {
         if (m_aggregateDir[aggregateIndex] != NULL)
-            H2_FREE_AT(m_aggregateDir[aggregateIndex], RETAIL_FILE, 0x1da);
+            H2_FREE(m_aggregateDir[aggregateIndex]);
         if (m_aggregateFd[aggregateIndex] != INVALID_FILE) {
             close(m_aggregateFd[aggregateIndex]);
             m_aggregateFd[aggregateIndex] = INVALID_FILE;
@@ -330,7 +331,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
     m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
-    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC_AT(directoryBytes, RETAIL_FILE, 542));
+    m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);
     return LOAD_SUCCESS;
 }
@@ -509,4 +510,3 @@ i32 iSaveCtr = 0;
 i32 lastAggZ[POSITION_STACK_DEPTH];
 i32l lastPositionZ[POSITION_STACK_DEPTH];
 
-#undef RETAIL_FILE

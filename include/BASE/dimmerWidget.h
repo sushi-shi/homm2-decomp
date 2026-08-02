@@ -18,7 +18,7 @@ public:
         i16 id,
         H2_ENUM_PARAM(WidgetKind, i16) kind
     );
-    virtual ~dimmerWidget() OVERRIDE {}
+    virtual ~dimmerWidget(void) OVERRIDE;
     virtual void Draw(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;
     void Read(void);

@@ -63,7 +63,7 @@ sample::sample(char* name, i32l, i32l, i32l)
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 57
     m_playbackData.data =
-        static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.sampleAllocation, 57));
+        static_cast<char*>(H2_ALLOC(size));
     m_playbackData.size = size;
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_playbackData.data), size);
@@ -74,7 +74,7 @@ inline sample::~sample() {
     if (gpSoundManager != NULL)
         gpSoundManager->StopSample(this);
 #line 97
-    H2_FREE_AT(m_playbackData.data, gSampleSourceFiles.sampleDestruction, 0x61);
+    H2_FREE(m_playbackData.data);
     memset(&m_playbackData, 0, sizeof(m_playbackData));
 }
 
@@ -88,7 +88,7 @@ MIDIWrap::MIDIWrap(char* name)
     ) {
     u32l size = gpResourceManager->GetFileSize(m_id);
 #line 110
-    m_data = static_cast<char*>(H2_ALLOC_AT(size, gSampleSourceFiles.midiAllocation, 110));
+    m_data = static_cast<char*>(H2_ALLOC(size));
     gpResourceManager->PointToFile(m_id);
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), size);
 }
@@ -96,6 +96,6 @@ MIDIWrap::MIDIWrap(char* name)
 VA(0x004ce610, 0x3d)
 inline MIDIWrap::~MIDIWrap() {
 #line 118
-    H2_FREE_AT(m_data, gSampleSourceFiles.midiDestruction, 0x76);
+    H2_FREE(m_data);
     m_data = NULL;
 }

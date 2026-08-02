@@ -272,7 +272,6 @@ H2_ENUM_END(OverviewDialogConstant)
 #define OVERVIEW_SCROLL_MIN_Y_FLOAT 18.0f
 #define OVERVIEW_SCROLL_ROUNDING_OFFSET 0.4
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Overview.cpp")
 
 #define OVERVIEW_TEXT_WIDGET_ROWS (reinterpret_cast<OverviewTextWidgetRow*>(textWidgetDynamic))
 #define OVERVIEW_ICON_WIDGET_ROWS (reinterpret_cast<OverviewIconWidgetRow*>(iconWidgetDynamic))
@@ -362,10 +361,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             i32 hasCaptain0;
             i32 captainMana;
             {
-                valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                    strlen(record->m_name) + 1, RETAIL_FILE,
-                    overviewDynamicSourceLine + 79
-                ));
+                valueText0 = static_cast<char*>(H2_ALLOC(strlen(record->m_name) + 1));
                 strcpy(valueText0, record->m_name);
 
                 OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
@@ -548,10 +544,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                            OVERVIEW_TROOP_TEXT_CAPACITY, RETAIL_FILE,
-                            overviewDynamicSourceLine + 238
-                        ));
+                        valueText0 = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
                         sprintf(
                             valueText0,
                             "%d",
@@ -650,10 +643,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                            OVERVIEW_TROOP_TEXT_CAPACITY, RETAIL_FILE,
-                            overviewDynamicSourceLine + 298
-                        ));
+                        valueText0 = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
                         sprintf(
                             valueText0,
                             "%d",
@@ -764,10 +754,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
             iconCount++;
 
             for (item = 0; item < HERO_PRIMARY_STAT_COUNT; item++) {
-                valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                    OVERVIEW_PRIMARY_TEXT_CAPACITY, RETAIL_FILE,
-                    overviewDynamicSourceLine + 386
-                ));
+                valueText0 = static_cast<char*>(H2_ALLOC(OVERVIEW_PRIMARY_TEXT_CAPACITY));
                 sprintf(
                     valueText0,
                     "%d",
@@ -844,10 +831,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                         overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                         iconCount++;
 
-                        valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                            OVERVIEW_TROOP_TEXT_CAPACITY, RETAIL_FILE,
-                            overviewDynamicSourceLine + 445
-                        ));
+                        valueText0 = static_cast<char*>(H2_ALLOC(OVERVIEW_TROOP_TEXT_CAPACITY));
                         sprintf(
                             valueText0,
                             "%d",
@@ -927,10 +911,7 @@ void game::SetupDynamicStuff(i32 redraw, i32 updateKnob, i32 forceUpdate) {
                     overWin->AddWidget(OVERVIEW_ICON_WIDGET_ROWS[row][iconCount], -1);
                     iconCount++;
 
-                    valueText0 = static_cast<char*>(H2_ALLOC_AT(
-                        OVERVIEW_SKILL_LEVEL_CAPACITY, RETAIL_FILE,
-                        overviewDynamicSourceLine + 507
-                    ));
+                    valueText0 = static_cast<char*>(H2_ALLOC(OVERVIEW_SKILL_LEVEL_CAPACITY));
                     sprintf(valueText0, "%d", static_cast<i32>(heroData13->GetSSLevel(detailIndex1)));
                     OVERVIEW_TEXT_WIDGET_ROWS[row][textItemCount] = new textWidget(
                         static_cast<i16>(
@@ -1078,10 +1059,7 @@ void game::SetupNewOverviewType(OverviewType overviewType, i32 redrawFrom) {
         }
     }
     for (title = 0; title < OVERVIEW_TITLE_COUNT; title++) {
-        titleCopy = static_cast<char*>(H2_ALLOC_AT(
-            strlen(cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]) + 1, RETAIL_FILE,
-            overviewSetupSourceLine + 42
-        ));
+        titleCopy = static_cast<char*>(H2_ALLOC(strlen(cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]) + 1));
         strcpy(titleCopy, cOverviewText[IDX(giOverviewType) * OVERVIEW_TITLE_COUNT + title]);
         textWidgetTitle[title] = new textWidget(
             titleLefts[IDX(giOverviewType)][title],
@@ -1136,14 +1114,8 @@ void game::Overview(void) {
         textWidgetTitle[mine4] = NULL;
     }
 
-    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC_AT(
-        DYNAMIC_ARRAY_BYTES, RETAIL_FILE,
-        overviewDialogSourceLine + 17
-    ));
-    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC_AT(
-        DYNAMIC_ARRAY_BYTES, RETAIL_FILE,
-        overviewDialogSourceLine + 18
-    ));
+    textWidgetDynamic = static_cast<textWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
+    iconWidgetDynamic = static_cast<iconWidget**>(H2_ALLOC(DYNAMIC_ARRAY_BYTES));
     for (row0 = 0; row0 < OVERVIEW_VISIBLE_ROWS; row0++) {
         for (mine4 = 0; mine4 < OVERVIEW_DYNAMIC_WIDGETS_PER_ROW; mine4++) {
             OVERVIEW_TEXT_WIDGET_ROWS[row0][mine4] = NULL;
@@ -1222,14 +1194,8 @@ void game::Overview(void) {
     gpWindowManager->FadeScreen(FADE_OUT, OVERVIEW_FADE_STEPS, NULL);
     delete overWin;
     overWin = NULL;
-    H2_FREE_AT(
-        textWidgetDynamic, RETAIL_FILE,
-        overviewDialogSourceLine + 104
-    );
-    H2_FREE_AT(
-        iconWidgetDynamic, RETAIL_FILE,
-        overviewDialogSourceLine + 105
-    );
+    H2_FREE(textWidgetDynamic);
+    H2_FREE(iconWidgetDynamic);
     textWidgetDynamic = NULL;
     iconWidgetDynamic = NULL;
 }
@@ -1661,4 +1627,3 @@ class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
 #undef OVERVIEW_SCROLL_ROUNDING_OFFSET
 #undef OVERVIEW_SCROLL_MIN_Y_FLOAT
 #undef OVERVIEW_SCROLL_KNOB_RANGE_FLOAT
-#undef RETAIL_FILE

@@ -24,7 +24,6 @@ H2_ENUM_BEGIN(WinsockPrivateConstant)
     EXTRA_GUEST_PLAYER_THRESHOLD = 2
 H2_ENUM_END(WinsockPrivateConstant)
 
-#define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\Wsnetwin.cpp")
 
 static i16 s_wsInitSourceLineBase = 61;
 static i16 s_wsTermSourceLineBase = 248;
@@ -52,14 +51,8 @@ i16 wsnet_init(void) {
         SetFullScreenStatus(0);
     }
     gbRemoteOn = true;
-    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC_AT(
-        WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*), RETAIL_FILE,
-        s_wsInitSourceLineBase + 10
-    ));
-    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC_AT(
-        WS_TRANSPORT_BUFFER_COUNT * sizeof(i32), RETAIL_FILE,
-        s_wsInitSourceLineBase + 11
-    ));
+    ppDPRcvBuffer = static_cast<u8**>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*)));
+    piDPRcvBufferSize = static_cast<i32*>(H2_ALLOC(WS_TRANSPORT_BUFFER_COUNT * sizeof(i32)));
     memset(ppDPRcvBuffer, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(u8*));
     memset(piDPRcvBufferSize, 0, WS_TRANSPORT_BUFFER_COUNT * sizeof(i32));
 
@@ -197,10 +190,10 @@ void wsnet_term(void) {
     if (sd_dg != INVALID_SOCKET)
         closesocket(sd_dg);
     if (ppDPRcvBuffer != NULL)
-        H2_FREE_AT(ppDPRcvBuffer, RETAIL_FILE, s_wsTermSourceLineBase + 7);
+        H2_FREE(ppDPRcvBuffer);
     ppDPRcvBuffer = NULL;
     if (piDPRcvBufferSize != NULL)
-        H2_FREE_AT(piDPRcvBufferSize, RETAIL_FILE, s_wsTermSourceLineBase + 11);
+        H2_FREE(piDPRcvBufferSize);
     piDPRcvBufferSize = NULL;
     WSACleanup();
     bHostFound = 0;
@@ -219,7 +212,7 @@ void wsSendMessage(
     u16 size,
     void* data
 ) {
-    u8* packetBuffer = static_cast<u8*>(H2_ALLOC_AT(size + 1, RETAIL_FILE, s_wsSendSourceLineBase + 2));
+    u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1));
     struct sockaddr_in peerAddress;
     i32 attemptCount;
     i32 error;
@@ -272,7 +265,7 @@ void wsSendMessage(
             return;
         }
     }
-    H2_FREE_AT(packetBuffer, RETAIL_FILE, s_wsSendSourceLineBase + 57);
+    H2_FREE(packetBuffer);
 }
 
 VA(0x004b24e8, 0x4d)
@@ -301,10 +294,7 @@ i16 wsnet_rcv(i16, u16, void* data) {
         return 0;
     size = piDPRcvBufferSize[iDPRcvBufferTail];
     memcpy(data, ppDPRcvBuffer[iDPRcvBufferTail], size);
-    H2_FREE_AT(
-        ppDPRcvBuffer[iDPRcvBufferTail], RETAIL_FILE,
-        s_wsReceiveSourceLineBase + 9
-    );
+    H2_FREE(ppDPRcvBuffer[iDPRcvBufferTail]);
     iDPRcvBufferTail = (iDPRcvBufferTail + 1) % WS_TRANSPORT_BUFFER_COUNT;
     return static_cast<i16>(size);
 }
@@ -347,10 +337,7 @@ void wsEvaluateMessage(u32l size, i32 sender) {
 
     switch (static_cast<NetworkPacketType>(rcvBufIn[0])) {
         case NETWORK_PACKET_DATA:
-            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC_AT(
-                size - 1, RETAIL_FILE,
-                s_wsEvaluateSourceLineBase + 10
-            ));
+            ppDPRcvBuffer[iDPRcvBufferHead] = static_cast<u8*>(H2_ALLOC(size - 1));
             memcpy(ppDPRcvBuffer[iDPRcvBufferHead], rcvBufIn + 1, size - 1);
             piDPRcvBufferSize[iDPRcvBufferHead] = size;
             iDPRcvBufferHead = (iDPRcvBufferHead + 1) % WS_TRANSPORT_BUFFER_COUNT;
@@ -532,4 +519,3 @@ struct in_addr gIn_addrIP;
 struct sockaddr_in saddr_remote;
 i32 iAddrLen;
 
-#undef RETAIL_FILE

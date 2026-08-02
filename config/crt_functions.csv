@@ -4,8 +4,9 @@
 # `homm2 audit unmatched-census --write-config`; review rows whose
 # alternates list collisions.
 entry_rva,size,symbol,member,library,evidence,alternates
-0xd68c2,11,_atoi,atox.obj,libcmt.lib,masked-exact,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
-0xd68e0,224,__mbscat,mbscat.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\mbscat.obj!__mbscat|libcmt.lib:build\intel\mt_obj\strcat.obj!_strcat
+0xd68c2,11,??3@YAXPAX@Z,delete.obj,libcmt.lib,reviewed-callgraph forwards to _free at 0xd7d64; every DeleteMainClasses delete-site calls it,11 identical candidates: libcmt.lib:build\intel\mt_obj\atox.obj!_atoi|libcmt.lib:build\intel\mt_obj\unlink.obj!__unlink|libcmt.lib:build\intel\mt_obj\wunlink.obj!__wunlink|libcmt.lib:build\intel\mt_obj\delete.obj!??3@YAXPAX@Z
+0xd68d0,7,_strcpy,strcat.obj,libcmt.lib,reviewed-callgraph,strcpy head sharing strcat tail (jmp 0xd6941); called as strcpy by baseManager ctor and 44 units
+0xd68e0,224,_strcat,strcat.obj,libcmt.lib,reviewed-callgraph _strcpy stub at 0xd68d0 jumps into this body so the linked member is strcat.obj,2 identical candidates: libcmt.lib:build\intel\mt_obj\mbscat.obj!__mbscat|libcmt.lib:build\intel\mt_obj\strcat.obj!_strcat
 0xd69c0,123,_strlen,strlen.obj,libcmt.lib,masked-exact,
 0xd6a3b,14,??2@YAPAXI@Z,new.obj,libcmt.lib,masked-exact,3 identical candidates: libcmt.lib:build\intel\mt_obj\_wctype.obj!_iswupper|libcmt.lib:build\intel\mt_obj\new.obj!??2@YAPAXI@Z|libcmt.lib:build\intel\mt_obj\mktime.obj!_mktime
 0xd6a49,45,?_JumpToContinuation@@YGXPAXPAUEHRegistrationNode@@@Z,trnsctrl.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=45
@@ -41,6 +42,7 @@ entry_rva,size,symbol,member,library,evidence,alternates
 0xd7cb9,9,__lockexit,crt0dat.obj,libcmt.lib,masked-exact,2 identical candidates: libcmt.lib:build\intel\mt_obj\crt0dat.obj!__lockexit|libcmt.lib:build\intel\mt_obj\crt0dat.obj!__unlockexit
 0xd7cc2,26,__initterm,crt0dat.obj,libcmt.lib,masked-exact,
 0xd7ce0,129,_strcmp,strcmp.obj,libcmt.lib,prefix-24,prefix-24 only; size ours=129
+0xd7d64,215,_free,free.obj,libcmt.lib,reviewed-callgraph,forwarded to by operator delete 0xd68c2; callees are heap internals
 0xd7e4d,80,_strerror,strerror.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7e9d,115,__dosmaperr,dosmap.obj,libcmt.lib,masked-exact,union-mask (delinker missed image sites)
 0xd7f10,9,__errno,dosmap.obj,libcmt.lib,masked-exact,

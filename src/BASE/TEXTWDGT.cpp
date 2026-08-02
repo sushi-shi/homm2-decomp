@@ -1,6 +1,5 @@
 #include <va.h>
 #include <BASE/textWidget.h>
-#include <BASE/TEXTWDGT_TYPES.h>
 #include <BASE/widgetKind.h>
 #include <BASE/resourceManager.h>
 #include <BASE/Misc.h>
@@ -8,11 +7,6 @@
 #include <BASE/heroWindow.h>
 #include <SOURCE/KB.h>
 #include <string.h>
-
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\TEXTWDGT.CPP"
-
-static STextWidgetSourceFiles gTextWidgetSourceFiles =
-    {RETAIL_FILE, RETAIL_FILE, RETAIL_FILE, RETAIL_FILE};
 
 H2_ENUM_BEGIN(TextWidgetConstant)
     RESOURCE_NAME_CAPACITY = 16,
@@ -59,7 +53,7 @@ void textWidget::Read(void) {
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
     i16 len = gpResourceManager->ReadWord();
-    m_text = static_cast<char*>(H2_ALLOC_AT(len, gTextWidgetSourceFiles.read, 57));
+    m_text = static_cast<char*>(H2_ALLOC(len));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_text), len);
     gpResourceManager->Read13(reinterpret_cast<i8*>(resourceName));
     gpResourceManager->SavePosition();
@@ -75,7 +69,7 @@ void textWidget::Read(void) {
 VA(0x004c31c0, 0x72)
 inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
-    H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
+    H2_FREE(m_text);
 }
 
 #define SET_WIDGET_MESSAGE(messageValue, commandValue, idValue)                                  \
@@ -132,13 +126,9 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
                     }
                     u16 newLen = strlen(newText);
                     if (strlen(m_text) < newLen) {
-                        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
+                        H2_FREE(m_text);
                         m_text = static_cast<char*>(
-                            H2_ALLOC_AT(
-                                newLen + TEXT_BUFFER_GROWTH,
-                                gTextWidgetSourceFiles.resizeAlloc,
-                                212
-                            )
+                            H2_ALLOC(newLen + TEXT_BUFFER_GROWTH)
                         );
                     }
                     strcpy(m_text, newText);
@@ -194,16 +184,11 @@ void textWidget::SetText(char* text) {
     }
     u16 newLen = strlen(text);
     if (strlen(m_text) < newLen) {
-        H2_FREE_AT(m_text, gTextWidgetSourceFiles.resizeFree, 0xd3);
-        m_text = static_cast<char*>(H2_ALLOC_AT(
-            newLen + TEXT_BUFFER_GROWTH,
-            gTextWidgetSourceFiles.resizeAlloc,
-            212
-        ));
+        H2_FREE(m_text);
+        m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
     }
     strcpy(m_text, text);
 }
 
 
 
-#undef RETAIL_FILE

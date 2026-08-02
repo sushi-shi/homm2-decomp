@@ -2,7 +2,7 @@
 #include <BASE/dimmerWidget.h>
 #include <BASE/resourceManager.h>
 #include <SOURCE/KB.h>
-VA(0x004d32f0, 0x12)
+VA(0x004d3310, 0x2b)
 dimmerWidget::dimmerWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {}
 
 VA(0x004d3340, 0x3f)
@@ -35,3 +35,6 @@ VA(0x004d3420, 0x13)
 void dimmerWidget::Draw(void) {
     Dim();
 }
+
+VA(0x004d3470, 0x1c)
+dimmerWidget::~dimmerWidget() {}

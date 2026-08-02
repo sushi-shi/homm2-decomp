@@ -76,12 +76,11 @@ void FadeIn(i32);
 void FadeOut(i32);
 i32 Random(i32 low, i32 high);
 void ProcessAssert(i32 condition, char* file, i32 line);
-#define H2_ALLOC(size, originalLine) BaseAlloc(size, const_cast<char*>(RETAIL_FILE), originalLine)
-#define H2_FREE(ptr, originalLine) BaseFree(ptr, const_cast<char*>(RETAIL_FILE), originalLine)
-#define H2_ALLOC_AT(size, originalFile, originalLine)                                              \
-    BaseAlloc(size, const_cast<char*>(originalFile), originalLine)
-#define H2_FREE_AT(ptr, originalFile, originalLine)                                                \
-    BaseFree(ptr, const_cast<char*>(originalFile), originalLine)
+// Gold 2.1 abandoned the file/line debug allocator: BaseAlloc/BaseFree are
+// still compiled into Misc but have zero retail callers - every allocation
+// site lowers to plain operator new/delete (435/524 direct calls image-wide).
+#define H2_ALLOC(size) ::operator new(size)
+#define H2_FREE(ptr) ::operator delete(ptr)
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, char* pattern);

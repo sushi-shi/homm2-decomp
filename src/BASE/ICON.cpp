@@ -29,21 +29,18 @@ H2_ENUM_BEGIN(IconDrawExtentConstant)
     DRAW_COMBAT_HEIGHT = 444
 H2_ENUM_END(IconDrawExtentConstant)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\ICON.CPP"
 VA(0x004c26f0, 0xb7)
 icon::icon(u32l id) : resource(RESOURCE_CATEGORY_ICON, id, RESOURCE_REFERENCE_INITIAL, NULL) {
-    static char allocationSourceFile[] = RETAIL_FILE;
     gpResourceManager->PointToFile(id);
     m_frameCount = gpResourceManager->ReadWord();
     u32 len = gpResourceManager->ReadLong();
-    m_data = static_cast<u8*>(H2_ALLOC_AT(len, allocationSourceFile, 18));
+    m_data = static_cast<u8*>(H2_ALLOC(len));
     gpResourceManager->ReadBlock(reinterpret_cast<i8*>(m_data), len);
 }
 
 VA(0x004c27e0, 0x33)
 inline icon::~icon() {
-    static char destructionSourceFile[] = RETAIL_FILE;
-    H2_FREE_AT(m_data, destructionSourceFile, 0x1a);
+    H2_FREE(m_data);
 }
 
 VA(0x004c2820, 0x72)
@@ -367,4 +364,3 @@ void icon::DimToBuffer(
 
 
 
-#undef RETAIL_FILE

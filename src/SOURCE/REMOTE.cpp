@@ -39,7 +39,6 @@ H2_ENUM_CLASS_BEGIN(RemoteSetupCommand)
     SETUP_CAMPAIGN_GAME = 0x3e
 H2_ENUM_CLASS_END(RemoteSetupCommand)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\REMOTE.CPP"
 #define REMOTE_PACKET(buffer) (reinterpret_cast<RemotePacketHeader*>(buffer))
 #define REMOTE_MESSAGE(buffer) (reinterpret_cast<RemoteMessage*>(buffer))
 #define REMOTE_PLAYER_INFO(message) (reinterpret_cast<SNetPlayerInfo*>((message)->payload))
@@ -591,9 +590,7 @@ char* GetRemoteData(i8 remove) {
     if (selected >= 0) {
         memcpy(rcvBufOut, rcvBuf[selected], REMOTE_MESSAGE_SIZE);
         if (remove != 0) {
-            H2_FREE_AT(
-                rcvBuf[selected], RETAIL_FILE, gGetRemoteDataLineBase + GET_REMOTE_DATA_FREE_LINE_OFFSET
-            );
+            H2_FREE(rcvBuf[selected]);
             rcvBuf[selected] = NULL;
         }
         return rcvBufOut;
@@ -796,9 +793,7 @@ void PollRemote(void) {
                 }
                 if (queueIndex >= REMOTE_QUEUE_CAPACITY)
                     continue;
-                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC_AT(
-                    REMOTE_MESSAGE_SIZE, RETAIL_FILE, gPollRemoteLineBase + POLL_REMOTE_ALLOC_LINE_OFFSET
-                ));
+                rcvBuf[queueIndex] = static_cast<char*>(H2_ALLOC(REMOTE_MESSAGE_SIZE));
                 iInOrder[queueIndex] = iInOrderCtr++;
                 memcpy(rcvBuf[queueIndex], rcvBufIn, REMOTE_MESSAGE_SIZE);
                 queueCount++;
@@ -895,4 +890,3 @@ char* rcvBuf[REMOTE_QUEUE_STORAGE_COUNT];
 i32 bGotGameType;
 SNetPlayerInfo gsThisNetPlayerInfo;
 
-#undef RETAIL_FILE

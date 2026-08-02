@@ -10,6 +10,8 @@
 #include <BASE/Misc.h>
 #include <stdio.h>
 
+#define RETAIL_FILE "e:\\Users\\igorl\\VSS\\HMM\\HMM2\\Source\\Game\\NETWIN.CPP"
+
 H2_ENUM_BEGIN(NetbiosResetConstant)
     RESET_SESSION_LIMIT_INDEX = 0,
     RESET_NAME_LIMIT_INDEX    = 2,
@@ -17,7 +19,6 @@ H2_ENUM_BEGIN(NetbiosResetConstant)
     RESET_NAME_LIMIT          = 10
 H2_ENUM_END(NetbiosResetConstant)
 
-#define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\netwin.cpp"
 
 static u8 gNbCallRetries = 0;
 static u8 gNetbiosAvail = 0;
@@ -106,9 +107,7 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(NULL, 1, 0, NULL);
         memset(&localNcb, 0, sizeof(localNcb));
-        statusBuffer = static_cast<u8*>(H2_ALLOC_AT(
-            NETBIOS_ADAPTER_STATUS_SIZE, RETAIL_FILE, gNbInitSourceLineBase + 40
-        ));
+        statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE));
         localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
         localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
         localNcb.buffer = statusBuffer;
@@ -121,7 +120,7 @@ extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
             localNcb.callName[RESET_NAME_LIMIT_INDEX] = RESET_NAME_LIMIT;
             Netbios(&localNcb);
         }
-        H2_FREE_AT(statusBuffer, RETAIL_FILE, gNbInitSourceLineBase + 54);
+        H2_FREE(statusBuffer);
         gNbShutdown = 0;
         return 0;
     }
@@ -153,9 +152,9 @@ extern "C" void __fastcall nb_term(void) {
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != NULL)
-        H2_FREE_AT(node, RETAIL_FILE, gNbTermSourceLineBase + 31);
+        H2_FREE(node);
     while ((node = pop_node(&gNbFreeQueue)) != NULL)
-        H2_FREE_AT(node, RETAIL_FILE, gNbTermSourceLineBase + 35);
+        H2_FREE(node);
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -166,7 +165,7 @@ extern "C" void __fastcall nb_term(void) {
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
     while ((node = pop_node(&gNbRcvQueue)) != NULL)
-        H2_FREE_AT(node, RETAIL_FILE, gNbTermSourceLineBase + 50);
+        H2_FREE(node);
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
@@ -186,7 +185,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
         else
             len = node->len;
         memcpy(buf, node->data, len);
-        H2_FREE_AT(node, RETAIL_FILE, gNbReceiveSourceLineBase + 11);
+        H2_FREE(node);
         return len;
     }
     return 0;
@@ -203,9 +202,7 @@ extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
     }
     if (!HAS(gNetStatus[session], NETBIOS_SESSION_ACTIVE))
         return IDX(NETBIOS_RESULT_SESSION_OUT_OF_RANGE);
-    node = static_cast<tag_Node*>(H2_ALLOC_AT(
-        len + NETBIOS_PACKET_HEADER_SIZE, RETAIL_FILE, gNbSendSourceLineBase + 15
-    ));
+    node = static_cast<tag_Node*>(H2_ALLOC(len + NETBIOS_PACKET_HEADER_SIZE));
     node->len = len;
     node->sessionIndex = static_cast<u8>(session);
     memcpy(node->data, data, len);
@@ -410,7 +407,7 @@ void nb_thr_ctl(void) {
                         }
                     }
                 }
-                H2_FREE_AT(node, RETAIL_FILE, gNbThreadSourceLineBase + 96);
+                H2_FREE(node);
             }
         }
     }
@@ -632,10 +629,7 @@ static void __fastcall nb_recv_complete(i32 session) {
             switch (gNbSessNcb[session].returnCode) {
                 case NETBIOS_RESULT_SUCCESS:
                     node = static_cast<tag_Node*>(
-                        H2_ALLOC_AT(
-                            gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE, RETAIL_FILE,
-                            gNbReceiveCompleteSourceLineBase + 16
-                        )
+                        H2_ALLOC(gNbSessNcb[session].length + NETBIOS_PACKET_HEADER_SIZE)
                     );
                     if (node != NULL) {
                         node->len = gNbSessNcb[session].length;
@@ -669,4 +663,3 @@ static void __fastcall nb_format_name(char* src, u8* dst) {
         dst[i] = ' ';
 }
 
-#undef RETAIL_FILE

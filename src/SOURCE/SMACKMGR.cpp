@@ -173,7 +173,7 @@ void SmackManagerMain(void) {
     bMainDone = 1;
     memcpy(savedPalette9, gPalette->m_data, PALETTE_DATA_SIZE);
 
-    if (gbNoSound || !gpSoundManager->m_backendState.buka.digitalDriver
+    if (gbNoSound || !gpSoundManager->m_digitalDriver
         || gConfig.soundVolume == CONFIG_VOLUME_MUTED
         || bSmackNum == SMACK_CREDITS) {
         bSmackSound = 0;
@@ -181,13 +181,13 @@ void SmackManagerMain(void) {
         bSmackSound = 1;
         if (AIL_get_preference(MILES_SOUND_SYSTEM_PREFERENCE)) {
             SmackSoundUseMSS(
-                reinterpret_cast<void*>(gpSoundManager->m_backendState.buka.digitalDriver)
+                reinterpret_cast<void*>(gpSoundManager->m_digitalDriver)
             );
             LogStr("SSSS 1");
         } else {
             SmackSoundUseDirectSound(
                 reinterpret_cast<SmackMilesDigitalDriver*>(
-                    gpSoundManager->m_backendState.buka.digitalDriver
+                    gpSoundManager->m_digitalDriver
                 )
                     ->directSound
             );

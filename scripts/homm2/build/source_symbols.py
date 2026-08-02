@@ -105,9 +105,22 @@ def symbols_for_file(path: Path, source_root: Path, repo: Path) -> list[SourceSy
                 f"{path}:{cursor.location.line}: unusable VA marker on "
                 f"{cursor.spelling!r}")
         rows.append(SourceSymbol(
-            rva=va - IMAGE_BASE, name=cursor.mangled_name, unit=unit,
+            rva=va - IMAGE_BASE, name=_vc6_symbol_name(cursor), unit=unit,
             size=size, kind="func", provenance="source-annotation"))
     return rows
+
+
+def _vc6_symbol_name(cursor) -> str:
+    """clang's MSVC mangler names destructor definitions as the vbase
+    destructor (??_D...@@QAEXXZ); VC6 only emits that helper for classes with
+    virtual bases, which this codebase never uses. The retail symbol for a
+    user destructor is the plain ??1, virtual destructors as UAE."""
+    name = cursor.mangled_name
+    if cursor.kind == ci.CursorKind.DESTRUCTOR and name.startswith("??_D"):
+        access = "U" if cursor.is_virtual_method() else "Q"
+        assert name.endswith("@@QAEXXZ"), name
+        return "??1" + name[len("??_D"):-len("@@QAEXXZ")] + f"@@{access}AE@XZ"
+    return name
 
 
 # Reviewed identification CSVs: interim claims kept out of source until the
