@@ -2,6 +2,7 @@
 #include "EDITOR/fullMap.h"
 #include "EDITOR/mapcell.h"
 #include <BASE/Misc.h>
+#include <SOURCE/KB.h>
 #include <string.h>
 #include <io.h>
 
