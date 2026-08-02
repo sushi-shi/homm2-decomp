@@ -182,7 +182,7 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
         giViewWorldScaleLookup = SCALE_INDEX_NEAR;
 
     iVWViewableCells = WORLD_DRAW_SIZE / IDX(giViewWorldScale);
-    if (MAP_WIDTH < iVWViewableCells)
+    if (iVWViewableCells > MAP_WIDTH)
         iVWViewableCells = MAP_WIDTH;
     iVWCenterOffset = iVWViewableCells >> 1;
     iVWMapOriginY = 0;
@@ -191,12 +191,12 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
         iVWMapOriginX = centerX - (iVWViewableCells >> 1);
         if (iVWMapOriginX < 0)
             iVWMapOriginX = 0;
-        if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
+        if (iVWMapOriginX + iVWViewableCells >= MAP_WIDTH)
             iVWMapOriginX = MAP_WIDTH - iVWViewableCells;
         iVWMapOriginY = centerY - (iVWViewableCells >> 1);
         if (iVWMapOriginY < 0)
             iVWMapOriginY = 0;
-        if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
+        if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
             iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
     }
 

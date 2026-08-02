@@ -370,7 +370,7 @@ BASE/WINDOW	?RemoveAndDeleteWidget@heroWindow@@QAEXH@Z	100.0000	7d0af76b0109
 BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	95.1507	58bf4111366e
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	b01eecebcd16
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	f30559a466ff
-BASE/WINMGR	??0heroWindowManager@@QAE@XZ	99.8333	c9f85b1b51ab
+BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	0b5e1800ce0f
 BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	81.4112	30caf024d5eb
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	100.0000	1183a5510de9
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	1058c1ccd6f9
@@ -1347,7 +1347,7 @@ SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	99.7143	67aa1505e29f
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	97.5748	e35354994e6a
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	8f85a9beed9e
 SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	88.3456	d478e654d23a
-SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	98.0000	ffe74a903e6f
+SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	99.3388	a3a66e65a99c
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.7226	03dd826b92ea
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	97.5073	5b0db971cfd1
 SOURCE/Wsnetwin	?wsEvaluateMessage@@YIXKH@Z	100.0000	4c07c527f13e
