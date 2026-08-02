@@ -131,7 +131,7 @@ BASE/Bzip	?setGlobalCRC@@YIXI@Z	100.0000	6e97a740e2f6
 BASE/Bzip	?shellTrivial@@YIXXZ	100.0000	78273e158f0b
 BASE/Bzip	?showFileNames@@YIXXZ	100.0000	c178c8ce00b9
 BASE/Bzip	?sortIt@@YIXXZ	100.0000	4f22ec5d910e
-BASE/Bzip	?spotBlock@@YIXH@Z	99.9794	fadac213e6bc
+BASE/Bzip	?spotBlock@@YIXH@Z	100.0000	fadac213e6bc
 BASE/Bzip	?stripe@@YIXXZ	100.0000	9e1b328c6673
 BASE/Bzip	?trivialGt@@YIHHH@Z	100.0000	a5528a24065d
 BASE/Bzip	?unRLEandDump@@YIXPAU_iobuf@@H@Z	100.0000	a967925394d0
@@ -151,12 +151,12 @@ BASE/EXEC	??0executive@@QAE@XZ	100.0000	2198e1058a32
 BASE/EXEC	?AddManager@executive@@QAEHPAVbaseManager@@H@Z	84.6887	c7188d87ff9b
 BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	96.2381	2558aa71d599
 BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	57.7474	774634bc5689
-BASE/EXEC	?InitSystem@executive@@QAEHXZ	99.7455	42e8597a1e5b
+BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	42e8597a1e5b
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	71.1593	e69c460d8f2a
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	85.4528	bb6925048c62
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	78.5500	7a5a0a411c47
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	91.8000	0f3a8231b9d2
-BASE/EXEC	?Terminate@executive@@QAEXXZ	99.8889	954f5a9ba0c3
+BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	954f5a9ba0c3
 BASE/FONT	??0font@@QAE@K@Z	99.8983	a335f165fa1c
 BASE/FONT	??1font@@UAE@XZ	100.0000	065137566962
 BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	68.0294	b411f78e3aec
@@ -711,7 +711,7 @@ SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	2fe4feca0dd0
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	86.5641	dde1bc62a41a
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	78.0714	219751d447ee
 SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	93.4593	efd5ed1b34f2
-SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	99.9412	c06973c72312
+SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	c06973c72312
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	87.4047	c123ae70ee3e
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	92.6191	6788270a16ae
 SOURCE/Campaign	?CampaignHandler@@YIHAAUtag_message@@@Z	71.0000	d77a6b184852
@@ -910,7 +910,7 @@ SOURCE/HERO	?GetExperience@hero@@QAEHH@Z	99.8461	2af12997113d
 SOURCE/HERO	?GetLevel@hero@@QAEHH@Z	98.1000	5909c6676399
 SOURCE/HERO	?GetNthSS@hero@@QAEHH@Z	100.0000	15e760d69e7d
 SOURCE/HERO	?GetNthSpell@hero@@QAEHHH@Z	99.7255	c59a8f50575d
-SOURCE/HERO	?GetNumSpells@hero@@QAEHH@Z	99.9815	04e4a41f3ca4
+SOURCE/HERO	?GetNumSpells@hero@@QAEHH@Z	100.0000	04e4a41f3ca4
 SOURCE/HERO	?GetOccupiedTown@hero@@QAEPAVtown@@XZ	100.0000	46586095c9ee
 SOURCE/HERO	?GetSSLevel@hero@@QAECH@Z	99.6852	bc2b369e9b23
 SOURCE/HERO	?GiveSS@hero@@QAEHHH@Z	100.0000	69383f5f256c
@@ -952,7 +952,7 @@ SOURCE/KB	??1soundManager@@QAE@XZ	87.2727	df265cfe8dd2
 SOURCE/KB	?AddNetBoxLine@@YIXPADD@Z	100.0000	82253d1b46d6
 SOURCE/KB	?AddScoreToHighScore@@YIHHHHHPAD@Z	98.8638	c10f362d777f
 SOURCE/KB	?BVResMsg@@YIXPADHH@Z	100.0000	2176968caca2
-SOURCE/KB	?CanBuild@@YIHPAVtown@@H@Z	99.9949	849bd1b54534
+SOURCE/KB	?CanBuild@@YIHPAVtown@@H@Z	100.0000	849bd1b54534
 SOURCE/KB	?CanBuy@@YIHPAVtown@@H@Z	99.7949	a53bb98c50f1
 SOURCE/KB	?CheckEndGame@@YIXHH@Z	95.5414	a214adf5a932
 SOURCE/KB	?CheckMem@@YIHXZ	100.0000	110f0a3121cd
@@ -1401,7 +1401,7 @@ SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	84.1818	457d59b47f2e
 SOURCE/comwin	?com_init@@YIFEHH@Z	94.6743	b21d07111131
 SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	92.9833	5fcc6c365438
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	d3dfb2830a60
-SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	99.9000	2c5d5b8e8bb7
+SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	2c5d5b8e8bb7
 SOURCE/comwin	?com_stat@@YIEFG@Z	100.0000	ddc07b36e77d
 SOURCE/comwin	?com_term@@YIXF@Z	100.0000	a5de10dbee2b
 SOURCE/comwin	?comm_wrt_task@@YIXXZ	99.5938	bde27b781069
@@ -1423,7 +1423,7 @@ SOURCE/dpnetwin	?dpnet_sess@@YAFHHZZ	100.0000	2a0579c07e7b
 SOURCE/dpnetwin	?dpnet_snd@@YIHHHPAX@Z	99.6667	0b1c3d2043b3
 SOURCE/dpnetwin	?dpnet_stat@@YIEFG@Z	100.0000	691e20ee6066
 SOURCE/dpnetwin	?dpnet_term@@YIXXZ	100.0000	dd61b554a0af
-SOURCE/kbwin	?AppAbout@@YGHPAXIIJ@Z	99.9688	4b636c4f4658
+SOURCE/kbwin	?AppAbout@@YGHPAXIIJ@Z	100.0000	4b636c4f4658
 SOURCE/kbwin	?AppCommand@@YIJPAXIIJ@Z	73.7939	1f83b55e9937
 SOURCE/kbwin	?AppExit@@YIXXZ	100.0000	5d5226685dd1
 SOURCE/kbwin	?AppIdle@@YIHXZ	100.0000	3f553df292bd
@@ -1442,9 +1442,9 @@ SOURCE/kbwin	_WinMain@16	99.7442	a9911ee0b680
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	ea5c962377cf
 SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	5f81d890e2fa
 SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	36.8900	0634dc79fa95
-SOURCE/netwin	?nb_arm_recv@@YIXH@Z	94.2469	8da6f5b3e700
+SOURCE/netwin	?nb_arm_recv@@YIXH@Z	94.2593	8da6f5b3e700
 SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	74fde161acde
-SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	99.6986	0e268725bb01
+SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	99.7123	0e268725bb01
 SOURCE/netwin	?nb_close_session@@YIXH@Z	100.0000	ee26921cc43b
 SOURCE/netwin	?nb_format_name@@YIXPADPAE@Z	100.0000	7d29b3d4c0be
 SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	b805282b1b7c
@@ -1472,7 +1472,7 @@ SOURCE/wingraph	?DDAppPaint@@YIHPAX0@Z	97.8951	443d68ed94b1
 SOURCE/wingraph	?DDCleanUpWinGraphics@@YIXXZ	99.8809	4763dd1aaa67
 SOURCE/wingraph	?DDCreateSurface@@YIPAUIDirectDrawSurface@@KKH@Z	99.6539	ff34749f6f9e
 SOURCE/wingraph	?DDInitGraphics@@YIXXZ	100.0000	f275c1dc169c
-SOURCE/wingraph	?DDInitializePalette@@YIXXZ	99.8356	9eabc2bec140
+SOURCE/wingraph	?DDInitializePalette@@YIXXZ	99.9315	9eabc2bec140
 SOURCE/wingraph	?DDQueryNewPalette@@YIHXZ	100.0000	4da38551460d
 SOURCE/wingraph	?DDRestoreDisplayMode@@YIXXZ	100.0000	460db30b85d0
 SOURCE/wingraph	?DDSD@@YIXHPADH@Z	55.3160	36ee08ee6298
@@ -1493,7 +1493,7 @@ SOURCE/wingraph	?UpdatePalette@@YIXPAC@Z	61.2000	d18ac4963343
 SOURCE/wingraph	?WGAppPaint@@YIHPAX0@Z	97.8088	54209a849b43
 SOURCE/wingraph	?WGCleanUpWinGraphics@@YIXXZ	100.0000	8af52d636ced
 SOURCE/wingraph	?WGInitGraphics@@YIXXZ	100.0000	0bf3ad9bbfd5
-SOURCE/wingraph	?WGInitializePalette@@YIXXZ	87.6947	4b35db37af15
+SOURCE/wingraph	?WGInitializePalette@@YIXXZ	87.8210	4b35db37af15
 SOURCE/wingraph	?WGQueryNewPalette@@YIHXZ	100.0000	0711bbf5a0a0
 SOURCE/wingraph	?WGUpdatePalette@@YIXPAC@Z	98.1034	654f32b0f644
 SOURCE/x_arena	?ArenaWindowHandler@@YIHAAUtag_message@@@Z	92.7857	5f4e76ad0cef

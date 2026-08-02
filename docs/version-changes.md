@@ -118,7 +118,11 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (wingraph). Found mechanically: for every byte-proven function, the retail
   dword at each donated string site names a cell whose retail content is
   compared with the compiled literal. Source now carries the CP1251 bytes as
-  hex escapes with the Russian rendering in a trailing comment.
+  hex escapes with the Russian rendering in a trailing comment. The same
+  translation reshapes `SExecutiveText` (BASE/EXEC): eleven of its eighteen
+  inline `char[]` messages are Russian, so every slot size changed
+  (struct 0x214 → 0x25c; each slot is align4(strlen+1)); the list-format
+  strings and `Terminated` stay English.
 - **[Buka] `soundManager` class rework.** The class gained a backend-state
   head at offset 0x36: backend/savedBackend kinds, the Miles `_DIG_DRIVER*`,
   an `audiere::AudioDevicePtr` (a real RefPtr — its inlined ref/unref
