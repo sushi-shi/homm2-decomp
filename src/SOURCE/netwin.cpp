@@ -483,7 +483,7 @@ VA(0x00474d59, 0x11d)
 static void __stdcall nb_recv_any_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
-        if (&gNbSessNcb[i] == ncb)
+        if (ncb == &gNbSessNcb[i])
             break;
     }
     if (i >= NETBIOS_SESSION_COUNT)
@@ -537,7 +537,7 @@ VA(0x00474ffa, 0xf4)
 static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
     i32 i;
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++) {
-        if (&gNbSessNcb[i] == ncb)
+        if (ncb == &gNbSessNcb[i])
             break;
     }
     if (i >= NETBIOS_SESSION_COUNT)

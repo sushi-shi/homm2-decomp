@@ -642,7 +642,7 @@ void townObject::Draw(i32 advanceAnimation) {
             if (gpTownManager->m_town->m_type == FACTION_BARBARIAN
                 && gpTownManager->m_town->m_buildState < TOWN_BARBARIAN_ANIMATION_BUILD_STATE)
                 return;
-            m_icon->DrawToBuffer(0, 0, m_animationFrame + baseFrame + 1, ICON_DRAW_NORMAL);
+            m_icon->DrawToBuffer(0, 0, baseFrame + m_animationFrame + 1, ICON_DRAW_NORMAL);
             if (advanceAnimation == 1) {
                 ++m_animationFrame;
                 if (m_animationFrame == m_animationFrameCount)
