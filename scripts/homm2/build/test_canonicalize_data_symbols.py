@@ -11,6 +11,7 @@ from homm2.build.canonicalize_data_symbols import (
     CompgenClaim,
     CompgenDataClaim,
     canonicalize_coff,
+    defer_data_comparison,
     main,
     sidecar_bytes,
 )
@@ -144,6 +145,36 @@ def compiler_function_graph():
 
 
 class CanonicalizeDataSymbolsTest(unittest.TestCase):
+    def test_defer_data_drops_data_sections_and_symbols(self):
+        obj = make_coff([
+            SectionSpec(".text", bytes(8), TEXT, ((0, 1, DIR32),)),
+            SectionSpec(".data", b"payload\0", DATA),
+            SectionSpec(".bss", bytes(4), BSS),
+        ], [
+            ("_fn", 0, 1, 0x20, 2),
+            ("?gTable@@3PAHA", 0, 2, 0, 2),
+            ("_zeroed$S9", 0, 3, 0, 3),
+        ])
+        deferred = CoffObject(defer_data_comparison(obj))
+        text = deferred.sections[0]
+        self.assertEqual((text.raw_size, text.reloc_count), (8, 1))
+        for section in deferred.sections[1:]:
+            self.assertEqual(
+                (section.raw_size, section.raw_offset, section.reloc_count),
+                (0, 0, 0), section.name)
+        table = deferred.symbols[1]
+        self.assertEqual(
+            (table.section, table.value, table.storage_class), (0, 0, 2))
+        static = deferred.symbols[2]
+        self.assertEqual((static.section, static.storage_class), (0, 2))
+        self.assertEqual(deferred.symbols[0].section, 1)
+        self.assertEqual(deferred.relocations[0].symbol_index, 1)
+
+    def test_defer_data_without_data_sections_is_identity(self):
+        obj = make_coff(
+            [SectionSpec(".text", bytes(4), TEXT)], [("_fn", 0, 1, 0x20, 2)])
+        self.assertEqual(defer_data_comparison(obj), obj)
+
     def test_source_compgen_data_binding_uses_semantic_name(self):
         obj = make_coff([
             SectionSpec(".text", bytes(4), TEXT, ((0, 1, DIR32),)),

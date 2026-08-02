@@ -55,12 +55,17 @@ def main():
                command=f"{PY} -m homm2.build.cc_wrap --out $out --src $in -- $flags",
                depfile="$out.d", deps="gcc",
                description="cl $unit")
+        # --defer-data: data comparison is deferred until the DATA/DATA_COMPGEN
+        # campaign models storage. Normalized copies drop data sections and
+        # symbols on BOTH sides so objdiff scores code only; remove the flag
+        # when reviewed data identities exist.
         w.rule("canonicalize_data_symbols",
                command=(f"{PY} -m homm2.build.canonicalize_data_symbols "
                         "--input $in --output $out --sidecar $sidecar "
                         "--unit $unit --compgen-manifest "
                         "build/gen/compiler_generated_functions.csv "
-                        "--data-manifest build/gen/delink_data_manifest.tsv"),
+                        "--data-manifest build/gen/delink_data_manifest.tsv "
+                        "--defer-data"),
                description="normalize-data $unit")
         w.rule("canonicalize_relocs",
                command=(f"{PY} -m homm2.build.canonicalize_relocs "
