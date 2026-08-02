@@ -69,6 +69,13 @@ def main():
     d = EXE.read_bytes()
     secs = sections(d)
     end = image_end(d)
+    # donation-verified string cells: content matched a compiled literal in a
+    # byte-proven function, overriding the pointer-shape guard (e.g. "ATA").
+    verified = set()
+    cells = REPO / "build/gen/string_cells.tsv"
+    if cells.is_file():
+        for line in cells.read_text().splitlines()[1:]:
+            verified.add(int(line, 16))
     rows = [ln.rstrip("\n") for ln in open(CSV)]
     hdr, body = rows[0], rows[1:]
 
@@ -84,7 +91,7 @@ def main():
             continue
         const_rows.append((int(f[0], 16), i))
     for rva, i in sorted(const_rows):
-        if looks_like_pointer(d, secs, rva, end):
+        if rva not in verified and looks_like_pointer(d, secs, rva, end):
             pointers += 1
             continue
         s = read_str(d, secs, rva)

@@ -53,9 +53,9 @@ def image_extent(exe: bytes) -> int:
     return IMAGE_BASE + struct.unpack_from("<I", exe, pe + 0x50)[0]
 
 
-def function_bodies(obj_path: Path):
+def function_bodies(obj_path: Path, coff=None):
     """name -> (bytes, [(offset, type, symbol, addend)]) per function."""
-    coff = CoffFile(str(obj_path))
+    coff = coff or CoffFile(str(obj_path))
     first_header = 20 + struct.unpack_from("<H", coff.data, 16)[0]
     out = {}
     for section in coff.sections:
@@ -94,6 +94,46 @@ def function_bodies(obj_path: Path):
     return out
 
 
+def string_data(coff) -> dict:
+    """String symbol -> NUL-terminated bytes from the object's data sections.
+
+    Covers both static $SG cells (/Gf off) and pooled ??_C@ COMDATs (/Gf on).
+    """
+    out = {}
+    for sym in coff.symbols.values():
+        if (not sym.name.startswith(("$SG", "??_C@"))) or sym.section <= 0:
+            continue
+        section = coff.sections[sym.section - 1]
+        raw = bytes(coff.data[section.raw_offset + sym.value:
+                              section.raw_offset + min(sym.value + 512,
+                                                       section.raw_size)])
+        cut = raw.find(b"\0")
+        if cut >= 0:
+            out[sym.name] = raw[:cut]
+    return out
+
+
+def pe_sections(exe: bytes):
+    pe = struct.unpack_from("<I", exe, 0x3C)[0]
+    count = struct.unpack_from("<H", exe, pe + 6)[0]
+    optional = struct.unpack_from("<H", exe, pe + 20)[0]
+    out = []
+    for index in range(count):
+        offset = pe + 24 + optional + index * 40
+        vsize, va, rsize, roff = struct.unpack_from("<4I", exe, offset + 8)
+        out.append((va, min(vsize, rsize), roff))
+    return out
+
+
+def retail_cstring(exe: bytes, secs, rva: int):
+    for va, size, roff in secs:
+        if va <= rva < va + size:
+            raw = exe[roff + rva - va:roff + rva - va + 512]
+            cut = raw.find(b"\0")
+            return raw[:cut] if cut >= 0 else None
+    return None
+
+
 def masked_equal(ours: bytes, retail: bytes, sites) -> bool:
     if len(ours) < len(retail):
         return False
@@ -115,9 +155,11 @@ def main(argv=None):
     end_va = image_extent(exe)
     claims = load_claims()
 
+    secs = pe_sections(exe)
     donated = {}
     named = {}
     interior = []
+    string_cells = {}
     functions_used = 0
     rejected_target = 0
     for unit, rows in sorted(claims.items()):
@@ -126,7 +168,9 @@ def main(argv=None):
         obj_path = BASE_OBJS / f"{unit}.obj"
         if not obj_path.exists():
             continue
-        bodies = function_bodies(obj_path)
+        coff = CoffFile(str(obj_path))
+        bodies = function_bodies(obj_path, coff)
+        strings = string_data(coff)
         for rva, size, name in rows:
             body = bodies.get(name)
             if body is None:
@@ -161,6 +205,16 @@ def main(argv=None):
             functions_used += 1
             for site, target, symbol, addend in fn_sites:
                 donated[site] = target
+                if (symbol or "").startswith(("$SG", "??_C@")) and addend == 0:
+                    # string-content evidence: the retail cell holds exactly
+                    # the literal our object compiled -> the cell is a
+                    # string even if its first dword happens to parse as an
+                    # in-image pointer (e.g. "ATA").
+                    ours_text = strings.get(symbol)
+                    cell_rva = target - IMAGE_BASE
+                    if (ours_text is not None and
+                            retail_cstring(exe, secs, cell_rva) == ours_text):
+                        string_cells[cell_rva] = True
                 # TU-local artifacts never vote: $L jump-table/branch labels
                 # (their name is a compile accident and planting them as PDB
                 # data owners re-splits the delinked table relocs), string and
@@ -183,6 +237,14 @@ def main(argv=None):
     print(f"[reloc-donation] {functions_used} masked-identical functions "
           f"donated {len(donated)} DIR32 sites "
           f"({rejected_target} functions rejected on out-of-image targets)")
+
+    cells_path = REPO / "build/gen/string_cells.tsv"
+    with cells_path.open("w") as stream:
+        print("cell_rva", file=stream)
+        for cell_rva in sorted(string_cells):
+            print(f"0x{cell_rva:x}", file=stream)
+    print(f"[reloc-donation] {len(string_cells)} content-verified string "
+          f"cells -> {cells_path}")
 
     # target-name evidence: unanimous owners become real names for the
     # synthetic manifest-target rows (const_<RVA> otherwise). Distinct owners

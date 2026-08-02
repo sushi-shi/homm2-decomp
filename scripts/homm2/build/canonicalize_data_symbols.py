@@ -34,6 +34,7 @@ from homm2.build.normalized_freshness import write_stamp
 
 SYMBOL_SIZE = 18
 VOLATILE_SG = re.compile(r"^\$SG[0-9]+$")
+ANON_STR = re.compile(r"^(\$anon_str_[0-9a-f]{64})_[0-9]+$")
 VOLATILE_T = re.compile(r"^\$T[0-9]+$")
 NAMED_STATIC = re.compile(r"^(?P<prefix>.+\$S)[0-9]+$")
 VOLATILE_E_FUNCTION = re.compile(r"^_?\$E[0-9]+$")
@@ -329,6 +330,10 @@ def _definitions(coff: CoffObject) -> tuple[Definition, ...]:
 
 def _family(name: str) -> tuple[str, str | None] | None:
     if VOLATILE_SG.fullmatch(name):
+        return "sg", None
+    if name.startswith("??_C@"):
+        # /Gf pooled string literal: an external COMDAT whose mangled name
+        # encodes the content - same content-identified family as $SG cells.
         return "sg", None
     if VOLATILE_T.fullmatch(name):
         return "t", None
@@ -861,7 +866,8 @@ def canonicalize_coff(payload: bytes,
 
     candidates = {
         row.symbol.index: row for row in definitions
-        if row.symbol.storage_class == 3 and _family(row.symbol.name) is not None
+        if _family(row.symbol.name) is not None and
+        (row.symbol.storage_class == 3 or row.symbol.name.startswith("??_C@"))
     }
     kinds: dict[int, tuple[str, bytes, str, str]] = {}
     for definition in candidates.values():
@@ -985,9 +991,24 @@ def canonicalize_coff(payload: bytes,
                 display_digest, base_name, record,
             ))
 
+        # Duplicate literals take their occurrence index from the first
+        # executable-section site that references them (code order is what
+        # both sides of a byte-proven pair share); definition address order
+        # is only the tiebreak and the fallback for unreferenced cells.
+        first_reference: dict[int, tuple[int, int]] = {}
+        for section in coff.sections:
+            if not section.characteristics & MEM_EXECUTE:
+                continue
+            for relocation in section_relocations[section.index]:
+                key = (section.index, relocation.site)
+                index = relocation.symbol_index
+                if index not in first_reference or key < first_reference[index]:
+                    first_reference[index] = key
         for (definition, family, kind, meaningful, proof, preview,
              digest, base_name, record) in sorted(
                  prepared, key=lambda row: (
+                     first_reference.get(row[0].symbol.index,
+                                         (0x7FFFFFFF, 0x7FFFFFFF)),
                      row[0].section.index, row[0].start)):
             occurrence = occurrences[base_name]
             occurrences[base_name] += 1
@@ -1060,6 +1081,39 @@ def canonicalize_coff(payload: bytes,
         raise RuntimeError("data and compiler-function canonicalization overlap")
     renames.update(compgen_rename)
     rows.extend(compgen_rows)
+
+    # /Gf turns pooled literals into COMDATs the linker folds image-wide, so
+    # a delinked relocation can carry another unit's global occurrence index
+    # in its $anon_str name. Both sides therefore renumber every $anon_str
+    # symbol they see - defined candidate or external reference - by order
+    # of first executable-section reference: a per-object, code-ordered
+    # identity that byte-proven pairs share.
+    anon_stems = {}
+    for index, symbol in coff.symbols.items():
+        match = ANON_STR.fullmatch(renames.get(index, symbol.name))
+        if match:
+            anon_stems[index] = match.group(1)
+    if anon_stems:
+        anon_first_site = {}
+        for relocation in coff.relocations:
+            section = coff.sections[relocation.section - 1]
+            if not section.characteristics & MEM_EXECUTE:
+                continue
+            index = relocation.symbol_index
+            if index in anon_stems:
+                key = (relocation.section, relocation.site)
+                if index not in anon_first_site or key < anon_first_site[index]:
+                    anon_first_site[index] = key
+        counters = {}
+        for index in sorted(anon_stems, key=lambda i: (
+                anon_first_site.get(i, (0x7FFFFFFF, 0x7FFFFFFF)), i)):
+            stem = anon_stems[index]
+            occurrence = counters.get(stem, 0)
+            counters[stem] = occurrence + 1
+            renumbered = f"{stem}_{occurrence}"
+            if renumbered != renames.get(index, coff.symbols[index].name):
+                renames[index] = renumbered
+
     normalized = _rewrite_names(coff, renames)
     normalized, jump_table_rewrites = _rewrite_jump_table_relocations(
         coff, normalized)
