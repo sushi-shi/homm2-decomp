@@ -27,6 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| philAI::RVConversion resource sum order | ORE, GEMS, MERCURY, GOLD, WOOD, SULFUR, CRYSTAL | GOLD, WOOD, ORE, CRYSTAL, SULFUR, MERCURY, GEMS | OPEN |
 | advManager::ScreenScroll locals + 4 compares | `originX/originY`; bound-first clamps; `m_mapOriginX != originX \|\| ...` | `xOrigin/yOrigin` (yOrigin 2 < xOrigin 11 flips the pair); local-first clamps and != compares | OPEN |
 | combatManager::UpdateMouseGrid 5 compares | `m_mouseGridHex == hexIndex`; extent updates expr-first | `hexIndex == m_mouseGridHex`; `giMinExtent* > expr`, `giMaxExtent* < expr` (global-left) | OPEN - slot residual parked |
 | game::DoKnob knob clamp compare | `floatChain < cast(mouse.y)` | `cast(mouse.y) > floatChain` (fild-first) | OPEN - slot residual parked |
