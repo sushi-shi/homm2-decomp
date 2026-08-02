@@ -1899,29 +1899,30 @@ void LogInt(
 
 VA(0x004bfc90, 0x76)
 void AiPrint(char* text) {
-    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        FillBitmapArea(
-            gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
-        );
-        smallFont->DrawBoundedString(
-            text,
-            0,
-            STATUS_TEXT_Y,
-            STATUS_BAR_WIDTH,
-            STATUS_TEXT_HEIGHT,
-            FONT_DRAW_DEFAULT,
-            FONT_ALIGN_LEFT
-        );
-        BlitBitmapToScreen(
-            gpWindowManager->m_screen,
-            0,
-            STATUS_BAR_Y,
-            STATUS_BAR_WIDTH,
-            STATUS_BAR_HEIGHT,
-            0,
-            STATUS_BAR_Y
-        );
-    }
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+
+    FillBitmapArea(
+        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
+    );
+    smallFont->DrawBoundedString(
+        text,
+        0,
+        STATUS_TEXT_Y,
+        STATUS_BAR_WIDTH,
+        STATUS_TEXT_HEIGHT,
+        FONT_DRAW_DEFAULT,
+        FONT_ALIGN_LEFT
+    );
+    BlitBitmapToScreen(
+        gpWindowManager->m_screen,
+        0,
+        STATUS_BAR_Y,
+        STATUS_BAR_WIDTH,
+        STATUS_BAR_HEIGHT,
+        0,
+        STATUS_BAR_Y
+    );
 }
 
 VA(0x004bfd10, 0x30)
