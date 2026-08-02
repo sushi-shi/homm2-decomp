@@ -146,7 +146,7 @@ i32 recruitUnit::Open(i32 priority) {
         m_maximum = goldMaximum < resourceMaximum ? goldMaximum : resourceMaximum;
     } else
         m_maximum = goldMaximum;
-    if (*m_available < m_maximum)
+    if (m_maximum > *m_available)
         m_maximum = *m_available;
     m_recruited = 0;
     m_noRoom = 0;

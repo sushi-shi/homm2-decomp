@@ -1018,7 +1018,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
 VA(0x0044cefc, 0x43)
 i32 game::Scan(i8* array, i32 start, i32 length) {
     i32 i;
-    for (i = start; i < length + start; i++) {
+    for (i = start; i < start + length; i++) {
         if (array[i] == -1)
             return i;
     }

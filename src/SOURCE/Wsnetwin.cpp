@@ -490,7 +490,7 @@ VA(0x004b2a5d, 0xfd)
 i32 wsWaitForHost(void) {
     switch (iWSWaitForHostStatus) {
         case 0:
-            if (KBTickCount() < iWSNextTickCount)
+            if (iWSNextTickCount > KBTickCount())
                 return 0;
             wsProcessMessages();
             if (bHostFound != 0) {
