@@ -27,6 +27,12 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| GetMonType threshold compares | `table[...] >= score`; `table[...] <= score` | `score <= table[...]`; `score >= table[...]` | OPEN |
+| philAI::NetValueOfArtifact addend order | `a4 * cost[a3] + a2 * cost[GOLD]` | `a2 * cost[GOLD] + a4 * cost[a3]` | OPEN |
+| hero::HeroScreenUpdate | `index`; `index == giHeroScreenSrcIndex` | `i`; `giHeroScreenSrcIndex == i` | OPEN |
+| advManager::CheckScreenScroll locals + origin compares | `mouseX6/mouseY1/oldOriginX9/oldOriginY3`; `m_mapOriginX == old...` | `mouseX/mouseY/oldMapX/oldMapY`; `oldMapX == m_mapOriginX` (both axes) | OPEN - 2.0 names are PoL auto-suffixed |
+| textEntryWidget::textEntryWidget(void) store order | `cursor, icon, kind, maxLength, iconFrame, displayOffset` | `cursor, maxLength, icon, iconFrame, displayOffset, kind` | OPEN |
+| DimensionDoorHandler mouse fields + flag | `payload.mouse.x/.y` (+4/+8); `handled` | `payload.mouse.screenX/.screenY` (+0x10/+0x14); `result` | OPEN - VALUE-SEMANTIC: different union fields read; check what 2.0's bytes read before classifying |
 | game::IsMobile locals + return compare | `cp`; `CalcTerrainCost(...) <= m_remainingMobility` | `cell`; `m_remainingMobility >= CalcTerrainCost(...)` | OPEN |
 | combatManager::GetStrength locals + and-mask | `armyIndex4/bit36/strength7/currentArmy8`; `(bit36 & mask)` | `idx/bitMask/totalStrength/currentArmy`; `(mask & bitMask)` | OPEN - 2.0 names are PoL auto-suffixed; dev names unknown on 4.2 side too |
 | advManager::CheckSetEvilInterface | `m_evilInterface != gbUseEvilInterface`; `interfaceMessage` | `gbUseEvilInterface != m_evilInterface`; `message` | OPEN |

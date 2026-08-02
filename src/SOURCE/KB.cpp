@@ -2861,10 +2861,10 @@ i32 GetMonType(i32 score, HighScoreType campaign) {
     i32 idx;
     for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
         if (campaign == HIGH_SCORE_CAMPAIGN || campaign == HIGH_SCORE_EXPANSION_CAMPAIGN) {
-            if (giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] >= score)
+            if (score <= giScoreCampaignMon[idx][IDX(MONSTER_SCORE_THRESHOLD)])
                 return giScoreCampaignMon[idx][IDX(MONSTER_SCORE_TYPE)];
         } else {
-            if (giScoreMon[idx][IDX(MONSTER_SCORE_THRESHOLD)] <= score)
+            if (score >= giScoreMon[idx][IDX(MONSTER_SCORE_THRESHOLD)])
                 return giScoreMon[idx][IDX(MONSTER_SCORE_TYPE)];
         }
     }
