@@ -122,6 +122,15 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   re-validated on VC6 SP5 by probe: order rule identical; slot offsets
   round each local to 4 bytes.
 
+## Scoring-surface note
+
+objdiff's per-function fuzzy undercounts proof-vocabulary exactness on this
+branch: functions whose bytes, claimed size, and ordered relocation rows all
+agree can still read 99.9x (e.g. philAI::CombatMonsterEvent, byte- and
+reloc-identical, $fnpad boundary present, 99.973). The graded census
+(masked-identical class) is the truthful exact count; treat sub-100 rows in
+that class as display artifacts, not residuals.
+
 ## Bookkeeping
 
 - The 36 no-PoL-counterpart functions harvested from the attempt-1 remap are
