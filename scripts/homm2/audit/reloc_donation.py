@@ -147,7 +147,7 @@ def main(argv=None):
             functions_used += 1
             for site, target, symbol, addend in fn_sites:
                 donated[site] = target
-                if symbol and not symbol.startswith("__real@"):
+                if symbol and not symbol.startswith(("__real@", "??_C@", "$SG")):
                     # our object stores the addend in the field, so the
                     # symbol's linked address is target - addend
                     owner_rva = target - IMAGE_BASE - addend
