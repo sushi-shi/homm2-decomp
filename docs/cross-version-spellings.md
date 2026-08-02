@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| fullMap::GetCell inline body | `cells + y * width + x` | `&Column(x)[y * width]` (nested-inline: y*width via this-temp first, x*12, cells - the retail shape at ~119 call sites; fuzzy +0.3% TU-wide, 0 drops) | OPEN - test under 4.2 |
+| game::HasLateOverlay cell fetch | `WORLDMAP->Row(row) + col` | `WORLDMAP->GetCell(col, row)` | OPEN |
+| ComputeUALoc probe reads | `gpGame->m_worldMap.Row(y)[x].f` (x4) | `gpGame->m_worldMap.GetCell(x, y)->f` | OPEN - slot residual parked |
 | combatManager::SummonElemental hex index | `summonHexes_l[side*3 + (rand+off)%3]` | flat `*(summonHexes_l + side*3 + (rand+off)%3)` | OPEN - slot residual parked |
 | game::GetLuck block order | clamps, Battle Garb, then Rainbow | Rainbow BEFORE clamps (VALUE - see version-changes) | dev-change candidate |
 | strip::DrawIcons X exprs + type compare | `m_x + slot * STEP + FIRST_X` (5 sites); `m_army->types[slot] != cached[slot]` | `m_x + FIRST_X + slot * STEP` (NEW CLASS: const after member steers member-first eval); `cached[slot] != army types` | OPEN |
