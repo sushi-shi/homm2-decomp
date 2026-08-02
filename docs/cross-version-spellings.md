@@ -19,7 +19,9 @@ devs wrote. Each entry below must eventually resolve to one of:
 Resolution protocol: compile the candidate spelling in the 2.0 tree
 (homm2-decomp-master, MSVC 4.2 harness) and byte-compare against the 2.0
 target the same way `reloc_donation.masked_equal` does here. Until that run
-happens, entries stay OPEN.
+happens, entries stay OPEN. Timing: the verification runs are deferred until
+the 2.1 reconstruction is complete - this branch only records divergences
+while chasing exactness; the cross-analysis is a later dedicated phase.
 
 ## Open entries (2026-08-02)
 
