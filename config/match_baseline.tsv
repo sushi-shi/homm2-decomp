@@ -885,8 +885,8 @@ SOURCE/GAME	?TurnOnAIMusic@game@@QAEXXZ	84.2857	c3e92abe92e1
 SOURCE/GAME	?UpdateSpellWidgets@game@@QAEXXZ	56.0694	4ddcc8272e05
 SOURCE/GAME	?ViewArmy@game@@QAEXHHHHPAVtown@@HHHPAVhero@@PAVarmy@@PAVarmyGroup@@H@Z	89.6596	8a1635c159c9
 SOURCE/GAME	?ViewArmyHandler@@YIHAAUtag_message@@@Z	90.6432	b3a2e05a22b0
-SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	98.5914	71be62e7d1bd
-SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	96.6270	522b311bd41f
+SOURCE/GAME	?ViewSpecialHandler@@YIHAAUtag_message@@@Z	100.0000	f5e1d2324645
+SOURCE/GAME	?ViewSpells@game@@QAEHPAVhero@@HP6IHAAUtag_message@@@ZH@Z	96.6349	522b311bd41f
 SOURCE/GAME	?ViewSpellsHandler@@YIHAAUtag_message@@@Z	63.2011	5772e3a912d6
 SOURCE/GAME	?WaitForPlayer@game@@QAEXPADH@Z	91.9851	e5b5315bbcd0
 SOURCE/GAME	?WeeklyGenericSite@game@@QAEXPAVmapCell@@@Z	100.0000	e99d589ef4ed
@@ -1043,7 +1043,7 @@ SOURCE/Netbios	?InitNetGuest@@YICXZ	95.1034	2ea07e44ccd7
 SOURCE/Netbios	?InitNetHost@@YICXZ	93.4471	c013523c9cec
 SOURCE/Netbios	?WaitForGuest@@YICXZ	93.3390	041ce4b07a0b
 SOURCE/Netbios	?WaitForHost@@YICXZ	92.4545	d61acb79de9f
-SOURCE/Netbios	?nbnet_init@@YIHXZ	99.8762	0a32853d81e8
+SOURCE/Netbios	?nbnet_init@@YIHXZ	99.9143	51854391062e
 SOURCE/Newgame	?CleanUpNewGameWindow@game@@QAEXXZ	100.0000	b4e6b747ea35
 SOURCE/Newgame	?DrawNGKPDisplayString@game@@QAEXH@Z	100.0000	8366e39e9ea2
 SOURCE/Newgame	?GetLossConditionText@game@@QAEXPAD@Z	99.9508	36b521870130
