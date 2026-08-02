@@ -787,45 +787,45 @@ void combatManager::DetermineEffectOfSpell(SpellType spell, i32* bestEffect, i32
 VA(0x00496f02, 0x26d)
 i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
     float workChance = COMBAT_SPELL_AI_FULL_EFFECT_IMMEDIATE;
-    i32 spellPowerValue = m_spellPower[IDX(m_currentSide)];
+    i32 spellPower = m_spellPower[IDX(m_currentSide)];
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
         && m_heroes[IDX(m_currentSide)] != NULL
         && m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_BOOK_ELEMENTS))
-        spellPowerValue <<= 1;
+        spellPower <<= 1;
 
     if ((spell == SPELL_SUMMON_EARTH_ELEMENTAL || spell == SPELL_SUMMON_AIR_ELEMENTAL
          || spell == SPELL_SUMMON_FIRE_ELEMENTAL || spell == SPELL_SUMMON_WATER_ELEMENTAL)
         && !SpaceForElementalExists())
         return 0;
 
-    CreatureType creatureType;
+    CreatureType monType;
     switch (spell) {
         case SPELL_SUMMON_EARTH_ELEMENTAL:
-            creatureType = CREATURE_EARTH_ELEMENTAL;
+            monType = CREATURE_EARTH_ELEMENTAL;
             break;
         case SPELL_SUMMON_AIR_ELEMENTAL:
-            creatureType = CREATURE_AIR_ELEMENTAL;
+            monType = CREATURE_AIR_ELEMENTAL;
             break;
         case SPELL_SUMMON_FIRE_ELEMENTAL:
-            creatureType = CREATURE_FIRE_ELEMENTAL;
+            monType = CREATURE_FIRE_ELEMENTAL;
             break;
         case SPELL_SUMMON_WATER_ELEMENTAL:
-            creatureType = CREATURE_WATER_ELEMENTAL;
+            monType = CREATURE_WATER_ELEMENTAL;
             break;
         default:
             workChance = m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex]
                              .SpellCastWorkChance(SPELL_MIRROR_IMAGE);
-            creatureType = m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex]
+            monType = m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex]
                                .m_monsterType;
-            spellPowerValue =
+            spellPower =
                 m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex].m_quantity
                 * SPELL_DEFAULT_CREATURE_POWER;
             break;
     }
 
-    i32 creatureEffect = gMonsterDatabase[IDX(creatureType)].fightValue * IDX(creatureType);
+    i32 creatureEffect = IDX(monType) * gMonsterDatabase[IDX(monType)].fightValue;
     if (spell == SPELL_MIRROR_IMAGE) {
         float mirrorMod;
         if (m_spellPower[IDX(m_currentSide)] == COMBAT_SPELL_AI_MIRROR_POWER_ONE)
@@ -836,7 +836,7 @@ i32 combatManager::EffectSpellCreateCreature(i32 hex, SpellType spell) {
             mirrorMod = COMBAT_SPELL_AI_MIRROR_DEFAULT_MODIFIER;
         creatureEffect = static_cast<i32>(creatureEffect * mirrorMod);
         if (HAS(
-                gMonsterDatabase[IDX(creatureType)].flags.abilityFlags,
+                gMonsterDatabase[IDX(monType)].flags.abilityFlags,
                 MONSTER_ABILITY_FLAG_SHOOTER
             ))
             creatureEffect =

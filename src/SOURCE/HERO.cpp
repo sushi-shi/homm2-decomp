@@ -2035,18 +2035,18 @@ i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
 VA(0x00464a9e, 0xdd)
 void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 quickView) {
     i32 skillBonusValue;
-    char* skillLevelText;
+    char* skillText;
 
     skillBonusValue = GetSSLevel(skill) - IDX(m_secondarySkills[IDX(skill)]);
     if (skillBonusValue > 0) {
-        skillLevelText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
+        skillText = gSecondarySkillLevels[IDX(m_secondarySkills[IDX(skill)]) - 1];
         sprintf(
             gText,
             "{%s Necromancy (+%d)}\n\n%s Necromancy (+%d) allows %d percent of the creatures "
             "killed in combat to be brought back from the dead as Skeletons.",
-            skillLevelText,
+            skillText,
             skillBonusValue,
-            skillLevelText,
+            skillText,
             skillBonusValue,
             GetSSLevel(skill) * HERO_NECROMANCY_PERCENT_PER_LEVEL
         );
@@ -2059,7 +2059,7 @@ void hero::DoSSLevelDialog(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill, i32 qui
         NORMAL_DIALOG_NO_RESOURCE,
         NORMAL_DIALOG_NO_VALUE,
         NORMAL_DIALOG_SECONDARY_SKILL,
-        IDX(m_secondarySkills[IDX(skill)]) + IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE
+        IDX(skill) * HERO_SECONDARY_SKILL_ICON_STRIDE + IDX(m_secondarySkills[IDX(skill)])
             - HERO_SECONDARY_SKILL_ICON_FRAME_BASE,
         NORMAL_DIALOG_NO_RESOURCE,
         0,

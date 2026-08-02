@@ -329,15 +329,16 @@ namespace {
 VA(0x0042b850, 0x2be)
 MessageDispatchResult combatManager::Main(tag_message& message) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
+    army* currentArmy;
 
     if (gbNoShowCombat == 0) {
-        if (KBTickCount() > glTimers[0]) {
+        if (glTimers[0] < KBTickCount()) {
             PollSound();
             glTimers[0] = static_cast<i32>(
-                KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * COMBAT_SOUND_POLL_DELAY
+                KBTickCount() + COMBAT_SOUND_POLL_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]
             );
         }
-        if (KBTickCount() > glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT]
+        if (glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] < KBTickCount()
             && gbProcessingCombatAction == 0) {
             gbProcessingCombatAction = true;
             CycleCombatScreen();
@@ -378,13 +379,11 @@ MessageDispatchResult combatManager::Main(tag_message& message) {
         }
     }
 
-    {
-        army* currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
-        if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
-            currentArmy->GoBerserk();
-            if (CheckWin(&message) != 0)
-                return MESSAGE_DISPATCH_FORWARD;
-        }
+    currentArmy = &m_armies[IDX(m_currentArmySide)][m_currentArmyIndex];
+    if (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BERSERK)] != 0) {
+        currentArmy->GoBerserk();
+        if (CheckWin(&message) != 0)
+            return MESSAGE_DISPATCH_FORWARD;
     }
 
     if (gbNoShowCombat == 0) {
