@@ -782,9 +782,9 @@ i32 playerData::HasMobileHero(void) {
 VA(0x0044c5a6, 0x5a)
 i32 GetNumObelisks(i32 color) {
     i32 count = 0;
-    i32 i;
-    for (i = 0; i < GAME_BOAT_COUNT; i++) {
-        if (gpGame->m_obeliskVisitors[i] & (1 << color))
+    i32 idx;
+    for (idx = 0; idx < GAME_BOAT_COUNT; idx++) {
+        if (gpGame->m_obeliskVisitors[idx] & (1 << color))
             count++;
     }
     return count;
@@ -816,9 +816,9 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     i32 count = 0;
     i32 i;
     for (i = 0; i < m_heroCount; i++) {
-        i32 j;
-        for (j = 0; j < HERO_ARTIFACT_SLOT_COUNT; j++) {
-            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[j] == artifact)
+        i32 jj;
+        for (jj = 0; jj < HERO_ARTIFACT_SLOT_COUNT; jj++) {
+            if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[jj] == artifact)
                 count++;
         }
     }
@@ -828,9 +828,9 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
 VA(0x0044c738, 0x6b)
 i32 game::MineTypesOwned(i32 owner, MineType mineType) {
     i32 num = 0;
-    i32 i;
-    for (i = 0; i < GAME_MINE_COUNT; i++) {
-        if (m_mines[i].owner == owner && m_mines[i].resourceType == mineType)
+    i32 n;
+    for (n = 0; n < GAME_MINE_COUNT; n++) {
+        if (m_mines[n].owner == owner && m_mines[n].resourceType == mineType)
             num++;
     }
     return num;
@@ -1039,38 +1039,38 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
 
 VA(0x0044cfa0, 0x1a1)
 i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
-    i32 result = -1;
+    i32 r = -1;
     i32 previousHero;
-    i32 heroId = -1;
+    i32 heroIdx = -1;
     i32 attempts = 0;
     i32 oldHeroId;
     while (attempts < HERO_SELECTION_RETRY_LIMIT) {
         attempts++;
-        heroId = Random(0, IDX(GAME_HERO_COUNT) - 1);
-        if (m_availableHeroes[heroId] != HERO_AVAILABILITY_UNAVAILABLE
-            && m_availableHeroes[heroId] != WEEKLY_AVAILABLE_HERO)
+        heroIdx = Random(0, IDX(GAME_HERO_COUNT) - 1);
+        if (m_availableHeroes[heroIdx] != HERO_AVAILABILITY_UNAVAILABLE
+            && m_availableHeroes[heroIdx] != WEEKLY_AVAILABLE_HERO)
             continue;
-        if (m_availableHeroes[heroId] == WEEKLY_AVAILABLE_HERO
+        if (m_availableHeroes[heroIdx] == WEEKLY_AVAILABLE_HERO
             && attempts < HERO_SELECTION_REUSE_RETRY_LIMIT)
             continue;
         if (heroClass >= FACTION_KNIGHT && heroClass <= FACTION_NECROMANCER
             && attempts < HERO_SELECTION_FACTION_RETRY_LIMIT
-            && m_heroRecs[heroId].m_cursorType != heroClass)
+            && m_heroRecs[heroIdx].m_cursorType != heroClass)
             continue;
         if (requireExperienced && attempts < HERO_SELECTION_EXPERIENCE_RETRY_LIMIT
-            && m_heroRecs[heroId].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
-            && (m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_NONE
-                || m_heroRecs[heroId].m_artifacts[0] == ARTIFACT_MAGIC_BOOK)
-            && (m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_NONE
-                || m_heroRecs[heroId].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
+            && m_heroRecs[heroIdx].m_experience < HERO_SELECTION_MINIMUM_EXPERIENCE
+            && (m_heroRecs[heroIdx].m_artifacts[0] == ARTIFACT_NONE
+                || m_heroRecs[heroIdx].m_artifacts[0] == ARTIFACT_MAGIC_BOOK)
+            && (m_heroRecs[heroIdx].m_artifacts[1] == ARTIFACT_NONE
+                || m_heroRecs[heroIdx].m_artifacts[1] == ARTIFACT_MAGIC_BOOK))
             continue;
         if (gbInCampaign && attempts < HERO_SELECTION_CAMPAIGN_RETRY_LIMIT
-            && m_heroRecs[heroId].m_portrait >= CAMPAIGN_HERO_ROLAND
-            && m_heroRecs[heroId].m_portrait <= CAMPAIGN_HERO_BRAX)
+            && m_heroRecs[heroIdx].m_portrait >= CAMPAIGN_HERO_ROLAND
+            && m_heroRecs[heroIdx].m_portrait <= CAMPAIGN_HERO_BRAX)
             continue;
         break;
     }
-    return heroId;
+    return heroIdx;
 }
 
 VA(0x0044d141, 0x5f)
@@ -2780,14 +2780,14 @@ VA(0x00453a95, 0x85)
 void game::InitializePasswords(void) {
     char flag;
     i32 i;
-    i32 j;
+    i32 jj;
     for (i = 0; i < PASSWORD_INDEX_COUNT; i++) {
         flag = 0;
         while (flag == 0) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = 1;
-            for (j = 0; j < i; j++) {
-                if (xPasswordStringsIndex[j] == xPasswordStringsIndex[i])
+            for (jj = 0; jj < i; jj++) {
+                if (xPasswordStringsIndex[jj] == xPasswordStringsIndex[i])
                     flag = 0;
             }
         }
@@ -2798,8 +2798,8 @@ VA(0x00453b1a, 0x6b)
 void game::RandomizeBarrier(mapCell* cell) {
     i32 idx = cell->m_objectMetadata;
     idx &= PASSWORD_INDEX_MASK;
-    i32 pass = xPasswordStringsIndex[idx];
-    i32 color = (pass << PASSWORD_COLOR_SHIFT) | idx;
+    i32 p = xPasswordStringsIndex[idx];
+    i32 color = (p << PASSWORD_COLOR_SHIFT) | idx;
     cell->m_objectMetadata = color | 0;
 }
 
@@ -4658,7 +4658,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     type &= WEEKLY_RECRUIT_TYPE_MASK;
     i32 recruitCount = cell->m_objectMetadata;
     recruitCount >>= WEEKLY_RECRUIT_COUNT_SHIFT;
-    i32 packed;
+    i32 value;
 
     switch (type) {
         case 0:
@@ -4680,8 +4680,8 @@ void game::WeeklyRecruitSite(mapCell* cell) {
 
     if (recruitCount > WEEKLY_RECRUIT_LIMIT)
         recruitCount = WEEKLY_RECRUIT_LIMIT;
-    packed = (recruitCount << WEEKLY_RECRUIT_COUNT_SHIFT) | type;
-    cell->m_objectMetadata = packed | 0;
+    value = (recruitCount << WEEKLY_RECRUIT_COUNT_SHIFT) | type;
+    cell->m_objectMetadata = value | 0;
 }
 
 VA(0x00459ab8, 0x61)
