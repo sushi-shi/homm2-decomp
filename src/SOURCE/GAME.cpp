@@ -7413,7 +7413,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         memcpy(joinData9, oldData13, oldSize10);
 
         position1 = JOIN_HEADER_SIZE;
-        while (diffSize1 > position1) {
+        while (position1 < diffSize1) {
             copyFlag16 = diffData5[position1] >> DIFF_COPY_FLAG_SHIFT;
             copyLength9 = GetSkipCopyLen(diffData5, &position1);
             if (copyFlag16) {

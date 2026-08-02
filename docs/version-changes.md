@@ -153,7 +153,10 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   2.0 body (PoL, byte-pinned) sets 0. Both sides proven by bytes; classify
   against the Gold 2.1 GOG binary. The same function's bounds guard checks
   `x` against `MAP_HEIGHT` and `mapY` against `MAP_WIDTH` - swapped axes,
-  harmless on square maps, present in retail.
+  harmless on square maps, present in retail. Companion site:
+  `army::LoadResources` writes `loopCount = 0` in this image where the
+  PoL line wrote 1 (byte-pinned both sides, 2026-08-03) - the two sites
+  moved in opposite directions between versions.
 - **[2.1?/unclassified] Combat hex validation tightened.** 2.0's
   `ValidHex` accepts hexes 0..125 (PoL byte-proven, `<= 125`); this image
   bounds the grid at `hex < COMBAT_HEX_COUNT` (117). Out-of-grid hexes

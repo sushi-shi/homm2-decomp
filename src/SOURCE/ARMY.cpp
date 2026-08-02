@@ -276,15 +276,7 @@ void army::Init(
 
 VA(0x00418b7d, 0x44d)
 void army::LoadResources(void) {
-    i32 unusedLoadWord17;
-    i32 unusedLoadWord14;
-    i32 unusedLoadWord9;
-    i32 unusedLoadWord0;
     i32 i;
-    i32 unusedLoadWord2;
-    i32 unusedLoadWord28;
-    i32 unusedLoadWord34;
-    i32 unusedLoadWord40;
 
     if (gbNoShowCombat) {
         return;
@@ -350,7 +342,7 @@ void army::LoadResources(void) {
         if (m_samples[i]) {
             m_samples[i]->m_playbackData.volume = ARMY_SAMPLE_VOLUME;
             m_samples[i]->m_playbackData.channelType = ARMY_SAMPLE_CHANNEL;
-            m_samples[i]->m_playbackData.loopCount = 1;
+            m_samples[i]->m_playbackData.loopCount = 0;
         }
     }
 }
