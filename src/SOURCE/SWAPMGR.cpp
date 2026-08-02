@@ -982,8 +982,8 @@ void swapManager::SplitMons(void) {
     delete gpTownManager->m_heroWindow1;
 
     if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
-        if (selectedArmy->m_creatureTypes[m_selectedSlot]
-            == targetArmy->m_creatureTypes[m_targetSlot]) {
+        if (targetArmy->m_creatureTypes[m_targetSlot]
+            == selectedArmy->m_creatureTypes[m_selectedSlot]) {
             selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;
             targetArmy->m_creatureCounts[m_targetSlot] += gpTownManager->m_splitAmount;
             if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
