@@ -5486,11 +5486,12 @@ void game::ProcessRandomObjects(void) {
 
 VA(0x0045b736, 0x20e)
 void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
-    i32 col;
+    i32 i;
     i32 cutoff;
-    i32 row;
+    i32 j;
     u8 mask = static_cast<u8>(1 << player);
-    i32 visibility;
+    i32 vis;
+    i32 distance;
 
     if (!gbHumanPlayer[player]) {
         if (giCurTurn > MIDDLE_TURN_LAST) {
@@ -5509,23 +5510,23 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
         cutoff = SMALL_RADIUS_THRESHOLD;
 
     if (radius >= RADIAL_RADIUS_LIMIT) {
-        for (row = 0; row < MAP_HEIGHT; row++) {
-            for (col = 0; col < MAP_WIDTH; col++) {
-                i32 distance = static_cast<i32>(
-                    sqrt(static_cast<double>((x - col) * (x - col) + (y - row) * (y - row)))
+        for (j = 0; j < MAP_HEIGHT; j++) {
+            for (i = 0; i < MAP_WIDTH; i++) {
+                distance = static_cast<i32>(
+                    sqrt(static_cast<double>((y - j) * (y - j) + (x - i) * (x - i)))
                 );
                 if (distance < radius) {
-                    mapExtra[MAP_WIDTH * row + col] |= mask;
+                    *(mapExtra + i + MAP_WIDTH * j) |= mask;
                 }
             }
         }
     } else {
-        for (row = y - radius; row <= y + radius; row++) {
-            for (col = x - radius; col <= x + radius; col++) {
-                visibility = radius - abs(y - row) + radius - abs(x - col);
-                if (visibility >= cutoff && col >= 0 && row >= 0 && col < MAP_WIDTH
-                    && row < MAP_HEIGHT) {
-                    mapExtra[MAP_WIDTH * row + col] |= mask;
+        for (j = y - radius; j <= y + radius; j++) {
+            for (i = x - radius; i <= x + radius; i++) {
+                vis = radius - abs(y - j) + radius - abs(x - i);
+                if (vis >= cutoff && i >= 0 && j >= 0 && i < MAP_WIDTH
+                    && j < MAP_HEIGHT) {
+                    *(mapExtra + i + MAP_WIDTH * j) |= mask;
                 }
             }
         }
@@ -5539,8 +5540,10 @@ void game::MakeAllWaterVisible(i32 player) {
     i32 y;
     for (x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
-            if (giGroundToTerrain[WORLDMAP->Row(y)[x].m_terrainImageIndex] == TERRAIN_WATER)
-                mapExtra[y * MAP_WIDTH + x] |= mask;
+            fullMap* map = WORLDMAP;
+            if (giGroundToTerrain[map->Column(x)[y * map->width].m_terrainImageIndex]
+                == TERRAIN_WATER)
+                *(mapExtra + x + MAP_WIDTH * y) |= mask;
         }
     }
 }

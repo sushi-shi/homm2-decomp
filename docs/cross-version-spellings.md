@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| game::SetVisibility mapExtra writes + distance terms + locals | `mapExtra[MAP_WIDTH * row + col] \|=`; x-term first; `col/row/visibility`, distance in-loop | `*(mapExtra + col + MAP_WIDTH * row) \|=` (RMW emits base-first load, index-first store); y-term first; `i/j/vis`, distance hoisted to fn scope | OPEN |
+| game::MakeAllWaterVisible map access | `WORLDMAP->Row(y)[x]`; `mapExtra[y * MAP_WIDTH + x]` | in-loop `fullMap* map = WORLDMAP;` + `map->Column(x)[y * map->width]`; `*(mapExtra + x + MAP_WIDTH * y)` | OPEN - third Column-class site (GetNewCellExtra pair, now this) |
 | philAI::RVConversion resource sum order | ORE, GEMS, MERCURY, GOLD, WOOD, SULFUR, CRYSTAL | GOLD, WOOD, ORE, CRYSTAL, SULFUR, MERCURY, GEMS | OPEN |
 | advManager::ScreenScroll locals + 4 compares | `originX/originY`; bound-first clamps; `m_mapOriginX != originX \|\| ...` | `xOrigin/yOrigin` (yOrigin 2 < xOrigin 11 flips the pair); local-first clamps and != compares | OPEN |
 | combatManager::UpdateMouseGrid 5 compares | `m_mouseGridHex == hexIndex`; extent updates expr-first | `hexIndex == m_mouseGridHex`; `giMinExtent* > expr`, `giMaxExtent* < expr` (global-left) | OPEN - slot residual parked |
