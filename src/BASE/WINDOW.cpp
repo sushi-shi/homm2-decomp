@@ -237,7 +237,7 @@ void heroWindow::AddWidget(class widget* newWidget, i32 zOrder) {
     }
     if (newWidget->Open(zOrder, this) != 0)
         return;
-    while (local_8 != NULL && zOrder < local_8->m_zOrder) {
+    while (local_8 != NULL && local_8->m_zOrder > zOrder) {
         local_8 = local_8->m_next;
     }
     if (local_8 == NULL) {
@@ -326,7 +326,7 @@ void heroWindow::DrawWindow(i32 update, i32 firstId, i32 lastId) {
     while (local_8 != NULL) {
         PollSound();
         if (firstId != WINDOW_ALL_WIDGETS_LOW || lastId != WINDOW_ALL_WIDGETS_HIGH) {
-            if (firstId <= local_8->m_id && local_8->m_id <= lastId)
+            if (local_8->m_id >= firstId && local_8->m_id <= lastId)
                 local_8->Main(local_24);
         } else
             local_8->Main(local_24);

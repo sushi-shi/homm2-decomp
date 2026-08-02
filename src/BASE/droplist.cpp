@@ -147,7 +147,7 @@ void dropListWidget::Read(void) {
 
 VA(0x004d0240, 0x139)
 void dropListWidget::DeleteItem(i32 index) {
-    if (index < m_itemCount) {
+    if (m_itemCount > index) {
         if (m_selectedIndex == index)
             m_selectedIndex = -1;
         if (m_itemCount == 1) {

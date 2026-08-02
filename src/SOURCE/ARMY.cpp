@@ -2844,7 +2844,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) i;
 
     if (m_spellInfluence[IDX(influence)]) {
-        if (m_spellInfluence[IDX(influence)] < rounds) {
+        if (rounds > m_spellInfluence[IDX(influence)]) {
             m_spellInfluence[IDX(influence)] = static_cast<u8>(rounds);
         }
         return 0;

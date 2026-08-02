@@ -321,7 +321,7 @@ SpellType hero::GetNthSpell(HeroSpellType type, i32 spellNumber) {
                     && !HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT))) {
                 spellOrdinalCount++;
             }
-            if (spellOrdinalCount == spellNumber)
+            if (spellNumber == spellOrdinalCount)
                 return spell;
         }
     }
