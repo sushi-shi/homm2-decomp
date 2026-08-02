@@ -8914,41 +8914,41 @@ void advManager::ForceNewHover(void) {
 
 VA(0x00412697, 0x1a8)
 void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 updatePointer) {
-    i32 originX;
-    i32 originY;
+    i32 xOrigin;
+    i32 yOrigin;
 
-    originX = m_mapOriginX;
-    originY = m_mapOriginY;
+    xOrigin = m_mapOriginX;
+    yOrigin = m_mapOriginY;
     iLastScrollTime = KBTickCount();
 
     switch (direction) {
         case MAP_DIRECTION_NORTH:
-            --originY;
+            --yOrigin;
             break;
         case MAP_DIRECTION_NORTH_EAST:
-            ++originX;
-            --originY;
+            ++xOrigin;
+            --yOrigin;
             break;
         case MAP_DIRECTION_EAST:
-            ++originX;
+            ++xOrigin;
             break;
         case MAP_DIRECTION_SOUTH_EAST:
-            ++originX;
-            ++originY;
+            ++xOrigin;
+            ++yOrigin;
             break;
         case MAP_DIRECTION_SOUTH:
-            ++originY;
+            ++yOrigin;
             break;
         case MAP_DIRECTION_SOUTH_WEST:
-            --originX;
-            ++originY;
+            --xOrigin;
+            ++yOrigin;
             break;
         case MAP_DIRECTION_WEST:
-            --originX;
+            --xOrigin;
             break;
         case MAP_DIRECTION_NORTH_WEST:
-            --originX;
-            --originY;
+            --xOrigin;
+            --yOrigin;
             break;
     }
 
@@ -8956,23 +8956,23 @@ void advManager::ScreenScroll(H2_ENUM_PARAM(MapDirection, i32) direction, i32 up
         gpMouseManager->SetPointer(IDX(direction) + IDX(HOVER_SCROLL_FRAME_FIRST));
     }
 
-    if (originX < SCROLL_MIN_ORIGIN) {
-        originX = SCROLL_MIN_ORIGIN;
+    if (xOrigin < SCROLL_MIN_ORIGIN) {
+        xOrigin = SCROLL_MIN_ORIGIN;
     }
-    if (MAP_WIDTH - VIEW_EDGE_MARGIN < originX) {
-        originX = MAP_WIDTH - VIEW_EDGE_MARGIN;
+    if (xOrigin > MAP_WIDTH - VIEW_EDGE_MARGIN) {
+        xOrigin = MAP_WIDTH - VIEW_EDGE_MARGIN;
     }
-    if (originY < SCROLL_MIN_ORIGIN) {
-        originY = SCROLL_MIN_ORIGIN;
+    if (yOrigin < SCROLL_MIN_ORIGIN) {
+        yOrigin = SCROLL_MIN_ORIGIN;
     }
-    if (MAP_HEIGHT - VIEW_EDGE_MARGIN < originY) {
-        originY = MAP_HEIGHT - VIEW_EDGE_MARGIN;
+    if (yOrigin > MAP_HEIGHT - VIEW_EDGE_MARGIN) {
+        yOrigin = MAP_HEIGHT - VIEW_EDGE_MARGIN;
     }
 
-    if (m_mapOriginX != originX || m_mapOriginY != originY) {
+    if (xOrigin != m_mapOriginX || yOrigin != m_mapOriginY) {
         DemobilizeCurrHero();
-        m_mapOriginX = originX;
-        m_mapOriginY = originY;
+        m_mapOriginX = xOrigin;
+        m_mapOriginY = yOrigin;
         UpdateRadar(1, 0);
         CompleteDraw(0);
         UpdateScreen(0, 0);

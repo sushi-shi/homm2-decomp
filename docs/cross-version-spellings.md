@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| advManager::ScreenScroll locals + 4 compares | `originX/originY`; bound-first clamps; `m_mapOriginX != originX \|\| ...` | `xOrigin/yOrigin` (yOrigin 2 < xOrigin 11 flips the pair); local-first clamps and != compares | OPEN |
+| combatManager::UpdateMouseGrid 5 compares | `m_mouseGridHex == hexIndex`; extent updates expr-first | `hexIndex == m_mouseGridHex`; `giMinExtent* > expr`, `giMaxExtent* < expr` (global-left) | OPEN - slot residual parked |
 | game::DoKnob knob clamp compare | `floatChain < cast(mouse.y)` | `cast(mouse.y) > floatChain` (fild-first) | OPEN - slot residual parked |
 | philAI::GetBestCreature random compare | `weakestArmyValue < table.randomValue` | `table.randomValue > weakestArmyValue` | OPEN - slot residual parked |
 | playerData::NextHero local + hero compare | `current`; `m_heroIds[i] == m_currentHero` | `curHero`; `m_currentHero == m_heroIds[i]` | OPEN |

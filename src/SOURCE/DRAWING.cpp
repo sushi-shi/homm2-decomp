@@ -724,7 +724,7 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
     if (hexIndex < 0 || hexIndex >= COMBAT_HEX_COUNT || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
         || hexIndex % COMBAT_GRID_ROW_LENGTH == COMBAT_GRID_ROW_LENGTH - 1)
         hexIndex = -1;
-    if (m_mouseGridHex == hexIndex)
+    if (hexIndex == m_mouseGridHex)
         return;
 
     if (m_mouseGridBuffer == NULL)
@@ -794,13 +794,13 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentY = 0;
     }
     if (hexIndex != -1) {
-        if (m_hexCells[hexIndex].m_gridLeft < giMinExtentX)
+        if (giMinExtentX > m_hexCells[hexIndex].m_gridLeft)
             giMinExtentX = m_hexCells[hexIndex].m_gridLeft;
-        if (m_hexCells[hexIndex].m_gridTop < giMinExtentY)
+        if (giMinExtentY > m_hexCells[hexIndex].m_gridTop)
             giMinExtentY = m_hexCells[hexIndex].m_gridTop;
-        if (m_hexCells[hexIndex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET > giMaxExtentX)
+        if (giMaxExtentX < m_hexCells[hexIndex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET)
             giMaxExtentX = m_hexCells[hexIndex].m_gridLeft + COMBAT_MOUSE_HEX_MAX_X_OFFSET;
-        if (m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET > giMaxExtentY)
+        if (giMaxExtentY < m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET)
             giMaxExtentY = m_hexCells[hexIndex].m_gridTop + COMBAT_MOUSE_HEX_MAX_Y_OFFSET;
     }
     if (giMaxExtentY > COMBAT_MAX_EXTENT_Y)
