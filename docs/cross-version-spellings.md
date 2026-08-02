@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| textWidget::textWidget(void) store order | `color, alignment, font, text, kind` | `font, text, color, alignment, kind` | OPEN |
+| dropListWidget::dropListWidget(void) store order | `items, savedBackground, itemCount, selectedIndex` | `itemCount, items, selectedIndex, savedBackground` | OPEN |
 | combatManager::DoBlast FP factor | `gfCombatSpeedMod[speed] * BLAST_FRAME_DELAY` | `BLAST_FRAME_DELAY * gfCombatSpeedMod[speed]` | OPEN - same class as combatManager::Main |
 | heroWindow::MoveWindow clamp sums | `m_winWidth + newX`; `m_winHeight + newY` | `newX + m_winWidth`; `newY + m_winHeight` | OPEN - slot 6-perm residual parked (no symmetric rename satisfies newX<newY<=oldH<=oldX<oldY<oldW) |
 | army::LoadResources dead locals + loopCount | eight `unusedLoadWord*` decls; `loopCount = 1` | no dead locals (frame 0x08); `loopCount = 0` | OPEN - loopCount is VALUE-LEVEL (see version-changes) |
