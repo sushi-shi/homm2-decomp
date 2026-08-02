@@ -174,6 +174,7 @@ H2_ENUM_END(EarthquakeConstant)
 }
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\SPELLS.CPP"
+VA(0x00498790, 0x67)
 i32 combatManager::HasValidSpellTarget(SpellType spell) {
     i32 hex;
 
@@ -187,6 +188,7 @@ i32 combatManager::HasValidSpellTarget(SpellType spell) {
     return 0;
 }
 
+VA(0x004987f7, 0x380)
 i32 combatManager::ViewSpells(i32) {
     CreatureType elementalType;
 
@@ -372,6 +374,7 @@ i32 combatManager::ViewSpells(i32) {
     return 0;
 }
 
+VA(0x00498bc1, 0xfb)
 MessageDispatchResult CombatSpecialHandler(tag_message& message) {
     if (message.type == SPELL_MESSAGE_HOVER) {
         gpWindowManager->ConvertToHover(message);
@@ -404,6 +407,7 @@ MessageDispatchResult CombatSpecialHandler(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00498cbc, 0x23b)
 MessageDispatchResult HandleCastSpell(tag_message& message) {
     i32 hex;
 
@@ -469,6 +473,7 @@ MessageDispatchResult HandleCastSpell(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00498f2b, 0x204)
 i32 combatManager::FindResurrectArmyIndex(
     H2_ENUM_PARAM(CombatSide, i32) side,
     H2_ENUM_PARAM(SpellType, i32) spell,
@@ -503,6 +508,7 @@ i32 combatManager::FindResurrectArmyIndex(
     return NO_SELECTION;
 }
 
+VA(0x0049912f, 0x332)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
     i32 unusedSpellWord5;
@@ -614,6 +620,7 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     return 1;
 }
 
+VA(0x004994a8, 0x173)
 void combatManager::SpellMessage(SpellType spell, i32 hex) {
     army* target_i;
     char* armyName;
@@ -655,6 +662,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
     CombatMessage(gText, 1, 0, 0);
 }
 
+VA(0x00499653, 0x1ad7)
 void combatManager::CastSpell(
     SpellType spell,
     i32 targetHex,
@@ -1280,6 +1288,7 @@ cast_done:
     CheckChangeSelector();
 }
 
+VA(0x0049b22d, 0x90)
 void combatManager::DefaultSpell(i32 targetHex) {
     if (!ValidHex(targetHex) || m_hexCells[targetHex].m_occupantSide < COMBAT_ATTACKER_SIDE)
         return;
@@ -1288,6 +1297,7 @@ void combatManager::DefaultSpell(i32 targetHex) {
     target->SpellEffect(gsSpellInfo[IDX(m_selectedSpell)].combatEffect, 0, 1);
 }
 
+VA(0x0049b2bd, 0x548)
 void combatManager::Fireball(i32 targetHex, SpellType spell) {
     if (!ValidHex(targetHex))
         return;
@@ -1463,6 +1473,7 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
     }
 }
 
+VA(0x0049b805, 0x330)
 void combatManager::MeteorShower(i32 targetHex) {
     if (!ValidHex(targetHex))
         return;
@@ -1545,6 +1556,7 @@ void combatManager::MeteorShower(i32 targetHex) {
     }
 }
 
+VA(0x0049bb35, 0x2bd)
 void combatManager::ElementalStorm(void) {
     i32 baseDamage_w;
     i32 column_e;
@@ -1619,6 +1631,7 @@ void combatManager::ElementalStorm(void) {
     }
 }
 
+VA(0x0049bdf2, 0xa64)
 void combatManager::Armageddon(void) {
     i32 baseDamage2 = m_spellPower[IDX(m_currentSide)] * SPELL_ARMAGEDDON_DAMAGE_PER_POWER;
     i32 anyAffected6 = 0;
@@ -1834,6 +1847,7 @@ void combatManager::Armageddon(void) {
     gpMouseManager->ShowColorPointer();
 }
 
+VA(0x0049c856, 0x127)
 void combatManager::TurnToStone(army* target) {
     ResetLimitCreature();
     ++m_limitCreatureCount[IDX(target->m_side)][target->m_index];
@@ -1858,6 +1872,7 @@ void combatManager::TurnToStone(army* target) {
     );
 }
 
+VA(0x0049c97d, 0x1d3)
 void combatManager::BloodLustEffect(
     army* target, H2_ENUM_PARAM(MonsterFlags, i32) effect
 ) {
@@ -1901,6 +1916,7 @@ void combatManager::BloodLustEffect(
     );
 }
 
+VA(0x0049cb50, 0x78)
 void combatManager::Ripple(i32 strength) {
     i32 unusedRippleWord1;
     i32 unusedRippleWord2;
@@ -1915,6 +1931,7 @@ void combatManager::Ripple(i32 strength) {
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
+VA(0x0049cbc8, 0x67)
 void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     memcpy(
         m_backgroundBuffer->m_pixels,
@@ -1932,6 +1949,7 @@ void combatManager::Blur(i32 redAdjust, i32 greenAdjust, i32 blueAdjust) {
     m_backgroundDrawn = 0;
 }
 
+VA(0x0049cc2f, 0x25a)
 void combatManager::ResetBoltAngle(SBolt* bolt) {
     i32 angleX36;
     float averageAngle28;
@@ -2001,6 +2019,7 @@ void combatManager::ResetBoltAngle(SBolt* bolt) {
     }
 }
 
+VA(0x0049ce89, 0x42e)
 void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     i32 widthRollResult;
     i32 distance;
@@ -2138,6 +2157,7 @@ void combatManager::DrawBolt(SBolt* bolt, i32 stepCount) {
     }
 }
 
+VA(0x0049d2fe, 0x212)
 void combatManager::AddBolt(
     SBolt* bolt,
     i32 startX,
@@ -2210,6 +2230,7 @@ void combatManager::AddBolt(
     ResetBoltAngle(bolt);
 }
 
+VA(0x0049d510, 0x922)
 void combatManager::DoBolt(
     i32 managePointer,
     i32 startX,
@@ -2444,6 +2465,7 @@ void combatManager::DoBolt(
     gpWindowManager->m_updateFlags = 1;
 }
 
+VA(0x0049de32, 0x164)
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     army* candidate_p;
     i32 closestHex_f;
@@ -2482,6 +2504,7 @@ i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
     return closestHex_f;
 }
 
+VA(0x0049df96, 0x31d)
 void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     i32 damage_l;
     army* target_j;
@@ -2584,6 +2607,7 @@ void combatManager::ChainLightning(i32 targetHex, i32 spellPower) {
     gpMouseManager->ShowColorPointer();
 }
 
+VA(0x0049e2b3, 0x267)
 void combatManager::VaporizeCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex
 ) {
@@ -2652,6 +2676,7 @@ void combatManager::VaporizeCreature(
     gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
+VA(0x0049e51a, 0x4ed)
 void combatManager::RippleCreature(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex, CombatRippleMode mode
 ) {
@@ -2793,6 +2818,7 @@ void combatManager::RippleCreature(
         gpCombatManager->DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
+VA(0x0049ea07, 0x624)
 void combatManager::ShowMassSpell(
     i8 (*const affected)[COMBAT_ARMY_SLOT_COUNT],
     H2_ENUM_PARAM(CombatEffectType, i32) effect,
@@ -2922,6 +2948,7 @@ void combatManager::ShowMassSpell(
         MakeCreaturesVanish();
 }
 
+VA(0x0049f02b, 0x713)
 void combatManager::CastMassSpell(SpellType spell, i32 spellPower) {
     army* target_i = NULL;
     CombatEffectType effect = gsSpellInfo[IDX(spell)].combatEffect;
@@ -3104,6 +3131,7 @@ applySpellInfluence:
     gpWindowManager->m_updateFlags = 1;
 }
 
+VA(0x0049f7c0, 0x64a)
 void combatManager::MirrorImage(i32 targetHex) {
     CombatHexDirection searchDirection11;
     i32 xOffset8;
@@ -3230,6 +3258,7 @@ mirror_found:
     DrawFrame(1, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
 }
 
+VA(0x0049fe0a, 0x1e2)
 void combatManager::SummonElemental(
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
     i32 spellPower
@@ -3276,6 +3305,7 @@ void combatManager::SummonElemental(
         spellPower += SPELL_WIZARD_HAT_POWER_BONUS;
 }
 
+VA(0x0049ffec, 0x18c)
 void combatManager::DoLuck(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex) {
     army* target_i = &m_armies[IDX(side)][armyIndex];
     i32 targetX_k = target_i->MidX();
@@ -3330,6 +3360,7 @@ void combatManager::DoLuck(H2_ENUM_PARAM(CombatSide, i32) side, i32 armyIndex) {
     );
 }
 
+VA(0x004a0178, 0x2bb)
 void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) {
     float stepY_e;
     i32 frameSpacing_c;
@@ -3417,6 +3448,7 @@ void combatManager::DoBlast(i32 targetHex, H2_ENUM_PARAM(SpellType, i32) spell) 
     gpResourceManager->Dispose(blastIcon_h);
 }
 
+VA(0x004a0433, 0x592)
 void combatManager::Resurrect(
     H2_ENUM_PARAM(SpellType, i32) spell,
     i32 targetHex,
@@ -3564,6 +3596,7 @@ void combatManager::Resurrect(
     target_i->m_monster.flags.abilityFlags &= MONSTER_FLAGS_RESURRECTED_MASK;
 }
 
+VA(0x004a09c5, 0x86)
 i32 combatManager::SpaceForElementalExists(void) {
     if ((m_currentSide == COMBAT_ATTACKER_SIDE
          && m_hexCells[ATTACKER_SUMMON_HEX_TOP].m_occupantSide != COMBAT_SIDE_NONE
@@ -3578,6 +3611,7 @@ i32 combatManager::SpaceForElementalExists(void) {
         return 1;
 }
 
+VA(0x004a0a4b, 0xa1)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
     SAMPLE2 sample = NULL_SAMPLE2;
     sample = LoadPlaySample("rsbryfzl.82m");
@@ -3592,6 +3626,7 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
     WaitEndSample(sample, -1);
 }
 
+VA(0x004a0aec, 0x1cd)
 void combatManager::ModifyDamageForArtifacts(
     i32l* damage,
     H2_ENUM_PARAM(SpellType, i32) spell,
@@ -3634,6 +3669,7 @@ void combatManager::ModifyDamageForArtifacts(
     }
 }
 
+VA(0x004a0cb9, 0x975)
 void combatManager::Earthquake(void) {
     // Retail screen-shake trajectory; each row is an ordered x/y displacement.
     // NOLINTBEGIN(readability-magic-numbers)
@@ -3835,6 +3871,7 @@ void combatManager::Earthquake(void) {
     gpMouseManager->ShowColorPointer();
 }
 
+VA(0x004a162e, 0x233)
 void combatManager::ShowSpellMessage(
     i32 castByCreature,
     H2_ENUM_PARAM(SpellType, i32) spell,

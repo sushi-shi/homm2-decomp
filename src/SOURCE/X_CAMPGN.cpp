@@ -263,44 +263,55 @@ static H2_ENUM_STORAGE(GameDifficulty, i8)
                                                           {0, 1, 2, 2, -1, -1, -1, -1}
 };
 
+VA(0x004b32e0, 0x18)
 ExpCampaign::ExpCampaign(void) {
     m_window = NULL;
 }
 
+VA(0x004b32f8, 0xb)
 ExpCampaign::~ExpCampaign() {}
 
+VA(0x004b3303, 0x1e)
 void ExpCampaign::ResetMapChoices(void) {
     memset(m_mapChoices, 0, sizeof(m_mapChoices));
 }
 
+VA(0x004b3321, 0x1e)
 void ExpCampaign::ResetMapsPlayed(void) {
     memset(m_mapsPlayed, 0, sizeof(m_mapsPlayed));
 }
 
+VA(0x004b333f, 0x1e)
 void ExpCampaign::ResetAwards(void) {
     memset(m_awards, 0, sizeof(m_awards));
 }
 
+VA(0x004b335d, 0x1e)
 void ExpCampaign::ResetBonusChoices(void) {
     memset(m_bonusChoices, 0, sizeof(m_bonusChoices));
 }
 
+VA(0x004b337b, 0x17)
 void ExpCampaign::GrantAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
     m_awards[IDX(award)] = 1;
 }
 
+VA(0x004b3392, 0x17)
 void ExpCampaign::RemoveAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
     m_awards[IDX(award)] = 0;
 }
 
+VA(0x004b33a9, 0x16)
 i8 ExpCampaign::HasAward(H2_ENUM_PARAM(ExpansionCampaignAward, i32) award) {
     return m_awards[IDX(award)];
 }
 
+VA(0x004b33bf, 0x19)
 void ExpCampaign::SetMapWasPlayed(void) {
     m_mapsPlayed[IDX(m_currentMap)] = 1;
 }
 
+VA(0x004b33d8, 0x4f)
 void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     m_campaignId = campaignId;
     m_currentMap = MAP_NONE;
@@ -311,6 +322,7 @@ void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
     ResetBonusChoices();
 }
 
+VA(0x004b3427, 0x63f)
 void ExpCampaign::InitMap(void) {
     SCampaignChoice* campaignChoice =
         &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
@@ -498,6 +510,7 @@ void ExpCampaign::InitMap(void) {
     gbRetreatWin = true;
 }
 
+VA(0x004b3aba, 0x34b)
 void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     m_viewOnly = viewOnly;
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
@@ -591,6 +604,7 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     }
 }
 
+VA(0x004b3e05, 0x7b8)
 void ExpCampaign::UpdateInfo(i32 redraw) {
     tag_message message;
     i8 hasVisibleAward;
@@ -804,6 +818,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
         m_window->DrawWindow();
 }
 
+VA(0x004b4642, 0x121)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
     i32 mapIndex;
@@ -844,6 +859,7 @@ i32 ExpCampaign::HandleVictory(void) {
     return 0;
 }
 
+VA(0x004b4773, 0x121)
 void ExpCampaign::HandleVictory1(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -894,6 +910,7 @@ void ExpCampaign::HandleVictory1(void) {
     }
 }
 
+VA(0x004b48b8, 0x102)
 void ExpCampaign::HandleVictory2(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -940,6 +957,7 @@ void ExpCampaign::HandleVictory2(void) {
     }
 }
 
+VA(0x004b49de, 0x94)
 void ExpCampaign::HandleVictory3(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -967,6 +985,7 @@ void ExpCampaign::HandleVictory3(void) {
     }
 }
 
+VA(0x004b4a86, 0x7f)
 void ExpCampaign::HandleVictory4(void) {
     switch (m_currentMap + 1) {
         case MAP_NONE + 1:
@@ -991,6 +1010,7 @@ void ExpCampaign::HandleVictory4(void) {
     }
 }
 
+VA(0x004b4b19, 0x57)
 void ExpCampaign::ReplaySmacker(void) {
     switch (m_campaignId) {
         case EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY:
@@ -1009,6 +1029,7 @@ void ExpCampaign::ReplaySmacker(void) {
     gpWindowManager->m_updateFlags = 1;
 }
 
+VA(0x004b4b80, 0xac)
 void ExpCampaign::ReplaySmacker1(void) {
     switch (m_viewMap + 1) {
         case MAP_POL_UPRISING + 1:
@@ -1041,6 +1062,7 @@ void ExpCampaign::ReplaySmacker1(void) {
     }
 }
 
+VA(0x004b4c4c, 0x90)
 void ExpCampaign::ReplaySmacker2(void) {
     switch (m_viewMap + 1) {
         case MAP_DES_CONQUER_AND_UNIFY + 1:
@@ -1070,6 +1092,7 @@ void ExpCampaign::ReplaySmacker2(void) {
     }
 }
 
+VA(0x004b4cfc, 0x78)
 void ExpCampaign::ReplaySmacker3(void) {
     switch (m_viewMap + 1) {
         case MAP_WIZ_SHROUDED_ISLES + 1:
@@ -1090,6 +1113,7 @@ void ExpCampaign::ReplaySmacker3(void) {
     }
 }
 
+VA(0x004b4d84, 0x60)
 void ExpCampaign::ReplaySmacker4(void) {
     switch (m_viewMap + 1) {
         case MAP_VOY_STRANDED + 1:
@@ -1106,6 +1130,7 @@ void ExpCampaign::ReplaySmacker4(void) {
     }
 }
 
+VA(0x004b4df4, 0x3c)
 u8 ExpCampaign::IsCompleted(void) {
     if (m_mapsPlayed[m_mapCount - 1])
         return 1;
@@ -1115,12 +1140,14 @@ u8 ExpCampaign::IsCompleted(void) {
     return 0;
 }
 
+VA(0x004b4e30, 0x24)
 i8 ExpCampaign::IsThisMapCompleted(void) {
     if (m_mapsPlayed[IDX(m_currentMap)])
         return 1;
     return 0;
 }
 
+VA(0x004b4e54, 0x26e)
 MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
@@ -1219,6 +1246,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004b5102, 0x5f)
 void ExpCampaign::Autosave(void) {
     if (m_currentMap != MAP_NONE) {
         m_mapsPlayed[IDX(m_currentMap)] = 1;
@@ -1232,33 +1260,39 @@ void ExpCampaign::Autosave(void) {
     }
 }
 
+VA(0x004b5161, 0x1a)
 ExpansionCampaignId ExpCampaign::Choose(void) {
     PlaySmacker(SMACKER_CAMPAIGN_CHOICE);
     return xLastChoice;
 }
 
+VA(0x004b517b, 0x58)
 i16 ExpCampaign::Days(void) {
     return (m_mapDays[IDX(m_currentMap)]
             + (gpGame->m_week - 1) * EXPANSION_CAMPAIGN_DAYS_PER_WEEK)
            + (gpGame->m_month - 1) * EXPANSION_CAMPAIGN_DAYS_PER_MONTH + gpGame->m_day;
 }
 
+VA(0x004b51d3, 0x10)
 i32 ExpCampaign::CampaignID(void) {
     return IDX(m_campaignId);
 }
 
+VA(0x004b51e3, 0x28)
 char* ExpCampaign::JosephName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xJosephName[0];
     return xStableText[IDX(m_currentMap)];
 }
 
+VA(0x004b520b, 0x28)
 char* ExpCampaign::IvanName(void) {
     if (m_currentMap < EXPANSION_CAMPAIGN_FIRST_ALTERNATE_NAME_MAP)
         return xUncleIvanName[0];
     return xStableText[IDX(m_currentMap) + EXPANSION_CAMPAIGN_IVAN_NAME_OFFSET];
 }
 
+VA(0x004b5233, 0x30)
 i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
     if (m_campaignId == EXPANSION_CAMPAIGN_DESCENDANTS
         && m_currentMap == MAP_DES_ELVEN_LANDS
@@ -1267,6 +1301,7 @@ i8 ExpCampaign::IsSpecialGoldenBow(i32 x, i32 y) {
     return 0;
 }
 
+VA(0x004b5263, 0x22)
 i8 ExpCampaign::IsSpecialUA(void) {
     if (m_campaignId == EXPANSION_CAMPAIGN_WIZARDS_ISLE
         && m_currentMap == MAP_WIZ_POWERS_END)
@@ -1274,6 +1309,7 @@ i8 ExpCampaign::IsSpecialUA(void) {
     return 0;
 }
 
+VA(0x004b5285, 0x50)
 i8 ExpCampaign::IsSpecialLossCondition(i32 playerIndex) {
     playerData* player = &gpGame->m_players[playerIndex];
 

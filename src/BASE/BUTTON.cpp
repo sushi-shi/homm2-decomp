@@ -19,6 +19,7 @@ H2_ENUM_BEGIN(ButtonConstant)
     REPEAT_DELAY_TICKS     = 60
 H2_ENUM_END(ButtonConstant)
 
+VA(0x004d34e0, 0x63)
 button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_normalFrame = 0;
     m_pressedFrame = 0;
@@ -28,6 +29,7 @@ button::button(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_icon = NULL;
 }
 
+VA(0x004d3580, 0xb6)
 button::button(
     i16 x,
     i16 y,
@@ -50,6 +52,7 @@ button::button(
     m_hotkey = hotkey;
 }
 
+VA(0x004d3640, 0xc7)
 button::button(
     i16 x,
     i16 y,
@@ -73,6 +76,7 @@ button::button(
     m_hotkey = hotkey;
 }
 
+VA(0x004d3710, 0x115)
 void button::Read(void) {
     char iconName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -92,6 +96,7 @@ void button::Read(void) {
     m_kind = gpResourceManager->ReadWord();
 }
 
+VA(0x004d3830, 0x5b)
 inline button::~button() {
     gpResourceManager->Dispose(m_icon);
 }
@@ -116,6 +121,7 @@ inline H2_ENUM_RETURN(MessageDispatchResult, i16)
     return MESSAGE_DISPATCH_FORWARD;
 }
 
+VA(0x004d3890, 0x4d8)
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
@@ -225,6 +231,7 @@ normalEvent:
     return widget::Main(msg);
 }
 
+VA(0x004d3d70, 0xe9)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
     heroWindow* window = m_owner;
     i16 x = window->m_posX + m_x;
@@ -245,12 +252,14 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
     return MESSAGE_DISPATCH_FORWARD;
 }
 
+VA(0x004d3e60, 0xb7)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
     return DeselectSelected(msg);
 }
 
 #undef SET_WIDGET_MESSAGE
 
+VA(0x004d3f20, 0x91)
 void button::Draw(void) {
     heroWindow* win = m_owner;
     if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {

@@ -17,6 +17,7 @@ static u8* gBlitSrc;
 static u8* gBlitDst;
 static i32 gBlitRow;
 
+VA(0x004c6450, 0x82)
 void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
     gFillRow = 0;
@@ -29,6 +30,7 @@ void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
     }
 }
 
+VA(0x004c64e0, 0xee)
 void FillBitmapAreaClip(
     class bitmap* bmp,
     i32 x,
@@ -68,6 +70,7 @@ void FillBitmapAreaClip(
     }
 }
 
+VA(0x004c65d0, 0xb7)
 void BlitBitmap(
     class bitmap* src,
     i32 sx,
@@ -91,6 +94,7 @@ void BlitBitmap(
     }
 }
 
+VA(0x004c6690, 0xcd)
 void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
     gDimPtr = bmp->m_pixels + bmp->m_width * y + x;
     for (gDimRow = 0; gDimRow < h; gDimRow++) {

@@ -328,6 +328,7 @@ H2_ENUM_END(CombatStorageConstant)
 }
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\SOURCE\\COMMAND.CPP"
+VA(0x0042b850, 0x2be)
 MessageDispatchResult combatManager::Main(tag_message& message) {
     MessageDispatchResult result = MESSAGE_DISPATCH_CONSUME;
 
@@ -414,6 +415,7 @@ ProcessAction:
     return result;
 }
 
+VA(0x0042bb0e, 0x123)
 i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
@@ -441,6 +443,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     }
 }
 
+VA(0x0042bc31, 0x758)
 void combatManager::SetCombatDirections(i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
@@ -640,6 +643,7 @@ void combatManager::SetCombatDirections(i32 targetHex) {
     currentArmy_3->m_targetIndex = targetIndex_6;
 }
 
+VA(0x0042c389, 0x575)
 void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex) {
     if (m_gridSelectionDisabled != 0)
         return;
@@ -775,6 +779,7 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
     gpMouseManager->SetPointer(m_mouseDirection + POINTER_ATTACK_OFFSET);
 }
 
+VA(0x0042c8fe, 0x5a)
 i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     i32 result;
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
@@ -795,6 +800,7 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
     }
 }
 
+VA(0x0042c958, 0x6fb)
 MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     i32 mouseX = message.payload.mouse.screenX;
     i32 mouseY = message.payload.mouse.screenY;
@@ -1063,6 +1069,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0042d14d, 0x58)
 i32 combatManager::IsNegationSphereInEffect(void) {
     CombatSide side;
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; side++) {
@@ -1072,6 +1079,7 @@ i32 combatManager::IsNegationSphereInEffect(void) {
     return 0;
 }
 
+VA(0x0042d1a5, 0x1c4)
 void combatManager::ResetRound(void) {
     i32 unusedResetRoundWord6;
 
@@ -1111,6 +1119,7 @@ void combatManager::ResetRound(void) {
     m_currentSpeed = ROUND_INITIAL_SPEED;
 }
 
+VA(0x0042d369, 0x205)
 i32 combatManager::CheckWin(struct tag_message* message) {
     i32 combatEnded = 0;
     if (IsWinner(m_currentSide) != 0) {
@@ -1158,6 +1167,7 @@ i32 combatManager::CheckWin(struct tag_message* message) {
     return combatEnded;
 }
 
+VA(0x0042d56e, 0x3f6)
 CombatMessageCommand combatManager::GetCommand(i32 hexIndex) {
     i32 column = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 rowPos = hexIndex / COMBAT_GRID_ROW_LENGTH;
@@ -1292,6 +1302,7 @@ smallView:
     return command;
 }
 
+VA(0x0042d964, 0x1eb)
 i32 combatManager::RightClick(i32 hexIndex) {
     i32 col = hexIndex % COMBAT_GRID_ROW_LENGTH;
     i32 row = hexIndex / COMBAT_GRID_ROW_LENGTH;
@@ -1355,6 +1366,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
     return 0;
 }
 
+VA(0x0042db4f, 0x2f2)
 void combatManager::DoCommand(CombatMessageCommand command) {
     i32 unusedCommandWord2;
     i32 unusedCommandWord5;
@@ -1466,6 +1478,7 @@ void combatManager::DoCommand(CombatMessageCommand command) {
     }
 }
 
+VA(0x0042de7d, 0x4f3)
 MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     char iconFile[WIN_LOSE_ICON_FILENAME_SIZE];
     tag_message animationMessage;
@@ -1614,6 +1627,7 @@ MessageDispatchResult WinCombatHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0042e370, 0x108)
 void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     i32 widgetIndex;
     for (widgetIndex = 0; widgetIndex < WIN_LOSE_WIDGET_COUNT; widgetIndex++) {
@@ -1630,6 +1644,7 @@ void combatManager::ClearWinLoseBottom(class heroWindow* window) {
     }
 }
 
+VA(0x0042e478, 0x29d)
 void combatManager::ShowWinLoseArtifact(
     class heroWindow* window, H2_ENUM_PARAM(ArtifactType, i32) artifact
 ) {
@@ -1703,6 +1718,7 @@ void combatManager::ShowWinLoseArtifact(
     WaitEndSample(pickupSample, -1);
 }
 
+VA(0x0042e715, 0x225)
 void combatManager::ShowSkeletons(class heroWindow* window) {
     static i16 skeletonSourceLineBase = 0x6c8; // NOLINT(readability-magic-numbers)
     tag_message message;
@@ -1771,6 +1787,7 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     WaitEndSample(pickupSample, -1);
 }
 
+VA(0x0042e93a, 0x2f2)
 void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     static i16 eagleEyeSourceLineBase = 0x702; // NOLINT(readability-magic-numbers)
     SpellType displayedSpell = m_eagleEyeSpell[IDX(m_combatResult)];
@@ -1849,6 +1866,7 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     WaitEndSample(playedSample, -1);
 }
 
+VA(0x0042ec2c, 0x9d5)
 void combatManager::ShowDeadArmies(class heroWindow* window) {
     static i16 casualtySourceLineBase = 0x74b; // NOLINT(readability-magic-numbers)
     i32 casualtyQuantity_0[CASUALTY_QUANTITY_STORAGE_COUNT];
@@ -2042,6 +2060,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 }
 
+VA(0x0042f601, 0xb17)
 void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     char experienceText[VICTORY_EXPERIENCE_TEXT_SIZE];
     i32 emptySlots;
@@ -2273,6 +2292,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     gMapY = gpAdvManager->m_mapOriginY;
 }
 
+VA(0x00430118, 0x383)
 void combatManager::DoLoseWindow(void) {
     i32 unusedLoseWord_h = IDX(COMBAT_RESULT_ATTACKER);
     CombatResult losingSide_h;
@@ -2360,6 +2380,7 @@ void combatManager::DoLoseWindow(void) {
     m_winLoseWindow = NULL;
 }
 
+VA(0x0043049b, 0x3bd)
 i32 combatManager::DoSurrender(void) {
     i32 armyIndex_n;
     i16 dialogType;
@@ -2435,6 +2456,7 @@ i32 combatManager::DoSurrender(void) {
     return gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_TWO;
 }
 
+VA(0x00430858, 0xb5)
 void combatManager::CheckChangeSelector(void) {
     if (gbNoShowCombat != 0)
         return;
@@ -2449,6 +2471,7 @@ void combatManager::CheckChangeSelector(void) {
     SetupSmallView();
 }
 
+VA(0x0043090d, 0xed)
 void combatManager::CheckCastleAttack(void) {
     if (m_inCastleCombat != 0 && m_currentSide == COMBAT_ATTACKER_SIDE) {
         while (m_catapultAttacksRemaining[IDX(m_currentSide)] > 0) {
@@ -2466,6 +2489,7 @@ void combatManager::CheckCastleAttack(void) {
     }
 }
 
+VA(0x004309fa, 0xb6)
 void combatManager::CheckGetAIMove(void) {
     i32 retreat = AICheckRetreat();
     if (m_heroCastSpell[IDX(m_currentSide)] == 0
@@ -2482,6 +2506,7 @@ void combatManager::CheckGetAIMove(void) {
     DoCompAI(m_currentSide);
 }
 
+VA(0x00430ab0, 0x14f)
 void combatManager::GetControl(void) {
     m_selectedHex = INVALID_HEX;
     m_previousCommand = COMBAT_INVALID_COMMAND;
@@ -2510,6 +2535,7 @@ setup_view:
     ResetMouse();
 }
 
+VA(0x00430bff, 0xbf)
 void combatManager::ResetMouse(void) {
     i32 mouseY_g;
     i32 mouseX_f;
@@ -2531,6 +2557,7 @@ void combatManager::ResetMouse(void) {
     }
 }
 
+VA(0x00430cbe, 0x5ef)
 MessageDispatchResult combatManager::ProcessNextAction(struct tag_message& message) {
     i32 actionData[IDX(ACTION_DATA_COUNT)];
     i32 transmitResult;
@@ -2689,6 +2716,7 @@ Finished:
     return dispatchResult;
 }
 
+VA(0x004312c9, 0x211)
 void combatManager::ResetCyclingCreatures(void) {
     army* currentArmy_p = NULL;
     i32 cyclingCount = 0;
@@ -2730,6 +2758,7 @@ void combatManager::ResetCyclingCreatures(void) {
     gpCombatManager->DrawFrame(1, 1, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
 }
 
+VA(0x004314da, 0xdf)
 void combatManager::ResetCycleTimers(void) {
     i32l currentTime_r = KBTickCount();
     CombatSide side;
@@ -2752,10 +2781,12 @@ void combatManager::ResetCycleTimers(void) {
     }
 }
 
+VA(0x004315b9, 0x41)
 i32 InCombatArea(i32 x, i32 y) {
     return x >= 0 && x < COMBAT_SCREEN_WIDTH && y >= 0 && y < COMBAT_AREA_HEIGHT;
 }
 
+VA(0x004315fa, 0x930)
 void combatManager::CycleCombatScreen(void) {
     army* currentArmy;
     u8 cycleArmy[COMBAT_SIDE_COUNT][COMBAT_ARMY_SLOT_COUNT];
@@ -2952,12 +2983,14 @@ setCycleTimer:
     );
 }
 
+VA(0x00431f2a, 0x30)
 void combatManager::SetCombatViewArmySmallLevel(i32 level) {
     gConfig.combatArmyInfoLevel = level;
     DrawFrame(1, 0, 0, 0, COMMAND_FRAME_DELAY, 1, 1);
     WritePrefs();
 }
 
+VA(0x00431f5a, 0xbb)
 void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel) {
     if (gConfig.showCombatGrid == showGrid && gConfig.showCombatMouseHex == showMouseHex
         && gConfig.combatShadeLevel == shadeLevel)
@@ -2974,6 +3007,7 @@ void combatManager::SetCombatGrid(i32 showGrid, i32 showMouseHex, i32 shadeLevel
     WritePrefs();
 }
 
+VA(0x00432015, 0x323)
 void combatManager::AddArmy(
     H2_ENUM_PARAM(CombatSide, i32) side,
     H2_ENUM_PARAM(CreatureType, i32) monsterType,
@@ -3040,6 +3074,7 @@ void combatManager::AddArmy(
     );
 }
 
+VA(0x00432338, 0x13d)
 void combatManager::SetupSmallView(void) {
     i32 unusedSmallViewWord1;
     i32 unusedSmallViewWord2;
@@ -3070,6 +3105,7 @@ void combatManager::SetupSmallView(void) {
     }
 }
 
+VA(0x00432475, 0x2ae)
 void combatManager::ViewBallista(i32 quickView) {
     i32 archerCount;
     i32 attackBonus;

@@ -69,6 +69,7 @@ H2_ENUM_END(SmackManagerConstant)
 
 static i8 bExpansionSmackNum;
 
+VA(0x00494540, 0x3f)
 void ConvertSmackerPalette(u8* paletteData) {
     i32 i;
 
@@ -77,6 +78,7 @@ void ConvertSmackerPalette(u8* paletteData) {
             static_cast<u8>(static_cast<i32>(paletteData[i]) >> PALETTE_VALUE_SHIFT);
 }
 
+VA(0x0049457f, 0x1ea)
 void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette, i32 skipPalette) {
     if (drawFrame && smack->NewPalette && !skipPalette) {
         memcpy(gPalette->m_data, smack->Palette, PALETTE_DATA_SIZE);
@@ -138,6 +140,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
 }
 
 // Named one-byte retail stub.
+VA(0x00494769, 0x1149)
 void SmackManagerMain(void) {
     i32 soundFlags4;
     i32 preloadFlags26;
@@ -553,6 +556,7 @@ playbackDone:
     backImage = NULL;
 }
 
+VA(0x004958e6, 0x44)
 void ShutDownSmacker(void) {
     if (smk1)
         SmackClose(smk1);
@@ -562,6 +566,7 @@ void ShutDownSmacker(void) {
     smk2 = NULL;
 }
 
+VA(0x0049592a, 0x13b)
 i32 PlaySmacker(i32 smackNumber) {
     i8 savedPalette[PALETTE_DATA_SIZE];
     i32 oldUpdateFlags;
@@ -606,6 +611,7 @@ icon* brotherIcon = NULL;
 static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
+VA(0x00495a65, 0x4f)
 ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
     ExpansionCampaignId campaign = EXPANSION_CAMPAIGN_PRICE_OF_LOYALTY;
     for (; IDX(campaign) < EXPANSION_RECT_COUNT; ++campaign) {
@@ -615,6 +621,7 @@ ExpansionCampaignId ExpansionCampaignRect(i32 x, i32 y) {
     return EXPANSION_CAMPAIGN_NONE;
 }
 
+VA(0x00495ab4, 0x64)
 i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     if (x < rect->x)
         return 0;
@@ -627,6 +634,7 @@ i8 PointInRect(i32 x, i32 y, tag_rect* rect) {
     return 1;
 }
 
+VA(0x00495b18, 0x243)
 void PrintSummaryInfo(SmackSum* summary) {
     sprintf(
         gText,

@@ -54,6 +54,7 @@ H2_ENUM_BEGIN(RecruitControl)
     CONFIRM_CONTROL        = 0x7802
 H2_ENUM_END(RecruitControl)
 
+VA(0x0048c330, 0x1f2)
 void SetupRecruitWin(
     class heroWindow* window,
     H2_ENUM_PARAM(CreatureType, i32) creatureType,
@@ -106,6 +107,7 @@ void SetupRecruitWin(
     }
 }
 
+VA(0x0048c522, 0x26b)
 i32 recruitUnit::Open(i32 priority) {
     i32 goldMaximum;
     i32 resourceMaximum;
@@ -171,6 +173,7 @@ i32 recruitUnit::Open(i32 priority) {
     return 0;
 }
 
+VA(0x0048c78d, 0xc8)
 void recruitUnit::Close(void) {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
@@ -202,6 +205,7 @@ void recruitUnit::Close(void) {
     KBChangeMenu(hmnuRecruitSave);
 }
 
+VA(0x0048c855, 0x115)
 void recruitUnit::Update(void) {
     // Retail reserves this scratch buffer even though the formatted text is stored in gText.
     char text[NAME_SIZE];
@@ -228,6 +232,7 @@ void recruitUnit::Update(void) {
     }
 }
 
+VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     i32 close = 0;
     i32 quickView = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
@@ -342,6 +347,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0048cd07, 0xc4)
 recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
     i32 costs[RESOURCE_COUNT + 1];
     i32 resource;
@@ -366,6 +372,7 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
     }
 }
 
+VA(0x0048cdcb, 0xdf)
 recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     i32 costs[RESOURCE_COUNT + 1];
     i32 resource;
@@ -390,6 +397,7 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
     }
 }
 
+VA(0x0048ceaa, 0x161)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
     i32 costs[RESOURCE_COUNT + 1];
     i32 goldPrice;

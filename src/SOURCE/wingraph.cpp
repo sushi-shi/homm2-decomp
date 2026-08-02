@@ -40,6 +40,7 @@ static i16 gDDCleanUpLineBase = 526; // NOLINT(readability-magic-numbers)
 static i16 gDDSetFullScreenLineBase = 572; // NOLINT(readability-magic-numbers)
 static i16 gSetGraphicsTypeLineBase = 1247; // NOLINT(readability-magic-numbers)
 
+VA(0x004afbe0, 0x3a)
 void DDRestoreDisplayMode(void) {
     HRESULT result;
 
@@ -50,6 +51,7 @@ void DDRestoreDisplayMode(void) {
     }
 }
 
+VA(0x004afc1a, 0x2d)
 i32 DDQueryNewPalette(void) {
     i32 unused;
 
@@ -60,6 +62,7 @@ i32 DDQueryNewPalette(void) {
     return SetPalette();
 }
 
+VA(0x004afc47, 0x76)
 void CreatePrimary(void) {
     HRESULT result;
 
@@ -73,6 +76,7 @@ void CreatePrimary(void) {
     }
 }
 
+VA(0x004afcbd, 0xb2)
 void SetupClipper(void) {
     HRESULT result;
 
@@ -89,6 +93,7 @@ void SetupClipper(void) {
     }
 }
 
+VA(0x004afd6f, 0x120)
 void DDInitGraphics(void) {
     HRESULT result;
 
@@ -119,6 +124,7 @@ void DDInitGraphics(void) {
     InitializePalette();
 }
 
+VA(0x004afe8f, 0x4da)
 i32 DDAppPaint(void* window, void* paintDC) {
     i32 sourceTop4;
     i32 sourceWidth5;
@@ -229,6 +235,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
     return 1;
 }
 
+VA(0x004b0369, 0x111)
 void DDInitializePalette(void) {
     HDC dc0;
     i32 entry;
@@ -270,6 +277,7 @@ void DDInitializePalette(void) {
     }
 }
 
+VA(0x004b047a, 0x7e)
 i32 DDSetPalette(void) {
     HRESULT result;
 
@@ -285,6 +293,7 @@ i32 DDSetPalette(void) {
     return 0;
 }
 
+VA(0x004b04f8, 0x109)
 struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary) {
     DDSURFACEDESC description;
     IDirectDrawSurface* surface;
@@ -321,6 +330,7 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     return surface;
 }
 
+VA(0x004b0601, 0x57f)
 void DDSD(i32 error, char* file, i32 line) {
     HRESULT restoreResult;
     i32 unused;
@@ -436,6 +446,7 @@ void DDSD(i32 error, char* file, i32 line) {
     ShutDown(gText);
 }
 
+VA(0x004b0c15, 0xee)
 void DDUpdatePalette(i8* paletteData) {
     i32 entry;
     HRESULT result0;
@@ -478,6 +489,7 @@ void DDUpdatePalette(i8* paletteData) {
         );
 }
 
+VA(0x004b0d03, 0x14a)
 void DDCleanUpWinGraphics(void) {
     HRESULT restoreResult;
     HRESULT result;
@@ -513,6 +525,7 @@ void DDCleanUpWinGraphics(void) {
     }
 }
 
+VA(0x004b0e4d, 0x279)
 void DDSetFullScreenStatus(i32 fullScreen) {
     i32 width;
     i32 windowHeight0;
@@ -595,6 +608,7 @@ void DDSetFullScreenStatus(i32 fullScreen) {
     }
 }
 
+VA(0x004b10c6, 0x72)
 i32 WGQueryNewPalette(void) {
     i32 paletteChanges;
     HDC hdc;
@@ -612,6 +626,7 @@ i32 WGQueryNewPalette(void) {
     }
 }
 
+VA(0x004b1138, 0x13b)
 void WGInitGraphics(void) {
     HBITMAP bitmap;
 
@@ -645,6 +660,7 @@ void WGInitGraphics(void) {
     PatBlt(hdcImage, 0, 0, iMainWinScreenWidth, iMainWinScreenHeight, BLACKNESS);
 }
 
+VA(0x004b1273, 0x1c1)
 void WGUpdatePalette(i8* paletteData) {
     HDC dc0;
     i32 entry;
@@ -714,6 +730,7 @@ void WGUpdatePalette(i8* paletteData) {
     }
 }
 
+VA(0x004b1434, 0x1a2)
 void WGInitializePalette(void) {
     HDC dc0;
     i32 entry;
@@ -764,6 +781,7 @@ void WGInitializePalette(void) {
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
 }
 
+VA(0x004b15d6, 0x1bd)
 i32 WGAppPaint(void* window, void* paintDC) {
     i32 padding8;
     RECT clientRect16;
@@ -829,6 +847,7 @@ i32 WGAppPaint(void* window, void* paintDC) {
     return 1;
 }
 
+VA(0x004b1793, 0x67)
 void WGCleanUpWinGraphics(void) {
     HGDIOBJ bitmap;
 
@@ -844,6 +863,7 @@ void WGCleanUpWinGraphics(void) {
     }
 }
 
+VA(0x004b17fa, 0x66)
 void ConnectToDLLs(void) {
     hDDrawLibrary = LoadLibraryA("DDRAW.DLL");
     if (reinterpret_cast<u32l>(hDDrawLibrary) >= WINGRAPH_LOAD_LIBRARY_SUCCESS) {
@@ -859,12 +879,14 @@ void ConnectToDLLs(void) {
     }
 }
 
+VA(0x004b1860, 0x1a)
 void DisconnectDLLs(void) {
     if (reinterpret_cast<u32l>(hDDrawLibrary) >= WINGRAPH_LOAD_LIBRARY_SUCCESS) {
         FreeLibrary(hDDrawLibrary);
     }
 }
 
+VA(0x004b187a, 0x15)
 void RestoreDisplayMode(void) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING) {
         return;
@@ -873,6 +895,7 @@ void RestoreDisplayMode(void) {
     }
 }
 
+VA(0x004b188f, 0x17)
 i32 SetPalette(void) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return 0;
@@ -880,6 +903,7 @@ i32 SetPalette(void) {
         return DDSetPalette();
 }
 
+VA(0x004b18a6, 0x6b)
 void GetGraphicsInfo(void) {
     HDC screenDC;
 
@@ -899,6 +923,7 @@ void GetGraphicsInfo(void) {
     }
 }
 
+VA(0x004b1911, 0x82)
 void InitGraphics(void) {
     LogStr("IG1");
     ConnectToDLLs();
@@ -918,6 +943,7 @@ void InitGraphics(void) {
     }
 }
 
+VA(0x004b1993, 0x31)
 i32 AppPaint(void* window, void* message) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return WGAppPaint(window, message);
@@ -925,6 +951,7 @@ i32 AppPaint(void* window, void* message) {
         return DDAppPaint(window, message);
 }
 
+VA(0x004b19c4, 0x1a)
 void InitializePalette(void) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         WGInitializePalette();
@@ -932,6 +959,7 @@ void InitializePalette(void) {
         DDInitializePalette();
 }
 
+VA(0x004b19de, 0x28)
 void UpdatePalette(i8* paletteData) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         WGUpdatePalette(paletteData);
@@ -939,6 +967,7 @@ void UpdatePalette(i8* paletteData) {
         DDUpdatePalette(paletteData);
 }
 
+VA(0x004b1a06, 0x1f)
 void CleanUpWinGraphics(void) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         WGCleanUpWinGraphics();
@@ -947,6 +976,7 @@ void CleanUpWinGraphics(void) {
     DisconnectDLLs();
 }
 
+VA(0x004b1a25, 0xa1)
 void SetFullScreenStatus(i32 fullScreen) {
     if (gbInSmackMgr != 0)
         return;
@@ -968,6 +998,7 @@ void SetFullScreenStatus(i32 fullScreen) {
         CheckChangeCursor(0, 0, 1);
 }
 
+VA(0x004b1ac6, 0x1a)
 i32 QueryNewPalette(void) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         return WGQueryNewPalette();
@@ -975,6 +1006,7 @@ i32 QueryNewPalette(void) {
         return DDQueryNewPalette();
 }
 
+VA(0x004b1ae0, 0x1ce)
 i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     i32 fullScreen;
     i32 x;

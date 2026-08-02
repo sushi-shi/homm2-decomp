@@ -2,6 +2,7 @@
 #include <BASE/baseManager.h>
 #include <string.h>
 
+VA(0x004c5cd0, 0x4c)
 baseManager::baseManager(void)
     : m_next(NULL),
       m_prev(NULL) {

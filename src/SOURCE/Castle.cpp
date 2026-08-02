@@ -99,6 +99,7 @@ H2_ENUM_BEGIN(CastleConstant)
     RACE_ICON_FRAMES             = 32
 H2_ENUM_END(CastleConstant)
 
+VA(0x00424320, 0xf10)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     widget* backgroundWidget19;
     i32 backgroundFrame6;
@@ -420,6 +421,7 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 }
 
+VA(0x00425230, 0x979)
 MessageDispatchResult CastleHandler(tag_message& message) {
     i32 cannotRecruitHero;
     i32 hoverMessage;

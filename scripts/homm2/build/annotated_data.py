@@ -59,7 +59,7 @@ def _clang_args(repo: Path, source: Path, *, mode: ClangMode) -> list[str]:
         "-fms-compatibility-version=10.20", "-fms-extensions",
         "-fdelayed-template-parsing", "-ferror-limit=0",
         "-Xclang", "-fdefault-calling-conv=fastcall",
-        "-D_X86_", "-DWIN32", "-D_WINDOWS", "-D_MT",
+        "-D_X86_", "-DWIN32", "-D_WINDOWS", "-D_MT", "-DNO_STRICT",
     ]
     project_includes = [repo / "include"]
     vendor = repo / "vendor"

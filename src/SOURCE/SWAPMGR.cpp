@@ -83,6 +83,7 @@ H2_ENUM_BEGIN(SwapManagerConstant)
     SPLIT_CONFIRM                = 0x7802
 H2_ENUM_END(SwapManagerConstant)
 
+VA(0x004a2260, 0x79)
 swapManager::swapManager(void) {
     m_window = NULL;
     m_selectorIcon = NULL;
@@ -95,23 +96,27 @@ swapManager::swapManager(void) {
     m_heroes[IDX(SWAP_SIDE_RIGHT)] = NULL;
 }
 
+VA(0x004a22d9, 0x33)
 swapManager::swapManager(hero* leftHero, hero* rightHero) {
     m_heroes[IDX(SWAP_SIDE_LEFT)] = leftHero;
     m_heroes[IDX(SWAP_SIDE_RIGHT)] = rightHero;
 }
 
+VA(0x004a230c, 0x3d)
 void swapManager::Reset(void) {
     H2_ENUM_ASSIGN_CHAIN_5(
         m_selectedSide, m_targetSide, m_itemType, m_selectedSlot, m_targetSlot, SLOT_NONE
     );
 }
 
+VA(0x004a2349, 0x25)
 i32 swapManager::DrawSwapWin(void) {
     m_window->DrawWindow(0);
     gpWindowManager->UpdateScreen();
     return 0;
 }
 
+VA(0x004a236e, 0x3e2)
 i32 swapManager::Open(i32 id) {
     Reset();
     m_window = new heroWindow(0, 0, "swapwin.bin");
@@ -202,6 +207,7 @@ i32 swapManager::Open(i32 id) {
     return 0;
 }
 
+VA(0x004a2750, 0x11f)
 void swapManager::Close(void) {
     gpResourceManager->Dispose(m_selectorIcon);
     gpWindowManager->RemoveWindow(m_window);
@@ -227,6 +233,7 @@ void swapManager::Close(void) {
     gpAdvManager->m_adventureWindow->BroadcastMessage(message);
 }
 
+VA(0x004a286f, 0x185)
 void swapManager::DrawSelector(void) {
     const char selectorFrame_17 = 10;
     const i16 leftArmyX_37 = 37;
@@ -297,6 +304,7 @@ void swapManager::DrawSelector(void) {
     }
 }
 
+VA(0x004a29f4, 0x8ef)
 MessageDispatchResult swapManager::Main(tag_message& message) {
     i32 closeRequested_5 = 0;
     i32 quickView = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
@@ -727,6 +735,7 @@ MessageDispatchResult swapManager::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004a33b6, 0x98)
 void swapManager::ViewMon(void) {
     gpGame->ViewArmy(
         ARMY_VIEW_X,
@@ -744,6 +753,7 @@ void swapManager::ViewMon(void) {
     );
 }
 
+VA(0x004a344e, 0x24b)
 void swapManager::SwapArtifacts(void) {
     H2_ENUM_STORAGE(ArtifactType, i32) selectedArtifact =
         m_heroes[IDX(m_selectedSide)]->m_artifacts[m_selectedSlot];
@@ -788,6 +798,7 @@ void swapManager::SwapArtifacts(void) {
     }
 }
 
+VA(0x004a3699, 0x14e)
 void swapManager::SwapMons(void) {
     i32 selectedArmyCount = 0;
     for (i32 slot_1 = 0; slot_1 < ARMY_GROUP_SLOT_COUNT; ++slot_1) {
@@ -815,6 +826,7 @@ void swapManager::SwapMons(void) {
     selectedArmy->Swap(m_selectedSlot, targetArmy, m_targetSlot);
 }
 
+VA(0x004a37e7, 0x449)
 void swapManager::Update(void) {
     i32 slot;
     tag_message message_1;
@@ -928,6 +940,7 @@ void swapManager::Update(void) {
     }
 }
 
+VA(0x004a3c30, 0x381)
 void swapManager::SplitMons(void) {
     i16 unusedAmountControl_29 = SPLIT_AMOUNT_CONTROL;
     i32 unusedState = 0;

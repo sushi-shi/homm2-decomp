@@ -41,6 +41,7 @@ static SExecutiveText gExecutiveText = {
     "Terminated"
 };
 
+VA(0x004c4f20, 0x35)
 executive::executive(void) {
     m_managerListHead = NULL;
     m_managerListTail = NULL;
@@ -48,6 +49,7 @@ executive::executive(void) {
     m_result = 0;
 }
 
+VA(0x004c4f60, 0xb0)
 i32 executive::InitSystem(void) {
     if (gpResourceManager->Open(MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.resourceInitError);
@@ -64,6 +66,7 @@ i32 executive::InitSystem(void) {
     return 0;
 }
 
+VA(0x004c5010, 0xb8)
 void executive::ShutDownSystem(void) {
     EarlyShutDownSystem();
     gpSoundManager->Close();
@@ -82,6 +85,7 @@ void executive::ShutDownSystem(void) {
     gpResourceManager->Close();
 }
 
+VA(0x004c50d0, 0x170)
 i32 executive::DoDialog(class baseManager* manager) {
     baseManager* managerList[DIALOG_MANAGER_CAPACITY];
     baseManager* previousList[DIALOG_MANAGER_CAPACITY];
@@ -131,6 +135,7 @@ i32 executive::DoDialog(class baseManager* manager) {
     return dialog->m_result;
 }
 
+VA(0x004c5240, 0xac)
 void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStart);
     LogStr(gExecutiveText.managerListDivider1);
@@ -144,6 +149,7 @@ void executive::PrintManagerList(void) {
     LogStr(gExecutiveText.managerListStop);
 }
 
+VA(0x004c52f0, 0x13c)
 i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == NULL)
         return MANAGER_ERROR;
@@ -183,6 +189,7 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     return MANAGER_SUCCESS;
 }
 
+VA(0x004c5430, 0xc3)
 void executive::RemoveManager(class baseManager* mgr) {
     if (mgr != NULL) {
         mgr->Close();
@@ -213,6 +220,7 @@ void executive::RemoveManager(class baseManager* mgr) {
     }
 }
 
+VA(0x004c5500, 0x7c)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
     RemoveManager(saved);
@@ -225,6 +233,7 @@ void executive::CallManager(class baseManager* mgr) {
     m_activeManager = saved;
 }
 
+VA(0x004c5580, 0x179)
 void executive::MainLoop(void) {
     tag_message message;
     i32 keepDispatching;
@@ -279,6 +288,7 @@ void executive::MainLoop(void) {
     }
 }
 
+VA(0x004c5700, 0x15)
 void executive::Terminate(void) {
     ShutDown(gExecutiveText.terminationMessage);
 }

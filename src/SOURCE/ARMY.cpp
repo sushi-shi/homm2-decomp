@@ -151,6 +151,7 @@ H2_ENUM_CLASS_END(BerserkMaskIndex)
 
 }
 
+VA(0x00418650, 0xc2)
 army::army(void) {
     H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
@@ -171,10 +172,12 @@ army::army(void) {
     m_xOffset = 0;
 }
 
+VA(0x00418712, 0xd)
 void army::WaitSample(ArmySampleType sampleIndex) {
     return;
 }
 
+VA(0x0041871f, 0xd2)
 void army::InitClean(void) {
     H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
@@ -195,6 +198,7 @@ void army::InitClean(void) {
     m_lastTargetHex = -1;
 }
 
+VA(0x004187f1, 0x38c)
 void army::Init(
     CreatureType monsterType, i32 quantity, H2_ENUM_PARAM(CombatSide, i32) side, i32 index, i32 hex, i32 unknown
 ) {
@@ -270,6 +274,7 @@ void army::Init(
     m_armyGroupSlot = unknown;
 }
 
+VA(0x00418b7d, 0x44d)
 void army::LoadResources(void) {
     i32 unusedLoadWord17;
     i32 unusedLoadWord14;
@@ -350,6 +355,7 @@ void army::LoadResources(void) {
     }
 }
 
+VA(0x00418fca, 0xcb)
 void army::FreeResources(void) {
     H2_ENUM_STORAGE_STEPPED(ArmySampleType, i32) sampleType;
 
@@ -372,6 +378,7 @@ void army::FreeResources(void) {
     }
 }
 
+VA(0x00419095, 0x6e4)
 void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     i32 quantityY0;
     i32 spellY;
@@ -619,11 +626,13 @@ void army::DrawToBuffer(i32 x, i32 y, i32 effectsOnly) {
     }
 }
 
+VA(0x00419790, 0x22)
 void army::Wince(void) {
     m_animationSequence = ARMY_ANIMATION_WINCE;
     m_animationFrame = 0;
 }
 
+VA(0x004197b2, 0xa27)
 void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawing) {
     i32 oldMaxX_1;
     i32 oldMaxY_1;
@@ -882,6 +891,7 @@ void army::Walk(CombatHexDirection direction, i32 finishStanding, i32 skipDrawin
     }
 }
 
+VA(0x0041a1d9, 0x165f)
 void army::SpecialAttack(void) {
     char combatText[ARMY_COMBAT_TEXT_SIZE];
     i32 missileDelay_2;
@@ -1342,11 +1352,13 @@ void army::SpecialAttack(void) {
     }
 }
 
+VA(0x0041b838, 0x20)
 void army::DirDoAttack(CombatHexDirection direction) {
     m_attackDirection = direction;
     DoAttack(0);
 }
 
+VA(0x0041b858, 0x583)
 void army::DoHydraAttack(i32) {
     i32 damage_8;
     i32 killed_4;
@@ -1443,6 +1455,7 @@ void army::DoHydraAttack(i32) {
     gpCombatManager->m_limitCreatureCount[IDX(m_side)][m_index] = 1;
 }
 
+VA(0x0041bddb, 0x13f6)
 void army::DoAttack(i32 retaliation) {
     ArmyFacing targetOriginalFacing_5;
     CombatHexDirection originalDirection;
@@ -1795,14 +1808,17 @@ void army::DoAttack(i32 retaliation) {
     }
 }
 
+VA(0x0041d220, 0xb)
 void army::ResetPath(void) {
     return;
 }
 
+VA(0x0041d22b, 0x1a)
 i32 army::WalkTo(void) {
     return WalkTo(m_moveTargetHex);
 }
 
+VA(0x0041d245, 0x2aa)
 i32 army::WalkTo(i32 destination) {
     i32 direction_3;
     i32 steps;
@@ -1884,10 +1900,12 @@ i32 army::WalkTo(i32 destination) {
     return 0;
 }
 
+VA(0x0041d4ef, 0x1a)
 i32 army::AttackTo(void) {
     return AttackTo(m_moveTargetHex);
 }
 
+VA(0x0041d509, 0x1c8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
     i32 numSteps;
@@ -1944,6 +1962,7 @@ i32 army::AttackTo(i32 destination) {
     return ARMY_PATH_BLOCKED;
 }
 
+VA(0x0041d6d1, 0x21d)
 void army::CheckLuck(void) {
     SAMPLE2 luckSample;
 
@@ -1992,6 +2011,7 @@ void army::CheckLuck(void) {
     }
 }
 
+VA(0x0041d8ee, 0x444)
 void army::DamageEnemy(
     army* target,
     i32* damageResult,
@@ -2114,6 +2134,7 @@ void army::DamageEnemy(
     *killedResult = target->Damage(damageDone2, SPELL_NONE);
 }
 
+VA(0x0041dd32, 0x21c)
 i32 army::Damage(i32l damage, SpellType spell) {
     i32 killed_13;
     ArmyFacing originalFacing;
@@ -2172,6 +2193,7 @@ i32 army::Damage(i32l damage, SpellType spell) {
     return killed_13;
 }
 
+VA(0x0041df4e, 0x11d7)
 void army::PowEffect(
     H2_ENUM_PARAM(CombatEffectType, i32) effect,
     i32 resetLimits,
@@ -2555,16 +2577,19 @@ void army::PowEffect(
     }
 }
 
+VA(0x0041f125, 0x24)
 u32l army::Strength(void) {
     return gMonsterDatabase[IDX(m_monsterType)].fightValue * m_quantity;
 }
 
+VA(0x0041f149, 0x57)
 i32 army::LeaveNoBody(void) {
     return m_monsterType == CREATURE_EARTH_ELEMENTAL || m_monsterType == CREATURE_AIR_ELEMENTAL
            || m_monsterType == CREATURE_FIRE_ELEMENTAL || m_monsterType == CREATURE_WATER_ELEMENTAL
            || HAS(m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE);
 }
 
+VA(0x0041f1a0, 0x35f)
 void army::ProcessDeath(i32 immediate) {
     i32 rearHex;
     army* mirrorImage_4;
@@ -2640,6 +2665,7 @@ void army::ProcessDeath(i32 immediate) {
     }
 }
 
+VA(0x0041f4ff, 0x35f)
 void army::SpellEffect(
     H2_ENUM_PARAM(CombatEffectType, i32) effect,
     i32 effectFrameDelay,
@@ -2736,6 +2762,7 @@ void army::SpellEffect(
     }
 }
 
+VA(0x0041f85e, 0xe5)
 void army::CancelSpellType(ArmySpellCancelType cancelType) {
     switch (cancelType) {
         case ARMY_CANCEL_SPELLS_AFTER_MOVE:
@@ -2764,6 +2791,7 @@ void army::CancelSpellType(ArmySpellCancelType cancelType) {
     }
 }
 
+VA(0x0041f943, 0xf9)
 void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     if (!m_spellInfluence[IDX(influence)]) {
         return;
@@ -2810,6 +2838,7 @@ void army::CancelIndividualSpell(ArmySpellInfluence influence) {
     }
 }
 
+VA(0x0041fa5f, 0x1fd)
 i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) i;
 
@@ -2883,6 +2912,7 @@ i32 army::SetSpellInfluence(ArmySpellInfluence influence, i32 rounds) {
     return 1;
 }
 
+VA(0x0041fc98, 0x8d)
 void army::DecrementSpellRounds(void) {
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) i;
 
@@ -2900,6 +2930,7 @@ void army::DecrementSpellRounds(void) {
     }
 }
 
+VA(0x0041fd25, 0x513)
 void army::GoBerserk(void) {
     i32 masks_28[IDX(BERSERK_MASK_COUNT)];
     i32 savedQuantity_10;
@@ -3045,6 +3076,7 @@ berserkFinish:
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x00420238, 0x35d)
 void army::MoveAttack(i32 destination, i32 moveOnly) {
     i32 baseAttackMask;
     i32 targetAttackMask;
@@ -3146,6 +3178,7 @@ finish:
     gpCombatManager->m_limitCreature = 1;
 }
 
+VA(0x00420595, 0x75c)
 float army::SpellCastWorkChance(SpellType spell) {
     i32 foundSpell_8;
     H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) i_15;
@@ -3319,6 +3352,7 @@ float army::SpellCastWorkChance(SpellType spell) {
     return ARMY_SPELL_CHANCE_ALWAYS;
 }
 
+VA(0x00420cf1, 0x42)
 i32 army::SpellCastWorks(SpellType spell) {
     i32 chance;
 
@@ -3326,6 +3360,7 @@ i32 army::SpellCastWorks(SpellType spell) {
     return SRandom(1, RANDOM_SPELL_ROLL_MAX) <= chance;
 }
 
+VA(0x00420d33, 0x37b)
 void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 skipDrawing) {
     frameInfo->animationFrameCount[IDX(ARMY_ANIMATION_WALK)] = 0;
     if (!skipDrawing && finishStanding) {
@@ -3433,6 +3468,7 @@ void BuildTempWalkSeq(struct SMonFrameInfo* frameInfo, i32 finishStanding, i32 s
     }
 }
 
+VA(0x004210ae, 0x5b)
 void army::DispelGood(void) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_HASTE);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLESS);
@@ -3444,6 +3480,7 @@ void army::DispelGood(void) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_STEELSKIN);
 }
 
+VA(0x00421109, 0x86)
 void army::Cure(i32 amount) {
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_SLOW);
     CancelIndividualSpell(ARMY_SPELL_INFLUENCE_BLIND);
@@ -3458,6 +3495,7 @@ void army::Cure(i32 amount) {
     }
 }
 
+VA(0x0042118f, 0x57)
 i32 army::MidX(void) {
     i32 wideOffset;
 
@@ -3473,6 +3511,7 @@ i32 army::MidX(void) {
     return gpCombatManager->m_hexCells[m_hex].m_x + wideOffset;
 }
 
+VA(0x004211e6, 0x46)
 i32 army::MidY(void) {
     return gpCombatManager->m_hexCells[m_hex].m_y
            - (GetIconEntry(
@@ -3483,12 +3522,14 @@ i32 army::MidY(void) {
               >> 1);
 }
 
+VA(0x0042122c, 0x44)
 i32 army::TopY(void) {
     return gpCombatManager->m_hexCells[m_hex].m_y
            - GetIconEntry(m_creatureIcon, m_frameInfo.animationFrames[IDX(ARMY_ANIMATION_STAND)][0])
                  ->h;
 }
 
+VA(0x00421270, 0xa6)
 i32 army::RightX(void) {
     if (m_facing == ARMY_FACING_RIGHT) {
         return gpCombatManager->m_hexCells[m_hex].m_x
@@ -3512,6 +3553,7 @@ i32 army::RightX(void) {
     }
 }
 
+VA(0x00421316, 0xa6)
 i32 army::LeftX(void) {
     if (m_facing == ARMY_FACING_RIGHT) {
         return gpCombatManager->m_hexCells[m_hex].m_x
@@ -3535,6 +3577,7 @@ i32 army::LeftX(void) {
     }
 }
 
+VA(0x004213bc, 0x136)
 i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
     army* otherArmy1;
     i32 otherHex1;
@@ -3574,6 +3617,7 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
     return 0;
 }
 
+VA(0x004214f2, 0x14b)
 void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType) {
     i32 speedDifference;
 
@@ -3612,6 +3656,7 @@ void ModifyFrameInfo(struct SMonFrameInfo* frameInfo, CreatureType monsterType) 
     }
 }
 
+VA(0x0042163d, 0x8b)
 i32 army::GetPowBaseY(void) {
     i32 y;
 

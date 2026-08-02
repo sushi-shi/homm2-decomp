@@ -41,6 +41,7 @@ static i32 s_hasTarget;
 static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
 static hero* s_currentHero;
 
+VA(0x004916c0, 0x116)
 i32 searchArray::BuildPath(
     i32 startX,
     i32 startY,
@@ -73,6 +74,7 @@ i32 searchArray::BuildPath(
     return m_pathLength;
 }
 
+VA(0x004917d6, 0xcc2)
 void searchArray::SeedPosition(
     i32 seedX,
     i32 seedY,

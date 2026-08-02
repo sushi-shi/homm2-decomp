@@ -11,6 +11,7 @@ H2_ENUM_BEGIN(WidgetConstant)
     DEFAULT_EXTENT = 16
 H2_ENUM_END(WidgetConstant)
 
+VA(0x004d4010, 0x8b)
 widget::widget(
     i16 x,
     i16 y,
@@ -32,6 +33,7 @@ widget::widget(
     m_kind = kind;
 }
 
+VA(0x004d40a0, 0x7d)
 widget::widget(void) {
     m_id = 0;
     m_owner = NULL;
@@ -46,14 +48,17 @@ widget::widget(void) {
     m_height = DEFAULT_EXTENT;
 }
 
+VA(0x004d4120, 0x14)
 widget::~widget() {}
 
+VA(0x004d4140, 0x23)
 i32 widget::Open(i32 zOrder, class heroWindow* owner) {
     m_zOrder = zOrder;
     m_owner = owner;
     return 0;
 }
 
+VA(0x004d4170, 0xb)
 void widget::Close(void) {}
 
 static inline void DimWidgetArea(widget* target) {
@@ -75,6 +80,7 @@ static inline i32 IsInsideWidget(widget* target, i16 x, i16 y) {
              || target->m_y + target->m_height <= y);
 }
 
+VA(0x004d4180, 0x35d)
 MessageDispatchResult widget::Main(tag_message& message) {
     switch (message.type) {
         case MESSAGE_MOUSE_MOVE: {
@@ -181,6 +187,7 @@ MessageDispatchResult widget::Main(tag_message& message) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+VA(0x004d4540, 0x7e)
 void widget::Dim(void) {
     if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
         i16 x = m_owner->m_posX + m_x;

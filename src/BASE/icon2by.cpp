@@ -32,6 +32,7 @@ static inline u8* IconOutsideCopySource(u8* src, i32 currentX, i32 clipX) {
     return src + (clipX - currentX);
 }
 
+// @remove
 void IconToBitmapYModify(
     class icon* srcIcon,
     class bitmap* dest,

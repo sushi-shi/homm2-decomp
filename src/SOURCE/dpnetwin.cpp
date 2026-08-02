@@ -34,6 +34,7 @@ H2_ENUM_END(DirectPlayStorageConstant)
 
 #define RETAIL_FILE const_cast<char*>("I:\\Projects\\Heroes\\Prog\\SOURCE\\dpnetwin.cpp")
 
+VA(0x00436770, 0x81)
 BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, void*) {
     LogStr("ServiceProvider:");
     _strupr(name);
@@ -54,6 +55,7 @@ BOOL WINAPI dpEnumServiceProvider(struct _GUID* guid, char* name, DWORD, DWORD, 
     return 1;
 }
 
+VA(0x004367f1, 0x75)
 BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     if (flags & DPESC_TIMEDOUT)
         return 0;
@@ -73,6 +75,7 @@ BOOL WINAPI dpEnumSession(DPSESSIONDESC* session, void*, LPDWORD, DWORD flags) {
     return 1;
 }
 
+VA(0x00436866, 0x2bf)
 i16 dpnet_init(void) {
     static i16 initSourceLineBase = 95; // NOLINT(readability-magic-numbers)
     DirectPlayStartupMessage startup;
@@ -172,6 +175,7 @@ i16 dpnet_init(void) {
     return 0;
 }
 
+VA(0x00436b25, 0xc3)
 void CleanupDPVars(void) {
     lpIDC = NULL;
     dcoID = 0;
@@ -194,6 +198,7 @@ void CleanupDPVars(void) {
     iLastMsgNumHumanPlayers = 1;
 }
 
+VA(0x00436be8, 0xed)
 void dpnet_term(void) {
     static i16 termSourceLineBase = 219; // NOLINT(readability-magic-numbers)
     char drainBuffer[DP_TRANSPORT_TERM_DRAIN_READ_SIZE + sizeof(i32)];
@@ -218,6 +223,7 @@ void dpnet_term(void) {
     CleanupDPVars();
 }
 
+VA(0x00436cd5, 0xcf)
 void dpSendMessage(
     i32 destination,
     H2_ENUM_PARAM(NetworkPacketType, u8) type,
@@ -239,6 +245,7 @@ void dpSendMessage(
     H2_FREE_AT(message, RETAIL_FILE, sendSourceLineBase + 16);
 }
 
+VA(0x00436da4, 0x48)
 i32 dpnet_snd(i32 position, i32 size, void* data) {
     i32 destination;
 
@@ -251,6 +258,7 @@ i32 dpnet_snd(i32 position, i32 size, void* data) {
     return 0;
 }
 
+VA(0x00436dec, 0x93)
 i16 dpnet_rcv(i16, u16, void* data) {
     static i16 receiveSourceLineBase = 284; // NOLINT(readability-magic-numbers)
     u32 size;
@@ -267,14 +275,17 @@ i16 dpnet_rcv(i16, u16, void* data) {
     return static_cast<i16>(size);
 }
 
+VA(0x00436e7f, 0x14)
 u8 dpnet_stat(i16, u16) {
     return 0;
 }
 
+VA(0x00436e93, 0x8)
 i16 __cdecl dpnet_sess(i32, i32, ...) {
     return 0;
 }
 
+VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     static i16 processSourceLineBase = 312; // NOLINT(readability-magic-numbers)
     DWORD packetSize[RECEIVE_ARGUMENT_STORAGE_COUNT];
@@ -306,6 +317,7 @@ void dpProcessMessages(void) {
 }
 
 // Named one-byte retail stub.
+VA(0x00436f33, 0x230)
 void dpEvaluateMessage(u32l size, i32 sender) {
     static i16 evaluateSourceLineBase = 355; // NOLINT(readability-magic-numbers)
     DirectPlayStartupMessage* startup = reinterpret_cast<DirectPlayStartupMessage*>(rcvBufIn + 1);
@@ -369,6 +381,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
     }
 }
 
+VA(0x00437177, 0x15a)
 i32 dpWaitForFirstGuest(void) {
     static i16 firstGuestSourceLineBase = 426; // NOLINT(readability-magic-numbers)
     DPSESSIONDESC session;
@@ -407,6 +420,7 @@ i32 dpWaitForFirstGuest(void) {
     return 0;
 }
 
+VA(0x004372e1, 0x7c)
 i32 dpWaitForExtraGuests(void) {
     tag_message message;
 
@@ -429,6 +443,7 @@ i32 dpWaitForExtraGuests(void) {
     return 0;
 }
 
+VA(0x0043735d, 0x37e)
 i32 dpWaitForHost(void) {
     static i16 hostSourceLineBase = 510; // NOLINT(readability-magic-numbers)
     DWORD enumerationTimeout;
@@ -525,6 +540,7 @@ i32 dpWaitForHost(void) {
     return 0;
 }
 
+VA(0x004376f3, 0x515)
 void DPSD(i32 result, char* file, i32 line) {
     char errorText[REMOTE_ERROR_TEXT_SIZE];
     i32 errorFlag;

@@ -25,6 +25,7 @@ H2_ENUM_END(ArmyFlightConstant)
 
 }
 
+VA(0x0044b000, 0x21e)
 i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     hexcell* cell_9;
     i32 candidateHex;
@@ -87,6 +88,7 @@ i32 army::CanFit(i32 hex, i32 tryOtherSide, i32* fittingHex) {
     }
 }
 
+VA(0x0044b21e, 0x396)
 i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     i32 attackHex7[ARMY_ATTACK_HEX_COUNT];
     u32 directionMask;
@@ -208,10 +210,12 @@ i32 army::ValidFlight(i32 destination, ArmyPathTarget pathMode) {
     return 0;
 }
 
+VA(0x0044b5b4, 0x1a)
 i32 army::FlyTo(void) {
     return FlyTo(m_moveTargetHex);
 }
 
+VA(0x0044b5ce, 0x9e2)
 i32 army::FlyTo(i32 destination) {
     i32 endRearHex;
     i32 oldMinExtentY;

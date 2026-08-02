@@ -21,6 +21,7 @@ H2_ENUM_BEGIN(BankBoxConstant)
     BOX_WINDOW_ACTIVE           = 1
 H2_ENUM_END(BankBoxConstant)
 
+VA(0x004a18a0, 0x2b0)
 strip::strip(
     i32 x,
     i32 y,
@@ -94,6 +95,7 @@ strip::strip(
     gpWindowManager->AddWindow(m_window, -1, drawWindow);
 }
 
+VA(0x004a1b50, 0x12b)
 strip::~strip() {
     i32 slot;
 
@@ -113,11 +115,13 @@ strip::~strip() {
     gpResourceManager->Dispose(m_flagIcon);
 }
 
+VA(0x004a1c7b, 0x35)
 void strip::Draw(void) {
     DrawIcons(1);
     gpWindowManager->UpdateScreenRegion(m_x, m_y, STRIP_WINDOW_WIDTH, STRIP_WINDOW_HEIGHT);
 }
 
+VA(0x004a1cb0, 0x37d)
 void strip::DrawIcons(i32 drawWindow) {
     icon* oldIcons[STRIP_ARMY_SLOT_COUNT];
     CreatureType oldCreatureTypes[STRIP_ARMY_SLOT_COUNT];
@@ -206,10 +210,12 @@ void strip::DrawIcons(i32 drawWindow) {
     }
 }
 
+VA(0x004a202d, 0x28)
 void strip::DrawFrame(void) {
     m_stripIcon->DrawToBuffer(m_x, m_y, 0, ICON_DRAW_NORMAL);
 }
 
+VA(0x004a2055, 0xd6)
 bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     m_player = player;
     m_x = x;
@@ -221,11 +227,13 @@ bankBox::bankBox(i32 x, i32 y, class playerData* player) {
     Update(1);
 }
 
+VA(0x004a212b, 0x34)
 bankBox::~bankBox() {
     gpWindowManager->RemoveWindow(m_window);
     delete m_window;
 }
 
+VA(0x004a215f, 0xc0)
 void bankBox::Update(i32 drawWindow) {
     char text[BOX_TEXT_SIZE];
     tag_message message;

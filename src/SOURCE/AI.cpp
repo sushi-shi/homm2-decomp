@@ -43,6 +43,7 @@ H2_ENUM_BEGIN(ArmyFrontOffset)
     WIDE_CREATURE_FRONT_OFFSET = 2
 H2_ENUM_END(ArmyFrontOffset)
 
+VA(0x00415a60, 0x82b)
 i32 combatManager::AICheckRetreat(void) {
     if (m_combatTowns[IDX(m_currentSide)] != NULL)
         return 0;
@@ -192,6 +193,7 @@ i32 combatManager::AICheckRetreat(void) {
     return 0;
 }
 
+VA(0x0041628b, 0xfa0)
 void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
     u32l shooterStrengths37[COMBAT_SIDE_COUNT];
     i32 enemyStronger3;
@@ -509,6 +511,7 @@ finish:
     }
 }
 
+VA(0x0041722b, 0xab)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
     float remainingHitPoints = static_cast<float>(
@@ -526,6 +529,7 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
     return modifiedDamage;
 }
 
+VA(0x004172d6, 0x293)
 void combatManager::DoLichShot(class army* lich) {
     i32 bestArmy12 = COMBAT_AI_NO_ARMY;
     float bestDamage15 = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
@@ -585,6 +589,7 @@ void combatManager::DoLichShot(class army* lich) {
     }
 }
 
+VA(0x00417569, 0x109)
 i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -609,6 +614,7 @@ i32 combatManager::GetShooterMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x00417672, 0xa8)
 i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -627,6 +633,7 @@ i32 combatManager::GetMirrorImageMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x0041771a, 0xf7)
 i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -650,6 +657,7 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x00417811, 0xa1)
 i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex11 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -668,6 +676,7 @@ i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x004178b2, 0x11d)
 i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -693,6 +702,7 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x004179cf, 0xc5)
 i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -714,6 +724,7 @@ i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x00417a94, 0xb6)
 i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -733,6 +744,7 @@ i32 combatManager::GetTraitorMask(H2_ENUM_PARAM(CombatSide, i32) side) {
     return mask5;
 }
 
+VA(0x00417b4a, 0x184)
 i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -771,6 +783,7 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return bestArmy1;
 }
 
+VA(0x00417cce, 0xa0)
 i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex2 = 0;
     u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
@@ -791,6 +804,7 @@ i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return worstArmy6;
 }
 
+VA(0x00417d6e, 0x12e)
 i32 combatManager::GetClosestArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -822,6 +836,7 @@ i32 combatManager::GetClosestArmy(
     return closestArmy7;
 }
 
+VA(0x00417e9c, 0xa6)
 u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex4 = 0;
     u32 bit36 = COMBAT_AI_MASK_FIRST_BIT;
@@ -841,6 +856,7 @@ u32l combatManager::GetStrength(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     return strength7;
 }
 
+VA(0x00417f42, 0x178)
 i32 combatManager::AttemptAttack(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -883,6 +899,7 @@ i32 combatManager::AttemptAttack(
     return 0;
 }
 
+VA(0x004180ba, 0x144)
 i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 availableMask4 =
         ~currentArmy->GetAttackMask(
@@ -927,6 +944,7 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     }
 }
 
+VA(0x004181fe, 0x207)
 i32 combatManager::WalkTowardArmyFront(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
@@ -989,6 +1007,7 @@ i32 combatManager::WalkTowardArmyFront(
     return WalkTowardArmy(currentArmy, side, mask);
 }
 
+VA(0x00418405, 0x204)
 i32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {

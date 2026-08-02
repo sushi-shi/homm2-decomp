@@ -329,6 +329,7 @@ namespace {
 
 static char s_twoStringFormat[] = "%s %s";
 
+VA(0x0043b640, 0x5de6)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CreatureType secondUpgrade1;
     CreatureType firstUpgrade_e;
@@ -3714,6 +3715,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+VA(0x00441609, 0x8c9)
 void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     i32 erased_a = 0;
     i32 frame_k = NO_FRAME;
@@ -3916,6 +3918,7 @@ void advManager::EraseObj(class mapCell* cell, i32 x, i32 y) {
     gpGame->SetupAdjacentMons();
 }
 
+VA(0x00441f0d, 0xaf)
 void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
     swapManager* swapWindow = new swapManager(firstHero, secondHero);
     if (swapWindow == NULL)
@@ -3925,6 +3928,7 @@ void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
     RedrawAdvScreen(1, 0);
 }
 
+VA(0x00441fbc, 0x125)
 i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
     i32 color = cell->m_objectMetadata;
@@ -3974,6 +3978,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
     }
 }
 
+VA(0x004420e1, 0x95)
 i8 StrEqNoCase(char* firstString, char* secondString) {
     char* firstPosition = firstString;
     char* secondPos = secondString;
@@ -3998,6 +4003,7 @@ i8 StrEqNoCase(char* firstString, char* secondString) {
     }
 }
 
+VA(0x00442176, 0xe0)
 void advManager::PasswordEvent(mapCell* cell, hero*) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
     i32 color = cell->m_objectMetadata;
@@ -4019,6 +4025,7 @@ void advManager::PasswordEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= 1 << color;
 }
 
+VA(0x00442256, 0x6e0)
 void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 currentSiteType;
     mapCell* currentCell5;
@@ -4338,6 +4345,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
+VA(0x00442952, 0x15c)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     SAMPLE2 eventSample = NULL_SAMPLE2;
     H2_ENUM_STORAGE(RecruitSiteType, u32) siteType2;
@@ -4387,6 +4395,7 @@ void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
+VA(0x00442ac2, 0xaa)
 void advManager::ExpansionRecruitEvent(
     hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, i16* availableCount
 ) {
@@ -4399,6 +4408,7 @@ void advManager::ExpansionRecruitEvent(
     delete dialogManager;
 }
 
+VA(0x00442b6c, 0x21a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     SAMPLE2 eventSample1 = NULL_SAMPLE2;
     i32 heroId9;
@@ -4481,6 +4491,7 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     );
 }
 
+VA(0x00442d86, 0x1a7)
 void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     hero* eventHero1;
     CombatResult combatResult1;
@@ -4526,6 +4537,7 @@ void advManager::TownEvent(mapCell* cell, i32 x, i32 y) {
     eventHero1->CheckLevel();
 }
 
+VA(0x00442f2d, 0x237)
 void advManager::EventSound(
     H2_ENUM_PARAM(MapObjectType, i32) eventType,
     i32 eventData,
@@ -4711,6 +4723,7 @@ void advManager::EventSound(
     }
 }
 
+VA(0x00443340, 0xa9)
 void advManager::EventWindow(
     i32 eventId,
     i32 buttons,
@@ -4744,6 +4757,7 @@ void advManager::EventWindow(
     NormalDialog(eventText, buttons, -1, -1, IDX(type1), value1, type2, value2, type3, 0);
 }
 
+VA(0x004433e9, 0x92)
 i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 artifactExtra) {
     i32 artifactSlot;
 
@@ -4766,6 +4780,7 @@ i32 GiveArtifact(hero* eventHero, ArtifactType artifact, b32 checkEndGame, i8 ar
     return artifactSlot;
 }
 
+VA(0x0044347b, 0x4e)
 ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     ArtifactType artifactId =
         ArtifactType(gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true));
@@ -4777,6 +4792,7 @@ ArtifactType advManager::GiveRandomArtifact(hero* eventHero) {
     return artifactId;
 }
 
+VA(0x004434c9, 0x61)
 i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) {
     i32 oldLevel;
     i32 unusedLevel2;
@@ -4793,6 +4809,7 @@ i32 advManager::GiveExperience(hero* eventHero, i32 experience, i32 checkLevel) 
     return newLevel1 - oldLevel;
 }
 
+VA(0x0044352a, 0x83)
 void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 amount) {
     if (resourceType >= RES_WOOD && resourceType <= RES_GOLD)
         gpGame->m_players[eventHero->m_owner].m_resources[IDX(resourceType)] += amount;
@@ -4800,6 +4817,7 @@ void advManager::GiveResource(hero* eventHero, ResourceType resourceType, i32 am
         CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+VA(0x004435ad, 0xe0)
 void advManager::RecruitEvent(
     hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, mapCell* cell
 ) {
@@ -4816,6 +4834,7 @@ void advManager::RecruitEvent(
     cell->m_objectMetadata = static_cast<u16>(availableCount15 + 0);
 }
 
+VA(0x0044368d, 0x232)
 i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
 
@@ -4960,6 +4979,7 @@ i32 advManager::SkeletonEvent(hero* eventHero, mapCell* cell, char* text, i32 x,
     return 0;
 }
 
+VA(0x004438bf, 0x26b)
 i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5116,6 +5136,7 @@ i32 advManager::ZombieEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i
     return 0;
 }
 
+VA(0x00443b2a, 0x2cc)
 i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i32 y) {
     ArtifactType artifactId;
     switch (static_cast<UndeadEventLevel>(cell->m_objectMetadata)) {
@@ -5276,6 +5297,7 @@ i32 advManager::GhostEvent(hero* eventHero, mapCell* cell, char* text, i32 x, i3
     return 0;
 }
 
+VA(0x00443df6, 0x1ce)
 void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     HouseRecruitmentSite siteIndex = RECRUIT_ARCHER;
     CreatureType creatureTypes[IDX(RECRUIT_SITE_COUNT)];
@@ -5369,6 +5391,7 @@ void advManager::HouseEvent(hero* eventHero, mapCell* cell) {
     }
 }
 
+VA(0x0044403b, 0x536)
 CombatResult advManager::CombatMonsterEvent(
     hero* eventHero,
     CreatureType monsterType,
@@ -5557,6 +5580,7 @@ CombatResult advManager::CombatMonsterEvent(
     return combatResult7;
 }
 
+VA(0x00444571, 0x2da)
 void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     i32 statChanges[EVENT_ARTIFACT_PRIMARY_STAT_COUNT + 1];
     i32 maxSpellPoints;
@@ -5843,6 +5867,7 @@ void GiveTakeArtifactStat(hero* targetHero, ArtifactType artifact, b32 take) {
     }
 }
 
+VA(0x00444949, 0x1b2)
 void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     i32 targetSlot;
     i32 sourceArtifactSlot;
@@ -5903,6 +5928,7 @@ void advManager::TransferArtifacts(hero* sourceHero, hero* destinationHero) {
     destinationHero->CheckAnduranPieces(0);
 }
 
+VA(0x00444afb, 0x6d)
 void advManager::HeroLoses(hero* lostHero) {
     if (lostHero == NULL)
         return;
@@ -5916,6 +5942,7 @@ void advManager::HeroLoses(hero* lostHero) {
     }
 }
 
+VA(0x00444b68, 0x118)
 void advManager::DoWhirlpool(hero* eventHero) {
     i32 armyValue;
     i32 weakestValue;
@@ -5952,6 +5979,7 @@ void advManager::DoWhirlpool(hero* eventHero) {
     }
 }
 
+VA(0x00444c80, 0xf3)
 void advManager::FizzleCenter(i32 fizzleType) {
     SAMPLE2 playedSample;
     i32 fizzleStepCount;
@@ -5998,6 +6026,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
     }
 }
 
+VA(0x00444d73, 0x29a1)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     float battleStatValue_o;
     float spellValueFactor_i;
@@ -7141,6 +7170,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+VA(0x004478df, 0x56)
 i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     // Preserved retail /Od frame slot; this array has no semantic use.
     i32 unusedBarrier15[5]; // NOLINT(readability-magic-numbers)
@@ -7153,6 +7183,7 @@ i32 advManager::BarrierAIEvent(mapCell* cell, hero*) {
     return 0;
 }
 
+VA(0x00447935, 0x54)
 void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     i32 unusedPassword6[1];
     i32 color = cell->m_objectMetadata;
@@ -7160,6 +7191,7 @@ void advManager::PasswordAIEvent(mapCell* cell, hero*) {
     gpCurPlayer->m_barrierTents |= (1 << color);
 }
 
+VA(0x00447989, 0x31d)
 void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     // Preserved retail /Od frame slots; these arrays have no semantic use.
     i32 unusedPair27[2]; // NOLINT(readability-magic-numbers)
@@ -7272,6 +7304,7 @@ void advManager::GenericSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
+VA(0x00447cda, 0x175)
 void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     i32 cost16[IDX(RES_COUNT)];
     i32 purchaseCount17;
@@ -7338,6 +7371,7 @@ void advManager::RecruitSiteAIEvent(mapCell* cell, hero* eventHero) {
     }
 }
 
+VA(0x00447e63, 0x19c)
 void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     i32 heroId9;
     hero* releasedHero13;
@@ -7376,6 +7410,7 @@ void advManager::JailAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
     );
 }
 
+VA(0x00447fff, 0x731)
 void advManager::PlayerMonsterInteract(
     mapCell* cell,
     mapCell* combatCell,
@@ -7695,6 +7730,7 @@ fightMonsters:
         *handled = 1;
 }
 
+VA(0x00448730, 0x3d4)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
     i32 replacementSlot;
     CreatureType monsterType;
@@ -7829,6 +7865,7 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
     }
 }
 
+VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
     // Original-source anchor consumed by H2_FREE line reconstruction.
     static i16 sourceLineBase = 0x1655; // NOLINT(readability-magic-numbers)
@@ -7916,6 +7953,7 @@ i32 advManager::DoNetCombat(char* packet) {
     return 1;
 }
 
+VA(0x00448c95, 0x5e7)
 CombatResult advManager::DoCombat(
     i32 x,
     i32 y,
@@ -8127,6 +8165,7 @@ combatFinished:
     return gpCombatManager->m_combatResult;
 }
 
+VA(0x0044927c, 0x306)
 void advManager::SendHeroTownData(
     i32 x,
     i32 y,
@@ -8266,6 +8305,7 @@ void advManager::SendHeroTownData(
     H2_FREE_AT(buffer, RETAIL_FILE, sourceLineBase + 0x5c);
 }
 
+VA(0x00449582, 0x3de)
 void advManager::ReceiveHeroTownData(
     char* packet,
     i32* remotePlayer,
@@ -8420,6 +8460,7 @@ void advManager::ReceiveHeroTownData(
     }
 }
 
+VA(0x00449960, 0x1fc)
 CombatResult advManager::AutoResolveCombat(
     i32 x,
     i32 y,
@@ -8500,6 +8541,7 @@ CombatResult advManager::AutoResolveCombat(
     return gpCombatManager->m_combatResult;
 }
 
+VA(0x00449b5c, 0x8f)
 i32 RiddleStringsEqual(char* answer, char* expected) {
     i32 index;
     char expectedPrefix[RIDDLE_EXPECTED_BUFFER_SIZE];

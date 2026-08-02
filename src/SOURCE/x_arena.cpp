@@ -46,6 +46,7 @@ H2_ENUM_BEGIN(ArenaConstant)
     DRAW_MODE               = 1
 H2_ENUM_END(ArenaConstant)
 
+VA(0x004b2ba0, 0x3bb)
 i32 DoArenaDialog(void) {
     i32 statValues_2[CHOICE_COUNT];
     i32 statValue_28;
@@ -139,6 +140,7 @@ i32 DoArenaDialog(void) {
     return choice;
 }
 
+VA(0x004b2f5b, 0x1e1)
 MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     tag_message dialogMessage_12;
     i32 widgetIndex_5;
@@ -220,6 +222,7 @@ MessageDispatchResult ArenaWindowHandler(struct tag_message& message_1) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004b313c, 0x169)
 void UpdateArenaIcons(void) {
     i32 widgetIndex;
 

@@ -26,6 +26,7 @@ static inline i32 FlipDimRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
     return clipTop <= currentY && currentY <= clipBottom;
 }
 
+VA(0x004d64b0, 0x3c3)
 void FlipDimIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

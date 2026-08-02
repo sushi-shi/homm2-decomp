@@ -12,6 +12,7 @@ H2_ENUM_BEGIN(TowerDrawConstant)
     TOWER_OVERLAY_FRAME = 9
 H2_ENUM_END(TowerDrawConstant)
 
+VA(0x00464cc0, 0x3b)
 hexcell::hexcell(void) {
     m_obstacleIndex = -1;
     m_blocked = 0;
@@ -21,10 +22,12 @@ hexcell::hexcell(void) {
     m_deadOccupantCount = 0;
 }
 
+VA(0x00464cfb, 0xb)
 void hexcell::DrawGround(void) {
     return;
 }
 
+VA(0x00464d06, 0xa1)
 void hexcell::DrawLowerDeadOccupants(void) {
     ArmyFacing currentFrame;
     i32 i;
@@ -41,6 +44,7 @@ void hexcell::DrawLowerDeadOccupants(void) {
     }
 }
 
+VA(0x00464da7, 0xa4)
 void hexcell::DrawUpperDeadOccupant(void) {
     ArmyFacing currentFrame;
     i32 i;
@@ -57,6 +61,7 @@ void hexcell::DrawUpperDeadOccupant(void) {
     }
 }
 
+VA(0x00464e4b, 0x10d)
 void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
     if (m_occupantSide != COMBAT_SIDE_NONE) {
         if (drawState != ARMY_DRAW_ALL) {
@@ -74,6 +79,7 @@ void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
     }
 }
 
+VA(0x00464f58, 0x126)
 void hexcell::DrawTower(i32 frame) {
     i32 level = 0;
     i32 row;
@@ -112,10 +118,12 @@ void hexcell::DrawTower(i32 frame) {
     }
 }
 
+VA(0x0046507e, 0xb)
 void hexcell::DrawClouds(void) {
     return;
 }
 
+VA(0x00465089, 0x44)
 void hexcell::DrawObstacle(void) {
     gpCombatManager->m_obstacleIcons[m_obstacleIndex]
         ->CombatClipDrawToBuffer(m_x, m_y, 0, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL);

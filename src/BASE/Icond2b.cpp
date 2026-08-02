@@ -20,6 +20,7 @@ static IconEntry* s_entry;
 static u32 s_spanCount;
 static i32 s_clipR;
 
+VA(0x004c6af0, 0x357)
 void DimIconToBitmap(
     class icon* srcIcon,
     class bitmap* dest,

@@ -13,6 +13,7 @@ H2_ENUM_BEGIN(BitmapConstant)
     COPY_STRIDE = 640 // Full-screen row stride assumed by CopyTo's fast path.
 H2_ENUM_END(BitmapConstant)
 
+// @remove
 bitmap::bitmap(void)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     m_bitmapType = BITMAP_TYPE_NONE;
@@ -22,6 +23,7 @@ bitmap::bitmap(void)
 }
 
 #line 15
+// @remove
 bitmap::bitmap(BitmapType p1, i16 p2, i16 p3)
     : resource(RESOURCE_CATEGORY_BITMAP, 0, RESOURCE_REFERENCE_UNMANAGED, NULL) {
     static char dimensionsAllocationSourceFile[] = RETAIL_FILE;
@@ -32,6 +34,7 @@ bitmap::bitmap(BitmapType p1, i16 p2, i16 p3)
 }
 
 #line 28
+// @remove
 bitmap::bitmap(u32l id)
     : resource(RESOURCE_CATEGORY_BITMAP, id, RESOURCE_REFERENCE_INITIAL, NULL) {
     static char resourceAllocationSourceFile[] = RETAIL_FILE;
@@ -47,6 +50,7 @@ bitmap::bitmap(u32l id)
     PollSound();
 }
 #line 48
+// @remove
 inline bitmap::~bitmap() {
     static char destructionSourceFile[] = RETAIL_FILE;
     if (m_pixels != NULL)
@@ -54,6 +58,7 @@ inline bitmap::~bitmap() {
     m_pixels = NULL;
 }
 
+VA(0x004c5f30, 0x154)
 void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 width;
     i32 destinationY;
@@ -89,26 +94,31 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     }
 }
 
+VA(0x004c6090, 0x47)
 inline void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
 }
 
+VA(0x004c60e0, 0x3d)
 void bitmap::DrawToScreen(i16 x, i16 y) {
     PollSound();
     BlitBitmapToScreen(this, 0, 0, m_width, m_height, x, y);
     PollSound();
 }
 
+VA(0x004c6120, 0x29)
 void bitmap::GrabScreen(i16 x, i16 y) {
     GrabBitmap(gpWindowManager->m_screen, x, y);
 }
 
+VA(0x004c6150, 0x36)
 inline void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 
+VA(0x004c6190, 0x12f)
 void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     i32 sourceX;
     i32 sourceY;
@@ -141,6 +151,7 @@ void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
     }
 }
 
+VA(0x004c62c0, 0xb6)
 void bitmap::CopyTo(
     class bitmap* destination,
     i32 destinationX,
@@ -191,6 +202,7 @@ static inline u8* BitmapPixels(bitmap* value, i32 offset) {
     return value->m_pixels + offset;
 }
 
+VA(0x004c6380, 0x77)
 void bitmap::CopyToCareful(
     class bitmap* destination,
     i32 destinationX,

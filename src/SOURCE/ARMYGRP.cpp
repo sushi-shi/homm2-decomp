@@ -23,13 +23,16 @@ void SwapValues(Value& lhs, Value& rhs) {
 }
 #endif
 
+VA(0x00421710, 0x31)
 armyGroup::armyGroup(void) {
     memset(m_creatureTypes, ARMY_GROUP_EMPTY_SLOT, sizeof(m_creatureTypes));
     memset(m_creatureCounts, 0, sizeof(m_creatureCounts));
 }
 
+VA(0x00421741, 0xd)
 void armyGroup::View(i32) {}
 
+VA(0x0042174e, 0x5a)
 i32 armyGroup::HasAllUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
@@ -40,6 +43,7 @@ i32 armyGroup::HasAllUndead(void) {
     return 1;
 }
 
+VA(0x004217a8, 0x5a)
 i32 armyGroup::HasSomeUndead(void) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] != CREATURE_NONE
@@ -52,6 +56,7 @@ i32 armyGroup::HasSomeUndead(void) {
     return 0;
 }
 
+VA(0x00421802, 0x231)
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
     i32 morale = 0;
     ArmyGroupAlignmentResult alignmentValue;
@@ -122,11 +127,13 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     return morale;
 }
 
+VA(0x00421a33, 0x23)
 void armyGroup::Dismiss(i32 slot) {
     m_creatureTypes[slot] = CREATURE_NONE;
     m_creatureCounts[slot] = 0;
 }
 
+VA(0x00421a56, 0x40)
 i32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     for (i32 slot = 0; slot < ARMY_GROUP_SLOT_COUNT; ++slot) {
         if (m_creatureTypes[slot] == creatureType)
@@ -135,6 +142,7 @@ i32 armyGroup::IsMember(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     return 0;
 }
 
+VA(0x00421a96, 0x124)
 ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
@@ -173,6 +181,7 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 }
 
+VA(0x00421bba, 0x3b)
 i32 armyGroup::CanJoin(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     if (IsMember(creatureType))
         return 1;
@@ -181,6 +190,7 @@ i32 armyGroup::CanJoin(H2_ENUM_PARAM(CreatureType, i32) creatureType) {
     return 0;
 }
 
+VA(0x00421bf5, 0x48)
 i32 armyGroup::GetNumArmies(void) {
     i32 numArmies = 0;
     for (i32 i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
@@ -190,6 +200,7 @@ i32 armyGroup::GetNumArmies(void) {
     return numArmies;
 }
 
+VA(0x00421c3d, 0xdf)
 i32 armyGroup::Add(
     H2_ENUM_PARAM(CreatureType, i32) creatureType, i32 quantity, i32 slot
 ) {
@@ -221,6 +232,7 @@ i32 armyGroup::Add(
     return 1;
 }
 
+VA(0x00421d1c, 0x6b)
 void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 #if H2_STRICT_ENUMS
     SwapValues(m_creatureTypes[slot], otherGroup->m_creatureTypes[otherSlot]);
@@ -236,6 +248,7 @@ void armyGroup::Swap(i32 slot, armyGroup* otherGroup, i32 otherSlot) {
 #endif
 }
 
+VA(0x00421d87, 0x133)
 void armyGroup::DamageGroup(float damagePercent) {
     i32 numKilled;
     i32 percentChance = static_cast<i32>(

@@ -20,6 +20,7 @@ H2_ENUM_BEGIN(TextWidgetConstant)
     TEXT_BUFFER_GROWTH     = 5
 H2_ENUM_END(TextWidgetConstant)
 
+VA(0x004c2f50, 0x58)
 textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_color = FONT_DRAW_DEFAULT;
     m_alignment = FONT_ALIGN_CENTER;
@@ -28,6 +29,7 @@ textWidget::textWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
+VA(0x004c2fe0, 0xa7)
 textWidget::textWidget(
     i16 x,
     i16 y,
@@ -49,6 +51,7 @@ textWidget::textWidget(
     m_kind = WIDGET_KIND_TEXT;
 }
 
+VA(0x004c3090, 0x12f)
 void textWidget::Read(void) {
     char resourceName[RESOURCE_NAME_CAPACITY];
     m_x = gpResourceManager->ReadWord();
@@ -69,6 +72,7 @@ void textWidget::Read(void) {
     m_kind = WIDGET_KIND_TEXT;
 }
 
+VA(0x004c31c0, 0x72)
 inline textWidget::~textWidget() {
     gpResourceManager->Dispose(m_font);
     H2_FREE_AT(m_text, gTextWidgetSourceFiles.destruction, 0x55);
@@ -80,6 +84,7 @@ inline textWidget::~textWidget() {
     messageValue.payload.widget.command = commandValue;                                          \
     messageValue.payload.widget.id = idValue
 
+VA(0x004c3240, 0x226)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
     H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
     if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
@@ -161,6 +166,7 @@ normalEvent:
 
 #undef SET_WIDGET_MESSAGE
 
+VA(0x004c3470, 0x82)
 void textWidget::Draw(void) {
     FontDrawMode color = FONT_DRAW_DIMMED;
     if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
@@ -176,10 +182,12 @@ void textWidget::Draw(void) {
     );
 }
 
+VA(0x004c3500, 0x18)
 void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
     m_color = color;
 }
 
+VA(0x004c3520, 0xae)
 void textWidget::SetText(char* text) {
     if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
         m_text = text;

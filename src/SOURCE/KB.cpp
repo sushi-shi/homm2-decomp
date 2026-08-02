@@ -292,6 +292,7 @@ H2_ENUM_BEGIN(NormalDialogDrawRange)
     NORMAL_DIALOG_BACKGROUND_WIDGET_LAST_ID = -256
 H2_ENUM_END(NormalDialogDrawRange)
 
+VA(0x00465bf0, 0x115)
 extern "C" void PollSound(void) {
     if (gbInPollSound)
         return;
@@ -327,11 +328,13 @@ extern "C" void PollSound(void) {
     gbInPollSound = false;
 }
 
+VA(0x00465d05, 0x17)
 void ForcePollSound(void) {
     glTimers[GLOBAL_POLL_SOUND_TIMER_SLOT] = KBTickCount() - 1;
     PollSound();
 }
 
+VA(0x00465d1c, 0x594)
 void InitMainClasses(void) {
     gpExec = new executive;
     gpInputManager = new inputManager;
@@ -350,6 +353,7 @@ void InitMainClasses(void) {
     gpBufferPalette = new palette;
 }
 
+VA(0x004662b0, 0x301)
 void DeleteMainClasses(void) {
     if (gpBufferPalette)
         delete gpBufferPalette;
@@ -398,11 +402,13 @@ void DeleteMainClasses(void) {
     gpResourceManager = NULL;
 }
 
+VA(0x004665b1, 0x2e)
 void EarlyShutdown(char* caption, char* text) {
     MessageBoxA(hwndApp, text, caption, MB_ICONHAND);
     exit(0);
 }
 
+VA(0x004665df, 0x12a)
 void SetupCDRom(void) {
     i32 savedNoSound = gbNoSound;
     if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
@@ -462,6 +468,7 @@ void SetupCDRom(void) {
     gbNoSound = savedNoSound;
 }
 
+VA(0x00466709, 0x5e)
 i32 EarlySetup(void) {
     if (bEarlySetupDone)
         return 0;
@@ -478,6 +485,7 @@ i32 EarlySetup(void) {
     return 1;
 }
 
+VA(0x00466767, 0x148c)
 i32 oldmain(void) {
     i32 command_a;
     i32 quit_g;
@@ -1019,6 +1027,7 @@ i32 oldmain(void) {
     return 0;
 }
 
+VA(0x00467c38, 0x70)
 char toupper(char c) {
     if (c >= 'a' && c <= 'z')
         return c - ' ';
@@ -1026,6 +1035,7 @@ char toupper(char c) {
         return c;
 }
 
+VA(0x00467ca8, 0x595)
 i32 InterpretCommandLine(void) {
     i32 len;
     i32 i;
@@ -1198,6 +1208,7 @@ i32 InterpretCommandLine(void) {
     return 1;
 }
 
+VA(0x0046829b, 0x5cb)
 MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     i32 handled = 0;
     i32 idx;
@@ -1393,10 +1404,12 @@ MessageDispatchResult InitMenuHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004688b4, 0x10)
 MessageDispatchResult NullHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004688c4, 0x145)
 MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     // Retail initializes these otherwise-unused /Od frame locals. Their suffixes preserve the
     // observed identifier-bucket order; their original purpose remains unknown.
@@ -1449,6 +1462,7 @@ MessageDispatchResult RecruitHeroHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00468a09, 0x179)
 char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     char buf[BUILDING_INFO_BUFFER_SIZE];
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE) {
@@ -1483,6 +1497,7 @@ char* GetBuildingInfo(FactionType race, BuildingSlotType building, i32 mode) {
     return gText;
 }
 
+VA(0x00468b82, 0x69)
 char* GetBuildingName(FactionType race, BuildingSlotType building) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_NECROMANCER_SHRINE)
         return xNecromancerShrine;
@@ -1496,6 +1511,7 @@ char* GetBuildingName(FactionType race, BuildingSlotType building) {
         return gDwellingNames[IDX(race)][IDX(building) - IDX(BUILDING_SLOT_DWELLING_FIRST)];
 }
 
+VA(0x00468beb, 0xf0)
 void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const dest, i32 mageLevel) {
     i32 level;
     if (building == BUILDING_SLOT_NECROMANCER_SHRINE && race == FACTION_NECROMANCER) {
@@ -1525,10 +1541,12 @@ void GetBuildingCost(FactionType race, BuildingSlotType building, i32* const des
     }
 }
 
+VA(0x00468cdb, 0x15)
 char* GetMonsterName(H2_ENUM_PARAM(CreatureType, i32) monster) {
     return gArmyNames[IDX(monster)];
 }
 
+VA(0x00468d05, 0xc3)
 void GetMonsterCost(CreatureType monster, i32* const cost) {
     i32 idx;
     for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
@@ -1560,6 +1578,7 @@ void GetMonsterCost(CreatureType monster, i32* const cost) {
     }
 }
 
+VA(0x00468e12, 0x273)
 i32 CanBuild(town* t, BuildingSlotType building) {
     i32 reqMask;
     i32 haveMask;
@@ -1621,6 +1640,7 @@ i32 CanBuild(town* t, BuildingSlotType building) {
     return 0;
 }
 
+VA(0x00469085, 0x80)
 i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
@@ -1633,6 +1653,7 @@ i32 CanBuy(town* t, BuildingSlotType type) {
     return 1;
 }
 
+VA(0x00469105, 0x7b)
 i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i32 level) {
     if (race == FACTION_NECROMANCER && building == BUILDING_SLOT_UPGRADE_CASTLE)
         return NECROMANCER_CASTLE_UPGRADE_BASE_RESOURCE_VALUE;
@@ -1651,6 +1672,7 @@ i32 GetBuildingBaseResourceValue(FactionType race, BuildingSlotType building, i3
     }
 }
 
+VA(0x00469180, 0x177)
 MessageDispatchResult WaitHandler(tag_message& msg) {
     i32 result = 0;
     gbFunctionComplete = true;
@@ -1725,6 +1747,7 @@ MessageDispatchResult WaitHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x0046932f, 0x39b)
 MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     i32 type;
     i32 extra;
@@ -1958,10 +1981,12 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00469721, 0x13)
 MessageDispatchResult TrueFalseDialogHandler(struct tag_message& msg) {
     return EventWindowHandler(msg);
 }
 
+VA(0x00469734, 0x165)
 void PlayerDead(i32 player) {
     playerData* rec;
     i32 i;
@@ -1996,6 +2021,7 @@ void PlayerDead(i32 player) {
     }
 }
 
+VA(0x00469899, 0x1630)
 void CheckEndGame(
     H2_ENUM_PARAM(CheckEndGameForcedResult, i32) forcedResult,
     b32 dragonCityCaptured
@@ -2600,6 +2626,7 @@ void CheckEndGame(
     bInCheckEndGame = 0;
 }
 
+VA(0x0046aec9, 0x80)
 void QuickViewWait(void) {
     tag_message ev;
     i32 done;
@@ -2618,6 +2645,7 @@ void QuickViewWait(void) {
     gpMouseManager->ReallyShowPointer();
 }
 
+VA(0x0046af49, 0x1cf)
 void InitVars(void) {
     i32 i;
     i32 j;
@@ -2656,6 +2684,7 @@ void InitVars(void) {
     }
 }
 
+VA(0x0046b118, 0x593)
 void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     i32 mixedUndead4;
     i32 alignment_e;
@@ -2785,6 +2814,7 @@ showDialog:
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
 
+VA(0x0046b6ab, 0x33e)
 void game::ShowLuckInfo(hero* h, i32 dialogType) {
     char description[MORALE_LUCK_DESCRIPTION_SIZE];
     i32 luckValue;
@@ -2838,6 +2868,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);
 }
 
+VA(0x0046b9e9, 0xac)
 void ClearMapExtra(void) {
     static i16 clearMapExtraSourceLineBase = 0x0cbe;
     i32 i;
@@ -2860,6 +2891,7 @@ void ClearMapExtra(void) {
     iMaxMapExtra = 0;
 }
 
+VA(0x0046ba95, 0x79)
 i32 GetMonType(i32 score, HighScoreType campaign) {
     i32 idx;
     for (idx = IDX(CREATURE_COUNT) - 1; idx >= 0; idx--) {
@@ -2874,6 +2906,7 @@ i32 GetMonType(i32 score, HighScoreType campaign) {
     return giScoreMon[0][IDX(MONSTER_SCORE_TYPE)];
 }
 
+VA(0x0046bb0e, 0x405)
 i32 AddScoreToHighScore(
     i32 score,
     i32 days,
@@ -2958,6 +2991,7 @@ i32 AddScoreToHighScore(
     return 0;
 }
 
+VA(0x0046bf13, 0x5e)
 void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
     giBottomViewOverride = BOTTOM_VIEW_RESOURCE;
     giBottomViewOverrideEndTime = KBTickCount() + BOTTOM_VIEW_RESOURCE_MESSAGE_DURATION;
@@ -2967,11 +3001,13 @@ void BVResMsg(char* s, H2_ENUM_PARAM(ResourceType, i32) res, i32 qty) {
     gpAdvManager->UpdBottomView(1, 1, 1);
 }
 
+VA(0x0046bf71, 0x1e)
 void GOut(char* str) {
     if (gpAdvManager->m_active == 1)
         AiPrint(str);
 }
 
+VA(0x0046bf8f, 0x3e)
 i32 NetPosToGamePos(i32 netPos) {
     for (i32 i = 0; i < GAME_PLAYER_COUNT; i++)
         if (gbGamePosToNetPos[i] == netPos)
@@ -2979,6 +3015,7 @@ i32 NetPosToGamePos(i32 netPos) {
     return -1;
 }
 
+VA(0x0046bfcd, 0xd9)
 i32 WaitForOtherPlayer(void) {
     i32 result = 0;
     KbRemotePacket* data;
@@ -3019,6 +3056,7 @@ i32 WaitForOtherPlayer(void) {
 // the printable-key range test: retail compares the stored byte directly, while
 // MSVC zero-extends the equivalent u8/u32 expression. Literal, narrowed,
 // inline-helper, and bit-field spellings did not reproduce that lowering.
+VA(0x0046c0a6, 0xb25)
 void PopNetBox(char* text, i32 netPlayer) {
     i32 textY_d;
     i32l messageTime_b;
@@ -3311,6 +3349,7 @@ void PopNetBox(char* text, i32 netPlayer) {
     bShowIt = savedShowIt_a;
 }
 
+VA(0x0046cbcb, 0x96)
 void AddNetBoxLine(char* str, char color) {
     if (color < 0 || color > BOX_MAX_COLOR)
         color = BOX_DEFAULT_COLOR;
@@ -3326,6 +3365,7 @@ void AddNetBoxLine(char* str, char color) {
     cNetBoxColor[BOX_LINE_COUNT - 1] = color;
 }
 
+VA(0x0046cc61, 0x1d9)
 void ShutDown(char* msg) {
     static i16 shutdownSourceLineBase = 0x0ef4;
     char buf[GLOBAL_TEXT_BUFFER_SIZE];
@@ -3385,6 +3425,7 @@ H2_ENUM_BEGIN(FileErrorConstant)
     FILE_ERROR_BUFFER_SIZE = 500
 H2_ENUM_END(FileErrorConstant)
 
+VA(0x0046ce3a, 0x99)
 void FileError(char* filename) {
     char buf1[FILE_ERROR_BUFFER_SIZE];
     i32 err;
@@ -3417,6 +3458,7 @@ H2_ENUM_BEGIN(SmackFadeConstant)
     SMACK_FADE_RED_COMPONENT     = 0
 H2_ENUM_END(SmackFadeConstant)
 
+VA(0x0046ced3, 0x236)
 void SmackFade(u8* src, u8* dst) {
     static i16 smackFadeSourceLineBase = 0x0f61;
     u8* a;
@@ -3480,6 +3522,7 @@ void SmackFade(u8* src, u8* dst) {
     H2_FREE_AT(f, RETAIL_FILE, smackFadeSourceLineBase + 50);
 }
 
+VA(0x0046d109, 0x3b2)
 void ShowCongrats(HighScoreType highScoreType) {
     static i16 congratsSourceLineBase = 0x0f97;
     u8 savedPalette[CONGRATS_PALETTE_BUFFER_SIZE];
@@ -3555,6 +3598,7 @@ void ShowCongrats(HighScoreType highScoreType) {
     memcpy(gpBufferPalette->m_data, gPalette->m_data, MISC_PALETTE_BYTE_COUNT);
 }
 
+VA(0x0046d4bb, 0x79)
 void CongratsWait(void) {
     i32 cmd = 0;
     i32 done = 0;
@@ -3576,6 +3620,7 @@ H2_ENUM_BEGIN(SamplePlaybackConstant)
     SAMPLE_DEFAULT_WAIT_TIME      = 4000
 H2_ENUM_END(SamplePlaybackConstant)
 
+VA(0x0046d534, 0x41)
 SAMPLE2 LoadPlaySample(char* name) {
     SAMPLE2 ss;
     ss.pSample = gpResourceManager->GetSample(name);
@@ -3586,6 +3631,7 @@ SAMPLE2 LoadPlaySample(char* name) {
     return ss;
 }
 
+VA(0x0046d575, 0x84)
 void WaitEndSample(SAMPLE2 s, i32 waitTime) {
     i32l endTime;
     if (waitTime < 0)
@@ -3605,6 +3651,7 @@ H2_ENUM_BEGIN(MemoryErrorConstant)
     MEMORY_ERROR_REQUEST_SIZE = 6400
 H2_ENUM_END(MemoryErrorConstant)
 
+VA(0x0046d5f9, 0x4b)
 void MemError(void) {
     if (gbInMemError)
         return;
@@ -3614,23 +3661,28 @@ void MemError(void) {
     ShutDown(gText);
 }
 
+VA(0x0046d644, 0x29)
 char* GetTownName(i32 i) {
     town* t = GetCastleRec(i);
     return t->m_name;
 }
 
+VA(0x0046d66d, 0x2f)
 void LoadSystemwideIcons(void) {
     gBuyBuildIcons = gpResourceManager->GetIcon("buybuild.icn");
     gSystemIcons = gpResourceManager->GetIcon("system.icn");
 }
 
+VA(0x0046d69c, 0x28)
 void UnloadSystemwideIcons(void) {
     gpResourceManager->Dispose((resource*)gBuyBuildIcons);
     gpResourceManager->Dispose((resource*)gSystemIcons);
 }
 
+VA(0x0046d6c4, 0x5)
 void EarlyShutDownSystem(void) {}
 
+VA(0x0046d6c9, 0x4c)
 i32 GameUnsaved(void) {
     if ((gpAdvManager && gpAdvManager->m_active == 1)
         || (gpCombatManager && gpCombatManager->m_active == 1)
@@ -3640,6 +3692,7 @@ i32 GameUnsaved(void) {
         return 0;
 }
 
+VA(0x0046d715, 0x7b7)
 i32 HandleAppSpecificMenuCommands(i32 command) {
     i32 menuChanged;
     hero* currentHeroRec;
@@ -3914,6 +3967,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
     return 0;
 }
 
+VA(0x0046dfe5, 0x23e)
 void UpdateSystemOptionsMenu(void) {
     i32 menuCommand;
     i32 checkedCommand;
@@ -4017,6 +4071,7 @@ void UpdateSystemOptionsMenu(void) {
     );
 }
 
+VA(0x0046e273, 0x7d)
 void CleanUpMenus(void) {
     if (hmnuApp) {
         SetMenu(hwndApp, NULL);
@@ -4032,11 +4087,13 @@ void CleanUpMenus(void) {
     hmnuApp = NULL;
 }
 
+VA(0x0046e2f0, 0x1b)
 void UpdateAppSpecificMenus(void* hMenu) {
     if (hmnuAdv == hMenu)
         UpdateSystemOptionsMenu();
 }
 
+VA(0x0046e30b, 0x12)
 void EarlyResizeWindow(i32 x, i32 y, i32 w, i32 h) {
     if (gbClosingApp)
         return;
@@ -4047,6 +4104,7 @@ H2_ENUM_BEGIN(MapAreaConstant)
     MAP_AREA_LIMIT  = 448
 H2_ENUM_END(MapAreaConstant)
 
+VA(0x0046e31d, 0x41)
 i32 InMapArea(i32 x, i32 y) {
     return x >= MAP_AREA_ORIGIN && x < MAP_AREA_LIMIT && y >= MAP_AREA_ORIGIN
         && y < MAP_AREA_LIMIT;
@@ -4077,6 +4135,7 @@ H2_ENUM_BEGIN(DynamicWindowConstant)
     LEFT_FRAME_LAST           = 11,
 H2_ENUM_END(DynamicWindowConstant)
 
+VA(0x0046e35e, 0x829)
 void SetupDynamicWindow(
     i32 x,
     i32 y,
@@ -4314,6 +4373,7 @@ void SetupDynamicWindow(
     }
 }
 
+VA(0x0046eb87, 0xd3)
 void TestDynamicWindow(i32 p1, i32 p2) {
     heroWindow* p;
     i32 q, r, s, u, v, w;
@@ -4351,6 +4411,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
     delete p;
 }
 
+VA(0x0046ec5a, 0x88)
 void HandleRemoteDeadPlayerExit(i32 pos) {
     SPlayerExit pe;
     if (giThisGamePos == pos) {
@@ -4378,6 +4439,7 @@ H2_ENUM_BEGIN(PlayerExitLocalConstant)
     PLAYER_EXIT_HEARTBEAT_DISABLED       = 0x0bebc1ff
 H2_ENUM_END(PlayerExitLocalConstant)
 
+VA(0x0046ece2, 0x8e)
 void HandleRemoteSuddenExit(void) {
     SPlayerExit exitInfo;
     i32 destination;
@@ -4410,6 +4472,7 @@ void HandleRemoteSuddenExit(void) {
     DelayMilli(PLAYER_EXIT_TRANSMIT_DELAY);
 }
 
+VA(0x0046ed70, 0x4f)
 void DropDownToOnePlayer(void) {
     RemoteCleanup();
     giNumHumanPlayers = 1;
@@ -4419,6 +4482,7 @@ void DropDownToOnePlayer(void) {
     ComputeAdvNetControl();
 }
 
+VA(0x0046edbf, 0x356)
 void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32 forwardedReport) {
     i32 showExitMessage;
     char playerExitMessage[PLAYER_EXIT_MESSAGE_LENGTH];
@@ -4527,6 +4591,7 @@ void ReceiveHostReportsPlayerExit(i32 hostNetPosition, SPlayerExit exitInfo, i32
         );
 }
 
+VA(0x0046f115, 0x2c9)
 void ReceiveRemotePlayerExit(SPlayerExit exitInfo) {
     i32 localPlayerLost;
     i32 sendReturn;
@@ -4643,12 +4708,14 @@ H2_ENUM_BEGIN(CheckMemoryConstant)
     CHECK_MEMORY_AVAILABLE_KB         = 8000
 H2_ENUM_END(CheckMemoryConstant)
 
+VA(0x0046f3de, 0x1e)
 i32 CheckMem(void) {
     giTotalHighMem = CHECK_MEMORY_TOTAL_KB;
     giHighMemBuffer = CHECK_MEMORY_AVAILABLE_KB;
     return 1;
 }
 
+VA(0x0046f3fc, 0xce)
 i32 GetManaCost(SpellType spell, hero* h) {
     i32 c = gsSpellInfo[IDX(spell)].cost;
     if (h != NULL) {
@@ -4670,6 +4737,7 @@ i32 GetManaCost(SpellType spell, hero* h) {
     return c;
 }
 
+VA(0x0046f4ca, 0x88)
 void SetWinText(heroWindow* j, i32 id) {
     i32 a = 0;
     i32 i;
@@ -4696,6 +4764,7 @@ H2_ENUM_BEGIN(ShingleAnimationConstant)
     SHINGLE_UPDATE_HEIGHT          = 187
 H2_ENUM_END(ShingleAnimationConstant)
 
+VA(0x0046f552, 0x79)
 void CheckShingleUpdate(void) {
     if (!gShingleAnim)
         return;
@@ -4796,6 +4865,7 @@ inline i32 NormalDialogCenterOffset(i32 extent) {
     return extent / NORMAL_DIALOG_CENTER_PART_COUNT;
 }
 
+VA(0x0046f5cb, 0x16ab)
 void NormalDialog(
     char* text,
     i32 dialogType,
@@ -5473,6 +5543,7 @@ void NormalDialog(
     pNormalDialogWindow = savedNormalDialogWindow_o;
 }
 
+VA(0x00470d22, 0x68)
 void UpdateNormalDialog(char* text) {
     i16 show = 1;
     tag_message evt;

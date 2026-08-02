@@ -22,6 +22,7 @@ H2_ENUM_BEGIN(NetbiosSetupConstant)
     DETACH_SOURCE_SESSION    = 1
 H2_ENUM_END(NetbiosSetupConstant)
 
+VA(0x00473830, 0x10c)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 reserved;
@@ -69,6 +70,7 @@ i8 InitNetHost(void) {
     return 0;
 }
 
+VA(0x0047394c, 0x188)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
 
@@ -131,6 +133,7 @@ i8 InitNetGuest(void) {
     return 0;
 }
 
+VA(0x00473ae8, 0x3b)
 i8 WaitForHost(void) {
     char scratch[SCRATCH_BUFFER_SIZE];
     i32 status;
@@ -148,6 +151,7 @@ i8 WaitForHost(void) {
     return 0;
 }
 
+VA(0x00473b23, 0xb3)
 i8 WaitForGuest(void) {
     char scratch[SCRATCH_BUFFER_SIZE];
     i32 status;
@@ -183,6 +187,7 @@ i8 WaitForGuest(void) {
     return 0;
 }
 
+VA(0x00473bd6, 0x18c)
 i32 nbnet_init(void) {
     char scratch[SCRATCH_BUFFER_SIZE];
     i32 unused;

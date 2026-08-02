@@ -687,6 +687,7 @@ H2_ENUM_BEGIN(PlayerDataSerializationConstant)
     PLAYER_SAVE_CHEATED_FLAG_SIZE  = 1
 H2_ENUM_END(PlayerDataSerializationConstant)
 
+VA(0x0044bff0, 0x23b)
 void playerData::Write(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
@@ -719,6 +720,7 @@ void playerData::Write(i32 file) {
     write(file, m_unknownad, sizeof(m_unknownad));
 }
 
+VA(0x0044c22b, 0x22c)
 void playerData::Read(i32 file) {
     char unused[PLAYER_SAVE_SCRATCH_SIZE];
 
@@ -749,6 +751,7 @@ void playerData::Read(i32 file) {
     read(file, m_unknownad, sizeof(m_unknownad));
 }
 
+VA(0x0044c457, 0xff)
 i32 playerData::NextHero(i32) {
     i32 current = -1;
     i32 i;
@@ -771,6 +774,7 @@ i32 playerData::NextHero(i32) {
     return -1;
 }
 
+VA(0x0044c556, 0x50)
 i32 playerData::HasMobileHero(void) {
     i32 i;
     for (i = 0; i < m_heroCount; i++) {
@@ -780,6 +784,7 @@ i32 playerData::HasMobileHero(void) {
     return 0;
 }
 
+VA(0x0044c5a6, 0x5a)
 i32 GetNumObelisks(i32 color) {
     i32 count = 0;
     i32 i;
@@ -790,6 +795,7 @@ i32 GetNumObelisks(i32 color) {
     return count;
 }
 
+VA(0x0044c600, 0xb4)
 i32 playerData::BuildingsOwned(FactionType townType, BuildingSlotType buildingIndex, i32 buildState) {
     i32 count = 0;
     i32 i;
@@ -810,6 +816,7 @@ i32 playerData::BuildingsOwned(FactionType townType, BuildingSlotType buildingIn
     return count;
 }
 
+VA(0x0044c6b4, 0x84)
 i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     i32 count = 0;
     i32 i;
@@ -823,6 +830,7 @@ i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     return count;
 }
 
+VA(0x0044c738, 0x6b)
 i32 game::MineTypesOwned(i32 owner, MineType mineType) {
     i32 num = 0;
     i32 i;
@@ -844,6 +852,7 @@ H2_ENUM_BEGIN(UltimateArtifactHintConstant)
     HINT_LOCATION_RETRY_LIMIT = 200
 H2_ENUM_END(UltimateArtifactHintConstant)
 
+VA(0x0044c7a3, 0x37b)
 void ComputeUALoc(i32 player) {
     i32 result = gpGame->SetupPuzzlePieces(player, 1);
     if (result < MINIMUM_PUZZLE_PIECES
@@ -910,6 +919,7 @@ H2_ENUM_BEGIN(PuzzleSetupConstant)
     PUZZLE_FALLBACK_RETRY_LIMIT     = 100
 H2_ENUM_END(PuzzleSetupConstant)
 
+VA(0x0044cb1e, 0x21d)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     i32 pieceCountTotal = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
@@ -965,6 +975,7 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
     return pieceCountTotal;
 }
 
+VA(0x0044cd3b, 0x95)
 i32 game::IsMobile(i32 heroId) {
     if (heroId == -1)
         return 0;
@@ -981,10 +992,12 @@ i32 game::IsMobile(i32 heroId) {
            <= mobileHero->m_remainingMobility;
 }
 
+VA(0x0044cdd0, 0x13)
 fullMap* game::GetWorldMapData(void) {
     return &m_worldMap;
 }
 
+VA(0x0044cde3, 0x119)
 i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     i32 boatIdx = Scan(m_boatSlots, 0, GAME_BOAT_COUNT);
     if (boatIdx != -1) {
@@ -1006,6 +1019,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
     return boatIdx;
 }
 
+VA(0x0044cefc, 0x43)
 i32 game::Scan(i8* array, i32 start, i32 length) {
     i32 i;
     for (i = start; i < length + start; i++) {
@@ -1015,6 +1029,7 @@ i32 game::Scan(i8* array, i32 start, i32 length) {
     return -1;
 }
 
+VA(0x0044cf3f, 0x61)
 i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
     i32 idx = target;
     i32 i;
@@ -1026,6 +1041,7 @@ i32 game::RandomScan(i8* array, i32 start, i32 range, i32 unused, i8 target) {
     return -1;
 }
 
+VA(0x0044cfa0, 0x1a1)
 i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     i32 result = -1;
     i32 previousHero;
@@ -1061,6 +1077,7 @@ i32 game::GetNewHeroId(i32, FactionType heroClass, i32 requireExperienced) {
     return heroId;
 }
 
+VA(0x0044d141, 0x5f)
 i32 game::GetTownId(i32 col, i32 row) {
     i32 i;
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
@@ -1070,6 +1087,7 @@ i32 game::GetTownId(i32 col, i32 row) {
     return -1;
 }
 
+VA(0x0044d1a0, 0x62)
 i32 game::GetMineId(i32 col, i32 row) {
     i32 i;
     for (i = 0; i < GAME_MINE_COUNT; i++) {
@@ -1079,6 +1097,7 @@ i32 game::GetMineId(i32 col, i32 row) {
     return -1;
 }
 
+VA(0x0044d202, 0x1ac)
 void GenerateStandardFileName(char* source, char* destination) {
     char* extension = FindLastToken(source, '.');
     if (extension == NULL) {
@@ -1106,6 +1125,7 @@ void GenerateStandardFileName(char* source, char* destination) {
     strcpy(destination + indexOut, extension);
 }
 
+VA(0x0044d3ae, 0xb5a)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     void* emptyPayload = H2_ALLOC_AT(GAME_SAVE_BUFFER_SIZE, RETAIL_FILE, gSaveSourceLine + 10);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
@@ -1266,6 +1286,7 @@ i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
     return 1;
 }
 
+VA(0x0044df08, 0x9d1)
 void game::SetupOrigData(void) {
     ClearMapExtra();
     gbIAmGreatest = false;
@@ -1404,6 +1425,7 @@ void game::SetupOrigData(void) {
     bShowIt = gbThisNetHumanPlayer[giCurPlayer];
 }
 
+VA(0x0044e8d9, 0xa79)
 void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     LogStr("LG1");
     if (loadFromFile) {
@@ -1572,6 +1594,7 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
+VA(0x0044f352, 0x2d3)
 void game::GiveTroopsToNeutralTown(i32 townId) {
     i32 unused28;
     i32 tierKey36;
@@ -1702,6 +1725,7 @@ void game::GiveTroopsToNeutralTown(i32 townId) {
     }
 }
 
+VA(0x0044f6cf, 0x86)
 void game::GiveTroopsToNeutralTowns(void) {
     i32 i;
     for (i = 0; i < GAME_TOWN_COUNT; i++) {
@@ -1716,6 +1740,7 @@ void game::GiveTroopsToNeutralTowns(void) {
     }
 }
 
+VA(0x0044f755, 0x1c7a)
 void game::NewMap(char* filename) {
     char* extension0;
     FactionType randomColor2;
@@ -2122,6 +2147,7 @@ inline town* GetCastleSlot(game* instance, i32 index) {
     return &instance->m_castleRecs[index];
 }
 
+VA(0x004513cf, 0x24ca)
 void game::RandomizeEvents(void) {
     i32 shrineId8 = 1;
     i32 bottleId11 = 1;
@@ -2773,6 +2799,7 @@ void game::RandomizeEvents(void) {
     }
 }
 
+VA(0x00453a95, 0x85)
 void game::InitializePasswords(void) {
     char flag;
     i32 i;
@@ -2790,6 +2817,7 @@ void game::InitializePasswords(void) {
     }
 }
 
+VA(0x00453b1a, 0x6b)
 void game::RandomizeBarrier(mapCell* cell) {
     i32 idx = cell->m_objectMetadata;
     idx &= PASSWORD_INDEX_MASK;
@@ -2798,10 +2826,12 @@ void game::RandomizeBarrier(mapCell* cell) {
     cell->m_objectMetadata = color | 0;
 }
 
+VA(0x00453b85, 0x19)
 void game::RandomizePassword(mapCell* cell) {
     RandomizeBarrier(cell);
 }
 
+VA(0x00453b9e, 0x435)
 i32 game::LoadMap(char* filename) {
     char column5[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     i32 i37;
@@ -2898,6 +2928,7 @@ i32 game::LoadMap(char* filename) {
     return 0;
 }
 
+VA(0x00453fd3, 0x307)
 void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     i32 i;
     town* townRec;
@@ -2957,6 +2988,7 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
+VA(0x004542da, 0x320)
 void game::ClaimMine(i32 mineId, i32 player) {
     mapCell* acc;
     i32 flag;
@@ -3042,6 +3074,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
     }
 }
 
+VA(0x004546ee, 0x1e1)
 SpellType
 game::ViewSpells(
     hero* spellHero, HeroSpellType spellType, MessageDispatchHandler callback, i32 readOnly
@@ -3088,6 +3121,7 @@ game::ViewSpells(
     return m_viewSpell;
 }
 
+VA(0x004548cf, 0x48f)
 void game::UpdateSpellWidgets(void) {
     tag_message message9;
     i32 spellSlot6;
@@ -3195,6 +3229,7 @@ void game::UpdateSpellWidgets(void) {
     }
 }
 
+VA(0x00454d5e, 0x5c9)
 MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
 
@@ -3433,6 +3468,7 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004553d1, 0x138)
 MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         if (gpWindowManager->m_lastHoverId == msg.payload.hover.id)
@@ -3474,6 +3510,7 @@ MessageDispatchResult ViewSpecialHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00455529, 0xd08)
 void game::ViewArmy(
     i32 x,
     i32 y,
@@ -3787,6 +3824,7 @@ void game::ViewArmy(
     delete m_viewArmyWindow;
 }
 
+VA(0x00456231, 0x37d)
 MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     i32 goldCost6;
     ResourceType resourceType0;
@@ -3919,6 +3957,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x004565ae, 0x53e)
 i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
     // Retail per-creature neutral-stack ranges. The paired bounds are balance payload,
     // while the switch labels identify the domain that owns each pair.
@@ -4062,16 +4101,19 @@ i32 game::GetRandomNumTroops(H2_ENUM_PARAM(CreatureType, i32) monsterType) {
     // NOLINTEND(readability-magic-numbers)
 }
 
+VA(0x00456bf4, 0x2c)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
     gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
     gpSoundManager->m_samplesReady = 0;
 }
 
+VA(0x00456c20, 0x12)
 void game::TurnOffAIMusic(void) {
     gpSoundManager->m_samplesReady = 1;
 }
 
+VA(0x00456c32, 0x50a)
 void game::NextPlayer(void) {
     char scratch[NEXT_PLAYER_SCRATCH_SIZE];
     i32 remotePlayer;
@@ -4179,6 +4221,7 @@ void game::NextPlayer(void) {
         gpAdvManager->ForceNewHover();
 }
 
+VA(0x0045713c, 0x38a)
 i32 game::ComputeDailyGold(i32 player) {
     i32 heroIndex;
     i32 gold = 0;
@@ -4244,6 +4287,7 @@ i32 game::ComputeDailyGold(i32 player) {
     return gold;
 }
 
+VA(0x004574c6, 0xa10)
 void game::PerDay(void) {
     i32 maxSpellPoints9;
     i32 player;
@@ -4398,6 +4442,7 @@ void game::PerDay(void) {
     }
 }
 
+VA(0x00457ed6, 0x19d2)
 void game::PerWeek(void) {
     FactionType heroClass18 = FACTION_KNIGHT;
     i32 outerIndex5;
@@ -4651,6 +4696,7 @@ void game::PerWeek(void) {
     GiveTroopsToNeutralTowns();
 }
 
+VA(0x0045997e, 0x126)
 void game::WeeklyRecruitSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
     type &= WEEKLY_RECRUIT_TYPE_MASK;
@@ -4686,6 +4732,7 @@ void game::WeeklyRecruitSite(mapCell* cell) {
     cell->m_objectMetadata = packed | 0;
 }
 
+VA(0x00459ab8, 0x61)
 void game::WeeklyGenericSite(mapCell* cell) {
     i32 type = cell->m_objectMetadata;
     type &= WEEKLY_SITE_TYPE_MASK;
@@ -4699,6 +4746,7 @@ void game::WeeklyGenericSite(mapCell* cell) {
     // NOLINTEND(readability-magic-numbers)
 }
 
+VA(0x00459b19, 0x383)
 void game::PerMonth(void) {
     mapCell* cell0;
     i32 mapX8;
@@ -4784,6 +4832,7 @@ void game::PerMonth(void) {
     gpAdvManager->CompleteDraw(0);
 }
 
+VA(0x00459e9c, 0x3c2)
 void game::ConvertObject(
     i32 left,
     i32 top,
@@ -4870,6 +4919,7 @@ void game::ConvertObject(
     }
 }
 
+VA(0x0045a25e, 0x1b0)
 void game::RandomizeTown(i32 x, i32 y, i32) {
     i32 unused6[RANDOM_TOWN_SCRATCH_WIDTH];
     i32 townId0 = GetTownId(x, y);
@@ -4939,6 +4989,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     m_castleRecs[townId0].m_type = race0;
 }
 
+VA(0x0045a40e, 0x4f6)
 void game::RandomizeMine(i32 x, i32 y) {
     u8 objectFrame1;
     i32 mineId;
@@ -5084,6 +5135,7 @@ void game::RandomizeMine(i32 x, i32 y) {
     m_mines[mineId].resourceType = mineType29;
 }
 
+VA(0x0045a930, 0xb8)
 void game::InitRandomArtifacts(void) {
     // Retail /Od retains this otherwise unused local between the loop-index slots.
     i32 ignoredIndex;
@@ -5098,6 +5150,7 @@ void game::InitRandomArtifacts(void) {
     }
 }
 
+VA(0x0045a9e8, 0x132)
 i32 game::GetRandomArtifactId(
     H2_ENUM_PARAM(ArtifactLevelMask, i32) levelMask,
     b32 allowCursed
@@ -5137,6 +5190,7 @@ i32 game::GetRandomArtifactId(
     return IDX(artifact);
 }
 
+VA(0x0045ab1a, 0x3e)
 i32 IsCursedItem(ArtifactType item) {
     if (item == ARTIFACT_FIZBIN_OF_MISFORTUNE || item == ARTIFACT_HIDEOUS_MASK
         || item == ARTIFACT_TAX_LIEN || item == ARTIFACT_ARM_OF_MARTYR
@@ -5146,6 +5200,7 @@ i32 IsCursedItem(ArtifactType item) {
     return 0;
 }
 
+VA(0x0045ab58, 0x1a8)
 void game::RandomizeHeroPool(void) {
     for (i32 heroId = 0; heroId < RANDOM_HERO_COUNT; heroId++) {
         m_heroRecs[heroId].m_experience =
@@ -5169,6 +5224,7 @@ void game::RandomizeHeroPool(void) {
     }
 }
 
+VA(0x0045ad00, 0x342)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
     i32 armySlot7 = 0;
@@ -5229,6 +5285,7 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     }
 }
 
+VA(0x0045b042, 0x65d)
 void game::ProcessRandomObjects(void) {
     i32 maxValue17;
     i32 x10;
@@ -5493,6 +5550,7 @@ void game::ProcessRandomObjects(void) {
     }
 }
 
+VA(0x0045b736, 0x20e)
 void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     i32 col;
     i32 cutoff;
@@ -5540,6 +5598,7 @@ void game::SetVisibility(i32 x, i32 y, i32 player, i32 radius) {
     }
 }
 
+VA(0x0045b944, 0xc8)
 void game::MakeAllWaterVisible(i32 player) {
     char mask = static_cast<char>(1 << player);
     i32 x;
@@ -5552,6 +5611,7 @@ void game::MakeAllWaterVisible(i32 player) {
     }
 }
 
+VA(0x0045ba0c, 0xc8)
 void game::GiveArmy(
     armyGroup* group,
     H2_ENUM_PARAM(CreatureType, i32) type,
@@ -5584,6 +5644,7 @@ void game::GiveArmy(
     group->m_creatureCounts[i] += count;
 }
 
+VA(0x0045bad4, 0x7e)
 i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     i32 exp = 0;
     i32 i;
@@ -5598,6 +5659,7 @@ i32 game::ExperienceValueOfStack(armyGroup* group, hero* h) {
     return exp;
 }
 
+VA(0x0045bb52, 0x124)
 i32 game::GetLuck(hero* h, class army*, town* castle) {
     i32 luck;
     if (h == NULL)
@@ -5629,6 +5691,7 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
     return luck;
 }
 
+VA(0x0045bc76, 0xdf)
 void game::SetupAdjacentMons(void) {
     i32 col;
     i32 row;
@@ -5647,6 +5710,7 @@ void game::SetupAdjacentMons(void) {
     }
 }
 
+VA(0x0045bd55, 0x54)
 void game::CancelComputerScreen(void) {
     TurnOffAIMusic();
     bShowIt = 1;
@@ -5661,6 +5725,7 @@ void game::CancelComputerScreen(void) {
     }
 }
 
+VA(0x0045bda9, 0xe1)
 void game::ShowComputerScreen(void) {
     if (gConfig.blackoutComputer) {
         i32 saved = gbThisNetHumanPlayer[giCurPlayer];
@@ -5685,6 +5750,7 @@ void game::ShowComputerScreen(void) {
     ShowHeroesLogo();
 }
 
+VA(0x0045be8a, 0x95)
 void game::ShowHeroesLogo(void) {
     if (gpAdvManager->m_openState == 0) {
         gpAdvManager->m_openState = 1;
@@ -5712,6 +5778,7 @@ void game::ShowHeroesLogo(void) {
     }
 }
 
+VA(0x0045bf1f, 0x11f)
 void game::WaitForPlayer(char* text, i32 player) {
     if (gbBlackoutPlayer && giNumHumanPlayers > 1 && !gbRemoteOn) {
         gpMouseManager->SetPointer(0);
@@ -5744,6 +5811,7 @@ void game::WaitForPlayer(char* text, i32 player) {
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x0045c03e, 0xda)
 i32 game::HasLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_drawOverlayOnTop)
@@ -5766,6 +5834,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x0045c118, 0xe9)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayTileset == TILESET_FLAG32)
@@ -5787,6 +5856,7 @@ void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x0045c201, 0xf7)
 i32 game::HasObjectTilesetIndex(
     i32 col,
     i32 row,
@@ -5814,6 +5884,7 @@ i32 game::HasObjectTilesetIndex(
 }
 
 // Retail /Ob1 includes an inline-accessor continuation in this function.
+VA(0x0045c2f8, 0xdc)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     mapCell* cell = WORLDMAP->Row(row) + col;
     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
@@ -5834,6 +5905,7 @@ void game::ConvertAllToLateOverlay(i32 col, i32 row) {
     }
 }
 
+VA(0x0045c3d4, 0x24f)
 void game::ProcessMapExtra(void) {
     i32 unused;
     i32 cost;
@@ -5881,6 +5953,7 @@ void game::ProcessMapExtra(void) {
     }
 }
 
+VA(0x0045c623, 0x871)
 void game::SetupTowns(void) {
     static i16 setupTownsSourceLineBase = 0x17f9;
     char defaultDwellingRoll[DEFAULT_DWELLING_ROLL_CAPACITY];
@@ -6104,6 +6177,7 @@ void game::SetupTowns(void) {
     }
 }
 
+VA(0x0045ce94, 0x726)
 void game::ProcessOnMapHeroes(void) {
     static i16 processOnMapHeroesSourceLineBase = 0x18ef;
     u32 extraIndex0;
@@ -6318,6 +6392,7 @@ void game::ProcessOnMapHeroes(void) {
     }
 }
 
+VA(0x0045d5ba, 0x4c9)
 void game::CheckHeroConsistency(void) {
     hero* mapHero3;
     mapCell* cell1;
@@ -6431,6 +6506,7 @@ void game::CheckHeroConsistency(void) {
 #define samplesReady samplesReady1
 #define success success14
 
+VA(0x0045da83, 0x7b3)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 success;
     i32 samplesReady;
@@ -6703,6 +6779,7 @@ transmitCleanup:
 #define samplesReady samplesReady0
 #define success success15
 
+VA(0x0045e236, 0x6c8)
 i32 game::ReceiveSaveGame(
     i32 dataSize,
     i32 expectedCrc,
@@ -6950,6 +7027,7 @@ i32 game::ReceiveSaveGame(
 #undef samplesReady
 #undef success
 
+VA(0x0045e8fe, 0x4fd)
 void game::DoNewTurn(void) {
     char musicFile18[NEW_TURN_MUSIC_FILENAME_CAPACITY];
     char lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
@@ -7055,6 +7133,7 @@ void game::DoNewTurn(void) {
     );
 }
 
+VA(0x0045edfb, 0x4c)
 i32 game::GetBoatsBuilt(void) {
     i32 count = 0;
     i32 i;
@@ -7065,6 +7144,7 @@ i32 game::GetBoatsBuilt(void) {
     return count;
 }
 
+VA(0x0045ee47, 0x7f)
 i32 game::GetNumThievesGuilds(i32 color) {
     i32 num = 0;
     i32 i;
@@ -7076,6 +7156,7 @@ i32 game::GetNumThievesGuilds(i32 color) {
     return num;
 }
 
+VA(0x0045eec6, 0xff)
 i32 game::CalcDifficultyRating(void) {
     i32 notused;
     i32 rating = 0;
@@ -7100,6 +7181,7 @@ i32 game::CalcDifficultyRating(void) {
     return rating;
 }
 
+VA(0x0045efc5, 0x177)
 i32 CalcBaseScore(i32 days) {
     i32 score = SCORE_BASE;
 
@@ -7140,6 +7222,7 @@ clampScore:
     return score;
 }
 
+VA(0x0045f13c, 0xa7)
 void game::RestoreCell(
     i32 x,
     i32 y,
@@ -7163,6 +7246,7 @@ void game::RestoreCell(
     cell->m_objectMetadata = barrier;
 }
 
+VA(0x0045f1e3, 0xb9)
 void game::SetMapSize(i32 w, i32 h) {
     static i16 setMapSizeSourceLineBase = 0x1d0d;
     if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized)
@@ -7180,6 +7264,7 @@ mapSized:
     memset(mapExtra, 0, MAP_WIDTH * MAP_HEIGHT);
 }
 
+VA(0x0045f29c, 0x107)
 void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     u8 flags = 0;
     flags = (cmd << COMMAND_SHIFT) | flags;
@@ -7204,6 +7289,7 @@ void WriteDiffHeaderInfo(u8 cmd, i32 len, u8* buf, i32* pos) {
     }
 }
 
+VA(0x0045f3a3, 0xd7)
 i32 GetSkipCopyLen(u8* buf, i32* pos) {
     u8 b = buf[*pos];
     i32 len;
@@ -7224,6 +7310,7 @@ i32 GetSkipCopyLen(u8* buf, i32* pos) {
     return len;
 }
 
+VA(0x0045f47a, 0x553)
 void CreateDiffFile(
     char* oldName,
     char* joinName,
@@ -7373,6 +7460,7 @@ void CreateDiffFile(
     return;
 }
 
+VA(0x0045f9cd, 0x37e)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     static i16 createJoinFileSourceLineBase = 0x1e0f;
     u8* oldData13 = NULL;
@@ -7459,6 +7547,7 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
         H2_FREE_AT(joinData9, RETAIL_FILE, createJoinFileSourceLineBase + 0x57);
 }
 
+VA(0x0045fd4b, 0x46)
 i32 game::HeroIDToHeroPos(playerData* pd, i32 heroId) {
     i32 i;
     for (i = 0; i < pd->m_heroCount; i++) {
@@ -7468,6 +7557,7 @@ i32 game::HeroIDToHeroPos(playerData* pd, i32 heroId) {
     return -1;
 }
 
+VA(0x0045fd91, 0x46)
 i32 game::TownIDToTownPos(playerData* pd, i32 townId) {
     i32 i;
     for (i = 0; i < pd->m_townCount; i++) {
@@ -7477,6 +7567,7 @@ i32 game::TownIDToTownPos(playerData* pd, i32 townId) {
     return -1;
 }
 
+VA(0x0045fdd7, 0x64d)
 void game::SetupNewRumour(void) {
     char rumourBuffer6[RUMOUR_SCRATCH_CAPACITY];
     i32l categoryStats7[GAME_PLAYER_COUNT];
@@ -7606,6 +7697,7 @@ void game::SetupNewRumour(void) {
     // NOLINTEND(readability-magic-numbers)
 }
 
+VA(0x00460424, 0xae)
 EventExtra* GetMapEvent(i32 x, i32 y) {
     i32 i;
     for (i = 0; i < gpGame->m_mapEventCount; i++) {
@@ -7617,6 +7709,7 @@ EventExtra* GetMapEvent(i32 x, i32 y) {
     return NULL;
 }
 
+VA(0x004604d2, 0x318)
 void game::CheckForTimeEvent(void) {
     i32 dayNumber6;
     i32 eventIndex11;
@@ -7688,6 +7781,7 @@ void game::CheckForTimeEvent(void) {
     }
 }
 
+VA(0x004607ea, 0x11e)
 void CheckValidAvailableHeroes(void) {
     i32 candidatePlayer0;
     i32 heroIndex5;
@@ -7712,6 +7806,7 @@ void CheckValidAvailableHeroes(void) {
     }
 }
 
+VA(0x00460908, 0x92)
 i32 CalcFileCRC(char* filename) {
     static i16 calcFileCrcSourceLineBase = 0x1f5e;
     i32l size = FileSize(filename);
@@ -7726,6 +7821,7 @@ i32 CalcFileCRC(char* filename) {
     return crc;
 }
 
+VA(0x0046099a, 0x120)
 void CompressTest2(void) {
     i32 dataSize2;
     i32l encodedSize14;
@@ -7764,6 +7860,7 @@ void CompressTest2(void) {
     H2_FREE_AT(decodedData6, RETAIL_FILE, gCompressTest2SourceLine + 28);
 }
 
+VA(0x00460aba, 0x18c)
 void CompressTest(void) {
     i32l fileSize7;
     i32l encodedSize14;
@@ -7811,6 +7908,7 @@ void CompressTest(void) {
     LogStr(const_cast<char*>("C8"));
 }
 
+VA(0x00460c46, 0x46)
 void CompressTest3(void) {
     char buf[TEST_MESSAGE_CAPACITY];
     i32 i;
@@ -7821,6 +7919,7 @@ void CompressTest3(void) {
     }
 }
 
+VA(0x00460c8c, 0x17d)
 i32 game::CountShrines(i32 player) {
     if (xIsExpansionMap == 0)
         return 0;

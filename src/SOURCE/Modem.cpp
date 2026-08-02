@@ -24,6 +24,7 @@ H2_ENUM_BEGIN(ModemPrivateConstant)
     INPUT_QUEUE_GUARD         = 4
 H2_ENUM_END(ModemPrivateConstant)
 
+VA(0x00472ca0, 0x1f8)
 void ModemSetup(i32 mode) {
     char directConnectMessage3[SETUP_TEXT_CAPACITY];
     i32 resetAttempt9;
@@ -105,6 +106,7 @@ void ModemSetup(i32 mode) {
     }
 }
 
+VA(0x00472e98, 0x8e)
 i32l Dial(void) {
     char dialCommand[MODEM_COMMAND_BUFFER_SIZE];
     iLastDialPos = 0;
@@ -117,6 +119,7 @@ i32l Dial(void) {
     return 0;
 }
 
+VA(0x00472f26, 0x42)
 i32l Wait(void) {
     GUIModemResponse("Waiting for ring...", "RING");
     GUIModemCommand("Initializing modem...", "ATA");
@@ -125,6 +128,7 @@ i32l Wait(void) {
     return 0;
 }
 
+VA(0x00472f68, 0x6c)
 void GUIModemCommand(char* message, char* command) {
     iLastActionTime = 0;
     iModemCommandPos = 0;
@@ -135,6 +139,7 @@ void GUIModemCommand(char* message, char* command) {
         ShutDown(NULL);
 }
 
+VA(0x00472fd4, 0x7e)
 i8 GUIModemCommandExec(void) {
     i32 commandLength;
     if (KBTickCount() < iLastActionTime + MODEM_COMMAND_INTERVAL)
@@ -152,6 +157,7 @@ i8 GUIModemCommandExec(void) {
     }
 }
 
+VA(0x00473052, 0x61)
 void ModemCommand(char* command) {
     char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
@@ -163,6 +169,7 @@ void ModemCommand(char* command) {
     write_buffer("\r", 1);
 }
 
+VA(0x004730b3, 0x75)
 i8 GUIModemResponse(char* message, char* response) {
     memset(GUIMRresponse, 0, MODEM_RESPONSE_SIZE);
     GUIMRrespptr = 0;
@@ -174,6 +181,7 @@ i8 GUIModemResponse(char* message, char* response) {
     return 0;
 }
 
+VA(0x00473128, 0xb3)
 i8 GUIModemResponseExec(void) {
     GUIMRc = read_byte();
     if (GUIMRc == -1)
@@ -200,6 +208,7 @@ i8 GUIModemResponseExec(void) {
     }
 }
 
+VA(0x004731db, 0x42)
 i32 write_buffer(char* buffer, i32 length) {
     if (outque.writePosition + length + MODEM_QUEUE_GUARD > MODEM_OUT_QUEUE_SIZE)
         return 0;
@@ -207,6 +216,7 @@ i32 write_buffer(char* buffer, i32 length) {
     return 1;
 }
 
+VA(0x0047321d, 0x33)
 i32 read_byte(void) {
     u8 value[READ_STORAGE_SIZE];
     i32 received = com_rcv(0, 1, value);
@@ -216,10 +226,12 @@ i32 read_byte(void) {
         return -1;
 }
 
+VA(0x00473250, 0x1c)
 void write_byte(i32 value) {
     com_snd(0, 0, 1, &value, 0);
 }
 
+VA(0x0047326c, 0x19c)
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     u32 idSeed = KBTickCount();
@@ -259,6 +271,7 @@ void Connect(void) {
     }
 }
 
+VA(0x00473408, 0x1e4)
 i32 WaitForDirectConnect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
     switch (WFDCStage) {
@@ -307,6 +320,7 @@ i32 WaitForDirectConnect(void) {
     return 0;
 }
 
+VA(0x004735ec, 0x100)
 char ReadPacket(void) {
     i32 input;
     if (inque.writePosition > MODEM_QUEUE_INPUT_SIZE - IDX(INPUT_QUEUE_GUARD)) {
@@ -348,6 +362,7 @@ readPacketStart:
     }
 }
 
+VA(0x004736ec, 0x10b)
 void WriteModemPacket(char* buffer, i32 length) {
     i32 encodedPosition = 0;
     if (length > MODEM_PACKET_PAYLOAD_SIZE) {

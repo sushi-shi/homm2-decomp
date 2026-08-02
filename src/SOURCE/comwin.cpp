@@ -44,6 +44,7 @@ static i16 s_comWriteSourceLineBase = 310;
 static ComPortState s_comPorts[PORT_COUNT];
 
 
+VA(0x00432760, 0x5f)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     node->next = NULL;
     node->prev = node->next;
@@ -57,6 +58,7 @@ void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     }
 }
 
+VA(0x004327bf, 0x3b)
 struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     tag_Node* node = anchor->head;
     if (node != NULL)
@@ -66,11 +68,13 @@ struct tag_Node* pop_node(struct tag_Anchor* anchor) {
     return node;
 }
 
+VA(0x004327fa, 0x25)
 void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->head = NULL;
     anchor->tail = NULL;
 }
 
+VA(0x0043281f, 0x280)
 void ShutdownComError(char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
@@ -145,6 +149,7 @@ void ShutdownComError(char* function) {
     ShutDown(message);
 }
 
+VA(0x00432ba2, 0x2e8)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
     char portName[PORT_NAME_SIZE];
     BOOL success;
@@ -234,6 +239,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
     return static_cast<i16>(portIndex);
 }
 
+VA(0x00432e9e, 0xe9)
 void com_term(i16 portIndex) {
     tag_Node* node;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
@@ -249,6 +255,7 @@ void com_term(i16 portIndex) {
     }
 }
 
+VA(0x00432f87, 0xc1)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     COMSTAT status;
     DWORD commErrors;
@@ -280,6 +287,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
     return 0;
 }
 
+VA(0x00433048, 0x11c)
 i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     BOOL result;
     tag_Node* sendNode;
@@ -311,10 +319,12 @@ i16 com_snd(i16 portIndex, u16, u16 length, void* data, i32 priority) {
     return 1;
 }
 
+VA(0x00433164, 0x8)
 i16 __cdecl com_sess(i32, i32, ...) {
     return 0;
 }
 
+VA(0x0043316c, 0x5b)
 u8 com_stat(i16 portIndex, u16) {
     DWORD modemStatus;
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE
@@ -324,6 +334,7 @@ u8 com_stat(i16 portIndex, u16) {
     return 0;
 }
 
+VA(0x004331c7, 0xc3)
 void comm_wrt_task(void) {
     DWORD bytesWritten;
     u32 writtenTotal;

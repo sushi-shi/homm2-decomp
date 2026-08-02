@@ -115,6 +115,7 @@ H2_ENUM_BEGIN(CampaignTrackConstant)
     TRACK_SELECTED_FRAME_FOUR_STEPS  = 12
 H2_ENUM_END(CampaignTrackConstant)
 
+VA(0x00421f00, 0x494)
 i32 game::HandleCampaignWin(void) {
     H2_ENUM_STORAGE_STEPPED(CampaignSide, i32) sideIndex;
     i32 mapIndex;
@@ -273,6 +274,7 @@ i32 game::HandleCampaignWin(void) {
     return 0;
 }
 
+VA(0x004223f0, 0x27a)
 void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map) {
     if (side == CAMPAIGN_ROLAND) {
         switch (map + 1) {
@@ -375,6 +377,7 @@ void game::PlayPreScenarioSmacker(H2_ENUM_PARAM(CampaignSide, i32) side, i32 map
     gpWindowManager->m_updateFlags = 1;
 }
 
+VA(0x004226d2, 0x40a)
 void game::ShowCampaignInfo(i32 viewOnly, i32) {
     i32 savedInterface;
     i32 map;
@@ -488,6 +491,7 @@ void game::ShowCampaignInfo(i32 viewOnly, i32) {
     }
 }
 
+VA(0x00422adc, 0x87f)
 void game::CampaignInfoUpdate(i32 redraw) {
     i32 map;
     tag_message message;
@@ -695,6 +699,7 @@ void game::CampaignInfoUpdate(i32 redraw) {
         campWin->DrawWindow();
 }
 
+VA(0x004233b8, 0x44a)
 MessageDispatchResult CampaignHandler(struct tag_message& message) {
     i32 map;
 
@@ -818,6 +823,7 @@ MessageDispatchResult CampaignHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
+VA(0x00423842, 0x3c)
 void game::InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32) side) {
     memset(&m_campaignType, 0, CAMPAIGN_STATE_RESET_SIZE);
     m_campaignType = side;
@@ -825,6 +831,7 @@ void game::InitEntireCampaign(H2_ENUM_PARAM(CampaignSide, i32) side) {
     m_campaignScenario = CAMPAIGN_NO_SCENARIO;
 }
 
+VA(0x0042387e, 0xa41)
 void game::InitCampaignMap(void) {
     i32 selectedChoicePosition;
     SCampaignChoice* choiceBest;

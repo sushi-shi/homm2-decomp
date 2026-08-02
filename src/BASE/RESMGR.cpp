@@ -31,6 +31,7 @@ H2_ENUM_BEGIN(ResourceConstant)
 H2_ENUM_END(ResourceConstant)
 
 #define RETAIL_FILE "I:\\Projects\\Heroes\\Prog\\BASE\\RESMGR.CPP"
+VA(0x004b7ee0, 0xb8)
 resourceManager::resourceManager(void) : baseManager() {
     i32 aggregateIndex;
     m_active = false;
@@ -47,6 +48,7 @@ resourceManager::resourceManager(void) : baseManager() {
     m_curAggregate = 0;
 }
 
+VA(0x004b7fa0, 0x92)
 void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIcon) {
     if (useIcon) {
         icon* backdropIcon = GetIcon(name);
@@ -64,6 +66,7 @@ void resourceManager::GetBackdrop(char* name, class bitmap* backdrop, i32 useIco
     }
 }
 
+VA(0x004b8040, 0xc0)
 void resourceManager::GetBackdropAtLoc(
     char* filename,
     class bitmap* destination,
@@ -94,6 +97,7 @@ void resourceManager::GetBackdropAtLoc(
     }
 }
 
+VA(0x004b8100, 0xbf)
 class palette* resourceManager::GetPalette(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
@@ -107,6 +111,7 @@ class palette* resourceManager::GetPalette(char* name) {
     }
 }
 
+VA(0x004b81c0, 0xbf)
 class bitmap* resourceManager::GetBitmap(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
@@ -120,10 +125,12 @@ class bitmap* resourceManager::GetBitmap(char* name) {
     }
 }
 
+VA(0x004b8280, 0x24)
 class icon* resourceManager::GetIcon(char* name) {
     return GetIcon(MakeId(name, 1));
 }
 
+VA(0x004b82b0, 0xae)
 class icon* resourceManager::GetIcon(u32l resourceId) {
     icon* iconPointer = static_cast<icon*>(Query(resourceId));
     if (iconPointer != NULL) {
@@ -136,6 +143,7 @@ class icon* resourceManager::GetIcon(u32l resourceId) {
     }
 }
 
+VA(0x004b8360, 0xbf)
 class tileset* resourceManager::GetTileset(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
@@ -149,10 +157,12 @@ class tileset* resourceManager::GetTileset(char* name) {
     }
 }
 
+VA(0x004b8420, 0xf)
 class mouse* resourceManager::GetMouse(char*) {
     return NULL;
 }
 
+VA(0x004b8430, 0xbf)
 class font* resourceManager::GetFont(char* name) {
     u32l resourceId = MakeId(name, 1);
     resource* fontEntry = Query(resourceId);
@@ -166,6 +176,7 @@ class font* resourceManager::GetFont(char* name) {
     }
 }
 
+VA(0x004b84f0, 0xbf)
 class sample* resourceManager::GetSample(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
@@ -179,6 +190,7 @@ class sample* resourceManager::GetSample(char* name) {
     }
 }
 
+VA(0x004b85b0, 0xbf)
 class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
     u32l id = MakeId(name, 1);
     resource* r = Query(id);
@@ -192,6 +204,7 @@ class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
     }
 }
 
+VA(0x004b8670, 0x75)
 void resourceManager::Dispose(class resource* resourceToDispose) {
     if (m_expunging != 0)
         return;
@@ -206,6 +219,7 @@ void resourceManager::Dispose(class resource* resourceToDispose) {
     }
 }
 
+VA(0x004b86f0, 0x43)
 void resourceManager::AddResource(class resource* newResource) {
     if (m_resourceListHead == NULL) {
         m_resourceListHead = newResource;
@@ -216,6 +230,7 @@ void resourceManager::AddResource(class resource* newResource) {
     }
 }
 
+VA(0x004b8740, 0x7e)
 void resourceManager::Expunge(void) {
     m_expunging = 1;
     resource* currentResource = m_resourceListHead;
@@ -229,6 +244,7 @@ void resourceManager::Expunge(void) {
     m_expunging = 0;
 }
 
+VA(0x004b87c0, 0x37)
 class resource* resourceManager::Query(u32l resourceId) {
     resource* cursorResource = m_resourceListHead;
     while (cursorResource != NULL && cursorResource->m_id != resourceId) {
@@ -237,10 +253,12 @@ class resource* resourceManager::Query(u32l resourceId) {
     return cursorResource;
 }
 
+VA(0x004b8800, 0xf)
 MessageDispatchResult resourceManager::Main(struct tag_message&) {
     return MESSAGE_DISPATCH_CONTINUE;
 }
 
+VA(0x004b8810, 0x7d)
 i32 resourceManager::Open(i32 priority) {
     if (LoadAggregateHeader(EXPANSION_AGGREGATE_NAME) != LOAD_SUCCESS)
         return LOAD_ERROR;
@@ -254,6 +272,7 @@ i32 resourceManager::Open(i32 priority) {
     return LOAD_SUCCESS;
 }
 
+VA(0x004b8890, 0x61)
 void resourceManager::RemoveResource(class resource* resourceToRemove) {
     if (m_resourceListHead == resourceToRemove) {
         m_resourceListHead = resourceToRemove->m_next;
@@ -270,6 +289,7 @@ void resourceManager::RemoveResource(class resource* resourceToRemove) {
     }
 }
 
+VA(0x004b8900, 0xaf)
 void resourceManager::Close(void) {
     i32 aggregateIndex;
     if (m_active != 1)
@@ -288,6 +308,7 @@ void resourceManager::Close(void) {
     m_active = false;
 }
 
+VA(0x004b89b0, 0x138)
 i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     i16 fileCountBuffer[FILE_COUNT_BUFFER_WORDS];
     i32 aggregateFile;
@@ -314,6 +335,7 @@ i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
     return LOAD_SUCCESS;
 }
 
+VA(0x004b8af0, 0xf8)
 void resourceManager::PointToFile(u32l fileId) {
     char isFound = 0;
     i32 entryIndex;
@@ -347,6 +369,7 @@ void resourceManager::PointToFile(u32l fileId) {
         lseek(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate][entryIndex].offset, 0);
 }
 
+VA(0x004b8bf0, 0xd6)
 u32l resourceManager::GetFileSize(u32l fileId) {
     char isFound = 0;
     i32 entryIndex;
@@ -380,18 +403,21 @@ u32l resourceManager::GetFileSize(u32l fileId) {
     return m_aggregateDir[matchedAggregate][entryIndex].size;
 }
 
+VA(0x004b8cd0, 0x50)
 void resourceManager::SavePosition(void) {
     lastPositionZ[iSaveCtr] = tell(m_aggregateFd[m_curAggregate]);
     lastAggZ[iSaveCtr] = m_curAggregate;
     iSaveCtr = iSaveCtr + 1;
 }
 
+VA(0x004b8d20, 0x51)
 void resourceManager::RestorePosition(void) {
     iSaveCtr = iSaveCtr - 1;
     m_curAggregate = lastAggZ[iSaveCtr];
     lseek(m_aggregateFd[m_curAggregate], lastPositionZ[iSaveCtr], 0);
 }
 
+VA(0x004b8d80, 0x59)
 i8 resourceManager::ReadByte(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 703);
     i8 value = 0;
@@ -405,6 +431,7 @@ i8 resourceManager::ReadByte(void) {
     return value;
 }
 
+VA(0x004b8de0, 0x5c)
 i16 resourceManager::ReadWord(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 732);
     i16 value = 0;
@@ -418,6 +445,7 @@ i16 resourceManager::ReadWord(void) {
     return value;
 }
 
+VA(0x004b8e40, 0x5c)
 i32l resourceManager::ReadLong(void) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 760);
     i32l value = 0;
@@ -431,6 +459,7 @@ i32l resourceManager::ReadLong(void) {
     return value;
 }
 
+VA(0x004b8ea0, 0xa0)
 u32l resourceManager::MakeId(char* name, i32 translate) {
     strcpy(m_lastFileName, name);
     if (gbUseEvilInterface != 0 && translate != 0) {
@@ -445,10 +474,12 @@ u32l resourceManager::MakeId(char* name, i32 translate) {
     return result;
 }
 
+VA(0x004b8f40, 0x1b)
 void resourceManager::Read13(i8* destination) {
     ReadBlock(destination, RESOURCE_MANAGER_READ13_BYTES);
 }
 
+VA(0x004b8f60, 0x9b)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
     H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 816);
     PollSound();

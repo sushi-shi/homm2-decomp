@@ -34,6 +34,7 @@ i32l lLastMIDIPollTickCount = 0;
 static SMidiText gMidiText =
     {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
 
+VA(0x004c57d0, 0x51)
 void soundManager::MIDIStartup(void) {
     i32 i;
     LogStr(gMidiText.startupBegin);
@@ -53,6 +54,7 @@ void soundManager::MIDIStartup(void) {
     }
 }
 
+VA(0x004c5830, 0xf0)
 void soundManager::MIDIShutdown(void) {
     i32 i;
     if (gbNoSound == 0 && m_midiReady != 0) {
@@ -76,6 +78,7 @@ void soundManager::MIDIShutdown(void) {
     }
 }
 
+VA(0x004c5920, 0x17b)
 void soundManager::MIDIPlay(i32 midiTrack) {
     if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED) {
         LogStr(gMidiText.playBegin);
@@ -112,6 +115,7 @@ void soundManager::MIDIPlay(i32 midiTrack) {
     }
 }
 
+VA(0x004c5aa0, 0xe7)
 inline void soundManager::MIDIStop(void) {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
         if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
@@ -129,6 +133,7 @@ inline void soundManager::MIDIStop(void) {
     }
 }
 
+VA(0x004c5b90, 0x56)
 inline i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
@@ -137,6 +142,7 @@ inline i32 soundManager::MIDIIsPlaying(void) {
     return 0;
 }
 
+VA(0x004c5bf0, 0x8f)
 inline void soundManager::MIDISetVolume(void) {
     if (gbNoSound == 0 && m_midiReady != 0) {
         i32 volume = MAX_VOLUME;
@@ -152,6 +158,7 @@ inline void soundManager::MIDISetVolume(void) {
     }
 }
 
+// @remove
 void soundManager::MIDIPoll(void) {}
 
 class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
