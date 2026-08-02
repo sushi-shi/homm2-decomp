@@ -62,7 +62,6 @@ def main(argv=None):
     if cmd == "build":
         if AUDITS:
             if sh("python3", "-m", "homm2.build.annotated_functions", "--check"): return 1
-            if sh("python3", "-m", "homm2.build.runtime_fid", "--check"): return 1
         if sh("python3", "configure.py"): return 1
         if sh("ninja", *rest): return 1
         # Relocation field validation consumes the objdiff report. Generate it
