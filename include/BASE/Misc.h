@@ -79,8 +79,8 @@ void ProcessAssert(i32 condition, char* file, i32 line);
 // Gold 2.1 abandoned the file/line debug allocator: BaseAlloc/BaseFree are
 // still compiled into Misc but have zero retail callers - every allocation
 // site lowers to plain operator new/delete (435/524 direct calls image-wide).
-#define H2_ALLOC(size) ::operator new(size)
-#define H2_FREE(ptr) ::operator delete(ptr)
+#define H2_ALLOC(size) static_cast<void*>(new u8[size])
+#define H2_FREE(ptr) delete (ptr)
 #define H2_ASSERT(condition, originalFile, originalLine)                                           \
     ProcessAssert(condition, originalFile, originalLine)
 char* FindStringInString(char* text, char* pattern);
