@@ -10,7 +10,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#pragma intrinsic(strcpy, strcat, strlen, memcpy)
 
 #define True 1
 #define False 0
@@ -739,8 +738,8 @@ VA(0x004c8370, 0x49)
 Int32 NORMALISE(Int32 p) {
     return IF_THEN_ELSE(
         ((p) < 0),
-        (lastPP + (p)),
-        IF_THEN_ELSE(((lastPP > (p)) == False), ((p)-lastPP), (p))
+        ((p) + lastPP),
+        IF_THEN_ELSE(((p) >= lastPP), ((p)-lastPP), (p))
     );
 }
 
@@ -1295,7 +1294,7 @@ void undoReversibleTransformation(void) {
 
 #define SPOT_BASIS_STEP 8000
 
-VA(0x004c99a0, 0x14f)
+VA(0x004c99a0, 0x173)
 void spotBlock(Bool weAreCompressing) {
     Int32 spotPos, delta, updatedDelta;
 
