@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| hero::DoSSLevelDialog local + icon-frame expr | `skillLevelText`; `skills[...] + skill * STRIDE - BASE` | `skillText`; `skill * STRIDE + skills[...] - BASE` | OPEN |
+| combatManager::EffectSpellCreateCreature locals + imul | `spellPowerValue/creatureType`; `fightValue * IDX(type)` | `spellPower/monType`; `IDX(monType) * fightValue` | OPEN |
+| combatManager::Main timers + FP factor + army decl | `KBTickCount() > glTimers[...]` (x2); `mod[speed] * DELAY`; `army* currentArmy` in bare block | `glTimers[...] < KBTickCount()`; `DELAY * mod[speed]`; `army* currentArmy;` hoisted to fn top (goto forbids initialized decl; hoist also moves it into the outer frame group - inner-block locals slot AFTER outer ones) | OPEN |
 | advManager::SetTownContext locals + two compares | `currentTownValue/contextValue7`; `m_currentTerrain != cast(ctx)`; `page + 3 - 1 < ctx` | `tp/townNo`; `cast(townNo) != m_currentTerrain`; `townNo > page + 3 - 1` | OPEN |
 | dpnet_init locals + guest loop | `enumerateFunction/result`; `giNumHumanPlayers > guestIndex` | `dpEnumerate/rc`; `guestIndex < giNumHumanPlayers` | OPEN |
 | army::GetBestDirection compares | source-first (`sCC < tC` etc.); `leftFlag == isMovingRight` | target-first (`tC > sCC`, `tC != sCC`, `tRV > sR`, `tRV != sR`); `isMovingRight == leftFlag` | OPEN - slot 8-perm residual parked: no natural rename satisfies b(down)<=b(tCol)<=b(sCol)<b(left)<=b(up)<=b(tRow)<=b(sRow)<b(right) |
