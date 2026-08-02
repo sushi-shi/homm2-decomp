@@ -343,7 +343,7 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
 
     smallR = bigR / smallT;
 
-    smallR_x_smallL = smallL * smallR;
+    smallR_x_smallL = smallR * smallL;
     bigL = bigL + smallR_x_smallL;
 
     if (smallH < smallT)
@@ -359,8 +359,8 @@ void arithCodeSymbol(BitStream* bs, Model* m, Int32 symbol) {
 
 VA(0x004c7520, 0xf8)
 Int32 arithDecodeSymbol(BitStream* bs, Model* m) {
-    UInt32 smallL, target, smallH, smallT, smallR,
-        smallR_x_smallL, symbol;
+    UInt32 smallL, smallH, smallT, smallR;
+    UInt32 smallR_x_smallL, target, symbol;
 
     smallT = m->totFreq;
 
@@ -996,25 +996,25 @@ void qsortFull(Int32 left, Int32 right) {
     Int32 sp = 0;
 
     Int32 wuL = left;
-    Int32 wuR1 = right;
+    Int32 wuR = right;
 
     while (True) {
 
-        if (wuR1 - wuL > ISORT_BELOW) {
+        if (wuR - wuL > ISORT_BELOW) {
 
-            wuC = (wuL + wuR1) >> 1;
+            wuC = (wuL + wuR) >> 1;
             if (fullGt(zptr[RC(wuL)], zptr[RC(wuC)]))
                 SWAP(wuL, wuC);
-            if (fullGt(zptr[RC(wuL)], zptr[RC(wuR1)]))
-                SWAP(wuL, wuR1);
-            if (fullGt(zptr[RC(wuC)], zptr[RC(wuR1)]))
-                SWAP(wuC, wuR1);
+            if (fullGt(zptr[RC(wuL)], zptr[RC(wuR)]))
+                SWAP(wuL, wuR);
+            if (fullGt(zptr[RC(wuC)], zptr[RC(wuR)]))
+                SWAP(wuC, wuR);
 
-            SWAP(wuC, wuR1 - 1);
-            pivot = zptr[RC(wuR1 - 1)];
+            SWAP(wuC, wuR - 1);
+            pivot = zptr[RC(wuR - 1)];
 
             i = wuL;
-            j = wuR1 - 1;
+            j = wuR - 1;
             for (;;) {
                 do
                     i++;
@@ -1025,23 +1025,23 @@ void qsortFull(Int32 left, Int32 right) {
                 if (i < j)
                     SWAP(i, j) else break;
             }
-            SWAP(i, wuR1 - 1);
+            SWAP(i, wuR - 1);
 
-            if ((i - wuL) > (wuR1 - i)) {
+            if ((i - wuL) > (wuR - i)) {
                 stackL[sp] = wuL;
                 stackR[sp] = i - 1;
                 sp++;
                 wuL = i + 1;
             } else {
                 stackL[sp] = i + 1;
-                stackR[sp] = wuR1;
+                stackR[sp] = wuR;
                 sp++;
-                wuR1 = i - 1;
+                wuR = i - 1;
             }
 
         } else {
 
-            for (i = wuL + 1; i <= wuR1; i++) {
+            for (i = wuL + 1; i <= wuR; i++) {
                 v = zptr[RC(i)];
                 j = i;
                 while (fullGt(zptr[RC(j - 1)], v)) {
@@ -1057,7 +1057,7 @@ void qsortFull(Int32 left, Int32 right) {
                 return;
             sp--;
             wuL = stackL[sp];
-            wuR1 = stackR[sp];
+            wuR = stackR[sp];
         }
     }
 }
@@ -1088,25 +1088,25 @@ Bool trivialGt(Int32 i1, Int32 i2) {
 
 VA(0x004c9220, 0xf4)
 void shellTrivial(void) {
-    Int32 i, j, h, bigN2;
+    Int32 i, j, h, bigN;
     Int32 v;
 
-    Int32 ptrLo5 = 0;
-    Int32 ptrHi7 = last;
-    bigN2 = ptrHi7 - ptrLo5 + 1;
+    Int32 ptrLo = 0;
+    Int32 ptrHi = last;
+    bigN = ptrHi - ptrLo + 1;
     h = 1;
     do {
         h = 3 * h + 1;
-    } while (!(h > bigN2));
+    } while (!(h > bigN));
     do {
         h = h / 3;
-        for (i = ptrLo5 + h; i <= ptrHi7; i++) {
+        for (i = ptrLo + h; i <= ptrHi; i++) {
             v = zptr[i];
             j = i;
             while (trivialGt(zptr[j - h], v)) {
                 zptr[j] = zptr[j - h];
                 j = j - h;
-                if (j <= (ptrLo5 + h - 1))
+                if (j <= (ptrLo + h - 1))
                     goto zero;
             }
         zero:
@@ -1201,10 +1201,10 @@ void sortIt(void) {
 
                 Int32 freqHere = ftab[i + 1] - ftab[i];
 
-                if (freqHere >= loBound && hiBound >= freqHere) {
+                if (freqHere >= loBound && freqHere <= hiBound) {
                     Int32 j, k;
                     Int32 lower = ftab[i];
-                    Int32 upper5 = ftab[i + 1] - 1;
+                    Int32 upper = ftab[i + 1] - 1;
 
                     candNo++;
                     notDone -= freqHere;
@@ -1222,10 +1222,10 @@ void sortIt(void) {
                         LogStr(gText);
                     }
 
-                    qsortFull(lower, upper5);
+                    qsortFull(lower, upper);
 
                     if (freqHere < 65535) {
-                        for (j = lower, k = 0; j <= upper5; j++, k++) {
+                        for (j = lower, k = 0; j <= upper; j++, k++) {
                             Int32 a2update = zptr[j];
                             SETREST16(a2update, k);
                             if (a2update < (4 * NUM_FULLGT_UNROLLINGS))
@@ -1505,23 +1505,23 @@ VA(0x004c9ff0, 0x257)
 void compressStream(FILE* stream, FILE* zStream) {
     IntNative retVal;
     Bool thisIsTheLastBlock;
-    BitStream* zbs2;
+    BitStream* zbs;
     UInt32 crcToSend;
     Int32 blockNo = 1;
 
     bytesIn = 0;
     bytesOut = 0;
 
-    zbs2 = bsOpenWriteStream(zStream);
+    zbs = bsOpenWriteStream(zStream);
 
-    bsPutUChar(zbs2, 'B');
-    bsPutUChar(zbs2, 'Z');
-    bsPutUChar(zbs2, '0');
-    bsPutUChar(zbs2, '0' + blockSize100k);
+    bsPutUChar(zbs, 'B');
+    bsPutUChar(zbs, 'Z');
+    bsPutUChar(zbs, '0');
+    bsPutUChar(zbs, '0' + blockSize100k);
 
     initialiseCRC();
     initBogusModel();
-    arithCodeStartEncoding(zbs2);
+    arithCodeStartEncoding(zbs);
 
     do {
         if (veryVerbose) {
@@ -1532,18 +1532,18 @@ void compressStream(FILE* stream, FILE* zStream) {
         thisIsTheLastBlock = loadAndRLEsource(stream);
         spotBlock(True);
         doReversibleTransformation();
-        moveToFrontCodeAndSend(zbs2, thisIsTheLastBlock);
+        moveToFrontCodeAndSend(zbs, thisIsTheLastBlock);
     } while (!thisIsTheLastBlock);
 
     crcToSend = getFinalCRC();
-    putUInt32(zbs2, crcToSend);
+    putUInt32(zbs, crcToSend);
     if (veryVerbose) {
         sprintf(gText, "\nCRC = 0x%x\n", crcToSend);
         LogStr(gText);
     }
 
-    arithCodeDoneEncoding(zbs2);
-    bsClose(zbs2);
+    arithCodeDoneEncoding(zbs);
+    bsClose(zbs);
     ERROR_IF_NOT_ZERO(ferror(stream));
     retVal = fclose(stream);
     ERROR_IF_EOF(retVal);
@@ -1584,20 +1584,20 @@ void compressStream(FILE* stream, FILE* zStream) {
 VA(0x004ca250, 0x233)
 Bool uncompressStream(FILE* zStream, FILE* stream) {
     Bool thisIsTheLastBlock;
-    BitStream* zbs02;
+    BitStream* zbs;
     Int32 magic1, magic2, magic3, magic4;
     UInt32 crcStored, crcComputed;
     Int32 currBlockNo;
     IntNative retVal;
 
-    zbs02 = (bsOpenReadStream(zStream));
+    zbs = (bsOpenReadStream(zStream));
 
-    magic1 = (Int32)bsGetUChar(zbs02);
-    magic2 = (Int32)bsGetUChar(zbs02);
-    magic3 = (Int32)bsGetUChar(zbs02);
-    magic4 = (Int32)bsGetUChar(zbs02);
+    magic1 = (Int32)bsGetUChar(zbs);
+    magic2 = (Int32)bsGetUChar(zbs);
+    magic3 = (Int32)bsGetUChar(zbs);
+    magic4 = (Int32)bsGetUChar(zbs);
     if (magic1 != 'B' || magic2 != 'Z' || magic3 != '0' || magic4 < '1' || magic4 > '9') {
-        bsClose(zbs02);
+        bsClose(zbs);
         retVal = fclose(stream);
         ERROR_IF_EOF(retVal);
         FreeDecompressStructures();
@@ -1607,7 +1607,7 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     setDecompressStructureSizes(magic4 - '0');
     initialiseCRC();
     initBogusModel();
-    arithCodeStartDecoding(zbs02);
+    arithCodeStartDecoding(zbs);
 
     if (veryVerbose) {
         sprintf(gText, "  ");
@@ -1620,7 +1620,7 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
             sprintf(gText, "[%d: ac+mtf ", currBlockNo);
             LogStr(gText);
         }
-        thisIsTheLastBlock = getAndMoveToFrontDecode(zbs02);
+        thisIsTheLastBlock = getAndMoveToFrontDecode(zbs);
         if (veryVerbose)
             LogStr("rt ");
         undoReversibleTransformation();
@@ -1635,7 +1635,7 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     if (veryVerbose)
         LogStr(" ");
 
-    crcStored = getUInt32(zbs02);
+    crcStored = getUInt32(zbs);
     crcComputed = getFinalCRC();
     if (veryVerbose) {
         sprintf(gText, "CRCs: stored = 0x%x, computed = 0x%x\n  ", crcStored, crcComputed);
@@ -1644,8 +1644,8 @@ Bool uncompressStream(FILE* zStream, FILE* stream) {
     if (crcStored != crcComputed)
         crcError(crcStored, crcComputed);
 
-    arithCodeDoneDecoding(zbs02);
-    bsClose(zbs02);
+    arithCodeDoneDecoding(zbs);
+    bsClose(zbs);
     ERROR_IF_NOT_ZERO(ferror(stream));
     retVal = fclose(stream);
     ERROR_IF_EOF(retVal);
@@ -1819,7 +1819,7 @@ VA(0x004ca800, 0xa4)
 void compress(Char* name) {
     FILE* inStr;
     FILE* outStr;
-    IntNative retVal3;
+    IntNative retVal;
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1833,15 +1833,15 @@ void compress(Char* name) {
     compressStream(inStr, outStr);
     outputHandleJustInCase = NULL;
 
-    retVal3 = remove(inName);
+    retVal = remove(inName);
 }
 
 VA(0x004ca8b0, 0xc2)
 void uncompress(Char* name) {
     FILE* inStr;
-    FILE* outStr2;
+    FILE* outStr;
     Bool magicNumberOK;
-    IntNative retVal3;
+    IntNative retVal;
 
     strcpy(inName, name);
     strcpy(outName, name);
@@ -1849,15 +1849,15 @@ void uncompress(Char* name) {
         outName[strlen(outName) - 3] = '\0';
 
     inStr = fopen(inName, "rb");
-    outStr2 = fopen(outName, "wb");
+    outStr = fopen(outName, "wb");
 
     errno = 0;
-    outputHandleJustInCase = outStr2;
-    magicNumberOK = uncompressStream(inStr, outStr2);
+    outputHandleJustInCase = outStr;
+    magicNumberOK = uncompressStream(inStr, outStr);
     outputHandleJustInCase = NULL;
 
-    retVal3 = remove(inName);
-    ERROR_IF_NOT_ZERO(retVal3);
+    retVal = remove(inName);
+    ERROR_IF_NOT_ZERO(retVal);
 }
 
 VA(0x004ca980, 0x259)
