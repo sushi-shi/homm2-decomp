@@ -41,8 +41,11 @@ public:
     mapCell* Row(i32 y) {
         return &cells[y * width];
     }
+    mapCell* Column(i32 x) {
+        return &cells[x];
+    }
     void Cell(mapCell*& cell, i32 x, i32 y) {
-        cell = cells + y * width + x;
+        cell = cells + x + y * width;
     }
     mapCell* GetCell(i32 x, i32 y) {
         return cells + y * width + x;

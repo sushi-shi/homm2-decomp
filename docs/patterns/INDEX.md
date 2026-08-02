@@ -12,3 +12,4 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [loop-exit-in-header-chain](loop-exit-in-header-chain.md) | direct jcc to loop exit (no jmp stub) → break condition lives in the loop header chain |
 | [od-slot-solve](od-slot-solve.md) | byte-identical except swapped ebp displacements → solve local-name buckets, never grind |
 | [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) | jmp-to-jmp at a loop back edge → if/else inside the loop, not `continue` |
+- [inline-call-operand-index-first](inline-call-operand-index-first.md) - ptr-side-first vs inline-accessor index-first; zero-arm ternary sbb

@@ -59,14 +59,14 @@ void fullMap::ClearCellExtra(i32 index) {
 
 VA(0x00472290, 0x113)
 i32 fullMap::GetNewCellExtraIndex(void) {
-    i32 nb;
+    i32 n;
     mapCellExtra* i;
     i32 j;
 
-    for (nb = 1; nb < extraCount; nb++) {
-        if (extras[nb].nextIndex == MAPCELL_EXTRA_FREE) {
-            ClearCellExtra(nb);
-            return nb;
+    for (n = 1; n < extraCount; n++) {
+        if (extras[n].nextIndex == MAPCELL_EXTRA_FREE) {
+            ClearCellExtra(n);
+            return n;
         }
     }
     i = static_cast<mapCellExtra*>(
@@ -94,7 +94,7 @@ void fullMap::Write(i32 handle) {
 VA(0x004726f9, 0x258)
 void fullMap::Read(i32 handle, i32 convert) {
     i32 nb;
-    oldMapCell* tmp;
+    oldMapCell* tmp1;
     i32 x, y;
     oldMapCellExtra* tmp2;
 
@@ -102,12 +102,12 @@ void fullMap::Read(i32 handle, i32 convert) {
     read(handle, &height, sizeof(height));
     Init(width, height);
     if (convert) {
-        tmp = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
-        read(handle, tmp, width * height * sizeof(oldMapCell));
+        tmp1 = static_cast<oldMapCell*>(H2_ALLOC(width * height * sizeof(oldMapCell)));
+        read(handle, tmp1, width * height * sizeof(oldMapCell));
         for (x = 0; x < width; x++)
             for (y = 0; y < height; y++)
-                memcpy(cells + width * y + x, tmp + width * y + x, sizeof(mapCell));
-        delete tmp;
+                memcpy(cells + x + y * width, tmp1 + x + y * width, sizeof(mapCell));
+        delete tmp1;
     } else {
         read(handle, cells, width * height * sizeof(mapCell));
     }
@@ -133,13 +133,13 @@ mapCellExtra* fullMap::GetNewCellExtraOverlay(i32 x, i32 y) {
     i32 ni;
     mapCell* cell;
 
-    if (Row(y)[x].m_extraIndex == 0) {
+    if (Column(x)[y * width].m_extraIndex == 0) {
         Cell(cell, x, y);
         cell->m_extraIndex = GetNewCellExtraIndex();
-        return Extra(Row(y)[x].m_extraIndex);
+        return &extras[Column(x)[y * width].m_extraIndex];
     } else {
-        ix = Row(y)[x].m_extraIndex;
-        node = Extra(Row(y)[x].m_extraIndex);
+        ix = Column(x)[y * width].m_extraIndex;
+        node = &extras[Column(x)[y * width].m_extraIndex];
         for (;;) {
             if (node->overlayIndex == MAPCELL_SPRITE_NONE)
                 return node;
@@ -163,13 +163,13 @@ mapCellExtra* fullMap::GetNewCellExtraObject(i32 x, i32 y) {
     i32 ni;
     mapCell* cell;
 
-    if (Row(y)[x].m_extraIndex == 0) {
+    if (Column(x)[y * width].m_extraIndex == 0) {
         Cell(cell, x, y);
         cell->m_extraIndex = GetNewCellExtraIndex();
-        return Extra(Row(y)[x].m_extraIndex);
+        return &extras[Column(x)[y * width].m_extraIndex];
     } else {
-        ix = Row(y)[x].m_extraIndex;
-        node = Extra(Row(y)[x].m_extraIndex);
+        ix = Column(x)[y * width].m_extraIndex;
+        node = &extras[Column(x)[y * width].m_extraIndex];
         for (;;) {
             if (node->objectIndex == MAPCELL_SPRITE_NONE)
                 return node;
@@ -199,13 +199,10 @@ void fullMap::ChangeTilesetIndex(
     i32 idx;
     mapCellExtra* ptr;
     TilesetId t;
-    i32 dummy;
+    i32 a;
 
     ptr = NULL;
-    if (index == MAPCELL_SPRITE_NONE)
-        t = TILESET_NONE;
-    else
-        t = tileset;
+    t = index != MAPCELL_SPRITE_NONE ? tileset : TILESET_NONE;
 
     if (overlay == 0) {
         if (cell->m_objectIndex != MAPCELL_SPRITE_NONE && cell->m_objectTileset != tileset) {
