@@ -218,15 +218,15 @@ void dpSendMessage(
     void* data
 ) {
     u8* message = static_cast<u8*>(H2_ALLOC(size + 1));
-    i32 result;
+    i32 status;
 
     message[0] = static_cast<u8>(type);
     if (size != 0)
         memcpy(message + 1, data, size);
-    result = lpIDC->Send(dcoID, destination, 0, message, size + 1);
-    if (result != RESULT_OK && result != RESULT_INVALID_PLAYER
-        && result != RESULT_INVALID_ARGUMENT) {
-        DPSD(result, RETAIL_FILE, 268);
+    status = lpIDC->Send(dcoID, destination, 0, message, size + 1);
+    if (status != RESULT_OK && status != RESULT_INVALID_PLAYER
+        && status != RESULT_INVALID_ARGUMENT) {
+        DPSD(status, RETAIL_FILE, 268);
     }
     H2_FREE(message);
 }
