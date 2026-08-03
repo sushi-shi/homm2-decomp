@@ -114,13 +114,13 @@ class palette* resourceManager::GetPalette(char* name) {
 
 VA(0x004b81c0, 0xbf)
 class bitmap* resourceManager::GetBitmap(char* name) {
-    u32l id = MakeId(name, 1);
-    resource* r = Query(id);
+    u32l fileId = MakeId(name, 1);
+    resource* r = Query(fileId);
     if (r != NULL) {
         r->m_refCount++;
         return static_cast<bitmap*>(r);
     } else {
-        r = new bitmap(id);
+        r = new bitmap(fileId);
         AddResource(r);
         return static_cast<bitmap*>(r);
     }
@@ -193,8 +193,8 @@ class sample* resourceManager::GetSample(char* name) {
 
 VA(0x004b85b0, 0xbf)
 class MIDIWrap* resourceManager::GetMIDIWrap(char* name) {
-    u32l id = MakeId(name, 1);
-    resource* r = Query(id);
+    u32l fileId = MakeId(name, 1);
+    resource* r = Query(fileId);
     if (r != NULL) {
         r->m_refCount++;
         return static_cast<MIDIWrap*>(r);

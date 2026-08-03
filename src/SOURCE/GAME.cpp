@@ -5555,7 +5555,7 @@ void game::GiveArmy(
     i32 count,
     i32 slot
 ) {
-    i32 tmp;
+    i32 swap;
     i32 i;
     if (slot >= 0) {
         i = slot;

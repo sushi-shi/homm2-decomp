@@ -298,12 +298,12 @@ BASE/RESMGR	?Dispose@resourceManager@@QAEXPAVresource@@@Z	100.0000	79a97f40642b
 BASE/RESMGR	?Expunge@resourceManager@@QAEXXZ	100.0000	c35a005a2ab4
 BASE/RESMGR	?GetBackdrop@resourceManager@@QAEXPADPAVbitmap@@H@Z	100.0000	54373e347c8e
 BASE/RESMGR	?GetBackdropAtLoc@resourceManager@@QAEXPADPAVbitmap@@HHH@Z	100.0000	06806672a511
-BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	99.8103	c9616af5e50e
+BASE/RESMGR	?GetBitmap@resourceManager@@QAEPAVbitmap@@PAD@Z	100.0000	71f4e19ab996
 BASE/RESMGR	?GetFileSize@resourceManager@@QAEKK@Z	99.9855	d1ec0c366758
 BASE/RESMGR	?GetFont@resourceManager@@QAEPAVfont@@PAD@Z	100.0000	24639c89b94a
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@K@Z	100.0000	9db8c493385a
 BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	cc622d98232b
-BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	99.8276	558a5ef5a0e4
+BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	100.0000	268a593c7129
 BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	e0f03c8cd0f2
 BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	100.0000	90a68b5c7904
 BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	94.6379	05e40129d696
@@ -831,7 +831,7 @@ SOURCE/GAME	?GetRandomNumTroops@game@@QAEHH@Z	100.0000	36b3e8300577
 SOURCE/GAME	?GetSkipCopyLen@@YIHPAEPAH@Z	100.0000	4fe990de15b2
 SOURCE/GAME	?GetTownId@game@@QAEHHH@Z	100.0000	a6734c706f5b
 SOURCE/GAME	?GetWorldMapData@game@@QAEPAVfullMap@@XZ	100.0000	b8638cb6a3d1
-SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	99.7121	8da0a91274d4
+SOURCE/GAME	?GiveArmy@game@@QAEXPAVarmyGroup@@HHH@Z	100.0000	e383c470475e
 SOURCE/GAME	?GiveTroopsToNeutralTown@game@@QAEXH@Z	53.4302	481a934af3c3
 SOURCE/GAME	?GiveTroopsToNeutralTowns@game@@QAEXXZ	100.0000	8d7b98889e8e
 SOURCE/GAME	?HasLateOverlay@game@@QAEHHH@Z	100.0000	a465bec97499
@@ -1213,7 +1213,7 @@ SOURCE/SETUP	?SetupComPort@game@@QAEHXZ	100.0000	b7fb09399646
 SOURCE/SETUP	?SetupComPortHandler@@YIHAAUtag_message@@@Z	100.0000	329b15b18517
 SOURCE/SETUP	?SetupGame@game@@QAEHXZ	100.0000	fc4b6c98af0d
 SOURCE/SETUP	?SetupGameHandler@@YIHAAUtag_message@@@Z	100.0000	2254483287f5
-SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	99.8533	e21b730fe738
+SOURCE/SETUP	?SetupHotSeatGame@game@@QAEHXZ	99.7533	fea259920e1d
 SOURCE/SETUP	?SetupHotSeatGameHandler@@YIHAAUtag_message@@@Z	100.0000	e43d4ead0b03
 SOURCE/SETUP	?SetupModemGame@game@@QAEHXZ	100.0000	00755bfa2e5a
 SOURCE/SETUP	?SetupModemGameHandler@@YIHAAUtag_message@@@Z	100.0000	a1b11c032192
