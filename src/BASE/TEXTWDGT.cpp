@@ -88,10 +88,8 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
     switch (msg.type) {
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            i16 relativeX =
-                static_cast<i16>(msg.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
-            i16 relativeY =
-                static_cast<i16>(msg.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
+            i32 relativeX = msg.payload.mouse.x - m_owner->m_posX;
+            i32 relativeY = msg.payload.mouse.y - m_owner->m_posY;
             if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                 || relativeY >= m_y + m_height)
                 return MESSAGE_DISPATCH_CONTINUE;
