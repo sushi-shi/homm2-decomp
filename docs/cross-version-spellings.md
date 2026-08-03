@@ -27,6 +27,9 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| combatManager::Resurrect five sites | `m_initialQuantity < m_quantity`; `count == index+1`; `A<B?A:B` min-ternary; two FP/index orders | `m_quantity > m_initialQuantity`; `index+1 == count`; `REVERSE<frames?REVERSE:frames`; FIZZLE_DELAY const-first | OPEN - slot residual parked |
+| combatManager::VaporizeCreature stripe writes | `gyModify[row*W + firstY + top]`; `gyModify[lastY + (row*-W - bottom)]` | `*(row*W + gyModify + firstY + top)`; `*(gyModify - row*W - bottom + lastY)` (computed-term-first flat sums; simple loads canonicalize, muls do not) | OPEN - slot residual parked |
+| combatManager::TurnToStone limit increment | `++m_limitCreatureCount[side][index]` | retail reads m_index FIRST - no plain respelling reproduces it (flat + and commuted-bracket both canonicalize identically); PERMUTER matrix queued (accessor-introduction arm) | OPEN - parked |
 | fullMap::GetCell inline body | `cells + y * width + x` | `&Column(x)[y * width]` (nested-inline: y*width via this-temp first, x*12, cells - the retail shape at ~119 call sites; fuzzy +0.3% TU-wide, 0 drops) | OPEN - test under 4.2 |
 | game::HasLateOverlay cell fetch | `WORLDMAP->Row(row) + col` | `WORLDMAP->GetCell(col, row)` | OPEN |
 | ComputeUALoc probe reads | `gpGame->m_worldMap.Row(y)[x].f` (x4) | `gpGame->m_worldMap.GetCell(x, y)->f` | OPEN - slot residual parked |
