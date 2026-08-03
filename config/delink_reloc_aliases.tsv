@@ -20,6 +20,8 @@ function_rva	target_rva	site_rva	owner	addend	occurrences
 0x1f943	0xfa476	0x1f9d6	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0x16	1
 0x2174e	0xfa476	0x2178b	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0x16	1
 0x217a8	0xfa476	0x217e5	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0x16	1
+0x21a96	0xfa46a	0x21af8	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0xa	1
+0x21a96	0xfa46a	0x21b12	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0xa	1
 0x29ff2	0xfa468	0x2a0e0	?gMonsterDatabase@@3PAUtag_monsterInfo@@A	0x8	1
 0x2b346	0x12630e	0x2b365	?gConfig@@3UconfigStruct@@A	0x12e	1
 0x2b346	0x126254	0x2b384	?gConfig@@3UconfigStruct@@A	0x74	1

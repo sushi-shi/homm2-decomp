@@ -27,6 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| slot-solve batch 2 | PoL names | GetOutOfItMask armyIndex2/bit1/mask5/currentArmy10 -> idx/bitMask/result/currentArmy (GetStrength family echo); IsHomogeneous nRaces/last -> numRaces/prev | OPEN as slot-name class |
 | slot-solve batch 1 (8 fns) | PoL names | GetMoveShowIt directionX/Y->dx/dy; GetSSLevel bonus/ssLevel; DemobilizeCurrHero hp/cell; StopOnTrigger trigger->special (bucket model mispredicts 'metadata' on VC6); RandomizeBarrier idx->index; CanBuy idx->r; NumOfGivenArtifact jj hoisted to fn top; InitializePasswords jj->j + table-read mirror | OPEN as slot-name class |
 | combatManager::EffectSpellCure six sites | `index != targetIndex`; fightValue-cast leading FP chain; `fightValue * m_quantity`; `>= MAX ? MAX : X` duration ternaries; `IDX(m_currentSide) == sideWork` (x2) | `targetIndex != index`; `cast(curePoints) * MODIFIER * fightValue`; `m_quantity * fightValue`; `< MAX ? X : MAX`; `sideWork == IDX(m_currentSide)` | OPEN - slot residual parked |
 | combatManager::ProcessCombatMsg switch layout | case order as in source | retail lays inner-switch case bodies in a DIFFERENT order (jump-table targets differ; first body is the m_?f2c3 member call, ours is the 0/1 local store) + one member/local mirror | OPEN - PARKED for body-diff pass: needs jump-table target mapping |
