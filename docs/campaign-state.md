@@ -26,28 +26,40 @@ BELOW the `this` spill (e.g. `this` at -0x18, temp at -0x1a) and stores
 to the destination ONCE; an if/else stores twice. So *retail frame
 LARGER than ours* is the tell. Queue: 53 fns >=80%, every one +4.
 
-## OPEN MODEL QUESTION: where does `this` spill? (blocks 74 slot solves)
+## RESOLVED: the /Od frame layout, and the `this`-slot counter
 
-`od_slots` assumes `this` spills LAST (deepest slot). Retail contradicts
-that. `army::AttackTo` (0x41d509), frame 0x10 on both sides:
+Settled with two probe TUs compiled by the real VC6 (scratchpad
+`probe.cpp` / `probe2.cpp`; same names, different decl order, then same
+decl order, different names). Result:
 
-    retail:  mov [ebp-0x0c], ecx     <- `this` is the THIRD slot
-             ... a named local lives at [ebp-0x10], deeper than `this`
-    ours:    mov [ebp-0x10], ecx     <- `this` last, as the model says
+    [ebp-0x4] ... named locals, sorted by (bucket(name), -decl_index)
+    ...       ... `this`, DEEPEST of the named group
+    ...       ... compiler temps, BELOW `this`
 
-Both are VC6 /Od builds of three same-named scalars, so a fixed
-"this-last" rule cannot produce both. Treating `this` as an ordinary
-hashed identifier does not resolve it either: `bucket('this')` is 11,
-which predicts retail's layout - but our own compile of those exact
-names disagrees with that prediction too. So the 4.2-derived `bucket()`
-is not reproducing VC6 here, exactly as CLAUDE.md warns.
+`od_slots.slot_order` reproduces the named-local order on VC6 exactly -
+it predicted both probes. `this` is always last of the named group; it
+is NOT hashed (`bucket('this')`=11 is a red herring).
 
-Consequence: 74 of the 102 pure slot-permutation functions are
-`__thiscall`, so their solves cannot be trusted to the model until this
-is settled by the `od-frames`/`od-oracle` harness on VC6 objects. Use
-the model to GENERATE candidate names, never to conclude - every solve
-so far (LogStr, TurnTo, GetPointer) was confirmed by compiling, and
-`AttackTo`'s model-blessed chain measured 23 -> 23 and was reverted.
+**So `this`'s slot is a COUNTER.** Retail spilling `this` at `[ebp-N]`
+means retail has exactly `N/4 - 1` named locals. If we have more, the
+extras are things retail never named - a ternary or an inlined call
+result that lives in a compiler temp below `this`. That is a direct,
+cheap detector, and it does not need any naming judgement.
+
+`army::AttackTo` is the worked example. Retail spills `this` at -0xc =
+two named locals; we had three. The third (`finishStanding`) is retail's
+ternary argument:
+
+    Walk(dir, pathIndex != 1 && stepCount < m_monster.speed ? 0 : 1, ...)
+
+Dropping the variable took it 23 -> 14 diffs, and the last 14 were an
+ordinary two-slot swap: `pathIndex` had to precede the step counter, so
+`numSteps`(bucket 0) became `stepCount`(9), tying with `pathIndex`(9)
+and letting the later declaration win the tie. EXACT.
+
+(My earlier note here claimed retail contradicted od_slots and that this
+blocked 74 solves. That was wrong on both counts - the model is right,
+and the `this` position is a useful signal rather than an obstacle.)
 
 ## Negative result: the dead-local class is EXHAUSTED
 
