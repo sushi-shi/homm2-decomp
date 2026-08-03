@@ -67,6 +67,37 @@ and in `philAI::EvaluateMineEvent` (0x8b4c3)
 All three sites closed with the pointer form; the subscript form is one
 instruction longer and puts the wrong term in the SIB index.
 
+## The scaled-element variant: `n * sizeof(T) + p` vs `&p[n]`
+
+When the element is not a byte, the subscript form must emit an `imul` for the
+scale, and the *pointer* stays in the accumulator. Writing the product as the
+LEFT operand of a plain `+` moves the accumulator to the index instead
+(`GetIconEntry`, RVA 0xc03d0, `sizeof(IconEntry) == 13`):
+
+```
+ours  return &iconPtr->Entries()[index];        retail
+--------------------------------------------   --------------------------------------------
+8b 45 f8     mov  eax, [ebp-8]   ; iconPtr      8b 45 f8     mov  eax, [ebp-8]   ; index
+8b 48 12     mov  ecx, [eax+0x12]                6b c0 0d     imul eax, eax, 0xd
+89 4d fc     mov  [ebp-4], ecx   ; accessor $T  8b 4d fc     mov  ecx, [ebp-4]   ; iconPtr
+8b 55 f4     mov  edx, [ebp-0xc] ; index        8b 51 12     mov  edx, [ecx+0x12]
+6b d2 0d     imul edx, edx, 0xd                 03 c2        add  eax, edx
+8b 45 fc     mov  eax, [ebp-4]
+03 c2        add  eax, edx
+```
+
+Two tells: retail's frame is 8 bytes (the two param spills only — no inline
+accessor temp), and `add` accumulates into the *product*, not the pointer.
+
+```cpp
+VA(0x004c03d0, 0x1e)
+struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
+    return reinterpret_cast<struct IconEntry*>(index * sizeof(IconEntry) + iconPtr->m_data);
+}
+```
+
+EXACT.
+
 **Related.** When the pointer side is an *inlined accessor call* the rule
 flips again and the SUBSCRIPT is evaluated first — see
 [inline-call-operand-index-first](inline-call-operand-index-first.md), which

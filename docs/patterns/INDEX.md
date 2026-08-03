@@ -25,3 +25,4 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [struct-return-temp-vs-scalar-typedef](struct-return-temp-vs-scalar-typedef.md) | ours-only `mov [$T],eax; mov eax,[$T]` after a `?AU<name>@@`-returning call → `<name>` is a scalar typedef in retail, not a 1-member struct |
 | [flat-map-index-pointer-form](flat-map-index-pointer-form.md) | `base + x` accumulated with `y*W` in the SIB → the source is `*(p + x + y*W)`, not `p[x + y*W]` |
 | [fp-relational-mask](fp-relational-mask.md) | `testb $0x41` vs `testb $0x1` after `fcomp` → the mask names the source relational; `a > b` and `b < a` are different bytes |
+| [bool-expression-return-temp](bool-expression-return-temp.md) | predicate returns `mov eax,[slot]` and stores `0` before `1` → source is `return (A&&B)\|\|(C&&D);`, not `if (...) return 1; return 0;` |

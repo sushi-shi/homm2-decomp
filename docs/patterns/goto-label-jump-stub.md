@@ -42,5 +42,64 @@ Wrapping the tail in `for(;;)`, `while(1)`, `do{}while(0)` or appending a dead
 (VC6 drops the unreachable back edge), so the stub can only come from a live
 `goto`.
 
+## Reading it in reverse: stubs on OUR side mean our `goto` is retail's `break`
+
+The rule is one stub per live `goto` statement, parked in source order right
+before the epilogue. Counting them therefore counts the source's gotos.
+`DataEntryWindowHandler` (0xc0a50) had five `goto normalEvent;` exits and one
+structural fall-through; retail has the opposite:
+
+```
+ours (5x goto normalEvent)                 retail
+------------------------------------       ------------------------------------
+; each exit site                           ; each exit site
+e9 79 01 00 00  jmp <stub_i>               0f 85 5d 01 00 00  jne <normalEvent>
+...                                        e9 43 01 00 00     jmp <normalEvent>
+36a6: mov ecx,[ebp-8]                      365b: mov ecx,[ebp-8]
+      call EventWindowHandler                    call EventWindowHandler
+36ae: eb 0c  jmp <epilogue>                3663: eb 05  jmp <epilogue>
+36b0: eb f4  jmp 36a6   ; stub_1           3665: e9 f9 fe ff ff jmp <gotText>
+36b2: eb f2  jmp 36a6   ; stub_2                 ; the ONE goto in the function
+36b4: eb f0  jmp 36a6   ; stub_3
+36b6: eb ee  jmp 36a6   ; stub_4
+36b8: eb ec  jmp 36a6   ; stub_5
+36ba: eb ea  jmp 36a6   ; stub_6
+36bc: mov esp, ebp ...                     366a: mov esp, ebp ...
+```
+
+Retail reaches `EventWindowHandler` with *direct* `jne`/`jmp`s and keeps a
+single stub for a jump the other way. So the exits are not gotos: they are the
+end of an `if` whose body is everything up to that call, plus `break`s out of
+the switches nested inside it, and the one stub is a real
+`goto` into a `case` label. What closed it:
+
+```cpp
+    if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT) {
+        ++bDataEntryTime;
+        goto gotText;                       /* the only goto -> the only stub */
+    }
+    if (message.type == MESSAGE_WIDGET) {   /* jne straight to the tail call  */
+        switch (message.payload.widget.command) {
+            case WIDGET_COMMAND_DESELECT:
+                switch (message.payload.widget.id) { case ENTRY_CANCEL_BUTTON: ... }
+                break;                      /* direct jmp to the tail call    */
+            case WIDGET_COMMAND_SELECT:
+                switch (message.payload.widget.id) {
+                    case ENTRY_TEXT_WIDGET:
+                    gotText:
+                        ...
+                        if (strlen(...) == 0)
+                            break;          /* direct jmp to the tail call    */
+                }
+        }
+    }
+    return EventWindowHandler(message);
+```
+
+An implicit switch default (no `default:` clause) targets the end of that
+switch, so when the innermost switch is the last statement of the last case of
+the outer switch, and that switch is the last statement of the `if`, all four
+"give up" edges collapse onto one address — which is why retail needs no stubs.
+
 Related: [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) is the same
 jmp-to-jmp shape produced by if/else nesting rather than by a label id.

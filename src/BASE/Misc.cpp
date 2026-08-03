@@ -11,7 +11,7 @@
 #include <BASE/textEntryWidget.h>
 #include <BASE/Misc.h>
 
-#define MISC_REGISTRY_KEY "SOFTWARE\\New World Computing\\Heroes of Might and Magic 2\\1.0"
+#define MISC_REGISTRY_KEY "SOFTWARE\\Buka\\3DO\\Heroes of Might and Magic Platinum\\1.000"
 #include <BASE/MiscEnums.h>
 H2_ENUM_BEGIN(DataEntryLayout)
     WINDOW_X                    = 0xb1,
@@ -20,11 +20,12 @@ H2_ENUM_BEGIN(DataEntryLayout)
     PROMPT_WIDTH                = 240,
     PROMPT_LINE_HEIGHT          = 16,
     CANCEL_PROMPT_HEIGHT        = 39,
-    ROW_ROUNDING_BIAS           = 15,
+    ROW_TOP_MARGIN              = 40,
+    ROW_ROUNDING_BIAS           = 25,
     ROW_HEIGHT                  = 45,
     MAX_ROW_COUNT               = 6,
     CANCEL_Y_OFFSET             = 30,
-    ENTRY_BASE_Y                = 95,
+    ENTRY_BASE_Y                = 50,
     WINDOW_NAME_CAPACITY        = 16,
     TEXT_BUFFER_CAPACITY        = 100,
     TEXT_FIELD_X                = 35,
@@ -366,101 +367,93 @@ u32l MAKEFILEID(char* text) {
 VA(0x004bd9f0, 0xe7)
 i32 FindIndex(struct indexArray* entries, i32 low, i32 high, i32 key) {
     giFindMid = (low + high) >> 1;
-    while (high - low > 1) {
-        i32 value = entries[giFindMid].key;
-        if (value > key) {
-            high = giFindMid;
+    while (1) {
+        if (high - low > 1) {
+            if (key < entries[giFindMid].key)
+                high = giFindMid;
+            else if (key > entries[giFindMid].key)
+                low = giFindMid;
+            else
+                return entries[giFindMid].value;
         } else {
-            low = giFindMid;
-            if (value >= key)
+            if (key == entries[low].key)
                 return entries[low].value;
+            if (key == entries[high].key)
+                return entries[high].value;
+            return INDEX_NOT_FOUND;
         }
         giFindMid = (low + high) >> 1;
     }
-    if (entries[low].key == key) {
-        return entries[low].value;
-    }
-    if (entries[high].key == key) {
-        return entries[high].value;
-    }
-    return INDEX_NOT_FOUND;
 }
 
 #include <BASE/MiscGraphicsConstants.h>
 
 VA(0x004bdae0, 0x1af)
 void FadeIn(i32 increment) {
-    palette* fadePalette = new palette;
-    if (fadePalette == NULL)
+    i32 done, i, j, delayTime, threshold;
+    palette* pal = new palette;
+    if (pal == NULL)
         MemError();
-    i32 done = 0;
+    done = 0;
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memset(fadePalette->m_data, 0, MISC_PALETTE_BYTE_COUNT);
-    i32 level = 0;
-    for (;;) {
-        if (level >= MISC_PALETTE_LEVEL_COUNT) {
-            if (done) {
-                delete fadePalette;
-                return;
-            }
-            level = MISC_PALETTE_MAX_LEVEL;
-        }
-        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
+    memset(pal->m_data, 0, MISC_PALETTE_BYTE_COUNT);
+    for (i = 0; i < MISC_PALETTE_LEVEL_COUNT; i += increment) {
+    fadeStep:
+        delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        i8* colors;
-        if (level == MISC_PALETTE_MAX_LEVEL) {
+        if (i == MISC_PALETTE_MAX_LEVEL) {
             done = 1;
-            colors = gpBufferPalette->m_data;
+            UpdatePalette(gpBufferPalette->m_data);
         } else {
-            i32 threshold = MISC_PALETTE_MAX_LEVEL - level;
-            for (i32 i = 0; i < MISC_PALETTE_BYTE_COUNT; ++i) {
-                i8 color = gpBufferPalette->m_data[i];
-                if (color > threshold)
-                    fadePalette->m_data[i] = color - threshold;
+            threshold = MISC_PALETTE_MAX_LEVEL - i;
+            for (j = 0; j < MISC_PALETTE_BYTE_COUNT; ++j) {
+                if (gpBufferPalette->m_data[j] > threshold)
+                    pal->m_data[j] = gpBufferPalette->m_data[j] - threshold;
             }
-            colors = fadePalette->m_data;
+            UpdatePalette(pal->m_data);
         }
-        UpdatePalette(colors);
-        DelayTil(&delayUntil);
-        level += increment;
+        DelayTil(&delayTime);
     }
+    if (done == 0) {
+        i = MISC_PALETTE_MAX_LEVEL;
+        goto fadeStep;
+    }
+    delete pal;
 }
 
 VA(0x004bdc90, 0x1b2)
 void FadeOut(i32 increment) {
-    palette* fadePalette = new palette;
-    if (fadePalette == NULL)
+    i32 done, i, j, delayTime;
+    palette* pal = new palette;
+    if (pal == NULL)
         MemError();
-    i32 done = 0;
+    done = 0;
     if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0)
         increment *= WINDOWED_FADE_INCREMENT_SCALE;
-    memcpy(fadePalette->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
-    i32 level = 0;
-    for (;;) {
-        if (level >= FADE_LEVEL_COUNT) {
-            if (done) {
-                delete fadePalette;
-                return;
-            }
-            level = FADE_LEVEL_LAST;
-        }
-        i32 delayUntil = KBTickCount() + FADE_FRAME_DELAY;
+    memcpy(pal->m_data, gpBufferPalette->m_data, MISC_PALETTE_BYTE_COUNT);
+    for (i = 0; i < FADE_LEVEL_COUNT; i += increment) {
+    fadeStep:
+        delayTime = KBTickCount() + FADE_FRAME_DELAY;
         PollSound();
-        if (level == FADE_LEVEL_LAST)
+        if (i == FADE_LEVEL_LAST)
             done = 1;
-        for (i32 i = 0; i < PALETTE_DATA_SIZE; ++i) {
-            if (fadePalette->m_data[i] > 0) {
-                if (fadePalette->m_data[i] > increment)
-                    fadePalette->m_data[i] -= increment;
+        for (j = 0; j < PALETTE_DATA_SIZE; ++j) {
+            if (pal->m_data[j] > 0) {
+                if (pal->m_data[j] > increment)
+                    pal->m_data[j] -= increment;
                 else
-                    fadePalette->m_data[i] = 0;
+                    pal->m_data[j] = 0;
             }
         }
-        UpdatePalette(fadePalette->m_data);
-        level += increment;
-        DelayTil(&delayUntil);
+        UpdatePalette(pal->m_data);
+        DelayTil(&delayTime);
     }
+    if (done == 0) {
+        i = FADE_LEVEL_LAST;
+        goto fadeStep;
+    }
+    delete pal;
 }
 
 VA(0x004bde50, 0x40)
@@ -490,39 +483,31 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
 
 VA(0x004bdf10, 0x75)
 char* FindStringInString(char* text, char* pattern) {
-    i32 pattern_len = strlen(pattern);
-    i32 count = (strlen(text)) - pattern_len + 1;
-    i32 i = 0;
-    if (count > 0) {
-        do {
-            if (strncmp(text + i, pattern, pattern_len) == 0)
-                return text + i;
-            ++i;
-        } while (count > i);
+    i32 iLen = strlen(text);
+    i32 patternLen = strlen(pattern);
+    for (i32 i = 0; i < iLen - patternLen + 1; ++i) {
+        if (strncmp(text + i, pattern, patternLen) == 0)
+            return text + i;
     }
     return NULL;
 }
 
 VA(0x004bdf90, 0x56)
 char* FindToken(char* text, char token) {
-    i32 len = strlen(text);
-    i32 i = 0;
-    if (len > 0) {
-        do {
-            if (text[i] == token)
-                return text + i;
-            ++i;
-        } while (len > i);
+    i32 iLen = strlen(text);
+    for (i32 i = 0; i < iLen; ++i) {
+        if (*(text + i) == token)
+            return text + i;
     }
     return NULL;
 }
 
 VA(0x004bdff0, 0x56)
 char* FindLastToken(char* text, char token) {
-    for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        if (text[i] == token) {
+    i32 iLen = strlen(text);
+    for (i32 i = iLen - 1; i >= 0; --i) {
+        if (*(text + i) == token)
             return text + i;
-        }
     }
     return NULL;
 }
@@ -597,25 +582,25 @@ void SetGameDefaults(void) {
 
 VA(0x004be340, 0xcb)
 void ReadPrefsFromFile(void) {
+    i32 result;
+    FILE* file;
+
     sprintf(gText, "%s", "HEROES2.CFG");
     if (access(gText, 0) == -1) {
-        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        strcpy(gConfig.autoLoadName, "AUTO");
-        strcpy(gConfig.autoSaveName, "AUTO");
-        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
+        SetInstallDefaults();
+        SetGameDefaults();
+        WritePrefs();
     } else {
-        FILE* f = fopen(gText, "rb");
-        if (f == NULL)
+        file = fopen(gText, "rb");
+        if (file == NULL)
             FileError(gText);
-        fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, f);
-        fclose(f);
-        if (gConfig.needsDefaultInitialization == 0)
-            goto skipDefaults;
+        fread(&gConfig, CONFIG_PERSISTED_SIZE, 1, file);
+        result = fclose(file);
+        if (gConfig.needsDefaultInitialization != 0) {
+            SetGameDefaults();
+            WritePrefs();
+        }
     }
-    SetGameDefaults();
-    UpdateSystemOptionsMenu();
-    WritePrefsToRegistry();
-skipDefaults:
     strcpy(gcRegCDRomPath, "");
     strcpy(gcRegAppPath, "");
 }
@@ -631,429 +616,426 @@ H2_ENUM_END(RegistryValueSize)
 
 VA(0x004be410, 0x89f)
 void ReadPrefsFromRegistry(void) {
+    DWORD dwcbData;
     HKEY hKey;
-    DWORD dwType;
-    DWORD dwSize;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
     char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
+    LONG lRet;
+    DWORD dwType;
 
-    strcpy(szScratch, "");
     strcpy(szKey, MISC_REGISTRY_KEY);
     hKey = NULL;
-    if (RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey) != 0)
-        return;
-    dwSize = REGISTRY_DWORD_BYTES;
-    if (RegQueryValueExA(
+    lRet = RegCreateKeyA(HKEY_LOCAL_MACHINE, szKey, &hKey);
+    if (lRet == 0) {
+        dwcbData = REGISTRY_DWORD_BYTES;
+        if (RegQueryValueExA(
+                hKey,
+                "HMM2POL MusicVolume",
+                NULL,
+                &dwType,
+                reinterpret_cast<u8*>(&gConfig.musicVolume),
+                &dwcbData
+            )
+            != 0) {
+            memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
+            SetInstallDefaults();
+            SetGameDefaults();
+            RegCloseKey(hKey);
+            WritePrefs();
+            return;
+        }
+        RegQueryValueExA(
             hKey,
-            "Music Volume",
+            "HMM2POL MusicVolume",
             NULL,
             &dwType,
             reinterpret_cast<u8*>(&gConfig.musicVolume),
-            &dwSize
-        )
-        != 0) {
-        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        memset(&gConfig, 0, CONFIG_PERSISTED_SIZE);
-        strcpy(gConfig.autoLoadName, "AUTO");
-        strcpy(gConfig.autoSaveName, "AUTO");
-        gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
-        SetGameDefaults();
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL FXVolume",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.soundVolume),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL WalkSpeed",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ComputerWalkSpeed",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ShowRoute",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.showRoute),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL BlackoutComputer",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.blackoutComputer),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL SoundQuality",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.musicSource),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL UseOpera",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.useOpera),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL DirectConnectComPort",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL DirectConnectBaudRate",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ModemComPort",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ModemBaudRate",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+            &dwcbData
+        );
+        dwcbData = MODEM_INIT_STRING_SIZE + 1;
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ModemInitString",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(gConfig.modemInitString),
+            &dwcbData
+        );
+        dwcbData = REGISTRY_DWORD_BYTES;
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL UniqueSystemID",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(gConfig.uniqueSystemID),
+            &dwcbData
+        );
+        gConfig.uniqueSystemID[UNIQUE_ID_TERMINATOR_INDEX] = 0;
+        dwcbData = NETWORK_DEFAULT_NAME_SIZE + 1;
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL NetName",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(gConfig.networkDefaultName),
+            &dwcbData
+        );
+        dwcbData = REGISTRY_DWORD_BYTES;
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL UseAutosave",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.autosave),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL SlowVideo",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.slowVideo),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CombatShowGrid",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.showCombatGrid),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CombatShowMouseHex",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CombatGridLevel",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CombatViewArmyLevel",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EvilInterfaceUsage",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL AutoCombat",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CombatSpeed",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.combatSpeed),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL AutoCombatSpells",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL FirstMapOffset",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.firstMapOffset),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL CurrentMapOffset",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.currentMapOffset),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL ShowObjectBoxes",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorAnimateScreen",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorPaletteCycling",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameShowMenu",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameWindowXLeft",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameWindowYTop",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameWindowWidth",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameWindowHeight",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameFullScreen",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL GameColorMouseCursor",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorShowMenu",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorWindowXLeft",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorWindowYTop",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorWindowWidth",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorWindowHeight",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorFullScreen",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+            &dwcbData
+        );
+        RegQueryValueExA(
+            hKey,
+            "HMM2POL EditorColorMouseCursor",
+            NULL,
+            &dwType,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+            &dwcbData
+        );
+        dwcbData = MODEM_INIT_STRING_SIZE + 1;
+        if (RegQueryValueExA(
+                hKey,
+                "PathPL2",
+                NULL,
+                &dwType,
+                reinterpret_cast<u8*>(gcRegAppPath),
+                &dwcbData
+            )
+            != 0)
+            strcpy(gcRegAppPath, "");
+        if (RegQueryValueExA(
+                hKey,
+                "HMM2POL CDDrive",
+                NULL,
+                &dwType,
+                reinterpret_cast<u8*>(gcRegCDRomPath),
+                &dwcbData
+            )
+            != 0)
+            strcpy(gcRegCDRomPath, "");
         RegCloseKey(hKey);
-        UpdateSystemOptionsMenu();
-        WritePrefsToRegistry();
-        return;
+        if (gConfig.gfx[IDX(giCurExe)].width <= 0)
+            gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
+        if (gConfig.gfx[IDX(giCurExe)].height <= 0)
+            gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
+        if (gConfig.gfx[IDX(giCurExe)].x < 0)
+            gConfig.gfx[IDX(giCurExe)].x = 0;
+        if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
+            gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
+        if (gConfig.gfx[IDX(giCurExe)].y < 0)
+            gConfig.gfx[IDX(giCurExe)].y = 0;
+        if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
+            gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
     }
-    RegQueryValueExA(
-        hKey,
-        "Music Volume",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.musicVolume),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Sound Volume",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.soundVolume),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Walk Speed",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.walkSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Computer Walk Speed",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Show Route",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showRoute),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Blackout Computer",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Sound Quality",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.musicSource),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Use Opera",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.useOpera),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Direct Connect Com Port",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Direct Connect Baud Rate",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Modem Com Port",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Modem Baud Rate",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
-        &dwSize
-    );
-    dwSize = MODEM_INIT_STRING_SIZE + 1;
-    RegQueryValueExA(
-        hKey,
-        "Modem Init String",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.modemInitString),
-        &dwSize
-    );
-    dwSize = REGISTRY_DWORD_BYTES;
-    RegQueryValueExA(
-        hKey,
-        "Unique System ID",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.uniqueSystemID),
-        &dwSize
-    );
-    gConfig.uniqueSystemID[UNIQUE_ID_TERMINATOR_INDEX] = 0;
-    dwSize = NETWORK_DEFAULT_NAME_SIZE + 1;
-    RegQueryValueExA(
-        hKey,
-        "Network Default Name",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(gConfig.networkDefaultName),
-        &dwSize
-    );
-    dwSize = REGISTRY_DWORD_BYTES;
-    RegQueryValueExA(
-        hKey,
-        "Autosave",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.autosave),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Slow Video",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.slowVideo),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Show Combat Grid",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showCombatGrid),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Show Combat Mouse Hex",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Combat Shade Level",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Combat Army Info Level",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Evil Interface Usage",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Quick Combat Level",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Combat Speed",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.combatSpeed),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Auto Combat Use Spells",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "First Map Offset",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.firstMapOffset),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Current Map Offset",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.currentMapOffset),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Show Object Boxes",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Screen Animation",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Palette Cycling",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Show Menu",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game X",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Y",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Width",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Height",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Full Screen",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Main Game Color Mouse Cursor",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Show Menu",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor X",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Y",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Width",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Height",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Full Screen",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
-        &dwSize
-    );
-    RegQueryValueExA(
-        hKey,
-        "Editor Color Mouse Cursor",
-        NULL,
-        &dwType,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
-        &dwSize
-    );
-    dwSize = MODEM_INIT_STRING_SIZE + 1;
-    if (RegQueryValueExA(
-            hKey,
-            "AppPath",
-            NULL,
-            &dwType,
-            reinterpret_cast<u8*>(gcRegAppPath),
-            &dwSize
-        )
-        != 0)
-        strcpy(gcRegAppPath, "");
-    if (RegQueryValueExA(
-            hKey,
-            "CDDrive",
-            NULL,
-            &dwType,
-            reinterpret_cast<u8*>(gcRegCDRomPath),
-            &dwSize
-        )
-        != 0)
-        strcpy(gcRegCDRomPath, "");
-    RegCloseKey(hKey);
-    if (gConfig.gfx[IDX(giCurExe)].width <= 0)
-        gConfig.gfx[IDX(giCurExe)].width = MINIMUM_WINDOW_WIDTH;
-    if (gConfig.gfx[IDX(giCurExe)].height <= 0)
-        gConfig.gfx[IDX(giCurExe)].height = MINIMUM_WINDOW_HEIGHT;
-    if (gConfig.gfx[IDX(giCurExe)].x < 0)
-        gConfig.gfx[IDX(giCurExe)].x = 0;
-    if (gConfig.gfx[IDX(giCurExe)].x > giMainVideoModeHeight - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[IDX(giCurExe)].x = giMainVideoModeHeight - WINDOW_POSITION_MARGIN;
-    if (gConfig.gfx[IDX(giCurExe)].y < 0)
-        gConfig.gfx[IDX(giCurExe)].y = 0;
-    if (gConfig.gfx[IDX(giCurExe)].y > giMainVideoModeWidth - WINDOW_POSITION_MARGIN)
-        gConfig.gfx[IDX(giCurExe)].y = giMainVideoModeWidth - WINDOW_POSITION_MARGIN;
 }
 
 VA(0x004becb0, 0xa8)
@@ -1089,366 +1071,366 @@ VA(0x004bedd0, 0x4cb)
 void WritePrefsToRegistry(void) {
     HKEY hKey;
     char szKey[REGISTRY_TEXT_BUFFER_SIZE];
-    char szScratch[REGISTRY_TEXT_BUFFER_SIZE];
+    LONG lRet;
 
-    strcpy(szScratch, "");
     strcpy(szKey, MISC_REGISTRY_KEY);
     hKey = NULL;
-    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey) != 0)
-        return;
-    RegSetValueExA(
-        hKey,
-        "Music Volume",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.musicVolume),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Sound Volume",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.soundVolume),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Walk Speed",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.walkSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Computer Walk Speed",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Show Route",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showRoute),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Blackout Computer",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.blackoutComputer),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Sound Quality",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.musicSource),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Use Opera",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.useOpera),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Direct Connect Com Port",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Direct Connect Baud Rate",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Modem Com Port",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Modem Baud Rate",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Modem Init String",
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.modemInitString),
-        MODEM_INIT_STRING_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        "Unique System ID",
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.uniqueSystemID),
-        UNIQUE_SYSTEM_ID_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        "Network Default Name",
-        0,
-        REG_SZ,
-        reinterpret_cast<u8*>(gConfig.networkDefaultName),
-        NETWORK_DEFAULT_NAME_SIZE
-    );
-    RegSetValueExA(
-        hKey,
-        "Autosave",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.autosave),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Slow Video",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.slowVideo),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Show Combat Grid",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showCombatGrid),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Show Combat Mouse Hex",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Combat Shade Level",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Combat Army Info Level",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Evil Interface Usage",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Quick Combat Level",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Combat Speed",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.combatSpeed),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Auto Combat Use Spells",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "First Map Offset",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.firstMapOffset),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Current Map Offset",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.currentMapOffset),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Show Object Boxes",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Screen Animation",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Palette Cycling",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Show Menu",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game X",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Y",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Width",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Height",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Full Screen",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Main Game Color Mouse Cursor",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Show Menu",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor X",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Y",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Width",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Height",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Full Screen",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
-        REGISTRY_DWORD_BYTES
-    );
-    RegSetValueExA(
-        hKey,
-        "Editor Color Mouse Cursor",
-        0,
-        REG_DWORD,
-        reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
-        REGISTRY_DWORD_BYTES
-    );
-    RegCloseKey(hKey);
+    lRet = RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_ALL_ACCESS, &hKey);
+    if (lRet == 0) {
+        RegSetValueExA(
+            hKey,
+            "HMM2POL MusicVolume",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.musicVolume),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL FXVolume",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.soundVolume),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL WalkSpeed",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.walkSpeed),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ComputerWalkSpeed",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.computerWalkSpeed),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ShowRoute",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.showRoute),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL BlackoutComputer",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.blackoutComputer),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL SoundQuality",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.musicSource),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL UseOpera",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.useOpera),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL DirectConnectComPort",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_DIRECT)]),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL DirectConnectBaudRate",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_DIRECT)]),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ModemComPort",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.comPort[IDX(CONFIG_CONNECTION_MODEM)]),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ModemBaudRate",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.baudRate[IDX(CONFIG_CONNECTION_MODEM)]),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ModemInitString",
+            0,
+            REG_SZ,
+            reinterpret_cast<u8*>(gConfig.modemInitString),
+            MODEM_INIT_STRING_SIZE
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL UniqueSystemID",
+            0,
+            REG_SZ,
+            reinterpret_cast<u8*>(gConfig.uniqueSystemID),
+            UNIQUE_SYSTEM_ID_SIZE
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL NetName",
+            0,
+            REG_SZ,
+            reinterpret_cast<u8*>(gConfig.networkDefaultName),
+            NETWORK_DEFAULT_NAME_SIZE
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL UseAutosave",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.autosave),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL SlowVideo",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.slowVideo),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CombatShowGrid",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.showCombatGrid),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CombatShowMouseHex",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.showCombatMouseHex),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CombatGridLevel",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.combatShadeLevel),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CombatViewArmyLevel",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.combatArmyInfoLevel),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EvilInterfaceUsage",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.evilInterfaceUsage),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL AutoCombat",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.quickCombatLevel),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CombatSpeed",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.combatSpeed),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL AutoCombatSpells",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.autoCombatUseSpells),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL FirstMapOffset",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.firstMapOffset),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL CurrentMapOffset",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.currentMapOffset),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL ShowObjectBoxes",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.showObjectBoxes),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorAnimateScreen",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.editorScreenAnimation),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorPaletteCycling",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.editorPaletteCycling),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameShowMenu",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].showMenu),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameWindowXLeft",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].x),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameWindowYTop",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].y),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameWindowWidth",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].width),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameWindowHeight",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].height),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameFullScreen",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL GameColorMouseCursor",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].colorMouseCursor),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorShowMenu",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].showMenu),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorWindowXLeft",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].x),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorWindowYTop",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].y),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorWindowWidth",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].width),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorWindowHeight",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].height),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorFullScreen",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].fullScreen),
+            REGISTRY_DWORD_BYTES
+        );
+        RegSetValueExA(
+            hKey,
+            "HMM2POL EditorColorMouseCursor",
+            0,
+            REG_DWORD,
+            reinterpret_cast<u8*>(&gConfig.gfx[IDX(CONFIG_EXECUTABLE_EDITOR)].colorMouseCursor),
+            REGISTRY_DWORD_BYTES
+        );
+        RegCloseKey(hKey);
+    }
 }
 
 VA(0x004bf2a0, 0xf)
@@ -1460,22 +1442,27 @@ void WritePrefs(void) {
 VA(0x004bf2b0, 0x3f)
 i32 IsCDDrive(i32 driveIndex) {
     sprintf(gText, "A:\\");
-    gText[0] = gText[0] + driveIndex;
+    gText[0] += driveIndex;
     return GetDriveTypeA(gText) == DRIVE_CDROM;
 }
 
 VA(0x004bf2f0, 0x7b)
 bool DriveSupportsFreeSpaceQuery(char driveLetter) {
-    char rootPath[CD_DRIVE_QUERY_PATH_SIZE];
-    ULARGE_INTEGER availableBytes;
-    ULARGE_INTEGER totalBytes;
+    UINT oldMode;
+    char szPath[CD_DRIVE_QUERY_PATH_SIZE];
+    ULARGE_INTEGER availToCaller;
+    ULARGE_INTEGER total;
     ULARGE_INTEGER freeBytes;
 
-    wsprintfA(rootPath, "%c:", driveLetter);
-    UINT previousErrorMode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    BOOL result = GetDiskFreeSpaceExA(rootPath, &availableBytes, &totalBytes, &freeBytes);
-    SetErrorMode(previousErrorMode);
-    return result != 0;
+    wsprintfA(szPath, "%c:", driveLetter);
+    oldMode = SetErrorMode(SEM_FAILCRITICALERRORS);
+    if (GetDiskFreeSpaceExA(szPath, &availToCaller, &total, &freeBytes) != 0) {
+        SetErrorMode(oldMode);
+        return true;
+    } else {
+        SetErrorMode(oldMode);
+        return false;
+    }
 }
 
 VA(0x004bf370, 0x35f)
@@ -1555,7 +1542,7 @@ H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
                         );
                         RegSetValueExA(
                             key,
-                            "CDDrive",
+                            "HMM2POL CDDrive",
                             0,
                             REG_SZ,
                             reinterpret_cast<u8*>(registryPath),
@@ -1621,60 +1608,42 @@ void BlitBitmapToScreen(
     i32 destinationX,
     i32 destinationY
 ) {
-    i32 blitSourceX = sourceX;
     if (gbColorMice == 0) {
-        BlitBitmapToScreenVesa(
-            bmp,
-            blitSourceX,
-            sourceY,
-            width,
-            height,
-            destinationX,
-            destinationY
-        );
+        BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
         return;
     }
     if (giScrollX != 0 || giScrollY != 0) {
-        blitSourceX = giScrollX + BLIT_SCROLL_OFFSET;
+        sourceX = giScrollX + BLIT_SCROLL_OFFSET;
         width = BLIT_SCROLL_EXTENT;
         sourceY = giScrollY + BLIT_SCROLL_OFFSET;
         height = BLIT_SCROLL_EXTENT;
     }
-    gBlitRight = width + destinationX - 1;
-    gBlitBottom = height + destinationY - 1;
-    if (gpMouseManager->IsVis() != 0 && gBlitRight >= gpMouseManager->m_savedLeft
-        && gpMouseManager->m_cursorRight >= destinationX
-        && gBlitBottom >= gpMouseManager->m_savedTop
-        && gpMouseManager->m_cursorBottom >= destinationY) {
+    gBlitRight = destinationX + width - 1;
+    gBlitBottom = destinationY + height - 1;
+    if (gpMouseManager->IsVis() == 0 || gBlitRight < gpMouseManager->m_savedLeft
+        || destinationX > gpMouseManager->m_cursorRight
+        || gBlitBottom < gpMouseManager->m_savedTop
+        || destinationY > gpMouseManager->m_cursorBottom) {
+        BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
+    } else {
         gpMouseManager->SaveAndDraw();
-        BlitBitmapToScreenVesa(
-            bmp,
-            blitSourceX,
-            sourceY,
-            width,
-            height,
-            destinationX,
-            destinationY
-        );
-        if (gpMouseManager->m_cursorRight > gBlitRight || gpMouseManager->m_savedLeft < destinationX
-            || gpMouseManager->m_cursorBottom > gBlitBottom
-            || gpMouseManager->m_savedTop < destinationY) {
-            i32 savedY = gpMouseManager->m_savedTop;
-            i32 savedX = gpMouseManager->m_savedLeft;
+        BlitBitmapToScreenVesa(bmp, sourceX, sourceY, width, height, destinationX, destinationY);
+        if (gBlitRight < gpMouseManager->m_cursorRight
+            || destinationX > gpMouseManager->m_savedLeft
+            || gBlitBottom < gpMouseManager->m_cursorBottom
+            || destinationY > gpMouseManager->m_savedTop) {
             BlitBitmapToScreenVesa(
                 bmp,
-                savedX,
-                savedY,
-                gpMouseManager->m_cursorRight - savedX + 1,
-                gpMouseManager->m_cursorBottom - savedY + 1,
-                savedX,
-                savedY
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop,
+                gpMouseManager->m_cursorRight - gpMouseManager->m_savedLeft + 1,
+                gpMouseManager->m_cursorBottom - gpMouseManager->m_savedTop + 1,
+                gpMouseManager->m_savedLeft,
+                gpMouseManager->m_savedTop
             );
         }
         gpMouseManager->RestoreUnderlying();
-        return;
     }
-    BlitBitmapToScreenVesa(bmp, blitSourceX, sourceY, width, height, destinationX, destinationY);
 }
 VA(0x004bf990, 0x91)
 void LogTruncate(void) {
@@ -1804,46 +1773,43 @@ void AbsAiPrint(char* text) {
     giDebugLevel = saved;
 }
 
-static inline i32 FadeThreshold(i32 level, i32 increment) {
-    i32 index = MISC_PALETTE_LEVEL_COUNT - level - increment;
-    if (index < 0)
-        index = 0;
-    return giChangeThreshold[index];
-}
-
 VA(0x004bfd40, 0x19c)
 void FadeTo(u8* source, u8* destination, i32 increment) {
-    u8 colors[MISC_PALETTE_BYTE_COUNT];
-    memcpy(colors, source, sizeof(colors));
+    u8 temp[MISC_PALETTE_BYTE_COUNT];
+    u8 *current, *to;
+    i32 idx, change, diff, move, delay, iLevel, nextTime, k;
+
+    delay = FADE_TO_FRAME_DELAY;
+    memcpy(temp, source, MISC_PALETTE_BYTE_COUNT);
     increment >>= FADE_TO_INCREMENT_SHIFT;
-    if (increment < 1)
+    if (increment < 1) {
         increment = 1;
-    i32 level = FADE_TO_START_LEVEL;
-    do {
-        i32 delayUntil = KBTickCount() + FADE_TO_FRAME_DELAY;
+        delay *= WINDOWED_FADE_INCREMENT_SCALE;
+    }
+    for (iLevel = FADE_TO_START_LEVEL; iLevel < MISC_PALETTE_LEVEL_COUNT; iLevel += increment) {
+        nextTime = KBTickCount() + FADE_TO_FRAME_DELAY;
         PollSound();
-        i32 threshold = FadeThreshold(level, increment);
-        u8* current = colors;
-        u8* target = destination;
-        i32 count = MISC_PALETTE_BYTE_COUNT;
-        do {
-            i32 difference = static_cast<i32>(*target) - static_cast<i32>(*current);
-            i32 distance = difference < 0 ? -difference : difference;
-            if (distance > threshold) {
-                distance -= threshold;
-                if (difference > 0)
-                    *current += static_cast<u8>(distance);
+        idx = MISC_PALETTE_LEVEL_COUNT - iLevel - increment;
+        if (idx < 0)
+            idx = 0;
+        change = giChangeThreshold[idx];
+        current = temp;
+        to = destination;
+        for (k = 0; k < MISC_PALETTE_BYTE_COUNT; ++k) {
+            diff = *to - *current;
+            if (abs(diff) > change) {
+                move = abs(diff) - change;
+                if (diff > 0)
+                    *current = *current + move;
                 else
-                    *current -= static_cast<u8>(distance);
+                    *current = *current - move;
             }
             ++current;
-            ++target;
-            --count;
-        } while (count != 0);
-        UpdatePalette(reinterpret_cast<i8*>(colors));
-        DelayTil(&delayUntil);
-        level += increment;
-    } while (level < MISC_PALETTE_LEVEL_COUNT);
+            ++to;
+        }
+        UpdatePalette(reinterpret_cast<i8*>(temp));
+        DelayTil(&nextTime);
+    }
     UpdatePalette(reinterpret_cast<i8*>(destination));
 }
 
@@ -1885,87 +1851,96 @@ void FadeToColorTable(u8* colorTable, i32 increment) {
 
 VA(0x004c0050, 0x44)
 i32 IsCycleColor(i32 color) {
-    if ((color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
-        || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST)) {
-        return 1;
-    }
-    return 0;
-}
-
-static inline i32 PCXValueIsLiteral(u8 value) {
-    return (value & RLE_RUN_MARKER) != RLE_RUN_MARKER;
+    return (color >= CYCLE_RANGE_ONE_FIRST && color <= CYCLE_RANGE_ONE_LAST)
+        || (color >= CYCLE_RANGE_TWO_FIRST && color <= CYCLE_RANGE_TWO_LAST);
 }
 
 VA(0x004c00a0, 0x2a9)
 void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* paletteData) {
-    PCXHeader header;
-    memset(&header, 0, sizeof(header));
-    header.manufacturer = MANUFACTURER_ZSOFT;
-    header.version = VERSION_3_0;
-    header.encoding = ENCODING_RLE;
-    header.bitsPerPixel = BITS_PER_PIXEL;
-    header.xMax = static_cast<u16>(width - 1);
-    header.yMax = static_cast<u16>(height - 1);
-    header.planes = PLANE_COUNT;
-    header.bytesPerLine = static_cast<u16>(width);
-    header.paletteType = PALETTE_TYPE_COLOR;
-    i32 fileHandle = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (fileHandle == -1)
+    i32 fd;
+    i32 iLen;
+    u8 bMark;
+    u8 color;
+    i32 sourceIndex;
+    i32 x;
+    i32 y;
+    i32 endPos;
+    u8* rowPtr;
+    u8* encodedRow;
+    PCXHeader pcxHdr;
+    u8* palOut;
+    i32 runLength;
+
+    memset(&pcxHdr, 0, sizeof(pcxHdr));
+    pcxHdr.manufacturer = MANUFACTURER_ZSOFT;
+    pcxHdr.version = VERSION_3_0;
+    pcxHdr.encoding = ENCODING_RLE;
+    pcxHdr.bitsPerPixel = BITS_PER_PIXEL;
+    pcxHdr.xMax = static_cast<u16>(width - 1);
+    pcxHdr.yMax = static_cast<u16>(height - 1);
+    pcxHdr.planes = PLANE_COUNT;
+    pcxHdr.bytesPerLine = static_cast<u16>(width);
+    pcxHdr.paletteType = PALETTE_TYPE_COLOR;
+    fd = open(filename, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (fd == -1)
         return;
-    write(fileHandle, &header, sizeof(header));
-    u8* encodedRow =
-        static_cast<u8*>(H2_ALLOC(width * 2));
-    for (i32 row = 0; row < height; ++row) {
-        i32 sourceIndex = 0;
-        u32 encodedSize = 0;
+    write(fd, &pcxHdr, sizeof(pcxHdr));
+    encodedRow = static_cast<u8*>(H2_ALLOC(width * 2));
+    for (y = 0; y < height; ++y) {
+        sourceIndex = 0;
+        rowPtr = pixels + y * width;
+        iLen = 0;
         while (sourceIndex < width) {
-            u8 value = pixels[sourceIndex];
-            i32 runEnd = sourceIndex;
-            while (runEnd < width && pixels[runEnd] == value
-                   && runEnd - sourceIndex + 1 < RLE_RUN_LIMIT)
-                ++runEnd;
-            i32 runLength = runEnd - sourceIndex;
-            if (runLength <= 1 && PCXValueIsLiteral(value)) {
-                encodedRow[encodedSize++] = value;
-                ++sourceIndex;
-            } else {
-                encodedRow[encodedSize++] = static_cast<u8>(runLength | RLE_RUN_MARKER);
-                encodedRow[encodedSize++] = value;
+            color = *(rowPtr + sourceIndex);
+            endPos = sourceIndex;
+            while (endPos < width && *(rowPtr + endPos) == color
+                   && endPos - sourceIndex + 1 < RLE_RUN_LIMIT)
+                ++endPos;
+            runLength = endPos - sourceIndex;
+            if (runLength > 1 || (color & RLE_RUN_MARKER) == RLE_RUN_MARKER) {
+                *(encodedRow + iLen) = static_cast<u8>(runLength | RLE_RUN_MARKER);
+                *(encodedRow + iLen + 1) = color;
+                iLen += 2;
                 sourceIndex += runLength;
+            } else {
+                *(encodedRow + iLen) = color;
+                iLen += 1;
+                sourceIndex += 1;
             }
         }
-        write(fileHandle, encodedRow, encodedSize);
-        pixels += width;
+        write(fd, encodedRow, iLen);
     }
     H2_FREE(encodedRow);
-    u8 paletteMarker = VGA_PALETTE_MARKER;
-    write(fileHandle, &paletteMarker, 1);
-    u8* outputPalette = static_cast<u8*>(
-        H2_ALLOC(PALETTE_BYTE_COUNT)
-    );
-    for (i32 i = 0; i < PALETTE_BYTE_COUNT; ++i)
-        outputPalette[i] = paletteData[i] << COMPONENT_SCALE_SHIFT;
-    write(fileHandle, outputPalette, PALETTE_BYTE_COUNT);
-    H2_FREE(outputPalette);
-    close(fileHandle);
+    bMark = VGA_PALETTE_MARKER;
+    write(fd, &bMark, 1);
+    palOut = static_cast<u8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
+    for (x = 0; x < PALETTE_BYTE_COUNT; ++x)
+        *(palOut + x) = *(paletteData + x) << COMPONENT_SCALE_SHIFT;
+    write(fd, palOut, PALETTE_BYTE_COUNT);
+    H2_FREE(palOut);
+    close(fd);
 }
 
 VA(0x004c0350, 0x73)
 i32l FileSize(char* filename) {
-    FILE* file = fopen(filename, "r+b");
-    if (file == NULL) {
-        FileError(filename);
+    FILE* f;
+    i32l lLen;
+
+    f = fopen(filename, "r+b");
+    if (f == NULL) {
+        if (f == NULL)
+            FileError(filename);
     }
-    fseek(file, 0, SEEK_END);
-    i32l size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    fclose(file);
-    return size;
+    fseek(f, 0, SEEK_END);
+    lLen = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    fclose(f);
+    return lLen;
 }
 
 VA(0x004c03d0, 0x1e)
 struct IconEntry* GetIconEntry(class icon* iconPtr, i32 index) {
-    return &iconPtr->Entries()[index];
+    return reinterpret_cast<struct IconEntry*>(index * sizeof(IconEntry) + iconPtr->m_data);
 }
 VA(0x004c03f0, 0x72)
 i32 SRandom(i32 low, i32 high) {
@@ -2030,65 +2005,78 @@ void GetDataEntry(
     i32 showCancel,
     i32 useImmediateHandler
 ) {
-    MouseCursorType savedCursorType = gpMouseManager->m_cursorType;
-    i32 savedCursorFrame = gpMouseManager->m_cursorFrame;
+    MouseCursorType savedCursorType;
+    i16 wId;
+    i32 nRows;
+    char windowName[WINDOW_NAME_CAPACITY];
+    i32 entryY;
+    i32 nHeight;
+    i32 textLines;
+    char cBuf[TEXT_BUFFER_CAPACITY];
+    textEntryWidget* pText;
+    tag_message msg;
+    i32 nFrame;
+
+    wId = ENTRY_TEXT_WIDGET;
+    savedCursorType = gpMouseManager->m_cursorType;
+    nFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount != 0)
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
 
     cDEDest = destination;
     iDEMaxLen = maximumLength;
-    strcpy(destination, "");
+    strcpy(cDEDest, "");
 
-    i32 rows = bigFont->LineLength(prompt, PROMPT_WIDTH) * PROMPT_LINE_HEIGHT;
+    textLines = bigFont->LineLength(prompt, PROMPT_WIDTH);
+    nHeight = textLines * PROMPT_LINE_HEIGHT;
     if (showCancel != 0)
-        rows += CANCEL_PROMPT_HEIGHT;
-    rows = (rows + ROW_ROUNDING_BIAS) / ROW_HEIGHT;
-    if (rows > MAX_ROW_COUNT)
-        rows = MAX_ROW_COUNT;
-    i32 entryY = rows * ROW_HEIGHT - (showCancel != 0 ? CANCEL_Y_OFFSET : 0) + ENTRY_BASE_Y;
+        nHeight += CANCEL_PROMPT_HEIGHT;
+    nHeight += ROW_TOP_MARGIN;
+    nRows = (nHeight - ROW_ROUNDING_BIAS) / ROW_HEIGHT;
+    if (nRows > MAX_ROW_COUNT)
+        nRows = MAX_ROW_COUNT;
+    entryY = (nRows + 1) * ROW_HEIGHT + ENTRY_BASE_Y - (showCancel != 0 ? CANCEL_Y_OFFSET : 0);
 
-    char windowName[WINDOW_NAME_CAPACITY];
-    sprintf(windowName, "evntwin%d.bin", rows);
+    sprintf(windowName, "evntwin%d.bin", nRows);
     DataEntryWin = new heroWindow(WINDOW_X, WINDOW_Y, windowName);
     if (DataEntryWin == NULL)
         MemError();
 
-    tag_message message;
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = ENTRY_PROMPT_WIDGET;
-    message.payload.widget.data.text = prompt;
-    DataEntryWin->BroadcastMessage(message);
+    msg.type = MESSAGE_WIDGET;
+    msg.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    msg.payload.widget.id = ENTRY_PROMPT_WIDGET;
+    msg.payload.widget.data.text = prompt;
+    DataEntryWin->BroadcastMessage(msg);
 
-    char entryText[TEXT_BUFFER_CAPACITY];
-    if (initialText == NULL)
-        initialText = "";
-    strcpy(entryText, initialText);
-    message.payload.widget.id = ENTRY_TEXT_WIDGET;
-    message.payload.widget.data.text = entryText;
-    DataEntryWin->BroadcastMessage(message);
-    strcpy(destination, entryText);
+    if (initialText != NULL)
+        strcpy(cBuf, initialText);
+    else
+        strcpy(cBuf, "");
+    msg.payload.widget.id = ENTRY_TEXT_WIDGET;
+    msg.payload.widget.data.text = cBuf;
+    DataEntryWin->BroadcastMessage(msg);
+    strcpy(destination, cBuf);
 
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message.payload.widget.id = ENTRY_BUTTON_ONE;
-    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SEVEN;
-    DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_EIGHT;
-    DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_FIVE;
-    DataEntryWin->BroadcastMessage(message);
-    message.payload.widget.id = ENTRY_BUTTON_SIX;
-    DataEntryWin->BroadcastMessage(message);
+    msg.type = MESSAGE_WIDGET;
+    msg.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    msg.payload.widget.id = ENTRY_BUTTON_ONE;
+    DataEntryWin->BroadcastMessage(msg);
+    msg.payload.widget.id = ENTRY_BUTTON_SEVEN;
+    DataEntryWin->BroadcastMessage(msg);
+    msg.payload.widget.id = ENTRY_BUTTON_EIGHT;
+    DataEntryWin->BroadcastMessage(msg);
+    msg.payload.widget.id = ENTRY_BUTTON_FIVE;
+    DataEntryWin->BroadcastMessage(msg);
+    msg.payload.widget.id = ENTRY_BUTTON_SIX;
+    DataEntryWin->BroadcastMessage(msg);
     if (showCancel == 0) {
-        message.payload.widget.id = ENTRY_CANCEL_BUTTON;
-        DataEntryWin->BroadcastMessage(message);
+        msg.payload.widget.id = ENTRY_CANCEL_BUTTON;
+        DataEntryWin->BroadcastMessage(msg);
     }
 
-    textEntryWidget* entry = new textEntryWidget(
+    pText = new textEntryWidget(
         TEXT_FIELD_X,
         static_cast<i16>(entryY),
         TEXT_FIELD_WIDTH,
@@ -2105,11 +2093,11 @@ void GetDataEntry(
         TEXT_FIELD_HORIZONTAL_INSET,
         TEXT_FIELD_VERTICAL_INSET
     );
-    if (entry == NULL)
+    if (pText == NULL)
         MemError();
-    inBoxY = entryY + INPUT_BOX_Y_OFFSET;
     inBoxX = INPUT_BOX_X;
-    DataEntryWin->AddWidget(entry, WIDGET_Z_ORDER);
+    inBoxY = entryY + INPUT_BOX_Y_OFFSET;
+    DataEntryWin->AddWidget(pText, WIDGET_Z_ORDER);
 
     if (useImmediateHandler != 0) {
         bDataEntryTime = ENTRY_PHASE_IMMEDIATE;
@@ -2118,16 +2106,15 @@ void GetDataEntry(
         bDataEntryTime = ENTRY_PHASE_READY;
     gpWindowManager->DoDialog(DataEntryWin, DataEntryWindowHandler, 0);
     delete DataEntryWin;
-    gpMouseManager->SetPointer(
-        "",
-        savedCursorFrame,
-        savedCursorType
-    );
+    gpMouseManager->SetPointer("", nFrame, savedCursorType);
     gbAllowTextEntryEscape = true;
 }
 
 VA(0x004c0a50, 0x1fa)
 MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
+    i16 wId;
+
+    wId = ENTRY_TEXT_WIDGET;
     if (bDataEntryTime == ENTRY_PHASE_IMMEDIATE) {
         ++bDataEntryTime;
         message.type = MESSAGE_LEFT_BUTTON_DOWN;
@@ -2137,52 +2124,47 @@ MessageDispatchResult DataEntryWindowHandler(struct tag_message& message) {
         return MESSAGE_DISPATCH_CONSUME;
     }
 
-    if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT)
+    if (bDataEntryTime == ENTRY_PHASE_POINTER_SENT) {
         ++bDataEntryTime;
-    else {
-        if (message.type != MESSAGE_WIDGET)
-            goto normalEvent;
+        goto gotText;
+    }
+    if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
-            case WIDGET_COMMAND_SELECT:
-                if (message.payload.widget.id != ENTRY_TEXT_WIDGET)
-                    goto normalEvent;
-                break;
             case WIDGET_COMMAND_DESELECT:
-                goto possibleCancelEvent;
-            default:
-                goto normalEvent;
+                switch (message.payload.widget.id) {
+                    case ENTRY_CANCEL_BUTTON:
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        return MESSAGE_DISPATCH_FORWARD;
+                }
+                break;
+            case WIDGET_COMMAND_SELECT:
+                switch (message.payload.widget.id) {
+                    case ENTRY_TEXT_WIDGET:
+                    gotText:
+                        message.type = MESSAGE_WIDGET;
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
+                        DataEntryWin->BroadcastMessage(message);
+                        if (strlen(message.payload.widget.data.text) == 0)
+                            break;
+                        memset(cDEDest, 0, iDEMaxLen);
+                        strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
+                        message.type = MESSAGE_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.data.text = cDEDest;
+                        DataEntryWin->BroadcastMessage(message);
+                        DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
+                        if (gbTextEntryEscaped != 0)
+                            break;
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        message.payload.widget.id = ENTRY_TEXT_WIDGET;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        return MESSAGE_DISPATCH_FORWARD;
+                }
         }
     }
-
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.id = ENTRY_TEXT_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_GET_TEXT;
-    DataEntryWin->BroadcastMessage(message);
-    if (strlen(message.payload.widget.data.text) == 0)
-        goto normalEvent;
-    memset(cDEDest, 0, iDEMaxLen);
-    strncpy(cDEDest, message.payload.widget.data.text, iDEMaxLen - 1);
-    message.type = MESSAGE_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message.payload.widget.id = ENTRY_TEXT_WIDGET;
-    message.payload.widget.data.text = cDEDest;
-    DataEntryWin->BroadcastMessage(message);
-    DataEntryWin->DrawWindow(DRAW_MODE, REDRAW_OFFSET, REDRAW_OFFSET);
-    if (gbTextEntryEscaped != 0)
-        goto normalEvent;
-    gpWindowManager->m_dialogResult = message.payload.widget.id;
-    message.payload.widget.id = ENTRY_TEXT_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-    return MESSAGE_DISPATCH_FORWARD;
-
-possibleCancelEvent:
-    if (message.payload.widget.id != ENTRY_CANCEL_BUTTON)
-        goto normalEvent;
-    message.payload.widget.id = ENTRY_TEXT_WIDGET;
-    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-    return MESSAGE_DISPATCH_FORWARD;
-
-normalEvent:
     return EventWindowHandler(message);
 }
 
