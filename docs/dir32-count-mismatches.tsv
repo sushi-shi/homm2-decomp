@@ -1,7 +1,10 @@
 # DIR32 relocation-count mismatches on SAME-LENGTH functions (2026-08-03).
 # ours = DIR32 sites in build/objdiff/base/<unit>.obj within the claimed span
 # retail = rows of config/delink_relocs.tsv falling in that span
-# The masked byte compare CANNOT see these: it zeroes reloc sites on both sides.
+# RESOLVED 2026-08-03: all 72 deltas are +3 and are the SEH registration triple
+# (fs:[0] read + install + uninstall against __except_list). Those are COFF
+# relocations in our object but NOT image relocations, so the manifest rightly
+# omits them. reloc_donation.py:203 already skips __except_list. NOT a defect.
 delta	ours	retail	rva	unit	function
 3	4	1	0xcd3f0	BASE/AudiereMusic	?StartupAudiereMusic@@YI_NV?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z
 3	5	2	0xc5d50	BASE/BITMAP	??0bitmap@@QAE@FFF@Z
