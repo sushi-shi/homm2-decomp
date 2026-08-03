@@ -547,9 +547,7 @@ void mouseManager::RestoreUnderlying(void) {
 VA(0x004ba2b0, 0x26)
 void mouseManager::ReallyHidePointer(void) {
     if (gbColorMice != 0) {
-        m_hideCount++;
-        if (m_hideCount == 1)
-            NewUpdate(1);
+        HideColorPointer();
     } else {
         ShowCursor(0);
     }
@@ -558,20 +556,7 @@ void mouseManager::ReallyHidePointer(void) {
 VA(0x004ba2e0, 0x26)
 void mouseManager::ReallyShowPointer(void) {
     if (gbColorMice != 0) {
-        if (m_hideCount > 0 && --m_hideCount == 0) {
-            gbPutzingWithMouseCtr++;
-            if (gbColorMice != 0) {
-                GetCursorPos(&gMouseCheckPt);
-                ScreenToClient(hwndApp, &gMouseCheckPt);
-                i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-                m_mouseX = x;
-                i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
-                m_mouseY = y;
-                CheckChangeCursor(x, y, 0);
-            }
-            NewUpdate(1);
-            gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
-        }
+        ShowColorPointer();
     } else {
         ShowCursor(1);
     }
@@ -586,19 +571,14 @@ void mouseManager::HideColorPointer(void) {
 
 VA(0x004ba350, 0x66)
 void mouseManager::ShowColorPointer(void) {
-    if (m_hideCount > 0 && --m_hideCount == 0) {
-        gbPutzingWithMouseCtr++;
-        if (gbColorMice != 0) {
-            GetCursorPos(&gMouseCheckPt);
-            ScreenToClient(hwndApp, &gMouseCheckPt);
-            i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-            m_mouseX = x;
-            i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
-            m_mouseY = y;
-            CheckChangeCursor(x, y, 0);
+    if (m_hideCount > 0) {
+        m_hideCount = m_hideCount - 1;
+        if (m_hideCount == 0) {
+            gbPutzingWithMouseCtr = gbPutzingWithMouseCtr + 1;
+            CheckUpdateMousePos();
+            NewUpdate(1);
+            gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
         }
-        NewUpdate(1);
-        gbPutzingWithMouseCtr--;
     }
 }
 
