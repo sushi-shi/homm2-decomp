@@ -1132,7 +1132,7 @@ SOURCE/PHILAI	?GetOddsOfWinning@philAI@@QAEMH@Z	100.0000	bc83878a676f
 SOURCE/PHILAI	?GetTurnAIVars@philAI@@QAEXH@Z	96.5006	efc9dc9a6583
 SOURCE/PHILAI	?GetTurnAttentionValue@philAI@@QAEXH@Z	100.0000	b99b6d12ac41
 SOURCE/PHILAI	?GoodAdjacent@philAI@@QAEHPAH@Z	91.9275	b4964d644389
-SOURCE/PHILAI	?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z	95.9103	8760fc1d927a
+SOURCE/PHILAI	?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z	99.0897	637771d9d398
 SOURCE/PHILAI	?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z	93.6598	1fb532fae50f
 SOURCE/PHILAI	?IncrementHourGlass@philAI@@QAEXXZ	100.0000	a22cdb0fe751
 SOURCE/PHILAI	?InitAIMapVars@@YIXXZ	100.0000	3b78cbac6abe
@@ -1263,7 +1263,7 @@ SOURCE/SPELLS	?GetNextChainLightningTarget@combatManager@@QAEHPAVarmy@@H@Z	99.57
 SOURCE/SPELLS	?HandleCastSpell@@YIHAAUtag_message@@@Z	72.1957	519a2664458b
 SOURCE/SPELLS	?HasValidSpellTarget@combatManager@@QAEHH@Z	100.0000	350515d10b4b
 SOURCE/SPELLS	?MeteorShower@combatManager@@QAEXH@Z	99.7268	a2df3301e614
-SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	82.1429	0c87e8201eb7
+SOURCE/SPELLS	?MirrorImage@combatManager@@QAEXH@Z	82.7344	8773681e7224
 SOURCE/SPELLS	?ModifyDamageForArtifacts@combatManager@@QAEXPAJHPAVhero@@1@Z	100.0000	53639b930dac
 SOURCE/SPELLS	?ResetBoltAngle@combatManager@@QAEXPAUSBolt@@@Z	94.6166	18efbad93bd3
 SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	99.7629	25daad4d2eea
@@ -1346,7 +1346,7 @@ SOURCE/VIEW	?HandleViewGeneral@@YIHAAUtag_message@@@Z	99.1696	f0eee3130bb1
 SOURCE/VIEW	?ViewArmy@combatManager@@QAEXPAVarmy@@H@Z	99.7143	6f44a1a53892
 SOURCE/VIEW	?ViewGeneral@combatManager@@QAEHHHH@Z	97.5748	e35354994e6a
 SOURCE/Viewwrld	?VWCleanup@advManager@@QAEXXZ	100.0000	8f85a9beed9e
-SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	88.3456	d478e654d23a
+SOURCE/Viewwrld	?VWCompleteDraw@advManager@@QAEXXZ	89.8407	36f132913df4
 SOURCE/Viewwrld	?VWInit@advManager@@QAEXHH@Z	99.3388	a3a66e65a99c
 SOURCE/Viewwrld	?ViewWorld@advManager@@QAEXHHH@Z	99.7372	03dd826b92ea
 SOURCE/Viewwrld	?ViewWorldDialogHandler@@YIHAAUtag_message@@@Z	97.5073	5b0db971cfd1

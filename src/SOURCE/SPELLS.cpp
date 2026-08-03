@@ -3058,10 +3058,8 @@ void combatManager::MirrorImage(i32 targetHex) {
                 searchHex = source6->m_hex;
             } else {
                 if (HAS(source6->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-                    if (source6->m_facing == ARMY_FACING_RIGHT)
-                        searchHex = source6->m_hex + 1;
-                    else
-                        searchHex = source6->m_hex - 1;
+                    searchHex = source6->m_facing == ARMY_FACING_RIGHT ? source6->m_hex + 1
+                                : source6->m_hex - 1;
                 } else {
                     continue;
                 }

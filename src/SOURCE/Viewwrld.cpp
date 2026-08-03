@@ -327,10 +327,8 @@ void advManager::VWCompleteDraw(void) {
                 groundFrame29 += IDX(giGroundToTerrain[cell0->m_terrainImageIndex])
                                  * WORLD_TERRAIN_FRAME_STRIDE;
                 if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
-                    if (flipped5 == ICON_DRAW_FLIPPED)
-                        townIconHighlight1 = IDX(giViewWorldScale) - 1;
-                    else
-                        townIconHighlight1 = 0;
+                    townIconHighlight1 = flipped5 == ICON_DRAW_FLIPPED ? IDX(giViewWorldScale) - 1
+                                         : 0;
                     pVWGround->DrawToBuffer(
                         pixelX6 + townIconHighlight1,
                         pixelY2,
