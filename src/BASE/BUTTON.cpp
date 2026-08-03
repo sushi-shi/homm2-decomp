@@ -124,7 +124,7 @@ VA(0x004d3890, 0x4d8)
 MessageDispatchResult button::Main(tag_message& msg) {
     if (m_kind == WIDGET_KIND_AUTO_REPEAT && HAS(m_flags, WIDGET_FLAG_SELECTED)
         && KBTickCount() > glTimers[GLOBAL_BUTTON_REPEAT_TIMER_SLOT]) {
-        return DeselectSelected(msg);
+        return Deselect(msg);
     }
 
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
@@ -149,7 +149,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                 && !HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                 if (m_hotkey == NO_HOTKEY || m_hotkey != msg.payload.keyboard.keyCode)
                     return MESSAGE_DISPATCH_CONTINUE;
-                return DeselectSelected(msg);
+                return Deselect(msg);
             }
             break;
 
@@ -158,10 +158,8 @@ MessageDispatchResult button::Main(tag_message& msg) {
             if (!HAS(m_flags, WIDGET_FLAG_DRAW))
                 goto normalEvent;
 
-            i16 relativeX =
-                static_cast<i16>(msg.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
-            i16 relativeY =
-                static_cast<i16>(msg.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
+            i32 relativeX = msg.payload.mouse.x - m_owner->m_posX;
+            i32 relativeY = msg.payload.mouse.y - m_owner->m_posY;
             if (eventType == MESSAGE_RIGHT_BUTTON_DOWN) {
                 if (relativeX >= m_x && relativeY >= m_y && relativeX < m_x + m_width
                     && relativeY < m_y + m_height) {
@@ -179,14 +177,12 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     PollSound();
                     gpMouseManager->Main(msg);
                     if (msg.type == MESSAGE_MOUSE_MOVE) {
-                        relativeX = static_cast<i16>(msg.payload.mouse.x)
-                                    - static_cast<i16>(m_owner->m_posX);
-                        relativeY = static_cast<i16>(msg.payload.mouse.y)
-                                    - static_cast<i16>(m_owner->m_posY);
+                        relativeX = msg.payload.mouse.x - m_owner->m_posX;
+                        relativeY = msg.payload.mouse.y - m_owner->m_posY;
                         if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
                             || relativeY >= m_y + m_height) {
                             if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                                DeselectSelected(msg);
+                                Deselect(msg);
                             }
                         } else if (!HAS(m_flags, WIDGET_FLAG_SELECTED)) {
                             Select(msg);
@@ -196,7 +192,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
                     msg = gpInputManager->GetEvent();
                 }
                 if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                    return DeselectSelected(msg);
+                    return Deselect(msg);
                 }
                 return MESSAGE_DISPATCH_CONSUME;
             }
@@ -206,7 +202,7 @@ MessageDispatchResult button::Main(tag_message& msg) {
         case MESSAGE_LEFT_BUTTON_UP: {
             if (HAS(m_flags, WIDGET_FLAG_DRAW)
                 && HAS(m_flags, WIDGET_FLAG_SELECTED)) {
-                return DeselectSelected(msg);
+                return Deselect(msg);
             }
             goto normalEvent;
         }
