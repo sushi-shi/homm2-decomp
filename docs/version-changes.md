@@ -164,6 +164,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   chain (62/63/64/65 prefix identical). Byte-pinned both sides
   (2026-08-03). Reads as a dev logic fix: skeletons killed in combat
   no longer feed necromancy.
+- **[Buka] The RESMGR read helpers lost their error branches.**
+  `ReadByte`/`ReadWord`/`ReadLong` in 2.1 are assert + read + return
+  with NO `if (bytesRead == 0)` debug-trap block (retail bodies are
+  0x59/0x5c/0x5c bytes; the PoL branch would add 41). Assert line
+  numbers also moved (703/732/760/816 -> 675/700/723/775), so the
+  source file itself shrank ~30-40 lines between versions.
 - **[Buka] Rainbow luck bonus applies before the clamps.**
   `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
   MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
