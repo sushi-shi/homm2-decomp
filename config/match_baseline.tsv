@@ -1442,7 +1442,7 @@ SOURCE/kbwin	_WinMain@16	99.7442	a9911ee0b680
 SOURCE/netwin	?is_netbios_avail@@YIHXZ	100.0000	ea5c962377cf
 SOURCE/netwin	?nb_add_name@@YIXXZ	100.0000	5f81d890e2fa
 SOURCE/netwin	?nb_add_name_done@@YGXPAUNetbiosControlBlock@@@Z	36.8900	0634dc79fa95
-SOURCE/netwin	?nb_arm_recv@@YIXH@Z	94.2593	8da6f5b3e700
+SOURCE/netwin	?nb_arm_recv@@YIXH@Z	99.9383	1473dae99beb
 SOURCE/netwin	?nb_call@@YIGHPAX@Z	100.0000	74fde161acde
 SOURCE/netwin	?nb_call_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	d8ec3c8b61e8
 SOURCE/netwin	?nb_close_session@@YIXH@Z	100.0000	ee26921cc43b
