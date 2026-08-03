@@ -562,7 +562,7 @@ static void __stdcall nb_call_done(NetbiosControlBlock* ncb) {
 VA(0x004750ee, 0x124)
 static void __fastcall nb_arm_recv(i32 session) {
     H2_ENUM_STORAGE(NetbiosResult, u8) result;
-    for (;;) {
+    while (1) {
         ProcessAssert(
             gNbSessNcb[session].returnCode != NETBIOS_RESULT_PENDING,
             RETAIL_FILE,

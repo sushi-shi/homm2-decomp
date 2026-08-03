@@ -41,6 +41,12 @@ to try FIRST on any residual, in rough order of yield:
 
 ## Negative results (do not re-derive)
 
+- `while (1)` vs `for (;;)` is a REAL /Od distinction - `while (1)` emits
+  `mov eax,1; test eax,eax; je <end>` at the loop top, `for (;;)` does not -
+  but it is PER SITE. `nb_arm_recv` needed `while (1)` (-10 -> exact);
+  `Icon2b::IconToBitmap` got worse with it (+6 -> +25). Read the loop head
+  in the retail bytes before changing either way.
+
 - The ternary→`if/else` lever does **not** generalise by inspection.
   `army::CheckLuck` needs it; `ShowSpellCastFailure` is unaffected (168
   bytes either way). The 16 ternary rows in the frame queue must each be
