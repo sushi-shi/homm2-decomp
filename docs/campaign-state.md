@@ -1,8 +1,38 @@
 # Buka 2.1 campaign state (2026-08-03)
 
-**976 / 1727 exact (56.5%), 985 banked, fuzzy 87.92, matched-code-bytes 15.66%.**
+**991 / 1727 exact (57.4%), 1000 banked, fuzzy 88.07, matched-code-bytes 16.13%.**
 Session start was 880 (51.0%) / fuzzy 87.13. Zero real regressions at every
-checkpoint; `homm2 selftest` green (507) throughout.
+checkpoint; `homm2 selftest` green (513) throughout.
+
+## Control-flow detectors (2026-08-03) - run these FIRST on any residual
+
+Three cheap byte-signature scans now rank the whole image. Each is a few
+lines over the retail bytes vs ours; all three closed functions on first use.
+
+**1. Guard clauses.** `jcc L; jmp end` (TWO jumps) is `if (...) return;`.
+A single `jcc end` is `if (...) { ... }`. Count `jcc +2/eb` and `jcc +5/e9`
+(plus the `0f 8x` near forms) on both sides and diff the counts.
+Current queue: 39 fns missing 90 sites, 36 fns with 62 SPURIOUS guards.
+
+**2. `&&` vs `||` guard.** The discriminator is where the SECOND
+conditional jumps:
+
+    if (A && B) { body }        -> both jcc target the END
+    if (!A || !B) return;       -> first jcc targets a shared `jmp end`,
+       body                        second jcc targets the BODY
+
+**3. Ternary temp.** Retail materialising `c ? a : b` allocates a temp
+BELOW the `this` spill (e.g. `this` at -0x18, temp at -0x1a) and stores
+to the destination ONCE; an if/else stores twice. So *retail frame
+LARGER than ours* is the tell. Queue: 53 fns >=80%, every one +4.
+
+## Negative result: the dead-local class is EXHAUSTED
+
+The decl-vs-use scan finds 168 unreferenced locals image-wide, but the
+intersection with ours-larger frames is EMPTY. Every remaining one sits
+in a function whose frame already matches - it is padding retail has too
+(the `unusedXxx` names). The Netbios `scratch[]` pair was the last real
+one. Do not re-run this expecting yield.
 
 ## Codegen laws proven this session
 

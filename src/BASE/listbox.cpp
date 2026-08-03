@@ -194,43 +194,40 @@ void listBoxWidget::Read(void) {
 
 VA(0x004cec60, 0x1f1)
 void listBoxWidget::DeleteItem(i32 index) {
-    if (index >= m_itemCount)
-        return;
-    if (m_selectedIndex == index)
-        m_selectedIndex = -1;
-    if (m_topIndex == index && m_scrollRange <= m_topIndex)
-        m_topIndex--;
-    if (--m_scrollRange < 0)
-        m_scrollRange = 0;
-    if (m_topIndex < 0)
-        m_topIndex = 0;
-    if (m_topIndex > m_scrollRange)
-        m_topIndex = m_scrollRange;
-    if (m_itemCount == 1) {
+    if (m_itemCount > index) {
+        if (m_selectedIndex == index)
+            m_selectedIndex = -1;
+        if (m_topIndex == index && m_scrollRange <= m_topIndex)
+            m_topIndex--;
+        if (--m_scrollRange < 0)
+            m_scrollRange = 0;
+        if (m_topIndex < 0)
+            m_topIndex = 0;
+        if (m_topIndex > m_scrollRange)
+            m_topIndex = m_scrollRange;
+        if (m_itemCount == 1) {
 #line 156
-        H2_FREE(m_items[0]);
-        H2_FREE(m_items);
-        m_items = NULL;
-    } else {
-#line 162
-        char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
-        memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
-        if (m_itemCount - index - 1 > 0)
-            memcpy(
-                &newItems[index],
-                &m_items[index + 1],
-                (m_itemCount - index - 1) * sizeof(*m_items)
-            );
-        if (m_items != NULL)
-#line 169
+            H2_FREE(m_items[0]);
             H2_FREE(m_items);
-        m_items = newItems;
+            m_items = NULL;
+        } else {
+#line 162
+            char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount - 1) * sizeof(*m_items)));
+            memcpy(newItems, m_items, (m_itemCount - 1) * sizeof(*m_items));
+            if (m_itemCount - index - 1 > 0)
+                memcpy(
+                    &newItems[index],
+                    &m_items[index + 1],
+                    (m_itemCount - index - 1) * sizeof(*m_items)
+                );
+            if (m_items != NULL)
+#line 169
+                H2_FREE(m_items);
+            m_items = newItems;
+        }
+        m_itemCount--;
+        m_visibleItemCount = m_scrollRange > 0 ? m_maxVisibleItems : m_itemCount;
     }
-    m_itemCount--;
-    if (m_scrollRange > 0)
-        m_visibleItemCount = m_maxVisibleItems;
-    else
-        m_visibleItemCount = m_itemCount;
 }
 
 VA(0x004cee60, 0x48c)
