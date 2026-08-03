@@ -27,6 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| bitmap::GrabBitmap + DrawToBuffer linkage | declared `__declspec(dllexport) inline` | plain out-of-line methods - retail CALLS both (GrabScreen emits `call ?GrabBitmap@...`, and both have their own claimed spans at 0xc6150 / 0xc6090) | OPEN - PoL may have inlined them; check 2.0 bytes |
 | HandleRemoteDeadPlayerExit guard | `giThisGamePos == pos` | `pos == giThisGamePos` (a1-moffs local-first) | OPEN |
 | MapExtraPosAndAdjacentsSet reads | `mapExtra[MAP_WIDTH * y + x]`, `mapExtra[checkY * MAP_WIDTH + checkX]` | flat `*(mapExtra + x + MAP_WIDTH * y)` (both); the `if (MAP_HEIGHT <= checkY) {} else` empty-if is REAL (removing it loses 2 bytes) but must read `checkY >= MAP_HEIGHT` | OPEN - 2 jump-distance bytes left: retail places the loop-back jmp BEFORE the body, ours after |
 | BlitBitmapToScreenVesa convention | `__fastcall` | `__cdecl` (509 -> 501 vs retail 486; residual is body work) | OPEN |
