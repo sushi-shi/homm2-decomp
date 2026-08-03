@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| combatManager::EffectSpellCure six sites | `index != targetIndex`; fightValue-cast leading FP chain; `fightValue * m_quantity`; `>= MAX ? MAX : X` duration ternaries; `IDX(m_currentSide) == sideWork` (x2) | `targetIndex != index`; `cast(curePoints) * MODIFIER * fightValue`; `m_quantity * fightValue`; `< MAX ? X : MAX`; `sideWork == IDX(m_currentSide)` | OPEN - slot residual parked |
+| combatManager::ProcessCombatMsg switch layout | case order as in source | retail lays inner-switch case bodies in a DIFFERENT order (jump-table targets differ; first body is the m_?f2c3 member call, ours is the 0/1 local store) + one member/local mirror | OPEN - PARKED for body-diff pass: needs jump-table target mapping |
 | combatManager::Resurrect five sites | `m_initialQuantity < m_quantity`; `count == index+1`; `A<B?A:B` min-ternary; two FP/index orders | `m_quantity > m_initialQuantity`; `index+1 == count`; `REVERSE<frames?REVERSE:frames`; FIZZLE_DELAY const-first | OPEN - slot residual parked |
 | combatManager::VaporizeCreature stripe writes | `gyModify[row*W + firstY + top]`; `gyModify[lastY + (row*-W - bottom)]` | `*(row*W + gyModify + firstY + top)`; `*(gyModify - row*W - bottom + lastY)` (computed-term-first flat sums; simple loads canonicalize, muls do not) | OPEN - slot residual parked |
 | combatManager::TurnToStone limit increment | `++m_limitCreatureCount[side][index]` | retail reads m_index FIRST - no plain respelling reproduces it (flat + and commuted-bracket both canonicalize identically); PERMUTER matrix queued (accessor-introduction arm) | OPEN - parked |
