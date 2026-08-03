@@ -229,18 +229,10 @@ void InitMemEntry(void) {
 
 VA(0x004bd530, 0x113)
 void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
-    char text[FORMAT_BUFFER_SIZE];
-    char logText[TEXT_BUFFER_SIZE];
     if (size == 0)
         return NULL;
-    if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
-               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
-        gpMemEntry =
-            static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
-        for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
-            gpMemEntry[initIndex].used = 0;
-    }
+    if (gpMemEntry == NULL)
+        InitMemEntry();
     giTotalMemAllocated += size;
     void* ptr = malloc(size);
     if (ptr == NULL) {
@@ -259,43 +251,13 @@ void* BaseAlloc(u32 size, char* originalFile, i32 originalLine) {
             entryIndex = ENTRY_SEARCH_COMPLETE;
         }
     }
-    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL) {
-        sprintf(
-            text,
-            "KBAlloc    Size %d   Ptr %d   File %s  Line %d",
-            size,
-            ptr,
-            originalFile,
-            originalLine
-        );
-        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen("KB.LOG", "at+");
-            if (logFile != NULL) {
-                strcpy(logText, text);
-                *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                    *reinterpret_cast<const u16*>("\n");
-                fputs(logText, logFile);
-                fclose(logFile);
-                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
-            }
-        }
-    }
     return ptr;
 }
 
 VA(0x004bd650, 0x154)
 void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
-    char logText[TEXT_BUFFER_SIZE];
-    char text[FORMAT_BUFFER_SIZE];
-    if (gpMemEntry == NULL) {
-        LogInt(gMemEntryTag, iMemEntries, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
-               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
-        gpMemEntry =
-            static_cast<MemEntry*>(malloc(MEMORY_ENTRY_CAPACITY * sizeof(MemEntry)));
-        for (i32 initIndex = 0; initIndex < MEMORY_ENTRY_CAPACITY; ++initIndex)
-            gpMemEntry[initIndex].used = 0;
-    }
+    if (gpMemEntry == NULL)
+        InitMemEntry();
     if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
         LogInt(
             "Free ",
@@ -308,18 +270,7 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
             LOG_UNUSED_VALUE
         );
     if (ptr == NULL) {
-        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen("KB.LOG", "at+");
-            if (logFile != NULL) {
-                strcpy(logText, "NULL POINTER");
-                *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                    *reinterpret_cast<const u16*>("\n");
-                fputs(logText, logFile);
-                fclose(logFile);
-                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
-            }
-        }
+        LogStr("NULL POINTER");
         return;
     }
     --iMemEntries;
@@ -337,94 +288,54 @@ void BaseFree(void* ptr, char* originalFile, i32 originalLine) {
     i32 entryIndex;
     for (entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
         if (gpMemEntry[entryIndex].ptr == ptr) {
-            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL) {
-                sprintf(
-                    text,
-                    "KBFree    Size %d   Ptr %d   File %s  Line %d",
-                    gpMemEntry[entryIndex].size,
-                    ptr,
-                    gpMemEntry[entryIndex].file,
-                    gpMemEntry[entryIndex].line
-                );
-                if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-                    FILE* logFile =
-                        fopen("KB.LOG", "at+");
-                    if (logFile != NULL) {
-                        strcpy(logText, text);
-                        *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                            *reinterpret_cast<const u16*>("\n");
-                        fputs(logText, logFile);
-                        fclose(logFile);
-                        if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                            OutputDebugStringA(logText);
-                    }
-                }
-            }
             gpMemEntry[entryIndex].used = 0;
             giTotalMemAllocated -= gpMemEntry[entryIndex].size;
             entryIndex = ENTRY_SEARCH_COMPLETE;
         }
     }
     if (entryIndex < ENTRY_SEARCH_COMPLETE) {
-        sprintf(gText, "Bad Delete,  File '%13s'  Line % 4d, ptr %12d", originalFile, originalLine, ptr);
-        if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-            FILE* logFile = fopen("KB.LOG", "at+");
-            if (logFile != NULL) {
-                strcpy(logText, gText);
-                *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                    *reinterpret_cast<const u16*>("\n");
-                fputs(logText, logFile);
-                fclose(logFile);
-                if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                    OutputDebugStringA(logText);
-            }
-        }
+        sprintf(
+            gText,
+            "Bad Delete,  File '%13s'  Line % 4d, ptr %12d",
+            originalFile,
+            originalLine,
+            ptr
+        );
+        LogStr(gText);
     } else {
         free(ptr);
+        ptr = NULL;
     }
 }
 
 VA(0x004bd7b0, 0xe7)
 void PrintMemoryLeaks(void) {
-    char logText[TEXT_BUFFER_SIZE];
-    if (giDebugLevel >= MEMORY_LEAK_DEBUG_LEVEL && gpMemEntry != NULL) {
-        LogInt(
-            "Total Memory Leaks",
-            iMemEntries,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE,
-            LOG_UNUSED_VALUE
-        );
-        i32 entryIndex = 0;
-        do {
-            if (gpMemEntry[entryIndex].used != 0) {
-                sprintf(
-                    gText,
-                    "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
-                    gpMemEntry[entryIndex].file,
-                    gpMemEntry[entryIndex].line,
-                    reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
-                    gpMemEntry[entryIndex].size
-                );
-                if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-                    FILE* logFile =
-                        fopen("KB.LOG", "at+");
-                    if (logFile != NULL) {
-                        strcpy(logText, gText);
-                        *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                            *reinterpret_cast<const u16*>("\n");
-                        fputs(logText, logFile);
-                        fclose(logFile);
-                        if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                            OutputDebugStringA(logText);
-                    }
-                }
-            }
-            entryIndex = entryIndex + 1;
-        } while (entryIndex < MEMORY_ENTRY_CAPACITY);
+    if (giDebugLevel < MEMORY_LEAK_DEBUG_LEVEL)
+        return;
+    if (gpMemEntry == NULL)
+        return;
+    LogInt(
+        "Total Memory Leaks",
+        iMemEntries,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE,
+        LOG_UNUSED_VALUE
+    );
+    for (i32 entryIndex = 0; entryIndex < MEMORY_ENTRY_CAPACITY; ++entryIndex) {
+        if (gpMemEntry[entryIndex].used != 0) {
+            sprintf(
+                gText,
+                "Memory Leak,  File '%13s'  Line % 4d, ptr %12d   size %6d",
+                gpMemEntry[entryIndex].file,
+                gpMemEntry[entryIndex].line,
+                reinterpret_cast<i32>(gpMemEntry[entryIndex].ptr),
+                gpMemEntry[entryIndex].size
+            );
+            LogStr(gText);
+        }
     }
 }
 
@@ -1792,38 +1703,34 @@ void BlitBitmapToScreen(
 VA(0x004bf990, 0x91)
 void LogTruncate(void) {
     char logText[TEXT_BUFFER_SIZE];
-    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        i32 fileHandle = open(
-            "KB.LOG",
-            _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT,
-            _S_IWRITE
-        );
-        if (fileHandle != -1) {
-            strcpy(logText, "===========New Log==========");
-            *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                *reinterpret_cast<const u16*>("\n");
-            write(fileHandle, logText, strlen(logText));
-            close(fileHandle);
-        }
-    }
+    i32 fileHandle;
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+    fileHandle = open("KB.LOG", _O_WRONLY | _O_CREAT | _O_TRUNC | _O_TEXT, _S_IWRITE);
+    if (fileHandle == -1)
+        return;
+    strcpy(logText, "===========New Log==========");
+    strcat(logText, "\n");
+    write(fileHandle, logText, strlen(logText));
+    close(fileHandle);
 }
 
 
 VA(0x004bfa30, 0x9a)
 void LogStr(char* text) {
     char logText[TEXT_BUFFER_SIZE];
-    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        FILE* logFile = fopen("KB.LOG", "at+");
-        if (logFile != NULL) {
-            strcpy(logText, text);
-            *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                *reinterpret_cast<const u16*>("\n");
-            fputs(logText, logFile);
-            fclose(logFile);
-            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                OutputDebugStringA(logText);
-        }
-    }
+    FILE* out;
+    if (giDebugLevel < FILE_DEBUG_LEVEL)
+        return;
+    out = fopen("KB.LOG", "at+");
+    if (out == NULL)
+        return;
+    strcpy(logText, text);
+    strcat(logText, "\n");
+    fputs(logText, out);
+    fclose(out);
+    if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
+        OutputDebugStringA(logText);
 }
 
 VA(0x004bfad0, 0x1b6)
@@ -1838,7 +1745,6 @@ void LogInt(
     i32 value7
 ) {
     char text[FORMAT_BUFFER_SIZE];
-    char logText[TEXT_BUFFER_SIZE];
     if (value7 != LOG_UNUSED_VALUE)
         sprintf(
             text,
@@ -1883,18 +1789,7 @@ void LogInt(
         sprintf(text, "%s : % 8d % 8d", label, value1, value2);
     else
         sprintf(text, "%s : % 8d", label, value1);
-    if (giDebugLevel >= FILE_DEBUG_LEVEL) {
-        FILE* file = fopen("KB.LOG", "at+");
-        if (file != NULL) {
-            strcpy(logText, text);
-            *reinterpret_cast<u16*>(logText + strlen(logText)) =
-                *reinterpret_cast<const u16*>("\n");
-            fputs(logText, file);
-            fclose(file);
-            if (giDebugLevel == DEBUGGER_OUTPUT_LEVEL)
-                OutputDebugStringA(logText);
-        }
-    }
+    LogStr(text);
 }
 
 VA(0x004bfc90, 0x76)

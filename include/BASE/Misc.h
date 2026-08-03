@@ -28,7 +28,7 @@ struct indexArray {
 
 #pragma pack(push, 1)
 struct MemEntry {
-    char used;
+    u8 used;
     void* ptr;
     u32 size;
     char file[MEM_ENTRY_FILE_CAPACITY];
