@@ -113,29 +113,16 @@ MessageDispatchResult textWidget::Main(tag_message& msg) {
 
         case MESSAGE_WIDGET:
             switch (msg.payload.widget.command) {
-                case WIDGET_COMMAND_SET_TEXT: {
+                case WIDGET_COMMAND_SET_TEXT:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    char* newText = msg.payload.widget.data.text;
-                    if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
-                        m_text = newText;
-                        return MESSAGE_DISPATCH_CONSUME;
-                    }
-                    u16 newLen = strlen(newText);
-                    if (strlen(m_text) < newLen) {
-                        H2_FREE(m_text);
-                        m_text = static_cast<char*>(
-                            H2_ALLOC(newLen + TEXT_BUFFER_GROWTH)
-                        );
-                    }
-                    strcpy(m_text, newText);
+                    SetText(msg.payload.widget.data.text);
                     return MESSAGE_DISPATCH_CONSUME;
-                }
 
                 case WIDGET_COMMAND_SET_FILL_COLOR:
                     if (m_id != msg.payload.widget.id)
                         goto normalEvent;
-                    m_color = static_cast<FontDrawMode>(msg.payload.widget.data.value);
+                    SetColorIndex(static_cast<FontDrawMode>(msg.payload.widget.data.value));
                     return MESSAGE_DISPATCH_CONSUME;
 
                 default:
