@@ -602,50 +602,29 @@ void mouseManager::CheckUpdateMousePos(void) {
 
 VA(0x004ba460, 0x106)
 void mouseManager::SetColorMice(i32 enabled) {
-    if (enabled != gbColorMice) {
+    if (enabled == gbColorMice)
+        return;
+    {
         i32 savedWM56 = gpWindowManager->m_updateFlags;
         gpWindowManager->m_updateFlags = 0;
         gbPutzingWithMouseCtr++;
-        i32 savedInNew = bInNewMouseUpdate;
+        i32 wasInNew = bInNewMouseUpdate;
         bInNewMouseUpdate = 0;
-        if (gbColorMice != 0) {
-            m_hideCount++;
-            if (m_hideCount == 1)
-                NewUpdate(1);
-        } else {
-            ShowCursor(0);
-        }
-        i32 savedX = m_cursorFrame;
-        MouseCursorType savedY = m_cursorType;
-        i32 saved7e = m_forcePointerUpdate;
+        ReallyHidePointer();
         m_cursorReady = 0;
+        i32 savedX = m_cursorFrame;
+        MouseCursorType oldType = m_cursorType;
+        i32 saved7e = m_forcePointerUpdate;
         gbColorMice = enabled;
         m_cursorFrame = MOUSE_RELOAD_CURSOR_FRAME;
         m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
         m_forcePointerUpdate = 0;
-        SetPointer(gMouseManagerStrings.defaultCursorName, savedX, savedY);
-        m_cursorReady = 1;
+        SetPointer(gMouseManagerStrings.defaultCursorName, savedX, oldType);
         m_forcePointerUpdate = saved7e;
-        if (gbColorMice != 0) {
-            if (m_hideCount > 0 && --m_hideCount == 0) {
-                gbPutzingWithMouseCtr++;
-                if (gbColorMice != 0) {
-                    GetCursorPos(&gMouseCheckPt);
-                    ScreenToClient(hwndApp, &gMouseCheckPt);
-                    i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-                    m_mouseX = x;
-                    i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
-                    m_mouseY = y;
-                    CheckChangeCursor(x, y, 0);
-                }
-                NewUpdate(1);
-                gbPutzingWithMouseCtr--;
-            }
-        } else {
-            ShowCursor(1);
-        }
-        gbPutzingWithMouseCtr--;
-        bInNewMouseUpdate = savedInNew;
+        m_cursorReady = 1;
+        ReallyShowPointer();
+        bInNewMouseUpdate = wasInNew;
+        gbPutzingWithMouseCtr = gbPutzingWithMouseCtr - 1;
         gpWindowManager->m_updateFlags = savedWM56;
     }
 }

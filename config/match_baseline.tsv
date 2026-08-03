@@ -216,7 +216,7 @@ BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	99.6429	e4438511ec49
 BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	99.6429	9704e8fd33e8
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	90.0118	c2e3592fb488
-BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	0.0000	11e3df8e1c4c
+BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	99.8461	df04d528c2fa
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	88.9638	6152e8092dab
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	92.8174	08b42dfe195c
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	d350493d39ed
