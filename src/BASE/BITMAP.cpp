@@ -156,27 +156,17 @@ void bitmap::CopyTo(
 ) {
     PollSound();
     if (width != COPY_STRIDE) {
-        if (height > 0) {
-            i32 rowCount = height;
-            i32 destinationRowOffset;
-            i32 sourceRowOffset;
-            sourceRowOffset = sourceY * COPY_STRIDE;
-            destinationRowOffset = destinationY * COPY_STRIDE;
-            do {
-                memcpy(
-                    destination->m_pixels + destinationRowOffset + destinationX,
-                    m_pixels + sourceRowOffset + sourceX,
-                    width
-                );
-                sourceRowOffset += COPY_STRIDE;
-                destinationRowOffset += COPY_STRIDE;
-                rowCount--;
-            } while (rowCount != 0);
+        for (i32 row = 0; row < height; row++) {
+            memcpy(
+                destination->m_pixels + destinationX + (destinationY + row) * COPY_STRIDE,
+                m_pixels + sourceX + (sourceY + row) * COPY_STRIDE,
+                width
+            );
         }
     } else {
         memcpy(
-            destination->m_pixels + destinationY * COPY_STRIDE + destinationX,
-            m_pixels + sourceY * COPY_STRIDE + sourceX,
+            destination->m_pixels + destinationX + destinationY * COPY_STRIDE,
+            m_pixels + sourceX + sourceY * COPY_STRIDE,
             width * height
         );
     }
@@ -205,22 +195,14 @@ void bitmap::CopyToCareful(
     i32 width,
     i32 height
 ) {
-    const u32 copyWidth = width;
-    i32 row;
-    bitmap* target = destination;
-    bitmap* source = this;
-    if (width >= 1) {
-        row = 0;
-        if (row < height) {
-            do {
-                memcpy(
-                    BitmapPixels(target, (destinationY + row) * BitmapWidth(target)) + destinationX,
-                    BitmapPixels(source) + (sourceY + row) * BitmapWidth(source) + sourceX,
-                    copyWidth
-                );
-                ++row;
-            } while (row < height);
-        }
+    if (width < 1)
+        return;
+    for (i32 row = 0; row < height; row++) {
+        memcpy(
+            destination->m_pixels + destinationX + (destinationY + row) * destination->m_width,
+            m_pixels + sourceX + (sourceY + row) * m_width,
+            width
+        );
     }
 }
 
