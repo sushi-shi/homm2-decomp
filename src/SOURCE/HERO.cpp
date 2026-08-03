@@ -1866,7 +1866,7 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     gpTownManager->m_splitMaximum = gpHVHero->m_army.m_creatureCounts[sourceSlot];
 
     message.type = HERO_UI_MESSAGE;
-    sprintf(gText, "Move how many troops?");
+    sprintf(gText, "\xd1\xea\xee\xeb\xfc\xea\xee \xe2\xee\xe8\xed\xee\xe2 \xef\xe5\xf0\xe5\xed\xe5\xf1\xf2\xe8?");
     message.payload.widget.command = HERO_UI_WIDGET_TEXT;
     message.payload.widget.id = UI_SPLIT_TEXT;
     message.payload.widget.data.text = gText;
@@ -2086,7 +2086,7 @@ void hero::CheckAnduranPieces(i32 showDialog) {
         if (gbThisNetHumanPlayer[m_owner]) {
             LoadPlaySample("treasure.82m");
             NormalDialog(
-                "The three Anduran artifacts magically combine into one.",
+                "\xd2\xf0\xe8 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xe0 \xc0\xed\xe4\xf3\xf0\xe0\xed\xe0 \xf7\xf3\xe4\xe5\xf1\xed\xfb\xec \xf1\xef\xee\xf1\xee\xe1\xee\xec \xee\xe1\xfa\xe5\xe4\xe8\xed\xe8\xeb\xe8\xf1\xfc \xe2 \xee\xe4\xe8\xed \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
                 NORMAL_DIALOG_INFO,
                 NORMAL_DIALOG_NO_RESOURCE,
                 NORMAL_DIALOG_NO_VALUE,

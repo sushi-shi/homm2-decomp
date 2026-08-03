@@ -1428,9 +1428,9 @@ void combatManager::Fireball(i32 targetHex, SpellType spell) {
             m_heroes[IDX(OppositeCombatSide(m_currentSide))]
         );
         if (spell == SPELL_COLD_RING)
-            sprintf(gText, "The cold ring does %d damage.", baseDamage);
+            sprintf(gText, "\xcb\xe5\xe4\xff\xed\xee\xe5 \xea\xee\xeb\xfc\xf6\xee \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage);
         else
-            sprintf(gText, "The fireball does %d damage.", baseDamage);
+            sprintf(gText, "\xce\xe3\xed\xe5\xed\xed\xfb\xe9 \xf8\xe0\xf0 \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage);
         CombatMessage(gText, 1, 1, 0);
         target->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1509,7 +1509,7 @@ void combatManager::MeteorShower(i32 targetHex) {
         }
     }
     if (anyAffected_h) {
-        sprintf(gText, "The meteor shower does %d damage.", baseDamage_w);
+        sprintf(gText, "\xc7\xe2\xe5\xe7\xe4\xee\xef\xe0\xe4 \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage_w);
         CombatMessage(gText, 1, 1, 0);
         target_k->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
     }
@@ -1615,7 +1615,7 @@ void combatManager::Armageddon(void) {
         }
     }
     if (anyAffected6) {
-        sprintf(gText, "The armaggedon does %d damage.", baseDamage2);
+        sprintf(gText, "\xc0\xf0\xec\xe0\xe3\xe5\xe4\xe4\xee\xed \xed\xe0\xed\xee\xf1\xe8\xf2 %d \xe5\xe4. \xf3\xf0\xee\xed\xe0.", baseDamage2);
         CombatMessage(gText, 1, 1, 0);
     }
 
@@ -3081,7 +3081,7 @@ void combatManager::MirrorImage(i32 targetHex) {
         }
         ++distance6;
     }
-    sprintf(gText, "Mirror Image spell failed!");
+    sprintf(gText, "\xd1\xee\xf0\xe2\xe0\xeb\xee\xf1\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 \xf1\xee\xf2\xe2\xee\xf0\xe5\xed\xe8\xff \xf4\xe0\xed\xf2\xee\xec\xee\xe2!");
     NormalDialog(
         gText,
         NORMAL_DIALOG_INFO,

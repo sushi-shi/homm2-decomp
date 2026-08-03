@@ -1010,7 +1010,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                 case KEY_CAST_SPELL:
                     if (m_heroes[IDX(m_currentSide)] == NULL) {
                         NormalDialog(
-                            "You have no hero to cast a spell.",
+                            "\xc8\xb5P",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1041,7 +1041,7 @@ MessageDispatchResult combatManager::ProcessCombatMsg(tag_message& message) {
                         );
                     } else if (m_heroCastSpell[IDX(m_currentSide)] != 0 && giDebugLevel == 0) {
                         NormalDialog(
-                            "You have already cast a spell this round.",
+                            "\xc2\xfb \xf3\xe6\xe5 \xed\xe0\xef\xf0\xe0\xe2\xeb\xff\xeb\xe8 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff \xe2 \xfd\xf2\xee\xec \xf0\xe0\xf3\xed\xe4\xe5.",
                             NORMAL_DIALOG_INFO,
                             NORMAL_DIALOG_NO_RESOURCE,
                             NORMAL_DIALOG_NO_VALUE,
@@ -1654,7 +1654,7 @@ void combatManager::ShowWinLoseArtifact(
     tag_message message;
     char* capturedArtifactName;
 
-    sprintf(gText, "You have captured an enemy artifact!");
+    sprintf(gText, "\xc2\xfb \xe7\xe0\xf5\xe2\xe0\xf2\xe8\xeb\xe8 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2!");
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = COMBAT_WIN_LOSE_TEXT_COMMAND;
     message.payload.widget.id = WIN_LOSE_TEXT_ID;
@@ -1907,7 +1907,7 @@ void combatManager::ShowDeadArmies(class heroWindow* window) {
     }
 
     text_27 = static_cast<char*>(H2_ALLOC(CASUALTY_HEADING_CAPACITY));
-    sprintf(text_27, "Battlefield Casualties");
+    sprintf(text_27, "\xcf\xee\xf2\xe5\xf0\xe8");
     m_winLoseBottomTextWidgets[CASUALTY_TITLE_WIDGET] = new textWidget(
         CASUALTY_TITLE_X,
         CASUALTY_TITLE_Y,
