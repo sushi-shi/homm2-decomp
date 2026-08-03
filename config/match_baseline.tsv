@@ -1451,9 +1451,9 @@ SOURCE/netwin	?nb_listen@@YIGHPAX@Z	100.0000	b805282b1b7c
 SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	7aae41686da9
 SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	e7aaa4b61cb1
 SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	61354c20e32c
-SOURCE/netwin	?nb_thr_ctl@@YIXXZ	99.6738	39e934b9379c
-SOURCE/netwin	@nb_term@0	99.6539	5fc9c6d0d63a
-SOURCE/netwin	_nb_init	99.6556	ba14975e84e1
+SOURCE/netwin	?nb_thr_ctl@@YIXXZ	100.0000	d3b6ebae22aa
+SOURCE/netwin	@nb_term@0	100.0000	c80070c99560
+SOURCE/netwin	_nb_init	99.7219	ba14975e84e1
 SOURCE/netwin	_nb_rcv	100.0000	6823e25a3f0a
 SOURCE/netwin	_nb_sess	99.6127	15faa93fa4d6
 SOURCE/netwin	_nb_snd	100.0000	00ceb0ee45dd
