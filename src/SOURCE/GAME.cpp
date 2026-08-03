@@ -655,10 +655,6 @@ H2_ENUM_END(ViewArmyControlId)
 inline town* GetCastle(i32 idx) {
     return &gpGame->m_castleRecs[idx];
 }
-inline i8 PlayerEventByte(i8 color) {
-    return gpGame->m_players[color].m_color;
-}
-
 inline b32 CanGenerateMonsterGuard(CreatureType monsterType) {
     return monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
            && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
@@ -7603,11 +7599,12 @@ void game::SetupNewRumour(void) {
 
 VA(0x00460424, 0xae)
 EventExtra* GetMapEvent(i32 x, i32 y) {
+    EventExtra* ev;
     i32 i;
     for (i = 0; i < gpGame->m_mapEventCount; i++) {
-        EventExtra* ev = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEventIndices[i]]);
+        ev = reinterpret_cast<EventExtra*>(ppMapExtra[gpGame->m_mapEventIndices[i]]);
         if (ev->x == x && ev->y == y && ev->active != 0
-            && ev->players[PlayerEventByte(giCurPlayer)] != 0)
+            && ev->players[gpGame->m_players[static_cast<i8>(giCurPlayer)].m_color] != 0)
             return ev;
     }
     return NULL;
