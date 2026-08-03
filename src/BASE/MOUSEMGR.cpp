@@ -175,7 +175,9 @@ MessageDispatchResult mouseManager::Main(struct tag_message&) {
 
 VA(0x004b9430, 0x1a2)
 void mouseManager::SetPointer(char* name, i32 frame, MouseCursorType cursorType) {
-    if (m_forcePointerUpdate == 0) {
+    if (m_forcePointerUpdate != 0)
+        return;
+    {
         gbPutzingWithMouseCtr++;
         gpResourceManager->SavePosition();
         if (cursorType == MOUSE_AUTO_CURSOR_TYPE) {
