@@ -22,6 +22,7 @@ base_nogf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX",
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
 o1_frame = ["/nologo", "/c", "/O1", "/Oy-", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
 base_oi = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Oi", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
+base_gf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
 # Buka's modern audio TUs carry C++ exception state (the image's SEH unwind
 # funclets come from them); /Gi- pins the incremental-compilation surface off.
 base_gx = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
@@ -83,7 +84,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/FONT"
 source = "src/BASE/FONT.cpp"
-flags = "base_oi"
+flags = "base_gf"
 
 [[unit]]
 unit = "BASE/ICON"
@@ -157,7 +158,7 @@ flags = "base"
 [[unit]]
 unit = "BASE/RESMGR"
 source = "src/BASE/RESMGR.cpp"
-flags = "base_oi"
+flags = "base_gf"
 
 [[unit]]
 unit = "BASE/RESOURCE"
