@@ -135,10 +135,12 @@ leaveEvent:
 
 VA(0x004cb570, 0xec)
 void border::Draw(void) {
-    heroWindow* window = m_owner;
-    i16 y = m_y + static_cast<i16>(window->m_posY);
-    i16 x = m_x + static_cast<i16>(window->m_posX);
+    i16 x = m_owner->m_posX + m_x;
+    i16 y = m_owner->m_posY + m_y;
     switch (m_kind) {
+        case WIDGET_KIND_ICON:
+            m_backgroundIcon->DrawToBuffer(x, y, 0, ICON_DRAW_NORMAL);
+            return;
         case WIDGET_KIND_SOLID:
             FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, m_fillColor);
             return;
@@ -155,9 +157,6 @@ void border::Draw(void) {
                 y
             );
             PollSound();
-            return;
-        case WIDGET_KIND_ICON:
-            m_backgroundIcon->DrawToBuffer(x, y, 0, ICON_DRAW_NORMAL);
             return;
         default:
             return;

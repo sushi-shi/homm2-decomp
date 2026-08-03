@@ -189,11 +189,8 @@ normalEvent:
 
 VA(0x004bbd70, 0x175)
 void iconWidget::Draw(void) {
-    heroWindow* window = m_owner;
-    i16 y = static_cast<i16>(window->m_posY);
-    i16 x = static_cast<i16>(window->m_posX);
-    x += m_x;
-    y += m_y;
+    i16 x = m_owner->m_posX + m_x;
+    i16 y = m_owner->m_posY + m_y;
 
     switch (m_kind) {
         case WIDGET_KIND_ICON_DIRECT:
