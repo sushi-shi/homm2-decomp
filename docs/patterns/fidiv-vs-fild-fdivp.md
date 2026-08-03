@@ -57,3 +57,32 @@ Every `float`-typed arm (`(float)a/(float)b`, `(float)a/b`, `a/(float)b`) produc
 still `fstp dword`. (The operand swap in the same line is the separate
 `inline-call-operand-index-first` axis: `/Od` lowers `a * b` as `mov reg,a; imul reg,b`,
 so the retail order of the two loads names the source order.)
+
+## Independent confirmation (SOURCE/EVENTS)
+
+The same rule was re-derived from scratch on `advManager::PlayerMonsterInteract`
+(0x47fff) and `advManager::ComputerMonsterInteract` (0x48730), which carry the
+same army-strength ratio.
+
+```
+ours   (float)/(float)                     retail
+------------------------------------       ------------------------------------
+db 85 b0 fe ff ff  fildl  -0x150(%ebp)     db 85 b0 fe ff ff  fildl  -0x150(%ebp)
+...                                        ...
+89 85 ac fe ff ff  movl %eax,-0x154(%ebp)  89 85 ac fe ff ff  movl %eax,-0x154(%ebp)
+da b5 ac fe ff ff  fidivl -0x154(%ebp)     db 85 ac fe ff ff  fildl  -0x154(%ebp)
+                                           de f9              fdivrp %st, %st(1)
+d9 5d f8           fstps  -0x8(%ebp)       d9 5d f0           fstps  -0x10(%ebp)
+```
+
+A 13-arm `batch_source_variants` matrix (`ratio_expr`) separates the two classes
+cleanly: the four `double` arms all land on size 1841, which is retail's size
+(99.810814%), and the four `float` arms on 1839 (99.522520%). Which operand
+carries the cast does not matter, only the type of the division.
+
+**Cross-version note.** PoL 2.0's retail bytes at the same site are also
+`fild; fild; fdivrp`, but the 2.0 reconstruction reaches them from
+`(float)a / (float)b` under MSVC 4.2, which does not perform the `fidiv` fold at
+all. The spelling divergence is therefore a compiler-version artifact rather
+than a source difference, and stays OPEN in `docs/cross-version-spellings.md`
+until the 2.0 tree re-tests the `double` spelling.

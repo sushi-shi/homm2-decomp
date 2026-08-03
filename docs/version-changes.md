@@ -227,6 +227,35 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[Buka] Music configuration** routed through the new `MusicFlags` TU and
   the config musicSource/musicVolume paths in `GAME`/`ADVMGR`/`SMACKMGR`
   (fade timing via `glTimers` slots).
+- **[2.1?/unclassified] `SAMPLE2` shrank to one pointer and `NULL_SAMPLE2`
+  is gone.** PoL 2.0 initializes every event-sound local by copying the
+  8-byte global (`mov eax,NULL_SAMPLE2; mov ecx,NULL_SAMPLE2+4; mov -0x20,eax;
+  mov -0x1c,ecx`, e.g. BarrierEvent 0x4aea92, GenericSiteEvent 0x4b0810).
+  This image stores a single immediate zero (`c7 45 f8 00000000`) into a
+  4-byte slot and never reads a `NULL_SAMPLE2` global anywhere; PoL's
+  `InitVars` writes `NULL_SAMPLE2.pSample = NULL` as its first statement,
+  retail 2.1's `InitVars` (0x46af49) starts at `gGameCommand = -1`. Modeled
+  as `SAMPLE2 sample = {NULL};`. Byte-pinned in BarrierEvent (0x41fbc) and
+  JailEvent (0x42b6c); the same delta is pending in the other EVENTS
+  sound sites (PasswordEvent, GenericSiteEvent, RecruitSiteEvent, DoEvent,
+  FizzleCenter) and in every other TU that still copies `NULL_SAMPLE2`.
+- **[2.1?/unclassified] `advManager::CombatMonsterEvent` stack-split
+  counter is a scalar, not the array's spare element.** PoL's frame carries
+  `placement[MONSTER_ARMY_SLOTS + 1]` and uses `placement[5]` as the running
+  army index; 2.1's frame has `placement[5]` (at -0x14) plus a separate int
+  at -0x20 that the `+= stackCount` walks. Same total frame, different local
+  set. Byte-pinned 2026-08-03 (0x4403b).
+- **[2.1?/unclassified] `advManager::ComputerMonsterInteract` combat tail is
+  an if/else, and the flee arm returns.** 2.1 spells
+  `if (result != 0) *handled = 1; else cell->m_objectMetadata = ...;` and
+  ends the flee arm with an explicit `return;` (jump straight to the
+  epilogue at 0xce36); the PoL body uses an early `return` in the result arm
+  and lets the metadata update fall through. Byte-pinned (0x48730).
+- **[2.1?/unclassified] `advManager::DoCombat` defender-side owner is an
+  if/else chain.** 2.1 writes `secondPlayer` directly in three arms (no
+  ternary temp: only the attacker side keeps the `-0x88` ternary temp);
+  PoL nests two ternaries and burns two extra temps (frame 0x9c vs 0x94).
+  Byte-pinned (0x48c95).
 
 ## Reconstruction infrastructure notes (not version deltas)
 
