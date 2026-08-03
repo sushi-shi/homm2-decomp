@@ -1900,8 +1900,7 @@ i32 army::AttackTo(void) {
 
 VA(0x0041d509, 0x1c8)
 i32 army::AttackTo(i32 destination) {
-    i32 finishStanding;
-    i32 numSteps;
+    i32 stepCount;
     i32 pathIndex;
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
@@ -1924,22 +1923,17 @@ i32 army::AttackTo(i32 destination) {
             DoAttack(0);
         } else {
             pathIndex = 0;
-            numSteps = 0;
+            stepCount = 0;
             for (pathIndex = gpSearchArray->m_pathLength - 1; pathIndex != 0; pathIndex--) {
-                numSteps++;
-                if (pathIndex != 1 && numSteps < m_monster.speed) {
-                    finishStanding = 0;
-                } else {
-                    finishStanding = 1;
-                }
+                stepCount++;
                 Walk(
                     static_cast<CombatHexDirection>(
                         gpSearchArray->m_storage.path.directions[pathIndex + 1]
                     ),
-                    finishStanding,
+                    pathIndex != 1 && stepCount < m_monster.speed ? 0 : 1,
                     pathIndex != gpSearchArray->m_pathLength - 1
                 );
-                if (numSteps >= m_monster.speed && pathIndex != 1) {
+                if (stepCount >= m_monster.speed && pathIndex != 1) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
