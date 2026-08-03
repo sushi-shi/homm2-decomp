@@ -331,23 +331,17 @@ void mouseManager::SetPointer(i32 frame) {
 
 VA(0x004b9b40, 0x5b8)
 void mouseManager::NewUpdate(i32 force) {
-    i32 width;
-    i32 height;
     if (m_hideCount != 0 && force == 0)
         return;
-    if (m_cursorReady == 0 || bInNewMouseUpdate != 0)
+    if (m_cursorReady == 0)
+        return;
+    if (bInNewMouseUpdate != 0)
         return;
 
+    gbPutzingWithMouseCtr = gbPutzingWithMouseCtr + 1;
     bInNewMouseUpdate = 1;
-    gbPutzingWithMouseCtr++;
     if (force == 0) {
-        if (gbColorMice == 0)
-            goto updateDone;
-        GetCursorPos(&gMouseCheckPt);
-        ScreenToClient(hwndApp, &gMouseCheckPt);
-        m_mouseX = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-        m_mouseY = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
-        CheckChangeCursor(m_mouseX, m_mouseY, 0);
+        CheckUpdateMousePos();
     }
     if (gbColorMice == 0)
         goto updateDone;
@@ -399,14 +393,14 @@ void mouseManager::NewUpdate(i32 force) {
                 gOldMouseLeft = m_savedLeft;
             if (gOldMouseTop > m_savedTop)
                 gOldMouseTop = m_savedTop;
-            i32 right =
-                m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
-            if (gOldMouseRight < right)
-                gOldMouseRight = right;
-            i32 bottom =
-                m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
-            if (gOldMouseBottom < bottom)
-                gOldMouseBottom = bottom;
+            if (gOldMouseRight
+                < m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1)
+                gOldMouseRight =
+                    m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] - 1;
+            if (gOldMouseBottom
+                < m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1)
+                gOldMouseBottom =
+                    m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] - 1;
             goto updateBoundsReady;
         }
     }
@@ -425,16 +419,16 @@ updateBoundsReady:
         if (gOldMouseBottom > MOUSE_SCREEN_HEIGHT - 1)
             gOldMouseBottom = MOUSE_SCREEN_HEIGHT - 1;
 
-        width = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-        if (m_savedLeft + width > MOUSE_SCREEN_WIDTH)
+        if (m_savedLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
+            > MOUSE_SCREEN_WIDTH)
             m_savedWidth = MOUSE_SCREEN_WIDTH - m_savedLeft;
         else
-            m_savedWidth = width;
-        height = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
-        if (m_savedTop + height > MOUSE_SCREEN_HEIGHT)
+            m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
+        if (m_savedTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
+            > MOUSE_SCREEN_HEIGHT)
             m_savedHeight = MOUSE_SCREEN_HEIGHT - m_savedTop;
         else
-            m_savedHeight = height;
+            m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
 
         gpWindowManager->m_screen->CopyToCareful(
             m_savedUnderlying,
