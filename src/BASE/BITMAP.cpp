@@ -88,7 +88,7 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
 }
 
 VA(0x004c6090, 0x47)
-inline void bitmap::DrawToBuffer(i16 x, i16 y) {
+void bitmap::DrawToBuffer(i16 x, i16 y) {
     PollSound();
     BlitBitmap(this, 0, 0, m_width, m_height, gpWindowManager->m_screen, x, y);
     PollSound();
@@ -107,7 +107,7 @@ void bitmap::GrabScreen(i16 x, i16 y) {
 }
 
 VA(0x004c6150, 0x36)
-inline void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
+void bitmap::GrabBitmap(class bitmap* src, i16 x, i16 y) {
     BlitBitmap(src, x, y, m_width, m_height, this, 0, 0);
 }
 
