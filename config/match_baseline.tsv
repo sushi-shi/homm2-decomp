@@ -414,7 +414,7 @@ BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	6e108658333c
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	044aca525aac
 BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	e5aad5bf2f33
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	f04ab5d35611
-BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	75.3775	7211fd0c8444
+BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	79.4525	59e8b01bd033
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	45.1972	e9f0fcbd7663
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	34.3569	2278fb616996
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	80.5790	1613322bfbb2

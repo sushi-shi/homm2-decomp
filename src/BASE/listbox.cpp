@@ -339,21 +339,20 @@ VA(0x004cf310, 0x54e)
 void listBoxWidget::DrawLBStuff(i32 doUpdate) {
     i32 y;
     i32 x;
+    i32 i;
     x = m_listX + m_owner->m_posX;
     y = m_listY + m_owner->m_posY;
-    for (i32 i = 0; i < m_maxVisibleItems; i++) {
+    for (i = 0; i < m_maxVisibleItems; i++) {
         if (i == 0) {
             m_icon->DrawToBuffer(x, y, m_firstRowFrame, ICON_DRAW_NORMAL);
             if (i < m_visibleItemCount) {
-                FontDrawMode color =
-                    m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(
                     m_items[m_topIndex],
                     x + TEXT_LEFT_INSET,
                     y + FIRST_ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    color,
+                    m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
             }
@@ -361,79 +360,69 @@ void listBoxWidget::DrawLBStuff(i32 doUpdate) {
         } else if (1 == m_maxVisibleItems - i) {
             m_icon->DrawToBuffer(x, y, m_lastRowFrame, ICON_DRAW_NORMAL);
             if (m_visibleItemCount > i) {
-                i32 itemIndex = m_topIndex + i;
-                FontDrawMode color =
-                    m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(
-                    m_items[itemIndex],
+                    m_items[m_topIndex + i],
                     x + TEXT_LEFT_INSET,
                     y + ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    color,
+                    m_selectedIndex == m_topIndex + i ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
             }
         } else {
             m_icon->DrawToBuffer(x, y, m_middleRowFrame, ICON_DRAW_NORMAL);
             if (i < m_visibleItemCount) {
-                i32 itemIndex = m_topIndex + i;
-                FontDrawMode color =
-                    m_selectedIndex == itemIndex ? m_selectedColor : m_normalColor;
                 m_font->DrawBoundedString(
-                    m_items[itemIndex],
+                    m_items[m_topIndex + i],
                     x + TEXT_LEFT_INSET,
                     y + ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    color,
+                    m_selectedIndex == m_topIndex + i ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
             }
             y += m_rowHeight;
         }
     }
-    i32 upFrame = m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame;
-    m_icon->DrawToBuffer(m_scrollUpX + m_owner->m_posX, m_scrollUpY + m_owner->m_posY, upFrame, ICON_DRAW_NORMAL);
+    m_icon->DrawToBuffer(
+        m_scrollUpX + m_owner->m_posX,
+        m_scrollUpY + m_owner->m_posY,
+        m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame,
+        ICON_DRAW_NORMAL
+    );
     m_icon->DrawToBuffer(
         m_scrollTrackX + m_owner->m_posX,
         m_scrollTrackY + m_owner->m_posY,
         m_scrollTrackFirstFrame,
         ICON_DRAW_NORMAL
     );
-    i32 j;
-    for (j = SCROLL_TRACK_EDGE_ROW_COUNT;
-         j < m_maxVisibleItems - SCROLL_TRACK_EDGE_ROW_COUNT;
-         j++)
+    for (i = SCROLL_TRACK_EDGE_ROW_COUNT; i < m_maxVisibleItems - SCROLL_TRACK_EDGE_ROW_COUNT;
+         i++)
         m_icon->DrawToBuffer(
             m_scrollTrackX + m_owner->m_posX,
-            (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
+            (i - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
             m_scrollTrackMiddleFrame,
             ICON_DRAW_NORMAL
         );
     m_icon->DrawToBuffer(
         m_scrollTrackX + m_owner->m_posX,
-        (j - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
+        (i - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
         m_scrollTrackLastFrame,
         ICON_DRAW_NORMAL
     );
-    i32 downFrame = m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame;
     m_icon->DrawToBuffer(
         m_scrollDownX + m_owner->m_posX,
         m_scrollDownY + m_owner->m_posY,
-        downFrame,
+        m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame,
         ICON_DRAW_NORMAL
     );
-    i16 thumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
-    m_scrollThumbX = thumbX;
-    i32 offset;
-    if (m_scrollRange > 0)
-        offset = m_topIndex * m_scrollThumbTravel / m_scrollRange;
-    else
-        offset = m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR;
-    i16 thumbY = offset + m_owner->m_posY + m_scrollTrackY + SCROLL_THUMB_Y_INSET;
-    m_scrollThumbY = thumbY;
-    m_icon->DrawToBuffer(thumbX, thumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
+    m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
+    m_scrollThumbY = (m_scrollRange > 0 ? m_topIndex * m_scrollThumbTravel / m_scrollRange
+                                        : m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR)
+                     + m_owner->m_posY + m_scrollTrackY + SCROLL_THUMB_Y_INSET;
+    m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     if (doUpdate)
         gpWindowManager
             ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
