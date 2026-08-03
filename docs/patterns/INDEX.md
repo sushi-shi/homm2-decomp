@@ -13,3 +13,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [od-slot-solve](od-slot-solve.md) | byte-identical except swapped ebp displacements → solve local-name buckets, never grind |
 | [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) | jmp-to-jmp at a loop back edge → if/else inside the loop, not `continue` |
 - [inline-call-operand-index-first](inline-call-operand-index-first.md) - ptr-side-first vs inline-accessor index-first; zero-arm ternary sbb
+- [od-constant-ternary-lowering](od-constant-ternary-lowering.md) - `setcc/dec/and/add` select: `dec` (not `sub reg,1`) means a real `?:`, and the source condition is the INVERSE of the emitted setcc
+- [two-backedge-jmps-in-one-loop](two-backedge-jmps-in-one-loop.md) - two separate `jmp <increment>` blocks in one loop body → an explicit `continue` guard plus the natural body end, never one `&&` chain
+- [paren-suppresses-fp-commute](paren-suppresses-fp-commute.md) - `fld`/`fmul` on the wrong float operands and no source order helps → parenthesise the indexed operand
