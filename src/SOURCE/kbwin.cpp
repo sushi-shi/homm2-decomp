@@ -454,7 +454,7 @@ void KBChangeMenu(HMENU menu) {
 
 VA(0x00471d60, 0x117)
 void SetMenuStatus(i32 showMenu) {
-    i32 width;
+    i32 winWidth;
     i32 height;
     i32l windowStyle;
     i32l replacedStyle;
@@ -462,11 +462,11 @@ void SetMenuStatus(i32 showMenu) {
     if (gConfig.gfx[IDX(giCurExe)].fullScreen && showMenu)
         return;
     {
-        width = gConfig.gfx[IDX(giCurExe)].width;
+        winWidth = gConfig.gfx[IDX(giCurExe)].width;
         height = gConfig.gfx[IDX(giCurExe)].height;
         gConfig.gfx[IDX(giCurExe)].showMenu = showMenu;
         KBChangeMenu(NULL);
-        gConfig.gfx[IDX(giCurExe)].width = width;
+        gConfig.gfx[IDX(giCurExe)].width = winWidth;
         gConfig.gfx[IDX(giCurExe)].height = height;
         WritePrefs();
         windowStyle = GetWindowLongA(hwndApp, GWL_STYLE);
