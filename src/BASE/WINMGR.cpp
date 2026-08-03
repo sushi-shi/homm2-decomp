@@ -399,9 +399,8 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
     if (cur == NULL) {
         w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = NULL;
-        heroWindow* oldHead = m_windowListHead;
         m_windowListHead = w;
-        if (oldHead == NULL)
+        if (m_windowListHead == NULL)
             m_windowListTail = w;
     } else if (cur->m_nextWindow == NULL) {
         w->m_prevWindow = m_windowListTail;
@@ -471,8 +470,7 @@ i32 heroWindowManager::DoDialog(
         heroWindowManager* manager = gpWindowManager;
         if (dialogPalette != NULL)
             SetPalette(dialogPalette->m_data, 0);
-        WindowFadeMode fadeType = FADE_IN;
-        switch (fadeType) {
+        switch (FADE_IN) {
             case FADE_IN: {
                 u32 savedUpdate = manager->m_updateFlags;
                 manager->m_updateFlags = 0;
@@ -645,7 +643,6 @@ void heroWindowManager::FizzleForward(
         if (y + height > SCREEN_HEIGHT)
             height = SCREEN_HEIGHT - y;
         if (width > 0 && height > 0) {
-            u32 savedUpdate = m_updateFlags;
             m_updateFlags = 0;
             if (delay == -1)
                 delay = FIZZLE_DEFAULT_DELAY;
@@ -657,8 +654,7 @@ void heroWindowManager::FizzleForward(
 
             for (i32 frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
                 sprintf(gText, "CCYCLE%02d.BIN", frame);
-                u32l id = gpResourceManager->MakeId(gText, 1);
-                gpResourceManager->PointToFile(id);
+                gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
                 gpResourceManager->ReadBlock(cycleTable, FIZZLE_CYCLE_TABLE_BYTES);
                 i32 sourceY = y;
                 if (sourceY < y + height) {
@@ -700,7 +696,7 @@ void heroWindowManager::FizzleForward(
             BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
             BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
             gbEnlargeScreenBlit = true;
-            m_updateFlags = savedUpdate;
+            m_updateFlags = m_updateFlags;
             if (m_fizzleSource != NULL)
                 delete m_fizzleSource;
             m_fizzleSource = NULL;

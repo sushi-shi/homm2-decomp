@@ -31,13 +31,11 @@ void IconToBitmapScale(
     }
     i32 step = SCALE_NATIVE_SIZE / scale;
     i32 srcBase = ((1 - scale) * step + SCALE_NATIVE_SIZE) >> 1;
-    i32 srcAdv = step * SCALE_WORK_BITMAP_SIZE;
     bitmap* tmp =
         new bitmap(BITMAP_TYPE_NONE, SCALE_WORK_BITMAP_SIZE, SCALE_WORK_BITMAP_SIZE);
     i32 rowOff = 0;
-    u8* tmpPixels = tmp->m_pixels;
     do {
-        memset(tmpPixels + rowOff, 0, SCALE_NATIVE_SIZE);
+        memset(tmp->m_pixels + rowOff, 0, SCALE_NATIVE_SIZE);
         rowOff = rowOff + SCALE_NATIVE_SIZE;
     } while (rowOff < SCALE_NATIVE_SIZE * SCALE_WORK_BITMAP_SIZE);
     IconToBitmap(
@@ -73,7 +71,7 @@ void IconToBitmapScale(
                     cols = cols - 1;
                 } while (cols != 0);
             }
-            srcRow = srcRow + srcAdv;
+            srcRow = srcRow + (step * SCALE_WORK_BITMAP_SIZE);
             dstRow = dstRow + pitch;
             rows = rows - 1;
         } while (rows != 0);

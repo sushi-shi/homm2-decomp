@@ -138,8 +138,7 @@ void border::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = m_y + static_cast<i16>(window->m_posY);
     i16 x = m_x + static_cast<i16>(window->m_posX);
-    WidgetKind kind = m_kind;
-    switch (kind) {
+    switch (m_kind) {
         case WIDGET_KIND_SOLID:
             FillBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, m_fillColor);
             return;

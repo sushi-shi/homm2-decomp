@@ -192,11 +192,10 @@ void iconWidget::Draw(void) {
     heroWindow* window = m_owner;
     i16 y = static_cast<i16>(window->m_posY);
     i16 x = static_cast<i16>(window->m_posX);
-    WidgetKind kind = m_kind;
     x += m_x;
     y += m_y;
 
-    switch (kind) {
+    switch (m_kind) {
         case WIDGET_KIND_ICON_DIRECT:
             m_icon->DrawToBuffer(x, y, m_frame, m_orientation);
             return;

@@ -90,9 +90,8 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     i8* yModify
 ) {
     if (gbComputeExtent != 0) {
-        IconDrawOrientation mirror = orientation;
         i32 entryOffset = frame * sizeof(IconEntry);
-        if (mirror != ICON_DRAW_NORMAL) {
+        if (orientation != ICON_DRAW_NORMAL) {
             limits->right =
                 x - reinterpret_cast<IconEntry*>(m_data + entryOffset)->x;
             limits->left =
