@@ -2019,41 +2019,24 @@ i32 SRandom(i32 low, i32 high) {
     if (high < low) {
         return low;
     }
-
-    i32 highTerm = (high * RANDOM_TERM_MULTIPLIER) & RANDOM_TERM_MASK;
-    i32 lowTerm = (low * RANDOM_TERM_MULTIPLIER) & RANDOM_TERM_MASK;
-    iLastSeed += highTerm << RANDOM_HIGH_TERM_SHIFT;
-    iLastSeed += lowTerm * RANDOM_LOW_TERM_MULTIPLIER;
-    iLastSeed += highTerm;
-    iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
-    iLastSeed &= RANDOM_SEED_MASK;
-
-    i32 result = 0;
-    i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
-    mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
-    for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
-        if (mix & (1 << i)) {
-            result |= 1 << i;
-        }
-    }
-    mix += low;
-    i32 range = high - low;
-    mix += high * RANDOM_HIGH_MIX_MULTIPLIER;
-    i32 rangedResult = low + result % (range + 1);
-    iLastSeed = mix;
-    return rangedResult;
+    SIncRandomize(low, high);
+    i32 result = SGenRand();
+    iLastSeed += low;
+    iLastSeed += high * RANDOM_HIGH_MIX_MULTIPLIER;
+    return result % (high - low + 1) + low;
 }
 
 VA(0x004c0470, 0x92)
 void SIncRandomize(i32 x, i32 y) {
     x *= RANDOM_TERM_MULTIPLIER;
-    x &= RANDOM_TERM_MASK;
     y *= RANDOM_TERM_MULTIPLIER;
+    x &= RANDOM_TERM_MASK;
     y &= RANDOM_TERM_MASK;
     iLastSeed += y << RANDOM_HIGH_TERM_SHIFT;
     iLastSeed += x * RANDOM_LOW_TERM_MULTIPLIER;
     iLastSeed += y;
-    iLastSeed += (iLastSeed & RANDOM_FEEDBACK_MASK) << RANDOM_FEEDBACK_SHIFT;
+    i32 feedback = iLastSeed & RANDOM_FEEDBACK_MASK;
+    iLastSeed += feedback << RANDOM_FEEDBACK_SHIFT;
 }
 
 VA(0x004c0510, 0x1f)
@@ -2064,17 +2047,18 @@ void SRand(i32 seed) {
 
 VA(0x004c0530, 0x92)
 i32 SGenRand(void) {
-    i32 result = 0;
+    i32 bitMask;
+    i32 ret = 0;
     iLastSeed &= RANDOM_SEED_MASK;
-    i32 mix = iLastSeed * RANDOM_MIX_MULTIPLIER;
-    mix += (mix & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
+    iLastSeed *= RANDOM_MIX_MULTIPLIER;
+    iLastSeed += (iLastSeed & RANDOM_MIX_MASK) >> RANDOM_MIX_SHIFT;
     for (i32 i = RANDOM_TOP_BIT; i >= 0; --i) {
-        if (mix & (1 << i)) {
-            result |= 1 << i;
+        bitMask = 1 << i;
+        if (iLastSeed & bitMask) {
+            ret |= 1 << i;
         }
     }
-    iLastSeed = mix;
-    return result;
+    return ret;
 }
 
 VA(0x004c05d0, 0x10)
