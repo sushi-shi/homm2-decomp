@@ -556,7 +556,7 @@ SOURCE/AI	?GetClosestArmy@combatManager@@QAEHPAVarmy@@HH@Z	96.9634	ed82a82a725b
 SOURCE/AI	?GetFlyerMask@combatManager@@QAEHH@Z	100.0000	83d01d3dfca4
 SOURCE/AI	?GetMirrorImageMask@combatManager@@QAEHH@Z	100.0000	f4ce2418266a
 SOURCE/AI	?GetModLichDamage@combatManager@@QAEMPAVarmy@@M@Z	93.2500	9cda7aecc37f
-SOURCE/AI	?GetOutOfItMask@combatManager@@QAEHH@Z	99.8276	3c8efe761793
+SOURCE/AI	?GetOutOfItMask@combatManager@@QAEHH@Z	100.0000	fbd3fbaf05d3
 SOURCE/AI	?GetShooterMask@combatManager@@QAEHH@Z	100.0000	de29005bad0a
 SOURCE/AI	?GetStrength@combatManager@@QAEKHH@Z	100.0000	d61081a7d38b
 SOURCE/AI	?GetTraitorMask@combatManager@@QAEHH@Z	100.0000	1915cfa018f8
@@ -618,7 +618,7 @@ SOURCE/ARMYGRP	?GetMorale@armyGroup@@QAEHPAVhero@@PAVtown@@PAV1@@Z	99.7299	bc47d
 SOURCE/ARMYGRP	?GetNumArmies@armyGroup@@QAEHXZ	100.0000	bdd9b2273f54
 SOURCE/ARMYGRP	?HasAllUndead@armyGroup@@QAEHXZ	100.0000	2969ba7cba8f
 SOURCE/ARMYGRP	?HasSomeUndead@armyGroup@@QAEHXZ	100.0000	8dfcc2ab36ab
-SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	99.8925	dc7de949e9f6
+SOURCE/ARMYGRP	?IsHomogeneous@armyGroup@@QAEHH@Z	100.0000	8e3853aecdb1
 SOURCE/ARMYGRP	?IsMember@armyGroup@@QAEHH@Z	100.0000	4921216ba207
 SOURCE/ARMYGRP	?Swap@armyGroup@@QAEXHPAV1@H@Z	100.0000	e61231df2594
 SOURCE/ARMYGRP	?View@armyGroup@@QAEXH@Z	100.0000	a0b6e860755c

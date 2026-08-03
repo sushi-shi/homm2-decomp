@@ -702,24 +702,24 @@ i32 combatManager::GetWalkerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
 
 VA(0x004179cf, 0xc5)
 i32 combatManager::GetOutOfItMask(H2_ENUM_PARAM(CombatSide, i32) side) {
-    i32 armyIndex2 = 0;
-    u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
-    u32 mask5 = 0;
-    army* currentArmy10;
+    i32 idx = 0;
+    u32 bitMask = COMBAT_AI_MASK_FIRST_BIT;
+    u32 result = 0;
+    army* currentArmy;
 
-    for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        currentArmy10 =
-            m_armies[IDX(side)] + armyIndex2;
-        if (currentArmy10 != NULL
-            && HAS(currentArmy10->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+    for (idx = 0; idx < m_armyCount[IDX(side)]; idx++) {
+        currentArmy =
+            m_armies[IDX(side)] + idx;
+        if (currentArmy != NULL
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
-            && (currentArmy10->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] != 0
-                || currentArmy10->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] != 0
-                || currentArmy10->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] != 0))
-            mask5 |= bit1;
-        bit1 <<= 1;
+            && (currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)] != 0
+                || currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)] != 0
+                || currentArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)] != 0))
+            result |= bitMask;
+        bitMask <<= 1;
     }
-    return mask5;
+    return result;
 }
 
 VA(0x00417a94, 0xb6)

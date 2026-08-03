@@ -147,16 +147,16 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     i32 numCreatureTypes = 0;
     u8 raceUsed[ARMY_GROUP_RACE_COUNT];
     memset(raceUsed, 0, sizeof(raceUsed));
-    CreatureType last = CREATURE_NONE;
-    i32 nRaces;
+    CreatureType prev = CREATURE_NONE;
+    i32 numRaces;
     i32 i;
     for (i = 0; i < ARMY_GROUP_SLOT_COUNT; ++i) {
         if (m_creatureTypes[i] != CREATURE_NONE) {
             if (countRaces == ARMY_GROUP_EMPTY_SLOT)
                 ++raceUsed[IDX(gMonsterDatabase[IDX(m_creatureTypes[i])].race)];
-            if (m_creatureTypes[i] != last) {
+            if (m_creatureTypes[i] != prev) {
                 ++numCreatureTypes;
-                last = m_creatureTypes[i];
+                prev = m_creatureTypes[i];
             }
         }
     }
@@ -164,19 +164,19 @@ ArmyGroupAlignmentResult armyGroup::IsHomogeneous(i32 countRaces) {
     if (numCreatureTypes <= 1)
         return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 
-    nRaces = 0;
+    numRaces = 0;
     for (i = 0; i < ARMY_GROUP_RACE_COUNT; ++i) {
         if (raceUsed[i])
-            ++nRaces;
+            ++numRaces;
     }
 
-    if (nRaces == 1)
+    if (numRaces == 1)
         return ARMY_GROUP_ALIGNMENT_SAME;
-    if (nRaces == THREE_ALIGNMENT_COUNT)
+    if (numRaces == THREE_ALIGNMENT_COUNT)
         return ARMY_GROUP_ALIGNMENT_THREE;
-    if (nRaces == FOUR_ALIGNMENT_COUNT)
+    if (numRaces == FOUR_ALIGNMENT_COUNT)
         return ARMY_GROUP_ALIGNMENT_FOUR;
-    if (nRaces >= FIVE_ALIGNMENT_COUNT)
+    if (numRaces >= FIVE_ALIGNMENT_COUNT)
         return ARMY_GROUP_ALIGNMENT_FIVE_OR_MORE;
     return ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
 }
