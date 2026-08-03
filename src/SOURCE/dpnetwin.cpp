@@ -233,14 +233,9 @@ void dpSendMessage(
 
 VA(0x00436da4, 0x48)
 i32 dpnet_snd(i32 position, i32 size, void* data) {
-    i32 destination;
 
     dpProcessMessages();
-    if (position == DP_TRANSPORT_BROADCAST_POSITION)
-        destination = 0;
-    else
-        destination = giNetPosToDCOPos[position];
-    dpSendMessage(destination, NETWORK_PACKET_DATA, static_cast<u16>(size), data);
+    dpSendMessage((position == DP_TRANSPORT_BROADCAST_POSITION ? 0 : giNetPosToDCOPos[position]), NETWORK_PACKET_DATA, static_cast<u16>(size), data);
     return 0;
 }
 

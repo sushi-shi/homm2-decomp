@@ -644,7 +644,6 @@ i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
 VA(0x004994a8, 0x1ab)
 void combatManager::SpellMessage(SpellType spell, i32 hex) {
     army* target;
-    char* armyName;
 
     if (gbNoShowCombat)
         return;
@@ -673,11 +672,7 @@ void combatManager::SpellMessage(SpellType spell, i32 hex) {
             target =
                 &m_armies[IDX(m_hexCells[hex].m_occupantSide)][m_hexCells[hex].m_occupantIndex];
         format_target:
-            if (target->m_quantity == 1)
-                armyName = gArmyNames[IDX(target->m_monsterType)];
-            else
-                armyName = gArmyNamesPlural[IDX(target->m_monsterType)];
-            sprintf(gText, "Cast %s on %s", gSpellNames[IDX(spell)], armyName);
+            sprintf(gText, "Cast %s on %s", gSpellNames[IDX(spell)], (target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)] : gArmyNamesPlural[IDX(target->m_monsterType)]));
             break;
     }
 

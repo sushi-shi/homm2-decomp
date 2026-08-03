@@ -83,37 +83,45 @@ VA(0x00464f58, 0x126)
 void hexcell::DrawTower(i32 frame) {
     i32 level = 0;
     i32 row;
-    i32 drawX;
-    i32 rightX;
-    i32 temp;
 
-    if (level)
-        drawX = m_x;
-    else
-        drawX = m_x + TOWER_X_OFFSET;
     gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
-        ->CombatClipDrawToBuffer(drawX, m_y, frame, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL);
+        ->CombatClipDrawToBuffer(
+            level ? m_x : m_x + TOWER_X_OFFSET,
+            m_y,
+            frame,
+            m_limits,
+            ICON_DRAW_FLIPPED,
+            0,
+            NULL,
+            NULL
+        );
 
     row = (m_y - TOWER_ROW_Y_ORIGIN) / COMBAT_HEX_VERTICAL_STEP;
     if (row == TOWER_EXCLUDED_ROW)
         return;
     if (row & 1) {
-        if (level)
-            rightX = m_x;
-        else
-            rightX = m_x + TOWER_X_OFFSET;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
-                rightX, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_FLIPPED, 0, NULL, NULL
+                level ? m_x : m_x + TOWER_X_OFFSET,
+                m_y,
+                TOWER_OVERLAY_FRAME,
+                m_limits,
+                ICON_DRAW_FLIPPED,
+                0,
+                NULL,
+                NULL
             );
     } else {
-        if (level)
-            temp = m_x - TOWER_X_OFFSET;
-        else
-            temp = m_x;
         gpCombatManager->m_combatIcons[IDX(COMBAT_ICON_TOWER)]
             ->CombatClipDrawToBuffer(
-                temp, m_y, TOWER_OVERLAY_FRAME, m_limits, ICON_DRAW_NORMAL, 0, NULL, NULL
+                level ? m_x - TOWER_X_OFFSET : m_x,
+                m_y,
+                TOWER_OVERLAY_FRAME,
+                m_limits,
+                ICON_DRAW_NORMAL,
+                0,
+                NULL,
+                NULL
             );
     }
 }
