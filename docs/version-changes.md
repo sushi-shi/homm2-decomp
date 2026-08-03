@@ -177,6 +177,14 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `__cdecl` reproduces retail's exact sizes (0x28 / 0x1c1 / 0xee).
   Suspect a wider class - any /Gr TU function whose retail prologue
   lacks the ecx spill is a `__cdecl` candidate.
+- **[Buka] `bitmap::CopyTo` / `CopyToCareful` were rewritten as plain
+  indexed loops.** PoL's running-offset `do/while` (with `rowCount`,
+  `sourceRowOffset`, `destinationRowOffset`) is gone; 2.1 spells both as
+  `for (row = 0; row < height; row++)` with the address recomputed each
+  iteration as `pixels + x + (y + row) * stride`, and `CopyToCareful`
+  opens with a `if (width < 1) return;` guard. `CopyTo` keeps the
+  `width != COPY_STRIDE` fast-path test in that polarity (loop first,
+  whole-block memcpy in the else). Both byte-exact 2026-08-03.
 - **[Buka] Rainbow luck bonus applies before the clamps.**
   `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
   MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
