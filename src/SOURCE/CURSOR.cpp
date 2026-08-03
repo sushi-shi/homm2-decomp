@@ -464,32 +464,30 @@ i32 advManager::GetCursorBaseFrame(H2_ENUM_PARAM(MapDirection, i32) direction) {
 
 VA(0x00433e2c, 0x213)
 void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
-    i32 turnStep_c = 1;
+    i32 inc = 1;
     i32 directionDifference = IDX(direction) - IDX(m_cursorDirection);
     if (directionDifference == 0)
         return;
     if ((directionDifference < 0 && directionDifference >= -DIRECTION_HALF_COUNT)
         || (directionDifference > 0 && directionDifference > DIRECTION_HALF_COUNT))
-        turnStep_c = -1;
+        inc = -1;
     m_cursorTurning = 1;
-    i32 frameIndex_i = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
-    i32 delay_f =
+    i32 frameIndex = IDX(m_cursorDirection) * TURN_FRAME_MULTIPLIER;
+    i32 delayTime =
         giStepDelay[IDX((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]])];
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_SLOWEST)
-        delay_f *= CURSOR_SLOW_TURN_MULTIPLIER;
+        delayTime *= CURSOR_SLOW_TURN_MULTIPLIER;
     if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
         == CONFIG_WALK_SPEED_SLOW)
-        delay_f = static_cast<i32>(delay_f * SLOW_TURN_DELAY_SCALE);
+        delayTime = static_cast<i32>(delayTime * SLOW_TURN_DELAY_SCALE);
 
     do {
         m_cursorCycle = 1;
-        if (m_cursorType >= HERO_TYPE_BOAT)
-            m_cursorFrame = boatFrameFlip[frameIndex_i];
-        else
-            m_cursorFrame = horseFrameFlip[frameIndex_i];
+        m_cursorFrame = m_cursorType < HERO_TYPE_BOAT ? horseFrameFlip[frameIndex]
+                                                      : boatFrameFlip[frameIndex];
         m_cursorFrameCount = 0;
-        glTimers[1] = delay_f + KBTickCount();
+        glTimers[1] = KBTickCount() + delayTime;
         if ((&gConfig.computerWalkSpeed)[gbThisNetHumanPlayer[giCurPlayer]]
             != CONFIG_WALK_SPEED_INSTANT) {
             if (ComboDraw(m_mapOriginX, m_mapOriginY, 0))
@@ -497,11 +495,11 @@ void advManager::TurnTo(H2_ENUM_PARAM(MapDirection, i32) direction) {
             if (bShowIt)
                 DelayTil(&glTimers[1]);
         }
-        frameIndex_i += turnStep_c;
-        if (frameIndex_i < 0)
-            frameIndex_i = CURSOR_TURN_FRAME_COUNT - 1;
-        frameIndex_i %= CURSOR_TURN_FRAME_COUNT;
-    } while (IDX(direction) * TURN_FRAME_MULTIPLIER != frameIndex_i);
+        frameIndex += inc;
+        if (frameIndex < 0)
+            frameIndex = CURSOR_TURN_FRAME_COUNT - 1;
+        frameIndex %= CURSOR_TURN_FRAME_COUNT;
+    } while (frameIndex != IDX(direction) * TURN_FRAME_MULTIPLIER);
 
     m_cursorDirection = direction;
     StopCursor(1);

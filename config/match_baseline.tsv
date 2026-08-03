@@ -412,7 +412,7 @@ BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	47.8243	9de0bfc0777d.4dabe2f544ff
 BASE/listbox	??0listBoxWidget@@QAE@XZ	100.0000	6e108658333c
 BASE/listbox	??1listBoxWidget@@UAE@XZ	100.0000	044aca525aac
-BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	96.3742	bf77b9e8f3de
+BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	e5aad5bf2f33
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	f04ab5d35611
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	75.3775	7211fd0c8444
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	45.1972	e9f0fcbd7663
@@ -710,7 +710,7 @@ SOURCE/CURSOR	?PurgeMapChangeQueue@advManager@@QAEXXZ	100.0000	03e4ea519edd
 SOURCE/CURSOR	?SendMapChange@@YIXHCEEHEE@Z	100.0000	2fe4feca0dd0
 SOURCE/CURSOR	?StartCursor@advManager@@QAEXH@Z	93.6282	dde1bc62a41a
 SOURCE/CURSOR	?StopCursor@advManager@@QAEXH@Z	87.3929	219751d447ee
-SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	93.4593	efd5ed1b34f2
+SOURCE/CURSOR	?TurnTo@advManager@@QAEXH@Z	99.8889	869b82bf0188
 SOURCE/CURSOR	?UnwindMapChangeQueue@advManager@@QAEXHH@Z	100.0000	c06973c72312
 SOURCE/CURSOR	?ValidMove@advManager@@QAEHHH@Z	99.8006	c123ae70ee3e
 SOURCE/CURSOR	?ValidMoveWithEvent@advManager@@QAEHPAVhero@@H@Z	99.7262	6788270a16ae
