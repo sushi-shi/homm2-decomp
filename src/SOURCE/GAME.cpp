@@ -1006,7 +1006,7 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         boat->y = static_cast<i8>(y);
         boat->direction = MAP_DIRECTION_EAST;
         boat->owner = static_cast<i8>(giCurPlayer);
-        mapCell* cell = WORLDMAP->Row(y) + x;
+        mapCell* cell = WORLDMAP->GetCell(x, y);
         boat->savedTriggerType = cell->m_triggerType;
         boat->savedEventData = static_cast<u8>(cell->m_objectMetadata);
         cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
@@ -2181,7 +2181,7 @@ void game::RandomizeEvents(void) {
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.Row(yPos19) + xPos2;
+            cell2 = m_worldMap.GetCell(xPos2, yPos19);
             switch (cell2->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
                     cell2->m_objectMetadata = IDX(HERO_SKILL_NECROMANCY);
@@ -2661,7 +2661,7 @@ void game::RandomizeEvents(void) {
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.Row(yPos19) + xPos2;
+            cell2 = m_worldMap.GetCell(xPos2, yPos19);
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && cell2->m_objectLayerBit1) {
                 valid27 = 1;
                 extraIndex3 = cell2->m_extraIndex;
@@ -2680,7 +2680,7 @@ void game::RandomizeEvents(void) {
 
     for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
         for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.Row(yPos19) + xPos2;
+            cell2 = m_worldMap.GetCell(xPos2, yPos19);
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
                 && cell2->m_objectTileset == TILESET_X_LOC2)
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
@@ -3010,7 +3010,7 @@ void game::ClaimMine(i32 mineId, i32 player) {
             y = m_mines[mineId].y;
             break;
     }
-    acc = m_worldMap.Row(y) + x;
+    acc = m_worldMap.GetCell(x, y);
     if (player == -1) {
         m_worldMap.ChangeTilesetIndex(
             acc, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, 1, -1
@@ -5086,7 +5086,7 @@ void game::InitRandomArtifacts(void) {
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
     for (i32 x = 0; MAP_WIDTH > x; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
-            mapCell* cell = WORLDMAP->Row(y) + x;
+            mapCell* cell = WORLDMAP->GetCell(x, y);
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT))
                 m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
         }
@@ -5771,7 +5771,7 @@ i32 game::HasLateOverlay(i32 col, i32 row) {
 
 VA(0x0045c118, 0xe9)
 void game::ConvertFlagToLateOverlay(i32 col, i32 row) {
-    mapCell* cell = WORLDMAP->Row(row) + col;
+    mapCell* cell = WORLDMAP->GetCell(col, row);
     if (cell->m_overlayTileset == TILESET_FLAG32)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra;
@@ -5797,7 +5797,7 @@ i32 game::HasObjectTilesetIndex(
     H2_ENUM_PARAM(TilesetId, i32) tileset,
     i32 index
 ) {
-    mapCell* cell = WORLDMAP->Row(row) + col;
+    mapCell* cell = WORLDMAP->GetCell(col, row);
     if (cell->m_objectTileset == tileset && cell->m_objectIndex == index)
         return 1;
     mapCellExtra* extra;
@@ -5819,7 +5819,7 @@ i32 game::HasObjectTilesetIndex(
 
 VA(0x0045c2f8, 0xdc)
 void game::ConvertAllToLateOverlay(i32 col, i32 row) {
-    mapCell* cell = WORLDMAP->Row(row) + col;
+    mapCell* cell = WORLDMAP->GetCell(col, row);
     if (cell->m_overlayIndex != MAPCELL_SPRITE_NONE)
         cell->m_drawOverlayOnTop = 1;
     mapCellExtra* extra;
@@ -5849,7 +5849,7 @@ void game::ProcessMapExtra(void) {
 
     for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
         for (col6 = 0; MAP_WIDTH > col6; col6++) {
-            cell10 = WORLDMAP->Row(row16) + col6;
+            cell10 = WORLDMAP->GetCell(col6, row16);
             switch (cell10->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
@@ -5864,7 +5864,7 @@ void game::ProcessMapExtra(void) {
 
     for (row16 = 0; row16 < MAP_HEIGHT; row16++) {
         for (col6 = 0; MAP_WIDTH > col6; col6++) {
-            cell10 = WORLDMAP->Row(row16) + col6;
+            cell10 = WORLDMAP->GetCell(col6, row16);
             if (cell10->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE) && row16 > 0
                 && HasLateOverlay(col6, row16 - 1)) {
                 ConvertFlagToLateOverlay(col6, row16);
@@ -7167,7 +7167,7 @@ void game::RestoreCell(
 
 VA(0x0045f1e3, 0xb9)
 void game::SetMapSize(i32 w, i32 h) {
-    if (h == MAP_HEIGHT && w == MAP_WIDTH && bMapInitialized)
+    if (MAP_HEIGHT == h && MAP_WIDTH == w && bMapInitialized)
         goto mapSized;
     {
         bMapInitialized = 1;
@@ -7839,7 +7839,7 @@ i32 game::CountShrines(i32 player) {
         town* castle;
         for (row = 0; row < MAP_HEIGHT; row++) {
             for (col = 0; col < MAP_WIDTH; col++) {
-                cell = WORLDMAP->Row(row) + col;
+                cell = WORLDMAP->GetCell(col, row);
                 if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
                     castle = GetCastle(cell->m_objectMetadata);
                     if (castle->m_owner == player
