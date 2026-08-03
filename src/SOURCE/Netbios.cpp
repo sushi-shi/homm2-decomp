@@ -134,7 +134,6 @@ i8 InitNetGuest(void) {
 
 VA(0x00473ae8, 0x3b)
 i8 WaitForHost(void) {
-    char scratch[SCRATCH_BUFFER_SIZE];
     i32 status;
 
     switch (iWaitForHostStatus) {
@@ -152,7 +151,6 @@ i8 WaitForHost(void) {
 
 VA(0x00473b23, 0xb3)
 i8 WaitForGuest(void) {
-    char scratch[SCRATCH_BUFFER_SIZE];
     i32 status;
 
     switch (iWaitForGuestStatus) {
