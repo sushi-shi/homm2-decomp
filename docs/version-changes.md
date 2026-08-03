@@ -117,14 +117,16 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   unit block - their compiles ran without pooling (`base_nogf`). Pooled
   literals are `??_C@` COMDATs the linker folds image-wide, so cross-unit
   references are expected.
-- **[Buka] In-code UI strings translated to Russian (CP1251).** 29 string
+- **[Buka] In-code UI strings translated to Russian (CP1251).** 33 string
   literals compiled into code (not the resource text) carry Buka's Russian
   translation where PoL/Gold had English: the ADVMGR bottom-bar date words
   (`Month`/`Week`/`Day` → `Месяц`/`Неделя`/`День`), combat confirmations and
   the Sphere-of-Negation notice (COMMAND), hero dismissal (HERO), building
   production and out-of-memory text (KB), the whole Modem/SETUP dial and
   hosting dialog set, garrison-full (RECRUIT), five combat-spell rejection
-  messages (SPELLS), the tavern rumor lead-in (TOWNMGR), network
+  messages plus the Holy Word / Holy Shout and Death-spell damage reports
+  and the plural/singular resurrection reports (SPELLS), the tavern rumor
+  lead-in (TOWNMGR), network
   hosting/waiting texts (Wsnetwin/dpnetwin), and the 256-color requirement
   (wingraph). Found mechanically: for every byte-proven function, the retail
   dword at each donated string site names a cell whose retail content is
