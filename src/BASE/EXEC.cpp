@@ -192,33 +192,29 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
 
 VA(0x004c5430, 0xc3)
 void executive::RemoveManager(class baseManager* mgr) {
-    if (mgr != NULL) {
-        mgr->Close();
-        baseManager* next;
-        baseManager* prev = mgr->m_prev;
-        if (prev == NULL) {
-            baseManager* tail = m_managerListTail;
-            if (m_managerListHead == tail) {
-                m_managerListTail = NULL;
-                m_managerListHead = NULL;
-            } else {
-                next = mgr->m_next;
-                m_managerListHead = next;
-                next->m_prev = NULL;
-            }
-            mgr->m_prev = NULL;
-            mgr->m_next = NULL;
-            return;
+    if (mgr == NULL)
+        return;
+    mgr->Close();
+    baseManager* prev = mgr->m_prev;
+    if (prev == NULL) {
+        if (m_managerListHead == m_managerListTail) {
+            m_managerListTail = NULL;
+            m_managerListHead = NULL;
+        } else {
+            m_managerListHead = mgr->m_next;
+            m_managerListHead->m_prev = NULL;
         }
-        next = mgr->m_next;
-        prev->m_next = next;
-        if (next == NULL)
-            m_managerListTail = prev;
-        else
-            next->m_prev = prev;
         mgr->m_prev = NULL;
         mgr->m_next = NULL;
+        return;
     }
+    prev->m_next = mgr->m_next;
+    if (prev->m_next == NULL)
+        m_managerListTail = prev;
+    else
+        prev->m_next->m_prev = prev;
+    mgr->m_prev = NULL;
+    mgr->m_next = NULL;
 }
 
 VA(0x004c5500, 0x7c)

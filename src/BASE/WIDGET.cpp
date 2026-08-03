@@ -189,9 +189,9 @@ MessageDispatchResult widget::Main(tag_message& message) {
 
 VA(0x004d4540, 0x7e)
 void widget::Dim(void) {
-    if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
-        i16 x = m_owner->m_posX + m_x;
-        i16 y = m_y + m_owner->m_posY;
-        DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
-    }
+    if (m_kind == WIDGET_KIND_UNDIMMED || m_kind == WIDGET_KIND_TEXT)
+        return;
+    i16 x = m_owner->m_posX + m_x;
+    i16 y = m_owner->m_posY + m_y;
+    DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
 }
