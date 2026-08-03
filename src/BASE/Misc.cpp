@@ -512,9 +512,8 @@ void ProcessAssert(i32 condition, char* file, i32 line) {
 
 VA(0x004bdf10, 0x75)
 char* FindStringInString(char* text, char* pattern) {
-    i32 text_len = strlen(text);
     i32 pattern_len = strlen(pattern);
-    i32 count = text_len - pattern_len + 1;
+    i32 count = (strlen(text)) - pattern_len + 1;
     i32 i = 0;
     if (count > 0) {
         do {

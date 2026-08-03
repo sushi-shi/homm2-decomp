@@ -37,9 +37,8 @@ textWidget::textWidget(
     H2_ENUM_PARAM(FontAlignment, i16) alignment
 )
     : widget(x, y, width, height, id, kind) {
-    font* loadedFont = gpResourceManager->GetFont(fontName);
     m_color = color;
-    m_font = loadedFont;
+    m_font = (gpResourceManager->GetFont(fontName));
     m_text = text;
     m_alignment = alignment;
     m_kind = WIDGET_KIND_TEXT;

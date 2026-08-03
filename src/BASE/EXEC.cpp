@@ -159,7 +159,6 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     }
     if (!mgr->m_active && mgr->Open(priority) != 0)
         return MANAGER_ERROR;
-    baseManager* tail = m_managerListTail;
     baseManager* cur = m_managerListTail;
     if (cur != NULL) {
         do {
@@ -178,7 +177,7 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
             m_managerListTail = mgr;
     } else if (cur->m_next == NULL) {
         mgr->m_next = NULL;
-        mgr->m_prev = tail;
+        mgr->m_prev = m_managerListTail;
         m_managerListTail->m_next = mgr;
         m_managerListTail = mgr;
     } else {
