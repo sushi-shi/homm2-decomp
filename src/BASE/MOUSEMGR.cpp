@@ -489,14 +489,16 @@ void mouseManager::MouseCoords(i32& x, i32& y) {
 
 VA(0x004ba160, 0x105)
 void mouseManager::SaveAndDraw(void) {
-    m_savedWidth =
-        m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL] > MOUSE_SCREEN_WIDTH
-                       ? MOUSE_SCREEN_WIDTH - m_cursorLeft
-                       : iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
-    m_savedHeight =
-        m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL] > MOUSE_SCREEN_HEIGHT
-                        ? MOUSE_SCREEN_HEIGHT - m_cursorTop
-                        : iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
+    if (m_cursorLeft + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL]
+        > MOUSE_SCREEN_WIDTH)
+        m_savedWidth = MOUSE_SCREEN_WIDTH - m_cursorLeft;
+    else
+        m_savedWidth = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_HORIZONTAL];
+    if (m_cursorTop + iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL]
+        > MOUSE_SCREEN_HEIGHT)
+        m_savedHeight = MOUSE_SCREEN_HEIGHT - m_cursorTop;
+    else
+        m_savedHeight = iMouseSize[m_cursorSizeIndex][MOUSE_CURSOR_VERTICAL];
     gpWindowManager->m_screen->CopyToCareful(
         m_savedUnderlying,
         0,
@@ -582,11 +584,9 @@ void mouseManager::CheckUpdateMousePos(void) {
     if (gbColorMice != 0) {
         GetCursorPos(&gMouseCheckPt);
         ScreenToClient(hwndApp, &gMouseCheckPt);
-        i32 x = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
-        m_mouseX = x;
-        i32 y = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
-        m_mouseY = y;
-        CheckChangeCursor(x, y, 0);
+        m_mouseX = (gMouseCheckPt.x * MOUSE_SCREEN_WIDTH) / iMainWinScreenWidth;
+        m_mouseY = (gMouseCheckPt.y * MOUSE_SCREEN_HEIGHT) / iMainWinScreenHeight;
+        CheckChangeCursor(m_mouseX, m_mouseY, 0);
     }
 }
 
