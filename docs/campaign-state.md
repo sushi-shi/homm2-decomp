@@ -97,24 +97,31 @@ rule: it does not close the function, and there is no natural name at the
 required bucket for the textY local - the width slot wants bucket 0
 (`wide` fits), the textY slot wants bucket 1 and nothing clean lands there.)
 
-### DIR32 count census (docs/dir32-count-mismatches.tsv)
+### DIR32 count census - RESOLVED, false alarm
 
-Ran the reloc check across every same-length function: **72 mismatches,
-and the delta is +3 in ALL 72** - never +1, +2 or negative. That
-uniformity says one systematic cause, not 72 independent defects. Two
-hypotheses, untested:
+Ran a reloc-count check across every same-length function: 72 mismatches,
+every one exactly +3. Dumped the three unmatched site offsets for
+`UpdBottomViewResMsg` and they are the **SEH registration triple**:
 
-1. `config/delink_relocs.tsv` (analysis output, the only DIR32 channel
-   since the image has no `.reloc` directory) is missing three sites per
-   affected function.
-2. Our objects genuinely emit three extra absolute references per
-   function - one construct, repeated.
+```
+@0x0c  64 a1 00000000      mov eax, fs:[0]      ; __except_list read
+@0x14  64 89 25 00000000   mov fs:[0], esp      ; install handler
+@0x37c 64 89 0d 00000000   mov fs:[0], ecx      ; uninstall
+```
 
-Hypothesis 1 is the more likely: the affected set is dominated by
-ADVMGR/CMBTMGR dialog-style functions that share a call shape. Resolve
-by dumping the three unmatched site RVAs for one function and checking
-what the retail bytes hold there. Do NOT "fix" 72 functions before
-settling which side is wrong.
+Those are genuine COFF relocations against `__except_list` in our object,
+but they are NOT image relocations - the operand is a segment-relative
+`fs:` offset, so `config/delink_relocs.tsv` correctly omits them. All 72
+rows are /GX functions and the +3 is the same three sites every time.
+
+`homm2.audit.reloc_donation` already skips `__except_list`
+(reloc_donation.py:203); my ad-hoc census simply failed to replicate that
+rule. **The byte-proof harness was never wrong here** - retract the
+earlier note claiming it has a reloc-count blind spot. `docs/
+dir32-count-mismatches.tsv` is kept only as the worked example.
+
+The permuter's `relocs A/B` line is still worth reading, but for /GX
+functions expect ours to exceed retail by exactly 3.
 
 ## Work queues (artifacts, not prose)
 
