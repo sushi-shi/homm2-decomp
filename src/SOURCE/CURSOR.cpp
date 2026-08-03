@@ -516,13 +516,13 @@ i32 advManager::GetMoveShowIt(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
 ) {
-    i32 directionX = normalDirTable[IDX(direction)].x;
-    i32 directionY = normalDirTable[IDX(direction)].y;
+    i32 dx = normalDirTable[IDX(direction)].x;
+    i32 dy = normalDirTable[IDX(direction)].y;
     if ((gbThisNetHumanPlayer[giCurPlayer] || !gConfig.blackoutComputer)
         && (MapExtraPosAndAdjacentsSet(movingHero->m_x, movingHero->m_y, giCurWatchPlayerBit)
             || MapExtraPosAndAdjacentsSet(
-                movingHero->m_x + directionX,
-                movingHero->m_y + directionY,
+                movingHero->m_x + dx,
+                movingHero->m_y + dy,
                 giCurWatchPlayerBit
             )))
         return 1;

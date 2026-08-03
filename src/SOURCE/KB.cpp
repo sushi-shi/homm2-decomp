@@ -1634,11 +1634,11 @@ VA(0x00469085, 0x80)
 i32 CanBuy(town* t, BuildingSlotType type) {
     i32 buf[KB_BUILDING_RESOURCE_COUNT];
     playerData* ptr;
-    i32 idx;
+    i32 r;
     GetBuildingCost(t->m_type, type, buf, t->m_buildState);
     ptr = &gpGame->m_players[giCurPlayer];
-    for (idx = 0; idx < KB_BUILDING_RESOURCE_COUNT; idx++)
-        if (ptr->m_resources[idx] < buf[idx])
+    for (r = 0; r < KB_BUILDING_RESOURCE_COUNT; r++)
+        if (ptr->m_resources[r] < buf[r])
             return 0;
     return 1;
 }

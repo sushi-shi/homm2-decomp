@@ -815,8 +815,8 @@ VA(0x0044c6b4, 0x84)
 i32 playerData::NumOfGivenArtifact(ArtifactType artifact) {
     i32 count = 0;
     i32 i;
+    i32 jj;
     for (i = 0; i < m_heroCount; i++) {
-        i32 jj;
         for (jj = 0; jj < HERO_ARTIFACT_SLOT_COUNT; jj++) {
             if (gpGame->m_heroRecs[m_heroIds[i]].m_artifacts[jj] == artifact)
                 count++;
@@ -2780,14 +2780,14 @@ VA(0x00453a95, 0x85)
 void game::InitializePasswords(void) {
     char flag;
     i32 i;
-    i32 jj;
+    i32 j;
     for (i = 0; i < PASSWORD_INDEX_COUNT; i++) {
         flag = 0;
         while (flag == 0) {
             xPasswordStringsIndex[i] = Random(0, X_GLOBAL_PASSWORD_STRING_COUNT - 1);
             flag = 1;
-            for (jj = 0; jj < i; jj++) {
-                if (xPasswordStringsIndex[jj] == xPasswordStringsIndex[i])
+            for (j = 0; j < i; j++) {
+                if (xPasswordStringsIndex[i] == xPasswordStringsIndex[j])
                     flag = 0;
             }
         }
@@ -2796,10 +2796,10 @@ void game::InitializePasswords(void) {
 
 VA(0x00453b1a, 0x6b)
 void game::RandomizeBarrier(mapCell* cell) {
-    i32 idx = cell->m_objectMetadata;
-    idx &= PASSWORD_INDEX_MASK;
-    i32 p = xPasswordStringsIndex[idx];
-    i32 color = (p << PASSWORD_COLOR_SHIFT) | idx;
+    i32 index = cell->m_objectMetadata;
+    index &= PASSWORD_INDEX_MASK;
+    i32 p = xPasswordStringsIndex[index];
+    i32 color = (p << PASSWORD_COLOR_SHIFT) | index;
     cell->m_objectMetadata = color | 0;
 }
 
