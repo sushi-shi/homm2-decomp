@@ -29,12 +29,6 @@ H2_ENUM_BEGIN(FindPathConstant)
     INITIAL_BEST_DISTANCE          = COMBAT_SCREEN_WIDTH
 H2_ENUM_END(FindPathConstant)
 
-inline i32 ApproximateGridDistance(i32 xDistance, i32 yDistance) {
-    if (xDistance < yDistance)
-        return yDistance + xDistance / DISTANCE_MINOR_DIVISOR;
-    return xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
-}
-
 }
 
 static i32 gSearchLow;
@@ -100,7 +94,8 @@ i32 searchArray::QuickDistance(i32 x1, i32 y1, i32 x2, i32 y2) {
     i32 xDistance = abs(x1 - x2);
     i32 yDistance = abs(y1 - y2);
 
-    return ApproximateGridDistance(xDistance, yDistance);
+    return xDistance < yDistance ? yDistance + xDistance / DISTANCE_MINOR_DIVISOR
+                                 : xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
 }
 
 VA(0x00449d9b, 0xa1)
@@ -449,7 +444,9 @@ i32 searchArray::FindCombatPath(
             i32 yDistance =
                 abs(gpCombatManager->m_hexCells[currentHex].m_y
                     - gpCombatManager->m_hexCells[targetHex].m_y);
-            i32 distance = ApproximateGridDistance(xDistance, yDistance);
+            i32 distance = xDistance < yDistance
+                               ? yDistance + xDistance / DISTANCE_MINOR_DIVISOR
+                               : xDistance + yDistance / DISTANCE_MINOR_DIVISOR;
 
             if (unit->m_targetSide != COMBAT_SIDE_NONE) {
                 attackMask =
