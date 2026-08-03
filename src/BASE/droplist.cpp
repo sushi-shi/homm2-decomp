@@ -502,9 +502,7 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_dropButtonWidth,
         m_dropButtonHeight
     );
-    m_savedBackground =
-        new bitmap(BITMAP_TYPE_NONE, m_savedBackgroundWidth, m_savedBackgroundHeight);
-    m_savedBackground->GrabScreen(m_savedBackgroundX, m_savedBackgroundY);
+    SaveDropBackground();
 
     DrawDropStuff();
     for (;;) {
@@ -682,16 +680,7 @@ void dropListWidget::ProcessSelectDialog(void) {
     }
 
 done:
-    m_savedBackground->DrawToBuffer(m_savedBackgroundX, m_savedBackgroundY);
-    gpWindowManager->UpdateScreenRegion(
-        m_savedBackgroundX,
-        m_savedBackgroundY,
-        m_savedBackgroundWidth,
-        m_savedBackgroundHeight
-    );
-    if (m_savedBackground != NULL)
-        delete m_savedBackground;
-    m_savedBackground = NULL;
+    RestoreDropBackground();
     Draw();
     gpWindowManager
         ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
