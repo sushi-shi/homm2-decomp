@@ -9336,22 +9336,22 @@ void advManager::SaveAdventureBorder(void) {
 
     m_adventureBorder = static_cast<u8*>(H2_ALLOC(BORDER_BUFFER_SIZE));
     u8* savedPixels = m_adventureBorder;
-    u8* screenPixel = gpWindowManager->m_screen->m_pixels;
+    u8* screen = gpWindowManager->m_screen->m_pixels;
     i32 row;
     for (row = 0; row < BORDER_EDGE_SIZE; ++row) {
-        memcpy(savedPixels, screenPixel, BORDER_ROW_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(savedPixels, screen, BORDER_ROW_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_ROW_BYTES;
     }
     for (row = BORDER_EDGE_SIZE; row < BORDER_MIDDLE_END; ++row) {
-        memcpy(savedPixels, screenPixel, BORDER_SIDE_BYTES);
-        memcpy(savedPixels + BORDER_SIDE_BYTES, screenPixel + BORDER_MIDDLE_END, BORDER_SIDE_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(savedPixels, screen, BORDER_SIDE_BYTES);
+        memcpy(savedPixels + BORDER_SIDE_BYTES, screen + BORDER_MIDDLE_END, BORDER_SIDE_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_SAVED_SIDE_BYTES;
     }
     for (row = BORDER_MIDDLE_END; row < SCREEN_HEIGHT; ++row) {
-        memcpy(savedPixels, screenPixel, BORDER_ROW_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(savedPixels, screen, BORDER_ROW_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_ROW_BYTES;
     }
 }
@@ -9365,23 +9365,23 @@ void advManager::DrawAdventureBorder(void) {
         return;
     }
 
-    u8* screenPixel = gpWindowManager->m_screen->m_pixels;
+    u8* screen = gpWindowManager->m_screen->m_pixels;
     u8* savedPixels = m_adventureBorder;
     i32 row;
     for (row = 0; row < BORDER_EDGE_SIZE; ++row) {
-        memcpy(screenPixel, savedPixels, BORDER_ROW_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(screen, savedPixels, BORDER_ROW_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_ROW_BYTES;
     }
     for (row = BORDER_EDGE_SIZE; row < BORDER_MIDDLE_END; ++row) {
-        memcpy(screenPixel, savedPixels, BORDER_SIDE_BYTES);
-        memcpy(screenPixel + BORDER_MIDDLE_END, savedPixels + BORDER_SIDE_BYTES, BORDER_SIDE_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(screen, savedPixels, BORDER_SIDE_BYTES);
+        memcpy(screen + BORDER_MIDDLE_END, savedPixels + BORDER_SIDE_BYTES, BORDER_SIDE_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_SAVED_SIDE_BYTES;
     }
     for (row = BORDER_MIDDLE_END; row < SCREEN_HEIGHT; ++row) {
-        memcpy(screenPixel, savedPixels, BORDER_ROW_BYTES);
-        screenPixel += BORDER_SCREEN_PITCH;
+        memcpy(screen, savedPixels, BORDER_ROW_BYTES);
+        screen += BORDER_SCREEN_PITCH;
         savedPixels += BORDER_ROW_BYTES;
     }
 }

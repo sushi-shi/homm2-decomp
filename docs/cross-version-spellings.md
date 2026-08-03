@@ -27,6 +27,8 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| advManager::SaveAdventureBorder local | `screenPixel` | `screen` (bucket 0 ties savedPixels; later decl wins the 3-cycle) | OPEN |
+| advManager::DrawAdventureBorder slots | - | PARKED: the sibling's rename does NOT transfer (Draw declares screen first and wants savedPixels above it); decl-order swap measured 232 diffs, `saved`/`dst`+`src` measured worse - permuter queued | OPEN |
 | slot-solve batch 4 (3 fns) | PoL names | GetBitmap/GetMIDIWrap `id`->`fileId`; GiveArmy `tmp`->`swap` | OPEN as slot-name class |
 | DDSetFullScreenStatus / SetupHotSeatGame slots | - | PARKED: retail's 5-slot order needs x/y declared ASYMMETRICALLY (868 solver hits, all requiring e.g. `x` + `top`/`y1`) - unnatural for a paired coordinate function; SetupHotSeatGame's `window` slot resists both bucket-1 and bucket-2 names | OPEN - permuter/identifier_rename matrix queued |
 | slot-solve batch 3 (7 fns) | PoL names | HandleVictory mapIndex->map; dpSendMessage result->status; DetermineHeroToMove idx/val->best/value; GetTurnAttentionValue factor->scale; Expunge cur/next (ShutDownSystem echo); ValidPath reserved->extra (dead slot); ValidSpellTarget unusedSpellWord5->unused (dead slot) | OPEN as slot-name class |
