@@ -1069,7 +1069,7 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
         positiveEffectResult = 0;
         negativeEffectResult = 0;
         for (index = 0; index < COMBAT_ARMY_SLOT_COUNT; index++) {
-            if (targetIndex != -1 && index != targetIndex)
+            if (targetIndex != -1 && targetIndex != index)
                 continue;
             if (m_armies[sideWork][index].IsAlive()) {
                 combatTarget = &m_armies[sideWork][index];
@@ -1080,18 +1080,16 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                         curePointsTotal = combatTarget->m_hitPointsLost;
                     positiveEffectResult = static_cast<i32>(
                         positiveEffectResult
-                        + static_cast<float>(
-                              gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue
-                          ) * curePointsTotal
-                              * COMBAT_SPELL_AI_CURE_VALUE_MODIFIER
+                        + static_cast<float>(curePointsTotal) * COMBAT_SPELL_AI_CURE_VALUE_MODIFIER
+                              * gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue
                               / combatTarget->m_monster.hitPoints
                     );
                 }
 
                 fullQuantityWork =
                     HAS(combatTarget->m_monster.flags.all, MONSTER_FLAGS_FULL_AI_QUANTITY) != 0;
-                armyValueResult = gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue
-                                  * combatTarget->m_quantity;
+                armyValueResult = combatTarget->m_quantity
+                                  * gMonsterDatabase[IDX(combatTarget->m_monsterType)].fightValue;
                 if (HAS(combatTarget->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
                     negativeEffectResult = armyValueResult;
                 } else {
@@ -1116,10 +1114,10 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                           * gfCancelDurationMods
                                               [combatTarget->m_spellInfluence[IDX(influence)]
                                                            + fullQuantityWork
-                                                       >= SPELL_AI_MAX_DURATION
-                                                   ? SPELL_AI_MAX_DURATION
-                                                   : combatTarget->m_spellInfluence[IDX(influence)]
-                                                         + fullQuantityWork]
+                                                       < SPELL_AI_MAX_DURATION
+                                                   ? combatTarget->m_spellInfluence[IDX(influence)]
+                                                         + fullQuantityWork
+                                                   : SPELL_AI_MAX_DURATION]
                                 );
                                 break;
                             case ARMY_SPELL_INFLUENCE_ANTI_MAGIC:
@@ -1140,10 +1138,10 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
                                           * gfCancelDurationMods
                                               [combatTarget->m_spellInfluence[IDX(influence)]
                                                            + fullQuantityWork
-                                                       >= SPELL_AI_MAX_DURATION
-                                                   ? SPELL_AI_MAX_DURATION
-                                                   : combatTarget->m_spellInfluence[IDX(influence)]
-                                                         + fullQuantityWork]
+                                                       < SPELL_AI_MAX_DURATION
+                                                   ? combatTarget->m_spellInfluence[IDX(influence)]
+                                                         + fullQuantityWork
+                                                   : SPELL_AI_MAX_DURATION]
                                 );
                                 break;
                         }
@@ -1154,11 +1152,11 @@ void combatManager::EffectSpellCure(i32* effect, i32 targetSide, i32 targetIndex
         }
         if (cure == 1)
             positiveEffectResult = 0;
-    if (IDX(m_currentSide) == sideWork)
+    if (sideWork == IDX(m_currentSide))
             *effect += -negativeEffectResult - positiveEffectResult;
         else
             *effect += positiveEffectResult + negativeEffectResult;
-        if (targetSide == SPELL_AI_ANY_SIDE && IDX(m_currentSide) == sideWork)
+        if (targetSide == SPELL_AI_ANY_SIDE && sideWork == IDX(m_currentSide))
             sideWork = IDX(OppositeCombatSide(m_currentSide));
         else
             done = 1;

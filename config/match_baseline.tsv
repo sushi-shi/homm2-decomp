@@ -1235,7 +1235,7 @@ SOURCE/SPELLAI	?ClearEffects@combatManager@@QAEXXZ	100.0000	aeb55146f37f
 SOURCE/SPELLAI	?DetermineEffectOfSpell@combatManager@@QAEXHPAH0@Z	75.7848	e2e34603608e
 SOURCE/SPELLAI	?DoSpellAI@combatManager@@QAEHHH@Z	99.6797	1a01dbfceb88
 SOURCE/SPELLAI	?EffectSpellCreateCreature@combatManager@@QAEHHH@Z	99.9744	369d30937a0a
-SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	93.7589	34c83a54339d
+SOURCE/SPELLAI	?EffectSpellCure@combatManager@@QAEXPAHHHH@Z	99.7826	659c64177a42
 SOURCE/SPELLAI	?EffectSpellDamage@combatManager@@QAEXPAHHH@Z	54.4188	6c9806f7527c
 SOURCE/SPELLAI	?EffectSpellResurrect@combatManager@@QAEXPAHHH@Z	99.9785	3ba13f7af31d
 SOURCE/SPELLAI	?FirstArmy@combatManager@@QAEHHHPAH@Z	100.0000	e590a6be71b6
