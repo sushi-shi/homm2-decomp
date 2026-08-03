@@ -609,18 +609,18 @@ done:
 
 VA(0x004938d5, 0x28b)
 i32 game::PickLoadGame(void) {
-    char filePattern_4[FILE_PATTERN_CAPACITY];
-    i32 dialogResult_18;
-    heroWindow* window_27;
-    fileRequester* requester_11;
+    char filePattern[FILE_PATTERN_CAPACITY];
+    i32 dialogResult;
+    heroWindow* window;
+    fileRequester* requester;
 
     if (gbWaitForRemoteReceive != 0)
         return 1;
 
     if (gbInCampaign != 0) {
-        sprintf(filePattern_4, "*.GMC");
+        sprintf(filePattern, "*.GMC");
     } else if (xIsPlayingExpansionCampaign != 0) {
-        sprintf(filePattern_4, "*.GXC");
+        sprintf(filePattern, "*.GXC");
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             "At least one player does not have the Heroes II Expansion set.  You will only be able "
@@ -635,13 +635,13 @@ i32 game::PickLoadGame(void) {
             -1,
             0
         );
-        sprintf(filePattern_4, "*.GM%d", giNumHumanPlayers);
+        sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
     } else {
-        window_27 = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
-        if (window_27 == NULL)
+        window = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
+        if (window == NULL)
             MemError();
-        gpWindowManager->DoDialog(window_27, ExpStdGameHandler, 0);
-        delete window_27;
+        gpWindowManager->DoDialog(window, ExpStdGameHandler, 0);
+        delete window;
 
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case CHOICE_ONE:
@@ -655,28 +655,28 @@ i32 game::PickLoadGame(void) {
         }
 
         if (xIsExpansionMap != 0)
-            sprintf(filePattern_4, "*.GX%d", giNumHumanPlayers);
+            sprintf(filePattern, "*.GX%d", giNumHumanPlayers);
         else
-            sprintf(filePattern_4, "*.GM%d", giNumHumanPlayers);
+            sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
     }
 
-    requester_11 = new fileRequester(
+    requester = new fileRequester(
         FILE_REQUESTER_X,
         FILE_REQUESTER_Y,
         FILE_REQUESTER_LOAD_GAME,
-        filePattern_4,
+        filePattern,
         gcGamePath,
-        filePattern_4
+        filePattern
     );
-    if (requester_11 == NULL)
+    if (requester == NULL)
         MemError();
-    dialogResult_18 = gpExec->DoDialog(requester_11);
-    if (dialogResult_18 == FILE_REQUESTER_OK) {
+    dialogResult = gpExec->DoDialog(requester);
+    if (dialogResult == FILE_REQUESTER_OK) {
         gpGame->LoadGame(gLastFilename, 0, 0);
-        delete requester_11;
+        delete requester;
         return 1;
     } else {
-        delete requester_11;
+        delete requester;
         return 0;
     }
 }

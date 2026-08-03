@@ -2810,32 +2810,32 @@ void game::RandomizePassword(mapCell* cell) {
 
 VA(0x00453b9e, 0x435)
 i32 game::LoadMap(char* filename) {
-    char column5[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
+    char column[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     i32 i37;
-    i32 file2;
-    char row9[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
-    char type5[LOAD_MAP_RECORD_SCRATCH_SIZE];
-    char trailer15[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    i32 file;
+    char row[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
+    char type[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    char trailer[LOAD_MAP_RECORD_SCRATCH_SIZE];
 
     sprintf(gText, "%s%s", gcMapPath, filename);
-    file2 = open(gText, _O_BINARY);
-    if (file2 == -1)
+    file = open(gText, _O_BINARY);
+    if (file == -1)
         FileError(gText);
-    read(file2, &m_mapHeader, sizeof(m_mapHeader));
-    m_worldMap.Read(file2, 1);
+    read(file, &m_mapHeader, sizeof(m_mapHeader));
+    m_worldMap.Read(file, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
     for (i37 = 0; i37 < GAME_TOWN_COUNT; i37++) {
-        read(file2, column5, sizeof(column5[0]));
-        read(file2, row9, sizeof(row9[0]));
-        read(file2, type5, sizeof(type5[0]));
-        if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
+        read(file, column, sizeof(column[0]));
+        read(file, row, sizeof(row[0]));
+        read(file, type, sizeof(type[0]));
+        if (static_cast<u8>(column[0]) != SAVED_TOWN_OFF_MAP) {
             m_castleRecs[i37].m_onMap = 1;
-            m_castleRecs[i37].m_x = static_cast<u8>(column5[0]);
-            m_castleRecs[i37].m_y = static_cast<u8>(row9[0]);
+            m_castleRecs[i37].m_x = static_cast<u8>(column[0]);
+            m_castleRecs[i37].m_y = static_cast<u8>(row[0]);
             m_castleRecs[i37].m_type =
-                static_cast<FactionType>(type5[0] & TOWN_RECORD_TYPE_MASK);
-            if (type5[0] < 0)
+                static_cast<FactionType>(type[0] & TOWN_RECORD_TYPE_MASK);
+            if (type[0] < 0)
                 m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_CASTLE);
             else
                 m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_TENT);
@@ -2844,37 +2844,37 @@ i32 game::LoadMap(char* filename) {
 
     for (i37 = 0; i37 < GAME_MINE_COUNT; i37++) {
         if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i37 >= GAME_TOWN_COUNT) {
-            column5[0] = -1;
-            row9[0] = -1;
-            type5[0] = -1;
+            column[0] = -1;
+            row[0] = -1;
+            type[0] = -1;
         } else {
-            read(file2, column5, sizeof(column5[0]));
-            read(file2, row9, sizeof(row9[0]));
-            read(file2, type5, sizeof(type5[0]));
+            read(file, column, sizeof(column[0]));
+            read(file, row, sizeof(row[0]));
+            read(file, type, sizeof(type[0]));
         }
-        if (static_cast<u8>(column5[0]) != SAVED_TOWN_OFF_MAP) {
+        if (static_cast<u8>(column[0]) != SAVED_TOWN_OFF_MAP) {
             m_mines[i37].guardianType = CREATURE_NONE;
-            m_mines[i37].x = static_cast<u8>(column5[0]);
-            m_mines[i37].y = static_cast<u8>(row9[0]);
-            m_mines[i37].resourceType = static_cast<MineType>(type5[0]);
+            m_mines[i37].x = static_cast<u8>(column[0]);
+            m_mines[i37].y = static_cast<u8>(row[0]);
+            m_mines[i37].resourceType = static_cast<MineType>(type[0]);
         }
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    read(file2, &m_obeliskCount, sizeof(m_obeliskCount));
+    read(file, &m_obeliskCount, sizeof(m_obeliskCount));
     read(
-        file2,
+        file,
         m_rumourEventIndices,
         m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
     );
     m_rumourEventCount = m_mapHeader.rumourCount;
     read(
-        file2,
+        file,
         m_timeEventIndices,
         m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    read(file2, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    read(file, &iMaxMapExtra, sizeof(iMaxMapExtra));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
     );
@@ -2884,12 +2884,12 @@ i32 game::LoadMap(char* filename) {
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
     for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
-        read(file2, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
+        read(file, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
         ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37]);
-        read(file2, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
+        read(file, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
     }
-    read(file2, trailer15, sizeof(u16));
-    close(file2);
+    read(file, trailer, sizeof(u16));
+    close(file);
     return 0;
 }
 
@@ -4696,81 +4696,81 @@ void game::WeeklyGenericSite(mapCell* cell) {
 
 VA(0x00459b19, 0x383)
 void game::PerMonth(void) {
-    mapCell* cell0;
-    i32 mapX8;
-    i32 mapY5;
-    i32 townIndex0;
-    i32 building4;
-    i32 growth9;
-    town* castle10;
-    i32 firstCount5;
-    i32 secondCount4;
+    mapCell* cell;
+    i32 mapX;
+    i32 mapY;
+    i32 townIndex;
+    i32 building;
+    i32 growth;
+    town* castle;
+    i32 firstCount;
+    i32 secondCount;
 
     m_month++;
-    townIndex0 = Random(ROLL_MIN, ROLL_MAX);
-    if (townIndex0 <= NORMAL_ROLL_MAX) {
+    townIndex = Random(ROLL_MIN, ROLL_MAX);
+    if (townIndex <= NORMAL_ROLL_MAX) {
         giMonthType = CALENDAR_PERIOD_NORMAL;
         giMonthTypeExtra = Random(NORMAL_NAME_MIN, NORMAL_NAME_MAX);
-    } else if (townIndex0 <= CREATURE_ROLL_MAX) {
+    } else if (townIndex <= CREATURE_ROLL_MAX) {
         giMonthType = CALENDAR_PERIOD_CREATURE;
         giMonthTypeExtra = giMonType[Random(CREATURE_LIST_MIN, CREATURE_LIST_MAX)];
     } else {
         giMonthType = CALENDAR_PERIOD_PLAGUE;
     }
 
-    for (townIndex0 = 0; townIndex0 < GAME_TOWN_COUNT; townIndex0++) {
-        for (building4 = WEEKLY_FIRST_DWELLING; building4 <= WEEKLY_LAST_DWELLING; building4++) {
-            castle10 = GetTown(townIndex0);
-            if (castle10->m_buildings & (1 << building4)) {
-                growth9 = gMonsterDatabase[IDX(gDwellingType[IDX(castle10->m_type)]
-                                                            [building4 - WEEKLY_FIRST_DWELLING])]
+    for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
+        for (building = WEEKLY_FIRST_DWELLING; building <= WEEKLY_LAST_DWELLING; building++) {
+            castle = GetTown(townIndex);
+            if (castle->m_buildings & (1 << building)) {
+                growth = gMonsterDatabase[IDX(gDwellingType[IDX(castle->m_type)]
+                                                            [building - WEEKLY_FIRST_DWELLING])]
                               .growth;
-                if (castle10->m_buildings & WELL_BUILDING)
-                    growth9 += WELL_GROWTH;
-                if (building4 == WEEKLY_FIRST_DWELLING
-                    && (castle10->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
-                    growth9 += FIRST_DWELLING_GROWTH;
+                if (castle->m_buildings & WELL_BUILDING)
+                    growth += WELL_GROWTH;
+                if (building == WEEKLY_FIRST_DWELLING
+                    && (castle->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
+                    growth += FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
-                    && IDX(gDwellingType[IDX(castle10->m_type)]
-                                        [building4 - WEEKLY_FIRST_DWELLING])
+                    && IDX(gDwellingType[IDX(castle->m_type)]
+                                        [building - WEEKLY_FIRST_DWELLING])
                            == giMonthTypeExtra)
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] *=
+                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] *=
                         CREATURE_MONTH_MULTIPLIER;
 
                 if (giMonthType == CALENDAR_PERIOD_PLAGUE) {
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] -= growth9;
-                    if (castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] < 0)
-                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] = 0;
-                    castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] =
-                        castle10->m_garrison[building4 - WEEKLY_FIRST_DWELLING] >> 1;
+                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] -= growth;
+                    if (castle->m_garrison[building - WEEKLY_FIRST_DWELLING] < 0)
+                        castle->m_garrison[building - WEEKLY_FIRST_DWELLING] = 0;
+                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] =
+                        castle->m_garrison[building - WEEKLY_FIRST_DWELLING] >> 1;
                 }
             }
         }
     }
 
     if (giMonthType == CALENDAR_PERIOD_CREATURE) {
-        for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
-            for (mapY5 = 0; mapY5 < MAP_HEIGHT; mapY5++) {
-                cell0 = gpAdvManager->GetCell(mapX8, mapY5);
-                if (cell0->m_triggerType == MAP_OBJECT_NONE && !cell0->m_objectLayerBit1
-                    && !cell0->m_objectLayerBit0
-                    && giGroundToTerrain[cell0->m_terrainImageIndex] != TERRAIN_WATER) {
+        for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
+            for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
+                cell = gpAdvManager->GetCell(mapX, mapY);
+                if (cell->m_triggerType == MAP_OBJECT_NONE && !cell->m_objectLayerBit1
+                    && !cell->m_objectLayerBit0
+                    && giGroundToTerrain[cell->m_terrainImageIndex] != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
-                        cell0->m_triggerType = MONSTER_TRIGGER;
-                        cell0->m_objectTileset = TILESET_MONS32;
-                        cell0->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
-                        firstCount5 = GetRandomNumTroops(
+                        cell->m_triggerType = MONSTER_TRIGGER;
+                        cell->m_objectTileset = TILESET_MONS32;
+                        cell->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
+                        firstCount = GetRandomNumTroops(
                             static_cast<CreatureType>(giMonthTypeExtra)
                         );
-                        secondCount4 = GetRandomNumTroops(
+                        secondCount = GetRandomNumTroops(
                             static_cast<CreatureType>(giMonthTypeExtra)
                         );
-                        cell0->m_objectMetadata = (firstCount5 + secondCount4) | 0;
+                        cell->m_objectMetadata = (firstCount + secondCount) | 0;
                         if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
                             < MONSTER_GUARD_CUTOFF)
-                            cell0->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
+                            cell->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                 }
             }
@@ -4869,19 +4869,19 @@ void game::ConvertObject(
 
 VA(0x0045a25e, 0x1b0)
 void game::RandomizeTown(i32 x, i32 y, i32) {
-    i32 unused6[RANDOM_TOWN_SCRATCH_WIDTH];
-    i32 townId0 = GetTownId(x, y);
-    town* castle0 = GetTown(townId0);
+    i32 unused[RANDOM_TOWN_SCRATCH_WIDTH];
+    i32 townId = GetTownId(x, y);
+    town* castle = GetTown(townId);
     mapTownExtra* extra =
         reinterpret_cast<mapTownExtra*>(ppMapExtra[WORLDMAP->GetCell(x, y)->m_objectMetadata]);
-    FactionType race0;
+    FactionType race;
 
     if (extra->color == RANDOM_TOWN_UNOWNED_COLOR)
-        race0 = static_cast<FactionType>(Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX));
+        race = static_cast<FactionType>(Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX));
     else
-        race0 = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
+        race = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
 
-    castle0->m_turnsOwned = RANDOM_TOWN_AGE;
+    castle->m_turnsOwned = RANDOM_TOWN_AGE;
     ConvertObject(
         x + RANDOM_TOWN_LEFT,
         y + RANDOM_TOWN_TOP,
@@ -4891,7 +4891,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
-        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
     );
@@ -4904,7 +4904,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
-        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_TOWN,
         MAP_OBJECT_CASTLE
     );
@@ -4917,7 +4917,7 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OBJECT_SOURCE_FIRST,
         RANDOM_TOWN_OBJECT_SOURCE_LAST,
         RANDOM_TOWN_OBJECT_TILESET,
-        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
     );
@@ -4930,11 +4930,11 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
         RANDOM_TOWN_OVERLAY_SOURCE_FIRST,
         RANDOM_TOWN_OVERLAY_SOURCE_LAST,
         RANDOM_TOWN_OVERLAY_TILESET,
-        IDX(race0) << RANDOM_TOWN_RACE_FRAME_SHIFT,
+        IDX(race) << RANDOM_TOWN_RACE_FRAME_SHIFT,
         MAP_OBJECT_RANDOM_CASTLE,
         MAP_OBJECT_CASTLE
     );
-    m_castleRecs[townId0].m_type = race0;
+    m_castleRecs[townId].m_type = race;
 }
 
 VA(0x0045a40e, 0x522)
@@ -6313,37 +6313,37 @@ void game::ProcessOnMapHeroes(void) {
 
 VA(0x0045d5ba, 0x4c9)
 void game::CheckHeroConsistency(void) {
-    hero* mapHero3;
-    mapCell* cell1;
+    hero* mapHero;
+    mapCell* cell;
     i32 x11;
     i32 y8;
-    i32 player3;
-    i32 slot1;
-    i32 total26 = 0;
-    i32 consistent13;
-    town* occupiedTown9;
+    i32 player;
+    i32 slot;
+    i32 total = 0;
+    i32 consistent;
+    town* occupiedTown;
 
-    for (player3 = 0; player3 < m_playerCount; player3++) {
-        if (m_playerDead[player3] != 0)
+    for (player = 0; player < m_playerCount; player++) {
+        if (m_playerDead[player] != 0)
             continue;
-        total26 += m_players[player3].m_heroCount;
-        for (slot1 = 0; slot1 < m_players[player3].m_heroCount; slot1++) {
-            if (m_heroRecs[m_players[player3].m_heroIds[slot1]].m_owner != player3)
-                consistent13 = 0;
+        total += m_players[player].m_heroCount;
+        for (slot = 0; slot < m_players[player].m_heroCount; slot++) {
+            if (m_heroRecs[m_players[player].m_heroIds[slot]].m_owner != player)
+                consistent = 0;
         }
     }
 
-    for (player3 = 0; player3 < m_playerCount; player3++) {
-        if (m_playerDead[player3] == 0) {
-            for (slot1 = 0; slot1 < AVAILABLE_HERO_SLOTS; slot1++) {
-                if ((m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] >= 0
-                     && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]]
+    for (player = 0; player < m_playerCount; player++) {
+        if (m_playerDead[player] == 0) {
+            for (slot = 0; slot < AVAILABLE_HERO_SLOTS; slot++) {
+                if ((m_availableHeroes[m_players[player].m_availableHeroIds[slot]] >= 0
+                     && m_availableHeroes[m_players[player].m_availableHeroIds[slot]]
                             <= HERO_CONSISTENCY_PLAYABLE_FACTION_MAX)
-                    || (total26 < HERO_CONSISTENCY_POOL_THRESHOLD
-                        && m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] == -1)) {
-                    m_players[player3].m_availableHeroIds[slot1] =
-                        static_cast<i8>(GetNewHeroId(player3, FACTION_ANY, 0));
-                    m_availableHeroes[m_players[player3].m_availableHeroIds[slot1]] =
+                    || (total < HERO_CONSISTENCY_POOL_THRESHOLD
+                        && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
+                    m_players[player].m_availableHeroIds[slot] =
+                        static_cast<i8>(GetNewHeroId(player, FACTION_ANY, 0));
+                    m_availableHeroes[m_players[player].m_availableHeroIds[slot]] =
                         WEEKLY_AVAILABLE_HERO;
                 }
             }
@@ -6352,53 +6352,53 @@ void game::CheckHeroConsistency(void) {
 
     for (x11 = 0; x11 < MAP_WIDTH; x11++) {
         for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
-            cell1 = gpAdvManager->GetCell(x11, y8);
-            if (cell1->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
-                if (cell1->m_objectMetadata >= 0 && cell1->m_objectMetadata < GAME_HERO_COUNT) {
-                    mapHero3 = GetHero(cell1->m_objectMetadata);
-                    if (mapHero3->m_x != x11 || mapHero3->m_y != y8) {
-                        cell1->m_triggerType = 0;
-                        cell1->m_objectMetadata = 0;
+            cell = gpAdvManager->GetCell(x11, y8);
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
+                if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
+                    mapHero = GetHero(cell->m_objectMetadata);
+                    if (mapHero->m_x != x11 || mapHero->m_y != y8) {
+                        cell->m_triggerType = 0;
+                        cell->m_objectMetadata = 0;
                     }
-                    if (mapHero3->m_owner < 0 || mapHero3->m_owner >= GAME_PLAYER_COUNT) {
-                        if (mapHero3->m_locationType
+                    if (mapHero->m_owner < 0 || mapHero->m_owner >= GAME_PLAYER_COUNT) {
+                        if (mapHero->m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                            occupiedTown9 = gpGame->GetTown(mapHero3->m_occupiedTown);
-                            occupiedTown9->m_occupyingHeroId = -1;
+                            occupiedTown = gpGame->GetTown(mapHero->m_occupiedTown);
+                            occupiedTown->m_occupyingHeroId = -1;
                         }
-                        if (mapHero3->m_x == x11 && mapHero3->m_y == y8) {
+                        if (mapHero->m_x == x11 && mapHero->m_y == y8) {
                             RestoreCell(
-                                mapHero3->m_x,
-                                mapHero3->m_y,
-                                mapHero3->m_locationType,
-                                mapHero3->m_occupiedTown,
+                                mapHero->m_x,
+                                mapHero->m_y,
+                                mapHero->m_locationType,
+                                mapHero->m_occupiedTown,
                                 NULL,
                                 1
                             );
                         } else {
-                            cell1->m_triggerType = 0;
-                            cell1->m_objectMetadata = 0;
+                            cell->m_triggerType = 0;
+                            cell->m_objectMetadata = 0;
                         }
                     }
                 } else {
-                    cell1->m_triggerType = 0;
+                    cell->m_triggerType = 0;
                 }
             }
         }
     }
 
-    for (player3 = 0; player3 < GAME_HERO_COUNT; player3++) {
-        for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
-            if (m_heroRecs[player3].m_army.m_troopTypes[slot1] == CREATURE_NONE
-                || m_heroRecs[player3].m_army.m_creatureCounts[slot1] < 0)
-                m_heroRecs[player3].m_army.m_creatureCounts[slot1] = 0;
+    for (player = 0; player < GAME_HERO_COUNT; player++) {
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
+            if (m_heroRecs[player].m_army.m_troopTypes[slot] == CREATURE_NONE
+                || m_heroRecs[player].m_army.m_creatureCounts[slot] < 0)
+                m_heroRecs[player].m_army.m_creatureCounts[slot] = 0;
         }
     }
-    for (player3 = 0; player3 < GAME_TOWN_COUNT; player3++) {
-        for (slot1 = 0; slot1 < ARMY_GROUP_SLOT_COUNT; slot1++) {
-            if (m_castleRecs[player3].m_army.m_troopTypes[slot1] == CREATURE_NONE
-                || m_castleRecs[player3].m_army.m_creatureCounts[slot1] < 0)
-                m_castleRecs[player3].m_army.m_creatureCounts[slot1] = 0;
+    for (player = 0; player < GAME_TOWN_COUNT; player++) {
+        for (slot = 0; slot < ARMY_GROUP_SLOT_COUNT; slot++) {
+            if (m_castleRecs[player].m_army.m_troopTypes[slot] == CREATURE_NONE
+                || m_castleRecs[player].m_army.m_creatureCounts[slot] < 0)
+                m_castleRecs[player].m_army.m_creatureCounts[slot] = 0;
         }
     }
 }
@@ -7377,68 +7377,68 @@ void CreateDiffFile(
 
 VA(0x0045f9cd, 0x37e)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
-    u8* oldData13 = NULL;
-    u8* diffData5 = NULL;
-    u8* joinData9 = NULL;
-    i32 joinSize37 = 0;
-    i32 diffSize1;
-    i32 copyLength9;
-    i32 diffFile2;
-    i32 oldSize10;
-    u8 copyFlag16;
-    i32 position1;
-    i32 joinFile0;
+    u8* oldData = NULL;
+    u8* diffData = NULL;
+    u8* joinData = NULL;
+    i32 joinSize = 0;
+    i32 diffSize;
+    i32 copyLength;
+    i32 diffFile;
+    i32 oldSize;
+    u8 copyFlag;
+    i32 position;
+    i32 joinFile;
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    diffSize1 = FileSize(gText);
-    diffData5 = static_cast<u8*>(H2_ALLOC(diffSize1));
+    diffSize = FileSize(gText);
+    diffData = static_cast<u8*>(H2_ALLOC(diffSize));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    diffFile2 = open(gText, _O_BINARY);
-    if (diffFile2 == -1)
+    diffFile = open(gText, _O_BINARY);
+    if (diffFile == -1)
         FileError(gText);
-    read(diffFile2, diffData5, diffSize1);
-    close(diffFile2);
+    read(diffFile, diffData, diffSize);
+    close(diffFile);
 
-    joinData9 = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
-    if (diffData5[0] == 0) {
-        memcpy(joinData9, diffData5 + JOIN_HEADER_SIZE, diffSize1 - JOIN_HEADER_SIZE);
-        joinSize37 = diffSize1 - JOIN_HEADER_SIZE;
+    joinData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
+    if (diffData[0] == 0) {
+        memcpy(joinData, diffData + JOIN_HEADER_SIZE, diffSize - JOIN_HEADER_SIZE);
+        joinSize = diffSize - JOIN_HEADER_SIZE;
     } else {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        oldSize10 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize10));
+        oldSize = FileSize(gText);
+        oldData = static_cast<u8*>(H2_ALLOC(oldSize));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        diffFile2 = open(gText, _O_BINARY);
-        if (diffFile2 == -1)
+        diffFile = open(gText, _O_BINARY);
+        if (diffFile == -1)
             FileError(gText);
-        read(diffFile2, oldData13, oldSize10);
-        close(diffFile2);
-        memcpy(joinData9, oldData13, oldSize10);
+        read(diffFile, oldData, oldSize);
+        close(diffFile);
+        memcpy(joinData, oldData, oldSize);
 
-        position1 = JOIN_HEADER_SIZE;
-        while (position1 < diffSize1) {
-            copyFlag16 = diffData5[position1] >> DIFF_COPY_FLAG_SHIFT;
-            copyLength9 = GetSkipCopyLen(diffData5, &position1);
-            if (copyFlag16) {
-                memcpy(joinData9 + joinSize37, diffData5 + position1, copyLength9);
-                joinSize37 += copyLength9;
-                position1 += copyLength9;
+        position = JOIN_HEADER_SIZE;
+        while (position < diffSize) {
+            copyFlag = diffData[position] >> DIFF_COPY_FLAG_SHIFT;
+            copyLength = GetSkipCopyLen(diffData, &position);
+            if (copyFlag) {
+                memcpy(joinData + joinSize, diffData + position, copyLength);
+                joinSize += copyLength;
+                position += copyLength;
             } else {
-                joinSize37 += copyLength9;
+                joinSize += copyLength;
             }
         }
     }
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (joinFile0 == -1)
+    joinFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (joinFile == -1)
         FileError(gText);
-    write(joinFile0, joinData9, joinSize37);
-    close(joinFile0);
+    write(joinFile, joinData, joinSize);
+    close(joinFile);
     LogInt(
         const_cast<char*>("New Join CRC"),
-        calc_crc_long(joinData9, joinSize37),
-        joinSize37,
+        calc_crc_long(joinData, joinSize),
+        joinSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -7447,18 +7447,18 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     );
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile0 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (joinFile0 == -1)
+    joinFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (joinFile == -1)
         FileError(gText);
-    write(joinFile0, joinData9, joinSize37);
-    close(joinFile0);
+    write(joinFile, joinData, joinSize);
+    close(joinFile);
 
-    if (oldData13)
-        H2_FREE(oldData13);
-    if (diffData5)
-        H2_FREE(diffData5);
-    if (joinData9)
-        H2_FREE(joinData9);
+    if (oldData)
+        H2_FREE(oldData);
+    if (diffData)
+        H2_FREE(diffData);
+    if (joinData)
+        H2_FREE(joinData);
 }
 
 VA(0x0045fd4b, 0x46)
@@ -7732,87 +7732,87 @@ i32 CalcFileCRC(char* filename) {
 
 VA(0x0046099a, 0x120)
 void CompressTest2(void) {
-    i32 dataSize2;
-    i32l encodedSize14;
-    i32l decodedSize17;
-    char* sourceData6;
-    i32 sourceCrc0;
-    char* decodedData6;
-    i32 index7;
-    i32 decodedCrc5;
-    i32 sourceCrcCheck7;
-    char* encodedData6;
+    i32 dataSize;
+    i32l encodedSize;
+    i32l decodedSize;
+    char* sourceData;
+    i32 sourceCrc;
+    char* decodedData;
+    i32 index;
+    i32 decodedCrc;
+    i32 sourceCrcCheck;
+    char* encodedData;
 
-    dataSize2 = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
-    sourceData6 =
+    dataSize = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
+    sourceData =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
         );
-    encodedData6 =
+    encodedData =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
         );
-    decodedData6 =
+    decodedData =
         static_cast<char*>(
-            H2_ALLOC(dataSize2 + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
         );
-    for (index7 = 0; index7 < dataSize2; index7++)
-        sourceData6[index7] = static_cast<char>(Random(0, 255));
-    sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    encodedSize14 = EncodeData(encodedData6, sourceData6, dataSize2);
-    decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
-    decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), dataSize2);
-    sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), dataSize2);
-    H2_FREE(sourceData6);
-    H2_FREE(encodedData6);
-    H2_FREE(decodedData6);
+    for (index = 0; index < dataSize; index++)
+        sourceData[index] = static_cast<char>(Random(0, 255));
+    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(sourceData), dataSize);
+    encodedSize = EncodeData(encodedData, sourceData, dataSize);
+    decodedSize = DecodeData(decodedData, encodedData, encodedSize);
+    decodedCrc = calc_crc_long(reinterpret_cast<u8*>(decodedData), dataSize);
+    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(sourceData), dataSize);
+    H2_FREE(sourceData);
+    H2_FREE(encodedData);
+    H2_FREE(decodedData);
 }
 
 VA(0x00460aba, 0x18c)
 void CompressTest(void) {
-    i32l fileSize7;
-    i32l encodedSize14;
-    i32l decodedSize17;
-    char* sourceData6;
-    i32 sourceCrc0;
-    char* decodedData6;
-    i32 fileHandle4;
-    i32 decodedCrc5;
-    i32 sourceCrcCheck7;
-    char* encodedData6;
-    char filename3[TEST_FILENAME_SIZE];
+    i32l fileSize;
+    i32l encodedSize;
+    i32l decodedSize;
+    char* sourceData;
+    i32 sourceCrc;
+    char* decodedData;
+    i32 fileHandle;
+    i32 decodedCrc;
+    i32 sourceCrcCheck;
+    char* encodedData;
+    char filename[TEST_FILENAME_SIZE];
 
     LogStr(const_cast<char*>("C1"));
-    strcpy(filename3, "c:\\TEMP\\Z.DIF");
-    fileSize7 = FileSize(filename3);
-    sourceData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA)
+    strcpy(filename, "c:\\TEMP\\Z.DIF");
+    fileSize = FileSize(filename);
+    sourceData = static_cast<char*>(
+        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    encodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA)
+    encodedData = static_cast<char*>(
+        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    decodedData6 = static_cast<char*>(
-        H2_ALLOC(fileSize7 + TEST_FILE_BUFFER_EXTRA)
+    decodedData = static_cast<char*>(
+        H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
     LogStr(const_cast<char*>("C2"));
-    fileHandle4 = open(filename3, _O_BINARY);
-    if (fileHandle4 == -1)
-        FileError(filename3);
-    read(fileHandle4, sourceData6, fileSize7);
+    fileHandle = open(filename, _O_BINARY);
+    if (fileHandle == -1)
+        FileError(filename);
+    read(fileHandle, sourceData, fileSize);
     LogStr(const_cast<char*>("C3"));
-    sourceCrc0 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
+    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(sourceData), fileSize);
     LogStr(const_cast<char*>("C4"));
-    close(fileHandle4);
+    close(fileHandle);
     LogStr(const_cast<char*>("C5"));
-    encodedSize14 = EncodeData(encodedData6, sourceData6, fileSize7);
+    encodedSize = EncodeData(encodedData, sourceData, fileSize);
     LogStr(const_cast<char*>("C6"));
-    decodedSize17 = DecodeData(decodedData6, encodedData6, encodedSize14);
+    decodedSize = DecodeData(decodedData, encodedData, encodedSize);
     LogStr(const_cast<char*>("C7"));
-    decodedCrc5 = calc_crc_long(reinterpret_cast<u8*>(decodedData6), fileSize7);
-    sourceCrcCheck7 = calc_crc_long(reinterpret_cast<u8*>(sourceData6), fileSize7);
-    H2_FREE(sourceData6);
-    H2_FREE(encodedData6);
-    H2_FREE(decodedData6);
+    decodedCrc = calc_crc_long(reinterpret_cast<u8*>(decodedData), fileSize);
+    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(sourceData), fileSize);
+    H2_FREE(sourceData);
+    H2_FREE(encodedData);
+    H2_FREE(decodedData);
     LogStr(const_cast<char*>("C8"));
 }
 

@@ -1902,7 +1902,7 @@ VA(0x0041d509, 0x1c8)
 i32 army::AttackTo(i32 destination) {
     i32 finishStanding;
     i32 numSteps;
-    i32 pathIndex_4;
+    i32 pathIndex;
 
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_FLYING)) {
         if (m_hex != destination) {
@@ -1923,23 +1923,23 @@ i32 army::AttackTo(i32 destination) {
             gpCombatManager->TestRaiseDoor();
             DoAttack(0);
         } else {
-            pathIndex_4 = 0;
+            pathIndex = 0;
             numSteps = 0;
-            for (pathIndex_4 = gpSearchArray->m_pathLength - 1; pathIndex_4 != 0; pathIndex_4--) {
+            for (pathIndex = gpSearchArray->m_pathLength - 1; pathIndex != 0; pathIndex--) {
                 numSteps++;
-                if (pathIndex_4 != 1 && numSteps < m_monster.speed) {
+                if (pathIndex != 1 && numSteps < m_monster.speed) {
                     finishStanding = 0;
                 } else {
                     finishStanding = 1;
                 }
                 Walk(
                     static_cast<CombatHexDirection>(
-                        gpSearchArray->m_storage.path.directions[pathIndex_4 + 1]
+                        gpSearchArray->m_storage.path.directions[pathIndex + 1]
                     ),
                     finishStanding,
-                    pathIndex_4 != gpSearchArray->m_pathLength - 1
+                    pathIndex != gpSearchArray->m_pathLength - 1
                 );
-                if (numSteps >= m_monster.speed && pathIndex_4 != 1) {
+                if (numSteps >= m_monster.speed && pathIndex != 1) {
                     return ARMY_PATH_BLOCKED;
                 }
             }
@@ -2671,16 +2671,16 @@ void army::SpellEffect(
     i32 effectFrameDelay,
     i32 animateCreature
 ) {
-    u32l effectFileId_3;
-    IconEntry* entry_8;
-    i32 frame_4;
-    i32 minimumYOffset_16;
-    i32 powBaseY_14;
-    i32 frameDelay_2;
+    u32l effectFileId;
+    IconEntry* entry;
+    i32 frame;
+    i32 minimumYOffset;
+    i32 powBaseY;
+    i32 frameDelay;
     i32 i_16;
-    i32 unusedSpellEffectWord_12;
+    i32 unusedSpellEffectWord;
 
-    effectFileId_3 = MAKEFILEID(gCombatFxNames[IDX(effect)]);
+    effectFileId = MAKEFILEID(gCombatFxNames[IDX(effect)]);
     if (m_animationSequence == ARMY_ANIMATION_WINCE
         || m_animationSequence == ARMY_ANIMATION_WINCE_RETURN) {
         animateCreature = 0;
@@ -2688,52 +2688,52 @@ void army::SpellEffect(
     if (!gbNoShowCombat) {
         if (gCurLoadedSpellEffect != effect) {
             gpResourceManager->Dispose(gCurLoadedSpellIcon);
-            gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId_3);
+            gCurLoadedSpellIcon = gpResourceManager->GetIcon(effectFileId);
             gCurLoadedSpellEffect = effect;
         }
     }
-    frame_4 = 0;
+    frame = 0;
     m_drawSpellEffect = 1;
     m_spellEffectYOffset = 0;
     if (!gbNoShowCombat) {
-        minimumYOffset_16 = EFFECT_MINIMUM_Y;
+        minimumYOffset = EFFECT_MINIMUM_Y;
         for (i_16 = 0; i_16 < gCurLoadedSpellIcon->m_frameCount; i_16++) {
-            entry_8 = GetIconEntry(gCurLoadedSpellIcon, i_16);
-            if (entry_8->y < minimumYOffset_16) {
-                minimumYOffset_16 = entry_8->y;
+            entry = GetIconEntry(gCurLoadedSpellIcon, i_16);
+            if (entry->y < minimumYOffset) {
+                minimumYOffset = entry->y;
             }
         }
-        powBaseY_14 = GetPowBaseY();
-        powBaseY_14 += minimumYOffset_16;
-        if (powBaseY_14 < 0) {
-            m_spellEffectYOffset = -powBaseY_14;
+        powBaseY = GetPowBaseY();
+        powBaseY += minimumYOffset;
+        if (powBaseY < 0) {
+            m_spellEffectYOffset = -powBaseY;
         }
         if (animateCreature) {
-            frameDelay_2 =
+            frameDelay =
                 ARMY_SPELL_EFFECT_ANIMATION_DURATION
                 / m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
             m_animationSequence = ARMY_ANIMATION_WINCE;
-            for (; frame_4
+            for (; frame
                    < m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE)];
-                 frame_4++) {
-                m_animationFrame = frame_4;
-                if (frame_4 < giNumPowFrames[IDX(effect)]) {
-                    gCurSpellEffectFrame = frame_4;
+                 frame++) {
+                m_animationFrame = frame;
+                if (frame < giNumPowFrames[IDX(effect)]) {
+                    gCurSpellEffectFrame = frame;
                 } else {
                     gCurSpellEffectFrame = giNumPowFrames[IDX(effect)];
                 }
                 glTimers[1] = static_cast<i32>(
-                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
+                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay
                 );
                 gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);
             }
         }
-        for (; frame_4 < giNumPowFrames[IDX(effect)]; frame_4++) {
+        for (; frame < giNumPowFrames[IDX(effect)]; frame++) {
             glTimers[1] = static_cast<i32>(
                 KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * effectFrameDelay
             );
-            gCurSpellEffectFrame = frame_4;
+            gCurSpellEffectFrame = frame;
             gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
             DelayTil(&glTimers[1]);
         }
@@ -2741,14 +2741,14 @@ void army::SpellEffect(
     m_drawSpellEffect = 0;
     if (!gbNoShowCombat) {
         if (animateCreature) {
-            frameDelay_2 = ARMY_SPELL_EFFECT_ANIMATION_DURATION
+            frameDelay = ARMY_SPELL_EFFECT_ANIMATION_DURATION
                            / m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
             m_animationSequence = ARMY_ANIMATION_WINCE_RETURN;
-            for (frame_4 = 0; frame_4 < m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
-                 frame_4++) {
-                m_animationFrame = frame_4;
+            for (frame = 0; frame < m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_WINCE_RETURN)];
+                 frame++) {
+                m_animationFrame = frame;
                 glTimers[1] = static_cast<i32>(
-                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay_2
+                    KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * frameDelay
                 );
                 gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
                 DelayTil(&glTimers[1]);
@@ -3578,17 +3578,17 @@ i32 army::LeftX(void) {
 
 VA(0x004213bc, 0x136)
 i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
-    army* otherArmy1;
-    i32 otherHex1;
+    army* otherArmy;
+    i32 otherHex;
     i32 otherRearHex;
     i32 adjacentHex;
     i32 rearHex;
     CombatHexDirection directionResult;
 
-    otherArmy1 = &gpCombatManager->m_armies[IDX(side)][index];
-    otherHex1 = otherArmy1->m_hex;
-    if (HAS(otherArmy1->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-        otherRearHex = otherHex1 + (otherArmy1->m_side == COMBAT_ATTACKER_SIDE ? 1 : -1);
+    otherArmy = &gpCombatManager->m_armies[IDX(side)][index];
+    otherHex = otherArmy->m_hex;
+    if (HAS(otherArmy->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
+        otherRearHex = otherHex + (otherArmy->m_side == COMBAT_ATTACKER_SIDE ? 1 : -1);
     } else {
         otherRearHex = -1;
     }
@@ -3596,7 +3596,7 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
          IDX(directionResult) < ARMY_ADJACENT_DIRECTION_COUNT;
          directionResult++) {
         adjacentHex = GetAdjacentCellIndex(m_hex, directionResult);
-        if (otherHex1 == adjacentHex
+        if (otherHex == adjacentHex
             || (adjacentHex != -1 && otherRearHex == adjacentHex)) {
             return 1;
         }
@@ -3607,7 +3607,7 @@ i32 army::OtherArmyAdjacent(H2_ENUM_PARAM(CombatSide, i32) side, i32 index) {
              IDX(directionResult) < ARMY_ADJACENT_DIRECTION_COUNT;
              directionResult++) {
             adjacentHex = GetAdjacentCellIndex(rearHex, directionResult);
-            if (otherHex1 == adjacentHex
+            if (otherHex == adjacentHex
                 || (adjacentHex != -1 && otherRearHex == adjacentHex)) {
                 return 1;
             }

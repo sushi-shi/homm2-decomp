@@ -657,17 +657,17 @@ i32 combatManager::GetFlyerMask(H2_ENUM_PARAM(CombatSide, i32) side) {
 
 VA(0x00417811, 0xa1)
 i32 combatManager::GetAllMask(H2_ENUM_PARAM(CombatSide, i32) side) {
-    i32 armyIndex11 = 0;
+    i32 armyIndex = 0;
     u32 armyBit = COMBAT_AI_MASK_FIRST_BIT;
     u32 bits = 0;
-    army* currentArmy38;
+    army* currentArmy;
 
-    for (armyIndex11 = 0; armyIndex11 < m_armyCount[IDX(side)]; armyIndex11++) {
-        currentArmy38 = &m_armies[IDX(side)][armyIndex11];
-        if (currentArmy38 != NULL
-            && HAS(currentArmy38->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+    for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
+        currentArmy = &m_armies[IDX(side)][armyIndex];
+        if (currentArmy != NULL
+            && HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                    == 0
-            && currentArmy38->m_quantity > 0)
+            && currentArmy->m_quantity > 0)
             bits |= armyBit;
         armyBit <<= 1;
     }
@@ -783,23 +783,23 @@ i32 combatManager::GetBestArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
 
 VA(0x00417cce, 0xa0)
 i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
-    i32 armyIndex2 = 0;
-    u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
-    u32l worstStrength2 = COMBAT_AI_WORST_STRENGTH_LIMIT;
-    i32 worstArmy6 = COMBAT_AI_NO_ARMY;
-    u32l strength8;
+    i32 armyIndex = 0;
+    u32 bit = COMBAT_AI_MASK_FIRST_BIT;
+    u32l worstStrength = COMBAT_AI_WORST_STRENGTH_LIMIT;
+    i32 worstArmy = COMBAT_AI_NO_ARMY;
+    u32l strength;
 
-    for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        if ((mask & bit1) != 0) {
-            strength8 = m_armies[IDX(side)][armyIndex2].Strength();
-            if (strength8 < worstStrength2) {
-                worstArmy6 = armyIndex2;
-                worstStrength2 = strength8;
+    for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
+        if ((mask & bit) != 0) {
+            strength = m_armies[IDX(side)][armyIndex].Strength();
+            if (strength < worstStrength) {
+                worstArmy = armyIndex;
+                worstStrength = strength;
             }
         }
-        bit1 <<= 1;
+        bit <<= 1;
     }
-    return worstArmy6;
+    return worstArmy;
 }
 
 VA(0x00417d6e, 0x12e)
@@ -903,39 +903,39 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         ~currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
         );
-    u32 bit0;
-    u32 targetMask29;
-    CombatHexDirection direction36;
-    i32 attackHexes5[ARMY_ATTACK_HEX_COUNT];
-    i32 targetArmy15;
+    u32 bit;
+    u32 targetMask;
+    CombatHexDirection direction;
+    i32 attackHexes[ARMY_ATTACK_HEX_COUNT];
+    i32 targetArmy;
 
     if (availableMask4 == 0)
         return 0;
 
-    bit0 = COMBAT_AI_MASK_FIRST_BIT;
-    targetMask29 = 0;
-    for (direction36 = COMBAT_DIRECTION_NORTHEAST;
-         IDX(direction36) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
-         direction36++) {
-        if ((availableMask4 & bit0) != 0
+    bit = COMBAT_AI_MASK_FIRST_BIT;
+    targetMask = 0;
+    for (direction = COMBAT_DIRECTION_NORTHEAST;
+         IDX(direction) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
+         direction++) {
+        if ((availableMask4 & bit) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
-                direction36,
+                direction,
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
-                attackHexes5
+                attackHexes
             )
-            && attackHexes5[0] >= 0)
-            targetMask29 |= 1 << m_hexCells[attackHexes5[0]].m_occupantIndex;
-        bit0 <<= 1;
+            && attackHexes[0] >= 0)
+            targetMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
+        bit <<= 1;
     }
     if (currentArmy->m_monsterType == CREATURE_GHOST)
-        targetArmy15 = GetWorstArmy(OppositeCombatSide(m_currentSide), targetMask29);
+        targetArmy = GetWorstArmy(OppositeCombatSide(m_currentSide), targetMask);
     else
-        targetArmy15 = GetBestArmy(OppositeCombatSide(m_currentSide), targetMask29);
-    if (targetArmy15 != COMBAT_AI_NO_ARMY) {
+        targetArmy = GetBestArmy(OppositeCombatSide(m_currentSide), targetMask);
+    if (targetArmy != COMBAT_AI_NO_ARMY) {
         giNextAction = ACTION_MOVE;
-        giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][targetArmy15].m_hex;
+        giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][targetArmy].m_hex;
         return 1;
     } else {
         return 0;
@@ -1009,79 +1009,79 @@ VA(0x00418405, 0x204)
 i32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
-    i32 targetArmy6;
-    army* targetPtr9;
-    i32 targetHex7;
-    i32 attackMask36;
-    i32 savedSpeed12;
-    i32 pathFound5;
-    i32 unusedPath8;
-    i32 movement27;
-    i32 pathIndex14;
+    i32 targetArmy;
+    army* targetPtr;
+    i32 targetHex;
+    i32 attackMask;
+    i32 savedSpeed;
+    i32 pathFound;
+    i32 unusedPath;
+    i32 movement;
+    i32 pathIndex;
 
-    targetArmy6 = GetClosestArmy(currentArmy, side, mask);
+    targetArmy = GetClosestArmy(currentArmy, side, mask);
 
-    if (targetArmy6 == COMBAT_AI_NO_ARMY)
+    if (targetArmy == COMBAT_AI_NO_ARMY)
         return 0;
 
-    targetPtr9 = &m_armies[IDX(side)][targetArmy6];
-    targetHex7 = targetPtr9->m_hex;
+    targetPtr = &m_armies[IDX(side)][targetArmy];
+    targetHex = targetPtr->m_hex;
     currentArmy->m_targetSide = side;
-    currentArmy->m_targetIndex = targetArmy6;
-    attackMask36 =
+    currentArmy->m_targetIndex = targetArmy;
+    attackMask =
         currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
         );
-    if (attackMask36 != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+    if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
         giNextAction = ACTION_WAIT;
         return 1;
     }
 
-    savedSpeed12 = currentArmy->m_monster.speed;
+    savedSpeed = currentArmy->m_monster.speed;
     currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    pathFound5 = gpSearchArray->FindCombatPath(
+    pathFound = gpSearchArray->FindCombatPath(
         currentArmy->m_hex,
-        targetHex7,
+        targetHex,
         currentArmy,
         COMBAT_AI_PATH_TO_TARGET,
         0
     );
-    if (pathFound5 == 0
-        && HAS(targetPtr9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
-        switch (targetPtr9->m_facing) {
+    if (pathFound == 0
+        && HAS(targetPtr->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
+        switch (targetPtr->m_facing) {
             case ARMY_FACING_LEFT:
-                targetHex7--;
+                targetHex--;
                 break;
             case ARMY_FACING_RIGHT:
-                targetHex7++;
+                targetHex++;
                 break;
         }
-        if (targetHex7 != COMBAT_AI_NO_ARMY)
-            pathFound5 = gpSearchArray->FindCombatPath(
+        if (targetHex != COMBAT_AI_NO_ARMY)
+            pathFound = gpSearchArray->FindCombatPath(
                 currentArmy->m_hex,
-                targetHex7,
+                targetHex,
                 currentArmy,
                 COMBAT_AI_PATH_TO_TARGET,
                 0
             );
     }
-    currentArmy->m_monster.speed = static_cast<i8>(savedSpeed12);
+    currentArmy->m_monster.speed = static_cast<i8>(savedSpeed);
     if (gpSearchArray->m_pathLength > 1) {
         giNextAction = ACTION_MOVE;
-        movement27 = currentArmy->m_monster.speed;
-        pathIndex14 = gpSearchArray->m_pathLength - 1;
+        movement = currentArmy->m_monster.speed;
+        pathIndex = gpSearchArray->m_pathLength - 1;
         giNextActionGridIndex = currentArmy->m_hex;
-        while (pathIndex14 >= 1 && movement27 != 0) {
+        while (pathIndex >= 1 && movement != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
                 static_cast<CombatHexDirection>(
-                    gpSearchArray->m_storage.aiPath.directions[pathIndex14]
+                    gpSearchArray->m_storage.aiPath.directions[pathIndex]
                 )
             );
-            pathIndex14--;
-            movement27--;
+            pathIndex--;
+            movement--;
             if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
-                movement27 = 0;
+                movement = 0;
         }
         return 1;
     }

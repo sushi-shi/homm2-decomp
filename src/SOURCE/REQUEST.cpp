@@ -365,10 +365,10 @@ i32 fileRequester::Open(i32 id) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    u8 okEnabled3;
+    u8 okEnabled;
     i32 fileIndex;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
-        okEnabled3 = 1;
+        okEnabled = 1;
         strcpy(m_filename, gpGame->m_saveName);
         char* dot = FindLastToken(m_filename, '.');
         if (dot != NULL) {
@@ -387,7 +387,7 @@ i32 fileRequester::Open(i32 id) {
             }
         }
     } else {
-        okEnabled3 = 0;
+        okEnabled = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
             char mapName[CURRENT_MAP_NAME_CAPACITY];
             fileIndex = 0;
@@ -400,7 +400,7 @@ i32 fileRequester::Open(i32 id) {
             for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
                 if (strcmpi(m_fileNames[fileIndex].text, mapName) == 0) {
                     m_selectedIndex = fileIndex;
-                    okEnabled3 = 1;
+                    okEnabled = 1;
                 }
             }
         }
@@ -417,17 +417,17 @@ i32 fileRequester::Open(i32 id) {
     m_window->BroadcastMessage(message);
     Update(0);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled3 = 1;
+        okEnabled = 1;
     }
     gpWindowManager->AddWindow(m_window, -1, 1);
     if (m_fileCount == 0) {
-        okEnabled3 = 0;
+        okEnabled = 0;
     }
     if (m_mode == FILE_REQUESTER_SAVE_GAME && strcmpi(m_filename, "NEWGAME") == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled3 = 1;
+        okEnabled = 1;
     }
-    SetOK(okEnabled3);
+    SetOK(okEnabled);
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = id;
     m_active = true;
