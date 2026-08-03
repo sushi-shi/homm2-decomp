@@ -12,7 +12,11 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [loop-exit-in-header-chain](loop-exit-in-header-chain.md) | direct jcc to loop exit (no jmp stub) → break condition lives in the loop header chain |
 | [od-slot-solve](od-slot-solve.md) | byte-identical except swapped ebp displacements → solve local-name buckets, never grind |
 | [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) | jmp-to-jmp at a loop back edge → if/else inside the loop, not `continue` |
-- [inline-call-operand-index-first](inline-call-operand-index-first.md) - ptr-side-first vs inline-accessor index-first; zero-arm ternary sbb
-- [od-constant-ternary-lowering](od-constant-ternary-lowering.md) - `setcc/dec/and/add` select: `dec` (not `sub reg,1`) means a real `?:`, and the source condition is the INVERSE of the emitted setcc
-- [two-backedge-jmps-in-one-loop](two-backedge-jmps-in-one-loop.md) - two separate `jmp <increment>` blocks in one loop body → an explicit `continue` guard plus the natural body end, never one `&&` chain
-- [paren-suppresses-fp-commute](paren-suppresses-fp-commute.md) - `fld`/`fmul` on the wrong float operands and no source order helps → parenthesise the indexed operand
+| [inline-call-operand-index-first](inline-call-operand-index-first.md) | ptr-side-first vs inline-accessor index-first; zero-arm ternary sbb |
+| [od-constant-ternary-lowering](od-constant-ternary-lowering.md) | `setcc/dec/and/add` select: `dec` (not `sub reg,1`) means a real `?:`, and the source condition is the INVERSE of the emitted setcc |
+| [two-backedge-jmps-in-one-loop](two-backedge-jmps-in-one-loop.md) | two separate `jmp <increment>` blocks in one loop body → an explicit `continue` guard plus the natural body end, never one `&&` chain |
+| [paren-suppresses-fp-commute](paren-suppresses-fp-commute.md) | `fld`/`fmul` on the wrong float operands and no source order helps → parenthesise the indexed operand |
+| [sret-copy-vs-elided-init](sret-copy-vs-elided-init.md) | `rep movsl` after a struct-returning call → the local was declared first and assigned, not initialised |
+| [fidiv-vs-fild-fdivp](fidiv-vs-fild-fdivp.md) | `fild;fild;fdivp` instead of `fidiv` → the division itself is `double`, whatever the operand casts say |
+| [narrow-inline-accessor-spill](narrow-inline-accessor-spill.md) | extra byte-store + `movsx` off a frame slot, frame one slot too big → retail read the member, not the `i8` inline accessor |
+| [duplicate-string-cells-no-gf](duplicate-string-cells-no-gf.md) | target has `$anon_str_<hash>_0.._N` where we have one → that unit compiled without `/Gf`; move it to `base_nogf` |

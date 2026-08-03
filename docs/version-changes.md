@@ -164,6 +164,16 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `army::LoadResources` writes `loopCount = 0` in this image where the
   PoL line wrote 1 (byte-pinned both sides, 2026-08-03) - the two sites
   moved in opposite directions between versions.
+- **[2.1?/unclassified] Visions no longer doubles the join fee.**
+  `advManager::DoVisions` computes the diplomacy joining price as
+  `gMonsterDatabase[type].cost * count` in this image; the 2.0 body (PoL,
+  byte-pinned) multiplies that by 2. Retail bytes at RVA 0x154ac read
+  `movsx ecx,word[eax+gMonsterDatabase]; imul ecx,[ebp-0xc];
+  mov [ebp-0xf8],ecx` with no `shl ecx,1` - the 2.0 build emits the shift.
+  The same function evaluates its strength ratio in **double** precision in
+  2.1 (`fild;fild;fdivp`) where 2.0 divides in float (`fidiv`), and
+  multiplies `count * fightValue` rather than `fightValue * count`.
+  Classify against the Gold 2.1 GOG binary.
 - **[Buka] Necromancy eligibility excludes SKELETON, not GHOST.**
   `combatManager::DoVictory`'s stack-count chain compares
   `m_monsterType` against creature 47 (SKELETON) where the PoL 2.0
