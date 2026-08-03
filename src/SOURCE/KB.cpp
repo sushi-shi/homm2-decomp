@@ -4036,7 +4036,7 @@ void CleanUpMenus(void) {
 
 VA(0x0046e2f0, 0x1b)
 void UpdateAppSpecificMenus(void* hMenu) {
-    if (hmnuAdv == hMenu)
+    if (hMenu == hmnuAdv)
         UpdateSystemOptionsMenu();
 }
 

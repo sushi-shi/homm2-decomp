@@ -2636,9 +2636,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             teleportCount = 0;
             for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
                 for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
-                    if ((gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_triggerType
+                    if ((gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_triggerType
                             == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                        && (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex
+                        && (gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_objectIndex
                                == cell->m_objectIndex
                         && (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                   : WHIRLPOOL_MIN_DISTANCE)
@@ -2652,9 +2652,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     teleportCount = Random(1, teleportCount);
                 for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
                     for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
-                        if ((gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_triggerType
+                        if ((gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_triggerType
                                 == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                            && (gpGame->m_worldMap.Row(teleportY) + teleportX3)->m_objectIndex
+                            && (gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_objectIndex
                                    == cell->m_objectIndex
                             && (teleportX3 != x || teleportY != y)
                             && (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
@@ -6661,9 +6661,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             exitCount = 0;
             for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
                 for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
-                    if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType
+                    if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
                             == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                        && gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex
+                        && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                == cell->m_objectIndex
                         && abs(exitY_d - y) + abs(exitX - x)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS
@@ -6678,9 +6678,9 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     exitCount = Random(1, exitCount);
                 for (exitY_d = 0; MAP_HEIGHT > exitY_d; ++exitY_d) {
                     for (exitX = 0; MAP_WIDTH > exitX; ++exitX) {
-                        if (gpGame->m_worldMap.Row(exitY_d)[exitX].m_triggerType
+                        if (gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_triggerType
                                 == (eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                            && gpGame->m_worldMap.Row(exitY_d)[exitX].m_objectIndex
+                            && gpGame->m_worldMap.GetCell(exitX, exitY_d)->m_objectIndex
                                    == cell->m_objectIndex
                             && abs(exitY_d - y) + abs(exitX - x)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
