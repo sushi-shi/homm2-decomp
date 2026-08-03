@@ -57,6 +57,30 @@ to try FIRST on any residual, in rough order of yield:
 - `TurnToStone`'s `++m_limitCreatureCount[side][index]`: flat-`+` and
   commuted-bracket spellings both canonicalise identically to ours.
 
+## Permuter workflow (confirmed working on this branch, 2026-08-03)
+
+```
+homm2 permute <src.cpp> <rva> --min-depth 1 --max-depth 2 \
+    --families identifier_rename --rename-identifier <local> ... \
+    --limit 80 -o /tmp/<fn>.json --run --top 8 \
+    --allow-external-diagnostic 'template parameter redefines default argument' \
+    --allow-external-diagnostic "template specialization requires 'template<>'" \
+    --allow-external-diagnostic 'no member named' \
+    --allow-external-diagnostic 'invalid operands to binary expression'
+```
+
+All four allowances are REQUIRED - without them the run dies on the MSVC
+STL headers under clang. `--min-depth 0 --max-depth 0` generates the
+baseline only; depth must be >= 1 to apply a mutation. Note the engine
+generates its own suffixed rename candidates (`fooAmount`, `fooIndex`,
+`fooCount`...) and ignores `--rename-candidate` values.
+
+First use, on `townManager::SetArmyCommand` (6 disp diffs, whose chain
+solver returned the identity): 8 rename arms all produced byte-identical
+output at 99.6197%. That DISPROVES the rename hypothesis mechanically -
+the residual is not a local-name problem. Same conclusion the identity
+result implied, now measured rather than inferred.
+
 ## Work queues (artifacts, not prose)
 
 | queue | file | rows | state |
