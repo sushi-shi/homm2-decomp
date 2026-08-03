@@ -81,6 +81,22 @@ output at 99.6197%. That DISPROVES the rename hypothesis mechanically -
 the residual is not a local-name problem. Same conclusion the identity
 result implied, now measured rather than inferred.
 
+### What the permuter reports that hand-probing does not
+
+Its per-arm line carries `relocs A/B`. A MISMATCH there (ours/retail) is a
+structural defect no rename can touch, and it is invisible to the masked
+byte compare because the masker zeroes reloc sites on both sides.
+`advManager::UpdBottomViewResMsg` reports `relocs 44/41` - we emit three
+relocations retail does not, so its 13 "displacement" diffs are really a
+call/global-reference difference. Check the reloc counts before spending
+a slot solve on any function.
+
+(That run also found a +0.024% rename arm using engine-generated names
+like `iconWidth6Index` / `textY19Size`. Rejected under the prime source
+rule: it does not close the function, and there is no natural name at the
+required bucket for the textY local - the width slot wants bucket 0
+(`wide` fits), the textY slot wants bucket 1 and nothing clean lands there.)
+
 ## Work queues (artifacts, not prose)
 
 | queue | file | rows | state |
