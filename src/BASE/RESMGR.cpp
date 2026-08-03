@@ -420,43 +420,25 @@ void resourceManager::RestorePosition(void) {
 
 VA(0x004b8d80, 0x59)
 i8 resourceManager::ReadByte(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 703);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 675);
     i8 value = 0;
-    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
-    if (bytesRead == 0) {
-        i32 errorCode = errno;
-        i32 debugTrap = 0;
-        debugTrap++;
-        debugTrap++;
-    }
+    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 VA(0x004b8de0, 0x5c)
 i16 resourceManager::ReadWord(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 732);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 700);
     i16 value = 0;
-    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
-    if (bytesRead == 0) {
-        i32 errorCode = errno;
-        i32 debugTrap = 0;
-        debugTrap++;
-        debugTrap++;
-    }
+    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
 VA(0x004b8e40, 0x5c)
 i32l resourceManager::ReadLong(void) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 760);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 723);
     i32l value = 0;
-    i32 bytesRead = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
-    if (bytesRead == 0) {
-        i32 errorCode = errno;
-        i32 debugTrap = 0;
-        debugTrap++;
-        debugTrap++;
-    }
+    i32 result = read(m_aggregateFd[m_curAggregate], &value, sizeof(value));
     return value;
 }
 
@@ -482,7 +464,7 @@ void resourceManager::Read13(i8* destination) {
 
 VA(0x004b8f60, 0x9b)
 void resourceManager::ReadBlock(i8* destination, u32l size) {
-    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 816);
+    H2_ASSERT(m_aggregateFd[m_curAggregate] != INVALID_FILE, RETAIL_FILE, 775);
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
