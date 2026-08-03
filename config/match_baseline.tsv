@@ -279,7 +279,7 @@ BASE/Misc	?SRandom@@YIHHH@Z	100.0000	ee23f77f6613
 BASE/Misc	?SetGameDefaults@@YIXXZ	45.9385	787a52f76d90
 BASE/Misc	?SetInstallDefaults@@YIXXZ	100.0000	44fff69415e8
 BASE/Misc	?SetPalette@@YIXPACH@Z	100.0000	5e86bfda1e0c
-BASE/Misc	?SetupCDDrive@@YIHXZ	0.0000	d9903dd27d88
+BASE/Misc	?SetupCDDrive@@YIHXZ	0.0000	033a8d607436
 BASE/Misc	?ShowMemoryStatus@@YIXXZ	0.0000	6246dd5b6f3f
 BASE/Misc	?WritePrefs@@YIXXZ	100.0000	d1519ff5b5c3
 BASE/Misc	?WritePrefsToFile@@YIXXZ	41.8667	f999eaf5ee82
@@ -401,7 +401,7 @@ BASE/droplist	?DeleteItem@dropListWidget@@QAEXH@Z	100.0000	b4810860dba4
 BASE/droplist	?Draw@dropListWidget@@UAEXXZ	70.5545	63c402db5463
 BASE/droplist	?DrawDropStuff@dropListWidget@@QAEXXZ	83.3128	36a14d06665c
 BASE/droplist	?Main@dropListWidget@@UAEHAAUtag_message@@@Z	21.1576	15a0e522fc56
-BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	40.0975	df28073cc3a7
+BASE/droplist	?ProcessSelectDialog@dropListWidget@@QAEXXZ	46.1512	6a374b0975a4
 BASE/droplist	?Read@dropListWidget@@QAEXXZ	79.9388	776756cd918a
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	92.4468	42b283b6d313
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	a20e3ef2d96b
