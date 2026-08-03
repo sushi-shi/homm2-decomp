@@ -217,7 +217,6 @@ void searchArray::TestPossibleDirections(
     i32 allowOccupied,
     i32 waterMode
 ) {
-    TerrainType invalidTerrain = TERRAIN_INVALID;
 
     memset(occupied, 0, SEARCH_DIRECTION_COUNT);
     gSearchCurrentCell = gpAdvManager->GetCell(x, y);
@@ -318,7 +317,7 @@ void searchArray::TestPossibleDirections(
 
         goto storeDirection;
     invalidDirection:
-        gSearchTerrain = invalidTerrain;
+        gSearchTerrain = TERRAIN_INVALID;
     storeDirection:
         terrain[gSearchDirection] = gSearchTerrain;
         gSearchDirection++;

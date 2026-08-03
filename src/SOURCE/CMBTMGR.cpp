@@ -485,7 +485,6 @@ i32 combatManager::Open(i32 openFlags) {
     LogStr("Op1");
     memcpy(m_savedPalette, gPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpMouseManager->m_forcePointerUpdate = 1;
-    i32 savedShowMouseHex = gConfig.showCombatMouseHex;
     gConfig.showCombatMouseHex = 0;
     m_previousCombatMessageExpiration = 0;
     m_combatMessageExpiration = 0;
@@ -529,7 +528,7 @@ i32 combatManager::Open(i32 openFlags) {
     m_combatPalette = gpResourceManager->GetPalette("kb.pal");
     KBChangeMenu(hmnuCmbt);
     CombatMessage("", 1, 1, 0);
-    gConfig.showCombatMouseHex = savedShowMouseHex;
+    gConfig.showCombatMouseHex = gConfig.showCombatMouseHex;
     if (m_combatPalette->m_data != gpBufferPalette->m_data)
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);

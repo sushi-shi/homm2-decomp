@@ -776,7 +776,6 @@ mapCell* advManager::MoveHero(
                 m_updateMinX = startVals[directionX_b + 1];
                 m_updateMinY = startVals[directionY_b + 1];
             }
-            i32l tick = KBTickCount();
             if (step_a + 1 == halfSteps_o * MOVE_TILE_HALF_COUNT) {
                 m_updateMinX = 0;
                 m_updateMinY = 0;
@@ -789,7 +788,7 @@ mapCell* advManager::MoveHero(
                 UpdateScreen(0, 0);
             }
             if (bShowIt)
-                DelayTilMilli(tick + stepDelay_d);
+                DelayTilMilli((KBTickCount()) + stepDelay_d);
         }
         giDeferObjDrawX = giDeferObjDrawY = -1;
         gbNoBorder = false;
