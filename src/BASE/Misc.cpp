@@ -498,14 +498,15 @@ i32 Random(i32 low, i32 high) {
 
 VA(0x004bde90, 0x74)
 void ProcessAssert(i32 condition, char* file, i32 line) {
+    i32 unusedAssertWord;
     if (condition == 0) {
         gpMouseManager->SetColorMice(0);
         SetFullScreenStatus(0);
         sprintf(gText, "Assert statement failed in module %s, line %d.  Do you wish to abort the program?", file, line);
-        if (MessageBoxA(hwndApp, gText, "Assert Failure", MB_YESNO | MB_ICONHAND)
-            != IDNO) {
-            ShutDown(NULL);
-        }
+        if (MessageBoxA(hwndApp, gText, "Assert Failure", MB_YESNO | MB_ICONHAND) == IDNO)
+            return;
+        unusedAssertWord = 0;
+        ShutDown(NULL);
     }
 }
 
