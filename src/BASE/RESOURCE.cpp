@@ -1,5 +1,6 @@
 #include <va.h>
 #include <BASE/resource.h>
+#include <SOURCE/KB.h>
 
 VA(0x004d4860, 0x3d)
 resource::resource(void) {

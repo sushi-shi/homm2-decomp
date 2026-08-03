@@ -6,6 +6,7 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/IconEntry.h>
 #include <string.h>
+#include <SOURCE/KB.h>
 
 static i32 s_clipB;
 static u32 s_loopCount;

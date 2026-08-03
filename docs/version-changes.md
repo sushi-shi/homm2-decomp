@@ -46,7 +46,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   game TUs; each emits the ctype-facet guard stub trio ($E19/$E18 +
   `?id@?$ctype@G@std@@` dtor thunk, the dtor COMDAT-folded to ADVMGR's copy
   at 0x415a50). Only BITS, TILE, X_GLOBAL, MusicFlags, and the emptied TUs
-  stay clean.
+  stay clean. **Resolved 2026-08-03**: eleven of our TUs did not reach the
+  chain and so emitted no stubs, leaving their claimed `_$E18`/`_$E19`
+  spans unpaired. Adding `#include <SOURCE/KB.h>` to Icon2b, Icond2b,
+  Icondf2b, Iconf2b, Iconm2b, Iconmf2b, icon2bc, icon2bs, iconf2bc,
+  bmap2 and RESOURCE emits them, byte-matching retail (+22 exact,
+  units-with-progress 84 -> 94, 0 drops).
 
 ## Removed (present in PoL 2.0, absent from this image)
 

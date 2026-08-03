@@ -6,6 +6,7 @@
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
+#include <SOURCE/KB.h>
 
 static i32 s_clipB;
 static u32 s_loopCount;

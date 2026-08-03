@@ -7,6 +7,7 @@
 #include <BASE/IconRle.h>
 #include <BASE/IconMonoRle.h>
 #include <string.h>
+#include <SOURCE/KB.h>
 
 static i32 s_clipB;
 static i32 s_y;
