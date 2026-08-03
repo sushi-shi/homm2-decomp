@@ -1844,10 +1844,9 @@ void townManager::DoCommand(TownManagerArmyCommand command) {
             break;
 
         case ARMY_COMMAND_VIEW:
-            if (m_selectedStrip == m_heroStrip)
-                viewedHero = gpGame->GetHero(m_town->m_occupyingHeroId);
-            else
-                viewedHero = NULL;
+            viewedHero = m_selectedStrip == m_heroStrip
+                             ? gpGame->GetHero(m_town->m_occupyingHeroId)
+                             : NULL;
             if (m_castleDialogActive == 1
                 || (m_selectedStrip == m_heroStrip && m_selectedStrip->m_army->GetNumArmies() == 1))
                 dismissAllowed = 1;

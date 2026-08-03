@@ -199,10 +199,7 @@ i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr
 
     portState.fParity = 0;
     portState.fOutxCtsFlow = 1;
-    if (useDtr != 0)
-        portState.fOutxDsrFlow = 1;
-    else
-        portState.fOutxDsrFlow = 0;
+    portState.fOutxDsrFlow = useDtr != 0 ? 1 : 0;
     portState.fDtrControl = DTR_CONTROL_ENABLE;
     portState.fInX = 0;
     portState.fOutX = 0;
@@ -263,10 +260,7 @@ i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
         result = ClearCommError(s_comPorts[portIndex].handle, &commErrors, &status);
         if (result == 0)
             ShutdownComError("Clear communications error queue");
-        if (status.cbInQue <= requested)
-            count = status.cbInQue;
-        else
-            count = requested;
+        count = status.cbInQue <= requested ? status.cbInQue : requested;
         if (count != 0) {
             result = ReadFile(
                 s_comPorts[portIndex].handle,

@@ -1316,7 +1316,7 @@ SOURCE/TOWNMGR	?BuildObj@townManager@@QAEXH@Z	97.2981	2ea649f09a1a
 SOURCE/TOWNMGR	?BuyBuild@townManager@@QAEHHHH@Z	96.5822	69fda709fe50
 SOURCE/TOWNMGR	?ChangeTown@townManager@@QAEXXZ	18.4375	c88b97487f6c
 SOURCE/TOWNMGR	?Close@townManager@@UAEXXZ	100.0000	dad901dccb6f
-SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	92.6809	0e2eafdf9f44
+SOURCE/TOWNMGR	?DoCommand@townManager@@QAEXH@Z	95.0177	90df07d58050
 SOURCE/TOWNMGR	?DoTavern@townManager@@QAEXXZ	100.0000	feda98b3c589
 SOURCE/TOWNMGR	?Draw@townObject@@QAEXH@Z	100.0000	9ab3da5761ca
 SOURCE/TOWNMGR	?DrawTown@townManager@@QAEXHH@Z	100.0000	fc7dc5438a11
@@ -1398,8 +1398,8 @@ SOURCE/X_CAMPGN	?ShowInfo@ExpCampaign@@QAEXHH@Z	95.0351	28d3312aa59c
 SOURCE/X_CAMPGN	?UpdateInfo@ExpCampaign@@QAEXH@Z	87.2438	c5fe6a7af76a
 SOURCE/comwin	?ShutdownComError@@YIXPAD@Z	0.0000	5ada8f9524a3
 SOURCE/comwin	?add_node@@YIXPAUtag_Anchor@@PAUtag_Node@@@Z	84.1818	457d59b47f2e
-SOURCE/comwin	?com_init@@YIFEHH@Z	94.6743	b21d07111131
-SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	92.9833	5fcc6c365438
+SOURCE/comwin	?com_init@@YIFEHH@Z	97.8532	20e24ba8c209
+SOURCE/comwin	?com_rcv@@YIFFGPAX@Z	95.0500	ae8602b45f09
 SOURCE/comwin	?com_sess@@YAFHHZZ	100.0000	d3dfb2830a60
 SOURCE/comwin	?com_snd@@YIFFGGPAXH@Z	100.0000	2c5d5b8e8bb7
 SOURCE/comwin	?com_stat@@YIEFG@Z	100.0000	ddc07b36e77d
