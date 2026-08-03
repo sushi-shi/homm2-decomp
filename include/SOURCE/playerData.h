@@ -55,7 +55,7 @@ public:
     i8 m_heroLocatorPage;
     i8 m_heroIds[PLAYER_HERO_CAPACITY];
     i8 m_availableHeroIds[PLAYER_AVAILABLE_HERO_COUNT];
-    i8 m_minimumHeroCount;
+    u8 m_minimumHeroCount;
     PlayerPersonality m_aiDifficulty;
     i8 m_cheatValue;
     char m_unusedSaveData[PLAYER_UNUSED_SAVE_DATA_SIZE];

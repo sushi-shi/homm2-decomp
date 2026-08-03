@@ -109,3 +109,38 @@ cast.
 
 Narrowing back on assignment is unaffected: the store stays a non-popping
 `d9 55 fc  fst dword ptr [ebp-4]`.
+
+## The same axis for a float MULTIPLICAND spilled across a call (SOURCE/PHILAI)
+
+`philAI::GetBestHero` (0x8410d) multiplies a `float` local by a double-typed
+sum that contains a call. When the float operand is written FIRST, VC6 must
+materialise it as a double and spill it across the call; when it is written
+second it folds straight into `fmuls`:
+
+```
+ours  (Random(1,10) + BASE) * benefitCost   retail  benefitCost * (Random(1,10) + BASE)
+------------------------------------------  ------------------------------------------
+                                            d9 45 f0  flds  benefitCost
+                                            dd 5d d0  fstpl -0x30(%ebp)   ; double temp
+b9 01.. movl $0x1, %ecx  ; Random(1,10)     b9 01..   movl $0x1, %ecx
+e8 ..   calll Random                        e8 ..     calll Random
+89 45 d4 movl %eax, -0x2c(%ebp)             89 45 cc  movl %eax, -0x34(%ebp)
+db 45 d4 fildl -0x2c(%ebp)                  db 45 cc  fildl -0x34(%ebp)
+dc 05 .. faddl <BASE>                       dc 05 ..  faddl <BASE>
+d8 4d fc fmuls benefitCost                  dc 4d d0  fmull -0x30(%ebp)
+dc 35 .. fdivl <DIVISOR>                    dc 35 ..  fdivl <DIVISOR>
+```
+
+An explicit `static_cast<double>(benefitCost)` on the second operand does NOT
+produce the spill (same absorption as the `fidiv` divisor cast) - only moving
+the float operand to the LEFT of the multiply does, because then it is
+evaluated before the call and has to survive it. Retail's frame is 8 bytes
+larger for exactly that temp.
+
+```cpp
+        randomizedScore = static_cast<float>(
+            benefitCost9 * (Random(1, 10) + AI_HERO_PURCHASE_RANDOM_BASE)
+            / AI_PURCHASE_RANDOM_DIVISOR
+        );
+```
+
