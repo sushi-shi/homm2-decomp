@@ -2012,24 +2012,24 @@ i8 hero::Stats(HeroPrimaryStat stat) {
 
 VA(0x00464a03, 0x9b)
 i8 hero::GetSSLevel(H2_ENUM_PARAM(HeroSecondarySkill, i32) skill) {
-    i8 shrineAndArtifactBonus = 0;
-    i8 baseLevel;
+    i8 bonus = 0;
+    i8 ssLevel;
 
-    baseLevel = static_cast<i8>(m_secondarySkills[IDX(skill)]);
+    ssLevel = static_cast<i8>(m_secondarySkills[IDX(skill)]);
     if (skill != HERO_SKILL_NECROMANCY)
-        return IDX(baseLevel);
-    if (baseLevel == IDX(HERO_SKILL_LEVEL_NONE))
-        return IDX(baseLevel);
+        return IDX(ssLevel);
+    if (ssLevel == IDX(HERO_SKILL_LEVEL_NONE))
+        return IDX(ssLevel);
     if (HasArtifact(ARTIFACT_SPADE_NECROMANCY))
-        shrineAndArtifactBonus++;
+        bonus++;
     if (m_cursorType == FACTION_NECROMANCER)
-        shrineAndArtifactBonus += gpGame->CountShrines(m_owner);
-    if (shrineAndArtifactBonus > HERO_NECROMANCY_BONUS_MAX)
-        shrineAndArtifactBonus = HERO_NECROMANCY_BONUS_MAX;
-    baseLevel += shrineAndArtifactBonus;
-    if (baseLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
-        baseLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
-    return IDX(baseLevel);
+        bonus += gpGame->CountShrines(m_owner);
+    if (bonus > HERO_NECROMANCY_BONUS_MAX)
+        bonus = HERO_NECROMANCY_BONUS_MAX;
+    ssLevel += bonus;
+    if (ssLevel > HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX)
+        ssLevel = HERO_NECROMANCY_EFFECTIVE_LEVEL_MAX;
+    return IDX(ssLevel);
 }
 
 VA(0x00464a9e, 0xdd)
