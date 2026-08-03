@@ -76,7 +76,7 @@ i32 is_netbios_avail(void) {
 }
 
 VA(0x00473e34, 0x218)
-extern "C" u16 __fastcall nb_init(u16 maxNames, u16 maxSessions) {
+extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
     NetbiosControlBlock localNcb;
     i32 i;
     u8* statusBuffer;
@@ -169,7 +169,7 @@ extern "C" void __fastcall nb_term(void) {
 }
 
 VA(0x0047421c, 0x96)
-extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
+extern "C" u16 __cdecl nb_rcv(i16 session, void* buf) {
     tag_Node* node;
     i32 len;
 
@@ -189,7 +189,7 @@ extern "C" u16 __fastcall nb_rcv(i16 session, void* buf) {
 }
 
 VA(0x004742b2, 0xc0)
-extern "C" u16 __fastcall nb_snd(i16 session, i16 len, void* data) {
+extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
     tag_Node* node;
 
     if (gNbMaxSess == session && len == 0) {
@@ -335,7 +335,7 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
 }
 
 VA(0x00474839, 0xf)
-extern "C" char __fastcall nb_stat(i16 session) {
+extern "C" char __cdecl nb_stat(i16 session) {
     return static_cast<char>(gNetStatus[session]);
 }
 
