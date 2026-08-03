@@ -183,24 +183,41 @@ def target_function(tu: ci.TranslationUnit, source: Path, blob: bytes, rva: int)
     return matches[0]
 
 
-def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn, allowed_external=()):
+def classify_parse_errors(
+    tu: ci.TranslationUnit, source: Path, fn, allowed_external=(), system_roots=(),
+):
     """Classify errors, allowing only reviewed nonfatal diagnostics outside the target."""
     blocking = []
     trailing = []
     allowed = []
     matched_allowances = set()
     source = source.resolve()
+    roots = tuple(Path(root).resolve() for root in system_roots)
     for diagnostic in tu.diagnostics:
         if diagnostic.severity < ci.Diagnostic.Error:
             continue
         rendered = str(diagnostic)
         location_file = diagnostic.location.file
-        same_source = (
-            location_file is not None and Path(str(location_file)).resolve() == source
+        located = (
+            Path(str(location_file)).resolve() if location_file is not None else None
         )
+        same_source = located is not None and located == source
         outside_target = not (
             fn.extent.start.offset <= diagnostic.location.offset <= fn.extent.end.offset
         )
+        if (
+            located is not None and not same_source
+            and diagnostic.severity < ci.Diagnostic.Fatal
+            and any(located.is_relative_to(root) for root in roots)
+        ):
+            # The vendored VC6 system headers reach a modern clang only through a
+            # third-party vendor header, and no game translation unit uses the STL.
+            # CL.EXE compiles them; clang rejects their pre-standard spellings. Such
+            # a diagnostic is the vendor-header surface the whole build tolerates and
+            # cannot reach the target function's AST. Errors in game headers stay
+            # blocking: those do change what we are about to mutate.
+            allowed.append(rendered)
+            continue
         allowance = next(
             (item for item in allowed_external if item and item in rendered), None
         )
@@ -222,6 +239,13 @@ def classify_parse_errors(tu: ci.TranslationUnit, source: Path, fn, allowed_exte
         else:
             trailing.append(rendered)
     return blocking, trailing, allowed, set(allowed_external) - matched_allowances
+
+
+def system_include_roots(args: list[str]) -> tuple[Path, ...]:
+    """The -isystem directories carrying the vendored VC6 headers."""
+    return tuple(
+        Path(value) for flag, value in zip(args, args[1:]) if flag == "-isystem"
+    )
 
 
 def cursor_range(cursor) -> tuple[int, int]:
@@ -1659,9 +1683,10 @@ def main(argv=None, *, prog=None, description=None) -> int:
     blob = source.read_bytes()
     text = blob.decode("utf-8")
     index = ci.Index.create()
+    parse_args = clang_args(root, source)
     tu = index.parse(
         str(source),
-        args=clang_args(root, source),
+        args=parse_args,
         unsaved_files=[(str(source), text)],
         options=ci.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD,
     )
@@ -1670,7 +1695,10 @@ def main(argv=None, *, prog=None, description=None) -> int:
     except ValueError as exc:
         parser.error(str(exc))
     diagnostics, trailing_diagnostics, allowed_diagnostics, unmatched_allowances = \
-        classify_parse_errors(tu, source, fn, args.allow_external_diagnostic)
+        classify_parse_errors(
+            tu, source, fn, args.allow_external_diagnostic,
+            system_include_roots(parse_args),
+        )
     if unmatched_allowances:
         parser.error(
             "external diagnostic allowances did not match:\n"
@@ -1777,8 +1805,8 @@ def main(argv=None, *, prog=None, description=None) -> int:
         )
     if allowed_diagnostics:
         print(
-            f"allowed {len(allowed_diagnostics)} reviewed external parse diagnostic(s); "
-            "recorded in the manifest"
+            f"allowed {len(allowed_diagnostics)} external parse diagnostic(s) from "
+            "reviewed allowances and the vendored system headers; recorded in the manifest"
         )
     if args.run:
         from homm2.permute.batch_source_variants import main as run_batch
