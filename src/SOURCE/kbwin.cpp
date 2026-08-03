@@ -55,7 +55,7 @@ WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 s
 
 VA(0x00470f42, 0x2ec)
 i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, char* commandLine) {
-    HMENU windowMenu;
+
     RECT windowRect;
     WNDCLASSA appClass;
 
@@ -117,10 +117,6 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
     windowRect.right = gConfig.gfx[IDX(giCurExe)].width - 1;
     windowRect.bottom = gConfig.gfx[IDX(giCurExe)].height - 1;
     AdjustWindowRect(&windowRect, giCurWindowsStyleFlags, gConfig.gfx[IDX(giCurExe)].showMenu);
-    if (gConfig.gfx[IDX(giCurExe)].showMenu != 0)
-        windowMenu = reinterpret_cast<HMENU>(hmnuDflt);
-    else
-        windowMenu = NULL;
     hwndApp = CreateWindowExA(
         0,
         szAppName,
@@ -131,7 +127,7 @@ i32 AppInit(HINSTANCE instance, HINSTANCE previousInstance, i32 showCommand, cha
         windowRect.right - windowRect.left + 1,
         windowRect.bottom - windowRect.top + 1,
         NULL,
-        windowMenu,
+        (gConfig.gfx[IDX(giCurExe)].showMenu != 0 ? reinterpret_cast<HMENU>(hmnuDflt) : NULL),
         instance,
         NULL
     );

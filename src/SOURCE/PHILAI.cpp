@@ -402,9 +402,7 @@ H2_ENUM_END(AITownEvaluationConstant)
 
 
 
-
 searchArray SVSearchArray;
-
 
 inline i32 HeroRVByteOffset(i32 x, i32 y) {
     return x * sizeof(i16) + MAP_WIDTH * y * sizeof(i16);
@@ -6540,7 +6538,7 @@ i32 philAI::EvaluateMonsterEvent(CreatureType monsterType, i32 eventData, i32* l
 
 VA(0x0048ba5e, 0x4cc)
 i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChance) {
-    float attackBonus6;
+
     town* townPtr29;
     i32 townId8;
     hero* enemyHero6;
@@ -6589,13 +6587,9 @@ i32 philAI::EvaluateHeroEvent(i32 heroId, i32 x, i32 y, i32 mode, i32* liveChanc
             townValue8 = ValueOfTown(townPtr29);
             townId8 = townPtr29->m_id;
             if (townPtr29->m_owner >= 0) {
-                if (gbHumanPlayer[townPtr29->m_owner])
-                    attackBonus6 = gfAttackHumanBonus;
-                else
-                    attackBonus6 = gfAttackComputerBonus;
                 townValue8 = static_cast<i32>(
                     ((EVENT_EARLY_TURN_DIFFICULTY_STEP - gpGame->m_playerCount)
-                         * AI_EVENT_TOWN_PLAYER_FACTOR * attackBonus6
+                         * AI_EVENT_TOWN_PLAYER_FACTOR * (gbHumanPlayer[townPtr29->m_owner] ? gfAttackHumanBonus : gfAttackComputerBonus)
                      + AI_EVENT_VALUE_BASE_FACTOR)
                     * townValue8
                 );

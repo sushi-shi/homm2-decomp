@@ -501,7 +501,6 @@ static i16 gDiffSourceLine = 0x1d66;
 static i16 gCompressTest2SourceLine = 0x1f72;
 static i16 gCompressTestSourceLine = 0x1f95;
 
-
 H2_ENUM_BEGIN(GameTuningConstant)
     RANDOM_SCAN_RETRY_LIMIT          = 10000,
     EXPERIENCE_HERO_PRESENCE_BONUS   = 500,
@@ -4258,7 +4257,6 @@ void game::PerDay(void) {
     i32 restoredSpellPoints13;
     hero* townHero12;
     town* currentTown4;
-    double penaltyRate9;
 
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_COUNT; resource8++) {
@@ -4350,14 +4348,10 @@ void game::PerDay(void) {
     for (player = 0; player < gpGame->m_playerCount; player++) {
         for (resource8 = RES_WOOD; resource8 < RES_GOLD; resource8++) {
             if (m_playerHandicap[player] != PLAYER_HANDICAP_NONE) {
-                if (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE)
-                    penaltyRate9 = GAME_HANDICAP_MODERATE_DAILY_PENALTY;
-                else
-                    penaltyRate9 = GAME_HANDICAP_SEVERE_DAILY_PENALTY;
                 m_players[player].m_resources[IDX(resource8)] -= static_cast<i32>(
                     (gpGame->m_players[player].m_aiData.m_income[IDX(resource8)]
                      + m_players[player].m_resources[IDX(resource8)])
-                    * penaltyRate9
+                    * (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE ? GAME_HANDICAP_MODERATE_DAILY_PENALTY : GAME_HANDICAP_SEVERE_DAILY_PENALTY)
                 );
             }
         }
