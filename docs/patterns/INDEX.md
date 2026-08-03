@@ -22,3 +22,4 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [duplicate-string-cells-no-gf](duplicate-string-cells-no-gf.md) | target has `$anon_str_<hash>_0.._N` where we have one → that unit compiled without `/Gf`; move it to `base_nogf` |
 | [goto-label-jump-stub](goto-label-jump-stub.md) | loop exit reaches its join through a `jmp` stub parked before the epilogue → source `goto`, not `break` |
 | [compiler-temp-vs-named-local](compiler-temp-vs-named-local.md) | `this` spill and every temp shifted by one slot → one side named a value the other left a temp |
+| [struct-return-temp-vs-scalar-typedef](struct-return-temp-vs-scalar-typedef.md) | ours-only `mov [$T],eax; mov eax,[$T]` after a `?AU<name>@@`-returning call → `<name>` is a scalar typedef in retail, not a 1-member struct |
