@@ -3924,26 +3924,30 @@ void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
 
 VA(0x00441fbc, 0x125)
 i32 advManager::BarrierEvent(mapCell* cell, hero*) {
-    SAMPLE2 eventSample = NULL_SAMPLE2;
-    i32 color = cell->m_objectMetadata;
-    color &= COLOR_MASK;
+    SAMPLE2 eventSample = {NULL};
+    i32 colorIndex = cell->m_objectMetadata;
+    colorIndex &= COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
     passwordIndex >>= PASSWORD_SHIFT;
-    char response[INPUT_BUFFER_SIZE];
+    char word[INPUT_BUFFER_SIZE];
 
     sprintf(
         gText,
-        "A magical %s barrier stands tall before you, blocking your way.  "
-        "Runes on the arch read, \"Speak the key and you may pass.\"",
-        xBarrierColor[color]
+        "\xc4\xee\xf0\xee\xe3\xf3 \xe2\xe0\xec \xef\xf0\xe5\xe3\xf0\xe0\xe6\xe4\xe0\xe5\xf2 %s "
+        "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0. \xd0\xf3\xed\xfb "
+        "\xed\xe0 \xed\xe5\xec \xe3\xeb\xe0\xf1\xff\xf2: \"\xd1\xea\xe0\xe6\xe8 \xf1\xeb\xee\xe2\xee "
+        "\xe8 \xf1\xec\xee\xe6\xe5\xf8\xfc \xef\xf0\xee\xe9\xf2\xe8.\"",
+        xBarrierColor[colorIndex]
     );
-    GetDataEntry(gText, response, INPUT_LENGTH, NULL, 0, 1);
-    if (StrEqNoCase(response, xPasswordStrings[passwordIndex])
-        && (gpCurPlayer->m_barrierTents & (1 << color))) {
-        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &eventSample);
+    GetDataEntry(gText, word, INPUT_LENGTH, NULL, 0, 1);
+    if (StrEqNoCase(word, xPasswordStrings[passwordIndex])
+        && (gpCurPlayer->m_barrierTents & (1 << colorIndex))) {
+        EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, colorIndex, &eventSample);
         NormalDialog(
-            "\xcc\xd7Q"
-            "nothingness.",
+            "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 "
+            "\xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe5 \xf1\xeb\xee\xe2\xee, \xea\xe0\xea "
+            "\xf1\xe2\xe5\xf0\xea\xe0\xfe\xf9\xe8\xe9 \xe1\xe0\xf0\xfc\xe5\xf0 \xe8\xf1\xf7\xe5\xe7 "
+            "\xe2 \xef\xf3\xf1\xf2\xee\xf2\xe5.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -3974,23 +3978,23 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 
 VA(0x004420e1, 0x95)
 i8 StrEqNoCase(char* firstString, char* sndString) {
-    char* second = sndString;
-    char* fstPosition = firstString;
-    char upper;
+    char* firstPtr = firstString;
+    char* secondPtr = sndString;
     i32 chCount = 0;
     char fstUpper;
+    char sndUpper;
 
     while (1) {
         chCount++;
         if (chCount == SITE_STRING_LIMIT)
             return 1;
-        fstUpper = static_cast<char>(toupper(static_cast<i32>(*fstPosition)));
-        upper = static_cast<char>(toupper(static_cast<i32>(*second)));
-        if (fstUpper == upper) {
+        fstUpper = static_cast<char>(toupper(static_cast<i32>(*firstPtr)));
+        sndUpper = static_cast<char>(toupper(static_cast<i32>(*secondPtr)));
+        if (fstUpper == sndUpper) {
             if (fstUpper == 0)
                 return 1;
-            fstPosition++;
-            second++;
+            firstPtr++;
+            secondPtr++;
         } else {
             return 0;
         }
@@ -4394,25 +4398,27 @@ void advManager::ExpansionRecruitEvent(
     hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, i16* availableCount
 ) {
     tag_message dialogMessage;
-    baseManager* dialogManager = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
+    baseManager* recruitWindow = new recruitUnit(&eventHero->m_army, creatureType, availableCount);
     i32 dialogResult;
-    if (dialogManager == NULL)
+    if (recruitWindow == NULL)
         MemError();
-    gpExec->DoDialog(dialogManager);
-    delete dialogManager;
+    gpExec->DoDialog(recruitWindow);
+    delete recruitWindow;
 }
 
 VA(0x00442b6c, 0x21a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
-    SAMPLE2 eventSample1 = NULL_SAMPLE2;
-    i32 heroId9;
-    hero* releasedHero1;
+    SAMPLE2 eventSample = {NULL};
+    i32 heroId;
+    hero* freedHero;
 
-    heroId9 = cell->m_objectMetadata;
-    if (gpGame->m_availableHeroes[heroId9] != EVENT_JAILED_HERO) {
+    heroId = cell->m_objectMetadata;
+    if (gpGame->m_availableHeroes[heroId] != EVENT_JAILED_HERO) {
         NormalDialog(
-            "The jailer tells you that the hero who was imprisoned here has been released by the "
-            "king who imprisoned him.",
+            "\xd2\xfe\xf0\xe5\xec\xf9\xe8\xea \xf1\xea\xe0\xe7\xe0\xeb \xe2\xe0\xec, "
+            "\xf7\xf2\xee \xe3\xe5\xf0\xee\xe9, \xf2\xee\xec\xe8\xe2\xf8\xe8\xe9\xf1\xff "
+            "\xf2\xf3\xf2 \xe2 \xef\xeb\xe5\xed\xf3 \xe1\xfb\xeb \xee\xf1\xe2\xee\xe1\xee\xe6\xe4\xe5\xed "
+            "\xe5\xe3\xee \xea\xee\xf0\xee\xeb\xe5\xec.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4429,8 +4435,12 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
     if (gpCurPlayer->m_heroCount >= EVENT_HERO_LIMIT) {
         NormalDialog(
-            "You already have 8 heroes, and regretfully must leave the prisoner in this jail to "
-            "languish in agony for untold days.",
+            "\xd3 \xe2\xe0\xf1 \xf3\xe6\xe5 8 \xe3\xe5\xf0\xee\xe5\xe2. "
+            "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe2\xe0\xec \xef\xf0\xe8\xe4\xe5\xf2\xf1\xff "
+            "\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xf2\xee\xec\xe8\xf2\xfc\xf1\xff "
+            "\xfd\xf2\xee\xe3\xee \xe3\xe5\xf0\xee\xff \xe2 \xf2\xe5\xec\xed\xe8\xf6\xe5 "
+            "\xe5\xf9\xe5 \xed\xe5\xee\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee\xe5 "
+            "\xe2\xf0\xe5\xec\xff.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -4444,10 +4454,16 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         return;
     }
 
-    EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample1);
+    EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, 0, &eventSample);
     NormalDialog(
-        "In a dazzling display of daring, you break into the local jail and free the hero "
-        "imprisoned there, who, in return, pledges loyalty to your cause.",
+        "\xd1 \xee\xf1\xeb\xe5\xef\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9 \xee\xf2\xe2\xe0\xe3\xee\xe9 "
+        "\xe2\xfb \xe2\xee\xf0\xe2\xe0\xeb\xe8\xf1\xfc \xe2 \xec\xe5\xf1\xf2\xed\xf3\xfe "
+        "\xf2\xe5\xec\xed\xe8\xf6\xf3 \xe8 \xee\xf1\xe2\xee\xe1\xee\xe4\xe8\xeb\xe8 "
+        "\xe3\xe5\xf0\xee\xff, \xf2\xee\xec\xff\xf9\xe5\xe3\xee\xf1\xff "
+        "\xe7\xe4\xe5\xf1\xfc \xe2 \xef\xeb\xe5\xed\xf3. "
+        "\xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
+        "\xee\xed \xef\xee\xea\xeb\xff\xeb\xf1\xff \xf1\xeb\xf3\xe6\xe8\xf2\xfc "
+        "\xe2\xe0\xec.",
         NORMAL_DIALOG_INFO,
         -1,
         -1,
@@ -4458,25 +4474,25 @@ void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         -1,
         0
     );
-    gpGame->m_heroRecs[heroId9].m_owner = eventHero->m_owner;
-    gpGame->m_availableHeroes[heroId9] = eventHero->m_owner;
-    releasedHero1 = &gpGame->m_heroRecs[heroId9];
+    gpGame->m_heroRecs[heroId].m_owner = eventHero->m_owner;
+    gpGame->m_availableHeroes[heroId] = eventHero->m_owner;
+    freedHero = &gpGame->m_heroRecs[heroId];
     EraseObj(cell, x, y);
-    gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId9);
+    gpCurPlayer->m_heroIds[gpCurPlayer->m_heroCount] = static_cast<i8>(heroId);
     gpCurPlayer->m_heroCount++;
-    releasedHero1->m_x = x;
-    releasedHero1->m_y = y;
-    releasedHero1->m_eventFlags = HERO_EVENT_NONE;
-    releasedHero1->m_direction = MAP_DIRECTION_EAST;
-    releasedHero1->m_remainingMobility = releasedHero1->CalcMobility();
-    releasedHero1->m_mobility = releasedHero1->m_remainingMobility;
-    releasedHero1->m_locationType = cell->m_triggerType;
-    releasedHero1->m_occupiedTown = cell->m_objectMetadata;
+    freedHero->m_x = x;
+    freedHero->m_y = y;
+    freedHero->m_eventFlags = HERO_EVENT_NONE;
+    freedHero->m_direction = MAP_DIRECTION_EAST;
+    freedHero->m_remainingMobility = freedHero->CalcMobility();
+    freedHero->m_mobility = freedHero->m_remainingMobility;
+    freedHero->m_locationType = cell->m_triggerType;
+    freedHero->m_occupiedTown = cell->m_objectMetadata;
     cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-    cell->m_objectMetadata = heroId9;
+    cell->m_objectMetadata = heroId;
     SendMapChange(
         MAP_CHANGE_RECRUIT_HERO,
-        static_cast<i8>(heroId9),
+        static_cast<i8>(heroId),
         x,
         y,
         MAP_CHANGE_CURRENT_PLAYER,
@@ -4727,17 +4743,17 @@ void advManager::EventWindow(
     i32 value2,
     i32 type3
 ) {
-    i32 dialogState7;
-    i32 eventWindowUnused12;
-    i32 windowGap1;
-    i32 unusedStyle9;
-    i32 unusedResult;
-    i32 dialogState8;
-    i32 eventWindowUnused11;
-    i32 unusedStyle;
+    i32 eventWindowUnused4;
+    i32 eventWindowUnused3;
+    i32 eventDone;
+    i32 eventWindowUnused8;
+    i32 eventWindowUnused7;
+    i32 eventWindowUnused6;
+    i32 eventWindowUnused5;
     char eventText[EVENT_TEXT_BUFFER_SIZE];
+    i32 unusedStyle9;
 
-    unusedResult = 0;
+    eventDone = 0;
     unusedStyle9 = 1;
 
     if (eventId >= 0 && eventId < EVENT_TEXT_COUNT)
@@ -4814,16 +4830,16 @@ VA(0x004435ad, 0xe0)
 void advManager::RecruitEvent(
     hero* eventHero, H2_ENUM_PARAM(CreatureType, i32) creatureType, mapCell* cell
 ) {
-    tag_message dialogMessage;
+    tag_message recruitMessage;
     i16 availableCount = static_cast<i16>(cell->m_objectMetadata);
-    baseManager* dialogManager =
+    baseManager* recruitWindow =
         new recruitUnit(&eventHero->m_army, creatureType, &availableCount);
-    i32 dialogResult;
+    i32 eventResult;
 
-    if (dialogManager == NULL)
+    if (recruitWindow == NULL)
         MemError();
-    gpExec->DoDialog(dialogManager);
-    delete dialogManager;
+    gpExec->DoDialog(recruitWindow);
+    delete recruitWindow;
     cell->m_objectMetadata = static_cast<u16>(availableCount + 0);
 }
 
@@ -5402,15 +5418,16 @@ CombatResult advManager::CombatMonsterEvent(
     i32 tertiaryCount,
     i32 tertiaryStacks
 ) {
-    i32 stackCount;
-    i32 stackIndex9;
-    CombatResult combatResult7;
-    i32 lastStackCount;
-    CreatureType temporaryTypes7[MONSTER_ARMY_SLOTS];
-    i32 temporaryCounts[MONSTER_ARMY_SLOTS];
-    i32 placement4[MONSTER_ARMY_SLOTS + 1];
+    i32 placement4[MONSTER_ARMY_SLOTS];
+    i32 combatUnused;
+    i32 lastCount;
     i32 groupCount;
-    i32 stackTotal;
+    i32 stackCount;
+    CreatureType savedTypes[MONSTER_ARMY_SLOTS];
+    CombatResult battleOutcome;
+    i32 savedCounts[MONSTER_ARMY_SLOTS];
+    i32 stackIdx;
+    i32 combatUnused0;
 
     DemobilizeCurrHero();
     if (combatX == -1) {
@@ -5419,10 +5436,7 @@ CombatResult advManager::CombatMonsterEvent(
     } else {
         m_lastQuickViewX = combatX;
         m_lastQuickViewY = combatY;
-        if (eventHero->m_x >= combatX)
-            m_mineGuardianFacingLeft = 0;
-        else
-            m_mineGuardianFacingLeft = 1;
+        m_mineGuardianFacingLeft = eventHero->m_x < combatX;
         if (ComboDraw(0))
             UpdateScreen(0, 0);
         m_lastQuickViewX = -1;
@@ -5433,8 +5447,8 @@ CombatResult advManager::CombatMonsterEvent(
     stackCount = MONSTER_ARMY_SLOTS - secondaryStacks - tertiaryStacks;
     if (stackCount < 1)
         stackCount = 1;
-    placement4[MONSTER_ARMY_SLOTS] = 0;
-    SRand(combatY + combatX);
+    groupCount = 0;
+    SRand(combatX + combatY);
     if (stackCount == MONSTER_ARMY_SLOTS
         && HAS(gMonsterDatabase[IDX(monsterType)].attributes, MONSTER_ATTRIBUTE_RANGED) == 0) {
         i32 roll = SRandom(0, MONSTER_RANDOM_MAX);
@@ -5444,8 +5458,8 @@ CombatResult advManager::CombatMonsterEvent(
             stackCount = MONSTER_FOUR_STACK_COUNT;
     }
 
-    for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
-        if (stackIndex9 == (stackCount >> 1)
+    for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
+        if (stackIdx == (stackCount >> 1)
             && (monsterType == CREATURE_ARCHER || monsterType == CREATURE_PIKEMAN
                 || monsterType == CREATURE_SWORDSMAN || monsterType == CREATURE_CAVALRY
                 || monsterType == CREATURE_PALADIN || monsterType == CREATURE_ORC
@@ -5459,57 +5473,57 @@ CombatResult advManager::CombatMonsterEvent(
                 || monsterType == CREATURE_LICH)
             && SRandom(0, MONSTER_RANDOM_MAX) < MONSTER_UPGRADE_CHANCE && secondaryCount == 0
             && tertiaryCount == 0)
-            gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
                 NextCreatureType(monsterType);
         else
-            gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
                 monsterType;
-        gpMonGroup->m_creatureCounts[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
-            static_cast<i16>((stackIndex9 < monsterCount % stackCount) + monsterCount / stackCount);
+        gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
+            static_cast<i16>(monsterCount / stackCount + (monsterCount % stackCount > stackIdx));
     }
 
-    placement4[MONSTER_ARMY_SLOTS] += stackCount;
+    groupCount += stackCount;
     if (secondaryStacks != 0) {
         stackCount = secondaryStacks;
-        for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
-            gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+        for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
+            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
                 secondaryType;
-            gpMonGroup->m_creatureCounts[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+            gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
                 static_cast<i16>(
-                    (stackIndex9 < secondaryCount % stackCount) + secondaryCount / stackCount
+                    secondaryCount / stackCount + (secondaryCount % stackCount > stackIdx)
                 );
         }
     }
 
-    placement4[MONSTER_ARMY_SLOTS] += stackCount;
+    groupCount += stackCount;
     if (tertiaryStacks != 0) {
         stackCount = tertiaryStacks;
-        for (stackIndex9 = 0; stackIndex9 < stackCount; stackIndex9++) {
-            gpMonGroup->m_creatureTypes[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+        for (stackIdx = 0; stackIdx < stackCount; stackIdx++) {
+            gpMonGroup->m_creatureTypes[groupCount + stackIdx] =
                 tertiaryType;
-            gpMonGroup->m_creatureCounts[placement4[MONSTER_ARMY_SLOTS] + stackIndex9] =
+            gpMonGroup->m_creatureCounts[groupCount + stackIdx] =
                 static_cast<i16>(
-                    (stackIndex9 < secondaryCount % stackCount) + tertiaryCount / stackCount
+                    tertiaryCount / stackCount + (secondaryCount % stackCount > stackIdx)
                 );
         }
     }
-    lastStackCount = stackCount;
+    lastCount = stackCount;
 
-    for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++) {
-        if (gpMonGroup->m_creatureCounts[stackIndex9] <= 0)
-            gpMonGroup->m_creatureTypes[stackIndex9] = CREATURE_NONE;
+    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+        if (gpMonGroup->m_creatureCounts[stackIdx] <= 0)
+            gpMonGroup->m_creatureTypes[stackIdx] = CREATURE_NONE;
     }
-    for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++)
-        placement4[stackIndex9] = stackIndex9;
+    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++)
+        placement4[stackIdx] = stackIdx;
 
-    if (lastStackCount == 1) {
+    if (lastCount == 1) {
         placement4[2] = 0;
         placement4[0] = 2;
-    } else if (lastStackCount == 2) {
+    } else if (lastCount == 2) {
         placement4[1] = 1;
         placement4[3] = 0;
         placement4[0] = 3;
-    } else if (lastStackCount == 3) {
+    } else if (lastCount == 3) {
         placement4[0] = 3;
         placement4[1] = 0;
         placement4[2] = 1;
@@ -5527,18 +5541,18 @@ CombatResult advManager::CombatMonsterEvent(
         placement4[4] = 1;
     }
 
-    for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++) {
-        temporaryTypes7[stackIndex9] = gpMonGroup->m_creatureTypes[stackIndex9];
-        temporaryCounts[stackIndex9] = gpMonGroup->m_creatureCounts[stackIndex9];
+    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+        savedTypes[stackIdx] = gpMonGroup->m_creatureTypes[stackIdx];
+        savedCounts[stackIdx] = gpMonGroup->m_creatureCounts[stackIdx];
     }
-    for (stackIndex9 = 0; stackIndex9 < MONSTER_ARMY_SLOTS; stackIndex9++) {
-        gpMonGroup->m_creatureTypes[stackIndex9] = temporaryTypes7[placement4[stackIndex9]];
-        gpMonGroup->m_creatureCounts[stackIndex9] =
-            static_cast<i16>(temporaryCounts[placement4[stackIndex9]]);
+    for (stackIdx = 0; stackIdx < MONSTER_ARMY_SLOTS; stackIdx++) {
+        gpMonGroup->m_creatureTypes[stackIdx] = savedTypes[placement4[stackIdx]];
+        gpMonGroup->m_creatureCounts[stackIdx] =
+            static_cast<i16>(savedCounts[placement4[stackIdx]]);
     }
 
     if (defender != 0)
-        combatResult7 = DoCombat(
+        battleOutcome = DoCombat(
             combatX,
             combatY,
             NULL,
@@ -5548,11 +5562,11 @@ CombatResult advManager::CombatMonsterEvent(
             &eventHero->m_army,
             mapX,
             mapY,
-            combatY + combatX,
+            combatX + combatY,
             1
         );
     else
-        combatResult7 = DoCombat(
+        battleOutcome = DoCombat(
             combatX,
             combatY,
             eventHero,
@@ -5562,11 +5576,11 @@ CombatResult advManager::CombatMonsterEvent(
             gpMonGroup,
             mapX,
             mapY,
-            combatY + combatX,
+            combatX + combatY,
             1
         );
     MobilizeCurrHero(0);
-    return combatResult7;
+    return battleOutcome;
 }
 
 VA(0x00444571, 0x2da)
@@ -7403,37 +7417,42 @@ void advManager::PlayerMonsterInteract(
     i32 combatX,
     i32 combatY
 ) {
-    CreatureType monster_n;
-    float strengthRatio_p;
-    CombatResult combatResult_f;
-    i32 forcedJoin_f;
-    i32 joining;
-    i32 monsterCount_n;
-    i32 joiningCost_i;
-    char offerText_g[MONSTER_OFFER_BUFFER_SIZE];
+    CreatureType monsterType;
+    CombatResult result;
+    i32 creatureCount;
+    float armyRatio;
+    i32 forceJoin;
+    i32 joiningCost;
+    char monsterText[MONSTER_OFFER_BUFFER_SIZE];
+    i32 numJoining;
 
     unused = 0;
     gpMouseManager->ShowColorPointer();
-    monster_n = static_cast<CreatureType>(cell->m_objectIndex);
-    forcedJoin_f = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    monsterCount_n = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    strengthRatio_p =
-        static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
-        / static_cast<float>(gMonsterDatabase[IDX(monster_n)].fightValue * monsterCount_n);
+    monsterType = static_cast<CreatureType>(cell->m_objectIndex);
+    forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
+    creatureCount = cell->m_objectMetadata & MONSTER_COUNT_MASK;
+    armyRatio = static_cast<double>(
+                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
+                )
+                / static_cast<double>(
+                    creatureCount * gMonsterDatabase[IDX(monsterType)].fightValue
+                );
 
     if (gbInCampaign
         && ((gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARVEN_ALLIANCE)]
-             && (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF))
+             && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF))
             || (gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_OGRE_ALLIANCE)]
-                && (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD))
+                && (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD))
             || (gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DRAGON_ALLIANCE)]
-                && (monster_n == CREATURE_GREEN_DRAGON || monster_n == CREATURE_RED_DRAGON
-                    || monster_n == CREATURE_BLACK_DRAGON)))) {
-        if (!eventHero->m_army.CanJoin(monster_n)) {
-            if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
+                && (monsterType == CREATURE_GREEN_DRAGON || monsterType == CREATURE_RED_DRAGON
+                    || monsterType == CREATURE_BLACK_DRAGON)))) {
+        if (!eventHero->m_army.CanJoin(monsterType)) {
+            if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "The dwarves hail you, \"Any friend of Roland is a friend of ours.  You may "
-                    "pass.\"",
+                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xf3\xfe "
+                    "\xe2\xe0\xf1: \"\xc4\xf0\xf3\xe3 \xd0\xee\xeb\xe0\xed\xe4\xe0 "
+                    "- \xed\xe0\xf8 \xe4\xf0\xf3\xe3. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 "
+                    "\xef\xf0\xee\xe9\xf2\xe8.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7444,9 +7463,11 @@ void advManager::PlayerMonsterInteract(
                     -1,
                     0
                 );
-            else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
+            else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "The ogres give you a grunt of recognition, \"Archibald's allies may pass.\"",
+                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xe2\xe0\xf1: "
+                    "\"\xd1\xee\xfe\xe7\xed\xe8\xea\xe8 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xe0 "
+                    "\xec\xee\xe3\xf3\xf2 \xef\xf0\xee\xe9\xf2\xe8.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7459,9 +7480,14 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "The dragons see you and call out.  \"Our alliance with Archibald compels us "
-                    "to join you.  Unfortunately you have no room.  A pity!\"  They quickly "
-                    "scatter.",
+                    "\xc4\xf0\xe0\xea\xee\xed\xfb, \xef\xee\xf1\xec\xee\xf2\xf0\xe5\xe2 "
+                    "\xed\xe0 \xe2\xe0\xf1, \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb\xe8: "
+                    "\"\xcd\xe0\xf8 \xe0\xeb\xfc\xff\xed\xf1 \xf1 \xc0\xf0\xf7\xe8\xe1\xe0\xeb\xfc\xe4\xee\xec "
+                    "\xe2\xfb\xed\xf3\xe6\xe4\xe0\xe5\xf2 \xed\xe0\xf1 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec.  \xca \xed\xe5\xf1\xf7\xe0\xf1\xf2\xfc\xfe, "
+                    "\xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xe4\xeb\xff \xed\xe0\xf1 \xec\xe5\xf1\xf2\xe0. "
+                    "\xca\xe0\xea\xe0\xff \xe6\xe0\xeb\xee\xf1\xf2\xfc!\"  \xc8 "
+                    "\xe1\xfb\xf1\xf2\xf0\xee \xf3\xeb\xe5\xf2\xe5\xeb\xe8.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7474,9 +7500,12 @@ void advManager::PlayerMonsterInteract(
                 );
             *handled = 1;
         } else {
-            if (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)
+            if (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)
                 NormalDialog(
-                    "The dwarves recognize their allies and gladly join your forces.",
+                    "\xc3\xed\xee\xec\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xf1\xe2\xee\xe8\xf5 "
+                    "\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2 \xe8 \xf0\xe0\xe4\xfb "
+                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea "
+                    "\xed\xe8\xec.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7487,9 +7516,12 @@ void advManager::PlayerMonsterInteract(
                     -1,
                     0
                 );
-            else if (monster_n == CREATURE_OGRE || monster_n == CREATURE_OGRE_LORD)
+            else if (monsterType == CREATURE_OGRE || monsterType == CREATURE_OGRE_LORD)
                 NormalDialog(
-                    "The ogres recognize you as the Dwarfbane and lumber over to join you.",
+                    "\xce\xe3\xf0\xfb \xef\xf0\xe8\xe7\xed\xe0\xeb\xe8 \xed\xe0\xf1, "
+                    "\xea\xe0\xea \xe2\xf0\xe0\xe3\xee\xe2 \xe3\xed\xee\xec\xee\xe2 "
+                    "\xe8 \xf0\xe0\xe4\xfb \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec. ",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7502,8 +7534,11 @@ void advManager::PlayerMonsterInteract(
                 );
             else
                 NormalDialog(
-                    "The dragons, snarling and growling, agree to join forces with you, their "
-                    "'Ally'.",
+                    "\xc3\xee\xf0\xe4\xe5\xeb\xe8\xe2\xfb\xe5 \xe4\xf0\xe0\xea\xee\xed\xfb "
+                    "\xe2\xfb\xed\xf3\xe6\xe4\xe5\xed\xfb \xe1\xfb\xeb\xe8 \xef\xf0\xe8\xe7\xed\xe0\xf2\xfc "
+                    "\xe2 \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xf5 '\xf1\xee\xfe\xe7\xed\xe8\xea\xee\xe2' "
+                    "\xe8 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xec.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -7514,16 +7549,17 @@ void advManager::PlayerMonsterInteract(
                     -1,
                     0
                 );
-            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+            eventHero->m_army.Add(monsterType, creatureCount, -1);
             *handled = 1;
         }
         return;
     }
 
     if (gbInCampaign && gpGame->m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)]
-        && (monster_n == CREATURE_DWARF || monster_n == CREATURE_BATTLE_DWARF)) {
+        && (monsterType == CREATURE_DWARF || monsterType == CREATURE_BATTLE_DWARF)) {
         NormalDialog(
-            "\"The Dwarfbane!!!!, run for your lives.\"",
+            "\"\xc2\xf0\xe0\xe3\xe8 \xe3\xed\xee\xec\xee\xe2! \xc1\xe5\xe3\xe8\xf2\xe5, "
+            "\xe5\xf1\xeb\xe8 \xe6\xe8\xe7\xed\xfc \xe4\xee\xf0\xee\xe3\xe0.\"",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -7539,13 +7575,21 @@ void advManager::PlayerMonsterInteract(
     }
 
     if (xIsPlayingExpansionCampaign && xCampaign.HasAward(AWARD_ELVEN_ALLIANCE)
-        && (monster_n == CREATURE_ELF || monster_n == CREATURE_GRAND_ELF)) {
+        && (monsterType == CREATURE_ELF || monsterType == CREATURE_GRAND_ELF)) {
         *handled = 1;
-        if (eventHero->m_army.CanJoin(monster_n)) {
+        if (eventHero->m_army.CanJoin(monsterType)) {
             NormalDialog(
-                "As you approach the group of elves, their leader calls them all to attention.  He "
-                "shouts to them, \"Who of you is brave enough to join this fearless ally of "
-                "ours?\"  The group explodes with cheers as they run to join your ranks.",
+                "\xc5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea "
+                "\xee\xf2\xf0\xff\xe4\xf3 \xfd\xeb\xfc\xf4\xee\xe2, \xea\xe0\xea "
+                "\xe8\xf5 \xe2\xee\xe6\xe0\xea \xef\xf0\xe8\xe7\xe2\xe0\xeb "
+                "\xf1\xe2\xee\xe9 \xee\xf2\xf0\xff\xe4 \xea \xee\xf0\xf3\xe6\xe8\xfe. "
+                "\xce\xed \xf1\xea\xe0\xe7\xe0\xeb \xe8\xec: \"\xca\xf2\xee "
+                "\xe8\xe7 \xe2\xe0\xf1 \xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
+                "\xf1\xec\xe5\xeb, \xf7\xf2\xee\xe1\xfb \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
+                "\xe2 \xe0\xf0\xec\xe8\xfe \xed\xe0\xf8\xe5\xe3\xee \xec\xf3\xe6\xe5\xf1\xf2\xe2\xe5\xed\xed\xee\xe3\xee "
+                "\xf1\xee\xfe\xe7\xed\xe8\xea\xe0?\" \xc2\xe5\xf1\xfc \xee\xf2\xf0\xff\xe4 "
+                "\xe5\xe4\xe8\xed\xee\xe4\xf3\xf8\xed\xee \xe2\xf1\xf2\xf3\xef\xe8\xeb "
+                "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -7556,12 +7600,18 @@ void advManager::PlayerMonsterInteract(
                 -1,
                 0
             );
-            eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+            eventHero->m_army.Add(monsterType, creatureCount, -1);
         } else {
             NormalDialog(
-                "The elves stand at attention as you approach.  Their leader calls to you and "
-                "says, \"Let us not impede your progress, ally!  Move on, and may victory be "
-                "yours.\"",
+                "\xdd\xeb\xfc\xf4\xfb \xed\xe0\xf1\xf2\xee\xf0\xee\xe6\xe8\xeb\xe8\xf1\xfc "
+                "\xef\xf0\xe8 \xe2\xe0\xf8\xe5\xec \xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8. "
+                "\xc8\xf5 \xe2\xee\xe6\xe0\xea \xee\xe1\xf0\xe0\xf2\xe8\xeb\xf1\xff "
+                "\xea \xe2\xe0\xec \xf1\xee \xf1\xeb\xee\xe2\xe0\xec\xe8: \"\xcc\xfb "
+                "\xed\xe5 \xec\xee\xe6\xe5\xec \xef\xf0\xe8\xed\xff\xf2\xfc "
+                "\xf3\xf7\xe0\xf1\xf2\xe8\xe5 \xe2 \xe2\xe0\xf8\xe8\xf5 \xe4\xe5\xeb\xe0\xf5, "
+                "\xf1\xee\xfe\xe7\xed\xe8\xea! \xcf\xf0\xee\xf5\xee\xe4\xe8, "
+                "\xed\xe0\xf8\xe0 \xef\xee\xe1\xe5\xe4\xe0 \xe1\xf3\xe4\xe5\xf2 "
+                "\xe2\xe0\xf8\xe5\xe9.\"",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -7576,17 +7626,17 @@ void advManager::PlayerMonsterInteract(
         return;
     }
 
-    if (eventHero->m_army.CanJoin(monster_n)
-        && strengthRatio_p
+    if (eventHero->m_army.CanJoin(monsterType)
+        && armyRatio
             > MONSTER_STRENGTH_JOIN
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monster_n != CREATURE_GHOST
-        && monster_n != CREATURE_EARTH_ELEMENTAL && monster_n != CREATURE_AIR_ELEMENTAL
-        && monster_n != CREATURE_FIRE_ELEMENTAL && monster_n != CREATURE_WATER_ELEMENTAL) {
-        if (forcedJoin_f) {
-            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monster_n)]);
+        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && monsterType != CREATURE_GHOST
+        && monsterType != CREATURE_EARTH_ELEMENTAL && monsterType != CREATURE_AIR_ELEMENTAL
+        && monsterType != CREATURE_FIRE_ELEMENTAL && monsterType != CREATURE_WATER_ELEMENTAL) {
+        if (forceJoin) {
+            sprintf(gText, gEventText[EVENT_TEXT_FOLLOWERS], gArmyNamesPlural[IDX(monsterType)]);
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                eventHero->m_army.Add(monster_n, monsterCount_n, -1);
+                eventHero->m_army.Add(monsterType, creatureCount, -1);
                 *handled = 1;
                 return;
             } else {
@@ -7597,57 +7647,66 @@ void advManager::PlayerMonsterInteract(
                    != HERO_SKILL_LEVEL_NONE) {
             if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                 == HERO_SKILL_LEVEL_EXPERT)
-                joining = monsterCount_n;
+                numJoining = creatureCount;
             else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                      == HERO_SKILL_LEVEL_ADVANCED)
-                joining = monsterCount_n / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
+                numJoining = creatureCount / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
             else
-                joining = monsterCount_n / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;
-            if (!joining)
-                joining = 1;
+                numJoining = creatureCount / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;
+            if (!numJoining)
+                numJoining = 1;
 
-            joiningCost_i = gMonsterDatabase[IDX(monster_n)].cost * monsterCount_n;
-            if (joiningCost_i > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
-                if (strengthRatio_p
+            joiningCost = gMonsterDatabase[IDX(monsterType)].cost * creatureCount;
+            if (joiningCost > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                if (armyRatio
                     > MONSTER_STRENGTH_FLEE)
                     goto monstersFlee;
                 else
                     goto fightMonsters;
             }
 
-            if (monsterCount_n == 1) {
+            if (creatureCount == 1) {
                 sprintf(
                     gText,
-                    "The %s is swayed by your diplomatic tongue, and offers to join your army for "
-                    "the sum of %d gold.  Do you accept?",
-                    gArmyNames[IDX(monster_n)],
-                    joiningCost_i
+                    "%s \xed\xe0\xf5\xee\xe4\xe8\xf2\xf1\xff \xef\xee\xe4 \xe2\xef\xe5\xf7\xe0\xf2\xeb\xe5\xed\xe8\xe5\xec "
+                    "\xe2\xe0\xf8\xe5\xe9 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2\xe8\xf7\xed\xee\xf1\xf2\xe8, "
+                    "\xe8 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 \xf1\xe2\xee\xe8 "
+                    "\xf3\xf1\xeb\xf3\xe3\xe8 \xe2\xe0\xf8\xe5\xec\xf3 \xe2\xee\xe9\xf1\xea\xf3 "
+                    "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
+                    gArmyNames[IDX(monsterType)],
+                    joiningCost
                 );
             } else {
                 sprintf(
                     gText,
-                    "The creatures are swayed by your diplomatic tongue, and make you an offer:\n\n"
+                    "\xc2\xee\xe8\xed\xfb \xef\xee\xea\xee\xf0\xe5\xed\xfb \xe2\xe0\xf8\xe8\xec "
+                    "\xf8\xe0\xf0\xec\xee\xec \xe8 \xe2\xfb\xe4\xe2\xe8\xed\xf3\xeb\xe8 "
+                    "\xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xe5:\n\n"
                 );
-                if (monsterCount_n == joining)
+                if (numJoining == creatureCount)
                     sprintf(
-                        offerText_g,
-                        "All %d of the %s will join your army for the sum of %d gold.  Do you "
-                        "accept?",
-                        monsterCount_n,
-                        gArmyNamesPlural[IDX(monster_n)],
-                        joiningCost_i
+                        monsterText,
+                        "\xce\xf2\xf0\xff\xe4 \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 "
+                        "\xe2 \xf0\xff\xe4\xfb \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
+                        "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
+                        "\xef\xf0\xe8\xed\xff\xf2\xfc \xe8\xf5?",
+                        creatureCount,
+                        gArmyNamesPlural[IDX(monsterType)],
+                        joiningCost
                     );
                 else
                     sprintf(
-                        offerText_g,
-                        "%d of the %d %s will join your army, and the rest will leave you alone, "
-                        "for the sum of %d gold.  Do you accept?",
-                        joining,
-                        monsterCount_n,
-                        gArmyNamesPlural[IDX(monster_n)],
-                        joiningCost_i
+                        monsterText,
+                        "%d \xe8\xe7 %d %s \xe2\xf1\xf2\xf3\xef\xff\xf2 \xe2 \xf0\xff\xe4\xfb "
+                        "\xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe0 \xee\xf1\xf2\xe0\xe2\xf8\xe8\xe5\xf1\xff "
+                        "\xee\xf1\xf2\xe0\xe2\xff\xf2 \xe2\xe0\xf1 \xe2 \xef\xee\xea\xee\xe5 "
+                        "\xe7\xe0 %d \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc2\xfb \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb?",
+                        numJoining,
+                        creatureCount,
+                        gArmyNamesPlural[IDX(monsterType)],
+                        joiningCost
                     );
-                strcat(gText, offerText_g);
+                strcat(gText, monsterText);
             }
 
             NormalDialog(
@@ -7656,16 +7715,16 @@ void advManager::PlayerMonsterInteract(
                 -1,
                 -1,
                 IDX(RES_GOLD),
-                joiningCost_i,
+                joiningCost,
                 -1,
                 0,
                 -1,
                 0
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
-                eventHero->m_army.Add(monster_n, joining, -1);
+                eventHero->m_army.Add(monsterType, numJoining, -1);
                 *handled = 1;
-                gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost_i;
+                gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
                 return;
             } else {
                 EventWindow(EVENT_TEXT_MONSTER_REFUSAL, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
@@ -7674,13 +7733,16 @@ void advManager::PlayerMonsterInteract(
         }
     }
 
-    if (strengthRatio_p > MONSTER_STRENGTH_FLEE) {
+    if (armyRatio > MONSTER_STRENGTH_FLEE) {
     monstersFlee:
         sprintf(
             gText,
-            "The %s, awed by the power of your forces, begin to scatter.  Do you wish to pursue "
-            "and engage them?",
-            gArmyNamesPlural[IDX(monster_n)]
+            "\xc3\xf0\xf3\xef\xef\xe0 %s, \xf1\xf2\xf0\xe0\xf8\xe0\xf1\xfc "
+            "\xec\xee\xf9\xe8 \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe8\xed\xf1\xf2\xe2\xe0, "
+            "\xe1\xf0\xee\xf1\xe8\xeb\xe0\xf1\xfc \xe2\xf0\xe0\xf1\xf1\xfb\xef\xed\xf3\xfe. "
+            "\xd1\xee\xe8\xe7\xe2\xee\xeb\xe8\xf2\xe5 \xe8\xe7\xeb\xee\xe2\xe8\xf2\xfc "
+            "\xe8\xf5 \xe8 \xe7\xe0\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe4\xf0\xe0\xf2\xfc\xf1\xff?",
+            gArmyNamesPlural[IDX(monsterType)]
         );
         EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
         if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
@@ -7690,10 +7752,10 @@ void advManager::PlayerMonsterInteract(
     }
 
 fightMonsters:
-    combatResult_f = CombatMonsterEvent(
+    result = CombatMonsterEvent(
         eventHero,
-        monster_n,
-        monsterCount_n,
+        monsterType,
+        creatureCount,
         combatCell,
         x,
         y,
@@ -7707,51 +7769,52 @@ fightMonsters:
         0,
         0
     );
-    if (combatResult_f == COMBAT_RESULT_ATTACKER || combatResult_f == COMBAT_RESULT_DRAW)
+    if (result == COMBAT_RESULT_ATTACKER || result == COMBAT_RESULT_DRAW)
         *handled = 1;
 }
 
 VA(0x00448730, 0x3d4)
 void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* handled) {
-    i32 replacementSlot;
     CreatureType monsterType;
-    i32 purchaseValue;
+    i32 replacementSlot;
+    i32 creatureCount[MONSTER_COMBAT_VALUE_COUNT];
+    i32 bought;
+    float armyRatio;
+    u32 forceJoin;
+    i32 purchaseWorth;
     i32 joiningCost;
-    i32 numBought;
-    i32 monsterCount[MONSTER_COMBAT_VALUE_COUNT];
-    u32 forceMask;
-    float strengthRatio;
     i32 joiningCount;
 
     monsterType = static_cast<CreatureType>(cell->m_objectIndex);
-    monsterCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
-    forceMask = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
-    strengthRatio =
-        static_cast<float>(gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0))
-        / static_cast<float>(
-            gMonsterDatabase[IDX(monsterType)].fightValue
-            * monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
-        );
+    creatureCount[MONSTER_COMBAT_REMAINING_COUNT] = cell->m_objectMetadata & MONSTER_COUNT_MASK;
+    forceJoin = cell->m_objectMetadata & MONSTER_JOIN_FORCED;
+    armyRatio = static_cast<double>(
+                    gpPhilAI->FightValueOfStack(&eventHero->m_army, eventHero, 0, 0, 0, 0)
+                )
+                / static_cast<double>(
+                    creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
+                    * gMonsterDatabase[IDX(monsterType)].fightValue
+                );
 
     if (eventHero->m_army.CanJoin(monsterType)
-        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && strengthRatio > MONSTER_STRENGTH_JOIN
+        && !eventHero->HasArtifact(ARTIFACT_HIDEOUS_MASK) && armyRatio > MONSTER_STRENGTH_JOIN
         && monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
         && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
         && monsterType != CREATURE_WATER_ELEMENTAL) {
-        if (forceMask) {
+        if (forceJoin) {
             gpPhilAI->EvaluateOneTimeCreaturePurchase(
                 monsterType,
-                monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
+                creatureCount[MONSTER_COMBAT_REMAINING_COUNT],
                 1,
-                numBought,
-                purchaseValue,
+                bought,
+                purchaseWorth,
                 replacementSlot
             );
-            if (numBought > 0) {
+            if (bought > 0) {
                 gpGame->GiveArmy(
                     &eventHero->m_army,
                     monsterType,
-                    monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
+                    creatureCount[MONSTER_COMBAT_REMAINING_COUNT],
                     replacementSlot
                 );
                 *handled = 1;
@@ -7763,38 +7826,38 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 != HERO_SKILL_LEVEL_NONE) {
                 if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                     == HERO_SKILL_LEVEL_EXPERT)
-                    joiningCount = monsterCount[MONSTER_COMBAT_REMAINING_COUNT];
+                    joiningCount = creatureCount[MONSTER_COMBAT_REMAINING_COUNT];
                 else if (eventHero->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)]
                          == HERO_SKILL_LEVEL_ADVANCED)
-                    joiningCount = monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
+                    joiningCount = creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                                    / MONSTER_DIPLOMACY_ADVANCED_JOIN_DIVISOR;
                 else
-                    joiningCount = monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
+                    joiningCount = creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                                    / MONSTER_DIPLOMACY_BASIC_JOIN_DIVISOR;
                 if (!joiningCount)
                     joiningCount = 1;
 
                 joiningCost = static_cast<i32>(
                     gMonsterDatabase[IDX(monsterType)].cost
-                    * monsterCount[MONSTER_COMBAT_REMAINING_COUNT]
+                    * creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
                     * MONSTER_AI_JOIN_COST_FRACTION
                 );
-                if (gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]
-                    < joiningCost) {
-                    if (strengthRatio > MONSTER_STRENGTH_FLEE)
+                if (joiningCost
+                    > gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)]) {
+                    if (armyRatio > MONSTER_STRENGTH_FLEE)
                         goto computerMonstersFlee;
                     else
                         goto fightComputerMonsters;
                 }
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
                     monsterType,
-                    monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
+                    creatureCount[MONSTER_COMBAT_REMAINING_COUNT],
                     1,
-                    numBought,
-                    purchaseValue,
+                    bought,
+                    purchaseWorth,
                     replacementSlot
                 );
-                if (numBought > 0) {
+                if (bought > 0) {
                     gpGame->m_players[eventHero->m_owner].m_resources[IDX(RES_GOLD)] -= joiningCost;
                     gpGame->GiveArmy(
                         &eventHero->m_army,
@@ -7809,12 +7872,12 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
         }
     }
 
-    if (strengthRatio > MONSTER_STRENGTH_FLEE) {
+    if (armyRatio > MONSTER_STRENGTH_FLEE) {
     computerMonstersFlee:
         gpAdvManager->GiveExperience(
             eventHero,
-            gMonsterDatabase[IDX(monsterType)].hitPoints
-                * monsterCount[MONSTER_COMBAT_REMAINING_COUNT],
+            creatureCount[MONSTER_COMBAT_REMAINING_COUNT]
+                * gMonsterDatabase[IDX(monsterType)].hitPoints,
             1
         );
         eventHero->CheckLevel();
@@ -7824,25 +7887,26 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
                 &eventHero->m_army,
                 CREATURE_SKELETON,
                 static_cast<i32>(
-                    static_cast<double>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
-                    * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
+                    static_cast<double>(creatureCount[MONSTER_COMBAT_REMAINING_COUNT])
                     * MONSTER_NECROMANCY_FRACTION
+                    * eventHero->GetSSLevel(HERO_SKILL_NECROMANCY)
                 ),
                 -1
             );
         }
         *handled = 1;
+        return;
     } else {
     fightComputerMonsters:
-        monsterCount[MONSTER_COMBAT_RESULT] =
-            gpPhilAI->CombatMonsterEvent(eventHero, monsterType, monsterCount, cell);
-        if (monsterCount[MONSTER_COMBAT_RESULT] != 0) {
+        creatureCount[MONSTER_COMBAT_RESULT] =
+            gpPhilAI->CombatMonsterEvent(eventHero, monsterType, creatureCount, cell);
+        if (creatureCount[MONSTER_COMBAT_RESULT] != 0) {
             *handled = 1;
-            return;
+        } else {
+            cell->m_objectMetadata =
+                (cell->m_objectMetadata & MONSTER_FLAGS_MASK)
+                + (creatureCount[MONSTER_COMBAT_REMAINING_COUNT] & MONSTER_COUNT_MASK);
         }
-        cell->m_objectMetadata = (cell->m_objectMetadata & MONSTER_FLAGS_MASK)
-                                 + (static_cast<u16>(monsterCount[MONSTER_COMBAT_REMAINING_COUNT])
-                                    & MONSTER_COUNT_MASK);
     }
 }
 
@@ -7850,18 +7914,18 @@ VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
     hero* secondHro;
     i32 randSeed;
-    i32 battleX;
-    i32 setupBattleY;
-    i32 combatY;
+    i32 firstSide;
+    town* battleTown;
     H2_ENUM_STORAGE(CombatResult, i8) combatRes;
     i32 initCombatX;
-    hero* firstHero;
-    i32 otherPlr;
-    i32 firstSide;
+    i32 netUnused7;
     armyGroup* secondArmy;
+    i32 battleX;
     armyGroup* troopFirst;
-    town* battleTown;
-    i32 sz;
+    i32 otherPlr;
+    i32 setupBattleY;
+    hero* firstHero;
+    i32 combatY;
     i32 outcome;
 
     firstHero = NULL;
@@ -7947,19 +8011,19 @@ CombatResult advManager::DoCombat(
     i32 processLosses
 ) {
     armyGroup* receivedSecondArmy2;
+    armyGroup* receivedFirstArmy;
     hero* receivedSecondHero9;
     hero* receivedFirstHero1;
-    armyGroup* receivedFirstArmy;
     town* receivedTown;
+    char* packet_j;
     i32 remotePlayer;
-    char* packet8;
-    H2_ENUM_STORAGE(CombatResult, i8) combatResult3;
     tag_message message9;
-    i32 secondPlayer7;
-    i32 firstPlayer4;
+    H2_ENUM_STORAGE(CombatResult, i8) combatResult3;
+    i32 savedShowIt_f;
+    i32 secondPlayer8;
     i32 savedPlayer1;
-    i32 savedShowIt_e;
     i32 unusedCombat_a;
+    i32 firstPlayer4;
 
     if (giDebugLevel == COMBAT_AUTO_RESOLVE_DEBUG_LEVEL)
         return AutoResolveCombat(
@@ -7977,17 +8041,22 @@ CombatResult advManager::DoCombat(
         );
     gbInCombat = true;
     firstPlayer4 = firstHero ? firstHero->m_owner : -1;
-    secondPlayer7 = secondHero ? secondHero->m_owner : (combatTown ? combatTown->m_owner : -1);
+    if (secondHero)
+        secondPlayer8 = secondHero->m_owner;
+    else if (combatTown)
+        secondPlayer8 = combatTown->m_owner;
+    else
+        secondPlayer8 = -1;
     if (randomSeed == -1)
         randomSeed = Random(1, COMBAT_RANDOM_SEED_MAX);
     DemobilizeCurrHero();
     savedPlayer1 = giCurPlayer;
-    savedShowIt_e = bShowIt;
+    savedShowIt_f = bShowIt;
 
-    if (firstPlayer4 >= 0 && secondPlayer7 >= 0 && gbHumanPlayer[secondPlayer7]) {
-        if (!gbThisNetHumanPlayer[secondPlayer7]) {
+    if (firstPlayer4 >= 0 && secondPlayer8 >= 0 && gbHumanPlayer[secondPlayer8]) {
+        if (!gbThisNetHumanPlayer[secondPlayer8]) {
             iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = giThisNetPos;
-            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = gbGamePosToNetPos[secondPlayer7];
+            iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = gbGamePosToNetPos[secondPlayer8];
             SendHeroTownData(
                 x,
                 y,
@@ -7999,13 +8068,13 @@ CombatResult advManager::DoCombat(
                 setupCombatX,
                 setupCombatY,
                 randomSeed,
-                gbGamePosToNetPos[secondPlayer7],
+                gbGamePosToNetPos[secondPlayer8],
                 COMBAT_RESULT_ATTACKER,
                 0,
                 0
             );
             if (!gbHumanPlayer[firstPlayer4]) {
-                for (;;) {
+                while (1) {
                     PollSound();
                     FillBitmapArea(
                         gpWindowManager->m_screen,
@@ -8015,12 +8084,12 @@ CombatResult advManager::DoCombat(
                         COMBAT_NETWORK_POLL_HEIGHT,
                         0
                     );
-                    packet8 = CheckHandleNet();
-                    if (packet8) {
-                        switch (EVENTS_REMOTE_MESSAGE(packet8)->command) {
+                    packet_j = CheckHandleNet();
+                    if (packet_j) {
+                        switch (EVENTS_REMOTE_MESSAGE(packet_j)->command) {
                             case REMOTE_COMMAND:
                                 ReceiveHeroTownData(
-                                    packet8,
+                                    packet_j,
                                     &remotePlayer,
                                     &x,
                                     &y,
@@ -8070,11 +8139,11 @@ CombatResult advManager::DoCombat(
             gpGame->TurnOffAIMusic();
             sprintf(
                 gText,
-                "%s's %s is under attack!",
-                cPlayerNames[secondPlayer7],
-                combatTown ? "Town" : "Hero"
+                "\xe3\xee\xf0\xee\xe4",
+                cPlayerNames[secondPlayer8],
+                combatTown ? "\xe3\xe5\xf0\xee\xe9" : "%s, \xe2\xe0\xf8 %s \xe0\xf2\xe0\xea\xee\xe2\xe0\xed!"
             );
-            gpGame->WaitForPlayer(gText, secondPlayer7);
+            gpGame->WaitForPlayer(gText, secondPlayer8);
         }
     }
 
@@ -8124,7 +8193,7 @@ combatFinished:
                 break;
         }
     }
-    bShowIt = savedShowIt_e;
+    bShowIt = savedShowIt_f;
     giCurPlayer = savedPlayer1;
     if (!gbHumanPlayer[giCurPlayer]) {
         gpGame->ShowComputerScreen();
@@ -8298,16 +8367,16 @@ void advManager::ReceiveHeroTownData(
     i8* retreatWin,
     i8* combatSurrender
 ) {
-    i32 hasFirstHero;
-    i32 hasTown;
-    i32 hasSecondHero;
-    i32l lastPacketTime;
-    i32 result;
-    i32 gotFirstHeroFirst;
+    i32 hasFirstHero4;
+    i32 gotSecondHeroFirst2;
     i32 gotFirstHeroSecond;
-    i32 gotSecondHeroFirst;
-    i32 gotSecondHeroSecond;
-    i32 firstOwner;
+    i32 firstOwner8;
+    i32 gotSecondHeroSecond2;
+    i32 result7;
+    i32 hasTown2;
+    i32 hasSecondHero0;
+    i32 gotFirstHeroFirst0;
+    i32l lastPacketTime7;
     i32 secondOwner;
 
     *firstHero = NULL;
@@ -8315,22 +8384,22 @@ void advManager::ReceiveHeroTownData(
     *combatTown = NULL;
     *secondHero = NULL;
     *secondArmy = NULL;
-    hasFirstHero = hasSecondHero = hasTown = 0;
+    hasFirstHero4 = hasSecondHero0 = hasTown2 = 0;
     *remotePlayer = EVENTS_REMOTE_MESSAGE(packet)->sender;
     *x = EVENTS_REMOTE_COMBAT(packet)->x;
     *y = EVENTS_REMOTE_COMBAT(packet)->y;
-    hasFirstHero = EVENTS_REMOTE_COMBAT(packet)->hasFirstHero;
-    hasTown = EVENTS_REMOTE_COMBAT(packet)->hasTown;
-    hasSecondHero = EVENTS_REMOTE_COMBAT(packet)->hasSecondHero;
+    hasFirstHero4 = EVENTS_REMOTE_COMBAT(packet)->hasFirstHero;
+    hasTown2 = EVENTS_REMOTE_COMBAT(packet)->hasTown;
+    hasSecondHero0 = EVENTS_REMOTE_COMBAT(packet)->hasSecondHero;
     *setupCombatX = EVENTS_REMOTE_COMBAT(packet)->setupCombatX;
     *setupCombatY = EVENTS_REMOTE_COMBAT(packet)->setupCombatY;
     *randomSeed = EVENTS_REMOTE_COMBAT(packet)->randomSeed;
     *combatResult = EVENTS_REMOTE_COMBAT(packet)->combatResult;
     *retreatWin = EVENTS_REMOTE_COMBAT(packet)->retreatWin;
     *combatSurrender = EVENTS_REMOTE_COMBAT(packet)->combatSurrender;
-    firstOwner = EVENTS_REMOTE_COMBAT(packet)->firstOwner;
-    if (firstOwner > 0)
-        gpGame->m_players[firstOwner].m_resources[IDX(RES_GOLD)] =
+    firstOwner8 = EVENTS_REMOTE_COMBAT(packet)->firstOwner;
+    if (firstOwner8 > 0)
+        gpGame->m_players[firstOwner8].m_resources[IDX(RES_GOLD)] =
             EVENTS_REMOTE_COMBAT(packet)->firstGold;
     secondOwner = EVENTS_REMOTE_COMBAT(packet)->secondOwner;
     if (secondOwner > 0)
@@ -8341,14 +8410,14 @@ void advManager::ReceiveHeroTownData(
     memcpy(*firstArmy, &EVENTS_REMOTE_COMBAT(packet)->firstArmy, sizeof(armyGroup));
     *secondArmy = static_cast<armyGroup*>(H2_ALLOC(sizeof(armyGroup)));
     memcpy(*secondArmy, &EVENTS_REMOTE_COMBAT(packet)->secondArmy, sizeof(armyGroup));
-    if (hasTown) {
+    if (hasTown2) {
         *combatTown = static_cast<town*>(H2_ALLOC(sizeof(town)));
         memcpy(*combatTown, &EVENTS_REMOTE_COMBAT(packet)->combatTown, sizeof(town));
     }
 
     iCombatControlNetPos[IDX(COMBAT_ATTACKER_SIDE)] = *remotePlayer;
     iCombatControlNetPos[IDX(COMBAT_DEFENDER_SIDE)] = giThisNetPos;
-    result = TransmitRemoteData(
+    result7 = TransmitRemoteData(
         NULL,
         *remotePlayer,
         0,
@@ -8357,29 +8426,29 @@ void advManager::ReceiveHeroTownData(
         COMBAT_REMOTE_FRAGMENT_TYPE,
         REMOTE_MESSAGE_DEFAULT
     );
-    if (!result)
+    if (!result7)
         ShutDown(NULL);
 
-    lastPacketTime = KBTickCount();
-    gotFirstHeroFirst = 1;
+    lastPacketTime7 = KBTickCount();
+    gotFirstHeroFirst0 = 1;
     gotFirstHeroSecond = 1;
-    gotSecondHeroFirst = 1;
-    gotSecondHeroSecond = 1;
-    if (hasFirstHero) {
+    gotSecondHeroFirst2 = 1;
+    gotSecondHeroSecond2 = 1;
+    if (hasFirstHero4) {
         *firstHero = static_cast<hero*>(H2_ALLOC(sizeof(hero)));
-        gotFirstHeroFirst = 0;
+        gotFirstHeroFirst0 = 0;
         gotFirstHeroSecond = 0;
     }
-    if (hasSecondHero) {
+    if (hasSecondHero0) {
         *secondHero = static_cast<hero*>(H2_ALLOC(sizeof(hero)));
-        gotSecondHeroFirst = 0;
-        gotSecondHeroSecond = 0;
+        gotSecondHeroFirst2 = 0;
+        gotSecondHeroSecond2 = 0;
     }
 
-    while (!gotFirstHeroFirst || !gotFirstHeroSecond || !gotSecondHeroFirst
-           || !gotSecondHeroSecond) {
+    while (!gotFirstHeroFirst0 || !gotFirstHeroSecond || !gotSecondHeroFirst2
+           || !gotSecondHeroSecond2) {
         PollSound();
-        if (lastPacketTime + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
+        if (lastPacketTime7 + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
                 const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
                 NORMAL_DIALOG_CONFIRM,
@@ -8393,17 +8462,17 @@ void advManager::ReceiveHeroTownData(
                 0
             );
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                lastPacketTime = KBTickCount();
+                lastPacketTime7 = KBTickCount();
             else
                 ShutDown(const_cast<char*>("\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE
             && EVENTS_REMOTE_MESSAGE(packet)->command == REMOTE_COMMAND) {
-            lastPacketTime = KBTickCount();
+            lastPacketTime7 = KBTickCount();
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_FIRST) {
                 memcpy(*firstHero, EVENTS_REMOTE_HERO(packet)->data, COMBAT_REMOTE_HERO_FIRST_SIZE);
-                gotFirstHeroFirst = 1;
+                gotFirstHeroFirst0 = 1;
             }
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_FIRST_HERO_SECOND) {
                 memcpy(
@@ -8419,7 +8488,7 @@ void advManager::ReceiveHeroTownData(
                     EVENTS_REMOTE_HERO(packet)->data,
                     COMBAT_REMOTE_HERO_FIRST_SIZE
                 );
-                gotSecondHeroFirst = 1;
+                gotSecondHeroFirst2 = 1;
             }
             if (EVENTS_REMOTE_HERO(packet)->fragment == REMOTE_SECOND_HERO_SECOND) {
                 memcpy(
@@ -8427,7 +8496,7 @@ void advManager::ReceiveHeroTownData(
                     EVENTS_REMOTE_HERO(packet)->data,
                     COMBAT_REMOTE_HERO_SECOND_SIZE
                 );
-                gotSecondHeroSecond = 1;
+                gotSecondHeroSecond2 = 1;
             }
         }
     }
