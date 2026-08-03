@@ -362,30 +362,30 @@ void heroWindow::RestoreBackground(void) {
 
 VA(0x004bb4a0, 0x175)
 void heroWindow::MoveWindow(i32 dx, i32 dy) {
-    i32 oldX = m_posX;
-    i32 oldY = m_posY;
-    i32 oldW = m_winWidth;
-    i32 oldH = m_winHeight;
-    i32 newX = m_posX + dx;
-    i32 newY = m_posY + dy;
-    if (newX < 0)
-        newX = 0;
-    if (newY < 0)
-        newY = 0;
-    if (SCREEN_WIDTH < newX + m_winWidth)
-        newX = SCREEN_WIDTH - m_winWidth;
-    if (SCREEN_HEIGHT < newY + m_winHeight)
-        newY = SCREEN_HEIGHT - m_winHeight;
+    i32 x = m_posX;
+    i32 yPrev = m_posY;
+    i32 oldWidth = m_winWidth;
+    i32 oldHgt = m_winHeight;
+    i32 toX = m_posX + dx;
+    i32 toY = m_posY + dy;
+    if (toX < 0)
+        toX = 0;
+    if (toY < 0)
+        toY = 0;
+    if (SCREEN_WIDTH < toX + m_winWidth)
+        toX = SCREEN_WIDTH - m_winWidth;
+    if (SCREEN_HEIGHT < toY + m_winHeight)
+        toY = SCREEN_HEIGHT - m_winHeight;
     m_savedBackground->DrawToBuffer(m_posX, m_posY);
-    m_posX = newX;
-    m_posY = newY;
+    m_posX = toX;
+    m_posY = toY;
     m_savedBackground->GrabBitmap(gpWindowManager->m_screen, m_posX, m_posY);
     DrawWindow(0);
-    oldW = oldW + abs(m_posX - oldX);
-    oldH = oldH + abs(m_posY - oldY);
-    if (m_posX < oldX)
-        oldX = m_posX;
-    if (m_posY < oldY)
-        oldY = m_posY;
-    gpWindowManager->UpdateScreenRegion(oldX, oldY, oldW, oldH);
+    oldWidth = oldWidth + abs(m_posX - x);
+    oldHgt = oldHgt + abs(m_posY - yPrev);
+    if (m_posX < x)
+        x = m_posX;
+    if (m_posY < yPrev)
+        yPrev = m_posY;
+    gpWindowManager->UpdateScreenRegion(x, yPrev, oldWidth, oldHgt);
 }

@@ -326,10 +326,10 @@ u8 com_stat(i16 portIndex, u16) {
 
 VA(0x004331c7, 0xc3)
 void comm_wrt_task(void) {
-    DWORD bytesWritten;
-    u32 writtenTotal;
+    DWORD sizeWritten;
+    u32 totalWritten;
     tag_Node* packetNode;
-    BOOL callResult;
+    BOOL callRv;
     ComPortState* comPort;
 
     comPort = s_comPorts;
@@ -340,18 +340,18 @@ void comm_wrt_task(void) {
             packetNode = pop_node(&comPort->normalQueue);
         if (packetNode == NULL)
             return;
-        writtenTotal = 0;
-        while (comPort->handle != INVALID_HANDLE_VALUE && writtenTotal < packetNode->len) {
-            callResult = WriteFile(
+        totalWritten = 0;
+        while (comPort->handle != INVALID_HANDLE_VALUE && totalWritten < packetNode->len) {
+            callRv = WriteFile(
                 comPort->handle,
-                packetNode->comData + writtenTotal,
-                packetNode->len - writtenTotal,
-                &bytesWritten,
+                packetNode->comData + totalWritten,
+                packetNode->len - totalWritten,
+                &sizeWritten,
                 NULL
             );
-            if (callResult == 0)
+            if (callRv == 0)
                 ShutdownComError("Write communications data");
-            writtenTotal += bytesWritten;
+            totalWritten += sizeWritten;
         }
         H2_FREE(packetNode);
     }

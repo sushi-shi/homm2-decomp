@@ -1350,7 +1350,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
     if (sampleSet >= 1)
         sampleSet = CURSOR_SAMPLE_FAST_SET;
 #endif
-    i32 sampleSuffix[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
+    i32 suffixSample[CURSOR_SAMPLE_COUNT] = {0, 3, 5, 3, 4, 5, 6, 3, 3};
     for (i32 index = 0; index < CURSOR_SAMPLE_COUNT; ++index) {
         sprintf(
             gText,
@@ -1360,7 +1360,7 @@ void advManager::GetCursorSampleSet(ConfigWalkSpeed sampleSet) {
 #else
             sampleSet,
 #endif
-            sampleSuffix[index]
+            suffixSample[index]
         );
         m_cursorSamples[index] = gpResourceManager->GetSample(gText);
         m_cursorSamples[index]->m_playbackData.volume = CURSOR_SAMPLE_VOLUME;
@@ -9358,6 +9358,10 @@ void advManager::SaveAdventureBorder(void) {
 
 VA(0x004135a6, 0x134)
 void advManager::DrawAdventureBorder(void) {
+    u8* savedPixels;
+    u8* screen;
+    i32 row;
+
     if (m_adventureBorder == NULL) {
         return;
     }
@@ -9365,9 +9369,9 @@ void advManager::DrawAdventureBorder(void) {
         return;
     }
 
-    u8* screen = gpWindowManager->m_screen->m_pixels;
-    u8* savedPixels = m_adventureBorder;
-    i32 row;
+
+    screen = gpWindowManager->m_screen->m_pixels;
+    savedPixels = m_adventureBorder;
     for (row = 0; row < BORDER_EDGE_SIZE; ++row) {
         memcpy(screen, savedPixels, BORDER_ROW_BYTES);
         screen += BORDER_SCREEN_PITCH;

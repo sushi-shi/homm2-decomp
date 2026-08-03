@@ -235,21 +235,21 @@ bankBox::~bankBox() {
 
 VA(0x004a215f, 0xc0)
 void bankBox::Update(i32 drawWindow) {
-    char text[BOX_TEXT_SIZE];
+    char str[BOX_TEXT_SIZE];
     tag_message message;
     i32 resource;
 
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = BANK_BOX_SET_TEXT_COMMAND;
     for (resource = 0; resource < BOX_NON_GOLD_RESOURCE_COUNT; resource++) {
-        sprintf(text, "%d", m_player->m_resources[resource]);
+        sprintf(str, "%d", m_player->m_resources[resource]);
         message.payload.widget.id = BOX_FIRST_RESOURCE_WIDGET + resource;
-        message.payload.widget.data.text = text;
+        message.payload.widget.data.text = str;
         m_window->BroadcastMessage(message);
     }
-    sprintf(text, "%d", m_player->m_resources[IDX(RES_GOLD)]);
+    sprintf(str, "%d", m_player->m_resources[IDX(RES_GOLD)]);
     message.payload.widget.id = BOX_GOLD_WIDGET;
-    message.payload.widget.data.text = text;
+    message.payload.widget.data.text = str;
     m_window->BroadcastMessage(message);
     m_window->DrawWindow(drawWindow);
 }

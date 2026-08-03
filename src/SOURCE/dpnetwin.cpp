@@ -267,7 +267,7 @@ VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
     DWORD packetSize[RECEIVE_ARGUMENT_STORAGE_COUNT];
     i32 destinationIds[RECEIVE_ARGUMENT_STORAGE_COUNT];
-    i32 senderId;
+    i32 fromId;
     i32 receiveResult;
 
     if (lpIDC == NULL)
@@ -275,7 +275,7 @@ void dpProcessMessages(void) {
     while (1) {
         packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
-            reinterpret_cast<LPDPID>(&senderId),
+            reinterpret_cast<LPDPID>(&fromId),
             reinterpret_cast<LPDPID>(destinationIds),
             1,
             rcvBufIn,
@@ -285,10 +285,10 @@ void dpProcessMessages(void) {
             return;
         if (receiveResult != RESULT_OK)
             DPSD(receiveResult, RETAIL_FILE, 335);
-        if (senderId == 0) {
+        if (fromId == 0) {
         } else {
             if (destinationIds[0] == 0 || destinationIds[0] == dcoID)
-                dpEvaluateMessage(packetSize[0], senderId);
+                dpEvaluateMessage(packetSize[0], fromId);
         }
     }
 }

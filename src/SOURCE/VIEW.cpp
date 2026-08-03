@@ -364,41 +364,42 @@ MessageDispatchResult HandleViewGeneral(tag_message& message) {
 
 VA(0x004ade2f, 0x143)
 void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
+        i32 xWnd;
+        i16 viewYOffsetConst;
+        i32 yWindow;
+        i32 xDelta;
+        i16 viewXOffsetFixed;
+        CombatSide side;
+        i16 viewWidthConstant;
+        i16 viewHeightConstant;
+
     if (viewedArmy == NULL)
         return;
     {
-        CombatSide side;
-        i32 windowX;
-        i32 windowY;
-        i16 viewWidthConstant;
-        i16 viewYOffsetConstant;
-        i16 viewXOffsetConstant;
-        i32 xOffset;
-        i16 viewHeightConstant;
 
         viewWidthConstant = ARMY_WIDTH - ARMY_VIEW_X_OFFSET;
         viewHeightConstant = ARMY_HEIGHT;
-        viewXOffsetConstant = ARMY_VIEW_X_OFFSET;
-        viewYOffsetConstant = ARMY_Y_OFFSET;
-        windowX = m_hexCells[viewedArmy->m_hex].m_x;
-        windowY = m_hexCells[viewedArmy->m_hex].m_y;
-        xOffset =
+        viewXOffsetFixed = ARMY_VIEW_X_OFFSET;
+        viewYOffsetConst = ARMY_Y_OFFSET;
+        xWnd = m_hexCells[viewedArmy->m_hex].m_x;
+        yWindow = m_hexCells[viewedArmy->m_hex].m_y;
+        xDelta =
             (viewedArmy->m_facing == ARMY_FACING_LEFT ? ARMY_FACING_OFFSET_DELTA : 0)
             + ARMY_RIGHT_FACING_X_OFFSET;
-        windowX -= xOffset;
-        if (windowX < 0)
-            windowX = 0;
-        if (windowX + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
-            windowX = ARMY_RIGHT_CLAMP;
-        windowY -= ARMY_Y_OFFSET;
-        if (windowY < 0)
-            windowY = 0;
-        if (windowY + ARMY_HEIGHT > ARMY_SCREEN_HEIGHT)
-            windowY = ARMY_BOTTOM_CLAMP;
+        xWnd -= xDelta;
+        if (xWnd < 0)
+            xWnd = 0;
+        if (xWnd + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
+            xWnd = ARMY_RIGHT_CLAMP;
+        yWindow -= ARMY_Y_OFFSET;
+        if (yWindow < 0)
+            yWindow = 0;
+        if (yWindow + ARMY_HEIGHT > ARMY_SCREEN_HEIGHT)
+            yWindow = ARMY_BOTTOM_CLAMP;
         side = viewedArmy->m_side;
         gpGame->ViewArmy(
-            windowX,
-            windowY,
+            xWnd,
+            yWindow,
             viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
             m_combatTowns[IDX(side)],

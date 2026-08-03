@@ -3540,7 +3540,7 @@ void ShowCongrats(HighScoreType highScoreType) {
 
 VA(0x0046d4bb, 0x79)
 void CongratsWait(void) {
-    i32 cmd = 0;
+    i32 command = 0;
     i32 done = 0;
     tag_message msg;
     gpInputManager->Flush();

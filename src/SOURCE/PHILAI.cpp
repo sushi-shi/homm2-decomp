@@ -873,12 +873,12 @@ void philAI::CheckReload(void) {
 
 VA(0x0047f41f, 0x29f)
 void philAI::CheckBerserk(void) {
-    i32 row;
-    i32 column;
-    mapCell* kn;
+    i32 col;
     i32 jb;
-    i32 idx;
     i32 best = -1;
+    i32 line;
+    mapCell* knIndex;
+    i32 ndx;
     hero* heroPtr;
 
     gbBerserk = false;
@@ -891,33 +891,33 @@ void philAI::CheckBerserk(void) {
     if (jb < AI_BERSERK_THRESHOLD)
         return;
     {
-        for (column = 0; column < MAP_WIDTH; column++) {
-            for (row = 0; row < MAP_HEIGHT; row++) {
-                kn = gpAdvManager->GetCell(column, row);
-                switch (kn->m_triggerType) {
+        for (col = 0; col < MAP_WIDTH; col++) {
+            for (line = 0; line < MAP_HEIGHT; line++) {
+                knIndex = gpAdvManager->GetCell(col, line);
+                switch (knIndex->m_triggerType) {
                     case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
-                        if (gpGame->m_castleOwners[kn->m_objectMetadata] != gpCurAIHero->m_owner) {
-                            if (gpGame->m_castleOwners[kn->m_objectMetadata] != -1) {
-                                idx = FightValueOfStack(
-                                    &GetCastleSlot(kn->m_objectMetadata)->m_army,
+                        if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != gpCurAIHero->m_owner) {
+                            if (gpGame->m_castleOwners[knIndex->m_objectMetadata] != -1) {
+                                ndx = FightValueOfStack(
+                                    &GetCastleSlot(knIndex->m_objectMetadata)->m_army,
                                     NULL,
                                     1,
                                     1,
-                                    kn->m_objectMetadata,
+                                    knIndex->m_objectMetadata,
                                     0
                                 );
-                                if (idx > jb)
+                                if (ndx > jb)
                                     return;
-                                if (idx > best)
-                                    best = idx;
+                                if (ndx > best)
+                                    best = ndx;
                             }
                         }
                         break;
                     case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION):
-                        if (gpGame->m_availableHeroes[kn->m_objectMetadata]
+                        if (gpGame->m_availableHeroes[knIndex->m_objectMetadata]
                             != gpCurAIHero->m_owner) {
-                            heroPtr = GetHeroSlot(kn->m_objectMetadata);
-                            idx = FightValueOfStack(
+                            heroPtr = GetHeroSlot(knIndex->m_objectMetadata);
+                            ndx = FightValueOfStack(
                                 &heroPtr->m_army,
                                 NULL,
                                 1,
@@ -926,10 +926,10 @@ void philAI::CheckBerserk(void) {
                                 heroPtr->m_occupiedTown,
                                 0
                             );
-                            if (idx * 2 > jb)
+                            if (ndx * 2 > jb)
                                 return;
-                            if (idx * 2 > best)
-                                best = idx * 2;
+                            if (ndx * 2 > best)
+                                best = ndx * 2;
                         }
                         break;
                 }
@@ -2624,11 +2624,11 @@ void philAI::ValueOfBuyingBuilding(
 VA(0x0048372c, 0x171)
 void philAI::GetBestBuilding(town* t, BHC& bhc, float& fOut) {
     float score;
-    BuildingSlotType node;
-    float nb;
     float kn;
-    BuildingSlotType jb;
+    BuildingSlotType node;
     float idx;
+    BuildingSlotType jb;
+    float nb;
     i32 cost;
     nb = -99.0f;
     kn = -99.0f;
@@ -4695,8 +4695,8 @@ i32 philAI::ChooseToPayRansomOnHero(i32) {
 
 VA(0x00487c24, 0xd2)
 void philAI::BuildBuilding(town* t, H2_ENUM_PARAM(BuildingSlotType, i32) building) {
-    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     i32 i;
+    i32 cost[AI_PURCHASE_RESOURCE_COUNT];
     sprintf(
         gText,
         "Player %d built %s in town %d.\n",
@@ -4886,9 +4886,9 @@ i32 philAI::CombatMonsterEvent(
     hero* h, H2_ENUM_PARAM(CreatureType, i32) monType, i32* pCount, mapCell* cell
 ) {
     i32 kn;
-    i32 jb;
-    float f2;
     float idx;
+    float f2;
+    i32 jb;
     i32 total;
     memset(gpMonGroup->m_creatureTypes, -1, sizeof(gpMonGroup->m_creatureTypes));
     memset(gpMonGroup->m_quantities, 0, sizeof(gpMonGroup->m_quantities));

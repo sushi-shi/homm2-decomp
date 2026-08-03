@@ -19,13 +19,13 @@ H2_ENUM_END(KbWinPrivateConstant)
 VA(0x00470e30, 0x112)
 extern "C" i32 __stdcall
 WinMain(HINSTANCE instance, HINSTANCE previousInstance, char* commandLine, i32 showCommand) {
-    DWORD lastError;
+    DWORD errorLast;
     MSG message;
 
     hInstApp = instance;
     gEventHandle = CreateEventA(NULL, 0, 0, "Heroes II");
-    lastError = GetLastError();
-    if (gEventHandle == NULL || lastError == ERROR_ALREADY_EXISTS) {
+    errorLast = GetLastError();
+    if (gEventHandle == NULL || errorLast == ERROR_ALREADY_EXISTS) {
         sprintf(gText, "Only one copy of %s may run at a time", "Heroes of Might and Magic II");
         MessageBoxA(NULL, gText, "Startup Error", MB_ICONHAND);
         return 0;

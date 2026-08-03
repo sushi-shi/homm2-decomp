@@ -388,12 +388,12 @@ i32 font::LineLength(char* str, i32 maxW) {
 VA(0x004c4e40, 0x8b)
 i32 font::LineWidth(char* str) {
     i32 s = strlen(str);
-    i32 p = 0, w = 0;
-    char* v = str;
-    while (p < s && v[p] != 0) {
-        while (v[p] != 0 && v[p] != '\n') {
-            w += GetCharacterWidth(v[p]);
-            p++;
+    i32 idx = 0, w = 0;
+    char* p = str;
+    while (idx < s && p[idx] != 0) {
+        while (p[idx] != 0 && p[idx] != '\n') {
+            w += GetCharacterWidth(p[idx]);
+            idx++;
         }
     }
     return w;

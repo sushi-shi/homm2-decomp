@@ -843,31 +843,31 @@ H2_ENUM_BEGIN(UltimateArtifactHintConstant)
 H2_ENUM_END(UltimateArtifactHintConstant)
 
 VA(0x0044c7a3, 0x37b)
-void ComputeUALoc(i32 player) {
-    i32 result = gpGame->SetupPuzzlePieces(player, 1);
+void ComputeUALoc(i32 playerIndex) {
+    i32 result = gpGame->SetupPuzzlePieces(playerIndex, 1);
     if (result < MINIMUM_PUZZLE_PIECES
         || gpGame->m_ultimateArtifactId == ARTIFACT_NONE) {
-        gpGame->m_players[player].m_ultimateArtifactHintChance = 0;
-        gpGame->m_players[player].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
-        gpGame->m_players[player].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
+        gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = 0;
+        gpGame->m_players[playerIndex].m_ultimateArtifactHintX = HINT_COORDINATE_UNKNOWN;
+        gpGame->m_players[playerIndex].m_ultimateArtifactHintY = HINT_COORDINATE_UNKNOWN;
     } else {
-        i32 probability =
+        i32 chance =
             (result - MINIMUM_PUZZLE_PIECES) * HINT_CHANCE_PER_PIECE;
-        if (probability > HINT_CHANCE_MAXIMUM)
-            probability = HINT_CHANCE_MAXIMUM;
-        if (probability < HINT_CHANCE_MINIMUM)
-            probability = HINT_CHANCE_MINIMUM;
-        gpGame->m_players[player].m_ultimateArtifactHintChance = static_cast<i8>(probability);
+        if (chance > HINT_CHANCE_MAXIMUM)
+            chance = HINT_CHANCE_MAXIMUM;
+        if (chance < HINT_CHANCE_MINIMUM)
+            chance = HINT_CHANCE_MINIMUM;
+        gpGame->m_players[playerIndex].m_ultimateArtifactHintChance = static_cast<i8>(chance);
 
         if (Random(HINT_CHANCE_MINIMUM, HINT_CHANCE_MAXIMUM)
-            <= gpGame->m_players[player].m_ultimateArtifactHintChance) {
-            gpGame->m_players[player].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
-            gpGame->m_players[player].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
+            <= gpGame->m_players[playerIndex].m_ultimateArtifactHintChance) {
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintX = gpGame->m_ultimateArtifactX;
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintY = gpGame->m_ultimateArtifactY;
         } else {
             i32 x = HINT_COORDINATE_UNKNOWN;
             i32 y = HINT_COORDINATE_UNKNOWN;
-            i32 direction = 0;
-            i32 tries = 0;
+            i32 heading = 0;
+            i32 triesCount = 0;
             while (
                 !(x >= 0 && (&x)[0] < MAP_WIDTH && y >= 0 && (&y)[0] < MAP_HEIGHT
                   && gpGame->m_worldMap.GetCell(x, y)->m_triggerType == MAP_OBJECT_NONE
@@ -876,28 +876,28 @@ void ComputeUALoc(i32 player) {
                   && giGroundToTerrain[gpGame->m_worldMap.GetCell(x, y)->m_terrainImageIndex]
                          != TERRAIN_WATER)
             ) {
-                tries++;
-                direction = 0;
-                while (direction == 0)
-                    direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                triesCount++;
+                heading = 0;
+                while (heading == 0)
+                    heading = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
                                 - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
                                 - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
-                x = gpGame->m_ultimateArtifactX + direction;
-                direction = 0;
-                while (direction == 0)
-                    direction = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
+                x = gpGame->m_ultimateArtifactX + heading;
+                heading = 0;
+                while (heading == 0)
+                    heading = HINT_OFFSET_CENTER - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
                                 - Random(0, HINT_OFFSET_ROLL_MAXIMUM)
                                 - Random(0, HINT_OFFSET_ROLL_MAXIMUM);
-                y = gpGame->m_ultimateArtifactY + direction;
-                if (tries >= HINT_LOCATION_RETRY_LIMIT) {
+                y = gpGame->m_ultimateArtifactY + heading;
+                if (triesCount >= HINT_LOCATION_RETRY_LIMIT) {
                     x = gpGame->m_ultimateArtifactX;
                     y = gpGame->m_ultimateArtifactY;
                     goto saveLocation;
                 }
             }
         saveLocation:
-            gpGame->m_players[player].m_ultimateArtifactHintX = static_cast<i8>(x);
-            gpGame->m_players[player].m_ultimateArtifactHintY = static_cast<i8>(y);
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintX = static_cast<i8>(x);
+            gpGame->m_players[playerIndex].m_ultimateArtifactHintY = static_cast<i8>(y);
         }
     }
 }
@@ -1001,11 +1001,11 @@ i32 game::CreateBoat(i32 x, i32 y, i32 notify) {
         boat->y = static_cast<i8>(y);
         boat->direction = MAP_DIRECTION_EAST;
         boat->owner = static_cast<i8>(giCurPlayer);
-        mapCell* cell = WORLDMAP->GetCell(x, y);
-        boat->savedTriggerType = cell->m_triggerType;
-        boat->savedEventData = static_cast<u8>(cell->m_objectMetadata);
-        cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
-        cell->m_objectMetadata = boatIdx;
+        mapCell* square = WORLDMAP->GetCell(x, y);
+        boat->savedTriggerType = square->m_triggerType;
+        boat->savedEventData = static_cast<u8>(square->m_objectMetadata);
+        square->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT;
+        square->m_objectMetadata = boatIdx;
     }
     return boatIdx;
 }
@@ -6303,23 +6303,23 @@ void game::ProcessOnMapHeroes(void) {
 
 VA(0x0045d5ba, 0x4c9)
 void game::CheckHeroConsistency(void) {
-    hero* mapHero;
-    mapCell* cell;
-    i32 x11;
+    i32 all = 0;
     i32 y8;
-    i32 player;
+    i32 c;
+    hero* boardHro;
     i32 slot;
-    i32 total = 0;
-    i32 consistent;
-    town* occupiedTown;
+    i32 player;
+    mapCell* cell;
+    town* townOccupied;
+    i32 sane;
 
     for (player = 0; player < m_playerCount; player++) {
         if (m_playerDead[player] != 0)
             continue;
-        total += m_players[player].m_heroCount;
+        all += m_players[player].m_heroCount;
         for (slot = 0; slot < m_players[player].m_heroCount; slot++) {
             if (m_heroRecs[m_players[player].m_heroIds[slot]].m_owner != player)
-                consistent = 0;
+                sane = 0;
         }
     }
 
@@ -6329,7 +6329,7 @@ void game::CheckHeroConsistency(void) {
                 if ((m_availableHeroes[m_players[player].m_availableHeroIds[slot]] >= 0
                      && m_availableHeroes[m_players[player].m_availableHeroIds[slot]]
                             <= HERO_CONSISTENCY_PLAYABLE_FACTION_MAX)
-                    || (total < HERO_CONSISTENCY_POOL_THRESHOLD
+                    || (all < HERO_CONSISTENCY_POOL_THRESHOLD
                         && m_availableHeroes[m_players[player].m_availableHeroIds[slot]] == -1)) {
                     m_players[player].m_availableHeroIds[slot] =
                         static_cast<i8>(GetNewHeroId(player, FACTION_ANY, 0));
@@ -6340,28 +6340,28 @@ void game::CheckHeroConsistency(void) {
         }
     }
 
-    for (x11 = 0; x11 < MAP_WIDTH; x11++) {
+    for (c = 0; c < MAP_WIDTH; c++) {
         for (y8 = 0; y8 < MAP_HEIGHT; y8++) {
-            cell = gpAdvManager->GetCell(x11, y8);
+            cell = gpAdvManager->GetCell(c, y8);
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID)) {
                 if (cell->m_objectMetadata >= 0 && cell->m_objectMetadata < GAME_HERO_COUNT) {
-                    mapHero = GetHero(cell->m_objectMetadata);
-                    if (mapHero->m_x != x11 || mapHero->m_y != y8) {
+                    boardHro = GetHero(cell->m_objectMetadata);
+                    if (boardHro->m_x != c || boardHro->m_y != y8) {
                         cell->m_triggerType = 0;
                         cell->m_objectMetadata = 0;
                     }
-                    if (mapHero->m_owner < 0 || mapHero->m_owner >= GAME_PLAYER_COUNT) {
-                        if (mapHero->m_locationType
+                    if (boardHro->m_owner < 0 || boardHro->m_owner >= GAME_PLAYER_COUNT) {
+                        if (boardHro->m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                            occupiedTown = gpGame->GetTown(mapHero->m_occupiedTown);
-                            occupiedTown->m_occupyingHeroId = -1;
+                            townOccupied = gpGame->GetTown(boardHro->m_occupiedTown);
+                            townOccupied->m_occupyingHeroId = -1;
                         }
-                        if (mapHero->m_x == x11 && mapHero->m_y == y8) {
+                        if (boardHro->m_x == c && boardHro->m_y == y8) {
                             RestoreCell(
-                                mapHero->m_x,
-                                mapHero->m_y,
-                                mapHero->m_locationType,
-                                mapHero->m_occupiedTown,
+                                boardHro->m_x,
+                                boardHro->m_y,
+                                boardHro->m_locationType,
+                                boardHro->m_occupiedTown,
                                 NULL,
                                 1
                             );
@@ -7708,55 +7708,55 @@ void CheckValidAvailableHeroes(void) {
 }
 
 VA(0x00460908, 0x92)
-i32 CalcFileCRC(char* filename) {
-    i32l size = FileSize(filename);
-    char* block = static_cast<char*>(H2_ALLOC(size));
-    i32 hand = open(filename, _O_BINARY);
-    if (hand == -1)
-        FileError(filename);
-    read(hand, block, size);
-    i32 crc = calc_crc_long(reinterpret_cast<u8*>(block), size);
-    close(hand);
-    H2_FREE(block);
-    return crc;
+i32 CalcFileCRC(char* file) {
+    i32l len = FileSize(file);
+    char* blk = static_cast<char*>(H2_ALLOC(len));
+    i32 fp = open(file, _O_BINARY);
+    if (fp == -1)
+        FileError(file);
+    read(fp, blk, len);
+    i32 checksum = calc_crc_long(reinterpret_cast<u8*>(blk), len);
+    close(fp);
+    H2_FREE(blk);
+    return checksum;
 }
 
 VA(0x0046099a, 0x120)
 void CompressTest2(void) {
-    i32 dataSize;
-    i32l encodedSize;
-    i32l decodedSize;
-    char* sourceData;
-    i32 sourceCrc;
-    char* decodedData;
+    i32l plainSize;
+    char* unpackedData;
+    i32l compSize;
+    i32 srcCrc;
+    i32 dataSz;
     i32 index;
-    i32 decodedCrc;
-    i32 sourceCrcCheck;
-    char* encodedData;
+    i32 unpackedCrc;
+    char* fromData;
+    char* encoded;
+    i32 srcCrcCheck;
 
-    dataSize = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
-    sourceData =
+    dataSz = Random(TEST_RANDOM_SIZE_MIN, TEST_RANDOM_SIZE_MAX);
+    fromData =
         static_cast<char*>(
-            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
         );
-    encodedData =
+    encoded =
         static_cast<char*>(
-            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
         );
-    decodedData =
+    unpackedData =
         static_cast<char*>(
-            H2_ALLOC(dataSize + TEST_RANDOM_BUFFER_EXTRA)
+            H2_ALLOC(dataSz + TEST_RANDOM_BUFFER_EXTRA)
         );
-    for (index = 0; index < dataSize; index++)
-        sourceData[index] = static_cast<char>(Random(0, 255));
-    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(sourceData), dataSize);
-    encodedSize = EncodeData(encodedData, sourceData, dataSize);
-    decodedSize = DecodeData(decodedData, encodedData, encodedSize);
-    decodedCrc = calc_crc_long(reinterpret_cast<u8*>(decodedData), dataSize);
-    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(sourceData), dataSize);
-    H2_FREE(sourceData);
-    H2_FREE(encodedData);
-    H2_FREE(decodedData);
+    for (index = 0; index < dataSz; index++)
+        fromData[index] = static_cast<char>(Random(0, 255));
+    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+    compSize = EncodeData(encoded, fromData, dataSz);
+    plainSize = DecodeData(unpackedData, encoded, compSize);
+    unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), dataSz);
+    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), dataSz);
+    H2_FREE(fromData);
+    H2_FREE(encoded);
+    H2_FREE(unpackedData);
 }
 
 VA(0x00460aba, 0x18c)
@@ -7809,11 +7809,11 @@ void CompressTest(void) {
 
 VA(0x00460c46, 0x46)
 void CompressTest3(void) {
-    char buf[TEST_MESSAGE_CAPACITY];
+    char buffer[TEST_MESSAGE_CAPACITY];
     i32 i;
     for (i = 0; i < COMPRESS_TEST_ITERATIONS; i++) {
-        sprintf(buf, "Test # %d", i);
-        AiPrint(buf);
+        sprintf(buffer, "Test # %d", i);
+        AiPrint(buffer);
         CompressTest2();
     }
 }

@@ -780,16 +780,16 @@ void swapManager::SwapArtifacts(void) {
         tag_message message;
         message.type = MESSAGE_WIDGET;
         for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
-            for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
-                if (skillSlot < m_heroes[IDX(side)]->m_secondarySkillCount) {
+            for (i32 slotSkill = 0; slotSkill < SECONDARY_SKILL_WIDGET_COUNT; ++slotSkill) {
+                if (slotSkill < m_heroes[IDX(side)]->m_secondarySkillCount) {
                     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                     message.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
-                                                  + skillSlot + CONTROL_LEFT_SKILL_LEVEL_FIRST;
+                                                  + slotSkill + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                     message.payload.widget.data.text = gText;
                     sprintf(
                         gText,
                         "%d",
-                        m_heroes[IDX(side)]->GetSSLevel(m_heroes[IDX(side)]->GetNthSS(skillSlot))
+                        m_heroes[IDX(side)]->GetSSLevel(m_heroes[IDX(side)]->GetNthSS(slotSkill))
                     );
                     m_window->BroadcastMessage(message);
                 }
