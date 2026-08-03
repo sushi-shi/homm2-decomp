@@ -1,8 +1,16 @@
 # Buka 2.1 campaign state (2026-08-03)
 
-**991 / 1727 exact (57.4%), 1000 banked, fuzzy 88.07, matched-code-bytes 16.13%.**
+**1047 / 1727 BYTE-EXACT (60.6%); objdiff reports 999 (57.8%), 1008 banked,
+fuzzy 88.10, matched-code-bytes 16.35%.**
 Session start was 880 (51.0%) / fuzzy 87.13. Zero real regressions at every
 checkpoint; `homm2 selftest` green (513) throughout.
+
+The 48-function gap between byte-exact and objdiff is entirely reloc NAMES -
+the delinker calls unclaimed data operands `const_*`/`$anon_str_*`, so
+functions that agree byte-for-byte report 98-99.9%. Closing it is the data
+campaign (task 20). Note it does NOT move the byte-exact count: those
+functions are already matched, so data work cannot help reach a byte-exact
+target.
 
 ## Control-flow detectors (2026-08-03) - run these FIRST on any residual
 
@@ -60,6 +68,18 @@ and letting the later declaration win the tie. EXACT.
 (My earlier note here claimed retail contradicted od_slots and that this
 blocked 74 solves. That was wrong on both counts - the model is right,
 and the `this` position is a useful signal rather than an obstacle.)
+
+### Caveat: initialised decls do not always follow bucket order
+
+`combatManager::RightClick` has `i32 col = ...; i32 row = ...;` adjacent
+at function scope. bucket(col)=0 < bucket(row)=2 predicts col shallower;
+our own VC6 compile puts row shallower, and retail puts col shallower.
+Renaming col -> column(5) made it worse (5 -> 7 diffs) and swapping the
+declaration order made it worse again (5 -> 9, because it also reorders
+the evaluation). So the probe-validated ordering rule holds for plain
+declarations but something about initialised adjacent decls - or the
+later function-scope `currentArmy` - is not captured. Measure before
+trusting the model on initialised locals.
 
 ## Negative result: the dead-local class is EXHAUSTED
 
