@@ -177,10 +177,7 @@ extern "C" u16 __cdecl nb_rcv(i16 session, void* buf) {
     node = pop_node(&gNbRcvQueue);
     LeaveCriticalSection(&gNbRcvLock);
     if (node) {
-        if (node->len >= session)
-            len = static_cast<u16>(session);
-        else
-            len = node->len;
+        len = node->len < session ? node->len : static_cast<u16>(session);
         memcpy(buf, node->data, len);
         H2_FREE(node);
         return len;
