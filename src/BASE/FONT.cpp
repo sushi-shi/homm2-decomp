@@ -165,18 +165,22 @@ void font::DrawString(char* s, i32 x, i32 y, FontDrawMode mode) {
 
 VA(0x004c3a70, 0xa8)
 i32 font::GetCharacterWidth(u8 c) {
-    if (c == '{' || c == '}') {
+    i32 code = c;
+    if (code == '{' || code == '}') {
         return 0;
-    } else {
-        if (c == ' ')
-            c = 'i';
-        if (c == FONT_SPACER_CHAR)
-            c = '_';
-        c -= ' ';
-        if (c < 0 || c > FONT_GLYPH_FALLBACK)
-            c = FONT_GLYPH_FALLBACK;
-        return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[c].w + m_isLarge;
     }
+    if (code == ' ')
+        code = 'i';
+    if (code == '.')  // the width path measures '.' as the underscore glyph
+        code = '_';
+    if (code < ' '
+        || (code > 0x7f && code < 0xc0 && code != 0xb8 && code != 0xa8)) {
+        code = 0x7f;
+    } else if (code > 0x7f) {
+        code = RemapCyrillicCharacter(code);
+    }
+    code -= ' ';
+    return reinterpret_cast<struct IconEntry*>(m_glyphIcon->m_data)[code].w + m_isLarge;
 }
 
 // Buka's Cyrillic line breaker. Retail compares the zero-extended byte, so

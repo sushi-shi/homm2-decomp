@@ -185,6 +185,14 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   opens with a `if (width < 1) return;` guard. `CopyTo` keeps the
   `width != COPY_STRIDE` fast-path test in that polarity (loop first,
   whole-block memcpy in the else). Both byte-exact 2026-08-03.
+- **[Buka] `font::GetCharacterWidth` became Cyrillic-aware.** The 2.1
+  body routes any code above 0x7f through `RemapCyrillicCharacter`
+  (which our source had but NEVER CALLED, so VC6 dropped the
+  unreferenced static and the claimed 0xc37a0 span went unpaired), and
+  rejects the 0x80..0xbf gap - except 0xa8 / 0xb8, the two stray Yo
+  glyphs - to the 0x7f fallback. It also measures `'.'` (0x2e) as the
+  underscore glyph where the draw path still uses `FONT_SPACER_CHAR`
+  (0x1f). Both functions byte-exact 2026-08-03.
 - **[Buka] Rainbow luck bonus applies before the clamps.**
   `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
   MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
