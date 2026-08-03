@@ -27,6 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| army::CheckLuck creature-name temp | two ternaries inline in the sprintf argument lists | a named `char* creatureName` local, assigned per branch - PROVEN by frame: retail's frame is 0x10 with ONE 4-byte slot, ours reserved two ternary temps at 0x14. Four arms measured: single hoist 511 (-30, frame exact), duplicated if/else 557 (+16, frame exact, KEPT), duplicated ternary 569 (+28), original inline 557 (+16, frame wrong). Retail 541 sits between the hoisted and duplicated forms | OPEN - permuter matrix queued |
 | bitmap::GrabBitmap + DrawToBuffer linkage | declared `__declspec(dllexport) inline` | plain out-of-line methods - retail CALLS both (GrabScreen emits `call ?GrabBitmap@...`, and both have their own claimed spans at 0xc6150 / 0xc6090) | OPEN - PoL may have inlined them; check 2.0 bytes |
 | HandleRemoteDeadPlayerExit guard | `giThisGamePos == pos` | `pos == giThisGamePos` (a1-moffs local-first) | OPEN |
 | MapExtraPosAndAdjacentsSet reads | `mapExtra[MAP_WIDTH * y + x]`, `mapExtra[checkY * MAP_WIDTH + checkX]` | flat `*(mapExtra + x + MAP_WIDTH * y)` (both); the `if (MAP_HEIGHT <= checkY) {} else` empty-if is REAL (removing it loses 2 bytes) but must read `checkY >= MAP_HEIGHT` | OPEN - 2 jump-distance bytes left: retail places the loop-back jmp BEFORE the body, ours after |

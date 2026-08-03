@@ -1977,21 +1977,28 @@ void army::CheckLuck(void) {
             sprintf(gText, "goodluck.82m");
         }
         luckSample = LoadPlaySample(gText);
+        char* creatureName;
         if (m_luckOutcome < 0) {
+            if (m_quantity > 1)
+                creatureName = gArmyNamesPlural[IDX(m_monsterType)];
+            else
+                creatureName = gArmyNames[IDX(m_monsterType)];
             sprintf(
                 gText,
                 "Bad luck descends on the %s",
-                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
-                               : gArmyNames[IDX(m_monsterType)]
+                creatureName
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
+            if (m_quantity > 1)
+                creatureName = gArmyNamesPlural[IDX(m_monsterType)];
+            else
+                creatureName = gArmyNames[IDX(m_monsterType)];
             sprintf(
                 gText,
                 "Good luck shines on the %s",
-                m_quantity > 1 ? gArmyNamesPlural[IDX(m_monsterType)]
-                               : gArmyNames[IDX(m_monsterType)]
+                creatureName
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
