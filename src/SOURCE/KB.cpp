@@ -4360,7 +4360,7 @@ void TestDynamicWindow(i32 p1, i32 p2) {
 VA(0x0046ec5a, 0x88)
 void HandleRemoteDeadPlayerExit(i32 pos) {
     SPlayerExit pe;
-    if (giThisGamePos == pos) {
+    if (pos == giThisGamePos) {
         if (!gpGame->TransmitSaveGame((giThisNetPos + 1) % giNumHumanPlayers, 1, 0))
             ShutDown(NULL);
         RemoteCleanup();

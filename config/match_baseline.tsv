@@ -242,8 +242,8 @@ BASE/Misc	?AiPrint@@YIXPAD@Z	100.0000	34d4d1d088c1
 BASE/Misc	?BaseAlloc@@YIPAXIPADH@Z	0.0000	f3a78b076682
 BASE/Misc	?BaseFree@@YIXPAXPADH@Z	0.0000	b39c95d6e883
 BASE/Misc	?BitmapToScreen@@YIXPAVbitmap@@@Z	100.0000	50a43a40357c
-BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	60.4122	81efe106ce06
-BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	87.2917	8e1bd50148cc
+BASE/Misc	?BlitBitmapToScreen@@YIXPAVbitmap@@HHHHHH@Z	62.5676	81efe106ce06
+BASE/Misc	?BlitBitmapToScreenNoMouseCheck@@YIXPAVbitmap@@HHHHHH@Z	100.0000	8e1bd50148cc
 BASE/Misc	?CreatePCXFile@@YIXPADPAEHH1@Z	79.7704	3107f79bf6f0.076d7b63a6f7
 BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	72.2406	4d12edf05295
 BASE/Misc	?DriveSupportsFreeSpaceQuery@@YI_ND@Z	75.8919	63336774890a
@@ -419,7 +419,7 @@ BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	45.1972	e9f0fcbd7663
 BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	34.3569	2278fb616996
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	80.5790	1613322bfbb2
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	1da5ac3f7fee
-BASE/miscwin	@BlitBitmapToScreenVesa@28	80.2929	a073d070b1fe
+BASE/miscwin	_BlitBitmapToScreenVesa	82.8357	e1f4a7047920
 BASE/soundmgr	??0soundManager@@QAE@XZ	48.5000	35fb1625087c
 BASE/soundmgr	?AdjustMusicVolumes@soundManager@@QAEXXZ	93.9623	72a919172b8c.95b55bccad90
 BASE/soundmgr	?AdjustSoundVolumes@soundManager@@QAEXXZ	100.0000	7ec25e4e0a49.ed147910f694
@@ -502,7 +502,7 @@ SOURCE/ADVMGR	?InsertSound@advManager@@QAEXHHHH@Z	100.0000	e8dadc4a0c48
 SOURCE/ADVMGR	?IsCrystalBallInEffect@advManager@@QAEHHHH@Z	99.9138	640a26505644
 SOURCE/ADVMGR	?LoadRemote@advManager@@QAEXXZ	64.6148	1e89c9bd43c6
 SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	81.0961	2dd3aac09c39
-SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	90.5070	a5b00609391c
+SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.5775	28091092a1b9
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	367f9621bc52
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	001c91f6647b
 SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	99.8483	be78a3a69fba
@@ -982,7 +982,7 @@ SOURCE/KB	?GetMonsterName@@YIPADH@Z	100.0000	33efb4ca49a8
 SOURCE/KB	?GetMonsterPluralName@@YIPADH@Z	100.0000	a6927ce776e0
 SOURCE/KB	?GetTownName@@YIPADH@Z	100.0000	06d5e0a13f1b
 SOURCE/KB	?HandleAppSpecificMenuCommands@@YIHH@Z	52.1620	4c121cb60f40
-SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	97.2093	bbcd3193d7e1
+SOURCE/KB	?HandleRemoteDeadPlayerExit@@YIXH@Z	100.0000	b8cdc9fc39df
 SOURCE/KB	?HandleRemoteSuddenExit@@YIXXZ	100.0000	379e3a39c313
 SOURCE/KB	?InMapArea@@YIHHH@Z	100.0000	d3c308bb5b19
 SOURCE/KB	?InitMainClasses@@YIXXZ	99.9934	49f08a97658c

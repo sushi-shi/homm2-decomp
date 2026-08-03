@@ -18,7 +18,7 @@ H2_ENUM_BEGIN(VesaBlitConstant)
 H2_ENUM_END(VesaBlitConstant)
 
 VA(0x004d4610, 0x1e6)
-extern "C" void __fastcall BlitBitmapToScreenVesa(
+extern "C" void __cdecl BlitBitmapToScreenVesa(
     bitmap* sourceBitmap,
     i32 sourceX,
     i32 sourceY,

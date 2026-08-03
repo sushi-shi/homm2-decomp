@@ -5,7 +5,7 @@
 
 class bitmap;
 
-extern "C" void __fastcall BlitBitmapToScreenVesa(class bitmap*, i32, i32, i32, i32, i32, i32);
+extern "C" void __cdecl BlitBitmapToScreenVesa(class bitmap*, i32, i32, i32, i32, i32, i32);
 i16 AutoInitSVGA(void);
 
 struct tagPAINTSTRUCT;
