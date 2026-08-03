@@ -94,22 +94,18 @@ static SMouseManagerStrings gMouseManagerStrings = {
 VA(0x004b9050, 0x12e)
 mouseManager::mouseManager(void) : baseManager() {
     i32 i;
+    m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     m_savedUnderlying = NULL;
     m_active = false;
-    m_cursorType = MOUSE_INVALID_CURSOR_TYPE;
     strcpy(m_name, gMouseManagerStrings.managerName.text);
     m_cursorFrame = 0;
-    m_cursorReady = 1;
     m_cursorIcon = NULL;
-    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        hbmpAndMask[i] = NULL;
-    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        hMouseCursor[i] = NULL;
-    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        cColorBits[i] = NULL;
-    for (i = 0; i < MOUSE_CURSOR_COUNT; i++)
-        cAndBits[i] = NULL;
+    m_cursorReady = 1;
     for (i = 0; i < MOUSE_CURSOR_COUNT; i++) {
+        cAndBits[i] = NULL;
+        cColorBits[i] = NULL;
+        hMouseCursor[i] = NULL;
+        hbmpAndMask[i] = NULL;
         if (iHotSpot[i][MOUSE_CURSOR_HORIZONTAL] == MOUSE_DEFAULT_HOTSPOT)
             iHotSpot[i][MOUSE_CURSOR_HORIZONTAL] =
                 iMouseSize[i][MOUSE_CURSOR_VERTICAL] / HOTSPOT_CENTER_DIVISOR;
