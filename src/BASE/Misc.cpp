@@ -341,31 +341,9 @@ void PrintMemoryLeaks(void) {
 
 VA(0x004bd8a0, 0x35)
 void ShowMemoryStatus(void) {
-    sprintf(gText, "Mem Left %dK", REPORTED_MEMORY_KILOBYTES);
-    i32 savedDebugLevel = giDebugLevel;
-    giDebugLevel = FORCED_DEBUG_LEVEL;
-    FillBitmapArea(
-        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
-    );
-    smallFont->DrawBoundedString(
-        gText,
-        0,
-        STATUS_TEXT_Y,
-        STATUS_BAR_WIDTH,
-        STATUS_TEXT_HEIGHT,
-        FONT_DRAW_DEFAULT,
-        FONT_ALIGN_LEFT
-    );
-    BlitBitmapToScreen(
-        gpWindowManager->m_screen,
-        0,
-        STATUS_BAR_Y,
-        STATUS_BAR_WIDTH,
-        STATUS_BAR_HEIGHT,
-        0,
-        STATUS_BAR_Y
-    );
-    giDebugLevel = savedDebugLevel;
+    i32 memLeft = MemSize(1);
+    sprintf(gText, "Mem Left %dK", memLeft);
+    AbsAiPrint(gText);
 }
 
 VA(0x004bd8e0, 0x10a)
@@ -1822,27 +1800,7 @@ VA(0x004bfd10, 0x30)
 void AbsAiPrint(char* text) {
     i32 saved = giDebugLevel;
     giDebugLevel = FORCED_DEBUG_LEVEL;
-    FillBitmapArea(
-        gpWindowManager->m_screen, 0, STATUS_BAR_Y, STATUS_BAR_WIDTH, STATUS_BAR_HEIGHT, 0
-    );
-    smallFont->DrawBoundedString(
-        text,
-        0,
-        STATUS_TEXT_Y,
-        STATUS_BAR_WIDTH,
-        STATUS_TEXT_HEIGHT,
-        FONT_DRAW_DEFAULT,
-        FONT_ALIGN_LEFT
-    );
-    BlitBitmapToScreen(
-        gpWindowManager->m_screen,
-        0,
-        STATUS_BAR_Y,
-        STATUS_BAR_WIDTH,
-        STATUS_BAR_HEIGHT,
-        0,
-        STATUS_BAR_Y
-    );
+    AiPrint(text);
     giDebugLevel = saved;
 }
 
