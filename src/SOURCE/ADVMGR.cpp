@@ -9502,7 +9502,7 @@ void ComputeAdvNetControl(void) {
 
 VA(0x00413b4d, 0xda)
 i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
-    if (mapExtra[MAP_WIDTH * y + x] & mask) {
+    if (*(mapExtra + x + MAP_WIDTH * y) & mask) {
         return 1;
     }
     for (i32 checkX = x - 1; checkX <= x + 1; ++checkX) {
@@ -9511,9 +9511,9 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
         }
         for (i32 checkY = y - 1; checkY <= y + 1; ++checkY) {
             if (checkY >= 0) {
-                if (MAP_HEIGHT <= checkY) {
+                if (checkY >= MAP_HEIGHT) {
                 } else {
-                    if (mapExtra[checkY * MAP_WIDTH + checkX] & mask) {
+                    if (*(mapExtra + checkX + MAP_WIDTH * checkY) & mask) {
                         return 1;
                     }
                 }
