@@ -27,6 +27,7 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 
 | Site | PoL 2.0 spelling | 2.1 byte-pinned spelling | State |
 |---|---|---|---|
+| combatManager::SetupAdjacencyArray locals | `sourceHex`; rowIndex/direction declared inside the outer loop | `fromHex`; both hoisted to fn scope (retail's toHex sits at -0x10, only reachable with 4 fn-scope slots). 41 -> 13 diffs, 3-cycle -> 2-cycle. RESIDUAL: rowIndex/direction pair - the bucket model predicts direction@-4 and MATCHES the target, but VC6 compiles the reverse; 4 probes (dir/y/decl-swap) never flipped it. First hard model-vs-VC6 disagreement on an ENUM-typed local | OPEN - permuter identifier_rename queued |
 | advManager::SaveAdventureBorder local | `screenPixel` | `screen` (bucket 0 ties savedPixels; later decl wins the 3-cycle) | OPEN |
 | advManager::DrawAdventureBorder slots | - | PARKED: the sibling's rename does NOT transfer (Draw declares screen first and wants savedPixels above it); decl-order swap measured 232 diffs, `saved`/`dst`+`src` measured worse - permuter queued | OPEN |
 | slot-solve batch 4 (3 fns) | PoL names | GetBitmap/GetMIDIWrap `id`->`fileId`; GiveArmy `tmp`->`swap` | OPEN as slot-name class |
