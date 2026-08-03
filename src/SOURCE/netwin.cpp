@@ -128,7 +128,7 @@ extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
 
 VA(0x0047404c, 0x1d0)
 extern "C" void __fastcall nb_term(void) {
-    tag_Node* node;
+    tag_Node* np;
     NetbiosControlBlock block;
     i32 i;
 
@@ -149,10 +149,10 @@ extern "C" void __fastcall nb_term(void) {
         Netbios(&block);
     }
     EnterCriticalSection(&gNbSndLock);
-    while ((node = pop_node(&gNbSndQueue)) != NULL)
-        H2_FREE(node);
-    while ((node = pop_node(&gNbFreeQueue)) != NULL)
-        H2_FREE(node);
+    while ((np = pop_node(&gNbSndQueue)) != NULL)
+        H2_FREE(np);
+    while ((np = pop_node(&gNbFreeQueue)) != NULL)
+        H2_FREE(np);
     LeaveCriticalSection(&gNbSndLock);
     DeleteCriticalSection(&gNbSndLock);
     for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++) {
@@ -162,8 +162,8 @@ extern "C" void __fastcall nb_term(void) {
     gNbShutdown |= 1;
     SetEvent(gNbEvents.handles[0]);
     EnterCriticalSection(&gNbRcvLock);
-    while ((node = pop_node(&gNbRcvQueue)) != NULL)
-        H2_FREE(node);
+    while ((np = pop_node(&gNbRcvQueue)) != NULL)
+        H2_FREE(np);
     LeaveCriticalSection(&gNbRcvLock);
     DeleteCriticalSection(&gNbRcvLock);
 }
@@ -339,10 +339,10 @@ extern "C" char __cdecl nb_stat(i16 session) {
 VA(0x00474848, 0x215)
 void nb_thr_ctl(void) {
     i32 keepRunning;
-    i32 i;
-    tag_Node* node;
-    NetbiosControlBlock localNcb;
-    H2_ENUM_STORAGE(NetbiosResult, u8) rc;
+    i32 idx;
+    tag_Node* entry;
+    NetbiosControlBlock block;
+    H2_ENUM_STORAGE(NetbiosResult, u8) result;
     i32 sendComplete;
 
     keepRunning = 1;
@@ -351,34 +351,34 @@ void nb_thr_ctl(void) {
     {
         if (WaitForSingleObject(gNbEvents.handles[0], 0) == WAIT_OBJECT_0)
             ResetEvent(gNbEvents.handles[0]);
-        for (i = 0; i < NETBIOS_RECEIVE_EVENT_COUNT; i++) {
-            if (WaitForSingleObject(gNbEvents.handles[i + NETBIOS_RECEIVE_EVENT_FIRST], 0)
+        for (idx = 0; idx < NETBIOS_RECEIVE_EVENT_COUNT; idx++) {
+            if (WaitForSingleObject(gNbEvents.handles[idx + NETBIOS_RECEIVE_EVENT_FIRST], 0)
                 == WAIT_OBJECT_0) {
-                ResetEvent(gNbEvents.handles[i + NETBIOS_RECEIVE_EVENT_FIRST]);
-                nb_recv_complete(i);
+                ResetEvent(gNbEvents.handles[idx + NETBIOS_RECEIVE_EVENT_FIRST]);
+                nb_recv_complete(idx);
             }
         }
         while (keepRunning) {
             EnterCriticalSection(&gNbSndLock);
-            node = pop_node(&gNbFreeQueue);
-            if (node == NULL)
-                node = pop_node(&gNbSndQueue);
+            entry = pop_node(&gNbFreeQueue);
+            if (entry == NULL)
+                entry = pop_node(&gNbSndQueue);
             LeaveCriticalSection(&gNbSndLock);
-            if (node == NULL) {
+            if (entry == NULL) {
                 keepRunning = 0;
             } else {
                 memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
-                gNbCtlNcb.sessionNumber = gNbSessLsn[node->sessionIndex];
+                gNbCtlNcb.sessionNumber = gNbSessLsn[entry->sessionIndex];
                 if (gNbCtlNcb.sessionNumber != NETBIOS_INVALID_ID) {
-                    memcpy(gNbSessBuf.bytes, node->data, node->len);
+                    memcpy(gNbSessBuf.bytes, entry->data, entry->len);
                     gNbCtlNcb.buffer = gNbSessBuf.bytes;
-                    gNbCtlNcb.length = node->len;
+                    gNbCtlNcb.length = entry->len;
                     gNbCtlNcb.command = NETBIOS_COMMAND_SEND;
                     gNbCtlNcb.adapterNumber = gNetbiosLana;
                     sendComplete = 0;
                     while (!sendComplete) {
-                        rc = Netbios(&gNbCtlNcb);
-                        switch (rc) {
+                        result = Netbios(&gNbCtlNcb);
+                        switch (result) {
                             case NETBIOS_RESULT_SUCCESS:
                                 sendComplete = 1;
                                 break;
@@ -392,14 +392,14 @@ void nb_thr_ctl(void) {
                             case NETBIOS_RESULT_SESSION_OUT_OF_RANGE:
                             case NETBIOS_RESULT_SESSION_CLOSED:
                             case NETBIOS_RESULT_SESSION_ENDED:
-                                gNetStatus[node->sessionIndex] &= ~NETBIOS_SESSION_ACTIVE;
+                                gNetStatus[entry->sessionIndex] &= ~NETBIOS_SESSION_ACTIVE;
                                 break;
                             default:
                                 break;
                         }
                     }
                 }
-                H2_FREE(node);
+                H2_FREE(entry);
             }
         }
     }
