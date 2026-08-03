@@ -26,6 +26,29 @@ BELOW the `this` spill (e.g. `this` at -0x18, temp at -0x1a) and stores
 to the destination ONCE; an if/else stores twice. So *retail frame
 LARGER than ours* is the tell. Queue: 53 fns >=80%, every one +4.
 
+## OPEN MODEL QUESTION: where does `this` spill? (blocks 74 slot solves)
+
+`od_slots` assumes `this` spills LAST (deepest slot). Retail contradicts
+that. `army::AttackTo` (0x41d509), frame 0x10 on both sides:
+
+    retail:  mov [ebp-0x0c], ecx     <- `this` is the THIRD slot
+             ... a named local lives at [ebp-0x10], deeper than `this`
+    ours:    mov [ebp-0x10], ecx     <- `this` last, as the model says
+
+Both are VC6 /Od builds of three same-named scalars, so a fixed
+"this-last" rule cannot produce both. Treating `this` as an ordinary
+hashed identifier does not resolve it either: `bucket('this')` is 11,
+which predicts retail's layout - but our own compile of those exact
+names disagrees with that prediction too. So the 4.2-derived `bucket()`
+is not reproducing VC6 here, exactly as CLAUDE.md warns.
+
+Consequence: 74 of the 102 pure slot-permutation functions are
+`__thiscall`, so their solves cannot be trusted to the model until this
+is settled by the `od-frames`/`od-oracle` harness on VC6 objects. Use
+the model to GENERATE candidate names, never to conclude - every solve
+so far (LogStr, TurnTo, GetPointer) was confirmed by compiling, and
+`AttackTo`'s model-blessed chain measured 23 -> 23 and was reverted.
+
 ## Negative result: the dead-local class is EXHAUSTED
 
 The decl-vs-use scan finds 168 unreferenced locals image-wide, but the
