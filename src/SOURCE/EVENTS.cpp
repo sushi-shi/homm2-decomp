@@ -380,10 +380,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
     eraseObject = 0;
     fizzleType3 = 0;
-    playedSample3 = NULL_SAMPLE2;
+    playedSample3 = NULL;
+    eventSample_f = NULL;
     gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer(0);
-    eventSample_f = NULL_SAMPLE2;
 
     switch (eventType_g) {
         case MAP_OBJECT_TRADING_POST:
@@ -1134,7 +1134,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL,
                     NULL
                 );
-                WaitEndSample(playedSample3, -1);
+                WaitEndSample(&playedSample3, -1);
                 CheckAdjacentMon(&adjacentMonster8);
             }
             break;
@@ -3709,7 +3709,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
     }
     UpdateScreen(0, 0);
     gpSoundManager->SwitchAmbientMusic(giTerrainToMusicTrack[IDX(m_currentTerrain)]);
-    WaitEndSample(playedSample3, -1);
+    WaitEndSample(&eventSample_f, -1);
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
@@ -3924,7 +3924,7 @@ void advManager::HeroSwap(hero* firstHero, hero* secondHero) {
 
 VA(0x00441fbc, 0x125)
 i32 advManager::BarrierEvent(mapCell* cell, hero*) {
-    SAMPLE2 eventSample = {NULL};
+    SAMPLE2 eventSample = NULL;
     i32 colorIndex = cell->m_objectMetadata;
     colorIndex &= COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
@@ -4003,7 +4003,7 @@ i8 StrEqNoCase(char* firstString, char* sndString) {
 
 VA(0x00442176, 0xe0)
 void advManager::PasswordEvent(mapCell* cell, hero*) {
-    SAMPLE2 eventSample = NULL_SAMPLE2;
+    SAMPLE2 eventSample = NULL;
     i32 color = cell->m_objectMetadata;
     color &= COLOR_MASK;
     i32 passwordIndex = cell->m_objectMetadata;
@@ -4044,7 +4044,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
     i32 oldQuantity4;
 
     cursedArtifactCount9 = 0;
-    eventSample5 = NULL_SAMPLE2;
+    eventSample5 = NULL;
     H2_ENUM_DECODE_MASKED(
         GenericSiteType,
         siteType2,
@@ -4345,7 +4345,7 @@ void advManager::GenericSiteEvent(mapCell* cell, hero* eventHero) {
 
 VA(0x00442952, 0x170)
 void advManager::RecruitSiteEvent(mapCell* cell, hero* eventHero) {
-    SAMPLE2 eventSample = NULL_SAMPLE2;
+    SAMPLE2 eventSample = NULL;
     H2_ENUM_STORAGE(RecruitSiteType, u32) siteType2;
     i16 availableCount;
     CreatureType creatureType1;
@@ -4408,7 +4408,7 @@ void advManager::ExpansionRecruitEvent(
 
 VA(0x00442b6c, 0x21a)
 void advManager::JailEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
-    SAMPLE2 eventSample = {NULL};
+    SAMPLE2 eventSample = NULL;
     i32 heroId;
     hero* freedHero;
 
@@ -4551,7 +4551,7 @@ VA(0x00442f2d, 0x237)
 void advManager::EventSound(
     H2_ENUM_PARAM(MapObjectType, i32) eventType,
     i32 eventData,
-    struct SAMPLE2* outSample
+    SAMPLE2* outSample
 ) {
     const i32 treasureSound_a = SOUND_TREASURE;
     const i32 experienceSound_o = SOUND_EXPERIENCE;
@@ -6000,7 +6000,6 @@ void advManager::FizzleCenter(i32 fizzleType) {
             default:
                 return;
         }
-        playedSample = NULL_SAMPLE2;
         playedSample = LoadPlaySample(gText);
         gpMouseManager->HideColorPointer();
         gpWindowManager->SaveFizzleSource(
@@ -6021,7 +6020,7 @@ void advManager::FizzleCenter(i32 fizzleType) {
             NULL
         );
         gpMouseManager->ShowColorPointer();
-        WaitEndSample(playedSample, -1);
+        WaitEndSample(&playedSample, -1);
     }
 }
 

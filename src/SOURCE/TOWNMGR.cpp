@@ -1323,7 +1323,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                     );
                                     if (m_heroStrip == NULL)
                                         MemError();
-                                    buildSample_m = NULL_SAMPLE2;
+                                    buildSample_m = NULL;
                                     buildSample_m = LoadPlaySample("buildtwn.82M");
                                     hero* townHero = gpGame->GetHero(m_town->m_occupyingHeroId);
                                     i32 fizzleWidth = TOWN_VIEW_FIZZLE_WIDTH;
@@ -1339,7 +1339,7 @@ MessageDispatchResult townManager::Main(tag_message& message) {
                                         NULL,
                                         NULL
                                     );
-                                    WaitEndSample(buildSample_m, -1);
+                                    WaitEndSample(&buildSample_m, -1);
                                     m_recruitResult = 0;
                                     gpWindowManager->ReleaseFizzleSource();
                                 } else {
@@ -2486,7 +2486,6 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             giMaxExtentY - giMinExtentY + 1
         );
         DrawTown(0, 1);
-        buildSample_b = NULL_SAMPLE2;
         buildSample_b = LoadPlaySample("buildtwn.82M");
         gpWindowManager->FizzleForward(
             giMinExtentX,
@@ -2497,7 +2496,7 @@ void townManager::BuildObj(H2_ENUM_PARAM(BuildingSlotType, i32) building) {
             NULL,
             NULL
         );
-        WaitEndSample(buildSample_b, -1);
+        WaitEndSample(&buildSample_b, -1);
         PollSound();
         m_selectedBuilding = BUILDING_SLOT_NONE;
         gpWindowManager->BroadcastMessage(

@@ -1712,10 +1712,10 @@ void combatManager::ShowWinLoseArtifact(
     window->AddWidget(m_winLoseBottomTextWidgets[0], -1);
 
     gpCombatManager->m_winLoseWindow->DrawWindow();
-    SAMPLE2 pickupSample = NULL_SAMPLE2;
+    SAMPLE2 pickupSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
-    WaitEndSample(pickupSample, -1);
+    WaitEndSample(&pickupSample, -1);
 }
 
 VA(0x0042e715, 0x225)
@@ -1780,10 +1780,10 @@ void combatManager::ShowSkeletons(class heroWindow* window) {
     m_winLoseWindow->BroadcastMessage(message);
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
-    SAMPLE2 pickupSample = NULL_SAMPLE2;
+    SAMPLE2 pickupSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     pickupSample = LoadPlaySample(gText);
-    WaitEndSample(pickupSample, -1);
+    WaitEndSample(&pickupSample, -1);
 }
 
 VA(0x0042e93a, 0x2f2)
@@ -1858,10 +1858,10 @@ void combatManager::ShowEagleEyeSpell(class heroWindow* window) {
     m_winLoseWindow->BroadcastMessage(spellMessage);
     gpCombatManager->m_winLoseWindow->DrawWindow();
 
-    SAMPLE2 playedSample = NULL_SAMPLE2;
+    SAMPLE2 playedSample;
     sprintf(gText, "pickup%02d.82M", SRandom(PICKUP_SAMPLE_FIRST, PICKUP_SAMPLE_LAST));
     playedSample = LoadPlaySample(gText);
-    WaitEndSample(playedSample, -1);
+    WaitEndSample(&playedSample, -1);
 }
 
 VA(0x0042ec2c, 0x9d5)

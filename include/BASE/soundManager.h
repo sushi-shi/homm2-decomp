@@ -121,7 +121,7 @@ public:
     void StopAllSamples(i32);
     void StopSample(class sample*);
     void ModifySample(class sample*, i32);
-    i32 DigitalReport(class sample*);
+    bool DigitalReport(class sample*);
     void AdjustSoundVolumes(void);
     void AdjustMusicVolumes(void);
     void ForcePollSound(void);

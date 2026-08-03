@@ -784,7 +784,7 @@ void hero::CheckLevel(void) {
     newLevel = GetLevel(m_experience);
     if (m_level == newLevel) {
     } else {
-        sampleValue = NULL_SAMPLE2;
+        sampleValue = NULL;
         levelsGained = newLevel - m_level;
         for (currentLevelIndex = m_level + 1; currentLevelIndex <= newLevel; currentLevelIndex++) {
             sprintf(gText, cHeroLevel[0], m_name);
@@ -942,7 +942,7 @@ void hero::CheckLevel(void) {
             }
         }
         m_level = static_cast<i16>(newLevel);
-        WaitEndSample(sampleValue, -1);
+        WaitEndSample(&sampleValue, -1);
     }
 }
 

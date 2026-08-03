@@ -1964,40 +1964,34 @@ void army::CheckLuck(void) {
         m_luckOutcome = -1;
     }
     if (m_luckOutcome) {
-        luckSample = NULL_SAMPLE2;
         if (m_luckOutcome < 0) {
             sprintf(gText, "badluck.82m");
         } else {
             sprintf(gText, "goodluck.82m");
         }
         luckSample = LoadPlaySample(gText);
-        char* creatureName;
         if (m_luckOutcome < 0) {
-            if (m_quantity > 1)
-                creatureName = gArmyNamesPlural[IDX(m_monsterType)];
-            else
-                creatureName = gArmyNames[IDX(m_monsterType)];
             sprintf(
                 gText,
-                "Bad luck descends on the %s",
-                creatureName
+                "\xcf\xeb\xee\xf5\xe0\xff \xf3\xe4\xe0\xf7\xe0 \xe1\xfb\xeb\xe0 "
+                "\xed\xe8\xf1\xef\xee\xf1\xeb\xe0\xed\xe0 \xed\xe0 %s!",
+                m_quantity <= 1 ? gArmyNames[IDX(m_monsterType)]
+                                : gArmyNamesPlural[IDX(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             SpellEffect(COMBAT_EFFECT_BAD_LUCK, ARMY_BAD_LUCK_EFFECT_DELAY, 0);
         } else {
-            if (m_quantity > 1)
-                creatureName = gArmyNamesPlural[IDX(m_monsterType)];
-            else
-                creatureName = gArmyNames[IDX(m_monsterType)];
             sprintf(
                 gText,
-                "Good luck shines on the %s",
-                creatureName
+                "\xd3\xe4\xe0\xf7\xe0 \xed\xe0 \xf1\xf2\xee\xf0\xee\xed\xe5 "
+                "\xee\xf2\xf0\xff\xe4\xe0 %s!",
+                m_quantity <= 1 ? gArmyNames[IDX(m_monsterType)]
+                                : gArmyNamesPlural[IDX(m_monsterType)]
             );
             gpCombatManager->CombatMessage(gText, 1, 1, 0);
             gpCombatManager->DoLuck(m_side, m_index);
         }
-        WaitEndSample(luckSample, -1);
+        WaitEndSample(&luckSample, -1);
         if (m_luckOutcome > 0) {
             gpCombatManager->DrawFrame(1, 0, 0, 0, ARMY_COMBAT_FRAME_DELAY, 1, 1);
             gpMouseManager->ShowColorPointer();
