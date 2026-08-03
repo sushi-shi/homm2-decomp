@@ -4160,10 +4160,7 @@ void philAI::HeroInteractionAtHero(
         }
 
         for (heroIndex9 = 0; heroIndex9 < HERO_INTERACTION_HERO_COUNT; heroIndex9++) {
-            if (heroIndex9 == 0)
-                currentHero9 = firstHero;
-            else
-                currentHero9 = secondHero;
+            currentHero9 = heroIndex9 == 0 ? firstHero : secondHero;
             heroValues27[heroIndex9] = 0;
             for (statIndex8 = 0; statIndex8 < HERO_INTERACTION_PRIMARY_STAT_COUNT;
                  statIndex8++) {
