@@ -420,36 +420,33 @@ void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags
 
 VA(0x004b7400, 0xe9)
 void heroWindowManager::RemoveWindow(class heroWindow* w) {
-    if (w != NULL) {
-        w->Close();
-        if (m_windowListHead == w) {
-            heroWindow* next = w->m_nextWindow;
-            m_windowListHead = next;
-            if (next == NULL)
-                m_windowListTail = NULL;
-            else
-                next->m_prevWindow = NULL;
+    if (w == NULL)
+        return;
+    w->Close();
+    if (w == m_windowListHead) {
+        m_windowListHead = w->m_nextWindow;
+        if (m_windowListHead == NULL)
+            m_windowListTail = NULL;
+        else
+            m_windowListHead->m_prevWindow = NULL;
+    } else {
+        if (w == m_windowListTail) {
+            m_windowListTail = w->m_prevWindow;
+            m_windowListTail->m_nextWindow = NULL;
         } else {
-            if (m_windowListTail == w) {
-                heroWindow* prev = w->m_prevWindow;
-                m_windowListTail = prev;
-                prev->m_nextWindow = NULL;
-            } else {
-                heroWindow* prev = w->m_prevWindow;
-                if (prev != NULL)
-                    prev->m_nextWindow = w->m_nextWindow;
-                if (w->m_nextWindow != NULL)
-                    w->m_nextWindow->m_prevWindow = w->m_prevWindow;
-            }
+            if (w->m_prevWindow != NULL)
+                w->m_prevWindow->m_nextWindow = w->m_nextWindow;
+            if (w->m_nextWindow != NULL)
+                w->m_nextWindow->m_prevWindow = w->m_prevWindow;
         }
-        if (m_activeWindow == w)
-            m_activeWindow = NULL;
-        if (m_activeWindow == NULL) {
-            m_focusWindow = m_windowListTail;
-            return;
-        }
-        m_focusWindow = m_activeWindow;
     }
+    if (m_activeWindow == w)
+        m_activeWindow = NULL;
+    if (m_activeWindow == NULL) {
+        m_focusWindow = m_windowListTail;
+        return;
+    }
+    m_focusWindow = m_activeWindow;
 }
 
 VA(0x004b74f0, 0x199)
@@ -596,27 +593,27 @@ void heroWindowManager::ScreenShot(void) {
 
 VA(0x004b7840, 0x159)
 void heroWindowManager::SaveFizzleSource(i32 x, i32 y, i32 width, i32 height) {
-    if (bShowIt != 0) {
-        if (x < 0) {
-            width += x;
-            x = 0;
-        }
-        if (y < 0) {
-            height += y;
-            y = 0;
-        }
-        if (x + width > SCREEN_WIDTH)
-            width = SCREEN_WIDTH - x;
-        if (y + height > SCREEN_HEIGHT)
-            height = SCREEN_HEIGHT - y;
-        if (width > 0 && height > 0) {
-            if (m_fizzleSource != NULL)
-                delete m_fizzleSource;
-            m_fizzleSource =
-                new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-            BlitBitmap(gpWindowManager->m_screen, x, y, width, height, m_fizzleSource, 0, 0);
-        }
+    if (bShowIt == 0)
+        return;
+    if (x < 0) {
+        width += x;
+        x = 0;
     }
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+    if (x + width > SCREEN_WIDTH)
+        width = SCREEN_WIDTH - x;
+    if (y + height > SCREEN_HEIGHT)
+        height = SCREEN_HEIGHT - y;
+    if (width <= 0 || height <= 0)
+        return;
+    if (m_fizzleSource != NULL)
+        delete m_fizzleSource;
+    m_fizzleSource =
+        new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
+    BlitBitmap(gpWindowManager->m_screen, x, y, width, height, m_fizzleSource, 0, 0);
 }
 
 VA(0x004b79a0, 0x5)

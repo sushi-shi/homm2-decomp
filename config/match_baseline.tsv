@@ -29,10 +29,10 @@ BASE/BITMAP	??1bitmap@@UAE@XZ	100.0000	9b92e79cae06
 BASE/BITMAP	?CopyTo@bitmap@@QAEXPAV1@HHHHHH@Z	100.0000	29e4860e16be
 BASE/BITMAP	?CopyToCareful@bitmap@@QAEXPAV1@HHHHHH@Z	100.0000	61c664f01736
 BASE/BITMAP	?DrawToBuffer@bitmap@@QAEXFF@Z	100.0000	f6b34926ae4a
-BASE/BITMAP	?DrawToBufferCareful@bitmap@@QAEXFF@Z	87.7818	de0f872977f6
+BASE/BITMAP	?DrawToBufferCareful@bitmap@@QAEXFF@Z	98.3909	a6382cbc722e
 BASE/BITMAP	?DrawToScreen@bitmap@@QAEXFF@Z	100.0000	d57d560abd38
 BASE/BITMAP	?GrabBitmap@bitmap@@QAEXPAV1@FF@Z	100.0000	ded4c2e9dcf2
-BASE/BITMAP	?GrabBitmapCareful@bitmap@@QAEXPAV1@FF@Z	98.2981	0d8654bbcfdd
+BASE/BITMAP	?GrabBitmapCareful@bitmap@@QAEXPAV1@FF@Z	98.2981	dc6360088f2e
 BASE/BITMAP	?GrabScreen@bitmap@@QAEXFF@Z	100.0000	b62fe898641d
 BASE/BITS	_BitClear	100.0000	6986c0636685
 BASE/BITS	_BitSet	100.0000	7d912b4d9d30
@@ -154,7 +154,7 @@ BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	57.7474	774634bc5689
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	42e8597a1e5b
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	71.1593	e69c460d8f2a
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	85.4528	bb6925048c62
-BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	78.5500	7a5a0a411c47
+BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	8753e0b48f52
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	181316dc8cc1
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	954f5a9ba0c3
 BASE/FONT	??0font@@QAE@K@Z	100.0000	447d5a218210
@@ -352,7 +352,7 @@ BASE/WIDGET	??0widget@@QAE@FFFFFF@Z	100.0000	a6d29efcea84
 BASE/WIDGET	??0widget@@QAE@XZ	100.0000	fa36abb08403
 BASE/WIDGET	??1widget@@UAE@XZ	100.0000	8705273b4125
 BASE/WIDGET	?Close@widget@@QAEXXZ	100.0000	f728306d5a57
-BASE/WIDGET	?Dim@widget@@QAEXXZ	85.7907	fea8b9f0dcbc
+BASE/WIDGET	?Dim@widget@@QAEXXZ	100.0000	b3888c946b2d
 BASE/WIDGET	?Main@widget@@UAEHAAUtag_message@@@Z	0.0000	afb79eb85537.d55dec860822
 BASE/WIDGET	?Open@widget@@QAEHHPAVheroWindow@@@Z	100.0000	13cb729f54d5
 BASE/WINDOW	??0heroWindow@@QAE@HHHHH@Z	78.2558	520c705c0fdf
@@ -386,8 +386,8 @@ BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	82.5938	6b8d30a55ced
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	80.1325	16fd6cd61141
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	61.1111	8de786945ca5
 BASE/WINMGR	?ReleaseFizzleSource@heroWindowManager@@QAEXXZ	100.0000	dcd7ce3959af
-BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	83.1184	44288be2b7f1
-BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	96.3365	4fbbd045d847
+BASE/WINMGR	?RemoveWindow@heroWindowManager@@QAEXPAVheroWindow@@@Z	100.0000	fd3ada851f1a
+BASE/WINMGR	?SaveFizzleSource@heroWindowManager@@QAEXHHHH@Z	100.0000	cad57373be6b
 BASE/WINMGR	?ScreenShot@heroWindowManager@@QAEXXZ	100.0000	e5c121f8cfd7
 BASE/WINMGR	?UpdateScreen@heroWindowManager@@QAEXXZ	100.0000	ae006dfb5dcf
 BASE/WINMGR	?UpdateScreenRegion@heroWindowManager@@QAEXHHHH@Z	100.0000	4f634b9863d7

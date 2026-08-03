@@ -57,34 +57,34 @@ void bitmap::DrawToBufferCareful(i16 x, i16 y) {
     i32 destinationY;
     i32 height;
     i32 destinationX;
-    bitmap* screen;
 
     if (x >= 0 && x + m_width <= gpWindowManager->m_screen->m_width && y >= 0
         && y + m_height <= gpWindowManager->m_screen->m_height) {
         DrawToBuffer(x, y);
-    } else {
-        width = m_width;
-        height = m_height;
-        if (x < 0) {
-            width += x;
-            destinationX = 0;
-        } else {
-            destinationX = x;
-        }
-        if (y < 0) {
-            height += y;
-            destinationY = 0;
-        } else {
-            destinationY = y;
-        }
-        screen = gpWindowManager->m_screen;
-        if (destinationX + width > screen->m_width)
-            width = screen->m_width - destinationX;
-        if (destinationY + height > screen->m_height)
-            height = screen->m_height - destinationY;
-        if (width >= 0 && height >= 0)
-            BlitBitmap(this, 0, 0, width, height, screen, destinationX, destinationY);
+        return;
     }
+    width = m_width;
+    height = m_height;
+    if (x < 0) {
+        width += x;
+        destinationX = 0;
+    } else {
+        destinationX = x;
+    }
+    if (y < 0) {
+        height += y;
+        destinationY = 0;
+    } else {
+        destinationY = y;
+    }
+    if (destinationX + width > gpWindowManager->m_screen->m_width)
+        width = gpWindowManager->m_screen->m_width - destinationX;
+    if (destinationY + height > gpWindowManager->m_screen->m_height)
+        height = gpWindowManager->m_screen->m_height - destinationY;
+    if (width >= 0 && height >= 0)
+        BlitBitmap(
+            this, 0, 0, width, height, gpWindowManager->m_screen, destinationX, destinationY
+        );
 }
 
 VA(0x004c6090, 0x47)
@@ -120,28 +120,28 @@ void bitmap::GrabBitmapCareful(class bitmap* source, i16 x, i16 y) {
 
     if (x >= 0 && x + m_width <= source->m_width && y >= 0 && y + m_height <= source->m_height) {
         GrabBitmap(source, x, y);
-    } else {
-        width = m_width;
-        height = m_height;
-        if (x < 0) {
-            width += x;
-            sourceX = 0;
-        } else {
-            sourceX = x;
-        }
-        if (y < 0) {
-            height += y;
-            sourceY = 0;
-        } else {
-            sourceY = y;
-        }
-        if (sourceX + width > source->m_width)
-            width = source->m_width - sourceX;
-        if (sourceY + height > source->m_height)
-            height = source->m_height - sourceY;
-        if (width >= 0 && height >= 0)
-            BlitBitmap(source, sourceX, sourceY, width, height, this, 0, 0);
+        return;
     }
+    width = m_width;
+    height = m_height;
+    if (x < 0) {
+        width += x;
+        sourceX = 0;
+    } else {
+        sourceX = x;
+    }
+    if (y < 0) {
+        height += y;
+        sourceY = 0;
+    } else {
+        sourceY = y;
+    }
+    if (sourceX + width > source->m_width)
+        width = source->m_width - sourceX;
+    if (sourceY + height > source->m_height)
+        height = source->m_height - sourceY;
+    if (width >= 0 && height >= 0)
+        BlitBitmap(source, sourceX, sourceY, width, height, this, 0, 0);
 }
 
 VA(0x004c62c0, 0xb6)
