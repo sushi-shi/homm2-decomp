@@ -215,26 +215,7 @@ i32 MouseMessageHandler(void*, u32 message, u32, i32l messageData) {
 
 afterMouseCoordinates:
     if (message == WM_MOUSEMOVE && gpMouseManager != NULL) {
-        i32 y = event->payload.mouse.y;
-        i32 x = event->payload.mouse.x;
-        if (bInCheckChangeCursor == 0 && gConfig.gfx[IDX(giCurExe)].fullScreen == 0
-            && gConfig.gfx[IDX(giCurExe)].colorMouseCursor != 0) {
-            bInCheckChangeCursor = 1;
-            if (x >= 0 && x < MOUSE_SCREEN_WIDTH && y >= 0 && y < MOUSE_SCREEN_HEIGHT) {
-                if (bLastMouseOffscreen != 0) {
-                    bLastMouseOffscreen = 0;
-                    gpMouseManager->SetPointer(MOUSE_KEEP_CURRENT_FRAME);
-                }
-                if (bLastOnscreenMouseColor != gbColorMice)
-                    gpMouseManager->SetColorMice(1);
-            } else if (bLastMouseOffscreen == 0) {
-                bLastMouseOffscreen = 1;
-                bLastOnscreenMouseColor = gbColorMice;
-                if (gbColorMice != 0)
-                    gpMouseManager->SetColorMice(0);
-            }
-            bInCheckChangeCursor = 0;
-        }
+        CheckChangeCursor(event->payload.mouse.x, event->payload.mouse.y, 0);
     }
 
     if (event->type != MESSAGE_NONE) {
