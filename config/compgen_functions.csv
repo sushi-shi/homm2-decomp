@@ -117,8 +117,8 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xb56f0,18,_$E18,SOURCE/X_CAMPGN,SOURCE/X_CAMPGN,masked-exact
 0xb6a90,100,??0?$RefPtr@VAudioDevice@audiere@@@audiere@@QAE@ABV01@@Z,BASE/soundmgr,BASE/soundmgr,reviewed-callgraph
 0xb6b00,44,??1AudiereSampleNode@@QAE@XZ,BASE/soundmgr,BASE/AudiereEffects,masked-exact
-0xb6b30,39,_$E19,BASE/soundmgr,BASE/soundmgr,masked-exact
-0xb6b60,18,_$E18,BASE/soundmgr,BASE/soundmgr,masked-exact
+0xb6b30,39,_$E21,BASE/soundmgr,BASE/soundmgr,masked-exact
+0xb6b60,18,_$E20,BASE/soundmgr,BASE/soundmgr,masked-exact
 0xb7e90,39,_$E19,BASE/WINMGR,BASE/AudiereEffects,masked-exact
 0xb7ec0,18,_$E18,BASE/WINMGR,BASE/AudiereEffects,masked-exact
 0xb9000,39,_$E19,BASE/RESMGR,BASE/AudiereEffects,masked-exact
@@ -178,8 +178,8 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xcc720,18,_$E18,BASE/icon2bs,BASE/AudiereEffects,masked-exact
 0xccf70,44,??1AudiereSampleNode@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xccfa0,81,??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
-0xcd000,39,_$E19,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
-0xcd030,18,_$E18,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
+0xcd000,39,_$E21,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
+0xcd030,18,_$E20,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd050,44,??1AudiereSampleNode@@QAE@XZ,BASE/AudiereEffects,BASE/AudiereEffects,masked-exact
 0xcd080,15,_$E17,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcd090,97,_$E14,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
@@ -193,8 +193,8 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xcda80,81,??4?$RefPtr@VOutputStream@audiere@@@audiere@@QAEAAV01@PAVOutputStream@1@@Z,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcdae0,39,_$E29,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
 0xcdb10,18,_$E31,BASE/AudiereMusic,BASE/AudiereMusic,masked-exact
-0xce040,39,_$E19,BASE/MilesSound,BASE/MilesSound,masked-exact
-0xce070,18,_$E18,BASE/MilesSound,BASE/MilesSound,masked-exact
+0xce040,39,_$E21,BASE/MilesSound,BASE/MilesSound,masked-exact
+0xce070,18,_$E20,BASE/MilesSound,BASE/MilesSound,masked-exact
 0xce190,46,??_Gtileset@@UAEPAXI@Z,BASE/TILESET,BASE/FONT,masked-exact
 0xce200,39,_$E19,BASE/TILESET,BASE/AudiereEffects,masked-exact
 0xce230,18,_$E18,BASE/TILESET,BASE/AudiereEffects,masked-exact
