@@ -1452,11 +1452,11 @@ SOURCE/netwin	?nb_recv_any@@YIGH@Z	100.0000	7aae41686da9
 SOURCE/netwin	?nb_recv_any_done@@YGXPAUNetbiosControlBlock@@@Z	100.0000	e7aaa4b61cb1
 SOURCE/netwin	?nb_recv_complete@@YIXH@Z	100.0000	61354c20e32c
 SOURCE/netwin	?nb_thr_ctl@@YIXXZ	99.6738	39e934b9379c
-SOURCE/netwin	@nb_term@0	99.6615	feb473cdcb1f
-SOURCE/netwin	_nb_init	99.5232	5f7cf8469bb6
+SOURCE/netwin	@nb_term@0	99.6539	5fc9c6d0d63a
+SOURCE/netwin	_nb_init	99.6556	ba14975e84e1
 SOURCE/netwin	_nb_rcv	74.5417	82bd8d8197d8
 SOURCE/netwin	_nb_sess	99.6127	15faa93fa4d6
-SOURCE/netwin	_nb_snd	95.9322	64375e0227de
+SOURCE/netwin	_nb_snd	100.0000	00ceb0ee45dd
 SOURCE/netwin	_nb_stat	100.0000	f14c489a0f8b
 SOURCE/tradpost	?ComputeTradeRatios@@YIXHHPAH00@Z	97.8793	56baf4dc9099
 SOURCE/tradpost	?DoTradeKnob@@YIXUtag_message@@@Z	98.0000	c1d1045c8e10

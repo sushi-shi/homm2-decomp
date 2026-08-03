@@ -77,7 +77,7 @@ i32 is_netbios_avail(void) {
 
 VA(0x00473e34, 0x218)
 extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
-    NetbiosControlBlock localNcb;
+    NetbiosControlBlock block;
     i32 i;
     u8* statusBuffer;
     i32 returnCode;
@@ -105,19 +105,19 @@ extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
         init_anchor(&gNbFreeQueue, 1, 0);
         for (i = 0; i < NETBIOS_THREAD_EVENT_COUNT; i++)
             gNbEvents.handles[i] = CreateEventA(NULL, 1, 0, NULL);
-        memset(&localNcb, 0, sizeof(localNcb));
+        memset(&block, 0, sizeof(block));
         statusBuffer = static_cast<u8*>(H2_ALLOC(NETBIOS_ADAPTER_STATUS_SIZE));
-        localNcb.command = NETBIOS_COMMAND_ADAPTER_STATUS;
-        localNcb.length = NETBIOS_ADAPTER_STATUS_SIZE;
-        localNcb.buffer = statusBuffer;
-        localNcb.adapterNumber = gNetbiosLana;
-        if (Netbios(&localNcb) == NETBIOS_RESULT_ENVIRONMENT_UNDEFINED) {
-            memset(&localNcb, 0, sizeof(localNcb));
-            localNcb.command = NETBIOS_COMMAND_RESET;
-            localNcb.adapterNumber = gNetbiosLana;
-            localNcb.callName[RESET_SESSION_LIMIT_INDEX] = RESET_SESSION_LIMIT;
-            localNcb.callName[RESET_NAME_LIMIT_INDEX] = RESET_NAME_LIMIT;
-            Netbios(&localNcb);
+        block.command = NETBIOS_COMMAND_ADAPTER_STATUS;
+        block.length = NETBIOS_ADAPTER_STATUS_SIZE;
+        block.buffer = statusBuffer;
+        block.adapterNumber = gNetbiosLana;
+        if (Netbios(&block) == NETBIOS_RESULT_ENVIRONMENT_UNDEFINED) {
+            memset(&block, 0, sizeof(block));
+            block.command = NETBIOS_COMMAND_RESET;
+            block.adapterNumber = gNetbiosLana;
+            block.callName[RESET_SESSION_LIMIT_INDEX] = RESET_SESSION_LIMIT;
+            block.callName[RESET_NAME_LIMIT_INDEX] = RESET_NAME_LIMIT;
+            Netbios(&block);
         }
         H2_FREE(statusBuffer);
         gNbShutdown = 0;
@@ -129,24 +129,24 @@ extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
 VA(0x0047404c, 0x1d0)
 extern "C" void __fastcall nb_term(void) {
     tag_Node* node;
-    NetbiosControlBlock localNcb;
+    NetbiosControlBlock block;
     i32 i;
 
     for (i = 0; i < NETBIOS_SESSION_COUNT; i++)
         nb_close_session(i);
     if (gNbCtlNcb.commandComplete == NETBIOS_RESULT_PENDING) {
-        memset(&localNcb, 0, sizeof(localNcb));
-        localNcb.command = NETBIOS_COMMAND_CANCEL;
-        localNcb.adapterNumber = gNetbiosLana;
-        localNcb.buffer = &gNbCtlNcb;
-        Netbios(&localNcb);
+        memset(&block, 0, sizeof(block));
+        block.command = NETBIOS_COMMAND_CANCEL;
+        block.adapterNumber = gNetbiosLana;
+        block.buffer = &gNbCtlNcb;
+        Netbios(&block);
     }
     if (HAS(gNetStatus[gNbMaxSess], NETBIOS_SESSION_NAME_REGISTERED)) {
-        memset(&localNcb, 0, sizeof(localNcb));
-        memcpy(localNcb.name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
-        localNcb.command = NETBIOS_COMMAND_DELETE_NAME;
-        localNcb.adapterNumber = gNetbiosLana;
-        Netbios(&localNcb);
+        memset(&block, 0, sizeof(block));
+        memcpy(block.name, gNbNameBuf[gNbMaxSess].bytes, NETBIOS_NAME_SIZE);
+        block.command = NETBIOS_COMMAND_DELETE_NAME;
+        block.adapterNumber = gNetbiosLana;
+        Netbios(&block);
     }
     EnterCriticalSection(&gNbSndLock);
     while ((node = pop_node(&gNbSndQueue)) != NULL)
@@ -192,7 +192,7 @@ VA(0x004742b2, 0xc0)
 extern "C" u16 __cdecl nb_snd(i16 session, i16 len, void* data) {
     tag_Node* node;
 
-    if (gNbMaxSess == session && len == 0) {
+    if (session == gNbMaxSess && len == 0) {
         nb_add_name();
         return 0;
     }
