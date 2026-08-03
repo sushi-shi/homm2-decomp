@@ -68,10 +68,8 @@ H2_ENUM_BEGIN(GameSaveFormatConstant)
     STANDARD_FILENAME_BASENAME_SIZE    = 8,
     SAVE_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_PLAYER_FLAGS_SCRATCH_SIZE     = 8,
-    SAVE_MARKER_SCRATCH_COUNT          = 3,
-    LOAD_DIMENSION_SCRATCH_COUNT       = 11,
-    LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 8,
-    LOAD_MARKER_SCRATCH_SIZE           = 8,
+    SAVE_SPARE_SLOT_COUNT              = 6,
+    LOAD_CURRENT_PLAYER_SCRATCH_SIZE   = 4,
     SAVE_TRUNCATED_SCALAR_SIZE         = sizeof(i8),
     SAVE_EVENT_HEADER_SIZE             = sizeof(u16) * 2,
     SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG = 2
@@ -911,37 +909,37 @@ H2_ENUM_END(PuzzleSetupConstant)
 
 VA(0x0044cb1e, 0x21d)
 i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
-    i32 pieceCountTotal = GetNumObelisks(player);
+    i32 pieceCount = GetNumObelisks(player);
     i32 unvisitedObelisks = PUZZLE_PIECE_COUNT - m_obeliskCount;
-    float ratio = static_cast<float>(GetNumObelisks(player)) / m_obeliskCount;
-    float interpolation =
-        (ratio * ratio + ratio)
+    float fraction = GetNumObelisks(player) / static_cast<double>(m_obeliskCount);
+    float interp =
+        (fraction * fraction + fraction)
         / static_cast<float>(PUZZLE_INTERPOLATION_TERM_COUNT)
         ;
-    pieceCountTotal = static_cast<i32>(pieceCountTotal + unvisitedObelisks * interpolation);
+    pieceCount = static_cast<i32>(pieceCount + unvisitedObelisks * interp);
 
     if (GetNumObelisks(player) == m_obeliskCount)
-        pieceCountTotal = PUZZLE_PIECE_COUNT;
-    pieceCountTotal += m_players[player].m_cheatValue;
-    if (pieceCountTotal > PUZZLE_PIECE_COUNT)
-        pieceCountTotal = PUZZLE_PIECE_COUNT;
+        pieceCount = PUZZLE_PIECE_COUNT;
+    pieceCount += m_players[player].m_cheatValue;
+    if (pieceCount > PUZZLE_PIECE_COUNT)
+        pieceCount = PUZZLE_PIECE_COUNT;
     if (justCount)
-        return pieceCountTotal;
+        return pieceCount;
 
     memset(puzzlePiecesRemoved, 0, PUZZLE_PIECE_STORAGE_SIZE);
     SRand(
         m_players[player].m_color
         + m_players[player].m_evilInterface * PUZZLE_INTERFACE_SEED_STRIDE
     );
+    i32 targetPiece;
     i32 tries;
     i32 fallbackNum;
-    i32 pieceValue;
     i32 i;
-    for (i = 0; (&i)[0] < pieceCountTotal; i++) {
-        for (pieceValue = 0;
-             pieceValue < PUZZLE_PIECE_COUNT;
-             pieceValue += SRandom(1, PUZZLE_RANDOM_STEP_MAXIMUM)) {
-            if (!BitTest(puzzlePiecesRemoved, pieceValue))
+    for (i = 0; (&i)[0] < pieceCount; i++) {
+        for (targetPiece = 0;
+             targetPiece < PUZZLE_PIECE_COUNT;
+             targetPiece += SRandom(1, PUZZLE_RANDOM_STEP_MAXIMUM)) {
+            if (!BitTest(puzzlePiecesRemoved, targetPiece))
                 break;
         }
 
@@ -958,12 +956,12 @@ i32 game::SetupPuzzlePieces(i32 player, i32 justCount) {
         }
         if (fallbackNum >= PUZZLE_PIECE_COUNT)
             fallbackNum = 0;
-        if (pieceValue < PUZZLE_PIECE_COUNT)
-            BitSet(puzzlePiecesRemoved, pieceValue);
+        if (targetPiece < PUZZLE_PIECE_COUNT)
+            BitSet(puzzlePiecesRemoved, targetPiece);
         else
             BitSet(puzzlePiecesRemoved, fallbackNum);
     }
-    return pieceCountTotal;
+    return pieceCount;
 }
 
 VA(0x0044cd3b, 0x95)
@@ -1118,160 +1116,162 @@ void GenerateStandardFileName(char* source, char* destination) {
 
 VA(0x0044d3ae, 0xb5a)
 i32 game::SaveGame(char* filename, i32 generateName, i8 expansionFormat) {
-    void* emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
+    i32 nHuman;
+    i32 saveFlag;
+    char workBuf[SAVE_LEGACY_SCRATCH_SIZE];
+    i32 scratchVals[SAVE_SPARE_SLOT_COUNT];
+    char savePath[SAVE_PATH_CAPACITY];
+    i32 outFile;
+    i32 iFile;
+    char genName[SAVE_PATH_CAPACITY];
+    char humans[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
+    char plBuf[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
+    void* emptyPayload;
+    i32 lastTag;
+    i32 chunkTag;
+    i32 oldTag;
+
+    emptyPayload = H2_ALLOC(GAME_SAVE_BUFFER_SIZE);
     memset(emptyPayload, 0, GAME_SAVE_BUFFER_SIZE);
     if (!xIsExpansionMap)
         expansionFormat = 1;
     gpAdvManager->DemobilizeCurrHero();
 
-    char savePathValue[SAVE_PATH_CAPACITY];
-    char generatedNameStorage[SAVE_PATH_CAPACITY];
-    i32 humanPlayersVar;
-    i32 indexFile;
-    i32 unusedTemp;
-    i32 oldFlag;
-    i32 saveValue;
-    i32 filePadding;
-    i32 compatibilityReserved;
     if (generateName) {
         if (gbInCampaign) {
-            sprintf(generatedNameStorage, "%s.%s", filename, "GMC");
+            sprintf(genName, "%s.%s", filename, "GMC");
         } else if (xIsPlayingExpansionCampaign) {
-            sprintf(generatedNameStorage, "%s.%s", filename, "GXC");
+            sprintf(genName, "%s.%s", filename, "GXC");
         } else {
-            humanPlayersVar = 0;
-            for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
-                if (m_playerDead[indexFile] == 0 && gbHumanPlayer[indexFile])
-                    humanPlayersVar++;
+            nHuman = 0;
+            for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
+                if (m_playerDead[iFile] == 0 && gbHumanPlayer[iFile])
+                    nHuman++;
             }
             if (xIsExpansionMap && !expansionFormat)
-                sprintf(generatedNameStorage, "%s.GX%d", filename, humanPlayersVar);
+                sprintf(genName, "%s.GX%d", filename, nHuman);
             else
-                sprintf(generatedNameStorage, "%s.GM%d", filename, humanPlayersVar);
+                sprintf(genName, "%s.GM%d", filename, nHuman);
         }
     } else {
-        sprintf(generatedNameStorage, filename);
+        sprintf(genName, filename);
     }
 
-    if (strnicmp(generatedNameStorage, "RMT", sizeof("RMT") - 1) == 0) {
-        sprintf(savePathValue, "%s%s", ".\\DATA\\", generatedNameStorage);
+    if (strnicmp(genName, "RMT", sizeof("RMT") - 1) == 0) {
+        sprintf(savePath, "%s%s", ".\\DATA\\", genName);
     } else {
-        sprintf(savePathValue, "%s%s", gcGamePath, generatedNameStorage);
-        if (strnicmp(generatedNameStorage, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
-            && strnicmp(generatedNameStorage, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
+        sprintf(savePath, "%s%s", gcGamePath, genName);
+        if (strnicmp(genName, "AUTOSAVE", sizeof("AUTOSAVE") - 1) != 0
+            && strnicmp(genName, "PLYREXIT", sizeof("PLYREXIT") - 1) != 0)
             strcpy(gpGame->m_saveName, filename);
     }
 
-    i32 handle = open(savePathValue, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (handle == -1)
-        FileError(savePathValue);
+    outFile = open(savePath, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (outFile == -1)
+        FileError(savePath);
 
-    i32 legacyMarkerTemp = -1;
+    oldTag = -1;
     if (!expansionFormat)
-        write(handle, &legacyMarkerTemp, sizeof(legacyMarkerTemp));
-    write(handle, &m_worldMap.width, sizeof(m_worldMap.width));
-    write(handle, &m_worldMap.height, sizeof(m_worldMap.height));
-    write(handle, &m_mapHeader, sizeof(m_mapHeader));
-    write(handle, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    write(handle, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, this, sizeof(m_difficultyRating));
-    write(handle, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    write(handle, cPlayerNames, sizeof(cPlayerNames));
+        write(outFile, &oldTag, sizeof(oldTag));
+    write(outFile, &m_worldMap.width, sizeof(m_worldMap.width));
+    write(outFile, &m_worldMap.height, sizeof(m_worldMap.height));
+    write(outFile, &m_mapHeader, sizeof(m_mapHeader));
+    write(outFile, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    write(outFile, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(outFile, this, sizeof(m_difficultyRating));
+    write(outFile, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(outFile, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(outFile, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(outFile, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    write(outFile, cPlayerNames, sizeof(cPlayerNames));
 
-    char legacyData[SAVE_LEGACY_SCRATCH_SIZE];
-    memset(legacyData, 0, SAVE_LEGACY_CLEAR_SIZE);
-    write(handle, legacyData, SAVE_LEGACY_SERIALIZED_SIZE);
+    memset(workBuf, 0, SAVE_LEGACY_CLEAR_SIZE);
+    write(outFile, workBuf, SAVE_LEGACY_SERIALIZED_SIZE);
     if (xIsPlayingExpansionCampaign) {
         i32 campaignTypeInfo = SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG;
-        write(handle, &campaignTypeInfo, sizeof(campaignTypeInfo));
-        write(handle, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        write(outFile, &campaignTypeInfo, sizeof(campaignTypeInfo));
+        write(outFile, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     } else {
-        write(handle, &gbInCampaign, sizeof(gbInCampaign));
+        write(outFile, &gbInCampaign, sizeof(gbInCampaign));
         if (gbInCampaign)
-            write(handle, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+            write(outFile, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     }
     if (!expansionFormat)
-        write(handle, &xIsExpansionMap, sizeof(xIsExpansionMap));
+        write(outFile, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    write(handle, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    GenerateStandardFileName(m_saveName, legacyData);
-    write(handle, legacyData, SAVE_STANDARD_FILENAME_SIZE);
-    write(handle, &m_playerCount, sizeof(m_playerCount));
-    char currentPlayerInfo[SAVE_CURRENT_PLAYER_SCRATCH_SIZE];
-    currentPlayerInfo[0] = static_cast<char>(giCurPlayer);
-    write(handle, currentPlayerInfo, sizeof(currentPlayerInfo[0]));
-    write(handle, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    write(handle, m_playerDead, sizeof(m_playerDead));
+    write(outFile, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    GenerateStandardFileName(m_saveName, workBuf);
+    write(outFile, workBuf, SAVE_STANDARD_FILENAME_SIZE);
+    write(outFile, &m_playerCount, sizeof(m_playerCount));
+    plBuf[0] = static_cast<char>(giCurPlayer);
+    write(outFile, plBuf, sizeof(plBuf[0]));
+    write(outFile, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    write(outFile, m_playerDead, sizeof(m_playerDead));
 
-    char humanFlagsLocal[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++) {
-        humanFlagsLocal[indexFile] = static_cast<char>(gbHumanPlayer[indexFile]);
-        if (m_playerDead[indexFile] != 0)
-            humanFlagsLocal[indexFile] = 0;
+    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++) {
+        humans[iFile] = static_cast<char>(gbHumanPlayer[iFile]);
+        if (m_playerDead[iFile] != 0)
+            humans[iFile] = 0;
     }
-    write(handle, humanFlagsLocal, GAME_PLAYER_COUNT);
-    write(handle, &m_day, sizeof(m_day));
-    write(handle, &m_week, sizeof(m_week));
-    write(handle, &m_month, sizeof(m_month));
-    for (indexFile = 0; indexFile < GAME_PLAYER_COUNT; indexFile++)
-        m_players[indexFile].Write(handle);
+    write(outFile, humans, GAME_PLAYER_COUNT);
+    write(outFile, &m_day, sizeof(m_day));
+    write(outFile, &m_week, sizeof(m_week));
+    write(outFile, &m_month, sizeof(m_month));
+    for (iFile = 0; iFile < GAME_PLAYER_COUNT; iFile++)
+        m_players[iFile].Write(outFile);
 
-    write(handle, &m_obeliskCount, sizeof(m_obeliskCount));
-    for (indexFile = 0; indexFile < GAME_HERO_COUNT; indexFile++)
-        m_heroRecs[indexFile].Write(handle, !expansionFormat);
-    write(handle, m_availableHeroes, sizeof(m_availableHeroes));
-    write(handle, m_castleRecs, sizeof(m_castleRecs));
-    write(handle, m_castleOwners, sizeof(m_castleOwners));
-    write(handle, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    write(handle, m_mines, sizeof(m_mines));
-    write(handle, m_mineOwners, sizeof(m_mineOwners));
+    write(outFile, &m_obeliskCount, sizeof(m_obeliskCount));
+    for (iFile = 0; iFile < GAME_HERO_COUNT; iFile++)
+        m_heroRecs[iFile].Write(outFile, !expansionFormat);
+    write(outFile, m_availableHeroes, sizeof(m_availableHeroes));
+    write(outFile, m_castleRecs, sizeof(m_castleRecs));
+    write(outFile, m_castleOwners, sizeof(m_castleOwners));
+    write(outFile, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    write(outFile, m_mines, sizeof(m_mines));
+    write(outFile, m_mineOwners, sizeof(m_mineOwners));
     if (!expansionFormat)
-        write(handle, m_randomArtifacts, IDX(ARTIFACT_COUNT));
+        write(outFile, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
-        write(handle, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    write(handle, m_boats, sizeof(m_boats));
-    write(handle, m_boatSlots, sizeof(m_boatSlots));
-    write(handle, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    write(handle, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    write(handle, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    write(handle, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    write(handle, m_rumour, sizeof(m_rumour));
-    write(handle, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    write(handle, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+        write(outFile, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    write(outFile, m_boats, sizeof(m_boats));
+    write(outFile, m_boatSlots, sizeof(m_boatSlots));
+    write(outFile, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    write(outFile, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    write(outFile, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    write(outFile, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    write(outFile, m_rumour, sizeof(m_rumour));
+    write(outFile, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    write(outFile, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     write(
-        handle,
+        outFile,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    write(handle, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(handle, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    write(handle, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    write(handle, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    write(outFile, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(outFile, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    write(outFile, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    write(outFile, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
-    i32 markerBuffer[SAVE_MARKER_SCRATCH_COUNT];
-    markerBuffer[0] = GAME_FILE_MARKER;
-    i32 unusedMarkerInfo = GAME_UNUSED_FILE_MARKER;
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    write(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    for (indexFile = 1; indexFile < iMaxMapExtra; indexFile++) {
-        write(handle, markerBuffer, sizeof(markerBuffer[0]));
-        write(handle, pwSizeOfMapExtra + indexFile, sizeof(pwSizeOfMapExtra[indexFile]));
-        if (ppMapExtra[indexFile] != NULL)
-            write(handle, ppMapExtra[indexFile], pwSizeOfMapExtra[indexFile]);
+    chunkTag = GAME_FILE_MARKER;
+    lastTag = GAME_UNUSED_FILE_MARKER;
+    write(outFile, &chunkTag, sizeof(chunkTag));
+    write(outFile, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    write(outFile, &chunkTag, sizeof(chunkTag));
+    for (iFile = 1; iFile < iMaxMapExtra; iFile++) {
+        write(outFile, &chunkTag, sizeof(chunkTag));
+        write(outFile, pwSizeOfMapExtra + iFile, sizeof(pwSizeOfMapExtra[iFile]));
+        if (ppMapExtra[iFile] != NULL)
+            write(outFile, ppMapExtra[iFile], pwSizeOfMapExtra[iFile]);
         else
-            write(handle, emptyPayload, pwSizeOfMapExtra[indexFile]);
+            write(outFile, emptyPayload, pwSizeOfMapExtra[iFile]);
     }
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    write(handle, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    m_worldMap.Write(handle);
-    write(handle, markerBuffer, sizeof(markerBuffer[0]));
-    close(handle);
+    write(outFile, &chunkTag, sizeof(chunkTag));
+    write(outFile, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    write(outFile, &chunkTag, sizeof(chunkTag));
+    m_worldMap.Write(outFile);
+    write(outFile, &chunkTag, sizeof(chunkTag));
+    close(outFile);
     H2_FREE(emptyPayload);
     return 1;
 }
@@ -1417,139 +1417,146 @@ void game::SetupOrigData(void) {
 
 VA(0x0044e8d9, 0xa79)
 void game::LoadGame(char* filename, i32 loadFromFile, i32) {
+    char workData[SAVE_LEGACY_CLEAR_SIZE];
+    i32 oldFlag;
+    char isHuman[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
+    i32 saveVal;
+    i32 rows;
+    char pathBuf[SAVE_PATH_CAPACITY];
+    i8 expTag;
+    i32 fd;
+    char junkBuf[SAVE_LEGACY_CLEAR_SIZE];
+    i32 ndx;
+    char plBuf[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
+    char chunkTag[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
+    i32 numHumans;
+    i32 wide;
+
     LogStr("LG1");
     if (loadFromFile) {
         SetupOrigData();
         return;
     }
     LogStr("LG2");
-    i32 humansLoaded3 = 0;
+    numHumans = 0;
     gbGameOver = false;
     m_gameLoaded = 1;
 
-    char path28[SAVE_PATH_CAPACITY];
     if (loadFromFile || strnicmp(filename, "RMT", sizeof("RMT") - 1) == 0)
-        sprintf(path28, "%s%s", ".\\DATA\\", filename);
+        sprintf(pathBuf, "%s%s", ".\\DATA\\", filename);
     else
-        sprintf(path28, "%s%s", gcGamePath, filename);
+        sprintf(pathBuf, "%s%s", gcGamePath, filename);
 
-    i32 file0 = open(path28, _O_BINARY);
-    if (file0 == -1)
-        FileError(path28);
+    fd = open(pathBuf, _O_BINARY);
+    if (fd == -1)
+        FileError(pathBuf);
     ClearMapExtra();
 
-    i8 expansionMarker0 = 0;
-    i32 width8;
-    i32 height9[LOAD_DIMENSION_SCRATCH_COUNT];
-    read(file0, &width8, sizeof(width8));
-    if (width8 == -1) {
-        expansionMarker0 = 1;
-        read(file0, &width8, sizeof(width8));
+    expTag = 0;
+    read(fd, &wide, sizeof(wide));
+    if (wide == -1) {
+        expTag = 1;
+        read(fd, &wide, sizeof(wide));
     }
-    read(file0, height9, sizeof(height9[0]));
-    SetMapSize(width8, height9[0]);
-    read(file0, &m_mapHeader, sizeof(m_mapHeader));
-    read(file0, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
-    read(file0, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, this, sizeof(m_difficultyRating));
-    read(file0, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
-    read(file0, cPlayerNames, sizeof(cPlayerNames));
+    read(fd, &rows, sizeof(rows));
+    SetMapSize(wide, rows);
+    read(fd, &m_mapHeader, sizeof(m_mapHeader));
+    read(fd, m_setupPlayerColor, CAMPAIGN_SETUP_RESET_SIZE);
+    read(fd, &gbIAmGreatest, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(fd, this, sizeof(m_difficultyRating));
+    read(fd, &giMonthType, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(fd, &giMonthTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(fd, &giWeekType, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(fd, &giWeekTypeExtra, SAVE_TRUNCATED_SCALAR_SIZE);
+    read(fd, cPlayerNames, sizeof(cPlayerNames));
 
-    char oldData3[SAVE_LEGACY_CLEAR_SIZE];
-    read(file0, oldData3, SAVE_LEGACY_SERIALIZED_SIZE);
-    read(file0, &gbInCampaign, sizeof(gbInCampaign));
+    read(fd, workData, SAVE_LEGACY_SERIALIZED_SIZE);
+    read(fd, &gbInCampaign, sizeof(gbInCampaign));
     if (gbInCampaign == 1) {
-        read(file0, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
+        read(fd, &m_campaignType, CAMPAIGN_STATE_RESET_SIZE);
     } else if (gbInCampaign == SAVE_EXPANSION_CAMPAIGN_FORMAT_TAG) {
         xIsPlayingExpansionCampaign = 1;
         gbInCampaign = false;
-        read(file0, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
+        read(fd, &xCampaign, CAMPAIGN_SAVE_PREFIX_SIZE);
     }
-    if (expansionMarker0)
-        read(file0, &xIsExpansionMap, sizeof(xIsExpansionMap));
+    if (expTag)
+        read(fd, &xIsExpansionMap, sizeof(xIsExpansionMap));
 
     gpAdvManager->PurgeMapChangeQueue();
-    read(file0, &giMapChangeCtr, sizeof(giMapChangeCtr));
-    read(file0, oldData3, SAVE_STANDARD_FILENAME_SIZE);
+    read(fd, &giMapChangeCtr, sizeof(giMapChangeCtr));
+    read(fd, workData, SAVE_STANDARD_FILENAME_SIZE);
     if (strnicmp(filename, "RMT", sizeof("RMT") - 1) != 0)
         sprintf(gpGame->m_saveName, filename);
-    read(file0, &m_playerCount, sizeof(m_playerCount));
+    read(fd, &m_playerCount, sizeof(m_playerCount));
 
-    char currentPlayer6[LOAD_CURRENT_PLAYER_SCRATCH_SIZE];
-    read(file0, currentPlayer6, sizeof(currentPlayer6[0]));
-    giCurPlayer = currentPlayer6[0];
-    read(file0, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
-    read(file0, m_playerDead, sizeof(m_playerDead));
+    read(fd, plBuf, sizeof(plBuf[0]));
+    giCurPlayer = plBuf[0];
+    read(fd, &m_deadPlayerCount, sizeof(m_deadPlayerCount));
+    read(fd, m_playerDead, sizeof(m_playerDead));
 
-    char humanFlags1[SAVE_PLAYER_FLAGS_SCRATCH_SIZE];
-    read(file0, humanFlags1, GAME_PLAYER_COUNT);
-    i32 i29;
-    for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
-        if (humanFlags1[i29] && humansLoaded3 < (&giNumHumanPlayers)[0]) {
-            humansLoaded3++;
-            gbHumanPlayer[i29] = 1;
+    read(fd, isHuman, GAME_PLAYER_COUNT);
+    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
+        if (isHuman[ndx] && numHumans < (&giNumHumanPlayers)[0]) {
+            numHumans++;
+            gbHumanPlayer[ndx] = 1;
         } else {
-            gbHumanPlayer[i29] = 0;
+            gbHumanPlayer[ndx] = 0;
         }
     }
-    for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++) {
-        if (gbHumanPlayer[i29]) {
-            if (!gbRemoteOn || (&i29)[0] == giThisGamePos)
-                gbThisNetHumanPlayer[i29] = 1;
+    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++) {
+        if (gbHumanPlayer[ndx]) {
+            if (!gbRemoteOn || (&ndx)[0] == giThisGamePos)
+                gbThisNetHumanPlayer[ndx] = 1;
             else
-                gbThisNetHumanPlayer[i29] = 0;
+                gbThisNetHumanPlayer[ndx] = 0;
         } else {
-            gbThisNetHumanPlayer[i29] = 0;
+            gbThisNetHumanPlayer[ndx] = 0;
         }
     }
 
-    read(file0, &m_day, sizeof(m_day));
-    read(file0, &m_week, sizeof(m_week));
-    read(file0, &m_month, sizeof(m_month));
-    giCurTurn = (m_week - 1) * EVENT_DAYS_PER_WEEK
-                + (m_month - 1) * EVENT_DAYS_PER_MONTH + m_day;
-    for (i29 = 0; i29 < GAME_PLAYER_COUNT; i29++)
-        m_players[i29].Read(file0);
+    read(fd, &m_day, sizeof(m_day));
+    read(fd, &m_week, sizeof(m_week));
+    read(fd, &m_month, sizeof(m_month));
+    giCurTurn = m_day + (m_week - 1) * EVENT_DAYS_PER_WEEK
+                + (m_month - 1) * EVENT_DAYS_PER_MONTH;
+    for (ndx = 0; ndx < GAME_PLAYER_COUNT; ndx++)
+        m_players[ndx].Read(fd);
 
-    read(file0, &m_obeliskCount, sizeof(m_obeliskCount));
-    for (i29 = 0; i29 < GAME_HERO_COUNT; i29++)
-        m_heroRecs[i29].Read(file0, expansionMarker0);
-    read(file0, m_availableHeroes, sizeof(m_availableHeroes));
-    read(file0, m_castleRecs, sizeof(m_castleRecs));
-    read(file0, m_castleOwners, sizeof(m_castleOwners));
-    read(file0, m_dailyEventFlags, sizeof(m_dailyEventFlags));
-    read(file0, m_mines, sizeof(m_mines));
-    read(file0, m_mineOwners, sizeof(m_mineOwners));
-    if (expansionMarker0)
-        read(file0, m_randomArtifacts, IDX(ARTIFACT_COUNT));
+    read(fd, &m_obeliskCount, sizeof(m_obeliskCount));
+    for (ndx = 0; ndx < GAME_HERO_COUNT; ndx++)
+        m_heroRecs[ndx].Read(fd, expTag);
+    read(fd, m_availableHeroes, sizeof(m_availableHeroes));
+    read(fd, m_castleRecs, sizeof(m_castleRecs));
+    read(fd, m_castleOwners, sizeof(m_castleOwners));
+    read(fd, m_dailyEventFlags, sizeof(m_dailyEventFlags));
+    read(fd, m_mines, sizeof(m_mines));
+    read(fd, m_mineOwners, sizeof(m_mineOwners));
+    if (expTag)
+        read(fd, m_randomArtifacts, IDX(ARTIFACT_COUNT));
     else
-        read(file0, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
-    read(file0, m_boats, sizeof(m_boats));
-    read(file0, m_boatSlots, sizeof(m_boatSlots));
-    read(file0, m_obeliskVisitors, sizeof(m_obeliskVisitors));
-    read(file0, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
-    read(file0, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
-    read(file0, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
-    read(file0, m_rumour, sizeof(m_rumour));
-    read(file0, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
-    read(file0, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
+        read(fd, m_randomArtifacts, ARTIFACT_BASE_TABLE_SIZE);
+    read(fd, m_boats, sizeof(m_boats));
+    read(fd, m_boatSlots, sizeof(m_boatSlots));
+    read(fd, m_obeliskVisitors, sizeof(m_obeliskVisitors));
+    read(fd, &m_ultimateArtifactX, sizeof(m_ultimateArtifactX));
+    read(fd, &m_ultimateArtifactY, sizeof(m_ultimateArtifactY));
+    read(fd, &m_ultimateArtifactId, sizeof(m_ultimateArtifactId));
+    read(fd, m_rumour, sizeof(m_rumour));
+    read(fd, m_defaultPlayerNames, sizeof(m_defaultPlayerNames));
+    read(fd, &m_rumourEventCount, SAVE_EVENT_HEADER_SIZE);
     read(
-        file0,
+        fd,
         m_rumourEventIndices,
         m_rumourEventCount * sizeof(m_rumourEventIndices[0])
     );
-    read(file0, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(file0, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
-    read(file0, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
-    read(file0, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
+    read(fd, &m_timeEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(fd, m_timeEventIndices, m_timeEventCount * sizeof(m_timeEventIndices[0]));
+    read(fd, &m_mapEventCount, SAVE_EVENT_HEADER_SIZE);
+    read(fd, m_mapEventIndices, m_mapEventCount * sizeof(m_mapEventIndices[0]));
 
-    char marker0[LOAD_MARKER_SCRATCH_SIZE];
-    read(file0, marker0, sizeof(i32));
-    read(file0, &iMaxMapExtra, sizeof(iMaxMapExtra));
-    read(file0, marker0, sizeof(i32));
+    read(fd, chunkTag, sizeof(i32));
+    read(fd, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    read(fd, chunkTag, sizeof(i32));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(*ppMapExtra))
     );
@@ -1558,18 +1565,18 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(*ppMapExtra));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(*pwSizeOfMapExtra));
-    for (i29 = 1; (&i29)[0] < iMaxMapExtra; i29++) {
-        read(file0, marker0, sizeof(i32));
-        read(file0, pwSizeOfMapExtra + i29, sizeof(pwSizeOfMapExtra[i29]));
-        ppMapExtra[i29] = H2_ALLOC(pwSizeOfMapExtra[i29]);
-        read(file0, ppMapExtra[i29], pwSizeOfMapExtra[i29]);
+    for (ndx = 1; (&ndx)[0] < iMaxMapExtra; ndx++) {
+        read(fd, chunkTag, sizeof(i32));
+        read(fd, pwSizeOfMapExtra + ndx, sizeof(pwSizeOfMapExtra[ndx]));
+        ppMapExtra[ndx] = H2_ALLOC(pwSizeOfMapExtra[ndx]);
+        read(fd, ppMapExtra[ndx], pwSizeOfMapExtra[ndx]);
     }
-    read(file0, marker0, sizeof(i32));
-    read(file0, mapExtra, MAP_WIDTH * MAP_HEIGHT);
-    read(file0, marker0, sizeof(i32));
-    m_worldMap.Read(file0, 0);
-    read(file0, marker0, sizeof(i32));
-    close(file0);
+    read(fd, chunkTag, sizeof(i32));
+    read(fd, mapExtra, MAP_WIDTH * MAP_HEIGHT);
+    read(fd, chunkTag, sizeof(i32));
+    m_worldMap.Read(fd, 0);
+    read(fd, chunkTag, sizeof(i32));
+    close(fd);
 
     gpAdvManager->m_heroContextLocked = 0;
     gpCurPlayer = &gpGame->m_players[giCurPlayer];
@@ -1732,29 +1739,29 @@ void game::GiveTroopsToNeutralTowns(void) {
 
 VA(0x0044f755, 0x1c7a)
 void game::NewMap(char* filename) {
-    char* extension0;
-    FactionType randomColor2;
-    i32 nextHuman6;
-    i32 player2;
-    i32 townIndex9;
-    i32 heroIndex1;
-    i32 pass27;
-    i32 selectedTown14;
-    i32 ultimateDistance5;
-    i32 ultimateTries4;
-    i32 campaignHero15;
-    FactionType heroClass5;
-    i32 heroX6;
-    i32 heroY16;
-    i8 setupClass12;
-    FactionType specialFaction6;
-    HeroPortrait specialPortrait6;
-    char* specialName3;
-    FactionType specialClass6;
-    i32 resource13;
+    FactionType sideClass;
+    char* heroName;
+    HeroPortrait curPic;
+    FactionType specClass;
+    i32 awardHero;
+    i32 padNum;
+    i32 selectedTown;
+    i32 heroIndex;
+    i32 humanPos;
+    FactionType startClass;
+    i32 nTown;
+    i32 player;
+    i32 yPos;
+    i32 ultimateTries;
+    i32 xPos;
+    FactionType race;
+    char* dotPos;
+    i32 junkVal;
+    i32 iPass;
+    i32 ultimateDistance;
 
-    extension0 = FindLastToken(gMapName, '.');
-    if (extension0 != NULL && StrEqNoCase(extension0 + 1, "MX2"))
+    dotPos = FindLastToken(gMapName, '.');
+    if (dotPos != NULL && StrEqNoCase(dotPos + 1, "MX2"))
         xIsExpansionMap = 1;
     if (xIsExpansionMap)
         gTownEligibleBuildMask[IDX(FACTION_NECROMANCER)] |= NECROMANCER_SHRINE_BUILD_MASK;
@@ -1767,40 +1774,40 @@ void game::NewMap(char* filename) {
     giCurPlayerBit = static_cast<u8>(1 << giCurPlayer);
     giCurWatchPlayerBit = giCurPlayerBit;
     giCurWatchPlayer = giCurPlayer;
-    randomColor2 = static_cast<FactionType>(Random(0, GAME_PLAYER_COUNT - 1));
-    nextHuman6 = giNumHumanPlayers;
+    race = static_cast<FactionType>(Random(0, GAME_PLAYER_COUNT - 1));
+    humanPos = giNumHumanPlayers;
 
-    for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-        if (player2 >= gpGame->m_mapHeader.playerCount) {
-            gbSetupGamePosToRealGamePos[player2] = -1;
+    for (player = 0; player < GAME_PLAYER_COUNT; player++) {
+        if (player >= gpGame->m_mapHeader.playerCount) {
+            gbSetupGamePosToRealGamePos[player] = -1;
         } else {
-            if (m_setupPlayerNetworkId[player2] == GAME_COMPUTER_PLAYER)
-                gbSetupGamePosToRealGamePos[player2] = static_cast<i8>(nextHuman6++);
+            if (m_setupPlayerNetworkId[player] == GAME_COMPUTER_PLAYER)
+                gbSetupGamePosToRealGamePos[player] = static_cast<i8>(humanPos++);
             else
-                gbSetupGamePosToRealGamePos[player2] = m_setupPlayerNetworkId[player2];
+                gbSetupGamePosToRealGamePos[player] = m_setupPlayerNetworkId[player];
         }
     }
-    for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-        m_players[player2].m_color = -1;
-        gcColorToPlayerPos[player2] = -1;
-        gcColorToSetupPos[player2] = -1;
-        if (gpGame->m_setupPlayerRace[player2] == FACTION_RANDOM)
-            gpGame->m_setupPlayerRace[player2] = randomColor2;
-        randomColor2 = (randomColor2 + 1) % GAME_PLAYER_COUNT;
+    for (player = 0; player < GAME_PLAYER_COUNT; player++) {
+        m_players[player].m_color = -1;
+        gcColorToPlayerPos[player] = -1;
+        gcColorToSetupPos[player] = -1;
+        if (gpGame->m_setupPlayerRace[player] == FACTION_RANDOM)
+            gpGame->m_setupPlayerRace[player] = race;
+        race = (race + 1) % GAME_PLAYER_COUNT;
     }
-    for (player2 = 0; player2 < m_playerCount; player2++)
-        gcColorToSetupPos[m_setupPlayerColor[player2]] = static_cast<i8>(player2);
-    for (player2 = 0; player2 < m_playerCount; player2++)
-        m_players[gbSetupGamePosToRealGamePos[player2]].m_color = m_setupPlayerColor[player2];
-    for (player2 = 0; player2 < m_playerCount; player2++)
-        gcColorToPlayerPos[m_players[player2].m_color] = static_cast<i8>(player2);
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        m_players[player2].m_townCount = 0;
-        m_players[player2].m_townLocatorPage = 0;
-        m_players[player2].m_currentTown = -1;
-        m_players[player2].m_heroCount = 0;
-        m_players[player2].m_heroLocatorPage = 0;
-        m_players[player2].m_currentHero = -1;
+    for (player = 0; player < m_playerCount; player++)
+        gcColorToSetupPos[m_setupPlayerColor[player]] = static_cast<i8>(player);
+    for (player = 0; player < m_playerCount; player++)
+        m_players[gbSetupGamePosToRealGamePos[player]].m_color = m_setupPlayerColor[player];
+    for (player = 0; player < m_playerCount; player++)
+        gcColorToPlayerPos[m_players[player].m_color] = static_cast<i8>(player);
+    for (player = 0; player < m_playerCount; player++) {
+        m_players[player].m_townCount = 0;
+        m_players[player].m_townLocatorPage = 0;
+        m_players[player].m_currentTown = -1;
+        m_players[player].m_heroCount = 0;
+        m_players[player].m_heroLocatorPage = 0;
+        m_players[player].m_currentHero = -1;
     }
 
     RandomizeHeroPool();
@@ -1811,13 +1818,13 @@ void game::NewMap(char* filename) {
     ProcessMapExtra();
     SetupTowns();
     InitializePasswords();
-    for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++)
-        m_players[player2].m_barrierTents = 0;
+    for (player = 0; player < GAME_PLAYER_COUNT; player++)
+        m_players[player].m_barrierTents = 0;
     RandomizeEvents();
     ProcessOnMapHeroes();
     m_deadPlayerCount = 0;
-    for (player2 = m_playerCount; player2 < GAME_PLAYER_COUNT; player2++)
-        m_playerDead[player2] = 1;
+    for (player = m_playerCount; player < GAME_PLAYER_COUNT; player++)
+        m_playerDead[player] = 1;
 
     if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE
         || m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
@@ -1825,208 +1832,207 @@ void game::NewMap(char* filename) {
         m_mapHeader.allowNormalVictory = 0;
     }
     if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_SIDE) {
-        townIndex9 = 0;
-        for (player2 = 0; player2 < GAME_PLAYER_COUNT; player2++) {
-            if (m_mapHeader.playerEnabled[player2] != 0)
-                townIndex9++;
-            if (m_mapHeader.victoryConditionValue + 1 == townIndex9) {
-                m_mapHeader.victorySideThreshold = static_cast<u16>(player2);
-                player2 = VICTORY_SIDE_SEARCH_DONE;
+        nTown = 0;
+        for (player = 0; player < GAME_PLAYER_COUNT; player++) {
+            if (m_mapHeader.playerEnabled[player] != 0)
+                nTown++;
+            if (nTown == m_mapHeader.victoryConditionValue + 1) {
+                m_mapHeader.victorySideThreshold = static_cast<u16>(player);
+                player = VICTORY_SIDE_SEARCH_DONE;
             }
         }
     }
     if (m_mapHeader.victoryCondition == MAP_VICTORY_FIND_ARTIFACT)
         m_mapHeader.computerAlsoWins = 1;
 
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        m_players[player2].m_ultimateArtifactHintChance = 0;
-        m_players[player2].m_ultimateArtifactHintX = -1;
-        m_players[player2].m_ultimateArtifactHintY = -1;
-        heroIndex1 = 0;
-        selectedTown14 = -1;
-        if (m_mapHeader.unknown25 == 0 && m_players[player2].m_townCount > 0) {
-            for (pass27 = 0; pass27 < STARTING_HERO_TOWN_PASS_COUNT; pass27++) {
-                for (townIndex9 = 0; townIndex9 < m_players[player2].m_townCount; townIndex9++) {
-                    if (selectedTown14 == -1
-                        && m_castleRecs[(m_players + player2)->m_townIds[townIndex9]]
+    for (player = 0; player < m_playerCount; player++) {
+        m_players[player].m_ultimateArtifactHintChance = 0;
+        m_players[player].m_ultimateArtifactHintX = -1;
+        m_players[player].m_ultimateArtifactHintY = -1;
+        heroIndex = 0;
+        selectedTown = -1;
+        if (m_mapHeader.unknown25 == 0 && m_players[player].m_townCount > 0) {
+            for (iPass = 0; iPass < STARTING_HERO_TOWN_PASS_COUNT; iPass++) {
+                for (nTown = 0; nTown < m_players[player].m_townCount; nTown++) {
+                    if (selectedTown == -1
+                        && m_castleRecs[(m_players + player)->m_townIds[nTown]]
                                    .m_occupyingHeroId
                                == -1
-                        && ((m_castleRecs[(m_players + player2)->m_townIds[townIndex9]].m_buildings
+                        && ((m_castleRecs[(m_players + player)->m_townIds[nTown]].m_buildings
                              & IDX(TOWN_BUILDING_CASTLE))
                                 != 0
-                            || pass27 == STARTING_HERO_ALLOW_NON_CASTLE_PASS))
-                        selectedTown14 = townIndex9;
+                            || iPass == STARTING_HERO_ALLOW_NON_CASTLE_PASS))
+                        selectedTown = nTown;
                 }
             }
         }
-        if (selectedTown14 != -1) {
-            m_players[player2].m_heroIds[m_players[player2].m_heroCount] =
+        if (selectedTown != -1) {
+            m_players[player].m_heroIds[m_players[player].m_heroCount] =
                 static_cast<i8>(GetNewHeroId(
-                    player2,
-                    m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_type,
+                    player,
+                    m_castleRecs[m_players[player].m_townIds[selectedTown]].m_type,
                     0
                 ));
-            m_availableHeroes[m_players[player2].m_heroIds[m_players[player2].m_heroCount]] =
-                static_cast<i8>(player2);
-            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_owner =
-                static_cast<i8>(player2);
-            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x =
-                m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_x;
-            m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y =
-                m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_y;
-            m_castleRecs[m_players[player2].m_townIds[selectedTown14]].m_occupyingHeroId =
-                m_players[player2].m_heroIds[m_players[player2].m_heroCount];
+            m_availableHeroes[m_players[player].m_heroIds[m_players[player].m_heroCount]] =
+                static_cast<i8>(player);
+            m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_owner =
+                static_cast<i8>(player);
+            m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_x =
+                m_castleRecs[m_players[player].m_townIds[selectedTown]].m_x;
+            m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_y =
+                m_castleRecs[m_players[player].m_townIds[selectedTown]].m_y;
+            m_castleRecs[m_players[player].m_townIds[selectedTown]].m_occupyingHeroId =
+                m_players[player].m_heroIds[m_players[player].m_heroCount];
             SetVisibility(
-                m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_x,
-                m_heroRecs[m_players[player2].m_heroIds[m_players[player2].m_heroCount]].m_y,
-                player2,
-                giVisRange[static_cast<i8>(
-                    m_heroRecs[m_players[player2].m_heroIds[0]].m_cursorType)]
+                m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_x,
+                m_heroRecs[m_players[player].m_heroIds[m_players[player].m_heroCount]].m_y,
+                player,
+                giVisRange[IDX(m_heroRecs[m_players[player].m_heroIds[0]]
+                                   .m_secondarySkills[IDX(HERO_SKILL_SCOUTING)])]
             );
-            m_players[player2].m_heroCount++;
+            m_players[player].m_heroCount++;
         }
     }
 
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        if (player2 == 0 && gbInCampaign
+    for (player = 0; player < m_playerCount; player++) {
+        if (player == 0 && gbInCampaign
             && (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0
-                || m_campaignAwards[IDX(CAMPAIGN_AWARD_DWARFBANE)] != 0)) {
-            if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0)
-                specialFaction6 = FACTION_SORCERESS;
-            else
-                specialFaction6 = FACTION_NECROMANCER;
-            for (campaignHero15 = 0; campaignHero15 < GAME_HERO_COUNT; campaignHero15++) {
-                if (m_heroRecs[campaignHero15].m_cursorType == specialFaction6
-                    && m_availableHeroes[campaignHero15] == -1)
+                || m_campaignAwards[IDX(CAMPAIGN_AWARD_NECROMANCER_GUILD)] != 0)) {
+            specClass = m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)]
+                                  ? FACTION_SORCERESS
+                                  : FACTION_NECROMANCER;
+            for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
+                if (m_heroRecs[awardHero].m_cursorType == specClass
+                    && m_availableHeroes[awardHero] == -1)
                     break;
             }
-            if (campaignHero15 < GAME_HERO_COUNT) {
+            if (awardHero < GAME_HERO_COUNT) {
                 if (m_campaignAwards[IDX(CAMPAIGN_AWARD_SORCERESS_GUILD)] != 0) {
-                    m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[campaignHero15].CheckLevel();
-                    strcpy(m_heroRecs[campaignHero15].m_name, "Sister Eliza");
-                    m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_ELIZA;
+                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
+                    m_heroRecs[awardHero].CheckLevel();
+                    strcpy(m_heroRecs[awardHero].m_name, "Sister Eliza");
+                    m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_ELIZA;
                 } else {
-                    m_heroRecs[campaignHero15].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
-                    m_heroRecs[campaignHero15].CheckLevel();
-                    strcpy(m_heroRecs[campaignHero15].m_name, "Brother Brax");
-                    m_heroRecs[campaignHero15].m_portrait = CAMPAIGN_HERO_BRAX;
+                    m_heroRecs[awardHero].m_experience += CAMPAIGN_EXPERIENCE_BONUS;
+                    m_heroRecs[awardHero].CheckLevel();
+                    strcpy(m_heroRecs[awardHero].m_name, "Brother Brax");
+                    m_heroRecs[awardHero].m_portrait = CAMPAIGN_HERO_BRAX;
                 }
-                m_players[player2].m_availableHeroIds[0] = static_cast<char>(campaignHero15);
-                m_availableHeroes[m_players[player2].m_availableHeroIds[0]] =
+                m_players[player].m_availableHeroIds[0] = static_cast<char>(awardHero);
+                m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                     WEEKLY_AVAILABLE_HERO;
-                heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
+                startClass = m_heroRecs[awardHero].m_cursorType;
                 goto secondHero;
             }
         }
         {
-            if (xIsPlayingExpansionCampaign && player2 == 0) {
-                specialClass6 = FACTION_ANY;
+            if (xIsPlayingExpansionCampaign && player == 0) {
+                specClass = FACTION_ANY;
                 if (xCampaign.HasAward(AWARD_WAYWARD_SON)) {
-                    specialClass6 = FACTION_WIZARD;
-                    specialName3 = xCampaign.JosephName();
-                    specialPortrait6 = EXPANSION_HERO_JOSEPH_PORTRAIT;
+                    specClass = FACTION_WIZARD;
+                    heroName = xCampaign.JosephName();
+                    curPic = EXPANSION_HERO_JOSEPH_PORTRAIT;
                 } else if (xCampaign.HasAward(AWARD_UNCLE_IVAN)) {
-                    specialClass6 = FACTION_BARBARIAN;
-                    specialName3 = xCampaign.IvanName();
-                    specialPortrait6 = EXPANSION_HERO_IVAN_PORTRAIT;
+                    specClass = FACTION_BARBARIAN;
+                    heroName = xCampaign.IvanName();
+                    curPic = EXPANSION_HERO_IVAN_PORTRAIT;
                 }
-                if (specialClass6 != FACTION_ANY) {
-                    for (campaignHero15 = 0; campaignHero15 < GAME_HERO_COUNT; campaignHero15++) {
-                        if (m_heroRecs[campaignHero15].m_cursorType == specialClass6
-                            && m_availableHeroes[campaignHero15] == -1)
+                if (specClass != FACTION_ANY) {
+                    for (awardHero = 0; awardHero < GAME_HERO_COUNT; awardHero++) {
+                        if (m_heroRecs[awardHero].m_cursorType == specClass
+                            && m_availableHeroes[awardHero] == -1)
                             break;
                     }
-                    if (campaignHero15 < GAME_HERO_COUNT) {
-                        m_heroRecs[campaignHero15].m_experience = CAMPAIGN_EXPERIENCE_BONUS;
-                        m_heroRecs[campaignHero15].CheckLevel();
-                        strcpy(m_heroRecs[campaignHero15].m_name, specialName3);
-                        m_heroRecs[campaignHero15].m_portrait = specialPortrait6;
-                        m_players[player2].m_availableHeroIds[0] =
-                            static_cast<char>(campaignHero15);
-                        m_availableHeroes[m_players[player2].m_availableHeroIds[0]] =
+                    if (awardHero < GAME_HERO_COUNT) {
+                        m_heroRecs[awardHero].m_experience = CAMPAIGN_EXPERIENCE_BONUS;
+                        m_heroRecs[awardHero].CheckLevel();
+                        strcpy(m_heroRecs[awardHero].m_name, heroName);
+                        m_heroRecs[awardHero].m_portrait = curPic;
+                        m_players[player].m_availableHeroIds[0] =
+                            static_cast<char>(awardHero);
+                        m_availableHeroes[m_players[player].m_availableHeroIds[0]] =
                             WEEKLY_AVAILABLE_HERO;
-                        heroClass5 = m_heroRecs[campaignHero15].m_cursorType;
+                        startClass = m_heroRecs[awardHero].m_cursorType;
                         goto secondHero;
                     }
                 }
             }
-            heroClass5 = static_cast<FactionType>(Random(0, IDX(FACTION_COUNT) - 1));
-            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+            startClass = static_cast<FactionType>(Random(0, IDX(FACTION_COUNT) - 1));
+            if (m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]]
                 < FACTION_COUNT)
-                heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
-            m_players[player2].m_availableHeroIds[0] =
-                static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-            m_availableHeroes[m_players[player2].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
+                startClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
+            m_players[player].m_availableHeroIds[0] =
+                static_cast<char>(GetNewHeroId(player, startClass, 0));
+            m_availableHeroes[m_players[player].m_availableHeroIds[0]] = WEEKLY_AVAILABLE_HERO;
         }
     secondHero:
-        heroClass5 = (heroClass5 + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
-        m_players[player2].m_availableHeroIds[1] =
-            static_cast<char>(GetNewHeroId(player2, heroClass5, 0));
-        m_availableHeroes[m_players[player2].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
+        startClass = (startClass + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
+        m_players[player].m_availableHeroIds[1] =
+            static_cast<char>(GetNewHeroId(player, startClass, 0));
+        m_availableHeroes[m_players[player].m_availableHeroIds[1]] = WEEKLY_AVAILABLE_HERO;
     }
 
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        for (campaignHero15 = 0; campaignHero15 < m_players[player2].m_heroCount;
-             campaignHero15++) {
-            heroX6 = m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_x;
-            heroY16 = m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_y;
-            m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_locationType =
-                m_worldMap.GetCell(heroX6, heroY16)->m_triggerType;
-            m_heroRecs[m_players[player2].m_heroIds[campaignHero15]].m_occupiedTown =
-                m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata;
-            m_worldMap.GetCell(heroX6, heroY16)->m_triggerType =
+    for (player = 0; player < m_playerCount; player++) {
+        for (nTown = 0; nTown < m_players[player].m_heroCount;
+             nTown++) {
+            xPos = m_heroRecs[m_players[player].m_heroIds[nTown]].m_x;
+            yPos = m_heroRecs[m_players[player].m_heroIds[nTown]].m_y;
+            m_heroRecs[m_players[player].m_heroIds[nTown]].m_locationType =
+                m_worldMap.GetCell(xPos, yPos)->m_triggerType;
+            m_heroRecs[m_players[player].m_heroIds[nTown]].m_occupiedTown =
+                m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
+            m_worldMap.GetCell(xPos, yPos)->m_triggerType =
                 MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION;
-            m_worldMap.GetCell(heroX6, heroY16)->m_objectMetadata =
-                m_players[player2].m_heroIds[campaignHero15];
+            m_worldMap.GetCell(xPos, yPos)->m_objectMetadata =
+                m_players[player].m_heroIds[nTown];
         }
-        if (m_players[player2].m_heroCount > 0)
-            m_players[player2].m_currentHero = m_players[player2].m_heroIds[0];
-        else if (m_players[player2].m_townCount > 0)
-            m_players[player2].m_currentTown = m_players[player2].m_townIds[0];
+        if (m_players[player].m_heroCount > 0)
+            m_players[player].m_currentHero = m_players[player].m_heroIds[0];
+        else if (m_players[player].m_townCount > 0)
+            m_players[player].m_currentTown = m_players[player].m_townIds[0];
     }
 
-    player2 = -1;
-    townIndex9 = -1;
-    ultimateTries4 = 0;
-    ultimateDistance5 =
+    player = -1;
+    nTown = -1;
+    ultimateTries = 0;
+    ultimateDistance =
         Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
         + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
         + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
-    while (player2 < ULTIMATE_ARTIFACT_BORDER_MARGIN
-           || townIndex9 < ULTIMATE_ARTIFACT_BORDER_MARGIN
-           || player2 > MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
-           || townIndex9 > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
-           || m_worldMap.GetCell(player2, townIndex9)->m_objectIndex != MAPCELL_SPRITE_NONE
-           || m_worldMap.GetCell(player2, townIndex9)->m_overlayIndex != MAPCELL_SPRITE_NONE
-           || giGroundToTerrain[m_worldMap.GetCell(player2, townIndex9)->m_terrainImageIndex]
+    while (player < ULTIMATE_ARTIFACT_BORDER_MARGIN
+           || nTown < ULTIMATE_ARTIFACT_BORDER_MARGIN
+           || player > MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
+           || nTown > MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
+           || m_worldMap.GetCell(player, nTown)->m_objectIndex != MAPCELL_SPRITE_NONE
+           || m_worldMap.GetCell(player, nTown)->m_overlayIndex != MAPCELL_SPRITE_NONE
+           || giGroundToTerrain[m_worldMap.GetCell(player, nTown)->m_terrainImageIndex]
                   == TERRAIN_WATER
            || (giNumHumanPlayers == 1
-               && ultimateTries4 < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
-               && ultimateDistance5
-                      >= abs(player2 - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
-                             + abs(townIndex9 - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
-        if (ultimateTries4 < ULTIMATE_SEARCH_REGION_RETRY_LIMIT && giUABaseX > 0) {
-            player2 = giUABaseX + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
-            townIndex9 = giUABaseY + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
+               && ultimateTries < ULTIMATE_HUMAN_DISTANCE_RETRY_LIMIT
+               && ultimateDistance
+                      >= abs(player - m_heroRecs[m_players[0].m_heroIds[0]].m_x)
+                             + abs(nTown - m_heroRecs[m_players[0].m_heroIds[0]].m_y))) {
+        if (ultimateTries < ULTIMATE_SEARCH_REGION_RETRY_LIMIT && giUABaseX > 0) {
+            player = giUABaseX + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
+            nTown = giUABaseY + (giUARadius != 0 ? Random(-giUARadius, giUARadius) : 0);
         } else {
-            player2 = Random(
+            player = Random(
                 ULTIMATE_ARTIFACT_BORDER_MARGIN,
                 MAP_WIDTH - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
             );
-            townIndex9 = Random(
+            nTown = Random(
                 ULTIMATE_ARTIFACT_BORDER_MARGIN,
                 MAP_HEIGHT - ULTIMATE_ARTIFACT_BORDER_MARGIN - 1
             );
         }
-        ultimateDistance5 =
+        ultimateDistance =
             Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
             + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_COMMON_ROLL_MAX)
             + Random(ULTIMATE_DISTANCE_ROLL_MIN, ULTIMATE_DISTANCE_BONUS_ROLL_MAX);
-        ultimateTries4++;
+        ultimateTries++;
     }
-    m_ultimateArtifactX = static_cast<i8>(player2);
-    m_ultimateArtifactY = static_cast<i8>(townIndex9);
+    m_ultimateArtifactX = static_cast<i8>(player);
+    m_ultimateArtifactY = static_cast<i8>(nTown);
     m_ultimateArtifactId =
         static_cast<ArtifactType>(Random(IDX(ARTIFACT_ULTIMATE_BOOK), IDX(ARTIFACT_GOLDEN_GOOSE)));
     if (gbInCampaign
@@ -2037,94 +2043,98 @@ void game::NewMap(char* filename) {
                 && m_campaignScenario + CAMPAIGN_SCENARIO_NUMBER_OFFSET
                        == CAMPAIGN_ARCHIBALD_ULTIMATE_CROWN_SCENARIO)))
         m_ultimateArtifactId = ARTIFACT_ULTIMATE_CROWN;
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        if (gbHumanPlayer[player2]) {
-            m_players[player2].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
+    for (player = 0; player < m_playerCount; player++) {
+        if (gbHumanPlayer[player]) {
+            m_players[player].m_aiDifficulty = PLAYER_PERSONALITY_HUMAN;
             memcpy(
-                m_players[player2].m_resources,
+                m_players[player].m_resources,
                 gInitResourcesHuman[IDX(m_difficulty)],
-                sizeof(m_players[player2].m_resources)
+                sizeof(m_players[player].m_resources)
             );
-            if (m_playerHandicap[player2] != PLAYER_HANDICAP_NONE) {
-                for (townIndex9 = 0; townIndex9 < IDX(RES_COUNT); townIndex9++) {
-                    double resourceScale;
-                    if (m_playerHandicap[player2] == PLAYER_HANDICAP_MODERATE)
-                        resourceScale = GAME_HANDICAP_MODERATE_RESOURCE_FACTOR;
-                    else
-                        resourceScale = GAME_HANDICAP_SEVERE_RESOURCE_FACTOR;
-                    (m_players + player2)->m_resources[townIndex9] = static_cast<i32>(
-                        (m_players + player2)->m_resources[townIndex9] * resourceScale
+            if (m_playerHandicap[player] != PLAYER_HANDICAP_NONE) {
+                for (nTown = 0; nTown < IDX(RES_COUNT); nTown++) {
+                    (m_players + player)->m_resources[nTown] = static_cast<i32>(
+                        (m_players + player)->m_resources[nTown]
+                        * (m_playerHandicap[player] == PLAYER_HANDICAP_MODERATE
+                               ? GAME_HANDICAP_MODERATE_RESOURCE_FACTOR
+                               : GAME_HANDICAP_SEVERE_RESOURCE_FACTOR)
                     );
                 }
             }
         } else {
-            m_players[player2].m_aiDifficulty = static_cast<PlayerPersonality>(Random(
+            m_players[player].m_aiDifficulty = static_cast<PlayerPersonality>(Random(
                 IDX(PLAYER_PERSONALITY_COMPUTER_FIRST),
                 IDX(PLAYER_PERSONALITY_COMPUTER_LAST)
             ));
             memcpy(
-                m_players[player2].m_resources,
+                m_players[player].m_resources,
                 gInitResourcesComputer[IDX(m_difficulty)],
-                sizeof(m_players[player2].m_resources)
+                sizeof(m_players[player].m_resources)
             );
         }
     }
     SetupAdjacentMons();
     if (m_mapHeader.lossCondition == MAP_LOSS_HERO) {
-        ultimateDistance5 = m_mapHeader.lossConditionValue;
-        ultimateTries4 = m_mapHeader.lossTownY;
+        xPos = m_mapHeader.lossConditionValue;
+        yPos = m_mapHeader.lossTownY;
         m_mapHeader.lossConditionValue = 0;
-        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType
+        if (m_worldMap.GetCell(xPos, yPos)->m_triggerType
             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
             m_mapHeader.lossConditionValue =
-                m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_objectMetadata;
+                m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
         else {
-            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType
+            if (m_worldMap.GetCell(xPos, yPos - 1)->m_triggerType
                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
                 m_mapHeader.lossConditionValue =
-                    m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
+                    m_worldMap.GetCell(xPos, yPos - 1)->m_objectMetadata;
             else
                 m_mapHeader.lossCondition = MAP_LOSS_STANDARD;
         }
     }
     if (m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO) {
-        ultimateDistance5 = m_mapHeader.victoryConditionValue;
-        ultimateTries4 = m_mapHeader.victoryTownY;
+        xPos = m_mapHeader.victoryConditionValue;
+        yPos = m_mapHeader.victoryTownY;
         m_mapHeader.victoryConditionValue = 0;
-        if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_triggerType
+        if (m_worldMap.GetCell(xPos, yPos)->m_triggerType
             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
             m_mapHeader.victoryConditionValue =
-                m_worldMap.GetCell(ultimateDistance5, ultimateTries4)->m_objectMetadata;
+                m_worldMap.GetCell(xPos, yPos)->m_objectMetadata;
         else {
-            if (m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_triggerType
+            if (m_worldMap.GetCell(xPos, yPos - 1)->m_triggerType
                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERMAID))
                 m_mapHeader.victoryConditionValue =
-                    m_worldMap.GetCell(ultimateDistance5, ultimateTries4 - 1)->m_objectMetadata;
+                    m_worldMap.GetCell(xPos, yPos - 1)->m_objectMetadata;
             else
                 m_mapHeader.victoryCondition = MAP_VICTORY_DEFEAT_ALL;
         }
     }
-    for (player2 = 0; player2 < m_playerCount; player2++) {
-        heroClass5 = FACTION_KNIGHT;
-        if (m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]] >= FACTION_KNIGHT
-            && m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]]
+    for (player = 0; player < m_playerCount; player++) {
+        sideClass = FACTION_KNIGHT;
+        if (m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]] >= FACTION_KNIGHT
+            && m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]]
                    < FACTION_COUNT) {
-            heroClass5 = m_setupPlayerRace[gcColorToSetupPos[m_players[player2].m_color]];
+            sideClass = m_setupPlayerRace[gcColorToSetupPos[m_players[player].m_color]];
         } else {
-            if (!!m_players[player2].m_townCount) {
-                heroClass5 = gpGame->m_castleRecs[m_players[player2].TownId(0)].m_type;
-            } else if (!!m_players[player2].m_heroCount) {
-                heroClass5 = gpGame->m_heroRecs[m_players[player2].HeroId(0)].m_cursorType;
+            if (!!m_players[player].m_townCount) {
+                sideClass = gpGame->m_castleRecs[m_players[player].m_townIds[0]].m_type;
+            } else if (!!m_players[player].m_heroCount) {
+                sideClass = gpGame->m_heroRecs[m_players[player].m_heroIds[0]].m_cursorType;
             }
         }
-        m_players[player2].m_evilInterface = heroClass5 == FACTION_BARBARIAN
-                                             || heroClass5 == FACTION_WARLOCK
-                                             || heroClass5 == FACTION_NECROMANCER;
-        if (gbInCampaign && player2 == 0)
-            m_players[player2].m_evilInterface = m_campaignType == CAMPAIGN_ARCHIBALD;
-        for (townIndex9 = 0; townIndex9 < gpGame->m_players[player2].m_townCount; townIndex9++)
-            GetCastle(gpGame->m_players[player2].m_townIds[townIndex9])->GiveSpells(NULL);
-        gpGame->m_players[player2].m_minimumHeroCount = gpGame->m_players[player2].m_heroCount;
+        if (sideClass == FACTION_BARBARIAN || sideClass == FACTION_WARLOCK
+            || sideClass == FACTION_NECROMANCER)
+            m_players[player].m_evilInterface = 1;
+        else
+            m_players[player].m_evilInterface = 0;
+        if (gbInCampaign && player == 0) {
+            if (m_campaignType == CAMPAIGN_ARCHIBALD)
+                m_players[player].m_evilInterface = 1;
+            else
+                m_players[player].m_evilInterface = 0;
+        }
+        for (nTown = 0; nTown < gpGame->m_players[player].m_townCount; nTown++)
+            GetCastle(gpGame->m_players[player].m_townIds[nTown])->GiveSpells(NULL);
+        gpGame->m_players[player].m_minimumHeroCount = gpGame->m_players[player].m_heroCount;
     }
     gpPhilAI->GetGameAIVars();
     gbInNewGameSetup = false;
@@ -2805,71 +2815,71 @@ void game::RandomizePassword(mapCell* cell) {
 
 VA(0x00453b9e, 0x435)
 i32 game::LoadMap(char* filename) {
-    char column[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
-    i32 i37;
-    i32 file;
-    char row[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
+    char x[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
+    char y[LOAD_MAP_COORDINATE_SCRATCH_SIZE];
     char type[LOAD_MAP_RECORD_SCRATCH_SIZE];
-    char trailer[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    char junk[LOAD_MAP_RECORD_SCRATCH_SIZE];
+    i32 i;
+    i32 handle;
 
     sprintf(gText, "%s%s", gcMapPath, filename);
-    file = open(gText, _O_BINARY);
-    if (file == -1)
+    handle = open(gText, _O_BINARY);
+    if (handle == -1)
         FileError(gText);
-    read(file, &m_mapHeader, sizeof(m_mapHeader));
-    m_worldMap.Read(file, 1);
+    read(handle, &m_mapHeader, sizeof(m_mapHeader));
+    m_worldMap.Read(handle, 1);
     SetMapSize(m_worldMap.width, m_worldMap.height);
 
-    for (i37 = 0; i37 < GAME_TOWN_COUNT; i37++) {
-        read(file, column, sizeof(column[0]));
-        read(file, row, sizeof(row[0]));
-        read(file, type, sizeof(type[0]));
-        if (static_cast<u8>(column[0]) != SAVED_TOWN_OFF_MAP) {
-            m_castleRecs[i37].m_onMap = 1;
-            m_castleRecs[i37].m_x = static_cast<u8>(column[0]);
-            m_castleRecs[i37].m_y = static_cast<u8>(row[0]);
-            m_castleRecs[i37].m_type =
+    for (i = 0; i < GAME_TOWN_COUNT; i++) {
+        read(handle, x, sizeof(x[0]));
+        read(handle, y, sizeof(y[0]));
+        read(handle, type, sizeof(type[0]));
+        if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+            m_castleRecs[i].m_onMap = 1;
+            m_castleRecs[i].m_x = static_cast<u8>(x[0]);
+            m_castleRecs[i].m_y = static_cast<u8>(y[0]);
+            m_castleRecs[i].m_type =
                 static_cast<FactionType>(type[0] & TOWN_RECORD_TYPE_MASK);
             if (type[0] < 0)
-                m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_CASTLE);
+                m_castleRecs[i].m_buildings |= IDX(TOWN_BUILDING_CASTLE);
             else
-                m_castleRecs[i37].m_buildings |= IDX(TOWN_BUILDING_TENT);
+                m_castleRecs[i].m_buildings |= IDX(TOWN_BUILDING_TENT);
         }
     }
 
-    for (i37 = 0; i37 < GAME_MINE_COUNT; i37++) {
-        if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i37 >= GAME_TOWN_COUNT) {
-            column[0] = -1;
-            row[0] = -1;
+    for (i = 0; i < GAME_MINE_COUNT; i++) {
+        if (m_mapHeader.magic == MAP_HEADER_MAGIC_BASE_GAME && i >= GAME_TOWN_COUNT) {
+            x[0] = -1;
+            y[0] = -1;
             type[0] = -1;
         } else {
-            read(file, column, sizeof(column[0]));
-            read(file, row, sizeof(row[0]));
-            read(file, type, sizeof(type[0]));
+            read(handle, x, sizeof(x[0]));
+            read(handle, y, sizeof(y[0]));
+            read(handle, type, sizeof(type[0]));
         }
-        if (static_cast<u8>(column[0]) != SAVED_TOWN_OFF_MAP) {
-            m_mines[i37].guardianType = CREATURE_NONE;
-            m_mines[i37].x = static_cast<u8>(column[0]);
-            m_mines[i37].y = static_cast<u8>(row[0]);
-            m_mines[i37].resourceType = static_cast<MineType>(type[0]);
+        if (static_cast<u8>(x[0]) != SAVED_TOWN_OFF_MAP) {
+            m_mines[i].guardianType = CREATURE_NONE;
+            m_mines[i].x = static_cast<u8>(x[0]);
+            m_mines[i].y = static_cast<u8>(y[0]);
+            m_mines[i].resourceType = static_cast<MineType>(type[0]);
         }
     }
 
     m_mapHeader.magic = MAP_HEADER_MAGIC_EXPANSION_GAME;
-    read(file, &m_obeliskCount, sizeof(m_obeliskCount));
+    read(handle, &m_obeliskCount, sizeof(m_obeliskCount));
     read(
-        file,
+        handle,
         m_rumourEventIndices,
         m_mapHeader.rumourCount * sizeof(m_rumourEventIndices[0])
     );
     m_rumourEventCount = m_mapHeader.rumourCount;
     read(
-        file,
+        handle,
         m_timeEventIndices,
         m_mapHeader.timeEventCount * sizeof(m_timeEventIndices[0])
     );
     m_timeEventCount = m_mapHeader.timeEventCount;
-    read(file, &iMaxMapExtra, sizeof(iMaxMapExtra));
+    read(handle, &iMaxMapExtra, sizeof(iMaxMapExtra));
     ppMapExtra = reinterpret_cast<void**>(
         H2_ALLOC(iMaxMapExtra * sizeof(ppMapExtra[0]))
     );
@@ -2878,13 +2888,13 @@ i32 game::LoadMap(char* filename) {
     );
     memset(ppMapExtra, 0, iMaxMapExtra * sizeof(ppMapExtra[0]));
     memset(pwSizeOfMapExtra, 0, iMaxMapExtra * sizeof(pwSizeOfMapExtra[0]));
-    for (i37 = 1; (&i37)[0] < iMaxMapExtra; i37++) {
-        read(file, pwSizeOfMapExtra + i37, sizeof(pwSizeOfMapExtra[0]));
-        ppMapExtra[i37] = H2_ALLOC(pwSizeOfMapExtra[i37]);
-        read(file, ppMapExtra[i37], pwSizeOfMapExtra[i37]);
+    for (i = 1; (&i)[0] < iMaxMapExtra; i++) {
+        read(handle, pwSizeOfMapExtra + i, sizeof(pwSizeOfMapExtra[0]));
+        ppMapExtra[i] = H2_ALLOC(pwSizeOfMapExtra[i]);
+        read(handle, ppMapExtra[i], pwSizeOfMapExtra[i]);
     }
-    read(file, trailer, sizeof(u16));
-    close(file);
+    read(handle, junk, sizeof(u16));
+    close(handle);
     return 0;
 }
 
@@ -4686,81 +4696,73 @@ void game::WeeklyGenericSite(mapCell* cell) {
 
 VA(0x00459b19, 0x383)
 void game::PerMonth(void) {
-    mapCell* cell;
-    i32 mapX;
-    i32 mapY;
-    i32 townIndex;
-    i32 building;
+    mapCell* spot;
+    i32 x;
+    i32 i;
+    i32 y;
     i32 growth;
-    town* castle;
-    i32 firstCount;
-    i32 secondCount;
+    town* twn;
+    i32 j;
 
     m_month++;
-    townIndex = Random(ROLL_MIN, ROLL_MAX);
-    if (townIndex <= NORMAL_ROLL_MAX) {
+    i = Random(ROLL_MIN, ROLL_MAX);
+    if (i <= NORMAL_ROLL_MAX) {
         giMonthType = CALENDAR_PERIOD_NORMAL;
         giMonthTypeExtra = Random(NORMAL_NAME_MIN, NORMAL_NAME_MAX);
-    } else if (townIndex <= CREATURE_ROLL_MAX) {
+    } else if (i <= CREATURE_ROLL_MAX) {
         giMonthType = CALENDAR_PERIOD_CREATURE;
         giMonthTypeExtra = giMonType[Random(CREATURE_LIST_MIN, CREATURE_LIST_MAX)];
     } else {
         giMonthType = CALENDAR_PERIOD_PLAGUE;
     }
 
-    for (townIndex = 0; townIndex < GAME_TOWN_COUNT; townIndex++) {
-        for (building = WEEKLY_FIRST_DWELLING; building <= WEEKLY_LAST_DWELLING; building++) {
-            castle = GetTown(townIndex);
-            if (castle->m_buildings & (1 << building)) {
-                growth = gMonsterDatabase[IDX(gDwellingType[IDX(castle->m_type)]
-                                                            [building - WEEKLY_FIRST_DWELLING])]
+    for (i = 0; i < GAME_TOWN_COUNT; i++) {
+        for (j = WEEKLY_FIRST_DWELLING; j <= WEEKLY_LAST_DWELLING; j++) {
+            twn = GetTown(i);
+            if (twn->m_buildings & (1 << j)) {
+                growth = gMonsterDatabase[IDX(gDwellingType[IDX(twn->m_type)]
+                                                           [j - WEEKLY_FIRST_DWELLING])]
                               .growth;
-                if (castle->m_buildings & WELL_BUILDING)
+                if (twn->m_buildings & WELL_BUILDING)
                     growth += WELL_GROWTH;
-                if (building == WEEKLY_FIRST_DWELLING
-                    && (castle->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
+                if (j == WEEKLY_FIRST_DWELLING
+                    && (twn->m_buildings & FIRST_DWELLING_BONUS_BUILDING))
                     growth += FIRST_DWELLING_GROWTH;
 
                 if (giMonthType == CALENDAR_PERIOD_CREATURE
-                    && IDX(gDwellingType[IDX(castle->m_type)]
-                                        [building - WEEKLY_FIRST_DWELLING])
+                    && IDX(gDwellingType[IDX(twn->m_type)][j - WEEKLY_FIRST_DWELLING])
                            == giMonthTypeExtra)
-                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] *=
-                        CREATURE_MONTH_MULTIPLIER;
+                    twn->m_garrison[j - WEEKLY_FIRST_DWELLING] *= CREATURE_MONTH_MULTIPLIER;
 
                 if (giMonthType == CALENDAR_PERIOD_PLAGUE) {
-                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] -= growth;
-                    if (castle->m_garrison[building - WEEKLY_FIRST_DWELLING] < 0)
-                        castle->m_garrison[building - WEEKLY_FIRST_DWELLING] = 0;
-                    castle->m_garrison[building - WEEKLY_FIRST_DWELLING] =
-                        castle->m_garrison[building - WEEKLY_FIRST_DWELLING] >> 1;
+                    twn->m_garrison[j - WEEKLY_FIRST_DWELLING] -= growth;
+                    if (twn->m_garrison[j - WEEKLY_FIRST_DWELLING] < 0)
+                        twn->m_garrison[j - WEEKLY_FIRST_DWELLING] = 0;
+                    twn->m_garrison[j - WEEKLY_FIRST_DWELLING] =
+                        twn->m_garrison[j - WEEKLY_FIRST_DWELLING] >> 1;
                 }
             }
         }
     }
 
     if (giMonthType == CALENDAR_PERIOD_CREATURE) {
-        for (mapX = 0; mapX < MAP_WIDTH; mapX++) {
-            for (mapY = 0; mapY < MAP_HEIGHT; mapY++) {
-                cell = gpAdvManager->GetCell(mapX, mapY);
-                if (cell->m_triggerType == MAP_OBJECT_NONE && !cell->m_objectLayerBit1
-                    && !cell->m_objectLayerBit0
-                    && giGroundToTerrain[cell->m_terrainImageIndex] != TERRAIN_WATER) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            for (y = 0; y < MAP_HEIGHT; y++) {
+                spot = gpAdvManager->GetCell(x, y);
+                if (spot->m_triggerType == MAP_OBJECT_NONE && !spot->m_objectLayerBit1
+                    && !spot->m_objectLayerBit0
+                    && giGroundToTerrain[spot->m_terrainImageIndex] != TERRAIN_WATER) {
                     if (Random(MONSTER_SPAWN_MIN, MONSTER_SPAWN_MAX)
                         == MONSTER_SPAWN_ROLL) {
-                        cell->m_triggerType = MONSTER_TRIGGER;
-                        cell->m_objectTileset = TILESET_MONS32;
-                        cell->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
-                        firstCount = GetRandomNumTroops(
-                            static_cast<CreatureType>(giMonthTypeExtra)
-                        );
-                        secondCount = GetRandomNumTroops(
-                            static_cast<CreatureType>(giMonthTypeExtra)
-                        );
-                        cell->m_objectMetadata = (firstCount + secondCount) | 0;
+                        spot->m_triggerType = MONSTER_TRIGGER;
+                        spot->m_objectTileset = TILESET_MONS32;
+                        spot->m_objectIndex = static_cast<u8>(giMonthTypeExtra);
+                        spot->m_objectMetadata =
+                            GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra))
+                            + GetRandomNumTroops(static_cast<CreatureType>(giMonthTypeExtra));
                         if (Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
                             < MONSTER_GUARD_CUTOFF)
-                            cell->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
+                            spot->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                 }
             }
@@ -4787,11 +4789,11 @@ void game::ConvertObject(
     i32 x;
     i32 y;
     mapCell* cell;
-    mapCellExtra* extra;
+    mapCellExtra* ext;
 
-    for (x = left; right >= x; x++) {
-        for (y = top; bottom >= y; y++) {
-            if (x < 0 || x >= MAP_WIDTH || y < 0 || MAP_HEIGHT <= y)
+    for (x = left; x <= right; x++) {
+        for (y = top; y <= bottom; y++) {
+            if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT)
                 continue;
             cell = WORLDMAP->GetCell(x, y);
             if (cell->m_objectIndex != static_cast<u8>(-1)
@@ -4808,22 +4810,22 @@ void game::ConvertObject(
 
             if (cell->m_extraIndex != 0
                 && WORLDMAP->Extra(cell->m_extraIndex)->objectIndex != static_cast<u8>(-1))
-                extra = WORLDMAP->Extra(cell->m_extraIndex);
+                ext = WORLDMAP->Extra(cell->m_extraIndex);
             else
-                extra = NULL;
-            while (extra != NULL) {
-                if (extra->objectTileset == oldTileset
-                    && extra->objectIndex >= oldFirstIndex
-                    && extra->objectIndex <= oldLastIndex) {
-                    extra->objectTileset = newTileset;
-                    extra->objectIndex =
-                        static_cast<u8>(extra->objectIndex - oldFirstIndex + newFirstIndex);
+                ext = NULL;
+            while (ext != NULL) {
+                if (ext->objectTileset == oldTileset
+                    && ext->objectIndex >= oldFirstIndex
+                    && ext->objectIndex <= oldLastIndex) {
+                    ext->objectTileset = newTileset;
+                    ext->objectIndex =
+                        static_cast<u8>(ext->objectIndex - oldFirstIndex + newFirstIndex);
                 }
-                if (extra->nextIndex != 0
-                    && WORLDMAP->Extra(extra->nextIndex)->objectIndex != static_cast<u8>(-1))
-                    extra = WORLDMAP->Extra(extra->nextIndex);
+                if (ext->nextIndex != 0
+                    && WORLDMAP->Extra(ext->nextIndex)->objectIndex != static_cast<u8>(-1))
+                    ext = WORLDMAP->Extra(ext->nextIndex);
                 else
-                    extra = NULL;
+                    ext = NULL;
             }
 
             if (cell->m_overlayIndex != static_cast<u8>(-1)
@@ -4836,22 +4838,22 @@ void game::ConvertObject(
             }
             if (cell->m_extraIndex != 0
                 && WORLDMAP->Extra(cell->m_extraIndex)->overlayIndex != static_cast<u8>(-1))
-                extra = WORLDMAP->Extra(cell->m_extraIndex);
+                ext = WORLDMAP->Extra(cell->m_extraIndex);
             else
-                extra = NULL;
-            while (extra != NULL) {
-                if (extra->overlayTileset == oldTileset
-                    && extra->overlayIndex >= oldFirstIndex
-                    && extra->overlayIndex <= oldLastIndex) {
-                    extra->overlayTileset = newTileset;
-                    extra->overlayIndex =
-                        static_cast<u8>(extra->overlayIndex - oldFirstIndex + newFirstIndex);
+                ext = NULL;
+            while (ext != NULL) {
+                if (ext->overlayTileset == oldTileset
+                    && ext->overlayIndex >= oldFirstIndex
+                    && ext->overlayIndex <= oldLastIndex) {
+                    ext->overlayTileset = newTileset;
+                    ext->overlayIndex =
+                        static_cast<u8>(ext->overlayIndex - oldFirstIndex + newFirstIndex);
                 }
-                if (extra->nextIndex != 0
-                    && WORLDMAP->Extra(extra->nextIndex)->overlayIndex != static_cast<u8>(-1))
-                    extra = WORLDMAP->Extra(extra->nextIndex);
+                if (ext->nextIndex != 0
+                    && WORLDMAP->Extra(ext->nextIndex)->overlayIndex != static_cast<u8>(-1))
+                    ext = WORLDMAP->Extra(ext->nextIndex);
                 else
-                    extra = NULL;
+                    ext = NULL;
             }
         }
     }
@@ -4862,14 +4864,14 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
     i32 unused[RANDOM_TOWN_SCRATCH_WIDTH];
     i32 townId = GetTownId(x, y);
     town* castle = GetTown(townId);
-    mapTownExtra* extra =
+    mapTownExtra* townExtra =
         reinterpret_cast<mapTownExtra*>(ppMapExtra[WORLDMAP->GetCell(x, y)->m_objectMetadata]);
     FactionType race;
 
-    if (extra->color == RANDOM_TOWN_UNOWNED_COLOR)
+    if (townExtra->color == RANDOM_TOWN_UNOWNED_COLOR)
         race = static_cast<FactionType>(Random(RANDOM_TOWN_RACE_MIN, RANDOM_TOWN_RACE_MAX));
     else
-        race = m_setupPlayerRace[gcColorToSetupPos[extra->color]];
+        race = m_setupPlayerRace[gcColorToSetupPos[townExtra->color]];
 
     castle->m_turnsOwned = RANDOM_TOWN_AGE;
     ConvertObject(
@@ -4929,144 +4931,146 @@ void game::RandomizeTown(i32 x, i32 y, i32) {
 
 VA(0x0045a40e, 0x522)
 void game::RandomizeMine(i32 x, i32 y) {
-    u8 objectFrame1;
-    i32 mineId;
-    MineType mineType29;
-    H2_ENUM_STORAGE(TerrainType, i32) terrain3;
-    i32 columnOffset4;
-    i32 retry4;
-    i32 rowOffset0;
-    u8 mineFrame36;
-    MapObjectType triggerType19;
+    u8 objFrame;
+    i32 mineIdx;
+    i32 iRow;
+    i32 count;
+    i32 iCol;
+    MapObjectType trigger;
+    MineType resType;
+    H2_ENUM_STORAGE(TerrainType, i32) terrain;
+    u8 mineFrame;
 
-    terrain3 = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
-    for (retry4 = 0; retry4 < RANDOM_MINE_RETRY_LIMIT; retry4++) {
-        switch (terrain3) {
+    terrain = giGroundToTerrain[WORLDMAP->GetCell(x, y)->m_terrainImageIndex];
+    for (count = 0; count < RANDOM_MINE_RETRY_LIMIT; count++) {
+        switch (terrain) {
             case TERRAIN_GRASS:
             case TERRAIN_DIRT:
-                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
-                if (mineType29 == MINE_TYPE_MERCURY)
-                    mineType29 = MINE_TYPE_WOOD;
+                resType = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
+                if (resType == MINE_TYPE_MERCURY)
+                    resType = MINE_TYPE_WOOD;
                 break;
             case TERRAIN_SNOW:
-                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_ORE), IDX(MINE_TYPE_GOLD)));
+                resType = static_cast<MineType>(Random(IDX(MINE_TYPE_ORE), IDX(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_SWAMP:
-                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_WOOD), IDX(MINE_TYPE_GOLD)));
+                resType = static_cast<MineType>(Random(IDX(MINE_TYPE_WOOD), IDX(MINE_TYPE_GOLD)));
                 break;
             case TERRAIN_LAVA:
-                mineType29 = MINE_TYPE_MERCURY;
+                resType = MINE_TYPE_MERCURY;
                 break;
             default:
-                mineType29 = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
+                resType = static_cast<MineType>(Random(IDX(MINE_TYPE_MERCURY), IDX(MINE_TYPE_GOLD)));
                 break;
         }
-        if (RandMineQty[IDX(mineType29)] == 0)
-            retry4 = RANDOM_MINE_RETRY_LIMIT;
+        if (RandMineQty[IDX(resType)] == 0)
+            count = RANDOM_MINE_RETRY_LIMIT;
     }
-    RandMineQty[IDX(mineType29)]++;
+    RandMineQty[IDX(resType)]++;
 
-    switch (mineType29) {
+    switch (resType) {
         case MINE_TYPE_WOOD:
-            mineFrame36 = 5;
+            mineFrame = 5;
             break;
         case MINE_TYPE_MERCURY:
-            mineFrame36 = 25;
+            mineFrame = 25;
             break;
         default:
-            switch (terrain3) {
+            switch (terrain) {
                 case TERRAIN_GRASS:
-                    mineFrame36 = 15;
+                    mineFrame = 15;
                     break;
                 case TERRAIN_SNOW:
-                    mineFrame36 = 19;
+                    mineFrame = 19;
                     break;
                 default:
-                    mineFrame36 = 9;
+                    mineFrame = 9;
                     break;
             }
             break;
     }
 
-    switch (mineType29) {
+    switch (resType) {
         case MINE_TYPE_WOOD:
-            objectFrame1 = 7;
+            objFrame = 7;
             break;
         case MINE_TYPE_MERCURY:
-            switch (terrain3) {
+            switch (terrain) {
                 case TERRAIN_SWAMP:
-                    objectFrame1 = 43;
+                    objFrame = 43;
                     break;
                 case TERRAIN_LAVA:
-                    objectFrame1 = 35;
+                    objFrame = 35;
                     break;
                 default:
-                    objectFrame1 = 27;
+                    objFrame = 27;
                     break;
             }
             break;
         default:
-            switch (terrain3) {
+            switch (terrain) {
                 case TERRAIN_GRASS:
-                    objectFrame1 = 17;
+                    objFrame = 17;
                     break;
                 case TERRAIN_SNOW:
-                    objectFrame1 = 21;
+                    objFrame = 21;
                     break;
                 case TERRAIN_SWAMP:
-                    objectFrame1 = 23;
+                    objFrame = 23;
                     break;
                 case TERRAIN_DESERT:
-                    objectFrame1 = 13;
+                    objFrame = 13;
                     break;
                 default:
-                    objectFrame1 = 11;
+                    objFrame = 11;
                     break;
             }
             break;
     }
 
-    WORLDMAP->GetCell(x, y)->m_objectIndex = objectFrame1;
-    WORLDMAP->GetCell(x + 1, y)->m_objectIndex = objectFrame1 + 1;
-    WORLDMAP->GetCell(x, y - 1)->m_overlayIndex = mineFrame36;
-    WORLDMAP->GetCell(x + 1, y - 1)->m_overlayIndex = mineFrame36 + 1;
+    WORLDMAP->GetCell(x, y)->m_objectIndex = objFrame;
+    WORLDMAP->GetCell(x + 1, y)->m_objectIndex = objFrame + 1;
+    WORLDMAP->GetCell(x, y - 1)->m_overlayIndex = mineFrame;
+    WORLDMAP->GetCell(x + 1, y - 1)->m_overlayIndex = mineFrame + 1;
 
-    if (mineType29 == MINE_TYPE_MERCURY) {
+    if (resType == MINE_TYPE_MERCURY) {
         WORLDMAP->GetCell(x + 1, y)->m_objType |= 1;
-        triggerType19 = MAP_OBJECT_ALCHEMIST_LAB;
-    } else if (mineType29 == MINE_TYPE_WOOD) {
-        triggerType19 = MAP_OBJECT_SAWMILL;
+        trigger = MAP_OBJECT_ALCHEMIST_LAB;
+    } else if (resType == MINE_TYPE_WOOD) {
+        trigger = MAP_OBJECT_SAWMILL;
     } else {
         m_worldMap.ChangeTilesetIndex(
             WORLDMAP->GetCell(x + 1, y),
             x + 1,
             y,
             TILESET_EXTRAOVR,
-            IDX(mineType29) - IDX(MINE_TYPE_ORE),
+            IDX(resType) - IDX(MINE_TYPE_ORE),
             0,
             -1
         );
-        triggerType19 = MAP_OBJECT_MINE;
+        trigger = MAP_OBJECT_MINE;
     }
 
-    mineId = GetMineId(x, y);
-    for (rowOffset0 = 0; rowOffset0 < RANDOM_MINE_FOOTPRINT_WIDTH; rowOffset0++) {
-        for (columnOffset4 = 0; columnOffset4 < RANDOM_MINE_FOOTPRINT_WIDTH; columnOffset4++) {
-            if ((WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
+    mineIdx = GetMineId(x, y);
+    for (iRow = 0; iRow < RANDOM_MINE_FOOTPRINT_WIDTH; iRow++) {
+        for (iCol = 0; iCol < RANDOM_MINE_FOOTPRINT_WIDTH; iCol++) {
+            if ((WORLDMAP->GetCell(x + iCol, y - iRow)->m_triggerType
                  & MAP_TRIGGER_TYPE_MASK)
-                > MAP_OBJECT_NONE)
-                if (IDX(
-                        WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType
-                        & MAP_TRIGGER_TYPE_MASK
-                    )
-                    <= MINE_FLAG_OVERWRITE_LIMIT)
-                    continue;
-            WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_objectMetadata = mineId;
-            WORLDMAP->GetCell(columnOffset4 + x, y - rowOffset0)->m_triggerType = triggerType19;
+                    > MAP_OBJECT_NONE
+                && IDX(
+                       WORLDMAP->GetCell(x + iCol, y - iRow)->m_triggerType
+                       & MAP_TRIGGER_TYPE_MASK
+                   )
+                       <= MINE_FLAG_OVERWRITE_LIMIT) {
+                // a lower-numbered trigger already owns this tile
+            } else {
+                WORLDMAP->GetCell(x + iCol, y - iRow)->m_objectMetadata = mineIdx;
+                WORLDMAP->GetCell(x + iCol, y - iRow)->m_triggerType = trigger;
+            }
         }
     }
     WORLDMAP->GetCell(x, y)->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
-    m_mines[mineId].resourceType = mineType29;
+    m_mines[mineIdx].resourceType = resType;
 }
 
 VA(0x0045a930, 0xb8)
@@ -7226,48 +7230,48 @@ void CreateDiffFile(
     i32 remotePlayer,
     i32 forceWhole
 ) {
-    u8* diffData6;
-    i32 unusedFirst0;
-    i32 unusedSecond4;
-    u8* joinData29;
-    i32 joinSize36;
-    i32 joinFile1;
-    i32 copyLength28;
-    i32l startTime11;
-    i32 diffSize29;
-    u8* oldData13;
-    i32 oldSize37;
-    i32 compareOffset4;
-    i32 position1;
-    i32 sendWhole4;
-    i32 oldFile17;
+    i32 joinSize;
+    u8* fullData;
+    i32 unusedVal;
+    i32 inFd;
+    i32l timeIn;
+    i32 matchLen;
+    u8* prevData;
+    i32 diffTotal;
+    i32 readFile;
+    i32 length;
+    u8* diffOut;
+    i32 oldSize;
+    i32 fullSend;
+    i32 destFile;
+    i32 position;
 
-    startTime11 = KBTickCount();
-    oldData13 = NULL;
-    joinData29 = NULL;
-    diffData6 = NULL;
-    oldSize37 = 0;
-    joinSize36 = 0;
-    diffSize29 = 0;
-    sendWhole4 = 0;
+    timeIn = KBTickCount();
+    prevData = NULL;
+    fullData = NULL;
+    diffOut = NULL;
+    oldSize = 0;
+    joinSize = 0;
+    diffTotal = 0;
+    fullSend = 0;
 
-    if (forceWhole || (iLastDiffSendTo != -1 && remotePlayer != iLastDiffSendTo))
-        sendWhole4 = 1;
+    if (forceWhole || (iLastDiffSendTo != -1 && iLastDiffSendTo != remotePlayer))
+        fullSend = 1;
     iLastDiffSendTo = remotePlayer;
 
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinSize36 = FileSize(gText);
-    joinData29 = static_cast<u8*>(H2_ALLOC(joinSize36));
+    joinSize = FileSize(gText);
+    fullData = static_cast<u8*>(H2_ALLOC(joinSize));
     sprintf(gText, "%s%s", ".\\DATA\\", joinName);
-    joinFile1 = open(gText, _O_BINARY);
-    if (joinFile1 == -1)
+    readFile = open(gText, _O_BINARY);
+    if (readFile == -1)
         FileError(gText);
-    read(joinFile1, joinData29, joinSize36);
-    close(joinFile1);
+    read(readFile, fullData, joinSize);
+    close(readFile);
     LogInt(
         const_cast<char*>("Orig Join CRC"),
-        calc_crc_long(joinData29, joinSize36),
-        joinSize36,
+        calc_crc_long(fullData, joinSize),
+        joinSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -7277,144 +7281,144 @@ void CreateDiffFile(
 
     if (!forceWhole) {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        oldSize37 = FileSize(gText);
-        oldData13 = static_cast<u8*>(H2_ALLOC(oldSize37));
+        oldSize = FileSize(gText);
+        prevData = static_cast<u8*>(H2_ALLOC(oldSize));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-        oldFile17 = open(gText, _O_BINARY);
-        if (oldFile17 == -1)
+        inFd = open(gText, _O_BINARY);
+        if (inFd == -1)
             FileError(gText);
-        read(oldFile17, oldData13, oldSize37);
-        close(oldFile17);
+        read(inFd, prevData, oldSize);
+        close(inFd);
     }
 
-    diffData6 = static_cast<u8*>(H2_ALLOC((oldSize37 > joinSize36 ? oldSize37 : joinSize36) + DIFF_BUFFER_EXTRA));
-    if (sendWhole4) {
-        diffData6[0] = 0;
-        diffData6[1] = 0;
-        memcpy(diffData6 + JOIN_HEADER_SIZE, joinData29, joinSize36);
-        diffSize29 = joinSize36 + JOIN_HEADER_SIZE;
+    diffOut = static_cast<u8*>(H2_ALLOC((oldSize > joinSize ? oldSize : joinSize) + DIFF_BUFFER_EXTRA));
+    if (fullSend) {
+        diffOut[0] = 0;
+        diffOut[1] = 0;
+        memcpy(diffOut + JOIN_HEADER_SIZE, fullData, joinSize);
+        diffTotal = joinSize + JOIN_HEADER_SIZE;
     } else {
-        diffData6[0] = 1;
-        diffData6[1] = 0;
-        diffSize29 = JOIN_HEADER_SIZE;
-        position1 = 0;
-        copyLength28 = 0;
-        compareOffset4 = copyLength28;
+        diffOut[0] = 1;
+        diffOut[1] = 0;
+        diffTotal = JOIN_HEADER_SIZE;
+        position = 0;
+        length = 0;
+        matchLen = length;
         while (1) {
-            if (position1 + copyLength28 >= oldSize37 || position1 + copyLength28 >= joinSize36) {
-                copyLength28 = oldSize37 - position1;
-                WriteDiffHeaderInfo(1, copyLength28, diffData6, &diffSize29);
-                memcpy(diffData6 + diffSize29, joinData29 + position1, copyLength28);
-                diffSize29 += copyLength28;
-                position1 += copyLength28;
-                copyLength28 = 0;
-                break;
+            if (position + length >= oldSize || position + length >= joinSize) {
+                length = oldSize - position;
+                WriteDiffHeaderInfo(1, length, diffOut, &diffTotal);
+                memcpy(diffOut + diffTotal, fullData + position, length);
+                diffTotal += length;
+                position += length;
+                length = 0;
+                goto Finish;
             }
-            if (oldData13[position1 + copyLength28] == joinData29[position1 + copyLength28]) {
-                compareOffset4 = 1;
-                while (position1 + compareOffset4 + copyLength28 < oldSize37
-                       && position1 + compareOffset4 + copyLength28 < joinSize36
-                       && oldData13[position1 + compareOffset4 + copyLength28]
-                              == joinData29[position1 + compareOffset4 + copyLength28])
-                    compareOffset4++;
-                if (compareOffset4 <= DIFF_MAX_SHORT_MATCH) {
-                    copyLength28 += compareOffset4;
-                    compareOffset4 = 0;
-                    continue;
+            if (*(prevData + position + length) == *(fullData + position + length)) {
+                matchLen = 1;
+                while (position + length + matchLen < oldSize
+                       && position + length + matchLen < joinSize
+                       && *(prevData + position + length + matchLen)
+                              == *(fullData + position + length + matchLen))
+                    matchLen++;
+                if (matchLen <= DIFF_MAX_SHORT_MATCH) {
+                    length += matchLen;
+                    matchLen = 0;
                 } else {
-                    if (copyLength28 != 0) {
-                        WriteDiffHeaderInfo(1, copyLength28, diffData6, &diffSize29);
-                        memcpy(diffData6 + diffSize29, joinData29 + position1, copyLength28);
-                        diffSize29 += copyLength28;
-                        position1 += copyLength28;
-                        copyLength28 = 0;
+                    if (length != 0) {
+                        WriteDiffHeaderInfo(1, length, diffOut, &diffTotal);
+                        memcpy(diffOut + diffTotal, fullData + position, length);
+                        diffTotal += length;
+                        position += length;
+                        length = 0;
                     }
-                    WriteDiffHeaderInfo(0, compareOffset4, diffData6, &diffSize29);
-                    position1 += compareOffset4;
-                    compareOffset4 = 0;
+                    WriteDiffHeaderInfo(0, matchLen, diffOut, &diffTotal);
+                    position += matchLen;
+                    matchLen = 0;
                 }
             } else {
-                while (position1 + copyLength28 < oldSize37 && position1 + copyLength28 < joinSize36
-                       && oldData13[position1 + copyLength28]
-                              != joinData29[position1 + copyLength28])
-                    copyLength28++;
+                while (position + length < oldSize && position + length < joinSize
+                       && *(prevData + position + length)
+                              != *(fullData + position + length))
+                    length++;
             }
         }
     }
 
+Finish:
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (joinFile1 == -1)
+    destFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (destFile == -1)
         FileError(gText);
-    write(joinFile1, diffData6, diffSize29);
-    close(joinFile1);
+    write(destFile, diffOut, diffTotal);
+    close(destFile);
 
     sprintf(gText, "%s%s", ".\\DATA\\", oldName);
-    joinFile1 = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (joinFile1 == -1)
+    destFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (destFile == -1)
         FileError(gText);
-    write(joinFile1, joinData29, joinSize36);
-    close(joinFile1);
+    write(destFile, fullData, joinSize);
+    close(destFile);
 
-    if (oldData13 != NULL)
-        H2_FREE(oldData13);
-    if (joinData29 != NULL)
-        H2_FREE(joinData29);
-    if (diffData6 != NULL)
-        H2_FREE(diffData6);
+    if (prevData != NULL)
+        H2_FREE(prevData);
+    if (fullData != NULL)
+        H2_FREE(fullData);
+    if (diffOut != NULL)
+        H2_FREE(diffOut);
     return;
 }
 
 VA(0x0045f9cd, 0x37e)
 void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
-    u8* oldData = NULL;
-    u8* diffData = NULL;
-    u8* joinData = NULL;
-    i32 joinSize = 0;
-    i32 diffSize;
-    i32 copyLength;
-    i32 diffFile;
-    i32 oldSize;
+    u8* oldBuf = NULL;
     u8 copyFlag;
+    u8* diffData = NULL;
+    u8* outData = NULL;
+    i32 outSize = 0;
+    i32 diffLength;
+    i32 diffFile;
+    i32 copyLength;
+    i32 oldSize;
     i32 position;
     i32 joinFile;
 
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
-    diffSize = FileSize(gText);
-    diffData = static_cast<u8*>(H2_ALLOC(diffSize));
+    diffLength = FileSize(gText);
+    diffData = static_cast<u8*>(H2_ALLOC(diffLength));
     sprintf(gText, "%s%s", ".\\DATA\\", diffName);
     diffFile = open(gText, _O_BINARY);
     if (diffFile == -1)
         FileError(gText);
-    read(diffFile, diffData, diffSize);
+    read(diffFile, diffData, diffLength);
     close(diffFile);
 
-    joinData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
+    outData = static_cast<u8*>(H2_ALLOC(JOIN_BUFFER_SIZE));
     if (diffData[0] == 0) {
-        memcpy(joinData, diffData + JOIN_HEADER_SIZE, diffSize - JOIN_HEADER_SIZE);
-        joinSize = diffSize - JOIN_HEADER_SIZE;
+        memcpy(outData, diffData + JOIN_HEADER_SIZE, diffLength - JOIN_HEADER_SIZE);
+        outSize = diffLength - JOIN_HEADER_SIZE;
     } else {
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         oldSize = FileSize(gText);
-        oldData = static_cast<u8*>(H2_ALLOC(oldSize));
+        oldBuf = static_cast<u8*>(H2_ALLOC(oldSize));
         sprintf(gText, "%s%s", ".\\DATA\\", oldName);
         diffFile = open(gText, _O_BINARY);
         if (diffFile == -1)
             FileError(gText);
-        read(diffFile, oldData, oldSize);
+        read(diffFile, oldBuf, oldSize);
         close(diffFile);
-        memcpy(joinData, oldData, oldSize);
+        memcpy(outData, oldBuf, oldSize);
 
         position = JOIN_HEADER_SIZE;
-        while (position < diffSize) {
+        while (position < diffLength) {
             copyFlag = diffData[position] >> DIFF_COPY_FLAG_SHIFT;
             copyLength = GetSkipCopyLen(diffData, &position);
             if (copyFlag) {
-                memcpy(joinData + joinSize, diffData + position, copyLength);
-                joinSize += copyLength;
+                memcpy(outData + outSize, diffData + position, copyLength);
+                outSize += copyLength;
                 position += copyLength;
             } else {
-                joinSize += copyLength;
+                outSize += copyLength;
             }
         }
     }
@@ -7423,12 +7427,12 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     joinFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile == -1)
         FileError(gText);
-    write(joinFile, joinData, joinSize);
+    write(joinFile, outData, outSize);
     close(joinFile);
     LogInt(
         const_cast<char*>("New Join CRC"),
-        calc_crc_long(joinData, joinSize),
-        joinSize,
+        calc_crc_long(outData, outSize),
+        outSize,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -7440,15 +7444,15 @@ void CreateJoinFile(char* oldName, char* diffName, char* joinName) {
     joinFile = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
     if (joinFile == -1)
         FileError(gText);
-    write(joinFile, joinData, joinSize);
+    write(joinFile, outData, outSize);
     close(joinFile);
 
-    if (oldData)
-        H2_FREE(oldData);
+    if (oldBuf)
+        H2_FREE(oldBuf);
     if (diffData)
         H2_FREE(diffData);
-    if (joinData)
-        H2_FREE(joinData);
+    if (outData)
+        H2_FREE(outData);
 }
 
 VA(0x0045fd4b, 0x46)
@@ -7761,49 +7765,49 @@ void CompressTest2(void) {
 
 VA(0x00460aba, 0x18c)
 void CompressTest(void) {
+    char* fromData;
+    char* encoded;
+    i32 srcCrcCheck;
+    i32 unpackedCrc;
+    i32 hFile;
     i32l fileSize;
-    i32l encodedSize;
-    i32l decodedSize;
-    char* sourceData;
-    i32 sourceCrc;
-    char* decodedData;
-    i32 fileHandle;
-    i32 decodedCrc;
-    i32 sourceCrcCheck;
-    char* encodedData;
-    char filename[TEST_FILENAME_SIZE];
+    char diffName[TEST_FILENAME_SIZE];
+    i32 srcCrc;
+    char* unpackedData;
+    i32l compSize;
+    i32l plainSize;
 
     LogStr(const_cast<char*>("C1"));
-    strcpy(filename, "c:\\TEMP\\Z.DIF");
-    fileSize = FileSize(filename);
-    sourceData = static_cast<char*>(
+    strcpy(diffName, "c:\\TEMP\\Z.DIF");
+    fileSize = FileSize(diffName);
+    fromData = static_cast<char*>(
         H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    encodedData = static_cast<char*>(
+    encoded = static_cast<char*>(
         H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
-    decodedData = static_cast<char*>(
+    unpackedData = static_cast<char*>(
         H2_ALLOC(fileSize + TEST_FILE_BUFFER_EXTRA)
     );
     LogStr(const_cast<char*>("C2"));
-    fileHandle = open(filename, _O_BINARY);
-    if (fileHandle == -1)
-        FileError(filename);
-    read(fileHandle, sourceData, fileSize);
+    hFile = open(diffName, _O_BINARY);
+    if (hFile == -1)
+        FileError(diffName);
+    read(hFile, fromData, fileSize);
     LogStr(const_cast<char*>("C3"));
-    sourceCrc = calc_crc_long(reinterpret_cast<u8*>(sourceData), fileSize);
+    srcCrc = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
     LogStr(const_cast<char*>("C4"));
-    close(fileHandle);
+    close(hFile);
     LogStr(const_cast<char*>("C5"));
-    encodedSize = EncodeData(encodedData, sourceData, fileSize);
+    compSize = EncodeData(encoded, fromData, fileSize);
     LogStr(const_cast<char*>("C6"));
-    decodedSize = DecodeData(decodedData, encodedData, encodedSize);
+    plainSize = DecodeData(unpackedData, encoded, compSize);
     LogStr(const_cast<char*>("C7"));
-    decodedCrc = calc_crc_long(reinterpret_cast<u8*>(decodedData), fileSize);
-    sourceCrcCheck = calc_crc_long(reinterpret_cast<u8*>(sourceData), fileSize);
-    H2_FREE(sourceData);
-    H2_FREE(encodedData);
-    H2_FREE(decodedData);
+    unpackedCrc = calc_crc_long(reinterpret_cast<u8*>(unpackedData), fileSize);
+    srcCrcCheck = calc_crc_long(reinterpret_cast<u8*>(fromData), fileSize);
+    H2_FREE(fromData);
+    H2_FREE(encoded);
+    H2_FREE(unpackedData);
     LogStr(const_cast<char*>("C8"));
 }
 

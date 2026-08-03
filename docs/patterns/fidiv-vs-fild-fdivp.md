@@ -86,3 +86,26 @@ carries the cast does not matter, only the type of the division.
 all. The spelling divergence is therefore a compiler-version artifact rather
 than a source difference, and stays OPEN in `docs/cross-version-spellings.md`
 until the 2.0 tree re-tests the `double` spelling.
+
+## Third confirmation, and the sharper statement of the rule (SOURCE/GAME)
+
+`game::SetupPuzzlePieces` (0x4cb1e) hit it again, and a 9-arm matrix over the
+*divisor* spelling pins down which cast actually matters:
+
+| divisor spelling            | body size | lowering |
+| :--                         | --:       | :--      |
+| `int` (no cast)             | 539       | `fidiv`  |
+| `static_cast<float>(int)`   | 539       | `fidiv`  |
+| `static_cast<i32>(int)`     | 539       | `fidiv`  |
+| `static_cast<double>(int)`  | 541       | `fild` + `fdivp` — retail |
+
+So an explicit `static_cast<float>` on the operand does **not** stop the fold:
+the cast is absorbed into the same coercion node, and `/Od` still folds the
+integer memory operand into `fidiv`. Only raising the *division* to `double`
+puts the divisor on the x87 stack first. Consistent with the arms measured in
+EVENTS, where `static_cast<double>(a) / b` also lands on the retail form — it
+is the common type of the division that decides, not which side carries the
+cast.
+
+Narrowing back on assignment is unaffected: the store stays a non-popping
+`d9 55 fc  fst dword ptr [ebp-4]`.
