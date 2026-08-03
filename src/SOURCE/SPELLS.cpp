@@ -531,7 +531,7 @@ i32 combatManager::FindResurrectArmyIndex(
 VA(0x0049912f, 0x379)
 i32 combatManager::ValidSpellTarget(SpellType spell, i32 hex) {
     army* target_j = NULL;
-    i32 unusedSpellWord5;
+    i32 unused;
     i32 destHex;
     if (!ValidHex(hex))
         return 0;

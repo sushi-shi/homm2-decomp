@@ -821,7 +821,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
 VA(0x004b4642, 0x131)
 i32 ExpCampaign::HandleVictory(void) {
     i32 days = 0;
-    i32 mapIndex;
+    i32 map;
 
     if (m_currentMap > MAP_NONE) {
         days = Days();
@@ -846,11 +846,11 @@ i32 ExpCampaign::HandleVictory(void) {
         return 0;
 
     m_currentMap = MAP_NONE;
-    for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
-        if (m_mapChoices[mapIndex]) {
-            m_mapDays[mapIndex] = days;
+    for (map = 0; map < m_mapCount; ++map) {
+        if (m_mapChoices[map]) {
+            m_mapDays[map] = days;
             if (m_currentMap == MAP_NONE)
-                m_currentMap = static_cast<ExpansionCampaignMap>(mapIndex);
+                m_currentMap = static_cast<ExpansionCampaignMap>(map);
         }
     }
     ShowInfo(0, 0);

@@ -1859,24 +1859,24 @@ void philAI::GetBestBHC(i32 player, BHC& best) {
 
 VA(0x00481b1f, 0xe4)
 hero* philAI::DetermineHeroToMove(i32 player) {
-    i32 val;
+    i32 value;
     i32 jb;
-    i32 idx;
+    i32 best;
     i32 i;
     jb = 0;
-    idx = -1;
+    best = -1;
     if (gpCurPlayer->HasMobileHero()) {
         for (i = 0; i < gpCurPlayer->m_heroCount; i++) {
-            val = gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[i]]
+            value = gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[i]]
                           .m_remainingMobility;
-            if (val > jb) {
-                jb = val;
-                idx = i;
+            if (value > jb) {
+                jb = value;
+                best = i;
             }
         }
     }
-    if (idx >= 0)
-        return &gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[idx]];
+    if (best >= 0)
+        return &gpGame->m_heroRecs[gpGame->m_players[player].m_heroIds[best]];
     gpGame->m_players[player].m_currentHero = -1;
     return NULL;
 }
@@ -3071,18 +3071,18 @@ void philAI::GetTurnAttentionValue(i32 player) {
     ptr->buildingValue = ptr->gameWeightA;
     ptr->heroValue = ptr->gameWeightB;
     ptr->upgradeBase = ptr->gameRemainder;
-    float factor;
+    float scale;
     if (giCurTurn < 5)
-        factor = 1.6f;
+        scale = 1.6f;
     else if (giCurTurn < 10)
-        factor = 1.4f;
+        scale = 1.4f;
     else if (giCurTurn < 20)
-        factor = 1.2f;
+        scale = 1.2f;
     else if (giCurTurn < 30)
-        factor = 1.0f;
+        scale = 1.0f;
     else
-        factor = 0.8f;
-    ptr->heroValue = ptr->heroValue * factor;
+        scale = 0.8f;
+    ptr->heroValue = ptr->heroValue * scale;
 }
 
 VA(0x00484504, 0x71)

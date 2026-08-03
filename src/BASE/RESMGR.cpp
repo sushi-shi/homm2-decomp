@@ -234,13 +234,13 @@ void resourceManager::AddResource(class resource* newResource) {
 VA(0x004b8740, 0x7e)
 void resourceManager::Expunge(void) {
     m_expunging = 1;
-    resource* currentResource = m_resourceListHead;
-    resource* nextResource = NULL;
-    while (currentResource != NULL) {
-        nextResource = currentResource->m_next;
-        RemoveResource(currentResource);
-        delete currentResource;
-        currentResource = nextResource;
+    resource* cur = m_resourceListHead;
+    resource* next = NULL;
+    while (cur != NULL) {
+        next = cur->m_next;
+        RemoveResource(cur);
+        delete cur;
+        cur = next;
     }
     m_expunging = 0;
 }
