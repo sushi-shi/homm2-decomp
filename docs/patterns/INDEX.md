@@ -20,3 +20,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [fidiv-vs-fild-fdivp](fidiv-vs-fild-fdivp.md) | `fild;fild;fdivp` instead of `fidiv` → the division itself is `double`, whatever the operand casts say |
 | [narrow-inline-accessor-spill](narrow-inline-accessor-spill.md) | extra byte-store + `movsx` off a frame slot, frame one slot too big → retail read the member, not the `i8` inline accessor |
 | [duplicate-string-cells-no-gf](duplicate-string-cells-no-gf.md) | target has `$anon_str_<hash>_0.._N` where we have one → that unit compiled without `/Gf`; move it to `base_nogf` |
+| [goto-label-jump-stub](goto-label-jump-stub.md) | loop exit reaches its join through a `jmp` stub parked before the epilogue → source `goto`, not `break` |
+| [compiler-temp-vs-named-local](compiler-temp-vs-named-local.md) | `this` spill and every temp shifted by one slot → one side named a value the other left a temp |
