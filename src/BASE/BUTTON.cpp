@@ -232,9 +232,8 @@ normalEvent:
 
 VA(0x004d3d70, 0xe9)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& msg) {
-    heroWindow* window = m_owner;
-    i16 x = window->m_posX + m_x;
-    i16 y = m_y + static_cast<i16>(window->m_posY);
+    i16 x = m_owner->m_posX + m_x;
+    i16 y = m_owner->m_posY + m_y;
     m_icon->DrawToBuffer(x, y, m_pressedFrame, ICON_DRAW_NORMAL);
     gpWindowManager->UpdateScreenRegion(x, y, m_width, m_height);
     m_flags |= WIDGET_FLAG_SELECTED;
