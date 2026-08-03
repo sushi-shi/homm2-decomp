@@ -103,6 +103,31 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Changed
 
+- **[Buka] The preferences registry moved to Buka's own key and value
+  namespace.** `BASE/Misc`'s three registry functions
+  (`ReadPrefsFromRegistry` 0xbe410, `WritePrefsToRegistry` 0xbedd0,
+  `SetupCDDrive` 0xbf370) open
+  `SOFTWARE\Buka\3DO\Heroes of Might and Magic Platinum\1.000` instead of
+  `SOFTWARE\New World Computing\Heroes of Might and Magic 2\1.0`, and every
+  value name is prefixed and de-spaced: `Music Volume` -> `HMM2POL
+  MusicVolume`, `Sound Volume` -> `HMM2POL FXVolume`, `Quick Combat Level` ->
+  `HMM2POL AutoCombat`, `Combat Shade Level` -> `HMM2POL CombatGridLevel`,
+  `Combat Army Info Level` -> `HMM2POL CombatViewArmyLevel`,
+  `Network Default Name` -> `HMM2POL NetName`, `Autosave` -> `HMM2POL
+  UseAutosave`, `Main Game *` -> `HMM2POL Game*`, `Editor *` -> `HMM2POL
+  Editor*`, `Editor Screen Animation` -> `HMM2POL EditorAnimateScreen`,
+  `CDDrive` -> `HMM2POL CDDrive`. The application-path value is renamed
+  outright: `AppPath` -> `PathPL2` (the Polish-release lineage this build
+  inherits). Full pair list with retail addresses in
+  `docs/buka-literal-divergences.tsv`; all 46 names are byte-pinned by the
+  `$anon_str_<sha256 of content+NUL>` cells the delinker names.
+- **[unclassified] `ReadPrefsFromFile` / `ReadPrefsFromRegistry` default-path
+  bodies call the shared helpers.** Both reset paths run
+  `SetInstallDefaults(); SetGameDefaults(); WritePrefs();` (the registry one
+  preceded by an explicit `memset(&gConfig, 0, 0x19d)` and `RegCloseKey`)
+  rather than inlining the memset/strcpy/`musicSource` block and the
+  `UpdateSystemOptionsMenu(); WritePrefsToRegistry();` pair. Byte-pinned at
+  0xbe371 and 0xbe4a3.
 - **[Buka] `resourceManager::m_lastFileName` grew from 60 to 1000 bytes**
   (`RESOURCE_MANAGER_FILENAME_CAPACITY` 0x3c -> 0x3e8, sizeof 0xa2 ->
   0x44e). Byte-pinned three ways: `m_lastFileId` reads at `this+0x44a`
