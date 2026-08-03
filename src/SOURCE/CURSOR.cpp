@@ -327,10 +327,8 @@ void advManager::DrawCursor(void) {
 
 VA(0x00433ab7, 0x327)
 void advManager::DrawCursorShadow(void) {
-    i32 shadowOffset;
-    i32 boatShadowOffset;
     i32 drawFrame;
-    i32 boatFrame;
+    i32 boatIndex;
     i32 shadowFrame;
     i32 drawY;
 
@@ -353,17 +351,17 @@ void advManager::DrawCursorShadow(void) {
         drawX += CURSOR_SHADOW_FLIP_X_ADJUST;
         drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
-            boatFrame = drawFrame;
-            if (boatFrame >= CURSOR_SHADOW_ANIM_FIRST && boatFrame < CURSOR_SHADOW_ANIM_END)
-                boatShadowOffset = CURSOR_BOAT_SHADOW_OFFSET;
-            else
-                boatShadowOffset = 0;
+            boatIndex = drawFrame;
             IconToBitmap(
                 m_boatShadowIcon,
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                boatFrame + boatShadowOffset,
+                boatIndex
+                    + (boatIndex >= CURSOR_SHADOW_ANIM_FIRST
+                               && boatIndex < CURSOR_SHADOW_ANIM_END
+                           ? CURSOR_BOAT_SHADOW_OFFSET
+                           : 0),
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -383,17 +381,16 @@ void advManager::DrawCursorShadow(void) {
                 shadowFrame = SPRITE_UP_SHADOW_WIDE;
             if (shadowFrame == SPRITE_UP_STEP_1)
                 shadowFrame = SPRITE_UP_SHADOW_WIDE;
-            if (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST
-                && shadowFrame < CURSOR_SHADOW_ANIM_END)
-                shadowOffset = CURSOR_HORSE_SHADOW_OFFSET;
-            else
-                shadowOffset = 0;
             IconToBitmap(
                 m_shadowIcon,
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                shadowOffset + shadowFrame,
+                (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST
+                         && shadowFrame < CURSOR_SHADOW_ANIM_END
+                     ? CURSOR_HORSE_SHADOW_OFFSET
+                     : 0)
+                    + shadowFrame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
