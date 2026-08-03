@@ -61,16 +61,12 @@ searchArray::searchArray(void) {
 
 VA(0x00449c55, 0x13)
 searchArray::~searchArray() {
-    if (m_storage.cells != NULL)
-        H2_FREE(m_storage.cells);
-    m_storage.cells = NULL;
+    Close();
 }
 
 VA(0x00449c68, 0x3c)
 void searchArray::Init(void) {
-    if (m_storage.cells != NULL)
-        H2_FREE(m_storage.cells);
-    m_storage.cells = NULL;
+    Close();
     m_storage.cells = static_cast<searchCell*>(H2_ALLOC(MAP_WIDTH * sizeof(searchCell) * MAP_HEIGHT));
 }
 
