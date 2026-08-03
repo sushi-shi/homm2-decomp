@@ -4541,7 +4541,6 @@ void advManager::EventSound(
     const i32 experienceSound_o = SOUND_EXPERIENCE;
     const i32 moraleSound_e = SOUND_MORALE;
     const i32 luckSound_g = SOUND_LUCK;
-    const i32 pickupSound_o = SOUND_PICKUP;
     const i32 mineSound_c = SOUND_MINE;
     char sampleFile_m[SOUND_FILENAME_LENGTH];
     strcpy(sampleFile_m, "");
@@ -4550,7 +4549,7 @@ void advManager::EventSound(
     switch (eventType) {
         case MAP_OBJECT_WAGON:
         case MAP_OBJECT_LEAN_TO:
-            musicTrack_e = pickupSound_o;
+            musicTrack_e = SOUND_PICKUP;
         case MAP_OBJECT_ARCHER_HOUSE:
         case MAP_OBJECT_GOBLIN_HUT:
         case MAP_OBJECT_DWARF_COTTAGE:

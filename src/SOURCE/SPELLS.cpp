@@ -3497,7 +3497,6 @@ i32 combatManager::SpaceForElementalExists(void) {
 
 VA(0x004a0a4b, 0xa1)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
-    SAMPLE2 sample = LoadPlaySample("rsbryfzl.82m");
     sprintf(
         gText,
         "The %s %s the spell!",
@@ -3506,7 +3505,7 @@ void combatManager::ShowSpellCastFailure(army* target, i32) {
         target->m_quantity == 1 ? "resists" : "resist"
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
-    WaitEndSample(sample, -1);
+    WaitEndSample((LoadPlaySample("rsbryfzl.82m")), -1);
 }
 
 VA(0x004a0aec, 0x1cd)

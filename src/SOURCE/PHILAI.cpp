@@ -401,7 +401,6 @@ H2_ENUM_BEGIN(AITownEvaluationConstant)
 H2_ENUM_END(AITownEvaluationConstant)
 
 
-
 searchArray SVSearchArray;
 
 inline i32 HeroRVByteOffset(i32 x, i32 y) {
@@ -6363,7 +6362,7 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
     i32 result1 = 0;
     i32 outcomeValue4;
     i32 mineValue0;
-    float attackBonus0;
+
     if (gpGame->m_mineOwners[mineIndex] == gpCurAIHero->m_owner
         || OnMySide(gpGame->m_mineOwners[mineIndex]))
         return result1;
@@ -6424,11 +6423,7 @@ i32 philAI::EvaluateMineEvent(i32 mineIndex, i32 x, i32 y, i32* liveChance) {
             * gaiTurnValueOfMine[x + MAP_WIDTH * y]
         );
         if (gpGame->m_mineOwners[mineIndex] >= 0) {
-            if (gbHumanPlayer[gpGame->m_mineOwners[mineIndex]])
-                attackBonus0 = gfAttackHumanBonus;
-            else
-                attackBonus0 = gfAttackComputerBonus;
-            mineValue0 = static_cast<i32>(mineValue0 * attackBonus0);
+            mineValue0 = static_cast<i32>(mineValue0 * (gbHumanPlayer[gpGame->m_mineOwners[mineIndex]] ? gfAttackHumanBonus : gfAttackComputerBonus));
         }
         result1 += mineValue0;
     }

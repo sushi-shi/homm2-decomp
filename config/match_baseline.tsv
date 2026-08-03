@@ -747,7 +747,7 @@ SOURCE/EVENTS	?DoEvent@advManager@@QAEXPAVmapCell@@HH@Z	75.6614	2a873dd14ff6
 SOURCE/EVENTS	?DoNetCombat@advManager@@QAEHPAD@Z	99.6736	901912ed130b
 SOURCE/EVENTS	?DoWhirlpool@advManager@@QAEXPAVhero@@@Z	87.6829	b414f8021b11
 SOURCE/EVENTS	?EraseObj@advManager@@QAEXPAVmapCell@@HH@Z	90.5524	b399387fa3a6
-SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	0.0000	56a64727fb1f
+SOURCE/EVENTS	?EventSound@advManager@@QAEXHHPAUSAMPLE2@@@Z	0.0000	4c1feedcbd36
 SOURCE/EVENTS	?EventWindow@advManager@@QAEXHHPADHHHHH@Z	99.8491	95e47b2d5895
 SOURCE/EVENTS	?ExpansionRecruitEvent@advManager@@QAEXPAVhero@@HPAF@Z	99.9216	3d9e152e6cbf
 SOURCE/EVENTS	?FizzleCenter@advManager@@QAEXH@Z	89.5323	8ebda350b187
@@ -1113,7 +1113,7 @@ SOURCE/PHILAI	?EvaluateBarrier@philAI@@QAEHPAVmapCell@@@Z	100.0000	46cb41fe5fc7
 SOURCE/PHILAI	?EvaluateGenericSite@philAI@@QAEHPAVmapCell@@@Z	93.9554	88a1ce328c7f
 SOURCE/PHILAI	?EvaluateHeroEvent@philAI@@QAEHHHHHPAH@Z	95.7414	cb552bd9b5bd
 SOURCE/PHILAI	?EvaluateJail@philAI@@QAEHPAVmapCell@@@Z	100.0000	e9f6e9b35ca2
-SOURCE/PHILAI	?EvaluateMineEvent@philAI@@QAEHHHHPAH@Z	97.0157	6b48dded0024
+SOURCE/PHILAI	?EvaluateMineEvent@philAI@@QAEHHHHPAH@Z	96.9529	77b765bb07db
 SOURCE/PHILAI	?EvaluateMonsterEvent@philAI@@QAEHHHPAH@Z	98.7434	692eba2d59b8
 SOURCE/PHILAI	?EvaluateOneTimeCreaturePurchase@philAI@@QAEXHHHAAH00@Z	97.4750	cb071e7df9cd
 SOURCE/PHILAI	?EvaluatePassword@philAI@@QAEHPAVmapCell@@@Z	100.0000	1c55c01ebd4e
@@ -1270,7 +1270,7 @@ SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	99.7629	25daad4d2eea
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	80dc6ffba1ec
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.6866	7e3481594100
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	99.4785	06b57ecdf0e8
-SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	63.5556	e01a8983b3f2
+SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	53.8889	fbaaa9ea9e63
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	88.8400	bbfdaf2d769b
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	25e693d9babc
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	99.8944	e1ed6193181c
