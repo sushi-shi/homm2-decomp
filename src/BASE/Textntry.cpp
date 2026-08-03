@@ -76,12 +76,10 @@ textEntryWidget::textEntryWidget(
     : textWidget(x, y, width, height, text, fontName, color, id, kind, FONT_ALIGN_CENTER) {
     m_cursorPosition = 0;
     m_maxLength = maxLength;
-    icon* loadedIcon = gpResourceManager->GetIcon(iconName);
-    i16 rectX = m_x;
     m_displayOffset = 0;
-    m_icon = loadedIcon;
+    m_icon = (gpResourceManager->GetIcon(iconName));
     m_iconFrame = iconFrame;
-    m_rectX = rectX;
+    m_rectX = m_x;
     m_kind = WIDGET_KIND_TEXT_ENTRY;
     m_rectY = m_y;
     m_rectW = m_width;

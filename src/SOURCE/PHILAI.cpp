@@ -400,7 +400,6 @@ H2_ENUM_BEGIN(AITownEvaluationConstant)
     TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
 H2_ENUM_END(AITownEvaluationConstant)
 
-
 searchArray SVSearchArray;
 
 inline i32 HeroRVByteOffset(i32 x, i32 y) {
@@ -2211,7 +2210,6 @@ void philAI::ProbableOutcomeOfBattle(
     float difficultyFactor5;
     float exponent1;
     float attackerPower17;
-    float attackBonus13;
 
     attackerFightValue26 =
         static_cast<float>(FightValueOfStack(attacker, attackerHero, 1, 0, 0, useTown));
@@ -2347,12 +2345,8 @@ void philAI::ProbableOutcomeOfBattle(
             && defenderHero->m_id == gpGame->m_mapHeader.lossConditionValue)
             defenderArtifacts18 += AI_BATTLE_SPECIAL_ARTIFACT_VALUE;
 
-        if (gbHumanPlayer[defenderHero->m_owner] != 0)
-            attackBonus13 = gfAttackHumanBonus;
-        else
-            attackBonus13 = gfAttackComputerBonus;
         outcomeValue = static_cast<i32>(
-            winChance * ((defenderArtifacts18 + AI_BATTLE_DEFENDER_ARTIFACT_BASE) * attackBonus13)
+            winChance * ((defenderArtifacts18 + AI_BATTLE_DEFENDER_ARTIFACT_BASE) * (gbHumanPlayer[defenderHero->m_owner] != 0 ? gfAttackHumanBonus : gfAttackComputerBonus))
             + outcomeValue
         );
     }
@@ -3942,9 +3936,8 @@ i32 philAI::QuickCombat(
     float winChance37;
     i32 necromancyCount6;
     float casualtyFraction17;
-    i32 defenderOwner1;
+
     float winnerChance0;
-    float rollDifference8;
 
     attackerExperience37 = gpGame->ExperienceValueOfStack(attacker, attackerHero);
     if (townBattle != 0)
@@ -3961,10 +3954,6 @@ i32 philAI::QuickCombat(
 
     attackerWon2 = 0;
     selectedGroup36 = NULL;
-    if (defenderHero != NULL)
-        defenderOwner1 = defenderHero->m_owner;
-    else
-        defenderOwner1 = AI_BATTLE_NO_PLAYER;
     ProbableOutcomeOfBattle(
         attacker,
         attackerHero,
@@ -3973,7 +3962,7 @@ i32 philAI::QuickCombat(
         NULL,
         townBattle,
         townId,
-        defenderOwner1,
+        (defenderHero != NULL ? defenderHero->m_owner : AI_BATTLE_NO_PLAYER),
         winChance37,
         attackerLoss5,
         defenderLoss8,
@@ -3994,11 +3983,7 @@ i32 philAI::QuickCombat(
         selectedGroup36 = defender;
     }
 
-    if (winChance37 < randomRoll8)
-        rollDifference8 = randomRoll8 - winChance37;
-    else
-        rollDifference8 = winChance37 - randomRoll8;
-    adjustedDifference1 = rollDifference8;
+    adjustedDifference1 = (winChance37 < randomRoll8 ? randomRoll8 - winChance37 : winChance37 - randomRoll8);
     if (attackerWon2 != 0 && winChance37 > AI_QUICK_COMBAT_WIN_BONUS_THRESHOLD)
         adjustedDifference1 =
             static_cast<float>((winChance37 + AI_QUICK_COMBAT_WIN_BONUS) * adjustedDifference1);
@@ -4278,7 +4263,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
     i32 transferValue;
     float desiredShare0;
     float transferCurve;
-    float shareDifference7;
+
     i32 spellMultiplier1;
     float transferFactor;
 
@@ -4394,11 +4379,7 @@ void philAI::HeroInteractionAtTown(hero* heroPtr, town* townPtr, i32 doInteracti
         && townPtr->m_y == gpGame->m_mapHeader.victoryTownY) {
         desiredShare0 = 0.8f;
     }
-    if (desiredShare0 >= townShare5)
-        shareDifference7 = desiredShare0 - townShare5;
-    else
-        shareDifference7 = townShare5 - desiredShare0;
-    transferShare9 = shareDifference7;
+    transferShare9 = (desiredShare0 >= townShare5 ? desiredShare0 - townShare5 : townShare5 - desiredShare0);
     if (!(desiredShare0 * AI_TOWN_SHARE_DIFFERENCE_FACTOR <= transferShare9)
         || transferShare9 < AI_MINIMUM_TOWN_SHARE_DIFFERENCE)
         return;
@@ -4642,12 +4623,8 @@ void philAI::ChooseEvaluateBattle(
     i32 p;
     i32 node, nb, kn, jb;
     float idx;
-    i32 race;
-    if (h2 != NULL)
-        race = h2->m_owner;
-    else
-        race = -1;
-    ProbableOutcomeOfBattle(ag1, h1, ag2, h2, NULL, a, b, race, idx, jb, kn, nb, node, val);
+
+    ProbableOutcomeOfBattle(ag1, h1, ag2, h2, NULL, a, b, (h2 != NULL ? h2->m_owner : -1), idx, jb, kn, nb, node, val);
     val = static_cast<i32>(c * idx + val);
     if (val <= 0) {
         outValue = 0;

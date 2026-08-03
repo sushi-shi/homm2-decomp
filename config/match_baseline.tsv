@@ -40,7 +40,7 @@ BASE/BITS	_BitTest	100.0000	50d3d02b6c88
 BASE/BORDER	??0border@@QAE@FFFFFFFPAD@Z	100.0000	3feb999386ce
 BASE/BORDER	??0border@@QAE@XZ	100.0000	bdda7206cf3e
 BASE/BORDER	??1border@@UAE@XZ	100.0000	5c9024540d83
-BASE/BORDER	?Draw@border@@UAEXXZ	60.4026	adf48346dfb8
+BASE/BORDER	?Draw@border@@UAEXXZ	67.2078	5ca00c240b02
 BASE/BORDER	?Main@border@@UAEHAAUtag_message@@@Z	22.5366	07545389770f
 BASE/BORDER	?Read@border@@QAEXXZ	92.7848	eb755b22356a
 BASE/BUTTON	??0button@@QAE@FFFFKFFFFFF@Z	100.0000	909d8ecf15cf
@@ -170,7 +170,7 @@ BASE/FONT	?RemapCyrillicCharacter@@YIHH@Z	100.0000	0ac695a260ea
 BASE/ICON	??0icon@@QAE@K@Z	100.0000	60f4f580eca7
 BASE/ICON	??1icon@@UAE@XZ	100.0000	e60a9b41b48e
 BASE/ICON	?ClipFillToBuffer@icon@@QAEXHHHHHHHHH@Z	100.0000	28e05171c91b
-BASE/ICON	?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z	89.9878	42963237f1a1
+BASE/ICON	?CombatClipDrawToBuffer@icon@@QAEHHHHPAUSLimitData@@HHPAEPAC@Z	90.3110	ad2909fa9953
 BASE/ICON	?DimToBuffer@icon@@QAEXHHHH@Z	100.0000	b87879e52ab4
 BASE/ICON	?DrawToBuffer@icon@@QAEXHHHH@Z	100.0000	988ff5a580b6
 BASE/ICON	?FillToBuffer@icon@@QAEXHHHHHPAUSLimitData@@@Z	78.2476	55cccbc4dcb8
@@ -178,7 +178,7 @@ BASE/ICONWDGT	??0iconWidget@@QAE@FFFFKFCFFF@Z	100.0000	f257053492df
 BASE/ICONWDGT	??0iconWidget@@QAE@FFFFPADFCFFF@Z	100.0000	b3f26e58981f
 BASE/ICONWDGT	??0iconWidget@@QAE@XZ	100.0000	142ec5bf3ef0
 BASE/ICONWDGT	??1iconWidget@@UAE@XZ	100.0000	1f6a8d697283
-BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	77.3967	90952e73e03b
+BASE/ICONWDGT	?Draw@iconWidget@@UAEXXZ	79.9587	832bff6363cc
 BASE/ICONWDGT	?Main@iconWidget@@UAEHAAUtag_message@@@Z	0.0000	29263972126d
 BASE/ICONWDGT	?Read@iconWidget@@QAEXXZ	96.8841	34143d361c89
 BASE/INPUTMGR	??0inputManager@@QAE@XZ	100.0000	0d38ad992fbb
@@ -341,7 +341,7 @@ BASE/TEXTWDGT	?SetText@textWidget@@QAEXPAD@Z	0.0000	030bccaec0d8
 BASE/TILE	_TileToBitmap	99.4624	90d974ac90df
 BASE/TILESET	??0tileset@@QAE@K@Z	100.0000	1948f06e19aa
 BASE/TILESET	??1tileset@@UAE@XZ	100.0000	2c6c96104590
-BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	81.5354	d2e65bb0fe99
+BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	82.6299	885460135009
 BASE/Textntry	??0textEntryWidget@@QAE@XZ	100.0000	18191e6b51dc
 BASE/Textntry	??1textEntryWidget@@UAE@XZ	100.0000	6341119ebe12
 BASE/Textntry	?Draw@textEntryWidget@@UAEXXZ	71.0577	4c8250e30d26
@@ -371,7 +371,7 @@ BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	95.1507	58bf4111366e
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	b01eecebcd16
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	f30559a466ff
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	0b5e1800ce0f
-BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	81.4112	30caf024d5eb
+BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	84.7290	768f1daa4940
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	100.0000	1183a5510de9
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	1058c1ccd6f9
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	d5d7a1b03ae8
@@ -379,9 +379,9 @@ BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	50e4aa3b8315
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	eef2e34e81d2
 BASE/WINMGR	?CreateFizzleTables@@YIXXZ	100.0000	bf8922368e76
 BASE/WINMGR	?CycleColors@@YIXH@Z	80.0210	e5ae32b49419
-BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	58.2703	36b211dfe3c9.db7f59af7c85
+BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	59.5135	5172e1a20dcf.db7f59af7c85
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	89.7381	39336ee6fb74.db7f59af7c85
-BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	81.7322	aaa126b09ea3
+BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	80.3362	02706e1214a0
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	82.5938	6b8d30a55ced
 BASE/WINMGR	?Open@heroWindowManager@@UAEHH@Z	80.1325	16fd6cd61141
 BASE/WINMGR	?RedrawScreen@heroWindowManager@@QAEXXZ	61.1111	8de786945ca5
@@ -406,7 +406,7 @@ BASE/droplist	?Read@dropListWidget@@QAEXXZ	79.9388	776756cd918a
 BASE/droplist	?RestoreDropBackground@dropListWidget@@QAEXXZ	92.4468	42b283b6d313
 BASE/droplist	?SaveDropBackground@dropListWidget@@QAEXXZ	100.0000	a20e3ef2d96b
 BASE/icon2bc	?IconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAEH@Z	28.5335	dc787e6b3741.0e13db56b47b
-BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	75.0341	3b462a119eab
+BASE/icon2bs	?IconToBitmapScale@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	70.3352	ae7fa0ec50e2
 BASE/icon2by	?IconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	38.0102	34ecbd68a88f.30f5cab9fe5a
 BASE/iconf2bc	?FlipIconToBitmapColorTable@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAE@Z	28.0441	a4f2b5ab6596.2e149f56ae53
 BASE/iconf2by	?FlipIconToBitmapYModify@@YIXPAVicon@@PAVbitmap@@HHHHHHHHHPAC@Z	47.8243	9de0bfc0777d.4dabe2f544ff
@@ -416,7 +416,7 @@ BASE/listbox	?DeleteItem@listBoxWidget@@QAEXH@Z	100.0000	e5aad5bf2f33
 BASE/listbox	?Draw@listBoxWidget@@UAEXXZ	100.0000	f04ab5d35611
 BASE/listbox	?DrawLBStuff@listBoxWidget@@QAEXH@Z	79.4525	59e8b01bd033
 BASE/listbox	?Main@listBoxWidget@@UAEHAAUtag_message@@@Z	45.1972	e9f0fcbd7663
-BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	34.3569	2278fb616996
+BASE/listbox	?ProcessMouseMessage@listBoxWidget@@QAEHAAUtag_message@@@Z	37.0627	67cfa2f04fd7
 BASE/listbox	?Read@listBoxWidget@@QAEXXZ	80.5790	1613322bfbb2
 BASE/miscwin	?AutoInitSVGA@@YIFXZ	100.0000	1da5ac3f7fee
 BASE/miscwin	_BlitBitmapToScreenVesa	82.8357	e1f4a7047920
@@ -1089,7 +1089,7 @@ SOURCE/PHILAI	?CheckBuyStuff@philAI@@QAEXXZ	95.7057	0524a2c8d16e
 SOURCE/PHILAI	?CheckDoMain@@YIXHH@Z	90.3500	592defd4c64f
 SOURCE/PHILAI	?CheckForCreatureUpgrades@philAI@@QAEXXZ	92.5270	16e25fb33c4e
 SOURCE/PHILAI	?CheckReload@philAI@@QAEXXZ	83.4794	07a44f391a5b
-SOURCE/PHILAI	?ChooseEvaluateBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@01HHHAAH2@Z	97.0328	d0395a649f98
+SOURCE/PHILAI	?ChooseEvaluateBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@01HHHAAH2@Z	97.1148	2ae29ee12090
 SOURCE/PHILAI	?ChooseGoldOrExperience@philAI@@QAEHHH@Z	100.0000	1399dc0ecf55
 SOURCE/PHILAI	?ChooseToFightForArtifact@philAI@@QAEHHHH@Z	86.1385	16ccd2bdffe2
 SOURCE/PHILAI	?ChooseToPayRansomOnHero@philAI@@QAEHH@Z	100.0000	365a5acacdaf
@@ -1133,7 +1133,7 @@ SOURCE/PHILAI	?GetTurnAIVars@philAI@@QAEXH@Z	96.5006	efc9dc9a6583
 SOURCE/PHILAI	?GetTurnAttentionValue@philAI@@QAEXH@Z	100.0000	b99b6d12ac41
 SOURCE/PHILAI	?GoodAdjacent@philAI@@QAEHPAH@Z	91.9275	b4964d644389
 SOURCE/PHILAI	?HeroInteractionAtHero@philAI@@QAEXPAVhero@@0HPAH@Z	99.0897	637771d9d398
-SOURCE/PHILAI	?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z	93.6598	1fb532fae50f
+SOURCE/PHILAI	?HeroInteractionAtTown@philAI@@QAEXPAVhero@@PAVtown@@HPAH@Z	93.4838	c0124db5678f
 SOURCE/PHILAI	?IncrementHourGlass@philAI@@QAEXXZ	100.0000	a22cdb0fe751
 SOURCE/PHILAI	?InitAIMapVars@@YIXXZ	100.0000	3b78cbac6abe
 SOURCE/PHILAI	?LikelihoodOfEnemyAttacking@philAI@@QAEXPAVtown@@PAVhero@@AAM2AAH332@Z	100.0000	b64349c931d5
@@ -1142,8 +1142,8 @@ SOURCE/PHILAI	?MaxBuyableCreatures@philAI@@QAEHH@Z	99.8205	83881f271dc7
 SOURCE/PHILAI	?MeanRVOfUnexploredTerritory@philAI@@QAEHH@Z	100.0000	0f596eebe1fb
 SOURCE/PHILAI	?NetValueOfArtifact@philAI@@QAEHHHHH@Z	100.0000	524692e2ce04
 SOURCE/PHILAI	?OnMySide@@YIHH@Z	100.0000	566230436099
-SOURCE/PHILAI	?ProbableOutcomeOfBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@010HHHAAMAAH3333@Z	90.0698	c3b074836b2a
-SOURCE/PHILAI	?QuickCombat@philAI@@QAEHPAVarmyGroup@@PAVhero@@01HHAAM2@Z	95.8878	9137cea59702
+SOURCE/PHILAI	?ProbableOutcomeOfBattle@philAI@@QAEXPAVarmyGroup@@PAVhero@@010HHHAAMAAH3333@Z	89.9283	c2d987035ef1
+SOURCE/PHILAI	?QuickCombat@philAI@@QAEHPAVarmyGroup@@PAVhero@@01HHAAM2@Z	95.7204	92aaaf51dcc3
 SOURCE/PHILAI	?RVConversion@philAI@@QAEHQAH@Z	100.0000	c23ed0e5c512
 SOURCE/PHILAI	?RVOfPosition@philAI@@QAEHHHHHHHHHHH@Z	98.2797	849d2c9fe213
 SOURCE/PHILAI	?RedistributeTroops@philAI@@QAEXPAVarmyGroup@@0HHHHH@Z	89.8339	45729e707c81

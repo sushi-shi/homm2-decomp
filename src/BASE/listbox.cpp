@@ -516,13 +516,10 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
                 message.payload.widget.command = WIDGET_COMMAND_SELECT;
                 message.type = MESSAGE_WIDGET;
                 message.payload.widget.id = m_id;
-                i32 selectedIndex = m_selectedIndex;
                 message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
-                message.payload.widget.data.value = selectedIndex;
+                message.payload.widget.data.value = m_selectedIndex;
                 if (m_lastSelectedIndex == m_selectedIndex) {
-                    i32 lastTick = m_lastClickTime;
-                    i32 currentTick = KBTickCount();
-                    if (lastTick + DOUBLE_CLICK_TICKS > currentTick)
+                    if (m_lastClickTime + DOUBLE_CLICK_TICKS > (KBTickCount()))
                         message.payload.widget.parameter = SELECTION_DOUBLE_CLICK;
                 }
                 m_lastSelectedIndex = m_selectedIndex;
