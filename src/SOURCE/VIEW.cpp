@@ -369,36 +369,36 @@ void combatManager::ViewArmy(army* viewedArmy, i32 quickView) {
     {
         CombatSide side;
         i32 windowX;
-        i32 windowY_5;
+        i32 windowY;
         i16 viewWidthConstant;
-        i16 viewYOffsetConstant_1;
-        i16 viewXOffsetConstant_9;
-        i32 xOffset_9;
-        i16 viewHeightConstant_10;
+        i16 viewYOffsetConstant;
+        i16 viewXOffsetConstant;
+        i32 xOffset;
+        i16 viewHeightConstant;
 
         viewWidthConstant = ARMY_WIDTH - ARMY_VIEW_X_OFFSET;
-        viewHeightConstant_10 = ARMY_HEIGHT;
-        viewXOffsetConstant_9 = ARMY_VIEW_X_OFFSET;
-        viewYOffsetConstant_1 = ARMY_Y_OFFSET;
+        viewHeightConstant = ARMY_HEIGHT;
+        viewXOffsetConstant = ARMY_VIEW_X_OFFSET;
+        viewYOffsetConstant = ARMY_Y_OFFSET;
         windowX = m_hexCells[viewedArmy->m_hex].m_x;
-        windowY_5 = m_hexCells[viewedArmy->m_hex].m_y;
-        xOffset_9 =
+        windowY = m_hexCells[viewedArmy->m_hex].m_y;
+        xOffset =
             (viewedArmy->m_facing == ARMY_FACING_LEFT ? ARMY_FACING_OFFSET_DELTA : 0)
             + ARMY_RIGHT_FACING_X_OFFSET;
-        windowX -= xOffset_9;
+        windowX -= xOffset;
         if (windowX < 0)
             windowX = 0;
         if (windowX + ARMY_WIDTH > ARMY_SCREEN_WIDTH)
             windowX = ARMY_RIGHT_CLAMP;
-        windowY_5 -= ARMY_Y_OFFSET;
-        if (windowY_5 < 0)
-            windowY_5 = 0;
-        if (windowY_5 + ARMY_HEIGHT > ARMY_SCREEN_HEIGHT)
-            windowY_5 = ARMY_BOTTOM_CLAMP;
+        windowY -= ARMY_Y_OFFSET;
+        if (windowY < 0)
+            windowY = 0;
+        if (windowY + ARMY_HEIGHT > ARMY_SCREEN_HEIGHT)
+            windowY = ARMY_BOTTOM_CLAMP;
         side = viewedArmy->m_side;
         gpGame->ViewArmy(
             windowX,
-            windowY_5,
+            windowY,
             viewedArmy->m_monsterType,
             viewedArmy->m_quantity,
             m_combatTowns[IDX(side)],

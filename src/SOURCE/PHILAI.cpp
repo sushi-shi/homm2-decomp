@@ -877,8 +877,8 @@ void philAI::CheckReload(void) {
 
 VA(0x0047f41f, 0x29f)
 void philAI::CheckBerserk(void) {
-    i32 row17;
-    i32 column1;
+    i32 row;
+    i32 column;
     mapCell* kn;
     i32 jb;
     i32 idx;
@@ -895,9 +895,9 @@ void philAI::CheckBerserk(void) {
     if (jb < AI_BERSERK_THRESHOLD)
         return;
     {
-        for (column1 = 0; column1 < MAP_WIDTH; column1++) {
-            for (row17 = 0; row17 < MAP_HEIGHT; row17++) {
-                kn = gpAdvManager->GetCell(column1, row17);
+        for (column = 0; column < MAP_WIDTH; column++) {
+            for (row = 0; row < MAP_HEIGHT; row++) {
+                kn = gpAdvManager->GetCell(column, row);
                 switch (kn->m_triggerType) {
                     case (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE):
                         if (gpGame->m_castleOwners[kn->m_objectMetadata] != gpCurAIHero->m_owner) {

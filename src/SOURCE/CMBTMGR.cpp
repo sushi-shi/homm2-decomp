@@ -2044,52 +2044,52 @@ i32 combatManager::ShotIsThroughWall(
     if (InCastle(sourceHex) || !InCastle(targetHex))
         return 0;
 
-    i32 sourceColumn1 = sourceHex % COMBAT_GRID_ROW_LENGTH;
-    i32 sourceRow9 = sourceHex / COMBAT_GRID_ROW_LENGTH;
-    i32 targetColumn8 = targetHex % COMBAT_GRID_ROW_LENGTH;
-    i32 targetRow26 = targetHex / COMBAT_GRID_ROW_LENGTH;
-    i32 columnDistance4 = targetColumn8 - sourceColumn1;
-    i32 rowDistance17 = targetRow26 - sourceRow9;
-    i32 traceLength1;
-    float columnStep5;
-    float rowStep2;
-    if (abs(columnDistance4) > abs(rowDistance17)) {
-        traceLength1 = abs(columnDistance4);
-        columnStep5 = columnDistance4 > 0 ? 1 : -1;
-        rowStep2 = static_cast<float>(rowDistance17) / static_cast<float>(abs(columnDistance4));
+    i32 sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    i32 sourceRow = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    i32 targetColumn = targetHex % COMBAT_GRID_ROW_LENGTH;
+    i32 targetRow = targetHex / COMBAT_GRID_ROW_LENGTH;
+    i32 columnDistance = targetColumn - sourceColumn;
+    i32 rowDistance = targetRow - sourceRow;
+    i32 traceLength;
+    float columnStep;
+    float rowStep;
+    if (abs(columnDistance) > abs(rowDistance)) {
+        traceLength = abs(columnDistance);
+        columnStep = columnDistance > 0 ? 1 : -1;
+        rowStep = static_cast<float>(rowDistance) / static_cast<float>(abs(columnDistance));
     } else {
-        traceLength1 = abs(rowDistance17);
-        rowStep2 = rowDistance17 > 0 ? 1 : -1;
-        columnStep5 = static_cast<float>(columnDistance4) / static_cast<float>(abs(rowDistance17));
+        traceLength = abs(rowDistance);
+        rowStep = rowDistance > 0 ? 1 : -1;
+        columnStep = static_cast<float>(columnDistance) / static_cast<float>(abs(rowDistance));
     }
-    columnStep5 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
+    columnStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
     ;
-    rowStep2 /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
-    float traceColumn6 = static_cast<float>(sourceColumn1);
-    float traceRow1 = static_cast<float>(sourceRow9);
-    i32 traceIndex13;
-    i32 traceHex11;
-    i32 structureIndex0;
-    for (traceIndex13 = 0; traceIndex13 < traceLength1 * COMBAT_WALL_TRACE_SUBDIVISIONS;
-         traceIndex13++) {
-        traceColumn6 += columnStep5;
-        traceRow1 += rowStep2;
-        traceHex11 =
-            static_cast<i32>(traceRow1) * COMBAT_GRID_ROW_LENGTH + static_cast<i32>(traceColumn6);
-        for (structureIndex0 = 0; structureIndex0 < COMBAT_CASTLE_STRUCTURE_COUNT;
-             structureIndex0++) {
-            if (traceHex11 == iWallToHexCell[structureIndex0]
-                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+    rowStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    float traceColumn = static_cast<float>(sourceColumn);
+    float traceRow = static_cast<float>(sourceRow);
+    i32 traceIndex;
+    i32 traceHex;
+    i32 structureIndex;
+    for (traceIndex = 0; traceIndex < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
+         traceIndex++) {
+        traceColumn += columnStep;
+        traceRow += rowStep;
+        traceHex =
+            static_cast<i32>(traceRow) * COMBAT_GRID_ROW_LENGTH + static_cast<i32>(traceColumn);
+        for (structureIndex = 0; structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
+             structureIndex++) {
+            if (traceHex == iWallToHexCell[structureIndex]
+                && m_wallStates[structureIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structureIndex0 + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structureIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
-            if (traceHex11 == iTowerToHexCell[structureIndex0]
-                && m_wallStates[structureIndex0] != COMBAT_WALL_STATE_DESTROYED) {
+            if (traceHex == iTowerToHexCell[structureIndex]
+                && m_wallStates[structureIndex] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
-            if (traceHex11 == IDX(COMBAT_CASTLE_HEX_GATE)
+            if (traceHex == IDX(COMBAT_CASTLE_HEX_GATE)
                 && m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
                 return 1;
             }

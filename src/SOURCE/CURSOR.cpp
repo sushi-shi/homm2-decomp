@@ -329,8 +329,8 @@ VA(0x00433ab7, 0x327)
 void advManager::DrawCursorShadow(void) {
     i32 shadowOffset;
     i32 boatShadowOffset;
-    i32 drawFrame_f;
-    i32 boatFrame_i;
+    i32 drawFrame;
+    i32 boatFrame;
     i32 shadowFrame;
     i32 drawY;
 
@@ -351,10 +351,10 @@ void advManager::DrawCursorShadow(void) {
 
     if (m_cursorFrame & CURSOR_FLIP_FLAG) {
         drawX += CURSOR_SHADOW_FLIP_X_ADJUST;
-        drawFrame_f = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
+        drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
-            boatFrame_i = drawFrame_f;
-            if (boatFrame_i >= CURSOR_SHADOW_ANIM_FIRST && boatFrame_i < CURSOR_SHADOW_ANIM_END)
+            boatFrame = drawFrame;
+            if (boatFrame >= CURSOR_SHADOW_ANIM_FIRST && boatFrame < CURSOR_SHADOW_ANIM_END)
                 boatShadowOffset = CURSOR_BOAT_SHADOW_OFFSET;
             else
                 boatShadowOffset = 0;
@@ -363,7 +363,7 @@ void advManager::DrawCursorShadow(void) {
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                boatFrame_i + boatShadowOffset,
+                boatFrame + boatShadowOffset,
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -372,7 +372,7 @@ void advManager::DrawCursorShadow(void) {
                 0
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
-            shadowFrame = drawFrame_f;
+            shadowFrame = drawFrame;
             if (shadowFrame == SPRITE_UP_STEP_5)
                 shadowFrame = SPRITE_UP_SHADOW_STEP_5;
             if (shadowFrame == SPRITE_UP_STEP_4)
@@ -403,14 +403,14 @@ void advManager::DrawCursorShadow(void) {
             );
         }
     } else {
-        drawFrame_f = m_cursorFrame + m_cursorFrameCount;
+        drawFrame = m_cursorFrame + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             IconToBitmap(
                 m_boatShadowIcon,
                 gpWindowManager->m_screen,
                 drawX,
                 drawY,
-                drawFrame_f,
+                drawFrame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -424,7 +424,7 @@ void advManager::DrawCursorShadow(void) {
                 gpWindowManager->m_screen,
                 drawX,
                 drawY,
-                drawFrame_f,
+                drawFrame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -1008,25 +1008,25 @@ i32 advManager::ValidMoveWithEvent(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
 ) {
-    i32 directionX0;
-    i32 destinationX0;
-    i32 directionY0;
-    i32 destinationY0;
-    mapCell* destinationCell0;
+    i32 directionX;
+    i32 destinationX;
+    i32 directionY;
+    i32 destinationY;
+    mapCell* destinationCell;
 
-    directionX0 = normalDirTable[IDX(direction)].x;
-    directionY0 = normalDirTable[IDX(direction)].y;
-    destinationX0 = movingHero->m_x + directionX0;
-    destinationY0 = movingHero->m_y + directionY0;
-    if (destinationX0 < 0 || destinationX0 > MAP_WIDTH - 1 || destinationY0 < 0
-        || destinationY0 > MAP_HEIGHT - 1)
+    directionX = normalDirTable[IDX(direction)].x;
+    directionY = normalDirTable[IDX(direction)].y;
+    destinationX = movingHero->m_x + directionX;
+    destinationY = movingHero->m_y + directionY;
+    if (destinationX < 0 || destinationX > MAP_WIDTH - 1 || destinationY < 0
+        || destinationY > MAP_HEIGHT - 1)
         return 0;
 
-    destinationCell0 = m_mapData->GetCell(destinationX0, destinationY0);
-    switch (destinationCell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
+    destinationCell = m_mapData->GetCell(destinationX, destinationY);
+    switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
             if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {
-                if (HAS(gpGame->GetHero(destinationCell0->m_objectMetadata)->m_eventFlags,
+                if (HAS(gpGame->GetHero(destinationCell->m_objectMetadata)->m_eventFlags,
                         HERO_EVENT_EMBARKED))
                     return 1;
                 else

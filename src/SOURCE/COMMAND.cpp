@@ -783,7 +783,9 @@ void combatManager::CheckSetMouseDirection(i32 mouseX, i32 mouseY, i32 targetHex
 
 VA(0x0042c8fe, 0x5a)
 i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
-    i32 result;
+    i32 x;
+    i32 y;
+    i32 unusedResult;
     if (command == COMBAT_MESSAGE_COMMAND_OPPOSING_OPTIONS) {
         return POINTER_VIEW;
     } else {
@@ -792,8 +794,8 @@ i32 combatManager::GetPointer(CombatMessageCommand command, i32 hexIndex) {
             case COMBAT_MESSAGE_COMMAND_FLY:
             case COMBAT_MESSAGE_COMMAND_SHOOT:
             case COMBAT_MESSAGE_COMMAND_VIEW_INFO: {
-                i32 x = hexIndex % COMBAT_GRID_ROW_LENGTH;
-                i32 y = hexIndex / COMBAT_GRID_ROW_LENGTH;
+                x = hexIndex % COMBAT_GRID_ROW_LENGTH;
+                y = hexIndex / COMBAT_GRID_ROW_LENGTH;
                 return IDX(command);
             }
             default:
@@ -2063,13 +2065,13 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     i32 i;
     i32 necroEligible;
     i32 cost;
-    i32 fadeIndex26;
-    army* currentArmy26;
+    i32 fadeIndex;
+    army* currentArmy;
     tag_message message;
     i32 victoryLevels = 0;
     CombatSide combatSide;
-    i32 deadCreatureCount3;
-    i32 lastLivingArmy0;
+    i32 deadCreatureCount;
+    i32 lastLivingArmy;
 
     if (m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL
         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)]->m_isCaptain != 0)
@@ -2081,48 +2083,48 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     iMaxTransferArtifacts = 0;
     iCurTransferArtifact = -1;
     bSkeletonsShown = 0;
-    deadCreatureCount3 = 0;
+    deadCreatureCount = 0;
     necroEligible = 0;
 
     for (combatSide = COMBAT_ATTACKER_SIDE; IDX(combatSide) < COMBAT_SIDE_COUNT; ++combatSide) {
         living = 0;
-        lastLivingArmy0 = -1;
+        lastLivingArmy = -1;
         for (i = 0; i < gpCombatManager->m_armyCount[IDX(combatSide)]; ++i) {
-            currentArmy26 = &m_armies[IDX(combatSide)][i];
-            if (currentArmy26->m_quantity > 0) {
-                lastLivingArmy0 = i;
-                if (currentArmy26->m_temporaryResurrectionQuantity > 0)
-                    currentArmy26->m_quantity -= currentArmy26->m_temporaryResurrectionQuantity;
-                if (currentArmy26->m_quantity < 0)
-                    currentArmy26->m_quantity = 0;
-                living += currentArmy26->m_quantity;
+            currentArmy = &m_armies[IDX(combatSide)][i];
+            if (currentArmy->m_quantity > 0) {
+                lastLivingArmy = i;
+                if (currentArmy->m_temporaryResurrectionQuantity > 0)
+                    currentArmy->m_quantity -= currentArmy->m_temporaryResurrectionQuantity;
+                if (currentArmy->m_quantity < 0)
+                    currentArmy->m_quantity = 0;
+                living += currentArmy->m_quantity;
             }
-            if (CombatResultForSide(combatSide) == winningSide && currentArmy26->m_quantity > 0
-                && HAS(currentArmy26->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
-                && currentArmy26->m_monsterType != CREATURE_EARTH_ELEMENTAL
-                && currentArmy26->m_monsterType != CREATURE_AIR_ELEMENTAL
-                && currentArmy26->m_monsterType != CREATURE_FIRE_ELEMENTAL
-                && currentArmy26->m_monsterType != CREATURE_WATER_ELEMENTAL
-                && currentArmy26->m_monsterType != CREATURE_SKELETON) {
+            if (CombatResultForSide(combatSide) == winningSide && currentArmy->m_quantity > 0
+                && HAS(currentArmy->m_monster.flags.all, MONSTER_FLAGS_LIGHT_PALETTE) == 0
+                && currentArmy->m_monsterType != CREATURE_EARTH_ELEMENTAL
+                && currentArmy->m_monsterType != CREATURE_AIR_ELEMENTAL
+                && currentArmy->m_monsterType != CREATURE_FIRE_ELEMENTAL
+                && currentArmy->m_monsterType != CREATURE_WATER_ELEMENTAL
+                && currentArmy->m_monsterType != CREATURE_SKELETON) {
                 ++necroEligible;
             }
             if (OppositeCombatResult(CombatResultForSide(combatSide)) == winningSide) {
-                deadCreatureCount3 += currentArmy26->m_initialQuantity - currentArmy26->m_quantity;
+                deadCreatureCount += currentArmy->m_initialQuantity - currentArmy->m_quantity;
             }
         }
-        if (living == 0 && lastLivingArmy0 != -1)
-            m_armies[IDX(combatSide)][lastLivingArmy0].m_quantity = 1;
+        if (living == 0 && lastLivingArmy != -1)
+            m_armies[IDX(combatSide)][lastLivingArmy].m_quantity = 1;
     }
 
     if (winningSide != COMBAT_RESULT_DRAW && necroEligible < VICTORY_NECROMANCY_STACK_LIMIT
         && m_heroes[IDX(winningSide)] != NULL
         && m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY) != 0) {
         giSkeletonsCreated = static_cast<i32>(
-            deadCreatureCount3
+            deadCreatureCount
             * (m_heroes[IDX(winningSide)]->GetSSLevel(HERO_SKILL_NECROMANCY)
                * COMBAT_NECROMANCY_LEVEL_FACTOR)
         );
-        if (giSkeletonsCreated <= 0 && deadCreatureCount3 != 0)
+        if (giSkeletonsCreated <= 0 && deadCreatureCount != 0)
             giSkeletonsCreated = 1;
     }
 
@@ -2134,7 +2136,7 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
     if (m_terrainType == TERRAIN_WASTELAND)
         fadeCount = VICTORY_WASTELAND_FADE_STEPS;
     timer = KBTickCount();
-    for (fadeIndex26 = 0; fadeIndex26 < fadeCount; ++fadeIndex26) {
+    for (fadeIndex = 0; fadeIndex < fadeCount; ++fadeIndex) {
         PollSound();
         DelayTil(&timer);
         timer = KBTickCount() + VICTORY_FADE_DELAY;
@@ -2182,28 +2184,28 @@ void combatManager::DoVictory(H2_ENUM_PARAM(CombatResult, i32) winningSide) {
                     emptySlots = 0;
                     if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
                         && m_heroes[IDX(COMBAT_DEFENDER_SIDE)] != NULL) {
-                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT;
-                             ++fadeIndex26) {
-                            if (m_heroes[IDX(winningSide)]->m_artifacts[fadeIndex26]
+                        for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT;
+                             ++fadeIndex) {
+                            if (m_heroes[IDX(winningSide)]->m_artifacts[fadeIndex]
                                 == ARTIFACT_NONE) {
                                 ++emptySlots;
                             }
                         }
-                        for (fadeIndex26 = 0; fadeIndex26 < HERO_ARTIFACT_SLOT_COUNT;
-                             ++fadeIndex26) {
+                        for (fadeIndex = 0; fadeIndex < HERO_ARTIFACT_SLOT_COUNT;
+                             ++fadeIndex) {
                             if (m_heroes[IDX(OppositeCombatResult(winningSide))]
-                                        ->m_artifacts[fadeIndex26]
+                                        ->m_artifacts[fadeIndex]
                                     >= ARTIFACT_ARCANE_NECKLACE
                                 && m_heroes[IDX(OppositeCombatResult(winningSide))]
-                                           ->m_artifacts[fadeIndex26]
+                                           ->m_artifacts[fadeIndex]
                                        != ARTIFACT_MAGIC_BOOK
                                 && iMaxTransferArtifacts < emptySlots) {
                                 iTransferArtifacts[iMaxTransferArtifacts] =
                                     m_heroes[IDX(OppositeCombatResult(winningSide))]
-                                        ->m_artifacts[fadeIndex26];
+                                        ->m_artifacts[fadeIndex];
                                 iTransferArtifactsInfo[iMaxTransferArtifacts] =
                                     m_heroes[IDX(OppositeCombatResult(winningSide))]
-                                        ->m_artifactExtra[fadeIndex26];
+                                        ->m_artifactExtra[fadeIndex];
                                 ++iMaxTransferArtifacts;
                             }
                         }
@@ -2537,8 +2539,8 @@ setup_view:
 
 VA(0x00430bff, 0xbf)
 void combatManager::ResetMouse(void) {
-    i32 mouseY_g;
-    i32 mouseX_f;
+    i32 mouseY;
+    i32 mouseX;
     tag_message message;
 
     if (gbNoShowCombat != 0)
@@ -2547,10 +2549,10 @@ void combatManager::ResetMouse(void) {
         && gbHumanPlayer[m_playerId[IDX(m_currentSide)]] != 0) {
         m_selectedHex = INVALID_HEX;
         ClearCombatMessages(0);
-        gpMouseManager->MouseCoords(mouseX_f, mouseY_g);
+        gpMouseManager->MouseCoords(mouseX, mouseY);
         message.type = MESSAGE_MOUSE_MOVE;
-        message.payload.mouse.x = message.payload.mouse.screenX = mouseX_f;
-        message.payload.mouse.y = message.payload.mouse.screenY = mouseY_g;
+        message.payload.mouse.x = message.payload.mouse.screenX = mouseX;
+        message.payload.mouse.y = message.payload.mouse.screenY = mouseY;
         ProcessCombatMsg(message);
     } else {
         gpMouseManager->SetPointer(COMBAT_POINTER_DEFAULT);
@@ -2718,19 +2720,19 @@ Finished:
 
 VA(0x004312c9, 0x211)
 void combatManager::ResetCyclingCreatures(void) {
-    army* currentArmy_p = NULL;
+    army* currentArmy = NULL;
     i32 cyclingCount = 0;
     CombatSide side;
     i32 index;
-    i32 unusedCyclingWord6;
+    i32 unusedCyclingWord;
 
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
-            if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
+            if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0
-                && currentArmy_p->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
-                && currentArmy_p->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
+                && currentArmy->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                && currentArmy->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
                 ++cyclingCount;
                 ++gpCombatManager->m_limitCreatureCount[IDX(side)][index];
             }
@@ -2742,13 +2744,13 @@ void combatManager::ResetCyclingCreatures(void) {
     gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
     for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
         for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
-            if (HAS(currentArmy_p->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+            currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
+            if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                 == 0) {
-                currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
-                currentArmy_p->m_animationSequence = ARMY_ANIMATION_STAND;
-                currentArmy_p->m_animationFrame = 0;
-                currentArmy_p->m_lastAnimationTime = KBTickCount();
+                currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
+                currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
+                currentArmy->m_animationFrame = 0;
+                currentArmy->m_lastAnimationTime = KBTickCount();
             }
         }
     }
@@ -3009,44 +3011,44 @@ void combatManager::AddArmy(
     H2_ENUM_PARAM(MonsterFlags, i32) flags,
     i32 animate
 ) {
-    i32 armyIndex_r = INVALID_ARMY_INDEX;
-    i32 reusedArmy_m = 0;
-    i32 index_g;
+    i32 armyIndex = INVALID_ARMY_INDEX;
+    i32 reusedArmy = 0;
+    i32 index;
     army* newArmy;
-    for (index_g = 0; index_g < COMBAT_ARMY_CAPACITY; ++index_g) {
-        if (m_armies[IDX(side)][index_g].m_monsterType == CREATURE_NONE) {
-            armyIndex_r = index_g;
+    for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
+        if (m_armies[IDX(side)][index].m_monsterType == CREATURE_NONE) {
+            armyIndex = index;
             break;
         }
-        if (m_armies[IDX(side)][index_g].m_quantity == 0
-            && HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
-            && (HAS(m_armies[IDX(side)][index_g].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)
+        if (m_armies[IDX(side)][index].m_quantity == 0
+            && HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_AI_EXCLUDED) != 0
+            && (HAS(m_armies[IDX(side)][index].m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)
                     != 0
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_EARTH_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_AIR_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_FIRE_ELEMENTAL
-                || m_armies[IDX(side)][index_g].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
-            armyIndex_r = index_g;
-            reusedArmy_m = 1;
+                || m_armies[IDX(side)][index].m_monsterType == CREATURE_EARTH_ELEMENTAL
+                || m_armies[IDX(side)][index].m_monsterType == CREATURE_AIR_ELEMENTAL
+                || m_armies[IDX(side)][index].m_monsterType == CREATURE_FIRE_ELEMENTAL
+                || m_armies[IDX(side)][index].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
+            armyIndex = index;
+            reusedArmy = 1;
             break;
         }
     }
 
-    if (armyIndex_r == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+    if (armyIndex == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
-    newArmy = &m_armies[IDX(side)][armyIndex_r];
-    newArmy->Init(monsterType, quantity, side, armyIndex_r, hex, INVALID_HEX);
+    newArmy = &m_armies[IDX(side)][armyIndex];
+    newArmy->Init(monsterType, quantity, side, armyIndex, hex, INVALID_HEX);
     newArmy->LoadResources();
     newArmy->m_monster.flags.all |= flags;
-    if (reusedArmy_m == 0)
+    if (reusedArmy == 0)
         ++m_armyCount[IDX(side)];
 
     if (animate == 0)
         return;
 
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(side)][armyIndex_r];
+    ++m_limitCreatureCount[IDX(side)][armyIndex];
     gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,

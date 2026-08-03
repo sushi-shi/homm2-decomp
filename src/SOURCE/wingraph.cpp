@@ -503,10 +503,10 @@ void DDCleanUpWinGraphics(void) {
 VA(0x004b0e4d, 0x279)
 void DDSetFullScreenStatus(i32 fullScreen) {
     i32 width;
-    i32 windowHeight0;
+    i32 windowHeight;
     i32 x;
     i32 y;
-    HRESULT result0;
+    HRESULT result;
 
     if (gbWinGraphBusy != 0)
         return;
@@ -516,48 +516,48 @@ void DDSetFullScreenStatus(i32 fullScreen) {
         x = gConfig.gfx[IDX(giCurExe)].x;
         y = gConfig.gfx[IDX(giCurExe)].y;
         width = gConfig.gfx[IDX(giCurExe)].width;
-        windowHeight0 = gConfig.gfx[IDX(giCurExe)].height;
+        windowHeight = gConfig.gfx[IDX(giCurExe)].height;
         gbWinGraphBusy = true;
         gConfig.gfx[IDX(giCurExe)].fullScreen = fullScreen;
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0)
             SetMenuStatus(0);
 
-        result0 = lpDD->SetCooperativeLevel(
+        result = lpDD->SetCooperativeLevel(
             hwndApp,
             DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN | DDSCL_ALLOWREBOOT
         );
-        if (result0 != DD_OK)
-            DDSD(result0, RETAIL_FILE, 593);
+        if (result != DD_OK)
+            DDSD(result, RETAIL_FILE, 593);
         if (gConfig.gfx[IDX(giCurExe)].fullScreen != 0) {
-            result0 = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
-            if (result0 != DD_OK)
-                DDSD(result0, RETAIL_FILE, 599);
+            result = lpDD->SetDisplayMode(WINGRAPH_WIDTH, WINGRAPH_HEIGHT, WINGRAPH_COLOR_DEPTH);
+            if (result != DD_OK)
+                DDSD(result, RETAIL_FILE, 599);
         } else {
-            result0 = lpDD->RestoreDisplayMode();
-            if (result0 != DD_OK)
-                DDSD(result0, RETAIL_FILE, 606);
-            result0 = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
-            if (result0 != DD_OK)
-                DDSD(result0, RETAIL_FILE, 611);
+            result = lpDD->RestoreDisplayMode();
+            if (result != DD_OK)
+                DDSD(result, RETAIL_FILE, 606);
+            result = lpDD->SetCooperativeLevel(hwndApp, DDSCL_NORMAL);
+            if (result != DD_OK)
+                DDSD(result, RETAIL_FILE, 611);
         }
         if (lpDDSPrimary != NULL) {
             lpDDSPrimary->Release();
             lpDDSPrimary = NULL;
         }
         CreatePrimary();
-        result0 = lpDDSPrimary->SetPalette(lpDDPal);
-        if (result0 != DD_OK)
-            DDSD(result0, RETAIL_FILE, 623);
+        result = lpDDSPrimary->SetPalette(lpDDPal);
+        if (result != DD_OK)
+            DDSD(result, RETAIL_FILE, 623);
         WritePrefs();
         gbWinGraphBusy = false;
         if (gConfig.gfx[IDX(giCurExe)].fullScreen == 0) {
             SetMenuStatus(1);
-            ResizeWindow(x, y, width, windowHeight0);
+            ResizeWindow(x, y, width, windowHeight);
         } else {
             gConfig.gfx[IDX(giCurExe)].x = x;
             gConfig.gfx[IDX(giCurExe)].y = y;
             gConfig.gfx[IDX(giCurExe)].width = width;
-            gConfig.gfx[IDX(giCurExe)].height = windowHeight0;
+            gConfig.gfx[IDX(giCurExe)].height = windowHeight;
         }
         SetupClipper();
     }
@@ -619,7 +619,7 @@ VA(0x004b1273, 0x1c1)
 void __cdecl WGUpdatePalette(i8* paletteData) {
     HDC dc0;
     i32 entry;
-    i32 result0;
+    i32 result;
 
     for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
          entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
@@ -655,7 +655,7 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
     dc0 = GetDC(hwndApp);
     if (hpalApp != NULL)
         SelectPalette(dc0, hpalApp, 0);
-    result0 = RealizePalette(dc0);
+    result = RealizePalette(dc0);
     ReleaseDC(hwndApp, dc0);
     if (giMainVideoModeColorDepth != WINGRAPH_COLOR_DEPTH && gpWindowManager->m_screen != NULL) {
         if (gbLimitedCombatUpdatePalette != 0) {
@@ -974,7 +974,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     i32 x;
     i32 y;
     i32 width;
-    i32 height7;
+    i32 height;
     void* screenBuffer;
 
     if (giGraphicsType == graphicsType)
@@ -988,7 +988,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     x = gConfig.gfx[IDX(giCurExe)].x;
     y = gConfig.gfx[IDX(giCurExe)].y;
     width = gConfig.gfx[IDX(giCurExe)].width;
-    height7 = gConfig.gfx[IDX(giCurExe)].height;
+    height = gConfig.gfx[IDX(giCurExe)].height;
     screenBuffer = H2_ALLOC(WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     memcpy(screenBuffer, gpWindowManager->m_screen->m_pixels, WINGRAPH_WIDTH * WINGRAPH_HEIGHT);
     if (graphicsType == WINGRAPH_GRAPHICS_WING) {
@@ -1007,7 +1007,7 @@ i32 SetGraphicsType(WingraphGraphicsType graphicsType) {
     H2_FREE(screenBuffer);
     if (fullScreen != 0 && graphicsType == WINGRAPH_GRAPHICS_WING) {
         SetMenuStatus(1);
-        ResizeWindow(x, y, width, height7);
+        ResizeWindow(x, y, width, height);
     }
     BlitBitmapToScreen(gpWindowManager->m_screen, 0, 0, WINGRAPH_WIDTH, WINGRAPH_HEIGHT, 0, 0);
     UpdatePalette(gpBufferPalette->m_data);

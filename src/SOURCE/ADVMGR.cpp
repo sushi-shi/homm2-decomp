@@ -5791,12 +5791,12 @@ i32 advManager::UpdBottomViewNewTurn(void) {
 VA(0x0040b634, 0x384)
 i32 advManager::UpdBottomViewResMsg(void) {
 
-    i32 iconWidth6;
-    i32 iconHeight11;
-    i32 textY19;
-    i32 lineCount10;
-    char* messageText2;
-    char* resourceCountText6;
+    i32 iconWidth;
+    i32 iconHeight;
+    i32 textY;
+    i32 lineCount;
+    char* messageText;
+    char* resourceCountText;
 
     if (!gbForceUpdate && iCurBottomView == BOTTOM_VIEW_RESOURCE) {
         return 0;
@@ -5821,20 +5821,20 @@ i32 advManager::UpdBottomViewResMsg(void) {
     }
     m_adventureWindow->AddWidget(m_bottomViewBackground, -1);
 
-    textY19 = 0;
+    textY = 0;
     if (giBottomViewResource < RES_VALID_BEGIN) {
-        textY19 = RESOURCE_VIEW_MULTILINE_HEIGHT;
-        lineCount10 = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
-        textY19 -= lineCount10 * RESOURCE_VIEW_LINE_HEIGHT;
+        textY = RESOURCE_VIEW_MULTILINE_HEIGHT;
+        lineCount = smallFont->LineLength(gcBottomViewText, BOTTOM_VIEW_PANEL_WIDTH);
+        textY -= lineCount * RESOURCE_VIEW_LINE_HEIGHT;
     }
-    messageText2 = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
-    sprintf(messageText2, gcBottomViewText);
+    messageText = static_cast<char*>(H2_ALLOC(strlen(gcBottomViewText) + 1));
+    sprintf(messageText, gcBottomViewText);
     m_bottomViewAllTexts[0] = new textWidget(
         BOTTOM_VIEW_PANEL_X,
-        textY19 + RESOURCE_VIEW_TEXT_BASE_Y,
+        textY + RESOURCE_VIEW_TEXT_BASE_Y,
         BOTTOM_VIEW_PANEL_WIDTH,
         RESOURCE_VIEW_TEXT_HEIGHT,
-        messageText2,
+        messageText,
         "smalfont.fnt",
         FONT_DRAW_DEFAULT,
         BOTTOM_VIEW_TEXT_ID,
@@ -5848,18 +5848,18 @@ i32 advManager::UpdBottomViewResMsg(void) {
 
     if (giBottomViewResource >= RES_VALID_BEGIN) {
         if (giBottomViewResource == RES_GOLD) {
-            iconWidth6 = RESOURCE_VIEW_GOLD_WIDTH;
-            iconHeight11 = RESOURCE_VIEW_GOLD_HEIGHT;
+            iconWidth = RESOURCE_VIEW_GOLD_WIDTH;
+            iconHeight = RESOURCE_VIEW_GOLD_HEIGHT;
         } else {
-            iconWidth6 = RESOURCE_VIEW_ICON_WIDTH;
-            iconHeight11 = RESOURCE_VIEW_ICON_HEIGHT;
+            iconWidth = RESOURCE_VIEW_ICON_WIDTH;
+            iconHeight = RESOURCE_VIEW_ICON_HEIGHT;
         }
         m_bottomViewHourglassBackground = new iconWidget(
-            (BOTTOM_VIEW_PANEL_WIDTH - iconWidth6) / BOTTOM_VIEW_CENTER_DIVISOR
+            (BOTTOM_VIEW_PANEL_WIDTH - iconWidth) / BOTTOM_VIEW_CENTER_DIVISOR
                 + BOTTOM_VIEW_PANEL_X,
-            RESOURCE_VIEW_ICON_BOTTOM - iconHeight11 - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
-            iconWidth6,
-            iconHeight11,
+            RESOURCE_VIEW_ICON_BOTTOM - iconHeight - RESOURCE_VIEW_ICON_BOTTOM_PADDING,
+            iconWidth,
+            iconHeight,
             "resource.icn",
             IDX(giBottomViewResource),
             ICON_DRAW_NORMAL,
@@ -5872,14 +5872,14 @@ i32 advManager::UpdBottomViewResMsg(void) {
         }
         m_adventureWindow->AddWidget(m_bottomViewHourglassBackground, -1);
 
-        resourceCountText6 = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
-        sprintf(resourceCountText6, "%d", giBottomViewResourceQty);
+        resourceCountText = static_cast<char*>(H2_ALLOC(BOTTOM_VIEW_COUNT_BUFFER_SIZE));
+        sprintf(resourceCountText, "%d", giBottomViewResourceQty);
         m_bottomViewAllTexts[1] = new textWidget(
             RESOURCE_VIEW_COUNT_X,
             RESOURCE_VIEW_COUNT_Y,
             RESOURCE_VIEW_COUNT_WIDTH,
             RESOURCE_VIEW_COUNT_HEIGHT,
-            resourceCountText6,
+            resourceCountText,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
             BOTTOM_VIEW_TEXT_ID_2,
@@ -7296,31 +7296,31 @@ void advManager::CastSpell(SpellType spell) {
 
 VA(0x0040edaf, 0x24b)
 i32 SaveGame(void) {
-    i32 result11 = 0;
-    i32 humanPlayerCount1 = 0;
+    i32 result = 0;
+    i32 humanPlayerCount = 0;
     gpAdvManager->DisableButtons();
     gpMouseManager->SetPointer("advmice.mse", SAVE_POINTER_FRAME, MOUSE_AUTO_CURSOR_TYPE);
     i32 playerLocal;
     for (playerLocal = 0; playerLocal < SAVE_PLAYER_COUNT; ++playerLocal) {
         if (!gpGame->m_playerDead[playerLocal] && gbHumanPlayer[playerLocal]) {
-            ++humanPlayerCount1;
+            ++humanPlayerCount;
         }
     }
 
-    char extension7[SAVE_EXTENSION_SIZE];
+    char extension[SAVE_EXTENSION_SIZE];
     char patternState[SAVE_PATTERN_SIZE];
     if (gbInCampaign) {
-        sprintf(extension7, ".GMC");
+        sprintf(extension, ".GMC");
         sprintf(patternState, "*.GMC");
     } else if (xIsPlayingExpansionCampaign) {
-        sprintf(extension7, ".GXC");
+        sprintf(extension, ".GXC");
         sprintf(patternState, "*.GXC");
     } else if (xIsExpansionMap) {
-        sprintf(extension7, ".GX%d", humanPlayerCount1);
-        sprintf(patternState, "*.GX%d", humanPlayerCount1);
+        sprintf(extension, ".GX%d", humanPlayerCount);
+        sprintf(patternState, "*.GX%d", humanPlayerCount);
     } else {
-        sprintf(extension7, ".GM%d", humanPlayerCount1);
-        sprintf(patternState, "*.GM%d", humanPlayerCount1);
+        sprintf(extension, ".GM%d", humanPlayerCount);
+        sprintf(patternState, "*.GM%d", humanPlayerCount);
     }
 
     fileRequester* requester2 = new fileRequester(
@@ -7329,23 +7329,23 @@ i32 SaveGame(void) {
         FILE_REQUESTER_SAVE_GAME,
         patternState,
         gcGamePath,
-        extension7
+        extension
     );
     if (requester2 == NULL) {
         MemError();
     }
-    i32 dialogResult7 = gpExec->DoDialog(requester2);
-    if (dialogResult7 == FILE_REQUESTER_OK) {
-        result11 = 1;
+    i32 dialogResult = gpExec->DoDialog(requester2);
+    if (dialogResult == FILE_REQUESTER_OK) {
+        result = 1;
         bFreshSave = 1;
-        result11 = gpGame->SaveGame(gLastFilename, 0, 0);
-        if (result11) {
+        result = gpGame->SaveGame(gLastFilename, 0, 0);
+        if (result) {
             NormalDialog("Game saved successfully.", 1, -1, -1, -1, 0, -1, 0, -1, 0);
         }
     }
     delete requester2;
     gpAdvManager->EnableButtons();
-    return result11;
+    return result;
 }
 
 VA(0x0040effa, 0x8b)
@@ -9967,7 +9967,7 @@ MessageDispatchResult CPanelHandler(tag_message& message) {
 
 VA(0x004149c0, 0x1a2)
 void advManager::SystemOptions(void) {
-    tag_message message6;
+    tag_message message;
     i32 oldInterfaceMode;
     ConfigWalkSpeed prevWalkSpeed;
     i32 heroContextLocked;
