@@ -818,7 +818,6 @@ i32 combatManager::MoreTreesNear(void) {
 VA(0x00427a8b, 0x3ba)
 void combatManager::LoadIcons(void) {
     i32 index;
-    i32 heroColor;
     for (index = 0; index < COMBAT_FIXED_ICON_COUNT; index++)
         m_combatIcons[index] = NULL;
 
@@ -870,6 +869,8 @@ void combatManager::LoadIcons(void) {
         }
 
         if (m_heroIcons[index]) {
+            i32 heroColor;
+
             if (m_playerId[index] == -1)
                 heroColor = COMBAT_NEUTRAL_HERO_COLOR;
             else
@@ -985,44 +986,44 @@ void combatManager::FreeArmies(void) {
 
 VA(0x004282fe, 0x191)
 i32 combatManager::GetGridIndex(i32 x, i32 y) {
-    i32 gridX;
-    i32 gridY;
-    i32 rowIndex;
-    i32 gridColumn;
-    i32 diagonalDistance;
-    i32 yOffset;
     i32 xResidual;
+    i32 yOffset;
+    i32 mapX;
+    i32 lineIndex;
+    i32 cellsColumn;
+    i32 diagonalDist;
+    i32 mapY;
 
-    gridX = x;
-    gridY = y;
-    gridY -= COMBAT_HEX_GRID_TOP_ORIGIN;
-    rowIndex = gridY / COMBAT_HEX_VERTICAL_STEP;
-    gridX -= COMBAT_GRID_INDEX_X_ORIGIN;
-    if (!(rowIndex & 1))
-        gridX -= COMBAT_HEX_ROW_STAGGER;
-    gridColumn = gridX / COMBAT_HEX_HORIZONTAL_STEP;
+    mapX = x;
+    mapY = y;
+    mapY -= COMBAT_HEX_GRID_TOP_ORIGIN;
+    lineIndex = mapY / COMBAT_HEX_VERTICAL_STEP;
+    mapX -= COMBAT_GRID_INDEX_X_ORIGIN;
+    if (!(lineIndex & 1))
+        mapX -= COMBAT_HEX_ROW_STAGGER;
+    cellsColumn = mapX / COMBAT_HEX_HORIZONTAL_STEP;
 
-    if (gridColumn < 0)
+    if (cellsColumn < 0)
         goto specialRegion;
 
-    yOffset = gridY % COMBAT_HEX_VERTICAL_STEP;
+    yOffset = mapY % COMBAT_HEX_VERTICAL_STEP;
     if (yOffset < COMBAT_GRID_DIAGONAL_HEIGHT) {
-        xResidual = gridX % COMBAT_HEX_HORIZONTAL_STEP;
-        diagonalDistance =
+        xResidual = mapX % COMBAT_HEX_HORIZONTAL_STEP;
+        diagonalDist =
             abs(xResidual - COMBAT_HEX_ROW_STAGGER) / COMBAT_GRID_DIAGONAL_SLOPE_DIVISOR;
-        if (yOffset < diagonalDistance) {
-            rowIndex--;
+        if (yOffset < diagonalDist) {
+            lineIndex--;
             if (xResidual < COMBAT_HEX_ROW_STAGGER) {
-                if (!(rowIndex & 1))
-                    gridColumn--;
-            } else if (rowIndex & 1) {
-                gridColumn++;
+                if (!(lineIndex & 1))
+                    cellsColumn--;
+            } else if (lineIndex & 1) {
+                cellsColumn++;
             }
         }
     }
 
-    if (gridColumn <= COMBAT_GRID_REVERSE_COLUMN_END || gridColumn >= COMBAT_GRID_COLUMN_END
-        || rowIndex >= COMBAT_GRID_ROW_COUNT || rowIndex < 0) {
+    if (cellsColumn <= COMBAT_GRID_REVERSE_COLUMN_END || cellsColumn >= COMBAT_GRID_COLUMN_END
+        || lineIndex >= COMBAT_GRID_ROW_COUNT || lineIndex < 0) {
     specialRegion:
         if (x >= 0 && x <= COMBAT_GRID_LEFT_SPECIAL_X_MAX && y >= COMBAT_GRID_LEFT_SPECIAL_Y_MIN
             && y <= COMBAT_GRID_LEFT_SPECIAL_Y_MAX)
@@ -1036,7 +1037,7 @@ i32 combatManager::GetGridIndex(i32 x, i32 y) {
             return COMBAT_BALLISTA_HEX;
         return -1;
     }
-    return rowIndex * COMBAT_GRID_ROW_LENGTH + gridColumn;
+    return lineIndex * COMBAT_GRID_ROW_LENGTH + cellsColumn;
 }
 
 VA(0x0042848f, 0x1ba)
@@ -1135,59 +1136,59 @@ i32 combatManager::CheckApplyBadMorale(
 
 VA(0x004287bf, 0x345)
 i32 combatManager::GetNextArmy(i32 checkMorale) {
-    army* activeArmy;
-    i32 speedLoop;
-    CombatSide stackSide;
-    i32 armyCounter;
+    i32 skipEnt;
+    i32 speedIter;
+    i32 hasPending;
     i32 sideLoop;
-    i32 hasDeferred;
-    i32 skipEntry;
+    i32 stackCounter;
+    army* curArmy;
+    CombatSide stackSide;
     i32 armyOffset;
 
 restart:
-    hasDeferred = 0;
+    hasPending = 0;
     stackSide = m_currentArmySide;
     m_currentSpeed = COMBAT_MAX_SPEED;
-    for (speedLoop = 0; speedLoop < COMBAT_SPEED_LEVEL_COUNT; speedLoop++) {
+    for (speedIter = 0; speedIter < COMBAT_SPEED_LEVEL_COUNT; speedIter++) {
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
             stackSide ^= 1;
-            for (armyCounter = 0; armyCounter < m_armyCount[IDX(stackSide)]; armyCounter++) {
-                skipEntry = 0;
-                activeArmy = armyCounter + m_armies[IDX(stackSide)];
-                if (HAS(activeArmy->m_monster.flags.abilityFlags,
+            for (stackCounter = 0; stackCounter < m_armyCount[IDX(stackSide)]; stackCounter++) {
+                skipEnt = 0;
+                curArmy = stackCounter + m_armies[IDX(stackSide)];
+                if (HAS(curArmy->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_AI_EXCLUDED | MONSTER_ABILITY_FLAG_BAD_MORALE)
-                    || IDX(activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
-                    || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
-                    || activeArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
-                    || (activeArmy->m_monster.speed != m_currentSpeed
+                    || IDX(curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PARALYZE)])
+                    || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]
+                    || curArmy->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLIND)]
+                    || (curArmy->m_monster.speed != m_currentSpeed
                         && !(
-                            activeArmy->m_monster.flags.abilityFlags
+                            curArmy->m_monster.flags.abilityFlags
                             & MONSTER_ABILITY_FLAG_HIGH_MORALE
                         )))
-                    skipEntry = 1;
+                    skipEnt = 1;
 
-                if (!skipEntry && speedLoop == 0
+                if (!skipEnt && speedIter == 0
                     && !(
-                        activeArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_HIGH_MORALE
+                        curArmy->m_monster.flags.abilityFlags & MONSTER_ABILITY_FLAG_HIGH_MORALE
                     ))
-                    skipEntry = 1;
+                    skipEnt = 1;
 
-                if HAS (activeArmy->m_monster.flags.abilityFlags,
+                if HAS (curArmy->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_DEFERRED_TURN) {
-                    skipEntry = 1;
-                    hasDeferred = 1;
+                    skipEnt = 1;
+                    hasPending = 1;
                 }
 
-                if (!skipEntry && checkMorale && CheckApplyBadMorale(stackSide, armyCounter))
-                    skipEntry = 1;
-                if (!skipEntry)
+                if (!skipEnt && checkMorale && CheckApplyBadMorale(stackSide, stackCounter))
+                    skipEnt = 1;
+                if (!skipEnt)
                     break;
             }
 
-            if (armyCounter != m_armyCount[IDX(stackSide)]) {
+            if (stackCounter != m_armyCount[IDX(stackSide)]) {
                 m_currentArmySide = stackSide;
-                m_currentArmyIndex = armyCounter;
-                if ((armyCounter + m_armies[IDX(stackSide)])
+                m_currentArmyIndex = stackCounter;
+                if ((stackCounter + m_armies[IDX(stackSide)])
                         ->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_HYPNOTIZE)])
                     m_currentSide = OppositeCombatSide(stackSide);
                 else
@@ -1197,18 +1198,18 @@ restart:
             }
         }
 
-        if (speedLoop) {
+        if (speedIter) {
             m_currentSpeed--;
             if (m_currentSpeed == 0)
                 m_currentSpeed = COMBAT_SPEED_LEVEL_COUNT;
         }
     }
 
-    if (hasDeferred) {
+    if (hasPending) {
         checkMorale = 0;
         for (sideLoop = 0; sideLoop < COMBAT_SIDE_COUNT; sideLoop++) {
-            for (armyCounter = 0; armyCounter < m_armyCount[sideLoop]; armyCounter++) {
-                (m_armies[sideLoop] + armyCounter)->m_monster.flags.abilityFlags &=
+            for (stackCounter = 0; stackCounter < m_armyCount[sideLoop]; stackCounter++) {
+                (m_armies[sideLoop] + stackCounter)->m_monster.flags.abilityFlags &=
                     ~MONSTER_ABILITY_FLAG_DEFERRED_TURN;
             }
         }
@@ -2032,6 +2033,21 @@ VA(0x0042aabf, 0x29b)
 i32 combatManager::ShotIsThroughWall(
     H2_ENUM_PARAM(CombatSide, i32) side, i32 sourceHex, i32 targetHex
 ) {
+    float columnStride;
+    i32 colTarget;
+    float rowStride;
+    i32 traceLength;
+    i32 tgtLine;
+    i32 traceSquare;
+    float traceRow;
+    float traceColumn;
+    i32 structIndex;
+    i32 traceIx;
+    i32 columnDist;
+    i32 rowSpan;
+    i32 sourceColumn;
+    i32 srcLine;
+
     if (!m_inCastleCombat)
         return 0;
     if (m_heroes[IDX(side)]
@@ -2043,52 +2059,46 @@ i32 combatManager::ShotIsThroughWall(
     if (InCastle(sourceHex) || !InCastle(targetHex))
         return 0;
 
-    i32 sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
-    i32 sourceRow = sourceHex / COMBAT_GRID_ROW_LENGTH;
-    i32 targetColumn = targetHex % COMBAT_GRID_ROW_LENGTH;
-    i32 targetRow = targetHex / COMBAT_GRID_ROW_LENGTH;
-    i32 columnDistance = targetColumn - sourceColumn;
-    i32 rowDistance = targetRow - sourceRow;
-    i32 traceLength;
-    float columnStep;
-    float rowStep;
-    if (abs(columnDistance) > abs(rowDistance)) {
-        traceLength = abs(columnDistance);
-        columnStep = columnDistance > 0 ? 1 : -1;
-        rowStep = static_cast<float>(rowDistance) / static_cast<float>(abs(columnDistance));
+    sourceColumn = sourceHex % COMBAT_GRID_ROW_LENGTH;
+    srcLine = sourceHex / COMBAT_GRID_ROW_LENGTH;
+    colTarget = targetHex % COMBAT_GRID_ROW_LENGTH;
+    tgtLine = targetHex / COMBAT_GRID_ROW_LENGTH;
+    columnDist = colTarget - sourceColumn;
+    rowSpan = tgtLine - srcLine;
+    if (abs(columnDist) > abs(rowSpan)) {
+        traceLength = abs(columnDist);
+        columnStride = columnDist > 0 ? 1 : -1;
+        rowStride = static_cast<float>(rowSpan) / static_cast<float>(abs(columnDist));
     } else {
-        traceLength = abs(rowDistance);
-        rowStep = rowDistance > 0 ? 1 : -1;
-        columnStep = static_cast<float>(columnDistance) / static_cast<float>(abs(rowDistance));
+        traceLength = abs(rowSpan);
+        rowStride = rowSpan > 0 ? 1 : -1;
+        columnStride = static_cast<float>(columnDist) / static_cast<float>(abs(rowSpan));
     }
-    columnStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
+    columnStride /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS)
     ;
-    rowStep /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
-    float traceColumn = static_cast<float>(sourceColumn);
-    float traceRow = static_cast<float>(sourceRow);
-    i32 traceIndex;
-    i32 traceHex;
-    i32 structureIndex;
-    for (traceIndex = 0; traceIndex < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
-         traceIndex++) {
-        traceColumn += columnStep;
-        traceRow += rowStep;
-        traceHex =
+    rowStride /= static_cast<float>(COMBAT_WALL_TRACE_SUBDIVISIONS);
+    traceColumn = static_cast<float>(sourceColumn);
+    traceRow = static_cast<float>(srcLine);
+    for (traceIx = 0; traceIx < traceLength * COMBAT_WALL_TRACE_SUBDIVISIONS;
+         traceIx++) {
+        traceColumn += columnStride;
+        traceRow += rowStride;
+        traceSquare =
             static_cast<i32>(traceRow) * COMBAT_GRID_ROW_LENGTH + static_cast<i32>(traceColumn);
-        for (structureIndex = 0; structureIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
-             structureIndex++) {
-            if (traceHex == iWallToHexCell[structureIndex]
-                && m_wallStates[structureIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+        for (structIndex = 0; structIndex < COMBAT_CASTLE_STRUCTURE_COUNT;
+             structIndex++) {
+            if (traceSquare == iWallToHexCell[structIndex]
+                && m_wallStates[structIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_DESTROYED
-                && m_wallStates[structureIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
+                && m_wallStates[structIndex + IDX(COMBAT_WALL_SLOT_SECTION_FIRST)]
                        != COMBAT_WALL_STATE_SECTION_DESTROYED) {
                 return 1;
             }
-            if (traceHex == iTowerToHexCell[structureIndex]
-                && m_wallStates[structureIndex] != COMBAT_WALL_STATE_DESTROYED) {
+            if (traceSquare == iTowerToHexCell[structIndex]
+                && m_wallStates[structIndex] != COMBAT_WALL_STATE_DESTROYED) {
                 return 1;
             }
-            if (traceHex == IDX(COMBAT_CASTLE_HEX_GATE)
+            if (traceSquare == IDX(COMBAT_CASTLE_HEX_GATE)
                 && m_drawbridgeState == COMBAT_DRAWBRIDGE_RAISED) {
                 return 1;
             }

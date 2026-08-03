@@ -124,24 +124,24 @@ i32 army::ValidMove(CombatHexDirection direction) {
 
 VA(0x0047d13b, 0x226)
 i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
-    i32 destinationHexNext;
-    i32 rearHex;
+    i32 destHexNext;
+    i32 rearSquare;
     i32 frontValid;
     i32 rearValidResult;
 
     if (!ValidHex(sourceHex))
         return 0;
 
-    destinationHexNext = GetAdjacentCellIndex(sourceHex, direction);
-    if (!ValidHex(destinationHexNext))
+    destHexNext = GetAdjacentCellIndex(sourceHex, direction);
+    if (!ValidHex(destHexNext))
         return 0;
 
     frontValid = 0;
-    if (gpCombatManager->m_hexCells[destinationHexNext].m_occupantSide == COMBAT_SIDE_NONE
-        && (!gpCombatManager->m_hexCells[destinationHexNext].m_blocked
+    if (gpCombatManager->m_hexCells[destHexNext].m_occupantSide == COMBAT_SIDE_NONE
+        && (!gpCombatManager->m_hexCells[destHexNext].m_blocked
             || (gpCombatManager->m_inCastleCombat
-                && (destinationHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
-                    || destinationHexNext == IDX(COMBAT_CASTLE_HEX_GATE))
+                && (destHexNext == COMBAT_CASTLE_GATE_APPROACH_HEX
+                    || destHexNext == IDX(COMBAT_CASTLE_HEX_GATE))
                 && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
                     || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
                         && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
@@ -154,28 +154,28 @@ i32 army::ValidMove(i32 sourceHex, CombatHexDirection direction) {
     }
 
     if HAS(m_monster.attributes, MONSTER_ATTRIBUTE_WIDE) {
-        rearHex = ARMY_HEX_INVALID;
+        rearSquare = ARMY_HEX_INVALID;
         switch (m_facing) {
             case ARMY_FACING_LEFT:
                 if (direction == COMBAT_DIRECTION_EAST)
                     return frontValid;
                 else
-                    rearHex = GetAdjacentCellIndex(destinationHexNext, COMBAT_DIRECTION_WEST);
+                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_WEST);
                 break;
             case ARMY_FACING_RIGHT:
                 if (direction == COMBAT_DIRECTION_WEST)
                     return frontValid;
                 else
-                    rearHex = GetAdjacentCellIndex(destinationHexNext, COMBAT_DIRECTION_EAST);
+                    rearSquare = GetAdjacentCellIndex(destHexNext, COMBAT_DIRECTION_EAST);
                 break;
         }
 
         rearValidResult = 0;
-        if (ValidHex(rearHex) && gpCombatManager->m_hexCells[rearHex].m_occupantSide == COMBAT_SIDE_NONE
-            && (!gpCombatManager->m_hexCells[rearHex].m_blocked
+        if (ValidHex(rearSquare) && gpCombatManager->m_hexCells[rearSquare].m_occupantSide == COMBAT_SIDE_NONE
+            && (!gpCombatManager->m_hexCells[rearSquare].m_blocked
                 || (gpCombatManager->m_inCastleCombat
-                    && (rearHex == COMBAT_CASTLE_GATE_APPROACH_HEX
-                        || rearHex == IDX(COMBAT_CASTLE_HEX_GATE))
+                    && (rearSquare == COMBAT_CASTLE_GATE_APPROACH_HEX
+                        || rearSquare == IDX(COMBAT_CASTLE_HEX_GATE))
                     && (gpCombatManager->m_drawbridgeState != COMBAT_DRAWBRIDGE_RAISED
                         || (gpCombatManager->m_currentSide == COMBAT_DEFENDER_SIDE
                             && gpCombatManager->m_hexCells[COMBAT_CASTLE_GATE_APPROACH_HEX]
@@ -425,40 +425,40 @@ CombatHexDirection OppositeDirection(CombatHexDirection direction) {
 
 VA(0x0047d9ec, 0x77e)
 CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 blockedMask) {
-    i32 sourceRow;
-    i32 sourceColumnCheck;
-    i32 targetRowValue;
-    i32 targetColumn;
-    i32 isMovingUp;
     i32 isMovingDown;
-    i32 leftFlag;
+    i32 leftFl;
+    i32 sourceColumnCheck;
+    i32 colTarget;
+    i32 targetRowVal;
+    i32 isMovingUp;
+    i32 srcRow;
     i32 isMovingRight;
 
     if (!ValidHex(sourceHex) || !ValidHex(targetHex))
         return COMBAT_DIRECTION_INVALID;
 
     sourceColumnCheck = sourceHex % ARMY_HEX_COLUMNS;
-    sourceRow = sourceHex / ARMY_HEX_COLUMNS;
-    targetColumn = targetHex % ARMY_HEX_COLUMNS;
-    targetRowValue = targetHex / ARMY_HEX_COLUMNS;
+    srcRow = sourceHex / ARMY_HEX_COLUMNS;
+    colTarget = targetHex % ARMY_HEX_COLUMNS;
+    targetRowVal = targetHex / ARMY_HEX_COLUMNS;
     isMovingUp = 0;
     isMovingDown = 0;
-    leftFlag = 0;
+    leftFl = 0;
     isMovingRight = 0;
 
-    if (targetColumn > sourceColumnCheck)
+    if (colTarget > sourceColumnCheck)
         isMovingRight = 1;
-    else if (targetColumn != sourceColumnCheck)
-        leftFlag = 1;
+    else if (colTarget != sourceColumnCheck)
+        leftFl = 1;
 
-    if (targetRowValue > sourceRow)
+    if (targetRowVal > srcRow)
         isMovingDown = 1;
-    else if (targetRowValue != sourceRow)
+    else if (targetRowVal != srcRow)
         isMovingUp = 1;
 
-    if (isMovingRight == leftFlag) {
+    if (isMovingRight == leftFl) {
         if (isMovingUp == 1) {
-            if (sourceRow & 1) {
+            if (srcRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                     return COMBAT_DIRECTION_NORTHWEST;
                 else if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHEAST)))
@@ -494,7 +494,7 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
                     return COMBAT_DIRECTION_WIDE_EAST;
             }
         } else {
-            if (sourceRow & 1) {
+            if (srcRow & 1) {
                 if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHWEST)))
                     return COMBAT_DIRECTION_SOUTHWEST;
                 else if (!(blockedMask & BIT(COMBAT_DIRECTION_SOUTHEAST)))
@@ -532,7 +532,7 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
         }
     }
 
-    if (leftFlag == 1) {
+    if (leftFl == 1) {
         if (isMovingUp == 1) {
             if (!(blockedMask & BIT(COMBAT_DIRECTION_NORTHWEST)))
                 return COMBAT_DIRECTION_NORTHWEST;

@@ -58,13 +58,13 @@ i32 armyGroup::HasSomeUndead(void) {
 
 VA(0x00421802, 0x231)
 i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGroup) {
-    i32 morale = 0;
-    ArmyGroupAlignmentResult alignmentValue;
+    i32 moraleCount = 0;
+    ArmyGroupAlignmentResult alignValue;
     i32 hasSomeUndead = 0;
-    i32 moraleModifier = 0;
+    i32 moraleDelta = 0;
     i32 enemyHasBoneDragon;
     i32 index;
-    alignmentValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
+    alignValue = IsHomogeneous(ARMY_GROUP_EMPTY_SLOT);
 
     if (HasAllUndead())
         return 0;
@@ -81,50 +81,50 @@ i32 armyGroup::GetMorale(hero* armyHero, town* occupiedTown, armyGroup* enemyGro
     }
 
     if (enemyHasBoneDragon)
-        --morale;
+        --moraleCount;
 
     if (armyHero != NULL) {
         if (armyHero->HasArtifact(ARTIFACT_BATTLE_GARB))
             return ARMY_GROUP_MORALE_MAX;
 
-        morale += IDX(armyHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]);
-        morale += armyHero->m_morale;
+        moraleCount += IDX(armyHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]);
+        moraleCount += armyHero->m_morale;
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_VALOR))
-            ++morale;
+            ++moraleCount;
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_COURAGE))
-            ++morale;
+            ++moraleCount;
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_HONOR))
-            ++morale;
+            ++moraleCount;
         if (armyHero->HasArtifact(ARTIFACT_MEDAL_OF_DISTINCTION))
-            ++morale;
+            ++moraleCount;
         if (armyHero->HasArtifact(ARTIFACT_FIZBIN_OF_MISFORTUNE))
-            morale -= FIZBIN_MORALE_PENALTY;
+            moraleCount -= FIZBIN_MORALE_PENALTY;
         if (armyHero->HasArtifact(ARTIFACT_ARM_OF_MARTYR))
             hasSomeUndead = 1;
         if (armyHero->HasArtifact(ARTIFACT_MASTHEAD)
             && HAS(armyHero->m_eventFlags, HERO_EVENT_EMBARKED))
-            ++morale;
+            ++moraleCount;
     }
 
     if (hasSomeUndead)
-        --morale;
-    if (hasSomeUndead && alignmentValue > ARMY_GROUP_ALIGNMENT_NO_MODIFIER)
-        alignmentValue = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
-    morale += IDX(alignmentValue);
+        --moraleCount;
+    if (hasSomeUndead && alignValue > ARMY_GROUP_ALIGNMENT_NO_MODIFIER)
+        alignValue = ARMY_GROUP_ALIGNMENT_NO_MODIFIER;
+    moraleCount += IDX(alignValue);
 
     if (occupiedTown != NULL && occupiedTown->m_type != FACTION_NECROMANCER
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_TAVERN)))
-        ++morale;
+        ++moraleCount;
     if (occupiedTown != NULL && occupiedTown->m_type == FACTION_BARBARIAN
         && (occupiedTown->m_buildings & IDX(TOWN_BUILDING_COLISEUM)))
-        morale += COLISEUM_MORALE_BONUS;
+        moraleCount += COLISEUM_MORALE_BONUS;
 
-    if (morale < ARMY_GROUP_MORALE_MIN)
-        morale = ARMY_GROUP_MORALE_MIN;
-    else if (morale > ARMY_GROUP_MORALE_MAX)
-        morale = ARMY_GROUP_MORALE_MAX;
+    if (moraleCount < ARMY_GROUP_MORALE_MIN)
+        moraleCount = ARMY_GROUP_MORALE_MIN;
+    else if (moraleCount > ARMY_GROUP_MORALE_MAX)
+        moraleCount = ARMY_GROUP_MORALE_MAX;
 
-    return morale;
+    return moraleCount;
 }
 
 VA(0x00421a33, 0x23)

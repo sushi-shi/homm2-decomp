@@ -311,25 +311,25 @@ void resourceManager::Close(void) {
 
 VA(0x004b89b0, 0x138)
 i32 resourceManager::LoadAggregateHeader(char* aggregateName) {
-    i16 fileCountBuffer[FILE_COUNT_BUFFER_WORDS];
-    i32 aggregateFile;
+    i16 fpCountBuffer[FILE_COUNT_BUFFER_WORDS];
+    i32 aggregateFp;
     u32 directoryBytes;
     if (m_numAggregates >= RESOURCE_MANAGER_AGGREGATE_LIMIT) {
         sprintf(gText, "Only %d .AGG files can be used at once.", RESOURCE_MANAGER_AGGREGATE_LIMIT);
         ShutDown(gText);
         return LOAD_ERROR;
     }
-    aggregateFile = open(aggregateName, BINARY_OPEN_MODE);
-    if (aggregateFile == INVALID_FILE) {
+    aggregateFp = open(aggregateName, BINARY_OPEN_MODE);
+    if (aggregateFp == INVALID_FILE) {
         sprintf(gText, "Can't open file: %s", aggregateName);
         ShutDown(gText);
         return LOAD_ERROR;
     }
     m_curAggregate = m_numAggregates;
     m_numAggregates = m_numAggregates + 1;
-    m_aggregateFd[m_curAggregate] = aggregateFile;
-    read(m_aggregateFd[m_curAggregate], fileCountBuffer, sizeof(i16));
-    m_aggregateEntryCount[m_curAggregate] = fileCountBuffer[0];
+    m_aggregateFd[m_curAggregate] = aggregateFp;
+    read(m_aggregateFd[m_curAggregate], fpCountBuffer, sizeof(i16));
+    m_aggregateEntryCount[m_curAggregate] = fpCountBuffer[0];
     directoryBytes = m_aggregateEntryCount[m_curAggregate] * ENTRY_BYTES;
     m_aggregateDir[m_curAggregate] = static_cast<aggEntry*>(H2_ALLOC(directoryBytes));
     read(m_aggregateFd[m_curAggregate], m_aggregateDir[m_curAggregate], directoryBytes);

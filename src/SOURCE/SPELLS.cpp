@@ -2403,41 +2403,41 @@ void combatManager::DoBolt(
 
 VA(0x0049de32, 0x164)
 i32 combatManager::GetNextChainLightningTarget(army* source, i32 requireWorks) {
-    army* candidate;
-    i32 closestHex;
-    i32 distance;
+    i32 xDelta;
+    i32 closestCell;
+    i32 fromY;
     i32 sourceX;
-    i32 sourceY;
-    i32 deltaX;
-    CombatSide side;
-    i32 deltaY;
-    i32 closestDistance;
     i32 armyIndex;
-    closestDistance = CHAIN_LIGHTNING_DISTANCE_SENTINEL;
-    closestHex = COMBAT_HEX_EMPTY;
+    i32 y;
+    i32 len;
+    army* candidate;
+    CombatSide sideIndex;
+    i32 closest;
+    closest = CHAIN_LIGHTNING_DISTANCE_SENTINEL;
+    closestCell = COMBAT_HEX_EMPTY;
     sourceX = source->MidX();
-    sourceY = source->MidY();
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; ++armyIndex) {
-            candidate = &m_armies[IDX(side)][armyIndex];
-            if (gArmyEffected[IDX(side)][armyIndex] == 0) {
+    fromY = source->MidY();
+    for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
+        for (armyIndex = 0; armyIndex < m_armyCount[IDX(sideIndex)]; ++armyIndex) {
+            candidate = &m_armies[IDX(sideIndex)][armyIndex];
+            if (gArmyEffected[IDX(sideIndex)][armyIndex] == 0) {
                 if ((requireWorks != 0 && candidate->SpellCastWorks(SPELL_CHAIN_LIGHTNING))
                     || (requireWorks == 0
                         && candidate->SpellCastWorkChance(SPELL_CHAIN_LIGHTNING) != 0.0f)) {
-                    deltaX = abs(candidate->MidX() - sourceX);
-                    deltaY = abs(candidate->MidY() - sourceY);
-                    distance = static_cast<i32>(
-                        sqrt(static_cast<double>(deltaX * deltaX + deltaY * deltaY))
+                    xDelta = abs(candidate->MidX() - sourceX);
+                    y = abs(candidate->MidY() - fromY);
+                    len = static_cast<i32>(
+                        sqrt(static_cast<double>(xDelta * xDelta + y * y))
                     );
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestHex = candidate->m_hex;
+                    if (len < closest) {
+                        closest = len;
+                        closestCell = candidate->m_hex;
                     }
                 }
             }
         }
     }
-    return closestHex;
+    return closestCell;
 }
 
 VA(0x0049df96, 0x31d)

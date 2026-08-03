@@ -807,7 +807,7 @@ void PollRemote(void) {
 
 VA(0x0048e5d3, 0x122)
 i32 TransmitAndWait(
-    char* data,
+    char* bytes,
     i32 destination,
     i32 length,
     i8 command,
@@ -815,16 +815,16 @@ i32 TransmitAndWait(
     char** response
 ) {
     i32 result;
-    i32 ticks;
+    i32 clock;
     i8 complete;
     char* receivedData;
-    i32 unusedResponseState;
+    i32 unusedResponseStatus;
 
     if (gbRemoteOn == 0 || gbInNetSetup != 0)
         return 1;
     receivedData = NULL;
     result = TransmitRemoteData(
-        data,
+        bytes,
         destination,
         length,
         command,
@@ -834,12 +834,12 @@ i32 TransmitAndWait(
     );
     if (result == 0)
         goto transmitComplete;
-    ticks = KBTickCount();
+    clock = KBTickCount();
     complete = 0;
     while (complete == 0) {
-        if (ticks + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
+        if (clock + REMOTE_CHAIN_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                "Error sending data.  Keep trying??",
+                "Error sending bytes.  Keep trying??",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -851,7 +851,7 @@ i32 TransmitAndWait(
                 0
             );
             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                ticks = KBTickCount();
+                clock = KBTickCount();
             } else {
                 result = 0;
                 goto transmitComplete;
@@ -860,7 +860,7 @@ i32 TransmitAndWait(
         ForcePollSound();
         receivedData = GetRemoteData(1);
         if (receivedData != NULL)
-            unusedResponseState = 0;
+            unusedResponseStatus = 0;
         if (receivedData != NULL
             && REMOTE_MESSAGE(receivedData)->type == REMOTE_MESSAGE_RELIABLE
             && REMOTE_MESSAGE(receivedData)->command == responseCommand) {

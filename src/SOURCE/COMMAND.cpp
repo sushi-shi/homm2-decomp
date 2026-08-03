@@ -1323,7 +1323,7 @@ i32 combatManager::RightClick(i32 hexIndex) {
                 return 0;
 
             CombatSide side = m_hexCells[hexIndex].m_occupantSide;
-            i32 armyIndex = m_hexCells[hexIndex].m_occupantIndex;
+            i32 armyIdx = m_hexCells[hexIndex].m_occupantIndex;
             if (m_hexCells[hexIndex].m_blocked != 0
                 && (gpCombatManager->m_inCastleCombat == 0
                     || (hexIndex != COMBAT_CASTLE_GATE_APPROACH_HEX && hexIndex != CASTLE_GATE_HEX)
@@ -2720,37 +2720,37 @@ Finished:
 
 VA(0x004312c9, 0x211)
 void combatManager::ResetCyclingCreatures(void) {
-    army* currentArmy = NULL;
-    i32 cyclingCount = 0;
-    CombatSide side;
+    army* currentTroop = NULL;
+    i32 rotateCount = 0;
     i32 index;
-    i32 unusedCyclingWord;
+    i32 unusedRotateWord;
+    CombatSide sideIndex;
 
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
-            if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+    for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
+            currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
+            if (HAS(currentTroop->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                     == 0
-                && currentArmy->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
-                && currentArmy->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
-                ++cyclingCount;
-                ++gpCombatManager->m_limitCreatureCount[IDX(side)][index];
+                && currentTroop->m_animationSequence >= COMBAT_CREATURE_CYCLE_SEQUENCE_FIRST
+                && currentTroop->m_animationSequence <= COMBAT_CREATURE_CYCLE_SEQUENCE_LAST) {
+                ++rotateCount;
+                ++gpCombatManager->m_limitCreatureCount[IDX(sideIndex)][index];
             }
         }
     }
-    if (cyclingCount == 0)
+    if (rotateCount == 0)
         return;
 
     gpCombatManager->DrawFrame(0, 1, 1, 1, COMMAND_FRAME_DELAY, 1, 1);
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
-            if (HAS(currentArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
+    for (sideIndex = COMBAT_ATTACKER_SIDE; IDX(sideIndex) < COMBAT_SIDE_COUNT; ++sideIndex) {
+        for (index = 0; index < gpCombatManager->m_armyCount[IDX(sideIndex)]; ++index) {
+            currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
+            if (HAS(currentTroop->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED)
                 == 0) {
-                currentArmy = &gpCombatManager->m_armies[IDX(side)][index];
-                currentArmy->m_animationSequence = ARMY_ANIMATION_STAND;
-                currentArmy->m_animationFrame = 0;
-                currentArmy->m_lastAnimationTime = KBTickCount();
+                currentTroop = &gpCombatManager->m_armies[IDX(sideIndex)][index];
+                currentTroop->m_animationSequence = ARMY_ANIMATION_STAND;
+                currentTroop->m_animationFrame = 0;
+                currentTroop->m_lastAnimationTime = KBTickCount();
             }
         }
     }
@@ -3011,13 +3011,13 @@ void combatManager::AddArmy(
     H2_ENUM_PARAM(MonsterFlags, i32) flags,
     i32 animate
 ) {
-    i32 armyIndex = INVALID_ARMY_INDEX;
+    i32 armyIdx = INVALID_ARMY_INDEX;
     i32 reusedArmy = 0;
     i32 index;
-    army* newArmy;
+    army* newStack;
     for (index = 0; index < COMBAT_ARMY_CAPACITY; ++index) {
         if (m_armies[IDX(side)][index].m_monsterType == CREATURE_NONE) {
-            armyIndex = index;
+            armyIdx = index;
             break;
         }
         if (m_armies[IDX(side)][index].m_quantity == 0
@@ -3028,19 +3028,19 @@ void combatManager::AddArmy(
                 || m_armies[IDX(side)][index].m_monsterType == CREATURE_AIR_ELEMENTAL
                 || m_armies[IDX(side)][index].m_monsterType == CREATURE_FIRE_ELEMENTAL
                 || m_armies[IDX(side)][index].m_monsterType == CREATURE_WATER_ELEMENTAL)) {
-            armyIndex = index;
+            armyIdx = index;
             reusedArmy = 1;
             break;
         }
     }
 
-    if (armyIndex == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
+    if (armyIdx == INVALID_ARMY_INDEX || m_hexCells[hex].m_occupantSide != COMBAT_SIDE_NONE)
         return;
 
-    newArmy = &m_armies[IDX(side)][armyIndex];
-    newArmy->Init(monsterType, quantity, side, armyIndex, hex, INVALID_HEX);
-    newArmy->LoadResources();
-    newArmy->m_monster.flags.all |= flags;
+    newStack = &m_armies[IDX(side)][armyIdx];
+    newStack->Init(monsterType, quantity, side, armyIdx, hex, INVALID_HEX);
+    newStack->LoadResources();
+    newStack->m_monster.flags.all |= flags;
     if (reusedArmy == 0)
         ++m_armyCount[IDX(side)];
 
@@ -3048,7 +3048,7 @@ void combatManager::AddArmy(
         return;
 
     ResetLimitCreature();
-    ++m_limitCreatureCount[IDX(side)][armyIndex];
+    ++m_limitCreatureCount[IDX(side)][armyIdx];
     gpCombatManager->DrawFrame(0, 1, 0, 1, COMMAND_FRAME_DELAY, 1, 1);
     gpWindowManager->SaveFizzleSource(
         giMinExtentX,

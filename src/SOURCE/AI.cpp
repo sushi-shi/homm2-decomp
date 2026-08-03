@@ -785,21 +785,21 @@ VA(0x00417cce, 0xa0)
 i32 combatManager::GetWorstArmy(H2_ENUM_PARAM(CombatSide, i32) side, i32 mask) {
     i32 armyIndex = 0;
     u32 bit = COMBAT_AI_MASK_FIRST_BIT;
-    u32l worstStrength = COMBAT_AI_WORST_STRENGTH_LIMIT;
-    i32 worstArmy = COMBAT_AI_NO_ARMY;
-    u32l strength;
+    u32l weakestStrength = COMBAT_AI_WORST_STRENGTH_LIMIT;
+    i32 weakestArmy = COMBAT_AI_NO_ARMY;
+    u32l force;
 
     for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
         if ((mask & bit) != 0) {
-            strength = m_armies[IDX(side)][armyIndex].Strength();
-            if (strength < worstStrength) {
-                worstArmy = armyIndex;
-                worstStrength = strength;
+            force = m_armies[IDX(side)][armyIndex].Strength();
+            if (force < weakestStrength) {
+                weakestArmy = armyIndex;
+                weakestStrength = force;
             }
         }
         bit <<= 1;
     }
-    return worstArmy;
+    return weakestArmy;
 }
 
 VA(0x00417d6e, 0x12e)
@@ -1009,76 +1009,76 @@ VA(0x00418405, 0x204)
 i32 combatManager::WalkTowardArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
-    i32 targetArmy;
-    army* targetPtr;
-    i32 targetHex;
-    i32 attackMask;
-    i32 savedSpeed;
-    i32 pathFound;
-    i32 unusedPath;
+    i32 targetStack;
+    i32 prevSpeed;
+    i32 routeGot;
+    i32 atkMask;
     i32 movement;
-    i32 pathIndex;
+    i32 pathNdx;
+    army* targetPtr;
+    i32 targetSquare;
+    i32 unusedPath;
 
-    targetArmy = GetClosestArmy(currentArmy, side, mask);
+    targetStack = GetClosestArmy(currentArmy, side, mask);
 
-    if (targetArmy == COMBAT_AI_NO_ARMY)
+    if (targetStack == COMBAT_AI_NO_ARMY)
         return 0;
 
-    targetPtr = &m_armies[IDX(side)][targetArmy];
-    targetHex = targetPtr->m_hex;
+    targetPtr = &m_armies[IDX(side)][targetStack];
+    targetSquare = targetPtr->m_hex;
     currentArmy->m_targetSide = side;
-    currentArmy->m_targetIndex = targetArmy;
-    attackMask =
+    currentArmy->m_targetIndex = targetStack;
+    atkMask =
         currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ASSIGNED, ARMY_HEX_INVALID
         );
-    if (attackMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
+    if (atkMask != COMBAT_AI_ALL_ATTACK_DIRECTIONS) {
         giNextAction = ACTION_WAIT;
         return 1;
     }
 
-    savedSpeed = currentArmy->m_monster.speed;
+    prevSpeed = currentArmy->m_monster.speed;
     currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    pathFound = gpSearchArray->FindCombatPath(
+    routeGot = gpSearchArray->FindCombatPath(
         currentArmy->m_hex,
-        targetHex,
+        targetSquare,
         currentArmy,
         COMBAT_AI_PATH_TO_TARGET,
         0
     );
-    if (pathFound == 0
+    if (routeGot == 0
         && HAS(targetPtr->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_WIDE) != 0) {
         switch (targetPtr->m_facing) {
             case ARMY_FACING_LEFT:
-                targetHex--;
+                targetSquare--;
                 break;
             case ARMY_FACING_RIGHT:
-                targetHex++;
+                targetSquare++;
                 break;
         }
-        if (targetHex != COMBAT_AI_NO_ARMY)
-            pathFound = gpSearchArray->FindCombatPath(
+        if (targetSquare != COMBAT_AI_NO_ARMY)
+            routeGot = gpSearchArray->FindCombatPath(
                 currentArmy->m_hex,
-                targetHex,
+                targetSquare,
                 currentArmy,
                 COMBAT_AI_PATH_TO_TARGET,
                 0
             );
     }
-    currentArmy->m_monster.speed = static_cast<i8>(savedSpeed);
+    currentArmy->m_monster.speed = static_cast<i8>(prevSpeed);
     if (gpSearchArray->m_pathLength > 1) {
         giNextAction = ACTION_MOVE;
         movement = currentArmy->m_monster.speed;
-        pathIndex = gpSearchArray->m_pathLength - 1;
+        pathNdx = gpSearchArray->m_pathLength - 1;
         giNextActionGridIndex = currentArmy->m_hex;
-        while (pathIndex >= 1 && movement != 0) {
+        while (pathNdx >= 1 && movement != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
                 static_cast<CombatHexDirection>(
-                    gpSearchArray->m_storage.aiPath.directions[pathIndex]
+                    gpSearchArray->m_storage.aiPath.directions[pathNdx]
                 )
             );
-            pathIndex--;
+            pathNdx--;
             movement--;
             if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
                 movement = 0;

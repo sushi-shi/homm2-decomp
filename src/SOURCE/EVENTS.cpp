@@ -3973,24 +3973,24 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
 }
 
 VA(0x004420e1, 0x95)
-i8 StrEqNoCase(char* firstString, char* secondString) {
-    char* firstPosition = firstString;
-    char* secondPos = secondString;
-    i32 characterCount = 0;
-    char firstUpper;
-    char secondUpper;
+i8 StrEqNoCase(char* firstString, char* sndString) {
+    char* second = sndString;
+    char* fstPosition = firstString;
+    char upper;
+    i32 chCount = 0;
+    char fstUpper;
 
     while (1) {
-        characterCount++;
-        if (characterCount == SITE_STRING_LIMIT)
+        chCount++;
+        if (chCount == SITE_STRING_LIMIT)
             return 1;
-        firstUpper = static_cast<char>(toupper(static_cast<i32>(*firstPosition)));
-        secondUpper = static_cast<char>(toupper(static_cast<i32>(*secondPos)));
-        if (firstUpper == secondUpper) {
-            if (firstUpper == 0)
+        fstUpper = static_cast<char>(toupper(static_cast<i32>(*fstPosition)));
+        upper = static_cast<char>(toupper(static_cast<i32>(*second)));
+        if (fstUpper == upper) {
+            if (fstUpper == 0)
                 return 1;
-            firstPosition++;
-            secondPos++;
+            fstPosition++;
+            second++;
         } else {
             return 0;
         }
@@ -7848,84 +7848,84 @@ void advManager::ComputerMonsterInteract(mapCell* cell, hero* eventHero, i32* ha
 
 VA(0x00448b04, 0x191)
 i32 advManager::DoNetCombat(char* packet) {
-    hero* secondHero;
-    i32 setupCombatY;
-    i32 combatX;
+    hero* secondHro;
+    i32 randSeed;
+    i32 battleX;
+    i32 setupBattleY;
     i32 combatY;
-    i32 randomSeed;
-    H2_ENUM_STORAGE(CombatResult, i8) combatResult;
-    i32 setupCombatX;
+    H2_ENUM_STORAGE(CombatResult, i8) combatRes;
+    i32 initCombatX;
     hero* firstHero;
-    i32 remotePlayer;
-    i32 firstPlayer;
+    i32 otherPlr;
+    i32 firstSide;
     armyGroup* secondArmy;
-    armyGroup* firstArmy;
-    town* combatTown;
-    i32 size;
-    i32 result;
+    armyGroup* troopFirst;
+    town* battleTown;
+    i32 sz;
+    i32 outcome;
 
     firstHero = NULL;
-    firstArmy = NULL;
-    combatTown = NULL;
-    secondHero = NULL;
+    troopFirst = NULL;
+    battleTown = NULL;
+    secondHro = NULL;
     secondArmy = NULL;
     ReceiveHeroTownData(
         packet,
-        &remotePlayer,
-        &combatX,
+        &otherPlr,
+        &battleX,
         &combatY,
         &firstHero,
-        &firstArmy,
-        &combatTown,
-        &secondHero,
+        &troopFirst,
+        &battleTown,
+        &secondHro,
         &secondArmy,
-        &setupCombatX,
-        &setupCombatY,
-        &randomSeed,
-        &combatResult,
+        &initCombatX,
+        &setupBattleY,
+        &randSeed,
+        &combatRes,
         &gbRetreatWin,
         &gbCombatSurrender
     );
-    firstPlayer = firstHero->m_owner;
-    combatResult = DoCombat(
-        combatX,
+    firstSide = firstHero->m_owner;
+    combatRes = DoCombat(
+        battleX,
         combatY,
         firstHero,
-        firstArmy,
-        combatTown,
-        secondHero,
+        troopFirst,
+        battleTown,
+        secondHro,
         secondArmy,
-        setupCombatX,
-        setupCombatY,
-        randomSeed,
+        initCombatX,
+        setupBattleY,
+        randSeed,
         0
     );
-    if (!gbHumanPlayer[firstPlayer]) {
+    if (!gbHumanPlayer[firstSide]) {
         SendHeroTownData(
-            combatX,
+            battleX,
             combatY,
             firstHero,
-            firstArmy,
-            combatTown,
-            secondHero,
+            troopFirst,
+            battleTown,
+            secondHro,
             secondArmy,
-            setupCombatX,
-            setupCombatY,
-            randomSeed,
-            remotePlayer,
-            combatResult,
+            initCombatX,
+            setupBattleY,
+            randSeed,
+            otherPlr,
+            combatRes,
             gbRetreatWin,
             gbCombatSurrender
         );
     }
-    if (firstArmy)
-        H2_FREE(firstArmy);
+    if (troopFirst)
+        H2_FREE(troopFirst);
     if (secondArmy)
         H2_FREE(secondArmy);
-    if (combatTown)
-        H2_FREE(combatTown);
-    if (secondHero)
-        H2_FREE(secondHero);
+    if (battleTown)
+        H2_FREE(battleTown);
+    if (secondHro)
+        H2_FREE(secondHro);
     if (firstHero)
         H2_FREE(firstHero);
     gbRetreatWin = false;
