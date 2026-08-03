@@ -20,6 +20,7 @@ typedef enum FontConstant {
 
 VA(0x004c3620, 0xe5)
 font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_INITIAL, NULL) {
+    char name[RESOURCE_MANAGER_READ13_BYTES];
     gpResourceManager->PointToFile(id);
     m_height = gpResourceManager->ReadWord();
     i32 h = gpResourceManager->ReadWord();
@@ -27,10 +28,9 @@ font::font(u32l id) : resource(RESOURCE_CATEGORY_FONT, id, RESOURCE_REFERENCE_IN
         m_isLarge = 1;
     else
         m_isLarge = 0;
-    char fname[RESOURCE_MANAGER_READ13_BYTES];
-    gpResourceManager->Read13(reinterpret_cast<i8*>(fname));
+    gpResourceManager->Read13(reinterpret_cast<i8*>(name));
     gbLoadingMonoIcon = true;
-    m_glyphIcon = gpResourceManager->GetIcon(fname);
+    m_glyphIcon = gpResourceManager->GetIcon(name);
     gbLoadingMonoIcon = false;
 }
 

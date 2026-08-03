@@ -2759,20 +2759,20 @@ void combatManager::ResetCyclingCreatures(void) {
 
 VA(0x004314da, 0xdf)
 void combatManager::ResetCycleTimers(void) {
-    i32l currentTime_r = KBTickCount();
-    CombatSide side;
-    i32 index;
-    army* currentArmy_p;
+    i32l now = KBTickCount();
+    CombatSide which;
+    i32 i;
+    army* ap;
 
     m_heroCycleTimer[IDX(COMBAT_ATTACKER_SIDE)] = KBTickCount();
     m_heroCycleTimer[IDX(COMBAT_DEFENDER_SIDE)] = KBTickCount();
-    for (side = COMBAT_ATTACKER_SIDE; IDX(side) < COMBAT_SIDE_COUNT; ++side) {
-        for (index = 0; index < gpCombatManager->m_armyCount[IDX(side)]; ++index) {
-            currentArmy_p = &gpCombatManager->m_armies[IDX(side)][index];
-            currentArmy_p->m_lastAnimationTime = currentTime_r;
-            if (currentArmy_p->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
-                currentArmy_p->m_lastAnimationTime -=
-                    Random(STAND_DELAY_RANDOM_MIN, currentArmy_p->m_frameInfo.standStillDelay);
+    for (which = COMBAT_ATTACKER_SIDE; IDX(which) < COMBAT_SIDE_COUNT; ++which) {
+        for (i = 0; i < gpCombatManager->m_armyCount[IDX(which)]; ++i) {
+            ap = &gpCombatManager->m_armies[IDX(which)][i];
+            ap->m_lastAnimationTime = now;
+            if (ap->m_frameInfo.standStillDelay > STAND_DELAY_RANDOM_THRESHOLD) {
+                ap->m_lastAnimationTime -=
+                    Random(STAND_DELAY_RANDOM_MIN, ap->m_frameInfo.standStillDelay);
             }
         }
     }

@@ -157,7 +157,7 @@ BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	85.4528	bb6925048c62
 BASE/EXEC	?RemoveManager@executive@@QAEXPAVbaseManager@@@Z	78.5500	7a5a0a411c47
 BASE/EXEC	?ShutDownSystem@executive@@QAEXXZ	100.0000	181316dc8cc1
 BASE/EXEC	?Terminate@executive@@QAEXXZ	100.0000	954f5a9ba0c3
-BASE/FONT	??0font@@QAE@K@Z	99.8983	a335f165fa1c
+BASE/FONT	??0font@@QAE@K@Z	100.0000	447d5a218210
 BASE/FONT	??1font@@UAE@XZ	100.0000	065137566962
 BASE/FONT	?DrawBoundedString@font@@QAEXPADHHHHHH@Z	68.0294	b411f78e3aec
 BASE/FONT	?DrawString@font@@QAEXPADHHH@Z	100.0000	4338d18cdd8c
@@ -505,7 +505,7 @@ SOURCE/ADVMGR	?Main@advManager@@UAEHAAUtag_message@@@Z	81.0961	2dd3aac09c39
 SOURCE/ADVMGR	?MapExtraPosAndAdjacentsSet@@YIHHHE@Z	99.5775	28091092a1b9
 SOURCE/ADVMGR	?MobilizeCurrHero@advManager@@QAEXH@Z	100.0000	367f9621bc52
 SOURCE/ADVMGR	?MouseInScrollZone@advManager@@QAEHXZ	100.0000	001c91f6647b
-SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	99.8483	be78a3a69fba
+SOURCE/ADVMGR	?Open@advManager@@UAEHH@Z	99.8848	be78a3a69fba
 SOURCE/ADVMGR	?ProcessDeSelect@advManager@@QAEHPAUtag_message@@PAHPAPAVmapCell@@@Z	62.4112	7241900d0fe5
 SOURCE/ADVMGR	?ProcessHover@advManager@@QAEHHH@Z	87.4441	8067d1551fa3
 SOURCE/ADVMGR	?ProcessSearch@advManager@@QAEHHH@Z	95.8962	6bf8e26e61d3
@@ -680,7 +680,7 @@ SOURCE/COMMAND	?IsNegationSphereInEffect@combatManager@@QAEHXZ	100.0000	946f5d2f
 SOURCE/COMMAND	?Main@combatManager@@UAEHAAUtag_message@@@Z	100.0000	cd550672d44f
 SOURCE/COMMAND	?ProcessCombatMsg@combatManager@@QAEHAAUtag_message@@@Z	97.9501	6f4a78e2e5d5
 SOURCE/COMMAND	?ProcessNextAction@combatManager@@QAEHAAUtag_message@@@Z	95.9106	8114b924379e
-SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	99.7719	15f2f1bcab92
+SOURCE/COMMAND	?ResetCycleTimers@combatManager@@QAEXXZ	100.0000	f3a420664740
 SOURCE/COMMAND	?ResetCyclingCreatures@combatManager@@QAEXXZ	99.6861	5c0ddc2a841b
 SOURCE/COMMAND	?ResetMouse@combatManager@@QAEXXZ	99.7647	5995c6dd20c5
 SOURCE/COMMAND	?ResetRound@combatManager@@QAEXXZ	100.0000	c47ad485fcf6
