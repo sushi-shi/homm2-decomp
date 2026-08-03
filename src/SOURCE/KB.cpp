@@ -2627,7 +2627,6 @@ VA(0x0046af49, 0x1cf)
 void InitVars(void) {
     i32 i;
     i32 j;
-    NULL_SAMPLE2.pSample = NULL;
     gGameCommand = -1;
     gPalette = NULL;
     gbCombatSurrender = false;
@@ -3563,28 +3562,30 @@ H2_ENUM_END(SamplePlaybackConstant)
 VA(0x0046d534, 0x41)
 SAMPLE2 LoadPlaySample(char* name) {
     SAMPLE2 ss;
-    ss.pSample = gpResourceManager->GetSample(name);
-    if (ss.pSample) {
-        ss.pSample->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
-        gpSoundManager->MemorySample(ss.pSample);
+    ss = gpResourceManager->GetSample(name);
+    if (ss) {
+        ss->m_playbackData.channelType = SAMPLE_PLAYBACK_CHANNEL_GROUP;
+        gpSoundManager->MemorySample(ss);
     }
     return ss;
 }
 
 VA(0x0046d575, 0x84)
-void WaitEndSample(SAMPLE2 s, i32 waitTime) {
+void WaitEndSample(SAMPLE2* s, i32 waitTime) {
     i32l endTime;
+    if (!s)
+        return;
+    if (!*s)
+        return;
     if (waitTime < 0)
         waitTime = SAMPLE_DEFAULT_WAIT_TIME;
     endTime = KBTickCount() + waitTime;
-    if (s.pSample)
-        while (gpSoundManager->DigitalReport(s.pSample) && KBTickCount() < endTime) {
-            Process1WindowsMessage();
-            PollSound();
-        }
-    if (s.pSample)
-        gpResourceManager->Dispose((resource*)s.pSample);
-    s.pSample = NULL;
+    while (gpSoundManager->DigitalReport(*s) && KBTickCount() < endTime) {
+        Process1WindowsMessage();
+        PollSound();
+    }
+    gpResourceManager->Dispose((resource*)*s);
+    *s = NULL;
 }
 
 H2_ENUM_BEGIN(MemoryErrorConstant)
@@ -10111,7 +10112,6 @@ i32 giLimitPlayer;
 i32 giShowClouds;
 i32 bDoColorCycle;
 inputManager* gpInputManager;
-SAMPLE2 NULL_SAMPLE2;
 i32 iMaxMapExtra;
 palette* gPalette;
 resourceManager* gpResourceManager;

@@ -814,9 +814,7 @@ struct SSpellInfo {
     SpellInfoAttribute attributes;
 };
 SIZE(SSpellInfo, 0x16);
-struct SAMPLE2 {
-    class sample* pSample;
-};
+typedef sample* SAMPLE2;
 
 #pragma pack(push, 1)
 struct SWinSetup {

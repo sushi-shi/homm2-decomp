@@ -537,7 +537,7 @@ mapCell* advManager::MoveHero(
     i32 forceMove
 ) {
     EventExtra* mapEvent_e = NULL;
-    SAMPLE2 fizzleSample_h = NULL_SAMPLE2;
+    SAMPLE2 fizzleSample_h = NULL;
     mapCell* eventCell_g;
     hero* movingHero_f;
     mapCell* currentCell_f;
@@ -663,7 +663,7 @@ mapCell* advManager::MoveHero(
                     NULL,
                     NULL
                 );
-                WaitEndSample(fizzleSample_h, -1);
+                WaitEndSample(&fizzleSample_h, -1);
                 break;
 
             case MAP_OBJECT_HERO_INTERACTION:

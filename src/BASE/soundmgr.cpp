@@ -659,13 +659,13 @@ void soundManager::ModifySample(
 }
 
 VA(0x004b6250, 0x8e)
-i32 soundManager::DigitalReport(class sample* sampleResource) {
+bool soundManager::DigitalReport(class sample* sampleResource) {
     if (IsAudiereBackend(this)) {
         return AudiereSamplePlaying(sampleResource);
     }
     if (IsMilesBackend(this))
         return MilesSamplePlaying(sampleResource);
-    return 0;
+    return false;
 }
 
 VA(0x004b62e0, 0x4d)

@@ -2612,7 +2612,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
     SAMPLE2 digSampleState;
     i32 artifactResultLocal;
 
-    digSampleState = NULL_SAMPLE2;
+    digSampleState = NULL;
     searchingHeroState = GetHeroSlot(gpCurPlayer->m_currentHero);
 
     if (searchingHeroState->m_mobility != searchingHeroState->m_remainingMobility) {
@@ -2753,7 +2753,7 @@ i32 advManager::ProcessSearch(i32 x, i32 y) {
         NormalDialog("Nothing here.\nWhere could it be?", 1, -1, -1, -1, 0, -1, 0, -1, 0);
     }
     if (gbHumanPlayer[giCurPlayer]) {
-        WaitEndSample(digSampleState, -1);
+        WaitEndSample(&digSampleState, -1);
     }
     for (playerState = 0; playerState < gpGame->m_playerCount; ++playerState) {
         ComputeUALoc(playerState);

@@ -532,7 +532,7 @@ i32 combatManager::Open(i32 openFlags) {
         memmove(m_combatPalette->m_data, gpBufferPalette->m_data, COMBAT_PALETTE_DATA_SIZE);
     gpWindowManager->FadeScreen(FADE_IN, FADE_STEPS, m_combatPalette);
     gbLimitedCombatUpdatePalette = true;
-    WaitEndSample(preBattleSample, -1);
+    WaitEndSample(&preBattleSample, -1);
 
     gpSoundManager->SwitchAmbientMusic(SRandom(AMBIENT_MUSIC_FIRST, AMBIENT_MUSIC_LAST));
     glTimers[GLOBAL_COMBAT_CYCLE_TIMER_SLOT] = KBTickCount();
@@ -1053,7 +1053,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
         return;
 
     bInHighMoraleBonus = 1;
-    SAMPLE2 moraleSample = {NULL};
+    SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
         sprintf(gText, "goodmrle.82M");
         moraleSample = LoadPlaySample(gText);
@@ -1082,7 +1082,7 @@ void combatManager::CheckApplyGoodMorale(H2_ENUM_PARAM(CombatSide, i32) side, i3
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_HIGH_MORALE;
 
     if (!gbNoShowCombat)
-        WaitEndSample(moraleSample, -1);
+        WaitEndSample(&moraleSample, -1);
 }
 
 VA(0x00428649, 0x176)
@@ -1103,7 +1103,7 @@ i32 combatManager::CheckApplyBadMorale(
                == BAD_MORALE_NETWORK_SKIP_ROLL)
         return 0;
 
-    SAMPLE2 moraleSample = {NULL};
+    SAMPLE2 moraleSample = NULL;
     if (!gbNoShowCombat) {
         moraleSample = LoadPlaySample("BADMRLE.82M");
         if (activeArmy->m_quantity <= 1)
@@ -1126,7 +1126,7 @@ i32 combatManager::CheckApplyBadMorale(
     activeArmy->SpellEffect(COMBAT_EFFECT_BAD_MORALE, MORALE_EFFECT_DURATION, 1);
     activeArmy->m_monster.flags.abilityFlags |= MONSTER_ABILITY_FLAG_BAD_MORALE;
     if (!gbNoShowCombat)
-        WaitEndSample(moraleSample, -1);
+        WaitEndSample(&moraleSample, -1);
     return 1;
 }
 
@@ -1319,8 +1319,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_IMPACT_SOUND);
     sample* loadedSample26 = gpResourceManager->GetSample(gText);
     i32 unknown15;
-    SAMPLE2 catapultSound37 = {NULL};
-    SAMPLE2 impactSound1 = {NULL};
+    SAMPLE2 catapultSound37 = NULL;
+    SAMPLE2 impactSound1 = NULL;
     icon* boulder37 = gpResourceManager->GetIcon("boulder.icn");
     sprintf(gText, "catsnd%02d.82M", COMBAT_CATAPULT_LAUNCH_SOUND);
     catapultSound37 = LoadPlaySample(gText);
@@ -1610,8 +1610,8 @@ void combatManager::CatAttack(H2_ENUM_PARAM(CombatSide, i32) side) {
     m_catapultFrame[IDX(side)] = 0;
     DrawFrame(1, 0, 0, 0, COMBAT_CATAPULT_ANIMATION_DELAY, 1, 1);
     gpResourceManager->Dispose(boulder37);
-    WaitEndSample(impactSound1, -1);
-    WaitEndSample(catapultSound37, -1);
+    WaitEndSample(&impactSound1, -1);
+    WaitEndSample(&catapultSound37, -1);
     if (loadedSample26)
         gpResourceManager->Dispose(loadedSample26);
     LogStr("CA2");
@@ -1749,7 +1749,7 @@ void combatManager::KeepAttack(H2_ENUM_PARAM(CombatTowerSelector, i32) tower) {
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
     target0->CancelSpellType(ARMY_CANCEL_SPELLS_AFTER_DAMAGE);
     target0->PowEffect(COMBAT_EFFECT_INVALID, 1, -1, -1);
-    WaitEndSample(keepSample19, -1);
+    WaitEndSample(&keepSample19, -1);
     LogStr("KA2");
 }
 
@@ -1968,7 +1968,7 @@ void combatManager::LowerDoor(void) {
         m_drawbridgeState = bridgeFrame;
         DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     }
-    WaitEndSample(drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample, -1);
 }
 
 VA(0x0042a91a, 0xb6)
@@ -1984,7 +1984,7 @@ void combatManager::RaiseDoor(void) {
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
     m_drawbridgeState = COMBAT_DRAWBRIDGE_RAISED;
     DrawFrame(1, 0, 1, 0, COMBAT_DOOR_ANIMATION_DELAY, 1, 1);
-    WaitEndSample(drawbridgeSample, -1);
+    WaitEndSample(&drawbridgeSample, -1);
 }
 
 VA(0x0042a9d0, 0x61)

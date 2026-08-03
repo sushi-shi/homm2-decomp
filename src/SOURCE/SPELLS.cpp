@@ -716,7 +716,7 @@ void combatManager::CastSpell(
         }
     }
 
-    spellSample = NULL_SAMPLE2;
+    spellSample = NULL;
     if (m_limitCreature != 0) {
         ResetLimitCreature();
         if (ValidHex(m_limitCreatureHex)
@@ -858,7 +858,7 @@ void combatManager::CastSpell(
                 m_hexCells[teleportArmy_i->m_hex - 1].m_occupantIndex = COMBAT_HEX_EMPTY;
             }
             if (gbNoShowCombat == 0)
-                WaitEndSample(spellSample, -1);
+                WaitEndSample(&spellSample, -1);
             if (gbNoShowCombat == 0) {
                 sprintf(gText, "telptin.82m");
                 spellSample = LoadPlaySample(gText);
@@ -1240,7 +1240,7 @@ cast_done:
         m_heroAnimationFrame[IDX(m_currentSide)] = 0;
         DrawFrame(1, 0, 0, 0, COMBAT_DRAW_DELAY, 1, 1);
     }
-    WaitEndSample(spellSample, -1);
+    WaitEndSample(&spellSample, -1);
     CheckChangeSelector();
 }
 
@@ -3505,15 +3505,17 @@ i32 combatManager::SpaceForElementalExists(void) {
 
 VA(0x004a0a4b, 0xa1)
 void combatManager::ShowSpellCastFailure(army* target, i32) {
+    SAMPLE2 fizzleSample = LoadPlaySample("rsbryfzl.82m");
     sprintf(
         gText,
-        "The %s %s the spell!",
+        "%s%s \xf1\xee\xef\xf0\xee\xf2\xe8\xe2\xeb\xff\xe5\xf2\xf1\xff "
+        "\xfd\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe!",
+        target->m_quantity == 1 ? "" : "\xce\xf2\xf0\xff\xe4 ",
         target->m_quantity == 1 ? gArmyNames[IDX(target->m_monsterType)]
-                                : gArmyNamesPlural[IDX(target->m_monsterType)],
-        target->m_quantity == 1 ? "resists" : "resist"
+                                : gArmyNamesPlural[IDX(target->m_monsterType)]
     );
     gpCombatManager->CombatMessage(gText, 1, 1, 0);
-    WaitEndSample((LoadPlaySample("rsbryfzl.82m")), -1);
+    WaitEndSample(&fizzleSample, -1);
 }
 
 VA(0x004a0aec, 0x1cd)

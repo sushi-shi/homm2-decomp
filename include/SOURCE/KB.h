@@ -9,7 +9,6 @@
 
 H2_ENUM_CLASS_FORWARD(CDRomSetupResult);
 
-struct SAMPLE2;
 struct SSpellInfo;
 struct SWinSetup;
 class advManager;
@@ -508,7 +507,7 @@ void SmackFade(u8* src, u8* dst);
 void ShowCongrats(HighScoreType);
 void CongratsWait(void);
 SAMPLE2 LoadPlaySample(char* name);
-void WaitEndSample(SAMPLE2 s, i32 waitTime);
+void WaitEndSample(SAMPLE2* s, i32 waitTime);
 void MemError(void);
 char* GetTownName(i32 i);
 void LoadSystemwideIcons(void);
@@ -674,10 +673,6 @@ H2_ENUM_CLASS_BEGIN(MapExtraFlag)
 H2_ENUM_CLASS_END(MapExtraFlag)
 extern u8* mapExtra;
 extern tag_tilePoint normalDirTable[];
-extern SAMPLE2 NULL_SAMPLE2;
-inline SAMPLE2& GetNullSample(void) {
-    return NULL_SAMPLE2;
-}
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;
 extern i16* pwSizeOfMapExtra;
