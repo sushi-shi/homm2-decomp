@@ -170,6 +170,13 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   0x59/0x5c/0x5c bytes; the PoL branch would add 41). Assert line
   numbers also moved (703/732/760/816 -> 675/700/723/775), so the
   source file itself shrank ~30-40 lines between versions.
+- **[Buka] The wingraph palette family is `__cdecl`, not `/Gr` fastcall.**
+  `UpdatePalette`, `WGUpdatePalette` and `DDUpdatePalette` read their
+  `i8*` argument from `[ebp+8]` with no ecx spill, and `UpdatePalette`
+  calls the other two with `push`/`add esp,4`. Declaring all three
+  `__cdecl` reproduces retail's exact sizes (0x28 / 0x1c1 / 0xee).
+  Suspect a wider class - any /Gr TU function whose retail prologue
+  lacks the ecx spill is a `__cdecl` candidate.
 - **[Buka] Rainbow luck bonus applies before the clamps.**
   `game::GetLuck` in 2.1 adds the Sorceress Rainbow bonus BEFORE the
   MIN/MAX clamps and the Battle Garb override; the PoL 2.0 order
