@@ -97,6 +97,25 @@ rule: it does not close the function, and there is no natural name at the
 required bucket for the textY local - the width slot wants bucket 0
 (`wide` fits), the textY slot wants bucket 1 and nothing clean lands there.)
 
+### DIR32 count census (docs/dir32-count-mismatches.tsv)
+
+Ran the reloc check across every same-length function: **72 mismatches,
+and the delta is +3 in ALL 72** - never +1, +2 or negative. That
+uniformity says one systematic cause, not 72 independent defects. Two
+hypotheses, untested:
+
+1. `config/delink_relocs.tsv` (analysis output, the only DIR32 channel
+   since the image has no `.reloc` directory) is missing three sites per
+   affected function.
+2. Our objects genuinely emit three extra absolute references per
+   function - one construct, repeated.
+
+Hypothesis 1 is the more likely: the affected set is dominated by
+ADVMGR/CMBTMGR dialog-style functions that share a call shape. Resolve
+by dumping the three unmatched site RVAs for one function and checking
+what the retail bytes hold there. Do NOT "fix" 72 functions before
+settling which side is wrong.
+
 ## Work queues (artifacts, not prose)
 
 | queue | file | rows | state |
