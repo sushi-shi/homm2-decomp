@@ -72,8 +72,7 @@ inline i32 ArmyFacingRearHexOffset(ArmyFacing facing) {
 #else
 #define OppositeArmyFacing(facing) (ARMY_FACING_RIGHT - (facing))
 #define ArmyFacingForSide(side) (ARMY_FACING_RIGHT - (side))
-#define ArmyFacingRearHexOffset(facing)                                                        \
-    (static_cast<u32>((facing) - ARMY_FACING_RIGHT) < 1 ? 1 : -1)
+#define ArmyFacingRearHexOffset(facing) ((facing) == ARMY_FACING_RIGHT ? 1 : -1)
 #endif
 
 H2_ENUM_CLASS_BEGIN(ArmyDrawState)
