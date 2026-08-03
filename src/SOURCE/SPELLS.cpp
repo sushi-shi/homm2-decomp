@@ -2589,13 +2589,13 @@ void combatManager::VaporizeCreature(H2_ENUM_PARAM(CombatSide, i32) side, i32 ar
         if (phase11 == VAPORIZE_PHASE_COUNT - 1)
             rowCount = (rowCount - 1) / VAPORIZE_ROW_PAIR_SIZE + 1;
         for (row9 = 0; row9 < rowCount; ++row9) {
-            gyModify[row9 * VAPORIZE_STRIPE_WIDTH + firstY8 + topOffset8] = VAPORIZE_MASKED;
-            gyModify[lastY11 + (row9 * -VAPORIZE_STRIPE_WIDTH - bottomOffset4)] = VAPORIZE_MASKED;
+            *(row9 * VAPORIZE_STRIPE_WIDTH + gyModify + firstY8 + topOffset8) = VAPORIZE_MASKED;
+            *(gyModify - row9 * VAPORIZE_STRIPE_WIDTH - bottomOffset4 + lastY11) = VAPORIZE_MASKED;
             gbLimitToExtent = true;
             gpCombatManager->DrawFrame(1, 0, 1, 0, VAPORIZE_FRAME_DELAY, 1, 1);
         }
     }
-    DelayMilli(static_cast<i32l>(gfCombatSpeedMod[gConfig.combatSpeed] * SPELL_VANISH_END_DELAY));
+    DelayMilli(static_cast<i32l>(SPELL_VANISH_END_DELAY * gfCombatSpeedMod[gConfig.combatSpeed]));
     target->m_palette = NULL;
     target->m_showQuantity = 1;
     H2_FREE(gyModify);
@@ -3370,7 +3370,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
     oldQuantity_b = target_i->m_quantity;
     target_i->m_quantity +=
         spellPower * RESURRECT_HIT_POINTS_PER_POWER / target_i->m_monster.hitPoints;
-    if (target_i->m_initialQuantity < target_i->m_quantity)
+    if (target_i->m_quantity > target_i->m_initialQuantity)
         target_i->m_quantity = target_i->m_initialQuantity;
     if (spell == SPELL_RESURRECT)
         target_i->m_temporaryResurrectionQuantity += target_i->m_quantity - oldQuantity_b;
@@ -3401,7 +3401,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o];
                     m_hexCells[deadHex_k].m_occupantFrame =
                         m_hexCells[deadHex_k].m_deadOccupantFrames[index_o];
-                    if (m_hexCells[deadHex_k].m_deadOccupantCount == index_o + 1) {
+                    if (index_o + 1 == m_hexCells[deadHex_k].m_deadOccupantCount) {
                         m_hexCells[deadHex_k].m_deadOccupantSides[index_o] = COMBAT_SIDE_NONE;
                         m_hexCells[deadHex_k].m_deadOccupantIndices[index_o] = COMBAT_HEX_EMPTY;
                     } else {
@@ -3448,7 +3448,7 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
         for (index_o = 0; index_o < RESURRECT_ANIMATION_FRAME_COUNT; ++index_o) {
             glTimers[0] = static_cast<i32>(
                 KBTickCount()
-                + gfCombatSpeedMod[gConfig.combatSpeed] * IDX(SPELL_FIZZLE_FRAME_DELAY)
+                + IDX(SPELL_FIZZLE_FRAME_DELAY) * gfCombatSpeedMod[gConfig.combatSpeed]
             );
             IconToBitmap(
                 resurrectIcon,
@@ -3471,11 +3471,11 @@ void combatManager::Resurrect(H2_ENUM_PARAM(SpellType, i32) spell, i32 targetHex
                     target_i->m_animationFrame = 0;
                 } else {
                     target_i->m_animationFrame =
-                        target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1
-                                < RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
-                            ? target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
-                                  - 1
-                            : RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o;
+                        RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
+                                < target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)] - 1
+                            ? RESURRECT_DEATH_REVERSE_FRAME - 1 - index_o
+                            : target_i->m_frameInfo.animationFrameCount[IDX(ARMY_ANIMATION_DEATH)]
+                                  - 1;
                 }
             }
             DrawFrame(0, 0, 0, 0, SPELL_FIZZLE_FRAME_DELAY, 1, 1);
