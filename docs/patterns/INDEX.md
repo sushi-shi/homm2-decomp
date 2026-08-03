@@ -23,3 +23,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [goto-label-jump-stub](goto-label-jump-stub.md) | loop exit reaches its join through a `jmp` stub parked before the epilogue → source `goto`, not `break` |
 | [compiler-temp-vs-named-local](compiler-temp-vs-named-local.md) | `this` spill and every temp shifted by one slot → one side named a value the other left a temp |
 | [struct-return-temp-vs-scalar-typedef](struct-return-temp-vs-scalar-typedef.md) | ours-only `mov [$T],eax; mov eax,[$T]` after a `?AU<name>@@`-returning call → `<name>` is a scalar typedef in retail, not a 1-member struct |
+| [flat-map-index-pointer-form](flat-map-index-pointer-form.md) | `base + x` accumulated with `y*W` in the SIB → the source is `*(p + x + y*W)`, not `p[x + y*W]` |
+| [fp-relational-mask](fp-relational-mask.md) | `testb $0x41` vs `testb $0x1` after `fcomp` → the mask names the source relational; `a > b` and `b < a` are different bytes |
