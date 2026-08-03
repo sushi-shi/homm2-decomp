@@ -212,14 +212,14 @@ BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	3158a37d4d26
 BASE/MOUSEMGR	?MouseCoords@mouseManager@@QAEXAAH0@Z	100.0000	8464b641abb5
 BASE/MOUSEMGR	?NewUpdate@mouseManager@@QAEXH@Z	69.8773	97bf8dbbf9dc
 BASE/MOUSEMGR	?Open@mouseManager@@UAEHH@Z	99.9275	d8a702714dd9
-BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	35.2143	431c87cecfdf
-BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	0.0000	4d30a279ab40
+BASE/MOUSEMGR	?ReallyHidePointer@mouseManager@@QAEXXZ	99.6429	e4438511ec49
+BASE/MOUSEMGR	?ReallyShowPointer@mouseManager@@QAEXXZ	99.6429	9704e8fd33e8
 BASE/MOUSEMGR	?RestoreUnderlying@mouseManager@@QAEXXZ	100.0000	c08c64731854
 BASE/MOUSEMGR	?SaveAndDraw@mouseManager@@QAEXXZ	90.0118	c2e3592fb488
 BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	0.0000	11e3df8e1c4c
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	88.9638	6152e8092dab
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	92.8174	08b42dfe195c
-BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	3.2414	8d69724fe434
+BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	d350493d39ed
 BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	14.4800	e0e535c36b40
 BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	0.0000	cb48ab56d094
 BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	65.7755	60bce9ca94d0
