@@ -220,12 +220,12 @@ BASE/MOUSEMGR	?SetColorMice@mouseManager@@QAEXH@Z	99.8461	df04d528c2fa
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXH@Z	88.9777	6152e8092dab
 BASE/MOUSEMGR	?SetPointer@mouseManager@@QAEXPADHH@Z	94.6783	d47f06a1289a
 BASE/MOUSEMGR	?ShowColorPointer@mouseManager@@QAEXXZ	100.0000	d350493d39ed
-BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	14.4800	e0e535c36b40
-BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	0.0000	cb48ab56d094
-BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	65.7755	60bce9ca94d0
-BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	0.0000	304e61e6e7d8
+BASE/Midi	?MIDIIsPlaying@soundManager@@QAEHXZ	14.0000	84b9d4856f7e
+BASE/Midi	?MIDIPlay@soundManager@@QAEXH@Z	76.9417	cb48ab56d094
+BASE/Midi	?MIDISetVolume@soundManager@@QAEXXZ	65.6122	798a171f9c8d
+BASE/Midi	?MIDIShutdown@soundManager@@QAEXXZ	48.6721	304e61e6e7d8
 BASE/Midi	?MIDIStartup@soundManager@@QAEXXZ	0.0000	8b37494b6a69
-BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	41.1600	3be0c857ab25
+BASE/Midi	?MIDIStop@soundManager@@QAEXXZ	72.9000	e0b812442575
 BASE/MilesSound	?AdjustMilesSampleVolumes@@YIXXZ	73.7879	44d0ee3c92f5
 BASE/MilesSound	?AllocateMilesSampleHandles@@YIXPAU_DIG_DRIVER@@@Z	100.0000	7a5fefc5eaf6
 BASE/MilesSound	?MilesSamplePlaying@@YI_NPAVsample@@@Z	100.0000	4105daab0413
