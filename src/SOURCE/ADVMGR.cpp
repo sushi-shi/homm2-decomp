@@ -9510,13 +9510,11 @@ i32 MapExtraPosAndAdjacentsSet(i32 x, i32 y, u8 mask) {
             continue;
         }
         for (i32 checkY = y - 1; checkY <= y + 1; ++checkY) {
-            if (checkY >= 0) {
-                if (checkY >= MAP_HEIGHT) {
-                } else {
-                    if (*(mapExtra + checkX + MAP_WIDTH * checkY) & mask) {
-                        return 1;
-                    }
-                }
+            if (checkY < 0 || checkY >= MAP_HEIGHT) {
+                continue;
+            }
+            if (*(mapExtra + checkX + MAP_WIDTH * checkY) & mask) {
+                return 1;
             }
         }
     }
