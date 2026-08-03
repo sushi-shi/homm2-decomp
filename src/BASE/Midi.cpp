@@ -116,7 +116,7 @@ void soundManager::MIDIPlay(i32 midiTrack) {
 }
 
 VA(0x004c5aa0, 0xe7)
-inline void soundManager::MIDIStop(void) {
+void soundManager::MIDIStop(void) {
     if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
         if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
             AIL_stop_sequence(hSequence[CurrentMidiFile]);
@@ -134,7 +134,7 @@ inline void soundManager::MIDIStop(void) {
 }
 
 VA(0x004c5b90, 0x56)
-inline i32 soundManager::MIDIIsPlaying(void) {
+i32 soundManager::MIDIIsPlaying(void) {
     if (gbNoSound == 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED && m_midiReady != 0
         && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
         return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
@@ -143,7 +143,7 @@ inline i32 soundManager::MIDIIsPlaying(void) {
 }
 
 VA(0x004c5bf0, 0x8f)
-inline void soundManager::MIDISetVolume(void) {
+void soundManager::MIDISetVolume(void) {
     if (gbNoSound == 0 && m_midiReady != 0) {
         i32 volume = MAX_VOLUME;
         if (m_fadeSteps > 0) {

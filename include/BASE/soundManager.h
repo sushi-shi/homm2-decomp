@@ -136,9 +136,9 @@ public:
     void MIDIStartup(void);
     void MIDIShutdown(void);
     void MIDIPlay(i32);
-    __declspec(dllexport) inline void MIDIStop(void);
-    __declspec(dllexport) inline i32 MIDIIsPlaying(void);
-    __declspec(dllexport) inline void MIDISetVolume(void);
+    __declspec(dllexport) void MIDIStop(void);
+    __declspec(dllexport) i32 MIDIIsPlaying(void);
+    __declspec(dllexport) void MIDISetVolume(void);
     void MIDIPoll(void);
 };
 #pragma pack(pop)
