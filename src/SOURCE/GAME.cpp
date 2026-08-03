@@ -3044,7 +3044,7 @@ game::ViewSpells(
     viewSpellsHero = spellHero;
     m_viewSpell = SPELL_NONE;
     if (spellHero->GetNumSpells(spellType) == 0) {
-        NormalDialog(const_cast<char*>("No spells to cast."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
+        NormalDialog(const_cast<char*>("\xcd\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe9."), 1, -1, -1, -1, 0, -1, 0, -1, 0);
     } else {
         m_viewSpellsCallback = callback;
         m_viewSpellsReadOnly = static_cast<i8>(readOnly);
@@ -4140,7 +4140,7 @@ void game::NextPlayer(void) {
         gpAdvManager->CheckSetEvilInterface(1, giCurPlayer);
         gbAllBlack = false;
         if (gbBlackoutPlayer && giNumHumanPlayers > 1) {
-            sprintf(gText, "%s's turn.", cPlayerNames[giCurPlayer]);
+            sprintf(gText, "%s, \xf2\xe5\xef\xe5\xf0\xfc \xe2\xe0\xf8 \xf5\xee\xe4.", cPlayerNames[giCurPlayer]);
             WaitForPlayer(gText, giCurPlayer);
         }
         if (gbThisNetHumanPlayer[giCurPlayer])
@@ -6461,7 +6461,7 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
 
     LogStr(const_cast<char*>("Transmit Game Start"));
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("Sending Data"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>("\xcf\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe0 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
     AiPrint(const_cast<char*>("Transmit Start - Compressing"));
 
     acknowledged = static_cast<char*>(H2_ALLOC(REMOTE_PACKET_TRACKING_CAPACITY));
@@ -6741,7 +6741,7 @@ i32 game::ReceiveSaveGame(
 
     gpAdvManager->UnwindMapChangeQueue(REMOTE_MAP_CHANGE_UNWIND_LIMIT, 0);
     if (gpAdvManager->m_active == 1)
-        BVResMsg(const_cast<char*>("Receiving Data"), RES_NONE, 0);
+        BVResMsg(const_cast<char*>("\xcf\xee\xeb\xf3\xf7\xe5\xed\xe8\xe5 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
 
     samplesReady = gpSoundManager->m_samplesReady;
     oldTrack = static_cast<i8>(gpSoundManager->m_musicTrack);
@@ -6786,7 +6786,7 @@ i32 game::ReceiveSaveGame(
         CheckDoMain(0, 1);
         if (KBTickCount() > lastPacketTime + REMOTE_RECEIVE_TIMEOUT) {
             NormalDialog(
-                const_cast<char*>("Error receiving data.  Keep trying?"),
+                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
                 REMOTE_RECEIVE_DIALOG_BUTTONS,
                 -1,
                 -1,

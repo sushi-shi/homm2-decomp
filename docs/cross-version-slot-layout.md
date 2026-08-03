@@ -971,6 +971,37 @@ That ratio is the campaign fact in miniature: **most functions that need a local
 this branch need it because they are anchored to the PoL 2.0 fork, not because the
 reconstruction was careless.**
 
+## 13. Buka literal divergences (2026-08-03)
+
+Pairing each function's string literals against retail's in reference order (the code is
+otherwise identical, so position i corresponds) found **191 sites where our literal is not
+the text Buka ships** - the English original where retail carries a CP1251 Russian
+translation. `docs/buka-literal-divergences.tsv` lists every pair with the retail address.
+
+50 were corrected in source, taking only the unambiguous ones: our literal plain ASCII,
+retail's cell containing Cyrillic, the format-specifier sequence identical on both sides
+(a translation preserves `%d`), real prose rather than a bare `"%d"` (which carries no
+evidence that position i lines up), and the literal occurring exactly once in the
+function. Spelling follows the tree's existing convention - hex-escaped CP1251, as in
+`wingraph.cpp` - so the source needs no UTF-8 dependency.
+
+These are correctness fixes, not score fixes: with `functionRelocDiffs=none` the cell
+identity is no longer compared, so they moved two rows by ~0.03%. They are recorded
+because they are exactly the kind of 2.0 -> Buka content delta this branch exists to
+recover, and because a wrong literal is a wrong program even when the bytes score alike.
+
+**What still blocks the 2.0-exact gap.** Of the 1268 functions proven exact on the 2.0
+line, 830 are exact here and 438 are not. Disabling the data-value relocation scoring
+closed 58 of them. Of the remainder: ~270 differ in body (ordinary matching work), ~64 are
+jump-table scanner artefacts, 39 are pure data-model artefacts, 34 are one/two-instruction
+residuals and 14 are slot-only. The data-model artefacts have one cause worth stating
+plainly: this branch has no source `DATA()` claim, so the delinked target spells a global
+as `const_<RVA>` with addend 0 while we spell the same address as `symbol + addend`. The
+linked address is identical, the operand bytes are not, and `canonicalize_relocs` cannot
+equalise them because proving the split needs a claimed owner RVA. Claiming data is
+therefore a prerequisite for the last few percent of *code* matching, not a separate
+project.
+
 ## Reproduction
 
 Scripts used (session scratchpad, not committed): `census.py` (masked-body cross-version

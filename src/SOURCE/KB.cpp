@@ -1830,8 +1830,8 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                             break;
                         case EVENT_WINDOW_EXPERIENCE:
                             NormalDialog(
-                                "{Experience}\n\nExperience allows your heroes to go up levels, "
-                                "increasing their primary and secondary skills.",
+                                "\xd4\xa8P"
+                                "\xd4\xa9P",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
                                 -1,
@@ -1924,11 +1924,11 @@ MessageDispatchResult EventWindowHandler(struct tag_message& msg) {
                         case NORMAL_DIALOG_RESOURCE_GEMS:
                         case NORMAL_DIALOG_RESOURCE_GOLD:
                             NormalDialog(
-                                "{Resources}\n\nThere are seven resources in Heroes 2, used to "
-                                "build and improves castles, purchase troops and recruit heroes.  "
-                                "Gold is the most common, required for virtually everything.  Wood "
-                                "and ore are used for most buildings.  Gems, Mercury, Sulfur and "
-                                "Crystal are rare magical resources used for the most powerful "
+                                "D\xd7P"
+                                "{\xce\xef\xfb\xf2}\x0a\x0a\xce\xef\xfb\xf2 \xef\xee\xe7\xe2\xee\xeb\xff\xe5\xf2 \xef\xee\xe2\xfb\xf8\xe0\xf2\xfc \xe2\xe0\xf8\xe8\xec \xe3\xe5\xf0\xee\xff\xec \xf1\xe2\xee\xe8 \xf3\xf0\xee\xe2\xed\xe8, \xf3\xe2\xe5\xeb\xe8\xf7\xe8\xe2\xe0\xf2\xfc \xef\xe5\xf0\xe2\xe8\xf7\xed\xfb\xe5 \xe8 \xe2\xf2\xee\xf0\xe8\xf7\xed\xfb\xe5 \xed\xe0\xe2\xfb\xea\xe8."
+                                "\x8c\xf6P"
+                                "\xbc\xdcP"
+                                "\xbc\xfeP"
                                 "creatures and buildings.",
                                 NORMAL_DIALOG_QUICK_VIEW,
                                 -1,
@@ -2926,7 +2926,7 @@ i32 AddScoreToHighScore(
             entries_a[destination + 1] = entries_a[destination];
 
         GetDataEntry(
-            "Please enter your name for the high score list.",
+            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 \xf1\xe2\xee\xe5 \xe8\xec\xff \xe4\xeb\xff \xf2\xe0\xe1\xeb\xe8\xf6\xfb \xf0\xe5\xea\xee\xf0\xe4\xee\xe2.",
             playerName_c,
             HIGH_SCORE_NAME_LENGTH,
             NULL,
@@ -3331,7 +3331,7 @@ void ShutDown(char* msg) {
         strcpy(buf, msg);
         SetFullScreenStatus(0);
         LogStr(buf);
-        MessageBoxA(hwndApp, buf, "Unexpected Program Termination", MB_ICONHAND);
+        MessageBoxA(hwndApp, buf, "\xcd\xe5\xef\xf0\xe5\xe4\xe2\xe8\xe4\xe5\xed\xed\xee\xe5 \xef\xf0\xe5\xf0\xfb\xe2\xe0\xed\xe8\xe5 \xef\xf0\xee\xe3\xf0\xe0\xec\xec\xfb", MB_ICONHAND);
     } else {
         sprintf(buf, "Bye!");
     }
@@ -3667,7 +3667,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         case APP_MENU_RESTART_11:
         case APP_MENU_RESTART_12:
         case APP_MENU_RESTART_13:
-            strcpy(gText, "Are you sure you want to restart?  (Your current game will be lost)");
+            strcpy(gText, "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc \xf1\xed\xe0\xf7\xe0\xeb\xe0?  (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)");
             goto confirmMenuCommand;
 
         case APP_MENU_LOAD_0:
@@ -3683,7 +3683,7 @@ i32 HandleAppSpecificMenuCommands(i32 command) {
         case APP_MENU_LOAD_10:
             strcpy(
                 gText,
-                "Are you sure you want to load a new game?  (Your current game will be lost)"
+                "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe7\xe0\xe3\xf0\xf3\xe7\xe8\xf2\xfc \xed\xee\xe2\xf3\xfe \xe8\xe3\xf0\xf3? (\xdd\xf2\xe0 \xe8\xe3\xf0\xe0 \xe1\xf3\xe4\xe5\xf2 \xef\xee\xf2\xe5\xf0\xff\xed\xe0)"
             );
         confirmMenuCommand:
             if (gpAdvManager->m_active == 1) {

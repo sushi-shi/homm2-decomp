@@ -766,7 +766,7 @@ void townManager::SetupTown(void) {
     message.payload.widget.id = TOWN_WINDOW_TEXT_CONTROL;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);
-    strcpy(gText, "Town Screen");
+    strcpy(gText, "\xdd\xea\xf0\xe0\xed \xe3\xee\xf0\xee\xe4\xe0");
     message.payload.widget.id = TOWN_CONTROL_STATUS_TEXT;
     message.payload.widget.data.text = gText;
     m_townWindow->BroadcastMessage(message);

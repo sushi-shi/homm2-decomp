@@ -260,7 +260,7 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
             if (hwndApp == window) {
                 if (GameUnsaved() != 0) {
                     NormalDialog(
-                        "Are you sure you want to quit?",
+                        "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xe2\xfb\xe9\xf2\xe8?",
                         NORMAL_DIALOG_CONFIRM,
                         NORMAL_DIALOG_NO_RESOURCE,
                         NORMAL_DIALOG_NO_VALUE,

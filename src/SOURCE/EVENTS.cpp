@@ -3942,7 +3942,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         && (gpCurPlayer->m_barrierTents & (1 << color))) {
         EventSound(cell->m_triggerType & MAP_TRIGGER_TYPE_MASK, color, &eventSample);
         NormalDialog(
-            "As you speak the magic word, the glowing barrier dissolves into "
+            "\xcc\xd7Q"
             "nothingness.",
             NORMAL_DIALOG_INFO,
             -1,
@@ -3957,7 +3957,7 @@ i32 advManager::BarrierEvent(mapCell* cell, hero*) {
         return 1;
     } else {
         NormalDialog(
-            "You speak, and nothing happens.",
+            "\xc2\xfb \xef\xf0\xee\xe8\xe7\xed\xe5\xf1\xeb\xe8 \xf1\xeb\xee\xe2\xee, \xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5 \xef\xf0\xee\xe8\xe7\xee\xf8\xeb\xee.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -8381,7 +8381,7 @@ void advManager::ReceiveHeroTownData(
         PollSound();
         if (lastPacketTime + COMBAT_REMOTE_TIMEOUT < KBTickCount()) {
             NormalDialog(
-                const_cast<char*>("Error receiving data.  Keep trying?"),
+                const_cast<char*>("\xce\xf8\xe8\xe1\xea\xe0 \xef\xee\xeb\xf3\xf7\xe5\xed\xe8\xff \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xe8. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe0\xf2\xfc?"),
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,
@@ -8395,7 +8395,7 @@ void advManager::ReceiveHeroTownData(
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                 lastPacketTime = KBTickCount();
             else
-                ShutDown(const_cast<char*>("Game canceled."));
+                ShutDown(const_cast<char*>("\xc8\xe3\xf0\xe0 \xef\xf0\xe5\xea\xf0\xe0\xf9\xe5\xed\xe0."));
         }
         packet = GetRemoteData(1);
         if (packet && EVENTS_REMOTE_MESSAGE(packet)->type == REMOTE_MESSAGE_RELIABLE

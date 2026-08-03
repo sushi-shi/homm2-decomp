@@ -162,7 +162,7 @@ void RemoteMain(RemoteGameMode gameMode) {
             strcpy(gsThisNetPlayerInfo.name, gConfig.networkDefaultName);
     } else {
         GetDataEntry(
-            "Please enter a 'handle' by which you will be known.",
+            "\xcf\xee\xe6\xe0\xeb\xf3\xe9\xf1\xf2\xe0, \xe2\xe2\xe5\xe4\xe8\xf2\xe5 \xe8\xec\xff, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec \xe2\xfb \xe1\xf3\xe4\xe5\xf2\xe5 \xe8\xe7\xe2\xe5\xf1\xf2\xed\xfb.",
             gsThisNetPlayerInfo.name,
             NET_NAME_INPUT_LIMIT,
             gConfig.networkDefaultName,
@@ -550,7 +550,7 @@ i32 TransmitRemoteData(
         }
         if (allowRetryDialog != 0 && attempt0 == REMOTE_RETRY_COUNT && result == 0) {
             NormalDialog(
-                "Error sending data.  Keep trying??",
+                "\xce\xf8\xe8\xe1\xea\xe0 \xef\xe5\xf0\xe5\xf1\xfb\xeb\xea\xe8 \xe4\xe0\xed\xed\xfb\xf5. \xcf\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xfc?",
                 NORMAL_DIALOG_CONFIRM,
                 -1,
                 -1,

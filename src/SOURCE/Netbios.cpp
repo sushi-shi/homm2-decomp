@@ -32,7 +32,7 @@ i8 InitNetHost(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, HOST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS is not loaded.");
+                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
             else {
                 iInitNetHostStatus++;
                 gbRemoteOn = true;
@@ -57,7 +57,7 @@ i8 InitNetHost(void) {
                 == NETBIOS_RESULT_SUCCESS)
                 iInitNetHostStatus++;
             else
-                ShutDown("Network initialization failed");
+                ShutDown("\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
             status = static_cast<u8>(nb_stat(HOST_SESSION));
@@ -78,7 +78,7 @@ i8 InitNetGuest(void) {
         case SETUP_INITIALIZE:
             if (static_cast<i16>(nb_init(SETUP_SESSION_COUNT, GUEST_SESSION))
                 == INIT_UNAVAILABLE)
-                ShutDown("NETBIOS is not loaded.");
+                ShutDown("NETBIOS \xed\xe5 \xe7\xe0\xe3\xf0\xf3\xe6\xe5\xed\xe0.");
             else {
                 gbRemoteOn = true;
                 iInitNetGuestStatus++;
@@ -124,7 +124,7 @@ i8 InitNetGuest(void) {
                     )
                 )
                 != NETBIOS_RESULT_SUCCESS) {
-                sprintf(gText, "Network initialization failed");
+                sprintf(gText, "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
                 ShutDown(gText);
             }
             return 1;
