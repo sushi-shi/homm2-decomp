@@ -4,6 +4,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/Icon2b.h>
 #include <string.h>
+#include <SOURCE/KB.h>
 
 H2_ENUM_BEGIN(IconScaleConstant)
     SCALE_NATIVE_SIZE      = 0x20,

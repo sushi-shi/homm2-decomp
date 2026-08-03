@@ -3,6 +3,7 @@
 #include <BASE/bitmap.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <string.h>
+#include <SOURCE/KB.h>
 H2_ENUM_BEGIN(BitmapDimConstant)
     DIM_PALETTE_LEVEL_STRIDE = 256
 H2_ENUM_END(BitmapDimConstant)
