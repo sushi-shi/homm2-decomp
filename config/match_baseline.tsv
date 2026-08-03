@@ -1270,7 +1270,7 @@ SOURCE/SPELLS	?Resurrect@combatManager@@QAEXHHH@Z	99.6881	9e2ca8ff9796
 SOURCE/SPELLS	?Ripple@combatManager@@QAEXH@Z	100.0000	80dc6ffba1ec
 SOURCE/SPELLS	?RippleCreature@combatManager@@QAEXHHH@Z	96.6866	7e3481594100
 SOURCE/SPELLS	?ShowMassSpell@combatManager@@QAEXQAY0BE@CHH@Z	99.4785	06b57ecdf0e8
-SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	58.8222	90da9f244222
+SOURCE/SPELLS	?ShowSpellCastFailure@combatManager@@QAEXPAVarmy@@H@Z	63.5556	e01a8983b3f2
 SOURCE/SPELLS	?ShowSpellMessage@combatManager@@QAEXHHPAVarmy@@@Z	88.8400	bbfdaf2d769b
 SOURCE/SPELLS	?SpaceForElementalExists@combatManager@@QAEHXZ	100.0000	25e693d9babc
 SOURCE/SPELLS	?SpellMessage@combatManager@@QAEXHH@Z	99.7887	bf1c33bff8d2
