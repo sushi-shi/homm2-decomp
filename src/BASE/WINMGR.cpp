@@ -465,31 +465,8 @@ i32 heroWindowManager::DoDialog(
     m_lastHoverId = HERO_WINDOW_NO_HOVER_WIDGET;
     if (window != NULL)
         AddWindow(window, -1, 1);
-    if (fade != 0) {
-        palette* dialogPalette = gPalette;
-        heroWindowManager* manager = gpWindowManager;
-        if (dialogPalette != NULL)
-            SetPalette(dialogPalette->m_data, 0);
-        switch (FADE_IN) {
-            case FADE_IN: {
-                u32 savedUpdate = manager->m_updateFlags;
-                manager->m_updateFlags = 0;
-                PollSound();
-                FadeIn(DIALOG_FADE_STEPS);
-                manager->m_updateFlags = FadeSavedUpdate() | savedUpdate;
-                break;
-            }
-            case FADE_OUT:
-                FadeSavedUpdate() = manager->m_updateFlags;
-                manager->m_updateFlags = 0;
-                PollSound();
-                FadeOut(DIALOG_FADE_STEPS);
-                break;
-            default:
-                break;
-        }
-        PollSound();
-    }
+    if (fade != 0)
+        gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
     gpInputManager->Flush();
     done = 0;
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;

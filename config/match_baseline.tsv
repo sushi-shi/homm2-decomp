@@ -191,7 +191,7 @@ BASE/INPUTMGR	?GetEvent@inputManager@@QAE?AUtag_message@@XZ	76.8254	c422f86b74b6
 BASE/INPUTMGR	?KeyboardMessageHandler@@YIHPAXIIJ@Z	61.1362	972abbdbe848
 BASE/INPUTMGR	?Main@inputManager@@UAEHAAUtag_message@@@Z	100.0000	1814a859e7a5
 BASE/INPUTMGR	?MakeScanCodeTable@inputManager@@QAEXXZ	43.9343	e5b38409e5cc.503969be9963
-BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	61.0660	9dfdf57d6e26
+BASE/INPUTMGR	?MouseMessageHandler@@YIHPAXIIJ@Z	83.0472	3e79d9a66adb
 BASE/INPUTMGR	?Open@inputManager@@UAEHH@Z	100.0000	18dd0830ebaa.5e877b076c9a
 BASE/INPUTMGR	?PeekEvent@inputManager@@QAE?AUtag_message@@XZ	76.3793	68dc42638fb3
 BASE/INPUTMGR	?SetKeyCodeType@inputManager@@QAEXH@Z	61.2500	0e64864541d3.5e877b076c9a
@@ -379,7 +379,7 @@ BASE/WINMGR	?CreateColorLookupTables@@YIXXZ	100.0000	50e4aa3b8315
 BASE/WINMGR	?CreateColorTables@@YIXXZ	100.0000	eef2e34e81d2
 BASE/WINMGR	?CreateFizzleTables@@YIXXZ	100.0000	bf8922368e76
 BASE/WINMGR	?CycleColors@@YIXH@Z	80.0210	e5ae32b49419
-BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	59.5135	5172e1a20dcf.db7f59af7c85
+BASE/WINMGR	?DoDialog@heroWindowManager@@QAEHPAVheroWindow@@P6IHAAUtag_message@@@ZH@Z	95.2072	84f13645b9bf
 BASE/WINMGR	?FadeScreen@heroWindowManager@@QAEXHHPAVpalette@@@Z	89.7381	39336ee6fb74.db7f59af7c85
 BASE/WINMGR	?FizzleForward@heroWindowManager@@QAEXHHHHHPAC0@Z	80.3362	02706e1214a0
 BASE/WINMGR	?Main@heroWindowManager@@UAEHAAUtag_message@@@Z	82.5938	6b8d30a55ced
