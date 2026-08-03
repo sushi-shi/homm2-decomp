@@ -431,7 +431,7 @@ void DDSD(i32 error, char* file, i32 line) {
 }
 
 VA(0x004b0c15, 0xee)
-void DDUpdatePalette(i8* paletteData) {
+void __cdecl DDUpdatePalette(i8* paletteData) {
     i32 entry;
     HRESULT result0;
 
@@ -616,7 +616,7 @@ void WGInitGraphics(void) {
 }
 
 VA(0x004b1273, 0x1c1)
-void WGUpdatePalette(i8* paletteData) {
+void __cdecl WGUpdatePalette(i8* paletteData) {
     HDC dc0;
     i32 entry;
     i32 result0;
@@ -922,7 +922,7 @@ void InitializePalette(void) {
 }
 
 VA(0x004b19de, 0x28)
-void UpdatePalette(i8* paletteData) {
+void __cdecl UpdatePalette(i8* paletteData) {
     if (giGraphicsType == WINGRAPH_GRAPHICS_WING)
         WGUpdatePalette(paletteData);
     else

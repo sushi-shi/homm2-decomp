@@ -19828,6 +19828,7 @@ site_rva	kind
 0xb0b90	dir32
 0xb0b94	dir32
 0xb0b98	dir32
+0xb0c1d	dir32
 0xb0c2b	dir32
 0xb0c68	dir32
 0xb0c83	dir32
