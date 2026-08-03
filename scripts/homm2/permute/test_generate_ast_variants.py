@@ -30,6 +30,7 @@ from homm2.permute.generate_ast_variants import (
     identifier_rename_edits,
     mutation_name,
     statement_order_edits,
+    system_include_roots,
     terminal_return_order_edits,
     utf8_byte_offset,
 )
@@ -563,6 +564,43 @@ class AstVariantSemanticTests(unittest.TestCase):
         self.assertEqual(
             target_unmatched, {"cannot initialize a variable of type 'int *'"}
         )
+
+    def test_system_header_errors_pass_but_game_header_errors_block(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            (base / "sys").mkdir()
+            (base / "game").mkdir()
+            (base / "sys" / "vendored.h").write_text(
+                "inline int Vendored() { int *pointer = 1; return *pointer; }\n"
+            )
+            (base / "game" / "owner.h").write_text(
+                "inline int Owner() { int *pointer = 1; return *pointer; }\n"
+            )
+            source = base / "target.cpp"
+            source.write_text(
+                "#include <vendored.h>\n#include <owner.h>\nint Target() { return 1; }\n"
+            )
+            args = [
+                "-x", "c++", "-std=c++14",
+                "-isystem", str(base / "sys"), "-I", str(base / "game"),
+            ]
+            tu = ci.Index.create().parse(str(source), args=args)
+            target = next(
+                cursor for cursor in tu.cursor.get_children()
+                if cursor.kind == ci.CursorKind.FUNCTION_DECL
+                and cursor.spelling == "Target"
+            )
+            roots = system_include_roots(args)
+            blocking, _trailing, allowed, unmatched = classify_parse_errors(
+                tu, source, target, (), roots
+            )
+        self.assertEqual(roots, (base / "sys",))
+        # The vendored system header is tolerated; the game-owned header is not.
+        self.assertEqual(len(allowed), 1)
+        self.assertIn("vendored.h", allowed[0])
+        self.assertEqual(len(blocking), 1)
+        self.assertIn("owner.h", blocking[0])
+        self.assertEqual(unmatched, set())
 
 
 if __name__ == "__main__":
