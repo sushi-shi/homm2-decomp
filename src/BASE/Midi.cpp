@@ -1,5 +1,7 @@
 #include <va.h>
 #include <BASE/soundManager.h>
+#include <BASE/Midi.h>
+#include <BASE/MusicFlags.h>
 #include <mss.h>
 #include <SOURCE/KB.h>
 #include <SOURCE/X_GLOBAL.h>
@@ -35,131 +37,125 @@ static SMidiText gMidiText =
     {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
 
 VA(0x004c57d0, 0x51)
-void soundManager::MIDIStartup(void) {
-    i32 i;
-    LogStr(gMidiText.startupBegin);
-    if (gbNoSound == 0 && (m_midiStarted = 1, gbDontTryMIDI == 0)) {
-        LogStr(gMidiText.startupDriver);
-        for (i = 0; i < MIDI_TRACK_COUNT; i++)
-            pMIDIWrap[i] = NULL;
-        for (i = 0; i < MIDI_TRACK_COUNT; i++)
-            hSequence[i] = NULL;
-        m_midiReady = 1;
-        LogStr(gMidiText.startupOpen);
-        i = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER);
-        LogInt(gMidiText.startupOpenResult, i, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE,
-               LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE, LOG_UNUSED_VALUE);
-        if (i != 0)
-            m_midiReady = 0;
-    }
+bool MIDIStartup(void) {
+    if (MusicFlagsActive())
+        return true;
+    MIDIShutdown();
+    gMusicFlagA = AIL_midiOutOpen(&hMDI, NULL, MIDI_MAPPER) == 0 ? true : false;
+    gMusicFlagB = 1;
+    gMusicFeatureEnabled = !gMusicFlagA;
+    return true;
 }
 
 VA(0x004c5830, 0xf0)
-void soundManager::MIDIShutdown(void) {
+void MIDIShutdown(void) {
     i32 i;
-    if (gbNoSound == 0 && m_midiReady != 0) {
-        MIDIStop();
-        LogStr(gMidiText.shutdownBegin);
-        for (i = 0; i < MIDI_TRACK_COUNT; i++) {
-            if (hSequence[i] != NULL)
-                AIL_release_sequence_handle(hSequence[i]);
+    if (!GetMusicFlagA())
+        return;
+    for (i = 0; i < MIDI_TRACK_COUNT; i++) {
+        if (hSequence[i] != NULL) {
+            if (AIL_sequence_status(hSequence[i]) == SEQUENCE_PLAYING)
+                AIL_stop_sequence(hSequence[i]);
+            AIL_release_sequence_handle(hSequence[i]);
             hSequence[i] = NULL;
         }
-        LogStr(gMidiText.shutdownDriver);
-        AIL_midiOutClose(hMDI);
-        hMDI = NULL;
-        m_midiReady = 0;
-        for (i = 0; i < MIDI_TRACK_COUNT; i++) {
-            if (pMIDIWrap[i] != NULL)
-                gpResourceManager->Dispose(pMIDIWrap[i]);
+    }
+    AIL_midiOutClose(hMDI);
+    hMDI = NULL;
+    gMusicFlagA = 0;
+    for (i = 0; i < MIDI_TRACK_COUNT; i++) {
+        if (pMIDIWrap[i] != NULL) {
+            gpResourceManager->Dispose(pMIDIWrap[i]);
             pMIDIWrap[i] = NULL;
         }
-        LogStr(gMidiText.shutdownComplete);
     }
 }
 
 VA(0x004c5920, 0x17b)
-void soundManager::MIDIPlay(i32 midiTrack) {
-    if (gbNoSound == 0 && m_midiReady != 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED) {
-        LogStr(gMidiText.playBegin);
-        if (bGotMidi[midiTrack] == 0)
-            midiTrack = MIDI_NO_TRACK;
-        if (midiTrack == MIDI_NO_TRACK) {
-            MIDIStop();
+void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
+    if (!GetMusicFlagA())
+        return;
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
+        return;
+    if (bGotMidi[midiTrack] == 0)
+        midiTrack = MIDI_NO_TRACK;
+    if (midiTrack < 0) {
+        MIDIStop(currentTrack);
+        return;
+    }
+    if (midiTrack == CurrentMidiFile)
+        return;
+    MIDIStop(currentTrack);
+
+    char filename[MIDI_FILENAME_CAPACITY];
+    sprintf(filename, gMidiText.filenameFormat, midiTrack);
+    if (hSequence[midiTrack] == NULL) {
+        hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
+        if (hSequence[midiTrack] == NULL) {
+            MIDIShutdown();
             return;
         }
-        if (midiTrack != CurrentMidiFile) {
-            MIDIStop();
-
-            char filename[MIDI_FILENAME_CAPACITY];
-            sprintf(filename, gMidiText.filenameFormat, midiTrack);
-            if (hSequence[midiTrack] == NULL) {
-                hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
-                if (hSequence[midiTrack] == NULL)
-                    MIDIShutdown();
-                pMIDIWrap[midiTrack] = gpResourceManager->GetMIDIWrap(filename);
-                if (AIL_init_sequence(hSequence[midiTrack], pMIDIWrap[midiTrack]->m_data, 0) == 0)
-                    return;
-                MIDISetVolume();
-                AIL_start_sequence(hSequence[midiTrack]);
-                if (bMusicIsLooping[midiTrack] != 0)
-                    AIL_set_sequence_loop_count(hSequence[midiTrack], 0);
-                else
-                    AIL_set_sequence_loop_count(hSequence[midiTrack], 1);
-            } else {
-                AIL_resume_sequence(hSequence[midiTrack]);
-            }
-            CurrentMidiFile = midiTrack;
-            m_currentTrack = static_cast<char>(midiTrack);
-        }
+        pMIDIWrap[midiTrack] = gpResourceManager->GetMIDIWrap(filename);
+        if (AIL_init_sequence(hSequence[midiTrack], pMIDIWrap[midiTrack]->m_data, 0) == 0)
+            return;
+        MIDISetVolume(fadeSteps);
+        AIL_start_sequence(hSequence[midiTrack]);
+        if (bMusicIsLooping[midiTrack] != 0)
+            AIL_set_sequence_loop_count(hSequence[midiTrack], 0);
+        else
+            AIL_set_sequence_loop_count(hSequence[midiTrack], 1);
+    } else {
+        AIL_resume_sequence(hSequence[midiTrack]);
     }
+    CurrentMidiFile = midiTrack;
+    currentTrack = midiTrack;
 }
 
 VA(0x004c5aa0, 0xe7)
-void soundManager::MIDIStop(void) {
-    if (gbNoSound == 0 && m_midiReady != 0 && CurrentMidiFile != MIDI_NO_TRACK) {
-        if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
-            AIL_stop_sequence(hSequence[CurrentMidiFile]);
-            if (gbLowMemory != 0 || bSaveMusicPosition[CurrentMidiFile] == 0) {
-                AIL_release_sequence_handle(hSequence[CurrentMidiFile]);
-                hSequence[CurrentMidiFile] = NULL;
-                if (pMIDIWrap[CurrentMidiFile] != NULL)
-                    gpResourceManager->Dispose(pMIDIWrap[CurrentMidiFile]);
-                pMIDIWrap[CurrentMidiFile] = NULL;
-            }
+void MIDIStop(i32& currentTrack) {
+    if (!GetMusicFlagA())
+        return;
+    if (CurrentMidiFile < 0)
+        return;
+    if (MIDIIsPlaying() && hSequence[CurrentMidiFile] != NULL) {
+        AIL_stop_sequence(hSequence[CurrentMidiFile]);
+        if (bSaveMusicPosition[CurrentMidiFile] == 0) {
+            AIL_release_sequence_handle(hSequence[CurrentMidiFile]);
+            hSequence[CurrentMidiFile] = NULL;
+            if (pMIDIWrap[CurrentMidiFile] != NULL)
+                gpResourceManager->Dispose(pMIDIWrap[CurrentMidiFile]);
+            pMIDIWrap[CurrentMidiFile] = NULL;
         }
-        CurrentMidiFile = MIDI_NO_TRACK;
-        m_currentTrack = MIDI_NO_TRACK;
     }
+    CurrentMidiFile = MIDI_NO_TRACK;
+    currentTrack = MIDI_NO_TRACK;
 }
 
 VA(0x004c5b90, 0x56)
-i32 soundManager::MIDIIsPlaying(void) {
-    if (gbNoSound == 0 && gConfig.musicVolume != CONFIG_VOLUME_MUTED && m_midiReady != 0
-        && CurrentMidiFile != MIDI_NO_TRACK && hSequence[CurrentMidiFile] != NULL) {
-        return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
-    }
-    return 0;
+bool MIDIIsPlaying(void) {
+    if (gConfig.musicVolume == CONFIG_VOLUME_MUTED || !GetMusicFlagA()
+        || CurrentMidiFile < 0 || hSequence[CurrentMidiFile] == NULL)
+        return false;
+    return AIL_sequence_status(hSequence[CurrentMidiFile]) == SEQUENCE_PLAYING;
 }
 
 VA(0x004c5bf0, 0x8f)
-void soundManager::MIDISetVolume(void) {
-    if (gbNoSound == 0 && m_midiReady != 0) {
-        i32 volume = MAX_VOLUME;
-        if (m_fadeSteps > 0) {
-            if (m_fadeSteps <= VOLUME_FADE_SPLIT)
-                volume = ((VOLUME_LOW_RANGE - m_fadeSteps) * MAX_VOLUME)
-                         / VOLUME_LOW_RANGE;
-            else
-                volume = ((m_fadeSteps - VOLUME_FADE_SPLIT) * MAX_VOLUME)
-                         / VOLUME_HIGH_RANGE;
-        }
-        AIL_set_XMIDI_master_volume(hMDI, ConvertVolume(volume, SOUND_VOLUME_MUSIC));
+void MIDISetVolume(i32& fadeSteps) {
+    if (!GetMusicFlagA())
+        return;
+    i32 volume = MAX_VOLUME;
+    if (fadeSteps > 0) {
+        if (fadeSteps <= VOLUME_FADE_SPLIT)
+            volume = ((VOLUME_LOW_RANGE - fadeSteps) * volume) / VOLUME_LOW_RANGE;
+        else
+            volume = ((fadeSteps - VOLUME_FADE_SPLIT) * volume) / VOLUME_HIGH_RANGE;
     }
+    volume = gpSoundManager->ConvertVolume(volume, SOUND_VOLUME_MUSIC);
+    AIL_set_XMIDI_master_volume(hMDI, volume);
 }
 
 // @remove
-void soundManager::MIDIPoll(void) {}
+void MIDIPoll(void) {}
 
 class MIDIWrap* pMIDIWrap[MIDI_TRACK_COUNT];
 struct _SEQUENCE* hSequence[MIDI_TRACK_COUNT];

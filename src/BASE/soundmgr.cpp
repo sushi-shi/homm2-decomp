@@ -2,6 +2,8 @@
 #include <BASE/soundManager.h>
 #include <BASE/sample.h>
 #include <BASE/soundBackends.h>
+#include <BASE/Midi.h>
+#include <BASE/MusicFlags.h>
 #include <BASE/soundmgr.h>
 #include <SOURCE/X_GLOBAL.h>
 #include <SOURCE/KB.h>
@@ -51,24 +53,27 @@ H2_ENUM_BEGIN(SoundSampleStatus)
 H2_ENUM_END(SoundSampleStatus)
 
 
+static WAVEOUTCAPSA gWaveOutCaps;
 static PCMWAVEFORMAT gWaveFormat;
 #define NORMALIZED_VOLUME_MAX 127.0f
 
-static bool gSoundBackendsReady = false;
+bool gSoundDisabled = false;
+bool gSoundBackendsReady = false;
 
-static inline bool IsAudiereBackend(const soundManager* manager) {
-    return manager->m_backend == SOUND_BACKEND_AUDIERE
-        && manager->m_audiereDevice != NULL;
-}
-
-static inline bool IsMilesBackend(const soundManager* manager) {
-    return manager->m_backend == SOUND_BACKEND_MILES
-        && manager->m_digitalDriver != NULL;
-}
-
-H2_ENUM_CLASS_BEGIN(SoundStateSpan)
-    SOUND_STATE_RESET_SPAN = 0xae
-H2_ENUM_CLASS_END(SoundStateSpan)
+// State of the removed MCI/redbook CD path and of the removed Miles sample
+// handle pool: the `@remove` bodies below are the PoL 2.0 sources kept as the
+// removed-body record, and this is the state they read. Nothing retail
+// references it, so none of it is a soundManager member.
+static i32 gCDReady;
+static i32 gCDTrack;
+static i32 gCDPlayFrame;
+static i32 gCDPollTimer;
+static i16 gAuxDevice;
+static i32 gPollRequested;
+static i32 gPollDue;
+static i32 gPollToggle;
+static struct _SAMPLE* gSampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
+static i32 gNumSampleHandles;
 
 // @remove
 void HandleMCIError(i32 errorCode, char* commandString) {
@@ -114,20 +119,20 @@ void soundManager::CDStop(void) {
     char position[CD_POSITION_BUFFER_CAPACITY];
     if (gbNoSound != 0)
         return;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return;
     wsprintfA(CommandString, "stop CD wait");
     nMCIError =
         mciSendStringA(CommandString, lpszReturnString, MCI_RETURN_CHARACTER_LIMIT, NULL);
     if (nMCIError != 0)
         HandleMCIError(nMCIError, CommandString);
-    if (strcmpi(lpszReturnString, "stopped") != 0 && m_currentTrack >= 0) {
+    if (strcmpi(lpszReturnString, "stopped") != 0 && m_musicTrack >= 0) {
         wsprintfA(CommandString, "status CD position");
         nMCIError = mciSendStringA(CommandString, position, sizeof(position), NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
-        strcpy(CDPreviousPosition[m_currentTrack], position);
-        ValidatePreviousPosition(m_currentTrack);
+        strcpy(CDPreviousPosition[m_musicTrack], position);
+        ValidatePreviousPosition(m_musicTrack);
     }
     CDPlaying = 0;
 }
@@ -136,7 +141,7 @@ void soundManager::CDStop(void) {
 i32 soundManager::CDIsPlaying(void) {
     if (gbNoSound != 0)
         return 0;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return 0;
     wsprintfA(CommandString, "status CD mode");
     nMCIError =
@@ -152,20 +157,21 @@ bool soundManager::CDStartup(void) {
         return true;
 
     ShutdownSoundBackends();
-    if (gbNoSound != 0)
+    if (gSoundDisabled)
         return false;
 
     m_backend = SOUND_BACKEND_AUDIERE;
-    m_audiereDevice = audiere::OpenDevice();
-    gSoundBackendsReady = StartupAudiereMusic(m_audiereDevice);
-    return gSoundBackendsReady;
+    m_audiereDevice = audiere::OpenDevice("winmm");
+    if (m_audiereDevice != NULL)
+        return StartupAudiereMusic(m_audiereDevice);
+    return false;
 }
 
 // @remove
 void soundManager::CDShutdown(void) {
     if (gbNoSound != 0)
         return;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return;
     wsprintfA(CommandString, "stop CD");
     nMCIError =
@@ -185,9 +191,9 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     u32l local_8;
     if (gbNoSound != 0)
         return;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return;
-    if (m_auxDevice == -1)
+    if (gAuxDevice == -1)
         return;
     if (volume == -1)
         local_c = IDX(gConfig.musicVolume);
@@ -205,7 +211,7 @@ void soundManager::CDSetVolume(i32 volume, i32 fadeScale) {
     } else {
         local_8 = 0;
     }
-    auxSetVolume(m_auxDevice, local_8);
+    auxSetVolume(gAuxDevice, local_8);
 }
 
 // @remove
@@ -219,7 +225,7 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     HWND wndn;
     if (gbNoSound != 0)
         return;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
@@ -227,10 +233,10 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         CDStop();
         return;
     }
-    if (m_currentTrack == track && CDPlaying != 0 && restart == 0)
+    if (m_musicTrack == track && CDPlaying != 0 && restart == 0)
         return;
-    m_cdTrack = track;
-    m_cdPlayFrame = volume;
+    gCDTrack = track;
+    gCDPlayFrame = volume;
     Process1WindowsMessage();
     ServiceSound();
     t1 = KBTickCount();
@@ -249,8 +255,8 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
         nMCIError = mciSendStringA(CommandString, buffer, CD_POSITION_BUFFER_CAPACITY, NULL);
         if (nMCIError != 0)
             HandleMCIError(nMCIError, CommandString);
-        strcpy(CDPreviousPosition[m_currentTrack], buffer);
-        ValidatePreviousPosition(m_currentTrack);
+        strcpy(CDPreviousPosition[m_musicTrack], buffer);
+        ValidatePreviousPosition(m_musicTrack);
     }
     t2 = KBTickCount();
     notify = bMusicIsLooping[track];
@@ -304,14 +310,14 @@ void soundManager::CDPlay(i32 track, i32 resume, i32 volume, i32 restart) {
     CDPlaying = 1;
     Process1WindowsMessage();
     ServiceSound();
-    if (m_fadeSteps > 0) {
-        m_fadeSteps = FADE_TOTAL_STEPS;
+    if (m_musicFadeSteps > 0) {
+        m_musicFadeSteps = FADE_TOTAL_STEPS;
         glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount() + CD_FADE_DELAY_TICKS;
         CDSetVolume(IDX(CONFIG_VOLUME_MAX), 0);
     } else {
         CDSetVolume(volume, 0);
     }
-    m_currentTrack = static_cast<char>(track);
+    m_musicTrack = static_cast<char>(track);
 }
 
 // @remove
@@ -320,66 +326,91 @@ void soundManager::CDPoll(void) {
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    if (m_cdReady == 0)
+    if (gCDReady == 0)
         return;
-    if (CDPlaying == 0 || m_currentTrack < 0)
+    if (CDPlaying == 0 || m_musicTrack < 0)
         return;
     {
-        if (bMusicIsLooping[m_currentTrack] == 0)
+        if (bMusicIsLooping[m_musicTrack] == 0)
             return;
-        if (KBTickCount() < m_pollTimer + CD_POLL_INTERVAL_TICKS)
+        if (KBTickCount() < gCDPollTimer + CD_POLL_INTERVAL_TICKS)
             return;
-        m_pollTimer = KBTickCount();
+        gCDPollTimer = KBTickCount();
         if (CDIsPlaying() == 0)
-            CDPlay(m_cdTrack, 0, m_cdPlayFrame, 1);
+            CDPlay(gCDTrack, 0, gCDPlayFrame, 1);
     }
 }
 
 VA(0x004b5710, 0x101)
 void soundManager::ShutdownSoundBackends(void) {
-    if (IsAudiereBackend(this)) {
-        StopAudiereMusic(m_musicTrack);
-        StopAllAudiereSamples();
-        m_audiereDevice->unref();
-        m_audiereDevice = NULL;
-    } else if (IsMilesBackend(this)) {
+    if (IsMilesBackend(this)) {
         MIDIShutdown();
         StopAllMilesSamples();
         AIL_shutdown();
+        m_digitalDriver = NULL;
+    } else if (IsAudiereBackend(this)) {
+        StopAudiereMusic(m_musicTrack);
+        StopAllAudiereSamples();
+        m_audiereDevice = NULL;
     }
-    m_digitalDriver = NULL;
-    m_audiereDevice = NULL;
     m_backend = SOUND_BACKEND_NONE;
-    gSoundBackendsReady = false;
 }
 
 VA(0x004b5820, 0x18f)
 bool soundManager::StartupMilesBackend(void) {
-    if (IsMilesBackend(this))
+    if (m_backend == SOUND_BACKEND_MILES)
         return true;
 
     ShutdownSoundBackends();
-    if (gbNoSound != 0)
+    if (gSoundDisabled)
         return false;
 
     m_backend = SOUND_BACKEND_MILES;
+    if (waveOutGetNumDevs() == 0) {
+        m_digitalDriver = NULL;
+        return false;
+    }
+    if (waveOutGetDevCapsA(0, &gWaveOutCaps, sizeof(gWaveOutCaps)) != 0) {
+        MessageBoxA(
+            hwndApp,
+            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
+            "\xe7\xe2\xf3\xea\xe0!  \xcd\xe5 \xed\xe0\xe9\xe4\xe5\xed\xee "
+            "\xf3\xf1\xf2\xf0\xee\xe9\xf1\xf2\xe2\xee.",
+            "\xce\xf8\xe8\xe1\xea\xe0 \xe7\xe0\xe3\xf0\xf3\xe7\xea\xe8",
+            0
+        );
+        m_digitalDriver = NULL;
+        return false;
+    }
     AIL_startup();
-    m_digitalDriver = WAVE_init_driver(
-        DEFAULT_SAMPLE_RATE,
-        DEFAULT_SAMPLE_BITS,
-        DEFAULT_SAMPLE_CHANNELS,
-        1
-    );
-    if (m_digitalDriver == NULL) {
+    AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
+
+    u32l sampleRate = DEFAULT_SAMPLE_RATE;
+    u16 bitsPerSample = DEFAULT_SAMPLE_BITS;
+    u16 channels = DEFAULT_SAMPLE_CHANNELS;
+    gWaveFormat.wf.wFormatTag = 1;
+    gWaveFormat.wf.nChannels = channels;
+    gWaveFormat.wf.nSamplesPerSec = sampleRate;
+    gWaveFormat.wf.nAvgBytesPerSec =
+        sampleRate * (bitsPerSample / DEFAULT_SAMPLE_BITS) * channels;
+    gWaveFormat.wf.nBlockAlign = (bitsPerSample / DEFAULT_SAMPLE_BITS) * channels;
+    gWaveFormat.wBitsPerSample = bitsPerSample;
+    if (AIL_waveOutOpen(&m_digitalDriver, NULL, 0, &gWaveFormat.wf) != 0) {
+        MessageBoxA(
+            hwndApp,
+            AIL_last_error(),
+            "\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 "
+            "\xe7\xe2\xf3\xea\xe0!",
+            0
+        );
+        m_digitalDriver = NULL;
         AIL_shutdown();
-        m_backend = SOUND_BACKEND_NONE;
         return false;
     }
 
     StartupMilesSamples(m_digitalDriver);
-    MIDIStartup();
     gSoundBackendsReady = true;
-    return true;
+    return MIDIStartup();
 }
 
 VA(0x004b5ae0, 0xb1)
@@ -419,9 +450,9 @@ float soundManager::ConvertVolumeFloat(i32 volume, SoundVolumeConversionMode sou
 void __stdcall SetReady2Poll(u32l) {
     if (gpSoundManager == NULL)
         return;
-    gpSoundManager->m_pollToggle ^= 1;
-    if (gpSoundManager->m_pollToggle != 0)
-        gpSoundManager->m_pollDue = 1;
+    gPollToggle ^= 1;
+    if (gPollToggle != 0)
+        gPollDue = 1;
 }
 
 // @remove
@@ -433,16 +464,12 @@ void __stdcall UpdateTimers(u32l) {
 
 VA(0x004b5bd0, 0x146)
 soundManager::soundManager(void) : baseManager() {
-    m_audiereDevice = NULL;
     m_backend = SOUND_BACKEND_NONE;
     m_savedBackend = SOUND_BACKEND_NONE;
     m_active = false;
     gSoundBackendsReady = false;
     m_digitalDriver = NULL;
-    if (m_audiereDevice != NULL) {
-        m_audiereDevice->unref();
-        m_audiereDevice = NULL;
-    }
+    m_audiereDevice = NULL;
     m_musicFadeTargetTrack = MIDI_NO_TRACK;
     m_musicFadeSteps = 0;
     m_musicTrack = MIDI_NO_TRACK;
@@ -547,25 +574,27 @@ i32 soundManager::Open(i32) {
     }
 
     m_musicTrack = MIDI_NO_TRACK;
-    if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-        StartupMilesBackend();
-        if (m_midiReady == 0) {
-            if (!CDStartup()) {
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI) {
+        if (!CDStartup()) {
+            StartupMilesBackend();
+            if (MusicFlagsActive()) {
                 gConfig.musicVolume = CONFIG_VOLUME_MUTED;
                 WritePrefs();
             } else {
-                gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
+                gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
                 WritePrefs();
             }
         }
-    } else if (!CDStartup()) {
+    } else {
         StartupMilesBackend();
-        if (m_midiReady != 0) {
-            gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
-            WritePrefs();
-        } else {
-            gConfig.musicVolume = CONFIG_VOLUME_MUTED;
-            WritePrefs();
+        if (MusicFlagsActive()) {
+            if (CDStartup()) {
+                gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
+                WritePrefs();
+            } else {
+                gConfig.musicVolume = CONFIG_VOLUME_MUTED;
+                WritePrefs();
+            }
         }
     }
 
@@ -589,12 +618,12 @@ void soundManager::AllocateSampleHandles(void) {
     if (m_digitalDriver == NULL)
         return;
     for (local_8 = 0; local_8 < SOUND_SAMPLE_HANDLE_CAPACITY; local_8++) {
-        m_sampleHandles[local_8] =
+        gSampleHandles[local_8] =
             AIL_allocate_sample_handle(m_digitalDriver);
-        if (m_sampleHandles[local_8] == NULL)
+        if (gSampleHandles[local_8] == NULL)
             break;
     }
-    m_numSampleHandles = local_8;
+    gNumSampleHandles = local_8;
 }
 
 VA(0x004b6000, 0x28)
@@ -630,7 +659,7 @@ void soundManager::StopAllSamples(i32 stopMusic) {
     if (IsMilesBackend(this)) {
         m_musicFadeSteps = 0;
         if (stopMusic != 0)
-            MIDIStop();
+            MIDIStop(m_musicTrack);
         StopAllMilesSamples();
     }
 }
@@ -678,19 +707,21 @@ void soundManager::AdjustSoundVolumes(void) {
 
 VA(0x004b6330, 0xad)
 void soundManager::AdjustMusicVolumes(void) {
-    if (!gSoundBackendsReady || m_musicTrack < 0)
+    if (!gSoundBackendsReady)
+        return;
+    if (m_musicTrack < 0)
         return;
     if (IsAudiereBackend(this))
         SetAudiereMusicVolume(-1, false);
     else if (IsMilesBackend(this))
-        MIDISetVolume();
+        MIDISetVolume(m_musicFadeSteps);
 }
 
 // @remove
 void soundManager::ForcePollSound(void) {
     if (gbNoSound != 0)
         return;
-    m_pollRequested = 1;
+    gPollRequested = 1;
     PollSound();
 }
 
@@ -699,19 +730,21 @@ void soundManager::SetMusicQuality(i32 musicSource) {
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
 
-    i32 previousTrack = m_musicTrack;
+    i32 previousTrack;
     if (IsAudiereBackend(this)) {
+        previousTrack = m_musicTrack;
         StopAudiereMusic(m_musicTrack);
         m_musicTrack = MIDI_NO_TRACK;
     } else if (IsMilesBackend(this)) {
-        MIDIStop();
+        previousTrack = m_musicTrack;
+        MIDIStop(m_musicTrack);
     }
 
     gConfig.musicSource = ConfigMusicSource(musicSource);
-    if (musicSource == CONFIG_MUSIC_SOURCE_MIDI)
-        StartupMilesBackend();
-    else
+    if (gConfig.musicSource != CONFIG_MUSIC_SOURCE_MIDI)
         CDStartup();
+    else
+        StartupMilesBackend();
     if (previousTrack >= 0)
         PlayAmbientMusic(previousTrack);
 }
@@ -735,64 +768,66 @@ void soundManager::PlayAmbientMusic(i32 track) {
             track
         );
     } else if (IsMilesBackend(this)) {
-        MIDIPlay(track);
+        MIDIPlay(m_musicTrack, m_musicFadeSteps, track);
     }
     m_musicTrack = track;
 }
 
 VA(0x004b65e0, 0x227)
 void soundManager::PollSound(void) {
+    i32 musicFadeStep;
     i32 volume;
     i32l delta;
+    i32l switchDelta;
     if (m_musicFadeSteps == 0)
         return;
     if (gConfig.musicVolume == CONFIG_VOLUME_MUTED)
         return;
-    if (m_musicFadeSteps < 1)
-        return;
-
-    Process1WindowsMessage();
-    if (m_musicTrack < CD_MUSIC_TRACK_FIRST
-        || m_musicTrack > CD_MUSIC_TRACK_LAST)
-        glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
-    delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
-    m_musicFadeSteps = delta / FADE_STEP_TICKS;
-    if (m_musicFadeSteps < 1)
-        m_musicFadeSteps = 0;
-
-    if (m_musicFadeSteps < FADE_TOTAL_STEPS
-        && m_musicTrack != m_musicFadeTargetTrack) {
-        if (bSaveMusicPosition[m_musicTrack] == 0)
+    if (m_musicFadeSteps > 0) {
+        Process1WindowsMessage();
+        if (m_musicTrack < CD_MUSIC_TRACK_FIRST
+            || m_musicTrack > CD_MUSIC_TRACK_LAST)
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
-        PlayAmbientMusic(m_musicFadeTargetTrack);
         delta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
         m_musicFadeSteps = delta / FADE_STEP_TICKS;
         if (m_musicFadeSteps < 1)
             m_musicFadeSteps = 0;
-        m_musicTrack = m_musicFadeTargetTrack;
-    }
 
-    if (m_musicFadeSteps < FADE_TOTAL_STEPS)
-        volume = (FADE_TOTAL_STEPS - m_musicFadeSteps)
-               * SAMPLE_VOLUME_MAX / FADE_TOTAL_STEPS;
-    else
-        volume = (m_musicFadeSteps - FADE_HOLD_STEPS)
-               * SAMPLE_VOLUME_MAX / FADE_SAMPLE_RISE_STEPS;
-    if (volume > SAMPLE_VOLUME_MAX)
-        volume = SAMPLE_VOLUME_MAX;
-    if (volume < 0)
-        volume = 0;
+        if (m_musicFadeSteps <= FADE_HOLD_STEPS
+            && m_musicTrack != m_musicFadeTargetTrack) {
+            if (bSaveMusicPosition[m_musicTrack] == 0)
+                glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] = KBTickCount();
+            PlayAmbientMusic(m_musicFadeTargetTrack);
+            switchDelta = glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] - KBTickCount();
+            m_musicFadeSteps = switchDelta / FADE_STEP_TICKS;
+            if (m_musicFadeSteps < 1)
+                m_musicFadeSteps = 0;
+            m_musicTrack = m_musicFadeTargetTrack;
+        }
 
-    if (IsAudiereBackend(this)) {
-        volume = (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume
-               * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
-        if (volume > MIDI_VOLUME_MAX)
-            volume = MIDI_VOLUME_MAX;
+        musicFadeStep = m_musicFadeSteps;
+        if (m_musicFadeSteps <= FADE_HOLD_STEPS)
+            volume = (FADE_TOTAL_STEPS - m_musicFadeSteps)
+                   * SAMPLE_VOLUME_MAX / FADE_TOTAL_STEPS;
+        else
+            volume = (m_musicFadeSteps - FADE_HOLD_STEPS)
+                   * SAMPLE_VOLUME_MAX / FADE_SAMPLE_RISE_STEPS;
+        if (volume > SAMPLE_VOLUME_MAX)
+            volume = SAMPLE_VOLUME_MAX;
         if (volume < 0)
             volume = 0;
-        SetAudiereMusicVolume(volume, true);
-    } else if (IsMilesBackend(this)) {
-        MIDISetVolume();
+
+        if (IsAudiereBackend(this)) {
+            volume = (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume
+                   * MIDI_VOLUME_MAX / CD_VOLUME_SCALE_DIVISOR;
+            if (volume > MIDI_VOLUME_MAX)
+                volume = MIDI_VOLUME_MAX;
+            if (volume < 0)
+                volume = 0;
+            SetAudiereMusicVolume(volume, true);
+        } else if (IsMilesBackend(this)) {
+            MIDISetVolume(m_musicFadeSteps);
+        }
     }
 }
 
@@ -827,8 +862,11 @@ void soundManager::SwitchAmbientMusic(i32 track) {
 
 VA(0x004b68d0, 0x115)
 void soundManager::MemorySample(class sample* sampleResource) {
-    if (sampleResource == NULL || !gSoundBackendsReady
-        || gConfig.soundVolume == CONFIG_VOLUME_MUTED)
+    if (sampleResource == NULL)
+        return;
+    if (!gSoundBackendsReady)
+        return;
+    if (gConfig.soundVolume == CONFIG_VOLUME_MUTED)
         return;
     if (IsAudiereBackend(this)) {
         PlayAudiereSample(sampleResource, m_audiereDevice);
@@ -851,7 +889,7 @@ i32 soundManager::MusicPlaying(void) {
     if (m_backend == SOUND_BACKEND_AUDIERE)
         return AudiereMusicPlaying();
     if (m_backend == SOUND_BACKEND_MILES) {
-        if (m_midiReady == 0)
+        if (MusicFlagsActive())
             return false;
         return MIDIIsPlaying();
     }
