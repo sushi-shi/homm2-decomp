@@ -29,3 +29,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [empty-then-branch-is-continue](empty-then-branch-is-continue.md) | loop guard jumps BACKWARD to the increment, not forward past an else body → `continue`, not `if (x) {} else {...}` |
 | [od-frame-function-scope-locals](od-frame-function-scope-locals.md) | retail's frame interleaves what we declare in a nested block → retail declared every local at function scope |
 | [lea-base-names-add-order](lea-base-names-add-order.md) | `lea K(%eax,%edx)` vs `lea K(%edx,%eax)` with identical registers → the SIB base is the LEFT operand of the source `+` |
+| [integer-relational-operand-side](integer-relational-operand-side.md) | `cmp mem,reg` (`39`) vs `cmp reg,mem` (`3b`) with mirrored `jcc` -> the memory reference is the source's LEFT or RIGHT relational operand |
+| [switch-case-early-break](switch-case-early-break.md) | a case arm ending in a NEAR `jmp` to the switch end (not a short `jmp` to a local join) -> `if (c) { ...; break; }`, not `if/else`; the same shape places a shared `goto` label INSIDE the guard's then-arm |

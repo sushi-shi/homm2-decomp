@@ -62,6 +62,39 @@ An out-of-frame byte return of an inlined accessor is materialised through a
 1-byte temp before the sign extension; the direct member read sign-extends in
 place. Close: index the member array directly.
 
+**Case 4 - a nested `?:` chain never shares one slot** (`townManager::SetupWell`
+0xaacfd, the CP1251 first-letter upcase). Retail writes ONE byte slot from four
+arms and reads it once:
+
+    retail                                    ours (4-way nested ternary, char arms)
+    ----------------------------------------  ----------------------------------------
+    88 8d 5c ff ff ff  mov [ebp-0xa4], cl     88 8d 5b ff ff ff  mov [ebp-0xa5], cl
+    eb 26              jmp  <end>             eb 2e              jmp  <end>
+    ...  (three more arms, same slot) ...     ...  (three more arms, THREE slots) ...
+    c6 85 5c ff ff ff a8  mov [ebp-0xa4],0xa8 c6 85 59 ff ff ff a8  mov [ebp-0xa7],0xa8
+    8a 8d 5c ff ff ff  mov cl, [ebp-0xa4]     8a 8d 59 ff ff ff  mov cl, [ebp-0xa7]
+    88 0d <gText>      mov [gText], cl        88 8d 5a ff ff ff  mov [ebp-0xa6], cl
+                                              8a 95 5a ff ff ff  mov dl, [ebp-0xa6]
+                                              88 95 5b ff ff ff  mov [ebp-0xa5], dl
+                                              8a 85 5b ff ff ff  mov al, [ebp-0xa5]
+                                              88 05 <gText>      mov [gText], al
+
+VC6 gives every `?:` NODE its own temp and copies inward-to-outward, so an
+N-level chain costs N slots and N-1 copies no matter how the arms are typed
+(`char`, `i8`, `u8` and int arms were all measured). One slot with four writes
+and one read is therefore a NAMED local, not a conditional expression. Close:
+
+```cpp
+char upperFirst;
+if (static_cast<u8>(gText[0]) >= 'a' && static_cast<u8>(gText[0]) <= 'z')
+    upperFirst = static_cast<u8>(gText[0]) - ' ';
+else if (...)
+    ...
+gText[0] = upperFirst;
+```
+
+`SetupWell` 90.32% -> EXACT.
+
 **Diagnosis rule.** Diff with `(%ebp)` displacements VISIBLE. If the temps and
 the `this` spill are shifted by a constant while the instruction stream is
 identical, count the named slots: the side with more named slots has a source

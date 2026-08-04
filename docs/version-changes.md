@@ -294,6 +294,40 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   PoL nests two ternaries and burns two extra temps (frame 0x9c vs 0x94).
   Byte-pinned (0x48c95).
 
+### SOURCE/TOWNMGR (town screen)
+
+- **[Buka] The garrison crest reads out the calendar.**
+  `townManager::SetCommandAndText` (0xa61d0) has a `case 0x74`
+  (`TOWN_WIDGET_GARRISON_CREST`, the crest widget that owns the garrison
+  strip's first border id) that PoL does not: it prints
+  `sprintf(m_statusText, "%s: %d, %s: %d, %s: %d", "\xcc\xe5\xf1\xff\xf6",
+  gpGame->m_month, "\xcd\xe5\xe4\xe5\xeb\xff", gpGame->m_week,
+  "\xc4\xe5\xed\xfc", gpGame->m_day)` ("Месяц/Неделя/День"). Its presence
+  raises the 0x74..0x7a arm from a compare chain to a 7-entry jump table.
+- **[Buka] CP1251-aware first-letter upcase.** Both `townManager::SetupWell`
+  (0xaacfd) and `townManager::SetupThievesGuild` (0xab344) replace PoL's
+  `gText[0] -= ' ';` with a four-way classifier written through one `char`
+  local: `'a'..'z'` and CP1251 `0xe0..0xff` subtract 0x20, `0xb8` ("ё") maps
+  to `0xa8` ("Ё"), anything else passes through. The reads are all
+  zero-extended, i.e. the source compares `(u8)gText[0]`.
+- **[unclassified] `townManager::ChangeTown` (0xa5163) reordered and gained a
+  MIDI settle.** The ambient-music switch now runs AFTER
+  `SetupExtraStuff()/SetupTown()/SetCommandAndText()`, is guarded by
+  `gConfig.useOpera != 0 || gConfig.musicSource == MIDI`, and calls
+  `Sleep(100)` before `SwitchAmbientMusic` when the source is MIDI. The
+  reconstruction previously had the switch first and no sleep.
+- **[unclassified] `townManager::RecruitHero` (0xaa0d8) keeps two visit
+  flags.** Placing the recruited hero does
+  `m_recruitHero->m_eventFlags &= HERO_EVENT_SIRENS | HERO_EVENT_ARENA;`
+  (mask 0x600000) instead of clearing the field to `HERO_EVENT_NONE`.
+- **[Buka] Seventeen user-facing strings are CP1251 Russian**, verified by
+  content hash against the image: the two spell-book dialogs, the mage-guild
+  no-room dialog, the boat dialogs, the split-army prompts, the thieves-guild
+  column headers ("Ат./Защ./Маг./Зн."), "Доступно:", "\n\nНеобходимо:",
+  "Гильдия магов, 2 этаж", "%d этаж Гильдии магов", the hero-summary format
+  "%s %d уровня %s. Артефактов: %d.", and the strip labels "героя" /
+  "гарнизона".
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
