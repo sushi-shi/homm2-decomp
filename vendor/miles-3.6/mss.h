@@ -97,6 +97,11 @@ DXDEC S32       AILCALL AIL_waveOutOpen             (HDIGDRIVER FAR* drvr,
 /*  Digital sample services                                                  */
 /*==========================================================================*/
 DXDEC HSAMPLE   AILCALL AIL_allocate_sample_handle  (HDIGDRIVER dig);
+/* The Buka/Gold 2.1 image imports these two on top of the PoL 2.0 set: the
+   Smacker player drops the digital master volume to the configured level for
+   the duration of a movie and restores it afterwards. */
+DXDEC S32       AILCALL AIL_digital_master_volume   (HDIGDRIVER dig);
+DXDEC void      AILCALL AIL_set_digital_master_volume(HDIGDRIVER dig, S32 master_volume);
 DXDEC void      AILCALL AIL_init_sample             (HSAMPLE S);
 DXDEC void      AILCALL AIL_start_sample            (HSAMPLE S);
 DXDEC void      AILCALL AIL_end_sample              (HSAMPLE S);
