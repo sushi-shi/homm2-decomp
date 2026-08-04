@@ -103,3 +103,47 @@ the outer switch, and that switch is the last statement of the `if`, all four
 
 Related: [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) is the same
 jmp-to-jmp shape produced by if/else nesting rather than by a label id.
+
+## The stubs are parked in REVERSE source order — use that to LOCATE a missing goto
+
+Three functions of SOURCE/CURSOR + SOURCE/FINDPATH measured the ordering: the
+stub block immediately before the epilogue lists one `jmp` per live `goto`, and
+the FIRST `goto` in source order gets the HIGHEST stub address.
+
+`searchArray::FindCombatPath` (0x4a906), four gotos:
+
+```
+source order                                    stub (address ascending)
+1  if (!ValidHex(..)) goto restoreMoatFailure;   1201: jmp 11a6   <- 4th source goto
+2  if (m_pathLength == 0) goto ..Failure;        11ff: jmp 11a6   <- 3rd
+3  else if (bestHex != targetHex) goto ..;       11fd: jmp 11ad   <- ... reversed:
+4  result = m_pathLength; goto restoreMoat;      1203: jmp 11a6
+```
+
+read bottom-up: `11fd`->restoreMoat is goto #4, `11ff`/`1201`->failure are #3/#2,
+`1203` is #1.
+
+That makes the block a direct census. `advManager::MoveHero` (0x340ca) had ten
+stubs on our side and TWELVE in retail; the two extra sat at source positions 9
+and 10, i.e. between the `!ValidMove` guard (#8) and the two adjacent-monster
+gotos (#11/#12) — which pinned them to the two 5-byte `jmp`s at the end of the
+cursor-cell `switch` and at the end of its enclosing `if`:
+
+```
+retail                                     ours
+1a49: mov [ebp-0x28], 0   ; eventCell=NULL  1a3f: mov [ebp-0x28], 0
+1a50: e9 .. jmp <stub#9>  ; goto            (falls straight through)
+1a55: e9 .. jmp <stub#10> ; goto            1a2b: ja  <movementDone>   (direct)
+1a5a: movementDone:                         1a46: movementDone:
+```
+
+Adding the two `goto movementDone;` statements (one closing the `switch`'s
+enclosing block, one after the `if`) reproduced them.  A structural
+fall-through into a label compiles to a DIRECT `jcc`/`jmp` at the label; only a
+written `goto` costs a stub, so a stub deficit is always a missing `goto`
+statement and a stub surplus is a `goto` retail spells as fall-through or
+`break`.
+
+`searchArray::TestPossibleDirections` (0x4a136) is the extreme case: thirteen
+stubs, i.e. thirteen `gSearchTerrain = TERRAIN_INVALID; goto storeDirection;`
+sites written out longhand rather than one shared `invalidDirection:` block.

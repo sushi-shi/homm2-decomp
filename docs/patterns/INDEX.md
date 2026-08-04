@@ -14,6 +14,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [if-else-two-jmp-backedge](if-else-two-jmp-backedge.md) | jmp-to-jmp at a loop back edge → if/else inside the loop, not `continue` |
 | [inline-call-operand-index-first](inline-call-operand-index-first.md) | ptr-side-first vs inline-accessor index-first; zero-arm ternary sbb |
 | [od-constant-ternary-lowering](od-constant-ternary-lowering.md) | `setcc/dec/and/add` select: `dec` (not `sub reg,1`) means a real `?:`, and the source condition is the INVERSE of the emitted setcc |
+| [neg-sbb-ternary-zero-compare](neg-sbb-ternary-zero-compare.md) | `[sub K]/neg/sbb/[and M]/add A` select: a `?:` whose condition is an equality against a constant; an `if`/`else` with the same two stores never produces it |
 | [two-backedge-jmps-in-one-loop](two-backedge-jmps-in-one-loop.md) | two separate `jmp <increment>` blocks in one loop body → an explicit `continue` guard plus the natural body end, never one `&&` chain |
 | [paren-suppresses-fp-commute](paren-suppresses-fp-commute.md) | `fld`/`fmul` on the wrong float operands and no source order helps → parenthesise the indexed operand |
 | [sret-copy-vs-elided-init](sret-copy-vs-elided-init.md) | `rep movsl` after a struct-returning call → the local was declared first and assigned, not initialised |
@@ -35,6 +36,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [byte-store-int-rhs-order](byte-store-int-rhs-order.md) | `arr[i] = <byte>`: retail's `and $0xff` plus value-before-index order → the RHS is an `int` expression, not a `u8` lvalue |
 | [bool-store-to-byte-field](bool-store-to-byte-field.md) | `xor/cmp/sete/movb` into a one-byte field → `field = (a == b);`, not an `if/else` pair of `movb` stores |
 | [switch-table-tail-in-function-span](switch-table-tail-in-function-span.md) | function is byte-identical yet capped: the compiler's switch tables sit just past the Ghidra size; widen the `VA(...)` size to the next function's start |
+| [static-init-funclet-chain-names-owner-tu](static-init-funclet-chain-names-owner-tu.md) | extra `_$E<n>` rows beyond the standard pair → the TU defines a global object; the `mov ecx,<DIR32>` in the ctor thunk names it |
 | [bool-plus-enum-mask](bool-plus-enum-mask.md) | ours-only `and $0xff` after `setcc` before an `add imm` → the other addend is an ENUM constant; cast it (or the bool) to `i32` |
 | [add-simple-operand-into-accumulator](add-simple-operand-into-accumulator.md) | retail keeps an extra `mov` (`mov scratch,<product>` / `mov acc,<local>` / `add acc,scratch`) → the ACCUMULATOR operand is the source's LEFT one; per-site, not per-function |
 | [ternary-temp-after-this](ternary-temp-after-this.md) | two constant stores to one slot joined by `jmp`, then a load, with the slot DEEPER than the `this` spill → a branchy `?:`, not an if/else pair of stores |
