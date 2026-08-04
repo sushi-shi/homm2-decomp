@@ -6005,7 +6005,6 @@ void advManager::FizzleCenter(i32 fizzleType) {
 
 VA(0x00444d73, 0x2b6c)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
-    float battleStatValue_o;
     float spellValueFactor_i;
     u32 resourceAmount_o;
     i32 unusedEventResult_e;
@@ -6653,7 +6652,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     }
                 }
             }
-            if (exitCount >= 1) {
+            if (exitCount > 0) {
                 if (exitCount > 1)
                     exitCount = Random(1, exitCount);
                 for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
@@ -6694,23 +6693,32 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
                 if (artifactGuardCount_b == CREATURE_ROGUE) {
                     artifactGuardResult_e = EVENT_ROGUE_COUNT;
-                } else {
-                    artifactGuardResult_e = 1;
-                    if (gpPhilAI->ChooseToFightForArtifact(artifact_g, artifactGuardCount_b, 1)
-                        == 0)
-                        break;
+                    goto artifactFight;
                 }
-                if (gpPhilAI->CombatMonsterEvent(
-                        eventHero,
-                        artifactGuardCount_b,
-                        &artifactGuardResult_e,
-                        cell
-                    )
-                    == 0)
-                    break;
-                goto artifactPickup;
+                artifactGuardResult_e = 1;
+                if (gpPhilAI->ChooseToFightForArtifact(artifact_g, artifactGuardCount_b, 1)) {
+                artifactFight:
+                    if (gpPhilAI->CombatMonsterEvent(
+                            eventHero,
+                            artifactGuardCount_b,
+                            &artifactGuardResult_e,
+                            cell
+                        ))
+                        goto artifactPickup;
+                }
+                break;
             }
             switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
+                case ARTIFACT_EVENT_MODE_WISDOM:
+                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                        != HERO_SKILL_LEVEL_NONE)
+                        goto artifactPickup;
+                    break;
+                case ARTIFACT_EVENT_MODE_LEADERSHIP:
+                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                        != HERO_SKILL_LEVEL_NONE)
+                        goto artifactPickup;
+                    break;
                 case ARTIFACT_EVENT_MODE_PICKUP:
                 artifactPickup:
                     for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h) {
@@ -6726,16 +6734,6 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             EVENT_ARTIFACT_GOLD;
                         goto artifactPickup;
                     }
-                    break;
-                case ARTIFACT_EVENT_MODE_WISDOM:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
-                        != HERO_SKILL_LEVEL_NONE)
-                        goto artifactPickup;
-                    break;
-                case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                    if (eventHero->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
-                        != HERO_SKILL_LEVEL_NONE)
-                        goto artifactPickup;
                     break;
                 case ARTIFACT_EVENT_MODE_RESOURCE_3:
                     if (gpPhilAI->NetValueOfArtifact(
@@ -6825,7 +6823,10 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_SIGN:
+            break;
+
         case MAP_OBJECT_BOTTLE:
+            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
             break;
 
         case MAP_OBJECT_DAEMON_CAVE:
@@ -6861,54 +6862,52 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_PYRAMID:
-            if (cell->m_objectMetadata != 0
-                && eventHero->HasSpell(SpellType(cell->m_objectMetadata - 1)) == 0) {
-                for (index_h = 0; index_h < ARMY_GROUP_SLOT_COUNT; ++index_h) {
-                    gpMonGroup->m_creatureTypes[index_h] = CREATURE_ROYAL_MUMMY;
-                    gpMonGroup->m_creatureCounts[index_h] = PYRAMID_GUARD_STACK_QUANTITY;
-                }
-                index_h = cell->m_objectMetadata - 1;
-                if (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)) {
-                    battleStatValue_o =
-                        eventHero->Stats(HERO_PRIMARY_SPELL_POWER) > AI_BATTLE_STAT_MAX
-                            ? gfBattleStat[AI_BATTLE_STAT_MAX]
-                            : gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)];
-                    spellValueFactor_i = battleStatValue_o;
-                } else {
-                    spellValueFactor_i = 1.0f;
-                }
-                pyramidBattleValue_l = static_cast<i32>(
-                    gsSpellInfo[index_h].aiValue * gpCurPlayer->m_aiData.m_upgradeValueWeight
-                    * spellValueFactor_i
-                );
-                gpPhilAI->ChooseEvaluateBattle(
-                    &eventHero->m_army,
+            if (cell->m_objectMetadata == 0)
+                break;
+            if (eventHero->HasSpell(SpellType(cell->m_objectMetadata - 1)))
+                break;
+            for (index_h = 0; index_h < ARMY_GROUP_SLOT_COUNT; ++index_h) {
+                gpMonGroup->m_creatureTypes[index_h] = CREATURE_ROYAL_MUMMY;
+                gpMonGroup->m_creatureCounts[index_h] = PYRAMID_GUARD_STACK_QUANTITY;
+            }
+            index_h = cell->m_objectMetadata - 1;
+            if (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)) {
+                spellValueFactor_i =
+                    eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= AI_BATTLE_STAT_MAX
+                        ? gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)]
+                        : gfBattleStat[AI_BATTLE_STAT_MAX];
+            } else {
+                spellValueFactor_i = 1.0f;
+            }
+            pyramidBattleValue_l = static_cast<i32>(
+                gsSpellInfo[index_h].aiValue * spellValueFactor_i
+                * gpCurPlayer->m_aiData.m_upgradeValueWeight
+            );
+            gpPhilAI->ChooseEvaluateBattle(
+                &eventHero->m_army,
+                eventHero,
+                gpMonGroup,
+                NULL,
+                0,
+                0,
+                pyramidBattleValue_l,
+                battleWon_j,
+                battleResult_l
+            );
+            if (battleWon_j != 0) {
+                index_h = PYRAMID_GUARD_COUNT;
+                combatResult_d = gpPhilAI->CombatMonsterEvent(
                     eventHero,
-                    gpMonGroup,
-                    NULL,
-                    0,
-                    0,
-                    pyramidBattleValue_l,
-                    battleWon_j,
-                    battleResult_l
+                    CREATURE_ROYAL_MUMMY,
+                    &index_h,
+                    cell
                 );
-                if (battleWon_j == 0) {
-                } else {
-                    index_h = PYRAMID_GUARD_COUNT;
-                    combatResult_d = gpPhilAI->CombatMonsterEvent(
-                        eventHero,
-                        CREATURE_ROYAL_MUMMY,
-                        &index_h,
-                        cell
+                if (combatResult_d != 0) {
+                    eventHero->AddSpell(
+                        static_cast<SpellType>(cell->m_objectMetadata - 1),
+                        eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
-                    if (combatResult_d == 0) {
-                    } else {
-                        eventHero->AddSpell(
-                            static_cast<SpellType>(cell->m_objectMetadata - 1),
-                            eventHero->Stats(HERO_PRIMARY_KNOWLEDGE)
-                        );
-                        cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                    }
+                    cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 }
             }
             break;
@@ -6955,8 +6954,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     survivingCount_a = EVENT_GUARD_COUNT_MAX;
                 gpGame->m_mines[cell->m_objectMetadata].guardianCount =
                     static_cast<u8>(survivingCount_a);
-                if (combatResult_d == 0) {
-                } else {
+                if (combatResult_d != 0) {
                     eventHero->CheckLevel();
                     gpGame->ConvertObject(
                         x + ABANDONED_MINE_X_MIN,

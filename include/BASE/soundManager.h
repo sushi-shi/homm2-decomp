@@ -80,6 +80,8 @@ public:
     void CDPoll(void);
     void ShutdownSoundBackends(void);
     bool StartupMilesBackend(void);
+    void SaveBackend(void);
+    void RestoreBackend(void);
     i32 ConvertVolume(i32, SoundVolumeConversionMode);
     float ConvertVolumeFloat(i32, SoundVolumeConversionMode);
     void AllocateSampleHandles(void);
@@ -118,6 +120,28 @@ inline bool IsAudiereBackend(const soundManager* manager) {
 
 inline bool IsMilesBackend(const soundManager* manager) {
     return manager->m_backend == SOUND_BACKEND_MILES && manager->m_digitalDriver != NULL;
+}
+
+inline bool IsSoundBackendActive(const soundManager* manager) {
+    return IsAudiereBackend(manager) || IsMilesBackend(manager);
+}
+
+// Smacker playback hands the Miles digital driver to the movie player, so the
+// backend that was live when a movie started is remembered here and brought
+// back up afterwards.
+inline void soundManager::SaveBackend(void) {
+    m_savedBackend = m_backend;
+}
+
+inline void soundManager::RestoreBackend(void) {
+    if (m_backend == m_savedBackend)
+        return;
+    if (m_backend != SOUND_BACKEND_NONE)
+        ShutdownSoundBackends();
+    if (m_savedBackend == SOUND_BACKEND_MILES)
+        StartupMilesBackend();
+    else if (m_savedBackend == SOUND_BACKEND_AUDIERE)
+        CDStartup();
 }
 
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
