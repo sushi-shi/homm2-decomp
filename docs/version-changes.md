@@ -842,6 +842,41 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   restart/load confirmation prompts. All verified by content hash against the
   image (`sha256(bytes + NUL)` = the delinker's `$anon_str_<hash>` name).
 
+- **[Buka] `game::ShowCampaignInfo` (0x226d2) has no low-memory REPLAY
+  disable.** PoL 2.0 broadcasts a second `CAMPAIGN_MESSAGE_DESELECT` for
+  `CAMPAIGN_DIALOG_REPLAY` under `if (gbLowMemory)`; retail goes straight from
+  the `if (!viewOnly)` RESTART deselect to `SwitchAmbientMusic`. The whole
+  guard and its body are gone (the eight instructions between the first
+  `BroadcastMessage` and the ambient-music `neg/sbb` select).
+- **[Buka] `game::CampaignInfoUpdate` (0x22adc) is localized and its bonus
+  strings were rewritten.** The resource line is `sprintf(gText, "%s: %d",
+  gResourceNames[...], choice->amount)` - a different format string AND the
+  two arguments swapped relative to PoL's `"%d %s"`. The nine named-artifact
+  `case` labels are emitted in a different SOURCE order (jump table decoded
+  from the retail index/jump tables at +0x87f/+0x8a3: MINOR_SCROLL,
+  MAGE_RING, DEFENDER_HELM, POWER_AXE, DRAGON_SWORD, DIVINE_BREASTPLATE,
+  FIZBIN, THUNDER_MACE, ARMORED_GAUNTLETS) and all nine literals, plus the
+  Summon-Earth, Puzzle-Pieces, Experience and `"n/a"` strings, are CP1251
+  Russian. The CREATURES case no longer capitalizes the copied army name -
+  PoL's `armyName[0] -= 'a' - 'A';` has no retail counterpart (three
+  instructions absent).
+- **[unclassified] `CampaignHandler` (0x233b8) indexes
+  `m_campaignMapEnabled` with the scenario first.** On the switching-map
+  accept path retail computes `m_campaignScenario * 12 + IDX(m_campaignType)`
+  (`movsbl 0x4(%ecx),%edx; imul $0xc; lea 0xa2(%eax,%edx)`), i.e.
+  `m_campaignMapEnabled[m_campaignScenario][IDX(m_campaignType)]`, where PoL
+  2.0 has the indices the other way round. Every other use of the array in
+  both builds is `[side][map]`, so the 2.1 line writes out of the declared
+  `[2][12]` bounds here; the two adjacent statements
+  (`m_campaignScenarioBonus`, `m_campaignChoice`) keep `[type][scenario]`.
+- **[unclassified] `game::SetupNetworkGame2` (0x92b64) probes for
+  DPLAYX.DLL.** After the Windows-NT check (which in retail dims only
+  `CHOICE_THREE`, not PoL's `CHOICE_ONE` *and* `CHOICE_THREE`), the body does
+  `hLib = NULL; hLib = LoadLibraryA("DPLAYX.DLL"); if (hLib == NULL) { ...
+  dim CHOICE_ONE ... }` with its own `tag_message` in the guarded block.
+  Retail's frame is 0x20 bytes larger than PoL's for exactly that handle and
+  message. The library is never freed.
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC

@@ -55,6 +55,29 @@ Note the polarity flip that comes with it: the assignment form falls through to
 the `0` arm, the `if`/`else` form falls through to the `1` arm, so the last
 term's `jcc` inverts as well.
 
+## Third measurement: the same axis pointing the OTHER way
+
+`highScoreManager::Open` (RVA 0x65169) writes the chain into a **byte class
+member**, and there retail is the side that materialises the temp:
+
+```
+ours   if (a || b) m_showCampaignScores = 1;    retail  m_showCampaignScores = a || b;
+       else        m_showCampaignScores = 0;
+--------------------------------------------    --------------------------------------------
+75 ..              jne  <then>                  74 ..              je   <one>
+8b 45 e8           movl -0x18(%ebp), %eax        c7 45 e4 00 00 00 00  movl $0, -0x1c(%ebp)
+c6 40 5e 01        movb $1, 0x5e(%eax)           eb ..              jmp  <join>
+eb ..              jmp  <join>                   c7 45 e4 01 00 00 00  movl $1, -0x1c(%ebp)
+8b 4d e8           movl -0x18(%ebp), %ecx        8b 45 e8           movl -0x18(%ebp), %eax
+c6 41 5e 00        movb $0, 0x5e(%ecx)           8a 4d e4           movb -0x1c(%ebp), %cl
+                                                 88 48 5e           movb %cl, 0x5e(%eax)
+83 ec 10           subl $0x10, %esp   (frame)    83 ec 14           subl $0x14, %esp   (frame)
+```
+
+The 4-byte temp is retail's here, so the *assignment* form is the retail
+spelling. Same reading rule as `QuickInfo`, opposite answer: whoever owns the
+extra slot owns the assignment form. `highScoreManager::Open` 94.39% -> EXACT.
+
 ## Companions
 
 - [bool-expression-return-temp](bool-expression-return-temp.md) is the same

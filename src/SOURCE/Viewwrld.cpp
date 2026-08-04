@@ -111,12 +111,12 @@ H2_ENUM_END(ViewWorldGroundFrame)
 
 VA(0x004adfb0, 0x2ba)
 void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAllTerrains) {
-    i8 paletteData[WORLD_PALETTE_SIZE];
-    char* viewIconNames[LEGEND_COUNT];
-    tag_message dialogMessage;
-    heroWindow* viewWorldWindow;
+    heroWindow* window;
+    i8 palette[WORLD_PALETTE_SIZE];
+    char* iconNames[LEGEND_COUNT];
+    tag_message legendMessage;
 
-    memcpy(paletteData, gpBufferPalette->m_data, WORLD_PALETTE_SIZE);
+    memcpy(palette, gpBufferPalette->m_data, WORLD_PALETTE_SIZE);
     gbInViewWorld = true;
     iVWWhatToDraw = whatToDraw;
     iVWDrawAllObjs = drawAllObjects;
@@ -128,31 +128,31 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     gpWindowManager->m_updateFlags = 1;
 
     sprintf(gText, "viewlgnd.bin");
-    viewWorldWindow = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
-    if (viewWorldWindow == NULL)
+    window = new heroWindow(WORLD_WINDOW_X, WORLD_WINDOW_Y, gText);
+    if (window == NULL)
         MemError();
 
-    viewIconNames[LEGEND_MINES] = "MINE";
-    viewIconNames[LEGEND_RESOURCES] = "RSRC";
-    viewIconNames[LEGEND_ARTIFACTS] = "RTFX";
-    viewIconNames[LEGEND_TOWNS] = "TWNS";
-    viewIconNames[LEGEND_HEROES] = "HROS";
-    viewIconNames[LEGEND_ALL] = "_ALL";
-    viewIconNames[LEGEND_WORLD] = "WRLD";
+    iconNames[LEGEND_MINES] = "MINE";
+    iconNames[LEGEND_RESOURCES] = "RSRC";
+    iconNames[LEGEND_ARTIFACTS] = "RTFX";
+    iconNames[LEGEND_TOWNS] = "TWNS";
+    iconNames[LEGEND_HEROES] = "HROS";
+    iconNames[LEGEND_ALL] = "_ALL";
+    iconNames[LEGEND_WORLD] = "WRLD";
     sprintf(
         gText,
         "view%s.icn",
-        viewIconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
+        iconNames[whatToDraw == SPELL_VIEW_ALL && drawAllObjects == 0 && drawAllTerrains == 0
                           ? LEGEND_WORLD
                           : IDX(whatToDraw) - IDX(SPELL_VIEW_MINES)]
     );
-    dialogMessage.type = VIEW_WORLD_MESSAGE;
-    dialogMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
-    dialogMessage.payload.widget.id = WORLD_ICON_WIDGET;
-    dialogMessage.payload.widget.data.text = gText;
-    viewWorldWindow->BroadcastMessage(dialogMessage);
-    gpWindowManager->DoDialog(viewWorldWindow, ViewWorldDialogHandler, 0);
-    delete viewWorldWindow;
+    legendMessage.type = VIEW_WORLD_MESSAGE;
+    legendMessage.payload.widget.command = VIEW_WORLD_ICON_MESSAGE;
+    legendMessage.payload.widget.id = WORLD_ICON_WIDGET;
+    legendMessage.payload.widget.data.text = gText;
+    window->BroadcastMessage(legendMessage);
+    gpWindowManager->DoDialog(window, ViewWorldDialogHandler, 0);
+    delete window;
 
     UpdateRadar(1, 0);
     VWCleanup();
@@ -161,7 +161,7 @@ void advManager::ViewWorld(SpellType whatToDraw, b32 drawAllObjects, b32 drawAll
     RedrawAdvScreen(1, 0);
     giCycleType = WINDOW_COLOR_CYCLE_DEFAULT;
     gpWindowManager->m_updateFlags = 1;
-    SetPalette(paletteData, 1);
+    SetPalette(palette, 1);
 }
 
 VA(0x004ae26a, 0x51)
@@ -216,33 +216,28 @@ void advManager::VWInit(i32 centerX, i32 centerY) {
 
 VA(0x004ae4ee, 0x11e2)
 void advManager::VWCompleteDraw(void) {
-    i32 mineHighlight18;
-    i32 heroHighlight8;
-    i32 artifactHighlight2;
-    i32 townFlagHighlight3;
-    i32 townIconHighlight1;
-    i8 mineLetterY0[SCALE_OFFSET_CAPACITY];
-    i8 townIconX2[SCALE_OFFSET_CAPACITY];
-    i8 townFlagX15[SCALE_OFFSET_CAPACITY];
-    i32 currentHeroHere;
-    i32 pixelY2;
-    i32 pixelX6;
-    u8* pixel4;
+    u8* endPixel0;
     u8 drawTilesets0[WORLD_TILESET_COUNT];
-    u8* rowEnd37;
-    i32 unusedRowState14;
-    i32 mapY3;
-    mapCell* cell0;
-    i32 mapX7;
-    i32 playerColor26;
-    u32 groundShape1;
-    u32 groundFrame29;
-    MineType resourceType9;
-    H2_ENUM_STORAGE(IconDrawOrientation, u32) flipped5;
-    i32 unusedExtraState29;
-    mapCellExtra* extra15;
+    u8* pix0;
+    i32 spare;
+    i32 cellX;
+    i32 heroHere0;
+    mapCellExtra* extraCell;
+    i32 cellY;
+    i32 dead;
+    u32 frame0;
+    i32 drawY1;
+    i32 screenX;
+    MineType resource0;
+    u32 shape;
+    i8 iconX1[SCALE_OFFSET_CAPACITY];
+    i8 townFlagX0[SCALE_OFFSET_CAPACITY];
+    H2_ENUM_STORAGE(IconDrawOrientation, u32) orientation1;
+    i32 color0;
+    mapCell* cell;
+    i8 letterY1[SCALE_OFFSET_CAPACITY];
 
-    groundFrame29 = 0;
+    frame0 = 0;
     FillBitmapArea(
         gpWindowManager->m_screen,
         WORLD_LEFT,
@@ -256,95 +251,94 @@ void advManager::VWCompleteDraw(void) {
     drawTilesets0[IDX(TILESET_ART32)] = 0;
     drawTilesets0[IDX(TILESET_FLAG32)] = 0;
 
-    for (mapY3 = iVWMapOriginY; mapY3 < iVWMapOriginY + iVWViewableCells; mapY3++) {
-        for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
-            cell0 = GetCell(mapX7, mapY3);
-            if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains
+    for (cellY = iVWMapOriginY; cellY < iVWMapOriginY + iVWViewableCells; cellY++) {
+        for (cellX = iVWMapOriginX; cellX < iVWMapOriginX + iVWViewableCells; cellX++) {
+            cell = GetCell(cellX, cellY);
+            if ((*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit) || iVWDrawAllTerrains
                 || (iVWWhatToDraw == SPELL_VIEW_TOWNS
-                    && (((cell0->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE)
-                        || (cell0->m_triggerType
+                    && (((cell->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_CASTLE)
+                        || (cell->m_triggerType
                                 == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
-                            && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
+                            && gpGame->m_heroRecs[cell->m_objectMetadata].m_locationType
                                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))))) {
-                flipped5 = ICON_DRAW_NORMAL;
-                pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + iVWXPixelOffset;
-                pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + iVWYPixelOffset;
-                groundShape1 =
-                    giGroundShape[cell0->m_terrainImageIndex] & WORLD_GROUND_SHAPE_MASK;
-                switch (groundShape1) {
+                orientation1 = ICON_DRAW_NORMAL;
+                screenX = iVWXPixelOffset + (cellX - iVWMapOriginX) * IDX(giViewWorldScale);
+                drawY1 = iVWYPixelOffset + (cellY - iVWMapOriginY) * IDX(giViewWorldScale);
+                shape =
+                    giGroundShape[cell->m_terrainImageIndex] & WORLD_GROUND_SHAPE_MASK;
+                switch (shape) {
                     case 0:
                     case 9:
                     case 18:
                     case 19:
                     case 20:
                     case 21:
-                        groundFrame29 = GROUND_FRAME_ZERO;
+                        frame0 = GROUND_FRAME_ZERO;
                         break;
                     case 1:
                     case 12:
                     case 15:
                     case 16:
-                        groundFrame29 = GROUND_FRAME_ONE;
+                        frame0 = GROUND_FRAME_ONE;
                         break;
                     case 2:
                     case 10:
                     case 11:
-                        groundFrame29 = GROUND_FRAME_TWO;
+                        frame0 = GROUND_FRAME_TWO;
                         break;
                     case 3:
                     case 13:
                     case 14:
                     case 17:
-                        groundFrame29 = GROUND_FRAME_THREE;
+                        frame0 = GROUND_FRAME_THREE;
                         break;
                     case 4:
-                        groundFrame29 = GROUND_FRAME_FOUR;
+                        frame0 = GROUND_FRAME_FOUR;
                         break;
                     case 5:
-                        groundFrame29 = GROUND_FRAME_FIVE;
+                        frame0 = GROUND_FRAME_FIVE;
                         break;
                     case 6:
-                        groundFrame29 = GROUND_FRAME_SIX;
+                        frame0 = GROUND_FRAME_SIX;
                         break;
                     case 7:
-                        groundFrame29 = GROUND_FRAME_SEVEN;
+                        frame0 = GROUND_FRAME_SEVEN;
                         break;
                     case 8:
-                        groundFrame29 = GROUND_FRAME_EIGHT;
+                        frame0 = GROUND_FRAME_EIGHT;
                         break;
                     default:
                         break;
                 }
-                if (cell0->m_flags & GROUND_HORIZONTAL_FLIP)
-                    flipped5 = ICON_DRAW_FLIPPED;
-                if (cell0->m_flags & GROUND_ALTERNATE_SET)
-                    groundFrame29 += GROUND_ALTERNATE_OFFSET;
-                if (groundFrame29 == 0)
-                    groundFrame29 +=
-                        (mapY3 * GROUND_RANDOM_X_MULTIPLIER + mapX7) & GROUND_RANDOM_FRAME_MASK;
+                if (cell->m_flags & GROUND_HORIZONTAL_FLIP)
+                    orientation1 = ICON_DRAW_FLIPPED;
+                if (cell->m_flags & GROUND_ALTERNATE_SET)
+                    frame0 += GROUND_ALTERNATE_OFFSET;
+                if (frame0 == 0)
+                    frame0 +=
+                        (cellY * GROUND_RANDOM_X_MULTIPLIER + cellX) & GROUND_RANDOM_FRAME_MASK;
                 else
-                    groundFrame29 += GROUND_FRAME_OFFSET;
-                groundFrame29 += IDX(giGroundToTerrain[cell0->m_terrainImageIndex])
+                    frame0 += GROUND_FRAME_OFFSET;
+                frame0 += IDX(giGroundToTerrain[cell->m_terrainImageIndex])
                                  * WORLD_TERRAIN_FRAME_STRIDE;
-                if ((giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7]) || iVWDrawAllTerrains) {
-                    townIconHighlight1 = flipped5 == ICON_DRAW_FLIPPED ? IDX(giViewWorldScale) - 1
-                                         : 0;
+                if ((*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit) || iVWDrawAllTerrains) {
                     pVWGround->DrawToBuffer(
-                        pixelX6 + townIconHighlight1,
-                        pixelY2,
-                        groundFrame29,
-                        flipped5
+                        screenX
+                            + (orientation1 == ICON_DRAW_FLIPPED ? IDX(giViewWorldScale) - 1 : 0),
+                        drawY1,
+                        frame0,
+                        orientation1
                     );
                 }
 
-                if ((cell0->m_objectData & 1) && cell0->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[IDX(cell0->m_objectTileset)]) {
+                if (cell->m_objectLayerBit0 && cell->m_objectIndex != WORLD_NO_SPRITE
+                    && drawTilesets0[IDX(cell->m_objectTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[IDX(cell0->m_objectTileset)],
+                        m_objectIcons[IDX(cell->m_objectTileset)],
                         gpWindowManager->m_screen,
-                        pixelX6,
-                        pixelY2,
-                        cell0->m_objectIndex,
+                        screenX,
+                        drawY1,
+                        cell->m_objectIndex,
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
@@ -353,20 +347,20 @@ void advManager::VWCompleteDraw(void) {
                         IDX(giViewWorldScale)
                     );
                 }
-                if (cell0->m_extraIndex == 0
-                    || m_mapData->Extra(cell0->m_extraIndex)->objectIndex == WORLD_NO_SPRITE)
-                    extra15 = NULL;
+                if (cell->m_extraIndex != 0
+                    && m_mapData->Extra(cell->m_extraIndex)->objectIndex != WORLD_NO_SPRITE)
+                    extraCell = m_mapData->Extra(cell->m_extraIndex);
                 else
-                    extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != NULL) {
-                    if (extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[IDX(extra15->objectTileset)]) {
+                    extraCell = NULL;
+                while (extraCell != NULL) {
+                    if (extraCell->objectLayerBit0 && extraCell->objectIndex != WORLD_NO_SPRITE
+                        && drawTilesets0[IDX(extraCell->objectTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[IDX(extra15->objectTileset)],
+                            m_objectIcons[IDX(extraCell->objectTileset)],
                             gpWindowManager->m_screen,
-                            pixelX6,
-                            pixelY2,
-                            extra15->objectIndex,
+                            screenX,
+                            drawY1,
+                            extraCell->objectIndex,
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
@@ -375,22 +369,22 @@ void advManager::VWCompleteDraw(void) {
                             IDX(giViewWorldScale)
                         );
                     }
-                    if (extra15->nextIndex == 0
-                        || m_mapData->Extra(extra15->nextIndex)->objectIndex
-                               == WORLD_NO_SPRITE)
-                        extra15 = NULL;
+                    if (extraCell->nextIndex != 0
+                        && m_mapData->Extra(extraCell->nextIndex)->objectIndex
+                               != WORLD_NO_SPRITE)
+                        extraCell = m_mapData->Extra(extraCell->nextIndex);
                     else
-                        extra15 = m_mapData->Extra(extra15->nextIndex);
+                        extraCell = NULL;
                 }
 
-                if (!(cell0->m_objectData & 1) && cell0->m_objectIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[IDX(cell0->m_objectTileset)]) {
+                if (!cell->m_objectLayerBit0 && cell->m_objectIndex != WORLD_NO_SPRITE
+                    && drawTilesets0[IDX(cell->m_objectTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[IDX(cell0->m_objectTileset)],
+                        m_objectIcons[IDX(cell->m_objectTileset)],
                         gpWindowManager->m_screen,
-                        pixelX6,
-                        pixelY2,
-                        cell0->m_objectIndex,
+                        screenX,
+                        drawY1,
+                        cell->m_objectIndex,
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
@@ -399,20 +393,20 @@ void advManager::VWCompleteDraw(void) {
                         IDX(giViewWorldScale)
                     );
                 }
-                if (cell0->m_extraIndex == 0
-                    || m_mapData->Extra(cell0->m_extraIndex)->objectIndex == WORLD_NO_SPRITE)
-                    extra15 = NULL;
+                if (cell->m_extraIndex != 0
+                    && m_mapData->Extra(cell->m_extraIndex)->objectIndex != WORLD_NO_SPRITE)
+                    extraCell = m_mapData->Extra(cell->m_extraIndex);
                 else
-                    extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != NULL) {
-                    if (!extra15->objectLayerBit0 && extra15->objectIndex != WORLD_NO_SPRITE
-                        && drawTilesets0[IDX(extra15->objectTileset)]) {
+                    extraCell = NULL;
+                while (extraCell != NULL) {
+                    if (!extraCell->objectLayerBit0 && extraCell->objectIndex != WORLD_NO_SPRITE
+                        && drawTilesets0[IDX(extraCell->objectTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[IDX(extra15->objectTileset)],
+                            m_objectIcons[IDX(extraCell->objectTileset)],
                             gpWindowManager->m_screen,
-                            pixelX6,
-                            pixelY2,
-                            extra15->objectIndex,
+                            screenX,
+                            drawY1,
+                            extraCell->objectIndex,
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
@@ -421,22 +415,22 @@ void advManager::VWCompleteDraw(void) {
                             IDX(giViewWorldScale)
                         );
                     }
-                    if (extra15->nextIndex == 0
-                        || m_mapData->Extra(extra15->nextIndex)->objectIndex
-                               == WORLD_NO_SPRITE)
-                        extra15 = NULL;
+                    if (extraCell->nextIndex != 0
+                        && m_mapData->Extra(extraCell->nextIndex)->objectIndex
+                               != WORLD_NO_SPRITE)
+                        extraCell = m_mapData->Extra(extraCell->nextIndex);
                     else
-                        extra15 = m_mapData->Extra(extra15->nextIndex);
+                        extraCell = NULL;
                 }
 
-                if (cell0->m_overlayIndex != WORLD_NO_SPRITE
-                    && drawTilesets0[IDX(cell0->m_overlayTileset)]) {
+                if (cell->m_overlayIndex != WORLD_NO_SPRITE
+                    && drawTilesets0[IDX(cell->m_overlayTileset)]) {
                     IconToBitmapScale(
-                        m_objectIcons[IDX(cell0->m_overlayTileset)],
+                        m_objectIcons[IDX(cell->m_overlayTileset)],
                         gpWindowManager->m_screen,
-                        pixelX6,
-                        pixelY2,
-                        cell0->m_overlayIndex,
+                        screenX,
+                        drawY1,
+                        cell->m_overlayIndex,
                         ICON_DRAW_NO_CLIP,
                         0,
                         0,
@@ -445,19 +439,19 @@ void advManager::VWCompleteDraw(void) {
                         IDX(giViewWorldScale)
                     );
                 }
-                if (cell0->m_extraIndex == 0
-                    || m_mapData->Extra(cell0->m_extraIndex)->overlayIndex == WORLD_NO_SPRITE)
-                    extra15 = NULL;
+                if (cell->m_extraIndex != 0
+                    && m_mapData->Extra(cell->m_extraIndex)->overlayIndex != WORLD_NO_SPRITE)
+                    extraCell = m_mapData->Extra(cell->m_extraIndex);
                 else
-                    extra15 = m_mapData->Extra(cell0->m_extraIndex);
-                while (extra15 != NULL) {
-                    if (drawTilesets0[IDX(extra15->overlayTileset)]) {
+                    extraCell = NULL;
+                while (extraCell != NULL) {
+                    if (drawTilesets0[IDX(extraCell->overlayTileset)]) {
                         IconToBitmapScale(
-                            m_objectIcons[IDX(extra15->overlayTileset)],
+                            m_objectIcons[IDX(extraCell->overlayTileset)],
                             gpWindowManager->m_screen,
-                            pixelX6,
-                            pixelY2,
-                            extra15->overlayIndex,
+                            screenX,
+                            drawY1,
+                            extraCell->overlayIndex,
                             ICON_DRAW_NO_CLIP,
                             0,
                             0,
@@ -466,157 +460,145 @@ void advManager::VWCompleteDraw(void) {
                             IDX(giViewWorldScale)
                         );
                     }
-                    if (extra15->nextIndex == 0
-                        || m_mapData->Extra(extra15->nextIndex)->overlayIndex
-                               == WORLD_NO_SPRITE)
-                        extra15 = NULL;
+                    if (extraCell->nextIndex != 0
+                        && m_mapData->Extra(extraCell->nextIndex)->overlayIndex
+                               != WORLD_NO_SPRITE)
+                        extraCell = m_mapData->Extra(extraCell->nextIndex);
                     else
-                        extra15 = m_mapData->Extra(extra15->nextIndex);
+                        extraCell = NULL;
                 }
             }
         }
     }
 
-    for (mapY3 = WORLD_TOP; mapY3 < WORLD_BOTTOM; mapY3++) {
-        pixel4 = gpWindowManager->m_screen->m_pixels + mapY3 * WORLD_SCREEN_WIDTH;
-        rowEnd37 = pixel4 + WORLD_RIGHT;
-        for (pixel4 += WORLD_LEFT; pixel4 < rowEnd37; pixel4++)
-            *pixel4 = gColorTableNoCycle[*pixel4];
+    for (cellY = WORLD_TOP; cellY < WORLD_BOTTOM; cellY++) {
+        pix0 =
+            gpWindowManager->m_screen->m_pixels + cellY * WORLD_SCREEN_WIDTH + WORLD_LEFT;
+        endPixel0 = pix0 + WORLD_DRAW_SIZE;
+        for (; pix0 < endPixel0; pix0++)
+            *pix0 = gColorTableNoCycle[*pix0];
     }
 
-    for (mapY3 = iVWMapOriginY; mapY3 < iVWMapOriginY + iVWViewableCells; mapY3++) {
-        for (mapX7 = iVWMapOriginX; mapX7 < iVWMapOriginX + iVWViewableCells; mapX7++) {
-            cell0 = GetCell(mapX7, mapY3);
-            pixelX6 = (mapX7 - iVWMapOriginX) * IDX(giViewWorldScale) + (IDX(giViewWorldScale) >> 1)
-                      + iVWXPixelOffset;
-            pixelY2 = (mapY3 - iVWMapOriginY) * IDX(giViewWorldScale) + (IDX(giViewWorldScale) >> 1)
-                      + iVWYPixelOffset;
+    for (cellY = iVWMapOriginY; cellY < iVWMapOriginY + iVWViewableCells; cellY++) {
+        for (cellX = iVWMapOriginX; cellX < iVWMapOriginX + iVWViewableCells; cellX++) {
+            cell = GetCell(cellX, cellY);
+            screenX = iVWXPixelOffset + (cellX - iVWMapOriginX) * IDX(giViewWorldScale)
+                      + (IDX(giViewWorldScale) >> 1);
+            drawY1 = iVWYPixelOffset + (cellY - iVWMapOriginY) * IDX(giViewWorldScale)
+                      + (IDX(giViewWorldScale) >> 1);
 
-            if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
-                && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT)
+                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_ARTIFACTS)) {
-                artifactHighlight2 =
-                    iVWWhatToDraw == SPELL_VIEW_ARTIFACTS ? WORLD_ARTIFACT_HIGHLIGHT : 0;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_Y)],
+                    screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_X)],
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_ARTIFACT][IDX(COORDINATE_AXIS_Y)],
                     ARTIFACT_ICON_FRAME,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
                     WORLD_DRAW_SIZE,
-                    artifactHighlight2
+                    iVWWhatToDraw == SPELL_VIEW_ARTIFACTS ? WORLD_ARTIFACT_HIGHLIGHT : 0
                 );
             }
 
-            if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
-                 || (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
-                     && gpGame->m_heroRecs[cell0->m_objectMetadata].m_locationType
+            if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                 || (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                     && gpGame->m_heroRecs[cell->m_objectMetadata].m_locationType
                             == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)))
-                && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
+                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_TOWNS)) {
-                if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
-                    playerColor26 = gpGame->m_castleOwners[cell0->m_objectMetadata];
+                if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+                    color0 = gpGame->m_castleOwners[cell->m_objectMetadata];
                 else
-                    playerColor26 =
-                        gpGame->m_castleOwners[gpGame->m_heroRecs[cell0->m_objectMetadata]
+                    color0 =
+                        gpGame->m_castleOwners[gpGame->m_heroRecs[cell->m_objectMetadata]
                                                    .m_occupiedTown];
-                if (playerColor26 < 0)
-                    playerColor26 = WORLD_NO_OWNER_COLOR;
+                if (color0 < 0)
+                    color0 = WORLD_NO_OWNER_COLOR;
                 else
-                    playerColor26 = gpGame->m_players[playerColor26].m_color;
-                townFlagX15[SCALE_INDEX_FAR] = -2;
-                townFlagX15[SCALE_INDEX_MIDDLE] = -3;
-                townFlagX15[SCALE_INDEX_NEAR] = -6;
-                townIconX2[SCALE_INDEX_FAR] = 5;
-                townIconX2[SCALE_INDEX_MIDDLE] = 7;
-                townIconX2[SCALE_INDEX_NEAR] = 10;
-                if (iVWWhatToDraw == SPELL_VIEW_TOWNS)
-                    townFlagHighlight3 = playerColor26 + WORLD_HIGHLIGHT_BASE;
-                else
-                    townFlagHighlight3 = 0;
+                    color0 = gpGame->m_players[color0].m_color;
+                townFlagX0[SCALE_INDEX_FAR] = -2;
+                townFlagX0[SCALE_INDEX_MIDDLE] = -3;
+                townFlagX0[SCALE_INDEX_NEAR] = -6;
+                iconX1[SCALE_INDEX_FAR] = 5;
+                iconX1[SCALE_INDEX_MIDDLE] = 7;
+                iconX1[SCALE_INDEX_NEAR] = 10;
                 FlipIconToBitmap(
                     pVWFlags,
                     gpWindowManager->m_screen,
-                    townFlagX15[giViewWorldScaleLookup] + pixelX6
+                    screenX + townFlagX0[giViewWorldScaleLookup]
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
-                    playerColor26,
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
+                    color0,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
                     WORLD_DRAW_SIZE,
-                    townFlagHighlight3
+                    iVWWhatToDraw == SPELL_VIEW_TOWNS ? color0 + WORLD_HIGHLIGHT_BASE : 0
                 );
-                if (iVWWhatToDraw == SPELL_VIEW_TOWNS)
-                    townIconHighlight1 = playerColor26 + WORLD_HIGHLIGHT_BASE;
-                else
-                    townIconHighlight1 = 0;
                 IconToBitmap(
                     pVWFlags,
                     gpWindowManager->m_screen,
-                    townIconX2[giViewWorldScaleLookup] + pixelX6
+                    screenX + iconX1[giViewWorldScaleLookup]
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
-                    playerColor26,
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_TOWN][IDX(COORDINATE_AXIS_Y)],
+                    color0,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
                     WORLD_DRAW_SIZE,
-                    townIconHighlight1
+                    iVWWhatToDraw == SPELL_VIEW_TOWNS ? color0 + WORLD_HIGHLIGHT_BASE : 0
                 );
             }
 
-            if (gpCurPlayer->m_currentHero == -1
-                || gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_x != mapX7
-                || gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_y != mapY3)
-                currentHeroHere = 0;
+            if (gpCurPlayer->m_currentHero != -1
+                && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_x == cellX
+                && gpGame->m_heroRecs[gpCurPlayer->m_currentHero].m_y == cellY)
+                heroHere0 = 1;
             else
-                currentHeroHere = 1;
-            if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
-                 || currentHeroHere)
-                && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
+                heroHere0 = 0;
+            if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)
+                 || heroHere0)
+                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_HEROES)) {
-                if (!currentHeroHere)
-                    playerColor26 = gpGame->m_availableHeroes[cell0->m_objectMetadata];
+                if (heroHere0)
+                    color0 = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
                 else
-                    playerColor26 = gpGame->m_availableHeroes[gpCurPlayer->m_currentHero];
-                if (playerColor26 >= 0) {
-                    groundFrame29 = gpGame->m_players[playerColor26].m_color;
-                    if (iVWWhatToDraw == SPELL_VIEW_HEROES)
-                        heroHighlight8 = groundFrame29 + WORLD_HIGHLIGHT_BASE;
-                    else
-                        heroHighlight8 = 0;
+                    color0 = gpGame->m_availableHeroes[cell->m_objectMetadata];
+                if (color0 >= 0) {
+                    frame0 = gpGame->m_players[color0].m_color;
                     IconToBitmap(
                         pVWMisc,
                         gpWindowManager->m_screen,
-                        pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_X)],
-                        pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_Y)],
-                        groundFrame29 + HERO_ICON_FRAME_BASE,
+                        screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_X)],
+                        drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_HERO][IDX(COORDINATE_AXIS_Y)],
+                        frame0 + HERO_ICON_FRAME_BASE,
                         ICON_DRAW_CLIP,
                         WORLD_LEFT,
                         WORLD_TOP,
                         WORLD_DRAW_SIZE,
                         WORLD_DRAW_SIZE,
-                        heroHighlight8
+                        iVWWhatToDraw == SPELL_VIEW_HEROES ? frame0 + WORLD_HIGHLIGHT_BASE
+                                                           : 0
                     );
                 }
             }
 
-            if (cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE)
-                && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE)
+                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_RESOURCES)) {
-                groundFrame29 = cell0->m_objectIndex >> 1;
+                frame0 = cell->m_objectIndex / 2;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_Y)],
+                    screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_X)],
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_RESOURCE][IDX(COORDINATE_AXIS_Y)],
                     RESOURCE_ICON_FRAME,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
@@ -628,9 +610,9 @@ void advManager::VWCompleteDraw(void) {
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
-                    groundFrame29,
+                    screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
+                    frame0,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
@@ -640,44 +622,38 @@ void advManager::VWCompleteDraw(void) {
                 );
             }
 
-            if ((cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
-                 || cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL)
-                 || cell0->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
-                && (iVWDrawAllObjs || (giCurPlayerBit & mapExtra[MAP_WIDTH * mapY3 + mapX7])
+            if ((cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE)
+                 || cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL)
+                 || cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
+                && (iVWDrawAllObjs || (*(mapExtra + cellX + MAP_WIDTH * cellY) & giCurPlayerBit)
                     || iVWWhatToDraw == SPELL_VIEW_MINES)) {
-                playerColor26 = gpGame->m_mineOwners[cell0->m_objectMetadata];
-                if (playerColor26 < 0)
-                    groundFrame29 = WORLD_NO_OWNER_COLOR;
-                else
-                    groundFrame29 = gpGame->m_players[playerColor26].m_color;
-                if (iVWWhatToDraw == SPELL_VIEW_MINES)
-                    mineHighlight18 = groundFrame29 + WORLD_HIGHLIGHT_BASE;
-                else
-                    mineHighlight18 = 0;
+                color0 = gpGame->m_mineOwners[cell->m_objectMetadata];
+                frame0 = color0 < 0 ? WORLD_NO_OWNER_COLOR
+                                                  : gpGame->m_players[color0].m_color;
                 IconToBitmap(
                     pVWMisc,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_X)],
-                    pixelY2 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_Y)],
-                    groundFrame29,
+                    screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_X)],
+                    drawY1 - iVWHalf[giViewWorldScaleLookup][OFFSET_MINE][IDX(COORDINATE_AXIS_Y)],
+                    frame0,
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
                     WORLD_DRAW_SIZE,
                     WORLD_DRAW_SIZE,
-                    mineHighlight18
+                    iVWWhatToDraw == SPELL_VIEW_MINES ? frame0 + WORLD_HIGHLIGHT_BASE : 0
                 );
-                mineLetterY0[SCALE_INDEX_FAR] = 0;
-                mineLetterY0[SCALE_INDEX_MIDDLE] = 0;
-                mineLetterY0[SCALE_INDEX_NEAR] = 2;
-                resourceType9 = gpGame->m_mines[cell0->m_objectMetadata].resourceType;
+                letterY1[SCALE_INDEX_FAR] = 0;
+                letterY1[SCALE_INDEX_MIDDLE] = 0;
+                letterY1[SCALE_INDEX_NEAR] = 2;
+                resource0 = gpGame->m_mines[cell->m_objectMetadata].resourceType;
                 IconToBitmap(
                     pVWLetters,
                     gpWindowManager->m_screen,
-                    pixelX6 - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
-                    mineLetterY0[giViewWorldScaleLookup] + pixelY2
+                    screenX - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_X)],
+                    drawY1 + letterY1[giViewWorldScaleLookup]
                         - iVWHalf[giViewWorldScaleLookup][OFFSET_LETTER][IDX(COORDINATE_AXIS_Y)],
-                    IDX(resourceType9),
+                    IDX(resource0),
                     ICON_DRAW_CLIP,
                     WORLD_LEFT,
                     WORLD_TOP,
@@ -698,11 +674,11 @@ void advManager::VWCompleteDraw(void) {
 
 VA(0x004af6d0, 0x4d4)
 MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
-    float radarScale6;
-    i32 radarY1;
-    i32 radarX0;
-    tag_message savedMessage;
-    tag_message currentMessage7;
+    float radarScale;
+    tag_message oldMessage;
+    tag_message eventMessage;
+    i32 mapX;
+    i32 mapY;
 
     if (!gpSoundManager->MusicPlaying())
         gpSoundManager->SwitchAmbientMusic(
@@ -722,79 +698,79 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         break;
                     switch (MAP_HEIGHT) {
                         case MAP_DIMENSION_SMALL:
-                            radarScale6 = 4.0f;
+                            radarScale = 4.0f;
                             break;
                         case MAP_DIMENSION_MEDIUM:
-                            radarScale6 = 2.0f;
+                            radarScale = 2.0f;
                             break;
                         case MAP_DIMENSION_LARGE:
-                            radarScale6 = 1.3333f;
+                            radarScale = 1.3333f;
                             break;
                         default:
-                            radarScale6 = 1.0f;
+                            radarScale = 1.0f;
                             break;
                     }
 
-                    radarX0 = message.payload.mouse.screenX;
-                    radarY1 = message.payload.mouse.screenY;
-                    radarX0 = static_cast<i32>((radarX0 - WORLD_RADAR_LEFT) / radarScale6);
-                    radarY1 = static_cast<i32>((radarY1 - WORLD_RADAR_TOP) / radarScale6);
-                    iVWMapOriginX = radarX0 - iVWCenterOffset;
-                    iVWMapOriginY = radarY1 - iVWCenterOffset;
+                    mapX = message.payload.mouse.screenX;
+                    mapY = message.payload.mouse.screenY;
+                    mapX = static_cast<i32>((mapX - WORLD_RADAR_LEFT) / radarScale);
+                    mapY = static_cast<i32>((mapY - WORLD_RADAR_TOP) / radarScale);
+                    iVWMapOriginX = mapX - iVWCenterOffset;
+                    iVWMapOriginY = mapY - iVWCenterOffset;
                     if (iVWMapOriginX < 0)
                         iVWMapOriginX = 0;
                     if (iVWMapOriginY < 0)
                         iVWMapOriginY = 0;
-                    if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
+                    if (iVWMapOriginX + iVWViewableCells >= MAP_WIDTH)
                         iVWMapOriginY = MAP_WIDTH - iVWViewableCells;
-                    if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
+                    if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
                         iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                     gpAdvManager->UpdateRadar(1, 0);
                     gpAdvManager->VWCompleteDraw();
 
-                    currentMessage7.type = MESSAGE_NONE;
-                    while (currentMessage7.type != VIEW_WORLD_MOUSE_UP) {
+                    eventMessage.type = MESSAGE_NONE;
+                    while (eventMessage.type != VIEW_WORLD_MOUSE_UP) {
                         Process1WindowsMessage();
-                        currentMessage7 = gpInputManager->GetEvent();
-                        savedMessage = currentMessage7;
-                        while (currentMessage7.type != VIEW_WORLD_MOUSE_UP
-                               && currentMessage7.type != MESSAGE_NONE) {
-                            if (currentMessage7.type == VIEW_WORLD_MOUSE_MOVE)
-                                savedMessage = currentMessage7;
+                        eventMessage = gpInputManager->GetEvent();
+                        oldMessage = eventMessage;
+                        while (eventMessage.type != VIEW_WORLD_MOUSE_UP
+                               && eventMessage.type != MESSAGE_NONE) {
+                            if (eventMessage.type == VIEW_WORLD_MOUSE_MOVE)
+                                oldMessage = eventMessage;
                             Process1WindowsMessage();
-                            currentMessage7 = gpInputManager->GetEvent();
+                            eventMessage = gpInputManager->GetEvent();
                         }
-                        if (savedMessage.type == VIEW_WORLD_MOUSE_MOVE) {
-                            if (savedMessage.payload.mouse.x < WORLD_RADAR_LEFT)
-                                savedMessage.payload.mouse.x = WORLD_RADAR_LEFT;
-                            if (savedMessage.payload.mouse.x >= WORLD_RADAR_RIGHT)
-                                savedMessage.payload.mouse.x =
+                        if (oldMessage.type == VIEW_WORLD_MOUSE_MOVE) {
+                            if (oldMessage.payload.mouse.x < WORLD_RADAR_LEFT)
+                                oldMessage.payload.mouse.x = WORLD_RADAR_LEFT;
+                            if (oldMessage.payload.mouse.x >= WORLD_RADAR_RIGHT)
+                                oldMessage.payload.mouse.x =
                                     MAP_WIDTH * RADAR_DRAG_MAP_SCALE + WORLD_RADAR_LEFT - 1;
-                            if (savedMessage.payload.mouse.y < WORLD_RADAR_TOP)
-                                savedMessage.payload.mouse.y = WORLD_RADAR_TOP;
-                            if (savedMessage.payload.mouse.y >= WORLD_RADAR_BOTTOM)
-                                savedMessage.payload.mouse.y =
+                            if (oldMessage.payload.mouse.y < WORLD_RADAR_TOP)
+                                oldMessage.payload.mouse.y = WORLD_RADAR_TOP;
+                            if (oldMessage.payload.mouse.y >= WORLD_RADAR_BOTTOM)
+                                oldMessage.payload.mouse.y =
                                     MAP_HEIGHT * RADAR_DRAG_MAP_SCALE + WORLD_RADAR_TOP - 1;
-                            gpMouseManager->Main(savedMessage);
-                            radarX0 = static_cast<i32>(
-                                (savedMessage.payload.mouse.x - WORLD_RADAR_LEFT) / radarScale6
+                            gpMouseManager->Main(oldMessage);
+                            mapX = static_cast<i32>(
+                                (oldMessage.payload.mouse.x - WORLD_RADAR_LEFT) / radarScale
                             );
-                            radarY1 = static_cast<i32>(
-                                (savedMessage.payload.mouse.y - WORLD_RADAR_TOP) / radarScale6
+                            mapY = static_cast<i32>(
+                                (oldMessage.payload.mouse.y - WORLD_RADAR_TOP) / radarScale
                             );
-                            iVWMapOriginX = radarX0 - iVWCenterOffset;
-                            iVWMapOriginY = radarY1 - iVWCenterOffset;
+                            iVWMapOriginX = mapX - iVWCenterOffset;
+                            iVWMapOriginY = mapY - iVWCenterOffset;
                             if (iVWMapOriginX < 0)
                                 iVWMapOriginX = 0;
                             if (iVWMapOriginY < 0)
                                 iVWMapOriginY = 0;
-                            if (MAP_WIDTH <= iVWMapOriginX + iVWViewableCells)
+                            if (iVWMapOriginX + iVWViewableCells >= MAP_WIDTH)
                                 iVWMapOriginX = MAP_WIDTH - iVWViewableCells;
-                            if (MAP_HEIGHT <= iVWMapOriginY + iVWViewableCells)
+                            if (iVWMapOriginY + iVWViewableCells >= MAP_HEIGHT)
                                 iVWMapOriginY = MAP_HEIGHT - iVWViewableCells;
                             gpAdvManager->UpdateRadar(1, 0);
                             gpAdvManager->VWCompleteDraw();
-                            savedMessage.type = MESSAGE_NONE;
+                            oldMessage.type = MESSAGE_NONE;
                         }
                     }
                 }
@@ -824,7 +800,7 @@ MessageDispatchResult ViewWorldDialogHandler(struct tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
                         message.payload.widget.command =
-                            BaseWidgetCommand(message.payload.widget.id);
+                            BaseWidgetCommand(EVENT_WINDOW_CLOSE_COMMAND);
                         return MESSAGE_DISPATCH_FORWARD;
                     default:
                         break;
