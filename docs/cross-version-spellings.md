@@ -300,3 +300,26 @@ while chasing exactness; the cross-analysis is a later dedicated phase.
 | SOURCE/ADVMGR `APanelHandler` / `TownPortalHandler` dialog close | `message.payload.widget.command = static_cast<BaseWidgetCommand>(message.payload.widget.id);` | the literal command `WIDGET_COMMAND_DIALOG_SELECT` | OPEN |
 | SOURCE/ADVMGR `CastSpell` mine-guardian local | `CreatureType guardianTypes1[MINE_GUARDIAN_VALUE_COUNT]` with `[MINE_GUARDIAN_TYPE_INDEX]` | scalar `CreatureType mineGuard;` plus one unreferenced `i32 guardianCount;` (retail's frame has 5 four-byte locals, one dead) | OPEN |
 | SOURCE/ADVMGR slot names (13 functions) | PoL names | whole-frame renames solved from od_slots buckets: `ProcessSearch`, `UpdateHeroLocator`, `UpdateTownLocators`, `UpdBottomViewEnemyTurn`, `HeroQuickView`, `TownQuickView`, `CastSpell`, `TownGate`, `ShowRoute`, `ComboDraw`, `UpdateSystemOptions` | OPEN as slot-name class |
+| SOURCE/GAME `SetupOrigData` calendar / patrol / destination / ultimate-artifact groups | chained `b = a;` after `a = K;` | each member spelled with its own literal (`m_week = INITIAL_CALENDAR_VALUE;` etc.) | OPEN |
+| SOURCE/GAME `ClaimTown` new-owner turn count | `m_turnsOwned = (m_owner == -1) ? TOWN_NEW_OWNER_TURN_COUNT : 0;` | branchy `if/else` pair of stores | OPEN |
+| SOURCE/GAME `ViewSpells` tab widget id | `if (spellType == SPELL_TYPE_COMBAT) id = COMBAT_TAB; else id = ADVENTURE_TAB;` | `static_cast<i16>(VIEW_SPELL_COMBAT_TAB_ID + static_cast<i32>(spellType != SPELL_TYPE_COMBAT))` | OPEN |
+| SOURCE/GAME `NextPlayer` bottom-view override | `giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] ? BOTTOM_VIEW_NEW_TURN : BOTTOM_VIEW_NONE;` (also `WaitForPlayer`) | branchy `if/else` pair of stores | OPEN |
+| SOURCE/GAME `ComputeDailyGold` town income | `if (buildings & CASTLE) gold += VILLAGE; else gold += TOWN;` | `gold += (buildings & CASTLE) ? DAILY_GOLD_VILLAGE_INCOME : DAILY_GOLD_TOWN_INCOME;` | OPEN |
+| SOURCE/GAME `ComputeDailyGold` / `CalcBaseScore` identity scalings | empty `if` bodies for DIFFICULTY_NORMAL / MAP_DIMENSION_MEDIUM | real `* 1.0` multiplies (`GAME_DIFFICULTY_NORMAL_GOLD_FACTOR`, `GAME_SCORE_MEDIUM_DAY_SCALE`) | OPEN |
+| SOURCE/GAME `PerDay` / `CheckForTimeEvent` turn number | `(m_week - 1) * 7 + (m_month - 1) * 28 + m_day` | `m_day` first: `m_day + (m_week - 1) * 7 + (m_month - 1) * 28` | OPEN |
+| SOURCE/GAME `PerDay` AI resource bonus | `m_players[player].m_resources[m_day - 1]++;` | `... += 1;` (changes the read's evaluation order) | OPEN |
+| SOURCE/GAME `PerDay` spell-point / mage-guild guards | `hero->m_spellPoints < restored`, `townHero->m_spellPoints < maxSpellPoints` | the local first: `restored > hero->m_spellPoints`, `maxSpellPoints > townHero->m_spellPoints` | OPEN |
+| SOURCE/GAME `ProcessMapExtra` column loop | `MAP_WIDTH > col` | `col < MAP_WIDTH` | OPEN |
+| SOURCE/GAME `SetupTowns` dwelling count | `if (--dwellingCount != 0) buildings |= DWELLING_2; dwellingCount--;` | the second decrement inside the guard | OPEN |
+| SOURCE/GAME `SetupTowns` custom-building mask | `(gTownEligibleBuildMask[type] & extra->buildings) | (buildings & (CASTLE|TENT))` | operands swapped on both `&` and `|` | OPEN |
+| SOURCE/GAME `SetupTowns` spell rolls | `raceChance[type] < Random(0,10)`, `spellValue < Random(1,1500)`, `(POWER ? 4 : 1) * aiValue` | `Random(...) >` first, and `aiValue * (POWER ? 4 : 1)` | OPEN |
+| SOURCE/GAME `SetupTowns` filled mage-guild slot | `if (...) { usedSpells[...] = 1; } else { ... }` | `continue;` in the then-arm, else-body unindented | OPEN |
+| SOURCE/GAME `SetupTowns` / `CheckForTimeEvent` / `ProcessOnMapHeroes` slot names | PoL names | whole-frame renames solved from od_slots buckets (SetupTowns also merges the building/slot counter and the outer spell/slot counter into one local each, and adds one dead local) | OPEN as slot-name class |
+| SOURCE/GAME `ProcessOnMapHeroes` jail flag | `if ((trigger & MASK) == MAP_OBJECT_JAIL) isJail = 1; else isJail = 0;` | `isJail = (trigger & MASK) == MAP_OBJECT_JAIL;` | OPEN |
+| SOURCE/GAME `ProcessOnMapHeroes` cell fetch | `&WORLDMAP->Row(y)[x]` | `WORLDMAP->GetCell(x, y)` (Column form) | OPEN |
+| SOURCE/GAME `TransmitSaveGame` ack marker | `acknowledged[batch * BATCH + packet] = 1;` | pointer form `*(acknowledged + packet + batch * BATCH) = 1;` | OPEN |
+| SOURCE/GAME `TransmitSaveGame` / `ReceiveSaveGame` old music track | `oldTrack = static_cast<i8>(gpSoundManager->m_musicTrack);` | no cast (dword load) | OPEN |
+| SOURCE/GAME `ReceiveSaveGame` packet timeout / decoded-buffer compare | `KBTickCount() > lastPacketTime + TIMEOUT`, `incomingData != decodedData` | `lastPacketTime + TIMEOUT < KBTickCount()`, `decodedData != incomingData` | OPEN |
+| SOURCE/GAME `WriteDiffHeaderInfo` header flags | `flags = (cmd << SHIFT) | flags;`, `(len >> 8) & 0x1f`, `static_cast<u8>(len)` | `flags |= cmd << SHIFT;`, `(len & 0x1f00) >> 8`, `len & 0xff` | OPEN |
+| SOURCE/GAME `CalcBaseScore` first-tier deduction | `score -= -(-days);` | `score -= days;` | OPEN |
+| SOURCE/GAME `CheckForTimeEvent` event guards | `event->firstDay < dayNumber`, `resources[i] < -amount` | `dayNumber > event->firstDay`, `-amount > resources[i]` | OPEN |
