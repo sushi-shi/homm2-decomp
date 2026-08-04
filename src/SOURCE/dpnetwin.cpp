@@ -265,30 +265,32 @@ i16 __cdecl dpnet_sess(i32, i32, ...) {
 
 VA(0x00436e9b, 0x98)
 void dpProcessMessages(void) {
-    DWORD packetSize[RECEIVE_ARGUMENT_STORAGE_COUNT];
-    i32 destinationIds[RECEIVE_ARGUMENT_STORAGE_COUNT];
-    i32 fromId;
+    DWORD size;
+    i32 to;
+    i32 i;
+    i32 j;  // i and j are unreferenced; retail's frame reserves both slots
+    i32 sender;
     i32 receiveResult;
 
     if (lpIDC == NULL)
         return;
     while (1) {
-        packetSize[0] = DP_TRANSPORT_RECEIVE_SIZE;
+        size = DP_TRANSPORT_RECEIVE_SIZE;
         receiveResult = lpIDC->Receive(
-            reinterpret_cast<LPDPID>(&fromId),
-            reinterpret_cast<LPDPID>(destinationIds),
+            reinterpret_cast<LPDPID>(&sender),
+            reinterpret_cast<LPDPID>(&to),
             1,
             rcvBufIn,
-            packetSize
+            &size
         );
         if (receiveResult == RESULT_NO_MESSAGES)
             return;
         if (receiveResult != RESULT_OK)
             DPSD(receiveResult, RETAIL_FILE, 335);
-        if (fromId == 0) {
+        if (sender == 0) {
         } else {
-            if (destinationIds[0] == 0 || destinationIds[0] == dcoID)
-                dpEvaluateMessage(packetSize[0], fromId);
+            if (to == 0 || to == dcoID)
+                dpEvaluateMessage(size, sender);
         }
     }
 }
@@ -358,7 +360,7 @@ void dpEvaluateMessage(u32l size, i32 sender) {
 VA(0x00437177, 0x16a)
 i32 dpWaitForFirstGuest(void) {
     DPSESSIONDESC session;
-    i32 result;
+    i32 rv;
 
     switch (iDPWaitForFirstGuestStatus) {
         case FIRST_GUEST_CREATE_SESSION:
@@ -368,9 +370,9 @@ i32 dpWaitForFirstGuest(void) {
             session.guidSession = *g_lpGuid;
             session.dwFlags = IDX(SESSION_OPEN_CREATE);
             strcpy(session.szSessionName, "Heroes 2");
-            result = lpIDC->Open(&session);
-            if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, 442);
+            rv = lpIDC->Open(&session);
+            if (rv != RESULT_OK)
+                DPSD(rv, RETAIL_FILE, 442);
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_DISABLE_COMPRESSION:
@@ -379,9 +381,9 @@ i32 dpWaitForFirstGuest(void) {
             iDPWaitForFirstGuestStatus++;
             break;
         case FIRST_GUEST_CREATE_PLAYER:
-            result = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-            if (result != RESULT_OK)
-                DPSD(result, RETAIL_FILE, 472);
+            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            if (rv != RESULT_OK)
+                DPSD(rv, RETAIL_FILE, 472);
             giNetPosToDCOPos[0] = dcoID;
             iDPWaitForFirstGuestStatus++;
             break;
@@ -422,13 +424,13 @@ i32 dpWaitForExtraGuests(void) {
 
 VA(0x0043735d, 0x396)
 i32 dpWaitForHost(void) {
-    DWORD enumerationTimeout;
-    DPSESSIONDESC sessionDescription;
-    i32 playResult;
-    char statusString[STATUS_TEXT_SIZE];
+    DPSESSIONDESC session;
+    i32 rv;
+    char text[STATUS_TEXT_SIZE];
+    DWORD timeout;
 
-    sprintf(statusString, "WFHS %d", iDPWaitForHostStatus);
-    AiPrint(statusString);
+    sprintf(text, "WFHS %d", iDPWaitForHostStatus);
+    AiPrint(text);
     switch (iDPWaitForHostStatus) {
         case HOST_ENUMERATE_SESSIONS:
             if (iWaitForHostWaitCount != 0) {
@@ -437,46 +439,46 @@ i32 dpWaitForHost(void) {
                 return 0;
             }
             iSessionToTry = 0;
-            memset(&sessionDescription, 0, sizeof(sessionDescription));
-            sessionDescription.dwSize = sizeof(sessionDescription);
-            sessionDescription.guidSession = *g_lpGuid;
+            memset(&session, 0, sizeof(session));
+            session.dwSize = sizeof(session);
+            session.guidSession = *g_lpGuid;
             iMaxSession = 0;
             if (iEnumCount % DP_TRANSPORT_ENUM_LONG_INTERVAL != DP_TRANSPORT_ENUM_LONG_PHASE)
-                enumerationTimeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
+                timeout = DP_TRANSPORT_ENUM_SHORT_TIMEOUT;
             else
-                enumerationTimeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
-            playResult =
+                timeout = DP_TRANSPORT_ENUM_LONG_TIMEOUT;
+            rv =
                 lpIDC
-                    ->EnumSessions(&sessionDescription, enumerationTimeout, dpEnumSession, NULL, 0);
+                    ->EnumSessions(&session, timeout, dpEnumSession, NULL, 0);
             iEnumCount++;
-            if (playResult == RESULT_NO_SESSIONS) {
+            if (rv == RESULT_NO_SESSIONS) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 return 0;
             }
-            if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, 548);
+            if (rv != RESULT_OK)
+                DPSD(rv, RETAIL_FILE, 548);
             if (iMaxSession > 0) {
                 iWaitForHostWaitCount = DP_TRANSPORT_RETRY_WAIT_COUNT;
                 iDPWaitForHostStatus++;
             }
             break;
         case HOST_JOIN_SESSION:
-            memset(&sessionDescription, 0, sizeof(sessionDescription));
-            sessionDescription.dwSize = sizeof(sessionDescription);
-            sessionDescription.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
-            sessionDescription.guidSession = *g_lpGuid;
-            sessionDescription.dwFlags = IDX(SESSION_OPEN_JOIN);
-            sessionDescription.dwSession = lSessions[iSessionToTry];
-            strcpy(sessionDescription.szSessionName, "Heroes 2");
-            playResult = lpIDC->Open(&sessionDescription);
-            if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, 567);
+            memset(&session, 0, sizeof(session));
+            session.dwSize = sizeof(session);
+            session.dwMaxPlayers = DP_TRANSPORT_MAX_PLAYERS;
+            session.guidSession = *g_lpGuid;
+            session.dwFlags = IDX(SESSION_OPEN_JOIN);
+            session.dwSession = lSessions[iSessionToTry];
+            strcpy(session.szSessionName, "Heroes 2");
+            rv = lpIDC->Open(&session);
+            if (rv != RESULT_OK)
+                DPSD(rv, RETAIL_FILE, 567);
             iDPWaitForHostStatus++;
             break;
         case HOST_CREATE_PLAYER:
-            playResult = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
-            if (playResult != RESULT_OK)
-                DPSD(playResult, RETAIL_FILE, 577);
+            rv = lpIDC->CreatePlayer(&dcoID, "Dude", "Heroes Player", &dphEvent);
+            if (rv != RESULT_OK)
+                DPSD(rv, RETAIL_FILE, 577);
             iDPWaitForHostStatus++;
             break;
         case HOST_ANNOUNCE_PLAYER:
@@ -501,9 +503,9 @@ i32 dpWaitForHost(void) {
                     iDPWaitForHostStatus = HOST_JOIN_SESSION;
                     iSessionToTry++;
                 }
-                playResult = lpIDC->Close();
-                if (playResult != RESULT_OK)
-                    DPSD(playResult, RETAIL_FILE, 603);
+                rv = lpIDC->Close();
+                if (rv != RESULT_OK)
+                    DPSD(rv, RETAIL_FILE, 603);
             } else if (iLastHereIAmTickCount + DP_TRANSPORT_ACCEPT_TIMEOUT < KBTickCount()) {
                 iDPWaitForHostStatus--;
             }
@@ -517,15 +519,15 @@ i32 dpWaitForHost(void) {
     return 0;
 }
 
-VA(0x004376f3, 0x515)
+VA(0x004376f3, 0x5d5)
 void DPSD(i32 result, char* file, i32 line) {
+    i32 flag;
     char errorText[REMOTE_ERROR_TEXT_SIZE];
-    i32 errorFlag;
 
     if (bInDPSD != 0)
         return;
     bInDPSD = 1;
-    errorFlag = 0;
+    flag = 0;
     switch (result) {
         case RESULT_OK:
             return;
