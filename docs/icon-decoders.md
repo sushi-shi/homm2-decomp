@@ -12,6 +12,14 @@ current observation-only scores. Behaviour claims below that cite an RVA were re
 retail with `homm2 sema disasm`; the rest are read off the reconstruction and inherit its
 provisional status.
 
+**Stale-RVA warning.** The index and per-function RVAs below are the PoL 2.0
+addresses carried over with this file; they are NOT this image's. Read the
+current addresses off the `VA(...)` markers in `src/BASE/*.cpp` (for example
+`IconToBitmap` is 0xc14c0 here, not 0xd0570). The fidelity sentence above is
+also historical: all eleven RLE blitters plus the four `BASE/bmap2` blitters are
+now byte-exact, and the retail bodies keep every working value in file statics
+rather than locals (see `docs/patterns/no-local-frame-file-statics.md`).
+
 
 ## 1. Index
 
