@@ -440,6 +440,35 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `army::SpecialAttack`, `army::DoAttack` and `army::DoHydraAttack` each
   reserve `char[800]` for the `strcpy(text, gText)` copy (frames 0x43c, 0x38c,
   0x358).
+- **[Buka] `toupper` (`SOURCE/KB` 0x67c38) folds CP1251 Cyrillic.** Beyond
+  `'a'..'z'` it uppercases 0xE0..0xFF (а..я) by subtracting 0x20 and maps the
+  single 0xB8 (ё) to 0xA8 (Ё). The parameter stays `char`; the body reads it
+  through `(u8)` casts, which is what widens its /Od home slot to a dword
+  (`docs/patterns/uchar-cast-widens-param-spill.md`).
+- **[Buka] A second, inline copy of the same fold lives in a header.**
+  `/Ob1` expands it in `oldmain`, `game::GetSideDesc` (twice), `ShowCongrats`,
+  `SOURCE/GAME`, `BASE/FONT`, `SOURCE/ARMY`, `Overview`, `REQUEST`, `SPELLS`
+  and `TOWNMGR`; only `InterpretCommandLine` calls the out-of-line `toupper`.
+  The inline copy differs in one detail — it subtracts from the masked value
+  (`(u8)c - ' '`), the out-of-line one from the sign-extended byte. Modelled
+  as `CyrillicToUpper` in `include/SOURCE/KB.h`; the sites it replaced in our
+  reconstruction had been written as `x -= 'a' - 'A'`, which is not the retail
+  fold at all (it corrupts every non-ASCII first letter).
+- **[Buka] `InterpretCommandLine` (0x67ca8) dropped five switches.** The
+  `/M`, `/R`, `/D`, `/S` and `/X` options (gbDontTryMIDI, gbDontTryRedbook,
+  gbDontTryDigital, gbNoSound, xSmackFromNetwork) are gone from the option
+  switch, and with `/S` gone the `gbNoSound = false` initialiser at the top of
+  the function went too. `/Z /W /V /N /I /P /T` remain.
+- **[Buka] `oldmain` (0x66767) plays two extra Buka videos.** The intro is a
+  four-term chain `PlaySmacker(0x49) && PlaySmacker(0x42) && PlaySmacker(1)`
+  guarding `PlaySmacker(0x41)` (PoL had one guard and two videos), and the
+  credits case plays 0x48, 0x24 **and** 0x4a.
+- **[unclassified] `oldmain`'s remote player re-match keys on
+  `SNetPlayerInfo::uniqueSystemID`, not `.name`.** Both the `strcmp` against
+  `game::m_defaultPlayerNames[i*4]` and the `strcpy` back into it use offset 0
+  of the 34-byte record — the 4-byte, 3-character system id whose length the
+  guard `strlen(...) == 3` checks — while our reconstruction had used the
+  21-byte `.name` at offset 4.
 
 ### SOURCE/GAME (turn/map setup, army and spell views)
 

@@ -142,7 +142,8 @@ H2_ENUM_END(NewGameDialogConstant)
 
 H2_ENUM_CLASS_BEGIN(NewGameMapChoice)
     MAP_CHOICE_STANDARD  = 1,
-    MAP_CHOICE_EXPANSION = 2
+    MAP_CHOICE_EXPANSION = 2,
+    MAP_CHOICE_CANCEL    = GAME_DIALOG_CANCEL
 H2_ENUM_CLASS_END(NewGameMapChoice)
 
 H2_ENUM_CLASS_BEGIN(NewGamePlayerSlot)
@@ -222,7 +223,9 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
 H2_ENUM_END(NewGamePlayerLayout)
 
 H2_ENUM_BEGIN(NewGameKeyEncoding)
-    KEY_SCAN_CODE_SHIFT = 8
+    KEY_SCAN_CODE_SHIFT = 8,
+    KEY_SCAN_CODE_MASK  = 0xff00,
+    KEY_ASCII_MASK      = 0xff
 H2_ENUM_END(NewGameKeyEncoding)
 
 
@@ -239,8 +242,13 @@ void game::GetMap(void) {
     strcpy(gcCurMapName, "");
     if (gbRemoteOn && xNetHasOldPlayers) {
         NormalDialog(
-            "At least one player does not have the Heroes II Expansion set.  You will only be able "
-            "to choose from original Heroes II games.",
+            "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3"
+            "\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 "
+            "II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec"
+            "\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2"
+            "\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed"
+            "\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 "
+            "II.",
             NORMAL_DIALOG_INFO,
             -1,
             -1,
@@ -297,17 +305,17 @@ void game::ProcessNewMap(struct SMapHeader* header) {
 
 VA(0x004756e8, 0x404)
 void game::InitNewGame(struct SMapHeader* header) {
-    i32 activePlayerCount;
-    i32 unusedPlayerCount;
+    i32 humanCount;
+    i32 playerType;
     i32 player;
-    i32 computerPlayers;
-    i32 humanPlayers;
-    i32 flexiblePlayerType;
+    i32 unusedTally;
+    i32 activeColorCount;
+    i32 computerCount;
 
-    activePlayerCount = 0;
-    unusedPlayerCount = 0;
-    humanPlayers = 0;
-    computerPlayers = 0;
+    activeColorCount = 0;
+    unusedTally = 0;
+    humanCount = 0;
+    computerCount = 0;
 
     if (m_newGameInitialized && m_newGameHumanCount == giNumHumanPlayers) {
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
@@ -325,17 +333,17 @@ void game::InitNewGame(struct SMapHeader* header) {
 
         for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
             if (m_mapHeader.playerEnabled[player]) {
-                m_setupPlayerColor[activePlayerCount] = static_cast<i8>(player);
-                ++activePlayerCount;
+                m_setupPlayerColor[activeColorCount] = static_cast<i8>(player);
+                ++activeColorCount;
             }
         }
 
         for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
             if (player >= m_mapHeader.playerCount) {
                 m_setupPlayerType[player] = GAME_NETWORK_PLAYER_NONE;
-                m_setupPlayerNetworkId[player] = m_setupPlayerType[player];
+                m_setupPlayerNetworkId[player] = GAME_NETWORK_PLAYER_NONE;
                 m_setupPlayerRace[player] = FACTION_ANY;
-                m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
+                m_playerHandicap[player] = static_cast<PlayerHandicap>(-1);
             } else {
                 m_playerHandicap[player] = PLAYER_HANDICAP_NONE;
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
@@ -348,34 +356,34 @@ void game::InitNewGame(struct SMapHeader* header) {
             if (m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                 && !m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
-                m_setupPlayerNetworkId[player] = static_cast<i8>(humanPlayers);
-                ++humanPlayers;
+                m_setupPlayerNetworkId[player] = static_cast<i8>(humanCount);
+                ++humanCount;
             } else if (!m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]
                        && m_mapHeader.playerCanComputer[m_setupPlayerColor[player]]) {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
                 m_setupPlayerType[player] = GAME_PLAYER_DEFAULT;
-                ++computerPlayers;
+                ++computerCount;
             }
         }
 
-        if (humanPlayers < giNumHumanPlayers
-            && computerPlayers < m_mapHeader.playerCount - giNumHumanPlayers)
-            flexiblePlayerType = GAME_PLAYER_FLEXIBLE;
+        if (humanCount < giNumHumanPlayers
+            && computerCount < m_mapHeader.playerCount - giNumHumanPlayers)
+            playerType = GAME_PLAYER_FLEXIBLE;
         else
-            flexiblePlayerType = GAME_PLAYER_DEFAULT;
+            playerType = GAME_PLAYER_DEFAULT;
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerType[player] == GAME_NETWORK_PLAYER_NONE)
-                m_setupPlayerType[player] = static_cast<i8>(flexiblePlayerType);
+                m_setupPlayerType[player] = static_cast<i8>(playerType);
         }
 
         for (player = 0; player < m_mapHeader.playerCount; ++player) {
             if (m_setupPlayerNetworkId[player] != GAME_NETWORK_PLAYER_NONE)
                 continue;
-            if (humanPlayers < giNumHumanPlayers
+            if (humanCount < giNumHumanPlayers
                 && m_mapHeader.playerCanHuman[m_setupPlayerColor[player]]) {
-                m_setupPlayerNetworkId[player] = static_cast<i8>(humanPlayers);
-                ++humanPlayers;
+                m_setupPlayerNetworkId[player] = static_cast<i8>(humanCount);
+                ++humanCount;
             } else {
                 m_setupPlayerNetworkId[player] = GAME_COMPUTER_PLAYER;
             }
@@ -423,16 +431,15 @@ i32 game::NewGame(void) {
             MemError();
         gpWindowManager->DoDialog(choiceWindow, ExpStdGameHandler, 0);
         delete choiceWindow;
-        i16 dialogResult = static_cast<i16>(gpWindowManager->m_dialogResult);
-        if (dialogResult == GAME_DIALOG_CANCEL)
-            return 0;
-        switch (static_cast<NewGameMapChoice>(dialogResult)) {
+        switch (static_cast<NewGameMapChoice>(static_cast<i16>(gpWindowManager->m_dialogResult))) {
             case MAP_CHOICE_STANDARD:
                 xIsExpansionMap = 0;
                 break;
             case MAP_CHOICE_EXPANSION:
                 xIsExpansionMap = 1;
                 break;
+            case MAP_CHOICE_CANCEL:
+                return 0;
         }
     }
 
@@ -541,8 +548,8 @@ i32 game::NewGame(void) {
 
             strcpy(gMapName, m_mapFilename);
             mapHeaderResult = GetMapHeader(m_mapFilename, &m_mapHeader);
-            if (!mapHeaderResult || m_mapHeader.minHumanPlayers > giNumHumanPlayers
-                || m_mapHeader.maxHumanPlayers < giNumHumanPlayers)
+            if (!mapHeaderResult || giNumHumanPlayers < m_mapHeader.minHumanPlayers
+                || giNumHumanPlayers > m_mapHeader.maxHumanPlayers)
                 gpGame->GetMap();
             else
                 break;
@@ -700,15 +707,11 @@ void game::InitNewGameWindow(void) {
             PLAYER_RACE_Y,
             PLAYER_RACE_WIDTH,
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT - GAME_RACE_WIDGET_SINGLE_HEIGHT))
-                + GAME_RACE_WIDGET_SINGLE_HEIGHT
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT : GAME_RACE_WIDGET_SINGLE_HEIGHT
             ),
             "ngextra.icn",
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_RACE_WIDGET_MULTIPLAYER_FRAME - GAME_RACE_WIDGET_SINGLE_FRAME))
-                + GAME_RACE_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME : GAME_RACE_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
@@ -725,16 +728,11 @@ void game::InitNewGameWindow(void) {
             PLAYER_SELECT_Y,
             PLAYER_SELECT_WIDTH,
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT
-                    - GAME_PLAYER_WIDGET_SINGLE_HEIGHT))
-                + GAME_PLAYER_WIDGET_SINGLE_HEIGHT
+                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT : GAME_PLAYER_WIDGET_SINGLE_HEIGHT
             ),
             "ngextra.icn",
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME - GAME_PLAYER_WIDGET_SINGLE_FRAME))
-                + GAME_PLAYER_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME : GAME_PLAYER_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
@@ -753,9 +751,7 @@ void game::InitNewGameWindow(void) {
             PLAYER_COLOR_HEIGHT,
             "ngextra.icn",
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_COLOR_WIDGET_MULTIPLAYER_FRAME - GAME_COLOR_WIDGET_SINGLE_FRAME))
-                + GAME_COLOR_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME : GAME_COLOR_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
@@ -902,10 +898,10 @@ void game::UpdateNewGameWindow(void) {
     for (playerIndex3 = 0; playerIndex3 < m_mapHeader.playerCount; ++playerIndex3) {
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER) {
             sprintf(gText, "");
-        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]) != 0) {
+        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]);
         } else {
-            sprintf(gText, "Player %d", m_setupPlayerNetworkId[playerIndex3] + 1);
+            sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerIndex3] + 1);
         }
         messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         messageTemp.payload.widget.id =
@@ -913,10 +909,9 @@ void game::UpdateNewGameWindow(void) {
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (m_selectedSetupPlayer == playerIndex3)
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-        else
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+        messageTemp.payload.widget.command = playerIndex3 == m_selectedSetupPlayer
+                                                 ? NEW_GAME_WIDGET_ENABLE
+                                                 : NEW_GAME_WIDGET_DISABLE;
         messageTemp.payload.widget.id =
             NEW_GAME_PLAYER_SELECT_FIRST + playerIndex3;
         messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
@@ -933,22 +928,20 @@ void game::UpdateNewGameWindow(void) {
             NEW_GAME_COLOR_FIRST + playerIndex3;
         if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
             messageTemp.payload.widget.data.value =
-                m_setupPlayerColor[playerIndex3]
-                + (playerLockedValue ? GAME_COMPUTER_COLOR_LOCKED_FRAME
-                                     : GAME_COMPUTER_COLOR_UNLOCKED_FRAME);
+                (playerLockedValue ? GAME_COMPUTER_COLOR_LOCKED_FRAME
+                                   : GAME_COMPUTER_COLOR_UNLOCKED_FRAME)
+                + m_setupPlayerColor[playerIndex3];
         else
             messageTemp.payload.widget.data.value =
-                m_setupPlayerColor[playerIndex3]
-                + (playerLockedValue ? GAME_HUMAN_COLOR_LOCKED_FRAME
-                                     : GAME_HUMAN_COLOR_UNLOCKED_FRAME);
+                (playerLockedValue ? GAME_HUMAN_COLOR_LOCKED_FRAME
+                                   : GAME_HUMAN_COLOR_UNLOCKED_FRAME)
+                + m_setupPlayerColor[playerIndex3];
         if (giNumHumanPlayers > 1)
             messageTemp.payload.widget.data.value += GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
-        if (playerLockedValue)
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        else
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        messageTemp.payload.widget.command =
+            playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
         messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
@@ -960,10 +953,9 @@ void game::UpdateNewGameWindow(void) {
         else
             messageTemp.payload.widget.data.value = IDX(m_playerHandicap[playerIndex3]);
         m_newGameWindow->BroadcastMessage(messageTemp);
-        if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        else
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        messageTemp.payload.widget.command =
+            m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
+                                                                        : NEW_GAME_WIDGET_ENABLE;
         messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
 
@@ -978,9 +970,8 @@ void game::UpdateNewGameWindow(void) {
         messageTemp.payload.widget.id =
             NEW_GAME_RACE_CYCLE_FIRST + playerIndex3;
         messageTemp.payload.widget.data.value =
-            IDX(m_setupPlayerRace[playerIndex3])
-            + (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE
-                                 : GAME_RANDOM_RACE_FRAME_BASE);
+            (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
+            + IDX(m_setupPlayerRace[playerIndex3]);
         m_newGameWindow->BroadcastMessage(messageTemp);
 
         sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex3])]);
@@ -989,10 +980,8 @@ void game::UpdateNewGameWindow(void) {
             NEW_GAME_RACE_NAME_FIRST + playerIndex3;
         messageTemp.payload.widget.data.text = gText;
         m_newGameWindow->BroadcastMessage(messageTemp);
-        if (playerLockedValue)
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        else
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        messageTemp.payload.widget.command =
+            playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
         messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         m_newGameWindow->BroadcastMessage(messageTemp);
     }
@@ -1000,13 +989,18 @@ void game::UpdateNewGameWindow(void) {
     gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
     messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
     messageTemp.payload.widget.id = NEW_GAME_RATING;
-    sprintf(gText, "%s %d%%", "Rating", gpGame->m_difficultyRating);
+    sprintf(
+        gText,
+        "%s %d%%",
+        "\xd0\xe5\xe9\xf2\xe8\xed\xe3",
+        gpGame->m_difficultyRating
+    );
     messageTemp.payload.widget.data.text = gText;
     m_newGameWindow->BroadcastMessage(messageTemp);
     DrawNGKPDisplayString(0);
 }
 
-VA(0x0047734a, 0xd15)
+VA(0x0047734a, 0xdd1)
 MessageDispatchResult NewGameHandler(struct tag_message& message) {
     i32 transmitResultTemp;
     i32 redrawWindow = 0;
@@ -1045,12 +1039,13 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
                     message.type = MESSAGE_WIDGET;
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                     return MESSAGE_DISPATCH_FORWARD;
 
                 case GAME_REMOTE_CANCEL:
                     NormalDialog(
-                        "The host has canceled the game.",
+                        "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
+                        "\xe8\xeb \xe8\xe3\xf0\xf3.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1110,7 +1105,7 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     break;
             }
         }
-        if (glTimers[0] < static_cast<i32>(KBTickCount())) {
+        if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
             gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
             gpGame->DrawNGKPDisplayString(1);
         }
@@ -1225,7 +1220,7 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                     gbNewGameDialogOver = true;
                     return MESSAGE_DISPATCH_FORWARD;
 
@@ -1244,7 +1239,7 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                     }
                     gpWindowManager->m_dialogResult = message.payload.widget.id;
                     message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
                     gbNewGameDialogOver = true;
                     return MESSAGE_DISPATCH_FORWARD;
 
@@ -1387,7 +1382,10 @@ MessageDispatchResult NewGameHandler(struct tag_message& message) {
                                     static_cast<i8>(swapPlayerTemp);
                             } else {
                                 NormalDialog(
-                                    "The two positions selected can not be swapped.",
+                                    "\xc4\xe2\xe5 \xe2\xfb\xe1\xf0\xe0\xed\xed\xfb"
+                                    "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
+                                    "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
+                                    "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
                                     NORMAL_DIALOG_INFO,
                                     -1,
                                     -1,
@@ -1505,7 +1503,7 @@ finish:
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-VA(0x0047811b, 0x35c)
+VA(0x0047811b, 0x3f3)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
     char workText[GAME_KEY_BUFFER_SIZE];
     char keyChar;
@@ -1523,7 +1521,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_DELETE:
-            if (strlen(cNGKPCore) > NGKPcursorIndex) {
+            if (NGKPcursorIndex < strlen(cNGKPCore)) {
                 strcpy(gText, cNGKPCore + (NGKPcursorIndex + 1));
                 strcpy(cNGKPCore + NGKPcursorIndex, gText);
             }
@@ -1535,7 +1533,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
             break;
 
         case INPUT_SCAN_NUMPAD_6:
-            if (strlen(cNGKPCore) > NGKPcursorIndex)
+            if (NGKPcursorIndex < strlen(cNGKPCore))
                 ++NGKPcursorIndex;
             break;
 
@@ -1558,9 +1556,8 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                 strcpy(workText, cNGKPCore);
                 keyChar = 0;
                 if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
-                    scanCode =
-                        static_cast<u8>(static_cast<u32>(message.payload.keyboard.keyCode)
-                                        >> KEY_SCAN_CODE_SHIFT);
+                    scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
+                        >> KEY_SCAN_CODE_SHIFT;
                     switch (static_cast<NewGameKeyCode>(scanCode)) {
                         case GAME_KEYPAD_INSERT:
                             keyChar = '0';
@@ -1594,7 +1591,8 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                             break;
                     }
                 } else {
-                    keyChar = static_cast<char>(message.payload.keyboard.keyCode);
+                    keyChar =
+                        static_cast<char>(message.payload.keyboard.keyCode & KEY_ASCII_MASK);
 
                     if (keyChar == '{' || keyChar == '}')
                         keyChar = 0;
@@ -1627,7 +1625,7 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     if (giNumHumanPlayers == 1 || iMPBaseType == MULTIPLAYER_BASE_HOT_SEAT)
         return;
 
-    if (glTimers[0] < static_cast<i32>(KBTickCount())) {
+    if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
         NGKPcursorFlashOn = 1 - NGKPcursorFlashOn;
         glTimers[0] = KBTickCount() + GAME_CURSOR_FLASH_TICKS;
     }
@@ -1640,7 +1638,7 @@ void game::NGKPSetupDisplayString(char* text, u16 cursor) {
     else
         cNGKPDisplay[cursor] = '_';
 
-    if (cursor < strlen(text))
+    if (strlen(text) > cursor)
         strcpy(cNGKPDisplay + (cursor + 1), text + cursor);
     else
         cNGKPDisplay[cursor + 1] = 0;
@@ -1799,15 +1797,11 @@ void game::ShowScenInfo(void) {
             SCENARIO_PLAYER_RACE_Y,
             PLAYER_RACE_WIDTH,
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT - GAME_RACE_WIDGET_SINGLE_HEIGHT))
-                + GAME_RACE_WIDGET_SINGLE_HEIGHT
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT : GAME_RACE_WIDGET_SINGLE_HEIGHT
             ),
             "ngextra.icn",
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_RACE_WIDGET_MULTIPLAYER_FRAME - GAME_RACE_WIDGET_SINGLE_FRAME))
-                + GAME_RACE_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME : GAME_RACE_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
@@ -1826,9 +1820,7 @@ void game::ShowScenInfo(void) {
             PLAYER_COLOR_HEIGHT,
             "ngextra.icn",
             static_cast<i16>(
-                ((giNumHumanPlayers <= 1) - 1
-                 & (GAME_COLOR_WIDGET_MULTIPLAYER_FRAME - GAME_COLOR_WIDGET_SINGLE_FRAME))
-                + GAME_COLOR_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME : GAME_COLOR_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
@@ -1940,7 +1932,7 @@ void game::ShowScenInfo(void) {
         } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) != 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
-            sprintf(gText, "Player %d", m_setupPlayerNetworkId[playerCounter] + 1);
+            sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerCounter] + 1);
         }
         scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
         scenarioMessageTemp.payload.widget.id =
@@ -2040,15 +2032,21 @@ void game::GetLossConditionText(char* text) {
                 city2 = GetTown(townId12);
                 sprintf(
                     text,
-                    "Lose the %s '%s'.",
-                    (city2->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
+                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc %s '%s'.",
+                    (city2->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+                        ? "\xe7\xe0\xec\xee\xea"
+                        : "\xe3\xee\xf0\xee\xe4",
                     city2->m_name
                 );
                 break;
 
             case MAP_LOSS_HERO:
                 lossHero11 = GetHero(m_mapHeader.lossConditionValue);
-                sprintf(text, "Lose the hero '%s'.", lossHero11->m_name);
+                sprintf(
+                    text,
+                    "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'.",
+                    lossHero11->m_name
+                );
                 break;
 
             case MAP_LOSS_TIME:
@@ -2061,7 +2059,9 @@ void game::GetLossConditionText(char* text) {
                 day26 = (gpGame->m_mapHeader.lossConditionValue - 1) % GAME_DAYS_PER_WEEK + 1;
                 sprintf(
                     text,
-                    "Fail to win by the end of month %d, week %d, day %d.",
+                    "\xcd\xe5 \xee\xe4\xe5\xf0\xe6\xe0\xf2\xfc \xef\xee\xe1\xe5"
+                    "\xe4\xf3 \xe4\xee \xea\xee\xed\xf6\xe0 %d \xec\xe5\xf1\xff\xf6"
+                    "\xe0, %d \xed\xe5\xe4\xe5\xeb\xe8, %d \xe4\xed\xff.",
                     month19,
                     week2,
                     day26
@@ -2069,45 +2069,58 @@ void game::GetLossConditionText(char* text) {
                 break;
         }
     } else {
-        sprintf(text, "Lose all your heroes, towns and castles.");
+        sprintf(
+            text,
+            "\xcf\xee\xf2\xe5\xf0\xff\xf2\xfc \xe2\xf1\xe5\xf5 \xe3\xe5\xf0\xee"
+            "\xe5\xe2, \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+        );
     }
 }
 
 VA(0x00479471, 0x2cb)
 void game::GetVictoryConditionText(char* text) {
-    i32 unusedVictoryWord;
-    hero* victoryHeroData;
-    i32 firstSideIsLocalResult;
+    town* targetTown;
+    i32 localPlayerFirst;
+    hero* victoryHero;
     char firstSide[GAME_SIDE_TEXT_SIZE];
     char secondSideValue[GAME_SIDE_TEXT_SIZE];
-    town* victoryTown;
-    i32 townId;
 
     if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_ALL) {
         switch (m_mapHeader.victoryCondition) {
             case MAP_VICTORY_CAPTURE_TOWN:
-                townId = GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY);
-                victoryTown = GetTown(townId);
+                targetTown = GetTown(
+                    GetTownId(m_mapHeader.victoryConditionValue, m_mapHeader.victoryTownY)
+                );
                 sprintf(
                     text,
-                    "Capture the %s '%s'",
-                    (victoryTown->m_buildings & IDX(TOWN_BUILDING_CASTLE)) ? "castle" : "town",
-                    victoryTown->m_name
+                    "\xc7\xe0\xf5\xe2\xe0\xf2\xe8\xf2\xfc %s '%s'",
+                    (targetTown->m_buildings & IDX(TOWN_BUILDING_CASTLE))
+                        ? "\xe7\xe0\xec\xee\xea"
+                        : "\xe3\xee\xf0\xee\xe4",
+                    targetTown->m_name
                 );
                 break;
 
             case MAP_VICTORY_DEFEAT_HERO:
-                victoryHeroData = GetHero(m_mapHeader.victoryConditionValue);
-                sprintf(text, "Defeat the hero '%s'", victoryHeroData->m_name);
+                victoryHero = GetHero(m_mapHeader.victoryConditionValue);
+                sprintf(
+                    text,
+                    "\xcf\xee\xe1\xe5\xe4\xe8\xf2\xfc \xe3\xe5\xf0\xee\xff '%s'",
+                    victoryHero->m_name
+                );
                 break;
 
             case MAP_VICTORY_FIND_ARTIFACT:
                 if (m_mapHeader.victoryConditionValue == 0)
-                    sprintf(text, "Find the ultimate artifact");
+                    sprintf(
+                        text,
+                        "\xcd\xe0\xe9\xf2\xe8 \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2"
+                        "\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2"
+                    );
                 else
                     sprintf(
                         text,
-                        "Find the %s",
+                        "\xcd\xe0\xe9\xf2\xe8 %s",
                         gArtifactNames[m_mapHeader.victoryConditionValue - 1]
                     );
                 break;
@@ -2115,36 +2128,58 @@ void game::GetVictoryConditionText(char* text) {
             case MAP_VICTORY_ACCUMULATE_GOLD:
                 sprintf(
                     text,
-                    "Accumulate %d gold",
+                    "\xd1\xee\xe1\xf0\xe0\xf2\xfc %d \xe7\xee\xeb\xee\xf2\xe0",
                     m_mapHeader.victoryConditionValue * GAME_GOLD_CONDITION_MULTIPLIER
                 );
                 break;
 
             case MAP_VICTORY_DEFEAT_SIDE:
-                firstSideIsLocalResult =
+                localPlayerFirst =
                     GetSideDesc(firstSide, 0, m_mapHeader.victoryConditionValue - 1);
                 GetSideDesc(
                     secondSideValue,
                     m_mapHeader.victoryConditionValue,
                     m_mapHeader.playerCount - 1
                 );
-                if (firstSideIsLocalResult)
-                    sprintf(text, "%s must defeat %s", firstSide, secondSideValue);
+                if (localPlayerFirst)
+                    sprintf(
+                        text,
+                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
+                        "\xf2\xfc\xf1\xff",
+                        firstSide,
+                        secondSideValue
+                    );
                 else
-                    sprintf(text, "%s must defeat %s", secondSideValue, firstSide);
+                    sprintf(
+                        text,
+                        "%s \xe8 %s \xe4\xee\xeb\xe6\xed\xfb \xf1\xf0\xe0\xe7\xe8"
+                        "\xf2\xfc\xf1\xff",
+                        secondSideValue,
+                        firstSide
+                    );
         }
 
         if (m_mapHeader.victoryCondition != MAP_VICTORY_DEFEAT_SIDE
             && m_mapHeader.allowNormalVictory != 0)
             strcat(
                 text,
-                ", or you may win by defeating all enemy heroes and capturing all enemy towns and "
-                "castles."
+                ", \xe8\xeb\xe8 \xe2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe8"
+                "\xe3\xf0\xe0\xf2\xfc, \xf3\xed\xe8\xf7\xf2\xee\xe6\xe8\xe2 "
+                "\xe2\xf1\xe5\xf5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5"
+                "\xf0\xee\xe5\xe2 \xe8 \xe7\xe0\xf5\xe2\xe0\xf2\xe8\xe2 \xe2\xf1"
+                "\xe5 \xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4"
+                "\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
             );
         else
             strcat(text, ".");
     } else {
-        strcpy(text, "Defeat all enemy heroes and capture all enemy towns and castles.");
+        strcpy(
+            text,
+            "\xd3\xed\xe8\xf7\xf2\xee\xe6\xe8\xf2\xfc \xe2\xf1\xe5\xf5 \xe2\xf0"
+            "\xe0\xe6\xe5\xf1\xea\xe8\xf5 \xe3\xe5\xf0\xee\xe5\xe2  \xe8 \xe7\xe0"
+            "\xf5\xe2\xe0\xf2\xe8\xf2\xfc \xe2\xf1\xe5 \xe2\xf0\xe0\xe6\xe5\xf1"
+            "\xea\xe8\xe5 \xe3\xee\xf0\xee\xe4\xe0 \xe8 \xe7\xe0\xec\xea\xe8."
+        );
     }
 }
 
@@ -2165,10 +2200,7 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             localPlayerIndex = player5;
     }
 
-    if (localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer)
-        localPlayerOnSide = 1;
-    else
-        localPlayerOnSide = 0;
+    localPlayerOnSide = localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer ? 1 : 0;
 
     sideSize = lastPlayer - firstPlayer + 1;
     otherPlayerCount2 = sideSize - (localPlayerOnSide != 0);
@@ -2176,42 +2208,42 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     if (localPlayerOnSide) {
         if (otherPlayerCount2 != 0) {
             if (otherPlayerCount2 > 1)
-                sprintf(text, "You and your allies ");
+                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8\xe8 \xf1\xee\xfe\xe7\xed\xe8\xea\xe8 ");
             else
-                sprintf(text, "You and your ally ");
+                sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8 \xf1\xee\xfe\xe7\xed\xe8\xea ");
 
             listedPlayerCount5 = 0;
             for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
                 if (localPlayerIndex != player5) {
                     ++listedPlayerCount5;
                     sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
-                    colorName3[0] -= 'a' - 'A';
+                    colorName3[0] = CyrillicToUpper(colorName3[0]);
                     strcat(text, colorName3);
                     if (listedPlayerCount5 < otherPlayerCount2 - 1)
                         strcat(text, ", ");
                     else if (listedPlayerCount5 < otherPlayerCount2)
-                        strcat(text, " and ");
+                        strcat(text, " \xe8 ");
                 }
             }
         } else {
-            sprintf(text, "You");
+            sprintf(text, "\xc2\xfb");
         }
     } else {
         if (sideSize > 1)
-            strcpy(text, "the enemy alliance of ");
+            strcpy(text, "\xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xf1\xee\xfe\xe7 ");
         else
-            strcpy(text, "the enemy - ");
+            strcpy(text, "\xe2\xf0\xe0\xe3 - ");
 
         listedPlayerCount5 = 0;
         for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
             ++listedPlayerCount5;
             sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
-            colorName3[0] -= 'a' - 'A';
+            colorName3[0] = CyrillicToUpper(colorName3[0]);
             strcat(text, colorName3);
             if (listedPlayerCount5 < otherPlayerCount2 - 1)
                 strcat(text, ", ");
             else if (listedPlayerCount5 < otherPlayerCount2)
-                strcat(text, " and ");
+                strcat(text, " \xe8 ");
         }
     }
 
