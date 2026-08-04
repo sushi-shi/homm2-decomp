@@ -285,7 +285,42 @@ def _build_parser() -> argparse.ArgumentParser:
     srv.add_argument("addr", help="hex RVA, e.g. 0x0004a3c0")
     srv.set_defaults(func=cmd_rva)
 
+    sf = ss.add_parser("frames", help="our own frame slot names (/Z7 CodeView)")
+    sf.add_argument("unit", help="unit name, e.g. SOURCE/GAME")
+    sf.add_argument("function", nargs="?", help="substring of the mangled name")
+    sf.set_defaults(func=cmd_frames)
+
     return ap
+
+
+def cmd_frames(args) -> None:
+    """Frame-slot names our own compile produced. The retail-matching build carries
+    no debug records, so this recompiles the unit with its own flags plus /Z7 - which
+    adds CodeView records without changing /Od code - and reads the slots back.
+
+    Pair it with `homm2/core/od_slots.py`: this names the ours side of a slot solve
+    outright, leaving only retail's layout to work out."""
+    import tomllib
+
+    from homm2.analysis.od_frame_names import format_frames, frame_names
+    from homm2.build.cc_wrap import run_compile
+
+    units = tomllib.loads((REPO / "config/units.toml").read_text())
+    entry = next((u for u in units.get("unit", []) if u.get("unit") == args.unit), None)
+    if entry is None:
+        die(f"unknown unit {args.unit!r} - see config/units.toml")
+
+    obj = REPO / "build/frames" / (args.unit.replace("/", "_") + ".obj")
+    flags = [*units["flags"][entry.get("flags", "base")], "/Z7"]
+    rc, log, _timed_out = run_compile(REPO / entry["source"], obj, flags, depfile=False)
+    if rc:
+        die(f"/Z7 compile of {args.unit} failed:\n{log[-2000:]}")
+
+    out = format_frames(frame_names(obj.read_bytes()), args.function or "")
+    if not out:
+        die(f"no frame records for {args.function!r} in {args.unit}"
+            if args.function else f"no frame records in {args.unit}")
+    print(out)
 
 
 def main(argv=None) -> int:
