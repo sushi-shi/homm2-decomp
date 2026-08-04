@@ -369,11 +369,13 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_FADE_SPEED                       = 8,
     OLD_MAIN_LONG_FADE_SPEED                  = 0x80,
     OLD_MAIN_DEBUG_MEMORY_CHECK_LEVEL         = 9,
+    OLD_MAIN_INTRO_PUBLISHER_VIDEO            = 0x49,
     OLD_MAIN_INTRO_PRIMARY_VIDEO              = 0x42,
     OLD_MAIN_INTRO_FALLBACK_VIDEO             = 1,
     OLD_MAIN_INTRO_SECONDARY_VIDEO            = 0x41,
     OLD_MAIN_CREDITS_FIRST_VIDEO              = 0x48,
     OLD_MAIN_CREDITS_SECOND_VIDEO             = 0x24,
+    OLD_MAIN_CREDITS_THIRD_VIDEO              = 0x4a,
     OLD_MAIN_STANDARD_VICTORY_VIDEO           = 3,
     OLD_MAIN_EXPANSION_VICTORY_VIDEO          = 0x40,
     OLD_MAIN_NEW_GAME                         = 0x65,
@@ -383,11 +385,13 @@ H2_ENUM_BEGIN(OldMainConstant)
     OLD_MAIN_EXIT                             = 0x69,
     OLD_MAIN_SETUP_NEW                        = 0,
     OLD_MAIN_SETUP_LOAD                       = 1,
-    OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 5999,
+    OLD_MAIN_REGULAR_COMPRESSION_MEMORY_LIMIT = 6000,
     OLD_MAIN_NET_BUFFER_SIZE                  = 256,
     OLD_MAIN_NETWORK_PACKET                   = 0x20,
     OLD_MAIN_ARCHIBALD_FINAL_SCENARIO         = 10,
     OLD_MAIN_ROLAND_FINAL_SCENARIO            = 9,
+    OLD_MAIN_ARCHIBALD_FINAL_SCENARIO_NUMBER  = OLD_MAIN_ARCHIBALD_FINAL_SCENARIO + 1,
+    OLD_MAIN_ROLAND_FINAL_SCENARIO_NUMBER     = OLD_MAIN_ROLAND_FINAL_SCENARIO + 1,
     OLD_MAIN_DIALOG_WAIT                      = 6,
     OLD_MAIN_REMOTE_PREFIX_RESERVED_SIZE      = 4,
     OLD_MAIN_REMOTE_BODY_RESERVED_SIZE        = 2,
@@ -472,6 +476,17 @@ void SetupCDRom(void);
 i32 EarlySetup(void);
 i32 oldmain(void);
 char toupper(char c);
+// Codepage-1251 uppercase folding, expanded at its call sites; the out-of-line
+// toupper above carries the same ranges for the command-line parser.
+inline char CyrillicToUpper(char c) {
+    if (static_cast<u8>(c) >= 'a' && static_cast<u8>(c) <= 'z')
+        return static_cast<u8>(c) - ' ';
+    if (static_cast<u8>(c) >= 0xE0 && static_cast<u8>(c) <= 0xFF)
+        return static_cast<u8>(c) - ' ';
+    if (static_cast<u8>(c) == 0xB8)
+        return static_cast<char>(0xA8);
+    return c;
+}
 i32 InterpretCommandLine(void);
 MessageDispatchResult InitMenuHandler(struct tag_message&);
 MessageDispatchResult NullHandler(struct tag_message& msg);

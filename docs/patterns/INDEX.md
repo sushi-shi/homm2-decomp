@@ -63,3 +63,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [initializer-store-order-pins-declaration-order](initializer-store-order-pins-declaration-order.md) | frames identical, hundreds of raw bytes differ -> the `= N` store sequence is the declaration order |
 | [switch-goto-tail-stub-island](switch-goto-tail-stub-island.md) | a run of 5-byte `jmp <tail>` stubs before the epilogue, one per case, in reverse source order → the cases end in `goto`, not `break`, and the `ja` shows the tail lives inside the last case |
 | [hiword-macro-double-mask](hiword-macro-double-mask.md) | doubled `and $0xffff` after `shr $0x10` (or a mask before `movswl %dx`) → the source calls the Win32 `HIWORD` macro, not a `static_cast` |
+| [uchar-cast-widens-param-spill](uchar-cast-widens-param-spill.md) | dword spill of a one-byte `__fastcall` param + `dword & 0xff` reads → the body casts it `(unsigned char)`, the parameter is still `char` |
+| [adjacent-enum-ternary-setcc](adjacent-enum-ternary-setcc.md) | bare `xor/setcc/add K` select over two enum constants one apart → a real `?:`; adding the enumerator to a bool instead leaves an ours-only `and 0xff` |
