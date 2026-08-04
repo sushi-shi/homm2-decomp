@@ -52,436 +52,436 @@ i32 combatManager::AICheckRetreat(void) {
     if (m_heroes[IDX(m_currentSide)]->m_isCaptain != 0)
         return 0;
     if (gpGame->m_mapHeader.victoryCondition == MAP_VICTORY_DEFEAT_HERO
-        && m_heroes[IDX(m_currentSide)]->m_id
-               == gpGame->m_mapHeader.victoryConditionValue)
+        && gpGame->m_mapHeader.victoryConditionValue == m_heroes[IDX(m_currentSide)]->m_id)
         return 0;
     if (gpGame->m_players[m_heroes[IDX(m_currentSide)]->m_owner].m_townCount == 0
         && gpGame->m_players[m_heroes[IDX(m_currentSide)]->m_owner].m_heroCount
                == COMBAT_AI_LAST_HERO_COUNT)
         return 0;
 
-    hero retreatHero8;
-    armyGroup retreatArmy6;
-    armyGroup* armyGroupPtr1;
-    hero* heroPtr9;
-    i32 side9;
-    i32 armyIndex36;
-    i32 groupCount8;
-    i32 strengths1[COMBAT_SIDE_COUNT];
-    i32 artifactValues[COMBAT_SIDE_COUNT];
-    float experienceBonus17;
-    i32 artifactValue15;
-    float retreatChance7;
-    float retreatThreshold7;
+    float chance;
+    hero heroRec;
+    i32 force[COMBAT_SIDE_COUNT];
+    hero* sideHero;
+    armyGroup* armies;
+    i32 artifactTotals[COMBAT_SIDE_COUNT];
+    armyGroup retreatArmy;
+    i32 armyIndex;
+    float bonus;
+    float retreatRatio;
+    i32 artifactValue;
+    i32 sideNum;
+    i32 groupIndex;
 
-    for (side9 = 0; side9 < COMBAT_SIDE_COUNT; side9++) {
-        if (m_heroes[side9] != NULL) {
-            retreatHero8 = *m_heroes[side9];
-            heroPtr9 = &retreatHero8;
-            armyGroupPtr1 = &heroPtr9->m_army;
+    for (sideNum = 0; sideNum < COMBAT_SIDE_COUNT; sideNum++) {
+        if (m_heroes[sideNum] != NULL) {
+            heroRec = *m_heroes[sideNum];
+            sideHero = &heroRec;
+            armies = &sideHero->m_army;
         } else {
-            armyGroupPtr1 = &retreatArmy6;
-            heroPtr9 = NULL;
+            armies = &retreatArmy;
+            sideHero = NULL;
         }
 
-        for (armyIndex36 = 0; armyIndex36 < COMBAT_AI_GROUP_SLOT_COUNT; armyIndex36++) {
-            armyGroupPtr1->m_creatureTypes[armyIndex36] = -1;
-            armyGroupPtr1->m_creatureCounts[armyIndex36] = 0;
+        for (armyIndex = 0; armyIndex < COMBAT_AI_GROUP_SLOT_COUNT; armyIndex++) {
+            armies->m_creatureTypes[armyIndex] = -1;
+            armies->m_creatureCounts[armyIndex] = 0;
         }
 
-        groupCount8 = 0;
-        for (armyIndex36 = 0; armyIndex36 < COMBAT_AI_ARMY_SLOT_COUNT; armyIndex36++) {
-            if ((m_armies[side9] + armyIndex36)->IsAlive()) {
-                armyGroupPtr1->m_creatureTypes[groupCount8] = static_cast<i8>(
-                    (m_armies[side9] + armyIndex36)
+        groupIndex = 0;
+        for (armyIndex = 0; armyIndex < COMBAT_AI_ARMY_SLOT_COUNT; armyIndex++) {
+            if ((m_armies[sideNum] + armyIndex)->IsAlive()) {
+                armies->m_creatureTypes[groupIndex] = static_cast<i8>(
+                    (m_armies[sideNum] + armyIndex)
                         ->m_monsterType
                 );
-                if (HAS((m_armies[side9] + armyIndex36)
+                if (HAS((m_armies[sideNum] + armyIndex)
                             ->m_monster.flags.abilityFlags,
                         MONSTER_ABILITY_FLAG_FULL_AI_QUANTITY)
                     != 0) {
-                    armyGroupPtr1->m_creatureCounts[groupCount8] = static_cast<i16>(
-                        (m_armies[side9] + armyIndex36)
+                    armies->m_creatureCounts[groupIndex] = static_cast<i16>(
+                        (m_armies[sideNum] + armyIndex)
                             ->m_quantity
                     );
                 } else {
-                    armyGroupPtr1->m_creatureCounts[groupCount8] =
+                    armies->m_creatureCounts[groupIndex] =
                         static_cast<i16>(static_cast<i32>(
-                            (m_armies[side9] + armyIndex36)
+                            (m_armies[sideNum] + armyIndex)
                                 ->m_quantity
                             * COMBAT_AI_QUANTITY_ESTIMATE
                         ));
                 }
-                groupCount8++;
+                groupIndex++;
             }
-            if (groupCount8 >= COMBAT_AI_GROUP_SLOT_COUNT)
-                armyIndex36 = COMBAT_AI_GROUP_SCAN_DONE;
+            if (groupIndex >= COMBAT_AI_GROUP_SLOT_COUNT)
+                armyIndex = COMBAT_AI_GROUP_SCAN_DONE;
         }
 
-        strengths1[side9] =
+        force[sideNum] =
             gpPhilAI
-                ->FightValueOfStack(armyGroupPtr1, heroPtr9, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
-        if (m_combatTowns[side9] != NULL)
-            strengths1[side9] =
-                static_cast<i32>(strengths1[side9] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);
+                ->FightValueOfStack(armies, sideHero, COMBAT_AI_FIGHT_VALUE_MODE, 0, 0, 0);
+        if (m_combatTowns[sideNum] != NULL)
+            force[sideNum] =
+                static_cast<i32>(force[sideNum] * COMBAT_AI_TOWN_STRENGTH_MODIFIER);
 
-        artifactValues[side9] = 0;
-        if (heroPtr9 != NULL) {
-            for (armyIndex36 = 0; armyIndex36 < AI_BATTLE_ARTIFACT_SLOT_COUNT; armyIndex36++) {
-                if (heroPtr9->m_artifacts[armyIndex36] != ARTIFACT_NONE
-                    && IDX(heroPtr9->m_artifacts[armyIndex36])
+        artifactTotals[sideNum] = 0;
+        if (sideHero != NULL) {
+            for (armyIndex = 0; armyIndex < AI_BATTLE_ARTIFACT_SLOT_COUNT; armyIndex++) {
+                if (sideHero->m_artifacts[armyIndex] >= ARTIFACT_VALID_BEGIN
+                    && IDX(sideHero->m_artifacts[armyIndex])
                            < AI_BATTLE_BASE_ARTIFACT_LIMIT) {
-                    artifactValues[side9] +=
-                        gArtifactBaseRV[IDX(heroPtr9->m_artifacts[armyIndex36])];
+                    artifactTotals[sideNum] +=
+                        gArtifactBaseRV[IDX(sideHero->m_artifacts[armyIndex])];
                 }
             }
         }
     }
 
-    strengths1[IDX(OppositeCombatSide(m_currentSide))] = static_cast<i32>(
-        strengths1[IDX(OppositeCombatSide(m_currentSide))] * COMBAT_AI_TOWN_STRENGTH_MODIFIER
-    );
-    artifactValue15 = artifactValues[IDX(m_currentSide)];
-    if (artifactValues[IDX(m_currentSide)] < COMBAT_AI_MIN_ARTIFACT_VALUE
+    force[IDX(OppositeCombatSide(m_currentSide))] *= COMBAT_AI_TOWN_STRENGTH_MODIFIER;
+    artifactValue = artifactTotals[IDX(m_currentSide)];
+    if (artifactTotals[IDX(m_currentSide)] < COMBAT_AI_MIN_ARTIFACT_VALUE
         && m_heroes[IDX(m_currentSide)]->m_experience < COMBAT_AI_MIN_HERO_EXPERIENCE)
         return 0;
 
-    retreatChance7 = COMBAT_AI_BASE_RETREAT_CHANCE;
-    if (artifactValue15 > COMBAT_AI_HIGH_ARTIFACT_VALUE)
-        retreatChance7 = static_cast<float>(retreatChance7 + COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS);
-    else if (artifactValue15 > COMBAT_AI_MEDIUM_ARTIFACT_VALUE)
-        retreatChance7 =
-            static_cast<float>(retreatChance7 + COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS);
-    else if (artifactValue15 > 0)
-        retreatChance7 = static_cast<float>(retreatChance7 + COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS);
+    chance = COMBAT_AI_BASE_RETREAT_CHANCE;
+    if (artifactValue > COMBAT_AI_HIGH_ARTIFACT_VALUE)
+        chance = static_cast<float>(chance + COMBAT_AI_HIGH_ARTIFACT_RETREAT_BONUS);
+    else if (artifactValue > COMBAT_AI_MEDIUM_ARTIFACT_VALUE)
+        chance =
+            static_cast<float>(chance + COMBAT_AI_MEDIUM_ARTIFACT_RETREAT_BONUS);
+    else if (artifactValue > 0)
+        chance = static_cast<float>(chance + COMBAT_AI_LOW_ARTIFACT_RETREAT_BONUS);
 
-    if (strengths1[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_40000)
-        retreatChance7 -= static_cast<float>(strengths1[IDX(m_currentSide)] / COMBAT_AI_STRENGTH_20000);
-    else if (strengths1[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_30000)
-        retreatChance7 =
-            static_cast<float>(retreatChance7 - COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY);
-    else if (strengths1[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_15000)
-        retreatChance7 =
-            static_cast<float>(retreatChance7 - COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY);
-    else if (strengths1[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_5000)
-        retreatChance7 =
-            static_cast<float>(retreatChance7 - COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY);
-    else if (strengths1[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_2500)
-        retreatChance7 =
-            static_cast<float>(retreatChance7 - COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY);
+    if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_40000)
+        chance -= static_cast<float>(force[IDX(m_currentSide)] / COMBAT_AI_STRENGTH_20000);
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_30000)
+        chance =
+            static_cast<float>(chance - COMBAT_AI_STRENGTH_30000_RETREAT_PENALTY);
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_15000)
+        chance =
+            static_cast<float>(chance - COMBAT_AI_STRENGTH_15000_RETREAT_PENALTY);
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_5000)
+        chance =
+            static_cast<float>(chance - COMBAT_AI_STRENGTH_5000_RETREAT_PENALTY);
+    else if (force[IDX(m_currentSide)] > COMBAT_AI_STRENGTH_2500)
+        chance =
+            static_cast<float>(chance - COMBAT_AI_STRENGTH_2500_RETREAT_PENALTY);
 
-    retreatChance7 = static_cast<float>(
-        retreatChance7
+    chance = static_cast<float>(
+        chance
         - (COMBAT_AI_MAX_DIFFICULTY - IDX(gpGame->m_difficulty))
               * COMBAT_AI_DIFFICULTY_RETREAT_STEP
     );
-    experienceBonus17 =
+    bonus =
         static_cast<float>(m_heroes[IDX(m_currentSide)]->m_experience / COMBAT_AI_EXPERIENCE_DIVISOR);
-    if (experienceBonus17 > COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE)
-        experienceBonus17 = COMBAT_AI_MAX_EXPERIENCE_BONUS;
-    retreatChance7 += experienceBonus17;
+    if (bonus > COMBAT_AI_MAX_EXPERIENCE_BONUS_COMPARE)
+        bonus = COMBAT_AI_MAX_EXPERIENCE_BONUS;
+    chance += bonus;
     if (m_currentSide == COMBAT_ATTACKER_SIDE)
-        retreatChance7 = static_cast<float>(retreatChance7 - COMBAT_AI_ATTACKER_RETREAT_PENALTY);
-    if (retreatChance7 > COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE)
-        retreatChance7 = COMBAT_AI_MAX_RETREAT_CHANCE;
+        chance = static_cast<float>(chance - COMBAT_AI_ATTACKER_RETREAT_PENALTY);
+    if (chance > COMBAT_AI_MAX_RETREAT_CHANCE_COMPARE)
+        chance = COMBAT_AI_MAX_RETREAT_CHANCE;
 
-    if (retreatChance7
-        > (retreatThreshold7 =
-               static_cast<float>(strengths1[IDX(m_currentSide)])
-               / (strengths1[IDX(COMBAT_ATTACKER_SIDE)] + strengths1[IDX(COMBAT_DEFENDER_SIDE)])))
+    retreatRatio = static_cast<float>(force[IDX(m_currentSide)])
+                   / static_cast<double>(
+                       force[IDX(COMBAT_ATTACKER_SIDE)] + force[IDX(COMBAT_DEFENDER_SIDE)]
+                   );
+    if (retreatRatio < chance)
         return 1;
     return 0;
 }
 
 VA(0x0041628b, 0xfa0)
 void combatManager::DoCompAI(H2_ENUM_PARAM(CombatSide, i32)) {
-    u32l shooterStrengths37[COMBAT_SIDE_COUNT];
-    i32 enemyStronger3;
-    i32 attackType3;
-    u32 shooterMasks6[COMBAT_SIDE_COUNT];
-    u32 traitorMasks13[COMBAT_SIDE_COUNT];
-    u32 walkerMasks15[COMBAT_SIDE_COUNT];
-    CombatSide enemySide12;
-    u32l totalArmyStrength11;
-    CombatHexDirection adjacentDirection6;
-    army* currentArmy9;
-    i32 targetArmy16;
-    combatManager* combat2;
-    i32 fifthArmyStrength5;
-    u32 mirrorMasks7[COMBAT_SIDE_COUNT];
-    u32l enemyShooterStrength18;
-    u32 flyerMasks14[COMBAT_SIDE_COUNT];
-    u32 outOfItMasks15[COMBAT_SIDE_COUNT];
-    u32l currentShooterStrength5;
-    i32 archerLevel18;
-    i32 strongEnough16;
-    i32 numArchers6;
-    i32 goldenBowBonus;
-    i32 towerStrength4;
-    town* castle2;
-    u8 castleBoundary27[COMBAT_AI_CASTLE_BOUNDARY_COUNT];
-    i32 extraArchers29;
-    hexcell* castleCell5;
-    i32 castleRow29;
-    i32 adjacentHex8;
-    u32 castleTargetHex2;
+    u32 traitorArray[COMBAT_SIDE_COUNT];
+    i32 best;
+    CombatSide sideEnemy;
+    u32 flyerMask[COMBAT_SIDE_COUNT];
+    u32 walkers[COMBAT_SIDE_COUNT];
+    i32 stronger;
+    i32 shootStrong;
+    u32l myShootPower;
+    i32 plan;
+    u32l shootStrengths[COMBAT_SIDE_COUNT];
+    u32l enemyShooters;
+    army* thisArmy;
+    u32 oddMasks[COMBAT_SIDE_COUNT];
+    CombatHexDirection dirIndex;
+    u32l totalArmyStrength;
+    combatManager* combat;
+    i32 fifth;
+    u32 shooters[COMBAT_SIDE_COUNT];
+    i32 archers;
+    u32 mirrorMask[COMBAT_SIDE_COUNT];
+    i32 rowIndex;
+    i32 archeryBonus;
+    i32 plusArchers;
+    i32 keepStrength;
+    i32 grade;
+    town* pCastle;
+    u8 rowLimit[COMBAT_AI_CASTLE_BOUNDARY_COUNT];
+    i32 adjCell;
+    hexcell* targetCell;
+    u32 targetHex;
 
     m_limitCreature = 0;
-    currentArmy9 = m_currentArmyIndex + m_armies[IDX(m_currentArmySide)];
-    attackType3 = COMBAT_AI_ATTACK_NONE;
-    enemySide12 = OppositeCombatSide(m_currentSide);
+    thisArmy = m_currentArmyIndex + m_armies[IDX(m_currentArmySide)];
+    plan = COMBAT_AI_ATTACK_NONE;
+    sideEnemy = OppositeCombatSide(m_currentSide);
 
-    mirrorMasks7[IDX(m_currentSide)] = GetMirrorImageMask(m_currentSide);
-    mirrorMasks7[IDX(enemySide12)] = GetMirrorImageMask(enemySide12);
-    shooterMasks6[IDX(m_currentSide)] = GetShooterMask(m_currentSide);
-    shooterMasks6[IDX(enemySide12)] = GetShooterMask(enemySide12);
-    flyerMasks14[IDX(m_currentSide)] = GetFlyerMask(m_currentSide);
-    flyerMasks14[IDX(enemySide12)] = GetFlyerMask(enemySide12);
-    walkerMasks15[IDX(m_currentSide)] = GetWalkerMask(m_currentSide);
-    walkerMasks15[IDX(enemySide12)] = GetWalkerMask(enemySide12);
-    outOfItMasks15[IDX(m_currentSide)] = GetOutOfItMask(m_currentSide);
-    outOfItMasks15[IDX(enemySide12)] = GetOutOfItMask(enemySide12);
-    traitorMasks13[IDX(m_currentSide)] = GetTraitorMask(m_currentSide);
-    traitorMasks13[IDX(enemySide12)] = GetTraitorMask(enemySide12);
-    shooterStrengths37[IDX(m_currentSide)] = GetStrength(m_currentSide, shooterMasks6[IDX(m_currentSide)]);
-    shooterStrengths37[IDX(enemySide12)] = GetStrength(enemySide12, shooterMasks6[IDX(enemySide12)]);
-    totalArmyStrength11 = GetStrength(
+    mirrorMask[IDX(m_currentSide)] = GetMirrorImageMask(m_currentSide);
+    mirrorMask[IDX(sideEnemy)] = GetMirrorImageMask(sideEnemy);
+    shooters[IDX(m_currentSide)] = GetShooterMask(m_currentSide);
+    shooters[IDX(sideEnemy)] = GetShooterMask(sideEnemy);
+    flyerMask[IDX(m_currentSide)] = GetFlyerMask(m_currentSide);
+    flyerMask[IDX(sideEnemy)] = GetFlyerMask(sideEnemy);
+    walkers[IDX(m_currentSide)] = GetWalkerMask(m_currentSide);
+    walkers[IDX(sideEnemy)] = GetWalkerMask(sideEnemy);
+    oddMasks[IDX(m_currentSide)] = GetOutOfItMask(m_currentSide);
+    oddMasks[IDX(sideEnemy)] = GetOutOfItMask(sideEnemy);
+    traitorArray[IDX(m_currentSide)] = GetTraitorMask(m_currentSide);
+    traitorArray[IDX(sideEnemy)] = GetTraitorMask(sideEnemy);
+    shootStrengths[IDX(m_currentSide)] = GetStrength(m_currentSide, shooters[IDX(m_currentSide)]);
+    shootStrengths[IDX(sideEnemy)] = GetStrength(sideEnemy, shooters[IDX(sideEnemy)]);
+    totalArmyStrength = GetStrength(
         m_currentSide,
-        shooterMasks6[IDX(m_currentSide)]
-            | (flyerMasks14[IDX(m_currentSide)]
-               | (walkerMasks15[IDX(m_currentSide)]
-                  | (outOfItMasks15[IDX(m_currentSide)] | traitorMasks13[IDX(m_currentSide)])))
+        shooters[IDX(m_currentSide)] | flyerMask[IDX(m_currentSide)]
+            | walkers[IDX(m_currentSide)] | oddMasks[IDX(m_currentSide)]
+            | traitorArray[IDX(m_currentSide)]
     );
-    fifthArmyStrength5 = static_cast<i32>(totalArmyStrength11 + COMBAT_AI_STRENGTH_ROUNDING)
+    fifth = static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
                          / COMBAT_AI_STRENGTH_FRACTION;
-    strongEnough16 = 0;
-    enemyStronger3 = 0;
-    currentShooterStrength5 = GetStrength(m_currentSide, shooterMasks6[IDX(m_currentSide)]);
-    enemyShooterStrength18 = GetStrength(enemySide12, shooterMasks6[IDX(enemySide12)]);
+    shootStrong = 0;
+    stronger = 0;
+    myShootPower = GetStrength(m_currentSide, shooters[IDX(m_currentSide)]);
+    enemyShooters = GetStrength(sideEnemy, shooters[IDX(sideEnemy)]);
 
     if (m_inCastleCombat != 0) {
         if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
                 == HERO_SKILL_LEVEL_NONE
             && !m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->HasArtifact(ARTIFACT_GOLDEN_BOW)) {
             if (m_currentSide == COMBAT_ATTACKER_SIDE)
-                currentShooterStrength5 =
-                    static_cast<i32>(currentShooterStrength5) / COMBAT_SIDE_COUNT;
+                myShootPower =
+                    static_cast<i32>(myShootPower) / COMBAT_SIDE_COUNT;
             else
-                enemyShooterStrength18 =
-                    static_cast<i32>(enemyShooterStrength18) / COMBAT_SIDE_COUNT;
+                enemyShooters =
+                    static_cast<i32>(enemyShooters) / COMBAT_SIDE_COUNT;
         }
         if (m_wallStates[IDX(COMBAT_WALL_SLOT_KEEP)] == COMBAT_WALL_STATE_KEEP_STANDING) {
-            castle2 = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)];
-            m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&numArchers6, &archerLevel18);
-            extraArchers29 = 0;
+            pCastle = m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)];
+            m_combatTowns[IDX(COMBAT_DEFENDER_SIDE)]->CalcNumLevelArchers(&archers, &grade);
+            plusArchers = 0;
             if (m_wallStates[IDX(COMBAT_WALL_SLOT_TOP_TOWER)]
                 == COMBAT_WALL_STATE_TOWER_STANDING)
-                extraArchers29 += numArchers6 / COMBAT_SIDE_COUNT;
+                plusArchers += archers / COMBAT_SIDE_COUNT;
             if (m_wallStates[IDX(COMBAT_WALL_SLOT_BOTTOM_TOWER)]
                 == COMBAT_WALL_STATE_TOWER_STANDING)
-                extraArchers29 += numArchers6 / COMBAT_SIDE_COUNT;
-            numArchers6 += extraArchers29;
-            towerStrength4 = static_cast<i32>(
-                (archerLevel18 * COMBAT_AI_TOWER_LEVEL_SCALE + COMBAT_AI_TOWER_BASE_SCALE)
-                * (numArchers6 * COMBAT_AI_TOWER_STRENGTH)
+                plusArchers += archers / COMBAT_SIDE_COUNT;
+            archers += plusArchers;
+            keepStrength = static_cast<i32>(
+                archers * COMBAT_AI_TOWER_STRENGTH
+                * (grade * COMBAT_AI_TOWER_LEVEL_SCALE + COMBAT_AI_TOWER_BASE_SCALE)
             );
-            if (m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
-                && (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
-                    || m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
-                           != HERO_SKILL_LEVEL_NONE))
-                goldenBowBonus = 0;
-            else
-                goldenBowBonus = 1;
+            archeryBonus =
+                m_heroes[IDX(COMBAT_ATTACKER_SIDE)] != NULL
+                        && (m_heroes[IDX(COMBAT_ATTACKER_SIDE)]->HasArtifact(ARTIFACT_GOLDEN_BOW)
+                            || m_heroes[IDX(COMBAT_ATTACKER_SIDE)]
+                                       ->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)]
+                                   != HERO_SKILL_LEVEL_NONE)
+                    ? 0
+                    : 1;
             if (m_currentSide == COMBAT_DEFENDER_SIDE)
-                currentShooterStrength5 += towerStrength4;
+                myShootPower += keepStrength;
             else
-                enemyShooterStrength18 += towerStrength4;
+                enemyShooters += keepStrength;
         }
     }
 
     if (m_heroes[IDX(m_currentSide)] != NULL) {
-        currentShooterStrength5 = static_cast<i32>(
-            static_cast<i32>(currentShooterStrength5)
+        myShootPower = static_cast<i32>(
+            static_cast<i32>(myShootPower)
             * gfSSArcheryMod
                 [IDX(m_heroes[IDX(m_currentSide)]->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])]
         );
     }
     if (m_heroes[IDX(OppositeCombatSide(m_currentSide))] != NULL) {
-        enemyShooterStrength18 = static_cast<i32>(
-            static_cast<i32>(enemyShooterStrength18)
+        enemyShooters = static_cast<i32>(
+            static_cast<i32>(enemyShooters)
             * gfSSArcheryMod
                 [IDX(m_heroes[IDX(OppositeCombatSide(m_currentSide))]
                          ->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])]
         );
     }
-    if (static_cast<i32>(currentShooterStrength5)
-        > static_cast<i32>(totalArmyStrength11 + COMBAT_AI_STRENGTH_ROUNDING)
-              / COMBAT_AI_STRENGTH_FRACTION)
-        strongEnough16 = 1;
-    if (static_cast<i32>(enemyShooterStrength18) > static_cast<i32>(currentShooterStrength5))
-        enemyStronger3 = 1;
+    if (static_cast<i32>(totalArmyStrength + COMBAT_AI_STRENGTH_ROUNDING)
+            / COMBAT_AI_STRENGTH_FRACTION
+        < static_cast<i32>(myShootPower))
+        shootStrong = 1;
+    if (static_cast<i32>(enemyShooters) > static_cast<i32>(myShootPower))
+        stronger = 1;
 
-    if (HAS(currentArmy9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
-        if (currentArmy9->m_monster.shots > 0)
-            attackType3 = COMBAT_AI_ATTACK_SHOOT;
+    if (HAS(thisArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0) {
+        if (thisArmy->m_monster.shots > 0)
+            plan = COMBAT_AI_ATTACK_SHOOT;
         else
-            attackType3 = COMBAT_AI_ATTACK_WALK;
-    } else if (HAS(currentArmy9->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0) {
-        attackType3 = COMBAT_AI_ATTACK_FLY;
+            plan = COMBAT_AI_ATTACK_WALK;
+    } else if (HAS(thisArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_FLYING) != 0) {
+        plan = COMBAT_AI_ATTACK_FLY;
     } else {
-        attackType3 = COMBAT_AI_ATTACK_WALK;
+        plan = COMBAT_AI_ATTACK_WALK;
     }
 
-    switch (attackType3) {
+    switch (plan) {
         case COMBAT_AI_ATTACK_SHOOT:
-            if (AttemptAdjacentAttack(currentArmy9))
+            if (AttemptAdjacentAttack(thisArmy))
                 goto finish;
-            if (currentArmy9->m_monsterType == CREATURE_LICH
-                || currentArmy9->m_monsterType == CREATURE_POWER_LICH) {
-                DoLichShot(currentArmy9);
+            if (thisArmy->m_monsterType == CREATURE_LICH
+                || thisArmy->m_monsterType == CREATURE_POWER_LICH) {
+                DoLichShot(thisArmy);
                 goto finish;
             }
-            targetArmy16 = GetBestArmy(enemySide12, mirrorMasks7[IDX(enemySide12)]);
-            if (targetArmy16 != -1) {
+            best = GetBestArmy(sideEnemy, mirrorMask[IDX(sideEnemy)]);
+            if (best != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[IDX(enemySide12)] + targetArmy16)
+                    (m_armies[IDX(sideEnemy)] + best)
                         ->m_hex;
                 goto finish;
             }
-            targetArmy16 = GetBestArmy(enemySide12, shooterMasks6[IDX(enemySide12)]);
-            if (targetArmy16 != -1) {
+            best = GetBestArmy(sideEnemy, shooters[IDX(sideEnemy)]);
+            if (best != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[IDX(enemySide12)] + targetArmy16)
+                    (m_armies[IDX(sideEnemy)] + best)
                         ->m_hex;
                 goto finish;
             }
-            targetArmy16 = GetBestArmy(enemySide12, flyerMasks14[IDX(enemySide12)]);
-            if (targetArmy16 != -1) {
+            best = GetBestArmy(sideEnemy, flyerMask[IDX(sideEnemy)]);
+            if (best != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[IDX(enemySide12)] + targetArmy16)
+                    (m_armies[IDX(sideEnemy)] + best)
                         ->m_hex;
                 goto finish;
             }
-            if (walkerMasks15[IDX(enemySide12)] != 0) {
-                targetArmy16 =
-                    GetClosestArmy(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]);
-                if (targetArmy16 != -1) {
+            if (walkers[IDX(sideEnemy)] != 0) {
+                best =
+                    GetClosestArmy(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]);
+                if (best != -1) {
                     giNextAction = ACTION_MOVE;
                     giNextActionGridIndex =
-                        (m_armies[IDX(enemySide12)] + targetArmy16)
+                        (m_armies[IDX(sideEnemy)] + best)
                             ->m_hex;
                     goto finish;
                 }
             }
-            targetArmy16 = GetBestArmy(enemySide12, outOfItMasks15[IDX(enemySide12)]);
-            if (targetArmy16 != -1) {
+            best = GetBestArmy(sideEnemy, oddMasks[IDX(sideEnemy)]);
+            if (best != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[IDX(enemySide12)] + targetArmy16)
+                    (m_armies[IDX(sideEnemy)] + best)
                         ->m_hex;
                 goto finish;
             }
-            targetArmy16 = GetBestArmy(enemySide12, traitorMasks13[IDX(enemySide12)]);
-            if (targetArmy16 != -1) {
+            best = GetBestArmy(sideEnemy, traitorArray[IDX(sideEnemy)]);
+            if (best != -1) {
                 giNextAction = ACTION_MOVE;
                 giNextActionGridIndex =
-                    (m_armies[IDX(enemySide12)] + targetArmy16)
+                    (m_armies[IDX(sideEnemy)] + best)
                         ->m_hex;
                 goto finish;
             }
             break;
         case COMBAT_AI_ATTACK_FLY:
-            if (strongEnough16 != 0 && enemyStronger3 == 0) {
-                if (AttemptAttack(currentArmy9, enemySide12, mirrorMasks7[IDX(enemySide12)]))
+            if (shootStrong != 0 && stronger == 0) {
+                if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, shooterMasks6[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, shooters[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, flyerMasks14[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, flyerMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, outOfItMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, oddMasks[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, traitorArray[IDX(sideEnemy)]))
                     goto finish;
             } else {
-                if (AttemptAttack(currentArmy9, enemySide12, mirrorMasks7[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, shooterMasks6[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, shooters[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, flyerMasks14[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, flyerMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, outOfItMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, oddMasks[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, traitorArray[IDX(sideEnemy)]))
                     goto finish;
             }
             break;
         case COMBAT_AI_ATTACK_WALK:
-            if (strongEnough16 != 0 && enemyStronger3 == 0) {
-                if (AttemptAttack(currentArmy9, enemySide12, mirrorMasks7[IDX(enemySide12)]))
+            if (COMBAT_AI_ATTACK_NONE)
+                goto finish;
+            if (shootStrong != 0 && stronger == 0) {
+                if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, shooterMasks6[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, shooters[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, flyerMasks14[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, flyerMask[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, outOfItMasks15[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, oddMasks[IDX(sideEnemy)]))
                     goto finish;
-                if (AttemptAttack(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
+                if (AttemptAttack(thisArmy, sideEnemy, traitorArray[IDX(sideEnemy)]))
                     goto finish;
-                if (WalkTowardArmyFront(currentArmy9, m_currentSide, shooterMasks6[IDX(m_currentSide)]))
+                if (WalkTowardArmyFront(thisArmy, m_currentSide, shooters[IDX(m_currentSide)]))
                     goto finish;
                 giNextAction = ACTION_WAIT;
                 goto finish;
             }
-            if (AttemptAttack(currentArmy9, enemySide12, mirrorMasks7[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, mirrorMask[IDX(sideEnemy)]))
                 goto finish;
-            if (AttemptAttack(currentArmy9, enemySide12, shooterMasks6[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, shooters[IDX(sideEnemy)]))
                 goto finish;
-            if (AttemptAttack(currentArmy9, enemySide12, flyerMasks14[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, flyerMask[IDX(sideEnemy)]))
                 goto finish;
-            if (AttemptAttack(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]))
                 goto finish;
-            if (AttemptAttack(currentArmy9, enemySide12, outOfItMasks15[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, oddMasks[IDX(sideEnemy)]))
                 goto finish;
-            if (AttemptAttack(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
+            if (AttemptAttack(thisArmy, sideEnemy, traitorArray[IDX(sideEnemy)]))
                 goto finish;
-            if (WalkTowardArmy(currentArmy9, enemySide12, shooterMasks6[IDX(enemySide12)]))
+            if (WalkTowardArmy(thisArmy, sideEnemy, shooters[IDX(sideEnemy)]))
                 goto finish;
-            if (WalkTowardArmy(currentArmy9, enemySide12, walkerMasks15[IDX(enemySide12)]))
+            if (WalkTowardArmy(thisArmy, sideEnemy, walkers[IDX(sideEnemy)]))
                 goto finish;
-            if (WalkTowardArmy(currentArmy9, enemySide12, flyerMasks14[IDX(enemySide12)]))
+            if (WalkTowardArmy(thisArmy, sideEnemy, flyerMask[IDX(sideEnemy)]))
                 goto finish;
-            if (WalkTowardArmy(currentArmy9, enemySide12, outOfItMasks15[IDX(enemySide12)]))
+            if (WalkTowardArmy(thisArmy, sideEnemy, oddMasks[IDX(sideEnemy)]))
                 goto finish;
-            if (WalkTowardArmy(currentArmy9, enemySide12, traitorMasks13[IDX(enemySide12)]))
+            if (WalkTowardArmy(thisArmy, sideEnemy, traitorArray[IDX(sideEnemy)]))
                 goto finish;
 
-            castleBoundary27[0] = COMBAT_AI_CASTLE_BOUNDARY_ROW_0;
-            castleBoundary27[1] = COMBAT_AI_CASTLE_BOUNDARY_ROW_1;
-            castleBoundary27[2] = COMBAT_AI_CASTLE_BOUNDARY_ROW_2;
-            castleBoundary27[3] = COMBAT_AI_CASTLE_BOUNDARY_ROW_3;
-            castleBoundary27[4] = COMBAT_AI_CASTLE_BOUNDARY_ROW_4;
-            castleBoundary27[5] = COMBAT_AI_CASTLE_BOUNDARY_ROW_5;
-            castleBoundary27[6] = COMBAT_AI_CASTLE_BOUNDARY_ROW_6;
-            castleBoundary27[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
-            castleBoundary27[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
-            castleRow29 = currentArmy9->m_hex / ARMY_HEX_COLUMNS;
+            rowLimit[0] = COMBAT_AI_CASTLE_BOUNDARY_ROW_0;
+            rowLimit[1] = COMBAT_AI_CASTLE_BOUNDARY_ROW_1;
+            rowLimit[2] = COMBAT_AI_CASTLE_BOUNDARY_ROW_2;
+            rowLimit[3] = COMBAT_AI_CASTLE_BOUNDARY_ROW_3;
+            rowLimit[4] = COMBAT_AI_CASTLE_BOUNDARY_ROW_4;
+            rowLimit[5] = COMBAT_AI_CASTLE_BOUNDARY_ROW_5;
+            rowLimit[6] = COMBAT_AI_CASTLE_BOUNDARY_ROW_6;
+            rowLimit[7] = COMBAT_AI_CASTLE_BOUNDARY_ROW_7;
+            rowLimit[8] = COMBAT_AI_CASTLE_BOUNDARY_ROW_8;
+            rowIndex = thisArmy->m_hex / ARMY_HEX_COLUMNS;
             if (m_currentSide == COMBAT_ATTACKER_SIDE && m_inCastleCombat != 0
-                && currentArmy9->m_hex < castleBoundary27[castleRow29]) {
-                castleTargetHex2 = castleBoundary27[castleRow29];
-                castleCell5 = &gpCombatManager->m_hexCells[castleTargetHex2];
-                if (ValidHex(castleTargetHex2) && castleCell5->m_occupantSide == COMBAT_SIDE_NONE
-                    && castleCell5->m_blocked == 0) {
+                && thisArmy->m_hex < rowLimit[rowIndex]) {
+                targetHex = rowLimit[rowIndex];
+                targetCell = &gpCombatManager->m_hexCells[targetHex];
+                if (ValidHex(targetHex) && targetCell->m_occupantSide == COMBAT_SIDE_NONE
+                    && targetCell->m_blocked == 0) {
                     giNextAction = ACTION_MOVE;
-                    giNextActionGridIndex = castleTargetHex2;
+                    giNextActionGridIndex = targetHex;
                     goto finish;
                 }
             }
@@ -493,17 +493,17 @@ finish:
     if (giNextAction == ACTION_MOVE && giNextActionGridIndex > 0
         && giNextActionGridIndex < COMBAT_HEX_COUNT
         && gpCombatManager->m_hexCells[giNextActionGridIndex].m_occupantSide == COMBAT_SIDE_NONE) {
-        for (adjacentDirection6 = COMBAT_DIRECTION_NORTHEAST;
-             IDX(adjacentDirection6) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
-             adjacentDirection6++) {
-            adjacentHex8 = currentArmy9->GetAdjacentCellIndex(
-                giNextActionGridIndex, adjacentDirection6
+        for (dirIndex = COMBAT_DIRECTION_NORTHEAST;
+             IDX(dirIndex) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             dirIndex++) {
+            adjCell = thisArmy->GetAdjacentCellIndex(
+                giNextActionGridIndex, dirIndex
             );
-            if (adjacentHex8 > 0 && adjacentHex8 < COMBAT_HEX_COUNT
-                && gpCombatManager->m_hexCells[adjacentHex8].m_occupantSide
+            if (adjCell > 0 && adjCell < COMBAT_HEX_COUNT
+                && gpCombatManager->m_hexCells[adjCell].m_occupantSide
                        == OppositeCombatSide(m_currentSide)) {
-                giNextActionGridIndex = adjacentHex8;
-                break;
+                giNextActionGridIndex = adjCell;
+                return;
             }
         }
     }
@@ -513,10 +513,10 @@ VA(0x0041722b, 0xab)
 float combatManager::GetModLichDamage(class army* target, float damage) {
     float modifiedDamage = damage;
     float remainingHitPoints = static_cast<float>(
-        target->m_monster.hitPoints * target->m_quantity - target->m_hitPointsLost
+        target->m_quantity * target->m_monster.hitPoints - target->m_hitPointsLost
     );
 
-    if (remainingHitPoints < modifiedDamage)
+    if (modifiedDamage > remainingHitPoints)
         modifiedDamage = remainingHitPoints;
     if (HAS(target->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_SHOOTER) != 0)
         modifiedDamage = static_cast<float>(modifiedDamage * COMBAT_AI_LICH_PRIORITY_MULTIPLIER);
@@ -529,60 +529,59 @@ float combatManager::GetModLichDamage(class army* target, float damage) {
 
 VA(0x004172d6, 0x293)
 void combatManager::DoLichShot(class army* lich) {
-    i32 bestArmy12 = COMBAT_AI_NO_ARMY;
-    float bestDamage15 = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
-    float lichDamage5 = static_cast<float>(lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
-    i32 armyIndex37;
-    u8 damaged19[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
-    float damageValue10;
-    float adjacentDamage6;
-    CombatHexDirection direction37;
-    i32 adjacentHex13;
-    i32 targetHex36;
-    army* target17;
+    float splashDamage;
+    i32 armyIndex;
+    i32 bestIndex = COMBAT_AI_NO_ARMY;
+    float bestTotal = COMBAT_AI_MIN_LICH_DAMAGE_SCORE;
+    float shotDamage = static_cast<float>(lich->m_quantity * COMBAT_AI_LICH_DAMAGE_PER_CREATURE);
+    i32 sideHex;
+    float score;
+    CombatHexDirection iDir;
+    army* targetArmy;
+    u8 marked[IDX(COMBAT_SIDE_COUNT) * COMBAT_AI_ARMY_SLOT_COUNT];
+    i32 targetHex;
 
-    for (armyIndex37 = 0; armyIndex37 < m_armyCount[IDX(OppositeCombatSide(m_currentSide))];
-         armyIndex37++) {
-        memset(damaged19, 0, sizeof(damaged19));
-        damageValue10 = 0;
-        target17 = &m_armies[IDX(OppositeCombatSide(m_currentSide))][armyIndex37];
-        if (target17 == NULL
-            || HAS(target17->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
-            || target17->m_quantity <= 0)
+    for (armyIndex = 0; armyIndex < m_armyCount[IDX(OppositeCombatSide(m_currentSide))];
+         armyIndex++) {
+        memset(marked, 0, sizeof(marked));
+        score = 0;
+        targetArmy = &m_armies[IDX(OppositeCombatSide(m_currentSide))][armyIndex];
+        if (targetArmy == NULL
+            || HAS(targetArmy->m_monster.flags.abilityFlags, MONSTER_ABILITY_FLAG_AI_EXCLUDED) != 0
+            || targetArmy->m_quantity <= 0)
             continue;
-        damageValue10 = GetModLichDamage(target17, lichDamage5);
-        damaged19[IDX(target17->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + target17->m_index] = 1;
-        targetHex36 = target17->m_hex;
-        for (direction37 = COMBAT_DIRECTION_NORTHEAST;
-             IDX(direction37) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
-             direction37++) {
-            adjacentHex13 = GetAdjacentCellIndexNoArmy(targetHex36, direction37);
-            if (adjacentHex13 >= 0 && adjacentHex13 < COMBAT_HEX_COUNT
-                && m_hexCells[adjacentHex13].m_occupantSide != COMBAT_SIDE_NONE
-                && m_hexCells[adjacentHex13].m_occupantIndex != -1
-                && damaged19
-                           [IDX(m_hexCells[adjacentHex13].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
-                            + m_hexCells[adjacentHex13].m_occupantIndex]
+        score = GetModLichDamage(targetArmy, shotDamage);
+        *(marked + IDX(targetArmy->m_side) * COMBAT_AI_ARMY_SLOT_COUNT + targetArmy->m_index) =
+            1;
+        targetHex = targetArmy->m_hex;
+        for (iDir = COMBAT_DIRECTION_NORTHEAST;
+             IDX(iDir) < COMBAT_AI_ADJACENT_DIRECTION_COUNT;
+             iDir++) {
+            sideHex = GetAdjacentCellIndexNoArmy(targetHex, iDir);
+            if (sideHex >= 0 && sideHex < COMBAT_HEX_COUNT
+                && m_hexCells[sideHex].m_occupantSide != COMBAT_SIDE_NONE
+                && m_hexCells[sideHex].m_occupantIndex != -1
+                && *(marked + IDX(m_hexCells[sideHex].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
+                     + m_hexCells[sideHex].m_occupantIndex)
                        == 0) {
-                adjacentDamage6 = GetModLichDamage(
-                    &m_armies[IDX(m_hexCells[adjacentHex13].m_occupantSide)]
-                             [m_hexCells[adjacentHex13].m_occupantIndex],
-                    lichDamage5
+                splashDamage = GetModLichDamage(
+                    &m_armies[IDX(m_hexCells[sideHex].m_occupantSide)]
+                             [m_hexCells[sideHex].m_occupantIndex],
+                    shotDamage
                 );
-                damaged19
-                    [IDX(m_hexCells[adjacentHex13].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
-                     + m_hexCells[adjacentHex13].m_occupantIndex] = 1;
-                if (m_hexCells[adjacentHex13].m_occupantSide == m_currentSide)
-                    damageValue10 -= adjacentDamage6;
+                *(marked + IDX(m_hexCells[sideHex].m_occupantSide) * COMBAT_AI_ARMY_SLOT_COUNT
+                  + m_hexCells[sideHex].m_occupantIndex) = 1;
+                if (m_hexCells[sideHex].m_occupantSide == m_currentSide)
+                    score -= splashDamage;
                 else
-                    damageValue10 += adjacentDamage6;
+                    score += splashDamage;
             }
         }
-        if (bestArmy12 == COMBAT_AI_NO_ARMY || damageValue10 > bestDamage15) {
-            bestDamage15 = damageValue10;
-            bestArmy12 = armyIndex37;
+        if (bestIndex == COMBAT_AI_NO_ARMY || score > bestTotal) {
+            bestTotal = score;
+            bestIndex = armyIndex;
             giNextAction = ACTION_MOVE;
-            giNextActionGridIndex = targetHex36;
+            giNextActionGridIndex = targetHex;
         }
     }
 }
@@ -806,32 +805,32 @@ VA(0x00417d6e, 0x12e)
 i32 combatManager::GetClosestArmy(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
-    i32 armyIndex2 = 0;
-    u32 bit1 = COMBAT_AI_MASK_FIRST_BIT;
-    i32 closestValue29 = COMBAT_AI_CLOSEST_ARMY_LIMIT;
-    i32 closestArmy7 = COMBAT_AI_NO_ARMY;
-    i32 value19;
-    army* target26;
+    i32 armyIndex = 0;
+    army* target;
+    u32 bitFlag = COMBAT_AI_MASK_FIRST_BIT;
+    i32 bestValue = COMBAT_AI_CLOSEST_ARMY_LIMIT;
+    i32 armyFound = COMBAT_AI_NO_ARMY;
+    i32 val;
 
-    for (armyIndex2 = 0; armyIndex2 < m_armyCount[IDX(side)]; armyIndex2++) {
-        if ((bit1 & mask) != 0) {
-            target26 = &m_armies[IDX(side)][armyIndex2];
-            value19 = gpSearchArray->QuickDistance(
+    for (armyIndex = 0; armyIndex < m_armyCount[IDX(side)]; armyIndex++) {
+        if ((mask & bitFlag) != 0) {
+            target = &m_armies[IDX(side)][armyIndex];
+            val = gpSearchArray->QuickDistance(
                 m_hexCells[currentArmy->m_hex].m_x,
                 m_hexCells[currentArmy->m_hex].m_y,
-                m_hexCells[target26->m_hex].m_x,
-                m_hexCells[target26->m_hex].m_y
+                m_hexCells[target->m_hex].m_x,
+                m_hexCells[target->m_hex].m_y
             );
-            value19 = value19 * COMBAT_AI_DISTANCE_WEIGHT
-                      - target26->m_monster.hitPoints * target26->m_quantity;
-            if (closestValue29 > value19) {
-                closestArmy7 = armyIndex2;
-                closestValue29 = value19;
+            val = val * COMBAT_AI_DISTANCE_WEIGHT
+                  - target->m_quantity * target->m_monster.hitPoints;
+            if (val < bestValue) {
+                armyFound = armyIndex;
+                bestValue = val;
             }
         }
-        bit1 <<= 1;
+        bitFlag <<= 1;
     }
-    return closestArmy7;
+    return armyFound;
 }
 
 VA(0x00417e9c, 0xa6)
@@ -906,8 +905,9 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
     u32 oneBit;
     u32 enemyMask;
     CombatHexDirection direction;
-    i32 attackHexes[ARMY_ATTACK_HEX_COUNT];
+    i32 hexes;
     i32 enemyArmy;
+    i32 destHex;
 
     if (availableMask4 == 0)
         return 0;
@@ -923,10 +923,10 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
                 direction,
                 ARMY_ATTACK_TARGET_ENEMY,
                 ARMY_HEX_INVALID,
-                attackHexes
+                &destHex
             )
-            && attackHexes[0] >= 0)
-            enemyMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
+            && destHex >= 0)
+            enemyMask |= 1 << m_hexCells[destHex].m_occupantIndex;
         oneBit <<= 1;
     }
     if (currentArmy->m_monsterType == CREATURE_GHOST)
@@ -946,59 +946,56 @@ VA(0x004181fe, 0x207)
 i32 combatManager::WalkTowardArmyFront(
     class army* currentArmy, H2_ENUM_PARAM(CombatSide, i32) side, i32 mask
 ) {
-    i32 targetArmy6;
-    i32 frontOffset13;
-    i32 targetHex7;
-    i32 savedSpeed11;
-    i32 pathFound6;
-    i32 movement3;
-    i32 pathIndex12;
+    i32 armyIndex;
+    i32 frontDelta;
+    i32 frontHex;
+    i32 oldSpeed;
+    i32 pathFound;
+    i32 left;
+    i32 step;
 
     currentArmy->m_targetSide = COMBAT_AI_NO_ARMY;
     currentArmy->m_targetIndex = COMBAT_AI_NO_ARMY;
-    targetArmy6 = GetClosestArmy(currentArmy, side, mask);
-    if (targetArmy6 == COMBAT_AI_NO_ARMY)
+    armyIndex = GetClosestArmy(currentArmy, side, mask);
+    if (armyIndex == COMBAT_AI_NO_ARMY)
         return 0;
 
-    frontOffset13 = SINGLE_HEX_FRONT_OFFSET;
-    targetHex7 = targetArmy6[m_armies[IDX(side)]].m_hex;
-    if (HAS(targetArmy6[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
+    frontDelta = SINGLE_HEX_FRONT_OFFSET;
+    frontHex = armyIndex[m_armies[IDX(side)]].m_hex;
+    if (HAS(armyIndex[m_armies[IDX(side)]].m_monster.flags.abilityFlags,
             MONSTER_ABILITY_FLAG_WIDE)
         != 0)
-        frontOffset13 = WIDE_CREATURE_FRONT_OFFSET;
-    if (currentArmy->m_facing == ARMY_FACING_RIGHT)
-        targetHex7 += frontOffset13;
-    else
-        targetHex7 += -frontOffset13;
-    if (targetHex7 % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1 || targetHex7 % ARMY_HEX_COLUMNS == 0)
+        frontDelta = WIDE_CREATURE_FRONT_OFFSET;
+    frontHex += currentArmy->m_facing == ARMY_FACING_RIGHT ? frontDelta : -frontDelta;
+    if (frontHex % ARMY_HEX_COLUMNS == ARMY_HEX_COLUMNS - 1 || frontHex % ARMY_HEX_COLUMNS == 0)
         return WalkTowardArmy(currentArmy, side, mask);
 
-    savedSpeed11 = currentArmy->m_monster.speed;
+    oldSpeed = currentArmy->m_monster.speed;
     currentArmy->m_monster.speed = COMBAT_AI_UNLIMITED_PATH_SPEED;
-    pathFound6 = gpSearchArray->FindCombatPath(
+    pathFound = gpSearchArray->FindCombatPath(
         currentArmy->m_hex,
-        targetHex7,
+        frontHex,
         currentArmy,
         COMBAT_AI_PATH_TO_FRONT,
         0
     );
-    currentArmy->m_monster.speed = static_cast<i8>(savedSpeed11);
+    currentArmy->m_monster.speed = static_cast<i8>(oldSpeed);
     if (gpSearchArray->m_pathLength > 0) {
         giNextAction = ACTION_MOVE;
-        movement3 = currentArmy->m_monster.speed;
-        pathIndex12 = gpSearchArray->m_pathLength - 1;
+        left = currentArmy->m_monster.speed;
+        step = gpSearchArray->m_pathLength - 1;
         giNextActionGridIndex = currentArmy->m_hex;
-        while (pathIndex12 >= 0 && movement3 != 0) {
+        while (step >= 0 && left != 0) {
             giNextActionGridIndex = currentArmy->GetAdjacentCellIndex(
                 giNextActionGridIndex,
                 static_cast<CombatHexDirection>(
-                    gpSearchArray->m_storage.aiPath.directions[pathIndex12]
+                    gpSearchArray->m_storage.aiPath.directions[step]
                 )
             );
-            pathIndex12--;
-            movement3--;
+            step--;
+            left--;
             if (giNextActionGridIndex > 0 && bIsMoatSlowed[giNextActionGridIndex] != 0)
-                movement3 = 0;
+                left = 0;
         }
         return 1;
     }
