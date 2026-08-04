@@ -126,6 +126,7 @@ i32 swapManager::Open(i32 id) {
     SetWinText(m_window, WINDOW_TEXT_ID);
 
     tag_message message;
+    i32 skillWidget;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_ICON;
     sprintf(gText, "port%04d.icn", IDX(m_heroes[IDX(SWAP_SIDE_LEFT)]->m_portrait));
@@ -148,28 +149,28 @@ i32 swapManager::Open(i32 id) {
     message.payload.widget.id = TITLE_WIDGET;
     m_window->BroadcastMessage(message);
 
-    for (SwapManagerSide side_6 = SWAP_SIDE_LEFT; side_6 < SWAP_SIDE_COUNT; ++side_6) {
-        for (i32 skillSlot = 0; skillSlot < SECONDARY_SKILL_WIDGET_COUNT; ++skillSlot) {
-            if (skillSlot < m_heroes[IDX(side_6)]->m_secondarySkillCount) {
+    for (SwapManagerSide swapSide = SWAP_SIDE_LEFT; swapSide < SWAP_SIDE_COUNT; ++swapSide) {
+        for (skillWidget = 0; skillWidget < SECONDARY_SKILL_WIDGET_COUNT; ++skillWidget) {
+            if (skillWidget < m_heroes[IDX(swapSide)]->m_secondarySkillCount) {
                 message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
-                message.payload.widget.data.value = IDX(m_heroes[IDX(side_6)]->GetNthSS(skillSlot));
+                message.payload.widget.data.value = IDX(m_heroes[IDX(swapSide)]->GetNthSS(skillWidget));
                 m_window->BroadcastMessage(message);
 
                 message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
                                             + CONTROL_LEFT_SKILL_LEVEL_FIRST;
                 message.payload.widget.data.text = gText;
                 sprintf(
                     gText,
                     "%d",
-                    m_heroes[IDX(side_6)]->GetSSLevel(m_heroes[IDX(side_6)]->GetNthSS(skillSlot))
+                    m_heroes[IDX(swapSide)]->GetSSLevel(m_heroes[IDX(swapSide)]->GetNthSS(skillWidget))
                 );
                 m_window->BroadcastMessage(message);
             } else {
                 message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-                message.payload.widget.id = IDX(side_6) * SECONDARY_SKILL_WIDGET_COUNT + skillSlot
+                message.payload.widget.id = IDX(swapSide) * SECONDARY_SKILL_WIDGET_COUNT + skillWidget
                                             + CONTROL_LEFT_SKILL_FIRST;
                 message.payload.widget.data.value = EMPTY_SKILL_VALUE;
                 m_window->BroadcastMessage(message);
@@ -778,9 +779,10 @@ void swapManager::SwapArtifacts(void) {
     if (selectedArtifact == ARTIFACT_SPADE_NECROMANCY
         || targetArtifact_2 == ARTIFACT_SPADE_NECROMANCY) {
         tag_message message;
+        i32 slotSkill;
         message.type = MESSAGE_WIDGET;
         for (SwapManagerSide side = SWAP_SIDE_LEFT; side < SWAP_SIDE_COUNT; ++side) {
-            for (i32 slotSkill = 0; slotSkill < SECONDARY_SKILL_WIDGET_COUNT; ++slotSkill) {
+            for (slotSkill = 0; slotSkill < SECONDARY_SKILL_WIDGET_COUNT; ++slotSkill) {
                 if (slotSkill < m_heroes[IDX(side)]->m_secondarySkillCount) {
                     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
                     message.payload.widget.id = IDX(side) * SECONDARY_SKILL_WIDGET_COUNT
@@ -942,13 +944,20 @@ void swapManager::Update(void) {
 
 VA(0x004a3c30, 0x381)
 void swapManager::SplitMons(void) {
-    i16 unusedAmountControl = SPLIT_AMOUNT_CONTROL;
-    i32 unusedState = 0;
-    armyGroup* selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
-    armyGroup* targetArmy = &m_heroes[IDX(m_targetSide)]->m_army;
-    i32 emptySlot;
-    unusedState = 0;
-    i16 unusedTextControl = SPLIT_TEXT_CONTROL;
+    i16 textControl;
+    armyGroup* targetTroops;
+    armyGroup* selectedArmy;
+    i32 openSlot;
+    i16 unusedAmountControl;
+    tag_message message;
+    i32 dlgState;
+
+    unusedAmountControl = SPLIT_AMOUNT_CONTROL;
+    dlgState = 0;
+    selectedArmy = &m_heroes[IDX(m_selectedSide)]->m_army;
+    targetTroops = &m_heroes[IDX(m_targetSide)]->m_army;
+    dlgState = 0;
+    textControl = SPLIT_TEXT_CONTROL;
 
     gpTownManager->m_heroWindow1 =
         new heroWindow(SPLIT_WINDOW_X, SPLIT_WINDOW_Y, "splitwin.bin");
@@ -957,7 +966,6 @@ void swapManager::SplitMons(void) {
     gpTownManager->m_splitAmount = 0;
     gpTownManager->m_splitMaximum = selectedArmy->m_creatureCounts[m_selectedSlot];
 
-    tag_message message;
     message.type = MESSAGE_WIDGET;
     if (m_selectedSide == m_targetSide) {
         sprintf(gText, "Move how many troops?");
@@ -982,24 +990,24 @@ void swapManager::SplitMons(void) {
     delete gpTownManager->m_heroWindow1;
 
     if (gpWindowManager->m_dialogResult == SPLIT_CONFIRM) {
-        if (targetArmy->m_creatureTypes[m_targetSlot]
+        if (targetTroops->m_creatureTypes[m_targetSlot]
             == selectedArmy->m_creatureTypes[m_selectedSlot]) {
             selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;
-            targetArmy->m_creatureCounts[m_targetSlot] += gpTownManager->m_splitAmount;
+            targetTroops->m_creatureCounts[m_targetSlot] += gpTownManager->m_splitAmount;
             if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
                 selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;
             return;
         }
-        if (targetArmy->m_creatureTypes[m_targetSlot] != CREATURE_NONE) {
-            for (emptySlot = 0; emptySlot < ARMY_GROUP_SLOT_COUNT; ++emptySlot) {
-                if (targetArmy->m_creatureTypes[emptySlot] == CREATURE_NONE)
+        if (targetTroops->m_creatureTypes[m_targetSlot] != CREATURE_NONE) {
+            for (openSlot = 0; openSlot < ARMY_GROUP_SLOT_COUNT; ++openSlot) {
+                if (targetTroops->m_creatureTypes[openSlot] == CREATURE_NONE)
                     break;
             }
-            if (emptySlot < ARMY_GROUP_SLOT_COUNT)
-                m_targetSlot = emptySlot;
+            if (openSlot < ARMY_GROUP_SLOT_COUNT)
+                m_targetSlot = openSlot;
         }
-        targetArmy->m_creatureTypes[m_targetSlot] = selectedArmy->m_creatureTypes[m_selectedSlot];
-        targetArmy->m_creatureCounts[m_targetSlot] = gpTownManager->m_splitAmount;
+        targetTroops->m_creatureTypes[m_targetSlot] = selectedArmy->m_creatureTypes[m_selectedSlot];
+        targetTroops->m_creatureCounts[m_targetSlot] = gpTownManager->m_splitAmount;
         selectedArmy->m_creatureCounts[m_selectedSlot] -= gpTownManager->m_splitAmount;
         if (selectedArmy->m_creatureCounts[m_selectedSlot] == 0)
             selectedArmy->m_creatureTypes[m_selectedSlot] = CREATURE_NONE;

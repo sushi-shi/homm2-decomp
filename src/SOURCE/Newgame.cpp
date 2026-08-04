@@ -121,7 +121,7 @@ H2_ENUM_CLASS_END(NewGameKeyCode)
 
 H2_ENUM_BEGIN(NewGameStorageConstant)
     FILE_MASK_CAPACITY      = 16,
-    SAVED_MAP_NAME_CAPACITY = 44,
+    SAVED_MAP_NAME_CAPACITY = 16,
     PLAYER_LABEL_CAPACITY   = 2
 H2_ENUM_END(NewGameStorageConstant)
 
@@ -228,8 +228,10 @@ H2_ENUM_END(NewGameKeyEncoding)
 
 VA(0x004754b0, 0x1d2)
 void game::GetMap(void) {
+    // Unreferenced, but retail's frame reserves its 28 bytes above loadResult.
+    tag_message dlgMessage;
     fileRequester* requesterResult;
-    i32 resultCode;
+    i32 loadResult;
     char fileMask[FILE_MASK_CAPACITY];
     char savedName[SAVED_MAP_NAME_CAPACITY];
 
@@ -266,8 +268,8 @@ void game::GetMap(void) {
     );
     if (requesterResult == NULL)
         MemError();
-    resultCode = gpExec->DoDialog(requesterResult);
-    if (resultCode == FILE_REQUESTER_OK) {
+    loadResult = gpExec->DoDialog(requesterResult);
+    if (loadResult == FILE_REQUESTER_OK) {
         delete requesterResult;
         strcpy(gMapName, gLastFilename);
         if (strcmpi(savedName, gMapName) != 0) {

@@ -62,58 +62,58 @@ H2_ENUM_END(CombatLayoutConstant)
 
 VA(0x00495da0, 0x214)
 i32 combatManager::DoSpellAI(H2_ENUM_PARAM(CombatSide, i32) side, i32 restricted) {
-    SpellType bestSpellChoice;
-    i32 effectScore;
-    H2_ENUM_STORAGE_STEPPED(SpellType, i32) spellIndex;
+    SpellType chosenSpell;
+    i32 effect;
+    H2_ENUM_STORAGE_STEPPED(SpellType, i32) spell;
     i32 bestHexWork;
-    i32 candidateHex;
-    i32 bestEffectWork;
+    i32 candHex;
+    i32 bestValue;
     i32 manaRatioResult;
 
-    bestEffectWork = 0;
-    bestSpellChoice = SPELL_NONE;
+    bestValue = 0;
+    chosenSpell = SPELL_NONE;
     bestHexWork = -1;
 
     if (m_heroes[IDX(side)] == NULL)
         return 0;
 
-    for (spellIndex = IDX(COMBAT_ATTACKER_SIDE); IDX(spellIndex) < COMBAT_SIDE_COUNT; spellIndex++) {
-        if (m_heroes[IDX(spellIndex)] != NULL
-            && m_heroes[IDX(spellIndex)]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
+    for (spell = IDX(COMBAT_ATTACKER_SIDE); IDX(spell) < COMBAT_SIDE_COUNT; spell++) {
+        if (m_heroes[IDX(spell)] != NULL
+            && m_heroes[IDX(spell)]->HasArtifact(ARTIFACT_SPHERE_NEGATION))
             return 0;
     }
 
-    for (spellIndex = SPELL_FIREBALL; spellIndex < SPELL_COUNT; spellIndex++) {
-        if (m_heroes[IDX(side)]->HasSpell(spellIndex)
-            && HAS(gsSpellInfo[IDX(spellIndex)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)
-            && GetManaCost(spellIndex, m_heroes[IDX(side)]) <= m_heroes[IDX(side)]->m_spellPoints) {
-            if (restricted && spellIndex != SPELL_FIREBALL && spellIndex != SPELL_FIREBLAST
-                && spellIndex != SPELL_LIGHTNING_BOLT && spellIndex != SPELL_CHAIN_LIGHTNING
-                && spellIndex != SPELL_HOLY_WORD && spellIndex != SPELL_HOLY_SHOUT
-                && spellIndex != SPELL_MAGIC_ARROW && spellIndex != SPELL_ARMAGEDDON
-                && spellIndex != SPELL_ELEMENTAL_STORM && spellIndex != SPELL_METEOR_SHOWER
-                && spellIndex != SPELL_COLD_RAY && spellIndex != SPELL_COLD_RING
-                && spellIndex != SPELL_DEATH_RIPPLE && spellIndex != SPELL_DEATH_WAVE)
+    for (spell = SPELL_FIREBALL; spell < SPELL_COUNT; spell++) {
+        if (m_heroes[IDX(side)]->HasSpell(spell)
+            && HAS(gsSpellInfo[IDX(spell)].attributes, SPELL_INFO_ATTRIBUTE_COMBAT)
+            && GetManaCost(spell, m_heroes[IDX(side)]) <= m_heroes[IDX(side)]->m_spellPoints) {
+            if (restricted && spell != SPELL_FIREBALL && spell != SPELL_FIREBLAST
+                && spell != SPELL_LIGHTNING_BOLT && spell != SPELL_CHAIN_LIGHTNING
+                && spell != SPELL_HOLY_WORD && spell != SPELL_HOLY_SHOUT
+                && spell != SPELL_MAGIC_ARROW && spell != SPELL_ARMAGEDDON
+                && spell != SPELL_ELEMENTAL_STORM && spell != SPELL_METEOR_SHOWER
+                && spell != SPELL_COLD_RAY && spell != SPELL_COLD_RING
+                && spell != SPELL_DEATH_RIPPLE && spell != SPELL_DEATH_WAVE)
                 continue;
-            DetermineEffectOfSpell(spellIndex, &effectScore, &candidateHex);
+            DetermineEffectOfSpell(spell, &effect, &candHex);
 
             manaRatioResult =
-                m_heroes[IDX(side)]->m_spellPoints / GetManaCost(spellIndex, m_heroes[IDX(side)]);
+                m_heroes[IDX(side)]->m_spellPoints / GetManaCost(spell, m_heroes[IDX(side)]);
             if (manaRatioResult > SPELL_AI_MAX_MANA_RATIO)
                 manaRatioResult = SPELL_AI_MAX_MANA_RATIO;
-            effectScore = static_cast<i32>(effectScore * gfSpellCastableCombatMod[manaRatioResult]);
+            effect = static_cast<i32>(effect * gfSpellCastableCombatMod[manaRatioResult]);
 
-            if (effectScore > bestEffectWork) {
-                bestEffectWork = effectScore;
-                bestSpellChoice = spellIndex;
-                bestHexWork = candidateHex;
+            if (effect > bestValue) {
+                bestValue = effect;
+                chosenSpell = spell;
+                bestHexWork = candHex;
             }
         }
     }
 
-    if (bestEffectWork > 0) {
+    if (bestValue > 0) {
         giNextAction = ACTION_CAST_SPELL;
-        giNextActionExtra = IDX(bestSpellChoice);
+        giNextActionExtra = IDX(chosenSpell);
         giNextActionGridIndex = bestHexWork;
         return 1;
     }

@@ -396,15 +396,15 @@ void combatManager::SetupGridForArmy(army* armyPtr) {
 
 VA(0x0043883f, 0x4d8)
 i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
-    i32 retval;
-    i32 minX;
-    i32 minY;
-    i32 maxX;
+    i32 didRedraw;
+    i32 oldShading;
     i32 maxY;
-    i32 cellIndex;
     i32 gridChanged;
-    i32 drawShading;
-    i32 hadOldShade;
+    i32 minY;
+    i32 minX;
+    i32 maxX;
+    i32 cell;
+    i32 doShading;
 
     if (gbNoShowCombat != 0)
         return 0;
@@ -422,45 +422,45 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
     if (gConfig.combatShadeLevel < 1 && gConfig.showCombatGrid == 0)
         return 0;
 
-    retval = 0;
+    didRedraw = 0;
     minX = COMBAT_MAX_EXTENT_X;
     minY = COMBAT_MAX_EXTENT_Y;
     maxX = 0;
     maxY = 0;
-    drawShading = 0;
-    hadOldShade = 0;
+    doShading = 0;
+    oldShading = 0;
     gridChanged = 0;
 
     if (gConfig.combatShadeLevel < 1)
         goto DrawCombatGrid;
 
-    for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-        if (m_previousGridState[cellIndex] != m_gridState[cellIndex])
+    for (cell = 0; cell < COMBAT_HEX_COUNT; cell++) {
+        if (m_previousGridState[cell] != m_gridState[cell])
             gridChanged = 1;
-        if (m_gridState[cellIndex] != GRID_SHADE_NONE)
-            drawShading = 1;
-        if (m_previousGridState[cellIndex] != GRID_SHADE_NONE)
-            hadOldShade = 1;
+        if (m_gridState[cell] != GRID_SHADE_NONE)
+            doShading = 1;
+        if (m_previousGridState[cell] != GRID_SHADE_NONE)
+            oldShading = 1;
     }
 
     if (resetGridDisplay != 0) {
-        if (drawShading == 0)
+        if (doShading == 0)
             goto DrawCombatGrid;
     } else {
         if (gridChanged == 0)
             return 0;
-        if (hadOldShade != 0) {
-            for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-                if (m_previousGridState[cellIndex] != m_gridState[cellIndex]
-                    || m_gridState[cellIndex] != GRID_SHADE_NONE) {
-                    if (m_hexCells[cellIndex].m_gridLeft < minX)
-                        minX = m_hexCells[cellIndex].m_gridLeft;
-                    if (m_hexCells[cellIndex].m_gridTop < minY)
-                        minY = m_hexCells[cellIndex].m_gridTop;
-                    if (m_hexCells[cellIndex].m_gridRight > maxX)
-                        maxX = m_hexCells[cellIndex].m_gridRight;
-                    if (m_hexCells[cellIndex].m_gridBottom > maxY)
-                        maxY = m_hexCells[cellIndex].m_gridBottom;
+        if (oldShading != 0) {
+            for (cell = 0; cell < COMBAT_HEX_COUNT; cell++) {
+                if (m_previousGridState[cell] != m_gridState[cell]
+                    || m_gridState[cell] != GRID_SHADE_NONE) {
+                    if (m_hexCells[cell].m_gridLeft < minX)
+                        minX = m_hexCells[cell].m_gridLeft;
+                    if (m_hexCells[cell].m_gridTop < minY)
+                        minY = m_hexCells[cell].m_gridTop;
+                    if (m_hexCells[cell].m_gridRight > maxX)
+                        maxX = m_hexCells[cell].m_gridRight;
+                    if (m_hexCells[cell].m_gridBottom > maxY)
+                        maxY = m_hexCells[cell].m_gridBottom;
                 }
             }
             if (minX < COMBAT_GRID_COPY_LEFT)
@@ -480,43 +480,43 @@ i32 combatManager::UpdateGrid(i32 resetGridDisplay, i32 rebuildGrid) {
                 maxX - minX + 1,
                 maxY - minY + 1
             );
-            retval = 1;
+            didRedraw = 1;
         }
     }
 
-    if (drawShading == 0)
+    if (doShading == 0)
         goto DrawCombatGrid;
-    for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-        if (m_gridState[cellIndex] != GRID_SHADE_NONE) {
+    for (cell = 0; cell < COMBAT_HEX_COUNT; cell++) {
+        if (m_gridState[cell] != GRID_SHADE_NONE) {
             DimIconToBitmap(
                 m_combatIcons[IDX(COMBAT_ICON_GRID)],
                 m_backgroundBuffer,
-                m_hexCells[cellIndex].m_gridLeft,
-                m_hexCells[cellIndex].m_gridTop,
+                m_hexCells[cell].m_gridLeft,
+                m_hexCells[cell].m_gridTop,
                 1,
-                IDX(m_gridState[cellIndex]) - 1,
+                IDX(m_gridState[cell]) - 1,
                 ICON_DRAW_CLIP,
                 0,
                 0,
                 COMBAT_SCREEN_WIDTH,
                 COMBAT_AREA_HEIGHT
             );
-            retval = 1;
+            didRedraw = 1;
         }
     }
 
 DrawCombatGrid:
     if (gConfig.showCombatGrid != 0) {
-        if (bGridWasShowing != 0 && retval == 0)
+        if (bGridWasShowing != 0 && didRedraw == 0)
             goto CopyGridState;
-        for (cellIndex = 0; cellIndex < COMBAT_HEX_COUNT; cellIndex++) {
-            if (cellIndex % COMBAT_GRID_ROW_LENGTH != 0
-                && cellIndex % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1) {
+        for (cell = 0; cell < COMBAT_HEX_COUNT; cell++) {
+            if (cell % COMBAT_GRID_ROW_LENGTH != 0
+                && cell % COMBAT_GRID_ROW_LENGTH != COMBAT_GRID_ROW_LENGTH - 1) {
                 MonoIconToBitmap(
                     m_combatIcons[IDX(COMBAT_ICON_GRID)],
                     m_backgroundBuffer,
-                    m_hexCells[cellIndex].m_gridLeft,
-                    m_hexCells[cellIndex].m_gridTop,
+                    m_hexCells[cell].m_gridLeft,
+                    m_hexCells[cell].m_gridTop,
                     COMBAT_GRID_LINE_FRAME,
                     COMBAT_GRID_LINE_COLOR,
                     ICON_DRAW_CLIP,
@@ -527,13 +527,13 @@ DrawCombatGrid:
                 );
             }
         }
-        retval = 1;
+        didRedraw = 1;
         bGridWasShowing = 1;
     }
 
 CopyGridState:
     memcpy(m_previousGridState, m_gridState, sizeof(m_previousGridState));
-    return retval;
+    return didRedraw;
 }
 
 VA(0x00438d17, 0x341)
@@ -704,13 +704,13 @@ void combatManager::DrawBackground(void) {
 
 VA(0x00439058, 0x560)
 void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
-    i32 oldLimit;
+    i32 savedLimit;
     i32 copyHeight;
-    i32 maxXSave;
-    i32 oldMinX;
-    i32 oldMaxYBackup;
-    i32 savedComputeExtents;
-    i32 savedExtentMinY;
+    i32 oldMaxX;
+    i32 savedMinX;
+    i32 backupMaxY;
+    i32 oldCompute;
+    i32 savedMinY;
 
     if (m_nonVisualCombat != 0)
         return;
@@ -776,12 +776,12 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         );
     }
 
-    oldMinX = giMinExtentX;
-    savedExtentMinY = giMinExtentY;
-    maxXSave = giMaxExtentX;
-    oldMaxYBackup = giMaxExtentY;
-    oldLimit = gbLimitToExtent;
-    savedComputeExtents = gbComputeExtent;
+    savedMinX = giMinExtentX;
+    savedMinY = giMinExtentY;
+    oldMaxX = giMaxExtentX;
+    backupMaxY = giMaxExtentY;
+    savedLimit = gbLimitToExtent;
+    oldCompute = gbComputeExtent;
     if (m_mouseGridHex != -1) {
         giMinExtentX = m_hexCells[m_mouseGridHex].m_gridLeft;
         giMinExtentY = m_hexCells[m_mouseGridHex].m_gridTop;
@@ -824,12 +824,12 @@ void combatManager::UpdateMouseGrid(i32 hexIndex, i32 forceUpdate) {
         giMaxExtentX - giMinExtentX + 1,
         giMaxExtentY - giMinExtentY + 1
     );
-    giMinExtentX = oldMinX;
-    giMinExtentY = savedExtentMinY;
-    giMaxExtentX = maxXSave;
-    giMaxExtentY = oldMaxYBackup;
-    gbLimitToExtent = oldLimit;
-    gbComputeExtent = savedComputeExtents;
+    giMinExtentX = savedMinX;
+    giMinExtentY = savedMinY;
+    giMaxExtentX = oldMaxX;
+    giMaxExtentY = backupMaxY;
+    gbLimitToExtent = savedLimit;
+    gbComputeExtent = oldCompute;
     m_mouseGridHex = hexIndex;
 }
 

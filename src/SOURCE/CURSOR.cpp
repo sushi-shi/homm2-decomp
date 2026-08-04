@@ -327,9 +327,9 @@ void advManager::DrawCursor(void) {
 
 VA(0x00433ab7, 0x327)
 void advManager::DrawCursorShadow(void) {
-    i32 drawFrame;
+    i32 frame;
     i32 boatIndex;
-    i32 shadowFrame;
+    i32 shadowPic;
     i32 drawY;
 
     if (bShowIt == 0 || bSpecialHideCursor)
@@ -349,9 +349,9 @@ void advManager::DrawCursorShadow(void) {
 
     if (m_cursorFrame & CURSOR_FLIP_FLAG) {
         drawX += CURSOR_SHADOW_FLIP_X_ADJUST;
-        drawFrame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
+        frame = (m_cursorFrame & CURSOR_FRAME_MASK) + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
-            boatIndex = drawFrame;
+            boatIndex = frame;
             IconToBitmap(
                 m_boatShadowIcon,
                 gpWindowManager->m_screen,
@@ -370,27 +370,27 @@ void advManager::DrawCursorShadow(void) {
                 0
             );
         } else if (m_drawHeroShadows && m_cursorType != HERO_TYPE_BOAT) {
-            shadowFrame = drawFrame;
-            if (shadowFrame == SPRITE_UP_STEP_5)
-                shadowFrame = SPRITE_UP_SHADOW_STEP_5;
-            if (shadowFrame == SPRITE_UP_STEP_4)
-                shadowFrame = SPRITE_UP_SHADOW_STEP_4;
-            if (shadowFrame == SPRITE_UP_STEP_3)
-                shadowFrame = SPRITE_UP_SHADOW_STEP_3;
-            if (shadowFrame == SPRITE_UP_STEP_2)
-                shadowFrame = SPRITE_UP_SHADOW_WIDE;
-            if (shadowFrame == SPRITE_UP_STEP_1)
-                shadowFrame = SPRITE_UP_SHADOW_WIDE;
+            shadowPic = frame;
+            if (shadowPic == SPRITE_UP_STEP_5)
+                shadowPic = SPRITE_UP_SHADOW_STEP_5;
+            if (shadowPic == SPRITE_UP_STEP_4)
+                shadowPic = SPRITE_UP_SHADOW_STEP_4;
+            if (shadowPic == SPRITE_UP_STEP_3)
+                shadowPic = SPRITE_UP_SHADOW_STEP_3;
+            if (shadowPic == SPRITE_UP_STEP_2)
+                shadowPic = SPRITE_UP_SHADOW_WIDE;
+            if (shadowPic == SPRITE_UP_STEP_1)
+                shadowPic = SPRITE_UP_SHADOW_WIDE;
             IconToBitmap(
                 m_shadowIcon,
                 gpWindowManager->m_screen,
                 drawX - CURSOR_SHADOW_FLIP_X_ADJUST,
                 drawY,
-                (shadowFrame >= CURSOR_SHADOW_ANIM_FIRST
-                         && shadowFrame < CURSOR_SHADOW_ANIM_END
-                     ? CURSOR_HORSE_SHADOW_OFFSET
-                     : 0)
-                    + shadowFrame,
+                shadowPic
+                    + (shadowPic >= CURSOR_SHADOW_ANIM_FIRST
+                               && shadowPic < CURSOR_SHADOW_ANIM_END
+                           ? CURSOR_HORSE_SHADOW_OFFSET
+                           : 0),
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -400,14 +400,14 @@ void advManager::DrawCursorShadow(void) {
             );
         }
     } else {
-        drawFrame = m_cursorFrame + m_cursorFrameCount;
+        frame = m_cursorFrame + m_cursorFrameCount;
         if (m_drawHeroShadows && m_cursorType == HERO_TYPE_BOAT) {
             IconToBitmap(
                 m_boatShadowIcon,
                 gpWindowManager->m_screen,
                 drawX,
                 drawY,
-                drawFrame,
+                frame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -421,7 +421,7 @@ void advManager::DrawCursorShadow(void) {
                 gpWindowManager->m_screen,
                 drawX,
                 drawY,
-                drawFrame,
+                frame,
                 ICON_DRAW_CLIP,
                 0,
                 0,
@@ -1004,21 +1004,21 @@ i32 advManager::ValidMoveWithEvent(
     hero* movingHero,
     H2_ENUM_PARAM(MapDirection, i32) direction
 ) {
-    i32 directionX;
-    i32 destinationX;
-    i32 directionY;
-    i32 destinationY;
+    i32 dirX;
+    i32 newX;
+    i32 dirY;
+    i32 newY;
     mapCell* destinationCell;
 
-    directionX = normalDirTable[IDX(direction)].x;
-    directionY = normalDirTable[IDX(direction)].y;
-    destinationX = movingHero->m_x + directionX;
-    destinationY = movingHero->m_y + directionY;
-    if (destinationX < 0 || destinationX > MAP_WIDTH - 1 || destinationY < 0
-        || destinationY > MAP_HEIGHT - 1)
+    dirX = normalDirTable[IDX(direction)].x;
+    dirY = normalDirTable[IDX(direction)].y;
+    newX = movingHero->m_x + dirX;
+    newY = movingHero->m_y + dirY;
+    if (newX < 0 || newX > MAP_WIDTH - 1 || newY < 0
+        || newY > MAP_HEIGHT - 1)
         return 0;
 
-    destinationCell = m_mapData->GetCell(destinationX, destinationY);
+    destinationCell = m_mapData->GetCell(newX, newY);
     switch (destinationCell->m_triggerType & MAP_TRIGGER_TYPE_MASK) {
         case MAP_OBJECT_HERO_INTERACTION:
             if (HAS(movingHero->m_eventFlags, HERO_EVENT_EMBARKED)) {

@@ -101,308 +101,312 @@ H2_ENUM_END(CastleConstant)
 
 VA(0x00424320, 0xf10)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
-    widget* backgroundWidget19;
-    i32 backgroundFrame6;
-    i32 slot7;
-    i32 row9;
-    i32 column8;
-    i32 widgetFrame12;
-    i32 terrainIconFrame27;
-    i32 raceIconFrame;
-    u32l captainBuilt;
-    char iconName4[TOWN_OBJECT_FILENAME_SIZE];
-    char statLine11[CAPTAIN_STAT_LINE_CAPACITY];
-    tag_message message3;
+    u32l captainQuarters;
+    i32 tileX;
+    i32 tileY;
+    i32 terrainIconFrame;
+    i32 column;
+    i32 rowPos;
+    widget* backgroundWidget;
+    i32 raceBase;
+    i16 builtFrame;
+    i32 slotNum;
+    char icnName[TOWN_OBJECT_FILENAME_SIZE];
+    i32 backFrame;
+    i16 noBuildFrame;
+    char captainStatLine[CAPTAIN_STAT_LINE_CAPACITY];
+    i32 stateFrame;
+    tag_message msg;
+    i16 cannotAffordIcon;
 
     casWin = window;
-    i16 builtFrame7 = IDX(FRAME_BUILT);
-    i16 cannotBuildFrame17 = IDX(FRAME_CANNOT_BUILD);
-    i16 cannotAffordFrame6 = IDX(FRAME_CANNOT_AFFORD);
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        castleSlotsUse[slot7] = castleSlotsBase[slot7];
-        if (castleSlotsBase[slot7] >= BUILDING_SLOT_DWELLING_SECOND
-            && castleSlotsBase[slot7] <= BUILDING_SLOT_DWELLING_SIXTH
-            && ((m_town->m_buildings & (1L << IDX(castleSlotsBase[slot7])))
+    builtFrame = IDX(FRAME_BUILT);
+    noBuildFrame = IDX(FRAME_CANNOT_BUILD);
+    cannotAffordIcon = IDX(FRAME_CANNOT_AFFORD);
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        castleSlotsUse[slotNum] = castleSlotsBase[slotNum];
+        if (castleSlotsBase[slotNum] >= BUILDING_SLOT_DWELLING_SECOND
+            && castleSlotsBase[slotNum] <= BUILDING_SLOT_DWELLING_SIXTH
+            && ((m_town->m_buildings & (1L << IDX(castleSlotsBase[slotNum])))
                 || (m_town->m_buildings
-                    & (1L << (IDX(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET)))
-                || (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
+                    & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))
+                || (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                     && m_town->m_type == FACTION_WARLOCK
                     && (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6))))
             && (gTownEligibleBuildMask[IDX(m_town->m_type)]
-                & (1L << (IDX(castleSlotsBase[slot7]) + CASTLE_UPGRADE_OFFSET)))) {
-            if (castleSlotsBase[slot7] == BUILDING_SLOT_DWELLING_SIXTH
+                & (1L << (IDX(castleSlotsBase[slotNum]) + CASTLE_UPGRADE_OFFSET)))) {
+            if (castleSlotsBase[slotNum] == BUILDING_SLOT_DWELLING_SIXTH
                 && m_town->m_type == FACTION_WARLOCK
                 && ((m_town->m_buildings & IDX(TOWN_BUILDING_UPGRADED_DWELLING_6))
                     || (m_town->m_buildings & IDX(TOWN_BUILDING_ALTERNATE_UPGRADED_DWELLING_6)))) {
-                castleSlotsUse[slot7] = BUILDING_SLOT_DWELLING_LAST;
+                castleSlotsUse[slotNum] = BUILDING_SLOT_DWELLING_LAST;
             } else {
-                castleSlotsUse[slot7] = castleSlotsBase[slot7] + CASTLE_UPGRADE_OFFSET;
+                castleSlotsUse[slotNum] = castleSlotsBase[slotNum] + CASTLE_UPGRADE_OFFSET;
             }
         }
     }
 
-    m_buildableBuildings = 0;
-    m_affordableBuildings = m_buildableBuildings;
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        if (CanBuy(m_town, castleSlotsUse[slot7]))
-            m_affordableBuildings |= 1L << IDX(castleSlotsUse[slot7]);
-        if (CanBuild(m_town, castleSlotsUse[slot7]))
-            m_buildableBuildings |= 1L << IDX(castleSlotsUse[slot7]);
+    m_affordableBuildings = m_buildableBuildings = 0;
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        if (CanBuy(m_town, castleSlotsUse[slotNum]))
+            m_affordableBuildings |= 1L << IDX(castleSlotsUse[slotNum]);
+        if (CanBuild(m_town, castleSlotsUse[slotNum]))
+            m_buildableBuildings |= 1L << IDX(castleSlotsUse[slotNum]);
     }
 
-    message3.type = MESSAGE_WIDGET;
-    message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        message3.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slot7;
-        message3.payload.widget.data.value = IDX(castleSlotsUse[slot7]);
-        casWin->BroadcastMessage(message3);
+    msg.type = MESSAGE_WIDGET;
+    msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        msg.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slotNum;
+        msg.payload.widget.data.value = IDX(castleSlotsUse[slotNum]);
+        casWin->BroadcastMessage(msg);
     }
 
-    message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    sprintf(iconName4, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
-    message3.payload.widget.data.text = iconName4;
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        message3.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slot7;
-        casWin->BroadcastMessage(message3);
+    msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
+    sprintf(icnName, "cstl%s.icn", cHeroTypeShortName[IDX(m_town->m_type)]);
+    msg.payload.widget.data.text = icnName;
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        msg.payload.widget.id = CONTROL_BUILDING_ICON_FIRST + slotNum;
+        casWin->BroadcastMessage(msg);
     }
 
-    message3.payload.widget.command = CASTLE_WIDGET_TEXT;
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        message3.payload.widget.id = CONTROL_BUILDING_NAME_FIRST + slot7;
-        if (castleSlotsUse[slot7] == CASTLE_MAGE_GUILD) {
+    msg.payload.widget.command = CASTLE_WIDGET_TEXT;
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        msg.payload.widget.id = CONTROL_BUILDING_NAME_FIRST + slotNum;
+        if (castleSlotsUse[slotNum] == CASTLE_MAGE_GUILD) {
             sprintf(
                 gText,
                 "%d \xfd\xf2\xe0\xe6 \xc3\xe8\xeb\xfc\xe4\xe8\xe8 \xec\xe0\xe3\xee\xe2",
                 m_town->m_buildState + 1 < TOWN_MAGE_GUILD_MAX_LEVEL ? m_town->m_buildState + 1
                                                                      : TOWN_MAGE_GUILD_MAX_LEVEL
             );
-            message3.payload.widget.data.text = gText;
+            msg.payload.widget.data.text = gText;
         } else {
-            message3.payload.widget.data.text = GetBuildingName(
+            msg.payload.widget.data.text = GetBuildingName(
                 m_town->m_type,
-                castleSlotsUse[slot7]
+                castleSlotsUse[slotNum]
             );
         }
-        casWin->BroadcastMessage(message3);
+        casWin->BroadcastMessage(msg);
     }
 
-    for (slot7 = 0; slot7 < CASTLE_SLOT_COUNT; ++slot7) {
-        widgetFrame12 = FRAME_NONE;
-        if ((m_town->m_buildings & (1L << IDX(castleSlotsUse[slot7])))
-            && (castleSlotsUse[slot7] != CASTLE_MAGE_GUILD
+    for (slotNum = 0; slotNum < CASTLE_SLOT_COUNT; ++slotNum) {
+        stateFrame = FRAME_NONE;
+        if ((m_town->m_buildings & (1L << IDX(castleSlotsUse[slotNum])))
+            && (castleSlotsUse[slotNum] != CASTLE_MAGE_GUILD
                 || m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)) {
-            widgetFrame12 = FRAME_BUILT;
+            stateFrame = FRAME_BUILT;
         } else {
-            if (!(m_buildableBuildings & (1L << IDX(castleSlotsUse[slot7]))))
-                widgetFrame12 = FRAME_CANNOT_BUILD;
-            else if (!(m_affordableBuildings & (1L << IDX(castleSlotsUse[slot7]))))
-                widgetFrame12 = FRAME_CANNOT_AFFORD;
+            if (!(m_buildableBuildings & (1L << IDX(castleSlotsUse[slotNum]))))
+                stateFrame = FRAME_CANNOT_BUILD;
+            else if (!(m_affordableBuildings & (1L << IDX(castleSlotsUse[slotNum]))))
+                stateFrame = FRAME_CANNOT_AFFORD;
         }
 
-        if (widgetFrame12 != FRAME_NONE) {
-            message3.payload.widget.command = CASTLE_WIDGET_ENABLE;
-            message3.payload.widget.id = CONTROL_BUILDING_BUTTON_FIRST + slot7;
-            message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-            casWin->BroadcastMessage(message3);
-            message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-            message3.payload.widget.data.value = widgetFrame12;
-            casWin->BroadcastMessage(message3);
+        if (stateFrame != FRAME_NONE) {
+            msg.payload.widget.command = CASTLE_WIDGET_ENABLE;
+            msg.payload.widget.id = CONTROL_BUILDING_BUTTON_FIRST + slotNum;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            casWin->BroadcastMessage(msg);
+            msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+            msg.payload.widget.data.value = stateFrame;
+            casWin->BroadcastMessage(msg);
         } else {
-            message3.payload.widget.command = CASTLE_WIDGET_DISABLE;
-            message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-            message3.payload.widget.id = CONTROL_BUILDING_BUTTON_FIRST + slot7;
-            casWin->BroadcastMessage(message3);
+            msg.payload.widget.command = CASTLE_WIDGET_DISABLE;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            msg.payload.widget.id = CONTROL_BUILDING_BUTTON_FIRST + slotNum;
+            casWin->BroadcastMessage(msg);
         }
 
-        if (widgetFrame12 == FRAME_BUILT) {
-            message3.payload.widget.command = CASTLE_WIDGET_DISABLE;
-            message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-            message3.payload.widget.id = CONTROL_BUILDING_OVERLAY_FIRST + slot7;
-            casWin->BroadcastMessage(message3);
+        if (stateFrame == FRAME_BUILT) {
+            msg.payload.widget.command = CASTLE_WIDGET_DISABLE;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            msg.payload.widget.id = CONTROL_BUILDING_OVERLAY_FIRST + slotNum;
+            casWin->BroadcastMessage(msg);
         } else {
-            message3.payload.widget.command = CASTLE_WIDGET_ENABLE;
-            message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-            message3.payload.widget.id = CONTROL_BUILDING_OVERLAY_FIRST + slot7;
-            casWin->BroadcastMessage(message3);
-            message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-            message3.payload.widget.data.value =
-                widgetFrame12 == FRAME_NONE ? IDX(FRAME_AVAILABLE) : FRAME_UNAVAILABLE;
-            casWin->BroadcastMessage(message3);
+            msg.payload.widget.command = CASTLE_WIDGET_ENABLE;
+            msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+            msg.payload.widget.id = CONTROL_BUILDING_OVERLAY_FIRST + slotNum;
+            casWin->BroadcastMessage(msg);
+            msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+            msg.payload.widget.data.value =
+                stateFrame == FRAME_NONE ? IDX(FRAME_AVAILABLE) : FRAME_UNAVAILABLE;
+            casWin->BroadcastMessage(msg);
         }
     }
 
-    captainBuilt = m_town->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
-    message3.payload.widget.command =
-        captainBuilt != 0 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
-    message3.payload.widget.id = CONTROL_CAPTAIN_OVERLAY;
-    message3.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    casWin->BroadcastMessage(message3);
-    message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-    message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
-    message3.payload.widget.data.value = captainBuilt != 0;
-    casWin->BroadcastMessage(message3);
+    captainQuarters = m_town->m_buildings & IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
+    msg.payload.widget.command =
+        captainQuarters != 0 ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
+    msg.payload.widget.id = CONTROL_CAPTAIN_OVERLAY;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    casWin->BroadcastMessage(msg);
+    msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+    msg.payload.widget.id = CONTROL_CAPTAIN_ICON;
+    msg.payload.widget.data.value = captainQuarters != 0;
+    casWin->BroadcastMessage(msg);
     sprintf(gText, "CSTLCAP%c.ICN", cHeroTypeInitial[IDX(m_town->m_type)]);
-    message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
-    message3.payload.widget.id = CONTROL_CAPTAIN_ICON;
-    message3.payload.widget.data.text = gText;
-    casWin->BroadcastMessage(message3);
-    message3.payload.widget.command =
-        captainBuilt != 0 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
-    message3.payload.widget.id = CONTROL_CAPTAIN_FLAG;
-    message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-    casWin->BroadcastMessage(message3);
-    if (captainBuilt != 0) {
-        message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-        message3.payload.widget.id = CONTROL_CAPTAIN_FLAG;
-        message3.payload.widget.data.value = gpCurPlayer->m_color;
-        casWin->BroadcastMessage(message3);
+    msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
+    msg.payload.widget.id = CONTROL_CAPTAIN_ICON;
+    msg.payload.widget.data.text = gText;
+    casWin->BroadcastMessage(msg);
+    msg.payload.widget.command =
+        captainQuarters != 0 ? CASTLE_WIDGET_ENABLE : CASTLE_WIDGET_DISABLE;
+    msg.payload.widget.id = CONTROL_CAPTAIN_FLAG;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+    casWin->BroadcastMessage(msg);
+    if (captainQuarters != 0) {
+        msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+        msg.payload.widget.id = CONTROL_CAPTAIN_FLAG;
+        msg.payload.widget.data.value = gpCurPlayer->m_color;
+        casWin->BroadcastMessage(msg);
     }
 
-    widgetFrame12 = FRAME_NONE;
-    if (captainBuilt != 0) {
-        message3.payload.widget.command = CASTLE_WIDGET_TEXT;
-        message3.payload.widget.data.text = gText;
+    stateFrame = FRAME_NONE;
+    if (captainQuarters != 0) {
+        msg.payload.widget.command = CASTLE_WIDGET_TEXT;
+        msg.payload.widget.data.text = gText;
         sprintf(gText, "");
-        for (slot7 = 0; slot7 < HERO_PRIMARY_STAT_COUNT; ++slot7) {
-            sprintf(statLine11, "%s\n", gStatNames[slot7]);
-            strcat(gText, statLine11);
+        for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
+            sprintf(captainStatLine, "%s\n", gStatNames[slotNum]);
+            strcat(gText, captainStatLine);
         }
-        message3.payload.widget.id = CONTROL_CAPTAIN_STATS;
-        casWin->BroadcastMessage(message3);
+        msg.payload.widget.id = CONTROL_CAPTAIN_STATS;
+        casWin->BroadcastMessage(msg);
         sprintf(gText, "");
-        for (slot7 = 0; slot7 < HERO_PRIMARY_STAT_COUNT; ++slot7) {
-            sprintf(statLine11, "%d\n", captainStats[IDX(m_town->m_type)][slot7]);
-            strcat(gText, statLine11);
+        for (slotNum = 0; slotNum < HERO_PRIMARY_STAT_COUNT; ++slotNum) {
+            sprintf(captainStatLine, "%d\n", captainStats[IDX(m_town->m_type)][slotNum]);
+            strcat(gText, captainStatLine);
         }
-        message3.payload.widget.id = CONTROL_CAPTAIN_VALUES;
-        casWin->BroadcastMessage(message3);
-        message3.payload.widget.command = m_town->m_formation != TOWN_FORMATION_SPREAD
+        msg.payload.widget.id = CONTROL_CAPTAIN_VALUES;
+        casWin->BroadcastMessage(msg);
+        msg.payload.widget.command = m_town->m_formation != TOWN_FORMATION_SPREAD
                                               ? CASTLE_WIDGET_DISABLE
                                               : CASTLE_WIDGET_ENABLE;
-        message3.payload.widget.id = CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE;
-        message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-        casWin->BroadcastMessage(message3);
-        message3.payload.widget.command = m_town->m_formation == TOWN_FORMATION_SPREAD
+        msg.payload.widget.id = CONTROL_CAPTAIN_FORMATION_SPREAD_INACTIVE;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        casWin->BroadcastMessage(msg);
+        msg.payload.widget.command = m_town->m_formation == TOWN_FORMATION_SPREAD
                                               ? CASTLE_WIDGET_DISABLE
                                               : CASTLE_WIDGET_ENABLE;
-        message3.payload.widget.id = CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE;
-        message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-        casWin->BroadcastMessage(message3);
+        msg.payload.widget.id = CONTROL_CAPTAIN_FORMATION_GROUPED_INACTIVE;
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        casWin->BroadcastMessage(msg);
     } else {
         if (!CanBuild(m_town, CASTLE_CAPTAIN))
-            widgetFrame12 = FRAME_CANNOT_BUILD;
+            stateFrame = FRAME_CANNOT_BUILD;
         else if (!CanBuy(m_town, CASTLE_CAPTAIN))
-            widgetFrame12 = FRAME_CANNOT_AFFORD;
+            stateFrame = FRAME_CANNOT_AFFORD;
         if (CanBuild(m_town, CASTLE_CAPTAIN))
             m_buildableBuildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
         if (CanBuy(m_town, CASTLE_CAPTAIN))
             m_affordableBuildings |= IDX(TOWN_BUILDING_CAPTAIN_QUARTERS);
     }
 
-    message3.payload.widget.command =
-        widgetFrame12 == FRAME_NONE ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
-    message3.payload.widget.id = CONTROL_CAPTAIN_BUTTON;
-    message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-    casWin->BroadcastMessage(message3);
-    if (widgetFrame12 != FRAME_NONE) {
-        message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-        message3.payload.widget.data.value = widgetFrame12;
-        casWin->BroadcastMessage(message3);
+    msg.payload.widget.command =
+        stateFrame == FRAME_NONE ? CASTLE_WIDGET_DISABLE : CASTLE_WIDGET_ENABLE;
+    msg.payload.widget.id = CONTROL_CAPTAIN_BUTTON;
+    msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+    casWin->BroadcastMessage(msg);
+    if (stateFrame != FRAME_NONE) {
+        msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+        msg.payload.widget.data.value = stateFrame;
+        casWin->BroadcastMessage(msg);
     }
 
     if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost)
-        widgetFrame12 = FRAME_CANNOT_AFFORD;
+        stateFrame = FRAME_CANNOT_AFFORD;
     else if (gpCurPlayer->m_heroCount == PLAYER_HERO_CAPACITY || m_town->m_occupyingHeroId != -1)
-        widgetFrame12 = FRAME_CANNOT_BUILD;
+        stateFrame = FRAME_CANNOT_BUILD;
     else if (m_recruitResult != 0)
-        widgetFrame12 = FRAME_BUILT;
+        stateFrame = FRAME_BUILT;
     else
-        widgetFrame12 = FRAME_NONE;
+        stateFrame = FRAME_NONE;
 
-    for (slot7 = 0; slot7 < PLAYER_AVAILABLE_HERO_COUNT; ++slot7) {
-        message3.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
-        message3.payload.widget.id = CONTROL_RECRUIT_FIRST + slot7;
-        if (widgetFrame12 != FRAME_NONE) {
-            message3.payload.widget.command = CASTLE_WIDGET_ENABLE;
-            casWin->BroadcastMessage(message3);
-            message3.payload.widget.command = CASTLE_WIDGET_FRAME;
-            message3.payload.widget.data.value = widgetFrame12;
-            casWin->BroadcastMessage(message3);
+    for (slotNum = 0; slotNum < PLAYER_AVAILABLE_HERO_COUNT; ++slotNum) {
+        msg.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
+        msg.payload.widget.id = CONTROL_RECRUIT_FIRST + slotNum;
+        if (stateFrame != FRAME_NONE) {
+            msg.payload.widget.command = CASTLE_WIDGET_ENABLE;
+            casWin->BroadcastMessage(msg);
+            msg.payload.widget.command = CASTLE_WIDGET_FRAME;
+            msg.payload.widget.data.value = stateFrame;
+            casWin->BroadcastMessage(msg);
         } else {
-            message3.payload.widget.command = CASTLE_WIDGET_DISABLE;
-            casWin->BroadcastMessage(message3);
+            msg.payload.widget.command = CASTLE_WIDGET_DISABLE;
+            casWin->BroadcastMessage(msg);
         }
-        message3.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
+        msg.payload.widget.command = CASTLE_WIDGET_ICON_FILE;
         sprintf(
-            iconName4,
+            icnName,
             "port%04d.icn",
-            IDX(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slot7)].m_portrait)
+            IDX(gpGame->m_heroRecs[gpCurPlayer->AvailableHeroId(slotNum)].m_portrait)
         );
-        message3.payload.widget.data.text = iconName4;
-        message3.payload.widget.id = CONTROL_HERO_FIRST + slot7;
-        casWin->BroadcastMessage(message3);
+        msg.payload.widget.data.text = icnName;
+        msg.payload.widget.id = CONTROL_HERO_FIRST + slotNum;
+        casWin->BroadcastMessage(msg);
     }
 
-    i32 backgroundLeft4 = BACKGROUND_LEFT;
-    i32 backgroundTop12 = BACKGROUND_TOP;
-    terrainIconFrame27 = (IDX(giGroundToTerrain
+    tileX = BACKGROUND_LEFT;
+    tileY = BACKGROUND_TOP;
+    terrainIconFrame = (IDX(giGroundToTerrain
                                   [gpGame->m_worldMap.GetCell(m_town->m_x, m_town->m_y)
                                        ->m_terrainImageIndex])
                           - 1)
-                         * TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES;
-    raceIconFrame = IDX(m_town->m_type) * RACE_ICON_FRAMES;
+                         * (TERRAIN_ICON_COLUMNS * TERRAIN_ICON_FRAMES);
+    raceBase = IDX(m_town->m_type) * RACE_ICON_FRAMES;
     if (updateOnly == 0) {
-        backgroundFrame6 = 0;
-        for (row9 = BACKGROUND_TERRAIN_FIRST_ROW; row9 <= BACKGROUND_TERRAIN_LAST_ROW; ++row9) {
-            for (column8 = BACKGROUND_FIRST_COLUMN; column8 <= BACKGROUND_LAST_COLUMN; ++column8) {
-                backgroundWidget19 = new iconWidget(
+        backFrame = 0;
+        for (rowPos = BACKGROUND_TERRAIN_FIRST_ROW; rowPos <= BACKGROUND_TERRAIN_LAST_ROW; ++rowPos) {
+            for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
+                backgroundWidget = new iconWidget(
                     static_cast<i16>(
-                        (column8 - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
+                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
                     ),
-                    static_cast<i16>((row9 - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntwba.icn",
-                    static_cast<i16>(terrainIconFrame27 + backgroundFrame6),
+                    static_cast<i16>(terrainIconFrame + backFrame),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
                     BACKGROUND_FILL_COLOR
                 );
-                if (backgroundWidget19 == NULL)
+                if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget19, TOWN_WIDGET_INSERT_DEFAULT);
-                ++backgroundFrame6;
+                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                ++backFrame;
             }
         }
-        backgroundFrame6 = 0;
-        for (row9 = BACKGROUND_TOWN_FIRST_ROW; row9 <= BACKGROUND_TOWN_LAST_ROW; ++row9) {
-            for (column8 = BACKGROUND_FIRST_COLUMN; column8 <= BACKGROUND_LAST_COLUMN; ++column8) {
-                if (row9 == BACKGROUND_TOWN_FIRST_ROW && column8 != BACKGROUND_TOP_CENTER_COLUMN) {
+        backFrame = 0;
+        for (rowPos = BACKGROUND_TOWN_FIRST_ROW; rowPos <= BACKGROUND_TOWN_LAST_ROW; ++rowPos) {
+            for (column = BACKGROUND_FIRST_COLUMN; column <= BACKGROUND_LAST_COLUMN; ++column) {
+                if (rowPos == BACKGROUND_TOWN_FIRST_ROW && column != BACKGROUND_TOP_CENTER_COLUMN) {
                     continue;
                 }
-                backgroundWidget19 = new iconWidget(
+                backgroundWidget = new iconWidget(
                     static_cast<i16>(
-                        (column8 - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
+                        (column - BACKGROUND_FIRST_COLUMN) * BACKGROUND_TILE_SIZE + BACKGROUND_LEFT
                     ),
-                    static_cast<i16>((row9 - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
+                    static_cast<i16>((rowPos - BACKGROUND_TOWN_FIRST_ROW) * BACKGROUND_TILE_SIZE),
                     BACKGROUND_TILE_SIZE,
                     BACKGROUND_TILE_SIZE,
                     "objntown.icn",
-                    static_cast<i16>(raceIconFrame + backgroundFrame6),
+                    static_cast<i16>(raceBase + backFrame),
                     ICON_DRAW_NORMAL,
                     TOWN_WIDGET_ID_NONE,
                     WIDGET_KIND_ICON_DIRECT,
                     BACKGROUND_FILL_COLOR
                 );
-                if (backgroundWidget19 == NULL)
+                if (backgroundWidget == NULL)
                     MemError();
-                casWin->AddWidget(backgroundWidget19, TOWN_WIDGET_INSERT_DEFAULT);
-                ++backgroundFrame6;
+                casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
+                ++backFrame;
             }
         }
         if (xIsExpansionMap == 0 && m_town->m_type == FACTION_NECROMANCER) {
-            backgroundWidget19 = new iconWidget(
+            backgroundWidget = new iconWidget(
                 EXPANSION_OVERLAY_X,
                 EXPANSION_OVERLAY_Y,
                 EXPANSION_OVERLAY_WIDTH,
@@ -414,9 +418,9 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
                 WIDGET_KIND_ICON_DIRECT,
                 BACKGROUND_FILL_COLOR
             );
-            if (backgroundWidget19 == NULL)
+            if (backgroundWidget == NULL)
                 MemError();
-            casWin->AddWidget(backgroundWidget19, TOWN_WIDGET_INSERT_DEFAULT);
+            casWin->AddWidget(backgroundWidget, TOWN_WIDGET_INSERT_DEFAULT);
         }
     }
 }

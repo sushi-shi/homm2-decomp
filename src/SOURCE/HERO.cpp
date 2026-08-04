@@ -413,35 +413,35 @@ void hero::HeroScreenUpdate(void) {
 VA(0x00461520, 0x1c3)
 void hero::UpdateArmies(void) {
     tag_message message;
-    i32 index;
+    i32 slot;
 
     message.type = HERO_UI_MESSAGE;
-    for (index = 0; index < UI_ARMY_SLOT_COUNT; index++) {
-        if (m_army.m_creatureTypes[index] == CREATURE_NONE) {
+    for (slot = 0; slot < UI_ARMY_SLOT_COUNT; slot++) {
+        if (m_army.m_creatureTypes[slot] == CREATURE_NONE) {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value = UI_ARMY_EMPTY_FRAME;
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_DISABLE;
-            message.payload.widget.id = index + UI_ARMY_PORTRAIT_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
-            message.payload.widget.id = index + UI_ARMY_COUNT_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_COUNT_FIRST;
             heroWin->BroadcastMessage(message);
-            message.payload.widget.id = index + UI_ARMY_SELECTOR_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_SELECTOR_FIRST;
             heroWin->BroadcastMessage(message);
         } else {
             message.payload.widget.command = HERO_UI_WIDGET_FRAME;
-            message.payload.widget.id = index + UI_ARMY_ICON_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_ICON_FIRST;
             message.payload.widget.data.value =
-                IDX(gMonsterDatabase[IDX(m_army.m_creatureTypes[index])].race)
+                IDX(gMonsterDatabase[IDX(m_army.m_creatureTypes[slot])].race)
                 + UI_ARMY_RACE_FRAME_OFFSET;
             heroWin->BroadcastMessage(message);
 
             message.payload.widget.command = HERO_UI_WIDGET_ICON_FILE;
-            sprintf(gText, "monh%04d.icn", IDX(m_army.m_creatureTypes[index]));
-            message.payload.widget.id = index + UI_ARMY_PORTRAIT_FIRST;
+            sprintf(gText, "monh%04d.icn", IDX(m_army.m_creatureTypes[slot]));
+            message.payload.widget.id = slot + UI_ARMY_PORTRAIT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
 
@@ -449,9 +449,9 @@ void hero::UpdateArmies(void) {
             message.payload.widget.data.value = UI_WIDGET_FRAME_ACTIVE;
             heroWin->BroadcastMessage(message);
 
-            sprintf(gText, "%d", m_army.m_creatureCounts[index]);
+            sprintf(gText, "%d", m_army.m_creatureCounts[slot]);
             message.payload.widget.command = HERO_UI_WIDGET_TEXT;
-            message.payload.widget.id = index + UI_ARMY_COUNT_FIRST;
+            message.payload.widget.id = slot + UI_ARMY_COUNT_FIRST;
             message.payload.widget.data.text = gText;
             heroWin->BroadcastMessage(message);
 
@@ -1855,7 +1855,7 @@ void SetupHeroView(void) {
 VA(0x00464415, 0x2b6)
 void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     i16 splitTextSlot = UI_SPLIT_TEXT;
-    i16 splitAmount = UI_SPLIT_AMOUNT;
+    i16 splitAmountSlot = UI_SPLIT_AMOUNT;
     tag_message message;
 
     gpTownManager->m_heroWindow1 =
@@ -1879,8 +1879,8 @@ void DoHeroSplit(i32 destinationSlot, i32 sourceSlot) {
     delete gpTownManager->m_heroWindow1;
 
     if (gpWindowManager->m_dialogResult == UI_DIALOG_SPLIT && gpTownManager->m_splitAmount != 0) {
-        if (gpHVHero->m_army.m_creatureTypes[sourceSlot]
-            == gpHVHero->m_army.m_creatureTypes[destinationSlot]) {
+        if (gpHVHero->m_army.m_creatureTypes[destinationSlot]
+            == gpHVHero->m_army.m_creatureTypes[sourceSlot]) {
             gpHVHero->m_army.m_creatureCounts[sourceSlot] -= gpTownManager->m_splitAmount;
             gpHVHero->m_army.m_creatureCounts[destinationSlot] += gpTownManager->m_splitAmount;
             if (gpHVHero->m_army.m_creatureCounts[sourceSlot] == 0)

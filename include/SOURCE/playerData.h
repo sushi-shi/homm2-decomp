@@ -81,25 +81,25 @@ public:
     i32 CurrentHero(void) {
         return m_currentHero;
     }
-    i8 CurrentTown(void) {
+    i32 CurrentTown(void) {
         return m_currentTown;
     }
-    i8 Color(void) {
+    i32 Color(void) {
         return m_color;
     }
-    i8 HeroCount(void) {
+    i32 HeroCount(void) {
         return m_heroCount;
     }
-    i8 TownCount(void) {
+    i32 TownCount(void) {
         return m_townCount;
     }
-    i8 HeroId(i32 index) {
+    i32 HeroId(i32 index) {
         return m_heroIds[index];
     }
-    i8 TownId(i32 index) {
+    i32 TownId(i32 index) {
         return m_townIds[index];
     }
-    i8 AvailableHeroId(i32 index) {
+    i32 AvailableHeroId(i32 index) {
         return m_availableHeroIds[index];
     }
 };

@@ -609,18 +609,18 @@ done:
 
 VA(0x004938d5, 0x28b)
 i32 game::PickLoadGame(void) {
-    char filePattern[FILE_PATTERN_CAPACITY];
+    char fileMask[FILE_PATTERN_CAPACITY];
     i32 dialogResult;
-    heroWindow* window;
-    fileRequester* requester;
+    heroWindow* heroWin;
+    fileRequester* fileReq;
 
     if (gbWaitForRemoteReceive != 0)
         return 1;
 
     if (gbInCampaign != 0) {
-        sprintf(filePattern, "*.GMC");
+        sprintf(fileMask, "*.GMC");
     } else if (xIsPlayingExpansionCampaign != 0) {
-        sprintf(filePattern, "*.GXC");
+        sprintf(fileMask, "*.GXC");
     } else if (gbRemoteOn != 0 && xNetHasOldPlayers != 0) {
         NormalDialog(
             "\xca\xe0\xea \xec\xe8\xed\xe8\xec\xf3\xec \xf3 \xee\xe4\xed\xee\xe3\xee \xe8\xe3\xf0\xee\xea\xe0 \xed\xe5\xf2 \xc3\xe5\xf0\xee\xe5\xe2 II: \xd6\xe5\xed\xe0 \xc2\xe5\xf0\xed\xee\xf1\xf2\xe8. \xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xea\xe0\xf0\xf2\xf3 \xf2\xee\xeb\xfc\xea\xee \xf1\xf2\xe0\xed\xe4\xe0\xf0\xf2\xed\xee\xe3\xee \xf4\xee\xf0\xec\xe0\xf2\xe0 \xc3\xe5\xf0\xee\xe5\xe2 II."
@@ -635,13 +635,13 @@ i32 game::PickLoadGame(void) {
             -1,
             0
         );
-        sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
+        sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     } else {
-        window = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
-        if (window == NULL)
+        heroWin = new heroWindow(WINDOW_X, WINDOW_Y, "x_mapmnu.bin");
+        if (heroWin == NULL)
             MemError();
-        gpWindowManager->DoDialog(window, ExpStdGameHandler, 0);
-        delete window;
+        gpWindowManager->DoDialog(heroWin, ExpStdGameHandler, 0);
+        delete heroWin;
 
         switch (static_cast<i16>(gpWindowManager->m_dialogResult)) {
             case CHOICE_ONE:
@@ -655,28 +655,28 @@ i32 game::PickLoadGame(void) {
         }
 
         if (xIsExpansionMap != 0)
-            sprintf(filePattern, "*.GX%d", giNumHumanPlayers);
+            sprintf(fileMask, "*.GX%d", giNumHumanPlayers);
         else
-            sprintf(filePattern, "*.GM%d", giNumHumanPlayers);
+            sprintf(fileMask, "*.GM%d", giNumHumanPlayers);
     }
 
-    requester = new fileRequester(
+    fileReq = new fileRequester(
         FILE_REQUESTER_X,
         FILE_REQUESTER_Y,
         FILE_REQUESTER_LOAD_GAME,
-        filePattern,
+        fileMask,
         gcGamePath,
-        filePattern
+        fileMask
     );
-    if (requester == NULL)
+    if (fileReq == NULL)
         MemError();
-    dialogResult = gpExec->DoDialog(requester);
+    dialogResult = gpExec->DoDialog(fileReq);
     if (dialogResult == FILE_REQUESTER_OK) {
         gpGame->LoadGame(gLastFilename, 0, 0);
-        delete requester;
+        delete fileReq;
         return 1;
     } else {
-        delete requester;
+        delete fileReq;
         return 0;
     }
 }

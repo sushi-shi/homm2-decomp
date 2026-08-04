@@ -1202,15 +1202,15 @@ void game::Overview(void) {
 
 VA(0x0047c253, 0x2ae)
 void game::DoKnob(void) {
-    tag_message pendingMessage;
+    i32 topBefore;
+    double itemPixels;
     float scrollRange;
-    i32 mouseY;
-    i32 mouseX;
-    float scrollTop;
-    double pixelsPerItem;
-    i32 newTop;
-    tag_message message;
-    i32 previousTop;
+    tag_message widgetMessage;
+    i32 ptX;
+    i32 ptY;
+    i32 topNow;
+    float topValue;
+    tag_message pendingMessage;
 
     if (giOverviewItems[IDX(giOverviewType)] <= OVERVIEW_VISIBLE_ROWS) {
         return;
@@ -1218,53 +1218,53 @@ void game::DoKnob(void) {
 
     {
         scrollRange = static_cast<float>(SCROLL_RANGE);
-        scrollTop = static_cast<float>(SCROLL_MIN_Y);
-        previousTop = giOverviewTop[IDX(giOverviewType)];
-        pixelsPerItem =
+        topValue = static_cast<float>(SCROLL_MIN_Y);
+        topBefore = giOverviewTop[IDX(giOverviewType)];
+        itemPixels =
             scrollRange / (giOverviewItems[IDX(giOverviewType)] - (OVERVIEW_VISIBLE_ROWS - 1));
-        gpMouseManager->MouseCoords(mouseX, mouseY);
+        gpMouseManager->MouseCoords(ptX, ptY);
         gpInputManager->Flush();
-        message = gpInputManager->GetEvent();
-        while (message.type != MESSAGE_LEFT_BUTTON_UP
-               && message.type != MESSAGE_RIGHT_BUTTON_UP) {
-            if (message.type == MESSAGE_MOUSE_MOVE) {
-                if (static_cast<float>(message.payload.mouse.y) < scrollTop) {
-                    message.payload.mouse.y = static_cast<i32>(scrollTop);
+        widgetMessage = gpInputManager->GetEvent();
+        while (widgetMessage.type != MESSAGE_LEFT_BUTTON_UP
+               && widgetMessage.type != MESSAGE_RIGHT_BUTTON_UP) {
+            if (widgetMessage.type == MESSAGE_MOUSE_MOVE) {
+                if (static_cast<float>(widgetMessage.payload.mouse.y) < topValue) {
+                    widgetMessage.payload.mouse.y = static_cast<i32>(topValue);
                 }
-                if (static_cast<float>(message.payload.mouse.y)
-                    > scrollRange + scrollTop - IDX(SCROLL_LAST_PIXEL_ADJUST)) {
-                    message.payload.mouse.y = static_cast<i32>(
-                        scrollRange + scrollTop - IDX(SCROLL_LAST_PIXEL_ADJUST)
+                if (static_cast<float>(widgetMessage.payload.mouse.y)
+                    > topValue + scrollRange - IDX(SCROLL_LAST_PIXEL_ADJUST)) {
+                    widgetMessage.payload.mouse.y = static_cast<i32>(
+                        topValue + scrollRange - IDX(SCROLL_LAST_PIXEL_ADJUST)
                     );
                 }
-                gpMouseManager->Main(message);
+                gpMouseManager->Main(widgetMessage);
                 OVScrollKnob->m_y =
-                    static_cast<i16>(message.payload.mouse.y - SCROLL_KNOB_OFFSET);
-                newTop = static_cast<i32>((OVScrollKnob->m_y - scrollTop) / pixelsPerItem);
-                if (previousTop != newTop) {
-                    if (newTop > giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
-                        newTop = giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
+                    static_cast<i16>(widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET);
+                topNow = static_cast<i32>((OVScrollKnob->m_y - topValue) / itemPixels);
+                if (topNow != topBefore) {
+                    if (topNow > giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS) {
+                        topNow = giOverviewItems[IDX(giOverviewType)] - OVERVIEW_VISIBLE_ROWS;
                     }
-                    if (newTop < 0) {
-                        newTop = 0;
+                    if (topNow < 0) {
+                        topNow = 0;
                     }
-                    giOverviewTop[IDX(giOverviewType)] = newTop;
+                    giOverviewTop[IDX(giOverviewType)] = topNow;
                     OVScrollKnob->m_y =
-                        static_cast<i16>(message.payload.mouse.y - SCROLL_KNOB_OFFSET);
+                        static_cast<i16>(widgetMessage.payload.mouse.y - SCROLL_KNOB_OFFSET);
                     SetupDynamicStuff(1, 0, 0);
-                    previousTop = newTop;
+                    topBefore = topNow;
                 } else {
                     overWin->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
                 }
             }
             Process1WindowsMessage();
-            message = gpInputManager->GetEvent();
-            if (message.type == MESSAGE_MOUSE_MOVE) {
+            widgetMessage = gpInputManager->GetEvent();
+            if (widgetMessage.type == MESSAGE_MOUSE_MOVE) {
                 i32 discardMouseMoves = 1;
                 while (discardMouseMoves) {
                     pendingMessage = gpInputManager->PeekEvent();
                     if (pendingMessage.type == MESSAGE_MOUSE_MOVE) {
-                        message = gpInputManager->GetEvent();
+                        widgetMessage = gpInputManager->GetEvent();
                     } else {
                         discardMouseMoves = 0;
                     }
