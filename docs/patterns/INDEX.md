@@ -74,3 +74,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [dead-code-after-early-return-in-span](dead-code-after-early-return-in-span.md) | inventory row says `reachable != total` and the span ends mid-block -> `/Od` kept the code after an early `return`, resuming at the first internal label; widen the `VA(...)` |
 | [jump-table-entry-swap-names-case-labels](jump-table-entry-swap-names-case-labels.md) | exactly two dispatch-table entries swapped and no other byte differs -> two `case` constants sit on the wrong bodies, not the bodies in the wrong order |
 | [reused-loop-counter-shrinks-frame](reused-loop-counter-shrinks-frame.md) | frame one slot too big and two of our slots map to one retail slot -> retail reused a single loop counter for two loops |
+| [inline-accessor-return-temp](inline-accessor-return-temp.md) | frame 4 bytes too big per accessor call, plus a store-then-reload of the accessor's result → retail read the member directly and cast it |
+| [unsigned-byte-flag-zero-extend](unsigned-byte-flag-zero-extend.md) | retail's `xor r32,r32` + `mov r8` where ours has `movsbl` → the one-byte member is `u8`, not `char` |

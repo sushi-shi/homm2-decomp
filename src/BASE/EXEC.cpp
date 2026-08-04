@@ -88,52 +88,37 @@ void executive::ShutDownSystem(void) {
 
 VA(0x004c50d0, 0x170)
 i32 executive::DoDialog(class baseManager* manager) {
-    baseManager* managerList[DIALOG_MANAGER_CAPACITY];
-    baseManager* previousList[DIALOG_MANAGER_CAPACITY];
-    baseManager* nextList[DIALOG_MANAGER_CAPACITY];
-    i32 dialogStorage[sizeof(executive) / sizeof(i32)];
-    executive* dialog = reinterpret_cast<executive*>(dialogStorage);
-    baseManager* listManager;
-    i32 managerIndex;
-    i32 managerCount;
-    managerCount = 0;
-    dialog->m_managerListHead = NULL;
-    dialog->m_managerListTail = NULL;
-    dialog->m_activeManager = NULL;
-    listManager = m_managerListHead;
-    dialog->m_result = 0;
-    managerIndex = 0;
-    if (listManager != NULL) {
-        do {
-            managerList[managerIndex] = listManager;
-            previousList[managerIndex] = listManager->m_prev;
-            listManager = listManager->m_next;
-            nextList[managerIndex] = listManager;
-            managerIndex++;
-            managerCount++;
-        } while (listManager != NULL);
+    baseManager* savePrev[DIALOG_MANAGER_CAPACITY];
+    i32 idx;
+    baseManager* p;
+    baseManager* saveMgr[DIALOG_MANAGER_CAPACITY];
+    baseManager* saveNext[DIALOG_MANAGER_CAPACITY];
+    executive ex;
+    i32 count = 0;
+
+    p = m_managerListHead;
+    while (p != NULL) {
+        saveMgr[count] = p;
+        savePrev[count] = p->m_prev;
+        saveNext[count] = p->m_next;
+        p = p->m_next;
+        count++;
     }
     if (AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError1);
-    if (dialog->AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(gpMouseManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError2);
-    if (dialog->AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(gpWindowManager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError3);
-    if (dialog->AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
+    if (ex.AddManager(manager, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.dialogManagerError4);
-    dialog->MainLoop();
+    ex.MainLoop();
     RemoveManager(manager);
-    if (managerCount > 0) {
-        managerIndex = 0;
-        do {
-            listManager = managerList[managerIndex];
-            listManager->m_prev = previousList[managerIndex];
-            listManager->m_next = nextList[managerIndex];
-            managerIndex++;
-            managerCount--;
-        } while (managerCount != 0);
+    for (idx = 0; idx < count; idx++) {
+        saveMgr[idx]->m_prev = savePrev[idx];
+        saveMgr[idx]->m_next = saveNext[idx];
     }
-    return dialog->m_result;
+    return ex.m_result;
 }
 
 VA(0x004c5240, 0xac)
@@ -143,9 +128,11 @@ void executive::PrintManagerList(void) {
     sprintf(gText, gExecutiveText.managerListHeaderFormat, m_managerListHead, m_managerListTail);
     LogStr(gText);
     LogStr(gExecutiveText.managerListDivider2);
-    for (baseManager* m = m_managerListHead; m != NULL; m = m->m_next) {
+    baseManager* m = m_managerListHead;
+    while (m != NULL) {
         sprintf(gText, gExecutiveText.managerListEntryFormat, m->m_name, m, m->m_prev, m->m_next);
         LogStr(gText);
+        m = m->m_next;
     }
     LogStr(gExecutiveText.managerListStop);
 }
@@ -155,18 +142,16 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
     if (mgr == NULL)
         return MANAGER_ERROR;
     if (priority == MANAGER_DEFAULT_PRIORITY) {
-        priority = m_managerListTail == NULL ? 0 : m_managerListTail->m_priority + 1;
+        if (m_managerListTail == NULL)
+            priority = 0;
+        else
+            priority = m_managerListTail->m_priority + 1;
     }
     if (!mgr->m_active && mgr->Open(priority) != 0)
         return MANAGER_ERROR;
     baseManager* cur = m_managerListTail;
-    if (cur != NULL) {
-        do {
-            if (cur->m_priority <= priority)
-                break;
-            cur = cur->m_prev;
-        } while (cur != NULL);
-    }
+    while (cur != NULL && cur->m_priority > priority)
+        cur = cur->m_prev;
     if (cur == NULL) {
         mgr->m_next = m_managerListHead;
         mgr->m_prev = NULL;
@@ -176,8 +161,8 @@ i32 executive::AddManager(class baseManager* mgr, i32 priority) {
         if (m_managerListTail == NULL)
             m_managerListTail = mgr;
     } else if (cur->m_next == NULL) {
-        mgr->m_next = NULL;
         mgr->m_prev = m_managerListTail;
+        mgr->m_next = NULL;
         m_managerListTail->m_next = mgr;
         m_managerListTail = mgr;
     } else {
@@ -219,7 +204,7 @@ void executive::RemoveManager(class baseManager* mgr) {
 VA(0x004c5500, 0x7c)
 void executive::CallManager(class baseManager* mgr) {
     baseManager* saved = m_activeManager;
-    RemoveManager(saved);
+    RemoveManager(m_activeManager);
     if (AddManager(mgr, MANAGER_DEFAULT_PRIORITY) != 0)
         ShutDown(gExecutiveText.callManagerError1);
     MainLoop();
@@ -231,56 +216,51 @@ void executive::CallManager(class baseManager* mgr) {
 
 VA(0x004c5580, 0x179)
 void executive::MainLoop(void) {
+    i32 done;
     tag_message message;
-    i32 keepDispatching;
-    i32 done = 0;
-    MessageDispatchResult result;
-    baseManager* manager;
-    if (m_managerListHead != NULL) {
-        gpInputManager->Flush();
-        do {
-            Process1WindowsMessage();
-            message = gpInputManager->GetEvent();
-            keepDispatching = 1;
-            m_activeManager = m_managerListHead;
-            if (m_managerListHead == NULL)
-                return;
-            do {
-                if (!keepDispatching)
-                    break;
-                if (done)
-                    return;
-                manager = m_activeManager;
-                if (manager->m_active == true
-                    && (message.type != MESSAGE_MOUSE_MOVE || gpWindowManager != manager)) {
-                    result = manager->Main(message);
-                    switch (result) {
-                        case MESSAGE_DISPATCH_CONSUME:
-                            keepDispatching = 0;
-                            break;
-                        case MESSAGE_DISPATCH_FORWARD:
-                            if ((message.type & MESSAGE_EXECUTIVE) == MESSAGE_NONE)
-                                break;
+    i32 dispatch;
+
+    done = 0;
+    dispatch = 1;
+    if (m_managerListHead == NULL)
+        return;
+    gpInputManager->Flush();
+    while (!done) {
+        Process1WindowsMessage();
+        message = gpInputManager->GetEvent();
+        dispatch = 1;
+        m_activeManager = m_managerListHead;
+        if (m_activeManager == NULL)
+            return;
+        while (m_activeManager != NULL && dispatch && !done) {
+            if (m_activeManager->m_active == true
+                && (message.type != MESSAGE_MOUSE_MOVE || m_activeManager != gpWindowManager)) {
+                switch (m_activeManager->Main(message)) {
+                    case MESSAGE_DISPATCH_CONSUME:
+                        dispatch = 0;
+                        break;
+                    case MESSAGE_DISPATCH_FORWARD:
+                        if (HAS(message.type, MESSAGE_EXECUTIVE)) {
                             switch (message.payload.executive.command) {
                                 case EXECUTIVE_COMMAND_TERMINATE_LOOP:
+                                    done++;
+                                    break;
+                                case EXECUTIVE_COMMAND_RETURN_RESULT:
+                                    m_result = message.payload.executive.result;
                                     done++;
                                     break;
                                 case EXECUTIVE_COMMAND_REMOVE_MANAGER:
                                     RemoveManager(m_activeManager);
                                     m_activeManager = NULL;
                                     break;
-                                case EXECUTIVE_COMMAND_RETURN_RESULT:
-                                    m_result = message.payload.executive.result;
-                                    done++;
-                                    break;
                             }
-                            break;
-                    }
+                        }
+                        break;
                 }
-                if (m_activeManager != NULL)
-                    m_activeManager = m_activeManager->m_next;
-            } while (m_activeManager != NULL);
-        } while (!done);
+            }
+            if (m_activeManager != NULL)
+                m_activeManager = m_activeManager->m_next;
+        }
     }
 }
 
