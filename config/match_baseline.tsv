@@ -1050,11 +1050,11 @@ SOURCE/Newgame	?GetSideDesc@game@@QAEHPADHH@Z	100.0000	f296eda95619
 SOURCE/Newgame	?GetVictoryConditionText@game@@QAEXPAD@Z	100.0000	ad081e2d2b51
 SOURCE/Newgame	?InitNewGame@game@@QAEXPAUSMapHeader@@@Z	100.0000	62657a3a5821
 SOURCE/Newgame	?NGKPSetupDisplayString@game@@QAEXPADG@Z	100.0000	1f94c5dc68b1
-SOURCE/Newgame	?NewGame@game@@QAEHXZ	99.1870	edd460d4b409
+SOURCE/Newgame	?NewGame@game@@QAEHXZ	100.0000	fe9e12f3387e
 SOURCE/Newgame	?ProcessNGKeyPress@game@@QAEHAAUtag_message@@@Z	100.0000	52aee5ca7274
 SOURCE/Newgame	?ProcessNewMap@game@@QAEXPAUSMapHeader@@@Z	100.0000	292209677ba8
 SOURCE/Newgame	?SetupNetPlayerNames@game@@QAEXXZ	100.0000	9ec3ce96d04f
-SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	99.7377	e1f0a2b06ac6
+SOURCE/Newgame	?ShowScenInfo@game@@QAEXXZ	100.0000	7c987f4483c1
 SOURCE/Overview	?DoKnob@game@@QAEXXZ	100.0000	feac8a001607
 SOURCE/Overview	?Overview@game@@QAEXXZ	100.0000	5412d3533be7
 SOURCE/Overview	?OverviewHandler@@YIHAAUtag_message@@@Z	100.0000	5ee4f3e049b3
