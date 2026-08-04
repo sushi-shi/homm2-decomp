@@ -2024,59 +2024,59 @@ void army::DamageEnemy(
     i32 rangedAttack,
     i32 defenseModifier
 ) {
-    float damage1;
-    i32 attackBonus6;
-    i32 defenseBonus9;
-    i32 attackDifference7;
-    i32 rearHex19;
-    i32 index16;
-    i32 damageDone2;
-    i32 genieDamage26;
-    hero* commander1;
+    float baseDamage;
+    i32 attackAdd;
+    i32 defBonus;
+    i32 diff;
+    i32 genieHalfDamage;
+    i32 rearHex;
+    i32 count;
+    i32 damageTotal;
+    hero* commander;
 
     if (!target) {
         return;
     }
-    damage1 = 0;
+    baseDamage = 0;
     gbGenieHalf = false;
-    for (index16 = 0; index16 < m_quantity; index16++) {
+    for (count = 0; count < m_quantity; count++) {
         if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_BLESS)]) {
-            damage1 += m_monster.damageMax;
+            baseDamage += m_monster.damageMax;
         } else if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_CURSE)]) {
-            damage1 += m_monster.damageMin;
+            baseDamage += m_monster.damageMin;
         } else {
-            damage1 += SRandom(m_monster.damageMin, m_monster.damageMax);
+            baseDamage += SRandom(m_monster.damageMin, m_monster.damageMax);
         }
     }
-    attackBonus6 = 0;
-    defenseBonus9 = 0;
-    attackDifference7 = m_monster.attack + attackBonus6
-                        - (target->m_monster.defense + defenseBonus9 + defenseModifier);
+    attackAdd = 0;
+    defBonus = 0;
+    diff = m_monster.attack + attackAdd
+                        - (target->m_monster.defense + defBonus + defenseModifier);
     if (m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_DRAGON_SLAYER)]
         && (target->m_monsterType == CREATURE_GREEN_DRAGON
             || target->m_monsterType == CREATURE_RED_DRAGON
             || target->m_monsterType == CREATURE_BLACK_DRAGON
             || target->m_monsterType == CREATURE_BONE_DRAGON)) {
-        attackDifference7 += ARMY_DRAGON_SLAYER_BONUS;
+        diff += ARMY_DRAGON_SLAYER_BONUS;
     }
     if (gpCombatManager->m_drawbridgeBackgroundVisible) {
-        rearHex19 = -1;
+        rearHex = -1;
         if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_WIDE)) {
-            rearHex19 = target->m_hex + ArmyFacingRearHexOffset(target->m_facing);
+            rearHex = target->m_hex + ArmyFacingRearHexOffset(target->m_facing);
         }
-        for (index16 = 0; index16 < ARMY_MOAT_CELL_COUNT; index16++) {
-            if (target->m_hex == moatCell[index16] || rearHex19 == moatCell[index16]) {
-                attackDifference7 += ARMY_MOAT_ATTACK_BONUS;
+        for (count = 0; count < ARMY_MOAT_CELL_COUNT; count++) {
+            if (target->m_hex == moatCell[count] || rearHex == moatCell[count]) {
+                diff += ARMY_MOAT_ATTACK_BONUS;
             }
         }
     }
-    if (attackDifference7 > ARMY_DAMAGE_STAT_LIMIT) {
-        attackDifference7 = ARMY_DAMAGE_STAT_LIMIT;
+    if (diff > ARMY_DAMAGE_STAT_LIMIT) {
+        diff = ARMY_DAMAGE_STAT_LIMIT;
     }
-    if (attackDifference7 < -ARMY_DAMAGE_STAT_LIMIT) {
-        attackDifference7 = -ARMY_DAMAGE_STAT_LIMIT;
+    if (diff < -ARMY_DAMAGE_STAT_LIMIT) {
+        diff = -ARMY_DAMAGE_STAT_LIMIT;
     }
-    damage1 *= gfBattleStat[attackDifference7 + ARMY_DAMAGE_STAT_LIMIT];
+    baseDamage *= gfBattleStat[diff + ARMY_DAMAGE_STAT_LIMIT];
     if ((m_monsterType == CREATURE_CRUSADER
          && HAS(target->m_monster.flags.all, MONSTER_FLAGS_UNDEAD))
         || (m_monsterType == CREATURE_EARTH_ELEMENTAL
@@ -2087,56 +2087,56 @@ void army::DamageEnemy(
             && target->m_monsterType == CREATURE_FIRE_ELEMENTAL)
         || (m_monsterType == CREATURE_FIRE_ELEMENTAL
             && target->m_monsterType == CREATURE_WATER_ELEMENTAL)) {
-        damage1 *= DAMAGE_DOUBLE_MULTIPLIER;
+        baseDamage *= DAMAGE_DOUBLE_MULTIPLIER;
     }
     if (m_luckOutcome > 0) {
-        damage1 *= DAMAGE_DOUBLE_MULTIPLIER;
+        baseDamage *= DAMAGE_DOUBLE_MULTIPLIER;
     }
     if (m_luckOutcome < 0) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
     m_luckOutcome = 0;
     if (rangedAttack && gpCombatManager->ShotIsThroughWall(m_side, m_hex, target->m_hex)) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
-    commander1 = gpCombatManager->m_heroes[IDX(m_side)];
-    if (commander1 && rangedAttack) {
-        damage1 *=
-            gfSSArcheryMod[IDX(commander1->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])];
+    commander = gpCombatManager->m_heroes[IDX(m_side)];
+    if (commander && rangedAttack) {
+        baseDamage *=
+            gfSSArcheryMod[IDX(commander->m_secondarySkills[IDX(HERO_SKILL_ARCHERY)])];
     }
     if (HAS(m_monster.flags.all, MONSTER_FLAGS_SHOOTER) && !rangedAttack
         && m_monsterType != CREATURE_TITAN && m_monsterType != CREATURE_MAGE
         && m_monsterType != CREATURE_ARCHMAGE) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
     if (rangedAttack && target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_SHIELD)]) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
     if (m_damagePenalty == ARMY_DAMAGE_PENALTY_HALF) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
     m_damagePenalty = ARMY_DAMAGE_PENALTY_NONE;
     if (target->m_spellInfluence[IDX(ARMY_SPELL_INFLUENCE_PETRIFIED)]) {
-        damage1 /= DAMAGE_HALF_DIVISOR;
+        baseDamage /= DAMAGE_HALF_DIVISOR;
     }
-    damageDone2 = static_cast<i32>(damage1 + DAMAGE_ROUNDING_OFFSET);
+    damageTotal = static_cast<i32>(baseDamage + DAMAGE_ROUNDING_OFFSET);
     if (m_monsterType == CREATURE_GENIE
         && SRandom(1, ARMY_GENIE_HALF_ROLL_MAX) == ARMY_GENIE_HALF_ROLL) {
-        genieDamage26 =
+        genieHalfDamage =
             ((target->m_quantity + 1) / GENIE_QUANTITY_DIVISOR) * target->m_monster.hitPoints;
-        if (genieDamage26 > damageDone2) {
+        if (genieHalfDamage > damageTotal) {
             gbGenieHalf = true;
-            damageDone2 = genieDamage26;
+            damageTotal = genieHalfDamage;
         }
     }
-    if (damageDone2 <= 0) {
-        damageDone2 = 1;
+    if (damageTotal <= 0) {
+        damageTotal = 1;
     }
     if (HAS(target->m_monster.flags.all, MONSTER_FLAGS_MIRROR_IMAGE)) {
-        damageDone2 = -1;
+        damageTotal = -1;
     }
-    *damageResult = damageDone2;
-    *killedResult = target->Damage(damageDone2, SPELL_NONE);
+    *damageResult = damageTotal;
+    *killedResult = target->Damage(damageTotal, SPELL_NONE);
 }
 
 VA(0x0041dd32, 0x21c)
@@ -2289,9 +2289,10 @@ void army::PowEffect(
         }
     }
     totalFrames_4 = maximumStartFrames + maximumEndFrames_1;
-    totalFrames_4 = maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7 > totalFrames_4
-                        ? maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7
-                        : totalFrames_4;
+    totalFrames_4 =
+        totalFrames_4 > maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7
+            ? totalFrames_4
+            : maximumStartFrames + maximumDamageFrames_3 - overlapAdjustment_7;
     totalFrames_4 = maximumDamageFrames_3 > totalFrames_4 ? maximumDamageFrames_3 : totalFrames_4;
     effectFrames_1 = effectFrames_1 > totalFrames_4 ? effectFrames_1 : totalFrames_4;
     frameDelay_6 = ARMY_POW_EFFECT_DELAY;
@@ -2366,7 +2367,7 @@ void army::PowEffect(
                         + current->m_frameInfo
                               .animationFrameCount[IDX(current->m_effectAnimationStart + 1)];
                 }
-                if (current->m_animationSequence == current->m_effectAnimationStart) {
+                if (current->m_effectAnimationStart == current->m_animationSequence) {
                     current->m_effectAnimationLength--;
                 }
                 if (m_drawState < ARMY_DRAW_EFFECT) {
@@ -2376,7 +2377,7 @@ void army::PowEffect(
         }
     }
     frame = 0;
-    for (frame = 0; effectFrames_1 > frame; frame++) {
+    for (frame = 0; frame < effectFrames_1; frame++) {
         for (side_4 = COMBAT_ATTACKER_SIDE; IDX(side_4) < COMBAT_SIDE_COUNT; side_4++) {
             for (index_10 = 0; index_10 < gpCombatManager->m_armyCount[IDX(side_4)]; index_10++) {
                 current = &gpCombatManager->m_armies[IDX(side_4)][index_10];
@@ -2454,7 +2455,7 @@ void army::PowEffect(
             && frame < giNumPowFrames[IDX(gCurLoadedSpellEffect)]) {
             gCurLoadedSpellIcon->CombatClipDrawToBuffer(
                 effectX,
-                m_spellEffectYOffset + effectY,
+                effectY + m_spellEffectYOffset,
                 gCurSpellEffectFrame,
                 &m_spellLimits,
                 ICON_DRAW_NORMAL,
@@ -2676,14 +2677,14 @@ void army::SpellEffect(
     i32 effectFrameDelay,
     i32 animateCreature
 ) {
-    u32l effectFileId;
     IconEntry* entry;
-    i32 frame;
-    i32 minimumYOffset;
-    i32 powBaseY;
+    i32 smallestY;
     i32 frameDelay;
-    i32 i_16;
-    i32 unusedSpellEffectWord;
+    i32 unusedWord;
+    i32 frame;
+    i32 i;
+    u32l effectFileId;
+    i32 powBaseY;
 
     effectFileId = MAKEFILEID(gCombatFxNames[IDX(effect)]);
     if (m_animationSequence == ARMY_ANIMATION_WINCE
@@ -2701,15 +2702,15 @@ void army::SpellEffect(
     m_drawSpellEffect = 1;
     m_spellEffectYOffset = 0;
     if (!gbNoShowCombat) {
-        minimumYOffset = EFFECT_MINIMUM_Y;
-        for (i_16 = 0; i_16 < gCurLoadedSpellIcon->m_frameCount; i_16++) {
-            entry = GetIconEntry(gCurLoadedSpellIcon, i_16);
-            if (entry->y < minimumYOffset) {
-                minimumYOffset = entry->y;
+        smallestY = EFFECT_MINIMUM_Y;
+        for (i = 0; i < gCurLoadedSpellIcon->m_frameCount; i++) {
+            entry = GetIconEntry(gCurLoadedSpellIcon, i);
+            if (entry->y < smallestY) {
+                smallestY = entry->y;
             }
         }
         powBaseY = GetPowBaseY();
-        powBaseY += minimumYOffset;
+        powBaseY += smallestY;
         if (powBaseY < 0) {
             m_spellEffectYOffset = -powBaseY;
         }
@@ -3215,11 +3216,11 @@ float army::SpellCastWorkChance(SpellType spell) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if ((spell == SPELL_RESURRECT || spell == SPELL_TRUE_RESURRECT)
-        && (HAS(m_monster.flags.all, MONSTER_FLAGS_UNDEAD) || m_initialQuantity == m_quantity)) {
+        && (HAS(m_monster.flags.all, MONSTER_FLAGS_UNDEAD) || m_quantity == m_initialQuantity)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if (spell == SPELL_ANIMATE_DEAD
-        && (!HAS(m_monster.flags.all, MONSTER_FLAGS_UNDEAD) || m_initialQuantity == m_quantity)) {
+        && (!HAS(m_monster.flags.all, MONSTER_FLAGS_UNDEAD) || m_quantity == m_initialQuantity)) {
         return ARMY_SPELL_CHANCE_NONE;
     }
     if ((spell == SPELL_HOLY_WORD || spell == SPELL_HOLY_SHOUT)
@@ -3339,7 +3340,7 @@ float army::SpellCastWorkChance(SpellType spell) {
             )) {
             hypnotizeHitPoints_37 *= ARTIFACT_POWER_MULTIPLIER;
         }
-        if (m_monster.hitPoints * m_quantity > hypnotizeHitPoints_37) {
+        if (m_quantity * m_monster.hitPoints > hypnotizeHitPoints_37) {
             return ARMY_SPELL_CHANCE_NONE;
         }
     }

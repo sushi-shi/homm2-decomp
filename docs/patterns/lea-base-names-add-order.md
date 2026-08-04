@@ -73,3 +73,45 @@ memory operand of a single `add`. Measured on `SetupDynamicWindow` (RVA 0x6e35e)
 `leftOffset + columnIndex * TILE_SIZE` and `topOffsetNum + tileRowPos * TILE_SIZE`
 closed a 562-vs-564 instruction-count gap, and the `lea` form of the same rule fixed
 `*contentLeft + columnsSize * TILE_SIZE - 1` plus four border-tile coordinates.
+
+### Confirmed on real sites (SOURCE/ARMY)
+
+
+The same rule reads off a plain two-term `int` sum whose operands are a computed
+value and a simple lvalue. `/Od` evaluates the COMPLEX operand first into a
+register, then materialises the simple one, and the ADD's **destination register
+holds the LEFT operand of the source `+`**:
+
+```
+ours   ArmyFacingRearHexOffset(m_facing) + m_hex      retail   m_hex + ArmyFacingRearHexOffset(m_facing)
+------------------------------------------------     ------------------------------------------------
+8b 82 86 00 00 00  movl 0x86(%edx), %eax  ; facing    8b 88 86 00 00 00  movl 0x86(%eax), %ecx
+83 e8 01           subl $0x1, %eax                    83 e9 01           subl $0x1, %ecx
+f7 d8              negl %eax                          f7 d9              negl %ecx
+1b c0              sbbl %eax, %eax                    1b c9              sbbl %ecx, %ecx
+83 e0 fe           andl $-0x2, %eax                   83 e1 fe           andl $-0x2, %ecx
+83 c0 01           addl $0x1, %eax                    83 c1 01           addl $0x1, %ecx
+8b 4d e8           movl -0x18(%ebp), %ecx             8b 55 e8           movl -0x18(%ebp), %edx
+03 41 7a           addl 0x7a(%ecx), %eax   <<<        8b 42 7a           movl 0x7a(%edx), %eax   <<<
+                                                      03 c1              addl %ecx, %eax
+```
+
+`add eax, [ecx+0x7a]` keeps the *computed* value as the accumulator, so the
+computed value is the source's LEFT operand. Retail loads `m_hex` into a fresh
+register and adds the computed one, so `m_hex` is the LEFT operand. One
+instruction longer, and it is the retail form at every `ArmyFacingRearHexOffset`
+site in `SOURCE/ARMY` (`army::Walk`, `army::ProcessDeath`, `army::DamageEnemy`).
+
+The same reading applies when the simple operand is a *parameter*:
+
+```
+ours   m_frameInfo.spellEffectX * rear + x     retail   x + m_frameInfo.spellEffectX * rear
+0f bf 82 2a 01 00 00 movswl 0x12a(%edx),%eax   0f bf 82 2a 01 00 00 movswl 0x12a(%edx),%eax
+...                                            ...
+0f af c2             imull %edx, %eax          0f af c2             imull %edx, %eax
+03 45 08             addl 0x8(%ebp), %eax      8b 4d 08             movl 0x8(%ebp), %ecx
+                                               03 c8                addl %eax, %ecx
+```
+
+`army::DrawToBuffer` 96.66% -> EXACT once every such sum was rewritten with the
+simple operand on the left.

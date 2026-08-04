@@ -358,6 +358,27 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   "%s %d уровня %s. Артефактов: %d.", and the strip labels "героя" /
   "гарнизона".
 
+- **[Buka] Combat damage messages rebuilt around CP1251 case folding**
+  (`army::SpecialAttack` 0x1a1d9, `army::DoAttack` 0x1bddb,
+  `army::DoHydraAttack` 0x1b858). PoL's `"%s %s %d %s.\n%d %s %s."` with a
+  singular/plural attacker name and a `gText[0] -= 32` capitalisation became
+  `"%s %s %s %d %s.\n%d %s %s."` — a leading literal "Атака", the attacker's
+  name **always** plural (`gArmyNamesPlural[m_monsterType]`, no
+  `m_quantity > 1` select), "наносит", the damage, "ед. урона", the kill count,
+  and a defender name/verb pair selected on `killed <= 1`. Two new helpers
+  replace the bare `-= 32`: inline CP1251 `ToUpperCp1251` / `ToLowerCp1251`
+  fold `a`-`z`, `а`-`я` (0xE0-0xFF) and `ё`/`Ё` (0xB8/0xA8) — each expansion
+  gets its own byte slot in the caller frame. The defender's singular name is
+  lower-cased into a new 100-byte file-static scratch buffer at VA 0x00524038
+  (`gTargetName`, referenced only by `SOURCE/ARMY`, 22 sites). The genie-half
+  message keeps a `m_quantity <= 1` select but pairs the *singular* attacker
+  name with the *plural* verb "уничтожают" (and vice-versa) — a translation
+  slip preserved in the bytes.
+- **[Buka] `SOURCE/ARMY` combat text buffers are 800 bytes**, not 200:
+  `army::SpecialAttack`, `army::DoAttack` and `army::DoHydraAttack` each
+  reserve `char[800]` for the `strcpy(text, gText)` copy (frames 0x43c, 0x38c,
+  0x358).
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
