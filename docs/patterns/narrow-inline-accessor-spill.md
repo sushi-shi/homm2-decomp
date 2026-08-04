@@ -40,3 +40,47 @@ the `new` temp and the switch temp each one slot deeper (`-0x40/-0x44/-0x48` ret
 96.70% -> EXACT with that single token. Note this is *site-local*: other call sites in
 the same TU (`advManager::CheckCastSpell`, 100% exact) do carry the accessor's temp, so
 the retail source genuinely mixes the two spellings. Read the frame, not the habit.
+
+## Second tell: the accessor hoists ahead of the argument pushes
+
+When the accessor call is an *argument*, the extra temp is not the only difference:
+`/Ob1` expands the inline body as a statement before the call's right-to-left push
+sequence starts, so every later argument's `push` moves after it. A direct member
+read stays inside the argument evaluation and keeps retail's order.
+
+```cpp
+struct P { char pad[0x49c]; i8 color; };
+class G { public: P p[4]; i8 GetColor(int i) { return p[i].color; } };
+G* gp;  void Sink(int,int,int,int);
+
+void a_accessor(int who) { Sink(1, gp->GetColor(who), -1, 5000); }   // ours
+void a_member(int who)   { Sink(1, gp->p[who].color, -1, 5000); }    // retail
+```
+
+```
+a_accessor  (ours)                            a_member  (retail)
+--------------------------------------------- ---------------------------------------------
+83 ec 08     subl $0x8, %esp                  51           pushl %ecx        ; frame 4, not 8
+89 4d f8     movl %ecx, -0x8(%ebp)            89 4d fc     movl %ecx, -0x4(%ebp)
+8b 45 f8     movl -0x8(%ebp), %eax            68 88 13 00 00  pushl $0x1388  ; args first
+69 c0 9d 04 00 00  imull $0x49d, %eax, %eax   6a ff        pushl $-0x1
+8b 0d ..     movl 0x0, %ecx                   8b 45 fc     movl -0x4(%ebp), %eax
+8a 94 01 9c 04 00 00  movb 0x49c(%ecx,%eax), %dl   69 c0 9d 04 00 00  imull $0x49d, %eax, %eax
+88 55 fc     movb %dl, -0x4(%ebp)   ; the temp 8b 0d ..     movl 0x0, %ecx
+68 88 13 00 00  pushl $0x1388  ; args AFTER   0f be 94 01 9c 04 00 00  movsbl 0x49c(%ecx,%eax), %edx
+6a ff        pushl $-0x1                      b9 01 00 00 00  movl $0x1, %ecx
+0f be 55 fc  movsbl -0x4(%ebp), %edx          e8 ..        calll Sink
+b9 01 00 00 00  movl $0x1, %ecx
+e8 ..        calll Sink
+```
+
+Measured on `CheckEndGame` (RVA 0x69899, three sites), `ReceiveHostReportsPlayerExit`
+(0x6edbf) and `ReceiveRemotePlayerExit` (0x6f115): all five call sites needed
+
+```cpp
+    gpGame->m_players[static_cast<i8>(player)].m_color,   // retail
+    gpGame->GetPlayerColor(static_cast<i8>(player)),      // ours
+```
+
+so in this image `game::GetPlayerColor` is a reconstruction convenience, not what
+those call sites were written as.

@@ -31,3 +31,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [lea-base-names-add-order](lea-base-names-add-order.md) | `lea K(%eax,%edx)` vs `lea K(%edx,%eax)` with identical registers → the SIB base is the LEFT operand of the source `+` |
 | [integer-relational-operand-side](integer-relational-operand-side.md) | `cmp mem,reg` (`39`) vs `cmp reg,mem` (`3b`) with mirrored `jcc` -> the memory reference is the source's LEFT or RIGHT relational operand |
 | [switch-case-early-break](switch-case-early-break.md) | a case arm ending in a NEAR `jmp` to the switch end (not a short `jmp` to a local join) -> `if (c) { ...; break; }`, not `if/else`; the same shape places a shared `goto` label INSIDE the guard's then-arm |
+| [cast-widens-relational-to-unsigned](cast-widens-relational-to-unsigned.md) | `jb`/`jbe` where retail has `jl`/`jle`, everything else identical → a `u32` cast made the comparison unsigned |
+| [byte-store-int-rhs-order](byte-store-int-rhs-order.md) | `arr[i] = <byte>`: retail's `and $0xff` plus value-before-index order → the RHS is an `int` expression, not a `u8` lvalue |
+| [bool-store-to-byte-field](bool-store-to-byte-field.md) | `xor/cmp/sete/movb` into a one-byte field → `field = (a == b);`, not an `if/else` pair of `movb` stores |

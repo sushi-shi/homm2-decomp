@@ -293,6 +293,36 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   ternary temp: only the attacker side keeps the `-0x88` ternary temp);
   PoL nests two ternaries and burns two extra temps (frame 0x9c vs 0x94).
   Byte-pinned (0x48c95).
+- **[Buka] `ShutDown` no longer stops the CD.** PoL 2.0 calls
+  `gpSoundManager->CDStop()` between `ShutDownSmacker()` and
+  `ClearMapExtra()`; 2.1/Buka drops the call entirely (`homm2 relocs 0x6cc61`
+  reported it as the unit's only only-base reference). The farewell string is
+  localized: `"Bye!"` -> `"\xcf\xee\xea\xe0!"` ("Пока!"). Byte-pinned
+  (0x6cc61).
+- **[Buka] `CheckEndGame` lost two dead 100-byte text buffers.** PoL's frame
+  carries three `char[100]` locals; this image has exactly one (the artifact
+  name) plus the `char[20]` campaign save name, and the frame is 0xfc where
+  PoL's is far larger. Same local COUNT (33), different composition. All 23
+  user-facing strings are CP1251 Russian. Byte-pinned (0x69899).
+- **[Buka] End-game / player-exit / net-box user text is localized.**
+  `CheckEndGame` (23 strings), `ReceiveHostReportsPlayerExit` (6),
+  `ReceiveRemotePlayerExit` (5), `PopNetBox` (1), `ShutDown` (1) and
+  `AddScoreToHighScore` (1) all carry CP1251 Russian text where PoL has
+  English. Two are semantic, not just translated: the save-game name
+  `"PLYREXIT"` became `"\xc8\xe3\xf0\xee\xea \xc2\xfb\xf8\xe5\xeb"`
+  ("Игрок Вышел"), and the campaign autosave prefix `"WIN_"` became
+  `"\xcf\xce\xc1\xc5\xc4\xc0_"` ("ПОБЕДА_"), so both save files are named
+  in Russian. `ReceiveHostReportsPlayerExit`'s timed-out and exited host
+  reports were also collapsed onto the same sentence (two identical
+  duplicate cells in the unit's literal block).
+- **[Buka] `soundManager` is 82 bytes (0x52).** `InitMainClasses` allocates
+  `new soundManager` with `push $0x52`, and the retail constructor
+  (`??0soundManager@@QAE@XZ`, 0x4b5bd0) writes no offset above 0x4e. Every
+  member our `include/BASE/soundManager.h` models past `m_musicTrack` (the
+  Miles sample-handle tables, MIDI track positions, CD/aux state) is
+  therefore NOT in this image's class; those fields live elsewhere. Pinned by
+  `InitMainClasses` (0x65d1c), which is otherwise byte-identical and is held
+  at 3 bytes by the wrong `sizeof`.
 
 ### SOURCE/TOWNMGR (town screen)
 
