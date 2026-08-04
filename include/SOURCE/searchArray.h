@@ -114,7 +114,7 @@ public:
         return m_storage.nodes + y * width;
     }
     searchNode& GetNode(i32 x, i32 y) {
-        return *(m_storage.nodes + y * MAP_WIDTH + x);
+        return *(m_storage.nodes + x + MAP_WIDTH * y);
     }
     searchArray(void);
     ~searchArray();
