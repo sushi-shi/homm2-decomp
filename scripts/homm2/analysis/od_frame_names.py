@@ -12,6 +12,7 @@ inside `S_GPROC32`/`S_LPROC32` (0x100a/0x100b) blocks closed by `S_END` (0x0006)
 import struct
 
 SYM_END = 0x0006
+SYM_BLOCK32 = 0x0207
 SYM_BPREL32 = 0x1006
 SYM_GPROC32 = 0x100A
 SYM_LPROC32 = 0x100B
@@ -67,7 +68,7 @@ def frame_names(obj: bytes) -> dict[str, list[tuple[int, str]]]:
         blob = obj[pointer:pointer + size]
         # A signature dword precedes the records in CV4/CV5 streams.
         cursor = 4 if struct.unpack_from("<I", blob, 0)[0] in (1, 2) else 0
-        open_procs: list[str] = []
+        scopes: list[str | None] = []
         while cursor + 4 <= len(blob):
             record_length, record_type = struct.unpack_from("<HH", blob, cursor)
             if record_length < 2:
@@ -75,15 +76,22 @@ def frame_names(obj: bytes) -> dict[str, list[tuple[int, str]]]:
             body = blob[cursor + 4:cursor + 2 + record_length]
             if record_type in (SYM_GPROC32, SYM_LPROC32):
                 function = _proc_name(body)
-                open_procs.append(function)
+                scopes.append(function)
                 slots.setdefault(function, [])
+            elif record_type == SYM_BLOCK32:
+                # An inner `{ }` scope, closed by its own S_END. Push a marker so
+                # that S_END does not pop the procedure and lose every later local.
+                scopes.append(None)
             elif record_type == SYM_END:
-                if open_procs:
-                    open_procs.pop()
+                if scopes:
+                    scopes.pop()
             elif record_type == SYM_BPREL32 and len(body) >= 9:
-                if open_procs:
+                enclosing = next(
+                    (s for s in reversed(scopes) if s is not None), None
+                )
+                if enclosing is not None:
                     displacement = struct.unpack_from("<i", body, 0)[0]
-                    slots[open_procs[-1]].append(
+                    slots[enclosing].append(
                         (displacement, _length_prefixed(body, 8))
                     )
             cursor += 2 + record_length
