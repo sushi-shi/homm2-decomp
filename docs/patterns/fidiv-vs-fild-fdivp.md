@@ -144,3 +144,65 @@ larger for exactly that temp.
         );
 ```
 
+
+## Fourth confirmation, and the OTHER trigger: a parenthesised divisor cast (SOURCE/COMMAND)
+
+`combatManager::CheckSetMouseDirection` (0x2c389) divides two `int` locals into a
+`float`. Here BOTH operands are plain local lvalues, and the double-vs-float rule
+above does not separate the arms at all - every `(float)/(double)` combination folds
+to `fidiv`. What separates them is a **parenthesis around the divisor's cast**:
+
+```
+d1: static_cast<float>(x) / static_cast<float>(y)
+55           pushl %ebp
+...
+db 45 f8     fildl -0x8(%ebp)
+da 75 f4     fidivl -0xc(%ebp)          <-- folded
+d9 5d fc     fstps -0x4(%ebp)
+
+d2: static_cast<float>(x) / (static_cast<float>(y))      <-- retail
+db 45 f8     fildl -0x8(%ebp)
+db 45 f4     fildl -0xc(%ebp)           <-- both on the x87 stack
+de f9        fdivrp %st, %st(1)
+d9 5d fc     fstps -0x4(%ebp)
+```
+
+Measured arms (VC6 SP5, `/Od /MT /Gr /G5 /Ob1 /Gf /Gi- /GX`, `int x, int y` locals):
+
+| divisor spelling            | lowering |
+| :--                         | :--      |
+| `static_cast<float>(y)`     | `fidiv`  |
+| `(float)y`                  | `fidiv`  |
+| `(double)y`                 | `fidiv`  |
+| `(y)`                       | `fidiv`  |
+| `((float)y)`                | `fild` + `fdivrp` |
+| `((double)y)`               | `fild` + `fdivrp` |
+| `(static_cast<float>(y))`   | `fild` + `fdivrp` |
+
+So it is specifically a **parenthesised cast expression** as the divisor that stops
+the memory operand from folding into `fidiv`; a parenthesised *lvalue* does not, and
+the cast's target type does not matter. Same family as
+[paren-suppresses-fp-commute](paren-suppresses-fp-commute.md): the paren survives into
+the codegen tree as its own node.
+
+```cpp
+    /* The parenthesised divisor cast is load-bearing: without it VC6 folds the
+       divisor into a single `fidiv`, while retail keeps both operands on the x87
+       stack (`fild`, `fild`, `fdivp`). */
+    float ratio7 = static_cast<float>(relativeX1) / (static_cast<float>(relativeY10));
+```
+
+`combatManager::CheckSetMouseDirection` 96.14% -> EXACT.
+
+## Reading `de e9` / `de f9` back to a source order
+
+llvm-objdump prints the register form of `fsub`/`fsubr` with the historical AT&T swap.
+Anchor it with a probe rather than the mnemonic: with `A` pushed first and `B` second,
+
+- `de e9` (printed `fsubrp %st, %st(1)`) computes **A - B**
+- `de f9` (printed `fdivrp %st, %st(1)`) computes **A / B**
+
+i.e. the printed `r` is a lie for the popping register forms. Used on
+`combatManager::CycleCombatScreen` (0x315fa) to read
+`fild rand; fmul 0.5; fild delay; fmul 0.25; de e9; faddl temp` back as
+`lastAnimationTime + (Random(0, delay) * 0.5 - delay * 0.25)`.
