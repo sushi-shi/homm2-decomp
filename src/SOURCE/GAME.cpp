@@ -60,6 +60,17 @@ H2_ENUM_BEGIN(ExpansionCampaignSaveConstant)
     CAMPAIGN_SAVE_PREFIX_SIZE = 0x4f
 H2_ENUM_END(ExpansionCampaignSaveConstant)
 
+/* CP1251 (Russian) code points the Buka build folds when it derives a save-file
+   base name; the Latin fold is the same 0x20 distance in both alphabets. */
+H2_ENUM_BEGIN(Cp1251Constant)
+    CP1251_CAPITAL_YO = 0xa8,
+    CP1251_SMALL_YO   = 0xb8,
+    CP1251_CAPITAL_A  = 0xc0,
+    CP1251_CAPITAL_YA = 0xdf,
+    CP1251_SMALL_A    = 0xe0,
+    CP1251_SMALL_YA   = 0xff
+H2_ENUM_END(Cp1251Constant)
+
 H2_ENUM_BEGIN(GameSaveFormatConstant)
     SAVE_PATH_CAPACITY                 = 452,
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
@@ -346,7 +357,7 @@ H2_ENUM_END(LayerScanConstant)
 
 H2_ENUM_BEGIN(RandomMapObjectFootprintConstant)
     CASTLE_METADATA_X_RADIUS      = 2,
-    CASTLE_METADATA_TOP_OFFSET    = 2,
+    CASTLE_METADATA_TOP_OFFSET    = 3,
     CASTLE_METADATA_BOTTOM_OFFSET = 1,
     CASTLE_BOAT_X_OFFSET          = 1,
     CASTLE_BOAT_Y_OFFSET          = 2,
@@ -362,20 +373,16 @@ H2_ENUM_BEGIN(RandomMineConstant)
     WINDMILL_RESOURCE_AMOUNT_MAX      = 5
 H2_ENUM_END(RandomMineConstant)
 
-inline i32 IsTownObjectTileset(TilesetId tileset) {
-    return tileset >= TILESET_OBJNTOWN && tileset <= TILESET_OBJNTWRD;
-}
-
 inline MineType RandomMineType(MineType first, MineType last) {
     return static_cast<MineType>(Random(IDX(first), IDX(last)));
 }
 
 H2_ENUM_BEGIN(ArtifactGuardianConstant)
     ARTIFACT_GUARDIAN_CHOICE_COUNT = 10,
-    MAJOR_GUARDIAN_CHOICE_FIRST    = 0,
-    MAJOR_GUARDIAN_CHOICE_COUNT    = 6,
-    MINOR_GUARDIAN_CHOICE_FIRST    = 6,
-    MINOR_GUARDIAN_CHOICE_COUNT    = 4
+    MINOR_GUARDIAN_CHOICE_FIRST    = 0,
+    MINOR_GUARDIAN_CHOICE_COUNT    = 4,
+    MAJOR_GUARDIAN_CHOICE_FIRST    = 4,
+    MAJOR_GUARDIAN_CHOICE_COUNT    = 6
 H2_ENUM_END(ArtifactGuardianConstant)
 
 H2_ENUM_BEGIN(ArtifactEventGenerationConstant)
@@ -561,6 +568,7 @@ H2_ENUM_BEGIN(GameViewSpellsConstant)
     VIEW_SPELL_ICON_ID_10              = 110,
     VIEW_SPELL_ICON_ID_11              = 111,
     VIEW_SPELL_ICON_ID_BASE            = VIEW_SPELL_ICON_ID_0,
+    VIEW_SPELL_AVAILABLE_COLOR         = 1,
     VIEW_SPELL_UNAVAILABLE_COLOR       = 3,
     VIEW_SPELL_NAME_WIDTH              = 78,
     VIEW_SPELL_MANA_MAX                = 999,
@@ -653,21 +661,6 @@ H2_ENUM_END(ViewArmyControlId)
 
 inline town* GetCastle(i32 idx) {
     return &gpGame->m_castleRecs[idx];
-}
-inline b32 CanGenerateMonsterGuard(CreatureType monsterType) {
-    return monsterType != CREATURE_GHOST && monsterType != CREATURE_EARTH_ELEMENTAL
-           && monsterType != CREATURE_AIR_ELEMENTAL && monsterType != CREATURE_FIRE_ELEMENTAL
-           && monsterType != CREATURE_WATER_ELEMENTAL;
-}
-
-inline i32 GetRandomEventSpell(SpellLevel spellLevel) {
-    i32 spellMetadata =
-        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
-    while (gsSpellInfo[spellMetadata - MAP_EVENT_SPELL_OFFSET].level != spellLevel) {
-        spellMetadata =
-            Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
-    }
-    return spellMetadata;
 }
 
 H2_ENUM_BEGIN(PlayerDataSerializationConstant)
@@ -1089,30 +1082,37 @@ i32 game::GetMineId(i32 col, i32 row) {
 
 VA(0x0044d202, 0x1ac)
 void GenerateStandardFileName(char* source, char* destination) {
-    char* extension = FindLastToken(source, '.');
-    if (extension == NULL) {
+    char* ext = FindLastToken(source, '.');
+    if (ext == NULL) {
         strcpy(destination, source);
         return;
     }
 
-    *extension = '\0';
+    *ext = '\0';
     i32 indexOut = 0;
-    i32 sourceLength = strlen(source);
+    i32 length = strlen(source);
     i32 i;
-    char c;
-    for (i = 0; i < (&sourceLength)[0]; i++) {
-        c = source[i];
-        if (c >= 'a' && c <= 'z')
-            c -= 'a' - 'A';
-        if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_') {
-            destination[indexOut] = c;
+    u8 chr;
+    for (i = 0; i < length; i++) {
+        chr = source[i];
+        if (chr >= 'a' && chr <= 'z')
+            chr = chr - ('a' - 'A');
+        else if (chr >= CP1251_SMALL_A && chr <= CP1251_SMALL_YA)
+            chr = chr - (CP1251_SMALL_A - CP1251_CAPITAL_A);
+        else if (chr == CP1251_SMALL_YO)
+            chr = CP1251_CAPITAL_YO;
+        else
+            chr = chr;
+        if ((chr >= 'A' && chr <= 'Z') || (chr >= CP1251_CAPITAL_A && chr <= CP1251_CAPITAL_YA)
+            || chr == CP1251_CAPITAL_YO || (chr >= '0' && chr <= '9') || chr == '_') {
+            destination[indexOut] = chr;
             indexOut++;
         }
         if (indexOut >= STANDARD_FILENAME_BASENAME_SIZE)
             i = 999;
     }
-    *extension = '.';
-    strcpy(destination + indexOut, extension);
+    *ext = '.';
+    strcpy(destination + indexOut, ext);
 }
 
 VA(0x0044d3ae, 0xb5a)
@@ -1592,134 +1592,134 @@ void game::LoadGame(char* filename, i32 loadFromFile, i32) {
     gpAdvManager->CheckSetEvilInterface(0, -1);
 }
 
-VA(0x0044f352, 0x2d3)
+VA(0x0044f352, 0x37d)
 void game::GiveTroopsToNeutralTown(i32 townId) {
-    i32 unused28;
-    i32 tierKey36;
-    CreatureType creature28;
-    i32 reinforcementRandom;
-    i32 count1;
-    i32 turnRollRange10;
+    i32 roll;
+    CreatureType monster;
+    i32 unused;
+    i32 tierBase;
+    i32 turnBonus;
+    i32 howMany;
 
     if ((m_castleRecs[townId].m_x > 0 || m_castleRecs[townId].m_y > 0)
         && m_castleRecs[townId].m_owner < 0) {
-        reinforcementRandom = Random(REINFORCEMENT_ROLL_MIN, REINFORCEMENT_ROLL_MAX);
-        turnRollRange10 = giCurTurn / REINFORCEMENT_TURN_ROLL_DIVISOR;
-        if (turnRollRange10 != 0)
-            reinforcementRandom += Random(0, turnRollRange10);
+        roll = Random(REINFORCEMENT_ROLL_MIN, REINFORCEMENT_ROLL_MAX);
+        turnBonus = giCurTurn / REINFORCEMENT_TURN_ROLL_DIVISOR;
+        if (turnBonus != 0)
+            roll += Random(0, turnBonus);
 
-        if (reinforcementRandom <= REINFORCEMENT_TIER_ONE_THRESHOLD) {
-            tierKey36 = REINFORCEMENT_TIER_ONE_KEY;
-            count1 = Random(REINFORCEMENT_TIER_ONE_COUNT_MIN, REINFORCEMENT_TIER_ONE_COUNT_MAX);
-        } else if (reinforcementRandom <= REINFORCEMENT_TIER_TWO_THRESHOLD) {
-            tierKey36 = REINFORCEMENT_TIER_TWO_KEY;
-            count1 = Random(REINFORCEMENT_TIER_TWO_COUNT_MIN, REINFORCEMENT_TIER_TWO_COUNT_MAX);
-        } else if (reinforcementRandom <= REINFORCEMENT_TIER_THREE_THRESHOLD) {
-            tierKey36 = REINFORCEMENT_TIER_THREE_KEY;
-            count1 = Random(REINFORCEMENT_TIER_THREE_COUNT_MIN, REINFORCEMENT_TIER_THREE_COUNT_MAX);
-        } else if (reinforcementRandom <= REINFORCEMENT_TIER_FOUR_THRESHOLD) {
-            tierKey36 = REINFORCEMENT_TIER_FOUR_KEY;
-            count1 = Random(REINFORCEMENT_TIER_FOUR_COUNT_MIN, REINFORCEMENT_TIER_FOUR_COUNT_MAX);
+        if (roll <= REINFORCEMENT_TIER_ONE_THRESHOLD) {
+            tierBase = REINFORCEMENT_TIER_ONE_KEY;
+            howMany = Random(REINFORCEMENT_TIER_ONE_COUNT_MIN, REINFORCEMENT_TIER_ONE_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_TWO_THRESHOLD) {
+            tierBase = REINFORCEMENT_TIER_TWO_KEY;
+            howMany = Random(REINFORCEMENT_TIER_TWO_COUNT_MIN, REINFORCEMENT_TIER_TWO_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_THREE_THRESHOLD) {
+            tierBase = REINFORCEMENT_TIER_THREE_KEY;
+            howMany = Random(REINFORCEMENT_TIER_THREE_COUNT_MIN, REINFORCEMENT_TIER_THREE_COUNT_MAX);
+        } else if (roll <= REINFORCEMENT_TIER_FOUR_THRESHOLD) {
+            tierBase = REINFORCEMENT_TIER_FOUR_KEY;
+            howMany = Random(REINFORCEMENT_TIER_FOUR_COUNT_MIN, REINFORCEMENT_TIER_FOUR_COUNT_MAX);
         } else {
-            tierKey36 = REINFORCEMENT_TIER_FIVE_KEY;
-            count1 = REINFORCEMENT_TIER_FIVE_COUNT;
+            tierBase = REINFORCEMENT_TIER_FIVE_KEY;
+            howMany = REINFORCEMENT_TIER_FIVE_COUNT;
         }
 
-        count1 += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
-        switch (IDX(m_castleRecs[townId].m_type) + tierKey36) {
+        howMany += giCurTurn / REINFORCEMENT_TURN_COUNT_DIVISOR;
+        switch (tierBase + IDX(m_castleRecs[townId].m_type)) {
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_KNIGHT):
-                creature28 = CREATURE_PEASANT;
+                monster = CREATURE_PEASANT;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_KNIGHT):
-                creature28 = CREATURE_ARCHER;
+                monster = CREATURE_ARCHER;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_KNIGHT):
-                creature28 = CREATURE_PIKEMAN;
+                monster = CREATURE_PIKEMAN;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_KNIGHT):
-                creature28 = CREATURE_SWORDSMAN;
+                monster = CREATURE_SWORDSMAN;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_KNIGHT):
-                creature28 = CREATURE_CAVALRY;
+                monster = CREATURE_CAVALRY;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_BARBARIAN):
-                creature28 = CREATURE_GOBLIN;
+                monster = CREATURE_GOBLIN;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_BARBARIAN):
-                creature28 = CREATURE_ORC;
+                monster = CREATURE_ORC;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_BARBARIAN):
-                creature28 = CREATURE_WOLF;
+                monster = CREATURE_WOLF;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_BARBARIAN):
-                creature28 = CREATURE_OGRE;
+                monster = CREATURE_OGRE;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_BARBARIAN):
-                creature28 = CREATURE_TROLL;
+                monster = CREATURE_TROLL;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_SORCERESS):
-                creature28 = CREATURE_SPRITE;
+                monster = CREATURE_SPRITE;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_SORCERESS):
-                creature28 = CREATURE_DWARF;
+                monster = CREATURE_DWARF;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_SORCERESS):
-                creature28 = CREATURE_ELF;
+                monster = CREATURE_ELF;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_SORCERESS):
-                creature28 = CREATURE_DRUID;
+                monster = CREATURE_DRUID;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_SORCERESS):
-                creature28 = CREATURE_UNICORN;
+                monster = CREATURE_UNICORN;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WARLOCK):
-                creature28 = CREATURE_CENTAUR;
+                monster = CREATURE_CENTAUR;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WARLOCK):
-                creature28 = CREATURE_GARGOYLE;
+                monster = CREATURE_GARGOYLE;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WARLOCK):
-                creature28 = CREATURE_GRIFFIN;
+                monster = CREATURE_GRIFFIN;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WARLOCK):
-                creature28 = CREATURE_MINOTAUR;
+                monster = CREATURE_MINOTAUR;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WARLOCK):
-                creature28 = CREATURE_HYDRA;
+                monster = CREATURE_HYDRA;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_WIZARD):
-                creature28 = CREATURE_HALFLING;
+                monster = CREATURE_HALFLING;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_WIZARD):
-                creature28 = CREATURE_BOAR;
+                monster = CREATURE_BOAR;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_WIZARD):
-                creature28 = CREATURE_IRON_GOLEM;
+                monster = CREATURE_IRON_GOLEM;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_WIZARD):
-                creature28 = CREATURE_ROC;
+                monster = CREATURE_ROC;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_WIZARD):
-                creature28 = CREATURE_MAGE;
+                monster = CREATURE_MAGE;
                 break;
             case REINFORCEMENT_TIER_ONE_KEY + IDX(FACTION_NECROMANCER):
-                creature28 = CREATURE_SKELETON;
+                monster = CREATURE_SKELETON;
                 break;
             case REINFORCEMENT_TIER_TWO_KEY + IDX(FACTION_NECROMANCER):
-                creature28 = CREATURE_ZOMBIE;
+                monster = CREATURE_ZOMBIE;
                 break;
             case REINFORCEMENT_TIER_THREE_KEY + IDX(FACTION_NECROMANCER):
-                creature28 = CREATURE_MUMMY;
+                monster = CREATURE_MUMMY;
                 break;
             case REINFORCEMENT_TIER_FOUR_KEY + IDX(FACTION_NECROMANCER):
-                creature28 = CREATURE_VAMPIRE;
+                monster = CREATURE_VAMPIRE;
                 break;
             case REINFORCEMENT_TIER_FIVE_KEY + IDX(FACTION_NECROMANCER):
-                creature28 = CREATURE_LICH;
+                monster = CREATURE_LICH;
                 break;
             default:;
         }
-        GiveArmy(&m_castleRecs[townId].m_army, creature28, count1, ARMY_GROUP_EMPTY_SLOT);
+        GiveArmy(&m_castleRecs[townId].m_army, monster, howMany, ARMY_GROUP_EMPTY_SLOT);
     }
 }
 
@@ -2148,46 +2148,46 @@ inline town* GetCastleSlot(game* instance, i32 index) {
     return &instance->m_castleRecs[index];
 }
 
-VA(0x004513cf, 0x24ca)
+VA(0x004513cf, 0x26c6)
 void game::RandomizeEvents(void) {
+    i32 valid;
+    u32 extraIndex27;
+    i32 row;
+    i32 xPos;
+    ArtifactType value;
     i32 shrineId8 = 1;
-    i32 bottleId11 = 1;
-    i32 jailId28 = 1;
-    i32 sphinxId26 = 1;
-    i32 tentId10 = 1;
-    i32 hutId11 = 1;
+    i32 bottleId = 1;
+    i32 jailId8 = 1;
+    i32 sphinxId = 1;
+    i32 tentId0 = 1;
+    i32 hutId27 = 1;
     i32 eyeId13 = 1;
-    i32 row18;
-    i32 signId4 = 1;
-    u32 extraIndex3;
-    i32 yPos19;
-    i32 xPos2;
-    i32 j9;
-    ArtifactType value26;
-    i32 randomValue7;
-    i32 mineId2;
-    i32 column1;
-    i32 upperCount;
-    i32 lowerCount16;
-    TilesetId upperTilesets29[LAYER_SCAN_CAPACITY];
-    i32 upperIndexes1[LAYER_SCAN_CAPACITY];
-    TilesetId lowerTilesets4[LAYER_SCAN_CAPACITY];
-    i32 lowerIndexes7[LAYER_SCAN_CAPACITY];
-    CreatureType artifactGuardianChoices[ARTIFACT_GUARDIAN_CHOICE_COUNT];
-    EventExtra* mapEvent1;
-    mapCell* townEntrance;
+    i32 signId = 1;
+    i32 j4;
     mapCell* cell2;
-    mapCellExtra* extra15;
-    town* townRec4;
-    mapEventExtra* eventData16;
-    i32 valid27;
+    i32 yPos;
+    i32 randomValue5;
+    i32 column3;
+    mapCellExtra* extra9;
+    mapEventExtra* eventData4;
+    i32 mineId6;
+    EventExtra* mapEvent0;
+    town* townRec;
+    mapCell* townEntrance2;
+    CreatureType artifactGuardianChoices1[ARTIFACT_GUARDIAN_CHOICE_COUNT];
+    i32 lowerCount;
+    i32 upperCount5;
+    TilesetId lowerTilesets5[LAYER_SCAN_CAPACITY];
+    TilesetId upperTilesets0[LAYER_SCAN_CAPACITY];
+    i32 upperIndexes8[LAYER_SCAN_CAPACITY];
+    i32 lowerIndexes28[LAYER_SCAN_CAPACITY];
 
     m_mapEventCount = 0;
     memset(m_mapEventIndices, 0, sizeof(m_mapEventIndices));
 
-    for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.GetCell(xPos2, yPos19);
+    for (yPos = 0; yPos < MAP_HEIGHT; yPos++) {
+        for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
+            cell2 = m_worldMap.GetCell(xPos, yPos);
             switch (cell2->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_HUT:
                     cell2->m_objectMetadata = IDX(HERO_SKILL_NECROMANCY);
@@ -2202,22 +2202,22 @@ void game::RandomizeEvents(void) {
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
-                    CreateBoat(xPos2, yPos19, 1);
+                    CreateBoat(xPos, yPos, 1);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SPHINX:
-                    eventData16 =
+                    eventData4 =
                         reinterpret_cast<mapEventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
-                    if (strlen(eventData16->riddle) > 1 && eventData16->answerCount >= 1)
-                        eventData16->active = 1;
+                    if (strlen(eventData4->riddle) > 1 && eventData4->answerCount >= 1)
+                        eventData4->active = 1;
                     else
-                        eventData16->active = 0;
+                        eventData4->active = 0;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAP_EVENT:
                     m_mapEventIndices[m_mapEventCount] = cell2->m_objectMetadata;
-                    mapEvent1 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
-                    mapEvent1->x = static_cast<i16>(xPos2);
-                    mapEvent1->y = static_cast<i16>(yPos19);
-                    mapEvent1->active = 1;
+                    mapEvent0 = reinterpret_cast<EventExtra*>(ppMapExtra[cell2->m_objectMetadata]);
+                    mapEvent0->x = static_cast<i16>(xPos);
+                    mapEvent0->y = static_cast<i16>(yPos);
+                    mapEvent0->active = 1;
                     cell2->m_objectMetadata = 0;
                     cell2->m_triggerType = 0;
                     cell2->m_objectIndex = MAPCELL_SPRITE_NONE;
@@ -2225,29 +2225,29 @@ void game::RandomizeEvents(void) {
                     m_mapEventCount++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GAZEBO:
-                    cell2->m_objectMetadata = bottleId11++;
+                    cell2->m_objectMetadata = bottleId++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_FORT:
-                    cell2->m_objectMetadata = jailId28++;
+                    cell2->m_objectMetadata = jailId8++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WITCH_DOCTOR_HUT:
-                    cell2->m_objectMetadata = sphinxId26;
-                    sphinxId26++;
+                    cell2->m_objectMetadata = sphinxId;
+                    sphinxId++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MERCENARY_CAMP:
-                    cell2->m_objectMetadata = tentId10++;
+                    cell2->m_objectMetadata = tentId0++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES:
-                    if (xPos2 <= 0
-                        || m_worldMap.GetCell(xPos2 - 1, yPos19)->m_triggerType
-                               != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES))
-                        cell2->m_objectMetadata = hutId11++;
-                    else
+                    if (xPos > 0
+                        && m_worldMap.GetCell(xPos - 1, yPos)->m_triggerType
+                               == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_STANDING_STONES))
                         cell2->m_objectMetadata =
-                            m_worldMap.GetCell(xPos2 - 1, yPos19)->m_objectMetadata;
+                            m_worldMap.GetCell(xPos - 1, yPos)->m_objectMetadata;
+                    else
+                        cell2->m_objectMetadata = hutId27++;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_XANADU:
-                    cell2->m_objectMetadata = signId4++;
+                    cell2->m_objectMetadata = signId++;
                     break;
                 case MAP_OBJECT_WHIRLPOOL:
                     cell2->m_triggerType |= MAP_TRIGGER_ACTION_FLAG;
@@ -2261,26 +2261,26 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SKELETON:
                     if (!HasObjectTilesetIndex(
-                            xPos2,
-                            yPos19,
+                            xPos,
+                            yPos,
                             TILESET_OBJNDSRT,
                             SKELETON_DESERT_FRAME
-                        )) {
+                        ))
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
-                    } else if (Random(SKELETON_ROLL_MIN, SKELETON_ROLL_MAX)
-                               > SKELETON_ARTIFACT_ROLL_MAX) {
-                        cell2->m_objectMetadata = SKELETON_EMPTY;
-                    } else {
-                        cell2->m_objectMetadata =
-                            GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true)
-                            + SKELETON_ARTIFACT_OFFSET;
-                    }
+                    else
+                        cell2->m_objectMetadata = Random(SKELETON_ROLL_MIN, SKELETON_ROLL_MAX)
+                                                          <= SKELETON_ARTIFACT_ROLL_MAX
+                                                      ? GetRandomArtifactId(
+                                                            ARTIFACT_LEVEL_RANDOM,
+                                                            true
+                                                        ) + SKELETON_ARTIFACT_OFFSET
+                                                      : SKELETON_EMPTY;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON:
-                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
-                    if (randomValue7 < WAGON_EMPTY_CUTOFF)
+                    randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                    if (randomValue5 < WAGON_EMPTY_CUTOFF)
                         cell2->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                    else if (randomValue7 < WAGON_ARTIFACT_CUTOFF)
+                    else if (randomValue5 < WAGON_ARTIFACT_CUTOFF)
                         cell2->m_objectMetadata =
                             GetRandomArtifactId(
                                 ARTIFACT_LEVEL_MINOR | ARTIFACT_LEVEL_TREASURE,
@@ -2326,22 +2326,22 @@ void game::RandomizeEvents(void) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREASURE_CHEST:
                     if (giGroundToTerrain[cell2->m_terrainImageIndex] == TERRAIN_WATER) {
                         cell2->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SEA_CHEST;
-                        randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
-                        if (randomValue7 < SEA_CHEST_EMPTY_CUTOFF)
+                        randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                        if (randomValue5 < SEA_CHEST_EMPTY_CUTOFF)
                             cell2->m_objectMetadata = SEA_CHEST_OUTCOME_EMPTY;
-                        else if (randomValue7 < SEA_CHEST_GOLD_CUTOFF)
+                        else if (randomValue5 < SEA_CHEST_GOLD_CUTOFF)
                             cell2->m_objectMetadata = SEA_CHEST_OUTCOME_GOLD;
                         else
                             cell2->m_objectMetadata =
                                 GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true)
                                 | CHEST_ARTIFACT_FLAG;
                     } else {
-                        randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
-                        if (randomValue7 < LAND_CHEST_SMALL_CUTOFF)
+                        randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                        if (randomValue5 < LAND_CHEST_SMALL_CUTOFF)
                             cell2->m_objectMetadata = CHEST_REWARD_SMALL;
-                        else if (randomValue7 < LAND_CHEST_MEDIUM_CUTOFF)
+                        else if (randomValue5 < LAND_CHEST_MEDIUM_CUTOFF)
                             cell2->m_objectMetadata = CHEST_REWARD_MEDIUM;
-                        else if (randomValue7 < LAND_CHEST_LARGE_CUTOFF)
+                        else if (randomValue5 < LAND_CHEST_LARGE_CUTOFF)
                             cell2->m_objectMetadata = CHEST_REWARD_LARGE;
                         else
                             cell2->m_objectMetadata =
@@ -2360,11 +2360,11 @@ void game::RandomizeEvents(void) {
                         + ANCIENT_LAMP_COUNT_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHIPWRECK_SURVIVOR:
-                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
-                    if (randomValue7 < SHIPWRECK_SURVIVOR_TREASURE_CUTOFF)
+                    randomValue5 = Random(EVENT_ROLL_MIN, EVENT_ROLL_MAX);
+                    if (randomValue5 < SHIPWRECK_SURVIVOR_TREASURE_CUTOFF)
                         cell2->m_objectMetadata =
                             GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, true);
-                    else if (randomValue7 < SHIPWRECK_SURVIVOR_MINOR_CUTOFF)
+                    else if (randomValue5 < SHIPWRECK_SURVIVOR_MINOR_CUTOFF)
                         cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, true);
                     else
                         cell2->m_objectMetadata = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, true);
@@ -2422,32 +2422,32 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_OF_KNOWLEDGE:
                     cell2->m_objectMetadata =
-                        (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
-                         << TREE_KNOWLEDGE_MODE_SHIFT)
-                        | eyeId13++;
+                        eyeId13++
+                        | (Random(TREE_KNOWLEDGE_FREE, TREE_KNOWLEDGE_GEMS)
+                           << TREE_KNOWLEDGE_MODE_SHIFT);
                     break;
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
-                    CreatureType monsterType = static_cast<CreatureType>(cell2->m_objectIndex);
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER:
                     if (cell2->m_objectMetadata == MAP_EVENT_DATA_EMPTY) {
-                        cell2->m_objectMetadata = GetRandomNumTroops(monsterType);
-                        if (CanGenerateMonsterGuard(monsterType)
+                        cell2->m_objectMetadata = GetRandomNumTroops(cell2->m_objectIndex);
+                        if (cell2->m_objectIndex != IDX(CREATURE_GHOST)
+                            && cell2->m_objectIndex != IDX(CREATURE_EARTH_ELEMENTAL)
+                            && cell2->m_objectIndex != IDX(CREATURE_AIR_ELEMENTAL)
+                            && cell2->m_objectIndex != IDX(CREATURE_FIRE_ELEMENTAL)
+                            && cell2->m_objectIndex != IDX(CREATURE_WATER_ELEMENTAL)
                             && Random(MONSTER_GUARD_ROLL_MIN, MONSTER_GUARD_ROLL_MAX)
                                    < MONSTER_GUARD_CUTOFF)
                             cell2->m_objectMetadata |= IDX(MAP_MONSTER_GUARD_FLAG);
                     }
                     break;
-                }
-                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE: {
-                    ResourceType resourceType =
-                        static_cast<ResourceType>(cell2->m_objectIndex >> 1);
-                    cell2->m_objectMetadata = IDX(resourceType);
-                    switch (resourceType) {
-                        case RES_WOOD:
-                        case RES_ORE:
+                case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE:
+                    cell2->m_objectMetadata = cell2->m_objectIndex / 2;
+                    switch (cell2->m_objectMetadata) {
+                        case IDX(RES_WOOD):
+                        case IDX(RES_ORE):
                             cell2->m_objectMetadata =
                                 Random(RESOURCE_BULK_AMOUNT_MIN, RESOURCE_BULK_AMOUNT_MAX);
                             break;
-                        case RES_GOLD:
+                        case IDX(RES_GOLD):
                             cell2->m_objectMetadata =
                                 Random(RESOURCE_BULK_AMOUNT_MIN, RESOURCE_BULK_AMOUNT_MAX);
                             break;
@@ -2457,21 +2457,37 @@ void game::RandomizeEvents(void) {
                             break;
                     }
                     break;
-                }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_FIRST_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SPELL_LEVEL_FIRST);
+                        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+                    while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
+                           != SPELL_LEVEL_FIRST)
+                        cell2->m_objectMetadata = Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1)
+                                                  + MAP_EVENT_SPELL_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_SECOND_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SPELL_LEVEL_SECOND);
+                        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+                    while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
+                           != SPELL_LEVEL_SECOND)
+                        cell2->m_objectMetadata = Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1)
+                                                  + MAP_EVENT_SPELL_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SHRINE_THIRD_CIRCLE:
                     cell2->m_objectMetadata =
-                        GetRandomEventSpell(SPELL_LEVEL_THIRD);
+                        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+                    while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
+                           != SPELL_LEVEL_THIRD)
+                        cell2->m_objectMetadata = Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1)
+                                                  + MAP_EVENT_SPELL_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PYRAMID:
-                    cell2->m_objectMetadata = GetRandomEventSpell(SPELL_LEVEL_FIFTH);
+                    cell2->m_objectMetadata =
+                        Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1) + MAP_EVENT_SPELL_OFFSET;
+                    while (gsSpellInfo[cell2->m_objectMetadata - MAP_EVENT_SPELL_OFFSET].level
+                           != SPELL_LEVEL_FIFTH)
+                        cell2->m_objectMetadata = Random(IDX(SPELL_FIREBALL), IDX(SPELL_COUNT) - 1)
+                                                  + MAP_EVENT_SPELL_OFFSET;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
                     cell2->m_objectMetadata = Random(15, 25);
@@ -2511,137 +2527,137 @@ void game::RandomizeEvents(void) {
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
                     if (!HasObjectTilesetIndex(
-                            xPos2,
-                            yPos19,
+                            xPos,
+                            yPos,
                             TILESET_OBJNMUL2,
                             WAGON_CAMP_ACTIVE_FRAME
-                        ))
+                        )) {
                         cell2->m_triggerType &= MAP_TRIGGER_TYPE_MASK;
-                    else
-                        cell2->m_objectMetadata = Random(30, 50);
+                        break;
+                    }
+                    cell2->m_objectMetadata = Random(30, 50);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT:
-                    randomValue7 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
-                    value26 = static_cast<ArtifactType>(cell2->m_objectIndex >> 1);
-                    if (value26 != ARTIFACT_SPELL_SCROLL) {
-                        if (randomValue7 < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
-                            if (randomValue7 % EVENT_BUCKET_COUNT
-                                == ARTIFACT_EVENT_WISDOM_BUCKET)
-                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_WISDOM;
-                            else if (randomValue7 % EVENT_BUCKET_COUNT
-                                     == ARTIFACT_EVENT_LEADERSHIP_BUCKET)
-                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_LEADERSHIP;
-                            else
-                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_PICKUP;
-                        } else if (randomValue7 < ARTIFACT_EVENT_GUARD_CUTOFF) {
-                            if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_TREASURE)
-                                cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_GOLD;
-                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MINOR)
-                                cell2->m_objectMetadata =
-                                    (Random(IDX(RES_WOOD), IDX(RES_GEMS))
-                                     << ARTIFACT_EVENT_RESOURCE_SHIFT)
-                                    | ARTIFACT_EVENT_MODE_RESOURCE_3;
-                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MAJOR)
-                                cell2->m_objectMetadata =
-                                    (Random(IDX(RES_WOOD), IDX(RES_GEMS))
-                                     << ARTIFACT_EVENT_RESOURCE_SHIFT)
-                                    | ARTIFACT_EVENT_MODE_RESOURCE_5;
-                        } else {
-                            artifactGuardianChoices[6] = CREATURE_PALADIN;
-                            artifactGuardianChoices[7] = CREATURE_CRUSADER;
-                            artifactGuardianChoices[8] = CREATURE_CYCLOPS;
-                            artifactGuardianChoices[9] = CREATURE_GENIE;
-                            artifactGuardianChoices[0] = CREATURE_GREEN_DRAGON;
-                            artifactGuardianChoices[1] = CREATURE_RED_DRAGON;
-                            artifactGuardianChoices[2] = CREATURE_BLACK_DRAGON;
-                            artifactGuardianChoices[3] = CREATURE_BONE_DRAGON;
-                            artifactGuardianChoices[4] = CREATURE_GIANT;
-                            artifactGuardianChoices[5] = CREATURE_TITAN;
-                            cell2->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
-                            if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_TREASURE)
-                                cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
-                            else if (gArtifactLevel[IDX(value26)] == ARTIFACT_LEVEL_MINOR)
-                                cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
-                                    EVENT_ROLL_MIN,
-                                    MINOR_GUARDIAN_CHOICE_COUNT - 1
-                                ) + MINOR_GUARDIAN_CHOICE_FIRST]);
-                            else
-                                cell2->m_objectMetadata |= IDX(artifactGuardianChoices[Random(
-                                    EVENT_ROLL_MIN,
-                                    MAJOR_GUARDIAN_CHOICE_COUNT - 1
-                                ) + MAJOR_GUARDIAN_CHOICE_FIRST]);
-                        }
+                    randomValue5 = Random(EVENT_ROLL_MIN, EVENT_BUCKET_ROLL_MAX);
+                    value = static_cast<ArtifactType>(cell2->m_objectIndex / 2);
+                    if (value == ARTIFACT_SPELL_SCROLL)
+                        break;
+                    if (randomValue5 < ARTIFACT_EVENT_UNCONDITIONAL_CUTOFF) {
+                        if (randomValue5 % EVENT_BUCKET_COUNT
+                            == ARTIFACT_EVENT_WISDOM_BUCKET)
+                            cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_WISDOM;
+                        else if (randomValue5 % EVENT_BUCKET_COUNT
+                                 == ARTIFACT_EVENT_LEADERSHIP_BUCKET)
+                            cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_LEADERSHIP;
+                        else
+                            cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_PICKUP;
+                    } else if (randomValue5 < ARTIFACT_EVENT_GUARD_CUTOFF) {
+                        if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_TREASURE)
+                            cell2->m_objectMetadata = ARTIFACT_EVENT_MODE_GOLD;
+                        else if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_MINOR)
+                            cell2->m_objectMetadata =
+                                (Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                                 << ARTIFACT_EVENT_RESOURCE_SHIFT)
+                                | ARTIFACT_EVENT_MODE_RESOURCE_3;
+                        else if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_MAJOR)
+                            cell2->m_objectMetadata =
+                                (Random(IDX(RES_WOOD), IDX(RES_GEMS))
+                                 << ARTIFACT_EVENT_RESOURCE_SHIFT)
+                                | ARTIFACT_EVENT_MODE_RESOURCE_5;
+                    } else {
+                        artifactGuardianChoices1[0] = CREATURE_PALADIN;
+                        artifactGuardianChoices1[1] = CREATURE_CRUSADER;
+                        artifactGuardianChoices1[2] = CREATURE_CYCLOPS;
+                        artifactGuardianChoices1[3] = CREATURE_GENIE;
+                        artifactGuardianChoices1[4] = CREATURE_GREEN_DRAGON;
+                        artifactGuardianChoices1[5] = CREATURE_RED_DRAGON;
+                        artifactGuardianChoices1[6] = CREATURE_BLACK_DRAGON;
+                        artifactGuardianChoices1[7] = CREATURE_BONE_DRAGON;
+                        artifactGuardianChoices1[8] = CREATURE_GIANT;
+                        artifactGuardianChoices1[9] = CREATURE_TITAN;
+                        cell2->m_objectMetadata = ARTIFACT_EVENT_GUARDED_FLAG;
+                        if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_TREASURE)
+                            cell2->m_objectMetadata |= IDX(CREATURE_ROGUE);
+                        else if (gArtifactLevel[IDX(value)] == ARTIFACT_LEVEL_MINOR)
+                            cell2->m_objectMetadata |= IDX(artifactGuardianChoices1[Random(
+                                EVENT_ROLL_MIN,
+                                MINOR_GUARDIAN_CHOICE_COUNT - 1
+                            ) + MINOR_GUARDIAN_CHOICE_FIRST]);
+                        else
+                            cell2->m_objectMetadata |= IDX(artifactGuardianChoices1[Random(
+                                EVENT_ROLL_MIN,
+                                MAJOR_GUARDIAN_CHOICE_COUNT - 1
+                            ) + MAJOR_GUARDIAN_CHOICE_FIRST]);
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE:
-                    mineId2 = GetTownId(xPos2, yPos19);
-                    for (row18 = yPos19 - CASTLE_METADATA_TOP_OFFSET;
-                         row18 <= yPos19 + CASTLE_METADATA_BOTTOM_OFFSET;
-                         row18++) {
-                        for (column1 = xPos2 - CASTLE_METADATA_X_RADIUS;
-                             column1 <= xPos2 + CASTLE_METADATA_X_RADIUS;
-                             column1++) {
-                            if (m_worldMap.GetCell(column1, row18)->m_objectMetadata != 0)
-                                continue;
-                            m_worldMap.GetCell(column1, row18)->m_objectMetadata = mineId2;
+                    mineId6 = GetTownId(xPos, yPos);
+                    for (row = yPos - CASTLE_METADATA_TOP_OFFSET;
+                         row <= yPos + CASTLE_METADATA_BOTTOM_OFFSET;
+                         row++) {
+                        for (column3 = xPos - CASTLE_METADATA_X_RADIUS;
+                             column3 <= xPos + CASTLE_METADATA_X_RADIUS;
+                             column3++) {
+                            if (m_worldMap.GetCell(column3, row)->m_objectMetadata == 0)
+                                m_worldMap.GetCell(column3, row)->m_objectMetadata = mineId6;
                         }
                     }
-                    townRec4 = GetCastleSlot(this, mineId2);
-                    townRec4->m_boatY = -1;
-                    townRec4->m_boatX = townRec4->m_boatY;
-                    if (yPos19 <= MAP_HEIGHT - CASTLE_BOAT_Y_OFFSET - 1) {
-                        townEntrance = gpAdvManager->GetCell(
-                            xPos2 - CASTLE_BOAT_X_OFFSET,
-                            yPos19 + CASTLE_BOAT_Y_OFFSET
+                    townRec = GetCastleSlot(this, mineId6);
+                    townRec->m_boatY = -1;
+                    townRec->m_boatX = -1;
+                    if (yPos <= MAP_HEIGHT - CASTLE_BOAT_Y_OFFSET - 1) {
+                        townEntrance2 = gpAdvManager->GetCell(
+                            xPos - CASTLE_BOAT_X_OFFSET,
+                            yPos + CASTLE_BOAT_Y_OFFSET
                         );
-                        if (giGroundToTerrain[townEntrance->m_terrainImageIndex]
+                        if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
                             == TERRAIN_WATER) {
-                            townRec4->m_boatX = static_cast<i8>(xPos2 - CASTLE_BOAT_X_OFFSET);
-                            townRec4->m_boatY = static_cast<i8>(yPos19 + CASTLE_BOAT_Y_OFFSET);
+                            townRec->m_boatX = static_cast<i8>(xPos - CASTLE_BOAT_X_OFFSET);
+                            townRec->m_boatY = static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
                         } else {
-                            townEntrance = gpAdvManager->GetCell(
-                                xPos2 + CASTLE_BOAT_X_OFFSET,
-                                yPos19 + CASTLE_BOAT_Y_OFFSET
+                            townEntrance2 = gpAdvManager->GetCell(
+                                xPos + CASTLE_BOAT_X_OFFSET,
+                                yPos + CASTLE_BOAT_Y_OFFSET
                             );
-                            if (giGroundToTerrain[townEntrance->m_terrainImageIndex]
+                            if (giGroundToTerrain[townEntrance2->m_terrainImageIndex]
                                 == TERRAIN_WATER) {
-                                townRec4->m_boatX =
-                                    static_cast<i8>(xPos2 + CASTLE_BOAT_X_OFFSET);
-                                townRec4->m_boatY =
-                                    static_cast<i8>(yPos19 + CASTLE_BOAT_Y_OFFSET);
+                                townRec->m_boatX =
+                                    static_cast<i8>(xPos + CASTLE_BOAT_X_OFFSET);
+                                townRec->m_boatY =
+                                    static_cast<i8>(yPos + CASTLE_BOAT_Y_OFFSET);
                             }
                         }
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LIGHTHOUSE: {
-                    m_worldMap.GetCell(xPos2, yPos19)->m_objectMetadata = GetMineId(xPos2, yPos19);
+                    m_worldMap.GetCell(xPos, yPos)->m_objectMetadata = GetMineId(xPos, yPos);
                     break;
                 }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ABANDONED_MINE:
-                    mineId2 = GetMineId(xPos2, yPos19);
-                    m_mines[mineId2].guardianType = CREATURE_GHOST;
-                    m_mines[mineId2].guardianCount = static_cast<u8>(Random(
+                    mineId6 = GetMineId(xPos, yPos);
+                    m_mines[mineId6].guardianType = CREATURE_GHOST;
+                    m_mines[mineId6].guardianCount = static_cast<u8>(Random(
                         ABANDONED_MINE_GUARDIAN_COUNT_MIN,
                         ABANDONED_MINE_GUARDIAN_COUNT_MAX
                     ));
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MINE:
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SAWMILL:
-                    mineId2 = GetMineId(xPos2, yPos19);
-                    for (row18 = yPos19 - MINE_METADATA_TOP_OFFSET; row18 <= yPos19;
-                         row18++) {
-                        for (column1 = xPos2 - MINE_METADATA_LEFT_OFFSET;
-                             column1 <= xPos2 + MINE_METADATA_RIGHT_OFFSET;
-                             column1++) {
-                            if (column1 == xPos2 - MINE_METADATA_LEFT_OFFSET
+                    mineId6 = GetMineId(xPos, yPos);
+                    for (row = yPos - MINE_METADATA_TOP_OFFSET; row <= yPos;
+                         row++) {
+                        for (column3 = xPos - MINE_METADATA_LEFT_OFFSET;
+                             column3 <= xPos + MINE_METADATA_RIGHT_OFFSET;
+                             column3++) {
+                            if (column3 == xPos - MINE_METADATA_LEFT_OFFSET
                                 && cell2->m_triggerType
                                        != (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ALCHEMIST_LAB))
                                 continue;
-                            if (m_worldMap.GetCell(column1, row18)->m_objectMetadata == 0
-                                || ((m_worldMap.GetCell(column1, row18)->m_triggerType
+                            if (m_worldMap.GetCell(column3, row)->m_objectMetadata == 0
+                                || ((m_worldMap.GetCell(column3, row)->m_triggerType
                                      & MAP_TRIGGER_TYPE_MASK)
                                     == (cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK)))
-                                m_worldMap.GetCell(column1, row18)->m_objectMetadata = mineId2;
+                                m_worldMap.GetCell(column3, row)->m_objectMetadata = mineId6;
                         }
                     }
                     break;
@@ -2665,28 +2681,28 @@ void game::RandomizeEvents(void) {
         }
     }
 
-    for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.GetCell(xPos2, yPos19);
+    for (yPos = 0; yPos < MAP_HEIGHT; yPos++) {
+        for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
+            cell2 = m_worldMap.GetCell(xPos, yPos);
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE && cell2->m_objectLayerBit1) {
-                valid27 = 1;
-                extraIndex3 = cell2->m_extraIndex;
-                while (extraIndex3 != 0) {
-                    extra15 = m_worldMap.Extra(extraIndex3);
-                    if (extra15->objectIndex != MAPCELL_SPRITE_NONE
-                        && !extra15->objectLayerBit1)
-                        valid27 = 0;
-                    extraIndex3 = extra15->nextIndex;
+                valid = 1;
+                extraIndex27 = cell2->m_extraIndex;
+                while (extraIndex27 != 0) {
+                    extra9 = m_worldMap.Extra(extraIndex27);
+                    if (extra9->objectIndex != MAPCELL_SPRITE_NONE
+                        && !extra9->objectLayerBit1)
+                        valid = 0;
+                    extraIndex27 = extra9->nextIndex;
                 }
-                if (valid27)
+                if (valid)
                     cell2->m_flags |= IDX(MAP_CELL_OBJECT_SHADOW_ONLY);
             }
         }
     }
 
-    for (yPos19 = 0; yPos19 < MAP_HEIGHT; yPos19++) {
-        for (xPos2 = 0; xPos2 < MAP_WIDTH; xPos2++) {
-            cell2 = m_worldMap.GetCell(xPos2, yPos19);
+    for (yPos = 0; yPos < MAP_HEIGHT; yPos++) {
+        for (xPos = 0; xPos < MAP_WIDTH; xPos++) {
+            cell2 = m_worldMap.GetCell(xPos, yPos);
             if ((cell2->m_triggerType & MAP_TRIGGER_TYPE_MASK) == MAP_OBJECT_ROCK
                 && cell2->m_objectTileset == TILESET_X_LOC2)
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
@@ -2695,88 +2711,91 @@ void game::RandomizeEvents(void) {
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
                 && cell2->m_overlayIndex != MAPCELL_SPRITE_NONE)
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
-            upperCount = 0;
-            lowerCount16 = 0;
-            if (!(cell2->m_flags & IDX(MAP_CELL_OCCUPIED)) && yPos19 < MAP_HEIGHT - 1
+            upperCount5 = 0;
+            lowerCount = 0;
+            if (!(cell2->m_flags & IDX(MAP_CELL_OCCUPIED)) && yPos < MAP_HEIGHT - 1
                 && cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))) {
                 mapCell* below0;
-                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
+                if (m_worldMap.GetCell(xPos, yPos + 1)->m_objectIndex != MAPCELL_SPRITE_NONE
                     && !(
-                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                        m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
                         & MAP_TRIGGER_ACTION_FLAG
                     )
                     && !(
-                        m_worldMap.GetCell(xPos2, yPos19 + 1)->m_flags
+                        m_worldMap.GetCell(xPos, yPos + 1)->m_flags
                         & IDX(MAP_CELL_OBJECT_SHADOW_ONLY)
                     )) {
                     if (!cell2->m_objectLayerBit1) {
-                        upperTilesets29[upperCount] = cell2->m_objectTileset;
-                        upperIndexes1[upperCount] = cell2->m_objectIndex;
-                        upperCount++;
+                        upperTilesets0[upperCount5] = cell2->m_objectTileset;
+                        upperIndexes8[upperCount5] = cell2->m_objectIndex;
+                        upperCount5++;
                     }
                     if (cell2->m_extraIndex != 0)
-                        extra15 = m_worldMap.Extra(cell2->m_extraIndex);
+                        extra9 = m_worldMap.Extra(cell2->m_extraIndex);
                     else
-                        extra15 = NULL;
-                    while (upperCount < LAYER_SCAN_CAPACITY && extra15 != NULL) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra15->objectLayerBit1) {
-                            upperTilesets29[upperCount] = extra15->objectTileset;
-                            upperIndexes1[upperCount] = extra15->objectIndex;
-                            upperCount++;
+                        extra9 = NULL;
+                    while (upperCount5 < LAYER_SCAN_CAPACITY && extra9 != NULL) {
+                        if (extra9->objectIndex != MAPCELL_SPRITE_NONE
+                            && !extra9->objectLayerBit1) {
+                            upperTilesets0[upperCount5] = extra9->objectTileset;
+                            upperIndexes8[upperCount5] = extra9->objectIndex;
+                            upperCount5++;
                         }
-                        if (extra15->nextIndex != 0)
-                            extra15 = m_worldMap.Extra(extra15->nextIndex);
+                        if (extra9->nextIndex != 0)
+                            extra9 = m_worldMap.Extra(extra9->nextIndex);
                         else
-                            extra15 = NULL;
+                            extra9 = NULL;
                     }
-                    below0 = m_worldMap.GetCell(xPos2, yPos19 + 1);
+                    below0 = m_worldMap.GetCell(xPos, yPos + 1);
                     if (!below0->m_objectLayerBit1) {
-                        lowerTilesets4[lowerCount16] = below0->m_objectTileset;
-                        lowerIndexes7[lowerCount16] = below0->m_objectIndex;
-                        lowerCount16++;
+                        lowerTilesets5[lowerCount] = below0->m_objectTileset;
+                        lowerIndexes28[lowerCount] = below0->m_objectIndex;
+                        lowerCount++;
                     }
                     if (below0->m_extraIndex != 0)
-                        extra15 = m_worldMap.Extra(below0->m_extraIndex);
+                        extra9 = m_worldMap.Extra(below0->m_extraIndex);
                     else
-                        extra15 = NULL;
-                    while (lowerCount16 < LAYER_SCAN_CAPACITY && extra15 != NULL) {
-                        if (extra15->objectIndex != MAPCELL_SPRITE_NONE
-                            && !extra15->objectLayerBit1) {
-                            lowerTilesets4[lowerCount16] = extra15->objectTileset;
-                            lowerIndexes7[lowerCount16] = extra15->objectIndex;
-                            lowerCount16++;
+                        extra9 = NULL;
+                    while (lowerCount < LAYER_SCAN_CAPACITY && extra9 != NULL) {
+                        if (extra9->objectIndex != MAPCELL_SPRITE_NONE
+                            && !extra9->objectLayerBit1) {
+                            lowerTilesets5[lowerCount] = extra9->objectTileset;
+                            lowerIndexes28[lowerCount] = extra9->objectIndex;
+                            lowerCount++;
                         }
-                        if (extra15->nextIndex != 0)
-                            extra15 = m_worldMap.Extra(extra15->nextIndex);
+                        if (extra9->nextIndex != 0)
+                            extra9 = m_worldMap.Extra(extra9->nextIndex);
                         else
-                            extra15 = NULL;
+                            extra9 = NULL;
                     }
-                    for (randomValue7 = 0; randomValue7 < upperCount; randomValue7++) {
-                        for (j9 = 0; lowerCount16 > j9; j9++) {
-                            if (lowerTilesets4[j9] == upperTilesets29[randomValue7]
-                                || (IsTownObjectTileset(upperTilesets29[randomValue7])
-                                    && IsTownObjectTileset(lowerTilesets4[j9])))
+                    for (randomValue5 = 0; randomValue5 < upperCount5; randomValue5++) {
+                        for (j4 = 0; j4 < lowerCount; j4++) {
+                            if (upperTilesets0[randomValue5] == lowerTilesets5[j4]
+                                || (upperTilesets0[randomValue5] >= TILESET_OBJNTOWN
+                                    && upperTilesets0[randomValue5] <= TILESET_OBJNTWRD
+                                    && lowerTilesets5[j4] >= TILESET_OBJNTOWN
+                                    && lowerTilesets5[j4] <= TILESET_OBJNTWRD))
                                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
                         }
                     }
                 }
             }
-            if (yPos19 < MAP_HEIGHT - 1) {
-                if (m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+            if (yPos < MAP_HEIGHT - 1) {
+                if (m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
                         == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
-                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                    || m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN)
-                    || m_worldMap.GetCell(xPos2, yPos19 + 1)->m_triggerType
+                    || m_worldMap.GetCell(xPos, yPos + 1)->m_triggerType
                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE))
                     cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
             }
             if (cell2->m_objectIndex != MAPCELL_SPRITE_NONE
                 && !(cell2->m_triggerType & MAP_TRIGGER_ACTION_FLAG)
                 && !(cell2->m_flags & IDX(MAP_CELL_OBJECT_SHADOW_ONLY))
-                && (yPos19 == MAP_HEIGHT - 1 || (m_worldMap.Row(yPos19 + 1)[xPos2].m_flags & 4)))
+                && (yPos == MAP_HEIGHT - 1
+                    || (m_worldMap.GetCell(xPos, yPos + 1)->m_flags & 4)))
                 cell2->m_flags |= IDX(MAP_CELL_OCCUPIED);
         }
     }
@@ -2961,12 +2980,12 @@ void game::ClaimTown(i32 townId, i32 player, i32 suppressVisibility) {
     CheckEndGame(END_GAME_FORCE_NONE, false);
 }
 
-VA(0x004542da, 0x320)
+VA(0x004542da, 0x414)
 void game::ClaimMine(i32 mineId, i32 player) {
-    mapCell* acc;
-    i32 flag;
     i32 x;
     i32 y;
+    i32 flag1;
+    mapCell* cell;
 
     SendMapChange(
         MAP_CHANGE_CLAIM_MINE,
@@ -2981,19 +3000,19 @@ void game::ClaimMine(i32 mineId, i32 player) {
     m_mineOwners[mineId] = static_cast<i8>(player);
     switch (m_mines[mineId].resourceType) {
         case MINE_TYPE_ALCHEMIST_LAB:
-            flag = MINE_FLAG_ALCHEMIST_OFFSET;
+            flag1 = MINE_FLAG_ALCHEMIST_OFFSET;
             break;
         case MINE_TYPE_LIGHTHOUSE:
-            flag = MINE_FLAG_LIGHTHOUSE_OFFSET;
+            flag1 = MINE_FLAG_LIGHTHOUSE_OFFSET;
             break;
         case MINE_TYPE_WOOD:
-            flag = MINE_FLAG_WOOD_OFFSET;
+            flag1 = MINE_FLAG_WOOD_OFFSET;
             break;
         case MINE_TYPE_MERCURY:
-            flag = MINE_FLAG_MERCURY_OFFSET;
+            flag1 = MINE_FLAG_MERCURY_OFFSET;
             break;
         default:
-            flag = MINE_FLAG_COMMON_OFFSET;
+            flag1 = MINE_FLAG_COMMON_OFFSET;
             break;
     }
     switch (m_mines[mineId].resourceType) {
@@ -3018,18 +3037,18 @@ void game::ClaimMine(i32 mineId, i32 player) {
             y = m_mines[mineId].y;
             break;
     }
-    acc = m_worldMap.GetCell(x, y);
+    cell = m_worldMap.GetCell(x, y);
     if (player == -1) {
         m_worldMap.ChangeTilesetIndex(
-            acc, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, 1, -1
+            cell, x, y, TILESET_FLAG32, MAPCELL_SPRITE_NONE, 1, -1
         );
     } else {
         m_worldMap.ChangeTilesetIndex(
-            acc,
+            cell,
             x,
             y,
             TILESET_FLAG32,
-            GetPlayerColor(static_cast<i8>(player)) + flag,
+            flag1 + GetPlayerColor(static_cast<i8>(player)),
             1,
             -1
         );
@@ -3096,119 +3115,155 @@ game::ViewSpells(
 
 VA(0x004548cf, 0x48f)
 void game::UpdateSpellWidgets(void) {
-    tag_message message9;
-    i32 spellSlot6;
     i32 spellPoints0;
-    SpellType spell2;
-    i32 lineLength0;
+    i32 lines;
+    tag_message message;
+    i32 i;
+    SpellType spell1;
 
-    message9.type = MESSAGE_WIDGET;
+    message.type = MESSAGE_WIDGET;
     spellPoints0 = m_viewSpellsHero->m_spellPoints;
     if (spellPoints0 > VIEW_SPELL_MANA_MAX)
         spellPoints0 = VIEW_SPELL_MANA_MAX;
-    message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-    if (spellPoints0 > VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
-        message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    else
-        message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message9.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
-    m_viewSpellsWindow->BroadcastMessage(message9);
-    if (spellPoints0 > VIEW_SPELL_MANA_TENS_THRESHOLD)
-        message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-    else
-        message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-    message9.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
-    m_viewSpellsWindow->BroadcastMessage(message9);
+    memset(&message, 0, sizeof(message));
+
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = static_cast<BaseWidgetCommand>(
+        IDX(WIDGET_COMMAND_SET_FLAGS)
+        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_HUNDREDS_THRESHOLD)
+    );
+    message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    m_viewSpellsWindow->BroadcastMessage(message);
+
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = static_cast<BaseWidgetCommand>(
+        IDX(WIDGET_COMMAND_SET_FLAGS)
+        + static_cast<i32>(spellPoints0 <= VIEW_SPELL_MANA_TENS_THRESHOLD)
+    );
+    message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
+    message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+    m_viewSpellsWindow->BroadcastMessage(message);
 
     sprintf(
         gText,
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_HUNDREDS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
-    m_viewSpellsWindow->BroadcastMessage(message9);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = VIEW_SPELL_MANA_HUNDREDS_ID;
+    message.payload.widget.data.text = gText;
+    m_viewSpellsWindow->BroadcastMessage(message);
+
     sprintf(
         gText,
         "%d",
         (spellPoints0 / VIEW_SPELL_MANA_TENS_DIVISOR) % VIEW_SPELL_MANA_DIGIT_BASE
     );
-    message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
-    m_viewSpellsWindow->BroadcastMessage(message9);
-    sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
-    message9.payload.widget.data.text = gText;
-    message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message9.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
-    m_viewSpellsWindow->BroadcastMessage(message9);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = VIEW_SPELL_MANA_TENS_ID;
+    message.payload.widget.data.text = gText;
+    m_viewSpellsWindow->BroadcastMessage(message);
 
-    for (spellSlot6 = 0; spellSlot6 < VIEW_SPELL_PAGE_SIZE; spellSlot6++) {
-        if (m_viewSpellsTop[IDX(m_viewSpellsType)] + spellSlot6
+    sprintf(gText, "%d", spellPoints0 % VIEW_SPELL_MANA_DIGIT_BASE);
+    message.type = MESSAGE_WIDGET;
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = VIEW_SPELL_MANA_ONES_ID;
+    message.payload.widget.data.text = gText;
+    m_viewSpellsWindow->BroadcastMessage(message);
+
+    for (i = 0; i < VIEW_SPELL_PAGE_SIZE; i++) {
+        if (m_viewSpellsTop[IDX(m_viewSpellsType)] + i
             >= m_viewSpellsCount[IDX(m_viewSpellsType)]) {
-            message9.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
-            message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-            m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
-            m_viewSpellsWindow->BroadcastMessage(message9);
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+            m_viewSpellsWindow->BroadcastMessage(message);
         } else {
-            spell2 = m_viewSpellsHero->GetNthSpell(
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            spell1 = m_viewSpellsHero->GetNthSpell(
                 m_viewSpellsType,
-                m_viewSpellsTop[IDX(m_viewSpellsType)] + spellSlot6 + 1
+                m_viewSpellsTop[IDX(m_viewSpellsType)] + i + 1
             );
-            message9.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
-            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
-            if (GetManaCost(spell2, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
-                message9.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FILL_COLOR;
+            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            if (GetManaCost(spell1, m_viewSpellsHero) > m_viewSpellsHero->m_spellPoints)
+                message.payload.widget.data.value = VIEW_SPELL_UNAVAILABLE_COLOR;
             else
-                message9.payload.executive.command = EXECUTIVE_COMMAND_TERMINATE_LOOP;
-            m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-            message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-            m_viewSpellsWindow->BroadcastMessage(message9);
-            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_ICON_ID_BASE;
-            m_viewSpellsWindow->BroadcastMessage(message9);
-            if (m_viewSpellsReadOnly) {
-                message9.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-                message9.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
-                m_viewSpellsWindow->BroadcastMessage(message9);
-            }
-            message9.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-            message9.payload.widget.data.value = gsSpellInfo[IDX(spell2)].iconIndex;
-            m_viewSpellsWindow->BroadcastMessage(message9);
-            lineLength0 = smallFont->LineLength(gSpellNames[IDX(spell2)], VIEW_SPELL_NAME_WIDTH);
-            if (lineLength0 == 1) {
+                message.payload.widget.data.value = VIEW_SPELL_AVAILABLE_COLOR;
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            lines = smallFont->LineLength(gSpellNames[IDX(spell1)], VIEW_SPELL_NAME_WIDTH);
+            if (lines == 1) {
                 sprintf(
                     gText,
                     "%s\n[%d]",
-                    gSpellNames[IDX(spell2)],
-                    GetManaCost(spell2, m_viewSpellsHero)
+                    gSpellNames[IDX(spell1)],
+                    GetManaCost(spell1, m_viewSpellsHero)
                 );
             } else {
                 sprintf(
                     gText,
                     "%s [%d]",
-                    gSpellNames[IDX(spell2)],
-                    GetManaCost(spell2, m_viewSpellsHero)
+                    gSpellNames[IDX(spell1)],
+                    GetManaCost(spell1, m_viewSpellsHero)
                 );
             }
-            message9.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            message9.payload.widget.id = spellSlot6 + VIEW_SPELL_TEXT_ID_BASE;
-            message9.payload.widget.data.text = gText;
-            m_viewSpellsWindow->BroadcastMessage(message9);
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            message.payload.widget.data.text = gText;
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_TEXT_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED);
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
+            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            message.payload.widget.data.value = gsSpellInfo[IDX(spell1)].iconIndex;
+            m_viewSpellsWindow->BroadcastMessage(message);
+
+            message.type = MESSAGE_WIDGET;
+            message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+            message.payload.widget.id = i + VIEW_SPELL_ICON_ID_BASE;
+            message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+            m_viewSpellsWindow->BroadcastMessage(message);
         }
     }
 }
 
-VA(0x00454d5e, 0x5c9)
+VA(0x00454d5e, 0x673)
 MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
     SpellType spell;
 
     if (msg.type == MESSAGE_MOUSE_MOVE) {
         gpWindowManager->ConvertToHover(msg);
-        if (msg.payload.hover.id == gpWindowManager->m_lastHoverId) {
+        if (gpWindowManager->m_lastHoverId == msg.payload.hover.id) {
             return MESSAGE_DISPATCH_CONSUME;
         } else {
             return gpGame->m_viewSpellsCallback(msg);
@@ -3236,8 +3291,11 @@ MessageDispatchResult ViewSpellsHandler(tag_message& msg) {
                             );
                             break;
                         case VIEW_SPELL_PREVIOUS_ID:
-                            if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] == 0)
+                            if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] == 0) {
+                                gpGame->UpdateSpellWidgets();
+                                gpGame->m_viewSpellsWindow->MoveWindow(0, 0);
                                 break;
+                            }
                             gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] -=
                                 VIEW_SPELL_PAGE_SIZE;
                             if (gpGame->m_viewSpellsTop[IDX(gpGame->m_viewSpellsType)] < 0)
@@ -3498,16 +3556,35 @@ void game::ViewArmy(
     armyGroup* theGroup,
     i32 groupIndex
 ) {
-    i16 baseX7 = VIEW_ARMY_UNUSED_BASE_X;
-    i16 quickBaseY3 = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
-    i16 blankWidget3 = VIEW_ARMY_BLANK_WIDGET_ID;
-    i16 numWidget15 = VIEW_ARMY_COUNT_WIDGET_ID;
-    i16 titleMessage15 = VIEW_ARMY_TITLE_WIDGET_ID;
-    i16 detailMessage2 = VIEW_ARMY_DETAIL_WIDGET_ID;
-    i16 frame18 = VIEW_ARMY_MONSTER_WIDGET_ID;
-    i32 loopIndex0;
-    tag_message message6;
-    message6.type = MESSAGE_WIDGET;
+    i16 titleMessage14;
+    i16 detailMessage0;
+    tag_monsterInfo* monster;
+    iconWidget* monsterWidget9;
+    char* details0;
+    i16 blankWidget;
+    i32 modifier14;
+    i16 quickBaseY;
+    tag_monsterInfo* armyMonster2;
+    char filename5[VIEW_ARMY_FILENAME_SIZE];
+    i16 baseX8;
+    i32 loopIndex;
+    i32 iconFrame8;
+    i16 numWidget5;
+    i32 morale;
+    i32 luck4;
+    u8 armyName0[VIEW_ARMY_NAME_SIZE];
+    icon* monsterIcon5;
+    tag_message message;
+    i16 frame;
+
+    baseX8 = VIEW_ARMY_UNUSED_BASE_X;
+    quickBaseY = VIEW_ARMY_UNUSED_QUICK_BASE_Y;
+    blankWidget = VIEW_ARMY_BLANK_WIDGET_ID;
+    numWidget5 = VIEW_ARMY_COUNT_WIDGET_ID;
+    titleMessage14 = VIEW_ARMY_TITLE_WIDGET_ID;
+    detailMessage0 = VIEW_ARMY_DETAIL_WIDGET_ID;
+    frame = VIEW_ARMY_MONSTER_WIDGET_ID;
+    message.type = MESSAGE_WIDGET;
 
     iViewArmyFrame = 0;
     iViewArmyType = monsterType;
@@ -3515,14 +3592,14 @@ void game::ViewArmy(
     gbAllowUpgrade = false;
 
     if (castle && (gpAdvManager->m_active == 1 || gpTownManager->m_active == 1)) {
-        for (loopIndex0 = IDX(BUILDING_SLOT_DWELLING_SECOND);
-             loopIndex0 <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
-             loopIndex0++) {
+        for (loopIndex = IDX(BUILDING_SLOT_DWELLING_SECOND);
+             loopIndex <= IDX(BUILDING_SLOT_DWELLING_SIXTH);
+             loopIndex++) {
             if (gDwellingType[IDX(castle->m_type)]
-                             [loopIndex0 - IDX(BUILDING_SLOT_DWELLING_FIRST)]
+                             [loopIndex - IDX(BUILDING_SLOT_DWELLING_FIRST)]
                     == monsterType
                 && (castle->m_buildings
-                    & (1 << (loopIndex0 + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))) {
+                    & (1 << (loopIndex + VIEW_ARMY_DWELLING_UPGRADE_OFFSET)))) {
                 gbAllowUpgrade = true;
                 iViewArmyUpgradeToType = NextCreatureType(monsterType);
             }
@@ -3534,12 +3611,11 @@ void game::ViewArmy(
         }
     }
 
-    tag_monsterInfo* monster8 = &gMonsterDatabase[IDX(monsterType)];
-    tag_monsterInfo* armyMonster11;
+    monster = &gMonsterDatabase[IDX(monsterType)];
     if (theArmy)
-        armyMonster11 = &theArmy->m_monster;
+        armyMonster2 = &theArmy->m_monster;
     else
-        armyMonster11 = &gMonsterDatabase[IDX(monsterType)];
+        armyMonster2 = &gMonsterDatabase[IDX(monsterType)];
 
     x = VIEW_ARMY_WINDOW_X;
     y = VIEW_ARMY_WINDOW_Y;
@@ -3547,7 +3623,10 @@ void game::ViewArmy(
     if (!m_viewArmyWindow)
         MemError();
 
-    viewArmyFacingWIPXMod = facing == ARMY_FACING_RIGHT ? -1 : 1;
+    if (facing == ARMY_FACING_RIGHT)
+        viewArmyFacingWIPXMod = -1;
+    else
+        viewArmyFacingWIPXMod = 1;
     gpResourceManager
         ->PointToFile(gpResourceManager->MakeId(cArmyFrameFileNames[IDX(monsterType)], 1));
     gpResourceManager->ReadBlock(
@@ -3558,100 +3637,97 @@ void game::ViewArmy(
     BuildTempWalkSeq(&sViewArmyMonFrameInfo, 0, 1);
 
     viewArmyBaseX = VIEW_ARMY_MONSTER_BASE_X;
-    char filename4[VIEW_ARMY_FILENAME_SIZE];
-    if (gbLowMemory)
-        sprintf(filename4, "monh%04d.icn", IDX(monsterType));
-    else
-        strcpy(filename4, cMonFilename[IDX(monsterType)]);
+    strcpy(filename5, cMonFilename[IDX(monsterType)]);
 
-    icon* monsterIcon5 = gpResourceManager->GetIcon(filename4);
-    i32 iconFrame15 = sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0];
-    viewArmyBaseX += (GetIconEntry(monsterIcon5, iconFrame15)->w
-                      / VIEW_ARMY_ICON_CENTER_DIVISOR)
-                     * viewArmyFacingWIPXMod;
-    viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame15)->x * viewArmyFacingWIPXMod
-                     + sViewArmyMonFrameInfo.walkXOffsets[0] * viewArmyFacingWIPXMod;
+    monsterIcon5 = gpResourceManager->GetIcon(filename5);
+    iconFrame8 = sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0];
+    viewArmyBaseX += viewArmyFacingWIPXMod
+                     * (GetIconEntry(monsterIcon5, iconFrame8)->w
+                        / VIEW_ARMY_ICON_CENTER_DIVISOR);
+    viewArmyBaseX += GetIconEntry(monsterIcon5, iconFrame8)->x * viewArmyFacingWIPXMod
+                     + viewArmyFacingWIPXMod * sViewArmyMonFrameInfo.walkXOffsets[0];
     viewArmyBaseY = VIEW_ARMY_MONSTER_BASE_Y;
     viewArmyBaseY +=
-        GetIconEntry(monsterIcon5, iconFrame15)->h / VIEW_ARMY_ICON_CENTER_DIVISOR;
-    if (gbLowMemory) {
-        viewArmyBaseX = VIEW_ARMY_LOW_MEMORY_MONSTER_X;
-        viewArmyBaseY = VIEW_ARMY_LOW_MEMORY_MONSTER_Y;
-    }
-
-    iconWidget* monsterWidget7 = new iconWidget(
+        GetIconEntry(monsterIcon5, iconFrame8)->h / VIEW_ARMY_ICON_CENTER_DIVISOR;
+    monsterWidget9 = new iconWidget(
         static_cast<i16>(viewArmyBaseX),
         static_cast<i16>(viewArmyBaseY),
         VIEW_ARMY_MONSTER_WIDGET_WIDTH,
         VIEW_ARMY_MONSTER_WIDGET_HEIGHT,
-        filename4,
-        gbLowMemory ? 0 : sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
-        facing == ARMY_FACING_LEFT ? ICON_DRAW_FLIPPED : ICON_DRAW_NORMAL,
+        filename5,
+        sViewArmyMonFrameInfo.animationFrames[IDX(ARMY_ANIMATION_WALK)][0],
+        static_cast<i8>(facing == ARMY_FACING_LEFT),
         VIEW_ARMY_MONSTER_WIDGET_Z_ORDER,
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (!monsterWidget7)
+    if (!monsterWidget9)
         MemError();
-    m_viewArmyWindow->AddWidget(monsterWidget7, -1);
+    m_viewArmyWindow->AddWidget(monsterWidget9, -1);
     gpResourceManager->Dispose(monsterIcon5);
 
-    char armyName8[VIEW_ARMY_NAME_SIZE];
-    strcpy(armyName8, gArmyNames[IDX(monsterType)]);
-    armyName8[0] -= VIEW_ARMY_ASCII_CASE_OFFSET;
-    message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    message6.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
-    message6.payload.widget.data.text = armyName8;
-    m_viewArmyWindow->BroadcastMessage(message6);
+    strcpy(reinterpret_cast<char*>(armyName0), gArmyNames[IDX(monsterType)]);
+    if (armyName0[0] >= 'a' && armyName0[0] <= 'z')
+        armyName0[0] = armyName0[0] - ('a' - 'A');
+    else if (armyName0[0] >= CP1251_SMALL_A && armyName0[0] <= CP1251_SMALL_YA)
+        armyName0[0] = armyName0[0] - (CP1251_SMALL_A - CP1251_CAPITAL_A);
+    else if (armyName0[0] == CP1251_SMALL_YO)
+        armyName0[0] = CP1251_CAPITAL_YO;
+    else
+        armyName0[0] = armyName0[0];
+    message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+    message.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
+    message.payload.widget.data.text = reinterpret_cast<char*>(armyName0);
+    m_viewArmyWindow->BroadcastMessage(message);
 
-    char* details9 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE));
-    i32 morale2 = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
-    if (HAS(monster8->flags.all, MONSTER_FLAGS_NO_MORALE))
-        morale2 = 0;
+    details0 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE));
+    morale = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
+    if (HAS(monster->flags.all, MONSTER_FLAGS_NO_MORALE))
+        morale = 0;
 
-    sprintf(details9, "");
-    i32 modifier15 = 0;
+    sprintf(details0, "");
+    modifier14 = 0;
     sprintf(
         gText,
         "%s%d",
         cArmyDetail[ARMY_DETAIL_ATTACK],
-        static_cast<i32>(monster8->attack)
+        static_cast<i32>(monster->attack)
     );
-    strcat(details9, gText);
+    strcat(details0, gText);
     if (theHero)
-        modifier15 += theHero->Stats(HERO_PRIMARY_ATTACK);
+        modifier14 += theHero->Stats(HERO_PRIMARY_ATTACK);
     if (theArmy)
-        modifier15 = theArmy->m_monster.attack - monster8->attack;
-    if (modifier15) {
-        sprintf(gText, " (%d)", monster8->attack + modifier15);
-        strcat(details9, gText);
+        modifier14 = theArmy->m_monster.attack - monster->attack;
+    if (modifier14) {
+        sprintf(gText, " (%d)", monster->attack + modifier14);
+        strcat(details0, gText);
     }
 
-    modifier15 = 0;
+    modifier14 = 0;
     sprintf(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DEFENSE],
-        static_cast<i32>(monster8->defense)
+        static_cast<i32>(monster->defense)
     );
-    strcat(details9, gText);
+    strcat(details0, gText);
     if (theHero)
-        modifier15 += theHero->Stats(HERO_PRIMARY_DEFENSE);
+        modifier14 += theHero->Stats(HERO_PRIMARY_DEFENSE);
     if (theArmy)
-        modifier15 = theArmy->m_monster.defense - monster8->defense;
-    if (modifier15) {
-        sprintf(gText, " (%d)", monster8->defense + modifier15);
-        strcat(details9, gText);
+        modifier14 = theArmy->m_monster.defense - monster->defense;
+    if (modifier14) {
+        sprintf(gText, " (%d)", monster->defense + modifier14);
+        strcat(details0, gText);
     }
 
-    if (HAS(monster8->flags.all, MONSTER_FLAGS_SHOOTER)) {
-        i32 shots8 = armyMonster11->shots;
+    if (HAS(monster->flags.all, MONSTER_FLAGS_SHOOTER)) {
+        i32 shots8 = armyMonster2->shots;
         if (shots8 > 0) {
             if (gpCombatManager->m_active == 1)
                 sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_LEFT], shots8);
             else
                 sprintf(gText, "\n%s%d", cArmyDetail[ARMY_DETAIL_SHOTS_OUTSIDE], shots8);
-            strcat(details9, gText);
+            strcat(details0, gText);
         }
     }
 
@@ -3659,82 +3735,82 @@ void game::ViewArmy(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_DAMAGE],
-        static_cast<i32>(monster8->damageMin)
+        static_cast<i32>(monster->damageMin)
     );
-    strcat(details9, gText);
-    if (monster8->damageMin != monster8->damageMax) {
-        sprintf(gText, "-%d", static_cast<i32>(monster8->damageMax));
-        strcat(details9, gText);
+    strcat(details0, gText);
+    if (monster->damageMin != monster->damageMax) {
+        sprintf(gText, "-%d", static_cast<i32>(monster->damageMax));
+        strcat(details0, gText);
     }
     sprintf(
         gText,
         "\n%s%d",
         cArmyDetail[ARMY_DETAIL_HIT_POINTS],
-        static_cast<u32>(monster8->hitPoints)
+        static_cast<u32>(monster->hitPoints)
     );
-    strcat(details9, gText);
+    strcat(details0, gText);
     if (gpCombatManager->m_active == 1) {
         sprintf(
             gText,
             "\n%s%d",
-            "Hit Points Left: ",
-            static_cast<u32>(monster8->hitPoints) - theArmy->m_hitPointsLost
+            "\xce\xf1\xf2\xe0\xeb\xee\xf1\xfc \xe7\xe4\xee\xf0\xee\xe2\xfc\xff: ",
+            static_cast<u32>(monster->hitPoints) - theArmy->m_hitPointsLost
         );
-        strcat(details9, gText);
+        strcat(details0, gText);
     }
-    sprintf(gText, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster11->speed]);
-    strcat(details9, gText);
+    sprintf(gText, "\n%s%s", cArmyDetail[ARMY_DETAIL_SPEED], speedText[armyMonster2->speed]);
+    strcat(details0, gText);
     sprintf(
         gText,
         "\n%s%s",
         cArmyDetail[ARMY_DETAIL_MORALE],
-        gMoraleText[morale2 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
+        gMoraleText[morale + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
     );
-    strcat(details9, gText);
-    i32 luck1 = GetLuck(theHero, theArmy, castle);
+    strcat(details0, gText);
+    luck4 = GetLuck(theHero, theArmy, castle);
     sprintf(
         gText,
         "\n%s%s",
         cArmyDetail[ARMY_DETAIL_LUCK],
-        gLuckText[luck1 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
+        gLuckText[luck4 + VIEW_ARMY_TEXT_NEUTRAL_OFFSET]
     );
-    strcat(details9, gText);
+    strcat(details0, gText);
 
-    message6.payload.widget.id = VIEW_ARMY_DETAIL_WIDGET_ID;
-    message6.payload.widget.data.text = details9;
-    m_viewArmyWindow->BroadcastMessage(message6);
+    message.payload.widget.id = VIEW_ARMY_DETAIL_WIDGET_ID;
+    message.payload.widget.data.text = details0;
+    m_viewArmyWindow->BroadcastMessage(message);
     if (!gbAllowUpgrade) {
-        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message6.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
-        m_viewArmyWindow->BroadcastMessage(message6);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.id = VIEW_ARMY_UPGRADE_ACTION_ID;
+        m_viewArmyWindow->BroadcastMessage(message);
     }
     if (disableUpgrade) {
-        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message6.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
-        m_viewArmyWindow->BroadcastMessage(message6);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.id = VIEW_ARMY_UPGRADE_ID;
+        m_viewArmyWindow->BroadcastMessage(message);
     }
     if (quickView) {
-        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message6.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
-        m_viewArmyWindow->BroadcastMessage(message6);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.id = VIEW_ARMY_QUICK_VIEW_ID;
+        m_viewArmyWindow->BroadcastMessage(message);
     }
     if (numTroops < 1) {
-        message6.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        message6.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        message6.payload.widget.id = VIEW_ARMY_BLANK_WIDGET_ID;
-        m_viewArmyWindow->BroadcastMessage(message6);
-        message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
-        m_viewArmyWindow->BroadcastMessage(message6);
+        message.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
+        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
+        message.payload.widget.id = VIEW_ARMY_BLANK_WIDGET_ID;
+        m_viewArmyWindow->BroadcastMessage(message);
+        message.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
+        m_viewArmyWindow->BroadcastMessage(message);
     } else {
         char countText[VIEW_ARMY_COUNT_TEXT_SIZE];
         sprintf(countText, "%d", numTroops);
-        message6.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-        message6.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
-        message6.payload.widget.data.text = countText;
-        m_viewArmyWindow->BroadcastMessage(message6);
+        message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+        message.payload.widget.id = VIEW_ARMY_COUNT_WIDGET_ID;
+        message.payload.widget.data.text = countText;
+        m_viewArmyWindow->BroadcastMessage(message);
     }
 
     if (theArmy) {
@@ -3744,29 +3820,29 @@ void game::ViewArmy(
             spellY3 += VIEW_ARMY_QUICK_SPELL_Y_OFFSET;
         i32 spacing0 = VIEW_ARMY_SPELL_SPACING_BASE - theArmy->m_spellCount;
         i32 spellX3 =
-            VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount + spellCenterX8
+            spellCenterX8 + (VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount)
             - (theArmy->m_spellCount * spacing0) / VIEW_ARMY_ICON_CENTER_DIVISOR;
         H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) spellIndex9 =
             ARMY_SPELL_INFLUENCE_NONE;
-        for (loopIndex0 = 0;
-             loopIndex0 < (theArmy->m_spellCount < VIEW_ARMY_SPELL_VISIBLE_LIMIT
+        for (loopIndex = 0;
+             loopIndex < (theArmy->m_spellCount < VIEW_ARMY_SPELL_VISIBLE_LIMIT
                                ? theArmy->m_spellCount
                                : VIEW_ARMY_SPELL_VISIBLE_LIMIT);
-             loopIndex0++) {
+             loopIndex++) {
             spellIndex9++;
             for (; spellIndex9 < ARMY_SPELL_INFLUENCE_COUNT; spellIndex9++) {
                 if (theArmy->m_spellInfluence[IDX(spellIndex9)])
                     break;
             }
             iconWidget* spellWidget = new iconWidget(
-                static_cast<i16>((&loopIndex0)[0] * spacing0 + spellX3),
+                static_cast<i16>(spellX3 + loopIndex * spacing0),
                 static_cast<i16>(spellY3 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
                 0,
                 0,
                 const_cast<char*>("spellinl.icn"),
                 static_cast<i16>(IDX(spellIndex9)),
                 ICON_DRAW_NORMAL,
-                static_cast<i16>(loopIndex0 + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
+                static_cast<i16>(loopIndex + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
@@ -3791,20 +3867,21 @@ void game::ViewArmy(
         if (gbUpgradeArmy && theGroup)
             theGroup->m_troopTypes[groupIndex] = iViewArmyUpgradeToType;
     }
-    H2_FREE(details9);
+    H2_FREE(details0);
     delete m_viewArmyWindow;
 }
 
 VA(0x00456231, 0x37d)
 MessageDispatchResult ViewArmyHandler(tag_message& msg) {
-    i32 goldCost6;
-    ResourceType resourceType0;
-    i32 resourceCost5;
+    i32 resourceCost;
+    i16 frameDelay6;
+    i16 frameOffset;
+    i32 goldCost;
+    ResourceType resourceType7;
 
     gbDismissArmy = false;
     gbUpgradeArmy = false;
-    i16 frameDelay0 = VIEW_ARMY_HANDLER_FRAME_DELAY;
-    i16 frameOffset1;
+    frameDelay6 = VIEW_ARMY_HANDLER_FRAME_DELAY;
 
     if (msg.type == MESSAGE_WIDGET) {
         switch (msg.payload.widget.command) {
@@ -3814,11 +3891,11 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                     case EVENT_WINDOW_SECOND_BUTTON:
                         gpWindowManager->m_dialogResult = msg.payload.widget.id;
                         msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                        msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
+                        msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                         return MESSAGE_DISPATCH_FORWARD;
                     case EVENT_WINDOW_FOURTH_BUTTON:
                         NormalDialog(
-                            const_cast<char*>("Are you sure you want to dismiss this army?"),
+                            const_cast<char*>("\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee \xf5\xee\xf2\xe8\xf2\xe5 \xf0\xe0\xf1\xef\xf3\xf1\xf2\xe8\xf2\xfc \xfd\xf2\xee\xf2 \xee\xf2\xf0\xff\xe4?"),
                             NORMAL_DIALOG_CONFIRM,
                             -1,
                             -1,
@@ -3832,64 +3909,64 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
                         if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
                             gbDismissArmy = true;
                             msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
-                            msg.payload.widget.command = BaseWidgetCommand(msg.payload.widget.id);
+                            msg.payload.widget.command = BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                             return MESSAGE_DISPATCH_FORWARD;
                         }
                         break;
                     case VIEW_ARMY_UPGRADE_ACTION_ID:
-                        goldCost6 = (gMonsterDatabase[IDX(iViewArmyUpgradeToType)].cost
-                                     - gMonsterDatabase[IDX(iViewArmyType)].cost)
-                                    * iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
+                        goldCost = iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER
+                                   * (gMonsterDatabase[IDX(iViewArmyUpgradeToType)].cost
+                                      - gMonsterDatabase[IDX(iViewArmyType)].cost);
                         if (iViewArmyUpgradeToType == CREATURE_BLACK_DRAGON) {
-                            resourceType0 = RES_SULFUR;
-                            resourceCost5 =
+                            resourceType7 = RES_SULFUR;
+                            resourceCost =
                                 iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         } else if (iViewArmyUpgradeToType == CREATURE_TITAN) {
-                            resourceType0 = RES_GEMS;
-                            resourceCost5 =
+                            resourceType7 = RES_GEMS;
+                            resourceCost =
                                 iViewArmyNumTroops * VIEW_ARMY_UPGRADE_COST_MULTIPLIER;
                         } else {
-                            resourceType0 = RES_NONE;
-                            resourceCost5 = 0;
+                            resourceType7 = RES_NONE;
+                            resourceCost = 0;
                         }
-                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= goldCost6
-                            && (resourceType0 == RES_NONE
-                                || gpCurPlayer->m_resources[IDX(resourceType0)] >= resourceCost5)) {
+                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= goldCost
+                            && (resourceType7 == RES_NONE
+                                || gpCurPlayer->m_resources[IDX(resourceType7)] >= resourceCost)) {
                             NormalDialog(
                                 const_cast<char*>(
-                                    "Your troops can be upgraded, but it will cost you dearly.  "
-                                    "Do you wish to upgrade them?"
+                                    "\xc2\xfb \xec\xee\xe6\xe5\xf2\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2 \xe7\xe0 "
+                                    "\xed\xe5\xea\xee\xf2\xee\xf0\xf3\xfe \xf1\xf3\xec\xec\xf3. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe8\xf5?"
                                 ),
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
                                 IDX(RES_GOLD),
-                                goldCost6,
-                                IDX(resourceType0),
-                                resourceCost5,
+                                goldCost,
+                                IDX(resourceType7),
+                                resourceCost,
                                 -1,
                                 0
                             );
                             if (gpWindowManager->m_dialogResult == NORMAL_DIALOG_BUTTON_FIVE) {
-                                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost6;
-                                if (resourceType0 != RES_NONE)
-                                    gpCurPlayer->m_resources[IDX(resourceType0)] -= resourceCost5;
+                                gpCurPlayer->m_resources[IDX(RES_GOLD)] -= goldCost;
+                                if (resourceType7 != RES_NONE)
+                                    gpCurPlayer->m_resources[IDX(resourceType7)] -= resourceCost;
                                 gbUpgradeArmy = true;
                                 msg.payload.widget.id = VIEW_ARMY_CLOSE_ID;
                                 msg.payload.widget.command =
-                                    BaseWidgetCommand(msg.payload.widget.id);
+                                    BaseWidgetCommand(VIEW_ARMY_CLOSE_ID);
                                 return MESSAGE_DISPATCH_FORWARD;
                             }
                         } else {
                             NormalDialog(
-                                const_cast<char*>("You can't afford to upgrade your troops!"),
+                                const_cast<char*>("\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe7\xe2\xee\xeb\xe8\xf2\xfc \xf1\xe5\xe1\xe5 \xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2!"),
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
                                 IDX(RES_GOLD),
-                                goldCost6,
-                                IDX(resourceType0),
-                                resourceCost5,
+                                goldCost,
+                                IDX(resourceType7),
+                                resourceCost,
                                 -1,
                                 0
                             );
@@ -3904,7 +3981,7 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
         }
     }
 
-    if (!gbLowMemory && KBTickCount() > glTimers[0]) {
+    if (glTimers[0] < KBTickCount()) {
         msg.type = MESSAGE_WIDGET;
         msg.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         msg.payload.widget.id = VIEW_ARMY_MONSTER_WIDGET_ID;
@@ -3915,8 +3992,8 @@ MessageDispatchResult ViewArmyHandler(tag_message& msg) {
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
         msg.payload.widget.command = WIDGET_COMMAND_SET_X;
         msg.payload.widget.data.value =
-            sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame] * viewArmyFacingWIPXMod
-            + viewArmyBaseX;
+            viewArmyBaseX
+            + viewArmyFacingWIPXMod * sViewArmyMonFrameInfo.walkXOffsets[iViewArmyFrame];
         gpGame->m_viewArmyWindow->BroadcastMessage(msg);
         gpGame->m_viewArmyWindow->DrawWindow(1, 0, WINDOW_DRAW_ID_LIMIT);
         glTimers[0] = static_cast<i32>(
@@ -4406,238 +4483,226 @@ void game::PerDay(void) {
     }
 }
 
-VA(0x00457ed6, 0x19d2)
+VA(0x00457ed6, 0x1aa8)
 void game::PerWeek(void) {
-    FactionType heroClass18 = FACTION_KNIGHT;
-    i32 outerIndex5;
-    i32 innerIndex3;
-    i32 mapY5;
-    i32 mapX8;
-    town* castle37;
-    i32 growth13;
-    FactionType desiredClass1;
-    i32 monsterIncrease16;
-    i32 monsterCount36;
-    hero* weeklyHero4;
+    FactionType heroClass = FACTION_KNIGHT;
+    i32 mapY7;
+    i32 mapX10;
+    FactionType desiredClass;
+    i32 outerIndex;
+    i32 innerIndex;
+    i32 monsterCount;
+    i32 growth2;
+    town* castle5;
+    hero* weeklyHero;
+    i32 monsterIncrease8;
 
     giWeekType = CALENDAR_PERIOD_NORMAL;
     giWeekTypeExtra = Random(0, WEEK_NAME_LAST);
     if (m_week != GAME_WEEKS_PER_MONTH) {
-        outerIndex5 = Random(1, SPECIAL_WEEK_ROLL_MAX);
-        if (outerIndex5 == 1) {
+        outerIndex = Random(1, SPECIAL_WEEK_ROLL_MAX);
+        if (outerIndex == 1) {
             giWeekType = CALENDAR_PERIOD_CREATURE;
             giWeekTypeExtra = Random(0, CREATURE_WEEK_LAST);
         }
     }
 
-    for (outerIndex5 = 0; outerIndex5 < GAME_TOWN_COUNT; outerIndex5++) {
-        castle37 = GetTown(outerIndex5);
-        for (innerIndex3 = WEEKLY_FIRST_DWELLING; innerIndex3 <= WEEKLY_LAST_DWELLING;
-             innerIndex3++) {
-            if (castle37->m_buildings & (1 << innerIndex3)) {
-                growth13 = gMonsterDatabase[IDX(gDwellingType[IDX(castle37->m_type)]
-                                                             [innerIndex3 - WEEKLY_FIRST_DWELLING])]
+    for (outerIndex = 0; outerIndex < GAME_TOWN_COUNT; outerIndex++) {
+        castle5 = GetTown(outerIndex);
+        for (innerIndex = WEEKLY_FIRST_DWELLING; innerIndex <= WEEKLY_LAST_DWELLING;
+             innerIndex++) {
+            if (castle5->m_buildings & (1 << innerIndex)) {
+                growth2 = gMonsterDatabase[IDX(gDwellingType[IDX(castle5->m_type)]
+                                                             [innerIndex - WEEKLY_FIRST_DWELLING])]
                                .growth;
-                if (castle37->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
-                    growth13 += CASTLE_GROWTH_SPECIAL_BONUS;
-                if (innerIndex3 == WEEKLY_FIRST_DWELLING
-                    && (castle37->m_buildings & BIT(BUILDING_SLOT_WELL_EXTRA)))
-                    growth13 += CASTLE_GROWTH_WELL_BONUS;
-                if (castle37->m_owner == -1)
-                    growth13 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
-                if (castle37->m_owner >= 0
-                    && castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] == 0
-                    && !gbHumanPlayer[castle37->m_owner]) {
+                if (castle5->m_buildings & BIT(BUILDING_SLOT_SPECIAL_FOUR))
+                    growth2 += CASTLE_GROWTH_SPECIAL_BONUS;
+                if (innerIndex == WEEKLY_FIRST_DWELLING
+                    && (castle5->m_buildings & BIT(BUILDING_SLOT_WELL_EXTRA)))
+                    growth2 += CASTLE_GROWTH_WELL_BONUS;
+                if (castle5->m_owner == -1)
+                    growth2 /= NEUTRAL_CASTLE_GROWTH_DIVISOR;
+                if (castle5->m_owner >= 0
+                    && castle5->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] == 0
+                    && !gbHumanPlayer[castle5->m_owner]) {
                     if (gpGame->m_difficulty == DIFFICULTY_HARD)
-                        growth13 = static_cast<i32>(growth13 * WEEKLY_HARD_GROWTH_FACTOR);
+                        growth2 = static_cast<i32>(growth2 * WEEKLY_HARD_GROWTH_FACTOR);
                     if (gpGame->m_difficulty == DIFFICULTY_EXPERT)
-                        growth13 = static_cast<i32>(growth13 * WEEKLY_EXPERT_GROWTH_FACTOR);
+                        growth2 = static_cast<i32>(growth2 * WEEKLY_EXPERT_GROWTH_FACTOR);
                     if (gpGame->m_difficulty == DIFFICULTY_IMPOSSIBLE)
-                        growth13 = static_cast<i32>(growth13 * WEEKLY_IMPOSSIBLE_GROWTH_FACTOR);
+                        growth2 = static_cast<i32>(growth2 * WEEKLY_IMPOSSIBLE_GROWTH_FACTOR);
                 }
                 if (giWeekType == CALENDAR_PERIOD_CREATURE
-                    && IDX(gDwellingType[IDX(castle37->m_type)]
-                                        [innerIndex3 - WEEKLY_FIRST_DWELLING])
+                    && IDX(gDwellingType[IDX(castle5->m_type)]
+                                        [innerIndex - WEEKLY_FIRST_DWELLING])
                            == giWeekTypeExtra)
-                    growth13 += CREATURE_WEEK_GROWTH_BONUS;
-                castle37->m_garrison[innerIndex3 - WEEKLY_FIRST_DWELLING] += growth13;
+                    growth2 += CREATURE_WEEK_GROWTH_BONUS;
+                castle5->m_garrison[innerIndex - WEEKLY_FIRST_DWELLING] += growth2;
             }
         }
     }
 
-    for (outerIndex5 = 0; outerIndex5 < GAME_PLAYER_COUNT; outerIndex5++) {
-        for (innerIndex3 = 0; innerIndex3 < AVAILABLE_HERO_SLOTS; innerIndex3++) {
-            if (innerIndex3 == 1) {
-                heroClass18 =
-                    m_heroRecs[gpGame->m_players[outerIndex5].m_availableHeroIds[0]].m_cursorType;
+    for (outerIndex = 0; outerIndex < GAME_PLAYER_COUNT; outerIndex++) {
+        for (innerIndex = 0; innerIndex < AVAILABLE_HERO_SLOTS; innerIndex++) {
+            if (innerIndex == 1) {
+                heroClass =
+                    m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[0]].m_cursorType;
             }
-            heroClass18 =
-                (heroClass18 + Random(1, IDX(FACTION_COUNT) - 1)) % IDX(FACTION_COUNT);
-            desiredClass1 = heroClass18;
-            if (innerIndex3 == 0
-                && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]]
+            heroClass =
+                (Random(1, IDX(FACTION_COUNT) - 1) + heroClass) % IDX(FACTION_COUNT);
+            desiredClass = heroClass;
+            if (innerIndex == 0
+                && m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]]
                        < FACTION_COUNT) {
-                desiredClass1 =
-                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex5].m_color]];
+                desiredClass =
+                    m_setupPlayerRace[gcColorToSetupPos[m_players[outerIndex].m_color]];
             }
 
-            if (gpGame->m_availableHeroes[(
-                    innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                )[gpGame->m_players[0].m_availableHeroIds]]
+            if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                 == WEEKLY_AVAILABLE_HERO) {
                 if (HAS(gpGame
-                            ->m_heroRecs[(
-                                innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                            )[gpGame->m_players[0].m_availableHeroIds]]
+                            ->m_heroRecs[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                             .m_eventFlags,
                         WEEKLY_HERO_RESERVED_FLAG))
                     continue;
             }
             {
-                if (gpGame->m_availableHeroes[(
-                        innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                    )[gpGame->m_players[0].m_availableHeroIds]]
+                if (gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]]
                     == WEEKLY_AVAILABLE_HERO)
-                    gpGame->m_availableHeroes[(
-                        innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                    )[gpGame->m_players[0].m_availableHeroIds]] = -1;
-                if (innerIndex3 == 1 && !gbHumanPlayer[outerIndex5])
-                    desiredClass1 = FACTION_ANY;
-                i32 useDifficultyBonus3 =
-                    !gbHumanPlayer[outerIndex5] && gpGame->m_difficulty > DIFFICULTY_EASY;
-                (
-                    innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                )[gpGame->m_players[0].m_availableHeroIds] =
-                    static_cast<i8>(
-                        gpGame->GetNewHeroId(outerIndex5, desiredClass1, useDifficultyBonus3)
-                    );
-                m_availableHeroes[(
-                    innerIndex3 - outerIndex5 + outerIndex5 * (sizeof(playerData) + 1)
-                )[gpGame->m_players[0].m_availableHeroIds]] = WEEKLY_AVAILABLE_HERO;
+                    gpGame->m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = -1;
+                if (innerIndex == 1 && !gbHumanPlayer[outerIndex])
+                    desiredClass = FACTION_ANY;
+                gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex] =
+                    static_cast<i8>(gpGame->GetNewHeroId(
+                        outerIndex,
+                        desiredClass,
+                        !gbHumanPlayer[outerIndex] && gpGame->m_difficulty > DIFFICULTY_EASY
+                    ));
+                m_availableHeroes[gpGame->m_players[outerIndex].m_availableHeroIds[innerIndex]] = WEEKLY_AVAILABLE_HERO;
             }
         }
     }
 
-    for (mapY5 = 0; MAP_HEIGHT > mapY5; mapY5++) {
-        for (mapX8 = 0; mapX8 < MAP_WIDTH; mapX8++) {
-            switch (WORLDMAP->Row(mapY5)[mapX8].m_triggerType) {
+    for (mapY7 = 0; mapY7 < MAP_HEIGHT; mapY7++) {
+        for (mapX10 = 0; mapX10 < MAP_WIDTH; mapX10++) {
+            switch (WORLDMAP->GetCell(mapX10, mapY7)->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER: {
-                    monsterCount36 = WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    monsterCount = WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                      & IDX(MAP_MONSTER_COUNT_MASK);
-                    monsterIncrease16 = monsterCount36 / EVENT_DAYS_PER_WEEK;
+                    monsterIncrease8 = monsterCount / EVENT_DAYS_PER_WEEK;
                     if (Random(1, EVENT_DAYS_PER_WEEK)
-                        <= static_cast<i32>(monsterCount36 % EVENT_DAYS_PER_WEEK))
-                        monsterIncrease16++;
-                    monsterCount36 += monsterIncrease16;
-                    if (monsterCount36 > WEEKLY_MONSTER_LIMIT)
-                        monsterCount36 = WEEKLY_MONSTER_LIMIT;
-                    WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata =
-                        (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        <= static_cast<i32>(monsterCount % EVENT_DAYS_PER_WEEK))
+                        monsterIncrease8++;
+                    monsterCount += monsterIncrease8;
+                    if (monsterCount > WEEKLY_MONSTER_LIMIT)
+                        monsterCount = WEEKLY_MONSTER_LIMIT;
+                    WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata =
+                        (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                          & IDX(MAP_MONSTER_GUARD_FLAG))
-                        | monsterCount36;
+                        | monsterCount;
                     break;
                 }
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTESIAN_SPRING:
-                    WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 1;
+                    WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = 1;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATER_WHEEL:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                         != WEEKLY_WATER_WHEEL_EMPTY)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = 2;
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = 2;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MAGIC_GARDEN:
-                    WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = Random(0, 1) ? 7 : 6;
+                    WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = Random(0, 1) ? 7 : 6;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WINDMILL:
-                    WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata = Random(1, 5);
+                    WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata = Random(1, 5);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARCHER_HOUSE:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(2, 4);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(2, 4);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_GOBLIN_HUT:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DWARF_COTTAGE:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(2, 4);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(2, 4);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_PEASANT_HUT:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_LOG_CABIN:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DESERT_TENT:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WAGON_CAMP:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_HOUSE:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(4, 8);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(4, 8);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_SIRENS:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_WATCH_TOWER:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 4);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 4);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RUINS:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TREE_CITY:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                         < WEEKLY_MONSTER_POPULATION_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(10, 20);
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(10, 20);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CAVE:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(3, 6);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(3, 6);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXCAVATION:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(4, 8);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(4, 8);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HALFLING_HOLE:
-                    if (WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(5, 10);
+                    if (WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata < WEEKLY_GROWTH_LIMIT)
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(5, 10);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_TROLL_BRIDGE:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
-                        && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CITY_OF_DEAD:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
-                        && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += Random(1, 3);
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += Random(1, 3);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_DRAGON_CITY:
-                    if (!(WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                    if (!(WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                           & WEEKLY_DWELLING_NO_GROWTH_FLAG)
-                        && WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata
+                        && WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata
                                < WEEKLY_DRAGON_CITY_LIMIT)
-                        WORLDMAP->GetCell(mapX8, mapY5)->m_objectMetadata += 1;
+                        WORLDMAP->GetCell(mapX10, mapY7)->m_objectMetadata += 1;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_DWELLING:
-                    WeeklyRecruitSite(WORLDMAP->GetCell(mapX8, mapY5));
+                    WeeklyRecruitSite(WORLDMAP->GetCell(mapX10, mapY7));
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EXPANSION_OBJECT:
-                    WeeklyGenericSite(WORLDMAP->GetCell(mapX8, mapY5));
+                    WeeklyGenericSite(WORLDMAP->GetCell(mapX10, mapY7));
                     break;
                 default:
                     break;
@@ -4645,10 +4710,10 @@ void game::PerWeek(void) {
         }
     }
 
-    for (outerIndex5 = 0; outerIndex5 < GAME_HERO_COUNT; outerIndex5++) {
-        weeklyHero4 = &m_heroRecs[outerIndex5];
-        if (HAS(weeklyHero4->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
-            H2_ENUM_CLEAR_FLAG(weeklyHero4->m_eventFlags, WEEKLY_HERO_VISIT_FLAG);
+    for (outerIndex = 0; outerIndex < GAME_HERO_COUNT; outerIndex++) {
+        weeklyHero = &m_heroRecs[outerIndex];
+        if (HAS(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG))
+            H2_ENUM_CLEAR_FLAG(weeklyHero->m_eventFlags, WEEKLY_HERO_VISIT_FLAG);
     }
 
     m_week++;
@@ -5080,14 +5145,14 @@ void game::RandomizeMine(i32 x, i32 y) {
 
 VA(0x0045a930, 0xb8)
 void game::InitRandomArtifacts(void) {
-    i32 ignoredIndex;
+    i32 unused4;
     i32 y;
     memset(m_randomArtifacts, 0, sizeof(m_randomArtifacts));
-    for (i32 x = 0; MAP_WIDTH > x; x++) {
+    for (i32 x = 0; x < MAP_WIDTH; x++) {
         for (y = 0; y < MAP_HEIGHT; y++) {
             mapCell* cell = WORLDMAP->GetCell(x, y);
             if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT))
-                m_randomArtifacts[cell->m_objectIndex >> 1] = 1;
+                m_randomArtifacts[cell->m_objectIndex / 2] = 1;
         }
     }
 }
@@ -5097,24 +5162,28 @@ i32 game::GetRandomArtifactId(
     H2_ENUM_PARAM(ArtifactLevelMask, i32) levelMask,
     b32 allowCursed
 ) {
-    i32 attempts = 0;
+    i32 tries = 0;
     ArtifactType artifact;
 
-    while (1) {
+    for (;;) {
         if (xIsExpansionMap)
             artifact = static_cast<ArtifactType>(Random(ARTIFACT_FIRST, ARTIFACT_EXPANSION_LAST));
         else
             artifact = static_cast<ArtifactType>(Random(ARTIFACT_FIRST, ARTIFACT_BASE_LAST));
 
-        if (!HAS(levelMask, gArtifactLevel[IDX(artifact)]))
+        if (!HAS(gArtifactLevel[IDX(artifact)], levelMask))
             continue;
         if (artifact == ARTIFACT_EDITOR_ANY_ULTIMATE || artifact == ARTIFACT_EDITOR_UNUSED_84
             || artifact == ARTIFACT_EDITOR_UNUSED_85 || artifact == ARTIFACT_EDITOR_UNUSED_86
-            || artifact == ARTIFACT_SPELL_SCROLL || artifact == ARTIFACT_BREASTPLATE_ANDURAN
-            || artifact == ARTIFACT_BATTLE_GARB || artifact == ARTIFACT_HELMET_ANDURAN
-            || artifact == ARTIFACT_SWORD_ANDURAN || artifact == ARTIFACT_SPHERE_NEGATION)
+            || artifact == ARTIFACT_SPELL_SCROLL)
             continue;
-        if (attempts++ < ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[IDX(artifact)])
+        if (xIsPlayingExpansionCampaign) {
+            if (artifact == ARTIFACT_BREASTPLATE_ANDURAN || artifact == ARTIFACT_BATTLE_GARB
+                || artifact == ARTIFACT_HELMET_ANDURAN || artifact == ARTIFACT_SWORD_ANDURAN
+                || artifact == ARTIFACT_SPHERE_NEGATION)
+                continue;
+        }
+        if (tries++ < ARTIFACT_UNIQUE_RETRIES && m_randomArtifacts[IDX(artifact)])
             continue;
         if (IsCursedItem(artifact)) {
             if (!allowCursed)
@@ -5169,8 +5238,8 @@ void game::RandomizeHeroPool(void) {
 VA(0x0045ad00, 0x342)
 void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
     armyGroup* army2 = &m_heroRecs[heroId].m_army;
-    i32 armySlot7 = 0;
-    RandomHeroArmyRange armyTable7[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
+    i32 armySlot16 = 0;
+    RandomHeroArmyRange armyTable[IDX(FACTION_COUNT)][RANDOM_HERO_ARMY_OPTION_COUNT] = {
         {{IDX(CREATURE_PEASANT), 30, 50},
          {IDX(CREATURE_ARCHER), 3, 5},
          {IDX(CREATURE_PIKEMAN), 2, 4}},
@@ -5184,299 +5253,299 @@ void game::SetRandomHeroArmies(i32 heroId, i32 strongArmy) {
          {IDX(CREATURE_IRON_GOLEM), 1, 2}},
         {{IDX(CREATURE_SKELETON), 6, 10}, {IDX(CREATURE_ZOMBIE), 2, 4}, {IDX(CREATURE_MUMMY), 1, 2}}
     };
-    i32 selected9[RANDOM_HERO_ARMY_OPTION_COUNT];
-    i32 index9;
-    i32 minimum5;
-    i32 maximum5;
+    i32 selected[RANDOM_HERO_ARMY_OPTION_COUNT];
+    i32 index;
+    i32 minimum3;
+    i32 maximum;
 
-    selected9[0] = RANDOM_HERO_STACK_SELECTED;
-    selected9[1] =
-        RANDOM_HERO_FIRST_STACK_CHANCE + (strongArmy ? RANDOM_HERO_FIRST_STACK_BONUS_CHANCE : 0)
-        > Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX);
-    selected9[RANDOM_HERO_SECOND_SELECTION] =
+    selected[0] = RANDOM_HERO_STACK_SELECTED;
+    selected[1] = Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX)
+                  < RANDOM_HERO_FIRST_STACK_CHANCE
+                        + (strongArmy ? RANDOM_HERO_FIRST_STACK_BONUS_CHANCE : 0);
+    selected[RANDOM_HERO_SECOND_SELECTION] =
         Random(RANDOM_HERO_PERCENT_MIN, RANDOM_HERO_PERCENT_MAX)
         < RANDOM_HERO_SECOND_STACK_CHANCE
               + (strongArmy ? RANDOM_HERO_SECOND_STACK_BONUS_CHANCE : 0);
-    if (!selected9[RANDOM_HERO_SECOND_SELECTION])
-        selected9[1] = RANDOM_HERO_STACK_SELECTED;
+    if (!selected[RANDOM_HERO_SECOND_SELECTION])
+        selected[1] = RANDOM_HERO_STACK_SELECTED;
 
-    for (index9 = 0; index9 < RANDOM_HERO_ARMY_SLOT_COUNT; index9++) {
-        army2->m_creatureTypes[index9] = CREATURE_NONE;
-        army2->m_creatureCounts[index9] = RANDOM_HERO_EMPTY_COUNT;
+    for (index = 0; index < RANDOM_HERO_ARMY_SLOT_COUNT; index++) {
+        army2->m_creatureTypes[index] = CREATURE_NONE;
+        army2->m_creatureCounts[index] = RANDOM_HERO_EMPTY_COUNT;
     }
 
-    for (index9 = 0; index9 < RANDOM_HERO_ARMY_SELECTION_COUNT; index9++) {
-        if (selected9[index9]) {
-            army2->m_creatureTypes[armySlot7] =
-                static_cast<i8>(armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].creature);
-            minimum5 = armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].minimum
+    for (index = 0; index < RANDOM_HERO_ARMY_SELECTION_COUNT; index++) {
+        if (selected[index]) {
+            army2->m_creatureTypes[armySlot16] =
+                static_cast<i8>(armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].creature);
+            minimum3 = armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].minimum
                        * RANDOM_HERO_COUNT_SCALE;
-            maximum5 = armyTable7[IDX(m_heroRecs[heroId].m_cursorType)][index9].maximum
+            maximum = armyTable[IDX(m_heroRecs[heroId].m_cursorType)][index].maximum
                            * RANDOM_HERO_COUNT_SCALE
                        + RANDOM_HERO_COUNT_ROUNDING;
             if (strongArmy)
-                minimum5 =
-                    (minimum5 + maximum5) / RANDOM_HERO_AVERAGE_DIVISOR;
-            army2->m_creatureCounts[armySlot7] =
-                static_cast<i16>(Random(minimum5, maximum5) / RANDOM_HERO_COUNT_SCALE);
-            armySlot7++;
+                minimum3 =
+                    (minimum3 + maximum) / RANDOM_HERO_AVERAGE_DIVISOR;
+            army2->m_creatureCounts[armySlot16] =
+                static_cast<i16>(Random(minimum3, maximum) / RANDOM_HERO_COUNT_SCALE);
+            armySlot16++;
         }
     }
 }
 
-VA(0x0045b042, 0x65d)
+VA(0x0045b042, 0x6f4)
 void game::ProcessRandomObjects(void) {
-    i32 maxValue17;
-    i32 x10;
-    i32 mineIndex8;
-    i32 y8;
-    i32 artifactId18;
-    i32 minValue7;
-    mapCell* cell6;
-    i32 randomType0;
-    MapObjectType randomObjectType3;
+    i32 artifactId;
+    i32 minValue;
+    i32 mineIndex2;
+    i32 x;
+    i32 y;
+    i32 maxValue;
+    mapCell* cell;
+    MapObjectType randomObjectType8;
+    i32 randomType8;
 
     giUABaseX = -1;
     giUABaseY = -1;
     giUARadius = 0;
-    for (mineIndex8 = 0; mineIndex8 < RANDOM_MINE_RESOURCE_COUNT; mineIndex8++)
-        RandMineQty[mineIndex8] = 0;
+    for (mineIndex2 = 0; mineIndex2 < RANDOM_MINE_RESOURCE_COUNT; mineIndex2++)
+        RandMineQty[mineIndex2] = 0;
 
-    for (y8 = 0; MAP_HEIGHT > y8; y8++) {
-        for (x10 = 0; x10 < MAP_WIDTH; x10++) {
-            cell6 = WORLDMAP->GetCell(x10, y8);
-            switch (cell6->m_triggerType) {
+    for (y = 0; y < MAP_HEIGHT; y++) {
+        for (x = 0; x < MAP_WIDTH; x++) {
+            cell = WORLDMAP->GetCell(x, y);
+            switch (cell->m_triggerType) {
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ULTIMATE_ARTIFACT:
-                    giUABaseX = static_cast<i16>(x10);
-                    giUABaseY = static_cast<i16>(y8);
-                    giUARadius = static_cast<i16>(cell6->m_objectMetadata);
-                    cell6->m_triggerType = MAP_OBJECT_NONE;
-                    cell6->m_objectTileset = TILESET_NONE;
-                    cell6->m_objectIndex = -1;
+                    giUABaseX = static_cast<i16>(x);
+                    giUABaseY = static_cast<i16>(y);
+                    giUARadius = static_cast<i16>(cell->m_objectMetadata);
+                    cell->m_triggerType = MAP_OBJECT_NONE;
+                    cell->m_objectTileset = TILESET_NONE;
+                    cell->m_objectIndex = -1;
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TOWN:
-                    RandomizeTown(x10, y8, 0);
+                    RandomizeTown(x, y, 0);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_CASTLE:
-                    RandomizeTown(x10, y8, 1);
+                    RandomizeTown(x, y, 1);
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER:
-                    minValue7 = 80;
-                    maxValue17 = 2000;
+                    minValue = 80;
+                    maxValue = 2000;
                     goto randomMonster;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
-                    minValue7 = 0;
-                    maxValue17 = 400;
+                    minValue = 0;
+                    maxValue = 400;
                     goto randomMonster;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
-                    minValue7 = 400;
-                    maxValue17 = 1000;
+                    minValue = 400;
+                    maxValue = 1000;
                     goto randomMonster;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
-                    minValue7 = 1000;
-                    maxValue17 = 2500;
+                    minValue = 1000;
+                    maxValue = 2500;
                     goto randomMonster;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
-                    minValue7 = 2500;
-                    maxValue17 = 100000;
+                    minValue = 2500;
+                    maxValue = 100000;
                     goto randomMonster;
                 randomMonster:
-                    if (cell6->m_objectTileset == TILESET_MONS32
-                        && cell6->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
-                        && cell6->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
-                        randomObjectType3 = static_cast<MapObjectType>(
-                            cell6->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER
+                    if (cell->m_objectTileset == TILESET_MONS32
+                        && cell->m_objectIndex >= RANDOM_MONSTER_SPRITE_FIRST
+                        && cell->m_objectIndex <= RANDOM_MONSTER_SPRITE_LAST) {
+                        randomObjectType8 = static_cast<MapObjectType>(
+                            cell->m_objectIndex + RANDOM_MONSTER_SPRITE_TO_TRIGGER
                         );
-                        switch (randomObjectType3) {
+                        switch (randomObjectType8) {
                             case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_WEAK:
-                                minValue7 = 0;
-                                maxValue17 = 400;
+                                minValue = 0;
+                                maxValue = 400;
                                 goto monsterBoundsReady;
                             case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_MEDIUM:
-                                minValue7 = 400;
-                                maxValue17 = 1000;
+                                minValue = 400;
+                                maxValue = 1000;
                                 goto monsterBoundsReady;
                             case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_STRONG:
-                                minValue7 = 1000;
-                                maxValue17 = 2500;
+                                minValue = 1000;
+                                maxValue = 2500;
                                 goto monsterBoundsReady;
                             case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MONSTER_VERY_STRONG:
-                                minValue7 = 2500;
-                                maxValue17 = 100000;
+                                minValue = 2500;
+                                maxValue = 100000;
                                 goto monsterBoundsReady;
                         }
                     }
                 monsterBoundsReady:
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
-                    cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
-                    while (gMonsterDatabase[cell6->m_objectIndex].randomValue <= minValue7
-                           || gMonsterDatabase[cell6->m_objectIndex].randomValue >= maxValue17)
-                        cell6->m_objectIndex = static_cast<u8>(Random(0, 65));
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_MONSTER;
+                    cell->m_objectIndex = static_cast<u8>(Random(0, 65));
+                    while (gMonsterDatabase[cell->m_objectIndex].randomValue <= minValue
+                           || gMonsterDatabase[cell->m_objectIndex].randomValue >= maxValue)
+                        cell->m_objectIndex = static_cast<u8>(Random(0, 65));
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_RESOURCE:
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE;
-                    randomType0 = Random(0, 6);
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RESOURCE;
+                    randomType8 = Random(0, 6);
                     ConvertObject(
-                        x10 - 1,
-                        y8,
-                        x10 - 1,
-                        y8,
+                        x - 1,
+                        y,
+                        x - 1,
+                        y,
                         TILESET_OBJNRSRC,
                         16,
                         16,
                         TILESET_OBJNRSRC,
-                        randomType0 * 2,
+                        randomType8 * 2,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
+                        x,
+                        y,
+                        x,
+                        y,
                         TILESET_OBJNRSRC,
                         17,
                         17,
                         TILESET_OBJNRSRC,
-                        randomType0 * 2 + 1,
+                        randomType8 * 2 + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
-                    switch (randomType0) {
+                    switch (randomType8) {
                         case 0:
                         case 2:
-                            cell6->m_objectMetadata = Random(8, 16) | 0;
+                            cell->m_objectMetadata = Random(8, 16) | 0;
                             break;
                         case 6:
-                            cell6->m_objectMetadata = Random(5, 10) | 0;
+                            cell->m_objectMetadata = Random(5, 10) | 0;
                             break;
                         default:
-                            cell6->m_objectMetadata = Random(3, 7) | 0;
+                            cell->m_objectMetadata = Random(3, 7) | 0;
                             break;
                     }
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_ARTIFACT:
-                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, false);
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
-                        x10 - 1,
-                        y8,
-                        x10 - 1,
-                        y8,
+                        x - 1,
+                        y,
+                        x - 1,
+                        y,
                         TILESET_OBJNARTI,
                         162,
                         162,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2,
+                        artifactId * 2,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
+                        x,
+                        y,
+                        x,
+                        y,
                         TILESET_OBJNARTI,
                         163,
                         163,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2 + 1,
+                        artifactId * 2 + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_TREASURE_ARTIFACT:
-                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_TREASURE, false);
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
-                        x10 - 1,
-                        y8,
-                        x10 - 1,
-                        y8,
+                        x - 1,
+                        y,
+                        x - 1,
+                        y,
                         TILESET_OBJNARTI,
                         166,
                         166,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2,
+                        artifactId * 2,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
+                        x,
+                        y,
+                        x,
+                        y,
                         TILESET_OBJNARTI,
                         167,
                         167,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2 + 1,
+                        artifactId * 2 + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MINOR_ARTIFACT:
-                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_MINOR, false);
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
-                        x10 - 1,
-                        y8,
-                        x10 - 1,
-                        y8,
+                        x - 1,
+                        y,
+                        x - 1,
+                        y,
                         TILESET_OBJNARTI,
                         168,
                         168,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2,
+                        artifactId * 2,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
+                        x,
+                        y,
+                        x,
+                        y,
                         TILESET_OBJNARTI,
                         169,
                         169,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2 + 1,
+                        artifactId * 2 + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_RANDOM_MAJOR_ARTIFACT:
-                    artifactId18 = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
-                    cell6->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
+                    artifactId = GetRandomArtifactId(ARTIFACT_LEVEL_MAJOR, false);
+                    cell->m_triggerType = MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_ARTIFACT;
                     ConvertObject(
-                        x10 - 1,
-                        y8,
-                        x10 - 1,
-                        y8,
+                        x - 1,
+                        y,
+                        x - 1,
+                        y,
                         TILESET_OBJNARTI,
                         170,
                         170,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2,
+                        artifactId * 2,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     ConvertObject(
-                        x10,
-                        y8,
-                        x10,
-                        y8,
+                        x,
+                        y,
+                        x,
+                        y,
                         TILESET_OBJNARTI,
                         171,
                         171,
                         TILESET_OBJNARTI,
-                        artifactId18 * 2 + 1,
+                        artifactId * 2 + 1,
                         MAP_OBJECT_NO_CONVERSION,
                         MAP_OBJECT_NO_CONVERSION
                     );
                     break;
                 case MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_EYE_OF_MAGI:
-                    RandomizeMine(x10, y8);
+                    RandomizeMine(x, y);
                     break;
             }
         }
@@ -5629,19 +5698,18 @@ i32 game::GetLuck(hero* h, class army*, town* castle) {
 
 VA(0x0045bc76, 0xdf)
 void game::SetupAdjacentMons(void) {
-    i32 col;
-    i32 row;
+    i32 col2;
+    i32 row13;
     u8 mask = IDX(MAP_EXTRA_ADJACENT_CLEAR_MASK);
-    {
-        i32 x;
-        i32 y;
-        for (x = 0; x < MAP_WIDTH; x++) {
-            for (y = 0; y < MAP_HEIGHT; y++) {
-                if (gpAdvManager->FindAdjacentMonster(x, y, &col, &row, -1, -1))
-                    mapExtra[y * MAP_WIDTH + x] |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
-                else
-                    mapExtra[y * MAP_WIDTH + x] &= IDX(mask);
-            }
+    i32 x;
+    i32 y;
+
+    for (x = 0; x < MAP_WIDTH; x++) {
+        for (y = 0; y < MAP_HEIGHT; y++) {
+            if (gpAdvManager->FindAdjacentMonster(x, y, &col2, &row13, -1, -1))
+                *(mapExtra + x + y * MAP_WIDTH) |= IDX(MAP_EXTRA_ADJACENT_MONSTER);
+            else
+                *(mapExtra + x + y * MAP_WIDTH) &= IDX(mask);
         }
     }
 }
@@ -6944,7 +7012,7 @@ i32 game::ReceiveSaveGame(
 VA(0x0045e8fe, 0x4fd)
 void game::DoNewTurn(void) {
     char musicFile18[NEW_TURN_MUSIC_FILENAME_CAPACITY];
-    char lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
+    u8 lowerName19[NEW_TURN_LOWER_NAME_CAPACITY];
     i32 musicTrack2;
 
     CheckForTimeEvent();
@@ -7002,13 +7070,26 @@ void game::DoNewTurn(void) {
                         gMonthNames[giMonthTypeExtra]
                     );
                 } else if (giMonthType == CALENDAR_PERIOD_CREATURE) {
-                    strcpy(lowerName19, gArmyNames[giMonthTypeExtra]);
-                    lowerName19[0] -= 'a' - 'A';
+                    u8 lowerFirst;
+                    strcpy(
+                        reinterpret_cast<char*>(lowerName19),
+                        gArmyNames[giMonthTypeExtra]
+                    );
+                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
+                        lowerFirst = lowerName19[0] + ('a' - 'A');
+                    else if (lowerName19[0] >= CP1251_CAPITAL_A
+                             && lowerName19[0] <= CP1251_CAPITAL_YA)
+                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
+                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
+                        lowerFirst = CP1251_SMALL_YO;
+                    else
+                        lowerFirst = lowerName19[0];
+                    lowerName19[0] = lowerFirst;
                     sprintf(
                         gText,
                         cNewTurn[NEW_MONTH_CREATURE_TEXT],
                         gArmyNames[giMonthTypeExtra],
-                        lowerName19
+                        reinterpret_cast<char*>(lowerName19)
                     );
                 } else {
                     sprintf(gText, cNewTurn[NEW_MONTH_PLAGUE_TEXT]);
@@ -7019,13 +7100,26 @@ void game::DoNewTurn(void) {
                 if (giWeekType == CALENDAR_PERIOD_NORMAL) {
                     sprintf(gText, cNewTurn[NEW_WEEK_NORMAL_TEXT], gWeekNames[giWeekTypeExtra]);
                 } else {
-                    strcpy(lowerName19, gArmyNames[giWeekTypeExtra]);
-                    lowerName19[0] -= 'a' - 'A';
+                    u8 lowerFirst;
+                    strcpy(
+                        reinterpret_cast<char*>(lowerName19),
+                        gArmyNames[giWeekTypeExtra]
+                    );
+                    if (lowerName19[0] >= 'A' && lowerName19[0] <= 'Z')
+                        lowerFirst = lowerName19[0] + ('a' - 'A');
+                    else if (lowerName19[0] >= CP1251_CAPITAL_A
+                             && lowerName19[0] <= CP1251_CAPITAL_YA)
+                        lowerFirst = lowerName19[0] + (CP1251_SMALL_A - CP1251_CAPITAL_A);
+                    else if (lowerName19[0] == CP1251_CAPITAL_YO)
+                        lowerFirst = CP1251_SMALL_YO;
+                    else
+                        lowerFirst = lowerName19[0];
+                    lowerName19[0] = lowerFirst;
                     sprintf(
                         gText,
                         cNewTurn[NEW_WEEK_CREATURE_TEXT],
                         gArmyNames[giWeekTypeExtra],
-                        lowerName19
+                        reinterpret_cast<char*>(lowerName19)
                     );
                 }
             }
@@ -7479,27 +7573,26 @@ i32 game::TownIDToTownPos(playerData* pd, i32 townId) {
 
 VA(0x0045fdd7, 0x64d)
 void game::SetupNewRumour(void) {
-    char rumourBuffer6[RUMOUR_SCRATCH_CAPACITY];
-    i32l categoryStats7[GAME_PLAYER_COUNT];
-    i8 categoryOrder2[RUMOUR_CATEGORY_ORDER_CAPACITY];
-    rumourEventExtra* event4;
-    i32 eventIndex11;
-    i32 attempts13;
-    i32 roll2;
-    i32 selectionRoll;
-    i32 direction9;
+    i32 roll;
+    i32 attempts8;
+    rumourEventExtra* event0;
+    i32 eventIndex;
+    i32 selectionRoll7;
+    i32l categoryStats[GAME_PLAYER_COUNT];
+    i32 direction;
+    i8 categoryOrder[RUMOUR_CATEGORY_ORDER_CAPACITY];
     if (m_rumourEventCount != 0 && Random(0, 9) < static_cast<i32>(m_rumourEventCount)) {
-        attempts13 = 0;
-        while (attempts13++ < 200) {
+        attempts8 = 0;
+        while (attempts8++ < 200) {
             if (m_rumourEventCount > 1)
-                eventIndex11 = Random(0, m_rumourEventCount - 1);
+                eventIndex = Random(0, m_rumourEventCount - 1);
             else
-                eventIndex11 = 0;
-            event4 =
-                reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex11]]);
-            if (strlen(event4->text) > 2 && event4->text[0] != '@') {
-                strcpy(m_rumour, event4->text);
-                event4->text[0] = '@';
+                eventIndex = 0;
+            event0 =
+                reinterpret_cast<rumourEventExtra*>(ppMapExtra[m_rumourEventIndices[eventIndex]]);
+            if (strlen(event0->text) > 2 && event0->text[0] != '@') {
+                strcpy(m_rumour, event0->text);
+                event0->text[0] = '@';
                 return;
             }
         }
@@ -7508,43 +7601,43 @@ void game::SetupNewRumour(void) {
     if (Random(0, 100) < 30) {
         strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
     } else {
-        roll2 = Random(0, 100);
-        if (roll2 < 80 && giCurTurn > 1) {
-            attempts13 = 0;
-            while (attempts13++ < 200) {
-                selectionRoll = Random(
+        roll = Random(0, 100);
+        if (roll < 80 && giCurTurn > 1) {
+            attempts8 = 0;
+            while (attempts8++ < 200) {
+                selectionRoll7 = Random(
                     IDX(THIEVES_CATEGORY_OBELISKS), IDX(THIEVES_CATEGORY_INCOME)
                 );
                 GetCategoryStats(
-                    static_cast<TownThievesGuildCategory>(selectionRoll),
-                    categoryStats7,
-                    categoryOrder2
+                    static_cast<TownThievesGuildCategory>(selectionRoll7),
+                    categoryStats,
+                    categoryOrder
                 );
-                SortStats(categoryStats7, categoryOrder2);
-                if (categoryStats7[1] != categoryStats7[0]) {
-                    if (selectionRoll == IDX(THIEVES_CATEGORY_OBELISKS))
+                SortStats(categoryStats, categoryOrder);
+                if (categoryStats[0] != categoryStats[1]) {
+                    if (selectionRoll7 == IDX(THIEVES_CATEGORY_OBELISKS))
                         sprintf(
                             m_rumour,
-                            "%s has found the most obelisks.",
-                            cPlayerNames[categoryOrder2[0]]
+                            "%s \xed\xe0\xf8\xe5\xeb \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xee\xe1\xe5\xeb\xe8\xf1\xea\xee\xe2.",
+                            cPlayerNames[categoryOrder[0]]
                         );
-                    else if (selectionRoll == IDX(THIEVES_CATEGORY_ARTIFACTS))
+                    else if (selectionRoll7 == IDX(THIEVES_CATEGORY_ARTIFACTS))
                         sprintf(
                             m_rumour,
-                            "%s has found the most artifacts.",
-                            cPlayerNames[categoryOrder2[0]]
+                            "%s \xed\xe0\xf8\xe5\xeb \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xe2.",
+                            cPlayerNames[categoryOrder[0]]
                         );
-                    else if (selectionRoll == IDX(THIEVES_CATEGORY_ARMY_STRENGTH))
+                    else if (selectionRoll7 == IDX(THIEVES_CATEGORY_ARMY_STRENGTH))
                         sprintf(
                             m_rumour,
-                            "%s has the most powerful forces.",
-                            cPlayerNames[categoryOrder2[0]]
+                            "%s \xee\xe1\xeb\xe0\xe4\xe0\xe5\xf2 \xf1\xe0\xec\xfb\xec\xe8 \xf1\xe8\xeb\xfc\xed\xfb\xec\xe8 \xe2\xee\xe9\xf1\xea\xe0\xec\xe8.",
+                            cPlayerNames[categoryOrder[0]]
                         );
                     else
                         sprintf(
                             m_rumour,
-                            "%s earns the most gold.",
-                            cPlayerNames[categoryOrder2[0]]
+                            "%s \xe7\xe0\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5 \xe2\xf1\xe5\xf5 \xe4\xe5\xed\xe5\xe3.",
+                            cPlayerNames[categoryOrder[0]]
                         );
                     return;
                 }
@@ -7552,52 +7645,57 @@ void game::SetupNewRumour(void) {
             goto ultimateRumour;
         } else {
         ultimateRumour:
-            selectionRoll = Random(0, 100);
-            if (selectionRoll < 33) {
-                if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
-                      || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
-                    direction9 = 7;
-                } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX
+            selectionRoll7 = Random(0, 100);
+            if (selectionRoll7 < 33) {
+                if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
+                      || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
+                    direction = 7;
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
-                    direction9 = 5;
-                } else if (!(IDX(m_mapHeader.width) * 0.33 <= m_ultimateArtifactX)) {
-                    direction9 = 6;
+                    direction = 5;
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.width) * 0.33)) {
+                    direction = 6;
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66
-                             || IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
-                    direction9 = 1;
+                             || m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
+                    direction = 1;
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66
                              || m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
-                    direction9 = 3;
+                    direction = 3;
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.width) * 0.66)) {
-                    direction9 = 2;
-                } else if (!(IDX(m_mapHeader.height) * 0.33 <= m_ultimateArtifactX)) {
-                    direction9 = 0;
+                    direction = 2;
+                } else if (!(m_ultimateArtifactX >= IDX(m_mapHeader.height) * 0.33)) {
+                    direction = 0;
                 } else if (!(m_ultimateArtifactX <= IDX(m_mapHeader.height) * 0.66)) {
-                    direction9 = 4;
+                    direction = 4;
                 } else {
-                    direction9 = 8;
+                    direction = 8;
                 }
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found in the %s regions of the world.",
-                    cDirections[direction9]
+                    "\xcc\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 \xec\xee\xe6\xe5\xf2 "
+                    "\xe1\xfb\xf2\xfc \xed\xe0\xe9\xe4\xe5\xed \xe2 %s \xf7\xe0\xf1\xf2\xe8 \xec\xe8\xf0\xe0.",
+                    cDirections[direction]
                 );
-            } else if (selectionRoll < 66) {
+            } else if (selectionRoll7 < 66) {
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact may be found %s.",
+                    "%s, \xf2\xee \xec\xe5\xf1\xf2\xee \xe3\xe4\xe5 \xec\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
+                    "\xed\xe0\xe9\xe4\xe5\xed \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2.",
                     cRumourTerrainDescriptions
                         [IDX(giGroundToTerrain
                                  [gpAdvManager
                                       ->GetCell(m_ultimateArtifactX, m_ultimateArtifactY)
                                       ->m_terrainImageIndex])]
                 );
-            } else {
+            } else if (m_ultimateArtifactId != -1) {
                 sprintf(
                     m_rumour,
-                    "The ultimate artifact is really the %s.",
+                    "\xce\xef\xf0\xe5\xe4\xe5\xeb\xe5\xed\xed\xee, \xec\xee\xe3\xf3\xf9\xe5\xf1\xf2\xe2\xe5\xed\xed\xfb\xe9 "
+                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 \xfd\xf2\xee %s.",
                     gArtifactNames[IDX(m_ultimateArtifactId)]
                 );
+            } else {
+                strcpy(m_rumour, cRandomTavernText[(giCurTurn / 7) % 8]);
             }
         }
     }
@@ -7826,25 +7924,33 @@ void CompressTest3(void) {
 
 VA(0x00460c8c, 0x17d)
 i32 game::CountShrines(i32 player) {
+    town* castle;
+    i32 count;
+    mapCell* cell;
+    i32 row15;
+    i32 col5;
+    hero* occupier;
+
     if (xIsExpansionMap == 0)
         return 0;
-    i32 count = 0;
-    mapCell* cell;
-    {
-        i32 col;
-        i32 row;
-        town* castle;
-        for (row = 0; row < MAP_HEIGHT; row++) {
-            for (col = 0; col < MAP_WIDTH; col++) {
-                cell = WORLDMAP->GetCell(col, row);
-                if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                    castle = GetCastle(cell->m_objectMetadata);
-                    if (castle->m_owner == player
-                        && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
-                        && castle->m_type == FACTION_NECROMANCER)
-                        count++;
-                }
+    count = 0;
+    for (row15 = 0; row15 < MAP_HEIGHT; row15++) {
+        for (col5 = 0; col5 < MAP_WIDTH; col5++) {
+            cell = WORLDMAP->GetCell(col5, row15);
+            castle = NULL;
+            if (cell->m_triggerType == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
+                castle = GetCastle(cell->m_objectMetadata);
+            } else if (cell->m_triggerType
+                       == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_HERO_INTERACTION)) {
+                occupier = gpGame->GetHero(cell->m_objectMetadata);
+                if (occupier->m_locationType
+                    == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE))
+                    castle = GetCastle(occupier->m_occupiedTown);
             }
+            if (castle != NULL && castle->m_owner == player
+                && (castle->m_buildings & IDX(TOWN_BUILDING_TAVERN))
+                && castle->m_type == FACTION_NECROMANCER)
+                count++;
         }
     }
     return count;

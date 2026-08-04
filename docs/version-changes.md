@@ -441,6 +441,60 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   reserve `char[800]` for the `strcpy(text, gText)` copy (frames 0x43c, 0x38c,
   0x358).
 
+### SOURCE/GAME (turn/map setup, army and spell views)
+
+- **[Buka] `GenerateStandardFileName` (0x44d202) folds CP1251 Cyrillic.** The
+  PoL body only upper-cased `a`-`z` and only accepted `A`-`Z`, `0`-`9`, `_`
+  into the eight-character save base name. The Buka body adds the CP1251
+  Russian alphabet: it upper-cases 0xE0-0xFF by 0x20 and maps 0xB8 (`ё`) to
+  0xA8 (`Ё`), and accepts 0xC0-0xDF and 0xA8 as name characters. The character
+  local is `unsigned char` (retail reads it with the `/G5` `and reg,0xff`
+  widening), which PoL's `char` was not.
+- **[Buka] `game::ViewArmy` (0x455529) upper-cases the army name's first
+  letter through the same CP1251 fold** instead of PoL's unconditional
+  `armyName[0] -= 'a' - 'A'`; `game::DoNewTurn` (0x45e8fe) lower-cases the
+  creature name through the mirrored fold (0xC0-0xDF += 0x20, 0xA8 -> 0xB8) in
+  both the new-month and new-week branches.
+- **[Buka] `game::ViewArmy` drops the low-memory art path.** PoL chose
+  `sprintf(filename, "monh%04d.icn", type)` under `gbLowMemory`, forced the
+  widget frame to 0, and overrode the monster origin with the low-memory
+  coordinates. Buka always uses `cMonFilename[type]`, always passes the walk
+  frame, and has no low-memory origin override. `ViewArmyHandler` (0x456231)
+  likewise animates on `glTimers[0] < KBTickCount()` alone, with no
+  `!gbLowMemory` guard.
+- **[Buka] `game::RandomizeEvents` (0x4513cf) reorders the artifact-guardian
+  table.** PoL filled `arr[6..9]` with paladin/crusader/cyclops/genie and
+  `arr[0..5]` with the dragons, then indexed minor guards at `+6` and major at
+  `+0`. Buka fills `arr[0..3]` with the small guards and `arr[4..9]` with the
+  dragons, indexing minor at `+0` and major at `+4`. Semantics are unchanged;
+  only the layout and the two base constants moved.
+- **[2.1?] `game::RandomizeEvents` castle metadata footprint is one row
+  taller** — the ownership stamp loop runs `y-3 .. y+1` instead of PoL's
+  `y-2 .. y+1` (`CASTLE_METADATA_TOP_OFFSET` 2 -> 3). [unclassified]
+- **[Buka] `game::GetRandomArtifactId` (0x45a9e8) gates the Anduran set on the
+  expansion campaign.** PoL rejected `ARTIFACT_BREASTPLATE_ANDURAN`,
+  `BATTLE_GARB`, `HELMET_ANDURAN`, `SWORD_ANDURAN` and `SPHERE_NEGATION`
+  unconditionally; Buka rejects them only when `xIsPlayingExpansionCampaign`
+  is set, so ordinary maps can now roll them.
+- **[Buka] `game::CountShrines` (0x460c8c) counts necromancer taverns under a
+  hero as well as on the tile.** PoL only inspected cells whose trigger is
+  `MAP_OBJECT_CASTLE`. Buka additionally resolves
+  `MAP_OBJECT_HERO_INTERACTION` cells through
+  `gpGame->GetHero(cell->m_objectMetadata)` and uses the hero's
+  `m_locationType`/`m_occupiedTown` when the hero is standing in a town.
+- **[Buka] `game::SetupNewRumour` (0x45fdd7) guards the ultimate-artifact
+  rumour.** When `m_ultimateArtifactId == -1` the final branch falls back to
+  `cRandomTavernText[(giCurTurn / 7) % 8]` instead of naming artifact -1.
+- **[Buka] `game::UpdateSpellWidgets` (0x4548cf) clears the message struct and
+  re-stamps `type` per broadcast.** The body opens with
+  `msg.type = MESSAGE_WIDGET; ...; memset(&msg, 0, sizeof(msg));` and then sets
+  `msg.type` again before *every* one of its fifteen `BroadcastMessage` calls;
+  it also drops PoL's read-only spell-icon flag branch, so the icon and text
+  widgets are always enabled + drawn.
+- **[Buka] `ViewSpellsHandler` (0x454d5e) refreshes the window even when the
+  spell page is already at the top** — the `VIEW_SPELL_PREVIOUS_ID` case calls
+  `UpdateSpellWidgets()` + `MoveWindow(0,0)` in both arms.
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
