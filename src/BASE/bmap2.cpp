@@ -20,14 +20,10 @@ static i32 gBlitRow;
 
 VA(0x004c6450, 0x82)
 void FillBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 color) {
-    gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
-    gFillRow = 0;
-    if (h > 0) {
-        do {
-            memset(gFillPtr, color, w);
-            gFillPtr += bmp->m_width;
-            gFillRow++;
-        } while (gFillRow < h);
+    gFillPtr = bmp->m_pixels + x + y * bmp->m_width;
+    for (gFillRow = 0; gFillRow < h; gFillRow++) {
+        memset(gFillPtr, color, w);
+        gFillPtr += bmp->m_width;
     }
 }
 
@@ -44,31 +40,22 @@ void FillBitmapAreaClip(
     i32 clipw,
     i32 cliph
 ) {
-    i32 cx2 = clipx - 1 + clipw;
-    i32 cy2;
-    if (x < cx2 && clipx < x - 1 + w && (cy2 = clipy - 1 + cliph, y < cy2) && clipy < y - 1 + h) {
-        if (cx2 <= x - 1 + w)
-            w = clipx + (clipw - x);
-        if (x < clipx) {
-            w = (w - clipx) + x;
-            x = clipx;
-        }
-        if (cy2 <= y - 1 + h)
-            h = (cliph - y) + clipy;
-        if (y < clipy) {
-            h = (h - clipy) + y;
-            y = clipy;
-        }
-        gFillPtr = bmp->m_pixels + bmp->m_width * y + x;
-        gFillRow = 0;
-        if (h > 0) {
-            do {
-                memset(gFillPtr, color, w);
-                gFillPtr += bmp->m_width;
-                gFillRow++;
-            } while (gFillRow < h);
-        }
+    if (x >= clipx + clipw - 1 || x + w - 1 <= clipx || y >= clipy + cliph - 1
+        || y + h - 1 <= clipy)
+        return;
+    if (x + w - 1 >= clipx + clipw - 1)
+        w = clipx + clipw - x;
+    if (x < clipx) {
+        w = w - (clipx - x);
+        x = clipx;
     }
+    if (y + h - 1 >= clipy + cliph - 1)
+        h = clipy + cliph - y;
+    if (y < clipy) {
+        h = h - (clipy - y);
+        y = clipy;
+    }
+    FillBitmapArea(bmp, x, y, w, h, color);
 }
 
 VA(0x004c65d0, 0xb7)
@@ -82,22 +69,18 @@ void BlitBitmap(
     i32 dx,
     i32 dy
 ) {
-    gBlitSrc = src->m_pixels + src->m_width * sy + sx;
-    gBlitDst = dst->m_pixels + dst->m_width * dy + dx;
-    gBlitRow = 0;
-    if (h > 0) {
-        do {
-            memcpy(gBlitDst, gBlitSrc, w);
-            gBlitSrc += src->m_width;
-            gBlitDst += dst->m_width;
-            gBlitRow++;
-        } while (gBlitRow < h);
+    gBlitSrc = src->m_pixels + sx + sy * src->m_width;
+    gBlitDst = dst->m_pixels + dx + dy * dst->m_width;
+    for (gBlitRow = 0; gBlitRow < h; gBlitRow++) {
+        memcpy(gBlitDst, gBlitSrc, w);
+        gBlitSrc += src->m_width;
+        gBlitDst += dst->m_width;
     }
 }
 
 VA(0x004c6690, 0xcd)
 void DimBitmapArea(class bitmap* bmp, i32 x, i32 y, i32 w, i32 h, i32 level) {
-    gDimPtr = bmp->m_pixels + bmp->m_width * y + x;
+    gDimPtr = bmp->m_pixels + y * bmp->m_width + x;
     for (gDimRow = 0; gDimRow < h; gDimRow++) {
         gDimNext = gDimPtr + bmp->m_width;
         for (gDimCol = 0; gDimCol < w; gDimCol++) {

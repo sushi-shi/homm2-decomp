@@ -1,25 +1,30 @@
 #include <va.h>
 #include <BASE/Icond2b.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRle.h>
 #include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <SOURCE/dimPalette.h>
 #include <SOURCE/KB.h>
 
-static i32 s_clipB;
-static u32 s_loopCount;
+H2_ENUM_BEGIN(IconDimConstant)
+    DIM_PALETTE_LEVEL_STRIDE = 0x100
+H2_ENUM_END(IconDimConstant)
+
+// Retail's frame is exactly the two __fastcall spills: every working value of
+// the decoder lives in a file static, not a local.
+static i32 s_loopCount;
 static i32 s_y;
-static i32 s_x;
-static i32 s_left;
-static u32 s_run;
-static u8* s_row;
-static u8* s_dst;
-static u8* s_src;
 static IconEntry* s_entry;
-static u32 s_spanCount;
+static i32 s_left;
+static i32 s_x;
+static u8* s_src;
+static u8* s_dst;
+static u8* s_row;
 static i32 s_clipR;
+static i32 s_clipB;
+static i32 s_spanCount;
+static i32 s_run;
 
 VA(0x004c6af0, 0x357)
 void DimIconToBitmap(
@@ -35,94 +40,64 @@ void DimIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    IconEntry* entries = srcIcon->Entries();
-    i32 entryX = entries[frame].x;
-    s_entry = &entries[frame];
-    s_src = srcIcon->m_data + entries[frame].srcOffset;
-    s_left = x + entryX;
-    i32 X = s_left;
+    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = x + s_entry->x;
+    s_x = s_left;
     s_y = y + s_entry->y;
-    i32 right;
-    u32 cnt;
+
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (s_left < clipX || s_left + s_entry->w > clipX + clipW || clipY > s_y
-            || s_y + s_entry->h > clipY + clipH) {
+        if (s_left >= clipX && s_left + s_entry->w <= clipX + clipW && s_y >= clipY
+            && s_y + s_entry->h <= clipY + clipH) {
+            clip = ICON_DRAW_NO_CLIP;
+        } else {
             clip = ICON_DRAW_CLIP;
             s_clipR = clipX + clipW - 1;
             s_clipB = clipY + clipH - 1;
-        } else {
-            clip = ICON_DRAW_NO_CLIP;
         }
     }
-    i32 rowOffset = s_y;
-    i16 pitch = dest->m_width;
-    rowOffset = rowOffset * pitch;
-    u8* row = dest->m_pixels + rowOffset;
+
+    s_row = dest->m_pixels + s_y * dest->m_width;
+
     for (;;) {
-        s_x = X;
-        i32 cmd = ReadIconRleByte(s_src);
-        if (static_cast<i8>(cmd) < 0) {
-            s_row = row;
-            s_run = cmd;
-            i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
-            if (n == 0)
+        s_run = *s_src;
+        s_src++;
+        if (static_cast<i8>(s_run) < 0) {
+            if ((s_run & ICON_RLE_MONO_RUN_MASK) != ICON_RLE_MONO_END_COUNT)
+                s_x += s_run & ICON_RLE_MONO_RUN_MASK;
+            else
                 return;
-            X = X + n;
-            continue;
-        }
-        s_run = cmd;
-        if (cmd != 0) {
+        } else if (s_run != ICON_RLE_MONO_NEWLINE_COMMAND) {
             if (clip == ICON_DRAW_NO_CLIP) {
-                u8* dst = row + X;
-                u32 paletteOffset;
-                s_loopCount = 0;
-                s_dst = dst;
-                if (cmd > 0) {
-                    paletteOffset = color * sizeof(uDimPal[0][0]);
-                    s_loopCount = cmd;
-                    cnt = cmd;
-                    do {
-                        i32 px = *dst++;
-                        cnt--;
-                        s_dst = dst;
-                        dst[-1] = (&uDimPal[0][0][0])[paletteOffset + px];
-                    } while (cnt != 0);
+                s_dst = s_row + s_x;
+                for (s_loopCount = 0; s_loopCount < s_run; s_loopCount++) {
+                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    s_dst++;
                 }
-            } else {
-                if (s_y >= clipY && s_y <= s_clipB && (right = X + cmd, clipX < right)
-                    && X <= s_clipR) {
-                    u32 palOffset;
-                    u8* dst;
-                    if (X >= clipX) {
-                        right = s_clipR < right ? (s_clipR - X) + 1 : cmd;
-                        dst = row + X;
-                    } else {
-                        right = s_clipR < right ? clipW : (cmd - clipX) + X;
-                        dst = row + clipX;
-                    }
-                    cnt = right;
-                    i32 cn = cnt;
-                    s_dst = dst;
-                    s_spanCount = right;
-                    s_loopCount = 0;
-                    if (cn > 0) {
-                        palOffset = color * sizeof(uDimPal[0][0]);
-                        s_loopCount = cn;
-                        do {
-                            i32 px = *dst++;
-                            cnt--;
-                            s_dst = dst;
-                            dst[-1] = (&uDimPal[0][0][0])[palOffset + px];
-                        } while (cnt != 0);
-                    }
+            } else if (s_y >= clipY && s_y <= s_clipB && s_x + s_run > clipX && s_x <= s_clipR) {
+                if (s_x >= clipX) {
+                    if (s_x + s_run <= s_clipR)
+                        s_spanCount = s_run;
+                    else
+                        s_spanCount = s_clipR - s_x + 1;
+                    s_dst = s_row + s_x;
+                } else {
+                    if (s_x + s_run <= s_clipR)
+                        s_spanCount = s_x + s_run - clipX;
+                    else
+                        s_spanCount = clipW;
+                    s_dst = s_row + clipX;
+                }
+                for (s_loopCount = 0; s_loopCount < s_spanCount; s_loopCount++) {
+                    *s_dst = uDimPal[0][0][color * DIM_PALETTE_LEVEL_STRIDE + *s_dst];
+                    s_dst++;
                 }
             }
-            X = X + cmd;
-            s_run = cmd;
-            continue;
+            s_x = s_x + s_run;
+        } else {
+            s_x = s_left;
+            s_y = s_y + 1;
+            s_row = s_row + dest->m_width;
         }
-        X = s_left;
-        row = row + pitch;
-        s_y = s_y + 1;
     }
 }

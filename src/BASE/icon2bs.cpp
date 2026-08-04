@@ -7,7 +7,7 @@
 #include <SOURCE/KB.h>
 
 H2_ENUM_BEGIN(IconScaleConstant)
-    SCALE_NATIVE_SIZE      = 0x20,
+    SCALE_NATIVE_SIZE = 0x20,
     SCALE_WORK_BITMAP_SIZE = 0x40
 H2_ENUM_END(IconScaleConstant)
 
@@ -15,8 +15,8 @@ VA(0x004cc4e0, 0x209)
 void IconToBitmapScale(
     class icon* srcIcon,
     class bitmap* dest,
-    i32 x,
-    i32 y,
+    i32 destX,
+    i32 destY,
     i32 frame,
     H2_ENUM_PARAM(IconDrawClipMode, i32) clip,
     i32 clipX,
@@ -25,22 +25,30 @@ void IconToBitmapScale(
     i32 clipH,
     i32 scale
 ) {
+    u8* srcOrg;
+    u8* dstOrg;
+    i32 lineStep;
+    u8* source;
+    u8* destPix;
+    i32 inc;
+    i32 x;
+    i32 y;
+    class bitmap* temp;
+    i32 srcBase;
+
     if (scale == SCALE_NATIVE_SIZE) {
-        IconToBitmap(srcIcon, dest, x, y, frame, clip, clipX, clipY, clipW, clipH, 0);
+        IconToBitmap(srcIcon, dest, destX, destY, frame, clip, clipX, clipY, clipW, clipH, 0);
         return;
     }
-    i32 step = SCALE_NATIVE_SIZE / scale;
-    i32 srcBase = ((1 - scale) * step + SCALE_NATIVE_SIZE) >> 1;
-    bitmap* tmp =
-        new bitmap(BITMAP_TYPE_NONE, SCALE_WORK_BITMAP_SIZE, SCALE_WORK_BITMAP_SIZE);
-    i32 rowOff = 0;
-    do {
-        memset(tmp->m_pixels + rowOff, 0, SCALE_NATIVE_SIZE);
-        rowOff = rowOff + SCALE_NATIVE_SIZE;
-    } while (rowOff < SCALE_NATIVE_SIZE * SCALE_WORK_BITMAP_SIZE);
+    inc = SCALE_NATIVE_SIZE / scale;
+    srcBase = (SCALE_NATIVE_SIZE - (scale - 1) * inc) >> 1;
+    lineStep = inc * SCALE_WORK_BITMAP_SIZE;
+    temp = new bitmap(BITMAP_TYPE_NONE, SCALE_WORK_BITMAP_SIZE, SCALE_WORK_BITMAP_SIZE);
+    for (y = 0; y < SCALE_NATIVE_SIZE * SCALE_WORK_BITMAP_SIZE; y += SCALE_NATIVE_SIZE)
+        memset(temp->m_pixels + y, 0, SCALE_NATIVE_SIZE);
     IconToBitmap(
         srcIcon,
-        tmp,
+        temp,
         0,
         0,
         frame,
@@ -51,30 +59,19 @@ void IconToBitmapScale(
         SCALE_NATIVE_SIZE,
         0
     );
-    i32 pitch = dest->m_width;
-    u8* dstRow = dest->m_pixels + y * pitch + x;
-    u8* srcRow = tmp->m_pixels + srcBase * SCALE_WORK_BITMAP_SIZE + srcBase;
-    i32 rows;
-    if (0 < scale) {
-        rows = scale;
-        do {
-            u8* dstPix = dstRow;
-            u8* srcPix = srcRow;
-            i32 cols;
-            if (0 < scale) {
-                cols = scale;
-                do {
-                    if (*srcPix != 0)
-                        *dstPix = *srcPix;
-                    dstPix = dstPix + 1;
-                    srcPix = srcPix + step;
-                    cols = cols - 1;
-                } while (cols != 0);
-            }
-            srcRow = srcRow + (step * SCALE_WORK_BITMAP_SIZE);
-            dstRow = dstRow + pitch;
-            rows = rows - 1;
-        } while (rows != 0);
+    dstOrg = dest->m_pixels + destX + destY * dest->m_width;
+    srcOrg = temp->m_pixels + srcBase + srcBase * SCALE_WORK_BITMAP_SIZE;
+    for (y = 0; y < scale; y++) {
+        source = srcOrg;
+        destPix = dstOrg;
+        for (x = 0; x < scale; x++) {
+            if (*source != 0)
+                *destPix = *source;
+            destPix++;
+            source += inc;
+        }
+        srcOrg += lineStep;
+        dstOrg += dest->m_width;
     }
-    delete tmp;
+    delete temp;
 }

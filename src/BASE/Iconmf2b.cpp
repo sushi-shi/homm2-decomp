@@ -1,31 +1,24 @@
 #include <va.h>
 #include <BASE/Iconmf2b.h>
 #include <BASE/IconEntry.h>
-#include <BASE/IconRle.h>
 #include <BASE/IconMonoRle.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
 #include <string.h>
 #include <SOURCE/KB.h>
 
-static i32 s_clipB;
+// Retail's frame is exactly the two __fastcall spills: every working value of
+// the decoder lives in a file static, not a local.
 static i32 s_y;
-static i32 s_x;
+static IconEntry* s_entry;
 static i32 s_left;
 static i32 s_right;
-static u32 s_run;
+static i32 s_x;
 static u8* s_row;
+static i32 s_run;
 static u8* s_src;
-static IconEntry* s_entry;
 static i32 s_clipR;
-
-static inline u8* FlipMonoInitialRow(bitmap* dest, i16 pitch, i32 currentY) {
-    return dest->m_pixels + currentY * pitch;
-}
-
-static inline i32 FlipMonoRowVisible(i32 clipTop, i32 currentY, i32 clipBottom) {
-    return clipTop <= currentY && currentY <= clipBottom;
-}
+static i32 s_clipB;
 
 VA(0x004d6130, 0x32f)
 void FlipMonoIconToBitmap(
@@ -41,62 +34,56 @@ void FlipMonoIconToBitmap(
     i32 clipW,
     i32 clipH
 ) {
-    IconEntry* entry = &srcIcon->Entries()[frame];
-    u8* data = srcIcon->m_data;
-    s_entry = entry;
-    i32 entryX = entry->x;
-    i32 x0 = x - entryX;
-    s_src = data + entry->srcOffset;
-    i32 width = entry->w;
-    x0 = (x0 - width) + 1;
-    s_left = x0;
-    i32 X = (width - 1) + x0;
-    s_right = X;
-    s_y = y + entry->y;
+    s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;
+    s_src = srcIcon->m_data + s_entry->srcOffset;
+    s_left = x - s_entry->x - s_entry->w + 1;
+    s_right = s_left + s_entry->w - 1;
+    s_x = s_right;
+    s_y = y + s_entry->y;
+
     if (clip != ICON_DRAW_NO_CLIP) {
-        if (clipX > x0 || clipW + clipX < width + x0 || clipY > s_y
-            || entry->h + s_y > clipY + clipH) {
+        if (s_left >= clipX && s_left + s_entry->w <= clipX + clipW && s_y >= clipY
+            && s_y + s_entry->h <= clipY + clipH) {
+            clip = ICON_DRAW_NO_CLIP;
+        } else {
             clip = ICON_DRAW_CLIP;
             s_clipR = clipX + clipW - 1;
             s_clipB = clipY + clipH - 1;
-        } else {
-            clip = ICON_DRAW_NO_CLIP;
         }
     }
-    i16 pitch = dest->m_width;
-    s_row = FlipMonoInitialRow(dest, pitch, s_y);
+
+    s_row = dest->m_pixels + s_y * dest->m_width;
+
     for (;;) {
-        s_x = X;
-        i32 cmd = ReadIconRleByte(s_src);
-        if (static_cast<i8>(cmd) < 0) {
-            s_run = cmd;
-            i32 n = cmd & ICON_RLE_MONO_RUN_MASK;
-            if (n == 0)
+        s_run = *s_src;
+        s_src++;
+        if (static_cast<i8>(s_run) < 0) {
+            if ((s_run & ICON_RLE_MONO_RUN_MASK) != ICON_RLE_MONO_END_COUNT)
+                s_x -= s_run & ICON_RLE_MONO_RUN_MASK;
+            else
                 return;
-            X = X - n;
-            continue;
-        }
-        s_run = cmd;
-        if (cmd != 0) {
+        } else if (s_run != ICON_RLE_MONO_NEWLINE_COMMAND) {
             if (clip == ICON_DRAW_NO_CLIP) {
-                memset((s_row - cmd) + 1 + X, color, cmd);
-            } else {
-                i32 left;
-                if (FlipMonoRowVisible(clipY, s_y, s_clipB)
-                    && (left = (X - cmd) + 1, clipX <= left) && s_clipR >= X) {
-                    if (clipX <= left) {
-                        memset((s_row - cmd) + 1 + X, color, cmd);
-                    } else {
-                        memset(s_row + clipX, color, (X - clipX) + 1);
-                    }
+                memset(s_row + s_x - s_run + 1, color, s_run);
+            } else if (s_y >= clipY && s_y <= s_clipB && s_x - s_run + 1 >= clipX
+                       && s_x <= s_clipR) {
+                if (s_x <= s_clipR) {
+                    if (s_x - s_run + 1 >= clipX)
+                        memset(s_row + s_x - s_run + 1, color, s_run);
+                    else
+                        memset(s_row + clipX, color, s_x - clipX + 1);
+                } else {
+                    if (s_x - s_run + 1 >= clipX)
+                        memset(s_row + s_x - s_run + 1, color, s_clipR - (s_x - s_run));
+                    else
+                        memset(s_row + clipX, color, clipW);
                 }
             }
-            s_run = cmd;
-            X = X - cmd;
-            continue;
+            s_x = s_x - s_run;
+        } else {
+            s_x = s_right;
+            s_y = s_y + 1;
+            s_row = s_row + dest->m_width;
         }
-        X = s_right;
-        s_y = s_y + 1;
-        s_row = s_row + pitch;
     }
 }
