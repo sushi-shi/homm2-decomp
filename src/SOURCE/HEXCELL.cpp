@@ -69,11 +69,11 @@ void hexcell::DrawOccupant(ArmyDrawState drawState, i32 frame) {
                 != drawState)
                 return;
         }
-        if (gbLimitToExtent && m_occupantSide == gpCombatManager->m_currentArmySide
-            && m_occupantIndex == gpCombatManager->m_currentArmyIndex)
+        if (gbLimitToExtent && gpCombatManager->m_currentArmySide == m_occupantSide
+            && gpCombatManager->m_currentArmyIndex == m_occupantIndex)
             gbCurrArmyDrawn = true;
-        if (gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_facing
-            != m_occupantFrame)
+        if (m_occupantFrame
+            != gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex].m_facing)
             gpCombatManager->m_armies[IDX(m_occupantSide)][m_occupantIndex]
                 .DrawToBuffer(m_x, m_y, frame);
     }

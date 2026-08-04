@@ -139,7 +139,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
         SmackNextFrame(smack);
 }
 
-VA(0x00494769, 0x1149)
+VA(0x00494769, 0x117d)
 void SmackManagerMain(void) {
     i32 soundFlags4;
     i32 preloadFlags26;
@@ -572,8 +572,8 @@ void ShutDownSmacker(void) {
 
 VA(0x0049592a, 0x13b)
 i32 PlaySmacker(i32 smackNumber) {
-    i8 savedPalette[PALETTE_DATA_SIZE];
     i32 oldUpdateFlags;
+    i8 savedPalette[PALETTE_DATA_SIZE];
 
     xLastChoice = EXPANSION_CAMPAIGN_NONE;
     if (gbNoCDRom)
@@ -591,12 +591,9 @@ i32 PlaySmacker(i32 smackNumber) {
     if (gConfig.slowVideo == VIDEO_SPEED_TEST) {
         gConfig.slowVideo = 0;
         WritePrefs();
-        bSmackNum = SMACK_EARTH;
-        bTesting = 1;
-        SmackManagerMain();
         bTesting = 0;
         if (smksum.TotalOpenTime + smksum.TotalReadTime >= VIDEO_OPEN_READ_SLOW_THRESHOLD
-            || smksum.TotalDecompTime >= VIDEO_DECOMP_SLOW_THRESHOLD || gbLowMemory) {
+            || smksum.TotalDecompTime >= VIDEO_DECOMP_SLOW_THRESHOLD) {
             gConfig.slowVideo = 1;
             WritePrefs();
         }

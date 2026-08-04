@@ -99,6 +99,26 @@ H2_ENUM_BEGIN(CastleConstant)
     RACE_ICON_FRAMES             = 32
 H2_ENUM_END(CastleConstant)
 
+namespace {
+
+    // The recruit slot is refused when the town already spent its hero this
+    // turn, the player cannot pay, the roster is full, or a hero is standing in
+    // the town.
+    inline i32 CannotRecruitHero(void) {
+        i32 cannot;
+
+        if (!(gpTownManager->m_recruitResult != 0
+              || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
+              || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
+              || gpTownManager->m_town->m_occupyingHeroId != -1))
+            cannot = 0;
+        else
+            cannot = 1;
+        return cannot;
+    }
+
+} // namespace
+
 VA(0x00424320, 0xf10)
 void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     u32l captainQuarters;
@@ -425,20 +445,19 @@ void townManager::SetupCastle(heroWindow* window, i32 updateOnly) {
     }
 }
 
-VA(0x00425230, 0x979)
+VA(0x00425230, 0xb6d)
 MessageDispatchResult CastleHandler(tag_message& message) {
-    i32 cannotRecruitHero;
+    i32 objIndex;
     i32 hoverMessage;
     i32 heroChoiceIndex;
-    i32 loopIndex;
-    H2_ENUM_STORAGE(BuildingSlotType, i32) buildSlot;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) whichBuilding;
     i32 quickFlag;
-    i32 result;
-    i16 textControl;
+    i32 ret;
+    i16 statusWidgetId;
 
-    textControl = IDX(CONTROL_STATUS_TEXT);
-    buildSlot = BUILDING_SLOT_NONE;
-    result = 0;
+    statusWidgetId = IDX(CONTROL_STATUS_TEXT);
+    whichBuilding = BUILDING_SLOT_NONE;
+    ret = 0;
     hoverMessage = 0;
 
     if (message.type == MESSAGE_MOUSE_MOVE || message.type == MESSAGE_WIDGET) {
@@ -447,34 +466,34 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             hoverMessage = 1;
         }
         if (message.payload.widget.id == CONTROL_CAPTAIN_ICON)
-            buildSlot = CASTLE_CAPTAIN;
+            whichBuilding = CASTLE_CAPTAIN;
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_GROUPED)
-            buildSlot = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED);
+            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED);
         else if (message.payload.widget.id == CONTROL_CAPTAIN_FORMATION_SPREAD)
-            buildSlot = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD);
+            whichBuilding = static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD);
         else {
             if (message.payload.widget.id >= CONTROL_BUILDING_NAME_FIRST
                 && message.payload.widget.id
                        < CONTROL_BUILDING_NAME_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildSlot = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
+                whichBuilding = message.payload.widget.id - CONTROL_BUILDING_NAME_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_ICON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_ICON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildSlot = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
+                whichBuilding = message.payload.widget.id - CONTROL_BUILDING_ICON_FIRST;
             else if (message.payload.widget.id >= CONTROL_BUILDING_BUTTON_FIRST
                      && message.payload.widget.id
                             < CONTROL_BUILDING_BUTTON_FIRST + static_cast<i32>(CASTLE_SLOT_COUNT))
-                buildSlot = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
-            if (buildSlot != BUILDING_SLOT_NONE)
-                buildSlot = castleSlotsUse[IDX(buildSlot)];
+                whichBuilding = message.payload.widget.id - CONTROL_BUILDING_BUTTON_FIRST;
+            if (whichBuilding != BUILDING_SLOT_NONE)
+                whichBuilding = castleSlotsUse[IDX(whichBuilding)];
         }
     }
 
     if (hoverMessage) {
-        if (message.payload.widget.id == gpTownManager->m_lastHoverId)
+        if (gpTownManager->m_lastHoverId == message.payload.widget.id)
             return MESSAGE_DISPATCH_CONSUME;
         gpTownManager->m_lastHoverId = message.payload.widget.id;
-        switch (buildSlot) {
+        switch (whichBuilding) {
 
             case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
                 sprintf(gText, cCastleInfo[IDX(INFO_GROUPED_FORMATION)]);
@@ -485,34 +504,34 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                 break;
 
             case TOWN_OBJECT_MAGE_GUILD:
-                if (!(gpTownManager->m_buildableBuildings & BIT(buildSlot))) {
+                if (!(gpTownManager->m_buildableBuildings & BIT(whichBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            buildSlot
+                            whichBuilding
                         )
                     );
-                } else if (!(gpTownManager->m_affordableBuildings & BIT(buildSlot))) {
+                } else if (!(gpTownManager->m_affordableBuildings & BIT(whichBuilding))) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            buildSlot
+                            whichBuilding
                         )
                     );
                 } else {
                     if (!(gpTownManager->m_town->m_buildings & 1L))
-                        loopIndex = IDX(INFO_BUILD_MAGE_GUILD);
+                        objIndex = IDX(INFO_BUILD_MAGE_GUILD);
                     else if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL)
-                        loopIndex = IDX(INFO_MAGE_GUILD_MAX_LEVEL);
+                        objIndex = IDX(INFO_MAGE_GUILD_MAX_LEVEL);
                     else if (!CanBuy(gpTownManager->m_town, CASTLE_MAGE_GUILD))
-                        loopIndex = IDX(INFO_CANNOT_AFFORD_MAGE_LEVEL);
+                        objIndex = IDX(INFO_CANNOT_AFFORD_MAGE_LEVEL);
                     else
-                        loopIndex = IDX(INFO_ADD_MAGE_GUILD_LEVEL);
-                    strcpy(gText, cCastleInfo[loopIndex]);
+                        objIndex = IDX(INFO_ADD_MAGE_GUILD_LEVEL);
+                    strcpy(gText, cCastleInfo[objIndex]);
                 }
                 break;
 
@@ -542,32 +561,32 @@ MessageDispatchResult CastleHandler(tag_message& message) {
             case BUILDING_SLOT_SPECIAL_THIRTY:
                 if (BitTest(gpGame->m_dailyEventFlags, gpTownManager->m_town->m_id)) {
                     sprintf(gText, "Cannot build.  Already built here this turn.");
-                } else if (gpTownManager->m_town->m_buildings & BIT(buildSlot)) {
+                } else if (gpTownManager->m_town->m_buildings & BIT(whichBuilding)) {
                     sprintf(
                         gText,
                         cCastleInfo[IDX(INFO_ALREADY_BUILT)],
                         GetBuildingName(
                             gpTownManager->m_town->m_type,
-                            buildSlot
+                            whichBuilding
                         )
                     );
                 } else {
-                    if (!(gpTownManager->m_buildableBuildings & BIT(buildSlot)))
+                    if (!(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                buildSlot
+                                whichBuilding
                             )
                         );
-                    else if (!(gpTownManager->m_affordableBuildings & BIT(buildSlot)))
+                    else if (!(gpTownManager->m_affordableBuildings & BIT(whichBuilding)))
                         sprintf(
                             gText,
                             cCastleInfo[IDX(INFO_CANNOT_AFFORD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                buildSlot
+                                whichBuilding
                             )
                         );
                     else
@@ -576,7 +595,7 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                             cCastleInfo[IDX(INFO_BUILD)],
                             GetBuildingName(
                                 gpTownManager->m_town->m_type,
-                                buildSlot
+                                whichBuilding
                             )
                         );
                 }
@@ -642,12 +661,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_DESELECT:
                 if (message.payload.widget.id == CONTROL_CLOSE)
-                    result = 1;
+                    ret = 1;
                 break;
             case WIDGET_COMMAND_SELECT:
             case WIDGET_COMMAND_ALTERNATE_SELECT:
-                quickFlag = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_LEFT_SHIFT)) != 0;
-                switch (buildSlot) {
+                quickFlag = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
+                switch (whichBuilding) {
 
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_SPREAD):
                         if (quickFlag) {
@@ -665,11 +684,11 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                        } else {
-                            gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
-                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                            gpTownManager->m_heroWindow0->DrawWindow();
+                            break;
                         }
+                        gpTownManager->m_town->m_formation = TOWN_FORMATION_SPREAD;
+                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
+                        gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
                     case static_cast<BuildingSlotType>(CONTROL_CAPTAIN_FORMATION_GROUPED):
@@ -687,19 +706,20 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                 -1,
                                 0
                             );
-                        } else {
-                            gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
-                            gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
-                            gpTownManager->m_heroWindow0->DrawWindow();
+                            break;
                         }
+                        gpTownManager->m_town->m_formation = TOWN_FORMATION_GROUPED;
+                        gpTownManager->SetupCastle(gpTownManager->m_heroWindow0, 1);
+                        gpTownManager->m_heroWindow0->DrawWindow();
                         break;
 
                     case TOWN_OBJECT_MAGE_GUILD:
-                        if (quickFlag
-                            || gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
-                            || (gpTownManager->m_buildableBuildings & BIT(buildSlot)))
-                            goto buy_building;
-                        break;
+                        if (!quickFlag) {
+                            if (gpTownManager->m_town->m_buildState == TOWN_MAGE_GUILD_MAX_LEVEL
+                                || !(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
+                                break;
+                        }
+                        goto buy_building;
 
                     case BUILDING_SLOT_SPECIAL_ONE:
                     case BUILDING_SLOT_NECROMANCER_SHRINE:
@@ -725,22 +745,23 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                     case BUILDING_SLOT_NECROMANCER_MAGE_PREREQUISITE:
                     case BUILDING_SLOT_SPECIAL_TWENTY_NINE:
                     case BUILDING_SLOT_SPECIAL_THIRTY:
-                        if (quickFlag
-                            || (!(gpTownManager->m_town->m_buildings & BIT(buildSlot))
-                                && (gpTownManager->m_buildableBuildings & BIT(buildSlot)))) {
-                        buy_building:
-                            for (loopIndex = 0;
-                                 loopIndex < gpTownManager->m_townObjectCount
-                                 && gpTownManager->m_townObjects[loopIndex]->m_buildingId
-                                        != buildSlot;
-                                 ++loopIndex) {
-                            }
-                            result = gpTownManager->BuyBuild(
-                                buildSlot,
-                                (gpTownManager->m_affordableBuildings & BIT(buildSlot)) == 0,
-                                quickFlag
-                            );
+                        if (!quickFlag) {
+                            if ((gpTownManager->m_town->m_buildings & BIT(whichBuilding))
+                                || !(gpTownManager->m_buildableBuildings & BIT(whichBuilding)))
+                                break;
                         }
+                    buy_building:
+                        for (objIndex = 0; objIndex < gpTownManager->m_townObjectCount;
+                             ++objIndex) {
+                            if (gpTownManager->m_townObjects[objIndex]->m_buildingId
+                                == whichBuilding)
+                                break;
+                        }
+                        ret = gpTownManager->BuyBuild(
+                            whichBuilding,
+                            (gpTownManager->m_affordableBuildings & BIT(whichBuilding)) == 0,
+                            quickFlag
+                        );
                         break;
 
                     case BUILDING_SLOT_NONE:
@@ -760,19 +781,12 @@ MessageDispatchResult CastleHandler(tag_message& message) {
                                     gpWindowManager
                                         ->FadeScreen(FADE_IN, TOWN_FADE_STEPS, NULL);
                                 } else {
-                                    cannotRecruitHero =
-                                        gpTownManager->m_recruitResult != 0
-                                        || gpCurPlayer->m_resources[IDX(RES_GOLD)] < gHeroGoldCost
-                                        || gpCurPlayer->m_heroCount >= PLAYER_HERO_CAPACITY
-                                        || gpTownManager->m_town->m_occupyingHeroId != -1;
-                                    result = gpTownManager->RecruitHero(
+                                    ret = gpTownManager->RecruitHero(
                                         heroChoiceIndex,
-                                        cannotRecruitHero
+                                        CannotRecruitHero()
                                     );
                                 }
                                 break;
-                            default:
-                                goto selection_done;
                         }
                         break;
                 }
@@ -781,9 +795,9 @@ MessageDispatchResult CastleHandler(tag_message& message) {
     }
 
 selection_done:
-    if (result != 0) {
+    if (ret != 0) {
         message.payload.widget.id = EVENT_WINDOW_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;

@@ -258,6 +258,7 @@ namespace {
         THIEVES_HERO_Y = 300,
         THIEVES_PRIMARY_STATS_Y = 339,
         THIEVES_PERSONALITY_Y = 397,
+        THIEVES_PERSONALITY_TEXT_Y = 393,
         THIEVES_CREATURE_Y = 418,
         THIEVES_HERO_LOCATOR_X = 246,
         THIEVES_HERO_LOCATOR_Y = 301,
@@ -270,11 +271,35 @@ namespace {
         THIEVES_PRIMARY_WIDGET_HEIGHT = 48,
         THIEVES_PERSONALITY_X = 227,
         THIEVES_PERSONALITY_WIDTH = 74,
-        THIEVES_PERSONALITY_HEIGHT = 16,
+        THIEVES_PERSONALITY_HEIGHT = 28,
         THIEVES_CREATURE_X = 244,
         THIEVES_CREATURE_WIDTH = 40,
         THIEVES_CREATURE_HEIGHT = 34
     H2_ENUM_END(ThievesGuildConstant)
+
+    H2_ENUM_BEGIN(Cp1251Letter)
+        CP1251_CAPITAL_YO = 0xa8,
+        CP1251_SMALL_YO   = 0xb8,
+        CP1251_SMALL_A    = 0xe0,
+        CP1251_SMALL_YA   = 0xff,
+        CP1251_CASE_STEP  = 0x20
+    H2_ENUM_END(Cp1251Letter)
+
+    // The localised build folds the leading letter of a colour name through the
+    // CP1251 alphabet, not through a bare -32 on the Latin range.
+    inline char ToUpperCp1251(u8 letter) {
+        char capital;
+
+        if (letter >= 'a' && letter <= 'z')
+            capital = letter - CP1251_CASE_STEP;
+        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
+            capital = letter - CP1251_CASE_STEP;
+        else if (letter == CP1251_SMALL_YO)
+            capital = CP1251_CAPITAL_YO;
+        else
+            capital = letter;
+        return capital;
+    }
 
 } // namespace
 
@@ -3253,16 +3278,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
         while (gpGame->m_playerDead[rank_a] != 0)
             ++rank_a;
         sprintf(gText, gColors[gpGame->m_players[rank_a].m_color]);
-        char upperFirst;
-        if (static_cast<u8>(gText[0]) >= 'a' && static_cast<u8>(gText[0]) <= 'z')
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) >= 0xe0 && static_cast<u8>(gText[0]) <= 0xff)
-            upperFirst = static_cast<u8>(gText[0]) - ' ';
-        else if (static_cast<u8>(gText[0]) == 0xb8)
-            upperFirst = '\xa8';
-        else
-            upperFirst = gText[0];
-        gText[0] = upperFirst;
+        gText[0] = ToUpperCp1251(gText[0]);
         message_h.type = MESSAGE_WIDGET;
         message_h.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
         message_h.payload.widget.id = position_a + TOWN_THIEVES_FIRST_PLAYER_CONTROL;
@@ -3389,7 +3405,7 @@ void townManager::SetupThievesGuild(heroWindow* window, i32 informationLevel) {
                         static_cast<i16>(
                             position_a * THIEVES_PLAYER_COLUMN_WIDTH + THIEVES_PERSONALITY_X
                         ),
-                        THIEVES_PERSONALITY_Y,
+                        THIEVES_PERSONALITY_TEXT_Y,
                         THIEVES_PERSONALITY_WIDTH,
                         THIEVES_PERSONALITY_HEIGHT,
                         widgetText_c,

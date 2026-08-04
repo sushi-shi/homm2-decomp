@@ -418,7 +418,7 @@ i32 combatManager::ValidHexToStandOn(i32 hexIndex) {
     if (hexIndex == IGNORED_HEX)
         return 1;
 
-    if (!(hexIndex == INVALID_HEX || MAP_WIDTH - 1 == hexIndex % COMBAT_GRID_ROW_LENGTH
+    if (!(hexIndex == INVALID_HEX || hexIndex % COMBAT_GRID_ROW_LENGTH == MAP_WIDTH - 1
           || hexIndex % COMBAT_GRID_ROW_LENGTH == 0
           || (m_hexCells[hexIndex].m_blocked != 0
               && (gpCombatManager->m_inCastleCombat == 0
@@ -2389,19 +2389,19 @@ void combatManager::DoLoseWindow(void) {
 
 VA(0x0043049b, 0x3bd)
 i32 combatManager::DoSurrender(void) {
-    i32 armyIndex_n;
-    i16 dialogType;
-    i16 dialogResult;
-    i16 textWidth_t;
+    i32 armyNum;
+    i16 dlgType;
+    i16 dlgResult;
+    i16 lineWidth;
     heroWindow* window;
     tag_message message;
 
     giSurrenderCost = 0;
-    for (armyIndex_n = 0; armyIndex_n < COMBAT_ARMY_SLOT_COUNT; ++armyIndex_n) {
-        if (m_armies[IDX(m_currentSide)][armyIndex_n].IsAlive()) {
-            giSurrenderCost +=
-                gMonsterDatabase[IDX(m_armies[IDX(m_currentSide)][armyIndex_n].m_monsterType)].cost
-                * m_armies[IDX(m_currentSide)][armyIndex_n].m_quantity;
+    for (armyNum = 0; armyNum < COMBAT_ARMY_SLOT_COUNT; ++armyNum) {
+        if (m_armies[IDX(m_currentSide)][armyNum].IsAlive()) {
+            giSurrenderCost += m_armies[IDX(m_currentSide)][armyNum].m_quantity
+                * gMonsterDatabase[IDX(m_armies[IDX(m_currentSide)][armyNum].m_monsterType)]
+                      .cost;
         }
     }
     if (m_heroes[IDX(m_currentSide)]->HasArtifact(ARTIFACT_STATESMANS_QUILL) != 0)
@@ -2415,9 +2415,9 @@ i32 combatManager::DoSurrender(void) {
                  * COMBAT_SURRENDER_DIPLOMACY_FACTOR)
     );
 
-    dialogType = SURRENDER_DIALOG_TYPE;
-    dialogResult = SURRENDER_DIALOG_ACCEPT_RESULT;
-    textWidth_t = SURRENDER_TEXT_WIDTH;
+    dlgType = SURRENDER_DIALOG_TYPE;
+    dlgResult = SURRENDER_DIALOG_ACCEPT_RESULT;
+    lineWidth = SURRENDER_TEXT_WIDTH;
     window = new heroWindow(SURRENDER_WINDOW_X, SURRENDER_WINDOW_Y, "surrendr.bin");
     if (window == NULL)
         MemError();
@@ -2431,20 +2431,19 @@ i32 combatManager::DoSurrender(void) {
     );
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
-    if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0)
-        message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_PORTRAIT_COMMAND;
-    else
-        message.payload.widget.command = COMBAT_SURRENDER_HERO_PORTRAIT_COMMAND;
+    message.payload.widget.command =
+        m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain
+        ? COMBAT_SURRENDER_CAPTAIN_PORTRAIT_COMMAND
+        : COMBAT_SURRENDER_HERO_PORTRAIT_COMMAND;
     message.payload.widget.id = SURRENDER_PORTRAIT_WIDGET_ID;
     message.payload.widget.data.value = SURRENDER_PORTRAIT_DEFAULT_COLOR;
     window->BroadcastMessage(message);
     if (m_heroes[IDX(OppositeCombatSide(m_currentSide))]->m_isCaptain != 0) {
         message.payload.widget.command = COMBAT_SURRENDER_CAPTAIN_OVERLAY_COMMAND;
-        if (m_playerId[IDX(OppositeCombatSide(m_currentSide))] == -1)
-            message.payload.widget.data.value = COMBAT_NEUTRAL_HERO_COLOR;
-        else
-            message.payload.widget.data.value =
-                gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]].m_color;
+        message.payload.widget.data.value =
+            m_playerId[IDX(OppositeCombatSide(m_currentSide))] == -1
+            ? COMBAT_NEUTRAL_HERO_COLOR
+            : gpGame->m_players[m_playerId[IDX(OppositeCombatSide(m_currentSide))]].m_color;
         window->BroadcastMessage(message);
     }
     message.payload.widget.data.text = gText;

@@ -1,6 +1,7 @@
 #include <va.h>
 #include <BASE/baseManager.h>
 #include <string.h>
+#include <BASE/soundManager.h>
 
 VA(0x004b5660, 0x5d)
 baseManager::baseManager(void)
