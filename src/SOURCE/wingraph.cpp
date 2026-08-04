@@ -114,12 +114,12 @@ void DDInitGraphics(void) {
 
 VA(0x004afe8f, 0x4da)
 i32 DDAppPaint(void* window, void* paintDC) {
-    i32 sourceTop4;
-    i32 sourceWidth5;
-    i32 sourceHeight3;
-    i32 sourceLeft3;
-    POINT point0;
-    PAINTSTRUCT paint3;
+    i32 sourceWidth;
+    i32 sourceHeight5;
+    i32 sourceTop8;
+    i32 sourceLeft6;
+    PAINTSTRUCT paint7;
+    POINT point1;
 
     if (gbWinGraphBusy != 0)
         return 1;
@@ -129,39 +129,39 @@ i32 DDAppPaint(void* window, void* paintDC) {
         return 1;
     {
         gbWinGraphBusy = true;
-        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint3);
+        paintDC = BeginPaint(reinterpret_cast<HWND>(window), &paint7);
         GetClientRect(reinterpret_cast<HWND>(window), &gDDClientRect);
-        if (paint3.rcPaint.right == 0 || paint3.rcPaint.bottom == 0)
-            paint3.rcPaint = gDDClientRect;
-        if (paint3.rcPaint.right < WINGRAPH_WIDTH)
-            paint3.rcPaint.right++;
-        if (paint3.rcPaint.bottom < WINGRAPH_HEIGHT)
-            paint3.rcPaint.bottom++;
+        if (paint7.rcPaint.right == 0 || paint7.rcPaint.bottom == 0)
+            paint7.rcPaint = gDDClientRect;
+        if (paint7.rcPaint.right < WINGRAPH_WIDTH)
+            paint7.rcPaint.right++;
+        if (paint7.rcPaint.bottom < WINGRAPH_HEIGHT)
+            paint7.rcPaint.bottom++;
 
-        gDDDestinationRect = paint3.rcPaint;
-        sourceWidth5 = ((gDDDestinationRect.right - gDDDestinationRect.left + 1) * WINGRAPH_WIDTH)
+        gDDDestinationRect = paint7.rcPaint;
+        sourceWidth = ((gDDDestinationRect.right - gDDDestinationRect.left + 1) * WINGRAPH_WIDTH)
                        / iMainWinScreenWidth;
-        sourceHeight3 = ((gDDDestinationRect.bottom - gDDDestinationRect.top + 1) * WINGRAPH_HEIGHT)
+        sourceHeight5 = ((gDDDestinationRect.bottom - gDDDestinationRect.top + 1) * WINGRAPH_HEIGHT)
                         / iMainWinScreenHeight;
-        sourceLeft3 = (gDDDestinationRect.left * WINGRAPH_WIDTH) / iMainWinScreenWidth;
-        sourceTop4 = (gDDDestinationRect.top * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
+        sourceLeft6 = (gDDDestinationRect.left * WINGRAPH_WIDTH) / iMainWinScreenWidth;
+        sourceTop8 = (gDDDestinationRect.top * WINGRAPH_HEIGHT) / iMainWinScreenHeight;
         if (giScrollX != 0) {
-            sourceLeft3 = giScrollX + WINGRAPH_SCROLL_MARGIN;
-            sourceWidth5 = WINGRAPH_SCROLL_SIZE;
+            sourceLeft6 = giScrollX + WINGRAPH_SCROLL_MARGIN;
+            sourceWidth = WINGRAPH_SCROLL_SIZE;
         }
         if (giScrollY != 0) {
-            sourceTop4 = giScrollY + WINGRAPH_SCROLL_MARGIN;
-            sourceHeight3 = WINGRAPH_SCROLL_SIZE;
+            sourceTop8 = giScrollY + WINGRAPH_SCROLL_MARGIN;
+            sourceHeight5 = WINGRAPH_SCROLL_SIZE;
         }
-        gDDSourceRect.left = sourceLeft3;
-        gDDSourceRect.right = sourceWidth5 + sourceLeft3 - 1;
-        gDDSourceRect.top = sourceTop4;
-        gDDSourceRect.bottom = sourceTop4 + sourceHeight3 - 1;
+        gDDSourceRect.left = sourceLeft6;
+        gDDSourceRect.right = sourceLeft6 + sourceWidth - 1;
+        gDDSourceRect.top = sourceTop8;
+        gDDSourceRect.bottom = sourceTop8 + sourceHeight5 - 1;
 
-        point0.y = 0;
-        point0.x = point0.y;
-        ClientToScreen(hwndApp, &point0);
-        OffsetRect(&gDDDestinationRect, point0.x, point0.y);
+        point1.y = 0;
+        point1.x = point1.y;
+        ClientToScreen(hwndApp, &point1);
+        OffsetRect(&gDDDestinationRect, point1.x, point1.y);
         gDDResult = lpDDSOne->Unlock(NULL);
         if (gDDResult != DD_OK)
             DDSD(gDDResult, RETAIL_FILE, 228);
@@ -176,7 +176,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
             gDDSourceRect.bottom = WINGRAPH_HEIGHT;
 
         lPaintStart = KBTickCount();
-        for (;;) {
+        while (1) {
             gDDResult =
                 lpDDSPrimary->Blt(&gDDDestinationRect, lpDDSOne, &gDDSourceRect, DDBLT_WAIT, NULL);
             if (gDDResult == DDERR_SURFACELOST) {
@@ -217,7 +217,7 @@ i32 DDAppPaint(void* window, void* paintDC) {
         }
         if (gDDResult != DD_OK)
             DDSD(gDDResult, RETAIL_FILE, 286);
-        EndPaint(reinterpret_cast<HWND>(window), &paint3);
+        EndPaint(reinterpret_cast<HWND>(window), &paint7);
         gbWinGraphBusy = false;
     }
     return 1;
@@ -314,106 +314,106 @@ struct IDirectDrawSurface* DDCreateSurface(u32l width, u32l height, i32 primary)
     return lpSurface;
 }
 
-VA(0x004b0601, 0x57f)
+VA(0x004b0601, 0x614)
 void DDSD(i32 error, char* file, i32 line) {
-    HRESULT restoreResult;
+    HRESULT hres;
     i32 unused;
-    char errorMessage0[WINGRAPH_ERROR_TEXT_SIZE];
+    char errorMessage[WINGRAPH_ERROR_TEXT_SIZE];
 
     if (bInDDSD != 0)
         return;
     bInDDSD = 1;
-    restoreResult = lpDD->RestoreDisplayMode();
+    hres = lpDD->RestoreDisplayMode();
     unused = 0;
     switch (error) {
         case DD_OK:
             return;
         case DDERR_GENERIC:
-            strcpy(errorMessage0, "DDERR_GENERIC            ");
+            strcpy(errorMessage, "DDERR_GENERIC            ");
             break;
         case DDERR_INVALIDCLIPLIST:
-            strcpy(errorMessage0, "DDERR_INVALIDCLIPLIST\t   ");
+            strcpy(errorMessage, "DDERR_INVALIDCLIPLIST\t   ");
             break;
         case DDERR_INVALIDOBJECT:
-            strcpy(errorMessage0, "DDERR_INVALIDOBJECT      ");
+            strcpy(errorMessage, "DDERR_INVALIDOBJECT      ");
             break;
         case DDERR_INVALIDPARAMS:
-            strcpy(errorMessage0, "DDERR_INVALIDPARAMS\t   ");
+            strcpy(errorMessage, "DDERR_INVALIDPARAMS\t   ");
             break;
         case DDERR_INVALIDRECT:
-            strcpy(errorMessage0, "DDERR_INVALIDRECT\t      ");
+            strcpy(errorMessage, "DDERR_INVALIDRECT\t      ");
             break;
         case DDERR_NOALPHAHW:
-            strcpy(errorMessage0, "DDERR_NOALPHAHW          ");
+            strcpy(errorMessage, "DDERR_NOALPHAHW          ");
             break;
         case DDERR_NOBLTHW:
-            strcpy(errorMessage0, "DDERR_NOBLTHW\t         ");
+            strcpy(errorMessage, "DDERR_NOBLTHW\t         ");
             break;
         case DDERR_NOCLIPLIST:
-            strcpy(errorMessage0, "DDERR_NOCLIPLIST         ");
+            strcpy(errorMessage, "DDERR_NOCLIPLIST         ");
             break;
         case DDERR_NODDROPSHW:
-            strcpy(errorMessage0, "DDERR_NODDROPSHW\t      ");
+            strcpy(errorMessage, "DDERR_NODDROPSHW\t      ");
             break;
         case DDERR_SURFACELOST:
-            strcpy(errorMessage0, "DDERR_SURFACELOST        ");
+            strcpy(errorMessage, "DDERR_SURFACELOST        ");
             break;
         case DDERR_UNSUPPORTED:
-            strcpy(errorMessage0, "DDERR_UNSUPPORTED\t      ");
+            strcpy(errorMessage, "DDERR_UNSUPPORTED\t      ");
             break;
         case DDERR_NOMIRRORHW:
-            strcpy(errorMessage0, "DDERR_NOMIRRORHW         ");
+            strcpy(errorMessage, "DDERR_NOMIRRORHW         ");
             break;
         case DDERR_NORASTEROPHW:
-            strcpy(errorMessage0, "DDERR_NORASTEROPHW\t      ");
+            strcpy(errorMessage, "DDERR_NORASTEROPHW\t      ");
             break;
         case DDERR_NOROTATIONHW:
-            strcpy(errorMessage0, "DDERR_NOROTATIONHW       ");
+            strcpy(errorMessage, "DDERR_NOROTATIONHW       ");
             break;
         case DDERR_NOSTRETCHHW:
-            strcpy(errorMessage0, "DDERR_NOSTRETCHHW\t      ");
+            strcpy(errorMessage, "DDERR_NOSTRETCHHW\t      ");
             break;
         case DDERR_SURFACEBUSY:
-            strcpy(errorMessage0, "DDERR_SURFACEBUSY        ");
+            strcpy(errorMessage, "DDERR_SURFACEBUSY        ");
             break;
         case DDERR_NOZBUFFERHW:
-            strcpy(errorMessage0, "DDERR_NOZBUFFERHW        ");
+            strcpy(errorMessage, "DDERR_NOZBUFFERHW        ");
             break;
         case DDERR_OUTOFMEMORY:
-            strcpy(errorMessage0, "DDERR_OUTOFMEMORY\t      ");
+            strcpy(errorMessage, "DDERR_OUTOFMEMORY\t      ");
             break;
         case DDERR_CLIPPERISUSINGHWND:
-            strcpy(errorMessage0, "DDERR_CLIPPERISUSINGHWND ");
+            strcpy(errorMessage, "DDERR_CLIPPERISUSINGHWND ");
             break;
         case DDERR_NOEXCLUSIVEMODE:
-            strcpy(errorMessage0, "DDERR_NOEXCLUSIVEMODE\t   ");
+            strcpy(errorMessage, "DDERR_NOEXCLUSIVEMODE\t   ");
             break;
         case DDERR_NOT8BITCOLOR:
-            strcpy(errorMessage0, "DDERR_NOT8BITCOLOR       ");
+            strcpy(errorMessage, "DDERR_NOT8BITCOLOR       ");
             break;
         case DDERR_NOPALETTEATTACHED:
-            strcpy(errorMessage0, "DDERR_NOPALETTEATTACHED  ");
+            strcpy(errorMessage, "DDERR_NOPALETTEATTACHED  ");
             break;
         case DDERR_NOPALETTEHW:
-            strcpy(errorMessage0, "DDERR_NOPALETTEHW\t      ");
+            strcpy(errorMessage, "DDERR_NOPALETTEHW\t      ");
             break;
         case DDERR_LOCKEDSURFACES:
-            strcpy(errorMessage0, "DDERR_LOCKEDSURFACES     ");
+            strcpy(errorMessage, "DDERR_LOCKEDSURFACES     ");
             break;
         case DDERR_IMPLICITLYCREATED:
-            strcpy(errorMessage0, "DDERR_IMPLICITLYCREATED  ");
+            strcpy(errorMessage, "DDERR_IMPLICITLYCREATED  ");
             break;
         case DDERR_WRONGMODE:
-            strcpy(errorMessage0, "DDERR_WRONGMODE          ");
+            strcpy(errorMessage, "DDERR_WRONGMODE          ");
             break;
         case DDERR_INCOMPATIBLEPRIMARY:
-            strcpy(errorMessage0, "DDERR_INCOMPATIBLEPRIMARY");
+            strcpy(errorMessage, "DDERR_INCOMPATIBLEPRIMARY");
             break;
         case DDERR_NOCLIPPERATTACHED:
-            strcpy(errorMessage0, "DDERR_NOCLIPPERATTACHED  ");
+            strcpy(errorMessage, "DDERR_NOCLIPPERATTACHED  ");
             break;
         default:
-            strcpy(errorMessage0, "Error type unknown");
+            strcpy(errorMessage, "Error type unknown");
             break;
     }
     MessageBeep(0);
@@ -422,7 +422,7 @@ void DDSD(i32 error, char* file, i32 line) {
     sprintf(
         gText,
         "DirectDraw Error:\n\n  '%s'\n\n  File: '%s'\n  Line: %d",
-        errorMessage0,
+        errorMessage,
         file,
         line
     );
@@ -686,7 +686,7 @@ void __cdecl WGUpdatePalette(i8* paletteData) {
 VA(0x004b1434, 0x1a2)
 void WGInitializePalette(void) {
     HDC dc0;
-    i32 entry;
+    i32 entry0;
 
     if (hpalApp != NULL)
         return;
@@ -699,37 +699,37 @@ void WGInitializePalette(void) {
         &LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE]
     );
     ReleaseDC(NULL, dc0);
-    for (entry = 0; entry < WINGRAPH_SYSTEM_PALETTE_SIZE; entry++) {
-        screenImage.colors[entry].rgbRed = LogicalPalette.entries[entry].peRed;
-        screenImage.colors[entry].rgbGreen = LogicalPalette.entries[entry].peGreen;
-        screenImage.colors[entry].rgbBlue = LogicalPalette.entries[entry].peBlue;
-        screenImage.colors[entry].rgbReserved = 0;
-        LogicalPalette.entries[entry].peFlags = 0;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbRed =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+    for (entry0 = 0; entry0 < WINGRAPH_SYSTEM_PALETTE_SIZE; entry0++) {
+        screenImage.colors[entry0].rgbRed = LogicalPalette.entries[entry0].peRed;
+        screenImage.colors[entry0].rgbGreen = LogicalPalette.entries[entry0].peGreen;
+        screenImage.colors[entry0].rgbBlue = LogicalPalette.entries[entry0].peBlue;
+        screenImage.colors[entry0].rgbReserved = 0;
+        LogicalPalette.entries[entry0].peFlags = 0;
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbRed =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
                 .peRed;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbGreen =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbGreen =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
                 .peGreen;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry].rgbBlue =
-            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0].rgbBlue =
+            LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
                 .peBlue;
-        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+        screenImage.colors[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
             .rgbReserved = 0;
-        LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry]
+        LogicalPalette.entries[WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE + entry0]
             .peFlags = 0;
     }
-    for (entry = WINGRAPH_SYSTEM_PALETTE_SIZE;
-         entry < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
-         entry++) {
-        LogicalPalette.entries[entry].peRed = 0;
-        screenImage.colors[entry].rgbRed = LogicalPalette.entries[entry].peRed;
-        LogicalPalette.entries[entry].peGreen = 0;
-        screenImage.colors[entry].rgbGreen = LogicalPalette.entries[entry].peGreen;
-        LogicalPalette.entries[entry].peBlue = 0;
-        screenImage.colors[entry].rgbBlue = LogicalPalette.entries[entry].peBlue;
-        screenImage.colors[entry].rgbReserved = 0;
-        LogicalPalette.entries[entry].peFlags = PC_NOCOLLAPSE;
+    for (entry0 = WINGRAPH_SYSTEM_PALETTE_SIZE;
+         entry0 < WINGRAPH_PALETTE_SIZE - WINGRAPH_SYSTEM_PALETTE_SIZE;
+         entry0++) {
+        LogicalPalette.entries[entry0].peRed = 0;
+        screenImage.colors[entry0].rgbRed = 0;
+        LogicalPalette.entries[entry0].peGreen = 0;
+        screenImage.colors[entry0].rgbGreen = 0;
+        LogicalPalette.entries[entry0].peBlue = 0;
+        screenImage.colors[entry0].rgbBlue = 0;
+        screenImage.colors[entry0].rgbReserved = 0;
+        LogicalPalette.entries[entry0].peFlags = PC_NOCOLLAPSE;
     }
     hpalApp = CreatePalette(reinterpret_cast<LOGPALETTE*>(&LogicalPalette));
 }

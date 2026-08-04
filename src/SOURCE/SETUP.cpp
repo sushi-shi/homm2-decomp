@@ -151,14 +151,14 @@ i32 game::SetupComPort(void) {
 
 VA(0x00492817, 0x22d)
 i32 game::SetupHotSeatGame(void) {
-    char defaultName[DEFAULT_PLAYER_NAME_CAPACITY];
     i32 i;
+    char name[DEFAULT_PLAYER_NAME_CAPACITY];
 
-    heroWindow* win = new heroWindow(WINDOW_X, WINDOW_Y, "stphotst.bin");
-    if (win == NULL)
+    heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stphotst.bin");
+    if (dialogWindow == NULL)
         MemError();
-    gpWindowManager->DoDialog(win, SetupHotSeatGameHandler, 0);
-    delete win;
+    gpWindowManager->DoDialog(dialogWindow, SetupHotSeatGameHandler, 0);
+    delete dialogWindow;
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
@@ -188,9 +188,9 @@ i32 game::SetupHotSeatGame(void) {
         NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
         if (gpWindowManager->m_dialogResult == DIALOG_YES) {
             for (i = 0; i < giNumHumanPlayers; i++) {
-                strcpy(defaultName, "");
+                strcpy(name, "");
                 sprintf(gText, "Enter player %d's name.", i + 1);
-                GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, defaultName, 0, 1);
+                GetDataEntry(gText, cPlayerNames[i], PLAYER_NAME_LENGTH, name, 0, 1);
             }
         }
     }
@@ -230,20 +230,21 @@ i32 game::SetupNetworkGame(void) {
 
 VA(0x00492b64, 0x281)
 i32 game::SetupNetworkGame2(void) {
-    tag_message message;
     OSVERSIONINFO osInfo;
-    i32 result;
+    HINSTANCE hLib;
+    i32 gotVersion;
+    tag_message msg;
 
-    heroWindow* window = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
-    if (window == NULL)
+    heroWindow* dialogWindow = new heroWindow(WINDOW_X, WINDOW_Y, "stpnet2.bin");
+    if (dialogWindow == NULL)
         MemError();
 
     memset(&osInfo, 0, sizeof(osInfo));
     osInfo.dwOSVersionInfoSize = sizeof(osInfo);
-    result = GetVersionEx(&osInfo);
+    gotVersion = GetVersionEx(&osInfo);
     LogInt(
         "Version",
-        result,
+        gotVersion,
         osInfo.dwPlatformId,
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE,
@@ -251,18 +252,28 @@ i32 game::SetupNetworkGame2(void) {
         LOG_UNUSED_VALUE,
         LOG_UNUSED_VALUE
     );
-    if (result != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
-        message.type = MESSAGE_WIDGET;
-        message.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        message.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
-        message.payload.widget.id = CHOICE_ONE;
-        window->BroadcastMessage(message);
-        message.payload.widget.id = CHOICE_THREE;
-        window->BroadcastMessage(message);
+    if (gotVersion != 0 && osInfo.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+        msg.type = MESSAGE_WIDGET;
+        msg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        msg.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        msg.payload.widget.id = CHOICE_THREE;
+        dialogWindow->BroadcastMessage(msg);
     }
 
-    gpWindowManager->DoDialog(window, SetupNetworkGame2Handler, 0);
-    delete window;
+    hLib = NULL;
+    hLib = LoadLibraryA("DPLAYX.DLL");
+    if (hLib == NULL) {
+        tag_message dimMsg;
+
+        dimMsg.type = MESSAGE_WIDGET;
+        dimMsg.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
+        dimMsg.payload.widget.data.value = IDX(WIDGET_COMMAND_DIMMED);
+        dimMsg.payload.widget.id = CHOICE_ONE;
+        dialogWindow->BroadcastMessage(dimMsg);
+    }
+
+    gpWindowManager->DoDialog(dialogWindow, SetupNetworkGame2Handler, 0);
+    delete dialogWindow;
 
     switch (gpWindowManager->m_dialogResult) {
         case CHOICE_ONE:
@@ -1148,7 +1159,7 @@ MessageDispatchResult BaseSetupHandler(struct tag_message& message) {
     if (handled || giMenuCommand != -1) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
         if (giMenuCommand != -1)
             gpWindowManager->m_dialogResult = DIALOG_CANCEL;
         return MESSAGE_DISPATCH_FORWARD;
