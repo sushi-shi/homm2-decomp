@@ -650,6 +650,51 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   A shooter, not a fast unit, is what makes the enemy hex reachable without a
   path.
 
+### SOURCE/REQUEST (file requester) + SOURCE/DRAWING (combat drawing)
+
+- **[Buka] `fileRequester::Main` (0x8f737) accepts CP1251 Cyrillic in the
+  filename field.** The character-class chain that sanitises the typed name
+  gained four terms between the ASCII digit test and the `'_'` test:
+  `c >= 0xC0 && c <= 0xDF` (А-Я), `c >= 0xE0 && c <= 0xFF` (а-я),
+  `c == 0xA8` (Ё) and `c == 0xB8` (ё). Every read of the buffer is
+  zero-extended (`xor eax,eax; mov al,[ebp+edx-0x160]`, and
+  `mov edx,[ebp-0x160]; and edx,0xff` for index 0), i.e. the buffer is
+  `unsigned char` in retail — the trailing-space trim loop and the
+  `newNameData[0] > ' '` test read it unsigned too. 30 instructions the
+  reconstruction was missing outright.
+- **[Buka] Five `fileRequester::Main` dialog strings are Russian.**
+  0x516b74 "Выберите из списка или нажмите кнопку отмены.",
+  0x516ba4 / 0x516bd4 the two "no maps of that size" variants,
+  0x516c2c "Выбранная вами игра рассчитана только на %d человек. ...",
+  0x516c90 "Выбранная игра начнется с %d игроками-людьми. ...". The PoL
+  English wording is kept as a comment beside each escape sequence.
+- **[unclassified] `fileRequester::Main` binds the scroll-gutter and
+  scroll-knob widget ids the other way round from the reconstruction.**
+  Retail's dispatch table sends id 3 (`FILE_REQUESTER_SCROLL_GUTTER`) to the
+  "jump the list to the clicked pixel" body and id 14
+  (`FILE_REQUESTER_SCROLL_KNOB`) to `DoKnob()`. See
+  `docs/patterns/jump-table-entry-swap-names-case-labels.md`.
+- **[unclassified] `fileRequester::InitializeFiles` (0x8e836) keeps the
+  extension in a 5-byte buffer.** The frame gives `extension` exactly 8 bytes
+  between `findFileData` (-0x454) and `indexData` (-0x460), i.e.
+  `char extension[FILE_REQUESTER_EXTENSION_SIZE]` (5, padded to 8) — the same
+  width as `m_extensions[i].text`, not the 208-byte scratch the
+  reconstruction had.
+- **[unclassified] `combatManager::CombatMessage(char*, int, int, int)`
+  (0x37e48) copies its argument into a 400-byte file-static first.** The body
+  opens `strcpy(gCombatMessageText, message);` and every later use — the
+  `NoShowCombatLog` call, both `strcpy`s into the member lines, `FindToken`,
+  the `newlinePtr > gCombatMessageText` bound — reads the static, never the
+  parameter. The static lives at 0x005242fc and is referenced only from this
+  function. The wrapper writes a temporary NUL over the embedded newline, so
+  the caller's string literal could not be used in place.
+- **[unclassified] `combatManager::CombatMessage(CombatMessageCommand)`
+  (0x381ef) handles `COMBAT_MESSAGE_COMMAND_SHOOT_THROUGH_WALL` (15) with the
+  same body as `COMBAT_MESSAGE_COMMAND_SHOOT` (3), and both the ATTACK and
+  SHOOT messages format `gArmyNamesPlural`, not `gArmyNames` (the VIEW_INFO
+  message still uses the singular table). The retail dispatch table is 16
+  entries (`cmp ...,0xf; ja`), the reconstruction's was 14.
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
