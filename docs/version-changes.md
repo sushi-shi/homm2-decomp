@@ -158,6 +158,50 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 
 ## Changed
 
+- **[Buka] `SetupCDDrive` (0xbf370) probes for the OGG music tracks, not a CD
+  audio device.** The PoL/2.1 body drives MCI (`open %c: type cdaudio alias CD`,
+  `info CD UPC wait`, `close CD`) and validates the disc through
+  `%c:\heroes2\anim\voy24.smk`. Buka's body has no MCI at all: it checks the
+  data files with `sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\")` (note the
+  expansion aggregate, and the two-literal `%s` + tail split), and for each
+  candidate drive it opens `<drive>` + a file-static
+  `"\\Tracks2\\02-AudioTrack 02.ogg"` (0x11e5dc) - the ripped soundtrack Buka
+  shipped in place of CD audio. The remembered `HMM2POL CDDrive` registry value
+  is written from `gcRegCDRomPath` (which the body itself fills with
+  `sprintf(gcRegCDRomPath, "%c:", ...)`), and `gcAnimPath` is never rewritten.
+  `DriveSupportsFreeSpaceQuery` gates both the remembered-drive fast path and
+  every scanned drive; the retry loop is a plain
+  `for (attempt = 0; attempt < 2; ++attempt) { ...; Sleep(3000); }` returning 2
+  when it runs out. Byte-exact.
+- **[unclassified] `WritePrefsToFile` (0xbed60) has no zero-scratch prologue.**
+  The whole body is `sprintf(gText, "%s", "HEROES2.CFG");
+  fd = open(gText, ...); if (fd == -1) return; write(fd, &gConfig, 0x19d);
+  close(fd);` - one 4-byte frame slot (`push ecx`), no `i32 zeroBuffer[25]`
+  clearing loop. Byte-exact.
+- **[unclassified] `SetGameDefaults` (0xbe0a0) seeds the map offset and the
+  unique system id from `Random`, not `rand`.** `gConfig.firstMapOffset =
+  Random(0, 32000)` (fastcall, not `rand() % 32001`), and each of the three
+  `uniqueSystemID` characters advances one accumulator with
+  `seed += Random(1, 999999) + KBTickCount();` before indexing a local
+  `"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"` pointer. The id bytes are cleared
+  with `memset(gConfig.uniqueSystemID, 0, 4)`. The graphics defaults run as a
+  real `for (i = 0; i < 2; ++i)` over `gConfig.gfx[i]`, and
+  `gConfig.blackoutComputer` is written 0 twice (once before the loop, once
+  after). Byte-exact.
+- **[unclassified] `executive::DoDialog` (0xc50d0) builds a real nested
+  `executive` on the stack.** The body declares `executive ex;` (its default
+  ctor runs first, before anything else), adds the mouse/window managers and
+  the dialog manager to `ex`, runs `ex.MainLoop()`, and returns `ex.m_result`.
+  The outer executive's list is saved into three parallel
+  `baseManager*[20]` arrays and restored afterwards with a single counter.
+  Byte-exact.
+- **[unclassified] `dropListWidget`'s four press/track flags are unsigned
+  bytes.** `m_scrollUpPressed`, `m_scrollDownPressed`, `m_scrollThumbDragging`
+  and `m_itemSelectionTracking` (0xac..0xaf) are read with `/G5`'s
+  `xor r32,r32` + `mov r8` zero-extension in `DrawDropStuff` and
+  `ProcessSelectDialog`, which pins them as `u8` rather than `char`
+  (`docs/patterns/unsigned-byte-flag-zero-extend.md`).
+
 - **[Buka] The preferences registry moved to Buka's own key and value
   namespace.** `BASE/Misc`'s three registry functions
   (`ReadPrefsFromRegistry` 0xbe410, `WritePrefsToRegistry` 0xbedd0,

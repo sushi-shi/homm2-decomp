@@ -70,8 +70,8 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     DEFAULT_WINDOW_WIDTH         = 0x280,
     DEFAULT_WINDOW_HEIGHT        = 0x1e0,
     DEFAULT_SLOW_VIDEO           = 3,
-    DEFAULT_MAP_OFFSET_COUNT     = 32001,
-    UNIQUE_ID_RANDOM_MODULUS     = 999999,
+    DEFAULT_MAP_OFFSET_MAX       = 32000,
+    UNIQUE_ID_RANDOM_MAX         = 999999,
     UNIQUE_ID_ALPHANUMERIC_COUNT = 36,
     UNIQUE_ID_ALPHA_COUNT        = 26,
     UNIQUE_ID_LEADING_INDEX      = 0,
@@ -80,24 +80,12 @@ H2_ENUM_BEGIN(MiscGameDefaultConstant)
     UNIQUE_ID_TERMINATOR_INDEX   = 3
 H2_ENUM_END(MiscGameDefaultConstant)
 
-H2_ENUM_CLASS_BEGIN(MiscGraphicsFieldIndex)
-    GRAPHICS_SHOW_MENU_FROM_FULLSCREEN   = -5,
-    GRAPHICS_X_FROM_FULLSCREEN           = -4,
-    GRAPHICS_Y_FROM_FULLSCREEN           = -3,
-    GRAPHICS_WIDTH_FROM_FULLSCREEN       = -2,
-    GRAPHICS_HEIGHT_FROM_FULLSCREEN      = -1,
-    GRAPHICS_FULLSCREEN                  = 0,
-    GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN = 1
-H2_ENUM_CLASS_END(MiscGraphicsFieldIndex)
-
 H2_ENUM_BEGIN(MiscCDDriveConstant)
     CD_FIRST_DRIVE_INDEX        = 2,
     CD_DRIVE_SLOT_COUNT         = 26,
-    CD_PATH_PREFIX_BYTES        = 2,
     CD_PATH_BUFFER_SIZE         = 100,
     CD_DRIVE_QUERY_PATH_SIZE    = 256,
-    CD_MCI_BUFFER_SIZE          = 256,
-    CD_MCI_RESULT_LENGTH        = 0xFF,
+    CD_READ_BUFFER_SIZE         = 256,
     CD_PROBE_TRAILER_SIZE       = 100,
     CD_RETRY_DELAY_MILLISECONDS = 3000,
     CD_RETRY_LIMIT              = 2
@@ -139,10 +127,7 @@ H2_ENUM_BEGIN(MiscPaletteComponent)
     PALETTE_COMPONENT_COUNT     = 3,
     PALETTE_RED_INDEX           = 0,
     PALETTE_GREEN_INDEX         = 1,
-    PALETTE_BLUE_INDEX          = 2,
-    PALETTE_RED_OUTPUT_OFFSET   = -3,
-    PALETTE_GREEN_OUTPUT_OFFSET = -2,
-    PALETTE_BLUE_OUTPUT_OFFSET  = -1
+    PALETTE_BLUE_INDEX          = 2
 H2_ENUM_END(MiscPaletteComponent)
 
 H2_ENUM_BEGIN(MiscWindowConstant)
@@ -205,6 +190,7 @@ static i32 gBlitBottom;
 i32 iMemEntries = 0;
 MemEntry* gpMemEntry = NULL;
 i32 giTotalMemAllocated = 0;
+static char* gcCDTrackName = "\\Tracks2\\02-AudioTrack 02.ogg";
 u8
     giChangeThreshold[FADE_CHANGE_THRESHOLD_COUNT] =
         {0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 19, 22, 26, 31, 37, 46};
@@ -349,19 +335,24 @@ void ShowMemoryStatus(void) {
 
 VA(0x004bd8e0, 0x10a)
 u32l MAKEFILEID(char* text) {
-    u32 hash = 0;
-    i32 sum = 0;
-    for (i32 i = strlen(text) - 1; i >= 0; --i) {
-        if (text[i] >= 'a' && text[i] <= 'z') {
-            text[i] &= ~('a' - 'A');
-        }
-        u32 shiftedHash = hash << HASH_LEFT_SHIFT;
-        hash >>= HASH_RIGHT_SHIFT;
-        hash += shiftedHash;
-        sum += text[i];
-        hash += text[i] + sum;
+    u32 fileId;
+    i32 size;
+    char buf[GLOBAL_AGGREGATE_PATH_SIZE];
+    i32 total;
+    i32 i;
+
+    strcpy(buf, text);
+    fileId = 0;
+    total = 0;
+    size = strlen(buf);
+    for (i = size - 1; i >= 0; --i) {
+        if (buf[i] >= 'a' && buf[i] <= 'z')
+            buf[i] &= ~('a' - 'A');
+        fileId = (fileId << HASH_LEFT_SHIFT) + (fileId >> HASH_RIGHT_SHIFT);
+        total += buf[i];
+        fileId += buf[i] + total;
     }
-    return hash;
+    return fileId;
 }
 
 VA(0x004bd9f0, 0xe7)
@@ -521,27 +512,30 @@ void SetInstallDefaults(void) {
 }
 VA(0x004be0a0, 0x29d)
 void SetGameDefaults(void) {
+    i32 i;
+    i32 seed;
+    i32 nAlpha;
+    char* alpha;
+
     gConfig.musicVolume = CONFIG_VOLUME_MIN;
     gConfig.soundVolume = CONFIG_VOLUME_MIN;
     gConfig.autosave = 1;
     gConfig.showRoute = 1;
-    i32* fullScreen = &gConfig.gfx[IDX(CONFIG_EXECUTABLE_GAME)].fullScreen;
-    do {
-        fullScreen[IDX(GRAPHICS_SHOW_MENU_FROM_FULLSCREEN)] = 1;
-        fullScreen[IDX(GRAPHICS_X_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(GRAPHICS_Y_FROM_FULLSCREEN)] = DEFAULT_WINDOW_ORIGIN;
-        fullScreen[IDX(GRAPHICS_COLOR_MOUSE_FROM_FULLSCREEN)] = 0;
-        fullScreen[IDX(GRAPHICS_FULLSCREEN)] = 1;
+    gConfig.blackoutComputer = 0;
+    for (i = IDX(CONFIG_EXECUTABLE_GAME); i < IDX(CONFIG_EXECUTABLE_COUNT); ++i) {
+        gConfig.gfx[i].showMenu = 1;
+        gConfig.gfx[i].x = DEFAULT_WINDOW_ORIGIN;
+        gConfig.gfx[i].y = DEFAULT_WINDOW_ORIGIN;
+        gConfig.gfx[i].colorMouseCursor = 0;
+        gConfig.gfx[i].fullScreen = 1;
         if (giMainVideoModeWidth <= DEFAULT_WINDOW_WIDTH) {
-            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_SMALL_WINDOW_WIDTH;
-            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] =
-                DEFAULT_SMALL_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = DEFAULT_SMALL_WINDOW_WIDTH;
+            gConfig.gfx[i].height = DEFAULT_SMALL_WINDOW_HEIGHT;
         } else {
-            fullScreen[IDX(GRAPHICS_WIDTH_FROM_FULLSCREEN)] = DEFAULT_WINDOW_WIDTH;
-            fullScreen[IDX(GRAPHICS_HEIGHT_FROM_FULLSCREEN)] = DEFAULT_WINDOW_HEIGHT;
+            gConfig.gfx[i].width = DEFAULT_WINDOW_WIDTH;
+            gConfig.gfx[i].height = DEFAULT_WINDOW_HEIGHT;
         }
-        fullScreen += CONFIG_GRAPHICS_SIZE / sizeof(*fullScreen);
-    } while (fullScreen < &gConfig.showCombatGrid);
+    }
     gConfig.showCombatGrid = 0;
     gConfig.showCombatMouseHex = 0;
     gConfig.combatShadeLevel = 0;
@@ -553,30 +547,28 @@ void SetGameDefaults(void) {
     gConfig.autoCombatUseSpells = 0;
     gConfig.blackoutComputer = 0;
     gConfig.currentMapOffset = 0;
-    gConfig.firstMapOffset = rand() % DEFAULT_MAP_OFFSET_COUNT;
+    gConfig.firstMapOffset = Random(0, DEFAULT_MAP_OFFSET_MAX);
     gConfig.showObjectBoxes = 0;
     gConfig.editorScreenAnimation = 0;
     gConfig.editorPaletteCycling = 0;
     gbFirstTimeThrough = true;
+    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
     gConfig.slowVideo = DEFAULT_SLOW_VIDEO;
     gConfig.computerWalkSpeed = CONFIG_WALK_SPEED_FAST;
-    gConfig.walkSpeed = CONFIG_WALK_SPEED_NORMAL;
     strcpy(gConfig.networkDefaultName, "The Unknown Hero");
-    *reinterpret_cast<i32*>(gConfig.uniqueSystemID) = 0;
-    i32 idSeed = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idSeed += KBTickCount();
+    nAlpha = UNIQUE_ID_ALPHANUMERIC_COUNT;
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    memset(gConfig.uniqueSystemID, 0, CONFIG_UNIQUE_SYSTEM_ID_SIZE);
+    seed = 0;
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
     gConfig.uniqueSystemID[UNIQUE_ID_TRAILING_INDEX] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
-    i32 idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idAdd += KBTickCount();
-    idSeed += idAdd;
+        alpha[seed % UNIQUE_ID_ALPHANUMERIC_COUNT];
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
     gConfig.uniqueSystemID[UNIQUE_ID_MIDDLE_INDEX] =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[idSeed % UNIQUE_ID_ALPHANUMERIC_COUNT];
-    idAdd = rand() % UNIQUE_ID_RANDOM_MODULUS + 1;
-    idAdd += KBTickCount();
-    idSeed += idAdd;
+        alpha[seed % UNIQUE_ID_ALPHANUMERIC_COUNT];
+    seed += Random(1, UNIQUE_ID_RANDOM_MAX) + KBTickCount();
     gConfig.uniqueSystemID[UNIQUE_ID_LEADING_INDEX] =
-        static_cast<char>(idSeed % UNIQUE_ID_ALPHA_COUNT + 'A');
+        static_cast<char>(seed % UNIQUE_ID_ALPHA_COUNT + 'A');
     gConfig.needsDefaultInitialization = 0;
 }
 
@@ -608,7 +600,6 @@ void ReadPrefsFromFile(void) {
 H2_ENUM_BEGIN(RegistryValueSize)
     REGISTRY_TEXT_BUFFER_SIZE = 100,
     REGISTRY_DWORD_BYTES      = 4,
-    CONFIG_ZERO_BUFFER_WORDS  = 25,
     MODEM_INIT_STRING_SIZE    = 0x62,
     UNIQUE_SYSTEM_ID_SIZE     = 4,
     NETWORK_DEFAULT_NAME_SIZE = 0x1e
@@ -1052,19 +1043,14 @@ void ReadPrefs(void) {
 
 VA(0x004bed60, 0x63)
 void WritePrefsToFile(void) {
-    i32 zeroBuffer[CONFIG_ZERO_BUFFER_WORDS];
-    i32 i;
-    i32* p = zeroBuffer;
-    for (i = CONFIG_ZERO_BUFFER_WORDS; i != 0; i--) {
-        *p = 0;
-        p++;
-    }
+    i32 fd;
+
     sprintf(gText, "%s", "HEROES2.CFG");
-    i32 fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
-    if (fd != -1) {
-        write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
-        close(fd);
-    }
+    fd = open(gText, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _S_IWRITE);
+    if (fd == -1)
+        return;
+    write(fd, &gConfig, CONFIG_PERSISTED_SIZE);
+    close(fd);
 }
 
 VA(0x004bedd0, 0x4cb)
@@ -1467,105 +1453,89 @@ bool DriveSupportsFreeSpaceQuery(char driveLetter) {
 
 VA(0x004bf370, 0x35f)
 H2_ENUM_RETURN(CDRomSetupResult, i32) SetupCDDrive(void) {
-    char registryPath[CD_PATH_BUFFER_SIZE];
-    char registryKey[CD_PATH_BUFFER_SIZE];
-    char cdDrives[CD_DRIVE_SLOT_COUNT];
-    char count;
-    i32 attempts;
-    HKEY key;
+    u32l dwErr;
+    u32l drives;
+    i32 i;
+    i32 handle;
+    i32 j;
+    i32 cdrom[CD_DRIVE_SLOT_COUNT];
+    char buffer[CD_READ_BUFFER_SIZE];
+    i32 status;
+    i32 num;
+    HKEY hKey;
+    char szKey[CD_PATH_BUFFER_SIZE];
 
-    sprintf(gText, ".\\DATA\\HEROES2.AGG");
-    i32 file = open(gText, _O_BINARY);
-    if (file == -1) {
+    sprintf(gText, "%sHEROES2x.AGG", ".\\DATA\\");
+    handle = open(gText, _O_BINARY);
+    if (handle == -1) {
         if (_chdir(gcRegAppPath) == -1)
             return CD_ROM_GAME_DIRECTORY_MISSING;
-        file = open(gText, _O_BINARY);
-        if (file == -1)
+        handle = open(gText, _O_BINARY);
+        if (handle == -1)
             return CD_ROM_DATA_FILES_MISSING;
     }
-    close(file);
+    close(handle);
 
-    u32l logicalDrives = GetLogicalDrives();
-    i32 cdDriveCount = 0;
-    memset(cdDrives, 0, sizeof(cdDrives));
-    for (i32 drive = CD_FIRST_DRIVE_INDEX; drive < CD_DRIVE_SLOT_COUNT; ++drive) {
-        if (logicalDrives & (1 << drive)) {
-            if (IsCDDrive(drive)) {
-                ++cdDriveCount;
-                cdDrives[cdDriveCount - 1] = static_cast<char>(drive);
+    drives = GetLogicalDrives();
+    memset(cdrom, 0, CD_DRIVE_SLOT_COUNT);
+    for (i = CD_FIRST_DRIVE_INDEX, j = 0; i < CD_DRIVE_SLOT_COUNT; ++i) {
+        if (drives & (1 << i)) {
+            if (IsCDDrive(i)) {
+                cdrom[j] = i;
+                ++j;
             }
         }
     }
-    count = static_cast<char>(cdDriveCount);
+    num = j;
 
-    if (strlen(gcRegCDRomPath) != 0) {
-        sprintf(gText, "%s\\heroes2\\anim\\voy24.smk", gcRegCDRomPath);
-        file = open(gText, _O_BINARY);
-        if (file != -1) {
-            close(file);
-            sprintf(gText + CD_PATH_PREFIX_BYTES, "%s", gcAnimPath);
-            strcpy(gcAnimPath, gText);
+    if (strlen(gcRegCDRomPath) > 0 && gcRegCDRomPath[0] >= 'A' && gcRegCDRomPath[0] <= 'Z'
+        && DriveSupportsFreeSpaceQuery(gcRegCDRomPath[0])) {
+        sprintf(gText, "%s%s", gcRegCDRomPath, gcCDTrackName);
+        handle = open(gText, _O_BINARY);
+        if (handle != -1) {
+            close(handle);
             return CD_ROM_READY;
         }
     }
+    if (num <= 0)
+        return CD_ROM_DRIVE_UNAVAILABLE;
 
-    typedef i32 (__cdecl *CDFormatCommand)(char*, const char*, ...);
-    CDFormatCommand formatCommand = wsprintfA;
-    attempts = 0;
-    {
-        char resultBuffer[CD_MCI_BUFFER_SIZE];
-        char command[CD_MCI_BUFFER_SIZE];
-        for (;;) {
-            for (i32 index = 0; index < count; ++index) {
-                formatCommand(command, "open %c: type cdaudio alias CD", cdDrives[index] + 'A');
-                if (mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL) == 0) {
-                    formatCommand(command, "info CD UPC wait");
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
-                    formatCommand(command, "close CD");
-                    mciSendStringA(command, resultBuffer, CD_MCI_RESULT_LENGTH, NULL);
+    for (i = 0; i < CD_RETRY_LIMIT; ++i) {
+        for (j = 0; j < num; ++j) {
+            if (DriveSupportsFreeSpaceQuery(cdrom[j] + 'A')) {
+                sprintf(gText, "%c:%s", cdrom[j] + 'A', gcCDTrackName);
+                handle = open(gText, _O_BINARY);
+                if (handle == -1)
+                    continue;
+                status = lseek(handle, 0, SEEK_END);
+                if (status != -1) {
+                    status = lseek(handle, -CD_PROBE_TRAILER_SIZE, SEEK_CUR);
+                    if (status != -1)
+                        status = read(handle, buffer, CD_PROBE_TRAILER_SIZE);
                 }
-                sprintf(gText, "%c:\\heroes2\\anim\\voy24.smk", cdDrives[index] + 'A');
-                file = open(gText, _O_BINARY);
-                if (file != -1) {
-                    if (lseek(file, 0, SEEK_END) != -1
-                        && lseek(file, -CD_PROBE_TRAILER_SIZE, SEEK_CUR) != -1)
-                        read(file, resultBuffer, CD_PROBE_TRAILER_SIZE);
-                    close(file);
-
-                    strcpy(registryKey, MISC_REGISTRY_KEY);
-                    key = NULL;
-                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, registryKey, 0, KEY_WRITE, &key) == 0) {
-                        wsprintfA(
-                            registryPath,
-                            "%c:",
-                            cdDrives[index] + 'A'
-                        );
+                close(handle);
+                if (status != -1) {
+                    sprintf(gcRegCDRomPath, "%c:", cdrom[j] + 'A');
+                    strcpy(szKey, MISC_REGISTRY_KEY);
+                    hKey = NULL;
+                    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, szKey, 0, KEY_WRITE, &hKey) == 0) {
                         RegSetValueExA(
-                            key,
+                            hKey,
                             "HMM2POL CDDrive",
                             0,
                             REG_SZ,
-                            reinterpret_cast<u8*>(registryPath),
-                            lstrlenA(registryPath) + 1
+                            reinterpret_cast<u8*>(gcRegCDRomPath),
+                            strlen(gcRegCDRomPath) + 1
                         );
-                        RegCloseKey(key);
+                        RegCloseKey(hKey);
                     }
-                    sprintf(
-                        gText,
-                        "%c:%s",
-                        cdDrives[index] + 'A',
-                        gcAnimPath
-                    );
-                    strcpy(gcAnimPath, gText);
                     return CD_ROM_READY;
                 }
             }
-            Sleep(CD_RETRY_DELAY_MILLISECONDS);
-            ++attempts;
-            if (attempts >= CD_RETRY_LIMIT)
-                return CD_ROM_EXPANSION_DISC_MISSING;
         }
+        Sleep(CD_RETRY_DELAY_MILLISECONDS);
     }
+    return CD_ROM_EXPANSION_DISC_MISSING;
 }
 
 VA(0x004bf6d0, 0x2b)
@@ -1815,38 +1785,36 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
 
 VA(0x004bfee0, 0x163)
 void FadeToColorTable(u8* colorTable, i32 increment) {
-    u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
-    i32 savedUpdateFlags = gpWindowManager->m_updateFlags;
+    u8* p;
+    i32 x;
+    i32 i;
+    i32 y;
+    u8 tempPal[MISC_PALETTE_BYTE_COUNT];
+    i8* pal;
+    i32 savedFlags;
+
+    savedFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
-    i8* paletteData = gpBufferPalette->m_data;
-    u8* output = translatedPalette;
-    i32 index = 0;
-    do {
-        i32 paletteIndex = colorTable[index] * MISC_PALETTE_COMPONENT_BYTES;
-        output += MISC_PALETTE_COMPONENT_BYTES;
-        ++index;
-        u8* sourceColor = reinterpret_cast<u8*>(paletteData) + paletteIndex;
-        output[PALETTE_RED_OUTPUT_OFFSET] = sourceColor[PALETTE_RED_INDEX];
-        output[PALETTE_GREEN_OUTPUT_OFFSET] = sourceColor[PALETTE_GREEN_INDEX];
-        output[PALETTE_BLUE_OUTPUT_OFFSET] = sourceColor[PALETTE_BLUE_INDEX];
-    } while (output < translatedPalette + sizeof(translatedPalette));
-    i32 rows = BLIT_SCREEN_HEIGHT;
-    FadeTo(reinterpret_cast<u8*>(paletteData), translatedPalette, increment);
-    i32 columns;
-    u8* pixel = gpWindowManager->m_screen->m_pixels;
-    do {
-        columns = BLIT_SCREEN_WIDTH;
-        do {
-            u8 pixelValue = *pixel;
-            *pixel = colorTable[pixelValue];
-            ++pixel;
-            --columns;
-        } while (columns != 0);
-        --rows;
-    } while (rows != 0);
+    pal = gpBufferPalette->m_data;
+    for (i = 0; i < MISC_PALETTE_BYTE_COUNT / PALETTE_COMPONENT_COUNT; ++i) {
+        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
+            pal[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
+        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
+            pal[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX];
+        tempPal[i * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX] =
+            pal[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX];
+    }
+    FadeTo(reinterpret_cast<u8*>(pal), tempPal, increment);
+    p = gpWindowManager->m_screen->m_pixels;
+    for (y = 0; y < BLIT_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < BLIT_SCREEN_WIDTH; ++x) {
+            *p = colorTable[*p];
+            ++p;
+        }
+    }
     gpWindowManager->UpdateScreen();
-    UpdatePalette(paletteData);
-    gpWindowManager->m_updateFlags = savedUpdateFlags;
+    UpdatePalette(pal);
+    gpWindowManager->m_updateFlags = savedFlags;
 }
 
 VA(0x004c0050, 0x44)

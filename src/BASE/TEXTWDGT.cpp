@@ -37,9 +37,9 @@ textWidget::textWidget(
     H2_ENUM_PARAM(FontAlignment, i16) alignment
 )
     : widget(x, y, width, height, id, kind) {
-    m_color = color;
-    m_font = (gpResourceManager->GetFont(fontName));
+    m_font = gpResourceManager->GetFont(fontName);
     m_text = text;
+    m_color = color;
     m_alignment = alignment;
     m_kind = WIDGET_KIND_TEXT;
 }
@@ -59,9 +59,9 @@ void textWidget::Read(void) {
     m_font = gpResourceManager->GetFont(resourceName);
     gpResourceManager->RestorePosition();
     m_color = static_cast<FontDrawMode>(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
-    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
+    m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & DRAW_MODE_MASK);
     m_id = gpResourceManager->ReadWord();
-    gpResourceManager->ReadWord();
+    m_kind = static_cast<WidgetKind>(gpResourceManager->ReadWord());
     m_kind = WIDGET_KIND_TEXT;
 }
 
@@ -78,62 +78,58 @@ inline textWidget::~textWidget() {
 
 VA(0x004c3240, 0x226)
 MessageDispatchResult textWidget::Main(tag_message& msg) {
-    H2_ENUM_STORAGE(WidgetFlag, i16) flags = m_flags;
-    if (!HAS(flags, WIDGET_FLAG_ENABLED)) {
+    if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (msg.type == MESSAGE_WIDGET)
             return widget::Main(msg);
         return MESSAGE_DISPATCH_CONTINUE;
     }
 
     switch (msg.type) {
+        case MESSAGE_WIDGET:
+            switch (msg.payload.widget.command) {
+                case WIDGET_COMMAND_SET_TEXT:
+                    if (msg.payload.widget.id == m_id) {
+                        SetText(msg.payload.widget.data.text);
+                        return MESSAGE_DISPATCH_CONSUME;
+                    }
+                    break;
+
+                case WIDGET_COMMAND_SET_FILL_COLOR:
+                    if (msg.payload.widget.id == m_id) {
+                        SetColorIndex(msg.payload.widget.data.value);
+                        return MESSAGE_DISPATCH_CONSUME;
+                    }
+                    break;
+            }
+            break;
+
         case MESSAGE_LEFT_BUTTON_DOWN:
         case MESSAGE_RIGHT_BUTTON_DOWN: {
-            i32 relativeX = msg.payload.mouse.x - m_owner->m_posX;
-            i32 relativeY = msg.payload.mouse.y - m_owner->m_posY;
-            if (relativeX < m_x || relativeY < m_y || relativeX >= m_x + m_width
-                || relativeY >= m_y + m_height)
-                return MESSAGE_DISPATCH_CONTINUE;
-            m_flags = flags | WIDGET_FLAG_SELECTED;
-            if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
-                msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
-            SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
-            return MESSAGE_DISPATCH_FORWARD;
+            i16 relativeX = msg.payload.mouse.x - m_owner->m_posX;
+            i16 relativeY = msg.payload.mouse.y - m_owner->m_posY;
+            if (relativeX >= m_x && relativeY >= m_y && relativeX < m_x + m_width
+                && relativeY < m_y + m_height) {
+                m_flags |= WIDGET_FLAG_SELECTED;
+                if (msg.type == MESSAGE_RIGHT_BUTTON_DOWN)
+                    msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
+                SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_SELECT, m_id);
+                return MESSAGE_DISPATCH_FORWARD;
+            }
+            return MESSAGE_DISPATCH_CONTINUE;
         }
 
         case MESSAGE_LEFT_BUTTON_UP:
         case MESSAGE_RIGHT_BUTTON_UP:
-            if (HAS(flags, WIDGET_FLAG_SELECTED)) {
-                m_flags = flags & ~WIDGET_FLAG_SELECTED;
+            if (HAS(m_flags, WIDGET_FLAG_SELECTED)) {
+                m_flags &= ~WIDGET_FLAG_SELECTED;
                 if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
                     msg.payload.widget.parameter = IDX(MESSAGE_MODIFIER_RIGHT_BUTTON);
                 SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
                 return MESSAGE_DISPATCH_FORWARD;
             }
             return MESSAGE_DISPATCH_CONTINUE;
-
-        case MESSAGE_WIDGET:
-            switch (msg.payload.widget.command) {
-                case WIDGET_COMMAND_SET_TEXT:
-                    if (m_id != msg.payload.widget.id)
-                        goto normalEvent;
-                    SetText(msg.payload.widget.data.text);
-                    return MESSAGE_DISPATCH_CONSUME;
-
-                case WIDGET_COMMAND_SET_FILL_COLOR:
-                    if (m_id != msg.payload.widget.id)
-                        goto normalEvent;
-                    SetColorIndex(static_cast<FontDrawMode>(msg.payload.widget.data.value));
-                    return MESSAGE_DISPATCH_CONSUME;
-
-                default:
-                    goto normalEvent;
-            }
-
-        default:
-            goto normalEvent;
     }
 
-normalEvent:
     return widget::Main(msg);
 }
 
@@ -141,16 +137,13 @@ normalEvent:
 
 VA(0x004c3470, 0x82)
 void textWidget::Draw(void) {
-    FontDrawMode color = FONT_DRAW_DIMMED;
-    if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
-        color = m_color;
     m_font->DrawBoundedString(
         m_text,
-        m_x + m_owner->m_posX,
-        m_y + m_owner->m_posY,
+        m_owner->m_posX + m_x,
+        m_owner->m_posY + m_y,
         m_width,
         m_height,
-        color,
+        HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_color,
         m_alignment
     );
 }
@@ -162,16 +155,16 @@ void textWidget::SetColorIndex(H2_ENUM_PARAM(FontDrawMode, i16) color) {
 
 VA(0x004c3520, 0xae)
 void textWidget::SetText(char* text) {
-    if (m_kind != WIDGET_KIND_TEXT && m_kind != WIDGET_KIND_TEXT_ENTRY) {
+    if (m_kind == WIDGET_KIND_TEXT || m_kind == WIDGET_KIND_TEXT_ENTRY) {
+        u16 newLen = strlen(text);
+        if (newLen > strlen(m_text)) {
+            H2_FREE(m_text);
+            m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
+        }
+        strcpy(m_text, text);
+    } else {
         m_text = text;
-        return;
     }
-    u16 newLen = strlen(text);
-    if (strlen(m_text) < newLen) {
-        H2_FREE(m_text);
-        m_text = static_cast<char*>(H2_ALLOC(newLen + TEXT_BUFFER_GROWTH));
-    }
-    strcpy(m_text, text);
 }
 
 

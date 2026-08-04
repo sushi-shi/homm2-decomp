@@ -32,8 +32,7 @@ H2_ENUM_CLASS_BEGIN(DropListFrame)
 H2_ENUM_CLASS_END(DropListFrame)
 
 H2_ENUM_BEGIN(DropListStorageConstant)
-    RESOURCE_NAME_CAPACITY   = 16,
-    SCROLL_METRIC_SLOT_COUNT = 2
+    RESOURCE_NAME_CAPACITY = 16
 H2_ENUM_END(DropListStorageConstant)
 
 H2_ENUM_BEGIN(DropListLayoutConstant)
@@ -86,8 +85,8 @@ dropListWidget::~dropListWidget() {
 
 VA(0x004cff40, 0x2f8)
 void dropListWidget::Read(void) {
+    IconEntry* entry;
     i8 name[RESOURCE_NAME_CAPACITY];
-    u8** entries;
 
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
@@ -110,7 +109,7 @@ void dropListWidget::Read(void) {
     m_selColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
     m_unusedColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
     m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
-    i16 id = gpResourceManager->ReadWord();
+    m_id = gpResourceManager->ReadWord();
 
     m_closedContentFrame = IDX(FRAME_CLOSED_CONTENT);
     m_dropButtonFrame = IDX(FRAME_DROP_BUTTON);
@@ -126,23 +125,20 @@ void dropListWidget::Read(void) {
     m_scrollTrackMiddleFrame = IDX(FRAME_SCROLL_TRACK_MIDDLE);
     m_scrollTrackLastFrame = IDX(FRAME_SCROLL_TRACK_LAST);
     m_scrollThumbFrame = IDX(FRAME_SCROLL_THUMB);
-    m_id = id;
-    entries = &m_icon->m_data;
-    i16 iconX = m_x;
-    i16 iconY = m_y;
-    IconEntry* topEntry = reinterpret_cast<IconEntry*>(*entries);
-    m_iconX = iconX;
-    m_iconY = iconY;
-    m_closedContentWidth = topEntry->w;
-    m_closedContentHeight = topEntry->h;
-    IconEntry* middleEntry = reinterpret_cast<IconEntry*>(*entries) + IDX(FRAME_DROP_BUTTON);
-    m_dropButtonX = iconX + m_closedContentWidth;
-    m_dropButtonY = iconY;
-    m_dropButtonWidth = middleEntry->w;
-    m_dropButtonHeight = middleEntry->h;
-    IconEntry* bottomEntry = reinterpret_cast<IconEntry*>(*entries) + IDX(FRAME_SCROLL_THUMB);
-    m_scrollThumbWidth = bottomEntry->w;
-    m_scrollThumbHeight = bottomEntry->h;
+
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_closedContentFrame;
+    m_iconX = m_x;
+    m_iconY = m_y;
+    m_closedContentWidth = entry->w;
+    m_closedContentHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_dropButtonFrame;
+    m_dropButtonX = m_iconX + m_closedContentWidth;
+    m_dropButtonY = m_y;
+    m_dropButtonWidth = entry->w;
+    m_dropButtonHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollThumbFrame;
+    m_scrollThumbWidth = entry->w;
+    m_scrollThumbHeight = entry->h;
 }
 
 VA(0x004d0240, 0x139)
@@ -173,6 +169,9 @@ void dropListWidget::DeleteItem(i32 index) {
 
 VA(0x004d0380, 0x42f)
 MessageDispatchResult dropListWidget::Main(tag_message& message) {
+    char* text;
+    char** newItems;
+
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
@@ -180,87 +179,91 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
     }
 
     switch (message.type) {
-        case MESSAGE_LEFT_BUTTON_DOWN:
-        case MESSAGE_RIGHT_BUTTON_DOWN:
-            if (HAS(m_flags, WIDGET_FLAG_DRAW)) {
-                i16 x =
-                    static_cast<i16>(message.payload.mouse.x) - static_cast<i16>(m_owner->m_posX);
-                i16 y =
-                    static_cast<i16>(message.payload.mouse.y) - static_cast<i16>(m_owner->m_posY);
-                if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                    if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
-                        message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                        message.type = MESSAGE_WIDGET;
-                        message.payload.widget.id = m_id;
-                        message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                        return MESSAGE_DISPATCH_FORWARD;
-                    }
-                    return MESSAGE_DISPATCH_CONTINUE;
-                } else {
-                    if (x >= m_dropButtonX && y >= m_dropButtonY
-                        && x < m_dropButtonX + m_dropButtonWidth
-                        && y < m_dropButtonY + m_dropButtonHeight) {
-                        ProcessSelectDialog();
-                        message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                        message.type = MESSAGE_WIDGET;
-                        message.payload.widget.id = m_id;
-                        return MESSAGE_DISPATCH_FORWARD;
-                    }
-                    return MESSAGE_DISPATCH_CONTINUE;
-                }
-            }
-            break;
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SET_SELECTION:
-                    if (m_id == message.payload.widget.id) {
-                        m_selectedIndex = static_cast<i16>(message.payload.widget.data.value);
-                        return MESSAGE_DISPATCH_CONSUME;
-                    }
-                    break;
-                case WIDGET_COMMAND_GET_SELECTION:
-                    if (m_id == message.payload.widget.id) {
-                        message.payload.widget.data.value = m_selectedIndex;
-                        return MESSAGE_DISPATCH_CONSUME;
-                    }
-                    break;
-                case WIDGET_COMMAND_APPEND_ITEM:
-                    if (m_id == message.payload.widget.id) {
-                        char* text = message.payload.widget.data.text;
-                        char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
-                        if (m_itemCount != 0)
-                            memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
-                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                        strcpy(newItems[m_itemCount], text);
-                        m_itemCount++;
-                        if (m_items != NULL)
-                            H2_FREE(m_items);
-                        m_items = newItems;
-                    }
-                    break;
-                case WIDGET_COMMAND_REPLACE_ITEM:
-                    if (m_id == message.payload.widget.id) {
-                        char* text = message.payload.widget.data.text;
-                        if (message.payload.widget.parameter < m_itemCount) {
-                            H2_FREE(m_items[message.payload.widget.parameter]);
-                            m_items[message.payload.widget.parameter] =
-                                static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                            strcpy(m_items[message.payload.widget.parameter], text);
-                        }
-                    }
-                    break;
-                case WIDGET_COMMAND_DELETE_ITEM:
-                    if (m_id == message.payload.widget.id)
-                        DeleteItem(message.payload.widget.data.value);
-                    break;
                 case WIDGET_COMMAND_CLEAR_ITEMS:
-                    if (m_id == message.payload.widget.id) {
-                        while (m_itemCount != 0)
-                            DeleteItem(0);
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    while (m_itemCount != 0)
+                        DeleteItem(0);
+                    break;
+
+                case WIDGET_COMMAND_DELETE_ITEM:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    DeleteItem(message.payload.widget.data.value);
+                    break;
+
+                case WIDGET_COMMAND_REPLACE_ITEM:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    text = message.payload.widget.data.text;
+                    if (m_itemCount > message.payload.widget.parameter) {
+                        H2_FREE(m_items[message.payload.widget.parameter]);
+                        m_items[message.payload.widget.parameter] =
+                            static_cast<char*>(H2_ALLOC(strlen(text) + 1));
+                        strcpy(m_items[message.payload.widget.parameter], text);
                     }
                     break;
+
+                case WIDGET_COMMAND_APPEND_ITEM:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    text = message.payload.widget.data.text;
+                    newItems =
+                        static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
+                    if (m_itemCount != 0)
+                        memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
+                    newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
+                    strcpy(newItems[m_itemCount], text);
+                    m_itemCount++;
+                    if (m_items != NULL)
+                        H2_FREE(m_items);
+                    m_items = newItems;
+                    break;
+
+                case WIDGET_COMMAND_SET_SELECTION:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    m_selectedIndex = message.payload.widget.data.value;
+                    return MESSAGE_DISPATCH_CONSUME;
+
+                case WIDGET_COMMAND_GET_SELECTION:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    message.payload.widget.data.value = m_selectedIndex;
+                    return MESSAGE_DISPATCH_CONSUME;
             }
             break;
+
+        case MESSAGE_LEFT_BUTTON_DOWN:
+        case MESSAGE_RIGHT_BUTTON_DOWN: {
+            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+                break;
+            i16 x = message.payload.mouse.x - m_owner->m_posX;
+            i16 y = message.payload.mouse.y - m_owner->m_posY;
+            if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+                if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                    message.payload.widget.id = m_id;
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    return MESSAGE_DISPATCH_FORWARD;
+                }
+                return MESSAGE_DISPATCH_CONTINUE;
+            } else {
+                if (x >= m_dropButtonX && y >= m_dropButtonY
+                    && x < m_dropButtonX + m_dropButtonWidth
+                    && y < m_dropButtonY + m_dropButtonHeight) {
+                    ProcessSelectDialog();
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.payload.widget.id = m_id;
+                    return MESSAGE_DISPATCH_FORWARD;
+                }
+                return MESSAGE_DISPATCH_CONTINUE;
+            }
+        }
     }
     return widget::Main(message);
 }
@@ -268,127 +271,112 @@ MessageDispatchResult dropListWidget::Main(tag_message& message) {
 VA(0x004d07b0, 0x11c)
 void dropListWidget::Draw(void) {
     m_icon->DrawToBuffer(
-        m_iconX + m_owner->m_posX,
-        m_iconY + m_owner->m_posY,
+        m_owner->m_posX + m_iconX,
+        m_owner->m_posY + m_iconY,
         m_closedContentFrame,
         ICON_DRAW_NORMAL
     );
     m_icon->DrawToBuffer(
-        m_dropButtonX + m_owner->m_posX,
-        m_dropButtonY + m_owner->m_posY,
+        m_owner->m_posX + m_dropButtonX,
+        m_owner->m_posY + m_dropButtonY,
         m_dropButtonFrame,
         ICON_DRAW_NORMAL
     );
-    if (m_itemCount > 0 && m_selectedIndex >= 0) {
-        FontDrawMode color = FONT_DRAW_DIMMED;
-        if (!HAS(m_flags, WIDGET_FLAG_DIMMED))
-            color = m_normalColor;
+    if (m_itemCount > 0 && m_selectedIndex >= 0)
         m_font->DrawBoundedString(
             m_items[m_selectedIndex],
-            m_contentX + m_owner->m_posX,
-            m_contentY + m_owner->m_posY,
+            m_owner->m_posX + m_contentX,
+            m_owner->m_posY + m_contentY,
             m_contentWidth,
             m_contentHeight,
-            color,
+            HAS(m_flags, WIDGET_FLAG_DIMMED) ? FONT_DRAW_DIMMED : m_normalColor,
             m_alignment
         );
-    }
 }
 
 VA(0x004d08d0, 0x58f)
 void dropListWidget::DrawDropStuff(void) {
     i32 y = m_owner->m_posY + m_listY;
+    i32 i;
+
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_firstRowFrame, ICON_DRAW_NORMAL);
-    FontDrawMode color = m_selectedIndex == m_topIndex ? m_selColor : m_normalColor;
     m_font->DrawBoundedString(
         m_items[m_topIndex],
         m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
         y + FIRST_ROW_TEXT_TOP_INSET,
         m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
         m_font->m_height + 1,
-        color,
+        m_topIndex == m_selectedIndex ? m_selColor : m_normalColor,
         m_alignment
     );
-    i32 i = 1;
     y += m_firstRowHeight;
-    while (i < m_visibleItemCount - 1 && m_topIndex + i < m_itemCount) {
+    for (i = 1; i < m_visibleItemCount - 1; i++) {
+        if (m_topIndex + i >= m_itemCount)
+            break;
         m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_middleRowFrame, ICON_DRAW_NORMAL);
-        i32 item = m_topIndex + i;
-        color = m_selectedIndex == item ? m_selColor : m_normalColor;
         m_font->DrawBoundedString(
-            m_items[item],
+            *(m_items + m_topIndex + i),
             m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
             y + ROW_TEXT_TOP_INSET,
             m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
-            color,
+            m_topIndex + i == m_selectedIndex ? m_selColor : m_normalColor,
             m_alignment
         );
-        i++;
         y += m_middleRowHeight;
     }
     m_icon->DrawToBuffer(m_owner->m_posX + m_listX, y, m_lastRowFrame, ICON_DRAW_NORMAL);
-    i32 item = m_topIndex + i;
-    if (item < m_itemCount) {
-        color = m_selectedIndex == item ? m_selColor : m_normalColor;
+    if (m_topIndex + i < m_itemCount)
         m_font->DrawBoundedString(
-            m_items[item],
+            *(m_items + m_topIndex + i),
             m_owner->m_posX + m_listX + TEXT_LEFT_INSET,
             y + ROW_TEXT_TOP_INSET,
             m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
             m_font->m_height + 1,
-            color,
+            m_topIndex + i == m_selectedIndex ? m_selColor : m_normalColor,
             m_alignment
         );
-    }
     if (m_scrollRange > 0) {
-        i32 frame;
-        if (m_scrollUpPressed != 0)
-            frame = m_scrollUpPressedFrame;
-        else
-            frame = m_scrollUpFrame;
-        m_icon
-            ->DrawToBuffer(m_owner->m_posX + m_scrollUpX, m_owner->m_posY + m_scrollUpY, frame, ICON_DRAW_NORMAL);
+        m_icon->DrawToBuffer(
+            m_owner->m_posX + m_scrollUpX,
+            m_owner->m_posY + m_scrollUpY,
+            m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame,
+            ICON_DRAW_NORMAL
+        );
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_scrollTrackX,
             m_owner->m_posY + m_scrollTrackY,
             m_scrollTrackFirstFrame,
             ICON_DRAW_NORMAL
         );
-        i = SCROLL_TRACK_EDGE_ROW_COUNT;
-        while (i < m_visibleItemCount - SCROLL_TRACK_EDGE_ROW_COUNT) {
+        for (i = SCROLL_TRACK_EDGE_ROW_COUNT;
+             i < m_visibleItemCount - SCROLL_TRACK_EDGE_ROW_COUNT;
+             i++)
             m_icon->DrawToBuffer(
                 m_owner->m_posX + m_scrollTrackX,
                 m_owner->m_posY + m_scrollTrackY + m_middleRowHeight * (i - 1),
                 m_scrollTrackMiddleFrame,
                 ICON_DRAW_NORMAL
             );
-            i++;
-        }
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_scrollTrackX,
             m_owner->m_posY + m_scrollTrackY + m_middleRowHeight * (i - 1),
             m_scrollTrackLastFrame,
             ICON_DRAW_NORMAL
         );
-        if (m_scrollDownPressed != 0)
-            frame = m_scrollDownPressedFrame;
-        else
-            frame = m_scrollDownFrame;
         m_icon->DrawToBuffer(
             m_owner->m_posX + m_scrollDownX,
             m_owner->m_posY + m_scrollDownY,
-            frame,
+            m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame,
             ICON_DRAW_NORMAL
         );
-        m_scrollThumbX =
-            static_cast<i16>(m_owner->m_posX) + m_scrollTrackX + SCROLL_THUMB_X_INSET;
-        m_scrollThumbY = static_cast<i16>(m_owner->m_posY)
-                         + (m_scrollThumbTravel * m_topIndex) / m_scrollRange + m_scrollTrackY
+        m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
+        m_scrollThumbY = m_owner->m_posY + m_scrollTrackY
+                         + m_scrollThumbTravel * m_topIndex / m_scrollRange
                          + SCROLL_THUMB_Y_INSET;
         m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     }
-    gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_savedBackgroundHeight + m_height);
+    gpWindowManager->UpdateScreenRegion(m_x, m_y, m_width, m_height + m_savedBackgroundHeight);
 }
 
 VA(0x004d0e60, 0xa6)
@@ -407,89 +395,72 @@ void dropListWidget::RestoreDropBackground(void) {
         m_savedBackgroundWidth,
         m_savedBackgroundHeight
     );
-    if (m_savedBackground != NULL)
-        delete m_savedBackground;
+    delete m_savedBackground;
     m_savedBackground = NULL;
 }
 
-VA(0x004d0fb0, 0xc62)
+VA(0x004d0fb0, 0xcb2)
 void dropListWidget::ProcessSelectDialog(void) {
-    i16 scrollWidth[SCROLL_METRIC_SLOT_COUNT];
-    i16 scrollTopHeight[SCROLL_METRIC_SLOT_COUNT];
-    i16 scrollBottomWidth[SCROLL_METRIC_SLOT_COUNT];
-    i16 scrollBottomHeight;
+    i32 offset;
+    i32 x;
     tag_message message;
+    i32 itemIndex;
+    IconEntry* entry;
+    i32 y;
     i32 firstRelease = 1;
-    i32 ownerX;
-    i32 ownerY;
+
     m_scrollUpPressed = 0;
     m_scrollDownPressed = 0;
     m_itemSelectionTracking = 0;
     m_scrollThumbDragging = 0;
     m_topIndex = 0;
     m_scrollRange = 0;
-
-    i16 numItems = m_itemCount;
-    if (numItems > m_maxVisibleItems) {
-        m_scrollRange = numItems - m_maxVisibleItems;
+    if (m_itemCount > m_maxVisibleItems) {
+        m_scrollRange = m_itemCount - m_maxVisibleItems;
         m_topIndex = m_selectedIndex;
-        if (m_selectedIndex < 0)
+        if (m_topIndex < 0)
             m_topIndex = 0;
-        if (m_scrollRange < m_topIndex)
+        if (m_topIndex > m_scrollRange)
             m_topIndex = m_scrollRange;
     }
-    if (m_scrollRange > 0) {
-        m_visibleItemCount = m_maxVisibleItems;
-    } else {
-        if (numItems <= MIN_VISIBLE_ITEM_COUNT)
-            numItems = MIN_VISIBLE_ITEM_COUNT;
-        m_visibleItemCount = numItems;
-    }
-
-    m_firstRowHeight = m_icon->Entries()[m_firstRowFrame].h;
-    m_middleRowHeight = m_icon->Entries()[m_middleRowFrame].h;
-    m_lastRowHeight = m_icon->Entries()[m_lastRowFrame].h;
+    m_visibleItemCount = m_scrollRange > 0 ? m_maxVisibleItems
+                                           : (m_itemCount > MIN_VISIBLE_ITEM_COUNT
+                                                  ? m_itemCount
+                                                  : MIN_VISIBLE_ITEM_COUNT);
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
+    m_firstRowHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_middleRowFrame;
+    m_middleRowHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_lastRowFrame;
+    m_lastRowHeight = entry->h;
     m_listX = m_iconX;
     m_listY = m_iconY + m_closedContentHeight;
-    m_listWidth = m_icon->Entries()[m_firstRowFrame].w;
-    m_listHeight =
-        (m_visibleItemCount - LIST_EDGE_ROW_COUNT) * m_middleRowHeight + m_firstRowHeight
-        + m_lastRowHeight;
-    IconEntry* iconEntry = &m_icon->Entries()[m_scrollUpFrame];
-    scrollWidth[0] = iconEntry->w;
-    m_scrollUpWidth = scrollWidth[0];
-    scrollTopHeight[0] = iconEntry->h;
-    m_scrollUpHeight = scrollTopHeight[0];
-    iconEntry = &m_icon->Entries()[m_scrollDownFrame];
-    scrollBottomWidth[0] = iconEntry->w;
-    m_scrollDownWidth = scrollBottomWidth[0];
-    scrollBottomHeight = iconEntry->h;
-    m_scrollDownHeight = scrollBottomHeight;
-    m_savedBackgroundX = m_iconX;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
+    m_listWidth = entry->w;
+    m_listHeight = (m_visibleItemCount - LIST_EDGE_ROW_COUNT) * m_middleRowHeight
+                   + m_firstRowHeight + m_lastRowHeight;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollUpFrame;
+    m_scrollUpWidth = entry->w;
+    m_scrollUpHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollDownFrame;
+    m_scrollDownWidth = entry->w;
+    m_scrollDownHeight = entry->h;
+    m_savedBackgroundX = m_listX;
     m_savedBackgroundY = m_listY;
-    if (m_scrollRange > 0) {
-        m_savedBackgroundWidth = scrollWidth[0] + m_listWidth;
-    } else {
-        m_savedBackgroundWidth = m_listWidth;
-    }
+    m_savedBackgroundWidth = m_scrollRange > 0 ? m_listWidth + m_scrollUpWidth : m_listWidth;
     m_savedBackgroundHeight = m_listHeight;
-
     if (m_scrollRange > 0) {
-        i16 scrollX = m_x + m_width - scrollWidth[0];
-        m_scrollUpX = scrollX;
-        m_scrollUpY = m_listY;
-        m_scrollDownX = scrollX;
-        i16 bottomY = m_listY - scrollBottomHeight + m_listHeight;
-        m_scrollDownY = bottomY;
-        m_scrollTrackX = scrollX;
-        i16 topY = m_listY + scrollTopHeight[0];
-        m_scrollTrackY = topY;
-        m_scrollTrackWidth = scrollBottomWidth[0];
-        bottomY -= topY;
-        m_scrollTrackHeight = bottomY;
-        m_scrollThumbTravel = bottomY - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
+        m_scrollUpX = m_x + m_width - 1 - (m_scrollUpWidth - 1);
+        m_scrollUpY = m_savedBackgroundY;
+        m_scrollDownX = m_scrollUpX;
+        m_scrollDownY = m_savedBackgroundY + m_savedBackgroundHeight - 1 - m_scrollDownHeight + 1;
+        m_scrollTrackX = m_scrollUpX;
+        m_scrollTrackY = m_scrollUpY + m_scrollUpHeight;
+        m_scrollTrackWidth = m_scrollDownWidth;
+        m_scrollTrackHeight = m_scrollDownY - m_scrollTrackY;
+        m_scrollThumbTravel =
+            m_scrollTrackHeight - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
     }
-
     m_icon->DrawToBuffer(
         m_owner->m_posX + m_dropButtonX,
         m_owner->m_posY + m_dropButtonY,
@@ -503,157 +474,63 @@ void dropListWidget::ProcessSelectDialog(void) {
         m_dropButtonHeight
     );
     SaveDropBackground();
-
     DrawDropStuff();
-    for (;;) {
+    while (1) {
         PollSound();
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
         gpMouseManager->Main(message);
-        ownerX = m_owner->m_posX;
-        ownerY = m_owner->m_posY;
-        i32 mouseX = message.payload.mouse.screenX - ownerX;
-        i32 mouseY = message.payload.mouse.screenY - ownerY;
-
+        x = message.payload.mouse.screenX - m_owner->m_posX;
+        y = message.payload.mouse.screenY - m_owner->m_posY;
         switch (message.type) {
-            case MESSAGE_KEY_DOWN:
-                switch (message.payload.keyboard.keyCode) {
-                    case INPUT_SCAN_NUMPAD_7:
-                        m_topIndex = 0;
-                        m_selectedIndex = 0;
-                        DrawDropStuff();
-                        continue;
-                    case INPUT_SCAN_NUMPAD_8:
-                        if (m_selectedIndex > 0) {
-                            m_selectedIndex--;
-                        }
-                        if (m_selectedIndex > 0 && m_selectedIndex < m_topIndex)
-                            m_topIndex = m_selectedIndex;
-                        DrawDropStuff();
-                        continue;
-                    case INPUT_SCAN_NUMPAD_9:
-                        m_topIndex = m_topIndex - m_maxVisibleItems + 1;
-                        if (m_topIndex < 0)
-                            m_topIndex = 0;
-                        m_selectedIndex = m_selectedIndex - m_maxVisibleItems + 1;
-                        if (m_selectedIndex < 0)
-                            m_selectedIndex = 0;
-                        DrawDropStuff();
-                        continue;
-                    case INPUT_SCAN_NUMPAD_1:
-                        m_topIndex = m_scrollRange;
-                        m_selectedIndex = m_itemCount - 1;
-                        DrawDropStuff();
-                        continue;
-                    case INPUT_SCAN_NUMPAD_2:
-                        if (m_selectedIndex < m_itemCount - 1)
-                            m_selectedIndex++;
-                        if (m_topIndex + m_maxVisibleItems - 1 < m_selectedIndex)
-                            m_topIndex = m_selectedIndex - m_maxVisibleItems + 1;
-                        DrawDropStuff();
-                        continue;
-                    case INPUT_SCAN_NUMPAD_3:
-                        m_topIndex = m_topIndex - 1 + m_maxVisibleItems;
-                        if (m_scrollRange < m_topIndex)
-                            m_topIndex = m_scrollRange;
-                        m_selectedIndex = m_selectedIndex - 1 + m_maxVisibleItems;
-                        if (m_itemCount - 1 < m_selectedIndex)
-                            m_selectedIndex = m_itemCount - 1;
-                        DrawDropStuff();
-                        continue;
-                }
-                break;
-
-            case MESSAGE_MOUSE_MOVE:
-                if (m_itemSelectionTracking != 0) {
-                    i32 item;
-                    if (m_firstRowHeight < mouseY - m_listY)
-                        item = (mouseY - m_listY - m_firstRowHeight) / m_middleRowHeight + 1;
-                    else
-                        item = 0;
-                    if (item < 0)
-                        item = 0;
-                    if (item >= m_visibleItemCount)
-                        item = m_visibleItemCount - 1;
-                    i32 selected = m_topIndex + item;
-                    if (selected < m_itemCount && m_selectedIndex != selected) {
-                        m_selectedIndex = static_cast<i16>(item) + m_topIndex;
-                        DrawDropStuff();
-                        continue;
-                    }
-                } else if (m_scrollThumbDragging != 0) {
-                    i32 scrollRange = m_scrollRange;
-                    i32 top = ((mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
-                                - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
-                               * (scrollRange + 1))
-                              / m_scrollThumbTravel;
-                    if (top < 0)
-                        top = 0;
-                    if (top > scrollRange)
-                        top = scrollRange;
-                    if (m_topIndex != top) {
-                        m_topIndex = static_cast<i16>(top);
-                        DrawDropStuff();
-                        continue;
-                    }
-                }
-                break;
-
             case MESSAGE_LEFT_BUTTON_DOWN:
-                if (mouseX < m_savedBackgroundX || mouseY < m_savedBackgroundY
-                    || mouseX >= m_savedBackgroundX + m_savedBackgroundWidth
-                    || mouseY >= m_savedBackgroundY + m_savedBackgroundHeight)
-                    goto done;
-                if (mouseX >= m_listX && mouseY >= m_listY && mouseX < m_listX + m_listWidth
-                    && mouseY < m_listY + m_listHeight) {
-                    i32 item;
-                    if (m_firstRowHeight < mouseY - m_listY)
-                        item = m_topIndex + 1
-                               + (mouseY - m_listY - m_firstRowHeight) / m_middleRowHeight;
+                if (x < m_savedBackgroundX || y < m_savedBackgroundY
+                    || x >= m_savedBackgroundX + m_savedBackgroundWidth
+                    || y >= m_savedBackgroundY + m_savedBackgroundHeight)
+                    goto closeList;
+                if (x >= m_listX && y >= m_listY && x < m_listX + m_listWidth
+                    && y < m_listY + m_listHeight) {
+                    offset = y - m_listY;
+                    if (offset > m_firstRowHeight)
+                        itemIndex =
+                            m_topIndex + (offset - m_firstRowHeight) / m_middleRowHeight + 1;
                     else
-                        item = m_topIndex;
+                        itemIndex = m_topIndex;
                     m_itemSelectionTracking = 1;
-                    if (item < m_itemCount && m_selectedIndex != item) {
-                        m_selectedIndex = static_cast<i16>(item);
+                    if (itemIndex < m_itemCount && m_selectedIndex != itemIndex) {
+                        m_selectedIndex = itemIndex;
                         DrawDropStuff();
-                        continue;
                     }
                 } else {
-                    if (mouseY < m_scrollUpY + m_scrollUpHeight) {
+                    if (y < m_scrollUpY + m_scrollUpHeight) {
                         if (m_topIndex > 0)
                             m_topIndex--;
                         m_scrollUpPressed = 1;
-                    } else if (mouseY >= m_scrollDownY) {
+                    } else if (y >= m_scrollDownY) {
                         if (m_topIndex < m_scrollRange)
                             m_topIndex++;
                         m_scrollDownPressed = 1;
                     } else {
-                        if (mouseY >= m_scrollThumbY
-                            && mouseY < m_scrollThumbY + m_scrollThumbHeight)
+                        if (y >= m_scrollThumbY && y < m_scrollThumbY + m_scrollThumbHeight)
                             m_scrollThumbDragging = 1;
-                        i16 scrollRange = m_scrollRange;
-                        m_topIndex = static_cast<i16>(
-                            ((mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
-                              - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
-                             * (scrollRange + 1))
-                            / m_scrollThumbTravel
-                        );
+                        m_topIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
+                                      - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                                     * (m_scrollRange + 1) / m_scrollThumbTravel;
                         if (m_topIndex < 0)
                             m_topIndex = 0;
-                        if (scrollRange < m_topIndex)
-                            m_topIndex = scrollRange;
+                        if (m_topIndex > m_scrollRange)
+                            m_topIndex = m_scrollRange;
                     }
                     DrawDropStuff();
-                    continue;
                 }
                 break;
 
             case MESSAGE_LEFT_BUTTON_UP:
-                if (firstRelease) {
+                if (firstRelease != 0) {
                     firstRelease = 0;
                     m_icon->DrawToBuffer(
-                        m_dropButtonX + ownerX,
-                        m_dropButtonY + ownerY,
+                        m_owner->m_posX + m_dropButtonX,
+                        m_owner->m_posY + m_dropButtonY,
                         m_dropButtonFrame,
                         ICON_DRAW_NORMAL
                     );
@@ -664,24 +541,110 @@ void dropListWidget::ProcessSelectDialog(void) {
                         m_dropButtonHeight
                     );
                 } else {
-                    if (m_itemSelectionTracking != 0)
-                        goto done;
-                    if (m_scrollUpPressed != 0 || m_scrollDownPressed != 0
-                        || m_scrollThumbDragging != 0) {
+                    if (m_itemSelectionTracking)
+                        goto closeList;
+                    if (m_scrollUpPressed || m_scrollDownPressed || m_scrollThumbDragging) {
                         m_scrollThumbDragging = 0;
                         m_scrollDownPressed = 0;
                         m_scrollUpPressed = 0;
                         DrawDropStuff();
-                        continue;
                     }
+                }
+                break;
+
+            case MESSAGE_MOUSE_MOVE:
+                if (m_itemSelectionTracking) {
+                    offset = y - m_listY;
+                    if (offset > m_firstRowHeight)
+                        itemIndex = (offset - m_firstRowHeight) / m_middleRowHeight + 1;
+                    else
+                        itemIndex = 0;
+                    if (itemIndex < 0)
+                        itemIndex = 0;
+                    if (itemIndex >= m_visibleItemCount)
+                        itemIndex = m_visibleItemCount - 1;
+                    if (m_topIndex + itemIndex < m_itemCount
+                        && m_topIndex + itemIndex != m_selectedIndex) {
+                        m_selectedIndex = m_topIndex + itemIndex;
+                        DrawDropStuff();
+                    }
+                } else if (m_scrollThumbDragging) {
+                    itemIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
+                                 - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                                * (m_scrollRange + 1) / m_scrollThumbTravel;
+                    if (itemIndex < 0)
+                        itemIndex = 0;
+                    if (itemIndex > m_scrollRange)
+                        itemIndex = m_scrollRange;
+                    if (m_topIndex != itemIndex) {
+                        m_topIndex = itemIndex;
+                        DrawDropStuff();
+                    }
+                }
+                break;
+
+            case MESSAGE_KEY_DOWN:
+                switch (message.payload.keyboard.keyCode) {
+                    case INPUT_SCAN_NUMPAD_8:
+                        if (m_selectedIndex > 0)
+                            m_selectedIndex--;
+                        if (m_selectedIndex > 0 && m_selectedIndex < m_topIndex)
+                            m_topIndex = m_selectedIndex;
+                        DrawDropStuff();
+                        break;
+
+                    case INPUT_SCAN_NUMPAD_2:
+                        if (m_selectedIndex < m_itemCount - 1)
+                            m_selectedIndex++;
+                        if (m_selectedIndex > m_topIndex + m_maxVisibleItems - 1)
+                            m_topIndex = m_selectedIndex - (m_maxVisibleItems - 1);
+                        DrawDropStuff();
+                        break;
+
+                    case INPUT_SCAN_NUMPAD_9:
+                        m_topIndex -= m_maxVisibleItems - 1;
+                        if (m_topIndex < 0)
+                            m_topIndex = 0;
+                        m_selectedIndex -= m_maxVisibleItems - 1;
+                        if (m_selectedIndex < 0)
+                            m_selectedIndex = 0;
+                        DrawDropStuff();
+                        break;
+
+                    case INPUT_SCAN_NUMPAD_3:
+                        m_topIndex += m_maxVisibleItems - 1;
+                        if (m_topIndex > m_scrollRange)
+                            m_topIndex = m_scrollRange;
+                        m_selectedIndex += m_maxVisibleItems - 1;
+                        if (m_selectedIndex > m_itemCount - 1)
+                            m_selectedIndex = m_itemCount - 1;
+                        DrawDropStuff();
+                        break;
+
+                    case INPUT_SCAN_NUMPAD_7:
+                        m_topIndex = 0;
+                        m_selectedIndex = 0;
+                        DrawDropStuff();
+                        break;
+
+                    case INPUT_SCAN_NUMPAD_1:
+                        m_topIndex = m_scrollRange;
+                        m_selectedIndex = m_itemCount - 1;
+                        DrawDropStuff();
+                        break;
                 }
                 break;
         }
     }
 
-done:
+closeList:
     RestoreDropBackground();
     Draw();
-    gpWindowManager
-        ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+    gpWindowManager->UpdateScreenRegion(
+        m_owner->m_posX + m_x,
+        m_owner->m_posY + m_y,
+        m_width,
+        m_height
+    );
 }
+
