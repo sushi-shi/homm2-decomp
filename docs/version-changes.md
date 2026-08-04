@@ -583,6 +583,44 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   calls `TranslatePolishInputCharacter`. The reconstruction's `return` in
   every case skipped it.
 
+### SOURCE/SPELLS + SOURCE/CMBTMGR (combat spells and the combat manager)
+
+- **[unclassified] `CombatSpecialHandler` (0x98bc1) does not call
+  `heroWindowManager::ConvertToHover`.** The spell-book hover handler goes
+  straight from `message.type == SPELL_MESSAGE_HOVER` to the
+  `m_lastHoverId` compare; PoL's body converts the message first. Pinned by
+  the two ours-only instructions (`push message; mov ecx,[gpWindowManager];
+  call ConvertToHover`) that the retail span has no room for.
+- **[unclassified] `combatManager::KeepAttack` (0x29990) has no trailing
+  `LogStr("KA2")`.** The opening `LogStr("KA1")` is present; the retail body
+  ends `WaitEndSample(&sample,-1); mov esp,ebp; pop ebp; ret 4`. The sibling
+  `CatAttack` keeps both `"CA1"` and `"CA2"`.
+- **[unclassified] `combatManager::ShowSpellMessage` (0xa162e) always uses
+  `gArmyNamesPlural`.** There is no `m_quantity > 1` selection: the body is
+  `if (target != NULL) sprintf(targetName, gArmyNamesPlural[type]);`. The
+  singular/plural choice IS present in the two sibling messages
+  (`KeepAttack`, `CastSpell`), so this is a behaviour difference, not a
+  reconstruction shortcut.
+- **[unclassified] `combatManager::CastSpell` (0x99653) guards the
+  `SPELL_MAGIC_ARROW` case body with a literal-true condition.** Retail emits
+  `mov eax,1; test eax,eax; je <case end>` before the case body, i.e. a build
+  switch the shipping tree left permanently on. See
+  `docs/patterns/constant-true-case-guard.md`.
+- **[unclassified] `combatManager::ChainLightning` (0x9df96) passes both bolt
+  angle limits as `firstBolt ? A : A` ternaries whose arms are equal.** The
+  two `DoBolt` angle arguments are computed with `neg/sbb/and $0/add K` from
+  the `firstBolt` flag; the intended first-bolt/branch-bolt split exists in
+  the source and was neutralised by giving both arms the same value. See
+  `docs/patterns/identical-arm-ternary.md`.
+- **[unclassified] `combatManager::MirrorImage` (0x9f7c0) skips six
+  (facing, direction, sourcePart, distance) combinations.** Between computing
+  `searchDirection` and walking the ray, retail runs six four-term guards that
+  `continue` the direction loop for
+  (RIGHT, EAST, 0, 1), (RIGHT, WEST, 0, 1), (RIGHT, WEST, 1, <=2),
+  (LEFT, WEST, 0, 1), (LEFT, EAST, 0, 1) and (LEFT, EAST, 1, <=2) - the hex
+  cells a wide creature's own body would occupy. 62 instructions the
+  reconstruction was missing outright.
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC

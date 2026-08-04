@@ -108,6 +108,8 @@ H2_ENUM_BEGIN(SpellCastConstant)
     CHAIN_LIGHTNING_END_WIDTH                      = 2,
     CHAIN_LIGHTNING_MIN_ANGLE                      = 10,
     CHAIN_LIGHTNING_MAX_ANGLE                      = 80,
+    CHAIN_LIGHTNING_FIRST_MIN_ANGLE                = 10,
+    CHAIN_LIGHTNING_FIRST_MAX_ANGLE                = 80,
     SPELL_MODIFIER_ROW_COUNT                       = 480,
     VAPORIZE_STRIPE_WIDTH                          = 5,
     VAPORIZE_PHASE_COUNT                           = 3,
