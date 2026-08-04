@@ -739,6 +739,54 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   message still uses the singular table). The retail dispatch table is 16
   entries (`cmp ...,0xf; ja`), the reconstruction's was 14.
 
+- **[unclassified] `advManager::LoadRemote` (0x412c7a) ends with two one-shot
+  warning dialogs the reconstruction did not have.** After
+  `gSoundBackendsReady = 1;` retail adds
+  `if ((i8)gpGame->m_cheated) { static i32 once = 0; if (!once) { once = 1;
+  sprintf(gText, "\xc8\xf1\xef\xee\xeb\xfc\xe7\xf3\xfe\xf2\xf1\xff \xf7\xe8\xf2-\xea\xee\xe4\xfb!\n");
+  NormalDialog(gText, NORMAL_DIALOG_INFO, ...); } }` and the same shape for
+  `giDebugLevel > 0` with `"Someone has their debug level set!\n"`. The two
+  guard flags are the unnamed .data cells 0x123ffc and 0x124000 (function
+  statics: no mangled name, so the delinker calls them `const_...`). Byte-exact.
+- **[unclassified] `advManager::Main` (0x4027cf) drops two things the
+  reconstruction carried.** The `WM_TIMER`-style forced-music guard is
+  `if (gConfig.musicVolume != CONFIG_VOLUME_MUTED && giForceSwitchMusic > 0
+  && KBTickCount() - giForceSwitchMusic > FORCED_MUSIC_DELAY)` — there is no
+  `!gbNoSound` term — and the F9 resource cheat is one compound assignment
+  `gpCurPlayer->m_resources[c] += (c == IDX(RES_GOLD) ? CHEAT_GOLD_AMOUNT
+  : CHEAT_RESOURCE_AMOUNT);` (a `neg`/`sbb` select), not an `if`/`else` pair.
+  `giCheatSeq` accumulates as
+  `giCheatSeq * CHEAT_SEQUENCE_RADIX % CHEAT_SEQUENCE_MODULUS + c`.
+- **[unclassified] `advManager::ProcessDeSelect` (0x404308) has no
+  `gbLowMemory` handling in its `PANEL_OVERVIEW` arm.** All three
+  `if (gbLowMemory) SetEnvironmentOrigin(...)` calls the reconstruction had
+  (before `TrimLoopingSounds`, inside the hero-return arm, and as the trailing
+  `else if`) are absent; the arm is just
+  `TrimLoopingSounds(0); gpGame->Overview();` then the two return-action arms.
+- **[unclassified] `Process1WindowsMessage` (SOURCE/kbwin, 0x4718f9) services
+  sound unconditionally.** Retail has no `if (gbNoSound == 0)` around
+  `gpSoundManager->ServiceSound()`.
+- **[unclassified] `AppWndProc` (SOURCE/kbwin, 0x471248) `WM_TIMER` does not
+  call `UpdateTimers`.** The arm is
+  `lTemp = KBTickCount(); if (lTemp > lLastGTimerTickCount + 5)
+  lLastGTimerTickCount = lTemp; return 0;` — the `UpdateTimers(0)` call the
+  reconstruction had is not in the image.
+- **[unclassified] `advManager::QuickInfo` (0x409363) carries several arms the
+  reconstruction lacked.** The terrain arm prints
+  `"%s\n%s"` with a can-dig/cannot-dig annotation chosen from the cell's
+  object/overlay/ground state; the barrier and traveller-tent arm is guarded by
+  `HAS(m_triggerType, MAP_TRIGGER_ACTION_FLAG)` and falls back to the terrain
+  name; the mine arms print only `"%s"` (no `" Mine"` suffix); the resource arm
+  indexes `gResourceNames[m_objectIndex / 2]` with no `& ~1` mask; and the
+  saved-text buffer is 800 bytes, not 200.
+- **[Buka] User-facing text in `advManager::QuickInfo`, `ProcessSelect`,
+  `LoadRemote` and `Main` is CP1251 Russian**, not the English of the
+  reconstruction: "Border"/"Uncharted Territory"/"Artifact"/"Unknown"/"Reefs",
+  the two "(already/not visited)" strings, the `"\n\nguarded by %s %s"` guard
+  suffix, the world-map and status-window quick-help texts, and the
+  restart/load confirmation prompts. All verified by content hash against the
+  image (`sha256(bytes + NUL)` = the delinker's `$anon_str_<hash>` name).
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
