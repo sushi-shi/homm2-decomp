@@ -693,6 +693,37 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `if (unit->m_monster.shots > 0 && GetAttackMask(...) == ATTACK_MASK_SURROUNDED)`.
   A shooter, not a fast unit, is what makes the enemy hex reachable without a
   path.
+- **[unclassified] `CastleHandler`'s quick-view test reads the RIGHT MOUSE
+  BUTTON, not left shift.** Retail masks `0x200`
+  (`MESSAGE_MODIFIER_RIGHT_BUTTON`) where the PoL 2.0 reconstruction masks
+  `0x2` (`MESSAGE_MODIFIER_LEFT_SHIFT`): `andl $0x200, %ecx` at the
+  `WIDGET_COMMAND_SELECT` arm of `CastleHandler` (0x25230). The whole
+  castle-screen "quick info" path is therefore a right-click in this build.
+- **[unclassified] `PlaySmacker` no longer runs the video speed test.** In the
+  `gConfig.slowVideo == VIDEO_SPEED_TEST` branch retail clears the flag, calls
+  `WritePrefs()`, stores `0` into one dword global and goes straight to the
+  `smksum` threshold test: the PoL sequence `bSmackNum = SMACK_EARTH;
+  bTesting = 1; SmackManagerMain(); bTesting = 0;` is gone, so `smksum` is
+  whatever the previous playback left behind. The threshold test also lost its
+  `|| gbLowMemory` term (retail's chain is two `||` terms, ours was three).
+- **[unclassified] `searchArray::SeedPosition` keeps a second, dead
+  `FindAdjacentMonster` call.** After the guard
+  `if (!findAdjacentMonster || s_currentNode.rvFlag1) goto point_complete;`
+  retail tests `s_currentNode.rvFlag1` again and, in the (unreachable) true
+  arm, calls `FindAdjacentMonster(x, y, &ax, &ay,
+  s_currentNode.adjacentMonsterX, s_currentNode.adjacentMonsterY)` and jumps to
+  `point_complete` when it succeeds; the false arm is the `-1, -1` call the PoL
+  reconstruction has. 33 instructions of retail code with no reachable effect.
+- **[unclassified] `searchArray::SeedPosition` reads the object tileset
+  bitfield.** `(m_objTypeBits & 0xfc) != 0xbc` in the PoL reconstruction is
+  `m_objectTileset != TILESET_DUMMY` here (`shrb $2 / andb $0x3f / cmp 0x2f`),
+  matching `TestPossibleDirections`. `SEARCH_OBJECT_TYPE_MASK` and
+  `SEARCH_BLOCKING_OBJECT_TYPE` lose their last users.
+- **[unclassified] Thieves' guild personality widget geometry.** The
+  personality `textWidget` in `townManager::SetupThievesGuild` is 28 pixels
+  high at y=393 (`pushl $0x1c` / `pushl $0x189`); the PoL reconstruction used
+  16 at y=397. The 397 constant survives in the same function as the value of a
+  dead `i16` local, so the widget geometry, not the constant, moved.
 
 ### SOURCE/REQUEST (file requester) + SOURCE/DRAWING (combat drawing)
 

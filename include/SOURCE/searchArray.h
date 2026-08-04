@@ -28,9 +28,7 @@ H2_ENUM_BEGIN(SearchConstant)
     SEARCH_INVALID_COORDINATE         = -1,
     SEARCH_NO_OBJECT                  = 0xFF,
     SEARCH_DIRECTION_EDGE_OBJECT_MASK = 0x83,
-    SEARCH_DIRECTION_OBJECT_MASK      = 0x38,
-    SEARCH_OBJECT_TYPE_MASK           = 0xfc,
-    SEARCH_BLOCKING_OBJECT_TYPE       = 0xbc
+    SEARCH_DIRECTION_OBJECT_MASK      = 0x38
 H2_ENUM_END(SearchConstant)
 
 #pragma pack(push, 1)
@@ -112,6 +110,9 @@ public:
     searchStorage m_storage;
     searchNode* GetRow(i32 y, i32 width) {
         return m_storage.nodes + y * width;
+    }
+    searchNode* GetColumn(i32 x) {
+        return m_storage.nodes + x;
     }
     searchNode& GetNode(i32 x, i32 y) {
         return *(m_storage.nodes + x + MAP_WIDTH * y);

@@ -71,6 +71,26 @@ H2_ENUM_BEGIN(Cp1251Constant)
     CP1251_SMALL_YA   = 0xff
 H2_ENUM_END(Cp1251Constant)
 
+namespace {
+
+    // The localised build folds the leading letter of a creature name through
+    // the CP1251 alphabet, not through a bare -32 on the Latin range.
+    inline char ToUpperCp1251(u8 letter) {
+        char capital;
+
+        if (letter >= 'a' && letter <= 'z')
+            capital = letter - ('a' - 'A');
+        else if (letter >= CP1251_SMALL_A && letter <= CP1251_SMALL_YA)
+            capital = letter - (CP1251_SMALL_A - CP1251_CAPITAL_A);
+        else if (letter == CP1251_SMALL_YO)
+            capital = CP1251_CAPITAL_YO;
+        else
+            capital = letter;
+        return capital;
+    }
+
+} // namespace
+
 H2_ENUM_BEGIN(GameSaveFormatConstant)
     SAVE_PATH_CAPACITY                 = 452,
     SAVE_LEGACY_SCRATCH_SIZE           = 100,
@@ -3667,21 +3687,17 @@ void game::ViewArmy(
     gpResourceManager->Dispose(monsterIcon5);
 
     strcpy(reinterpret_cast<char*>(armyName0), gArmyNames[IDX(monsterType)]);
-    if (armyName0[0] >= 'a' && armyName0[0] <= 'z')
-        armyName0[0] = armyName0[0] - ('a' - 'A');
-    else if (armyName0[0] >= CP1251_SMALL_A && armyName0[0] <= CP1251_SMALL_YA)
-        armyName0[0] = armyName0[0] - (CP1251_SMALL_A - CP1251_CAPITAL_A);
-    else if (armyName0[0] == CP1251_SMALL_YO)
-        armyName0[0] = CP1251_CAPITAL_YO;
-    else
-        armyName0[0] = armyName0[0];
+    armyName0[0] = ToUpperCp1251(armyName0[0]);
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = VIEW_ARMY_TITLE_WIDGET_ID;
     message.payload.widget.data.text = reinterpret_cast<char*>(armyName0);
     m_viewArmyWindow->BroadcastMessage(message);
 
     details0 = static_cast<char*>(H2_ALLOC(VIEW_ARMY_DETAIL_BUFFER_SIZE));
-    morale = theGroup ? theGroup->GetMorale(theHero, castle, NULL) : 0;
+    if (theGroup)
+        morale = theGroup->GetMorale(theHero, castle, NULL);
+    else
+        morale = 0;
     if (HAS(monster->flags.all, MONSTER_FLAGS_NO_MORALE))
         morale = 0;
 
@@ -3814,41 +3830,42 @@ void game::ViewArmy(
     }
 
     if (theArmy) {
-        i32 spellY3 = VIEW_ARMY_SPELL_BASE_Y;
-        i32 spellCenterX8 = VIEW_ARMY_SPELL_CENTER_X;
+        iconWidget* spellWidget0;
+        i32 spellY10 = VIEW_ARMY_SPELL_BASE_Y;
+        i32 spellCenterX27 = VIEW_ARMY_SPELL_CENTER_X;
         if (quickView)
-            spellY3 += VIEW_ARMY_QUICK_SPELL_Y_OFFSET;
-        i32 spacing0 = VIEW_ARMY_SPELL_SPACING_BASE - theArmy->m_spellCount;
-        i32 spellX3 =
-            spellCenterX8 + (VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount)
-            - (theArmy->m_spellCount * spacing0) / VIEW_ARMY_ICON_CENTER_DIVISOR;
-        H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) spellIndex9 =
+            spellY10 += VIEW_ARMY_QUICK_SPELL_Y_OFFSET;
+        i32 spacing5 = VIEW_ARMY_SPELL_SPACING_BASE - theArmy->m_spellCount;
+        i32 spellX2 =
+            spellCenterX27 + (VIEW_ARMY_SPELL_X_BIAS - theArmy->m_spellCount)
+            - (theArmy->m_spellCount * spacing5) / VIEW_ARMY_ICON_CENTER_DIVISOR;
+        H2_ENUM_STORAGE_STEPPED(ArmySpellInfluence, i32) spellIndex8 =
             ARMY_SPELL_INFLUENCE_NONE;
         for (loopIndex = 0;
-             loopIndex < (theArmy->m_spellCount < VIEW_ARMY_SPELL_VISIBLE_LIMIT
-                               ? theArmy->m_spellCount
-                               : VIEW_ARMY_SPELL_VISIBLE_LIMIT);
+             loopIndex < (theArmy->m_spellCount > VIEW_ARMY_SPELL_VISIBLE_LIMIT
+                               ? VIEW_ARMY_SPELL_VISIBLE_LIMIT
+                               : theArmy->m_spellCount);
              loopIndex++) {
-            spellIndex9++;
-            for (; spellIndex9 < ARMY_SPELL_INFLUENCE_COUNT; spellIndex9++) {
-                if (theArmy->m_spellInfluence[IDX(spellIndex9)])
+            spellIndex8++;
+            for (; spellIndex8 < ARMY_SPELL_INFLUENCE_COUNT; spellIndex8++) {
+                if (theArmy->m_spellInfluence[IDX(spellIndex8)])
                     break;
             }
-            iconWidget* spellWidget = new iconWidget(
-                static_cast<i16>(spellX3 + loopIndex * spacing0),
-                static_cast<i16>(spellY3 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
+            spellWidget0 = new iconWidget(
+                static_cast<i16>(spellX2 + loopIndex * spacing5),
+                static_cast<i16>(spellY10 + VIEW_ARMY_SPELL_WIDGET_Y_OFFSET),
                 0,
                 0,
                 const_cast<char*>("spellinl.icn"),
-                static_cast<i16>(IDX(spellIndex9)),
+                static_cast<i16>(IDX(spellIndex8)),
                 ICON_DRAW_NORMAL,
                 static_cast<i16>(loopIndex + VIEW_ARMY_SPELL_WIDGET_ID_BASE),
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!spellWidget)
+            if (!spellWidget0)
                 MemError();
-            m_viewArmyWindow->AddWidget(spellWidget, -1);
+            m_viewArmyWindow->AddWidget(spellWidget0, -1);
         }
     }
 

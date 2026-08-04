@@ -219,30 +219,30 @@ void wsSendMessage(
     void* data
 ) {
     u8* packetBuffer = static_cast<u8*>(H2_ALLOC(size + 1));
-    struct sockaddr_in peerAddress;
     i32 attemptCount;
-    i32 error;
+    struct sockaddr_in remote;
     i32 netPlayer;
+    i32 error;
 
     packetBuffer[0] = static_cast<u8>(type);
     if (size != 0)
         memcpy(packetBuffer + 1, data, size);
-    peerAddress.sin_family = AF_INET;
-    peerAddress.sin_port = htons(WS_TRANSPORT_PORT);
+    remote.sin_family = AF_INET;
+    remote.sin_port = htons(WS_TRANSPORT_PORT);
     if (destination == 0) {
-        for (netPlayer = 0; giNumHumanPlayers > netPlayer; netPlayer++) {
-            if (giThisNetPos == netPlayer)
+        for (netPlayer = 0; netPlayer < giNumHumanPlayers; netPlayer++) {
+            if (netPlayer == giThisNetPos)
                 continue;
             attemptCount = 0;
         sendPacket:
-            peerAddress.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
+            remote.sin_addr.s_addr = giNetPosToDCOPos[netPlayer];
             iRc = sendto(
                 sd_dg,
                 reinterpret_cast<char*>(packetBuffer),
                 size + 1,
                 0,
-                reinterpret_cast<struct sockaddr*>(&peerAddress),
-                sizeof(peerAddress)
+                reinterpret_cast<struct sockaddr*>(&remote),
+                sizeof(remote)
             );
             if (iRc == SOCKET_ERROR) {
                 error = WSAGetLastError();
@@ -256,14 +256,14 @@ void wsSendMessage(
             }
         }
     } else {
-        peerAddress.sin_addr.s_addr = destination;
+        remote.sin_addr.s_addr = destination;
         iRc = sendto(
             sd_dg,
             reinterpret_cast<char*>(packetBuffer),
             size + 1,
             0,
-            reinterpret_cast<struct sockaddr*>(&peerAddress),
-            sizeof(peerAddress)
+            reinterpret_cast<struct sockaddr*>(&remote),
+            sizeof(remote)
         );
         if (iRc == SOCKET_ERROR) {
             sprintf(cWSTextBuffer, "Error During sendto(): %d", WSAGetLastError());
@@ -309,14 +309,14 @@ VA(0x004b25c8, 0x8b)
 void wsProcessMessages(void) {
     struct sockaddr_in remote;
     i32 addressLength = sizeof(remote);
-    i32 receiveSize;
+    i32 bufLen;
 
-    while (1) {
-        receiveSize = WS_TRANSPORT_BUFFER_SIZE;
+    for (;;) {
+        bufLen = WS_TRANSPORT_BUFFER_SIZE;
         iRc = recvfrom(
             sd_dg,
             rcvBufIn,
-            receiveSize,
+            bufLen,
             0,
             reinterpret_cast<struct sockaddr*>(&remote),
             &addressLength
@@ -328,7 +328,7 @@ void wsProcessMessages(void) {
         }
         if (iRc == 0)
             return;
-        if (giNetPosToDCOPos[giThisNetPos] == static_cast<i32>(remote.sin_addr.s_addr)) {
+        if (static_cast<i32>(remote.sin_addr.s_addr) == giNetPosToDCOPos[giThisNetPos]) {
         } else {
             wsEvaluateMessage(iRc, static_cast<i32>(remote.sin_addr.s_addr));
         }
