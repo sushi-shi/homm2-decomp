@@ -7,6 +7,8 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | pattern | one-line trigger |
 | :-- | :-- |
 | [user-dtor-out-of-line](user-dtor-out-of-line.md) | delete-site calls `??1X` instead of inlining it → X has a user-declared dtor defined out of line |
+| [implicit-dtor-no-vptr-store](implicit-dtor-no-vptr-store.md) | polymorphic dtor COMDAT with NO `mov [eax],OFFSET vftbl` → the destructor is compiler-generated, not user-declared |
+| [inline-call-in-arglist-hoists-temps](inline-call-in-arglist-hoists-temps.md) | a narrowing-conversion temp materialised before the trailing constant pushes → some OTHER argument of the same call is an inlined function call |
 | [member-static-guarded-teardown](member-static-guarded-teardown.md) | atexit teardown with shared flag byte + bit per object → statics are class members, not file statics |
 | [while1-literal-test](while1-literal-test.md) | `mov ecx,1; test ecx,ecx; je end` at loop head → source spells `while (1)`, not `for (;;)` |
 | [loop-exit-in-header-chain](loop-exit-in-header-chain.md) | direct jcc to loop exit (no jmp stub) → break condition lives in the loop header chain |

@@ -5,6 +5,7 @@
 #include <SOURCE/kbwin.h>
 #include <SOURCE/NOOPT.h>
 #include <SOURCE/KB.h>
+#include <SOURCE/PATH.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -400,8 +401,6 @@ H2_ENUM_BEGIN(AITownEvaluationConstant)
     TOWN_EARLY_TURN_BASE            = 40,
     TOWN_EARLY_TURN_DIFFICULTY_STEP = 8
 H2_ENUM_END(AITownEvaluationConstant)
-
-searchArray SVSearchArray;
 
 #define HERO_RV_AT(values, byteOffset) \
     (*reinterpret_cast<i16*>(reinterpret_cast<u8*>(values) + (byteOffset)))

@@ -386,15 +386,15 @@ bool soundManager::StartupMilesBackend(void) {
     AIL_set_preference(AIL_WAVEOUT_PREFERENCE, 1);
 
     u32l sampleRate = DEFAULT_SAMPLE_RATE;
-    u16 bitsPerSample = DEFAULT_SAMPLE_BITS;
+    u16 bits = DEFAULT_SAMPLE_BITS;
     u16 channels = DEFAULT_SAMPLE_CHANNELS;
     gWaveFormat.wf.wFormatTag = 1;
     gWaveFormat.wf.nChannels = channels;
     gWaveFormat.wf.nSamplesPerSec = sampleRate;
     gWaveFormat.wf.nAvgBytesPerSec =
-        sampleRate * (bitsPerSample / DEFAULT_SAMPLE_BITS) * channels;
-    gWaveFormat.wf.nBlockAlign = (bitsPerSample / DEFAULT_SAMPLE_BITS) * channels;
-    gWaveFormat.wBitsPerSample = bitsPerSample;
+        sampleRate * (bits / DEFAULT_SAMPLE_BITS) * channels;
+    gWaveFormat.wf.nBlockAlign = (bits / DEFAULT_SAMPLE_BITS) * channels;
+    gWaveFormat.wBitsPerSample = bits;
     if (AIL_waveOutOpen(&m_digitalDriver, NULL, 0, &gWaveFormat.wf) != 0) {
         MessageBoxA(
             hwndApp,
@@ -419,16 +419,15 @@ i32 soundManager::ConvertVolume(i32 volume, SoundVolumeConversionMode soundType)
     if (soundType == SOUND_VOLUME_MUSIC) {
         if (gConfig.musicVolume >= CONFIG_VOLUME_MIN
             && gConfig.musicVolume <= CONFIG_VOLUME_MAX) {
-            local_8 =
-                ((FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)) * volume)
-                / IDX(CONFIG_VOLUME_MAX);
+            local_8 = (volume * (FADE_TOTAL_STEPS - IDX(gConfig.musicVolume)))
+                      / IDX(CONFIG_VOLUME_MAX);
             if (local_8 < 1)
                 local_8 = 1;
         }
     } else if (gConfig.soundVolume >= CONFIG_VOLUME_MIN
                && gConfig.soundVolume <= CONFIG_VOLUME_MAX) {
         local_8 =
-            ((FADE_TOTAL_STEPS - IDX(gConfig.soundVolume)) * volume) / IDX(CONFIG_VOLUME_MAX);
+            (volume * (FADE_TOTAL_STEPS - IDX(gConfig.soundVolume))) / IDX(CONFIG_VOLUME_MAX);
         if (local_8 < 1)
             local_8 = 1;
     }
@@ -523,7 +522,7 @@ WAVE_init_driver(u32l sampleRate, u16 bitsPerSample, u16 channels, u16 showError
 
 VA(0x004b5d20, 0x2df)
 i32 soundManager::Open(i32) {
-    i32 keyState;
+    i32 asyncState;
     i32 musicTrack;
 
     memset(bSaveMusicPosition, 0, MIDI_TRACK_COUNT);
@@ -562,13 +561,13 @@ i32 soundManager::Open(i32) {
     for (musicTrack = 2; musicTrack <= 4; musicTrack++)
         bMusicIsLooping[musicTrack] = 1;
 
-    keyState = GetAsyncKeyState(VK_F6);
-    if (HIBYTE(keyState)) {
+    asyncState = GetAsyncKeyState(VK_F6);
+    if (HIBYTE(asyncState)) {
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_MIDI;
         WritePrefs();
     }
-    keyState = GetAsyncKeyState(VK_F7);
-    if (HIBYTE(keyState)) {
+    asyncState = GetAsyncKeyState(VK_F7);
+    if (HIBYTE(asyncState)) {
         gConfig.musicSource = CONFIG_MUSIC_SOURCE_CD;
         WritePrefs();
     }
@@ -847,10 +846,10 @@ void soundManager::SwitchAmbientMusic(i32 track) {
         return;
     Process1WindowsMessage();
     if ((m_musicFadeSteps != 0
-         && m_musicFadeTargetTrack != track)
+         && track != m_musicFadeTargetTrack)
         || (m_musicFadeSteps == 0
-            && m_musicTrack != track)) {
-        if (m_musicFadeSteps < FADE_TOTAL_STEPS) {
+            && track != m_musicTrack)) {
+        if (m_musicFadeSteps <= FADE_HOLD_STEPS) {
             m_musicFadeSteps = FADE_TOTAL_STEPS;
             glTimers[GLOBAL_MUSIC_FADE_TIMER_SLOT] =
                 KBTickCount() + AMBIENT_FADE_DELAY_TICKS;

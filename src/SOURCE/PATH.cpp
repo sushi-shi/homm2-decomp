@@ -633,3 +633,5 @@ CombatHexDirection army::GetBestDirection(i32 sourceHex, i32 targetHex, i32 bloc
     }
     return COMBAT_DIRECTION_INVALID;
 }
+
+searchArray SVSearchArray;

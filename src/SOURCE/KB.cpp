@@ -4773,7 +4773,7 @@ void CheckShingleUpdate(void) {
 
 H2_ENUM_BEGIN(NormalDialogLayoutConstant)
     NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH = 5,
-    NORMAL_DIALOG_OR_TEXT_LENGTH = 3,
+    NORMAL_DIALOG_OR_TEXT_LENGTH = 4,
     NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT = 12,
     NORMAL_DIALOG_SPELL_LABEL_HEIGHT = 24,
     NORMAL_DIALOG_RESOURCE_LABEL_WIDTH = 100,
@@ -4864,41 +4864,41 @@ void NormalDialog(
     i32 showOrText,
     i32 timeout
 ) {
-    i32 panelHeight_p;
-    i32 labelY_o;
-    widget* borderWidget_o;
-    char iconFile_h[NORMAL_DIALOG_FILENAME_LENGTH];
-    char* resourceText_e[NORMAL_DIALOG_RESOURCE_COUNT];
-    i32 iconHeight_d;
-    i32 sizingIconHeight_l;
-    i32 showPrimaryBonus_e;
-    i32 resourceType_l[NORMAL_DIALOG_RESOURCE_COUNT];
-    i32 lineCount_d;
-    widget* iconPanel_j;
-    heroWindow* savedNormalDialogWindow_o;
-    i32 windowWidth_a;
-    i32 savedFirstResourceType_p;
-    i32 resourceImageWidth_g;
-    i16 showMessage_h;
-    i32 windowHeight_k;
-    i32 resourceSlot_n;
-    MouseCursorType savedPointerType_e;
-    i32 dialogContentHeight_h;
-    i32 textWidgetId_h;
-    tag_message message_e;
-    i32 savedSecondResourceType_f;
-    i32 windowRows_j;
-    i32 maxIconHeight_a;
-    i32 savedFirstResourceValue_i;
-    i32 resourceY_l;
-    i32 resourceFrame_g;
-    widget* textPanel_h;
-    i32 resourceCenterX_a;
-    i32 resourceValue_l[NORMAL_DIALOG_RESOURCE_COUNT];
-    i32 savedSecondResourceValue_j;
-    char* orText_f;
-    i32 savedPointerFrame_j;
-    i32 imageHeight_b;
+    i32 imageHeight_p;
+    i32 labelY_k;
+    widget* borderWidget_k;
+    i32 resourceFrame_n;
+    i16 showMessage_d;
+    i32 textWidgetId;
+    heroWindow* savedNormalDialogWindow;
+    i32 savedPointerFrame;
+    i32 windowHeight_h;
+    char* orText;
+    i32 showPrimaryBonus;
+    tag_message message_b;
+    i32 savedSecondResourceValue_n;
+    i32 savedFirstResourceValue;
+    widget* textPanel_j;
+    i32 resourceSlot;
+    i32 resourceY_f;
+    i32 iconHeight_h;
+    i32 lineCount;
+    i32 dialogContentHeight;
+    i32 resourceCenterX_c;
+    i32 resourceImageWidth;
+    i32 sizingIconHeight;
+    i32 savedFirstResourceType_k;
+    i32 maxIconHeight;
+    i32 savedSecondResourceType_m;
+    i32 windowRows_b;
+    char iconFile_a[NORMAL_DIALOG_FILENAME_LENGTH];
+    i32 resourceValue_c[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 windowWidth_f;
+    char* resourceText_p[NORMAL_DIALOG_RESOURCE_COUNT];
+    i32 resourceType_a[NORMAL_DIALOG_RESOURCE_COUNT];
+    MouseCursorType savedPointerType_o;
+    widget* iconPanel_a;
+    i32 panelHeight_d;
 
     if (!gbRemoteOn)
         timeout = 0;
@@ -4908,78 +4908,76 @@ void NormalDialog(
         giDialogTimeout = timeout;
     }
 
-    resourceCenterX_a = 0;
-    resourceY_l = 0;
-    resourceFrame_g = 0;
-    textWidgetId_h = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
-    resourceImageWidth_g = 0;
-    iconHeight_d = 0;
-    showPrimaryBonus_e = 0;
-    showMessage_h = 1;
+    resourceCenterX_c = 0;
+    resourceY_f = 0;
+    resourceFrame_n = 0;
+    textWidgetId = NORMAL_DIALOG_TEXT_WIDGET_FIRST_ID;
+    resourceImageWidth = 0;
+    iconHeight_h = 0;
+    showPrimaryBonus = 0;
+    showMessage_d = 1;
 
     if (firstResourceType == NORMAL_DIALOG_PRIMARY_SKILL
         && firstResourceValue >= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET) {
         firstResourceValue -= NORMAL_DIALOG_PRIMARY_BONUS_OFFSET;
-        showPrimaryBonus_e = 1;
+        showPrimaryBonus = 1;
     }
     if (firstResourceType >= NORMAL_DIALOG_MONSTER + 1
         && firstResourceType <= NORMAL_DIALOG_PRIMARY_SKILL - 1) {
         firstResourceType = NORMAL_DIALOG_NO_RESOURCE;
     }
 
-    savedNormalDialogWindow_o = pNormalDialogWindow;
-    savedFirstResourceType_p = giResType1;
-    savedFirstResourceValue_i = giResExtra1;
-    savedSecondResourceType_f = giResType2;
-    savedSecondResourceValue_j = giResExtra2;
+    savedNormalDialogWindow = pNormalDialogWindow;
+    savedFirstResourceType_k = giResType1;
+    savedFirstResourceValue = giResExtra1;
+    savedSecondResourceType_m = giResType2;
+    savedSecondResourceValue_n = giResExtra2;
     giResType1 = firstResourceType;
     giResExtra1 = firstResourceValue;
     giResType2 = secondResourceType;
     giResExtra2 = secondResourceValue;
 
-    resourceType_l[0] = firstResourceType;
-    resourceValue_l[0] = firstResourceValue;
-    resourceType_l[1] = secondResourceType;
-    resourceValue_l[1] = secondResourceValue;
+    resourceType_a[0] = firstResourceType;
+    resourceValue_c[0] = firstResourceValue;
+    resourceType_a[1] = secondResourceType;
+    resourceValue_c[1] = secondResourceValue;
 
-    lineCount_d = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
-    dialogContentHeight_h = lineCount_d * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
-    maxIconHeight_a = 0;
+    lineCount = bigFont->LineLength(text, NORMAL_DIALOG_TEXT_LINE_WIDTH);
+    dialogContentHeight = lineCount * NORMAL_DIALOG_TEXT_LINE_HEIGHT;
+    maxIconHeight = 0;
     if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-        dialogContentHeight_h += NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
+        dialogContentHeight += NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
 
-    for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot_n++) {
-        switch (resourceType_l[resourceSlot_n]) {
+    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot++) {
+        switch (resourceType_a[resourceSlot]) {
             case NORMAL_DIALOG_ARTIFACT:
-                sizingIconHeight_l = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_LUCK_BONUS:
-                sizingIconHeight_l = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_LUCK_PENALTY:
-                sizingIconHeight_l = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_MORALE_BONUS:
-                sizingIconHeight_l = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_MORALE_PENALTY:
-                sizingIconHeight_l = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_EXPERIENCE:
-                if (resourceValue_l[resourceSlot_n] == NORMAL_DIALOG_NO_VALUE)
-                    sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
-                else
-                    sizingIconHeight_l =
-                        NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
+                sizingIconHeight = resourceValue_c[resourceSlot] == NORMAL_DIALOG_NO_VALUE
+                    ? NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT
+                    : NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT + NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
                 break;
             case NORMAL_DIALOG_CREST:
-                sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_CREST_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_HERO:
-                sizingIconHeight_l = NORMAL_DIALOG_HERO_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_HERO_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_RESOURCE_GOLD:
-                sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_RESOURCE_WOOD:
             case NORMAL_DIALOG_RESOURCE_MERCURY:
@@ -4987,322 +4985,326 @@ void NormalDialog(
             case NORMAL_DIALOG_RESOURCE_SULFUR:
             case NORMAL_DIALOG_RESOURCE_CRYSTAL:
             case NORMAL_DIALOG_RESOURCE_GEMS:
-                sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_RESOURCE_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_SPELL:
-                sizingIconHeight_l = NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_SPELL_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_SECONDARY_SKILL:
-                sizingIconHeight_l = NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_SECONDARY_SKILL_LAYOUT_HEIGHT;
                 break;
             case NORMAL_DIALOG_MONSTER:
+                sizingIconHeight = NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT;
+                break;
             case NORMAL_DIALOG_PRIMARY_SKILL:
-                sizingIconHeight_l = NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT;
+                sizingIconHeight = NORMAL_DIALOG_PRIMARY_MONSTER_LAYOUT_HEIGHT;
                 break;
             default:
-                sizingIconHeight_l = 0;
+                sizingIconHeight = 0;
                 break;
         }
-        if (maxIconHeight_a < sizingIconHeight_l)
-            maxIconHeight_a = sizingIconHeight_l;
+        if (sizingIconHeight > maxIconHeight)
+            maxIconHeight = sizingIconHeight;
     }
 
-    if (maxIconHeight_a)
-        dialogContentHeight_h += maxIconHeight_a + NORMAL_DIALOG_RESOURCE_VERTICAL_GAP;
-    windowRows_j = (dialogContentHeight_h - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
+    if (maxIconHeight > 0)
+        dialogContentHeight += maxIconHeight + NORMAL_DIALOG_RESOURCE_VERTICAL_GAP;
+    windowRows_b = (dialogContentHeight - NORMAL_DIALOG_ROW_CALCULATION_OFFSET)
                    / NORMAL_DIALOG_WINDOW_ROW_HEIGHT;
-    if (windowRows_j > NORMAL_DIALOG_MAX_ROWS)
-        windowRows_j = NORMAL_DIALOG_MAX_ROWS;
-    windowWidth_a = NORMAL_DIALOG_WINDOW_WIDTH;
-    windowHeight_k =
-        windowRows_j * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
+    if (windowRows_b > NORMAL_DIALOG_MAX_ROWS)
+        windowRows_b = NORMAL_DIALOG_MAX_ROWS;
+    windowWidth_f = NORMAL_DIALOG_WINDOW_WIDTH;
+    windowHeight_h =
+        windowRows_b * NORMAL_DIALOG_WINDOW_ROW_HEIGHT + NORMAL_DIALOG_WINDOW_BASE_HEIGHT;
 
-    if (windowX == -1 || windowX + windowWidth_a >= NORMAL_DIALOG_SCREEN_RIGHT)
+    if (windowX == -1 || windowWidth_f + windowX >= NORMAL_DIALOG_SCREEN_RIGHT)
         windowX = NORMAL_DIALOG_DEFAULT_X;
-    if (windowY == -1 || windowY + windowHeight_k >= NORMAL_DIALOG_SCREEN_BOTTOM) {
-        windowY = NormalDialogCenterOffset(NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_k);
+    if (windowY == -1 || windowHeight_h + windowY >= NORMAL_DIALOG_SCREEN_BOTTOM) {
+        windowY = NormalDialogCenterOffset(NORMAL_DIALOG_SCREEN_HEIGHT - windowHeight_h);
         if (windowY > NORMAL_DIALOG_MAX_TOP)
             windowY = NORMAL_DIALOG_MAX_TOP;
     }
 
-    sprintf(iconFile_h, "evntwin%d.bin", windowRows_j);
-    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile_h);
+    sprintf(iconFile_a, "evntwin%d.bin", windowRows_b);
+    pNormalDialogWindow = new heroWindow(windowX, windowY, iconFile_a);
     if (!pNormalDialogWindow)
         MemError();
 
-    message_e.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_e.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
-    message_e.payload.widget.data.text = reinterpret_cast<char*>(NORMAL_DIALOG_DISABLE_COMMAND);
+    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message_b.payload.widget.command = NORMAL_DIALOG_DISABLE_COMMAND;
+    message_b.payload.widget.data.text = reinterpret_cast<char*>(NORMAL_DIALOG_DISABLE_COMMAND);
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH && dialogType != NORMAL_DIALOG_DISABLE_EIGHTH) {
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
-        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SEVEN;
+        pNormalDialogWindow->BroadcastMessage(message_b);
     }
     if (dialogType != NORMAL_DIALOG_DISABLE_SEVENTH) {
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
-        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_EIGHT;
+        pNormalDialogWindow->BroadcastMessage(message_b);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_LAST && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
-        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_ONE;
+        pNormalDialogWindow->BroadcastMessage(message_b);
     }
     if (dialogType != NORMAL_DIALOG_WAIT_FIRST && dialogType != NORMAL_DIALOG_INFO
         && dialogType != NORMAL_DIALOG_BUTTON_PAIR) {
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
-        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_TWO;
+        pNormalDialogWindow->BroadcastMessage(message_b);
     }
     if (dialogType != NORMAL_DIALOG_CONFIRM) {
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
-        pNormalDialogWindow->BroadcastMessage(message_e);
-        message_e.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
-        pNormalDialogWindow->BroadcastMessage(message_e);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_FIVE;
+        pNormalDialogWindow->BroadcastMessage(message_b);
+        message_b.payload.widget.id = NORMAL_DIALOG_BUTTON_SIX;
+        pNormalDialogWindow->BroadcastMessage(message_b);
     }
 
-    for (resourceSlot_n = 0; resourceSlot_n < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot_n++) {
-        iconPanel_j = NULL;
-        textPanel_h = NULL;
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_NO_RESOURCE)
+    for (resourceSlot = 0; resourceSlot < NORMAL_DIALOG_RESOURCE_COUNT; resourceSlot++) {
+        iconPanel_a = NULL;
+        textPanel_j = NULL;
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_NO_RESOURCE)
             break;
 
-        resourceText_e[resourceSlot_n] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
-        if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_RESOURCE_FIRST
-            && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_RESOURCE_LAST) {
-            if (resourceValue_l[resourceSlot_n] < 1) {
-                if (resourceValue_l[resourceSlot_n] == 0) {
-                    strcpy(resourceText_e[resourceSlot_n], "");
-                } else if (resourceValue_l[resourceSlot_n] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
-                    sprintf(
-                        resourceText_e[resourceSlot_n],
-                        "%d",
-                        resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
-                    );
-                } else {
-                    sprintf(
-                        resourceText_e[resourceSlot_n],
-                        "%d/\xe4\xe5\xed\xfc",
-                        -resourceValue_l[resourceSlot_n]
-                    );
-                }
+        resourceText_p[resourceSlot] = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
+        if (resourceType_a[resourceSlot] <= NORMAL_DIALOG_RESOURCE_LAST) {
+            if (resourceValue_c[resourceSlot] > 0) {
+                sprintf(resourceText_p[resourceSlot], "%d", resourceValue_c[resourceSlot]);
+            } else if (resourceValue_c[resourceSlot] == 0) {
+                strcpy(resourceText_p[resourceSlot], "");
+            } else if (resourceValue_c[resourceSlot] < -NORMAL_DIALOG_DAILY_RESOURCE_OFFSET) {
+                sprintf(
+                    resourceText_p[resourceSlot],
+                    "%d",
+                    resourceValue_c[resourceSlot] + NORMAL_DIALOG_DAILY_RESOURCE_OFFSET
+                );
             } else {
-                sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
+                sprintf(
+                    resourceText_p[resourceSlot],
+                    "%d/\xe4\xe5\xed\xfc",
+                    -resourceValue_c[resourceSlot]
+                );
             }
-            strcpy(iconFile_h, "resource.icn");
-            resourceFrame_g = resourceType_l[resourceSlot_n];
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL) {
+            strcpy(iconFile_a, "resource.icn");
+            resourceFrame_n = resourceType_a[resourceSlot];
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL) {
             sprintf(
-                resourceText_e[resourceSlot_n],
+                resourceText_p[resourceSlot],
                 "%s",
-                gSpellNames[resourceValue_l[resourceSlot_n]]
+                gSpellNames[resourceValue_c[resourceSlot]]
             );
-            strcpy(iconFile_h, "spells.icn");
-            resourceFrame_g = gsSpellInfo[resourceValue_l[resourceSlot_n]].iconIndex;
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_CREST) {
-            sprintf(resourceText_e[resourceSlot_n], "%s", "");
-            strcpy(iconFile_h, "brcrest.icn");
-            resourceFrame_g = resourceValue_l[resourceSlot_n];
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            sprintf(resourceText_e[resourceSlot_n], "%s", "");
-            strcpy(iconFile_h, "primskil.icn");
-            resourceFrame_g = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
-            sprintf(resourceText_e[resourceSlot_n], "%s", "");
-            strcpy(iconFile_h, "strip.icn");
-            resourceFrame_g = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            strcpy(iconFile_a, "spells.icn");
+            resourceFrame_n = gsSpellInfo[resourceValue_c[resourceSlot]].iconIndex;
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_CREST) {
+            sprintf(resourceText_p[resourceSlot], "%s", "");
+            strcpy(iconFile_a, "brcrest.icn");
+            resourceFrame_n = resourceValue_c[resourceSlot];
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            sprintf(resourceText_p[resourceSlot], "%s", "");
+            strcpy(iconFile_a, "primskil.icn");
+            resourceFrame_n = NORMAL_DIALOG_PRIMARY_BACKGROUND_FRAME;
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            sprintf(resourceText_p[resourceSlot], "%s", "");
+            strcpy(iconFile_a, "strip.icn");
+            resourceFrame_n = NORMAL_DIALOG_MONSTER_BACKGROUND_FRAME;
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
             sprintf(
-                resourceText_e[resourceSlot_n],
+                resourceText_p[resourceSlot],
                 "%s",
                 gSecondarySkills
-                    [resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                    [resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
-            strcpy(iconFile_h, "secskill.icn");
-            resourceFrame_g = resourceValue_l[resourceSlot_n] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
+            strcpy(iconFile_a, "secskill.icn");
+            resourceFrame_n = resourceValue_c[resourceSlot] / SECONDARY_SKILL_VALUE_LEVEL_COUNT
                               + NORMAL_DIALOG_SECONDARY_BACKGROUND_FRAME_BASE;
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
-            sprintf(resourceText_e[resourceSlot_n], "%s", "");
-            sprintf(iconFile_h, "surrendr.icn");
-            resourceFrame_g = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
-        } else if (resourceType_l[resourceSlot_n] >= NORMAL_DIALOG_EXPMRL_FIRST
-                   && resourceType_l[resourceSlot_n] <= NORMAL_DIALOG_EXPMRL_LAST) {
-            strcpy(resourceText_e[resourceSlot_n], "");
-            strcpy(iconFile_h, "expmrl.icn");
-            resourceFrame_g = resourceType_l[resourceSlot_n] - NORMAL_DIALOG_EXPMRL_FIRST;
-            if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_EXPMRL_LAST
-                && resourceValue_l[resourceSlot_n] != NORMAL_DIALOG_NO_VALUE) {
-                sprintf(resourceText_e[resourceSlot_n], "%d", resourceValue_l[resourceSlot_n]);
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
+            sprintf(resourceText_p[resourceSlot], "%s", "");
+            sprintf(iconFile_a, "surrendr.icn");
+            resourceFrame_n = NORMAL_DIALOG_HERO_BACKGROUND_FRAME;
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPERIENCE
+                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_MORALE_BONUS
+                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_MORALE_PENALTY
+                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_LUCK_BONUS
+                   || resourceType_a[resourceSlot] == NORMAL_DIALOG_LUCK_PENALTY) {
+            strcpy(resourceText_p[resourceSlot], "");
+            strcpy(iconFile_a, "expmrl.icn");
+            resourceFrame_n = resourceType_a[resourceSlot] - NORMAL_DIALOG_EXPMRL_FIRST;
+            if (resourceType_a[resourceSlot] == NORMAL_DIALOG_EXPMRL_LAST
+                && resourceValue_c[resourceSlot] != NORMAL_DIALOG_NO_VALUE) {
+                sprintf(resourceText_p[resourceSlot], "%d", resourceValue_c[resourceSlot]);
             }
         } else {
-            strcpy(resourceText_e[resourceSlot_n], "");
-            strcpy(iconFile_h, "resource.icn");
-            resourceFrame_g = resourceType_l[resourceSlot_n];
+            strcpy(resourceText_p[resourceSlot], "");
+            strcpy(iconFile_a, "resource.icn");
+            resourceFrame_n = resourceType_a[resourceSlot];
         }
 
-        switch (resourceType_l[resourceSlot_n]) {
+        switch (resourceType_a[resourceSlot]) {
+            case NORMAL_DIALOG_PRIMARY_SKILL:
+                resourceImageWidth = NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_ARTIFACT:
+                resourceImageWidth = NORMAL_DIALOG_LARGE_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_LUCK_BONUS:
+                resourceImageWidth = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_LUCK_PENALTY:
+                resourceImageWidth = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_MORALE_BONUS:
+                resourceImageWidth = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_MORALE_PENALTY:
+                resourceImageWidth = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_EXPERIENCE:
+                resourceImageWidth = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_CREST:
+                resourceImageWidth = NORMAL_DIALOG_CREST_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_CREST_ICON_HEIGHT;
+                break;
+            case NORMAL_DIALOG_HERO:
+                resourceImageWidth = NORMAL_DIALOG_HERO_BACKGROUND_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT;
+                break;
+            case NORMAL_DIALOG_RESOURCE_GOLD:
+                resourceImageWidth = NORMAL_DIALOG_LARGE_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
+                break;
             case NORMAL_DIALOG_RESOURCE_WOOD:
             case NORMAL_DIALOG_RESOURCE_MERCURY:
             case NORMAL_DIALOG_RESOURCE_ORE:
             case NORMAL_DIALOG_RESOURCE_SULFUR:
             case NORMAL_DIALOG_RESOURCE_CRYSTAL:
             case NORMAL_DIALOG_RESOURCE_GEMS:
-                resourceImageWidth_g = NORMAL_DIALOG_RESOURCE_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_RESOURCE_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_RESOURCE_GOLD:
-                resourceImageWidth_g = NORMAL_DIALOG_LARGE_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_GOLD_LAYOUT_HEIGHT;
-                break;
-            case NORMAL_DIALOG_ARTIFACT:
-                resourceImageWidth_g = NORMAL_DIALOG_LARGE_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT;
+                resourceImageWidth = NORMAL_DIALOG_RESOURCE_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_RESOURCE_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_SPELL:
-                resourceImageWidth_g = NORMAL_DIALOG_SPELL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_SPELL_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_CREST:
-                resourceImageWidth_g = NORMAL_DIALOG_CREST_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_CREST_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_LUCK_BONUS:
-                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_LUCK_BONUS_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_LUCK_PENALTY:
-                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_LUCK_PENALTY_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_MORALE_BONUS:
-                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_MORALE_BONUS_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_MORALE_PENALTY:
-                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_MORALE_PENALTY_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_EXPERIENCE:
-                resourceImageWidth_g = NORMAL_DIALOG_EXPMRL_ICON_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_EXPERIENCE_ICON_HEIGHT;
-                break;
-            case NORMAL_DIALOG_HERO:
-                resourceImageWidth_g = NORMAL_DIALOG_HERO_BACKGROUND_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_HERO_BACKGROUND_HEIGHT;
+                resourceImageWidth = NORMAL_DIALOG_SPELL_ICON_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_SPELL_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_SECONDARY_SKILL:
-                resourceImageWidth_g = NORMAL_DIALOG_SECONDARY_SKILL_BACKGROUND_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT;
+                resourceImageWidth = NORMAL_DIALOG_SECONDARY_SKILL_BACKGROUND_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_SECONDARY_SKILL_ICON_HEIGHT;
                 break;
             case NORMAL_DIALOG_MONSTER:
-            case NORMAL_DIALOG_PRIMARY_SKILL:
-                resourceImageWidth_g = NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH;
-                sizingIconHeight_l = NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT;
+                resourceImageWidth = NORMAL_DIALOG_PRIMARY_MONSTER_BACKGROUND_WIDTH;
+                sizingIconHeight = NORMAL_DIALOG_PRIMARY_MONSTER_ICON_HEIGHT;
                 break;
         }
 
-        imageHeight_b = sizingIconHeight_l;
-        if (strlen(resourceText_e[resourceSlot_n]))
-            sizingIconHeight_l += NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
+        imageHeight_p = sizingIconHeight;
+        if (strlen(resourceText_p[resourceSlot]) > 0)
+            sizingIconHeight += NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT;
 
-        if (resourceSlot_n == 0) {
-            if (resourceType_l[1] == NORMAL_DIALOG_NO_RESOURCE)
-                resourceCenterX_a = NormalDialogCenterOffset(
-                                        windowWidth_a - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
-                                    )
-                                    + NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET;
-            else
-                resourceCenterX_a = NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X;
+        if (resourceSlot == 0) {
+            resourceCenterX_c = resourceType_a[1] == NORMAL_DIALOG_NO_RESOURCE
+                ? NormalDialogCenterOffset(
+                      windowWidth_f - NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
+                  ) + NORMAL_DIALOG_SINGLE_RESOURCE_CENTER_INSET
+                : NORMAL_DIALOG_FIRST_RESOURCE_CENTER_X;
         } else {
-            resourceCenterX_a = windowWidth_a - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
+            resourceCenterX_c = windowWidth_f - NORMAL_DIALOG_SECOND_RESOURCE_RIGHT_INSET;
         }
-        resourceY_l = windowHeight_k - sizingIconHeight_l - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
+        resourceY_f = windowHeight_h - sizingIconHeight - NORMAL_DIALOG_RESOURCE_BOTTOM_INSET;
         if (dialogType != NORMAL_DIALOG_QUICK_VIEW)
-            resourceY_l -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
-        if (resourceType_l[0] == NORMAL_DIALOG_SECONDARY_SKILL
-            && resourceType_l[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            if (resourceSlot_n == 0)
-                resourceCenterX_a -= NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
+            resourceY_f -= NORMAL_DIALOG_BUTTON_AREA_HEIGHT;
+        if (resourceType_a[0] == NORMAL_DIALOG_SECONDARY_SKILL
+            && resourceType_a[1] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            if (resourceSlot == 0)
+                resourceCenterX_c -= NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
             else
-                resourceCenterX_a += NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
+                resourceCenterX_c += NORMAL_DIALOG_SECONDARY_PAIR_SPACING;
         }
 
-        iconPanel_j = new iconWidget(
-            resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
-                + (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL)
-                      * NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET,
-            resourceY_l,
-            resourceImageWidth_g,
-            imageHeight_b,
-            iconFile_h,
-            resourceFrame_g,
+        iconPanel_a = new iconWidget(
+            resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
+                + (resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
+                       ? NORMAL_DIALOG_SPELL_BACKGROUND_X_OFFSET
+                       : 0),
+            resourceY_f,
+            resourceImageWidth,
+            imageHeight_p,
+            iconFile_a,
+            resourceFrame_n,
             ICON_DRAW_NORMAL,
             -1,
-            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
+            resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL ? WIDGET_KIND_ICON_CENTERED
                                                                   : WIDGET_KIND_ICON_DIRECT,
             1
         );
-        if (!iconPanel_j)
+        if (!iconPanel_a)
             MemError();
-        pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+        pNormalDialogWindow->AddWidget(iconPanel_a, -1);
 
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_ARTIFACT) {
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_ARTIFACT) {
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_LARGE_ICON_WIDTH,
                 NORMAL_DIALOG_ARTIFACT_ICON_HEIGHT,
                 "artifact.icn",
-                resourceValue_l[resourceSlot_n] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
+                resourceValue_c[resourceSlot] + NORMAL_DIALOG_ARTIFACT_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "primskil.icn",
-                resourceValue_l[resourceSlot_n],
+                resourceValue_c[resourceSlot],
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
-            strcpy(resourceText_e[resourceSlot_n], gStatNames[resourceValue_l[resourceSlot_n]]);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
+            strcpy(resourceText_p[resourceSlot], gStatNames[resourceValue_c[resourceSlot]]);
         }
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_MONSTER) {
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_MONSTER) {
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 "strip.icn",
-                IDX(gMonsterDatabase[resourceValue_l[resourceSlot_n]].race)
+                IDX(gMonsterDatabase[resourceValue_c[resourceSlot]].race)
                     + NORMAL_DIALOG_MONSTER_RACE_FRAME_OFFSET,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
 
-            sprintf(gText, "monh%04d.icn", resourceValue_l[resourceSlot_n]);
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+            sprintf(gText, "monh%04d.icn", resourceValue_c[resourceSlot]);
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_ICON_OVERLAY_INSET,
-                resourceY_l + NORMAL_DIALOG_ICON_OVERLAY_INSET,
+                resourceY_f + NORMAL_DIALOG_ICON_OVERLAY_INSET,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_WIDTH,
                 NORMAL_DIALOG_PRIMARY_MONSTER_OVERLAY_HEIGHT,
                 gText,
@@ -5312,15 +5314,15 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_CREST) {
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_CREST) {
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
-                resourceY_l - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
+                resourceY_f - NORMAL_DIALOG_CREST_OVERLAY_OUTSET,
                 NORMAL_DIALOG_CREST_OVERLAY_WIDTH,
                 NORMAL_DIALOG_CREST_OVERLAY_HEIGHT,
                 "brcrest.icn",
@@ -5330,15 +5332,15 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
-                resourceY_l - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
+                resourceY_f - NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_OUTSET,
                 NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_WIDTH,
                 NORMAL_DIALOG_SECONDARY_SKILL_OVERLAY_HEIGHT,
                 "secskill.icn",
@@ -5348,142 +5350,145 @@ void NormalDialog(
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_HERO) {
-            sprintf(iconFile_h, "port%04d.icn", resourceValue_l[resourceSlot_n]);
-            iconPanel_j = new iconWidget(
-                resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g)
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_HERO) {
+            sprintf(iconFile_a, "port%04d.icn", resourceValue_c[resourceSlot]);
+            iconPanel_a = new iconWidget(
+                resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth)
                     + NORMAL_DIALOG_HERO_OVERLAY_INSET,
-                resourceY_l + NORMAL_DIALOG_HERO_OVERLAY_INSET,
+                resourceY_f + NORMAL_DIALOG_HERO_OVERLAY_INSET,
                 NORMAL_DIALOG_HERO_OVERLAY_WIDTH,
                 NORMAL_DIALOG_HERO_OVERLAY_HEIGHT,
-                iconFile_h,
+                iconFile_a,
                 0,
                 ICON_DRAW_NORMAL,
                 -1,
                 WIDGET_KIND_ICON_DIRECT,
                 1
             );
-            if (!iconPanel_j)
+            if (!iconPanel_a)
                 MemError();
-            pNormalDialogWindow->AddWidget(iconPanel_j, -1);
+            pNormalDialogWindow->AddWidget(iconPanel_a, -1);
         }
 
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SECONDARY_SKILL) {
-            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
-            textPanel_h = new textWidget(
-                resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                labelY_o,
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_SECONDARY_SKILL) {
+            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_SECONDARY_NAME_Y_OFFSET;
+            textPanel_j = new textWidget(
+                resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+                labelY_k,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
-                NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
-                resourceText_e[resourceSlot_n],
+                resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
+                    ? NORMAL_DIALOG_SPELL_LABEL_HEIGHT
+                    : NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
+                resourceText_p[resourceSlot],
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
-                textWidgetId_h++,
+                textWidgetId++,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
-            if (!textPanel_h)
+            if (!textPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel_h, -1);
+            pNormalDialogWindow->AddWidget(textPanel_j, -1);
 
-            resourceText_e[resourceSlot_n] =
+            resourceText_p[resourceSlot] =
                 static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_TEXT_LENGTH));
-            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
+            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_SECONDARY_LEVEL_Y_OFFSET;
             sprintf(
-                resourceText_e[resourceSlot_n],
+                resourceText_p[resourceSlot],
                 "%s",
                 gSecondarySkillLevels
-                    [resourceValue_l[resourceSlot_n] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
+                    [resourceValue_c[resourceSlot] % SECONDARY_SKILL_VALUE_LEVEL_COUNT]
             );
-        } else if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL) {
-            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
+        } else if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL) {
+            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_PRIMARY_LABEL_Y_OFFSET;
         } else {
-            labelY_o = sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
+            labelY_k = resourceY_f + sizingIconHeight - NORMAL_DIALOG_DEFAULT_LABEL_Y_OFFSET;
         }
 
-        textPanel_h = new textWidget(
-            resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-            labelY_o,
+        textPanel_j = new textWidget(
+            resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+            labelY_k,
             NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
-            resourceType_l[resourceSlot_n] == NORMAL_DIALOG_SPELL
+            resourceType_a[resourceSlot] == NORMAL_DIALOG_SPELL
                 ? NORMAL_DIALOG_SPELL_LABEL_HEIGHT
                 : NORMAL_DIALOG_RESOURCE_LABEL_HEIGHT,
-            resourceText_e[resourceSlot_n],
+            resourceText_p[resourceSlot],
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
-            textWidgetId_h++,
+            textWidgetId++,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (!textPanel_h)
+        if (!textPanel_j)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel_h, -1);
+        pNormalDialogWindow->AddWidget(textPanel_j, -1);
 
-        if (resourceType_l[resourceSlot_n] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus_e) {
+        if (resourceType_a[resourceSlot] == NORMAL_DIALOG_PRIMARY_SKILL && showPrimaryBonus) {
             char* bonusText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_PRIMARY_BONUS_TEXT_LENGTH));
             strcpy(bonusText, "+1 ");
-            textPanel_h = new textWidget(
-                resourceCenterX_a - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
-                sizingIconHeight_l + resourceY_l - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
+            textPanel_j = new textWidget(
+                resourceCenterX_c - NORMAL_DIALOG_RESOURCE_LABEL_HALF_WIDTH,
+                resourceY_f + sizingIconHeight - NORMAL_DIALOG_PRIMARY_BONUS_LABEL_Y_OFFSET,
                 NORMAL_DIALOG_RESOURCE_LABEL_WIDTH,
                 NORMAL_DIALOG_PRIMARY_BONUS_TEXT_HEIGHT,
                 bonusText,
                 "bigfont.fnt",
                 FONT_DRAW_DEFAULT,
-                textWidgetId_h++,
+                textWidgetId++,
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
-            if (!textPanel_h)
+            if (!textPanel_j)
                 MemError();
-            pNormalDialogWindow->AddWidget(textPanel_h, -1);
+            pNormalDialogWindow->AddWidget(textPanel_j, -1);
         }
 
-        borderWidget_o = new border(
-            resourceCenterX_a - NormalDialogCenterOffset(resourceImageWidth_g),
-            resourceY_l,
-            resourceImageWidth_g,
-            sizingIconHeight_l,
-            resourceSlot_n + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
+        borderWidget_k = new border(
+            resourceCenterX_c - NormalDialogCenterOffset(resourceImageWidth),
+            resourceY_f,
+            resourceImageWidth,
+            sizingIconHeight,
+            resourceSlot + NORMAL_DIALOG_RESOURCE_BORDER_FIRST_ID,
             WIDGET_KIND_TRANSPARENT,
             0,
             NULL
         );
-        pNormalDialogWindow->AddWidget(borderWidget_o, -1);
+        pNormalDialogWindow->AddWidget(borderWidget_k, -1);
     }
 
-    message_e.type = NORMAL_DIALOG_DISABLE_MESSAGE;
-    message_e.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
-    message_e.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
-    message_e.payload.widget.data.text = text;
-    pNormalDialogWindow->BroadcastMessage(message_e);
+    message_b.type = NORMAL_DIALOG_DISABLE_MESSAGE;
+    message_b.payload.widget.command = NORMAL_DIALOG_SET_TEXT_COMMAND;
+    message_b.payload.widget.id = NORMAL_DIALOG_TEXT_WIDGET_ID;
+    message_b.payload.widget.data.text = text;
+    pNormalDialogWindow->BroadcastMessage(message_b);
 
     if (showOrText == NORMAL_DIALOG_SHOW_OR_TEXT) {
-        orText_f = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_OR_TEXT_LENGTH));
-        strcpy(orText_f, "\xe8\xeb\xe8");
-        textPanel_h = new textWidget(
-            NormalDialogCenterOffset(windowWidth_a) - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
-            resourceY_l + NORMAL_DIALOG_OR_TEXT_Y_OFFSET,
+        orText = static_cast<char*>(H2_ALLOC(NORMAL_DIALOG_OR_TEXT_LENGTH));
+        strcpy(orText, "\xe8\xeb\xe8");
+        textPanel_j = new textWidget(
+            windowWidth_f / NORMAL_DIALOG_CENTER_PART_COUNT
+                - NORMAL_DIALOG_OR_TEXT_CENTER_X_OFFSET,
+            resourceY_f + NORMAL_DIALOG_OR_TEXT_Y_OFFSET,
             NORMAL_DIALOG_OR_TEXT_WIDTH,
             NORMAL_DIALOG_OR_TEXT_HEIGHT,
-            orText_f,
+            orText,
             "smalfont.fnt",
             FONT_DRAW_DEFAULT,
-            textWidgetId_h++,
+            textWidgetId++,
             WIDGET_KIND_TEXT,
             FONT_ALIGN_CENTER
         );
-        if (!textPanel_h)
+        if (!textPanel_j)
             MemError();
-        pNormalDialogWindow->AddWidget(textPanel_h, -1);
+        pNormalDialogWindow->AddWidget(textPanel_j, -1);
     }
 
-    savedPointerType_e = gpMouseManager->m_cursorType;
-    savedPointerFrame_j = gpMouseManager->m_cursorFrame;
+    savedPointerType_o = gpMouseManager->m_cursorType;
+    savedPointerFrame = gpMouseManager->m_cursorFrame;
     while (gpMouseManager->m_hideCount)
         gpMouseManager->ShowColorPointer();
     gpMouseManager->SetPointer("advmice.mse", 0, MOUSE_AUTO_CURSOR_TYPE);
@@ -5499,12 +5504,12 @@ void NormalDialog(
     }
 
     delete pNormalDialogWindow;
-    gpMouseManager->SetPointer("", savedPointerFrame_j, savedPointerType_e);
-    giResType1 = savedFirstResourceType_p;
-    giResExtra1 = savedFirstResourceValue_i;
-    giResType2 = savedSecondResourceType_f;
-    giResExtra2 = savedSecondResourceValue_j;
-    pNormalDialogWindow = savedNormalDialogWindow_o;
+    gpMouseManager->SetPointer("", savedPointerFrame, savedPointerType_o);
+    giResType1 = savedFirstResourceType_k;
+    giResExtra1 = savedFirstResourceValue;
+    giResType2 = savedSecondResourceType_m;
+    giResExtra2 = savedSecondResourceValue_n;
+    pNormalDialogWindow = savedNormalDialogWindow;
 }
 
 VA(0x00470d22, 0x68)
@@ -5523,9 +5528,6 @@ void UpdateNormalDialog(char* text) {
 
 VA(0x00470dd0, 0x19)
 game::~game() {}
-
-VA(0x00470df0, 0x37)
-soundManager::~soundManager() {}
 
 #define GROUND_REPEAT_2(value) value, value
 #define GROUND_REPEAT_4(value) GROUND_REPEAT_2(value), GROUND_REPEAT_2(value)
