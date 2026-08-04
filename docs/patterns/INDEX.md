@@ -45,3 +45,7 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [or-chain-early-return-vs-and-chain-guard](or-chain-early-return-vs-and-chain-guard.md) | short `jcc`s to a shared near-`jmp` stub with the last term inverted = `if (A\|\|B\|\|C) return;`; the same `jcc`s straight to the post-body join = `if (A&&B&&C) { body }` |
 | [if-else-arm-from-jcc-polarity](if-else-arm-from-jcc-polarity.md) | mirrored `jcc` with the two arms swapped -> the emitted `jcc` is the NEGATION of the source condition and the fall-through block is the then-arm |
 | [shr-not-sar-pins-unsigned-cast](shr-not-sar-pins-unsigned-cast.md) | `shrl` where the signed spelling gives `sarl` -> a `static_cast<u32>` around the masked value, not around the whole expression |
+| [chained-assignment-vs-repeated-constant](chained-assignment-vs-repeated-constant.md) | ours reloads the field just written (`b = a;`) → retail spelled each member of the group with its own literal |
+| [increment-vs-plus-equals-read-order](increment-vs-plus-equals-read-order.md) | `p[i]` read evaluates the subscript before the base → source is `p[i]++`; retail's base-first read is `p[i] += 1` |
+| [short-cast-of-int-sum](short-cast-of-int-sum.md) | `movswl %ax, r32` on an already-32-bit sum → the whole expression carries an `i16` cast (`movsbl %al` = `i8`) |
+| [dead-local-frame-gap](dead-local-frame-gap.md) | holes in retail's `-0xN(%ebp)` census are declared-but-unused locals; add them or every deeper slot shifts (plus the `/Z7` S_BPREL32 recipe for naming our own frame) |
