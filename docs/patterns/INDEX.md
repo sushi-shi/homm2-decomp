@@ -58,3 +58,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [getcell-vs-row-plus-index](getcell-vs-row-plus-index.md) | `cells + y*width*12 + x*12` (y-term added first) is `Row(y) + x`; retail's `cells + x*12 + y*width*12` with the y product computed first is `GetCell(x, y)` |
 | [int-accessor-for-narrow-store](int-accessor-for-narrow-store.md) | `movsx` on the source of a `char = char` store → the RHS is an `int`-returning accessor; no cast reproduces it, and no frame temp means the accessor is not the narrow one |
 | [reloc-rows-are-not-the-residual](reloc-rows-are-not-the-residual.md) | a diff dominated by `const_<RVA>` vs owner+addend rows scores nothing (`functionRelocDiffs: none`); strip the symbol tokens and the real bytes appear |
+| [int-cast-suppresses-bool-widen](int-cast-suppresses-bool-widen.md) | `setcc` followed by an ours-only `and reg,0xff` -> cast the relational to `i32` in the arithmetic |
+| [pointer-plus-index-base-first](pointer-plus-index-base-first.md) | pointer global loaded BEFORE the flat index -> `*(p + x + y*W)`, not `p[y*W + x]` |
+| [initializer-store-order-pins-declaration-order](initializer-store-order-pins-declaration-order.md) | frames identical, hundreds of raw bytes differ -> the `= N` store sequence is the declaration order |
