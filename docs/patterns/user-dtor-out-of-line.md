@@ -20,6 +20,14 @@ where `P` is an audiere-style RefPtr:
   `push` before `call [ecx+4]`).
 
 **Close.** Declare the dtor in the class, define it empty out of line in the
-TU whose region holds the retail body (`game::~game`,
-`soundManager::~soundManager` at the tail of SOURCE/KB;
+TU whose region holds the retail body (`game::~game` at the tail of SOURCE/KB;
 `dimmerWidget::~dimmerWidget` in BASE/DIMMER). Commit 9182c077.
+
+**Limit of the probe (2026-08-04).** The probe class `S` above has no virtual
+functions, so the two spellings differ only by the inlining. Once the class IS
+polymorphic they also differ by the vptr store that only the user-declared
+destructor emits, and that store is decisive — see
+[implicit-dtor-no-vptr-store](implicit-dtor-no-vptr-store.md). The
+`soundManager::~soundManager` row above was wrong for exactly that reason:
+retail's 0x37 body has no vptr store, so that destructor is compiler-generated
+and the class must not declare one.

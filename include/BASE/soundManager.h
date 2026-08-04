@@ -67,7 +67,6 @@ public:
     i32 m_musicFadeSteps;
     i32 m_musicTrack;
     soundManager(void);
-    ~soundManager(void);
     virtual i32 Open(i32) OVERRIDE;
     virtual void Close(void) OVERRIDE;
     virtual MessageDispatchResult Main(struct tag_message&) OVERRIDE;

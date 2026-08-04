@@ -69,3 +69,30 @@ gDimPtr  = bmp->m_pixels + y * bmp->m_width + x;   /* DimBitmapArea  */
 Both went exact. The same reading fixed every `s_row = dest->m_pixels + s_y *
 s_pitch;` and `s_entry = reinterpret_cast<IconEntry*>(srcIcon->m_data) + frame;`
 in the eleven icon decoders.
+
+## `imul` confirmation, and the destination-register caveat (2026-08-04)
+
+`soundManager::ConvertVolume` (RVA 0xb5ae0) multiplies a parameter by a
+subtraction. Both spellings compute the subtraction first — the rule above —
+but they differ in whether the parameter is folded as a memory operand, and
+that difference is the whole residual:
+
+```
+((FADE_TOTAL_STEPS - gConfig.musicVolume) * volume)      ours, 93.12%
+  b8 0b 00 00 00      movl  $0xb, %eax
+  2b 05 <gConfig>     subl  gConfig.musicVolume, %eax
+  0f af 45 08         imull 0x8(%ebp), %eax          <- volume folded
+
+(volume * (FADE_TOTAL_STEPS - gConfig.musicVolume))      retail, exact
+  b8 0b 00 00 00      movl  $0xb, %eax
+  2b 05 <gConfig>     subl  gConfig.musicVolume, %eax
+  8b 4d 08            movl  0x8(%ebp), %ecx           <- volume in a register
+  0f af c1            imull %ecx, %eax
+```
+
+So the non-foldable operand is emitted first in BOTH spellings; only the
+left/right roles decide whether the foldable one becomes a memory operand or
+gets its own register. Caveat to the "result lives in A's register" line above:
+here the product lands in the *subtraction's* accumulator (`%eax`), not in the
+left operand's register, because the non-foldable side already owns `%eax`.
+Read the operand sides off the fold, not off the destination register.

@@ -56,11 +56,25 @@ Three independent checks, all cheap:
 Measured for this case: moving `searchArray SVSearchArray;` from
 `src/SOURCE/PHILAI.cpp` to `src/SOURCE/PATH.cpp` took SOURCE/PATH from 14/18 to
 16/18 (`_$E17` and `_$E1` -> EXACT) with SOURCE/PHILAI and the tree-wide count
-otherwise unchanged (1464 -> 1466). The remaining two rows,
-`_$E18@0x7e1ce` / `_$E1@0x7e1e0`, are name-collision artifacts of the claimed
-inventory: one unit cannot carry two symbols literally called `_$E18`, so the
-generator suffixes the second pair and objdiff has nothing to pair them with.
+otherwise unchanged.
 
-**Note.** `_$E<n>` numbering is a per-TU counter and does NOT agree between our
-object and retail (ours emitted `_$E14/15/16/17/23/24` for the same six
-bodies); pair on address and body, never on the number.
+## Closing the last two rows: renumber the claim, don't chase the body
+
+`_$E18@0x7e1ce` / `_$E1@0x7e1e0` are name-collision artifacts of the claimed
+inventory, not a codegen residual: `_$E<n>` is a per-TU counter that does NOT
+agree between our object and retail. One unit cannot carry two symbols
+literally called `_$E18`, so the generator suffixes the second pair and objdiff
+has nothing to pair them with.
+
+The fix is to name the claims after what OUR object actually emits for the same
+six bodies (`llvm-objdump -t build/objdiff/base/<UNIT>.obj`), which is exactly
+what `homm2 audit unmatched-census --write-config` does for every other compgen
+row. For SOURCE/PATH the six rows become, in RVA order:
+
+```
+0x7e16a,39,_$E24   0x7e191,18,_$E23   0x7e1b0,15,_$E17
+0x7e1bf,15,_$E14   0x7e1ce,18,_$E16   0x7e1e0,15,_$E15
+```
+
+All six then pair by name and SOURCE/PATH closes at 18/18. Pair on address,
+size and body; the number is a naming convention, never evidence.
