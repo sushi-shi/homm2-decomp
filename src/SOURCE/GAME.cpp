@@ -4069,12 +4069,12 @@ VA(0x00456bf4, 0x2c)
 void game::TurnOnAIMusic(void) {
     gpSoundManager->StopAllSamples(1);
     gpSoundManager->SwitchAmbientMusic(GAME_AI_MUSIC_TRACK);
-    gpSoundManager->m_samplesReady = 0;
+    gSoundBackendsReady = 0;
 }
 
 VA(0x00456c20, 0x12)
 void game::TurnOffAIMusic(void) {
-    gpSoundManager->m_samplesReady = 1;
+    gSoundBackendsReady = 1;
 }
 
 VA(0x00456c32, 0x50a)
@@ -4162,16 +4162,16 @@ void game::NextPlayer(void) {
     if (gbThisNetHumanPlayer[giCurPlayer] && gbRemoteOn && m_day != 1 && giForceSwitchMusic == -1) {
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
         giForceSwitchMusic = KBTickCount();
-        gpSoundManager->m_samplesReady = 0;
+        gSoundBackendsReady = 0;
     }
     if (m_day == 1 && giCurTurn != 1)
-        gpSoundManager->m_samplesReady = 0;
+        gSoundBackendsReady = 0;
 
     DoNewTurn();
     CheckEndGame(END_GAME_FORCE_NONE, false);
-    if (gbThisNetHumanPlayer[giCurPlayer] && gpSoundManager->m_samplesReady == 0
+    if (gbThisNetHumanPlayer[giCurPlayer] && gSoundBackendsReady == 0
         && giForceSwitchMusic == -1) {
-        gpSoundManager->m_samplesReady = 1;
+        gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
@@ -5717,7 +5717,7 @@ void game::WaitForPlayer(char* text, i32 player) {
         giBottomViewOverrideEndTime = KBTickCount() + WAIT_BOTTOM_VIEW_TIMEOUT;
         giBottomViewOverride = gbThisNetHumanPlayer[giCurPlayer] ? BOTTOM_VIEW_NEW_TURN
                                                                  : BOTTOM_VIEW_NONE;
-        gpSoundManager->m_samplesReady = 1;
+        gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
         gpAdvManager->CompleteDraw(1);
         gpAdvManager->UpdateHeroLocators(1, 1);
@@ -6422,7 +6422,7 @@ void game::CheckHeroConsistency(void) {
 VA(0x0045da83, 0x7b3)
 i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     i32 success;
-    i32 samplesReady;
+    bool samplesReady;
     char filename[TRANSMIT_FILENAME_CAPACITY];
     u8* transmitData;
     i32 batchCount;
@@ -6457,11 +6457,11 @@ i32 game::TransmitSaveGame(i32 remotePlayer, i32 player, i32 useCurrentSave) {
     acknowledged = NULL;
     oldTrack = -1;
 
-    samplesReady = gpSoundManager->m_samplesReady;
-    gpSoundManager->m_samplesReady = 1;
+    samplesReady = gSoundBackendsReady;
+    gSoundBackendsReady = 1;
     oldTrack = static_cast<i8>(gpSoundManager->m_musicTrack);
     gpSoundManager->SwitchAmbientMusic(-1);
-    gpSoundManager->m_samplesReady = samplesReady;
+    gSoundBackendsReady = samplesReady;
 
     LogStr(const_cast<char*>("Transmit Game Start"));
     if (gpAdvManager->m_active == 1)
@@ -6644,10 +6644,10 @@ transmitCleanup:
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
     if (oldTrack != -1) {
-        samplesReady = gpSoundManager->m_samplesReady;
-        gpSoundManager->m_samplesReady = 1;
+        samplesReady = gSoundBackendsReady;
+        gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(oldTrack);
-        gpSoundManager->m_samplesReady = samplesReady;
+        gSoundBackendsReady = samplesReady;
     }
     return success;
 }
@@ -6701,7 +6701,7 @@ i32 game::ReceiveSaveGame(
 ) {
     i32 unused20819;
     i32 success;
-    i32 samplesReady;
+    bool samplesReady;
     char filename[RECEIVE_FILENAME_CAPACITY];
     u8* incomingData;
     i32 index;
@@ -6747,11 +6747,11 @@ i32 game::ReceiveSaveGame(
     if (gpAdvManager->m_active == 1)
         BVResMsg(const_cast<char*>("\xcf\xee\xeb\xf3\xf7\xe5\xed\xe8\xe5 \xe4\xe0\xed\xed\xfb\xf5"), RES_NONE, 0);
 
-    samplesReady = gpSoundManager->m_samplesReady;
+    samplesReady = gSoundBackendsReady;
     oldTrack = static_cast<i8>(gpSoundManager->m_musicTrack);
-    gpSoundManager->m_samplesReady = 1;
+    gSoundBackendsReady = 1;
     gpSoundManager->SwitchAmbientMusic(-1);
-    gpSoundManager->m_samplesReady = samplesReady;
+    gSoundBackendsReady = samplesReady;
 
     LogStr(const_cast<char*>("Begin Transmit Init Confirm"));
     result = TransmitRemoteData(
@@ -6914,10 +6914,10 @@ i32 game::ReceiveSaveGame(
         gpAdvManager->UpdBottomView(1, 1, 1);
     }
     if (oldTrack != -1) {
-        samplesReady = gpSoundManager->m_samplesReady;
-        gpSoundManager->m_samplesReady = 1;
+        samplesReady = gSoundBackendsReady;
+        gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(oldTrack);
-        gpSoundManager->m_samplesReady = samplesReady;
+        gSoundBackendsReady = samplesReady;
     }
     return success;
 }
@@ -6988,7 +6988,7 @@ void game::DoNewTurn(void) {
 
     if (m_day == 1 && (m_month != 1 || m_week != 1 || m_day != 1)) {
         if (gbThisNetHumanPlayer[giCurPlayer])
-            gpSoundManager->m_samplesReady = 1;
+            gSoundBackendsReady = 1;
         if (giWeekType != CALENDAR_PERIOD_NONE) {
             musicTrack2 = -1;
             if (m_week == 1) {

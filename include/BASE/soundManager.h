@@ -66,39 +66,6 @@ public:
     i32 m_musicFadeTargetTrack;
     i32 m_musicFadeSteps;
     i32 m_musicTrack;
-    i16 field_0x52;
-    struct _SAMPLE* m_sampleHandles[SOUND_SAMPLE_HANDLE_CAPACITY];
-    char _pad_0x8c[0x8];
-    i32 m_numSampleHandles;
-    char _pad_0x98[0x40];
-    char m_channelVolumes[SOUND_CHANNEL_VOLUME_CAPACITY];
-    struct _SAMPLE* m_channelSamples[SOUND_SAMPLE_HANDLE_CAPACITY];
-    char _pad_0x124[0x8];
-    void* m_channelSampleData[SOUND_SAMPLE_HANDLE_CAPACITY];
-    char _pad_0x164[0x8];
-    u32l m_channelSampleSizes[SOUND_SAMPLE_HANDLE_CAPACITY];
-    char _pad_0x1a4[0x3c8];
-    i32 field_0x56c;
-    char _pad_0x570[0x4];
-    i32 field_0x574;
-    char m_currentTrack;
-    char m_pollRequested;
-    char m_pollDue;
-    char m_pollToggle;
-    char _pad_0x57c[0x14];
-    i32l m_savedTrackPositions[MIDI_TRACK_COUNT];
-    i32 m_fading;
-    i32 m_samplesReady;
-    i32 m_fadeSteps;
-    i32 m_fadeTargetTrack;
-    i32 m_cdTrack;
-    i32 m_cdPlayFrame;
-    i16 m_auxDevice;
-    i32 m_cdReady;
-    i32 m_midiReady;
-    i32 m_cdStarted;
-    i32 m_midiStarted;
-    i32 m_pollTimer;
     soundManager(void);
     ~soundManager(void);
     virtual i32 Open(i32) OVERRIDE;
@@ -133,16 +100,27 @@ public:
     void GetNumberCDDrives(void);
     void ServiceSound(void);
     i32 MusicPlaying(void);
-    void MIDIStartup(void);
-    void MIDIShutdown(void);
-    void MIDIPlay(i32);
-    __declspec(dllexport) void MIDIStop(void);
-    __declspec(dllexport) i32 MIDIIsPlaying(void);
-    __declspec(dllexport) void MIDISetVolume(void);
-    void MIDIPoll(void);
 };
 #pragma pack(pop)
-SIZE(soundManager, 0x6ae);
+SIZE(soundManager, 0x52);
+
+// Set when the CD-ROM check turns the audio path off; the two backend
+// startups refuse to run while it is set. Distinct from KB's gbNoSound.
+extern bool gSoundDisabled;
+
+// Set once a backend has come up and cleared on shutdown; the adventure and
+// game layers save/restore it around forced ambient-music switches, so it is
+// module state rather than a soundManager member.
+extern bool gSoundBackendsReady;
+
+inline bool IsAudiereBackend(const soundManager* manager) {
+    return manager->m_backend == SOUND_BACKEND_AUDIERE && manager->m_audiereDevice != NULL;
+}
+
+inline bool IsMilesBackend(const soundManager* manager) {
+    return manager->m_backend == SOUND_BACKEND_MILES && manager->m_digitalDriver != NULL;
+}
+
 extern char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT];
 extern SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT];
 extern char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY];

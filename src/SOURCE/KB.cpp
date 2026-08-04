@@ -406,11 +406,11 @@ void EarlyShutdown(char* caption, char* text) {
 
 VA(0x004665df, 0x12a)
 void SetupCDRom(void) {
-    i32 savedNoSound = gbNoSound;
     if (iCDRomErr == CD_ROM_DRIVE_UNAVAILABLE) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
-        gbNoSound = true;
+        gpSoundManager->ShutdownSoundBackends();
+        gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
                 "Unable to access CD-ROM Drive.  Without a CD-ROM drive and a Heroes 2 Expansion "
@@ -429,7 +429,8 @@ void SetupCDRom(void) {
     } else if (iCDRomErr == CD_ROM_EXPANSION_DISC_MISSING) {
         SetPalette(gPalette->m_data, 1);
         gpMouseManager->ShowColorPointer();
-        gbNoSound = true;
+        gpSoundManager->ShutdownSoundBackends();
+        gSoundDisabled = true;
         if (giTCPHostStatus)
             NormalDialog(
                 "The Heroes 2 Expansion CD-ROM is not in the drive.  Without a Heroes 2 Expansion "
@@ -461,7 +462,6 @@ void SetupCDRom(void) {
         );
         exit(0);
     }
-    gbNoSound = savedNoSound;
 }
 
 VA(0x00466709, 0x5e)

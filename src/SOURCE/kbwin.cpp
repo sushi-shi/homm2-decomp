@@ -159,7 +159,7 @@ i32 AppIdle(void) {
         return 1;
 }
 
-VA(0x00471248, 0x503)
+VA(0x00471248, 0x63b)
 LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPARAM messageData) {
     if (message > KBWIN_PROCESS_MESSAGE_MAX || bProcessMessage[message] == 0) {
         return DefWindowProcA(window, message, messageParam, messageData);
@@ -193,12 +193,6 @@ LRESULT CALLBACK AppWndProc(HWND window, UINT message, WPARAM messageParam, LPAR
                 UpdateTimers(0);
             }
             return 0;
-        case KBWIN_CUSTOM_CD_MESSAGE:
-            if (messageParam == 1) {
-                gpSoundManager
-                    ->CDPlay(gpSoundManager->m_cdTrack, 0, gpSoundManager->m_cdPlayFrame, 1);
-            }
-            break;
         case WM_ACTIVATEAPP:
             gbForegroundApp = messageParam;
             return 0;

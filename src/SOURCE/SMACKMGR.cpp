@@ -585,7 +585,7 @@ i32 PlaySmacker(i32 smackNumber) {
     oldUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
     if (smackNumber != EXPANSION_CAMPAIGN) {
-        gpSoundManager->m_samplesReady = 1;
+        gSoundBackendsReady = 1;
         gpSoundManager->PlayAmbientMusic(-1);
     }
     if (gConfig.slowVideo == VIDEO_SPEED_TEST) {

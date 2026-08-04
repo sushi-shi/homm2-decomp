@@ -17,6 +17,7 @@
 #include <BASE/heroWindowManager.h>
 #include <BASE/inputManager.h>
 #include <BASE/mouseManager.h>
+#include <BASE/MusicFlags.h>
 #include <BASE/resourceManager.h>
 #include <BASE/sample.h>
 #include <BASE/soundManager.h>
@@ -7860,7 +7861,7 @@ void advManager::SetEnvironmentOrigin(i32 originX, i32 originY, i32 stopSounds) 
     i32 soundRadius;
     i32 edgeOffset;
 
-    if (gpSoundManager->m_samplesReady == 0) {
+    if (gSoundBackendsReady == 0) {
         return;
     }
 
@@ -9110,9 +9111,9 @@ void advManager::LoadRemote(void) {
     gpGame->LoadGame(gConfig.rmtRCName, 0, 1);
     if ((gpGame->m_day != 1 || (gpGame->m_week == 1 && gpGame->m_month == 1)) && gbRemoteOn
         && gbThisNetHumanPlayer[giCurPlayer]) {
-        gpSoundManager->m_samplesReady = 1;
+        gSoundBackendsReady = 1;
         gpSoundManager->SwitchAmbientMusic(WAIT_AMBIENT_MUSIC);
-        gpSoundManager->m_samplesReady = 0;
+        gSoundBackendsReady = 0;
         giForceSwitchMusic = KBTickCount();
     }
 
@@ -9123,7 +9124,7 @@ void advManager::LoadRemote(void) {
     if (gbThisNetHumanPlayer[giCurPlayer]) {
         gpGame->CancelComputerScreen();
         gbThisNetGotAdventureControl = true;
-        gpSoundManager->m_samplesReady = 0;
+        gSoundBackendsReady = 0;
     }
 
     gpGame->DoNewTurn();
@@ -9133,7 +9134,7 @@ void advManager::LoadRemote(void) {
     UpdBottomView(1, 1, 1);
     gpAdvManager->ForceNewHover();
     SendMapChange(MAP_CHANGE_MY_TURN, 0, 0, 0, MAP_CHANGE_CURRENT_PLAYER, 0, 0);
-    gpSoundManager->m_samplesReady = 1;
+    gSoundBackendsReady = 1;
 }
 
 VA(0x00412e8c, 0x1f5)
@@ -10119,6 +10120,17 @@ void UpdateSystemOptions(i32 initialDraw) {
     }
 }
 
+// The redbook and MIDI readiness flags this handler used to test went away
+// with the CD subsystem; both music paths now report present, which makes the
+// "neither is available" dialog unreachable in this build.
+static inline bool RedbookMusicPresent(void) {
+    return true;
+}
+
+static inline bool MidiMusicPresent(void) {
+    return true;
+}
+
 VA(0x00414e82, 0x575)
 MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     i32 preferencesChanged = 0;
@@ -10197,8 +10209,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                     ) {
                         case SYSTEM_OPTION_MUSIC_VOLUME:
                             if (gConfig.musicVolume == CONFIG_VOLUME_MUTED
-                                && gpSoundManager->m_cdReady == 0
-                                && gpSoundManager->m_midiReady == 0) {
+                                && !RedbookMusicPresent() && !MidiMusicPresent()) {
                                 NormalDialog(
                                     "Neither MIDI nor Redbook music is currently available on this "
                                     "system.",
@@ -10223,7 +10234,8 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_SOUND_VOLUME:
                             if (gConfig.soundVolume == CONFIG_VOLUME_MUTED
-                                && gpSoundManager->m_digitalDriver == NULL) {
+                                && !(IsAudiereBackend(gpSoundManager)
+                                     || IsMilesBackend(gpSoundManager))) {
                                 NormalDialog(
                                     "Digital sound is not currently available on this system.",
                                     OPTION_DIALOG_MESSAGE,
@@ -10267,10 +10279,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
 
                         case SYSTEM_OPTION_MUSIC_SOURCE:
                             if (gConfig.musicSource == CONFIG_MUSIC_SOURCE_MIDI) {
-                                if (gpSoundManager->m_cdStarted == 0) {
-                                    gpSoundManager->CDStartup();
-                                }
-                                if (gpSoundManager->m_cdReady == 0) {
+                                if (!gpSoundManager->CDStartup()) {
                                     NormalDialog(
                                         "Unable to set up CD stereo music.  Your CD player might "
                                         "be in use by another program, or your sound driver might "
@@ -10292,10 +10301,10 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
                             } else if (gConfig.useOpera == CONFIG_OPERA_DISABLED) {
                                 gConfig.useOpera = CONFIG_OPERA_ENABLED;
                             } else {
-                                if (gpSoundManager->m_midiStarted == 0) {
-                                    gpSoundManager->MIDIStartup();
+                                if (!MusicFlagsActive()) {
+                                    gpSoundManager->StartupMilesBackend();
                                 }
-                                if (gpSoundManager->m_midiReady == 0) {
+                                if (GetMusicFlagA() == 0) {
                                     gConfig.useOpera =
                                         static_cast<ConfigOperaMode>(1 - IDX(gConfig.useOpera));
                                 } else {

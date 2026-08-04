@@ -67,6 +67,41 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   STL init tail.
 - **[Buka] `soundManager::MIDIPoll`** (`src/BASE/Midi.cpp`) — the empty MCI
   poll body.
+- **[Buka] `soundManager` shrank from 0x6ae to 0x52 bytes** — everything the
+  PoL layer kept past `m_musicTrack` is gone. `InitMainClasses` pushes `0x52`
+  at `new soundManager`, the ctor (0x4b5bd0) writes no offset above `+0x4e`,
+  the dtor (0x470df0) touches only `+0x42`, and a whole-image census of every
+  `gpSoundManager` dereference tops out at `+0x4e`. The removed state resolved
+  four ways: `m_samplesReady` is the byte global at 0x5348f1 that this tree
+  already spelled `gSoundBackendsReady` (26 sites in ADVMGR/GAME/SMACKMGR);
+  `m_currentTrack`/`m_fadeSteps` were never separate from `m_musicTrack`
+  (`+0x4e`) and `m_musicFadeSteps` (`+0x4a`); `m_midiReady`/`m_midiStarted`
+  became the `BASE/MusicFlags` trio and `m_cdReady`/`m_cdStarted` collapsed
+  into `CDStartup()`'s bool result; the rest is read only by the `@remove`
+  CD bodies and is parked as file statics in `src/BASE/soundmgr.cpp`.
+- **[Buka] The `MIDI*` entry points are free `__fastcall` functions**
+  (`include/BASE/Midi.h`), not `soundManager` methods: `MIDIPlay(i32&
+  currentTrack, i32& fadeSteps, i32 track)`, `MIDIStop(i32& currentTrack)`,
+  `MIDISetVolume(i32& fadeSteps)`, `bool MIDIStartup(void)`,
+  `MIDIShutdown(void)`, `bool MIDIIsPlaying(void)`. `PlayAmbientMusic` passes
+  `this+0x4e` in ecx and `this+0x4a` in edx, mirroring the Audiere family's
+  `PlayAudiereMusic(i32&, i32&, ...)`. `MIDIStartup` publishes the MusicFlags
+  globals directly, so those are module globals rather than MusicFlags-private
+  statics.
+- **[Buka] `gSoundDisabled`** — a byte at 0x5348f0, set by `SetupCDRom` when
+  the CD-ROM check fails and read by `CDStartup`/`StartupMilesBackend`. It is
+  NOT `gbNoSound` (a dword at 0x52661c, referenced only from `SOURCE/KB`); the
+  two were conflated in the PoL-derived bodies.
+- **[Buka] `SetupCDRom` lost the `savedNoSound` save/restore** and gained a
+  `gpSoundManager->ShutdownSoundBackends()` in each CD-error arm.
+- **[Buka] `WAVE_init_driver` is inlined into `StartupMilesBackend`** with the
+  `WAVEOUTCAPSA` buffer promoted to a file static (0x5348a8, just before
+  `gWaveFormat` at 0x5348e0), `AIL_set_preference(15, 1)` made unconditional,
+  and `AIL_waveOutOpen` writing straight into `&m_digitalDriver`.
+- **[Buka] `AppWndProc` has no `KBWIN_CUSTOM_CD_MESSAGE` (0x3b9) case** — the
+  dispatch cascade tops out at 0x311 and the function carries no
+  `gpSoundManager` relocation. `AppInit` still sets
+  `bProcessMessage[0x3b9] = 1`.
 - ~~The Y-modify icon decoder pair~~ — **not removed after all**: retail
   relocated both decoders to the BASE tier tail (`FlipIconToBitmapYModify`
   at 0x4d5270, `IconToBitmapYModify` at 0x4d5a50) with rewritten bodies;
