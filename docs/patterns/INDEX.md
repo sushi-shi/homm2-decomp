@@ -61,3 +61,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [int-cast-suppresses-bool-widen](int-cast-suppresses-bool-widen.md) | `setcc` followed by an ours-only `and reg,0xff` -> cast the relational to `i32` in the arithmetic |
 | [pointer-plus-index-base-first](pointer-plus-index-base-first.md) | pointer global loaded BEFORE the flat index -> `*(p + x + y*W)`, not `p[y*W + x]` |
 | [initializer-store-order-pins-declaration-order](initializer-store-order-pins-declaration-order.md) | frames identical, hundreds of raw bytes differ -> the `= N` store sequence is the declaration order |
+| [switch-goto-tail-stub-island](switch-goto-tail-stub-island.md) | a run of 5-byte `jmp <tail>` stubs before the epilogue, one per case, in reverse source order → the cases end in `goto`, not `break`, and the `ja` shows the tail lives inside the last case |
+| [hiword-macro-double-mask](hiword-macro-double-mask.md) | doubled `and $0xffff` after `shr $0x10` (or a mask before `movswl %dx`) → the source calls the Win32 `HIWORD` macro, not a `static_cast` |

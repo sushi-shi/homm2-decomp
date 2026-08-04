@@ -81,7 +81,6 @@ H2_ENUM_BEGIN(ExpansionCampaignImplementationConstant)
     CAMPAIGN_ICON_Y                = 25,
     CAMPAIGN_ICON_WIDTH            = 376,
     CAMPAIGN_ICON_HEIGHT           = 49,
-    UNUSED_CAMPAIGN_DATA_COUNT     = 5,
     TRACK_FRAME_PLAYED             = 0,
     TRACK_FRAME_AVAILABLE          = 1,
     TRACK_FRAME_LOCKED             = 2,
@@ -324,8 +323,7 @@ void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
 
 VA(0x004b3427, 0x693)
 void ExpCampaign::InitMap(void) {
-    playerData* firstPlayer;
-    SCampaignChoice* campChoice =
+    SCampaignChoice* bonus =
         &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
@@ -339,72 +337,72 @@ void ExpCampaign::InitMap(void) {
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
-    i32 headerStatus = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
+    i32 mapHeaderResult = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = expansionCampaignDifficulty[IDX(m_campaignId)][IDX(m_currentMap)];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
 
-    firstPlayer = &gpGame->m_players[0];
-    i32 heroPosition;
-    hero* choiceHero;
-    switch (campChoice->type) {
+    playerData* player = &gpGame->m_players[0];
+    i32 heroSlot;
+    hero* pHero;
+    switch (bonus->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            firstPlayer->m_resources[IDX(campChoice->resource)] += campChoice->amount;
+            player->m_resources[IDX(bonus->resource)] += bonus->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
-            if (firstPlayer->m_heroCount > 0)
+            if (player->m_heroCount > 0)
                 GiveArtifact(
-                    gpGame->GetHero(firstPlayer->m_heroIds[0]),
-                    campChoice->artifact,
+                    gpGame->GetHero(player->m_heroIds[0]),
+                    bonus->artifact,
                     0,
                     -1
                 );
             break;
         case CAMPAIGN_CHOICE_SPELL:
-            if (firstPlayer->m_heroCount > 0)
-                gpGame->GetHero(firstPlayer->m_heroIds[0])
-                    ->m_spells[IDX(campChoice->spell)] = 1;
+            if (player->m_heroCount > 0)
+                gpGame->GetHero(player->m_heroIds[0])
+                    ->m_spells[IDX(bonus->spell)] = 1;
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-            if (firstPlayer->m_heroCount > 0) {
-                for (heroPosition = 0; heroPosition < firstPlayer->m_heroCount; ++heroPosition) {
-                    choiceHero = gpGame->GetHero(firstPlayer->m_heroIds[heroPosition]);
+            if (player->m_heroCount > 0) {
+                for (heroSlot = 0; heroSlot < player->m_heroCount; ++heroSlot) {
+                    pHero = gpGame->GetHero(player->m_heroIds[heroSlot]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_BLOOD_IS_THICKER) {
-                        if (choiceHero->m_portrait == HERO_GALLAVANT)
+                        if (pHero->m_portrait == HERO_GALLAVANT)
                             break;
                     } else {
                         if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                             && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
-                            if (choiceHero->m_portrait == HERO_CEALLACH)
+                            if (pHero->m_portrait == HERO_CEALLACH)
                                 break;
                         } else {
                             break;
                         }
                     }
                 }
-                choiceHero->SetSS(
-                    static_cast<HeroSecondarySkill>(campChoice->value),
-                    static_cast<HeroSkillLevel>(campChoice->amount)
+                pHero->SetSS(
+                    static_cast<HeroSecondarySkill>(bonus->value),
+                    static_cast<HeroSkillLevel>(bonus->amount)
                 );
             }
             break;
         case CAMPAIGN_CHOICE_CREATURES:
-            if (firstPlayer->m_heroCount > 0)
-                gpGame->GetHero(firstPlayer->m_heroIds[0])
-                    ->m_army.Add(campChoice->creature, campChoice->amount, -1);
+            if (player->m_heroCount > 0)
+                gpGame->GetHero(player->m_heroIds[0])
+                    ->m_army.Add(bonus->creature, bonus->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            firstPlayer->m_cheatValue = static_cast<i8>(campChoice->value);
+            player->m_cheatValue = static_cast<i8>(bonus->value);
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             i32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
-            if (firstPlayer->m_heroCount > 0) {
-                gpGame->GetHero(firstPlayer->m_heroIds[0])->m_experience += campChoice->value;
-                gpGame->GetHero(firstPlayer->m_heroIds[0])->CheckLevel();
+            if (player->m_heroCount > 0) {
+                gpGame->GetHero(player->m_heroIds[0])->m_experience += bonus->value;
+                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -412,41 +410,42 @@ void ExpCampaign::InitMap(void) {
         case CAMPAIGN_CHOICE_NONE:
             break;
         case CAMPAIGN_CHOICE_PRIMARY_SKILL:
-            if (firstPlayer->m_heroCount > 0) {
-                for (heroPosition = 0; heroPosition < firstPlayer->m_heroCount; ++heroPosition) {
-                    choiceHero = gpGame->GetHero(firstPlayer->m_heroIds[heroPosition]);
+            if (player->m_heroCount > 0) {
+                for (heroSlot = 0; heroSlot < player->m_heroCount; ++heroSlot) {
+                    pHero = gpGame->GetHero(player->m_heroIds[heroSlot]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
-                        if (choiceHero->m_portrait == HERO_CEALLACH)
+                        if (pHero->m_portrait == HERO_CEALLACH)
                             break;
                     } else {
                         break;
                     }
                 }
-                choiceHero->m_primaryStats[campChoice->value] += campChoice->amount;
+                pHero->m_primaryStats[bonus->value] += bonus->amount;
             }
             break;
         case CAMPAIGN_CHOICE_SPELL_SCROLL:
-            if (firstPlayer->m_heroCount > 0)
+            if (player->m_heroCount > 0)
                 GiveArtifact(
-                    gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                    gpGame->GetHero(player->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
                     0,
-                    static_cast<i8>(campChoice->spell)
+                    static_cast<i8>(bonus->spell)
                 );
             break;
     }
 
-    ExpansionCampaignAward award;
-    for (award = AWARD_ELVEN_ALLIANCE; IDX(award) < EXPANSION_CAMPAIGN_AWARD_COUNT; ++award) {
-        if (m_awards[IDX(award)] != 0) {
-            switch (award) {
+    ExpansionCampaignAward whichAward;
+    for (whichAward = AWARD_ELVEN_ALLIANCE; IDX(whichAward) < EXPANSION_CAMPAIGN_AWARD_COUNT;
+         ++whichAward) {
+        if (m_awards[IDX(whichAward)] != 0) {
+            switch (whichAward) {
                 case AWARD_ELVEN_ALLIANCE:
                     break;
                 case AWARD_BREASTPLATE_ANDURAN:
-                    if (firstPlayer->m_heroCount > 0)
+                    if (player->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                            gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
                             0,
                             -1
@@ -455,25 +454,25 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_WOOD_BONUS:
                     break;
                 case AWARD_HELMET_ANDURAN:
-                    if (firstPlayer->m_heroCount > 0)
+                    if (player->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                            gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
                             0,
                             -1
                         );
                     break;
                 case AWARD_DEFEAT_KRAEGER:
-                    for (heroPosition = 0; heroPosition < EXPANSION_CAMPAIGN_HERO_COUNT;
-                         ++heroPosition) {
-                        if (gpGame->m_heroRecs[heroPosition].m_portrait == HERO_DAINWIN)
-                            gpGame->m_heroRecs[heroPosition].Deallocate(0);
+                    for (heroSlot = 0; heroSlot < EXPANSION_CAMPAIGN_HERO_COUNT;
+                         ++heroSlot) {
+                        if (gpGame->m_heroRecs[heroSlot].m_portrait == HERO_DAINWIN)
+                            gpGame->m_heroRecs[heroSlot].Deallocate(0);
                     }
                     break;
                 case AWARD_BATTLE_GARB:
-                    if (firstPlayer->m_heroCount > 0)
+                    if (player->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                            gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
                             0,
                             -1
@@ -483,23 +482,23 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_UNCLE_IVAN:
                     break;
                 case AWARD_LEGENDARY_SCEPTER:
-                    if (firstPlayer->m_heroCount > 0)
+                    if (player->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                            gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
                             0,
                             -1
                         );
                     break;
                 case AWARD_SET_GUARDIAN:
-                    if (firstPlayer->m_heroCount > 0)
-                        gpGame->GetHero(firstPlayer->m_heroIds[0])
+                    if (player->m_heroCount > 0)
+                        gpGame->GetHero(player->m_heroIds[0])
                             ->m_spells[IDX(SPELL_SET_EARTH_GUARDIAN)] = 1;
                     break;
                 case AWARD_SPHERE_NEGATION:
-                    if (firstPlayer->m_heroCount > 0)
+                    if (player->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                            gpGame->GetHero(player->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
                             0,
                             -1
@@ -524,17 +523,17 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         MemError();
 
     widget* trackWidget = NULL;
-    i32 map;
-    for (map = 0; map < m_mapCount; ++map) {
+    i32 mapIndex;
+    for (mapIndex = 0; mapIndex < m_mapCount; ++mapIndex) {
         trackWidget = new iconWidget(
-            expansionCampaignTrackXY[IDX(m_campaignId)][map][0],
-            expansionCampaignTrackXY[IDX(m_campaignId)][map][1],
+            expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][0],
+            expansionCampaignTrackXY[IDX(m_campaignId)][mapIndex][1],
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             EXPANSION_CAMPAIGN_TRACK_ICON_SIZE,
             "x_cmpext.icn",
             0,
             ICON_DRAW_NORMAL,
-            map + CAMPAIGN_TRACK_WIDGET_FIRST,
+            mapIndex + CAMPAIGN_TRACK_WIDGET_FIRST,
             WIDGET_KIND_ICON_DIRECT,
             1
         );
@@ -543,8 +542,8 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         m_window->AddWidget(trackWidget, -1);
     }
 
-    widget* campaignIcon = NULL;
-    campaignIcon = new iconWidget(
+    widget* campIcon = NULL;
+    campIcon = new iconWidget(
         CAMPAIGN_ICON_X,
         CAMPAIGN_ICON_Y,
         CAMPAIGN_ICON_WIDTH,
@@ -556,21 +555,15 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
         WIDGET_KIND_ICON_DIRECT,
         1
     );
-    if (campaignIcon == NULL)
+    if (campIcon == NULL)
         MemError();
-    m_window->AddWidget(campaignIcon, -1);
+    m_window->AddWidget(campIcon, -1);
 
     tag_message message;
     message.type = MESSAGE_WIDGET;
     if (viewOnly == 0) {
         message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
         message.payload.widget.id = CAMPAIGN_DIALOG_RESTART;
-        message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
-        m_window->BroadcastMessage(message);
-    }
-    if (gbLowMemory != 0) {
-        message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
-        message.payload.widget.id = CAMPAIGN_DIALOG_REPLAY;
         message.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         m_window->BroadcastMessage(message);
     }
@@ -582,7 +575,10 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
 
     if (gpWindowManager->m_dialogResult == CAMPAIGN_DIALOG_RESTART) {
         NormalDialog(
-            "Are you sure you want to restart this scenario?",
+            /* "Вы действительно хотите начать сначала сценарий?" */
+            "\xc2\xfb \xe4\xe5\xe9\xf1\xf2\xe2\xe8\xf2\xe5\xeb\xfc\xed\xee "
+            "\xf5\xee\xf2\xe8\xf2\xe5 \xed\xe0\xf7\xe0\xf2\xfc "
+            "\xf1\xed\xe0\xf7\xe0\xeb\xe0 \xf1\xf6\xe5\xed\xe0\xf0\xe8\xe9?",
             CAMPAIGN_RESTART_CONFIRM,
             CAMPAIGN_DIALOG_NO_RESOURCE,
             CAMPAIGN_DIALOG_NO_RESOURCE,
@@ -605,30 +601,29 @@ void ExpCampaign::ShowInfo(i32 viewOnly, i32) {
     }
 }
 
-VA(0x004b3e05, 0x7b8)
+VA(0x004b3e05, 0x83d)
 void ExpCampaign::UpdateInfo(i32 redraw) {
-    tag_message message;
-    i8 hasVisibleAward;
-    i32 unusedCampaignData[UNUSED_CAMPAIGN_DATA_COUNT];
-    i32 map;
     SCampaignChoice* choice;
+    tag_message message;
+    char armyName[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
+    i8 hasVisibleAward;
+    i32 i;
     i8 showScroll;
-    char armyName8[EXPANSION_CAMPAIGN_ARMY_NAME_BUFFER_SIZE];
 
     message.type = MESSAGE_WIDGET;
-    for (map = 0; map < m_mapCount; ++map) {
-        if (m_mapChoices[map] != 0)
+    for (i = 0; i < m_mapCount; ++i) {
+        if (m_mapChoices[i] != 0)
             message.payload.widget.data.value = TRACK_FRAME_AVAILABLE;
-        else if (m_mapsPlayed[map] != 0)
+        else if (m_mapsPlayed[i] != 0)
             message.payload.widget.data.value = TRACK_FRAME_PLAYED;
         else
             message.payload.widget.data.value = TRACK_FRAME_LOCKED;
-        if (IDX(m_viewMap) == map)
+        if (i == IDX(m_viewMap))
             message.payload.widget.data.value +=
                 (IDX(m_campaignId) + TRACK_SELECTED_CAMPAIGN_OFFSET)
                 * TRACK_FRAME_CAMPAIGN_STRIDE;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
-        message.payload.widget.id = map + CAMPAIGN_TRACK_WIDGET_FIRST;
+        message.payload.widget.id = i + CAMPAIGN_TRACK_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
     }
 
@@ -659,72 +654,108 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
     hasVisibleAward = 0;
     message.payload.widget.id = CAMPAIGN_AWARDS_WIDGET;
     strcpy(gText, "");
-    for (map = 0; map < EXPANSION_CAMPAIGN_AWARD_COUNT; ++map) {
-        if (m_awards[map] != 0) {
+    for (i = 0; i < EXPANSION_CAMPAIGN_AWARD_COUNT; ++i) {
+        if (m_awards[i] != 0) {
             hasVisibleAward = 1;
-            strcat(gText, xCampaignAwards[map]);
+            strcat(gText, xCampaignAwards[i]);
             strcat(gText, "\n");
         }
     }
     if (hasVisibleAward == 0)
-        sprintf(gText, "None");
+        sprintf(gText, "\xcd\xe5\xf2" /* "Нет" */);
     m_window->BroadcastMessage(message);
 
-    for (map = 0; map < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
-        choice = xCampaignChoices[0][IDX(m_viewMap)]
-                 + IDX(m_campaignId) * EXPANSION_CAMPAIGN_MAX_MAP_COUNT
-                       * EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT
-                 + map;
+    for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
+        choice = &xCampaignChoices[IDX(m_campaignId)][IDX(m_viewMap)][i];
         switch (choice->type) {
             case CAMPAIGN_CHOICE_RESOURCE:
-                sprintf(gText, "%d %s", choice->amount, gResourceNames[IDX(choice->resource)]);
+                sprintf(gText, "%s: %d", gResourceNames[IDX(choice->resource)], choice->amount);
                 break;
             case CAMPAIGN_CHOICE_ARTIFACT:
                 switch (choice->artifact) {
                     case ARTIFACT_MINOR_SCROLL:
-                        strcpy(gText, "Minor Scroll");
+                        strcpy(
+                            gText,
+                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                        );
                         break;
                     case ARTIFACT_MAGE_RING:
-                        strcpy(gText, "Mage's Ring");
+                        strcpy(
+                            gText,
+                            "\xca\xee\xeb\xfc\xf6\xee \xec\xe0\xe3\xe0" /* "Кольцо мага" */
+                        );
                         break;
                     case ARTIFACT_DEFENDER_HELM:
-                        strcpy(gText, "Defender Helm");
+                        strcpy(
+                            gText,
+                            /* "Щлем защитника" */
+                            "\xd9\xeb\xe5\xec \xe7\xe0\xf9\xe8\xf2\xed\xe8\xea\xe0"
+                        );
                         break;
                     case ARTIFACT_POWER_AXE:
-                        strcpy(gText, "Power Axe");
+                        strcpy(gText, "\xd2\xee\xef\xee\xf0 \xf1\xe8\xeb\xfb" /* "Топор силы" */);
                         break;
                     case ARTIFACT_DRAGON_SWORD:
-                        strcpy(gText, "Dragon Sword");
+                        strcpy(
+                            gText,
+                            "\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xec\xe5\xf7" /* "Драконий меч" */
+                        );
                         break;
                     case ARTIFACT_DIVINE_BREASTPLATE:
-                        strcpy(gText, "Breastplate");
+                        strcpy(gText, "\xc4\xee\xf1\xef\xe5\xf5\xe8" /* "Доспехи" */);
                         break;
                     case ARTIFACT_FIZBIN_OF_MISFORTUNE:
-                        strcpy(gText, "Fizbin Medal");
+                        strcpy(
+                            gText,
+                            /* "Символ неудачи" */
+                            "\xd1\xe8\xec\xe2\xee\xeb \xed\xe5\xf3\xe4\xe0\xf7\xe8"
+                        );
                         break;
                     case ARTIFACT_THUNDER_MACE:
-                        strcpy(gText, "Thunder Mace");
+                        strcpy(
+                            gText,
+                            /* "Громовая палица" */
+                            "\xc3\xf0\xee\xec\xee\xe2\xe0\xff \xef\xe0\xeb\xe8\xf6\xe0"
+                        );
                         break;
                     case ARTIFACT_ARMORED_GAUNTLETS:
-                        strcpy(gText, "Gauntlets");
+                        strcpy(gText, "\xcf\xe5\xf0\xf7\xe0\xf2\xea\xe8" /* "Перчатки" */);
                         break;
                     case ARTIFACT_MAJOR_SCROLL:
-                        strcpy(gText, "Major Scroll");
+                        strcpy(
+                            gText,
+                            "\xcc\xe0\xeb\xfb\xe9 \xf1\xe2\xe8\xf2\xee\xea" /* "Малый свиток" */
+                        );
                         break;
                     case ARTIFACT_FOREMOST_SCROLL:
-                        strcpy(gText, "Foremost Scroll");
+                        strcpy(
+                            gText,
+                            /* "Свиток высш. зн." */
+                            "\xd1\xe2\xe8\xf2\xee\xea \xe2\xfb\xf1\xf8. \xe7\xed."
+                        );
                         break;
                     case ARTIFACT_BALLISTA:
-                        strcpy(gText, "Ballista");
+                        strcpy(gText, "\xc1\xe0\xeb\xeb\xe8\xf1\xf2\xe0" /* "Баллиста" */);
                         break;
                     case ARTIFACT_STEALTH_SHIELD:
-                        strcpy(gText, "Stealth Shield");
+                        strcpy(
+                            gText,
+                            "\xcd\xe5\xe7\xf0\xe8\xec\xfb\xe9 \xf9\xe8\xf2" /* "Незримый щит" */
+                        );
                         break;
                     case ARTIFACT_NOMAD_BOOTS:
-                        strcpy(gText, "Nomad Boots");
+                        strcpy(
+                            gText,
+                            /* "Башмаки кочевника" */
+                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xea\xee\xf7\xe5\xe2\xed\xe8\xea\xe0"
+                        );
                         break;
                     case ARTIFACT_TRAVELER_BOOTS:
-                        strcpy(gText, "Traveler's Boots");
+                        strcpy(
+                            gText,
+                            /* "Башмаки путника" */
+                            "\xc1\xe0\xf8\xec\xe0\xea\xe8 \xef\xf3\xf2\xed\xe8\xea\xe0"
+                        );
                         break;
                     case ARTIFACT_HIDEOUS_MASK:
                     case ARTIFACT_BLACK_PEARL:
@@ -735,7 +766,11 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 break;
             case CAMPAIGN_CHOICE_SPELL:
                 if (choice->spell == SPELL_SUMMON_EARTH_ELEMENTAL)
-                    sprintf(gText, "Summon Earth");
+                    sprintf(
+                        gText,
+                        "\xcf\xf0\xe8\xe7\xe2\xe0\xf2\xfc \xe7\xe5\xec\xeb\xff\xed\xfb\xf5 \xfd"
+                        "\xeb." /* "Призвать земляных эл." */
+                    );
                 else
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 break;
@@ -760,18 +795,22 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                 }
                 break;
             case CAMPAIGN_CHOICE_CREATURES:
-                strcpy(armyName8, gArmyNamesPlural[IDX(choice->creature)]);
-                armyName8[0] -= 'a' - 'A';
-                sprintf(gText, "%d %s", choice->amount, armyName8);
+                strcpy(armyName, gArmyNamesPlural[IDX(choice->creature)]);
+                sprintf(gText, "%d %s", choice->amount, armyName);
                 break;
             case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-                sprintf(gText, "%d %s", choice->value, "Puzzle Pieces");
+                sprintf(
+                    gText,
+                    "%d %s",
+                    choice->value,
+                    "\xce\xe1\xf0\xfb\xe2\xea\xe8 \xea\xe0\xf0\xf2\xfb" /* "Обрывки карты" */
+                );
                 break;
             case CAMPAIGN_CHOICE_EXPERIENCE:
-                sprintf(gText, "%d %s", choice->value, "Experience");
+                sprintf(gText, "%d %s", choice->value, "\xce\xef\xfb\xf2" /* "Опыт" */);
                 break;
             case CAMPAIGN_CHOICE_NONE:
-                sprintf(gText, "n/a");
+                sprintf(gText, "\xed/\xe4" /* "н/д" */);
                 break;
             case CAMPAIGN_CHOICE_ALIGNMENT:
                 sprintf(gText, gAlignmentNames[IDX(choice->faction)]);
@@ -788,19 +827,24 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
                         break;
                 }
                 if (showScroll != 0) {
-                    sprintf(gText, "%s %s", gSpellNames[IDX(choice->spell)], "Scroll");
+                    sprintf(
+                        gText,
+                        "%s %s",
+                        gSpellNames[IDX(choice->spell)],
+                        "\xd1\xe2\xe8\xf2\xee\xea" /* "Свиток" */
+                    );
                 } else {
                     sprintf(gText, "%s", gSpellNames[IDX(choice->spell)]);
                 }
                 break;
             }
         }
-        message.payload.widget.id = map + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
+        message.payload.widget.id = i + CAMPAIGN_BONUS_TEXT_WIDGET_FIRST;
         m_window->BroadcastMessage(message);
     }
 
-    for (map = 0; map < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++map) {
-        message.payload.widget.id = map + CAMPAIGN_BONUS_WIDGET_FIRST;
+    for (i = 0; i < EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT; ++i) {
+        message.payload.widget.id = i + CAMPAIGN_BONUS_WIDGET_FIRST;
         message.payload.widget.command = WIDGET_COMMAND_SET_FRAME;
         if (m_viewOnly == 0 && m_mapChoices[IDX(m_viewMap)] != 0)
             message.payload.widget.data.value = CAMPAIGN_WIDGET_ENABLE_FRAME;
@@ -808,7 +852,7 @@ void ExpCampaign::UpdateInfo(i32 redraw) {
             message.payload.widget.data.value = CAMPAIGN_WIDGET_DISABLE_FRAME;
         m_window->BroadcastMessage(message);
 
-        if (m_bonusChoices[IDX(m_viewMap)] == map)
+        if (m_bonusChoices[IDX(m_viewMap)] == i)
             message.payload.widget.command = CAMPAIGN_MESSAGE_SELECT;
         else
             message.payload.widget.command = CAMPAIGN_MESSAGE_DESELECT;
@@ -1148,7 +1192,7 @@ i8 ExpCampaign::IsThisMapCompleted(void) {
     return 0;
 }
 
-VA(0x004b4e54, 0x26e)
+VA(0x004b4e54, 0x2ae)
 MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
     i32 map;
 
@@ -1156,11 +1200,11 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
         gpSoundManager->SwitchAmbientMusic(
             giTerrainToMusicTrack[IDX(gpAdvManager->m_currentTerrain)]
         );
-    if (giDialogTimeout != 0 && giDialogTimeout < KBTickCount()) {
+    if (giDialogTimeout != 0 && KBTickCount() > giDialogTimeout) {
         message.type = MESSAGE_WIDGET;
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
-        message.payload.widget.command = BaseWidgetCommand(message.payload.widget.id);
+        message.payload.widget.command = BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
         giDialogTimeout = 0;
         return MESSAGE_DISPATCH_FORWARD;
     }
@@ -1213,8 +1257,14 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                                 xCampaign.m_currentMap = xCampaign.m_viewMap;
                             } else {
                                 NormalDialog(
-                                    "The currently selected map is not a valid choice for your "
-                                    "next scenario.",
+                                    /* "Выбранная карта - плохой выбор
+                                       для вашего следующего сценария." */
+                                    "\xc2\xfb\xe1\xf0\xe0\xed\xed\xe0\xff "
+                                    "\xea\xe0\xf0\xf2\xe0 - \xef\xeb\xee\xf5\xee\xe9 "
+                                    "\xe2\xfb\xe1\xee\xf0 \xe4\xeb\xff "
+                                    "\xe2\xe0\xf8\xe5\xe3\xee "
+                                    "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe3\xee "
+                                    "\xf1\xf6\xe5\xed\xe0\xf0\xe8\xff.",
                                     NORMAL_DIALOG_INFO,
                                     NORMAL_DIALOG_NO_RESOURCE,
                                     NORMAL_DIALOG_NO_RESOURCE,
@@ -1233,7 +1283,7 @@ MessageDispatchResult ExpCampaign::MessageHandler(struct tag_message& message) {
                         gpWindowManager->m_dialogResult = message.payload.widget.id;
                         message.payload.widget.id = CAMPAIGN_CLOSE_COMMAND;
                         message.payload.widget.command =
-                            BaseWidgetCommand(message.payload.widget.id);
+                            BaseWidgetCommand(CAMPAIGN_CLOSE_COMMAND);
                         giDialogTimeout = 0;
                         return MESSAGE_DISPATCH_FORWARD;
                     default:

@@ -494,6 +494,65 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[Buka] `ViewSpellsHandler` (0x454d5e) refreshes the window even when the
   spell page is already at the top** — the `VIEW_SPELL_PREVIOUS_ID` case calls
   `UpdateSpellWidgets()` + `MoveWindow(0,0)` in both arms.
+### SOURCE/X_CAMPGN (expansion campaign screen)
+
+- **[Buka] The bonus/award panel text is CP1251 Russian.**
+  `ExpCampaign::UpdateInfo` (0xb3e05) spells all fifteen campaign-bonus
+  artifact names, the spell-scroll suffix, the puzzle/experience bonus names
+  and the "no awards" placeholder in Russian: "Малый свиток", "Кольцо мага",
+  "Щлем защитника", "Топор силы", "Драконий меч", "Доспехи", "Символ
+  неудачи", "Громовая палица", "Перчатки", "Свиток высш. зн.", "Баллиста",
+  "Незримый щит", "Башмаки кочевника", "Башмаки путника", "Призвать земляных
+  эл.", "Обрывки карты", "Опыт", "н/д", "Свиток", "Нет". Two are semantic,
+  not just translated: **Major Scroll and Minor Scroll share one cell**
+  ("Малый свиток" is pushed for both `ARTIFACT_MINOR_SCROLL` and
+  `ARTIFACT_MAJOR_SCROLL`), and the resource bonus is formatted `"%s: %d"`
+  with the resource name first, not `"%d %s"`.
+- **[Buka] The creature bonus is not capitalised.** `UpdateInfo`'s
+  `CAMPAIGN_CHOICE_CREATURES` arm is `strcpy(armyName, gArmyNamesPlural[...])`
+  followed straight by `sprintf(gText, "%d %s", ...)`; the `armyName[0] -=
+  'a' - 'A'` upper-casing step the reconstruction carried has no bytes in
+  this image (the Russian plural names are already capitalised).
+- **[Buka] Abbreviated secondary-skill levels.** The special-bonus arm of
+  `UpdateInfo` indexes a three-entry X_CAMPGN-local table at VA 0x0051b800
+  ("1 ступ.", "2 ступ.", "3 ступ.") rather than the game-wide
+  `gSecondarySkillLevels` ("1 ступени"...), which is what the ordinary arm
+  still uses. The abbreviation exists because the Russian names no longer fit
+  the bonus widget.
+- **[Buka] No low-memory replay button.** `ExpCampaign::ShowInfo` (0xb3aba)
+  enables only `CAMPAIGN_DIALOG_RESTART` (widget 0x385, under
+  `viewOnly == 0`). The `gbLowMemory`-guarded `CAMPAIGN_DIALOG_REPLAY`
+  (widget 0x386) block the reconstruction carried is absent, and both dialog
+  prompts are Russian ("Вы действительно хотите начать сначала сценарий?",
+  "Выбранная карта - плохой выбор для вашего следующего сценария.").
+
+### BASE/INPUTMGR (keyboard/mouse input)
+
+- **[Buka] Enter is force-mapped to its scan code.** Both `WM_KEYDOWN` and
+  `WM_KEYUP` arms of `KeyboardMessageHandler` (0xbbf40) open with
+  `if (virtualKey == VK_RETURN) event->payload.keyboard.keyCode =
+  INPUT_SCAN_ENTER; else <HIWORD(lParam) & 0xff>` — the wParam virtual key
+  overrides the lParam scan byte for Enter only.
+- **[Buka] Cyrillic layout remap on the ASCII result.**
+  `TranslateInputCharacterCp1251` (0xbcad0, a file static) rewrites
+  `event.payload.keyboard.keyCode` through a 128-byte table at VA 0x0051e51c
+  whenever the code is in `[0, 0x80)`, and `AsciiConvert` calls it whenever
+  no control-class modifier is held. The table is identity below 0x22 and
+  maps the ASCII letter/punctuation range onto the CP1251 codes of the
+  standard ЙЦУКЕН layout (`A`->0xd4 "Ф", `B`->0xc8 "И", `"`->0xdd "Э"). No
+  PoL counterpart.
+- **[unclassified] `SetKeyCodeType` calls `Flush()`.** 0xbcaa0 stores
+  `m_keyCodeType` and then makes a real `__thiscall` to
+  `inputManager::Flush`, not an inline ring reset.
+- **[unclassified] `ForceMouseMove` tests its re-entrancy flag twice.**
+  0xbd300 emits `cmp gpInputManager->m_mouseMessageActive, 0 / je / jmp`
+  twice in a row before claiming the flag - a duplicated guard preserved in
+  the bytes.
+- **[unclassified] `AsciiConvert` shift-map falls through to the Polish
+  remap.** Each shifted-symbol case `break`s out of the switch; retail then
+  still runs the `(modifiers & MESSAGE_MODIFIER_CONTROL_KEYS) == 0` test and
+  calls `TranslatePolishInputCharacter`. The reconstruction's `return` in
+  every case skipped it.
 
 ## Reconstruction infrastructure notes (not version deltas)
 
