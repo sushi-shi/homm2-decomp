@@ -165,7 +165,7 @@ H2_ENUM_BEGIN(MapEventConstant)
     CHEST_REWARD_MEDIUM                  = 3,
     CHEST_REWARD_LARGE                   = 4,
     CHEST_GOLD_MULTIPLIER                = 500,
-    CHEST_EXPERIENCE_MULTIPLIER          = 125,
+    CHEST_EXPERIENCE_MULTIPLIER          = 500,
     DAEMON_CAVE_EMPTY                    = 1,
     DAEMON_REWARD_EXPERIENCE             = 2,
     DAEMON_REWARD_ARTIFACT               = 3,
