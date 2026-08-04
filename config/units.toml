@@ -16,7 +16,7 @@ platform = "win32"
 # emit PAUHMENU__@@ for every handle-taking function instead.
 [flags]
 base = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gf", "/Gi-", "/GX", "/DNO_STRICT"]
-# Ten TUs keep duplicate string cells in retail (same content, two cells
+# Eleven TUs keep duplicate string cells in retail (same content, two cells
 # inside the unit block): their compile ran without string pooling.
 base_nogf = ["/nologo", "/c", "/Od", "/MT", "/Gr", "/G5", "/Ob1", "/Gi-", "/GX", "/DNO_STRICT"]
 o2 = ["/nologo", "/c", "/O2", "/MT", "/Gr", "/G5", "/DNO_STRICT"]
@@ -283,7 +283,7 @@ flags = "base"
 [[unit]]
 unit = "SOURCE/ARMY"
 source = "src/SOURCE/ARMY.cpp"
-flags = "base"
+flags = "base_nogf"
 
 [[unit]]
 unit = "SOURCE/ARMYGRP"
