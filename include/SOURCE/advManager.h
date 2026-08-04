@@ -380,7 +380,7 @@ extern i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT];
 extern i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT];
 extern class sample* hOldWalkSample;
 extern class sample* hNewWalkSample;
-extern i32 EveryOther;
+extern u8 EveryOther;
 extern i32 startVals[ADVMGR_VIEW_WORLD_SCALE_COUNT];
 extern i8 iVWHalf[ADVMGR_VIEW_WORLD_SCALE_COUNT][ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT]
                      [IDX(COORDINATE_AXIS_COUNT)];

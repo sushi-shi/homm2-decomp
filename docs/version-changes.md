@@ -620,6 +620,35 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (LEFT, WEST, 0, 1), (LEFT, EAST, 0, 1) and (LEFT, EAST, 1, <=2) - the hex
   cells a wide creature's own body would occupy. 62 instructions the
   reconstruction was missing outright.
+- **[unclassified] `SOURCE/CURSOR` dropped the walk-sample bookkeeping.** PoL
+  2.0's `advManager::DrawCursor` kept the last two footstep voices in
+  `hOldWalkSample` / `hNewWalkSample` (`if (m_cursorFrameCount == 0)
+  hOldWalkSample = hNewWalkSample;` and `hNewWalkSample =
+  gpSoundManager->MemorySample(...)`), and `StopCursor` cleared both. In this
+  image none of the three statements exists: `DrawCursor` (0x334da) passes the
+  sample straight into `MemorySample` (`mov edx, 0x352(%ecx,%eax,4); push edx;
+  call ?MemorySample@soundManager@@QAEXPAVsample@@@Z` — note the `X` return,
+  i.e. `void`, where PoL's returned a voice id) and `StopCursor` (0x333f4)
+  stops after `EveryOther = 0`. Both globals are now write-only in the TU.
+- **[unclassified] `EveryOther` narrowed from `int` to `unsigned char` and is
+  toggled with `!`.** Every retail reference is a byte access
+  (`xor ecx,ecx; mov cl, byte ptr [EveryOther]` at 0x334da+0x4a4 and
+  0x340ca+0x81a, `movb $0x0` in `StopCursor`), and the toggle is
+  `neg ecx; sbb ecx,ecx; inc ecx` — logical NOT, not PoL's `1 - EveryOther`
+  (`mov eax,1; sub eax,...`). Declared `u8 EveryOther` in
+  `include/SOURCE/advManager.h` on this branch.
+- **[unclassified] `advManager::MoveHero`'s south-west deferred-draw arm adds
+  the Y delta.** In the `directionX == -1 && directionY == -1` arm retail reads
+  `add eax, -0x44(%ebp)` (directionY) where PoL 2.0 reads directionX
+  (`giDeferObjDrawX = movingHero->m_x + directionX_b;`). Both deltas are -1
+  inside that arm, so the runtime result is unchanged; the source line differs.
+- **[unclassified] `searchArray::SeedCombatPosition` gates on `shots`, not
+  `speed`.** Both of its "already surrounded" tests read
+  `movsbl 0xca(%ecx), %edx` = `m_monster.shots` (monsterInfo + 0x10), where PoL
+  2.0 reads `m_monster.speed` (0xc5 = monsterInfo + 0xb): retail is
+  `if (unit->m_monster.shots > 0 && GetAttackMask(...) == ATTACK_MASK_SURROUNDED)`.
+  A shooter, not a fast unit, is what makes the enemy hex reachable without a
+  path.
 
 ## Reconstruction infrastructure notes (not version deltas)
 
