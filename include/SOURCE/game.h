@@ -204,7 +204,7 @@ public:
     town* GetPlayerTown(i32 player, i32 index) {
         return &m_castleRecs[m_players[player].m_townIds[index]];
     }
-    i8 GetPlayerColor(i32 player) {
+    i32 GetPlayerColor(i32 player) {
         return m_players[player].m_color;
     }
     i32 GetMineId(i32, i32);

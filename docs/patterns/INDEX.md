@@ -35,3 +35,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [byte-store-int-rhs-order](byte-store-int-rhs-order.md) | `arr[i] = <byte>`: retail's `and $0xff` plus value-before-index order → the RHS is an `int` expression, not a `u8` lvalue |
 | [bool-store-to-byte-field](bool-store-to-byte-field.md) | `xor/cmp/sete/movb` into a one-byte field → `field = (a == b);`, not an `if/else` pair of `movb` stores |
 | [switch-table-tail-in-function-span](switch-table-tail-in-function-span.md) | function is byte-identical yet capped: the compiler's switch tables sit just past the Ghidra size; widen the `VA(...)` size to the next function's start |
+| [bool-plus-enum-mask](bool-plus-enum-mask.md) | ours-only `and $0xff` after `setcc` before an `add imm` → the other addend is an ENUM constant; cast it (or the bool) to `i32` |
+| [add-simple-operand-into-accumulator](add-simple-operand-into-accumulator.md) | retail keeps an extra `mov` (`mov scratch,<product>` / `mov acc,<local>` / `add acc,scratch`) → the ACCUMULATOR operand is the source's LEFT one; per-site, not per-function |
+| [ternary-temp-after-this](ternary-temp-after-this.md) | two constant stores to one slot joined by `jmp`, then a load, with the slot DEEPER than the `this` spill → a branchy `?:`, not an if/else pair of stores |

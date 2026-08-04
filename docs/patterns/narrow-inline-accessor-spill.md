@@ -84,3 +84,35 @@ Measured on `CheckEndGame` (RVA 0x69899, three sites), `ReceiveHostReportsPlayer
 
 so in this image `game::GetPlayerColor` is a reconstruction convenience, not what
 those call sites were written as.
+
+## Corollary (measured, still OPEN): the accessor's RETURN WIDTH also decides the widening
+
+Where the accessor result feeds a **`short`** parameter, the direct member read is not
+enough: `char -> short` lowers to a 16-bit `movsx` (`66 0f be`), while retail widens to
+32 bits and pushes.
+
+```
+retail                                                ours (direct member read)
+----------------------------------------------------- -----------------------------------------------------
+0f be 8c 10 9c 04 00 00  movsbl 0x49c(%eax,%edx), %ecx 66 0f be 8c 10 9c 04 00 00  movsbw 0x49c(%eax,%edx), %cx
+51                       pushl  %ecx                   51                          pushl  %ecx
+```
+
+Probe (same flags), `struct G { i8 tab[8][0x11b]; ... }; void SinkS(short,short);`:
+
+```cpp
+signed char GetC(int i) { return tab[i][0x49c]; }   // b1: movb -> temp; movsbw temp   (spill + 16-bit)
+int         GetI(int i) { return tab[i][0x49c]; }   // b2: movsbl 0x49c(%ecx,%eax),%edx (NO temp, 32-bit)
+short       GetS(int i) { return tab[i][0x49c]; }   // b3: movsbw 0x49c(%ecx,%eax),%dx  (no temp, 16-bit)
+SinkS(1, gp->tab[i][0x49c]);                        //     movsbw ...                   (no temp, 16-bit)
+SinkS(1, (int)gp->tab[i][0x49c]);                   //     movsbw ...  (the cast folds)
+```
+
+Only **b2** - an inline accessor declared to return `int` - reproduces retail's
+`movsbl` with no temp slot. So `game::GetPlayerColor` is very likely
+`i32 GetPlayerColor(i32)` in retail, not `i8`; the `i8` reconstruction forces call
+sites either to spill a byte temp (accessor form) or to emit `movsbw` (member form).
+Open at `advManager::UpdBottomViewEnemyTurn` (RVA 0xad72, 99.98%), one prefix byte:
+the fix is the one-token return-type change in `include/SOURCE/game.h`, which also
+touches `CURSOR/ProcessMapChange`, `VIEW/ViewGeneral` and `GAME/ClaimTown` (none of
+them currently exact).
