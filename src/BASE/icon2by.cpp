@@ -4,6 +4,7 @@
 #include <BASE/bitmap.h>
 #include <BASE/IconEntry.h>
 #include <BASE/IconRle.h>
+#include <SOURCE/KB.h>
 #include <BASE/IconShear.h>
 #include <SOURCE/dimPalette.h>
 #include <string.h>

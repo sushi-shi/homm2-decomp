@@ -225,10 +225,10 @@ entry_rva,size,symbol,unit,source_object,evidence
 0xd4940,18,_$E18,BASE/RESOURCE,BASE/AudiereEffects,masked-exact
 0xd5220,39,_$E19,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
 0xd5250,18,_$E18,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
-0xd5a00,39,_$E19,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
-0xd5a30,18,_$E18,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
-0xd60e0,39,_$E19,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
-0xd6110,18,_$E18,BASE/iconf2bc,BASE/AudiereEffects,masked-exact
+0xd5a00,39,_$E19,BASE/iconf2by,BASE/AudiereEffects,masked-exact
+0xd5a30,18,_$E18,BASE/iconf2by,BASE/AudiereEffects,masked-exact
+0xd60e0,39,_$E19,BASE/icon2by,BASE/AudiereEffects,masked-exact
+0xd6110,18,_$E18,BASE/icon2by,BASE/AudiereEffects,masked-exact
 0xd6460,39,_$E19,BASE/Iconmf2b,BASE/AudiereEffects,masked-exact
 0xd6490,18,_$E18,BASE/Iconmf2b,BASE/AudiereEffects,masked-exact
 0xd6880,39,_$E19,BASE/Icondf2b,BASE/AudiereEffects,masked-exact
