@@ -78,7 +78,7 @@ public:
     i32 HasMobileHero(void);
     i32 BuildingsOwned(FactionType, BuildingSlotType, i32);
     i32 NumOfGivenArtifact(ArtifactType);
-    i8 CurrentHero(void) {
+    i32 CurrentHero(void) {
         return m_currentHero;
     }
     i8 CurrentTown(void) {

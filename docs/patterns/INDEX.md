@@ -49,3 +49,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [increment-vs-plus-equals-read-order](increment-vs-plus-equals-read-order.md) | `p[i]` read evaluates the subscript before the base → source is `p[i]++`; retail's base-first read is `p[i] += 1` |
 | [short-cast-of-int-sum](short-cast-of-int-sum.md) | `movswl %ax, r32` on an already-32-bit sum → the whole expression carries an `i16` cast (`movsbl %al` = `i8`) |
 | [dead-local-frame-gap](dead-local-frame-gap.md) | holes in retail's `-0xN(%ebp)` census are declared-but-unused locals; add them or every deeper slot shifts (plus the `/Z7` S_BPREL32 recipe for naming our own frame) |
+| [x87-push-order-names-operand-order](x87-push-order-names-operand-order.md) | ours folds a local into `fmul <mem>`/`fimul`/`fiadd` where retail opens with `fild`/`fld` of it and closes `fmulp`/`faddp` → that local is the source's LEFT operand |
+| [do-while-zero-macro-tail](do-while-zero-macro-tail.md) | ours-only `xor reg,reg; test reg,reg; jne <top>` after a macro-expanded statement → a `do { } while (0)` wrapper retail never had |
+| [inline-accessor-return-width](inline-accessor-return-width.md) | `movsx` of a one-byte member with NO frame temp → the inline accessor returns `i32`; a byte temp means it returns `i8`; a plain `mov cl` means a direct member read |
