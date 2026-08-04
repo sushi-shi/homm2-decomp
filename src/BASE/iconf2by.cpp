@@ -1,6 +1,7 @@
 #include <va.h>
 #include <BASE/iconf2by.h>
 #include <BASE/IconRle.h>
+#include <SOURCE/KB.h>
 #include <BASE/IconShear.h>
 #include <BASE/icon.h>
 #include <BASE/bitmap.h>
