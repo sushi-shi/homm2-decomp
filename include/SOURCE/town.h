@@ -100,7 +100,7 @@ public:
     char m_name[TOWN_NAME_CAPACITY];
     town(void);
     i32 HasGarrison(void);
-    char OccupyingHero(void) {
+    i32 OccupyingHero(void) {
         return m_occupyingHeroId;
     }
     void GiveSpells(class hero*);

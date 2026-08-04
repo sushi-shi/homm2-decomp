@@ -51,3 +51,47 @@ EXACT. VC6 materialises the `bool` value of a short-circuit expression into a
 `i32 result; if (...) result = 1; else result = 0; return result;` is NOT the
 same shape — that form emits the `1` store first (the `then` block follows the
 condition) and would need the arms swapped.
+
+## The assignment variant: `x = (A || B || C);` (SOURCE/PHILAI)
+
+The same temp appears when the short-circuit value is ASSIGNED to a named
+`i32` local instead of returned. The tell is that the temp is a SECOND slot,
+deeper than `this`, that only ever receives `0`/`1` and is immediately copied
+into the real local:
+
+```
+ours   if (A || B || C) good = 1;                  retail
+       else             good = 0;
+------------------------------------------------  ------------------------------------------------
+83 ec 70  sub  esp, 0x70                           83 ec 78  sub  esp, 0x78    <- 2 extra temps
+...                                                ...
+81 f9 ab..cmp  ecx, 0xab                           81 fa ab..cmp  edx, 0xab
+75 ..     jne  FALSE                               75 15     jne  FALSE
+...       test flags                               ...       test flags
+74 ..     je   TRUE                                74 09     je   TRUE
+TRUE: c7 45 ec 01 00 00 00 mov [good], 1           FALSE: c7 45 8c 00 00 00 00 mov [ebp-0x74], 0
+eb ..     jmp  END                                 eb 07     jmp  JOIN
+FALSE:c7 45 ec 00 00 00 00 mov [good], 0           TRUE:  c7 45 8c 01 00 00 00 mov [ebp-0x74], 1
+                                                   JOIN:  8b 55 8c  mov edx, [ebp-0x74]
+                                                          89 55 ec  mov [good], edx
+```
+
+`philAI::DetermineTargetPosition` (0x81c03) has two of them, hence retail's
+frame is 8 bytes larger than the if/else form's:
+
+```cpp
+                            good = (cell->m_triggerType
+                                        == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)
+                                    || cell->m_triggerType
+                                           == (MAP_TRIGGER_ACTION_FLAG
+                                               | MAP_OBJECT_HERO_INTERACTION)
+                                    || (cell->m_triggerType
+                                            == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_BOAT)
+                                        && !HAS(
+                                            gpCurAIHero->m_eventFlags, HERO_EVENT_EMBARKED
+                                        )));
+```
+
+A plain `good = 0;` in a neighbouring arm stays a direct
+`mov [good], 0` — only the short-circuit expression takes the temp, so a
+mixed function shows both forms.
