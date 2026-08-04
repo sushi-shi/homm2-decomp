@@ -80,7 +80,7 @@ extern "C" u16 __cdecl nb_init(u16 maxNames, u16 maxSessions) {
     NetbiosControlBlock blk;
     i32 idx;
     u8* statusBuffer;
-    i32 returnCode;
+    i32 result;
 
     memset(gNbSessLsn, 0, sizeof(gNbSessLsn));
     memset(&gNbCtlNcb, 0, sizeof(gNbCtlNcb));
@@ -214,8 +214,8 @@ nb_sess(H2_ENUM_PARAM(NetbiosSessionOperation, i16) operation, ...) {
     i32 detachFlag;
     NetbiosControlBlock controlBlock;
     char* peer;
-    H2_ENUM_STORAGE(NetbiosResult, i16) rc;
     va_list args;
+    H2_ENUM_STORAGE(NetbiosResult, i16) rc;
 
     va_start(args, operation);
     switch (operation) {
@@ -425,11 +425,11 @@ static void nb_add_name(void) {
     }
 }
 
-VA(0x00474b12, 0x152)
+VA(0x00474b12, 0x193)
 static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
     i32 j;
     ProcessAssert(
-        &gNbSessNcb[gNbMaxSess] == ncb,
+        ncb == &gNbSessNcb[gNbMaxSess],
         RETAIL_FILE,
         537
     );
@@ -446,7 +446,7 @@ static void __stdcall nb_add_name_done(NetbiosControlBlock* ncb) {
         case NETBIOS_RESULT_DUPLICATE_ENVIRONMENT:
             for (j = NETBIOS_NAME_SIZE - 1; j >= 0; j--) {
                 ncb->name[j]++;
-                if (gNbNameBuf[gNbMaxSess].bytes[j] != ncb->name[j])
+                if (ncb->name[j] != gNbNameBuf[gNbMaxSess].bytes[j])
                     break;
             }
             Netbios(ncb);

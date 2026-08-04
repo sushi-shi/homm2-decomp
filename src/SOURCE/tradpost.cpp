@@ -1,5 +1,6 @@
 #include <va.h>
 #include <stdio.h>
+#include <string.h>
 #include <BASE/heroWindow.h>
 #include <BASE/heroWindowManager.h>
 #include <BASE/iconWidget.h>
@@ -39,8 +40,21 @@ H2_ENUM_BEGIN(TradingPostPrivateConstant)
     KNOB_FRAME      = 2,
     REDRAW_X_OFFSET = 32,
     REDRAW_WIDTH    = 258,
-    REDRAW_HEIGHT   = 418
+    REDRAW_HEIGHT   = 418,
+    OFFER_NAME_SIZE = 52
 H2_ENUM_END(TradingPostPrivateConstant)
+
+H2_ENUM_BEGIN(Cp1251Case)
+    CP1251_CASE_DELTA  = 0x20,
+    CP1251_UPPER_FIRST = 0xc0,
+    CP1251_UPPER_LAST  = 0xdf,
+    CP1251_UPPER_YO    = 0xa8,
+    CP1251_LOWER_YO    = 0xb8
+H2_ENUM_END(Cp1251Case)
+
+
+static char leftName[OFFER_NAME_SIZE];
+static char rightName[OFFER_NAME_SIZE];
 
 VA(0x004ac6e0, 0x193)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
@@ -80,13 +94,15 @@ void DoTradingPost(i32 isMarketplace, float efficiency) {
 VA(0x004ac873, 0x639)
 void UpdateTradingPost(i32 draw) {
     tag_message messageTemp;
-    i32 ratioLocal;
-    i32 maxTradeField;
-    i32 leftDenominatedLocal;
+    i32 idx;
+    OfferSide sideCurrent;
     i32 offeredValue;
     i32 requestedValue;
-    OfferSide sideCurrent;
-    i32 resource;
+    i32 leftDenominatedLocal;
+    i32 nMax;
+    i32 ratioLocal;
+    char chr1;
+    char chr2;
 
     messageTemp.type = MESSAGE_WIDGET;
     if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
@@ -97,30 +113,65 @@ void UpdateTradingPost(i32 draw) {
             requestedValue = iTradeRatio;
             offeredValue = 1;
         }
+        strcpy(rightName, gResourceNames[rightResource]);
+        if (static_cast<u8>(rightName[0]) >= 'A' && static_cast<u8>(rightName[0]) <= 'Z')
+            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
+        else if (static_cast<u8>(rightName[0]) >= CP1251_UPPER_FIRST
+                 && static_cast<u8>(rightName[0]) <= CP1251_UPPER_LAST)
+            chr1 = static_cast<char>(static_cast<u8>(rightName[0]) + CP1251_CASE_DELTA);
+        else if (static_cast<u8>(rightName[0]) == CP1251_UPPER_YO)
+            chr1 = static_cast<char>(CP1251_LOWER_YO);
+        else
+            chr1 = rightName[0];
+        rightName[0] = chr1;
+
+        strcpy(leftName, gResourceNames[leftResource]);
+        if (static_cast<u8>(leftName[0]) >= 'A' && static_cast<u8>(leftName[0]) <= 'Z')
+            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
+        else if (static_cast<u8>(leftName[0]) >= CP1251_UPPER_FIRST
+                 && static_cast<u8>(leftName[0]) <= CP1251_UPPER_LAST)
+            chr2 = static_cast<char>(static_cast<u8>(leftName[0]) + CP1251_CASE_DELTA);
+        else if (static_cast<u8>(leftName[0]) == CP1251_UPPER_YO)
+            chr2 = static_cast<char>(CP1251_LOWER_YO);
+        else
+            chr2 = leftName[0];
+        leftName[0] = chr2;
+
         sprintf(
             gText,
-            "{%s}\n\nI can offer you %d %s of %s for %d %s of %s.",
-            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post",
+            "{%s}\n\n\xcd\xe0 \xec\xee\xe5\xec \xf0\xfb\xed\xea\xe5 %s \xe8 %s "
+            "\xec\xe5\xed\xff\xfe\xf2\xf1\xff \xe8\xe7 \xf1\xee\xee\xf2\xed\xee\xf8\xe5\xed\xe8\xff "
+            "%d %s \xea %d %s" /* "{%s}\n\nНа моем рынке %s и %s меняются из соотношения %d %s к %d %s" */,
+            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
+                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */,
+            rightName,
+            leftName,
             offeredValue,
-            offeredValue > 1 ? "units" : "unit",
-            gResourceNames[rightResource],
+            offeredValue > 1 ? "\xe5\xe4." /* "ед." */ : "\xe5\xe4." /* "ед." */,
             requestedValue,
-            requestedValue > 1 ? "units" : "unit",
-            gResourceNames[leftResource]
+            requestedValue > 1 ? "\xe5\xe4." /* "ед." */ : "\xe5\xe4." /* "ед." */
         );
     } else if (bTradeMade != 0) {
         sprintf(
             gText,
-            "{%s}\n\nYou have received quite a bargain.  I expect to make no profit on the deal.  "
-            "Can I interest you in any of my other wares?",
-            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post"
+            "{%s}\n\n\xc2\xe0\xec \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe0 "
+            "\xe4\xee\xf1\xf2\xee\xe9\xed\xe0\xff \xf1\xe4\xe5\xeb\xea\xe0. \xdf \xed\xe5 "
+            "\xef\xfb\xf2\xe0\xfe\xf1\xfc \xed\xe0\xe6\xe8\xf2\xfc\xf1\xff \xed\xe0 \xed\xe5\xe9. "
+            "\xc2\xe0\xf1 \xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2 \xf7\xf2\xee-\xed\xe8\xe1\xf3\xe4\xfc "
+            "\xe8\xe7 \xec\xee\xe8\xf5 \xf2\xee\xe2\xe0\xf0\xee\xe2?" /* "{%s}\n\nВам предложена достойная сделка. Я не пытаюсь нажиться на ней. Вас интересует что-нибудь из моих товаров?" */,
+            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
+                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */
         );
     } else {
         sprintf(
             gText,
-            "{%s}\n\nPlease inspect our fine wares.  If you feel like offering a trade, click on "
-            "the items you wish to trade with and for.",
-            bIsMarketPlace != 0 ? "Marketplace" : "Trading Post"
+            "{%s}\n\n\xcf\xee\xf1\xec\xee\xf2\xf0\xe8\xf2\xe5 \xed\xe0 \xed\xe0\xf8\xe8 "
+            "\xf2\xee\xe2\xe0\xf0\xfb. \xc5\xf1\xeb\xe8 \xf7\xf2\xee-\xf2\xee \xe2\xe0\xf1 "
+            "\xe7\xe0\xe8\xed\xf2\xe5\xf0\xe5\xf1\xf3\xe5\xf2, \xf9\xe5\xeb\xea\xed\xe8\xf2\xe5 "
+            "\xef\xee \xed\xf3\xe6\xed\xfb\xec \xe2\xe5\xf9\xe0\xec \xe8 \xe2\xfb\xe1\xe5\xf0\xe8\xf2\xe5, "
+            "\xed\xe0 \xf7\xf2\xee \xf5\xee\xf2\xe8\xf2\xe5 \xef\xee\xec\xe5\xed\xff\xf2\xfc." /* "{%s}\n\nПосмотрите на наши товары. Если что-то вас заинтересует, щелкните по нужным вещам и выберите, на что хотите поменять." */,
+            bIsMarketPlace != 0 ? "\xd0\xfb\xed\xee\xea" /* "Рынок" */
+                                : "\xd0\xfb\xed\xee\xea" /* "Рынок" */
         );
     }
     messageTemp.type = MESSAGE_WIDGET;
@@ -129,12 +180,12 @@ void UpdateTradingPost(i32 draw) {
     messageTemp.payload.widget.data.text = gText;
     tpWindow->BroadcastMessage(messageTemp);
 
-    for (resource = TRADING_POST_CONTROL_FIRST; resource <= TRADING_POST_CONTROL_LAST; resource++) {
-        if (leftResource != -1 && rightResource != -1 && leftResource != rightResource)
-            messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
-        else
-            messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-        messageTemp.payload.widget.id = resource;
+    for (idx = TRADING_POST_CONTROL_FIRST; idx <= TRADING_POST_CONTROL_LAST; idx++) {
+        messageTemp.payload.widget.command =
+            leftResource != -1 && rightResource != -1 && leftResource != rightResource
+                ? WIDGET_COMMAND_SET_FLAGS
+                : WIDGET_COMMAND_CLEAR_FLAGS;
+        messageTemp.payload.widget.id = idx;
         messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_ENABLED | WIDGET_FLAG_DRAW);
         tpWindow->BroadcastMessage(messageTemp);
     }
@@ -142,16 +193,10 @@ void UpdateTradingPost(i32 draw) {
     for (sideCurrent = OFFER_LEFT; sideCurrent < OFFER_COUNT; sideCurrent++) {
         if (leftResource != -1 && rightResource != -1 && leftResource != rightResource) {
             messageTemp.payload.widget.command = TRADING_POST_SET_ICON;
-            if (sideCurrent == OFFER_LEFT) {
-                messageTemp.payload.widget.id = POST_LEFT_OFFER_ICON;
-            } else {
-                messageTemp.payload.widget.id = POST_RIGHT_OFFER_ICON;
-            }
-            if (sideCurrent == OFFER_LEFT) {
-                messageTemp.payload.widget.data.value = leftResource;
-            } else {
-                messageTemp.payload.widget.data.value = rightResource;
-            }
+            messageTemp.payload.widget.id =
+                sideCurrent == OFFER_LEFT ? POST_LEFT_OFFER_ICON : POST_RIGHT_OFFER_ICON;
+            messageTemp.payload.widget.data.value =
+                sideCurrent == OFFER_LEFT ? leftResource : rightResource;
             tpWindow->BroadcastMessage(messageTemp);
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
@@ -171,24 +216,24 @@ void UpdateTradingPost(i32 draw) {
             tpWindow->BroadcastMessage(messageTemp);
         }
 
-        for (resource = 0; resource < TRADING_POST_RESOURCE_COUNT; resource++) {
+        for (idx = 0; idx < TRADING_POST_RESOURCE_COUNT; idx++) {
             messageTemp.payload.widget.command = TRADING_POST_SET_TEXT;
             messageTemp.payload.widget.data.text = gText;
             if (sideCurrent == OFFER_LEFT) {
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + resource;
-                sprintf(gText, "%d", gpCurPlayer->m_resources[resource]);
+                messageTemp.payload.widget.id = TRADING_POST_LEFT_TEXT_FIRST + idx;
+                sprintf(gText, "%d", gpCurPlayer->m_resources[idx]);
             } else {
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + resource;
+                messageTemp.payload.widget.id = TRADING_POST_RIGHT_TEXT_FIRST + idx;
                 if (leftResource != -1) {
-                    if (resource == leftResource) {
-                        sprintf(gText, "n/a");
+                    if (leftResource == idx) {
+                        sprintf(gText, "\xed/\xe4" /* "н/д" */);
                     } else {
                         ComputeTradeRatios(
                             leftResource,
-                            resource,
+                            idx,
                             &ratioLocal,
                             &leftDenominatedLocal,
-                            &maxTradeField
+                            &nMax
                         );
                         if (leftDenominatedLocal != 0)
                             sprintf(gText, "%d", ratioLocal);
@@ -200,15 +245,14 @@ void UpdateTradingPost(i32 draw) {
                 }
             }
             tpWindow->BroadcastMessage(messageTemp);
-            if ((sideCurrent == OFFER_LEFT && leftResource == resource)
-                || (sideCurrent == OFFER_RIGHT && rightResource == resource))
+            if ((sideCurrent == OFFER_LEFT && leftResource == idx)
+                || (sideCurrent == OFFER_RIGHT && rightResource == idx))
                 messageTemp.payload.widget.command = WIDGET_COMMAND_SET_FLAGS;
             else
                 messageTemp.payload.widget.command = WIDGET_COMMAND_CLEAR_FLAGS;
-            if (sideCurrent == OFFER_LEFT)
-                messageTemp.payload.widget.id = TRADING_POST_LEFT_ICON_FIRST + resource;
-            else
-                messageTemp.payload.widget.id = TRADING_POST_RIGHT_ICON_FIRST + resource;
+            messageTemp.payload.widget.id = sideCurrent == OFFER_LEFT
+                                                ? TRADING_POST_LEFT_ICON_FIRST + idx
+                                                : TRADING_POST_RIGHT_ICON_FIRST + idx;
             messageTemp.payload.widget.data.value = IDX(WIDGET_FLAG_DRAW);
             tpWindow->BroadcastMessage(messageTemp);
         }
@@ -238,17 +282,17 @@ void ComputeTradeRatios(
     i32* leftDenominated,
     i32* maxTrade
 ) {
-    float sourceValueLocal = coreRatio[sourceResource] * fTradingPostEfficiency;
-    float destinationValueValue = static_cast<u32>(coreRatio[destinationResource]);
-    float tradeRatio = destinationValueValue / sourceValueLocal;
+    float srcVal = coreRatio[sourceResource] * fTradingPostEfficiency;
+    float dstVal = coreRatio[destinationResource];
+    float tRatio = dstVal / srcVal;
 
-    if (tradeRatio >= 1.0f) {
+    if (tRatio >= 1.0f) {
         *leftDenominated = 0;
-        *ratio = static_cast<i32>(tradeRatio + 0.999);
+        *ratio = static_cast<i32>(tRatio + 0.999);
         *maxTrade = gpCurPlayer->m_resources[sourceResource] / *ratio;
     } else {
         *leftDenominated = 1;
-        *ratio = static_cast<i32>(1.0f / tradeRatio);
+        *ratio = static_cast<i32>(1.0f / tRatio);
         *maxTrade = gpCurPlayer->m_resources[sourceResource];
     }
 }
@@ -261,7 +305,7 @@ void DoTradeKnob(struct tag_message message) {
     while (message.type != MESSAGE_LEFT_BUTTON_UP && message.type != MESSAGE_RIGHT_BUTTON_UP) {
         if (message.type == MESSAGE_MOUSE_MOVE) {
             knobPosition = message.payload.mouse.screenX - tpX - TRADING_POST_KNOB_TRACK_OFFSET;
-            qtyToTrade = (iMaxUnitsToTrade + 1) * knobPosition / TRADING_POST_KNOB_TRACK_WIDTH;
+            qtyToTrade = knobPosition * (iMaxUnitsToTrade + 1) / TRADING_POST_KNOB_TRACK_WIDTH;
             if (qtyToTrade < 0)
                 qtyToTrade = 0;
             if (qtyToTrade > iMaxUnitsToTrade)
@@ -294,30 +338,29 @@ void SetupNewTrade(void) {
     );
 }
 
-VA(0x004ad0d4, 0x326)
+VA(0x004ad0d4, 0x394)
 MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     i32 exitFlag = 0;
-    i32 updateDisplay = 0;
+    i32 redraw = 0;
     i32 resourceData;
-    i32 knobPositionValue;
+    i32 knobPosition;
 
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
                 switch (message.payload.widget.id) {
                     case POST_TRACK:
-                        if (iMaxUnitsToTrade == 0) {
-                        } else {
-                            knobPositionValue = message.payload.widget.screenX - tpX
-                                                - TRADING_POST_KNOB_TRACK_OFFSET;
-                            qtyToTrade = (iMaxUnitsToTrade + 1) * knobPositionValue
-                                         / TRADING_POST_KNOB_TRACK_WIDTH;
-                            if (qtyToTrade < 0)
-                                qtyToTrade = 0;
-                            if (iMaxUnitsToTrade < qtyToTrade)
-                                qtyToTrade = iMaxUnitsToTrade;
-                            updateDisplay = 1;
-                        }
+                        if (iMaxUnitsToTrade == 0)
+                            break;
+                        knobPosition =
+                            message.payload.widget.screenX - tpX - TRADING_POST_KNOB_TRACK_OFFSET;
+                        qtyToTrade =
+                            knobPosition * (iMaxUnitsToTrade + 1) / TRADING_POST_KNOB_TRACK_WIDTH;
+                        if (qtyToTrade < 0)
+                            qtyToTrade = 0;
+                        if (qtyToTrade > iMaxUnitsToTrade)
+                            qtyToTrade = iMaxUnitsToTrade;
+                        redraw = 1;
                         break;
                     case TRADING_POST_KNOB_ID:
                         DoTradeKnob(message);
@@ -330,9 +373,9 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                     case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GEMS):
                     case TRADING_POST_LEFT_SELECT_FIRST + IDX(RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_LEFT_SELECT_FIRST;
-                        if (leftResource != resourceData) {
+                        if (resourceData != leftResource) {
                             leftResource = resourceData;
-                            updateDisplay = 1;
+                            redraw = 1;
                             SetupNewTrade();
                         }
                         break;
@@ -344,9 +387,9 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                     case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GEMS):
                     case TRADING_POST_RIGHT_SELECT_FIRST + IDX(RES_GOLD):
                         resourceData = message.payload.widget.id - TRADING_POST_RIGHT_SELECT_FIRST;
-                        if (rightResource != resourceData) {
+                        if (resourceData != rightResource) {
                             rightResource = resourceData;
-                            updateDisplay = 1;
+                            redraw = 1;
                             if (leftResource != -1)
                                 SetupNewTrade();
                         }
@@ -371,25 +414,25 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
                         bTradeMade = 1;
                         rightResource = -1;
                         leftResource = rightResource;
-                        updateDisplay = 1;
+                        redraw = 1;
                         break;
                     case POST_DECREMENT:
                         if (qtyToTrade > 0) {
                             --qtyToTrade;
-                            updateDisplay = 1;
+                            redraw = 1;
                         }
                         break;
                     case POST_INCREMENT:
-                        if (iMaxUnitsToTrade > qtyToTrade) {
+                        if (qtyToTrade < iMaxUnitsToTrade) {
                             ++qtyToTrade;
-                            updateDisplay = 1;
+                            redraw = 1;
                         }
                         break;
                 }
                 break;
         }
     }
-    if (updateDisplay)
+    if (redraw)
         UpdateTradingPost(1);
     if (exitFlag) {
         message.payload.widget.id = IDX(WIDGET_COMMAND_DIALOG_SELECT);

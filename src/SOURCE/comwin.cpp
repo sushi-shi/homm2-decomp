@@ -43,14 +43,14 @@ static ComPortState s_comPorts[PORT_COUNT];
 VA(0x00432760, 0x5f)
 void add_node(struct tag_Anchor* anchor, struct tag_Node* node) {
     node->next = NULL;
-    node->prev = node->next;
+    node->prev = NULL;
     if (anchor->tail != NULL) {
         anchor->tail->next = node;
         node->prev = anchor->tail;
         anchor->tail = node;
     } else {
         anchor->tail = node;
-        anchor->head = anchor->tail;
+        anchor->head = node;
     }
 }
 
@@ -70,13 +70,13 @@ void init_anchor(struct tag_Anchor* anchor, i32, i32) {
     anchor->tail = NULL;
 }
 
-VA(0x0043281f, 0x280)
+VA(0x0043281f, 0x383)
 void ShutdownComError(char* function) {
     char errorName[ERROR_NAME_SIZE];
     char message[ERROR_MESSAGE_SIZE];
-    DWORD error = GetLastError();
+    DWORD errorCode = GetLastError();
 
-    switch (error) {
+    switch (errorCode) {
         case ERROR_INVALID_FUNCTION:
             strcpy(errorName, "ERROR_INVALID_FUNCTION    ");
             break;
@@ -136,7 +136,7 @@ void ShutdownComError(char* function) {
             break;
     }
 
-    sprintf(message, cWinComError[ERROR_TEXT_HEADER], function, error, errorName);
+    sprintf(message, cWinComError[ERROR_TEXT_HEADER], function, errorCode, errorName);
     strcat(message, cWinComError[ERROR_TEXT_SUGGESTIONS]);
     strcat(message, cWinComError[ERROR_TEXT_CHECK_CABLES]);
     strcat(message, cWinComError[ERROR_TEXT_REBOOT]);
@@ -147,89 +147,87 @@ void ShutdownComError(char* function) {
 
 VA(0x00432ba2, 0x2fc)
 i16 com_init(u8 portNumber, H2_ENUM_PARAM(ComBaudRate, i32) baudRate, i32 useDtr) {
+    i32 err;
+    i32 slot;
+    BOOL rv;
+    DCB state;
     char portName[PORT_NAME_SIZE];
-    BOOL success;
-    DCB portState;
-    i32 portIndex;
-    COMMTIMEOUTS commTimeouts;
+    COMMTIMEOUTS portTimeouts;
 
-    for (portIndex = 0; portIndex < PORT_COUNT; ++portIndex)
-        s_comPorts[portIndex].handle = INVALID_HANDLE_VALUE;
-    for (portIndex = 0; portIndex < PORT_COUNT; ++portIndex) {
-        if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE)
+    for (slot = 0; slot < PORT_COUNT; ++slot)
+        s_comPorts[slot].handle = INVALID_HANDLE_VALUE;
+    for (slot = 0; slot < PORT_COUNT; ++slot) {
+        if (s_comPorts[slot].handle == INVALID_HANDLE_VALUE)
             break;
     }
-    if (portIndex >= PORT_COUNT)
+    if (slot >= PORT_COUNT)
         return -1;
 
     wsprintfA(portName, "COM%d", portNumber);
-    s_comPorts[portIndex].handle =
+    s_comPorts[slot].handle =
         CreateFileA(portName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-    if (s_comPorts[portIndex].handle == INVALID_HANDLE_VALUE) {
+    if (s_comPorts[slot].handle == INVALID_HANDLE_VALUE) {
         sprintf(gText, "Opening COM%d", portNumber);
         ShutdownComError(gText);
         return -1;
     }
 
-    portState.DCBlength = sizeof(DCB);
-    GetCommState(s_comPorts[portIndex].handle, &portState);
-    s_comPorts[portIndex].savedState = portState;
-    GetCommTimeouts(s_comPorts[portIndex].handle, &s_comPorts[portIndex].savedTimeouts);
+    state.DCBlength = sizeof(DCB);
+    GetCommState(s_comPorts[slot].handle, &state);
+    s_comPorts[slot].savedState = state;
+    GetCommTimeouts(s_comPorts[slot].handle, &s_comPorts[slot].savedTimeouts);
 
     switch (baudRate) {
         case COM_BAUD_2400:
-            portState.BaudRate = BAUD_VALUE_2400;
+            state.BaudRate = BAUD_VALUE_2400;
             break;
         case COM_BAUD_4800:
-            portState.BaudRate = BAUD_VALUE_4800;
+            state.BaudRate = BAUD_VALUE_4800;
             break;
         case COM_BAUD_9600:
-            portState.BaudRate = BAUD_VALUE_9600;
+            state.BaudRate = BAUD_VALUE_9600;
             break;
         case COM_BAUD_19200:
-            portState.BaudRate = BAUD_VALUE_19200;
+            state.BaudRate = BAUD_VALUE_19200;
             break;
         case COM_BAUD_38400:
-            portState.BaudRate = BAUD_VALUE_38400;
+            state.BaudRate = BAUD_VALUE_38400;
             break;
         default:
-            portState.BaudRate = IDX(baudRate);
+            state.BaudRate = IDX(baudRate);
             break;
     }
 
-    portState.fParity = 0;
-    portState.fOutxCtsFlow = 1;
-    portState.fOutxDsrFlow = useDtr != 0 ? 1 : 0;
-    portState.fDtrControl = DTR_CONTROL_ENABLE;
-    portState.fInX = 0;
-    portState.fOutX = 0;
-    portState.fNull = 0;
-    portState.fRtsControl = RTS_CONTROL_HANDSHAKE;
-    portState.fAbortOnError = 1;
-    portState.ByteSize = COM_SERIAL_BYTE_SIZE;
-    portState.Parity = NOPARITY;
-    portState.StopBits = ONESTOPBIT;
+    state.fParity = 0;
+    state.fOutxCtsFlow = 1;
+    state.fOutxDsrFlow = useDtr != 0 ? 1 : 0;
+    state.fDtrControl = DTR_CONTROL_ENABLE;
+    state.fInX = 0;
+    state.fOutX = 0;
+    state.fNull = 0;
+    state.fRtsControl = RTS_CONTROL_HANDSHAKE;
+    state.fAbortOnError = 1;
+    state.ByteSize = COM_SERIAL_BYTE_SIZE;
+    state.Parity = NOPARITY;
+    state.StopBits = ONESTOPBIT;
 
-    success =
-        SetupComm(s_comPorts[portIndex].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
-    if (success == 0)
+    rv = SetupComm(s_comPorts[slot].handle, RECEIVE_BUFFER_SIZE, TRANSMIT_BUFFER_SIZE);
+    if (rv == 0)
         ShutdownComError("Initialize communications paramaters");
-    success = SetCommState(s_comPorts[portIndex].handle, &portState);
-    if (success == 0)
+    rv = SetCommState(s_comPorts[slot].handle, &state);
+    if (rv == 0)
         ShutdownComError("Configure communications device");
 
-    commTimeouts.ReadIntervalTimeout = MAXDWORD;
-    commTimeouts.ReadTotalTimeoutConstant = 0;
-    commTimeouts.ReadTotalTimeoutMultiplier = 0;
-    commTimeouts.WriteTotalTimeoutConstant = 0;
-    commTimeouts.WriteTotalTimeoutMultiplier = 0;
-    success = SetCommTimeouts(s_comPorts[portIndex].handle, &commTimeouts);
-    if (success == 0)
+    portTimeouts.ReadIntervalTimeout = MAXDWORD;
+    portTimeouts.ReadTotalTimeoutMultiplier = portTimeouts.ReadTotalTimeoutConstant = 0;
+    portTimeouts.WriteTotalTimeoutMultiplier = portTimeouts.WriteTotalTimeoutConstant = 0;
+    rv = SetCommTimeouts(s_comPorts[slot].handle, &portTimeouts);
+    if (rv == 0)
         ShutdownComError("Set communications timeouts");
 
-    init_anchor(&s_comPorts[portIndex].normalQueue, 1, 0);
-    init_anchor(&s_comPorts[portIndex].priorityQueue, 1, 0);
-    return static_cast<i16>(portIndex);
+    init_anchor(&s_comPorts[slot].normalQueue, 1, 0);
+    init_anchor(&s_comPorts[slot].priorityQueue, 1, 0);
+    return static_cast<i16>(slot);
 }
 
 VA(0x00432e9e, 0xe9)
@@ -250,26 +248,26 @@ void com_term(i16 portIndex) {
 
 VA(0x00432f87, 0xc1)
 i16 com_rcv(i16 portIndex, u16 requested, void* buffer) {
-    COMSTAT status;
-    DWORD commErrors;
-    u32 count;
+    DWORD err;
     i16 bytesRead[READ_RESULT_WORD_COUNT];
-    BOOL result;
+    COMSTAT status;
+    BOOL success;
+    u32 n;
 
     if (s_comPorts[portIndex].handle != INVALID_HANDLE_VALUE) {
-        result = ClearCommError(s_comPorts[portIndex].handle, &commErrors, &status);
-        if (result == 0)
+        success = ClearCommError(s_comPorts[portIndex].handle, &err, &status);
+        if (success == 0)
             ShutdownComError("Clear communications error queue");
-        count = status.cbInQue <= requested ? status.cbInQue : requested;
-        if (count != 0) {
-            result = ReadFile(
+        n = requested < status.cbInQue ? requested : status.cbInQue;
+        if (n != 0) {
+            success = ReadFile(
                 s_comPorts[portIndex].handle,
                 buffer,
-                count,
+                n,
                 reinterpret_cast<LPDWORD>(bytesRead),
                 NULL
             );
-            if (result == 0)
+            if (success == 0)
                 ShutdownComError("Read communications data");
             return bytesRead[0];
         }

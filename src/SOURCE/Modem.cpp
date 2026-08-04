@@ -162,7 +162,6 @@ i8 GUIModemCommandExec(void) {
 
 VA(0x00473052, 0x61)
 void ModemCommand(char* command) {
-    char modemText[MODEM_WORK_TEXT_SIZE];
     i32 commandLength = strlen(command);
     i32 commandPosition0;
     for (commandPosition0 = 0; commandPosition0 < commandLength; ++commandPosition0) {
@@ -194,6 +193,7 @@ i8 GUIModemResponseExec(void) {
         if (GUIMRrespptr > MODEM_RESPONSE_TRUNCATE_INDEX) {
             TruncateModemResponse();
         }
+        goto compareResponse;
     } else {
         if (GUIMRc >= PRINTABLE_CHARACTER_FIRST) {
             GUIMRresponse[GUIMRrespptr] = static_cast<char>(GUIMRc);
@@ -201,13 +201,12 @@ i8 GUIModemResponseExec(void) {
         }
         return 0;
     }
-    for (;;) {
-        if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
-            GUIMRrespptr = 0;
-            return 0;
-        } else {
-            return 1;
-        }
+compareResponse:
+    if (strncmp(GUIMRresponse, GUIMRresp, strlen(GUIMRresp)) != 0) {
+        GUIMRrespptr = 0;
+        return 0;
+    } else {
+        return 1;
     }
 }
 
@@ -335,7 +334,8 @@ readPacketStart:
         packetlen = 0;
         newpacket = 0;
     }
-    for (;;) {
+    do {
+    readNextByte:
         input = read_byte();
         if (input < 0)
             return 0;
@@ -351,7 +351,7 @@ readPacketStart:
         } else {
             if (input == MODEM_ESCAPE_BYTE) {
                 inescape = 1;
-                continue;
+                goto readNextByte;
             }
         }
         if (packetlen >= MODEM_PACKET_PAYLOAD_SIZE) {
@@ -361,7 +361,7 @@ readPacketStart:
         }
         packet[packetlen] = static_cast<char>(input);
         ++packetlen;
-    }
+    } while (1);
 }
 
 VA(0x004736ec, 0x10b)
@@ -372,21 +372,20 @@ void WriteModemPacket(char* buffer, i32 length) {
         return;
     }
 
-    i32 remaining5;
     char encoded[MODEM_ENCODED_PACKET_SIZE];
 
     encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
     ++encodedPosition;
     encoded[encodedPosition] = 0;
     ++encodedPosition;
-    while ((remaining5 = length--) != 0) {
+    while (length--) {
         if (*buffer == MODEM_ESCAPE_BYTE) {
             encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
             ++encodedPosition;
         }
         encoded[encodedPosition] = *buffer;
-        ++buffer;
         ++encodedPosition;
+        ++buffer;
     }
     encoded[encodedPosition] = MODEM_ESCAPE_BYTE;
     ++encodedPosition;

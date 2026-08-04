@@ -31,7 +31,7 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_HEARTBEAT_PLAYER_SHIFT        = 4,
     REMOTE_HEARTBEAT_PHASE_MASK          = 0x0f,
     REMOTE_ERROR_TEXT_SIZE               = 200,
-    REMOTE_HOST_TIMEOUT                  = 15000,
+    REMOTE_HOST_TIMEOUT                  = 60000,
     REMOTE_CHAIN_GUEST_TIMEOUT_INCREMENT = 30000,
     REMOTE_GUEST_TIMEOUT                 = 60000,
     REMOTE_CHAIN_TIMEOUT                 = 90000,
