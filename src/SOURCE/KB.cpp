@@ -2766,7 +2766,7 @@ void game::ShowMoraleInfo(hero* h, i32 dialogType) {
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB)) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_BATTLE_GARB)]);
     }
-    if (static_cast<i32>(strlen(gText)) == modifierStart) {
+    if (modifierStart == static_cast<i32>(strlen(gText))) {
         strcat(gText, cMoraleInfo[IDX(MORALE_INFO_NONE)]);
     }
 
@@ -2822,7 +2822,7 @@ void game::ShowLuckInfo(hero* h, i32 dialogType) {
         strcat(gText, cLuckInfo[IDX(INFO_MERMAID)]);
     if (h->HasArtifact(ARTIFACT_BATTLE_GARB))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_BATTLE_GARB)]);
-    if (static_cast<i32>(strlen(gText)) == modifierStart)
+    if (modifierStart == static_cast<i32>(strlen(gText)))
         strcat(gText, cLuckInfo[IDX(LUCK_INFO_NONE)]);
 
     NormalDialog(gText, dialogType, -1, -1, -1, 0, -1, 0, -1, 0);

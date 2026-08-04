@@ -533,13 +533,13 @@ townObject::townObject(
     H2_ENUM_PARAM(BuildingSlotType, i32) buildingId,
     char* iconBaseName
 ) {
-    char fileName[TOWN_OBJECT_FILENAME_SIZE];
+    char name[TOWN_OBJECT_FILENAME_SIZE];
     i32 x;
     i32 y;
     i32 tempY;
     i32 w;
     i32 h;
-    H2_ENUM_STORAGE(BuildingSlotType, i32) buildingId_h;
+    H2_ENUM_STORAGE(BuildingSlotType, i32) id_h;
 
     m_animationFrame = 0;
     m_icon = NULL;
@@ -550,17 +550,17 @@ townObject::townObject(
     y = sBuildingInfo[IDX(townType)][IDX(buildingId)].y;
     w = sBuildingInfo[IDX(townType)][IDX(buildingId)].width;
     h = sBuildingInfo[IDX(townType)][IDX(buildingId)].height;
-    buildingId_h = buildingId;
-    m_buildingId = buildingId_h;
-    sprintf(fileName, "%s.icn", iconBaseName);
-    m_icon = gpResourceManager->GetIcon(fileName);
-    if (buildingId_h != TOWN_OBJECT_NONE) {
+    id_h = buildingId;
+    m_buildingId = id_h;
+    sprintf(name, "%s.icn", iconBaseName);
+    m_icon = gpResourceManager->GetIcon(name);
+    if (id_h != TOWN_OBJECT_NONE) {
         m_border = new border(
             x,
             y,
             w,
             h,
-            static_cast<i16>(IDX(buildingId_h)),
+            static_cast<i16>(IDX(id_h)),
             WIDGET_KIND_TRANSPARENT,
             0,
             NULL

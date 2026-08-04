@@ -54,3 +54,39 @@ models them as `i32 unusedVars1[7];` / `i32 unusedValue3;` placed by bucket like
 any other name. Without them the frame is short and every displacement below
 the hole is wrong.
 
+
+## The base is -0x4 only without an EH frame (VC6 SP5, byte-proven)
+
+`/GX` units open the frame with the `__except_list` chain, which owns
+`-0x4` (the state index), `-0x8` (the handler) and `-0xc` (the saved link).
+The bucket sort then starts at `-0x10`, and every predicted offset shifts by
+`0xc`. `townObject::townObject` (0xa4740, `base_gx`-adjacent TOWNMGR frame with
+the SEH prologue) is the witness:
+
+```
+push ebp / mov ebp,esp
+push 0xffffffff        ; [ebp-0x4]
+push $L62369           ; [ebp-0x8]
+mov eax, fs:[__except_list] / push eax   ; [ebp-0xc]
+mov fs:[__except_list], esp
+sub esp, 0x38
+```
+
+A `char[16]` participates at its own size, so the slot walk is not uniform:
+
+```
+retail                                   ours (before)
+mov [ebp-0x18], ecx   ; x                mov [ebp-0x28], ecx
+mov [ebp-0x20], ecx   ; y                mov [ebp-0x34], ecx
+mov [ebp-0x10], ecx   ; w                mov [ebp-0x20], ecx
+mov [ebp-0x14], ecx   ; h                mov [ebp-0x24], ecx
+mov [ebp-0x34], edx   ; building id      mov [ebp-0x2c], edx
+lea eax, [ebp-0x30]   ; char name[16]    lea eax, [ebp-0x1c]
+```
+
+`predict_offsets(['name','x','y','tempY','w','h','id_h'], {'name': 16})`
+returns `w -0x10, h -0x14, x -0x18, tempY -0x1c, y -0x20, name -0x30,
+id_h -0x34` once `0xc` is added back - retail exactly. The closing edit was
+`fileName` -> `name` (bucket 0 -> 13) and `buildingId_h` -> `id_h`
+(bucket 9 -> 15); declaration order was already right and did not move. The
+function went 99.87% -> EXACT on the first rebuild.

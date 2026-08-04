@@ -7578,7 +7578,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
 
     for (drawX = 0; drawX < COMBO_VIEW_CELLS; ++drawX) {
         for (drawY = 0; drawY < COMBO_VIEW_CELLS; ++drawY) {
-            if (bComboDraw[0][drawY + drawX * COMBO_GRID_CELLS] != 0) {
+            if (bComboDraw[drawX][drawY] != 0) {
                 if (originX + drawX < 0 || originX + drawX >= MAP_WIDTH || originY + drawY < 0
                     || originY + drawY >= MAP_HEIGHT) {
                     *(bComboDraw[drawX] + drawY) = 0;
@@ -7724,10 +7724,10 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
             }
         }
         for (drawX = 0; drawX < COMBO_VIEW_CELLS; ++drawX) {
-            if (originX + drawX == giDeferObjDrawX && originY + drawY == giDeferObjDrawY) {
+            if (giDeferObjDrawX == originX + drawX && giDeferObjDrawY == originY + drawY) {
                 continue;
             }
-            if (originX + drawX == giDeferObjDrawX && originY + drawY == giDeferObjDrawY + 1) {
+            if (giDeferObjDrawX == originX + drawX && giDeferObjDrawY + 1 == originY + drawY) {
                 DrawCell(
                     originX + drawX,
                     originY + drawY - 1,
@@ -7807,13 +7807,13 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
                 if (drawX < giLimitUpdMinX) {
                     giLimitUpdMinX = drawX;
                 }
-                if (giLimitUpdMaxX < drawX) {
+                if (drawX > giLimitUpdMaxX) {
                     giLimitUpdMaxX = drawX;
                 }
-                if (giLimitUpdMinY > drawY) {
+                if (drawY < giLimitUpdMinY) {
                     giLimitUpdMinY = drawY;
                 }
-                if (giLimitUpdMaxY < drawY) {
+                if (drawY > giLimitUpdMaxY) {
                     giLimitUpdMaxY = drawY;
                 }
             }
@@ -7837,7 +7837,7 @@ i32 advManager::ComboDraw(i32 originX, i32 originY, i32 animate) {
         giLimitUpdMaxY = COMBO_UPDATE_MAX;
     }
 
-    if (giLimitUpdMaxX < giLimitUpdMinX || giLimitUpdMaxY < giLimitUpdMinY) {
+    if (giLimitUpdMinX > giLimitUpdMaxX || giLimitUpdMinY > giLimitUpdMaxY) {
         giLimitUpdMinX = giLimitUpdMaxX - 1;
         giLimitUpdMinY = giLimitUpdMaxY - 1;
         return 0;
@@ -10358,7 +10358,7 @@ MessageDispatchResult SystemOptionsHandler(struct tag_message& message) {
     if (accepted) {
         gpWindowManager->m_dialogResult = message.payload.widget.id;
         message.payload.widget.id = IDX(SYSTEM_OPTION_FIRST);
-        message.payload.widget.command = static_cast<BaseWidgetCommand>(message.payload.widget.id);
+        message.payload.widget.command = static_cast<BaseWidgetCommand>(IDX(SYSTEM_OPTION_FIRST));
         return MESSAGE_DISPATCH_FORWARD;
     }
     return MESSAGE_DISPATCH_CONSUME;
