@@ -237,10 +237,10 @@ void write_byte(i32 value) {
 VA(0x0047326c, 0x19c)
 void Connect(void) {
     char idMessage[HANDSHAKE_TEXT_CAPACITY];
-    u32 idSeed = KBTickCount();
+    u32 seed = KBTickCount();
     i32 packetResult;
-    idSeed %= MODEM_ID_MODULUS;
-    sprintf(idstr, "%06d", idSeed);
+    seed %= MODEM_ID_MODULUS;
+    sprintf(idstr, "%06d", seed);
     oldsec = -1;
     remotestage = 0;
     localstage = remotestage;

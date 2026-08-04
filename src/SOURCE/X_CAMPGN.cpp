@@ -324,7 +324,8 @@ void ExpCampaign::InitNewCampaign(ExpansionCampaignId campaignId) {
 
 VA(0x004b3427, 0x693)
 void ExpCampaign::InitMap(void) {
-    SCampaignChoice* campaignChoice =
+    playerData* firstPlayer;
+    SCampaignChoice* campChoice =
         &xCampaignChoices[IDX(m_campaignId)][IDX(m_currentMap)][m_bonusChoices[IDX(m_currentMap)]];
 
     memset(gpGame->m_setupPlayerColor, 0, EXPANSION_CAMPAIGN_PLAYER_SETUP_RESET_SIZE);
@@ -338,38 +339,38 @@ void ExpCampaign::InitMap(void) {
     if (m_currentMap == MAP_FIRST)
         m_mapDays[0] = 0;
     strcpy(gMapName, gpGame->m_mapFilename);
-    i32 mapHeaderResult = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
+    i32 headerStatus = GetMapHeader(gpGame->m_mapFilename, &gpGame->m_mapHeader);
     gpGame->LoadGame("origdata.bin", 1, 0);
     gpGame->InitNewGame(NULL);
     gpGame->m_difficulty = expansionCampaignDifficulty[IDX(m_campaignId)][IDX(m_currentMap)];
     gpGame->m_playerCount = gpGame->m_mapHeader.playerCount;
     gpGame->NewMap(gMapName);
 
-    playerData* player = &gpGame->m_players[0];
+    firstPlayer = &gpGame->m_players[0];
     i32 heroPosition;
     hero* choiceHero;
-    switch (campaignChoice->type) {
+    switch (campChoice->type) {
         case CAMPAIGN_CHOICE_RESOURCE:
-            player->m_resources[IDX(campaignChoice->resource)] += campaignChoice->amount;
+            firstPlayer->m_resources[IDX(campChoice->resource)] += campChoice->amount;
             break;
         case CAMPAIGN_CHOICE_ARTIFACT:
-            if (player->m_heroCount > 0)
+            if (firstPlayer->m_heroCount > 0)
                 GiveArtifact(
-                    gpGame->GetHero(player->m_heroIds[0]),
-                    campaignChoice->artifact,
+                    gpGame->GetHero(firstPlayer->m_heroIds[0]),
+                    campChoice->artifact,
                     0,
                     -1
                 );
             break;
         case CAMPAIGN_CHOICE_SPELL:
-            if (player->m_heroCount > 0)
-                gpGame->GetHero(player->m_heroIds[0])
-                    ->m_spells[IDX(campaignChoice->spell)] = 1;
+            if (firstPlayer->m_heroCount > 0)
+                gpGame->GetHero(firstPlayer->m_heroIds[0])
+                    ->m_spells[IDX(campChoice->spell)] = 1;
             break;
         case CAMPAIGN_CHOICE_SECONDARY_SKILL:
-            if (player->m_heroCount > 0) {
-                for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
-                    choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
+            if (firstPlayer->m_heroCount > 0) {
+                for (heroPosition = 0; heroPosition < firstPlayer->m_heroCount; ++heroPosition) {
+                    choiceHero = gpGame->GetHero(firstPlayer->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_BLOOD_IS_THICKER) {
                         if (choiceHero->m_portrait == HERO_GALLAVANT)
@@ -385,25 +386,25 @@ void ExpCampaign::InitMap(void) {
                     }
                 }
                 choiceHero->SetSS(
-                    static_cast<HeroSecondarySkill>(campaignChoice->value),
-                    static_cast<HeroSkillLevel>(campaignChoice->amount)
+                    static_cast<HeroSecondarySkill>(campChoice->value),
+                    static_cast<HeroSkillLevel>(campChoice->amount)
                 );
             }
             break;
         case CAMPAIGN_CHOICE_CREATURES:
-            if (player->m_heroCount > 0)
-                gpGame->GetHero(player->m_heroIds[0])
-                    ->m_army.Add(campaignChoice->creature, campaignChoice->amount, -1);
+            if (firstPlayer->m_heroCount > 0)
+                gpGame->GetHero(firstPlayer->m_heroIds[0])
+                    ->m_army.Add(campChoice->creature, campChoice->amount, -1);
             break;
         case CAMPAIGN_CHOICE_PUZZLE_PIECES:
-            player->m_cheatValue = static_cast<i8>(campaignChoice->value);
+            firstPlayer->m_cheatValue = static_cast<i8>(campChoice->value);
             break;
         case CAMPAIGN_CHOICE_EXPERIENCE: {
             i32 savedNewGameSetup = gbInNewGameSetup;
             gbInNewGameSetup = true;
-            if (player->m_heroCount > 0) {
-                gpGame->GetHero(player->m_heroIds[0])->m_experience += campaignChoice->value;
-                gpGame->GetHero(player->m_heroIds[0])->CheckLevel();
+            if (firstPlayer->m_heroCount > 0) {
+                gpGame->GetHero(firstPlayer->m_heroIds[0])->m_experience += campChoice->value;
+                gpGame->GetHero(firstPlayer->m_heroIds[0])->CheckLevel();
             }
             gbInNewGameSetup = savedNewGameSetup;
             break;
@@ -411,9 +412,9 @@ void ExpCampaign::InitMap(void) {
         case CAMPAIGN_CHOICE_NONE:
             break;
         case CAMPAIGN_CHOICE_PRIMARY_SKILL:
-            if (player->m_heroCount > 0) {
-                for (heroPosition = 0; heroPosition < player->m_heroCount; ++heroPosition) {
-                    choiceHero = gpGame->GetHero(player->m_heroIds[heroPosition]);
+            if (firstPlayer->m_heroCount > 0) {
+                for (heroPosition = 0; heroPosition < firstPlayer->m_heroCount; ++heroPosition) {
+                    choiceHero = gpGame->GetHero(firstPlayer->m_heroIds[heroPosition]);
                     if (m_campaignId == EXPANSION_CAMPAIGN_VOYAGE_HOME
                         && m_currentMap == MAP_VOY_KING_AND_COUNTRY) {
                         if (choiceHero->m_portrait == HERO_CEALLACH)
@@ -422,16 +423,16 @@ void ExpCampaign::InitMap(void) {
                         break;
                     }
                 }
-                choiceHero->m_primaryStats[campaignChoice->value] += campaignChoice->amount;
+                choiceHero->m_primaryStats[campChoice->value] += campChoice->amount;
             }
             break;
         case CAMPAIGN_CHOICE_SPELL_SCROLL:
-            if (player->m_heroCount > 0)
+            if (firstPlayer->m_heroCount > 0)
                 GiveArtifact(
-                    gpGame->GetHero(player->m_heroIds[0]),
+                    gpGame->GetHero(firstPlayer->m_heroIds[0]),
                     ARTIFACT_SPELL_SCROLL,
                     0,
-                    static_cast<i8>(campaignChoice->spell)
+                    static_cast<i8>(campChoice->spell)
                 );
             break;
     }
@@ -443,9 +444,9 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_ELVEN_ALLIANCE:
                     break;
                 case AWARD_BREASTPLATE_ANDURAN:
-                    if (player->m_heroCount > 0)
+                    if (firstPlayer->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(player->m_heroIds[0]),
+                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
                             ARTIFACT_BREASTPLATE_ANDURAN,
                             0,
                             -1
@@ -454,9 +455,9 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_WOOD_BONUS:
                     break;
                 case AWARD_HELMET_ANDURAN:
-                    if (player->m_heroCount > 0)
+                    if (firstPlayer->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(player->m_heroIds[0]),
+                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
                             ARTIFACT_HELMET_ANDURAN,
                             0,
                             -1
@@ -470,9 +471,9 @@ void ExpCampaign::InitMap(void) {
                     }
                     break;
                 case AWARD_BATTLE_GARB:
-                    if (player->m_heroCount > 0)
+                    if (firstPlayer->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(player->m_heroIds[0]),
+                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
                             ARTIFACT_BATTLE_GARB,
                             0,
                             -1
@@ -482,23 +483,23 @@ void ExpCampaign::InitMap(void) {
                 case AWARD_UNCLE_IVAN:
                     break;
                 case AWARD_LEGENDARY_SCEPTER:
-                    if (player->m_heroCount > 0)
+                    if (firstPlayer->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(player->m_heroIds[0]),
+                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
                             ARTIFACT_LEGENDARY_SCEPTER,
                             0,
                             -1
                         );
                     break;
                 case AWARD_SET_GUARDIAN:
-                    if (player->m_heroCount > 0)
-                        gpGame->GetHero(player->m_heroIds[0])
+                    if (firstPlayer->m_heroCount > 0)
+                        gpGame->GetHero(firstPlayer->m_heroIds[0])
                             ->m_spells[IDX(SPELL_SET_EARTH_GUARDIAN)] = 1;
                     break;
                 case AWARD_SPHERE_NEGATION:
-                    if (player->m_heroCount > 0)
+                    if (firstPlayer->m_heroCount > 0)
                         GiveArtifact(
-                            gpGame->GetHero(player->m_heroIds[0]),
+                            gpGame->GetHero(firstPlayer->m_heroIds[0]),
                             ARTIFACT_SPHERE_NEGATION,
                             0,
                             -1

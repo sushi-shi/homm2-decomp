@@ -57,3 +57,41 @@ Closing spelling in both functions:
                       / gpCurAIHero->m_mobility;
 ```
 
+## The same rule decides a RELATIONAL's operand sides (2026-08-04)
+
+[integer-relational-operand-side](integer-relational-operand-side.md) reads the
+answer off which operand reaches its register last. That rule assumes neither
+side contains a call. When exactly ONE side holds an inlined accessor, the
+call-bearing side is evaluated **last** and the plain side first, while the
+`cmp` keeps source order — so the register-load order inverts relative to the
+call-free spelling and the naive reading picks the wrong arm.
+
+`advManager::Main` (RVA 0x27cf), the `INPUT_SCAN_T` loop over `m_townIds`.
+Four spellings, one matrix, identical semantics:
+
+```
+A  TownId(i)      == m_currentTown       B  m_currentTown == TownId(i)
+   movsbl currentTown -> %ecx               movsbl currentTown -> %ecx
+   movsbl townIds[i]  -> %eax               movsbl townIds[i]  -> %eax
+   cmp %ecx, %eax   (3b c1)                 cmp %eax, %ecx   (3b c8)
+
+C  m_currentTown  == m_townIds[i]        D  CurrentTown()  == m_townIds[i]   == retail
+   movsbl currentTown -> %ecx               a1 <gpCurPlayer>   movl gpCurPlayer, %eax
+   movsbl townIds[i]  -> %eax               03 45 e8           addl -0x18(%ebp), %eax
+   cmp %ecx, %eax                           0f be 48 47        movsbl 0x47(%eax), %ecx
+                                            8b 15 <gpCurPlayer> movl gpCurPlayer, %edx
+                                            0f be 42 45        movsbl 0x45(%edx), %eax
+                                            3b c1              cmp %eax, %ecx
+```
+
+A, B and C all evaluate `m_currentTown` first: with no call on either side VC6
+takes the *simpler* operand first regardless of position. Only D — the inlined
+`CurrentTown()` on the LEFT — pushes that read to the end and evaluates
+`m_townIds[i]` first, which is retail's order. The accessor is therefore
+load-bearing at this site even though an `i32` accessor and a member read are
+byte-identical in isolation (see
+[inline-accessor-return-width](inline-accessor-return-width.md)).
+
+Two calls, one on each side (`CurrentTown() == TownId(i)`), fall back to the
+call-free order; the rule only fires when exactly one side has a call.
+

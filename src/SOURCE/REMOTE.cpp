@@ -400,10 +400,11 @@ i32 DecodePacket(u8* data, i32) {
 
 VA(0x0048da49, 0x158)
 i32 SendRemoteData(u8* dataToSend, u8*, i32 destination, i32 length) {
-    i32 sendStatus;
-    i32 out;
     i32 size;
-    u8 remotePacket[REMOTE_MESSAGE_SIZE + sizeof(i32)];
+    i32 out;
+    i32 retry;  // unreferenced; retail's frame reserves the slot
+    i32 sendStatus;
+    u8 remotePacket[REMOTE_MESSAGE_SIZE];
 
     out = 1;
     if (destination == REMOTE_BROADCAST_PLAYER && bUseDirectPlay == 0 && bUseWinsock == 0) {

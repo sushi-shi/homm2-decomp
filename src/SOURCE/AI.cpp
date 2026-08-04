@@ -903,21 +903,21 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
         ~currentArmy->GetAttackMask(
             currentArmy->m_hex, ARMY_ATTACK_TARGET_ENEMY, ARMY_HEX_INVALID
         );
-    u32 bit;
-    u32 targetMask;
+    u32 oneBit;
+    u32 enemyMask;
     CombatHexDirection direction;
     i32 attackHexes[ARMY_ATTACK_HEX_COUNT];
-    i32 targetArmy;
+    i32 enemyArmy;
 
     if (availableMask4 == 0)
         return 0;
 
-    bit = COMBAT_AI_MASK_FIRST_BIT;
-    targetMask = 0;
+    oneBit = COMBAT_AI_MASK_FIRST_BIT;
+    enemyMask = 0;
     for (direction = COMBAT_DIRECTION_NORTHEAST;
          IDX(direction) < COMBAT_AI_ATTACK_DIRECTION_COUNT;
          direction++) {
-        if ((availableMask4 & bit) != 0
+        if ((availableMask4 & oneBit) != 0
             && currentArmy->ValidAttack(
                 currentArmy->m_hex,
                 direction,
@@ -926,16 +926,16 @@ i32 combatManager::AttemptAdjacentAttack(class army* currentArmy) {
                 attackHexes
             )
             && attackHexes[0] >= 0)
-            targetMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
-        bit <<= 1;
+            enemyMask |= 1 << m_hexCells[attackHexes[0]].m_occupantIndex;
+        oneBit <<= 1;
     }
     if (currentArmy->m_monsterType == CREATURE_GHOST)
-        targetArmy = GetWorstArmy(OppositeCombatSide(m_currentSide), targetMask);
+        enemyArmy = GetWorstArmy(OppositeCombatSide(m_currentSide), enemyMask);
     else
-        targetArmy = GetBestArmy(OppositeCombatSide(m_currentSide), targetMask);
-    if (targetArmy != COMBAT_AI_NO_ARMY) {
+        enemyArmy = GetBestArmy(OppositeCombatSide(m_currentSide), enemyMask);
+    if (enemyArmy != COMBAT_AI_NO_ARMY) {
         giNextAction = ACTION_MOVE;
-        giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][targetArmy].m_hex;
+        giNextActionGridIndex = m_armies[IDX(OppositeCombatSide(m_currentSide))][enemyArmy].m_hex;
         return 1;
     } else {
         return 0;
@@ -1017,7 +1017,7 @@ i32 combatManager::WalkTowardArmy(
     i32 pathNdx;
     army* targetPtr;
     i32 targetSquare;
-    i32 unusedPath;
+    i32 path;
 
     targetStack = GetClosestArmy(currentArmy, side, mask);
 

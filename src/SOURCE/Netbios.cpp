@@ -26,7 +26,7 @@ VA(0x00473830, 0x11c)
 i8 InitNetHost(void) {
     char localName[NAME_BUFFER_SIZE];
     i32 reserved;
-    i32 status;
+    i32 needName;
 
     switch (iInitNetHostStatus) {
         case SETUP_INITIALIZE:
@@ -39,12 +39,12 @@ i8 InitNetHost(void) {
             }
             break;
         case SETUP_CHECK_LOCAL_NAME:
-            status =
+            needName =
                 !HAS(
                     static_cast<NetbiosSessionStatus>(static_cast<u8>(nb_stat(HOST_SESSION))),
                     NETBIOS_SESSION_NAME_REGISTERED
                 );
-            if (status)
+            if (needName)
                 iInitNetHostStatus++;
             else
                 return 1;
@@ -60,10 +60,10 @@ i8 InitNetHost(void) {
                 ShutDown("\xce\xf8\xe8\xe1\xea\xe0 \xe8\xed\xe8\xf6\xe8\xe0\xeb\xe8\xe7\xe0\xf6\xe8\xe8 \xf1\xe5\xf2\xe8.");
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME:
-            status = static_cast<u8>(nb_stat(HOST_SESSION));
-            if (HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_NAME_REGISTERED))
+            needName = static_cast<u8>(nb_stat(HOST_SESSION));
+            if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_NAME_REGISTERED))
                 return 1;
-            else if (HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_ERROR)) {
+            else if (HAS(static_cast<NetbiosSessionStatus>(needName), NETBIOS_SESSION_ERROR)) {
             }
             break;
     }
@@ -73,6 +73,7 @@ i8 InitNetHost(void) {
 VA(0x0047394c, 0x19c)
 i8 InitNetGuest(void) {
     char localName[NAME_BUFFER_SIZE];
+    i32 unregistered;
 
     switch (iInitNetGuestStatus) {
         case SETUP_INITIALIZE:
@@ -105,9 +106,9 @@ i8 InitNetGuest(void) {
             break;
         case SETUP_WAIT_FOR_LOCAL_NAME: {
             i32 status = static_cast<u8>(nb_stat(GUEST_SESSION));
-            i32 namePending =
+            unregistered =
                 !HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_NAME_REGISTERED);
-            if (namePending) {
+            if (unregistered) {
                 if (HAS(static_cast<NetbiosSessionStatus>(status), NETBIOS_SESSION_ERROR)) {
                     iNameRetryCount++;
                     iInitNetGuestStatus--;

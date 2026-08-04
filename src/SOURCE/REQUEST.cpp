@@ -365,12 +365,13 @@ i32 fileRequester::Open(i32 id) {
     tag_message message;
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-    u8 okEnabled;
-    i32 fileIndex;
+    u8 enabled;
+    i32 fileSlot;
+    char* dot;
     if (m_mode == FILE_REQUESTER_SAVE_GAME) {
-        okEnabled = 1;
+        enabled = 1;
         strcpy(m_filename, gpGame->m_saveName);
-        char* dot = FindLastToken(m_filename, '.');
+        dot = FindLastToken(m_filename, '.');
         if (dot != NULL) {
             *dot = 0;
         }
@@ -381,26 +382,26 @@ i32 fileRequester::Open(i32 id) {
         sprintf(gText, "File to Save:");
         message.payload.widget.data.text = gText;
         m_window->BroadcastMessage(message);
-        for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
-            if (strcmpi(m_fileNames[fileIndex].text, m_filename) == 0) {
-                m_selectedIndex = fileIndex;
+        for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
+            if (strcmpi(m_fileNames[fileSlot].text, m_filename) == 0) {
+                m_selectedIndex = fileSlot;
             }
         }
     } else {
-        okEnabled = 0;
+        enabled = 0;
         if (m_mode == FILE_REQUESTER_MAP_GAME) {
             char mapName[CURRENT_MAP_NAME_CAPACITY];
-            fileIndex = 0;
+            fileSlot = 0;
             memset(mapName, 0, CURRENT_MAP_NAME_CLEAR_SIZE);
-            while (fileIndex < LEGACY_MAP_BASENAME_SIZE && gMapName[fileIndex] != 0
-                   && gMapName[fileIndex] != '.') {
-                mapName[fileIndex] = gMapName[fileIndex];
-                ++fileIndex;
+            while (fileSlot < LEGACY_MAP_BASENAME_SIZE && gMapName[fileSlot] != 0
+                   && gMapName[fileSlot] != '.') {
+                mapName[fileSlot] = gMapName[fileSlot];
+                ++fileSlot;
             }
-            for (fileIndex = 0; fileIndex < m_fileCount; ++fileIndex) {
-                if (strcmpi(m_fileNames[fileIndex].text, mapName) == 0) {
-                    m_selectedIndex = fileIndex;
-                    okEnabled = 1;
+            for (fileSlot = 0; fileSlot < m_fileCount; ++fileSlot) {
+                if (strcmpi(m_fileNames[fileSlot].text, mapName) == 0) {
+                    m_selectedIndex = fileSlot;
+                    enabled = 1;
                 }
             }
         }
@@ -417,17 +418,17 @@ i32 fileRequester::Open(i32 id) {
     m_window->BroadcastMessage(message);
     Update(0);
     if (m_selectedIndex != FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled = 1;
+        enabled = 1;
     }
     gpWindowManager->AddWindow(m_window, -1, 1);
     if (m_fileCount == 0) {
-        okEnabled = 0;
+        enabled = 0;
     }
     if (m_mode == FILE_REQUESTER_SAVE_GAME && strcmpi(m_filename, "NEWGAME") == 0
         && m_selectedIndex == FILE_REQUESTER_SELECTION_NONE) {
-        okEnabled = 1;
+        enabled = 1;
     }
-    SetOK(okEnabled);
+    SetOK(enabled);
     m_messageMask = BASE_MANAGER_ACCEPT_EXECUTIVE;
     m_priority = id;
     m_active = true;

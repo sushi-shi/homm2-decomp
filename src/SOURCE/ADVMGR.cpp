@@ -2023,8 +2023,8 @@ MessageDispatchResult advManager::Main(struct tag_message& message) {
                                 for (cheatDigitLocal = 0;
                                      cheatDigitLocal < gpCurPlayer->m_townCount;
                                      ++cheatDigitLocal) {
-                                    if (gpCurPlayer->TownId(cheatDigitLocal)
-                                        == gpCurPlayer->m_currentTown) {
+                                    if (gpCurPlayer->CurrentTown()
+                                        == gpCurPlayer->m_townIds[cheatDigitLocal]) {
                                         if (cheatDigitLocal == gpCurPlayer->m_townCount - 1) {
                                             nextTownId = gpCurPlayer->m_townIds[0];
                                         } else {
