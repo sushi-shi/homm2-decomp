@@ -65,3 +65,5 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [hiword-macro-double-mask](hiword-macro-double-mask.md) | doubled `and $0xffff` after `shr $0x10` (or a mask before `movswl %dx`) → the source calls the Win32 `HIWORD` macro, not a `static_cast` |
 | [uchar-cast-widens-param-spill](uchar-cast-widens-param-spill.md) | dword spill of a one-byte `__fastcall` param + `dword & 0xff` reads → the body casts it `(unsigned char)`, the parameter is still `char` |
 | [adjacent-enum-ternary-setcc](adjacent-enum-ternary-setcc.md) | bare `xor/setcc/add K` select over two enum constants one apart → a real `?:`; adding the enumerator to a bool instead leaves an ours-only `and 0xff` |
+| [constant-true-case-guard](constant-true-case-guard.md) | `mov eax,1 / test / je` at a switch case head with no back edge -> a literal-true `if` the front end never folded; its register pressure moves the whole arm |
+| [identical-arm-ternary](identical-arm-ternary.md) | `neg / sbb / and $0 / add K` where a plain constant was expected -> a `?:` whose two arms are the SAME constant |
