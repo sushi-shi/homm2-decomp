@@ -34,3 +34,4 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [cast-widens-relational-to-unsigned](cast-widens-relational-to-unsigned.md) | `jb`/`jbe` where retail has `jl`/`jle`, everything else identical → a `u32` cast made the comparison unsigned |
 | [byte-store-int-rhs-order](byte-store-int-rhs-order.md) | `arr[i] = <byte>`: retail's `and $0xff` plus value-before-index order → the RHS is an `int` expression, not a `u8` lvalue |
 | [bool-store-to-byte-field](bool-store-to-byte-field.md) | `xor/cmp/sete/movb` into a one-byte field → `field = (a == b);`, not an `if/else` pair of `movb` stores |
+| [switch-table-tail-in-function-span](switch-table-tail-in-function-span.md) | function is byte-identical yet capped: the compiler's switch tables sit just past the Ghidra size; widen the `VA(...)` size to the next function's start |
