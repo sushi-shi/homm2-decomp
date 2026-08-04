@@ -102,6 +102,26 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   dispatch cascade tops out at 0x311 and the function carries no
   `gpSoundManager` relocation. `AppInit` still sets
   `bProcessMessage[0x3b9] = 1`.
+- **[unclassified] `advManager::DoAdvCommand`'s `ADVMGR_COMMAND_HERO_VIEW` arm
+  has no low-memory environment-origin dance.** The PoL body brackets
+  `HeroView(...)` with `if (gbLowMemory) SetEnvironmentOrigin(-1,-1,1);` before
+  and `if (gbLowMemory) SetEnvironmentOrigin(mapOriginX+7, mapOriginY+7, 1);`
+  after. Retail's case is 21 straight instructions
+  (`SetPointer(0); TrimLoopingSounds(0); HeroView(currentHero,0,0);
+  RedrawAdvScreen(1,0); FadeScreen(FADE_IN,8,NULL);`) with no `gbLowMemory`
+  relocation anywhere in the function. Removing both blocks closed the function.
+- **[unclassified] `advManager::SetEnvironmentOrigin` has no `LogInt` tracing.**
+  The reconstruction carried `LogInt("SEO a", edgeOffset, -999 x6)` and
+  `LogInt("SEO b", ...)` inside the active-sound sweep; retail's body has zero
+  `LogInt` relocations and its `for` head goes straight into the
+  `m_activeSounds[i].soundId != -1` test.
+- **[unclassified] `SystemOptionsHandler`'s `SYSTEM_OPTION_VIDEO` arm has no
+  low-memory refusal.** PoL shows `if (gbLowMemory) { NormalDialog("You don't
+  have enough memory for non-interlaced video.", ...); break; }` ahead of the
+  toggle; retail goes straight to
+  `gConfig.slowVideo = gConfig.slowVideo == 0;` (`xor edx,edx; cmpl $0,
+  slowVideo; sete dl; movl %edx, slowVideo`) — also an assignment, not the
+  PoL if/else pair of stores.
 - ~~The Y-modify icon decoder pair~~ — **not removed after all**: retail
   relocated both decoders to the BASE tier tail (`FlipIconToBitmapYModify`
   at 0x4d5270, `IconToBitmapYModify` at 0x4d5a50) with rewritten bodies;
@@ -207,7 +227,14 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   translation reshapes `SExecutiveText` (BASE/EXEC): eleven of its eighteen
   inline `char[]` messages are Russian, so every slot size changed
   (struct 0x214 → 0x25c; each slot is align4(strlen+1)); the list-format
-  strings and `Terminated` stay English.
+  strings and `Terminated` stay English. Seven more ADVMGR literals joined
+  the list on the 2026-08-04 harvest band: `SummonBoat`'s failure notice
+  (0xf0094 `Не удалось призвать корабль!!!`), `CPanelHandler`'s three
+  restart/load/quit confirmations (0xef408/0xef44c/0xef494) and
+  `SystemOptionsHandler`'s MIDI+Redbook, digital-sound and CD-stereo notices
+  (0xf0260/0xf029c/0xf02c8). The restart confirmation has two retail cells
+  (`_0` and `_1`); ADVMGR's own second user of that text is the
+  `INPUT_SCAN_N` cheat arm of `advManager::Main`, still English in source.
 - **[Buka] `soundManager` class rework.** The class gained a backend-state
   head at offset 0x36: backend/savedBackend kinds, the Miles `_DIG_DRIVER*`,
   an `audiere::AudioDevicePtr` (a real RefPtr — its inlined ref/unref

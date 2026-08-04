@@ -109,10 +109,22 @@ SinkS(1, (int)gp->tab[i][0x49c]);                   //     movsbw ...  (the cast
 ```
 
 Only **b2** - an inline accessor declared to return `int` - reproduces retail's
-`movsbl` with no temp slot. So `game::GetPlayerColor` is very likely
-`i32 GetPlayerColor(i32)` in retail, not `i8`; the `i8` reconstruction forces call
-sites either to spill a byte temp (accessor form) or to emit `movsbw` (member form).
-Open at `advManager::UpdBottomViewEnemyTurn` (RVA 0xad72, 99.98%), one prefix byte:
-the fix is the one-token return-type change in `include/SOURCE/game.h`, which also
-touches `CURSOR/ProcessMapChange`, `VIEW/ViewGeneral` and `GAME/ClaimTown` (none of
-them currently exact).
+`movsbl` with no temp slot. So `game::GetPlayerColor` is `i32 GetPlayerColor(i32)`
+in retail, not `i8`; an `i8` return would force call sites either to spill a byte
+temp (accessor form) or to emit `movsbw` (member form).
+
+**CLOSED** at `advManager::UpdBottomViewEnemyTurn` (RVA 0xad72, 99.98% -> EXACT).
+`GetPlayerColor` already returns `i32`; the one-byte residual was the *call site*
+still reading the member directly:
+
+```cpp
+    gpGame->GetPlayerColor(static_cast<char>(giCurPlayer)),                    // retail
+    static_cast<i32>(gpGame->m_players[static_cast<char>(giCurPlayer)].m_color) // ours
+```
+
+The `i32`-returning accessor expands in place (no hoist, no temp) because its body
+needs no frame slot, so the ten `iconWidget` argument pushes keep retail's
+right-to-left order. Which of the two spellings a site wants is decided by the
+widening width: a `short` parameter wants the accessor (`movsbl`), an `i32`
+parameter or an assignment to an `i32` lvalue is byte-identical either way - the
+same function's `BroadcastMessage` arm keeps the member read.
