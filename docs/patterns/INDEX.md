@@ -26,3 +26,6 @@ Founded 2026-08-02; nothing here is ported from the PoL VC4.2 catalog.
 | [flat-map-index-pointer-form](flat-map-index-pointer-form.md) | `base + x` accumulated with `y*W` in the SIB → the source is `*(p + x + y*W)`, not `p[x + y*W]` |
 | [fp-relational-mask](fp-relational-mask.md) | `testb $0x41` vs `testb $0x1` after `fcomp` → the mask names the source relational; `a > b` and `b < a` are different bytes |
 | [bool-expression-return-temp](bool-expression-return-temp.md) | predicate returns `mov eax,[slot]` and stores `0` before `1` → source is `return (A&&B)\|\|(C&&D);`, not `if (...) return 1; return 0;` |
+| [empty-then-branch-is-continue](empty-then-branch-is-continue.md) | loop guard jumps BACKWARD to the increment, not forward past an else body → `continue`, not `if (x) {} else {...}` |
+| [od-frame-function-scope-locals](od-frame-function-scope-locals.md) | retail's frame interleaves what we declare in a nested block → retail declared every local at function scope |
+| [lea-base-names-add-order](lea-base-names-add-order.md) | `lea K(%eax,%edx)` vs `lea K(%edx,%eax)` with identical registers → the SIB base is the LEFT operand of the source `+` |

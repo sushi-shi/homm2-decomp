@@ -135,11 +135,18 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `this+0x62`, and the single retail `push 0x44e` at the KB
   `new resourceManager` site. Longer localized path/name headroom.
 - **[build] String pooling (`/Gf`) is on for most of the build but off for
-  seven TUs.** Retail KB/dpnetwin/COMMAND/ADVMGR blocks hold one cell per
+  eight TUs.** Retail KB/dpnetwin/ADVMGR blocks hold one cell per
   literal content (duplicate literals in our reconstruction resolve to a
-  single retail cell), while Bzip, Misc, EVENTS, Modem, SETUP, SPELLS and
-  wingraph keep adjacent duplicate cells of the same content inside their
-  unit block - their compiles ran without pooling (`base_nogf`). Pooled
+  single retail cell), while Bzip, Misc, EVENTS, Modem, SETUP, SPELLS,
+  wingraph and COMMAND keep adjacent duplicate cells of the same content
+  inside their unit block - their compiles ran without pooling
+  (`base_nogf`). COMMAND's block carries seven `smalfont.fnt` cells, three
+  `pickup%02d.82M`, three `mons32.icn`, two `wincmbt.bin` and four
+  `Баллиста` (0xf1188/0xf11b8/0xf12d4/0xf1354/0xf1380/0xf1394/0xf13c0;
+  0xf1198/0xf12a4/0xf133c, ...), one per source occurrence; recompiling the
+  unit without `/Gf` leaves its `.text` byte-identical (28,432 bytes both
+  ways) and clears 25 `homm2 relocs only-base` rows, so the flip to
+  `base_nogf` in `config/units.toml` is pending. Pooled
   literals are `??_C@` COMDATs the linker folds image-wide, so cross-unit
   references are expected.
 - **[Buka] In-code UI strings translated to Russian (CP1251).** 33 string
@@ -151,7 +158,12 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   hosting dialog set, garrison-full (RECRUIT), five combat-spell rejection
   messages plus the Holy Word / Holy Shout and Death-spell damage reports
   and the plural/singular resurrection reports (SPELLS), the tavern rumor
-  lead-in (TOWNMGR), network
+  lead-in (TOWNMGR), the whole combat win/lose panel set (COMMAND:
+  the necromancy skeleton report singular+plural, the Eagle Eye
+  spell-learned line, the casualty panel `Потери`/`Нападавшие:`/
+  `Оборонявшиеся:`/`Нет`, and the ballista/turret info block
+  `Баллиста`/`Левая башня`/`Правая башня` with their destroyed and
+  fire-strength sentences), network
   hosting/waiting texts (Wsnetwin/dpnetwin), and the 256-color requirement
   (wingraph). Found mechanically: for every byte-proven function, the retail
   dword at each donated string site names a cell whose retail content is
