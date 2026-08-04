@@ -45,3 +45,31 @@ operands the wrong way round - `/Od` lowers `a * b` as `mov reg,a; imul reg,b`, 
 
 `combatManager::ShowDeadArmies` 95.75% -> EXACT (with the other axes on the same
 function).
+
+## The same rule without a `lea`: `add reg,[mem]` vs `mov reg,[mem]; add reg,reg`
+
+When the sum is not folded into an address, the left operand of the `+` still
+decides — and here it costs an instruction, so the function's instruction count
+moves too.
+
+```cpp
+int Make(int,int);  int gres;
+void o_exprfirst(int i, int base) { gres = Make(0, i * 0x30 + base); }   // ours
+void o_localfirst(int i, int base){ gres = Make(0, base + i * 0x30); }   // retail
+```
+
+```
+o_exprfirst  (ours)                           o_localfirst  (retail)
+--------------------------------------------- ---------------------------------------------
+8b 55 fc     movl -0x4(%ebp), %edx            8b 45 fc     movl -0x4(%ebp), %eax
+6b d2 30     imull $0x30, %edx, %edx          6b c0 30     imull $0x30, %eax, %eax
+03 55 f8     addl -0x8(%ebp), %edx            8b 55 f8     movl -0x8(%ebp), %edx
+                                              03 d0        addl %eax, %edx
+```
+
+`/Od` evaluates the multiply first in BOTH spellings; what changes is whether the
+named operand is the accumulator (`mov` it, then `add` the product into it) or the
+memory operand of a single `add`. Measured on `SetupDynamicWindow` (RVA 0x6e35e):
+`leftOffset + columnIndex * TILE_SIZE` and `topOffsetNum + tileRowPos * TILE_SIZE`
+closed a 562-vs-564 instruction-count gap, and the `lea` form of the same rule fixed
+`*contentLeft + columnsSize * TILE_SIZE - 1` plus four border-tile coordinates.
