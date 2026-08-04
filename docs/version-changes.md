@@ -769,6 +769,30 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   SHOOT messages format `gArmyNamesPlural`, not `gArmyNames` (the VIEW_INFO
   message still uses the singular table). The retail dispatch table is 16
   entries (`cmp ...,0xf; ja`), the reconstruction's was 14.
+- **[Buka] `SetupRecruitWin` (`SOURCE/RECRUIT` 0x8c330) recruits by plural name,
+  lower-cased.** It calls `GetMonsterPluralName`, not `GetMonsterName`, and then
+  folds the leading letter DOWN (`'A'..'Z'` and CP1251 `0xc0..0xdf` by +0x20,
+  `0xa8` (Ё) to `0xb8` (ё)) before `sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc"
+  /* Нанять */, name)`. PoL 2.0 raised the first letter (`name[0] -= 32`) for the
+  English "Recruit %s". The fold reads the buffer through `(u8)` casts and stores
+  the result through a `char` local, so it is an if/else chain over a byte slot,
+  not a ternary; the monster-name buffer is `char[40]`, not `char[20]`.
+- **[Buka] `game::ProcessIconSelect` (`SOURCE/Overview` 0x7c9b3) opens the artifact
+  viewer.** The kingdom-overview artifact click calls
+  `hero::ViewArtifact(artifact, quickView, m_artifactExtra[slot])` where the PoL
+  body called `NormalDialog(gArtifactDesc[artifact], ...)`. The magic-book special
+  case (`ViewSpells`) is unchanged.
+- **[Buka] `game::ShowScenInfo` / `game::InitNewGameWindow` race-name width is a
+  three-way select on player count.** `playerCount < 5 ? 26 : playerCount < 6 ? 16
+  : 0`, lowered as a branchy outer `?:` over a `setge/dec/and 0x10` inner one, and
+  the race-name text widget is 24 pixels high (the reconstruction had 12).
+- **[Buka] `oldmain` (`SOURCE/KB` 0x66767) re-dispatches a pending menu command.**
+  After `game_setup_complete` the retail body is `if (giMenuCommand != -1) goto
+  process_menu_command;` (jumping back INTO the `if (giMenuCommand != -1)` guard,
+  at the switch itself), then `if (!quit) { ... }` and `if (gbGameOver) { ... }` as
+  structured ifs; the two campaign-win arms `goto` a label inside the gbGameOver
+  block, so a won campaign scenario reaches the victory sequence whether or not
+  `gbGameOver` is set. The reconstruction had `goto game_finished` early exits.
 
 - **[unclassified] `advManager::LoadRemote` (0x412c7a) ends with two one-shot
   warning dialogs the reconstruction did not have.** After

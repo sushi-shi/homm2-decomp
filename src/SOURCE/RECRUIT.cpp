@@ -25,7 +25,7 @@ H2_ENUM_BEGIN(RecruitConstant)
     WINDOW_Y = 0x10,
     QUICK_WINDOW_X = 0xa0,
     QUICK_WINDOW_Y = 0x10,
-    NAME_SIZE = 20,
+    NAME_SIZE = 40,
     LABEL_SIZE = 40,
     BROADCAST_FLAGS = 0x4008,
     DRAW_DEPTH = 0x7fff,
@@ -63,13 +63,23 @@ void SetupRecruitWin(
     i32 resourceCost,
     i32 available
 ) {
-    char recruitName[NAME_SIZE];
+    char ch;
+    char monsterName[NAME_SIZE];
     char label[LABEL_SIZE];
     tag_message message;
 
-    strcpy(recruitName, GetMonsterName(creatureType));
-    recruitName[0] -= 'a' - 'A';
-    sprintf(label, "%s %s", "Recruit", recruitName);
+    strcpy(monsterName, GetMonsterPluralName(creatureType));
+    /* CP1251: fold the leading letter to lower case ('A'-'Z', '\xc0'-'\xdf' and '\xa8'). */
+    if (static_cast<u8>(monsterName[0]) >= 'A' && static_cast<u8>(monsterName[0]) <= 'Z')
+        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
+    else if (static_cast<u8>(monsterName[0]) >= 0xc0 && static_cast<u8>(monsterName[0]) <= 0xdf)
+        ch = static_cast<char>(static_cast<u8>(monsterName[0]) + 0x20);
+    else if (static_cast<u8>(monsterName[0]) == 0xa8)
+        ch = static_cast<char>(0xb8);
+    else
+        ch = monsterName[0];
+    monsterName[0] = ch;
+    sprintf(label, "%s %s", "\xcd\xe0\xed\xff\xf2\xfc" /* "Нанять" */, monsterName);
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
     message.payload.widget.id = TITLE_CONTROL;
@@ -85,7 +95,7 @@ void SetupRecruitWin(
         window->BroadcastMessage(message);
     }
 
-    sprintf(gText, "%s%d", "Available: ", available);
+    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Доступно: " */, available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     window->BroadcastMessage(message);
@@ -213,7 +223,7 @@ void recruitUnit::Update(void) {
     message.type = MESSAGE_WIDGET;
     message.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
 
-    sprintf(gText, "%s%d", "Available: ", *m_available);
+    sprintf(gText, "%s%d", "\xc4\xee\xf1\xf2\xf3\xef\xed\xee: " /* "Доступно: " */, *m_available);
     message.payload.widget.id = AVAILABLE_CONTROL;
     message.payload.widget.data.text = gText;
     m_window->BroadcastMessage(message);
@@ -234,9 +244,14 @@ void recruitUnit::Update(void) {
 
 VA(0x0048c96a, 0x39d)
 MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
-    i32 close = 0;
-    i32 quickView = (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) != 0;
+    i32 done = 0;
+    i32 quickView;
     i32 cost;
+
+    if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON))
+        quickView = 1;
+    else
+        quickView = 0;
     if (message.type == MESSAGE_WIDGET) {
         switch (message.payload.widget.command) {
             case WIDGET_COMMAND_SELECT:
@@ -306,19 +321,19 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         if (quickView != 0)
                             break;
                         m_quantity = 0;
-                        close = 1;
+                        done = 1;
                         break;
                     case CONFIRM_CONTROL:
                         if (quickView != 0)
                             break;
                         if (m_quantity == 0) {
-                            close = 1;
+                            done = 1;
                             goto checkClose;
                         }
                         if (m_army->CanJoin(m_creatureType) != 0) {
                             m_army->Add(m_creatureType, m_quantity, ARMY_GROUP_EMPTY_SLOT);
                         } else {
-                            close = 1;
+                            done = 1;
                             m_noRoom = 1;
                             goto checkClose;
                         }
@@ -329,7 +344,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
                         }
                         *m_available -= m_quantity;
                         m_recruited = 1;
-                        close = 1;
+                        done = 1;
                         break;
                 }
                 break;
@@ -338,7 +353,7 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
         }
 
     checkClose:
-        if (close == 1) {
+        if (done == 1) {
             message.type = MESSAGE_EXECUTIVE;
             message.payload.executive.command = EXECUTIVE_COMMAND_RETURN_RESULT;
             return MESSAGE_DISPATCH_FORWARD;
@@ -349,23 +364,23 @@ MessageDispatchResult recruitUnit::Main(struct tag_message& message) {
 
 VA(0x0048cd07, 0xc4)
 recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* available) {
-    i32 costs[RESOURCE_COUNT + 1];
-    i32 resource;
+    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 resourceIndex;
 
     m_sourceType = RECRUIT_SOURCE_EVENT;
     m_refreshTown = 0;
     m_army = army;
     m_creatureType = creatureType;
     m_available = available;
-    GetMonsterCost(m_creatureType, costs);
-    m_goldCost = costs[GOLD_RESOURCE];
-    for (resource = 0; resource < RESOURCE_COUNT; ++resource) {
-        if (costs[resource] != 0)
+    GetMonsterCost(m_creatureType, unitCosts);
+    m_goldCost = unitCosts[GOLD_RESOURCE];
+    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+        if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resource < RESOURCE_COUNT) {
-        m_resourceType = ResourceType(resource);
-        m_resourceCost = costs[IDX(m_resourceType)];
+    if (resourceIndex < RESOURCE_COUNT) {
+        m_resourceType = ResourceType(resourceIndex);
+        m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
@@ -374,23 +389,23 @@ recruitUnit::recruitUnit(class armyGroup* army, CreatureType creatureType, i16* 
 
 VA(0x0048cdcb, 0xdf)
 recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
-    i32 costs[RESOURCE_COUNT + 1];
-    i32 resource;
+    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 resourceIndex;
 
     m_refreshTown = refreshTown;
     m_sourceType = RECRUIT_SOURCE_TOWN;
     m_army = &townData->m_army;
     m_creatureType = gDwellingType[IDX(townData->m_type)][dwelling];
     m_available = &townData->m_garrison[dwelling];
-    GetMonsterCost(m_creatureType, costs);
-    m_goldCost = costs[GOLD_RESOURCE];
-    for (resource = 0; resource < RESOURCE_COUNT; ++resource) {
-        if (costs[resource] != 0)
+    GetMonsterCost(m_creatureType, unitCosts);
+    m_goldCost = unitCosts[GOLD_RESOURCE];
+    for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
+        if (unitCosts[resourceIndex] != 0)
             break;
     }
-    if (resource < RESOURCE_COUNT) {
-        m_resourceType = ResourceType(resource);
-        m_resourceCost = costs[IDX(m_resourceType)];
+    if (resourceIndex < RESOURCE_COUNT) {
+        m_resourceType = ResourceType(resourceIndex);
+        m_resourceCost = unitCosts[IDX(m_resourceType)];
     } else {
         m_resourceType = RECRUIT_NO_RESOURCE;
         m_resourceCost = 0;
@@ -399,39 +414,39 @@ recruitUnit::recruitUnit(class town* townData, i32 dwelling, i32 refreshTown) {
 
 VA(0x0048ceaa, 0x161)
 void QuickViewRecruit(class town* townData, i32 dwelling) {
-    i32 costs[RESOURCE_COUNT + 1];
-    i32 goldPrice;
-    ResourceType paymentType;
-    CreatureType unitType;
-    i32 resourcePrice;
+    CreatureType monsterType;
+    ResourceType resourceType;
     heroWindow* recruitWindow;
-    i32 amount;
+    i32 unitCosts[RESOURCE_COUNT + 1];
+    i32 resourceCost;
+    i32 goldCost;
     i32 resourceIndex;
+    i32 avail;
 
-    unitType = gDwellingType[IDX(townData->m_type)][dwelling];
-    amount = townData->m_garrison[dwelling];
-    GetMonsterCost(unitType, costs);
-    goldPrice = costs[GOLD_RESOURCE];
+    monsterType = gDwellingType[IDX(townData->m_type)][dwelling];
+    avail = townData->m_garrison[dwelling];
+    GetMonsterCost(monsterType, unitCosts);
+    goldCost = unitCosts[GOLD_RESOURCE];
     for (resourceIndex = 0; resourceIndex < RESOURCE_COUNT; ++resourceIndex) {
-        if (costs[resourceIndex] != 0)
+        if (unitCosts[resourceIndex] != 0)
             break;
     }
     if (resourceIndex < RESOURCE_COUNT) {
-        paymentType = ResourceType(resourceIndex);
-        resourcePrice = costs[IDX(paymentType)];
+        resourceType = ResourceType(resourceIndex);
+        resourceCost = unitCosts[IDX(resourceType)];
     } else {
-        paymentType = RECRUIT_NO_RESOURCE;
-        resourcePrice = 0;
+        resourceType = RECRUIT_NO_RESOURCE;
+        resourceCost = 0;
     }
 
     recruitWindow = new heroWindow(
         QUICK_WINDOW_X,
         QUICK_WINDOW_Y,
-        const_cast<char*>(paymentType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
+        const_cast<char*>(resourceType == RECRUIT_NO_RESOURCE ? "recruiq0.bin" : "recruiq1.bin")
     );
     if (recruitWindow == NULL)
         MemError();
-    SetupRecruitWin(recruitWindow, unitType, goldPrice, paymentType, resourcePrice, amount);
+    SetupRecruitWin(recruitWindow, monsterType, goldCost, resourceType, resourceCost, avail);
     gpWindowManager->AddWindow(recruitWindow, -1, 1);
     QuickViewWait();
     gpWindowManager->RemoveWindow(recruitWindow);

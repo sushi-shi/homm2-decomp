@@ -199,7 +199,7 @@ H2_ENUM_BEGIN(NewGamePlayerLayout)
     PLAYER_RACE_NAME_X_OFFSET         = 15,
     PLAYER_RACE_NAME_Y                = 322,
     PLAYER_RACE_NAME_BASE_WIDTH       = 64,
-    PLAYER_RACE_NAME_HEIGHT           = 12,
+    PLAYER_RACE_NAME_HEIGHT           = 24,
     PLAYER_RACE_NAME_CENTER_DIVISOR   = 2,
     PLAYER_RACE_NAME_NARROW_THRESHOLD = 5,
     PLAYER_RACE_NAME_HIDDEN_THRESHOLD = MAP_HEADER_PLAYER_COUNT,
@@ -324,6 +324,7 @@ void game::InitNewGame(struct SMapHeader* header) {
                 m_setupPlayerRace[player] = m_mapHeader.playerRace[m_setupPlayerColor[player]];
             }
         }
+        goto selected_player;
     } else {
         m_newGameHumanCount = static_cast<i8>(giNumHumanPlayers);
         if (header != NULL)
@@ -391,6 +392,8 @@ void game::InitNewGame(struct SMapHeader* header) {
         m_difficulty = DIFFICULTY_NORMAL;
         m_newGameInitialized = 1;
     }
+
+selected_player:
     m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
 }
 
@@ -461,28 +464,25 @@ i32 game::NewGame(void) {
         mapHeaderLoaded = 0;
         playerDataReceived = 0;
         do {
-            do {
-                do {
-                    PollSound();
-                    remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
-                } while (remoteBuffer == NULL);
-            } while (remoteBuffer->type != REMOTE_MESSAGE_RELIABLE);
-
-            switch (remoteBuffer->command) {
-                case GAME_REMOTE_MAP_HEADER:
-                    memset(&m_mapHeader, 0, sizeof(m_mapHeader));
-                    memcpy(&m_mapHeader, remoteBuffer->payload, GAME_MAP_PACKET_SIZE);
-                    mapHeaderLoaded = 1;
-                    break;
-                case GAME_REMOTE_PLAYER_INFO:
-                    memcpy(
-                        gsNetPlayerInfo,
-                        remoteBuffer->payload,
-                        GAME_PLAYER_INFO_PACKET_SIZE
-                    );
-                    SetupNetPlayerNames();
-                    playerDataReceived = 1;
-                    break;
+            PollSound();
+            remoteBuffer = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
+            if (remoteBuffer != NULL && remoteBuffer->type == REMOTE_MESSAGE_RELIABLE) {
+                switch (remoteBuffer->command) {
+                    case GAME_REMOTE_MAP_HEADER:
+                        memset(&m_mapHeader, 0, sizeof(m_mapHeader));
+                        memcpy(&m_mapHeader, remoteBuffer->payload, GAME_MAP_PACKET_SIZE);
+                        mapHeaderLoaded = 1;
+                        break;
+                    case GAME_REMOTE_PLAYER_INFO:
+                        memcpy(
+                            gsNetPlayerInfo,
+                            remoteBuffer->payload,
+                            GAME_PLAYER_INFO_PACKET_SIZE
+                        );
+                        SetupNetPlayerNames();
+                        playerDataReceived = 1;
+                        break;
+                }
             }
         } while (!playerDataReceived || !mapHeaderLoaded);
 
@@ -610,875 +610,910 @@ i32 game::NewGame(void) {
             m_playerCount = m_mapHeader.playerCount;
             NewMap(gMapName);
         }
-    }
-
-    for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
-        H2_FREE(cTextReceivedBuffer[textBufferIndex]);
-    }
-    H2_FREE(cNGKPCore);
-    H2_FREE(cNGKPDisplay);
-    gpResourceManager->Dispose(NGKPBkg);
-    return result;
-}
-
-VA(0x004765bc, 0xeb)
-void game::CleanUpNewGameWindow(void) {
-    i32 player;
-
-    for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_SELECT_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_COLOR_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_NAME_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_ICON_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_CYCLE_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_NAME_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_HUMAN_FIRST);
-        m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_FIRST);
-    }
-}
-
-VA(0x004766a7, 0x794)
-void game::InitNewGameWindow(void) {
-    i32 availableWidthResult;
-    widget* textControlLocal;
-    i32 firstPlayerXLocal;
-    i32 multiplayerYOffsetValue;
-    i32 playerCounter;
-    i32 playerSpacingTemp;
-    widget* iconControlLocal;
-    i32 playerGapValue;
-    char* label;
-    i32 raceTextWidth;
-    i32 singlePlayerYOffsetValue;
-
-    iconControlLocal = NULL;
-    textControlLocal = NULL;
-    availableWidthResult = PLAYER_AREA_WIDTH - m_mapHeader.playerCount * PLAYER_COLUMN_WIDTH;
-    playerGapValue = availableWidthResult / (m_mapHeader.playerCount + 1);
-    firstPlayerXLocal = playerGapValue + PLAYER_FIRST_X_OFFSET;
-    playerSpacingTemp = playerGapValue + PLAYER_COLUMN_WIDTH;
-    multiplayerYOffsetValue = 0;
-
-    if (giNumHumanPlayers > 1 && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
-        multiplayerYOffsetValue = PLAYER_MULTIPLAYER_Y_OFFSET;
-
-    for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
-        if (giNumHumanPlayers > 1) {
-            iconControlLocal = new iconWidget(
-                static_cast<i16>(
-                    playerSpacingTemp * playerCounter + firstPlayerXLocal + PLAYER_HUMAN_X_OFFSET
-                ),
-                static_cast<i16>(multiplayerYOffsetValue + PLAYER_HUMAN_Y),
-                PLAYER_HUMAN_WIDTH,
-                PLAYER_HUMAN_HEIGHT,
-                "ngextra.icn",
-                PLAYER_HUMAN_FRAME,
-                ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
-                WIDGET_KIND_ICON_DIRECT,
-                PLAYER_WIDGET_FILL_COLOR
-            );
-            if (iconControlLocal == NULL)
-                MemError();
-            m_newGameWindow->AddWidget(iconControlLocal, -1);
-
-            iconControlLocal = new iconWidget(
-                static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                                 + PLAYER_HANDICAP_X_OFFSET),
-                static_cast<i16>(multiplayerYOffsetValue + PLAYER_HANDICAP_Y),
-                PLAYER_HANDICAP_WIDTH,
-                PLAYER_HANDICAP_HEIGHT,
-                "ngextra.icn",
-                0,
-                ICON_DRAW_NORMAL,
-                static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
-                WIDGET_KIND_ICON_DIRECT,
-                PLAYER_WIDGET_FILL_COLOR
-            );
-            if (iconControlLocal == NULL)
-                MemError();
-            m_newGameWindow->AddWidget(iconControlLocal, -1);
         }
 
-        iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_X_OFFSET),
-            PLAYER_RACE_Y,
-            PLAYER_RACE_WIDTH,
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT : GAME_RACE_WIDGET_SINGLE_HEIGHT
-            ),
-            "ngextra.icn",
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME : GAME_RACE_WIDGET_SINGLE_FRAME
-            ),
-            ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
-            WIDGET_KIND_ICON_DIRECT,
-            PLAYER_WIDGET_FILL_COLOR
-        );
-        if (iconControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(iconControlLocal, -1);
+        for (textBufferIndex = 0; textBufferIndex < GAME_TEXT_BUFFER_COUNT; ++textBufferIndex) {
+            H2_FREE(cTextReceivedBuffer[textBufferIndex]);
+        }
+        H2_FREE(cNGKPCore);
+        H2_FREE(cNGKPDisplay);
+        gpResourceManager->Dispose(NGKPBkg);
+        return result;
+    }
 
-        iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_SELECT_X_OFFSET),
-            PLAYER_SELECT_Y,
-            PLAYER_SELECT_WIDTH,
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT : GAME_PLAYER_WIDGET_SINGLE_HEIGHT
-            ),
-            "ngextra.icn",
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME : GAME_PLAYER_WIDGET_SINGLE_FRAME
-            ),
-            ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
-            WIDGET_KIND_ICON_DIRECT,
-            PLAYER_WIDGET_FILL_COLOR
-        );
-        if (iconControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(iconControlLocal, -1);
+    VA(0x004765bc, 0xeb)
+    void game::CleanUpNewGameWindow(void) {
+        i32 player;
 
-        iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_COLOR_X_OFFSET),
-            PLAYER_COLOR_Y,
-            PLAYER_COLOR_WIDTH,
-            PLAYER_COLOR_HEIGHT,
-            "ngextra.icn",
-            static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME : GAME_COLOR_WIDGET_SINGLE_FRAME
-            ),
-            ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
-            WIDGET_KIND_ICON_DIRECT,
-            PLAYER_WIDGET_FILL_COLOR
-        );
-        if (iconControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(iconControlLocal, -1);
+        for (player = 0; player < MAP_HEADER_PLAYER_COUNT; ++player) {
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_SELECT_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_COLOR_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_NAME_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_ICON_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_CYCLE_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_RACE_NAME_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_PLAYER_HUMAN_FIRST);
+            m_newGameWindow->RemoveAndDeleteWidget(player + NEW_GAME_HANDICAP_FIRST);
+        }
+    }
 
-        if (giNumHumanPlayers > 1) {
+    VA(0x004766a7, 0x794)
+    void game::InitNewGameWindow(void) {
+        i32 availableWidthResult;
+        widget* textControlLocal;
+        i32 firstPlayerXLocal;
+        i32 multiplayerYOffsetValue;
+        i32 playerCounter;
+        i32 playerSpacingTemp;
+        widget* iconControlLocal;
+        i32 playerGapValue;
+        char* label;
+        i32 raceTextWidth;
+        i32 singlePlayerYOffsetValue;
+
+        iconControlLocal = NULL;
+        textControlLocal = NULL;
+        availableWidthResult = PLAYER_AREA_WIDTH - m_mapHeader.playerCount * PLAYER_COLUMN_WIDTH;
+        playerGapValue = availableWidthResult / (m_mapHeader.playerCount + 1);
+        firstPlayerXLocal = playerGapValue + PLAYER_FIRST_X_OFFSET;
+        playerSpacingTemp = playerGapValue + PLAYER_COLUMN_WIDTH;
+        multiplayerYOffsetValue = 0;
+
+        if (giNumHumanPlayers > 1 && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT)
+            multiplayerYOffsetValue = PLAYER_MULTIPLAYER_Y_OFFSET;
+
+        for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
+            if (giNumHumanPlayers > 1) {
+                iconControlLocal = new iconWidget(
+                    static_cast<i16>(
+                        firstPlayerXLocal + playerSpacingTemp * playerCounter
+                        + PLAYER_HUMAN_X_OFFSET
+                    ),
+                    static_cast<i16>(multiplayerYOffsetValue + PLAYER_HUMAN_Y),
+                    PLAYER_HUMAN_WIDTH,
+                    PLAYER_HUMAN_HEIGHT,
+                    "ngextra.icn",
+                    PLAYER_HUMAN_FRAME,
+                    ICON_DRAW_NORMAL,
+                    static_cast<i16>(playerCounter + NEW_GAME_PLAYER_HUMAN_FIRST),
+                    WIDGET_KIND_ICON_DIRECT,
+                    PLAYER_WIDGET_FILL_COLOR
+                );
+                if (iconControlLocal == NULL)
+                    MemError();
+                m_newGameWindow->AddWidget(iconControlLocal, -1);
+
+                iconControlLocal = new iconWidget(
+                    static_cast<i16>(
+                        firstPlayerXLocal + playerSpacingTemp * playerCounter
+                        + PLAYER_HANDICAP_X_OFFSET
+                    ),
+                    static_cast<i16>(multiplayerYOffsetValue + PLAYER_HANDICAP_Y),
+                    PLAYER_HANDICAP_WIDTH,
+                    PLAYER_HANDICAP_HEIGHT,
+                    "ngextra.icn",
+                    0,
+                    ICON_DRAW_NORMAL,
+                    static_cast<i16>(playerCounter + NEW_GAME_HANDICAP_FIRST),
+                    WIDGET_KIND_ICON_DIRECT,
+                    PLAYER_WIDGET_FILL_COLOR
+                );
+                if (iconControlLocal == NULL)
+                    MemError();
+                m_newGameWindow->AddWidget(iconControlLocal, -1);
+            }
+
+            iconControlLocal = new iconWidget(
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_RACE_X_OFFSET
+                ),
+                PLAYER_RACE_Y,
+                PLAYER_RACE_WIDTH,
+                static_cast<i16>(
+                    giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
+                                          : GAME_RACE_WIDGET_SINGLE_HEIGHT
+                ),
+                "ngextra.icn",
+                static_cast<i16>(
+                    giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_RACE_WIDGET_SINGLE_FRAME
+                ),
+                ICON_DRAW_NORMAL,
+                static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
+                WIDGET_KIND_ICON_DIRECT,
+                PLAYER_WIDGET_FILL_COLOR
+            );
+            if (iconControlLocal == NULL)
+                MemError();
+            m_newGameWindow->AddWidget(iconControlLocal, -1);
+
+            iconControlLocal = new iconWidget(
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_SELECT_X_OFFSET
+                ),
+                PLAYER_SELECT_Y,
+                PLAYER_SELECT_WIDTH,
+                static_cast<i16>(
+                    giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_HEIGHT
+                                          : GAME_PLAYER_WIDGET_SINGLE_HEIGHT
+                ),
+                "ngextra.icn",
+                static_cast<i16>(
+                    giNumHumanPlayers > 1 ? GAME_PLAYER_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_PLAYER_WIDGET_SINGLE_FRAME
+                ),
+                ICON_DRAW_NORMAL,
+                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_SELECT_FIRST),
+                WIDGET_KIND_ICON_DIRECT,
+                PLAYER_WIDGET_FILL_COLOR
+            );
+            if (iconControlLocal == NULL)
+                MemError();
+            m_newGameWindow->AddWidget(iconControlLocal, -1);
+
+            iconControlLocal = new iconWidget(
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_COLOR_X_OFFSET
+                ),
+                PLAYER_COLOR_Y,
+                PLAYER_COLOR_WIDTH,
+                PLAYER_COLOR_HEIGHT,
+                "ngextra.icn",
+                static_cast<i16>(
+                    giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
+                                          : GAME_COLOR_WIDGET_SINGLE_FRAME
+                ),
+                ICON_DRAW_NORMAL,
+                static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
+                WIDGET_KIND_ICON_DIRECT,
+                PLAYER_WIDGET_FILL_COLOR
+            );
+            if (iconControlLocal == NULL)
+                MemError();
+            m_newGameWindow->AddWidget(iconControlLocal, -1);
+
+            if (giNumHumanPlayers > 1) {
+                label = static_cast<char*>(H2_ALLOC(PLAYER_LABEL_CAPACITY));
+                sprintf(label, " ");
+                textControlLocal = new textWidget(
+                    static_cast<i16>(
+                        firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_NAME_X_OFFSET
+                    ),
+                    PLAYER_NAME_Y,
+                    PLAYER_NAME_WIDTH,
+                    PLAYER_NAME_HEIGHT,
+                    label,
+                    "smalfont.fnt",
+                    FONT_DRAW_DEFAULT,
+                    static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                    WIDGET_KIND_TEXT,
+                    FONT_ALIGN_CENTER
+                );
+                if (textControlLocal == NULL)
+                    MemError();
+                m_newGameWindow->AddWidget(textControlLocal, -1);
+            }
+
+            singlePlayerYOffsetValue = 0;
+            if (giNumHumanPlayers == 1)
+                singlePlayerYOffsetValue = PLAYER_SINGLE_Y_OFFSET;
+            iconControlLocal = new iconWidget(
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter
+                    + PLAYER_RACE_ICON_X_OFFSET
+                ),
+                static_cast<i16>(
+                    multiplayerYOffsetValue + singlePlayerYOffsetValue + PLAYER_RACE_ICON_Y
+                ),
+                PLAYER_RACE_ICON_WIDTH,
+                PLAYER_RACE_ICON_HEIGHT,
+                "ngextra.icn",
+                PLAYER_RACE_ICON_FRAME,
+                ICON_DRAW_NORMAL,
+                static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
+                WIDGET_KIND_ICON_DIRECT,
+                PLAYER_WIDGET_FILL_COLOR
+            );
+            if (iconControlLocal == NULL)
+                MemError();
+            m_newGameWindow->AddWidget(iconControlLocal, -1);
+
             label = static_cast<char*>(
                 H2_ALLOC(PLAYER_LABEL_CAPACITY)
             );
-            sprintf(label, " ");
+            sprintf(label, "A");
+            raceTextWidth = m_mapHeader.playerCount < PLAYER_RACE_NAME_NARROW_THRESHOLD
+                                ? PLAYER_RACE_NAME_WIDE_WIDTH
+                            : m_mapHeader.playerCount < PLAYER_RACE_NAME_HIDDEN_THRESHOLD
+                                ? PLAYER_RACE_NAME_NARROW_WIDTH
+                                : 0;
             textControlLocal = new textWidget(
-                static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                                 + PLAYER_NAME_X_OFFSET),
-                PLAYER_NAME_Y,
-                PLAYER_NAME_WIDTH,
-                PLAYER_NAME_HEIGHT,
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter
+                    + PLAYER_RACE_NAME_X_OFFSET - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+                ),
+                static_cast<i16>(
+                    multiplayerYOffsetValue + singlePlayerYOffsetValue + PLAYER_RACE_NAME_Y
+                ),
+                static_cast<i16>(raceTextWidth + PLAYER_RACE_NAME_BASE_WIDTH),
+                PLAYER_RACE_NAME_HEIGHT,
                 label,
                 "smalfont.fnt",
                 FONT_DRAW_DEFAULT,
-                static_cast<i16>(playerCounter + NEW_GAME_PLAYER_NAME_FIRST),
+                static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
                 WIDGET_KIND_TEXT,
                 FONT_ALIGN_CENTER
             );
             if (textControlLocal == NULL)
                 MemError();
             m_newGameWindow->AddWidget(textControlLocal, -1);
-        }
 
-        singlePlayerYOffsetValue = 0;
-        if (giNumHumanPlayers == 1)
-            singlePlayerYOffsetValue = PLAYER_SINGLE_Y_OFFSET;
-        iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_ICON_X_OFFSET),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + PLAYER_RACE_ICON_Y),
-            PLAYER_RACE_ICON_WIDTH,
-            PLAYER_RACE_ICON_HEIGHT,
-            "ngextra.icn",
-            PLAYER_RACE_ICON_FRAME,
-            ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_ICON_FIRST),
-            WIDGET_KIND_ICON_DIRECT,
-            PLAYER_WIDGET_FILL_COLOR
-        );
-        if (iconControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(iconControlLocal, -1);
-
-        label = static_cast<char*>(
-            H2_ALLOC(PLAYER_LABEL_CAPACITY)
-        );
-        sprintf(label, "A");
-        if (m_mapHeader.playerCount >= PLAYER_RACE_NAME_NARROW_THRESHOLD) {
-            if (m_mapHeader.playerCount >= PLAYER_RACE_NAME_HIDDEN_THRESHOLD)
-                raceTextWidth = 0;
-            else
-                raceTextWidth = PLAYER_RACE_NAME_NARROW_WIDTH;
-        } else {
-            raceTextWidth = PLAYER_RACE_NAME_WIDE_WIDTH;
-        }
-        textControlLocal = new textWidget(
-            static_cast<i16>(
-                playerSpacingTemp * playerCounter + firstPlayerXLocal + PLAYER_RACE_NAME_X_OFFSET
-                - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
-            ),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + PLAYER_RACE_NAME_Y),
-            static_cast<i16>(raceTextWidth + PLAYER_RACE_NAME_BASE_WIDTH),
-            PLAYER_RACE_NAME_HEIGHT,
-            label,
-            "smalfont.fnt",
-            FONT_DRAW_DEFAULT,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_NAME_FIRST),
-            WIDGET_KIND_TEXT,
-            FONT_ALIGN_CENTER
-        );
-        if (textControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(textControlLocal, -1);
-
-        iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_CYCLE_X_OFFSET),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + PLAYER_RACE_CYCLE_Y),
-            PLAYER_RACE_CYCLE_WIDTH,
-            PLAYER_RACE_CYCLE_HEIGHT,
-            "ngextra.icn",
-            PLAYER_RACE_CYCLE_FRAME,
-            ICON_DRAW_NORMAL,
-            static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
-            WIDGET_KIND_ICON_DIRECT,
-            PLAYER_WIDGET_FILL_COLOR
-        );
-        if (iconControlLocal == NULL)
-            MemError();
-        m_newGameWindow->AddWidget(iconControlLocal, -1);
-    }
-}
-
-VA(0x00476e3b, 0x50f)
-void game::UpdateNewGameWindow(void) {
-    i32 playerLockedValue;
-    tag_message messageTemp;
-    i32 playerIndex3;
-    i32 unusedPlayer17;
-
-    strcpy(gText, m_mapHeader.name);
-    messageTemp.type = MESSAGE_WIDGET;
-    messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    messageTemp.payload.widget.id = NEW_GAME_SCENARIO_NAME;
-    messageTemp.payload.widget.data.text = gText;
-    m_newGameWindow->BroadcastMessage(messageTemp);
-
-    messageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-    messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
-    for (playerIndex3 = 0; playerIndex3 < IDX(DIFFICULTY_COUNT); ++playerIndex3) {
-        messageTemp.payload.widget.id =
-            NEW_GAME_DIFFICULTY_FIRST + playerIndex3;
-        m_newGameWindow->BroadcastMessage(messageTemp);
-    }
-    messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-    messageTemp.payload.widget.id =
-        NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
-    m_newGameWindow->BroadcastMessage(messageTemp);
-
-    if (giNumHumanPlayers > 1) {
-        for (playerIndex3 = 0; playerIndex3 < GAME_CHAT_LINE_COUNT; ++playerIndex3) {
-            sprintf(gText, cTextReceivedBuffer[playerIndex3]);
-            messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-            messageTemp.payload.widget.id =
-                NEW_GAME_CHAT_FIRST + playerIndex3;
-            messageTemp.payload.widget.data.text = gText;
-            m_newGameWindow->BroadcastMessage(messageTemp);
+            iconControlLocal = new iconWidget(
+                static_cast<i16>(
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter
+                    + PLAYER_RACE_CYCLE_X_OFFSET
+                ),
+                static_cast<i16>(
+                    multiplayerYOffsetValue + singlePlayerYOffsetValue + PLAYER_RACE_CYCLE_Y
+                ),
+                PLAYER_RACE_CYCLE_WIDTH,
+                PLAYER_RACE_CYCLE_HEIGHT,
+                "ngextra.icn",
+                PLAYER_RACE_CYCLE_FRAME,
+                ICON_DRAW_NORMAL,
+                static_cast<i16>(playerCounter + NEW_GAME_RACE_CYCLE_FIRST),
+                WIDGET_KIND_ICON_DIRECT,
+                PLAYER_WIDGET_FILL_COLOR
+            );
+            if (iconControlLocal == NULL)
+                MemError();
+            m_newGameWindow->AddWidget(iconControlLocal, -1);
         }
     }
 
-    for (playerIndex3 = 0; playerIndex3 < m_mapHeader.playerCount; ++playerIndex3) {
-        if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER) {
-            sprintf(gText, "");
-        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]) > 0) {
-            sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex3]]);
-        } else {
-            sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerIndex3] + 1);
-        }
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        messageTemp.payload.widget.id =
-            NEW_GAME_PLAYER_NAME_FIRST + playerIndex3;
-        messageTemp.payload.widget.data.text = gText;
-        m_newGameWindow->BroadcastMessage(messageTemp);
+    VA(0x00476e3b, 0x50f)
+    void game::UpdateNewGameWindow(void) {
+        i32 playerLockedValue;
+        tag_message message;
+        i32 playerIndex;
+        i32 unusedPlayer17;
 
-        messageTemp.payload.widget.command = playerIndex3 == m_selectedSetupPlayer
+        strcpy(gText, m_mapHeader.name);
+        message.type = MESSAGE_WIDGET;
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        message.payload.widget.id = NEW_GAME_SCENARIO_NAME;
+        message.payload.widget.data.text = gText;
+        m_newGameWindow->BroadcastMessage(message);
+
+        message.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+        message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+        for (playerIndex = 0; playerIndex < IDX(DIFFICULTY_COUNT); ++playerIndex) {
+            message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + playerIndex;
+            m_newGameWindow->BroadcastMessage(message);
+        }
+        message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        message.payload.widget.id = NEW_GAME_DIFFICULTY_FIRST + IDX(m_difficulty);
+        m_newGameWindow->BroadcastMessage(message);
+
+        if (giNumHumanPlayers > 1) {
+            for (playerIndex = 0; playerIndex < GAME_CHAT_LINE_COUNT; ++playerIndex) {
+                sprintf(gText, cTextReceivedBuffer[playerIndex]);
+                message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+                message.payload.widget.id = NEW_GAME_CHAT_FIRST + playerIndex;
+                message.payload.widget.data.text = gText;
+                m_newGameWindow->BroadcastMessage(message);
+            }
+        }
+
+        for (playerIndex = 0; playerIndex < m_mapHeader.playerCount; ++playerIndex) {
+            if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER) {
+                sprintf(gText, "");
+            } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerIndex]]) > 0) {
+                sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerIndex]]);
+            } else {
+                sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerIndex] + 1);
+            }
+            message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+            message.payload.widget.id = NEW_GAME_PLAYER_NAME_FIRST + playerIndex;
+            message.payload.widget.data.text = gText;
+            m_newGameWindow->BroadcastMessage(message);
+
+            message.payload.widget.command = playerIndex == m_selectedSetupPlayer
                                                  ? NEW_GAME_WIDGET_ENABLE
                                                  : NEW_GAME_WIDGET_DISABLE;
-        messageTemp.payload.widget.id =
-            NEW_GAME_PLAYER_SELECT_FIRST + playerIndex3;
-        messageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
-        m_newGameWindow->BroadcastMessage(messageTemp);
+            message.payload.widget.id = NEW_GAME_PLAYER_SELECT_FIRST + playerIndex;
+            message.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
+            m_newGameWindow->BroadcastMessage(message);
 
-        if (m_setupPlayerType[playerIndex3] != GAME_PLAYER_DEFAULT
-            || (giNumHumanPlayers > 1
-                && m_setupPlayerNetworkId[playerIndex3] != GAME_COMPUTER_PLAYER))
-            playerLockedValue = 0;
-        else
-            playerLockedValue = 1;
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        messageTemp.payload.widget.id =
-            NEW_GAME_COLOR_FIRST + playerIndex3;
-        if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
-            messageTemp.payload.widget.data.value =
-                (playerLockedValue ? GAME_COMPUTER_COLOR_LOCKED_FRAME
-                                   : GAME_COMPUTER_COLOR_UNLOCKED_FRAME)
-                + m_setupPlayerColor[playerIndex3];
-        else
-            messageTemp.payload.widget.data.value =
-                (playerLockedValue ? GAME_HUMAN_COLOR_LOCKED_FRAME
-                                   : GAME_HUMAN_COLOR_UNLOCKED_FRAME)
-                + m_setupPlayerColor[playerIndex3];
-        if (giNumHumanPlayers > 1)
-            messageTemp.payload.widget.data.value += GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
-        m_newGameWindow->BroadcastMessage(messageTemp);
+            if (m_setupPlayerType[playerIndex] != GAME_PLAYER_DEFAULT
+                || (giNumHumanPlayers > 1
+                    && m_setupPlayerNetworkId[playerIndex] != GAME_COMPUTER_PLAYER))
+                playerLockedValue = 0;
+            else
+                playerLockedValue = 1;
+            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.id = NEW_GAME_COLOR_FIRST + playerIndex;
+            if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
+                message.payload.widget.data.value =
+                    (playerLockedValue ? GAME_COMPUTER_COLOR_LOCKED_FRAME
+                                       : GAME_COMPUTER_COLOR_UNLOCKED_FRAME)
+                    + m_setupPlayerColor[playerIndex];
+            else
+                message.payload.widget.data.value =
+                    (playerLockedValue ? GAME_HUMAN_COLOR_LOCKED_FRAME
+                                       : GAME_HUMAN_COLOR_UNLOCKED_FRAME)
+                    + m_setupPlayerColor[playerIndex];
+            if (giNumHumanPlayers > 1)
+                message.payload.widget.data.value += GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
+            m_newGameWindow->BroadcastMessage(message);
 
-        messageTemp.payload.widget.command =
-            playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
-        messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        m_newGameWindow->BroadcastMessage(messageTemp);
+            message.payload.widget.command =
+                playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
+            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            m_newGameWindow->BroadcastMessage(message);
 
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        messageTemp.payload.widget.id =
-            NEW_GAME_HANDICAP_FIRST + playerIndex3;
-        if (m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER)
-            messageTemp.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
-        else
-            messageTemp.payload.widget.data.value = IDX(m_playerHandicap[playerIndex3]);
-        m_newGameWindow->BroadcastMessage(messageTemp);
-        messageTemp.payload.widget.command =
-            m_setupPlayerNetworkId[playerIndex3] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
-                                                                        : NEW_GAME_WIDGET_ENABLE;
-        messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        m_newGameWindow->BroadcastMessage(messageTemp);
+            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.id = NEW_GAME_HANDICAP_FIRST + playerIndex;
+            if (m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER)
+                message.payload.widget.data.value = NEW_GAME_RACE_NAME_FIRST;
+            else
+                message.payload.widget.data.value = IDX(m_playerHandicap[playerIndex]);
+            m_newGameWindow->BroadcastMessage(message);
+            message.payload.widget.command =
+                m_setupPlayerNetworkId[playerIndex] == GAME_COMPUTER_PLAYER
+                    ? NEW_GAME_WIDGET_DISABLE
+                    : NEW_GAME_WIDGET_ENABLE;
+            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            m_newGameWindow->BroadcastMessage(message);
 
-        if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex3]] == FACTION_RANDOM)
-            playerLockedValue = 0;
-        else
-            playerLockedValue = 1;
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-        messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        m_newGameWindow->BroadcastMessage(messageTemp);
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
-        messageTemp.payload.widget.id =
-            NEW_GAME_RACE_CYCLE_FIRST + playerIndex3;
-        messageTemp.payload.widget.data.value =
-            (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
-            + IDX(m_setupPlayerRace[playerIndex3]);
-        m_newGameWindow->BroadcastMessage(messageTemp);
+            if (m_mapHeader.playerRace[m_setupPlayerColor[playerIndex]] == FACTION_RANDOM)
+                playerLockedValue = 0;
+            else
+                playerLockedValue = 1;
+            message.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            m_newGameWindow->BroadcastMessage(message);
+            message.payload.widget.command = NEW_GAME_WIDGET_SET_FRAME;
+            message.payload.widget.id = NEW_GAME_RACE_CYCLE_FIRST + playerIndex;
+            message.payload.widget.data.value =
+                (playerLockedValue ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
+                + IDX(m_setupPlayerRace[playerIndex]);
+            m_newGameWindow->BroadcastMessage(message);
 
-        sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex3])]);
-        messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-        messageTemp.payload.widget.id =
-            NEW_GAME_RACE_NAME_FIRST + playerIndex3;
-        messageTemp.payload.widget.data.text = gText;
-        m_newGameWindow->BroadcastMessage(messageTemp);
-        messageTemp.payload.widget.command =
-            playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
-        messageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
-        m_newGameWindow->BroadcastMessage(messageTemp);
-    }
-
-    gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
-    messageTemp.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
-    messageTemp.payload.widget.id = NEW_GAME_RATING;
-    sprintf(
-        gText,
-        "%s %d%%",
-        "\xd0\xe5\xe9\xf2\xe8\xed\xe3",
-        gpGame->m_difficultyRating
-    );
-    messageTemp.payload.widget.data.text = gText;
-    m_newGameWindow->BroadcastMessage(messageTemp);
-    DrawNGKPDisplayString(0);
-}
-
-VA(0x0047734a, 0xdd1)
-MessageDispatchResult NewGameHandler(struct tag_message& message) {
-    i32 transmitResultTemp;
-    i32 redrawWindow = 0;
-    i32 oldNetworkId;
-    i32 swapPlayerTemp;
-    i32 currentPlayerLocal;
-    i32 synchronizeSetupResult = 0;
-    tag_message windowMessage;
-    SMapHeader remoteMapHeaderValue;
-    NewGameRemotePacket* remotePacketResult;
-    i32 sender;
-    char setupData[GAME_SETUP_BUFFER_SIZE];
-    char mapPacketLocal[GAME_MAP_PACKET_SIZE];
-    tag_message mapWindowMessageTemp;
-    i32 helpDialogIndexLocal;
-    i32 unusedSender;
-    char mapNamePacket[MAP_HEADER_NAME_SIZE];
-
-    if (!gbNewGameShadowHidden) {
-        gbNewGameShadowHidden = true;
-        windowMessage.type = MESSAGE_WIDGET;
-        windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        windowMessage.payload.widget.id = NEW_GAME_SHADOW;
-        windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
-        gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
-    }
-
-    if (message.type == MESSAGE_NONE) {
-        remotePacketResult = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
-        if (remotePacketResult != NULL
-            && (remotePacketResult->type == REMOTE_MESSAGE_RELIABLE
-                || remotePacketResult->type == REMOTE_MESSAGE_UNRELIABLE)) {
-            switch (remotePacketResult->command) {
-                case GAME_REMOTE_START:
-                    gpWindowManager->m_dialogResult = message.payload.widget.id;
-                    gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
-                    message.type = MESSAGE_WIDGET;
-                    message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                    return MESSAGE_DISPATCH_FORWARD;
-
-                case GAME_REMOTE_CANCEL:
-                    NormalDialog(
-                        "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
-                        "\xe8\xeb \xe8\xe3\xf0\xf3.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
-                    ShutDown(NULL);
-                    break;
-
-                case GAME_REMOTE_SETUP:
-                    if (strcmp(remotePacketResult->payload, gpGame->m_mapHeader.name) != 0)
-                        break;
-                    memcpy(
-                        gpGame->m_setupPlayerColor,
-                        remotePacketResult->payload + MAP_HEADER_NAME_SIZE,
-                        GAME_SETUP_DATA_SIZE
-                    );
-                    redrawWindow = 1;
-                    break;
-
-                case GAME_REMOTE_MAP_HEADER:
-                    memset(&remoteMapHeaderValue, 0, sizeof(remoteMapHeaderValue));
-                    memcpy(
-                        &remoteMapHeaderValue,
-                        remotePacketResult->payload,
-                        GAME_MAP_PACKET_SIZE
-                    );
-                    gpGame->ProcessNewMap(&remoteMapHeaderValue);
-                    break;
-
-                case GAME_REMOTE_CHAT:
-                    redrawWindow = 1;
-                    sender = remotePacketResult->sender;
-                    if (sender >= 0) {
-                        sprintf(
-                            gText,
-                            "%s:  %s",
-                            gsNetPlayerInfo[sender].name,
-                            remotePacketResult->payload
-                        );
-                    } else {
-                        unusedSender = 0;
-                    }
-                    gText[GAME_CHAT_TEXT_LIMIT] = 0;
-                    for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
-                         ++currentPlayerLocal) {
-                        strcpy(
-                            cTextReceivedBuffer[currentPlayerLocal],
-                            cTextReceivedBuffer[currentPlayerLocal + 1]
-                        );
-                    }
-                    strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], gText);
-                    break;
-            }
+            sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerIndex])]);
+            message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+            message.payload.widget.id = NEW_GAME_RACE_NAME_FIRST + playerIndex;
+            message.payload.widget.data.text = gText;
+            m_newGameWindow->BroadcastMessage(message);
+            message.payload.widget.command =
+                playerLockedValue ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
+            message.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
+            m_newGameWindow->BroadcastMessage(message);
         }
-        if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
-            gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
-            gpGame->DrawNGKPDisplayString(1);
-        }
+
+        gpGame->m_difficultyRating = static_cast<i16>(CalcDifficultyRating());
+        message.payload.widget.command = NEW_GAME_WIDGET_SET_TEXT;
+        message.payload.widget.id = NEW_GAME_RATING;
+        sprintf(gText, "%s %d%%", "\xd0\xe5\xe9\xf2\xe8\xed\xe3", gpGame->m_difficultyRating);
+        message.payload.widget.data.text = gText;
+        m_newGameWindow->BroadcastMessage(message);
+        DrawNGKPDisplayString(0);
     }
 
-    if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
-        && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
-        redrawWindow = 1;
-        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
-             ++currentPlayerLocal) {
-            strcpy(
-                cTextReceivedBuffer[currentPlayerLocal],
-                cTextReceivedBuffer[currentPlayerLocal + 1]
-            );
+    VA(0x0047734a, 0xdd1)
+    MessageDispatchResult NewGameHandler(struct tag_message& message) {
+        i32 transmitResultTemp;
+        i32 redrawWindow = 0;
+        i32 oldNetworkId;
+        i32 swapPlayerTemp;
+        i32 currentPlayerLocal;
+        i32 synchronizeSetupResult = 0;
+        tag_message windowMessage;
+        SMapHeader remoteMapHeaderValue;
+        NewGameRemotePacket* remotePacketResult;
+        i32 sender;
+        char setupData[GAME_SETUP_BUFFER_SIZE];
+        char mapPacketLocal[GAME_MAP_PACKET_SIZE];
+        tag_message mapWindowMessageTemp;
+        i32 helpDialogIndexLocal;
+        i32 unusedSender;
+        char mapNamePacket[MAP_HEADER_NAME_SIZE];
+
+        if (!gbNewGameShadowHidden) {
+            gbNewGameShadowHidden = true;
+            windowMessage.type = MESSAGE_WIDGET;
+            windowMessage.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+            windowMessage.payload.widget.id = NEW_GAME_SHADOW;
+            windowMessage.payload.widget.data.value = GAME_SHADOW_FRAME;
+            gpGame->m_newGameWindow->BroadcastMessage(windowMessage);
         }
-        strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
-        strcpy(cNGKPCore, "");
-        strcpy(cNGKPDisplay, "");
-        NGKPcursorIndex = 0;
-        transmitResultTemp = TransmitRemoteData(
-            cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1],
-            GAME_REMOTE_CHANNEL,
-            strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
-            GAME_REMOTE_CHAT,
-            1,
-            1,
-            REMOTE_MESSAGE_DEFAULT
-        );
-        if (!transmitResultTemp)
-            ShutDown(NULL);
-    }
 
-    if (message.type != MESSAGE_WIDGET)
-        goto finish;
+        if (message.type == MESSAGE_NONE) {
+            remotePacketResult = reinterpret_cast<NewGameRemotePacket*>(GetRemoteData(1));
+            if (remotePacketResult != NULL
+                && (remotePacketResult->type == REMOTE_MESSAGE_RELIABLE
+                    || remotePacketResult->type == REMOTE_MESSAGE_UNRELIABLE)) {
+                switch (remotePacketResult->command) {
+                    case GAME_REMOTE_START:
+                        gpWindowManager->m_dialogResult = message.payload.widget.id;
+                        gpWindowManager->m_dialogResult = GAME_DIALOG_OK;
+                        message.type = MESSAGE_WIDGET;
+                        message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                        message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                        return MESSAGE_DISPATCH_FORWARD;
 
-    if (HAS(
-            message.payload.widget.modifiers,
-            MESSAGE_MODIFIER_RIGHT_BUTTON
-        )) {
-        if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
-            || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
-            helpDialogIndexLocal = -1;
-            if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
-                 && message.payload.widget.id <= NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_COUNT) - 1)
-                || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
-                    && message.payload.widget.id <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
-                helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
-            if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
-                 && message.payload.widget.id <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
-                || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
-                    && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1))
-                helpDialogIndexLocal = GAME_HELP_HANDICAP;
-            if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
-                 && message.payload.widget.id
-                        <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
-                || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
-                    && message.payload.widget.id <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
-                || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
-                    && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
-                || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
-                    && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST))
-                helpDialogIndexLocal = GAME_HELP_PLAYER;
-            if ((message.payload.widget.id >= NEW_GAME_RACE_CYCLE_FIRST
-                 && message.payload.widget.id <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
-                || (message.payload.widget.id >= NEW_GAME_RACE_ICON_FIRST
-                    && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1))
-                helpDialogIndexLocal = GAME_HELP_RACE;
-            if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
-                || message.payload.widget.id == NEW_GAME_MAP_SELECT
-                || message.payload.widget.id == NEW_GAME_SCENARIO_NAME)
-                helpDialogIndexLocal = GAME_HELP_MAP;
-            if (message.payload.widget.id == NEW_GAME_RATING)
-                helpDialogIndexLocal = GAME_HELP_RATING;
-            if (message.payload.widget.id == GAME_DIALOG_OK)
-                helpDialogIndexLocal = GAME_HELP_OK;
-            if (message.payload.widget.id == GAME_DIALOG_CANCEL)
-                helpDialogIndexLocal = GAME_HELP_CANCEL;
-            if (helpDialogIndexLocal != -1)
-                NormalDialog(
-                    gNewGameHelp[helpDialogIndexLocal],
-                    NEW_GAME_HELP_DIALOG_TYPE,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-        }
-        goto finish;
-    }
-
-    switch (message.payload.widget.command) {
-        case NEW_GAME_EVENT_RELEASE:
-            switch (message.payload.widget.id) {
-                case GAME_MAP_OPTIONS_CONTROL:
-                    goto chooseMap;
-
-                case GAME_DIALOG_OK:
-                    if (gbRemoteOn) {
-                        transmitResultTemp = TransmitRemoteData(
-                            NULL,
-                            GAME_REMOTE_CHANNEL,
+                    case GAME_REMOTE_CANCEL:
+                        NormalDialog(
+                            "\xd1\xe5\xf0\xe2\xe5\xf0 \xef\xf0\xe5\xea\xf0\xe0\xf2"
+                            "\xe8\xeb \xe8\xe3\xf0\xf3.",
+                            NORMAL_DIALOG_INFO,
+                            -1,
+                            -1,
+                            -1,
                             0,
-                            GAME_REMOTE_START,
-                            1,
-                            1,
-                            REMOTE_MESSAGE_DEFAULT
-                        );
-                    }
-                    gpWindowManager->m_dialogResult = message.payload.widget.id;
-                    message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                    gbNewGameDialogOver = true;
-                    return MESSAGE_DISPATCH_FORWARD;
-
-                case GAME_DIALOG_CANCEL:
-                    if (gbRemoteOn) {
-                        transmitResultTemp = TransmitRemoteData(
-                            NULL,
-                            GAME_REMOTE_CHANNEL,
+                            -1,
                             0,
-                            GAME_REMOTE_CANCEL,
-                            1,
-                            1,
-                            REMOTE_MESSAGE_DEFAULT
+                            -1,
+                            0
                         );
                         ShutDown(NULL);
-                    }
-                    gpWindowManager->m_dialogResult = message.payload.widget.id;
-                    message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
-                    message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
-                    gbNewGameDialogOver = true;
-                    return MESSAGE_DISPATCH_FORWARD;
-
-                default:
-                    break;
-            }
-            break;
-
-        case NEW_GAME_EVENT_PRESS:
-            switch (message.payload.widget.id) {
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_HARD):
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EXPERT):
-                case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
-                    goto setDifficulty;
-
-                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):
-                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_NORMAL):
-                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_HARD):
-                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EXPERT):
-                case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
-                setDifficulty:
-                    gpGame->m_difficulty = static_cast<GameDifficulty>(currentPlayerLocal);
-                    synchronizeSetupResult = 1;
-                    redrawWindow = 1;
-                    break;
-
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
-                    goto cycleHandicap;
-
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
-                cycleHandicap:
-                    synchronizeSetupResult = 1;
-                    redrawWindow = 1;
-                    if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
-                        != GAME_COMPUTER_PLAYER) {
-                        gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
-                            (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
-                            % IDX(PLAYER_HANDICAP_COUNT)
-                        );
-                    }
-                    break;
-
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_FIRST;
-                    goto selectPlayer;
-
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_COLOR_FIRST;
-                    goto selectPlayer;
-
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
-                    goto selectPlayer;
-
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
-                selectPlayer:
-                    synchronizeSetupResult = 1;
-                    redrawWindow = 1;
-                    if (gpGame->m_setupPlayerType[currentPlayerLocal] != GAME_PLAYER_DEFAULT
-                        || (giNumHumanPlayers > 1
-                            && gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
-                                   != GAME_COMPUTER_PLAYER)) {
-                        if (giNumHumanPlayers == 1) {
-                            if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
-                                == GAME_COMPUTER_PLAYER) {
-                                for (swapPlayerTemp = 0;
-                                     swapPlayerTemp < gpGame->m_mapHeader.playerCount;
-                                     ++swapPlayerTemp) {
-                                    if (gpGame->m_setupPlayerNetworkId[swapPlayerTemp]
-                                        != GAME_COMPUTER_PLAYER) {
-                                        oldNetworkId =
-                                            gpGame->m_setupPlayerNetworkId[swapPlayerTemp];
-                                        gpGame->m_setupPlayerNetworkId[swapPlayerTemp] =
-                                            gpGame->m_setupPlayerNetworkId[currentPlayerLocal];
-                                        gpGame->m_setupPlayerNetworkId[currentPlayerLocal] =
-                                            oldNetworkId;
-                                        swapPlayerTemp = GAME_SWAP_SEARCH_DONE;
-                                    }
-                                }
-                            }
-                        } else if (gpGame->m_selectedSetupPlayer == GAME_NETWORK_PLAYER_NONE) {
-                            gpGame->m_selectedSetupPlayer = static_cast<i8>(currentPlayerLocal);
-                        } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal
-                                   || (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
-                                           == GAME_COMPUTER_PLAYER
-                                       && gpGame->m_setupPlayerNetworkId
-                                                  [gpGame->m_selectedSetupPlayer]
-                                              == GAME_COMPUTER_PLAYER)) {
-                            gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
-                        } else {
-                            if ((gpGame->m_setupPlayerType[currentPlayerLocal]
-                                     != GAME_PLAYER_DEFAULT
-                                 && gpGame->m_setupPlayerType[gpGame->m_selectedSetupPlayer]
-                                        != GAME_PLAYER_DEFAULT)
-                                || (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
-                                        != GAME_COMPUTER_PLAYER
-                                    && gpGame->m_setupPlayerNetworkId[gpGame->m_selectedSetupPlayer]
-                                           != GAME_COMPUTER_PLAYER)) {
-                                swapPlayerTemp = gpGame->m_setupPlayerNetworkId[currentPlayerLocal];
-                                gpGame->m_setupPlayerNetworkId[currentPlayerLocal] =
-                                    gpGame->m_setupPlayerNetworkId[gpGame->m_selectedSetupPlayer];
-                                gpGame->m_setupPlayerNetworkId[gpGame->m_selectedSetupPlayer] =
-                                    static_cast<i8>(swapPlayerTemp);
-                            } else {
-                                NormalDialog(
-                                    "\xc4\xe2\xe5 \xe2\xfb\xe1\xf0\xe0\xed\xed\xfb"
-                                    "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
-                                    "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
-                                    "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
-                                    NORMAL_DIALOG_INFO,
-                                    -1,
-                                    -1,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0,
-                                    -1,
-                                    0
-                                );
-                            }
-                            gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
-                        }
-                    }
-                    break;
-
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
-                    goto cycleRace;
-
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIRST):
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SECOND):
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_THIRD):
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FOURTH):
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIFTH):
-                case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SIXTH):
-                    currentPlayerLocal = message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
-                cycleRace:
-                    if (gpGame->m_mapHeader
-                            .playerRace[gpGame->m_setupPlayerColor[currentPlayerLocal]]
-                        == FACTION_RANDOM) {
-                        if (gpGame->m_setupPlayerRace[currentPlayerLocal] == FACTION_RANDOM)
-                            gpGame->m_setupPlayerRace[currentPlayerLocal] = FACTION_KNIGHT;
-                        else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
-                                 == FACTION_NECROMANCER)
-                            gpGame->m_setupPlayerRace[currentPlayerLocal] = FACTION_RANDOM;
-                        else
-                            ++gpGame->m_setupPlayerRace[currentPlayerLocal];
-                        synchronizeSetupResult = 1;
-                        redrawWindow = 1;
-                    }
-                    break;
-
-                case GAME_MAP_OPTIONS_CONTROL:
-                    break;
-
-                case NEW_GAME_SCENARIO_NAME:
-                case NEW_GAME_MAP_SELECT:
-                chooseMap:
-                    if (gbRemoteOn && giThisNetPos != 0)
                         break;
-                    {
-                        mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                        mapWindowMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-                        mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                        mapWindowMessageTemp.payload.widget.data.value =
-                            GAME_WIDGET_INACTIVE_FRAME;
-                        gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
-                        gpGame->GetMap();
-                        mapWindowMessageTemp.type = MESSAGE_WIDGET;
-                        mapWindowMessageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-                        mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
-                        mapWindowMessageTemp.payload.widget.data.value =
-                            GAME_WIDGET_INACTIVE_FRAME;
-                        gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
-                        if (gbRemoteOn) {
-                            memcpy(mapPacketLocal, &gpGame->m_mapHeader, GAME_MAP_PACKET_SIZE);
-                            transmitResultTemp = TransmitRemoteData(
-                                mapPacketLocal,
-                                GAME_REMOTE_CHANNEL,
-                                GAME_MAP_PACKET_SIZE,
-                                GAME_REMOTE_MAP_HEADER,
-                                1,
-                                1,
-                                REMOTE_MESSAGE_DEFAULT
+
+                    case GAME_REMOTE_SETUP:
+                        if (strcmp(remotePacketResult->payload, gpGame->m_mapHeader.name) != 0)
+                            break;
+                        memcpy(
+                            gpGame->m_setupPlayerColor,
+                            remotePacketResult->payload + MAP_HEADER_NAME_SIZE,
+                            GAME_SETUP_DATA_SIZE
+                        );
+                        redrawWindow = 1;
+                        break;
+
+                    case GAME_REMOTE_MAP_HEADER:
+                        memset(&remoteMapHeaderValue, 0, sizeof(remoteMapHeaderValue));
+                        memcpy(
+                            &remoteMapHeaderValue,
+                            remotePacketResult->payload,
+                            GAME_MAP_PACKET_SIZE
+                        );
+                        gpGame->ProcessNewMap(&remoteMapHeaderValue);
+                        break;
+
+                    case GAME_REMOTE_CHAT:
+                        redrawWindow = 1;
+                        sender = remotePacketResult->sender;
+                        if (sender >= 0) {
+                            sprintf(
+                                gText,
+                                "%s:  %s",
+                                gsNetPlayerInfo[sender].name,
+                                remotePacketResult->payload
+                            );
+                        } else {
+                            unusedSender = 0;
+                        }
+                        gText[GAME_CHAT_TEXT_LIMIT] = 0;
+                        for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+                             ++currentPlayerLocal) {
+                            strcpy(
+                                cTextReceivedBuffer[currentPlayerLocal],
+                                cTextReceivedBuffer[currentPlayerLocal + 1]
                             );
                         }
-                    }
-                    break;
-
-                default:
-                    break;
+                        strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], gText);
+                        break;
+                }
             }
-            break;
+            if (static_cast<i32>(KBTickCount()) > glTimers[0]) {
+                gpGame->NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
+                gpGame->DrawNGKPDisplayString(1);
+            }
+        }
 
-        default:
-            break;
-    }
+        if (message.type == MESSAGE_KEY_DOWN && giNumHumanPlayers > 1
+            && iMPBaseType != MULTIPLAYER_BASE_HOT_SEAT && gpGame->ProcessNGKeyPress(message)) {
+            redrawWindow = 1;
+            for (currentPlayerLocal = 0; currentPlayerLocal < GAME_CHAT_LINE_COUNT - 1;
+                 ++currentPlayerLocal) {
+                strcpy(
+                    cTextReceivedBuffer[currentPlayerLocal],
+                    cTextReceivedBuffer[currentPlayerLocal + 1]
+                );
+            }
+            strcpy(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1], cNGKPCore);
+            strcpy(cNGKPCore, "");
+            strcpy(cNGKPDisplay, "");
+            NGKPcursorIndex = 0;
+            transmitResultTemp = TransmitRemoteData(
+                cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1],
+                GAME_REMOTE_CHANNEL,
+                strlen(cTextReceivedBuffer[GAME_CHAT_LINE_COUNT - 1]) + 1,
+                GAME_REMOTE_CHAT,
+                1,
+                1,
+                REMOTE_MESSAGE_DEFAULT
+            );
+            if (!transmitResultTemp)
+                ShutDown(NULL);
+        }
+
+        if (message.type == MESSAGE_WIDGET) {
+            if (HAS(message.payload.widget.modifiers, MESSAGE_MODIFIER_RIGHT_BUTTON)) {
+                if (message.payload.widget.command == NEW_GAME_EVENT_PRESS
+                    || message.payload.widget.command == NEW_GAME_EVENT_ALTERNATE_PRESS) {
+                    helpDialogIndexLocal = -1;
+                    if ((message.payload.widget.id >= NEW_GAME_DIFFICULTY_HELP_FIRST
+                         && message.payload.widget.id
+                                <= NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_DIFFICULTY_FIRST
+                            && message.payload.widget.id
+                                   <= NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_COUNT) - 1))
+                        helpDialogIndexLocal = GAME_HELP_DIFFICULTY;
+                    if ((message.payload.widget.id >= NEW_GAME_HANDICAP_FIRST
+                         && message.payload.widget.id
+                                <= NEW_GAME_HANDICAP_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_PLAYER_HUMAN_FIRST
+                            && message.payload.widget.id <= NEW_GAME_PLAYER_HUMAN_FIRST
+                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                - 1))
+                        helpDialogIndexLocal = GAME_HELP_HANDICAP;
+                    if ((message.payload.widget.id >= NEW_GAME_COLOR_FIRST
+                         && message.payload.widget.id
+                                <= NEW_GAME_COLOR_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_RACE_FIRST
+                            && message.payload.widget.id
+                                   <= NEW_GAME_RACE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_PLAYER_SELECT_FIRST
+                            && message.payload.widget.id <= NEW_GAME_PLAYER_NAME_FIRST)
+                        || (message.payload.widget.id >= NEW_GAME_PLAYER_NAME_FIRST
+                            && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST))
+                        helpDialogIndexLocal = GAME_HELP_PLAYER;
+                    if ((message.payload.widget.id >= NEW_GAME_RACE_CYCLE_FIRST
+                         && message.payload.widget.id
+                                <= NEW_GAME_RACE_CYCLE_FIRST + IDX(GAME_PLAYER_CONTROL_COUNT) - 1)
+                        || (message.payload.widget.id >= NEW_GAME_RACE_ICON_FIRST
+                            && message.payload.widget.id <= NEW_GAME_RACE_ICON_FIRST
+                                                                + IDX(GAME_PLAYER_CONTROL_COUNT)
+                                                                - 1))
+                        helpDialogIndexLocal = GAME_HELP_RACE;
+                    if (message.payload.widget.id == GAME_MAP_OPTIONS_CONTROL
+                        || message.payload.widget.id == NEW_GAME_MAP_SELECT
+                        || message.payload.widget.id == NEW_GAME_SCENARIO_NAME)
+                        helpDialogIndexLocal = GAME_HELP_MAP;
+                    if (message.payload.widget.id == NEW_GAME_RATING)
+                        helpDialogIndexLocal = GAME_HELP_RATING;
+                    if (message.payload.widget.id == GAME_DIALOG_OK)
+                        helpDialogIndexLocal = GAME_HELP_OK;
+                    if (message.payload.widget.id == GAME_DIALOG_CANCEL)
+                        helpDialogIndexLocal = GAME_HELP_CANCEL;
+                    if (helpDialogIndexLocal != -1)
+                        NormalDialog(
+                            gNewGameHelp[helpDialogIndexLocal],
+                            NEW_GAME_HELP_DIALOG_TYPE,
+                            -1,
+                            -1,
+                            -1,
+                            0,
+                            -1,
+                            0,
+                            -1,
+                            0
+                        );
+                }
+            } else {
+                switch (message.payload.widget.command) {
+                    case NEW_GAME_EVENT_RELEASE:
+                        switch (message.payload.widget.id) {
+                            case GAME_MAP_OPTIONS_CONTROL:
+                                goto chooseMap;
+
+                            case GAME_DIALOG_OK:
+                                if (gbRemoteOn) {
+                                    transmitResultTemp = TransmitRemoteData(
+                                        NULL,
+                                        GAME_REMOTE_CHANNEL,
+                                        0,
+                                        GAME_REMOTE_START,
+                                        1,
+                                        1,
+                                        REMOTE_MESSAGE_DEFAULT
+                                    );
+                                }
+                                gpWindowManager->m_dialogResult = message.payload.widget.id;
+                                message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                                message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                                gbNewGameDialogOver = true;
+                                return MESSAGE_DISPATCH_FORWARD;
+
+                            case GAME_DIALOG_CANCEL:
+                                if (gbRemoteOn) {
+                                    transmitResultTemp = TransmitRemoteData(
+                                        NULL,
+                                        GAME_REMOTE_CHANNEL,
+                                        0,
+                                        GAME_REMOTE_CANCEL,
+                                        1,
+                                        1,
+                                        REMOTE_MESSAGE_DEFAULT
+                                    );
+                                    ShutDown(NULL);
+                                }
+                                gpWindowManager->m_dialogResult = message.payload.widget.id;
+                                message.payload.widget.id = GAME_DIALOG_CLOSE_MESSAGE;
+                                message.payload.widget.command = WIDGET_COMMAND_DIALOG_SELECT;
+                                gbNewGameDialogOver = true;
+                                return MESSAGE_DISPATCH_FORWARD;
+
+                            default:
+                                break;
+                        }
+                        break;
+
+                    case NEW_GAME_EVENT_PRESS:
+                        switch (message.payload.widget.id) {
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_HELP_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_HELP_FIRST;
+                                goto setDifficulty;
+
+                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EASY):
+                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_NORMAL):
+                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_HARD):
+                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_EXPERT):
+                            case NEW_GAME_DIFFICULTY_FIRST + IDX(DIFFICULTY_IMPOSSIBLE):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_DIFFICULTY_FIRST;
+                            setDifficulty:
+                                gpGame->m_difficulty =
+                                    static_cast<GameDifficulty>(currentPlayerLocal);
+                                synchronizeSetupResult = 1;
+                                redrawWindow = 1;
+                                break;
+
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_HANDICAP_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_HANDICAP_FIRST;
+                                goto cycleHandicap;
+
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_HUMAN_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_PLAYER_HUMAN_FIRST;
+                            cycleHandicap:
+                                synchronizeSetupResult = 1;
+                                redrawWindow = 1;
+                                if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                    != GAME_COMPUTER_PLAYER) {
+                                    gpGame->m_playerHandicap[currentPlayerLocal] = PlayerHandicap(
+                                        (IDX(gpGame->m_playerHandicap[currentPlayerLocal]) + 1)
+                                        % IDX(PLAYER_HANDICAP_COUNT)
+                                    );
+                                }
+                                break;
+
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_RACE_FIRST;
+                                goto selectPlayer;
+
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_COLOR_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_COLOR_FIRST;
+                                goto selectPlayer;
+
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_SELECT_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_PLAYER_SELECT_FIRST;
+                                goto selectPlayer;
+
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_PLAYER_NAME_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_PLAYER_NAME_FIRST;
+                            selectPlayer:
+                                synchronizeSetupResult = 1;
+                                redrawWindow = 1;
+                                if (gpGame->m_setupPlayerType[currentPlayerLocal]
+                                        != GAME_PLAYER_DEFAULT
+                                    || (giNumHumanPlayers > 1
+                                        && gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                               != GAME_COMPUTER_PLAYER)) {
+                                    if (giNumHumanPlayers == 1) {
+                                        if (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                            == GAME_COMPUTER_PLAYER) {
+                                            for (swapPlayerTemp = 0;
+                                                 swapPlayerTemp < gpGame->m_mapHeader.playerCount;
+                                                 ++swapPlayerTemp) {
+                                                if (gpGame->m_setupPlayerNetworkId[swapPlayerTemp]
+                                                    != GAME_COMPUTER_PLAYER) {
+                                                    oldNetworkId = gpGame->m_setupPlayerNetworkId
+                                                                       [swapPlayerTemp];
+                                                    gpGame->m_setupPlayerNetworkId[swapPlayerTemp] =
+                                                        gpGame->m_setupPlayerNetworkId
+                                                            [currentPlayerLocal];
+                                                    gpGame->m_setupPlayerNetworkId
+                                                        [currentPlayerLocal] = oldNetworkId;
+                                                    swapPlayerTemp = GAME_SWAP_SEARCH_DONE;
+                                                }
+                                            }
+                                        }
+                                    } else if (gpGame->m_selectedSetupPlayer
+                                               == GAME_NETWORK_PLAYER_NONE) {
+                                        gpGame->m_selectedSetupPlayer =
+                                            static_cast<i8>(currentPlayerLocal);
+                                    } else if (gpGame->m_selectedSetupPlayer == currentPlayerLocal
+                                               || (gpGame->m_setupPlayerNetworkId
+                                                           [currentPlayerLocal]
+                                                       == GAME_COMPUTER_PLAYER
+                                                   && gpGame->m_setupPlayerNetworkId
+                                                              [gpGame->m_selectedSetupPlayer]
+                                                          == GAME_COMPUTER_PLAYER)) {
+                                        gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
+                                    } else {
+                                        if ((gpGame->m_setupPlayerType[currentPlayerLocal]
+                                                 != GAME_PLAYER_DEFAULT
+                                             && gpGame->m_setupPlayerType
+                                                        [gpGame->m_selectedSetupPlayer]
+                                                    != GAME_PLAYER_DEFAULT)
+                                            || (gpGame->m_setupPlayerNetworkId[currentPlayerLocal]
+                                                    != GAME_COMPUTER_PLAYER
+                                                && gpGame->m_setupPlayerNetworkId
+                                                           [gpGame->m_selectedSetupPlayer]
+                                                       != GAME_COMPUTER_PLAYER)) {
+                                            swapPlayerTemp =
+                                                gpGame->m_setupPlayerNetworkId[currentPlayerLocal];
+                                            gpGame->m_setupPlayerNetworkId[currentPlayerLocal] =
+                                                gpGame->m_setupPlayerNetworkId
+                                                    [gpGame->m_selectedSetupPlayer];
+                                            gpGame->m_setupPlayerNetworkId
+                                                [gpGame->m_selectedSetupPlayer] =
+                                                static_cast<i8>(swapPlayerTemp);
+                                        } else {
+                                            NormalDialog(
+                                                "\xc4\xe2\xe5 \xe2\xfb\xe1\xf0\xe0\xed\xed\xfb"
+                                                "\xf5 \xef\xee\xe7\xe8\xf6\xe8\xe8 \xed\xe5 \xec"
+                                                "\xee\xe3\xf3\xf2 \xef\xee\xec\xe5\xed\xff\xf2"
+                                                "\xfc\xf1\xff \xec\xe5\xf1\xf2\xe0\xec\xe8.",
+                                                NORMAL_DIALOG_INFO,
+                                                -1,
+                                                -1,
+                                                -1,
+                                                0,
+                                                -1,
+                                                0,
+                                                -1,
+                                                0
+                                            );
+                                        }
+                                        gpGame->m_selectedSetupPlayer = GAME_NETWORK_PLAYER_NONE;
+                                    }
+                                }
+                                break;
+
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_CYCLE_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_RACE_CYCLE_FIRST;
+                                goto cycleRace;
+
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIRST):
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SECOND):
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_THIRD):
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FOURTH):
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_FIFTH):
+                            case NEW_GAME_RACE_ICON_FIRST + IDX(PLAYER_SLOT_SIXTH):
+                                currentPlayerLocal =
+                                    message.payload.widget.id - NEW_GAME_RACE_ICON_FIRST;
+                            cycleRace:
+                                if (gpGame->m_mapHeader
+                                        .playerRace[gpGame->m_setupPlayerColor[currentPlayerLocal]]
+                                    == FACTION_RANDOM) {
+                                    if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                        == FACTION_RANDOM)
+                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                            FACTION_KNIGHT;
+                                    else if (gpGame->m_setupPlayerRace[currentPlayerLocal]
+                                             == FACTION_NECROMANCER)
+                                        gpGame->m_setupPlayerRace[currentPlayerLocal] =
+                                            FACTION_RANDOM;
+                                    else
+                                        ++gpGame->m_setupPlayerRace[currentPlayerLocal];
+                                    synchronizeSetupResult = 1;
+                                    redrawWindow = 1;
+                                }
+                                break;
+
+                            case GAME_MAP_OPTIONS_CONTROL:
+                                break;
+
+                            case NEW_GAME_SCENARIO_NAME:
+                            case NEW_GAME_MAP_SELECT:
+                            chooseMap:
+                                if (gbRemoteOn && giThisNetPos != 0)
+                                    break;
+                                {
+                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
+                                    mapWindowMessageTemp.payload.widget.command =
+                                        NEW_GAME_WIDGET_DISABLE;
+                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    mapWindowMessageTemp.payload.widget.data.value =
+                                        GAME_WIDGET_INACTIVE_FRAME;
+                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    gpGame->GetMap();
+                                    mapWindowMessageTemp.type = MESSAGE_WIDGET;
+                                    mapWindowMessageTemp.payload.widget.command =
+                                        NEW_GAME_WIDGET_ENABLE;
+                                    mapWindowMessageTemp.payload.widget.id = GAME_DIALOG_CANCEL;
+                                    mapWindowMessageTemp.payload.widget.data.value =
+                                        GAME_WIDGET_INACTIVE_FRAME;
+                                    gpGame->m_newGameWindow->BroadcastMessage(mapWindowMessageTemp);
+                                    if (gbRemoteOn) {
+                                        memcpy(
+                                            mapPacketLocal,
+                                            &gpGame->m_mapHeader,
+                                            GAME_MAP_PACKET_SIZE
+                                        );
+                                        transmitResultTemp = TransmitRemoteData(
+                                            mapPacketLocal,
+                                            GAME_REMOTE_CHANNEL,
+                                            GAME_MAP_PACKET_SIZE,
+                                            GAME_REMOTE_MAP_HEADER,
+                                            1,
+                                            1,
+                                            REMOTE_MESSAGE_DEFAULT
+                                        );
+                                    }
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
 
 finish:
     if (redrawWindow) {
@@ -1505,7 +1540,7 @@ finish:
 
 VA(0x0047811b, 0x3f3)
 i32 game::ProcessNGKeyPress(struct tag_message& message) {
-    char workText[GAME_KEY_BUFFER_SIZE];
+    char buf[GAME_KEY_BUFFER_SIZE];
     char keyChar;
     i32 scanCode;
     i32 widthResult;
@@ -1553,7 +1588,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
 
             if (strlen(cNGKPCore) + 1 < GAME_CHAT_TEXT_LIMIT
                 && message.payload.keyboard.keyCode != 0) {
-                strcpy(workText, cNGKPCore);
+                strcpy(buf, cNGKPCore);
                 keyChar = 0;
                 if (message.payload.keyboard.keyCode >= IDX(GAME_KEY_FIRST_EXTENDED)) {
                     scanCode = (message.payload.keyboard.keyCode & KEY_SCAN_CODE_MASK)
@@ -1608,7 +1643,7 @@ i32 game::ProcessNGKeyPress(struct tag_message& message) {
                     NGKPSetupDisplayString(cNGKPCore, static_cast<u16>(NGKPcursorIndex));
                     widthResult = smallFont->LineLength(cNGKPDisplay, GAME_CHAT_DRAW_WIDTH);
                     if (widthResult > GAME_CHAT_MAX_LINES) {
-                        strcpy(cNGKPCore, workText);
+                        strcpy(cNGKPCore, buf);
                         --NGKPcursorIndex;
                     }
                 }
@@ -1754,8 +1789,7 @@ void game::ShowScenInfo(void) {
         if (giNumHumanPlayers > 1) {
             iconControlLocal = new iconWidget(
                 static_cast<i16>(
-                    playerSpacingTemp * playerCounter + firstPlayerXLocal
-                    + PLAYER_HUMAN_X_OFFSET
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_HUMAN_X_OFFSET
                 ),
                 static_cast<i16>(multiplayerYOffsetValue + SCENARIO_PLAYER_HUMAN_Y),
                 PLAYER_HUMAN_WIDTH,
@@ -1773,8 +1807,7 @@ void game::ShowScenInfo(void) {
 
             iconControlLocal = new iconWidget(
                 static_cast<i16>(
-                    playerSpacingTemp * playerCounter + firstPlayerXLocal
-                    + PLAYER_HANDICAP_X_OFFSET
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_HANDICAP_X_OFFSET
                 ),
                 static_cast<i16>(multiplayerYOffsetValue + SCENARIO_PLAYER_HANDICAP_Y),
                 PLAYER_HANDICAP_WIDTH,
@@ -1792,16 +1825,19 @@ void game::ShowScenInfo(void) {
         }
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_X_OFFSET),
+            static_cast<i16>(
+                firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_RACE_X_OFFSET
+            ),
             SCENARIO_PLAYER_RACE_Y,
             PLAYER_RACE_WIDTH,
             static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT : GAME_RACE_WIDGET_SINGLE_HEIGHT
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_HEIGHT
+                                      : GAME_RACE_WIDGET_SINGLE_HEIGHT
             ),
             "ngextra.icn",
             static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME : GAME_RACE_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_RACE_WIDGET_MULTIPLAYER_FRAME
+                                      : GAME_RACE_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_RACE_FIRST),
@@ -1813,14 +1849,16 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(iconControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_COLOR_X_OFFSET),
+            static_cast<i16>(
+                firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_COLOR_X_OFFSET
+            ),
             SCENARIO_PLAYER_COLOR_Y,
             PLAYER_COLOR_WIDTH,
             PLAYER_COLOR_HEIGHT,
             "ngextra.icn",
             static_cast<i16>(
-                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME : GAME_COLOR_WIDGET_SINGLE_FRAME
+                giNumHumanPlayers > 1 ? GAME_COLOR_WIDGET_MULTIPLAYER_FRAME
+                                      : GAME_COLOR_WIDGET_SINGLE_FRAME
             ),
             ICON_DRAW_NORMAL,
             static_cast<i16>(playerCounter + NEW_GAME_COLOR_FIRST),
@@ -1838,8 +1876,7 @@ void game::ShowScenInfo(void) {
             sprintf(label, " ");
             textControlLocal = new textWidget(
                 static_cast<i16>(
-                    playerSpacingTemp * playerCounter + firstPlayerXLocal
-                    + PLAYER_NAME_X_OFFSET
+                    firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_NAME_X_OFFSET
                 ),
                 SCENARIO_PLAYER_NAME_Y,
                 PLAYER_NAME_WIDTH,
@@ -1858,10 +1895,12 @@ void game::ShowScenInfo(void) {
 
         singlePlayerYOffsetValue = 0;
         iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_ICON_X_OFFSET),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + SCENARIO_PLAYER_RACE_ICON_Y),
+            static_cast<i16>(
+                firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_RACE_ICON_X_OFFSET
+            ),
+            static_cast<i16>(
+                multiplayerYOffsetValue + singlePlayerYOffsetValue + SCENARIO_PLAYER_RACE_ICON_Y
+            ),
             PLAYER_RACE_ICON_WIDTH,
             PLAYER_RACE_ICON_HEIGHT,
             "ngextra.icn",
@@ -1879,21 +1918,19 @@ void game::ShowScenInfo(void) {
             H2_ALLOC(PLAYER_LABEL_CAPACITY)
         );
         sprintf(label, "A");
-        if (m_mapHeader.playerCount >= PLAYER_RACE_NAME_NARROW_THRESHOLD) {
-            if (m_mapHeader.playerCount >= MAP_HEADER_PLAYER_COUNT)
-                raceTextWidth = 0;
-            else
-                raceTextWidth = PLAYER_RACE_NAME_NARROW_WIDTH;
-        } else {
-            raceTextWidth = PLAYER_RACE_NAME_WIDE_WIDTH;
-        }
+        raceTextWidth = m_mapHeader.playerCount < PLAYER_RACE_NAME_NARROW_THRESHOLD
+                            ? PLAYER_RACE_NAME_WIDE_WIDTH
+                        : m_mapHeader.playerCount < MAP_HEADER_PLAYER_COUNT
+                            ? PLAYER_RACE_NAME_NARROW_WIDTH
+                            : 0;
         textControlLocal = new textWidget(
             static_cast<i16>(
-                playerSpacingTemp * playerCounter + firstPlayerXLocal
-                + PLAYER_RACE_NAME_X_OFFSET - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
+                firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_RACE_NAME_X_OFFSET
+                - raceTextWidth / PLAYER_RACE_NAME_CENTER_DIVISOR
             ),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + SCENARIO_PLAYER_RACE_NAME_Y),
+            static_cast<i16>(
+                multiplayerYOffsetValue + singlePlayerYOffsetValue + SCENARIO_PLAYER_RACE_NAME_Y
+            ),
             static_cast<i16>(raceTextWidth + PLAYER_RACE_NAME_BASE_WIDTH),
             PLAYER_RACE_NAME_HEIGHT,
             label,
@@ -1908,10 +1945,12 @@ void game::ShowScenInfo(void) {
         scenarioWindowValue->AddWidget(textControlLocal, -1);
 
         iconControlLocal = new iconWidget(
-            static_cast<i16>(playerSpacingTemp * playerCounter + firstPlayerXLocal
-                             + PLAYER_RACE_CYCLE_X_OFFSET),
-            static_cast<i16>(multiplayerYOffsetValue + singlePlayerYOffsetValue
-                             + SCENARIO_PLAYER_RACE_CYCLE_Y),
+            static_cast<i16>(
+                firstPlayerXLocal + playerSpacingTemp * playerCounter + PLAYER_RACE_CYCLE_X_OFFSET
+            ),
+            static_cast<i16>(
+                multiplayerYOffsetValue + singlePlayerYOffsetValue + SCENARIO_PLAYER_RACE_CYCLE_Y
+            ),
             PLAYER_RACE_CYCLE_WIDTH,
             PLAYER_RACE_CYCLE_HEIGHT,
             "ngextra.icn",
@@ -1929,7 +1968,7 @@ void game::ShowScenInfo(void) {
     for (playerCounter = 0; playerCounter < m_mapHeader.playerCount; ++playerCounter) {
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER) {
             sprintf(gText, "");
-        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) != 0) {
+        } else if (strlen(cPlayerNames[m_setupPlayerNetworkId[playerCounter]]) > 0) {
             sprintf(gText, cPlayerNames[m_setupPlayerNetworkId[playerCounter]]);
         } else {
             sprintf(gText, "\xc8\xe3\xf0\xee\xea %d", m_setupPlayerNetworkId[playerCounter] + 1);
@@ -1940,10 +1979,9 @@ void game::ShowScenInfo(void) {
         scenarioMessageTemp.payload.widget.data.text = gText;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
-        if (m_selectedSetupPlayer == playerCounter)
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
-        else
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
+        scenarioMessageTemp.payload.widget.command = playerCounter != m_selectedSetupPlayer
+                                                         ? NEW_GAME_WIDGET_DISABLE
+                                                         : NEW_GAME_WIDGET_ENABLE;
         scenarioMessageTemp.payload.widget.id =
             NEW_GAME_PLAYER_SELECT_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.value = GAME_WIDGET_REFRESH_FRAME;
@@ -1960,23 +1998,21 @@ void game::ShowScenInfo(void) {
             NEW_GAME_COLOR_FIRST + playerCounter;
         if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
             scenarioMessageTemp.payload.widget.data.value =
-                m_setupPlayerColor[playerCounter]
-                + (playerLockedLocal ? GAME_COMPUTER_COLOR_LOCKED_FRAME
-                                     : GAME_COMPUTER_COLOR_UNLOCKED_FRAME);
+                (playerLockedLocal ? GAME_COMPUTER_COLOR_LOCKED_FRAME
+                                   : GAME_COMPUTER_COLOR_UNLOCKED_FRAME)
+                + m_setupPlayerColor[playerCounter];
         else
             scenarioMessageTemp.payload.widget.data.value =
-                m_setupPlayerColor[playerCounter]
-                + (playerLockedLocal ? GAME_HUMAN_COLOR_LOCKED_FRAME
-                                     : GAME_HUMAN_COLOR_UNLOCKED_FRAME);
+                (playerLockedLocal ? GAME_HUMAN_COLOR_LOCKED_FRAME
+                                   : GAME_HUMAN_COLOR_UNLOCKED_FRAME)
+                + m_setupPlayerColor[playerCounter];
         if (giNumHumanPlayers > 1)
             scenarioMessageTemp.payload.widget.data.value +=
                 GAME_MULTIPLAYER_COLOR_FRAME_OFFSET;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
-        if (playerLockedLocal)
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        else
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        scenarioMessageTemp.payload.widget.command =
+            playerLockedLocal ? NEW_GAME_WIDGET_DISABLE : NEW_GAME_WIDGET_ENABLE;
         scenarioMessageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
@@ -1988,10 +2024,9 @@ void game::ShowScenInfo(void) {
         else
             scenarioMessageTemp.payload.widget.data.value = IDX(m_playerHandicap[playerCounter]);
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
-        if (m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER)
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_DISABLE;
-        else
-            scenarioMessageTemp.payload.widget.command = NEW_GAME_WIDGET_ENABLE;
+        scenarioMessageTemp.payload.widget.command =
+            m_setupPlayerNetworkId[playerCounter] == GAME_COMPUTER_PLAYER ? NEW_GAME_WIDGET_DISABLE
+                                                                          : NEW_GAME_WIDGET_ENABLE;
         scenarioMessageTemp.payload.widget.data.value = GAME_WIDGET_INACTIVE_FRAME;
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
@@ -1999,9 +2034,8 @@ void game::ShowScenInfo(void) {
         scenarioMessageTemp.payload.widget.id =
             NEW_GAME_RACE_CYCLE_FIRST + playerCounter;
         scenarioMessageTemp.payload.widget.data.value =
-            IDX(m_setupPlayerRace[playerCounter])
-            + (playerLockedLocal ? GAME_FIXED_RACE_FRAME_BASE
-                                 : GAME_RANDOM_RACE_FRAME_BASE);
+            (playerLockedLocal ? GAME_FIXED_RACE_FRAME_BASE : GAME_RANDOM_RACE_FRAME_BASE)
+            + IDX(m_setupPlayerRace[playerCounter]);
         scenarioWindowValue->BroadcastMessage(scenarioMessageTemp);
 
         sprintf(gText, gAlignmentNames[IDX(m_setupPlayerRace[playerCounter])]);
@@ -2185,43 +2219,42 @@ void game::GetVictoryConditionText(char* text) {
 
 VA(0x0047973c, 0x386)
 i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
-    char colorName3[GAME_SIDE_TEXT_SIZE];
-    i32 sideSize;
-    i32 localPlayerOnSide;
-    i32 unusedSideWord1;
-    i32 localPlayerIndex;
-    i32 player5;
-    i32 listedPlayerCount5;
-    i32 otherPlayerCount2;
+    char colorStr[GAME_SIDE_TEXT_SIZE];
+    i32 sideCount;
+    i32 i;
+    i32 onSide;
+    i32 otherPlayerCount;
+    i32 localPlayer;
+    i32 listedPlayerCount;
 
-    localPlayerIndex = -1;
-    for (player5 = 0; player5 < m_mapHeader.playerCount; ++player5) {
-        if (m_setupPlayerNetworkId[player5] == giThisGamePos)
-            localPlayerIndex = player5;
+    localPlayer = -1;
+    for (i = 0; i < m_mapHeader.playerCount; ++i) {
+        if (m_setupPlayerNetworkId[i] == giThisGamePos)
+            localPlayer = i;
     }
 
-    localPlayerOnSide = localPlayerIndex >= firstPlayer && localPlayerIndex <= lastPlayer ? 1 : 0;
+    onSide = localPlayer >= firstPlayer && localPlayer <= lastPlayer ? 1 : 0;
 
-    sideSize = lastPlayer - firstPlayer + 1;
-    otherPlayerCount2 = sideSize - (localPlayerOnSide != 0);
+    sideCount = lastPlayer - firstPlayer + 1;
+    otherPlayerCount = sideCount - (onSide != 0);
 
-    if (localPlayerOnSide) {
-        if (otherPlayerCount2 != 0) {
-            if (otherPlayerCount2 > 1)
+    if (onSide) {
+        if (otherPlayerCount != 0) {
+            if (otherPlayerCount > 1)
                 sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8\xe8 \xf1\xee\xfe\xe7\xed\xe8\xea\xe8 ");
             else
                 sprintf(text, "\xc2\xfb \xe8 \xe2\xe0\xf8 \xf1\xee\xfe\xe7\xed\xe8\xea ");
 
-            listedPlayerCount5 = 0;
-            for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
-                if (localPlayerIndex != player5) {
-                    ++listedPlayerCount5;
-                    sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
-                    colorName3[0] = CyrillicToUpper(colorName3[0]);
-                    strcat(text, colorName3);
-                    if (listedPlayerCount5 < otherPlayerCount2 - 1)
+            listedPlayerCount = 0;
+            for (i = firstPlayer; i <= lastPlayer; ++i) {
+                if (i != localPlayer) {
+                    ++listedPlayerCount;
+                    sprintf(colorStr, gColors[m_setupPlayerColor[i]]);
+                    colorStr[0] = CyrillicToUpper(colorStr[0]);
+                    strcat(text, colorStr);
+                    if (listedPlayerCount < otherPlayerCount - 1)
                         strcat(text, ", ");
-                    else if (listedPlayerCount5 < otherPlayerCount2)
+                    else if (listedPlayerCount < otherPlayerCount)
                         strcat(text, " \xe8 ");
                 }
             }
@@ -2229,25 +2262,25 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
             sprintf(text, "\xc2\xfb");
         }
     } else {
-        if (sideSize > 1)
+        if (sideCount > 1)
             strcpy(text, "\xe2\xf0\xe0\xe6\xe5\xf1\xea\xe8\xe9 \xf1\xee\xfe\xe7 ");
         else
             strcpy(text, "\xe2\xf0\xe0\xe3 - ");
 
-        listedPlayerCount5 = 0;
-        for (player5 = firstPlayer; player5 <= lastPlayer; ++player5) {
-            ++listedPlayerCount5;
-            sprintf(colorName3, gColors[m_setupPlayerColor[player5]]);
-            colorName3[0] = CyrillicToUpper(colorName3[0]);
-            strcat(text, colorName3);
-            if (listedPlayerCount5 < otherPlayerCount2 - 1)
+        listedPlayerCount = 0;
+        for (i = firstPlayer; i <= lastPlayer; ++i) {
+            ++listedPlayerCount;
+            sprintf(colorStr, gColors[m_setupPlayerColor[i]]);
+            colorStr[0] = CyrillicToUpper(colorStr[0]);
+            strcat(text, colorStr);
+            if (listedPlayerCount < otherPlayerCount - 1)
                 strcat(text, ", ");
-            else if (listedPlayerCount5 < otherPlayerCount2)
+            else if (listedPlayerCount < otherPlayerCount)
                 strcat(text, " \xe8 ");
         }
     }
 
-    return localPlayerOnSide;
+    return onSide;
 }
 
 b32 gbNewGameDialogOver = true;
