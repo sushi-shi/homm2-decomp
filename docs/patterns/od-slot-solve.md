@@ -90,3 +90,39 @@ id_h -0x34` once `0xc` is added back - retail exactly. The closing edit was
 `fileName` -> `name` (bucket 0 -> 13) and `buildingId_h` -> `id_h`
 (bucket 9 -> 15); declaration order was already right and did not move. The
 function went 99.87% -> EXACT on the first rebuild.
+
+## Buckets need only be NON-DECREASING, never equal (VC6 SP5, byte-proven)
+
+A long permutation looks unsolvable if you assume the names have to share one
+bucket. They do not. The frame order is `sort(key=(bucket, -decl_index))`, so
+the only constraint on a run of `n` locals is
+
+    bucket(slot_1) <= bucket(slot_2) <= ... <= bucket(slot_n)
+
+and every tie is broken by **declaration order alone** (later-declared is
+shallower). Declarations without initialisers emit no code at `/Od`, so their
+order is a free lever — reorder them until each bucket group reads
+shallow-first-declared-last. Only initialised declarations are pinned, by
+[initializer-store-order-pins-declaration-order](initializer-store-order-pins-declaration-order.md).
+
+Practically: build one candidate list per role (10-30 faithful spellings),
+then run a trivial DP over "last bucket used" to pick a monotone chain of
+minimum naming cost. `SOURCE/Newgame` needed an 11-name and a 15-name
+permutation whose shared subsequence is identical:
+
+    -0x10 columnGap(b1)   -0x14 nameWidget(b6)   -0x18 firstColumnX(b6)
+    -0x1c playerCounter(b7)  -0x20 availWidth(b7)  -0x24 iconControl(b11)
+    -0x28 playerStep(b11)  -0x2c multiplayerYOffset(b13)
+    -0x30 raceNameWidth(b13)  -0x34 yExtra(b13)  -0x38 name(b13)
+
+with one declaration order
+
+    columnGap, availWidth, firstColumnX, playerStep, playerCounter, mapSize,
+    locked, name, yExtra, raceNameWidth, msg, multiplayerYOffset,
+    nameWidget, iconControl, window
+
+serving BOTH `game::InitNewGameWindow` (11 of those names) and
+`game::ShowScenInfo` (all 15, with `msg` a 28-byte `tag_message` and the two
+extra `b1` names `locked`/`window` above `columnGap`). Both went EXACT on the
+first rebuild. An earlier attempt rejected the pair as unsolvable because it
+searched only for a six-name single-bucket clump.
