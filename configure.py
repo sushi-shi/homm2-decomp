@@ -223,11 +223,21 @@ def main():
     (od / "objdiff.json").write_text(json.dumps({
         "$schema": "https://raw.githubusercontent.com/encounter/objdiff/main/config.schema.json",
         "build_base": False, "build_target": False,
-        # This branch does not model static data yet: there is not one source DATA()
-        # claim, so every global is spelled `const_<RVA>` in the delinked target and
-        # objdiff's `data_value` strictness scores a data model that does not exist.
-        # Compare instructions only until data claims land.
-        "options": {"functionRelocDiffs": "none"},
+        # Relocation targets are scored. Under `none` a function could be 100%
+        # exact while reading the wrong global: a DIR32 site is four masked bytes,
+        # so `mov eax,[gArmyNames]` and `mov eax,[gArmyNamesPlural]` compared
+        # equal. Six such sites were real Buka localization faults, and
+        # advManager::QuickInfo read gResourceNames where retail reads a
+        # Buka-only gMineNames[7] -- all at a flawless 100.00%.
+        #
+        # `data_value` is affordable now that the data model exists (1179 source
+        # DATA()/VTBL() claims; assert_relocs 3058 -> 0). It is also strictly
+        # stronger than assert_relocs, which only checks that a target RESOLVES to
+        # the retail address: this additionally compares the referenced symbol's
+        # identity and payload, so the residual it exposes is representation
+        # (delinker `const_<RVA>` spellings, anonymous-data naming) on top of
+        # targeting. Instructions stay measurable via `fuzzy`.
+        "options": {"functionRelocDiffs": "data_value"},
         "watch_patterns": ["*.obj"], "units": units_j,
     }, indent=2) + "\n")
     print(f"configure: {len(units)} units -> build.ninja + build/objdiff/objdiff.json")
