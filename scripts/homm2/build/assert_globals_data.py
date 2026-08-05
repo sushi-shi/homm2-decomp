@@ -9,13 +9,29 @@ Run from repo root; exits 1 on any violation."""
 import csv, re, sys, glob
 
 IMG = 0x400000
+# External data is unique in the program, so its identifier alone names it. An
+# internal (file-static) definition is unique only within its unit — ten icon
+# decoders each define their own `s_clipB` at their own address — so its unit is
+# part of the key, and a .cpp definition is matched against its own unit first.
 rva_of = {}
+static_rva_of = {}
 for r in csv.DictReader(open("build/gen/symbol_names.csv")):
     if r["kind"] != "data":
         continue
     m = re.match(r'\?([A-Za-z_]\w*)@@', r["name"]) or re.match(r'[_@]?([A-Za-z_]\w*)', r["name"])
-    if m:
+    if not m:
+        continue
+    if r["name"].startswith("?"):
         rva_of.setdefault(m.group(1), int(r["rva"], 16))
+    else:
+        static_rva_of.setdefault((r["unit"], m.group(1)), int(r["rva"], 16))
+
+
+def want_rva(unit, name):
+    """The VA this definition must claim, or None when nothing claims it."""
+    if (unit, name) in static_rva_of:
+        return static_rva_of[(unit, name)]
+    return rva_of.get(name)
 
 DATA_RE = re.compile(r'^\s*DATA\(0x([0-9a-fA-F]+)\)\s+(.*)$')
 
@@ -39,6 +55,7 @@ def note(va, loc):
 # (1) .cpp DEFINITIONS: every inventory-global def carries DATA(exact VA). Unclaimed defs may carry
 #     DATA too (Phase-B module-private synthetic globals) — those just claim their VA for uniqueness.
 for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
+    unit = c[len("src/"):-len(".cpp")]
     for i, line in enumerate(open(c), 1):
         loc = "%s:%d" % (c, i)
         dm = DATA_RE.match(line)
@@ -46,11 +63,12 @@ for c in sorted(glob.glob("src/**/*.cpp", recursive=True)):
         name = def_name(rest.split('//')[0])
         if not name:
             continue
-        if name not in rva_of:                        # unclaimed file-scope def (helper/static)
+        claimed = want_rva(unit, name)
+        if claimed is None:                           # unclaimed file-scope def (helper/static)
             if dm:
                 note(dm.group(1), loc)
             continue
-        want = rva_of[name] + IMG
+        want = claimed + IMG
         if not dm:
             bad.append((loc, name, "no DATA() on definition", "%#010x" % want))
         elif int(dm.group(1), 16) != want:

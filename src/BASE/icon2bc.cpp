@@ -10,23 +10,23 @@
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-static i32 s_left;
-static i32 s_clipR;
-static u8* s_dimPal;
-static u8 s_color;
-static i32 s_spanCount;
-static u8* s_dst;
-static u8* s_row;
-static i32 s_y;
-static IconEntry* s_entry;
-static i32 s_run;
-static i32 s_x;
-static i32 s_clipB;
-static u8* s_src;
-static i32 s_dimLen;
-static i32 s_loopCount;
+DATA(0x005360d4) static i32 s_left;
+DATA(0x005360d8) static i32 s_clipR;
+DATA(0x005360dc) static u8* s_dimPal;
+DATA(0x005360e0) static u8 s_color;
+DATA(0x005360e4) static i32 s_spanCount;
+DATA(0x005360e8) static u8* s_dst;
+DATA(0x005360ec) static u8* s_row;
+DATA(0x005360f0) static i32 s_y;
+DATA(0x005360f4) static IconEntry* s_entry;
+DATA(0x005360f8) static i32 s_run;
+DATA(0x005360fc) static i32 s_x;
+DATA(0x00536100) static i32 s_clipB;
+DATA(0x00536104) static u8* s_src;
+DATA(0x00536108) static i32 s_dimLen;
+DATA(0x0053610c) static i32 s_loopCount;
 DATA(0x00536110) static u8* s_literalSource;
-static i32 s_pitch;
+DATA(0x00536114) static i32 s_pitch;
 
 VA(0x004c0ca0, 0x7cf)
 void IconToBitmapColorTable(

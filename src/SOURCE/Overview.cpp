@@ -1572,7 +1572,7 @@ DATA(0x0053099c) OverviewType iLastDynamicType;
 DATA(0x00530998) i32 iLastDynamicTop;
 DATA(0x005309ac) i32 iOverviewItems;
 DATA(0x00530990) i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
-DATA(0x005309a0) class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
+DATA(0x005309a0) class textWidget* textWidgetTitle[OVERVIEW_TITLE_COUNT];
 
 #undef OVERVIEW_SCROLL_ROUNDING_OFFSET
 #undef OVERVIEW_SCROLL_MIN_Y_FLOAT

@@ -970,7 +970,7 @@ H2_ENUM_CLASS_END(AdventureMusicQuality)
 DATA(0x004ea40c) static const i32 environmentVolumes[ENVIRONMENT_VOLUME_COUNT] = {64, 57, 40, 21, 7, 5, 3, 0};
 
 DATA(0x00523e3c) static u16 s_drawGroundTile;
-static i32 s_adjacentMonsterX;
+DATA(0x00523e2c) static i32 s_adjacentMonsterX;
 static i32 s_drawPixelY;
 DATA(0x00523e14) static mapCellExtra* s_drawExtra;
 DATA(0x00523e38) static i32 s_adjacentMonsterY;

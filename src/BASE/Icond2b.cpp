@@ -13,18 +13,18 @@ H2_ENUM_END(IconDimConstant)
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-static i32 s_loopCount;
-static i32 s_y;
-static IconEntry* s_entry;
-static i32 s_left;
-static i32 s_x;
-static u8* s_src;
-static u8* s_dst;
-static u8* s_row;
-static i32 s_clipR;
-static i32 s_clipB;
-static i32 s_spanCount;
-static i32 s_run;
+DATA(0x005363d0) static i32 s_loopCount;
+DATA(0x005363d4) static i32 s_y;
+DATA(0x005363d8) static IconEntry* s_entry;
+DATA(0x005363dc) static i32 s_left;
+DATA(0x005363e0) static i32 s_x;
+DATA(0x005363e4) static u8* s_src;
+DATA(0x005363e8) static u8* s_dst;
+DATA(0x005363ec) static u8* s_row;
+DATA(0x005363f0) static i32 s_clipR;
+DATA(0x005363f4) static i32 s_clipB;
+DATA(0x005363f8) static i32 s_spanCount;
+DATA(0x005363fc) static i32 s_run;
 
 VA(0x004c6af0, 0x357)
 void DimIconToBitmap(

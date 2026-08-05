@@ -13,7 +13,7 @@ H2_ENUM_BEGIN(RemoteConstant)
     REMOTE_NET_NAME_SIZE                 = 32,
     REMOTE_ENCODED_BUFFER_SIZE           = 268,
     REMOTE_RECEIVE_BUFFER_SIZE           = 266,
-    REMOTE_TRANSPORT_BUFFER_SIZE         = 272,
+    REMOTE_TRANSPORT_BUFFER_SIZE         = 268,
     REMOTE_MESSAGE_SIZE                  = 256,
     REMOTE_MESSAGE_PAYLOAD_SIZE          = 247,
     REMOTE_PACKET_HEADER_SIZE            = 6,

@@ -342,7 +342,7 @@ extern i32 NGKPcursorFlashOn;
 extern i32 iLastDynamicTop;
 extern i32 iOverviewItems;
 extern i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
-extern class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
+extern class textWidget* textWidgetTitle[];
 extern H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
 extern CampaignTrackType iCampaignTrackType;
 extern i32 bCampaignViewOnly;

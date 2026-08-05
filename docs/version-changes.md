@@ -29,6 +29,15 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `e:\Users\igorl\...` path strings; every other TU's asserts were compiled
   out. MOUSEMGR's four surviving assert sites are reconstructed and exact
   (lines 398, 446, 501, 520 — PoL 2.0 had them at 410, 458, 514, 533).
+- **[Buka] MIDI trace strings compiled out.** `BASE/Midi` carried an
+  `SMidiText` of nine slots — eight short driver-log messages (`"MS1"`,
+  `"MS2"`, `"MS6b"`, `"MS6c"`, `"MS4"`, `"MP1a"`) plus the sequence filename
+  format. `"MS6b"` and `"MP1a"` occur nowhere in the image, and the one
+  surviving allocation is a bare 16-byte cell at 0x51f594 holding
+  `"MIDI%04d.XMI"`, its padded extent running exactly to `crc32Table` at
+  0x51f5a4. The struct is gone from the reconstruction along with
+  `include/BASE/MIDI_TYPES.h`; `MIDIPlay` formats from
+  `gMidiFilenameFormat` directly. Same shape as the assert removal above.
 - **[Buka] No /Gi line machinery.** The PoL-era `*SourceLineBase` statics
   (VC4.2 `/Gi` __LINE__Var lowering) have no VC6 counterpart; retail passes
   literal line numbers where file/line machinery survives at all. All 76
@@ -296,11 +305,19 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   code-referenced literals, so the literal harvest above could not see them;
   the DATA() claim payload audit reads them directly out of `.data`.
   `szAppName` (0x5157dc) holds `"\xc3\xe5\xf0\xee\xe8 II"` ("Герои II")
-  where the reconstruction still carries `"Heroes II"`, and `szTitle`
-  (0x5157e8) holds `"\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II"`
-  ("Герои Меча и Магии II") where it carries `"Heroes of Might and Magic II"`.
-  Both retail allocations are correspondingly shorter than the reconstructed
-  arrays, so neither address is claimed yet.
+  where the reconstruction carried `"Heroes II"`, and `szTitle` (0x5157e8)
+  holds `"\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II"`
+  ("Герои Меча и Магии II") where it carried `"Heroes of Might and Magic II"`.
+  Both are corrected and claimed. The translation also settles their extents:
+  `szTitle` is linked twelve bytes after `szAppName`, and an initialized
+  allocation is padded to four, so `szAppName` is 9 bytes (`"Герои II"` with
+  its NUL) and `szTitle` 22 — the reconstruction's `[16]`/`[32]` were both
+  impossible. Neither carries an explicit bound now; the initializer is the
+  length, as in the Petzold window skeleton this shell descends from, and
+  `KBWIN_APP_NAME_SIZE`/`KBWIN_WINDOW_TITLE_SIZE` are gone. Compiled payloads
+  are byte-identical to retail including the padding: `szAppName`
+  `0977d7fc41aa8d34e35e4bf0714119dcc1d5e466e846a7677739907a95537390`,
+  `szTitle` `b96ed0c6b22e16cd34b46dc2b05d59e2e566a54f71cd9349424c9fc88c48d7ec`.
 - **[Buka] `soundManager` class rework.** The class gained a backend-state
   head at offset 0x36: backend/savedBackend kinds, the Miles `_DIG_DRIVER*`,
   an `audiere::AudioDevicePtr` (a real RefPtr — its inlined ref/unref

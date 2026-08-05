@@ -10,22 +10,22 @@
 
 // The decoder keeps every piece of working state in file statics: retail's
 // frame is exactly the two __fastcall spills, with no local slots at all.
-static i32 s_loopCount;
-static u8* s_src;
-static i32 s_left;
-static u8* s_dimPal;
-static i32 s_pitch;
-static i32 s_run;
-static u8* s_dst;
-static u8 s_color;
-static i32 s_spanCount;
-static i32 s_x;
-static IconEntry* s_entry;
-static i32 s_y;
-static i32 s_clipR;
-static i32 s_clipB;
-static i32 s_dimLen;
-static u8* s_row;
+DATA(0x00536118) static i32 s_loopCount;
+DATA(0x0053611c) static u8* s_src;
+DATA(0x00536120) static i32 s_left;
+DATA(0x00536124) static u8* s_dimPal;
+DATA(0x00536128) static i32 s_pitch;
+DATA(0x0053612c) static i32 s_run;
+DATA(0x00536130) static u8* s_dst;
+DATA(0x00536134) static u8 s_color;
+DATA(0x00536138) static i32 s_spanCount;
+DATA(0x0053613c) static i32 s_x;
+DATA(0x00536140) static IconEntry* s_entry;
+DATA(0x00536144) static i32 s_y;
+DATA(0x00536148) static i32 s_clipR;
+DATA(0x0053614c) static i32 s_clipB;
+DATA(0x00536150) static i32 s_dimLen;
+DATA(0x00536154) static u8* s_row;
 
 VA(0x004c14c0, 0x750)
 void IconToBitmap(

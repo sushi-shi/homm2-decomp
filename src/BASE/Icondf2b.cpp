@@ -13,19 +13,19 @@ H2_ENUM_END(IconFlipDimConstant)
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-static i32 s_loopCount;
-static i32 s_x;
-static u8* s_src;
-static u8* s_dst;
-static i32 s_y;
-static u8* s_row;
-static i32 s_left;
-static IconEntry* s_entry;
-static i32 s_run;
-static i32 s_spanCount;
-static i32 s_clipR;
-static i32 s_clipB;
-static i32 s_right;
+DATA(0x005398a0) static i32 s_loopCount;
+DATA(0x005398a4) static i32 s_x;
+DATA(0x005398a8) static u8* s_src;
+DATA(0x005398ac) static u8* s_dst;
+DATA(0x005398b0) static i32 s_y;
+DATA(0x005398b4) static u8* s_row;
+DATA(0x005398b8) static i32 s_left;
+DATA(0x005398bc) static IconEntry* s_entry;
+DATA(0x005398c0) static i32 s_run;
+DATA(0x005398c4) static i32 s_spanCount;
+DATA(0x005398c8) static i32 s_clipR;
+DATA(0x005398cc) static i32 s_clipB;
+DATA(0x005398d0) static i32 s_right;
 
 VA(0x004d64b0, 0x3c3)
 void FlipDimIconToBitmap(

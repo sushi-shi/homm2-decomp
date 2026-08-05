@@ -103,7 +103,6 @@ public:
     ExpansionCampaignMap m_viewMap;
     class heroWindow* m_window;
     i32 m_viewOnly;
-    char m_pad_0x4f;
     ExpCampaign(void);
     ~ExpCampaign();
     void ResetMapChoices(void);
@@ -146,7 +145,7 @@ public:
     i8 IsSpecialLossCondition(i32);
 };
 #pragma pack(pop)
-SIZE(ExpCampaign, 0x50);
+SIZE(ExpCampaign, 0x4f);
 
 extern struct SCampaignChoice xCampaignChoices[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                               [EXPANSION_CAMPAIGN_MAX_MAP_COUNT]

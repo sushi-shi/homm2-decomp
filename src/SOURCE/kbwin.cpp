@@ -523,8 +523,9 @@ void InitVideo(void) {
     return;
 }
 
-char szAppName[KBWIN_APP_NAME_SIZE] = "Heroes II";
-char szTitle[KBWIN_WINDOW_TITLE_SIZE] = "Heroes of Might and Magic II";
+DATA(0x005157dc) char szAppName[] = "\xc3\xe5\xf0\xee\xe8 II"; /* "Герои II" */
+DATA(0x005157e8) char szTitle[] = /* "Герои Меча и Магии II" */
+    "\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II";
 DATA(0x00526cd4) HWND hwndApp = NULL;
 DATA(0x00526cd8) HMENU hmnuApp = NULL;
 DATA(0x00526cdc) HANDLE gEventHandle = NULL;

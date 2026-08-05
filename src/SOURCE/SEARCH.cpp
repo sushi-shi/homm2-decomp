@@ -26,7 +26,7 @@ DATA(0x00533e20) static i32 s_adjacentY;
 DATA(0x00533de8) static mapCell* s_targetCell;
 DATA(0x00533dc4) static i32 s_currentWater;
 DATA(0x00533e1c) static i32 s_bestTargetCost;
-static i32 s_adjacentMonsterX;
+DATA(0x00533e08) static i32 s_adjacentMonsterX;
 DATA(0x00533dc0) static i32 s_adjacentCost;
 DATA(0x00533e00) static i32 s_mapX;
 DATA(0x00533de4) static i32 s_neighborY;

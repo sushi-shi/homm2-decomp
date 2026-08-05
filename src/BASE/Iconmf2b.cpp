@@ -9,16 +9,16 @@
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-static i32 s_y;
-static IconEntry* s_entry;
-static i32 s_left;
-static i32 s_right;
-static i32 s_x;
-static u8* s_row;
-static i32 s_run;
-static u8* s_src;
-static i32 s_clipR;
-static i32 s_clipB;
+DATA(0x00539878) static i32 s_y;
+DATA(0x0053987c) static IconEntry* s_entry;
+DATA(0x00539880) static i32 s_left;
+DATA(0x00539884) static i32 s_right;
+DATA(0x00539888) static i32 s_x;
+DATA(0x0053988c) static u8* s_row;
+DATA(0x00539890) static i32 s_run;
+DATA(0x00539894) static u8* s_src;
+DATA(0x00539898) static i32 s_clipR;
+DATA(0x0053989c) static i32 s_clipB;
 
 VA(0x004d6130, 0x32f)
 void FlipMonoIconToBitmap(
