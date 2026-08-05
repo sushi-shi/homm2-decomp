@@ -876,6 +876,74 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   dim CHOICE_ONE ... }` with its own `tag_message` in the guarded block.
   Retail's frame is 0x20 bytes larger than PoL's for exactly that handle and
   message. The library is never freed.
+- **[unclassified] The widget dispatch family stopped snapshotting `m_flags`.**
+  Every PoL `Main` override opens `H2EnumStorage<WidgetFlag,i16> flags =
+  m_flags;` and then writes `m_flags = flags | WIDGET_FLAG_SELECTED` /
+  `m_flags = flags & ~WIDGET_FLAG_SELECTED`. Retail keeps no such slot in any
+  of them (`border::Main` 0xcb390 has a 0x10 frame: two coordinates, `this`,
+  one switch temp) and performs read-modify-write on the member in place -
+  `movw 0x16(%ecx),%dx; orb $1,%dl; movw %dx,0x16(%eax)`. `widget::Main`
+  (0xd4180) likewise re-reads `m_flags` after `m_flags |= ...` instead of
+  testing a `flags` local. Affects `widget::Main`, `border::Main`,
+  `iconWidget::Main`, `button::Main`.
+- **[unclassified] `widget::Main` (0xd4180) moved the un-dimmable-kind test
+  into `widget::Dim`.** PoL guards both call sites with `m_kind !=
+  WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT` and calls the file-static
+  `DimWidgetArea(this)`; the PoL `WIDGET_COMMAND_DRAW` arm also returns
+  `MESSAGE_DISPATCH_CONTINUE` from inside that guard. Retail has neither test
+  at the call sites (`movswl 0x16(%eax),%ecx; and $8; test; je; call
+  ?Dim@widget@@QAEXXZ` and nothing else) and no `DimWidgetArea` body anywhere
+  in `.text`; the kind test lives only in `widget::Dim` (0xd4540). The DRAW arm
+  falls through to the switch's `break`.
+- **[unclassified] `widget::Main` `WIDGET_COMMAND_SET_FLAGS` writes the member
+  directly.** PoL builds `flags = m_flags | (i16)value; m_flags = flags;` and
+  then tests the local. Retail is `m_flags |= value & 0xffff;` followed by a
+  fresh `movswl 0x16(%edx),%eax` of the member. `WIDGET_COMMAND_CLEAR_FLAGS`
+  keeps its `flags` local, but its initialiser masks (`and edx,0xffff`) where
+  PoL casts, and the `WIDGET_COMMAND_DIMMED` fast path assigns
+  `flags = WIDGET_FLAG_DIMMED` and re-uses the shared `m_flags &= ~flags`
+  instead of naming the enumerator.
+- **[unclassified] `iconWidget::Main` (0xbba10) sets a right-button modifier on
+  a message it has already retyped.** The button-up arm ends
+  `msg.type = MESSAGE_WIDGET; ...command = WIDGET_COMMAND_DESELECT;
+  ...id = m_id; if (msg.type == MESSAGE_RIGHT_BUTTON_UP)
+  msg.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;` - retail
+  really emits `cmpl $0x40,(%ecx); jne; movl $0x200,0xc(%edx)` at 0x64d after
+  the `movl $0x200,(%edx)` at 0x630, so the test can never be true. PoL has no
+  such statement, and Buka's own `border::Main` (the same arm, same file
+  family) does not either.
+- **[unclassified] `iconWidget::Read` (0xbb890) masks the orientation byte.**
+  Retail is `movswl %ax,%edx; andl $0xff,%edx; movb %dl,0x26(%eax)` - i.e.
+  `m_orientation = (IconDrawOrientation)(ReadWord() & 0xff)`, matching the
+  `m_fillColor` line two statements later. PoL stores the `ReadWord()` result
+  unmasked.
+- **[unclassified] `border::Read` (0xcb250) uses two name buffers and no `kind`
+  local.** Retail's 0x24 frame holds `char[16]` at -0x10 and a second
+  `char[16]` at -0x20, one declared inside each of the bitmap and icon
+  branches, and `m_kind` is written straight from `ReadWord()` before the two
+  NULL stores and re-read (`movswl 0x14(%edx),%eax`) for each test. PoL keeps a
+  single function-scope `resourceName` and a `kind` local.
+- **[unclassified] `button::DeselectSelected` is gone; `button::Deselect`
+  (0xd3e60) carries the body.** PoL routes all six deselect sites through a
+  private `inline DeselectSelected`; retail has the full flag-clear / `Draw()`
+  / `UpdateScreenRegion` / message-fill body inside `Deselect` and five REL32
+  `call ?Deselect@button@@QAEFAAUtag_message@@@Z` sites in `button::Main`.
+  The message fill order is `type`, `command`, `id` in both.
+- **[unclassified] `button::Main` (0xd3890) drag loop returns
+  `MESSAGE_DISPATCH_FORWARD` literally.** On loop exit retail is
+  `call ?Deselect@...; movl $0x2,%eax` - the deselect result is discarded -
+  where PoL returns it (`movswl %ax,%eax`). The three flag guards on the
+  keyboard arms are separate early-exit `break`s (`jne <next>; jmp <switch
+  end>` per term), not one `&&` chain, and the KEY_UP arm's hotkey test has the
+  same polarity as KEY_DOWN's (`if (m_hotkey != NO_HOTKEY && m_hotkey ==
+  keyCode) return Deselect(msg);`) rather than PoL's inverted `||` guard.
+- **[unclassified] `button::button(char*, ...)` (0xd3640) and `button::Draw`
+  (0xd3f20) drop their one local.** Both open `push ecx` (a single `this`
+  slot): the ctor assigns `m_iconId = MakeId(...)` and then reads the member
+  back for `GetIcon`, and `Draw` addresses `m_owner->m_posX` directly instead
+  of caching a `heroWindow* win`. `iconWidget::Draw` (0xbbd70) likewise has no
+  `widgetWidth`/`iconWidth` pair - a 0x14 frame with only `x`, `y`, the
+  `IconEntry*`, `this` and the switch temp.
 
 ## Reconstruction infrastructure notes (not version deltas)
 

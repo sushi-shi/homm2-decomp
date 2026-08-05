@@ -51,3 +51,39 @@ compiler's storage for the body that already owns the span. It needs
 `homm2 redelink` to take effect. Check for it whenever
 `grep VA(0x` shows a gap between a `switch`-carrying function's end and the next
 claimed RVA.
+
+## Variant: the dense byte-index table, and the 0.00% symptom
+
+A *dense* `switch` (VC6's `sub imm; cmp imm; ja default; movzx idx; jmp *table`)
+stores **two** tables: 4 bytes per distinct target, then one index byte per case
+value in the range. Both are addressed as displacements off the function symbol,
+so the dispatch names the exact sizes:
+
+```
+42c: 8a 90 1c 03 00 00     movb  0x31c(%eax), %dl      DIR32 ?Main@iconWidget@@...
+432: ff 24 95 08 03 00 00  jmpl  *0x308(,%edx,4)       DIR32 ?Main@iconWidget@@...
+```
+
+`0x308` is the claimed size (where the jump table starts), `0x31c` is where the
+index table starts, so the jump table is `0x31c-0x308 = 0x14` = 5 entries and the
+index table is `cmp` bound + 1 = `0x39` bytes. Reviewed size = `0x308 + 0x14 +
+0x39 = 0x355`; the 11 bytes of `0xcc` up to the next function are handled by the
+`$fnpad` boundary symbol (`docs/data-symbol-normalization.md`).
+
+**When the truncated span is long enough to swallow the next function's entry
+point, objdiff reports no score at all** - `homm2 sema match` prints `--` and the
+report's `fuzzy_match_percent` is `null`, not a low number. `iconWidget::Main`
+read `--`, not 0.4%, because the delinker gave it exactly `0x308` bytes and put
+`?Draw@iconWidget@@UAEXXZ` on top of its own jump table.
+
+Three spans in the widget-dispatch family closed this way:
+
+| function | RVA | claimed | reviewed | tables |
+| :-- | :-- | :-- | :-- | :-- |
+| `iconWidget::Main` | 0xbba10 | 0x308 | 0x355 | 5 entries + 0x39 index |
+| `border::Main` | 0xcb390 | 0x199 | 0x1de | 3 entries + 0x39 index |
+| `widget::Main` | 0xd4180 | 0x35d | 0x3b5 | 7 entries + 0x3c index |
+
+The index-table *contents* are matching evidence in their own right: they encode
+the case-value -> target-slot map, so a byte-identical index table with shifted
+jump-table addends means the case labels are right and only the body layout moved.

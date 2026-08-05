@@ -8,7 +8,8 @@
 #include <SOURCE/KB.h>
 
 H2_ENUM_BEGIN(WidgetConstant)
-    DEFAULT_EXTENT = 16
+    DEFAULT_EXTENT   = 16,
+    WIDGET_FLAG_MASK = 0xffff
 H2_ENUM_END(WidgetConstant)
 
 VA(0x004d4010, 0x8b)
@@ -61,49 +62,39 @@ i32 widget::Open(i32 zOrder, class heroWindow* owner) {
 VA(0x004d4170, 0xb)
 void widget::Close(void) {}
 
-static inline i32 IsInsideWidget(widget* target, i16 x, i16 y) {
-    i16 left = target->m_x;
-    return !(left > x || target->m_y > y || left + target->m_width <= x
-             || target->m_y + target->m_height <= y);
-}
-
-VA(0x004d4180, 0x35d)
+VA(0x004d4180, 0x3b5)
 MessageDispatchResult widget::Main(tag_message& message) {
+    // A switch arm may not jump past an initialisation, so the hit-test
+    // coordinates are declared for the whole function.
+    i16 x;
+    i16 y;
     switch (message.type) {
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
                 case WIDGET_COMMAND_DRAW:
                     if (HAS(m_flags, WIDGET_FLAG_DRAW))
                         Draw();
-                    if (HAS(m_flags, WIDGET_FLAG_DIMMED)
-                        && m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
+                    if (HAS(m_flags, WIDGET_FLAG_DIMMED))
                         Dim();
-                        return MESSAGE_DISPATCH_CONTINUE;
-                    }
                     break;
 
                 case WIDGET_COMMAND_SET_FLAGS:
-                    if (m_id == message.payload.widget.id) {
+                    if (message.payload.widget.id == m_id) {
                         if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
                             m_flags |= WIDGET_FLAG_DIMMED;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
-                            m_flags
-                            | static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(
-                                message.payload.widget.data.value
-                            );
-                        m_flags = flags;
-                        if (HAS(flags, WIDGET_FLAG_DIMMED)) {
+                        m_flags |= static_cast<WidgetFlag>(
+                            message.payload.widget.data.value & WIDGET_FLAG_MASK
+                        );
+                        if (HAS(m_flags, WIDGET_FLAG_DIMMED)) {
                             Draw();
-                            if (m_kind != WIDGET_KIND_UNDIMMED && m_kind != WIDGET_KIND_TEXT) {
-                                Dim();
-                            }
+                            Dim();
                         }
                         if (HAS(m_flags, WIDGET_FLAG_UPDATE)) {
                             gpWindowManager->UpdateScreenRegion(
-                                m_x + m_owner->m_posX,
-                                m_y + m_owner->m_posY,
+                                m_owner->m_posX + m_x,
+                                m_owner->m_posY + m_y,
                                 m_width,
                                 m_height
                             );
@@ -114,21 +105,23 @@ MessageDispatchResult widget::Main(tag_message& message) {
                     break;
 
                 case WIDGET_COMMAND_CLEAR_FLAGS:
-                    if (m_id == message.payload.widget.id) {
-                        i32 rawFlags = message.payload.widget.data.value;
-                        if (rawFlags == IDX(WIDGET_COMMAND_DIMMED)) {
-                            m_flags &= ~WIDGET_FLAG_DIMMED;
+                    if (message.payload.widget.id == m_id) {
+                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
+                            static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(
+                                message.payload.widget.data.value & WIDGET_FLAG_MASK
+                            );
+                        if (message.payload.widget.data.value == IDX(WIDGET_COMMAND_DIMMED)) {
+                            flags = WIDGET_FLAG_DIMMED;
+                            m_flags &= ~flags;
                             return MESSAGE_DISPATCH_CONSUME;
                         }
-                        H2_ENUM_STORAGE(WidgetFlag, i16) flags =
-                            static_cast<H2_ENUM_STORAGE(WidgetFlag, i16)>(rawFlags);
                         m_flags &= ~flags;
                         if (HAS(flags, WIDGET_FLAG_DIMMED))
                             Draw();
                         if (HAS(flags, WIDGET_FLAG_UPDATE))
                             gpWindowManager->UpdateScreenRegion(
-                                m_x + m_owner->m_posX,
-                                m_y + m_owner->m_posY,
+                                m_owner->m_posX + m_x,
+                                m_owner->m_posY + m_y,
                                 m_width,
                                 m_height
                             );
@@ -137,38 +130,36 @@ MessageDispatchResult widget::Main(tag_message& message) {
                     break;
 
                 case WIDGET_COMMAND_SET_X:
-                    if (m_id == message.payload.widget.id) {
-                        m_x = static_cast<i16>(message.payload.widget.data.value);
+                    if (message.payload.widget.id == m_id) {
+                        m_x = message.payload.widget.data.value;
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_Y:
-                    if (m_id == message.payload.widget.id) {
-                        m_y = static_cast<i16>(message.payload.widget.data.value);
+                    if (message.payload.widget.id == m_id) {
+                        m_y = message.payload.widget.data.value;
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
 
                 case WIDGET_COMMAND_SET_WIDTH:
-                    if (m_id == message.payload.widget.id) {
-                        m_width = static_cast<i16>(message.payload.widget.data.value);
+                    if (message.payload.widget.id == m_id) {
+                        m_width = message.payload.widget.data.value;
                         return MESSAGE_DISPATCH_CONSUME;
                     }
                     break;
             }
             break;
 
-        case MESSAGE_MOUSE_MOVE: {
-            i32 x = message.payload.mouse.x;
-            i32 y = message.payload.mouse.y;
-            x -= m_owner->m_posX;
-            y -= m_owner->m_posY;
-            if (!IsInsideWidget(this, static_cast<i16>(x), static_cast<i16>(y)))
-                break;
-            message.payload.hover.id = m_id;
-            return MESSAGE_DISPATCH_FORWARD;
-        }
+        case MESSAGE_MOUSE_MOVE:
+            x = message.payload.mouse.x - m_owner->m_posX;
+            y = message.payload.mouse.y - m_owner->m_posY;
+            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                message.payload.hover.id = m_id;
+                return MESSAGE_DISPATCH_FORWARD;
+            }
+            break;
     }
     return MESSAGE_DISPATCH_CONTINUE;
 }
