@@ -216,7 +216,7 @@ BASE/Misc	?DataEntryWindowHandler@@YIHAAUtag_message@@@Z	100.0000	22b9317756ad
 BASE/Misc	?FadeIn@@YIXH@Z	97.4074	b9092401a5d8
 BASE/Misc	?FadeOut@@YIXH@Z	100.0000	68186f6c0fe5
 BASE/Misc	?FadeTo@@YIXPAE0H@Z	100.0000	f51ec4d719e4.6cc274dabc50
-BASE/Misc	?FadeToColorTable@@YIXPAEH@Z	96.0323	ffaad35d640c
+BASE/Misc	?FadeToColorTable@@YIXPAEH@Z	100.0000	8b2bb8c83892
 BASE/Misc	?FileSize@@YIJPAD@Z	100.0000	73993529f329
 BASE/Misc	?FindIndex@@YIHPAUindexArray@@HHH@Z	100.0000	c6baaffbe8c9
 BASE/Misc	?FindLastToken@@YIPADPADD@Z	100.0000	f58301bc96e4

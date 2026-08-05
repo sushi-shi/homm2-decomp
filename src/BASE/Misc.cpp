@@ -2131,35 +2131,33 @@ void FadeTo(u8* source, u8* destination, i32 increment) {
 
 VA(0x004c65e0, 0xb8)
 void FadeToColorTable(u8* colorTable, i32 increment) {
+    u8* pixel;
+    i32 x;
+    i32 i;
+    i32 y;
     u8 translatedPalette[MISC_PALETTE_BYTE_COUNT];
-    i32 savedUpdateFlags = gpWindowManager->m_updateFlags;
+    i8* paletteData;
+    i32 savedUpdateFlags;
+
+    savedUpdateFlags = gpWindowManager->m_updateFlags;
     gpWindowManager->m_updateFlags = 0;
-    i8* paletteData = gpBufferPalette->m_data;
-    u8* output = translatedPalette;
-    i32 index = 0;
-    do {
-        i32 paletteIndex = colorTable[index] * MISC_PALETTE_COMPONENT_BYTES;
-        output += MISC_PALETTE_COMPONENT_BYTES;
-        ++index;
-        u8* sourceColor = reinterpret_cast<u8*>(paletteData) + paletteIndex;
-        output[PALETTE_RED_OUTPUT_OFFSET] = sourceColor[PALETTE_RED_INDEX];
-        output[PALETTE_GREEN_OUTPUT_OFFSET] = sourceColor[PALETTE_GREEN_INDEX];
-        output[PALETTE_BLUE_OUTPUT_OFFSET] = sourceColor[PALETTE_BLUE_INDEX];
-    } while (output < translatedPalette + sizeof(translatedPalette));
-    i32 rows = BLIT_SCREEN_HEIGHT;
+    paletteData = gpBufferPalette->m_data;
+    for (i = 0; i < MISC_PALETTE_BYTE_COUNT / PALETTE_COMPONENT_COUNT; ++i) {
+        translatedPalette[i * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX] =
+            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_RED_INDEX];
+        translatedPalette[i * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX] =
+            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_GREEN_INDEX];
+        translatedPalette[i * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX] =
+            paletteData[colorTable[i] * PALETTE_COMPONENT_COUNT + PALETTE_BLUE_INDEX];
+    }
     FadeTo(reinterpret_cast<u8*>(paletteData), translatedPalette, increment);
-    i32 columns;
-    u8* pixel = gpWindowManager->m_screen->m_pixels;
-    do {
-        columns = BLIT_SCREEN_WIDTH;
-        do {
-            u8 pixelValue = *pixel;
-            *pixel = colorTable[pixelValue];
+    pixel = gpWindowManager->m_screen->m_pixels;
+    for (y = 0; y < BLIT_SCREEN_HEIGHT; ++y) {
+        for (x = 0; x < BLIT_SCREEN_WIDTH; ++x) {
+            *pixel = colorTable[*pixel];
             ++pixel;
-            --columns;
-        } while (columns != 0);
-        --rows;
-    } while (rows != 0);
+        }
+    }
     gpWindowManager->UpdateScreen();
     UpdatePalette(paletteData);
     gpWindowManager->m_updateFlags = savedUpdateFlags;
