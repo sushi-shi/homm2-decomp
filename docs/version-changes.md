@@ -974,6 +974,33 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   Retail assigns the value in an `if`/`else` (no join temp); the PoL-style
   `?:` costs a frame slot, a store-and-reload at the join, and a `push ebx`
   for the rest of the function.
+- **[Buka] `advManager::DoEvent` (0x3b640) folds the first letter of every
+  interpolated resource name to CP1251 lower case.** The PoL 2.0 body writes
+  `name[0] += ' '` (an ASCII-only lower-case) at three sites - the campfire /
+  resource pickup, and the `ARTIFACT_EVENT_MODE_RESOURCE_3` and `_RESOURCE_5`
+  leprechaun offers. Buka replaced each with the range chain
+  `'A'..'Z' -> +0x20`, `0xc0..0xdf -> +0x20`, `0xa8 -> 0xb8`, else unchanged,
+  through a `char` variable, byte-identical to the already exact
+  `SetupRecruitWin` (`SOURCE/RECRUIT.cpp`). See
+  `docs/patterns/cp1251-fold-first-letter.md`.
+- **[unclassified] `advManager::DoEvent` obelisk bookkeeping is 1-based.**
+  Retail reads and writes `gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1]`
+  (displacement 0x634c, one byte below the array base), matching the already
+  exact `philAI::ValueOfEventAtPosition`. Our body indexed without the `- 1`.
+- **[unclassified] `advManager::DoEvent` Dragon City campaign gate compares the
+  1-based scenario number.** Retail emits `movsx edx,[gpGame+4]; add edx,1;
+  cmp edx,7`, i.e. `gpGame->m_campaignScenario + 1 == 7`; the enum
+  `DRAGON_CITY_ARCHIBALD_SCENARIO` is therefore 7, not 6.
+- **[unclassified] `advManager::DoEvent` sign/bottle random text uses a signed
+  modulo.** `cRandomSignText[x % 4]` (`and 0x80000003 / jns / dec / or -4 /
+  inc`), not `abs(x) & 3`; `SIGN_MINIMUM_TEXT_LENGTH` is 1 with the test spelled
+  `strlen(text) > 1`, and the windmill gate is `metadata <= IDX(RES_GOLD)`.
+- **[unclassified] `advManager::DoAIEvent` (0x44d73) keeps the player body's
+  sphinx reward bookkeeping.** Retail initialises the four
+  `primaryReward / primaryAmount / secondaryReward / secondaryAmount` locals
+  (`-1, 0, -1, 0`) at the top of the successful-riddle branch even though the AI
+  path never displays a reward window - a copy of `DoEvent`'s sphinx block that
+  the AI version never trimmed.
 
 ## Reconstruction infrastructure notes (not version deltas)
 
