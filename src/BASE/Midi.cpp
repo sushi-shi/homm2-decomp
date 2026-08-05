@@ -7,7 +7,6 @@
 #include <SOURCE/X_GLOBAL.h>
 #include <BASE/resourceManager.h>
 #include <BASE/MIDIWrap.h>
-#include <BASE/MIDI_TYPES.h>
 #include <BASE/Misc.h>
 #include <stdio.h>
 
@@ -33,8 +32,7 @@ DATA(0x0051f558) u8 bGotMidi[MIDI_TRACK_COUNT] = {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
                                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 i32l lLastMIDIPollTickCount = 0;
-static SMidiText gMidiText =
-    {"MS1", "MS2", "MS6b", "MS6c", "MS1", "MS2", "MS4", "MP1a", "MIDI%04d.XMI"};
+DATA(0x0051f594) static char gMidiFilenameFormat[] = "MIDI%04d.XMI";
 
 VA(0x004c57d0, 0x51)
 bool MIDIStartup(void) {
@@ -88,7 +86,7 @@ void MIDIPlay(i32& currentTrack, i32& fadeSteps, i32 midiTrack) {
     MIDIStop(currentTrack);
 
     char filename[MIDI_FILENAME_CAPACITY];
-    sprintf(filename, gMidiText.filenameFormat, midiTrack);
+    sprintf(filename, gMidiFilenameFormat, midiTrack);
     if (hSequence[midiTrack] == NULL) {
         hSequence[midiTrack] = AIL_allocate_sequence_handle(hMDI);
         if (hSequence[midiTrack] == NULL) {

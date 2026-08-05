@@ -17,6 +17,11 @@ when a residual will not explain itself, grouped by the question they answer:
   data        strict_allocation_diff - strict reviewed-allocation comparison from
               objdiff one-shot JSON. Also the checker homm2.build.strict_allocations
               shells out to, so it is a library as much as a command.
+              data_claims - derive a global's retail address from the donation
+              evidence transposed per symbol, check it against the retail payload,
+              and write the DATA() marker. Its `extents` mode audits how long a
+              claimed allocation may be, which is the only channel that catches a
+              trailing element the reconstruction invented.
   evidence    harvest_max_observations - copies banked-MAX replay coordinates and
               winning disassembly out of build/ into tracked docs, so a maximum keeps
               its evidence and not just its score.
@@ -44,6 +49,8 @@ TOOLS = {
                            "rank byte-vs-bitfield load mismatches"),
     "allocations": ("strict_allocation_diff",
                     "strict reviewed-allocation diff from objdiff JSON"),
+    "data-claims": ("data_claims",
+                    "derive DATA() addresses for globals; `extents` audits lengths"),
     "harvest-max": ("harvest_max_observations",
                     "bank MAX replay coordinates + asm into docs"),
     "od-oracle": ("od_oracle",

@@ -38,7 +38,7 @@ H2_ENUM_BEGIN(AdventureManagerStorageConstant)
     ADVMGR_PLAYER_FLAG_ICON_COUNT        = GAME_PLAYER_COUNT,
     ADVMGR_ACTIVE_SOUND_COUNT            = 4,
     ADVMGR_CURSOR_SAMPLE_COUNT           = 9,
-    ADVMGR_STEP_PIXEL_COUNT              = 6,
+    ADVMGR_STEP_PIXEL_COUNT              = 5,
     ADVMGR_STEP_DELAY_COUNT              = 5,
     ADVMGR_VIEW_WORLD_SCALE_COUNT        = 3,
     ADVMGR_VIEW_WORLD_OFFSET_KIND_COUNT  = 6,

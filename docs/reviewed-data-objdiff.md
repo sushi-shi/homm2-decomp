@@ -152,29 +152,109 @@ handled in `homm2.build.assert_relocs` with unit tests beside it:
 Each rule was ablated against the live objects to confirm it clears its own
 class and nothing else (5 / 1 / 8 rows respectively).
 
+### The tool
+
+`homm2 audit data-claims` is the derivation above, promoted out of scratch. It
+reads the retail image, every compiled object and every file-scope `VarDecl` in
+`src/`, applies exactly the rules listed here, writes `build/gen/data_claims.json`
+and `build/gen/data_claims_rejected.json`, and with `--write` inserts the accepted
+markers. Proposals already claimed by a marker are dropped before selection, so a
+run after a landed tranche derives only what is new. `homm2 selftest audit` covers
+the pure rules: the majority rule, the payload verdicts, the per-symbol vote
+transposition, every rejection reason in `select_claims`, marker insertion, the PE
+reader's loader-zero tail, and the extent classifier.
+
+One caution about proving a tranche codegen-neutral from `report.json`: a
+function row carries `fuzzy_match_percent`, `size` and `address` at its own top
+level, *not* under a `measures` key the way a unit row does. A fingerprint that
+reads `function["measures"]` therefore records `None` for every column and its
+diff proves only that the set of function names is unchanged. Compare the
+top-level fields, and the report's own `measures` totals alongside them.
+
+`homm2 audit data-claims extents` audits how long a claimed allocation may be.
+Two channels bound it: the retail payload (the lowest offset at which our bytes
+and retail's disagree, with our own relocated fields masked) and the next
+*claimed* address — a function or a `DATA()` global only, because a `const_` site
+is merely an address somebody references and `&array[last]` references the
+interior of the very allocation being measured.
+
+### Third tranche: extents, file statics, and a struct that is not there
+
+The first tranche's 78 contradicted claims are closed. 68 were arrays one element
+too long — a trailing `NULL` or `0` the reconstruction invented to fill an
+enum-count bound: `giPixelsPerStep` `{2,4,6,8,16,0}` against retail's five,
+`gfStatPower[42]` against 41, `iMouseOffset[4]` against three,
+`gResourceBaseValue[8]` against seven, and 58 more in `SOURCE/KB`. Eight were
+byte arrays four bytes long (`gMapColors`, `gcGamePath`, `bStopOnTrigger`,
+`gFullMapName`, and the four `REMOTE` transport buffers) and two were one byte
+long (`gLastFilename`, and `ExpCampaign`'s trailing `m_pad_0x4f`).
+
+Where a count constant bounded only proven-short arrays its value was decremented;
+where it also bounds an allocation the image proves is longer, the short array got
+its own bound instead. `KB_TERRAIN_TYPE_COUNT` is the instructive case: it really
+is `IDX(TERRAIN_COUNT) + 1`, because `giTerrainCost` measures exactly
+`10 * 4 * 2` ints, so `gTerrainNames` and `cRumourTerrainDescriptions` moved to
+`IDX(TERRAIN_COUNT)` and the constant stayed.
+
+A probe TU settles the alignment question the census raises, and the answer is
+not uniform: **initialized `.data` allocations are padded up to a four-byte
+boundary; `.bss` allocations are not padded at all.** `char aName[10]` is followed
+at offset 12, but `char bName[351]` is followed at offset 351. So a `.bss`
+neighbour pins its predecessor's length exactly (`gLastFilename` is 351 and
+`ExpCampaign` 79, both unanimous), while an initialized neighbour leaves up to
+three bytes of slack. Corrections in `.data` therefore take the proven bound,
+which reproduces retail's layout under either reading.
+
+**148 file statics were claimed once the vote stopped pooling them.** A static's
+linker name is `_name`, unique only inside its translation unit, and the icon
+decoder family really does define ten distinct `s_clipB`s. Keying the census on
+the name alone merged ten units' sites into one ballot and then rejected the
+result as "defined in more than one place"; keying it on `(unit, name)` — for
+symbols the COFF storage class marks `IMAGE_SYM_CLASS_STATIC`, so an external
+referenced from elsewhere still votes program-wide — gives each decoder its own
+unanimous address. `assert_globals_data` learned the same distinction, matching
+a `.cpp` definition against its own unit before falling back to the program-wide
+map. The 148 are 138 decoder statics across ten `BASE/Icon*` units plus ten
+ordinary ones; every address is distinct and every vote unanimous.
+
+**`_gMidiText` is a struct retail does not have.** Its single vote placed the
+symbol inside `bGotMidi`, which is what an addend computed against a *wrong*
+struct layout looks like: the site is `gMidiText.filenameFormat`, retail's dword
+is the format cell 0x51f594, and subtracting our `0x2c` field offset walks the
+owner back into the preceding array. `"MS6b"` and `"MP1a"` — two of the eight
+log-message slots that offset is made of — appear nowhere in the image, so the
+Buka build compiled the MIDI logging out the way it compiled the asserts out.
+The reconstruction now carries the one surviving allocation, `static char
+gMidiFilenameFormat[] = "MIDI%04d.XMI"` at 0x51f594, whose padded extent runs
+exactly to `crc32Table` at 0x51f5a4, and `include/BASE/MIDI_TYPES.h` is gone.
+
 ### Open queue
 
-- **Reconstructed arrays that are one element too long.** For 70 claims the next
-  claimed address proves retail's allocation is exactly four bytes shorter than
-  ours (two more are one byte shorter), so the reconstruction carries a trailing
-  zero/NULL element retail does not have — `giPixelsPerStep` `{2,4,6,8,16,0}`
-  against retail's five entries, `gfStatPower[42]` against 41, `iMouseOffset[4]`
-  against three, `gResourceBaseValue[8]` against seven, and 58 more in
-  `SOURCE/KB`. These do not affect code bytes but they do move every later
-  allocation in the final link. Two of the newly claimed rows are the same
-  shape and their claims deliberately overlap the preceding array's phantom
-  cell: `gMineNames` at 0x4fe018 sits on `gResourceNames`'s eighth (NULL) cell,
-  and `xRecruitmentSiteNames`'s sixth (NULL) cell runs into `gWinSetup` at
-  0x4ff358. Inventory sizes are provisional, so the delinker tolerates this;
-  the trailing-NULL sweep removes it.
-- **Payload contradictions left unclaimed**: `szAppName`/`szTitle` (Russian in
-  retail, see `docs/version-changes.md`), `_gMidiText`, `_smackMasterVolumes`,
-  `gMineCharacteristics`, `gMapColors`, `cCombatBkgNames`. The five
-  `COMBAT_SPELL_AI_*_MODIFIER` `.rdata` floats left this list: no use site
-  negates, so the stored sign is the fact, and the definitions are now positive
-  and claimed at 0x4ea80c..0x4ea81c. `xRecruitmentSiteNames` also left it — its
-  first five cells match retail and only the reconstruction's trailing NULL
-  differs, which is the array-length item above, not a payload contradiction.
+- **Payload contradictions: none left.** The five `COMBAT_SPELL_AI_*_MODIFIER`
+  `.rdata` floats left the list because no use site negates, so the stored sign
+  is the fact and the definitions are now positive and claimed at
+  0x4ea80c..0x4ea81c. `szAppName`/`szTitle` left it because they are Russian in
+  retail (see `docs/version-changes.md`), and with the translation restored both
+  payloads match byte for byte. `gMineCharacteristics`, `gMapColors`,
+  `cCombatBkgNames` and `xRecruitmentSiteNames` were length faults rather than
+  content ones: their leading cells always matched and only a trailing invented
+  element differed, which the extent sweep removed. `_gMidiText` was a third
+  shape again — retail has no such struct at all.
+- **Seven symbols the derivation votes for but cannot spell as a claim.** Two
+  are class statics (`AudiereMusicState::source`/`::stream`), three are
+  function-local statics (`FadeSavedUpdate`'s `savedUpdate`, `LoadRemote`'s
+  `cheatWarned`/`debugWarned`), and one is a `std::ctype<wchar_t>::id` guard.
+  Each has a stable decorated name and unanimous votes; what is missing is a
+  marker channel — `DATA()` binds to a namespace-scope `VarDecl`, and
+  `identifier()` deliberately refuses anything else so a member never claims a
+  namespace-scope address.
+- **`s_drawPixelY` and `s_drawHeroYOffset` (`SOURCE/ADVMGR`) both win
+  0x523fd0.** 37 votes and 8 respectively, both with the same runner-up at
+  0x523e0c, and one address cannot have two owners. The shape matches the
+  lesson above — a symbol whose votes split is usually a wrong call site — so
+  the likely reading is that retail has one variable where the reconstruction
+  has two. `s_drawHeroYOffset` holds the claim because it was landed first;
+  `s_drawPixelY` is unclaimed and the derivation reports the collision by name.
 - **`_gMouseManagerStrings` stays unclaimed**, with the evidence written down:
   its 12 donation votes name **six** distinct owners — 0x11e358 (4), 0x11e318
   (4), 0x11e3b0, 0x11e364, 0x11e324, 0x135eac (1 each) — and the payload differs

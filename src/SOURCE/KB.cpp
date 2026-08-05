@@ -5772,7 +5772,7 @@ DATA(0x004f8ba0) i32 giMainVideoModeColorDepth = WINGRAPH_COLOR_DEPTH;
 DATA(0x004f8ba4) i32 giMainVideoModeWidth = WINGRAPH_WIDTH;
 DATA(0x004f8ba8) i32 giMainVideoModeHeight = WINGRAPH_HEIGHT;
 u32l glMilliCounter = 0;
-DATA(0x004f8bac) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0, 0, 0, 0, 0};
+DATA(0x004f8bac) u8 gMapColors[RADAR_MAP_COLOR_COUNT] = {77, 98, 13, 104, 32, 118, 54, 206, 41, 0, 0, 0};
 u8 gObjectColors[RADAR_OBJECT_COLOR_COUNT] =
     {16, 48, 98, 160, 126, 74, 110, 179, 100, 218, 12, 12, 12, 12, 12, 12};
 DATA(0x004f8bc8) u8 gOwnerColors[RADAR_OWNER_COLOR_COUNT] = {73, 105, 190, 114, 205, 138, 10, 0};
@@ -6214,7 +6214,7 @@ DATA(0x004fa038) tag_tilePoint normalDirTable[NORMAL_DIRECTION_COUNT] = {
     {-1, 0, 16},
     {-1, -1, 16}
 };
-DATA(0x004fa058) i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1, 0};
+DATA(0x004fa058) i32 gResourceBaseValue[RESOURCE_VALUE_COUNT] = {200, 300, 200, 300, 300, 300, 1};
 DATA(0x004fa074) i32 gInitResourcesHuman[STARTING_RESOURCE_DIFFICULTY_COUNT][STARTING_RESOURCE_TYPE_COUNT] = {
     {30, 10, 30, 10, 10, 10, 10000},
     {20, 5, 20, 5, 5, 5, 7500},
@@ -6229,7 +6229,7 @@ DATA(0x004fa100) i32 gInitResourcesComputer[STARTING_RESOURCE_DIFFICULTY_COUNT][
     {30, 10, 30, 10, 10, 10, 10000},
     {30, 10, 30, 10, 10, 10, 10000}
 };
-DATA(0x004fa18c) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000, 0};
+DATA(0x004fa18c) i32 gMineCharacteristics[MINE_CHARACTERISTIC_COUNT] = {2, 1, 2, 1, 1, 1, 1000};
 DATA(0x004fa1a8) i32 gSSValues[IDX(HERO_SKILL_COUNT)][SECONDARY_SKILL_VALUE_LEVEL_COUNT] = {
     {400, 750, 1000},
     {200, 450, 850},
@@ -6618,21 +6618,21 @@ DATA(0x004fab14) float gfStatPower[KB_STAT_POWER_COUNT] = {0.5f,  0.5f,  0.5f,  
                                           0.77f, 0.8f,  0.84f, 0.88f, 0.92f, 0.96f, 1.0f,
                                           1.04f, 1.08f, 1.12f, 1.16f, 1.2f,  1.24f, 1.28f,
                                           1.32f, 1.36f, 1.4f,  1.44f, 1.48f, 1.52f, 1.56f,
-                                          1.6f,  1.64f, 1.68f, 1.72f, 1.76f, 1.8f,  0.0f};
+                                          1.6f,  1.64f, 1.68f, 1.72f, 1.76f, 1.8f};
 DATA(0x004fabb8) float gfBattleStat[KB_STAT_POWER_COUNT] = {
     0.2f, 0.2f,  0.2f, 0.2f,  0.2f, 0.25f, 0.3f, 0.35f, 0.4f, 0.45f, 0.5f, 0.55f, 0.6f, 0.65f,
     0.7f, 0.75f, 0.8f, 0.85f, 0.9f, 0.95f, 1.0f, 1.1f,  1.2f, 1.3f,  1.4f, 1.5f,  1.6f, 1.7f,
-    1.8f, 1.9f,  2.0f, 2.1f,  2.2f, 2.3f,  2.4f, 2.5f,  2.6f, 2.7f,  2.8f, 2.9f,  3.0f, 0.0f
+    1.8f, 1.9f,  2.0f, 2.1f,  2.2f, 2.3f,  2.4f, 2.5f,  2.6f, 2.7f,  2.8f, 2.9f,  3.0f
 };
 DATA(0x004fac5c) i8 gSpellLimits[KB_SPELL_LIMIT_COUNT] = {3, 3, 2, 2, 1};
 DATA(0x004fac64) float gfSpellCastableCombatMod[KB_SPELL_MOD_COUNT] =
-    {0.27f, 0.4f, 0.48f, 0.56f, 0.64f, 0.73f, 0.81f, 0.88f, 0.93f, 0.97f, 1.0f, 0.0f};
+    {0.27f, 0.4f, 0.48f, 0.56f, 0.64f, 0.73f, 0.81f, 0.88f, 0.93f, 0.97f, 1.0f};
 DATA(0x004fac90) float gfSpellCastNumMod[KB_SPELL_MOD_COUNT] =
-    {0.0f, 1.0f, 1.75f, 2.35f, 2.85f, 3.35f, 3.7f, 4.0f, 4.26f, 4.5f, 4.7f, 0.0f};
+    {0.0f, 1.0f, 1.75f, 2.35f, 2.85f, 3.35f, 3.7f, 4.0f, 4.26f, 4.5f, 4.7f};
 DATA(0x004facbc) float gfPhilAISpellPowerMod[KB_SPELL_MOD_COUNT] =
-    {0.0f, 1.0f, 1.75f, 2.5f, 3.1f, 3.5f, 4.0f, 4.5f, 5.4f, 5.75f, 6.15f, 0.0f};
+    {0.0f, 1.0f, 1.75f, 2.5f, 3.1f, 3.5f, 4.0f, 4.5f, 5.4f, 5.75f, 6.15f};
 DATA(0x004face8) float gfPhilAIDurationMod[KB_SPELL_MOD_COUNT] =
-    {0.0f, 0.4f, 0.65f, 0.8f, 1.0f, 1.16f, 1.3f, 1.43f, 1.54f, 1.64f, 1.74f, 0.0f};
+    {0.0f, 0.4f, 0.65f, 0.8f, 1.0f, 1.16f, 1.3f, 1.43f, 1.54f, 1.64f, 1.74f};
 DATA(0x004fad14) float gfSpellTypeNumMod[KB_QUICK_COMBAT_SPELL_TYPE_COUNT] =
     {1.0f, 0.75f, 0.55f, 0.4f, 0.28f, 0.2f, 0.15f};
 DATA(0x0052662c) b32 gbDrawSavedCursor = false;
@@ -7233,7 +7233,7 @@ DATA(0x004fba78) u8 giNumPowFrames[KB_SPELL_EFFECT_COUNT] = {10, 10, 10, 10, 10,
                                             16, 14, 19, 22, 10, 17, 10, 12, 11, 16};
 DATA(0x004fba98) SpellEffectDisplayType giSpellEffectShowType = SPELL_EFFECT_DISPLAY_EFFECT_STATUS;
 DATA(0x004fba9c) i8 gcColorToPlayerPos[RADAR_OWNER_COLOR_COUNT] = {0, 1, 2, 3, 4, 5, 0, 0};
-char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
+DATA(0x004fbaa4) char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
                                                      "CBKGGRTR.icn", "CBKGGRMT.icn",
                                                      "CBKGSNTR.icn", "CBKGSNMT.icn",
                                                      "CBKGSWMP.icn", "",
@@ -7242,7 +7242,7 @@ char* cCombatBkgNames[KB_COMBAT_BACKGROUND_COUNT] = {"CBKGWATR.icn", "",
                                                      "CBKGDITR.icn", "CBKGDIMT.icn",
                                                      "CBKGCRCK.icn", "",
                                                      "CBKGBEAC.icn", "",
-                                                     "CBKGGRAV.icn", NULL};
+                                                     "CBKGGRAV.icn"};
 DATA(0x004fbaf0) struct SCmbtObstacle sCmbtObstacles[KB_COMBAT_OBSTACLE_COUNT] = {
     {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000200, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
     {0x00000042, 3, 1, {0, 0, 0, 0, 0, 0, 0, 0}}, {0x00000001, 1, 1, {0, 0, 0, 0, 0, 0, 0, 0}},
@@ -7290,7 +7290,7 @@ DATA(0x004fbe64) u8 bStopOnTrigger[KB_TRIGGER_TYPE_COUNT] = {
     0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0,
     1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0,
-    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0
+    0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1
 };
 DATA(0x004fbee0) char* gTownPrefixNames[IDX(FACTION_COUNT)] = {"twnk", "twnb", "twns", "twnw", "twnz", "twnn"};
 DATA(0x004fbef8) char* gTownObjNames[KB_TOWN_OBJECT_NAME_COUNT] = {
@@ -7408,8 +7408,8 @@ DATA(0x004fc110) i32 gNeutralBuildingCosts[KB_BUILDING_NEUTRAL_LIMIT][KB_BUILDIN
     {0, 0, 0, 0, 0, 0, 500}
 };
 DATA(0x004fc2d0) i32 gMageBaseResourceValues[KB_MAGE_GUILD_LEVEL_COUNT] = {0, 4000, 6500, 8500, 10500, 15000};
-DATA(0x004fc2e8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST) + 1] = {
-    5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0, 0
+DATA(0x004fc2e8) i32 gNeutralBaseResourceValues[IDX(BUILDING_SLOT_DWELLING_FIRST)] = {
+    5000, 300, 350, 2000, 3000, 0, 12000, 2500, 1500, 1500, 200, 1000, 500, 0, 0, 1100, 0, 0, 0
 };
 DATA(0x004fc334) i32 gSpecialBuildingBaseResourceValues[IDX(FACTION_COUNT)] = {1500, 1000, 1000, 4500, 3500, 1000};
 DATA(0x004fc34c) i32 gDwellingBaseResourceValues[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
@@ -7906,7 +7906,7 @@ DATA(0x004fd641) SCampaignChoice
           {CAMPAIGN_CHOICE_ALIGNMENT, IDX(FACTION_BARBARIAN), CHOICE_NO_AMOUNT}}}
 };
 DATA(0x00526688) char* congratsText = NULL;
-DATA(0x004fd7ac) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004fd7ac) char* gArtifactNames[IDX(ARTIFACT_COUNT)] = {
     "Ultimate Book of Knowledge",
     "Ultimate Sword of Dominion",
     "Ultimate Cloak of Protection",
@@ -8009,10 +8009,9 @@ DATA(0x004fd7ac) char* gArtifactNames[KB_ARTIFACT_LEVEL_COUNT] = {
     "Staff of Wizardry",
     "Sword Breaker",
     "Sword of Anduran",
-    "Spade of Necromancy",
-    NULL
+    "Spade of Necromancy"
 };
-DATA(0x004fd948) char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004fd948) char* gArtifactDesc[IDX(ARTIFACT_COUNT)] = {
     "{Ultimate Book\n(+12 Knowledge)}\n\nThe Ultimate Book of Knowledge increases your knowledge "
     "by 12.",
     "{Ultimate Sword\n(+12 Attack)}\n\nThe Ultimate Sword of Dominion increases your attack skill "
@@ -8149,10 +8148,9 @@ DATA(0x004fd948) char* gArtifactDesc[KB_ARTIFACT_LEVEL_COUNT] = {
     "{Staff of Wizardry}\n\nThe Staff of Wizardry boosts your spell power by 5.",
     "{Sword Breaker}\n\nThe Sword Breaker increases your defense by 4 and attack by 1.",
     "{Sword of Anduran}\n\nThe Sword increases your attack skill by 5.",
-    "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill.",
-    NULL
+    "{Spade of Necromancy}\n\nThe Spade gives you increased necromancy skill."
 };
-DATA(0x004fdae4) char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
+DATA(0x004fdae4) char* gArtifactEvent[IDX(ARTIFACT_COUNT)] = {
     "",
     "",
     "",
@@ -8398,8 +8396,7 @@ DATA(0x004fdae4) char* gArtifactEvent[KB_ARTIFACT_LEVEL_COUNT] = {
     "and runs away.  Picking up the fabled sword, you give thanks that half-witted Trolls tend to "
     "grab the wrong end of sharp objects.",
     "A dirty shovel has been thrust into a dirt mound nearby. Upon investigation, you discover it "
-    "to be the enchanted shovel of the Gravediggers, long thought lost by mortals.",
-    NULL
+    "to be the enchanted shovel of the Gravediggers, long thought lost by mortals."
 };
 DATA(0x004fdc80) char* gStatNames[HERO_PRIMARY_STAT_COUNT] =
     {"Attack Skill", "Defense Skill", "Spell Power", "Knowledge"};
@@ -8557,10 +8554,10 @@ DATA(0x004fded0) char* gArmyNamesPlural[IDX(CREATURE_COUNT)] = {
     "fire elementals",
     "water elementals"
 };
-DATA(0x004fdfd8) char* gTerrainNames[KB_TERRAIN_TYPE_COUNT] =
-    {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach", NULL};
+DATA(0x004fdfd8) char* gTerrainNames[IDX(TERRAIN_COUNT)] =
+    {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach"};
 DATA(0x004fdffc) char* gResourceNames[RESOURCE_VALUE_COUNT] =
-    {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold", NULL};
+    {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold"};
 // The localised build names the mine, not the resource it yields, in the
 // adventure-map quick info; the English 2.1 tree has no such table and reads
 // gResourceNames there. See docs/version-changes.md.
@@ -8835,16 +8832,14 @@ DATA(0x004fe224) char* gEventText[KB_EVENT_TEXT_TABLE_COUNT] = {
     "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the "
     "tattered clothing, you find nothing.",
     "{Skeleton}\n\nYou come upon the remains of an unfortunate adventurer.  Searching through the "
-    "tattered clothing, you find ",
-    NULL
+    "tattered clothing, you find "
 };
 DATA(0x004fe3a0) char* gCPanelHelp[KB_CONTROL_PANEL_HELP_COUNT] = {
     "Start a single or multi-player game.",
     "Load a previously saved game.",
     "Save the current game.",
     "Quit out of Heroes of Might and Magic II.",
-    "Exit this menu without doing anything.",
-    NULL
+    "Exit this menu without doing anything."
 };
 DATA(0x004fe3b4) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "{OK}\n\nExit this menu.",
@@ -8861,24 +8856,21 @@ DATA(0x004fe3b4) char* gCSPanelHelp[KB_COMBAT_SPELL_PANEL_HELP_COUNT] = {
     "on 486 computers.",
     "{Shadow Cursor}\n\nToggle on or off a shadowing system showing where the hex grid that the "
     "mouse cursor is currently over is shadowed.  When this is turned on, there is a slight "
-    "performance cost, most noticeable on 486 computers.",
-    NULL
+    "performance cost, most noticeable on 486 computers."
 };
 DATA(0x004fe3d0) char* gAPanelHelp[KB_ADVENTURE_PANEL_HELP_COUNT] = {
     "View the entire world.",
     "View the obelisk puzzle.",
     "View information on the scenario you are currently playing.",
     "Dig for the Ultimate Artifact.",
-    "Exit this menu without doing anything.",
-    NULL
+    "Exit this menu without doing anything."
 };
 DATA(0x004fe3e4) char* gInitMenuHelp[KB_INIT_MENU_HELP_COUNT] = {
     "{New Game}\n\nStart a single or multi-player game.",
     "{Load Game}\n\nLoad a previously saved game.",
     "{High Scores}\n\nView the high score screen.",
     "{Credits}\n\nView the credits screen.",
-    "{Quit}\n\nQuit Heroes of Might and Magic and return to the operating system.",
-    NULL
+    "{Quit}\n\nQuit Heroes of Might and Magic and return to the operating system."
 };
 DATA(0x004fe3f8) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Next Hero}\n\nSelect the next Hero.",
@@ -8891,9 +8883,9 @@ DATA(0x004fe3f8) char* gAdvMenuHelp[KB_ADVENTURE_MENU_HELP_COUNT] = {
     "{Cast Spell}\n\nCast an adventure spell."
 };
 DATA(0x004fe418) char* gLuckText[KB_LUCK_TEXT_COUNT] =
-    {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish", NULL};
+    {"Cursed", "Awful", "Bad", "Normal", "Good", "Great", "Irish"};
 DATA(0x004fe434) char* gMoraleText[KB_MORALE_TEXT_COUNT] =
-    {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!", NULL};
+    {"Treason", "Awful", "Poor", "Normal", "Good", "Great", "Blood!"};
 DATA(0x004fe450) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "Off",
     "On",
@@ -8905,10 +8897,9 @@ DATA(0x004fe450) char* onOffText[KB_ON_OFF_TEXT_COUNT] = {
     "On\nVolume 4",
     "On\nVolume 3",
     "On\nVolume 2",
-    "On\nVolume 1",
-    NULL
+    "On\nVolume 1"
 };
-DATA(0x004fe47c) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump", NULL};
+DATA(0x004fe47c) char* walkSpeedText[KB_WALK_SPEED_TEXT_COUNT] = {"Walk", "Trot", "Canter", "Gallop", "Jump"};
 DATA(0x004fe490) char* gColors[IDX(FACTION_COUNT)] = {"blue", "green", "red", "yellow", "orange", "purple"};
 DATA(0x004fe4c0) char* gMonthNames[KB_MONTH_NAME_COUNT] = {
     "Grasshopper",
@@ -8937,8 +8928,7 @@ DATA(0x004fe4e8) char* gWeekNames[KB_WEEK_NAME_COUNT] = {
     "Lizard",
     "Tortoise",
     "Hedgehog",
-    "Condor",
-    NULL
+    "Condor"
 };
 DATA(0x004fe524) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "Kingdom Overview",
@@ -8965,8 +8955,7 @@ DATA(0x004fe524) char* cHeroScreen[KB_HERO_SCREEN_TEXT_COUNT] = {
     "View %s %s Info",
     "View Spell Points Info",
     "Set army combat formation to 'Spread'",
-    "Set army combat formation to 'Grouped'",
-    NULL
+    "Set army combat formation to 'Grouped'"
 };
 DATA(0x004fe588) char* cCastleInfo[KB_CASTLE_INFO_TEXT_COUNT] = {
     "Build Mage Guild",
@@ -9010,8 +8999,7 @@ DATA(0x004fe5c8) char* cLuckInfo[KB_LUCK_INFO_TEXT_COUNT] = {
     "\nExpert Luck +3",
     "\nMasthead bonus at sea +1",
     "\nMermaid visited +1",
-    "\nBattle Garb of Anduran gives you maximum luck.",
-    NULL
+    "\nBattle Garb of Anduran gives you maximum luck."
 };
 char* IQnames[KB_IQ_NAME_COUNT] = {"None", "Dumb", "Average", "Smart", "Genius", NULL};
 DATA(0x004fe630) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
@@ -9023,8 +9011,7 @@ DATA(0x004fe630) char* cSpellHelp[KB_SPELL_HELP_TEXT_COUNT] = {
     "View Spells",
     "Select Spell",
     "View Combat Spells",
-    "Your hero has %d spell points remaining",
-    NULL
+    "Your hero has %d spell points remaining"
 };
 DATA(0x004fe654) char* speedText[KB_SPEED_TEXT_COUNT] = {
     "",
@@ -9047,8 +9034,7 @@ DATA(0x004fe67c) char* cArmyDetail[KB_ARMY_DETAIL_TEXT_COUNT] = {
     "Speed: ",
     "Morale: ",
     "Luck: ",
-    "Shots: ",
-    NULL
+    "Shots: "
 };
 DATA(0x004fe6a0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Attack: ",
@@ -9059,8 +9045,7 @@ DATA(0x004fe6a0) char* cWellDetail[KB_WELL_DETAIL_TEXT_COUNT] = {
     "Speed: ",
     "Available: ",
     "\n\nSpeed:\n%s",
-    "\n\nGrowth\n + %d / week",
-    NULL
+    "\n\nGrowth\n + %d / week"
 };
 char* cKingdomOverview[KB_KINGDOM_OVERVIEW_TEXT_COUNT] = {
     "Kingdom Overview     Month %d, Week %d, Day %d",
@@ -9076,8 +9061,7 @@ DATA(0x004fe6d0) char* cNewTurn[KB_NEW_TURN_TEXT_COUNT] = {
     "population.",
     "Astrologers proclaim month of the PLAGUE!\n\nAll populations are halved.",
     "Astrologers proclaim week of the %s.\n\nAll dwellings increase population.",
-    "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population.",
-    NULL
+    "Astrologers proclaim week of the %s.\n\n%s growth +5.\n\nAll dwellings increase population."
 };
 DATA(0x004fe6ec) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Attack: ",
@@ -9086,8 +9070,7 @@ DATA(0x004fe6ec) char* cViewGeneralLabels[KB_VIEW_GENERAL_LABEL_COUNT] = {
     "Knowledge: ",
     "Morale: ",
     "Luck: ",
-    "Spell Points: ",
-    NULL
+    "Spell Points: "
 };
 DATA(0x004fe708) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Stop Catapult",
@@ -9096,8 +9079,7 @@ DATA(0x004fe708) char* cViewGeneralHelp[KB_VIEW_GENERAL_HELP_COUNT] = {
     "Surrender",
     "Cancel",
     "Hero's Options",
-    "Captain's Options",
-    NULL
+    "Captain's Options"
 };
 DATA(0x004fe724) char* cViewGeneralLongHelp[KB_VIEW_GENERAL_LONG_HELP_COUNT] = {
     "{Cast Spell}\n\nCast a magical spell.  You may only cast one spell per combat round.  The "
@@ -9123,14 +9105,13 @@ DATA(0x004fe734) char* cCombatMessage[KB_COMBAT_MESSAGE_COUNT] = {
     "View Ballista Info"
 };
 DATA(0x004fe764) char* cHeroLevel[KB_HERO_LEVEL_TEXT_COUNT] =
-    {"%s has gained", " a level.\n", " %d levels.\n", NULL};
+    {"%s has gained", " a level.\n", " %d levels.\n"};
 DATA(0x004fe770) char* cCombatHelp[KB_COMBAT_HELP_COUNT] = {
     "Wait for other units to go.",
     "Skip this unit",
     "Auto combat",
     "Customize system options.",
-    "",
-    NULL
+    ""
 };
 DATA(0x004fe784) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "{Wait}\n\nHave the current creature wait to take its turn until all the other creatures have "
@@ -9139,8 +9120,7 @@ DATA(0x004fe784) char* cLongCombatHelp[KB_LONG_COMBAT_HELP_COUNT] = {
     "to go again until the next round.",
     "{Auto Combat}\n\nAllows the computer to fight out the battle for you.",
     "{System Options}\n\nAllows you to customize the combat screen.",
-    "{Message Bar}\n\nShows the results of individual monster's actions.",
-    NULL
+    "{Message Bar}\n\nShows the results of individual monster's actions."
 };
 DATA(0x004fe798) char* cTownCommand[KB_TOWN_COMMAND_COUNT] = {
     "Redistribute %s army",
@@ -9210,16 +9190,14 @@ DATA(0x004fe900) char* gSetupBaudHelp[KB_SETUP_BAUD_HELP_COUNT] = {
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
     "{38400 Baud}\n\nUse a 38400 baud connection speed.\n\nNote: For a 14400 baud modem, use the "
     "19200 baud speed.  For a 28800 baud modem, use the 38400 baud speed.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe914) char* gSetupComPortHelp[KB_SETUP_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the modem connection.",
     "{COM 2}\n\nUse COM Port 2 for the modem connection.",
     "{COM 3}\n\nUse COM Port 3 for the modem connection.",
     "{COM 4}\n\nUse COM Port 4 for the modem connection.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe928) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "{2400 Baud}\n\nUse a 2400 baud connection speed. \n\nNote: In general, computers with the "
@@ -9238,16 +9216,14 @@ DATA(0x004fe928) char* gSetupDCBaudHelp[KB_SETUP_DC_BAUD_HELP_COUNT] = {
     "older UART 8250 chip should use 19200 baud, and computers with the newer UART 16550 chip "
     "should use 38400 baud.  When in doubt, try slower speeds first, and if they work, then try "
     "faster speeds.  Most computers made in 1994 or later have a UART 16550 chip.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe93c) char* gSetupDCComPortHelp[KB_SETUP_DC_COM_PORT_HELP_COUNT] = {
     "{COM 1}\n\nUse COM Port 1 for the direct connection.",
     "{COM 2}\n\nUse COM Port 2 for the direct connection.",
     "{COM 3}\n\nUse COM Port 3 for the direct connection.",
     "{Com 4}\n\nUse COM Port 4 for the direct connection.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe950) char* gSetupHotSeatGameHelp[KB_SETUP_HOT_SEAT_HELP_COUNT] = {
     "{2 Players}\n\nPlay with 2 human players, and optionally, up to 4 additional computer "
@@ -9281,15 +9257,13 @@ DATA(0x004fe988) char* gSetupMultiPlayerGameHelp[KB_SETUP_MULTIPLAYER_HELP_COUNT
     "phone lines using modems.",
     "{Direct Connect}\n\nPlay a direct connect game, where 2 players use their own computers "
     "directly connected through their serial port by a null modem.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe99c) char* gSetupNetworkGameHelp[KB_SETUP_NETWORK_HELP_COUNT] = {
     "{Host}\n\nThe host sets up the game options.  There can only be one host per network game.",
     "{Guest}\n\nThe guest waits for the host to set up the game, then is automatically added in.  "
     "There can be multiple guests for TCP/IP and IPX games, but only 1 guest for NetBIOS games.",
-    "{Cancel}\n\nCancel back to the main menu.",
-    NULL
+    "{Cancel}\n\nCancel back to the main menu."
 };
 DATA(0x004fe9a8) char* gSetupNetworkGame2Help[KB_SETUP_NETWORK_SECOND_HELP_COUNT] = {
     "{IPX}\n\nIPX networking is the most commonly used form of network in Windows 95.  Up to 6 "
@@ -9323,8 +9297,7 @@ DATA(0x004fe9c8) char* cBattleResults[KB_BATTLE_RESULT_TEXT_COUNT] = {
     "Your forces surrender to the enemy, and depart in shame.",
     "Your cowardly forces flee from battle.",
     "Your forces suffer a bitter defeat.",
-    "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s).",
-    NULL
+    "\n\nFor valor in combat, %s receives %d experience, and gains %d level(s)."
 };
 DATA(0x004fe9f4) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
     "{Good Morale}\n\nGood morale may give your armies extra attacks in combat.",
@@ -9363,7 +9336,7 @@ DATA(0x004fe9f4) char* cMoraleInfo[KB_MORALE_INFO_TEXT_COUNT] = {
 };
 DATA(0x004fea74) char* cMapSize[KB_MAP_SIZE_TEXT_COUNT] = {"Small", "Medium", "Large", "Huge"};
 DATA(0x004fea84) char* cDifficulty[KB_DIFFICULTY_TEXT_COUNT] =
-    {"Easy", "Normal", "Hard", "Expert", "Impossible", NULL};
+    {"Easy", "Normal", "Hard", "Expert", "Impossible"};
 char* cStartDifficulty[KB_START_DIFFICULTY_TEXT_COUNT] = {"Easy", "Normal", "Hard", "Expert"};
 char* cCampaignLeaders[KB_CAMPAIGN_LEADER_TEXT_COUNT] =
     {"Lord Ironfist", "Lord Slayer", "Queen Lamanda", "Lord Alamar"};
@@ -9374,7 +9347,7 @@ char* cHumanDifficulty[KB_HUMAN_DIFFICULTY_TEXT_COUNT] =
 char* cHumanInfoDifficulty[KB_HUMAN_INFO_DIFFICULTY_TEXT_COUNT] =
     {"Human-", "Human-Easy", "Human-Normal", "Human-Hard", "Human-Expert", NULL};
 DATA(0x004feaf4) char* musicQualityText[KB_MUSIC_QUALITY_TEXT_COUNT] =
-    {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera", NULL};
+    {"MIDI", "CD Stereo w/o Opera", "CD Stereo with Opera"};
 DATA(0x004feb00) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Fireball}\n\nCauses a giant fireball to strike the selected area, damaging all nearby "
     "creatures.",
@@ -9457,8 +9430,7 @@ DATA(0x004feb00) char* gSpellDesc[KB_SPELL_TEXT_COUNT] = {
     "{Set Earth Guardian}\n\nSets Earth Elementals to guard a mine against enemy armies.",
     "{Set Air Guardian}\n\nSets Air Elementals to guard a mine against enemy armies.",
     "{Set Fire Guardian}\n\nSets Fire Elementals to guard a mine against enemy armies.",
-    "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies.",
-    NULL
+    "{Set Water Guardian}\n\nSets Water Elementals to guard a mine against enemy armies."
 };
 DATA(0x004fec04) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Fireball",
@@ -9525,11 +9497,10 @@ DATA(0x004fec04) char* gSpellNames[KB_SPELL_TEXT_COUNT] = {
     "Set Earth Guardian",
     "Set Air Guardian",
     "Set Fire Guardian",
-    "Set Water Guardian",
-    NULL
+    "Set Water Guardian"
 };
 DATA(0x004fed08) char* gSecondarySkillLevels[KB_SECONDARY_SKILL_LEVEL_TEXT_COUNT] =
-    {"Basic", "Advanced", "Expert", NULL};
+    {"Basic", "Advanced", "Expert"};
 DATA(0x004fed14) char* gSecondarySkills[KB_SECONDARY_SKILL_TEXT_COUNT] = {
     "Pathfinding",
     "Archery",
@@ -9565,8 +9536,7 @@ DATA(0x004fed4c) char* gNeutralBuildingNames[KB_NEUTRAL_BUILDING_TEXT_COUNT] = {
     "Captain's Quarters",
     "",
     "",
-    "",
-    NULL
+    ""
 };
 DATA(0x004fed98) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Farm",
@@ -9575,11 +9545,10 @@ DATA(0x004fed98) char* gWellExtraNames[KB_WELL_EXTRA_NAME_COUNT] = {
     "Waterfall",
     "Orchard",
     "Skull Pile",
-    "1st Lvl Growth",
-    NULL
+    "1st Lvl Growth"
 };
 DATA(0x004fedb4) char* gSpecialBuildingNames[KB_SPECIAL_BUILDING_NAME_COUNT] =
-    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special", NULL};
+    {"Fortifications", "Coliseum", "Rainbow", "Dungeon", "Library", "Storm", "Special"};
 DATA(0x004fedd0) char* gDwellingNames[IDX(FACTION_COUNT)][KB_DWELLING_TYPE_COUNT] = {
     {"Thatched Hut",
      "Archery Range",
@@ -9757,8 +9726,7 @@ DATA(0x004fef98) char* cBuildingInfoNeutral[KB_NEUTRAL_BUILDING_INFO_COUNT] = {
     "present.",
     "",
     "",
-    "",
-    NULL
+    ""
 };
 DATA(0x004fefe4) char* gBuildingInfoSpecial[KB_SPECIAL_BUILDING_INFO_COUNT] = {
     "The Fortifications increase the toughness of the walls, increasing the number of turns it "
@@ -9779,8 +9747,7 @@ DATA(0x004feffc) char* cDirections[KB_DIRECTION_TEXT_COUNT] = {
     "southwestern",
     "western",
     "northwestern",
-    "central",
-    NULL
+    "central"
 };
 DATA(0x004ff020) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_COUNT] = {
     "in the murky depths of the ocean.",
@@ -9791,13 +9758,12 @@ DATA(0x004ff020) char* cRumourTerrainDescriptions[KB_RUMOUR_TERRAIN_DESCRIPTION_
     "under a desert drift.",
     "in the dirt.",
     "in a parched wasteland.",
-    "buried on a beach.",
-    NULL
+    "buried on a beach."
 };
-DATA(0x004ff044) char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil", NULL};
+DATA(0x004ff044) char* gInterfaceTypeText[KB_INTERFACE_TYPE_TEXT_COUNT] = {"Dynamic", "Good", "Evil"};
 DATA(0x004ff050) char* cBWMouseText[KB_BW_MOUSE_TEXT_COUNT] = {"Black & White", "Color"};
-DATA(0x004ff058) char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast", NULL};
-DATA(0x004ff064) char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full", NULL};
+DATA(0x004ff058) char* combatSpeedText[KB_COMBAT_SPEED_TEXT_COUNT] = {"Normal", "Fast", "Very Fast"};
+DATA(0x004ff064) char* combatMiniInfoText[KB_COMBAT_MINI_INFO_TEXT_COUNT] = {"None", "Spells Only", "Full"};
 DATA(0x004ff070) char* gcCommandLineHelp[KB_COMMAND_LINE_HELP_COUNT] = {
     "\n\n\n***Command Line Help***\n",
     "\n",
@@ -9826,7 +9792,7 @@ DATA(0x004ff0c0) char* cWinComError[KB_WIN_COM_ERROR_TEXT_COUNT] = {
     "\n  4) Consider lowering the BAUD rate in 'CONFIG' to 19200 or 9600."
 };
 DATA(0x004ff0d8) char* cMiniViewText[KB_MINI_VIEW_TEXT_COUNT] =
-    {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots", NULL};
+    {"%d Units", "%d Unit", "Attack", "Defense", "HP ", "Dmg", "Mrl", "Luk", "Shots"};
 DATA(0x004ff0fc) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "{Small Maps}\n\nView only maps of size small (36 x 36).",
     "{Medium Maps}\n\nView only maps of size medium (72 x 72).",
@@ -9853,8 +9819,7 @@ DATA(0x004ff0fc) char* gFileRequestHelp[KB_FILE_REQUEST_HELP_COUNT] = {
     "{Selected Map Difficulty}\n\nThe map difficulty of the currently selected map.  The map "
     "difficulty is determined by the scenario designer.  More difficult maps might include more or "
     "stronger enemies, fewer resources, or other special conditions making things tougher for the "
-    "human player.",
-    NULL
+    "human player."
 };
 DATA(0x004ff138) char* cPersonality[KB_PERSONALITY_TEXT_COUNT] = {"Warrior", "Builder", "Explorer", "Human"};
 DATA(0x004ff148) char* gArmySizeNames[KB_ARMY_SIZE_NAME_COUNT][KB_ARMY_SIZE_NAME_VARIANT_COUNT] = {
@@ -10033,16 +9998,14 @@ DATA(0x004ff328) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Eye of the Magi",
     "Stables",
     "Mermaid",
-    "Sirens",
-    NULL
+    "Sirens"
 };
 DATA(0x004ff344) char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Barrow Mounds",
     "Earth Summoning Altar",
     "Air Summoning Altar",
     "Fire Summoning Altar",
-    "Water Summoning Altar",
-    NULL
+    "Water Summoning Altar"
 };
 DATA(0x004ff358) SWinSetup gWinSetup[KB_WIN_SETUP_COUNT] = {
     {0, 100, "Build improvement:"},
@@ -10239,7 +10202,7 @@ DATA(0x005249f4) u8 bSaveMusicPosition[KB_MUSIC_TRACK_COUNT];
 DATA(0x00525a10) H2_ENUM_STORAGE(BottomViewMode, i32) giBottomViewOverride;
 DATA(0x00524f74) char gcTCPAddress[GLOBAL_TCP_TEXT_SIZE];
 DATA(0x005249dc) u8 giSetupGameType;
-DATA(0x00525a64) char gLastFilename[GLOBAL_AGGREGATE_PATH_SIZE];
+DATA(0x00525a64) char gLastFilename[GLOBAL_LAST_FILENAME_SIZE];
 DATA(0x005261ac) i32 giFullySeeded;
 DATA(0x00524de0) icon* gBuyBuildIcons;
 b32 gbNoSound;

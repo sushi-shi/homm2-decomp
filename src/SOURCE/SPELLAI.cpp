@@ -1473,7 +1473,7 @@ void combatManager::EffectSpellDamage(i32* effect, SpellType spell, i32 targetHe
 }
 
 DATA(0x005182d8) float gfDurationMods[COMBAT_DURATION_MOD_COUNT] =
-    {0.0f, 0.33f, 0.55f, 0.72f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f, 0.0f};
+    {0.0f, 0.33f, 0.55f, 0.72f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f};
 DATA(0x00518304) float gfCancelDurationMods[COMBAT_CANCEL_DURATION_MOD_COUNT] =
     {0.0f, 0.5f, 0.65f, 0.78f, 0.85f, 0.95f, 1.03f, 1.08f, 1.12f, 1.15f, 1.18f};
 DATA(0x00533eb4) i32 giCurrSpellGroup;

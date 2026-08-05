@@ -184,7 +184,7 @@ H2_ENUM_BEGIN(CombatGridConstant)
     COMBAT_WIN_LOSE_WIDGET_COUNT            = 25,
     COMBAT_DIRECTION_MAP_COUNT              = 24,
     COMBAT_BACKGROUND_NAME_SIZE             = 13,
-    COMBAT_DURATION_MOD_COUNT               = 12,
+    COMBAT_DURATION_MOD_COUNT               = 11,
     COMBAT_CANCEL_DURATION_MOD_COUNT        = 11,
     COMBAT_TRANSFER_ARTIFACT_COUNT          = 16,
     COMBAT_CASTLE_REVERSE_ROW               = 5,

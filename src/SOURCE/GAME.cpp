@@ -190,7 +190,7 @@ H2_ENUM_BEGIN(GameDailyEconomyConstant)
 H2_ENUM_END(GameDailyEconomyConstant)
 
 H2_ENUM_BEGIN(WeeklyRuntimeConstant)
-    WEEK_NAME_LAST                = KB_WEEK_NAME_COUNT - 2,
+    WEEK_NAME_LAST                = KB_WEEK_NAME_COUNT - 1,
     CREATURE_WEEK_LAST            = IDX(CREATURE_BONE_DRAGON),
     SPECIAL_WEEK_ROLL_MAX         = 4,
     CASTLE_GROWTH_SPECIAL_BONUS   = 2,

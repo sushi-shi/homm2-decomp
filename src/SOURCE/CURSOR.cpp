@@ -1565,7 +1565,7 @@ void SendMapChange(
 }
 
 DATA(0x004f19f0) i32 bMoveSoundMade = 1;
-DATA(0x004f19f4) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16, 0};
+DATA(0x004f19f4) i32 giPixelsPerStep[ADVMGR_STEP_PIXEL_COUNT] = {2, 4, 6, 8, 16};
 DATA(0x004f1a08) i32 giStepDelay[ADVMGR_STEP_DELAY_COUNT] = {20, 25, 20, 15, 15};
 class sample* hOldWalkSample = NULL;
 class sample* hNewWalkSample = NULL;

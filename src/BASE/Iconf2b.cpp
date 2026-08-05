@@ -10,24 +10,24 @@
 
 // Retail's frame is exactly the two __fastcall spills: every working value of
 // the decoder lives in a file static, not a local.
-static u8* s_row;
-static IconEntry* s_entry;
-static i32 s_right;
-static i32 s_spanCount;
-static i32 s_left;
-static i32 s_y;
-static i32 s_dimLen;
-static u8* s_dimPal;
-static i32 s_x;
-static i32 s_clipR;
-static i32 s_srcSkip;
-static i32 s_run;
-static i32 s_clipB;
-static u8* s_src;
-static u8* s_dst;
-static u8 s_color;
-static u8* s_copyDst;
-static i32 s_loopCount;
+DATA(0x00536158) static u8* s_row;
+DATA(0x0053615c) static IconEntry* s_entry;
+DATA(0x00536160) static i32 s_right;
+DATA(0x00536164) static i32 s_spanCount;
+DATA(0x00536168) static i32 s_left;
+DATA(0x0053616c) static i32 s_y;
+DATA(0x00536170) static i32 s_dimLen;
+DATA(0x00536174) static u8* s_dimPal;
+DATA(0x00536178) static i32 s_x;
+DATA(0x0053617c) static i32 s_clipR;
+DATA(0x00536180) static i32 s_srcSkip;
+DATA(0x00536184) static i32 s_run;
+DATA(0x00536188) static i32 s_clipB;
+DATA(0x0053618c) static u8* s_src;
+DATA(0x00536190) static u8* s_dst;
+DATA(0x00536194) static u8 s_color;
+DATA(0x00536198) static u8* s_copyDst;
+DATA(0x0053619c) static i32 s_loopCount;
 
 VA(0x004c1c60, 0x8a2)
 void FlipIconToBitmap(
