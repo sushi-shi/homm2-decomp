@@ -294,3 +294,6 @@ void highScoreManager::Update(void) {
     if (noScoreFile == 0)
         close(inputFile);
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(highScoreManager, 0x004ea630)

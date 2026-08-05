@@ -12,3 +12,6 @@ baseManager::baseManager(void)
     m_active = false;
     strcpy(m_name, "Unknown");
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(baseManager, 0x004ea944)

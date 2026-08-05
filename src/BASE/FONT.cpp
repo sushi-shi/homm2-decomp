@@ -421,3 +421,6 @@ i32 font::LineWidth(char* str) {
     }
     return w;
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(font, 0x004ea9ac)

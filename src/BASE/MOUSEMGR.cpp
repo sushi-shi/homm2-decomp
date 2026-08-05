@@ -632,3 +632,6 @@ void mouseManager::SetColorMice(i32 enabled) {
         gpWindowManager->m_updateFlags = savedWM56;
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(mouseManager, 0x004ea978)

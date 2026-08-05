@@ -487,3 +487,5 @@ DATA(0x005349c0) i32 iSaveCtr = 0;
 DATA(0x00534998) i32 lastAggZ[POSITION_STACK_DEPTH];
 DATA(0x00534970) i32l lastPositionZ[POSITION_STACK_DEPTH];
 
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(resourceManager, 0x004ea96c)

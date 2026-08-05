@@ -172,3 +172,6 @@ void widget::Dim(void) {
     i16 y = m_owner->m_posY + m_y;
     DimBitmapArea(gpWindowManager->m_screen, x, y, m_width, m_height, 0);
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(widget, 0x004eaa1c)

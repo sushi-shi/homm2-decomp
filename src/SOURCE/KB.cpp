@@ -8561,6 +8561,18 @@ DATA(0x004fdfd8) char* gTerrainNames[KB_TERRAIN_TYPE_COUNT] =
     {"Ocean", "Grass", "Snow", "Swamp", "Lava", "Desert", "Dirt", "Wasteland", "Beach", NULL};
 DATA(0x004fdffc) char* gResourceNames[RESOURCE_VALUE_COUNT] =
     {"Wood", "Mercury", "Ore", "Sulfur", "Crystal", "Gems", "Gold", NULL};
+// The localised build names the mine, not the resource it yields, in the
+// adventure-map quick info; the English 2.1 tree has no such table and reads
+// gResourceNames there. See docs/version-changes.md.
+DATA(0x004fe018) char* gMineNames[KB_MINE_NAME_COUNT] = {
+    "\xcb\xe5\xf1\xee\xef\xe8\xeb\xea\xe0" /* "Лесопилка" */,
+    "\xcb\xe0\xe1\xee\xf0\xe0\xf2\xee\xf0\xe8\xff \xe0\xeb\xf5\xe8\xec\xe8\xea\xe0" /* "Лаборатория алхимика" */,
+    "\xd0\xf3\xe4\xed\xe0\xff \xf8\xe0\xf5\xf2\xe0" /* "Рудная шахта" */,
+    "\xd1\xe5\xf0\xed\xe0\xff \xf8\xe0\xf5\xf2\xe0" /* "Серная шахта" */,
+    "\xca\xf0\xe8\xf1\xf2\xe0\xeb\xfc\xed\xe0\xff \xf8\xe0\xf5\xf2\xe0" /* "Кристальная шахта" */,
+    "\xd1\xe0\xec\xee\xf6\xe2\xe5\xf2\xed\xe0\xff \xf8\xe0\xf5\xf2\xe0" /* "Самоцветная шахта" */,
+    "\xc7\xee\xeb\xee\xf2\xe0\xff \xf8\xe0\xf5\xf2\xe0" /* "Золотая шахта" */
+};
 DATA(0x004fe034) char* gQuickViewText[KB_QUICK_VIEW_TEXT_COUNT] = {
     "",
     "Alchemist Lab",
@@ -10024,7 +10036,7 @@ DATA(0x004ff328) char* xGenericSiteNames[KB_GENERIC_SITE_NAME_COUNT] = {
     "Sirens",
     NULL
 };
-char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
+DATA(0x004ff344) char* xRecruitmentSiteNames[KB_RECRUITMENT_SITE_NAME_COUNT] = {
     "Barrow Mounds",
     "Earth Summoning Altar",
     "Air Summoning Altar",

@@ -31,11 +31,24 @@ class RelocOwnersTest(unittest.TestCase):
             self.assertEqual(len(owners), 1, symbol)
             self.assertEqual(owners[0].source_name, "gTable")
 
-    def test_definition_rva_mismatch_disqualifies_the_owner(self):
+    def test_reviewed_extent_contradicting_the_source_claim_is_fatal(self):
+        # Dropping the row would switch the owner-extent rule off for exactly the
+        # symbol it was written for, and say nothing.
+        with self.assertRaises(ValueError) as raised:
+            owners_from_rows(
+                [data_row("?gConfig@@3PAXA", 0x3000)],
+                {"gConfig": 0x3004}, {"gConfig": (0x3000, 0x40)})
+        self.assertIn("gConfig", str(raised.exception))
+
+    def test_inventory_row_at_another_address_disqualifies_the_owner(self):
         owners = owners_from_rows(
-            [data_row("?gConfig@@3PAXA", 0x3000)],
-            {"gConfig": 0x3004}, {"gConfig": (0x3000, 0x40)})
+            [data_row("?gConfig@@3PAXA", 0x3010)],
+            {"gConfig": 0x3000}, {"gConfig": (0x3000, 0x40)})
         self.assertEqual(owners, [])
+
+    def test_a_symbol_without_a_source_claim_is_not_a_contradiction(self):
+        self.assertEqual(owners_from_rows(
+            [data_row("?gConfig@@3PAXA", 0x3000)], {}, {"gConfig": (0x3000, 0x40)}), [])
 
     def test_positive_size_smaller_than_the_extent_is_a_contradiction(self):
         definitions = {"gConfig": 0x3000}

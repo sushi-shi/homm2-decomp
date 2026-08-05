@@ -211,3 +211,6 @@ void iconWidget::Draw(void) {
             return;
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(iconWidget, 0x004ea984)

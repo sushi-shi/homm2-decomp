@@ -15,6 +15,16 @@
 #define DATA(addr) __attribute__((annotate("data:" #addr)))
 #define DATA_COMPGEN(addr, name, value) value
 #define DATA_COMPGEN_GUARD(addr, name, owner)
+// Where a class's compiler-emitted vtable sits in the retail image. Nothing in
+// the source defines a vtable, so unlike DATA(...) this marker stands alone at
+// file scope in the owning .cpp; the analysis branch spends it on a declaration
+// that allocates nothing, purely so the attribute has somewhere to attach and a
+// misplaced marker is a parse error. VTBL2 names the secondary vtable a derived
+// class emits for one of its bases. Both expand to nothing for the compiler.
+#define VTBL(cls, addr)                                                                            \
+    __attribute__((annotate("vtbl:" #cls " " #addr))) extern const char cls##_vt;
+#define VTBL2(cls, base, addr)                                                                     \
+    __attribute__((annotate("vtbl2:" #cls " " #base " " #addr))) extern const char cls##_vt_##base;
 #define OVERRIDE override
 #define SIZE(type, bytes) static_assert(sizeof(type) == (bytes), "sizeof(" #type ") != " #bytes)
 
@@ -31,6 +41,8 @@
 #define DATA(addr)
 #define DATA_COMPGEN(addr, name, value) value
 #define DATA_COMPGEN_GUARD(addr, name, owner)
+#define VTBL(cls, addr)
+#define VTBL2(cls, base, addr)
 #define OVERRIDE
 
 #define SIZE(type, bytes)

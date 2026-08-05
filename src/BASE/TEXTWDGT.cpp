@@ -167,5 +167,5 @@ void textWidget::SetText(char* text) {
     }
 }
 
-
-
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(textWidget, 0x004ea9a0)

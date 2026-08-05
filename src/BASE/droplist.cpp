@@ -648,3 +648,5 @@ closeList:
     );
 }
 
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(dropListWidget, 0x004ea9ec)

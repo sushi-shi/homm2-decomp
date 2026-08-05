@@ -533,3 +533,6 @@ MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
     }
     return MESSAGE_DISPATCH_CONSUME;
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(listBoxWidget, 0x004ea9e0)

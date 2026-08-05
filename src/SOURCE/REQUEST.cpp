@@ -1216,3 +1216,6 @@ DATA(0x00516ae0) char* cFRDummy = "";
 DATA(0x00533d78) float fGutterMinY;
 DATA(0x00533d7c) float fGutterTravelLength;
 DATA(0x00533d80) i32 iMaxListSize;
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(fileRequester, 0x004ea800)

@@ -151,3 +151,6 @@ void border::Draw(void) {
             return;
     }
 }
+
+// Compiler-emitted vtables; the markers are census claims, not definitions.
+VTBL(border, 0x004ea9c4)

@@ -12,7 +12,8 @@ claim. It is audit and delinker metadata, never a placement directive.
 Codegen neutrality is measured, not assumed: adding the macro and then 1,018
 markers left all 99 compiled objects byte-identical to the unmarked build apart
 from the COFF `TimeDateStamp` (and `SOURCE/ARMY`'s per-compilation unnamed-
-namespace cookie, which rerolls on any recompile), and all 2,473 objdiff
+namespace cookie, which rerolled on any recompile until the second tranche gave
+`gTargetName` internal linkage the ordinary way), and all 2,473 objdiff
 function rows unchanged.
 
 `homm2.build.source_symbols.symbols_for_file` walks both marker families in one
@@ -29,6 +30,31 @@ donated owner name, which would put one symbol at two addresses.
 A claimed address stops being a synthetic `const_<RVA>` alias and stops needing
 a donation vote; the delinked retail object names the real global, and
 `assert_relocs` can resolve it.
+
+## The source `VTBL()` claim channel
+
+`VTBL(Class, addr)` and `VTBL2(Derived, Base, addr)` reconstruct the identities
+`??_7Class@@6B@` and `??_7Derived@@6BBase@@@`, which
+`homm2.build.annotated_vtables` and `source_symbols.collect` have always
+consumed. Nothing in the source *defines* a vtable, so unlike `DATA()` the
+marker stands alone at file scope in the owning `.cpp`; the `__clang__` branch
+spends it on an `extern const char Class__vtbl;` declaration that allocates
+nothing, purely so the `annotate` attribute has somewhere to attach and a
+misplaced marker is a parse error. The compiler branch expands both to nothing,
+so MSVC never sees the declaration either.
+
+The 30 primary vtables this image emits were derived from the same donation
+evidence as the data claims, with `??_7` removed from the derivation's skip
+list: every one is unanimous (1 to 4 votes), none shares an address, and each
+one's retail cells decode to that class's own virtual methods — `Open`/`Close`/
+`Main` for the manager family, `Draw`/`??_G`/`Main` for the widget family, and
+three copies of `_purecall` (0x4d9061) for the abstract `baseManager`,
+`widget`, and `resource`. They occupy one `.rdata` run, 0x4ea42c..0x4eaa2c.
+
+Codegen neutrality was measured the same way as for `DATA()`: adding the macros
+and all 30 markers, together with this tranche's source corrections, left all
+2,473 objdiff function rows byte-identical (`functions-exact 1727/1727`,
+`matched-code-bytes 100.00%` before and after).
 
 ### Evidence rules used for the first tranche
 
@@ -55,6 +81,77 @@ for that symbol's linked address. A claim was written only when
 between its two already-claimed neighbours. `assert_relocs` fell from 3,058
 rows to 52, and 514 addresses stopped being `const_<RVA>`.
 
+Both reviewed calls were later confirmed, and the split votes turned out to be
+symptoms rather than noise: the second tranche's source corrections below made
+every one of the four symbols unanimous — `gbColorMice` 14/14, its neighbour
+`bLastOnscreenMouseColor` 3/3, `gArmyNames` 26/26 and `gArmyNamesPlural` 84/84.
+A symbol whose votes split across two addresses is worth re-reading as "some
+call site names the wrong global" before it is treated as an ambiguity.
+
+### Second tranche: `assert_relocs` 52 → 0
+
+The 52 rows the first tranche left behind split into three causes, and all three
+are now closed. None of the work moved an objdiff row.
+
+**38 were real defects in the reconstruction**, invisible to objdiff because it
+masks relocations (see `docs/patterns/byte-identical-wrong-global.md`):
+
+- 22 rows: `SOURCE/ARMY`'s `gTargetName`. Resolved by *linkage*, not by an audit
+  exemption. VC6 decorates an unnamed-namespace object with the absolute source
+  path plus a per-compilation cookie
+  (`?gTargetName@?%Z:\...\ARMY.cpp1586521473@@3PADA`), so no stable name exists
+  to claim and the object was the only non-deterministic input in the build. A
+  file-scope `static` has exactly the same linkage and storage, mangles as the
+  stable `_gTargetName`, and is what 1996 game code would have written anyway;
+  the definition moved out of the unnamed namespace and carries
+  `DATA(0x00524038)` (22 unanimous votes, 100 bytes of loader zero). Compiling
+  `SOURCE/ARMY` twice with no source change now yields objects differing in two
+  bytes of the COFF `TimeDateStamp` and nothing else, so the build has no
+  remaining source of non-determinism.
+- 3 rows: `bSecondAttack` (`SOURCE/ARMY`, `DATA(0x005240a0)`, 3 unanimous votes)
+  and 1 row: `xRecruitmentSiteNames` (`SOURCE/KB`, `DATA(0x004ff344)`) were
+  simply unclaimed.
+- 4 rows: the vtables of `soundManager`, `combatManager` and `recruitUnit`
+  (twice), closed by the `VTBL()` channel above.
+- 6 rows: `gArmyNames` where retail reads `gArmyNamesPlural` (and one the other
+  way) across TOWNMGR, GAME and SWAPMGR — a Buka localisation change, see
+  `docs/version-changes.md`.
+- 1 row: `CheckChangeCursor` read `gbColorMice` and `bLastOnscreenMouseColor`
+  in the wrong order and used the compound `if ((a = b) != 0)` where retail
+  splits the latch from its test.
+- 1 row: `advManager::QuickInfo`'s two mine arms read `gResourceNames` where
+  retail reads a distinct seven-entry `gMineNames` table at 0x4fe018.
+
+**14 were delinker and compiler artifacts the audit could not express**, now
+handled in `homm2.build.assert_relocs` with unit tests beside it:
+
+- 5 rows (`army::DoAttack` ×2, `army::ProcessDeath`, `army::SpecialAttack`,
+  `HandleCastSpell`, `SetMenus`): a recursive call keeps its destination inside
+  the function's own carved span, so the delinker writes the final displacement
+  and emits no COFF relocation, while MSVC must relocate every REL32 against the
+  function symbol. `delinked_self_references` reads the delinked bytes at the
+  same function-relative site and counts the call only when its displacement
+  lands exactly on the function entry.
+- 8 rows (`BASE/AudiereMusic`, `SOURCE/PHILAI`): MSVC names static-initializer
+  thunks and their guards with a per-compilation counter, so `_$E16` is the
+  sixteenth internal symbol of *that* compilation, not an identity. AudiereMusic
+  numbers two ahead of retail and PHILAI's ctype guard pair is `$E18`/`$E19`
+  here and `$E3`/`$E19` there, so pairing by name compares unrelated thunks.
+  They are audited as one group per unit (`check_ordinal_locals`) with
+  references *between* counter symbols dropped, since those cannot be resolved
+  across two numberings. Only those two units differ; the other 95 name their
+  thunks identically.
+- 1 row (`PlayAudiereMusic`): VC6's linker folds identical COMDATs, so
+  `RefPtr<SampleSource>::operator=` and `RefPtr<OutputStream>::operator=` — 81
+  byte-identical instructions each, no relocations — share the single retail
+  address 0xccfa0, and only one of them can be a claimed name.
+  `folded_comdat_symbols` rewrites the candidate symbol onto the retail one, and
+  only when the candidate object defines both COMDATs with identical bytes *and*
+  retail names the other at the very same site.
+
+Each rule was ablated against the live objects to confirm it clears its own
+class and nothing else (5 / 1 / 8 rows respectively).
+
 ### Open queue
 
 - **Reconstructed arrays that are one element too long.** For 70 claims the next
@@ -64,27 +161,35 @@ rows to 52, and 514 addresses stopped being `const_<RVA>`.
   against retail's five entries, `gfStatPower[42]` against 41, `iMouseOffset[4]`
   against three, `gResourceBaseValue[8]` against seven, and 58 more in
   `SOURCE/KB`. These do not affect code bytes but they do move every later
-  allocation in the final link.
+  allocation in the final link. Two of the newly claimed rows are the same
+  shape and their claims deliberately overlap the preceding array's phantom
+  cell: `gMineNames` at 0x4fe018 sits on `gResourceNames`'s eighth (NULL) cell,
+  and `xRecruitmentSiteNames`'s sixth (NULL) cell runs into `gWinSetup` at
+  0x4ff358. Inventory sizes are provisional, so the delinker tolerates this;
+  the trailing-NULL sweep removes it.
 - **Payload contradictions left unclaimed**: `szAppName`/`szTitle` (Russian in
   retail, see `docs/version-changes.md`), `_gMidiText`, `_smackMasterVolumes`,
-  `gMineCharacteristics`, `gMapColors`, `cCombatBkgNames`,
-  `xRecruitmentSiteNames`, and the five `COMBAT_SPELL_AI_*_MODIFIER` `.rdata`
-  floats whose retail sign is positive where the reconstruction stores a
-  negative.
-- **`_gMouseManagerStrings`** votes for four distinct owner addresses: the
-  single reconstructed aggregate stands where retail has separate allocations.
-- **`SOURCE/ARMY`'s unnamed namespace.** `gTargetName` mangles as
-  `?gTargetName@?%<absolute source path>ARMY.cpp<cookie>@@3PADA`, where the
-  cookie changes on every compile. It cannot be claimed, it is 22 of the 52
-  remaining `assert_relocs` rows, and it is the only source of non-determinism
-  in the compiled objects.
-- **Vtables.** Four of the remaining rows are `??_7<class>@@6B@` targets.
-  `homm2.build.annotated_vtables` and `collect` already consume `VTBL`/`VTBL2`
-  markers; only the `va.h` macros and the source markers are missing.
-- **`config/reloc_data_owners.tsv` records `gConfig` at `0x128d20`**, but 523
-  unanimous votes and the donation inventory both place it at `0x1261e0`
-  (claimed there now). The stale row silently disables the only owner-extent
-  rule instead of failing.
+  `gMineCharacteristics`, `gMapColors`, `cCombatBkgNames`. The five
+  `COMBAT_SPELL_AI_*_MODIFIER` `.rdata` floats left this list: no use site
+  negates, so the stored sign is the fact, and the definitions are now positive
+  and claimed at 0x4ea80c..0x4ea81c. `xRecruitmentSiteNames` also left it — its
+  first five cells match retail and only the reconstruction's trailing NULL
+  differs, which is the array-length item above, not a payload contradiction.
+- **`_gMouseManagerStrings` stays unclaimed**, with the evidence written down:
+  its 12 donation votes name **six** distinct owners — 0x11e358 (4), 0x11e318
+  (4), 0x11e3b0, 0x11e364, 0x11e324, 0x135eac (1 each) — and the payload differs
+  in 404 of 456 bytes. Each reference is `gMouseManagerStrings + <field
+  offset>`, so a single retail allocation would make every vote agree; six
+  disjoint bases is direct evidence that retail has separate `$SG` string cells
+  where the reconstruction groups them into one aggregate to pin their order.
+  Claiming any one address would put the symbol where five of its own
+  references contradict it. `_`-prefixed internal names are outside
+  `assert_relocs`'s FAKE check, so this costs no audit row.
+- **`config/reloc_data_owners.tsv` recorded `gConfig` at `0x128d20`**, but 523
+  unanimous votes and the donation inventory both place it at `0x1261e0`. The
+  row now reads `0x1261e0`, and `reloc_owners.owners_from_rows` raises on a
+  reviewed extent whose address contradicts the symbol's `DATA()` claim instead
+  of silently switching the owner-extent rule off for that symbol.
 
 The native objdiff 3.7.1 report exposes data at section granularity. It does not
 produce one report row per COFF data symbol, and no debug records carry allocation
