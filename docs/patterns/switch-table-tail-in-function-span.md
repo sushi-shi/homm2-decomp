@@ -87,3 +87,28 @@ Three spans in the widget-dispatch family closed this way:
 The index-table *contents* are matching evidence in their own right: they encode
 the case-value -> target-slot map, so a byte-identical index table with shifted
 jump-table addends means the case labels are right and only the body layout moved.
+## Stop at the tables, not at the next function: the linker pad is NOT the span
+
+The "widen to the next claimed RVA" recipe overshoots whenever LINK.EXE inserted
+alignment padding between the tables and the next function. `heroWindow::heroWindow(
+i32, i32, char*)` (0xba700) is the witness: the dispatch reads
+`jmpl *0x6aa(,%edx,4)` and `movb 0x6c6(%eax)`, so the tails are
+
+```
+0x6aa  7 dword entries   (6 cases + default)   -> 0x6c6
+0x6c6  0x41 index bytes  (values 0 .. 0x40)    -> 0x707
+0x707  6 dword entries   (0x201 .. 0x206)      -> 0x71f
+```
+
+and the next claimed function `heroWindow::Open` is at 0xbae20 = +0x720. Claiming the
+full gap (`VA(0x004ba700, 0x720)`) leaves exactly ONE differing byte and reads 99.78%:
+
+```
+ours   .. 06 00 00 2e 05 00 00 | 55 8b ec ..     (next function follows immediately)
+retail .. 06 00 00 2e 05 00 00 | cc | 55 8b ec .. (0xcc = LINK.EXE inter-function pad)
+```
+
+`VA(0x004ba700, 0x71f)` — the compiler's own output size, tables included, pad
+excluded — is EXACT. Compute the span from the dispatch displacements and the table
+geometry, then check the residue against the next RVA; a 1..15-byte remainder of
+`0xcc` (or `0x90`) is padding and belongs to no function.

@@ -1001,6 +1001,46 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (`-1, 0, -1, 0`) at the top of the successful-riddle branch even though the AI
   path never displays a reward window - a copy of `DoEvent`'s sphinx block that
   the AI version never trimmed.
+- **[unclassified] `gbEveryOtherCycle` (BASE/WINMGR) narrowed to one byte
+  and is toggled with `!`.** PoL 2.0 stores a dword (`movl $0x1, gb...` /
+  `movl $1,%eax; subl gb...,%eax`, i.e. `1 - gbEveryOtherCycle`); retail
+  writes `movb $0x1` and reads it zero-extended (`xorl %eax,%eax; movb
+  gb...,%al`) before the `negl/sbbl/incl` logical-NOT triple, so the 2.1
+  variable is an unsigned one-byte flag assigned `!gbEveryOtherCycle`. The
+  header declaration moves `b32` -> `u8`.
+- **[unclassified] `CycleColors` (0xb6b80) addresses the combat cycles by
+  palette COLOUR index, not by byte offset.** PoL computes
+  `m_data + 0x14a + frame*12` (combat) and `m_data + 0x144 + frame*21`
+  (alternate); retail computes `(0x6e + frame*4) * 3` (`leal
+  0x6e(,%eax,4); imull $3`) and `(0x6c + frame*7) * 3`. Same addresses,
+  different source form: the 2.1 body multiplies a colour index by
+  `PALETTE_COLOR_BYTES`.
+- **[unclassified] `heroWindowManager::Open` (0xb7020) clears the buffer
+  palette with `memset`.** PoL walks it as `i32*` in a hand-rolled
+  `for (i = 0xc0; i != 0; i--) *pal++ = 0;` loop (two named locals in the
+  frame); retail calls `memset(gpBufferPalette->m_data, 0, 0x300)` and has
+  no locals at all. The two `baseManager` field stores are also swapped:
+  retail assigns `m_messageMask` before `m_priority`.
+- **[unclassified] `heroWindowManager::DoDialog` (0xb74f0) tests the done
+  flag twice.** PoL's body is `do { ... } while (done == 0);` followed by
+  unconditional `RemoveWindow`/`Flush`; retail opens the loop with the test
+  (`while (done == 0)`) and wraps the teardown in `if (done != 0) { ... }`,
+  so the guard is dead but present in the bytes (`cmpl $0,-0x8(%ebp); je`
+  immediately after the loop exit that only fires when it is non-zero).
+- **[unclassified] `heroWindowManager::FizzleForward` (0xb79b0) saves and
+  restores `m_updateFlags`.** Retail spills the field to `-0x10(%ebp)`
+  before zeroing it and writes it back after the last blit; the PoL-derived
+  reconstruction had a self-assignment stub there. The row pointers are also
+  recomputed per scanline from `(sourceY - y)` instead of being carried in
+  running offsets.
+- **[2.1] `heroWindow::heroWindow(i32,i32,char*)` (0xba700) reads six more
+  widget record types.** PoL's body is 0x521 bytes with a nine-case switch;
+  retail is 0x71f (0x6aa of code plus a 7-entry jump table, a 0x41-byte index
+  map and a 6-entry jump table) and handles `0x201 TEXT_ENTRY_RECT`,
+  `0x202 TEXT_ENTRY_MULTILINE`, `0x203 DROP_LIST`,
+  `0x204 TEXT_ENTRY_INSET_FIVE`, `0x205 LIST_BOX` and
+  `0x206 TEXT_ENTRY_INSET_FOUR` through a second dense dispatch. It also
+  carries the /GX exception frame PoL's does not.
 
 ## Reconstruction infrastructure notes (not version deltas)
 

@@ -56,7 +56,7 @@ public:
 #pragma pack(pop)
 SIZE(heroWindowManager, 0x62);
 extern i32 iCombatCycleFrame;
-extern b32 gbEveryOtherCycle;
+extern u8 gbEveryOtherCycle;
 extern i32 iCycle1Count;
 extern i32 iCycle2Count;
 extern i32 iCycle3Count;
