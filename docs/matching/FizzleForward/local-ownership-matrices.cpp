@@ -96,6 +96,46 @@ u16 lookup =
  *
  *   build/fizzle-forward-default-trial32-state-summary.json
  *   build/tu-state-noise/fizzle-forward-default-trial32/
+ *
+ * Later-to-current structural subtraction, 2026-08-05:
+ *
+ * The exact Gold/Buka parent recomputes the work and screen row pointers from
+ * `sourceY` on every row. PoL's retained parent instead carried `workOffset`
+ * and `screenOffset` induction variables. Testing only this ownership change,
+ * while preserving PoL's proven countdown inner loop, null cleanup, allocator
+ * metadata, and surrounding CFG, improved clean output from 99.302635% at
+ * 1028 bytes to 99.523026% at the exact retail size of 1026. Both arms were
+ * crossed with clean plus 50 forest/top states (102/102 complete):
+ *
+ *   build/fizzle-forward-cross-version-row-ownership-axes.json
+ *   build/fizzle-forward-cross-version-row-ownership-manifest.json
+ *   build/source-variant-batch/fizzle-forward-cross-version-row-ownership/results.json
+ *
+ * The later-row arm reached 99.720400% at trial 37 with exact 34/34 topology
+ * and 33/33 relocations. The ordinary source now retains the direct row
+ * expressions and removes the obsolete running offsets entirely; dead offset
+ * maintenance is not retained as compiler steering.
+ *
+ * A separate 102-cell product-order matrix proved Gold/Buka's frame-first
+ * palette interpolation spelling byte-identical to PoL's delta-first spelling
+ * in every clean/state cell:
+ *
+ *   build/fizzle-forward-cross-version-palette-product-manifest.json
+ *   build/source-variant-batch/fizzle-forward-cross-version-palette-product/results.json
+ *
+ * Finally, the clean retained parent crossed lookup-byte order and palette
+ * subscript ownership with all 51 states (204/204 complete). Pointer/index
+ * subscript order remained erased; saved-byte-first lookup ownership was a
+ * lower island. No exact closure appeared:
+ *
+ *   build/fizzle-forward-later-row-descendants-axes.json
+ *   build/fizzle-forward-later-row-descendants-manifest.json
+ *   build/source-variant-batch/fizzle-forward-later-row-descendants/results.json
+ *
+ * Disposition: retain later-style row recomputation as the stronger semantic
+ * parent. Its clean body has retail size, exact CFG, and complete ordered
+ * relocations; the remaining lookup-register and palette-SIB residual stays
+ * live for a different evidence-backed structural descendant.
  */
 
 void FizzleForward_local_ownership_attempts() {

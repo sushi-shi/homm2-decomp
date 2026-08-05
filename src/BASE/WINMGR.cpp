@@ -679,13 +679,11 @@ void heroWindowManager::FizzleForward(
                 gpResourceManager->ReadBlock(cycleTable, FIZZLE_CYCLE_TABLE_BYTES);
                 i32 sourceY = y;
                 if (sourceY < y + height) {
-                    i32 screenOffset = y * SCREEN_WIDTH;
-                    i32 workOffset = 0;
                     do {
                         u8* savedPixel =
                             m_fizzleSource->m_pixels + m_fizzleSource->m_width * (sourceY - y);
-                        u8* workPixel = m_fizzleWork->m_pixels + workOffset;
-                        u8* screenPixel = m_screen->m_pixels + x + screenOffset;
+                        u8* workPixel = m_fizzleWork->m_pixels + (sourceY - y) * width;
+                        u8* screenPixel = m_screen->m_pixels + sourceY * SCREEN_WIDTH + x;
                         if (x < x + width) {
                             i32 remaining = width;
                             do {
@@ -695,8 +693,6 @@ void heroWindowManager::FizzleForward(
                                 remaining--;
                             } while (remaining != 0);
                         }
-                        screenOffset += SCREEN_WIDTH;
-                        workOffset += width;
                         sourceY++;
                     } while (sourceY < y + height);
                 }

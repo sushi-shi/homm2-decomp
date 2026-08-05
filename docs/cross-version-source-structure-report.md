@@ -46,6 +46,11 @@ appendix; it is not the matching priority.
   2.1 negative no-overlap branch, direct `sourceX` mutation, and repeated mouse
   field reads restore retail size and all 24 relocations; forest/top trial 3
   then closes the remaining two clean-state bytes exactly.
+- `FizzleForward` retains the 2.1 per-row pointer recomputation after removing
+  later-only loop and allocator differences. Clean output improves from
+  99.3026%/1028 bytes to 99.5230% at retail size with exact CFG and relocations;
+  a complete state matrix reaches the existing 99.7204% structural island but
+  does not yet close the remaining register/SIB ownership.
 - Two bounded negatives constrain further BASE work. PoL's
   `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
   helper call, and 408 relational/state cells could not move its four-byte
