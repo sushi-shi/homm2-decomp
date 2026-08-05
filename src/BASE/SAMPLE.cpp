@@ -17,7 +17,7 @@ static SSampleSourceFiles gSampleSourceFiles =
     {SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE, SAMPLE_SOURCE_FILE};
 
 VA(0x004ce250, 0x210)
-sample::sample(char* name, i32l, i32l, i32l)
+sample::sample(char* name)
     : resource(
         RESOURCE_CATEGORY_SAMPLE,
         gpResourceManager->MakeId(name, 1),
@@ -32,12 +32,18 @@ sample::sample(char* name, i32l, i32l, i32l)
     m_playbackData.activeSample = NULL;
     m_playbackData.channelType = 0;
 
-    char filename[FILENAME_CAPACITY];
-    strcpy(filename, name);
-    _strrev(filename);
+    char fileName[FILENAME_CAPACITY];
+    strcpy(fileName, name);
+    _strrev(fileName);
 
     for (i32 i = 0; i < FORMAT_SUFFIX_LENGTH; i++) {
-        switch (filename[i]) {
+        switch (fileName[i]) {
+            case '8':
+                m_playbackData.sampleFormat = FORMAT_8_BIT;
+                break;
+            case '6':
+                m_playbackData.sampleFormat = FORMAT_16_BIT;
+                break;
             case '1':
                 m_playbackData.sampleRate = RATE_11025;
                 break;
@@ -46,12 +52,6 @@ sample::sample(char* name, i32l, i32l, i32l)
                 break;
             case '4':
                 m_playbackData.sampleRate = RATE_44100;
-                break;
-            case '6':
-                m_playbackData.sampleFormat = FORMAT_16_BIT;
-                break;
-            case '8':
-                m_playbackData.sampleFormat = FORMAT_8_BIT;
                 break;
             case 'M':
             case 'm':

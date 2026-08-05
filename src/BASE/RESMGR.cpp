@@ -27,7 +27,6 @@ H2_ENUM_BEGIN(ResourceConstant)
     EVIL_TRANSLATION_COUNT  = 37,
     BACKDROP_ROW_BYTES      = 640,
     BINARY_OPEN_MODE        = 0x8000,
-    SAMPLE_VOLUME           = 127,
     FILE_COUNT_BUFFER_WORDS = 2,
     POSITION_STACK_DEPTH    = 10
 H2_ENUM_END(ResourceConstant)
@@ -179,13 +178,13 @@ class font* resourceManager::GetFont(char* name) {
 
 VA(0x004b84f0, 0xbf)
 class sample* resourceManager::GetSample(char* name) {
-    u32l id = MakeId(name, 1);
-    resource* r = Query(id);
+    u32l fileId = MakeId(name, 1);
+    resource* r = Query(fileId);
     if (r != NULL) {
         r->m_refCount++;
         return static_cast<sample*>(r);
     } else {
-        r = new sample(name, 0, SAMPLE_VOLUME, 1);
+        r = new sample(name);
         AddResource(r);
         return static_cast<sample*>(r);
     }

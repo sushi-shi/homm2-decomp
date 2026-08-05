@@ -1045,6 +1045,23 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   `0x206 TEXT_ENTRY_INSET_FOUR` through a second dense dispatch. It also
   carries the /GX exception frame PoL's does not.
 
+- **[2.1] `sample::sample` (0xce250) lost its three configuration parameters
+  and the packed format flag.** PoL's ctor is
+  `sample(char* name, i32l channelType, i32l volume, i32l loopCount)` and
+  stores those three arguments; it also folds a `FORMAT_STEREO`/`FORMAT_MONO`
+  `formatFlags` local into a single `m_playbackData.format` field after the
+  suffix loop. Retail's is `sample(char* name)` (`retl $0x4`, and `0x8(%ebp)`
+  is the only positive frame reference) and hardcodes the defaults instead:
+  `volume = 0x7f`, `loopCount = 0`, `stereo = 1`, `sampleFormat = FORMAT_16_BIT`,
+  `sampleRate = RATE_44100`, `activeSample = NULL`, `channelType = 0`. The
+  playback struct also split PoL's one `format` flags field into separate
+  `sampleFormat` and `stereo` `i32`s, so the `'M'`/`'m'` arm writes
+  `stereo = 0` directly and there is no post-loop `|=`. The suffix `switch`
+  additionally reorders its cases to `'8' '6' '1' '2' '4' 'M'/'m'` (retail's
+  jump table sends the lowest case value `'1'` to the THIRD body). The
+  single caller `resourceManager::GetSample` (0xb84f0) pushes one argument.
+  Byte-exact.
+
 ## Reconstruction infrastructure notes (not version deltas)
 
 - `BASE/Bzip` is Julian Seward's bzip 0.21 (25 Aug 1996) adapted by NWC
@@ -1059,6 +1076,15 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   transfer their compiled relocation sites onto retail bytes; unanimous
   (symbol, addend) votes name the data owners and alias interior fields as
   owner+addend. Re-run with `--write` after each matching wave.
+- `true`/`false` are REAL keywords on this branch. `include/Ints.h` inherited
+  `#define true 1` / `#define false 0` from the MSVC 4.2 line ("pre-bool
+  compiler"); VC6 SP5 has `bool`, and the difference is byte-visible - an
+  int-valued `c ? true : false` materialises a 32-bit temp (`xor reg,reg`
+  ahead of the `setcc`) where a bool-valued one materialises a byte. Dropping
+  the two defines was measured over all 2473 functions: 3 improved, 0
+  regressed (`BASE/Midi MIDIStartup` 90.00 -> EXACT on its own, plus
+  `PlayAudiereSample`/`PlayAudiereMusic` once spelled with the ternary). See
+  docs/patterns/bool-argument-byte-temp-vs-int-temp.md.
 - VC6 /Od slot-order model (`homm2/core/od_slots.py`, solved on cl 10.20)
   re-validated on VC6 SP5 by probe: order rule identical; slot offsets
   round each local to 4 bytes.

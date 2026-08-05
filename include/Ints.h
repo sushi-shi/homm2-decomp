@@ -24,13 +24,12 @@ typedef unsigned __int64 u64;
 #define NULL 0
 #endif
 
-// Boolean-int aliases for the pre-bool compiler.
+// Boolean-int aliases for retail's integer boolean fields. VC6 has a real
+// `bool` with real `true`/`false` keywords, and the distinction is byte-visible:
+// an int-valued `c ? true : false` materialises a 32-bit temp (`xor reg,reg`
+// before the `setcc`), a bool-valued one materialises a byte.
 typedef i32 b32;
 typedef i8 b8;
-#if !H2_STRICT_ENUMS
-#define true 1
-#define false 0
-#endif
 
 // Modern builds type-check domains; the retail MSVC build keeps the integer ABI.
 #if H2_STRICT_ENUMS

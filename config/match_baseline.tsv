@@ -7,7 +7,7 @@ BASE/AudiereEffects	?AudiereSamplePlaying@@YI_NPAVsample@@@Z	100.0000	5ae38b433e
 BASE/AudiereEffects	?BeginAudiereSampleIteration@@YIXXZ	100.0000	71e05d7fe65d
 BASE/AudiereEffects	?EndAudiereSampleIteration@@YIXXZ	100.0000	64f87f82c508
 BASE/AudiereEffects	?FindAudiereSample@@YIPAUAudiereSampleNode@@PAVsample@@@Z	4.1304	9733ba51555a
-BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	99.6403	b59c2a03369f
+BASE/AudiereEffects	?PlayAudiereSample@@YIXPAVsample@@V?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	af9a47dcc636
 BASE/AudiereEffects	?PurgeFinishedAudiereSamples@@YIXXZ	100.0000	96434c35e788
 BASE/AudiereEffects	?SetAllAudiereSampleVolumes@@YIXH@Z	100.0000	c5bce4cf8033
 BASE/AudiereEffects	?SetAudiereSampleVolume@@YIXPAVsample@@H@Z	100.0000	e38b19c6a90a
@@ -16,7 +16,7 @@ BASE/AudiereEffects	?StopAudiereSample@@YIXPAVsample@@@Z	100.0000	d9c61e9352df
 BASE/AudiereEffects	?WaitForAudiereSample@@YIXPAVsample@@@Z	100.0000	2a763a28d8a8
 BASE/AudiereMusic	?AudiereMusicAvailable@@YI_NXZ	100.0000	1001bd3a24bb
 BASE/AudiereMusic	?AudiereMusicPlaying@@YI_NXZ	100.0000	d80e2edbabe9
-BASE/AudiereMusic	?PlayAudiereMusic@@YIXAAH0V?$RefPtr@VAudioDevice@audiere@@@audiere@@H@Z	99.5726	abcc2bf6dc4b
+BASE/AudiereMusic	?PlayAudiereMusic@@YIXAAH0V?$RefPtr@VAudioDevice@audiere@@@audiere@@H@Z	100.0000	c359dae0d6a3
 BASE/AudiereMusic	?ResetAudiereMusic@@YIXXZ	100.0000	28d0e39d5071
 BASE/AudiereMusic	?SetAudiereMusicVolume@@YIXHH@Z	100.0000	bbc82415fb66
 BASE/AudiereMusic	?StartupAudiereMusic@@YI_NV?$RefPtr@VAudioDevice@audiere@@@audiere@@@Z	100.0000	6695b12b4972
@@ -53,8 +53,8 @@ BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	100.0000	9689b54f2a52
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	df07d123bd65
 BASE/BUTTON	?Select@button@@QAEFAAUtag_message@@@Z	100.0000	b0abdbd2a7e0
 BASE/Blur	?DoBlur@@YIXPAVbitmap@@0HHHH@Z	45.0882	32f8227bb601
-BASE/Bzip	?DecodeData@@YIJPAD0K@Z	99.7763	56951cf07fbb
-BASE/Bzip	?EncodeData@@YIJPAD0K@Z	99.7852	97db33efa39f
+BASE/Bzip	?DecodeData@@YIJPAD0K@Z	100.0000	f2774d51acba
+BASE/Bzip	?EncodeData@@YIJPAD0K@Z	100.0000	bf9496ccce08
 BASE/Bzip	?FreeCompressStructures@@YIXXZ	100.0000	b9555f418c05
 BASE/Bzip	?FreeDecompressStructures@@YIXXZ	100.0000	28dc5d2f1f8f
 BASE/Bzip	?GETALL@@YIIH@Z	100.0000	e89e0523862b
@@ -123,7 +123,7 @@ BASE/Bzip	?putInt32@@YIXPAUBitStream@@H@Z	100.0000	7d0b48bd93a1
 BASE/Bzip	?putSymbol@@YIXPAUModel@@HPAUBitStream@@@Z	100.0000	a9e93b965372
 BASE/Bzip	?putUChar@@YIXPAUBitStream@@E@Z	100.0000	4293ca303fbe
 BASE/Bzip	?putUInt32@@YIXPAUBitStream@@I@Z	100.0000	6301968f9444
-BASE/Bzip	?qsortFull@@YIXHH@Z	99.8339	cae1076aa6ab
+BASE/Bzip	?qsortFull@@YIXHH@Z	100.0000	cae1076aa6ab
 BASE/Bzip	?sendMTFVal@@YIXPAUBitStream@@H@Z	100.0000	e85e9dcd5a60
 BASE/Bzip	?sendZeroes@@YIXPAUBitStream@@H@Z	100.0000	3415493b7474
 BASE/Bzip	?setDecompressStructureSizes@@YIXH@Z	100.0000	f0c48d771bb2
@@ -224,12 +224,12 @@ BASE/Midi	?MIDIIsPlaying@@YI_NXZ	100.0000	c80924e77a9e
 BASE/Midi	?MIDIPlay@@YIXAAH0H@Z	100.0000	2664ac228525
 BASE/Midi	?MIDISetVolume@@YIXAAH@Z	93.4694	79202ccca2c0
 BASE/Midi	?MIDIShutdown@@YIXXZ	100.0000	58e21c77d0a8
-BASE/Midi	?MIDIStartup@@YI_NXZ	90.0000	31e5699efee0
+BASE/Midi	?MIDIStartup@@YI_NXZ	100.0000	31e5699efee0
 BASE/Midi	?MIDIStop@@YIXAAH@Z	100.0000	b292663e2d17
 BASE/MilesSound	?AdjustMilesSampleVolumes@@YIXXZ	73.7879	44d0ee3c92f5
 BASE/MilesSound	?AllocateMilesSampleHandles@@YIXPAU_DIG_DRIVER@@@Z	100.0000	7a5fefc5eaf6
 BASE/MilesSound	?MilesSamplePlaying@@YI_NPAVsample@@@Z	100.0000	4105daab0413
-BASE/MilesSound	?PlayMilesSample@@YIXPAVsample@@@Z	99.9655	61e50d0bd892
+BASE/MilesSound	?PlayMilesSample@@YIXPAVsample@@@Z	100.0000	d9ce63086313
 BASE/MilesSound	?ServiceMilesSamples@@YIXXZ	100.0000	b41cd2a399d7
 BASE/MilesSound	?SetMilesSampleHandleVolume@@YIXPAU_SAMPLE@@H@Z	100.0000	bd89bc037395
 BASE/MilesSound	?SetMilesSampleVolume@@YIXPAVsample@@H@Z	100.0000	e4f032321f61
@@ -306,7 +306,7 @@ BASE/RESMGR	?GetIcon@resourceManager@@QAEPAVicon@@PAD@Z	100.0000	cc622d98232b
 BASE/RESMGR	?GetMIDIWrap@resourceManager@@QAEPAVMIDIWrap@@PAD@Z	100.0000	268a593c7129
 BASE/RESMGR	?GetMouse@resourceManager@@QAEPAVmouse@@PAD@Z	100.0000	e0f03c8cd0f2
 BASE/RESMGR	?GetPalette@resourceManager@@QAEPAVpalette@@PAD@Z	100.0000	90a68b5c7904
-BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	94.6552	05e40129d696
+BASE/RESMGR	?GetSample@resourceManager@@QAEPAVsample@@PAD@Z	100.0000	eb765245915d
 BASE/RESMGR	?GetTileset@resourceManager@@QAEPAVtileset@@PAD@Z	100.0000	e2cb9ffba3a3
 BASE/RESMGR	?LoadAggregateHeader@resourceManager@@QAEHPAD@Z	100.0000	3a29dcbe0313
 BASE/RESMGR	?Main@resourceManager@@UAEHAAUtag_message@@@Z	100.0000	b44313c564a4
@@ -327,7 +327,7 @@ BASE/RESOURCE	??0resource@@QAE@XZ	100.0000	0e12b90947d6
 BASE/RESOURCE	??1resource@@UAE@XZ	100.0000	3aa9520075ed
 BASE/Ripple	?DoRipple@@YIXPAVbitmap@@0HH@Z	74.7525	30c50b3a9486
 BASE/SAMPLE	??0MIDIWrap@@QAE@PAD@Z	100.0000	b40e685da3aa
-BASE/SAMPLE	??0sample@@QAE@PADJJJ@Z	99.7766	846ed438b007
+BASE/SAMPLE	??0sample@@QAE@PAD@Z	100.0000	74d58d8b6664
 BASE/SAMPLE	??1MIDIWrap@@UAE@XZ	100.0000	a8f2ea5b3d87
 BASE/SAMPLE	??1sample@@UAE@XZ	100.0000	b2b39e69ebb8
 BASE/TEXTWDGT	??0textWidget@@QAE@FFFFPAD0FFFF@Z	100.0000	379ff38822cc
@@ -338,7 +338,7 @@ BASE/TEXTWDGT	?Main@textWidget@@UAEHAAUtag_message@@@Z	100.0000	30413c672b17
 BASE/TEXTWDGT	?Read@textWidget@@QAEXXZ	100.0000	7be57f8e537c
 BASE/TEXTWDGT	?SetColorIndex@textWidget@@QAEXF@Z	100.0000	d0f9e5060397
 BASE/TEXTWDGT	?SetText@textWidget@@QAEXPAD@Z	100.0000	e664b2bcad47
-BASE/TILE	_TileToBitmap	99.4624	90d974ac90df
+BASE/TILE	_TileToBitmap	100.0000	4c92a0567d35
 BASE/TILESET	??0tileset@@QAE@K@Z	100.0000	1948f06e19aa
 BASE/TILESET	??1tileset@@UAE@XZ	100.0000	2c6c96104590
 BASE/Textntry	??0textEntryWidget@@QAE@FFFFFPAD0F0FFFFHH@Z	100.0000	91a6788a03f5

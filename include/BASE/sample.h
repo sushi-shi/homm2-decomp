@@ -9,7 +9,7 @@
 class sample : public resource {
 public:
     SamplePlaybackData m_playbackData;
-    sample(char*, i32l, i32l, i32l);
+    sample(char*);
     __declspec(dllexport) virtual inline ~sample() OVERRIDE;
 };
 #pragma pack(pop)
