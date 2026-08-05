@@ -33,6 +33,9 @@ appendix; it is not the matching priority.
 - `textEntryWidget::Read` closes by publishing `m_maxLines` and
   `m_preserveTextOnFocus` directly. The temporary in the earlier PoL
   reconstruction was invented; the 2.1 direct-field phase survives unchanged.
+- `CreatePCXFile` does not yet close, but its 2.1 indexed-row encoder supplies
+  the stronger PoL parent: 98.2770% becomes 99.2568% clean and 99.4257% in an
+  unchanged-source island, with exact CFG and relocation structure.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must

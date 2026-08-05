@@ -2199,25 +2199,28 @@ void CreatePCXFile(char* filename, u8* pixels, i32 width, i32 height, u8* palett
         static_cast<u8*>(H2_ALLOC_AT(width * 2, gMiscText.pcx.encodedRowAllocation.text, 1480));
     for (i32 row = 0; row < height; ++row) {
         i32 sourceIndex = 0;
-        u32 encodedSize = 0;
+        u8* rowPixels = pixels + row * width;
+        i32 encodedSize = 0;
         while (sourceIndex < width) {
-            u8 value = pixels[sourceIndex];
+            u8 value = *(rowPixels + sourceIndex);
             i32 runEnd = sourceIndex;
-            while (runEnd < width && pixels[runEnd] == value
+            while (runEnd < width && *(rowPixels + runEnd) == value
                    && runEnd - sourceIndex + 1 < RLE_RUN_LIMIT)
                 ++runEnd;
             i32 runLength = runEnd - sourceIndex;
-            if (runLength <= 1 && PCXValueIsLiteral(value)) {
-                encodedRow[encodedSize++] = value;
-                ++sourceIndex;
-            } else {
-                encodedRow[encodedSize++] = static_cast<u8>(runLength | RLE_RUN_MARKER);
-                encodedRow[encodedSize++] = value;
+            if (runLength > 1 || (value & RLE_RUN_MARKER) == RLE_RUN_MARKER) {
+                *(encodedRow + encodedSize) =
+                    static_cast<u8>(runLength | RLE_RUN_MARKER);
+                *(encodedRow + encodedSize + 1) = value;
+                encodedSize += 2;
                 sourceIndex += runLength;
+            } else {
+                *(encodedRow + encodedSize) = value;
+                encodedSize += 1;
+                sourceIndex += 1;
             }
         }
         write(fileHandle, encodedRow, encodedSize);
-        pixels += width;
     }
     H2_FREE_AT(encodedRow, gMiscText.pcx.encodedRowDestruction.text, 0x5f0);
     u8 paletteMarker = VGA_PALETTE_MARKER;
