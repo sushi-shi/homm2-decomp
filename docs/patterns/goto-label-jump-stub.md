@@ -147,3 +147,48 @@ statement and a stub surplus is a `goto` retail spells as fall-through or
 `searchArray::TestPossibleDirections` (0x4a136) is the extreme case: thirteen
 stubs, i.e. thirteen `gSearchTerrain = TERRAIN_INVALID; goto storeDirection;`
 sites written out longhand rather than one shared `invalidDirection:` block.
+
+## The stub's TARGET names the label — even when that address is inside a nested arm
+
+Counting stubs gives the number of `goto`s; reading each stub's destination
+gives the LABEL, and the label address then has to be spelled somewhere the
+structure already reaches. It does not have to be at function scope.
+
+`CycleColors` (0xb6b80, BASE/WINMGR) has exactly one stub:
+
+```
+3f4: eb 05              jmp <epilogue>     ; hop over the stub
+3f6: e9 7b fe ff ff     jmp 0x276          ; the ONE stub
+3fb: 8b e5 5d c3        <epilogue>
+```
+
+so the body contains exactly one `goto`, reached from
+
+```
+87: 85 c9              testl %ecx, %ecx
+89: 75 05              jne  0x8e           ; short jcc over ...
+8b: e9 68 03 00 00     jmp  0x3f6          ; ... the goto
+```
+
+The other three long jumps in the function (`e9` to 0x3a1, at 0x14f, 0x2b9 and
+0x332) are DIRECT, so they are structural arm ends, not gotos — which forces
+0x3a1 to be the end of an `if/else` and 0x276 to be a point INSIDE the else:
+
+```cpp
+    if (gbEveryOtherCycle == 0)
+        goto cycleType;                     /* the one stub */
+    if (giCycleType == WINDOW_COLOR_CYCLE_WORLD_VIEW) {
+        ...                                 /* arm end: direct jmp 0x3a1 */
+    } else {
+        <five palette rotations>
+    cycleType:                              /* 0x276, inside the else block */
+        if (giCycleType == ..._DEFAULT) { ... }        /* direct jmp 0x3a1 */
+        else if (giCycleType == ..._COMBAT) { ... }    /* direct jmp 0x3a1 */
+        else if (giCycleType == ..._COMBAT_ALTERNATE) { ... }
+    }
+    /* 0x3a1 */
+```
+
+A `goto` that enters a block is legal C++ as long as it skips no
+initialisation, and nothing else reproduces one stub plus three direct arm-end
+jumps. `CycleColors` 80.72% -> EXACT.

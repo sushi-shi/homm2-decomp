@@ -43,17 +43,14 @@ H2_ENUM_END(WindowConstant)
 VA(0x004ba5c0, 0x99)
 heroWindow::heroWindow(void) {
     strcpy(name, "Default Construct");
-    m_prevWindow = NULL;
-    m_nextWindow = m_prevWindow;
+    m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
-    m_posY = 0;
-    m_posX = m_posY;
+    m_posX = m_posY = 0;
     m_winWidth = SCREEN_WIDTH;
     m_winHeight = SCREEN_HEIGHT;
     m_winFlags = WINDOW_FLAG_FIXED_LAYER;
     m_winState = WINDOW_STATE_CLOSED;
-    m_widgetListHead = NULL;
-    m_widgetListTail = m_widgetListHead;
+    m_widgetListTail = m_widgetListHead = NULL;
     m_savedBackground = NULL;
 }
 
@@ -62,8 +59,7 @@ heroWindow::heroWindow(
     i32 x, i32 y, i32 w, i32 h, H2_ENUM_PARAM(WindowFlag, i32) flags
 ) {
     strcpy(name, "Dynamic Construct");
-    m_prevWindow = NULL;
-    m_nextWindow = m_prevWindow;
+    m_nextWindow = m_prevWindow = NULL;
     m_zOrder = -1;
     m_posX = x;
     m_posY = y;
@@ -71,31 +67,29 @@ heroWindow::heroWindow(
     m_winHeight = h;
     m_winFlags = flags;
     m_winState = WINDOW_STATE_CLOSED;
-    m_widgetListHead = NULL;
-    m_widgetListTail = m_widgetListHead;
+    m_widgetListTail = m_widgetListHead = NULL;
     m_savedBackground = NULL;
 }
 
-VA(0x004ba700, 0x6aa)
+VA(0x004ba700, 0x71f)
 heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
-    u32l jb;
-    i32 idx;
-    textEntryWidget* pte;
-    textWidget* ptw;
+    widget* pWidget;
+    textWidget* pText;
+    textEntryWidget* pTextEnt;
+    iconWidget* pIcon;
+    button* pButton;
+    dropListWidget* pDrop;
+    border* pBorder;
     WindowWidgetRecordType type;
-    button* pbtn;
-    dropListWidget* pdl;
-    border* pbd;
-    widget* pwdg;
-    iconWidget* picn;
-    listBoxWidget* plist;
-    dimmerWidget* pdim;
+    dimmerWidget* pDimmer;
+    listBoxWidget* pListBox;
+    i32 idx;
+    u32l jb;
     strcpy(name, resourceName);
     jb = gpResourceManager->MakeId(resourceName, 1);
     gpResourceManager->PointToFile(jb);
     m_savedBackground = NULL;
-    m_prevWindow = NULL;
-    m_nextWindow = m_prevWindow;
+    m_nextWindow = m_prevWindow = NULL;
     m_winState = WINDOW_STATE_CLOSED;
     m_zOrder = -1;
     m_posX = x;
@@ -104,80 +98,79 @@ heroWindow::heroWindow(i32 x, i32 y, char* resourceName) {
     m_winHeight = gpResourceManager->ReadWord();
     m_winFlags = static_cast<WindowFlag>(gpResourceManager->ReadWord());
     m_winFlags |= WINDOW_FLAG_OWNS_WIDGETS;
-    m_widgetListHead = NULL;
-    m_widgetListTail = m_widgetListHead;
+    m_widgetListTail = m_widgetListHead = NULL;
     idx = 0;
     while (idx == 0) {
         PollSound();
         type = static_cast<WindowWidgetRecordType>(gpResourceManager->ReadWord());
-        pwdg = NULL;
+        pWidget = NULL;
         switch (type) {
             case WIDGET_RECORD_END:
                 idx++;
                 break;
             case WIDGET_RECORD_BORDER:
-                pbd = new border();
-                pbd->Read();
-                pwdg = pbd;
+                pBorder = new border();
+                pBorder->Read();
+                pWidget = pBorder;
                 break;
             case WIDGET_RECORD_BUTTON:
-                pbtn = new button();
-                pbtn->Read();
-                pwdg = pbtn;
+                pButton = new button();
+                pButton->Read();
+                pWidget = pButton;
                 break;
             case WIDGET_RECORD_ICON:
-                picn = new iconWidget();
-                picn->Read();
-                pwdg = picn;
+                pIcon = new iconWidget();
+                pIcon->Read();
+                pWidget = pIcon;
                 break;
             case WIDGET_RECORD_DIMMER:
-                pdim = new dimmerWidget();
-                pdim->Read();
-                pwdg = pdim;
+                pDimmer = new dimmerWidget();
+                pDimmer->Read();
+                pWidget = pDimmer;
                 break;
             case WIDGET_RECORD_TEXT:
-                ptw = new textWidget();
-                ptw->Read();
-                pwdg = ptw;
+                pText = new textWidget();
+                pText->Read();
+                pWidget = pText;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY:
-                pte = new textEntryWidget();
-                pte->Read(TEXT_ENTRY_READ_DEFAULT);
-                pwdg = pte;
+                pTextEnt = new textEntryWidget();
+                pTextEnt->Read(TEXT_ENTRY_READ_DEFAULT);
+                pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_RECT:
-                pte = new textEntryWidget();
-                pte->Read(TEXT_ENTRY_READ_RECT);
-                pwdg = pte;
+                pTextEnt = new textEntryWidget();
+                pTextEnt->Read(TEXT_ENTRY_READ_RECT);
+                pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_MULTILINE:
-                pte = new textEntryWidget();
-                pte->Read(TEXT_ENTRY_READ_MULTILINE);
-                pwdg = pte;
+                pTextEnt = new textEntryWidget();
+                pTextEnt->Read(TEXT_ENTRY_READ_MULTILINE);
+                pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_INSET_FIVE:
-                pte = new textEntryWidget();
-                pte->Read(TEXT_ENTRY_READ_INSET_FIVE);
-                pwdg = pte;
+                pTextEnt = new textEntryWidget();
+                pTextEnt->Read(TEXT_ENTRY_READ_INSET_FIVE);
+                pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_TEXT_ENTRY_INSET_FOUR:
-                pte = new textEntryWidget();
-                pte->Read(TEXT_ENTRY_READ_INSET_FOUR);
-                pwdg = pte;
+                pTextEnt = new textEntryWidget();
+                pTextEnt->Read(TEXT_ENTRY_READ_INSET_FOUR);
+                pWidget = pTextEnt;
                 break;
             case WIDGET_RECORD_DROP_LIST:
-                pdl = new dropListWidget();
-                pdl->Read();
-                pwdg = pdl;
+                pDrop = new dropListWidget();
+                pDrop->Read();
+                pWidget = pDrop;
                 break;
             case WIDGET_RECORD_LIST_BOX:
-                plist = new listBoxWidget();
-                plist->Read();
-                pwdg = plist;
+                pListBox = new listBoxWidget();
+                pListBox->Read();
+                pWidget = pListBox;
                 break;
         }
-        if (idx == 0 && pwdg != NULL)
-            AddWidget(pwdg, -1);
+        if (idx == 0 && pWidget != NULL)
+            AddWidget(pWidget, -1);
     }
 }
 
@@ -264,13 +257,13 @@ void heroWindow::RemoveWidget(class widget* w) {
     if (w == NULL)
         return;
     w->Close();
-    if (m_widgetListTail == w) {
+    if (w == m_widgetListTail) {
         m_widgetListTail = w->m_prev;
         if (m_widgetListTail == NULL)
             m_widgetListHead = NULL;
         else
             m_widgetListTail->m_next = NULL;
-    } else if (m_widgetListHead == w) {
+    } else if (w == m_widgetListHead) {
         m_widgetListHead = w->m_next;
         m_widgetListHead->m_prev = NULL;
     } else {
@@ -279,8 +272,7 @@ void heroWindow::RemoveWidget(class widget* w) {
     }
     widget* nextWidget = w->m_next;
     if (nextWidget == NULL) {
-        m_widgetListHead = NULL;
-        m_widgetListTail = m_widgetListHead;
+        m_widgetListTail = m_widgetListHead = NULL;
     } else {
         nextWidget->m_prev = w->m_prev;
         if (nextWidget->m_prev != NULL)

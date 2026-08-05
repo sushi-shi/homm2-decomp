@@ -53,3 +53,41 @@ needed the same on both `m_cursorMapX/Y = VIEW_CENTER_CELL` and
 reload-and-copy triple, the source really is the chained `a = b;` form — see the
 `CompleteDraw` all-black origin reset row in docs/cross-version-spellings.md, where
 PoL 2.0 spells the chain and Buka spells two literals.
+
+## The genuine chained EXPRESSION `a = b = K` is the literal form, not the copy form
+
+The two spellings above are `a = K; b = K;` and `a = K; b = a;` — two *statements*.
+The third spelling, a single chained assignment expression, is a distinct source form
+and VC6 folds it to the **literal** shape: the inner assignment's value is the
+constant, not a reload of `b`.
+
+`heroWindow::heroWindow(void)` (0xba5c0), `heroWindow(i32,i32,i32,i32,WindowFlag)`
+(0xba660), `heroWindow(i32,i32,char*)` (0xba700) and `heroWindow::RemoveWidget`
+(0xbb0d0) each carry two or three such pairs; retail stores immediates in both slots
+and the store ORDER is inner-then-outer, which is what names the spelling:
+
+```
+ours   m_prevWindow = NULL;                    retail (and the fix)
+       m_nextWindow = m_prevWindow;                   m_nextWindow = m_prevWindow = NULL;
+------------------------------------------     ------------------------------------------
+8b 4d fc        movl -0x4(%ebp), %ecx          8b 4d fc        movl -0x4(%ebp), %ecx
+c7 41 08 00..   movl $0x0, 0x8(%ecx)           c7 41 08 00..   movl $0x0, 0x8(%ecx)
+8b 55 fc        movl -0x4(%ebp), %edx          8b 55 fc        movl -0x4(%ebp), %edx
+8b 45 fc        movl -0x4(%ebp), %eax          c7 42 04 00..   movl $0x0, 0x4(%edx)
+8b 48 08        movl 0x8(%eax), %ecx
+89 4a 04        movl %ecx, 0x4(%edx)
+```
+
+`m_prevWindow` is 0x8 and `m_nextWindow` is 0x4, so retail writes 0x8 first: the
+INNER target of `m_nextWindow = m_prevWindow = NULL`. Reading the store order
+therefore recovers which name the source put on the right. The same evidence gives
+`m_posX = m_posY = 0` (0x2c before 0x28) and
+`m_widgetListTail = m_widgetListHead = NULL` (0x3c before 0x38).
+
+Consequence for the census: a pair of immediate stores does NOT prove two independent
+statements. Two statements repeat the constant in source order; the chained
+expression writes the RIGHTMOST target first. Both are byte-identical only when the
+two fields happen to be stored in the other order.
+
+All four functions closed EXACT with this plus the `w == m_widgetListTail` operand
+order in `RemoveWidget`.

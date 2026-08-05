@@ -8,11 +8,11 @@ H2_ENUM_BEGIN(WindowColorCycleConstant)
     ALTERNATE_CYCLE_REFLECTION_THRESHOLD = 4,
     CYCLE_PALETTE_OFFSET                 = 0x282,
     CYCLE_PALETTE_BYTES                  = 84,
-    COMBAT_CYCLE_SOURCE_OFFSET           = 0x14a,
-    ALTERNATE_CYCLE_SOURCE_OFFSET        = 0x144,
+    COMBAT_CYCLE_FIRST_COLOR = 0x6e,
+    ALTERNATE_CYCLE_FIRST_COLOR = 0x6c,
     WORLD_CYCLE_FRAME_COLOR_STEP         = 3,
-    COMBAT_CYCLE_FRAME_BYTES             = 12,
-    ALTERNATE_CYCLE_FRAME_BYTES          = 21
+    COMBAT_CYCLE_FRAME_COLORS = 4,
+    ALTERNATE_CYCLE_FRAME_COLORS = 7
 H2_ENUM_END(WindowColorCycleConstant)
 
 H2_ENUM_BEGIN(WindowColorCyclePaletteOffset)
@@ -48,8 +48,7 @@ H2_ENUM_END(WindowScreenConstant)
 
 H2_ENUM_BEGIN(WindowPaletteConstant)
     PALETTE_COLOR_BYTES = 3,
-    PALETTE_BYTE_COUNT  = 0x300,
-    PALETTE_DWORD_COUNT = 0xc0
+    PALETTE_BYTE_COUNT = 0x300
 H2_ENUM_END(WindowPaletteConstant)
 
 H2_ENUM_BEGIN(WindowFizzleConstant)
@@ -79,7 +78,7 @@ static inline u32& FadeSavedUpdate(void) {
 
 
 i32 iCombatCycleFrame = 0;
-b32 gbEveryOtherCycle = true;
+u8 gbEveryOtherCycle = true;
 i32 iCycle1Count = 0;
 i32 iCycle2Count = 0;
 i32 iCycle3Count = 0;
@@ -97,8 +96,11 @@ VA(0x004b6b80, 0x3ff)
 void CycleColors(i32 forceUpdate) {
     i8 savedColor[PALETTE_COLOR_BYTES];
     iCycle1Count++;
-    if (gpWindowManager == NULL || gpBufferPalette == NULL
-        || gpWindowManager->m_active != 1)
+    if (gpWindowManager == NULL)
+        return;
+    if (gpBufferPalette == NULL)
+        return;
+    if (gpWindowManager->m_active != 1)
         return;
     if (gpWindowManager->m_updateFlags == 0 && forceUpdate == 0)
         return;
@@ -106,31 +108,26 @@ void CycleColors(i32 forceUpdate) {
     if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT)
         gbEveryOtherCycle = true;
     else
-        gbEveryOtherCycle = 1 - gbEveryOtherCycle;
+        gbEveryOtherCycle = !gbEveryOtherCycle;
 
-    if (gbEveryOtherCycle != 0) {
-        if (giCycleType == WINDOW_COLOR_CYCLE_WORLD_VIEW) {
-            iCombatCycleFrame = (iCombatCycleFrame + 1) % CYCLE_FRAME_COUNT;
-            i32 frame = iCombatCycleFrame;
-            if (frame >= CYCLE_REFLECTION_THRESHOLD)
-                frame = CYCLE_FRAME_COUNT - frame;
-            else
-                frame = iCombatCycleFrame;
-            u8 cycleIndices[WORLD_CYCLE_COLOR_COUNT] =
-                {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
-            for (i32 colorIndex = 0; colorIndex < WORLD_CYCLE_COLOR_COUNT; ++colorIndex) {
-                i8* src = gpBufferPalette->m_data
-                          + (cycleIndices[colorIndex] + frame * WORLD_CYCLE_FRAME_COLOR_STEP)
-                                * PALETTE_COLOR_BYTES;
-                memcpy(
-                    gCyclePal + colorIndex * PALETTE_COLOR_BYTES,
-                    src,
-                    PALETTE_COLOR_BYTES
-                );
-            }
-            goto updatePalette;
-        }
+    if (gbEveryOtherCycle == 0)
+        goto cycleType;
 
+    if (giCycleType == WINDOW_COLOR_CYCLE_WORLD_VIEW) {
+        iCombatCycleFrame = (iCombatCycleFrame + 1) % CYCLE_FRAME_COUNT;
+        i32 cycleFrame = iCombatCycleFrame < CYCLE_REFLECTION_THRESHOLD
+                             ? iCombatCycleFrame
+                             : CYCLE_FRAME_COUNT - iCombatCycleFrame;
+        u8 colorIndices[WORLD_CYCLE_COLOR_COUNT] = {0x98, 0x43, 0x59, 0xb5, 0x70, 0xdb, 0x87, 0x10};
+        for (i32 colorIndex = 0; colorIndex < WORLD_CYCLE_COLOR_COUNT; colorIndex++)
+            memcpy(
+                gCyclePal + colorIndex * PALETTE_COLOR_BYTES,
+                gpBufferPalette->m_data
+                    + (colorIndices[colorIndex] + cycleFrame * WORLD_CYCLE_FRAME_COLOR_STEP)
+                          * PALETTE_COLOR_BYTES,
+                PALETTE_COLOR_BYTES
+            );
+    } else {
         memcpy(
             savedColor,
             gCyclePal + CYCLE_ROTATION_1_SAVE_OFFSET,
@@ -206,58 +203,43 @@ void CycleColors(i32 forceUpdate) {
             savedColor,
             PALETTE_COLOR_BYTES
         );
+
+    cycleType:
+        if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT) {
+            memcpy(savedColor, gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET, PALETTE_COLOR_BYTES);
+            memmove(
+                gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET,
+                gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
+                PALETTE_COLOR_BYTES
+            );
+            memcpy(gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET, savedColor, PALETTE_COLOR_BYTES);
+        } else if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
+            iCombatCycleFrame = (iCombatCycleFrame + 1) % CYCLE_FRAME_COUNT;
+            i32 cycleFrame = iCombatCycleFrame < CYCLE_REFLECTION_THRESHOLD
+                                 ? iCombatCycleFrame
+                                 : CYCLE_FRAME_COUNT - iCombatCycleFrame;
+            memcpy(
+                gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
+                gpBufferPalette->m_data
+                    + (COMBAT_CYCLE_FIRST_COLOR + cycleFrame * COMBAT_CYCLE_FRAME_COLORS)
+                          * PALETTE_COLOR_BYTES,
+                PALETTE_COLOR_BYTES
+            );
+        } else if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE) {
+            iCombatCycleFrame = (iCombatCycleFrame + 1) % ALTERNATE_CYCLE_FRAME_COUNT;
+            i32 cycleFrame = iCombatCycleFrame < ALTERNATE_CYCLE_REFLECTION_THRESHOLD
+                                 ? iCombatCycleFrame
+                                 : ALTERNATE_CYCLE_FRAME_COUNT - iCombatCycleFrame;
+            memcpy(
+                gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
+                gpBufferPalette->m_data
+                    + (ALTERNATE_CYCLE_FIRST_COLOR + cycleFrame * ALTERNATE_CYCLE_FRAME_COLORS)
+                          * PALETTE_COLOR_BYTES,
+                PALETTE_COLOR_BYTES
+            );
+        }
     }
 
-    if (giCycleType == WINDOW_COLOR_CYCLE_DEFAULT) {
-        memcpy(
-            savedColor,
-            gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET,
-            PALETTE_COLOR_BYTES
-        );
-        memmove(
-            gCyclePal + DEFAULT_CYCLE_SAVE_OFFSET,
-            gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
-            PALETTE_COLOR_BYTES
-        );
-        memcpy(
-            gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
-            savedColor,
-            PALETTE_COLOR_BYTES
-        );
-        goto updatePalette;
-    }
-
-    if (giCycleType == WINDOW_COLOR_CYCLE_COMBAT) {
-        iCombatCycleFrame = (iCombatCycleFrame + 1) % CYCLE_FRAME_COUNT;
-        i32 frame = iCombatCycleFrame;
-        if (frame >= CYCLE_REFLECTION_THRESHOLD)
-            frame = CYCLE_FRAME_COUNT - frame;
-        else
-            frame = iCombatCycleFrame;
-        memcpy(
-            gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
-            gpBufferPalette->m_data + COMBAT_CYCLE_SOURCE_OFFSET
-                + frame * COMBAT_CYCLE_FRAME_BYTES,
-            PALETTE_COLOR_BYTES
-        );
-    } else {
-        if (giCycleType != WINDOW_COLOR_CYCLE_COMBAT_ALTERNATE)
-            goto updatePalette;
-        i32 frame = (iCombatCycleFrame + 1) % ALTERNATE_CYCLE_FRAME_COUNT;
-        iCombatCycleFrame = frame;
-        if (frame >= ALTERNATE_CYCLE_REFLECTION_THRESHOLD)
-            frame = ALTERNATE_CYCLE_FRAME_COUNT - frame;
-        else
-            frame = iCombatCycleFrame;
-        memcpy(
-            gCyclePal + DEFAULT_CYCLE_SOURCE_OFFSET,
-            gpBufferPalette->m_data + ALTERNATE_CYCLE_SOURCE_OFFSET
-                + frame * ALTERNATE_CYCLE_FRAME_BYTES,
-            PALETTE_COLOR_BYTES
-        );
-    }
-
-updatePalette:
     memcpy(
         gpBufferPalette->m_data + CYCLE_PALETTE_OFFSET,
         gCyclePal,
@@ -299,13 +281,8 @@ heroWindowManager::heroWindowManager(void) : baseManager() {
 
 VA(0x004b7020, 0x12e)
 i32 heroWindowManager::Open(i32 managerOrder) {
-    i32 i;
     InitVideo();
-    i32* pal = reinterpret_cast<i32*>(gpBufferPalette->m_data);
-    for (i = PALETTE_DWORD_COUNT; i != 0; i--) {
-        *pal = 0;
-        pal++;
-    }
+    memset(gpBufferPalette->m_data, 0, PALETTE_BYTE_COUNT);
     SetPalette(gpBufferPalette->m_data, 1);
     m_screen = new bitmap();
     if (m_screen == NULL)
@@ -319,8 +296,8 @@ i32 heroWindowManager::Open(i32 managerOrder) {
         FRAMEBUFFER_FILL_COLOR,
         SCREEN_WIDTH * SCREEN_HEIGHT
     );
-    m_priority = managerOrder;
     m_messageMask = BASE_MANAGER_ACCEPT_RIGHT_BUTTON_DOWN;
+    m_priority = managerOrder;
     m_active = true;
     strcpy(m_name, "heroWindowManager");
     return 0;
@@ -345,15 +322,19 @@ void heroWindowManager::Close(void) {
 
 VA(0x004b71f0, 0x5b)
 MessageDispatchResult heroWindowManager::Main(struct tag_message& msg) {
-    MessageDispatchResult result = MESSAGE_DISPATCH_CONTINUE;
+    MessageDispatchResult ret = MESSAGE_DISPATCH_CONTINUE;
     heroWindow* w = m_windowListTail;
     while (w != NULL) {
-        result = w->BroadcastMessage(msg);
-        if (result >= MESSAGE_DISPATCH_CONSUME && result <= MESSAGE_DISPATCH_FORWARD)
-            break;
+        switch (ret = w->BroadcastMessage(msg)) {
+            case MESSAGE_DISPATCH_CONTINUE:
+                break;
+            case MESSAGE_DISPATCH_CONSUME:
+            case MESSAGE_DISPATCH_FORWARD:
+                return ret;
+        }
         w = w->m_prevWindow;
     }
-    return result;
+    return ret;
 }
 
 VA(0x004b7250, 0x1c)
@@ -375,32 +356,25 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 
 VA(0x004b72b0, 0x142)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
-    i32 z;
     if (HAS(w->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
-        z = 0;
-    else
-        z = zOrder;
-    if (z == -1) {
-        z = 0;
-        if (cur != NULL)
-            z = cur->m_zOrder + 1;
+        zOrder = 0;
+    if (zOrder == -1) {
+        if (cur == NULL)
+            zOrder = 0;
+        else
+            zOrder = cur->m_zOrder + 1;
     }
-    if (z != 0 && m_windowListHead == NULL)
+    if (zOrder != 0 && m_windowListHead == NULL)
         return;
-    if (w->Open(z, openFlags) != 0)
+    if (w->Open(zOrder, openFlags) != 0)
         return;
-    if (cur != NULL) {
-        do {
-            if (cur->m_zOrder <= z)
-                break;
-            cur = cur->m_prevWindow;
-        } while (cur != NULL);
-    }
+    while (cur != NULL && cur->m_zOrder > zOrder)
+        cur = cur->m_prevWindow;
     if (cur == NULL) {
         w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = NULL;
         m_windowListHead = w;
-        if (m_windowListHead == NULL)
+        if (m_windowListTail == NULL)
             m_windowListTail = w;
     } else if (cur->m_nextWindow == NULL) {
         w->m_prevWindow = m_windowListTail;
@@ -468,9 +442,9 @@ i32 heroWindowManager::DoDialog(
     if (fade != 0)
         gpWindowManager->FadeScreen(FADE_IN, DIALOG_FADE_STEPS, gPalette);
     gpInputManager->Flush();
-    done = 0;
     m_dialogResult = HERO_WINDOW_NO_DIALOG_RESULT;
-    do {
+    done = 0;
+    while (done == 0) {
         PollSound();
         Process1WindowsMessage();
         message = gpInputManager->GetEvent();
@@ -487,10 +461,12 @@ i32 heroWindowManager::DoDialog(
         if (result == MESSAGE_DISPATCH_FORWARD && message.type == MESSAGE_WIDGET
             && message.payload.widget.command == WIDGET_COMMAND_DIALOG_SELECT)
             done = 1;
-    } while (done == 0);
-    if (window != NULL)
-        RemoveWindow(window);
-    gpInputManager->Flush();
+    }
+    if (done != 0) {
+        if (window != NULL)
+            RemoveWindow(window);
+        gpInputManager->Flush();
+    }
     gbInDialog = false;
     iDialogNestCount--;
     if (iDialogNestCount == 0)
@@ -520,8 +496,11 @@ void heroWindowManager::UpdateScreenRegion(i32 x, i32 y, i32 w, i32 h) {
 
 VA(0x004b7710, 0x2f)
 void heroWindowManager::RedrawScreen(void) {
-    for (heroWindow* w = m_windowListHead; w != NULL; w = w->m_nextWindow)
+    heroWindow* w = m_windowListHead;
+    while (w != NULL) {
         w->DrawWindow();
+        w = w->m_nextWindow;
+    }
 }
 
 VA(0x004b7740, 0x8f)
@@ -534,8 +513,7 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
             m_updateFlags = 0;
             PollSound();
             FadeIn(steps);
-            m_updateFlags = FadeSavedUpdate() | saved;
-            PollSound();
+            m_updateFlags = saved | FadeSavedUpdate();
             break;
         }
         case FADE_OUT:
@@ -543,12 +521,9 @@ void heroWindowManager::FadeScreen(WindowFadeMode direction, i32 steps, class pa
             m_updateFlags = 0;
             PollSound();
             FadeOut(steps);
-            PollSound();
-            break;
-        default:
-            PollSound();
             break;
     }
+    PollSound();
 }
 
 VA(0x004b77d0, 0x63)
@@ -604,86 +579,87 @@ void heroWindowManager::FizzleForward(
     i8* startPalette,
     i8* endPalette
 ) {
-    if (bShowIt != 0) {
-        gbEnlargeScreenBlit = false;
-        i32 tick = 0;
-        if (x < 0) {
-            width += x;
-            x = 0;
-        }
-        if (y < 0) {
-            height += y;
-            y = 0;
-        }
-        if (x + width > SCREEN_WIDTH)
-            width = SCREEN_WIDTH - x;
-        if (y + height > SCREEN_HEIGHT)
-            height = SCREEN_HEIGHT - y;
-        if (width > 0 && height > 0) {
-            m_updateFlags = 0;
-            if (delay == -1)
-                delay = FIZZLE_DEFAULT_DELAY;
-            i8* fadePalette = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
-            m_fizzleWork =
-                new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
-            i8* cycleTable = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
-            BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
+    u8* workPixel;
+    u8* screenPixel;
+    i8* paletteBuf;
+    u8* savePixel;
+    i32l tickStart;
+    i32 i;
+    i32 frame;
+    i32 sourceY;
+    i32 sourceX;
+    i8* ccycleBuf;
+    i32 saveFlags;
 
-            for (i32 frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
-                sprintf(gText, "CCYCLE%02d.BIN", frame);
-                gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
-                gpResourceManager->ReadBlock(cycleTable, FIZZLE_CYCLE_TABLE_BYTES);
-                i32 sourceY = y;
-                if (sourceY < y + height) {
-                    i32 screenOffset = y * SCREEN_WIDTH;
-                    i32 workOffset = 0;
-                    do {
-                        u8* savedPixel =
-                            m_fizzleSource->m_pixels + m_fizzleSource->m_width * (sourceY - y);
-                        u8* workPixel = m_fizzleWork->m_pixels + workOffset;
-                        u8* screenPixel = m_screen->m_pixels + x + screenOffset;
-                        if (x < x + width) {
-                            i32 remaining = width;
-                            do {
-                                u16 lookup = *workPixel++
-                                             | (*savedPixel++ << FIZZLE_LOOKUP_HIGH_BYTE_SHIFT);
-                                *screenPixel++ = cycleTable[lookup];
-                                remaining--;
-                            } while (remaining != 0);
-                        }
-                        screenOffset += SCREEN_WIDTH;
-                        workOffset += width;
-                        sourceY++;
-                    } while (sourceY < y + height);
-                }
-                PollSound();
-                DelayTilMilli(delay + tick);
-                tick = KBTickCount();
-                BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
-                if (startPalette != NULL) {
-                    memcpy(fadePalette, startPalette, PALETTE_BYTE_COUNT);
-                    for (i32 i = 0; i < PALETTE_BYTE_COUNT; i++)
-                        fadePalette[i] += (endPalette[i] - startPalette[i]) * (frame + 1)
-                                          / CYCLE_FRAME_COUNT;
-                    UpdatePalette(fadePalette);
-                }
-                PollSound();
-            }
-            DelayTilMilli(delay + tick);
-            BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
-            BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
-            gbEnlargeScreenBlit = true;
-            m_updateFlags = m_updateFlags;
-            if (m_fizzleSource != NULL)
-                delete m_fizzleSource;
-            m_fizzleSource = NULL;
-            if (m_fizzleWork != NULL)
-                delete m_fizzleWork;
-            m_fizzleWork = NULL;
-            H2_FREE(cycleTable);
-            H2_FREE(fadePalette);
-        }
+    if (bShowIt == 0)
+        return;
+    gbEnlargeScreenBlit = false;
+    tickStart = 0;
+    if (x < 0) {
+        width += x;
+        x = 0;
     }
+    if (y < 0) {
+        height += y;
+        y = 0;
+    }
+    if (x + width > SCREEN_WIDTH)
+        width = SCREEN_WIDTH - x;
+    if (y + height > SCREEN_HEIGHT)
+        height = SCREEN_HEIGHT - y;
+    if (width <= 0 || height <= 0)
+        return;
+
+    saveFlags = m_updateFlags;
+    m_updateFlags = 0;
+    if (delay == -1)
+        delay = FIZZLE_DEFAULT_DELAY;
+    paletteBuf = static_cast<i8*>(H2_ALLOC(PALETTE_BYTE_COUNT));
+    m_fizzleWork = new bitmap(BITMAP_TYPE_NONE, static_cast<i16>(width), static_cast<i16>(height));
+    ccycleBuf = static_cast<i8*>(H2_ALLOC(FIZZLE_CYCLE_TABLE_BYTES));
+    BlitBitmap(m_screen, x, y, width, height, m_fizzleWork, 0, 0);
+
+    for (frame = 0; frame < CYCLE_FRAME_COUNT; frame++) {
+        sprintf(gText, "CCYCLE%02d.BIN", frame);
+        gpResourceManager->PointToFile((gpResourceManager->MakeId(gText, 1)));
+        gpResourceManager->ReadBlock(ccycleBuf, FIZZLE_CYCLE_TABLE_BYTES);
+        for (sourceY = y; sourceY < y + height; sourceY++) {
+            savePixel = m_fizzleSource->m_pixels + (sourceY - y) * m_fizzleSource->m_width;
+            workPixel = m_fizzleWork->m_pixels + (sourceY - y) * width;
+            screenPixel = m_screen->m_pixels + sourceY * SCREEN_WIDTH + x;
+            for (sourceX = x; sourceX < x + width; sourceX++) {
+                *screenPixel = ccycleBuf[static_cast<u16>(
+                    *workPixel | (*savePixel << FIZZLE_LOOKUP_HIGH_BYTE_SHIFT)
+                )];
+                savePixel++;
+                workPixel++;
+                screenPixel++;
+            }
+        }
+        PollSound();
+        DelayTilMilli(tickStart + delay);
+        tickStart = KBTickCount();
+        BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
+        if (startPalette != NULL) {
+            memcpy(paletteBuf, startPalette, PALETTE_BYTE_COUNT);
+            for (i = 0; i < PALETTE_BYTE_COUNT; i++)
+                paletteBuf[i] +=
+                    (frame + 1) * (endPalette[i] - startPalette[i]) / CYCLE_FRAME_COUNT;
+            UpdatePalette(paletteBuf);
+        }
+        PollSound();
+    }
+    DelayTilMilli(tickStart + delay);
+    BlitBitmap(m_fizzleWork, 0, 0, width, height, m_screen, x, y);
+    BlitBitmapToScreen(m_screen, x, y, width, height, x, y);
+    gbEnlargeScreenBlit = true;
+    m_updateFlags = saveFlags;
+    delete m_fizzleSource;
+    m_fizzleSource = NULL;
+    delete m_fizzleWork;
+    m_fizzleWork = NULL;
+    H2_FREE(ccycleBuf);
+    H2_FREE(paletteBuf);
 }
 
 VA(0x004b7e20, 0x4d)
