@@ -62,10 +62,10 @@ public:
     i16 m_scrollThumbWidth;
     i16 m_scrollThumbHeight;
     i16 m_scrollThumbTravel;
-    char m_scrollUpPressed;
-    char m_scrollDownPressed;
-    char m_scrollThumbDragging;
-    char m_itemSelectionTracking;
+    u8 m_scrollUpPressed;
+    u8 m_scrollDownPressed;
+    u8 m_scrollThumbDragging;
+    u8 m_itemSelectionTracking;
     bitmap* m_scrollbar;
     listBoxWidget(void);
     virtual ~listBoxWidget() OVERRIDE;

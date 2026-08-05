@@ -56,8 +56,7 @@ H2_ENUM_BEGIN(ListBoxFrame)
 H2_ENUM_END(ListBoxFrame)
 
 H2_ENUM_BEGIN(ListBoxStorageConstant)
-    RESOURCE_NAME_CAPACITY  = 16,
-    FRAME_HEIGHT_SLOT_COUNT = 2
+    RESOURCE_NAME_CAPACITY = 16
 H2_ENUM_END(ListBoxStorageConstant)
 
 H2_ENUM_BEGIN(ListBoxLayoutConstant)
@@ -78,8 +77,6 @@ H2_ENUM_BEGIN(ListBoxSelectionClickCount)
     SELECTION_SINGLE_CLICK = 1,
     SELECTION_DOUBLE_CLICK = 2
 H2_ENUM_END(ListBoxSelectionClickCount)
-
-
 
 VA(0x004ce6a0, 0x5d)
 listBoxWidget::listBoxWidget(void) : widget(0, 0, 0, 0, 0, WIDGET_KIND_NONE) {
@@ -107,28 +104,20 @@ listBoxWidget::~listBoxWidget() {
 
 VA(0x004ce840, 0x41c)
 void listBoxWidget::Read(void) {
-    i16 frameHeight[FRAME_HEIGHT_SLOT_COUNT];
-    i8 iconName[RESOURCE_NAME_CAPACITY];
-    IconEntry* iconEntry;
-    i16 bottomY;
-    i16 topY;
-    i16 rightX;
-    i16 firstRowHeight;
-    i16 listX;
-    i16 rowHeight;
-    i16 listY;
-    i16 lastRowHeight;
+    IconEntry* entry;
+    i8 name[RESOURCE_NAME_CAPACITY];
+
     m_x = gpResourceManager->ReadWord();
     m_y = gpResourceManager->ReadWord();
     m_width = gpResourceManager->ReadWord();
     m_height = gpResourceManager->ReadWord();
-    gpResourceManager->Read13(iconName);
+    gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(iconName));
+    m_font = gpResourceManager->GetFont(reinterpret_cast<char*>(name));
     gpResourceManager->RestorePosition();
-    gpResourceManager->Read13(iconName);
+    gpResourceManager->Read13(name);
     gpResourceManager->SavePosition();
-    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(iconName));
+    m_icon = gpResourceManager->GetIcon(reinterpret_cast<char*>(name));
     gpResourceManager->RestorePosition();
     m_maxVisibleItems = gpResourceManager->ReadWord();
     m_normalColor = static_cast<FontDrawMode>(gpResourceManager->ReadWord());
@@ -146,43 +135,36 @@ void listBoxWidget::Read(void) {
     m_scrollTrackMiddleFrame = FRAME_SCROLL_TRACK_MIDDLE;
     m_scrollTrackLastFrame = FRAME_SCROLL_TRACK_LAST;
     m_scrollThumbFrame = FRAME_SCROLL_THUMB;
-    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_THUMB)];
-    m_scrollThumbWidth = iconEntry->w;
-    frameHeight[0] = iconEntry->h;
-    m_scrollThumbHeight = frameHeight[0];
-    firstRowHeight = m_icon->Entries()[IDX(FRAME_FIRST_ROW)].h;
-    m_firstRowHeight = firstRowHeight;
-    listX = m_x;
-    rowHeight = m_icon->Entries()[IDX(FRAME_MIDDLE_ROW)].h;
-    listY = m_y;
-    m_rowHeight = rowHeight;
-    lastRowHeight = m_icon->Entries()[IDX(FRAME_LAST_ROW)].h;
-    m_lastRowHeight = lastRowHeight;
-    m_listX = listX;
-    m_listY = listY;
-    m_listWidth = m_icon->Entries()[IDX(FRAME_FIRST_ROW)].w;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollThumbFrame;
+    m_scrollThumbWidth = entry->w;
+    m_scrollThumbHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
+    m_firstRowHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_middleRowFrame;
+    m_rowHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_lastRowFrame;
+    m_lastRowHeight = entry->h;
+    m_listX = m_x;
+    m_listY = m_y;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_firstRowFrame;
+    m_listWidth = entry->w;
     m_listHeight = (m_maxVisibleItems - LIST_EDGE_ROW_COUNT) * m_rowHeight + m_firstRowHeight
                    + m_lastRowHeight;
-    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_UP)];
-    m_scrollUpWidth = iconEntry->w;
-    m_scrollUpHeight = iconEntry->h;
-    iconEntry = &m_icon->Entries()[IDX(FRAME_SCROLL_DOWN)];
-    m_scrollDownWidth = iconEntry->w;
-    m_scrollDownHeight = iconEntry->h;
-    rightX = m_width - m_scrollUpWidth + m_x;
-    m_scrollUpX = rightX;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollUpFrame;
+    m_scrollUpWidth = entry->w;
+    m_scrollUpHeight = entry->h;
+    entry = reinterpret_cast<IconEntry*>(m_icon->m_data) + m_scrollDownFrame;
+    m_scrollDownWidth = entry->w;
+    m_scrollDownHeight = entry->h;
+    m_scrollUpX = m_x + m_width - 1 - (m_scrollUpWidth - 1);
     m_scrollUpY = m_y;
-    m_scrollDownX = rightX;
-    bottomY = m_y + m_height - m_scrollDownHeight;
-    m_scrollDownY = bottomY;
-    m_scrollTrackX = rightX;
-    topY = m_y + m_scrollUpHeight;
-    bottomY -= topY;
-    m_scrollTrackY = topY;
+    m_scrollDownX = m_scrollUpX;
+    m_scrollDownY = m_y + m_height - 1 - m_scrollDownHeight + 1;
+    m_scrollTrackX = m_scrollUpX;
+    m_scrollTrackY = m_scrollUpY + m_scrollUpHeight;
     m_scrollTrackWidth = m_scrollDownWidth;
-    m_scrollTrackHeight = bottomY;
-    m_scrollThumbTravel =
-        m_scrollTrackHeight - frameHeight[0] - SCROLL_THUMB_TRAVEL_PADDING;
+    m_scrollTrackHeight = m_scrollDownY - m_scrollTrackY;
+    m_scrollThumbTravel = m_scrollTrackHeight - m_scrollThumbHeight - SCROLL_THUMB_TRAVEL_PADDING;
     m_scrollUpPressed = 0;
     m_scrollDownPressed = 0;
     m_itemSelectionTracking = 0;
@@ -232,100 +214,110 @@ void listBoxWidget::DeleteItem(i32 index) {
 
 VA(0x004cee60, 0x48c)
 MessageDispatchResult listBoxWidget::Main(tag_message& message) {
+    i16 x;
+    i16 y;
+    char* text;
+    char** newItems;
+
     if (!HAS(m_flags, WIDGET_FLAG_ENABLED)) {
         if (message.type == MESSAGE_WIDGET)
             return widget::Main(message);
         return MESSAGE_DISPATCH_CONTINUE;
     }
+
     switch (message.type) {
-        case MESSAGE_MOUSE_MOVE:
-        case MESSAGE_LEFT_BUTTON_UP:
-            if (HAS(m_flags, WIDGET_FLAG_DRAW))
-                return ProcessMouseMessage(message);
-            break;
-        case MESSAGE_LEFT_BUTTON_DOWN:
-        case MESSAGE_RIGHT_BUTTON_DOWN: {
-            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
-                break;
-            i16 mx = message.payload.mouse.x - m_owner->m_posX;
-            i16 my = message.payload.mouse.y - m_owner->m_posY;
-            i16 left = m_x;
-            if (left > mx || m_y > my || left + m_width <= mx || m_y + m_height <= my)
-                return MESSAGE_DISPATCH_CONTINUE;
-            if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
-                message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
-                message.type = MESSAGE_WIDGET;
-                message.payload.widget.id = m_id;
-                message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
-                return MESSAGE_DISPATCH_FORWARD;
-            }
-            return ProcessMouseMessage(message);
-        }
         case MESSAGE_WIDGET:
             switch (message.payload.widget.command) {
-                case WIDGET_COMMAND_SET_SELECTION:
-                    if (m_id == message.payload.widget.id) {
-                        m_selectedIndex = message.payload.widget.data.value;
-                        return MESSAGE_DISPATCH_CONSUME;
-                    }
+                case WIDGET_COMMAND_CLEAR_ITEMS:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    while (m_itemCount != 0)
+                        DeleteItem(0);
                     break;
-                case WIDGET_COMMAND_GET_SELECTION:
-                    if (m_id == message.payload.widget.id) {
-                        message.payload.widget.data.value = m_selectedIndex;
-                        return MESSAGE_DISPATCH_CONSUME;
-                    }
+
+                case WIDGET_COMMAND_DELETE_ITEM:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    DeleteItem(message.payload.widget.data.value);
                     break;
+
                 case WIDGET_COMMAND_REPLACE_ITEM:
-                    if (m_id == message.payload.widget.id) {
-                        char* text = message.payload.widget.data.text;
-                        if (m_itemCount <= message.payload.widget.parameter)
-                            break;
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    text = message.payload.widget.data.text;
+                    if (m_itemCount > message.payload.widget.parameter) {
 #line 222
                         H2_FREE(m_items[message.payload.widget.parameter]);
-                        m_items[message.payload.widget.parameter] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
+                        m_items[message.payload.widget.parameter] =
+                            static_cast<char*>(H2_ALLOC(strlen(text) + 1));
                         strcpy(m_items[message.payload.widget.parameter], text);
                     }
                     break;
+
                 case WIDGET_COMMAND_APPEND_ITEM:
-                    if (m_id == message.payload.widget.id) {
-                        char* text = message.payload.widget.data.text;
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    text = message.payload.widget.data.text;
 #line 233
-                        char** newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
-                        if (m_itemCount != 0)
-                            memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
+                    newItems = static_cast<char**>(H2_ALLOC((m_itemCount + 1) * sizeof(*m_items)));
+                    if (m_itemCount != 0)
+                        memcpy(newItems, m_items, m_itemCount * sizeof(*m_items));
 #line 236
-                        newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
-                        strcpy(newItems[m_itemCount], text);
-                        m_itemCount++;
-                        if (m_items != NULL)
+                    newItems[m_itemCount] = static_cast<char*>(H2_ALLOC(strlen(text) + 1));
+                    strcpy(newItems[m_itemCount], text);
+                    m_itemCount++;
+                    if (m_items != NULL)
 #line 240
-                            H2_FREE(m_items);
-                        m_items = newItems;
-                        if (m_maxVisibleItems < m_itemCount) {
-                            m_scrollRange = m_itemCount - m_maxVisibleItems;
-                            m_topIndex = m_selectedIndex;
-                            if (m_topIndex < 0)
-                                m_topIndex = 0;
-                            if (m_topIndex > m_scrollRange)
-                                m_topIndex = m_scrollRange;
-                        }
-                        if (m_scrollRange > 0)
-                            m_visibleItemCount = m_maxVisibleItems;
-                        else
-                            m_visibleItemCount = m_itemCount;
+                        H2_FREE(m_items);
+                    m_items = newItems;
+                    if (m_itemCount > m_maxVisibleItems) {
+                        m_scrollRange = m_itemCount - m_maxVisibleItems;
+                        m_topIndex = m_selectedIndex;
+                        if (m_topIndex < 0)
+                            m_topIndex = 0;
+                        if (m_topIndex > m_scrollRange)
+                            m_topIndex = m_scrollRange;
                     }
+                    m_visibleItemCount = m_scrollRange > 0 ? m_maxVisibleItems : m_itemCount;
                     break;
-                case WIDGET_COMMAND_DELETE_ITEM:
-                    if (m_id == message.payload.widget.id)
-                        DeleteItem(message.payload.widget.data.value);
-                    break;
-                case WIDGET_COMMAND_CLEAR_ITEMS:
-                    if (m_id == message.payload.widget.id)
-                        while (m_itemCount != 0)
-                            DeleteItem(0);
-                    break;
+
+                case WIDGET_COMMAND_SET_SELECTION:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    m_selectedIndex = message.payload.widget.data.value;
+                    return MESSAGE_DISPATCH_CONSUME;
+
+                case WIDGET_COMMAND_GET_SELECTION:
+                    if (message.payload.widget.id != m_id)
+                        break;
+                    message.payload.widget.data.value = m_selectedIndex;
+                    return MESSAGE_DISPATCH_CONSUME;
             }
             break;
+
+        case MESSAGE_LEFT_BUTTON_DOWN:
+        case MESSAGE_RIGHT_BUTTON_DOWN:
+            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+                break;
+            x = message.payload.mouse.x - m_owner->m_posX;
+            y = message.payload.mouse.y - m_owner->m_posY;
+            if (x >= m_x && y >= m_y && x < m_x + m_width && y < m_y + m_height) {
+                if (message.type == MESSAGE_RIGHT_BUTTON_DOWN) {
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.command = WIDGET_COMMAND_ALTERNATE_SELECT;
+                    message.payload.widget.id = m_id;
+                    message.payload.widget.modifiers = MESSAGE_MODIFIER_RIGHT_BUTTON;
+                    return MESSAGE_DISPATCH_FORWARD;
+                }
+                return ProcessMouseMessage(message);
+            }
+            return MESSAGE_DISPATCH_CONTINUE;
+
+        case MESSAGE_MOUSE_MOVE:
+        case MESSAGE_LEFT_BUTTON_UP:
+            if (!HAS(m_flags, WIDGET_FLAG_DRAW))
+                break;
+            return ProcessMouseMessage(message);
     }
     return widget::Main(message);
 }
@@ -337,203 +329,207 @@ void listBoxWidget::Draw(void) {
 
 VA(0x004cf310, 0x54e)
 void listBoxWidget::DrawLBStuff(i32 doUpdate) {
-    i32 y;
+    i32 row;
     i32 x;
-    i32 i;
-    x = m_listX + m_owner->m_posX;
-    y = m_listY + m_owner->m_posY;
-    for (i = 0; i < m_maxVisibleItems; i++) {
-        if (i == 0) {
+    i32 y;
+
+    x = m_owner->m_posX + m_listX;
+    y = m_owner->m_posY + m_listY;
+    for (row = 0; row < m_maxVisibleItems; row++) {
+        if (row == 0) {
             m_icon->DrawToBuffer(x, y, m_firstRowFrame, ICON_DRAW_NORMAL);
-            if (i < m_visibleItemCount) {
+            if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
                     m_items[m_topIndex],
                     x + TEXT_LEFT_INSET,
                     y + FIRST_ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    m_selectedIndex == m_topIndex ? m_selectedColor : m_normalColor,
+                    m_topIndex == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
-            }
             y += m_firstRowHeight;
-        } else if (1 == m_maxVisibleItems - i) {
+        } else if (row == m_maxVisibleItems - 1) {
             m_icon->DrawToBuffer(x, y, m_lastRowFrame, ICON_DRAW_NORMAL);
-            if (m_visibleItemCount > i) {
+            if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
-                    m_items[m_topIndex + i],
+                    *(m_items + m_topIndex + row),
                     x + TEXT_LEFT_INSET,
                     y + ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    m_selectedIndex == m_topIndex + i ? m_selectedColor : m_normalColor,
+                    m_topIndex + row == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
-            }
         } else {
             m_icon->DrawToBuffer(x, y, m_middleRowFrame, ICON_DRAW_NORMAL);
-            if (i < m_visibleItemCount) {
+            if (row < m_visibleItemCount)
                 m_font->DrawBoundedString(
-                    m_items[m_topIndex + i],
+                    *(m_items + m_topIndex + row),
                     x + TEXT_LEFT_INSET,
                     y + ROW_TEXT_TOP_INSET,
                     m_listWidth - TEXT_HORIZONTAL_INSET_COUNT * TEXT_LEFT_INSET,
                     m_font->m_height + 1,
-                    m_selectedIndex == m_topIndex + i ? m_selectedColor : m_normalColor,
+                    m_topIndex + row == m_selectedIndex ? m_selectedColor : m_normalColor,
                     m_alignment
                 );
-            }
             y += m_rowHeight;
         }
     }
     m_icon->DrawToBuffer(
-        m_scrollUpX + m_owner->m_posX,
-        m_scrollUpY + m_owner->m_posY,
+        m_owner->m_posX + m_scrollUpX,
+        m_owner->m_posY + m_scrollUpY,
         m_scrollUpPressed ? m_scrollUpPressedFrame : m_scrollUpFrame,
         ICON_DRAW_NORMAL
     );
     m_icon->DrawToBuffer(
-        m_scrollTrackX + m_owner->m_posX,
-        m_scrollTrackY + m_owner->m_posY,
+        m_owner->m_posX + m_scrollTrackX,
+        m_owner->m_posY + m_scrollTrackY,
         m_scrollTrackFirstFrame,
         ICON_DRAW_NORMAL
     );
-    for (i = SCROLL_TRACK_EDGE_ROW_COUNT; i < m_maxVisibleItems - SCROLL_TRACK_EDGE_ROW_COUNT;
-         i++)
+    for (row = SCROLL_TRACK_EDGE_ROW_COUNT; row < m_maxVisibleItems - SCROLL_TRACK_EDGE_ROW_COUNT;
+         row++)
         m_icon->DrawToBuffer(
-            m_scrollTrackX + m_owner->m_posX,
-            (i - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
+            m_owner->m_posX + m_scrollTrackX,
+            m_owner->m_posY + m_scrollTrackY + m_rowHeight * (row - 1),
             m_scrollTrackMiddleFrame,
             ICON_DRAW_NORMAL
         );
     m_icon->DrawToBuffer(
-        m_scrollTrackX + m_owner->m_posX,
-        (i - 1) * m_rowHeight + m_scrollTrackY + m_owner->m_posY,
+        m_owner->m_posX + m_scrollTrackX,
+        m_owner->m_posY + m_scrollTrackY + m_rowHeight * (row - 1),
         m_scrollTrackLastFrame,
         ICON_DRAW_NORMAL
     );
     m_icon->DrawToBuffer(
-        m_scrollDownX + m_owner->m_posX,
-        m_scrollDownY + m_owner->m_posY,
+        m_owner->m_posX + m_scrollDownX,
+        m_owner->m_posY + m_scrollDownY,
         m_scrollDownPressed ? m_scrollDownPressedFrame : m_scrollDownFrame,
         ICON_DRAW_NORMAL
     );
     m_scrollThumbX = m_owner->m_posX + m_scrollTrackX + SCROLL_THUMB_X_INSET;
-    m_scrollThumbY = (m_scrollRange > 0 ? m_topIndex * m_scrollThumbTravel / m_scrollRange
-                                        : m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR)
-                     + m_owner->m_posY + m_scrollTrackY + SCROLL_THUMB_Y_INSET;
+    m_scrollThumbY = m_owner->m_posY + m_scrollTrackY
+                     + (m_scrollRange > 0 ? m_scrollThumbTravel * m_topIndex / m_scrollRange
+                                          : m_scrollThumbTravel / SCROLL_THUMB_CENTER_DIVISOR)
+                     + SCROLL_THUMB_Y_INSET;
     m_icon->DrawToBuffer(m_scrollThumbX, m_scrollThumbY, m_scrollThumbFrame, ICON_DRAW_NORMAL);
     if (doUpdate)
         gpWindowManager
-            ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+            ->UpdateScreenRegion(m_owner->m_posX + m_x, m_owner->m_posY + m_y, m_width, m_height);
 }
 
 VA(0x004cf860, 0x4f2)
 MessageDispatchResult listBoxWidget::ProcessMouseMessage(tag_message& message) {
-    i32 mouseX = message.payload.mouse.screenX - m_owner->m_posX;
-    i32 mouseY = message.payload.mouse.screenY - m_owner->m_posY;
-    i32 adjY = mouseY - m_listY;
+    i32 offset;
+    i32 x;
+    i32 itemIndex;
+    i32 y;
+
+    x = message.payload.mouse.screenX - m_owner->m_posX;
+    y = message.payload.mouse.screenY - m_owner->m_posY;
+    offset = y - m_listY;
     switch (message.type) {
-        case MESSAGE_MOUSE_MOVE:
-            if (m_itemSelectionTracking) {
-                i32 row;
-                i16 firstRowHeight = m_firstRowHeight;
-                if (adjY > firstRowHeight)
-                    row = (adjY - firstRowHeight) / m_rowHeight + 1;
-                else
-                    row = 0;
-                if (row < 0)
-                    row = 0;
-                if (row >= m_visibleItemCount)
-                    row = m_visibleItemCount - 1;
-                if (m_topIndex + row == m_selectedIndex)
-                    goto done;
-                m_selectedIndex = row + m_topIndex;
-            } else if (m_scrollThumbDragging) {
-                i32 newTop = (mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
-                              - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
-                             * (m_scrollRange + 1) / m_scrollThumbTravel;
-                if (newTop < 0)
-                    newTop = 0;
-                if (newTop > m_scrollRange)
-                    newTop = m_scrollRange;
-                if (m_topIndex == newTop)
-                    goto done;
-                m_topIndex = newTop;
-            } else {
-                return MESSAGE_DISPATCH_CONTINUE;
-            }
-            goto redraw;
         case MESSAGE_LEFT_BUTTON_DOWN:
             if (m_itemCount == 0)
-                goto done;
-            if (m_listX <= mouseX && m_listY <= mouseY && mouseX < m_listX + m_listWidth
-                && mouseY < m_listY + m_listHeight) {
-                i32 clickedIndex;
-                if (adjY > m_firstRowHeight)
-                    clickedIndex = m_topIndex + (adjY - m_firstRowHeight) / m_rowHeight + 1;
+                break;
+            if (x >= m_listX && y >= m_listY && x < m_listX + m_listWidth
+                && y < m_listY + m_listHeight) {
+                if (offset > m_firstRowHeight)
+                    itemIndex = m_topIndex + (offset - m_firstRowHeight) / m_rowHeight + 1;
                 else
-                    clickedIndex = m_topIndex;
-                if (m_itemCount <= clickedIndex)
-                    goto done;
+                    itemIndex = m_topIndex;
+                if (itemIndex >= m_itemCount)
+                    break;
                 m_itemSelectionTracking = 1;
                 gbSendMouseMoveMessages = true;
-                if (m_selectedIndex == clickedIndex)
-                    goto done;
-                m_selectedIndex = clickedIndex;
-            } else if (mouseY < m_scrollUpY + m_scrollUpHeight) {
-                if (m_topIndex > 0)
-                    m_topIndex--;
-                m_scrollUpPressed = 1;
-            } else if (mouseY >= m_scrollDownY) {
-                if (m_topIndex < m_scrollRange)
-                    m_topIndex++;
-                m_scrollDownPressed = 1;
-            } else {
-                if (m_scrollThumbY <= mouseY && mouseY < m_scrollThumbY + m_scrollThumbHeight) {
-                    m_scrollThumbDragging = 1;
-                    gbSendMouseMoveMessages = true;
+                if (m_selectedIndex != itemIndex) {
+                    m_selectedIndex = itemIndex;
+                    DrawLBStuff(1);
                 }
-                m_topIndex = (mouseY - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR
-                              - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT)
-                             * (m_scrollRange + 1) / m_scrollThumbTravel;
-                if (m_topIndex < 0)
-                    m_topIndex = 0;
-                if (m_topIndex > m_scrollRange)
-                    m_topIndex = m_scrollRange;
+            } else {
+                if (y < m_scrollUpY + m_scrollUpHeight) {
+                    if (m_topIndex > 0)
+                        m_topIndex--;
+                    m_scrollUpPressed = 1;
+                } else if (y >= m_scrollDownY) {
+                    if (m_topIndex < m_scrollRange)
+                        m_topIndex++;
+                    m_scrollDownPressed = 1;
+                } else {
+                    if (y >= m_scrollThumbY && y < m_scrollThumbY + m_scrollThumbHeight) {
+                        m_scrollThumbDragging = 1;
+                        gbSendMouseMoveMessages = true;
+                    }
+                    m_topIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
+                                  - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                                 * (m_scrollRange + 1) / m_scrollThumbTravel;
+                    if (m_topIndex < 0)
+                        m_topIndex = 0;
+                    if (m_topIndex > m_scrollRange)
+                        m_topIndex = m_scrollRange;
+                }
+                DrawLBStuff(1);
             }
-            goto redraw;
+            break;
+
         case MESSAGE_LEFT_BUTTON_UP:
             gbSendMouseMoveMessages = false;
             if (m_scrollUpPressed || m_scrollDownPressed || m_scrollThumbDragging) {
                 m_scrollThumbDragging = 0;
                 m_scrollDownPressed = 0;
                 m_scrollUpPressed = 0;
-                goto redraw;
-            }
-            if (m_itemSelectionTracking) {
-                m_itemSelectionTracking = 0;
-                message.payload.widget.command = WIDGET_COMMAND_SELECT;
-                message.type = MESSAGE_WIDGET;
-                message.payload.widget.id = m_id;
-                message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
-                message.payload.widget.data.value = m_selectedIndex;
-                if (m_lastSelectedIndex == m_selectedIndex) {
-                    if (m_lastClickTime + DOUBLE_CLICK_TICKS > (KBTickCount()))
-                        message.payload.widget.parameter = SELECTION_DOUBLE_CLICK;
+                DrawLBStuff(1);
+            } else {
+                if (m_itemSelectionTracking) {
+                    m_itemSelectionTracking = 0;
+                    message.type = MESSAGE_WIDGET;
+                    message.payload.widget.command = WIDGET_COMMAND_SELECT;
+                    message.payload.widget.id = m_id;
+                    message.payload.widget.data.value = m_selectedIndex;
+                    message.payload.widget.parameter = SELECTION_SINGLE_CLICK;
+                    if (m_selectedIndex == m_lastSelectedIndex) {
+                        if (m_lastClickTime + DOUBLE_CLICK_TICKS > KBTickCount())
+                            message.payload.widget.parameter = SELECTION_DOUBLE_CLICK;
+                    }
+                    m_lastSelectedIndex = m_selectedIndex;
+                    m_lastClickTime = KBTickCount();
+                    return MESSAGE_DISPATCH_FORWARD;
                 }
-                m_lastSelectedIndex = m_selectedIndex;
-                m_lastClickTime = KBTickCount();
-                return MESSAGE_DISPATCH_FORWARD;
+                return MESSAGE_DISPATCH_CONTINUE;
             }
-            return MESSAGE_DISPATCH_CONTINUE;
+            break;
+
+        case MESSAGE_MOUSE_MOVE:
+            if (m_itemSelectionTracking) {
+                if (offset > m_firstRowHeight)
+                    itemIndex = (offset - m_firstRowHeight) / m_rowHeight + 1;
+                else
+                    itemIndex = 0;
+                if (itemIndex < 0)
+                    itemIndex = 0;
+                if (itemIndex >= m_visibleItemCount)
+                    itemIndex = m_visibleItemCount - 1;
+                if (m_topIndex + itemIndex != m_selectedIndex) {
+                    m_selectedIndex = m_topIndex + itemIndex;
+                    DrawLBStuff(1);
+                }
+            } else if (m_scrollThumbDragging) {
+                itemIndex = (y - m_scrollTrackY - SCROLL_DRAG_Y_ADJUSTMENT
+                             - m_scrollThumbHeight / SCROLL_THUMB_CENTER_DIVISOR)
+                            * (m_scrollRange + 1) / m_scrollThumbTravel;
+                if (itemIndex < 0)
+                    itemIndex = 0;
+                if (itemIndex > m_scrollRange)
+                    itemIndex = m_scrollRange;
+                if (m_topIndex != itemIndex) {
+                    m_topIndex = itemIndex;
+                    DrawLBStuff(1);
+                }
+            } else {
+                return MESSAGE_DISPATCH_CONTINUE;
+            }
+            break;
     }
-    goto done;
-redraw:
-    DrawLBStuff(1);
-done:
     return MESSAGE_DISPATCH_CONSUME;
 }
-
-
-

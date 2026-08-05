@@ -93,3 +93,24 @@ byte-neutral in production once the `&` is present. `iconWidget::Read`'s
 
 `widget::Main` 98.61% -> EXACT, `iconWidget::Main` 99.61% -> EXACT,
 `iconWidget::Read` 96.88% -> EXACT.
+
+`textEntryWidget::Read` (RVA 0xd1f60) repeats the byte-width form on a `char`
+field, where the folded spelling is one instruction shorter and the mask is the
+only difference:
+
+```
+ours: m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord());
+      2fe: e8 ...              calll   <ReadWord>
+      303: 8b 4d e8            movl    -0x18(%ebp), %ecx
+      306: 88 41 2a            movb    %al, 0x2a(%ecx)
+
+retail
+      38b: e8 ...              calll   <ReadWord>
+      390: 0f bf c8            movswl  %ax, %ecx
+      393: 81 e1 ff 00 00 00   andl    $0xff, %ecx
+      399: 8b 55 e8            movl    -0x18(%ebp), %edx
+      39c: 88 4a 2a            movb    %cl, 0x2a(%edx)
+```
+
+`m_alignment = static_cast<FontAlignment>(gpResourceManager->ReadWord() & 0xff);`
+closed it - the same `& COLOR_MASK` the neighbouring `m_color` read already had.
