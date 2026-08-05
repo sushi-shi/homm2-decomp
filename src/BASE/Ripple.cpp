@@ -14,67 +14,75 @@ H2_ENUM_BEGIN(RippleConstant)
     SCREEN_WIDTH   = 640,
     PROFILE_RADIUS = 25,
     PROFILE_SIZE   = PROFILE_RADIUS * 2 + 1,
-    REDRAW_RADIUS  = 22,
-    REDRAW_WIDTH   = 41,
-    SWEEP_STEP     = 4,
-    SWEEP_END      = SCREEN_WIDTH + PROFILE_RADIUS
+    // The profile is flat over its outer seven samples, so only the middle
+    // REDRAW_WIDTH columns can change; the sweep step widens that span.
+    REDRAW_RADIUS = 18,
+    REDRAW_WIDTH  = 37,
+    SWEEP_STEP    = 4,
+    SWEEP_END     = SCREEN_WIDTH + PROFILE_RADIUS
 H2_ENUM_END(RippleConstant)
 
 VA(0x004cb6b0, 0x35e)
 void DoRipple(bitmap* source, bitmap* destination, i32 height, i32 strength) {
-    i32 profileIndex;
+    i32 idx;
+    u8 previous[SCREEN_WIDTH];
+    i32 deadline7;
+    i32 blitWidth;
+    i32 column7;
+    i32 blitX3;
+    i32 srcRow;
+    i32 sweepPosition;
 
     gpMouseManager->HideColorPointer();
 
-    u8 profile[PROFILE_SIZE] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 5, 6, 6, 6, 7, 7, 7,
-                                7, 7, 6, 6, 6, 5, 4, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
-    u8 previous[SCREEN_WIDTH];
+    u8 rippleProfile[PROFILE_SIZE] = {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3,
+                                      4, 5, 6, 6, 6, 7, 7, 7, 7, 7, 6, 6, 6, 5, 4, 3, 3, 2,
+                                      2, 2, 2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0};
+    i32 step7 = SWEEP_STEP;
+
     memset(previous, 0, sizeof(previous));
-    i32 position = -PROFILE_RADIUS;
 
-    do {
+    for (sweepPosition = -PROFILE_RADIUS; sweepPosition < SWEEP_END; sweepPosition += step7) {
         PollSound();
-        i32 deadline = KBTickCount() + gfCombatSpeedMod[gConfig.combatSpeed] * 9.0f;
+        deadline7 =
+            KBTickCount() + static_cast<i32>(9.0f * gfCombatSpeedMod[gConfig.combatSpeed]);
 
-        for (profileIndex = 0; profileIndex <= PROFILE_SIZE - 1; ++profileIndex) {
-            i32 column = profileIndex + position - PROFILE_RADIUS;
-            if (column < 0 || column >= SCREEN_WIDTH)
+        for (idx = 0; idx <= PROFILE_SIZE - 1; idx++) {
+            column7 = sweepPosition + idx - PROFILE_RADIUS;
+            if (column7 < 0 || column7 >= SCREEN_WIDTH)
+                continue;
+            if (rippleProfile[idx] == previous[column7])
                 continue;
 
-            if (previous[column] == profile[profileIndex])
-                continue;
+            u8* destinationPixel = destination->m_pixels + column7;
+            u8* sourcePixel =
+                source->m_pixels + column7 + rippleProfile[idx] * SCREEN_WIDTH * strength;
 
-            u8* destinationPixel = destination->m_pixels + column;
-            i32 sourceRow = profile[profileIndex] * strength;
-            u8* sourcePixel = source->m_pixels + sourceRow * SCREEN_WIDTH + column;
-
-            if (height > sourceRow) {
-                do {
-                    *destinationPixel = *sourcePixel;
-                    if (sourceRow - height == -1)
-                        break;
-                    destinationPixel += SCREEN_WIDTH;
-                    sourcePixel += SCREEN_WIDTH;
-                    ++sourceRow;
-                } while (height > sourceRow);
+            srcRow = rippleProfile[idx] * strength;
+            for (; srcRow < height; srcRow++) {
+                *destinationPixel = *sourcePixel;
+                if (srcRow + 1 == height)
+                    break;
+                destinationPixel += SCREEN_WIDTH;
+                sourcePixel += SCREEN_WIDTH;
             }
-            previous[column] = profile[profileIndex];
+            previous[column7] = rippleProfile[idx];
         }
 
-        i32 redrawX = position - REDRAW_RADIUS;
-        i32 width = REDRAW_WIDTH;
-        if (redrawX < 0) {
-            width += redrawX;
-            redrawX = 0;
+        blitX3    = sweepPosition - REDRAW_RADIUS - step7;
+        blitWidth = step7 + REDRAW_WIDTH;
+        if (blitX3 < 0) {
+            blitWidth += blitX3;
+            blitX3 = 0;
         }
-        if (redrawX + width > SCREEN_WIDTH)
-            width = SCREEN_WIDTH - redrawX;
-        if (width >= 1) {
-            BlitBitmapToScreen(gpWindowManager->m_screen, redrawX, 0, width, height, redrawX, 0);
-            DelayTil(&deadline);
-        }
-        position += SWEEP_STEP;
-    } while (position < SWEEP_END);
+        if (blitX3 + blitWidth > SCREEN_WIDTH)
+            blitWidth = SCREEN_WIDTH - blitX3;
+        if (blitWidth < 1)
+            continue;
+
+        BlitBitmapToScreen(gpWindowManager->m_screen, blitX3, 0, blitWidth, height, blitX3, 0);
+        DelayTil(&deadline7);
+    }
 
     gpMouseManager->ShowColorPointer();
 }

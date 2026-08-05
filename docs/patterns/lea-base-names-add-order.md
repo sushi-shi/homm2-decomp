@@ -115,3 +115,24 @@ ours   m_frameInfo.spellEffectX * rear + x     retail   x + m_frameInfo.spellEff
 
 `army::DrawToBuffer` 96.66% -> EXACT once every such sum was rewritten with the
 simple operand on the left.
+
+## Both operands plain locals: the LOAD order is reversed, the SIB still names the left
+
+When neither operand needs computing — two dword frame slots plus a constant —
+`/Od` still folds the whole thing into one `lea`, and the instruction sequence is
+the same length either way. The RIGHT operand is loaded **first**, into the SIB
+*index* register; the LEFT operand is loaded second, into the SIB *base*.
+
+`DoRipple` (RVA 0xcb6b0), `column7 = <a> + <b> - PROFILE_RADIUS`:
+
+```
+retail   sweepPosition + idx - 25                ours   idx + sweepPosition - 25
+---------------------------------------------    ---------------------------------------------
+8b 4d fc        movl -0x4(%ebp), %ecx    ; idx   8b 8d 2c fd..  movl -0x2d4(%ebp), %ecx  ; pos
+8b 95 2c fd..   movl -0x2d4(%ebp), %edx  ; pos   8b 55 fc       movl -0x4(%ebp), %edx    ; idx
+8d 44 0a e7     leal -0x19(%edx,%ecx), %eax      8d 44 0a e7    leal -0x19(%edx,%ecx), %eax
+```
+
+The `lea` byte-encodes identically (`8d 44 0a e7`) — only the two `mov`s swap, so
+this reads as pure noise unless you know which slot is which. `DoRipple`'s whole
+residual after the structural rewrite was these two instructions.
