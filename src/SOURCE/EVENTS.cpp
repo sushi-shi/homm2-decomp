@@ -122,13 +122,6 @@ namespace {
         EVENT_JAILED_HERO = 0x41
     H2_ENUM_END(AIEventConstant)
 
-    H2_ENUM_BEGIN(AIEventResultIndex)
-        AI_EVENT_RESULT_ERASE_OBJECT = 0,
-        AI_EVENT_RESULT_UNUSED = 1,
-        AI_EVENT_RESULT_PURCHASE_COUNT = 2,
-        AI_EVENT_RESULT_COUNT = 3
-    H2_ENUM_END(AIEventResultIndex)
-
     H2_ENUM_BEGIN(MonsterCombatValueIndex)
         MONSTER_COMBAT_REMAINING_COUNT = 0,
         MONSTER_COMBAT_RESULT = 1,
@@ -268,8 +261,8 @@ namespace {
         XANADU_DIPLOMACY_MULTIPLIER = 2,
         TEMPLE_MORALE_BONUS = 2,
         PYRAMID_LUCK_PENALTY = 2,
-        SIGN_MINIMUM_TEXT_LENGTH = 2,
-        SIGN_RANDOM_TEXT_MASK = 3,
+        SIGN_MINIMUM_TEXT_LENGTH = 1,
+        SIGN_RANDOM_TEXT_COUNT = 4,
         CHEST_EXPERIENCE_LEVEL_OFFSET = 1,
         PRIMARY_BONUS_ATTACK = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_ATTACK),
         PRIMARY_BONUS_DEFENSE = NORMAL_DIALOG_PRIMARY_BONUS_OFFSET + IDX(HERO_PRIMARY_DEFENSE),
@@ -291,7 +284,7 @@ namespace {
         DRAGON_CITY_CAMPAIGN_FACTOR = 2,
         DRAGON_CITY_GREEN_COUNT_FACTOR = 3,
         DRAGON_CITY_DRAGON_STACKS = 1,
-        DRAGON_CITY_ARCHIBALD_SCENARIO = 6,
+        DRAGON_CITY_ARCHIBALD_SCENARIO = 7,
         PYRAMID_ROYAL_MUMMY_COUNT = 30,
         PYRAMID_VAMPIRE_LORD_COUNT = 20,
         PYRAMID_VAMPIRE_LORD_STACKS = 2
@@ -329,56 +322,56 @@ static char s_twoStringFormat[] = "%s %s";
 
 VA(0x0043b640, 0x5fc9)
 void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
+    char eventText_b[EVENT_TEXT_BUFFER_SIZE];
+    mapCell* skeletonCell_e;
+    mapCell* zombieCell_o;
+    town* occupiedTown_b;
+    i32 heroLevel_e;
+    i32 levelExperience_g;
+    i32 dragonFactor_i;
+    CombatResult mineCombatResult_b;
+    i32 adjacentMonster_j;
+    i32 wellSpellPoints_o;
+    i32 springSpellPoints_j;
+    i32 secondaryAmount_j;
+    i32 secondaryReward_k;
+    i32 primaryReward_e;
+    i32 primaryAmount_j;
+    i32 correctAnswer_e;
+    boatRecord* boat_k;
+    i32 teleportCount_e;
+    ResourceType resourceType_a;
+    heroWindow* oracleWindow_o;
+    i32 guardedCount_i;
+    i32 teleportY_e;
+    i32 teleportX_e;
+    ArtifactType artifact_g;
+    i32 artifactResourceType_k;
+    CreatureType monsterType_f;
+    hero* otherHero_e;
+    CombatResult heroCombatResult_h;
+    mapEventExtra* eventExtra_o;
+    i32 resourceAmount_o;
+    CreatureType guardedMonster_c;
+    tag_message oracleMessage_o;
+    MapObjectType eventType_g;
+    tag_message unusedEventMessage;
+    i32 eraseObject_l;
+    char sphinxAnswer_a[SPHINX_ANSWER_BUFFER_SIZE];
     CreatureType secondUpgrade1;
+    SAMPLE2 playedSample3;
     CreatureType firstUpgrade_e;
-    SAMPLE2 eventSample_f;
+    i32 fizzleType_k;
     i32 eventValue1;
     signEventExtra* signExtra_k;
-    SAMPLE2 playedSample3;
-    tag_message unusedEventMessage;
-    MapObjectType eventType_g;
+    CreatureType thirdUpgrade_f;
     hero* eventHero2;
-    char sphinxAnswer_a[SPHINX_ANSWER_BUFFER_SIZE];
-    i32 eraseObject;
-    i32 fizzleType3;
-    CreatureType thirdUpgrade;
-    CreatureType monsterType6;
-    i32 guardedCount;
-    CombatResult heroCombatResult3;
-    i32 teleportY;
-    ArtifactType artifact8;
-    mapEventExtra* eventExtra1;
-    ResourceType resourceType;
-    i32 teleportX3;
-    i32 teleportCount;
-    CreatureType guardedMonster5;
-    boatRecord* boat_j;
-    heroWindow* oracleWindow;
-    tag_message oracleMessage1;
-    hero* otherHero6;
-    i32 resourceAmount6;
-    i32 artifactResourceType;
-    i32 secondaryAmount;
-    i32 primaryAmount1;
-    i32 secondaryReward_f;
-    i32 primaryReward3;
-    i32 correctAnswer1;
-    char eventText[EVENT_TEXT_BUFFER_SIZE];
-    mapCell* skeletonCell1;
-    mapCell* zombieCell6;
-    town* occupiedTown4;
-    i32 levelExperience1;
-    i32 heroLevel2;
-    i32 dragonFactor_d;
-    CombatResult mineCombatResult7;
-    i32 adjacentMonster8;
-    i32 wellSpellPoints5;
-    i32 springSpellPoints;
+    SAMPLE2 eventSample_f;
 
     eventHero2 = &gpGame->m_heroRecs[gpCurPlayer->m_currentHero];
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
-    eraseObject = 0;
-    fizzleType3 = 0;
+    eraseObject_l = 0;
+    fizzleType_k = 0;
     playedSample3 = NULL;
     eventSample_f = NULL;
     gpMouseManager->ShowColorPointer();
@@ -395,9 +388,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Magic Garden}\n\nYou've found a magic garden, the kind of place that "
-                    "leprechauns and faeries like to cavort in, but there is no one here today.  "
-                    "Perhaps you should try again next week.",
+                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xe7\xe0\xe1\xf0\xe5\xeb\xe8 "
+                    "\xe2 \xe2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4, \xe8\xe7 \xf2\xe5\xf5, \xe3\xe4\xe5 "
+                    "\xf2\xe0\xea \xee\xe1\xee\xe6\xe0\xfe\xf2 \xf0\xe5\xe7\xe2\xe8\xf2\xfc\xf1\xff \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xfb "
+                    "\xf1 \xf4\xe5\xff\xec\xe8, \xed\xee \xf1\xe5\xe3\xee\xe4\xed\xff \xe7\xe4\xe5\xf1\xfc \xed\xe8\xea\xee\xe3\xee."
+                    " \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
+                    "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5.",
                     -1,
                     0,
                     -1,
@@ -409,9 +405,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Magic Garden}\n\nYou catch a leprechaun foolishly sleeping amidst a cluster "
-                    "of magic mushrooms.  In exchange for his freedom, he guides you to a small "
-                    "pot filled with precious things.",
+                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xf1\xe0\xe4}\n\n\xc2\xfb \xef\xee\xe9\xec\xe0\xeb\xe8 "
+                    "\xeb\xe5\xef\xf0\xe5\xea\xee\xed\xe0, \xf2\xe0\xea \xe1\xe5\xf1\xef\xe5\xf7\xed\xee \xe7\xe0\xf1\xed\xf3\xe2\xf8\xe5\xe3\xee "
+                    "\xef\xee\xe4 \xf8\xeb\xff\xef\xea\xee\xe9 \xe2\xee\xeb\xf8\xe5\xe1\xed\xee\xe3\xee \xe3\xf0\xe8\xe1\xe0."
+                    " \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xf1\xe2\xee\xe1\xee\xe4\xf3 \xee\xed \xf0\xe0\xf1\xf1\xea\xe0\xe7\xe0\xeb "
+                    "\xe2\xe0\xec, \xe3\xe4\xe5 \xeb\xe5\xe6\xe8\xf2 \xe3\xee\xf0\xf8\xee\xf7\xe5\xea \xf1\xee "
+                    "\xe2\xf1\xff\xea\xe8\xec\xe8 \xf6\xe5\xed\xed\xfb\xec\xe8 \xe2\xe5\xf9\xe8\xf6\xe0\xec\xe8.",
                     cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET,
                     static_cast<ResourceType>(
                         cell->m_objectMetadata - MAP_EVENT_RESOURCE_OFFSET
@@ -439,11 +438,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
         case MAP_OBJECT_SPHINX:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            eventExtra1 = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
-            if (!eventExtra1->active) {
+            eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
+            if (!eventExtra_o->active) {
                 NormalDialog(
-                    "{Sphinx}\n\nYou come across a giant Sphinx.  The Sphinx remains strangely "
-                    "quiet.",
+                    "{\xd1\xf4\xe8\xed\xea\xf1}\n\n\xc2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 \xea \xee\xe3\xf0\xee\xec\xed\xee\xec\xf3 "
+                    "\xd1\xf4\xe8\xed\xea\xf1\xf3, \xed\xee \xee\xed \xe4\xe0\xe6\xe5 \xed\xe5 \xf8\xe5\xeb\xee\xf5\xed\xf3\xeb\xf1\xff.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -454,78 +453,86 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
+                break;
             } else {
                 sprintf(
                     gText,
-                    "\"I have a riddle for you,\" the Sphinx says.  \"Answer correctly, and you "
-                    "shall be rewarded.  Answer incorrectly, and you shall be eaten.  Do you "
-                    "accept the challenge?\""
+                    "\"\xc5\xf1\xf2\xfc \xf3 \xec\xe5\xed\xff \xe7\xe0\xe3\xe0\xe4\xea\xe0 \xe4\xeb\xff \xf2\xe5\xe1\xff,"
+                    "\"\xf1\xea\xe0\xe7\xe0\xeb \xd1\xf4\xe8\xed\xea\xf1. \"\xce\xf2\xe2\xe5\xf2\xe8\xf8\xfc "
+                    "\xe2\xe5\xf0\xed\xee - \xef\xee\xeb\xf3\xf7\xe8\xf8\xfc \xed\xe0\xe3\xf0\xe0\xe4\xf3. \xce\xf8\xe8\xe1\xe5\xf8\xfc\xf1\xff "
+                    "- \xff \xf1\xee\xe6\xf0\xf3 \xf2\xe5\xe1\xff. \xcf\xf0\xe8\xed\xe8\xec\xe0\xe5\xf8\xfc \xeb\xe8 "
+                    "\xf2\xfb \xec\xee\xe9 \xe2\xfb\xe7\xee\xe2?\""
                 );
                 NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                     sprintf(
                         gText,
-                        "The Sphinx asks you the following riddle:\n\n'%s'\n\nYour answer?",
-                        eventExtra1->riddle
+                        "\xd1\xf4\xe8\xed\xea\xf1 \xe7\xe0\xe3\xe0\xe4\xe0\xeb \xe2\xe0\xec \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xf3\xfe "
+                        "\xe7\xe0\xe3\xe0\xe4\xea\xf3::\n\n'%s'\n\n\xc2\xe0\xf8 \xee\xf2\xe2\xe5\xf2?",
+                        eventExtra_o->riddle
                     );
                     GetDataEntry(gText, sphinxAnswer_a, SPHINX_INPUT_LENGTH, NULL, 0, 1);
-                    correctAnswer1 = 0;
-                    for (eventValue1 = 0; eventValue1 < eventExtra1->answerCount; eventValue1++) {
-                        if (RiddleStringsEqual(sphinxAnswer_a, eventExtra1->answers[eventValue1]))
-                            correctAnswer1 = 1;
+                    correctAnswer_e = 0;
+                    for (eventValue1 = 0; eventValue1 < eventExtra_o->answerCount; eventValue1++) {
+                        if (RiddleStringsEqual(sphinxAnswer_a, eventExtra_o->answers[eventValue1]))
+                            correctAnswer_e = 1;
                     }
 
-                    if (correctAnswer1) {
-                        primaryReward3 = MAP_EVENT_REWARD_NONE;
-                        primaryAmount1 = 0;
-                        secondaryReward_f = MAP_EVENT_REWARD_NONE;
-                        secondaryAmount = 0;
+                    if (correctAnswer_e) {
+                        primaryReward_e = MAP_EVENT_REWARD_NONE;
+                        primaryAmount_j = 0;
+                        secondaryReward_k = MAP_EVENT_REWARD_NONE;
+                        secondaryAmount_j = 0;
                         for (eventValue1 = 0; eventValue1 < SPHINX_RESOURCE_COUNT;
                              eventValue1++) {
                             gpGame->m_players[giCurPlayer].m_resources[eventValue1] +=
-                                eventExtra1->resources[eventValue1];
+                                eventExtra_o->resources[eventValue1];
                             if (gpGame->m_players[giCurPlayer].m_resources[eventValue1] < 0)
                                 gpGame->m_players[giCurPlayer].m_resources[eventValue1] = 0;
-                            if (eventExtra1->resources[eventValue1] != 0) {
-                                if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
-                                    secondaryReward_f = primaryReward3;
-                                    secondaryAmount = primaryAmount1;
+                            if (eventExtra_o->resources[eventValue1] != 0) {
+                                if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
+                                    secondaryReward_k = primaryReward_e;
+                                    secondaryAmount_j = primaryAmount_j;
                                 }
-                                primaryReward3 = eventValue1;
-                                primaryAmount1 = eventExtra1->resources[eventValue1];
+                                primaryReward_e = eventValue1;
+                                primaryAmount_j = eventExtra_o->resources[eventValue1];
                             }
                         }
 
-                        if (eventExtra1->artifact != MAP_EVENT_REWARD_NONE
+                        if (eventExtra_o->artifact != MAP_EVENT_REWARD_NONE
                             && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
-                            GiveArtifact(eventHero2, ArtifactType(eventExtra1->artifact), 1, -1);
-                            if (primaryReward3 != MAP_EVENT_REWARD_NONE) {
-                                secondaryReward_f = primaryReward3;
-                                secondaryAmount = primaryAmount1;
+                            GiveArtifact(eventHero2, ArtifactType(eventExtra_o->artifact), 1, -1);
+                            if (primaryReward_e != MAP_EVENT_REWARD_NONE) {
+                                secondaryReward_k = primaryReward_e;
+                                secondaryAmount_j = primaryAmount_j;
                             }
-                            primaryReward3 = MAP_EVENT_REWARD_ARTIFACT;
-                            primaryAmount1 = eventExtra1->artifact;
+                            primaryReward_e = MAP_EVENT_REWARD_ARTIFACT;
+                            primaryAmount_j = eventExtra_o->artifact;
                         }
 
                         NormalDialog(
-                            "Looking somewhat disappointed, the Sphinx sighs.  You've answered my "
-                            "riddle so here's your reward.  Now begone.",
+                            "\xcd\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf0\xe0\xe7\xee\xf7\xe0\xf0\xee\xe2\xe0\xed\xed\xee "
+                            "\xd1\xf4\xe8\xed\xea\xf1 \xef\xf0\xee\xec\xee\xeb\xe2\xe8\xeb. \xd2\xfb \xe4\xe0\xeb \xe2\xe5\xf0\xed\xfb\xe9 "
+                            "\xee\xf2\xe2\xe5\xf2, \xe2\xee\xf2 \xf2\xe2\xee\xff \xed\xe0\xe3\xf0\xe0\xe4\xe0. \xc0 \xf2\xe5\xef\xe5\xf0\xfc "
+                            "\xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
-                            primaryReward3,
-                            primaryAmount1,
-                            secondaryReward_f,
-                            secondaryAmount,
+                            primaryReward_e,
+                            primaryAmount_j,
+                            secondaryReward_k,
+                            secondaryAmount_j,
                             -1,
                             0
                         );
-                        eventExtra1->active = 0;
+                        eventExtra_o->active = 0;
                     } else {
                         NormalDialog(
-                            "\"You guessed incorrectly,\" the Sphinx says, smiling.  The Sphinx "
-                            "swipes at you with a paw, knocking you to the ground.  Another blow "
-                            "makes the world go black, and you know no more.",
+                            "\"\xd2\xe2\xee\xff \xe4\xee\xe3\xe0\xe4\xea\xe0 \xee\xf8\xe8\xe1\xee\xf7\xed\xe0,\" \xf1\xea\xe0\xe7\xe0\xeb,"
+                            " \xf3\xeb\xfb\xe1\xe0\xff\xf1\xfc, \xd1\xf4\xe8\xed\xea\xf1. \xd3\xf5\xec\xfb\xeb\xff\xfe\xf9\xe8\xe9\xf1\xff "
+                            "\xd1\xf4\xe8\xed\xea\xf1 \xef\xee\xe2\xe0\xeb\xe8\xeb \xf2\xe5\xe1\xff \xed\xe0 \xe7\xe5\xec\xeb\xfe "
+                            "\xe8 \xec\xe8\xf0 \xee\xea\xf3\xf2\xe0\xeb\xe0 \xed\xe5\xef\xf0\xee\xe3\xeb\xff\xe4\xed\xe0\xff "
+                            "\xf2\xfc\xec\xe0.",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -545,8 +552,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_OBSERVATION_TOWER:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             NormalDialog(
-                "{Observation Tower}\n\nFrom the observation tower, you are able to see distant "
-                "lands.",
+                "{\xce\xe1\xe7\xee\xf0\xed\xe0\xff \xe1\xe0\xf8\xed\xff}\n\n\xd1 \xe2\xe5\xf0\xf8\xe8\xed\xfb "
+                "\xee\xe1\xe7\xee\xf0\xed\xee\xe9 \xe1\xe0\xf8\xed\xe8 \xe2\xfb \xf1\xec\xee\xe3\xeb\xe8 "
+                "\xf0\xe0\xe7\xe3\xeb\xff\xe4\xe5\xf2\xfc \xe4\xe0\xeb\xfc\xed\xe8\xe5 \xe7\xe5\xec\xeb\xe8.",
                 NORMAL_DIALOG_INFO,
                 -1,
                 -1,
@@ -563,7 +571,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_HILL_FORT:
-            thirdUpgrade = secondUpgrade1 = firstUpgrade_e = CREATURE_NONE;
+            firstUpgrade_e = secondUpgrade1 = thirdUpgrade_f = CREATURE_NONE;
             if (eventHero2->CreatureTypeCount(CREATURE_OGRE))
                 firstUpgrade_e = CREATURE_OGRE;
             if (eventHero2->CreatureTypeCount(CREATURE_ORC)) {
@@ -578,7 +586,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 else if (secondUpgrade1 == CREATURE_NONE)
                     secondUpgrade1 = CREATURE_DWARF;
                 else
-                    thirdUpgrade = CREATURE_DWARF;
+                    thirdUpgrade_f = CREATURE_DWARF;
             }
 
             if (firstUpgrade_e != CREATURE_NONE) {
@@ -586,25 +594,30 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 eventHero2->UpgradeCreatures(CREATURE_OGRE, CREATURE_OGRE_LORD);
                 eventHero2->UpgradeCreatures(CREATURE_ORC, CREATURE_ORC_CHIEF);
                 eventHero2->UpgradeCreatures(CREATURE_DWARF, CREATURE_BATTLE_DWARF);
-                if (thirdUpgrade != CREATURE_NONE) {
+                if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Hill Fort}\n\n All of the %s, %s and %s you have in your army have been "
-                        "trained by the battle masters of the fort.  Your army now contains %s, "
-                        "%s, and %s.",
+                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc4\xeb\xff \xe2\xf1\xe5\xf5 %s, %s"
+                        " \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 "
+                        "\xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 \xf3 \xec\xe0\xf1\xf2\xe5\xf0\xee\xe2 \xe1\xee\xff \xe8\xe7 "
+                        "\xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 "
+                        "\xe0\xf0\xec\xe8\xe8 \xe8\xec\xe5\xfe\xf2\xf1\xff \xee\xf2\xf0\xff\xe4\xfb %s, %s, \xe8 "
+                        "%s",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(thirdUpgrade)],
+                        gArmyNamesPlural[IDX(thirdUpgrade_f)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
                         gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[IDX(thirdUpgrade) + 1]
+                        gArmyNamesPlural[IDX(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Hill Fort}\n\nAll of the %s and %s you have in your army have been "
-                        "trained by the battle masters of the fort.  Your army now contains %s "
-                        "and %s.",
+                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
+                        "%s \xe8 %s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf8\xeb\xe8 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
+                        "\xf3 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee \xf4\xee\xf0\xf2\xe0."
+                        " \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 \xef\xee\xff\xe2\xe8\xeb\xe8\xf1\xfc "
+                        "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s.",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
@@ -613,8 +626,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Hill Fort}\n\nAll of the %s you have in your army have been trained "
-                        "by the battle masters of the fort.  Your army now contains %s.",
+                        "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xc2\xf1\xe5 \xee\xf2\xf0\xff\xe4\xfb "
+                        "%s \xe2\xe0\xf8\xe5\xe3\xee \xe2\xee\xe9\xf1\xea\xe0 \xef\xf0\xee\xf5\xee\xe4\xff\xf2 \xee\xe1\xf3\xf7\xe5\xed\xe8\xe5 "
+                        "\xf3 \xe1\xee\xe5\xe2\xfb\xf5 \xed\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea\xee\xe2 \xfd\xf2\xee\xe3\xee "
+                        "\xf4\xee\xf0\xf2\xe0. \xd2\xe5\xef\xe5\xf0\xfc \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8 "
+                        "\xe5\xf1\xf2\xfc \xee\xf2\xf0\xff\xe4 %s.",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                     );
@@ -633,9 +649,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Hill Fort}\n\nAn unusual alliance of Orcs, Ogres, and Dwarves offer to train "
-                    "(upgrade) any such troops brought to them.  Unfortunately, you have none with "
-                    "you.",
+                    "{\xd4\xee\xf0\xf2 \xed\xe0 \xf5\xee\xeb\xec\xe5}\n\n\xcd\xe5\xee\xe1\xfb\xf7\xed\xfb\xe9 "
+                    "\xf1\xee\xfe\xe7 \xee\xe3\xf0\xee\xe2 \xe8 \xe3\xed\xee\xec\xee\xe2 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                    "\xe2\xe0\xec \xef\xee\xf2\xf0\xe5\xed\xe8\xf0\xee\xe2\xe0\xf2\xfc (\xf3\xeb\xf3\xf7\xf8\xe8\xf2\xfc)"
+                    " \xeb\xfe\xe1\xfb\xe5 \xef\xee\xe4\xee\xe1\xed\xfb\xe5 \xe8\xec \xe2\xee\xe9\xf1\xea\xe0."
+                    " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xf2\xe0\xea\xe8\xf5 \xef\xf0\xe8 "
+                    "\xf1\xe5\xe1\xe5 \xed\xe5\xf2.",
                     -1,
                     0,
                     -1,
@@ -646,9 +665,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FREEMANS_FOUNDRY:
-            thirdUpgrade = CREATURE_NONE;
-            secondUpgrade1 = CREATURE_NONE;
-            firstUpgrade_e = CREATURE_NONE;
+            firstUpgrade_e = secondUpgrade1 = thirdUpgrade_f = CREATURE_NONE;
             if (eventHero2->CreatureTypeCount(CREATURE_PIKEMAN))
                 firstUpgrade_e = CREATURE_PIKEMAN;
             if (eventHero2->CreatureTypeCount(CREATURE_SWORDSMAN)) {
@@ -663,7 +680,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 else if (secondUpgrade1 == CREATURE_NONE)
                     secondUpgrade1 = CREATURE_IRON_GOLEM;
                 else
-                    thirdUpgrade = CREATURE_IRON_GOLEM;
+                    thirdUpgrade_f = CREATURE_IRON_GOLEM;
             }
 
             if (firstUpgrade_e != CREATURE_NONE) {
@@ -674,23 +691,25 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     CREATURE_MASTER_SWORDSMAN
                 );
                 eventHero2->UpgradeCreatures(CREATURE_IRON_GOLEM, CREATURE_STEEL_GOLEM);
-                if (thirdUpgrade != CREATURE_NONE) {
+                if (thirdUpgrade_f != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Freeman's Foundry}\n\nAll of your  %s, %s and %s have been upgraded into "
-                        "%s, %s, and %s.",
+                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
+                        "\xee\xf2\xf0\xff\xe4\xfb %s, %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
+                        "%s, %s, \xe8 %s",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
-                        gArmyNamesPlural[IDX(thirdUpgrade)],
+                        gArmyNamesPlural[IDX(thirdUpgrade_f)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
                         gArmyNamesPlural[IDX(secondUpgrade1) + 1],
-                        gArmyNamesPlural[IDX(thirdUpgrade) + 1]
+                        gArmyNamesPlural[IDX(thirdUpgrade_f) + 1]
                     );
                 } else if (secondUpgrade1 != CREATURE_NONE) {
                     sprintf(
                         gText,
-                        "{Freeman's Foundry}\n\nAll of your %s and %s have been upgraded into "
-                        "%s and %s.",
+                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
+                        "\xee\xf2\xf0\xff\xe4\xfb %s \xe8 %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
+                        "%s \xe8 %s",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(secondUpgrade1)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1],
@@ -699,7 +718,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     sprintf(
                         gText,
-                        "{Freeman's Foundry}\n\nAll of your %s have been upgraded into %s.",
+                        "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xc2\xf1\xe5 \xe2\xe0\xf8\xe8 "
+                        "\xee\xf2\xf0\xff\xe4\xfb %s \xf2\xe5\xef\xe5\xf0\xfc \xf1\xf2\xe0\xeb\xe8 \xee\xf2\xf0\xff\xe4\xe0\xec\xe8 "
+                        "%s.",
                         gArmyNamesPlural[IDX(firstUpgrade_e)],
                         gArmyNamesPlural[IDX(firstUpgrade_e) + 1]
                     );
@@ -718,11 +739,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Freeman's Foundry}\n\nA blacksmith working at the foundry offers to convert "
-                    "all Pikemen and Swordsmen's weapons brought to him from iron to steel. He "
-                    "also says that he knows a process that will convert Iron Golems into Steel "
-                    "Golems.  Unfortunately, you have none of these troops in your army, so he "
-                    "can't help you.",
+                    "{\xc2\xee\xeb\xfc\xed\xe0\xff \xeb\xe8\xf2\xe5\xe9\xed\xe0\xff}\n\n\xca\xf3\xe7\xed\xe5\xf6 "
+                    "\xef\xf0\xe8 \xfd\xf2\xee\xe9 \xeb\xe8\xf2\xe5\xe9\xed\xee\xe9 \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                    "\xe7\xe0\xec\xe5\xed\xe8\xf2\xfc \xee\xf0\xf3\xe6\xe8\xe5 \xea\xee\xef\xe5\xe9\xf9\xe8\xea\xee\xe2 "
+                    "\xe8 \xec\xe5\xf7\xed\xe8\xea\xee\xe2 \xf1 \xe6\xe5\xeb\xe5\xe7\xed\xee\xe3\xee \xed\xe0 "
+                    "\xf1\xf2\xe0\xeb\xfc\xed\xee\xe5. \xce\xed \xf2\xe0\xea\xe6\xe5 \xf1\xea\xe0\xe7\xe0\xeb,"
+                    " \xf7\xf2\xee \xe2\xeb\xe0\xe4\xe5\xe5\xf2 \xf2\xe5\xf5\xed\xee\xeb\xee\xe3\xe8\xe5\xe9 "
+                    "\xef\xee\xe2\xfb\xf8\xe5\xed\xe8\xff \xe6\xe5\xeb\xe5\xe7\xed\xfb\xf5 \xe3\xee\xeb\xe5\xec\xee\xe2 "
+                    "\xe4\xee \xf1\xf2\xe0\xeb\xfc\xed\xfb\xf5. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8\xea\xee\xe3\xee "
+                    "\xe8\xe7 \xed\xe8\xf5 \xed\xe5\xf2 \xe2 \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8, \xe8 "
+                    "\xee\xed \xed\xe5 \xec\xee\xe3\xf3\xf2 \xef\xee\xec\xee\xf7\xfc \xe2\xe0\xec.",
                     -1,
                     0,
                     -1,
@@ -733,45 +759,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_SEA_CHEST:
-            if (!(cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)
-                || eventHero2->NumArtifacts() >= EVENT_ARTIFACT_CAPACITY) {
-                if (cell->m_objectMetadata == SEA_CHEST_OUTCOME_EMPTY) {
-                    NormalDialog(
-                        "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
-                        "you open it, only to find it empty.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
-                } else {
-                    NormalDialog(
-                        "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, "
-                        "you open it and find 1500 gold pieces.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        IDX(RES_GOLD),
-                        SEA_CHEST_GOLD,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
-                    GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
-                }
-            } else {
-                eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
+            if ((cell->m_objectMetadata & CHEST_ARTIFACT_FLAG)
+                && eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{Chest}\n\nAfter spending hours trying to fish the chest out of the sea, you "
-                    "open it and find 1000 gold and the %s",
-                    gArtifactNames[eventValue1]
+                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
+                    "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
+                    "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee. \xc2\xed\xf3\xf2\xf0\xe8 "
+                    "\xe1\xfb\xeb\xe8 %s \xe8 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
                     gText,
@@ -779,24 +775,65 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     -1,
                     MAP_EVENT_REWARD_ARTIFACT,
-                    eventValue1,
+                    cell->m_objectMetadata & CHEST_ARTIFACT_MASK,
                     IDX(RES_GOLD),
                     SEA_CHEST_ARTIFACT_GOLD,
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
+                GiveArtifact(
+                    eventHero2,
+                    ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
+                    1,
+                    -1
+                );
                 GiveResource(eventHero2, RES_GOLD, SEA_CHEST_ARTIFACT_GOLD);
+            } else if (cell->m_objectMetadata != SEA_CHEST_OUTCOME_EMPTY) {
+                NormalDialog(
+                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xf0\xee\xe2\xe5\xe4\xff \xf7\xe0\xf1\xfb, \xef\xfb\xf2\xe0\xff\xf1\xfc "
+                    "\xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea \xe8\xe7 \xe2\xee\xe4\xfb, \xe2\xfb "
+                    "\xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 \xe5\xe3\xee \xe8 \xed\xe0\xf8\xeb\xe8 "
+                    "\xe2\xed\xf3\xf2\xf0\xe8 1500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    IDX(RES_GOLD),
+                    SEA_CHEST_GOLD,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+                GiveResource(eventHero2, RES_GOLD, SEA_CHEST_GOLD);
+            } else {
+                NormalDialog(
+                    "{\xd1\xf3\xed\xe4\xf3\xea}\n\n\xcf\xee\xf2\xf0\xe0\xf2\xe8\xe2 \xf7\xe0\xf1\xfb \xed\xe0 "
+                    "\xf2\xee, \xf7\xf2\xee\xe1\xfb \xe2\xfb\xeb\xee\xe2\xe8\xf2\xfc \xf1\xf3\xed\xe4\xf3\xea "
+                    "\xe8\xe7 \xec\xee\xf0\xff, \xe2\xfb \xed\xe0\xea\xee\xed\xe5\xf6 \xee\xf2\xea\xf0\xfb\xeb\xe8 "
+                    "\xe5\xe3\xee \xeb\xe8\xf8\xfc \xe7\xe0 \xf2\xe5\xec, \xf7\xf2\xee\xe1\xfb \xf3\xe2\xe8\xe4\xe5\xf2\xfc:"
+                    " \xe2\xed\xf3\xf2\xf0\xe8 \xef\xf3\xf1\xf2\xee.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
             }
-            fizzleType3 = 1;
-            eraseObject = 1;
+            fizzleType_k = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_FLOTSAM: {
             switch (static_cast<FlotsamReward>(cell->m_objectMetadata)) {
                 case FLOTSAM_EMPTY:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, but find nothing.",
+                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
+                        "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8, \xed\xee \xed\xe8\xf7\xe5\xe3\xee "
+                        "\xed\xe5 \xed\xe0\xf8\xeb\xe8.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -810,7 +847,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, and find some wood.",
+                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
+                        "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xe4\xee\xe1\xfb\xeb\xe8 "
+                        "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -825,8 +864,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_WOOD_AND_GOLD:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam, and find some wood and some "
-                        "gold.",
+                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
+                        "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
+                        "\xed\xe5\xec\xed\xee\xe3\xee \xe7\xee\xeb\xee\xf2\xe0 \xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -842,8 +882,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
                 case FLOTSAM_LARGE_TREASURE:
                     NormalDialog(
-                        "{Flotsam}\n\nYou search through the flotsam and find some wood and some "
-                        "gold.",
+                        "{\xce\xe1\xeb\xee\xec\xea\xe8}\n\n\xc2\xfb \xe8\xf1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xeb\xe8 "
+                        "\xef\xeb\xe0\xe2\xe0\xfe\xf9\xe8\xe5 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xed\xe0\xf8\xeb\xe8 "
+                        "\xed\xe5\xec\xed\xee\xe3\xee \xe4\xf0\xe5\xe2\xe5\xf1\xe8\xed\xfb \xe8 \xe7\xee\xeb\xee\xf2\xe0.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -858,8 +899,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     GiveResource(eventHero2, RES_GOLD, FLOTSAM_LARGE_GOLD_AMOUNT);
                     break;
             }
-            fizzleType3 = 1;
-            eraseObject = 1;
+            fizzleType_k = 1;
+            eraseObject_l = 1;
             break;
         }
 
@@ -867,9 +908,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->NumArtifacts() < EVENT_ARTIFACT_CAPACITY) {
                 sprintf(
                     gText,
-                    "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
-                    "in an unforgiving ocean.  Grateful, he rewards you for your act of kindness "
-                    "by giving you the %s.",
+                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
+                    "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
+                    "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
+                    "\xee\xea\xe5\xe0\xed\xe5. \xcd\xe0\xe3\xf0\xe0\xe4\xe0 \xe7\xe0 \xe2\xe0\xf8\xf3 \xe4\xee\xe1\xf0\xee\xf2\xf3 "
+                    "- %s.",
                     gArtifactNames[cell->m_objectMetadata]
                 );
                 NormalDialog(
@@ -887,9 +930,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 GiveArtifact(eventHero2, ArtifactType(cell->m_objectMetadata), 1, -1);
             } else {
                 NormalDialog(
-                    "{Shipwreck Survivor}\n\nYou've pulled a shipwreck survivor from certain death "
-                    "in an unforgiving ocean.  Grateful, he says, \"I would give you an artifact "
-                    "as a reward, but you're all full.\"",
+                    "{\xcf\xee\xf2\xe5\xf0\xef\xe5\xe2\xf8\xe8\xe9 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}"
+                    "\n\n\xc2\xfb \xf1\xef\xe0\xf1\xeb\xe8 \xe6\xe5\xf0\xf2\xe2\xf3 \xea\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xff "
+                    "\xee\xf2 \xed\xe5\xec\xe8\xed\xf3\xe5\xec\xee\xe9 \xf1\xec\xe5\xf0\xf2\xe8 \xe2 \xe1\xe5\xe7\xe6\xe0\xeb\xee\xf1\xf2\xed\xee\xec "
+                    "\xee\xea\xe5\xe0\xed\xe5. \xc8\xf1\xef\xee\xeb\xed\xe5\xed\xed\xfb\xe9 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xe8,"
+                    " \xe1\xe5\xe4\xed\xff\xe3\xe0 \xf1\xea\xe0\xe7\xe0\xeb: \"\xdf \xe1\xfb \xed\xe0\xe3\xf0\xe0\xe4\xe8\xeb "
+                    "\xe2\xe0\xf1 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2\xee\xec, \xed\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 "
+                    "\xe4\xeb\xff \xed\xe5\xe3\xee \xec\xe5\xf1\xf2\xe0.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -901,15 +948,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0
                 );
             }
-            fizzleType3 = 1;
-            eraseObject = 1;
+            fizzleType_k = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_MAGELLAN_MAPS:
             if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < MAGELLAN_MAP_COST) {
                 NormalDialog(
-                    "{Magellan's Maps}\n\nThe captain sighs.  \"You don't have enough money, eh?  "
-                    "You can't expect me to give my maps away for free!\"",
+                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xca\xe0\xef\xe8\xf2\xe0\xed "
+                    "\xe2\xe7\xe4\xfb\xf5\xe0\xe5\xf2. \"\xd7\xf2\xee, \xe4\xe5\xed\xfc\xe6\xe0\xf2 \xed\xe5 "
+                    "\xf5\xe2\xe0\xf2\xe0\xe5\xf2, \xe4\xe0? \xd2\xfb \xe6\xe5 \xed\xe5 \xe4\xf3\xec\xe0\xe5\xf8\xfc,"
+                    " \xe1\xf3\xe4\xf2\xee \xff \xee\xf2\xe4\xe0\xec \xf2\xe5\xe1\xe5 \xf1\xe2\xee\xe8 \xea\xe0\xf0\xf2\xfb "
+                    "\xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee!\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -923,9 +973,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Magellan's Maps}\n\nA retired captain living on this refurbished fishing "
-                    "platform offers to sell you maps of the sea he made in his younger days for "
-                    "1,000 gold.  Do you wish to buy the maps?",
+                    "{\xca\xe0\xf0\xf2\xfb \xcc\xe0\xe3\xe5\xeb\xeb\xe0\xed\xe0}\n\n\xc1\xfb\xe2\xf8\xe8\xe9 "
+                    "\xea\xe0\xef\xe8\xf2\xe0\xed, \xe6\xe8\xe2\xf3\xf9\xe8\xe9 \xed\xe0 \xfd\xf2\xee\xec \xef\xee\xe4\xed\xee\xe2\xeb\xe5\xed\xed\xee\xec "
+                    "\xf0\xfb\xe1\xee\xeb\xee\xe2\xed\xee\xec \xef\xf0\xe8\xf7\xe0\xeb\xe5, \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                    "\xe2\xe0\xec \xea\xe0\xf0\xf2\xfb, \xf1\xee\xf1\xf2\xe0\xe2\xeb\xe5\xed\xed\xfb\xe5 \xe2 "
+                    "\xef\xf0\xe5\xe6\xed\xe8\xe5 \xe4\xed\xe8, \xe7\xe0 1000 \xe7\xee\xeb\xee\xf2\xfb\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                    "\xe8\xf5 \xea\xf3\xef\xe8\xf2\xfc?",
                     NORMAL_DIALOG_CONFIRM,
                     -1,
                     -1,
@@ -949,54 +1002,68 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (eventHero2->m_secondarySkills[cell->m_objectMetadata] != HERO_SKILL_LEVEL_NONE) {
                 sprintf(
                     gText,
-                    "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying an "
-                    "ancient tome on %s.  As you approach, she turns and speaks.  \"You already "
-                    "know that which I would teach you. I can help you no further.\"",
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
+                    "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
+                    "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
+                    "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
+                    "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
+                    "\xe8 \xec\xee\xeb\xe2\xe8\xeb\xe0: \"\xc2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xf2\xee,"
+                    " \xf7\xe5\xec\xf3 \xff \xec\xee\xe3\xeb\xe0 \xe1\xfb \xed\xe0\xf3\xf7\xe8\xf2\xfc. \xc1\xee\xeb\xfc\xf8\xe5 "
+                    "\xed\xe8\xf7\xe5\xec \xef\xee\xec\xee\xf7\xfc \xed\xe5 \xf1\xec\xee\xe3\xf3.\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                break;
-            }
-            if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
+            } else if (eventHero2->m_secondarySkillCount >= HERO_SECONDARY_SKILL_LIMIT) {
                 sprintf(
                     gText,
-                    "{Witch's Hut}\n\nYou approach the hut and observe a witch inside studying "
-                    "an ancient tome on %s.  As you approach, she turns and focuses her one "
-                    "glass eye on you.  \"You already know everything you deserve to learn!\" "
-                    "the witch screeches. \"NOW GET OUT OF MY HOUSE!\"",
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xcf\xee\xe4\xee\xe9\xe4\xff \xea "
+                    "\xf5\xe8\xe6\xe8\xed\xe5 \xe8 \xe7\xe0\xe3\xeb\xff\xed\xf3\xe2 \xe2 \xee\xea\xed\xee, \xe2\xfb "
+                    "\xf3\xe2\xe8\xe4\xe5\xeb\xe8 \xe2\xe5\xe4\xfc\xec\xf3, \xf1\xea\xeb\xee\xed\xe8\xe2\xf8\xf3\xfe\xf1\xff "
+                    "\xed\xe0\xe4 \xe4\xf0\xe5\xe2\xed\xe5\xe9 \xea\xed\xe8\xe3\xee\xe9 \xef\xee\xe4 \xed\xe0\xe7\xe2\xe0\xed\xe8\xe5\xec "
+                    "%s. \xca\xee\xe3\xe4\xe0 \xe2\xfb \xe2\xee\xf8\xeb\xe8, \xee\xed\xe0 \xee\xe1\xe5\xf0\xed\xf3\xeb\xe0\xf1\xfc "
+                    "\xe8 \xed\xe0\xf1\xf2\xe0\xe2\xe8\xeb\xe0 \xed\xe0 \xe2\xe0\xf1 \xf1\xe2\xee\xe9 \xf1\xf2\xe5\xea\xeb\xff\xed\xed\xfb\xe9 "
+                    "\xe3\xeb\xe0\xe7. \"\xd2\xfb \xf3\xe6\xe5 \xe8 \xf2\xe0\xea \xe7\xed\xe0\xe5\xf8\xfc \xe2\xf1\xe5,"
+                    " \xf7\xe5\xe3\xee \xe7\xe0\xf1\xeb\xf3\xe6\xe8\xe2\xe0\xe5\xf8\xfc!\" - \xe7\xe0\xe2\xee\xef\xe8\xeb\xe0 "
+                    "\xe2\xe5\xe4\xfc\xec\xe0. \"- \xc0 \xf2\xe5\xef\xe5\xf0\xfc \xf3\xe1\xe8\xf0\xe0\xe9\xf1\xff "
+                    "\xe8\xe7 \xec\xee\xe5\xe3\xee \xe4\xee\xec\xe0!\"",
                     gSecondarySkills[cell->m_objectMetadata]
                 );
                 NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                break;
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                sprintf(
+                    gText,
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xc4\xf0\xff\xf5\xeb\xe0\xff, \xed\xee "
+                    "\xe1\xe5\xf1\xf1\xec\xe5\xf0\xf2\xed\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0, \xe6\xe8\xe2\xf3\xf9\xe0\xff "
+                    "\xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5 \xed\xe0 \xea\xf3\xf0\xfc\xe8\xf5 \xed\xee\xe6\xea\xe0\xf5,"
+                    " \xef\xee \xea\xe0\xea\xe8\xec-\xf2\xee \xed\xe5\xef\xee\xed\xff\xf2\xed\xfb\xec \xf1\xee\xee\xe1\xf0\xe0\xe6\xe5\xed\xe8\xff\xec "
+                    "\xf0\xe5\xf8\xe8\xeb\xe0, \xf7\xf2\xee %s \xe2\xe0\xec \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff.",
+                    gSecondarySkills[cell->m_objectMetadata]
+                );
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    gText,
+                    NORMAL_DIALOG_SECONDARY_SKILL,
+                    cell->m_objectMetadata * SECONDARY_SKILL_VALUE_LEVEL_COUNT,
+                    -1,
+                    0,
+                    -1
+                );
+                eventHero2->GiveSS(
+                    static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
+                    HERO_SKILL_LEVEL_BASIC
+                );
             }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            sprintf(
-                gText,
-                "{Witch's Hut}\n\nAn ancient and immortal witch living in a hut with "
-                "bird's legs for stilts teaches you %s for her own inscrutable purposes.",
-                gSecondarySkills[cell->m_objectMetadata]
-            );
-            EventWindow(
-                -1,
-                NORMAL_DIALOG_INFO,
-                gText,
-                NORMAL_DIALOG_SECONDARY_SKILL,
-                cell->m_objectMetadata * SECONDARY_SKILL_VALUE_LEVEL_COUNT,
-                -1,
-                0,
-                -1
-            );
-            eventHero2->GiveSS(
-                static_cast<HeroSecondarySkill>(cell->m_objectMetadata),
-                HERO_SKILL_LEVEL_BASIC
-            );
             break;
 
         case MAP_OBJECT_ARTESIAN_SPRING:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Artesian Spring}\n\nThe spring only refills once a week, and someone's "
-                    "already been here this week.",
+                    "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xdd\xf2\xee\xf2 "
+                    "\xf0\xee\xe4\xed\xe8\xea \xe2\xee\xf1\xef\xee\xeb\xed\xff\xe5\xf2\xf1\xff \xf0\xe0\xe7 \xe2 "
+                    "\xed\xe5\xe4\xe5\xeb\xfe, \xe0 \xea\xf2\xee-\xf2\xee \xf3\xe6\xe5 \xef\xf0\xe8\xea\xeb\xe0\xe4\xfb\xe2\xe0\xeb\xf1\xff "
+                    "\xea \xed\xe5\xec\xf3 \xed\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1010,13 +1077,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                springSpellPoints =
+                springSpellPoints_j =
                     eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
                 if (eventHero2->m_spellPoints
-                    < springSpellPoints * ARTESIAN_SPRING_MANA_MULTIPLIER) {
+                    >= springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER) {
                     NormalDialog(
-                        "{Artesian Spring}\n\nA drink from the spring fills your blood with magic! "
-                        " You have twice your normal spell points in reserve.",
+                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xe4\xe2\xee\xe5 \xef\xee\xe2\xfb\xf8\xe0\xe5\xf2 "
+                        "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, "
+                        "\xed\xee \xe2\xfb \xf3\xe6\xe5 \xef\xf0\xe8\xe1\xfb\xe2\xe0\xe5\xf2\xe5 \xe2 \xef\xee\xe4\xee\xe1\xed\xee\xec "
+                        "\xf1\xee\xf1\xf2\xee\xff\xed\xe8\xe8.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1027,11 +1097,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
-                    eventHero2->m_spellPoints = springSpellPoints * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 } else {
                     NormalDialog(
-                        "{Artesian Spring}\n\nA drink at the spring is supposed to give you twice "
-                        "your normal spell points, but you are already at that level.",
+                        "{\xc0\xf0\xf2\xe5\xe7\xe8\xe0\xed\xf1\xea\xe8\xe9 \xe8\xf1\xf2\xee\xf7\xed\xe8\xea}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xf0\xee\xe4\xed\xe8\xea\xe0 \xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xf3 "
+                        "\xea\xf0\xee\xe2\xfc \xec\xe0\xe3\xe8\xe5\xe9! \xd2\xe5\xef\xe5\xf0\xfc \xf3 \xe2\xe0\xf1 "
+                        "\xe2 \xe7\xe0\xef\xe0\xf1\xe5 \xe2\xe4\xe2\xee\xe5 \xe1\xee\xeb\xfc\xf8\xe5 \xee\xe1\xfb\xf7\xed\xee\xe3\xee "
+                        "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xee\xe9 \xfd\xed\xe5\xf0\xe3\xe8\xe8.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1042,20 +1114,53 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         -1,
                         0
                     );
+                    eventHero2->m_spellPoints = springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER;
                 }
             }
             break;
 
         case MAP_OBJECT_MAGIC_WELL:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_MAGIC_WELL)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_MAGIC_WELL)) {
+                NormalDialog(
+                    "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 "
+                    "\xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc2\xf2\xee\xf0\xee\xe9 \xe3\xeb\xee\xf2\xee\xea \xe8\xe7 "
+                    "\xea\xee\xeb\xee\xe4\xf6\xe0 \xe7\xe0 \xe4\xe5\xed\xfc \xe2\xe0\xec \xed\xe5 \xef\xee\xec\xee\xe6\xe5\xf2.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 cell->m_objectMetadata = 0;
-                wellSpellPoints5 =
+                wellSpellPoints_o =
                     eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
-                if (eventHero2->m_spellPoints < wellSpellPoints5) {
+                if (eventHero2->m_spellPoints >= wellSpellPoints_o) {
                     NormalDialog(
-                        "{Magic Well}\n\nA drink from the well has restored your spell points to "
-                        "maximum.",
+                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xee\xe1\xfb\xf7\xed\xee \xe2\xee\xf1\xf1\xf2\xe0\xed\xe0\xe2\xeb\xe8\xe2\xe0\xe5\xf2 "
+                        "\xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe, \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 "
+                        "\xee\xed\xe0 \xf3 \xe2\xe0\xf1 \xe8 \xf2\xe0\xea \xed\xe0 \xef\xf0\xe5\xe4\xe5\xeb\xe5.",
+                        NORMAL_DIALOG_INFO,
+                        -1,
+                        -1,
+                        -1,
+                        0,
+                        -1,
+                        0,
+                        -1,
+                        0
+                    );
+                } else {
+                    NormalDialog(
+                        "{\xc2\xee\xeb\xf8\xe5\xe1\xed\xfb\xe9 \xea\xee\xeb\xee\xe4\xe5\xf6}\n\n\xc3\xeb\xee\xf2\xee\xea "
+                        "\xe8\xe7 \xea\xee\xeb\xee\xe4\xf6\xe0 \xef\xee\xeb\xed\xee\xf1\xf2\xfc\xfe \xe2\xee\xf1\xf1\xf2\xe0\xed\xee\xe2\xe8\xeb "
+                        "\xe2\xe0\xf8\xf3 \xec\xe0\xe3\xe8\xf7\xe5\xf1\xea\xf3\xfe \xfd\xed\xe5\xf0\xe3\xe8\xfe.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -1069,35 +1174,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     eventHero2->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
                     );
-                    eventHero2->m_spellPoints = wellSpellPoints5;
-                } else {
-                    NormalDialog(
-                        "{Magic Well}\n\nA drink at the well is supposed to restore your spell "
-                        "points, but you are already at maximum.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
+                    eventHero2->m_spellPoints = wellSpellPoints_o;
                 }
-            } else {
-                NormalDialog(
-                    "{Magic Well}\n\nA second drink at the well in one day will not help you.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
             }
             break;
 
@@ -1129,17 +1207,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     NULL
                 );
                 WaitEndSample(&playedSample3, -1);
-                CheckAdjacentMon(&adjacentMonster8);
+                CheckAdjacentMon(&adjacentMonster_j);
             }
             break;
 
         case MAP_OBJECT_BOAT:
-            boat_j = &gpGame->m_boats[cell->m_objectMetadata];
+            boat_k = &gpGame->m_boats[cell->m_objectMetadata];
             gpGame->RestoreCell(
                 -1,
                 -1,
-                boat_j->savedTriggerType,
-                boat_j->savedEventData,
+                boat_k->savedTriggerType,
+                boat_k->savedEventData,
                 cell,
                 BOAT_RESTORE_MODE
             );
@@ -1147,10 +1225,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_EMBARKED)
             );
             eventHero2->m_remainingMobility = 0;
-            boat_j->heroId = eventHero2->m_id;
-            boat_j->owner = eventHero2->m_owner;
+            boat_k->heroId = eventHero2->m_id;
+            boat_k->owner = eventHero2->m_owner;
             m_cursorType = HERO_TYPE_BOAT;
-            m_cursorDirection = boat_j->direction;
+            m_cursorDirection = boat_k->direction;
             m_cursorFrame = GetCursorBaseFrame(m_cursorDirection);
             m_cursorActive = 1;
             CompleteDraw(m_mapOriginX, m_mapOriginY, 0, 1);
@@ -1158,102 +1236,102 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_MINE:
-            if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-                if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
-                    mineCombatResult7 = CombatMonsterEvent(
-                        eventHero2,
-                        gpGame->m_mines[cell->m_objectMetadata].guardianType,
-                        gpGame->m_mines[cell->m_objectMetadata].guardianCount,
-                        cell,
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        CREATURE_NONE,
-                        0,
-                        0,
-                        CREATURE_NONE,
-                        0,
-                        0
-                    );
-                    if (mineCombatResult7 != COMBAT_RESULT_ATTACKER)
-                        break;
+            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+                break;
+            if (gpGame->m_mines[cell->m_objectMetadata].guardianType != CREATURE_NONE) {
+                mineCombatResult_b = CombatMonsterEvent(
+                    eventHero2,
+                    gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                    gpGame->m_mines[cell->m_objectMetadata].guardianCount,
+                    cell,
+                    x,
+                    y,
+                    0,
+                    x,
+                    y,
+                    CREATURE_NONE,
+                    0,
+                    0,
+                    CREATURE_NONE,
+                    0,
+                    0
+                );
+                if (mineCombatResult_b == COMBAT_RESULT_ATTACKER) {
                     gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
                     eventHero2->CheckLevel();
+                } else {
+                    break;
                 }
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_GOLD)
-                    resourceAmount6 = MINE_GOLD_INCOME;
-                else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_ORE)
-                    resourceAmount6 = MINE_ORE_INCOME;
-                else
-                    resourceAmount6 = 1;
-                EventWindow(
-                    IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
-                        + MINE_RESOURCE_ICON_OFFSET,
-                    NORMAL_DIALOG_INFO,
-                    "",
-                    IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
-                    -resourceAmount6,
-                    -1,
-                    0,
-                    -1
-                );
-            claimMine:
-                gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             }
-            break;
+            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+            if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_GOLD)
+                resourceAmount_o = MINE_GOLD_INCOME;
+            else if (gpGame->m_mines[cell->m_objectMetadata].resourceType == MINE_TYPE_ORE)
+                resourceAmount_o = MINE_ORE_INCOME;
+            else
+                resourceAmount_o = 1;
+            EventWindow(
+                IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType)
+                    + MINE_RESOURCE_ICON_OFFSET,
+                NORMAL_DIALOG_INFO,
+                "",
+                IDX(gpGame->m_mines[cell->m_objectMetadata].resourceType),
+                -resourceAmount_o,
+                -1,
+                0,
+                -1
+            );
+            goto claimMine;
 
         case MAP_OBJECT_ALCHEMIST_LAB:
-            if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(
-                    EVENT_TEXT_ALCHEMIST_CAPTURED,
-                    NORMAL_DIALOG_INFO,
-                    "",
-                    IDX(RES_MERCURY),
-                    NORMAL_DIALOG_NO_VALUE,
-                    -1,
-                    0,
-                    -1
-                );
-                goto claimMine;
-            }
-            break;
+            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+                break;
+            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+            EventWindow(
+                EVENT_TEXT_ALCHEMIST_CAPTURED,
+                NORMAL_DIALOG_INFO,
+                "",
+                IDX(RES_MERCURY),
+                NORMAL_DIALOG_NO_VALUE,
+                -1,
+                0,
+                -1
+            );
+            goto claimMine;
 
         case MAP_OBJECT_SAWMILL:
-            if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(
-                    EVENT_TEXT_SAWMILL_CAPTURED,
-                    NORMAL_DIALOG_INFO,
-                    "",
-                    IDX(RES_WOOD),
-                    -MINE_ORE_INCOME,
-                    -1,
-                    0,
-                    -1
-                );
-                goto claimMine;
-            }
+            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+                break;
+            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+            EventWindow(
+                EVENT_TEXT_SAWMILL_CAPTURED,
+                NORMAL_DIALOG_INFO,
+                "",
+                IDX(RES_WOOD),
+                -MINE_ORE_INCOME,
+                -1,
+                0,
+                -1
+            );
+        claimMine:
+            gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             break;
 
         case MAP_OBJECT_LIGHTHOUSE:
-            if (gpGame->m_mineOwners[cell->m_objectMetadata] != giCurPlayer) {
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
-                EventWindow(
-                    EVENT_TEXT_LIGHTHOUSE_CAPTURED,
-                    NORMAL_DIALOG_INFO,
-                    "",
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-            }
+            if (gpGame->m_mineOwners[cell->m_objectMetadata] == giCurPlayer)
+                break;
+            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+            gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
+            EventWindow(
+                EVENT_TEXT_LIGHTHOUSE_CAPTURED,
+                NORMAL_DIALOG_INFO,
+                "",
+                -1,
+                0,
+                -1,
+                0,
+                -1
+            );
             break;
 
         case MAP_OBJECT_TREASURE_CHEST:
@@ -1262,12 +1340,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     cell->m_objectMetadata = CHEST_REWARD_SMALL;
                     goto chestGold;
                 }
-                eventValue1 = cell->m_objectMetadata & CHEST_ARTIFACT_MASK;
                 sprintf(
                     gText,
-                    "{Chest}\n\nAfter scouring the area, you fall upon a hidden chest, containing "
-                    "the ancient artifact '%s'",
-                    gArtifactNames[eventValue1]
+                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
+                    " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe7\xe0\xf0\xfb\xf2\xfb\xe9 "
+                    "\xeb\xe0\xf0\xe5\xf6, \xe0 \xe2 \xed\xe5\xec - \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 "
+                    "'%s'",
+                    gArtifactNames[cell->m_objectMetadata & CHEST_ARTIFACT_MASK]
                 );
                 NormalDialog(
                     gText,
@@ -1275,21 +1354,29 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     -1,
                     MAP_EVENT_REWARD_ARTIFACT,
-                    eventValue1,
+                    cell->m_objectMetadata & CHEST_ARTIFACT_MASK,
                     -1,
                     0,
                     -1,
                     0
                 );
-                GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
+                GiveArtifact(
+                    eventHero2,
+                    ArtifactType(cell->m_objectMetadata & CHEST_ARTIFACT_MASK),
+                    1,
+                    -1
+                );
             } else {
             chestGold:
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Chest}\n\nAfter scouring the area, you fall upon a hidden treasure cache.  "
-                    "You may take the gold or distribute the gold to the peasants for experience.  "
-                    "Do you wish to keep the gold?",
+                    "{\xcb\xe0\xf0\xe5\xf6}\n\n\xc8\xf1\xf1\xeb\xe5\xe4\xf3\xff \xee\xea\xf0\xe5\xf1\xf2\xed\xee\xf1\xf2\xe8,"
+                    " \xe2\xfb \xed\xe0\xf2\xea\xed\xf3\xeb\xe8\xf1\xfc \xed\xe0 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
+                    "\xeb\xe0\xf0\xe5\xf6. \xc7\xee\xeb\xee\xf2\xee \xec\xee\xe6\xed\xee \xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc "
+                    "\xf1\xe5\xe1\xe5 \xe8\xeb\xe8 \xf0\xe0\xe7\xe4\xe0\xf2\xfc \xea\xf0\xe5\xf1\xf2\xfc\xff\xed\xe0\xec "
+                    "\xe2 \xee\xe1\xec\xe5\xed \xed\xe0 \xee\xef\xfb\xf2. \xce\xf1\xf2\xe0\xe2\xe8\xf2\xe5 \xf1\xe5\xe1\xe5 "
+                    "\xe7\xee\xeb\xee\xf2\xee?",
                     IDX(RES_GOLD),
                     cell->m_objectMetadata * CHEST_GOLD_MULTIPLIER,
                     NORMAL_DIALOG_EXPERIENCE,
@@ -1311,13 +1398,15 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         0
                     );
             }
-            eraseObject = 1;
-            fizzleType3 = 1;
+            eraseObject_l = 1;
+            fizzleType_k = 1;
             eventHero2->CheckLevel();
             break;
 
         case MAP_OBJECT_BUOY:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_BUOY)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_BUOY)) {
+                EventWindow(EVENT_TEXT_BUOY_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_BUOY)
@@ -1333,13 +1422,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-            } else {
-                EventWindow(EVENT_TEXT_BUOY_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
             }
             break;
 
         case MAP_OBJECT_FAERIE_RING:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_FAERIE_RING)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_FAERIE_RING)) {
+                EventWindow(
+                    EVENT_TEXT_FAERIE_RING_VISITED,
+                    NORMAL_DIALOG_INFO,
+                    "",
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FAERIE_RING)
@@ -1355,22 +1453,27 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-            } else {
+            }
+            break;
+
+        case MAP_OBJECT_IDOL:
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_IDOL)) {
                 EventWindow(
-                    EVENT_TEXT_FAERIE_RING_VISITED,
+                    -1,
                     NORMAL_DIALOG_INFO,
-                    "",
+                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
+                    " \xc3\xee\xe2\xee\xf0\xff\xf2, \xee\xed \xef\xf0\xe8\xed\xee\xf1\xe8\xf2 \xf3\xe4\xe0\xf7\xf3 "
+                    "\xf2\xe5\xec, \xea\xf2\xee \xe5\xe3\xee \xed\xe0\xe2\xe5\xf9\xe0\xe5\xf2, \xed\xee \xef\xee\xf1\xea\xee\xeb\xfc\xea\xf3 "
+                    "\xe7\xe2\xe5\xe7\xe4\xfb \xe8 \xf2\xe0\xea \xef\xee\xea\xf0\xee\xe2\xe8\xf2\xe5\xeb\xfc\xf1\xf2\xe2\xf3\xfe\xf2 "
+                    "\xe2\xe0\xec, \xe8\xe4\xee\xeb \xed\xe8\xf7\xe5\xe3\xee \xed\xee\xe2\xee\xe3\xee \xe2\xe0\xec "
+                    "\xed\xe5 \xe4\xe0\xeb.",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-            }
-            break;
-
-        case MAP_OBJECT_IDOL:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_IDOL)) {
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_IDOL)
@@ -1379,22 +1482,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Idol}\n\nYou've found an ancient and weathered stone idol.  Kissing it is "
-                    "supposed to be lucky, so you do.  The stone is very cold to the touch.",
+                    "{\xc8\xe4\xee\xeb}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe8\xe4\xee\xeb\xe0."
+                    " \xc3\xee\xe2\xee\xf0\xff\xf2, \xe5\xf1\xeb\xe8 \xe5\xe3\xee \xef\xee\xf6\xe5\xeb\xee\xe2\xe0\xf2\xfc,"
+                    " \xfd\xf2\xee \xef\xf0\xe8\xed\xe5\xf1\xe5\xf2 \xf3\xe4\xe0\xf7\xf3 - \xe2\xfb \xf2\xe0\xea "
+                    "\xe8 \xef\xee\xf1\xf2\xf3\xef\xe8\xeb\xe8. \xca\xe0\xec\xe5\xed\xfc \xee\xea\xe0\xe7\xe0\xeb\xf1\xff "
+                    "\xee\xf7\xe5\xed\xfc \xf5\xee\xeb\xee\xe4\xe5\xed \xe4\xeb\xff \xe3\xf3\xe1.",
                     NORMAL_DIALOG_LUCK_BONUS,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-            } else {
-                EventWindow(
-                    -1,
-                    NORMAL_DIALOG_INFO,
-                    "{Idol}\n\nYou've found an ancient and weathered stone idol.  It is supposed "
-                    "to grant luck to visitors, but since the stars are already smiling upon you, "
-                    "it does nothing.",
-                    -1,
                     0,
                     -1,
                     0,
@@ -1404,7 +1497,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_FOUNTAIN:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_FOUNTAIN)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_FOUNTAIN)) {
+                EventWindow(EVENT_TEXT_FOUNTAIN_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_FOUNTAIN)
@@ -1420,13 +1515,25 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     0,
                     -1
                 );
-            } else {
-                EventWindow(EVENT_TEXT_FOUNTAIN_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
             }
             break;
 
         case MAP_OBJECT_WATERING_HOLE:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_WATERING_HOLE)) {
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc2\xfb\xef\xe8\xe2\xea\xe0 \xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2,"
+                    " \xed\xee \xe8\xed\xfb\xf5 \xe1\xeb\xe0\xe3 \xed\xe5 \xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xc8\xf1\xf2\xee\xf7\xed\xe8\xea "
+                    "\xf1\xed\xee\xe2\xe0 \xef\xee\xec\xee\xe6\xe5\xf2 \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
+                    "\xe1\xe8\xf2\xe2\xfb.",
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_WATERING_HOLE)
@@ -1437,22 +1544,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Watering Hole}\n\nA drink at the watering hole fills your troops with "
-                    "strength and lifts their spirits.  You can travel a bit further today.",
+                    "{\xcf\xf0\xee\xec\xee\xe8\xed\xe0}\n\n\xc4\xee\xe1\xf0\xfb\xe9 \xe3\xeb\xee\xf2\xee\xea "
+                    "\xe8\xf1\xef\xee\xeb\xed\xe8\xeb \xe2\xe0\xf8\xe8 \xe2\xee\xe9\xf1\xea\xe0 \xf1\xe8\xeb\xfb "
+                    "\xe8 \xef\xee\xe4\xed\xff\xeb \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb \xf1\xec\xee\xe6\xe5\xf2\xe5 "
+                    "\xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe4\xe0\xeb\xfc\xf8\xe5.",
                     NORMAL_DIALOG_MORALE_BONUS,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-            } else {
-                EventWindow(
-                    -1,
-                    NORMAL_DIALOG_INFO,
-                    "{Watering Hole}\n\nThe drink at the watering hole is refreshing, but offers "
-                    "no further benefit.  The watering hole might help again if you fought a "
-                    "battle first.",
-                    -1,
                     0,
                     -1,
                     0,
@@ -1462,7 +1558,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_OASIS:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_OASIS)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_OASIS)) {
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xeb\xe0\xe3\xe8 \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
+                    "\xee\xf1\xe2\xe5\xe6\xe0\xe5\xf2, \xed\xee \xe8\xed\xee\xe9 \xef\xee\xeb\xfc\xe7\xfb \xed\xe5 "
+                    "\xef\xf0\xe8\xed\xee\xf1\xe8\xf2. \xdd\xf2\xee\xf2 \xee\xe0\xe7\xe8\xf1, \xe2\xee\xe7\xec\xee\xe6\xed\xee,"
+                    " \xef\xf0\xe8\xe3\xee\xe4\xe8\xf2\xf1\xff \xe2\xe0\xec \xef\xee\xf1\xeb\xe5 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
+                    "\xe1\xe8\xf2\xe2\xfb.",
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_OASIS)
@@ -1473,21 +1584,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Oasis}\n\nA drink at the oasis fills your troops with strength and lifts "
-                    "their spirits.  You can travel a bit further today.",
+                    "{\xce\xe0\xe7\xe8\xf1}\n\n\xc3\xeb\xee\xf2\xee\xea \xe2\xee\xe4\xfb \xe2 \xee\xe0\xe7\xe8\xf1\xe5 "
+                    "\xed\xe0\xef\xee\xeb\xed\xff\xe5\xf2 \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe8\xed\xee\xe2 \xf1\xe8\xeb\xee\xe9 "
+                    "\xe8 \xef\xee\xe4\xed\xe8\xec\xe0\xe5\xf2 \xe4\xf3\xf5. \xd1\xe5\xe3\xee\xe4\xed\xff \xe2\xfb "
+                    "\xf1\xec\xee\xe6\xe5\xf2\xe5 \xef\xf0\xee\xe9\xf2\xe8 \xf7\xf3\xf2\xfc \xe1\xee\xeb\xfc\xf8\xe5.",
                     NORMAL_DIALOG_MORALE_BONUS,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-            } else {
-                EventWindow(
-                    -1,
-                    NORMAL_DIALOG_INFO,
-                    "{Oasis}\n\nThe drink at the oasis is refreshing, but offers no further "
-                    "benefit.  The oasis might help again if you fought a battle first.",
-                    -1,
                     0,
                     -1,
                     0,
@@ -1497,35 +1598,36 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_TEMPLE:
-            if (!HAS(eventHero2->m_eventFlags, HERO_EVENT_TEMPLE)) {
+            if (HAS(eventHero2->m_eventFlags, HERO_EVENT_TEMPLE)) {
+                NormalDialog(
+                    "{\xd5\xf0\xe0\xec}\n\n\xc4\xe2\xee\xe9\xed\xe0\xff \xec\xee\xeb\xe8\xf2\xe2\xe0 \xe2\xee\xe9\xed\xe5 "
+                    "\xed\xe5 \xef\xee\xe4\xf1\xef\xee\xf0\xfc\xe5. \xc7\xe0\xf5\xee\xe4\xe8\xf2\xe5 \xef\xee\xf1\xeb\xe5 "
+                    "\xe1\xe8\xf2\xe2\xfb.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 eventHero2->m_eventFlags = HeroEventFlag(
                     static_cast<i32>(eventHero2->m_eventFlags) | IDX(HERO_EVENT_TEMPLE)
                 );
                 eventHero2->m_morale += TEMPLE_MORALE_BONUS;
                 NormalDialog(
-                    "{Temple}\n\nA visit and a prayer at the temple raises the morale of your "
-                    "troops.",
+                    "{\xd5\xf0\xe0\xec}\n\n\xcf\xee\xf1\xe5\xf9\xe5\xed\xe8\xe5 \xf5\xf0\xe0\xec\xe0 \xe8 \xec\xee\xeb\xe8\xf2\xe2\xe0 "
+                    "\xef\xee\xe4\xed\xff\xeb\xe8 \xec\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe8\xf5 \xe2\xee\xe9\xf1\xea.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
                     NORMAL_DIALOG_MORALE_BONUS,
                     0,
                     NORMAL_DIALOG_MORALE_BONUS,
-                    0,
-                    -1,
-                    0
-                );
-            } else {
-                NormalDialog(
-                    "{Temple}\n\nIt doesn't help to pray twice before a battle.  Come back after "
-                    "you've fought.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
                     0,
                     -1,
                     0
@@ -1536,7 +1638,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_LEAN_TO:
             if (!cell->m_objectMetadata) {
                 NormalDialog(
-                    "{Lean To}\n\nThe lean-to is long abandoned.  There is nothing of value here.",
+                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xdd\xf2\xee \xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe5 \xe4\xe0\xe2\xed\xee "
+                    "\xe1\xf0\xee\xf8\xe5\xed\xee. \xcd\xe8\xf7\xe5\xe3\xee \xf6\xe5\xed\xed\xee\xe3\xee \xf2\xf3\xf2 "
+                    "\xed\xe5\xf2.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1549,91 +1653,102 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                resourceType = static_cast<ResourceType>(
-                    (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
-                );
-                resourceAmount6 =
-                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT;
                 NormalDialog(
-                    "{Lean To}\n\nYou've found an abandoned lean-to.  Poking about, you discover "
-                    "some resources hidden nearby.",
+                    "{\xcd\xe0\xe2\xe5\xf1}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 "
+                    "\xed\xe0\xe2\xe5\xf1. \xcf\xee\xe8\xf1\xea\xe0\xe2 \xe2\xee\xea\xf0\xf3\xe3, \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 "
+                    "\xea\xee\xe5-\xea\xe0\xea\xe8\xe5 \xf0\xe5\xf1\xf3\xf0\xf1\xfb, \xef\xf0\xe8\xef\xf0\xff\xf2\xe0\xed\xed\xfb\xe5 "
+                    "\xef\xee\xe1\xeb\xe8\xe7\xee\xf1\xf2\xe8.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
-                    IDX(resourceType),
-                    resourceAmount6,
+                    (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
+                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
                     -1,
                     0,
                     -1,
                     0
                 );
-                GiveResource(eventHero2, resourceType, resourceAmount6);
+                GiveResource(
+                    eventHero2,
+                    static_cast<ResourceType>(
+                        (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
+                    ),
+                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT
+                );
                 cell->m_objectMetadata = 0;
             }
             break;
 
         case MAP_OBJECT_WAGON:
-            if (cell->m_objectMetadata) {
-                if (!(cell->m_objectMetadata & WAGON_ARTIFACT_FLAG)) {
-                    resourceType = static_cast<ResourceType>(
-                        (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
-                    );
-                    resourceAmount6 =
-                        (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT;
-                    EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                    EventWindow(
-                        -1,
-                        NORMAL_DIALOG_INFO,
-                        "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
-                        "make it to safe terrain.  Inside, you find some of the wagon's cargo "
-                        "still intact.",
-                        IDX(resourceType),
-                        resourceAmount6,
-                        -1,
-                        0,
-                        -1
-                    );
-                    GiveResource(eventHero2, resourceType, resourceAmount6);
-                    cell->m_objectMetadata = 0;
-                    break;
-                }
-                if (eventHero2->NumArtifacts() != EVENT_ARTIFACT_CAPACITY) {
-                    EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                    eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
-                    sprintf(
-                        gText,
-                        "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite "
-                        "make it to safe terrain.  Searching inside, you find the '%s'.",
-                        gArtifactNames[eventValue1]
-                    );
-                    EventWindow(
-                        -1,
-                        NORMAL_DIALOG_INFO,
-                        gText,
-                        MAP_EVENT_REWARD_ARTIFACT,
-                        eventValue1,
-                        -1,
-                        0,
-                        -1
-                    );
-                    GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
-                    cell->m_objectMetadata = 0;
-                    break;
-                }
+            if (cell->m_objectMetadata == 0) {
+            wagonEmpty:
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
+                    "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
+                    "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
+                    " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xea\xf2\xee-\xf2\xee \xed\xe0\xf8\xe5\xeb \xe5\xe5 "
+                    "\xe4\xee \xe2\xe0\xf1, \xef\xee\xe2\xee\xe7\xea\xe0 \xef\xf3\xf1\xf2\xe0.",
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1
+                );
+                cell->m_objectMetadata = 0;
+                break;
             }
-            EventWindow(
-                -1,
-                NORMAL_DIALOG_INFO,
-                "{Wagon}\n\nYou come across an old wagon left by a trader who didn't quite make it "
-                "to safe terrain.  Unfortunately, others have found it first, and the wagon is "
-                "empty.",
-                -1,
-                0,
-                -1,
-                0,
-                -1
-            );
-            cell->m_objectMetadata = 0;
+            if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
+                if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY)
+                    goto wagonEmpty;
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                eventValue1 = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
+                sprintf(
+                    gText,
+                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
+                    "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
+                    "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
+                    " \xc2 \xed\xe5\xe9 \xe2\xfb \xed\xe0\xf8\xeb\xe8 %s.",
+                    gArtifactNames[eventValue1]
+                );
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    gText,
+                    MAP_EVENT_REWARD_ARTIFACT,
+                    eventValue1,
+                    -1,
+                    0,
+                    -1
+                );
+                GiveArtifact(eventHero2, ArtifactType(eventValue1), 1, -1);
+                cell->m_objectMetadata = 0;
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                EventWindow(
+                    -1,
+                    NORMAL_DIALOG_INFO,
+                    "{\xcf\xee\xe2\xee\xe7\xea\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 \xed\xe0 \xf1\xf2\xe0\xf0\xf3\xfe "
+                    "\xef\xee\xe2\xee\xe7\xea\xf3, \xed\xe5 \xe4\xee\xe5\xf5\xe0\xe2\xf8\xf3\xfe \xe4\xee \xf2\xee\xf0\xed\xee\xe9 "
+                    "\xe4\xee\xf0\xee\xe3\xe8 \xe8 \xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe \xea\xf3\xef\xf6\xee\xec."
+                    " \xc2 \xed\xe5\xe9 \xe6\xe5 \xe2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xee \xf1\xe8\xf5 \xef\xee\xf0 "
+                    "\xed\xe5 \xf2\xf0\xee\xed\xf3\xf2\xfb\xe9 \xe3\xf0\xf3\xe7.",
+                    (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1,
+                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT,
+                    -1,
+                    0,
+                    -1
+                );
+                GiveResource(
+                    eventHero2,
+                    static_cast<ResourceType>(
+                        (cell->m_objectMetadata & CAMPFIRE_RESOURCE_MASK) - 1
+                    ),
+                    (cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT
+                );
+                cell->m_objectMetadata = 0;
+            }
             break;
 
         case MAP_OBJECT_SKELETON: {
@@ -1653,7 +1768,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 default:
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
-                        sprintf(gText, "%s.", "Treasure");
+                        sprintf(gText, "%s.", "\xd1\xee\xea\xf0\xee\xe2\xe8\xf9\xe5");
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
@@ -1712,8 +1827,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
-            eraseObject = 1;
-            fizzleType3 = 1;
+            eraseObject_l = 1;
+            fizzleType_k = 1;
             SetEnvironmentOrigin(
                 m_mapOriginX + ENVIRONMENT_BORDER,
                 m_mapOriginY + ENVIRONMENT_BORDER,
@@ -1724,8 +1839,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_XANADU:
             if (eventHero2->m_xanaduVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Xanadu}\n\nRecognizing you, the butler refuses to admit you.  \"The "
-                    "master,\" he says, \"will not see the same student twice.\"",
+                    "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xd3\xe7\xed\xe0\xe2 \xe2\xe0\xf1, \xeb\xe0\xea\xe5\xe9 "
+                    "\xee\xf2\xea\xe0\xe7\xe0\xeb\xf1\xff \xef\xf3\xf1\xf2\xe8\xf2\xfc \xe2\xed\xf3\xf2\xf0\xfc."
+                    " \"\xcd\xe0\xf1\xf2\xe0\xe2\xed\xe8\xea,\" - \xf1\xea\xe0\xe7\xe0\xeb \xee\xed, - \"\xed\xe5 "
+                    "\xef\xf0\xe8\xed\xe8\xec\xe0\xe5\xf2 \xee\xe4\xed\xee\xe3\xee \xe8 \xf2\xee\xe3\xee \xe6\xe5 "
+                    "\xf1\xf2\xf3\xe4\xe5\xed\xf2\xe0 \xe4\xe2\xe0\xe6\xe4\xfb.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1736,16 +1854,63 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     -1,
                     0
                 );
-                break;
+            } else {
+                if (eventHero2->m_level
+                        + IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
+                              * XANADU_DIPLOMACY_MULTIPLIER
+                    >= XANADU_ADMISSION_LEVEL) {
+                    EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                    NormalDialog(
+                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xe4\xee\xef\xf3\xf1\xf2\xe8\xeb "
+                        "\xe2\xe0\xf1 \xe4\xee \xe0\xf3\xe4\xe8\xe5\xed\xf6\xe8\xe8 \xf1 \xf5\xee\xe7\xff\xe8\xed\xee\xec "
+                        "\xe4\xee\xec\xe0. \xc7\xe0\xed\xff\xf2\xe8\xff \xf1 \xed\xe8\xec \xef\xee\xe2\xfb\xf1\xe8\xeb\xe8 "
+                        "\xf7\xe5\xf2\xfb\xf0\xe5 \xf3\xec\xe5\xed\xe8\xff, \xed\xe5\xee\xe1\xf5\xee\xe4\xe8\xec\xfb\xe5 "
+                        "\xea\xe0\xe6\xe4\xee\xec\xf3 \xe3\xe5\xf0\xee\xfe.",
+                        NORMAL_DIALOG_INFO,
+                        -1,
+                        -1,
+                        -1,
+                        0,
+                        -1,
+                        0,
+                        -1,
+                        0
+                    );
+                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
+                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
+                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
+                    eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
+                    eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
+                } else {
+                    NormalDialog(
+                        "{\xca\xf1\xe0\xed\xe0\xe4\xf3}\n\n\xcb\xe0\xea\xe5\xe9 \xee\xf2\xea\xf0\xfb\xeb \xe4\xe2\xe5\xf0\xfc "
+                        "\xe8 \xee\xe3\xeb\xff\xe4\xe5\xeb \xe2\xe0\xf1 \xf1 \xed\xee\xe3 \xe4\xee \xe3\xee\xeb\xee\xe2\xfb."
+                        " \"\xc2\xfb \xed\xe5 \xf2\xe0\xea \xe7\xed\xe0\xec\xe5\xed\xe8\xf2\xfb \xe8 \xed\xe5 \xf2\xe0\xea\xee\xe9 "
+                        "\xf3\xe6 \xe4\xe8\xef\xeb\xee\xec\xe0\xf2, \xf7\xf2\xee\xe1\xfb \xec\xee\xe9 \xf5\xee\xe7\xff\xe8\xed "
+                        "\xef\xf0\xe8\xed\xff\xeb \xe2\xe0\xf1,\" - \xf4\xfb\xf0\xea\xed\xf3\xeb \xee\xed. - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf2\xe5\xf1\xfc,"
+                        " \xea\xee\xe3\xe4\xe0 \xf1\xee\xf7\xf2\xe5\xf2\xe5 \xf1\xe5\xe1\xff \xe4\xee\xf1\xf2\xee\xe9\xed\xfb\xec."
+                        "\"",
+                        NORMAL_DIALOG_INFO,
+                        -1,
+                        -1,
+                        -1,
+                        0,
+                        -1,
+                        0,
+                        -1,
+                        0
+                    );
+                }
             }
-            if (eventHero2->m_level
-                    + IDX(eventHero2->m_secondarySkills[IDX(HERO_SKILL_DIPLOMACY)])
-                          * XANADU_DIPLOMACY_MULTIPLIER
-                < XANADU_ADMISSION_LEVEL) {
+            break;
+
+        case MAP_OBJECT_FORT:
+            if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
                 NormalDialog(
-                    "{Xanadu}\n\nThe butler opens the door and looks you up and down.  \"You "
-                    "are neither famous nor diplomatic enough to be admitted to see my "
-                    "master,\" he sniffs.  \"Come back when you think yourself worthy.\"",
+                    "{\xd4\xee\xf0\xf2}\n\n \"\xcf\xf0\xee\xf1\xe8\xf2\xe5, \xf1\xfd\xf0,\" - \xd1\xea\xe0\xe7\xe0\xeb "
+                    "\xef\xf0\xe5\xe4\xe2\xee\xe4\xe8\xf2\xe5\xeb\xfc \xe2\xee\xe8\xed\xee\xe2, - \"\xed\xee "
+                    "\xe2\xfb \xf3\xe6\xe5 \xe7\xed\xe0\xe5\xf2\xe5 \xe2\xf1\xe5, \xf7\xe5\xec\xf3 \xec\xfb \xf1\xef\xee\xf1\xee\xe1\xed\xfb "
+                    "\xed\xe0\xf3\xf7\xe8\xf2\xfc.\"",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -1759,202 +1924,171 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 NormalDialog(
-                    "{Xanadu}\n\nThe butler admits you to see the master of the house.  He "
-                    "trains you in the four skills a hero should know.",
+                    "{\xd4\xee\xf0\xf2}\n\n \xc2\xee\xe8\xed\xfb, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 \xe2 \xfd\xf2\xee\xec "
+                    "\xf4\xee\xf0\xf2\xe5, \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xef\xe0\xf0\xe5 \xed\xee\xe2\xfb\xf5 "
+                    "\xe7\xe0\xf9\xe8\xf2\xed\xfb\xf5 \xef\xf0\xe8\xe5\xec\xee\xe2.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    NORMAL_DIALOG_PRIMARY_SKILL,
+                    PRIMARY_BONUS_DEFENSE,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
+                eventHero2->m_fortVisits |= 1 << cell->m_objectMetadata;
+            }
+            break;
+
+        case MAP_OBJECT_STANDING_STONES:
+            if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
+                NormalDialog(
+                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
+                    "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
+                    "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
+                    "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xc4\xf0\xf3\xe8\xe4\xfb, \xed\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff "
+                    "\xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff, \xef\xee\xea\xe0\xe7\xe0\xeb\xe8 \xe6\xe5\xf1\xf2\xe0\xec\xe8,"
+                    " \xf7\xf2\xee \xe8\xec \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe5\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xf3\xf7\xe8\xf2\xfc.",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
                     -1,
                     0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                NormalDialog(
+                    "{\xcc\xe5\xed\xe3\xe8\xf0}\n\n\xc2\xfb \xe7\xe0\xf1\xf2\xe0\xeb\xe8 \xe3\xf0\xf3\xef\xef\xf3 "
+                    "\xe4\xf0\xf3\xe8\xe4\xee\xe2 \xe7\xe0 \xee\xe1\xf0\xff\xe4\xee\xec \xe2 \xee\xe4\xed\xee\xec "
+                    "\xe8\xe7 \xe8\xf5 \xe4\xe8\xea\xee\xe2\xe8\xed\xed\xfb\xf5 \xea\xe0\xec\xe5\xed\xed\xfb\xf5 "
+                    "\xf1\xee\xee\xf0\xf3\xe6\xe5\xed\xe8\xe9. \xcd\xe5 \xed\xe0\xf0\xf3\xf8\xe0\xff \xe1\xe5\xe7\xec\xee\xeb\xe2\xe8\xff,"
+                    " \xee\xed\xe8 \xe2\xf1\xe5 \xe6\xe5 \xed\xe0\xf3\xf7\xe8\xeb\xe8 \xe2\xe0\xf1 \xed\xee\xe2\xfb\xec "
+                    "\xf1\xef\xee\xf1\xee\xe1\xe0\xec \xea\xee\xeb\xe4\xee\xe2\xf1\xf2\xe2\xe0.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    NORMAL_DIALOG_PRIMARY_SKILL,
+                    PRIMARY_BONUS_SPELL_POWER,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
+                eventHero2->m_standingStoneVisits |= 1 << cell->m_objectMetadata;
+            }
+            break;
+
+        case MAP_OBJECT_WITCH_DOCTOR_HUT:
+            if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
+                NormalDialog(
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\"\xd3\xe1\xe8\xf0\xe0\xe9\xf1\xff!"
+                    "\" -  \xf0\xff\xe2\xea\xed\xf3\xeb\xe0 \xe2\xe5\xe4\xfc\xec\xe0, \"\xf2\xfb \xe7\xed\xe0\xe5\xf8\xfc "
+                    "\xe2\xf1\xe5, \xf7\xf2\xee \xe7\xed\xe0\xfe \xff.\"",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                NormalDialog(
+                    "{\xd5\xe8\xe6\xe8\xed\xe0 \xe2\xe5\xe4\xfc\xec\xfb}\n\n\xce\xf0\xf7\xe0\xff \xe2\xe5\xe4\xfc\xec\xe0,"
+                    " \xe6\xe8\xe2\xf3\xf9\xe0\xff \xe2 \xfd\xf2\xee\xe9 \xf5\xe8\xe6\xe8\xed\xe5, \xee\xe1\xee\xe3\xe0\xf2\xe8\xeb\xe0 "
+                    "\xe2\xe0\xf8\xe8 \xef\xee\xe7\xed\xe0\xed\xe8\xff \xe2 \xec\xe0\xe3\xe8\xe8, \xef\xee\xea\xe0\xe7\xe0\xe2,"
+                    " \xea\xe0\xea \xe3\xe0\xe4\xe0\xf2\xfc \xed\xe0 \xea\xe0\xec\xed\xff\xf5, \xf7\xe8\xf2\xe0\xf2\xfc "
+                    "\xe7\xed\xe0\xec\xe5\xed\xe8\xff \xe8 \xe8\xe7\xe2\xeb\xe5\xea\xe0\xf2\xfc \xf1\xf3\xf9\xed\xee\xf1\xf2\xfc "
+                    "\xe1\xfb\xf2\xe8\xff \xe8\xe7 \xf1\xeb\xee\xe6\xed\xee\xe3\xee \xef\xe5\xf0\xe5\xef\xeb\xe5\xf2\xe5\xed\xe8\xff "
+                    "\xf6\xfb\xef\xeb\xff\xf7\xfc\xe8\xf5 \xef\xee\xf2\xf0\xee\xf5\xee\xe2.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    NORMAL_DIALOG_PRIMARY_SKILL,
+                    PRIMARY_BONUS_KNOWLEDGE,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
+                eventHero2->m_witchDoctorVisits |= 1 << cell->m_objectMetadata;
+            }
+            break;
+
+        case MAP_OBJECT_MERCENARY_CAMP:
+            if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
+                NormalDialog(
+                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
+                    "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xe3\xe4\xe5 \xe2\xee\xe8\xed\xfb "
+                    "\xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf2 \xf2\xe0\xea\xf2\xe8\xea\xf3. \"\xc4\xeb\xff "
+                    "\xed\xe0\xf1 \xe2\xfb \xf1\xeb\xe8\xf8\xea\xee\xec \xf3\xec\xe5\xeb\xfb\xe9 \xe1\xee\xe5\xf6,"
+                    "\" -\xf1\xea\xe0\xe7\xe0\xeb \xea\xe0\xef\xe8\xf2\xe0\xed \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2."
+                    " - \"\xc1\xee\xeb\xfc\xf8\xe5 \xec\xfb \xed\xe8\xf7\xe5\xec\xf3 \xe2\xe0\xf1 \xed\xe0\xf3\xf7\xe8\xf2\xfc "
+                    "\xed\xe5 \xec\xee\xe6\xe5\xec.\"",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                NormalDialog(
+                    "{\xcb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2}\n\n\xc2\xfb \xef\xf0\xe8\xf8\xeb\xe8 "
+                    "\xe2 \xeb\xe0\xe3\xe5\xf0\xfc \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2, \xee\xf2\xf0\xe0\xe1\xe0\xf2\xfb\xe2\xe0\xfe\xf9\xe8\xf5 "
+                    "\xf1\xe2\xee\xfe \xf2\xe0\xea\xf2\xe8\xea\xf3. \xcd\xe0\xe5\xec\xed\xe8\xea\xe8 \xef\xee\xef\xf0\xe8\xe2\xe5\xf2\xf1\xf2\xe2\xee\xe2\xe0\xeb\xe8 "
+                    "\xe2\xe0\xf1 \xe8 \xef\xf0\xe8\xe3\xeb\xe0\xf1\xe8\xeb\xe8 \xe2\xec\xe5\xf1\xf2\xe5 \xf1 "
+                    "\xe2\xe0\xf8\xe8\xec \xee\xf2\xf0\xff\xe4\xee\xec \xef\xee\xe7\xe0\xed\xe8\xec\xe0\xf2\xfc\xf1\xff "
+                    "\xe2\xec\xe5\xf1\xf2\xe5 \xf1 \xed\xe8\xec\xe8.",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    NORMAL_DIALOG_PRIMARY_SKILL,
+                    PRIMARY_BONUS_ATTACK,
                     -1,
                     0,
                     -1,
                     0
                 );
                 eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
-                eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
-                eventHero2->m_xanaduVisits |= 1 << cell->m_objectMetadata;
+                eventHero2->m_mercenaryCampVisits |= 1 << cell->m_objectMetadata;
             }
-        
-
-            break;
-
-        case MAP_OBJECT_FORT:
-            if (eventHero2->m_fortVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    "{Fort}\n\n \"I'm sorry sir,\" The leader of the soldiers says, \"but you "
-                    "already know everything we have to teach.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                break;
-            }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            NormalDialog(
-                "{Fort}\n\n The soldiers living in the fort teach you a few new defensive "
-                "tricks.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                NORMAL_DIALOG_PRIMARY_SKILL,
-                PRIMARY_BONUS_DEFENSE,
-                -1,
-                0,
-                -1,
-                0
-            );
-            eventHero2->m_primaryStats[IDX(HERO_PRIMARY_DEFENSE)]++;
-            eventHero2->m_fortVisits |= 1 << cell->m_objectMetadata;
-        
-
-            break;
-
-        case MAP_OBJECT_STANDING_STONES:
-            if (eventHero2->m_standingStoneVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
-                    "their strange stone edifices.  Silently, the Druids turn you away, indicating "
-                    "they have nothing new to teach you.",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                break;
-            }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            NormalDialog(
-                "{Standing Stones}\n\nYou've found a group of Druids worshipping at one of "
-                "their strange stone edifices.  Silently, they teach you new ways to cast "
-                "spells.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                NORMAL_DIALOG_PRIMARY_SKILL,
-                PRIMARY_BONUS_SPELL_POWER,
-                -1,
-                0,
-                -1,
-                0
-            );
-            eventHero2->m_primaryStats[IDX(HERO_PRIMARY_SPELL_POWER)]++;
-            eventHero2->m_standingStoneVisits |= 1 << cell->m_objectMetadata;
-        
-
-            break;
-
-        case MAP_OBJECT_WITCH_DOCTOR_HUT:
-            if (eventHero2->m_witchDoctorVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    "{Witch Doctor's Hut}\n\n\"Go 'way!\", the witch doctor barks, \"you know all "
-                    "I know.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                break;
-            }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            NormalDialog(
-                "{Witch Doctor's Hut}\n\nAn Orcish witch doctor living in the hut deepens your "
-                "knowledge of magic by showing you how to cast stones, read portents, and "
-                "decipher the intricacies of chicken entrails.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                NORMAL_DIALOG_PRIMARY_SKILL,
-                PRIMARY_BONUS_KNOWLEDGE,
-                -1,
-                0,
-                -1,
-                0
-            );
-            eventHero2->m_primaryStats[IDX(HERO_PRIMARY_KNOWLEDGE)]++;
-            eventHero2->m_witchDoctorVisits |= 1 << cell->m_objectMetadata;
-        
-
-            break;
-
-        case MAP_OBJECT_MERCENARY_CAMP:
-            if (eventHero2->m_mercenaryCampVisits & (1 << cell->m_objectMetadata)) {
-                NormalDialog(
-                    "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
-                    "tactics.  \"You're too advanced for us,\" the mercenary captain says.  \"We "
-                    "can teach nothing more.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-                break;
-            }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            NormalDialog(
-                "{Mercenary Camp}\n\nYou've come upon a mercenary camp practicing their "
-                "tactics.  The mercenaries welcome you and your troops and invite you to train "
-                "with them.",
-                NORMAL_DIALOG_INFO,
-                -1,
-                -1,
-                NORMAL_DIALOG_PRIMARY_SKILL,
-                PRIMARY_BONUS_ATTACK,
-                -1,
-                0,
-                -1,
-                0
-            );
-            eventHero2->m_primaryStats[IDX(HERO_PRIMARY_ATTACK)]++;
-            eventHero2->m_mercenaryCampVisits |= 1 << cell->m_objectMetadata;
-        
-
             break;
 
         case MAP_OBJECT_GAZEBO:
             if (eventHero2->m_gazeboVisits & (1 << cell->m_objectMetadata)) {
                 EventWindow(EVENT_TEXT_GAZEBO_VISITED, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
-                break;
+            } else {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                EventWindow(
+                    EVENT_TEXT_GAZEBO_REWARD,
+                    NORMAL_DIALOG_INFO,
+                    "",
+                    NORMAL_DIALOG_EXPERIENCE,
+                    GAZEBO_EXPERIENCE,
+                    -1,
+                    0,
+                    -1
+                );
+                GiveExperience(eventHero2, GAZEBO_EXPERIENCE, 0);
+                eventHero2->m_gazeboVisits |= 1 << cell->m_objectMetadata;
+                eventHero2->CheckLevel();
             }
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            EventWindow(
-                EVENT_TEXT_GAZEBO_REWARD,
-                NORMAL_DIALOG_INFO,
-                "",
-                NORMAL_DIALOG_EXPERIENCE,
-                GAZEBO_EXPERIENCE,
-                -1,
-                0,
-                -1
-            );
-            GiveExperience(eventHero2, GAZEBO_EXPERIENCE, 0);
-            eventHero2->m_gazeboVisits |= 1 << cell->m_objectMetadata;
-            eventHero2->CheckLevel();
-        
-
             break;
 
         case MAP_OBJECT_WATER_WHEEL:
@@ -1978,28 +2112,42 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_RESOURCE:
-            resourceType = static_cast<ResourceType>(cell->m_objectIndex / 2);
+            resourceType_a = static_cast<ResourceType>(cell->m_objectIndex / 2);
             GiveResource(
                 eventHero2,
-                resourceType,
-                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                resourceType_a,
+                resourceType_a == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
-            strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType)]);
-            sphinxAnswer_a[0] += ' ';
+            strcpy(sphinxAnswer_a, gResourceNames[IDX(resourceType_a)]);
+            {
+                char resourceInitial;
+
+                if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
+                    && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
+                    resourceInitial = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
+                         && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
+                    resourceInitial = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
+                    resourceInitial = static_cast<char>(0xb8);
+                else
+                    resourceInitial = sphinxAnswer_a[0];
+                sphinxAnswer_a[0] = resourceInitial;
+            }
             sprintf(gText, gEventText[EVENT_TEXT_RESOURCE_PICKUP], sphinxAnswer_a);
             BVResMsg(
                 gText,
-                resourceType,
-                resourceType == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
+                resourceType_a,
+                resourceType_a == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                          : cell->m_objectMetadata
             );
-            eraseObject = 1;
-            fizzleType3 = 1;
+            eraseObject_l = 1;
+            fizzleType_k = 1;
             break;
 
         case MAP_OBJECT_WINDMILL:
-            if (cell->m_objectMetadata < SPHINX_RESOURCE_COUNT) {
+            if (cell->m_objectMetadata <= IDX(RES_GOLD)) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     EVENT_TEXT_WINDMILL_REWARD,
@@ -2028,8 +2176,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 RecruitEvent(eventHero2, CREATURE_GENIE, cell);
                 if (!cell->m_objectMetadata) {
-                    eraseObject = 1;
-                    fizzleType3 = 1;
+                    eraseObject_l = 1;
+                    fizzleType_k = 1;
                 }
             }
             break;
@@ -2039,8 +2187,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Tree City}\n\nYou've found a Sprite Tree City.  Unfortunately, none of the "
-                    "Sprites living there wish to join an army.  Maybe next week.",
+                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe9 "
+                    "\xe3\xee\xf0\xee\xe4 \xf4\xe5\xe9. \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xed\xe8 \xee\xe4\xed\xe0 "
+                    "\xf4\xe5\xff \xed\xe5 \xe7\xe0\xf5\xee\xf2\xe5\xeb\xe0 \xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff "
+                    "\xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc \xed\xe0 "
+                    "\xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xee\xed\xe8 \xef\xe5\xf0\xe5\xe4\xf3\xec\xe0\xfe\xf2.",
                     -1,
                     0,
                     -1,
@@ -2052,8 +2203,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Tree City}\n\nSome of the Sprites living in the tree city are willing to "
-                    "join your army for a price.  Do you want to recruit Sprites?",
+                    "{\xc4\xf0\xe5\xe2\xee-\xe3\xee\xf0\xee\xe4}\n\n\xcd\xe5\xea\xee\xf2\xee\xf0\xfb\xe5 \xf4\xe5\xe8 "
+                    "\xe8\xe7 \xfd\xf2\xee\xe3\xee \xe3\xee\xf0\xee\xe4\xe0 \xed\xe0 \xe4\xe5\xf0\xe5\xe2\xfc\xff\xf5 "
+                    "\xe6\xe5\xeb\xe0\xfe\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe "
+                    "\xe7\xe0 \xed\xe5\xea\xee\xf2\xee\xf0\xee\xe5 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
+                    " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xf4\xe5\xe9?",
                     -1,
                     0,
                     -1,
@@ -2070,8 +2224,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Ruins}\n\nYou search the ruins, but the Medusas that used to live here are "
-                    "gone.  Perhaps there will be more next week.",
+                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb,"
+                    " \xed\xee \xf3\xe1\xe5\xe4\xe8\xeb\xe8\xf1\xfc \xeb\xe8\xf8\xfc, \xf7\xf2\xee \xe6\xe8\xe2\xf8\xe8\xe5 "
+                    "\xf2\xf3\xf2 \xec\xe5\xe4\xf3\xe7\xfb \xf3\xf8\xeb\xe8. \xcc\xee\xe6\xe5\xf2 \xe1\xfb\xf2\xfc "
+                    "\xe2\xe0\xec \xef\xee\xe2\xe5\xe7\xe5\xf2 \xe1\xee\xeb\xfc\xf8\xe5 \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
+                    "\xed\xe5\xe4\xe5\xeb\xe5.",
                     -1,
                     0,
                     -1,
@@ -2083,8 +2240,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Ruins}\n\nYou've found some Medusas living in the ruins.  They are willing "
-                    "to join your army for a price.  Do you want to recruit Medusas?",
+                    "{\xd0\xf3\xe8\xed\xfb}\n\n\xc2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
+                    "\xe8 \xed\xe0\xf8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xe8\xf5 \xec\xe5\xe4\xf3\xe7,"
+                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xf2\xf3\xf2. \xce\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xed\xfb "
+                    "\xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc \xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xe2\xee\xe7\xed\xe0\xe3\xf0\xe0\xe6\xe4\xe5\xed\xe8\xe5."
+                    " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xec\xe5\xe4\xf3\xe7?",
                     -1,
                     0,
                     -1,
@@ -2101,9 +2261,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Troll Bridge}\n\nYou've found one of those bridges that Trolls are so fond "
-                    "of living under, but there are none here.  Perhaps there will be some next "
-                    "week.",
+                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xee\xe4\xe8\xed "
+                    "\xe8\xe7 \xf2\xe5\xf5 \xec\xee\xf1\xf2\xee\xe2, \xef\xee\xe4 \xea\xee\xf2\xee\xf0\xfb\xec\xe8 "
+                    "\xf2\xe0\xea \xeb\xfe\xe1\xff\xf2 \xf1\xe5\xeb\xe8\xf2\xfc\xf1\xff \xf2\xf0\xee\xeb\xeb\xe8,"
+                    " \xed\xee \xf1\xe5\xe9\xf7\xe0\xf1 \xf2\xf3\xf2 \xed\xe8\xea\xee\xe3\xee \xed\xe5\xf2. \xcc\xee\xe6\xe5\xf2,"
+                    " \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 \xed\xe5\xe4\xe5\xeb\xe5 \xef\xee\xff\xe2\xff\xf2\xf1\xff.",
                     -1,
                     0,
                     -1,
@@ -2114,69 +2276,76 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nTrolls living under the bridge challenge you.  Will you "
-                    "fight them?",
+                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xd2\xf0\xee\xeb\xeb\xe8, \xe6\xe8\xe2\xf3\xf9\xe8\xe5 "
+                    "\xef\xee\xe4 \xfd\xf2\xe8\xec \xec\xee\xf1\xf2\xee\xec \xe1\xf0\xee\xf1\xe0\xfe\xf2 \xe2\xe0\xec "
+                    "\xe2\xfb\xe7\xee\xe2. \xd1\xf0\xe0\xe7\xe8\xf2\xe5\xf1\xfc \xf1 \xed\xe8\xec\xe8?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                if (CombatMonsterEvent(
-                        eventHero2,
-                        CREATURE_TROLL,
-                        TROLL_BRIDGE_TROLL_COUNT,
-                        cell,
-                        x,
-                        y,
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES
+                    && CombatMonsterEvent(
+                           eventHero2,
+                           CREATURE_TROLL,
+                           TROLL_BRIDGE_TROLL_COUNT,
+                           cell,
+                           x,
+                           y,
+                           0,
+                           x,
+                           y,
+                           CREATURE_WAR_TROLL,
+                           TROLL_BRIDGE_WAR_TROLL_COUNT,
+                           TROLL_BRIDGE_WAR_TROLL_STACKS,
+                           CREATURE_NONE,
+                           0,
+                           0
+                       )
+                           == COMBAT_RESULT_ATTACKER) {
+                    eventHero2->CheckLevel();
+                    cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
+                    EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                    EventWindow(
+                        -1,
+                        NORMAL_DIALOG_CONFIRM,
+                        "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xce\xf1\xf2\xe0\xeb\xee\xf1\xfc \xeb\xe8\xf8\xfc "
+                        "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf2\xf0\xee\xeb\xeb\xe5\xe9, \xe2 \xf1\xf2\xf0\xe0\xf5\xe5 "
+                        "\xe7\xe0\xe1\xe8\xe2\xf8\xe8\xf5\xf1\xff \xef\xee\xe4 \xec\xee\xf1\xf2. \xce\xf1\xec\xe5\xeb\xe5\xe2,"
+                        " \xee\xed\xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 \xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 "
+                        "\xe2 \xea\xe0\xf7\xe5\xf1\xf2\xe2\xe5 \xed\xe0\xe5\xec\xed\xe8\xea\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                        "\xed\xe0\xed\xff\xf2\xfc \xf2\xf0\xee\xeb\xeb\xe5\xe9?",
+                        -1,
                         0,
-                        x,
-                        y,
-                        CREATURE_WAR_TROLL,
-                        TROLL_BRIDGE_WAR_TROLL_COUNT,
-                        TROLL_BRIDGE_WAR_TROLL_STACKS,
-                        CREATURE_NONE,
+                        -1,
                         0,
-                        0
-                    )
-                    != COMBAT_RESULT_ATTACKER)
-                    break;
-                eventHero2->CheckLevel();
-                cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                EventWindow(
-                    -1,
-                    NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nA few Trolls remain, cowering under the bridge.  They "
-                    "approach you and offer to join your forces as mercenaries.  Do you want to "
-                    "buy any Trolls?",
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1
-                );
-                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
-                    goto recruitTroll;
+                        -1
+                    );
+                    if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
+                        goto recruitTroll;
+                }
+                break;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Troll Bridge}\n\nSome Trolls living under a bridge are willing to join your "
-                    "army, but for a price.  Do you want to recruit Trolls?",
+                    "{\xcc\xee\xf1\xf2 \xf2\xf0\xee\xeb\xeb\xe5\xe9}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xf2\xf0\xee\xeb\xeb\xe5\xe9,"
+                    " \xe6\xe8\xe2\xf3\xf9\xe8\xf5 \xef\xee\xe4 \xec\xee\xf1\xf2\xee\xec, \xe6\xe5\xeb\xe0\xe5\xf2 "
+                    "\xef\xf0\xe8\xf1\xee\xe5\xe4\xe8\xed\xe8\xf2\xfc\xf1\xff \xea \xe2\xe0\xf8\xe5\xe9 \xe0\xf0\xec\xe8\xe8,"
+                    " \xed\xee \xe7\xe0 \xef\xeb\xe0\xf2\xf3.  \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc "
+                    "\xf2\xf0\xee\xeb\xeb\xe5\xe9?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-            recruitTroll:
-                RecruitEvent(eventHero2, CREATURE_TROLL, cell);
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                recruitTroll:
+                    RecruitEvent(eventHero2, CREATURE_TROLL, cell);
+                }
             }
             break;
 
@@ -2185,8 +2354,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{City of the Dead}\n\nThe City of the Dead is empty of life, and empty of "
-                    "unlife as well.  Perhaps some undead will move in next week.",
+                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2 \xfd\xf2\xee\xec \xe3\xee\xf0\xee\xe4\xe5 "
+                    "\xec\xe5\xf0\xf2\xe2\xe5\xf6\xee\xe2 \xe6\xe8\xe7\xed\xe8 \xed\xe5 \xed\xe0\xe1\xeb\xfe\xe4\xe0\xe5\xf2\xf1\xff,"
+                    " \xed\xe5\xe6\xe8\xf2\xe8 \xf2\xee\xe6\xe5. \xcc\xee\xe6\xe5\xf2, \xed\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
+                    "\xed\xe5\xe4\xe5\xeb\xe5 \xea\xf2\xee-\xf2\xee \xe8\xe7 \xed\xe5\xe6\xe8\xf2\xe8 \xe7\xe0\xe1\xf0\xe5\xe4\xe5\xf2 "
+                    "\xf1\xfe\xe4\xe0.",
                     -1,
                     0,
                     -1,
@@ -2197,44 +2369,46 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nYou've found the ruins of an ancient city, now "
-                    "inhabited solely by the undead.  Will you search?",
+                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf0\xf3\xe8\xed\xfb "
+                    "\xe4\xf0\xe5\xe2\xed\xe5\xe3\xee \xe3\xee\xf0\xee\xe4\xe0, \xed\xfb\xed\xe5 \xed\xe0\xf1\xe5\xeb\xe5\xed\xed\xee\xe3\xee "
+                    "\xeb\xe8\xf8\xfc \xed\xe5\xe6\xe8\xf2\xfc\xfe. \xce\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc "
+                    "\xe3\xee\xf0\xee\xe4?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                if (CombatMonsterEvent(
-                        eventHero2,
-                        CREATURE_VAMPIRE_LORD,
-                        CITY_DEAD_VAMPIRE_LORD_COUNT,
-                        cell,
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        CREATURE_ZOMBIE,
-                        CITY_DEAD_ZOMBIE_COUNT,
-                        CITY_DEAD_ZOMBIE_STACKS,
-                        CREATURE_POWER_LICH,
-                        CITY_DEAD_POWER_LICH_COUNT,
-                        CITY_DEAD_POWER_LICH_STACKS
-                    )
-                    != COMBAT_RESULT_ATTACKER)
-                    break;
-                eventHero2->CheckLevel();
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                    if (CombatMonsterEvent(
+                            eventHero2,
+                            CREATURE_VAMPIRE_LORD,
+                            CITY_DEAD_VAMPIRE_LORD_COUNT,
+                            cell,
+                            x,
+                            y,
+                            0,
+                            x,
+                            y,
+                            CREATURE_ZOMBIE,
+                            CITY_DEAD_ZOMBIE_COUNT,
+                            CITY_DEAD_ZOMBIE_STACKS,
+                            CREATURE_POWER_LICH,
+                            CITY_DEAD_POWER_LICH_COUNT,
+                            CITY_DEAD_POWER_LICH_STACKS
+                        )
+                        == COMBAT_RESULT_ATTACKER) {
+                    eventHero2->CheckLevel();
                 cell->m_objectMetadata -= DWELLING_GUARDED_FLAG;
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nSome of the surviving Liches are impressed by your "
-                    "victory over their fellows, and offer to join you for a price.  Do you want "
-                    "to recruit Liches?",
+                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xd3\xf6\xe5\xeb\xe5\xe2\xf8\xe8\xe5 "
+                    "\xeb\xe8\xf7\xe8 \xef\xf0\xee\xed\xe8\xea\xeb\xe8\xf1\xfc \xe2\xe0\xf8\xe5\xe9 \xef\xee\xe1\xe5\xe4\xee\xe9 "
+                    "\xed\xe0\xe4 \xe8\xf5 \xf1\xee\xe1\xf0\xe0\xf2\xfc\xff\xec\xe8 \xe8 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xeb\xe8 "
+                    "\xf1\xe2\xee\xe8 \xf3\xf1\xeb\xf3\xe3\xe8 \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                    "\xed\xe0\xed\xff\xf2\xfc \xeb\xe8\xf7\xe5\xe9?",
                     -1,
                     0,
                     -1,
@@ -2243,23 +2417,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     goto recruitLich;
+                    }
+                }
+                break;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{City of the Dead}\n\nSome Liches living here are willing to join your army "
-                    "for a price.  Do you want to recruit Liches?",
+                    "{\xc3\xf0\xe0\xe4 \xec\xe5\xf0\xf2\xe2\xfb\xf5}\n\n\xca\xee\xe5-\xea\xf2\xee \xe8\xe7 \xeb\xe8\xf7\xe5\xe9,"
+                    " \xee\xe1\xe8\xf2\xe0\xfe\xf9\xe8\xf5 \xe7\xe4\xe5\xf1\xfc, \xe6\xe5\xeb\xe0\xe5\xf2 \xe2\xf1\xf2\xf3\xef\xe8\xf2\xfc "
+                    "\xe2 \xe2\xe0\xf8\xf3 \xe0\xf0\xec\xe8\xfe \xe7\xe0 \xef\xeb\xe0\xf2\xf3. \xcd\xe0\xed\xff\xf2\xfc "
+                    "\xeb\xe8\xf7\xe5\xe9?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-            recruitLich:
-                RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                recruitLich:
+                    RecruitEvent(eventHero2, CREATURE_POWER_LICH, cell);
+                }
             }
             break;
 
@@ -2268,8 +2447,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "{Dragon City}\n\nThe Dragon city has no Dragons willing to join you this "
-                    "week.  Perhaps a Dragon will become available next week.",
+                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcd\xe0 \xfd\xf2\xee\xe9 \xed\xe5\xe4\xe5\xeb\xe5 "
+                    "\xe2 \xe3\xee\xf0\xee\xe4\xe5 \xed\xe5\xf2 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xe6\xe5\xeb\xe0\xfe\xf9\xe8\xf5 "
+                    "\xef\xf0\xe8\xec\xea\xed\xf3\xf2\xfc \xea \xe2\xe0\xec. \xcd\xe0 \xf1\xeb\xe5\xe4\xf3\xfe\xf9\xe5\xe9 "
+                    "\xed\xe5\xe4\xe5\xeb\xe5, \xe2\xee\xe7\xec\xee\xe6\xed\xee, \xea\xf2\xee-\xf2\xee \xef\xee\xff\xe2\xe8\xf2\xf1\xff.",
                     -1,
                     0,
                     -1,
@@ -2280,25 +2461,27 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nYou stand before the Dragon City, a place off-limits to mere "
-                    "humans.  Do you wish to violate this rule and challenge the Dragons to a "
-                    "fight?",
+                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc2\xfb \xf1\xf2\xee\xe8\xf2\xe5 "
+                    "\xef\xf0\xe5\xe4 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec \xe3\xee\xf0\xee\xe4\xee\xec, \xec\xe5\xf1\xf2\xee\xec,"
+                    " \xe7\xe0\xef\xf0\xe5\xf2\xed\xfb\xec \xe4\xeb\xff \xef\xf0\xee\xf1\xf2\xfb\xf5 \xf1\xec\xe5\xf0\xf2\xed\xfb\xf5."
+                    " \xd1\xee\xe1\xeb\xe0\xe3\xee\xe2\xee\xeb\xe8\xf2\xe5 \xeb\xe8 \xe2\xfb \xed\xe0\xf0\xf3\xf8\xe8\xf2\xfc "
+                    "\xfd\xf2\xee \xef\xf0\xe0\xe2\xe8\xeb\xee \xe8 \xe1\xf0\xee\xf1\xe8\xf2\xfc \xe2\xfb\xe7\xee\xe2 "
+                    "\xe4\xf0\xe0\xea\xee\xed\xe0\xec?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-                dragonFactor_d = DRAGON_CITY_BASE_FACTOR;
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                dragonFactor_i = DRAGON_CITY_BASE_FACTOR;
                 if (gbInCampaign && gpGame->m_campaignType == CAMPAIGN_ARCHIBALD
-                    && gpGame->m_campaignScenario == DRAGON_CITY_ARCHIBALD_SCENARIO)
-                    dragonFactor_d = DRAGON_CITY_CAMPAIGN_FACTOR;
+                    && gpGame->m_campaignScenario + 1 == DRAGON_CITY_ARCHIBALD_SCENARIO)
+                    dragonFactor_i = DRAGON_CITY_CAMPAIGN_FACTOR;
                 if (CombatMonsterEvent(
                         eventHero2,
                         CREATURE_GREEN_DRAGON,
-                        dragonFactor_d * DRAGON_CITY_GREEN_COUNT_FACTOR,
+                        dragonFactor_i * DRAGON_CITY_GREEN_COUNT_FACTOR,
                         cell,
                         x,
                         y,
@@ -2306,14 +2489,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         x,
                         y,
                         CREATURE_RED_DRAGON,
-                        dragonFactor_d,
+                        dragonFactor_i,
                         DRAGON_CITY_DRAGON_STACKS,
                         CREATURE_BLACK_DRAGON,
-                        dragonFactor_d,
+                        dragonFactor_i,
                         DRAGON_CITY_DRAGON_STACKS
                     )
-                    != COMBAT_RESULT_ATTACKER)
-                    break;
+                    == COMBAT_RESULT_ATTACKER) {
                 CheckEndGame(END_GAME_FORCE_NONE, true);
                 if (gbGameOver)
                     break;
@@ -2323,9 +2505,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nHaving defeated the Dragon champions, the city's leaders "
-                    "agree to supply some Dragons to your army for a price.  Do you wish to "
-                    "recruit Dragons?",
+                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xcf\xee\xf1\xeb\xe5 \xe2\xe0\xf8\xe5\xe9 "
+                    "\xef\xee\xe1\xe5\xe4\xfb \xed\xe0\xe4 \xeb\xf3\xf7\xf8\xe8\xec\xe8 \xe4\xf0\xe0\xea\xee\xed\xfc\xe8\xec\xe8 "
+                    "\xe2\xee\xe8\xed\xe0\xec\xe8 \xee\xf2\xf6\xfb \xe3\xee\xf0\xee\xe4\xe0 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
+                    "\xe7\xe0 \xef\xeb\xe0\xf2\xf3 \xef\xf0\xe5\xe4\xee\xf1\xf2\xe0\xe2\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
+                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                    "\xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
                     -1,
                     0,
                     -1,
@@ -2334,23 +2519,28 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 );
                 if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES)
                     goto recruitDragon;
+                }
+                }
+                break;
             } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_CONFIRM,
-                    "{Dragon City}\n\nThe Dragon city is willing to offer some Dragons for your "
-                    "army for a price.  Do you wish to recruit Dragons?",
+                    "{\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 \xe3\xee\xf0\xee\xe4}\n\n\xc4\xf0\xe0\xea\xee\xed\xe8\xe9 "
+                    "\xe3\xee\xf0\xee\xe4 \xe3\xee\xf2\xee\xe2 \xef\xf0\xe5\xe4\xeb\xee\xe6\xe8\xf2\xfc \xe2\xe0\xf8\xe5\xec\xf3 "
+                    "\xe2\xee\xe9\xf1\xea\xf3 \xe4\xf0\xe0\xea\xee\xed\xee\xe2, \xed\xe5 \xe1\xe5\xf1\xef\xeb\xe0\xf2\xed\xee."
+                    " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xed\xe0\xed\xff\xf2\xfc \xe4\xf0\xe0\xea\xee\xed\xee\xe2?",
                     -1,
                     0,
                     -1,
                     0,
                     -1
                 );
-                if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES)
-                    break;
-            recruitDragon:
-                RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                recruitDragon:
+                    RecruitEvent(eventHero2, CREATURE_RED_DRAGON, cell);
+                }
             }
             break;
 
@@ -2402,13 +2592,14 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_MONSTER:
-            PlayerMonsterInteract(cell, cell, eventHero2, &eraseObject, x, y, 0, x, y);
+            PlayerMonsterInteract(cell, cell, eventHero2, &eraseObject_l, x, y, 0, x, y);
             break;
 
         case MAP_OBJECT_OBELISK:
-            if (!(gpGame->m_obeliskVisitors[cell->m_objectMetadata] & (1 << eventHero2->m_owner))) {
+            if (!(gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1]
+                  & (1 << eventHero2->m_owner))) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                gpGame->m_obeliskVisitors[cell->m_objectMetadata] |= 1 << eventHero2->m_owner;
+                gpGame->m_obeliskVisitors[cell->m_objectMetadata - 1] |= 1 << eventHero2->m_owner;
                 EventWindow(EVENT_TEXT_OBELISK_REWARD, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
                 ViewPuzzle();
             } else {
@@ -2417,17 +2608,40 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_TREE_OF_KNOWLEDGE: {
-            if (!(eventHero2->m_treeKnowledgeVisits & (1 << cell->m_objectMetadata))) {
+            if ((eventHero2->m_treeKnowledgeVisits
+                 & (1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK)))
+                != 0) {
+                NormalDialog(
+                    "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
+                    "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
+                    "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec.  \"\xd0\xe0\xe4 \xe2\xe8\xe4\xe5\xf2\xfc "
+                    "\xf2\xe5\xe1\xff, \xec\xee\xe9 \xf3\xf7\xe5\xed\xe8\xea.  \xcd\xe0\xe4\xe5\xfe\xf1\xfc, "
+                    "\xec\xee\xff \xed\xe0\xf3\xea\xe0 \xef\xee\xf8\xeb\xe0 \xf2\xe5\xe1\xe5 \xed\xe0 \xef\xee\xeb\xfc\xe7\xf3."
+                    "\"",
+                    NORMAL_DIALOG_INFO,
+                    -1,
+                    -1,
+                    -1,
+                    0,
+                    -1,
+                    0,
+                    -1,
+                    0
+                );
+            } else {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                heroLevel2 = eventHero2->GetLevel(eventHero2->m_experience);
-                levelExperience1 = eventHero2->GetExperience(heroLevel2 + 1)
-                                   - eventHero2->GetExperience(heroLevel2);
+                heroLevel_e = eventHero2->GetLevel(eventHero2->m_experience);
+                levelExperience_g = eventHero2->GetExperience(heroLevel_e + 1)
+                                   - eventHero2->GetExperience(heroLevel_e);
                 switch (cell->m_objectMetadata >> TREE_KNOWLEDGE_MODE_SHIFT) {
                     case TREE_KNOWLEDGE_FREE:
                         NormalDialog(
-                            "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
-                            "delight.  \"Ahh, an adventurer!  Allow me to teach you a little of "
-                            "what I have learned over the ages.\"",
+                            "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
+                            "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
+                            "\xe7\xe0\xf1\xe2\xe5\xf2\xe8\xeb\xe8\xf1\xfc \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0,"
+                            " \xf1\xf2\xf0\xe0\xed\xed\xe8\xea! \xcf\xee\xe7\xe2\xee\xeb\xfc \xef\xf0\xe5\xef\xee\xe4\xe0\xf2\xfc "
+                            "\xf2\xe5\xe1\xe5 \xec\xe0\xeb\xf3\xfe \xf2\xee\xeb\xe8\xea\xf3 \xf2\xee\xe3\xee, \xf7\xf2\xee "
+                            "\xff \xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb.\"",
                             NORMAL_DIALOG_INFO,
                             -1,
                             -1,
@@ -2438,32 +2652,22 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             0
                         );
-                        GiveExperience(eventHero2, levelExperience1, 0);
-                        eventHero2->m_treeKnowledgeVisits |= 1 << cell->m_objectMetadata;
+                        GiveExperience(eventHero2, levelExperience_g, 0);
+                        eventHero2->m_treeKnowledgeVisits |=
+                            1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                         break;
 
                     case TREE_KNOWLEDGE_GOLD:
-                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] < TREE_KNOWLEDGE_GOLD_COST) {
+                        if (gpCurPlayer->m_resources[IDX(RES_GOLD)] >= TREE_KNOWLEDGE_GOLD_COST) {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
-                                "need 2000 gold.\" it whispers. (sniff)  \"Well, come back when "
-                                "you can pay me.\"",
-                                NORMAL_DIALOG_INFO,
-                                -1,
-                                -1,
-                                -1,
-                                0,
-                                -1,
-                                0,
-                                -1,
-                                0
-                            );
-                        } else {
-                            NormalDialog(
-                                "{Tree of Knowledge}\n\nUpon your approach, the tree opens its "
-                                "eyes in delight.  \"Ahh, an adventurer! I will be happy to teach "
-                                "you a little of what I have learned over the ages for a mere 2000 "
-                                "gold.\"  (Just bury it around my roots.)",
+                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xcf\xf0\xe8 \xe2\xe0\xf8\xe5\xec "
+                                "\xef\xf0\xe8\xe1\xeb\xe8\xe6\xe5\xed\xe8\xe8 \xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0 "
+                                "\xe7\xe0\xf1\xe8\xff\xeb\xe8 \xe2\xee\xf1\xf2\xee\xf0\xe3\xee\xec. \"\xc0, \xef\xf3\xf2\xed\xe8\xea!"
+                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xed\xe0\xf3\xf7\xf3 \xf2\xe5\xe1\xff \xf5\xee\xf2\xff "
+                                "\xe1\xfb \xec\xe0\xeb\xee\xe9 \xf7\xe0\xf1\xf2\xe8 \xf2\xee\xe3\xee, \xf7\xf2\xee \xf3\xf1\xe2\xee\xe8\xeb "
+                                "\xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
+                                ".",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2476,18 +2680,17 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[IDX(RES_GOLD)] -= TREE_KNOWLEDGE_GOLD_COST;
-                                GiveExperience(eventHero2, levelExperience1, 0);
-                                eventHero2->m_treeKnowledgeVisits |= 1 << cell->m_objectMetadata;
+                                GiveExperience(eventHero2, levelExperience_g, 0);
+                                eventHero2->m_treeKnowledgeVisits |=
+                            1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
-                        }
-                        break;
-
-                    case TREE_KNOWLEDGE_GEMS:
-                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] < TREE_KNOWLEDGE_GEM_COST) {
+                        } else {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nTears brim in the eyes of the tree.  \"I "
-                                "need 10 gems.\" it whispers. (sniff)  \"Well, come back when you "
-                                "can pay me.\"",
+                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc3\xeb\xe0\xe7\xe0 \xe4\xe5\xf0\xe5\xe2\xe0 "
+                                "\xed\xe0\xef\xee\xeb\xed\xe8\xeb\xe8\xf1\xfc \xf1\xeb\xe5\xe7\xe0\xec\xe8. \"\xcc\xed\xe5 "
+                                "\xed\xf3\xe6\xed\xee 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
+                                "\xee\xed\xee. (\xe2\xe7\xe4\xee\xf5) - \"\xc2\xee\xe7\xe2\xf0\xe0\xf9\xe0\xe9\xf1\xff, \xea\xee\xe3\xe4\xe0 "
+                                "\xf1\xec\xee\xe6\xe5\xf8\xfc \xe2\xed\xe5\xf1\xf2\xe8 \xef\xeb\xe0\xf2\xf3.\"",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2498,11 +2701,18 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 -1,
                                 0
                             );
-                        } else {
+                        }
+                        break;
+
+                    case TREE_KNOWLEDGE_GEMS:
+                        if (gpCurPlayer->m_resources[IDX(RES_GEMS)] >= TREE_KNOWLEDGE_GEM_COST) {
                             NormalDialog(
-                                "{Tree of Knowledge}\n\nAhh, an adventurer! I will be happy to "
-                                "teach you a little of what I have learned over the ages for a "
-                                "mere 10 gems.\"  (Just bury it around my roots.)",
+                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xc0, \xef\xf3\xf2\xed\xe8\xea!"
+                                " \xdf \xf1 \xf0\xe0\xe4\xee\xf1\xf2\xfc\xfe \xef\xf0\xe5\xef\xee\xe4\xe0\xec \xf2\xe5\xe1\xe5 "
+                                "\xf5\xee\xf2\xfc \xec\xe0\xeb\xf3\xfe \xf7\xe0\xf1\xf2\xfc \xf2\xee\xe3\xee, \xf7\xf2\xee "
+                                "\xe2\xfb\xf3\xf7\xe8\xeb \xe7\xe0 \xe3\xee\xe4\xfb, \xe2\xf1\xe5\xe3\xee \xe7\xe0 10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2."
+                                "\" (\xcf\xf0\xee\xf1\xf2\xee \xe7\xe0\xf0\xee\xe9 \xe8\xf5 \xf3 \xec\xee\xe8\xf5 \xea\xee\xf0\xed\xe5\xe9)"
+                                ".",
                                 NORMAL_DIALOG_CONFIRM,
                                 -1,
                                 -1,
@@ -2515,27 +2725,31 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                                 gpCurPlayer->m_resources[IDX(RES_GEMS)] -= TREE_KNOWLEDGE_GEM_COST;
-                                GiveExperience(eventHero2, levelExperience1, 0);
-                                eventHero2->m_treeKnowledgeVisits |= 1 << cell->m_objectMetadata;
+                                GiveExperience(eventHero2, levelExperience_g, 0);
+                                eventHero2->m_treeKnowledgeVisits |=
+                            1U << (cell->m_objectMetadata & TREE_KNOWLEDGE_VISIT_INDEX_MASK);
                             }
+                        } else {
+                            NormalDialog(
+                                "{\xc4\xf0\xe5\xe2\xee \xef\xee\xe7\xed\xe0\xed\xe8\xff}\n\n\xd1\xeb\xe5\xe7\xfb \xef\xe5\xf0\xe5\xef\xee\xeb\xed\xff\xfe\xf2 "
+                                "\xe4\xf0\xe5\xe2\xe5\xf1\xed\xfb\xe5 \xe3\xeb\xe0\xe7\xe0. \"\xcc\xed\xe5 \xed\xf3\xe6\xed\xee "
+                                "10 \xf1\xe0\xec\xee\xf6\xe2\xe5\xf2\xee\xe2.\" - \xef\xf0\xee\xf8\xe5\xef\xf2\xe0\xeb\xee "
+                                "\xee\xed\xee. (\xc2\xe7\xe4\xee\xf5). \"\xd7\xf2\xee \xe6, \xef\xf0\xe8\xf5\xee\xe4\xe8,"
+                                " \xea\xee\xe3\xe4\xe0 \xf1\xec\xee\xe6\xe5\xf8\xfc \xe7\xe0\xef\xeb\xe0\xf2\xe8\xf2\xfc."
+                                "\"",
+                                NORMAL_DIALOG_INFO,
+                                -1,
+                                -1,
+                                -1,
+                                0,
+                                -1,
+                                0,
+                                -1,
+                                0
+                            );
                         }
                         break;
                 }
-            } else {
-                NormalDialog(
-                    "{Tree of Knowledge}\n\nUpon your approach, the tree opens its eyes in "
-                    "delight.  \"It is good to see you, my student.  I hope my teachings have "
-                    "helped you.\"",
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    -1,
-                    0,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
             }
             eventHero2->CheckLevel();
             break;
@@ -2544,64 +2758,71 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_ORACLE:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             EventWindow(EVENT_TEXT_ORACLE, NORMAL_DIALOG_INFO, "", -1, 0, -1, 0, -1);
-            oracleWindow = new heroWindow(0, 0, "thiefwin.bin");
-            if (oracleWindow == NULL)
+            oracleWindow_o = new heroWindow(0, 0, "thiefwin.bin");
+            if (oracleWindow_o == NULL)
                 MemError();
-            SetWinText(oracleWindow, ORACLE_WINDOW_TEXT_ID);
-            gpTownManager->SetupThievesGuild(oracleWindow, ORACLE_THIEVES_GUILD_RANK);
-            strcpy(gText, "Shrine - Player Rankings");
-            oracleMessage1.type = MESSAGE_WIDGET;
-            oracleMessage1.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
-            oracleMessage1.payload.widget.id = 0;
-            oracleMessage1.payload.widget.data.text = gText;
-            oracleWindow->BroadcastMessage(oracleMessage1);
-            gpWindowManager->DoDialog(oracleWindow, TrueFalseDialogHandler, 0);
-            delete oracleWindow;
+            SetWinText(oracleWindow_o, ORACLE_WINDOW_TEXT_ID);
+            gpTownManager->SetupThievesGuild(oracleWindow_o, ORACLE_THIEVES_GUILD_RANK);
+            strcpy(gText, "\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 - \xe8\xed\xf4\xee\xf0\xec\xe0\xf6\xe8\xff \xee\xe1 "
+                          "\xe8\xe3\xf0\xee\xea\xe0\xf5");
+            oracleMessage_o.type = MESSAGE_WIDGET;
+            oracleMessage_o.payload.widget.command = WIDGET_COMMAND_SET_TEXT;
+            oracleMessage_o.payload.widget.id = 0;
+            oracleMessage_o.payload.widget.data.text = gText;
+            oracleWindow_o->BroadcastMessage(oracleMessage_o);
+            gpWindowManager->DoDialog(oracleWindow_o, TrueFalseDialogHandler, 0);
+            delete oracleWindow_o;
             RedrawAdvScreen(1, 0);
             break;
 
         case MAP_OBJECT_SHRINE_FIRST_CIRCLE:
-            eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Shrine of the 1st Circle}\n\nYou come across a small shrine attended by a group "
-                "of novice acolytes.  In exchange for your protection, they agree to teach you a "
-                "simple spell - ",
+                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 1-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                "\xed\xe0 \xec\xe0\xeb\xe5\xed\xfc\xea\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
+                "\xf1\xeb\xf3\xe6\xe0\xf2 \xec\xee\xeb\xee\xe4\xfb\xe5 \xef\xee\xf1\xeb\xf3\xf8\xed\xe8\xea\xe8."
+                "  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
+                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xee\xf1\xf2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
+                "- ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
 
         case MAP_OBJECT_SHRINE_SECOND_CIRCLE:
-            eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Shrine of the 2nd Circle}\n\nYou come across an ornate shrine attended by a "
-                "group of rotund friars.  In exchange for your protection, they agree to teach you "
-                "a spell - ",
+                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 2-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                "\xed\xe0 \xe1\xee\xe3\xe0\xf2\xee \xf0\xe0\xf1\xef\xe8\xf1\xe0\xed\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5,"
+                " \xe3\xe4\xe5 \xf1\xeb\xf3\xe6\xe0\xf2 \xef\xee\xeb\xed\xee\xef\xf0\xe0\xe2\xed\xfb\xe5 "
+                "\xe1\xf0\xe0\xf2\xfc\xff \xe2\xe5\xf0\xfb.  \xc2 \xee\xe1\xec\xe5\xed \xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 "
+                "\xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc \xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 "
+                "\xed\xee\xe2\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe - ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
             goto shrineSpell;
 
         case MAP_OBJECT_SHRINE_THIRD_CIRCLE:
-            eventValue1 = cell->m_objectMetadata - 1;
             sprintf(
                 gText,
                 "%s'%s'.  ",
-                "{Shrine of the 3rd Circle}\n\nYou come across a lavish shrine attended by a group "
-                "of high priests.  In exchange for your protection, they agree to teach you a "
-                "sophisticated spell - ",
+                "{\xd1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5 3-\xe3\xee \xca\xf0\xf3\xe3\xe0}\n\n\xc2\xfb \xed\xe0\xe1\xf0\xe5\xeb\xe8 "
+                "\xed\xe0 \xf0\xee\xf1\xea\xee\xf8\xed\xee\xe5 \xf1\xe2\xff\xf2\xe8\xeb\xe8\xf9\xe5, \xe3\xe4\xe5 "
+                "\xf1\xeb\xf3\xe6\xe0\xf2 \xe2\xfb\xf1\xf8\xe8\xe5 \xe6\xf0\xe5\xf6\xfb.  \xc2 \xee\xe1\xec\xe5\xed "
+                "\xed\xe0 \xe7\xe0\xf9\xe8\xf2\xf3 \xee\xed\xe8 \xf1\xee\xe3\xeb\xe0\xf1\xe8\xeb\xe8\xf1\xfc "
+                "\xed\xe0\xf3\xf7\xe8\xf2\xfc \xe2\xe0\xf1 \xef\xf0\xe5\xec\xf3\xe4\xf0\xee\xec\xf3 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xfe "
+                "- ",
                 gSpellNames[cell->m_objectMetadata - 1]
             );
         shrineSpell:
             if (eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
-                if (static_cast<i32>(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
-                        + SHRINE_WISDOM_BONUS
-                    >= IDX(gsSpellInfo[eventValue1].level)) {
+                if (IDX(gsSpellInfo[cell->m_objectMetadata - 1].level)
+                    <= static_cast<i32>(eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)])
+                           + SHRINE_WISDOM_BONUS) {
                     EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                     eventHero2->AddSpell(
-                        static_cast<SpellType>(eventValue1),
+                        static_cast<SpellType>(cell->m_objectMetadata - 1),
                         eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
                     );
                     EventWindow(
@@ -2609,7 +2830,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         NORMAL_DIALOG_INFO,
                         gText,
                         NORMAL_DIALOG_SPELL,
-                        eventValue1,
+                        cell->m_objectMetadata - 1,
                         -1,
                         0,
                         -1
@@ -2617,13 +2838,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 } else {
                     strcat(
                         gText,
-                        "Unfortunately, you do not have the wisdom to understand the spell, and "
-                        "you are unable to learn it.  "
+                        "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5 \xf5\xe2\xe0\xf2\xe0\xe5\xf2 "
+                        "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
+                        " \xe8 \xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
                     );
                     EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
                 }
             } else {
-                strcat(gText, "Unfortunately, you have no Magic Book to record the spell with.");
+                strcat(gText, "\xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
+                              "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5 "
+                              "\xe2 \xed\xe5\xe5.");
                 EventWindow(-1, NORMAL_DIALOG_INFO, gText, -1, 0, -1, 0, -1);
             }
             break;
@@ -2635,60 +2859,60 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
         case MAP_OBJECT_WHIRLPOOL:
             EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
             DoWhirlpool(eventHero2);
+            goto findTeleportDestination;
 
+        case MAP_OBJECT_STONE_LITHS:
+            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
         findTeleportDestination:
-            teleportCount = 0;
-            for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
-                for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
-                    if ((gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_triggerType
+            teleportCount_e = 0;
+            for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
+                for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
+                    if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
                             == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                        && (gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_objectIndex
+                        && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                == cell->m_objectIndex
-                        && abs(teleportX3 - x) + abs(teleportY - y)
+                        && abs(teleportX_e - x) + abs(teleportY_e - y)
                                > (eventType_g == MAP_OBJECT_STONE_LITHS ? STONE_LITHS_MIN_DISTANCE
                                                                         : WHIRLPOOL_MIN_DISTANCE)) {
-                        teleportCount++;
+                        teleportCount_e++;
                     }
                 }
             }
-            if (teleportCount >= 1) {
-                if (teleportCount > 1)
-                    teleportCount = Random(1, teleportCount);
-                for (teleportY = 0; teleportY < MAP_HEIGHT; teleportY++) {
-                    for (teleportX3 = 0; teleportX3 < MAP_WIDTH; teleportX3++) {
-                        if ((gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_triggerType
+            if (teleportCount_e >= 1) {
+                if (teleportCount_e > 1)
+                    teleportCount_e = Random(1, teleportCount_e);
+                for (teleportY_e = 0; teleportY_e < MAP_HEIGHT; teleportY_e++) {
+                    for (teleportX_e = 0; teleportX_e < MAP_WIDTH; teleportX_e++) {
+                        if ((gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_triggerType
                                 == static_cast<u8>(eventType_g | MAP_TRIGGER_ACTION_FLAG)
-                            && (gpGame->m_worldMap.GetCell(teleportX3, teleportY))->m_objectIndex
+                            && (gpGame->m_worldMap.GetCell(teleportX_e, teleportY_e))->m_objectIndex
                                    == cell->m_objectIndex
-                            && (teleportX3 != x || teleportY != y)
-                            && abs(teleportX3 - x) + abs(teleportY - y)
+                            && (teleportX_e != x || teleportY_e != y)
+                            && abs(teleportX_e - x) + abs(teleportY_e - y)
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? STONE_LITHS_MIN_DISTANCE
                                           : WHIRLPOOL_MIN_DISTANCE)
-                            && --teleportCount < 1) {
+                            && --teleportCount_e <= 0) {
                             goto teleportHero;
                         }
                     }
                 }
             teleportHero:
                 StopCursor(1);
-                gpAdvManager->TeleportTo(eventHero2, teleportX3, teleportY, 1, 0);
+                gpAdvManager->TeleportTo(eventHero2, teleportX_e, teleportY_e, 1, 0);
             }
             break;
 
-        case MAP_OBJECT_STONE_LITHS:
-            EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-            goto findTeleportDestination;
-
         case MAP_OBJECT_ARTIFACT: {
-            artifactResourceType = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
+            artifactResourceType_k = (cell->m_objectMetadata & ARTIFACT_EVENT_RESOURCE_MASK)
                                    >> ARTIFACT_EVENT_RESOURCE_SHIFT;
-            artifact8 = static_cast<ArtifactType>(cell->m_objectIndex / 2);
-            guardedMonster5 =
+            artifact_g = static_cast<ArtifactType>(cell->m_objectIndex / 2);
+            guardedMonster_c =
                 static_cast<CreatureType>(cell->m_objectMetadata & ARTIFACT_EVENT_MONSTER_MASK);
             if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY) {
                 NormalDialog(
-                    "You cannot pick up this artifact, you already have a full load!",
+                    "\xc2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xef\xee\xe4\xee\xe1\xf0\xe0\xf2\xfc \xfd\xf2\xee\xf2 "
+                    "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xec\xe5\xf1\xf2\xe0!",
                     NORMAL_DIALOG_INFO,
                     -1,
                     -1,
@@ -2706,76 +2930,212 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                 strcpy(
                     gText,
-                    "The fabled golden bow of the elves lies here in the dust.  You take it and "
-                    "journey back to the elven towns.  They shower you with their graciousness and "
-                    "the king promises that his people will aid you whenever you seek help."
+                    "\xd1\xea\xe0\xe7\xee\xf7\xed\xfb\xe9 \xe7\xee\xeb\xee\xf2\xee\xe9 \xeb\xf3\xea \xfd\xeb\xfc\xf4\xee\xe2 "
+                    "\xef\xf0\xee\xf1\xf2\xee \xe2\xe0\xeb\xff\xe5\xf2\xf1\xff \xe7\xe4\xe5\xf1\xfc, \xe2 \xe3\xf0\xff\xe7\xe8."
+                    " \xc2\xfb \xef\xee\xe4\xee\xe1\xf0\xe0\xeb\xe8 \xe5\xe3\xee \xe8 \xee\xf2\xe2\xe5\xe7\xeb\xe8 "
+                    "\xe2 \xfd\xeb\xfc\xf4\xe8\xe9\xf1\xea\xe8\xe9 \xe3\xee\xf0\xee\xe4. \xc2 \xe1\xeb\xe0\xe3\xee\xe4\xe0\xf0\xed\xee\xf1\xf2\xfc "
+                    "\xe7\xe0 \xfd\xf2\xee\xf2 \xef\xee\xe4\xe2\xe8\xe3 \xea\xee\xf0\xee\xeb\xfc \xfd\xeb\xfc\xf4\xee\xe2 "
+                    "\xef\xee\xee\xe1\xe5\xf9\xe0\xeb \xe2\xe0\xec \xef\xee\xec\xee\xf9\xfc \xf1\xe2\xee\xe5\xe3\xee "
+                    "\xed\xe0\xf0\xee\xe4\xe0 \xe2 \xeb\xfe\xe1\xf3\xfe \xec\xe8\xed\xf3\xf2\xf3, \xea\xee\xe3\xe4\xe0 "
+                    "\xe2\xe0\xec \xfd\xf2\xee \xef\xee\xed\xe0\xe4\xee\xe1\xe8\xf2\xf1\xff."
                 );
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
                     gText,
                     MAP_EVENT_REWARD_ARTIFACT,
-                    IDX(artifact8),
+                    IDX(artifact_g),
                     -1,
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, artifact8, 1, static_cast<i8>(cell->m_objectMetadata));
-                eraseObject = 1;
-                fizzleType3 = 1;
+                GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
+                eraseObject_l = 1;
+                fizzleType_k = 1;
                 break;
             }
 
-            if (artifact8 == ARTIFACT_SPELL_SCROLL) {
+            if (artifact_g == ARTIFACT_SPELL_SCROLL) {
                 EventSound(eventType_g, 1, &eventSample_f);
                 xTheSpell = cell->m_objectMetadata;
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    gArtifactEvent[IDX(artifact8)],
+                    gArtifactEvent[IDX(artifact_g)],
                     MAP_EVENT_REWARD_ARTIFACT,
-                    IDX(artifact8),
+                    IDX(artifact_g),
                     -1,
                     0,
                     -1
                 );
-                GiveArtifact(eventHero2, artifact8, 1, static_cast<i8>(cell->m_objectMetadata));
-                eraseObject = 1;
-                fizzleType3 = 1;
+                GiveArtifact(eventHero2, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
+                eraseObject_l = 1;
+                fizzleType_k = 1;
                 break;
             }
 
-            if (!(cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG)) {
+            if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
+                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
+                if (guardedMonster_c == CREATURE_ROGUE) {
+                    NormalDialog(
+                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xe7\xe0\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 "
+                        "\xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2. \xcd\xee \xe5\xe4\xe2\xe0 \xe2\xfb \xef\xee\xe4\xee\xf8\xeb\xe8 "
+                        "\xea \xed\xe5\xec\xf3, \xe8\xe7 \xea\xf3\xf1\xf2\xee\xe2 \xe2\xfb\xf1\xea\xee\xf7\xe8\xeb\xe0 "
+                        "\xf8\xe0\xe9\xea\xe0 \xf0\xe0\xe7\xe1\xee\xe9\xed\xe8\xea\xee\xe2, \xee\xf5\xf0\xe0\xed\xff\xfe\xf9\xe8\xf5 "
+                        "\xf1\xe2\xee\xe5 \xed\xe0\xe3\xf0\xe0\xe1\xeb\xe5\xed\xed\xee\xe5 \xe4\xee\xe1\xf0\xee.",
+                        NORMAL_DIALOG_INFO,
+                        -1,
+                        -1,
+                        -1,
+                        0,
+                        -1,
+                        0,
+                        -1,
+                        0
+                    );
+                    guardedCount_i = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
+                    goto artifactFight;
+                } else {
+                    guardedCount_i = 1;
+                    sprintf(
+                        gText,
+                        "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcd\xe0 \xef\xf0\xee\xe3\xe0\xeb\xe8\xed\xe5 \xe2\xfb "
+                        "\xef\xf0\xe8\xec\xe5\xf2\xe8\xeb\xe8 \xe4\xf0\xe5\xe2\xed\xe8\xe9 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2."
+                        " \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xe5\xe3\xee \xf1\xf2\xee\xf0\xee\xe6\xe8\xf2 "
+                        "\xee\xf2\xf0\xff\xe4 %s. \xcd\xe5 \xef\xf3\xe3\xe0\xe5\xf2 \xeb\xe8 \xe2\xe0\xf1 \xf1\xe8\xeb\xe0 "
+                        "%s, \xe8 \xe1\xf3\xe4\xe5\xf2\xe5 \xeb\xe8 \xe2\xfb \xf1\xf0\xe0\xe6\xe0\xf2\xfc\xf1\xff "
+                        "\xe7\xe0 \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2?",
+                        gArmyNamesPlural[IDX(guardedMonster_c)],
+                        gArmyNamesPlural[IDX(guardedMonster_c)]
+                    );
+                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
+                }
+                if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
+                artifactFight:
+                    if (CombatMonsterEvent(
+                            eventHero2,
+                            guardedMonster_c,
+                            guardedCount_i,
+                            cell,
+                            x,
+                            y,
+                            0,
+                            x,
+                            y,
+                            CREATURE_NONE,
+                            0,
+                            0,
+                            CREATURE_NONE,
+                            0,
+                            0
+                        )
+                        == COMBAT_RESULT_ATTACKER) {
+                        eventHero2->CheckLevel();
+                        sprintf(
+                            gText,
+                            "\xce\xe4\xe5\xf0\xe6\xe0\xe2 \xef\xee\xe1\xe5\xe4\xf3, \xe2\xfb \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 "
+                            "\xf1\xe2\xee\xe9 \xf2\xf0\xee\xf4\xe5\xe9 - %s.",
+                            gArtifactNames[IDX(artifact_g)]
+                        );
+                        NormalDialog(
+                            gText,
+                            NORMAL_DIALOG_INFO,
+                            -1,
+                            -1,
+                            MAP_EVENT_REWARD_ARTIFACT,
+                            cell->m_objectIndex / 2,
+                            -1,
+                            0,
+                            -1,
+                            0
+                        );
+                        goto giveArtifact;
+                    }
+                } else {
+                    NormalDialog(
+                        "\xc3\xeb\xe0\xe2\xed\xee\xe5 \xe2 \xe4\xee\xe1\xeb\xe5\xf1\xf2\xe8 - \xe1\xeb\xe0\xe3\xee\xf0\xe0\xe7\xf3\xec\xe8\xe5,"
+                        " \xef\xee\xfd\xf2\xee\xec\xf3 \xe2\xfb \xf0\xe5\xf8\xe8\xeb\xe8 \xef\xee\xea\xe0 \xf7\xf2\xee "
+                        "\xe2\xee\xe7\xe4\xe5\xf0\xe6\xe0\xf2\xfc\xf1\xff \xee\xf2 \xfd\xf2\xee\xe9 \xe1\xe8\xf2\xe2\xfb.",
+                        NORMAL_DIALOG_INFO,
+                        -1,
+                        -1,
+                        -1,
+                        0,
+                        -1,
+                        0,
+                        -1,
+                        0
+                    );
+                }
+                break;
+            } else {
                 switch (cell->m_objectMetadata & ARTIFACT_EVENT_MODE_MASK) {
+                    case ARTIFACT_EVENT_MODE_WISDOM:
+                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
+                            != HERO_SKILL_LEVEL_NONE)
+                            goto artifactPickup;
+                        sprintf(
+                            gText,
+                            "{\xc0\xf0\xe5\xf2\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xf3\xe1\xee\xe3\xe8\xe9 "
+                            "\xf1\xea\xe8\xf2 \xe8\xe7\xec\xee\xe6\xe4\xe5\xed\xed\xee\xe3\xee \xee\xf2\xf8\xe5\xeb\xfc\xed\xe8\xea\xe0."
+                            " \xd2\xee\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee %s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff "
+                            "\xef\xe5\xf0\xe2\xee\xec\xf3 \xe6\xe5 \xe2\xf1\xf2\xf0\xe5\xf7\xed\xee\xec\xf3 \xe2\xe5\xeb\xe8\xea\xee\xec\xf3 "
+                            "\xec\xf3\xe4\xf0\xe5\xf6\xf3.",
+                            gArtifactNames[IDX(artifact_g)]
+                        );
+                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        break;
+
+                    case ARTIFACT_EVENT_MODE_LEADERSHIP:
+                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
+                            != HERO_SKILL_LEVEL_NONE)
+                            goto artifactPickup;
+                        sprintf(
+                            gText,
+                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xc2\xfb \xed\xe0\xe2\xe5\xf1\xf2\xe8\xeb\xe8 \xf1\xf2\xe0\xf0\xee\xe3\xee "
+                            "\xf1\xee\xeb\xe4\xe0\xf2\xe0 \xe2 \xe5\xe3\xee \xf1\xea\xf0\xee\xec\xed\xee\xec \xe6\xe8\xeb\xe8\xf9\xe5."
+                            " \xd1\xee\xeb\xe4\xe0\xf2 \xef\xee\xe2\xe5\xe4\xe0\xeb \xe2\xe0\xec, \xf7\xf2\xee \xe5\xe3\xee "
+                            "%s \xe4\xee\xf1\xf2\xe0\xed\xe5\xf2\xf1\xff \xef\xe5\xf0\xe2\xee\xec\xf3 \xed\xe0\xf1\xf2\xee\xff\xf9\xe5\xec\xf3 "
+                            "\xeb\xe8\xe4\xe5\xf0\xf3, \xea\xee\xf2\xee\xf0\xee\xe3\xee \xee\xed \xe2\xf1\xf2\xf0\xe5\xf2\xe8\xf2.",
+                            gArtifactNames[IDX(artifact_g)]
+                        );
+                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
+                        break;
+
                     case ARTIFACT_EVENT_MODE_PICKUP:
                     artifactPickup:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            gArtifactEvent[IDX(artifact8)],
+                            gArtifactEvent[IDX(artifact_g)],
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact8),
+                            IDX(artifact_g),
                             -1,
                             0,
                             -1
                         );
-                        goto giveArtifact;
+                    giveArtifact:
+                        GiveArtifact(eventHero2, artifact_g, 1, -1);
+                        eraseObject_l = 1;
+                        fizzleType_k = 1;
+                        break;
 
                     case ARTIFACT_EVENT_MODE_GOLD:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "2000 gold.  Do you wish to buy this artifact?",
-                            gArtifactNames[IDX(artifact8)]
+                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                            "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s, \xe2\xf1\xe5\xe3\xee \xe7\xe0 2000 \xe7\xee\xeb\xee\xf2\xfb\xf5."
+                            " \xca\xf3\xef\xe8\xf2\xe5 \xe5\xe3\xee?",
+                            gArtifactNames[IDX(artifact_g)]
                         );
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_CONFIRM,
                             gText,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact8),
+                            IDX(artifact_g),
                             -1,
                             0,
                             -1
@@ -2788,8 +3148,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2802,8 +3165,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2817,43 +3182,31 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
                         break;
 
-                    case ARTIFACT_EVENT_MODE_WISDOM:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
-                            != HERO_SKILL_LEVEL_NONE)
-                            goto artifactPickup;
-                        sprintf(
-                            gText,
-                            "{Artifact}\n\nYou've found the humble dwelling of a withered hermit.  "
-                            "The hermit tells you that he is willing to give the %s to the first "
-                            "wise person he meets.",
-                            gArtifactNames[IDX(artifact8)]
-                        );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                        break;
-
-                    case ARTIFACT_EVENT_MODE_LEADERSHIP:
-                        if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_LEADERSHIP)]
-                            != HERO_SKILL_LEVEL_NONE)
-                            goto artifactPickup;
-                        sprintf(
-                            gText,
-                            "{Artifact}\n\nYou've come across the spartan quarters of a retired "
-                            "soldier.  The soldier tells you that he is willing to pass on the %s "
-                            "to the first true leader he meets.",
-                            gArtifactNames[IDX(artifact8)]
-                        );
-                        NormalDialog(gText, NORMAL_DIALOG_INFO, -1, -1, -1, 0, -1, 0, -1, 0);
-                        break;
-
                     case ARTIFACT_EVENT_MODE_RESOURCE_3:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType]);
-                        sphinxAnswer_a[0] += ' ';
+                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
+                        {
+                            char artifactInitial3;
+
+                            if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
+                                && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
+                                artifactInitial3 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                            else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
+                                     && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
+                                artifactInitial3 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                            else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
+                                artifactInitial3 = static_cast<char>(0xb8);
+                            else
+                                artifactInitial3 = sphinxAnswer_a[0];
+                            sphinxAnswer_a[0] = artifactInitial3;
+                        }
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "2500 gold and 3 %s.  Do you wish to buy this artifact?",
-                            gArtifactNames[IDX(artifact8)],
+                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                            "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
+                            "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 3 \xe5\xe4\xe8\xed\xe8\xf6\xfb. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                            "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
+                            gArtifactNames[IDX(artifact_g)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -2862,7 +3215,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact8),
+                            IDX(artifact_g),
                             -1,
                             0,
                             -1,
@@ -2872,18 +3225,21 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_3_GOLD_COST
                                 && gpGame->m_players[eventHero2->m_owner]
-                                           .m_resources[artifactResourceType]
+                                           .m_resources[artifactResourceType_k]
                                        >= ARTIFACT_EVENT_RESOURCE_3_AMOUNT) {
                                 gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_3_GOLD_COST;
                                 gpGame->m_players[eventHero2->m_owner]
-                                    .m_resources[artifactResourceType] -=
+                                    .m_resources[artifactResourceType_k] -=
                                     ARTIFACT_EVENT_RESOURCE_3_AMOUNT;
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2896,8 +3252,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2913,13 +3271,29 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
 
                     case ARTIFACT_EVENT_MODE_RESOURCE_5:
                         EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType]);
-                        sphinxAnswer_a[0] += ' ';
+                        sprintf(sphinxAnswer_a, gResourceNames[artifactResourceType_k]);
+                        {
+                            char artifactInitial5;
+
+                            if (static_cast<u8>(sphinxAnswer_a[0]) >= 'A'
+                                && static_cast<u8>(sphinxAnswer_a[0]) <= 'Z')
+                                artifactInitial5 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                            else if (static_cast<u8>(sphinxAnswer_a[0]) >= 0xc0
+                                     && static_cast<u8>(sphinxAnswer_a[0]) <= 0xdf)
+                                artifactInitial5 = static_cast<char>(static_cast<u8>(sphinxAnswer_a[0]) + 0x20);
+                            else if (static_cast<u8>(sphinxAnswer_a[0]) == 0xa8)
+                                artifactInitial5 = static_cast<char>(0xb8);
+                            else
+                                artifactInitial5 = sphinxAnswer_a[0];
+                            sphinxAnswer_a[0] = artifactInitial5;
+                        }
                         sprintf(
                             gText,
-                            "{Artifact}\n\nA leprechaun offers you the %s for the small price of "
-                            "3000 gold and 5 %s.  Do you wish to buy this artifact?",
-                            gArtifactNames[IDX(artifact8)],
+                            "{\xc0\xf0\xf2\xe5\xf4\xe0\xea\xf2}\n\n\xcb\xe5\xef\xf0\xe5\xea\xee\xed \xef\xf0\xe5\xe4\xeb\xe0\xe3\xe0\xe5\xf2 "
+                            "\xe2\xe0\xec \xe0\xf0\xf2\xe5\xf4\xe0\xea\xf2 - %s \xe7\xe0 3000 \xe7\xee\xeb\xee\xf2\xfb\xf5 "
+                            "\xe8 \xef\xf0\xee\xf1\xe8\xf2 %s - 5 \xe5\xe4\xe8\xed\xe8\xf6. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                            "\xea\xf3\xef\xe8\xf2\xfc \xef\xf0\xe5\xe4\xec\xe5\xf2?",
+                            gArtifactNames[IDX(artifact_g)],
                             sphinxAnswer_a
                         );
                         NormalDialog(
@@ -2928,7 +3302,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             -1,
                             -1,
                             MAP_EVENT_REWARD_ARTIFACT,
-                            IDX(artifact8),
+                            IDX(artifact_g),
                             -1,
                             0,
                             -1,
@@ -2938,18 +3312,21 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             if (gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)]
                                     >= ARTIFACT_EVENT_RESOURCE_5_GOLD_COST
                                 && gpGame->m_players[eventHero2->m_owner]
-                                           .m_resources[artifactResourceType]
+                                           .m_resources[artifactResourceType_k]
                                        >= ARTIFACT_EVENT_RESOURCE_5_AMOUNT) {
                                 gpGame->m_players[eventHero2->m_owner].m_resources[IDX(RES_GOLD)] -=
                                     ARTIFACT_EVENT_RESOURCE_5_GOLD_COST;
                                 gpGame->m_players[eventHero2->m_owner]
-                                    .m_resources[artifactResourceType] -=
+                                    .m_resources[artifactResourceType_k] -=
                                     ARTIFACT_EVENT_RESOURCE_5_AMOUNT;
                                 goto giveArtifact;
                             }
                             NormalDialog(
-                                "You try to pay the leprechaun, but realize that you can't afford "
-                                "it.  The leprechaun stamps his foot and ignores you.",
+                                "\xc2\xfb \xe8 \xf5\xee\xf2\xe5\xeb\xe8 \xe1\xfb \xf0\xe0\xf1\xef\xeb\xe0\xf2\xe8\xf2\xfc\xf1\xff "
+                                "\xf1 \xeb\xe5\xef\xf0\xe5\xea\xee\xed\xee\xec, \xed\xee \xef\xee\xed\xff\xeb\xe8, \xf7\xf2\xee "
+                                "\xf1\xe4\xe5\xeb\xea\xe0 \xe2\xe0\xec \xed\xe5 \xef\xee \xea\xe0\xf0\xec\xe0\xed\xf3. \xcb\xe5\xef\xf0\xe5\xea\xee\xed "
+                                "\xe7\xe0\xf2\xee\xef\xe0\xeb \xed\xee\xe3\xe0\xec\xe8 \xe8 \xee\xe1\xe8\xe6\xe5\xed\xed\xee "
+                                "\xed\xe0\xe4\xf3\xeb\xf1\xff.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2962,8 +3339,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             );
                         } else {
                             NormalDialog(
-                                "Insulted by your refusal of his generous offer, the leprechaun "
-                                "stamps his foot and ignores you.",
+                                "\xce\xf1\xea\xee\xf0\xe1\xeb\xe5\xed\xed\xfb\xe9 \xe2\xe0\xf8\xe8\xec \xee\xf2\xea\xe0\xe7\xee\xec "
+                                "\xee\xf2 \xe5\xe3\xee \xf9\xe5\xe4\xf0\xee\xe3\xee \xef\xf0\xe5\xe4\xeb\xee\xe6\xe5\xed\xe8\xff,"
+                                " \xeb\xe5\xea\xf0\xe5\xea\xee\xec \xef\xf0\xe8\xf2\xee\xef\xed\xf3\xeb \xed\xee\xe3\xee\xe9 "
+                                "\xe8 \xee\xf2\xe2\xe5\xf0\xed\xf3\xeb\xf1\xff \xee\xf2 \xe2\xe0\xf1.",
                                 NORMAL_DIALOG_INFO,
                                 -1,
                                 -1,
@@ -2977,163 +3356,78 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
                         break;
                 }
-            } else {
-                EventSound(eventType_g, cell->m_objectMetadata, &eventSample_f);
-                if (guardedMonster5 == CREATURE_ROGUE) {
-                    NormalDialog(
-                        "{Artifact}\n\nYou come upon an ancient artifact.  As you reach for it, a "
-                        "pack of Rogues leap out of the brush to guard their stolen loot.",
-                        NORMAL_DIALOG_INFO,
-                        -1,
-                        -1,
-                        -1,
-                        0,
-                        -1,
-                        0,
-                        -1,
-                        0
-                    );
-                    guardedCount = ARTIFACT_EVENT_GUARD_ROGUE_COUNT;
-                } else {
-                    guardedCount = 1;
-                    sprintf(
-                        gText,
-                        "{Artifact}\n\nThrough a clearing you observe an ancient artifact.  "
-                        "Unfortunately, it's guarded by a nearby %s.  Do you want to fight the %s "
-                        "for the artifact?",
-                        gArmyNamesPlural[IDX(guardedMonster5)],
-                        gArmyNamesPlural[IDX(guardedMonster5)]
-                    );
-                    NormalDialog(gText, NORMAL_DIALOG_CONFIRM, -1, -1, -1, 0, -1, 0, -1, 0);
-                    if (gpWindowManager->m_dialogResult != MONSTER_DIALOG_YES) {
-                        NormalDialog(
-                            "Discretion is the better part of valor, and you decide to avoid this "
-                            "fight for today.",
-                            NORMAL_DIALOG_INFO,
-                            -1,
-                            -1,
-                            -1,
-                            0,
-                            -1,
-                            0,
-                            -1,
-                            0
-                        );
-                        break;
-                    }
-                }
-                if (CombatMonsterEvent(
-                        eventHero2,
-                        guardedMonster5,
-                        guardedCount,
-                        cell,
-                        x,
-                        y,
-                        0,
-                        x,
-                        y,
-                        CREATURE_NONE,
-                        0,
-                        0,
-                        CREATURE_NONE,
-                        0,
-                        0
-                    )
-                    != COMBAT_RESULT_ATTACKER)
-                    break;
                 eventHero2->CheckLevel();
-                sprintf(
-                    gText,
-                    "Victorious, you take your prize, the %s",
-                    gArtifactNames[IDX(artifact8)]
-                );
-                NormalDialog(
-                    gText,
-                    NORMAL_DIALOG_INFO,
-                    -1,
-                    -1,
-                    MAP_EVENT_REWARD_ARTIFACT,
-                    cell->m_objectIndex / 2,
-                    -1,
-                    0,
-                    -1,
-                    0
-                );
-            giveArtifact:
-                GiveArtifact(eventHero2, artifact8, 1, -1);
-                eraseObject = 1;
-                fizzleType3 = 1;
             }
             break;
         }
 
         case MAP_OBJECT_HERO_INTERACTION:
             DemobilizeCurrHero();
-            otherHero6 = gpGame->GetHero(cell->m_objectMetadata);
-            if (otherHero6->m_owner == giCurPlayer) {
-                HeroSwap(eventHero2, otherHero6);
+            otherHero_e = gpGame->GetHero(cell->m_objectMetadata);
+            if (otherHero_e->m_owner == giCurPlayer) {
+                HeroSwap(eventHero2, otherHero_e);
             } else {
-                occupiedTown4 = NULL;
-                if (otherHero6->m_locationType
+                occupiedTown_b = NULL;
+                if (otherHero_e->m_locationType
                     == (MAP_TRIGGER_ACTION_FLAG | MAP_OBJECT_CASTLE)) {
-                    occupiedTown4 = gpGame->GetTown(otherHero6->m_occupiedTown);
-                    occupiedTown4->m_occupyingHeroId = otherHero6->m_id;
+                    occupiedTown_b = gpGame->GetTown(otherHero_e->m_occupiedTown);
+                    occupiedTown_b->m_occupyingHeroId = otherHero_e->m_id;
                 }
-                heroCombatResult3 = DoCombat(
+                heroCombatResult_h = DoCombat(
                     x,
                     y,
                     eventHero2,
                     &eventHero2->m_army,
-                    occupiedTown4,
-                    otherHero6,
-                    &otherHero6->m_army,
+                    occupiedTown_b,
+                    otherHero_e,
+                    &otherHero_e->m_army,
                     x,
                     y,
                     -1,
                     1
                 );
-                if (heroCombatResult3 == COMBAT_RESULT_ATTACKER && occupiedTown4 != NULL)
-                    gpGame->ClaimTown(occupiedTown4->m_id, giCurPlayer, 0);
+                if (heroCombatResult_h == COMBAT_RESULT_ATTACKER && occupiedTown_b != NULL)
+                    gpGame->ClaimTown(occupiedTown_b->m_id, giCurPlayer, 0);
             }
             break;
 
         case MAP_OBJECT_BOTTLE:
             if (cell->m_objectMetadata) {
                 signExtra_k = reinterpret_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
-                if (strlen(signExtra_k->text) < SIGN_MINIMUM_TEXT_LENGTH)
+                if (strlen(signExtra_k->text) > SIGN_MINIMUM_TEXT_LENGTH)
+                    EventWindow(-1, NORMAL_DIALOG_INFO, signExtra_k->text, -1, 0, -1, 0, -1);
+                else
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        cRandomSignText[(x < 0 ? -x : x) & SIGN_RANDOM_TEXT_MASK],
+                        cRandomSignText[x % SIGN_RANDOM_TEXT_COUNT],
                         -1,
                         0,
                         -1,
                         0,
                         -1
                     );
-                else
-                    EventWindow(-1, NORMAL_DIALOG_INFO, signExtra_k->text, -1, 0, -1, 0, -1);
             }
-            fizzleType3 = 1;
-            eraseObject = 1;
+            fizzleType_k = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_SIGN:
             if (cell->m_objectMetadata) {
                 signExtra_k = reinterpret_cast<signEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
-                if (strlen(signExtra_k->text) < SIGN_MINIMUM_TEXT_LENGTH)
+                if (strlen(signExtra_k->text) > SIGN_MINIMUM_TEXT_LENGTH)
+                    EventWindow(-1, NORMAL_DIALOG_INFO, signExtra_k->text, -1, 0, -1, 0, -1);
+                else
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        cRandomSignText[(x < 0 ? -x : x) & SIGN_RANDOM_TEXT_MASK],
+                        cRandomSignText[x % SIGN_RANDOM_TEXT_COUNT],
                         -1,
                         0,
                         -1,
                         0,
                         -1
                     );
-                else
-                    EventWindow(-1, NORMAL_DIALOG_INFO, signExtra_k->text, -1, 0, -1, 0, -1);
             }
             break;
 
@@ -3142,8 +3436,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Daemon Cave}\n\nThe entrance to the cave is dark, and a foul, sulfurous smell "
-                "issues from the cave mouth.  Will you enter?",
+                "{\xcf\xe5\xf9\xe5\xf0\xe0 \xe4\xe5\xec\xee\xed\xe0}\n\n\xc2\xf5\xee\xe4 \xe2 \xef\xe5\xf9\xe5\xf0\xf3 "
+                "\xe7\xe8\xff\xe5\xf2 \xf7\xe5\xf0\xed\xee\xe9 \xe4\xfb\xf0\xee\xe9, \xe8\xe7 \xea\xee\xf2\xee\xf0\xee\xe9 "
+                "\xf2\xff\xed\xe5\xf2 \xf2\xee\xf8\xed\xee\xf2\xe2\xee\xf0\xed\xfb\xec \xf1\xe5\xf0\xed\xe8\xf1\xf2\xfb\xec "
+                "\xe7\xeb\xee\xe2\xee\xed\xe8\xe5\xec. \xce\xf2\xe2\xe0\xe6\xe8\xf2\xe5\xf1\xfc \xeb\xe8 "
+                "\xe2\xfb \xe2\xee\xe9\xf2\xe8?",
                 -1,
                 0,
                 -1,
@@ -3156,7 +3453,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 EventWindow(
                     -1,
                     NORMAL_DIALOG_INFO,
-                    "Except for evidence of a terrible battle, the cave is empty.",
+                    "\xc5\xf1\xeb\xe8 \xed\xe5 \xf1\xf7\xe8\xf2\xe0\xf2\xfc \xf1\xeb\xe5\xe4\xee\xe2 \xf3\xe6\xe0\xf1\xed\xee\xe9 "
+                    "\xe1\xe8\xf2\xe2\xfb, \xef\xe5\xf9\xe5\xf0\xe0 \xef\xf3\xf1\xf2\xe0.",
                     -1,
                     0,
                     -1,
@@ -3166,21 +3464,26 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                 break;
             }
 
-            monsterType6 = static_cast<CreatureType>(
+            monsterType_f = static_cast<CreatureType>(
                 ((cell->m_objectMetadata & DAEMON_SERVANT_MASK) >> DAEMON_SERVANT_SHIFT)
                 + DAEMON_SERVANT_BASE
             );
             sprintf(
                 gText,
-                "You find a powerful and grotesque Demon in the cave.  \"Today,\" it rasps, \"you "
-                "will fight and surely die.  But I will give you a choice of deaths.  You may "
-                "fight me, or you may fight my servants.  Do you prefer to fight my servants?\""
+                "\xc2 \xef\xe5\xf9\xe5\xf0\xe5 \xe2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe3\xf0\xee\xe7\xed\xee\xe3\xee "
+                "\xe4\xee \xed\xe5\xeb\xe5\xef\xee\xf1\xf2\xe8 \xe4\xe5\xec\xee\xed\xe0. \"\xd1\xe5\xe3\xee\xe4\xed\xff,"
+                "\" - \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed, - \"\xf2\xe5\xe1\xff \xe6\xe4\xf3\xf2 \xe1\xee\xe9 "
+                "\xe8 \xe2\xe5\xf0\xed\xe0\xff \xf1\xec\xe5\xf0\xf2\xfc. \xcd\xee \xff \xef\xee\xe7\xe2\xee\xeb\xfe "
+                "\xf2\xe5\xe1\xe5 \xe2\xfb\xe1\xf0\xe0\xf2\xfc \xf1\xec\xe5\xf0\xf2\xfc. \xd2\xfb \xec\xee\xe6\xe5\xf8\xfc "
+                "\xe4\xf0\xe0\xf2\xfc\xf1\xff \xf1\xee \xec\xed\xee\xe9 \xe8\xeb\xe8 \xe6\xe5 \xf1 \xec\xee\xe8\xec\xe8 "
+                "\xf1\xeb\xf3\xe3\xe0\xec\xe8. \xcf\xf0\xe5\xe4\xef\xee\xf7\xe8\xf2\xe0\xe5\xf8\xfc \xf1\xf0\xe0\xe7\xe8\xf2\xfc\xf1\xff "
+                "\xf1 \xec\xee\xe8\xec\xe8 \xf1\xeb\xf3\xe3\xe0\xec\xe8?\""
             );
             EventWindow(-1, NORMAL_DIALOG_CONFIRM, gText, -1, 0, -1, 0, -1);
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (CombatMonsterEvent(
                         eventHero2,
-                        monsterType6,
+                        monsterType_f,
                         DAEMON_SERVANT_COUNT,
                         cell,
                         x,
@@ -3198,8 +3501,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     == COMBAT_RESULT_ATTACKER) {
                     eventHero2->CheckLevel();
                     NormalDialog(
-                        "Upon defeating the daemon's servants, you find a hidden cache with 2500 "
-                        "gold.",
+                        "\xce\xe4\xee\xeb\xe5\xe2 \xf1\xeb\xf3\xe3 \xe4\xe5\xec\xee\xed\xe0, \xe2\xfb \xed\xe0\xf8\xeb\xe8 "
+                        "\xea\xeb\xe0\xe4 \xe2 \xf0\xe0\xe7\xec\xe5\xf0\xe5 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3222,8 +3525,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
-                        "battle, you slay the monster and receive 1,000 experience points.",
+                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
+                        "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xea\xf0\xe0\xf2\xea\xee\xe9,"
+                        " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
+                        "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5 \xe8 \xef\xee\xeb\xf3\xf7\xe8\xeb\xe8 1000 \xee\xf7\xea\xee\xe2 "
+                        "\xee\xef\xfb\xf2\xe0.",
                         NORMAL_DIALOG_EXPERIENCE,
                         DAEMON_EXPERIENCE,
                         -1,
@@ -3235,15 +3541,19 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     break;
 
                 case DAEMON_REWARD_ARTIFACT:
-                    if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY
-                        || gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true) == -1)
+                    if (eventHero2->NumArtifacts() == EVENT_ARTIFACT_CAPACITY)
+                        goto daemonExperienceGold;
+                    if (gpGame->GetRandomArtifactId(ARTIFACT_LEVEL_RANDOM, true) == -1)
                         goto daemonExperienceGold;
                     GiveExperience(eventHero2, DAEMON_EXPERIENCE, 0);
                     eventValue1 = IDX(GiveRandomArtifact(eventHero2));
                     sprintf(
                         gText,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
-                        "battle, you slay the monster and find the %s in the back of the cave.",
+                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
+                        "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
+                        " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xe1\xe8\xf2\xe2\xfb \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
+                        "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xe0 \xe2 \xe3\xeb\xf3\xe1\xe8\xed\xe5 \xef\xe5\xf9\xe5\xf0\xfb "
+                        "\xed\xe0\xf8\xeb\xe8 %s.",
                         gArtifactNames[eventValue1]
                     );
                     EventWindow(
@@ -3265,9 +3575,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "The Demon screams its challenge and attacks!  After a short, desperate "
-                        "battle, you slay the monster and receive 1,000 experience points and "
-                        "2,500 gold.",
+                        "\xc4\xe5\xec\xee\xed \xe2\xfb\xea\xf0\xe8\xea\xed\xf3\xeb \xf1\xe2\xee\xe9 \xe2\xfb\xe7\xee\xe2 "
+                        "\xe8 \xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xe2 \xe1\xee\xe9! \xcf\xee\xf1\xeb\xe5 \xed\xe5\xef\xf0\xee\xe4\xee\xeb\xe6\xe8\xf2\xe5\xeb\xfc\xed\xee\xe9,"
+                        " \xed\xee \xee\xf2\xf7\xe0\xff\xed\xed\xee\xe9 \xf1\xf5\xe2\xe0\xf2\xea\xe8 \xe2\xfb \xef\xf0\xe8\xea\xee\xed\xf7\xe8\xeb\xe8 "
+                        "\xf7\xf3\xe4\xee\xe2\xe8\xf9\xe5, \xef\xee\xeb\xf3\xf7\xe8\xe2 1000 \xee\xf7\xea\xee\xe2 "
+                        "\xee\xef\xfb\xf2\xe0 \xe8 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.",
                         IDX(RES_GOLD),
                         DAEMON_GOLD,
                         NORMAL_DIALOG_EXPERIENCE,
@@ -3284,9 +3596,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_CONFIRM,
-                        "The Demon leaps upon you and has its claws at your throat before you can "
-                        "even draw your sword.  \"Your life is mine,\" it says.  \"I will sell it "
-                        "back to you for 2,500 gold.\"",
+                        "\xc4\xe5\xec\xee\xed \xed\xe0\xe1\xf0\xee\xf1\xe8\xeb\xf1\xff \xed\xe0 \xe2\xe0\xf1 \xe8 "
+                        "\xe2\xf6\xe5\xef\xe8\xeb\xf1\xff \xea\xee\xe3\xf2\xff\xec\xe8 \xe2 \xe3\xee\xf0\xeb\xee "
+                        "\xef\xf0\xe5\xe6\xe4\xe5, \xf7\xe5\xec \xe2\xfb \xee\xe1\xed\xe0\xe6\xe8\xeb\xe8 \xec\xe5\xf7."
+                        " \"\xd2\xe2\xee\xff \xe6\xe8\xe7\xed\xfc \xe2 \xec\xee\xe8\xf5 \xf0\xf3\xea\xe0\xf5,\" -"
+                        " \xef\xf0\xee\xf0\xfb\xf7\xe0\xeb \xee\xed. - \"\xdf \xe2\xe5\xf0\xed\xf3 \xe5\xe5 \xf2\xe5\xe1\xe5 "
+                        "\xe7\xe0 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5.\"",
                         -1,
                         0,
                         -1,
@@ -3299,8 +3614,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                "Seeing that you do not have 2500 gold, the demon slashes you with "
-                                "its claws, and the last thing you see is a red haze.",
+                                "\xcf\xee\xed\xff\xe2, \xf7\xf2\xee \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 2500 \xe7\xee\xeb\xee\xf2\xfb\xf5,"
+                                " \xe4\xe5\xec\xee\xed \xf0\xe0\xf1\xf2\xe5\xf0\xe7\xe0\xeb \xe2\xe0\xf1 \xf1\xe2\xee\xe8\xec\xe8 "
+                                "\xea\xeb\xfb\xea\xe0\xec\xe8, \xe8 \xef\xee\xf1\xeb\xe5\xe4\xed\xe5\xe5, \xf7\xf2\xee \xe2\xfb "
+                                "\xe2\xe8\xe4\xe5\xeb\xe8, \xe1\xfb\xeb\xe0 \xe0\xeb\xe0\xff \xef\xe5\xeb\xe5\xed\xe0 \xef\xe5\xf0\xe5\xe4 "
+                                "\xe3\xeb\xe0\xe7\xe0\xec\xe8.",
                                 -1,
                                 0,
                                 -1,
@@ -3326,8 +3644,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Shipwreck}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
-                "pushed against the rocks.  Do you wish to search the shipwreck?",
+                "{\xca\xee\xf0\xe0\xe1\xeb\xe5\xea\xf0\xf3\xf8\xe5\xed\xe8\xe5}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
+                "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
+                "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xef\xee\xf1\xea\xf0\xe8\xef\xfb\xe2\xe0\xe5\xf2,"
+                " \xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xef\xf0\xe8\xe1\xee\xe5\xec \xed\xe0 "
+                "\xf1\xea\xe0\xeb\xe0\xf5. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc "
+                "\xee\xe1\xeb\xee\xec\xea\xe8?",
                 -1,
                 0,
                 -1,
@@ -3340,9 +3662,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Upon defeating the Ghosts you spend several hours sifting through the "
-                            "debris and find nothing.  Such a despicable act reduces your army's "
-                            "morale.",
+                            "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8, \xe2\xfb "
+                            "\xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 \xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 "
+                            "\xed\xe0 \xf0\xfb\xf2\xfc\xe5 \xe2 \xec\xf3\xf1\xee\xf0\xe5, \xed\xee \xf2\xe0\xea \xed\xe8\xf7\xe5\xe3\xee "
+                            "\xe8 \xed\xe5 \xed\xe0\xf8\xeb\xe8. \xd1\xf2\xee\xeb\xfc \xed\xe5\xe1\xeb\xe0\xe3\xee\xe2\xe8\xe4\xed\xee\xe5 "
+                            "\xe7\xe0\xed\xff\xf2\xe8\xe5 \xf1\xed\xe8\xe7\xe8\xeb\xee \xec\xe0\xee\xf0\xe0\xeb\xfc \xe2\xe0\xf8\xe5\xe9 "
+                            "\xe0\xf0\xec\xe8\xe8.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3359,8 +3684,9 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         if (GhostEvent(
                                 eventHero2,
                                 cell,
-                                "Upon defeating the Ghosts you sift through the debris and find "
-                                "something!",
+                                "\xce\xe4\xee\xeb\xe5\xe2 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2, \xe2\xfb \xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 "
+                                "\xee\xf1\xf2\xe0\xed\xea\xe8 \xea\xee\xf0\xe0\xe1\xeb\xff \xe8 \xea\xee\xe5-\xf7\xf2\xee "
+                                "\xed\xe0\xf8\xeb\xe8!",
                                 x,
                                 y
                             ))
@@ -3394,13 +3720,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
                         break;
                     default:
-                        zombieCell6 = GetCell(
+                        zombieCell_o = GetCell(
                             x - normalDirTable[IDX(eventHero2->m_direction)].x,
                             y - normalDirTable[IDX(eventHero2->m_direction)].y
                         );
                         if (ZombieEvent(
                                 eventHero2,
-                                zombieCell6,
+                                zombieCell_o,
                                 gEventText[EVENT_TEXT_GRAVEYARD_REWARD],
                                 x,
                                 y
@@ -3417,8 +3743,11 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "{Derelict Ship}\n\nThe rotting hulk of a great pirate ship creaks eerily as it is "
-                "pushed against the rocks.  Do you wish to search the ship?",
+                "{\xc1\xf0\xee\xf8\xe5\xed\xed\xfb\xe9 \xea\xee\xf0\xe0\xe1\xeb\xfc}\n\n\xc3\xed\xe8\xfe\xf9\xe8\xe9 "
+                "\xee\xf1\xf2\xee\xe2 \xee\xe3\xf0\xee\xec\xed\xee\xe3\xee \xef\xe8\xf0\xe0\xf2\xf1\xea\xee\xe3\xee "
+                "\xea\xee\xf0\xe0\xe1\xeb\xff \xe7\xeb\xee\xe2\xe5\xf9\xe5 \xf1\xea\xf0\xe8\xef\xe8\xf2, "
+                "\xef\xee\xea\xe0\xf7\xe8\xe2\xe0\xe5\xec\xfb\xe9 \xe2\xee\xeb\xed\xe0\xec\xe8 \xed\xe0 \xf1\xea\xe0\xeb\xe0\xf5."
+                " \xc6\xe5\xeb\xe0\xe5\xf2\xe5 \xee\xe1\xfb\xf1\xea\xe0\xf2\xfc \xea\xee\xf0\xe0\xe1\xeb\xfc?",
                 -1,
                 0,
                 -1,
@@ -3431,9 +3760,12 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         EventWindow(
                             -1,
                             NORMAL_DIALOG_INFO,
-                            "Upon defeating the Skeletons you spend several hours sifting through "
-                            "the debris and find nothing.  Such a despicable act reduces your "
-                            "army's morale.",
+                            "\xd3\xf1\xec\xe8\xf0\xe8\xe2 \xf1\xea\xe5\xeb\xe5\xf2\xee\xe2, \xe2\xfb \xef\xee\xf2\xf0\xe0\xf2\xe8\xeb\xe8 "
+                            "\xed\xe5\xf1\xea\xee\xeb\xfc\xea\xee \xf7\xe0\xf1\xee\xe2 \xed\xe0 \xef\xee\xe8\xf1\xea\xe8 "
+                            "\xf1\xf0\xe5\xe4\xe8 \xe3\xed\xe8\xeb\xfb\xf5 \xee\xe1\xeb\xee\xec\xea\xee\xe2 - \xe8 \xe2\xef\xf3\xf1\xf2\xf3\xfe."
+                            " \xd1\xf2\xee\xeb\xfc \xe3\xf0\xff\xe7\xed\xe0\xff \xf0\xe0\xe1\xee\xf2\xe0 \xef\xeb\xee\xf5\xee "
+                            "\xf1\xea\xe0\xe7\xe0\xeb\xe0\xf1\xfc \xed\xe0 \xec\xee\xf0\xe0\xeb\xe8 \xe2\xe0\xf8\xe5\xe9 "
+                            "\xe0\xf0\xec\xe8\xe8.",
                             NORMAL_DIALOG_MORALE_PENALTY,
                             0,
                             -1,
@@ -3447,15 +3779,16 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         }
                         break;
                     default:
-                        skeletonCell1 = GetCell(
+                        skeletonCell_e = GetCell(
                             x - normalDirTable[IDX(eventHero2->m_direction)].x,
                             y - normalDirTable[IDX(eventHero2->m_direction)].y
                         );
                         if (SkeletonEvent(
                                 eventHero2,
-                                skeletonCell1,
-                                "Upon defeating the Skeletons you sift through the debris and find "
-                                "something!",
+                                skeletonCell_e,
+                                "\xd1\xee\xe2\xeb\xe0\xe4\xe0\xe2 \xf1\xee \xf1\xea\xe5\xeb\xe5\xf2\xe0\xec\xe8, \xe2\xfb "
+                                "\xee\xe1\xfb\xf1\xea\xe0\xeb\xe8 \xee\xe1\xeb\xee\xec\xea\xe8 \xe8 \xea\xee\xe5-\xf7\xf2\xee "
+                                "\xed\xe0\xf8\xeb\xe8!",
                                 x,
                                 y
                             ))
@@ -3471,9 +3804,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "You come upon the pyramid of a great and ancient king.  You are tempted to search "
-                "it for treasure, but all the old stories warn of fearful curses and undead "
-                "guardians.  Will you search?",
+                "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
+                "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xc8\xf1\xea\xf3\xf8\xe5\xed\xe8\xe5 "
+                "\xef\xee\xe8\xf1\xea\xe0\xf2\xfc \xe2 \xed\xe5\xe9 \xf1\xee\xea\xf0\xee\xe2\xe8\xf9\xe0 "
+                "\xe2\xe5\xeb\xe8\xea\xee, \xed\xee \xe2\xfb \xf1\xeb\xfb\xf8\xe0\xeb\xe8 \xe2\xf1\xe5 \xfd\xf2\xe8 "
+                "\xf1\xea\xe0\xe7\xea\xe8 \xee\xe1 \xf3\xe6\xe0\xf1\xed\xfb\xf5 \xef\xf0\xee\xea\xeb\xff\xf2\xe8\xff\xf5 "
+                "\xe8 \xed\xe5\xf3\xef\xee\xea\xee\xe5\xed\xed\xfb\xf5 \xf1\xf2\xf0\xe0\xe6\xe5\xe9. \xd5\xee\xf2\xe8\xf2\xe5 "
+                "\xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xf2\xfc \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3?",
                 -1,
                 0,
                 -1,
@@ -3483,8 +3820,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             if (gpWindowManager->m_dialogResult == MONSTER_DIALOG_YES) {
                 if (!cell->m_objectMetadata) {
                     NormalDialog(
-                        "You come upon the pyramid of a great and ancient king.  Routine "
-                        "exploration reveals that the pyramid is completely empty.",
+                        "\xc2\xfb \xed\xe0\xf8\xeb\xe8 \xef\xe8\xf0\xe0\xec\xe8\xe4\xf3 \xe4\xf0\xe5\xe2\xed\xe5\xe3\xee "
+                        "\xe2\xe5\xeb\xe8\xea\xee\xe3\xee \xf6\xe0\xf0\xff. \xcf\xe5\xf0\xe2\xee\xe5 \xe6\xe5 \xee\xe1\xf1\xeb\xe5\xe4\xee\xe2\xe0\xed\xe8\xe5 "
+                        "\xef\xe8\xf0\xe0\xec\xe8\xe4\xfb \xef\xee\xea\xe0\xe7\xe0\xeb\xee, \xf7\xf2\xee \xe2 \xed\xe5\xe9 "
+                        "\xe0\xe1\xf1\xee\xeb\xfe\xf2\xed\xee \xed\xe8\xf7\xe5\xe3\xee \xed\xe5\xf2.",
                         NORMAL_DIALOG_INFO,
                         -1,
                         -1,
@@ -3501,6 +3840,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         );
                         eventHero2->m_luck -= PYRAMID_LUCK_PENALTY;
                     }
+                    break;
                 } else {
                     if (CombatMonsterEvent(
                             eventHero2,
@@ -3521,43 +3861,46 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                         )
                         == COMBAT_RESULT_ATTACKER) {
                         eventHero2->CheckLevel();
-                        eventValue1 = cell->m_objectMetadata - 1;
-                        sprintf(
-                            eventText,
+                                    sprintf(
+                            eventText_b,
                             "%s'%s'.  ",
-                            "Upon defeating the monsters, you decipher an ancient glyph on the "
-                            "wall, telling the secret of the spell - ",
+                            "\xce\xe4\xee\xeb\xe5\xe2 \xf7\xf3\xe4\xee\xe2\xe8\xf9, \xe2\xfb \xf0\xe0\xf1\xf8\xe8\xf4\xf0\xee\xe2\xe0\xeb\xe8 "
+                            "\xe8\xe5\xf0\xee\xe3\xeb\xe8\xf4\xfb \xed\xe0 \xf1\xf2\xe5\xed\xe5, \xf1\xee\xee\xe1\xf9\xe0\xfe\xf9\xe8\xe5 "
+                            "\xf1\xe5\xea\xf0\xe5\xf2 \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xff - ",
                             gSpellNames[cell->m_objectMetadata - 1]
                         );
                         if (!eventHero2->HasArtifact(ARTIFACT_MAGIC_BOOK)) {
                             strcat(
-                                eventText,
-                                "  Unfortunately, you have no Magic Book to record the spell with."
+                                eventText_b,
+                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xf2 \xc2\xee\xeb\xf8\xe5\xe1\xed\xee\xe9 "
+                                "\xea\xed\xe8\xe3\xe8, \xf7\xf2\xee\xe1\xfb \xe7\xe0\xef\xe8\xf1\xe0\xf2\xfc \xe2 \xed\xe5\xe5 "
+                                "\xfd\xf2\xee \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5."
                             );
-                            EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
+                            EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         } else if (eventHero2->m_secondarySkills[IDX(HERO_SKILL_WISDOM)]
-                                   < HERO_SKILL_LEVEL_EXPERT) {
-                            strcat(
-                                eventText,
-                                "  Unfortunately, you do not have the wisdom to understand the "
-                                "spell, and you are unable to learn it.  "
-                            );
-                            EventWindow(-1, NORMAL_DIALOG_INFO, eventText, -1, 0, -1, 0, -1);
-                        } else {
+                                   >= HERO_SKILL_LEVEL_EXPERT) {
                             eventHero2->AddSpell(
-                                static_cast<SpellType>(eventValue1),
+                                static_cast<SpellType>(cell->m_objectMetadata - 1),
                                 eventHero2->Stats(HERO_PRIMARY_KNOWLEDGE)
                             );
                             EventWindow(
                                 -1,
                                 NORMAL_DIALOG_INFO,
-                                eventText,
+                                eventText_b,
                                 NORMAL_DIALOG_SPELL,
-                                eventValue1,
+                                cell->m_objectMetadata - 1,
                                 -1,
                                 0,
                                 -1
                             );
+                        } else {
+                            strcat(
+                                eventText_b,
+                                "  \xca \xf1\xee\xe6\xe0\xeb\xe5\xed\xe8\xfe, \xf3 \xe2\xe0\xf1 \xed\xe5\xe4\xee\xf1\xf2\xe0\xf2\xee\xf7\xed\xee "
+                                "\xec\xf3\xe4\xf0\xee\xf1\xf2\xe8, \xf7\xf2\xee\xe1\xfb \xef\xee\xed\xff\xf2\xfc \xe7\xe0\xea\xeb\xe8\xed\xe0\xed\xe8\xe5,"
+                                " \xe8\xe2\xfb \xed\xe5 \xec\xee\xe6\xe5\xf2\xe5 \xe2\xfb\xf3\xf7\xe8\xf2\xfc \xe5\xe3\xee."
+                            );
+                            EventWindow(-1, NORMAL_DIALOG_INFO, eventText_b, -1, 0, -1, 0, -1);
                         }
                         cell->m_objectMetadata = 0;
                     }
@@ -3570,8 +3913,10 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             EventWindow(
                 -1,
                 NORMAL_DIALOG_CONFIRM,
-                "You come upon an abandoned gold mine.  The mine appears to be haunted.  Do you "
-                "wish to enter?",
+                "\xc2\xfb \xee\xe1\xed\xe0\xf0\xf3\xe6\xe8\xeb\xe8 \xe7\xe0\xe1\xf0\xee\xf8\xe5\xed\xed\xf3\xfe "
+                "\xe7\xee\xeb\xee\xf2\xf3\xfe \xf8\xe0\xf5\xf2\xf3. \xca\xe0\xe6\xe5\xf2\xf1\xff, \xee\xed\xe0 "
+                "\xed\xe0\xf1\xe5\xeb\xe5\xed\xe0 \xef\xf0\xe8\xe7\xf0\xe0\xea\xe0\xec\xe8. \xc6\xe5\xeb\xe0\xe5\xf2\xe5 "
+                "\xe2\xee\xe9\xf2\xe8 \xe2\xed\xf3\xf2\xf0\xfc?",
                 -1,
                 0,
                 -1,
@@ -3601,7 +3946,8 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
                     EventWindow(
                         -1,
                         NORMAL_DIALOG_INFO,
-                        "You beat the Ghosts and are able to restore the mine to production.",
+                        "\xc2\xfb \xf0\xe0\xe7\xe1\xe8\xeb\xe8 \xef\xf0\xe8\xe7\xf0\xe0\xea\xee\xe2 \xe8 \xf1\xec\xee\xe3\xeb\xe8 "
+                        "\xed\xe0\xeb\xe0\xe4\xe8\xf2\xfc \xe4\xee\xe1\xfb\xf7\xf3 \xe7\xee\xeb\xee\xf2\xe0.",
                         -1,
                         0,
                         -1,
@@ -3682,7 +4028,7 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_BARRIER:
-            eraseObject = BarrierEvent(cell, eventHero2);
+            eraseObject_l = BarrierEvent(cell, eventHero2);
             break;
 
         case MAP_OBJECT_TRAVELER_TENT:
@@ -3701,14 +4047,13 @@ void advManager::DoEvent(mapCell* cell, i32 x, i32 y) {
             JailEvent(cell, eventHero2, x, y);
     }
 
-    playedSample3 = eventSample_f;
     UpdateRadar(1, 0);
     UpdateHeroLocators(1, 1);
     UpdateTownLocators(1, 1);
     UpdBottomView(1, 1, 1);
-    if (eraseObject) {
+    if (eraseObject_l) {
         EraseObj(cell, x, y);
-        FizzleCenter(fizzleType3);
+        FizzleCenter(fizzleType_k);
     } else {
         CompleteDraw(0);
     }
@@ -6005,60 +6350,57 @@ void advManager::FizzleCenter(i32 fizzleType) {
 
 VA(0x00444d73, 0x2b6c)
 void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
-    float spellValueFactor_i;
-    u32 resourceAmount_o;
-    i32 unusedEventResult_e;
-    i32 unusedEventValue_o;
-    mapCell* exitCell_d;
-    i32 teleportDistance_o;
-    i32 spell_g;
-    u32 guardianCount_i;
-    float attackerLoss_c;
+    i32 secondaryAmount_j;
+    i32 secondaryReward_k;
+    i32 primaryReward_e;
+    i32 primaryAmount_j;
+    i32 wellSpellPoints_o;
+    i32 springSpellPoints_j;
     float defenderLoss_k;
-    i32 levelExperience_g;
+    float attackerLoss_c;
     i32 heroLevel_e;
+    i32 levelExperience_g;
     i32 creatureCosts_a[IDX(RES_COUNT)];
     i32 spellPower_j;
     i32 adjacentMonster_j;
+    i32 savedShowIt_e;
+    boatRecord* boat_k;
+    i32 exitCount;
+    ResourceType resourceType_a;
+    i32 artifactGuardResult_e;
+    i32 exitY_d;
+    i32 exitX;
+    ArtifactType artifact_g;
     i32 artifactResource_p;
     hero* otherHero_e;
-    i32 artifactGuardResult_e;
     CombatResult heroCombatResult_h;
-    i32 exitY_d;
-    ArtifactType artifact_g;
     i32 heroInteractionResult;
-    ResourceType resourceType_a;
-    i32 exitX;
-    i32 exitCount;
-    mapEventExtra* eventExtra_o;
     CreatureType artifactGuardCount_b;
     i32 survivingCount_a;
-    boatRecord* boat_k;
-    i32 savedShowIt_e;
-    i32 mineId_j;
-    i32 rewardWork_e[ARMY_GROUP_SLOT_COUNT];
-    i32 resourceWork_p[IDX(RES_COUNT)];
-    i32 eventResults[AI_EVENT_RESULT_COUNT];
-    i32 abandonedMineValue_f;
-    i32 index_h;
-    town* occupiedTown_b;
-    i32 combatResult_d;
+    mapEventExtra* eventExtra_o;
+    MapObjectType eventType_g;
     i32 eventWork_o[IDX(RES_COUNT)];
+    i32 eraseObject_l;
+    i32 battleResult_l;
+    i32 creatureFlag_l;
+    i32 oldPlayer_o;
+    i32 purchaseCost_i;
     i32 battleWon_j;
     i32 pyramidBattleValue_l;
-    i32 oldPlayer_o;
-    MapObjectType eventType_g;
-    playerData* oldPlayerData_h;
-    i32 battleResult_l;
-    i32 purchaseCost_i;
-    i32 purchaseValue_a;
+    i32 unusedResult_m;
+    i32 index_h;
+    i32 purchaseCount_o;
     CreatureType creatureType_i;
-    i32 creatureFlag_l;
+    i32 purchaseValue_a;
+    i32 abandonedMineValue_f;
+    town* occupiedTown_b;
+    playerData* oldPlayerData_h;
+    i32 combatResult_d;
 
     occupiedTown_b = NULL;
     eventType_g = cell->m_triggerType & MAP_TRIGGER_TYPE_MASK;
-    eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 0;
-    eventResults[AI_EVENT_RESULT_UNUSED] = 0;
+    eraseObject_l = 0;
+    unusedResult_m = 0;
     oldPlayer_o = giCurPlayer;
     oldPlayerData_h = gpCurPlayer;
 
@@ -6184,7 +6526,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     eventHero->CheckLevel();
                 }
             }
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_WATERING_HOLE:
@@ -6305,8 +6647,8 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             } else {
                 if (cell->m_objectMetadata & WAGON_ARTIFACT_FLAG) {
                     if (eventHero->NumArtifacts() != HERO_ARTIFACT_SLOT_COUNT) {
-                        artifact_g = ArtifactType(cell->m_objectMetadata & WAGON_ARTIFACT_MASK);
-                        GiveArtifact(eventHero, artifact_g, 1, -1);
+                        index_h = cell->m_objectMetadata & WAGON_ARTIFACT_MASK;
+                        GiveArtifact(eventHero, ArtifactType(index_h), 1, -1);
                     }
                     cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
                 } else {
@@ -6334,7 +6676,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             } else if (cell->m_objectMetadata != 0) {
                 GiveResource(eventHero, RES_GOLD, EVENT_SEA_CHEST_GOLD);
             }
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_FLOTSAM:
@@ -6353,7 +6695,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     GiveResource(eventHero, RES_GOLD, FLOTSAM_LARGE_GOLD_AMOUNT);
                     break;
             }
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_CAMPFIRE:
@@ -6367,7 +6709,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 ResourceType(cell->m_objectMetadata & IDX(CAMPFIRE_RESOURCE_MASK)),
                 cell->m_objectMetadata >> CAMPFIRE_AMOUNT_SHIFT
             );
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_FORT:
@@ -6435,7 +6777,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 resourceType_a == RES_GOLD ? cell->m_objectMetadata * CAMPFIRE_GOLD_MULTIPLIER
                                            : cell->m_objectMetadata
             );
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_WINDMILL:
@@ -6535,39 +6877,41 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_EXCAVATION:
             creatureType_i = CREATURE_SKELETON;
             creatureFlag_l = 1;
+            goto creaturePurchase;
+
         creaturePurchase:
             if (cell->m_objectMetadata != 0) {
                 gpPhilAI->EvaluateOneTimeCreaturePurchase(
                     creatureType_i,
                     cell->m_objectMetadata,
                     creatureFlag_l,
-                    eventResults[AI_EVENT_RESULT_PURCHASE_COUNT],
+                    purchaseCount_o,
                     purchaseCost_i,
                     purchaseValue_a
                 );
-                if (eventResults[AI_EVENT_RESULT_PURCHASE_COUNT] > 0) {
+                if (purchaseCount_o > 0) {
                     gpGame->GiveArmy(
                         &eventHero->m_army,
                         creatureType_i,
-                        eventResults[AI_EVENT_RESULT_PURCHASE_COUNT],
+                        purchaseCount_o,
                         purchaseValue_a
                     );
-                    cell->m_objectMetadata -= eventResults[AI_EVENT_RESULT_PURCHASE_COUNT];
+                    cell->m_objectMetadata -= purchaseCount_o;
                     if (creatureFlag_l == 0) {
                         GetMonsterCost(creatureType_i, creatureCosts_a);
                         for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h)
                             gpCurPlayer->m_resources[index_h] -=
-                                eventResults[AI_EVENT_RESULT_PURCHASE_COUNT]
+                                purchaseCount_o
                                 * creatureCosts_a[index_h];
                     }
                 }
             }
             if (cell->m_objectMetadata == 0 && eventType_g == MAP_OBJECT_ANCIENT_LAMP)
-                eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+                eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_MONSTER:
-            ComputerMonsterInteract(cell, eventHero, eventResults);
+            ComputerMonsterInteract(cell, eventHero, &eraseObject_l);
             break;
 
         case MAP_OBJECT_TREE_OF_KNOWLEDGE:
@@ -6652,7 +6996,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                     }
                 }
             }
-            if (exitCount > 0) {
+            if (exitCount >= 1) {
                 if (exitCount > 1)
                     exitCount = Random(1, exitCount);
                 for (exitY_d = 0; exitY_d < MAP_HEIGHT; ++exitY_d) {
@@ -6665,7 +7009,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                                    > (eventType_g == MAP_OBJECT_STONE_LITHS
                                           ? EVENT_TELEPORT_STONE_DISTANCE
                                           : EVENT_TELEPORT_WHIRLPOOL_DISTANCE)
-                            && --exitCount < 1) {
+                            && --exitCount <= 0) {
                             goto teleportDestination;
                         }
                     }
@@ -6687,7 +7031,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 break;
             if (artifact_g == ARTIFACT_SPELL_SCROLL) {
                 GiveArtifact(eventHero, artifact_g, 1, static_cast<i8>(cell->m_objectMetadata));
-                eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+                eraseObject_l = 1;
                 break;
             }
             if (cell->m_objectMetadata & ARTIFACT_EVENT_GUARDED_FLAG) {
@@ -6726,7 +7070,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                             gpCurPlayer->m_resources[index_h] = 0;
                     }
                     GiveArtifact(eventHero, artifact_g, 1, -1);
-                    eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+                    eraseObject_l = 1;
                     break;
                 case ARTIFACT_EVENT_MODE_GOLD:
                     if (gpPhilAI->NetValueOfArtifact(IDX(artifact_g), EVENT_ARTIFACT_GOLD, 0, 0)) {
@@ -6826,7 +7170,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_BOTTLE:
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_DAEMON_CAVE:
@@ -6871,16 +7215,13 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 gpMonGroup->m_creatureCounts[index_h] = PYRAMID_GUARD_STACK_QUANTITY;
             }
             index_h = cell->m_objectMetadata - 1;
-            if (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)) {
-                spellValueFactor_i =
-                    eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= AI_BATTLE_STAT_MAX
-                        ? gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)]
-                        : gfBattleStat[AI_BATTLE_STAT_MAX];
-            } else {
-                spellValueFactor_i = 1.0f;
-            }
             pyramidBattleValue_l = static_cast<i32>(
-                gsSpellInfo[index_h].aiValue * spellValueFactor_i
+                gsSpellInfo[index_h].aiValue
+                * (HAS(gsSpellInfo[index_h].attributes, SPELL_INFO_ATTRIBUTE_POWER)
+                       ? (eventHero->Stats(HERO_PRIMARY_SPELL_POWER) <= AI_BATTLE_STAT_MAX
+                              ? gfBattleStat[eventHero->Stats(HERO_PRIMARY_SPELL_POWER)]
+                              : gfBattleStat[AI_BATTLE_STAT_MAX])
+                       : 1.0f)
                 * gpCurPlayer->m_aiData.m_upgradeValueWeight
             );
             gpPhilAI->ChooseEvaluateBattle(
@@ -6929,7 +7270,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             }
             abandonedMineValue_f = static_cast<i32>(
                 gMineCharacteristics[IDX(RES_GOLD)] * gafAITurnCostResource[IDX(RES_GOLD)]
-                * gaiTurnValueOfMine[x + y * MAP_WIDTH]
+                * *(gaiTurnValueOfMine + x + y * MAP_WIDTH)
             );
             gpPhilAI->ChooseEvaluateBattle(
                 &eventHero->m_army,
@@ -6942,90 +7283,90 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
                 battleWon_j,
                 battleResult_l
             );
-            if (battleWon_j != 0) {
-                survivingCount_a = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
-                combatResult_d = gpPhilAI->CombatMonsterEvent(
-                    eventHero,
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType,
-                    &survivingCount_a,
-                    cell
+            if (battleWon_j == 0)
+                break;
+            survivingCount_a = gpGame->m_mines[cell->m_objectMetadata].guardianCount;
+            combatResult_d = gpPhilAI->CombatMonsterEvent(
+                eventHero,
+                gpGame->m_mines[cell->m_objectMetadata].guardianType,
+                &survivingCount_a,
+                cell
+            );
+            if (survivingCount_a > EVENT_GUARD_COUNT_MAX)
+                survivingCount_a = EVENT_GUARD_COUNT_MAX;
+            gpGame->m_mines[cell->m_objectMetadata].guardianCount =
+                static_cast<u8>(survivingCount_a);
+            if (combatResult_d != 0) {
+                eventHero->CheckLevel();
+                gpGame->ConvertObject(
+                    x + ABANDONED_MINE_X_MIN,
+                    y + ABANDONED_MINE_Y_TOP,
+                    x + ABANDONED_MINE_X_MAX,
+                    y + ABANDONED_MINE_Y_TOP,
+                    ABANDONED_MINE_TILESET_TOP_A,
+                    MINE_TOP_A_FIRST_FRAME,
+                    MINE_TOP_A_LAST_FRAME,
+                    ABANDONED_MINE_TILESET_BOTTOM_A,
+                    MINE_BOTTOM_A_FRAME,
+                    MAP_OBJECT_ABANDONED_MINE,
+                    MAP_OBJECT_MINE
                 );
-                if (survivingCount_a > EVENT_GUARD_COUNT_MAX)
-                    survivingCount_a = EVENT_GUARD_COUNT_MAX;
-                gpGame->m_mines[cell->m_objectMetadata].guardianCount =
-                    static_cast<u8>(survivingCount_a);
-                if (combatResult_d != 0) {
-                    eventHero->CheckLevel();
-                    gpGame->ConvertObject(
-                        x + ABANDONED_MINE_X_MIN,
-                        y + ABANDONED_MINE_Y_TOP,
-                        x + ABANDONED_MINE_X_MAX,
-                        y + ABANDONED_MINE_Y_TOP,
-                        ABANDONED_MINE_TILESET_TOP_A,
-                        MINE_TOP_A_FIRST_FRAME,
-                        MINE_TOP_A_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_A,
-                        MINE_BOTTOM_A_FRAME,
-                        MAP_OBJECT_ABANDONED_MINE,
-                        MAP_OBJECT_MINE
-                    );
-                    gpGame->ConvertObject(
-                        x + ABANDONED_MINE_X_MIN,
-                        y,
-                        x + ABANDONED_MINE_X_MAX,
-                        y,
-                        ABANDONED_MINE_TILESET_TOP_A,
-                        MINE_SECOND_A_FIRST_FRAME,
-                        MINE_SECOND_A_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_A,
-                        MINE_SECOND_BOTTOM_A_FRAME,
-                        MAP_OBJECT_ABANDONED_MINE,
-                        MAP_OBJECT_MINE
-                    );
-                    gpGame->ConvertObject(
-                        x + ABANDONED_MINE_X_MIN,
-                        y + ABANDONED_MINE_Y_TOP,
-                        x + ABANDONED_MINE_X_MAX,
-                        y + ABANDONED_MINE_Y_TOP,
-                        ABANDONED_MINE_TILESET_TOP_B,
-                        MINE_TOP_B_FIRST_FRAME,
-                        MINE_TOP_B_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_B,
-                        MINE_BOTTOM_B_FRAME,
-                        MAP_OBJECT_ABANDONED_MINE,
-                        MAP_OBJECT_MINE
-                    );
-                    gpGame->ConvertObject(
-                        x + ABANDONED_MINE_X_MIN,
-                        y,
-                        x + ABANDONED_MINE_X_MAX,
-                        y,
-                        ABANDONED_MINE_TILESET_TOP_B,
-                        MINE_SECOND_B_FIRST_FRAME,
-                        MINE_SECOND_B_LAST_FRAME,
-                        ABANDONED_MINE_TILESET_BOTTOM_B,
-                        MINE_SECOND_BOTTOM_B_FRAME,
-                        MAP_OBJECT_ABANDONED_MINE,
-                        MAP_OBJECT_MINE
-                    );
-                    gpGame->ConvertObject(
-                        x,
-                        y,
-                        x,
-                        y,
-                        ABANDONED_MINE_TILESET_CENTER,
-                        MINE_CENTER_GHOST_FRAME,
-                        MINE_CENTER_GHOST_FRAME,
-                        ABANDONED_MINE_TILESET_CENTER,
-                        MINE_CENTER_GOLD_FRAME,
-                        MAP_OBJECT_ABANDONED_MINE,
-                        MAP_OBJECT_MINE
-                    );
-                    gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
-                    gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
-                    gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
-                    gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
-                }
+                gpGame->ConvertObject(
+                    x + ABANDONED_MINE_X_MIN,
+                    y,
+                    x + ABANDONED_MINE_X_MAX,
+                    y,
+                    ABANDONED_MINE_TILESET_TOP_A,
+                    MINE_SECOND_A_FIRST_FRAME,
+                    MINE_SECOND_A_LAST_FRAME,
+                    ABANDONED_MINE_TILESET_BOTTOM_A,
+                    MINE_SECOND_BOTTOM_A_FRAME,
+                    MAP_OBJECT_ABANDONED_MINE,
+                    MAP_OBJECT_MINE
+                );
+                gpGame->ConvertObject(
+                    x + ABANDONED_MINE_X_MIN,
+                    y + ABANDONED_MINE_Y_TOP,
+                    x + ABANDONED_MINE_X_MAX,
+                    y + ABANDONED_MINE_Y_TOP,
+                    ABANDONED_MINE_TILESET_TOP_B,
+                    MINE_TOP_B_FIRST_FRAME,
+                    MINE_TOP_B_LAST_FRAME,
+                    ABANDONED_MINE_TILESET_BOTTOM_B,
+                    MINE_BOTTOM_B_FRAME,
+                    MAP_OBJECT_ABANDONED_MINE,
+                    MAP_OBJECT_MINE
+                );
+                gpGame->ConvertObject(
+                    x + ABANDONED_MINE_X_MIN,
+                    y,
+                    x + ABANDONED_MINE_X_MAX,
+                    y,
+                    ABANDONED_MINE_TILESET_TOP_B,
+                    MINE_SECOND_B_FIRST_FRAME,
+                    MINE_SECOND_B_LAST_FRAME,
+                    ABANDONED_MINE_TILESET_BOTTOM_B,
+                    MINE_SECOND_BOTTOM_B_FRAME,
+                    MAP_OBJECT_ABANDONED_MINE,
+                    MAP_OBJECT_MINE
+                );
+                gpGame->ConvertObject(
+                    x,
+                    y,
+                    x,
+                    y,
+                    ABANDONED_MINE_TILESET_CENTER,
+                    MINE_CENTER_GHOST_FRAME,
+                    MINE_CENTER_GHOST_FRAME,
+                    ABANDONED_MINE_TILESET_CENTER,
+                    MINE_CENTER_GOLD_FRAME,
+                    MAP_OBJECT_ABANDONED_MINE,
+                    MAP_OBJECT_MINE
+                );
+                gpGame->m_mines[cell->m_objectMetadata].resourceType = MINE_TYPE_GOLD;
+                gpGame->m_mines[cell->m_objectMetadata].guardianType = CREATURE_NONE;
+                gpGame->m_mines[cell->m_objectMetadata].guardianCount = 0;
+                gpGame->ClaimMine(cell->m_objectMetadata, giCurPlayer);
             }
             break;
 
@@ -7039,30 +7380,30 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
         case MAP_OBJECT_SHIPWRECK_SURVIVOR:
             if (eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT)
                 GiveArtifact(eventHero, ArtifactType(cell->m_objectMetadata), 1, -1);
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = 1;
+            eraseObject_l = 1;
             break;
 
         case MAP_OBJECT_ARTESIAN_SPRING:
-            if (cell->m_objectMetadata != 0) {
-                cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                spellPower_j =
-                    eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
-                if (eventHero->m_spellPoints < spellPower_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
-                    eventHero->m_spellPoints =
-                        static_cast<i16>(spellPower_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
-            }
+            if (cell->m_objectMetadata == 0)
+                break;
+            cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
+            springSpellPoints_j =
+                eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
+            if (eventHero->m_spellPoints < springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER)
+                eventHero->m_spellPoints =
+                    static_cast<i16>(springSpellPoints_j * ARTESIAN_SPRING_MANA_MULTIPLIER);
             break;
 
         case MAP_OBJECT_MAGIC_WELL:
             if (HAS(eventHero->m_eventFlags, HERO_EVENT_MAGIC_WELL) == 0) {
                 cell->m_objectMetadata = MAP_EVENT_DATA_EMPTY;
-                spellPower_j =
+                wellSpellPoints_o =
                     eventHero->Stats(HERO_PRIMARY_KNOWLEDGE) * HERO_SPELL_POINTS_PER_KNOWLEDGE;
-                if (eventHero->m_spellPoints < spellPower_j) {
+                if (eventHero->m_spellPoints < wellSpellPoints_o) {
                     eventHero->m_eventFlags = HeroEventFlag(
                         static_cast<i32>(eventHero->m_eventFlags) | IDX(HERO_EVENT_MAGIC_WELL)
                     );
-                    eventHero->m_spellPoints = static_cast<i16>(spellPower_j);
+                    eventHero->m_spellPoints = static_cast<i16>(wellSpellPoints_o);
                 }
             }
             break;
@@ -7080,22 +7421,26 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
 
         case MAP_OBJECT_SPHINX:
             eventExtra_o = reinterpret_cast<mapEventExtra*>(ppMapExtra[cell->m_objectMetadata]);
-            if (eventExtra_o->active != 0) {
-                if (Random(0, EVENT_RANDOM_PERCENT_MAX) < EVENT_RANDOM_EVENT_SUCCESS) {
-                    for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h) {
-                        gpGame->m_players[giCurPlayer].m_resources[index_h] +=
-                            eventExtra_o->resources[index_h];
-                        if (gpGame->m_players[giCurPlayer].m_resources[index_h] < 0)
-                            gpGame->m_players[giCurPlayer].m_resources[index_h] = 0;
-                    }
-                    if (eventExtra_o->artifact != -1
-                        && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
-                        GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), 1, -1);
-                    }
-                    eventExtra_o->active = 0;
-                } else {
-                    HeroLoses(eventHero);
+            if (eventExtra_o->active == 0)
+                break;
+            if (Random(0, EVENT_RANDOM_PERCENT_MAX) < EVENT_RANDOM_EVENT_SUCCESS) {
+                primaryReward_e = MAP_EVENT_REWARD_NONE;
+                primaryAmount_j = 0;
+                secondaryReward_k = MAP_EVENT_REWARD_NONE;
+                secondaryAmount_j = 0;
+                for (index_h = 0; index_h < IDX(RES_COUNT); ++index_h) {
+                    gpGame->m_players[giCurPlayer].m_resources[index_h] +=
+                        eventExtra_o->resources[index_h];
+                    if (gpGame->m_players[giCurPlayer].m_resources[index_h] < 0)
+                        gpGame->m_players[giCurPlayer].m_resources[index_h] = 0;
                 }
+                if (eventExtra_o->artifact != -1
+                    && eventHero->NumArtifacts() < HERO_ARTIFACT_SLOT_COUNT) {
+                    GiveArtifact(eventHero, ArtifactType(eventExtra_o->artifact), 1, -1);
+                }
+                eventExtra_o->active = 0;
+            } else {
+                HeroLoses(eventHero);
             }
             break;
 
@@ -7103,7 +7448,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
 
         case MAP_OBJECT_BARRIER:
-            eventResults[AI_EVENT_RESULT_ERASE_OBJECT] = BarrierAIEvent(cell, eventHero);
+            eraseObject_l = BarrierAIEvent(cell, eventHero);
             break;
         case MAP_OBJECT_TRAVELER_TENT:
             PasswordAIEvent(cell, eventHero);
@@ -7122,7 +7467,7 @@ void advManager::DoAIEvent(mapCell* cell, hero* eventHero, i32 x, i32 y) {
             break;
     }
 
-    if (eventResults[AI_EVENT_RESULT_ERASE_OBJECT] != 0)
+    if (eraseObject_l != 0)
         EraseObj(cell, x, y);
     giCurPlayer = oldPlayer_o;
     gpCurPlayer = oldPlayerData_h;
