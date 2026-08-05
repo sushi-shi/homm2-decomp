@@ -53,12 +53,12 @@ H2_ENUM_BEGIN(SoundSampleStatus)
 H2_ENUM_END(SoundSampleStatus)
 
 
-static WAVEOUTCAPSA gWaveOutCaps;
-static PCMWAVEFORMAT gWaveFormat;
+DATA(0x005348a8) static WAVEOUTCAPSA gWaveOutCaps;
+DATA(0x005348e0) static PCMWAVEFORMAT gWaveFormat;
 #define NORMALIZED_VOLUME_MAX 127.0f
 
-bool gSoundDisabled = false;
-bool gSoundBackendsReady = false;
+DATA(0x005348f0) bool gSoundDisabled = false;
+DATA(0x005348f1) bool gSoundBackendsReady = false;
 
 // State of the removed MCI/redbook CD path and of the removed Miles sample
 // handle pool: the `@remove` bodies below are the PoL 2.0 sources kept as the
@@ -914,7 +914,7 @@ char* digitalDriverNames[DIGITAL_DRIVER_NAME_COUNT] = {
     "sblaster.dig",
     NULL
 };
-SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {{0, 1, 0}, {1, 2, 1}, {2, 6, 2}, {6, 16, 6}};
+DATA(0x00520188) SampleChannelStruct SCS[SOUND_CHANNEL_TYPE_COUNT] = {{0, 1, 0}, {1, 2, 1}, {2, 6, 2}, {6, 16, 6}};
 char CDPreviousPosition[MIDI_TRACK_COUNT][CD_POSITION_CAPACITY] = {0};
 i32 CDWaiting = -1;
 i32 CDPlaying = 0;

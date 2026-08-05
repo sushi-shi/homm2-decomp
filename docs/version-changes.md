@@ -280,6 +280,16 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   (0xf0260/0xf029c/0xf02c8). The restart confirmation has two retail cells
   (`_0` and `_1`); ADVMGR's own second user of that text is the
   `INPUT_SCAN_N` cheat arm of `advManager::Main`, still English in source.
+- **[Buka] The window class and title strings are Russian too**
+  (`SOURCE/kbwin`). These are initialized `char[]` globals rather than
+  code-referenced literals, so the literal harvest above could not see them;
+  the DATA() claim payload audit reads them directly out of `.data`.
+  `szAppName` (0x5157dc) holds `"\xc3\xe5\xf0\xee\xe8 II"` ("Герои II")
+  where the reconstruction still carries `"Heroes II"`, and `szTitle`
+  (0x5157e8) holds `"\xc3\xe5\xf0\xee\xe8 \xcc\xe5\xf7\xe0 \xe8 \xcc\xe0\xe3\xe8\xe8 II"`
+  ("Герои Меча и Магии II") where it carries `"Heroes of Might and Magic II"`.
+  Both retail allocations are correspondingly shorter than the reconstructed
+  arrays, so neither address is claimed yet.
 - **[Buka] `soundManager` class rework.** The class gained a backend-state
   head at offset 0x36: backend/savedBackend kinds, the Miles `_DIG_DRIVER*`,
   an `audiere::AudioDevicePtr` (a real RefPtr — its inlined ref/unref

@@ -19,10 +19,10 @@ H2_ENUM_BEGIN(MilesSampleConstant)
     MILES_VOLUME_CONVERSION_MODE      = 100
 H2_ENUM_END(MilesSampleConstant)
 
-static i32 gMilesSamplesReady;
-static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
-static i32 gMilesSampleHandleCount;
-static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT];
+DATA(0x005396d8) static i32 gMilesSamplesReady;
+DATA(0x005396dc) static struct _SAMPLE* gMilesSampleHandles[MILES_SAMPLE_HANDLE_STORAGE_COUNT];
+DATA(0x0053971c) static i32 gMilesSampleHandleCount;
+DATA(0x00539720) static i16 gMilesSampleVolumes[MILES_SAMPLE_VOLUME_COUNT];
 
 namespace {
 

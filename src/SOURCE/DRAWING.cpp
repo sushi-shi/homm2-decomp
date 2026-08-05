@@ -137,7 +137,7 @@ void combatManager::CheckUpdateCombatMessages(void) {
 // The incoming text is copied into this private buffer first: the wrapper below
 // writes a temporary terminator over the embedded newline, which the caller's
 // string literal cannot accept.
-static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
+DATA(0x005242fc) static char gCombatMessageText[COMBAT_MESSAGE_WRAP_BUFFER_SIZE];
 
 VA(0x00437e48, 0x3a7)
 void combatManager::CombatMessage(char* message, i32 updateScreen, i32 retainPrevious, i32 clear) {
@@ -1795,5 +1795,5 @@ void combatManager::DrawSmallView(i32 viewIndex, i32 updateScreen) {
     gbInDrawSmallView = false;
 }
 
-i32 bGridWasShowing = 0;
-b32 gbInDrawSmallView = false;
+DATA(0x0052448c) i32 bGridWasShowing = 0;
+DATA(0x00524490) b32 gbInDrawSmallView = false;

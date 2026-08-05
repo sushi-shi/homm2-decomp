@@ -250,6 +250,6 @@ void UpdateArenaIcons(void) {
     arenaWinPtr->DrawWindow(DRAW_MODE, WIDGET_FIRST_ID, WIDGET_LAST_ID);
 }
 
-i32 choice;
-class iconWidget* skillWidget[CHOICE_COUNT];
-class heroWindow* arenaWinPtr;
+DATA(0x005347d4) i32 choice;
+DATA(0x005347c8) class iconWidget* skillWidget[CHOICE_COUNT];
+DATA(0x005347c4) class heroWindow* arenaWinPtr;

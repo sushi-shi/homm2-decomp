@@ -3232,18 +3232,18 @@ void combatManager::ViewBallista(i32 quickView) {
     );
 }
 
-b32 gbThisNetHasControl;
-i32 iCurTransferArtifact;
-i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
-b32 gbWhichAnimationPlaying;
-i32 iMaxTransferArtifacts;
-i32 giNextActionExtra;
-i32 bSkeletonsShown;
-b32 gbShowingLoseWindow;
-i32 giWinCmbtFrame;
-i32 giNextActionGridIndex;
-i32 giSurrenderCost;
-i32 giSkeletonsCreated;
-H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
-H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
-i32 giNextActionGridIndex2;
+DATA(0x0052410c) b32 gbThisNetHasControl;
+DATA(0x00524134) i32 iCurTransferArtifact;
+DATA(0x005240fc) i8 iTransferArtifactsInfo[COMBAT_TRANSFER_ARTIFACT_COUNT];
+DATA(0x0052411c) b32 gbWhichAnimationPlaying;
+DATA(0x00524144) i32 iMaxTransferArtifacts;
+DATA(0x005240f8) i32 giNextActionExtra;
+DATA(0x00524118) i32 bSkeletonsShown;
+DATA(0x00524138) b32 gbShowingLoseWindow;
+DATA(0x00524130) i32 giWinCmbtFrame;
+DATA(0x0052413c) i32 giNextActionGridIndex;
+DATA(0x00524148) i32 giSurrenderCost;
+DATA(0x00524110) i32 giSkeletonsCreated;
+DATA(0x00524120) H2_ENUM_STORAGE(ArtifactType, i8) iTransferArtifacts[COMBAT_TRANSFER_ARTIFACT_COUNT];
+DATA(0x00524140) H2_ENUM_STORAGE(CombatAction, i32) giNextAction;
+DATA(0x00524114) i32 giNextActionGridIndex2;

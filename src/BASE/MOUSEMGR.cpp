@@ -26,23 +26,23 @@ H2_ENUM_BEGIN(MouseManagerLocalConstant)
     RESOURCE_NAME_CAPACITY = 16
 H2_ENUM_END(MouseManagerLocalConstant)
 
-static i32 gOldMouseRight;
-BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
-static POINT gMouseScreenPt;
-static POINT
+DATA(0x005352d0) static i32 gOldMouseRight;
+DATA(0x005349d0) BITMAP bmpAndMask[MOUSE_CURSOR_COUNT];
+DATA(0x00535ed8) static POINT gMouseScreenPt;
+DATA(0x00536060) static POINT
     gMouseCheckPt;
-static i32 gOldMouseTop;
-HICON hMouseCursor[MOUSE_CURSOR_COUNT];
-void* cAndBits[MOUSE_CURSOR_COUNT];
-void* cColorBits[MOUSE_CURSOR_COUNT];
-static i32 gOldMouseBottom;
-static i32 gOldMouseLeft;
-ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
-HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
+DATA(0x005349cc) static i32 gOldMouseTop;
+DATA(0x005352d4) HICON hMouseCursor[MOUSE_CURSOR_COUNT];
+DATA(0x00535ee0) void* cAndBits[MOUSE_CURSOR_COUNT];
+DATA(0x005355d4) void* cColorBits[MOUSE_CURSOR_COUNT];
+DATA(0x00535754) static i32 gOldMouseBottom;
+DATA(0x005349c8) static i32 gOldMouseLeft;
+DATA(0x00535758) ICONINFO IconInfo[MOUSE_CURSOR_COUNT];
+DATA(0x00535454) HBITMAP hbmpAndMask[MOUSE_CURSOR_COUNT];
 
 
-i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57, 0};
-i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
+DATA(0x0051e224) i32 iMouseOffset[MOUSE_CURSOR_TYPE_SLOT_COUNT] = {0, 41, 57, 0};
+DATA(0x0051e230) i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {15, 21}, {22, 21}, {24, 20}, {24, 24}, {30, 25}, {24, 24}, {24, 24}, {19, 23}, {15, 20},
     {30, 30}, {32, 26}, {31, 25}, {30, 25}, {24, 24}, {22, 21}, {31, 31}, {32, 26}, {31, 25},
     {30, 25}, {24, 24}, {22, 21}, {31, 31}, {32, 26}, {32, 25}, {32, 25}, {27, 24}, {25, 22},
@@ -55,7 +55,7 @@ i8 iMouseSize[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {28, 34}, {36, 34}, {66, 41}, {38, 35}, {59, 41}, {54, 39}, {35, 42}, {30, 34}, {45, 41},
     {39, 34}, {29, 43}, {25, 35}, {39, 35}, {47, 37}, {51, 13}
 };
-i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
+DATA(0x0051e2f0) i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {2, 3},   {2, 3},   {12, 11}, {12, 13}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},
     {15, 15}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},   {15, 15}, {15, 11}, {10, 10},
     {12, 13}, {9, 12},  {7, 9},   {15, 15}, {15, 11}, {10, 10}, {12, 13}, {9, 12},  {7, 9},
@@ -68,8 +68,8 @@ i8 iHotSpot[MOUSE_CURSOR_COUNT][MOUSE_CURSOR_AXIS_COUNT] = {
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1},
     {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}
 };
-b32 gbInSetPointer = false;
-i32 bInNewMouseUpdate = 0;
+DATA(0x00536068) b32 gbInSetPointer = false;
+DATA(0x0053606c) i32 bInNewMouseUpdate = 0;
 
 static SMouseManagerStrings gMouseManagerStrings = {
     {MOUSE_MANAGER_NAME},

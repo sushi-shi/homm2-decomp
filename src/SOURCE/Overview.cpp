@@ -1562,17 +1562,17 @@ i32 game::ProcessIconSelect(i32 widgetId, i32 quickView) {
     return 0;
 }
 
-class heroWindow* overWin = NULL;
-class textWidget** textWidgetDynamic = NULL;
-class iconWidget** iconWidgetDynamic = NULL;
-OverviewType giOverviewType = OVERVIEW_HEROES;
-i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)] = {0};
-class iconWidget* OVScrollKnob = NULL;
-OverviewType iLastDynamicType;
-i32 iLastDynamicTop;
-i32 iOverviewItems;
-i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
-class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
+DATA(0x005309b0) class heroWindow* overWin = NULL;
+DATA(0x005309b4) class textWidget** textWidgetDynamic = NULL;
+DATA(0x005309b8) class iconWidget** iconWidgetDynamic = NULL;
+DATA(0x005309bc) OverviewType giOverviewType = OVERVIEW_HEROES;
+DATA(0x005309c0) i32 giOverviewTop[IDX(OVERVIEW_TYPE_COUNT)] = {0};
+DATA(0x005309c8) class iconWidget* OVScrollKnob = NULL;
+DATA(0x0053099c) OverviewType iLastDynamicType;
+DATA(0x00530998) i32 iLastDynamicTop;
+DATA(0x005309ac) i32 iOverviewItems;
+DATA(0x00530990) i32 giOverviewItems[IDX(OVERVIEW_TYPE_COUNT)];
+DATA(0x005309a0) class textWidget* textWidgetTitle[OVERVIEW_VISIBLE_ROWS];
 
 #undef OVERVIEW_SCROLL_ROUNDING_OFFSET
 #undef OVERVIEW_SCROLL_MIN_Y_FLOAT

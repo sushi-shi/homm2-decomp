@@ -3881,11 +3881,11 @@ void combatManager::ShowSpellMessage(
     CombatMessage(message, 1, 1, 0);
 }
 
-i32 castX = 0;
-i32 castY = 0;
-i32 bInTeleportGetDest = 0;
-i32 indexToCastOn = -1;
-u8 uRedBeam[] = {0x77, 0xb5, 0xbc, 0xc0, 0xc3};
-u8 uRainbow[] =
+DATA(0x00533eb8) i32 castX = 0;
+DATA(0x00533ebc) i32 castY = 0;
+DATA(0x00533ec0) i32 bInTeleportGetDest = 0;
+DATA(0x00518330) i32 indexToCastOn = -1;
+DATA(0x00518334) u8 uRedBeam[] = {0x77, 0xb5, 0xbc, 0xc0, 0xc3};
+DATA(0x0051833c) u8 uRainbow[] =
     {0xbc, 0xba, 0xce, 0xca, 0xc8, 0x6f, 0x71, 0x73, 0xde, 0x5a, 0x9f, 0x47, 0x4a, 0x8d, 0x8f};
-i8* gyModify = NULL;
+DATA(0x00533ec4) i8* gyModify = NULL;

@@ -20,29 +20,29 @@ H2_ENUM_BEGIN(NetbiosResetConstant)
 H2_ENUM_END(NetbiosResetConstant)
 
 
-static u8 gNbCallRetries = 0;
-static u8 gNetbiosAvail = 0;
-static u8 gNetbiosLana = 0;
-static u8 gNbShutdown = 0;
-static u8 gNbMaxSess = NETBIOS_INVALID_ID;
-static u8 gNbLocalNum = 0;
-static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
-static char* gNbGroupName = "Empire Too ";
-static char* gNbListenName = "*";
+DATA(0x00530938) static u8 gNbCallRetries = 0;
+DATA(0x00530939) static u8 gNetbiosAvail = 0;
+DATA(0x0053093a) static u8 gNetbiosLana = 0;
+DATA(0x0053093b) static u8 gNbShutdown = 0;
+DATA(0x00515c44) static u8 gNbMaxSess = NETBIOS_INVALID_ID;
+DATA(0x0053093c) static u8 gNbLocalNum = 0;
+DATA(0x00530940) static H2_ENUM_STORAGE(NetbiosSessionStatus, u8) gNetStatus[NETBIOS_STATUS_COUNT] = {0};
+DATA(0x00515c48) static char* gNbGroupName = "Empire Too ";
+DATA(0x00515c4c) static char* gNbListenName = "*";
 
 
-static tag_Anchor gNbFreeQueueRuntime;
-static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
-static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT];
-static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT];
-static NetbiosSessionBuffer gNbSessionBufferContext;
-static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT];
-static NetbiosControlBlock gNbControlBlockArena;
-static tag_Anchor gNbReceiveQueueEntry;
-static tag_Anchor gNbSendQueueHead;
-static CRITICAL_SECTION gNbReceiveLockCriticalSection;
-static NetbiosThreadEvents gNbThreadEventsContext;
-static CRITICAL_SECTION gNbSendLockBacking;
+DATA(0x00528650) static tag_Anchor gNbFreeQueueRuntime;
+DATA(0x00528688) static u8 gNbSessionNumbersEntry[NETBIOS_SESSION_COUNT];
+DATA(0x00528698) static NetbiosPayload gNbReceiveDataLocal[NETBIOS_SESSION_COUNT];
+DATA(0x005308b0) static NetbiosName gNbNameBufferBacking[NETBIOS_SESSION_COUNT];
+DATA(0x0052f6b0) static NetbiosSessionBuffer gNbSessionBufferContext;
+DATA(0x005306b0) static NetbiosControlBlock gNbSessionControlBlocksArena[NETBIOS_SESSION_COUNT];
+DATA(0x00530870) static NetbiosControlBlock gNbControlBlockArena;
+DATA(0x00528680) static tag_Anchor gNbReceiveQueueEntry;
+DATA(0x00528690) static tag_Anchor gNbSendQueueHead;
+DATA(0x0052f698) static CRITICAL_SECTION gNbReceiveLockCriticalSection;
+DATA(0x00528658) static NetbiosThreadEvents gNbThreadEventsContext;
+DATA(0x00530920) static CRITICAL_SECTION gNbSendLockBacking;
 
 #define gNbFreeQueue gNbFreeQueueRuntime
 #define gNbSessLsn gNbSessionNumbersEntry

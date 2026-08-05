@@ -11,35 +11,35 @@
 #include <SOURCE/playerData.h>
 #include <SOURCE/searchArray.h>
 
-static i32 s_directionBlocked;
-static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
-static i32 s_processedPointCount;
-static i32 s_remainingMobility;
-static i32 s_adjacentX;
-static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SEARCH_DIRECTION_COUNT];
-static i32 s_targetWater;
-static i32 s_neighborX;
-static i32 s_mapY;
-static i32 s_currentCost;
-static mapCell* s_neighborCell;
-static i32 s_adjacentY;
-static mapCell* s_targetCell;
-static i32 s_currentWater;
-static i32 s_bestTargetCost;
+DATA(0x00533de0) static i32 s_directionBlocked;
+DATA(0x00533e04) static H2_ENUM_STORAGE(MapObjectType, i32) s_triggerType;
+DATA(0x00533e14) static i32 s_processedPointCount;
+DATA(0x00533db4) static i32 s_remainingMobility;
+DATA(0x00533dc8) static i32 s_adjacentX;
+DATA(0x00533da8) static H2_ENUM_STORAGE(TerrainType, i8) s_possibleDirections[SEARCH_DIRECTION_COUNT];
+DATA(0x00533dbc) static i32 s_targetWater;
+DATA(0x00533db0) static i32 s_neighborX;
+DATA(0x00533ddc) static i32 s_mapY;
+DATA(0x00533df4) static i32 s_currentCost;
+DATA(0x00533df8) static mapCell* s_neighborCell;
+DATA(0x00533e20) static i32 s_adjacentY;
+DATA(0x00533de8) static mapCell* s_targetCell;
+DATA(0x00533dc4) static i32 s_currentWater;
+DATA(0x00533e1c) static i32 s_bestTargetCost;
 static i32 s_adjacentMonsterX;
-static i32 s_adjacentCost;
-static i32 s_mapX;
-static i32 s_neighborY;
-static i32 s_hasAdjacentMonster;
-static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
-static i32 s_targetStepCost;
-static i32 s_candidateY;
-static searchNode* s_neighborNode;
-static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
-static searchNode s_currentNode;
-static i32 s_hasTarget;
-static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
-static hero* s_currentHero;
+DATA(0x00533dc0) static i32 s_adjacentCost;
+DATA(0x00533e00) static i32 s_mapX;
+DATA(0x00533de4) static i32 s_neighborY;
+DATA(0x00533da4) static i32 s_hasAdjacentMonster;
+DATA(0x00533e10) static H2_ENUM_STORAGE_STEPPED(MapDirection, i32) s_direction;
+DATA(0x00533e0c) static i32 s_targetStepCost;
+DATA(0x00533dfc) static i32 s_candidateY;
+DATA(0x00533e18) static searchNode* s_neighborNode;
+DATA(0x00533e24) static H2_ENUM_STORAGE(TerrainType, i32) s_terrain;
+DATA(0x00533dd0) static searchNode s_currentNode;
+DATA(0x00533da0) static i32 s_hasTarget;
+DATA(0x00533dec) static i8 s_directionCosts[SEARCH_DIRECTION_COUNT];
+DATA(0x00533e28) static hero* s_currentHero;
 
 VA(0x004916c0, 0x116)
 i32 searchArray::BuildPath(

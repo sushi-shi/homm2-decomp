@@ -7,6 +7,12 @@
 
 #define VA(addr, size) __attribute__((annotate("va:" #addr " size:" #size)))
 #define VA_COMPGEN(addr, size, kind, owner)
+// Where a global definition sits in the retail image, as an absolute VA. Like
+// VA(...) this is audit and delinker metadata, never a placement directive:
+// the compiler branch below expands it away, and the analysis branch attaches
+// a clang attribute only so a marker in a position that cannot carry one is a
+// parse error rather than a silently dropped claim.
+#define DATA(addr) __attribute__((annotate("data:" #addr)))
 #define DATA_COMPGEN(addr, name, value) value
 #define DATA_COMPGEN_GUARD(addr, name, owner)
 #define OVERRIDE override
@@ -22,6 +28,7 @@
 
 #define VA(addr, size)
 #define VA_COMPGEN(addr, size, kind, owner)
+#define DATA(addr)
 #define DATA_COMPGEN(addr, name, value) value
 #define DATA_COMPGEN_GUARD(addr, name, owner)
 #define OVERRIDE

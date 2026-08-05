@@ -627,29 +627,29 @@ void DPSD(i32 result, char* file, i32 line) {
     ShutDown(gText);
 }
 
-struct IDirectPlay* lpIDC = NULL;
-DPID dcoID = 0;
-struct _GUID* IPXGuid = NULL;
-struct _GUID* TCPGuid = NULL;
-HANDLE dphEvent = NULL;
-i32 iDPRcvBufferHead = 0;
-i32 iDPRcvBufferTail = 0;
-u8** ppDPRcvBuffer = NULL;
-i32* piDPRcvBufferSize = NULL;
-i32 bStartUpInfoReceived = 0;
-HMODULE hinstDplayx = NULL;
-H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
+DATA(0x005242b4) struct IDirectPlay* lpIDC = NULL;
+DATA(0x005242b8) DPID dcoID = 0;
+DATA(0x005242bc) struct _GUID* IPXGuid = NULL;
+DATA(0x005242c0) struct _GUID* TCPGuid = NULL;
+DATA(0x005242c4) HANDLE dphEvent = NULL;
+DATA(0x005242c8) i32 iDPRcvBufferHead = 0;
+DATA(0x005242cc) i32 iDPRcvBufferTail = 0;
+DATA(0x005242d0) u8** ppDPRcvBuffer = NULL;
+DATA(0x005242d4) i32* piDPRcvBufferSize = NULL;
+DATA(0x005242d8) i32 bStartUpInfoReceived = 0;
+DATA(0x005242dc) HMODULE hinstDplayx = NULL;
+DATA(0x005242e0) H2_ENUM_STORAGE_STEPPED(DirectPlayFirstGuestState, i32)
 iDPWaitForFirstGuestStatus = FIRST_GUEST_CREATE_SESSION;
-H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
-i32 iWaitForHostWaitCount = 0;
-i32 iEnumCount = 0;
-i32 iLastHereIAmTickCount = 0;
-i32 bInDPSD = 0;
-i32 iGUIDCount = 0;
-i32 iLastMsgNumHumanPlayers = 1;
-i32 iMaxSession;
-DirectPlayHostAcceptStatus giHostAcceptStatus;
-struct _GUID* g_lpGuid;
-i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
-i32 iSessionToTry;
-i32l lSessions[DP_TRANSPORT_SESSION_COUNT];
+DATA(0x005242e4) H2_ENUM_STORAGE_STEPPED(DirectPlayHostState, i32) iDPWaitForHostStatus = HOST_ENUMERATE_SESSIONS;
+DATA(0x005242e8) i32 iWaitForHostWaitCount = 0;
+DATA(0x005242ec) i32 iEnumCount = 0;
+DATA(0x005242f0) i32 iLastHereIAmTickCount = 0;
+DATA(0x005242f4) i32 bInDPSD = 0;
+DATA(0x005242f8) i32 iGUIDCount = 0;
+DATA(0x004f1ba0) i32 iLastMsgNumHumanPlayers = 1;
+DATA(0x00524280) i32 iMaxSession;
+DATA(0x005242b0) DirectPlayHostAcceptStatus giHostAcceptStatus;
+DATA(0x0052427c) struct _GUID* g_lpGuid;
+DATA(0x00524264) i32 giNetPosToDCOPos[DP_TRANSPORT_STARTUP_MAPPING_COUNT];
+DATA(0x00524284) i32 iSessionToTry;
+DATA(0x00524288) i32l lSessions[DP_TRANSPORT_SESSION_COUNT];

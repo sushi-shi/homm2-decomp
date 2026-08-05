@@ -215,4 +215,4 @@ void town::CalcNumLevelArchers(i32* numArchers, i32* mageGuildLevel) {
     }
 }
 
-i32 bEnteringTown = 0;
+DATA(0x00533ecc) i32 bEnteringTown = 0;

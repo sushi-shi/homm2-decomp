@@ -88,7 +88,7 @@ H2_ENUM_BEGIN(ExpansionCampaignImplementationConstant)
     TRACK_SELECTED_CAMPAIGN_OFFSET = 1
 H2_ENUM_END(ExpansionCampaignImplementationConstant)
 
-static i32
+DATA(0x0051b0b8) static i32
     expansionCampaignTrackXY[IDX(EXPANSION_CAMPAIGN_COUNT)][EXPANSION_CAMPAIGN_MAX_MAP_COUNT]
                             [TRACK_COORDINATE_COUNT] = {
         {{113, 310},
@@ -111,10 +111,10 @@ static i32
         {{222, 312}, {296, 312}, {370, 312}, {370, 354}, {-1, -1}, {-1, -1}, {-1, -1}, {-1, -1}}
 };
 
-static i32 expansionCampaignMapCounts[IDX(EXPANSION_CAMPAIGN_COUNT)] =
+DATA(0x0051b1b8) static i32 expansionCampaignMapCounts[IDX(EXPANSION_CAMPAIGN_COUNT)] =
     {8, 8, 4, 4};
 
-SCampaignChoice xCampaignChoices[IDX(
+DATA(0x0051b1c8) SCampaignChoice xCampaignChoices[IDX(
     EXPANSION_CAMPAIGN_COUNT
 )][EXPANSION_CAMPAIGN_MAX_MAP_COUNT][EXPANSION_CAMPAIGN_BONUS_CHOICE_COUNT] = {
     {{{CAMPAIGN_CHOICE_ARTIFACT, IDX(ARTIFACT_MEDAL_OF_VALOR), CAMPAIGN_CHOICE_NO_AMOUNT},
@@ -253,7 +253,7 @@ SCampaignChoice xCampaignChoices[IDX(
       {CAMPAIGN_CHOICE_RESOURCE, IDX(RES_WOOD), CAMPAIGN_CHOICE_ZERO_AMOUNT}}}
 };
 
-static H2_ENUM_STORAGE(GameDifficulty, i8)
+DATA(0x0051b3a8) static H2_ENUM_STORAGE(GameDifficulty, i8)
     expansionCampaignDifficulty[IDX(EXPANSION_CAMPAIGN_COUNT)]
                                [EXPANSION_CAMPAIGN_MAX_MAP_COUNT] = {
                                                           {0, 1, 1, 1, 1, 2, 2, 3},

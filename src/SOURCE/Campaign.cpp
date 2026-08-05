@@ -1086,14 +1086,14 @@ void game::InitCampaignMap(void) {
         gpGame->m_mapHeader.lossConditionValue = CAMPAIGN_ROLAND_TIME_LIMIT;
 }
 
-i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
+DATA(0x004f0828) i16 trackXY[IDX(CAMPAIGN_SIDE_COUNT)][CAMPAIGN_TRACK_POINT_COUNT]
                                   [GAME_CAMPAIGN_TRACK_COORDINATE_COUNT] = {
     39,  336, 113, 336, 150, 294, 187, 336, 261, 336, 335, 336, 409, 378, 409, 294, 483, 336,
     557, 336, -1,  -1,  261, 378, -1,  -1,  39,  336, 113, 336, 187, 294, 187, 378, 261, 336,
     335, 336, 372, 294, 409, 336, 483, 294, 483, 378, 557, 336, 261, 294, 261, 378
 };
-class heroWindow* campWin = NULL;
-H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
-CampaignTrackType iCampaignTrackType;
-i32 bCampaignViewOnly;
-i32 iCurViewMap;
+DATA(0x005240b4) class heroWindow* campWin = NULL;
+DATA(0x005240ac) H2_ENUM_STORAGE(CampaignSide, i32) iCurViewSide;
+DATA(0x005240a4) CampaignTrackType iCampaignTrackType;
+DATA(0x005240a8) i32 bCampaignViewOnly;
+DATA(0x005240b0) i32 iCurViewMap;

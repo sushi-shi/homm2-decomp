@@ -516,7 +516,7 @@ H2_ENUM_BEGIN(GameRumourConstant)
     RUMOUR_CATEGORY_ORDER_CAPACITY = 8
 H2_ENUM_END(GameRumourConstant)
 
-b32 gbGameOver = false;
+DATA(0x0052499c) b32 gbGameOver = false;
 static i16 gSaveSourceLine = 0x294;
 static i16 gLoadSourceLine = 0x44f;
 static i16 gMapSourceLine = 0xaf4;
@@ -7973,7 +7973,7 @@ i32 game::CountShrines(i32 player) {
     return count;
 }
 
-i8 giMonType[] = {
+DATA(0x004f7554) i8 giMonType[] = {
     IDX(CREATURE_PEASANT),
     IDX(CREATURE_TROLL),
     IDX(CREATURE_DWARF),
@@ -7987,28 +7987,28 @@ i8 giMonType[] = {
     IDX(CREATURE_UNICORN),
     IDX(CREATURE_LICH)
 };
-char bMapInitialized = 0;
-i32 iViewArmyNumTroops;
+DATA(0x005249a0) char bMapInitialized = 0;
+DATA(0x005245f0) i32 iViewArmyNumTroops;
 i8* gbNGHeroType;
-SMonFrameInfo sViewArmyMonFrameInfo;
-i16 giUABaseX;
-i16 giUABaseY;
-i32 giEndSequence;
-b32 gbDismissArmy;
+DATA(0x005245f8) SMonFrameInfo sViewArmyMonFrameInfo;
+DATA(0x00524960) i16 giUABaseX;
+DATA(0x00524962) i16 giUABaseY;
+DATA(0x00524998) i32 giEndSequence;
+DATA(0x00524970) b32 gbDismissArmy;
 i8* gbNGHuman;
-i32 iViewArmyFrame;
-b32 gbAllowUpgrade;
-H2_ENUM_STORAGE(CreatureType, i32) iViewArmyType;
-class hero* viewSpellsHero;
-b32 gbUpgradeArmy;
-i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
-char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
+DATA(0x0052496c) i32 iViewArmyFrame;
+DATA(0x00524938) b32 gbAllowUpgrade;
+DATA(0x0052497c) H2_ENUM_STORAGE(CreatureType, i32) iViewArmyType;
+DATA(0x0052495c) class hero* viewSpellsHero;
+DATA(0x005245f4) b32 gbUpgradeArmy;
+DATA(0x0052494c) i16 RandMineQty[AI_RANDOM_MINE_TYPE_COUNT];
+DATA(0x00524988) char gcCurMapName[GAME_CURRENT_MAP_NAME_SIZE];
 i8* gbNGDifficulty;
-H2_ENUM_STORAGE(CreatureType, i32) iViewArmyUpgradeToType;
-i32 viewArmyBaseX;
-i32 viewArmyBaseY;
+DATA(0x00524934) H2_ENUM_STORAGE(CreatureType, i32) iViewArmyUpgradeToType;
+DATA(0x00524948) i32 viewArmyBaseX;
+DATA(0x00524944) i32 viewArmyBaseY;
 i8* gbNGColor;
-i16 giUARadius;
+DATA(0x00524942) i16 giUARadius;
 i8* gbNGPlayerPos;
-i32 viewArmyFacingWIPXMod;
+DATA(0x00524930) i32 viewArmyFacingWIPXMod;
 

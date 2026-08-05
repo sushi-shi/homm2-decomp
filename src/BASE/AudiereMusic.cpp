@@ -15,8 +15,8 @@ H2_ENUM_BEGIN(AudiereMusicConstant)
     AUDIERE_FADE_DELAY               = 480
 H2_ENUM_END(AudiereMusicConstant)
 
-static float gAudiereMusicVolume = 1.0f;
-static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
+DATA(0x00520130) static float gAudiereMusicVolume = 1.0f;
+DATA(0x00520134) static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
     0.0f,
     1.0f,
     0.8f,
@@ -32,7 +32,7 @@ static float gAudiereMusicVolumes[AUDIERE_MUSIC_VOLUME_LEVEL_COUNT] = {
 };
 audiere::OutputStreamPtr AudiereMusicState::stream;
 audiere::SampleSourcePtr AudiereMusicState::source;
-static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
+DATA(0x005395e8) static i32 gAudiereMusicPositions[MIDI_TRACK_COUNT];
 
 VA(0x004cd260, 0x133)
 void StopAudiereMusic(i32& currentTrack) {

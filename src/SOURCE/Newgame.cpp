@@ -2286,12 +2286,12 @@ i32 game::GetSideDesc(char* text, i32 firstPlayer, i32 lastPlayer) {
     return onSide;
 }
 
-b32 gbNewGameDialogOver = true;
-i32 NGKPcursorFlashOn = 1;
-char* cNGKPDisplay;
-b32 gbNewGameShadowHidden;
-char* cNGKPCore;
-i32 NGKPcursorIndex;
-char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
-class icon* NGKPBkg;
+DATA(0x00515d14) b32 gbNewGameDialogOver = true;
+DATA(0x00515d18) i32 NGKPcursorFlashOn = 1;
+DATA(0x00530968) char* cNGKPDisplay;
+DATA(0x00530950) b32 gbNewGameShadowHidden;
+DATA(0x00530960) char* cNGKPCore;
+DATA(0x0053094c) i32 NGKPcursorIndex;
+DATA(0x00530954) char* cTextReceivedBuffer[GAME_TEXT_BUFFER_COUNT];
+DATA(0x00530964) class icon* NGKPBkg;
 

@@ -69,7 +69,7 @@ H2_ENUM_BEGIN(SmackManagerConstant)
     SMACK_OPTION_COUNT             = 75
 H2_ENUM_END(SmackManagerConstant)
 
-static i8 bExpansionSmackNum;
+DATA(0x00533e94) static i8 bExpansionSmackNum;
 
 VA(0x00494540, 0x3f)
 void ConvertSmackerPalette(u8* paletteData) {
@@ -143,7 +143,7 @@ void DoAdvance(Smack* smack, i32 drawFrame, i32 advanceFrame, i32 updatePalette,
 
 // Miles digital master volume the movie player runs at, indexed by the
 // configured sound level.
-static i32 smackMasterVolumes[IDX(CONFIG_VOLUME_LEVEL_COUNT)] =
+DATA(0x00517e18) static i32 smackMasterVolumes[IDX(CONFIG_VOLUME_LEVEL_COUNT)] =
     {0, 127, 97, 75, 52, 40, 30, 20, 15, 10, 5};
 
 VA(0x00494769, 0x117d)
@@ -621,9 +621,9 @@ i32 PlaySmacker(i32 smackNumber) {
     return gbPlayedThrough;
 }
 
-i32 bSmackSound = 0;
-icon* brotherIcon = NULL;
-static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
+DATA(0x00533e9c) i32 bSmackSound = 0;
+DATA(0x00533ea0) icon* brotherIcon = NULL;
+DATA(0x005170c8) static tag_rect expansionCampaignRects[EXPANSION_RECT_COUNT] =
     {{215, 49, 230, 150}, {217, 275, 230, 150}, {475, 132, 120, 180}, {41, 132, 120, 180}};
 
 VA(0x00495a65, 0x4f)
@@ -738,8 +738,8 @@ void PrintSummaryInfo(SmackSum* summary) {
 #undef LOG_SUMMARY_VALUE
 }
 
-icon* backImage = NULL;
-SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
+DATA(0x00533ea4) icon* backImage = NULL;
+DATA(0x005170e8) SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
     {"H2XINTRO", "", "H2XINTRO", "", 1, 1, 0, 0, 0, 0, 0},
     {"NWCLOGO", "", "NWCLOGO", "", 1, 1, 0, 0, 0, 0, 0},
     {"WIN", "", "WIN", "", 1, 0, 0, 1, 0, 0, 0},
@@ -816,11 +816,11 @@ SSmackOptions SmackOptions[SMACK_OPTION_COUNT] = {
     {"BUKA", "", "BUKA", "", 1, 1, 0, 0, 0, 0, 0},
     {"BUKACRED", "", "BUKACRED", "", 1, 0, 1, 0, 0, 0, 0}
 };
-i32 bTesting = 0;
-Smack* smk1 = NULL;
-Smack* smk2 = NULL;
-i8 bSmackNum;
-b32 gbLastFramePlayed;
-SmackSum smksum;
-b32 gbPlayedThrough;
-i8 bMainDone;
+DATA(0x00533ea8) i32 bTesting = 0;
+DATA(0x00533eac) Smack* smk1 = NULL;
+DATA(0x00533eb0) Smack* smk2 = NULL;
+DATA(0x00533e38) i8 bSmackNum;
+DATA(0x00533e98) b32 gbLastFramePlayed;
+DATA(0x00533e40) SmackSum smksum;
+DATA(0x00533e3c) b32 gbPlayedThrough;
+DATA(0x00533e95) i8 bMainDone;

@@ -65,7 +65,7 @@ H2_ENUM_END(WindowFizzleConstant)
 #define DATA(addr)
 #endif
 
-i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
+DATA(0x005348f4) i8 gCyclePal[WINDOW_CYCLE_PALETTE_BYTES];
 i16 memSelector;
 
 static inline u32& FadeSavedUpdate(void) {
@@ -77,12 +77,12 @@ static inline u32& FadeSavedUpdate(void) {
 #include <va.h>
 
 
-i32 iCombatCycleFrame = 0;
-u8 gbEveryOtherCycle = true;
-i32 iCycle1Count = 0;
-i32 iCycle2Count = 0;
-i32 iCycle3Count = 0;
-i32 iDialogNestCount = 0;
+DATA(0x0053495c) i32 iCombatCycleFrame = 0;
+DATA(0x0051dfe4) u8 gbEveryOtherCycle = true;
+DATA(0x00534960) i32 iCycle1Count = 0;
+DATA(0x00534964) i32 iCycle2Count = 0;
+DATA(0x00534968) i32 iCycle3Count = 0;
+DATA(0x0053496c) i32 iDialogNestCount = 0;
 
 #include <BASE/heroWindowManager.h>
 #include <BASE/widget.h>

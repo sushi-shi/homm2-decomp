@@ -53,8 +53,8 @@ H2_ENUM_BEGIN(Cp1251Case)
 H2_ENUM_END(Cp1251Case)
 
 
-static char leftName[OFFER_NAME_SIZE];
-static char rightName[OFFER_NAME_SIZE];
+DATA(0x00533ef4) static char leftName[OFFER_NAME_SIZE];
+DATA(0x00533f2c) static char rightName[OFFER_NAME_SIZE];
 
 VA(0x004ac6e0, 0x193)
 void DoTradingPost(i32 isMarketplace, float efficiency) {
@@ -442,18 +442,18 @@ MessageDispatchResult TradingPostHandler(struct tag_message& message) {
     return MESSAGE_DISPATCH_CONSUME;
 }
 
-u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
-class iconWidget* tradeKnob;
-i32 qtyToTrade;
-i32 leftResource;
-i32 iTradeRatio;
-i32 bTradeMade;
-float fTradingPostEfficiency;
-i32 tpX;
-i32 tpY;
-i32 bIsMarketPlace;
-i32 bLeftDenominated;
-class heroWindow* tpWindow;
-i32 rightResource;
-i32 iMaxUnitsToTrade;
+DATA(0x005198dc) u16 coreRatio[TRADING_POST_RESOURCE_COUNT] = {250, 500, 250, 500, 500, 500, 1};
+DATA(0x00533f74) class iconWidget* tradeKnob;
+DATA(0x00533f28) i32 qtyToTrade;
+DATA(0x00533ee0) i32 leftResource;
+DATA(0x00533f60) i32 iTradeRatio;
+DATA(0x00533ef0) i32 bTradeMade;
+DATA(0x00533ed8) float fTradingPostEfficiency;
+DATA(0x00533ee8) i32 tpX;
+DATA(0x00533eec) i32 tpY;
+DATA(0x00533f6c) i32 bIsMarketPlace;
+DATA(0x00533edc) i32 bLeftDenominated;
+DATA(0x00533f70) class heroWindow* tpWindow;
+DATA(0x00533f64) i32 rightResource;
+DATA(0x00533ee4) i32 iMaxUnitsToTrade;
 i32 maxUnitsToTrade;

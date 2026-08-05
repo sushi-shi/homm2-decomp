@@ -4,12 +4,32 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+import clang.cindex as ci
+
 from homm2.clang_options import ClangMode
 from homm2.build.annotated_data import (
     AnnotatedDataDefinition,
     _clang_args,
+    definitions_for_file,
     source_definitions,
 )
+
+
+def _var_cursor(path, start, end, *, spelling="value", mangled="?value@@3HA",
+                size=4, storage=ci.StorageClass.NONE):
+    cursor = mock.Mock()
+    cursor.kind = ci.CursorKind.VAR_DECL
+    cursor.is_definition.return_value = True
+    cursor.location.file = str(path)
+    cursor.location.line = 1
+    cursor.extent.start.offset = start
+    cursor.extent.end.offset = end
+    cursor.spelling = spelling
+    cursor.mangled_name = mangled
+    cursor.type.get_size.return_value = size
+    cursor.storage_class = storage
+    cursor.semantic_parent = None
+    return cursor
 
 
 class AnnotatedDataTest(unittest.TestCase):
@@ -85,6 +105,43 @@ class AnnotatedDataTest(unittest.TestCase):
                 object_path.write_bytes(b"object-v2")
                 source_definitions(source_root, repo, object_root, cache)
                 self.assertEqual(parser.call_count, 4)
+
+
+class DefinitionsForFileTest(unittest.TestCase):
+    def _definitions(self, text, **cursor_kwargs):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            source_root = repo / "src"
+            source = source_root / "SOURCE/UNIT.cpp"
+            source.parent.mkdir(parents=True)
+            source.write_text(text)
+            start = text.index("int")
+            translation = mock.Mock()
+            translation.cursor.walk_preorder.return_value = [
+                _var_cursor(source.resolve(), start, len(text) - 1,
+                            **cursor_kwargs)]
+            with mock.patch("homm2.build.annotated_data.ci.Index.create") as index:
+                rows = definitions_for_file(source, source_root, repo, translation)
+            return rows, index
+
+    def test_the_decorated_linker_name_is_recorded(self):
+        # The delinker and the relocation audits join on this spelling, so a
+        # claim without it names nothing.
+        rows, _index = self._definitions("DATA(0x00400100) int value;\n")
+        self.assertEqual(
+            [(r.rva, r.size, r.symbol, r.is_static) for r in rows],
+            [(0x100, 4, "?value@@3HA", False)])
+
+    def test_an_internal_linkage_object_keeps_its_underscore_spelling(self):
+        rows, _index = self._definitions(
+            "DATA(0x00400100) int value;\n", mangled="_value",
+            storage=ci.StorageClass.STATIC)
+        self.assertEqual([(r.symbol, r.is_static) for r in rows],
+                         [("_value", True)])
+
+    def test_a_supplied_translation_unit_is_not_reparsed(self):
+        _rows, index = self._definitions("DATA(0x00400100) int value;\n")
+        index.assert_not_called()
 
 
 if __name__ == "__main__":
