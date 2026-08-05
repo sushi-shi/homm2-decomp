@@ -36,4 +36,25 @@ The two helper spellings were byte-identical and peaked at 89.947790%, size
 creating retail's table-base lifetime. The direct indexed source remains
 91.333336% live and retains the 94.0482% historical MAX. No helper or generated
 state was retained.
+
+Later-to-current whole-log ownership, 2026-08-05:
+
+The exact Gold/Buka body calls `LogStr` for the null-pointer, matched-entry,
+and bad-delete paths. PoL retail contains the expanded operations, so the
+credible VC4.2 descendant placed the complete logging body in one explicit
+inline helper with its own `logText` buffer and called that helper at all three
+later-owned sites. This tested the full phase boundary, not only the newline
+micro-helpers above.
+
+The clean inline-helper parent flattened to the same 91.333336%, size-902,
+28-block object as the retained open body. A complete clean plus 50 forest/top
+census emitted only that object and a lower 90.967870% state; no trial
+approached the durable 94.0482% MAX or changed the five size-only blocks:
+
+  build/basefree-cross-version-log-helper-state-summary.json
+  build/tu-state-noise/basefree-cross-version-log-helper/
+
+Disposition: reject the full helper boundary in this parent and restore the
+open source. The experiment confirms that VC4.2 erases the later call
+ownership here; generated helper code is not retained.
 */

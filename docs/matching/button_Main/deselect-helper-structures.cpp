@@ -99,4 +99,21 @@ scheduling residual.  The direct form is retained because it raises live Main
 to 98.008570%, keeps exact size/CFG/relocations, and also restores the clean
 button::Select sibling to its already-recorded exact MAX.  Generated probes
 were restored.
+
+Later-to-current coordinate subtraction, 2026-08-05:
+
+Gold/Buka spells the inline deselection redraw coordinates as owner position
+plus widget position. A complete four-arm matrix tested that paired spelling,
+the retained PoL widget-plus-owner spelling, and both mixed-coordinate forms
+inside `DeselectSelected`, crossed with clean plus 50 forest/top states:
+
+  build/button-main-cross-version-coordinate-order-axes.json
+  build/button-main-cross-version-coordinate-order-manifest.json
+  build/source-variant-batch/button-main-cross-version-coordinate-order/results.json
+
+All 204/204 cells completed. Every coordinate arm was byte-identical within
+each state, including three states at the durable 98.907920% MAX, retail size
+1429, exact 71/71 topology, and 36/36 relocations. This source distinction is
+erased in Main's proven inline-helper parent and cannot account for the five
+repeated virtual-Draw scheduling residuals. Retain the current spelling.
 */
