@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from homm2.build.data_manifest_adapter import SYMBOL_HEADER
+from homm2.build.data_manifest_adapter import SYMBOL_HEADER, build_manifests
 from homm2.build.link_exe import (
     classify_pe_storage,
     load_required_initialized_storage,
@@ -218,7 +218,15 @@ def regenerate_targets(delinker=None, force=False):
                            ", ".join(str(path) for path in missing))
     delinker = _resolve_delinker(delinker)
     _atomic_write(MANIFEST, reviewed_manifest_bytes())
-    _atomic_write(DATA_MANIFEST, data_manifest_stub_bytes())
+    # build_manifests writes DATA_MANIFEST itself, from the source claims bound
+    # to candidate COFF topology. It is the one map the delinker and
+    # canonicalize_data_symbols both read, so it must exist before either runs.
+    summary = build_manifests()
+    print("[reviewed-data] data manifest: %d data + %d vtable + %d compgen "
+          "= %d row(s)" % (summary["definitions"], summary["vtables"],
+                           summary["compgen"], summary["rows"]))
+    for diagnostic in summary["compgen_diagnostics"]:
+        print(f"[reviewed-data] {diagnostic}")
     identity = _identity_inputs(delinker)
     if not force:
         try:
@@ -240,6 +248,10 @@ def regenerate_targets(delinker=None, force=False):
             "--output-path", str(temporary), "--engine-path", "c:\\proj\\",
             "--reloc-manifest", str(RELOC_MANIFEST),
             "--reloc-alias-manifest", str(RELOC_ALIASES),
+            # Topology for reconstructed storage. Names are not in here: the
+            # delinker takes symbol identities from the synthetic PDB, which
+            # synth_pdb builds from the same claims.
+            "--data-manifest", str(DATA_MANIFEST),
         ], cwd=REPO, check=True)
         absent = [name for name in sorted(_expected_delink_objects())
                   if not (temporary / name).is_file()]

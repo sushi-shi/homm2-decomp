@@ -3,18 +3,26 @@
 ``DATA()``, ``DATA_COMPGEN()``, ``VTBL()``, and ``VTBL2()`` are the address
 authorities for reconstructed storage; candidate objects provide the physical
 COFF topology, and this module resolves each claim to its candidate definition.
-The data campaign will assemble delinker manifests from these bindings; until
-then `reviewed_data` writes the header-only stub the normalize edges read. No
-hand-maintained private-data supplement participates in the build.
+`build_manifests` emits the delinker symbol manifests from those bindings. It is
+the single map both sides read: the delinker names retail storage from it, and
+`canonicalize_data_symbols` gives the compiled side the same canonical name from
+the same rows, so a claim can never bind on one side only. No hand-maintained
+private-data supplement participates in the build.
+
+The section and contribution manifests the PoL 2.0 line also writes here are
+absent by necessity, not omission: they derive from retail NB09 sstModule
+contributions and this image has no debug stream.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import os
 import re
 import struct
 import tempfile
+import tomllib
 import warnings
 from collections import defaultdict
 from dataclasses import dataclass
@@ -45,6 +53,8 @@ BASE_ROOT = REPO / "build/objdiff/base"
 SYMBOLS = REPO / "build/gen/symbol_names.csv"
 UNITS = REPO / "config/units.toml"
 EXE = REPO / "build/orig/HMM2PL.exe"
+SOURCE_MANIFEST = REPO / "build/gen/delink_data_from_source.tsv"
+COMBINED_MANIFEST = REPO / "build/gen/delink_data_manifest.tsv"
 SYMBOL_HEADER = (
     "name", "object", "rva", "size", "storage", "alignment",
     "section_ordinal", "section_offset", "scope", "provenance",
@@ -263,7 +273,12 @@ def _candidate_bytes(coff: CoffFile, candidate: CandidateDefinition,
 def _compgen_candidate_kind(candidate: CandidateDefinition) -> str | None:
     if candidate.symbol.startswith(("$SG", "??_C@")):
         return "STRING_LITERAL"
-    if candidate.symbol.startswith("$T"):
+    # `$T<counter>` is MSVC 4.2's spelling for a floating-point literal COMDAT;
+    # VC6 emits `__real@4@<bits>` / `__real@8@<bits>` instead, so a tree built
+    # with the retail toolchain has essentially no `$T` float candidates
+    # (SOURCE/PHILAI: 96 `__real@` against 2 `$T`). Both spellings name the same
+    # thing, and the claim binds by retail RVA and payload rather than by name.
+    if candidate.symbol.startswith(("$T", "__real@", "__xmm@")):
         return "FLOAT_LITERAL"
     if candidate.symbol.startswith("_$S5$"):
         return "STATIC_INIT_GUARD"
@@ -620,3 +635,86 @@ def validate_symbol_rows(rows, label: str) -> None:
     for previous, current in zip(sorted(intervals), sorted(intervals)[1:]):
         if previous[1] > current[0] and previous[0] != current[0]:
             raise ValueError(f"{label} overlapping allocations {previous} and {current}")
+
+
+def build_manifests(source_root=SOURCE_ROOT, base_root=BASE_ROOT, symbols=SYMBOLS,
+                    units=UNITS, exe=EXE, strict=False):
+    """Bind every source data claim to candidate COFF topology and emit the
+    delinker symbol manifests.
+
+    This is the single map both consumers read: the delinker names retail
+    storage from it (`configure.py` passes `--data-manifest`), and
+    `canonicalize_data_symbols.load_compgen_data_claims` reads the same rows to
+    give the compiled side the same canonical name.  Neither side re-parses
+    `DATA_COMPGEN()` for itself, so a claim cannot bind on one side only.
+
+    The section and contribution manifests the PoL 2.0 line also writes here are
+    deliberately absent: they are derived from retail NB09 sstModule
+    contributions, and this image has no debug stream.  Symbol rows never
+    depended on them - `source_rows` is complete before that work begins - so
+    the claim channel does not have to wait for a substitute.
+    """
+    definitions = source_definitions(Path(source_root), Path(base_root))
+    manifest = tomllib.loads(Path(units).read_text())
+    topology_by_unit = {}
+    for unit in sorted(row["unit"] for row in manifest.get("unit", [])):
+        topology_by_unit[unit] = candidate_topology(
+            Path(base_root) / f"{unit}.obj", unit)
+    public_by_rva, _public_by_symbol, _global_public_rvas = _load_public_data(
+        Path(symbols))
+    resolved = resolve_source_definitions(definitions, topology_by_unit, public_by_rva)
+    retail_rvas = sorted({row.rva for row in definitions})
+    next_rva = {rva: (retail_rvas[index + 1]
+                      if index + 1 < len(retail_rvas) else None)
+                for index, rva in enumerate(retail_rvas)}
+    source_rows = [_symbol_row(source, candidate, next_rva[source.rva])
+                   for source, candidate in resolved]
+    vtable_claims = source_vtables(Path(source_root), REPO)
+    resolved_vtables = resolve_vtable_definitions(
+        vtable_claims, topology_by_unit, public_by_rva)
+    vtable_rows = [_vtable_row(claim, candidate)
+                   for claim, candidate in resolved_vtables]
+    _mark_vtable_aliases(vtable_rows)
+    source_rows.extend(vtable_rows)
+    compgen_claims = source_compgen_data(Path(source_root), REPO)
+    resolved_compgen, compgen_diagnostics = resolve_compgen_definitions(
+        compgen_claims, topology_by_unit, Path(base_root), Path(exe),
+        reserved=[candidate for _source, candidate in resolved]
+                 + [candidate for _claim, candidate in resolved_vtables],
+        strict=strict, symbols=Path(symbols), units=Path(units))
+    compgen_rows = [_compgen_row(claim, candidate)
+                    for claim, candidate in resolved_compgen]
+    source_rows.extend(compgen_rows)
+    validate_symbol_rows(source_rows, "source annotations")
+    combined = list(source_rows)
+    validate_symbol_rows(combined, "combined")
+    _write_tsv(SOURCE_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(source_rows),
+               "Generated from source DATA()/DATA_COMPGEN()/VTBL()/VTBL2() plus "
+               "exact candidate COFF identity.")
+    _write_tsv(COMBINED_MANIFEST, SYMBOL_HEADER, _sorted_symbol_rows(combined),
+               "Generated Vostok symbol manifest; do not edit.")
+    return {
+        "definitions": len(resolved),
+        "vtables": len(resolved_vtables),
+        "compgen": len(resolved_compgen),
+        "rows": len(combined),
+        "compgen_diagnostics": list(compgen_diagnostics),
+    }
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--strict", action="store_true",
+                        help="fail instead of warning on an unresolved compgen claim")
+    args = parser.parse_args(argv)
+    summary = build_manifests(strict=args.strict)
+    print("[data-manifest] %d data + %d vtable + %d compgen = %d row(s) -> %s"
+          % (summary["definitions"], summary["vtables"], summary["compgen"],
+             summary["rows"], COMBINED_MANIFEST.relative_to(REPO)))
+    for diagnostic in summary["compgen_diagnostics"]:
+        print(f"[data-manifest] {diagnostic}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
