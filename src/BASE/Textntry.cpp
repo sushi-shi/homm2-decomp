@@ -154,15 +154,11 @@ void textEntryWidget::Read(H2_ENUM_PARAM(TextEntryReadMode, i32) type) {
         m_rectX = m_x;
         m_rectY = m_y;
         m_rectW = m_width;
-        i32 preserveText;
         m_rectH = m_height;
+        m_maxLines = 1;
         if (type == TEXT_ENTRY_READ_MULTILINE)
-            preserveText = 1;
+            m_preserveTextOnFocus = 1;
         else
-            preserveText = 1;
-        m_maxLines = preserveText;
-        m_preserveTextOnFocus = preserveText;
-        if (type != TEXT_ENTRY_READ_MULTILINE)
             m_preserveTextOnFocus = 0;
     }
     if (type == TEXT_ENTRY_READ_INSET_FIVE) {
