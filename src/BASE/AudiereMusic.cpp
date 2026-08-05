@@ -106,9 +106,9 @@ void SetAudiereMusicVolume(i32 volume, i32 fading) {
 
 VA(0x004cd680, 0x3c7)
 void PlayAudiereMusic(
+    audiere::AudioDevicePtr device,
     i32& currentTrack,
     i32& fadeSteps,
-    audiere::AudioDevicePtr device,
     i32 track
 ) {
     char filename[0x160];

@@ -1081,6 +1081,50 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
   jump table sends the lowest case value `'1'` to the THIRD body). The
   single caller `resourceManager::GetSample` (0xb84f0) pushes one argument.
   Byte-exact.
+- **[unclassified] `resourceManager::ReadBlock` (0xb8f60) lost PoL's debug
+  scaffolding.** PoL's body declares `i32 errorCode = errno;` before the
+  `sprintf` and closes the failure arm with `i32 debugTrap = 0; debugTrap++;
+  debugTrap++;`. Retail's frame is `sub esp,8` — exactly the `this` spill at
+  `-0x8` and `bytesRead` at `-0x4` — and the failure arm is only the
+  `sprintf(gText, "File error - ...", bytesRead, size, errno, m_lastFileName)`
+  plus `LogStr(gText)`, with one `call __errno` (PoL's spelling emits two,
+  one for the dead local). Neither local exists in 2.1. Byte-exact.
+- **[unclassified] `BlitBitmapToScreenVesa` (0xd4610) copies rows with a plain
+  `for` and no running offset.** PoL spells the copy
+  `i32 row = 0; if (height > row) { i32 destinationOffset = destinationY *
+  640; do { memcpy(...); destinationOffset += 640; ++row; } while (row <
+  height); }`. Retail is `for (row = 0; row < height; row++) memcpy(...)` with
+  `(destinationY + row) * 640` recomputed each iteration, so the frame is
+  `sub esp,0x14` (RECT + `row`) instead of `0x18`, and the loop skeleton is
+  MSVC's `for` layout (`jmp` to the test over an increment block). The guard
+  is also written `sourceBitmap != gpWindowManager->m_screen` (retail loads
+  the global for the address form first, then the LEFT operand into `ecx`,
+  `cmpl 0x46(%eax), %ecx`), and both pointer sums put the product before the
+  scalar offset: `m_pixels + (destinationY + row) * 640 + destinationX` and
+  `m_pixels + (row + sourceY) * m_width + sourceX`. Byte-exact.
+- **[Buka] `PlayAudiereMusic` takes the device first.** The retail signature is
+  `PlayAudiereMusic(audiere::AudioDevicePtr device, i32& currentTrack, i32&
+  fadeSteps, i32 track)`. The callee frame cannot distinguish this from
+  `(i32&, i32&, AudioDevicePtr, i32)` — `__fastcall` skips the class parameter
+  when assigning `ecx`/`edx`, so both orders give `ecx = currentTrack`,
+  `edx = fadeSteps`, device at `0x8(%ebp)`, track at `0xc(%ebp)`, and
+  `PlayAudiereMusic` itself is byte-identical either way. The single caller
+  `soundManager::PlayAmbientMusic` (0xb64d0) settles it: arguments are
+  evaluated right to left, so a leading class parameter forces the two
+  reference arguments to be evaluated before the `RefPtr` copy constructor and
+  parked in `esi`/`edi` (`push esi`/`push edi` in the prologue,
+  `mov ecx,edi` / `mov edx,esi` after the ctor). See
+  `docs/patterns/byvalue-class-arg-position-names-parameter-order.md`. This is
+  Buka-only code (no PoL counterpart); the parameter order was a reconstruction
+  claim until the caller closed. Byte-exact.
+- **[unclassified] `MIDISetVolume` (0xc5bf0) multiplies the running volume, not
+  the constant.** PoL's soundManager member spells the fade arms
+  `((VOLUME_LOW_RANGE - m_fadeSteps) * MAX_VOLUME) / VOLUME_LOW_RANGE`. Buka's
+  free function keeps the value in the `volume` local and puts it on the LEFT:
+  `(volume * (VOLUME_LOW_RANGE - fadeSteps)) / VOLUME_LOW_RANGE` and
+  `(volume * (fadeSteps - VOLUME_FADE_SPLIT)) / VOLUME_HIGH_RANGE`, which is
+  what emits `mov ecx,-0x4(%ebp); imull %ecx,%eax` instead of folding the local
+  into `imull -0x4(%ebp),%eax`. Byte-exact.
 
 ## Reconstruction infrastructure notes (not version deltas)
 

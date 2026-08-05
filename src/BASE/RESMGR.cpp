@@ -467,7 +467,6 @@ void resourceManager::ReadBlock(i8* destination, u32l size) {
     PollSound();
     i32 bytesRead = read(m_aggregateFd[m_curAggregate], destination, size);
     if (bytesRead != size) {
-        i32 errorCode = errno;
         sprintf(
             gText,
             "File error - bytes read %d, bytes requested %d, errno %d, last file '%s'",
@@ -477,9 +476,6 @@ void resourceManager::ReadBlock(i8* destination, u32l size) {
             m_lastFileName
         );
         LogStr(gText);
-        i32 debugTrap = 0;
-        debugTrap++;
-        debugTrap++;
     }
     PollSound();
 }

@@ -55,9 +55,9 @@ bool StartupAudiereMusic(audiere::AudioDevicePtr device);
 void ResetAudiereMusic(void);
 void SetAudiereMusicVolume(i32 volume, i32 fading);
 void PlayAudiereMusic(
+    audiere::AudioDevicePtr device,
     i32& currentTrack,
     i32& fadeSteps,
-    audiere::AudioDevicePtr device,
     i32 track
 );
 
