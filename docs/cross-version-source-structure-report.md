@@ -9,8 +9,8 @@ appendix; it is not the matching priority.
 
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
-  has 1,160/1,514 functions live exact and, after this investigation,
-  1,343/1,514 functions exact-max.
+  has 1,161/1,514 functions live exact and, after this investigation,
+  1,344/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -257,8 +257,12 @@ The same BASE sweep retained two byte-neutral exact-donor structures:
 `button::Deselect` now owns its public body directly, and
 `mouseManager::Close` uses the mainline early-return guard. Complete 204-cell
 and 51-state matrices respectively left their existing two-byte residuals
-unchanged. `executive::DoDialog` was also censused across 50 states; its PoL
-layout is already correct and no exact register-allocation island appeared.
+unchanged. Two flat 50-state censuses of `executive::DoDialog` initially left
+its exact-layout restore loop at 99.4375%. Starting from the later source and
+removing its newer stack-object and loop changes exposed the surviving clue:
+direct `managerList[managerIndex]` ownership. Retaining that expression inside
+PoL's proven decrementing loop closed the clean target at 100%, with 251 exact
+bytes, all 15 blocks, and the ordered 16/16 relocation stream.
 
 ### Continued BASE island batch
 

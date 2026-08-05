@@ -125,9 +125,8 @@ i32 executive::DoDialog(class baseManager* manager) {
     if (managerCount > 0) {
         managerIndex = 0;
         do {
-            listManager = managerList[managerIndex];
-            listManager->m_prev = previousList[managerIndex];
-            listManager->m_next = nextList[managerIndex];
+            managerList[managerIndex]->m_prev = previousList[managerIndex];
+            managerList[managerIndex]->m_next = nextList[managerIndex];
             managerIndex++;
             managerCount--;
         } while (managerCount != 0);

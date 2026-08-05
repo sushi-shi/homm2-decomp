@@ -130,7 +130,7 @@ BASE/DIMMER	?Read@dimmerWidget@@QAEXXZ	100.0000	6f5615b307cf
 BASE/EXEC	??0executive@@QAE@XZ	100.0000	52274ee35993
 BASE/EXEC	?AddManager@executive@@QAEHPAVbaseManager@@H@Z	100.0000	1023633078ab
 BASE/EXEC	?CallManager@executive@@QAEXPAVbaseManager@@@Z	100.0000	ca44ff04aa17
-BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	99.4375	629ac50ef233
+BASE/EXEC	?DoDialog@executive@@QAEHPAVbaseManager@@@Z	100.0000	9f9d21de629e
 BASE/EXEC	?InitSystem@executive@@QAEHXZ	100.0000	d1ab5cefb640
 BASE/EXEC	?MainLoop@executive@@QAEXXZ	100.0000	1121c22f25a2
 BASE/EXEC	?PrintManagerList@executive@@QAEXXZ	100.0000	f2971517bab0
@@ -523,7 +523,7 @@ SOURCE/ADVMGR	?ViewPuzzle@advManager@@QAEXXZ	99.3333	184a6006a045
 SOURCE/AI	?AICheckRetreat@combatManager@@QAEHXZ	99.4904	78849a4f08be
 SOURCE/AI	?AttemptAdjacentAttack@combatManager@@QAEHPAVarmy@@@Z	100.0000	3750e036a65f
 SOURCE/AI	?AttemptAttack@combatManager@@QAEHPAVarmy@@HH@Z	100.0000	4810a6d6edc1
-SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.4983	4b40aa2602ea
+SOURCE/AI	?DoCompAI@combatManager@@QAEXH@Z	97.5223	4b40aa2602ea
 SOURCE/AI	?DoLichShot@combatManager@@QAEXPAVarmy@@@Z	100.0000	09a648267683
 SOURCE/AI	?GetAllMask@combatManager@@QAEHH@Z	100.0000	98c41dde6a5b
 SOURCE/AI	?GetBestArmy@combatManager@@QAEHHH@Z	100.0000	59fc1a2bd34f
@@ -1227,7 +1227,7 @@ SOURCE/SPELLS	?DoBlast@combatManager@@QAEXHH@Z	100.0000	368b5b94227f
 SOURCE/SPELLS	?DoBolt@combatManager@@QAEXHHHHHHHHHHHHHHHHH@Z	99.3477	73ed71e645cc
 SOURCE/SPELLS	?DoLuck@combatManager@@QAEXHH@Z	100.0000	5454e637526f
 SOURCE/SPELLS	?DrawBolt@combatManager@@QAEXPAUSBolt@@H@Z	100.0000	2583c222df0a
-SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.1952	222058889a73
+SOURCE/SPELLS	?Earthquake@combatManager@@QAEXXZ	97.2061	222058889a73
 SOURCE/SPELLS	?ElementalStorm@combatManager@@QAEXXZ	100.0000	879c80bdc0ab
 SOURCE/SPELLS	?FindResurrectArmyIndex@combatManager@@QAEHHHH@Z	98.5619	f259c474d379
 SOURCE/SPELLS	?Fireball@combatManager@@QAEXHH@Z	100.0000	c5734a49d10e
