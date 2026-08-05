@@ -9,8 +9,8 @@ appendix; it is not the matching priority.
 
 - The later branch is a strong source-structure witness. It is exact for all
   1,727 classified game functions under VC6 SP5, while the current PoL branch
-  has 1,154/1,514 functions live exact and, after this investigation,
-  1,330/1,514 functions exact-max.
+  has 1,155/1,514 functions live exact and, after this investigation,
+  1,331/1,514 functions exact-max.
 - It must not be copied mechanically. Buka uses a different compiler and build
   state, and PoL 2.0 came from a real source fork. Retail PoL bytes remain the
   target.
@@ -22,6 +22,9 @@ appendix; it is not the matching priority.
   factor. The corrected 2.1 form reached audited 100.0000% in a focused replay,
   with retail size, exact bytes and CFG, and the complete ordered relocation
   stream.
+- A focused BASE follow-up closed `heroWindowManager::AddWindow` live at
+  100.0000%. Retail proves the exact mainline direct-`zOrder`, compact loop,
+  and tail-owned first-insertion structure.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
@@ -200,6 +203,26 @@ base-first form is retained because it is exact in the mainline witness and
 agrees with the PoL target's desired evaluation ownership. The replay evidence
 and harvested assembly are recorded with the other matching artifacts. See
 `docs/matching/TurnCostResource/`.
+
+### `heroWindowManager::AddWindow`: BASE ownership fix, live exact
+
+The prior source copied `zOrder` to another local, zeroed it before checking
+the list tail, expanded the insertion walk, and saved `m_windowListHead` to
+decide whether the first inserted window also became the tail. The exact Buka
+source instead mutates `zOrder` directly and tests `m_windowListTail`.
+
+PoL retail independently proves both distinctions: it uses a literal zero
+move in the automatic-layer arm and loads the tail field at the first-window
+test. Retaining the mainline structure produced 188/188 live exact bytes, an
+identical 19-block CFG, and the complete ordered 1/1 relocation stream under
+the clean VC4.2 state.
+
+The same BASE sweep retained two byte-neutral exact-donor structures:
+`button::Deselect` now owns its public body directly, and
+`mouseManager::Close` uses the mainline early-return guard. Complete 204-cell
+and 51-state matrices respectively left their existing two-byte residuals
+unchanged. `executive::DoDialog` was also censused across 50 states; its PoL
+layout is already correct and no exact register-allocation island appeared.
 
 ## Bugs and bug candidates exposed by the exact branch
 

@@ -388,33 +388,25 @@ heroWindowManager::BroadcastMessage(MessageType type, BaseWidgetCommand p2, i32 
 VA(0x004cac80, 0xbc)
 void heroWindowManager::AddWindow(class heroWindow* w, i32 zOrder, i32 openFlags) {
     heroWindow* cur = m_windowListTail;
-    i32 z;
     if (HAS(w->m_winFlags, WINDOW_FLAG_FIXED_LAYER))
-        z = 0;
-    else
-        z = zOrder;
-    if (z == -1) {
-        z = 0;
-        if (cur != NULL)
-            z = cur->m_zOrder + 1;
+        zOrder = 0;
+    if (zOrder == -1) {
+        if (cur == NULL)
+            zOrder = 0;
+        else
+            zOrder = cur->m_zOrder + 1;
     }
-    if (z != 0 && m_windowListHead == NULL)
+    if (zOrder != 0 && m_windowListHead == NULL)
         return;
-    if (w->Open(z, openFlags) != 0)
+    if (w->Open(zOrder, openFlags) != 0)
         return;
-    if (cur != NULL) {
-        do {
-            if (cur->m_zOrder <= z)
-                break;
-            cur = cur->m_prevWindow;
-        } while (cur != NULL);
-    }
+    while (cur != NULL && cur->m_zOrder > zOrder)
+        cur = cur->m_prevWindow;
     if (cur == NULL) {
         w->m_nextWindow = m_windowListHead;
         w->m_prevWindow = NULL;
-        heroWindow* oldHead = m_windowListHead;
         m_windowListHead = w;
-        if (oldHead == NULL)
+        if (m_windowListTail == NULL)
             m_windowListTail = w;
     } else if (cur->m_nextWindow == NULL) {
         w->m_prevWindow = m_windowListTail;

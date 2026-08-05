@@ -254,7 +254,16 @@ H2_ENUM_RETURN(MessageDispatchResult, i16) button::Select(struct tag_message& ms
 
 VA(0x004ddd10, 0x83)
 H2_ENUM_RETURN(MessageDispatchResult, i16) button::Deselect(struct tag_message& msg) {
-    return DeselectSelected(msg);
+    if (!HAS(m_flags, WIDGET_FLAG_SELECTED))
+        return MESSAGE_DISPATCH_CONTINUE;
+    m_flags &= ~WIDGET_FLAG_SELECTED;
+    Draw();
+    gpWindowManager
+        ->UpdateScreenRegion(m_x + m_owner->m_posX, m_y + m_owner->m_posY, m_width, m_height);
+    SET_WIDGET_MESSAGE(msg, WIDGET_COMMAND_DESELECT, m_id);
+    msg.payload.widget.modifiers = iLeftRightSave;
+    iLeftRightSave = MESSAGE_MODIFIER_NONE;
+    return MESSAGE_DISPATCH_FORWARD;
 }
 
 #undef SET_WIDGET_MESSAGE

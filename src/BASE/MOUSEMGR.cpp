@@ -150,38 +150,38 @@ i32 mouseManager::Open(i32 priority) {
 VA(0x004c93f0, 0xed)
 void mouseManager::Close(void) {
     i32 cursorIndex;
-    if (m_active == 1) {
-        m_active = false;
-        if (m_savedUnderlying != NULL)
-            delete m_savedUnderlying;
-        m_savedUnderlying = NULL;
-        SetCursor(LoadCursorA(NULL, IDC_ARROW));
-        for (cursorIndex = 0; cursorIndex < MOUSE_CURSOR_COUNT; cursorIndex++) {
-            if (hMouseCursor[cursorIndex] != NULL)
-                DestroyIcon(hMouseCursor[cursorIndex]);
-            hMouseCursor[cursorIndex] = NULL;
-            if (cAndBits[cursorIndex] != NULL)
-                H2_FREE_AT(
-                    cAndBits[cursorIndex],
-                    gMouseManagerStrings.andMaskDestruction.text,
-                    330
-                );
-            cAndBits[cursorIndex] = NULL;
-            if (cColorBits[cursorIndex] != NULL)
-                H2_FREE_AT(
-                    cColorBits[cursorIndex],
-                    gMouseManagerStrings.colorBitsDestruction.text,
-                    334
-                );
-            cColorBits[cursorIndex] = NULL;
-            if (hbmpAndMask[cursorIndex] != NULL)
-                DeleteObject(hbmpAndMask[cursorIndex]);
-            hbmpAndMask[cursorIndex] = NULL;
-        }
-        if (m_cursorIcon != NULL)
-            gpResourceManager->Dispose(m_cursorIcon);
-        m_cursorIcon = NULL;
+    if (m_active != 1)
+        return;
+    m_active = false;
+    if (m_savedUnderlying != NULL)
+        delete m_savedUnderlying;
+    m_savedUnderlying = NULL;
+    SetCursor(LoadCursorA(NULL, IDC_ARROW));
+    for (cursorIndex = 0; cursorIndex < MOUSE_CURSOR_COUNT; cursorIndex++) {
+        if (hMouseCursor[cursorIndex] != NULL)
+            DestroyIcon(hMouseCursor[cursorIndex]);
+        hMouseCursor[cursorIndex] = NULL;
+        if (cAndBits[cursorIndex] != NULL)
+            H2_FREE_AT(
+                cAndBits[cursorIndex],
+                gMouseManagerStrings.andMaskDestruction.text,
+                330
+            );
+        cAndBits[cursorIndex] = NULL;
+        if (cColorBits[cursorIndex] != NULL)
+            H2_FREE_AT(
+                cColorBits[cursorIndex],
+                gMouseManagerStrings.colorBitsDestruction.text,
+                334
+            );
+        cColorBits[cursorIndex] = NULL;
+        if (hbmpAndMask[cursorIndex] != NULL)
+            DeleteObject(hbmpAndMask[cursorIndex]);
+        hbmpAndMask[cursorIndex] = NULL;
     }
+    if (m_cursorIcon != NULL)
+        gpResourceManager->Dispose(m_cursorIcon);
+    m_cursorIcon = NULL;
 }
 
 VA(0x004c94e0, 0x5)

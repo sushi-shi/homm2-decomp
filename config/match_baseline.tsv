@@ -28,7 +28,7 @@ BASE/BUTTON	??0button@@QAE@FFFFKFFFFFF@Z	100.0000	eb0446c4689e
 BASE/BUTTON	??0button@@QAE@FFFFPADFFFFFF@Z	100.0000	b0c641980117
 BASE/BUTTON	??0button@@QAE@XZ	100.0000	1ff5d6d8c60c
 BASE/BUTTON	??1button@@UAE@XZ	100.0000	f4a10c9b70d2
-BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	99.7778	d750891b3574
+BASE/BUTTON	?Deselect@button@@QAEFAAUtag_message@@@Z	99.7778	d7e9c437bcdf
 BASE/BUTTON	?Draw@button@@UAEXXZ	100.0000	8d0d1d6cbd3e
 BASE/BUTTON	?Main@button@@UAEHAAUtag_message@@@Z	98.9079	2c0fe1491747
 BASE/BUTTON	?Read@button@@QAEXXZ	100.0000	7490095a6316
@@ -182,7 +182,7 @@ BASE/Iconm2b	?MonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	85.3149	7ec77
 BASE/Iconmf2b	?FlipMonoIconToBitmap@@YIXPAVicon@@PAVbitmap@@HHHHHHHHH@Z	81.2515	1f7da1d30d51.0bcb0c3934d6
 BASE/MOUSEMGR	??0mouseManager@@QAE@XZ	100.0000	af335173b95f
 BASE/MOUSEMGR	?CheckUpdateMousePos@mouseManager@@QAEXXZ	100.0000	88e22e24424c
-BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	99.6923	e8027ea4b95f
+BASE/MOUSEMGR	?Close@mouseManager@@UAEXXZ	99.6923	bda5af3dc302
 BASE/MOUSEMGR	?HideColorPointer@mouseManager@@QAEXXZ	100.0000	a44eb65f428f
 BASE/MOUSEMGR	?IsVis@mouseManager@@QAEHXZ	100.0000	c0199d7ec61a
 BASE/MOUSEMGR	?Main@mouseManager@@UAEHAAUtag_message@@@Z	100.0000	921a88177db1
@@ -334,7 +334,7 @@ BASE/WINDOW	?RemoveWidget@heroWindow@@QAEXPAVwidget@@@Z	100.0000	bd140157a7a5
 BASE/WINDOW	?RestoreBackground@heroWindow@@QAEXXZ	100.0000	9d5eb1ac139b
 BASE/WINDOW	?SaveBackground@heroWindow@@QAEHXZ	100.0000	b3a5e9e584e1
 BASE/WINMGR	??0heroWindowManager@@QAE@XZ	100.0000	a76cec9c7460
-BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	98.9730	39fa997a64a8
+BASE/WINMGR	?AddWindow@heroWindowManager@@QAEXPAVheroWindow@@HH@Z	100.0000	6b587be24fc2
 BASE/WINMGR	?BroadcastMessage@heroWindowManager@@QAEHHHHH@Z	81.1765	427bcb755878
 BASE/WINMGR	?Close@heroWindowManager@@UAEXXZ	100.0000	bc30261b61e9
 BASE/WINMGR	?ConvertToHover@heroWindowManager@@QAEHAAUtag_message@@@Z	100.0000	e83b4d15b45f
