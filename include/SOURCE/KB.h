@@ -687,6 +687,25 @@ H2_ENUM_CLASS_BEGIN(MapExtraFlag)
     MAP_EXTRA_ADJACENT_CLEAR_MASK = 0x7f
 H2_ENUM_CLASS_END(MapExtraFlag)
 extern u8* mapExtra;
+// The per-cell visibility/adjacency byte at (column, row).
+//
+// The inner grouping is load-bearing, not decoration. Retail's address
+// arithmetic is `(mapExtra + column) + row * MAP_WIDTH`, and /Od emits it in
+// exactly that order, so the base and the column term must be added as a unit.
+// Writing the natural mapExtra[column + row * MAP_WIDTH] regroups it into
+// `mapExtra + (column + row * MAP_WIDTH)` and cost 19 exact functions when
+// measured. See docs/patterns/flat-index-grouping-is-not-a-trick.md.
+//
+// `column` is therefore spliced DELIBERATELY UNPARENTHESISED, so that
+// MAP_EXTRA_AT(x + 1, y) keeps retail's `((mapExtra + x) + 1)` chain. Do not
+// "fix" it: wrapping it as `(mapExtra + (column))` groups the column term as a
+// unit instead and drops GetCloudLookup to 78.57%. Pass only additive column
+// expressions. `row` stays parenthesised for `*` precedence, which is free
+// because the row term is already a factor.
+//
+// An inline accessor cannot replace this macro: the inline boundary never
+// folds into the address computation, whatever its arity.
+#define MAP_EXTRA_AT(column, row) (*(mapExtra + column + (row) * MAP_WIDTH))
 extern tag_tilePoint normalDirTable[];
 extern heroWindow* pNormalDialogWindow;
 extern void** ppMapExtra;

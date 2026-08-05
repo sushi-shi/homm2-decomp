@@ -3209,61 +3209,61 @@ i32 advManager::GetCloudLookup(i32 x, i32 y) {
     }
 
     if (cloudMask == 0) {
-        if ((*(mapExtra + x + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH;
         }
-        if ((*(mapExtra + x + 1 + y * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x + 1, y) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_EAST;
         }
-        if ((*(mapExtra + x + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH;
         }
-        if ((*(mapExtra + x - 1 + y * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x - 1, y) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_WEST;
         }
-        if ((*(mapExtra + x + 1 + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x + 1, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH_EAST;
         }
-        if ((*(mapExtra + x + 1 + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x + 1, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH_EAST;
         }
-        if ((*(mapExtra + x - 1 + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x - 1, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH_WEST;
         }
-        if ((*(mapExtra + x - 1 + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+        if ((MAP_EXTRA_AT(x - 1, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH_WEST;
         }
     } else {
         if ((cloudMask & CLOUD_NORTH) == 0
-            && (*(mapExtra + x + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH;
         }
         if ((cloudMask & CLOUD_EAST) == 0
-            && (*(mapExtra + x + 1 + y * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x + 1, y) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_EAST;
         }
         if ((cloudMask & CLOUD_SOUTH) == 0
-            && (*(mapExtra + x + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH;
         }
         if ((cloudMask & CLOUD_WEST) == 0
-            && (*(mapExtra + x - 1 + y * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x - 1, y) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_WEST;
         }
         if ((cloudMask & CLOUD_NORTH_EAST) == 0
-            && (*(mapExtra + x + 1 + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x + 1, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH_EAST;
         }
         if ((cloudMask & CLOUD_SOUTH_EAST) == 0
-            && (*(mapExtra + x + 1 + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x + 1, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH_EAST;
         }
         if ((cloudMask & CLOUD_SOUTH_WEST) == 0
-            && (*(mapExtra + x - 1 + (y + 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x - 1, y + 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_SOUTH_WEST;
         }
         if ((cloudMask & CLOUD_NORTH_WEST) == 0
-            && (*(mapExtra + x - 1 + (y - 1) * MAP_WIDTH) & giCurWatchPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(x - 1, y - 1) & giCurWatchPlayerBit) == 0) {
             cloudMask |= CLOUD_NORTH_WEST;
         }
     }

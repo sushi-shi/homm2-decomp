@@ -219,7 +219,7 @@ void searchArray::TestPossibleDirections(
             goto storeDirection;
         }
         if (gbHumanPlayer[giCurPlayer] != 0
-            && (*(mapExtra + gSearchNextX + gSearchNextY * MAP_WIDTH) & giCurPlayerBit) == 0) {
+            && (MAP_EXTRA_AT(gSearchNextX, gSearchNextY) & giCurPlayerBit) == 0) {
             gSearchTerrain = TERRAIN_INVALID;
             goto storeDirection;
         }
