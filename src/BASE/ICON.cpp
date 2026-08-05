@@ -90,22 +90,16 @@ IconDrawResult icon::CombatClipDrawToBuffer(
     i8* yModify
 ) {
     if (gbComputeExtent != 0) {
-        i32 entryOffset = frame * sizeof(IconEntry);
         if (orientation != ICON_DRAW_NORMAL) {
-            limits->right =
-                x - reinterpret_cast<IconEntry*>(m_data + entryOffset)->x;
-            limits->left =
-                limits->right - reinterpret_cast<IconEntry*>(m_data + entryOffset)->w + 1;
-            limits->top = reinterpret_cast<IconEntry*>(m_data + entryOffset)->y + y;
-            limits->bottom =
-                reinterpret_cast<IconEntry*>(m_data + entryOffset)->h + limits->top - 1;
+            limits->right = x - reinterpret_cast<IconEntry*>(m_data)[frame].x;
+            limits->left = limits->right - reinterpret_cast<IconEntry*>(m_data)[frame].w + 1;
+            limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
+            limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
         } else {
-            limits->left = reinterpret_cast<IconEntry*>(m_data + entryOffset)->x + x;
-            limits->right =
-                reinterpret_cast<IconEntry*>(m_data + entryOffset)->w + limits->left - 1;
-            limits->top = reinterpret_cast<IconEntry*>(m_data + entryOffset)->y + y;
-            limits->bottom =
-                reinterpret_cast<IconEntry*>(m_data + entryOffset)->h + limits->top - 1;
+            limits->left = x + reinterpret_cast<IconEntry*>(m_data)[frame].x;
+            limits->right = limits->left + reinterpret_cast<IconEntry*>(m_data)[frame].w - 1;
+            limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
+            limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
         }
         if (gbSaveBiggestExtent != 0) {
             if (limits->left < giMinExtentX)
@@ -303,10 +297,10 @@ void icon::FillToBuffer(
         return;
     }
     if (gbLimitToExtent != 0 && limits != NULL) {
-        limits->left = Entries()[frame].x + x;
-        limits->right = Entries()[frame].w + limits->left - 1;
-        limits->top = Entries()[frame].y + y;
-        limits->bottom = Entries()[frame].h + limits->top - 1;
+        limits->left = x + reinterpret_cast<IconEntry*>(m_data)[frame].x;
+        limits->right = limits->left + reinterpret_cast<IconEntry*>(m_data)[frame].w - 1;
+        limits->top = y + reinterpret_cast<IconEntry*>(m_data)[frame].y;
+        limits->bottom = limits->top + reinterpret_cast<IconEntry*>(m_data)[frame].h - 1;
         if (gbCurrArmyDrawn == 0 || limits->left > giMaxExtentX || limits->right < giMinExtentX
             || limits->top > giMaxExtentY || limits->bottom < giMinExtentY)
             return;

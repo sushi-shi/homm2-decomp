@@ -27,7 +27,8 @@ path strings) with VC6 SP5 — PoL 2.0 used VC 4.2.
 - **[Buka] Asserts survive in five TUs only.** `ProcessAssert(cond, file,
   line)` is live in MOUSEMGR, RESMGR, netwin, dpnetwin, and wingraph with
   `e:\Users\igorl\...` path strings; every other TU's asserts were compiled
-  out. (Our MOUSEMGR reconstruction is still missing its retail asserts.)
+  out. MOUSEMGR's four surviving assert sites are reconstructed and exact
+  (lines 398, 446, 501, 520 — PoL 2.0 had them at 410, 458, 514, 533).
 - **[Buka] No /Gi line machinery.** The PoL-era `*SourceLineBase` statics
   (VC4.2 `/Gi` __LINE__Var lowering) have no VC6 counterpart; retail passes
   literal line numbers where file/line machinery survives at all. All 76

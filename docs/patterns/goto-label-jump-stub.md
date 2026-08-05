@@ -192,3 +192,21 @@ The other three long jumps in the function (`e9` to 0x3a1, at 0x14f, 0x2b9 and
 A `goto` that enters a block is legal C++ as long as it skips no
 initialisation, and nothing else reproduces one stub plus three direct arm-end
 jumps. `CycleColors` 80.72% -> EXACT.
+
+`mouseManager::NewUpdate` (0xb9b40) is the two-stub confirmation of both rules
+at once — reverse source order AND labels inside nested arms:
+
+```
+1085: eb 07              jmp <epilogue>
+1087: eb d9              jmp 0x1062     ; stub for goto #2  (lower address)
+1089: e9 f4 fc ff ff     jmp 0x0d82     ; stub for goto #1  (higher address)
+108e: <epilogue>
+```
+
+0xd82 is the tail of the THEN arm of the `if (m_savedLeft > gOldMouseRight || ...)`
+that follows the goto site, and 0x1062 is the last statement of the enclosing
+`if (gbColorMice != 0) { if (force != 0 || ...) { ... } }` — neither label is at
+function scope. `goto resetBounds;` (source #1, stub 0x1089) and
+`goto finishUpdate;` (source #2, stub 0x1087) closed it: 83.73% -> EXACT. The
+same function's two `je <0x106e>` transfers stay DIRECT, so those two conditions
+are ordinary nested `if`s, not gotos (`direct-jcc-vs-goto-stub`).
