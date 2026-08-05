@@ -46,6 +46,12 @@ appendix; it is not the matching priority.
   2.1 negative no-overlap branch, direct `sourceX` mutation, and repeated mouse
   field reads restore retail size and all 24 relocations; forest/top trial 3
   then closes the remaining two clean-state bytes exactly.
+- Two bounded negatives constrain further BASE work. PoL's
+  `FillBitmapAreaClip` really owns an inlined fill loop rather than the 2.1
+  helper call, and 408 relational/state cells could not move its four-byte
+  residual. `PrintMemoryLeaks` also requires the inlined logging body: the
+  direct 2.1 call is structurally contradictory, while an explicit inline
+  helper compiles identically to the retained open body in all 51 states.
 - The Buka comparison also distinguishes reconstruction bugs from bugs in PoL
   itself. For example, PoL retail really tests Bless twice in
   `army::DamageEnemy`; Buka changes the second test to Curse. The PoL bug must
