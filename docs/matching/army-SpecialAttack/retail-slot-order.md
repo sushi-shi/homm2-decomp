@@ -1,4 +1,4 @@
-# `army::SpecialAttack` (RVA 0x0001a1d9, 0x165f) — retail frame evidence
+# `army::SpecialAttack` (RVA 0x0001a1d9, 0x165f) — closed EXACT
 
 The instruction stream is byte-identical to ours modulo `-0xN(%ebp)`
 displacements. A 1:1 alignment of the two delinked/compiled objects over the
@@ -78,45 +78,56 @@ None of the 50 carries an initializer (the prologue's only stores are the `this`
 spill and `damage = 0; killed = 0;`), so declaration order is a free tie-break:
 the only constraint is that `bucket(name)` be NON-DECREASING down this list.
 
-## Why it is left open — now with a measured bound
+## How it closed
 
-Our current names are the obvious English role names. Their bucket sequence has
-**23 drops**, and its **longest non-decreasing subsequence is 15 of 50**. That
-is a hard bound, not a search result: *any* layout-correct naming must respell
-at least 35 of the 50 locals.
+Our names were the obvious English role names; their bucket sequence has 23
+drops and its longest non-decreasing subsequence is 15 of 50, so at least 35 had
+to be respelled.  A curated ~12-per-role vocabulary is INFEASIBLE (dies at
+`effectType`).  What worked is in
+`docs/patterns/pair-linked-bucket-chain-solve.md`: a compositional vocabulary,
+pair-LINKED stems (sixteen of the fifty are coordinate pairs whose two members
+sit up to 46 positions apart), and a beam with **per-floor quotas** so a cheap
+prefix cannot strand a wide-spread pair commitment.  Feasibility was settled
+first, with no cost function at all: filtered to `pen <= 2` candidates the walk
+reaches position 50, so a readable solution provably exists.
 
-A generated vocabulary (stem synonyms crossed with the codebase's own
-`i`/`n`/`b`/`p`/`f` prefixes and `Pos`/`Coord`/`Index`/`Num` decorations,
-~40 candidates per role) puts a hard floor on how idiomatic the result can be:
+The landed set keeps eleven roles' natural names and needs no stretched
+spelling.  Notable recoveries: `targetX`/`targetY` are `xCentre`/`yCentre`
+(they come from `target->MidX()`/`MidY()`), `sourceX`/`sourceY` are
+`anchorX`/`anchorY`, `missileHalfWidth`/`Height` are `arrowHalfW`/`arrowHalfH`,
+`minX`/`minY` are `clipLeft`/`clipTop`, and the loop counter reused by three
+loops is `k`.
 
-| naturalness budget | outcome |
-| :-- | :-- |
-| pen 0-1 only (name or its first-choice synonym) | **INFEASIBLE**, dies at role 7 (`oldY`) |
-| pen 0-2 (adds abbreviations, prefixes, `Pos` suffixes) | **INFEASIBLE**, dies at role 19 (`endX`) |
-| pen 0-3 (adds stretches) | feasible; optimum keeps **8** natural names, needs 13 pen-1, 23 pen-2 and 6 pen-3 |
+Declaration order is the reverse of the slot order **within each equal-bucket
+run**; across runs it is free, so the source lists the runs in ascending bucket
+order, which keeps `castX`/`castY`, `gainX`/`gainY` and `inFlightX`/`inFlightY`
+adjacent.
 
-The cheapest feasible arm reads `iTargetPosX`, `sourceYPos`, `myPosColumn`,
-`iTotalSteps`, `bMirror`, `pow` (for `effectType`), `iXDist`, `endPosX`,
-`fTangent`, `nMissileHalfWidth`, `pSaveBitmap`, `clipLeft`/`clipTop` beside
-`maxX`/`maxY`, `launchX` beside `iMissileY`, `fullYDistance`, `iOriginalAttack`,
-`fAngle` and `iMyX` — and breaks essentially every X/Y pair in a function whose
-whole subject is paired coordinates.
+## The frame was masking two source facts
 
-Under the project's rule that a clean 99.9 beats a contorted 100, that arm is
-not landed. The `_NN` suffixes a previous lane had introduced WERE removed (they
-are the same contortion in a more obvious form); that alone moved the function
-from 99.76% to 99.78% and restored readable source.
+With all 50 slots finally identical, a raw byte compare (masking only bytes a
+relocation covers on either side) left three differing bytes, both real:
 
-If the real 2.1 local names ever surface, the table above is the whole
-specification: assign them in this order, check `bucket()` is non-decreasing,
-and pick any declaration order that puts later-slotted names earlier within each
-equal-bucket run.
+```
+0x0961  target  jmp <body 0xefa>          |  ours  jmp <body 0xf55>
+0x10b4  target  movl -0x3f4(%ebp), %eax   |  ours  movl -0x3a0(%ebp), %eax
+0x10ba  target  cmpl -0x3a0(%ebp), %eax   |  ours  cmpl -0x3f4(%ebp), %eax
+```
+
+- the mage/bolt arm's `jmp` lands **inside** the ammo-cart block (body 0xefa),
+  not past it: `m_monster.shots--` sits AFTER the mage/missile `if`/`else` and
+  is common to both arms, so a mage also spends a shot;
+- the lich splash identity test loads the victim first:
+  `splashTarget != pEnemy`, not `pEnemy != splashTarget`.
+
+Both were invisible while the permutation was live.  Order matters: **solve the
+frame first, then re-diff.**
 
 ## Reproduce
 
 ```sh
-homm2 sema frames SOURCE/ARMY SpecialAttack                  # our 52 names
+homm2 sema frames SOURCE/ARMY SpecialAttack
 python3 build/scratch-m4/sm4.py  SOURCE/ARMY '?SpecialAttack@army@@QAEXXZ' 0x165f
-python3 build/scratch-m4/sxs.py  SOURCE/ARMY '?SpecialAttack@army@@QAEXXZ' 0x165f
-python3 build/scratch-m4/solve_sa6.py 2                      # vocabulary DP
+python3 build/scratch-m4/sa_run.py 4 60000 0.0 1
+python3 build/scratch-m4/sa_apply.py build/scratch-m4/sa_map5.txt
 ```
