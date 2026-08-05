@@ -29,10 +29,12 @@ Consequences that matter when solving a frame:
   cheapest way to reproduce a retail permutation: read retail's slot order off
   the delinked object, then declare in the reverse of it.
 
-## The layout has four regions, in this order
+## The layout has five regions, in this order
 
     [ function-scope named locals ]     bucket-sorted, as above
     [ inner-block named locals    ]     one group, in block source order
+    [ front-end expression temps  ]     dword-granular, body order
+    [ inline-expansion slots      ]     one set per /Ob1 call site, body order
     [ this / __fastcall spill     ]
     [ back-end temps              ]     byte-granular for `char`
 
@@ -40,9 +42,12 @@ Block-scope locals really do slot after **all** function-scope locals (VC6
 confirms the 4.2 rule) — a `{ char c; ... }` inside a `case` lands right below
 the largest function-scope array, before the temps.
 
-**Open residual.** In retail's `DoEvent` the three CP1251 fold variables and the
-seven front-end `abs()`/`?:` temps INTERLEAVE in that band
-(`T,T,T,CHAR,T,T,T,T,CHAR,CHAR`); no source arrangement reachable from block
-scope or bucket order reproduces the interleave, which keeps 34 bytes of that
-function unmatched. The rule that orders front-end temps against block-scope
-locals is not yet known.
+`od_slots` covers only the first two regions. Nothing in the last three is
+reachable by renaming: they are ordered by *when the front end created them*,
+so the source lever there is structural (whether a value is an inline callee's
+local or a caller's named local), never a name hash. See
+`inline-expansion-slots-after-expression-temps.md`, which resolves what used to
+be recorded here as an open residual: `DoEvent`'s three CP1251 fold variables
+interleave with its seven expression/expansion slots because they are inlined
+callees' locals, and the two front-end passes run in sequence. Spelling the
+folds as one file-static `inline` closed `DoEvent` exactly (0/24521 bytes).
